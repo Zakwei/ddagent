@@ -14,6 +14,7 @@ import 'package:ddagent_app/features/sessions/view/provider_logo.dart';
 import 'package:ddagent_app/features/settings/state/provider_auth_controller.dart';
 import 'package:ddagent_app/features/terminal/view/provider_login_dialog.dart';
 import 'package:ddagent_app/features/user/data/user_repository.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -68,13 +69,14 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       _emailPattern.hasMatch(_email.text.trim());
 
   Future<void> _next() async {
+    final i18n = Translations.of(context);
     setState(() => _error = null);
     if (_step == 0) {
       if (!_step0Valid) {
         setState(
           () => _error = _email.text.trim().isEmpty || _name.text.trim().isEmpty
-              ? 'Both git name and email are required.'
-              : 'Please enter a valid email address.',
+              ? i18n.onboarding.errors.nameAndEmailRequired
+              : i18n.onboarding.errors.invalidEmail,
         );
         return;
       }
@@ -117,6 +119,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context);
+    final i18n = Translations.of(context);
     final c = context.appColors;
     return Scaffold(
       body: Center(
@@ -146,16 +149,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   if (_step == 0) ...[
-                    Text('Git configuration', style: t.textTheme.titleLarge),
+                    Text(i18n.settings.git.title, style: t.textTheme.titleLarge),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
-                      'Used for commits created by ddagent sessions.',
+                      i18n.onboarding.gitHint,
                       style: t.textTheme.bodyMedium?.copyWith(color: c.mutedForeground),
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     AppInput(
                       controller: _name,
-                      hint: 'Name',
+                      hint: i18n.settings.git.name.label,
                       autofocus: true,
                       onChanged: (_) => setState(() {}),
                       onSubmitted: (_) => _next(),
@@ -163,7 +166,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     const SizedBox(height: AppSpacing.md),
                     AppInput(
                       controller: _email,
-                      hint: 'Email',
+                      hint: i18n.settings.git.email.label,
                       keyboardType: TextInputType.emailAddress,
                       onChanged: (_) => setState(() {}),
                       onSubmitted: (_) => _next(),
@@ -183,7 +186,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       AppButton(
                         variant: AppButtonVariant.ghost,
                         onPressed: _step == 0 || _busy ? null : () => setState(() => _step--),
-                        child: const Text('Previous'),
+                        child: Text(i18n.common.navigation.previous),
                       ),
                       const Spacer(),
                       AppButton(
@@ -193,7 +196,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                             ? (_step0Valid && !_busy ? _next : null)
                             : (_busy ? null : _next),
                         loading: _busy,
-                        child: Text(_step == 2 ? 'Complete Setup' : 'Next'),
+                        child: Text(
+                          _step == 2 ? i18n.onboarding.completeSetup : i18n.common.navigation.next,
+                        ),
                       ),
                     ],
                   ),
@@ -220,6 +225,7 @@ class _McpInstallStepState extends ConsumerState<_McpInstallStep> {
   bool _busy = false;
 
   Future<void> _install({required List<String>? providers}) async {
+    final i18n = Translations.of(context);
     setState(() => _busy = true);
     try {
       final results = await ref.read(mcpRepositoryProvider).installDdagent(providers: providers);
@@ -229,9 +235,17 @@ class _McpInstallStepState extends ConsumerState<_McpInstallStep> {
       AppToast.show(
         context,
         failed.isEmpty
-            ? 'Installed on $ok agent(s).'
-            : 'Installed on $ok; failed: '
-                  '${failed.map((f) => '${mcpProviderName(f.provider)} (${f.error ?? 'error'})').join(', ')}',
+            ? i18n.onboarding.mcp.installedOn(count: ok)
+            : i18n.onboarding.mcp.installedWithFailures(
+                installedCount: ok,
+                failed: failed
+                    .map(
+                      (f) =>
+                          '${mcpProviderName(f.provider)} '
+                          '(${f.error ?? i18n.common.status.error})',
+                    )
+                    .join(', '),
+              ),
         isError: failed.isNotEmpty,
       );
     } on AppError catch (e) {
@@ -244,19 +258,15 @@ class _McpInstallStepState extends ConsumerState<_McpInstallStep> {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context);
+    final i18n = Translations.of(context);
     final c = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          'Connect agents to ddagent',
-          style: t.textTheme.titleLarge,
-          textAlign: TextAlign.center,
-        ),
+        Text(i18n.onboarding.mcp.title, style: t.textTheme.titleLarge, textAlign: TextAlign.center),
         const SizedBox(height: AppSpacing.sm),
         Text(
-          'Install the ddagent MCP server so your agents can use the knowledge base '
-          'and ddagent tools. Pick agents, or install for all.',
+          i18n.onboarding.mcp.description,
           style: t.textTheme.bodyMedium?.copyWith(color: c.mutedForeground),
           textAlign: TextAlign.center,
         ),
@@ -291,7 +301,7 @@ class _McpInstallStepState extends ConsumerState<_McpInstallStep> {
                 onPressed: _busy || _selected.isEmpty
                     ? null
                     : () => _install(providers: _selected.toList()),
-                child: const Text('Install selected'),
+                child: Text(i18n.onboarding.mcp.installSelected),
               ),
             ),
             const SizedBox(width: AppSpacing.sm),
@@ -299,14 +309,14 @@ class _McpInstallStepState extends ConsumerState<_McpInstallStep> {
               child: AppButton(
                 onPressed: _busy ? null : () => _install(providers: null),
                 loading: _busy,
-                child: const Text('Install for all'),
+                child: Text(i18n.onboarding.mcp.installForAll),
               ),
             ),
           ],
         ),
         const SizedBox(height: AppSpacing.md),
         Text(
-          'Optional — you can also install this later in Settings → MCP.',
+          i18n.onboarding.mcp.laterHint,
           style: t.textTheme.bodySmall?.copyWith(color: c.mutedForeground),
           textAlign: TextAlign.center,
         ),
@@ -333,14 +343,19 @@ class _AgentConnectionsStep extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context);
+    final i18n = Translations.of(context);
     final c = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('Connect Your AI Agents', style: t.textTheme.titleLarge, textAlign: TextAlign.center),
+        Text(
+          i18n.onboarding.agents.title,
+          style: t.textTheme.titleLarge,
+          textAlign: TextAlign.center,
+        ),
         const SizedBox(height: AppSpacing.sm),
         Text(
-          'Login to one or more AI coding assistants. All are optional.',
+          i18n.onboarding.agents.description,
           style: t.textTheme.bodyMedium?.copyWith(color: c.mutedForeground),
           textAlign: TextAlign.center,
         ),
@@ -359,7 +374,7 @@ class _AgentConnectionsStep extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.md),
         Text(
-          'You can configure these later in Settings.',
+          i18n.onboarding.agents.laterHint,
           style: t.textTheme.bodySmall?.copyWith(color: c.mutedForeground),
           textAlign: TextAlign.center,
         ),
@@ -385,16 +400,17 @@ class _AgentConnectionCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final i18n = Translations.of(context);
     final c = context.appColors;
     final status = ref.watch(providerAuthStatusProvider(provider));
     final s = status.value;
     final loading = status.isLoading;
     final connected = s?.authenticated ?? false;
     final statusText = loading
-        ? 'Checking...'
+        ? i18n.settings.agents.authStatus.checking
         : connected
-        ? (s!.email ?? 'Connected')
-        : (s?.error ?? 'Not connected');
+        ? (s!.email ?? i18n.settings.agents.authStatus.connected)
+        : (s?.error ?? i18n.settings.agents.authStatus.notConnected);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -462,7 +478,9 @@ class _AgentConnectionCard extends ConsumerWidget {
                     if (!context.mounted) return;
                     AppToast.show(
                       context,
-                      exitCode == 0 ? 'Connected' : 'Not connected',
+                      exitCode == 0
+                          ? i18n.settings.agents.authStatus.connected
+                          : i18n.settings.agents.authStatus.notConnected,
                       isError: exitCode != 0,
                     );
                   },
@@ -475,7 +493,7 @@ class _AgentConnectionCard extends ConsumerWidget {
                 minimumSize: Size.zero,
                 textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
               ),
-              child: const Text('Login'),
+              child: Text(i18n.settings.agents.login.title),
             ),
         ],
       ),

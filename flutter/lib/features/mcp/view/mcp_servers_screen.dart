@@ -160,7 +160,7 @@ class McpServersPane extends ConsumerWidget {
     final tt = Theme.of(context).textTheme;
     final state = ref.watch(mcpServersProvider(provider));
     final providerName = mcpProviderName(provider);
-    final providerLabel = 'Add $providerName MCP Server';
+    final providerLabel = t.mcp.servers.addProviderTitle(provider: providerName);
     final error = state.deleteError ?? state.loadError;
 
     return Column(
@@ -206,7 +206,7 @@ class McpServersPane extends ConsumerWidget {
           height: AppSpacing.lg,
           child: state.isLoadingProjectScopes
               ? Text(
-                  'Refreshing project scopes...',
+                  t.mcp.servers.refreshingScopes,
                   style: tt.bodySmall?.copyWith(color: c.mutedForeground),
                 )
               : null,
@@ -231,7 +231,7 @@ class McpServersPane extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(vertical: AppSpacing.xxl),
             child: Center(
               child: Text(
-                'Loading MCP servers...',
+                t.mcp.servers.loading,
                 style: tt.bodyMedium?.copyWith(color: c.mutedForeground),
               ),
             ),
@@ -294,14 +294,13 @@ class McpServersPane extends ConsumerWidget {
     'codex' => t.settings.mcpServers.description.codex,
     'opencode' => t.settings.mcpServers.description.opencode,
     'devin' => t.settings.mcpServers.description.devin,
-    _ =>
-      'Model Context Protocol servers provide additional tools and data '
-          'sources to ${mcpProviderName(provider)}',
+    _ => t.mcp.servers.descriptionGeneric(provider: mcpProviderName(provider)),
   };
 
   Future<void> _openForm(BuildContext context, WidgetRef ref, {McpServer? editing}) async {
+    final t = Translations.of(context);
     final providerName = mcpProviderName(provider);
-    final label = 'Add $providerName MCP Server';
+    final label = t.mcp.servers.addProviderTitle(provider: providerName);
     final saved = await McpServerFormDialog.show(
       context,
       provider: provider,
@@ -312,28 +311,26 @@ class McpServersPane extends ConsumerWidget {
           ref.read(mcpServersProvider(provider).notifier).submit(payload, editing: editing),
     );
     if (saved && context.mounted) {
-      AppToast.show(context, Translations.of(context).settings.saveStatus.success);
+      AppToast.show(context, t.settings.saveStatus.success);
     }
   }
 
   Future<void> _openGlobalForm(BuildContext context, WidgetRef ref) async {
-    const label = 'Add Global MCP Server';
+    final t = Translations.of(context);
+    final label = t.mcp.servers.addGlobalTitle;
     final saved = await McpServerFormDialog.show(
       context,
       provider: provider,
       global: true,
       title: label,
-      description:
-          'Adds this MCP server to every provider: Claude, Cursor, Codex, '
-          'OpenCode, and Devin. Only stdio and HTTP transports are supported '
-          'because the same config must work across all providers.',
+      description: t.mcp.servers.addGlobalDescription,
       submitLabel: label,
       supportedScopes: kMcpGlobalScopes,
       supportedTransports: kMcpGlobalTransports,
       onSubmit: (payload) => ref.read(mcpServersProvider(provider).notifier).submitGlobal(payload),
     );
     if (saved && context.mounted) {
-      AppToast.show(context, Translations.of(context).settings.saveStatus.success);
+      AppToast.show(context, t.settings.saveStatus.success);
     }
   }
 
@@ -401,17 +398,15 @@ class _AddServerMenu extends StatelessWidget {
         _menuEntry(
           context,
           icon: LucideIcons.globe,
-          label: 'Add Global MCP Server',
-          description:
-              'Add Global MCP Server writes one common stdio or HTTP server '
-              'to Claude, Cursor, Codex, OpenCode, and Devin.',
+          label: t.mcp.servers.addGlobalTitle,
+          description: t.mcp.servers.addGlobalMenuDescription,
           onTap: onGlobal,
         ),
         _menuEntry(
           context,
           icon: LucideIcons.server,
-          label: 'Add $providerName MCP Server',
-          description: 'Add $providerName MCP Server only changes $providerName.',
+          label: t.mcp.servers.addProviderTitle(provider: providerName),
+          description: t.mcp.servers.addProviderDescription(provider: providerName),
           onTap: onProvider,
         ),
       ],
@@ -528,7 +523,7 @@ class _McpServerCard extends StatelessWidget {
                     label: t.settings.mcpServers.config.args,
                     value: server.args.join(' '),
                   ),
-                  _ConfigLine(label: 'Cwd', value: server.cwd),
+                  _ConfigLine(label: t.mcp.servers.config.cwd, value: server.cwd),
                   if (server.env.isNotEmpty)
                     _ConfigLine(
                       label: t.settings.mcpServers.config.environment,
@@ -537,7 +532,10 @@ class _McpServerCard extends StatelessWidget {
                           .join(', '),
                     ),
                   if (server.envVars.isNotEmpty)
-                    _ConfigLine(label: 'Env Vars', value: server.envVars.join(', ')),
+                    _ConfigLine(
+                      label: t.mcp.servers.config.envVars,
+                      value: server.envVars.join(', '),
+                    ),
                 ] else
                   Text(
                     t.settings.mcpServers.managed.hint,
@@ -647,6 +645,7 @@ class _TeamMcpCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     final c = context.appColors;
     final tt = Theme.of(context).textTheme;
     return Container(
@@ -678,7 +677,7 @@ class _TeamMcpCard extends StatelessWidget {
                   children: [
                     Flexible(
                       child: Text(
-                        'Team MCP Configs',
+                        t.mcp.team.title,
                         style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
                       ),
                     ),
@@ -692,8 +691,7 @@ class _TeamMcpCard extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpacing.xs),
                 Text(
-                  'Share MCP server configurations across your team. '
-                  'Everyone stays in sync automatically.',
+                  t.mcp.team.description,
                   style: tt.bodySmall?.copyWith(color: c.mutedForeground),
                 ),
                 const SizedBox(height: AppSpacing.md),
@@ -703,7 +701,7 @@ class _TeamMcpCard extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        'Available with ddagent Pro',
+                        t.mcp.team.cta,
                         style: tt.bodySmall?.copyWith(
                           color: c.primary,
                           fontWeight: FontWeight.w500,

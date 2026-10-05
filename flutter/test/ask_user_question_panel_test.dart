@@ -1,13 +1,16 @@
 import 'package:ddagent_app/core/theme/app_theme.dart';
 import 'package:ddagent_app/features/chat/view/tool_blocks.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-Widget _wrap(Widget child) => ProviderScope(
-  child: MaterialApp(
-    theme: AppTheme.dark(),
-    home: Scaffold(body: SingleChildScrollView(child: child)),
+Widget _wrap(Widget child) => TranslationProvider(
+  child: ProviderScope(
+    child: MaterialApp(
+      theme: AppTheme.dark(),
+      home: Scaffold(body: SingleChildScrollView(child: child)),
+    ),
   ),
 );
 

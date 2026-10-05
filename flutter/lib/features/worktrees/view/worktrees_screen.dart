@@ -9,6 +9,7 @@ import 'package:ddagent_app/features/projects/data/projects_repository.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/worktrees/data/worktrees_models.dart';
 import 'package:ddagent_app/features/worktrees/state/worktrees_controller.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -51,6 +52,7 @@ class _WorktreesScreenState extends ConsumerState<WorktreesScreen> {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
     final compact = context.breakpoint.isCompact;
+    final i18n = Translations.of(context);
 
     final selectedProject = projects.cast<Project?>().firstWhere(
       (p) => p?.projectId == state.projectId,
@@ -75,7 +77,7 @@ class _WorktreesScreenState extends ConsumerState<WorktreesScreen> {
                   children: [
                     Icon(Icons.fork_right, size: 20, color: c.mutedForeground),
                     const SizedBox(width: AppSpacing.xs),
-                    Text('Worktrees', style: t.titleSmall),
+                    Text(i18n.common.gitPanel.tabs.worktrees, style: t.titleSmall),
                     const SizedBox(width: AppSpacing.md),
                     // Project selector
                     if (projects.isNotEmpty)
@@ -119,7 +121,7 @@ class _WorktreesScreenState extends ConsumerState<WorktreesScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           const Icon(Icons.code, size: 16),
-                          if (!compact) ...[const SizedBox(width: 4), const Text('Scripts')],
+                          if (!compact) ...[const SizedBox(width: 4), Text(i18n.worktrees.scripts)],
                         ],
                       ),
                     ),
@@ -138,7 +140,10 @@ class _WorktreesScreenState extends ConsumerState<WorktreesScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           const Icon(Icons.add, size: 16),
-                          if (!compact) ...[const SizedBox(width: 4), const Text('New worktree')],
+                          if (!compact) ...[
+                            const SizedBox(width: 4),
+                            Text(i18n.common.gitPanel.worktrees.kNew),
+                          ],
                         ],
                       ),
                     ),
@@ -176,10 +181,10 @@ class _WorktreesScreenState extends ConsumerState<WorktreesScreen> {
                         children: [
                           Icon(Icons.fork_right, size: 48, color: c.mutedForeground),
                           const SizedBox(height: AppSpacing.sm),
-                          Text('No worktrees found', style: t.titleMedium),
+                          Text(i18n.worktrees.emptyTitle, style: t.titleMedium),
                           const SizedBox(height: AppSpacing.xs),
                           Text(
-                            'Create a worktree to isolate feature work or agent runs.',
+                            i18n.worktrees.emptyDescription,
                             style: t.bodySmall?.copyWith(color: c.mutedForeground),
                           ),
                           const SizedBox(height: AppSpacing.md),
@@ -190,7 +195,7 @@ class _WorktreesScreenState extends ConsumerState<WorktreesScreen> {
                               onCreate: (branch, baseBranch) =>
                                   ctrl.createWorktree(branch, baseBranch: baseBranch),
                             ),
-                            child: const Text('Create your first worktree'),
+                            child: Text(i18n.common.gitPanel.worktrees.createFirst),
                           ),
                         ],
                       ),
@@ -211,7 +216,10 @@ class _WorktreesScreenState extends ConsumerState<WorktreesScreen> {
                           onOpen: () async {
                             final proj = await ctrl.openWorktree(item.path);
                             if (context.mounted && proj != null) {
-                              AppToast.show(context, 'Opened worktree: ${item.branch}');
+                              AppToast.show(
+                                context,
+                                i18n.worktrees.opened(branch: item.branch ?? ''),
+                              );
                             }
                           },
                           onMerge: () => _MergeWorktreeDialog.show(
@@ -282,13 +290,14 @@ class _WorktreeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
 
     final isMain = worktree.isMain;
     final branchName =
         worktree.branch ??
         (worktree.isDetached
-            ? 'HEAD detached at ${worktree.headSha?.substring(0, 7) ?? 'unknown'}'
-            : 'detached');
+            ? i18n.worktrees.headDetachedAt(sha: worktree.headSha?.substring(0, 7) ?? 'unknown')
+            : i18n.common.gitPanel.worktrees.detached);
 
     final runStatus = runtime?.run.status ?? 'idle';
     final isRunRunning = runStatus == 'running';
@@ -323,14 +332,17 @@ class _WorktreeCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    if (isMain) ...[const SizedBox(width: 6), _badge(context, 'main', c.primary)],
+                    if (isMain) ...[
+                      const SizedBox(width: 6),
+                      _badge(context, i18n.worktrees.mainBadge, c.primary),
+                    ],
                     if (worktree.isCurrent) ...[
                       const SizedBox(width: 6),
-                      _badge(context, 'current', c.accent),
+                      _badge(context, i18n.common.gitPanel.branches.current, c.accent),
                     ],
                     if (worktree.isLocked) ...[
                       const SizedBox(width: 6),
-                      _badge(context, 'locked', c.destructive),
+                      _badge(context, i18n.common.gitPanel.worktrees.locked, c.destructive),
                     ],
                   ],
                 ),
@@ -346,14 +358,14 @@ class _WorktreeCard extends StatelessWidget {
                   variant: AppButtonVariant.ghost,
                   size: AppButtonSize.sm,
                   onPressed: onOpen,
-                  child: const Text('Open'),
+                  child: Text(i18n.common.gitPanel.worktrees.open),
                 ),
                 if (!isMain) ...[
                   AppButton(
                     variant: AppButtonVariant.ghost,
                     size: AppButtonSize.sm,
                     onPressed: onMerge,
-                    child: const Text('Merge'),
+                    child: Text(i18n.common.gitPanel.mergeWorktree.merge),
                   ),
                   AppButton(
                     variant: AppButtonVariant.ghost,
@@ -379,7 +391,11 @@ class _WorktreeCard extends StatelessWidget {
                 style: t.labelSmall?.copyWith(fontFamily: 'monospace', color: c.mutedForeground),
               ),
               if (worktree.changedFileCount > 0)
-                _badge(context, '${worktree.changedFileCount} changes', Colors.amber),
+                _badge(
+                  context,
+                  i18n.common.gitPanel.worktrees.changes(count: worktree.changedFileCount),
+                  Colors.amber,
+                ),
               if (worktree.ahead > 0 || worktree.behind > 0)
                 Text(
                   '${worktree.ahead}↑ ${worktree.behind}↓',
@@ -415,7 +431,7 @@ class _WorktreeCard extends StatelessWidget {
                     children: [
                       // Setup script status
                       if (runtime!.setup.status != 'idle') ...[
-                        Text('Setup: ', style: t.labelSmall),
+                        Text(i18n.worktrees.setupLabel, style: t.labelSmall),
                         _badge(
                           context,
                           runtime!.setup.status,
@@ -429,7 +445,7 @@ class _WorktreeCard extends StatelessWidget {
                       ],
 
                       // Run script status
-                      Text('Server: ', style: t.labelSmall),
+                      Text(i18n.worktrees.serverLabel, style: t.labelSmall),
                       Container(
                         width: 6,
                         height: 6,
@@ -441,7 +457,9 @@ class _WorktreeCard extends StatelessWidget {
                       const SizedBox(width: 4),
                       Text(
                         isRunRunning
-                            ? 'running${runtime!.run.port != null ? ' :${runtime!.run.port}' : ''}'
+                            ? (runtime!.run.port != null
+                                  ? i18n.worktrees.runRunningWithPort(port: runtime!.run.port!)
+                                  : i18n.worktrees.runRunning)
                             : runStatus,
                         style: t.labelSmall?.copyWith(
                           color: isRunRunning ? Colors.green : c.mutedForeground,
@@ -453,7 +471,9 @@ class _WorktreeCard extends StatelessWidget {
                     variant: AppButtonVariant.ghost,
                     size: AppButtonSize.sm,
                     onPressed: isRunRunning ? onStopScript : onRunScript,
-                    child: Text(isRunRunning ? 'Stop' : 'Run'),
+                    child: Text(
+                      isRunRunning ? i18n.worktrees.stopButton : i18n.worktrees.runButton,
+                    ),
                   ),
                 ],
               ),
@@ -510,6 +530,7 @@ class _NewWorktreeDialogState extends State<_NewWorktreeDialog> {
   }
 
   Future<void> _submit() async {
+    final i18n = Translations.of(context);
     final branch = _branchCtrl.text.trim();
     if (branch.isEmpty || _saving) return;
 
@@ -519,14 +540,15 @@ class _NewWorktreeDialogState extends State<_NewWorktreeDialog> {
     setState(() => _saving = false);
     if (res != null) {
       Navigator.of(context).pop();
-      AppToast.show(context, 'Worktree created');
+      AppToast.show(context, i18n.worktrees.created);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final i18n = Translations.of(context);
     return AlertDialog(
-      title: const Text('New worktree'),
+      title: Text(i18n.common.gitPanel.worktrees.kNew),
       content: SizedBox(
         width: 380,
         child: Column(
@@ -535,13 +557,13 @@ class _NewWorktreeDialogState extends State<_NewWorktreeDialog> {
           children: [
             AppInput(
               controller: _branchCtrl,
-              hint: 'New branch name (e.g. feature/login)',
+              hint: i18n.worktrees.branchHint,
               onChanged: (_) => setState(() {}),
             ),
             if (widget.baseBranch != null) ...[
               const SizedBox(height: AppSpacing.xs),
               Text(
-                'Branching off ${widget.baseBranch}',
+                i18n.worktrees.branchingOff(branch: widget.baseBranch!),
                 style: Theme.of(context).textTheme.bodySmall
                     ?.copyWith(color: context.appColors.mutedForeground),
               ),
@@ -554,13 +576,13 @@ class _NewWorktreeDialogState extends State<_NewWorktreeDialog> {
           variant: AppButtonVariant.ghost,
           size: AppButtonSize.sm,
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(i18n.chat.orchestrator.summary.cancelTasks),
         ),
         AppButton(
           size: AppButtonSize.sm,
           loading: _saving,
           onPressed: _branchCtrl.text.trim().isNotEmpty ? _submit : null,
-          child: const Text('Create'),
+          child: Text(i18n.common.buttons.create),
         ),
       ],
     );
@@ -611,7 +633,9 @@ class _MergeWorktreeDialogState extends State<_MergeWorktreeDialog> {
   void initState() {
     super.initState();
     _msgCtrl = TextEditingController(
-      text: "Merge branch '${widget.worktree.branch ?? 'worktree'}'",
+      text: t.common.gitPanel.mergeWorktree.mergeMessage(
+        branch: widget.worktree.branch ?? 'worktree',
+      ),
     );
   }
 
@@ -622,6 +646,7 @@ class _MergeWorktreeDialogState extends State<_MergeWorktreeDialog> {
   }
 
   Future<void> _submit() async {
+    final i18n = Translations.of(context);
     setState(() => _merging = true);
     final res = await widget.onMerge(
       _squash,
@@ -632,7 +657,7 @@ class _MergeWorktreeDialogState extends State<_MergeWorktreeDialog> {
     setState(() => _merging = false);
     if (res != null) {
       Navigator.of(context).pop();
-      AppToast.show(context, 'Worktree merged into ${res.targetBranch}');
+      AppToast.show(context, i18n.worktrees.merged(branch: res.targetBranch));
     }
   }
 
@@ -640,9 +665,10 @@ class _MergeWorktreeDialogState extends State<_MergeWorktreeDialog> {
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
     final c = context.appColors;
+    final i18n = Translations.of(context);
 
     return AlertDialog(
-      title: Text('Merge ${widget.worktree.branch ?? 'worktree'}'),
+      title: Text(i18n.worktrees.mergeTitle(branch: widget.worktree.branch ?? 'worktree')),
       content: SizedBox(
         width: 400,
         child: Column(
@@ -650,7 +676,7 @@ class _MergeWorktreeDialogState extends State<_MergeWorktreeDialog> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Merge changes into ${widget.baseBranch ?? 'base branch'}.',
+              i18n.worktrees.mergeDescription(branch: widget.baseBranch ?? 'base branch'),
               style: t.bodyMedium?.copyWith(color: c.mutedForeground),
             ),
             const SizedBox(height: AppSpacing.sm),
@@ -658,30 +684,34 @@ class _MergeWorktreeDialogState extends State<_MergeWorktreeDialog> {
               dense: true,
               contentPadding: EdgeInsets.zero,
               controlAffinity: ListTileControlAffinity.leading,
-              title: const Text('Squash commits'),
-              subtitle: const Text('Combine all commits into a single commit'),
+              title: Text(i18n.common.gitPanel.mergeWorktree.squashLabel),
+              subtitle: Text(i18n.worktrees.squashDescription),
               value: _squash,
               onChanged: (v) {
                 setState(() {
                   _squash = v ?? false;
                   _msgCtrl.text = _squash
-                      ? "Squash merge branch '${widget.worktree.branch ?? 'worktree'}'"
-                      : "Merge branch '${widget.worktree.branch ?? 'worktree'}'";
+                      ? i18n.common.gitPanel.mergeWorktree.squashMessage(
+                          branch: widget.worktree.branch ?? 'worktree',
+                        )
+                      : i18n.common.gitPanel.mergeWorktree.mergeMessage(
+                          branch: widget.worktree.branch ?? 'worktree',
+                        );
                 });
               },
             ),
             const SizedBox(height: AppSpacing.xs),
             AppInput(
               controller: _msgCtrl,
-              hint: 'Commit message',
+              hint: i18n.common.gitPanel.mergeWorktree.messageLabel,
               onChanged: (_) => setState(() {}),
             ),
             CheckboxListTile(
               dense: true,
               contentPadding: EdgeInsets.zero,
               controlAffinity: ListTileControlAffinity.leading,
-              title: const Text('Clean up after merge'),
-              subtitle: const Text('Remove worktree and delete branch once merged'),
+              title: Text(i18n.common.gitPanel.mergeWorktree.cleanupLabel),
+              subtitle: Text(i18n.worktrees.cleanupDescription),
               value: _cleanup,
               onChanged: (v) => setState(() => _cleanup = v ?? false),
             ),
@@ -693,13 +723,17 @@ class _MergeWorktreeDialogState extends State<_MergeWorktreeDialog> {
           variant: AppButtonVariant.ghost,
           size: AppButtonSize.sm,
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(i18n.chat.orchestrator.summary.cancelTasks),
         ),
         AppButton(
           size: AppButtonSize.sm,
           loading: _merging,
           onPressed: _submit,
-          child: Text(_squash ? 'Squash & Merge' : 'Merge'),
+          child: Text(
+            _squash
+                ? i18n.common.gitPanel.mergeWorktree.squashMerge
+                : i18n.common.gitPanel.mergeWorktree.merge,
+          ),
         ),
       ],
     );
@@ -733,13 +767,14 @@ class _RemoveWorktreeDialogState extends State<_RemoveWorktreeDialog> {
   bool _removing = false;
 
   Future<void> _submit() async {
+    final i18n = Translations.of(context);
     setState(() => _removing = true);
     final res = await widget.onRemove(_force, _deleteBranch);
     if (!mounted) return;
     setState(() => _removing = false);
     if (res != null) {
       Navigator.of(context).pop();
-      AppToast.show(context, 'Worktree removed');
+      AppToast.show(context, i18n.worktrees.removed);
     }
   }
 
@@ -747,10 +782,11 @@ class _RemoveWorktreeDialogState extends State<_RemoveWorktreeDialog> {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     final isDirty = widget.worktree.changedFileCount > 0;
 
     return AlertDialog(
-      title: Text('Remove worktree ${widget.worktree.branch ?? ''}?'),
+      title: Text(i18n.worktrees.removeTitle(branch: widget.worktree.branch ?? '')),
       content: SizedBox(
         width: 380,
         child: Column(
@@ -758,7 +794,7 @@ class _RemoveWorktreeDialogState extends State<_RemoveWorktreeDialog> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'This deletes the worktree folder. Linked projects will be archived.',
+              i18n.worktrees.removeDescription,
               style: t.bodySmall?.copyWith(color: c.mutedForeground),
             ),
             if (isDirty) ...[
@@ -770,7 +806,7 @@ class _RemoveWorktreeDialogState extends State<_RemoveWorktreeDialog> {
                   borderRadius: AppRadii.borderSm,
                 ),
                 child: Text(
-                  'Warning: This worktree has ${widget.worktree.changedFileCount} uncommitted changes that will be lost.',
+                  i18n.worktrees.dirtyWarning(count: widget.worktree.changedFileCount),
                   style: t.bodySmall?.copyWith(color: c.destructive),
                 ),
               ),
@@ -778,7 +814,7 @@ class _RemoveWorktreeDialogState extends State<_RemoveWorktreeDialog> {
                 dense: true,
                 contentPadding: EdgeInsets.zero,
                 controlAffinity: ListTileControlAffinity.leading,
-                title: const Text('Force remove (discard changes)'),
+                title: Text(i18n.worktrees.forceRemoveLabel),
                 value: _force,
                 onChanged: (v) => setState(() => _force = v ?? false),
               ),
@@ -787,7 +823,7 @@ class _RemoveWorktreeDialogState extends State<_RemoveWorktreeDialog> {
               dense: true,
               contentPadding: EdgeInsets.zero,
               controlAffinity: ListTileControlAffinity.leading,
-              title: const Text('Delete branch as well'),
+              title: Text(i18n.worktrees.deleteBranchLabel),
               value: _deleteBranch,
               onChanged: (v) => setState(() => _deleteBranch = v ?? false),
             ),
@@ -799,14 +835,14 @@ class _RemoveWorktreeDialogState extends State<_RemoveWorktreeDialog> {
           variant: AppButtonVariant.ghost,
           size: AppButtonSize.sm,
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(i18n.chat.orchestrator.summary.cancelTasks),
         ),
         AppButton(
           variant: AppButtonVariant.destructive,
           size: AppButtonSize.sm,
           loading: _removing,
           onPressed: (!isDirty || _force) ? _submit : null,
-          child: const Text('Remove'),
+          child: Text(i18n.common.gitPanel.remove),
         ),
       ],
     );
@@ -857,6 +893,7 @@ class _WorktreeScriptsDialogState extends State<_WorktreeScriptsDialog> {
   }
 
   Future<void> _submit() async {
+    final i18n = Translations.of(context);
     setState(() => _saving = true);
     final port = int.tryParse(_portCtrl.text.trim());
     final ok = await widget.onSave(
@@ -868,25 +905,26 @@ class _WorktreeScriptsDialogState extends State<_WorktreeScriptsDialog> {
     setState(() => _saving = false);
     if (ok) {
       Navigator.of(context).pop();
-      AppToast.show(context, 'Scripts configuration saved');
+      AppToast.show(context, i18n.worktrees.scriptsSaved);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final i18n = Translations.of(context);
     return AlertDialog(
-      title: const Text('Worktree scripts'),
+      title: Text(i18n.common.gitPanel.worktreeScripts.title),
       content: SizedBox(
         width: 420,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AppInput(controller: _setupCtrl, hint: 'Setup command (e.g. npm install)'),
+            AppInput(controller: _setupCtrl, hint: i18n.worktrees.setupHint),
             const SizedBox(height: AppSpacing.sm),
-            AppInput(controller: _runCtrl, hint: 'Run command (e.g. npm run dev)'),
+            AppInput(controller: _runCtrl, hint: i18n.worktrees.runHint),
             const SizedBox(height: AppSpacing.sm),
-            AppInput(controller: _portCtrl, hint: 'Run port (optional, e.g. 3000)'),
+            AppInput(controller: _portCtrl, hint: i18n.worktrees.portHint),
           ],
         ),
       ),
@@ -895,13 +933,13 @@ class _WorktreeScriptsDialogState extends State<_WorktreeScriptsDialog> {
           variant: AppButtonVariant.ghost,
           size: AppButtonSize.sm,
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(i18n.chat.orchestrator.summary.cancelTasks),
         ),
         AppButton(
           size: AppButtonSize.sm,
           loading: _saving,
           onPressed: _submit,
-          child: const Text('Save'),
+          child: Text(i18n.codeEditor.actions.save),
         ),
       ],
     );

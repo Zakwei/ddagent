@@ -12,6 +12,7 @@ import 'package:ddagent_app/features/taskmaster/data/taskmaster_repository.dart'
 import 'package:ddagent_app/features/taskmaster/state/taskmaster_controller.dart';
 import 'package:ddagent_app/features/taskmaster/view/task_board.dart';
 import 'package:ddagent_app/features/taskmaster/view/taskmaster_screen.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -176,19 +177,21 @@ class _FakeRepo extends TaskmasterRepository {
   }
 }
 
-Widget _app(_FakeRepo repo, _FakeChatChannel channel) => ProviderScope(
-  overrides: [
-    taskmasterRepositoryProvider.overrideWithValue(repo),
-    chatChannelProvider.overrideWithValue(channel),
-    projectsProvider.overrideWith(
-      () => FakeProjectsController([
-        const Project(projectId: 'p1', path: '/workspace/p1', displayName: 'Project 1'),
-      ]),
+Widget _app(_FakeRepo repo, _FakeChatChannel channel) => TranslationProvider(
+  child: ProviderScope(
+    overrides: [
+      taskmasterRepositoryProvider.overrideWithValue(repo),
+      chatChannelProvider.overrideWithValue(channel),
+      projectsProvider.overrideWith(
+        () => FakeProjectsController([
+          const Project(projectId: 'p1', path: '/workspace/p1', displayName: 'Project 1'),
+        ]),
+      ),
+    ],
+    child: MaterialApp(
+      theme: AppTheme.light(),
+      home: const TaskmasterScreen(projectId: 'p1'),
     ),
-  ],
-  child: MaterialApp(
-    theme: AppTheme.light(),
-    home: const TaskmasterScreen(projectId: 'p1'),
   ),
 );
 

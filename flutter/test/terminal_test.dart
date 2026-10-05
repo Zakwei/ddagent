@@ -7,6 +7,7 @@ import 'package:ddagent_app/core/theme/app_theme.dart';
 import 'package:ddagent_app/features/terminal/state/terminal_state.dart';
 import 'package:ddagent_app/features/terminal/view/provider_login_dialog.dart';
 import 'package:ddagent_app/features/terminal/view/terminal_screen.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -408,11 +409,13 @@ void main() {
       addTearDown(container.dispose);
 
       await tester.pumpWidget(
-        UncontrolledProviderScope(
-          container: container,
-          child: MaterialApp(
-            theme: AppTheme.dark(),
-            home: const Scaffold(body: TerminalScreen(projectPath: '/test/proj')),
+        TranslationProvider(
+          child: UncontrolledProviderScope(
+            container: container,
+            child: MaterialApp(
+              theme: AppTheme.dark(),
+              home: const Scaffold(body: TerminalScreen(projectPath: '/test/proj')),
+            ),
           ),
         ),
       );
@@ -447,11 +450,13 @@ void main() {
       addTearDown(container.dispose);
 
       await tester.pumpWidget(
-        UncontrolledProviderScope(
-          container: container,
-          child: MaterialApp(
-            theme: AppTheme.dark(),
-            home: const Scaffold(body: TerminalScreen(projectPath: '/test/proj')),
+        TranslationProvider(
+          child: UncontrolledProviderScope(
+            container: container,
+            child: MaterialApp(
+              theme: AppTheme.dark(),
+              home: const Scaffold(body: TerminalScreen(projectPath: '/test/proj')),
+            ),
           ),
         ),
       );
@@ -460,11 +465,11 @@ void main() {
       await tester.pumpAndSettle();
       fakeWs.sent.clear();
 
-      await tester.tap(find.text('ESC'));
+      await tester.tap(find.text('Escape'));
       await tester.pump();
       expect(fakeWs.sent.last['data'], '\x1b');
 
-      await tester.tap(find.text('TAB'));
+      await tester.tap(find.text('Tab'));
       await tester.pump();
       expect(fakeWs.sent.last['data'], '\t');
 
@@ -487,11 +492,13 @@ void main() {
       addTearDown(container.dispose);
 
       await tester.pumpWidget(
-        UncontrolledProviderScope(
-          container: container,
-          child: MaterialApp(
-            theme: AppTheme.dark(),
-            home: const Scaffold(body: TerminalScreen(projectPath: '/test/proj')),
+        TranslationProvider(
+          child: UncontrolledProviderScope(
+            container: container,
+            child: MaterialApp(
+              theme: AppTheme.dark(),
+              home: const Scaffold(body: TerminalScreen(projectPath: '/test/proj')),
+            ),
           ),
         ),
       );
@@ -522,11 +529,13 @@ void main() {
       addTearDown(container.dispose);
 
       await tester.pumpWidget(
-        UncontrolledProviderScope(
-          container: container,
-          child: MaterialApp(
-            theme: AppTheme.dark(),
-            home: const Scaffold(body: TerminalScreen(projectPath: '/test/proj')),
+        TranslationProvider(
+          child: UncontrolledProviderScope(
+            container: container,
+            child: MaterialApp(
+              theme: AppTheme.dark(),
+              home: const Scaffold(body: TerminalScreen(projectPath: '/test/proj')),
+            ),
           ),
         ),
       );
@@ -602,12 +611,14 @@ void main() {
       addTearDown(container.dispose);
 
       await tester.pumpWidget(
-        UncontrolledProviderScope(
-          container: container,
-          child: MaterialApp(
-            theme: AppTheme.dark(),
-            home: Scaffold(
-              body: ProviderLoginDialog(projectPath: '/test/proj', provider: 'claude'),
+        TranslationProvider(
+          child: UncontrolledProviderScope(
+            container: container,
+            child: MaterialApp(
+              theme: AppTheme.dark(),
+              home: Scaffold(
+                body: ProviderLoginDialog(projectPath: '/test/proj', provider: 'claude'),
+              ),
             ),
           ),
         ),

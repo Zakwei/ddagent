@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:ddagent_app/core/realtime/realtime_providers.dart';
 import 'package:ddagent_app/core/realtime/shell_channel.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xterm/xterm.dart';
 
@@ -549,7 +550,7 @@ class TerminalController extends Notifier<TerminalState> {
     void Function(int exitCode)? onComplete,
   }) {
     return createTab(
-      title: 'Login: $provider',
+      title: t.terminal.tabs.loginTitle(provider: provider),
       projectPath: projectPath,
       provider: provider,
       initialCommand: providerLoginCommand(provider),

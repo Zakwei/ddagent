@@ -176,6 +176,7 @@ class _KnowledgeGraphViewState extends ConsumerState<KnowledgeGraphView> {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     // Reload when the screen's project filter changes.
     ref.listen(
       knowledgeControllerProvider.select((state) => state.projectFilter),
@@ -209,9 +210,9 @@ class _KnowledgeGraphViewState extends ConsumerState<KnowledgeGraphView> {
               ),
               const Spacer(),
               if (_graph?.truncated == true)
-                const Padding(
-                  padding: EdgeInsets.only(right: 8),
-                  child: Text('truncated', style: TextStyle(fontSize: 11)),
+                Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: Text(t.knowledge.graph.truncated, style: const TextStyle(fontSize: 11)),
                 ),
               IconButton(onPressed: _loading ? null : _load, icon: const Icon(Icons.refresh)),
             ],

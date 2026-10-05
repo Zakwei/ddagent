@@ -30,6 +30,7 @@ import 'package:ddagent_app/features/workspace/view/session_picker.dart';
 import 'package:ddagent_app/features/workspace/view/split_workspace_grid.dart';
 import 'package:ddagent_app/features/workspace/view/workspace_dialogs.dart';
 import 'package:ddagent_app/features/workspace/view/workspace_launcher.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -398,23 +399,27 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
   /// SessionWorkspaceDialog parity — rebind the session to another project
   /// path (disabled mid-run / while awaiting permission).
   Future<void> _changeWorkspace(SplitPane pane, {required bool enabled}) async {
+    final i18n = Translations.of(context);
     if (!enabled) {
-      AppToast.error(context, 'Finish the run before changing workspace');
+      AppToast.error(context, i18n.workspace.finishRunBeforeChangingWorkspace);
       return;
     }
     final field = TextEditingController();
     final saved = await showDialog<bool>(
       context: context,
       builder: (ctx) => AppDialog(
-        title: 'Change workspace',
+        title: i18n.sidebar.workspace.submit,
         content: AppInput(controller: field, autofocus: true, hint: '/path/to/project'),
         actions: [
           AppButton(
             variant: AppButtonVariant.ghost,
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
+            child: Text(i18n.chat.orchestrator.summary.cancelTasks),
           ),
-          AppButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Save')),
+          AppButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(i18n.codeEditor.actions.save),
+          ),
         ],
       ),
     );
@@ -429,7 +434,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
       AppToast.error(context, err);
       return;
     }
-    AppToast.show(context, 'Workspace changed');
+    AppToast.show(context, i18n.sessions.toasts.workspaceChanged);
   }
 
   Future<void> _renameSession(String id, String name) async {
@@ -441,10 +446,11 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
   Future<void> _archiveSession(String id) async {
     // Web SessionActionsMenu confirms archive (same dialog as delete, gentler
     // copy) before calling the API.
+    final i18n = Translations.of(context);
     final ok = await AppDialog.confirm(
       context,
-      title: 'Archive session?',
-      message: 'Archive keeps the session out of the active list while preserving its history.',
+      title: i18n.sidebar.deleteConfirmation.archiveSession,
+      message: i18n.sidebar.deleteConfirmation.archiveSessionNotice,
       confirmLabel: 'Archive session',
     );
     if (!ok) return;
@@ -453,15 +459,16 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
     if (err != null) {
       AppToast.error(context, err);
     } else {
-      AppToast.show(context, 'Session archived');
+      AppToast.show(context, i18n.sessions.toasts.archived);
     }
   }
 
   Future<void> _deleteSession(String id) async {
+    final i18n = Translations.of(context);
     final ok = await AppDialog.confirm(
       context,
-      title: 'Delete session?',
-      message: 'Removes the session and its transcript. Cannot be undone.',
+      title: i18n.common.browserUse.deleteSession,
+      message: i18n.workspace.deleteSessionNotice,
       confirmLabel: 'Delete',
     );
     if (!ok) return;
@@ -470,7 +477,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
     if (err != null) {
       AppToast.error(context, err);
     } else {
-      AppToast.show(context, 'Session deleted');
+      AppToast.show(context, i18n.sessions.toasts.deleted);
     }
   }
 
@@ -597,6 +604,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
   }
 
   Future<void> _createSession(SplitPane pane, String provider, {String? accountId}) async {
+    final i18n = Translations.of(context);
     try {
       if (provider == 'orchestrator') {
         // Panes carry only projectId — resolve the path from the loaded
@@ -637,7 +645,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
           .read(workspaceProvider.notifier)
           .updatePane(pane.id, sessionId: () => s.sessionId, picker: false);
     } on Object catch (e) {
-      if (mounted) AppToast.error(context, 'Failed to create session: $e');
+      if (mounted) AppToast.error(context, i18n.sessions.createFailed(error: '$e'));
     }
   }
 }

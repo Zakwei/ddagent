@@ -16,6 +16,7 @@ import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
 import 'package:ddagent_app/features/sessions/view/session_list_row.dart';
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
 import 'package:ddagent_app/features/workspace/view/draft_extras.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -175,8 +176,10 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
         } else {
           final picked = await showDialog<_ProviderPick>(
             context: context,
-            builder: (ctx) =>
-                AppDialog(title: 'New chat — provider', content: _providerDialogBody(ctx, groups)),
+            builder: (ctx) => AppDialog(
+              title: Translations.of(ctx).workspace.newChatProvider,
+              content: _providerDialogBody(ctx, groups),
+            ),
           );
           if (picked == null) return;
           provider = picked.provider;
@@ -186,7 +189,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
         final picked = await showDialog<String>(
           context: context,
           builder: (ctx) => AppDialog(
-            title: 'New chat — provider',
+            title: Translations.of(ctx).workspace.newChatProvider,
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -221,6 +224,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
   /// when no accounts are configured or the accounts call fails so the caller
   /// falls back to the flat provider list.
   Future<List<_ProviderGroup>?> _providerAccountGroups(List<String> providers) async {
+    final i18n = Translations.of(context);
     List<ProviderAccount> accounts;
     try {
       accounts = await ref.read(providerAccountsRepositoryProvider).list();
@@ -257,7 +261,9 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
       final label = qa?.accountLabel ?? '';
       return _AccountChoice(
         accountId: null,
-        label: label.isEmpty ? 'Default' : 'Default · $label',
+        label: label.isEmpty
+            ? i18n.chat.composer.accountIsDefault
+            : i18n.workspace.accountWithLabel(label: label),
         tone: toneForQuota(qa),
       );
     }
@@ -398,6 +404,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
 
   /// border-b border-border/50, px-2 py-1.5, centered max-w-4xl row.
   Widget _topBar(AppColors c) {
+    final i18n = Translations.of(context);
     return Container(
       decoration: BoxDecoration(
         border: Border(bottom: BorderSide(color: c.border.withValues(alpha: 0.5))),
@@ -424,7 +431,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
                   ),
                   SessionListToolbarButton(
                     icon: LucideIcons.archive,
-                    label: 'Archived',
+                    label: i18n.chat.sessionPicker.archivedToggle,
                     active: _showArchived,
                     showLabel: !compact,
                     onTap: () {
@@ -586,6 +593,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
   }
 
   Widget _sessionRow(AppColors c, Session s, SessionsController ctrl) {
+    final i18n = Translations.of(context);
     return SessionListRow(
       session: s,
       running: widget.processingSessionIds.contains(s.sessionId) || s.isRunning,
@@ -596,23 +604,26 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
       actions: [
         SessionRowIconButton(
           icon: LucideIcons.eyeOff,
-          tooltip: 'Archive session',
+          tooltip: i18n.sidebar.deleteConfirmation.archiveSession,
           onTap: () => unawaited(_sessionAction('archive', s, ctrl)),
         ),
         SessionRowIconButton(
           icon: LucideIcons.trash2,
-          tooltip: 'Delete permanently',
+          tooltip: i18n.sidebar.deleteConfirmation.deleteSessionPermanently,
           danger: true,
           onTap: () => unawaited(_sessionAction('delete', s, ctrl)),
         ),
       ],
       menu: PopupMenuButton<String>(
-        tooltip: 'Session options',
+        tooltip: i18n.sidebar.sessions.options,
         style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
         onSelected: (v) => unawaited(_sessionAction(v, s, ctrl)),
-        itemBuilder: (_) => const [
-          PopupMenuItem(value: 'archive', child: Text('Archive')),
-          PopupMenuItem(value: 'delete', child: Text('Delete permanently')),
+        itemBuilder: (_) => [
+          PopupMenuItem(value: 'archive', child: Text(i18n.sidebar.search.archiveOnly)),
+          PopupMenuItem(
+            value: 'delete',
+            child: Text(i18n.sidebar.deleteConfirmation.deleteSessionPermanently),
+          ),
         ],
         child: SizedBox(
           width: 28,
@@ -635,6 +646,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
   );
 
   Widget _archivedBody(AppColors c) {
+    final i18n = Translations.of(context);
     if (_loadingArchived) {
       return ListView(
         padding: const EdgeInsets.all(6),
@@ -677,7 +689,10 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
                     variant: AppButtonVariant.outline,
                     size: AppButtonSize.sm,
                     onPressed: () => unawaited(_loadArchived()),
-                    child: const Text('Retry', style: TextStyle(fontSize: 12)),
+                    child: Text(
+                      i18n.chat.session.messages.retry,
+                      style: const TextStyle(fontSize: 12),
+                    ),
                   ),
                 ],
               ),
@@ -693,7 +708,10 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
         children: [
           _newChatRow(),
           _constrained(
-            const SessionListEmptyState(icon: LucideIcons.archive, label: 'No archived sessions'),
+            SessionListEmptyState(
+              icon: LucideIcons.archive,
+              label: i18n.chat.sessionPicker.archivedEmpty,
+            ),
           ),
         ],
       );
@@ -755,6 +773,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
   }
 
   String _archivedProjectName(Session s) {
+    final i18n = Translations.of(context);
     final n = s.raw['projectDisplayName'] as String?;
     if (n != null && n.isNotEmpty) return n;
     final path = s.projectPath;
@@ -762,10 +781,11 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
       final segs = path.split(RegExp(r'[\\/]'))..removeWhere((e) => e.isEmpty);
       if (segs.isNotEmpty) return segs.last;
     }
-    return s.projectId ?? 'Archived';
+    return s.projectId ?? i18n.workspace.archivedWorkspaceName;
   }
 
   Widget _archivedGroup(AppColors c, _ArchivedGroup g) {
+    final i18n = Translations.of(context);
     return Container(
       margin: const EdgeInsets.only(bottom: 4),
       decoration: BoxDecoration(
@@ -800,7 +820,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
                 ),
                 if (g.isProjectArchived && g.projectId != null)
                   _RestoreButton(
-                    label: 'Restore workspace',
+                    label: i18n.chat.sessionPicker.restoreProject,
                     busy: _busyProjectId == g.projectId,
                     onTap: () => unawaited(_restoreProject(g.projectId!)),
                   ),
@@ -825,6 +845,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
   }
 
   Widget _archivedRow(AppColors c, Session s, {required bool isLast}) {
+    final i18n = Translations.of(context);
     final age = formatSessionAge(s.lastActivity, DateTime.now());
     final meta = [if (age.isNotEmpty) age, if (s.messageCount > 0) '${s.messageCount}'].join(' · ');
     return Container(
@@ -863,13 +884,13 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
             ),
           ),
           _RestoreButton(
-            label: 'Restore',
+            label: i18n.chat.sessionPicker.restore,
             busy: _busySessionId == s.sessionId,
             onTap: () => unawaited(_restore(s)),
           ),
           SessionRowIconButton(
             icon: LucideIcons.trash2,
-            tooltip: 'Delete permanently',
+            tooltip: i18n.sidebar.deleteConfirmation.deleteSessionPermanently,
             danger: true,
             onTap: () => unawaited(_delete(s, refreshArchived: true)),
           ),
@@ -884,10 +905,11 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
     if (action == 'archive') {
       final err = await ctrl.archive(s.sessionId);
       if (!mounted) return;
+      final i18n = Translations.of(context);
       if (err != null) {
         AppToast.error(context, err);
       } else {
-        AppToast.show(context, 'Session archived');
+        AppToast.show(context, i18n.sessions.toasts.archived);
       }
     } else if (action == 'delete') {
       await _delete(s);
@@ -899,7 +921,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
     try {
       await ref.read(sessionsRepositoryProvider).restore(s.sessionId);
       if (!mounted) return;
-      AppToast.show(context, 'Session restored');
+      AppToast.show(context, Translations.of(context).sessions.toasts.restored);
       unawaited(_loadArchived());
       unawaited(ref.read(sessionsProvider(_globalScope).notifier).load());
     } on Object catch (e) {
@@ -914,7 +936,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
     try {
       await ref.read(projectsRepositoryProvider).restore(projectId);
       if (!mounted) return;
-      AppToast.show(context, 'Workspace restored');
+      AppToast.show(context, Translations.of(context).workspace.restored);
       unawaited(_loadArchived());
     } on Object catch (e) {
       if (mounted) AppToast.error(context, '$e');
@@ -924,9 +946,10 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
   }
 
   Future<void> _delete(Session s, {bool refreshArchived = false}) async {
+    final i18n = Translations.of(context);
     final ok = await AppDialog.confirm(
       context,
-      title: 'Delete session?',
+      title: i18n.common.browserUse.deleteSession,
       message:
           'Removes "${s.displayTitle}" and its transcript. '
           'This cannot be undone.',
@@ -936,7 +959,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
     try {
       await ref.read(sessionsRepositoryProvider).delete(s.sessionId, hardDelete: true);
       if (!mounted) return;
-      AppToast.show(context, 'Session deleted');
+      AppToast.show(context, i18n.sessions.toasts.deleted);
       if (refreshArchived) {
         unawaited(_loadArchived());
       }

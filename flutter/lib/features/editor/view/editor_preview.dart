@@ -7,6 +7,7 @@ import 'package:ddagent_app/features/editor/data/editor_file_kind.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_node.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_repository.dart';
 import 'package:ddagent_app/features/file_tree/view/file_viewer.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -29,6 +30,7 @@ class EditorPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     switch (kind) {
       case EditorFileKind.markdown:
         return Scrollbar(
@@ -47,8 +49,8 @@ class EditorPreview extends StatelessWidget {
           projectId: projectId,
           path: path,
           icon: Icons.play_circle_outline,
-          title: 'Media file',
-          subtitle: 'Audio/video preview is not supported yet',
+          title: t.codeEditor.mediaFile.title,
+          subtitle: t.codeEditor.mediaFile.subtitle,
         );
       case EditorFileKind.binary:
       case EditorFileKind.text:
@@ -56,8 +58,8 @@ class EditorPreview extends StatelessWidget {
           projectId: projectId,
           path: path,
           icon: Icons.insert_drive_file_outlined,
-          title: 'Binary file',
-          subtitle: 'Cannot display as text',
+          title: t.codeEditor.binaryFile.title,
+          subtitle: t.codeEditor.binaryFile.cannotDisplayAsText,
         );
     }
   }
@@ -82,6 +84,7 @@ class _BinaryCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
+    final t = Translations.of(context);
     // ponytail: the content endpoint has no range support, so the hex dump
     // fetches the whole blob — fine for typical assets; range requests are
     // the upgrade path for huge binaries.
@@ -112,7 +115,7 @@ class _BinaryCard extends ConsumerWidget {
                 _HexDump(bytes: snap.data!),
               ] else if (snap.hasError) ...[
                 const SizedBox(height: AppSpacing.sm),
-                Text('Failed to load file', style: TextStyle(color: colors.destructive)),
+                Text(t.codeEditor.failedToLoad, style: TextStyle(color: colors.destructive)),
               ] else
                 const Padding(
                   padding: EdgeInsets.only(top: AppSpacing.md),
@@ -142,6 +145,7 @@ class _HexDump extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final t = Translations.of(context);
     final style = Theme.of(context).textTheme.bodySmall!
         .copyWith(fontFamily: 'monospace', fontSize: 11);
     final dim = style.copyWith(color: colors.mutedForeground);
@@ -181,7 +185,10 @@ class _HexDump extends StatelessWidget {
         children: [
           ...rows,
           if (bytes.length > _maxBytes)
-            Text('… ${formatFileSize(bytes.length - _maxBytes)} more', style: dim),
+            Text(
+              t.codeEditor.hexDump.more(size: formatFileSize(bytes.length - _maxBytes)),
+              style: dim,
+            ),
         ],
       ),
     );

@@ -7,6 +7,7 @@ import 'package:ddagent_app/features/git/view/git_screen.dart';
 import 'package:ddagent_app/features/projects/data/projects_repository.dart';
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
 import 'package:ddagent_app/features/workspace/view/split_workspace_grid.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -51,14 +52,16 @@ class _FakeProjects extends ProjectsRepository {
   Future<List<Project>> archived() async => [];
 }
 
-Widget _app(_ViewGit git, {String projectId = 'p1'}) => ProviderScope(
-  overrides: [
-    gitRepositoryProvider.overrideWithValue(git),
-    projectsRepositoryProvider.overrideWithValue(_FakeProjects()),
-  ],
-  child: MaterialApp(
-    theme: AppTheme.light(),
-    home: Scaffold(body: GitScreen(projectId: projectId)),
+Widget _app(_ViewGit git, {String projectId = 'p1'}) => TranslationProvider(
+  child: ProviderScope(
+    overrides: [
+      gitRepositoryProvider.overrideWithValue(git),
+      projectsRepositoryProvider.overrideWithValue(_FakeProjects()),
+    ],
+    child: MaterialApp(
+      theme: AppTheme.light(),
+      home: Scaffold(body: GitScreen(projectId: projectId)),
+    ),
   ),
 );
 

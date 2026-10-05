@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/features/chat/state/composer_controller.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -217,6 +218,7 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
+    final t = Translations.of(context);
     final hasEffort = _state.effortValues(widget.arg.provider).isNotEmpty;
     final hasModel = _mergedOptions(_state).isNotEmpty;
     if (!hasEffort && !hasModel) return const SizedBox.shrink();
@@ -230,7 +232,7 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
 
     return Tooltip(
       // Web aria-label/title on `.oc-model-trigger`.
-      message: 'Select model and reasoning effort',
+      message: t.chat.composer.modelMenu,
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -497,6 +499,7 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
 
   /// `Search models...` field — h-8, border/60, muted/40, focus ring.
   Widget _searchField(AppColors c) {
+    final t = Translations.of(context);
     final focused = _searchFocus.hasFocus;
     return Container(
       height: 32,
@@ -524,7 +527,7 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
                 decoration: InputDecoration(
                   isCollapsed: true,
                   border: InputBorder.none,
-                  hintText: 'Search models...',
+                  hintText: t.chat.providerSelection.searchModels,
                   hintStyle: TextStyle(color: c.mutedForeground),
                 ),
                 onChanged: (_) => _refreshMenu(),

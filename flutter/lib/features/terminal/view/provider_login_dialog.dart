@@ -1,6 +1,7 @@
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/features/terminal/state/terminal_state.dart';
 import 'package:ddagent_app/features/terminal/view/terminal_view_wrapper.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -133,6 +134,7 @@ class _ProviderLoginDialogState extends ConsumerState<ProviderLoginDialog> {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final t = Translations.of(context);
     final terminalState = ref.watch(terminalControllerProvider);
 
     final currentTab = _tab != null
@@ -193,7 +195,7 @@ class _ProviderLoginDialogState extends ConsumerState<ProviderLoginDialog> {
                   IconButton(
                     icon: const Icon(Icons.close, size: 20),
                     onPressed: () => Navigator.of(context).pop(),
-                    tooltip: 'Close',
+                    tooltip: t.chat.common.close,
                   ),
                 ],
               ),
@@ -222,7 +224,7 @@ class _ProviderLoginDialogState extends ConsumerState<ProviderLoginDialog> {
                     TextButton.icon(
                       onPressed: () => _openAuthUrl(latestAuthUrl),
                       icon: const Icon(Icons.open_in_new, size: 14),
-                      label: const Text('Open in browser'),
+                      label: Text(t.terminal.authUrl.openInBrowser),
                       style: TextButton.styleFrom(visualDensity: VisualDensity.compact),
                     ),
                   ],

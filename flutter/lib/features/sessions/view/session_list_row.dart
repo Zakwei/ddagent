@@ -1,6 +1,7 @@
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/sessions/view/provider_logo.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -16,10 +17,10 @@ String formatSessionAge(String? dateString, DateTime now) {
   final date = DateTime.tryParse(dateString);
   if (date == null) return '';
   final minutes = now.difference(date).inMinutes;
-  if (minutes < 1) return '<1m';
-  if (minutes < 60) return '${minutes}m';
+  if (minutes < 1) return t.sessions.age.lessThanMinute;
+  if (minutes < 60) return t.sessions.age.minutes(count: minutes);
   final hours = minutes ~/ 60;
-  return hours < 24 ? '${hours}hr' : '${hours ~/ 24}d';
+  return hours < 24 ? t.sessions.age.hours(hours: hours) : t.sessions.age.days(days: hours ~/ 24);
 }
 
 /// "projectName or provider" — the row's second line
@@ -91,14 +92,16 @@ class SessionSearchField extends StatefulWidget {
   const SessionSearchField({
     super.key,
     this.autofocus = false,
-    this.hint = 'Search sessions...',
+    this.hint,
     this.showSpinner = false,
     this.onChanged,
     this.onEscape,
   });
 
   final bool autofocus;
-  final String hint;
+
+  /// Overrides the localized "Search sessions..." placeholder.
+  final String? hint;
 
   /// Shows a small spinner ahead of the clear button (full-text search busy).
   final bool showSpinner;
@@ -155,6 +158,7 @@ class _SessionSearchFieldState extends State<SessionSearchField> {
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
+    final t = Translations.of(context);
     // Border lives on the outer box (h-8, rounded-md, border-input) — the
     // decorator's own border only wraps the inner content and comes up short.
     return Container(
@@ -176,7 +180,7 @@ class _SessionSearchFieldState extends State<SessionSearchField> {
           onChanged: widget.onChanged,
           style: TextStyle(fontSize: 12, height: 16 / 12, color: c.foreground),
           decoration: InputDecoration(
-            hintText: widget.hint,
+            hintText: widget.hint ?? t.chat.sessionPicker.searchPlaceholder,
             hintStyle: TextStyle(fontSize: 12, height: 16 / 12, color: c.mutedForeground),
             isDense: true,
             border: InputBorder.none,
@@ -188,7 +192,7 @@ class _SessionSearchFieldState extends State<SessionSearchField> {
               child: Icon(LucideIcons.search, size: 14, color: c.mutedForeground),
             ),
             prefixIconConstraints: const BoxConstraints(minWidth: 28, maxHeight: 32),
-            suffixIcon: _suffix(c),
+            suffixIcon: _suffix(c, t),
             suffixIconConstraints: const BoxConstraints(maxHeight: 32),
           ),
         ),
@@ -196,7 +200,7 @@ class _SessionSearchFieldState extends State<SessionSearchField> {
     );
   }
 
-  Widget? _suffix(AppColors c) {
+  Widget? _suffix(AppColors c, Translations t) {
     if (!widget.showSpinner && !_hasText) return null;
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -213,7 +217,7 @@ class _SessionSearchFieldState extends State<SessionSearchField> {
           Padding(
             padding: const EdgeInsets.only(right: 4),
             child: Tooltip(
-              message: 'Clear search',
+              message: t.chat.sessionPicker.clearSearch,
               child: InkWell(
                 borderRadius: AppRadii.borderSm,
                 hoverColor: c.muted,
@@ -550,6 +554,7 @@ class _SessionNewChatButtonState extends State<SessionNewChatButton> {
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
+    final t = Translations.of(context);
     return MouseRegion(
       onEnter: (_) => setState(() => _hover = true),
       onExit: (_) => setState(() => _hover = false),
@@ -585,7 +590,7 @@ class _SessionNewChatButtonState extends State<SessionNewChatButton> {
                   ),
                   Expanded(
                     child: Text(
-                      '+ New chat',
+                      t.chat.sessionPicker.newChat,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(

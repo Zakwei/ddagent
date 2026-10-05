@@ -18,6 +18,7 @@ import 'package:ddagent_app/features/git/view/git_history.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/projects/view/project_menu_button.dart';
 import 'package:ddagent_app/features/worktrees/view/worktrees_screen.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -116,6 +117,7 @@ class _GitScreenState extends ConsumerState<GitScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(gitProvider);
     final c = context.appColors;
+    final i18n = Translations.of(context);
     final status = state.status;
     final projects = ref.watch(projectsProvider).projects;
 
@@ -131,7 +133,7 @@ class _GitScreenState extends ConsumerState<GitScreen> {
     } else if (status == null) {
       content = Center(
         child: Text(
-          state.error ?? 'Select a project',
+          state.error ?? i18n.git.selectProject,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: c.mutedForeground),
         ),
       );
@@ -214,6 +216,7 @@ class _GitScreenState extends ConsumerState<GitScreen> {
     List<(String, String)> unstaged,
     bool hasExpanded,
   ) {
+    final i18n = Translations.of(context);
     final changes = staged.length + unstaged.length;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -249,9 +252,9 @@ class _GitScreenState extends ConsumerState<GitScreen> {
                   padding: const EdgeInsets.all(AppSpacing.sm),
                   children: [
                     _SectionHeader(
-                      title: 'Staged Changes',
+                      title: i18n.git.stagedChanges,
                       count: staged.length,
-                      actionLabel: 'Unstage All',
+                      actionLabel: i18n.common.gitPanel.unstageAll,
                       onAction: staged.isEmpty || state.busy
                           ? null
                           : () => unawaited(ref.read(gitProvider.notifier).unstageAll()),
@@ -275,9 +278,9 @@ class _GitScreenState extends ConsumerState<GitScreen> {
                       ),
                     const SizedBox(height: AppSpacing.sm),
                     _SectionHeader(
-                      title: 'Changes',
+                      title: i18n.common.gitPanel.tabs.changes,
                       count: unstaged.length,
-                      actionLabel: 'Stage All',
+                      actionLabel: i18n.common.gitPanel.stageAll,
                       onAction: unstaged.isEmpty || state.busy
                           ? null
                           : () => unawaited(ref.read(gitProvider.notifier).stageAll()),
@@ -311,27 +314,29 @@ class _GitScreenState extends ConsumerState<GitScreen> {
   Future<void> _commit(List<String> staged) async {
     final message = _message.text.trim();
     if (message.isEmpty || staged.isEmpty) return;
+    final i18n = Translations.of(context);
     final res = await gitConfirm(
       context,
       type: GitConfirmType.commit,
-      message: 'Commit ${staged.length} file(s) with message: "$message"?',
+      message: i18n.common.gitPanel.confirmCommit(count: staged.length, message: message),
     );
     if (res != false || !mounted) return;
     final ok = await ref.read(gitProvider.notifier).commit(message, staged);
     if (!mounted) return;
     if (ok) {
       _message.clear();
-      AppToast.show(context, 'Commit created');
+      AppToast.show(context, i18n.git.commitCreated);
     }
   }
 
   Future<void> _discard(String file, {required bool untracked}) async {
+    final i18n = Translations.of(context);
     final res = await gitConfirm(
       context,
       type: untracked ? GitConfirmType.delete : GitConfirmType.discard,
       message: untracked
-          ? 'Delete untracked file "$file"? This action cannot be undone.'
-          : 'Discard all changes to "$file"? This action cannot be undone.',
+          ? i18n.common.gitPanel.confirmDeleteFile(file: file)
+          : i18n.common.gitPanel.confirmDiscardFile(file: file),
     );
     if (res != false || !mounted) return;
     final ctrl = ref.read(gitProvider.notifier);
@@ -354,6 +359,7 @@ class _NotGitView extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -365,14 +371,15 @@ class _NotGitView extends StatelessWidget {
             child: Icon(LucideIcons.gitBranch, size: 24, color: c.mutedForeground),
           ),
           const SizedBox(height: AppSpacing.md),
-          Text('No git repository', style: t.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+          Text(
+            i18n.common.gitPanel.noRepo.title,
+            style: t.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+          ),
           const SizedBox(height: AppSpacing.xs),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
             child: Text(
-              'This project is not a git repository yet. '
-              'Initialize one to start tracking changes '
-              'and use source control features.',
+              i18n.common.gitPanel.noRepo.description,
               textAlign: TextAlign.center,
               style: t.bodySmall?.copyWith(color: c.mutedForeground),
             ),
@@ -381,12 +388,12 @@ class _NotGitView extends StatelessWidget {
           AppButton(
             loading: busy,
             onPressed: onInit,
-            child: const Row(
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(LucideIcons.gitBranch, size: 16),
-                SizedBox(width: 6),
-                Text('Run git init'),
+                const Icon(LucideIcons.gitBranch, size: 16),
+                const SizedBox(width: 6),
+                Text(i18n.common.gitPanel.noRepo.init),
               ],
             ),
           ),
@@ -416,6 +423,7 @@ class _InitialCommitEmpty extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.lg),
@@ -424,11 +432,10 @@ class _InitialCommitEmpty extends ConsumerWidget {
           children: [
             Icon(LucideIcons.gitBranch, size: 36, color: c.mutedForeground),
             const SizedBox(height: AppSpacing.sm),
-            Text('No commits yet', style: t.titleSmall),
+            Text(i18n.common.gitPanel.noCommits.title, style: t.titleSmall),
             const SizedBox(height: AppSpacing.xs),
             Text(
-              "This repository doesn't have any commits yet. Create your "
-              'first commit to start tracking changes.',
+              i18n.common.gitPanel.noCommits.description,
               textAlign: TextAlign.center,
               style: t.bodySmall?.copyWith(color: c.mutedForeground),
             ),
@@ -436,7 +443,7 @@ class _InitialCommitEmpty extends ConsumerWidget {
             AppButton(
               loading: state.busy,
               onPressed: () => unawaited(ref.read(gitProvider.notifier).initialCommit()),
-              child: const Text('Create Initial Commit'),
+              child: Text(i18n.common.gitPanel.noCommits.create),
             ),
           ],
         ),
@@ -457,22 +464,29 @@ class _EmptyChanges extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     return ListView(
       padding: const EdgeInsets.all(AppSpacing.lg),
       children: [
         Icon(LucideIcons.gitCommitHorizontal, size: 36, color: c.mutedForeground),
         const SizedBox(height: AppSpacing.sm),
-        Text('No changes detected', textAlign: TextAlign.center, style: t.titleSmall),
+        Text(i18n.common.gitPanel.noChanges, textAlign: TextAlign.center, style: t.titleSmall),
         if (state.commits.isNotEmpty) ...[
           const SizedBox(height: AppSpacing.lg),
           Row(
             children: [
-              Text('Recent commits', style: t.labelSmall?.copyWith(color: c.mutedForeground)),
+              Text(
+                i18n.common.gitPanel.recentCommits,
+                style: t.labelSmall?.copyWith(color: c.mutedForeground),
+              ),
               const Spacer(),
               if (onOpenHistory != null)
                 InkWell(
                   onTap: onOpenHistory,
-                  child: Text('View all', style: t.labelSmall?.copyWith(color: c.primary)),
+                  child: Text(
+                    i18n.common.gitPanel.viewAll,
+                    style: t.labelSmall?.copyWith(color: c.primary),
+                  ),
                 ),
             ],
           ),
@@ -549,12 +563,11 @@ class _GitHeader extends ConsumerWidget {
   final ValueChanged<GitDiffViewMode> onViewMode;
 
   Future<void> _revertLatest(BuildContext context, WidgetRef ref) async {
+    final i18n = Translations.of(context);
     final res = await gitConfirm(
       context,
       type: GitConfirmType.revert,
-      message:
-          'Revert the latest local commit? This removes the commit but keeps '
-          'its changes staged.',
+      message: i18n.common.gitPanel.confirmRevert,
     );
     if (res != false || !context.mounted) return;
     await ref.read(gitProvider.notifier).revertLocalCommit();
@@ -575,21 +588,22 @@ class _GitHeader extends ConsumerWidget {
   }
 
   Future<void> _newBranch(BuildContext context, WidgetRef ref) async {
+    final i18n = Translations.of(context);
     var input = '';
     final name = await showDialog<String>(
       context: context,
       builder: (ctx) => AppDialog(
-        title: 'New branch',
+        title: i18n.common.gitPanel.branches.kNew,
         content: AppInput(hint: 'branch-name', autofocus: true, onChanged: (v) => input = v),
         actions: [
           AppButton(
             variant: AppButtonVariant.ghost,
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
+            child: Text(i18n.chat.orchestrator.summary.cancelTasks),
           ),
           AppButton(
             onPressed: () => Navigator.of(ctx).pop(input.trim()),
-            child: const Text('Create'),
+            child: Text(i18n.common.buttons.create),
           ),
         ],
       ),
@@ -605,9 +619,10 @@ class _GitHeader extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     final remote = state.remoteStatus;
     final branches = state.branches;
-    final current = state.status?.branch ?? 'no branch';
+    final current = state.status?.branch ?? i18n.git.noBranch;
     final ctrl = ref.read(gitProvider.notifier);
 
     Widget remoteBtn(IconData icon, String label, int badge, VoidCallback? onTap) {
@@ -626,7 +641,7 @@ class _GitHeader extends ConsumerWidget {
       child: Row(
         children: [
           PopupMenuButton<String>(
-            tooltip: 'Switch branch',
+            tooltip: i18n.git.switchBranch,
             onSelected: (v) {
               if (v == '__new__') {
                 unawaited(_newBranch(context, ref));
@@ -635,10 +650,16 @@ class _GitHeader extends ConsumerWidget {
               }
             },
             itemBuilder: (_) => [
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: '__new__',
                 child: Row(
-                  children: [Icon(Icons.add, size: 14), SizedBox(width: 8), Text('New branch…')],
+                  children: [
+                    const Icon(Icons.add, size: 14),
+                    const SizedBox(width: 8),
+                    // Ellipsis retained from the original literal: the widget
+                    // tests locate this menu item by its full text.
+                    Text('${i18n.common.gitPanel.branches.kNew}…'),
+                  ],
                 ),
               ),
               for (final b in branches.local)
@@ -692,33 +713,42 @@ class _GitHeader extends ConsumerWidget {
           ),
           const SizedBox(width: AppSpacing.xs),
           if (remote.hasRemote) ...[
-            remoteBtn(LucideIcons.download, 'Fetch', 0, () => unawaited(ctrl.fetch())),
+            remoteBtn(
+              LucideIcons.download,
+              i18n.common.gitPanel.fetch,
+              0,
+              () => unawaited(ctrl.fetch()),
+            ),
             remoteBtn(
               LucideIcons.arrowDown,
-              'Pull',
+              i18n.common.gitPanel.pull,
               remote.behind,
               () => unawaited(
                 _remoteOp(
                   context,
                   ref,
                   GitConfirmType.pull,
-                  'Pull ${remote.behind} commit(s) from '
-                  '${remote.remoteName ?? 'remote'}?',
+                  i18n.common.gitPanel.confirmPull(
+                    count: remote.behind,
+                    remote: remote.remoteName ?? 'remote',
+                  ),
                   (ctrl) => ctrl.pull(),
                 ),
               ),
             ),
             remoteBtn(
               LucideIcons.arrowUp,
-              'Push',
+              i18n.common.gitPanel.push,
               remote.ahead,
               () => unawaited(
                 _remoteOp(
                   context,
                   ref,
                   GitConfirmType.push,
-                  'Push ${remote.ahead} commit(s) to '
-                  '${remote.remoteName ?? 'remote'}?',
+                  i18n.common.gitPanel.confirmPush(
+                    count: remote.ahead,
+                    remote: remote.remoteName ?? 'remote',
+                  ),
                   (ctrl) => ctrl.push(),
                 ),
               ),
@@ -727,15 +757,17 @@ class _GitHeader extends ConsumerWidget {
             if (!remote.hasUpstream)
               remoteBtn(
                 LucideIcons.upload,
-                'Publish',
+                i18n.common.gitPanel.publish,
                 0,
                 () => unawaited(
                   _remoteOp(
                     context,
                     ref,
                     GitConfirmType.publish,
-                    'Publish branch "$current" to '
-                    '${remote.remoteName ?? 'remote'}?',
+                    i18n.common.gitPanel.confirmPublish(
+                      branch: current,
+                      remote: remote.remoteName ?? 'remote',
+                    ),
                     (ctrl) => ctrl.publish(),
                   ),
                 ),
@@ -746,20 +778,20 @@ class _GitHeader extends ConsumerWidget {
             icon: LucideIcons.rows3,
             label: '',
             selected: viewMode == GitDiffViewMode.unified,
-            tooltip: 'Unified diff',
+            tooltip: i18n.git.unifiedDiff,
             onPressed: () => onViewMode(GitDiffViewMode.unified),
           ),
           _HeaderButton(
             icon: LucideIcons.columns2,
             label: '',
             selected: viewMode == GitDiffViewMode.split,
-            tooltip: 'Split diff',
+            tooltip: i18n.git.splitDiff,
             onPressed: () => onViewMode(GitDiffViewMode.split),
           ),
           _HeaderButton(
             icon: LucideIcons.undo2,
             label: '',
-            tooltip: 'Revert latest local commit',
+            tooltip: i18n.common.gitPanel.revertLatest,
             onPressed: state.busy || state.commits.isEmpty
                 ? null
                 : () => unawaited(_revertLatest(context, ref)),
@@ -767,7 +799,7 @@ class _GitHeader extends ConsumerWidget {
           _HeaderButton(
             icon: LucideIcons.flag,
             label: '',
-            tooltip: 'Checkpoints',
+            tooltip: i18n.git.checkpoints.title,
             onPressed: () => unawaited(
               showDialog<void>(context: context, builder: (_) => const CheckpointsDialog()),
             ),
@@ -775,7 +807,7 @@ class _GitHeader extends ConsumerWidget {
           _HeaderButton(
             icon: LucideIcons.refreshCw,
             label: '',
-            tooltip: 'Refresh',
+            tooltip: i18n.common.buttons.refresh,
             onPressed: state.busy ? null : () => unawaited(ctrl.refresh()),
           ),
         ],
@@ -919,6 +951,7 @@ class _FileRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     final color = _statusColors[status] ?? c.mutedForeground;
     final name = file.split('/').last;
     final dir = file.length > name.length ? file.substring(0, file.length - name.length) : '';
@@ -984,7 +1017,9 @@ class _FileRow extends StatelessWidget {
                   if (!staged)
                     _FileAction(
                       icon: status == 'U' ? Icons.delete_outline : Icons.undo,
-                      tooltip: status == 'U' ? 'Delete file' : 'Discard changes',
+                      tooltip: status == 'U'
+                          ? i18n.git.deleteFile
+                          : i18n.common.gitPanel.discardChanges,
                       destructive: true,
                       onPressed: busy ? null : onDiscard,
                     ),
@@ -1005,6 +1040,7 @@ class _FileRow extends StatelessWidget {
   }
 
   Widget _diffArea(BuildContext context) {
+    final i18n = Translations.of(context);
     final d = diffState;
     if (d == null) {
       return const Padding(
@@ -1017,7 +1053,10 @@ class _FileRow extends StatelessWidget {
     if (d is! String) {
       return Padding(
         padding: const EdgeInsets.all(AppSpacing.md),
-        child: Text('Failed to load diff: $d', style: Theme.of(context).textTheme.bodySmall),
+        child: Text(
+          i18n.git.loadDiffFailed(error: d),
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
       );
     }
     return GitDiffViewer(
@@ -1025,7 +1064,7 @@ class _FileRow extends StatelessWidget {
       viewMode: viewMode,
       hunkAction: GitDiffHunkAction(
         isAdd: !staged,
-        tooltip: staged ? 'Unstage hunk' : 'Stage hunk',
+        tooltip: staged ? i18n.git.unstageHunk : i18n.git.stageHunk,
         onAction: onHunk,
       ),
     );
@@ -1119,6 +1158,7 @@ class _CommitComposerState extends ConsumerState<_CommitComposer> {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     final canCommit =
         !widget.busy && widget.message.text.trim().isNotEmpty && widget.stagedCount > 0;
 
@@ -1151,8 +1191,8 @@ class _CommitComposerState extends ConsumerState<_CommitComposer> {
                 const SizedBox(width: 8),
                 Text(
                   widget.hasChanges
-                      ? 'Commit ${widget.stagedCount} file(s)'
-                      : 'No changes to commit',
+                      ? i18n.common.gitPanel.commitFiles(count: widget.stagedCount)
+                      : i18n.common.gitPanel.noChangesToCommit,
                   style: t.bodyMedium?.copyWith(
                     color: widget.hasChanges ? Colors.white : c.mutedForeground,
                   ),
@@ -1182,7 +1222,7 @@ class _CommitComposerState extends ConsumerState<_CommitComposer> {
           if (widget.collapsed || !widget.hasChanges)
             Row(
               children: [
-                Text('Commit Changes', style: t.titleSmall),
+                Text(i18n.common.gitPanel.commitChanges, style: t.titleSmall),
                 const Spacer(),
                 InkWell(
                   onTap: () => setState(() => _collapsed = true),
@@ -1196,7 +1236,7 @@ class _CommitComposerState extends ConsumerState<_CommitComposer> {
               Expanded(
                 child: AppInput(
                   controller: widget.message,
-                  hint: 'Commit message',
+                  hint: i18n.git.commitMessage,
                   maxLines: 2,
                   enabled: !widget.busy,
                 ),
@@ -1220,14 +1260,14 @@ class _CommitComposerState extends ConsumerState<_CommitComposer> {
                               }
                             }
                           },
-                    child: const Text('✦ AI'),
+                    child: Text(i18n.git.aiButton),
                   ),
                   const SizedBox(height: AppSpacing.xs),
                   AppButton(
                     size: AppButtonSize.sm,
                     loading: widget.busy,
                     onPressed: canCommit ? widget.onCommit : null,
-                    child: const Text('Commit'),
+                    child: Text(i18n.common.gitPanel.commit),
                   ),
                 ],
               ),
@@ -1252,6 +1292,7 @@ class _ViewTabs extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
 
     Widget tab(_GitView v, String label, {int? count}) {
       final selected = view == v;
@@ -1297,10 +1338,10 @@ class _ViewTabs extends StatelessWidget {
       ),
       child: Row(
         children: [
-          tab(_GitView.changes, 'Changes', count: changeCount),
-          tab(_GitView.history, 'Commits'),
-          tab(_GitView.branches, 'Branches'),
-          tab(_GitView.worktrees, 'Worktrees'),
+          tab(_GitView.changes, i18n.common.gitPanel.tabs.changes, count: changeCount),
+          tab(_GitView.history, i18n.common.gitPanel.tabs.history),
+          tab(_GitView.branches, i18n.common.gitPanel.tabs.branches),
+          tab(_GitView.worktrees, i18n.common.gitPanel.tabs.worktrees),
         ],
       ),
     );
@@ -1316,12 +1357,13 @@ class _FileStatusLegend extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
-    const entries = [
-      ('M', 'Modified'),
-      ('A', 'Added'),
-      ('D', 'Deleted'),
-      ('U', 'Untracked'),
-      ('S', 'Staged'),
+    final i18n = Translations.of(context);
+    final entries = [
+      ('M', i18n.common.gitPanel.status.modified),
+      ('A', i18n.common.gitPanel.status.added),
+      ('D', i18n.common.gitPanel.status.deleted),
+      ('U', i18n.common.gitPanel.status.untracked),
+      ('S', i18n.git.statusStaged),
     ];
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 4),

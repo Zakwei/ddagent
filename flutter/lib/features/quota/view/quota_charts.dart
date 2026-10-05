@@ -1,6 +1,7 @@
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/features/quota/data/quota_models.dart';
 import 'package:ddagent_app/features/quota/view/quota_tone.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 
 /// Inline sparkline for account history (port of quota/Sparkline.tsx):
@@ -93,6 +94,7 @@ class _QuotaTrendChartState extends State<QuotaTrendChart> {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     final values = [for (final p in widget.trend) _cost ? p.costUsd : p.tokensTotal.toDouble()];
     final max = values.fold<double>(1, (m, v) => v > m ? v : m);
     final fmt = _cost ? formatCost : formatTokens;
@@ -102,7 +104,10 @@ class _QuotaTrendChartState extends State<QuotaTrendChart> {
       children: [
         Row(
           children: [
-            for (final (i, label) in const ['Tokens', 'Cost'].indexed)
+            for (final (i, label) in [
+              i18n.common.quota.metric.tokens,
+              i18n.common.quota.metric.cost,
+            ].indexed)
               Padding(
                 padding: const EdgeInsets.only(right: 4),
                 child: ChoiceChip(
@@ -117,7 +122,7 @@ class _QuotaTrendChartState extends State<QuotaTrendChart> {
             InkWell(
               onTap: () => setState(() => _hidden = !_hidden),
               child: Text(
-                _hidden ? 'Show' : 'Hide',
+                _hidden ? i18n.quota.chart.show : i18n.quota.chart.hide,
                 style: t.labelSmall?.copyWith(color: c.mutedForeground),
               ),
             ),
@@ -130,7 +135,7 @@ class _QuotaTrendChartState extends State<QuotaTrendChart> {
               padding: const EdgeInsets.all(AppSpacing.md),
               child: Center(
                 child: Text(
-                  'Not enough data for a trend.',
+                  i18n.quota.chart.noData,
                   style: t.bodySmall?.copyWith(color: c.mutedForeground),
                 ),
               ),
@@ -197,9 +202,11 @@ class _QuotaTrendChartState extends State<QuotaTrendChart> {
                       Padding(
                         padding: const EdgeInsets.only(left: labelW, top: 2),
                         child: Text(
-                          '${widget.trend[_selected!].date} · '
-                          '${formatTokens(widget.trend[_selected!].tokensTotal)} tokens · '
-                          '${formatCost(widget.trend[_selected!].costUsd)}',
+                          i18n.quota.chart.pointReadout(
+                            date: widget.trend[_selected!].date,
+                            tokens: formatTokens(widget.trend[_selected!].tokensTotal),
+                            cost: formatCost(widget.trend[_selected!].costUsd),
+                          ),
                           style: t.labelSmall?.copyWith(color: quotaToneColor(QuotaTone.info)),
                         ),
                       ),

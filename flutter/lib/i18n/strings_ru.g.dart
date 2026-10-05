@@ -47,6 +47,26 @@ class TranslationsRu extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final Translations$sidebar$ru sidebar = Translations$sidebar$ru._(_root);
 	@override late final Translations$tasks$ru tasks = Translations$tasks$ru._(_root);
 	@override late final Translations$knowledge$ru knowledge = Translations$knowledge$ru._(_root);
+	@override late final Translations$skills$ru skills = Translations$skills$ru._(_root);
+	@override late final Translations$mcp$ru mcp = Translations$mcp$ru._(_root);
+	@override late final Translations$terminal$ru terminal = Translations$terminal$ru._(_root);
+	@override late final Translations$worktrees$ru worktrees = Translations$worktrees$ru._(_root);
+	@override late final Translations$quota$ru quota = Translations$quota$ru._(_root);
+	@override late final Translations$scheduler$ru scheduler = Translations$scheduler$ru._(_root);
+	@override late final Translations$notifications$ru notifications = Translations$notifications$ru._(_root);
+	@override late final Translations$serverConnect$ru serverConnect = Translations$serverConnect$ru._(_root);
+	@override late final Translations$voice$ru voice = Translations$voice$ru._(_root);
+	@override late final Translations$preview$ru preview = Translations$preview$ru._(_root);
+	@override late final Translations$sharedContext$ru sharedContext = Translations$sharedContext$ru._(_root);
+	@override late final Translations$collab$ru collab = Translations$collab$ru._(_root);
+	@override late final Translations$browser$ru browser = Translations$browser$ru._(_root);
+	@override late final Translations$projects$ru projects = Translations$projects$ru._(_root);
+	@override late final Translations$sessions$ru sessions = Translations$sessions$ru._(_root);
+	@override late final Translations$git$ru git = Translations$git$ru._(_root);
+	@override late final Translations$kanban$ru kanban = Translations$kanban$ru._(_root);
+	@override late final Translations$onboarding$ru onboarding = Translations$onboarding$ru._(_root);
+	@override late final Translations$fileTree$ru fileTree = Translations$fileTree$ru._(_root);
+	@override late final Translations$workspace$ru workspace = Translations$workspace$ru._(_root);
 }
 
 // Path: auth
@@ -106,6 +126,14 @@ class Translations$chat$ru extends Translations$chat$en {
 	@override late final Translations$chat$quotaBadge$ru quotaBadge = Translations$chat$quotaBadge$ru._(_root);
 	@override late final Translations$chat$paneHeader$ru paneHeader = Translations$chat$paneHeader$ru._(_root);
 	@override late final Translations$chat$broadcast$ru broadcast = Translations$chat$broadcast$ru._(_root);
+	@override late final Translations$chat$changes$ru changes = Translations$chat$changes$ru._(_root);
+	@override late final Translations$chat$commandResult$ru commandResult = Translations$chat$commandResult$ru._(_root);
+	@override late final Translations$chat$commands$ru commands = Translations$chat$commands$ru._(_root);
+	@override late final Translations$chat$export$ru export = Translations$chat$export$ru._(_root);
+	@override late final Translations$chat$message$ru message = Translations$chat$message$ru._(_root);
+	@override late final Translations$chat$modelLibrary$ru modelLibrary = Translations$chat$modelLibrary$ru._(_root);
+	@override late final Translations$chat$pinFile$ru pinFile = Translations$chat$pinFile$ru._(_root);
+	@override late final Translations$chat$permissionRequest$ru permissionRequest = Translations$chat$permissionRequest$ru._(_root);
 }
 
 // Path: codeEditor
@@ -122,6 +150,15 @@ class Translations$codeEditor$ru extends Translations$codeEditor$en {
 	@override late final Translations$codeEditor$footer$ru footer = Translations$codeEditor$footer$ru._(_root);
 	@override late final Translations$codeEditor$binaryFile$ru binaryFile = Translations$codeEditor$binaryFile$ru._(_root);
 	@override late final Translations$codeEditor$filePreview$ru filePreview = Translations$codeEditor$filePreview$ru._(_root);
+	@override late final Translations$codeEditor$diff$ru diff = Translations$codeEditor$diff$ru._(_root);
+	@override String get discardUnsavedChanges => 'Отменить несохранённые изменения?';
+	@override late final Translations$codeEditor$emptyState$ru emptyState = Translations$codeEditor$emptyState$ru._(_root);
+	@override String get failedToLoad => 'Не удалось загрузить файл';
+	@override late final Translations$codeEditor$hexDump$ru hexDump = Translations$codeEditor$hexDump$ru._(_root);
+	@override late final Translations$codeEditor$mediaFile$ru mediaFile = Translations$codeEditor$mediaFile$ru._(_root);
+	@override late final Translations$codeEditor$settings$ru settings = Translations$codeEditor$settings$ru._(_root);
+	@override String unsavedChanges({required Object name}) => 'Несохранённые изменения в ${name}';
+	@override late final Translations$codeEditor$toasts$ru toasts = Translations$codeEditor$toasts$ru._(_root);
 }
 
 // Path: common
@@ -152,6 +189,8 @@ class Translations$common$ru extends Translations$common$en {
 	@override late final Translations$common$gitPanel$ru gitPanel = Translations$common$gitPanel$ru._(_root);
 	@override late final Translations$common$sessions$ru sessions = Translations$common$sessions$ru._(_root);
 	@override late final Translations$common$projects$ru projects = Translations$common$projects$ru._(_root);
+	@override late final Translations$common$codeBlock$ru codeBlock = Translations$common$codeBlock$ru._(_root);
+	@override late final Translations$common$update$ru update = Translations$common$update$ru._(_root);
 }
 
 // Path: settings
@@ -245,6 +284,7 @@ class Translations$tasks$ru extends Translations$tasks$en {
 	@override late final Translations$tasks$list$ru list = Translations$tasks$list$ru._(_root);
 	@override late final Translations$tasks$nextTask$ru nextTask = Translations$tasks$nextTask$ru._(_root);
 	@override late final Translations$tasks$taskDetail$ru taskDetail = Translations$tasks$taskDetail$ru._(_root);
+	@override late final Translations$tasks$toasts$ru toasts = Translations$tasks$toasts$ru._(_root);
 }
 
 // Path: knowledge
@@ -268,6 +308,393 @@ class Translations$knowledge$ru extends Translations$knowledge$en {
 	@override late final Translations$knowledge$links$ru links = Translations$knowledge$links$ru._(_root);
 	@override late final Translations$knowledge$tags$ru tags = Translations$knowledge$tags$ru._(_root);
 	@override late final Translations$knowledge$settings$ru settings = Translations$knowledge$settings$ru._(_root);
+	@override late final Translations$knowledge$contextBudget$ru contextBudget = Translations$knowledge$contextBudget$ru._(_root);
+	@override late final Translations$knowledge$critical$ru critical = Translations$knowledge$critical$ru._(_root);
+	@override late final Translations$knowledge$errors$ru errors = Translations$knowledge$errors$ru._(_root);
+	@override late final Translations$knowledge$graph$ru graph = Translations$knowledge$graph$ru._(_root);
+	@override late final Translations$knowledge$importAll$ru importAll = Translations$knowledge$importAll$ru._(_root);
+	@override late final Translations$knowledge$importSkills$ru importSkills = Translations$knowledge$importSkills$ru._(_root);
+	@override late final Translations$knowledge$linkOptions$ru linkOptions = Translations$knowledge$linkOptions$ru._(_root);
+	@override late final Translations$knowledge$migrate$ru migrate = Translations$knowledge$migrate$ru._(_root);
+}
+
+// Path: skills
+class Translations$skills$ru extends Translations$skills$en {
+	Translations$skills$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$skills$addDialog$ru addDialog = Translations$skills$addDialog$ru._(_root);
+	@override String deleteSkill({required Object name}) => 'Удалить ${name}';
+	@override late final Translations$skills$empty$ru empty = Translations$skills$empty$ru._(_root);
+	@override late final Translations$skills$errors$ru errors = Translations$skills$errors$ru._(_root);
+	@override late final Translations$skills$moveDialog$ru moveDialog = Translations$skills$moveDialog$ru._(_root);
+	@override String moveSkill({required Object name}) => 'Переместить ${name}';
+	@override String get projectLabel => 'Проект';
+	@override late final Translations$skills$scopes$ru scopes = Translations$skills$scopes$ru._(_root);
+	@override late final Translations$skills$screen$ru screen = Translations$skills$screen$ru._(_root);
+}
+
+// Path: mcp
+class Translations$mcp$ru extends Translations$mcp$en {
+	Translations$mcp$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$mcp$form$ru form = Translations$mcp$form$ru._(_root);
+	@override late final Translations$mcp$install$ru install = Translations$mcp$install$ru._(_root);
+	@override late final Translations$mcp$servers$ru servers = Translations$mcp$servers$ru._(_root);
+	@override late final Translations$mcp$team$ru team = Translations$mcp$team$ru._(_root);
+	@override late final Translations$mcp$tokens$ru tokens = Translations$mcp$tokens$ru._(_root);
+}
+
+// Path: terminal
+class Translations$terminal$ru extends Translations$terminal$en {
+	Translations$terminal$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$terminal$actions$ru actions = Translations$terminal$actions$ru._(_root);
+	@override late final Translations$terminal$authUrl$ru authUrl = Translations$terminal$authUrl$ru._(_root);
+	@override late final Translations$terminal$errors$ru errors = Translations$terminal$errors$ru._(_root);
+	@override late final Translations$terminal$fileLink$ru fileLink = Translations$terminal$fileLink$ru._(_root);
+	@override late final Translations$terminal$paste$ru paste = Translations$terminal$paste$ru._(_root);
+	@override late final Translations$terminal$shortcuts$ru shortcuts = Translations$terminal$shortcuts$ru._(_root);
+	@override late final Translations$terminal$tabs$ru tabs = Translations$terminal$tabs$ru._(_root);
+}
+
+// Path: worktrees
+class Translations$worktrees$ru extends Translations$worktrees$en {
+	Translations$worktrees$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get branchHint => 'Имя новой ветки (напр. feature/login)';
+	@override String branchingOff({required Object branch}) => 'Ветвление от ${branch}';
+	@override String get cleanupDescription => 'Удалить worktree и ветку после слияния';
+	@override String get created => 'Worktree создан';
+	@override String get deleteBranchLabel => 'Также удалить ветку';
+	@override String dirtyWarning({required Object count}) => 'Внимание: в этом worktree есть ${count} незафиксированных изменений, которые будут потеряны.';
+	@override String get emptyDescription => 'Создайте worktree, чтобы изолировать работу над функцией или запуски агентов.';
+	@override String get emptyTitle => 'Worktree не найдены';
+	@override String get forceRemoveLabel => 'Принудительно удалить (отменить изменения)';
+	@override String headDetachedAt({required Object sha}) => 'HEAD откреплён на ${sha}';
+	@override String get mainBadge => 'main';
+	@override String mergeDescription({required Object branch}) => 'Слить изменения в ${branch}.';
+	@override String mergeTitle({required Object branch}) => 'Слить ${branch}';
+	@override String merged({required Object branch}) => 'Worktree слит в ${branch}';
+	@override String opened({required Object branch}) => 'Открыт worktree: ${branch}';
+	@override String get portHint => 'Порт запуска (необязательно, напр. 3000)';
+	@override String get removeDescription => 'Это удалит папку worktree. Связанные проекты будут заархивированы.';
+	@override String removeTitle({required Object branch}) => 'Удалить worktree ${branch}?';
+	@override String get removed => 'Worktree удалён';
+	@override String get runButton => 'Запустить';
+	@override String get runHint => 'Команда запуска (напр. npm run dev)';
+	@override String get runRunning => 'выполняется';
+	@override String runRunningWithPort({required Object port}) => 'выполняется :${port}';
+	@override String get scripts => 'Скрипты';
+	@override String get scriptsSaved => 'Конфигурация скриптов сохранена';
+	@override String get serverLabel => 'Сервер: ';
+	@override String get setupHint => 'Команда настройки (напр. npm install)';
+	@override String get setupLabel => 'Настройка: ';
+	@override String get squashDescription => 'Объединить все коммиты в один коммит';
+	@override String get stopButton => 'Остановить';
+}
+
+// Path: quota
+class Translations$quota$ru extends Translations$quota$en {
+	Translations$quota$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$quota$agents$ru agents = Translations$quota$agents$ru._(_root);
+	@override late final Translations$quota$chart$ru chart = Translations$quota$chart$ru._(_root);
+	@override late final Translations$quota$config$ru config = Translations$quota$config$ru._(_root);
+	@override late final Translations$quota$overview$ru overview = Translations$quota$overview$ru._(_root);
+	@override late final Translations$quota$section$ru section = Translations$quota$section$ru._(_root);
+}
+
+// Path: scheduler
+class Translations$scheduler$ru extends Translations$scheduler$en {
+	Translations$scheduler$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get checking => 'Проверка…';
+	@override String get cronHint => 'Cron (мин час день месяц день недели) — напр. 0 9 * * *';
+	@override String deleteMessage({required Object id}) => 'Это удалит повторяющуюся задачу ${id}. Существующие сессии сохранятся.';
+	@override String get deleteTitle => 'Удалить расписание?';
+	@override String get editTitle => 'Редактировать расписание';
+	@override String get newLabel => 'Новый';
+	@override String nextIn({required Object time}) => 'через ${time}';
+	@override String get promptHint => 'Запрос для агента';
+	@override String get runs => 'Запуски';
+	@override String session({required Object id}) => 'сессия ${id}';
+	@override String get worktree => 'worktree';
+}
+
+// Path: notifications
+class Translations$notifications$ru extends Translations$notifications$en {
+	Translations$notifications$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get deviceLabel => 'ddagent Flutter';
+	@override late final Translations$notifications$errors$ru errors = Translations$notifications$errors$ru._(_root);
+}
+
+// Path: serverConnect
+class Translations$serverConnect$ru extends Translations$serverConnect$en {
+	Translations$serverConnect$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get connect => 'Подключить';
+	@override String get connecting => 'Подключение…';
+	@override String connectionFailed({required Object error}) => 'Не удалось подключиться (${error})';
+	@override String get enterUrl => 'Введите URL сервера';
+	@override String get subtitle => 'Подключитесь к вашему серверу ddagent';
+}
+
+// Path: voice
+class Translations$voice$ru extends Translations$voice$en {
+	Translations$voice$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get apiKeySaved => 'API-ключ (сохранён, введите, чтобы заменить)';
+	@override String get preview => 'Предпросмотр';
+	@override String get saveFailed => 'Не удалось сохранить конфигурацию STT';
+	@override String get settingsSaved => 'Настройки голосового ввода сохранены';
+}
+
+// Path: preview
+class Translations$preview$ru extends Translations$preview$en {
+	Translations$preview$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get embeddedWebOnly => 'Встроенный предпросмотр доступен в веб-сборке';
+	@override String get startDevServerHint => 'Запустите dev-сервер (npm run dev, flutter run -d web-server…),\nи его порт появится здесь.';
+}
+
+// Path: sharedContext
+class Translations$sharedContext$ru extends Translations$sharedContext$en {
+	Translations$sharedContext$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Общие заметки';
+}
+
+// Path: collab
+class Translations$collab$ru extends Translations$collab$en {
+	Translations$collab$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get copyToken => 'Копировать токен';
+	@override String get createInvite => 'Создать приглашение';
+	@override String get invite => 'Пригласить';
+	@override String get inviteTeammate => 'Пригласить коллегу';
+	@override late final Translations$collab$roles$ru roles = Translations$collab$roles$ru._(_root);
+	@override String get shareTokenHint => 'Поделитесь этим токеном приглашения — он показывается один раз и действует 72 ч:';
+	@override String get team => 'Команда';
+}
+
+// Path: browser
+class Translations$browser$ru extends Translations$browser$en {
+	Translations$browser$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get dialogTitle => 'Браузер агента';
+	@override String get viewError => 'Ошибка представления браузера';
+	@override String get web => 'Веб';
+}
+
+// Path: projects
+class Translations$projects$ru extends Translations$projects$en {
+	Translations$projects$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get archive => 'Архивировать';
+	@override String archivedSection({required Object count}) => 'Архивные (${count})';
+	@override String get clone => 'Клонировать';
+	@override String get cloneFailed => 'Не удалось клонировать';
+	@override String get cloneFinished => 'Клонирование завершено. Обновление списка проектов…';
+	@override String get cloneRepository => 'Клонировать репозиторий';
+	@override String get deletePermanently => 'Удалить навсегда';
+	@override String deleteProjectMessage({required Object name}) => 'Безвозвратно удаляет «${name}» вместе со всеми сессиями и сохранённой историей (очистка JSONL). Действие необратимо.';
+	@override String get deleteProjectTitle => 'Удалить проект?';
+	@override String get destinationPath => 'Путь назначения';
+	@override String get destinationPathRequired => 'Укажите путь назначения';
+	@override String get displayNameOptional => 'Отображаемое имя (необязательно)';
+	@override String get failedToLoadTokens => 'Не удалось загрузить токены GitHub';
+	@override String get githubTokenOptional => 'Токен GitHub (необязательно)';
+	@override String get newer => 'Новее';
+	@override String get older => 'Старее';
+	@override String get projectArchived => 'Проект архивирован';
+	@override String get projectDeleted => 'Проект удалён';
+	@override String get projectRenamed => 'Проект переименован';
+	@override String get projectRestored => 'Проект восстановлен';
+	@override String get repoUrlPlaceholder => 'https://github.com/org/repo.git';
+	@override String get repositoryCloned => 'Репозиторий клонирован';
+	@override String get repositoryUrlRequired => 'Укажите URL репозитория';
+	@override String get restore => 'Восстановить';
+	@override String sessionCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(count,
+		one: '${count} сессия',
+		other: '${count} сессий',
+	);
+	@override String get unknown => 'Неизвестно';
+	@override String usingStoredToken({required Object name}) => 'Используется сохранённый токен: ${name}';
+}
+
+// Path: sessions
+class Translations$sessions$ru extends Translations$sessions$en {
+	Translations$sessions$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$sessions$activity$ru activity = Translations$sessions$activity$ru._(_root);
+	@override late final Translations$sessions$age$ru age = Translations$sessions$age$ru._(_root);
+	@override String get archive => 'Архивировать';
+	@override String get archivedSessions => 'Архивные сессии';
+	@override String get autoOrchestrator => 'Авто (оркестратор)';
+	@override String get compareWith => 'Сравнить с…';
+	@override String createFailed({required Object error}) => 'Не удалось создать сессию: ${error}';
+	@override String deleteSessionMessage({required Object name}) => 'Удаляет «${name}» и её транскрипт. Действие необратимо.';
+	@override String get newSessionProvider => 'Новая сессия — провайдер';
+	@override String get noRecentSessions => 'Нет недавних сессий';
+	@override String get noSessions => 'Нет сессий';
+	@override String get projectPath => 'Путь к проекту';
+	@override String get rename => 'Переименовать';
+	@override late final Translations$sessions$toasts$ru toasts = Translations$sessions$toasts$ru._(_root);
+}
+
+// Path: git
+class Translations$git$ru extends Translations$git$en {
+	Translations$git$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get aiButton => '✦ ИИ';
+	@override late final Translations$git$checkpoints$ru checkpoints = Translations$git$checkpoints$ru._(_root);
+	@override String get commitCreated => 'Коммит создан';
+	@override String get commitMessage => 'Сообщение коммита';
+	@override String get deleteFile => 'Удалить файл';
+	@override String get hunkStage => '+ Фрагмент';
+	@override String get hunkUnstage => '− Фрагмент';
+	@override String get largeDiff => 'Большой diff: отрисовка ограничена, чтобы вкладка оставалась отзывчивой.';
+	@override String loadDiffFailed({required Object error}) => 'Не удалось загрузить diff: ${error}';
+	@override String get noBranch => 'нет ветки';
+	@override String get noDiff => 'Нет доступного diff';
+	@override String get selectProject => 'Выберите проект';
+	@override String get splitDiff => 'Рядом';
+	@override String get stageHunk => 'Подготовить фрагмент';
+	@override String get stagedChanges => 'Подготовленные изменения';
+	@override String get statusStaged => 'Подготовлено';
+	@override String get switchBranch => 'Переключить ветку';
+	@override String get unifiedDiff => 'Единый';
+	@override String get unstageHunk => 'Отменить подготовку фрагмента';
+}
+
+// Path: kanban
+class Translations$kanban$ru extends Translations$kanban$en {
+	Translations$kanban$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$kanban$card$ru card = Translations$kanban$card$ru._(_root);
+	@override late final Translations$kanban$comments$ru comments = Translations$kanban$comments$ru._(_root);
+	@override late final Translations$kanban$details$ru details = Translations$kanban$details$ru._(_root);
+	@override late final Translations$kanban$dialog$ru dialog = Translations$kanban$dialog$ru._(_root);
+	@override late final Translations$kanban$empty$ru empty = Translations$kanban$empty$ru._(_root);
+	@override String get saveFailed => 'Не удалось сохранить карточку';
+	@override late final Translations$kanban$time$ru time = Translations$kanban$time$ru._(_root);
+}
+
+// Path: onboarding
+class Translations$onboarding$ru extends Translations$onboarding$en {
+	Translations$onboarding$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$onboarding$agents$ru agents = Translations$onboarding$agents$ru._(_root);
+	@override String get completeSetup => 'Завершить настройку';
+	@override late final Translations$onboarding$errors$ru errors = Translations$onboarding$errors$ru._(_root);
+	@override String get gitHint => 'Используется для коммитов, создаваемых сессиями ddagent.';
+	@override late final Translations$onboarding$mcp$ru mcp = Translations$onboarding$mcp$ru._(_root);
+}
+
+// Path: fileTree
+class Translations$fileTree$ru extends Translations$fileTree$en {
+	Translations$fileTree$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get browseServerFilesystem => 'Обзор файловой системы сервера';
+	@override String get chooseFolder => 'Выбрать папку';
+	@override String get copyContents => 'Копировать содержимое';
+	@override String get noFiles => 'Нет файлов';
+	@override late final Translations$fileTree$search$ru search = Translations$fileTree$search$ru._(_root);
+	@override late final Translations$fileTree$titles$ru titles = Translations$fileTree$titles$ru._(_root);
+	@override String get uploadHere => 'Загрузить сюда';
+	@override String get uploadTo => 'Загрузить в';
+	@override String uploadedCount({required Object count}) => 'Загружено файлов: ${count}';
+	@override String get newName => 'Новое имя';
+	@override String notRegisteredProject({required Object path}) => 'Проект не зарегистрирован: ${path}';
+	@override String get showGitignoredFiles => 'Показать игнорируемые файлы';
+	@override String get hideGitignoredFiles => 'Скрыть игнорируемые файлы';
+	@override String get downloadUnsupportedOnWeb => 'Скачивание не поддерживается в веб-версии';
+	@override String get saveToPath => 'Сохранить по пути';
+	@override String savedTo({required Object path}) => 'Сохранено в ${path}';
+}
+
+// Path: workspace
+class Translations$workspace$ru extends Translations$workspace$en {
+	Translations$workspace$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get archivedWorkspaceName => 'Архив';
+	@override String get closePane => 'Закрыть панель';
+	@override String get closeSearch => 'Закрыть поиск';
+	@override String get deleteSessionNotice => 'Удаляет сессию и её транскрипт. Действие необратимо.';
+	@override String get exportChat => 'Экспортировать чат';
+	@override String get jumpToSession => 'Перейти к сессии…';
+	@override String get newChatProvider => 'Новый чат — провайдер';
+	@override String get nextMatch => 'Следующее совпадение';
+	@override String get previousMatch => 'Предыдущее совпадение';
+	@override String get searchTranscript => 'Поиск по транскрипту';
+	@override String sendTo({required Object count}) => 'Отправить в ${count}';
+	@override String accountWithLabel({required Object label}) => 'По умолчанию · ${label}';
+	@override String get finishRunBeforeChangingWorkspace => 'Завершите запуск перед сменой рабочей области';
+	@override String get restored => 'Рабочая область восстановлена';
+	@override String get maximizePane => 'Развернуть панель';
+	@override String get restorePanes => 'Восстановить панели';
+	@override String get reviewChangedFiles => 'Просмотреть изменённые файлы';
 }
 
 // Path: auth.login
@@ -381,6 +808,7 @@ class Translations$chat$tools$ru extends Translations$chat$tools$en {
 	@override String get updateTodo => 'Обновить список задач';
 	@override String get readTodo => 'Прочитать список задач';
 	@override String get searchResults => 'результаты';
+	@override String get todoReadLabel => 'TodoRead: чтение списка задач';
 }
 
 // Path: chat.search
@@ -462,6 +890,15 @@ class Translations$chat$permissions$ru extends Translations$chat$permissions$en 
 	@override String get retry => 'Разрешение сохранено. Повторите запрос для использования инструмента.';
 	@override String get error => 'Не удалось обновить разрешения. Попробуйте снова.';
 	@override String get openSettings => 'Открыть настройки';
+	@override String get allow => 'Разрешить';
+	@override String allowAll({required Object count}) => 'Разрешить все (${count})';
+	@override String get allowWithChanges => 'Разрешить с изменениями';
+	@override String get always => 'Всегда';
+	@override String get deny => 'Запретить';
+	@override String get editAndAllow => 'Изменить и разрешить';
+	@override String get editInput => 'Изменить ввод';
+	@override String get invalidJson => 'Неверный JSON';
+	@override String get reject => 'Отклонить';
 }
 
 // Path: chat.todo
@@ -540,6 +977,7 @@ class Translations$chat$input$ru extends Translations$chat$input$en {
 	@override String get autoContinueTasks => 'Автопродолжение';
 	@override String get autoContinueTasksTooltip => 'Включите, чтобы Devin автоматически переходил к следующей задаче Task Master';
 	@override late final Translations$chat$input$offlineQueue$ru offlineQueue = Translations$chat$input$offlineQueue$ru._(_root);
+	@override String cameraUnavailable({required Object error}) => 'Камера недоступна: ${error}';
 }
 
 // Path: chat.providerSelection
@@ -586,6 +1024,8 @@ class Translations$chat$session$ru extends Translations$chat$session$en {
 	@override late final Translations$chat$session$kContinue$ru kContinue = Translations$chat$session$kContinue$ru._(_root);
 	@override late final Translations$chat$session$loading$ru loading = Translations$chat$session$loading$ru._(_root);
 	@override late final Translations$chat$session$messages$ru messages = Translations$chat$session$messages$ru._(_root);
+	@override String get deleteConfirm => 'Удаляет сессию и её транскрипт. Действие необратимо.';
+	@override String get finishRunBeforeWorkspaceChange => 'Завершите запуск перед сменой рабочей области';
 }
 
 // Path: chat.shell
@@ -765,6 +1205,9 @@ class Translations$chat$askUserQuestion$ru extends Translations$chat$askUserQues
 
 	// Translations
 	@override String needsInput({required Object provider}) => '${provider} ждёт вашего ответа';
+	@override String get answerHint => 'Введите ваш ответ…';
+	@override String get other => 'Другое…';
+	@override String get skip => 'Пропустить';
 }
 
 // Path: chat.attachments
@@ -776,6 +1219,7 @@ class Translations$chat$attachments$ru extends Translations$chat$attachments$en 
 	// Translations
 	@override String get downloadFailedRetry => 'Загрузка не удалась — нажмите, чтобы повторить';
 	@override String get fileAttachment => 'Вложение';
+	@override String download({required Object name}) => 'Скачать ${name}';
 }
 
 // Path: chat.checkpoint
@@ -788,6 +1232,7 @@ class Translations$chat$checkpoint$ru extends Translations$chat$checkpoint$en {
 	@override String get creating => 'Создание снимка…';
 	@override String get revertChanges => 'Вернуть файлы к последнему чекпоинту';
 	@override String get undo => 'Отменить чекпоинт';
+	@override String get beforeAiTurn => 'перед ходом ИИ';
 }
 
 // Path: chat.common
@@ -811,6 +1256,8 @@ class Translations$chat$taskMaster$ru extends Translations$chat$taskMaster$en {
 	@override String get saved => 'Сохранено';
 	@override String get saving => 'Сохранение...';
 	@override String get taskShort => 'ЗАДАЧА';
+	@override String get addToTask => 'Добавить в TaskMaster';
+	@override String get added => 'Добавлено в TaskMaster';
 }
 
 // Path: chat.tokenUsage
@@ -868,6 +1315,103 @@ class Translations$chat$broadcast$ru extends Translations$chat$broadcast$en {
 	@override String get noOrchestrators => 'Нет доступных сессий оркестратора';
 }
 
+// Path: chat.changes
+class Translations$chat$changes$ru extends Translations$chat$changes$en {
+	Translations$chat$changes$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get empty => 'Нет изменений файлов';
+	@override String get failedToLoad => 'Не удалось загрузить изменения';
+}
+
+// Path: chat.commandResult
+class Translations$chat$commandResult$ru extends Translations$chat$commandResult$en {
+	Translations$chat$commandResult$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$chat$commandResult$fallback$ru fallback = Translations$chat$commandResult$fallback$ru._(_root);
+	@override String get filterCommands => 'Фильтр команд...';
+	@override String searchModels({required Object provider}) => 'Поиск моделей ${provider}...';
+}
+
+// Path: chat.commands
+class Translations$chat$commands$ru extends Translations$chat$commands$en {
+	Translations$chat$commands$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get runConfirmTitle => 'Выполнить команду?';
+	@override String get executionCancelled => 'Выполнение команды отменено';
+}
+
+// Path: chat.export
+class Translations$chat$export$ru extends Translations$chat$export$en {
+	Translations$chat$export$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String sessionTitle({required Object id}) => 'Сессия ${id}';
+	@override String get pdfFailed => 'Не удалось экспортировать PDF';
+	@override String get transcriptDownloaded => 'Транскрипт скачан';
+	@override String savedTo({required Object path}) => 'Сохранено ${path}';
+}
+
+// Path: chat.message
+class Translations$chat$message$ru extends Translations$chat$message$en {
+	Translations$chat$message$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get compactedSummary => 'Сжатая сводка';
+	@override String get rawView => 'Исходный вид';
+	@override String get resendHint => 'Отправить повторно из поля ввода';
+}
+
+// Path: chat.modelLibrary
+class Translations$chat$modelLibrary$ru extends Translations$chat$modelLibrary$en {
+	Translations$chat$modelLibrary$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String deleteTooltip({required Object name}) => 'Удалить ${name}';
+	@override String editTooltip({required Object name}) => 'Изменить ${name}';
+	@override String get enterNameAndId => 'Введите и имя модели, и ID модели.';
+	@override String get idNoSpaces => 'ID модели не может содержать пробелы.';
+	@override String get setAsDefault => 'Сделать по умолчанию';
+	@override String get defaultModel => 'Модель по умолчанию';
+}
+
+// Path: chat.pinFile
+class Translations$chat$pinFile$ru extends Translations$chat$pinFile$en {
+	Translations$chat$pinFile$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get action => 'Закрепить';
+	@override String get pathHint => 'path/to/file.ext';
+	@override String get title => 'Закрепить файл';
+}
+
+// Path: chat.permissionRequest
+class Translations$chat$permissionRequest$ru extends Translations$chat$permissionRequest$en {
+	Translations$chat$permissionRequest$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String title({required Object tool}) => 'Запрос разрешения · ${tool}';
+	@override String get question => 'Вопрос';
+}
+
 // Path: codeEditor.toolbar
 class Translations$codeEditor$toolbar$ru extends Translations$codeEditor$toolbar$en {
 	Translations$codeEditor$toolbar$ru._(TranslationsRu root) : this._root = root, super.internal(root);
@@ -883,6 +1427,10 @@ class Translations$codeEditor$toolbar$ru extends Translations$codeEditor$toolbar
 	@override String get settings => 'Настройки редактора';
 	@override String get collapse => 'Свернуть редактор';
 	@override String get expand => 'Развернуть редактор на всю ширину';
+	@override String get diffMerge => 'Diff / слияние';
+	@override String get previewInBrowser => 'Предпросмотр в браузере';
+	@override String get reload => 'Перезагрузить с диска';
+	@override String get toggleDock => 'Переключить панель файлов';
 }
 
 // Path: codeEditor.header
@@ -917,6 +1465,7 @@ class Translations$codeEditor$actions$ru extends Translations$codeEditor$actions
 	@override String get unpinFile => 'Открепить файл от контекста';
 	@override String get previewHtml => 'Открыть HTML-предпросмотр в новой вкладке';
 	@override String get retry => 'Повторить';
+	@override String get saveAll => 'Сохранить все';
 }
 
 // Path: codeEditor.footer
@@ -940,6 +1489,7 @@ class Translations$codeEditor$binaryFile$ru extends Translations$codeEditor$bina
 	// Translations
 	@override String get title => 'Бинарный файл';
 	@override String message({required Object fileName}) => 'Файл "${fileName}" не может быть отображен в текстовом редакторе, так как это бинарный файл.';
+	@override String get cannotDisplayAsText => 'Невозможно отобразить как текст';
 }
 
 // Path: codeEditor.filePreview
@@ -952,6 +1502,81 @@ class Translations$codeEditor$filePreview$ru extends Translations$codeEditor$fil
 	@override String get loading => 'Загрузка предпросмотра...';
 	@override String get error => 'Не удалось отобразить этот файл.';
 	@override String get openInNewTab => 'Открыть в новой вкладке';
+}
+
+// Path: codeEditor.diff
+class Translations$codeEditor$diff$ru extends Translations$codeEditor$diff$en {
+	Translations$codeEditor$diff$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get applyMerge => 'Применить слияние';
+	@override String get base => 'Базовый';
+	@override String get close => 'Закрыть diff';
+	@override String get current => 'Текущий';
+	@override String hunk({required Object number}) => 'Фрагмент ${number}';
+	@override String get noChanges => 'Нет изменений';
+	@override String get deletedOnDisk => 'удалён с диска';
+}
+
+// Path: codeEditor.emptyState
+class Translations$codeEditor$emptyState$ru extends Translations$codeEditor$emptyState$en {
+	Translations$codeEditor$emptyState$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Файл не открыт';
+}
+
+// Path: codeEditor.hexDump
+class Translations$codeEditor$hexDump$ru extends Translations$codeEditor$hexDump$en {
+	Translations$codeEditor$hexDump$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String more({required Object size}) => '… ещё ${size}';
+}
+
+// Path: codeEditor.mediaFile
+class Translations$codeEditor$mediaFile$ru extends Translations$codeEditor$mediaFile$en {
+	Translations$codeEditor$mediaFile$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get subtitle => 'Предпросмотр аудио и видео пока не поддерживается';
+	@override String get title => 'Медиафайл';
+}
+
+// Path: codeEditor.settings
+class Translations$codeEditor$settings$ru extends Translations$codeEditor$settings$en {
+	Translations$codeEditor$settings$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String fontSizeDecrease({required Object size}) => 'Размер шрифта −  (сейчас ${size})';
+	@override String get fontSizeIncrease => 'Размер шрифта +';
+	@override String get minimap => 'Миникарта';
+	@override String tabSize({required Object size}) => 'Размер табуляции: ${size}';
+}
+
+// Path: codeEditor.toasts
+class Translations$codeEditor$toasts$ru extends Translations$codeEditor$toasts$en {
+	Translations$codeEditor$toasts$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String savedFile({required Object name}) => 'Сохранено ${name}';
+	@override String get saveFailed => 'Не удалось сохранить';
+	@override String get allSaved => 'Всё сохранено';
+	@override String get someSavesFailed => 'Некоторые сохранения не удались';
+	@override String savedTo({required Object path}) => 'Сохранено в ${path}';
+	@override String get mergeApplied => 'Слияние применено — сохраните, чтобы зафиксировать';
 }
 
 // Path: common.buttons
@@ -977,6 +1602,8 @@ class Translations$common$buttons$ru extends Translations$common$buttons$en {
 	@override String get download => 'Скачать';
 	@override String get upload => 'Загрузить';
 	@override String get browse => 'Обзор';
+	@override String get openDiagram => 'Открыть диаграмму';
+	@override String get update => 'Обновить';
 }
 
 // Path: common.tabs
@@ -1516,6 +2143,34 @@ class Translations$common$projects$ru extends Translations$common$projects$en {
 	@override String get newSession => 'Новая сессия';
 }
 
+// Path: common.codeBlock
+class Translations$common$codeBlock$ru extends Translations$common$codeBlock$en {
+	Translations$common$codeBlock$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get wrapLines => 'Переносить строки';
+	@override String get noWrap => 'Без переноса';
+}
+
+// Path: common.update
+class Translations$common$update$ru extends Translations$common$update$en {
+	Translations$common$update$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String available({required Object version}) => 'Доступно обновление · v${version}';
+	@override String confirm({required Object version}) => 'Обновить до v${version}? Сервер обновится сам и перезапустится — активные сессии будут прерваны.';
+	@override String get downloading => 'Скачивание и применение обновления…';
+	@override String get restarting => 'Перезапуск сервера — это займёт мгновение…';
+	@override String done({required Object version}) => 'Обновлено до v${version}. Перезагрузите приложение, чтобы применить новую сборку.';
+	@override String get manualRestart => 'Обновление применено, но сервер не перезапустился сам — перезапустите его вручную, чтобы завершить.';
+	@override String get failed => 'Обновление не удалось.';
+	@override String get failedTitle => 'Не удалось обновить';
+}
+
 // Path: settings.changelog
 class Translations$settings$changelog$ru extends Translations$settings$changelog$en {
 	Translations$settings$changelog$ru._(TranslationsRu root) : this._root = root, super.internal(root);
@@ -1544,6 +2199,7 @@ class Translations$settings$server$ru extends Translations$settings$server$en {
 	@override String get restarting => 'Перезапуск… страница перезагрузится, когда сервер вернётся.';
 	@override String get restartFailed => 'Перезапуск не удался';
 	@override String get unsupported => 'Перезапуск доступен только когда сервер работает под менеджером служб.';
+	@override String get ok => 'OK';
 }
 
 // Path: settings.updates
@@ -1632,6 +2288,7 @@ class Translations$settings$appearance$ru extends Translations$settings$appearan
 	@override String get showMinimap => 'Показать миникарту';
 	@override String get lineNumbers => 'Номера строк';
 	@override String get fontSize => 'Размер шрифта';
+	@override late final Translations$settings$appearance$themeModes$ru themeModes = Translations$settings$appearance$themeModes$ru._(_root);
 }
 
 // Path: settings.actions
@@ -1661,6 +2318,7 @@ class Translations$settings$quickSettings$ru extends Translations$settings$quick
 	@override String get sendByCtrlEnter => 'Отправка по Ctrl+Enter';
 	@override String get sendByCtrlEnterDescription => 'Когда включено, нажатие Ctrl+Enter будет отправлять сообщение вместо просто Enter. Это полезно для пользователей IME, чтобы избежать случайной отправки.';
 	@override late final Translations$settings$quickSettings$dragHandle$ru dragHandle = Translations$settings$quickSettings$dragHandle$ru._(_root);
+	@override String get sendWithCtrlEnter => 'Отправлять по Ctrl+Enter';
 }
 
 // Path: settings.terminalShortcuts
@@ -1741,6 +2399,8 @@ class Translations$settings$notifications$ru extends Translations$settings$notif
 	@override late final Translations$settings$notifications$sound$ru sound = Translations$settings$notifications$sound$ru._(_root);
 	@override late final Translations$settings$notifications$events$ru events = Translations$settings$notifications$events$ru._(_root);
 	@override late final Translations$settings$notifications$desktop$ru desktop = Translations$settings$notifications$desktop$ru._(_root);
+	@override late final Translations$settings$notifications$channels$ru channels = Translations$settings$notifications$channels$ru._(_root);
+	@override String get unpair => 'Отвязать';
 }
 
 // Path: settings.appearanceSettings
@@ -1956,6 +2616,7 @@ class Translations$settings$workspaces$ru extends Translations$settings$workspac
 	@override String get description => 'Рабочие области — каталоги, в которых ddagent может вести чаты, запускать код и просматривать файлы.';
 	@override String get remove => 'Удалить рабочую область';
 	@override String get title => 'Рабочие области';
+	@override String get pathRequired => 'Требуется путь';
 }
 
 // Path: settings.about
@@ -1967,6 +2628,10 @@ class Translations$settings$about$ru extends Translations$settings$about$en {
 	// Translations
 	@override String get supportTitle => 'Поддержать проект';
 	@override String get buyMeACoffee => 'Угостите меня кофе';
+	@override String get learnMore => 'Подробнее';
+	@override late final Translations$settings$about$pro$ru pro = Translations$settings$about$pro$ru._(_root);
+	@override String get proFeatures => 'Возможности ddagent Pro';
+	@override String get tryHosted => 'Попробовать ddagent Hosted';
 }
 
 // Path: sidebar.projects
@@ -2355,6 +3020,7 @@ class Translations$tasks$notConfigured$ru extends Translations$tasks$notConfigur
 	@override String get whatIsTitle => '🎯 Что такое TaskMaster?';
 	@override late final Translations$tasks$notConfigured$features$ru features = Translations$tasks$notConfigured$features$ru._(_root);
 	@override String get initializeButton => 'Инициализировать TaskMaster AI';
+	@override String get writePrdFirst => 'Сначала создайте PRD';
 }
 
 // Path: tasks.gettingStarted
@@ -2508,6 +3174,15 @@ class Translations$tasks$prd$ru extends Translations$tasks$prd$en {
 
 	// Translations
 	@override String modified({required Object date}) => 'Изменено: ${date}';
+	@override String editorTitle({required Object name}) => 'PRD — ${name}';
+	@override String fileExistsMessage({required Object name}) => 'PRD с именем «${name}» уже существует. Перезаписать его?';
+	@override String get fileExistsTitle => 'Файл уже существует';
+	@override String get newFile => 'новый файл';
+	@override String get parse => 'Разобрать PRD';
+	@override String get template => 'Шаблон';
+	@override String get fileNameHint => 'имя файла (например, prd.txt)';
+	@override String get saved => 'PRD сохранён';
+	@override String get tasksGenerated => 'Задачи созданы из PRD';
 }
 
 // Path: tasks.statuses
@@ -2523,6 +3198,7 @@ class Translations$tasks$statuses$ru extends Translations$tasks$statuses$en {
 	@override String get blocked => 'Заблокировано';
 	@override String get deferred => 'Отложено';
 	@override String get cancelled => 'Отменено';
+	@override String get review => 'Ревью';
 }
 
 // Path: tasks.priorities
@@ -2625,6 +3301,8 @@ class Translations$tasks$list$ru extends Translations$tasks$list$en {
 	@override String get inProgressComplete => 'Выполняется (нажмите, чтобы завершить)';
 	@override String get markCompleted => 'Отметить как выполненную';
 	@override String toggleStatusAria({required Object id}) => 'Переключить статус задачи ${id}';
+	@override String get markDone => 'Отметить как выполненную';
+	@override String get reopen => 'Возобновить';
 }
 
 // Path: tasks.nextTask
@@ -2681,6 +3359,20 @@ class Translations$tasks$taskDetail$ru extends Translations$tasks$taskDetail$en 
 	@override String get testStrategy => 'Стратегия тестирования';
 	@override String get titleRequired => 'Название обязательно';
 	@override String get updateFailed => 'Не удалось обновить задачу';
+	@override String deleteConfirmMessage({required Object id}) => 'Задача #${id} будет удалена. Действие необратимо.';
+	@override String get notFound => 'Задача не найдена';
+	@override String get subtasks => 'Подзадачи';
+	@override String get idCopied => 'ID задачи скопирован';
+}
+
+// Path: tasks.toasts
+class Translations$tasks$toasts$ru extends Translations$tasks$toasts$en {
+	Translations$tasks$toasts$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String statusInProgress({required Object id}) => 'Задача ${id} переведена в статус «В процессе»';
 }
 
 // Path: knowledge.tabs
@@ -2875,6 +3567,672 @@ class Translations$knowledge$settings$ru extends Translations$knowledge$settings
 	@override String get description => 'Локальный слой памяти для агентов: память, правила, навыки и личные данные.';
 }
 
+// Path: knowledge.contextBudget
+class Translations$knowledge$contextBudget$ru extends Translations$knowledge$contextBudget$en {
+	Translations$knowledge$contextBudget$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String tokens({required Object tokens, required Object budget}) => '~${tokens} / ${budget} токенов';
+}
+
+// Path: knowledge.critical
+class Translations$knowledge$critical$ru extends Translations$knowledge$critical$en {
+	Translations$knowledge$critical$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get make => 'Сделать критическим';
+	@override String get makeAll => 'Сделать все правила критическими';
+	@override String get makeAllHint => 'Добавляет их в бюджет внедряемого контекста';
+}
+
+// Path: knowledge.errors
+class Translations$knowledge$errors$ru extends Translations$knowledge$errors$en {
+	Translations$knowledge$errors$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String importFailed({required Object error}) => 'Импорт не удался: ${error}';
+	@override String migrationFailed({required Object error}) => 'Миграция не удалась: ${error}';
+}
+
+// Path: knowledge.graph
+class Translations$knowledge$graph$ru extends Translations$knowledge$graph$en {
+	Translations$knowledge$graph$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get truncated => 'обрезано';
+}
+
+// Path: knowledge.importAll
+class Translations$knowledge$importAll$ru extends Translations$knowledge$importAll$en {
+	Translations$knowledge$importAll$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get action => 'Импортировать всё';
+	@override String get mergeDuplicates => 'Объединить дублирующиеся записи';
+	@override String get mergeDuplicatesHint => 'Объединяет дублирующиеся строки в ddagent (не файлы)';
+	@override String projectsScanned({required Object count}) => 'Просканировано проектов: ${count}';
+	@override String rulesSummary({required Object total, required Object duplicates}) => 'Правила: ${total} · группы дубликатов: ${duplicates}';
+	@override String skillsFound({required Object found, required Object newSkills}) => 'Найдено навыков агентов: ${found} (новых: ${newSkills})';
+	@override String get title => 'Импортировать всё в ddagent';
+}
+
+// Path: knowledge.importSkills
+class Translations$knowledge$importSkills$ru extends Translations$knowledge$importSkills$en {
+	Translations$knowledge$importSkills$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String found({required Object count}) => 'Найдено навыков у ваших агентов: ${count}.';
+	@override String summary({required Object imported, required Object skipped}) => 'Новых: ${imported} · пропущено: ${skipped}';
+	@override String get title => 'Импортировать навыки агентов';
+}
+
+// Path: knowledge.linkOptions
+class Translations$knowledge$linkOptions$ru extends Translations$knowledge$linkOptions$en {
+	Translations$knowledge$linkOptions$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String memory({required Object title}) => 'Память: ${title}';
+	@override String personal({required Object title}) => 'Личное: ${title}';
+	@override String rule({required Object title}) => 'Правило: ${title}';
+	@override String skill({required Object name}) => 'Навык: ${name}';
+}
+
+// Path: knowledge.migrate
+class Translations$knowledge$migrate$ru extends Translations$knowledge$migrate$en {
+	Translations$knowledge$migrate$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String duplicates({required Object count}) => 'Группы дубликатов по проектам: ${count}';
+	@override String get mergeDuplicates => 'Объединить дубликаты';
+	@override String removedPromoted({required Object removed, required Object promoted}) => 'Удалено: ${removed}, повышено: ${promoted}';
+	@override String rulesSummary({required Object total, required Object critical}) => 'Правила: всего ${total}, критических: ${critical}.';
+	@override String scanned({required Object count}) => 'Просканировано проектов: ${count}.';
+	@override String get title => 'Мигрировать существующие правила';
+}
+
+// Path: skills.addDialog
+class Translations$skills$addDialog$ru extends Translations$skills$addDialog$en {
+	Translations$skills$addDialog$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get chooseFileTitle => 'Выбрать SKILL.md';
+	@override String get chooseFiles => 'Выбрать файлы';
+	@override String get chooseFolder => 'Выбрать папку';
+	@override String get chooseFolderTitle => 'Выберите папку навыка';
+	@override String folderFilesMeta({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(count,
+		one: '${count} файл · ${size}',
+		other: '${count} файлов · ${size}',
+	);
+	@override String get folderUploadsNote => 'При загрузке папки сохраняется её имя; для отдельных файлов используется `name` из `SKILL.md`.';
+	@override String get hideInstallLocation => 'Скрыть место установки';
+	@override String get installSkill => 'Установить навык';
+	@override String installSkills({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(count,
+		one: 'Установить ${count} навык',
+		other: 'Установить ${count} навыков',
+	);
+	@override String markdownFileMeta({required Object size}) => 'Файл Markdown · ${size}';
+	@override String get pickHint => 'Папки могут содержать скрипты, справочные материалы и ресурсы.';
+	@override String get pickTitle => 'Выберите папку навыка или SKILL.md';
+	@override String get readyToInstall => 'Готово к установке';
+	@override String removeQueued({required Object name}) => 'Удалить ${name}';
+	@override String title({required Object provider}) => 'Добавить навык ${provider}';
+	@override String get uploadHint => 'Загрузите файл SKILL.md или папку навыка целиком.';
+	@override String get whereWillThisInstall => 'Куда это установится?';
+}
+
+// Path: skills.empty
+class Translations$skills$empty$ru extends Translations$skills$empty$en {
+	Translations$skills$empty$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get noGlobalSkills => 'Глобальные навыки пока не найдены';
+	@override String get noGlobalSkillsDescription => 'Добавьте глобальный навык выше, чтобы он был доступен во всех проектах.';
+	@override String get noMatchingSkills => 'Нет подходящих навыков';
+	@override String get noMatchingSkillsDescription => 'Попробуйте другую команду, имя, область, проект или исходный путь.';
+	@override String get noProjects => 'Нет доступных проектов';
+	@override String get noProjectsDescription => 'Добавьте проект или рабочую область, чтобы просмотреть его навыки.';
+	@override String get noSkillsInProject => 'В этом проекте нет навыков';
+	@override String get noSkillsInProjectDescription => 'Создайте папку .claude/skills, .cursor/skills или .agents/skills в выбранном проекте.';
+}
+
+// Path: skills.errors
+class Translations$skills$errors$ru extends Translations$skills$errors$en {
+	Translations$skills$errors$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get addMarkdownFirst => 'Сначала добавьте один или несколько файлов markdown.';
+	@override String couldNotReadSkillFile({required Object name}) => 'Не удалось прочитать SKILL.md из ${name}.';
+	@override String get dropMarkdownOrFolder => 'Перетащите один или несколько файлов markdown или папку с SKILL.md.';
+	@override String folderFileLimit({required Object count}) => 'Папка навыка может содержать до ${count} файлов.';
+	@override String get folderReadFailed => 'Не удалось прочитать папку навыка';
+	@override String get folderSizeLimit => 'Общий размер выбранных папок навыков должен быть меньше 30 МБ.';
+	@override String get importFailed => 'Не удалось импортировать навыки';
+	@override String get missingSkillFile => 'В выбранной папке нет файла SKILL.md.';
+}
+
+// Path: skills.moveDialog
+class Translations$skills$moveDialog$ru extends Translations$skills$moveDialog$en {
+	Translations$skills$moveDialog$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get moveToGlobal => 'Переместить в глобальные';
+	@override String get moveToProject => 'Переместить в проект';
+	@override String get toGlobalHint => 'Переместите этот навык в глобальную папку навыков, чтобы его могли использовать все проекты.';
+	@override String get toProjectHint => 'Выберите проект, которому будет принадлежать этот навык. Он будет перемещён из глобальной папки навыков провайдера.';
+}
+
+// Path: skills.scopes
+class Translations$skills$scopes$ru extends Translations$skills$scopes$en {
+	Translations$skills$scopes$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get admin => 'Администратор';
+	@override String get plugin => 'Плагин';
+	@override String get project => 'Проект';
+	@override String get repo => 'Репозиторий';
+	@override String get system => 'Система';
+	@override String get user => 'Пользователь';
+}
+
+// Path: skills.screen
+class Translations$skills$screen$ru extends Translations$skills$screen$en {
+	Translations$skills$screen$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get addSkill => 'Добавить навык';
+	@override String get clearSearch => 'Очистить поиск навыков';
+	@override String deleteDescription({required Object directory, required Object provider}) => 'Это удалит папку ${directory} из управляемой папки навыков ${provider}. Действие необратимо.';
+	@override String deleteTitle({required Object name}) => 'Удалить ${name}?';
+	@override String loadingSkills({required Object provider}) => 'Загрузка навыков ${provider}…';
+	@override String manageDescription({required Object provider}) => 'Управляйте навыками ${provider} из локальных файлов, папок целиком и мест, зависящих от проекта.';
+	@override String get noDescription => 'Описание не указано во front matter навыка.';
+	@override String pluginBadge({required Object name}) => 'Плагин: ${name}';
+	@override String projectBadge({required Object name}) => 'Проект: ${name}';
+	@override String get savedSuccessfully => 'Навыки успешно сохранены.';
+	@override String get scanningProjectSkills => 'Сканирование навыков проекта…';
+	@override String get searchHint => 'Поиск навыков…';
+	@override String skillsCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(count,
+		one: '${count} НАВЫК',
+		other: '${count} НАВЫКОВ',
+	);
+	@override String get sourceLabel => 'ИСТОЧНИК';
+}
+
+// Path: mcp.form
+class Translations$mcp$form$ru extends Translations$mcp$form$en {
+	Translations$mcp$form$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$mcp$form$fields$ru fields = Translations$mcp$form$fields$ru._(_root);
+	@override late final Translations$mcp$form$scope$ru scope = Translations$mcp$form$scope$ru._(_root);
+	@override String submitTo({required Object provider}) => 'Добавить сервер в ${provider}';
+	@override late final Translations$mcp$form$validation$ru validation = Translations$mcp$form$validation$ru._(_root);
+}
+
+// Path: mcp.install
+class Translations$mcp$install$ru extends Translations$mcp$install$en {
+	Translations$mcp$install$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get button => 'Установить';
+	@override String get cardDescription => 'Дайте своим агентам базу знаний и инструменты ddagent через MCP — выберите агентов или установите для всех.';
+	@override String get description => 'Позволяет выбранным агентам использовать базу знаний и инструменты ddagent через MCP.';
+	@override String get errorFallback => 'ошибка';
+	@override String failed({required Object error}) => 'Установка не удалась: ${error}';
+	@override String get installForAll => 'Установить для всех';
+	@override String get installSelected => 'Установить выбранным';
+	@override String installedCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(count,
+		one: 'Установлено для ${count} агента.',
+		other: 'Установлено для ${count} агентов.',
+	);
+	@override String partialFailure({required Object count, required Object failed}) => 'Установлено для ${count}; не удалось: ${failed}';
+	@override String get title => 'Установить MCP сервер ddagent';
+}
+
+// Path: mcp.servers
+class Translations$mcp$servers$ru extends Translations$mcp$servers$en {
+	Translations$mcp$servers$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get addGlobalDescription => 'Добавляет этот MCP сервер всем провайдерам: Claude, Cursor, Codex, OpenCode и Devin. Поддерживаются только транспорты stdio и HTTP, поскольку одна и та же конфигурация должна работать у всех провайдеров.';
+	@override String get addGlobalMenuDescription => '«Добавить глобальный MCP сервер» записывает один общий stdio- или HTTP-сервер в Claude, Cursor, Codex, OpenCode и Devin.';
+	@override String get addGlobalTitle => 'Добавить глобальный MCP сервер';
+	@override String addProviderDescription({required Object provider}) => '«Добавить MCP сервер для ${provider}» изменяет только ${provider}.';
+	@override String addProviderTitle({required Object provider}) => 'Добавить MCP сервер для ${provider}';
+	@override late final Translations$mcp$servers$config$ru config = Translations$mcp$servers$config$ru._(_root);
+	@override String descriptionGeneric({required Object provider}) => 'Серверы Model Context Protocol предоставляют ${provider} дополнительные инструменты и источники данных';
+	@override String get loading => 'Загрузка MCP серверов…';
+	@override String get refreshingScopes => 'Обновление областей проектов…';
+}
+
+// Path: mcp.team
+class Translations$mcp$team$ru extends Translations$mcp$team$en {
+	Translations$mcp$team$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get cta => 'Доступно с ddagent Pro';
+	@override String get description => 'Делитесь конфигурациями MCP серверов с командой. Все синхронизируются автоматически.';
+	@override String get title => 'Командные конфигурации MCP';
+}
+
+// Path: mcp.tokens
+class Translations$mcp$tokens$ru extends Translations$mcp$tokens$en {
+	Translations$mcp$tokens$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get scopeWrite => 'Запись';
+}
+
+// Path: terminal.actions
+class Translations$terminal$actions$ru extends Translations$terminal$actions$en {
+	Translations$terminal$actions$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get clearOutput => 'Очистить вывод';
+	@override String get connect => 'Подключить';
+	@override String get newShell => 'Новая оболочка';
+	@override String get newTab => 'Новая вкладка терминала';
+	@override String get providerLogin => 'Вход в провайдер';
+	@override String get restartSession => 'Перезапустить сессию';
+}
+
+// Path: terminal.authUrl
+class Translations$terminal$authUrl$ru extends Translations$terminal$authUrl$en {
+	Translations$terminal$authUrl$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get openInBrowser => 'Открыть в браузере';
+}
+
+// Path: terminal.errors
+class Translations$terminal$errors$ru extends Translations$terminal$errors$en {
+	Translations$terminal$errors$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String couldNotOpenLink({required Object url}) => 'Не удалось открыть ссылку: ${url}';
+}
+
+// Path: terminal.fileLink
+class Translations$terminal$fileLink$ru extends Translations$terminal$fileLink$en {
+	Translations$terminal$fileLink$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String detected({required Object path}) => 'Обнаружен файл: ${path}';
+}
+
+// Path: terminal.paste
+class Translations$terminal$paste$ru extends Translations$terminal$paste$en {
+	Translations$terminal$paste$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get hint => 'Ctrl+V / правый клик → Вставить';
+	@override String get title => 'Вставить в терминал';
+}
+
+// Path: terminal.shortcuts
+class Translations$terminal$shortcuts$ru extends Translations$terminal$shortcuts$en {
+	Translations$terminal$shortcuts$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get eof => 'EOF';
+	@override String get hide => 'Скрыть панель горячих клавиш';
+	@override String get interrupt => 'Прервать (SIGINT)';
+	@override String get suspend => 'Приостановить (SIGTSTP)';
+	@override String get showTooltip => 'Показать горячие клавиши';
+	@override String get hideTooltip => 'Скрыть горячие клавиши';
+}
+
+// Path: terminal.tabs
+class Translations$terminal$tabs$ru extends Translations$terminal$tabs$en {
+	Translations$terminal$tabs$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get antigravityCli => 'Antigravity CLI';
+	@override String get claudeCli => 'Claude CLI';
+	@override String get commandCodeCli => 'Command Code CLI';
+	@override String get cursorCli => 'Cursor CLI';
+	@override String get devinCli => 'Devin CLI';
+	@override String loginTitle({required Object provider}) => 'Вход: ${provider}';
+	@override String get opencodeCli => 'OpenCode CLI';
+	@override String get plainShell => 'Простая оболочка';
+	@override String shellName({required Object index}) => 'Оболочка ${index}';
+}
+
+// Path: quota.agents
+class Translations$quota$agents$ru extends Translations$quota$agents$en {
+	Translations$quota$agents$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String statusCount({required Object status, required Object count}) => '${status} (${count})';
+}
+
+// Path: quota.chart
+class Translations$quota$chart$ru extends Translations$quota$chart$en {
+	Translations$quota$chart$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get hide => 'Скрыть';
+	@override String get noData => 'Недостаточно данных для тренда.';
+	@override String pointReadout({required Object date, required Object tokens, required Object cost}) => '${date} · ${tokens} токенов · ${cost}';
+	@override String get show => 'Показать';
+}
+
+// Path: quota.config
+class Translations$quota$config$ru extends Translations$quota$config$en {
+	Translations$quota$config$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get accountRouting => 'Маршрутизация аккаунтов';
+	@override String get pollerTitle => 'Опрос и оповещения';
+	@override String get save => 'Сохранить конфигурацию';
+}
+
+// Path: quota.overview
+class Translations$quota$overview$ru extends Translations$quota$overview$en {
+	Translations$quota$overview$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get tokensAndCost => 'Токены и стоимость';
+}
+
+// Path: quota.section
+class Translations$quota$section$ru extends Translations$quota$section$en {
+	Translations$quota$section$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get config => 'Конфигурация';
+}
+
+// Path: notifications.errors
+class Translations$notifications$errors$ru extends Translations$notifications$errors$en {
+	Translations$notifications$errors$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get noResponse => 'Нет ответа от сервера';
+	@override String get registrationRejected => 'Сервер отклонил регистрацию';
+}
+
+// Path: collab.roles
+class Translations$collab$roles$ru extends Translations$collab$roles$en {
+	Translations$collab$roles$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get member => 'Участник';
+	@override String get viewer => 'Наблюдатель';
+}
+
+// Path: sessions.activity
+class Translations$sessions$activity$ru extends Translations$sessions$activity$en {
+	Translations$sessions$activity$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get committingChanges => 'Фиксация изменений';
+	@override String editingFile({required Object file}) => 'Редактирование ${file}';
+	@override String get editingFileGeneric => 'Редактирование файла';
+	@override String fetchingUrl({required Object url}) => 'Получение ${url}';
+	@override String get pushingBranch => 'Отправка ветки';
+	@override String readingFile({required Object file}) => 'Чтение ${file}';
+	@override String runningCommand({required Object command}) => 'Выполнение `${command}`';
+	@override String get runningShellCommand => 'Выполнение команды оболочки';
+	@override String runningTool({required Object name}) => 'Выполнение ${name}';
+	@override String searching({required Object query}) => 'Поиск «${query}»';
+	@override String get subagentRunning => 'Выполняется субагент';
+}
+
+// Path: sessions.age
+class Translations$sessions$age$ru extends Translations$sessions$age$en {
+	Translations$sessions$age$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String days({required Object days}) => '${days} дн.';
+	@override String hours({required Object hours}) => '${hours} ч.';
+	@override String get lessThanMinute => '<1 мин.';
+	@override String minutes({required Object count}) => '${count} мин.';
+}
+
+// Path: sessions.toasts
+class Translations$sessions$toasts$ru extends Translations$sessions$toasts$en {
+	Translations$sessions$toasts$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get archived => 'Сессия архивирована';
+	@override String get deleted => 'Сессия удалена';
+	@override String get pinned => 'Сессия закреплена';
+	@override String get renamed => 'Сессия переименована';
+	@override String get restored => 'Сессия восстановлена';
+	@override String get unpinned => 'Сессия откреплена';
+	@override String get workspaceChanged => 'Рабочая область изменена';
+}
+
+// Path: git.checkpoints
+class Translations$git$checkpoints$ru extends Translations$git$checkpoints$en {
+	Translations$git$checkpoints$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get create => 'Новый';
+	@override String get empty => 'Чекпоинтов пока нет';
+	@override String get labelHint => 'Метка чекпоинта (необязательно)';
+	@override String get restoreMessage => 'Сбросить рабочее дерево к этому чекпоинту? Текущие изменения будут заменены.';
+	@override String get restoreTitle => 'Восстановить чекпоинт';
+	@override String get restored => 'Чекпоинт восстановлен';
+	@override String get title => 'Чекпоинты';
+}
+
+// Path: kanban.card
+class Translations$kanban$card$ru extends Translations$kanban$card$en {
+	Translations$kanban$card$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get untitled => 'Без названия';
+}
+
+// Path: kanban.comments
+class Translations$kanban$comments$ru extends Translations$kanban$comments$en {
+	Translations$kanban$comments$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get add => 'Добавить комментарий';
+	@override String get empty => 'Комментариев пока нет';
+}
+
+// Path: kanban.details
+class Translations$kanban$details$ru extends Translations$kanban$details$en {
+	Translations$kanban$details$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String status({required Object status}) => 'Статус: ${status}';
+	@override String get title => 'Детали карточки';
+}
+
+// Path: kanban.dialog
+class Translations$kanban$dialog$ru extends Translations$kanban$dialog$en {
+	Translations$kanban$dialog$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get saving => 'Сохранение…';
+}
+
+// Path: kanban.empty
+class Translations$kanban$empty$ru extends Translations$kanban$empty$en {
+	Translations$kanban$empty$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get noProject => 'Проект не выбран';
+}
+
+// Path: kanban.time
+class Translations$kanban$time$ru extends Translations$kanban$time$en {
+	Translations$kanban$time$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String daysAgo({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(count,
+		one: '1 день назад',
+		other: '${count} дн. назад',
+	);
+	@override String hoursAgo({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(count,
+		one: '1 час назад',
+		other: '${count} ч. назад',
+	);
+	@override String minutesAgo({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(count,
+		one: '1 минуту назад',
+		other: '${count} мин. назад',
+	);
+	@override String get now => 'сейчас';
+}
+
+// Path: onboarding.agents
+class Translations$onboarding$agents$ru extends Translations$onboarding$agents$en {
+	Translations$onboarding$agents$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => 'Войдите в одного или нескольких ИИ-ассистентов программирования. Все они необязательны.';
+	@override String get laterHint => 'Вы можете настроить их позже в Настройках.';
+	@override String get title => 'Подключите своих ИИ-агентов';
+}
+
+// Path: onboarding.errors
+class Translations$onboarding$errors$ru extends Translations$onboarding$errors$en {
+	Translations$onboarding$errors$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get invalidEmail => 'Введите корректный адрес электронной почты.';
+	@override String get nameAndEmailRequired => 'Требуются и имя, и эл. почта для git.';
+}
+
+// Path: onboarding.mcp
+class Translations$onboarding$mcp$ru extends Translations$onboarding$mcp$en {
+	Translations$onboarding$mcp$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => 'Установите MCP сервер ddagent, чтобы ваши агенты могли использовать базу знаний и инструменты ddagent. Выберите агентов или установите для всех.';
+	@override String get installForAll => 'Установить для всех';
+	@override String get installSelected => 'Установить выбранным';
+	@override String installedOn({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(count,
+		one: 'Установлено для ${count} агента.',
+		other: 'Установлено для ${count} агентов.',
+	);
+	@override String installedWithFailures({required Object installedCount, required Object failed}) => 'Установлено для ${installedCount}; не удалось: ${failed}';
+	@override String get laterHint => 'Необязательно — вы также можете установить это позже в Настройках → MCP.';
+	@override String get title => 'Подключить агентов к ddagent';
+}
+
+// Path: fileTree.search
+class Translations$fileTree$search$ru extends Translations$fileTree$search$en {
+	Translations$fileTree$search$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get hint => 'Фильтр по именам / Enter — поиск по содержимому';
+	@override String get noMatches => 'Совпадений нет';
+	@override String get prompt => 'Введите запрос и нажмите Enter';
+	@override String get resultsTruncated => 'Результаты усечены';
+}
+
+// Path: fileTree.titles
+class Translations$fileTree$titles$ru extends Translations$fileTree$titles$en {
+	Translations$fileTree$titles$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String delete({required Object name}) => 'Удалить ${name}';
+	@override String download({required Object name}) => 'Скачать ${name}';
+	@override String rename({required Object name}) => 'Переименовать ${name}';
+}
+
 // Path: auth.login.errors
 class Translations$auth$login$errors$ru extends Translations$auth$login$errors$en {
 	Translations$auth$login$errors$ru._(TranslationsRu root) : this._root = root, super.internal(root);
@@ -3052,6 +4410,9 @@ class Translations$chat$session$messages$ru extends Translations$chat$session$me
 	@override String get loadOlderFailed => 'Не удалось загрузить старые сообщения.';
 	@override String get retry => 'Повторить';
 	@override String get noSearchMatches => 'Нет сообщений, соответствующих запросу.';
+	@override String loadAllCount({required Object count}) => 'Загрузить все (${count})';
+	@override String get loadOlder => 'Загрузить старые сообщения';
+	@override String retryLoadOlder({required Object error}) => 'Повторить загрузку старых — ${error}';
 }
 
 // Path: chat.shell.selectProject
@@ -3157,6 +4518,21 @@ class Translations$chat$claudeStatus$providers$ru extends Translations$chat$clau
 
 	// Translations
 	@override String get assistant => 'Ассистент';
+}
+
+// Path: chat.commandResult.fallback
+class Translations$chat$commandResult$fallback$ru extends Translations$chat$commandResult$fallback$en {
+	Translations$chat$commandResult$fallback$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get config => 'Откройте настройки и конфигурацию.';
+	@override String get cost => 'Просмотрите использование токенов для активной сессии.';
+	@override String get help => 'Показать документацию и синтаксис команд.';
+	@override String get memory => 'Откройте файл памяти CLAUDE.md проекта.';
+	@override String get models => 'Просмотрите доступные модели для активного провайдера.';
+	@override String get status => 'Проверьте состояние среды выполнения, версии, провайдера и окружения.';
 }
 
 // Path: common.fileTree.context
@@ -4051,6 +5427,18 @@ class Translations$settings$mcp$scope$ru extends Translations$settings$mcp$scope
 	@override String get project => 'Проект';
 }
 
+// Path: settings.appearance.themeModes
+class Translations$settings$appearance$themeModes$ru extends Translations$settings$appearance$themeModes$en {
+	Translations$settings$appearance$themeModes$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get dark => 'Темная';
+	@override String get light => 'Светлая';
+	@override String get system => 'Системная';
+}
+
 // Path: settings.quickSettings.sections
 class Translations$settings$quickSettings$sections$ru extends Translations$settings$quickSettings$sections$en {
 	Translations$settings$quickSettings$sections$ru._(TranslationsRu root) : this._root = root, super.internal(root);
@@ -4258,6 +5646,17 @@ class Translations$settings$notifications$desktop$ru extends Translations$settin
 	@override String get unsupported => 'Десктопные уведомления не поддерживаются в этой системе.';
 }
 
+// Path: settings.notifications.channels
+class Translations$settings$notifications$channels$ru extends Translations$settings$notifications$channels$en {
+	Translations$settings$notifications$channels$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get discord => 'Discord';
+	@override String get telegram => 'Telegram';
+}
+
 // Path: settings.appearanceSettings.darkMode
 class Translations$settings$appearanceSettings$darkMode$ru extends Translations$settings$appearanceSettings$darkMode$en {
 	Translations$settings$appearanceSettings$darkMode$ru._(TranslationsRu root) : this._root = root, super.internal(root);
@@ -4398,6 +5797,7 @@ class Translations$settings$git$name$ru extends Translations$settings$git$name$e
 	// Translations
 	@override String get label => 'Имя Git';
 	@override String get help => 'Ваше имя для git коммитов';
+	@override String get placeholder => 'John Doe';
 }
 
 // Path: settings.git.email
@@ -4409,6 +5809,7 @@ class Translations$settings$git$email$ru extends Translations$settings$git$email
 	// Translations
 	@override String get label => 'Email Git';
 	@override String get help => 'Ваш email для git коммитов';
+	@override String get placeholder => 'john@example.com';
 }
 
 // Path: settings.git.actions
@@ -4907,6 +6308,17 @@ class Translations$settings$browser$errors$ru extends Translations$settings$brow
 	@override String get saveSettings => 'Не удалось сохранить настройки Browser';
 }
 
+// Path: settings.about.pro
+class Translations$settings$about$pro$ru extends Translations$settings$about$pro$en {
+	Translations$settings$about$pro$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get syncSettings => 'Синхронизация настроек';
+	@override String get teamManagement => 'Управление командой';
+}
+
 // Path: tasks.notConfigured.features
 class Translations$tasks$notConfigured$features$ru extends Translations$tasks$notConfigured$features$en {
 	Translations$tasks$notConfigured$features$ru._(TranslationsRu root) : this._root = root, super.internal(root);
@@ -5055,6 +6467,53 @@ class Translations$tasks$board$deleteConfirm$ru extends Translations$tasks$board
 	// Translations
 	@override String description({required Object cardTitle}) => '«${cardTitle}» будет удалена безвозвратно.';
 	@override String get title => 'Удалить карточку?';
+}
+
+// Path: mcp.form.fields
+class Translations$mcp$form$fields$ru extends Translations$mcp$form$fields$en {
+	Translations$mcp$form$fields$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get bearerTokenEnvVar => 'Переменная окружения с Bearer-токеном';
+	@override String get envVarNames => 'Имена переменных окружения';
+	@override String get workingDirectory => 'Рабочий каталог';
+}
+
+// Path: mcp.form.scope
+class Translations$mcp$form$scope$ru extends Translations$mcp$form$scope$en {
+	Translations$mcp$form$scope$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get claudeLocal => 'Claude (локально)';
+	@override late final Translations$mcp$form$scope$description$ru description = Translations$mcp$form$scope$description$ru._(_root);
+	@override String get projectAllProviders => 'Проект (все провайдеры)';
+	@override String get userAllProviders => 'Пользователь (все провайдеры)';
+}
+
+// Path: mcp.form.validation
+class Translations$mcp$form$validation$ru extends Translations$mcp$form$validation$en {
+	Translations$mcp$form$validation$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String unsupportedGlobal({required Object type}) => '«Добавить MCP сервер» поддерживает только stdio и http у всех провайдеров, а не ${type}.';
+	@override String unsupportedProvider({required Object provider, required Object type}) => '${provider} не поддерживает MCP серверы типа ${type}';
+}
+
+// Path: mcp.servers.config
+class Translations$mcp$servers$config$ru extends Translations$mcp$servers$config$en {
+	Translations$mcp$servers$config$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get cwd => 'Рабочий каталог';
+	@override String get envVars => 'Переменные окружения';
 }
 
 // Path: common.projectWizard.step1.existing
@@ -5305,6 +6764,8 @@ class Translations$settings$apiKeys$github$form$ru extends Translations$settings
 	@override String get addButton => 'Добавить токен';
 	@override String get cancelButton => 'Отмена';
 	@override String get howToCreate => 'Как создать персональный токен доступа GitHub →';
+	@override String get showToken => 'Показать токен';
+	@override String get hideToken => 'Скрыть токен';
 }
 
 // Path: settings.tasks.notInstalled.steps
@@ -5486,6 +6947,20 @@ class Translations$tasks$gettingStarted$steps$startBuilding$ru extends Translati
 	// Translations
 	@override String get title => 'Начните разработку';
 	@override String get description => 'Попросите вашего AI-ассистента начать работу над задачами, обновлять их статус и добавлять новые задачи по мере развития вашего проекта.';
+}
+
+// Path: mcp.form.scope.description
+class Translations$mcp$form$scope$description$ru extends Translations$mcp$form$scope$description$en {
+	Translations$mcp$form$scope$description$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get local => 'Хранится в пользовательских настройках Claude для выбранного проекта';
+	@override String get project => 'Хранится в рабочей области выбранного проекта';
+	@override String get projectGlobal => 'Записывается в рабочую область выбранного проекта для всех провайдеров';
+	@override String get user => 'Доступно во всех проектах на вашей машине';
+	@override String get userGlobal => 'Записывается в пользовательскую конфигурацию каждого провайдера и доступно во всех проектах на этой машине';
 }
 
 // Path: common.notifications.codes.generic.info
@@ -5683,6 +7158,7 @@ extension on TranslationsRu {
 			'chat.tools.updateTodo' => 'Обновить список задач',
 			'chat.tools.readTodo' => 'Прочитать список задач',
 			'chat.tools.searchResults' => 'результаты',
+			'chat.tools.todoReadLabel' => 'TodoRead: чтение списка задач',
 			'chat.search.found' => ({required Object count, required Object type}) => 'Найдено ${count} ${type}',
 			'chat.search.file' => 'файл',
 			'chat.search.files' => 'файлов',
@@ -5710,6 +7186,15 @@ extension on TranslationsRu {
 			'chat.permissions.retry' => 'Разрешение сохранено. Повторите запрос для использования инструмента.',
 			'chat.permissions.error' => 'Не удалось обновить разрешения. Попробуйте снова.',
 			'chat.permissions.openSettings' => 'Открыть настройки',
+			'chat.permissions.allow' => 'Разрешить',
+			'chat.permissions.allowAll' => ({required Object count}) => 'Разрешить все (${count})',
+			'chat.permissions.allowWithChanges' => 'Разрешить с изменениями',
+			'chat.permissions.always' => 'Всегда',
+			'chat.permissions.deny' => 'Запретить',
+			'chat.permissions.editAndAllow' => 'Изменить и разрешить',
+			'chat.permissions.editInput' => 'Изменить ввод',
+			'chat.permissions.invalidJson' => 'Неверный JSON',
+			'chat.permissions.reject' => 'Отклонить',
 			'chat.todo.updated' => 'Список задач успешно обновлен',
 			'chat.todo.current' => 'Текущий список задач',
 			'chat.plan.viewPlan' => '📋 Просмотр плана реализации',
@@ -5764,6 +7249,7 @@ extension on TranslationsRu {
 			'chat.input.offlineQueue.clearBtn' => 'Отмена',
 			'chat.input.offlineQueue.multiple' => ({required Object count}) => '${count} сообщений в офлайн-очереди — отправятся автоматически при переподключении',
 			'chat.input.offlineQueue.single' => '1 сообщение в офлайн-очереди — отправится автоматически при переподключении',
+			'chat.input.cameraUnavailable' => ({required Object error}) => 'Камера недоступна: ${error}',
 			'chat.providerSelection.title' => 'Выберите вашего AI-ассистента',
 			'chat.providerSelection.description' => 'Выберите провайдера для начала нового разговора',
 			'chat.providerSelection.selectModel' => 'Выбрать модель',
@@ -5813,6 +7299,11 @@ extension on TranslationsRu {
 			'chat.session.messages.loadOlderFailed' => 'Не удалось загрузить старые сообщения.',
 			'chat.session.messages.retry' => 'Повторить',
 			'chat.session.messages.noSearchMatches' => 'Нет сообщений, соответствующих запросу.',
+			'chat.session.messages.loadAllCount' => ({required Object count}) => 'Загрузить все (${count})',
+			'chat.session.messages.loadOlder' => 'Загрузить старые сообщения',
+			'chat.session.messages.retryLoadOlder' => ({required Object error}) => 'Повторить загрузку старых — ${error}',
+			'chat.session.deleteConfirm' => 'Удаляет сессию и её транскрипт. Действие необратимо.',
+			'chat.session.finishRunBeforeWorkspaceChange' => 'Завершите запуск перед сменой рабочей области',
 			'chat.shell.selectProject.title' => 'Выберите проект',
 			'chat.shell.selectProject.description' => 'Выберите проект для открытия интерактивной оболочки в этом каталоге',
 			'chat.shell.status.newSession' => 'Новый сеанс',
@@ -5918,16 +7409,23 @@ extension on TranslationsRu {
 			'chat.splitOverview.idle' => 'Бездействует',
 			'chat.splitOverview.active' => 'Активна',
 			'chat.askUserQuestion.needsInput' => ({required Object provider}) => '${provider} ждёт вашего ответа',
+			'chat.askUserQuestion.answerHint' => 'Введите ваш ответ…',
+			'chat.askUserQuestion.other' => 'Другое…',
+			'chat.askUserQuestion.skip' => 'Пропустить',
 			'chat.attachments.downloadFailedRetry' => 'Загрузка не удалась — нажмите, чтобы повторить',
 			'chat.attachments.fileAttachment' => 'Вложение',
+			'chat.attachments.download' => ({required Object name}) => 'Скачать ${name}',
 			'chat.checkpoint.creating' => 'Создание снимка…',
 			'chat.checkpoint.revertChanges' => 'Вернуть файлы к последнему чекпоинту',
 			'chat.checkpoint.undo' => 'Отменить чекпоинт',
+			'chat.checkpoint.beforeAiTurn' => 'перед ходом ИИ',
 			'chat.common.close' => 'Закрыть',
 			'chat.taskMaster.saveToTask' => 'Задача',
 			'chat.taskMaster.saved' => 'Сохранено',
 			'chat.taskMaster.saving' => 'Сохранение...',
 			'chat.taskMaster.taskShort' => 'ЗАДАЧА',
+			'chat.taskMaster.addToTask' => 'Добавить в TaskMaster',
+			'chat.taskMaster.added' => 'Добавлено в TaskMaster',
 			'chat.tokenUsage.desc' => 'Просмотр потребления токенов в сессии',
 			'chat.tokenUsage.title' => 'Использование токенов',
 			'chat.tool.emptyResult' => '(пока нет вывода — инструмент вернул пустой результат)',
@@ -5938,6 +7436,36 @@ extension on TranslationsRu {
 			'chat.broadcast.selectOrchestrators' => 'Выбрать оркестраторы',
 			'chat.broadcast.orchestratorsOnly' => 'Только оркестраторы',
 			'chat.broadcast.noOrchestrators' => 'Нет доступных сессий оркестратора',
+			'chat.changes.empty' => 'Нет изменений файлов',
+			'chat.changes.failedToLoad' => 'Не удалось загрузить изменения',
+			'chat.commandResult.fallback.config' => 'Откройте настройки и конфигурацию.',
+			'chat.commandResult.fallback.cost' => 'Просмотрите использование токенов для активной сессии.',
+			'chat.commandResult.fallback.help' => 'Показать документацию и синтаксис команд.',
+			'chat.commandResult.fallback.memory' => 'Откройте файл памяти CLAUDE.md проекта.',
+			'chat.commandResult.fallback.models' => 'Просмотрите доступные модели для активного провайдера.',
+			'chat.commandResult.fallback.status' => 'Проверьте состояние среды выполнения, версии, провайдера и окружения.',
+			'chat.commandResult.filterCommands' => 'Фильтр команд...',
+			'chat.commandResult.searchModels' => ({required Object provider}) => 'Поиск моделей ${provider}...',
+			'chat.commands.runConfirmTitle' => 'Выполнить команду?',
+			'chat.commands.executionCancelled' => 'Выполнение команды отменено',
+			'chat.export.sessionTitle' => ({required Object id}) => 'Сессия ${id}',
+			'chat.export.pdfFailed' => 'Не удалось экспортировать PDF',
+			'chat.export.transcriptDownloaded' => 'Транскрипт скачан',
+			'chat.export.savedTo' => ({required Object path}) => 'Сохранено ${path}',
+			'chat.message.compactedSummary' => 'Сжатая сводка',
+			'chat.message.rawView' => 'Исходный вид',
+			'chat.message.resendHint' => 'Отправить повторно из поля ввода',
+			'chat.modelLibrary.deleteTooltip' => ({required Object name}) => 'Удалить ${name}',
+			'chat.modelLibrary.editTooltip' => ({required Object name}) => 'Изменить ${name}',
+			'chat.modelLibrary.enterNameAndId' => 'Введите и имя модели, и ID модели.',
+			'chat.modelLibrary.idNoSpaces' => 'ID модели не может содержать пробелы.',
+			'chat.modelLibrary.setAsDefault' => 'Сделать по умолчанию',
+			'chat.modelLibrary.defaultModel' => 'Модель по умолчанию',
+			'chat.pinFile.action' => 'Закрепить',
+			'chat.pinFile.pathHint' => 'path/to/file.ext',
+			'chat.pinFile.title' => 'Закрепить файл',
+			'chat.permissionRequest.title' => ({required Object tool}) => 'Запрос разрешения · ${tool}',
+			'chat.permissionRequest.question' => 'Вопрос',
 			'codeEditor.toolbar.changes' => 'изменения',
 			'codeEditor.toolbar.previousChange' => 'Предыдущее изменение',
 			'codeEditor.toolbar.nextChange' => 'Следующее изменение',
@@ -5946,6 +7474,10 @@ extension on TranslationsRu {
 			'codeEditor.toolbar.settings' => 'Настройки редактора',
 			'codeEditor.toolbar.collapse' => 'Свернуть редактор',
 			'codeEditor.toolbar.expand' => 'Развернуть редактор на всю ширину',
+			'codeEditor.toolbar.diffMerge' => 'Diff / слияние',
+			'codeEditor.toolbar.previewInBrowser' => 'Предпросмотр в браузере',
+			'codeEditor.toolbar.reload' => 'Перезагрузить с диска',
+			'codeEditor.toolbar.toggleDock' => 'Переключить панель файлов',
 			'codeEditor.loading' => ({required Object fileName}) => 'Загрузка ${fileName}...',
 			'codeEditor.header.showingChanges' => 'Показаны изменения',
 			'codeEditor.actions.copyPath' => 'Копировать путь к файлу',
@@ -5963,14 +7495,40 @@ extension on TranslationsRu {
 			'codeEditor.actions.unpinFile' => 'Открепить файл от контекста',
 			'codeEditor.actions.previewHtml' => 'Открыть HTML-предпросмотр в новой вкладке',
 			'codeEditor.actions.retry' => 'Повторить',
+			'codeEditor.actions.saveAll' => 'Сохранить все',
 			'codeEditor.footer.lines' => 'Строк:',
 			'codeEditor.footer.characters' => 'Символов:',
 			'codeEditor.footer.shortcuts' => 'Нажмите Ctrl+S для сохранения • Esc для закрытия',
 			'codeEditor.binaryFile.title' => 'Бинарный файл',
 			'codeEditor.binaryFile.message' => ({required Object fileName}) => 'Файл "${fileName}" не может быть отображен в текстовом редакторе, так как это бинарный файл.',
+			'codeEditor.binaryFile.cannotDisplayAsText' => 'Невозможно отобразить как текст',
 			'codeEditor.filePreview.loading' => 'Загрузка предпросмотра...',
 			'codeEditor.filePreview.error' => 'Не удалось отобразить этот файл.',
 			'codeEditor.filePreview.openInNewTab' => 'Открыть в новой вкладке',
+			'codeEditor.diff.applyMerge' => 'Применить слияние',
+			'codeEditor.diff.base' => 'Базовый',
+			'codeEditor.diff.close' => 'Закрыть diff',
+			'codeEditor.diff.current' => 'Текущий',
+			'codeEditor.diff.hunk' => ({required Object number}) => 'Фрагмент ${number}',
+			'codeEditor.diff.noChanges' => 'Нет изменений',
+			'codeEditor.diff.deletedOnDisk' => 'удалён с диска',
+			'codeEditor.discardUnsavedChanges' => 'Отменить несохранённые изменения?',
+			'codeEditor.emptyState.title' => 'Файл не открыт',
+			'codeEditor.failedToLoad' => 'Не удалось загрузить файл',
+			'codeEditor.hexDump.more' => ({required Object size}) => '… ещё ${size}',
+			'codeEditor.mediaFile.subtitle' => 'Предпросмотр аудио и видео пока не поддерживается',
+			'codeEditor.mediaFile.title' => 'Медиафайл',
+			'codeEditor.settings.fontSizeDecrease' => ({required Object size}) => 'Размер шрифта −  (сейчас ${size})',
+			'codeEditor.settings.fontSizeIncrease' => 'Размер шрифта +',
+			'codeEditor.settings.minimap' => 'Миникарта',
+			'codeEditor.settings.tabSize' => ({required Object size}) => 'Размер табуляции: ${size}',
+			'codeEditor.unsavedChanges' => ({required Object name}) => 'Несохранённые изменения в ${name}',
+			'codeEditor.toasts.savedFile' => ({required Object name}) => 'Сохранено ${name}',
+			'codeEditor.toasts.saveFailed' => 'Не удалось сохранить',
+			'codeEditor.toasts.allSaved' => 'Всё сохранено',
+			'codeEditor.toasts.someSavesFailed' => 'Некоторые сохранения не удались',
+			'codeEditor.toasts.savedTo' => ({required Object path}) => 'Сохранено в ${path}',
+			'codeEditor.toasts.mergeApplied' => 'Слияние применено — сохраните, чтобы зафиксировать',
 			'common.buttons.save' => 'Сохранить',
 			'common.buttons.cancel' => 'Отмена',
 			'common.buttons.delete' => 'Удалить',
@@ -5987,6 +7545,8 @@ extension on TranslationsRu {
 			'common.buttons.download' => 'Скачать',
 			'common.buttons.upload' => 'Загрузить',
 			'common.buttons.browse' => 'Обзор',
+			'common.buttons.openDiagram' => 'Открыть диаграмму',
+			'common.buttons.update' => 'Обновить',
 			'common.tabs.chat' => 'Чат',
 			'common.tabs.shell' => 'Терминал',
 			'common.tabs.files' => 'Файлы',
@@ -6052,6 +7612,8 @@ extension on TranslationsRu {
 			'common.mainContent.selectProjectDescription' => 'Выберите проект на боковой панели, чтобы начать работу с Claude. Каждый проект содержит ваши сеансы чата и историю файлов.',
 			'common.mainContent.tip' => 'Совет',
 			'common.mainContent.createProjectMobile' => 'Нажмите кнопку меню выше для доступа к проектам',
+			_ => null,
+		} ?? switch (path) {
 			'common.mainContent.createProjectDesktop' => 'Создайте новый проект, нажав на значок папки на боковой панели',
 			'common.mainContent.newSession' => 'Новый сеанс',
 			'common.mainContent.untitledSession' => 'Безымянный сеанс',
@@ -6137,8 +7699,6 @@ extension on TranslationsRu {
 			'common.fileTree.validation.reserved' => 'Имя файла является зарезервированным',
 			'common.projectWizard.title' => 'Создать новый проект',
 			'common.projectWizard.steps.type' => 'Тип',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.steps.configure' => 'Настройка',
 			'common.projectWizard.steps.confirm' => 'Подтверждение',
 			'common.projectWizard.step1.question' => 'У вас уже есть рабочее пространство или вы хотите создать новое?',
@@ -6566,6 +8126,8 @@ extension on TranslationsRu {
 			'common.gitPanel.mergeWorktree.commitCount' => ({required Object count}) => '${count} коммит(ов)',
 			'common.gitPanel.mergeWorktree.merge' => 'Слить',
 			'common.gitPanel.mergeWorktree.mergeMessage' => ({required Object branch}) => 'Слить ветку \'${branch}\'',
+			_ => null,
+		} ?? switch (path) {
 			'common.gitPanel.mergeWorktree.messageLabel' => 'Сообщение коммита',
 			'common.gitPanel.mergeWorktree.squashDesc' => ({required Object commits, required Object branch}) => 'Объединить все ${commits} в один коммит в ${branch}',
 			'common.gitPanel.mergeWorktree.squashLabel' => 'Сжать коммиты (squash)',
@@ -6651,8 +8213,6 @@ extension on TranslationsRu {
 			'common.gitPanel.worktrees.changes' => ({required Object count}) => '${count} изменений',
 			'common.gitPanel.worktrees.count' => ({required Object count}) => '${count} worktree',
 			'common.gitPanel.worktrees.createFirst' => 'Создайте первый worktree',
-			_ => null,
-		} ?? switch (path) {
 			'common.gitPanel.worktrees.detached' => 'откреплён',
 			'common.gitPanel.worktrees.detachedAt' => ({required Object sha}) => 'откреплён @ ${sha}',
 			'common.gitPanel.worktrees.detachedHead' => 'откреплённый HEAD',
@@ -6675,6 +8235,16 @@ extension on TranslationsRu {
 			'common.gitPanel.tabs.worktrees' => 'Ворктри',
 			'common.sessions.renameSession' => 'Переименовать сессию',
 			'common.projects.newSession' => 'Новая сессия',
+			'common.codeBlock.wrapLines' => 'Переносить строки',
+			'common.codeBlock.noWrap' => 'Без переноса',
+			'common.update.available' => ({required Object version}) => 'Доступно обновление · v${version}',
+			'common.update.confirm' => ({required Object version}) => 'Обновить до v${version}? Сервер обновится сам и перезапустится — активные сессии будут прерваны.',
+			'common.update.downloading' => 'Скачивание и применение обновления…',
+			'common.update.restarting' => 'Перезапуск сервера — это займёт мгновение…',
+			'common.update.done' => ({required Object version}) => 'Обновлено до v${version}. Перезагрузите приложение, чтобы применить новую сборку.',
+			'common.update.manualRestart' => 'Обновление применено, но сервер не перезапустился сам — перезапустите его вручную, чтобы завершить.',
+			'common.update.failed' => 'Обновление не удалось.',
+			'common.update.failedTitle' => 'Не удалось обновить',
 			'settings.title' => 'Настройки',
 			'settings.changelog.title' => 'Журнал изменений',
 			'settings.changelog.loading' => 'Загрузка…',
@@ -6688,6 +8258,7 @@ extension on TranslationsRu {
 			'settings.server.restarting' => 'Перезапуск… страница перезагрузится, когда сервер вернётся.',
 			'settings.server.restartFailed' => 'Перезапуск не удался',
 			'settings.server.unsupported' => 'Перезапуск доступен только когда сервер работает под менеджером служб.',
+			'settings.server.ok' => 'OK',
 			'settings.updates.title' => 'Обновления приложения',
 			'settings.updates.description' => 'Проверить GitHub на наличие новой десктопной сборки. Новые версии скачиваются автоматически и устанавливаются при выходе.',
 			'settings.updates.check' => 'Проверить обновления',
@@ -6733,6 +8304,9 @@ extension on TranslationsRu {
 			'settings.appearance.showMinimap' => 'Показать миникарту',
 			'settings.appearance.lineNumbers' => 'Номера строк',
 			'settings.appearance.fontSize' => 'Размер шрифта',
+			'settings.appearance.themeModes.dark' => 'Темная',
+			'settings.appearance.themeModes.light' => 'Светлая',
+			'settings.appearance.themeModes.system' => 'Системная',
 			'settings.actions.saveChanges' => 'Сохранить изменения',
 			'settings.actions.resetToDefaults' => 'Сбросить к значениям по умолчанию',
 			'settings.actions.cancelChanges' => 'Отменить изменения',
@@ -6750,6 +8324,7 @@ extension on TranslationsRu {
 			'settings.quickSettings.dragHandle.openPanel' => 'Открыть панель настроек',
 			'settings.quickSettings.dragHandle.draggingStatus' => 'Перетаскивание...',
 			'settings.quickSettings.dragHandle.toggleAndMove' => 'Нажмите для переключения, перетащите для перемещения',
+			'settings.quickSettings.sendWithCtrlEnter' => 'Отправлять по Ctrl+Enter',
 			'settings.terminalShortcuts.title' => 'Горячие клавиши терминала',
 			'settings.terminalShortcuts.sectionKeys' => 'Клавиши',
 			'settings.terminalShortcuts.sectionNavigation' => 'Навигация',
@@ -6889,6 +8464,9 @@ extension on TranslationsRu {
 			'settings.notifications.desktop.disable' => 'Отключить Push уведомления',
 			'settings.notifications.desktop.enabled' => 'Уведомления включены для этого десктопного приложения',
 			'settings.notifications.desktop.unsupported' => 'Десктопные уведомления не поддерживаются в этой системе.',
+			'settings.notifications.channels.discord' => 'Discord',
+			'settings.notifications.channels.telegram' => 'Telegram',
+			'settings.notifications.unpair' => 'Отвязать',
 			'settings.appearanceSettings.darkMode.label' => 'Темная тема',
 			'settings.appearanceSettings.darkMode.description' => 'Переключение между светлой и темной темами',
 			'settings.appearanceSettings.codeEditor.title' => 'Редактор кода',
@@ -6947,8 +8525,10 @@ extension on TranslationsRu {
 			'settings.git.description' => 'Настройте вашу git идентичность для коммитов. Эти настройки будут применены глобально через git config --global',
 			'settings.git.name.label' => 'Имя Git',
 			'settings.git.name.help' => 'Ваше имя для git коммитов',
+			'settings.git.name.placeholder' => 'John Doe',
 			'settings.git.email.label' => 'Email Git',
 			'settings.git.email.help' => 'Ваш email для git коммитов',
+			'settings.git.email.placeholder' => 'john@example.com',
 			'settings.git.actions.save' => 'Сохранить конфигурацию',
 			'settings.git.actions.saving' => 'Сохранение...',
 			'settings.git.status.success' => 'Успешно сохранено',
@@ -6978,6 +8558,8 @@ extension on TranslationsRu {
 			'settings.apiKeys.github.form.addButton' => 'Добавить токен',
 			'settings.apiKeys.github.form.cancelButton' => 'Отмена',
 			'settings.apiKeys.github.form.howToCreate' => 'Как создать персональный токен доступа GitHub →',
+			'settings.apiKeys.github.form.showToken' => 'Показать токен',
+			'settings.apiKeys.github.form.hideToken' => 'Скрыть токен',
 			'settings.apiKeys.github.empty' => 'GitHub токены еще не добавлены.',
 			'settings.apiKeys.github.added' => 'Добавлен:',
 			'settings.apiKeys.github.confirmDelete' => 'Вы уверены, что хотите удалить этот GitHub токен?',
@@ -7058,6 +8640,8 @@ extension on TranslationsRu {
 			'settings.permissions.toolExamples.bashRm' => '- Заблокировать все команды rm (опасно)',
 			'settings.permissions.shellExamples.title' => 'Примеры команд оболочки:',
 			'settings.permissions.shellExamples.ls' => '- Разрешить команду ls',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.shellExamples.gitStatus' => '- Разрешить git status',
 			'settings.permissions.shellExamples.npmInstall' => '- Разрешить npm install',
 			'settings.permissions.shellExamples.rmRf' => '- Заблокировать рекурсивное удаление',
@@ -7165,8 +8749,6 @@ extension on TranslationsRu {
 			'settings.browser.installed' => 'установлено',
 			'settings.browser.installing' => 'Установка...',
 			'settings.browser.missing' => 'отсутствует',
-			_ => null,
-		} ?? switch (path) {
 			'settings.browser.runtimeRequired' => 'Требуется среда выполнения браузера',
 			'settings.browser.statusDisabled' => 'отключён',
 			'settings.browser.statusLabel' => 'Статус',
@@ -7181,8 +8763,14 @@ extension on TranslationsRu {
 			'settings.workspaces.description' => 'Рабочие области — каталоги, в которых ddagent может вести чаты, запускать код и просматривать файлы.',
 			'settings.workspaces.remove' => 'Удалить рабочую область',
 			'settings.workspaces.title' => 'Рабочие области',
+			'settings.workspaces.pathRequired' => 'Требуется путь',
 			'settings.about.supportTitle' => 'Поддержать проект',
 			'settings.about.buyMeACoffee' => 'Угостите меня кофе',
+			'settings.about.learnMore' => 'Подробнее',
+			'settings.about.pro.syncSettings' => 'Синхронизация настроек',
+			'settings.about.pro.teamManagement' => 'Управление командой',
+			'settings.about.proFeatures' => 'Возможности ddagent Pro',
+			'settings.about.tryHosted' => 'Попробовать ddagent Hosted',
 			'sidebar.projects.title' => 'Проекты',
 			'sidebar.projects.newProject' => 'Новый проект',
 			'sidebar.projects.deleteProject' => 'Убрать проект',
@@ -7377,6 +8965,7 @@ extension on TranslationsRu {
 			'tasks.notConfigured.features.progressVisualization' => 'Визуализация прогресса: канбан-доски и детальная аналитика задач',
 			'tasks.notConfigured.features.cliIntegration' => 'Интеграция с CLI: используйте команды taskmaster для продвинутых рабочих процессов',
 			'tasks.notConfigured.initializeButton' => 'Инициализировать TaskMaster AI',
+			'tasks.notConfigured.writePrdFirst' => 'Сначала создайте PRD',
 			'tasks.gettingStarted.title' => 'Начало работы с TaskMaster',
 			'tasks.gettingStarted.subtitle' => 'TaskMaster инициализирован! Вот что делать дальше:',
 			'tasks.gettingStarted.steps.createPRD.title' => 'Создайте документ требований к продукту (PRD)',
@@ -7457,12 +9046,22 @@ extension on TranslationsRu {
 			'tasks.buttons.createNewPRD' => 'Создать новый PRD',
 			'tasks.buttons.prdsAvailable' => ({required Object count}) => 'Доступно ${count} PRD',
 			'tasks.prd.modified' => ({required Object date}) => 'Изменено: ${date}',
+			'tasks.prd.editorTitle' => ({required Object name}) => 'PRD — ${name}',
+			'tasks.prd.fileExistsMessage' => ({required Object name}) => 'PRD с именем «${name}» уже существует. Перезаписать его?',
+			'tasks.prd.fileExistsTitle' => 'Файл уже существует',
+			'tasks.prd.newFile' => 'новый файл',
+			'tasks.prd.parse' => 'Разобрать PRD',
+			'tasks.prd.template' => 'Шаблон',
+			'tasks.prd.fileNameHint' => 'имя файла (например, prd.txt)',
+			'tasks.prd.saved' => 'PRD сохранён',
+			'tasks.prd.tasksGenerated' => 'Задачи созданы из PRD',
 			'tasks.statuses.pending' => 'Ожидание',
 			'tasks.statuses.inProgress' => 'В процессе',
 			'tasks.statuses.done' => 'Выполнено',
 			'tasks.statuses.blocked' => 'Заблокировано',
 			'tasks.statuses.deferred' => 'Отложено',
 			'tasks.statuses.cancelled' => 'Отменено',
+			'tasks.statuses.review' => 'Ревью',
 			'tasks.priorities.high' => 'Высокий',
 			'tasks.priorities.medium' => 'Средний',
 			'tasks.priorities.low' => 'Низкий',
@@ -7536,6 +9135,8 @@ extension on TranslationsRu {
 			'tasks.list.inProgressComplete' => 'Выполняется (нажмите, чтобы завершить)',
 			'tasks.list.markCompleted' => 'Отметить как выполненную',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => 'Переключить статус задачи ${id}',
+			'tasks.list.markDone' => 'Отметить как выполненную',
+			'tasks.list.reopen' => 'Возобновить',
 			'tasks.nextTask.allComplete' => 'Все задачи выполнены',
 			'tasks.nextTask.feature1' => '- Управление задачами с ИИ: зависимости и подзадачи.',
 			'tasks.nextTask.feature2' => '- Генерация задач из PRD для быстрого старта проекта.',
@@ -7553,6 +9154,8 @@ extension on TranslationsRu {
 			'tasks.taskDetail.cancelEdit' => 'Отменить редактирование',
 			'tasks.taskDetail.close' => 'Закрыть',
 			'tasks.taskDetail.copyTaskId' => 'Копировать ID задачи',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.delete' => 'Удалить задачу',
 			'tasks.taskDetail.deleteConfirmDescription' => ({required Object title}) => '«${title}» будет безвозвратно удалена.',
 			'tasks.taskDetail.deleteConfirmTitle' => 'Удалить задачу?',
@@ -7574,6 +9177,11 @@ extension on TranslationsRu {
 			'tasks.taskDetail.testStrategy' => 'Стратегия тестирования',
 			'tasks.taskDetail.titleRequired' => 'Название обязательно',
 			'tasks.taskDetail.updateFailed' => 'Не удалось обновить задачу',
+			'tasks.taskDetail.deleteConfirmMessage' => ({required Object id}) => 'Задача #${id} будет удалена. Действие необратимо.',
+			'tasks.taskDetail.notFound' => 'Задача не найдена',
+			'tasks.taskDetail.subtasks' => 'Подзадачи',
+			'tasks.taskDetail.idCopied' => 'ID задачи скопирован',
+			'tasks.toasts.statusInProgress' => ({required Object id}) => 'Задача ${id} переведена в статус «В процессе»',
 			'knowledge.title' => 'Знания',
 			'knowledge.tabs.dashboard' => 'Панель',
 			'knowledge.tabs.memories' => 'Память',
@@ -7650,6 +9258,383 @@ extension on TranslationsRu {
 			'knowledge.tags.manage' => 'Управление тегами',
 			'knowledge.tags.none' => 'Тегов нет.',
 			'knowledge.settings.description' => 'Локальный слой памяти для агентов: память, правила, навыки и личные данные.',
+			'knowledge.contextBudget.tokens' => ({required Object tokens, required Object budget}) => '~${tokens} / ${budget} токенов',
+			'knowledge.critical.make' => 'Сделать критическим',
+			'knowledge.critical.makeAll' => 'Сделать все правила критическими',
+			'knowledge.critical.makeAllHint' => 'Добавляет их в бюджет внедряемого контекста',
+			'knowledge.errors.importFailed' => ({required Object error}) => 'Импорт не удался: ${error}',
+			'knowledge.errors.migrationFailed' => ({required Object error}) => 'Миграция не удалась: ${error}',
+			'knowledge.graph.truncated' => 'обрезано',
+			'knowledge.importAll.action' => 'Импортировать всё',
+			'knowledge.importAll.mergeDuplicates' => 'Объединить дублирующиеся записи',
+			'knowledge.importAll.mergeDuplicatesHint' => 'Объединяет дублирующиеся строки в ddagent (не файлы)',
+			'knowledge.importAll.projectsScanned' => ({required Object count}) => 'Просканировано проектов: ${count}',
+			'knowledge.importAll.rulesSummary' => ({required Object total, required Object duplicates}) => 'Правила: ${total} · группы дубликатов: ${duplicates}',
+			'knowledge.importAll.skillsFound' => ({required Object found, required Object newSkills}) => 'Найдено навыков агентов: ${found} (новых: ${newSkills})',
+			'knowledge.importAll.title' => 'Импортировать всё в ddagent',
+			'knowledge.importSkills.found' => ({required Object count}) => 'Найдено навыков у ваших агентов: ${count}.',
+			'knowledge.importSkills.summary' => ({required Object imported, required Object skipped}) => 'Новых: ${imported} · пропущено: ${skipped}',
+			'knowledge.importSkills.title' => 'Импортировать навыки агентов',
+			'knowledge.linkOptions.memory' => ({required Object title}) => 'Память: ${title}',
+			'knowledge.linkOptions.personal' => ({required Object title}) => 'Личное: ${title}',
+			'knowledge.linkOptions.rule' => ({required Object title}) => 'Правило: ${title}',
+			'knowledge.linkOptions.skill' => ({required Object name}) => 'Навык: ${name}',
+			'knowledge.migrate.duplicates' => ({required Object count}) => 'Группы дубликатов по проектам: ${count}',
+			'knowledge.migrate.mergeDuplicates' => 'Объединить дубликаты',
+			'knowledge.migrate.removedPromoted' => ({required Object removed, required Object promoted}) => 'Удалено: ${removed}, повышено: ${promoted}',
+			'knowledge.migrate.rulesSummary' => ({required Object total, required Object critical}) => 'Правила: всего ${total}, критических: ${critical}.',
+			'knowledge.migrate.scanned' => ({required Object count}) => 'Просканировано проектов: ${count}.',
+			'knowledge.migrate.title' => 'Мигрировать существующие правила',
+			'skills.addDialog.chooseFileTitle' => 'Выбрать SKILL.md',
+			'skills.addDialog.chooseFiles' => 'Выбрать файлы',
+			'skills.addDialog.chooseFolder' => 'Выбрать папку',
+			'skills.addDialog.chooseFolderTitle' => 'Выберите папку навыка',
+			'skills.addDialog.folderFilesMeta' => ({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(count, one: '${count} файл · ${size}', other: '${count} файлов · ${size}', ), 
+			'skills.addDialog.folderUploadsNote' => 'При загрузке папки сохраняется её имя; для отдельных файлов используется `name` из `SKILL.md`.',
+			'skills.addDialog.hideInstallLocation' => 'Скрыть место установки',
+			'skills.addDialog.installSkill' => 'Установить навык',
+			'skills.addDialog.installSkills' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(count, one: 'Установить ${count} навык', other: 'Установить ${count} навыков', ), 
+			'skills.addDialog.markdownFileMeta' => ({required Object size}) => 'Файл Markdown · ${size}',
+			'skills.addDialog.pickHint' => 'Папки могут содержать скрипты, справочные материалы и ресурсы.',
+			'skills.addDialog.pickTitle' => 'Выберите папку навыка или SKILL.md',
+			'skills.addDialog.readyToInstall' => 'Готово к установке',
+			'skills.addDialog.removeQueued' => ({required Object name}) => 'Удалить ${name}',
+			'skills.addDialog.title' => ({required Object provider}) => 'Добавить навык ${provider}',
+			'skills.addDialog.uploadHint' => 'Загрузите файл SKILL.md или папку навыка целиком.',
+			'skills.addDialog.whereWillThisInstall' => 'Куда это установится?',
+			'skills.deleteSkill' => ({required Object name}) => 'Удалить ${name}',
+			'skills.empty.noGlobalSkills' => 'Глобальные навыки пока не найдены',
+			'skills.empty.noGlobalSkillsDescription' => 'Добавьте глобальный навык выше, чтобы он был доступен во всех проектах.',
+			'skills.empty.noMatchingSkills' => 'Нет подходящих навыков',
+			'skills.empty.noMatchingSkillsDescription' => 'Попробуйте другую команду, имя, область, проект или исходный путь.',
+			'skills.empty.noProjects' => 'Нет доступных проектов',
+			'skills.empty.noProjectsDescription' => 'Добавьте проект или рабочую область, чтобы просмотреть его навыки.',
+			'skills.empty.noSkillsInProject' => 'В этом проекте нет навыков',
+			'skills.empty.noSkillsInProjectDescription' => 'Создайте папку .claude/skills, .cursor/skills или .agents/skills в выбранном проекте.',
+			'skills.errors.addMarkdownFirst' => 'Сначала добавьте один или несколько файлов markdown.',
+			'skills.errors.couldNotReadSkillFile' => ({required Object name}) => 'Не удалось прочитать SKILL.md из ${name}.',
+			'skills.errors.dropMarkdownOrFolder' => 'Перетащите один или несколько файлов markdown или папку с SKILL.md.',
+			'skills.errors.folderFileLimit' => ({required Object count}) => 'Папка навыка может содержать до ${count} файлов.',
+			'skills.errors.folderReadFailed' => 'Не удалось прочитать папку навыка',
+			'skills.errors.folderSizeLimit' => 'Общий размер выбранных папок навыков должен быть меньше 30 МБ.',
+			'skills.errors.importFailed' => 'Не удалось импортировать навыки',
+			'skills.errors.missingSkillFile' => 'В выбранной папке нет файла SKILL.md.',
+			'skills.moveDialog.moveToGlobal' => 'Переместить в глобальные',
+			'skills.moveDialog.moveToProject' => 'Переместить в проект',
+			'skills.moveDialog.toGlobalHint' => 'Переместите этот навык в глобальную папку навыков, чтобы его могли использовать все проекты.',
+			'skills.moveDialog.toProjectHint' => 'Выберите проект, которому будет принадлежать этот навык. Он будет перемещён из глобальной папки навыков провайдера.',
+			'skills.moveSkill' => ({required Object name}) => 'Переместить ${name}',
+			'skills.projectLabel' => 'Проект',
+			'skills.scopes.admin' => 'Администратор',
+			'skills.scopes.plugin' => 'Плагин',
+			'skills.scopes.project' => 'Проект',
+			'skills.scopes.repo' => 'Репозиторий',
+			'skills.scopes.system' => 'Система',
+			'skills.scopes.user' => 'Пользователь',
+			'skills.screen.addSkill' => 'Добавить навык',
+			'skills.screen.clearSearch' => 'Очистить поиск навыков',
+			'skills.screen.deleteDescription' => ({required Object directory, required Object provider}) => 'Это удалит папку ${directory} из управляемой папки навыков ${provider}. Действие необратимо.',
+			'skills.screen.deleteTitle' => ({required Object name}) => 'Удалить ${name}?',
+			'skills.screen.loadingSkills' => ({required Object provider}) => 'Загрузка навыков ${provider}…',
+			'skills.screen.manageDescription' => ({required Object provider}) => 'Управляйте навыками ${provider} из локальных файлов, папок целиком и мест, зависящих от проекта.',
+			'skills.screen.noDescription' => 'Описание не указано во front matter навыка.',
+			'skills.screen.pluginBadge' => ({required Object name}) => 'Плагин: ${name}',
+			'skills.screen.projectBadge' => ({required Object name}) => 'Проект: ${name}',
+			'skills.screen.savedSuccessfully' => 'Навыки успешно сохранены.',
+			'skills.screen.scanningProjectSkills' => 'Сканирование навыков проекта…',
+			'skills.screen.searchHint' => 'Поиск навыков…',
+			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(count, one: '${count} НАВЫК', other: '${count} НАВЫКОВ', ), 
+			'skills.screen.sourceLabel' => 'ИСТОЧНИК',
+			'mcp.form.fields.bearerTokenEnvVar' => 'Переменная окружения с Bearer-токеном',
+			'mcp.form.fields.envVarNames' => 'Имена переменных окружения',
+			'mcp.form.fields.workingDirectory' => 'Рабочий каталог',
+			'mcp.form.scope.claudeLocal' => 'Claude (локально)',
+			'mcp.form.scope.description.local' => 'Хранится в пользовательских настройках Claude для выбранного проекта',
+			'mcp.form.scope.description.project' => 'Хранится в рабочей области выбранного проекта',
+			'mcp.form.scope.description.projectGlobal' => 'Записывается в рабочую область выбранного проекта для всех провайдеров',
+			'mcp.form.scope.description.user' => 'Доступно во всех проектах на вашей машине',
+			'mcp.form.scope.description.userGlobal' => 'Записывается в пользовательскую конфигурацию каждого провайдера и доступно во всех проектах на этой машине',
+			'mcp.form.scope.projectAllProviders' => 'Проект (все провайдеры)',
+			'mcp.form.scope.userAllProviders' => 'Пользователь (все провайдеры)',
+			'mcp.form.submitTo' => ({required Object provider}) => 'Добавить сервер в ${provider}',
+			'mcp.form.validation.unsupportedGlobal' => ({required Object type}) => '«Добавить MCP сервер» поддерживает только stdio и http у всех провайдеров, а не ${type}.',
+			'mcp.form.validation.unsupportedProvider' => ({required Object provider, required Object type}) => '${provider} не поддерживает MCP серверы типа ${type}',
+			'mcp.install.button' => 'Установить',
+			'mcp.install.cardDescription' => 'Дайте своим агентам базу знаний и инструменты ddagent через MCP — выберите агентов или установите для всех.',
+			'mcp.install.description' => 'Позволяет выбранным агентам использовать базу знаний и инструменты ddagent через MCP.',
+			'mcp.install.errorFallback' => 'ошибка',
+			'mcp.install.failed' => ({required Object error}) => 'Установка не удалась: ${error}',
+			'mcp.install.installForAll' => 'Установить для всех',
+			'mcp.install.installSelected' => 'Установить выбранным',
+			'mcp.install.installedCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(count, one: 'Установлено для ${count} агента.', other: 'Установлено для ${count} агентов.', ), 
+			'mcp.install.partialFailure' => ({required Object count, required Object failed}) => 'Установлено для ${count}; не удалось: ${failed}',
+			'mcp.install.title' => 'Установить MCP сервер ddagent',
+			'mcp.servers.addGlobalDescription' => 'Добавляет этот MCP сервер всем провайдерам: Claude, Cursor, Codex, OpenCode и Devin. Поддерживаются только транспорты stdio и HTTP, поскольку одна и та же конфигурация должна работать у всех провайдеров.',
+			'mcp.servers.addGlobalMenuDescription' => '«Добавить глобальный MCP сервер» записывает один общий stdio- или HTTP-сервер в Claude, Cursor, Codex, OpenCode и Devin.',
+			'mcp.servers.addGlobalTitle' => 'Добавить глобальный MCP сервер',
+			'mcp.servers.addProviderDescription' => ({required Object provider}) => '«Добавить MCP сервер для ${provider}» изменяет только ${provider}.',
+			'mcp.servers.addProviderTitle' => ({required Object provider}) => 'Добавить MCP сервер для ${provider}',
+			'mcp.servers.config.cwd' => 'Рабочий каталог',
+			'mcp.servers.config.envVars' => 'Переменные окружения',
+			'mcp.servers.descriptionGeneric' => ({required Object provider}) => 'Серверы Model Context Protocol предоставляют ${provider} дополнительные инструменты и источники данных',
+			'mcp.servers.loading' => 'Загрузка MCP серверов…',
+			'mcp.servers.refreshingScopes' => 'Обновление областей проектов…',
+			'mcp.team.cta' => 'Доступно с ddagent Pro',
+			'mcp.team.description' => 'Делитесь конфигурациями MCP серверов с командой. Все синхронизируются автоматически.',
+			'mcp.team.title' => 'Командные конфигурации MCP',
+			'mcp.tokens.scopeWrite' => 'Запись',
+			'terminal.actions.clearOutput' => 'Очистить вывод',
+			'terminal.actions.connect' => 'Подключить',
+			'terminal.actions.newShell' => 'Новая оболочка',
+			'terminal.actions.newTab' => 'Новая вкладка терминала',
+			'terminal.actions.providerLogin' => 'Вход в провайдер',
+			'terminal.actions.restartSession' => 'Перезапустить сессию',
+			'terminal.authUrl.openInBrowser' => 'Открыть в браузере',
+			'terminal.errors.couldNotOpenLink' => ({required Object url}) => 'Не удалось открыть ссылку: ${url}',
+			'terminal.fileLink.detected' => ({required Object path}) => 'Обнаружен файл: ${path}',
+			'terminal.paste.hint' => 'Ctrl+V / правый клик → Вставить',
+			'terminal.paste.title' => 'Вставить в терминал',
+			'terminal.shortcuts.eof' => 'EOF',
+			'terminal.shortcuts.hide' => 'Скрыть панель горячих клавиш',
+			'terminal.shortcuts.interrupt' => 'Прервать (SIGINT)',
+			'terminal.shortcuts.suspend' => 'Приостановить (SIGTSTP)',
+			'terminal.shortcuts.showTooltip' => 'Показать горячие клавиши',
+			'terminal.shortcuts.hideTooltip' => 'Скрыть горячие клавиши',
+			'terminal.tabs.antigravityCli' => 'Antigravity CLI',
+			'terminal.tabs.claudeCli' => 'Claude CLI',
+			'terminal.tabs.commandCodeCli' => 'Command Code CLI',
+			'terminal.tabs.cursorCli' => 'Cursor CLI',
+			'terminal.tabs.devinCli' => 'Devin CLI',
+			'terminal.tabs.loginTitle' => ({required Object provider}) => 'Вход: ${provider}',
+			'terminal.tabs.opencodeCli' => 'OpenCode CLI',
+			'terminal.tabs.plainShell' => 'Простая оболочка',
+			'terminal.tabs.shellName' => ({required Object index}) => 'Оболочка ${index}',
+			'worktrees.branchHint' => 'Имя новой ветки (напр. feature/login)',
+			'worktrees.branchingOff' => ({required Object branch}) => 'Ветвление от ${branch}',
+			'worktrees.cleanupDescription' => 'Удалить worktree и ветку после слияния',
+			'worktrees.created' => 'Worktree создан',
+			'worktrees.deleteBranchLabel' => 'Также удалить ветку',
+			'worktrees.dirtyWarning' => ({required Object count}) => 'Внимание: в этом worktree есть ${count} незафиксированных изменений, которые будут потеряны.',
+			'worktrees.emptyDescription' => 'Создайте worktree, чтобы изолировать работу над функцией или запуски агентов.',
+			'worktrees.emptyTitle' => 'Worktree не найдены',
+			'worktrees.forceRemoveLabel' => 'Принудительно удалить (отменить изменения)',
+			'worktrees.headDetachedAt' => ({required Object sha}) => 'HEAD откреплён на ${sha}',
+			'worktrees.mainBadge' => 'main',
+			'worktrees.mergeDescription' => ({required Object branch}) => 'Слить изменения в ${branch}.',
+			'worktrees.mergeTitle' => ({required Object branch}) => 'Слить ${branch}',
+			'worktrees.merged' => ({required Object branch}) => 'Worktree слит в ${branch}',
+			'worktrees.opened' => ({required Object branch}) => 'Открыт worktree: ${branch}',
+			'worktrees.portHint' => 'Порт запуска (необязательно, напр. 3000)',
+			'worktrees.removeDescription' => 'Это удалит папку worktree. Связанные проекты будут заархивированы.',
+			'worktrees.removeTitle' => ({required Object branch}) => 'Удалить worktree ${branch}?',
+			'worktrees.removed' => 'Worktree удалён',
+			'worktrees.runButton' => 'Запустить',
+			'worktrees.runHint' => 'Команда запуска (напр. npm run dev)',
+			'worktrees.runRunning' => 'выполняется',
+			'worktrees.runRunningWithPort' => ({required Object port}) => 'выполняется :${port}',
+			'worktrees.scripts' => 'Скрипты',
+			'worktrees.scriptsSaved' => 'Конфигурация скриптов сохранена',
+			'worktrees.serverLabel' => 'Сервер: ',
+			'worktrees.setupHint' => 'Команда настройки (напр. npm install)',
+			'worktrees.setupLabel' => 'Настройка: ',
+			'worktrees.squashDescription' => 'Объединить все коммиты в один коммит',
+			'worktrees.stopButton' => 'Остановить',
+			'quota.agents.statusCount' => ({required Object status, required Object count}) => '${status} (${count})',
+			'quota.chart.hide' => 'Скрыть',
+			'quota.chart.noData' => 'Недостаточно данных для тренда.',
+			'quota.chart.pointReadout' => ({required Object date, required Object tokens, required Object cost}) => '${date} · ${tokens} токенов · ${cost}',
+			'quota.chart.show' => 'Показать',
+			'quota.config.accountRouting' => 'Маршрутизация аккаунтов',
+			'quota.config.pollerTitle' => 'Опрос и оповещения',
+			'quota.config.save' => 'Сохранить конфигурацию',
+			'quota.overview.tokensAndCost' => 'Токены и стоимость',
+			'quota.section.config' => 'Конфигурация',
+			'scheduler.checking' => 'Проверка…',
+			'scheduler.cronHint' => 'Cron (мин час день месяц день недели) — напр. 0 9 * * *',
+			'scheduler.deleteMessage' => ({required Object id}) => 'Это удалит повторяющуюся задачу ${id}. Существующие сессии сохранятся.',
+			'scheduler.deleteTitle' => 'Удалить расписание?',
+			'scheduler.editTitle' => 'Редактировать расписание',
+			'scheduler.newLabel' => 'Новый',
+			'scheduler.nextIn' => ({required Object time}) => 'через ${time}',
+			'scheduler.promptHint' => 'Запрос для агента',
+			'scheduler.runs' => 'Запуски',
+			'scheduler.session' => ({required Object id}) => 'сессия ${id}',
+			'scheduler.worktree' => 'worktree',
+			'notifications.deviceLabel' => 'ddagent Flutter',
+			'notifications.errors.noResponse' => 'Нет ответа от сервера',
+			'notifications.errors.registrationRejected' => 'Сервер отклонил регистрацию',
+			'serverConnect.connect' => 'Подключить',
+			'serverConnect.connecting' => 'Подключение…',
+			'serverConnect.connectionFailed' => ({required Object error}) => 'Не удалось подключиться (${error})',
+			'serverConnect.enterUrl' => 'Введите URL сервера',
+			'serverConnect.subtitle' => 'Подключитесь к вашему серверу ddagent',
+			'voice.apiKeySaved' => 'API-ключ (сохранён, введите, чтобы заменить)',
+			'voice.preview' => 'Предпросмотр',
+			'voice.saveFailed' => 'Не удалось сохранить конфигурацию STT',
+			'voice.settingsSaved' => 'Настройки голосового ввода сохранены',
+			'preview.embeddedWebOnly' => 'Встроенный предпросмотр доступен в веб-сборке',
+			'preview.startDevServerHint' => 'Запустите dev-сервер (npm run dev, flutter run -d web-server…),\nи его порт появится здесь.',
+			'sharedContext.title' => 'Общие заметки',
+			'collab.copyToken' => 'Копировать токен',
+			'collab.createInvite' => 'Создать приглашение',
+			'collab.invite' => 'Пригласить',
+			'collab.inviteTeammate' => 'Пригласить коллегу',
+			'collab.roles.member' => 'Участник',
+			'collab.roles.viewer' => 'Наблюдатель',
+			'collab.shareTokenHint' => 'Поделитесь этим токеном приглашения — он показывается один раз и действует 72 ч:',
+			'collab.team' => 'Команда',
+			'browser.dialogTitle' => 'Браузер агента',
+			'browser.viewError' => 'Ошибка представления браузера',
+			'browser.web' => 'Веб',
+			'projects.archive' => 'Архивировать',
+			'projects.archivedSection' => ({required Object count}) => 'Архивные (${count})',
+			'projects.clone' => 'Клонировать',
+			'projects.cloneFailed' => 'Не удалось клонировать',
+			'projects.cloneFinished' => 'Клонирование завершено. Обновление списка проектов…',
+			'projects.cloneRepository' => 'Клонировать репозиторий',
+			'projects.deletePermanently' => 'Удалить навсегда',
+			'projects.deleteProjectMessage' => ({required Object name}) => 'Безвозвратно удаляет «${name}» вместе со всеми сессиями и сохранённой историей (очистка JSONL). Действие необратимо.',
+			'projects.deleteProjectTitle' => 'Удалить проект?',
+			'projects.destinationPath' => 'Путь назначения',
+			'projects.destinationPathRequired' => 'Укажите путь назначения',
+			'projects.displayNameOptional' => 'Отображаемое имя (необязательно)',
+			'projects.failedToLoadTokens' => 'Не удалось загрузить токены GitHub',
+			'projects.githubTokenOptional' => 'Токен GitHub (необязательно)',
+			'projects.newer' => 'Новее',
+			'projects.older' => 'Старее',
+			'projects.projectArchived' => 'Проект архивирован',
+			'projects.projectDeleted' => 'Проект удалён',
+			'projects.projectRenamed' => 'Проект переименован',
+			'projects.projectRestored' => 'Проект восстановлен',
+			'projects.repoUrlPlaceholder' => 'https://github.com/org/repo.git',
+			'projects.repositoryCloned' => 'Репозиторий клонирован',
+			'projects.repositoryUrlRequired' => 'Укажите URL репозитория',
+			'projects.restore' => 'Восстановить',
+			'projects.sessionCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(count, one: '${count} сессия', other: '${count} сессий', ), 
+			'projects.unknown' => 'Неизвестно',
+			'projects.usingStoredToken' => ({required Object name}) => 'Используется сохранённый токен: ${name}',
+			'sessions.activity.committingChanges' => 'Фиксация изменений',
+			'sessions.activity.editingFile' => ({required Object file}) => 'Редактирование ${file}',
+			'sessions.activity.editingFileGeneric' => 'Редактирование файла',
+			'sessions.activity.fetchingUrl' => ({required Object url}) => 'Получение ${url}',
+			'sessions.activity.pushingBranch' => 'Отправка ветки',
+			'sessions.activity.readingFile' => ({required Object file}) => 'Чтение ${file}',
+			'sessions.activity.runningCommand' => ({required Object command}) => 'Выполнение `${command}`',
+			'sessions.activity.runningShellCommand' => 'Выполнение команды оболочки',
+			'sessions.activity.runningTool' => ({required Object name}) => 'Выполнение ${name}',
+			'sessions.activity.searching' => ({required Object query}) => 'Поиск «${query}»',
+			'sessions.activity.subagentRunning' => 'Выполняется субагент',
+			'sessions.age.days' => ({required Object days}) => '${days} дн.',
+			'sessions.age.hours' => ({required Object hours}) => '${hours} ч.',
+			'sessions.age.lessThanMinute' => '<1 мин.',
+			'sessions.age.minutes' => ({required Object count}) => '${count} мин.',
+			'sessions.archive' => 'Архивировать',
+			'sessions.archivedSessions' => 'Архивные сессии',
+			'sessions.autoOrchestrator' => 'Авто (оркестратор)',
+			'sessions.compareWith' => 'Сравнить с…',
+			'sessions.createFailed' => ({required Object error}) => 'Не удалось создать сессию: ${error}',
+			'sessions.deleteSessionMessage' => ({required Object name}) => 'Удаляет «${name}» и её транскрипт. Действие необратимо.',
+			'sessions.newSessionProvider' => 'Новая сессия — провайдер',
+			'sessions.noRecentSessions' => 'Нет недавних сессий',
+			'sessions.noSessions' => 'Нет сессий',
+			'sessions.projectPath' => 'Путь к проекту',
+			'sessions.rename' => 'Переименовать',
+			'sessions.toasts.archived' => 'Сессия архивирована',
+			'sessions.toasts.deleted' => 'Сессия удалена',
+			'sessions.toasts.pinned' => 'Сессия закреплена',
+			'sessions.toasts.renamed' => 'Сессия переименована',
+			'sessions.toasts.restored' => 'Сессия восстановлена',
+			'sessions.toasts.unpinned' => 'Сессия откреплена',
+			'sessions.toasts.workspaceChanged' => 'Рабочая область изменена',
+			'git.aiButton' => '✦ ИИ',
+			'git.checkpoints.create' => 'Новый',
+			'git.checkpoints.empty' => 'Чекпоинтов пока нет',
+			'git.checkpoints.labelHint' => 'Метка чекпоинта (необязательно)',
+			'git.checkpoints.restoreMessage' => 'Сбросить рабочее дерево к этому чекпоинту? Текущие изменения будут заменены.',
+			'git.checkpoints.restoreTitle' => 'Восстановить чекпоинт',
+			'git.checkpoints.restored' => 'Чекпоинт восстановлен',
+			'git.checkpoints.title' => 'Чекпоинты',
+			'git.commitCreated' => 'Коммит создан',
+			'git.commitMessage' => 'Сообщение коммита',
+			'git.deleteFile' => 'Удалить файл',
+			'git.hunkStage' => '+ Фрагмент',
+			'git.hunkUnstage' => '− Фрагмент',
+			'git.largeDiff' => 'Большой diff: отрисовка ограничена, чтобы вкладка оставалась отзывчивой.',
+			'git.loadDiffFailed' => ({required Object error}) => 'Не удалось загрузить diff: ${error}',
+			'git.noBranch' => 'нет ветки',
+			'git.noDiff' => 'Нет доступного diff',
+			'git.selectProject' => 'Выберите проект',
+			'git.splitDiff' => 'Рядом',
+			'git.stageHunk' => 'Подготовить фрагмент',
+			'git.stagedChanges' => 'Подготовленные изменения',
+			'git.statusStaged' => 'Подготовлено',
+			'git.switchBranch' => 'Переключить ветку',
+			'git.unifiedDiff' => 'Единый',
+			'git.unstageHunk' => 'Отменить подготовку фрагмента',
+			'kanban.card.untitled' => 'Без названия',
+			'kanban.comments.add' => 'Добавить комментарий',
+			'kanban.comments.empty' => 'Комментариев пока нет',
+			'kanban.details.status' => ({required Object status}) => 'Статус: ${status}',
+			'kanban.details.title' => 'Детали карточки',
+			'kanban.dialog.saving' => 'Сохранение…',
+			'kanban.empty.noProject' => 'Проект не выбран',
+			'kanban.saveFailed' => 'Не удалось сохранить карточку',
+			'kanban.time.daysAgo' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(count, one: '1 день назад', other: '${count} дн. назад', ), 
+			'kanban.time.hoursAgo' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(count, one: '1 час назад', other: '${count} ч. назад', ), 
+			'kanban.time.minutesAgo' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(count, one: '1 минуту назад', other: '${count} мин. назад', ), 
+			'kanban.time.now' => 'сейчас',
+			'onboarding.agents.description' => 'Войдите в одного или нескольких ИИ-ассистентов программирования. Все они необязательны.',
+			'onboarding.agents.laterHint' => 'Вы можете настроить их позже в Настройках.',
+			'onboarding.agents.title' => 'Подключите своих ИИ-агентов',
+			'onboarding.completeSetup' => 'Завершить настройку',
+			'onboarding.errors.invalidEmail' => 'Введите корректный адрес электронной почты.',
+			'onboarding.errors.nameAndEmailRequired' => 'Требуются и имя, и эл. почта для git.',
+			'onboarding.gitHint' => 'Используется для коммитов, создаваемых сессиями ddagent.',
+			'onboarding.mcp.description' => 'Установите MCP сервер ddagent, чтобы ваши агенты могли использовать базу знаний и инструменты ddagent. Выберите агентов или установите для всех.',
+			'onboarding.mcp.installForAll' => 'Установить для всех',
+			'onboarding.mcp.installSelected' => 'Установить выбранным',
+			'onboarding.mcp.installedOn' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(count, one: 'Установлено для ${count} агента.', other: 'Установлено для ${count} агентов.', ), 
+			'onboarding.mcp.installedWithFailures' => ({required Object installedCount, required Object failed}) => 'Установлено для ${installedCount}; не удалось: ${failed}',
+			'onboarding.mcp.laterHint' => 'Необязательно — вы также можете установить это позже в Настройках → MCP.',
+			'onboarding.mcp.title' => 'Подключить агентов к ddagent',
+			'fileTree.browseServerFilesystem' => 'Обзор файловой системы сервера',
+			'fileTree.chooseFolder' => 'Выбрать папку',
+			'fileTree.copyContents' => 'Копировать содержимое',
+			'fileTree.noFiles' => 'Нет файлов',
+			'fileTree.search.hint' => 'Фильтр по именам / Enter — поиск по содержимому',
+			'fileTree.search.noMatches' => 'Совпадений нет',
+			'fileTree.search.prompt' => 'Введите запрос и нажмите Enter',
+			'fileTree.search.resultsTruncated' => 'Результаты усечены',
+			'fileTree.titles.delete' => ({required Object name}) => 'Удалить ${name}',
+			'fileTree.titles.download' => ({required Object name}) => 'Скачать ${name}',
+			'fileTree.titles.rename' => ({required Object name}) => 'Переименовать ${name}',
+			'fileTree.uploadHere' => 'Загрузить сюда',
+			'fileTree.uploadTo' => 'Загрузить в',
+			'fileTree.uploadedCount' => ({required Object count}) => 'Загружено файлов: ${count}',
+			'fileTree.newName' => 'Новое имя',
+			'fileTree.notRegisteredProject' => ({required Object path}) => 'Проект не зарегистрирован: ${path}',
+			'fileTree.showGitignoredFiles' => 'Показать игнорируемые файлы',
+			'fileTree.hideGitignoredFiles' => 'Скрыть игнорируемые файлы',
+			'fileTree.downloadUnsupportedOnWeb' => 'Скачивание не поддерживается в веб-версии',
+			'fileTree.saveToPath' => 'Сохранить по пути',
+			'fileTree.savedTo' => ({required Object path}) => 'Сохранено в ${path}',
+			'workspace.archivedWorkspaceName' => 'Архив',
+			'workspace.closePane' => 'Закрыть панель',
+			'workspace.closeSearch' => 'Закрыть поиск',
+			'workspace.deleteSessionNotice' => 'Удаляет сессию и её транскрипт. Действие необратимо.',
+			'workspace.exportChat' => 'Экспортировать чат',
+			'workspace.jumpToSession' => 'Перейти к сессии…',
+			'workspace.newChatProvider' => 'Новый чат — провайдер',
+			'workspace.nextMatch' => 'Следующее совпадение',
+			'workspace.previousMatch' => 'Предыдущее совпадение',
+			'workspace.searchTranscript' => 'Поиск по транскрипту',
+			'workspace.sendTo' => ({required Object count}) => 'Отправить в ${count}',
+			'workspace.accountWithLabel' => ({required Object label}) => 'По умолчанию · ${label}',
+			'workspace.finishRunBeforeChangingWorkspace' => 'Завершите запуск перед сменой рабочей области',
+			'workspace.restored' => 'Рабочая область восстановлена',
+			'workspace.maximizePane' => 'Развернуть панель',
+			'workspace.restorePanes' => 'Восстановить панели',
+			'workspace.reviewChangedFiles' => 'Просмотреть изменённые файлы',
 			_ => null,
 		};
 	}

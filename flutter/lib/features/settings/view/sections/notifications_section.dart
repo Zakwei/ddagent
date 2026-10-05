@@ -375,7 +375,8 @@ class _MessengerChannelsCardState extends ConsumerState<_MessengerChannelsCard> 
 
   @override
   Widget build(BuildContext context) {
-    final t = Translations.of(context).settings.notifications;
+    final i18n = Translations.of(context);
+    final t = i18n.settings.notifications;
     final c = context.appColors;
     final tt = Theme.of(context).textTheme;
     final prefs = ref.watch(notificationPreferencesProvider).prefs;
@@ -401,7 +402,7 @@ class _MessengerChannelsCardState extends ConsumerState<_MessengerChannelsCard> 
           const SizedBox(height: AppSpacing.md),
           // Telegram
           _ChannelBox(
-            title: 'Telegram',
+            title: t.channels.telegram,
             configured: _configured('telegram'),
             enabled: prefs.telegram,
             onToggle: (v) => unawaited(_toggleChannel('telegram', v)),
@@ -444,7 +445,7 @@ class _MessengerChannelsCardState extends ConsumerState<_MessengerChannelsCard> 
                         ),
                       ),
                       IconButton(
-                        tooltip: 'Refresh',
+                        tooltip: i18n.common.buttons.refresh,
                         visualDensity: VisualDensity.compact,
                         icon: const Icon(LucideIcons.refreshCw, size: 14),
                         onPressed: () => unawaited(_refresh()),
@@ -493,7 +494,7 @@ class _MessengerChannelsCardState extends ConsumerState<_MessengerChannelsCard> 
           const SizedBox(height: AppSpacing.md),
           // Discord
           _ChannelBox(
-            title: 'Discord',
+            title: t.channels.discord,
             configured: _configured('discord'),
             enabled: prefs.discord,
             onToggle: (v) => unawaited(_toggleChannel('discord', v)),
@@ -615,6 +616,7 @@ class _ChatRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context).settings.notifications;
     final c = context.appColors;
     final tt = Theme.of(context).textTheme;
     return Padding(
@@ -644,7 +646,7 @@ class _ChatRow extends StatelessWidget {
             ),
             if (paired)
               IconButton(
-                tooltip: 'Unpair',
+                tooltip: t.unpair,
                 visualDensity: VisualDensity.compact,
                 icon: const Icon(LucideIcons.trash2, size: 14),
                 onPressed: busy ? null : onAction,

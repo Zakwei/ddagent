@@ -229,6 +229,7 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
   /// Click/Enter selection — `isSkillCommand` inserts the command into the
   /// input, everything else executes through `/api/commands/execute`.
   Future<void> _selectSlashCommand(int i) async {
+    final t = Translations.of(context);
     final cmds = _filteredCommands(ref.read(composerProvider(_arg)).slashCommands);
     if (i < 0 || i >= cmds.length) return;
     final c = cmds[i];
@@ -264,14 +265,14 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
     if (result.hasBashCommands) {
       final confirmed = await AppDialog.confirm(
         context,
-        title: 'Run command?',
+        title: t.chat.commands.runConfirmTitle,
         message:
             'This command contains bash commands that will be executed. Do you want to proceed?',
         confirmLabel: 'Proceed',
       );
       if (!mounted) return;
       if (!confirmed) {
-        AppToast.show(context, 'Command execution cancelled');
+        AppToast.show(context, t.chat.commands.executionCancelled);
         _focus.requestFocus();
         return;
       }
@@ -522,7 +523,9 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
       final bytes = await x.readAsBytes();
       await ref.read(composerProvider(_arg).notifier).attach(x.name, bytes, isImage: true);
     } on Object catch (e) {
-      if (mounted) AppToast.error(context, 'Camera unavailable: $e');
+      if (mounted) {
+        AppToast.error(context, Translations.of(context).chat.input.cameraUnavailable(error: e));
+      }
     }
   }
 
@@ -570,9 +573,14 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
     // Snapshot before every AI turn so the whole turn can be undone (web
     // `handleBeforeSend` → `createCheckpoint('before AI turn')`). Best-effort:
     // a failed snapshot must not block the send.
+    final t = Translations.of(context);
     final projectId = widget.projectId;
     if (projectId != null) {
-      unawaited(ref.read(checkpointProvider(projectId).notifier).create(label: 'before AI turn'));
+      unawaited(
+        ref
+            .read(checkpointProvider(projectId).notifier)
+            .create(label: t.chat.checkpoint.beforeAiTurn),
+      );
     }
     final running = ref.read(transcriptProvider(widget.sessionId)).runStatus == 'running';
     await ref.read(composerProvider(_arg).notifier).send(running: running);
@@ -912,20 +920,27 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
   }
 
   Future<void> _pinDialog(BuildContext context) async {
+    final t = Translations.of(context);
     final c = TextEditingController();
     final path = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Pin file'),
+        title: Text(t.chat.pinFile.title),
         content: TextField(
           controller: c,
           autofocus: true,
-          decoration: const InputDecoration(hintText: 'path/to/file.ext'),
+          decoration: InputDecoration(hintText: t.chat.pinFile.pathHint),
           onSubmitted: (v) => Navigator.pop(ctx, v),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(ctx, c.text), child: const Text('Pin')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(t.chat.orchestrator.summary.cancelTasks),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, c.text),
+            child: Text(t.chat.pinFile.action),
+          ),
         ],
       ),
     );
@@ -1125,7 +1140,7 @@ class _CheckpointButton extends ConsumerWidget {
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(ctx, false),
-                        child: const Text('Cancel'),
+                        child: Text(t.chat.orchestrator.summary.cancelTasks),
                       ),
                       FilledButton(
                         onPressed: () => Navigator.pop(ctx, true),
@@ -1338,6 +1353,7 @@ class _OptionBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final t = Translations.of(context);
     return Wrap(
       spacing: 4,
       runSpacing: 4,
@@ -1367,7 +1383,7 @@ class _OptionBar extends ConsumerWidget {
         // new-session composer; an active chat's footer is model+permission.
         if (state.accounts.isNotEmpty && !compact && sessionId.isEmpty)
           _MiniDropdown(
-            label: 'Account',
+            label: t.chat.composer.account,
             value: state.accountId,
             items: [null, for (final a in state.accounts) a.id],
             displayFor: (v) => v == null

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:ddagent_app/core/widgets/code_block.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -23,6 +24,7 @@ class MermaidBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -31,7 +33,7 @@ class MermaidBlock extends StatelessWidget {
           alignment: Alignment.centerRight,
           child: TextButton.icon(
             icon: const Icon(Icons.open_in_new, size: 14),
-            label: const Text('Open diagram'),
+            label: Text(t.common.buttons.openDiagram),
             onPressed: () => launchUrl(_islandUri, mode: LaunchMode.externalApplication),
           ),
         ),

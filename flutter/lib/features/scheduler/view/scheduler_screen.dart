@@ -10,6 +10,7 @@ import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/quota/view/quota_tone.dart';
 import 'package:ddagent_app/features/scheduler/data/scheduler_models.dart';
 import 'package:ddagent_app/features/scheduler/state/scheduler_controller.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -27,6 +28,7 @@ class SchedulerScreen extends ConsumerWidget {
     final projects = ref.watch(projectsProvider).projects;
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     final compact = context.breakpoint.isCompact;
 
     final projectName = {for (final p in projects) p.projectId: p.displayName};
@@ -48,7 +50,7 @@ class SchedulerScreen extends ConsumerWidget {
                   const SizedBox(width: AppSpacing.xs),
                   Flexible(
                     child: Text(
-                      'Schedules',
+                      i18n.settings.schedules.title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: t.titleSmall,
@@ -64,7 +66,7 @@ class SchedulerScreen extends ConsumerWidget {
                   AppButton(
                     size: AppButtonSize.sm,
                     onPressed: () => _JobDialog.show(context),
-                    child: Text(compact ? 'New' : 'New schedule'),
+                    child: Text(compact ? i18n.scheduler.newLabel : i18n.settings.schedules.kNew),
                   ),
                 ],
               ),
@@ -97,7 +99,7 @@ class SchedulerScreen extends ConsumerWidget {
                           Icon(Icons.schedule, size: 32, color: c.mutedForeground),
                           const SizedBox(height: AppSpacing.sm),
                           Text(
-                            'No schedules yet.',
+                            i18n.settings.schedules.empty,
                             style: t.bodyMedium?.copyWith(color: c.mutedForeground),
                           ),
                         ],
@@ -145,6 +147,7 @@ class _JobTileState extends ConsumerState<_JobTile> {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     final ctrl = ref.read(schedulerProvider.notifier);
     final j = widget.job;
     final busy = ref.watch(schedulerProvider.select((s) => s.busy));
@@ -171,8 +174,14 @@ class _JobTileState extends ConsumerState<_JobTile> {
                     style: t.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
                   ),
                 ),
-                if (!j.enabled) _badge(context, 'disabled', c.mutedForeground),
-                if (j.failCount > 0) _badge(context, '${j.failCount} failures', c.destructive),
+                if (!j.enabled)
+                  _badge(context, i18n.settings.schedules.disabled, c.mutedForeground),
+                if (j.failCount > 0)
+                  _badge(
+                    context,
+                    i18n.settings.schedules.failures(count: j.failCount),
+                    c.destructive,
+                  ),
               ],
             ),
             const SizedBox(height: 4),
@@ -186,9 +195,9 @@ class _JobTileState extends ConsumerState<_JobTile> {
                 ),
                 _meta(widget.projectLabel.isEmpty ? '—' : widget.projectLabel),
                 _meta(j.provider.isEmpty ? '—' : j.provider),
-                if (j.useWorktree) _meta('worktree'),
+                if (j.useWorktree) _meta(i18n.scheduler.worktree),
                 if (j.enabled && j.nextRunAt != null)
-                  _meta('next in ${formatRelativeTo(j.nextRunAt)}'),
+                  _meta(i18n.scheduler.nextIn(time: formatRelativeTo(j.nextRunAt))),
               ],
             ),
             const SizedBox(height: AppSpacing.xs),
@@ -211,7 +220,7 @@ class _JobTileState extends ConsumerState<_JobTile> {
                     children: [
                       const Icon(Icons.history, size: 14),
                       const SizedBox(width: 4),
-                      Text('Runs', style: Theme.of(context).textTheme.labelSmall),
+                      Text(i18n.scheduler.runs, style: Theme.of(context).textTheme.labelSmall),
                     ],
                   ),
                 ),
@@ -224,7 +233,10 @@ class _JobTileState extends ConsumerState<_JobTile> {
                     children: [
                       const Icon(Icons.play_arrow, size: 14),
                       const SizedBox(width: 2),
-                      Text('Run now', style: Theme.of(context).textTheme.labelSmall),
+                      Text(
+                        i18n.settings.schedules.runNow,
+                        style: Theme.of(context).textTheme.labelSmall,
+                      ),
                     ],
                   ),
                 ),
@@ -232,7 +244,10 @@ class _JobTileState extends ConsumerState<_JobTile> {
                   variant: AppButtonVariant.ghost,
                   size: AppButtonSize.sm,
                   onPressed: () => _JobDialog.show(context, job: j),
-                  child: Text('Edit', style: Theme.of(context).textTheme.labelSmall),
+                  child: Text(
+                    i18n.common.buttons.edit,
+                    style: Theme.of(context).textTheme.labelSmall,
+                  ),
                 ),
                 AppButton(
                   variant: AppButtonVariant.ghost,
@@ -240,11 +255,9 @@ class _JobTileState extends ConsumerState<_JobTile> {
                   onPressed: () async {
                     final ok = await AppDialog.confirm(
                       context,
-                      title: 'Delete schedule?',
-                      message:
-                          'This removes the recurring job '
-                          '${j.id}. Existing sessions are kept.',
-                      confirmLabel: 'Delete',
+                      title: i18n.scheduler.deleteTitle,
+                      message: i18n.scheduler.deleteMessage(id: j.id),
+                      confirmLabel: i18n.common.buttons.delete,
                     );
                     if (ok && context.mounted) {
                       unawaited(ctrl.deleteJob(j.id));
@@ -275,7 +288,10 @@ class _JobTileState extends ConsumerState<_JobTile> {
                   ),
                 )
               else if (widget.runs!.isEmpty)
-                Text('No runs yet.', style: t.bodySmall?.copyWith(color: c.mutedForeground))
+                Text(
+                  i18n.settings.schedules.noRuns,
+                  style: t.bodySmall?.copyWith(color: c.mutedForeground),
+                )
               else
                 for (final r in widget.runs!) _runRow(context, r),
             ],
@@ -306,6 +322,7 @@ class _JobTileState extends ConsumerState<_JobTile> {
   Widget _runRow(BuildContext context, SchedulerRun r) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     final tone = switch (r.status) {
       'completed' => quotaToneColor(QuotaTone.safe),
       'failed' => c.destructive,
@@ -345,7 +362,9 @@ class _JobTileState extends ConsumerState<_JobTile> {
               onTap: () => context.go('/chat/${r.sessionId}'),
               borderRadius: BorderRadius.circular(AppRadii.sm),
               child: Text(
-                'session ${r.sessionId!.substring(0, r.sessionId!.length.clamp(0, 8))}',
+                i18n.scheduler.session(
+                  id: r.sessionId!.substring(0, r.sessionId!.length.clamp(0, 8)),
+                ),
                 style: t.labelSmall?.copyWith(
                   fontFamily: 'monospace',
                   fontSize: 10,
@@ -443,6 +462,7 @@ class _JobDialogState extends ConsumerState<_JobDialog> {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     final s = ref.watch(schedulerProvider);
     final projects = ref.watch(projectsProvider).projects;
     if (_projectId.isEmpty && projects.isNotEmpty) {
@@ -453,9 +473,11 @@ class _JobDialogState extends ConsumerState<_JobDialog> {
         ? null
         : s.cronError ??
               (s.previewLoading
-                  ? 'Checking…'
+                  ? i18n.scheduler.checking
                   : s.cronPreview?.nextRunAt != null
-                  ? 'Next run: ${DateTime.tryParse(s.cronPreview!.nextRunAt!)?.toLocal()}'
+                  ? i18n.settings.schedules.nextRun(
+                      time: '${DateTime.tryParse(s.cronPreview!.nextRunAt!)?.toLocal()}',
+                    )
                   : null);
     final canSave =
         !_saving &&
@@ -464,7 +486,7 @@ class _JobDialogState extends ConsumerState<_JobDialog> {
         validateCron(_cron.text) == null;
 
     return AlertDialog(
-      title: Text(_editing ? 'Edit schedule' : 'New schedule'),
+      title: Text(_editing ? i18n.scheduler.editTitle : i18n.settings.schedules.kNew),
       content: SizedBox(
         width: 420,
         child: SingleChildScrollView(
@@ -474,7 +496,7 @@ class _JobDialogState extends ConsumerState<_JobDialog> {
             children: [
               DropdownButtonFormField<String>(
                 initialValue: _projectId.isEmpty ? null : _projectId,
-                decoration: const InputDecoration(labelText: 'Project'),
+                decoration: InputDecoration(labelText: i18n.settings.mcp.scope.project),
                 items: [
                   for (final p in projects)
                     DropdownMenuItem(
@@ -492,7 +514,7 @@ class _JobDialogState extends ConsumerState<_JobDialog> {
               const SizedBox(height: AppSpacing.sm),
               DropdownButtonFormField<String>(
                 initialValue: _provider,
-                decoration: const InputDecoration(labelText: 'Provider'),
+                decoration: InputDecoration(labelText: i18n.common.quota.group.provider),
                 items: [
                   for (final p in {..._JobDialog._providers, if (_provider.isNotEmpty) _provider})
                     DropdownMenuItem(value: p, child: Text(p)),
@@ -502,7 +524,7 @@ class _JobDialogState extends ConsumerState<_JobDialog> {
               const SizedBox(height: AppSpacing.sm),
               AppInput(
                 controller: _cron,
-                hint: 'Cron (min hour day month weekday) — e.g. 0 9 * * *',
+                hint: i18n.scheduler.cronHint,
                 onChanged: (_) => setState(() {}),
               ),
               if (cronHint != null)
@@ -518,7 +540,7 @@ class _JobDialogState extends ConsumerState<_JobDialog> {
               const SizedBox(height: AppSpacing.sm),
               AppInput(
                 controller: _prompt,
-                hint: 'Prompt for the agent',
+                hint: i18n.scheduler.promptHint,
                 maxLines: 3,
                 onChanged: (_) => setState(() {}),
               ),
@@ -526,7 +548,7 @@ class _JobDialogState extends ConsumerState<_JobDialog> {
                 dense: true,
                 contentPadding: EdgeInsets.zero,
                 controlAffinity: ListTileControlAffinity.leading,
-                title: const Text('Run in a fresh worktree'),
+                title: Text(i18n.settings.schedules.useWorktree),
                 value: _worktree,
                 onChanged: (v) => setState(() => _worktree = v ?? false),
               ),
@@ -534,7 +556,7 @@ class _JobDialogState extends ConsumerState<_JobDialog> {
                 dense: true,
                 contentPadding: EdgeInsets.zero,
                 controlAffinity: ListTileControlAffinity.leading,
-                title: const Text('Catch up missed runs'),
+                title: Text(i18n.settings.schedules.catchUp),
                 value: _catchUp,
                 onChanged: (v) => setState(() => _catchUp = v ?? false),
               ),
@@ -547,13 +569,13 @@ class _JobDialogState extends ConsumerState<_JobDialog> {
           variant: AppButtonVariant.ghost,
           size: AppButtonSize.sm,
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(i18n.chat.orchestrator.summary.cancelTasks),
         ),
         AppButton(
           size: AppButtonSize.sm,
           loading: _saving,
           onPressed: canSave ? _save : null,
-          child: Text(_editing ? 'Save' : 'Create'),
+          child: Text(_editing ? i18n.common.buttons.save : i18n.common.buttons.create),
         ),
       ],
     );

@@ -45,7 +45,7 @@ class DdagentApp extends ConsumerWidget {
     return MaterialApp.router(
       scaffoldMessengerKey: rootMessengerKey,
       scrollBehavior: const NoMouseDragScrollBehavior(),
-      title: 'ddagent',
+      title: Translations.of(context).sidebar.app.title,
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
       themeMode: ref.watch(themeModeProvider),

@@ -14,6 +14,7 @@ import 'package:ddagent_app/features/file_tree/view/folder_browser.dart';
 import 'package:ddagent_app/features/projects/data/projects_repository.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/settings/data/api_credentials_repository.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -60,6 +61,7 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
   Widget build(BuildContext context) {
     final t = Theme.of(context);
     final c = context.appColors;
+    final i18n = Translations.of(context);
     final state = ref.watch(projectsProvider);
     final ctrl = ref.read(projectsProvider.notifier);
 
@@ -85,7 +87,7 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
                 const AppNavMenuButton(),
                 Expanded(
                   child: AppInput(
-                    hint: 'Search projects…',
+                    hint: i18n.sidebar.projects.searchPlaceholder,
                     onChanged: (v) => setState(() => _query = v),
                   ),
                 ),
@@ -98,7 +100,7 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
                     ),
                   ),
                 IconButton(
-                  tooltip: 'Clone repository',
+                  tooltip: i18n.projects.cloneRepository,
                   icon: const Icon(Icons.cloud_download_outlined),
                   onPressed: () => showDialog<void>(
                     context: context,
@@ -106,7 +108,7 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
                   ).then((_) => ctrl.load()),
                 ),
                 IconButton(
-                  tooltip: 'New project',
+                  tooltip: i18n.sidebar.projects.newProject,
                   icon: Icon(Icons.add, color: c.primary),
                   onPressed: () => showDialog<void>(
                     context: context,
@@ -143,12 +145,24 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
                       ),
                       menu: _ProjectMenu(
                         entries: [
-                          ('Rename', () => unawaited(_renameDialog(p))),
                           (
-                            'Archive',
-                            () => onAction(() => ctrl.archive(p.projectId), 'Project archived'),
+                            i18n.sidebar.projects.renameProject,
+                            () => unawaited(_renameDialog(p)),
+                            false,
                           ),
-                          ('Delete permanently', () => unawaited(_hardDeleteConfirm(p))),
+                          (
+                            i18n.projects.archive,
+                            () => onAction(
+                              () => ctrl.archive(p.projectId),
+                              i18n.projects.projectArchived,
+                            ),
+                            false,
+                          ),
+                          (
+                            i18n.projects.deletePermanently,
+                            () => unawaited(_hardDeleteConfirm(p)),
+                            true,
+                          ),
                         ],
                       ),
                     ),
@@ -156,7 +170,7 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
                     Padding(
                       padding: const EdgeInsets.only(top: 48),
                       child: Text(
-                        'No projects yet',
+                        i18n.sidebar.projects.noProjects,
                         textAlign: TextAlign.center,
                         style: t.textTheme.bodyLarge?.copyWith(color: c.mutedForeground),
                       ),
@@ -175,7 +189,7 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
                               color: c.mutedForeground,
                             ),
                             Text(
-                              'Archived (${state.archived.length})',
+                              i18n.projects.archivedSection(count: state.archived.length),
                               style: t.textTheme.titleSmall?.copyWith(color: c.mutedForeground),
                             ),
                           ],
@@ -198,10 +212,18 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
                           menu: _ProjectMenu(
                             entries: [
                               (
-                                'Restore',
-                                () => onAction(() => ctrl.restore(p.projectId), 'Project restored'),
+                                i18n.projects.restore,
+                                () => onAction(
+                                  () => ctrl.restore(p.projectId),
+                                  i18n.projects.projectRestored,
+                                ),
+                                false,
                               ),
-                              ('Delete permanently', () => unawaited(_hardDeleteConfirm(p))),
+                              (
+                                i18n.projects.deletePermanently,
+                                () => unawaited(_hardDeleteConfirm(p)),
+                                true,
+                              ),
                             ],
                           ),
                         ),
@@ -216,41 +238,48 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
   }
 
   Future<void> _renameDialog(Project p) async {
+    final i18n = Translations.of(context);
     final ctrl = ref.read(projectsProvider.notifier);
     final field = TextEditingController(text: p.displayName);
     final saved = await showDialog<bool>(
       context: context,
       builder: (ctx) => AppDialog(
-        title: 'Rename project',
+        title: i18n.sidebar.projects.renameProject,
         content: AppInput(controller: field, autofocus: true),
         actions: [
           AppButton(
             variant: AppButtonVariant.ghost,
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
+            child: Text(i18n.chat.orchestrator.summary.cancelTasks),
           ),
-          AppButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Save')),
+          AppButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(i18n.codeEditor.actions.save),
+          ),
         ],
       ),
     );
     if (saved == true && field.text.trim().isNotEmpty) {
-      await _actionError(await ctrl.rename(p.projectId, field.text.trim()), 'Project renamed');
+      await _actionError(
+        await ctrl.rename(p.projectId, field.text.trim()),
+        i18n.projects.projectRenamed,
+      );
     }
     field.dispose();
   }
 
   Future<void> _hardDeleteConfirm(Project p) async {
+    final i18n = Translations.of(context);
     final confirmed = await AppDialog.confirm(
       context,
-      title: 'Delete project?',
-      message:
-          'Permanently removes "${p.displayName}" including all sessions and stored history (JSONL wipe). This cannot be undone.',
-      confirmLabel: 'Delete',
+      title: i18n.projects.deleteProjectTitle,
+      message: i18n.projects.deleteProjectMessage(name: p.displayName),
+      confirmLabel: i18n.common.buttons.delete,
     );
     if (confirmed) {
       await _actionError(
         await ref.read(projectsProvider.notifier).hardDelete(p.projectId),
-        'Project deleted',
+        i18n.projects.projectDeleted,
       );
     }
   }
@@ -260,7 +289,7 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
 class _ProjectMenu extends StatelessWidget {
   const _ProjectMenu({required this.entries});
 
-  final List<(String, VoidCallback)> entries;
+  final List<(String, VoidCallback, bool)> entries;
 
   @override
   Widget build(BuildContext context) => PopupMenuButton<int>(
@@ -272,9 +301,7 @@ class _ProjectMenu extends StatelessWidget {
           value: i,
           child: Text(
             entries[i].$1,
-            style: entries[i].$1.contains('Delete')
-                ? TextStyle(color: context.appColors.destructive)
-                : null,
+            style: entries[i].$3 ? TextStyle(color: context.appColors.destructive) : null,
           ),
         ),
     ],
@@ -309,6 +336,7 @@ class _ProjectTileState extends ConsumerState<_ProjectTile> {
   Widget build(BuildContext context) {
     final t = Theme.of(context);
     final c = context.appColors;
+    final i18n = Translations.of(context);
     final p = widget.project;
     return AppCard(
       padding: EdgeInsets.zero,
@@ -352,7 +380,7 @@ class _ProjectTileState extends ConsumerState<_ProjectTile> {
                   Padding(
                     padding: const EdgeInsets.only(right: AppSpacing.xs),
                     child: Text(
-                      '${p.sessionMeta!.total} sessions',
+                      i18n.projects.sessionCount(count: p.sessionMeta!.total),
                       style: t.textTheme.bodySmall?.copyWith(color: c.mutedForeground),
                     ),
                   ),
@@ -408,6 +436,7 @@ class _SessionsList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.appColors;
+    final i18n = Translations.of(context);
     final page = ref.watch(projectSessionsProvider((projectId, _limit, offset)));
     return page.when(
       loading: () => const Padding(
@@ -428,7 +457,8 @@ class _SessionsList extends ConsumerWidget {
               contentPadding: EdgeInsets.zero,
               leading: Icon(Icons.chat_bubble_outline, size: 16, color: c.mutedForeground),
               title: Text(
-                (s['title'] ?? s['displayName'] ?? s['id'] ?? 'session').toString(),
+                (s['title'] ?? s['displayName'] ?? s['id'] ?? i18n.sidebar.projects.untitledSession)
+                    .toString(),
                 overflow: TextOverflow.ellipsis,
               ),
               subtitle: s['provider'] != null
@@ -440,9 +470,15 @@ class _SessionsList extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (offset > 0)
-                TextButton(onPressed: () => onOffset(offset - _limit), child: const Text('Newer')),
+                TextButton(
+                  onPressed: () => onOffset(offset - _limit),
+                  child: Text(i18n.projects.newer),
+                ),
               if (data.sessionMeta?.hasMore == true)
-                TextButton(onPressed: () => onOffset(offset + _limit), child: const Text('Older')),
+                TextButton(
+                  onPressed: () => onOffset(offset + _limit),
+                  child: Text(i18n.projects.older),
+                ),
             ],
           ),
         ],
@@ -538,7 +574,7 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
             setState(() {
               _loadingTokens = false;
               _tokensLoaded = true;
-              _tokenError = e is AppError ? e.message : 'Failed to load GitHub tokens';
+              _tokenError = e is AppError ? e.message : t.projects.failedToLoadTokens;
             });
           }),
     );
@@ -554,10 +590,11 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
   }
 
   void _next() {
+    final i18n = Translations.of(context);
     setState(() => _error = null);
     if (_step == 1) {
       if (_path.text.trim().isEmpty) {
-        setState(() => _error = 'Please provide a workspace path');
+        setState(() => _error = i18n.common.projectWizard.errors.providePath);
         return;
       }
       setState(() => _step = 2);
@@ -599,6 +636,7 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
   }
 
   Future<void> _clone() async {
+    final i18n = Translations.of(context);
     _cancel = CancelToken();
     try {
       await for (final e
@@ -620,7 +658,7 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
         if (type == 'error') {
           setState(() {
             _busy = false;
-            _error = (e.data['error'] ?? e.data['message'] ?? 'Clone failed').toString();
+            _error = (e.data['error'] ?? e.data['message'] ?? i18n.projects.cloneFailed).toString();
           });
           return;
         }
@@ -641,21 +679,22 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
     }
   }
 
-  String get _authLabel {
+  String _authLabel(Translations i18n) {
     if (_tokenMode == 'stored' && _selectedTokenId.isNotEmpty) {
-      return 'Using stored token: ${_selectedTokenName ?? 'Unknown'}';
+      return i18n.projects.usingStoredToken(name: _selectedTokenName ?? i18n.projects.unknown);
     }
     if (_tokenMode == 'new' && _newToken.text.trim().isNotEmpty) {
-      return 'Using provided token';
+      return i18n.common.projectWizard.step3.usingProvidedToken;
     }
-    if (_isSsh) return 'SSH Key';
-    return 'No authentication';
+    if (_isSsh) return i18n.common.projectWizard.step3.sshKey;
+    return i18n.common.projectWizard.step3.noAuthentication;
   }
 
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     // Dismissal is blocked while creating (Escape/backdrop/header X).
     return PopScope(
       canPop: !_busy,
@@ -682,13 +721,13 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
                     const SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: Text(
-                        'Create New Project',
+                        i18n.common.projectWizard.title,
                         style: t.titleMedium?.copyWith(fontWeight: FontWeight.w600),
                       ),
                     ),
                     IconButton(
                       icon: const Icon(Icons.close, size: 20),
-                      tooltip: 'Close',
+                      tooltip: i18n.chat.common.close,
                       onPressed: _busy ? null : () => Navigator.of(context).pop(),
                     ),
                   ],
@@ -706,7 +745,7 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
                         Text(_error!, style: t.bodySmall?.copyWith(color: c.destructive)),
                         const SizedBox(height: AppSpacing.sm),
                       ],
-                      if (_step == 1) _buildStep1(c, t) else _buildStep2(c, t),
+                      if (_step == 1) _buildStep1(c, t, i18n) else _buildStep2(c, t, i18n),
                     ],
                   ),
                 ),
@@ -719,7 +758,11 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
                     AppButton(
                       variant: AppButtonVariant.outline,
                       onPressed: _busy ? null : (_step == 1 ? _close : _back),
-                      child: Text(_step == 1 ? 'Cancel' : 'Back'),
+                      child: Text(
+                        _step == 1
+                            ? i18n.common.projectWizard.buttons.cancel
+                            : i18n.common.projectWizard.buttons.back,
+                      ),
                     ),
                     const Spacer(),
                     AppButton(
@@ -728,8 +771,12 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
                       onPressed: _busy ? null : (_step == 2 ? _create : _next),
                       child: Text(
                         _busy
-                            ? (_isClone ? 'Cloning...' : 'Creating...')
-                            : (_step == 2 ? 'Create Project' : 'Next'),
+                            ? (_isClone
+                                  ? i18n.common.projectWizard.buttons.cloning
+                                  : i18n.common.projectWizard.buttons.creating)
+                            : (_step == 2
+                                  ? i18n.common.projectWizard.buttons.createProject
+                                  : i18n.common.projectWizard.buttons.next),
                       ),
                     ),
                   ],
@@ -745,45 +792,45 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
   void _close() => Navigator.of(context).pop();
 
   // StepConfiguration.tsx
-  Widget _buildStep1(AppColors c, TextTheme t) => Column(
+  Widget _buildStep1(AppColors c, TextTheme t, Translations i18n) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      _fieldLabel(t, 'Workspace Path'),
+      _fieldLabel(t, i18n.common.projectWizard.step2.newPath),
       Row(
         children: [
           Expanded(
             child: AppInput(
               controller: _path,
-              hint: '/path/to/new/workspace',
+              hint: i18n.common.projectWizard.step2.newPlaceholder,
               autofocus: true,
               enabled: !_busy,
             ),
           ),
           IconButton(
-            tooltip: 'Browse',
+            tooltip: i18n.common.buttons.browse,
             icon: const Icon(Icons.folder_open),
             onPressed: _busy ? null : _browse,
           ),
         ],
       ),
-      _fieldHelp(t, 'Full path to your workspace directory'),
+      _fieldHelp(t, i18n.common.projectWizard.step2.newHelp),
       const SizedBox(height: AppSpacing.md),
-      _fieldLabel(t, 'Display name (optional)'),
+      _fieldLabel(t, i18n.projects.displayNameOptional),
       AppInput(controller: _name, enabled: !_busy),
       const SizedBox(height: AppSpacing.md),
-      _fieldLabel(t, 'GitHub URL (Optional)'),
+      _fieldLabel(t, i18n.common.projectWizard.step2.githubUrl),
       AppInput(
         controller: _githubUrl,
-        hint: 'https://github.com/username/repository',
+        hint: i18n.common.projectWizard.step2.githubPlaceholder,
         enabled: !_busy,
       ),
-      _fieldHelp(t, 'Optional: provide a GitHub URL to clone a repository'),
-      if (_showGithubAuth) ...[const SizedBox(height: AppSpacing.md), _githubAuthCard(c, t)],
+      _fieldHelp(t, i18n.common.projectWizard.step2.githubHelp),
+      if (_showGithubAuth) ...[const SizedBox(height: AppSpacing.md), _githubAuthCard(c, t, i18n)],
     ],
   );
 
   // GithubAuthenticationCard.tsx
-  Widget _githubAuthCard(AppColors c, TextTheme t) => Container(
+  Widget _githubAuthCard(AppColors c, TextTheme t, Translations i18n) => Container(
     padding: const EdgeInsets.all(AppSpacing.md),
     decoration: BoxDecoration(
       color: c.muted.withValues(alpha: 0.3),
@@ -803,12 +850,11 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'GitHub Authentication (Optional)',
+                    i18n.common.projectWizard.step2.githubAuth,
                     style: t.titleSmall?.copyWith(fontWeight: FontWeight.w500),
                   ),
                   Text(
-                    'Only required for private repositories. Public repos '
-                    'can be cloned without authentication.',
+                    i18n.common.projectWizard.step2.githubAuthHelp,
                     style: t.bodySmall?.copyWith(color: c.mutedForeground),
                   ),
                 ],
@@ -828,7 +874,7 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'Loading stored tokens...',
+                  i18n.common.projectWizard.step2.loadingTokens,
                   style: t.bodySmall?.copyWith(color: c.mutedForeground),
                 ),
               ],
@@ -844,9 +890,9 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
           Row(
             children: [
               for (final (mode, label) in [
-                ('stored', 'Stored Token'),
-                ('new', 'New Token'),
-                ('none', 'None (Public)'),
+                ('stored', i18n.common.projectWizard.step2.storedToken),
+                ('new', i18n.common.projectWizard.step2.newToken),
+                ('none', i18n.common.projectWizard.step2.nonePublic),
               ])
                 Expanded(
                   child: Padding(
@@ -869,10 +915,10 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
           ),
           const SizedBox(height: 12),
           if (_tokenMode == 'stored') ...[
-            _fieldLabel(t, 'Select Token'),
+            _fieldLabel(t, i18n.common.projectWizard.step2.selectToken),
             DropdownButtonFormField<String>(
               initialValue: _selectedTokenId.isEmpty ? null : _selectedTokenId,
-              hint: const Text('-- Select a token --'),
+              hint: Text(i18n.common.projectWizard.step2.selectTokenPlaceholder),
               isExpanded: true,
               items: [
                 for (final tok in _tokens) DropdownMenuItem(value: tok.id, child: Text(tok.name)),
@@ -880,13 +926,13 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
               onChanged: (v) => setState(() => _selectedTokenId = v ?? ''),
             ),
           ] else if (_tokenMode == 'new') ...[
-            _fieldLabel(t, 'New Token'),
+            _fieldLabel(t, i18n.common.projectWizard.step2.newToken),
             AppInput(
               controller: _newToken,
-              hint: 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+              hint: i18n.common.projectWizard.step2.tokenPlaceholder,
               obscureText: true,
             ),
-            _fieldHelp(t, 'This token will be used only for this operation'),
+            _fieldHelp(t, i18n.common.projectWizard.step2.tokenHelp),
           ],
         ],
         if (!_loadingTokens && _tokenError == null && _tokens.isEmpty) ...[
@@ -899,33 +945,26 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
               borderRadius: AppRadii.borderLg,
             ),
             child: Text(
-              "Public repositories don't require authentication. You can "
-              'skip providing a token if cloning a public repo.',
+              i18n.common.projectWizard.step2.publicRepoInfo,
               style: t.bodySmall?.copyWith(color: c.primary),
             ),
           ),
           const SizedBox(height: 12),
-          _fieldLabel(t, 'GitHub Token (Optional for Public Repos)'),
+          _fieldLabel(t, i18n.common.projectWizard.step2.optionalTokenPublic),
           AppInput(
             controller: _newToken,
-            hint:
-                'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx '
-                '(leave empty for public repos)',
+            hint: i18n.common.projectWizard.step2.tokenPublicPlaceholder,
             obscureText: true,
             onChanged: (v) => setState(() => _tokenMode = v.trim().isEmpty ? 'none' : 'new'),
           ),
-          _fieldHelp(
-            t,
-            'No stored tokens available. You can add tokens in Settings '
-            '→ API Keys for easier reuse.',
-          ),
+          _fieldHelp(t, i18n.common.projectWizard.step2.noTokensHelp),
         ],
       ],
     ),
   );
 
   // StepReview.tsx
-  Widget _buildStep2(AppColors c, TextTheme t) => Column(
+  Widget _buildStep2(AppColors c, TextTheme t, Translations i18n) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
       Container(
@@ -939,14 +978,20 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'Review Your Configuration',
+              i18n.common.projectWizard.step3.reviewConfig,
               style: t.titleSmall?.copyWith(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 12),
-            _reviewRow(t, c, 'Path:', _path.text, mono: true),
+            _reviewRow(t, c, i18n.common.projectWizard.step3.path, _path.text, mono: true),
             if (_githubUrl.text.trim().isNotEmpty) ...[
-              _reviewRow(t, c, 'Clone From:', _githubUrl.text, mono: true),
-              _reviewRow(t, c, 'Authentication:', _authLabel),
+              _reviewRow(
+                t,
+                c,
+                i18n.common.projectWizard.step3.cloneFrom,
+                _githubUrl.text,
+                mono: true,
+              ),
+              _reviewRow(t, c, i18n.common.projectWizard.step3.authentication, _authLabel(i18n)),
             ],
           ],
         ),
@@ -965,7 +1010,7 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Cloning repository...',
+                    i18n.common.projectWizard.step3.cloningRepository,
                     style: t.bodySmall?.copyWith(color: c.primary, fontWeight: FontWeight.w500),
                   ),
                   const SizedBox(height: 6),
@@ -981,9 +1026,8 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
               )
             : Text(
                 _isClone
-                    ? 'The repository will be cloned from this folder.'
-                    : 'The workspace will be added to your project list '
-                          'and will be available for Claude/Cursor sessions.',
+                    ? i18n.common.projectWizard.step3.newWithClone
+                    : i18n.common.projectWizard.step3.newEmpty,
                 style: t.bodySmall?.copyWith(color: c.primary),
               ),
       ),
@@ -1033,6 +1077,7 @@ class _WizardProgress extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     Widget circle(int s, String label) => Row(
       children: [
         Container(
@@ -1066,7 +1111,7 @@ class _WizardProgress extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
       child: Row(
         children: [
-          circle(1, 'Configure'),
+          circle(1, i18n.common.projectWizard.steps.configure),
           Expanded(
             child: Container(
               margin: const EdgeInsets.symmetric(horizontal: 8),
@@ -1077,7 +1122,7 @@ class _WizardProgress extends StatelessWidget {
               ),
             ),
           ),
-          circle(2, 'Confirm'),
+          circle(2, i18n.common.projectWizard.steps.confirm),
         ],
       ),
     );
@@ -1156,12 +1201,13 @@ class _CloneDialogState extends ConsumerState<_CloneDialog> {
   }
 
   Future<void> _clone() async {
+    final i18n = Translations.of(context);
     if (_url.text.trim().isEmpty) {
-      setState(() => _error = 'Repository URL is required');
+      setState(() => _error = i18n.projects.repositoryUrlRequired);
       return;
     }
     if (_dest.text.trim().isEmpty) {
-      setState(() => _error = 'Destination path is required');
+      setState(() => _error = i18n.projects.destinationPathRequired);
       return;
     }
     setState(() {
@@ -1185,7 +1231,7 @@ class _CloneDialogState extends ConsumerState<_CloneDialog> {
         if (type == 'error') {
           setState(() {
             _busy = false;
-            _error = (e.data['error'] ?? e.data['message'] ?? 'Clone failed').toString();
+            _error = (e.data['error'] ?? e.data['message'] ?? i18n.projects.cloneFailed).toString();
           });
           return;
         }
@@ -1211,8 +1257,9 @@ class _CloneDialogState extends ConsumerState<_CloneDialog> {
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
+    final i18n = Translations.of(context);
     return AppDialog(
-      title: _done ? 'Repository cloned' : 'Clone repository',
+      title: _done ? i18n.projects.repositoryCloned : i18n.projects.cloneRepository,
       content: SizedBox(
         width: 420,
         child: Column(
@@ -1220,22 +1267,26 @@ class _CloneDialogState extends ConsumerState<_CloneDialog> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             if (!_done) ...[
-              AppInput(controller: _url, hint: 'https://github.com/org/repo.git', autofocus: true),
+              AppInput(controller: _url, hint: i18n.projects.repoUrlPlaceholder, autofocus: true),
               const SizedBox(height: AppSpacing.md),
               Row(
                 children: [
                   Expanded(
-                    child: AppInput(controller: _dest, hint: 'Destination path'),
+                    child: AppInput(controller: _dest, hint: i18n.projects.destinationPath),
                   ),
                   IconButton(
-                    tooltip: 'Browse',
+                    tooltip: i18n.common.buttons.browse,
                     icon: const Icon(Icons.folder_open),
                     onPressed: _browseDest,
                   ),
                 ],
               ),
               const SizedBox(height: AppSpacing.md),
-              AppInput(controller: _token, hint: 'GitHub token (optional)', obscureText: true),
+              AppInput(
+                controller: _token,
+                hint: i18n.projects.githubTokenOptional,
+                obscureText: true,
+              ),
             ],
             if (_log.isNotEmpty) ...[
               const SizedBox(height: AppSpacing.md),
@@ -1258,9 +1309,9 @@ class _CloneDialogState extends ConsumerState<_CloneDialog> {
               Text(_error!, style: TextStyle(color: c.destructive)),
             ],
             if (_done)
-              const Padding(
-                padding: EdgeInsets.only(top: AppSpacing.md),
-                child: Text('Clone finished. Refreshing project list…'),
+              Padding(
+                padding: const EdgeInsets.only(top: AppSpacing.md),
+                child: Text(i18n.projects.cloneFinished),
               ),
           ],
         ),
@@ -1272,9 +1323,9 @@ class _CloneDialogState extends ConsumerState<_CloneDialog> {
             _cancel?.cancel();
             Navigator.of(context).pop();
           },
-          child: Text(_done ? 'Close' : 'Cancel'),
+          child: Text(_done ? i18n.chat.common.close : i18n.chat.orchestrator.summary.cancelTasks),
         ),
-        if (!_done) AppButton(onPressed: _clone, loading: _busy, child: const Text('Clone')),
+        if (!_done) AppButton(onPressed: _clone, loading: _busy, child: Text(i18n.projects.clone)),
       ],
     );
   }

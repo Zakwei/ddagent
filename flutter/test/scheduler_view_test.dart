@@ -5,6 +5,7 @@ import 'package:ddagent_app/core/theme/app_theme.dart';
 import 'package:ddagent_app/features/projects/data/projects_repository.dart';
 import 'package:ddagent_app/features/scheduler/data/scheduler_repository.dart';
 import 'package:ddagent_app/features/scheduler/view/scheduler_screen.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -109,17 +110,19 @@ class _Projects extends ProjectsRepository {
   Future<List<Project>> archived() async => [];
 }
 
-Widget _app(_Repo repo, {bool dark = false}) => ProviderScope(
-  overrides: [
-    schedulerRepositoryProvider.overrideWithValue(repo),
-    projectsRepositoryProvider.overrideWithValue(_Projects()),
-    chatChannelProvider.overrideWithValue(
-      ChatChannel(WsClient(urlBuilder: () async => Uri.parse('ws://t'))),
+Widget _app(_Repo repo, {bool dark = false}) => TranslationProvider(
+  child: ProviderScope(
+    overrides: [
+      schedulerRepositoryProvider.overrideWithValue(repo),
+      projectsRepositoryProvider.overrideWithValue(_Projects()),
+      chatChannelProvider.overrideWithValue(
+        ChatChannel(WsClient(urlBuilder: () async => Uri.parse('ws://t'))),
+      ),
+    ],
+    child: MaterialApp(
+      theme: dark ? AppTheme.dark() : AppTheme.light(),
+      home: const SchedulerScreen(),
     ),
-  ],
-  child: MaterialApp(
-    theme: dark ? AppTheme.dark() : AppTheme.light(),
-    home: const SchedulerScreen(),
   ),
 );
 

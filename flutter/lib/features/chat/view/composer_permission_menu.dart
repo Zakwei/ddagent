@@ -150,6 +150,7 @@ class _ComposerPermissionMenuState extends State<ComposerPermissionMenu> {
 
   Widget _menuItems(BuildContext ctx) {
     final c = ctx.appColors;
+    final t = Translations.of(ctx);
     final isDark = Theme.of(ctx).brightness == Brightness.dark;
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -180,7 +181,7 @@ class _ComposerPermissionMenuState extends State<ComposerPermissionMenu> {
           const ComposerMenuSeparator(),
           ComposerMenuItem(
             colors: c,
-            label: 'Auto-continue',
+            label: t.chat.input.autoContinueTasks,
             description:
                 'Enable to let Devin automatically continue to the '
                 'next Task Master task',

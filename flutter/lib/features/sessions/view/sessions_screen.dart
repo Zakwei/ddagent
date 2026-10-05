@@ -15,6 +15,7 @@ import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
 import 'package:ddagent_app/features/sessions/view/session_list_row.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -130,6 +131,7 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
+    final t = Translations.of(context);
     final state = ref.watch(sessionsProvider(_scope));
     final ctrl = ref.read(sessionsProvider(_scope).notifier);
 
@@ -206,16 +208,20 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
                             // no projectId — a missing id means "belongs to
                             // this scope", not "other project".
                             if (local.any((s) => _isScopeSession(s)))
-                              SessionListGroupHeading('Current project (${_scopeProjectName()})'),
+                              SessionListGroupHeading(
+                                t.chat.splitSession.currentProjectGroup(name: _scopeProjectName()),
+                              ),
                             for (final s in local)
                               if (_isScopeSession(s)) _row(c, s, ctrl, state),
                             if (local.any((s) => !_isScopeSession(s)))
-                              const SessionListGroupHeading('Other projects'),
+                              SessionListGroupHeading(t.chat.splitSession.otherProjectsGroup),
                             for (final s in local)
                               if (!_isScopeSession(s)) _row(c, s, ctrl, state),
                           ] else ...[
                             SessionListGroupHeading(
-                              state.showArchived ? 'Archived sessions' : 'Recent sessions',
+                              state.showArchived
+                                  ? t.sessions.archivedSessions
+                                  : t.chat.splitSession.recentSessionsGroup,
                             ),
                             for (final s in local) _row(c, s, ctrl, state),
                           ],
@@ -229,7 +235,9 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
                           if (local.isEmpty && extraMatches.isEmpty && !state.loading)
                             SessionListEmptyState(
                               icon: q.isEmpty ? LucideIcons.messageSquarePlus : LucideIcons.search,
-                              label: q.isEmpty ? 'No sessions' : 'No sessions match your search',
+                              label: q.isEmpty
+                                  ? t.sessions.noSessions
+                                  : t.chat.sessionPicker.emptySearch,
                             ),
                         ],
                       ),
@@ -259,6 +267,7 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
   }
 
   Widget _row(AppColors c, Session s, SessionsController ctrl, SessionsState state) {
+    final t = Translations.of(context);
     return SessionListRow(
       session: s,
       running: s.isRunning,
@@ -274,18 +283,18 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
         if (!state.showArchived)
           SessionRowIconButton(
             icon: LucideIcons.eyeOff,
-            tooltip: 'Archive session',
-            onTap: () => _run(() => ctrl.archive(s.sessionId), 'Session archived'),
+            tooltip: t.sidebar.deleteConfirmation.archiveSession,
+            onTap: () => _run(() => ctrl.archive(s.sessionId), t.sessions.toasts.archived),
           )
         else
           SessionRowIconButton(
             icon: LucideIcons.rotateCcw,
-            tooltip: 'Restore session',
-            onTap: () => _run(() => ctrl.restore(s.sessionId), 'Session restored'),
+            tooltip: t.chat.sessionPicker.restoreSession,
+            onTap: () => _run(() => ctrl.restore(s.sessionId), t.sessions.toasts.restored),
           ),
         SessionRowIconButton(
           icon: LucideIcons.trash2,
-          tooltip: 'Delete permanently',
+          tooltip: t.sidebar.deleteConfirmation.deleteSessionPermanently,
           danger: true,
           onTap: () => _confirmDelete(s, ctrl),
         ),
@@ -297,6 +306,7 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
   /// border-b border-border/50, px-2 py-1.5, centered max-w-4xl row —
   /// same top-bar language as the in-pane picker.
   Widget _toolbar(AppColors c, SessionsState state, SessionsController ctrl) {
+    final t = Translations.of(context);
     return Container(
       decoration: BoxDecoration(
         border: Border(bottom: BorderSide(color: c.border.withValues(alpha: 0.5))),
@@ -323,7 +333,7 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
                   ),
                   SessionListToolbarButton(
                     icon: LucideIcons.archive,
-                    label: 'Archived',
+                    label: t.chat.sessionPicker.archivedToggle,
                     active: state.showArchived,
                     showLabel: !compact,
                     onTap: () => unawaited(ctrl.toggleArchived()),
@@ -347,29 +357,54 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
   }
 
   Widget _sessionMenu(Session s, SessionsController ctrl, bool archived) {
+    final t = Translations.of(context);
+    // (label, action, destructive) — the flag replaces the old "contains
+    // 'Delete'" check, which no longer works once labels are localized.
     final entries = archived
-        ? <(String, VoidCallback)>[
-            ('Restore', () => _run(() => ctrl.restore(s.sessionId), 'Session restored')),
-            ('Delete permanently', () => _confirmDelete(s, ctrl)),
-          ]
-        : <(String, VoidCallback)>[
-            ('Rename', () => unawaited(_renameDialog(s, ctrl))),
-            ('Change workspace', () => unawaited(_workspaceDialog(s, ctrl))),
+        ? <(String, VoidCallback, bool)>[
             (
-              ctrl.isPinned(s.sessionId) ? 'Unpin session' : 'Pin session',
+              t.chat.sessionPicker.restore,
+              () => _run(() => ctrl.restore(s.sessionId), t.sessions.toasts.restored),
+              false,
+            ),
+            (
+              t.sidebar.deleteConfirmation.deleteSessionPermanently,
+              () => _confirmDelete(s, ctrl),
+              true,
+            ),
+          ]
+        : <(String, VoidCallback, bool)>[
+            (t.sessions.rename, () => unawaited(_renameDialog(s, ctrl)), false),
+            (t.sidebar.workspace.submit, () => unawaited(_workspaceDialog(s, ctrl)), false),
+            (
+              ctrl.isPinned(s.sessionId)
+                  ? t.sidebar.sessions.unpinSession
+                  : t.sidebar.sessions.pinSession,
               () {
                 final pinned = ctrl.togglePin(s.sessionId);
-                AppToast.show(context, pinned ? 'Session pinned' : 'Session unpinned');
+                AppToast.show(
+                  context,
+                  pinned ? t.sessions.toasts.pinned : t.sessions.toasts.unpinned,
+                );
                 setState(() {});
               },
+              false,
             ),
-            ('Compare with…', () => unawaited(_compareDialog(s))),
-            ('Archive', () => _run(() => ctrl.archive(s.sessionId), 'Session archived')),
-            ('Delete permanently', () => _confirmDelete(s, ctrl)),
+            (t.sessions.compareWith, () => unawaited(_compareDialog(s)), false),
+            (
+              t.sessions.archive,
+              () => _run(() => ctrl.archive(s.sessionId), t.sessions.toasts.archived),
+              false,
+            ),
+            (
+              t.sidebar.deleteConfirmation.deleteSessionPermanently,
+              () => _confirmDelete(s, ctrl),
+              true,
+            ),
           ];
     final c = context.appColors;
     return PopupMenuButton<int>(
-      tooltip: 'Session options',
+      tooltip: t.sidebar.sessions.options,
       style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
       onSelected: (i) => entries[i].$2(),
       itemBuilder: (_) => [
@@ -378,9 +413,7 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
             value: i,
             child: Text(
               entries[i].$1,
-              style: entries[i].$1.contains('Delete')
-                  ? TextStyle(color: context.appColors.destructive)
-                  : null,
+              style: entries[i].$3 ? TextStyle(color: context.appColors.destructive) : null,
             ),
           ),
       ],
@@ -394,6 +427,7 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
 
   /// T17.8 — pick another session, then show the side-by-side usage compare.
   Future<void> _compareDialog(Session s) async {
+    final t = Translations.of(context);
     final others = ref
         .read(sessionsProvider(_scope))
         .sessions
@@ -402,7 +436,7 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
     final other = await showDialog<Session>(
       context: context,
       builder: (ctx) => SimpleDialog(
-        title: const Text('Compare with…'),
+        title: Text(t.sessions.compareWith),
         children: [
           for (final o in others.take(20))
             SimpleDialogOption(
@@ -447,59 +481,71 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
   }
 
   Future<void> _confirmDelete(Session s, SessionsController ctrl) async {
+    final t = Translations.of(context);
     final confirmed = await AppDialog.confirm(
       context,
-      title: 'Delete session?',
-      message: 'Removes "${s.displayTitle}" and its transcript. This cannot be undone.',
-      confirmLabel: 'Delete',
+      title: t.common.browserUse.deleteSession,
+      message: t.sessions.deleteSessionMessage(name: s.displayTitle),
+      confirmLabel: t.common.buttons.delete,
     );
     if (confirmed) {
-      await _run(() => ctrl.hardDelete(s.sessionId), 'Session deleted');
+      await _run(() => ctrl.hardDelete(s.sessionId), t.sessions.toasts.deleted);
     }
   }
 
   Future<void> _renameDialog(Session s, SessionsController ctrl) async {
+    final t = Translations.of(context);
     final field = TextEditingController(text: s.displayTitle);
     final saved = await showDialog<bool>(
       context: context,
       builder: (ctx) => AppDialog(
-        title: 'Rename session',
+        title: t.common.sessions.renameSession,
         content: AppInput(controller: field, autofocus: true),
         actions: [
           AppButton(
             variant: AppButtonVariant.ghost,
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
+            child: Text(t.chat.orchestrator.summary.cancelTasks),
           ),
-          AppButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Save')),
+          AppButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(t.codeEditor.actions.save),
+          ),
         ],
       ),
     );
     if (saved == true && field.text.trim().isNotEmpty) {
-      await _run(() => ctrl.rename(s.sessionId, field.text.trim()), 'Session renamed');
+      await _run(() => ctrl.rename(s.sessionId, field.text.trim()), t.sessions.toasts.renamed);
     }
     field.dispose();
   }
 
   Future<void> _workspaceDialog(Session s, SessionsController ctrl) async {
+    final t = Translations.of(context);
     final field = TextEditingController(text: s.projectPath ?? '');
     final saved = await showDialog<bool>(
       context: context,
       builder: (ctx) => AppDialog(
-        title: 'Change workspace',
-        content: AppInput(controller: field, hint: 'Project path', autofocus: true),
+        title: t.sidebar.workspace.submit,
+        content: AppInput(controller: field, hint: t.sessions.projectPath, autofocus: true),
         actions: [
           AppButton(
             variant: AppButtonVariant.ghost,
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
+            child: Text(t.chat.orchestrator.summary.cancelTasks),
           ),
-          AppButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Save')),
+          AppButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(t.codeEditor.actions.save),
+          ),
         ],
       ),
     );
     if (saved == true && field.text.trim().isNotEmpty) {
-      await _run(() => ctrl.changeWorkspace(s.sessionId, field.text.trim()), 'Workspace changed');
+      await _run(
+        () => ctrl.changeWorkspace(s.sessionId, field.text.trim()),
+        t.sessions.toasts.workspaceChanged,
+      );
     }
     field.dispose();
   }
@@ -509,6 +555,7 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
   /// 'Auto (orchestrator)' is a static extra entry (T18.1) — it needs a
   /// concrete projectPath, so it's only offered when one is known.
   Future<void> _newSession() async {
+    final t = Translations.of(context);
     String provider = 'claude';
     final canOrchestrate = (widget.projectPath ?? '').isNotEmpty;
     try {
@@ -523,13 +570,13 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
         final picked = await showDialog<String>(
           context: context,
           builder: (ctx) => AppDialog(
-            title: 'New session — provider',
+            title: t.sessions.newSessionProvider,
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 for (final p in providers)
                   ListTile(
-                    title: Text(p == 'orchestrator' ? 'Auto (orchestrator)' : p),
+                    title: Text(p == 'orchestrator' ? t.sessions.autoOrchestrator : p),
                     onTap: () => Navigator.of(ctx).pop(p),
                   ),
               ],
@@ -551,7 +598,7 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
         if (!mounted) return;
         _open(sessionId);
       } on Object catch (e) {
-        if (mounted) AppToast.error(context, 'Failed to create session: $e');
+        if (mounted) AppToast.error(context, t.sessions.createFailed(error: '$e'));
       }
       return;
     }
@@ -690,6 +737,7 @@ class _RecentScreenState extends ConsumerState<RecentScreen> {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context);
+    final i18n = Translations.of(context);
     final c = context.appColors;
     return RefreshIndicator(
       onRefresh: _refresh,
@@ -704,7 +752,7 @@ class _RecentScreenState extends ConsumerState<RecentScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SessionListGroupHeading('Recent sessions'),
+                  SessionListGroupHeading(i18n.chat.splitSession.recentSessionsGroup),
                   for (final s in _sessions)
                     SessionListRow(
                       session: s,
@@ -730,7 +778,7 @@ class _RecentScreenState extends ConsumerState<RecentScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 24),
                       child: Center(
                         child: Text(
-                          'No recent sessions',
+                          i18n.sessions.noRecentSessions,
                           style: t.textTheme.bodySmall?.copyWith(color: c.mutedForeground),
                         ),
                       ),

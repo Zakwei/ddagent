@@ -4,6 +4,7 @@ import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/features/mcp/data/mcp_constants.dart';
 import 'package:ddagent_app/features/mcp/data/mcp_models.dart';
 import 'package:ddagent_app/features/mcp/data/mcp_repository.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -26,22 +27,21 @@ class DdagentMcpInstallCard extends ConsumerStatefulWidget {
 
 class _DdagentMcpInstallCardState extends ConsumerState<DdagentMcpInstallCard> {
   Future<void> _openDialog() async {
+    final t = Translations.of(context);
     final preset = widget.defaultProviders?.where((p) => kMcpProviders.contains(p)).toList();
     final selected = <String>{...(preset?.isNotEmpty == true ? preset! : kMcpProviders)};
     await showDialog<void>(
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setState) => AlertDialog(
-          title: const Text('Install ddagent MCP server'),
+          title: Text(t.mcp.install.title),
           content: SizedBox(
             width: 440,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Lets the selected agents use the ddagent knowledge base and tools over MCP.',
-                ),
+                Text(t.mcp.install.description),
                 const SizedBox(height: 12),
                 Wrap(
                   spacing: 6,
@@ -65,14 +65,17 @@ class _DdagentMcpInstallCardState extends ConsumerState<DdagentMcpInstallCard> {
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancel')),
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text(t.settings.mcpForm.actions.cancel),
+            ),
             TextButton(
               onPressed: () => _install(ctx, providers: selected.toList()),
-              child: const Text('Install selected'),
+              child: Text(t.mcp.install.installSelected),
             ),
             FilledButton(
               onPressed: () => _install(ctx, providers: null),
-              child: const Text('Install for all'),
+              child: Text(t.mcp.install.installForAll),
             ),
           ],
         ),
@@ -81,6 +84,7 @@ class _DdagentMcpInstallCardState extends ConsumerState<DdagentMcpInstallCard> {
   }
 
   Future<void> _install(BuildContext dialogContext, {required List<String>? providers}) async {
+    final t = Translations.of(context);
     var results = const <GlobalMcpResult>[];
     Object? failure;
     try {
@@ -91,7 +95,7 @@ class _DdagentMcpInstallCardState extends ConsumerState<DdagentMcpInstallCard> {
     if (dialogContext.mounted) Navigator.of(dialogContext).pop();
     if (!mounted) return;
     if (failure != null) {
-      AppToast.show(context, 'Install failed: $failure', isError: true);
+      AppToast.show(context, t.mcp.install.failed(error: '$failure'), isError: true);
       return;
     }
     final ok = results.where((result) => result.created).length;
@@ -99,15 +103,24 @@ class _DdagentMcpInstallCardState extends ConsumerState<DdagentMcpInstallCard> {
     AppToast.show(
       context,
       failed.isEmpty
-          ? 'Installed on $ok agent(s).'
-          : 'Installed on $ok; failed: '
-                '${failed.map((f) => '${mcpProviderName(f.provider)} (${f.error ?? 'error'})').join(', ')}',
+          ? t.mcp.install.installedCount(count: ok)
+          : t.mcp.install.partialFailure(
+              count: ok,
+              failed: failed
+                  .map(
+                    (f) =>
+                        '${mcpProviderName(f.provider)} '
+                        '(${f.error ?? t.mcp.install.errorFallback})',
+                  )
+                  .join(', '),
+            ),
       isError: failed.isNotEmpty,
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     final c = context.appColors;
     return Card(
       margin: EdgeInsets.zero,
@@ -122,11 +135,10 @@ class _DdagentMcpInstallCardState extends ConsumerState<DdagentMcpInstallCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('Install ddagent MCP server', style: Theme.of(context).textTheme.titleSmall),
+                  Text(t.mcp.install.title, style: Theme.of(context).textTheme.titleSmall),
                   const SizedBox(height: 2),
                   Text(
-                    'Give your agents the knowledge base and ddagent tools over MCP — '
-                    'pick agents or install for all.',
+                    t.mcp.install.cardDescription,
                     style: Theme.of(context).textTheme.bodySmall
                         ?.copyWith(color: c.mutedForeground),
                   ),
@@ -134,7 +146,7 @@ class _DdagentMcpInstallCardState extends ConsumerState<DdagentMcpInstallCard> {
               ),
             ),
             const SizedBox(width: AppSpacing.md),
-            AppButton(onPressed: _openDialog, child: const Text('Install')),
+            AppButton(onPressed: _openDialog, child: Text(t.mcp.install.button)),
           ],
         ),
       ),

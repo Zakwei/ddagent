@@ -1,6 +1,7 @@
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -32,6 +33,7 @@ Future<bool?> gitConfirm(
     builder: (ctx) => StatefulBuilder(
       builder: (ctx, setState) {
         final c = ctx.appColors;
+        final i18n = Translations.of(ctx);
         final (icon, tint, btnColor) = switch (type) {
           GitConfirmType.discard ||
           GitConfirmType.delete ||
@@ -59,24 +61,24 @@ Future<bool?> gitConfirm(
           GitConfirmType.commit => (LucideIcons.check, const Color(0xFFCA8A04), c.primary),
         };
         final title = switch (type) {
-          GitConfirmType.discard => 'Discard Changes',
-          GitConfirmType.delete => 'Delete File',
-          GitConfirmType.commit => 'Confirm Action',
-          GitConfirmType.pull => 'Confirm Pull',
-          GitConfirmType.push => 'Confirm Push',
-          GitConfirmType.publish => 'Publish Branch',
-          GitConfirmType.revert => 'Revert Local Commit',
-          GitConfirmType.deleteBranch => 'Delete Branch',
+          GitConfirmType.discard => i18n.common.gitPanel.confirmTitles.discard,
+          GitConfirmType.delete => i18n.common.gitPanel.confirmTitles.delete,
+          GitConfirmType.commit => i18n.common.gitPanel.confirmTitles.commit,
+          GitConfirmType.pull => i18n.common.gitPanel.confirmTitles.pull,
+          GitConfirmType.push => i18n.common.gitPanel.confirmTitles.push,
+          GitConfirmType.publish => i18n.common.gitPanel.confirmTitles.publish,
+          GitConfirmType.revert => i18n.common.gitPanel.confirmTitles.revertLocalCommit,
+          GitConfirmType.deleteBranch => i18n.common.gitPanel.confirmTitles.deleteBranch,
         };
         final actionLabel = switch (type) {
-          GitConfirmType.discard => 'Discard',
-          GitConfirmType.delete => 'Delete',
-          GitConfirmType.commit => 'Confirm',
-          GitConfirmType.pull => 'Pull',
-          GitConfirmType.push => 'Push',
-          GitConfirmType.publish => 'Publish',
-          GitConfirmType.revert => 'Revert Commit',
-          GitConfirmType.deleteBranch => 'Delete',
+          GitConfirmType.discard => i18n.common.gitPanel.confirmActions.discard,
+          GitConfirmType.delete => i18n.common.gitPanel.confirmActions.delete,
+          GitConfirmType.commit => i18n.common.gitPanel.confirmActions.commit,
+          GitConfirmType.pull => i18n.common.gitPanel.confirmActions.pull,
+          GitConfirmType.push => i18n.common.gitPanel.confirmActions.push,
+          GitConfirmType.publish => i18n.common.gitPanel.confirmActions.publish,
+          GitConfirmType.revert => i18n.common.gitPanel.confirmActions.revertLocalCommit,
+          GitConfirmType.deleteBranch => i18n.common.gitPanel.confirmActions.deleteBranch,
         };
 
         return AppDialog(
@@ -176,7 +178,7 @@ Future<bool?> gitConfirm(
             AppButton(
               variant: AppButtonVariant.ghost,
               onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('Cancel'),
+              child: Text(i18n.chat.orchestrator.summary.cancelTasks),
             ),
             // Per-action color (pull=green, push=orange, destructive=red…)
             // — AppButton variants don't cover these, so style directly.

@@ -1,5 +1,6 @@
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/features/taskmaster/data/taskmaster_models.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -24,10 +25,10 @@ class TaskColumnSpec {
   final Color headerFgDark;
 }
 
-const _taskColumnConfig = <TaskColumnSpec>[
+List<TaskColumnSpec> _taskColumnConfig(Translations i18n) => [
   TaskColumnSpec(
     status: 'pending',
-    title: '📋 To Do',
+    title: i18n.tasks.kanban.pending,
     headerBgLight: Color(0xFFF1F5F9), // slate-100
     headerFgLight: Color(0xFF1E293B), // slate-800
     headerBgDark: Color(0xFF1E293B), // slate-800
@@ -35,7 +36,7 @@ const _taskColumnConfig = <TaskColumnSpec>[
   ),
   TaskColumnSpec(
     status: 'in-progress',
-    title: '🚀 In Progress',
+    title: i18n.tasks.kanban.inProgress,
     headerBgLight: Color(0xFFDBEAFE), // blue-100
     headerFgLight: Color(0xFF1E40AF), // blue-800
     headerBgDark: Color(0xFF1E40AF), // blue-800
@@ -43,7 +44,7 @@ const _taskColumnConfig = <TaskColumnSpec>[
   ),
   TaskColumnSpec(
     status: 'review',
-    title: '👀 Review',
+    title: i18n.tasks.kanban.review,
     headerBgLight: Color(0xFFEDE9FE), // violet-100
     headerFgLight: Color(0xFF5B21B6), // violet-800
     headerBgDark: Color(0xFF5B21B6), // violet-800
@@ -51,7 +52,7 @@ const _taskColumnConfig = <TaskColumnSpec>[
   ),
   TaskColumnSpec(
     status: 'done',
-    title: '✅ Done',
+    title: i18n.tasks.kanban.done,
     headerBgLight: Color(0xFFD1FAE5), // emerald-100
     headerFgLight: Color(0xFF065F46), // emerald-800
     headerBgDark: Color(0xFF065F46), // emerald-800
@@ -59,7 +60,7 @@ const _taskColumnConfig = <TaskColumnSpec>[
   ),
   TaskColumnSpec(
     status: 'blocked',
-    title: '🚫 Blocked',
+    title: i18n.tasks.kanban.blocked,
     headerBgLight: Color(0xFFFEE2E2), // red-100
     headerFgLight: Color(0xFF991B1B), // red-800
     headerBgDark: Color(0xFF991B1B), // red-800
@@ -67,7 +68,7 @@ const _taskColumnConfig = <TaskColumnSpec>[
   ),
   TaskColumnSpec(
     status: 'deferred',
-    title: '⏳ Deferred',
+    title: i18n.tasks.kanban.deferred,
     headerBgLight: Color(0xFFFEF3C7), // amber-100
     headerFgLight: Color(0xFF92400E), // amber-800
     headerBgDark: Color(0xFF92400E), // amber-800
@@ -75,7 +76,7 @@ const _taskColumnConfig = <TaskColumnSpec>[
   ),
   TaskColumnSpec(
     status: 'cancelled',
-    title: '❌ Cancelled',
+    title: i18n.tasks.kanban.cancelled,
     headerBgLight: Color(0xFFF3F4F6), // gray-100
     headerFgLight: Color(0xFF1F2937), // gray-800
     headerBgDark: Color(0xFF1F2937), // gray-800
@@ -94,49 +95,57 @@ class TaskKanbanColumn {
   final List<TaskmasterTask> tasks;
 }
 
-List<TaskKanbanColumn> buildTaskKanbanColumns(List<TaskmasterTask> tasks) {
+List<TaskKanbanColumn> buildTaskKanbanColumns(List<TaskmasterTask> tasks, Translations i18n) {
   final byStatus = <String, List<TaskmasterTask>>{};
   for (final t in tasks) {
     (byStatus[t.status] ??= []).add(t);
   }
   return [
-    for (final spec in _taskColumnConfig)
+    for (final spec in _taskColumnConfig(i18n))
       if (_coreStatuses.contains(spec.status) || (byStatus[spec.status]?.isNotEmpty ?? false))
         TaskKanbanColumn(spec: spec, tasks: byStatus[spec.status] ?? const []),
   ];
 }
 
 /// Status → (dot color, label color, label) — `getStatusStyle` in TaskCard.tsx.
-({Color dot, Color fg, String label}) taskStatusStyle(String status, AppColors c, bool dark) =>
-    switch (status) {
-      'done' => (
-        dot: const Color(0xFF16A34A),
-        fg: dark ? const Color(0xFFDCFCE7) : const Color(0xFF14532D),
-        label: 'Done',
-      ),
-      'in-progress' => (
-        dot: const Color(0xFF2563EB),
-        fg: dark ? const Color(0xFFDBEAFE) : const Color(0xFF1E3A8A),
-        label: 'In Progress',
-      ),
-      'review' => (
-        dot: const Color(0xFFD97706),
-        fg: dark ? const Color(0xFFFEF3C7) : const Color(0xFF78350F),
-        label: 'Review',
-      ),
-      'deferred' => (dot: c.mutedForeground, fg: c.mutedForeground, label: 'Deferred'),
-      'cancelled' => (
-        dot: const Color(0xFFDC2626),
-        fg: dark ? const Color(0xFFFEE2E2) : const Color(0xFF7F2D2D),
-        label: 'Cancelled',
-      ),
-      'blocked' => (
-        dot: const Color(0xFFDC2626),
-        fg: dark ? const Color(0xFFFEE2E2) : const Color(0xFF7F2D2D),
-        label: 'Blocked',
-      ),
-      _ => (dot: c.mutedForeground, fg: c.foreground, label: 'Pending'),
-    };
+({Color dot, Color fg, String label}) taskStatusStyle(
+  String status,
+  AppColors c,
+  bool dark,
+  Translations i18n,
+) => switch (status) {
+  'done' => (
+    dot: const Color(0xFF16A34A),
+    fg: dark ? const Color(0xFFDCFCE7) : const Color(0xFF14532D),
+    label: i18n.tasks.statuses.done,
+  ),
+  'in-progress' => (
+    dot: const Color(0xFF2563EB),
+    fg: dark ? const Color(0xFFDBEAFE) : const Color(0xFF1E3A8A),
+    label: i18n.tasks.statuses.inProgress,
+  ),
+  'review' => (
+    dot: const Color(0xFFD97706),
+    fg: dark ? const Color(0xFFFEF3C7) : const Color(0xFF78350F),
+    label: i18n.tasks.statuses.review,
+  ),
+  'deferred' => (
+    dot: c.mutedForeground,
+    fg: c.mutedForeground,
+    label: i18n.tasks.statuses.deferred,
+  ),
+  'cancelled' => (
+    dot: const Color(0xFFDC2626),
+    fg: dark ? const Color(0xFFFEE2E2) : const Color(0xFF7F2D2D),
+    label: i18n.tasks.statuses.cancelled,
+  ),
+  'blocked' => (
+    dot: const Color(0xFFDC2626),
+    fg: dark ? const Color(0xFFFEE2E2) : const Color(0xFF7F2D2D),
+    label: i18n.tasks.statuses.blocked,
+  ),
+  _ => (dot: c.mutedForeground, fg: c.foreground, label: i18n.tasks.statuses.pending),
+};
 
 /// 16×16 rounded priority tile — `renderPriorityIcon` in TaskCard.tsx.
 Widget taskPriorityTile(String priority, AppColors c, bool dark) {
@@ -184,7 +193,7 @@ Widget taskRunButton(
   required VoidCallback? onRun,
 }) {
   return Tooltip(
-    message: inProgress ? 'Task in progress' : 'Run task',
+    message: inProgress ? t.tasks.card.taskInProgress : t.tasks.card.runTask,
     child: InkWell(
       onTap: onRun,
       borderRadius: AppRadii.borderSm,
@@ -441,12 +450,14 @@ class _TaskBoardCardState extends State<TaskBoardCard> {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final dark = Theme.of(context).brightness == Brightness.dark;
+    final i18n = Translations.of(context);
     final task = widget.task;
-    final status = taskStatusStyle(task.status, c, dark);
+    final status = taskStatusStyle(task.status, c, dark, i18n);
     final subs = task.subtasks;
     final subsDone = subs.where((s) => s.isDone).length;
     final parentId = task.raw['parentId'];
     final deps = task.dependencies;
+    final depsLabel = i18n.tasks.card.dependsOnList(tasks: deps.join(', '));
     final inProgress = task.status == 'in-progress';
 
     final card = AnimatedContainer(
@@ -521,7 +532,7 @@ class _TaskBoardCardState extends State<TaskBoardCard> {
             children: [
               if (deps.isNotEmpty)
                 Tooltip(
-                  message: 'Depends on: ${deps.join(', ')}',
+                  message: depsLabel,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -532,7 +543,7 @@ class _TaskBoardCardState extends State<TaskBoardCard> {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        'Depends on: ${deps.join(', ')}',
+                        depsLabel,
                         style: TextStyle(
                           color: dark ? const Color(0xFFFBBF24) : const Color(0xFFD97706),
                           fontSize: 12,
@@ -543,7 +554,7 @@ class _TaskBoardCardState extends State<TaskBoardCard> {
                 ),
               const Spacer(),
               Tooltip(
-                message: 'Status: ${status.label}',
+                message: i18n.tasks.card.statusTooltip(status: status.label),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -568,7 +579,10 @@ class _TaskBoardCardState extends State<TaskBoardCard> {
               padding: const EdgeInsets.only(left: 12),
               child: Row(
                 children: [
-                  Text('Progress:', style: TextStyle(color: c.mutedForeground, fontSize: 12)),
+                  Text(
+                    i18n.tasks.card.progressLabel,
+                    style: TextStyle(color: c.mutedForeground, fontSize: 12),
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: ClipRRect(

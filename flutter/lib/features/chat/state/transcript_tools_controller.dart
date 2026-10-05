@@ -5,6 +5,7 @@ import 'package:ddagent_app/features/file_tree/data/file_saver.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/sessions/state/session_store.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -17,18 +18,20 @@ Future<void> exportTranscript(
   List<SessionMessage> messages,
   String format,
 ) async {
+  final t = Translations.of(context);
   final html = format != 'markdown'
-      ? transcriptToHtml(messages, title: 'Session $sessionId')
+      ? transcriptToHtml(messages, title: t.chat.export.sessionTitle(id: sessionId))
       : null;
   if (format == 'pdf') {
     try {
       await printHtmlDocument(html!);
     } on Exception {
-      if (context.mounted) AppToast.show(context, 'PDF export failed');
+      if (context.mounted) AppToast.show(context, t.chat.export.pdfFailed);
     }
     return;
   }
-  final text = html ?? transcriptToMarkdown(messages, title: 'Session $sessionId');
+  final text =
+      html ?? transcriptToMarkdown(messages, title: t.chat.export.sessionTitle(id: sessionId));
   final ext = format == 'html' ? 'html' : 'md';
   final path = await downloadText(
     'session-$sessionId.$ext',
@@ -36,7 +39,10 @@ Future<void> exportTranscript(
     mime: format == 'html' ? 'text/html' : 'text/markdown',
   );
   if (!context.mounted) return;
-  AppToast.show(context, path == null ? 'Transcript downloaded' : 'Saved $path');
+  AppToast.show(
+    context,
+    path == null ? t.chat.export.transcriptDownloaded : t.chat.export.savedTo(path: path),
+  );
 }
 
 class TranscriptToolsState {

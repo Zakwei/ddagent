@@ -8,6 +8,7 @@ import 'package:ddagent_app/features/scheduler/data/scheduler_models.dart';
 import 'package:ddagent_app/features/scheduler/data/scheduler_repository.dart';
 import 'package:ddagent_app/features/scheduler/state/scheduler_controller.dart';
 import 'package:ddagent_app/features/scheduler/view/scheduler_screen.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -180,17 +181,19 @@ Widget _buildTestApp({
         routes: [GoRoute(path: '/scheduler', builder: (_, _) => const SchedulerScreen())],
       );
 
-  return ProviderScope(
-    overrides: [
-      schedulerRepositoryProvider.overrideWithValue(schedulerRepo),
-      projectsRepositoryProvider.overrideWithValue(_FakeProjectsRepo()),
-      chatChannelProvider.overrideWithValue(
-        ChatChannel(WsClient(urlBuilder: () async => Uri.parse('ws://dummy'))),
+  return TranslationProvider(
+    child: ProviderScope(
+      overrides: [
+        schedulerRepositoryProvider.overrideWithValue(schedulerRepo),
+        projectsRepositoryProvider.overrideWithValue(_FakeProjectsRepo()),
+        chatChannelProvider.overrideWithValue(
+          ChatChannel(WsClient(urlBuilder: () async => Uri.parse('ws://dummy'))),
+        ),
+      ],
+      child: MaterialApp.router(
+        theme: dark ? AppTheme.dark() : AppTheme.light(),
+        routerConfig: router,
       ),
-    ],
-    child: MaterialApp.router(
-      theme: dark ? AppTheme.dark() : AppTheme.light(),
-      routerConfig: router,
     ),
   );
 }

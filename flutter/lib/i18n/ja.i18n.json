@@ -78,7 +78,8 @@
       "readFile": "ファイルを読み取り",
       "updateTodo": "Todoリストを更新",
       "readTodo": "Todoリストを読み取り",
-      "searchResults": "件の結果"
+      "searchResults": "件の結果",
+      "todoReadLabel": "TodoRead 読み取りリスト"
     },
     "search": {
       "found": "{{count}}件の{{type}}が見つかりました",
@@ -117,7 +118,16 @@
       "addTo": "{{entry}}を許可されたツールに追加します。",
       "retry": "権限を保存しました。ツールを使用するにはリクエストを再試行してください。",
       "error": "権限を更新できませんでした。もう一度お試しください。",
-      "openSettings": "設定を開く"
+      "openSettings": "設定を開く",
+      "allow": "許可",
+      "allowAll": "すべて許可 ({{count}})",
+      "allowWithChanges": "変更を加えて許可",
+      "always": "常に",
+      "deny": "拒否",
+      "editAndAllow": "編集して許可",
+      "editInput": "入力を編集",
+      "invalidJson": "無効なJSON",
+      "reject": "却下"
     },
     "todo": {
       "updated": "Todoリストを更新しました",
@@ -191,7 +201,8 @@
         "clearBtn": "キャンセル",
         "multiple": "{{count}} 件のメッセージがオフラインキューに — 再接続時に自動送信されます",
         "single": "1 件のメッセージがオフラインキューに — 再接続時に自動送信されます"
-      }
+      },
+      "cameraUnavailable": "カメラを利用できません: {{error}}"
     },
     "providerSelection": {
       "title": "AIアシスタントを選択",
@@ -253,8 +264,13 @@
         "loadingAll": "すべてのメッセージを読み込み中...",
         "allLoaded": "すべてのメッセージを読み込みました",
         "perfWarning": "すべてのメッセージを読み込みました — スクロールが遅くなる場合があります。「一番下へスクロール」をクリックしてください。",
-        "noSearchMatches": "検索に一致するメッセージがありません。"
-      }
+        "noSearchMatches": "検索に一致するメッセージがありません。",
+        "loadAllCount": "すべて読み込む ({{count}})",
+        "loadOlder": "過去のメッセージを読み込む",
+        "retryLoadOlder": "過去のメッセージの読み込みを再試行 — {{error}}"
+      },
+      "deleteConfirm": "セッションとそのトランスクリプトを削除します。元に戻せません。",
+      "finishRunBeforeWorkspaceChange": "ワークスペースを変更する前に実行を終了してください"
     },
     "shell": {
       "selectProject": {
@@ -397,16 +413,21 @@
       "active": "アクティブ"
     },
     "askUserQuestion": {
-      "needsInput": "{{provider}} があなたの入力を求めています"
+      "needsInput": "{{provider}} があなたの入力を求めています",
+      "answerHint": "回答を入力…",
+      "other": "その他…",
+      "skip": "スキップ"
     },
     "attachments": {
       "downloadFailedRetry": "ダウンロード失敗 — クリックで再試行",
-      "fileAttachment": "ファイル添付"
+      "fileAttachment": "ファイル添付",
+      "download": "{{name}} をダウンロード"
     },
     "checkpoint": {
       "creating": "スナップショットを作成中…",
       "revertChanges": "ファイルを最後のチェックポイントに戻す",
-      "undo": "チェックポイントを元に戻す"
+      "undo": "チェックポイントを元に戻す",
+      "beforeAiTurn": "AIターン前"
     },
     "common": {
       "close": "閉じる"
@@ -415,7 +436,9 @@
       "saveToTask": "タスク",
       "saved": "保存済み",
       "saving": "保存中...",
-      "taskShort": "タスク"
+      "taskShort": "タスク",
+      "addToTask": "TaskMasterに追加",
+      "added": "TaskMasterに追加しました"
     },
     "tokenUsage": {
       "desc": "セッションのトークン消費を表示",
@@ -436,6 +459,54 @@
       "selectOrchestrators": "オーケストレーターを選択",
       "orchestratorsOnly": "オーケストレーターのみ",
       "noOrchestrators": "利用可能なオーケストレーターセッションがありません"
+    },
+    "changes": {
+      "empty": "ファイルの変更はありません",
+      "failedToLoad": "変更の読み込みに失敗しました"
+    },
+    "commandResult": {
+      "fallback": {
+        "config": "設定と構成を開きます。",
+        "cost": "アクティブなセッションのトークン使用量を確認します。",
+        "help": "コマンドのドキュメントと構文を表示します。",
+        "memory": "プロジェクトのCLAUDE.mdメモリファイルを開きます。",
+        "models": "アクティブなプロバイダーで利用可能なモデルを参照します。",
+        "status": "ランタイム、バージョン、プロバイダー、環境のステータスを確認します。"
+      },
+      "filterCommands": "コマンドを絞り込む...",
+      "searchModels": "{{provider}} のモデルを検索..."
+    },
+    "commands": {
+      "runConfirmTitle": "コマンドを実行しますか？",
+      "executionCancelled": "コマンドの実行をキャンセルしました"
+    },
+    "export": {
+      "sessionTitle": "セッション {{id}}",
+      "pdfFailed": "PDFのエクスポートに失敗しました",
+      "transcriptDownloaded": "トランスクリプトをダウンロードしました",
+      "savedTo": "{{path}} を保存しました"
+    },
+    "message": {
+      "compactedSummary": "圧縮された要約",
+      "rawView": "生の表示",
+      "resendHint": "入力欄から再送信"
+    },
+    "modelLibrary": {
+      "deleteTooltip": "{{name}} を削除",
+      "editTooltip": "{{name}} を編集",
+      "enterNameAndId": "モデル名とモデルIDの両方を入力してください。",
+      "idNoSpaces": "モデルIDにスペースは使用できません。",
+      "setAsDefault": "デフォルトに設定",
+      "defaultModel": "デフォルトモデル"
+    },
+    "pinFile": {
+      "action": "ピン留め",
+      "pathHint": "path/to/file.ext",
+      "title": "ファイルをピン留め"
+    },
+    "permissionRequest": {
+      "title": "権限リクエスト · {{tool}}",
+      "question": "質問"
     }
   },
   "codeEditor": {
@@ -447,7 +518,11 @@
       "showDiff": "差分ハイライトを表示",
       "settings": "エディタ設定",
       "collapse": "エディタを折りたたむ",
-      "expand": "エディタを全幅に展開"
+      "expand": "エディタを全幅に展開",
+      "diffMerge": "差分 / マージ",
+      "previewInBrowser": "ブラウザでプレビュー",
+      "reload": "ディスクから再読み込み",
+      "toggleDock": "ファイルドックを切り替え"
     },
     "loading": "{{fileName}}を読み込んでいます...",
     "header": {
@@ -468,7 +543,8 @@
       "pinFile": "ファイルをコンテキストにピン留め",
       "unpinFile": "ファイルをコンテキストから外す",
       "previewHtml": "HTMLプレビューを新しいタブで開く",
-      "retry": "再試行"
+      "retry": "再試行",
+      "saveAll": "すべて保存"
     },
     "footer": {
       "lines": "行数:",
@@ -477,12 +553,49 @@
     },
     "binaryFile": {
       "title": "バイナリファイル",
-      "message": "ファイル \"{{fileName}}\" はバイナリファイルのため、テキストエディタで表示できません。"
+      "message": "ファイル \"{{fileName}}\" はバイナリファイルのため、テキストエディタで表示できません。",
+      "cannotDisplayAsText": "テキストとして表示できません"
     },
     "filePreview": {
       "loading": "プレビューを読み込み中...",
       "error": "このファイルを表示できません。",
       "openInNewTab": "新しいタブで開く"
+    },
+    "diff": {
+      "applyMerge": "マージを適用",
+      "base": "ベース",
+      "close": "差分を閉じる",
+      "current": "現在",
+      "hunk": "ハンク {{number}}",
+      "noChanges": "変更なし",
+      "deletedOnDisk": "ディスク上で削除済み"
+    },
+    "discardUnsavedChanges": "未保存の変更を破棄しますか？",
+    "emptyState": {
+      "title": "ファイルが開かれていません"
+    },
+    "failedToLoad": "ファイルの読み込みに失敗しました",
+    "hexDump": {
+      "more": "… 残り {{size}}"
+    },
+    "mediaFile": {
+      "subtitle": "音声/動画のプレビューはまだサポートされていません",
+      "title": "メディアファイル"
+    },
+    "settings": {
+      "fontSizeDecrease": "フォントサイズ −  (現在 {{size}})",
+      "fontSizeIncrease": "フォントサイズ +",
+      "minimap": "ミニマップ",
+      "tabSize": "タブサイズ: {{size}}"
+    },
+    "unsavedChanges": "{{name}} に未保存の変更があります",
+    "toasts": {
+      "savedFile": "{{name}} を保存しました",
+      "saveFailed": "保存に失敗しました",
+      "allSaved": "すべて保存しました",
+      "someSavesFailed": "一部の保存に失敗しました",
+      "savedTo": "{{path}} に保存しました",
+      "mergeApplied": "マージを適用しました — 保存して反映してください"
     }
   },
   "common": {
@@ -502,7 +615,9 @@
       "copy": "コピー",
       "download": "ダウンロード",
       "upload": "アップロード",
-      "browse": "参照"
+      "browse": "参照",
+      "openDiagram": "図を開く",
+      "update": "更新"
     },
     "tabs": {
       "chat": "チャット",
@@ -1363,6 +1478,20 @@
     },
     "projects": {
       "newSession": "新しいセッション"
+    },
+    "codeBlock": {
+      "wrapLines": "行を折り返す",
+      "noWrap": "折り返しなし"
+    },
+    "update": {
+      "available": "更新があります · v{{version}}",
+      "confirm": "v{{version}} に更新しますか？サーバーは自動で更新して再起動します — アクティブなセッションは中断されます。",
+      "downloading": "更新をダウンロードして適用中…",
+      "restarting": "サーバーを再起動中 — しばらくお待ちください…",
+      "done": "v{{version}} に更新しました。新しいバンドルを反映するにはアプリを再読み込みしてください。",
+      "manualRestart": "更新は適用されましたが、サーバーは自動で再起動しませんでした — 手動で再起動して完了してください。",
+      "failed": "更新に失敗しました。",
+      "failedTitle": "更新に失敗しました"
     }
   },
   "settings": {
@@ -1381,7 +1510,8 @@
       "restartConfirm": "ddagent サーバーを再起動しますか?アクティブなセッションは中断されます。",
       "restarting": "再起動中… サーバーが戻り次第、ページを再読み込みします。",
       "restartFailed": "再起動に失敗しました",
-      "unsupported": "再起動は、サーバーがサービスマネージャー管理下で動作している場合のみ利用できます。"
+      "unsupported": "再起動は、サーバーがサービスマネージャー管理下で動作している場合のみ利用できます。",
+      "ok": "OK"
     },
     "updates": {
       "title": "アプリの更新",
@@ -1438,7 +1568,12 @@
       "wordWrap": "折り返し",
       "showMinimap": "ミニマップを表示",
       "lineNumbers": "行番号",
-      "fontSize": "フォントサイズ"
+      "fontSize": "フォントサイズ",
+      "themeModes": {
+        "dark": "ダーク",
+        "light": "ライト",
+        "system": "システム"
+      }
     },
     "actions": {
       "saveChanges": "変更を保存",
@@ -1463,7 +1598,8 @@
         "openPanel": "設定パネルを開く",
         "draggingStatus": "ドラッグ中...",
         "toggleAndMove": "クリックで切替、ドラッグで移動"
-      }
+      },
+      "sendWithCtrlEnter": "Ctrl+Enterで送信"
     },
     "terminalShortcuts": {
       "title": "ターミナルショートカット",
@@ -1646,7 +1782,12 @@
         "disable": "プッシュ通知を無効にする",
         "enabled": "このデスクトップアプリの通知が有効です",
         "unsupported": "このシステムではデスクトップ通知はサポートされていません。"
-      }
+      },
+      "channels": {
+        "discord": "Discord",
+        "telegram": "Telegram"
+      },
+      "unpair": "ペアリングを解除"
     },
     "appearanceSettings": {
       "darkMode": {
@@ -1747,11 +1888,13 @@
       "description": "コミット用のGit IDを設定します。この設定は git config --global で適用されます",
       "name": {
         "label": "Git名前",
-        "help": "コミットに使用する名前"
+        "help": "コミットに使用する名前",
+        "placeholder": "山田 太郎"
       },
       "email": {
         "label": "Gitメールアドレス",
-        "help": "コミットに使用するメールアドレス"
+        "help": "コミットに使用するメールアドレス",
+        "placeholder": "john@example.com"
       },
       "actions": {
         "save": "設定を保存",
@@ -1797,7 +1940,9 @@
           "descriptionPlaceholder": "説明（任意）",
           "addButton": "トークンを追加",
           "cancelButton": "キャンセル",
-          "howToCreate": "GitHubパーソナルアクセストークンの作成方法 →"
+          "howToCreate": "GitHubパーソナルアクセストークンの作成方法 →",
+          "showToken": "トークンを表示",
+          "hideToken": "トークンを非表示"
         },
         "empty": "GitHubトークンはまだ追加されていません。",
         "added": "追加日:",
@@ -2112,11 +2257,19 @@
       "deleteTitle": "ワークスペースを削除",
       "description": "ワークスペースは、ddagent がチャット・コード実行・ブラウジングできるディレクトリです。",
       "remove": "ワークスペースを削除",
-      "title": "ワークスペース"
+      "title": "ワークスペース",
+      "pathRequired": "パスは必須です"
     },
     "about": {
       "supportTitle": "プロジェクトを支援",
-      "buyMeACoffee": "Buy Me a Coffee"
+      "buyMeACoffee": "Buy Me a Coffee",
+      "learnMore": "詳細を見る",
+      "pro": {
+        "syncSettings": "設定を同期",
+        "teamManagement": "チーム管理"
+      },
+      "proFeatures": "ddagent Pro の機能",
+      "tryHosted": "ddagent Hosted を試す"
     }
   },
   "sidebar": {
@@ -2375,7 +2528,8 @@
         "progressVisualization": "進捗の可視化：カンバンボードと詳細なタスク分析",
         "cliIntegration": "CLI統合：高度なワークフローのためにtaskmasterコマンドを使用"
       },
-      "initializeButton": "TaskMaster AIを初期化"
+      "initializeButton": "TaskMaster AIを初期化",
+      "writePrdFirst": "先にPRDを作成してください"
     },
     "gettingStarted": {
       "title": "TaskMasterを始める",
@@ -2491,7 +2645,16 @@
       "prdsAvailable": "{{count}}件のPRDがあります"
     },
     "prd": {
-      "modified": "更新日: {{date}}"
+      "modified": "更新日: {{date}}",
+      "editorTitle": "PRD — {{name}}",
+      "fileExistsMessage": "「{{name}}」という名前のPRDが既に存在します。上書きしますか？",
+      "fileExistsTitle": "ファイルは既に存在します",
+      "newFile": "新しいファイル",
+      "parse": "PRDを解析",
+      "template": "テンプレート",
+      "fileNameHint": "ファイル名（例: prd.txt）",
+      "saved": "PRDを保存しました",
+      "tasksGenerated": "PRDからタスクを生成しました"
     },
     "statuses": {
       "pending": "保留中",
@@ -2499,7 +2662,8 @@
       "done": "完了",
       "blocked": "ブロック中",
       "deferred": "延期",
-      "cancelled": "キャンセル"
+      "cancelled": "キャンセル",
+      "review": "レビュー"
     },
     "priorities": {
       "high": "高",
@@ -2596,7 +2760,9 @@
       "completedReopen": "完了（クリックで再開）",
       "inProgressComplete": "進行中（クリックで完了）",
       "markCompleted": "完了としてマーク",
-      "toggleStatusAria": "タスク {{id}} のステータスを切り替え"
+      "toggleStatusAria": "タスク {{id}} のステータスを切り替え",
+      "markDone": "完了にする",
+      "reopen": "再開"
     },
     "nextTask": {
       "allComplete": "すべてのタスクが完了",
@@ -2638,7 +2804,14 @@
       "taskTitle": "タスク {{id}}: {{title}}",
       "testStrategy": "テスト戦略",
       "titleRequired": "タイトルは必須です",
-      "updateFailed": "タスクの更新に失敗しました"
+      "updateFailed": "タスクの更新に失敗しました",
+      "deleteConfirmMessage": "タスク #{{id}} は削除されます。元に戻せません。",
+      "notFound": "タスクが見つかりません",
+      "subtasks": "サブタスク",
+      "idCopied": "タスクIDをコピーしました"
+    },
+    "toasts": {
+      "statusInProgress": "タスク {{id}} を進行中に設定しました"
     }
   },
   "knowledge": {
@@ -2743,6 +2916,556 @@
     },
     "settings": {
       "description": "エージェント向けのローカルメモリ層：メモリ、ルール、スキル、個人情報。"
+    },
+    "contextBudget": {
+      "tokens": "~{{tokens}} / {{budget}} tok"
+    },
+    "critical": {
+      "make": "クリティカルにする",
+      "makeAll": "すべてのルールをクリティカルにする",
+      "makeAllHint": "それらを注入されるコンテキスト予算に追加します"
+    },
+    "errors": {
+      "importFailed": "インポートに失敗しました: {{error}}",
+      "migrationFailed": "移行に失敗しました: {{error}}"
+    },
+    "graph": {
+      "truncated": "省略"
+    },
+    "importAll": {
+      "action": "すべてをインポート",
+      "mergeDuplicates": "重複エントリを統合",
+      "mergeDuplicatesHint": "ddagent 内の重複行を統合します（ファイルではありません）",
+      "projectsScanned": "スキャンしたプロジェクト: {{count}}",
+      "rulesSummary": "ルール: {{total}} · 重複グループ: {{duplicates}}",
+      "skillsFound": "見つかったエージェントスキル: {{found}} (新規: {{newSkills}})",
+      "title": "すべてを ddagent にインポート"
+    },
+    "importSkills": {
+      "found": "エージェント全体で {{count}} 件のスキルが見つかりました。",
+      "summary": "新規: {{imported}} · スキップ: {{skipped}}",
+      "title": "エージェントスキルをインポート"
+    },
+    "linkOptions": {
+      "memory": "メモリ: {{title}}",
+      "personal": "個人情報: {{title}}",
+      "rule": "ルール: {{title}}",
+      "skill": "スキル: {{name}}"
+    },
+    "migrate": {
+      "duplicates": "プロジェクト間の重複グループ: {{count}}",
+      "mergeDuplicates": "重複を統合",
+      "removedPromoted": "削除: {{removed}}、昇格: {{promoted}}",
+      "rulesSummary": "ルール: 合計 {{total}}、クリティカル {{critical}}。",
+      "scanned": "{{count}} 件のプロジェクトをスキャンしました。",
+      "title": "既存のルールを移行"
     }
+  },
+  "skills": {
+    "addDialog": {
+      "chooseFileTitle": "SKILL.mdを選択",
+      "chooseFiles": "ファイルを選択",
+      "chooseFolder": "フォルダを選択",
+      "chooseFolderTitle": "スキルフォルダを選択",
+      "folderFilesMeta": {
+        "one": "{{count}} ファイル · {{size}}",
+        "other": "{{count}} ファイル · {{size}}"
+      },
+      "folderUploadsNote": "フォルダをアップロードした場合は選択したフォルダ名が保持されます。単体ファイルの場合は `SKILL.md` の `name` が使用されます。",
+      "hideInstallLocation": "インストール先を非表示",
+      "installSkill": "スキルをインストール",
+      "installSkills": {
+        "one": "{{count}} 件のスキルをインストール",
+        "other": "{{count}} 件のスキルをインストール"
+      },
+      "markdownFileMeta": "Markdownファイル · {{size}}",
+      "pickHint": "フォルダにはスクリプト、参照、アセットを含めることができます。",
+      "pickTitle": "スキルフォルダまたはSKILL.mdを選択",
+      "readyToInstall": "インストールの準備完了",
+      "removeQueued": "{{name}} を削除",
+      "title": "{{provider}} スキルを追加",
+      "uploadHint": "SKILL.mdファイルまたは完全なスキルフォルダをアップロードしてください。",
+      "whereWillThisInstall": "どこにインストールされますか？"
+    },
+    "deleteSkill": "{{name}} を削除",
+    "empty": {
+      "noGlobalSkills": "グローバルスキルはまだ見つかっていません",
+      "noGlobalSkillsDescription": "上でグローバルスキルを追加すると、すべてのプロジェクトで利用できるようになります。",
+      "noMatchingSkills": "一致するスキルがありません",
+      "noMatchingSkillsDescription": "別のコマンド、名前、スコープ、プロジェクト、ソースパスをお試しください。",
+      "noProjects": "利用可能なプロジェクトがありません",
+      "noProjectsDescription": "プロジェクトまたはワークスペースを追加すると、そのスキルを参照できます。",
+      "noSkillsInProject": "このプロジェクトにスキルがありません",
+      "noSkillsInProjectDescription": "選択したプロジェクトに .claude/skills、.cursor/skills、または .agents/skills フォルダを作成してください。"
+    },
+    "errors": {
+      "addMarkdownFirst": "先に1つ以上のMarkdownファイルを追加してください。",
+      "couldNotReadSkillFile": "{{name}} から SKILL.md を読み取れませんでした。",
+      "dropMarkdownOrFolder": "1つ以上のMarkdownファイル、またはSKILL.mdを含むフォルダをドロップしてください。",
+      "folderFileLimit": "スキルフォルダには最大 {{count}} 個のファイルを含めることができます。",
+      "folderReadFailed": "スキルフォルダの読み取りに失敗しました",
+      "folderSizeLimit": "選択したスキルフォルダの合計サイズは30 MB未満である必要があります。",
+      "importFailed": "スキルのインポートに失敗しました",
+      "missingSkillFile": "選択したフォルダに SKILL.md ファイルが含まれていません。"
+    },
+    "moveDialog": {
+      "moveToGlobal": "グローバルに移動",
+      "moveToProject": "プロジェクトに移動",
+      "toGlobalHint": "このスキルをグローバルスキルディレクトリに移動し、すべてのプロジェクトで使用できるようにします。",
+      "toProjectHint": "このスキルを所有するプロジェクトを選択してください。プロバイダーのグローバルスキルディレクトリから移動します。"
+    },
+    "moveSkill": "{{name}} を移動",
+    "projectLabel": "プロジェクト",
+    "scopes": {
+      "admin": "管理者",
+      "plugin": "プラグイン",
+      "project": "プロジェクト",
+      "repo": "リポジトリ",
+      "system": "システム",
+      "user": "ユーザー"
+    },
+    "screen": {
+      "addSkill": "スキルを追加",
+      "clearSearch": "スキル検索をクリア",
+      "deleteDescription": "{{provider}} の管理対象スキルディレクトリから {{directory}} ディレクトリを削除します。元に戻せません。",
+      "deleteTitle": "{{name}} を削除しますか？",
+      "loadingSkills": "{{provider}} のスキルを読み込み中…",
+      "manageDescription": "ローカルファイル、フォルダ全体、プロジェクト対応の場所から {{provider}} スキルを管理します。",
+      "noDescription": "スキルのフロントマターに説明がありません。",
+      "pluginBadge": "プラグイン: {{name}}",
+      "projectBadge": "プロジェクト: {{name}}",
+      "savedSuccessfully": "スキルを保存しました。",
+      "scanningProjectSkills": "プロジェクトのスキルをスキャン中...",
+      "searchHint": "スキルを検索...",
+      "skillsCount": {
+        "one": "{{count}} スキル",
+        "other": "{{count}} スキル"
+      },
+      "sourceLabel": "ソース"
+    }
+  },
+  "mcp": {
+    "form": {
+      "fields": {
+        "bearerTokenEnvVar": "ベアラートークン環境変数",
+        "envVarNames": "環境変数名",
+        "workingDirectory": "作業ディレクトリ"
+      },
+      "scope": {
+        "claudeLocal": "Claude ローカル",
+        "description": {
+          "local": "選択したプロジェクトのClaudeユーザー設定に保存されます",
+          "project": "選択したプロジェクトのワークスペースに保存されます",
+          "projectGlobal": "すべてのプロバイダーの選択したプロジェクトワークスペースに書き込みます",
+          "user": "このマシン上のすべてのプロジェクトで利用できます",
+          "userGlobal": "各プロバイダーのユーザー設定に書き込み、このマシン上のすべてのプロジェクトで利用できます"
+        },
+        "projectAllProviders": "プロジェクト（すべてのプロバイダー）",
+        "userAllProviders": "ユーザー（すべてのプロバイダー）"
+      },
+      "submitTo": "{{provider}} にサーバーを追加",
+      "validation": {
+        "unsupportedGlobal": "MCPサーバーの追加は、すべてのプロバイダーで stdio と http のみをサポートし、{{type}} はサポートしません。",
+        "unsupportedProvider": "{{provider}} は {{type}} MCPサーバーをサポートしていません"
+      }
+    },
+    "install": {
+      "button": "インストール",
+      "cardDescription": "MCP経由でエージェントにナレッジベースとddagentツールを提供します — エージェントを選択するか、すべてにインストールしてください。",
+      "description": "選択したエージェントがMCP経由でddagentのナレッジベースとツールを使用できるようにします。",
+      "errorFallback": "エラー",
+      "failed": "インストールに失敗しました: {{error}}",
+      "installForAll": "すべてにインストール",
+      "installSelected": "選択項目にインストール",
+      "installedCount(param=count)": {
+        "one": "{{count}} 個のエージェントにインストールしました。",
+        "other": "{{count}} 個のエージェントにインストールしました。"
+      },
+      "partialFailure": "{{count}} 個にインストールしました。失敗: {{failed}}",
+      "title": "ddagent MCPサーバーをインストール"
+    },
+    "servers": {
+      "addGlobalDescription": "このMCPサーバーをすべてのプロバイダー（Claude、Cursor、Codex、OpenCode、Devin）に追加します。同じ設定をすべてのプロバイダーで機能させる必要があるため、stdio と HTTP トランスポートのみがサポートされます。",
+      "addGlobalMenuDescription": "グローバルMCPサーバーの追加は、共通の stdio または HTTP サーバーを Claude、Cursor、Codex、OpenCode、Devin に書き込みます。",
+      "addGlobalTitle": "グローバルMCPサーバーを追加",
+      "addProviderDescription": "{{provider}} MCPサーバーの追加は {{provider}} のみを変更します。",
+      "addProviderTitle": "{{provider}} MCPサーバーを追加",
+      "config": {
+        "cwd": "Cwd",
+        "envVars": "環境変数"
+      },
+      "descriptionGeneric": "Model Context Protocolサーバーは {{provider}} に追加のツールとデータソースを提供します",
+      "loading": "MCPサーバーを読み込み中...",
+      "refreshingScopes": "プロジェクトスコープを更新中..."
+    },
+    "team": {
+      "cta": "ddagent Pro で利用できます",
+      "description": "MCPサーバー設定をチーム全体で共有します。全員が自動的に同期されます。",
+      "title": "チームMCP設定"
+    },
+    "tokens": {
+      "scopeWrite": "書き込み"
+    }
+  },
+  "terminal": {
+    "actions": {
+      "clearOutput": "出力をクリア",
+      "connect": "接続",
+      "newShell": "新しいシェル",
+      "newTab": "新しいターミナルタブ",
+      "providerLogin": "プロバイダーログイン",
+      "restartSession": "セッションを再起動"
+    },
+    "authUrl": {
+      "openInBrowser": "ブラウザで開く"
+    },
+    "errors": {
+      "couldNotOpenLink": "リンクを開けませんでした: {{url}}"
+    },
+    "fileLink": {
+      "detected": "ファイルを検出: {{path}}"
+    },
+    "paste": {
+      "hint": "Ctrl+V / 右クリック → 貼り付け",
+      "title": "ターミナルに貼り付け"
+    },
+    "shortcuts": {
+      "eof": "EOF",
+      "hide": "ショートカットバーを非表示",
+      "interrupt": "中断 (SIGINT)",
+      "suspend": "一時停止 (SIGTSTP)",
+      "showTooltip": "ショートカットを表示",
+      "hideTooltip": "ショートカットを非表示"
+    },
+    "tabs": {
+      "antigravityCli": "Antigravity CLI",
+      "claudeCli": "Claude CLI",
+      "commandCodeCli": "Command Code CLI",
+      "cursorCli": "Cursor CLI",
+      "devinCli": "Devin CLI",
+      "loginTitle": "ログイン: {{provider}}",
+      "opencodeCli": "OpenCode CLI",
+      "plainShell": "通常のシェル",
+      "shellName": "シェル {{index}}"
+    }
+  },
+  "worktrees": {
+    "branchHint": "新しいブランチ名（例: feature/login）",
+    "branchingOff": "{{branch}} から分岐",
+    "cleanupDescription": "マージ後に worktree を削除してブランチも削除",
+    "created": "worktree を作成しました",
+    "deleteBranchLabel": "ブランチも削除",
+    "dirtyWarning": "警告: この worktree には失われる未コミットの変更が {{count}} 件あります。",
+    "emptyDescription": "worktree を作成して、機能開発やエージェントの実行を分離します。",
+    "emptyTitle": "worktree が見つかりません",
+    "forceRemoveLabel": "強制削除（変更を破棄）",
+    "headDetachedAt": "HEAD が {{sha}} で分離",
+    "mainBadge": "main",
+    "mergeDescription": "変更を {{branch}} にマージします。",
+    "mergeTitle": "{{branch}} をマージ",
+    "merged": "worktree を {{branch}} にマージしました",
+    "opened": "worktree を開きました: {{branch}}",
+    "portHint": "実行ポート（任意、例: 3000）",
+    "removeDescription": "worktree フォルダを削除します。リンクされたプロジェクトはアーカイブされます。",
+    "removeTitle": "worktree {{branch}} を削除しますか？",
+    "removed": "worktree を削除しました",
+    "runButton": "実行",
+    "runHint": "実行コマンド（例: npm run dev）",
+    "runRunning": "実行中",
+    "runRunningWithPort": "実行中 :{{port}}",
+    "scripts": "スクリプト",
+    "scriptsSaved": "スクリプト設定を保存しました",
+    "serverLabel": "サーバー: ",
+    "setupHint": "セットアップコマンド（例: npm install）",
+    "setupLabel": "セットアップ: ",
+    "squashDescription": "すべてのコミットを1つのコミットにまとめる",
+    "stopButton": "停止"
+  },
+  "quota": {
+    "agents": {
+      "statusCount": "{{status}} ({{count}})"
+    },
+    "chart": {
+      "hide": "非表示",
+      "noData": "トレンドを表示するにはデータが不足しています。",
+      "pointReadout": "{{date}} · {{tokens}} トークン · {{cost}}",
+      "show": "表示"
+    },
+    "config": {
+      "accountRouting": "アカウントのルーティング",
+      "pollerTitle": "ポーラーとアラート",
+      "save": "設定を保存"
+    },
+    "overview": {
+      "tokensAndCost": "トークンとコスト"
+    },
+    "section": {
+      "config": "設定"
+    }
+  },
+  "scheduler": {
+    "checking": "確認中…",
+    "cronHint": "Cron（分 時 日 月 曜日） — 例: 0 9 * * *",
+    "deleteMessage": "繰り返しジョブ {{id}} を削除します。既存のセッションは保持されます。",
+    "deleteTitle": "スケジュールを削除しますか？",
+    "editTitle": "スケジュールを編集",
+    "newLabel": "新規",
+    "nextIn": "次回まで {{time}}",
+    "promptHint": "エージェントへのプロンプト",
+    "runs": "実行回数",
+    "session": "セッション {{id}}",
+    "worktree": "worktree"
+  },
+  "notifications": {
+    "deviceLabel": "ddagent Flutter",
+    "errors": {
+      "noResponse": "サーバーから応答がありません",
+      "registrationRejected": "サーバーに登録を拒否されました"
+    }
+  },
+  "serverConnect": {
+    "connect": "接続",
+    "connecting": "接続中…",
+    "connectionFailed": "接続に失敗しました ({{error}})",
+    "enterUrl": "サーバーのURLを入力",
+    "subtitle": "ddagent サーバーに接続"
+  },
+  "voice": {
+    "apiKeySaved": "APIキー（保存済み、変更するには入力）",
+    "preview": "プレビュー",
+    "saveFailed": "STT設定の保存に失敗しました",
+    "settingsSaved": "音声入力設定を保存しました"
+  },
+  "preview": {
+    "embeddedWebOnly": "埋め込みプレビューはWebビルドでのみ利用できます",
+    "startDevServerHint": "開発サーバーを起動すると（npm run dev、flutter run -d web-server…）\nそのポートがここに表示されます。"
+  },
+  "sharedContext": {
+    "title": "共有ノート"
+  },
+  "collab": {
+    "copyToken": "トークンをコピー",
+    "createInvite": "招待を作成",
+    "invite": "招待",
+    "inviteTeammate": "チームメイトを招待",
+    "roles": {
+      "member": "メンバー",
+      "viewer": "閲覧者"
+    },
+    "shareTokenHint": "この招待トークンを共有してください — 一度だけ表示され、72時間で失効します:",
+    "team": "チーム"
+  },
+  "browser": {
+    "dialogTitle": "エージェントブラウザ",
+    "viewError": "ブラウザ表示エラー",
+    "web": "Web"
+  },
+  "projects": {
+    "archive": "アーカイブ",
+    "archivedSection": "アーカイブ済み ({{count}})",
+    "clone": "クローン",
+    "cloneFailed": "クローンに失敗しました",
+    "cloneFinished": "クローンが完了しました。プロジェクト一覧を更新中…",
+    "cloneRepository": "リポジトリをクローン",
+    "deletePermanently": "完全に削除",
+    "deleteProjectMessage": "「{{name}}」を、すべてのセッションと保存済み履歴を含めて完全に削除します（JSONL も消去）。元に戻せません。",
+    "deleteProjectTitle": "プロジェクトを削除しますか？",
+    "destinationPath": "保存先パス",
+    "destinationPathRequired": "保存先パスは必須です",
+    "displayNameOptional": "表示名（任意）",
+    "failedToLoadTokens": "GitHubトークンの読み込みに失敗しました",
+    "githubTokenOptional": "GitHubトークン（任意）",
+    "newer": "新しい方",
+    "older": "古い方",
+    "projectArchived": "プロジェクトをアーカイブしました",
+    "projectDeleted": "プロジェクトを削除しました",
+    "projectRenamed": "プロジェクト名を変更しました",
+    "projectRestored": "プロジェクトを復元しました",
+    "repoUrlPlaceholder": "https://github.com/org/repo.git",
+    "repositoryCloned": "リポジトリをクローンしました",
+    "repositoryUrlRequired": "リポジトリURLは必須です",
+    "restore": "復元",
+    "sessionCount": {
+      "one": "{{count}} セッション",
+      "other": "{{count}} セッション"
+    },
+    "unknown": "不明",
+    "usingStoredToken": "保存済みトークンを使用: {{name}}"
+  },
+  "sessions": {
+    "activity": {
+      "committingChanges": "変更をコミット中",
+      "editingFile": "{{file}} を編集中",
+      "editingFileGeneric": "ファイルを編集中",
+      "fetchingUrl": "{{url}} を取得中",
+      "pushingBranch": "ブランチをプッシュ中",
+      "readingFile": "{{file}} を読み取り中",
+      "runningCommand": "`{{command}}` を実行中",
+      "runningShellCommand": "シェルコマンドを実行中",
+      "runningTool": "{{name}} を実行中",
+      "searching": "“{{query}}” を検索中",
+      "subagentRunning": "サブエージェントを実行中"
+    },
+    "age": {
+      "days": "{{days}}日",
+      "hours": "{{hours}}時間",
+      "lessThanMinute": "1分未満",
+      "minutes": "{{count}}分"
+    },
+    "archive": "アーカイブ",
+    "archivedSessions": "アーカイブ済みセッション",
+    "autoOrchestrator": "自動（オーケストレーター）",
+    "compareWith": "比較対象…",
+    "createFailed": "セッションの作成に失敗しました: {{error}}",
+    "deleteSessionMessage": "「{{name}}」とそのトランスクリプトを削除します。元に戻せません。",
+    "newSessionProvider": "新しいセッション — プロバイダー",
+    "noRecentSessions": "最近のセッションはありません",
+    "noSessions": "セッションがありません",
+    "projectPath": "プロジェクトパス",
+    "rename": "名前を変更",
+    "toasts": {
+      "archived": "セッションをアーカイブしました",
+      "deleted": "セッションを削除しました",
+      "pinned": "セッションをピン留めしました",
+      "renamed": "セッション名を変更しました",
+      "restored": "セッションを復元しました",
+      "unpinned": "セッションのピン留めを解除しました",
+      "workspaceChanged": "ワークスペースを変更しました"
+    }
+  },
+  "git": {
+    "aiButton": "✦ AI",
+    "checkpoints": {
+      "create": "新規",
+      "empty": "チェックポイントはまだありません",
+      "labelHint": "チェックポイントのラベル（任意）",
+      "restoreMessage": "作業ツリーをこのチェックポイントにリセットしますか？現在の変更は置き換えられます。",
+      "restoreTitle": "チェックポイントを復元",
+      "restored": "チェックポイントを復元しました",
+      "title": "チェックポイント"
+    },
+    "commitCreated": "コミットを作成しました",
+    "commitMessage": "コミットメッセージ",
+    "deleteFile": "ファイルを削除",
+    "hunkStage": "+ ハンク",
+    "hunkUnstage": "− ハンク",
+    "largeDiff": "大きな差分のプレビュー: タブの応答性を保つため、レンダリングが制限されています。",
+    "loadDiffFailed": "差分の読み込みに失敗しました: {{error}}",
+    "noBranch": "ブランチなし",
+    "noDiff": "利用可能な差分がありません",
+    "selectProject": "プロジェクトを選択",
+    "splitDiff": "分割差分",
+    "stageHunk": "ハンクをステージ",
+    "stagedChanges": "ステージ済みの変更",
+    "statusStaged": "ステージ済み",
+    "switchBranch": "ブランチを切り替え",
+    "unifiedDiff": "統合差分",
+    "unstageHunk": "ハンクのステージを解除"
+  },
+  "kanban": {
+    "card": {
+      "untitled": "無題"
+    },
+    "comments": {
+      "add": "コメントを追加",
+      "empty": "コメントはまだありません"
+    },
+    "details": {
+      "status": "ステータス: {{status}}",
+      "title": "カードの詳細"
+    },
+    "dialog": {
+      "saving": "保存中…"
+    },
+    "empty": {
+      "noProject": "プロジェクトが選択されていません"
+    },
+    "saveFailed": "カードの保存に失敗しました",
+    "time": {
+      "daysAgo(param=count)": {
+        "one": "1日前",
+        "other": "{{count}}日前"
+      },
+      "hoursAgo(param=count)": {
+        "one": "1時間前",
+        "other": "{{count}}時間前"
+      },
+      "minutesAgo(param=count)": {
+        "one": "1分前",
+        "other": "{{count}}分前"
+      },
+      "now": "たった今"
+    }
+  },
+  "onboarding": {
+    "agents": {
+      "description": "1つ以上のAIコーディングアシスタントにログインします。すべて任意です。",
+      "laterHint": "これらは後で設定で構成できます。",
+      "title": "AIエージェントを接続"
+    },
+    "completeSetup": "セットアップを完了",
+    "errors": {
+      "invalidEmail": "有効なメールアドレスを入力してください。",
+      "nameAndEmailRequired": "git の名前とメールアドレスの両方が必要です。"
+    },
+    "gitHint": "ddagent セッションで作成されるコミットに使用されます。",
+    "mcp": {
+      "description": "ddagent MCPサーバーをインストールすると、エージェントがナレッジベースとddagentツールを使用できるようになります。エージェントを選択するか、すべてにインストールしてください。",
+      "installForAll": "すべてにインストール",
+      "installSelected": "選択項目にインストール",
+      "installedOn(param=count)": {
+        "one": "{{count}} 個のエージェントにインストールしました。",
+        "other": "{{count}} 個のエージェントにインストールしました。"
+      },
+      "installedWithFailures": "{{installedCount}} 個にインストールしました。失敗: {{failed}}",
+      "laterHint": "任意 — 後で設定 → MCP からインストールすることもできます。",
+      "title": "エージェントを ddagent に接続"
+    }
+  },
+  "fileTree": {
+    "browseServerFilesystem": "サーバーのファイルシステムを参照",
+    "chooseFolder": "フォルダを選択",
+    "copyContents": "内容をコピー",
+    "noFiles": "ファイルがありません",
+    "search": {
+      "hint": "名前を絞り込み / Enterで内容を検索",
+      "noMatches": "一致するものがありません",
+      "prompt": "クエリを入力してEnterを押してください",
+      "resultsTruncated": "結果は省略されています"
+    },
+    "titles": {
+      "delete": "{{name}} を削除",
+      "download": "{{name}} をダウンロード",
+      "rename": "{{name}} の名前を変更"
+    },
+    "uploadHere": "ここにアップロード",
+    "uploadTo": "アップロード先",
+    "uploadedCount": "{{count}} 件のファイルをアップロードしました",
+    "newName": "新しい名前",
+    "notRegisteredProject": "登録済みのプロジェクトではありません: {{path}}",
+    "showGitignoredFiles": "gitignore されたファイルを表示",
+    "hideGitignoredFiles": "gitignore されたファイルを非表示",
+    "downloadUnsupportedOnWeb": "Webではダウンロードを利用できません",
+    "saveToPath": "パスに保存",
+    "savedTo": "{{path}} に保存しました"
+  },
+  "workspace": {
+    "archivedWorkspaceName": "アーカイブ済み",
+    "closePane": "ペインを閉じる",
+    "closeSearch": "検索を閉じる",
+    "deleteSessionNotice": "セッションとそのトランスクリプトを削除します。元に戻せません。",
+    "exportChat": "チャットをエクスポート",
+    "jumpToSession": "セッションへジャンプ…",
+    "newChatProvider": "新しいチャット — プロバイダー",
+    "nextMatch": "次の一致",
+    "previousMatch": "前の一致",
+    "searchTranscript": "トランスクリプトを検索",
+    "sendTo": "{{count}} 件に送信",
+    "accountWithLabel": "デフォルト · {{label}}",
+    "finishRunBeforeChangingWorkspace": "ワークスペースを変更する前に実行を終了してください",
+    "restored": "ワークスペースを復元しました",
+    "maximizePane": "ペインを最大化",
+    "restorePanes": "ペインを復元",
+    "reviewChangedFiles": "変更されたファイルを確認"
   }
 }

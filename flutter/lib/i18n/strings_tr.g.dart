@@ -47,6 +47,26 @@ class TranslationsTr extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final Translations$sidebar$tr sidebar = Translations$sidebar$tr._(_root);
 	@override late final Translations$tasks$tr tasks = Translations$tasks$tr._(_root);
 	@override late final Translations$knowledge$tr knowledge = Translations$knowledge$tr._(_root);
+	@override late final Translations$skills$tr skills = Translations$skills$tr._(_root);
+	@override late final Translations$mcp$tr mcp = Translations$mcp$tr._(_root);
+	@override late final Translations$terminal$tr terminal = Translations$terminal$tr._(_root);
+	@override late final Translations$worktrees$tr worktrees = Translations$worktrees$tr._(_root);
+	@override late final Translations$quota$tr quota = Translations$quota$tr._(_root);
+	@override late final Translations$scheduler$tr scheduler = Translations$scheduler$tr._(_root);
+	@override late final Translations$notifications$tr notifications = Translations$notifications$tr._(_root);
+	@override late final Translations$serverConnect$tr serverConnect = Translations$serverConnect$tr._(_root);
+	@override late final Translations$voice$tr voice = Translations$voice$tr._(_root);
+	@override late final Translations$preview$tr preview = Translations$preview$tr._(_root);
+	@override late final Translations$sharedContext$tr sharedContext = Translations$sharedContext$tr._(_root);
+	@override late final Translations$collab$tr collab = Translations$collab$tr._(_root);
+	@override late final Translations$browser$tr browser = Translations$browser$tr._(_root);
+	@override late final Translations$projects$tr projects = Translations$projects$tr._(_root);
+	@override late final Translations$sessions$tr sessions = Translations$sessions$tr._(_root);
+	@override late final Translations$git$tr git = Translations$git$tr._(_root);
+	@override late final Translations$kanban$tr kanban = Translations$kanban$tr._(_root);
+	@override late final Translations$onboarding$tr onboarding = Translations$onboarding$tr._(_root);
+	@override late final Translations$fileTree$tr fileTree = Translations$fileTree$tr._(_root);
+	@override late final Translations$workspace$tr workspace = Translations$workspace$tr._(_root);
 }
 
 // Path: auth
@@ -106,6 +126,14 @@ class Translations$chat$tr extends Translations$chat$en {
 	@override late final Translations$chat$quotaBadge$tr quotaBadge = Translations$chat$quotaBadge$tr._(_root);
 	@override late final Translations$chat$paneHeader$tr paneHeader = Translations$chat$paneHeader$tr._(_root);
 	@override late final Translations$chat$broadcast$tr broadcast = Translations$chat$broadcast$tr._(_root);
+	@override late final Translations$chat$changes$tr changes = Translations$chat$changes$tr._(_root);
+	@override late final Translations$chat$commandResult$tr commandResult = Translations$chat$commandResult$tr._(_root);
+	@override late final Translations$chat$commands$tr commands = Translations$chat$commands$tr._(_root);
+	@override late final Translations$chat$export$tr export = Translations$chat$export$tr._(_root);
+	@override late final Translations$chat$message$tr message = Translations$chat$message$tr._(_root);
+	@override late final Translations$chat$modelLibrary$tr modelLibrary = Translations$chat$modelLibrary$tr._(_root);
+	@override late final Translations$chat$pinFile$tr pinFile = Translations$chat$pinFile$tr._(_root);
+	@override late final Translations$chat$permissionRequest$tr permissionRequest = Translations$chat$permissionRequest$tr._(_root);
 }
 
 // Path: codeEditor
@@ -122,6 +150,15 @@ class Translations$codeEditor$tr extends Translations$codeEditor$en {
 	@override late final Translations$codeEditor$footer$tr footer = Translations$codeEditor$footer$tr._(_root);
 	@override late final Translations$codeEditor$binaryFile$tr binaryFile = Translations$codeEditor$binaryFile$tr._(_root);
 	@override late final Translations$codeEditor$filePreview$tr filePreview = Translations$codeEditor$filePreview$tr._(_root);
+	@override late final Translations$codeEditor$diff$tr diff = Translations$codeEditor$diff$tr._(_root);
+	@override String get discardUnsavedChanges => 'Kaydedilmemiş değişikliklerden vazgeçilsin mi?';
+	@override late final Translations$codeEditor$emptyState$tr emptyState = Translations$codeEditor$emptyState$tr._(_root);
+	@override String get failedToLoad => 'Dosya yüklenemedi';
+	@override late final Translations$codeEditor$hexDump$tr hexDump = Translations$codeEditor$hexDump$tr._(_root);
+	@override late final Translations$codeEditor$mediaFile$tr mediaFile = Translations$codeEditor$mediaFile$tr._(_root);
+	@override late final Translations$codeEditor$settings$tr settings = Translations$codeEditor$settings$tr._(_root);
+	@override String unsavedChanges({required Object name}) => '${name} dosyasında kaydedilmemiş değişiklikler var';
+	@override late final Translations$codeEditor$toasts$tr toasts = Translations$codeEditor$toasts$tr._(_root);
 }
 
 // Path: common
@@ -152,6 +189,8 @@ class Translations$common$tr extends Translations$common$en {
 	@override late final Translations$common$gitPanel$tr gitPanel = Translations$common$gitPanel$tr._(_root);
 	@override late final Translations$common$sessions$tr sessions = Translations$common$sessions$tr._(_root);
 	@override late final Translations$common$projects$tr projects = Translations$common$projects$tr._(_root);
+	@override late final Translations$common$codeBlock$tr codeBlock = Translations$common$codeBlock$tr._(_root);
+	@override late final Translations$common$update$tr update = Translations$common$update$tr._(_root);
 }
 
 // Path: settings
@@ -245,6 +284,7 @@ class Translations$tasks$tr extends Translations$tasks$en {
 	@override late final Translations$tasks$list$tr list = Translations$tasks$list$tr._(_root);
 	@override late final Translations$tasks$nextTask$tr nextTask = Translations$tasks$nextTask$tr._(_root);
 	@override late final Translations$tasks$taskDetail$tr taskDetail = Translations$tasks$taskDetail$tr._(_root);
+	@override late final Translations$tasks$toasts$tr toasts = Translations$tasks$toasts$tr._(_root);
 }
 
 // Path: knowledge
@@ -268,6 +308,393 @@ class Translations$knowledge$tr extends Translations$knowledge$en {
 	@override late final Translations$knowledge$links$tr links = Translations$knowledge$links$tr._(_root);
 	@override late final Translations$knowledge$tags$tr tags = Translations$knowledge$tags$tr._(_root);
 	@override late final Translations$knowledge$settings$tr settings = Translations$knowledge$settings$tr._(_root);
+	@override late final Translations$knowledge$contextBudget$tr contextBudget = Translations$knowledge$contextBudget$tr._(_root);
+	@override late final Translations$knowledge$critical$tr critical = Translations$knowledge$critical$tr._(_root);
+	@override late final Translations$knowledge$errors$tr errors = Translations$knowledge$errors$tr._(_root);
+	@override late final Translations$knowledge$graph$tr graph = Translations$knowledge$graph$tr._(_root);
+	@override late final Translations$knowledge$importAll$tr importAll = Translations$knowledge$importAll$tr._(_root);
+	@override late final Translations$knowledge$importSkills$tr importSkills = Translations$knowledge$importSkills$tr._(_root);
+	@override late final Translations$knowledge$linkOptions$tr linkOptions = Translations$knowledge$linkOptions$tr._(_root);
+	@override late final Translations$knowledge$migrate$tr migrate = Translations$knowledge$migrate$tr._(_root);
+}
+
+// Path: skills
+class Translations$skills$tr extends Translations$skills$en {
+	Translations$skills$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$skills$addDialog$tr addDialog = Translations$skills$addDialog$tr._(_root);
+	@override String deleteSkill({required Object name}) => '${name} sil';
+	@override late final Translations$skills$empty$tr empty = Translations$skills$empty$tr._(_root);
+	@override late final Translations$skills$errors$tr errors = Translations$skills$errors$tr._(_root);
+	@override late final Translations$skills$moveDialog$tr moveDialog = Translations$skills$moveDialog$tr._(_root);
+	@override String moveSkill({required Object name}) => '${name} öğesini taşı';
+	@override String get projectLabel => 'Proje';
+	@override late final Translations$skills$scopes$tr scopes = Translations$skills$scopes$tr._(_root);
+	@override late final Translations$skills$screen$tr screen = Translations$skills$screen$tr._(_root);
+}
+
+// Path: mcp
+class Translations$mcp$tr extends Translations$mcp$en {
+	Translations$mcp$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$mcp$form$tr form = Translations$mcp$form$tr._(_root);
+	@override late final Translations$mcp$install$tr install = Translations$mcp$install$tr._(_root);
+	@override late final Translations$mcp$servers$tr servers = Translations$mcp$servers$tr._(_root);
+	@override late final Translations$mcp$team$tr team = Translations$mcp$team$tr._(_root);
+	@override late final Translations$mcp$tokens$tr tokens = Translations$mcp$tokens$tr._(_root);
+}
+
+// Path: terminal
+class Translations$terminal$tr extends Translations$terminal$en {
+	Translations$terminal$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$terminal$actions$tr actions = Translations$terminal$actions$tr._(_root);
+	@override late final Translations$terminal$authUrl$tr authUrl = Translations$terminal$authUrl$tr._(_root);
+	@override late final Translations$terminal$errors$tr errors = Translations$terminal$errors$tr._(_root);
+	@override late final Translations$terminal$fileLink$tr fileLink = Translations$terminal$fileLink$tr._(_root);
+	@override late final Translations$terminal$paste$tr paste = Translations$terminal$paste$tr._(_root);
+	@override late final Translations$terminal$shortcuts$tr shortcuts = Translations$terminal$shortcuts$tr._(_root);
+	@override late final Translations$terminal$tabs$tr tabs = Translations$terminal$tabs$tr._(_root);
+}
+
+// Path: worktrees
+class Translations$worktrees$tr extends Translations$worktrees$en {
+	Translations$worktrees$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get branchHint => 'Yeni dal adı (örn. feature/login)';
+	@override String branchingOff({required Object branch}) => '${branch} dalından ayrılıyor';
+	@override String get cleanupDescription => 'Birleştirildikten sonra worktree\'yi kaldır ve dalı sil';
+	@override String get created => 'Worktree oluşturuldu';
+	@override String get deleteBranchLabel => 'Dalı da sil';
+	@override String dirtyWarning({required Object count}) => 'Uyarı: Bu worktree\'de kaybolacak ${count} commit edilmemiş değişiklik var.';
+	@override String get emptyDescription => 'Özellik çalışmalarını veya agent çalıştırmalarını yalıtmak için bir worktree oluşturun.';
+	@override String get emptyTitle => 'Worktree bulunamadı';
+	@override String get forceRemoveLabel => 'Zorla kaldır (değişikliklerden vazgeç)';
+	@override String headDetachedAt({required Object sha}) => 'HEAD ${sha} konumunda ayrık';
+	@override String get mainBadge => 'main';
+	@override String mergeDescription({required Object branch}) => 'Değişiklikleri ${branch} dalına birleştir.';
+	@override String mergeTitle({required Object branch}) => '${branch} dalını birleştir';
+	@override String merged({required Object branch}) => 'Worktree ${branch} dalına birleştirildi';
+	@override String opened({required Object branch}) => 'Worktree açıldı: ${branch}';
+	@override String get portHint => 'Çalıştırma portu (isteğe bağlı, örn. 3000)';
+	@override String get removeDescription => 'Bu, worktree klasörünü siler. Bağlı projeler arşivlenecek.';
+	@override String removeTitle({required Object branch}) => '${branch} worktree\'si kaldırılsın mı?';
+	@override String get removed => 'Worktree kaldırıldı';
+	@override String get runButton => 'Çalıştır';
+	@override String get runHint => 'Çalıştırma komutu (örn. npm run dev)';
+	@override String get runRunning => 'çalışıyor';
+	@override String runRunningWithPort({required Object port}) => 'çalışıyor :${port}';
+	@override String get scripts => 'Scriptler';
+	@override String get scriptsSaved => 'Script yapılandırması kaydedildi';
+	@override String get serverLabel => 'Sunucu: ';
+	@override String get setupHint => 'Kurulum komutu (örn. npm install)';
+	@override String get setupLabel => 'Kurulum: ';
+	@override String get squashDescription => 'Tüm commitleri tek bir committe birleştir';
+	@override String get stopButton => 'Durdur';
+}
+
+// Path: quota
+class Translations$quota$tr extends Translations$quota$en {
+	Translations$quota$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$quota$agents$tr agents = Translations$quota$agents$tr._(_root);
+	@override late final Translations$quota$chart$tr chart = Translations$quota$chart$tr._(_root);
+	@override late final Translations$quota$config$tr config = Translations$quota$config$tr._(_root);
+	@override late final Translations$quota$overview$tr overview = Translations$quota$overview$tr._(_root);
+	@override late final Translations$quota$section$tr section = Translations$quota$section$tr._(_root);
+}
+
+// Path: scheduler
+class Translations$scheduler$tr extends Translations$scheduler$en {
+	Translations$scheduler$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get checking => 'Kontrol ediliyor…';
+	@override String get cronHint => 'Cron (dakika saat gün ay haftanın günü) — örn. 0 9 * * *';
+	@override String deleteMessage({required Object id}) => 'Bu, ${id} yinelenen görevini kaldırır. Mevcut oturumlar korunur.';
+	@override String get deleteTitle => 'Zamanlama silinsin mi?';
+	@override String get editTitle => 'Zamanlamayı düzenle';
+	@override String get newLabel => 'Yeni';
+	@override String nextIn({required Object time}) => '${time} sonra';
+	@override String get promptHint => 'Agent için prompt';
+	@override String get runs => 'Çalıştırmalar';
+	@override String session({required Object id}) => 'oturum ${id}';
+	@override String get worktree => 'worktree';
+}
+
+// Path: notifications
+class Translations$notifications$tr extends Translations$notifications$en {
+	Translations$notifications$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get deviceLabel => 'ddagent Flutter';
+	@override late final Translations$notifications$errors$tr errors = Translations$notifications$errors$tr._(_root);
+}
+
+// Path: serverConnect
+class Translations$serverConnect$tr extends Translations$serverConnect$en {
+	Translations$serverConnect$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get connect => 'Bağlan';
+	@override String get connecting => 'Bağlanılıyor…';
+	@override String connectionFailed({required Object error}) => 'Bağlantı başarısız (${error})';
+	@override String get enterUrl => 'Bir sunucu URL\'si girin';
+	@override String get subtitle => 'ddagent sunucunuza bağlanın';
+}
+
+// Path: voice
+class Translations$voice$tr extends Translations$voice$en {
+	Translations$voice$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get apiKeySaved => 'API Anahtarı (kayıtlı, değiştirmek için girin)';
+	@override String get preview => 'Önizle';
+	@override String get saveFailed => 'STT yapılandırması kaydedilemedi';
+	@override String get settingsSaved => 'Sesli giriş ayarları kaydedildi';
+}
+
+// Path: preview
+class Translations$preview$tr extends Translations$preview$en {
+	Translations$preview$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get embeddedWebOnly => 'Gömülü önizleme yalnızca web sürümünde kullanılabilir';
+	@override String get startDevServerHint => 'Bir geliştirme sunucusu başlatın (npm run dev, flutter run -d web-server…)\nve portu burada görünecek.';
+}
+
+// Path: sharedContext
+class Translations$sharedContext$tr extends Translations$sharedContext$en {
+	Translations$sharedContext$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Paylaşılan Notlar';
+}
+
+// Path: collab
+class Translations$collab$tr extends Translations$collab$en {
+	Translations$collab$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get copyToken => 'Token\'ı kopyala';
+	@override String get createInvite => 'Davet oluştur';
+	@override String get invite => 'Davet et';
+	@override String get inviteTeammate => 'Takım arkadaşını davet et';
+	@override late final Translations$collab$roles$tr roles = Translations$collab$roles$tr._(_root);
+	@override String get shareTokenHint => 'Bu davet token\'ını paylaşın — yalnızca bir kez gösterilir ve 72 saat içinde sona erer:';
+	@override String get team => 'Takım';
+}
+
+// Path: browser
+class Translations$browser$tr extends Translations$browser$en {
+	Translations$browser$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get dialogTitle => 'Agent Tarayıcısı';
+	@override String get viewError => 'Tarayıcı görünümü hatası';
+	@override String get web => 'Web';
+}
+
+// Path: projects
+class Translations$projects$tr extends Translations$projects$en {
+	Translations$projects$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get archive => 'Arşivle';
+	@override String archivedSection({required Object count}) => 'Arşivlenenler (${count})';
+	@override String get clone => 'Klonla';
+	@override String get cloneFailed => 'Klonlama başarısız';
+	@override String get cloneFinished => 'Klonlama tamamlandı. Proje listesi yenileniyor…';
+	@override String get cloneRepository => 'Depoyu klonla';
+	@override String get deletePermanently => 'Kalıcı olarak sil';
+	@override String deleteProjectMessage({required Object name}) => '"${name}" öğesini tüm oturumları ve saklanan geçmişiyle (JSONL silme) kalıcı olarak kaldırır. Bu işlem geri alınamaz.';
+	@override String get deleteProjectTitle => 'Proje silinsin mi?';
+	@override String get destinationPath => 'Hedef yol';
+	@override String get destinationPathRequired => 'Hedef yol gerekli';
+	@override String get displayNameOptional => 'Görünen ad (isteğe bağlı)';
+	@override String get failedToLoadTokens => 'GitHub token\'ları yüklenemedi';
+	@override String get githubTokenOptional => 'GitHub token\'ı (isteğe bağlı)';
+	@override String get newer => 'Daha yeni';
+	@override String get older => 'Daha eski';
+	@override String get projectArchived => 'Proje arşivlendi';
+	@override String get projectDeleted => 'Proje silindi';
+	@override String get projectRenamed => 'Proje yeniden adlandırıldı';
+	@override String get projectRestored => 'Proje geri yüklendi';
+	@override String get repoUrlPlaceholder => 'https://github.com/org/repo.git';
+	@override String get repositoryCloned => 'Depo klonlandı';
+	@override String get repositoryUrlRequired => 'Depo URL\'si gerekli';
+	@override String get restore => 'Geri yükle';
+	@override String sessionCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('tr'))(count,
+		one: '${count} oturum',
+		other: '${count} oturum',
+	);
+	@override String get unknown => 'Bilinmiyor';
+	@override String usingStoredToken({required Object name}) => 'Kayıtlı token kullanılıyor: ${name}';
+}
+
+// Path: sessions
+class Translations$sessions$tr extends Translations$sessions$en {
+	Translations$sessions$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$sessions$activity$tr activity = Translations$sessions$activity$tr._(_root);
+	@override late final Translations$sessions$age$tr age = Translations$sessions$age$tr._(_root);
+	@override String get archive => 'Arşivle';
+	@override String get archivedSessions => 'Arşivlenmiş oturumlar';
+	@override String get autoOrchestrator => 'Otomatik (düzenleyici)';
+	@override String get compareWith => 'Şununla karşılaştır…';
+	@override String createFailed({required Object error}) => 'Oturum oluşturulamadı: ${error}';
+	@override String deleteSessionMessage({required Object name}) => '"${name}" öğesini ve transkriptini kaldırır. Bu işlem geri alınamaz.';
+	@override String get newSessionProvider => 'Yeni oturum — sağlayıcı';
+	@override String get noRecentSessions => 'Yakın zamanda oturum yok';
+	@override String get noSessions => 'Oturum yok';
+	@override String get projectPath => 'Proje yolu';
+	@override String get rename => 'Yeniden adlandır';
+	@override late final Translations$sessions$toasts$tr toasts = Translations$sessions$toasts$tr._(_root);
+}
+
+// Path: git
+class Translations$git$tr extends Translations$git$en {
+	Translations$git$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get aiButton => '✦ AI';
+	@override late final Translations$git$checkpoints$tr checkpoints = Translations$git$checkpoints$tr._(_root);
+	@override String get commitCreated => 'Commit oluşturuldu';
+	@override String get commitMessage => 'Commit mesajı';
+	@override String get deleteFile => 'Dosyayı sil';
+	@override String get hunkStage => '+ Parça';
+	@override String get hunkUnstage => '− Parça';
+	@override String get largeDiff => 'Büyük diff önizlemesi: sekmeyi yanıt vermeye devam ettirmek için görüntüleme sınırlandırılır.';
+	@override String loadDiffFailed({required Object error}) => 'Diff yüklenemedi: ${error}';
+	@override String get noBranch => 'dal yok';
+	@override String get noDiff => 'Diff yok';
+	@override String get selectProject => 'Bir proje seçin';
+	@override String get splitDiff => 'Diff\'i böl';
+	@override String get stageHunk => 'Parçayı hazırla';
+	@override String get stagedChanges => 'Hazırlanan Değişiklikler';
+	@override String get statusStaged => 'Hazırlandı';
+	@override String get switchBranch => 'Dal değiştir';
+	@override String get unifiedDiff => 'Birleşik diff';
+	@override String get unstageHunk => 'Parçanın hazırlığını geri al';
+}
+
+// Path: kanban
+class Translations$kanban$tr extends Translations$kanban$en {
+	Translations$kanban$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$kanban$card$tr card = Translations$kanban$card$tr._(_root);
+	@override late final Translations$kanban$comments$tr comments = Translations$kanban$comments$tr._(_root);
+	@override late final Translations$kanban$details$tr details = Translations$kanban$details$tr._(_root);
+	@override late final Translations$kanban$dialog$tr dialog = Translations$kanban$dialog$tr._(_root);
+	@override late final Translations$kanban$empty$tr empty = Translations$kanban$empty$tr._(_root);
+	@override String get saveFailed => 'Kart kaydedilemedi';
+	@override late final Translations$kanban$time$tr time = Translations$kanban$time$tr._(_root);
+}
+
+// Path: onboarding
+class Translations$onboarding$tr extends Translations$onboarding$en {
+	Translations$onboarding$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$onboarding$agents$tr agents = Translations$onboarding$agents$tr._(_root);
+	@override String get completeSetup => 'Kurulumu Tamamla';
+	@override late final Translations$onboarding$errors$tr errors = Translations$onboarding$errors$tr._(_root);
+	@override String get gitHint => 'ddagent oturumlarının oluşturduğu commit\'ler için kullanılır.';
+	@override late final Translations$onboarding$mcp$tr mcp = Translations$onboarding$mcp$tr._(_root);
+}
+
+// Path: fileTree
+class Translations$fileTree$tr extends Translations$fileTree$en {
+	Translations$fileTree$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get browseServerFilesystem => 'Sunucu dosya sistemine göz at';
+	@override String get chooseFolder => 'Klasör seç';
+	@override String get copyContents => 'İçeriği kopyala';
+	@override String get noFiles => 'Dosya yok';
+	@override late final Translations$fileTree$search$tr search = Translations$fileTree$search$tr._(_root);
+	@override late final Translations$fileTree$titles$tr titles = Translations$fileTree$titles$tr._(_root);
+	@override String get uploadHere => 'Buraya yükle';
+	@override String get uploadTo => 'Şuraya yükle';
+	@override String uploadedCount({required Object count}) => '${count} dosya yüklendi';
+	@override String get newName => 'Yeni ad';
+	@override String notRegisteredProject({required Object path}) => 'Kayıtlı bir proje değil: ${path}';
+	@override String get showGitignoredFiles => 'Git tarafından yok sayılan dosyaları göster';
+	@override String get hideGitignoredFiles => 'Git tarafından yok sayılan dosyaları gizle';
+	@override String get downloadUnsupportedOnWeb => 'Web\'de indirme desteklenmiyor';
+	@override String get saveToPath => 'Yola kaydet';
+	@override String savedTo({required Object path}) => 'Şuraya kaydedildi: ${path}';
+}
+
+// Path: workspace
+class Translations$workspace$tr extends Translations$workspace$en {
+	Translations$workspace$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get archivedWorkspaceName => 'Arşivlenmiş';
+	@override String get closePane => 'Bölmeyi kapat';
+	@override String get closeSearch => 'Aramayı kapat';
+	@override String get deleteSessionNotice => 'Oturumu ve transkriptini kaldırır. Geri alınamaz.';
+	@override String get exportChat => 'Sohbeti dışa aktar';
+	@override String get jumpToSession => 'Oturuma git…';
+	@override String get newChatProvider => 'Yeni sohbet — sağlayıcı';
+	@override String get nextMatch => 'Sonraki eşleşme';
+	@override String get previousMatch => 'Önceki eşleşme';
+	@override String get searchTranscript => 'Transkriptte ara';
+	@override String sendTo({required Object count}) => '${count} oturuma gönder';
+	@override String accountWithLabel({required Object label}) => 'Varsayılan · ${label}';
+	@override String get finishRunBeforeChangingWorkspace => 'Çalışma alanını değiştirmeden önce çalıştırmayı bitir';
+	@override String get restored => 'Çalışma alanı geri yüklendi';
+	@override String get maximizePane => 'Bölmeyi büyüt';
+	@override String get restorePanes => 'Bölmeleri geri yükle';
+	@override String get reviewChangedFiles => 'Değişen dosyaları incele';
 }
 
 // Path: auth.login
@@ -381,6 +808,7 @@ class Translations$chat$tools$tr extends Translations$chat$tools$en {
 	@override String get updateTodo => 'Yapılacaklar listesini güncelle';
 	@override String get readTodo => 'Yapılacaklar listesini oku';
 	@override String get searchResults => 'sonuç';
+	@override String get todoReadLabel => 'TodoRead yapılacaklar listesi';
 }
 
 // Path: chat.search
@@ -462,6 +890,15 @@ class Translations$chat$permissions$tr extends Translations$chat$permissions$en 
 	@override String get retry => 'İzin kaydedildi. Aracı kullanmak için isteği tekrar dene.';
 	@override String get error => 'İzinler güncellenemedi. Lütfen tekrar dene.';
 	@override String get openSettings => 'Ayarları aç';
+	@override String get allow => 'İzin ver';
+	@override String allowAll({required Object count}) => 'Tümüne izin ver (${count})';
+	@override String get allowWithChanges => 'Değişikliklerle izin ver';
+	@override String get always => 'Her zaman';
+	@override String get deny => 'Reddet';
+	@override String get editAndAllow => 'Düzenle ve izin ver';
+	@override String get editInput => 'Girdiyi düzenle';
+	@override String get invalidJson => 'Geçersiz JSON';
+	@override String get reject => 'Reddet';
 }
 
 // Path: chat.todo
@@ -540,6 +977,7 @@ class Translations$chat$input$tr extends Translations$chat$input$en {
 	@override String get autoContinueTasks => 'Otomatik devam';
 	@override String get autoContinueTasksTooltip => 'Devin\'in bir sonraki Task Master görevine otomatik geçmesi için etkinleştir';
 	@override late final Translations$chat$input$offlineQueue$tr offlineQueue = Translations$chat$input$offlineQueue$tr._(_root);
+	@override String cameraUnavailable({required Object error}) => 'Kamera kullanılamıyor: ${error}';
 }
 
 // Path: chat.providerSelection
@@ -586,6 +1024,8 @@ class Translations$chat$session$tr extends Translations$chat$session$en {
 	@override late final Translations$chat$session$kContinue$tr kContinue = Translations$chat$session$kContinue$tr._(_root);
 	@override late final Translations$chat$session$loading$tr loading = Translations$chat$session$loading$tr._(_root);
 	@override late final Translations$chat$session$messages$tr messages = Translations$chat$session$messages$tr._(_root);
+	@override String get deleteConfirm => 'Oturumu ve transkriptini kaldırır. Geri alınamaz.';
+	@override String get finishRunBeforeWorkspaceChange => 'Çalışma alanını değiştirmeden önce çalıştırmayı bitir';
 }
 
 // Path: chat.shell
@@ -765,6 +1205,9 @@ class Translations$chat$askUserQuestion$tr extends Translations$chat$askUserQues
 
 	// Translations
 	@override String needsInput({required Object provider}) => '${provider} girdinizi bekliyor';
+	@override String get answerHint => 'Yanıtınızı yazın…';
+	@override String get other => 'Diğer…';
+	@override String get skip => 'Atla';
 }
 
 // Path: chat.attachments
@@ -776,6 +1219,7 @@ class Translations$chat$attachments$tr extends Translations$chat$attachments$en 
 	// Translations
 	@override String get downloadFailedRetry => 'İndirme başarısız — yeniden denemek için tıklayın';
 	@override String get fileAttachment => 'Dosya eki';
+	@override String download({required Object name}) => '${name} indir';
 }
 
 // Path: chat.checkpoint
@@ -788,6 +1232,7 @@ class Translations$chat$checkpoint$tr extends Translations$chat$checkpoint$en {
 	@override String get creating => 'Anlık görüntü oluşturuluyor…';
 	@override String get revertChanges => 'Dosyaları son kontrol noktasına geri al';
 	@override String get undo => 'Kontrol noktasını geri al';
+	@override String get beforeAiTurn => 'AI turundan önce';
 }
 
 // Path: chat.common
@@ -811,6 +1256,8 @@ class Translations$chat$taskMaster$tr extends Translations$chat$taskMaster$en {
 	@override String get saved => 'Kaydedildi';
 	@override String get saving => 'Kaydediliyor...';
 	@override String get taskShort => 'GÖREV';
+	@override String get addToTask => 'TaskMaster\'a ekle';
+	@override String get added => 'TaskMaster\'a eklendi';
 }
 
 // Path: chat.tokenUsage
@@ -868,6 +1315,103 @@ class Translations$chat$broadcast$tr extends Translations$chat$broadcast$en {
 	@override String get noOrchestrators => 'Kullanılabilir düzenleyici oturumu yok';
 }
 
+// Path: chat.changes
+class Translations$chat$changes$tr extends Translations$chat$changes$en {
+	Translations$chat$changes$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get empty => 'Dosya değişikliği yok';
+	@override String get failedToLoad => 'Değişiklikler yüklenemedi';
+}
+
+// Path: chat.commandResult
+class Translations$chat$commandResult$tr extends Translations$chat$commandResult$en {
+	Translations$chat$commandResult$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$chat$commandResult$fallback$tr fallback = Translations$chat$commandResult$fallback$tr._(_root);
+	@override String get filterCommands => 'Komutları filtrele...';
+	@override String searchModels({required Object provider}) => '${provider} modellerini ara...';
+}
+
+// Path: chat.commands
+class Translations$chat$commands$tr extends Translations$chat$commands$en {
+	Translations$chat$commands$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get runConfirmTitle => 'Komut çalıştırılsın mı?';
+	@override String get executionCancelled => 'Komut çalıştırma iptal edildi';
+}
+
+// Path: chat.export
+class Translations$chat$export$tr extends Translations$chat$export$en {
+	Translations$chat$export$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String sessionTitle({required Object id}) => 'Oturum ${id}';
+	@override String get pdfFailed => 'PDF dışa aktarma başarısız';
+	@override String get transcriptDownloaded => 'Transkript indirildi';
+	@override String savedTo({required Object path}) => 'Kaydedildi: ${path}';
+}
+
+// Path: chat.message
+class Translations$chat$message$tr extends Translations$chat$message$en {
+	Translations$chat$message$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get compactedSummary => 'Sıkıştırılmış özet';
+	@override String get rawView => 'Ham görünüm';
+	@override String get resendHint => 'Düzenleyiciden yeniden gönderin';
+}
+
+// Path: chat.modelLibrary
+class Translations$chat$modelLibrary$tr extends Translations$chat$modelLibrary$en {
+	Translations$chat$modelLibrary$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String deleteTooltip({required Object name}) => '${name} sil';
+	@override String editTooltip({required Object name}) => '${name} düzenle';
+	@override String get enterNameAndId => 'Hem model adını hem de model ID\'sini gir.';
+	@override String get idNoSpaces => 'Model ID\'leri boşluk içeremez.';
+	@override String get setAsDefault => 'Varsayılan olarak ayarla';
+	@override String get defaultModel => 'Varsayılan model';
+}
+
+// Path: chat.pinFile
+class Translations$chat$pinFile$tr extends Translations$chat$pinFile$en {
+	Translations$chat$pinFile$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get action => 'Sabitle';
+	@override String get pathHint => 'path/to/file.ext';
+	@override String get title => 'Dosyayı sabitle';
+}
+
+// Path: chat.permissionRequest
+class Translations$chat$permissionRequest$tr extends Translations$chat$permissionRequest$en {
+	Translations$chat$permissionRequest$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String title({required Object tool}) => 'İzin isteği · ${tool}';
+	@override String get question => 'Soru';
+}
+
 // Path: codeEditor.toolbar
 class Translations$codeEditor$toolbar$tr extends Translations$codeEditor$toolbar$en {
 	Translations$codeEditor$toolbar$tr._(TranslationsTr root) : this._root = root, super.internal(root);
@@ -883,6 +1427,10 @@ class Translations$codeEditor$toolbar$tr extends Translations$codeEditor$toolbar
 	@override String get settings => 'Editör Ayarları';
 	@override String get collapse => 'Editörü daralt';
 	@override String get expand => 'Editörü tüm genişliğe aç';
+	@override String get diffMerge => 'Diff / birleştirme';
+	@override String get previewInBrowser => 'Tarayıcıda önizle';
+	@override String get reload => 'Diskten yeniden yükle';
+	@override String get toggleDock => 'Dosya panelini aç/kapat';
 }
 
 // Path: codeEditor.header
@@ -917,6 +1465,7 @@ class Translations$codeEditor$actions$tr extends Translations$codeEditor$actions
 	@override String get unpinFile => 'Dosyayı bağlamdan çıkar';
 	@override String get previewHtml => 'HTML önizlemesini yeni sekmede aç';
 	@override String get retry => 'Yeniden dene';
+	@override String get saveAll => 'Tümünü kaydet';
 }
 
 // Path: codeEditor.footer
@@ -940,6 +1489,7 @@ class Translations$codeEditor$binaryFile$tr extends Translations$codeEditor$bina
 	// Translations
 	@override String get title => 'Binary Dosya';
 	@override String message({required Object fileName}) => '"${fileName}" dosyası binary olduğu için metin editöründe gösterilemez.';
+	@override String get cannotDisplayAsText => 'Metin olarak gösterilemez';
 }
 
 // Path: codeEditor.filePreview
@@ -952,6 +1502,81 @@ class Translations$codeEditor$filePreview$tr extends Translations$codeEditor$fil
 	@override String get loading => 'Önizleme yükleniyor...';
 	@override String get error => 'Bu dosya görüntülenemiyor.';
 	@override String get openInNewTab => 'Yeni sekmede aç';
+}
+
+// Path: codeEditor.diff
+class Translations$codeEditor$diff$tr extends Translations$codeEditor$diff$en {
+	Translations$codeEditor$diff$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get applyMerge => 'Birleştirmeyi uygula';
+	@override String get base => 'Temel';
+	@override String get close => 'Diff\'i kapat';
+	@override String get current => 'Geçerli';
+	@override String hunk({required Object number}) => 'Parça ${number}';
+	@override String get noChanges => 'Değişiklik yok';
+	@override String get deletedOnDisk => 'diskte silindi';
+}
+
+// Path: codeEditor.emptyState
+class Translations$codeEditor$emptyState$tr extends Translations$codeEditor$emptyState$en {
+	Translations$codeEditor$emptyState$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Açık dosya yok';
+}
+
+// Path: codeEditor.hexDump
+class Translations$codeEditor$hexDump$tr extends Translations$codeEditor$hexDump$en {
+	Translations$codeEditor$hexDump$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String more({required Object size}) => '… ${size} daha';
+}
+
+// Path: codeEditor.mediaFile
+class Translations$codeEditor$mediaFile$tr extends Translations$codeEditor$mediaFile$en {
+	Translations$codeEditor$mediaFile$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get subtitle => 'Ses/video önizlemesi henüz desteklenmiyor';
+	@override String get title => 'Medya dosyası';
+}
+
+// Path: codeEditor.settings
+class Translations$codeEditor$settings$tr extends Translations$codeEditor$settings$en {
+	Translations$codeEditor$settings$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String fontSizeDecrease({required Object size}) => 'Yazı tipi boyutu −  (şimdi ${size})';
+	@override String get fontSizeIncrease => 'Yazı tipi boyutu +';
+	@override String get minimap => 'Minimap';
+	@override String tabSize({required Object size}) => 'Sekme boyutu: ${size}';
+}
+
+// Path: codeEditor.toasts
+class Translations$codeEditor$toasts$tr extends Translations$codeEditor$toasts$en {
+	Translations$codeEditor$toasts$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String savedFile({required Object name}) => '${name} kaydedildi';
+	@override String get saveFailed => 'Kaydetme başarısız';
+	@override String get allSaved => 'Tümü kaydedildi';
+	@override String get someSavesFailed => 'Bazı kaydetmeler başarısız oldu';
+	@override String savedTo({required Object path}) => 'Şuraya kaydedildi: ${path}';
+	@override String get mergeApplied => 'Birleştirme uygulandı — kalıcı olması için kaydet';
 }
 
 // Path: common.buttons
@@ -977,6 +1602,8 @@ class Translations$common$buttons$tr extends Translations$common$buttons$en {
 	@override String get download => 'İndir';
 	@override String get upload => 'Yükle';
 	@override String get browse => 'Gözat';
+	@override String get openDiagram => 'Diyagramı aç';
+	@override String get update => 'Güncelle';
 }
 
 // Path: common.tabs
@@ -1516,6 +2143,34 @@ class Translations$common$projects$tr extends Translations$common$projects$en {
 	@override String get newSession => 'Yeni oturum';
 }
 
+// Path: common.codeBlock
+class Translations$common$codeBlock$tr extends Translations$common$codeBlock$en {
+	Translations$common$codeBlock$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get wrapLines => 'Satırları kaydır';
+	@override String get noWrap => 'Kaydırma yok';
+}
+
+// Path: common.update
+class Translations$common$update$tr extends Translations$common$update$en {
+	Translations$common$update$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String available({required Object version}) => 'Güncelleme mevcut · v${version}';
+	@override String confirm({required Object version}) => 'v${version} sürümüne güncellensin mi? Sunucu kendini günceller ve yeniden başlatır — etkin oturumlar kesintiye uğrayacak.';
+	@override String get downloading => 'Güncelleme indiriliyor ve uygulanıyor…';
+	@override String get restarting => 'Sunucu yeniden başlatılıyor — bu biraz sürer…';
+	@override String done({required Object version}) => 'v${version} sürümüne güncellendi. Yeni paketi almak için uygulamayı yeniden yükle.';
+	@override String get manualRestart => 'Güncelleme uygulandı ancak sunucu kendiliğinden yeniden başlamadı — tamamlamak için elle yeniden başlat.';
+	@override String get failed => 'Güncelleme başarısız oldu.';
+	@override String get failedTitle => 'Güncelleme başarısız';
+}
+
 // Path: settings.changelog
 class Translations$settings$changelog$tr extends Translations$settings$changelog$en {
 	Translations$settings$changelog$tr._(TranslationsTr root) : this._root = root, super.internal(root);
@@ -1544,6 +2199,7 @@ class Translations$settings$server$tr extends Translations$settings$server$en {
 	@override String get restarting => 'Yeniden başlatılıyor… sunucu döndüğünde sayfa yenilenecek.';
 	@override String get restartFailed => 'Yeniden başlatma başarısız';
 	@override String get unsupported => 'Yeniden başlatma yalnızca sunucu servis yöneticisi altında çalışırken kullanılabilir.';
+	@override String get ok => 'Tamam';
 }
 
 // Path: settings.updates
@@ -1632,6 +2288,7 @@ class Translations$settings$appearance$tr extends Translations$settings$appearan
 	@override String get showMinimap => 'Minimap\'i Göster';
 	@override String get lineNumbers => 'Satır Numaraları';
 	@override String get fontSize => 'Yazı Tipi Boyutu';
+	@override late final Translations$settings$appearance$themeModes$tr themeModes = Translations$settings$appearance$themeModes$tr._(_root);
 }
 
 // Path: settings.actions
@@ -1661,6 +2318,7 @@ class Translations$settings$quickSettings$tr extends Translations$settings$quick
 	@override String get sendByCtrlEnter => 'Ctrl+Enter ile gönder';
 	@override String get sendByCtrlEnterDescription => 'Etkinleştirildiğinde, Ctrl+Enter\'a basmak yalnız Enter yerine mesajı gönderir. IME (girdi metot düzenleyici) kullananlar için yanlışlıkla göndermeyi önler.';
 	@override late final Translations$settings$quickSettings$dragHandle$tr dragHandle = Translations$settings$quickSettings$dragHandle$tr._(_root);
+	@override String get sendWithCtrlEnter => 'Ctrl+Enter ile gönder';
 }
 
 // Path: settings.terminalShortcuts
@@ -1741,6 +2399,8 @@ class Translations$settings$notifications$tr extends Translations$settings$notif
 	@override late final Translations$settings$notifications$sound$tr sound = Translations$settings$notifications$sound$tr._(_root);
 	@override late final Translations$settings$notifications$events$tr events = Translations$settings$notifications$events$tr._(_root);
 	@override late final Translations$settings$notifications$desktop$tr desktop = Translations$settings$notifications$desktop$tr._(_root);
+	@override late final Translations$settings$notifications$channels$tr channels = Translations$settings$notifications$channels$tr._(_root);
+	@override String get unpair => 'Eşleştirmeyi kaldır';
 }
 
 // Path: settings.appearanceSettings
@@ -1956,6 +2616,7 @@ class Translations$settings$workspaces$tr extends Translations$settings$workspac
 	@override String get description => 'Çalışma alanları, ddagent’ın sohbet edebildiği, kod çalıştırabildiği ve gezinebildiği dizinlerdir.';
 	@override String get remove => 'Çalışma alanını kaldır';
 	@override String get title => 'Çalışma alanları';
+	@override String get pathRequired => 'Yol gerekli';
 }
 
 // Path: settings.about
@@ -1967,6 +2628,10 @@ class Translations$settings$about$tr extends Translations$settings$about$en {
 	// Translations
 	@override String get supportTitle => 'Projeyi destekle';
 	@override String get buyMeACoffee => 'Bana kahve ısmarla';
+	@override String get learnMore => 'Daha fazla bilgi';
+	@override late final Translations$settings$about$pro$tr pro = Translations$settings$about$pro$tr._(_root);
+	@override String get proFeatures => 'ddagent Pro Özellikleri';
+	@override String get tryHosted => 'ddagent Hosted\'ı deneyin';
 }
 
 // Path: sidebar.projects
@@ -2349,6 +3014,7 @@ class Translations$tasks$notConfigured$tr extends Translations$tasks$notConfigur
 	@override String get whatIsTitle => '🎯 TaskMaster nedir?';
 	@override late final Translations$tasks$notConfigured$features$tr features = Translations$tasks$notConfigured$features$tr._(_root);
 	@override String get initializeButton => 'TaskMaster AI\'yi Başlat';
+	@override String get writePrdFirst => 'Önce PRD yaz';
 }
 
 // Path: tasks.gettingStarted
@@ -2502,6 +3168,15 @@ class Translations$tasks$prd$tr extends Translations$tasks$prd$en {
 
 	// Translations
 	@override String modified({required Object date}) => 'Değişiklik: ${date}';
+	@override String editorTitle({required Object name}) => 'PRD — ${name}';
+	@override String fileExistsMessage({required Object name}) => '"${name}" adlı bir PRD zaten var. Üzerine yazmak istiyor musunuz?';
+	@override String get fileExistsTitle => 'Dosya zaten var';
+	@override String get newFile => 'yeni dosya';
+	@override String get parse => 'PRD\'yi ayrıştır';
+	@override String get template => 'Şablon';
+	@override String get fileNameHint => 'dosya adı (ör. prd.txt)';
+	@override String get saved => 'PRD kaydedildi';
+	@override String get tasksGenerated => 'PRD\'den görevler oluşturuldu';
 }
 
 // Path: tasks.statuses
@@ -2517,6 +3192,7 @@ class Translations$tasks$statuses$tr extends Translations$tasks$statuses$en {
 	@override String get blocked => 'Engellendi';
 	@override String get deferred => 'Ertelendi';
 	@override String get cancelled => 'İptal Edildi';
+	@override String get review => 'İnceleme';
 }
 
 // Path: tasks.priorities
@@ -2619,6 +3295,8 @@ class Translations$tasks$list$tr extends Translations$tasks$list$en {
 	@override String get inProgressComplete => 'Devam ediyor (tamamlamak için tıklayın)';
 	@override String get markCompleted => 'Tamamlandı olarak işaretle';
 	@override String toggleStatusAria({required Object id}) => 'Görev ${id} durumunu değiştir';
+	@override String get markDone => 'Tamamlandı olarak işaretle';
+	@override String get reopen => 'Yeniden aç';
 }
 
 // Path: tasks.nextTask
@@ -2675,6 +3353,20 @@ class Translations$tasks$taskDetail$tr extends Translations$tasks$taskDetail$en 
 	@override String get testStrategy => 'Test Stratejisi';
 	@override String get titleRequired => 'Başlık gerekli';
 	@override String get updateFailed => 'Görev güncellenemedi';
+	@override String deleteConfirmMessage({required Object id}) => '#${id} görevi kaldırılacak. Bu işlem geri alınamaz.';
+	@override String get notFound => 'Görev bulunamadı';
+	@override String get subtasks => 'Alt görevler';
+	@override String get idCopied => 'Görev ID kopyalandı';
+}
+
+// Path: tasks.toasts
+class Translations$tasks$toasts$tr extends Translations$tasks$toasts$en {
+	Translations$tasks$toasts$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String statusInProgress({required Object id}) => 'Görev ${id} devam ediyor olarak ayarlandı';
 }
 
 // Path: knowledge.tabs
@@ -2869,6 +3561,672 @@ class Translations$knowledge$settings$tr extends Translations$knowledge$settings
 	@override String get description => 'Ajanlar için yerel bellek katmanı: anılar, kurallar, beceriler ve kişisel bilgiler.';
 }
 
+// Path: knowledge.contextBudget
+class Translations$knowledge$contextBudget$tr extends Translations$knowledge$contextBudget$en {
+	Translations$knowledge$contextBudget$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String tokens({required Object tokens, required Object budget}) => '~${tokens} / ${budget} tok';
+}
+
+// Path: knowledge.critical
+class Translations$knowledge$critical$tr extends Translations$knowledge$critical$en {
+	Translations$knowledge$critical$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get make => 'Kritik yap';
+	@override String get makeAll => 'Tüm kuralları kritik yap';
+	@override String get makeAllHint => 'Bunları enjekte edilen bağlam bütçesine ekler';
+}
+
+// Path: knowledge.errors
+class Translations$knowledge$errors$tr extends Translations$knowledge$errors$en {
+	Translations$knowledge$errors$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String importFailed({required Object error}) => 'İçe aktarma başarısız: ${error}';
+	@override String migrationFailed({required Object error}) => 'Taşıma başarısız: ${error}';
+}
+
+// Path: knowledge.graph
+class Translations$knowledge$graph$tr extends Translations$knowledge$graph$en {
+	Translations$knowledge$graph$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get truncated => 'kısaltıldı';
+}
+
+// Path: knowledge.importAll
+class Translations$knowledge$importAll$tr extends Translations$knowledge$importAll$en {
+	Translations$knowledge$importAll$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get action => 'Her şeyi içe aktar';
+	@override String get mergeDuplicates => 'Yinelenen kayıtları birleştir';
+	@override String get mergeDuplicatesHint => 'ddagent içindeki yinelenen satırları birleştirir (dosyaları değil)';
+	@override String projectsScanned({required Object count}) => 'Taranan projeler: ${count}';
+	@override String rulesSummary({required Object total, required Object duplicates}) => 'Kurallar: ${total} · yinelenen gruplar: ${duplicates}';
+	@override String skillsFound({required Object found, required Object newSkills}) => 'Bulunan agent becerileri: ${found} (yeni: ${newSkills})';
+	@override String get title => 'Her şeyi ddagent\'a aktar';
+}
+
+// Path: knowledge.importSkills
+class Translations$knowledge$importSkills$tr extends Translations$knowledge$importSkills$en {
+	Translations$knowledge$importSkills$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String found({required Object count}) => 'Agentlarınızda ${count} beceri bulundu.';
+	@override String summary({required Object imported, required Object skipped}) => 'Yeni: ${imported} · atlanan: ${skipped}';
+	@override String get title => 'Agent becerilerini içe aktar';
+}
+
+// Path: knowledge.linkOptions
+class Translations$knowledge$linkOptions$tr extends Translations$knowledge$linkOptions$en {
+	Translations$knowledge$linkOptions$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String memory({required Object title}) => 'Bellek: ${title}';
+	@override String personal({required Object title}) => 'Kişisel: ${title}';
+	@override String rule({required Object title}) => 'Kural: ${title}';
+	@override String skill({required Object name}) => 'Beceri: ${name}';
+}
+
+// Path: knowledge.migrate
+class Translations$knowledge$migrate$tr extends Translations$knowledge$migrate$en {
+	Translations$knowledge$migrate$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String duplicates({required Object count}) => 'Projeler arası yinelenen gruplar: ${count}';
+	@override String get mergeDuplicates => 'Yinelenenleri birleştir';
+	@override String removedPromoted({required Object removed, required Object promoted}) => 'Kaldırılan: ${removed}, yükseltilen: ${promoted}';
+	@override String rulesSummary({required Object total, required Object critical}) => 'Kurallar: toplam ${total}, ${critical} kritik.';
+	@override String scanned({required Object count}) => '${count} proje tarandı.';
+	@override String get title => 'Mevcut kuralları taşı';
+}
+
+// Path: skills.addDialog
+class Translations$skills$addDialog$tr extends Translations$skills$addDialog$en {
+	Translations$skills$addDialog$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get chooseFileTitle => 'SKILL.md seç';
+	@override String get chooseFiles => 'Dosya Seç';
+	@override String get chooseFolder => 'Klasör Seç';
+	@override String get chooseFolderTitle => 'Bir beceri klasörü seçin';
+	@override String folderFilesMeta({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('tr'))(count,
+		one: '${count} dosya · ${size}',
+		other: '${count} dosya · ${size}',
+	);
+	@override String get folderUploadsNote => 'Klasör yüklemeleri seçilen klasör adını korur; tek başına dosyalar `SKILL.md` içindeki `name` değerini kullanır.';
+	@override String get hideInstallLocation => 'Kurulum konumunu gizle';
+	@override String get installSkill => 'Beceri Kur';
+	@override String installSkills({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('tr'))(count,
+		one: '${count} Beceri Kur',
+		other: '${count} Beceri Kur',
+	);
+	@override String markdownFileMeta({required Object size}) => 'Markdown dosyası · ${size}';
+	@override String get pickHint => 'Klasörler script, referans ve varlık içerebilir.';
+	@override String get pickTitle => 'Bir beceri klasörü veya SKILL.md seçin';
+	@override String get readyToInstall => 'Kuruluma hazır';
+	@override String removeQueued({required Object name}) => '${name} öğesini kaldır';
+	@override String title({required Object provider}) => '${provider} Becerisi Ekle';
+	@override String get uploadHint => 'Bir SKILL.md dosyası veya eksiksiz bir beceri klasörü yükleyin.';
+	@override String get whereWillThisInstall => 'Nereye kurulacak?';
+}
+
+// Path: skills.empty
+class Translations$skills$empty$tr extends Translations$skills$empty$en {
+	Translations$skills$empty$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get noGlobalSkills => 'Henüz genel beceri bulunamadı';
+	@override String get noGlobalSkillsDescription => 'Her projede kullanılabilir olması için yukarıdan bir genel beceri ekleyin.';
+	@override String get noMatchingSkills => 'Eşleşen beceri yok';
+	@override String get noMatchingSkillsDescription => 'Farklı bir komut, ad, kapsam, proje veya kaynak yolu deneyin.';
+	@override String get noProjects => 'Kullanılabilir proje yok';
+	@override String get noProjectsDescription => 'Becerilerine göz atmak için bir proje veya çalışma alanı ekleyin.';
+	@override String get noSkillsInProject => 'Bu projede beceri yok';
+	@override String get noSkillsInProjectDescription => 'Seçili projede bir .claude/skills, .cursor/skills veya .agents/skills klasörü oluşturun.';
+}
+
+// Path: skills.errors
+class Translations$skills$errors$tr extends Translations$skills$errors$en {
+	Translations$skills$errors$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get addMarkdownFirst => 'Önce bir veya daha fazla markdown dosyası ekleyin.';
+	@override String couldNotReadSkillFile({required Object name}) => '${name} içinden SKILL.md okunamadı.';
+	@override String get dropMarkdownOrFolder => 'Bir veya daha fazla markdown dosyası ya da SKILL.md içeren bir klasör bırakın.';
+	@override String folderFileLimit({required Object count}) => 'Bir beceri klasörü en fazla ${count} dosya içerebilir.';
+	@override String get folderReadFailed => 'Beceri klasörü okunamadı';
+	@override String get folderSizeLimit => 'Seçilen beceri klasörleri toplamda 30 MB\'den küçük olmalıdır.';
+	@override String get importFailed => 'Beceriler içe aktarılamadı';
+	@override String get missingSkillFile => 'Seçilen klasörde SKILL.md dosyası yok.';
+}
+
+// Path: skills.moveDialog
+class Translations$skills$moveDialog$tr extends Translations$skills$moveDialog$en {
+	Translations$skills$moveDialog$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get moveToGlobal => 'Genele taşı';
+	@override String get moveToProject => 'Projeye taşı';
+	@override String get toGlobalHint => 'Bu beceriyi, her projenin kullanabilmesi için genel beceriler dizinine taşıyın.';
+	@override String get toProjectHint => 'Bu beceriye sahip olacak projeyi seçin. Beceri, sağlayıcının genel beceriler dizininden taşınır.';
+}
+
+// Path: skills.scopes
+class Translations$skills$scopes$tr extends Translations$skills$scopes$en {
+	Translations$skills$scopes$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get admin => 'Yönetici';
+	@override String get plugin => 'Eklenti';
+	@override String get project => 'Proje';
+	@override String get repo => 'Depo';
+	@override String get system => 'Sistem';
+	@override String get user => 'Kullanıcı';
+}
+
+// Path: skills.screen
+class Translations$skills$screen$tr extends Translations$skills$screen$en {
+	Translations$skills$screen$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get addSkill => 'Beceri Ekle';
+	@override String get clearSearch => 'Beceri aramasını temizle';
+	@override String deleteDescription({required Object directory, required Object provider}) => 'Bu, ${directory} dizinini ${provider} tarafından yönetilen beceriler dizininden kaldırır. Bu işlem geri alınamaz.';
+	@override String deleteTitle({required Object name}) => '${name} silinsin mi?';
+	@override String loadingSkills({required Object provider}) => '${provider} becerileri yükleniyor…';
+	@override String manageDescription({required Object provider}) => '${provider} becerilerini yerel dosyalardan, eksiksiz klasörlerden ve proje bazlı konumlardan yönetin.';
+	@override String get noDescription => 'Beceri front matter bölümünde açıklama belirtilmemiş.';
+	@override String pluginBadge({required Object name}) => 'Eklenti: ${name}';
+	@override String projectBadge({required Object name}) => 'Proje: ${name}';
+	@override String get savedSuccessfully => 'Beceriler başarıyla kaydedildi.';
+	@override String get scanningProjectSkills => 'Proje becerileri taranıyor...';
+	@override String get searchHint => 'Beceri ara...';
+	@override String skillsCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('tr'))(count,
+		one: '${count} BECERİ',
+		other: '${count} BECERİ',
+	);
+	@override String get sourceLabel => 'KAYNAK';
+}
+
+// Path: mcp.form
+class Translations$mcp$form$tr extends Translations$mcp$form$en {
+	Translations$mcp$form$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$mcp$form$fields$tr fields = Translations$mcp$form$fields$tr._(_root);
+	@override late final Translations$mcp$form$scope$tr scope = Translations$mcp$form$scope$tr._(_root);
+	@override String submitTo({required Object provider}) => 'Sunucuyu ${provider} için ekle';
+	@override late final Translations$mcp$form$validation$tr validation = Translations$mcp$form$validation$tr._(_root);
+}
+
+// Path: mcp.install
+class Translations$mcp$install$tr extends Translations$mcp$install$en {
+	Translations$mcp$install$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get button => 'Kur';
+	@override String get cardDescription => 'Agentlarınıza MCP üzerinden bilgi tabanını ve ddagent araçlarını verin — agentları seçin veya tümü için kurun.';
+	@override String get description => 'Seçili agentların MCP üzerinden ddagent bilgi tabanını ve araçlarını kullanmasını sağlar.';
+	@override String get errorFallback => 'hata';
+	@override String failed({required Object error}) => 'Kurulum başarısız: ${error}';
+	@override String get installForAll => 'Tümü için kur';
+	@override String get installSelected => 'Seçilenler için kur';
+	@override String installedCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('tr'))(count,
+		one: '${count} agenta kuruldu.',
+		other: '${count} agenta kuruldu.',
+	);
+	@override String partialFailure({required Object count, required Object failed}) => '${count} agenta kuruldu; başarısız: ${failed}';
+	@override String get title => 'ddagent MCP sunucusunu kur';
+}
+
+// Path: mcp.servers
+class Translations$mcp$servers$tr extends Translations$mcp$servers$en {
+	Translations$mcp$servers$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get addGlobalDescription => 'Bu MCP sunucusunu tüm sağlayıcılara ekler: Claude, Cursor, Codex, OpenCode ve Devin. Aynı yapılandırmanın tüm sağlayıcılarda çalışması gerektiğinden yalnızca stdio ve HTTP taşımaları desteklenir.';
+	@override String get addGlobalMenuDescription => 'Genel MCP Sunucusu Ekle, Claude, Cursor, Codex, OpenCode ve Devin için ortak bir stdio veya HTTP sunucusu yazar.';
+	@override String get addGlobalTitle => 'Genel MCP Sunucusu Ekle';
+	@override String addProviderDescription({required Object provider}) => '${provider} MCP Sunucusu Ekle yalnızca ${provider} yapılandırmasını değiştirir.';
+	@override String addProviderTitle({required Object provider}) => '${provider} MCP Sunucusu Ekle';
+	@override late final Translations$mcp$servers$config$tr config = Translations$mcp$servers$config$tr._(_root);
+	@override String descriptionGeneric({required Object provider}) => 'Model Context Protocol sunucuları ${provider} için ek araçlar ve veri kaynakları sağlar';
+	@override String get loading => 'MCP sunucuları yükleniyor...';
+	@override String get refreshingScopes => 'Proje kapsamları yenileniyor...';
+}
+
+// Path: mcp.team
+class Translations$mcp$team$tr extends Translations$mcp$team$en {
+	Translations$mcp$team$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get cta => 'ddagent Pro ile kullanılabilir';
+	@override String get description => 'MCP sunucu yapılandırmalarını takımınızla paylaşın. Herkes otomatik olarak senkron kalır.';
+	@override String get title => 'Takım MCP Yapılandırmaları';
+}
+
+// Path: mcp.tokens
+class Translations$mcp$tokens$tr extends Translations$mcp$tokens$en {
+	Translations$mcp$tokens$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get scopeWrite => 'Yazma';
+}
+
+// Path: terminal.actions
+class Translations$terminal$actions$tr extends Translations$terminal$actions$en {
+	Translations$terminal$actions$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get clearOutput => 'Çıktıyı Temizle';
+	@override String get connect => 'Bağlan';
+	@override String get newShell => 'Yeni Shell';
+	@override String get newTab => 'Yeni Terminal Sekmesi';
+	@override String get providerLogin => 'Sağlayıcı Girişi';
+	@override String get restartSession => 'Oturumu Yeniden Başlat';
+}
+
+// Path: terminal.authUrl
+class Translations$terminal$authUrl$tr extends Translations$terminal$authUrl$en {
+	Translations$terminal$authUrl$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get openInBrowser => 'Tarayıcıda aç';
+}
+
+// Path: terminal.errors
+class Translations$terminal$errors$tr extends Translations$terminal$errors$en {
+	Translations$terminal$errors$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String couldNotOpenLink({required Object url}) => 'Bağlantı açılamadı: ${url}';
+}
+
+// Path: terminal.fileLink
+class Translations$terminal$fileLink$tr extends Translations$terminal$fileLink$en {
+	Translations$terminal$fileLink$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String detected({required Object path}) => 'Dosya algılandı: ${path}';
+}
+
+// Path: terminal.paste
+class Translations$terminal$paste$tr extends Translations$terminal$paste$en {
+	Translations$terminal$paste$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get hint => 'Ctrl+V / sağ tık → Yapıştır';
+	@override String get title => 'Terminale yapıştır';
+}
+
+// Path: terminal.shortcuts
+class Translations$terminal$shortcuts$tr extends Translations$terminal$shortcuts$en {
+	Translations$terminal$shortcuts$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get eof => 'EOF';
+	@override String get hide => 'Kısayol çubuğunu gizle';
+	@override String get interrupt => 'Kes (SIGINT)';
+	@override String get suspend => 'Askıya al (SIGTSTP)';
+	@override String get showTooltip => 'Kısayolları göster';
+	@override String get hideTooltip => 'Kısayolları gizle';
+}
+
+// Path: terminal.tabs
+class Translations$terminal$tabs$tr extends Translations$terminal$tabs$en {
+	Translations$terminal$tabs$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get antigravityCli => 'Antigravity CLI';
+	@override String get claudeCli => 'Claude CLI';
+	@override String get commandCodeCli => 'Command Code CLI';
+	@override String get cursorCli => 'Cursor CLI';
+	@override String get devinCli => 'Devin CLI';
+	@override String loginTitle({required Object provider}) => 'Giriş: ${provider}';
+	@override String get opencodeCli => 'OpenCode CLI';
+	@override String get plainShell => 'Basit Shell';
+	@override String shellName({required Object index}) => 'Shell ${index}';
+}
+
+// Path: quota.agents
+class Translations$quota$agents$tr extends Translations$quota$agents$en {
+	Translations$quota$agents$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String statusCount({required Object status, required Object count}) => '${status} (${count})';
+}
+
+// Path: quota.chart
+class Translations$quota$chart$tr extends Translations$quota$chart$en {
+	Translations$quota$chart$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get hide => 'Gizle';
+	@override String get noData => 'Eğilim için yeterli veri yok.';
+	@override String pointReadout({required Object date, required Object tokens, required Object cost}) => '${date} · ${tokens} token · ${cost}';
+	@override String get show => 'Göster';
+}
+
+// Path: quota.config
+class Translations$quota$config$tr extends Translations$quota$config$en {
+	Translations$quota$config$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get accountRouting => 'Hesap yönlendirme';
+	@override String get pollerTitle => 'Sorgulama ve uyarılar';
+	@override String get save => 'Yapılandırmayı kaydet';
+}
+
+// Path: quota.overview
+class Translations$quota$overview$tr extends Translations$quota$overview$en {
+	Translations$quota$overview$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get tokensAndCost => 'Tokenlar ve maliyet';
+}
+
+// Path: quota.section
+class Translations$quota$section$tr extends Translations$quota$section$en {
+	Translations$quota$section$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get config => 'Yapılandırma';
+}
+
+// Path: notifications.errors
+class Translations$notifications$errors$tr extends Translations$notifications$errors$en {
+	Translations$notifications$errors$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get noResponse => 'Sunucudan yanıt yok';
+	@override String get registrationRejected => 'Kayıt sunucu tarafından reddedildi';
+}
+
+// Path: collab.roles
+class Translations$collab$roles$tr extends Translations$collab$roles$en {
+	Translations$collab$roles$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get member => 'Üye';
+	@override String get viewer => 'Görüntüleyici';
+}
+
+// Path: sessions.activity
+class Translations$sessions$activity$tr extends Translations$sessions$activity$en {
+	Translations$sessions$activity$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get committingChanges => 'Değişiklikler commit ediliyor';
+	@override String editingFile({required Object file}) => '${file} düzenleniyor';
+	@override String get editingFileGeneric => 'Bir dosya düzenleniyor';
+	@override String fetchingUrl({required Object url}) => '${url} getiriliyor';
+	@override String get pushingBranch => 'Dal gönderiliyor';
+	@override String readingFile({required Object file}) => '${file} okunuyor';
+	@override String runningCommand({required Object command}) => '`${command}` çalıştırılıyor';
+	@override String get runningShellCommand => 'Bir shell komutu çalıştırılıyor';
+	@override String runningTool({required Object name}) => '${name} çalıştırılıyor';
+	@override String searching({required Object query}) => '“${query}” aranıyor';
+	@override String get subagentRunning => 'Alt agent çalışıyor';
+}
+
+// Path: sessions.age
+class Translations$sessions$age$tr extends Translations$sessions$age$en {
+	Translations$sessions$age$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String days({required Object days}) => '${days}g';
+	@override String hours({required Object hours}) => '${hours}sa';
+	@override String get lessThanMinute => '<1dk';
+	@override String minutes({required Object count}) => '${count}dk';
+}
+
+// Path: sessions.toasts
+class Translations$sessions$toasts$tr extends Translations$sessions$toasts$en {
+	Translations$sessions$toasts$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get archived => 'Oturum arşivlendi';
+	@override String get deleted => 'Oturum silindi';
+	@override String get pinned => 'Oturum sabitlendi';
+	@override String get renamed => 'Oturum yeniden adlandırıldı';
+	@override String get restored => 'Oturum geri yüklendi';
+	@override String get unpinned => 'Oturum sabitlemesi kaldırıldı';
+	@override String get workspaceChanged => 'Çalışma alanı değiştirildi';
+}
+
+// Path: git.checkpoints
+class Translations$git$checkpoints$tr extends Translations$git$checkpoints$en {
+	Translations$git$checkpoints$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get create => 'Yeni';
+	@override String get empty => 'Henüz kontrol noktası yok';
+	@override String get labelHint => 'Kontrol noktası etiketi (isteğe bağlı)';
+	@override String get restoreMessage => 'Çalışma ağacı bu kontrol noktasına sıfırlansın mı? Mevcut değişiklikler değiştirilecek.';
+	@override String get restoreTitle => 'Kontrol noktasını geri yükle';
+	@override String get restored => 'Kontrol noktası geri yüklendi';
+	@override String get title => 'Kontrol Noktaları';
+}
+
+// Path: kanban.card
+class Translations$kanban$card$tr extends Translations$kanban$card$en {
+	Translations$kanban$card$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get untitled => 'Adsız';
+}
+
+// Path: kanban.comments
+class Translations$kanban$comments$tr extends Translations$kanban$comments$en {
+	Translations$kanban$comments$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get add => 'Yorum ekle';
+	@override String get empty => 'Henüz yorum yok';
+}
+
+// Path: kanban.details
+class Translations$kanban$details$tr extends Translations$kanban$details$en {
+	Translations$kanban$details$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String status({required Object status}) => 'Durum: ${status}';
+	@override String get title => 'Kart Ayrıntıları';
+}
+
+// Path: kanban.dialog
+class Translations$kanban$dialog$tr extends Translations$kanban$dialog$en {
+	Translations$kanban$dialog$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get saving => 'Kaydediliyor…';
+}
+
+// Path: kanban.empty
+class Translations$kanban$empty$tr extends Translations$kanban$empty$en {
+	Translations$kanban$empty$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get noProject => 'Proje seçilmedi';
+}
+
+// Path: kanban.time
+class Translations$kanban$time$tr extends Translations$kanban$time$en {
+	Translations$kanban$time$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String daysAgo({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('tr'))(count,
+		one: '1 gün önce',
+		other: '${count} gün önce',
+	);
+	@override String hoursAgo({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('tr'))(count,
+		one: '1 saat önce',
+		other: '${count} saat önce',
+	);
+	@override String minutesAgo({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('tr'))(count,
+		one: '1 dakika önce',
+		other: '${count} dakika önce',
+	);
+	@override String get now => 'şimdi';
+}
+
+// Path: onboarding.agents
+class Translations$onboarding$agents$tr extends Translations$onboarding$agents$en {
+	Translations$onboarding$agents$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => 'Bir veya daha fazla AI kodlama asistanına giriş yapın. Tümü isteğe bağlıdır.';
+	@override String get laterHint => 'Bunları daha sonra Ayarlar\'dan yapılandırabilirsiniz.';
+	@override String get title => 'AI Agentlarınızı Bağlayın';
+}
+
+// Path: onboarding.errors
+class Translations$onboarding$errors$tr extends Translations$onboarding$errors$en {
+	Translations$onboarding$errors$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get invalidEmail => 'Lütfen geçerli bir e-posta adresi girin.';
+	@override String get nameAndEmailRequired => 'Hem git adı hem de e-posta gerekli.';
+}
+
+// Path: onboarding.mcp
+class Translations$onboarding$mcp$tr extends Translations$onboarding$mcp$en {
+	Translations$onboarding$mcp$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => 'Agentlarınızın bilgi tabanını ve ddagent araçlarını kullanabilmesi için ddagent MCP sunucusunu kurun. Agentları seçin veya tümü için kurun.';
+	@override String get installForAll => 'Tümü için kur';
+	@override String get installSelected => 'Seçilenler için kur';
+	@override String installedOn({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('tr'))(count,
+		one: '${count} agenta kuruldu.',
+		other: '${count} agenta kuruldu.',
+	);
+	@override String installedWithFailures({required Object installedCount, required Object failed}) => '${installedCount} agenta kuruldu; başarısız: ${failed}';
+	@override String get laterHint => 'İsteğe bağlı — bunu daha sonra Ayarlar → MCP bölümünden de kurabilirsiniz.';
+	@override String get title => 'Agentları ddagent\'a bağlayın';
+}
+
+// Path: fileTree.search
+class Translations$fileTree$search$tr extends Translations$fileTree$search$en {
+	Translations$fileTree$search$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get hint => 'Adları filtreleyin / içerikte aramak için Enter\'a basın';
+	@override String get noMatches => 'Eşleşme yok';
+	@override String get prompt => 'Bir sorgu yazın ve Enter\'a basın';
+	@override String get resultsTruncated => 'Sonuçlar kısaltıldı';
+}
+
+// Path: fileTree.titles
+class Translations$fileTree$titles$tr extends Translations$fileTree$titles$en {
+	Translations$fileTree$titles$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String delete({required Object name}) => '${name} sil';
+	@override String download({required Object name}) => '${name} indir';
+	@override String rename({required Object name}) => '${name} öğesini yeniden adlandır';
+}
+
 // Path: auth.login.errors
 class Translations$auth$login$errors$tr extends Translations$auth$login$errors$en {
 	Translations$auth$login$errors$tr._(TranslationsTr root) : this._root = root, super.internal(root);
@@ -3046,6 +4404,9 @@ class Translations$chat$session$messages$tr extends Translations$chat$session$me
 	@override String get loadOlderFailed => 'Eski mesajlar yüklenemedi.';
 	@override String get retry => 'Yeniden dene';
 	@override String get noSearchMatches => 'Aramanızla eşleşen mesaj yok.';
+	@override String loadAllCount({required Object count}) => 'Tümünü yükle (${count})';
+	@override String get loadOlder => 'Daha eski mesajları yükle';
+	@override String retryLoadOlder({required Object error}) => 'Eski mesajları yüklemeyi yeniden dene — ${error}';
 }
 
 // Path: chat.shell.selectProject
@@ -3151,6 +4512,21 @@ class Translations$chat$claudeStatus$providers$tr extends Translations$chat$clau
 
 	// Translations
 	@override String get assistant => 'Asistan';
+}
+
+// Path: chat.commandResult.fallback
+class Translations$chat$commandResult$fallback$tr extends Translations$chat$commandResult$fallback$en {
+	Translations$chat$commandResult$fallback$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get config => 'Ayarları ve yapılandırmayı açın.';
+	@override String get cost => 'Etkin oturumun token kullanımını inceleyin.';
+	@override String get help => 'Komut belgelerini ve sözdizimini gösterin.';
+	@override String get memory => 'Projenin CLAUDE.md bellek dosyasını açın.';
+	@override String get models => 'Etkin sağlayıcı için kullanılabilir modellere göz atın.';
+	@override String get status => 'Çalışma zamanı, sürüm, sağlayıcı ve ortam durumunu inceleyin.';
 }
 
 // Path: common.fileTree.context
@@ -4045,6 +5421,18 @@ class Translations$settings$mcp$scope$tr extends Translations$settings$mcp$scope
 	@override String get project => 'Proje';
 }
 
+// Path: settings.appearance.themeModes
+class Translations$settings$appearance$themeModes$tr extends Translations$settings$appearance$themeModes$en {
+	Translations$settings$appearance$themeModes$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get dark => 'Koyu';
+	@override String get light => 'Açık';
+	@override String get system => 'Sistem';
+}
+
 // Path: settings.quickSettings.sections
 class Translations$settings$quickSettings$sections$tr extends Translations$settings$quickSettings$sections$en {
 	Translations$settings$quickSettings$sections$tr._(TranslationsTr root) : this._root = root, super.internal(root);
@@ -4252,6 +5640,17 @@ class Translations$settings$notifications$desktop$tr extends Translations$settin
 	@override String get unsupported => 'Bu sistemde masaüstü bildirimleri desteklenmiyor.';
 }
 
+// Path: settings.notifications.channels
+class Translations$settings$notifications$channels$tr extends Translations$settings$notifications$channels$en {
+	Translations$settings$notifications$channels$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get discord => 'Discord';
+	@override String get telegram => 'Telegram';
+}
+
 // Path: settings.appearanceSettings.darkMode
 class Translations$settings$appearanceSettings$darkMode$tr extends Translations$settings$appearanceSettings$darkMode$en {
 	Translations$settings$appearanceSettings$darkMode$tr._(TranslationsTr root) : this._root = root, super.internal(root);
@@ -4392,6 +5791,7 @@ class Translations$settings$git$name$tr extends Translations$settings$git$name$e
 	// Translations
 	@override String get label => 'Git Adı';
 	@override String get help => 'Git commit\'leri için adın';
+	@override String get placeholder => 'John Doe';
 }
 
 // Path: settings.git.email
@@ -4403,6 +5803,7 @@ class Translations$settings$git$email$tr extends Translations$settings$git$email
 	// Translations
 	@override String get label => 'Git E-postası';
 	@override String get help => 'Git commit\'leri için e-postan';
+	@override String get placeholder => 'john@example.com';
 }
 
 // Path: settings.git.actions
@@ -4901,6 +6302,17 @@ class Translations$settings$browser$errors$tr extends Translations$settings$brow
 	@override String get saveSettings => 'Browser ayarları kaydedilemedi';
 }
 
+// Path: settings.about.pro
+class Translations$settings$about$pro$tr extends Translations$settings$about$pro$en {
+	Translations$settings$about$pro$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get syncSettings => 'Ayarları Senkronize Et';
+	@override String get teamManagement => 'Takım Yönetimi';
+}
+
 // Path: tasks.notConfigured.features
 class Translations$tasks$notConfigured$features$tr extends Translations$tasks$notConfigured$features$en {
 	Translations$tasks$notConfigured$features$tr._(TranslationsTr root) : this._root = root, super.internal(root);
@@ -5049,6 +6461,53 @@ class Translations$tasks$board$deleteConfirm$tr extends Translations$tasks$board
 	// Translations
 	@override String description({required Object cardTitle}) => '“${cardTitle}” kalıcı olarak silinecek.';
 	@override String get title => 'Kart silinsin mi?';
+}
+
+// Path: mcp.form.fields
+class Translations$mcp$form$fields$tr extends Translations$mcp$form$fields$en {
+	Translations$mcp$form$fields$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get bearerTokenEnvVar => 'Bearer Token Ortam Değişkeni';
+	@override String get envVarNames => 'Ortam Değişkeni Adları';
+	@override String get workingDirectory => 'Çalışma Dizini';
+}
+
+// Path: mcp.form.scope
+class Translations$mcp$form$scope$tr extends Translations$mcp$form$scope$en {
+	Translations$mcp$form$scope$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get claudeLocal => 'Claude Yerel';
+	@override late final Translations$mcp$form$scope$description$tr description = Translations$mcp$form$scope$description$tr._(_root);
+	@override String get projectAllProviders => 'Proje (Tüm Sağlayıcılar)';
+	@override String get userAllProviders => 'Kullanıcı (Tüm Sağlayıcılar)';
+}
+
+// Path: mcp.form.validation
+class Translations$mcp$form$validation$tr extends Translations$mcp$form$validation$en {
+	Translations$mcp$form$validation$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String unsupportedGlobal({required Object type}) => 'MCP Sunucusu Ekle, tüm sağlayıcılarda yalnızca stdio ve http destekler; ${type} desteklemez.';
+	@override String unsupportedProvider({required Object provider, required Object type}) => '${provider}, ${type} MCP sunucularını desteklemiyor';
+}
+
+// Path: mcp.servers.config
+class Translations$mcp$servers$config$tr extends Translations$mcp$servers$config$en {
+	Translations$mcp$servers$config$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get cwd => 'Çalışma Dizini';
+	@override String get envVars => 'Ortam Değişkenleri';
 }
 
 // Path: common.projectWizard.step1.existing
@@ -5299,6 +6758,8 @@ class Translations$settings$apiKeys$github$form$tr extends Translations$settings
 	@override String get addButton => 'Token Ekle';
 	@override String get cancelButton => 'İptal';
 	@override String get howToCreate => 'GitHub Kişisel Erişim Token\'ı nasıl oluşturulur →';
+	@override String get showToken => 'Token\'ı göster';
+	@override String get hideToken => 'Token\'ı gizle';
 }
 
 // Path: settings.tasks.notInstalled.steps
@@ -5480,6 +6941,20 @@ class Translations$tasks$gettingStarted$steps$startBuilding$tr extends Translati
 	// Translations
 	@override String get title => 'İnşaya Başla';
 	@override String get description => 'AI asistanına görevler üzerinde çalışmaya başlamasını, durumlarını güncellemesini ve proje geliştikçe yeni görevler eklemesini söyle.';
+}
+
+// Path: mcp.form.scope.description
+class Translations$mcp$form$scope$description$tr extends Translations$mcp$form$scope$description$en {
+	Translations$mcp$form$scope$description$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get local => 'Seçili proje için Claude kullanıcı ayarlarında saklanır';
+	@override String get project => 'Seçili proje çalışma alanında saklanır';
+	@override String get projectGlobal => 'Her sağlayıcı için seçili proje çalışma alanına yazar';
+	@override String get user => 'Makinenizdeki tüm projelerde kullanılabilir';
+	@override String get userGlobal => 'Her sağlayıcının kullanıcı yapılandırmasına yazar ve bu makinedeki projelerde kullanılabilir';
 }
 
 // Path: common.notifications.codes.generic.info
@@ -5677,6 +7152,7 @@ extension on TranslationsTr {
 			'chat.tools.updateTodo' => 'Yapılacaklar listesini güncelle',
 			'chat.tools.readTodo' => 'Yapılacaklar listesini oku',
 			'chat.tools.searchResults' => 'sonuç',
+			'chat.tools.todoReadLabel' => 'TodoRead yapılacaklar listesi',
 			'chat.search.found' => ({required Object count, required Object type}) => '${count} ${type} bulundu',
 			'chat.search.file' => 'dosya',
 			'chat.search.files' => 'dosya',
@@ -5704,6 +7180,15 @@ extension on TranslationsTr {
 			'chat.permissions.retry' => 'İzin kaydedildi. Aracı kullanmak için isteği tekrar dene.',
 			'chat.permissions.error' => 'İzinler güncellenemedi. Lütfen tekrar dene.',
 			'chat.permissions.openSettings' => 'Ayarları aç',
+			'chat.permissions.allow' => 'İzin ver',
+			'chat.permissions.allowAll' => ({required Object count}) => 'Tümüne izin ver (${count})',
+			'chat.permissions.allowWithChanges' => 'Değişikliklerle izin ver',
+			'chat.permissions.always' => 'Her zaman',
+			'chat.permissions.deny' => 'Reddet',
+			'chat.permissions.editAndAllow' => 'Düzenle ve izin ver',
+			'chat.permissions.editInput' => 'Girdiyi düzenle',
+			'chat.permissions.invalidJson' => 'Geçersiz JSON',
+			'chat.permissions.reject' => 'Reddet',
 			'chat.todo.updated' => 'Yapılacaklar listesi başarıyla güncellendi',
 			'chat.todo.current' => 'Mevcut Yapılacaklar Listesi',
 			'chat.plan.viewPlan' => '📋 Uygulama planını göster',
@@ -5758,6 +7243,7 @@ extension on TranslationsTr {
 			'chat.input.offlineQueue.clearBtn' => 'İptal',
 			'chat.input.offlineQueue.multiple' => ({required Object count}) => '${count} mesaj çevrimdışı kuyrukta — yeniden bağlanınca otomatik gönderilecek',
 			'chat.input.offlineQueue.single' => '1 mesaj çevrimdışı kuyrukta — yeniden bağlanınca otomatik gönderilecek',
+			'chat.input.cameraUnavailable' => ({required Object error}) => 'Kamera kullanılamıyor: ${error}',
 			'chat.providerSelection.title' => 'AI Asistanını Seç',
 			'chat.providerSelection.description' => 'Yeni bir konuşma başlatmak için bir sağlayıcı seç',
 			'chat.providerSelection.selectModel' => 'Model Seç',
@@ -5807,6 +7293,11 @@ extension on TranslationsTr {
 			'chat.session.messages.loadOlderFailed' => 'Eski mesajlar yüklenemedi.',
 			'chat.session.messages.retry' => 'Yeniden dene',
 			'chat.session.messages.noSearchMatches' => 'Aramanızla eşleşen mesaj yok.',
+			'chat.session.messages.loadAllCount' => ({required Object count}) => 'Tümünü yükle (${count})',
+			'chat.session.messages.loadOlder' => 'Daha eski mesajları yükle',
+			'chat.session.messages.retryLoadOlder' => ({required Object error}) => 'Eski mesajları yüklemeyi yeniden dene — ${error}',
+			'chat.session.deleteConfirm' => 'Oturumu ve transkriptini kaldırır. Geri alınamaz.',
+			'chat.session.finishRunBeforeWorkspaceChange' => 'Çalışma alanını değiştirmeden önce çalıştırmayı bitir',
 			'chat.shell.selectProject.title' => 'Proje Seç',
 			'chat.shell.selectProject.description' => 'O dizinde etkileşimli shell açmak için bir proje seç',
 			'chat.shell.status.newSession' => 'Yeni Oturum',
@@ -5912,16 +7403,23 @@ extension on TranslationsTr {
 			'chat.splitOverview.idle' => 'Boşta',
 			'chat.splitOverview.active' => 'Etkin',
 			'chat.askUserQuestion.needsInput' => ({required Object provider}) => '${provider} girdinizi bekliyor',
+			'chat.askUserQuestion.answerHint' => 'Yanıtınızı yazın…',
+			'chat.askUserQuestion.other' => 'Diğer…',
+			'chat.askUserQuestion.skip' => 'Atla',
 			'chat.attachments.downloadFailedRetry' => 'İndirme başarısız — yeniden denemek için tıklayın',
 			'chat.attachments.fileAttachment' => 'Dosya eki',
+			'chat.attachments.download' => ({required Object name}) => '${name} indir',
 			'chat.checkpoint.creating' => 'Anlık görüntü oluşturuluyor…',
 			'chat.checkpoint.revertChanges' => 'Dosyaları son kontrol noktasına geri al',
 			'chat.checkpoint.undo' => 'Kontrol noktasını geri al',
+			'chat.checkpoint.beforeAiTurn' => 'AI turundan önce',
 			'chat.common.close' => 'Kapat',
 			'chat.taskMaster.saveToTask' => 'Görev',
 			'chat.taskMaster.saved' => 'Kaydedildi',
 			'chat.taskMaster.saving' => 'Kaydediliyor...',
 			'chat.taskMaster.taskShort' => 'GÖREV',
+			'chat.taskMaster.addToTask' => 'TaskMaster\'a ekle',
+			'chat.taskMaster.added' => 'TaskMaster\'a eklendi',
 			'chat.tokenUsage.desc' => 'Oturum token tüketimini görüntüle',
 			'chat.tokenUsage.title' => 'Token kullanımı',
 			'chat.tool.emptyResult' => '(henüz çıktı yok — araç boş sonuç döndürdü)',
@@ -5932,6 +7430,36 @@ extension on TranslationsTr {
 			'chat.broadcast.selectOrchestrators' => 'Düzenleyicileri seç',
 			'chat.broadcast.orchestratorsOnly' => 'Yalnızca düzenleyiciler',
 			'chat.broadcast.noOrchestrators' => 'Kullanılabilir düzenleyici oturumu yok',
+			'chat.changes.empty' => 'Dosya değişikliği yok',
+			'chat.changes.failedToLoad' => 'Değişiklikler yüklenemedi',
+			'chat.commandResult.fallback.config' => 'Ayarları ve yapılandırmayı açın.',
+			'chat.commandResult.fallback.cost' => 'Etkin oturumun token kullanımını inceleyin.',
+			'chat.commandResult.fallback.help' => 'Komut belgelerini ve sözdizimini gösterin.',
+			'chat.commandResult.fallback.memory' => 'Projenin CLAUDE.md bellek dosyasını açın.',
+			'chat.commandResult.fallback.models' => 'Etkin sağlayıcı için kullanılabilir modellere göz atın.',
+			'chat.commandResult.fallback.status' => 'Çalışma zamanı, sürüm, sağlayıcı ve ortam durumunu inceleyin.',
+			'chat.commandResult.filterCommands' => 'Komutları filtrele...',
+			'chat.commandResult.searchModels' => ({required Object provider}) => '${provider} modellerini ara...',
+			'chat.commands.runConfirmTitle' => 'Komut çalıştırılsın mı?',
+			'chat.commands.executionCancelled' => 'Komut çalıştırma iptal edildi',
+			'chat.export.sessionTitle' => ({required Object id}) => 'Oturum ${id}',
+			'chat.export.pdfFailed' => 'PDF dışa aktarma başarısız',
+			'chat.export.transcriptDownloaded' => 'Transkript indirildi',
+			'chat.export.savedTo' => ({required Object path}) => 'Kaydedildi: ${path}',
+			'chat.message.compactedSummary' => 'Sıkıştırılmış özet',
+			'chat.message.rawView' => 'Ham görünüm',
+			'chat.message.resendHint' => 'Düzenleyiciden yeniden gönderin',
+			'chat.modelLibrary.deleteTooltip' => ({required Object name}) => '${name} sil',
+			'chat.modelLibrary.editTooltip' => ({required Object name}) => '${name} düzenle',
+			'chat.modelLibrary.enterNameAndId' => 'Hem model adını hem de model ID\'sini gir.',
+			'chat.modelLibrary.idNoSpaces' => 'Model ID\'leri boşluk içeremez.',
+			'chat.modelLibrary.setAsDefault' => 'Varsayılan olarak ayarla',
+			'chat.modelLibrary.defaultModel' => 'Varsayılan model',
+			'chat.pinFile.action' => 'Sabitle',
+			'chat.pinFile.pathHint' => 'path/to/file.ext',
+			'chat.pinFile.title' => 'Dosyayı sabitle',
+			'chat.permissionRequest.title' => ({required Object tool}) => 'İzin isteği · ${tool}',
+			'chat.permissionRequest.question' => 'Soru',
 			'codeEditor.toolbar.changes' => 'değişiklik',
 			'codeEditor.toolbar.previousChange' => 'Önceki değişiklik',
 			'codeEditor.toolbar.nextChange' => 'Sonraki değişiklik',
@@ -5940,6 +7468,10 @@ extension on TranslationsTr {
 			'codeEditor.toolbar.settings' => 'Editör Ayarları',
 			'codeEditor.toolbar.collapse' => 'Editörü daralt',
 			'codeEditor.toolbar.expand' => 'Editörü tüm genişliğe aç',
+			'codeEditor.toolbar.diffMerge' => 'Diff / birleştirme',
+			'codeEditor.toolbar.previewInBrowser' => 'Tarayıcıda önizle',
+			'codeEditor.toolbar.reload' => 'Diskten yeniden yükle',
+			'codeEditor.toolbar.toggleDock' => 'Dosya panelini aç/kapat',
 			'codeEditor.loading' => ({required Object fileName}) => '${fileName} yükleniyor...',
 			'codeEditor.header.showingChanges' => 'Değişiklikler gösteriliyor',
 			'codeEditor.actions.copyPath' => 'Dosya yolunu kopyala',
@@ -5957,14 +7489,40 @@ extension on TranslationsTr {
 			'codeEditor.actions.unpinFile' => 'Dosyayı bağlamdan çıkar',
 			'codeEditor.actions.previewHtml' => 'HTML önizlemesini yeni sekmede aç',
 			'codeEditor.actions.retry' => 'Yeniden dene',
+			'codeEditor.actions.saveAll' => 'Tümünü kaydet',
 			'codeEditor.footer.lines' => 'Satır:',
 			'codeEditor.footer.characters' => 'Karakter:',
 			'codeEditor.footer.shortcuts' => 'Kaydetmek için Ctrl+S • Kapatmak için Esc',
 			'codeEditor.binaryFile.title' => 'Binary Dosya',
 			'codeEditor.binaryFile.message' => ({required Object fileName}) => '"${fileName}" dosyası binary olduğu için metin editöründe gösterilemez.',
+			'codeEditor.binaryFile.cannotDisplayAsText' => 'Metin olarak gösterilemez',
 			'codeEditor.filePreview.loading' => 'Önizleme yükleniyor...',
 			'codeEditor.filePreview.error' => 'Bu dosya görüntülenemiyor.',
 			'codeEditor.filePreview.openInNewTab' => 'Yeni sekmede aç',
+			'codeEditor.diff.applyMerge' => 'Birleştirmeyi uygula',
+			'codeEditor.diff.base' => 'Temel',
+			'codeEditor.diff.close' => 'Diff\'i kapat',
+			'codeEditor.diff.current' => 'Geçerli',
+			'codeEditor.diff.hunk' => ({required Object number}) => 'Parça ${number}',
+			'codeEditor.diff.noChanges' => 'Değişiklik yok',
+			'codeEditor.diff.deletedOnDisk' => 'diskte silindi',
+			'codeEditor.discardUnsavedChanges' => 'Kaydedilmemiş değişikliklerden vazgeçilsin mi?',
+			'codeEditor.emptyState.title' => 'Açık dosya yok',
+			'codeEditor.failedToLoad' => 'Dosya yüklenemedi',
+			'codeEditor.hexDump.more' => ({required Object size}) => '… ${size} daha',
+			'codeEditor.mediaFile.subtitle' => 'Ses/video önizlemesi henüz desteklenmiyor',
+			'codeEditor.mediaFile.title' => 'Medya dosyası',
+			'codeEditor.settings.fontSizeDecrease' => ({required Object size}) => 'Yazı tipi boyutu −  (şimdi ${size})',
+			'codeEditor.settings.fontSizeIncrease' => 'Yazı tipi boyutu +',
+			'codeEditor.settings.minimap' => 'Minimap',
+			'codeEditor.settings.tabSize' => ({required Object size}) => 'Sekme boyutu: ${size}',
+			'codeEditor.unsavedChanges' => ({required Object name}) => '${name} dosyasında kaydedilmemiş değişiklikler var',
+			'codeEditor.toasts.savedFile' => ({required Object name}) => '${name} kaydedildi',
+			'codeEditor.toasts.saveFailed' => 'Kaydetme başarısız',
+			'codeEditor.toasts.allSaved' => 'Tümü kaydedildi',
+			'codeEditor.toasts.someSavesFailed' => 'Bazı kaydetmeler başarısız oldu',
+			'codeEditor.toasts.savedTo' => ({required Object path}) => 'Şuraya kaydedildi: ${path}',
+			'codeEditor.toasts.mergeApplied' => 'Birleştirme uygulandı — kalıcı olması için kaydet',
 			'common.buttons.save' => 'Kaydet',
 			'common.buttons.cancel' => 'İptal',
 			'common.buttons.delete' => 'Sil',
@@ -5981,6 +7539,8 @@ extension on TranslationsTr {
 			'common.buttons.download' => 'İndir',
 			'common.buttons.upload' => 'Yükle',
 			'common.buttons.browse' => 'Gözat',
+			'common.buttons.openDiagram' => 'Diyagramı aç',
+			'common.buttons.update' => 'Güncelle',
 			'common.tabs.chat' => 'Sohbet',
 			'common.tabs.shell' => 'Shell',
 			'common.tabs.files' => 'Dosyalar',
@@ -6046,6 +7606,8 @@ extension on TranslationsTr {
 			'common.mainContent.selectProjectDescription' => 'Claude ile kodlamaya başlamak için kenar çubuğundan bir proje seç. Her proje kendi sohbet oturumlarını ve dosya geçmişini içerir.',
 			'common.mainContent.tip' => 'İpucu',
 			'common.mainContent.createProjectMobile' => 'Projelere erişmek için yukarıdaki menü düğmesine dokun',
+			_ => null,
+		} ?? switch (path) {
 			'common.mainContent.createProjectDesktop' => 'Kenar çubuğundaki klasör simgesine tıklayarak yeni bir proje oluştur',
 			'common.mainContent.newSession' => 'Yeni Oturum',
 			'common.mainContent.untitledSession' => 'Adsız Oturum',
@@ -6131,8 +7693,6 @@ extension on TranslationsTr {
 			'common.fileTree.validation.reserved' => 'Dosya adı ayrılmış bir ad',
 			'common.projectWizard.title' => 'Yeni Proje Oluştur',
 			'common.projectWizard.steps.type' => 'Tür',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.steps.configure' => 'Yapılandır',
 			'common.projectWizard.steps.confirm' => 'Onayla',
 			'common.projectWizard.step1.question' => 'Zaten bir çalışma alanın var mı, yoksa yeni bir tane mi oluşturmak istersin?',
@@ -6560,6 +8120,8 @@ extension on TranslationsTr {
 			'common.gitPanel.mergeWorktree.commitCount' => ({required Object count}) => '${count} commit',
 			'common.gitPanel.mergeWorktree.merge' => 'Birleştir',
 			'common.gitPanel.mergeWorktree.mergeMessage' => ({required Object branch}) => '\'${branch}\' dalını birleştir',
+			_ => null,
+		} ?? switch (path) {
 			'common.gitPanel.mergeWorktree.messageLabel' => 'Commit mesajı',
 			'common.gitPanel.mergeWorktree.squashDesc' => ({required Object commits, required Object branch}) => '${commits} commitin tümünü ${branch} üzerinde tek committe birleştir',
 			'common.gitPanel.mergeWorktree.squashLabel' => 'Commitleri sıkıştır (squash)',
@@ -6645,8 +8207,6 @@ extension on TranslationsTr {
 			'common.gitPanel.worktrees.changes' => ({required Object count}) => '${count} değişiklik',
 			'common.gitPanel.worktrees.count' => ({required Object count}) => '${count} worktree',
 			'common.gitPanel.worktrees.createFirst' => 'İlk worktree’nizi oluşturun',
-			_ => null,
-		} ?? switch (path) {
 			'common.gitPanel.worktrees.detached' => 'ayrık',
 			'common.gitPanel.worktrees.detachedAt' => ({required Object sha}) => 'ayrık @ ${sha}',
 			'common.gitPanel.worktrees.detachedHead' => 'ayrık HEAD',
@@ -6669,6 +8229,16 @@ extension on TranslationsTr {
 			'common.gitPanel.tabs.worktrees' => 'Worktreeler',
 			'common.sessions.renameSession' => 'Oturumu yeniden adlandır',
 			'common.projects.newSession' => 'Yeni oturum',
+			'common.codeBlock.wrapLines' => 'Satırları kaydır',
+			'common.codeBlock.noWrap' => 'Kaydırma yok',
+			'common.update.available' => ({required Object version}) => 'Güncelleme mevcut · v${version}',
+			'common.update.confirm' => ({required Object version}) => 'v${version} sürümüne güncellensin mi? Sunucu kendini günceller ve yeniden başlatır — etkin oturumlar kesintiye uğrayacak.',
+			'common.update.downloading' => 'Güncelleme indiriliyor ve uygulanıyor…',
+			'common.update.restarting' => 'Sunucu yeniden başlatılıyor — bu biraz sürer…',
+			'common.update.done' => ({required Object version}) => 'v${version} sürümüne güncellendi. Yeni paketi almak için uygulamayı yeniden yükle.',
+			'common.update.manualRestart' => 'Güncelleme uygulandı ancak sunucu kendiliğinden yeniden başlamadı — tamamlamak için elle yeniden başlat.',
+			'common.update.failed' => 'Güncelleme başarısız oldu.',
+			'common.update.failedTitle' => 'Güncelleme başarısız',
 			'settings.title' => 'Ayarlar',
 			'settings.changelog.title' => 'Değişiklik günlüğü',
 			'settings.changelog.loading' => 'Yükleniyor…',
@@ -6682,6 +8252,7 @@ extension on TranslationsTr {
 			'settings.server.restarting' => 'Yeniden başlatılıyor… sunucu döndüğünde sayfa yenilenecek.',
 			'settings.server.restartFailed' => 'Yeniden başlatma başarısız',
 			'settings.server.unsupported' => 'Yeniden başlatma yalnızca sunucu servis yöneticisi altında çalışırken kullanılabilir.',
+			'settings.server.ok' => 'Tamam',
 			'settings.updates.title' => 'Uygulama güncellemeleri',
 			'settings.updates.description' => 'GitHub\'da daha yeni bir masaüstü sürümünü kontrol eder. Yeni sürümler otomatik indirilir ve çıkışta kurulur.',
 			'settings.updates.check' => 'Güncellemeleri denetle',
@@ -6727,6 +8298,9 @@ extension on TranslationsTr {
 			'settings.appearance.showMinimap' => 'Minimap\'i Göster',
 			'settings.appearance.lineNumbers' => 'Satır Numaraları',
 			'settings.appearance.fontSize' => 'Yazı Tipi Boyutu',
+			'settings.appearance.themeModes.dark' => 'Koyu',
+			'settings.appearance.themeModes.light' => 'Açık',
+			'settings.appearance.themeModes.system' => 'Sistem',
 			'settings.actions.saveChanges' => 'Değişiklikleri Kaydet',
 			'settings.actions.resetToDefaults' => 'Varsayılanlara Döndür',
 			'settings.actions.cancelChanges' => 'Değişiklikleri İptal Et',
@@ -6744,6 +8318,7 @@ extension on TranslationsTr {
 			'settings.quickSettings.dragHandle.openPanel' => 'Ayarlar panelini aç',
 			'settings.quickSettings.dragHandle.draggingStatus' => 'Sürükleniyor...',
 			'settings.quickSettings.dragHandle.toggleAndMove' => 'Açıp kapamak için tıkla, taşımak için sürükle',
+			'settings.quickSettings.sendWithCtrlEnter' => 'Ctrl+Enter ile gönder',
 			'settings.terminalShortcuts.title' => 'Terminal Kısayolları',
 			'settings.terminalShortcuts.sectionKeys' => 'Tuşlar',
 			'settings.terminalShortcuts.sectionNavigation' => 'Gezinme',
@@ -6883,6 +8458,9 @@ extension on TranslationsTr {
 			'settings.notifications.desktop.disable' => 'Push Bildirimlerini Devre Dışı Bırak',
 			'settings.notifications.desktop.enabled' => 'Bu masaüstü uygulaması için bildirimler etkin',
 			'settings.notifications.desktop.unsupported' => 'Bu sistemde masaüstü bildirimleri desteklenmiyor.',
+			'settings.notifications.channels.discord' => 'Discord',
+			'settings.notifications.channels.telegram' => 'Telegram',
+			'settings.notifications.unpair' => 'Eşleştirmeyi kaldır',
 			'settings.appearanceSettings.darkMode.label' => 'Koyu Mod',
 			'settings.appearanceSettings.darkMode.description' => 'Açık ve koyu temalar arasında geçiş yap',
 			'settings.appearanceSettings.codeEditor.title' => 'Kod Editörü',
@@ -6941,8 +8519,10 @@ extension on TranslationsTr {
 			'settings.git.description' => 'Commit\'ler için git kimliğini yapılandır. Bu ayarlar git config --global ile genel olarak uygulanacak',
 			'settings.git.name.label' => 'Git Adı',
 			'settings.git.name.help' => 'Git commit\'leri için adın',
+			'settings.git.name.placeholder' => 'John Doe',
 			'settings.git.email.label' => 'Git E-postası',
 			'settings.git.email.help' => 'Git commit\'leri için e-postan',
+			'settings.git.email.placeholder' => 'john@example.com',
 			'settings.git.actions.save' => 'Yapılandırmayı Kaydet',
 			'settings.git.actions.saving' => 'Kaydediliyor...',
 			'settings.git.status.success' => 'Başarıyla kaydedildi',
@@ -6972,6 +8552,8 @@ extension on TranslationsTr {
 			'settings.apiKeys.github.form.addButton' => 'Token Ekle',
 			'settings.apiKeys.github.form.cancelButton' => 'İptal',
 			'settings.apiKeys.github.form.howToCreate' => 'GitHub Kişisel Erişim Token\'ı nasıl oluşturulur →',
+			'settings.apiKeys.github.form.showToken' => 'Token\'ı göster',
+			'settings.apiKeys.github.form.hideToken' => 'Token\'ı gizle',
 			'settings.apiKeys.github.empty' => 'Henüz GitHub token\'ı eklenmemiş.',
 			'settings.apiKeys.github.added' => 'Eklendi:',
 			'settings.apiKeys.github.confirmDelete' => 'Bu GitHub token\'ını silmek istediğinden emin misin?',
@@ -7052,6 +8634,8 @@ extension on TranslationsTr {
 			'settings.permissions.toolExamples.bashRm' => '- Tüm rm komutlarını engelle (tehlikeli)',
 			'settings.permissions.shellExamples.title' => 'Shell Komut Örnekleri:',
 			'settings.permissions.shellExamples.ls' => '- ls komutuna izin ver',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.shellExamples.gitStatus' => '- git status\'a izin ver',
 			'settings.permissions.shellExamples.npmInstall' => '- npm install\'a izin ver',
 			'settings.permissions.shellExamples.rmRf' => '- Özyinelemeli silmeyi engelle',
@@ -7159,8 +8743,6 @@ extension on TranslationsTr {
 			'settings.browser.installed' => 'kurulu',
 			'settings.browser.installing' => 'Kuruluyor...',
 			'settings.browser.missing' => 'eksik',
-			_ => null,
-		} ?? switch (path) {
 			'settings.browser.runtimeRequired' => 'Tarayıcı runtime’ı gerekli',
 			'settings.browser.statusDisabled' => 'devre dışı',
 			'settings.browser.statusLabel' => 'Durum',
@@ -7175,8 +8757,14 @@ extension on TranslationsTr {
 			'settings.workspaces.description' => 'Çalışma alanları, ddagent’ın sohbet edebildiği, kod çalıştırabildiği ve gezinebildiği dizinlerdir.',
 			'settings.workspaces.remove' => 'Çalışma alanını kaldır',
 			'settings.workspaces.title' => 'Çalışma alanları',
+			'settings.workspaces.pathRequired' => 'Yol gerekli',
 			'settings.about.supportTitle' => 'Projeyi destekle',
 			'settings.about.buyMeACoffee' => 'Bana kahve ısmarla',
+			'settings.about.learnMore' => 'Daha fazla bilgi',
+			'settings.about.pro.syncSettings' => 'Ayarları Senkronize Et',
+			'settings.about.pro.teamManagement' => 'Takım Yönetimi',
+			'settings.about.proFeatures' => 'ddagent Pro Özellikleri',
+			'settings.about.tryHosted' => 'ddagent Hosted\'ı deneyin',
 			'sidebar.projects.title' => 'Projeler',
 			'sidebar.projects.newProject' => 'Yeni Proje',
 			'sidebar.projects.deleteProject' => 'Projeyi Kaldır',
@@ -7371,6 +8959,7 @@ extension on TranslationsTr {
 			'tasks.notConfigured.features.progressVisualization' => 'İlerleme Görselleştirme: Kanban panoları ve detaylı görev analizleri',
 			'tasks.notConfigured.features.cliIntegration' => 'CLI Entegrasyonu: İleri seviye iş akışları için taskmaster komutlarını kullan',
 			'tasks.notConfigured.initializeButton' => 'TaskMaster AI\'yi Başlat',
+			'tasks.notConfigured.writePrdFirst' => 'Önce PRD yaz',
 			'tasks.gettingStarted.title' => 'TaskMaster\'a Başlarken',
 			'tasks.gettingStarted.subtitle' => 'TaskMaster hazır! Sıradaki adımların:',
 			'tasks.gettingStarted.steps.createPRD.title' => 'Ürün Gereksinim Belgesi (PRD) oluştur',
@@ -7451,12 +9040,22 @@ extension on TranslationsTr {
 			'tasks.buttons.createNewPRD' => 'Yeni PRD Oluştur',
 			'tasks.buttons.prdsAvailable' => ({required Object count}) => '${count} PRD mevcut',
 			'tasks.prd.modified' => ({required Object date}) => 'Değişiklik: ${date}',
+			'tasks.prd.editorTitle' => ({required Object name}) => 'PRD — ${name}',
+			'tasks.prd.fileExistsMessage' => ({required Object name}) => '"${name}" adlı bir PRD zaten var. Üzerine yazmak istiyor musunuz?',
+			'tasks.prd.fileExistsTitle' => 'Dosya zaten var',
+			'tasks.prd.newFile' => 'yeni dosya',
+			'tasks.prd.parse' => 'PRD\'yi ayrıştır',
+			'tasks.prd.template' => 'Şablon',
+			'tasks.prd.fileNameHint' => 'dosya adı (ör. prd.txt)',
+			'tasks.prd.saved' => 'PRD kaydedildi',
+			'tasks.prd.tasksGenerated' => 'PRD\'den görevler oluşturuldu',
 			'tasks.statuses.pending' => 'Beklemede',
 			'tasks.statuses.inProgress' => 'Sürüyor',
 			'tasks.statuses.done' => 'Tamamlandı',
 			'tasks.statuses.blocked' => 'Engellendi',
 			'tasks.statuses.deferred' => 'Ertelendi',
 			'tasks.statuses.cancelled' => 'İptal Edildi',
+			'tasks.statuses.review' => 'İnceleme',
 			'tasks.priorities.high' => 'Yüksek',
 			'tasks.priorities.medium' => 'Orta',
 			'tasks.priorities.low' => 'Düşük',
@@ -7530,6 +9129,8 @@ extension on TranslationsTr {
 			'tasks.list.inProgressComplete' => 'Devam ediyor (tamamlamak için tıklayın)',
 			'tasks.list.markCompleted' => 'Tamamlandı olarak işaretle',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => 'Görev ${id} durumunu değiştir',
+			'tasks.list.markDone' => 'Tamamlandı olarak işaretle',
+			'tasks.list.reopen' => 'Yeniden aç',
 			'tasks.nextTask.allComplete' => 'Tüm görevler tamamlandı',
 			'tasks.nextTask.feature1' => '- Bağımlılıklar ve alt görevlerle AI destekli görev yönetimi.',
 			'tasks.nextTask.feature2' => '- Daha hızlı proje başlangıcı için PRD tabanlı görev oluşturma.',
@@ -7547,6 +9148,8 @@ extension on TranslationsTr {
 			'tasks.taskDetail.cancelEdit' => 'Düzenlemeyi iptal et',
 			'tasks.taskDetail.close' => 'Kapat',
 			'tasks.taskDetail.copyTaskId' => 'Görev ID’sini kopyala',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.delete' => 'Görevi sil',
 			'tasks.taskDetail.deleteConfirmDescription' => ({required Object title}) => '"${title}" kalıcı olarak silinecek.',
 			'tasks.taskDetail.deleteConfirmTitle' => 'Görev silinsin mi?',
@@ -7568,6 +9171,11 @@ extension on TranslationsTr {
 			'tasks.taskDetail.testStrategy' => 'Test Stratejisi',
 			'tasks.taskDetail.titleRequired' => 'Başlık gerekli',
 			'tasks.taskDetail.updateFailed' => 'Görev güncellenemedi',
+			'tasks.taskDetail.deleteConfirmMessage' => ({required Object id}) => '#${id} görevi kaldırılacak. Bu işlem geri alınamaz.',
+			'tasks.taskDetail.notFound' => 'Görev bulunamadı',
+			'tasks.taskDetail.subtasks' => 'Alt görevler',
+			'tasks.taskDetail.idCopied' => 'Görev ID kopyalandı',
+			'tasks.toasts.statusInProgress' => ({required Object id}) => 'Görev ${id} devam ediyor olarak ayarlandı',
 			'knowledge.title' => 'Bilgi',
 			'knowledge.tabs.dashboard' => 'Panel',
 			'knowledge.tabs.memories' => 'Anılar',
@@ -7644,6 +9252,383 @@ extension on TranslationsTr {
 			'knowledge.tags.manage' => 'Etiketleri yönet',
 			'knowledge.tags.none' => 'Henüz etiket yok.',
 			'knowledge.settings.description' => 'Ajanlar için yerel bellek katmanı: anılar, kurallar, beceriler ve kişisel bilgiler.',
+			'knowledge.contextBudget.tokens' => ({required Object tokens, required Object budget}) => '~${tokens} / ${budget} tok',
+			'knowledge.critical.make' => 'Kritik yap',
+			'knowledge.critical.makeAll' => 'Tüm kuralları kritik yap',
+			'knowledge.critical.makeAllHint' => 'Bunları enjekte edilen bağlam bütçesine ekler',
+			'knowledge.errors.importFailed' => ({required Object error}) => 'İçe aktarma başarısız: ${error}',
+			'knowledge.errors.migrationFailed' => ({required Object error}) => 'Taşıma başarısız: ${error}',
+			'knowledge.graph.truncated' => 'kısaltıldı',
+			'knowledge.importAll.action' => 'Her şeyi içe aktar',
+			'knowledge.importAll.mergeDuplicates' => 'Yinelenen kayıtları birleştir',
+			'knowledge.importAll.mergeDuplicatesHint' => 'ddagent içindeki yinelenen satırları birleştirir (dosyaları değil)',
+			'knowledge.importAll.projectsScanned' => ({required Object count}) => 'Taranan projeler: ${count}',
+			'knowledge.importAll.rulesSummary' => ({required Object total, required Object duplicates}) => 'Kurallar: ${total} · yinelenen gruplar: ${duplicates}',
+			'knowledge.importAll.skillsFound' => ({required Object found, required Object newSkills}) => 'Bulunan agent becerileri: ${found} (yeni: ${newSkills})',
+			'knowledge.importAll.title' => 'Her şeyi ddagent\'a aktar',
+			'knowledge.importSkills.found' => ({required Object count}) => 'Agentlarınızda ${count} beceri bulundu.',
+			'knowledge.importSkills.summary' => ({required Object imported, required Object skipped}) => 'Yeni: ${imported} · atlanan: ${skipped}',
+			'knowledge.importSkills.title' => 'Agent becerilerini içe aktar',
+			'knowledge.linkOptions.memory' => ({required Object title}) => 'Bellek: ${title}',
+			'knowledge.linkOptions.personal' => ({required Object title}) => 'Kişisel: ${title}',
+			'knowledge.linkOptions.rule' => ({required Object title}) => 'Kural: ${title}',
+			'knowledge.linkOptions.skill' => ({required Object name}) => 'Beceri: ${name}',
+			'knowledge.migrate.duplicates' => ({required Object count}) => 'Projeler arası yinelenen gruplar: ${count}',
+			'knowledge.migrate.mergeDuplicates' => 'Yinelenenleri birleştir',
+			'knowledge.migrate.removedPromoted' => ({required Object removed, required Object promoted}) => 'Kaldırılan: ${removed}, yükseltilen: ${promoted}',
+			'knowledge.migrate.rulesSummary' => ({required Object total, required Object critical}) => 'Kurallar: toplam ${total}, ${critical} kritik.',
+			'knowledge.migrate.scanned' => ({required Object count}) => '${count} proje tarandı.',
+			'knowledge.migrate.title' => 'Mevcut kuralları taşı',
+			'skills.addDialog.chooseFileTitle' => 'SKILL.md seç',
+			'skills.addDialog.chooseFiles' => 'Dosya Seç',
+			'skills.addDialog.chooseFolder' => 'Klasör Seç',
+			'skills.addDialog.chooseFolderTitle' => 'Bir beceri klasörü seçin',
+			'skills.addDialog.folderFilesMeta' => ({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('tr'))(count, one: '${count} dosya · ${size}', other: '${count} dosya · ${size}', ), 
+			'skills.addDialog.folderUploadsNote' => 'Klasör yüklemeleri seçilen klasör adını korur; tek başına dosyalar `SKILL.md` içindeki `name` değerini kullanır.',
+			'skills.addDialog.hideInstallLocation' => 'Kurulum konumunu gizle',
+			'skills.addDialog.installSkill' => 'Beceri Kur',
+			'skills.addDialog.installSkills' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('tr'))(count, one: '${count} Beceri Kur', other: '${count} Beceri Kur', ), 
+			'skills.addDialog.markdownFileMeta' => ({required Object size}) => 'Markdown dosyası · ${size}',
+			'skills.addDialog.pickHint' => 'Klasörler script, referans ve varlık içerebilir.',
+			'skills.addDialog.pickTitle' => 'Bir beceri klasörü veya SKILL.md seçin',
+			'skills.addDialog.readyToInstall' => 'Kuruluma hazır',
+			'skills.addDialog.removeQueued' => ({required Object name}) => '${name} öğesini kaldır',
+			'skills.addDialog.title' => ({required Object provider}) => '${provider} Becerisi Ekle',
+			'skills.addDialog.uploadHint' => 'Bir SKILL.md dosyası veya eksiksiz bir beceri klasörü yükleyin.',
+			'skills.addDialog.whereWillThisInstall' => 'Nereye kurulacak?',
+			'skills.deleteSkill' => ({required Object name}) => '${name} sil',
+			'skills.empty.noGlobalSkills' => 'Henüz genel beceri bulunamadı',
+			'skills.empty.noGlobalSkillsDescription' => 'Her projede kullanılabilir olması için yukarıdan bir genel beceri ekleyin.',
+			'skills.empty.noMatchingSkills' => 'Eşleşen beceri yok',
+			'skills.empty.noMatchingSkillsDescription' => 'Farklı bir komut, ad, kapsam, proje veya kaynak yolu deneyin.',
+			'skills.empty.noProjects' => 'Kullanılabilir proje yok',
+			'skills.empty.noProjectsDescription' => 'Becerilerine göz atmak için bir proje veya çalışma alanı ekleyin.',
+			'skills.empty.noSkillsInProject' => 'Bu projede beceri yok',
+			'skills.empty.noSkillsInProjectDescription' => 'Seçili projede bir .claude/skills, .cursor/skills veya .agents/skills klasörü oluşturun.',
+			'skills.errors.addMarkdownFirst' => 'Önce bir veya daha fazla markdown dosyası ekleyin.',
+			'skills.errors.couldNotReadSkillFile' => ({required Object name}) => '${name} içinden SKILL.md okunamadı.',
+			'skills.errors.dropMarkdownOrFolder' => 'Bir veya daha fazla markdown dosyası ya da SKILL.md içeren bir klasör bırakın.',
+			'skills.errors.folderFileLimit' => ({required Object count}) => 'Bir beceri klasörü en fazla ${count} dosya içerebilir.',
+			'skills.errors.folderReadFailed' => 'Beceri klasörü okunamadı',
+			'skills.errors.folderSizeLimit' => 'Seçilen beceri klasörleri toplamda 30 MB\'den küçük olmalıdır.',
+			'skills.errors.importFailed' => 'Beceriler içe aktarılamadı',
+			'skills.errors.missingSkillFile' => 'Seçilen klasörde SKILL.md dosyası yok.',
+			'skills.moveDialog.moveToGlobal' => 'Genele taşı',
+			'skills.moveDialog.moveToProject' => 'Projeye taşı',
+			'skills.moveDialog.toGlobalHint' => 'Bu beceriyi, her projenin kullanabilmesi için genel beceriler dizinine taşıyın.',
+			'skills.moveDialog.toProjectHint' => 'Bu beceriye sahip olacak projeyi seçin. Beceri, sağlayıcının genel beceriler dizininden taşınır.',
+			'skills.moveSkill' => ({required Object name}) => '${name} öğesini taşı',
+			'skills.projectLabel' => 'Proje',
+			'skills.scopes.admin' => 'Yönetici',
+			'skills.scopes.plugin' => 'Eklenti',
+			'skills.scopes.project' => 'Proje',
+			'skills.scopes.repo' => 'Depo',
+			'skills.scopes.system' => 'Sistem',
+			'skills.scopes.user' => 'Kullanıcı',
+			'skills.screen.addSkill' => 'Beceri Ekle',
+			'skills.screen.clearSearch' => 'Beceri aramasını temizle',
+			'skills.screen.deleteDescription' => ({required Object directory, required Object provider}) => 'Bu, ${directory} dizinini ${provider} tarafından yönetilen beceriler dizininden kaldırır. Bu işlem geri alınamaz.',
+			'skills.screen.deleteTitle' => ({required Object name}) => '${name} silinsin mi?',
+			'skills.screen.loadingSkills' => ({required Object provider}) => '${provider} becerileri yükleniyor…',
+			'skills.screen.manageDescription' => ({required Object provider}) => '${provider} becerilerini yerel dosyalardan, eksiksiz klasörlerden ve proje bazlı konumlardan yönetin.',
+			'skills.screen.noDescription' => 'Beceri front matter bölümünde açıklama belirtilmemiş.',
+			'skills.screen.pluginBadge' => ({required Object name}) => 'Eklenti: ${name}',
+			'skills.screen.projectBadge' => ({required Object name}) => 'Proje: ${name}',
+			'skills.screen.savedSuccessfully' => 'Beceriler başarıyla kaydedildi.',
+			'skills.screen.scanningProjectSkills' => 'Proje becerileri taranıyor...',
+			'skills.screen.searchHint' => 'Beceri ara...',
+			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('tr'))(count, one: '${count} BECERİ', other: '${count} BECERİ', ), 
+			'skills.screen.sourceLabel' => 'KAYNAK',
+			'mcp.form.fields.bearerTokenEnvVar' => 'Bearer Token Ortam Değişkeni',
+			'mcp.form.fields.envVarNames' => 'Ortam Değişkeni Adları',
+			'mcp.form.fields.workingDirectory' => 'Çalışma Dizini',
+			'mcp.form.scope.claudeLocal' => 'Claude Yerel',
+			'mcp.form.scope.description.local' => 'Seçili proje için Claude kullanıcı ayarlarında saklanır',
+			'mcp.form.scope.description.project' => 'Seçili proje çalışma alanında saklanır',
+			'mcp.form.scope.description.projectGlobal' => 'Her sağlayıcı için seçili proje çalışma alanına yazar',
+			'mcp.form.scope.description.user' => 'Makinenizdeki tüm projelerde kullanılabilir',
+			'mcp.form.scope.description.userGlobal' => 'Her sağlayıcının kullanıcı yapılandırmasına yazar ve bu makinedeki projelerde kullanılabilir',
+			'mcp.form.scope.projectAllProviders' => 'Proje (Tüm Sağlayıcılar)',
+			'mcp.form.scope.userAllProviders' => 'Kullanıcı (Tüm Sağlayıcılar)',
+			'mcp.form.submitTo' => ({required Object provider}) => 'Sunucuyu ${provider} için ekle',
+			'mcp.form.validation.unsupportedGlobal' => ({required Object type}) => 'MCP Sunucusu Ekle, tüm sağlayıcılarda yalnızca stdio ve http destekler; ${type} desteklemez.',
+			'mcp.form.validation.unsupportedProvider' => ({required Object provider, required Object type}) => '${provider}, ${type} MCP sunucularını desteklemiyor',
+			'mcp.install.button' => 'Kur',
+			'mcp.install.cardDescription' => 'Agentlarınıza MCP üzerinden bilgi tabanını ve ddagent araçlarını verin — agentları seçin veya tümü için kurun.',
+			'mcp.install.description' => 'Seçili agentların MCP üzerinden ddagent bilgi tabanını ve araçlarını kullanmasını sağlar.',
+			'mcp.install.errorFallback' => 'hata',
+			'mcp.install.failed' => ({required Object error}) => 'Kurulum başarısız: ${error}',
+			'mcp.install.installForAll' => 'Tümü için kur',
+			'mcp.install.installSelected' => 'Seçilenler için kur',
+			'mcp.install.installedCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('tr'))(count, one: '${count} agenta kuruldu.', other: '${count} agenta kuruldu.', ), 
+			'mcp.install.partialFailure' => ({required Object count, required Object failed}) => '${count} agenta kuruldu; başarısız: ${failed}',
+			'mcp.install.title' => 'ddagent MCP sunucusunu kur',
+			'mcp.servers.addGlobalDescription' => 'Bu MCP sunucusunu tüm sağlayıcılara ekler: Claude, Cursor, Codex, OpenCode ve Devin. Aynı yapılandırmanın tüm sağlayıcılarda çalışması gerektiğinden yalnızca stdio ve HTTP taşımaları desteklenir.',
+			'mcp.servers.addGlobalMenuDescription' => 'Genel MCP Sunucusu Ekle, Claude, Cursor, Codex, OpenCode ve Devin için ortak bir stdio veya HTTP sunucusu yazar.',
+			'mcp.servers.addGlobalTitle' => 'Genel MCP Sunucusu Ekle',
+			'mcp.servers.addProviderDescription' => ({required Object provider}) => '${provider} MCP Sunucusu Ekle yalnızca ${provider} yapılandırmasını değiştirir.',
+			'mcp.servers.addProviderTitle' => ({required Object provider}) => '${provider} MCP Sunucusu Ekle',
+			'mcp.servers.config.cwd' => 'Çalışma Dizini',
+			'mcp.servers.config.envVars' => 'Ortam Değişkenleri',
+			'mcp.servers.descriptionGeneric' => ({required Object provider}) => 'Model Context Protocol sunucuları ${provider} için ek araçlar ve veri kaynakları sağlar',
+			'mcp.servers.loading' => 'MCP sunucuları yükleniyor...',
+			'mcp.servers.refreshingScopes' => 'Proje kapsamları yenileniyor...',
+			'mcp.team.cta' => 'ddagent Pro ile kullanılabilir',
+			'mcp.team.description' => 'MCP sunucu yapılandırmalarını takımınızla paylaşın. Herkes otomatik olarak senkron kalır.',
+			'mcp.team.title' => 'Takım MCP Yapılandırmaları',
+			'mcp.tokens.scopeWrite' => 'Yazma',
+			'terminal.actions.clearOutput' => 'Çıktıyı Temizle',
+			'terminal.actions.connect' => 'Bağlan',
+			'terminal.actions.newShell' => 'Yeni Shell',
+			'terminal.actions.newTab' => 'Yeni Terminal Sekmesi',
+			'terminal.actions.providerLogin' => 'Sağlayıcı Girişi',
+			'terminal.actions.restartSession' => 'Oturumu Yeniden Başlat',
+			'terminal.authUrl.openInBrowser' => 'Tarayıcıda aç',
+			'terminal.errors.couldNotOpenLink' => ({required Object url}) => 'Bağlantı açılamadı: ${url}',
+			'terminal.fileLink.detected' => ({required Object path}) => 'Dosya algılandı: ${path}',
+			'terminal.paste.hint' => 'Ctrl+V / sağ tık → Yapıştır',
+			'terminal.paste.title' => 'Terminale yapıştır',
+			'terminal.shortcuts.eof' => 'EOF',
+			'terminal.shortcuts.hide' => 'Kısayol çubuğunu gizle',
+			'terminal.shortcuts.interrupt' => 'Kes (SIGINT)',
+			'terminal.shortcuts.suspend' => 'Askıya al (SIGTSTP)',
+			'terminal.shortcuts.showTooltip' => 'Kısayolları göster',
+			'terminal.shortcuts.hideTooltip' => 'Kısayolları gizle',
+			'terminal.tabs.antigravityCli' => 'Antigravity CLI',
+			'terminal.tabs.claudeCli' => 'Claude CLI',
+			'terminal.tabs.commandCodeCli' => 'Command Code CLI',
+			'terminal.tabs.cursorCli' => 'Cursor CLI',
+			'terminal.tabs.devinCli' => 'Devin CLI',
+			'terminal.tabs.loginTitle' => ({required Object provider}) => 'Giriş: ${provider}',
+			'terminal.tabs.opencodeCli' => 'OpenCode CLI',
+			'terminal.tabs.plainShell' => 'Basit Shell',
+			'terminal.tabs.shellName' => ({required Object index}) => 'Shell ${index}',
+			'worktrees.branchHint' => 'Yeni dal adı (örn. feature/login)',
+			'worktrees.branchingOff' => ({required Object branch}) => '${branch} dalından ayrılıyor',
+			'worktrees.cleanupDescription' => 'Birleştirildikten sonra worktree\'yi kaldır ve dalı sil',
+			'worktrees.created' => 'Worktree oluşturuldu',
+			'worktrees.deleteBranchLabel' => 'Dalı da sil',
+			'worktrees.dirtyWarning' => ({required Object count}) => 'Uyarı: Bu worktree\'de kaybolacak ${count} commit edilmemiş değişiklik var.',
+			'worktrees.emptyDescription' => 'Özellik çalışmalarını veya agent çalıştırmalarını yalıtmak için bir worktree oluşturun.',
+			'worktrees.emptyTitle' => 'Worktree bulunamadı',
+			'worktrees.forceRemoveLabel' => 'Zorla kaldır (değişikliklerden vazgeç)',
+			'worktrees.headDetachedAt' => ({required Object sha}) => 'HEAD ${sha} konumunda ayrık',
+			'worktrees.mainBadge' => 'main',
+			'worktrees.mergeDescription' => ({required Object branch}) => 'Değişiklikleri ${branch} dalına birleştir.',
+			'worktrees.mergeTitle' => ({required Object branch}) => '${branch} dalını birleştir',
+			'worktrees.merged' => ({required Object branch}) => 'Worktree ${branch} dalına birleştirildi',
+			'worktrees.opened' => ({required Object branch}) => 'Worktree açıldı: ${branch}',
+			'worktrees.portHint' => 'Çalıştırma portu (isteğe bağlı, örn. 3000)',
+			'worktrees.removeDescription' => 'Bu, worktree klasörünü siler. Bağlı projeler arşivlenecek.',
+			'worktrees.removeTitle' => ({required Object branch}) => '${branch} worktree\'si kaldırılsın mı?',
+			'worktrees.removed' => 'Worktree kaldırıldı',
+			'worktrees.runButton' => 'Çalıştır',
+			'worktrees.runHint' => 'Çalıştırma komutu (örn. npm run dev)',
+			'worktrees.runRunning' => 'çalışıyor',
+			'worktrees.runRunningWithPort' => ({required Object port}) => 'çalışıyor :${port}',
+			'worktrees.scripts' => 'Scriptler',
+			'worktrees.scriptsSaved' => 'Script yapılandırması kaydedildi',
+			'worktrees.serverLabel' => 'Sunucu: ',
+			'worktrees.setupHint' => 'Kurulum komutu (örn. npm install)',
+			'worktrees.setupLabel' => 'Kurulum: ',
+			'worktrees.squashDescription' => 'Tüm commitleri tek bir committe birleştir',
+			'worktrees.stopButton' => 'Durdur',
+			'quota.agents.statusCount' => ({required Object status, required Object count}) => '${status} (${count})',
+			'quota.chart.hide' => 'Gizle',
+			'quota.chart.noData' => 'Eğilim için yeterli veri yok.',
+			'quota.chart.pointReadout' => ({required Object date, required Object tokens, required Object cost}) => '${date} · ${tokens} token · ${cost}',
+			'quota.chart.show' => 'Göster',
+			'quota.config.accountRouting' => 'Hesap yönlendirme',
+			'quota.config.pollerTitle' => 'Sorgulama ve uyarılar',
+			'quota.config.save' => 'Yapılandırmayı kaydet',
+			'quota.overview.tokensAndCost' => 'Tokenlar ve maliyet',
+			'quota.section.config' => 'Yapılandırma',
+			'scheduler.checking' => 'Kontrol ediliyor…',
+			'scheduler.cronHint' => 'Cron (dakika saat gün ay haftanın günü) — örn. 0 9 * * *',
+			'scheduler.deleteMessage' => ({required Object id}) => 'Bu, ${id} yinelenen görevini kaldırır. Mevcut oturumlar korunur.',
+			'scheduler.deleteTitle' => 'Zamanlama silinsin mi?',
+			'scheduler.editTitle' => 'Zamanlamayı düzenle',
+			'scheduler.newLabel' => 'Yeni',
+			'scheduler.nextIn' => ({required Object time}) => '${time} sonra',
+			'scheduler.promptHint' => 'Agent için prompt',
+			'scheduler.runs' => 'Çalıştırmalar',
+			'scheduler.session' => ({required Object id}) => 'oturum ${id}',
+			'scheduler.worktree' => 'worktree',
+			'notifications.deviceLabel' => 'ddagent Flutter',
+			'notifications.errors.noResponse' => 'Sunucudan yanıt yok',
+			'notifications.errors.registrationRejected' => 'Kayıt sunucu tarafından reddedildi',
+			'serverConnect.connect' => 'Bağlan',
+			'serverConnect.connecting' => 'Bağlanılıyor…',
+			'serverConnect.connectionFailed' => ({required Object error}) => 'Bağlantı başarısız (${error})',
+			'serverConnect.enterUrl' => 'Bir sunucu URL\'si girin',
+			'serverConnect.subtitle' => 'ddagent sunucunuza bağlanın',
+			'voice.apiKeySaved' => 'API Anahtarı (kayıtlı, değiştirmek için girin)',
+			'voice.preview' => 'Önizle',
+			'voice.saveFailed' => 'STT yapılandırması kaydedilemedi',
+			'voice.settingsSaved' => 'Sesli giriş ayarları kaydedildi',
+			'preview.embeddedWebOnly' => 'Gömülü önizleme yalnızca web sürümünde kullanılabilir',
+			'preview.startDevServerHint' => 'Bir geliştirme sunucusu başlatın (npm run dev, flutter run -d web-server…)\nve portu burada görünecek.',
+			'sharedContext.title' => 'Paylaşılan Notlar',
+			'collab.copyToken' => 'Token\'ı kopyala',
+			'collab.createInvite' => 'Davet oluştur',
+			'collab.invite' => 'Davet et',
+			'collab.inviteTeammate' => 'Takım arkadaşını davet et',
+			'collab.roles.member' => 'Üye',
+			'collab.roles.viewer' => 'Görüntüleyici',
+			'collab.shareTokenHint' => 'Bu davet token\'ını paylaşın — yalnızca bir kez gösterilir ve 72 saat içinde sona erer:',
+			'collab.team' => 'Takım',
+			'browser.dialogTitle' => 'Agent Tarayıcısı',
+			'browser.viewError' => 'Tarayıcı görünümü hatası',
+			'browser.web' => 'Web',
+			'projects.archive' => 'Arşivle',
+			'projects.archivedSection' => ({required Object count}) => 'Arşivlenenler (${count})',
+			'projects.clone' => 'Klonla',
+			'projects.cloneFailed' => 'Klonlama başarısız',
+			'projects.cloneFinished' => 'Klonlama tamamlandı. Proje listesi yenileniyor…',
+			'projects.cloneRepository' => 'Depoyu klonla',
+			'projects.deletePermanently' => 'Kalıcı olarak sil',
+			'projects.deleteProjectMessage' => ({required Object name}) => '"${name}" öğesini tüm oturumları ve saklanan geçmişiyle (JSONL silme) kalıcı olarak kaldırır. Bu işlem geri alınamaz.',
+			'projects.deleteProjectTitle' => 'Proje silinsin mi?',
+			'projects.destinationPath' => 'Hedef yol',
+			'projects.destinationPathRequired' => 'Hedef yol gerekli',
+			'projects.displayNameOptional' => 'Görünen ad (isteğe bağlı)',
+			'projects.failedToLoadTokens' => 'GitHub token\'ları yüklenemedi',
+			'projects.githubTokenOptional' => 'GitHub token\'ı (isteğe bağlı)',
+			'projects.newer' => 'Daha yeni',
+			'projects.older' => 'Daha eski',
+			'projects.projectArchived' => 'Proje arşivlendi',
+			'projects.projectDeleted' => 'Proje silindi',
+			'projects.projectRenamed' => 'Proje yeniden adlandırıldı',
+			'projects.projectRestored' => 'Proje geri yüklendi',
+			'projects.repoUrlPlaceholder' => 'https://github.com/org/repo.git',
+			'projects.repositoryCloned' => 'Depo klonlandı',
+			'projects.repositoryUrlRequired' => 'Depo URL\'si gerekli',
+			'projects.restore' => 'Geri yükle',
+			'projects.sessionCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('tr'))(count, one: '${count} oturum', other: '${count} oturum', ), 
+			'projects.unknown' => 'Bilinmiyor',
+			'projects.usingStoredToken' => ({required Object name}) => 'Kayıtlı token kullanılıyor: ${name}',
+			'sessions.activity.committingChanges' => 'Değişiklikler commit ediliyor',
+			'sessions.activity.editingFile' => ({required Object file}) => '${file} düzenleniyor',
+			'sessions.activity.editingFileGeneric' => 'Bir dosya düzenleniyor',
+			'sessions.activity.fetchingUrl' => ({required Object url}) => '${url} getiriliyor',
+			'sessions.activity.pushingBranch' => 'Dal gönderiliyor',
+			'sessions.activity.readingFile' => ({required Object file}) => '${file} okunuyor',
+			'sessions.activity.runningCommand' => ({required Object command}) => '`${command}` çalıştırılıyor',
+			'sessions.activity.runningShellCommand' => 'Bir shell komutu çalıştırılıyor',
+			'sessions.activity.runningTool' => ({required Object name}) => '${name} çalıştırılıyor',
+			'sessions.activity.searching' => ({required Object query}) => '“${query}” aranıyor',
+			'sessions.activity.subagentRunning' => 'Alt agent çalışıyor',
+			'sessions.age.days' => ({required Object days}) => '${days}g',
+			'sessions.age.hours' => ({required Object hours}) => '${hours}sa',
+			'sessions.age.lessThanMinute' => '<1dk',
+			'sessions.age.minutes' => ({required Object count}) => '${count}dk',
+			'sessions.archive' => 'Arşivle',
+			'sessions.archivedSessions' => 'Arşivlenmiş oturumlar',
+			'sessions.autoOrchestrator' => 'Otomatik (düzenleyici)',
+			'sessions.compareWith' => 'Şununla karşılaştır…',
+			'sessions.createFailed' => ({required Object error}) => 'Oturum oluşturulamadı: ${error}',
+			'sessions.deleteSessionMessage' => ({required Object name}) => '"${name}" öğesini ve transkriptini kaldırır. Bu işlem geri alınamaz.',
+			'sessions.newSessionProvider' => 'Yeni oturum — sağlayıcı',
+			'sessions.noRecentSessions' => 'Yakın zamanda oturum yok',
+			'sessions.noSessions' => 'Oturum yok',
+			'sessions.projectPath' => 'Proje yolu',
+			'sessions.rename' => 'Yeniden adlandır',
+			'sessions.toasts.archived' => 'Oturum arşivlendi',
+			'sessions.toasts.deleted' => 'Oturum silindi',
+			'sessions.toasts.pinned' => 'Oturum sabitlendi',
+			'sessions.toasts.renamed' => 'Oturum yeniden adlandırıldı',
+			'sessions.toasts.restored' => 'Oturum geri yüklendi',
+			'sessions.toasts.unpinned' => 'Oturum sabitlemesi kaldırıldı',
+			'sessions.toasts.workspaceChanged' => 'Çalışma alanı değiştirildi',
+			'git.aiButton' => '✦ AI',
+			'git.checkpoints.create' => 'Yeni',
+			'git.checkpoints.empty' => 'Henüz kontrol noktası yok',
+			'git.checkpoints.labelHint' => 'Kontrol noktası etiketi (isteğe bağlı)',
+			'git.checkpoints.restoreMessage' => 'Çalışma ağacı bu kontrol noktasına sıfırlansın mı? Mevcut değişiklikler değiştirilecek.',
+			'git.checkpoints.restoreTitle' => 'Kontrol noktasını geri yükle',
+			'git.checkpoints.restored' => 'Kontrol noktası geri yüklendi',
+			'git.checkpoints.title' => 'Kontrol Noktaları',
+			'git.commitCreated' => 'Commit oluşturuldu',
+			'git.commitMessage' => 'Commit mesajı',
+			'git.deleteFile' => 'Dosyayı sil',
+			'git.hunkStage' => '+ Parça',
+			'git.hunkUnstage' => '− Parça',
+			'git.largeDiff' => 'Büyük diff önizlemesi: sekmeyi yanıt vermeye devam ettirmek için görüntüleme sınırlandırılır.',
+			'git.loadDiffFailed' => ({required Object error}) => 'Diff yüklenemedi: ${error}',
+			'git.noBranch' => 'dal yok',
+			'git.noDiff' => 'Diff yok',
+			'git.selectProject' => 'Bir proje seçin',
+			'git.splitDiff' => 'Diff\'i böl',
+			'git.stageHunk' => 'Parçayı hazırla',
+			'git.stagedChanges' => 'Hazırlanan Değişiklikler',
+			'git.statusStaged' => 'Hazırlandı',
+			'git.switchBranch' => 'Dal değiştir',
+			'git.unifiedDiff' => 'Birleşik diff',
+			'git.unstageHunk' => 'Parçanın hazırlığını geri al',
+			'kanban.card.untitled' => 'Adsız',
+			'kanban.comments.add' => 'Yorum ekle',
+			'kanban.comments.empty' => 'Henüz yorum yok',
+			'kanban.details.status' => ({required Object status}) => 'Durum: ${status}',
+			'kanban.details.title' => 'Kart Ayrıntıları',
+			'kanban.dialog.saving' => 'Kaydediliyor…',
+			'kanban.empty.noProject' => 'Proje seçilmedi',
+			'kanban.saveFailed' => 'Kart kaydedilemedi',
+			'kanban.time.daysAgo' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('tr'))(count, one: '1 gün önce', other: '${count} gün önce', ), 
+			'kanban.time.hoursAgo' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('tr'))(count, one: '1 saat önce', other: '${count} saat önce', ), 
+			'kanban.time.minutesAgo' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('tr'))(count, one: '1 dakika önce', other: '${count} dakika önce', ), 
+			'kanban.time.now' => 'şimdi',
+			'onboarding.agents.description' => 'Bir veya daha fazla AI kodlama asistanına giriş yapın. Tümü isteğe bağlıdır.',
+			'onboarding.agents.laterHint' => 'Bunları daha sonra Ayarlar\'dan yapılandırabilirsiniz.',
+			'onboarding.agents.title' => 'AI Agentlarınızı Bağlayın',
+			'onboarding.completeSetup' => 'Kurulumu Tamamla',
+			'onboarding.errors.invalidEmail' => 'Lütfen geçerli bir e-posta adresi girin.',
+			'onboarding.errors.nameAndEmailRequired' => 'Hem git adı hem de e-posta gerekli.',
+			'onboarding.gitHint' => 'ddagent oturumlarının oluşturduğu commit\'ler için kullanılır.',
+			'onboarding.mcp.description' => 'Agentlarınızın bilgi tabanını ve ddagent araçlarını kullanabilmesi için ddagent MCP sunucusunu kurun. Agentları seçin veya tümü için kurun.',
+			'onboarding.mcp.installForAll' => 'Tümü için kur',
+			'onboarding.mcp.installSelected' => 'Seçilenler için kur',
+			'onboarding.mcp.installedOn' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('tr'))(count, one: '${count} agenta kuruldu.', other: '${count} agenta kuruldu.', ), 
+			'onboarding.mcp.installedWithFailures' => ({required Object installedCount, required Object failed}) => '${installedCount} agenta kuruldu; başarısız: ${failed}',
+			'onboarding.mcp.laterHint' => 'İsteğe bağlı — bunu daha sonra Ayarlar → MCP bölümünden de kurabilirsiniz.',
+			'onboarding.mcp.title' => 'Agentları ddagent\'a bağlayın',
+			'fileTree.browseServerFilesystem' => 'Sunucu dosya sistemine göz at',
+			'fileTree.chooseFolder' => 'Klasör seç',
+			'fileTree.copyContents' => 'İçeriği kopyala',
+			'fileTree.noFiles' => 'Dosya yok',
+			'fileTree.search.hint' => 'Adları filtreleyin / içerikte aramak için Enter\'a basın',
+			'fileTree.search.noMatches' => 'Eşleşme yok',
+			'fileTree.search.prompt' => 'Bir sorgu yazın ve Enter\'a basın',
+			'fileTree.search.resultsTruncated' => 'Sonuçlar kısaltıldı',
+			'fileTree.titles.delete' => ({required Object name}) => '${name} sil',
+			'fileTree.titles.download' => ({required Object name}) => '${name} indir',
+			'fileTree.titles.rename' => ({required Object name}) => '${name} öğesini yeniden adlandır',
+			'fileTree.uploadHere' => 'Buraya yükle',
+			'fileTree.uploadTo' => 'Şuraya yükle',
+			'fileTree.uploadedCount' => ({required Object count}) => '${count} dosya yüklendi',
+			'fileTree.newName' => 'Yeni ad',
+			'fileTree.notRegisteredProject' => ({required Object path}) => 'Kayıtlı bir proje değil: ${path}',
+			'fileTree.showGitignoredFiles' => 'Git tarafından yok sayılan dosyaları göster',
+			'fileTree.hideGitignoredFiles' => 'Git tarafından yok sayılan dosyaları gizle',
+			'fileTree.downloadUnsupportedOnWeb' => 'Web\'de indirme desteklenmiyor',
+			'fileTree.saveToPath' => 'Yola kaydet',
+			'fileTree.savedTo' => ({required Object path}) => 'Şuraya kaydedildi: ${path}',
+			'workspace.archivedWorkspaceName' => 'Arşivlenmiş',
+			'workspace.closePane' => 'Bölmeyi kapat',
+			'workspace.closeSearch' => 'Aramayı kapat',
+			'workspace.deleteSessionNotice' => 'Oturumu ve transkriptini kaldırır. Geri alınamaz.',
+			'workspace.exportChat' => 'Sohbeti dışa aktar',
+			'workspace.jumpToSession' => 'Oturuma git…',
+			'workspace.newChatProvider' => 'Yeni sohbet — sağlayıcı',
+			'workspace.nextMatch' => 'Sonraki eşleşme',
+			'workspace.previousMatch' => 'Önceki eşleşme',
+			'workspace.searchTranscript' => 'Transkriptte ara',
+			'workspace.sendTo' => ({required Object count}) => '${count} oturuma gönder',
+			'workspace.accountWithLabel' => ({required Object label}) => 'Varsayılan · ${label}',
+			'workspace.finishRunBeforeChangingWorkspace' => 'Çalışma alanını değiştirmeden önce çalıştırmayı bitir',
+			'workspace.restored' => 'Çalışma alanı geri yüklendi',
+			'workspace.maximizePane' => 'Bölmeyi büyüt',
+			'workspace.restorePanes' => 'Bölmeleri geri yükle',
+			'workspace.reviewChangedFiles' => 'Değişen dosyaları incele',
 			_ => null,
 		};
 	}

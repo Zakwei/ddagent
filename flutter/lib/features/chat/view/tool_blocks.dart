@@ -6,6 +6,7 @@ import 'package:ddagent_app/core/utils/clipboard.dart';
 import 'package:ddagent_app/core/widgets/app_markdown.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
 import 'package:ddagent_app/features/settings/state/ui_preferences_controller.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -481,8 +482,8 @@ class ToolUseTile extends StatelessWidget {
     if (_subagentTools.contains(n)) {
       return _subagent(context, cs, input);
     }
-    if (_todoWriteTools.contains(n)) return _todoWrite(input);
-    if (_todoReadTools.contains(n)) return _todoRead();
+    if (_todoWriteTools.contains(n)) return _todoWrite(context, input);
+    if (_todoReadTools.contains(n)) return _todoRead(context);
     if (_taskWriteTools.contains(n)) return _taskWrite(n, input);
     if (_taskListTools.contains(n)) return _taskList(n, input);
     if (_fileTools.contains(n)) return _fileTool(context, cs, n, input);
@@ -515,13 +516,14 @@ class ToolUseTile extends StatelessWidget {
   }
 
   /// TodoWrite — collapsible "Updating todo list" + TodoListContent.
-  Widget _todoWrite(Map<String, dynamic> input) {
+  Widget _todoWrite(BuildContext context, Map<String, dynamic> input) {
+    final t = Translations.of(context);
     final todos = input['todos'];
     final list = todos is List ? todos : const <dynamic>[];
     return _ToolRow(
       message: message,
       glyph: '☰',
-      label: 'Updating todo list',
+      label: t.chat.tools.updatingTodo,
       extras: [
         if (list.isNotEmpty) TodoListView(todos: list),
         if (toolStatusFor(message) == ToolStatus.completed) const _SuccessLine('Todo list updated'),
@@ -530,7 +532,8 @@ class ToolUseTile extends StatelessWidget {
   }
 
   /// TodoRead — one-line input; the result content is a JSON todos array.
-  Widget _todoRead() {
+  Widget _todoRead(BuildContext context) {
+    final t = Translations.of(context);
     final content = _resultText();
     List<dynamic> todos = const [];
     if (content.trimLeft().startsWith('[')) {
@@ -544,7 +547,7 @@ class ToolUseTile extends StatelessWidget {
     return _ToolRow(
       message: message,
       glyph: ocToolGlyph('read'),
-      label: 'TodoRead reading list',
+      label: t.chat.tools.todoReadLabel,
       extras: [if (todos.isNotEmpty) TodoListView(todos: todos, isResult: true)],
       output: todos.isNotEmpty ? '' : content,
     );
@@ -1051,6 +1054,7 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     final cs = Theme.of(context).colorScheme;
     final qs = _questions;
     if (qs.isEmpty) return const SizedBox.shrink();
@@ -1151,12 +1155,15 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
           Row(
             children: [
               if (_step > 0)
-                TextButton(onPressed: () => setState(() => _step--), child: const Text('Back')),
+                TextButton(
+                  onPressed: () => setState(() => _step--),
+                  child: Text(t.common.navigation.back),
+                ),
               const Spacer(),
               TextButton(
                 onPressed: () =>
                     widget.onDecision(true, {...widget.input, 'answers': <String, dynamic>{}}),
-                child: const Text('Skip'),
+                child: Text(t.chat.askUserQuestion.skip),
               ),
               const SizedBox(width: 8),
               FilledButton(
@@ -1173,6 +1180,7 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
   }
 
   Widget _otherField(ColorScheme cs, Set<String> selected) {
+    final t = Translations.of(context);
     final active = _otherActive[_step] == true;
     if (!active) {
       return Padding(
@@ -1187,7 +1195,7 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
             children: [
               const Icon(Icons.radio_button_off, size: 18),
               const SizedBox(width: 6),
-              Text('Other…', style: TextStyle(fontSize: 13, color: cs.outline)),
+              Text(t.chat.askUserQuestion.other, style: TextStyle(fontSize: 13, color: cs.outline)),
             ],
           ),
         ),
@@ -1199,10 +1207,10 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
         controller: _otherText[_step],
         autofocus: true,
         style: const TextStyle(fontSize: 13),
-        decoration: const InputDecoration(
+        decoration: InputDecoration(
           isDense: true,
-          hintText: 'Type your answer…',
-          border: OutlineInputBorder(),
+          hintText: t.chat.askUserQuestion.answerHint,
+          border: const OutlineInputBorder(),
         ),
       ),
     );

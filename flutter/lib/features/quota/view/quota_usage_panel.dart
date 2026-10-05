@@ -3,6 +3,7 @@ import 'package:ddagent_app/features/quota/data/quota_models.dart';
 import 'package:ddagent_app/features/quota/state/quota_controller.dart';
 import 'package:ddagent_app/features/quota/view/quota_charts.dart';
 import 'package:ddagent_app/features/quota/view/quota_tone.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -18,6 +19,7 @@ class QuotaUsagePanel extends ConsumerWidget {
     final summary = state.summary;
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
 
     return ListView(
       padding: const EdgeInsets.all(AppSpacing.sm),
@@ -26,8 +28,8 @@ class QuotaUsagePanel extends ConsumerWidget {
           spacing: AppSpacing.sm,
           runSpacing: AppSpacing.xs,
           children: [
-            _pills(usagePeriods, state.period, ctrl.setPeriod),
-            _pills(usageGroupBys, state.groupBy, ctrl.setGroupBy),
+            _pills(i18n, usagePeriods, state.period, ctrl.setPeriod),
+            _pills(i18n, usageGroupBys, state.groupBy, ctrl.setGroupBy),
             if (state.loading)
               const SizedBox(
                 width: 14,
@@ -46,10 +48,13 @@ class QuotaUsagePanel extends ConsumerWidget {
           spacing: AppSpacing.sm,
           runSpacing: AppSpacing.xs,
           children: [
-            _metric('Tokens', formatTokens(summary?.totals.tokensTotal ?? 0)),
-            _metric('Cost', formatCost(summary?.totals.costUsd ?? 0)),
-            _metric('API calls', '${summary?.totals.apiCalls ?? 0}'),
-            _metric('Sessions', '${summary?.totals.sessions ?? 0}'),
+            _metric(
+              i18n.common.quota.metric.tokens,
+              formatTokens(summary?.totals.tokensTotal ?? 0),
+            ),
+            _metric(i18n.common.quota.metric.cost, formatCost(summary?.totals.costUsd ?? 0)),
+            _metric(i18n.common.quota.metric.calls, '${summary?.totals.apiCalls ?? 0}'),
+            _metric(i18n.common.quota.metric.sessions, '${summary?.totals.sessions ?? 0}'),
           ],
         ),
         const SizedBox(height: AppSpacing.sm),
@@ -59,7 +64,7 @@ class QuotaUsagePanel extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Daily trend', style: t.titleSmall),
+                Text(i18n.common.quota.usage.trendTitle, style: t.titleSmall),
                 const SizedBox(height: AppSpacing.sm),
                 QuotaTrendChart(trend: summary?.trend ?? const []),
               ],
@@ -73,7 +78,10 @@ class QuotaUsagePanel extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Breakdown by ${state.groupBy}', style: t.titleSmall),
+                Text(
+                  i18n.common.quota.usage.breakdownTitle(group: _label(i18n, state.groupBy)),
+                  style: t.titleSmall,
+                ),
                 const SizedBox(height: AppSpacing.sm),
                 if (state.loading && summary == null)
                   const Center(child: CircularProgressIndicator())
@@ -86,7 +94,7 @@ class QuotaUsagePanel extends ConsumerWidget {
                   Padding(
                     padding: const EdgeInsets.only(top: AppSpacing.xs),
                     child: Text(
-                      'Analytics store unavailable; showing no data.',
+                      i18n.common.quota.usage.sourceUnavailable,
                       style: t.labelSmall?.copyWith(color: c.mutedForeground),
                     ),
                   ),
@@ -98,14 +106,32 @@ class QuotaUsagePanel extends ConsumerWidget {
     );
   }
 
-  Widget _pills(List<String> values, String current, void Function(String) onTap) {
+  /// Localized label for a period / group-by id (`24h`, `provider`, …).
+  static String _label(Translations i18n, String value) => switch (value) {
+    '24h' => i18n.common.quota.period.k24h,
+    '7d' => i18n.common.quota.period.k7d,
+    '30d' => i18n.common.quota.period.k30d,
+    'all' => i18n.common.quota.period.all,
+    'provider' => i18n.common.quota.group.provider,
+    'model' => i18n.common.quota.group.model,
+    'agent' => i18n.common.quota.group.agent,
+    'tool' => i18n.common.quota.group.tool,
+    _ => value,
+  };
+
+  Widget _pills(
+    Translations i18n,
+    List<String> values,
+    String current,
+    void Function(String) onTap,
+  ) {
     return Builder(
       builder: (context) => Wrap(
         spacing: 4,
         children: [
           for (final v in values)
             ChoiceChip(
-              label: Text(v),
+              label: Text(_label(i18n, v)),
               selected: v == current,
               onSelected: (_) => onTap(v),
               visualDensity: VisualDensity.compact,
@@ -148,6 +174,7 @@ class QuotaUsagePanel extends ConsumerWidget {
     return Builder(
       builder: (context) {
         final t = Theme.of(context).textTheme;
+        final i18n = Translations.of(context);
         final muted = t.bodySmall?.copyWith(color: context.appColors.mutedForeground);
         Text right(Object v, {bool strong = false}) => Text(
           '$v',
@@ -160,13 +187,13 @@ class QuotaUsagePanel extends ConsumerWidget {
           dataRowMinHeight: 28,
           dataRowMaxHeight: 34,
           columns: [
-            DataColumn(label: Text('Name', style: muted)),
-            DataColumn(label: right('Input'), numeric: true),
-            DataColumn(label: right('Output'), numeric: true),
-            DataColumn(label: right('Cache read'), numeric: true),
-            DataColumn(label: right('Tokens'), numeric: true),
-            DataColumn(label: right('Calls'), numeric: true),
-            DataColumn(label: right('Cost'), numeric: true),
+            DataColumn(label: Text(i18n.common.quota.usage.colName, style: muted)),
+            DataColumn(label: right(i18n.common.quota.metric.input), numeric: true),
+            DataColumn(label: right(i18n.common.quota.metric.output), numeric: true),
+            DataColumn(label: right(i18n.common.quota.metric.cache), numeric: true),
+            DataColumn(label: right(i18n.common.quota.metric.tokens), numeric: true),
+            DataColumn(label: right(i18n.common.quota.metric.calls), numeric: true),
+            DataColumn(label: right(i18n.common.quota.metric.cost), numeric: true),
           ],
           rows: [
             for (final b in buckets)

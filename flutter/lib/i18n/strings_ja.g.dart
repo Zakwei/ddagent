@@ -47,6 +47,26 @@ class TranslationsJa extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final Translations$sidebar$ja sidebar = Translations$sidebar$ja._(_root);
 	@override late final Translations$tasks$ja tasks = Translations$tasks$ja._(_root);
 	@override late final Translations$knowledge$ja knowledge = Translations$knowledge$ja._(_root);
+	@override late final Translations$skills$ja skills = Translations$skills$ja._(_root);
+	@override late final Translations$mcp$ja mcp = Translations$mcp$ja._(_root);
+	@override late final Translations$terminal$ja terminal = Translations$terminal$ja._(_root);
+	@override late final Translations$worktrees$ja worktrees = Translations$worktrees$ja._(_root);
+	@override late final Translations$quota$ja quota = Translations$quota$ja._(_root);
+	@override late final Translations$scheduler$ja scheduler = Translations$scheduler$ja._(_root);
+	@override late final Translations$notifications$ja notifications = Translations$notifications$ja._(_root);
+	@override late final Translations$serverConnect$ja serverConnect = Translations$serverConnect$ja._(_root);
+	@override late final Translations$voice$ja voice = Translations$voice$ja._(_root);
+	@override late final Translations$preview$ja preview = Translations$preview$ja._(_root);
+	@override late final Translations$sharedContext$ja sharedContext = Translations$sharedContext$ja._(_root);
+	@override late final Translations$collab$ja collab = Translations$collab$ja._(_root);
+	@override late final Translations$browser$ja browser = Translations$browser$ja._(_root);
+	@override late final Translations$projects$ja projects = Translations$projects$ja._(_root);
+	@override late final Translations$sessions$ja sessions = Translations$sessions$ja._(_root);
+	@override late final Translations$git$ja git = Translations$git$ja._(_root);
+	@override late final Translations$kanban$ja kanban = Translations$kanban$ja._(_root);
+	@override late final Translations$onboarding$ja onboarding = Translations$onboarding$ja._(_root);
+	@override late final Translations$fileTree$ja fileTree = Translations$fileTree$ja._(_root);
+	@override late final Translations$workspace$ja workspace = Translations$workspace$ja._(_root);
 }
 
 // Path: auth
@@ -106,6 +126,14 @@ class Translations$chat$ja extends Translations$chat$en {
 	@override late final Translations$chat$quotaBadge$ja quotaBadge = Translations$chat$quotaBadge$ja._(_root);
 	@override late final Translations$chat$paneHeader$ja paneHeader = Translations$chat$paneHeader$ja._(_root);
 	@override late final Translations$chat$broadcast$ja broadcast = Translations$chat$broadcast$ja._(_root);
+	@override late final Translations$chat$changes$ja changes = Translations$chat$changes$ja._(_root);
+	@override late final Translations$chat$commandResult$ja commandResult = Translations$chat$commandResult$ja._(_root);
+	@override late final Translations$chat$commands$ja commands = Translations$chat$commands$ja._(_root);
+	@override late final Translations$chat$export$ja export = Translations$chat$export$ja._(_root);
+	@override late final Translations$chat$message$ja message = Translations$chat$message$ja._(_root);
+	@override late final Translations$chat$modelLibrary$ja modelLibrary = Translations$chat$modelLibrary$ja._(_root);
+	@override late final Translations$chat$pinFile$ja pinFile = Translations$chat$pinFile$ja._(_root);
+	@override late final Translations$chat$permissionRequest$ja permissionRequest = Translations$chat$permissionRequest$ja._(_root);
 }
 
 // Path: codeEditor
@@ -122,6 +150,15 @@ class Translations$codeEditor$ja extends Translations$codeEditor$en {
 	@override late final Translations$codeEditor$footer$ja footer = Translations$codeEditor$footer$ja._(_root);
 	@override late final Translations$codeEditor$binaryFile$ja binaryFile = Translations$codeEditor$binaryFile$ja._(_root);
 	@override late final Translations$codeEditor$filePreview$ja filePreview = Translations$codeEditor$filePreview$ja._(_root);
+	@override late final Translations$codeEditor$diff$ja diff = Translations$codeEditor$diff$ja._(_root);
+	@override String get discardUnsavedChanges => '未保存の変更を破棄しますか？';
+	@override late final Translations$codeEditor$emptyState$ja emptyState = Translations$codeEditor$emptyState$ja._(_root);
+	@override String get failedToLoad => 'ファイルの読み込みに失敗しました';
+	@override late final Translations$codeEditor$hexDump$ja hexDump = Translations$codeEditor$hexDump$ja._(_root);
+	@override late final Translations$codeEditor$mediaFile$ja mediaFile = Translations$codeEditor$mediaFile$ja._(_root);
+	@override late final Translations$codeEditor$settings$ja settings = Translations$codeEditor$settings$ja._(_root);
+	@override String unsavedChanges({required Object name}) => '${name} に未保存の変更があります';
+	@override late final Translations$codeEditor$toasts$ja toasts = Translations$codeEditor$toasts$ja._(_root);
 }
 
 // Path: common
@@ -152,6 +189,8 @@ class Translations$common$ja extends Translations$common$en {
 	@override late final Translations$common$gitPanel$ja gitPanel = Translations$common$gitPanel$ja._(_root);
 	@override late final Translations$common$sessions$ja sessions = Translations$common$sessions$ja._(_root);
 	@override late final Translations$common$projects$ja projects = Translations$common$projects$ja._(_root);
+	@override late final Translations$common$codeBlock$ja codeBlock = Translations$common$codeBlock$ja._(_root);
+	@override late final Translations$common$update$ja update = Translations$common$update$ja._(_root);
 }
 
 // Path: settings
@@ -245,6 +284,7 @@ class Translations$tasks$ja extends Translations$tasks$en {
 	@override late final Translations$tasks$list$ja list = Translations$tasks$list$ja._(_root);
 	@override late final Translations$tasks$nextTask$ja nextTask = Translations$tasks$nextTask$ja._(_root);
 	@override late final Translations$tasks$taskDetail$ja taskDetail = Translations$tasks$taskDetail$ja._(_root);
+	@override late final Translations$tasks$toasts$ja toasts = Translations$tasks$toasts$ja._(_root);
 }
 
 // Path: knowledge
@@ -268,6 +308,393 @@ class Translations$knowledge$ja extends Translations$knowledge$en {
 	@override late final Translations$knowledge$links$ja links = Translations$knowledge$links$ja._(_root);
 	@override late final Translations$knowledge$tags$ja tags = Translations$knowledge$tags$ja._(_root);
 	@override late final Translations$knowledge$settings$ja settings = Translations$knowledge$settings$ja._(_root);
+	@override late final Translations$knowledge$contextBudget$ja contextBudget = Translations$knowledge$contextBudget$ja._(_root);
+	@override late final Translations$knowledge$critical$ja critical = Translations$knowledge$critical$ja._(_root);
+	@override late final Translations$knowledge$errors$ja errors = Translations$knowledge$errors$ja._(_root);
+	@override late final Translations$knowledge$graph$ja graph = Translations$knowledge$graph$ja._(_root);
+	@override late final Translations$knowledge$importAll$ja importAll = Translations$knowledge$importAll$ja._(_root);
+	@override late final Translations$knowledge$importSkills$ja importSkills = Translations$knowledge$importSkills$ja._(_root);
+	@override late final Translations$knowledge$linkOptions$ja linkOptions = Translations$knowledge$linkOptions$ja._(_root);
+	@override late final Translations$knowledge$migrate$ja migrate = Translations$knowledge$migrate$ja._(_root);
+}
+
+// Path: skills
+class Translations$skills$ja extends Translations$skills$en {
+	Translations$skills$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$skills$addDialog$ja addDialog = Translations$skills$addDialog$ja._(_root);
+	@override String deleteSkill({required Object name}) => '${name} を削除';
+	@override late final Translations$skills$empty$ja empty = Translations$skills$empty$ja._(_root);
+	@override late final Translations$skills$errors$ja errors = Translations$skills$errors$ja._(_root);
+	@override late final Translations$skills$moveDialog$ja moveDialog = Translations$skills$moveDialog$ja._(_root);
+	@override String moveSkill({required Object name}) => '${name} を移動';
+	@override String get projectLabel => 'プロジェクト';
+	@override late final Translations$skills$scopes$ja scopes = Translations$skills$scopes$ja._(_root);
+	@override late final Translations$skills$screen$ja screen = Translations$skills$screen$ja._(_root);
+}
+
+// Path: mcp
+class Translations$mcp$ja extends Translations$mcp$en {
+	Translations$mcp$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$mcp$form$ja form = Translations$mcp$form$ja._(_root);
+	@override late final Translations$mcp$install$ja install = Translations$mcp$install$ja._(_root);
+	@override late final Translations$mcp$servers$ja servers = Translations$mcp$servers$ja._(_root);
+	@override late final Translations$mcp$team$ja team = Translations$mcp$team$ja._(_root);
+	@override late final Translations$mcp$tokens$ja tokens = Translations$mcp$tokens$ja._(_root);
+}
+
+// Path: terminal
+class Translations$terminal$ja extends Translations$terminal$en {
+	Translations$terminal$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$terminal$actions$ja actions = Translations$terminal$actions$ja._(_root);
+	@override late final Translations$terminal$authUrl$ja authUrl = Translations$terminal$authUrl$ja._(_root);
+	@override late final Translations$terminal$errors$ja errors = Translations$terminal$errors$ja._(_root);
+	@override late final Translations$terminal$fileLink$ja fileLink = Translations$terminal$fileLink$ja._(_root);
+	@override late final Translations$terminal$paste$ja paste = Translations$terminal$paste$ja._(_root);
+	@override late final Translations$terminal$shortcuts$ja shortcuts = Translations$terminal$shortcuts$ja._(_root);
+	@override late final Translations$terminal$tabs$ja tabs = Translations$terminal$tabs$ja._(_root);
+}
+
+// Path: worktrees
+class Translations$worktrees$ja extends Translations$worktrees$en {
+	Translations$worktrees$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get branchHint => '新しいブランチ名（例: feature/login）';
+	@override String branchingOff({required Object branch}) => '${branch} から分岐';
+	@override String get cleanupDescription => 'マージ後に worktree を削除してブランチも削除';
+	@override String get created => 'worktree を作成しました';
+	@override String get deleteBranchLabel => 'ブランチも削除';
+	@override String dirtyWarning({required Object count}) => '警告: この worktree には失われる未コミットの変更が ${count} 件あります。';
+	@override String get emptyDescription => 'worktree を作成して、機能開発やエージェントの実行を分離します。';
+	@override String get emptyTitle => 'worktree が見つかりません';
+	@override String get forceRemoveLabel => '強制削除（変更を破棄）';
+	@override String headDetachedAt({required Object sha}) => 'HEAD が ${sha} で分離';
+	@override String get mainBadge => 'main';
+	@override String mergeDescription({required Object branch}) => '変更を ${branch} にマージします。';
+	@override String mergeTitle({required Object branch}) => '${branch} をマージ';
+	@override String merged({required Object branch}) => 'worktree を ${branch} にマージしました';
+	@override String opened({required Object branch}) => 'worktree を開きました: ${branch}';
+	@override String get portHint => '実行ポート（任意、例: 3000）';
+	@override String get removeDescription => 'worktree フォルダを削除します。リンクされたプロジェクトはアーカイブされます。';
+	@override String removeTitle({required Object branch}) => 'worktree ${branch} を削除しますか？';
+	@override String get removed => 'worktree を削除しました';
+	@override String get runButton => '実行';
+	@override String get runHint => '実行コマンド（例: npm run dev）';
+	@override String get runRunning => '実行中';
+	@override String runRunningWithPort({required Object port}) => '実行中 :${port}';
+	@override String get scripts => 'スクリプト';
+	@override String get scriptsSaved => 'スクリプト設定を保存しました';
+	@override String get serverLabel => 'サーバー: ';
+	@override String get setupHint => 'セットアップコマンド（例: npm install）';
+	@override String get setupLabel => 'セットアップ: ';
+	@override String get squashDescription => 'すべてのコミットを1つのコミットにまとめる';
+	@override String get stopButton => '停止';
+}
+
+// Path: quota
+class Translations$quota$ja extends Translations$quota$en {
+	Translations$quota$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$quota$agents$ja agents = Translations$quota$agents$ja._(_root);
+	@override late final Translations$quota$chart$ja chart = Translations$quota$chart$ja._(_root);
+	@override late final Translations$quota$config$ja config = Translations$quota$config$ja._(_root);
+	@override late final Translations$quota$overview$ja overview = Translations$quota$overview$ja._(_root);
+	@override late final Translations$quota$section$ja section = Translations$quota$section$ja._(_root);
+}
+
+// Path: scheduler
+class Translations$scheduler$ja extends Translations$scheduler$en {
+	Translations$scheduler$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get checking => '確認中…';
+	@override String get cronHint => 'Cron（分 時 日 月 曜日） — 例: 0 9 * * *';
+	@override String deleteMessage({required Object id}) => '繰り返しジョブ ${id} を削除します。既存のセッションは保持されます。';
+	@override String get deleteTitle => 'スケジュールを削除しますか？';
+	@override String get editTitle => 'スケジュールを編集';
+	@override String get newLabel => '新規';
+	@override String nextIn({required Object time}) => '次回まで ${time}';
+	@override String get promptHint => 'エージェントへのプロンプト';
+	@override String get runs => '実行回数';
+	@override String session({required Object id}) => 'セッション ${id}';
+	@override String get worktree => 'worktree';
+}
+
+// Path: notifications
+class Translations$notifications$ja extends Translations$notifications$en {
+	Translations$notifications$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get deviceLabel => 'ddagent Flutter';
+	@override late final Translations$notifications$errors$ja errors = Translations$notifications$errors$ja._(_root);
+}
+
+// Path: serverConnect
+class Translations$serverConnect$ja extends Translations$serverConnect$en {
+	Translations$serverConnect$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get connect => '接続';
+	@override String get connecting => '接続中…';
+	@override String connectionFailed({required Object error}) => '接続に失敗しました (${error})';
+	@override String get enterUrl => 'サーバーのURLを入力';
+	@override String get subtitle => 'ddagent サーバーに接続';
+}
+
+// Path: voice
+class Translations$voice$ja extends Translations$voice$en {
+	Translations$voice$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get apiKeySaved => 'APIキー（保存済み、変更するには入力）';
+	@override String get preview => 'プレビュー';
+	@override String get saveFailed => 'STT設定の保存に失敗しました';
+	@override String get settingsSaved => '音声入力設定を保存しました';
+}
+
+// Path: preview
+class Translations$preview$ja extends Translations$preview$en {
+	Translations$preview$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get embeddedWebOnly => '埋め込みプレビューはWebビルドでのみ利用できます';
+	@override String get startDevServerHint => '開発サーバーを起動すると（npm run dev、flutter run -d web-server…）\nそのポートがここに表示されます。';
+}
+
+// Path: sharedContext
+class Translations$sharedContext$ja extends Translations$sharedContext$en {
+	Translations$sharedContext$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '共有ノート';
+}
+
+// Path: collab
+class Translations$collab$ja extends Translations$collab$en {
+	Translations$collab$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get copyToken => 'トークンをコピー';
+	@override String get createInvite => '招待を作成';
+	@override String get invite => '招待';
+	@override String get inviteTeammate => 'チームメイトを招待';
+	@override late final Translations$collab$roles$ja roles = Translations$collab$roles$ja._(_root);
+	@override String get shareTokenHint => 'この招待トークンを共有してください — 一度だけ表示され、72時間で失効します:';
+	@override String get team => 'チーム';
+}
+
+// Path: browser
+class Translations$browser$ja extends Translations$browser$en {
+	Translations$browser$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get dialogTitle => 'エージェントブラウザ';
+	@override String get viewError => 'ブラウザ表示エラー';
+	@override String get web => 'Web';
+}
+
+// Path: projects
+class Translations$projects$ja extends Translations$projects$en {
+	Translations$projects$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get archive => 'アーカイブ';
+	@override String archivedSection({required Object count}) => 'アーカイブ済み (${count})';
+	@override String get clone => 'クローン';
+	@override String get cloneFailed => 'クローンに失敗しました';
+	@override String get cloneFinished => 'クローンが完了しました。プロジェクト一覧を更新中…';
+	@override String get cloneRepository => 'リポジトリをクローン';
+	@override String get deletePermanently => '完全に削除';
+	@override String deleteProjectMessage({required Object name}) => '「${name}」を、すべてのセッションと保存済み履歴を含めて完全に削除します（JSONL も消去）。元に戻せません。';
+	@override String get deleteProjectTitle => 'プロジェクトを削除しますか？';
+	@override String get destinationPath => '保存先パス';
+	@override String get destinationPathRequired => '保存先パスは必須です';
+	@override String get displayNameOptional => '表示名（任意）';
+	@override String get failedToLoadTokens => 'GitHubトークンの読み込みに失敗しました';
+	@override String get githubTokenOptional => 'GitHubトークン（任意）';
+	@override String get newer => '新しい方';
+	@override String get older => '古い方';
+	@override String get projectArchived => 'プロジェクトをアーカイブしました';
+	@override String get projectDeleted => 'プロジェクトを削除しました';
+	@override String get projectRenamed => 'プロジェクト名を変更しました';
+	@override String get projectRestored => 'プロジェクトを復元しました';
+	@override String get repoUrlPlaceholder => 'https://github.com/org/repo.git';
+	@override String get repositoryCloned => 'リポジトリをクローンしました';
+	@override String get repositoryUrlRequired => 'リポジトリURLは必須です';
+	@override String get restore => '復元';
+	@override String sessionCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ja'))(count,
+		one: '${count} セッション',
+		other: '${count} セッション',
+	);
+	@override String get unknown => '不明';
+	@override String usingStoredToken({required Object name}) => '保存済みトークンを使用: ${name}';
+}
+
+// Path: sessions
+class Translations$sessions$ja extends Translations$sessions$en {
+	Translations$sessions$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$sessions$activity$ja activity = Translations$sessions$activity$ja._(_root);
+	@override late final Translations$sessions$age$ja age = Translations$sessions$age$ja._(_root);
+	@override String get archive => 'アーカイブ';
+	@override String get archivedSessions => 'アーカイブ済みセッション';
+	@override String get autoOrchestrator => '自動（オーケストレーター）';
+	@override String get compareWith => '比較対象…';
+	@override String createFailed({required Object error}) => 'セッションの作成に失敗しました: ${error}';
+	@override String deleteSessionMessage({required Object name}) => '「${name}」とそのトランスクリプトを削除します。元に戻せません。';
+	@override String get newSessionProvider => '新しいセッション — プロバイダー';
+	@override String get noRecentSessions => '最近のセッションはありません';
+	@override String get noSessions => 'セッションがありません';
+	@override String get projectPath => 'プロジェクトパス';
+	@override String get rename => '名前を変更';
+	@override late final Translations$sessions$toasts$ja toasts = Translations$sessions$toasts$ja._(_root);
+}
+
+// Path: git
+class Translations$git$ja extends Translations$git$en {
+	Translations$git$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get aiButton => '✦ AI';
+	@override late final Translations$git$checkpoints$ja checkpoints = Translations$git$checkpoints$ja._(_root);
+	@override String get commitCreated => 'コミットを作成しました';
+	@override String get commitMessage => 'コミットメッセージ';
+	@override String get deleteFile => 'ファイルを削除';
+	@override String get hunkStage => '+ ハンク';
+	@override String get hunkUnstage => '− ハンク';
+	@override String get largeDiff => '大きな差分のプレビュー: タブの応答性を保つため、レンダリングが制限されています。';
+	@override String loadDiffFailed({required Object error}) => '差分の読み込みに失敗しました: ${error}';
+	@override String get noBranch => 'ブランチなし';
+	@override String get noDiff => '利用可能な差分がありません';
+	@override String get selectProject => 'プロジェクトを選択';
+	@override String get splitDiff => '分割差分';
+	@override String get stageHunk => 'ハンクをステージ';
+	@override String get stagedChanges => 'ステージ済みの変更';
+	@override String get statusStaged => 'ステージ済み';
+	@override String get switchBranch => 'ブランチを切り替え';
+	@override String get unifiedDiff => '統合差分';
+	@override String get unstageHunk => 'ハンクのステージを解除';
+}
+
+// Path: kanban
+class Translations$kanban$ja extends Translations$kanban$en {
+	Translations$kanban$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$kanban$card$ja card = Translations$kanban$card$ja._(_root);
+	@override late final Translations$kanban$comments$ja comments = Translations$kanban$comments$ja._(_root);
+	@override late final Translations$kanban$details$ja details = Translations$kanban$details$ja._(_root);
+	@override late final Translations$kanban$dialog$ja dialog = Translations$kanban$dialog$ja._(_root);
+	@override late final Translations$kanban$empty$ja empty = Translations$kanban$empty$ja._(_root);
+	@override String get saveFailed => 'カードの保存に失敗しました';
+	@override late final Translations$kanban$time$ja time = Translations$kanban$time$ja._(_root);
+}
+
+// Path: onboarding
+class Translations$onboarding$ja extends Translations$onboarding$en {
+	Translations$onboarding$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$onboarding$agents$ja agents = Translations$onboarding$agents$ja._(_root);
+	@override String get completeSetup => 'セットアップを完了';
+	@override late final Translations$onboarding$errors$ja errors = Translations$onboarding$errors$ja._(_root);
+	@override String get gitHint => 'ddagent セッションで作成されるコミットに使用されます。';
+	@override late final Translations$onboarding$mcp$ja mcp = Translations$onboarding$mcp$ja._(_root);
+}
+
+// Path: fileTree
+class Translations$fileTree$ja extends Translations$fileTree$en {
+	Translations$fileTree$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get browseServerFilesystem => 'サーバーのファイルシステムを参照';
+	@override String get chooseFolder => 'フォルダを選択';
+	@override String get copyContents => '内容をコピー';
+	@override String get noFiles => 'ファイルがありません';
+	@override late final Translations$fileTree$search$ja search = Translations$fileTree$search$ja._(_root);
+	@override late final Translations$fileTree$titles$ja titles = Translations$fileTree$titles$ja._(_root);
+	@override String get uploadHere => 'ここにアップロード';
+	@override String get uploadTo => 'アップロード先';
+	@override String uploadedCount({required Object count}) => '${count} 件のファイルをアップロードしました';
+	@override String get newName => '新しい名前';
+	@override String notRegisteredProject({required Object path}) => '登録済みのプロジェクトではありません: ${path}';
+	@override String get showGitignoredFiles => 'gitignore されたファイルを表示';
+	@override String get hideGitignoredFiles => 'gitignore されたファイルを非表示';
+	@override String get downloadUnsupportedOnWeb => 'Webではダウンロードを利用できません';
+	@override String get saveToPath => 'パスに保存';
+	@override String savedTo({required Object path}) => '${path} に保存しました';
+}
+
+// Path: workspace
+class Translations$workspace$ja extends Translations$workspace$en {
+	Translations$workspace$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get archivedWorkspaceName => 'アーカイブ済み';
+	@override String get closePane => 'ペインを閉じる';
+	@override String get closeSearch => '検索を閉じる';
+	@override String get deleteSessionNotice => 'セッションとそのトランスクリプトを削除します。元に戻せません。';
+	@override String get exportChat => 'チャットをエクスポート';
+	@override String get jumpToSession => 'セッションへジャンプ…';
+	@override String get newChatProvider => '新しいチャット — プロバイダー';
+	@override String get nextMatch => '次の一致';
+	@override String get previousMatch => '前の一致';
+	@override String get searchTranscript => 'トランスクリプトを検索';
+	@override String sendTo({required Object count}) => '${count} 件に送信';
+	@override String accountWithLabel({required Object label}) => 'デフォルト · ${label}';
+	@override String get finishRunBeforeChangingWorkspace => 'ワークスペースを変更する前に実行を終了してください';
+	@override String get restored => 'ワークスペースを復元しました';
+	@override String get maximizePane => 'ペインを最大化';
+	@override String get restorePanes => 'ペインを復元';
+	@override String get reviewChangedFiles => '変更されたファイルを確認';
 }
 
 // Path: auth.login
@@ -381,6 +808,7 @@ class Translations$chat$tools$ja extends Translations$chat$tools$en {
 	@override String get updateTodo => 'Todoリストを更新';
 	@override String get readTodo => 'Todoリストを読み取り';
 	@override String get searchResults => '件の結果';
+	@override String get todoReadLabel => 'TodoRead 読み取りリスト';
 }
 
 // Path: chat.search
@@ -462,6 +890,15 @@ class Translations$chat$permissions$ja extends Translations$chat$permissions$en 
 	@override String get retry => '権限を保存しました。ツールを使用するにはリクエストを再試行してください。';
 	@override String get error => '権限を更新できませんでした。もう一度お試しください。';
 	@override String get openSettings => '設定を開く';
+	@override String get allow => '許可';
+	@override String allowAll({required Object count}) => 'すべて許可 (${count})';
+	@override String get allowWithChanges => '変更を加えて許可';
+	@override String get always => '常に';
+	@override String get deny => '拒否';
+	@override String get editAndAllow => '編集して許可';
+	@override String get editInput => '入力を編集';
+	@override String get invalidJson => '無効なJSON';
+	@override String get reject => '却下';
 }
 
 // Path: chat.todo
@@ -540,6 +977,7 @@ class Translations$chat$input$ja extends Translations$chat$input$en {
 	@override String get autoContinueTasks => '自動続行';
 	@override String get autoContinueTasksTooltip => '有効にすると Devin が次の Task Master タスクへ自動的に進みます';
 	@override late final Translations$chat$input$offlineQueue$ja offlineQueue = Translations$chat$input$offlineQueue$ja._(_root);
+	@override String cameraUnavailable({required Object error}) => 'カメラを利用できません: ${error}';
 }
 
 // Path: chat.providerSelection
@@ -586,6 +1024,8 @@ class Translations$chat$session$ja extends Translations$chat$session$en {
 	@override late final Translations$chat$session$kContinue$ja kContinue = Translations$chat$session$kContinue$ja._(_root);
 	@override late final Translations$chat$session$loading$ja loading = Translations$chat$session$loading$ja._(_root);
 	@override late final Translations$chat$session$messages$ja messages = Translations$chat$session$messages$ja._(_root);
+	@override String get deleteConfirm => 'セッションとそのトランスクリプトを削除します。元に戻せません。';
+	@override String get finishRunBeforeWorkspaceChange => 'ワークスペースを変更する前に実行を終了してください';
 }
 
 // Path: chat.shell
@@ -765,6 +1205,9 @@ class Translations$chat$askUserQuestion$ja extends Translations$chat$askUserQues
 
 	// Translations
 	@override String needsInput({required Object provider}) => '${provider} があなたの入力を求めています';
+	@override String get answerHint => '回答を入力…';
+	@override String get other => 'その他…';
+	@override String get skip => 'スキップ';
 }
 
 // Path: chat.attachments
@@ -776,6 +1219,7 @@ class Translations$chat$attachments$ja extends Translations$chat$attachments$en 
 	// Translations
 	@override String get downloadFailedRetry => 'ダウンロード失敗 — クリックで再試行';
 	@override String get fileAttachment => 'ファイル添付';
+	@override String download({required Object name}) => '${name} をダウンロード';
 }
 
 // Path: chat.checkpoint
@@ -788,6 +1232,7 @@ class Translations$chat$checkpoint$ja extends Translations$chat$checkpoint$en {
 	@override String get creating => 'スナップショットを作成中…';
 	@override String get revertChanges => 'ファイルを最後のチェックポイントに戻す';
 	@override String get undo => 'チェックポイントを元に戻す';
+	@override String get beforeAiTurn => 'AIターン前';
 }
 
 // Path: chat.common
@@ -811,6 +1256,8 @@ class Translations$chat$taskMaster$ja extends Translations$chat$taskMaster$en {
 	@override String get saved => '保存済み';
 	@override String get saving => '保存中...';
 	@override String get taskShort => 'タスク';
+	@override String get addToTask => 'TaskMasterに追加';
+	@override String get added => 'TaskMasterに追加しました';
 }
 
 // Path: chat.tokenUsage
@@ -868,6 +1315,103 @@ class Translations$chat$broadcast$ja extends Translations$chat$broadcast$en {
 	@override String get noOrchestrators => '利用可能なオーケストレーターセッションがありません';
 }
 
+// Path: chat.changes
+class Translations$chat$changes$ja extends Translations$chat$changes$en {
+	Translations$chat$changes$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get empty => 'ファイルの変更はありません';
+	@override String get failedToLoad => '変更の読み込みに失敗しました';
+}
+
+// Path: chat.commandResult
+class Translations$chat$commandResult$ja extends Translations$chat$commandResult$en {
+	Translations$chat$commandResult$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$chat$commandResult$fallback$ja fallback = Translations$chat$commandResult$fallback$ja._(_root);
+	@override String get filterCommands => 'コマンドを絞り込む...';
+	@override String searchModels({required Object provider}) => '${provider} のモデルを検索...';
+}
+
+// Path: chat.commands
+class Translations$chat$commands$ja extends Translations$chat$commands$en {
+	Translations$chat$commands$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get runConfirmTitle => 'コマンドを実行しますか？';
+	@override String get executionCancelled => 'コマンドの実行をキャンセルしました';
+}
+
+// Path: chat.export
+class Translations$chat$export$ja extends Translations$chat$export$en {
+	Translations$chat$export$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String sessionTitle({required Object id}) => 'セッション ${id}';
+	@override String get pdfFailed => 'PDFのエクスポートに失敗しました';
+	@override String get transcriptDownloaded => 'トランスクリプトをダウンロードしました';
+	@override String savedTo({required Object path}) => '${path} を保存しました';
+}
+
+// Path: chat.message
+class Translations$chat$message$ja extends Translations$chat$message$en {
+	Translations$chat$message$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get compactedSummary => '圧縮された要約';
+	@override String get rawView => '生の表示';
+	@override String get resendHint => '入力欄から再送信';
+}
+
+// Path: chat.modelLibrary
+class Translations$chat$modelLibrary$ja extends Translations$chat$modelLibrary$en {
+	Translations$chat$modelLibrary$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String deleteTooltip({required Object name}) => '${name} を削除';
+	@override String editTooltip({required Object name}) => '${name} を編集';
+	@override String get enterNameAndId => 'モデル名とモデルIDの両方を入力してください。';
+	@override String get idNoSpaces => 'モデルIDにスペースは使用できません。';
+	@override String get setAsDefault => 'デフォルトに設定';
+	@override String get defaultModel => 'デフォルトモデル';
+}
+
+// Path: chat.pinFile
+class Translations$chat$pinFile$ja extends Translations$chat$pinFile$en {
+	Translations$chat$pinFile$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get action => 'ピン留め';
+	@override String get pathHint => 'path/to/file.ext';
+	@override String get title => 'ファイルをピン留め';
+}
+
+// Path: chat.permissionRequest
+class Translations$chat$permissionRequest$ja extends Translations$chat$permissionRequest$en {
+	Translations$chat$permissionRequest$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String title({required Object tool}) => '権限リクエスト · ${tool}';
+	@override String get question => '質問';
+}
+
 // Path: codeEditor.toolbar
 class Translations$codeEditor$toolbar$ja extends Translations$codeEditor$toolbar$en {
 	Translations$codeEditor$toolbar$ja._(TranslationsJa root) : this._root = root, super.internal(root);
@@ -883,6 +1427,10 @@ class Translations$codeEditor$toolbar$ja extends Translations$codeEditor$toolbar
 	@override String get settings => 'エディタ設定';
 	@override String get collapse => 'エディタを折りたたむ';
 	@override String get expand => 'エディタを全幅に展開';
+	@override String get diffMerge => '差分 / マージ';
+	@override String get previewInBrowser => 'ブラウザでプレビュー';
+	@override String get reload => 'ディスクから再読み込み';
+	@override String get toggleDock => 'ファイルドックを切り替え';
 }
 
 // Path: codeEditor.header
@@ -917,6 +1465,7 @@ class Translations$codeEditor$actions$ja extends Translations$codeEditor$actions
 	@override String get unpinFile => 'ファイルをコンテキストから外す';
 	@override String get previewHtml => 'HTMLプレビューを新しいタブで開く';
 	@override String get retry => '再試行';
+	@override String get saveAll => 'すべて保存';
 }
 
 // Path: codeEditor.footer
@@ -940,6 +1489,7 @@ class Translations$codeEditor$binaryFile$ja extends Translations$codeEditor$bina
 	// Translations
 	@override String get title => 'バイナリファイル';
 	@override String message({required Object fileName}) => 'ファイル "${fileName}" はバイナリファイルのため、テキストエディタで表示できません。';
+	@override String get cannotDisplayAsText => 'テキストとして表示できません';
 }
 
 // Path: codeEditor.filePreview
@@ -952,6 +1502,81 @@ class Translations$codeEditor$filePreview$ja extends Translations$codeEditor$fil
 	@override String get loading => 'プレビューを読み込み中...';
 	@override String get error => 'このファイルを表示できません。';
 	@override String get openInNewTab => '新しいタブで開く';
+}
+
+// Path: codeEditor.diff
+class Translations$codeEditor$diff$ja extends Translations$codeEditor$diff$en {
+	Translations$codeEditor$diff$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get applyMerge => 'マージを適用';
+	@override String get base => 'ベース';
+	@override String get close => '差分を閉じる';
+	@override String get current => '現在';
+	@override String hunk({required Object number}) => 'ハンク ${number}';
+	@override String get noChanges => '変更なし';
+	@override String get deletedOnDisk => 'ディスク上で削除済み';
+}
+
+// Path: codeEditor.emptyState
+class Translations$codeEditor$emptyState$ja extends Translations$codeEditor$emptyState$en {
+	Translations$codeEditor$emptyState$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'ファイルが開かれていません';
+}
+
+// Path: codeEditor.hexDump
+class Translations$codeEditor$hexDump$ja extends Translations$codeEditor$hexDump$en {
+	Translations$codeEditor$hexDump$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String more({required Object size}) => '… 残り ${size}';
+}
+
+// Path: codeEditor.mediaFile
+class Translations$codeEditor$mediaFile$ja extends Translations$codeEditor$mediaFile$en {
+	Translations$codeEditor$mediaFile$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get subtitle => '音声/動画のプレビューはまだサポートされていません';
+	@override String get title => 'メディアファイル';
+}
+
+// Path: codeEditor.settings
+class Translations$codeEditor$settings$ja extends Translations$codeEditor$settings$en {
+	Translations$codeEditor$settings$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String fontSizeDecrease({required Object size}) => 'フォントサイズ −  (現在 ${size})';
+	@override String get fontSizeIncrease => 'フォントサイズ +';
+	@override String get minimap => 'ミニマップ';
+	@override String tabSize({required Object size}) => 'タブサイズ: ${size}';
+}
+
+// Path: codeEditor.toasts
+class Translations$codeEditor$toasts$ja extends Translations$codeEditor$toasts$en {
+	Translations$codeEditor$toasts$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String savedFile({required Object name}) => '${name} を保存しました';
+	@override String get saveFailed => '保存に失敗しました';
+	@override String get allSaved => 'すべて保存しました';
+	@override String get someSavesFailed => '一部の保存に失敗しました';
+	@override String savedTo({required Object path}) => '${path} に保存しました';
+	@override String get mergeApplied => 'マージを適用しました — 保存して反映してください';
 }
 
 // Path: common.buttons
@@ -977,6 +1602,8 @@ class Translations$common$buttons$ja extends Translations$common$buttons$en {
 	@override String get download => 'ダウンロード';
 	@override String get upload => 'アップロード';
 	@override String get browse => '参照';
+	@override String get openDiagram => '図を開く';
+	@override String get update => '更新';
 }
 
 // Path: common.tabs
@@ -1516,6 +2143,34 @@ class Translations$common$projects$ja extends Translations$common$projects$en {
 	@override String get newSession => '新しいセッション';
 }
 
+// Path: common.codeBlock
+class Translations$common$codeBlock$ja extends Translations$common$codeBlock$en {
+	Translations$common$codeBlock$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get wrapLines => '行を折り返す';
+	@override String get noWrap => '折り返しなし';
+}
+
+// Path: common.update
+class Translations$common$update$ja extends Translations$common$update$en {
+	Translations$common$update$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String available({required Object version}) => '更新があります · v${version}';
+	@override String confirm({required Object version}) => 'v${version} に更新しますか？サーバーは自動で更新して再起動します — アクティブなセッションは中断されます。';
+	@override String get downloading => '更新をダウンロードして適用中…';
+	@override String get restarting => 'サーバーを再起動中 — しばらくお待ちください…';
+	@override String done({required Object version}) => 'v${version} に更新しました。新しいバンドルを反映するにはアプリを再読み込みしてください。';
+	@override String get manualRestart => '更新は適用されましたが、サーバーは自動で再起動しませんでした — 手動で再起動して完了してください。';
+	@override String get failed => '更新に失敗しました。';
+	@override String get failedTitle => '更新に失敗しました';
+}
+
 // Path: settings.changelog
 class Translations$settings$changelog$ja extends Translations$settings$changelog$en {
 	Translations$settings$changelog$ja._(TranslationsJa root) : this._root = root, super.internal(root);
@@ -1544,6 +2199,7 @@ class Translations$settings$server$ja extends Translations$settings$server$en {
 	@override String get restarting => '再起動中… サーバーが戻り次第、ページを再読み込みします。';
 	@override String get restartFailed => '再起動に失敗しました';
 	@override String get unsupported => '再起動は、サーバーがサービスマネージャー管理下で動作している場合のみ利用できます。';
+	@override String get ok => 'OK';
 }
 
 // Path: settings.updates
@@ -1632,6 +2288,7 @@ class Translations$settings$appearance$ja extends Translations$settings$appearan
 	@override String get showMinimap => 'ミニマップを表示';
 	@override String get lineNumbers => '行番号';
 	@override String get fontSize => 'フォントサイズ';
+	@override late final Translations$settings$appearance$themeModes$ja themeModes = Translations$settings$appearance$themeModes$ja._(_root);
 }
 
 // Path: settings.actions
@@ -1661,6 +2318,7 @@ class Translations$settings$quickSettings$ja extends Translations$settings$quick
 	@override String get sendByCtrlEnter => 'Ctrl+Enterで送信';
 	@override String get sendByCtrlEnterDescription => '有効にすると、Enterではなく Ctrl+Enter でメッセージを送信します。IMEユーザーの誤送信防止に便利です。';
 	@override late final Translations$settings$quickSettings$dragHandle$ja dragHandle = Translations$settings$quickSettings$dragHandle$ja._(_root);
+	@override String get sendWithCtrlEnter => 'Ctrl+Enterで送信';
 }
 
 // Path: settings.terminalShortcuts
@@ -1741,6 +2399,8 @@ class Translations$settings$notifications$ja extends Translations$settings$notif
 	@override late final Translations$settings$notifications$sound$ja sound = Translations$settings$notifications$sound$ja._(_root);
 	@override late final Translations$settings$notifications$events$ja events = Translations$settings$notifications$events$ja._(_root);
 	@override late final Translations$settings$notifications$desktop$ja desktop = Translations$settings$notifications$desktop$ja._(_root);
+	@override late final Translations$settings$notifications$channels$ja channels = Translations$settings$notifications$channels$ja._(_root);
+	@override String get unpair => 'ペアリングを解除';
 }
 
 // Path: settings.appearanceSettings
@@ -1956,6 +2616,7 @@ class Translations$settings$workspaces$ja extends Translations$settings$workspac
 	@override String get description => 'ワークスペースは、ddagent がチャット・コード実行・ブラウジングできるディレクトリです。';
 	@override String get remove => 'ワークスペースを削除';
 	@override String get title => 'ワークスペース';
+	@override String get pathRequired => 'パスは必須です';
 }
 
 // Path: settings.about
@@ -1967,6 +2628,10 @@ class Translations$settings$about$ja extends Translations$settings$about$en {
 	// Translations
 	@override String get supportTitle => 'プロジェクトを支援';
 	@override String get buyMeACoffee => 'Buy Me a Coffee';
+	@override String get learnMore => '詳細を見る';
+	@override late final Translations$settings$about$pro$ja pro = Translations$settings$about$pro$ja._(_root);
+	@override String get proFeatures => 'ddagent Pro の機能';
+	@override String get tryHosted => 'ddagent Hosted を試す';
 }
 
 // Path: sidebar.projects
@@ -2349,6 +3014,7 @@ class Translations$tasks$notConfigured$ja extends Translations$tasks$notConfigur
 	@override String get whatIsTitle => '🎯 TaskMasterとは？';
 	@override late final Translations$tasks$notConfigured$features$ja features = Translations$tasks$notConfigured$features$ja._(_root);
 	@override String get initializeButton => 'TaskMaster AIを初期化';
+	@override String get writePrdFirst => '先にPRDを作成してください';
 }
 
 // Path: tasks.gettingStarted
@@ -2502,6 +3168,15 @@ class Translations$tasks$prd$ja extends Translations$tasks$prd$en {
 
 	// Translations
 	@override String modified({required Object date}) => '更新日: ${date}';
+	@override String editorTitle({required Object name}) => 'PRD — ${name}';
+	@override String fileExistsMessage({required Object name}) => '「${name}」という名前のPRDが既に存在します。上書きしますか？';
+	@override String get fileExistsTitle => 'ファイルは既に存在します';
+	@override String get newFile => '新しいファイル';
+	@override String get parse => 'PRDを解析';
+	@override String get template => 'テンプレート';
+	@override String get fileNameHint => 'ファイル名（例: prd.txt）';
+	@override String get saved => 'PRDを保存しました';
+	@override String get tasksGenerated => 'PRDからタスクを生成しました';
 }
 
 // Path: tasks.statuses
@@ -2517,6 +3192,7 @@ class Translations$tasks$statuses$ja extends Translations$tasks$statuses$en {
 	@override String get blocked => 'ブロック中';
 	@override String get deferred => '延期';
 	@override String get cancelled => 'キャンセル';
+	@override String get review => 'レビュー';
 }
 
 // Path: tasks.priorities
@@ -2619,6 +3295,8 @@ class Translations$tasks$list$ja extends Translations$tasks$list$en {
 	@override String get inProgressComplete => '進行中（クリックで完了）';
 	@override String get markCompleted => '完了としてマーク';
 	@override String toggleStatusAria({required Object id}) => 'タスク ${id} のステータスを切り替え';
+	@override String get markDone => '完了にする';
+	@override String get reopen => '再開';
 }
 
 // Path: tasks.nextTask
@@ -2675,6 +3353,20 @@ class Translations$tasks$taskDetail$ja extends Translations$tasks$taskDetail$en 
 	@override String get testStrategy => 'テスト戦略';
 	@override String get titleRequired => 'タイトルは必須です';
 	@override String get updateFailed => 'タスクの更新に失敗しました';
+	@override String deleteConfirmMessage({required Object id}) => 'タスク #${id} は削除されます。元に戻せません。';
+	@override String get notFound => 'タスクが見つかりません';
+	@override String get subtasks => 'サブタスク';
+	@override String get idCopied => 'タスクIDをコピーしました';
+}
+
+// Path: tasks.toasts
+class Translations$tasks$toasts$ja extends Translations$tasks$toasts$en {
+	Translations$tasks$toasts$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String statusInProgress({required Object id}) => 'タスク ${id} を進行中に設定しました';
 }
 
 // Path: knowledge.tabs
@@ -2869,6 +3561,672 @@ class Translations$knowledge$settings$ja extends Translations$knowledge$settings
 	@override String get description => 'エージェント向けのローカルメモリ層：メモリ、ルール、スキル、個人情報。';
 }
 
+// Path: knowledge.contextBudget
+class Translations$knowledge$contextBudget$ja extends Translations$knowledge$contextBudget$en {
+	Translations$knowledge$contextBudget$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String tokens({required Object tokens, required Object budget}) => '~${tokens} / ${budget} tok';
+}
+
+// Path: knowledge.critical
+class Translations$knowledge$critical$ja extends Translations$knowledge$critical$en {
+	Translations$knowledge$critical$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get make => 'クリティカルにする';
+	@override String get makeAll => 'すべてのルールをクリティカルにする';
+	@override String get makeAllHint => 'それらを注入されるコンテキスト予算に追加します';
+}
+
+// Path: knowledge.errors
+class Translations$knowledge$errors$ja extends Translations$knowledge$errors$en {
+	Translations$knowledge$errors$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String importFailed({required Object error}) => 'インポートに失敗しました: ${error}';
+	@override String migrationFailed({required Object error}) => '移行に失敗しました: ${error}';
+}
+
+// Path: knowledge.graph
+class Translations$knowledge$graph$ja extends Translations$knowledge$graph$en {
+	Translations$knowledge$graph$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get truncated => '省略';
+}
+
+// Path: knowledge.importAll
+class Translations$knowledge$importAll$ja extends Translations$knowledge$importAll$en {
+	Translations$knowledge$importAll$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get action => 'すべてをインポート';
+	@override String get mergeDuplicates => '重複エントリを統合';
+	@override String get mergeDuplicatesHint => 'ddagent 内の重複行を統合します（ファイルではありません）';
+	@override String projectsScanned({required Object count}) => 'スキャンしたプロジェクト: ${count}';
+	@override String rulesSummary({required Object total, required Object duplicates}) => 'ルール: ${total} · 重複グループ: ${duplicates}';
+	@override String skillsFound({required Object found, required Object newSkills}) => '見つかったエージェントスキル: ${found} (新規: ${newSkills})';
+	@override String get title => 'すべてを ddagent にインポート';
+}
+
+// Path: knowledge.importSkills
+class Translations$knowledge$importSkills$ja extends Translations$knowledge$importSkills$en {
+	Translations$knowledge$importSkills$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String found({required Object count}) => 'エージェント全体で ${count} 件のスキルが見つかりました。';
+	@override String summary({required Object imported, required Object skipped}) => '新規: ${imported} · スキップ: ${skipped}';
+	@override String get title => 'エージェントスキルをインポート';
+}
+
+// Path: knowledge.linkOptions
+class Translations$knowledge$linkOptions$ja extends Translations$knowledge$linkOptions$en {
+	Translations$knowledge$linkOptions$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String memory({required Object title}) => 'メモリ: ${title}';
+	@override String personal({required Object title}) => '個人情報: ${title}';
+	@override String rule({required Object title}) => 'ルール: ${title}';
+	@override String skill({required Object name}) => 'スキル: ${name}';
+}
+
+// Path: knowledge.migrate
+class Translations$knowledge$migrate$ja extends Translations$knowledge$migrate$en {
+	Translations$knowledge$migrate$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String duplicates({required Object count}) => 'プロジェクト間の重複グループ: ${count}';
+	@override String get mergeDuplicates => '重複を統合';
+	@override String removedPromoted({required Object removed, required Object promoted}) => '削除: ${removed}、昇格: ${promoted}';
+	@override String rulesSummary({required Object total, required Object critical}) => 'ルール: 合計 ${total}、クリティカル ${critical}。';
+	@override String scanned({required Object count}) => '${count} 件のプロジェクトをスキャンしました。';
+	@override String get title => '既存のルールを移行';
+}
+
+// Path: skills.addDialog
+class Translations$skills$addDialog$ja extends Translations$skills$addDialog$en {
+	Translations$skills$addDialog$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get chooseFileTitle => 'SKILL.mdを選択';
+	@override String get chooseFiles => 'ファイルを選択';
+	@override String get chooseFolder => 'フォルダを選択';
+	@override String get chooseFolderTitle => 'スキルフォルダを選択';
+	@override String folderFilesMeta({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ja'))(count,
+		one: '${count} ファイル · ${size}',
+		other: '${count} ファイル · ${size}',
+	);
+	@override String get folderUploadsNote => 'フォルダをアップロードした場合は選択したフォルダ名が保持されます。単体ファイルの場合は `SKILL.md` の `name` が使用されます。';
+	@override String get hideInstallLocation => 'インストール先を非表示';
+	@override String get installSkill => 'スキルをインストール';
+	@override String installSkills({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ja'))(count,
+		one: '${count} 件のスキルをインストール',
+		other: '${count} 件のスキルをインストール',
+	);
+	@override String markdownFileMeta({required Object size}) => 'Markdownファイル · ${size}';
+	@override String get pickHint => 'フォルダにはスクリプト、参照、アセットを含めることができます。';
+	@override String get pickTitle => 'スキルフォルダまたはSKILL.mdを選択';
+	@override String get readyToInstall => 'インストールの準備完了';
+	@override String removeQueued({required Object name}) => '${name} を削除';
+	@override String title({required Object provider}) => '${provider} スキルを追加';
+	@override String get uploadHint => 'SKILL.mdファイルまたは完全なスキルフォルダをアップロードしてください。';
+	@override String get whereWillThisInstall => 'どこにインストールされますか？';
+}
+
+// Path: skills.empty
+class Translations$skills$empty$ja extends Translations$skills$empty$en {
+	Translations$skills$empty$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get noGlobalSkills => 'グローバルスキルはまだ見つかっていません';
+	@override String get noGlobalSkillsDescription => '上でグローバルスキルを追加すると、すべてのプロジェクトで利用できるようになります。';
+	@override String get noMatchingSkills => '一致するスキルがありません';
+	@override String get noMatchingSkillsDescription => '別のコマンド、名前、スコープ、プロジェクト、ソースパスをお試しください。';
+	@override String get noProjects => '利用可能なプロジェクトがありません';
+	@override String get noProjectsDescription => 'プロジェクトまたはワークスペースを追加すると、そのスキルを参照できます。';
+	@override String get noSkillsInProject => 'このプロジェクトにスキルがありません';
+	@override String get noSkillsInProjectDescription => '選択したプロジェクトに .claude/skills、.cursor/skills、または .agents/skills フォルダを作成してください。';
+}
+
+// Path: skills.errors
+class Translations$skills$errors$ja extends Translations$skills$errors$en {
+	Translations$skills$errors$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get addMarkdownFirst => '先に1つ以上のMarkdownファイルを追加してください。';
+	@override String couldNotReadSkillFile({required Object name}) => '${name} から SKILL.md を読み取れませんでした。';
+	@override String get dropMarkdownOrFolder => '1つ以上のMarkdownファイル、またはSKILL.mdを含むフォルダをドロップしてください。';
+	@override String folderFileLimit({required Object count}) => 'スキルフォルダには最大 ${count} 個のファイルを含めることができます。';
+	@override String get folderReadFailed => 'スキルフォルダの読み取りに失敗しました';
+	@override String get folderSizeLimit => '選択したスキルフォルダの合計サイズは30 MB未満である必要があります。';
+	@override String get importFailed => 'スキルのインポートに失敗しました';
+	@override String get missingSkillFile => '選択したフォルダに SKILL.md ファイルが含まれていません。';
+}
+
+// Path: skills.moveDialog
+class Translations$skills$moveDialog$ja extends Translations$skills$moveDialog$en {
+	Translations$skills$moveDialog$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get moveToGlobal => 'グローバルに移動';
+	@override String get moveToProject => 'プロジェクトに移動';
+	@override String get toGlobalHint => 'このスキルをグローバルスキルディレクトリに移動し、すべてのプロジェクトで使用できるようにします。';
+	@override String get toProjectHint => 'このスキルを所有するプロジェクトを選択してください。プロバイダーのグローバルスキルディレクトリから移動します。';
+}
+
+// Path: skills.scopes
+class Translations$skills$scopes$ja extends Translations$skills$scopes$en {
+	Translations$skills$scopes$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get admin => '管理者';
+	@override String get plugin => 'プラグイン';
+	@override String get project => 'プロジェクト';
+	@override String get repo => 'リポジトリ';
+	@override String get system => 'システム';
+	@override String get user => 'ユーザー';
+}
+
+// Path: skills.screen
+class Translations$skills$screen$ja extends Translations$skills$screen$en {
+	Translations$skills$screen$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get addSkill => 'スキルを追加';
+	@override String get clearSearch => 'スキル検索をクリア';
+	@override String deleteDescription({required Object provider, required Object directory}) => '${provider} の管理対象スキルディレクトリから ${directory} ディレクトリを削除します。元に戻せません。';
+	@override String deleteTitle({required Object name}) => '${name} を削除しますか？';
+	@override String loadingSkills({required Object provider}) => '${provider} のスキルを読み込み中…';
+	@override String manageDescription({required Object provider}) => 'ローカルファイル、フォルダ全体、プロジェクト対応の場所から ${provider} スキルを管理します。';
+	@override String get noDescription => 'スキルのフロントマターに説明がありません。';
+	@override String pluginBadge({required Object name}) => 'プラグイン: ${name}';
+	@override String projectBadge({required Object name}) => 'プロジェクト: ${name}';
+	@override String get savedSuccessfully => 'スキルを保存しました。';
+	@override String get scanningProjectSkills => 'プロジェクトのスキルをスキャン中...';
+	@override String get searchHint => 'スキルを検索...';
+	@override String skillsCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ja'))(count,
+		one: '${count} スキル',
+		other: '${count} スキル',
+	);
+	@override String get sourceLabel => 'ソース';
+}
+
+// Path: mcp.form
+class Translations$mcp$form$ja extends Translations$mcp$form$en {
+	Translations$mcp$form$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$mcp$form$fields$ja fields = Translations$mcp$form$fields$ja._(_root);
+	@override late final Translations$mcp$form$scope$ja scope = Translations$mcp$form$scope$ja._(_root);
+	@override String submitTo({required Object provider}) => '${provider} にサーバーを追加';
+	@override late final Translations$mcp$form$validation$ja validation = Translations$mcp$form$validation$ja._(_root);
+}
+
+// Path: mcp.install
+class Translations$mcp$install$ja extends Translations$mcp$install$en {
+	Translations$mcp$install$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get button => 'インストール';
+	@override String get cardDescription => 'MCP経由でエージェントにナレッジベースとddagentツールを提供します — エージェントを選択するか、すべてにインストールしてください。';
+	@override String get description => '選択したエージェントがMCP経由でddagentのナレッジベースとツールを使用できるようにします。';
+	@override String get errorFallback => 'エラー';
+	@override String failed({required Object error}) => 'インストールに失敗しました: ${error}';
+	@override String get installForAll => 'すべてにインストール';
+	@override String get installSelected => '選択項目にインストール';
+	@override String installedCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ja'))(count,
+		one: '${count} 個のエージェントにインストールしました。',
+		other: '${count} 個のエージェントにインストールしました。',
+	);
+	@override String partialFailure({required Object count, required Object failed}) => '${count} 個にインストールしました。失敗: ${failed}';
+	@override String get title => 'ddagent MCPサーバーをインストール';
+}
+
+// Path: mcp.servers
+class Translations$mcp$servers$ja extends Translations$mcp$servers$en {
+	Translations$mcp$servers$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get addGlobalDescription => 'このMCPサーバーをすべてのプロバイダー（Claude、Cursor、Codex、OpenCode、Devin）に追加します。同じ設定をすべてのプロバイダーで機能させる必要があるため、stdio と HTTP トランスポートのみがサポートされます。';
+	@override String get addGlobalMenuDescription => 'グローバルMCPサーバーの追加は、共通の stdio または HTTP サーバーを Claude、Cursor、Codex、OpenCode、Devin に書き込みます。';
+	@override String get addGlobalTitle => 'グローバルMCPサーバーを追加';
+	@override String addProviderDescription({required Object provider}) => '${provider} MCPサーバーの追加は ${provider} のみを変更します。';
+	@override String addProviderTitle({required Object provider}) => '${provider} MCPサーバーを追加';
+	@override late final Translations$mcp$servers$config$ja config = Translations$mcp$servers$config$ja._(_root);
+	@override String descriptionGeneric({required Object provider}) => 'Model Context Protocolサーバーは ${provider} に追加のツールとデータソースを提供します';
+	@override String get loading => 'MCPサーバーを読み込み中...';
+	@override String get refreshingScopes => 'プロジェクトスコープを更新中...';
+}
+
+// Path: mcp.team
+class Translations$mcp$team$ja extends Translations$mcp$team$en {
+	Translations$mcp$team$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get cta => 'ddagent Pro で利用できます';
+	@override String get description => 'MCPサーバー設定をチーム全体で共有します。全員が自動的に同期されます。';
+	@override String get title => 'チームMCP設定';
+}
+
+// Path: mcp.tokens
+class Translations$mcp$tokens$ja extends Translations$mcp$tokens$en {
+	Translations$mcp$tokens$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get scopeWrite => '書き込み';
+}
+
+// Path: terminal.actions
+class Translations$terminal$actions$ja extends Translations$terminal$actions$en {
+	Translations$terminal$actions$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get clearOutput => '出力をクリア';
+	@override String get connect => '接続';
+	@override String get newShell => '新しいシェル';
+	@override String get newTab => '新しいターミナルタブ';
+	@override String get providerLogin => 'プロバイダーログイン';
+	@override String get restartSession => 'セッションを再起動';
+}
+
+// Path: terminal.authUrl
+class Translations$terminal$authUrl$ja extends Translations$terminal$authUrl$en {
+	Translations$terminal$authUrl$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get openInBrowser => 'ブラウザで開く';
+}
+
+// Path: terminal.errors
+class Translations$terminal$errors$ja extends Translations$terminal$errors$en {
+	Translations$terminal$errors$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String couldNotOpenLink({required Object url}) => 'リンクを開けませんでした: ${url}';
+}
+
+// Path: terminal.fileLink
+class Translations$terminal$fileLink$ja extends Translations$terminal$fileLink$en {
+	Translations$terminal$fileLink$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String detected({required Object path}) => 'ファイルを検出: ${path}';
+}
+
+// Path: terminal.paste
+class Translations$terminal$paste$ja extends Translations$terminal$paste$en {
+	Translations$terminal$paste$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get hint => 'Ctrl+V / 右クリック → 貼り付け';
+	@override String get title => 'ターミナルに貼り付け';
+}
+
+// Path: terminal.shortcuts
+class Translations$terminal$shortcuts$ja extends Translations$terminal$shortcuts$en {
+	Translations$terminal$shortcuts$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get eof => 'EOF';
+	@override String get hide => 'ショートカットバーを非表示';
+	@override String get interrupt => '中断 (SIGINT)';
+	@override String get suspend => '一時停止 (SIGTSTP)';
+	@override String get showTooltip => 'ショートカットを表示';
+	@override String get hideTooltip => 'ショートカットを非表示';
+}
+
+// Path: terminal.tabs
+class Translations$terminal$tabs$ja extends Translations$terminal$tabs$en {
+	Translations$terminal$tabs$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get antigravityCli => 'Antigravity CLI';
+	@override String get claudeCli => 'Claude CLI';
+	@override String get commandCodeCli => 'Command Code CLI';
+	@override String get cursorCli => 'Cursor CLI';
+	@override String get devinCli => 'Devin CLI';
+	@override String loginTitle({required Object provider}) => 'ログイン: ${provider}';
+	@override String get opencodeCli => 'OpenCode CLI';
+	@override String get plainShell => '通常のシェル';
+	@override String shellName({required Object index}) => 'シェル ${index}';
+}
+
+// Path: quota.agents
+class Translations$quota$agents$ja extends Translations$quota$agents$en {
+	Translations$quota$agents$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String statusCount({required Object status, required Object count}) => '${status} (${count})';
+}
+
+// Path: quota.chart
+class Translations$quota$chart$ja extends Translations$quota$chart$en {
+	Translations$quota$chart$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get hide => '非表示';
+	@override String get noData => 'トレンドを表示するにはデータが不足しています。';
+	@override String pointReadout({required Object date, required Object tokens, required Object cost}) => '${date} · ${tokens} トークン · ${cost}';
+	@override String get show => '表示';
+}
+
+// Path: quota.config
+class Translations$quota$config$ja extends Translations$quota$config$en {
+	Translations$quota$config$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get accountRouting => 'アカウントのルーティング';
+	@override String get pollerTitle => 'ポーラーとアラート';
+	@override String get save => '設定を保存';
+}
+
+// Path: quota.overview
+class Translations$quota$overview$ja extends Translations$quota$overview$en {
+	Translations$quota$overview$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get tokensAndCost => 'トークンとコスト';
+}
+
+// Path: quota.section
+class Translations$quota$section$ja extends Translations$quota$section$en {
+	Translations$quota$section$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get config => '設定';
+}
+
+// Path: notifications.errors
+class Translations$notifications$errors$ja extends Translations$notifications$errors$en {
+	Translations$notifications$errors$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get noResponse => 'サーバーから応答がありません';
+	@override String get registrationRejected => 'サーバーに登録を拒否されました';
+}
+
+// Path: collab.roles
+class Translations$collab$roles$ja extends Translations$collab$roles$en {
+	Translations$collab$roles$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get member => 'メンバー';
+	@override String get viewer => '閲覧者';
+}
+
+// Path: sessions.activity
+class Translations$sessions$activity$ja extends Translations$sessions$activity$en {
+	Translations$sessions$activity$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get committingChanges => '変更をコミット中';
+	@override String editingFile({required Object file}) => '${file} を編集中';
+	@override String get editingFileGeneric => 'ファイルを編集中';
+	@override String fetchingUrl({required Object url}) => '${url} を取得中';
+	@override String get pushingBranch => 'ブランチをプッシュ中';
+	@override String readingFile({required Object file}) => '${file} を読み取り中';
+	@override String runningCommand({required Object command}) => '`${command}` を実行中';
+	@override String get runningShellCommand => 'シェルコマンドを実行中';
+	@override String runningTool({required Object name}) => '${name} を実行中';
+	@override String searching({required Object query}) => '“${query}” を検索中';
+	@override String get subagentRunning => 'サブエージェントを実行中';
+}
+
+// Path: sessions.age
+class Translations$sessions$age$ja extends Translations$sessions$age$en {
+	Translations$sessions$age$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String days({required Object days}) => '${days}日';
+	@override String hours({required Object hours}) => '${hours}時間';
+	@override String get lessThanMinute => '1分未満';
+	@override String minutes({required Object count}) => '${count}分';
+}
+
+// Path: sessions.toasts
+class Translations$sessions$toasts$ja extends Translations$sessions$toasts$en {
+	Translations$sessions$toasts$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get archived => 'セッションをアーカイブしました';
+	@override String get deleted => 'セッションを削除しました';
+	@override String get pinned => 'セッションをピン留めしました';
+	@override String get renamed => 'セッション名を変更しました';
+	@override String get restored => 'セッションを復元しました';
+	@override String get unpinned => 'セッションのピン留めを解除しました';
+	@override String get workspaceChanged => 'ワークスペースを変更しました';
+}
+
+// Path: git.checkpoints
+class Translations$git$checkpoints$ja extends Translations$git$checkpoints$en {
+	Translations$git$checkpoints$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get create => '新規';
+	@override String get empty => 'チェックポイントはまだありません';
+	@override String get labelHint => 'チェックポイントのラベル（任意）';
+	@override String get restoreMessage => '作業ツリーをこのチェックポイントにリセットしますか？現在の変更は置き換えられます。';
+	@override String get restoreTitle => 'チェックポイントを復元';
+	@override String get restored => 'チェックポイントを復元しました';
+	@override String get title => 'チェックポイント';
+}
+
+// Path: kanban.card
+class Translations$kanban$card$ja extends Translations$kanban$card$en {
+	Translations$kanban$card$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get untitled => '無題';
+}
+
+// Path: kanban.comments
+class Translations$kanban$comments$ja extends Translations$kanban$comments$en {
+	Translations$kanban$comments$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get add => 'コメントを追加';
+	@override String get empty => 'コメントはまだありません';
+}
+
+// Path: kanban.details
+class Translations$kanban$details$ja extends Translations$kanban$details$en {
+	Translations$kanban$details$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String status({required Object status}) => 'ステータス: ${status}';
+	@override String get title => 'カードの詳細';
+}
+
+// Path: kanban.dialog
+class Translations$kanban$dialog$ja extends Translations$kanban$dialog$en {
+	Translations$kanban$dialog$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get saving => '保存中…';
+}
+
+// Path: kanban.empty
+class Translations$kanban$empty$ja extends Translations$kanban$empty$en {
+	Translations$kanban$empty$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get noProject => 'プロジェクトが選択されていません';
+}
+
+// Path: kanban.time
+class Translations$kanban$time$ja extends Translations$kanban$time$en {
+	Translations$kanban$time$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String daysAgo({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ja'))(count,
+		one: '1日前',
+		other: '${count}日前',
+	);
+	@override String hoursAgo({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ja'))(count,
+		one: '1時間前',
+		other: '${count}時間前',
+	);
+	@override String minutesAgo({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ja'))(count,
+		one: '1分前',
+		other: '${count}分前',
+	);
+	@override String get now => 'たった今';
+}
+
+// Path: onboarding.agents
+class Translations$onboarding$agents$ja extends Translations$onboarding$agents$en {
+	Translations$onboarding$agents$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => '1つ以上のAIコーディングアシスタントにログインします。すべて任意です。';
+	@override String get laterHint => 'これらは後で設定で構成できます。';
+	@override String get title => 'AIエージェントを接続';
+}
+
+// Path: onboarding.errors
+class Translations$onboarding$errors$ja extends Translations$onboarding$errors$en {
+	Translations$onboarding$errors$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get invalidEmail => '有効なメールアドレスを入力してください。';
+	@override String get nameAndEmailRequired => 'git の名前とメールアドレスの両方が必要です。';
+}
+
+// Path: onboarding.mcp
+class Translations$onboarding$mcp$ja extends Translations$onboarding$mcp$en {
+	Translations$onboarding$mcp$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => 'ddagent MCPサーバーをインストールすると、エージェントがナレッジベースとddagentツールを使用できるようになります。エージェントを選択するか、すべてにインストールしてください。';
+	@override String get installForAll => 'すべてにインストール';
+	@override String get installSelected => '選択項目にインストール';
+	@override String installedOn({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ja'))(count,
+		one: '${count} 個のエージェントにインストールしました。',
+		other: '${count} 個のエージェントにインストールしました。',
+	);
+	@override String installedWithFailures({required Object installedCount, required Object failed}) => '${installedCount} 個にインストールしました。失敗: ${failed}';
+	@override String get laterHint => '任意 — 後で設定 → MCP からインストールすることもできます。';
+	@override String get title => 'エージェントを ddagent に接続';
+}
+
+// Path: fileTree.search
+class Translations$fileTree$search$ja extends Translations$fileTree$search$en {
+	Translations$fileTree$search$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get hint => '名前を絞り込み / Enterで内容を検索';
+	@override String get noMatches => '一致するものがありません';
+	@override String get prompt => 'クエリを入力してEnterを押してください';
+	@override String get resultsTruncated => '結果は省略されています';
+}
+
+// Path: fileTree.titles
+class Translations$fileTree$titles$ja extends Translations$fileTree$titles$en {
+	Translations$fileTree$titles$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String delete({required Object name}) => '${name} を削除';
+	@override String download({required Object name}) => '${name} をダウンロード';
+	@override String rename({required Object name}) => '${name} の名前を変更';
+}
+
 // Path: auth.login.errors
 class Translations$auth$login$errors$ja extends Translations$auth$login$errors$en {
 	Translations$auth$login$errors$ja._(TranslationsJa root) : this._root = root, super.internal(root);
@@ -3046,6 +4404,9 @@ class Translations$chat$session$messages$ja extends Translations$chat$session$me
 	@override String get allLoaded => 'すべてのメッセージを読み込みました';
 	@override String get perfWarning => 'すべてのメッセージを読み込みました — スクロールが遅くなる場合があります。「一番下へスクロール」をクリックしてください。';
 	@override String get noSearchMatches => '検索に一致するメッセージがありません。';
+	@override String loadAllCount({required Object count}) => 'すべて読み込む (${count})';
+	@override String get loadOlder => '過去のメッセージを読み込む';
+	@override String retryLoadOlder({required Object error}) => '過去のメッセージの読み込みを再試行 — ${error}';
 }
 
 // Path: chat.shell.selectProject
@@ -3151,6 +4512,21 @@ class Translations$chat$claudeStatus$providers$ja extends Translations$chat$clau
 
 	// Translations
 	@override String get assistant => 'アシスタント';
+}
+
+// Path: chat.commandResult.fallback
+class Translations$chat$commandResult$fallback$ja extends Translations$chat$commandResult$fallback$en {
+	Translations$chat$commandResult$fallback$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get config => '設定と構成を開きます。';
+	@override String get cost => 'アクティブなセッションのトークン使用量を確認します。';
+	@override String get help => 'コマンドのドキュメントと構文を表示します。';
+	@override String get memory => 'プロジェクトのCLAUDE.mdメモリファイルを開きます。';
+	@override String get models => 'アクティブなプロバイダーで利用可能なモデルを参照します。';
+	@override String get status => 'ランタイム、バージョン、プロバイダー、環境のステータスを確認します。';
 }
 
 // Path: common.fileTree.context
@@ -4045,6 +5421,18 @@ class Translations$settings$mcp$scope$ja extends Translations$settings$mcp$scope
 	@override String get project => 'プロジェクト';
 }
 
+// Path: settings.appearance.themeModes
+class Translations$settings$appearance$themeModes$ja extends Translations$settings$appearance$themeModes$en {
+	Translations$settings$appearance$themeModes$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get dark => 'ダーク';
+	@override String get light => 'ライト';
+	@override String get system => 'システム';
+}
+
 // Path: settings.quickSettings.sections
 class Translations$settings$quickSettings$sections$ja extends Translations$settings$quickSettings$sections$en {
 	Translations$settings$quickSettings$sections$ja._(TranslationsJa root) : this._root = root, super.internal(root);
@@ -4252,6 +5640,17 @@ class Translations$settings$notifications$desktop$ja extends Translations$settin
 	@override String get unsupported => 'このシステムではデスクトップ通知はサポートされていません。';
 }
 
+// Path: settings.notifications.channels
+class Translations$settings$notifications$channels$ja extends Translations$settings$notifications$channels$en {
+	Translations$settings$notifications$channels$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get discord => 'Discord';
+	@override String get telegram => 'Telegram';
+}
+
 // Path: settings.appearanceSettings.darkMode
 class Translations$settings$appearanceSettings$darkMode$ja extends Translations$settings$appearanceSettings$darkMode$en {
 	Translations$settings$appearanceSettings$darkMode$ja._(TranslationsJa root) : this._root = root, super.internal(root);
@@ -4392,6 +5791,7 @@ class Translations$settings$git$name$ja extends Translations$settings$git$name$e
 	// Translations
 	@override String get label => 'Git名前';
 	@override String get help => 'コミットに使用する名前';
+	@override String get placeholder => '山田 太郎';
 }
 
 // Path: settings.git.email
@@ -4403,6 +5803,7 @@ class Translations$settings$git$email$ja extends Translations$settings$git$email
 	// Translations
 	@override String get label => 'Gitメールアドレス';
 	@override String get help => 'コミットに使用するメールアドレス';
+	@override String get placeholder => 'john@example.com';
 }
 
 // Path: settings.git.actions
@@ -4901,6 +6302,17 @@ class Translations$settings$browser$errors$ja extends Translations$settings$brow
 	@override String get saveSettings => 'Browser 設定の保存に失敗しました';
 }
 
+// Path: settings.about.pro
+class Translations$settings$about$pro$ja extends Translations$settings$about$pro$en {
+	Translations$settings$about$pro$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get syncSettings => '設定を同期';
+	@override String get teamManagement => 'チーム管理';
+}
+
 // Path: tasks.notConfigured.features
 class Translations$tasks$notConfigured$features$ja extends Translations$tasks$notConfigured$features$en {
 	Translations$tasks$notConfigured$features$ja._(TranslationsJa root) : this._root = root, super.internal(root);
@@ -5049,6 +6461,53 @@ class Translations$tasks$board$deleteConfirm$ja extends Translations$tasks$board
 	// Translations
 	@override String description({required Object cardTitle}) => '「${cardTitle}」は完全に削除されます。';
 	@override String get title => 'カードを削除しますか？';
+}
+
+// Path: mcp.form.fields
+class Translations$mcp$form$fields$ja extends Translations$mcp$form$fields$en {
+	Translations$mcp$form$fields$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get bearerTokenEnvVar => 'ベアラートークン環境変数';
+	@override String get envVarNames => '環境変数名';
+	@override String get workingDirectory => '作業ディレクトリ';
+}
+
+// Path: mcp.form.scope
+class Translations$mcp$form$scope$ja extends Translations$mcp$form$scope$en {
+	Translations$mcp$form$scope$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get claudeLocal => 'Claude ローカル';
+	@override late final Translations$mcp$form$scope$description$ja description = Translations$mcp$form$scope$description$ja._(_root);
+	@override String get projectAllProviders => 'プロジェクト（すべてのプロバイダー）';
+	@override String get userAllProviders => 'ユーザー（すべてのプロバイダー）';
+}
+
+// Path: mcp.form.validation
+class Translations$mcp$form$validation$ja extends Translations$mcp$form$validation$en {
+	Translations$mcp$form$validation$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String unsupportedGlobal({required Object type}) => 'MCPサーバーの追加は、すべてのプロバイダーで stdio と http のみをサポートし、${type} はサポートしません。';
+	@override String unsupportedProvider({required Object provider, required Object type}) => '${provider} は ${type} MCPサーバーをサポートしていません';
+}
+
+// Path: mcp.servers.config
+class Translations$mcp$servers$config$ja extends Translations$mcp$servers$config$en {
+	Translations$mcp$servers$config$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get cwd => 'Cwd';
+	@override String get envVars => '環境変数';
 }
 
 // Path: common.projectWizard.step1.existing
@@ -5299,6 +6758,8 @@ class Translations$settings$apiKeys$github$form$ja extends Translations$settings
 	@override String get addButton => 'トークンを追加';
 	@override String get cancelButton => 'キャンセル';
 	@override String get howToCreate => 'GitHubパーソナルアクセストークンの作成方法 →';
+	@override String get showToken => 'トークンを表示';
+	@override String get hideToken => 'トークンを非表示';
 }
 
 // Path: settings.tasks.notInstalled.steps
@@ -5480,6 +6941,20 @@ class Translations$tasks$gettingStarted$steps$startBuilding$ja extends Translati
 	// Translations
 	@override String get title => '開発を始める';
 	@override String get description => 'AIアシスタントにタスクの作業を開始してもらい、ステータスを更新し、プロジェクトの進行に応じて新しいタスクを追加します。';
+}
+
+// Path: mcp.form.scope.description
+class Translations$mcp$form$scope$description$ja extends Translations$mcp$form$scope$description$en {
+	Translations$mcp$form$scope$description$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get local => '選択したプロジェクトのClaudeユーザー設定に保存されます';
+	@override String get project => '選択したプロジェクトのワークスペースに保存されます';
+	@override String get projectGlobal => 'すべてのプロバイダーの選択したプロジェクトワークスペースに書き込みます';
+	@override String get user => 'このマシン上のすべてのプロジェクトで利用できます';
+	@override String get userGlobal => '各プロバイダーのユーザー設定に書き込み、このマシン上のすべてのプロジェクトで利用できます';
 }
 
 // Path: common.notifications.codes.generic.info
@@ -5677,6 +7152,7 @@ extension on TranslationsJa {
 			'chat.tools.updateTodo' => 'Todoリストを更新',
 			'chat.tools.readTodo' => 'Todoリストを読み取り',
 			'chat.tools.searchResults' => '件の結果',
+			'chat.tools.todoReadLabel' => 'TodoRead 読み取りリスト',
 			'chat.search.found' => ({required Object count, required Object type}) => '${count}件の${type}が見つかりました',
 			'chat.search.file' => 'ファイル',
 			'chat.search.files' => 'ファイル',
@@ -5704,6 +7180,15 @@ extension on TranslationsJa {
 			'chat.permissions.retry' => '権限を保存しました。ツールを使用するにはリクエストを再試行してください。',
 			'chat.permissions.error' => '権限を更新できませんでした。もう一度お試しください。',
 			'chat.permissions.openSettings' => '設定を開く',
+			'chat.permissions.allow' => '許可',
+			'chat.permissions.allowAll' => ({required Object count}) => 'すべて許可 (${count})',
+			'chat.permissions.allowWithChanges' => '変更を加えて許可',
+			'chat.permissions.always' => '常に',
+			'chat.permissions.deny' => '拒否',
+			'chat.permissions.editAndAllow' => '編集して許可',
+			'chat.permissions.editInput' => '入力を編集',
+			'chat.permissions.invalidJson' => '無効なJSON',
+			'chat.permissions.reject' => '却下',
 			'chat.todo.updated' => 'Todoリストを更新しました',
 			'chat.todo.current' => '現在のTodoリスト',
 			'chat.plan.viewPlan' => '📋 実装プランを表示',
@@ -5758,6 +7243,7 @@ extension on TranslationsJa {
 			'chat.input.offlineQueue.clearBtn' => 'キャンセル',
 			'chat.input.offlineQueue.multiple' => ({required Object count}) => '${count} 件のメッセージがオフラインキューに — 再接続時に自動送信されます',
 			'chat.input.offlineQueue.single' => '1 件のメッセージがオフラインキューに — 再接続時に自動送信されます',
+			'chat.input.cameraUnavailable' => ({required Object error}) => 'カメラを利用できません: ${error}',
 			'chat.providerSelection.title' => 'AIアシスタントを選択',
 			'chat.providerSelection.description' => '新しい会話を始めるプロバイダーを選択してください',
 			'chat.providerSelection.selectModel' => 'モデルを選択',
@@ -5807,6 +7293,11 @@ extension on TranslationsJa {
 			'chat.session.messages.allLoaded' => 'すべてのメッセージを読み込みました',
 			'chat.session.messages.perfWarning' => 'すべてのメッセージを読み込みました — スクロールが遅くなる場合があります。「一番下へスクロール」をクリックしてください。',
 			'chat.session.messages.noSearchMatches' => '検索に一致するメッセージがありません。',
+			'chat.session.messages.loadAllCount' => ({required Object count}) => 'すべて読み込む (${count})',
+			'chat.session.messages.loadOlder' => '過去のメッセージを読み込む',
+			'chat.session.messages.retryLoadOlder' => ({required Object error}) => '過去のメッセージの読み込みを再試行 — ${error}',
+			'chat.session.deleteConfirm' => 'セッションとそのトランスクリプトを削除します。元に戻せません。',
+			'chat.session.finishRunBeforeWorkspaceChange' => 'ワークスペースを変更する前に実行を終了してください',
 			'chat.shell.selectProject.title' => 'プロジェクトを選択',
 			'chat.shell.selectProject.description' => 'プロジェクトを選択してそのディレクトリでシェルを開きます',
 			'chat.shell.status.newSession' => '新しいセッション',
@@ -5912,16 +7403,23 @@ extension on TranslationsJa {
 			'chat.splitOverview.idle' => 'アイドル',
 			'chat.splitOverview.active' => 'アクティブ',
 			'chat.askUserQuestion.needsInput' => ({required Object provider}) => '${provider} があなたの入力を求めています',
+			'chat.askUserQuestion.answerHint' => '回答を入力…',
+			'chat.askUserQuestion.other' => 'その他…',
+			'chat.askUserQuestion.skip' => 'スキップ',
 			'chat.attachments.downloadFailedRetry' => 'ダウンロード失敗 — クリックで再試行',
 			'chat.attachments.fileAttachment' => 'ファイル添付',
+			'chat.attachments.download' => ({required Object name}) => '${name} をダウンロード',
 			'chat.checkpoint.creating' => 'スナップショットを作成中…',
 			'chat.checkpoint.revertChanges' => 'ファイルを最後のチェックポイントに戻す',
 			'chat.checkpoint.undo' => 'チェックポイントを元に戻す',
+			'chat.checkpoint.beforeAiTurn' => 'AIターン前',
 			'chat.common.close' => '閉じる',
 			'chat.taskMaster.saveToTask' => 'タスク',
 			'chat.taskMaster.saved' => '保存済み',
 			'chat.taskMaster.saving' => '保存中...',
 			'chat.taskMaster.taskShort' => 'タスク',
+			'chat.taskMaster.addToTask' => 'TaskMasterに追加',
+			'chat.taskMaster.added' => 'TaskMasterに追加しました',
 			'chat.tokenUsage.desc' => 'セッションのトークン消費を表示',
 			'chat.tokenUsage.title' => 'トークン使用量',
 			'chat.tool.emptyResult' => '(まだ出力なし — ツールは空の結果を返しました)',
@@ -5932,6 +7430,36 @@ extension on TranslationsJa {
 			'chat.broadcast.selectOrchestrators' => 'オーケストレーターを選択',
 			'chat.broadcast.orchestratorsOnly' => 'オーケストレーターのみ',
 			'chat.broadcast.noOrchestrators' => '利用可能なオーケストレーターセッションがありません',
+			'chat.changes.empty' => 'ファイルの変更はありません',
+			'chat.changes.failedToLoad' => '変更の読み込みに失敗しました',
+			'chat.commandResult.fallback.config' => '設定と構成を開きます。',
+			'chat.commandResult.fallback.cost' => 'アクティブなセッションのトークン使用量を確認します。',
+			'chat.commandResult.fallback.help' => 'コマンドのドキュメントと構文を表示します。',
+			'chat.commandResult.fallback.memory' => 'プロジェクトのCLAUDE.mdメモリファイルを開きます。',
+			'chat.commandResult.fallback.models' => 'アクティブなプロバイダーで利用可能なモデルを参照します。',
+			'chat.commandResult.fallback.status' => 'ランタイム、バージョン、プロバイダー、環境のステータスを確認します。',
+			'chat.commandResult.filterCommands' => 'コマンドを絞り込む...',
+			'chat.commandResult.searchModels' => ({required Object provider}) => '${provider} のモデルを検索...',
+			'chat.commands.runConfirmTitle' => 'コマンドを実行しますか？',
+			'chat.commands.executionCancelled' => 'コマンドの実行をキャンセルしました',
+			'chat.export.sessionTitle' => ({required Object id}) => 'セッション ${id}',
+			'chat.export.pdfFailed' => 'PDFのエクスポートに失敗しました',
+			'chat.export.transcriptDownloaded' => 'トランスクリプトをダウンロードしました',
+			'chat.export.savedTo' => ({required Object path}) => '${path} を保存しました',
+			'chat.message.compactedSummary' => '圧縮された要約',
+			'chat.message.rawView' => '生の表示',
+			'chat.message.resendHint' => '入力欄から再送信',
+			'chat.modelLibrary.deleteTooltip' => ({required Object name}) => '${name} を削除',
+			'chat.modelLibrary.editTooltip' => ({required Object name}) => '${name} を編集',
+			'chat.modelLibrary.enterNameAndId' => 'モデル名とモデルIDの両方を入力してください。',
+			'chat.modelLibrary.idNoSpaces' => 'モデルIDにスペースは使用できません。',
+			'chat.modelLibrary.setAsDefault' => 'デフォルトに設定',
+			'chat.modelLibrary.defaultModel' => 'デフォルトモデル',
+			'chat.pinFile.action' => 'ピン留め',
+			'chat.pinFile.pathHint' => 'path/to/file.ext',
+			'chat.pinFile.title' => 'ファイルをピン留め',
+			'chat.permissionRequest.title' => ({required Object tool}) => '権限リクエスト · ${tool}',
+			'chat.permissionRequest.question' => '質問',
 			'codeEditor.toolbar.changes' => '件の変更',
 			'codeEditor.toolbar.previousChange' => '前の変更',
 			'codeEditor.toolbar.nextChange' => '次の変更',
@@ -5940,6 +7468,10 @@ extension on TranslationsJa {
 			'codeEditor.toolbar.settings' => 'エディタ設定',
 			'codeEditor.toolbar.collapse' => 'エディタを折りたたむ',
 			'codeEditor.toolbar.expand' => 'エディタを全幅に展開',
+			'codeEditor.toolbar.diffMerge' => '差分 / マージ',
+			'codeEditor.toolbar.previewInBrowser' => 'ブラウザでプレビュー',
+			'codeEditor.toolbar.reload' => 'ディスクから再読み込み',
+			'codeEditor.toolbar.toggleDock' => 'ファイルドックを切り替え',
 			'codeEditor.loading' => ({required Object fileName}) => '${fileName}を読み込んでいます...',
 			'codeEditor.header.showingChanges' => '変更を表示中',
 			'codeEditor.actions.copyPath' => 'ファイルパスをコピー',
@@ -5957,14 +7489,40 @@ extension on TranslationsJa {
 			'codeEditor.actions.unpinFile' => 'ファイルをコンテキストから外す',
 			'codeEditor.actions.previewHtml' => 'HTMLプレビューを新しいタブで開く',
 			'codeEditor.actions.retry' => '再試行',
+			'codeEditor.actions.saveAll' => 'すべて保存',
 			'codeEditor.footer.lines' => '行数:',
 			'codeEditor.footer.characters' => '文字数:',
 			'codeEditor.footer.shortcuts' => 'Ctrl+Sで保存 • Escで閉じる',
 			'codeEditor.binaryFile.title' => 'バイナリファイル',
 			'codeEditor.binaryFile.message' => ({required Object fileName}) => 'ファイル "${fileName}" はバイナリファイルのため、テキストエディタで表示できません。',
+			'codeEditor.binaryFile.cannotDisplayAsText' => 'テキストとして表示できません',
 			'codeEditor.filePreview.loading' => 'プレビューを読み込み中...',
 			'codeEditor.filePreview.error' => 'このファイルを表示できません。',
 			'codeEditor.filePreview.openInNewTab' => '新しいタブで開く',
+			'codeEditor.diff.applyMerge' => 'マージを適用',
+			'codeEditor.diff.base' => 'ベース',
+			'codeEditor.diff.close' => '差分を閉じる',
+			'codeEditor.diff.current' => '現在',
+			'codeEditor.diff.hunk' => ({required Object number}) => 'ハンク ${number}',
+			'codeEditor.diff.noChanges' => '変更なし',
+			'codeEditor.diff.deletedOnDisk' => 'ディスク上で削除済み',
+			'codeEditor.discardUnsavedChanges' => '未保存の変更を破棄しますか？',
+			'codeEditor.emptyState.title' => 'ファイルが開かれていません',
+			'codeEditor.failedToLoad' => 'ファイルの読み込みに失敗しました',
+			'codeEditor.hexDump.more' => ({required Object size}) => '… 残り ${size}',
+			'codeEditor.mediaFile.subtitle' => '音声/動画のプレビューはまだサポートされていません',
+			'codeEditor.mediaFile.title' => 'メディアファイル',
+			'codeEditor.settings.fontSizeDecrease' => ({required Object size}) => 'フォントサイズ −  (現在 ${size})',
+			'codeEditor.settings.fontSizeIncrease' => 'フォントサイズ +',
+			'codeEditor.settings.minimap' => 'ミニマップ',
+			'codeEditor.settings.tabSize' => ({required Object size}) => 'タブサイズ: ${size}',
+			'codeEditor.unsavedChanges' => ({required Object name}) => '${name} に未保存の変更があります',
+			'codeEditor.toasts.savedFile' => ({required Object name}) => '${name} を保存しました',
+			'codeEditor.toasts.saveFailed' => '保存に失敗しました',
+			'codeEditor.toasts.allSaved' => 'すべて保存しました',
+			'codeEditor.toasts.someSavesFailed' => '一部の保存に失敗しました',
+			'codeEditor.toasts.savedTo' => ({required Object path}) => '${path} に保存しました',
+			'codeEditor.toasts.mergeApplied' => 'マージを適用しました — 保存して反映してください',
 			'common.buttons.save' => '保存',
 			'common.buttons.cancel' => 'キャンセル',
 			'common.buttons.delete' => '削除',
@@ -5981,6 +7539,8 @@ extension on TranslationsJa {
 			'common.buttons.download' => 'ダウンロード',
 			'common.buttons.upload' => 'アップロード',
 			'common.buttons.browse' => '参照',
+			'common.buttons.openDiagram' => '図を開く',
+			'common.buttons.update' => '更新',
 			'common.tabs.chat' => 'チャット',
 			'common.tabs.shell' => 'シェル',
 			'common.tabs.files' => 'ファイル',
@@ -6046,6 +7606,8 @@ extension on TranslationsJa {
 			'common.mainContent.selectProjectDescription' => 'サイドバーからプロジェクトを選択して、Claudeとコーディングを始めましょう。各プロジェクトにはチャットセッションとファイル履歴が含まれています。',
 			'common.mainContent.tip' => 'ヒント',
 			'common.mainContent.createProjectMobile' => '上部のメニューボタンからプロジェクトにアクセスできます',
+			_ => null,
+		} ?? switch (path) {
 			'common.mainContent.createProjectDesktop' => 'サイドバーのフォルダアイコンをクリックして新しいプロジェクトを作成できます',
 			'common.mainContent.newSession' => '新しいセッション',
 			'common.mainContent.untitledSession' => '無題のセッション',
@@ -6131,8 +7693,6 @@ extension on TranslationsJa {
 			'common.fileTree.validation.reserved' => 'ファイル名は予約語です',
 			'common.projectWizard.title' => '新規プロジェクトを作成',
 			'common.projectWizard.steps.type' => '種類',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.steps.configure' => '設定',
 			'common.projectWizard.steps.confirm' => '確認',
 			'common.projectWizard.step1.question' => '既存のワークスペースがありますか？それとも新しく作成しますか？',
@@ -6560,6 +8120,8 @@ extension on TranslationsJa {
 			'common.gitPanel.mergeWorktree.commitCount' => ({required Object count}) => '${count} コミット',
 			'common.gitPanel.mergeWorktree.merge' => 'マージ',
 			'common.gitPanel.mergeWorktree.mergeMessage' => ({required Object branch}) => 'ブランチ \'${branch}\' をマージ',
+			_ => null,
+		} ?? switch (path) {
 			'common.gitPanel.mergeWorktree.messageLabel' => 'コミットメッセージ',
 			'common.gitPanel.mergeWorktree.squashDesc' => ({required Object commits, required Object branch}) => '${commits} 件すべてを ${branch} 上の1つのコミットにまとめる',
 			'common.gitPanel.mergeWorktree.squashLabel' => 'コミットをスカッシュ',
@@ -6645,8 +8207,6 @@ extension on TranslationsJa {
 			'common.gitPanel.worktrees.changes' => ({required Object count}) => '${count} 件の変更',
 			'common.gitPanel.worktrees.count' => ({required Object count}) => '${count} 個の worktree',
 			'common.gitPanel.worktrees.createFirst' => '最初の worktree を作成',
-			_ => null,
-		} ?? switch (path) {
 			'common.gitPanel.worktrees.detached' => '分離',
 			'common.gitPanel.worktrees.detachedAt' => ({required Object sha}) => '分離 @ ${sha}',
 			'common.gitPanel.worktrees.detachedHead' => 'detached HEAD',
@@ -6669,6 +8229,16 @@ extension on TranslationsJa {
 			'common.gitPanel.tabs.worktrees' => 'ワークツリー',
 			'common.sessions.renameSession' => 'セッション名を変更',
 			'common.projects.newSession' => '新しいセッション',
+			'common.codeBlock.wrapLines' => '行を折り返す',
+			'common.codeBlock.noWrap' => '折り返しなし',
+			'common.update.available' => ({required Object version}) => '更新があります · v${version}',
+			'common.update.confirm' => ({required Object version}) => 'v${version} に更新しますか？サーバーは自動で更新して再起動します — アクティブなセッションは中断されます。',
+			'common.update.downloading' => '更新をダウンロードして適用中…',
+			'common.update.restarting' => 'サーバーを再起動中 — しばらくお待ちください…',
+			'common.update.done' => ({required Object version}) => 'v${version} に更新しました。新しいバンドルを反映するにはアプリを再読み込みしてください。',
+			'common.update.manualRestart' => '更新は適用されましたが、サーバーは自動で再起動しませんでした — 手動で再起動して完了してください。',
+			'common.update.failed' => '更新に失敗しました。',
+			'common.update.failedTitle' => '更新に失敗しました',
 			'settings.title' => '設定',
 			'settings.changelog.title' => '変更履歴',
 			'settings.changelog.loading' => '読み込み中…',
@@ -6682,6 +8252,7 @@ extension on TranslationsJa {
 			'settings.server.restarting' => '再起動中… サーバーが戻り次第、ページを再読み込みします。',
 			'settings.server.restartFailed' => '再起動に失敗しました',
 			'settings.server.unsupported' => '再起動は、サーバーがサービスマネージャー管理下で動作している場合のみ利用できます。',
+			'settings.server.ok' => 'OK',
 			'settings.updates.title' => 'アプリの更新',
 			'settings.updates.description' => 'GitHub で新しいデスクトップビルドを確認します。新しいバージョンは自動でダウンロードされ、終了時にインストールされます。',
 			'settings.updates.check' => '更新を確認',
@@ -6727,6 +8298,9 @@ extension on TranslationsJa {
 			'settings.appearance.showMinimap' => 'ミニマップを表示',
 			'settings.appearance.lineNumbers' => '行番号',
 			'settings.appearance.fontSize' => 'フォントサイズ',
+			'settings.appearance.themeModes.dark' => 'ダーク',
+			'settings.appearance.themeModes.light' => 'ライト',
+			'settings.appearance.themeModes.system' => 'システム',
 			'settings.actions.saveChanges' => '変更を保存',
 			'settings.actions.resetToDefaults' => 'デフォルトに戻す',
 			'settings.actions.cancelChanges' => '変更をキャンセル',
@@ -6744,6 +8318,7 @@ extension on TranslationsJa {
 			'settings.quickSettings.dragHandle.openPanel' => '設定パネルを開く',
 			'settings.quickSettings.dragHandle.draggingStatus' => 'ドラッグ中...',
 			'settings.quickSettings.dragHandle.toggleAndMove' => 'クリックで切替、ドラッグで移動',
+			'settings.quickSettings.sendWithCtrlEnter' => 'Ctrl+Enterで送信',
 			'settings.terminalShortcuts.title' => 'ターミナルショートカット',
 			'settings.terminalShortcuts.sectionKeys' => 'キー',
 			'settings.terminalShortcuts.sectionNavigation' => 'ナビゲーション',
@@ -6883,6 +8458,9 @@ extension on TranslationsJa {
 			'settings.notifications.desktop.disable' => 'プッシュ通知を無効にする',
 			'settings.notifications.desktop.enabled' => 'このデスクトップアプリの通知が有効です',
 			'settings.notifications.desktop.unsupported' => 'このシステムではデスクトップ通知はサポートされていません。',
+			'settings.notifications.channels.discord' => 'Discord',
+			'settings.notifications.channels.telegram' => 'Telegram',
+			'settings.notifications.unpair' => 'ペアリングを解除',
 			'settings.appearanceSettings.darkMode.label' => 'ダークモード',
 			'settings.appearanceSettings.darkMode.description' => 'ライトテーマとダークテーマを切り替えます',
 			'settings.appearanceSettings.codeEditor.title' => 'コードエディタ',
@@ -6941,8 +8519,10 @@ extension on TranslationsJa {
 			'settings.git.description' => 'コミット用のGit IDを設定します。この設定は git config --global で適用されます',
 			'settings.git.name.label' => 'Git名前',
 			'settings.git.name.help' => 'コミットに使用する名前',
+			'settings.git.name.placeholder' => '山田 太郎',
 			'settings.git.email.label' => 'Gitメールアドレス',
 			'settings.git.email.help' => 'コミットに使用するメールアドレス',
+			'settings.git.email.placeholder' => 'john@example.com',
 			'settings.git.actions.save' => '設定を保存',
 			'settings.git.actions.saving' => '保存中...',
 			'settings.git.status.success' => '保存しました',
@@ -6972,6 +8552,8 @@ extension on TranslationsJa {
 			'settings.apiKeys.github.form.addButton' => 'トークンを追加',
 			'settings.apiKeys.github.form.cancelButton' => 'キャンセル',
 			'settings.apiKeys.github.form.howToCreate' => 'GitHubパーソナルアクセストークンの作成方法 →',
+			'settings.apiKeys.github.form.showToken' => 'トークンを表示',
+			'settings.apiKeys.github.form.hideToken' => 'トークンを非表示',
 			'settings.apiKeys.github.empty' => 'GitHubトークンはまだ追加されていません。',
 			'settings.apiKeys.github.added' => '追加日:',
 			'settings.apiKeys.github.confirmDelete' => 'このGitHubトークンを削除してもよろしいですか？',
@@ -7052,6 +8634,8 @@ extension on TranslationsJa {
 			'settings.permissions.toolExamples.bashRm' => '- すべてのrmコマンドをブロック（危険）',
 			'settings.permissions.shellExamples.title' => 'シェルコマンドの例:',
 			'settings.permissions.shellExamples.ls' => '- lsコマンドを許可',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.shellExamples.gitStatus' => '- git statusを許可',
 			'settings.permissions.shellExamples.npmInstall' => '- npm installを許可',
 			'settings.permissions.shellExamples.rmRf' => '- 再帰的削除をブロック',
@@ -7159,8 +8743,6 @@ extension on TranslationsJa {
 			'settings.browser.installed' => 'インストール済み',
 			'settings.browser.installing' => 'インストール中...',
 			'settings.browser.missing' => '未インストール',
-			_ => null,
-		} ?? switch (path) {
 			'settings.browser.runtimeRequired' => 'ブラウザランタイムが必要です',
 			'settings.browser.statusDisabled' => '無効',
 			'settings.browser.statusLabel' => 'ステータス',
@@ -7175,8 +8757,14 @@ extension on TranslationsJa {
 			'settings.workspaces.description' => 'ワークスペースは、ddagent がチャット・コード実行・ブラウジングできるディレクトリです。',
 			'settings.workspaces.remove' => 'ワークスペースを削除',
 			'settings.workspaces.title' => 'ワークスペース',
+			'settings.workspaces.pathRequired' => 'パスは必須です',
 			'settings.about.supportTitle' => 'プロジェクトを支援',
 			'settings.about.buyMeACoffee' => 'Buy Me a Coffee',
+			'settings.about.learnMore' => '詳細を見る',
+			'settings.about.pro.syncSettings' => '設定を同期',
+			'settings.about.pro.teamManagement' => 'チーム管理',
+			'settings.about.proFeatures' => 'ddagent Pro の機能',
+			'settings.about.tryHosted' => 'ddagent Hosted を試す',
 			'sidebar.projects.title' => 'プロジェクト',
 			'sidebar.projects.newProject' => '新規プロジェクト',
 			'sidebar.projects.deleteProject' => 'プロジェクトを除去',
@@ -7371,6 +8959,7 @@ extension on TranslationsJa {
 			'tasks.notConfigured.features.progressVisualization' => '進捗の可視化：カンバンボードと詳細なタスク分析',
 			'tasks.notConfigured.features.cliIntegration' => 'CLI統合：高度なワークフローのためにtaskmasterコマンドを使用',
 			'tasks.notConfigured.initializeButton' => 'TaskMaster AIを初期化',
+			'tasks.notConfigured.writePrdFirst' => '先にPRDを作成してください',
 			'tasks.gettingStarted.title' => 'TaskMasterを始める',
 			'tasks.gettingStarted.subtitle' => 'TaskMasterが初期化されました！次にすることは:',
 			'tasks.gettingStarted.steps.createPRD.title' => 'Product Requirements Document (PRD) を作成',
@@ -7451,12 +9040,22 @@ extension on TranslationsJa {
 			'tasks.buttons.createNewPRD' => '新しいPRDを作成',
 			'tasks.buttons.prdsAvailable' => ({required Object count}) => '${count}件のPRDがあります',
 			'tasks.prd.modified' => ({required Object date}) => '更新日: ${date}',
+			'tasks.prd.editorTitle' => ({required Object name}) => 'PRD — ${name}',
+			'tasks.prd.fileExistsMessage' => ({required Object name}) => '「${name}」という名前のPRDが既に存在します。上書きしますか？',
+			'tasks.prd.fileExistsTitle' => 'ファイルは既に存在します',
+			'tasks.prd.newFile' => '新しいファイル',
+			'tasks.prd.parse' => 'PRDを解析',
+			'tasks.prd.template' => 'テンプレート',
+			'tasks.prd.fileNameHint' => 'ファイル名（例: prd.txt）',
+			'tasks.prd.saved' => 'PRDを保存しました',
+			'tasks.prd.tasksGenerated' => 'PRDからタスクを生成しました',
 			'tasks.statuses.pending' => '保留中',
 			'tasks.statuses.inProgress' => '進行中',
 			'tasks.statuses.done' => '完了',
 			'tasks.statuses.blocked' => 'ブロック中',
 			'tasks.statuses.deferred' => '延期',
 			'tasks.statuses.cancelled' => 'キャンセル',
+			'tasks.statuses.review' => 'レビュー',
 			'tasks.priorities.high' => '高',
 			'tasks.priorities.medium' => '中',
 			'tasks.priorities.low' => '低',
@@ -7530,6 +9129,8 @@ extension on TranslationsJa {
 			'tasks.list.inProgressComplete' => '進行中（クリックで完了）',
 			'tasks.list.markCompleted' => '完了としてマーク',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => 'タスク ${id} のステータスを切り替え',
+			'tasks.list.markDone' => '完了にする',
+			'tasks.list.reopen' => '再開',
 			'tasks.nextTask.allComplete' => 'すべてのタスクが完了',
 			'tasks.nextTask.feature1' => '- 依存関係とサブタスクを備えたAIタスク管理。',
 			'tasks.nextTask.feature2' => '- PRD駆動のタスク生成でプロジェクトを迅速に開始。',
@@ -7547,6 +9148,8 @@ extension on TranslationsJa {
 			'tasks.taskDetail.cancelEdit' => '編集をキャンセル',
 			'tasks.taskDetail.close' => '閉じる',
 			'tasks.taskDetail.copyTaskId' => 'タスクIDをコピー',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.delete' => 'タスクを削除',
 			'tasks.taskDetail.deleteConfirmDescription' => ({required Object title}) => '「${title}」は完全に削除されます。',
 			'tasks.taskDetail.deleteConfirmTitle' => 'タスクを削除しますか？',
@@ -7568,6 +9171,11 @@ extension on TranslationsJa {
 			'tasks.taskDetail.testStrategy' => 'テスト戦略',
 			'tasks.taskDetail.titleRequired' => 'タイトルは必須です',
 			'tasks.taskDetail.updateFailed' => 'タスクの更新に失敗しました',
+			'tasks.taskDetail.deleteConfirmMessage' => ({required Object id}) => 'タスク #${id} は削除されます。元に戻せません。',
+			'tasks.taskDetail.notFound' => 'タスクが見つかりません',
+			'tasks.taskDetail.subtasks' => 'サブタスク',
+			'tasks.taskDetail.idCopied' => 'タスクIDをコピーしました',
+			'tasks.toasts.statusInProgress' => ({required Object id}) => 'タスク ${id} を進行中に設定しました',
 			'knowledge.title' => 'ナレッジ',
 			'knowledge.tabs.dashboard' => 'ダッシュボード',
 			'knowledge.tabs.memories' => 'メモリ',
@@ -7644,6 +9252,383 @@ extension on TranslationsJa {
 			'knowledge.tags.manage' => 'タグを管理',
 			'knowledge.tags.none' => 'タグがありません。',
 			'knowledge.settings.description' => 'エージェント向けのローカルメモリ層：メモリ、ルール、スキル、個人情報。',
+			'knowledge.contextBudget.tokens' => ({required Object tokens, required Object budget}) => '~${tokens} / ${budget} tok',
+			'knowledge.critical.make' => 'クリティカルにする',
+			'knowledge.critical.makeAll' => 'すべてのルールをクリティカルにする',
+			'knowledge.critical.makeAllHint' => 'それらを注入されるコンテキスト予算に追加します',
+			'knowledge.errors.importFailed' => ({required Object error}) => 'インポートに失敗しました: ${error}',
+			'knowledge.errors.migrationFailed' => ({required Object error}) => '移行に失敗しました: ${error}',
+			'knowledge.graph.truncated' => '省略',
+			'knowledge.importAll.action' => 'すべてをインポート',
+			'knowledge.importAll.mergeDuplicates' => '重複エントリを統合',
+			'knowledge.importAll.mergeDuplicatesHint' => 'ddagent 内の重複行を統合します（ファイルではありません）',
+			'knowledge.importAll.projectsScanned' => ({required Object count}) => 'スキャンしたプロジェクト: ${count}',
+			'knowledge.importAll.rulesSummary' => ({required Object total, required Object duplicates}) => 'ルール: ${total} · 重複グループ: ${duplicates}',
+			'knowledge.importAll.skillsFound' => ({required Object found, required Object newSkills}) => '見つかったエージェントスキル: ${found} (新規: ${newSkills})',
+			'knowledge.importAll.title' => 'すべてを ddagent にインポート',
+			'knowledge.importSkills.found' => ({required Object count}) => 'エージェント全体で ${count} 件のスキルが見つかりました。',
+			'knowledge.importSkills.summary' => ({required Object imported, required Object skipped}) => '新規: ${imported} · スキップ: ${skipped}',
+			'knowledge.importSkills.title' => 'エージェントスキルをインポート',
+			'knowledge.linkOptions.memory' => ({required Object title}) => 'メモリ: ${title}',
+			'knowledge.linkOptions.personal' => ({required Object title}) => '個人情報: ${title}',
+			'knowledge.linkOptions.rule' => ({required Object title}) => 'ルール: ${title}',
+			'knowledge.linkOptions.skill' => ({required Object name}) => 'スキル: ${name}',
+			'knowledge.migrate.duplicates' => ({required Object count}) => 'プロジェクト間の重複グループ: ${count}',
+			'knowledge.migrate.mergeDuplicates' => '重複を統合',
+			'knowledge.migrate.removedPromoted' => ({required Object removed, required Object promoted}) => '削除: ${removed}、昇格: ${promoted}',
+			'knowledge.migrate.rulesSummary' => ({required Object total, required Object critical}) => 'ルール: 合計 ${total}、クリティカル ${critical}。',
+			'knowledge.migrate.scanned' => ({required Object count}) => '${count} 件のプロジェクトをスキャンしました。',
+			'knowledge.migrate.title' => '既存のルールを移行',
+			'skills.addDialog.chooseFileTitle' => 'SKILL.mdを選択',
+			'skills.addDialog.chooseFiles' => 'ファイルを選択',
+			'skills.addDialog.chooseFolder' => 'フォルダを選択',
+			'skills.addDialog.chooseFolderTitle' => 'スキルフォルダを選択',
+			'skills.addDialog.folderFilesMeta' => ({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ja'))(count, one: '${count} ファイル · ${size}', other: '${count} ファイル · ${size}', ), 
+			'skills.addDialog.folderUploadsNote' => 'フォルダをアップロードした場合は選択したフォルダ名が保持されます。単体ファイルの場合は `SKILL.md` の `name` が使用されます。',
+			'skills.addDialog.hideInstallLocation' => 'インストール先を非表示',
+			'skills.addDialog.installSkill' => 'スキルをインストール',
+			'skills.addDialog.installSkills' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ja'))(count, one: '${count} 件のスキルをインストール', other: '${count} 件のスキルをインストール', ), 
+			'skills.addDialog.markdownFileMeta' => ({required Object size}) => 'Markdownファイル · ${size}',
+			'skills.addDialog.pickHint' => 'フォルダにはスクリプト、参照、アセットを含めることができます。',
+			'skills.addDialog.pickTitle' => 'スキルフォルダまたはSKILL.mdを選択',
+			'skills.addDialog.readyToInstall' => 'インストールの準備完了',
+			'skills.addDialog.removeQueued' => ({required Object name}) => '${name} を削除',
+			'skills.addDialog.title' => ({required Object provider}) => '${provider} スキルを追加',
+			'skills.addDialog.uploadHint' => 'SKILL.mdファイルまたは完全なスキルフォルダをアップロードしてください。',
+			'skills.addDialog.whereWillThisInstall' => 'どこにインストールされますか？',
+			'skills.deleteSkill' => ({required Object name}) => '${name} を削除',
+			'skills.empty.noGlobalSkills' => 'グローバルスキルはまだ見つかっていません',
+			'skills.empty.noGlobalSkillsDescription' => '上でグローバルスキルを追加すると、すべてのプロジェクトで利用できるようになります。',
+			'skills.empty.noMatchingSkills' => '一致するスキルがありません',
+			'skills.empty.noMatchingSkillsDescription' => '別のコマンド、名前、スコープ、プロジェクト、ソースパスをお試しください。',
+			'skills.empty.noProjects' => '利用可能なプロジェクトがありません',
+			'skills.empty.noProjectsDescription' => 'プロジェクトまたはワークスペースを追加すると、そのスキルを参照できます。',
+			'skills.empty.noSkillsInProject' => 'このプロジェクトにスキルがありません',
+			'skills.empty.noSkillsInProjectDescription' => '選択したプロジェクトに .claude/skills、.cursor/skills、または .agents/skills フォルダを作成してください。',
+			'skills.errors.addMarkdownFirst' => '先に1つ以上のMarkdownファイルを追加してください。',
+			'skills.errors.couldNotReadSkillFile' => ({required Object name}) => '${name} から SKILL.md を読み取れませんでした。',
+			'skills.errors.dropMarkdownOrFolder' => '1つ以上のMarkdownファイル、またはSKILL.mdを含むフォルダをドロップしてください。',
+			'skills.errors.folderFileLimit' => ({required Object count}) => 'スキルフォルダには最大 ${count} 個のファイルを含めることができます。',
+			'skills.errors.folderReadFailed' => 'スキルフォルダの読み取りに失敗しました',
+			'skills.errors.folderSizeLimit' => '選択したスキルフォルダの合計サイズは30 MB未満である必要があります。',
+			'skills.errors.importFailed' => 'スキルのインポートに失敗しました',
+			'skills.errors.missingSkillFile' => '選択したフォルダに SKILL.md ファイルが含まれていません。',
+			'skills.moveDialog.moveToGlobal' => 'グローバルに移動',
+			'skills.moveDialog.moveToProject' => 'プロジェクトに移動',
+			'skills.moveDialog.toGlobalHint' => 'このスキルをグローバルスキルディレクトリに移動し、すべてのプロジェクトで使用できるようにします。',
+			'skills.moveDialog.toProjectHint' => 'このスキルを所有するプロジェクトを選択してください。プロバイダーのグローバルスキルディレクトリから移動します。',
+			'skills.moveSkill' => ({required Object name}) => '${name} を移動',
+			'skills.projectLabel' => 'プロジェクト',
+			'skills.scopes.admin' => '管理者',
+			'skills.scopes.plugin' => 'プラグイン',
+			'skills.scopes.project' => 'プロジェクト',
+			'skills.scopes.repo' => 'リポジトリ',
+			'skills.scopes.system' => 'システム',
+			'skills.scopes.user' => 'ユーザー',
+			'skills.screen.addSkill' => 'スキルを追加',
+			'skills.screen.clearSearch' => 'スキル検索をクリア',
+			'skills.screen.deleteDescription' => ({required Object provider, required Object directory}) => '${provider} の管理対象スキルディレクトリから ${directory} ディレクトリを削除します。元に戻せません。',
+			'skills.screen.deleteTitle' => ({required Object name}) => '${name} を削除しますか？',
+			'skills.screen.loadingSkills' => ({required Object provider}) => '${provider} のスキルを読み込み中…',
+			'skills.screen.manageDescription' => ({required Object provider}) => 'ローカルファイル、フォルダ全体、プロジェクト対応の場所から ${provider} スキルを管理します。',
+			'skills.screen.noDescription' => 'スキルのフロントマターに説明がありません。',
+			'skills.screen.pluginBadge' => ({required Object name}) => 'プラグイン: ${name}',
+			'skills.screen.projectBadge' => ({required Object name}) => 'プロジェクト: ${name}',
+			'skills.screen.savedSuccessfully' => 'スキルを保存しました。',
+			'skills.screen.scanningProjectSkills' => 'プロジェクトのスキルをスキャン中...',
+			'skills.screen.searchHint' => 'スキルを検索...',
+			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ja'))(count, one: '${count} スキル', other: '${count} スキル', ), 
+			'skills.screen.sourceLabel' => 'ソース',
+			'mcp.form.fields.bearerTokenEnvVar' => 'ベアラートークン環境変数',
+			'mcp.form.fields.envVarNames' => '環境変数名',
+			'mcp.form.fields.workingDirectory' => '作業ディレクトリ',
+			'mcp.form.scope.claudeLocal' => 'Claude ローカル',
+			'mcp.form.scope.description.local' => '選択したプロジェクトのClaudeユーザー設定に保存されます',
+			'mcp.form.scope.description.project' => '選択したプロジェクトのワークスペースに保存されます',
+			'mcp.form.scope.description.projectGlobal' => 'すべてのプロバイダーの選択したプロジェクトワークスペースに書き込みます',
+			'mcp.form.scope.description.user' => 'このマシン上のすべてのプロジェクトで利用できます',
+			'mcp.form.scope.description.userGlobal' => '各プロバイダーのユーザー設定に書き込み、このマシン上のすべてのプロジェクトで利用できます',
+			'mcp.form.scope.projectAllProviders' => 'プロジェクト（すべてのプロバイダー）',
+			'mcp.form.scope.userAllProviders' => 'ユーザー（すべてのプロバイダー）',
+			'mcp.form.submitTo' => ({required Object provider}) => '${provider} にサーバーを追加',
+			'mcp.form.validation.unsupportedGlobal' => ({required Object type}) => 'MCPサーバーの追加は、すべてのプロバイダーで stdio と http のみをサポートし、${type} はサポートしません。',
+			'mcp.form.validation.unsupportedProvider' => ({required Object provider, required Object type}) => '${provider} は ${type} MCPサーバーをサポートしていません',
+			'mcp.install.button' => 'インストール',
+			'mcp.install.cardDescription' => 'MCP経由でエージェントにナレッジベースとddagentツールを提供します — エージェントを選択するか、すべてにインストールしてください。',
+			'mcp.install.description' => '選択したエージェントがMCP経由でddagentのナレッジベースとツールを使用できるようにします。',
+			'mcp.install.errorFallback' => 'エラー',
+			'mcp.install.failed' => ({required Object error}) => 'インストールに失敗しました: ${error}',
+			'mcp.install.installForAll' => 'すべてにインストール',
+			'mcp.install.installSelected' => '選択項目にインストール',
+			'mcp.install.installedCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ja'))(count, one: '${count} 個のエージェントにインストールしました。', other: '${count} 個のエージェントにインストールしました。', ), 
+			'mcp.install.partialFailure' => ({required Object count, required Object failed}) => '${count} 個にインストールしました。失敗: ${failed}',
+			'mcp.install.title' => 'ddagent MCPサーバーをインストール',
+			'mcp.servers.addGlobalDescription' => 'このMCPサーバーをすべてのプロバイダー（Claude、Cursor、Codex、OpenCode、Devin）に追加します。同じ設定をすべてのプロバイダーで機能させる必要があるため、stdio と HTTP トランスポートのみがサポートされます。',
+			'mcp.servers.addGlobalMenuDescription' => 'グローバルMCPサーバーの追加は、共通の stdio または HTTP サーバーを Claude、Cursor、Codex、OpenCode、Devin に書き込みます。',
+			'mcp.servers.addGlobalTitle' => 'グローバルMCPサーバーを追加',
+			'mcp.servers.addProviderDescription' => ({required Object provider}) => '${provider} MCPサーバーの追加は ${provider} のみを変更します。',
+			'mcp.servers.addProviderTitle' => ({required Object provider}) => '${provider} MCPサーバーを追加',
+			'mcp.servers.config.cwd' => 'Cwd',
+			'mcp.servers.config.envVars' => '環境変数',
+			'mcp.servers.descriptionGeneric' => ({required Object provider}) => 'Model Context Protocolサーバーは ${provider} に追加のツールとデータソースを提供します',
+			'mcp.servers.loading' => 'MCPサーバーを読み込み中...',
+			'mcp.servers.refreshingScopes' => 'プロジェクトスコープを更新中...',
+			'mcp.team.cta' => 'ddagent Pro で利用できます',
+			'mcp.team.description' => 'MCPサーバー設定をチーム全体で共有します。全員が自動的に同期されます。',
+			'mcp.team.title' => 'チームMCP設定',
+			'mcp.tokens.scopeWrite' => '書き込み',
+			'terminal.actions.clearOutput' => '出力をクリア',
+			'terminal.actions.connect' => '接続',
+			'terminal.actions.newShell' => '新しいシェル',
+			'terminal.actions.newTab' => '新しいターミナルタブ',
+			'terminal.actions.providerLogin' => 'プロバイダーログイン',
+			'terminal.actions.restartSession' => 'セッションを再起動',
+			'terminal.authUrl.openInBrowser' => 'ブラウザで開く',
+			'terminal.errors.couldNotOpenLink' => ({required Object url}) => 'リンクを開けませんでした: ${url}',
+			'terminal.fileLink.detected' => ({required Object path}) => 'ファイルを検出: ${path}',
+			'terminal.paste.hint' => 'Ctrl+V / 右クリック → 貼り付け',
+			'terminal.paste.title' => 'ターミナルに貼り付け',
+			'terminal.shortcuts.eof' => 'EOF',
+			'terminal.shortcuts.hide' => 'ショートカットバーを非表示',
+			'terminal.shortcuts.interrupt' => '中断 (SIGINT)',
+			'terminal.shortcuts.suspend' => '一時停止 (SIGTSTP)',
+			'terminal.shortcuts.showTooltip' => 'ショートカットを表示',
+			'terminal.shortcuts.hideTooltip' => 'ショートカットを非表示',
+			'terminal.tabs.antigravityCli' => 'Antigravity CLI',
+			'terminal.tabs.claudeCli' => 'Claude CLI',
+			'terminal.tabs.commandCodeCli' => 'Command Code CLI',
+			'terminal.tabs.cursorCli' => 'Cursor CLI',
+			'terminal.tabs.devinCli' => 'Devin CLI',
+			'terminal.tabs.loginTitle' => ({required Object provider}) => 'ログイン: ${provider}',
+			'terminal.tabs.opencodeCli' => 'OpenCode CLI',
+			'terminal.tabs.plainShell' => '通常のシェル',
+			'terminal.tabs.shellName' => ({required Object index}) => 'シェル ${index}',
+			'worktrees.branchHint' => '新しいブランチ名（例: feature/login）',
+			'worktrees.branchingOff' => ({required Object branch}) => '${branch} から分岐',
+			'worktrees.cleanupDescription' => 'マージ後に worktree を削除してブランチも削除',
+			'worktrees.created' => 'worktree を作成しました',
+			'worktrees.deleteBranchLabel' => 'ブランチも削除',
+			'worktrees.dirtyWarning' => ({required Object count}) => '警告: この worktree には失われる未コミットの変更が ${count} 件あります。',
+			'worktrees.emptyDescription' => 'worktree を作成して、機能開発やエージェントの実行を分離します。',
+			'worktrees.emptyTitle' => 'worktree が見つかりません',
+			'worktrees.forceRemoveLabel' => '強制削除（変更を破棄）',
+			'worktrees.headDetachedAt' => ({required Object sha}) => 'HEAD が ${sha} で分離',
+			'worktrees.mainBadge' => 'main',
+			'worktrees.mergeDescription' => ({required Object branch}) => '変更を ${branch} にマージします。',
+			'worktrees.mergeTitle' => ({required Object branch}) => '${branch} をマージ',
+			'worktrees.merged' => ({required Object branch}) => 'worktree を ${branch} にマージしました',
+			'worktrees.opened' => ({required Object branch}) => 'worktree を開きました: ${branch}',
+			'worktrees.portHint' => '実行ポート（任意、例: 3000）',
+			'worktrees.removeDescription' => 'worktree フォルダを削除します。リンクされたプロジェクトはアーカイブされます。',
+			'worktrees.removeTitle' => ({required Object branch}) => 'worktree ${branch} を削除しますか？',
+			'worktrees.removed' => 'worktree を削除しました',
+			'worktrees.runButton' => '実行',
+			'worktrees.runHint' => '実行コマンド（例: npm run dev）',
+			'worktrees.runRunning' => '実行中',
+			'worktrees.runRunningWithPort' => ({required Object port}) => '実行中 :${port}',
+			'worktrees.scripts' => 'スクリプト',
+			'worktrees.scriptsSaved' => 'スクリプト設定を保存しました',
+			'worktrees.serverLabel' => 'サーバー: ',
+			'worktrees.setupHint' => 'セットアップコマンド（例: npm install）',
+			'worktrees.setupLabel' => 'セットアップ: ',
+			'worktrees.squashDescription' => 'すべてのコミットを1つのコミットにまとめる',
+			'worktrees.stopButton' => '停止',
+			'quota.agents.statusCount' => ({required Object status, required Object count}) => '${status} (${count})',
+			'quota.chart.hide' => '非表示',
+			'quota.chart.noData' => 'トレンドを表示するにはデータが不足しています。',
+			'quota.chart.pointReadout' => ({required Object date, required Object tokens, required Object cost}) => '${date} · ${tokens} トークン · ${cost}',
+			'quota.chart.show' => '表示',
+			'quota.config.accountRouting' => 'アカウントのルーティング',
+			'quota.config.pollerTitle' => 'ポーラーとアラート',
+			'quota.config.save' => '設定を保存',
+			'quota.overview.tokensAndCost' => 'トークンとコスト',
+			'quota.section.config' => '設定',
+			'scheduler.checking' => '確認中…',
+			'scheduler.cronHint' => 'Cron（分 時 日 月 曜日） — 例: 0 9 * * *',
+			'scheduler.deleteMessage' => ({required Object id}) => '繰り返しジョブ ${id} を削除します。既存のセッションは保持されます。',
+			'scheduler.deleteTitle' => 'スケジュールを削除しますか？',
+			'scheduler.editTitle' => 'スケジュールを編集',
+			'scheduler.newLabel' => '新規',
+			'scheduler.nextIn' => ({required Object time}) => '次回まで ${time}',
+			'scheduler.promptHint' => 'エージェントへのプロンプト',
+			'scheduler.runs' => '実行回数',
+			'scheduler.session' => ({required Object id}) => 'セッション ${id}',
+			'scheduler.worktree' => 'worktree',
+			'notifications.deviceLabel' => 'ddagent Flutter',
+			'notifications.errors.noResponse' => 'サーバーから応答がありません',
+			'notifications.errors.registrationRejected' => 'サーバーに登録を拒否されました',
+			'serverConnect.connect' => '接続',
+			'serverConnect.connecting' => '接続中…',
+			'serverConnect.connectionFailed' => ({required Object error}) => '接続に失敗しました (${error})',
+			'serverConnect.enterUrl' => 'サーバーのURLを入力',
+			'serverConnect.subtitle' => 'ddagent サーバーに接続',
+			'voice.apiKeySaved' => 'APIキー（保存済み、変更するには入力）',
+			'voice.preview' => 'プレビュー',
+			'voice.saveFailed' => 'STT設定の保存に失敗しました',
+			'voice.settingsSaved' => '音声入力設定を保存しました',
+			'preview.embeddedWebOnly' => '埋め込みプレビューはWebビルドでのみ利用できます',
+			'preview.startDevServerHint' => '開発サーバーを起動すると（npm run dev、flutter run -d web-server…）\nそのポートがここに表示されます。',
+			'sharedContext.title' => '共有ノート',
+			'collab.copyToken' => 'トークンをコピー',
+			'collab.createInvite' => '招待を作成',
+			'collab.invite' => '招待',
+			'collab.inviteTeammate' => 'チームメイトを招待',
+			'collab.roles.member' => 'メンバー',
+			'collab.roles.viewer' => '閲覧者',
+			'collab.shareTokenHint' => 'この招待トークンを共有してください — 一度だけ表示され、72時間で失効します:',
+			'collab.team' => 'チーム',
+			'browser.dialogTitle' => 'エージェントブラウザ',
+			'browser.viewError' => 'ブラウザ表示エラー',
+			'browser.web' => 'Web',
+			'projects.archive' => 'アーカイブ',
+			'projects.archivedSection' => ({required Object count}) => 'アーカイブ済み (${count})',
+			'projects.clone' => 'クローン',
+			'projects.cloneFailed' => 'クローンに失敗しました',
+			'projects.cloneFinished' => 'クローンが完了しました。プロジェクト一覧を更新中…',
+			'projects.cloneRepository' => 'リポジトリをクローン',
+			'projects.deletePermanently' => '完全に削除',
+			'projects.deleteProjectMessage' => ({required Object name}) => '「${name}」を、すべてのセッションと保存済み履歴を含めて完全に削除します（JSONL も消去）。元に戻せません。',
+			'projects.deleteProjectTitle' => 'プロジェクトを削除しますか？',
+			'projects.destinationPath' => '保存先パス',
+			'projects.destinationPathRequired' => '保存先パスは必須です',
+			'projects.displayNameOptional' => '表示名（任意）',
+			'projects.failedToLoadTokens' => 'GitHubトークンの読み込みに失敗しました',
+			'projects.githubTokenOptional' => 'GitHubトークン（任意）',
+			'projects.newer' => '新しい方',
+			'projects.older' => '古い方',
+			'projects.projectArchived' => 'プロジェクトをアーカイブしました',
+			'projects.projectDeleted' => 'プロジェクトを削除しました',
+			'projects.projectRenamed' => 'プロジェクト名を変更しました',
+			'projects.projectRestored' => 'プロジェクトを復元しました',
+			'projects.repoUrlPlaceholder' => 'https://github.com/org/repo.git',
+			'projects.repositoryCloned' => 'リポジトリをクローンしました',
+			'projects.repositoryUrlRequired' => 'リポジトリURLは必須です',
+			'projects.restore' => '復元',
+			'projects.sessionCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ja'))(count, one: '${count} セッション', other: '${count} セッション', ), 
+			'projects.unknown' => '不明',
+			'projects.usingStoredToken' => ({required Object name}) => '保存済みトークンを使用: ${name}',
+			'sessions.activity.committingChanges' => '変更をコミット中',
+			'sessions.activity.editingFile' => ({required Object file}) => '${file} を編集中',
+			'sessions.activity.editingFileGeneric' => 'ファイルを編集中',
+			'sessions.activity.fetchingUrl' => ({required Object url}) => '${url} を取得中',
+			'sessions.activity.pushingBranch' => 'ブランチをプッシュ中',
+			'sessions.activity.readingFile' => ({required Object file}) => '${file} を読み取り中',
+			'sessions.activity.runningCommand' => ({required Object command}) => '`${command}` を実行中',
+			'sessions.activity.runningShellCommand' => 'シェルコマンドを実行中',
+			'sessions.activity.runningTool' => ({required Object name}) => '${name} を実行中',
+			'sessions.activity.searching' => ({required Object query}) => '“${query}” を検索中',
+			'sessions.activity.subagentRunning' => 'サブエージェントを実行中',
+			'sessions.age.days' => ({required Object days}) => '${days}日',
+			'sessions.age.hours' => ({required Object hours}) => '${hours}時間',
+			'sessions.age.lessThanMinute' => '1分未満',
+			'sessions.age.minutes' => ({required Object count}) => '${count}分',
+			'sessions.archive' => 'アーカイブ',
+			'sessions.archivedSessions' => 'アーカイブ済みセッション',
+			'sessions.autoOrchestrator' => '自動（オーケストレーター）',
+			'sessions.compareWith' => '比較対象…',
+			'sessions.createFailed' => ({required Object error}) => 'セッションの作成に失敗しました: ${error}',
+			'sessions.deleteSessionMessage' => ({required Object name}) => '「${name}」とそのトランスクリプトを削除します。元に戻せません。',
+			'sessions.newSessionProvider' => '新しいセッション — プロバイダー',
+			'sessions.noRecentSessions' => '最近のセッションはありません',
+			'sessions.noSessions' => 'セッションがありません',
+			'sessions.projectPath' => 'プロジェクトパス',
+			'sessions.rename' => '名前を変更',
+			'sessions.toasts.archived' => 'セッションをアーカイブしました',
+			'sessions.toasts.deleted' => 'セッションを削除しました',
+			'sessions.toasts.pinned' => 'セッションをピン留めしました',
+			'sessions.toasts.renamed' => 'セッション名を変更しました',
+			'sessions.toasts.restored' => 'セッションを復元しました',
+			'sessions.toasts.unpinned' => 'セッションのピン留めを解除しました',
+			'sessions.toasts.workspaceChanged' => 'ワークスペースを変更しました',
+			'git.aiButton' => '✦ AI',
+			'git.checkpoints.create' => '新規',
+			'git.checkpoints.empty' => 'チェックポイントはまだありません',
+			'git.checkpoints.labelHint' => 'チェックポイントのラベル（任意）',
+			'git.checkpoints.restoreMessage' => '作業ツリーをこのチェックポイントにリセットしますか？現在の変更は置き換えられます。',
+			'git.checkpoints.restoreTitle' => 'チェックポイントを復元',
+			'git.checkpoints.restored' => 'チェックポイントを復元しました',
+			'git.checkpoints.title' => 'チェックポイント',
+			'git.commitCreated' => 'コミットを作成しました',
+			'git.commitMessage' => 'コミットメッセージ',
+			'git.deleteFile' => 'ファイルを削除',
+			'git.hunkStage' => '+ ハンク',
+			'git.hunkUnstage' => '− ハンク',
+			'git.largeDiff' => '大きな差分のプレビュー: タブの応答性を保つため、レンダリングが制限されています。',
+			'git.loadDiffFailed' => ({required Object error}) => '差分の読み込みに失敗しました: ${error}',
+			'git.noBranch' => 'ブランチなし',
+			'git.noDiff' => '利用可能な差分がありません',
+			'git.selectProject' => 'プロジェクトを選択',
+			'git.splitDiff' => '分割差分',
+			'git.stageHunk' => 'ハンクをステージ',
+			'git.stagedChanges' => 'ステージ済みの変更',
+			'git.statusStaged' => 'ステージ済み',
+			'git.switchBranch' => 'ブランチを切り替え',
+			'git.unifiedDiff' => '統合差分',
+			'git.unstageHunk' => 'ハンクのステージを解除',
+			'kanban.card.untitled' => '無題',
+			'kanban.comments.add' => 'コメントを追加',
+			'kanban.comments.empty' => 'コメントはまだありません',
+			'kanban.details.status' => ({required Object status}) => 'ステータス: ${status}',
+			'kanban.details.title' => 'カードの詳細',
+			'kanban.dialog.saving' => '保存中…',
+			'kanban.empty.noProject' => 'プロジェクトが選択されていません',
+			'kanban.saveFailed' => 'カードの保存に失敗しました',
+			'kanban.time.daysAgo' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ja'))(count, one: '1日前', other: '${count}日前', ), 
+			'kanban.time.hoursAgo' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ja'))(count, one: '1時間前', other: '${count}時間前', ), 
+			'kanban.time.minutesAgo' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ja'))(count, one: '1分前', other: '${count}分前', ), 
+			'kanban.time.now' => 'たった今',
+			'onboarding.agents.description' => '1つ以上のAIコーディングアシスタントにログインします。すべて任意です。',
+			'onboarding.agents.laterHint' => 'これらは後で設定で構成できます。',
+			'onboarding.agents.title' => 'AIエージェントを接続',
+			'onboarding.completeSetup' => 'セットアップを完了',
+			'onboarding.errors.invalidEmail' => '有効なメールアドレスを入力してください。',
+			'onboarding.errors.nameAndEmailRequired' => 'git の名前とメールアドレスの両方が必要です。',
+			'onboarding.gitHint' => 'ddagent セッションで作成されるコミットに使用されます。',
+			'onboarding.mcp.description' => 'ddagent MCPサーバーをインストールすると、エージェントがナレッジベースとddagentツールを使用できるようになります。エージェントを選択するか、すべてにインストールしてください。',
+			'onboarding.mcp.installForAll' => 'すべてにインストール',
+			'onboarding.mcp.installSelected' => '選択項目にインストール',
+			'onboarding.mcp.installedOn' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ja'))(count, one: '${count} 個のエージェントにインストールしました。', other: '${count} 個のエージェントにインストールしました。', ), 
+			'onboarding.mcp.installedWithFailures' => ({required Object installedCount, required Object failed}) => '${installedCount} 個にインストールしました。失敗: ${failed}',
+			'onboarding.mcp.laterHint' => '任意 — 後で設定 → MCP からインストールすることもできます。',
+			'onboarding.mcp.title' => 'エージェントを ddagent に接続',
+			'fileTree.browseServerFilesystem' => 'サーバーのファイルシステムを参照',
+			'fileTree.chooseFolder' => 'フォルダを選択',
+			'fileTree.copyContents' => '内容をコピー',
+			'fileTree.noFiles' => 'ファイルがありません',
+			'fileTree.search.hint' => '名前を絞り込み / Enterで内容を検索',
+			'fileTree.search.noMatches' => '一致するものがありません',
+			'fileTree.search.prompt' => 'クエリを入力してEnterを押してください',
+			'fileTree.search.resultsTruncated' => '結果は省略されています',
+			'fileTree.titles.delete' => ({required Object name}) => '${name} を削除',
+			'fileTree.titles.download' => ({required Object name}) => '${name} をダウンロード',
+			'fileTree.titles.rename' => ({required Object name}) => '${name} の名前を変更',
+			'fileTree.uploadHere' => 'ここにアップロード',
+			'fileTree.uploadTo' => 'アップロード先',
+			'fileTree.uploadedCount' => ({required Object count}) => '${count} 件のファイルをアップロードしました',
+			'fileTree.newName' => '新しい名前',
+			'fileTree.notRegisteredProject' => ({required Object path}) => '登録済みのプロジェクトではありません: ${path}',
+			'fileTree.showGitignoredFiles' => 'gitignore されたファイルを表示',
+			'fileTree.hideGitignoredFiles' => 'gitignore されたファイルを非表示',
+			'fileTree.downloadUnsupportedOnWeb' => 'Webではダウンロードを利用できません',
+			'fileTree.saveToPath' => 'パスに保存',
+			'fileTree.savedTo' => ({required Object path}) => '${path} に保存しました',
+			'workspace.archivedWorkspaceName' => 'アーカイブ済み',
+			'workspace.closePane' => 'ペインを閉じる',
+			'workspace.closeSearch' => '検索を閉じる',
+			'workspace.deleteSessionNotice' => 'セッションとそのトランスクリプトを削除します。元に戻せません。',
+			'workspace.exportChat' => 'チャットをエクスポート',
+			'workspace.jumpToSession' => 'セッションへジャンプ…',
+			'workspace.newChatProvider' => '新しいチャット — プロバイダー',
+			'workspace.nextMatch' => '次の一致',
+			'workspace.previousMatch' => '前の一致',
+			'workspace.searchTranscript' => 'トランスクリプトを検索',
+			'workspace.sendTo' => ({required Object count}) => '${count} 件に送信',
+			'workspace.accountWithLabel' => ({required Object label}) => 'デフォルト · ${label}',
+			'workspace.finishRunBeforeChangingWorkspace' => 'ワークスペースを変更する前に実行を終了してください',
+			'workspace.restored' => 'ワークスペースを復元しました',
+			'workspace.maximizePane' => 'ペインを最大化',
+			'workspace.restorePanes' => 'ペインを復元',
+			'workspace.reviewChangedFiles' => '変更されたファイルを確認',
 			_ => null,
 		};
 	}

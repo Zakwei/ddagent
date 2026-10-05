@@ -5,6 +5,7 @@ import 'package:ddagent_app/core/theme/app_theme.dart';
 import 'package:ddagent_app/features/preview/data/preview_repository.dart';
 import 'package:ddagent_app/features/preview/state/preview_controller.dart';
 import 'package:ddagent_app/features/preview/view/preview_pane.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -43,15 +44,17 @@ class _FakePreviewRepo extends PreviewRepository {
   }
 }
 
-Widget _buildPreviewPaneApp(_FakePreviewRepo repo, {String? projectPath}) => ProviderScope(
-  overrides: [
-    previewRepositoryProvider.overrideWithValue(repo),
-    serverBaseUrlProvider.overrideWithValue('http://srv:10087'),
-    authTokenStoreProvider.overrideWithValue(AuthTokenStore(storage: _FakeKv('token-123'))),
-  ],
-  child: MaterialApp(
-    theme: AppTheme.light(),
-    home: Scaffold(body: PreviewPane(projectPath: projectPath)),
+Widget _buildPreviewPaneApp(_FakePreviewRepo repo, {String? projectPath}) => TranslationProvider(
+  child: ProviderScope(
+    overrides: [
+      previewRepositoryProvider.overrideWithValue(repo),
+      serverBaseUrlProvider.overrideWithValue('http://srv:10087'),
+      authTokenStoreProvider.overrideWithValue(AuthTokenStore(storage: _FakeKv('token-123'))),
+    ],
+    child: MaterialApp(
+      theme: AppTheme.light(),
+      home: Scaffold(body: PreviewPane(projectPath: projectPath)),
+    ),
   ),
 );
 

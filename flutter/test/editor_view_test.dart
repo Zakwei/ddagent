@@ -8,6 +8,7 @@ import 'package:ddagent_app/features/editor/view/editor_screen.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_node.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_repository.dart';
 import 'package:ddagent_app/features/git/data/git_repository.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -61,14 +62,16 @@ Widget _app({
   required FakeFileTreeRepository files,
   required FakeGitRepository git,
   required Widget child,
-}) => ProviderScope(
-  overrides: [
-    fileTreeRepositoryProvider.overrideWithValue(files),
-    gitRepositoryProvider.overrideWithValue(git),
-  ],
-  child: MaterialApp(
-    theme: AppTheme.light(),
-    home: Scaffold(body: child),
+}) => TranslationProvider(
+  child: ProviderScope(
+    overrides: [
+      fileTreeRepositoryProvider.overrideWithValue(files),
+      gitRepositoryProvider.overrideWithValue(git),
+    ],
+    child: MaterialApp(
+      theme: AppTheme.light(),
+      home: Scaffold(body: child),
+    ),
   ),
 );
 
@@ -216,7 +219,7 @@ void main() {
 
     testWidgets('binary file shows the info card instead of an editor', (tester) async {
       await _pumpScreen(tester, files, git, file: '/a.zip');
-      expect(find.text('Binary file'), findsOneWidget);
+      expect(find.text('Binary File'), findsOneWidget);
       expect(find.byType(CodeEditor), findsNothing);
       // Blob fetch fails against the fake repo → error line appears.
       await tester.pumpAndSettle();

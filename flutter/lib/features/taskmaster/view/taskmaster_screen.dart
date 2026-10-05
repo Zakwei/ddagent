@@ -16,6 +16,7 @@ import 'package:ddagent_app/features/taskmaster/view/task_board.dart';
 import 'package:ddagent_app/features/taskmaster/view/task_detail_dialog.dart';
 import 'package:ddagent_app/features/taskmaster/view/task_tile.dart'
     show taskPriorities, taskStatuses;
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -221,6 +222,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
   // ─── Toolbar — TaskBoardToolbar parity ────────────────────────────────
 
   Widget _toolbar(TaskmasterState state) {
+    final i18n = Translations.of(context);
     final dark = Theme.of(context).brightness == Brightness.dark;
     final compact = context.breakpoint.isCompact;
 
@@ -233,7 +235,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
           onChanged: ref.read(taskmasterProvider.notifier).setSearchQuery,
           style: TextStyle(color: dark ? Colors.white : const Color(0xFF111827), fontSize: 14),
           decoration: InputDecoration(
-            hintText: 'Search tasks…',
+            hintText: i18n.tasks.search.placeholder,
             filled: true,
             fillColor: dark ? const Color(0xFF1F2937) : Colors.white,
             isDense: true,
@@ -387,8 +389,9 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
   }
 
   Widget _helpButton(bool dark) {
+    final i18n = Translations.of(context);
     return Tooltip(
-      message: 'TaskMaster Getting Started Guide',
+      message: i18n.tasks.buttons.help,
       child: InkWell(
         onTap: () => showDialog<void>(
           context: context,
@@ -623,6 +626,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
   };
 
   Widget _filtersPanel(TaskmasterState state) {
+    final i18n = Translations.of(context);
     final dark = Theme.of(context).brightness == Brightness.dark;
     final ctrl = ref.read(taskmasterProvider.notifier);
 
@@ -694,11 +698,11 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
                   }, parts.last == 'desc' ? SortOrder.desc : SortOrder.asc);
                 },
                 dark,
-                labels: const {
+                labels: {
                   'id-asc': 'ID (Ascending)',
                   'id-desc': 'ID (Descending)',
-                  'title-asc': 'Title (A-Z)',
-                  'title-desc': 'Title (Z-A)',
+                  'title-asc': i18n.tasks.sort.titleAsc,
+                  'title-desc': i18n.tasks.sort.titleDesc,
                   'status-asc': 'Status (A-Z)',
                   'status-desc': 'Status (Z-A)',
                   'priority-asc': 'Priority (High First)',
@@ -800,6 +804,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
   // ─── Content: kanban | list | grid ───────────────────────────────────
 
   Widget _content(TaskmasterState state, List<TaskmasterTask> tasks) {
+    final i18n = Translations.of(context);
     final dark = Theme.of(context).brightness == Brightness.dark;
     final ctrl = ref.read(taskmasterProvider.notifier);
 
@@ -919,7 +924,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
 
     // Kanban — responsive grid like `sm:grid md:grid-cols-2 lg:grid-cols-N`,
     // horizontal snap-scroll below that.
-    final columns = buildTaskKanbanColumns(tasks);
+    final columns = buildTaskKanbanColumns(tasks, i18n);
     return LayoutBuilder(
       builder: (context, constraints) {
         final w = constraints.maxWidth;
@@ -982,6 +987,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
   // ─── Next task banner — NextTaskBanner parity ────────────────────────
 
   Widget _nextTaskBanner(TaskmasterTask task) {
+    final i18n = Translations.of(context);
     final dark = Theme.of(context).brightness == Brightness.dark;
     final c = context.appColors;
     final ctrl = ref.read(taskmasterProvider.notifier);
@@ -1075,7 +1081,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
           ),
           const SizedBox(width: 4),
           Tooltip(
-            message: 'View task details',
+            message: i18n.tasks.nextTask.viewDetails,
             child: InkWell(
               onTap: () => unawaited(TaskDetailDialog.show(context, task.idText)),
               borderRadius: AppRadii.borderMd,
@@ -1106,19 +1112,23 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
   /// TaskMasterPanel.handleRunTask parity — flip the status, stash
   /// `/task-master start <id>` for the project composer, then open chat.
   Future<void> _runTask(TaskmasterTask t) async {
+    final i18n = Translations.of(context);
     final ctrl = ref.read(taskmasterProvider.notifier);
     final pid = ref.read(taskmasterProvider).projectId;
     final prompt = '/task-master start ${t.idText}';
     final ok = await ctrl.setTaskStatus(t.idText, 'in-progress');
     if (!mounted) return;
     if (!ok) {
-      AppToast.error(context, ref.read(taskmasterProvider).error ?? 'Failed to update task status');
+      AppToast.error(
+        context,
+        ref.read(taskmasterProvider).error ?? i18n.tasks.taskDetail.statusFailed,
+      );
       return;
     }
     await ChatStorage.writeDraft(ChatStorage.draftKey(projectId: pid), prompt);
     ChatStorage.stashRunTask(pid, prompt);
     if (!mounted) return;
-    AppToast.show(context, 'Task ${t.idText} set to in-progress');
+    AppToast.show(context, i18n.tasks.toasts.statusInProgress(id: t.idText));
     context.go('/workspace');
   }
 }
@@ -1176,6 +1186,7 @@ class _HelpDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     final dark = Theme.of(context).brightness == Brightness.dark;
     return Dialog(
       backgroundColor: c.popover,
@@ -1217,7 +1228,7 @@ class _HelpDialog extends StatelessWidget {
                   ),
                   IconButton(
                     icon: const Icon(Icons.close, size: 20),
-                    tooltip: 'Close',
+                    tooltip: i18n.tasks.helpGuide.closeTitle,
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                 ],
@@ -1697,6 +1708,7 @@ class _SetupView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.appColors;
+    final i18n = Translations.of(context);
     final dark = Theme.of(context).brightness == Brightness.dark;
     const features = [
       '- AI-Powered Task Management: Break complex projects into manageable '
@@ -1819,7 +1831,7 @@ class _SetupView extends ConsumerWidget {
                   AppButton(
                     variant: AppButtonVariant.secondary,
                     onPressed: () => unawaited(PrdEditorDialog.show(context)),
-                    child: const Text('Write PRD first'),
+                    child: Text(i18n.tasks.notConfigured.writePrdFirst),
                   ),
                 ],
               ),
@@ -1900,6 +1912,7 @@ class _SetupDialogState extends ConsumerState<_SetupDialog> {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     final dark = Theme.of(context).brightness == Brightness.dark;
     return AlertDialog(
       backgroundColor: c.popover,
@@ -1935,7 +1948,11 @@ class _SetupDialogState extends ConsumerState<_SetupDialog> {
               ],
             ),
           ),
-          IconButton(icon: const Icon(Icons.close, size: 20), tooltip: 'Close', onPressed: _close),
+          IconButton(
+            icon: const Icon(Icons.close, size: 20),
+            tooltip: i18n.tasks.setupModal.closeTitle,
+            onPressed: _close,
+          ),
         ],
       ),
       content: Column(

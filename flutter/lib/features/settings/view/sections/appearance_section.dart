@@ -52,10 +52,19 @@ class AppearanceSection extends ConsumerWidget {
                 description: appearance.darkMode.description,
                 child: SegmentedButton<ThemeMode>(
                   showSelectedIcon: false,
-                  segments: const [
-                    ButtonSegment(value: ThemeMode.system, label: Text('System')),
-                    ButtonSegment(value: ThemeMode.light, label: Text('Light')),
-                    ButtonSegment(value: ThemeMode.dark, label: Text('Dark')),
+                  segments: [
+                    ButtonSegment(
+                      value: ThemeMode.system,
+                      label: Text(t.settings.appearance.themeModes.system),
+                    ),
+                    ButtonSegment(
+                      value: ThemeMode.light,
+                      label: Text(t.settings.appearance.themeModes.light),
+                    ),
+                    ButtonSegment(
+                      value: ThemeMode.dark,
+                      label: Text(t.settings.appearance.themeModes.dark),
+                    ),
                   ],
                   selected: {mode},
                   onSelectionChanged: (s) => ref.read(themeModeProvider.notifier).set(s.first),

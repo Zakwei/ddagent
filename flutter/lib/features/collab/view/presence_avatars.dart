@@ -1,4 +1,5 @@
 import 'package:ddagent_app/features/collab/state/presence_controller.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 
 const _avatarColors = [
@@ -27,9 +28,10 @@ class PresenceAvatars extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (roster.isEmpty) return const SizedBox.shrink();
+    final t = Translations.of(context);
     final onSurface = Theme.of(context).colorScheme.surface;
     return Semantics(
-      label: '${roster.length} online',
+      label: t.tasks.board.presence.online(count: roster.length),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

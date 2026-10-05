@@ -17,6 +17,7 @@ import 'package:ddagent_app/features/file_tree/view/file_viewer.dart';
 import 'package:ddagent_app/features/file_tree/view/folder_browser.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/projects/view/project_menu_button.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -234,6 +235,7 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
 
   /// Choose a target directory among the loaded tree nodes.
   Future<String?> _pickDirectoryDialog() {
+    final t = Translations.of(context);
     final dirs = <String>{''};
     void walk(List<FileTreeNode> nodes) {
       for (final n in nodes) {
@@ -247,7 +249,7 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
     walk(ref.read(fileTreeProvider).roots);
     return AppDialog.show<String>(
       context,
-      title: 'Upload to',
+      title: t.fileTree.uploadTo,
       content: SizedBox(
         width: 420,
         height: 320,
@@ -314,14 +316,20 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
   }
 
   Future<void> _sendUpload(String targetPath, List<({String name, List<int> bytes})> files) async {
+    final t = Translations.of(context);
     final err = await ref.read(fileTreeProvider.notifier).uploadFiles(targetPath, files);
     if (!mounted) {
       return;
     }
-    AppToast.show(context, err ?? 'Uploaded ${files.length} file(s)', isError: err != null);
+    AppToast.show(
+      context,
+      err ?? t.fileTree.uploadedCount(count: files.length),
+      isError: err != null,
+    );
   }
 
   Future<void> _createEntry(FileTreeNode? parent, String type) async {
+    final t = Translations.of(context);
     final nameController = TextEditingController();
     final name = await AppDialog.show<String>(
       context,
@@ -331,11 +339,11 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
         AppButton(
           variant: AppButtonVariant.ghost,
           onPressed: () => AppDialog.pop(context),
-          child: const Text('Cancel'),
+          child: Text(t.chat.orchestrator.summary.cancelTasks),
         ),
         AppButton(
           onPressed: () => AppDialog.pop(context, nameController.text.trim()),
-          child: const Text('Create'),
+          child: Text(t.common.buttons.create),
         ),
       ],
     );
@@ -351,20 +359,21 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
   }
 
   Future<void> _rename(FileTreeNode node) async {
+    final t = Translations.of(context);
     final nameController = TextEditingController(text: node.name);
     final name = await AppDialog.show<String>(
       context,
-      title: 'Rename ${node.name}',
-      content: AppInput(controller: nameController, hint: 'New name', autofocus: true),
+      title: t.fileTree.titles.rename(name: node.name),
+      content: AppInput(controller: nameController, hint: t.fileTree.newName, autofocus: true),
       actions: [
         AppButton(
           variant: AppButtonVariant.ghost,
           onPressed: () => AppDialog.pop(context),
-          child: const Text('Cancel'),
+          child: Text(t.chat.orchestrator.summary.cancelTasks),
         ),
         AppButton(
           onPressed: () => AppDialog.pop(context, nameController.text.trim()),
-          child: const Text('Rename'),
+          child: Text(t.common.fileOperations.rename),
         ),
       ],
     );
@@ -386,9 +395,10 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
   }
 
   Future<void> _delete(FileTreeNode node) async {
+    final t = Translations.of(context);
     final ok = await AppDialog.confirm(
       context,
-      title: 'Delete ${node.name}',
+      title: t.fileTree.titles.delete(name: node.name),
       message:
           'Delete ${node.isDirectory ? 'folder' : 'file'} "${node.path}"? '
           'This cannot be undone.',
@@ -412,6 +422,7 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
   }
 
   Future<void> _browsePath() async {
+    final t = Translations.of(context);
     final picked = await FolderBrowserDialog.pick(context);
     if (picked == null || !mounted) {
       return;
@@ -424,60 +435,71 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
         return;
       }
     }
-    AppToast.show(context, 'Not a registered project: $picked', isError: true);
+    AppToast.show(context, t.fileTree.notRegisteredProject(path: picked), isError: true);
   }
 
-  List<AppMenuItem> _menuItems(FileTreeNode node) => [
-    if (!node.isDirectory) ...[
-      AppMenuItem(label: 'Open', icon: Icons.open_in_new, onTap: () => _open(node)),
-      AppMenuItem(
-        label: 'Open in editor',
-        icon: Icons.edit_note,
-        onTap: () => context.go(
-          '/editor?projectId=$_projectId'
-          '&file=${Uri.encodeQueryComponent(node.path)}',
+  List<AppMenuItem> _menuItems(FileTreeNode node) {
+    final t = Translations.of(context);
+    return [
+      if (!node.isDirectory) ...[
+        AppMenuItem(
+          label: t.common.gitPanel.worktrees.open,
+          icon: Icons.open_in_new,
+          onTap: () => _open(node),
         ),
-      ),
-    ],
-    if (node.isDirectory) ...[
+        AppMenuItem(
+          label: t.common.fileOperations.openInEditor,
+          icon: Icons.edit_note,
+          onTap: () => context.go(
+            '/editor?projectId=$_projectId'
+            '&file=${Uri.encodeQueryComponent(node.path)}',
+          ),
+        ),
+      ],
+      if (node.isDirectory) ...[
+        AppMenuItem(
+          label: t.chat.fileOperations.newFile,
+          icon: Icons.note_add_outlined,
+          onTap: () => _createEntry(node, 'file'),
+        ),
+        AppMenuItem(
+          label: t.common.fileOperations.newFolder,
+          icon: Icons.create_new_folder_outlined,
+          onTap: () => _createEntry(node, 'directory'),
+        ),
+        AppMenuItem(
+          label: t.fileTree.uploadHere,
+          icon: Icons.upload_outlined,
+          onTap: () => _upload(node.path),
+        ),
+      ],
       AppMenuItem(
-        label: 'New file',
-        icon: Icons.note_add_outlined,
-        onTap: () => _createEntry(node, 'file'),
+        label: t.common.fileOperations.copyPath,
+        icon: Icons.copy_outlined,
+        onTap: () {
+          Clipboard.setData(ClipboardData(text: node.path));
+          AppToast.show(context, t.common.fileTree.toast.pathCopied);
+        },
+      ),
+      if (!node.isDirectory)
+        AppMenuItem(
+          label: t.common.buttons.download,
+          icon: Icons.download_outlined,
+          onTap: () => downloadFile(context, ref, projectId: _projectId, node: node),
+        ),
+      AppMenuItem(
+        label: t.common.fileOperations.rename,
+        icon: Icons.edit_outlined,
+        onTap: () => _rename(node),
       ),
       AppMenuItem(
-        label: 'New folder',
-        icon: Icons.create_new_folder_outlined,
-        onTap: () => _createEntry(node, 'directory'),
+        label: t.common.buttons.delete,
+        icon: Icons.delete_outline,
+        destructive: true,
+        onTap: () => _delete(node),
       ),
-      AppMenuItem(
-        label: 'Upload here',
-        icon: Icons.upload_outlined,
-        onTap: () => _upload(node.path),
-      ),
-    ],
-    AppMenuItem(
-      label: 'Copy path',
-      icon: Icons.copy_outlined,
-      onTap: () {
-        Clipboard.setData(ClipboardData(text: node.path));
-        AppToast.show(context, 'Path copied');
-      },
-    ),
-    if (!node.isDirectory)
-      AppMenuItem(
-        label: 'Download',
-        icon: Icons.download_outlined,
-        onTap: () => downloadFile(context, ref, projectId: _projectId, node: node),
-      ),
-    AppMenuItem(label: 'Rename', icon: Icons.edit_outlined, onTap: () => _rename(node)),
-    AppMenuItem(
-      label: 'Delete',
-      icon: Icons.delete_outline,
-      destructive: true,
-      onTap: () => _delete(node),
-    ),
-  ];
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -485,6 +507,7 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
     final viewMode = ref.watch(fileTreeViewModeProvider);
     final projects = ref.watch(projectsProvider).projects;
     final compact = context.breakpoint.isCompact;
+    final t = Translations.of(context);
 
     // Late auto-select when the projects list arrives after first frame.
     if (!_autoSelected &&
@@ -519,10 +542,10 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
       children: [
         SubpageHeader(
           icon: LucideIcons.folder,
-          title: 'Files',
+          title: t.common.tabs.files,
           trailing: [
             _IconBtn(
-              tooltip: 'Browse server filesystem',
+              tooltip: t.fileTree.browseServerFilesystem,
               icon: LucideIcons.folderOpen,
               onTap: _browsePath,
             ),
@@ -619,8 +642,9 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
   }
 
   Widget _buildTree(FileTreeState state, FileTreeViewMode viewMode, List<FlatNode> visible) {
+    final t = Translations.of(context);
     if (state.projectId == null) {
-      return const Center(child: Text('Select a project'));
+      return Center(child: Text(t.chat.shell.selectProject.title));
     }
     if (state.loading && state.roots.isEmpty) {
       return const Center(child: CircularProgressIndicator());
@@ -635,14 +659,14 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
             AppButton(
               variant: AppButtonVariant.ghost,
               onPressed: () => ref.read(fileTreeProvider.notifier).refresh(),
-              child: const Text('Retry'),
+              child: Text(t.chat.session.messages.retry),
             ),
           ],
         ),
       );
     }
     if (visible.isEmpty) {
-      return const Center(child: Text('No files'));
+      return Center(child: Text(t.fileTree.noFiles));
     }
     return ListView.builder(
       controller: _scroll,
@@ -810,6 +834,7 @@ class _TreeToolbar extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     final canEdit = projectId != null;
     return Container(
       decoration: BoxDecoration(
@@ -825,32 +850,35 @@ class _TreeToolbar extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text('Files', style: t.bodyMedium?.copyWith(fontWeight: FontWeight.w500)),
+              Text(
+                i18n.common.tabs.files,
+                style: t.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
+              ),
               const Spacer(),
               _IconBtn(
-                tooltip: 'Upload files',
+                tooltip: i18n.common.fileTree.context.upload,
                 icon: LucideIcons.upload,
                 busy: uploading,
                 onTap: canEdit && !uploading ? onUpload : null,
               ),
               _IconBtn(
-                tooltip: 'New File',
+                tooltip: i18n.chat.fileOperations.newFile,
                 icon: LucideIcons.fileText,
                 onTap: canEdit ? onNewFile : null,
               ),
               _IconBtn(
-                tooltip: 'New Folder',
+                tooltip: i18n.common.fileOperations.newFolder,
                 icon: LucideIcons.folderPlus,
                 onTap: canEdit ? onNewFolder : null,
               ),
               _IconBtn(
-                tooltip: 'Refresh',
+                tooltip: i18n.common.buttons.refresh,
                 icon: LucideIcons.refreshCw,
                 busy: loading,
                 onTap: canEdit ? onRefresh : null,
               ),
               _IconBtn(
-                tooltip: 'Collapse All',
+                tooltip: i18n.common.fileTree.collapseAll,
                 icon: LucideIcons.chevronDown,
                 onTap: canEdit ? onCollapseAll : null,
               ),
@@ -880,7 +908,9 @@ class _TreeToolbar extends StatelessWidget {
                 onTap: onToggleRecentOnly,
               ),
               _IconBtn(
-                tooltip: respectGitignore ? 'Show gitignored files' : 'Hide gitignored files',
+                tooltip: respectGitignore
+                    ? i18n.fileTree.showGitignoredFiles
+                    : i18n.fileTree.hideGitignoredFiles,
                 icon: LucideIcons.eyeOff,
                 active: !respectGitignore,
                 onTap: canEdit ? onToggleRespectGitignore : null,
@@ -897,7 +927,7 @@ class _TreeToolbar extends StatelessWidget {
               style: const TextStyle(fontSize: 14),
               decoration: InputDecoration(
                 isDense: true,
-                hintText: 'Filter names / Enter to search contents',
+                hintText: i18n.fileTree.search.hint,
                 hintStyle: TextStyle(color: c.mutedForeground, fontSize: 14),
                 prefixIcon: Padding(
                   padding: const EdgeInsets.only(left: AppSpacing.sm),
@@ -1026,23 +1056,25 @@ class _SearchResults extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     if (result == null) {
       return Center(
-        child: searching
-            ? const CircularProgressIndicator()
-            : const Text('Type a query and press Enter'),
+        child: searching ? const CircularProgressIndicator() : Text(t.fileTree.search.prompt),
       );
     }
     final matches = result!.matches;
     if (matches.isEmpty) {
-      return const Center(child: Text('No matches'));
+      return Center(child: Text(t.fileTree.search.noMatches));
     }
     return Column(
       children: [
         if (result!.truncated)
           Padding(
             padding: const EdgeInsets.all(AppSpacing.sm),
-            child: Text('Results truncated', style: Theme.of(context).textTheme.bodySmall),
+            child: Text(
+              t.fileTree.search.resultsTruncated,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
           ),
         Expanded(
           child: ListView.builder(

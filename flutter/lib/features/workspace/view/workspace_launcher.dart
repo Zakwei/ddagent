@@ -1,5 +1,6 @@
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -20,6 +21,7 @@ class WorkspaceLauncher extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = Theme.of(context);
+    final i18n = Translations.of(context);
     final c = context.appColors;
     final projects = ref.watch(projectsProvider).projects;
     final ordered = [...projects];
@@ -47,7 +49,7 @@ class WorkspaceLauncher extends ConsumerWidget {
                 child: Icon(Icons.folder_outlined, color: c.mutedForeground),
               ),
               const SizedBox(height: AppSpacing.md),
-              Text('Choose a workspace', style: t.textTheme.titleMedium),
+              Text(i18n.chat.providerSelection.chooseWorkspace, style: t.textTheme.titleMedium),
               const SizedBox(height: AppSpacing.xs),
               Text(
                 'Pick a workspace for this pane, or create a new one.',

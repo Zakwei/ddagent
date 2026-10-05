@@ -6,6 +6,7 @@ import 'package:ddagent_app/core/realtime/ws_client.dart';
 import 'package:ddagent_app/core/theme/app_theme.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/projects/view/projects_screen.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -241,7 +242,7 @@ void main() {
       expect(sse.calls.single!['githubTokenId'], isNull);
 
       // SSH URL — no auth card, review says 'SSH Key'.
-      await t.tap(find.byTooltip('New project'));
+      await t.tap(find.byTooltip('New Project'));
       await t.pumpAndSettle();
       fields = _fields;
       await t.enterText(fields.at(0), '/w/ssh');
@@ -308,15 +309,17 @@ Map<String, dynamic> _screenRoutes({List<Map<String, dynamic>> tokens = const []
   'POST /api/projects/create-project': {'project': _project('new')},
 };
 
-Widget _screenApp(Map<String, dynamic> routes, _FakeSse sse) => ProviderScope(
-  overrides: [
-    dioProvider.overrideWithValue(_fakeDio(routes)),
-    sseClientProvider.overrideWithValue(sse),
-    chatChannelProvider.overrideWithValue(
-      ChatChannel(WsClient(urlBuilder: () async => Uri.parse('ws://t'))),
-    ),
-  ],
-  child: MaterialApp(theme: AppTheme.light(), home: const ProjectsScreen()),
+Widget _screenApp(Map<String, dynamic> routes, _FakeSse sse) => TranslationProvider(
+  child: ProviderScope(
+    overrides: [
+      dioProvider.overrideWithValue(_fakeDio(routes)),
+      sseClientProvider.overrideWithValue(sse),
+      chatChannelProvider.overrideWithValue(
+        ChatChannel(WsClient(urlBuilder: () async => Uri.parse('ws://t'))),
+      ),
+    ],
+    child: MaterialApp(theme: AppTheme.light(), home: const ProjectsScreen()),
+  ),
 );
 
 Future<void> _openWizard(WidgetTester t, _FakeSse sse, Map<String, dynamic> routes) async {
@@ -325,7 +328,7 @@ Future<void> _openWizard(WidgetTester t, _FakeSse sse, Map<String, dynamic> rout
   addTearDown(t.view.reset);
   await t.pumpWidget(_screenApp(routes, sse));
   await t.pumpAndSettle();
-  await t.tap(find.byTooltip('New project'));
+  await t.tap(find.byTooltip('New Project'));
   await t.pumpAndSettle();
 }
 

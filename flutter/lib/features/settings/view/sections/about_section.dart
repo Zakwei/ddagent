@@ -264,7 +264,7 @@ class _LinksBlock extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Try ddagent Hosted', style: tt.titleSmall),
+                Text(t.tryHosted, style: tt.titleSmall),
                 const SizedBox(height: AppSpacing.xs),
                 Text(
                   'Team collaboration, shared MCP configs, settings sync '
@@ -278,7 +278,7 @@ class _LinksBlock extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     spacing: AppSpacing.xs,
                     children: [
-                      Text('Learn more', style: tt.labelSmall?.copyWith(color: c.primary)),
+                      Text(t.learnMore, style: tt.labelSmall?.copyWith(color: c.primary)),
                       Icon(LucideIcons.externalLink, size: 12, color: c.primary),
                     ],
                   ),
@@ -287,19 +287,19 @@ class _LinksBlock extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
-          Text('ddagent Pro Features', style: tt.titleSmall),
+          Text(t.proFeatures, style: tt.titleSmall),
           const SizedBox(height: AppSpacing.sm),
-          const _ProCard(
+          _ProCard(
             icon: LucideIcons.cloud,
-            title: 'Sync Settings',
+            title: t.pro.syncSettings,
             description:
                 'Keep your preferences, MCP configs, and theme in sync '
                 'across all your environments.',
           ),
           const SizedBox(height: AppSpacing.sm),
-          const _ProCard(
+          _ProCard(
             icon: LucideIcons.users,
-            title: 'Team Management',
+            title: t.pro.teamManagement,
             description:
                 'Multiple users, role-based access, and shared projects '
                 'for your team.',
@@ -606,7 +606,7 @@ class _RestartBlockState extends ConsumerState<_RestartBlock> {
         _RestartStatus.unsupported => t.unsupported,
         _ => detail ?? t.restartFailed,
       }),
-      actions: [AppButton(onPressed: () => AppDialog.pop(context), child: const Text('OK'))],
+      actions: [AppButton(onPressed: () => AppDialog.pop(context), child: Text(t.ok))],
     );
   }
 

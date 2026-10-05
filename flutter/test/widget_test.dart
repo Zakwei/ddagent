@@ -6,6 +6,7 @@ import 'package:ddagent_app/core/realtime/ws_client.dart';
 import 'package:ddagent_app/core/router/app_router.dart';
 import 'package:ddagent_app/core/theme/app_theme.dart';
 import 'package:ddagent_app/core/widgets/adaptive_scaffold.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:ddagent_app/main.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -74,9 +75,11 @@ void main() {
 
   testWidgets('App boots, redirects to /connect without JWT', (tester) async {
     await tester.pumpWidget(
-      ProviderScope(
-        overrides: [authTokenStoreProvider.overrideWithValue(AuthTokenStore(storage: _MemKv()))],
-        child: const DdagentApp(),
+      TranslationProvider(
+        child: ProviderScope(
+          overrides: [authTokenStoreProvider.overrideWithValue(AuthTokenStore(storage: _MemKv()))],
+          child: const DdagentApp(),
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -102,12 +105,14 @@ void main() {
       ],
     );
     await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          dioProvider.overrideWithValue(_fakeDio()),
-          chatChannelProvider.overrideWithValue(ChatChannel(_FakeWs())),
-        ],
-        child: MaterialApp.router(theme: AppTheme.light(), routerConfig: router),
+      TranslationProvider(
+        child: ProviderScope(
+          overrides: [
+            dioProvider.overrideWithValue(_fakeDio()),
+            chatChannelProvider.overrideWithValue(ChatChannel(_FakeWs())),
+          ],
+          child: MaterialApp.router(theme: AppTheme.light(), routerConfig: router),
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -140,12 +145,14 @@ void main() {
       ],
     );
     await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          dioProvider.overrideWithValue(_fakeDio()),
-          chatChannelProvider.overrideWithValue(ChatChannel(_FakeWs())),
-        ],
-        child: MaterialApp.router(theme: AppTheme.light(), routerConfig: router),
+      TranslationProvider(
+        child: ProviderScope(
+          overrides: [
+            dioProvider.overrideWithValue(_fakeDio()),
+            chatChannelProvider.overrideWithValue(ChatChannel(_FakeWs())),
+          ],
+          child: MaterialApp.router(theme: AppTheme.light(), routerConfig: router),
+        ),
       ),
     );
     await tester.pumpAndSettle();

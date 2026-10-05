@@ -8,6 +8,7 @@ import 'package:ddagent_app/features/queue/data/queue_repository.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
 import 'package:ddagent_app/features/workspace/view/split_workspace_grid.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -56,6 +57,7 @@ class SplitOverviewDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context);
+    final i18n = Translations.of(context);
     final c = context.appColors;
     return Dialog(
       insetPadding: const EdgeInsets.all(AppSpacing.lg),
@@ -73,7 +75,7 @@ class SplitOverviewDialog extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  Text('Split panes overview', style: t.textTheme.titleSmall),
+                  Text(i18n.chat.splitOverview.title, style: t.textTheme.titleSmall),
                   const SizedBox(width: AppSpacing.sm),
                   Text(
                     '${panes.length} panes',
@@ -81,7 +83,7 @@ class SplitOverviewDialog extends StatelessWidget {
                   ),
                   const Spacer(),
                   IconButton(
-                    tooltip: 'Close overview',
+                    tooltip: i18n.chat.splitOverview.close,
                     icon: const Icon(Icons.close, size: 18),
                     onPressed: () => Navigator.of(context).pop(),
                   ),
@@ -301,10 +303,11 @@ class _BroadcastDialogState extends ConsumerState<BroadcastDialog> {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context);
+    final i18n = Translations.of(context);
     final c = context.appColors;
     final hasOrchestrators = _selectable.any(_isOrchestrator);
     return AppDialog(
-      title: 'Broadcast to sessions',
+      title: i18n.chat.splitWorkspace.broadcast,
       content: SizedBox(
         width: 420,
         child: Column(
@@ -316,7 +319,7 @@ class _BroadcastDialogState extends ConsumerState<BroadcastDialog> {
                 dense: true,
                 contentPadding: EdgeInsets.zero,
                 controlAffinity: ListTileControlAffinity.leading,
-                title: Text('Orchestrators only', style: t.textTheme.bodySmall),
+                title: Text(i18n.chat.broadcast.orchestratorsOnly, style: t.textTheme.bodySmall),
                 value: _orchestratorsOnly,
                 onChanged: (v) {
                   setState(() {
@@ -381,7 +384,7 @@ class _BroadcastDialogState extends ConsumerState<BroadcastDialog> {
                       ..clear()
                       ..addAll([for (final s in _visible) s.sessionId]),
                   ),
-                  child: const Text('Select all'),
+                  child: Text(i18n.chat.broadcast.selectAll),
                 ),
                 if (hasOrchestrators && !_orchestratorsOnly)
                   TextButton(
@@ -393,16 +396,12 @@ class _BroadcastDialogState extends ConsumerState<BroadcastDialog> {
                             if (_isOrchestrator(s)) s.sessionId,
                         ]),
                     ),
-                    child: const Text('Select orchestrators'),
+                    child: Text(i18n.chat.broadcast.selectOrchestrators),
                   ),
               ],
             ),
             const SizedBox(height: AppSpacing.sm),
-            AppInput(
-              controller: _message,
-              hint: 'Message to send to every selected session…',
-              maxLines: 3,
-            ),
+            AppInput(controller: _message, hint: i18n.chat.broadcast.placeholder, maxLines: 3),
             if (_results != null) ...[
               const SizedBox(height: AppSpacing.xs),
               Text(
@@ -427,14 +426,14 @@ class _BroadcastDialogState extends ConsumerState<BroadcastDialog> {
         AppButton(
           variant: AppButtonVariant.ghost,
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(i18n.chat.orchestrator.summary.cancelTasks),
         ),
         AppButton(
           loading: _sending,
           onPressed: _selected.isEmpty || _message.text.trim().isEmpty
               ? null
               : () => unawaited(_send()),
-          child: Text('Send to ${_selected.length}'),
+          child: Text(i18n.workspace.sendTo(count: _selected.length)),
         ),
       ],
     );

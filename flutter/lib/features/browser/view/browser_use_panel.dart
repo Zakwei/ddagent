@@ -7,31 +7,34 @@ import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_nav_menu.dart';
 import 'package:ddagent_app/features/browser_use/data/browser_use_repository.dart';
 import 'package:ddagent_app/features/browser_use/state/browser_use_controller.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 String _domain(String? url) {
-  if (url == null || url.isEmpty) return 'No page loaded';
+  if (url == null || url.isEmpty) return t.common.browserUse.noPageLoaded;
   return Uri.tryParse(url)?.host.isNotEmpty == true ? Uri.parse(url).host : url;
 }
 
 String _formatRelativeTime(String? value) {
-  if (value == null) return 'Never';
+  final rel = t.common.browserUse.relative;
+  if (value == null) return rel.never;
   final ts = DateTime.tryParse(value);
-  if (ts == null) return 'Unknown';
+  if (ts == null) return rel.unknown;
   final elapsed = DateTime.now().difference(ts).inSeconds;
-  if (elapsed < 10) return 'Just now';
-  if (elapsed < 60) return '${elapsed}s ago';
+  if (elapsed < 10) return rel.justNow;
+  if (elapsed < 60) return '$elapsed${rel.secondsAgo}';
   final minutes = elapsed ~/ 60;
-  if (minutes < 60) return '${minutes}m ago';
+  if (minutes < 60) return '$minutes${rel.minutesAgo}';
   final hours = minutes ~/ 60;
-  if (hours < 24) return '${hours}h ago';
-  return '${hours ~/ 24}d ago';
+  if (hours < 24) return '$hours${rel.hoursAgo}';
+  return '${hours ~/ 24}${rel.daysAgo}';
 }
 
-String _formatAction(String? action) => action == null ? 'Waiting' : action.replaceAll('_', ' ');
+String _formatAction(String? action) =>
+    action == null ? t.common.browserUse.waiting : action.replaceAll('_', ' ');
 
 /// Headless agent-browser panel — port of `browser-use/view/BrowserUsePanel.tsx`:
 /// runtime badge + install, session list with a selected-session surface
@@ -53,6 +56,7 @@ class _BrowserUsePanelState extends ConsumerState<BrowserUsePanel> {
     final c = context.appColors;
     final tt = Theme.of(context).textTheme;
     final compact = context.breakpoint.isCompact;
+    final t = Translations.of(context);
     final status = state.status;
 
     final sessions = state.sessions;
@@ -65,13 +69,14 @@ class _BrowserUsePanelState extends ConsumerState<BrowserUsePanel> {
     final activeCount = sessions.where((s) => s.isRunning).length;
     final needsBinaries =
         status?.enabled == true && !(status!.playwrightInstalled && status.chromiumInstalled);
+    final runtime = t.common.browserUse.runtime;
     final runtimeLabel = status?.enabled != true
-        ? 'Disabled'
+        ? runtime.disabled
         : status!.available
-        ? 'Ready'
+        ? runtime.ready
         : status.installInProgress || state.busy
-        ? 'Installing'
-        : 'Setup required';
+        ? runtime.installing
+        : runtime.setupRequired;
     final runtimeReady =
         status != null && status.enabled && (status.available || status.installInProgress);
 
@@ -92,7 +97,7 @@ class _BrowserUsePanelState extends ConsumerState<BrowserUsePanel> {
               Icon(LucideIcons.monitorPlay, size: 16, color: c.primary),
               Flexible(
                 child: Text(
-                  'Browser',
+                  t.common.browserUse.title,
                   overflow: TextOverflow.ellipsis,
                   style: tt.titleSmall?.copyWith(fontWeight: FontWeight.w600),
                 ),
@@ -100,13 +105,13 @@ class _BrowserUsePanelState extends ConsumerState<BrowserUsePanel> {
               _Badge(label: runtimeLabel, highlighted: runtimeReady),
               const Spacer(),
               IconButton(
-                tooltip: 'Open Browser settings',
+                tooltip: t.common.browserUse.openSettings,
                 icon: const Icon(LucideIcons.settings, size: 14),
                 visualDensity: VisualDensity.compact,
                 onPressed: () => context.go('/settings/tools'),
               ),
               IconButton(
-                tooltip: 'Refresh browser sessions',
+                tooltip: t.common.browserUse.refresh,
                 icon: const Icon(LucideIcons.refreshCw, size: 14),
                 visualDensity: VisualDensity.compact,
                 onPressed: state.loading ? null : () => ctrl.refresh(),
@@ -167,13 +172,16 @@ class _BrowserUsePanelState extends ConsumerState<BrowserUsePanel> {
                         children: [
                           Expanded(
                             child: Text(
-                              '$activeCount active / ${sessions.length} total',
+                              '${t.common.browserUse.activeCount(count: activeCount)} / '
+                              '${t.common.browserUse.totalCount(count: sessions.length)}',
                               overflow: TextOverflow.ellipsis,
                               style: tt.labelSmall?.copyWith(color: c.mutedForeground),
                             ),
                           ),
                           Text(
-                            'Updated ${_formatRelativeTime(selected?.updatedAt)}',
+                            t.common.browserUse.updated(
+                              time: _formatRelativeTime(selected?.updatedAt),
+                            ),
                             overflow: TextOverflow.ellipsis,
                             style: tt.labelSmall?.copyWith(color: c.mutedForeground),
                           ),
@@ -237,24 +245,27 @@ class _BrowserUsePanelState extends ConsumerState<BrowserUsePanel> {
 
   Future<void> _confirmDelete(BuildContext context, BrowserUseSession session) async {
     final c = context.appColors;
+    final t = Translations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete browser session?'),
+        title: Text(t.common.browserUse.deleteTitle),
         content: Text(
-          '${session.title ?? session.url ?? 'This session'} will be permanently deleted.',
+          t.common.browserUse.deleteDesc(
+            name: session.title ?? session.url ?? t.common.browserUse.thisSession,
+          ),
         ),
         actions: [
           AppButton(
             variant: AppButtonVariant.ghost,
             size: AppButtonSize.sm,
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
+            child: Text(t.common.browserUse.cancel),
           ),
           AppButton(
             size: AppButtonSize.sm,
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text('Delete', style: TextStyle(color: c.destructive)),
+            child: Text(t.common.buttons.delete, style: TextStyle(color: c.destructive)),
           ),
         ],
       ),
@@ -265,6 +276,7 @@ class _BrowserUsePanelState extends ConsumerState<BrowserUsePanel> {
   }
 
   Future<void> _showFullscreen(BuildContext context, BrowserUseSession session) {
+    final t = Translations.of(context);
     return showDialog<void>(
       context: context,
       builder: (ctx) => Dialog.fullscreen(
@@ -280,7 +292,7 @@ class _BrowserUsePanelState extends ConsumerState<BrowserUsePanel> {
                 children: [
                   Expanded(
                     child: Text(
-                      session.title ?? session.url ?? 'Browser session',
+                      session.title ?? session.url ?? t.common.browserUse.sessionFallback,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(ctx).textTheme.titleSmall?.copyWith(color: Colors.white70),
                     ),
@@ -289,10 +301,10 @@ class _BrowserUsePanelState extends ConsumerState<BrowserUsePanel> {
                     variant: AppButtonVariant.outline,
                     size: AppButtonSize.sm,
                     onPressed: () => Navigator.of(ctx).pop(),
-                    child: const Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       spacing: AppSpacing.xs,
-                      children: [Icon(LucideIcons.x, size: 14), Text('Close')],
+                      children: [Icon(LucideIcons.x, size: 14), Text(t.common.browserUse.close)],
                     ),
                   ),
                 ],
@@ -414,6 +426,7 @@ class _SessionSurface extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final tt = Theme.of(context).textTheme;
+    final t = Translations.of(context);
     final s = session;
     return Container(
       decoration: BoxDecoration(
@@ -429,7 +442,10 @@ class _SessionSurface extends StatelessWidget {
             child: Row(
               spacing: AppSpacing.sm,
               children: [
-                _Badge(label: s?.status ?? 'empty', highlighted: s?.isRunning == true),
+                _Badge(
+                  label: s?.status ?? t.common.browserUse.emptyStatus,
+                  highlighted: s?.isRunning == true,
+                ),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -445,7 +461,7 @@ class _SessionSurface extends StatelessWidget {
                           Icon(LucideIcons.externalLink, size: 12, color: c.mutedForeground),
                           Expanded(
                             child: Text(
-                              s?.url ?? 'No page loaded',
+                              s?.url ?? t.common.browserUse.noPageLoaded,
                               overflow: TextOverflow.ellipsis,
                               style: tt.labelSmall?.copyWith(color: c.mutedForeground),
                             ),
@@ -461,20 +477,20 @@ class _SessionSurface extends StatelessWidget {
                     style: tt.labelSmall?.copyWith(color: c.mutedForeground),
                   ),
                 IconButton(
-                  tooltip: 'Full screen',
+                  tooltip: t.common.browserUse.fullscreen,
                   icon: const Icon(LucideIcons.expand, size: 16),
                   visualDensity: VisualDensity.compact,
                   onPressed: onFullscreen,
                 ),
                 if (compact) ...[
                   IconButton(
-                    tooltip: 'Stop session',
+                    tooltip: t.common.browserUse.stopSession,
                     icon: const Icon(LucideIcons.square, size: 16),
                     visualDensity: VisualDensity.compact,
                     onPressed: busy || s?.isRunning != true ? null : onStop,
                   ),
                   IconButton(
-                    tooltip: 'Delete session',
+                    tooltip: t.common.browserUse.deleteSession,
                     icon: const Icon(LucideIcons.trash2, size: 16),
                     visualDensity: VisualDensity.compact,
                     onPressed: busy || s == null ? null : onDelete,
@@ -502,6 +518,7 @@ class _Surface extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tt = Theme.of(context).textTheme;
+    final t = Translations.of(context);
     final dataUrl = session?.screenshotDataUrl;
     final cursor = session?.cursor;
     final viewport = session?.viewport;
@@ -520,7 +537,7 @@ class _Surface extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
-                  session?.message ?? 'Waiting for screenshot',
+                  session?.message ?? t.common.browserUse.waitingForScreenshot,
                   style: tt.bodyMedium?.copyWith(
                     color: const Color(0xFFF5F5F5),
                     fontWeight: FontWeight.w500,
@@ -528,7 +545,7 @@ class _Surface extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'The next agent browser snapshot will render here.',
+                  t.common.browserUse.nextSnapshot,
                   style: tt.labelSmall?.copyWith(color: const Color(0xFFA3A3A3)),
                 ),
               ],
@@ -641,6 +658,7 @@ class _SessionsAside extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final tt = Theme.of(context).textTheme;
+    final t = Translations.of(context);
     final s = selected;
     return Container(
       decoration: BoxDecoration(
@@ -659,15 +677,18 @@ class _SessionsAside extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Sessions', style: tt.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
                       Text(
-                        '${sessions.length} total',
+                        t.common.browserUse.sessions,
+                        style: tt.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+                      ),
+                      Text(
+                        t.common.browserUse.totalCount(count: sessions.length),
                         style: tt.labelSmall?.copyWith(color: c.mutedForeground),
                       ),
                     ],
                   ),
                 ),
-                _Badge(label: '$activeCount active'),
+                _Badge(label: t.common.browserUse.activeCount(count: activeCount)),
               ],
             ),
           ),
@@ -676,7 +697,7 @@ class _SessionsAside extends StatelessWidget {
                 ? Padding(
                     padding: const EdgeInsets.all(AppSpacing.lg),
                     child: Text(
-                      'No agent browser sessions.',
+                      t.common.browserUse.noSessions,
                       textAlign: TextAlign.center,
                       style: tt.labelSmall?.copyWith(color: c.mutedForeground),
                     ),
@@ -716,7 +737,7 @@ class _SessionsAside extends StatelessWidget {
                     children: [
                       Icon(LucideIcons.bot, size: 14, color: c.mutedForeground),
                       Text(
-                        'SELECTED',
+                        t.common.browserUse.selected,
                         style: tt.labelSmall?.copyWith(
                           color: c.mutedForeground,
                           fontWeight: FontWeight.w500,
@@ -726,9 +747,18 @@ class _SessionsAside extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: AppSpacing.sm),
-                  _MetaRow(label: 'Status', value: s?.status ?? 'None'),
-                  _MetaRow(label: 'Last action', value: _formatAction(s?.lastAction)),
-                  _MetaRow(label: 'Profile', value: s?.profileName ?? 'Temporary'),
+                  _MetaRow(
+                    label: t.common.browserUse.status,
+                    value: s?.status ?? t.common.browserUse.none,
+                  ),
+                  _MetaRow(
+                    label: t.common.browserUse.lastAction,
+                    value: _formatAction(s?.lastAction),
+                  ),
+                  _MetaRow(
+                    label: t.common.browserUse.profile,
+                    value: s?.profileName ?? t.common.browserUse.temporary,
+                  ),
                   const SizedBox(height: AppSpacing.sm),
                   Row(
                     spacing: AppSpacing.sm,
@@ -738,10 +768,13 @@ class _SessionsAside extends StatelessWidget {
                           variant: AppButtonVariant.outline,
                           size: AppButtonSize.sm,
                           onPressed: busy || s?.isRunning != true ? null : onStop,
-                          child: const Row(
+                          child: Row(
                             mainAxisSize: MainAxisSize.min,
                             spacing: AppSpacing.xs,
-                            children: [Icon(LucideIcons.square, size: 14), Text('Stop')],
+                            children: [
+                              Icon(LucideIcons.square, size: 14),
+                              Text(t.common.browserUse.stop),
+                            ],
                           ),
                         ),
                       ),
@@ -750,10 +783,13 @@ class _SessionsAside extends StatelessWidget {
                           variant: AppButtonVariant.outline,
                           size: AppButtonSize.sm,
                           onPressed: busy || s == null ? null : onDelete,
-                          child: const Row(
+                          child: Row(
                             mainAxisSize: MainAxisSize.min,
                             spacing: AppSpacing.xs,
-                            children: [Icon(LucideIcons.trash2, size: 14), Text('Delete')],
+                            children: [
+                              Icon(LucideIcons.trash2, size: 14),
+                              Text(t.common.buttons.delete),
+                            ],
                           ),
                         ),
                       ),
@@ -896,6 +932,7 @@ class _EmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final tt = Theme.of(context).textTheme;
+    final t = Translations.of(context);
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.lg),
@@ -930,14 +967,16 @@ class _EmptyState extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          enabled ? 'No browser sessions yet' : 'Browser is disabled',
+                          enabled
+                              ? t.common.browserUse.empty.titleEnabled
+                              : t.common.browserUse.empty.titleDisabled,
                           style: tt.titleSmall?.copyWith(fontWeight: FontWeight.w600),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           enabled
-                              ? 'Agent browser sessions appear here while an AI task is using Browser.'
-                              : 'Enable Browser in settings to let agents open monitored browser sessions.',
+                              ? t.common.browserUse.empty.descEnabled
+                              : t.common.browserUse.empty.descDisabled,
                           style: tt.bodySmall?.copyWith(color: c.mutedForeground, height: 1.5),
                         ),
                       ],
@@ -958,7 +997,7 @@ class _EmptyState extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Runtime setup required',
+                        t.common.browserUse.runtimeSetup,
                         style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
                       ),
                       if (message != null) ...[
@@ -970,10 +1009,13 @@ class _EmptyState extends StatelessWidget {
                         size: AppButtonSize.sm,
                         loading: installing,
                         onPressed: onInstall,
-                        child: const Row(
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
                           spacing: AppSpacing.xs,
-                          children: [Icon(LucideIcons.download, size: 14), Text('Install Runtime')],
+                          children: [
+                            Icon(LucideIcons.download, size: 14),
+                            Text(t.common.browserUse.installRuntime),
+                          ],
                         ),
                       ),
                     ],
@@ -984,14 +1026,9 @@ class _EmptyState extends StatelessWidget {
               Wrap(
                 spacing: AppSpacing.sm,
                 runSpacing: AppSpacing.sm,
-                children: const [
-                  _PromptCard(
-                    text:
-                        'Use Browser to inspect the checkout flow and report any broken UI states.',
-                  ),
-                  _PromptCard(
-                    text: 'Open <url> with Browser, interact with the page, and summarize what changed after each step.',
-                  ),
+                children: [
+                  _PromptCard(text: t.common.browserUse.prompts.prompt1),
+                  _PromptCard(text: t.common.browserUse.prompts.prompt2),
                 ],
               ),
             ],
@@ -1027,7 +1064,7 @@ class _PromptCard extends StatelessWidget {
             children: [
               Icon(LucideIcons.bot, size: 12, color: c.mutedForeground),
               Text(
-                'PROMPT',
+                t.common.browserUse.promptLabel,
                 style: tt.labelSmall?.copyWith(
                   color: c.mutedForeground,
                   fontWeight: FontWeight.w500,
@@ -1070,16 +1107,17 @@ class _Screenshot extends StatelessWidget {
 
 /// Hosted dialog wrapper — "Browser" button entry point.
 Future<void> showBrowserUseDialog(BuildContext context) {
+  final t = Translations.of(context);
   return showDialog<void>(
     context: context,
     builder: (ctx) => AlertDialog(
-      title: const Text('Agent Browser'),
+      title: Text(t.browser.dialogTitle),
       content: const SizedBox(width: 720, height: 480, child: BrowserUsePanel()),
       actions: [
         AppButton(
           variant: AppButtonVariant.ghost,
           onPressed: () => Navigator.of(ctx).pop(),
-          child: const Text('Close'),
+          child: Text(t.common.browserUse.close),
         ),
       ],
     ),

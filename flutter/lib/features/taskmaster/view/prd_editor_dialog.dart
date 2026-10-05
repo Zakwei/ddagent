@@ -7,6 +7,7 @@ import 'package:ddagent_app/core/widgets/app_input.dart';
 import 'package:ddagent_app/core/widgets/app_markdown.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/features/taskmaster/state/taskmaster_controller.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -57,6 +58,7 @@ class _PrdEditorDialogState extends ConsumerState<PrdEditorDialog> {
   /// Validates the buffer, confirms overwriting an existing file name, then
   /// saves. Returns false (dialog stays open) on validation or cancel.
   Future<bool> _save() async {
+    final i18n = Translations.of(context);
     final name = _name.text.trim();
     final invalid = name.isEmpty
         ? 'Please provide a filename for the PRD.'
@@ -73,8 +75,8 @@ class _PrdEditorDialogState extends ConsumerState<PrdEditorDialog> {
     if (conflict) {
       final ok = await AppDialog.confirm(
         context,
-        title: 'File already exists',
-        message: 'A PRD named "$name" already exists. Do you want to overwrite it?',
+        title: i18n.tasks.prd.fileExistsTitle,
+        message: i18n.tasks.prd.fileExistsMessage(name: name),
         confirmLabel: 'Overwrite',
       );
       if (!ok || !mounted) return false;
@@ -85,6 +87,7 @@ class _PrdEditorDialogState extends ConsumerState<PrdEditorDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final i18n = Translations.of(context);
     final state = ref.watch(taskmasterProvider);
     final ctrl = ref.read(taskmasterProvider.notifier);
     final c = context.appColors;
@@ -98,7 +101,9 @@ class _PrdEditorDialogState extends ConsumerState<PrdEditorDialog> {
     }
 
     return AppDialog(
-      title: 'PRD — ${_name.text.isEmpty ? 'new file' : _name.text}',
+      title: i18n.tasks.prd.editorTitle(
+        name: _name.text.isEmpty ? i18n.tasks.prd.newFile : _name.text,
+      ),
       content: SizedBox(
         width: 640,
         height: 480,
@@ -110,7 +115,7 @@ class _PrdEditorDialogState extends ConsumerState<PrdEditorDialog> {
                 Expanded(
                   child: AppInput(
                     controller: _name,
-                    hint: 'file name (e.g. prd.txt)',
+                    hint: i18n.tasks.prd.fileNameHint,
                     enabled: !busy,
                     onChanged: (_) => setState(() {}),
                   ),
@@ -118,7 +123,10 @@ class _PrdEditorDialogState extends ConsumerState<PrdEditorDialog> {
                 const SizedBox(width: AppSpacing.sm),
                 if (state.prdTemplates.isNotEmpty)
                   DropdownButton<String>(
-                    hint: Text('Template', style: Theme.of(context).textTheme.labelSmall),
+                    hint: Text(
+                      i18n.tasks.prd.template,
+                      style: Theme.of(context).textTheme.labelSmall,
+                    ),
                     underline: const SizedBox.shrink(),
                     items: [
                       for (final tp in state.prdTemplates)
@@ -144,7 +152,9 @@ class _PrdEditorDialogState extends ConsumerState<PrdEditorDialog> {
                   ),
                 const SizedBox(width: AppSpacing.xs),
                 IconButton(
-                  tooltip: _preview ? 'Edit' : 'Preview markdown',
+                  tooltip: _preview
+                      ? i18n.common.buttons.edit
+                      : i18n.codeEditor.actions.previewMarkdown,
                   onPressed: () => setState(() => _preview = !_preview),
                   icon: Icon(
                     _preview ? Icons.edit_note : Icons.preview_outlined,
@@ -194,7 +204,7 @@ class _PrdEditorDialogState extends ConsumerState<PrdEditorDialog> {
         AppButton(
           variant: AppButtonVariant.ghost,
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Close'),
+          child: Text(i18n.chat.common.close),
         ),
         AppButton(
           variant: AppButtonVariant.secondary,
@@ -202,9 +212,9 @@ class _PrdEditorDialogState extends ConsumerState<PrdEditorDialog> {
           onPressed: () async {
             final ok = await _save();
             if (!context.mounted) return;
-            if (ok) AppToast.show(context, 'PRD saved');
+            if (ok) AppToast.show(context, i18n.tasks.prd.saved);
           },
-          child: const Text('Save'),
+          child: Text(i18n.codeEditor.actions.save),
         ),
         AppButton(
           loading: busy,
@@ -216,10 +226,10 @@ class _PrdEditorDialogState extends ConsumerState<PrdEditorDialog> {
                   if (!context.mounted) return;
                   if (ok) {
                     Navigator.of(context).pop();
-                    AppToast.show(context, 'Tasks generated from PRD');
+                    AppToast.show(context, i18n.tasks.prd.tasksGenerated);
                   }
                 },
-          child: const Text('Parse PRD'),
+          child: Text(i18n.tasks.prd.parse),
         ),
       ],
     );

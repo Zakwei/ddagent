@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -16,15 +17,16 @@ Future<void> initWindow() async {
   final saved = box.get('windowBounds');
 
   const minSize = Size(720, 480);
-  var opts = const WindowOptions(
+  // No widget tree here (runs before `runApp`), so use the global accessor.
+  var opts = WindowOptions(
     minimumSize: minSize,
-    title: 'ddagent',
+    title: t.sidebar.app.title,
     titleBarStyle: TitleBarStyle.normal,
   );
   if (saved is Map) {
     opts = WindowOptions(
       minimumSize: minSize,
-      title: 'ddagent',
+      title: t.sidebar.app.title,
       titleBarStyle: TitleBarStyle.normal,
       size: Size((saved['w'] as num?)?.toDouble() ?? 1280, (saved['h'] as num?)?.toDouble() ?? 800),
     );

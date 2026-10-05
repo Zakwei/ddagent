@@ -3,6 +3,7 @@ import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_repository.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -59,47 +60,53 @@ class _FolderBrowserDialogState extends ConsumerState<FolderBrowserDialog> {
   }
 
   @override
-  Widget build(BuildContext context) => AppDialog(
-    title: 'Choose folder',
-    content: SizedBox(
-      width: 420,
-      height: 320,
-      child: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : _error != null
-          ? Center(
-              child: Text(_error!, style: TextStyle(color: context.appColors.destructive)),
-            )
-          : Column(
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(_path ?? '', style: Theme.of(context).textTheme.bodySmall),
-                ),
-                const Divider(),
-                Expanded(
-                  child: ListView(
-                    children: [
-                      for (final d in _dirs)
-                        ListTile(
-                          dense: true,
-                          leading: const Icon(Icons.folder_outlined, size: 18),
-                          title: Text(d['name'] as String? ?? ''),
-                          onTap: () => _load(d['path'] as String?),
-                        ),
-                    ],
+  Widget build(BuildContext context) {
+    final t = Translations.of(context);
+    return AppDialog(
+      title: t.fileTree.chooseFolder,
+      content: SizedBox(
+        width: 420,
+        height: 320,
+        child: _loading
+            ? const Center(child: CircularProgressIndicator())
+            : _error != null
+            ? Center(
+                child: Text(_error!, style: TextStyle(color: context.appColors.destructive)),
+              )
+            : Column(
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(_path ?? '', style: Theme.of(context).textTheme.bodySmall),
                   ),
-                ),
-              ],
-            ),
-    ),
-    actions: [
-      AppButton(
-        variant: AppButtonVariant.ghost,
-        onPressed: () => Navigator.of(context).pop(),
-        child: const Text('Cancel'),
+                  const Divider(),
+                  Expanded(
+                    child: ListView(
+                      children: [
+                        for (final d in _dirs)
+                          ListTile(
+                            dense: true,
+                            leading: const Icon(Icons.folder_outlined, size: 18),
+                            title: Text(d['name'] as String? ?? ''),
+                            onTap: () => _load(d['path'] as String?),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
       ),
-      AppButton(onPressed: () => Navigator.of(context).pop(_path), child: const Text('Select')),
-    ],
-  );
+      actions: [
+        AppButton(
+          variant: AppButtonVariant.ghost,
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(t.chat.orchestrator.summary.cancelTasks),
+        ),
+        AppButton(
+          onPressed: () => Navigator.of(context).pop(_path),
+          child: Text(t.common.common.select),
+        ),
+      ],
+    );
+  }
 }

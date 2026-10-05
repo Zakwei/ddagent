@@ -9,6 +9,7 @@ import 'package:ddagent_app/features/git/view/checkpoints_dialog.dart';
 import 'package:ddagent_app/features/git/view/git_screen.dart';
 import 'package:ddagent_app/features/projects/data/projects_repository.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -213,18 +214,20 @@ class FakeGitRepository extends GitRepository {
   Future<Map<String, dynamic>> init(String p) async => _ok('init');
 }
 
-Widget _app({required FakeGitRepository gitRepo, String? projectId = 'p1'}) => ProviderScope(
-  overrides: [
-    gitRepositoryProvider.overrideWithValue(gitRepo),
-    projectsProvider.overrideWith(
-      () => FakeProjectsController([
-        const Project(projectId: 'p1', path: '/workspace/p1', displayName: 'Project 1'),
-      ]),
+Widget _app({required FakeGitRepository gitRepo, String? projectId = 'p1'}) => TranslationProvider(
+  child: ProviderScope(
+    overrides: [
+      gitRepositoryProvider.overrideWithValue(gitRepo),
+      projectsProvider.overrideWith(
+        () => FakeProjectsController([
+          const Project(projectId: 'p1', path: '/workspace/p1', displayName: 'Project 1'),
+        ]),
+      ),
+    ],
+    child: MaterialApp(
+      theme: AppTheme.light(),
+      home: Scaffold(body: GitScreen(projectId: projectId)),
     ),
-  ],
-  child: MaterialApp(
-    theme: AppTheme.light(),
-    home: Scaffold(body: GitScreen(projectId: projectId)),
   ),
 );
 

@@ -6,6 +6,7 @@ import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/features/git/state/git_controller.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -36,19 +37,18 @@ class _CheckpointsDialogState extends ConsumerState<CheckpointsDialog> {
   }
 
   Future<void> _restore(BuildContext context, String cpRef) async {
+    final i18n = Translations.of(context);
     final ok = await AppDialog.confirm(
       context,
-      title: 'Restore checkpoint',
-      message:
-          'Reset the working tree to this checkpoint? Current changes will '
-          'be replaced.',
-      confirmLabel: 'Restore',
+      title: i18n.git.checkpoints.restoreTitle,
+      message: i18n.git.checkpoints.restoreMessage,
+      confirmLabel: i18n.chat.sessionPicker.restore,
     );
     if (!ok || !context.mounted) return;
     final done = await ref.read(gitProvider.notifier).restoreCheckpoint(cpRef);
     if (!context.mounted) return;
     if (done) {
-      AppToast.show(context, 'Checkpoint restored');
+      AppToast.show(context, i18n.git.checkpoints.restored);
       Navigator.of(context).pop();
     }
   }
@@ -58,10 +58,11 @@ class _CheckpointsDialogState extends ConsumerState<CheckpointsDialog> {
     final state = ref.watch(gitProvider);
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     final checkpoints = state.checkpoints;
 
     return AppDialog(
-      title: 'Checkpoints',
+      title: i18n.git.checkpoints.title,
       content: SizedBox(
         width: 440,
         height: 360,
@@ -71,7 +72,7 @@ class _CheckpointsDialogState extends ConsumerState<CheckpointsDialog> {
             Row(
               children: [
                 Expanded(
-                  child: AppInput(controller: _label, hint: 'Checkpoint label (optional)'),
+                  child: AppInput(controller: _label, hint: i18n.git.checkpoints.labelHint),
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 AppButton(
@@ -85,7 +86,7 @@ class _CheckpointsDialogState extends ConsumerState<CheckpointsDialog> {
                         );
                     if (ok && mounted) _label.clear();
                   },
-                  child: const Text('New'),
+                  child: Text(i18n.git.checkpoints.create),
                 ),
               ],
             ),
@@ -94,7 +95,7 @@ class _CheckpointsDialogState extends ConsumerState<CheckpointsDialog> {
               child: checkpoints.isEmpty
                   ? Center(
                       child: Text(
-                        'No checkpoints yet',
+                        i18n.git.checkpoints.empty,
                         style: t.bodySmall?.copyWith(color: c.mutedForeground),
                       ),
                     )
@@ -144,7 +145,7 @@ class _CheckpointsDialogState extends ConsumerState<CheckpointsDialog> {
                                 onPressed: state.busy
                                     ? null
                                     : () => unawaited(_restore(context, cp.ref)),
-                                child: const Text('Restore'),
+                                child: Text(i18n.chat.sessionPicker.restore),
                               ),
                             ],
                           ),
@@ -159,7 +160,7 @@ class _CheckpointsDialogState extends ConsumerState<CheckpointsDialog> {
         AppButton(
           variant: AppButtonVariant.ghost,
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Close'),
+          child: Text(i18n.chat.common.close),
         ),
       ],
     );

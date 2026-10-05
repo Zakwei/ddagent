@@ -78,7 +78,8 @@
       "readFile": "读取文件",
       "updateTodo": "更新待办列表",
       "readTodo": "读取待办列表",
-      "searchResults": "结果"
+      "searchResults": "结果",
+      "todoReadLabel": "TodoRead 读取列表"
     },
     "search": {
       "found": "找到 {{count}} 个{{type}}",
@@ -117,7 +118,16 @@
       "addTo": "将 {{entry}} 添加到允许的工具。",
       "retry": "权限已保存。重试请求以使用该工具。",
       "error": "无法更新权限。请重试。",
-      "openSettings": "打开设置"
+      "openSettings": "打开设置",
+      "allow": "允许",
+      "allowAll": "全部允许（{{count}}）",
+      "allowWithChanges": "按修改允许",
+      "always": "始终",
+      "deny": "拒绝",
+      "editAndAllow": "编辑并允许",
+      "editInput": "编辑输入",
+      "invalidJson": "无效的 JSON",
+      "reject": "驳回"
     },
     "todo": {
       "updated": "待办列表已成功更新",
@@ -191,7 +201,8 @@
         "clearBtn": "取消",
         "multiple": "{{count}} 条消息在离线队列中 — 重新连接后将自动发送",
         "single": "1 条消息在离线队列中 — 重新连接后将自动发送"
-      }
+      },
+      "cameraUnavailable": "相机不可用：{{error}}"
     },
     "providerSelection": {
       "title": "选择您的 AI 助手",
@@ -253,8 +264,13 @@
         "perfWarning": "已加载全部消息 - 滚动可能变慢。点击「滚动到底部」恢复性能。",
         "loadOlderFailed": "加载较早消息失败。",
         "retry": "重试",
-        "noSearchMatches": "没有消息匹配搜索。"
-      }
+        "noSearchMatches": "没有消息匹配搜索。",
+        "loadAllCount": "加载全部（{{count}}）",
+        "loadOlder": "加载更早的消息",
+        "retryLoadOlder": "重试加载更早的消息 — {{error}}"
+      },
+      "deleteConfirm": "移除会话及其记录。此操作无法撤销。",
+      "finishRunBeforeWorkspaceChange": "请先结束运行再更改工作区"
     },
     "shell": {
       "selectProject": {
@@ -397,16 +413,21 @@
       "active": "活跃"
     },
     "askUserQuestion": {
-      "needsInput": "{{provider}} 需要你的输入"
+      "needsInput": "{{provider}} 需要你的输入",
+      "answerHint": "输入你的答案…",
+      "other": "其他…",
+      "skip": "跳过"
     },
     "attachments": {
       "downloadFailedRetry": "下载失败 — 点击重试",
-      "fileAttachment": "文件附件"
+      "fileAttachment": "文件附件",
+      "download": "下载 {{name}}"
     },
     "checkpoint": {
       "creating": "正在创建快照…",
       "revertChanges": "将文件还原到上一个检查点",
-      "undo": "撤销检查点"
+      "undo": "撤销检查点",
+      "beforeAiTurn": "AI 回合之前"
     },
     "common": {
       "close": "关闭"
@@ -415,7 +436,9 @@
       "saveToTask": "任务",
       "saved": "已保存",
       "saving": "正在保存...",
-      "taskShort": "任务"
+      "taskShort": "任务",
+      "addToTask": "添加到 TaskMaster",
+      "added": "已添加到 TaskMaster"
     },
     "tokenUsage": {
       "desc": "查看会话令牌消耗",
@@ -436,6 +459,54 @@
       "selectOrchestrators": "选择编排器",
       "orchestratorsOnly": "仅编排器",
       "noOrchestrators": "没有可用的编排器会话"
+    },
+    "changes": {
+      "empty": "没有文件更改",
+      "failedToLoad": "加载更改失败"
+    },
+    "commandResult": {
+      "fallback": {
+        "config": "打开设置和配置。",
+        "cost": "查看当前会话的令牌用量。",
+        "help": "显示命令文档和语法。",
+        "memory": "打开项目的 CLAUDE.md 记忆文件。",
+        "models": "浏览当前提供商的可用模型。",
+        "status": "查看运行时、版本、提供商和环境状态。"
+      },
+      "filterCommands": "筛选命令...",
+      "searchModels": "搜索 {{provider}} 模型..."
+    },
+    "commands": {
+      "runConfirmTitle": "运行命令？",
+      "executionCancelled": "命令执行已取消"
+    },
+    "export": {
+      "sessionTitle": "会话 {{id}}",
+      "pdfFailed": "PDF 导出失败",
+      "transcriptDownloaded": "会话记录已下载",
+      "savedTo": "已保存 {{path}}"
+    },
+    "message": {
+      "compactedSummary": "压缩摘要",
+      "rawView": "原始视图",
+      "resendHint": "从输入框重新发送"
+    },
+    "modelLibrary": {
+      "deleteTooltip": "删除 {{name}}",
+      "editTooltip": "编辑 {{name}}",
+      "enterNameAndId": "请输入模型名称和模型 ID。",
+      "idNoSpaces": "模型 ID 不能包含空格。",
+      "setAsDefault": "设为默认",
+      "defaultModel": "默认模型"
+    },
+    "pinFile": {
+      "action": "固定",
+      "pathHint": "path/to/file.ext",
+      "title": "固定文件"
+    },
+    "permissionRequest": {
+      "title": "权限请求 · {{tool}}",
+      "question": "问题"
     }
   },
   "codeEditor": {
@@ -447,7 +518,11 @@
       "showDiff": "显示差异高亮",
       "settings": "编辑器设置",
       "collapse": "折叠编辑器",
-      "expand": "展开编辑器到全宽"
+      "expand": "展开编辑器到全宽",
+      "diffMerge": "差异 / 合并",
+      "previewInBrowser": "在浏览器中预览",
+      "reload": "从磁盘重新加载",
+      "toggleDock": "切换文件停靠栏"
     },
     "loading": "正在加载 {{fileName}}...",
     "header": {
@@ -468,7 +543,8 @@
       "pinFile": "将文件固定到上下文",
       "unpinFile": "从上下文取消固定文件",
       "previewHtml": "在新标签页中打开 HTML 预览",
-      "retry": "重试"
+      "retry": "重试",
+      "saveAll": "全部保存"
     },
     "footer": {
       "lines": "行数：",
@@ -477,12 +553,49 @@
     },
     "binaryFile": {
       "title": "二进制文件",
-      "message": "文件 \"{{fileName}}\" 无法在文本编辑器中显示，因为它是二进制文件。"
+      "message": "文件 \"{{fileName}}\" 无法在文本编辑器中显示，因为它是二进制文件。",
+      "cannotDisplayAsText": "无法以文本形式显示"
     },
     "filePreview": {
       "loading": "正在加载预览...",
       "error": "无法显示此文件。",
       "openInNewTab": "在新标签页中打开"
+    },
+    "diff": {
+      "applyMerge": "应用合并",
+      "base": "基准",
+      "close": "关闭差异",
+      "current": "当前",
+      "hunk": "区块 {{number}}",
+      "noChanges": "没有更改",
+      "deletedOnDisk": "已在磁盘上删除"
+    },
+    "discardUnsavedChanges": "放弃未保存的更改？",
+    "emptyState": {
+      "title": "没有打开的文件"
+    },
+    "failedToLoad": "加载文件失败",
+    "hexDump": {
+      "more": "… 还有 {{size}}"
+    },
+    "mediaFile": {
+      "subtitle": "暂不支持音频/视频预览",
+      "title": "媒体文件"
+    },
+    "settings": {
+      "fontSizeDecrease": "字体大小 −  （当前 {{size}}）",
+      "fontSizeIncrease": "字体大小 +",
+      "minimap": "缩略图",
+      "tabSize": "Tab 大小：{{size}}"
+    },
+    "unsavedChanges": "{{name}} 中有未保存的更改",
+    "toasts": {
+      "savedFile": "已保存 {{name}}",
+      "saveFailed": "保存失败",
+      "allSaved": "全部已保存",
+      "someSavesFailed": "部分保存失败",
+      "savedTo": "已保存到 {{path}}",
+      "mergeApplied": "已应用合并 — 保存以保留更改"
     }
   },
   "common": {
@@ -502,7 +615,9 @@
       "copy": "复制",
       "download": "下载",
       "upload": "上传",
-      "browse": "浏览"
+      "browse": "浏览",
+      "openDiagram": "打开图表",
+      "update": "更新"
     },
     "tabs": {
       "chat": "聊天",
@@ -1363,6 +1478,20 @@
     },
     "projects": {
       "newSession": "新会话"
+    },
+    "codeBlock": {
+      "wrapLines": "自动换行",
+      "noWrap": "不换行"
+    },
+    "update": {
+      "available": "有可用更新 · v{{version}}",
+      "confirm": "更新到 v{{version}}？服务器会自行更新并重启 — 进行中的会话将被中断。",
+      "downloading": "正在下载并应用更新…",
+      "restarting": "正在重启服务器 — 请稍候…",
+      "done": "已更新到 v{{version}}。重新加载应用以载入新的应用包。",
+      "manualRestart": "更新已应用，但服务器未自动重启 — 请手动重启以完成。",
+      "failed": "更新失败。",
+      "failedTitle": "更新失败"
     }
   },
   "settings": {
@@ -1381,7 +1510,8 @@
       "restartConfirm": "确定重启 ddagent 服务器?活动会话将被中断。",
       "restarting": "正在重启… 服务器恢复后页面将自动刷新。",
       "restartFailed": "重启失败",
-      "unsupported": "仅当服务器在服务管理器下运行时才可重启。"
+      "unsupported": "仅当服务器在服务管理器下运行时才可重启。",
+      "ok": "确定"
     },
     "updates": {
       "title": "应用更新",
@@ -1438,7 +1568,12 @@
       "wordWrap": "自动换行",
       "showMinimap": "显示缩略图",
       "lineNumbers": "行号",
-      "fontSize": "字体大小"
+      "fontSize": "字体大小",
+      "themeModes": {
+        "dark": "深色",
+        "light": "浅色",
+        "system": "跟随系统"
+      }
     },
     "actions": {
       "saveChanges": "保存更改",
@@ -1463,7 +1598,8 @@
         "openPanel": "打开设置面板",
         "draggingStatus": "正在拖拽...",
         "toggleAndMove": "点击切换，拖拽移动"
-      }
+      },
+      "sendWithCtrlEnter": "使用 Ctrl+Enter 发送"
     },
     "terminalShortcuts": {
       "title": "终端快捷键",
@@ -1646,7 +1782,12 @@
         "actionRequired": "需要处理",
         "stop": "运行已停止",
         "error": "运行失败"
-      }
+      },
+      "channels": {
+        "discord": "Discord",
+        "telegram": "Telegram"
+      },
+      "unpair": "取消配对"
     },
     "appearanceSettings": {
       "darkMode": {
@@ -1747,11 +1888,13 @@
       "description": "配置您的 git 提交身份。这些设置将通过 git config --global 全局应用",
       "name": {
         "label": "Git 名称",
-        "help": "您的 git 提交名称"
+        "help": "您的 git 提交名称",
+        "placeholder": "John Doe"
       },
       "email": {
         "label": "Git 邮箱",
-        "help": "您的 git 提交邮箱"
+        "help": "您的 git 提交邮箱",
+        "placeholder": "john@example.com"
       },
       "actions": {
         "save": "保存配置",
@@ -1797,7 +1940,9 @@
           "descriptionPlaceholder": "描述（可选）",
           "addButton": "添加令牌",
           "cancelButton": "取消",
-          "howToCreate": "如何创建 GitHub 个人访问令牌 →"
+          "howToCreate": "如何创建 GitHub 个人访问令牌 →",
+          "showToken": "显示令牌",
+          "hideToken": "隐藏令牌"
         },
         "empty": "尚未添加 GitHub 令牌。",
         "added": "添加时间：",
@@ -2112,11 +2257,19 @@
       "deleteTitle": "移除工作区",
       "description": "工作区是 ddagent 可以聊天、运行代码和浏览的目录。",
       "remove": "移除工作区",
-      "title": "工作区"
+      "title": "工作区",
+      "pathRequired": "路径为必填项"
     },
     "about": {
       "supportTitle": "支持本项目",
-      "buyMeACoffee": "请我喝杯咖啡"
+      "buyMeACoffee": "请我喝杯咖啡",
+      "learnMore": "了解更多",
+      "pro": {
+        "syncSettings": "同步设置",
+        "teamManagement": "团队管理"
+      },
+      "proFeatures": "ddagent Pro 功能",
+      "tryHosted": "试用 ddagent Hosted"
     }
   },
   "sidebar": {
@@ -2375,7 +2528,8 @@
         "progressVisualization": "进度可视化：看板和详细的任务分析",
         "cliIntegration": "CLI 集成：使用 taskmaster 命令进行高级工作流"
       },
-      "initializeButton": "初始化 TaskMaster AI"
+      "initializeButton": "初始化 TaskMaster AI",
+      "writePrdFirst": "先编写 PRD"
     },
     "gettingStarted": {
       "title": "开始使用 TaskMaster",
@@ -2491,7 +2645,16 @@
       "prdsAvailable": "{{count}} 个 PRD 可用"
     },
     "prd": {
-      "modified": "修改时间：{{date}}"
+      "modified": "修改时间：{{date}}",
+      "editorTitle": "PRD — {{name}}",
+      "fileExistsMessage": "名为“{{name}}”的 PRD 已存在。要覆盖它吗？",
+      "fileExistsTitle": "文件已存在",
+      "newFile": "新文件",
+      "parse": "解析 PRD",
+      "template": "模板",
+      "fileNameHint": "文件名（例如 prd.txt）",
+      "saved": "PRD 已保存",
+      "tasksGenerated": "已从 PRD 生成任务"
     },
     "statuses": {
       "pending": "待处理",
@@ -2499,7 +2662,8 @@
       "done": "已完成",
       "blocked": "已阻止",
       "deferred": "已延后",
-      "cancelled": "已取消"
+      "cancelled": "已取消",
+      "review": "审查"
     },
     "priorities": {
       "high": "高",
@@ -2596,7 +2760,9 @@
       "completedReopen": "已完成（点击重新打开）",
       "inProgressComplete": "进行中（点击完成）",
       "markCompleted": "标记为已完成",
-      "toggleStatusAria": "切换任务 {{id}} 的状态"
+      "toggleStatusAria": "切换任务 {{id}} 的状态",
+      "markDone": "标记为已完成",
+      "reopen": "重新打开"
     },
     "nextTask": {
       "allComplete": "所有任务已完成",
@@ -2638,7 +2804,14 @@
       "taskTitle": "任务 {{id}}：{{title}}",
       "testStrategy": "测试策略",
       "titleRequired": "标题为必填项",
-      "updateFailed": "更新任务失败"
+      "updateFailed": "更新任务失败",
+      "deleteConfirmMessage": "任务 #{{id}} 将被移除。此操作无法撤销。",
+      "notFound": "未找到任务",
+      "subtasks": "子任务",
+      "idCopied": "任务 ID 已复制"
+    },
+    "toasts": {
+      "statusInProgress": "任务 {{id}} 已设为进行中"
     }
   },
   "knowledge": {
@@ -2743,6 +2916,556 @@
     },
     "settings": {
       "description": "面向代理的本地记忆层：记忆、规则、技能和个人信息。"
+    },
+    "contextBudget": {
+      "tokens": "~{{tokens}} / {{budget}} 令牌"
+    },
+    "critical": {
+      "make": "标记为严重",
+      "makeAll": "将所有规则设为严重",
+      "makeAllHint": "将它们加入注入的上下文预算"
+    },
+    "errors": {
+      "importFailed": "导入失败：{{error}}",
+      "migrationFailed": "迁移失败：{{error}}"
+    },
+    "graph": {
+      "truncated": "已截断"
+    },
+    "importAll": {
+      "action": "导入全部",
+      "mergeDuplicates": "合并重复条目",
+      "mergeDuplicatesHint": "合并 ddagent 中的重复行（不涉及文件）",
+      "projectsScanned": "已扫描项目：{{count}}",
+      "rulesSummary": "规则：{{total}} · 重复组：{{duplicates}}",
+      "skillsFound": "发现的代理技能：{{found}}（新增：{{newSkills}}）",
+      "title": "将全部内容导入 ddagent"
+    },
+    "importSkills": {
+      "found": "在你的代理中找到 {{count}} 个技能。",
+      "summary": "新增：{{imported}} · 已跳过：{{skipped}}",
+      "title": "导入代理技能"
+    },
+    "linkOptions": {
+      "memory": "记忆：{{title}}",
+      "personal": "个人信息：{{title}}",
+      "rule": "规则：{{title}}",
+      "skill": "技能：{{name}}"
+    },
+    "migrate": {
+      "duplicates": "跨项目的重复组：{{count}}",
+      "mergeDuplicates": "合并重复项",
+      "removedPromoted": "已移除：{{removed}}，已提升：{{promoted}}",
+      "rulesSummary": "规则：共 {{total}} 条，{{critical}} 条严重。",
+      "scanned": "已扫描 {{count}} 个项目。",
+      "title": "迁移现有规则"
     }
+  },
+  "skills": {
+    "addDialog": {
+      "chooseFileTitle": "选择 SKILL.md",
+      "chooseFiles": "选择文件",
+      "chooseFolder": "选择文件夹",
+      "chooseFolderTitle": "选择技能文件夹",
+      "folderFilesMeta": {
+        "one": "{{count}} 个文件 · {{size}}",
+        "other": "{{count}} 个文件 · {{size}}"
+      },
+      "folderUploadsNote": "文件夹上传会保留所选文件夹名称；单独文件使用 `SKILL.md` 中的 `name`。",
+      "hideInstallLocation": "隐藏安装位置",
+      "installSkill": "安装技能",
+      "installSkills": {
+        "one": "安装 {{count}} 个技能",
+        "other": "安装 {{count}} 个技能"
+      },
+      "markdownFileMeta": "Markdown 文件 · {{size}}",
+      "pickHint": "文件夹可包含脚本、参考资料和资源。",
+      "pickTitle": "选择技能文件夹或 SKILL.md",
+      "readyToInstall": "可以安装",
+      "removeQueued": "移除 {{name}}",
+      "title": "添加 {{provider}} 技能",
+      "uploadHint": "上传 SKILL.md 文件或完整的技能文件夹。",
+      "whereWillThisInstall": "将安装到何处？"
+    },
+    "deleteSkill": "删除 {{name}}",
+    "empty": {
+      "noGlobalSkills": "尚未发现全局技能",
+      "noGlobalSkillsDescription": "在上方添加全局技能，使其可用于所有项目。",
+      "noMatchingSkills": "没有匹配的技能",
+      "noMatchingSkillsDescription": "请尝试其他命令、名称、范围、项目或来源路径。",
+      "noProjects": "没有可用的项目",
+      "noProjectsDescription": "添加项目或工作区以浏览其技能。",
+      "noSkillsInProject": "此项目中没有技能",
+      "noSkillsInProjectDescription": "在所选项目中创建 .claude/skills、.cursor/skills 或 .agents/skills 文件夹。"
+    },
+    "errors": {
+      "addMarkdownFirst": "请先添加一个或多个 Markdown 文件。",
+      "couldNotReadSkillFile": "无法从 {{name}} 读取 SKILL.md。",
+      "dropMarkdownOrFolder": "拖入一个或多个 Markdown 文件，或包含 SKILL.md 的文件夹。",
+      "folderFileLimit": "一个技能文件夹最多可包含 {{count}} 个文件。",
+      "folderReadFailed": "读取技能文件夹失败",
+      "folderSizeLimit": "所选技能文件夹的总大小必须小于 30 MB。",
+      "importFailed": "导入技能失败",
+      "missingSkillFile": "所选文件夹不包含 SKILL.md 文件。"
+    },
+    "moveDialog": {
+      "moveToGlobal": "移动到全局",
+      "moveToProject": "移动到项目",
+      "toGlobalHint": "将此技能移入全局技能目录，以便所有项目都能使用。",
+      "toProjectHint": "选择应拥有此技能的项目。它将从提供商的全局技能目录中移出。"
+    },
+    "moveSkill": "移动 {{name}}",
+    "projectLabel": "项目",
+    "scopes": {
+      "admin": "管理员",
+      "plugin": "插件",
+      "project": "项目",
+      "repo": "仓库",
+      "system": "系统",
+      "user": "用户"
+    },
+    "screen": {
+      "addSkill": "添加技能",
+      "clearSearch": "清除技能搜索",
+      "deleteDescription": "这会将 {{directory}} 目录从 {{provider}} 的托管技能目录中移除。此操作无法撤销。",
+      "deleteTitle": "删除 {{name}}？",
+      "loadingSkills": "正在加载 {{provider}} 技能…",
+      "manageDescription": "管理来自本地文件、完整文件夹和项目级位置的 {{provider}} 技能。",
+      "noDescription": "技能的 front matter 中未提供描述。",
+      "pluginBadge": "插件：{{name}}",
+      "projectBadge": "项目：{{name}}",
+      "savedSuccessfully": "技能保存成功。",
+      "scanningProjectSkills": "正在扫描项目技能...",
+      "searchHint": "搜索技能...",
+      "skillsCount": {
+        "one": "{{count}} 个技能",
+        "other": "{{count}} 个技能"
+      },
+      "sourceLabel": "来源"
+    }
+  },
+  "mcp": {
+    "form": {
+      "fields": {
+        "bearerTokenEnvVar": "Bearer 令牌环境变量",
+        "envVarNames": "环境变量名称",
+        "workingDirectory": "工作目录"
+      },
+      "scope": {
+        "claudeLocal": "Claude 本地",
+        "description": {
+          "local": "存储在所选项目的 Claude 用户设置中",
+          "project": "存储在所选项目工作区中",
+          "projectGlobal": "写入所选项目工作区，适用于所有提供商",
+          "user": "在您机器的所有项目中可用",
+          "userGlobal": "写入每个提供商的用户配置，并在本机的所有项目中可用"
+        },
+        "projectAllProviders": "项目（所有提供商）",
+        "userAllProviders": "用户（所有提供商）"
+      },
+      "submitTo": "将服务器添加到 {{provider}}",
+      "validation": {
+        "unsupportedGlobal": "添加 MCP 服务器在所有提供商中仅支持 stdio 和 http，不支持 {{type}}。",
+        "unsupportedProvider": "{{provider}} 不支持 {{type}} MCP 服务器"
+      }
+    },
+    "install": {
+      "button": "安装",
+      "cardDescription": "通过 MCP 让你的代理使用知识库和 ddagent 工具 — 选择代理，或为全部安装。",
+      "description": "让所选代理通过 MCP 使用 ddagent 知识库和工具。",
+      "errorFallback": "错误",
+      "failed": "安装失败：{{error}}",
+      "installForAll": "为全部安装",
+      "installSelected": "安装到所选",
+      "installedCount(param=count)": {
+        "one": "已安装到 {{count}} 个代理。",
+        "other": "已安装到 {{count}} 个代理。"
+      },
+      "partialFailure": "已安装到 {{count}}；失败：{{failed}}",
+      "title": "安装 ddagent MCP 服务器"
+    },
+    "servers": {
+      "addGlobalDescription": "将此 MCP 服务器添加到所有提供商：Claude、Cursor、Codex、OpenCode 和 Devin。仅支持 stdio 和 HTTP 传输，因为同一份配置必须在所有提供商中都能使用。",
+      "addGlobalMenuDescription": "添加全局 MCP 服务器会将一个通用的 stdio 或 HTTP 服务器写入 Claude、Cursor、Codex、OpenCode 和 Devin。",
+      "addGlobalTitle": "添加全局 MCP 服务器",
+      "addProviderDescription": "添加 {{provider}} MCP 服务器只会更改 {{provider}}。",
+      "addProviderTitle": "添加 {{provider}} MCP 服务器",
+      "config": {
+        "cwd": "工作目录",
+        "envVars": "环境变量"
+      },
+      "descriptionGeneric": "Model Context Protocol 服务器为 {{provider}} 提供额外的工具和数据源",
+      "loading": "正在加载 MCP 服务器...",
+      "refreshingScopes": "正在刷新项目范围..."
+    },
+    "team": {
+      "cta": "ddagent Pro 版可用",
+      "description": "在团队中共享 MCP 服务器配置。所有人自动保持同步。",
+      "title": "团队 MCP 配置"
+    },
+    "tokens": {
+      "scopeWrite": "写入"
+    }
+  },
+  "terminal": {
+    "actions": {
+      "clearOutput": "清空输出",
+      "connect": "连接",
+      "newShell": "新建 Shell",
+      "newTab": "新建终端标签页",
+      "providerLogin": "提供商登录",
+      "restartSession": "重启会话"
+    },
+    "authUrl": {
+      "openInBrowser": "在浏览器中打开"
+    },
+    "errors": {
+      "couldNotOpenLink": "无法打开链接：{{url}}"
+    },
+    "fileLink": {
+      "detected": "检测到文件：{{path}}"
+    },
+    "paste": {
+      "hint": "Ctrl+V / 右键 → 粘贴",
+      "title": "粘贴到终端"
+    },
+    "shortcuts": {
+      "eof": "EOF",
+      "hide": "隐藏快捷键栏",
+      "interrupt": "中断 (SIGINT)",
+      "suspend": "挂起 (SIGTSTP)",
+      "showTooltip": "显示快捷键",
+      "hideTooltip": "隐藏快捷键"
+    },
+    "tabs": {
+      "antigravityCli": "Antigravity CLI",
+      "claudeCli": "Claude CLI",
+      "commandCodeCli": "Command Code CLI",
+      "cursorCli": "Cursor CLI",
+      "devinCli": "Devin CLI",
+      "loginTitle": "登录：{{provider}}",
+      "opencodeCli": "OpenCode CLI",
+      "plainShell": "普通 Shell",
+      "shellName": "Shell {{index}}"
+    }
+  },
+  "worktrees": {
+    "branchHint": "新分支名称（例如 feature/login）",
+    "branchingOff": "从 {{branch}} 创建分支",
+    "cleanupDescription": "合并后移除 worktree 并删除分支",
+    "created": "Worktree 已创建",
+    "deleteBranchLabel": "同时删除分支",
+    "dirtyWarning": "警告：此 worktree 有 {{count}} 个未提交的更改将会丢失。",
+    "emptyDescription": "创建 worktree 以隔离功能开发或代理运行。",
+    "emptyTitle": "未找到 worktree",
+    "forceRemoveLabel": "强制移除（放弃更改）",
+    "headDetachedAt": "HEAD 分离于 {{sha}}",
+    "mainBadge": "main",
+    "mergeDescription": "将更改合并到 {{branch}}。",
+    "mergeTitle": "合并 {{branch}}",
+    "merged": "Worktree 已合并到 {{branch}}",
+    "opened": "已打开 worktree：{{branch}}",
+    "portHint": "运行端口（可选，例如 3000）",
+    "removeDescription": "这将删除 worktree 文件夹。关联的项目将被归档。",
+    "removeTitle": "移除 worktree {{branch}}？",
+    "removed": "Worktree 已移除",
+    "runButton": "运行",
+    "runHint": "运行命令（例如 npm run dev）",
+    "runRunning": "运行中",
+    "runRunningWithPort": "运行中 :{{port}}",
+    "scripts": "脚本",
+    "scriptsSaved": "脚本配置已保存",
+    "serverLabel": "服务器： ",
+    "setupHint": "初始化命令（例如 npm install）",
+    "setupLabel": "初始化： ",
+    "squashDescription": "将所有提交合并为单个提交",
+    "stopButton": "停止"
+  },
+  "quota": {
+    "agents": {
+      "statusCount": "{{status}}（{{count}}）"
+    },
+    "chart": {
+      "hide": "隐藏",
+      "noData": "数据不足，无法显示趋势。",
+      "pointReadout": "{{date}} · {{tokens}} 令牌 · {{cost}}",
+      "show": "显示"
+    },
+    "config": {
+      "accountRouting": "账户路由",
+      "pollerTitle": "轮询与提醒",
+      "save": "保存配置"
+    },
+    "overview": {
+      "tokensAndCost": "令牌与成本"
+    },
+    "section": {
+      "config": "配置"
+    }
+  },
+  "scheduler": {
+    "checking": "检查中…",
+    "cronHint": "Cron（分 时 日 月 周）— 例如 0 9 * * *",
+    "deleteMessage": "这将移除重复任务 {{id}}。现有会话会保留。",
+    "deleteTitle": "删除定时任务？",
+    "editTitle": "编辑定时任务",
+    "newLabel": "新建",
+    "nextIn": "{{time}} 后",
+    "promptHint": "给代理的提示词",
+    "runs": "运行次数",
+    "session": "会话 {{id}}",
+    "worktree": "worktree"
+  },
+  "notifications": {
+    "deviceLabel": "ddagent Flutter",
+    "errors": {
+      "noResponse": "服务器无响应",
+      "registrationRejected": "注册被服务器拒绝"
+    }
+  },
+  "serverConnect": {
+    "connect": "连接",
+    "connecting": "正在连接…",
+    "connectionFailed": "连接失败（{{error}}）",
+    "enterUrl": "输入服务器 URL",
+    "subtitle": "连接到你的 ddagent 服务器"
+  },
+  "voice": {
+    "apiKeySaved": "API 密钥（已保存，输入以替换）",
+    "preview": "预览",
+    "saveFailed": "保存 STT 配置失败",
+    "settingsSaved": "语音输入设置已保存"
+  },
+  "preview": {
+    "embeddedWebOnly": "内嵌预览仅在 Web 构建中可用",
+    "startDevServerHint": "启动开发服务器（npm run dev、flutter run -d web-server…）\n其端口会显示在这里。"
+  },
+  "sharedContext": {
+    "title": "共享笔记"
+  },
+  "collab": {
+    "copyToken": "复制令牌",
+    "createInvite": "创建邀请",
+    "invite": "邀请",
+    "inviteTeammate": "邀请队友",
+    "roles": {
+      "member": "成员",
+      "viewer": "查看者"
+    },
+    "shareTokenHint": "分享此邀请令牌 — 它仅显示一次，并在 72 小时后过期：",
+    "team": "团队"
+  },
+  "browser": {
+    "dialogTitle": "代理浏览器",
+    "viewError": "浏览器视图错误",
+    "web": "Web"
+  },
+  "projects": {
+    "archive": "归档",
+    "archivedSection": "已归档（{{count}}）",
+    "clone": "克隆",
+    "cloneFailed": "克隆失败",
+    "cloneFinished": "克隆完成。正在刷新项目列表…",
+    "cloneRepository": "克隆仓库",
+    "deletePermanently": "永久删除",
+    "deleteProjectMessage": "永久移除“{{name}}”，包括所有会话和已存储的历史记录（清空 JSONL）。此操作无法撤销。",
+    "deleteProjectTitle": "删除项目？",
+    "destinationPath": "目标路径",
+    "destinationPathRequired": "目标路径为必填项",
+    "displayNameOptional": "显示名称（可选）",
+    "failedToLoadTokens": "加载 GitHub 令牌失败",
+    "githubTokenOptional": "GitHub 令牌（可选）",
+    "newer": "较新",
+    "older": "较早",
+    "projectArchived": "项目已归档",
+    "projectDeleted": "项目已删除",
+    "projectRenamed": "项目已重命名",
+    "projectRestored": "项目已恢复",
+    "repoUrlPlaceholder": "https://github.com/org/repo.git",
+    "repositoryCloned": "仓库已克隆",
+    "repositoryUrlRequired": "仓库 URL 为必填项",
+    "restore": "恢复",
+    "sessionCount": {
+      "one": "{{count}} 个会话",
+      "other": "{{count}} 个会话"
+    },
+    "unknown": "未知",
+    "usingStoredToken": "使用已保存的令牌：{{name}}"
+  },
+  "sessions": {
+    "activity": {
+      "committingChanges": "正在提交更改",
+      "editingFile": "正在编辑 {{file}}",
+      "editingFileGeneric": "正在编辑文件",
+      "fetchingUrl": "正在获取 {{url}}",
+      "pushingBranch": "正在推送分支",
+      "readingFile": "正在读取 {{file}}",
+      "runningCommand": "正在运行 `{{command}}`",
+      "runningShellCommand": "正在运行 Shell 命令",
+      "runningTool": "正在运行 {{name}}",
+      "searching": "正在搜索“{{query}}”",
+      "subagentRunning": "子代理运行中"
+    },
+    "age": {
+      "days": "{{days}}天",
+      "hours": "{{hours}}小时",
+      "lessThanMinute": "<1分钟",
+      "minutes": "{{count}}分钟"
+    },
+    "archive": "归档",
+    "archivedSessions": "已归档的会话",
+    "autoOrchestrator": "自动（编排器）",
+    "compareWith": "与之比较…",
+    "createFailed": "创建会话失败：{{error}}",
+    "deleteSessionMessage": "移除“{{name}}”及其记录。此操作无法撤销。",
+    "newSessionProvider": "新会话 — 提供商",
+    "noRecentSessions": "没有最近的会话",
+    "noSessions": "没有会话",
+    "projectPath": "项目路径",
+    "rename": "重命名",
+    "toasts": {
+      "archived": "会话已归档",
+      "deleted": "会话已删除",
+      "pinned": "会话已固定",
+      "renamed": "会话已重命名",
+      "restored": "会话已恢复",
+      "unpinned": "会话已取消固定",
+      "workspaceChanged": "工作区已更改"
+    }
+  },
+  "git": {
+    "aiButton": "✦ AI",
+    "checkpoints": {
+      "create": "新建",
+      "empty": "还没有检查点",
+      "labelHint": "检查点标签（可选）",
+      "restoreMessage": "将工作树重置到此检查点？当前更改将被替换。",
+      "restoreTitle": "恢复检查点",
+      "restored": "检查点已恢复",
+      "title": "检查点"
+    },
+    "commitCreated": "提交已创建",
+    "commitMessage": "提交消息",
+    "deleteFile": "删除文件",
+    "hunkStage": "+ 区块",
+    "hunkUnstage": "− 区块",
+    "largeDiff": "大型差异预览：为保证标签页响应流畅，渲染已受限。",
+    "loadDiffFailed": "加载差异失败：{{error}}",
+    "noBranch": "无分支",
+    "noDiff": "没有可用的差异",
+    "selectProject": "选择项目",
+    "splitDiff": "并排差异",
+    "stageHunk": "暂存区块",
+    "stagedChanges": "已暂存的更改",
+    "statusStaged": "已暂存",
+    "switchBranch": "切换分支",
+    "unifiedDiff": "统一差异",
+    "unstageHunk": "取消暂存区块"
+  },
+  "kanban": {
+    "card": {
+      "untitled": "未命名"
+    },
+    "comments": {
+      "add": "添加评论",
+      "empty": "还没有评论"
+    },
+    "details": {
+      "status": "状态：{{status}}",
+      "title": "卡片详情"
+    },
+    "dialog": {
+      "saving": "保存中…"
+    },
+    "empty": {
+      "noProject": "未选择项目"
+    },
+    "saveFailed": "保存卡片失败",
+    "time": {
+      "daysAgo(param=count)": {
+        "one": "1 天前",
+        "other": "{{count}} 天前"
+      },
+      "hoursAgo(param=count)": {
+        "one": "1 小时前",
+        "other": "{{count}} 小时前"
+      },
+      "minutesAgo(param=count)": {
+        "one": "1 分钟前",
+        "other": "{{count}} 分钟前"
+      },
+      "now": "刚刚"
+    }
+  },
+  "onboarding": {
+    "agents": {
+      "description": "登录一个或多个 AI 编程助手。全部为可选。",
+      "laterHint": "你可以稍后在设置中配置。",
+      "title": "连接你的 AI 代理"
+    },
+    "completeSetup": "完成设置",
+    "errors": {
+      "invalidEmail": "请输入有效的邮箱地址。",
+      "nameAndEmailRequired": "git 名称和邮箱均为必填项。"
+    },
+    "gitHint": "用于 ddagent 会话创建的提交。",
+    "mcp": {
+      "description": "安装 ddagent MCP 服务器，让你的代理可以使用知识库和 ddagent 工具。选择代理，或为全部安装。",
+      "installForAll": "为全部安装",
+      "installSelected": "安装到所选",
+      "installedOn(param=count)": {
+        "one": "已安装到 {{count}} 个代理。",
+        "other": "已安装到 {{count}} 个代理。"
+      },
+      "installedWithFailures": "已安装到 {{installedCount}}；失败：{{failed}}",
+      "laterHint": "可选 — 你也可以稍后在设置 → MCP 中安装。",
+      "title": "将代理连接到 ddagent"
+    }
+  },
+  "fileTree": {
+    "browseServerFilesystem": "浏览服务器文件系统",
+    "chooseFolder": "选择文件夹",
+    "copyContents": "复制内容",
+    "noFiles": "没有文件",
+    "search": {
+      "hint": "筛选名称 / 按 Enter 搜索内容",
+      "noMatches": "没有匹配项",
+      "prompt": "输入查询并按 Enter",
+      "resultsTruncated": "结果已截断"
+    },
+    "titles": {
+      "delete": "删除 {{name}}",
+      "download": "下载 {{name}}",
+      "rename": "重命名 {{name}}"
+    },
+    "uploadHere": "上传到此处",
+    "uploadTo": "上传到",
+    "uploadedCount": "已上传 {{count}} 个文件",
+    "newName": "新名称",
+    "notRegisteredProject": "不是已注册的项目：{{path}}",
+    "showGitignoredFiles": "显示被 gitignore 忽略的文件",
+    "hideGitignoredFiles": "隐藏被 gitignore 忽略的文件",
+    "downloadUnsupportedOnWeb": "网页端不支持下载",
+    "saveToPath": "保存到路径",
+    "savedTo": "已保存到 {{path}}"
+  },
+  "workspace": {
+    "archivedWorkspaceName": "已归档",
+    "closePane": "关闭窗格",
+    "closeSearch": "关闭搜索",
+    "deleteSessionNotice": "移除会话及其记录。此操作无法撤销。",
+    "exportChat": "导出聊天",
+    "jumpToSession": "跳转到会话…",
+    "newChatProvider": "新聊天 — 提供商",
+    "nextMatch": "下一个匹配项",
+    "previousMatch": "上一个匹配项",
+    "searchTranscript": "搜索记录",
+    "sendTo": "发送到 {{count}}",
+    "accountWithLabel": "默认 · {{label}}",
+    "finishRunBeforeChangingWorkspace": "请先结束运行再更改工作区",
+    "restored": "工作区已恢复",
+    "maximizePane": "最大化窗格",
+    "restorePanes": "恢复窗格",
+    "reviewChangedFiles": "查看更改的文件"
   }
 }

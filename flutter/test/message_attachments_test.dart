@@ -5,6 +5,7 @@ import 'package:ddagent_app/features/chat/view/transcript_view.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_repository.dart';
 import 'package:ddagent_app/features/misc/data/misc_repository.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -55,15 +56,17 @@ SessionMessage _msg() => SessionMessage(
   ],
 );
 
-Widget _app(_FakeMisc misc, _FakeFiles files, {String? projectId}) => ProviderScope(
-  overrides: [
-    miscRepositoryProvider.overrideWithValue(misc),
-    fileTreeRepositoryProvider.overrideWithValue(files),
-  ],
-  child: MaterialApp(
-    theme: AppTheme.ocChat(),
-    home: Scaffold(
-      body: MessageAttachments(message: _msg(), projectId: projectId),
+Widget _app(_FakeMisc misc, _FakeFiles files, {String? projectId}) => TranslationProvider(
+  child: ProviderScope(
+    overrides: [
+      miscRepositoryProvider.overrideWithValue(misc),
+      fileTreeRepositoryProvider.overrideWithValue(files),
+    ],
+    child: MaterialApp(
+      theme: AppTheme.ocChat(),
+      home: Scaffold(
+        body: MessageAttachments(message: _msg(), projectId: projectId),
+      ),
     ),
   ),
 );

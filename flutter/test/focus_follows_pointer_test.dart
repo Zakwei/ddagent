@@ -7,6 +7,7 @@ import 'package:ddagent_app/features/terminal/state/terminal_state.dart';
 import 'package:ddagent_app/features/terminal/view/terminal_view_wrapper.dart';
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
 import 'package:ddagent_app/features/workspace/view/split_workspace_grid.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -78,21 +79,23 @@ void main() {
 
   /// Pumps the real split-grid layout: a chat pane with [field] next to a
   /// terminal pane — the exact tree the guard inspects.
-  Widget app({Widget? field}) => ProviderScope(
-    child: MaterialApp(
-      theme: AppTheme.dark(),
-      home: Scaffold(
-        body: SplitWorkspaceGrid(
-          panes: const [
-            SplitPane(id: 'chat', kind: PaneKind.chat),
-            SplitPane(id: 'term', kind: PaneKind.terminal),
-          ],
-          activePaneId: 'term',
-          onClosePane: (_) {},
-          onReorderPanes: (_, _) {},
-          renderPane: (pane, _) => pane.id == 'chat'
-              ? field ?? const SizedBox()
-              : TerminalViewWrapper(tab: makeTab(), autofocus: false),
+  Widget app({Widget? field}) => TranslationProvider(
+    child: ProviderScope(
+      child: MaterialApp(
+        theme: AppTheme.dark(),
+        home: Scaffold(
+          body: SplitWorkspaceGrid(
+            panes: const [
+              SplitPane(id: 'chat', kind: PaneKind.chat),
+              SplitPane(id: 'term', kind: PaneKind.terminal),
+            ],
+            activePaneId: 'term',
+            onClosePane: (_) {},
+            onReorderPanes: (_, _) {},
+            renderPane: (pane, _) => pane.id == 'chat'
+                ? field ?? const SizedBox()
+                : TerminalViewWrapper(tab: makeTab(), autofocus: false),
+          ),
         ),
       ),
     ),
@@ -166,15 +169,17 @@ void main() {
 
   testWidgets('multi-line field outside a pane keeps focus', (tester) async {
     await tester.pumpWidget(
-      ProviderScope(
-        child: MaterialApp(
-          theme: AppTheme.dark(),
-          home: Scaffold(
-            body: Column(
-              children: [
-                const SizedBox(height: 100, child: TextField(autofocus: true, maxLines: 8)),
-                Expanded(child: TerminalViewWrapper(tab: makeTab(), autofocus: false)),
-              ],
+      TranslationProvider(
+        child: ProviderScope(
+          child: MaterialApp(
+            theme: AppTheme.dark(),
+            home: Scaffold(
+              body: Column(
+                children: [
+                  const SizedBox(height: 100, child: TextField(autofocus: true, maxLines: 8)),
+                  Expanded(child: TerminalViewWrapper(tab: makeTab(), autofocus: false)),
+                ],
+              ),
             ),
           ),
         ),

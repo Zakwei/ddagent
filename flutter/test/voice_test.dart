@@ -299,7 +299,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Przycisk odtwarzania mowy jest widoczny przy wiadomości
-      final ttsButton = find.byTooltip('Read aloud (TTS)');
+      final ttsButton = find.byTooltip('Read aloud');
       expect(ttsButton, findsOneWidget);
 
       // Kliknij odtwórz
@@ -311,12 +311,12 @@ void main() {
         contains('synthesizeSpeech:Oto odpowiedź asystenta na Twoje pytanie.:null'),
       );
       // Ikona zmienia się w przycisk zatrzymania
-      expect(find.byTooltip('Stop speaking'), findsOneWidget);
+      expect(find.byTooltip('Stop reading'), findsOneWidget);
 
       // Kliknij zatrzymaj
-      await tester.tap(find.byTooltip('Stop speaking'));
+      await tester.tap(find.byTooltip('Stop reading'));
       await tester.pumpAndSettle();
-      expect(find.byTooltip('Read aloud (TTS)'), findsOneWidget);
+      expect(find.byTooltip('Read aloud'), findsOneWidget);
     });
 
     testWidgets('STT Config Dialog: edycja i zapis endpointu', (tester) async {
@@ -338,7 +338,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Voice input (STT)'), findsOneWidget);
+      expect(find.text('Voice input (speech-to-text)'), findsOneWidget);
       expect(find.text('configured'), findsOneWidget);
 
       // Wprowadź nowy model i endpoint

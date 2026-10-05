@@ -15,6 +15,7 @@ import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/settings/state/agent_permissions_controller.dart';
 import 'package:ddagent_app/features/settings/state/locale_controller.dart';
 import 'package:ddagent_app/features/taskmaster/data/taskmaster_repository.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -735,7 +736,9 @@ class ComposerController extends Notifier<ComposerState> {
           if (s.sessionId.isNotEmpty)
             {
               'kind': 'session',
-              'title': (s.summary?.isNotEmpty ?? false) ? s.summary! : 'Session ${s.sessionId}',
+              'title': (s.summary?.isNotEmpty ?? false)
+                  ? s.summary!
+                  : t.chat.export.sessionTitle(id: s.sessionId),
               'value': (s.summary?.isNotEmpty ?? false) ? s.summary! : 'Session ${s.sessionId}',
             },
       ];

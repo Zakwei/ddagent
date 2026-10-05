@@ -4,6 +4,7 @@ import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/features/git/data/git_models.dart';
 import 'package:ddagent_app/features/git/state/git_controller.dart';
 import 'package:ddagent_app/features/git/view/git_diff_viewer.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -382,6 +383,7 @@ class _GitHistoryViewState extends ConsumerState<GitHistoryView> {
     final state = ref.watch(gitProvider);
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     final commits = state.commits;
 
     // Lane layout — rows align 1:1 with commits. Older responses without
@@ -405,7 +407,10 @@ class _GitHistoryViewState extends ConsumerState<GitHistoryView> {
           children: [
             Icon(LucideIcons.history, size: 32, color: c.mutedForeground),
             const SizedBox(height: AppSpacing.sm),
-            Text('No commits found', style: t.bodyMedium?.copyWith(color: c.mutedForeground)),
+            Text(
+              i18n.common.gitPanel.history.empty,
+              style: t.bodyMedium?.copyWith(color: c.mutedForeground),
+            ),
           ],
         ),
       );
@@ -570,6 +575,7 @@ class _CommitDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     if (diff == null) {
       return const Padding(
         padding: EdgeInsets.all(AppSpacing.md),
@@ -593,10 +599,16 @@ class _CommitDetails extends StatelessWidget {
         const SizedBox(height: AppSpacing.sm),
         Row(
           children: [
-            Text('Author ', style: t.labelSmall?.copyWith(color: c.mutedForeground)),
+            Text(
+              '${i18n.common.gitPanel.history.author} ',
+              style: t.labelSmall?.copyWith(color: c.mutedForeground),
+            ),
             Text(commit.author, style: t.labelSmall),
             const SizedBox(width: AppSpacing.md),
-            Text('Date ', style: t.labelSmall?.copyWith(color: c.mutedForeground)),
+            Text(
+              '${i18n.common.gitPanel.history.date} ',
+              style: t.labelSmall?.copyWith(color: c.mutedForeground),
+            ),
             Text(
               date == null
                   ? (commit.date ?? '')
@@ -616,15 +628,25 @@ class _CommitDetails extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                _stat(context, 'Files', '${files.length}'),
-                _stat(context, 'Added', '+$totalIns', color: const Color(0xFF2EA043)),
-                _stat(context, 'Removed', '-$totalDel', color: c.destructive),
+                _stat(context, i18n.common.gitPanel.history.files, '${files.length}'),
+                _stat(
+                  context,
+                  i18n.common.gitPanel.history.added,
+                  '+$totalIns',
+                  color: const Color(0xFF2EA043),
+                ),
+                _stat(
+                  context,
+                  i18n.common.gitPanel.history.removed,
+                  '-$totalDel',
+                  color: c.destructive,
+                ),
               ],
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
-            'CHANGED FILES',
+            i18n.common.gitPanel.history.changedFiles,
             style: t.labelSmall?.copyWith(
               color: c.mutedForeground,
               letterSpacing: 0.6,

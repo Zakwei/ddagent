@@ -4,14 +4,17 @@ import 'package:ddagent_app/core/widgets/code_block.dart';
 import 'package:ddagent_app/core/widgets/diff_block.dart';
 import 'package:ddagent_app/core/widgets/math_block.dart';
 import 'package:ddagent_app/core/widgets/mermaid_block.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-Widget _wrap(Widget child) => ProviderScope(
-  child: MaterialApp(
-    theme: AppTheme.light(),
-    home: Scaffold(body: SingleChildScrollView(child: child)),
+Widget _wrap(Widget child) => TranslationProvider(
+  child: ProviderScope(
+    child: MaterialApp(
+      theme: AppTheme.light(),
+      home: Scaffold(body: SingleChildScrollView(child: child)),
+    ),
   ),
 );
 

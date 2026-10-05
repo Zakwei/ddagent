@@ -95,6 +95,7 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
   /// One global action: import everything (project migration + agent skills).
   /// Reads the agents' files, writes only ddagent's database.
   Future<void> _openImportAll() async {
+    final t = Translations.of(context);
     final repo = ref.read(knowledgeRepositoryProvider);
     Map<String, dynamic> report;
     try {
@@ -102,7 +103,7 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
     } on Object catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Import failed: $error')));
+            .showSnackBar(SnackBar(content: Text(t.knowledge.errors.importFailed(error: error))));
       }
       return;
     }
@@ -122,16 +123,26 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
           final found = skills['found'] ?? 0;
           final newSkills = skills['imported'] ?? 0;
           return AlertDialog(
-            title: const Text('Import everything into ddagent'),
+            title: Text(t.knowledge.importAll.title),
             content: SizedBox(
               width: 520,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Projects scanned: $scanned'),
-                  Text('Agent skills found: $found (new: $newSkills)'),
-                  Text('Rules: ${rules['total'] ?? 0} · duplicate groups: $duplicates'),
+                  Text(t.knowledge.importAll.projectsScanned(count: scanned)),
+                  Text(
+                    t.knowledge.importAll.skillsFound(
+                      found: found as Object,
+                      newSkills: newSkills as Object,
+                    ),
+                  ),
+                  Text(
+                    t.knowledge.importAll.rulesSummary(
+                      total: (rules['total'] ?? 0) as Object,
+                      duplicates: duplicates,
+                    ),
+                  ),
                   const SizedBox(height: 12),
                   Container(
                     padding: const EdgeInsets.all(12),
@@ -152,8 +163,8 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
                     onChanged: dryRun
                         ? (value) => setState(() => mergeDuplicates = value ?? false)
                         : null,
-                    title: const Text('Merge duplicate entries'),
-                    subtitle: const Text('Collapses duplicate rows in ddagent (not files)'),
+                    title: Text(t.knowledge.importAll.mergeDuplicates),
+                    subtitle: Text(t.knowledge.importAll.mergeDuplicatesHint),
                   ),
                   CheckboxListTile(
                     dense: true,
@@ -162,8 +173,8 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
                     onChanged: dryRun
                         ? (value) => setState(() => promoteRules = value ?? false)
                         : null,
-                    title: const Text('Make all rules critical'),
-                    subtitle: const Text('Adds them to the injected context budget'),
+                    title: Text(t.knowledge.critical.makeAll),
+                    subtitle: Text(t.knowledge.critical.makeAllHint),
                   ),
                   Text(
                     dryRun ? 'Dry run — nothing written yet.' : 'Imported.',
@@ -173,7 +184,10 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
               ),
             ),
             actions: [
-              TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancel')),
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: Text(t.knowledge.common.cancel),
+              ),
               FilledButton(
                 onPressed: !dryRun
                     ? null
@@ -186,7 +200,7 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
                         await ref.read(knowledgeControllerProvider.notifier).refresh();
                         setState(() => report = result);
                       },
-                child: const Text('Import everything'),
+                child: Text(t.knowledge.importAll.action),
               ),
             ],
           );
@@ -197,14 +211,16 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
 
   /// Dry-run migration report with actions to merge duplicates / promote rules.
   Future<void> _openMigrate() async {
+    final t = Translations.of(context);
     final repo = ref.read(knowledgeRepositoryProvider);
     Map<String, dynamic> report;
     try {
       report = await repo.migrate(dryRun: true);
     } on Object catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Migration failed: $error')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(t.knowledge.errors.migrationFailed(error: error))));
       }
       return;
     }
@@ -218,20 +234,30 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
           final duplicates = (report['duplicates'] as List? ?? const []).length;
           final rules = report['rules'] as Map<String, dynamic>? ?? const {};
           return AlertDialog(
-            title: const Text('Migrate existing rules'),
+            title: Text(t.knowledge.migrate.title),
             content: SizedBox(
               width: 480,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Scanned $scannedProjects project(s).'),
+                  Text(t.knowledge.migrate.scanned(count: scannedProjects)),
                   const SizedBox(height: 4),
-                  Text('Rules: ${rules['total'] ?? 0} total, ${rules['critical'] ?? 0} critical.'),
+                  Text(
+                    t.knowledge.migrate.rulesSummary(
+                      total: (rules['total'] ?? 0) as Object,
+                      critical: (rules['critical'] ?? 0) as Object,
+                    ),
+                  ),
                   const SizedBox(height: 4),
-                  Text('Duplicate groups across projects: $duplicates'),
+                  Text(t.knowledge.migrate.duplicates(count: duplicates)),
                   const SizedBox(height: 4),
-                  Text('Removed: ${report['removed'] ?? 0}, promoted: ${report['promoted'] ?? 0}'),
+                  Text(
+                    t.knowledge.migrate.removedPromoted(
+                      removed: (report['removed'] ?? 0) as Object,
+                      promoted: (report['promoted'] ?? 0) as Object,
+                    ),
+                  ),
                   const SizedBox(height: 12),
                   Text(
                     dryRun ? 'Dry run — nothing has been changed yet.' : 'Applied.',
@@ -241,7 +267,10 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
               ),
             ),
             actions: [
-              TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Close')),
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: Text(t.knowledge.common.close),
+              ),
               TextButton(
                 onPressed: duplicates == 0 || !dryRun
                     ? null
@@ -250,7 +279,7 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
                         await ref.read(knowledgeControllerProvider.notifier).refresh();
                         setState(() => report = result);
                       },
-                child: const Text('Merge duplicates'),
+                child: Text(t.knowledge.migrate.mergeDuplicates),
               ),
               FilledButton(
                 onPressed: !dryRun
@@ -260,7 +289,7 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
                         await ref.read(knowledgeControllerProvider.notifier).refresh();
                         setState(() => report = result);
                       },
-                child: const Text('Make all rules critical'),
+                child: Text(t.knowledge.critical.makeAll),
               ),
             ],
           );
@@ -271,6 +300,7 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
 
   /// Dry-run report of the agent (global/default) skills that can be imported.
   Future<void> _openImportSkills() async {
+    final t = Translations.of(context);
     final repo = ref.read(knowledgeRepositoryProvider);
     Map<String, dynamic> report;
     try {
@@ -278,7 +308,7 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
     } on Object catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Import failed: $error')));
+            .showSnackBar(SnackBar(content: Text(t.knowledge.errors.importFailed(error: error))));
       }
       return;
     }
@@ -292,16 +322,21 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
           final imported = report['imported'] ?? 0;
           final skipped = report['skipped'] ?? 0;
           return AlertDialog(
-            title: const Text('Import agent skills'),
+            title: Text(t.knowledge.importSkills.title),
             content: SizedBox(
               width: 420,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Found $found skill(s) across your agents.'),
+                  Text(t.knowledge.importSkills.found(count: found as Object)),
                   const SizedBox(height: 4),
-                  Text('New: $imported · skipped: $skipped'),
+                  Text(
+                    t.knowledge.importSkills.summary(
+                      imported: imported as Object,
+                      skipped: skipped as Object,
+                    ),
+                  ),
                   const SizedBox(height: 12),
                   Text(
                     dryRun
@@ -314,7 +349,10 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
               ),
             ),
             actions: [
-              TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Close')),
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: Text(t.knowledge.common.close),
+              ),
               FilledButton(
                 onPressed: !dryRun
                     ? null
@@ -323,7 +361,7 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
                         await ref.read(knowledgeControllerProvider.notifier).refresh();
                         setState(() => report = result);
                       },
-                child: const Text('Import'),
+                child: Text(t.knowledge.dialog.import),
               ),
             ],
           );
@@ -411,28 +449,28 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
       for (final memory in data.memories)
         (
           key: 'memory:${memory.id}',
-          label: 'Memory: ${memory.title}',
+          label: t.knowledge.linkOptions.memory(title: memory.title),
           type: KnowledgeEntityType.memory,
           id: memory.id,
         ),
       for (final rule in data.rules)
         (
           key: 'rule:${rule.id}',
-          label: 'Rule: ${rule.title}',
+          label: t.knowledge.linkOptions.rule(title: rule.title),
           type: KnowledgeEntityType.rule,
           id: rule.id,
         ),
       for (final skill in data.skills)
         (
           key: 'skill:${skill.id}',
-          label: 'Skill: ${skill.name}',
+          label: t.knowledge.linkOptions.skill(name: skill.name),
           type: KnowledgeEntityType.skill,
           id: skill.id,
         ),
       for (final info in data.personal)
         (
           key: 'personal:${info.id}',
-          label: 'Personal: ${info.title}',
+          label: t.knowledge.linkOptions.personal(title: info.title),
           type: KnowledgeEntityType.personal,
           id: info.id,
         ),
@@ -589,8 +627,8 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
               itemBuilder: (_) => [
                 PopupMenuItem(value: 'export', child: Text(t.knowledge.actions.export)),
                 PopupMenuItem(value: 'import', child: Text(t.knowledge.actions.import)),
-                const PopupMenuItem(value: 'migrate', child: Text('Migrate existing rules')),
-                const PopupMenuItem(value: 'skills', child: Text('Import agent skills')),
+                PopupMenuItem(value: 'migrate', child: Text(t.knowledge.migrate.title)),
+                PopupMenuItem(value: 'skills', child: Text(t.knowledge.importSkills.title)),
               ],
             ),
           ],
@@ -652,18 +690,21 @@ Widget _makeCriticalButton(
   BuildContext context, {
   required bool isCritical,
   required Future<String?> Function() promote,
-}) => IconButton(
-  tooltip: 'Make critical',
-  icon: Icon(isCritical ? Icons.star : Icons.star_border),
-  onPressed: isCritical
-      ? null
-      : () async {
-          final error = await promote();
-          if (error != null && context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
-          }
-        },
-);
+}) {
+  final t = Translations.of(context);
+  return IconButton(
+    tooltip: t.knowledge.critical.make,
+    icon: Icon(isCritical ? Icons.star : Icons.star_border),
+    onPressed: isCritical
+        ? null
+        : () async {
+            final error = await promote();
+            if (error != null && context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+            }
+          },
+  );
+}
 
 Future<void> _confirmDelete(BuildContext context, Future<String?> Function() remove) async {
   final t = Translations.of(context);
@@ -698,6 +739,7 @@ class _ContextBudgetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     final ratio = budget <= 0 ? 0.0 : (tokens / budget).clamp(0.0, 1.0);
     final color = ratio >= 0.9
         ? Colors.red
@@ -719,7 +761,7 @@ class _ContextBudgetCard extends StatelessWidget {
                   style: Theme.of(context).textTheme.titleSmall,
                 ),
                 const Spacer(),
-                Text('~$tokens / $budget tok'),
+                Text(t.knowledge.contextBudget.tokens(tokens: tokens, budget: budget)),
               ],
             ),
             const SizedBox(height: 8),
@@ -747,6 +789,7 @@ class _ImportAllCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context);
+    final i18n = Translations.of(context);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -759,7 +802,7 @@ class _ImportAllCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('Import everything into ddagent', style: t.textTheme.titleSmall),
+                  Text(i18n.knowledge.importAll.title, style: t.textTheme.titleSmall),
                   const SizedBox(height: 2),
                   Text(
                     "Scan every project and import your agents' skills into the knowledge base. "
@@ -770,7 +813,7 @@ class _ImportAllCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 16),
-            FilledButton(onPressed: onPressed, child: const Text('Import everything')),
+            FilledButton(onPressed: onPressed, child: Text(i18n.knowledge.importAll.action)),
           ],
         ),
       ),

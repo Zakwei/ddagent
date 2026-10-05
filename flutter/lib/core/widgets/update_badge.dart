@@ -4,6 +4,7 @@ import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/features/system/data/system_repository.dart';
 import 'package:ddagent_app/features/system/state/update_controller.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -22,8 +23,9 @@ class UpdateBadge extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (!ref.watch(updateAvailableProvider)) return const SizedBox.shrink();
+    final t = Translations.of(context);
     final version = normalizeVersion(ref.watch(latestReleaseProvider).value!.tagName);
-    final label = 'Update available · v$version';
+    final label = t.common.update.available(version: version);
 
     if (variant == UpdateBadgeVariant.row) {
       return Padding(
@@ -186,21 +188,18 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
+    final t = Translations.of(context);
     final release = ref.watch(latestReleaseProvider).value;
     final version = release != null ? normalizeVersion(release.tagName) : '?';
     final busy = _status == _Status.updating || _status == _Status.restarting;
 
     final body = switch (_status) {
-      _Status.confirm =>
-        'Update to v$version? The server updates itself and restarts — '
-            'active sessions will be interrupted.',
-      _Status.updating => 'Downloading and applying the update…',
-      _Status.restarting => 'Restarting the server — this takes a moment…',
-      _Status.done => 'Updated to v$version. Reload the app to pick up the new bundle.',
-      _Status.manualRestart =>
-        'The update was applied but the server did not restart on its own — '
-            'restart it manually to finish.',
-      _Status.failed => _error.isNotEmpty ? _error : 'Update failed.',
+      _Status.confirm => t.common.update.confirm(version: version),
+      _Status.updating => t.common.update.downloading,
+      _Status.restarting => t.common.update.restarting,
+      _Status.done => t.common.update.done(version: version),
+      _Status.manualRestart => t.common.update.manualRestart,
+      _Status.failed => _error.isNotEmpty ? _error : t.common.update.failed,
     };
 
     return AlertDialog(
@@ -220,7 +219,9 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
             : const Icon(LucideIcons.circleArrowUp, size: 16, color: Color(0xFF10B981)),
       ),
       title: Text(
-        _status == _Status.failed ? 'Update failed' : 'Update available · v$version',
+        _status == _Status.failed
+            ? t.common.update.failedTitle
+            : t.common.update.available(version: version),
         style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
       ),
       content: ConstrainedBox(
@@ -235,7 +236,7 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
           TextButton.icon(
             onPressed: () => launchUrl(Uri.parse(release!.htmlUrl!)),
             icon: const Icon(LucideIcons.externalLink, size: 12),
-            label: const Text('Release notes', style: TextStyle(fontSize: 12)),
+            label: Text(t.sidebar.version.releaseNotes, style: const TextStyle(fontSize: 12)),
           )
         else
           const SizedBox.shrink(),
@@ -249,15 +250,15 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
               AppButton(
                 variant: AppButtonVariant.secondary,
                 onPressed: _close,
-                child: const Text('Close'),
+                child: Text(t.chat.common.close),
               ),
             if (_status == _Status.confirm) ...[
               const SizedBox(width: 12),
-              AppButton(onPressed: _runUpdate, child: const Text('Update')),
+              AppButton(onPressed: _runUpdate, child: Text(t.common.buttons.update)),
             ],
             if (_status == _Status.failed) ...[
               const SizedBox(width: 12),
-              AppButton(onPressed: _runUpdate, child: const Text('Retry')),
+              AppButton(onPressed: _runUpdate, child: Text(t.chat.session.messages.retry)),
             ],
           ],
         ),

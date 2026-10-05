@@ -180,26 +180,29 @@ class _McpServerFormDialogState extends ConsumerState<McpServerFormDialog> {
   String _scopeLabel(McpScope scope) {
     final t = Translations.of(context);
     return switch (scope) {
-      McpScope.user => widget.global ? 'User (All Providers)' : t.settings.mcpForm.scope.userGlobal,
-      McpScope.local => 'Claude Local',
+      McpScope.user =>
+        widget.global ? t.mcp.form.scope.userAllProviders : t.settings.mcpForm.scope.userGlobal,
+      McpScope.local => t.mcp.form.scope.claudeLocal,
       McpScope.project =>
-        widget.global ? 'Project (All Providers)' : t.settings.mcpForm.scope.projectLocal,
+        widget.global
+            ? t.mcp.form.scope.projectAllProviders
+            : t.settings.mcpForm.scope.projectLocal,
     };
   }
 
   /// `getScopeDescription` — these are literals in the web modal too.
-  String get _scopeDescription => switch (_scope) {
-    McpScope.user =>
-      widget.global
-          ? 'Writes to each provider user config and is available across '
-                'projects on this machine'
-          : 'Available across all projects on your machine',
-    McpScope.local => 'Stored in Claude user settings for the selected project',
-    McpScope.project =>
-      widget.global
-          ? 'Writes to the selected project workspace for every provider'
-          : 'Stored in the selected project workspace',
-  };
+  String get _scopeDescription {
+    final t = Translations.of(context);
+    return switch (_scope) {
+      McpScope.user =>
+        widget.global ? t.mcp.form.scope.description.userGlobal : t.mcp.form.scope.description.user,
+      McpScope.local => t.mcp.form.scope.description.local,
+      McpScope.project =>
+        widget.global
+            ? t.mcp.form.scope.description.projectGlobal
+            : t.mcp.form.scope.description.project,
+    };
+  }
 
   /// `validateJsonInput` — live JSON-mode validation with localized messages.
   void _validateJson(String value) {
@@ -216,10 +219,11 @@ class _McpServerFormDialogState extends ConsumerState<McpServerFormDialog> {
           error = t.settings.mcpForm.validation.missingType;
         } else if (!_transports.contains(transport)) {
           error = widget.global
-              ? 'Add MCP Server supports only stdio and http across all '
-                    'providers, not ${transport.wire}.'
-              : '${widget.provider} does not support ${transport.wire} '
-                    'MCP servers';
+              ? t.mcp.form.validation.unsupportedGlobal(type: transport.wire)
+              : t.mcp.form.validation.unsupportedProvider(
+                  provider: widget.provider,
+                  type: transport.wire,
+                );
         } else if (transport == McpTransport.stdio && (command is! String || command.isEmpty)) {
           error = t.settings.mcpForm.validation.stdioRequiresCommand;
         } else if (transport != McpTransport.stdio && (url is! String || url.isEmpty)) {
@@ -245,6 +249,7 @@ class _McpServerFormDialogState extends ConsumerState<McpServerFormDialog> {
   }
 
   Future<void> _submit() async {
+    final i18n = Translations.of(context);
     setState(() {
       _submitting = true;
       _submitError = null;
@@ -272,9 +277,7 @@ class _McpServerFormDialogState extends ConsumerState<McpServerFormDialog> {
         supportsWorkingDirectory: widget.global ? false : null,
         includeProviderSpecificFields: widget.global ? false : null,
         unsupportedTransportMessage: widget.global
-            ? (t) =>
-                  'Add MCP Server supports only stdio and http across all '
-                  'providers, not ${t.wire}.'
+            ? (type) => i18n.mcp.form.validation.unsupportedGlobal(type: type.wire)
             : null,
       );
       final error = await widget.onSubmit(payload);
@@ -304,7 +307,7 @@ class _McpServerFormDialogState extends ConsumerState<McpServerFormDialog> {
     final formT = t.settings.mcpForm;
     final providerName = mcpProviderName(widget.provider);
     final modalTitle = widget.title ?? (_isEditing ? formT.title.edit : formT.title.add);
-    final submitLabel = widget.submitLabel ?? '${formT.actions.addServer} to $providerName';
+    final submitLabel = widget.submitLabel ?? t.mcp.form.submitTo(provider: providerName);
 
     return Dialog(
       backgroundColor: c.background,
@@ -523,7 +526,7 @@ class _McpServerFormDialogState extends ConsumerState<McpServerFormDialog> {
                       AppInput(controller: _args, maxLines: 3, hint: '--port\n3000'),
                       if (_supportsWorkingDirectory) ...[
                         const SizedBox(height: AppSpacing.lg),
-                        const _FieldLabel('Working Directory'),
+                        _FieldLabel(t.mcp.form.fields.workingDirectory),
                         AppInput(controller: _cwd, hint: '.'),
                       ],
                     ],
@@ -560,14 +563,14 @@ class _McpServerFormDialogState extends ConsumerState<McpServerFormDialog> {
                         _importMode == McpImportMode.form &&
                         _transport == McpTransport.stdio) ...[
                       const SizedBox(height: AppSpacing.lg),
-                      const _FieldLabel('Environment Variable Names'),
+                      _FieldLabel(t.mcp.form.fields.envVarNames),
                       AppInput(controller: _envVars, maxLines: 3, hint: 'GITHUB_TOKEN\nAPI_KEY'),
                     ],
                     if (_showCodexFields &&
                         _importMode == McpImportMode.form &&
                         _transport == McpTransport.http) ...[
                       const SizedBox(height: AppSpacing.lg),
-                      const _FieldLabel('Bearer Token Environment Variable'),
+                      _FieldLabel(t.mcp.form.fields.bearerTokenEnvVar),
                       AppInput(controller: _bearerTokenEnvVar, hint: 'MCP_TOKEN'),
                     ],
 

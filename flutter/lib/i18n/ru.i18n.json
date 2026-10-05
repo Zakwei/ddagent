@@ -78,7 +78,8 @@
       "readFile": "Чтение файла",
       "updateTodo": "Обновить список задач",
       "readTodo": "Прочитать список задач",
-      "searchResults": "результаты"
+      "searchResults": "результаты",
+      "todoReadLabel": "TodoRead: чтение списка задач"
     },
     "search": {
       "found": "Найдено {{count}} {{type}}",
@@ -117,7 +118,16 @@
       "addTo": "Добавляет {{entry}} в разрешенные инструменты.",
       "retry": "Разрешение сохранено. Повторите запрос для использования инструмента.",
       "error": "Не удалось обновить разрешения. Попробуйте снова.",
-      "openSettings": "Открыть настройки"
+      "openSettings": "Открыть настройки",
+      "allow": "Разрешить",
+      "allowAll": "Разрешить все ({{count}})",
+      "allowWithChanges": "Разрешить с изменениями",
+      "always": "Всегда",
+      "deny": "Запретить",
+      "editAndAllow": "Изменить и разрешить",
+      "editInput": "Изменить ввод",
+      "invalidJson": "Неверный JSON",
+      "reject": "Отклонить"
     },
     "todo": {
       "updated": "Список задач успешно обновлен",
@@ -191,7 +201,8 @@
         "clearBtn": "Отмена",
         "multiple": "{{count}} сообщений в офлайн-очереди — отправятся автоматически при переподключении",
         "single": "1 сообщение в офлайн-очереди — отправится автоматически при переподключении"
-      }
+      },
+      "cameraUnavailable": "Камера недоступна: {{error}}"
     },
     "providerSelection": {
       "title": "Выберите вашего AI-ассистента",
@@ -253,8 +264,13 @@
         "perfWarning": "Все сообщения загружены — прокрутка может быть медленнее. Нажмите \"Прокрутить вниз\" для восстановления производительности.",
         "loadOlderFailed": "Не удалось загрузить старые сообщения.",
         "retry": "Повторить",
-        "noSearchMatches": "Нет сообщений, соответствующих запросу."
-      }
+        "noSearchMatches": "Нет сообщений, соответствующих запросу.",
+        "loadAllCount": "Загрузить все ({{count}})",
+        "loadOlder": "Загрузить старые сообщения",
+        "retryLoadOlder": "Повторить загрузку старых — {{error}}"
+      },
+      "deleteConfirm": "Удаляет сессию и её транскрипт. Действие необратимо.",
+      "finishRunBeforeWorkspaceChange": "Завершите запуск перед сменой рабочей области"
     },
     "shell": {
       "selectProject": {
@@ -397,16 +413,21 @@
       "active": "Активна"
     },
     "askUserQuestion": {
-      "needsInput": "{{provider}} ждёт вашего ответа"
+      "needsInput": "{{provider}} ждёт вашего ответа",
+      "answerHint": "Введите ваш ответ…",
+      "other": "Другое…",
+      "skip": "Пропустить"
     },
     "attachments": {
       "downloadFailedRetry": "Загрузка не удалась — нажмите, чтобы повторить",
-      "fileAttachment": "Вложение"
+      "fileAttachment": "Вложение",
+      "download": "Скачать {{name}}"
     },
     "checkpoint": {
       "creating": "Создание снимка…",
       "revertChanges": "Вернуть файлы к последнему чекпоинту",
-      "undo": "Отменить чекпоинт"
+      "undo": "Отменить чекпоинт",
+      "beforeAiTurn": "перед ходом ИИ"
     },
     "common": {
       "close": "Закрыть"
@@ -415,7 +436,9 @@
       "saveToTask": "Задача",
       "saved": "Сохранено",
       "saving": "Сохранение...",
-      "taskShort": "ЗАДАЧА"
+      "taskShort": "ЗАДАЧА",
+      "addToTask": "Добавить в TaskMaster",
+      "added": "Добавлено в TaskMaster"
     },
     "tokenUsage": {
       "desc": "Просмотр потребления токенов в сессии",
@@ -436,6 +459,54 @@
       "selectOrchestrators": "Выбрать оркестраторы",
       "orchestratorsOnly": "Только оркестраторы",
       "noOrchestrators": "Нет доступных сессий оркестратора"
+    },
+    "changes": {
+      "empty": "Нет изменений файлов",
+      "failedToLoad": "Не удалось загрузить изменения"
+    },
+    "commandResult": {
+      "fallback": {
+        "config": "Откройте настройки и конфигурацию.",
+        "cost": "Просмотрите использование токенов для активной сессии.",
+        "help": "Показать документацию и синтаксис команд.",
+        "memory": "Откройте файл памяти CLAUDE.md проекта.",
+        "models": "Просмотрите доступные модели для активного провайдера.",
+        "status": "Проверьте состояние среды выполнения, версии, провайдера и окружения."
+      },
+      "filterCommands": "Фильтр команд...",
+      "searchModels": "Поиск моделей {{provider}}..."
+    },
+    "commands": {
+      "runConfirmTitle": "Выполнить команду?",
+      "executionCancelled": "Выполнение команды отменено"
+    },
+    "export": {
+      "sessionTitle": "Сессия {{id}}",
+      "pdfFailed": "Не удалось экспортировать PDF",
+      "transcriptDownloaded": "Транскрипт скачан",
+      "savedTo": "Сохранено {{path}}"
+    },
+    "message": {
+      "compactedSummary": "Сжатая сводка",
+      "rawView": "Исходный вид",
+      "resendHint": "Отправить повторно из поля ввода"
+    },
+    "modelLibrary": {
+      "deleteTooltip": "Удалить {{name}}",
+      "editTooltip": "Изменить {{name}}",
+      "enterNameAndId": "Введите и имя модели, и ID модели.",
+      "idNoSpaces": "ID модели не может содержать пробелы.",
+      "setAsDefault": "Сделать по умолчанию",
+      "defaultModel": "Модель по умолчанию"
+    },
+    "pinFile": {
+      "action": "Закрепить",
+      "pathHint": "path/to/file.ext",
+      "title": "Закрепить файл"
+    },
+    "permissionRequest": {
+      "title": "Запрос разрешения · {{tool}}",
+      "question": "Вопрос"
     }
   },
   "codeEditor": {
@@ -447,7 +518,11 @@
       "showDiff": "Показать подсветку различий",
       "settings": "Настройки редактора",
       "collapse": "Свернуть редактор",
-      "expand": "Развернуть редактор на всю ширину"
+      "expand": "Развернуть редактор на всю ширину",
+      "diffMerge": "Diff / слияние",
+      "previewInBrowser": "Предпросмотр в браузере",
+      "reload": "Перезагрузить с диска",
+      "toggleDock": "Переключить панель файлов"
     },
     "loading": "Загрузка {{fileName}}...",
     "header": {
@@ -468,7 +543,8 @@
       "pinFile": "Закрепить файл в контексте",
       "unpinFile": "Открепить файл от контекста",
       "previewHtml": "Открыть HTML-предпросмотр в новой вкладке",
-      "retry": "Повторить"
+      "retry": "Повторить",
+      "saveAll": "Сохранить все"
     },
     "footer": {
       "lines": "Строк:",
@@ -477,12 +553,49 @@
     },
     "binaryFile": {
       "title": "Бинарный файл",
-      "message": "Файл \"{{fileName}}\" не может быть отображен в текстовом редакторе, так как это бинарный файл."
+      "message": "Файл \"{{fileName}}\" не может быть отображен в текстовом редакторе, так как это бинарный файл.",
+      "cannotDisplayAsText": "Невозможно отобразить как текст"
     },
     "filePreview": {
       "loading": "Загрузка предпросмотра...",
       "error": "Не удалось отобразить этот файл.",
       "openInNewTab": "Открыть в новой вкладке"
+    },
+    "diff": {
+      "applyMerge": "Применить слияние",
+      "base": "Базовый",
+      "close": "Закрыть diff",
+      "current": "Текущий",
+      "hunk": "Фрагмент {{number}}",
+      "noChanges": "Нет изменений",
+      "deletedOnDisk": "удалён с диска"
+    },
+    "discardUnsavedChanges": "Отменить несохранённые изменения?",
+    "emptyState": {
+      "title": "Файл не открыт"
+    },
+    "failedToLoad": "Не удалось загрузить файл",
+    "hexDump": {
+      "more": "… ещё {{size}}"
+    },
+    "mediaFile": {
+      "subtitle": "Предпросмотр аудио и видео пока не поддерживается",
+      "title": "Медиафайл"
+    },
+    "settings": {
+      "fontSizeDecrease": "Размер шрифта −  (сейчас {{size}})",
+      "fontSizeIncrease": "Размер шрифта +",
+      "minimap": "Миникарта",
+      "tabSize": "Размер табуляции: {{size}}"
+    },
+    "unsavedChanges": "Несохранённые изменения в {{name}}",
+    "toasts": {
+      "savedFile": "Сохранено {{name}}",
+      "saveFailed": "Не удалось сохранить",
+      "allSaved": "Всё сохранено",
+      "someSavesFailed": "Некоторые сохранения не удались",
+      "savedTo": "Сохранено в {{path}}",
+      "mergeApplied": "Слияние применено — сохраните, чтобы зафиксировать"
     }
   },
   "common": {
@@ -502,7 +615,9 @@
       "copy": "Копировать",
       "download": "Скачать",
       "upload": "Загрузить",
-      "browse": "Обзор"
+      "browse": "Обзор",
+      "openDiagram": "Открыть диаграмму",
+      "update": "Обновить"
     },
     "tabs": {
       "chat": "Чат",
@@ -1363,6 +1478,20 @@
     },
     "projects": {
       "newSession": "Новая сессия"
+    },
+    "codeBlock": {
+      "wrapLines": "Переносить строки",
+      "noWrap": "Без переноса"
+    },
+    "update": {
+      "available": "Доступно обновление · v{{version}}",
+      "confirm": "Обновить до v{{version}}? Сервер обновится сам и перезапустится — активные сессии будут прерваны.",
+      "downloading": "Скачивание и применение обновления…",
+      "restarting": "Перезапуск сервера — это займёт мгновение…",
+      "done": "Обновлено до v{{version}}. Перезагрузите приложение, чтобы применить новую сборку.",
+      "manualRestart": "Обновление применено, но сервер не перезапустился сам — перезапустите его вручную, чтобы завершить.",
+      "failed": "Обновление не удалось.",
+      "failedTitle": "Не удалось обновить"
     }
   },
   "settings": {
@@ -1381,7 +1510,8 @@
       "restartConfirm": "Перезапустить сервер ddagent? Активные сессии будут прерваны.",
       "restarting": "Перезапуск… страница перезагрузится, когда сервер вернётся.",
       "restartFailed": "Перезапуск не удался",
-      "unsupported": "Перезапуск доступен только когда сервер работает под менеджером служб."
+      "unsupported": "Перезапуск доступен только когда сервер работает под менеджером служб.",
+      "ok": "OK"
     },
     "updates": {
       "title": "Обновления приложения",
@@ -1438,7 +1568,12 @@
       "wordWrap": "Перенос слов",
       "showMinimap": "Показать миникарту",
       "lineNumbers": "Номера строк",
-      "fontSize": "Размер шрифта"
+      "fontSize": "Размер шрифта",
+      "themeModes": {
+        "dark": "Темная",
+        "light": "Светлая",
+        "system": "Системная"
+      }
     },
     "actions": {
       "saveChanges": "Сохранить изменения",
@@ -1463,7 +1598,8 @@
         "openPanel": "Открыть панель настроек",
         "draggingStatus": "Перетаскивание...",
         "toggleAndMove": "Нажмите для переключения, перетащите для перемещения"
-      }
+      },
+      "sendWithCtrlEnter": "Отправлять по Ctrl+Enter"
     },
     "terminalShortcuts": {
       "title": "Горячие клавиши терминала",
@@ -1646,7 +1782,12 @@
         "disable": "Отключить Push уведомления",
         "enabled": "Уведомления включены для этого десктопного приложения",
         "unsupported": "Десктопные уведомления не поддерживаются в этой системе."
-      }
+      },
+      "channels": {
+        "discord": "Discord",
+        "telegram": "Telegram"
+      },
+      "unpair": "Отвязать"
     },
     "appearanceSettings": {
       "darkMode": {
@@ -1747,11 +1888,13 @@
       "description": "Настройте вашу git идентичность для коммитов. Эти настройки будут применены глобально через git config --global",
       "name": {
         "label": "Имя Git",
-        "help": "Ваше имя для git коммитов"
+        "help": "Ваше имя для git коммитов",
+        "placeholder": "John Doe"
       },
       "email": {
         "label": "Email Git",
-        "help": "Ваш email для git коммитов"
+        "help": "Ваш email для git коммитов",
+        "placeholder": "john@example.com"
       },
       "actions": {
         "save": "Сохранить конфигурацию",
@@ -1797,7 +1940,9 @@
           "descriptionPlaceholder": "Описание (необязательно)",
           "addButton": "Добавить токен",
           "cancelButton": "Отмена",
-          "howToCreate": "Как создать персональный токен доступа GitHub →"
+          "howToCreate": "Как создать персональный токен доступа GitHub →",
+          "showToken": "Показать токен",
+          "hideToken": "Скрыть токен"
         },
         "empty": "GitHub токены еще не добавлены.",
         "added": "Добавлен:",
@@ -2112,11 +2257,19 @@
       "deleteTitle": "Удалить рабочую область",
       "description": "Рабочие области — каталоги, в которых ddagent может вести чаты, запускать код и просматривать файлы.",
       "remove": "Удалить рабочую область",
-      "title": "Рабочие области"
+      "title": "Рабочие области",
+      "pathRequired": "Требуется путь"
     },
     "about": {
       "supportTitle": "Поддержать проект",
-      "buyMeACoffee": "Угостите меня кофе"
+      "buyMeACoffee": "Угостите меня кофе",
+      "learnMore": "Подробнее",
+      "pro": {
+        "syncSettings": "Синхронизация настроек",
+        "teamManagement": "Управление командой"
+      },
+      "proFeatures": "Возможности ddagent Pro",
+      "tryHosted": "Попробовать ddagent Hosted"
     }
   },
   "sidebar": {
@@ -2381,7 +2534,8 @@
         "progressVisualization": "Визуализация прогресса: канбан-доски и детальная аналитика задач",
         "cliIntegration": "Интеграция с CLI: используйте команды taskmaster для продвинутых рабочих процессов"
       },
-      "initializeButton": "Инициализировать TaskMaster AI"
+      "initializeButton": "Инициализировать TaskMaster AI",
+      "writePrdFirst": "Сначала создайте PRD"
     },
     "gettingStarted": {
       "title": "Начало работы с TaskMaster",
@@ -2497,7 +2651,16 @@
       "prdsAvailable": "Доступно {{count}} PRD"
     },
     "prd": {
-      "modified": "Изменено: {{date}}"
+      "modified": "Изменено: {{date}}",
+      "editorTitle": "PRD — {{name}}",
+      "fileExistsMessage": "PRD с именем «{{name}}» уже существует. Перезаписать его?",
+      "fileExistsTitle": "Файл уже существует",
+      "newFile": "новый файл",
+      "parse": "Разобрать PRD",
+      "template": "Шаблон",
+      "fileNameHint": "имя файла (например, prd.txt)",
+      "saved": "PRD сохранён",
+      "tasksGenerated": "Задачи созданы из PRD"
     },
     "statuses": {
       "pending": "Ожидание",
@@ -2505,7 +2668,8 @@
       "done": "Выполнено",
       "blocked": "Заблокировано",
       "deferred": "Отложено",
-      "cancelled": "Отменено"
+      "cancelled": "Отменено",
+      "review": "Ревью"
     },
     "priorities": {
       "high": "Высокий",
@@ -2602,7 +2766,9 @@
       "completedReopen": "Выполнена (нажмите, чтобы переоткрыть)",
       "inProgressComplete": "Выполняется (нажмите, чтобы завершить)",
       "markCompleted": "Отметить как выполненную",
-      "toggleStatusAria": "Переключить статус задачи {{id}}"
+      "toggleStatusAria": "Переключить статус задачи {{id}}",
+      "markDone": "Отметить как выполненную",
+      "reopen": "Возобновить"
     },
     "nextTask": {
       "allComplete": "Все задачи выполнены",
@@ -2644,7 +2810,14 @@
       "taskTitle": "Задача {{id}}: {{title}}",
       "testStrategy": "Стратегия тестирования",
       "titleRequired": "Название обязательно",
-      "updateFailed": "Не удалось обновить задачу"
+      "updateFailed": "Не удалось обновить задачу",
+      "deleteConfirmMessage": "Задача #{{id}} будет удалена. Действие необратимо.",
+      "notFound": "Задача не найдена",
+      "subtasks": "Подзадачи",
+      "idCopied": "ID задачи скопирован"
+    },
+    "toasts": {
+      "statusInProgress": "Задача {{id}} переведена в статус «В процессе»"
     }
   },
   "knowledge": {
@@ -2749,6 +2922,556 @@
     },
     "settings": {
       "description": "Локальный слой памяти для агентов: память, правила, навыки и личные данные."
+    },
+    "contextBudget": {
+      "tokens": "~{{tokens}} / {{budget}} токенов"
+    },
+    "critical": {
+      "make": "Сделать критическим",
+      "makeAll": "Сделать все правила критическими",
+      "makeAllHint": "Добавляет их в бюджет внедряемого контекста"
+    },
+    "errors": {
+      "importFailed": "Импорт не удался: {{error}}",
+      "migrationFailed": "Миграция не удалась: {{error}}"
+    },
+    "graph": {
+      "truncated": "обрезано"
+    },
+    "importAll": {
+      "action": "Импортировать всё",
+      "mergeDuplicates": "Объединить дублирующиеся записи",
+      "mergeDuplicatesHint": "Объединяет дублирующиеся строки в ddagent (не файлы)",
+      "projectsScanned": "Просканировано проектов: {{count}}",
+      "rulesSummary": "Правила: {{total}} · группы дубликатов: {{duplicates}}",
+      "skillsFound": "Найдено навыков агентов: {{found}} (новых: {{newSkills}})",
+      "title": "Импортировать всё в ddagent"
+    },
+    "importSkills": {
+      "found": "Найдено навыков у ваших агентов: {{count}}.",
+      "summary": "Новых: {{imported}} · пропущено: {{skipped}}",
+      "title": "Импортировать навыки агентов"
+    },
+    "linkOptions": {
+      "memory": "Память: {{title}}",
+      "personal": "Личное: {{title}}",
+      "rule": "Правило: {{title}}",
+      "skill": "Навык: {{name}}"
+    },
+    "migrate": {
+      "duplicates": "Группы дубликатов по проектам: {{count}}",
+      "mergeDuplicates": "Объединить дубликаты",
+      "removedPromoted": "Удалено: {{removed}}, повышено: {{promoted}}",
+      "rulesSummary": "Правила: всего {{total}}, критических: {{critical}}.",
+      "scanned": "Просканировано проектов: {{count}}.",
+      "title": "Мигрировать существующие правила"
     }
+  },
+  "skills": {
+    "addDialog": {
+      "chooseFileTitle": "Выбрать SKILL.md",
+      "chooseFiles": "Выбрать файлы",
+      "chooseFolder": "Выбрать папку",
+      "chooseFolderTitle": "Выберите папку навыка",
+      "folderFilesMeta": {
+        "one": "{{count}} файл · {{size}}",
+        "other": "{{count}} файлов · {{size}}"
+      },
+      "folderUploadsNote": "При загрузке папки сохраняется её имя; для отдельных файлов используется `name` из `SKILL.md`.",
+      "hideInstallLocation": "Скрыть место установки",
+      "installSkill": "Установить навык",
+      "installSkills": {
+        "one": "Установить {{count}} навык",
+        "other": "Установить {{count}} навыков"
+      },
+      "markdownFileMeta": "Файл Markdown · {{size}}",
+      "pickHint": "Папки могут содержать скрипты, справочные материалы и ресурсы.",
+      "pickTitle": "Выберите папку навыка или SKILL.md",
+      "readyToInstall": "Готово к установке",
+      "removeQueued": "Удалить {{name}}",
+      "title": "Добавить навык {{provider}}",
+      "uploadHint": "Загрузите файл SKILL.md или папку навыка целиком.",
+      "whereWillThisInstall": "Куда это установится?"
+    },
+    "deleteSkill": "Удалить {{name}}",
+    "empty": {
+      "noGlobalSkills": "Глобальные навыки пока не найдены",
+      "noGlobalSkillsDescription": "Добавьте глобальный навык выше, чтобы он был доступен во всех проектах.",
+      "noMatchingSkills": "Нет подходящих навыков",
+      "noMatchingSkillsDescription": "Попробуйте другую команду, имя, область, проект или исходный путь.",
+      "noProjects": "Нет доступных проектов",
+      "noProjectsDescription": "Добавьте проект или рабочую область, чтобы просмотреть его навыки.",
+      "noSkillsInProject": "В этом проекте нет навыков",
+      "noSkillsInProjectDescription": "Создайте папку .claude/skills, .cursor/skills или .agents/skills в выбранном проекте."
+    },
+    "errors": {
+      "addMarkdownFirst": "Сначала добавьте один или несколько файлов markdown.",
+      "couldNotReadSkillFile": "Не удалось прочитать SKILL.md из {{name}}.",
+      "dropMarkdownOrFolder": "Перетащите один или несколько файлов markdown или папку с SKILL.md.",
+      "folderFileLimit": "Папка навыка может содержать до {{count}} файлов.",
+      "folderReadFailed": "Не удалось прочитать папку навыка",
+      "folderSizeLimit": "Общий размер выбранных папок навыков должен быть меньше 30 МБ.",
+      "importFailed": "Не удалось импортировать навыки",
+      "missingSkillFile": "В выбранной папке нет файла SKILL.md."
+    },
+    "moveDialog": {
+      "moveToGlobal": "Переместить в глобальные",
+      "moveToProject": "Переместить в проект",
+      "toGlobalHint": "Переместите этот навык в глобальную папку навыков, чтобы его могли использовать все проекты.",
+      "toProjectHint": "Выберите проект, которому будет принадлежать этот навык. Он будет перемещён из глобальной папки навыков провайдера."
+    },
+    "moveSkill": "Переместить {{name}}",
+    "projectLabel": "Проект",
+    "scopes": {
+      "admin": "Администратор",
+      "plugin": "Плагин",
+      "project": "Проект",
+      "repo": "Репозиторий",
+      "system": "Система",
+      "user": "Пользователь"
+    },
+    "screen": {
+      "addSkill": "Добавить навык",
+      "clearSearch": "Очистить поиск навыков",
+      "deleteDescription": "Это удалит папку {{directory}} из управляемой папки навыков {{provider}}. Действие необратимо.",
+      "deleteTitle": "Удалить {{name}}?",
+      "loadingSkills": "Загрузка навыков {{provider}}…",
+      "manageDescription": "Управляйте навыками {{provider}} из локальных файлов, папок целиком и мест, зависящих от проекта.",
+      "noDescription": "Описание не указано во front matter навыка.",
+      "pluginBadge": "Плагин: {{name}}",
+      "projectBadge": "Проект: {{name}}",
+      "savedSuccessfully": "Навыки успешно сохранены.",
+      "scanningProjectSkills": "Сканирование навыков проекта…",
+      "searchHint": "Поиск навыков…",
+      "skillsCount": {
+        "one": "{{count}} НАВЫК",
+        "other": "{{count}} НАВЫКОВ"
+      },
+      "sourceLabel": "ИСТОЧНИК"
+    }
+  },
+  "mcp": {
+    "form": {
+      "fields": {
+        "bearerTokenEnvVar": "Переменная окружения с Bearer-токеном",
+        "envVarNames": "Имена переменных окружения",
+        "workingDirectory": "Рабочий каталог"
+      },
+      "scope": {
+        "claudeLocal": "Claude (локально)",
+        "description": {
+          "local": "Хранится в пользовательских настройках Claude для выбранного проекта",
+          "project": "Хранится в рабочей области выбранного проекта",
+          "projectGlobal": "Записывается в рабочую область выбранного проекта для всех провайдеров",
+          "user": "Доступно во всех проектах на вашей машине",
+          "userGlobal": "Записывается в пользовательскую конфигурацию каждого провайдера и доступно во всех проектах на этой машине"
+        },
+        "projectAllProviders": "Проект (все провайдеры)",
+        "userAllProviders": "Пользователь (все провайдеры)"
+      },
+      "submitTo": "Добавить сервер в {{provider}}",
+      "validation": {
+        "unsupportedGlobal": "«Добавить MCP сервер» поддерживает только stdio и http у всех провайдеров, а не {{type}}.",
+        "unsupportedProvider": "{{provider}} не поддерживает MCP серверы типа {{type}}"
+      }
+    },
+    "install": {
+      "button": "Установить",
+      "cardDescription": "Дайте своим агентам базу знаний и инструменты ddagent через MCP — выберите агентов или установите для всех.",
+      "description": "Позволяет выбранным агентам использовать базу знаний и инструменты ddagent через MCP.",
+      "errorFallback": "ошибка",
+      "failed": "Установка не удалась: {{error}}",
+      "installForAll": "Установить для всех",
+      "installSelected": "Установить выбранным",
+      "installedCount(param=count)": {
+        "one": "Установлено для {{count}} агента.",
+        "other": "Установлено для {{count}} агентов."
+      },
+      "partialFailure": "Установлено для {{count}}; не удалось: {{failed}}",
+      "title": "Установить MCP сервер ddagent"
+    },
+    "servers": {
+      "addGlobalDescription": "Добавляет этот MCP сервер всем провайдерам: Claude, Cursor, Codex, OpenCode и Devin. Поддерживаются только транспорты stdio и HTTP, поскольку одна и та же конфигурация должна работать у всех провайдеров.",
+      "addGlobalMenuDescription": "«Добавить глобальный MCP сервер» записывает один общий stdio- или HTTP-сервер в Claude, Cursor, Codex, OpenCode и Devin.",
+      "addGlobalTitle": "Добавить глобальный MCP сервер",
+      "addProviderDescription": "«Добавить MCP сервер для {{provider}}» изменяет только {{provider}}.",
+      "addProviderTitle": "Добавить MCP сервер для {{provider}}",
+      "config": {
+        "cwd": "Рабочий каталог",
+        "envVars": "Переменные окружения"
+      },
+      "descriptionGeneric": "Серверы Model Context Protocol предоставляют {{provider}} дополнительные инструменты и источники данных",
+      "loading": "Загрузка MCP серверов…",
+      "refreshingScopes": "Обновление областей проектов…"
+    },
+    "team": {
+      "cta": "Доступно с ddagent Pro",
+      "description": "Делитесь конфигурациями MCP серверов с командой. Все синхронизируются автоматически.",
+      "title": "Командные конфигурации MCP"
+    },
+    "tokens": {
+      "scopeWrite": "Запись"
+    }
+  },
+  "terminal": {
+    "actions": {
+      "clearOutput": "Очистить вывод",
+      "connect": "Подключить",
+      "newShell": "Новая оболочка",
+      "newTab": "Новая вкладка терминала",
+      "providerLogin": "Вход в провайдер",
+      "restartSession": "Перезапустить сессию"
+    },
+    "authUrl": {
+      "openInBrowser": "Открыть в браузере"
+    },
+    "errors": {
+      "couldNotOpenLink": "Не удалось открыть ссылку: {{url}}"
+    },
+    "fileLink": {
+      "detected": "Обнаружен файл: {{path}}"
+    },
+    "paste": {
+      "hint": "Ctrl+V / правый клик → Вставить",
+      "title": "Вставить в терминал"
+    },
+    "shortcuts": {
+      "eof": "EOF",
+      "hide": "Скрыть панель горячих клавиш",
+      "interrupt": "Прервать (SIGINT)",
+      "suspend": "Приостановить (SIGTSTP)",
+      "showTooltip": "Показать горячие клавиши",
+      "hideTooltip": "Скрыть горячие клавиши"
+    },
+    "tabs": {
+      "antigravityCli": "Antigravity CLI",
+      "claudeCli": "Claude CLI",
+      "commandCodeCli": "Command Code CLI",
+      "cursorCli": "Cursor CLI",
+      "devinCli": "Devin CLI",
+      "loginTitle": "Вход: {{provider}}",
+      "opencodeCli": "OpenCode CLI",
+      "plainShell": "Простая оболочка",
+      "shellName": "Оболочка {{index}}"
+    }
+  },
+  "worktrees": {
+    "branchHint": "Имя новой ветки (напр. feature/login)",
+    "branchingOff": "Ветвление от {{branch}}",
+    "cleanupDescription": "Удалить worktree и ветку после слияния",
+    "created": "Worktree создан",
+    "deleteBranchLabel": "Также удалить ветку",
+    "dirtyWarning": "Внимание: в этом worktree есть {{count}} незафиксированных изменений, которые будут потеряны.",
+    "emptyDescription": "Создайте worktree, чтобы изолировать работу над функцией или запуски агентов.",
+    "emptyTitle": "Worktree не найдены",
+    "forceRemoveLabel": "Принудительно удалить (отменить изменения)",
+    "headDetachedAt": "HEAD откреплён на {{sha}}",
+    "mainBadge": "main",
+    "mergeDescription": "Слить изменения в {{branch}}.",
+    "mergeTitle": "Слить {{branch}}",
+    "merged": "Worktree слит в {{branch}}",
+    "opened": "Открыт worktree: {{branch}}",
+    "portHint": "Порт запуска (необязательно, напр. 3000)",
+    "removeDescription": "Это удалит папку worktree. Связанные проекты будут заархивированы.",
+    "removeTitle": "Удалить worktree {{branch}}?",
+    "removed": "Worktree удалён",
+    "runButton": "Запустить",
+    "runHint": "Команда запуска (напр. npm run dev)",
+    "runRunning": "выполняется",
+    "runRunningWithPort": "выполняется :{{port}}",
+    "scripts": "Скрипты",
+    "scriptsSaved": "Конфигурация скриптов сохранена",
+    "serverLabel": "Сервер: ",
+    "setupHint": "Команда настройки (напр. npm install)",
+    "setupLabel": "Настройка: ",
+    "squashDescription": "Объединить все коммиты в один коммит",
+    "stopButton": "Остановить"
+  },
+  "quota": {
+    "agents": {
+      "statusCount": "{{status}} ({{count}})"
+    },
+    "chart": {
+      "hide": "Скрыть",
+      "noData": "Недостаточно данных для тренда.",
+      "pointReadout": "{{date}} · {{tokens}} токенов · {{cost}}",
+      "show": "Показать"
+    },
+    "config": {
+      "accountRouting": "Маршрутизация аккаунтов",
+      "pollerTitle": "Опрос и оповещения",
+      "save": "Сохранить конфигурацию"
+    },
+    "overview": {
+      "tokensAndCost": "Токены и стоимость"
+    },
+    "section": {
+      "config": "Конфигурация"
+    }
+  },
+  "scheduler": {
+    "checking": "Проверка…",
+    "cronHint": "Cron (мин час день месяц день недели) — напр. 0 9 * * *",
+    "deleteMessage": "Это удалит повторяющуюся задачу {{id}}. Существующие сессии сохранятся.",
+    "deleteTitle": "Удалить расписание?",
+    "editTitle": "Редактировать расписание",
+    "newLabel": "Новый",
+    "nextIn": "через {{time}}",
+    "promptHint": "Запрос для агента",
+    "runs": "Запуски",
+    "session": "сессия {{id}}",
+    "worktree": "worktree"
+  },
+  "notifications": {
+    "deviceLabel": "ddagent Flutter",
+    "errors": {
+      "noResponse": "Нет ответа от сервера",
+      "registrationRejected": "Сервер отклонил регистрацию"
+    }
+  },
+  "serverConnect": {
+    "connect": "Подключить",
+    "connecting": "Подключение…",
+    "connectionFailed": "Не удалось подключиться ({{error}})",
+    "enterUrl": "Введите URL сервера",
+    "subtitle": "Подключитесь к вашему серверу ddagent"
+  },
+  "voice": {
+    "apiKeySaved": "API-ключ (сохранён, введите, чтобы заменить)",
+    "preview": "Предпросмотр",
+    "saveFailed": "Не удалось сохранить конфигурацию STT",
+    "settingsSaved": "Настройки голосового ввода сохранены"
+  },
+  "preview": {
+    "embeddedWebOnly": "Встроенный предпросмотр доступен в веб-сборке",
+    "startDevServerHint": "Запустите dev-сервер (npm run dev, flutter run -d web-server…),\nи его порт появится здесь."
+  },
+  "sharedContext": {
+    "title": "Общие заметки"
+  },
+  "collab": {
+    "copyToken": "Копировать токен",
+    "createInvite": "Создать приглашение",
+    "invite": "Пригласить",
+    "inviteTeammate": "Пригласить коллегу",
+    "roles": {
+      "member": "Участник",
+      "viewer": "Наблюдатель"
+    },
+    "shareTokenHint": "Поделитесь этим токеном приглашения — он показывается один раз и действует 72 ч:",
+    "team": "Команда"
+  },
+  "browser": {
+    "dialogTitle": "Браузер агента",
+    "viewError": "Ошибка представления браузера",
+    "web": "Веб"
+  },
+  "projects": {
+    "archive": "Архивировать",
+    "archivedSection": "Архивные ({{count}})",
+    "clone": "Клонировать",
+    "cloneFailed": "Не удалось клонировать",
+    "cloneFinished": "Клонирование завершено. Обновление списка проектов…",
+    "cloneRepository": "Клонировать репозиторий",
+    "deletePermanently": "Удалить навсегда",
+    "deleteProjectMessage": "Безвозвратно удаляет «{{name}}» вместе со всеми сессиями и сохранённой историей (очистка JSONL). Действие необратимо.",
+    "deleteProjectTitle": "Удалить проект?",
+    "destinationPath": "Путь назначения",
+    "destinationPathRequired": "Укажите путь назначения",
+    "displayNameOptional": "Отображаемое имя (необязательно)",
+    "failedToLoadTokens": "Не удалось загрузить токены GitHub",
+    "githubTokenOptional": "Токен GitHub (необязательно)",
+    "newer": "Новее",
+    "older": "Старее",
+    "projectArchived": "Проект архивирован",
+    "projectDeleted": "Проект удалён",
+    "projectRenamed": "Проект переименован",
+    "projectRestored": "Проект восстановлен",
+    "repoUrlPlaceholder": "https://github.com/org/repo.git",
+    "repositoryCloned": "Репозиторий клонирован",
+    "repositoryUrlRequired": "Укажите URL репозитория",
+    "restore": "Восстановить",
+    "sessionCount": {
+      "one": "{{count}} сессия",
+      "other": "{{count}} сессий"
+    },
+    "unknown": "Неизвестно",
+    "usingStoredToken": "Используется сохранённый токен: {{name}}"
+  },
+  "sessions": {
+    "activity": {
+      "committingChanges": "Фиксация изменений",
+      "editingFile": "Редактирование {{file}}",
+      "editingFileGeneric": "Редактирование файла",
+      "fetchingUrl": "Получение {{url}}",
+      "pushingBranch": "Отправка ветки",
+      "readingFile": "Чтение {{file}}",
+      "runningCommand": "Выполнение `{{command}}`",
+      "runningShellCommand": "Выполнение команды оболочки",
+      "runningTool": "Выполнение {{name}}",
+      "searching": "Поиск «{{query}}»",
+      "subagentRunning": "Выполняется субагент"
+    },
+    "age": {
+      "days": "{{days}} дн.",
+      "hours": "{{hours}} ч.",
+      "lessThanMinute": "<1 мин.",
+      "minutes": "{{count}} мин."
+    },
+    "archive": "Архивировать",
+    "archivedSessions": "Архивные сессии",
+    "autoOrchestrator": "Авто (оркестратор)",
+    "compareWith": "Сравнить с…",
+    "createFailed": "Не удалось создать сессию: {{error}}",
+    "deleteSessionMessage": "Удаляет «{{name}}» и её транскрипт. Действие необратимо.",
+    "newSessionProvider": "Новая сессия — провайдер",
+    "noRecentSessions": "Нет недавних сессий",
+    "noSessions": "Нет сессий",
+    "projectPath": "Путь к проекту",
+    "rename": "Переименовать",
+    "toasts": {
+      "archived": "Сессия архивирована",
+      "deleted": "Сессия удалена",
+      "pinned": "Сессия закреплена",
+      "renamed": "Сессия переименована",
+      "restored": "Сессия восстановлена",
+      "unpinned": "Сессия откреплена",
+      "workspaceChanged": "Рабочая область изменена"
+    }
+  },
+  "git": {
+    "aiButton": "✦ ИИ",
+    "checkpoints": {
+      "create": "Новый",
+      "empty": "Чекпоинтов пока нет",
+      "labelHint": "Метка чекпоинта (необязательно)",
+      "restoreMessage": "Сбросить рабочее дерево к этому чекпоинту? Текущие изменения будут заменены.",
+      "restoreTitle": "Восстановить чекпоинт",
+      "restored": "Чекпоинт восстановлен",
+      "title": "Чекпоинты"
+    },
+    "commitCreated": "Коммит создан",
+    "commitMessage": "Сообщение коммита",
+    "deleteFile": "Удалить файл",
+    "hunkStage": "+ Фрагмент",
+    "hunkUnstage": "− Фрагмент",
+    "largeDiff": "Большой diff: отрисовка ограничена, чтобы вкладка оставалась отзывчивой.",
+    "loadDiffFailed": "Не удалось загрузить diff: {{error}}",
+    "noBranch": "нет ветки",
+    "noDiff": "Нет доступного diff",
+    "selectProject": "Выберите проект",
+    "splitDiff": "Рядом",
+    "stageHunk": "Подготовить фрагмент",
+    "stagedChanges": "Подготовленные изменения",
+    "statusStaged": "Подготовлено",
+    "switchBranch": "Переключить ветку",
+    "unifiedDiff": "Единый",
+    "unstageHunk": "Отменить подготовку фрагмента"
+  },
+  "kanban": {
+    "card": {
+      "untitled": "Без названия"
+    },
+    "comments": {
+      "add": "Добавить комментарий",
+      "empty": "Комментариев пока нет"
+    },
+    "details": {
+      "status": "Статус: {{status}}",
+      "title": "Детали карточки"
+    },
+    "dialog": {
+      "saving": "Сохранение…"
+    },
+    "empty": {
+      "noProject": "Проект не выбран"
+    },
+    "saveFailed": "Не удалось сохранить карточку",
+    "time": {
+      "daysAgo(param=count)": {
+        "one": "1 день назад",
+        "other": "{{count}} дн. назад"
+      },
+      "hoursAgo(param=count)": {
+        "one": "1 час назад",
+        "other": "{{count}} ч. назад"
+      },
+      "minutesAgo(param=count)": {
+        "one": "1 минуту назад",
+        "other": "{{count}} мин. назад"
+      },
+      "now": "сейчас"
+    }
+  },
+  "onboarding": {
+    "agents": {
+      "description": "Войдите в одного или нескольких ИИ-ассистентов программирования. Все они необязательны.",
+      "laterHint": "Вы можете настроить их позже в Настройках.",
+      "title": "Подключите своих ИИ-агентов"
+    },
+    "completeSetup": "Завершить настройку",
+    "errors": {
+      "invalidEmail": "Введите корректный адрес электронной почты.",
+      "nameAndEmailRequired": "Требуются и имя, и эл. почта для git."
+    },
+    "gitHint": "Используется для коммитов, создаваемых сессиями ddagent.",
+    "mcp": {
+      "description": "Установите MCP сервер ddagent, чтобы ваши агенты могли использовать базу знаний и инструменты ddagent. Выберите агентов или установите для всех.",
+      "installForAll": "Установить для всех",
+      "installSelected": "Установить выбранным",
+      "installedOn(param=count)": {
+        "one": "Установлено для {{count}} агента.",
+        "other": "Установлено для {{count}} агентов."
+      },
+      "installedWithFailures": "Установлено для {{installedCount}}; не удалось: {{failed}}",
+      "laterHint": "Необязательно — вы также можете установить это позже в Настройках → MCP.",
+      "title": "Подключить агентов к ddagent"
+    }
+  },
+  "fileTree": {
+    "browseServerFilesystem": "Обзор файловой системы сервера",
+    "chooseFolder": "Выбрать папку",
+    "copyContents": "Копировать содержимое",
+    "noFiles": "Нет файлов",
+    "search": {
+      "hint": "Фильтр по именам / Enter — поиск по содержимому",
+      "noMatches": "Совпадений нет",
+      "prompt": "Введите запрос и нажмите Enter",
+      "resultsTruncated": "Результаты усечены"
+    },
+    "titles": {
+      "delete": "Удалить {{name}}",
+      "download": "Скачать {{name}}",
+      "rename": "Переименовать {{name}}"
+    },
+    "uploadHere": "Загрузить сюда",
+    "uploadTo": "Загрузить в",
+    "uploadedCount": "Загружено файлов: {{count}}",
+    "newName": "Новое имя",
+    "notRegisteredProject": "Проект не зарегистрирован: {{path}}",
+    "showGitignoredFiles": "Показать игнорируемые файлы",
+    "hideGitignoredFiles": "Скрыть игнорируемые файлы",
+    "downloadUnsupportedOnWeb": "Скачивание не поддерживается в веб-версии",
+    "saveToPath": "Сохранить по пути",
+    "savedTo": "Сохранено в {{path}}"
+  },
+  "workspace": {
+    "archivedWorkspaceName": "Архив",
+    "closePane": "Закрыть панель",
+    "closeSearch": "Закрыть поиск",
+    "deleteSessionNotice": "Удаляет сессию и её транскрипт. Действие необратимо.",
+    "exportChat": "Экспортировать чат",
+    "jumpToSession": "Перейти к сессии…",
+    "newChatProvider": "Новый чат — провайдер",
+    "nextMatch": "Следующее совпадение",
+    "previousMatch": "Предыдущее совпадение",
+    "searchTranscript": "Поиск по транскрипту",
+    "sendTo": "Отправить в {{count}}",
+    "accountWithLabel": "По умолчанию · {{label}}",
+    "finishRunBeforeChangingWorkspace": "Завершите запуск перед сменой рабочей области",
+    "restored": "Рабочая область восстановлена",
+    "maximizePane": "Развернуть панель",
+    "restorePanes": "Восстановить панели",
+    "reviewChangedFiles": "Просмотреть изменённые файлы"
   }
 }

@@ -8,6 +8,7 @@ import 'package:ddagent_app/core/theme/app_theme.dart';
 import 'package:ddagent_app/features/kanban/data/kanban_repository.dart';
 import 'package:ddagent_app/features/kanban/state/kanban_controller.dart';
 import 'package:ddagent_app/features/kanban/view/kanban_screen.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -151,16 +152,18 @@ Widget _buildKanbanTestApp({
   FakeChatChannel? channel,
   String projectId = 'test-proj',
 }) {
-  return ProviderScope(
-    overrides: [
-      kanbanRepositoryProvider.overrideWithValue(repo),
-      // chatChannelProvider auto-connects — an unmocked WsClient would leave
-      // a reconnect Timer pending and hang pumpAndSettle.
-      chatChannelProvider.overrideWithValue(channel ?? FakeChatChannel()),
-    ],
-    child: MaterialApp(
-      theme: AppTheme.light(),
-      home: KanbanScreen(projectId: projectId),
+  return TranslationProvider(
+    child: ProviderScope(
+      overrides: [
+        kanbanRepositoryProvider.overrideWithValue(repo),
+        // chatChannelProvider auto-connects — an unmocked WsClient would leave
+        // a reconnect Timer pending and hang pumpAndSettle.
+        chatChannelProvider.overrideWithValue(channel ?? FakeChatChannel()),
+      ],
+      child: MaterialApp(
+        theme: AppTheme.light(),
+        home: KanbanScreen(projectId: projectId),
+      ),
     ),
   );
 }

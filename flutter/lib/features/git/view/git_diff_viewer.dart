@@ -1,4 +1,5 @@
 import 'package:ddagent_app/core/theme/tokens.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 
 /// Port of shared/GitDiffViewer.tsx — unified or side-by-side unified-diff
@@ -106,11 +107,12 @@ class GitDiffViewer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final i18n = Translations.of(context);
     final raw = diff;
     if (raw == null || raw.isEmpty) {
-      return const Padding(
-        padding: EdgeInsets.all(AppSpacing.md),
-        child: Center(child: Text('No diff available')),
+      return Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Center(child: Text(i18n.git.noDiff)),
       );
     }
     final truncatedChars = raw.length > _charLimit;
@@ -131,10 +133,7 @@ class GitDiffViewer extends StatelessWidget {
               border: Border.all(color: context.appColors.border),
               borderRadius: AppRadii.borderMd,
             ),
-            child: Text(
-              'Large diff preview: rendering is limited to keep the tab responsive.',
-              style: Theme.of(context).textTheme.labelSmall,
-            ),
+            child: Text(i18n.git.largeDiff, style: Theme.of(context).textTheme.labelSmall),
           ),
         ConstrainedBox(
           constraints: const BoxConstraints(maxHeight: 400),
@@ -249,6 +248,7 @@ class GitDiffViewer extends StatelessWidget {
   }
 
   Widget _hunkButton(BuildContext context, int index) {
+    final i18n = Translations.of(context);
     final action = hunkAction!;
     final c = context.appColors;
     final color = action.isAdd ? const Color(0xFF2EA043) : c.destructive;
@@ -265,7 +265,7 @@ class GitDiffViewer extends StatelessWidget {
             borderRadius: AppRadii.borderMd,
           ),
           child: Text(
-            action.isAdd ? '+ Hunk' : '− Hunk',
+            action.isAdd ? i18n.git.hunkStage : i18n.git.hunkUnstage,
             style: Theme.of(context).textTheme.labelSmall?.copyWith(color: color),
           ),
         ),

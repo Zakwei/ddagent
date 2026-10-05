@@ -39,6 +39,7 @@ import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
 import 'package:ddagent_app/features/workspace/view/pane_header_metrics.dart';
 import 'package:ddagent_app/features/workspace/view/pane_session_header.dart';
 import 'package:ddagent_app/features/workspace/view/split_workspace_grid.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show ScrollDirection;
 import 'package:flutter/services.dart';
@@ -412,6 +413,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
   Widget _reviewBody(BuildContext context, List<Map<String, dynamic>> files) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     final tools = ref.watch(transcriptToolsProvider(widget.sessionId));
     if (tools.reviewLoading && files.isEmpty) {
       return Center(
@@ -420,22 +422,25 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
           spacing: 8,
           children: [
             const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2)),
-            Text('Loading…', style: t.labelSmall?.copyWith(fontSize: 12, color: c.mutedForeground)),
+            Text(
+              i18n.settings.changelog.loading,
+              style: t.labelSmall?.copyWith(fontSize: 12, color: c.mutedForeground),
+            ),
           ],
         ),
       );
     }
     if (tools.reviewError) {
-      return const Center(
+      return Center(
         child: SessionListEmptyState(
           icon: LucideIcons.triangleAlert,
-          label: 'Failed to load changes',
+          label: i18n.chat.changes.failedToLoad,
         ),
       );
     }
     if (files.isEmpty) {
-      return const Center(
-        child: SessionListEmptyState(icon: LucideIcons.fileDiff, label: 'No file changes'),
+      return Center(
+        child: SessionListEmptyState(icon: LucideIcons.fileDiff, label: i18n.chat.changes.empty),
       );
     }
     return Opacity(
@@ -624,6 +629,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
 
   @override
   Widget build(BuildContext context) {
+    final i18n = Translations.of(context);
     final sessionId = widget.sessionId;
     // Standalone `/chat/:id` mounts no workspace, so the running-session pulse
     // has to be kept alive here too (idempotent when WorkspaceScreen already
@@ -761,14 +767,14 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                             children: [
                               TextButton.icon(
                                 icon: const Icon(Icons.history, size: 16),
-                                label: const Text('Load older messages'),
+                                label: Text(i18n.chat.session.messages.loadOlder),
                                 onPressed: _loadOlder,
                               ),
                               // Web LoadAllMessagesOverlay — one-shot load of
                               // every remaining page, with the total count.
                               TextButton.icon(
                                 icon: const Icon(Icons.unfold_more, size: 16),
-                                label: Text('Load all ($total)'),
+                                label: Text(i18n.chat.session.messages.loadAllCount(count: total)),
                                 onPressed: _loadAll,
                               ),
                             ],
@@ -777,7 +783,9 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                 if (state.olderError != null)
                   TextButton(
                     onPressed: _loadOlder,
-                    child: Text('Retry loading older — ${state.olderError}'),
+                    child: Text(
+                      i18n.chat.session.messages.retryLoadOlder(error: state.olderError ?? ''),
+                    ),
                   ),
                 Expanded(
                   // The tools/panel must resolve the oc-chat theme — this
@@ -922,24 +930,28 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
 
   /// SessionWorkspaceDialog parity — rebind the session to another path.
   Future<void> _standaloneChangeWorkspace() async {
+    final i18n = Translations.of(context);
     final running = ref.read(sessionDetailsProvider(widget.sessionId)).value?.isRunning == true;
     if (running) {
-      AppToast.error(context, 'Finish the run before changing workspace');
+      AppToast.error(context, i18n.chat.session.finishRunBeforeWorkspaceChange);
       return;
     }
     final field = TextEditingController();
     final saved = await showDialog<bool>(
       context: context,
       builder: (ctx) => AppDialog(
-        title: 'Change workspace',
+        title: i18n.sidebar.workspace.submit,
         content: AppInput(controller: field, autofocus: true, hint: '/path/to/project'),
         actions: [
           AppButton(
             variant: AppButtonVariant.ghost,
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
+            child: Text(i18n.chat.orchestrator.summary.cancelTasks),
           ),
-          AppButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Save')),
+          AppButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(i18n.codeEditor.actions.save),
+          ),
         ],
       ),
     );
@@ -954,7 +966,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
       AppToast.error(context, err);
       return;
     }
-    AppToast.show(context, 'Workspace changed');
+    AppToast.show(context, i18n.sessions.toasts.workspaceChanged);
   }
 
   Future<void> _standaloneRename(String name) async {
@@ -970,11 +982,12 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
   }
 
   Future<void> _standaloneDelete({required bool hard}) async {
+    final i18n = Translations.of(context);
     if (hard) {
       final ok = await AppDialog.confirm(
         context,
-        title: 'Delete session?',
-        message: 'Removes the session and its transcript. Cannot be undone.',
+        title: i18n.common.browserUse.deleteSession,
+        message: i18n.chat.session.deleteConfirm,
         confirmLabel: 'Delete',
       );
       if (!ok) return;
@@ -988,7 +1001,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
       AppToast.error(context, err);
       return;
     }
-    AppToast.show(context, hard ? 'Session deleted' : 'Session archived');
+    AppToast.show(context, hard ? i18n.sessions.toasts.deleted : i18n.sessions.toasts.archived);
     context.go('/sessions');
   }
 }
@@ -1028,6 +1041,7 @@ class MessageTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
+    final i18n = Translations.of(context);
 
     if (message.isLocalCommand || message.isLocalCommandStdout) {
       return _wrap(
@@ -1053,7 +1067,7 @@ class MessageTile extends ConsumerWidget {
         _card(
           cs,
           icon: Icons.compress,
-          title: 'Compacted summary',
+          title: i18n.chat.message.compactedSummary,
           child: AppMarkdown(data: message.content ?? message.summary ?? '', selectable: false),
         ),
       );
@@ -1120,7 +1134,7 @@ class MessageTile extends ConsumerWidget {
             cs,
             color: cs.errorContainer,
             icon: Icons.error_outline,
-            title: 'Error',
+            title: i18n.chat.messageTypes.error,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -1128,8 +1142,8 @@ class MessageTile extends ConsumerWidget {
                 TextButton(
                   onPressed: () =>
                       ScaffoldMessenger.of(context)
-                          .showSnackBar(const SnackBar(content: Text('Resend from the composer'))),
-                  child: const Text('Retry'),
+                          .showSnackBar(SnackBar(content: Text(i18n.chat.message.resendHint))),
+                  child: Text(i18n.chat.session.messages.retry),
                 ),
               ],
             ),
@@ -1186,7 +1200,7 @@ class MessageTile extends ConsumerWidget {
           _card(
             cs,
             icon: Icons.notifications_outlined,
-            title: 'Notification',
+            title: i18n.common.notifications.codes.generic.info.title,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -1194,7 +1208,7 @@ class MessageTile extends ConsumerWidget {
                 if (target != null && target.isNotEmpty && target != sessionId)
                   TextButton.icon(
                     icon: const Icon(Icons.open_in_new, size: 14),
-                    label: const Text('Open session'),
+                    label: Text(i18n.tasks.board.card.openSession),
                     onPressed: () => context.go('/chat/$target'),
                   ),
               ],
@@ -1260,6 +1274,7 @@ class MessageTile extends ConsumerWidget {
   Widget _userBubble(BuildContext context, WidgetRef ref) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     final content = message.content ?? '';
     final time = clockTime(message.timestamp);
     final muted = t.labelSmall?.copyWith(color: c.mutedForeground);
@@ -1285,13 +1300,13 @@ class MessageTile extends ConsumerWidget {
                   if (content.trim().isNotEmpty) ...[
                     _UserBubbleAction(
                       icon: Icons.copy_outlined,
-                      tooltip: 'Copy',
+                      tooltip: i18n.chat.codeBlock.copy,
                       onTap: () => unawaited(copyTextWithFeedback(context, content)),
                     ),
                     if (projectId != null)
                       _UserBubbleAction(
                         icon: Icons.add_task,
-                        tooltip: 'Add to TaskMaster',
+                        tooltip: i18n.chat.taskMaster.addToTask,
                         onTap: () => _saveAsTask(context, ref, content),
                       ),
                   ],
@@ -1308,6 +1323,7 @@ class MessageTile extends ConsumerWidget {
   /// `MessageTaskMasterControl` — the message becomes a medium-priority
   /// task: code fences stripped, title ≤ 80 chars.
   Future<void> _saveAsTask(BuildContext context, WidgetRef ref, String content) async {
+    final i18n = Translations.of(context);
     final pid = projectId;
     if (pid == null) return;
     final plain = content
@@ -1328,18 +1344,19 @@ class MessageTile extends ConsumerWidget {
       });
       if (context.mounted) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('Added to TaskMaster')));
+            .showSnackBar(SnackBar(content: Text(i18n.chat.taskMaster.added)));
       }
     } on Object {
       if (context.mounted) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('Failed to add task')));
+            .showSnackBar(SnackBar(content: Text(i18n.tasks.createTask.error)));
       }
     }
   }
 
   Widget _permissionCard(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
+    final i18n = Translations.of(context);
     final requestId = message.requestId;
     final toolName = (message.context?['toolName'] ?? message.toolName)?.toString() ?? '';
     final input = message.toolInput is Map
@@ -1378,7 +1395,9 @@ class MessageTile extends ConsumerWidget {
         cs,
         color: cs.tertiaryContainer,
         icon: Icons.lock_outline,
-        title: isAskUser ? 'Question' : 'Permission request · $toolName',
+        title: isAskUser
+            ? i18n.chat.permissionRequest.question
+            : i18n.chat.permissionRequest.title(tool: toolName),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1406,12 +1425,12 @@ class MessageTile extends ConsumerWidget {
                       children: [
                         FilledButton.tonal(
                           onPressed: () => decide(allow: true),
-                          child: const Text('Allow'),
+                          child: Text(i18n.chat.permissions.allow),
                         ),
                         if (rememberEntry != null)
                           FilledButton.tonal(
                             onPressed: () => decide(allow: true, remember: rememberEntry),
-                            child: const Text('Always'),
+                            child: Text(i18n.chat.permissions.always),
                           ),
                         TextButton(
                           onPressed: () => _editInputDialog(context, input).then((v) {
@@ -1419,11 +1438,11 @@ class MessageTile extends ConsumerWidget {
                               decide(allow: true, updatedInput: v);
                             }
                           }),
-                          child: const Text('Edit & allow'),
+                          child: Text(i18n.chat.permissions.editAndAllow),
                         ),
                         TextButton(
                           onPressed: () => decide(allow: false),
-                          child: const Text('Deny'),
+                          child: Text(i18n.chat.permissions.deny),
                         ),
                       ],
                     ),
@@ -1488,11 +1507,12 @@ class MessageTile extends ConsumerWidget {
   }
 
   Future<Map<String, dynamic>?> _editInputDialog(BuildContext context, Map<String, dynamic> input) {
+    final i18n = Translations.of(context);
     final ctrl = TextEditingController(text: const JsonEncoder.withIndent('  ').convert(input));
     return showDialog<Map<String, dynamic>>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Edit input'),
+        title: Text(i18n.chat.permissions.editInput),
         content: SizedBox(
           width: 480,
           child: TextField(
@@ -1503,7 +1523,10 @@ class MessageTile extends ConsumerWidget {
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(i18n.chat.orchestrator.summary.cancelTasks),
+          ),
           FilledButton(
             onPressed: () {
               try {
@@ -1511,10 +1534,10 @@ class MessageTile extends ConsumerWidget {
                 Navigator.pop(ctx, v is Map ? Map<String, dynamic>.from(v) : input);
               } on Object {
                 ScaffoldMessenger.of(context)
-                    .showSnackBar(const SnackBar(content: Text('Invalid JSON')));
+                    .showSnackBar(SnackBar(content: Text(i18n.chat.permissions.invalidJson)));
               }
             },
-            child: const Text('Allow with changes'),
+            child: Text(i18n.chat.permissions.allowWithChanges),
           ),
         ],
       ),
@@ -1573,6 +1596,7 @@ class _MessageActionsState extends ConsumerState<MessageActions> {
     final message = widget.message;
     final child = widget.child;
     final stamp = clockTime(message.timestamp);
+    final i18n = Translations.of(context);
     final ttsState = ref.watch(ttsControllerProvider);
     final isSpeaking = ttsState.isSpeakingMessage(message.id);
     final textToSpeak = message.content ?? message.text ?? '';
@@ -1599,7 +1623,9 @@ class _MessageActionsState extends ConsumerState<MessageActions> {
                         size: 14,
                         color: isSpeaking ? Theme.of(context).colorScheme.primary : null,
                       ),
-                      tooltip: isSpeaking ? 'Stop speaking' : 'Read aloud (TTS)',
+                      tooltip: isSpeaking
+                          ? i18n.chat.voice.stopSpeaking
+                          : i18n.chat.voice.speakMessage,
                       padding: EdgeInsets.zero,
                       iconSize: 14,
                       constraints: const BoxConstraints(minWidth: 20, minHeight: 20),
@@ -1645,16 +1671,16 @@ class _MessageActionsState extends ConsumerState<MessageActions> {
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(context),
-                                child: const Text('Close'),
+                                child: Text(i18n.chat.common.close),
                               ),
                             ],
                           ),
                         );
                       }
                     },
-                    itemBuilder: (context) => const [
-                      PopupMenuItem(value: 'copy', child: Text('Copy')),
-                      PopupMenuItem(value: 'raw', child: Text('Raw view')),
+                    itemBuilder: (context) => [
+                      PopupMenuItem(value: 'copy', child: Text(i18n.chat.codeBlock.copy)),
+                      PopupMenuItem(value: 'raw', child: Text(i18n.chat.message.rawView)),
                     ],
                   ),
                 ],
@@ -1786,8 +1812,9 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     return Tooltip(
-      message: 'Download $_name',
+      message: i18n.chat.attachments.download(name: _name),
       child: InkWell(
         onTap: _path.isEmpty || _downloading ? null : _download,
         borderRadius: BorderRadius.circular(12),
@@ -1899,6 +1926,7 @@ class _PermissionBanner extends ConsumerWidget {
     if (pending.isEmpty) return const SizedBox.shrink();
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
 
     void decide(PendingPermission p, {required bool allow}) => ref
         .read(transcriptProvider(sessionId).notifier)
@@ -1981,15 +2009,21 @@ class _PermissionBanner extends ConsumerWidget {
                       style: t.bodySmall?.copyWith(color: c.foreground),
                     ),
                   ),
-                  TextButton(onPressed: () => decide(p, allow: true), child: const Text('Allow')),
+                  TextButton(
+                    onPressed: () => decide(p, allow: true),
+                    child: Text(i18n.chat.permissions.allow),
+                  ),
                   if (p.rememberEntry != null)
                     TextButton(
                       onPressed: () => decide(p, allow: true),
-                      child: const Text('Always'),
+                      child: Text(i18n.chat.permissions.always),
                     ),
                   TextButton(
                     onPressed: () => decide(p, allow: false),
-                    child: Text('Reject', style: TextStyle(color: c.destructive)),
+                    child: Text(
+                      i18n.chat.permissions.reject,
+                      style: TextStyle(color: c.destructive),
+                    ),
                   ),
                 ],
               ),
@@ -2003,7 +2037,7 @@ class _PermissionBanner extends ConsumerWidget {
                     decide(p, allow: true);
                   }
                 },
-                child: Text('Allow all (${permissions.length})'),
+                child: Text(i18n.chat.permissions.allowAll(count: permissions.length)),
               ),
             ),
         ],

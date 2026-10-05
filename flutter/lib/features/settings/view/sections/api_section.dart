@@ -70,7 +70,7 @@ class _ApiSectionState extends ConsumerState<ApiSection> {
       context,
       title: t.settings.apiKeys.title,
       message: t.settings.apiKeys.confirmDelete,
-      confirmLabel: 'Delete',
+      confirmLabel: t.common.buttons.delete,
     );
     if (confirmed) _report(await _ctrl.deleteApiKey(key.id));
   }
@@ -97,7 +97,7 @@ class _ApiSectionState extends ConsumerState<ApiSection> {
       context,
       title: t.settings.apiKeys.github.title,
       message: t.settings.apiKeys.github.confirmDelete,
-      confirmLabel: 'Delete',
+      confirmLabel: t.common.buttons.delete,
     );
     if (confirmed) {
       _report(await _ctrl.deleteGithubCredential(credential.id));
@@ -219,7 +219,9 @@ class _ApiSectionState extends ConsumerState<ApiSection> {
                           obscureText: !_showToken,
                         ),
                         IconButton(
-                          tooltip: _showToken ? 'Hide token' : 'Show token',
+                          tooltip: _showToken
+                              ? apiT.github.form.hideToken
+                              : apiT.github.form.showToken,
                           icon: Icon(
                             _showToken ? LucideIcons.eyeOff : LucideIcons.eye,
                             size: 16,
@@ -474,7 +476,7 @@ class _ApiKeyRow extends StatelessWidget {
               ),
             ),
             IconButton(
-              tooltip: 'Delete',
+              tooltip: t.common.buttons.delete,
               icon: const Icon(LucideIcons.trash2, size: 16),
               onPressed: onDelete,
             ),
@@ -536,7 +538,7 @@ class _GithubCredentialRow extends StatelessWidget {
               ),
             ),
             IconButton(
-              tooltip: 'Delete',
+              tooltip: t.common.buttons.delete,
               icon: const Icon(LucideIcons.trash2, size: 16),
               onPressed: onDelete,
             ),
@@ -583,7 +585,7 @@ class _SttSection extends ConsumerWidget {
               variant: AppButtonVariant.outline,
               size: AppButtonSize.sm,
               onPressed: () => SttConfigDialog.show(context),
-              child: const Text('Configure'),
+              child: Text(t.common.projectWizard.steps.configure),
             ),
           ),
         ],

@@ -2,6 +2,7 @@ import 'package:ddagent_app/core/theme/theme_controller.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/features/settings/state/ui_preferences_controller.dart';
 import 'package:ddagent_app/features/settings/ui/language_picker.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -18,6 +19,7 @@ class QuickSettingsDialog extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.appColors;
+    final t = Translations.of(context);
     final prefs = ref.watch(uiPreferencesProvider);
     final mode = ref.watch(themeModeProvider);
     final notifier = ref.read(uiPreferencesProvider.notifier);
@@ -53,10 +55,10 @@ class QuickSettingsDialog extends ConsumerWidget {
               ),
               const SizedBox(height: AppSpacing.md),
               _Section(
-                title: 'Appearance',
+                title: t.settings.tabs.appearance,
                 children: [
                   _ToggleRow(
-                    label: 'Dark mode',
+                    label: t.common.common.darkMode,
                     icon: mode == ThemeMode.dark ? LucideIcons.moon : LucideIcons.sun,
                     value: mode == ThemeMode.dark,
                     onChanged: (v) => ref
@@ -68,16 +70,16 @@ class QuickSettingsDialog extends ConsumerWidget {
                 ],
               ),
               _Section(
-                title: 'Tool display',
+                title: t.settings.quickSettings.sections.toolDisplay,
                 children: [
                   _ToggleRow(
-                    label: 'Show raw parameters',
+                    label: t.settings.quickSettings.showRawParameters,
                     icon: LucideIcons.eye,
                     value: prefs.showRawParameters,
                     onChanged: (v) => notifier.update((p) => p.copyWith(showRawParameters: v)),
                   ),
                   _ToggleRow(
-                    label: 'Show thinking',
+                    label: t.settings.quickSettings.showThinking,
                     icon: LucideIcons.brain,
                     value: prefs.showThinking,
                     onChanged: (v) => notifier.update((p) => p.copyWith(showThinking: v)),
@@ -85,10 +87,10 @@ class QuickSettingsDialog extends ConsumerWidget {
                 ],
               ),
               _Section(
-                title: 'Input settings',
+                title: t.settings.quickSettings.sections.inputSettings,
                 children: [
                   _ToggleRow(
-                    label: 'Send with Ctrl+Enter',
+                    label: t.settings.quickSettings.sendWithCtrlEnter,
                     icon: LucideIcons.languages,
                     value: prefs.sendByCtrlEnter,
                     onChanged: (v) => notifier.update((p) => p.copyWith(sendByCtrlEnter: v)),

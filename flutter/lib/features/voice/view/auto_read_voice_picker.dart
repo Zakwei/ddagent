@@ -1,6 +1,7 @@
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/features/voice/state/tts_controller.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -16,6 +17,7 @@ class AutoReadVoicePicker extends ConsumerWidget {
     final ctrl = ref.read(ttsControllerProvider.notifier);
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
 
     final currentVoice = ttsState.preferredVoice;
     final voices = ttsState.voices;
@@ -28,12 +30,12 @@ class AutoReadVoicePicker extends ConsumerWidget {
           child: DropdownButton<String>(
             value: validVoice,
             isExpanded: true,
-            hint: Text('Auto voice', style: t.bodySmall),
+            hint: Text(i18n.chat.voice.autoReadVoiceAuto, style: t.bodySmall),
             underline: const SizedBox.shrink(),
             items: [
               DropdownMenuItem(
                 value: '',
-                child: Text('Auto voice', style: t.bodySmall),
+                child: Text(i18n.chat.voice.autoReadVoiceAuto, style: t.bodySmall),
               ),
               for (final v in voices)
                 DropdownMenuItem(
@@ -56,7 +58,7 @@ class AutoReadVoicePicker extends ConsumerWidget {
             onPressed: () {
               ctrl.speak(
                 'preview',
-                'This is how replies will sound.',
+                i18n.chat.voice.autoReadPreview,
                 voice: currentVoice.isNotEmpty ? currentVoice : null,
               );
             },
@@ -69,7 +71,7 @@ class AutoReadVoicePicker extends ConsumerWidget {
                   color: c.primary,
                 ),
                 const SizedBox(width: 4),
-                const Text('Preview'),
+                Text(i18n.voice.preview),
               ],
             ),
           ),

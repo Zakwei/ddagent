@@ -4,6 +4,7 @@ import 'package:ddagent_app/core/widgets/app_card.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
 import 'package:ddagent_app/features/auth/state/auth_controller.dart';
 import 'package:ddagent_app/features/server_connect/data/server_profiles.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -29,9 +30,10 @@ class _ServerConnectScreenState extends ConsumerState<ServerConnectScreen> {
   }
 
   Future<void> _connect([String? preset]) async {
+    final i18n = Translations.of(context);
     final url = preset ?? _url.text;
     if (url.trim().isEmpty) {
-      setState(() => _error = 'Enter a server URL');
+      setState(() => _error = i18n.serverConnect.enterUrl);
       return;
     }
     setState(() {
@@ -43,7 +45,7 @@ class _ServerConnectScreenState extends ConsumerState<ServerConnectScreen> {
     if (!probe.ok) {
       setState(() {
         _busy = false;
-        _error = 'Connection failed (${probe.error})';
+        _error = i18n.serverConnect.connectionFailed(error: probe.error ?? '');
       });
       return;
     }
@@ -63,6 +65,7 @@ class _ServerConnectScreenState extends ConsumerState<ServerConnectScreen> {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context);
+    final i18n = Translations.of(context);
     final c = context.appColors;
     final profiles = ref.watch(serverProfilesProvider).profiles;
     return Scaffold(
@@ -76,10 +79,14 @@ class _ServerConnectScreenState extends ConsumerState<ServerConnectScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text('ddagent', style: t.textTheme.headlineMedium, textAlign: TextAlign.center),
+                  Text(
+                    i18n.sidebar.app.title,
+                    style: t.textTheme.headlineMedium,
+                    textAlign: TextAlign.center,
+                  ),
                   const SizedBox(height: AppSpacing.xs),
                   Text(
-                    'Connect to your ddagent server',
+                    i18n.serverConnect.subtitle,
                     style: t.textTheme.bodyMedium?.copyWith(color: c.mutedForeground),
                     textAlign: TextAlign.center,
                   ),
@@ -92,7 +99,7 @@ class _ServerConnectScreenState extends ConsumerState<ServerConnectScreen> {
                         title: Text(p.label, overflow: TextOverflow.ellipsis),
                         trailing: IconButton(
                           icon: const Icon(Icons.close, size: 18),
-                          tooltip: 'Remove',
+                          tooltip: i18n.common.gitPanel.remove,
                           onPressed: () => _remove(p.url),
                         ),
                         onTap: _busy ? null : () => _connect(p.url),
@@ -114,7 +121,7 @@ class _ServerConnectScreenState extends ConsumerState<ServerConnectScreen> {
                   AppButton(
                     onPressed: _connect,
                     loading: _busy,
-                    child: Text(_busy ? 'Connecting...' : 'Connect'),
+                    child: Text(_busy ? i18n.serverConnect.connecting : i18n.serverConnect.connect),
                   ),
                 ],
               ),

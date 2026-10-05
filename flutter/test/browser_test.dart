@@ -11,6 +11,7 @@ import 'package:ddagent_app/features/browser/view/browser_use_panel.dart';
 import 'package:ddagent_app/features/browser/view/web_browser_pane.dart';
 import 'package:ddagent_app/features/browser_use/data/browser_use_repository.dart';
 import 'package:ddagent_app/features/browser_use/state/browser_use_controller.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -339,12 +340,14 @@ void main() {
     late _FakeWs ws;
     late BrowserViewChannel channel;
 
-    Widget buildApp({String? url, ValueChanged<String>? onUrlChange}) => ProviderScope(
-      overrides: [browserViewChannelProvider.overrideWithValue(channel)],
-      child: MaterialApp(
-        theme: AppTheme.light(),
-        home: Scaffold(
-          body: WebBrowserPane(url: url, onUrlChange: onUrlChange),
+    Widget buildApp({String? url, ValueChanged<String>? onUrlChange}) => TranslationProvider(
+      child: ProviderScope(
+        overrides: [browserViewChannelProvider.overrideWithValue(channel)],
+        child: MaterialApp(
+          theme: AppTheme.light(),
+          home: Scaffold(
+            body: WebBrowserPane(url: url, onUrlChange: onUrlChange),
+          ),
         ),
       ),
     );
@@ -499,11 +502,13 @@ void main() {
   group('4. Testy widgetowe BrowserUsePanel', () {
     late _FakeBrowserRepo repo;
 
-    Widget buildPanel() => ProviderScope(
-      overrides: [browserUseRepositoryProvider.overrideWithValue(repo)],
-      child: MaterialApp(
-        theme: AppTheme.light(),
-        home: const Scaffold(body: BrowserUsePanel()),
+    Widget buildPanel() => TranslationProvider(
+      child: ProviderScope(
+        overrides: [browserUseRepositoryProvider.overrideWithValue(repo)],
+        child: MaterialApp(
+          theme: AppTheme.light(),
+          home: const Scaffold(body: BrowserUsePanel()),
+        ),
       ),
     );
 
@@ -562,7 +567,7 @@ void main() {
 
       expect(find.text('No browser sessions yet'), findsOneWidget);
       expect(find.text('Runtime setup required'), findsOneWidget);
-      expect(find.text('PROMPT'), findsNWidgets(2));
+      expect(find.text('Prompt'), findsNWidgets(2));
 
       await tester.tap(find.text('Install Runtime'));
       await tester.pumpAndSettle();

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:ddagent_app/features/skills/data/skill_models.dart';
 import 'package:ddagent_app/features/skills/data/skills_constants.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 
 /// Skills helpers — port of the pure functions in `ProviderSkills.tsx` +
 /// `useProviderSkills.ts` (search/merge/sort/group, managed-dir detection,
@@ -122,13 +123,11 @@ String skillBaseName(String filePath) {
 /// Enforces [kSkillFolderMaxFiles]/[kSkillFolderMaxBytes].
 List<QueuedSkillFile> buildQueuedSkillFolders(List<SkillSourceFile> files) {
   if (files.length > kSkillFolderMaxFiles) {
-    throw SkillPayloadException('A skill folder can contain up to $kSkillFolderMaxFiles files.');
+    throw SkillPayloadException(t.skills.errors.folderFileLimit(count: kSkillFolderMaxFiles));
   }
   final totalSize = files.fold<int>(0, (sum, f) => sum + f.size);
   if (totalSize > kSkillFolderMaxBytes) {
-    throw const SkillPayloadException(
-      'Selected skill folders must be smaller than 30 MB in total.',
-    );
+    throw SkillPayloadException(t.skills.errors.folderSizeLimit);
   }
 
   final skillRoots = [
@@ -137,7 +136,7 @@ List<QueuedSkillFile> buildQueuedSkillFolders(List<SkillSourceFile> files) {
   ]..sort((a, b) => b.length.compareTo(a.length));
 
   if (skillRoots.isEmpty) {
-    throw const SkillPayloadException('The selected folder does not contain a SKILL.md file.');
+    throw SkillPayloadException(t.skills.errors.missingSkillFile);
   }
 
   return [for (final root in skillRoots) _buildFolderEntry(root, files, skillRoots)];
@@ -156,7 +155,7 @@ QueuedSkillFile _buildFolderEntry(
       .where((f) => f.relativePath.toLowerCase() == '$root/skill.md'.toLowerCase())
       .firstOrNull;
   if (skillSource == null) {
-    throw SkillPayloadException('Could not read SKILL.md from ${skillBaseName(root)}.');
+    throw SkillPayloadException(t.skills.errors.couldNotReadSkillFile(name: skillBaseName(root)));
   }
 
   return QueuedSkillFile(

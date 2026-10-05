@@ -3,6 +3,7 @@ import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/features/voice/state/stt_controller.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -40,6 +41,7 @@ class _SttConfigDialogState extends ConsumerState<SttConfigDialog> {
   }
 
   Future<void> _save() async {
+    final i18n = Translations.of(context);
     setState(() => _saving = true);
     final ok = await ref
         .read(sttConfigProvider.notifier)
@@ -52,9 +54,9 @@ class _SttConfigDialogState extends ConsumerState<SttConfigDialog> {
     setState(() => _saving = false);
     if (ok) {
       Navigator.of(context).pop();
-      AppToast.show(context, 'Voice input settings saved');
+      AppToast.show(context, i18n.voice.settingsSaved);
     } else {
-      AppToast.error(context, 'Failed to save STT configuration');
+      AppToast.error(context, i18n.voice.saveFailed);
     }
   }
 
@@ -63,13 +65,14 @@ class _SttConfigDialogState extends ConsumerState<SttConfigDialog> {
     final config = ref.watch(sttConfigProvider);
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
 
     return AlertDialog(
       title: Row(
         children: [
           const Icon(Icons.mic, size: 20),
           const SizedBox(width: AppSpacing.xs),
-          const Text('Voice input (STT)'),
+          Text(i18n.settings.stt.title),
           const Spacer(),
           if (config.configured)
             Container(
@@ -78,9 +81,13 @@ class _SttConfigDialogState extends ConsumerState<SttConfigDialog> {
                 color: Colors.green.withValues(alpha: 0.15),
                 borderRadius: AppRadii.borderSm,
               ),
-              child: const Text(
-                'configured',
-                style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.green),
+              child: Text(
+                i18n.settings.stt.configured,
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
+                ),
               ),
             ),
         ],
@@ -92,21 +99,18 @@ class _SttConfigDialogState extends ConsumerState<SttConfigDialog> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Whisper-compatible /audio/transcriptions endpoint. Enables speech-to-text dictation in the composer.',
+              i18n.settings.stt.description,
               style: t.bodySmall?.copyWith(color: c.mutedForeground),
             ),
             const SizedBox(height: AppSpacing.md),
-            AppInput(
-              controller: _endpointCtrl,
-              hint: 'Endpoint URL (e.g. https://api.openai.com/v1)',
-            ),
+            AppInput(controller: _endpointCtrl, hint: i18n.settings.stt.endpoint),
             const SizedBox(height: AppSpacing.sm),
             AppInput(
               controller: _apiKeyCtrl,
-              hint: config.hasApiKey ? 'API Key (saved, enter to replace)' : 'API Key',
+              hint: config.hasApiKey ? i18n.voice.apiKeySaved : i18n.settings.stt.apiKey,
             ),
             const SizedBox(height: AppSpacing.sm),
-            AppInput(controller: _modelCtrl, hint: 'Model (e.g. whisper-1)'),
+            AppInput(controller: _modelCtrl, hint: i18n.settings.stt.model),
           ],
         ),
       ),
@@ -115,13 +119,13 @@ class _SttConfigDialogState extends ConsumerState<SttConfigDialog> {
           variant: AppButtonVariant.ghost,
           size: AppButtonSize.sm,
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(i18n.common.buttons.cancel),
         ),
         AppButton(
           size: AppButtonSize.sm,
           loading: _saving,
           onPressed: _save,
-          child: const Text('Save'),
+          child: Text(i18n.settings.stt.save),
         ),
       ],
     );

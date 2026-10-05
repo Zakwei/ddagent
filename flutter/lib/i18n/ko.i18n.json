@@ -78,7 +78,8 @@
       "readFile": "파일 읽기",
       "updateTodo": "Todo 리스트 업데이트",
       "readTodo": "Todo 리스트 읽기",
-      "searchResults": "결과"
+      "searchResults": "결과",
+      "todoReadLabel": "TodoRead 읽기 목록"
     },
     "search": {
       "found": "{{count}}개의 {{type}} 발견",
@@ -117,7 +118,16 @@
       "addTo": "{{entry}}을(를) 허용된 도구에 추가합니다.",
       "retry": "권한이 저장되었습니다. 도구를 사용하려면 요청을 재시도하세요.",
       "error": "권한을 업데이트할 수 없습니다. 다시 시도해주세요.",
-      "openSettings": "설정 열기"
+      "openSettings": "설정 열기",
+      "allow": "허용",
+      "allowAll": "모두 허용 ({{count}})",
+      "allowWithChanges": "변경 포함 허용",
+      "always": "항상",
+      "deny": "거부",
+      "editAndAllow": "편집 및 허용",
+      "editInput": "입력 편집",
+      "invalidJson": "잘못된 JSON",
+      "reject": "거절"
     },
     "todo": {
       "updated": "Todo 리스트가 업데이트되었습니다",
@@ -191,7 +201,8 @@
         "clearBtn": "취소",
         "multiple": "{{count}}개 메시지가 오프라인 큐에 있음 — 재연결 시 자동 전송됩니다",
         "single": "1개 메시지가 오프라인 큐에 있음 — 재연결 시 자동 전송됩니다"
-      }
+      },
+      "cameraUnavailable": "카메라를 사용할 수 없습니다: {{error}}"
     },
     "providerSelection": {
       "title": "AI 어시스턴트 선택",
@@ -253,8 +264,13 @@
         "perfWarning": "모든 메시지가 로드됨 - 스크롤이 느려질 수 있습니다. \"맨 아래로 스크롤\"을 클릭하면 성능이 복구됩니다.",
         "loadOlderFailed": "이전 메시지를 불러오지 못했습니다.",
         "retry": "다시 시도",
-        "noSearchMatches": "검색과 일치하는 메시지가 없습니다."
-      }
+        "noSearchMatches": "검색과 일치하는 메시지가 없습니다.",
+        "loadAllCount": "모두 로드 ({{count}})",
+        "loadOlder": "이전 메시지 로드",
+        "retryLoadOlder": "이전 메시지 로드 재시도 — {{error}}"
+      },
+      "deleteConfirm": "세션과 트랜스크립트를 제거합니다. 되돌릴 수 없습니다.",
+      "finishRunBeforeWorkspaceChange": "작업 영역을 변경하기 전에 실행을 완료하세요"
     },
     "shell": {
       "selectProject": {
@@ -397,16 +413,21 @@
       "active": "활성"
     },
     "askUserQuestion": {
-      "needsInput": "{{provider}}이(가) 입력을 기다립니다"
+      "needsInput": "{{provider}}이(가) 입력을 기다립니다",
+      "answerHint": "답변을 입력하세요…",
+      "other": "기타…",
+      "skip": "건너뛰기"
     },
     "attachments": {
       "downloadFailedRetry": "다운로드 실패 — 클릭하여 다시 시도",
-      "fileAttachment": "파일 첨부"
+      "fileAttachment": "파일 첨부",
+      "download": "{{name}} 다운로드"
     },
     "checkpoint": {
       "creating": "스냅샷 생성 중…",
       "revertChanges": "파일을 마지막 체크포인트로 되돌리기",
-      "undo": "체크포인트 실행 취소"
+      "undo": "체크포인트 실행 취소",
+      "beforeAiTurn": "AI 턴 이전"
     },
     "common": {
       "close": "닫기"
@@ -415,7 +436,9 @@
       "saveToTask": "작업",
       "saved": "저장됨",
       "saving": "저장 중...",
-      "taskShort": "작업"
+      "taskShort": "작업",
+      "addToTask": "TaskMaster에 추가",
+      "added": "TaskMaster에 추가됨"
     },
     "tokenUsage": {
       "desc": "세션 토큰 사용량 보기",
@@ -436,6 +459,54 @@
       "selectOrchestrators": "오케스트레이터 선택",
       "orchestratorsOnly": "오케스트레이터만",
       "noOrchestrators": "사용 가능한 오케스트레이터 세션이 없습니다"
+    },
+    "changes": {
+      "empty": "파일 변경 없음",
+      "failedToLoad": "변경사항을 불러오지 못했습니다"
+    },
+    "commandResult": {
+      "fallback": {
+        "config": "설정 및 구성을 엽니다.",
+        "cost": "활성 세션의 토큰 사용량을 확인합니다.",
+        "help": "명령어 문서와 구문을 표시합니다.",
+        "memory": "프로젝트 CLAUDE.md 메모리 파일을 엽니다.",
+        "models": "활성 제공자의 사용 가능한 모델을 살펴봅니다.",
+        "status": "런타임, 버전, 제공자 및 환경 상태를 확인합니다."
+      },
+      "filterCommands": "명령어 필터링...",
+      "searchModels": "{{provider}} 모델 검색..."
+    },
+    "commands": {
+      "runConfirmTitle": "명령어를 실행할까요?",
+      "executionCancelled": "명령어 실행이 취소되었습니다"
+    },
+    "export": {
+      "sessionTitle": "세션 {{id}}",
+      "pdfFailed": "PDF 내보내기 실패",
+      "transcriptDownloaded": "트랜스크립트 다운로드됨",
+      "savedTo": "{{path}}에 저장됨"
+    },
+    "message": {
+      "compactedSummary": "압축된 요약",
+      "rawView": "Raw 보기",
+      "resendHint": "입력창에서 다시 전송"
+    },
+    "modelLibrary": {
+      "deleteTooltip": "{{name}} 삭제",
+      "editTooltip": "{{name}} 편집",
+      "enterNameAndId": "모델 이름과 모델 ID를 모두 입력하세요.",
+      "idNoSpaces": "모델 ID에는 공백을 사용할 수 없습니다.",
+      "setAsDefault": "기본으로 설정",
+      "defaultModel": "기본 모델"
+    },
+    "pinFile": {
+      "action": "고정",
+      "pathHint": "path/to/file.ext",
+      "title": "파일 고정"
+    },
+    "permissionRequest": {
+      "title": "권한 요청 · {{tool}}",
+      "question": "질문"
     }
   },
   "codeEditor": {
@@ -447,7 +518,11 @@
       "showDiff": "Diff 하이라이트 표시",
       "settings": "에디터 설정",
       "collapse": "에디터 접기",
-      "expand": "에디터 전체 너비로 펼치기"
+      "expand": "에디터 전체 너비로 펼치기",
+      "diffMerge": "Diff / 병합",
+      "previewInBrowser": "브라우저에서 미리보기",
+      "reload": "디스크에서 다시 로드",
+      "toggleDock": "파일 독 전환"
     },
     "loading": "{{fileName}} 로딩 중...",
     "header": {
@@ -468,7 +543,8 @@
       "pinFile": "파일을 컨텍스트에 고정",
       "unpinFile": "파일을 컨텍스트에서 해제",
       "previewHtml": "새 탭에서 HTML 미리보기 열기",
-      "retry": "다시 시도"
+      "retry": "다시 시도",
+      "saveAll": "모두 저장"
     },
     "footer": {
       "lines": "줄:",
@@ -477,12 +553,49 @@
     },
     "binaryFile": {
       "title": "바이너리 파일",
-      "message": "파일 \"{{fileName}}\"은(는) 바이너리 파일이므로 텍스트 편집기에서 표시할 수 없습니다."
+      "message": "파일 \"{{fileName}}\"은(는) 바이너리 파일이므로 텍스트 편집기에서 표시할 수 없습니다.",
+      "cannotDisplayAsText": "텍스트로 표시할 수 없습니다"
     },
     "filePreview": {
       "loading": "미리보기 로딩 중...",
       "error": "이 파일을 표시할 수 없습니다.",
       "openInNewTab": "새 탭에서 열기"
+    },
+    "diff": {
+      "applyMerge": "병합 적용",
+      "base": "기본",
+      "close": "diff 닫기",
+      "current": "현재",
+      "hunk": "헝크 {{number}}",
+      "noChanges": "변경 사항 없음",
+      "deletedOnDisk": "디스크에서 삭제됨"
+    },
+    "discardUnsavedChanges": "저장하지 않은 변경 사항을 폐기할까요?",
+    "emptyState": {
+      "title": "열린 파일 없음"
+    },
+    "failedToLoad": "파일을 불러오지 못했습니다",
+    "hexDump": {
+      "more": "… {{size}}개 더"
+    },
+    "mediaFile": {
+      "subtitle": "오디오/비디오 미리보기는 아직 지원되지 않습니다",
+      "title": "미디어 파일"
+    },
+    "settings": {
+      "fontSizeDecrease": "글꼴 크기 −  (현재 {{size}})",
+      "fontSizeIncrease": "글꼴 크기 +",
+      "minimap": "미니맵",
+      "tabSize": "탭 크기: {{size}}"
+    },
+    "unsavedChanges": "{{name}}에 저장하지 않은 변경 사항",
+    "toasts": {
+      "savedFile": "{{name}} 저장됨",
+      "saveFailed": "저장 실패",
+      "allSaved": "모두 저장됨",
+      "someSavesFailed": "일부 저장 실패",
+      "savedTo": "{{path}}에 저장됨",
+      "mergeApplied": "병합 적용됨 — 저장하여 유지하세요"
     }
   },
   "common": {
@@ -502,7 +615,9 @@
       "copy": "복사",
       "download": "다운로드",
       "upload": "업로드",
-      "browse": "찾아보기"
+      "browse": "찾아보기",
+      "openDiagram": "다이어그램 열기",
+      "update": "업데이트"
     },
     "tabs": {
       "chat": "채팅",
@@ -1363,6 +1478,20 @@
     },
     "projects": {
       "newSession": "새 세션"
+    },
+    "codeBlock": {
+      "wrapLines": "줄바꿈",
+      "noWrap": "줄바꿈 안 함"
+    },
+    "update": {
+      "available": "업데이트 가능 · v{{version}}",
+      "confirm": "v{{version}}(으)로 업데이트할까요? 서버가 스스로 업데이트하고 재시작합니다 — 활성 세션이 중단됩니다.",
+      "downloading": "업데이트를 다운로드하고 적용하는 중…",
+      "restarting": "서버 재시작 중 — 잠시 걸립니다…",
+      "done": "v{{version}}(으)로 업데이트되었습니다. 새 번들을 적용하려면 앱을 새로고침하세요.",
+      "manualRestart": "업데이트가 적용되었지만 서버가 자동으로 재시작되지 않았습니다 — 마무리하려면 수동으로 재시작하세요.",
+      "failed": "업데이트 실패.",
+      "failedTitle": "업데이트 실패"
     }
   },
   "settings": {
@@ -1381,7 +1510,8 @@
       "restartConfirm": "ddagent 서버를 재시작할까요? 활성 세션이 중단됩니다.",
       "restarting": "재시작 중… 서버가 돌아오면 페이지가 새로고침됩니다.",
       "restartFailed": "재시작 실패",
-      "unsupported": "서버가 서비스 매니저로 실행 중일 때만 재시작할 수 있습니다."
+      "unsupported": "서버가 서비스 매니저로 실행 중일 때만 재시작할 수 있습니다.",
+      "ok": "확인"
     },
     "updates": {
       "title": "앱 업데이트",
@@ -1438,7 +1568,12 @@
       "wordWrap": "자동 줄바꿈",
       "showMinimap": "미니맵 표시",
       "lineNumbers": "줄 번호",
-      "fontSize": "글꼴 크기"
+      "fontSize": "글꼴 크기",
+      "themeModes": {
+        "dark": "다크",
+        "light": "라이트",
+        "system": "시스템"
+      }
     },
     "actions": {
       "saveChanges": "변경사항 저장",
@@ -1463,7 +1598,8 @@
         "openPanel": "설정 패널 열기",
         "draggingStatus": "드래그 중...",
         "toggleAndMove": "클릭하여 토글, 드래그하여 이동"
-      }
+      },
+      "sendWithCtrlEnter": "Ctrl+Enter로 전송"
     },
     "terminalShortcuts": {
       "title": "터미널 단축키",
@@ -1646,7 +1782,12 @@
         "actionRequired": "작업 필요",
         "stop": "실행 중지",
         "error": "실행 실패"
-      }
+      },
+      "channels": {
+        "discord": "Discord",
+        "telegram": "Telegram"
+      },
+      "unpair": "페어링 해제"
     },
     "appearanceSettings": {
       "darkMode": {
@@ -1747,11 +1888,13 @@
       "description": "커밋을 위한 Git 정보를 설정합니다. 이 설정은 git config --global로 전역 적용됩니다",
       "name": {
         "label": "Git 이름",
-        "help": "Git 커밋에 사용될 이름"
+        "help": "Git 커밋에 사용될 이름",
+        "placeholder": "John Doe"
       },
       "email": {
         "label": "Git 이메일",
-        "help": "Git 커밋에 사용될 이메일"
+        "help": "Git 커밋에 사용될 이메일",
+        "placeholder": "john@example.com"
       },
       "actions": {
         "save": "설정 저장",
@@ -1797,7 +1940,9 @@
           "descriptionPlaceholder": "설명 (선택사항)",
           "addButton": "토큰 추가",
           "cancelButton": "취소",
-          "howToCreate": "GitHub Personal Access Token 생성 방법 →"
+          "howToCreate": "GitHub Personal Access Token 생성 방법 →",
+          "showToken": "토큰 표시",
+          "hideToken": "토큰 숨기기"
         },
         "empty": "추가된 GitHub 토큰이 없습니다.",
         "added": "추가일:",
@@ -2112,11 +2257,19 @@
       "deleteTitle": "작업 영역 제거",
       "description": "작업 영역은 ddagent가 채팅하고, 코드를 실행하고, 탐색할 수 있는 디렉터리입니다.",
       "remove": "작업 영역 제거",
-      "title": "작업 영역"
+      "title": "작업 영역",
+      "pathRequired": "경로는 필수입니다"
     },
     "about": {
       "supportTitle": "프로젝트 후원하기",
-      "buyMeACoffee": "커피 한 잔 사주기"
+      "buyMeACoffee": "커피 한 잔 사주기",
+      "learnMore": "더 알아보기",
+      "pro": {
+        "syncSettings": "설정 동기화",
+        "teamManagement": "팀 관리"
+      },
+      "proFeatures": "ddagent Pro 기능",
+      "tryHosted": "ddagent Hosted 사용해보기"
     }
   },
   "sidebar": {
@@ -2375,7 +2528,8 @@
         "progressVisualization": "진행 상황 시각화: 칸반 보드와 상세한 작업 분석",
         "cliIntegration": "CLI 연동: 고급 워크플로우를 위한 taskmaster 명령어 사용"
       },
-      "initializeButton": "TaskMaster AI 초기화"
+      "initializeButton": "TaskMaster AI 초기화",
+      "writePrdFirst": "먼저 PRD 작성"
     },
     "gettingStarted": {
       "title": "TaskMaster 시작하기",
@@ -2491,7 +2645,16 @@
       "prdsAvailable": "PRD {{count}}개 사용 가능"
     },
     "prd": {
-      "modified": "수정됨: {{date}}"
+      "modified": "수정됨: {{date}}",
+      "editorTitle": "PRD — {{name}}",
+      "fileExistsMessage": "\"{{name}}\"이라는 PRD가 이미 있습니다. 덮어쓸까요?",
+      "fileExistsTitle": "파일이 이미 존재합니다",
+      "newFile": "새 파일",
+      "parse": "PRD 분석",
+      "template": "템플릿",
+      "fileNameHint": "파일 이름 (예: prd.txt)",
+      "saved": "PRD 저장됨",
+      "tasksGenerated": "PRD에서 작업이 생성되었습니다"
     },
     "statuses": {
       "pending": "대기 중",
@@ -2499,7 +2662,8 @@
       "done": "완료",
       "blocked": "차단됨",
       "deferred": "보류",
-      "cancelled": "취소됨"
+      "cancelled": "취소됨",
+      "review": "검토"
     },
     "priorities": {
       "high": "높음",
@@ -2596,7 +2760,9 @@
       "completedReopen": "완료됨 (클릭하여 다시 열기)",
       "inProgressComplete": "진행 중 (클릭하여 완료)",
       "markCompleted": "완료로 표시",
-      "toggleStatusAria": "작업 {{id}} 상태 전환"
+      "toggleStatusAria": "작업 {{id}} 상태 전환",
+      "markDone": "완료로 표시",
+      "reopen": "다시 열기"
     },
     "nextTask": {
       "allComplete": "모든 작업 완료",
@@ -2638,7 +2804,14 @@
       "taskTitle": "작업 {{id}}: {{title}}",
       "testStrategy": "테스트 전략",
       "titleRequired": "제목은 필수입니다",
-      "updateFailed": "작업 업데이트 실패"
+      "updateFailed": "작업 업데이트 실패",
+      "deleteConfirmMessage": "작업 #{{id}}이(가) 제거됩니다. 되돌릴 수 없습니다.",
+      "notFound": "작업을 찾을 수 없습니다",
+      "subtasks": "하위 작업",
+      "idCopied": "작업 ID 복사됨"
+    },
+    "toasts": {
+      "statusInProgress": "작업 {{id}}이(가) 진행 중으로 설정되었습니다"
     }
   },
   "knowledge": {
@@ -2743,6 +2916,556 @@
     },
     "settings": {
       "description": "에이전트를 위한 로컬 메모리 계층: 메모리, 규칙, 스킬, 개인정보."
+    },
+    "contextBudget": {
+      "tokens": "~{{tokens}} / {{budget}} 토큰"
+    },
+    "critical": {
+      "make": "치명적으로 표시",
+      "makeAll": "모든 규칙을 치명적으로 표시",
+      "makeAllHint": "주입되는 컨텍스트 예산에 추가합니다"
+    },
+    "errors": {
+      "importFailed": "가져오기 실패: {{error}}",
+      "migrationFailed": "마이그레이션 실패: {{error}}"
+    },
+    "graph": {
+      "truncated": "잘림"
+    },
+    "importAll": {
+      "action": "모두 가져오기",
+      "mergeDuplicates": "중복 항목 병합",
+      "mergeDuplicatesHint": "ddagent 내 중복 행을 병합합니다 (파일 아님)",
+      "projectsScanned": "검사한 프로젝트: {{count}}",
+      "rulesSummary": "규칙: {{total}} · 중복 그룹: {{duplicates}}",
+      "skillsFound": "발견한 에이전트 스킬: {{found}} (신규: {{newSkills}})",
+      "title": "ddagent로 모두 가져오기"
+    },
+    "importSkills": {
+      "found": "에이전트 전체에서 스킬 {{count}}개를 찾았습니다.",
+      "summary": "신규: {{imported}} · 건너뜀: {{skipped}}",
+      "title": "에이전트 스킬 가져오기"
+    },
+    "linkOptions": {
+      "memory": "메모리: {{title}}",
+      "personal": "개인정보: {{title}}",
+      "rule": "규칙: {{title}}",
+      "skill": "스킬: {{name}}"
+    },
+    "migrate": {
+      "duplicates": "프로젝트 간 중복 그룹: {{count}}",
+      "mergeDuplicates": "중복 병합",
+      "removedPromoted": "제거: {{removed}}, 승격: {{promoted}}",
+      "rulesSummary": "규칙: 총 {{total}}개, 치명적 {{critical}}개.",
+      "scanned": "프로젝트 {{count}}개를 검사했습니다.",
+      "title": "기존 규칙 마이그레이션"
     }
+  },
+  "skills": {
+    "addDialog": {
+      "chooseFileTitle": "SKILL.md 선택",
+      "chooseFiles": "파일 선택",
+      "chooseFolder": "폴더 선택",
+      "chooseFolderTitle": "스킬 폴더 선택",
+      "folderFilesMeta": {
+        "one": "{{count}}개 파일 · {{size}}",
+        "other": "{{count}}개 파일 · {{size}}"
+      },
+      "folderUploadsNote": "폴더 업로드는 선택한 폴더 이름을 유지하며, 단독 파일은 `SKILL.md`의 `name`을 사용합니다.",
+      "hideInstallLocation": "설치 위치 숨기기",
+      "installSkill": "스킬 설치",
+      "installSkills": {
+        "one": "스킬 {{count}}개 설치",
+        "other": "스킬 {{count}}개 설치"
+      },
+      "markdownFileMeta": "마크다운 파일 · {{size}}",
+      "pickHint": "폴더에는 스크립트, 참조 자료, 에셋을 포함할 수 있습니다.",
+      "pickTitle": "스킬 폴더 또는 SKILL.md 선택",
+      "readyToInstall": "설치 준비 완료",
+      "removeQueued": "{{name}} 제거",
+      "title": "{{provider}} 스킬 추가",
+      "uploadHint": "SKILL.md 파일 또는 전체 스킬 폴더를 업로드하세요.",
+      "whereWillThisInstall": "어디에 설치되나요?"
+    },
+    "deleteSkill": "{{name}} 삭제",
+    "empty": {
+      "noGlobalSkills": "아직 발견된 전역 스킬이 없습니다",
+      "noGlobalSkillsDescription": "위에서 전역 스킬을 추가하면 모든 프로젝트에서 사용할 수 있습니다.",
+      "noMatchingSkills": "일치하는 스킬 없음",
+      "noMatchingSkillsDescription": "다른 명령어, 이름, 범위, 프로젝트 또는 소스 경로를 시도해보세요.",
+      "noProjects": "사용 가능한 프로젝트 없음",
+      "noProjectsDescription": "스킬을 살펴보려면 프로젝트 또는 작업 영역을 추가하세요.",
+      "noSkillsInProject": "이 프로젝트에 스킬이 없습니다",
+      "noSkillsInProjectDescription": "선택한 프로젝트에 .claude/skills, .cursor/skills 또는 .agents/skills 폴더를 만드세요."
+    },
+    "errors": {
+      "addMarkdownFirst": "먼저 마크다운 파일을 하나 이상 추가하세요.",
+      "couldNotReadSkillFile": "{{name}}에서 SKILL.md를 읽을 수 없습니다.",
+      "dropMarkdownOrFolder": "마크다운 파일을 하나 이상 또는 SKILL.md가 포함된 폴더를 놓으세요.",
+      "folderFileLimit": "스킬 폴더에는 최대 {{count}}개 파일을 포함할 수 있습니다.",
+      "folderReadFailed": "스킬 폴더를 읽지 못했습니다",
+      "folderSizeLimit": "선택한 스킬 폴더의 총 용량은 30MB 미만이어야 합니다.",
+      "importFailed": "스킬 가져오기 실패",
+      "missingSkillFile": "선택한 폴더에 SKILL.md 파일이 없습니다."
+    },
+    "moveDialog": {
+      "moveToGlobal": "전역으로 이동",
+      "moveToProject": "프로젝트로 이동",
+      "toGlobalHint": "이 스킬을 전역 스킬 디렉터리로 이동하여 모든 프로젝트에서 사용할 수 있게 합니다.",
+      "toProjectHint": "이 스킬을 소유할 프로젝트를 선택하세요. 제공자의 전역 스킬 디렉터리에서 이동됩니다."
+    },
+    "moveSkill": "{{name}} 이동",
+    "projectLabel": "프로젝트",
+    "scopes": {
+      "admin": "관리자",
+      "plugin": "플러그인",
+      "project": "프로젝트",
+      "repo": "리포지토리",
+      "system": "시스템",
+      "user": "사용자"
+    },
+    "screen": {
+      "addSkill": "스킬 추가",
+      "clearSearch": "스킬 검색 지우기",
+      "deleteDescription": "{{provider}}의 관리형 스킬 디렉터리에서 {{directory}} 디렉터리를 제거합니다. 되돌릴 수 없습니다.",
+      "deleteTitle": "{{name}}을(를) 삭제할까요?",
+      "loadingSkills": "{{provider}} 스킬 로드 중…",
+      "manageDescription": "로컬 파일, 전체 폴더 및 프로젝트 인식 위치에서 {{provider}} 스킬을 관리합니다.",
+      "noDescription": "스킬 프런트 매터에 설명이 없습니다.",
+      "pluginBadge": "플러그인: {{name}}",
+      "projectBadge": "프로젝트: {{name}}",
+      "savedSuccessfully": "스킬이 저장되었습니다.",
+      "scanningProjectSkills": "프로젝트 스킬 검사 중...",
+      "searchHint": "스킬 검색...",
+      "skillsCount": {
+        "one": "SKILL {{count}}개",
+        "other": "SKILL {{count}}개"
+      },
+      "sourceLabel": "소스"
+    }
+  },
+  "mcp": {
+    "form": {
+      "fields": {
+        "bearerTokenEnvVar": "Bearer 토큰 환경 변수",
+        "envVarNames": "환경 변수 이름",
+        "workingDirectory": "작업 디렉터리"
+      },
+      "scope": {
+        "claudeLocal": "Claude 로컬",
+        "description": {
+          "local": "선택한 프로젝트의 Claude 사용자 설정에 저장됩니다",
+          "project": "선택한 프로젝트 작업 영역에 저장됩니다",
+          "projectGlobal": "모든 제공자의 선택한 프로젝트 작업 영역에 기록합니다",
+          "user": "이 컴퓨터의 모든 프로젝트에서 사용할 수 있습니다",
+          "userGlobal": "각 제공자의 사용자 설정에 기록되며 이 컴퓨터의 모든 프로젝트에서 사용할 수 있습니다"
+        },
+        "projectAllProviders": "프로젝트 (모든 제공자)",
+        "userAllProviders": "사용자 (모든 제공자)"
+      },
+      "submitTo": "{{provider}}에 서버 추가",
+      "validation": {
+        "unsupportedGlobal": "MCP 서버 추가는 모든 제공자에서 stdio와 http만 지원하며 {{type}}은(는) 지원하지 않습니다.",
+        "unsupportedProvider": "{{provider}}는 {{type}} MCP 서버를 지원하지 않습니다"
+      }
+    },
+    "install": {
+      "button": "설치",
+      "cardDescription": "MCP를 통해 에이전트에게 지식 베이스와 ddagent 도구를 제공하세요 — 에이전트를 선택하거나 전체에 설치하세요.",
+      "description": "선택한 에이전트가 MCP를 통해 ddagent 지식 베이스와 도구를 사용할 수 있게 합니다.",
+      "errorFallback": "오류",
+      "failed": "설치 실패: {{error}}",
+      "installForAll": "전체에 설치",
+      "installSelected": "선택 항목에 설치",
+      "installedCount(param=count)": {
+        "one": "에이전트 {{count}}개에 설치했습니다.",
+        "other": "에이전트 {{count}}개에 설치했습니다."
+      },
+      "partialFailure": "{{count}}개에 설치됨, 실패: {{failed}}",
+      "title": "ddagent MCP 서버 설치"
+    },
+    "servers": {
+      "addGlobalDescription": "이 MCP 서버를 모든 제공자(Claude, Cursor, Codex, OpenCode, Devin)에 추가합니다. 동일한 설정이 모든 제공자에서 작동해야 하므로 stdio와 HTTP 전송만 지원됩니다.",
+      "addGlobalMenuDescription": "전역 MCP 서버 추가는 하나의 공통 stdio 또는 HTTP 서버를 Claude, Cursor, Codex, OpenCode, Devin에 기록합니다.",
+      "addGlobalTitle": "전역 MCP 서버 추가",
+      "addProviderDescription": "{{provider}} MCP 서버 추가는 {{provider}}만 변경합니다.",
+      "addProviderTitle": "{{provider}} MCP 서버 추가",
+      "config": {
+        "cwd": "작업 디렉터리",
+        "envVars": "환경 변수"
+      },
+      "descriptionGeneric": "Model Context Protocol 서버는 {{provider}}에 추가 도구와 데이터 소스를 제공합니다",
+      "loading": "MCP 서버 로드 중...",
+      "refreshingScopes": "프로젝트 범위 새로 고치는 중..."
+    },
+    "team": {
+      "cta": "ddagent Pro에서 사용 가능",
+      "description": "팀 전체에서 MCP 서버 설정을 공유하세요. 모든 사람이 자동으로 동기화됩니다.",
+      "title": "팀 MCP 설정"
+    },
+    "tokens": {
+      "scopeWrite": "쓰기"
+    }
+  },
+  "terminal": {
+    "actions": {
+      "clearOutput": "출력 지우기",
+      "connect": "연결",
+      "newShell": "새 Shell",
+      "newTab": "새 터미널 탭",
+      "providerLogin": "제공자 로그인",
+      "restartSession": "세션 재시작"
+    },
+    "authUrl": {
+      "openInBrowser": "브라우저에서 열기"
+    },
+    "errors": {
+      "couldNotOpenLink": "링크를 열 수 없습니다: {{url}}"
+    },
+    "fileLink": {
+      "detected": "파일 감지됨: {{path}}"
+    },
+    "paste": {
+      "hint": "Ctrl+V / 마우스 오른쪽 클릭 → 붙여넣기",
+      "title": "터미널에 붙여넣기"
+    },
+    "shortcuts": {
+      "eof": "EOF",
+      "hide": "단축키 표시줄 숨기기",
+      "interrupt": "중단 (SIGINT)",
+      "suspend": "일시 중단 (SIGTSTP)",
+      "showTooltip": "단축키 표시",
+      "hideTooltip": "단축키 숨기기"
+    },
+    "tabs": {
+      "antigravityCli": "Antigravity CLI",
+      "claudeCli": "Claude CLI",
+      "commandCodeCli": "Command Code CLI",
+      "cursorCli": "Cursor CLI",
+      "devinCli": "Devin CLI",
+      "loginTitle": "로그인: {{provider}}",
+      "opencodeCli": "OpenCode CLI",
+      "plainShell": "일반 Shell",
+      "shellName": "Shell {{index}}"
+    }
+  },
+  "worktrees": {
+    "branchHint": "새 브랜치 이름 (예: feature/login)",
+    "branchingOff": "{{branch}}에서 분기",
+    "cleanupDescription": "병합되면 worktree를 제거하고 브랜치 삭제",
+    "created": "Worktree 생성됨",
+    "deleteBranchLabel": "브랜치도 삭제",
+    "dirtyWarning": "경고: 이 worktree에는 손실될 커밋되지 않은 변경 사항이 {{count}}개 있습니다.",
+    "emptyDescription": "기능 작업이나 에이전트 실행을 격리하려면 worktree를 생성하세요.",
+    "emptyTitle": "worktree를 찾을 수 없습니다",
+    "forceRemoveLabel": "강제 제거 (변경 사항 폐기)",
+    "headDetachedAt": "HEAD 분리됨 @ {{sha}}",
+    "mainBadge": "main",
+    "mergeDescription": "변경 사항을 {{branch}}에 병합합니다.",
+    "mergeTitle": "{{branch}} 병합",
+    "merged": "worktree가 {{branch}}에 병합됨",
+    "opened": "worktree 열림: {{branch}}",
+    "portHint": "실행 포트 (선택사항, 예: 3000)",
+    "removeDescription": "worktree 폴더가 삭제됩니다. 연결된 프로젝트는 보관됩니다.",
+    "removeTitle": "worktree {{branch}}을(를) 제거할까요?",
+    "removed": "worktree 제거됨",
+    "runButton": "실행",
+    "runHint": "실행 명령어 (예: npm run dev)",
+    "runRunning": "실행 중",
+    "runRunningWithPort": "실행 중 :{{port}}",
+    "scripts": "스크립트",
+    "scriptsSaved": "스크립트 설정이 저장되었습니다",
+    "serverLabel": "서버: ",
+    "setupHint": "설정 명령어 (예: npm install)",
+    "setupLabel": "설정: ",
+    "squashDescription": "모든 커밋을 단일 커밋으로 결합",
+    "stopButton": "중지"
+  },
+  "quota": {
+    "agents": {
+      "statusCount": "{{status}} ({{count}})"
+    },
+    "chart": {
+      "hide": "숨기기",
+      "noData": "추세를 표시하기에 데이터가 부족합니다.",
+      "pointReadout": "{{date}} · {{tokens}} 토큰 · {{cost}}",
+      "show": "표시"
+    },
+    "config": {
+      "accountRouting": "계정 라우팅",
+      "pollerTitle": "폴링 및 알림",
+      "save": "설정 저장"
+    },
+    "overview": {
+      "tokensAndCost": "토큰 및 비용"
+    },
+    "section": {
+      "config": "설정"
+    }
+  },
+  "scheduler": {
+    "checking": "확인 중…",
+    "cronHint": "Cron (분 시 일 월 요일) — 예: 0 9 * * *",
+    "deleteMessage": "반복 작업 {{id}}을(를) 제거합니다. 기존 세션은 유지됩니다.",
+    "deleteTitle": "일정을 삭제할까요?",
+    "editTitle": "일정 편집",
+    "newLabel": "새로 만들기",
+    "nextIn": "{{time}} 후 다음",
+    "promptHint": "에이전트에게 보낼 프롬프트",
+    "runs": "실행",
+    "session": "세션 {{id}}",
+    "worktree": "worktree"
+  },
+  "notifications": {
+    "deviceLabel": "ddagent Flutter",
+    "errors": {
+      "noResponse": "서버에서 응답이 없습니다",
+      "registrationRejected": "서버에서 등록을 거부했습니다"
+    }
+  },
+  "serverConnect": {
+    "connect": "연결",
+    "connecting": "연결 중…",
+    "connectionFailed": "연결 실패 ({{error}})",
+    "enterUrl": "서버 URL을 입력하세요",
+    "subtitle": "ddagent 서버에 연결하세요"
+  },
+  "voice": {
+    "apiKeySaved": "API 키 (저장됨, 교체하려면 입력)",
+    "preview": "미리보기",
+    "saveFailed": "STT 설정 저장 실패",
+    "settingsSaved": "음성 입력 설정이 저장되었습니다"
+  },
+  "preview": {
+    "embeddedWebOnly": "임베디드 미리보기는 웹 빌드에서 사용할 수 있습니다",
+    "startDevServerHint": "개발 서버를 시작하면(npm run dev, flutter run -d web-server…) 해당 포트가 여기에 표시됩니다."
+  },
+  "sharedContext": {
+    "title": "공유 노트"
+  },
+  "collab": {
+    "copyToken": "토큰 복사",
+    "createInvite": "초대 만들기",
+    "invite": "초대",
+    "inviteTeammate": "팀원 초대",
+    "roles": {
+      "member": "멤버",
+      "viewer": "뷰어"
+    },
+    "shareTokenHint": "이 초대 토큰을 공유하세요 — 한 번만 표시되며 72시간 후 만료됩니다:",
+    "team": "팀"
+  },
+  "browser": {
+    "dialogTitle": "에이전트 브라우저",
+    "viewError": "브라우저 뷰 오류",
+    "web": "웹"
+  },
+  "projects": {
+    "archive": "보관",
+    "archivedSection": "보관됨 ({{count}})",
+    "clone": "Clone",
+    "cloneFailed": "Clone 실패",
+    "cloneFinished": "Clone 완료. 프로젝트 목록을 새로 고치는 중…",
+    "cloneRepository": "저장소 Clone",
+    "deletePermanently": "영구 삭제",
+    "deleteProjectMessage": "모든 세션과 저장된 기록(JSONL 삭제)을 포함하여 \"{{name}}\"을(를) 영구적으로 제거합니다. 되돌릴 수 없습니다.",
+    "deleteProjectTitle": "프로젝트를 삭제할까요?",
+    "destinationPath": "대상 경로",
+    "destinationPathRequired": "대상 경로는 필수입니다",
+    "displayNameOptional": "표시 이름 (선택사항)",
+    "failedToLoadTokens": "GitHub 토큰을 불러오지 못했습니다",
+    "githubTokenOptional": "GitHub 토큰 (선택사항)",
+    "newer": "최신순",
+    "older": "오래된순",
+    "projectArchived": "프로젝트가 보관되었습니다",
+    "projectDeleted": "프로젝트가 삭제되었습니다",
+    "projectRenamed": "프로젝트 이름이 변경되었습니다",
+    "projectRestored": "프로젝트가 복원되었습니다",
+    "repoUrlPlaceholder": "https://github.com/org/repo.git",
+    "repositoryCloned": "저장소 Clone 완료",
+    "repositoryUrlRequired": "저장소 URL은 필수입니다",
+    "restore": "복원",
+    "sessionCount": {
+      "one": "세션 {{count}}개",
+      "other": "세션 {{count}}개"
+    },
+    "unknown": "알 수 없음",
+    "usingStoredToken": "저장된 토큰 사용: {{name}}"
+  },
+  "sessions": {
+    "activity": {
+      "committingChanges": "변경 사항 커밋 중",
+      "editingFile": "{{file}} 편집 중",
+      "editingFileGeneric": "파일 편집 중",
+      "fetchingUrl": "{{url}} 가져오는 중",
+      "pushingBranch": "브랜치 푸시 중",
+      "readingFile": "{{file}} 읽는 중",
+      "runningCommand": "`{{command}}` 실행 중",
+      "runningShellCommand": "Shell 명령어 실행 중",
+      "runningTool": "{{name}} 실행 중",
+      "searching": "“{{query}}” 검색 중",
+      "subagentRunning": "하위 에이전트 실행 중"
+    },
+    "age": {
+      "days": "{{days}}일",
+      "hours": "{{hours}}시간",
+      "lessThanMinute": "<1분",
+      "minutes": "{{count}}분"
+    },
+    "archive": "보관",
+    "archivedSessions": "보관된 세션",
+    "autoOrchestrator": "자동 (오케스트레이터)",
+    "compareWith": "비교 대상…",
+    "createFailed": "세션 생성 실패: {{error}}",
+    "deleteSessionMessage": "\"{{name}}\"과(와) 트랜스크립트를 제거합니다. 되돌릴 수 없습니다.",
+    "newSessionProvider": "새 세션 — 제공자",
+    "noRecentSessions": "최근 세션 없음",
+    "noSessions": "세션 없음",
+    "projectPath": "프로젝트 경로",
+    "rename": "이름 변경",
+    "toasts": {
+      "archived": "세션이 보관되었습니다",
+      "deleted": "세션이 삭제되었습니다",
+      "pinned": "세션이 고정되었습니다",
+      "renamed": "세션 이름이 변경되었습니다",
+      "restored": "세션이 복원되었습니다",
+      "unpinned": "세션 고정이 해제되었습니다",
+      "workspaceChanged": "작업 영역이 변경되었습니다"
+    }
+  },
+  "git": {
+    "aiButton": "✦ AI",
+    "checkpoints": {
+      "create": "새로 만들기",
+      "empty": "아직 체크포인트 없음",
+      "labelHint": "체크포인트 레이블 (선택사항)",
+      "restoreMessage": "작업 트리를 이 체크포인트로 재설정할까요? 현재 변경 사항이 대체됩니다.",
+      "restoreTitle": "체크포인트 복원",
+      "restored": "체크포인트가 복원되었습니다",
+      "title": "체크포인트"
+    },
+    "commitCreated": "커밋이 생성되었습니다",
+    "commitMessage": "커밋 메시지",
+    "deleteFile": "파일 삭제",
+    "hunkStage": "+ 헝크",
+    "hunkUnstage": "− 헝크",
+    "largeDiff": "대용량 diff 미리보기: 탭 응답성을 유지하기 위해 렌더링이 제한됩니다.",
+    "loadDiffFailed": "diff를 불러오지 못했습니다: {{error}}",
+    "noBranch": "브랜치 없음",
+    "noDiff": "사용 가능한 diff 없음",
+    "selectProject": "프로젝트 선택",
+    "splitDiff": "분할 diff",
+    "stageHunk": "헝크 스테이징",
+    "stagedChanges": "스테이징된 변경 사항",
+    "statusStaged": "스테이징됨",
+    "switchBranch": "브랜치 전환",
+    "unifiedDiff": "통합 diff",
+    "unstageHunk": "헝크 스테이징 해제"
+  },
+  "kanban": {
+    "card": {
+      "untitled": "제목 없음"
+    },
+    "comments": {
+      "add": "댓글 추가",
+      "empty": "아직 댓글 없음"
+    },
+    "details": {
+      "status": "상태: {{status}}",
+      "title": "카드 상세"
+    },
+    "dialog": {
+      "saving": "저장 중…"
+    },
+    "empty": {
+      "noProject": "선택한 프로젝트 없음"
+    },
+    "saveFailed": "카드를 저장하지 못했습니다",
+    "time": {
+      "daysAgo(param=count)": {
+        "one": "1일 전",
+        "other": "{{count}}일 전"
+      },
+      "hoursAgo(param=count)": {
+        "one": "1시간 전",
+        "other": "{{count}}시간 전"
+      },
+      "minutesAgo(param=count)": {
+        "one": "1분 전",
+        "other": "{{count}}분 전"
+      },
+      "now": "방금"
+    }
+  },
+  "onboarding": {
+    "agents": {
+      "description": "하나 이상의 AI 코딩 어시스턴트에 로그인하세요. 모두 선택사항입니다.",
+      "laterHint": "나중에 설정에서 구성할 수 있습니다.",
+      "title": "AI 에이전트 연결"
+    },
+    "completeSetup": "설정 완료",
+    "errors": {
+      "invalidEmail": "유효한 이메일 주소를 입력해주세요.",
+      "nameAndEmailRequired": "git 이름과 이메일이 모두 필요합니다."
+    },
+    "gitHint": "ddagent 세션이 생성한 커밋에 사용됩니다.",
+    "mcp": {
+      "description": "에이전트가 지식 베이스와 ddagent 도구를 사용할 수 있도록 ddagent MCP 서버를 설치하세요. 에이전트를 선택하거나 전체에 설치하세요.",
+      "installForAll": "전체에 설치",
+      "installSelected": "선택 항목에 설치",
+      "installedOn(param=count)": {
+        "one": "에이전트 {{count}}개에 설치했습니다.",
+        "other": "에이전트 {{count}}개에 설치했습니다."
+      },
+      "installedWithFailures": "{{installedCount}}개에 설치됨, 실패: {{failed}}",
+      "laterHint": "선택사항 — 나중에 설정 → MCP에서 설치할 수도 있습니다.",
+      "title": "에이전트를 ddagent에 연결"
+    }
+  },
+  "fileTree": {
+    "browseServerFilesystem": "서버 파일 시스템 찾아보기",
+    "chooseFolder": "폴더 선택",
+    "copyContents": "내용 복사",
+    "noFiles": "파일 없음",
+    "search": {
+      "hint": "이름 필터링 / Enter로 내용 검색",
+      "noMatches": "일치하는 항목 없음",
+      "prompt": "검색어를 입력하고 Enter를 누르세요",
+      "resultsTruncated": "결과가 잘렸습니다"
+    },
+    "titles": {
+      "delete": "{{name}} 삭제",
+      "download": "{{name}} 다운로드",
+      "rename": "{{name}} 이름 변경"
+    },
+    "uploadHere": "여기에 업로드",
+    "uploadTo": "업로드 대상",
+    "uploadedCount": "{{count}}개 파일 업로드됨",
+    "newName": "새 이름",
+    "notRegisteredProject": "등록되지 않은 프로젝트: {{path}}",
+    "showGitignoredFiles": "Git 무시 파일 표시",
+    "hideGitignoredFiles": "Git 무시 파일 숨기기",
+    "downloadUnsupportedOnWeb": "웹에서는 다운로드를 지원하지 않습니다",
+    "saveToPath": "경로에 저장",
+    "savedTo": "{{path}}에 저장됨"
+  },
+  "workspace": {
+    "archivedWorkspaceName": "보관됨",
+    "closePane": "창 닫기",
+    "closeSearch": "검색 닫기",
+    "deleteSessionNotice": "세션과 트랜스크립트를 제거합니다. 되돌릴 수 없습니다.",
+    "exportChat": "채팅 내보내기",
+    "jumpToSession": "세션으로 이동…",
+    "newChatProvider": "새 채팅 — 제공자",
+    "nextMatch": "다음 일치",
+    "previousMatch": "이전 일치",
+    "searchTranscript": "트랜스크립트 검색",
+    "sendTo": "{{count}}개에 전송",
+    "accountWithLabel": "기본 · {{label}}",
+    "finishRunBeforeChangingWorkspace": "작업 영역을 변경하기 전에 실행을 완료하세요",
+    "restored": "작업 영역이 복원되었습니다",
+    "maximizePane": "창 최대화",
+    "restorePanes": "창 복원",
+    "reviewChangedFiles": "변경된 파일 검토"
   }
 }

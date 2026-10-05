@@ -5,6 +5,7 @@ import 'package:ddagent_app/core/realtime/chat_channel.dart';
 import 'package:ddagent_app/core/realtime/realtime_providers.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/sessions/state/session_activity.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Server-side processing pulse — a 5 s poll of `GET /providers/sessions/running`
@@ -35,26 +36,30 @@ String? _toolStatusText(Object? toolName, Object? toolInput) {
 
   switch (name.toLowerCase()) {
     case 'task' || 'run_subagent' || 'agent':
-      return 'Subagent running';
+      return t.sessions.activity.subagentRunning;
     case 'read' || 'read_file' || 'grep' || 'glob':
-      return file.isNotEmpty ? 'Reading ${base(file)}' : 'Running $name';
+      return file.isNotEmpty
+          ? t.sessions.activity.readingFile(file: base(file))
+          : t.sessions.activity.runningTool(name: name);
     case 'write' || 'write_file' || 'edit' || 'edit_file' || 'applypatch' || 'apply_patch':
-      return file.isNotEmpty ? 'Editing ${base(file)}' : 'Editing a file';
+      return file.isNotEmpty
+          ? t.sessions.activity.editingFile(file: base(file))
+          : t.sessions.activity.editingFileGeneric;
     case 'bash' || 'shell' || 'execute_command' || 'run_command':
-      if (cmd.isEmpty) return 'Running a shell command';
+      if (cmd.isEmpty) return t.sessions.activity.runningShellCommand;
       final short = cmd.length > 48 ? '${cmd.substring(0, 45)}…' : cmd;
-      return 'Running `$short`';
+      return t.sessions.activity.runningCommand(command: short);
     case 'commit' || 'git_commit':
-      return 'Committing changes';
+      return t.sessions.activity.committingChanges;
     case 'push' || 'git_push':
-      return 'Pushing branch';
+      return t.sessions.activity.pushingBranch;
     case 'webfetch' || 'web_fetch' || 'websearch' || 'web_search':
-      if (url.isNotEmpty) return 'Fetching $url';
+      if (url.isNotEmpty) return t.sessions.activity.fetchingUrl(url: url);
       if (query.isNotEmpty) {
         final short = query.length > 40 ? '${query.substring(0, 37)}…' : query;
-        return 'Searching “$short”';
+        return t.sessions.activity.searching(query: short);
       }
-      return 'Running $name';
+      return t.sessions.activity.runningTool(name: name);
     default:
       return null;
   }

@@ -206,10 +206,11 @@ class _ProviderSkillsPaneState extends ConsumerState<ProviderSkillsPane> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AppDialog(
-        title: 'Delete ${skill.command.isNotEmpty ? skill.command : skill.name}?',
+        title: t.skills.screen.deleteTitle(
+          name: skill.command.isNotEmpty ? skill.command : skill.name,
+        ),
         content: Text(
-          'This removes the $directoryName directory from '
-          '$_providerName\'s managed skills directory. This cannot be undone.',
+          t.skills.screen.deleteDescription(directory: directoryName, provider: _providerName),
         ),
         actions: [
           AppButton(
@@ -303,8 +304,7 @@ class _ProviderSkillsPaneState extends ConsumerState<ProviderSkillsPane> {
                   Text(t.settings.tabs.skills, style: tt.titleMedium),
                   const SizedBox(height: AppSpacing.xs),
                   Text(
-                    'Manage $_providerName skills from local files, complete '
-                    'folders, and project-aware locations.',
+                    t.skills.screen.manageDescription(provider: _providerName),
                     style: tt.bodySmall?.copyWith(color: c.mutedForeground),
                   ),
                 ],
@@ -331,7 +331,7 @@ class _ProviderSkillsPaneState extends ConsumerState<ProviderSkillsPane> {
                   style: const TextStyle(fontSize: 14),
                   decoration: InputDecoration(
                     isDense: true,
-                    hintText: 'Search skills...',
+                    hintText: t.skills.screen.searchHint,
                     hintStyle: TextStyle(color: c.mutedForeground, fontSize: 14),
                     prefixIcon: Padding(
                       padding: const EdgeInsets.only(left: AppSpacing.sm),
@@ -341,7 +341,7 @@ class _ProviderSkillsPaneState extends ConsumerState<ProviderSkillsPane> {
                     suffixIcon: _query.isEmpty
                         ? null
                         : IconButton(
-                            tooltip: 'Clear skill search',
+                            tooltip: t.skills.screen.clearSearch,
                             icon: Icon(LucideIcons.x, size: 14, color: c.mutedForeground),
                             onPressed: () => setState(() {
                               _searchCtrl.clear();
@@ -355,12 +355,12 @@ class _ProviderSkillsPaneState extends ConsumerState<ProviderSkillsPane> {
             AppButton(
               size: AppButtonSize.sm,
               onPressed: () => unawaited(_openAdd()),
-              child: const Row(
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(LucideIcons.plus, size: 14),
-                  SizedBox(width: AppSpacing.xs),
-                  Text('Add Skill'),
+                  const Icon(LucideIcons.plus, size: 14),
+                  const SizedBox(width: AppSpacing.xs),
+                  Text(t.skills.screen.addSkill),
                 ],
               ),
             ),
@@ -401,9 +401,9 @@ class _ProviderSkillsPaneState extends ConsumerState<ProviderSkillsPane> {
           children: [
             SegmentedButton<bool>(
               showSelectedIcon: false,
-              segments: const [
-                ButtonSegment(value: false, label: Text('Global')),
-                ButtonSegment(value: true, label: Text('Projects')),
+              segments: [
+                ButtonSegment(value: false, label: Text(t.knowledge.common.global)),
+                ButtonSegment(value: true, label: Text(t.sidebar.projects.title)),
               ],
               selected: {_projectsMode},
               onSelectionChanged: (selection) => setState(() => _projectsMode = selection.first),
@@ -411,14 +411,14 @@ class _ProviderSkillsPaneState extends ConsumerState<ProviderSkillsPane> {
             if (_projectsMode)
               if (projects.isEmpty)
                 Text(
-                  'No projects available',
+                  t.skills.empty.noProjects,
                   style: tt.bodySmall?.copyWith(color: c.mutedForeground),
                 )
               else
                 ProjectMenuButton(
                   projects: projects,
                   selected: selectedProject,
-                  header: 'Project',
+                  header: t.skills.projectLabel,
                   onSelected: (project) => unawaited(
                     ref
                         .read(providerSkillsProvider(widget.provider).notifier)
@@ -441,7 +441,7 @@ class _ProviderSkillsPaneState extends ConsumerState<ProviderSkillsPane> {
                     ),
                     const SizedBox(width: AppSpacing.sm),
                     Text(
-                      'Scanning project skills...',
+                      t.skills.screen.scanningProjectSkills,
                       style: tt.bodySmall?.copyWith(color: c.mutedForeground),
                     ),
                   ],
@@ -469,7 +469,10 @@ class _ProviderSkillsPaneState extends ConsumerState<ProviderSkillsPane> {
               children: [
                 Icon(LucideIcons.circleCheck, size: 16, color: c.primary),
                 const SizedBox(width: AppSpacing.xs),
-                Text('Skills saved successfully.', style: tt.bodySmall?.copyWith(color: c.primary)),
+                Text(
+                  t.skills.screen.savedSuccessfully,
+                  style: tt.bodySmall?.copyWith(color: c.primary),
+                ),
               ],
             ),
           ),
@@ -480,40 +483,34 @@ class _ProviderSkillsPaneState extends ConsumerState<ProviderSkillsPane> {
             padding: const EdgeInsets.symmetric(vertical: AppSpacing.xxl),
             child: Center(
               child: Text(
-                'Loading $_providerName skills…',
+                t.skills.screen.loadingSkills(provider: _providerName),
                 style: tt.bodyMedium?.copyWith(color: c.mutedForeground),
               ),
             ),
           )
         else if (_projectsMode && selectedProject == null)
-          const _EmptyState(
+          _EmptyState(
             icon: LucideIcons.folder,
-            title: 'No projects available',
-            description: 'Add a project or workspace to browse its skills.',
+            title: t.skills.empty.noProjects,
+            description: t.skills.empty.noProjectsDescription,
           )
         else if (modeSkills.isEmpty)
           _projectsMode
-              ? const _EmptyState(
+              ? _EmptyState(
                   icon: LucideIcons.folder,
-                  title: 'No skills in this project',
-                  description:
-                      'Create a .claude/skills, .cursor/skills or '
-                      '.agents/skills folder in the selected project.',
+                  title: t.skills.empty.noSkillsInProject,
+                  description: t.skills.empty.noSkillsInProjectDescription,
                 )
-              : const _EmptyState(
+              : _EmptyState(
                   icon: LucideIcons.fileText,
-                  title: 'No global skills discovered yet',
-                  description:
-                      'Add a global skill above to make it available across '
-                      'every project.',
+                  title: t.skills.empty.noGlobalSkills,
+                  description: t.skills.empty.noGlobalSkillsDescription,
                 )
         else if (filtered.isEmpty)
-          const _EmptyState(
+          _EmptyState(
             icon: LucideIcons.search,
-            title: 'No matching skills',
-            description:
-                'Try a different command, name, scope, project, or source '
-                'path.',
+            title: t.skills.empty.noMatchingSkills,
+            description: t.skills.empty.noMatchingSkillsDescription,
           ),
 
         // Scope groups (`groupSkillsByScope`).
@@ -525,8 +522,7 @@ class _ProviderSkillsPaneState extends ConsumerState<ProviderSkillsPane> {
                 _ScopeBadge(scope: group.scope),
                 const SizedBox(width: AppSpacing.sm),
                 Text(
-                  '${group.skills.length} '
-                  'SKILL${group.skills.length == 1 ? '' : 'S'}',
+                  t.skills.screen.skillsCount(count: group.skills.length),
                   style: tt.labelSmall?.copyWith(color: c.mutedForeground, letterSpacing: 1.8),
                 ),
               ],
@@ -576,6 +572,7 @@ class _ScopeBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final i18n = Translations.of(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final colors = skillScopeBadgeColors(scope, isDark: isDark);
     return Container(
@@ -586,12 +583,23 @@ class _ScopeBadge extends StatelessWidget {
         borderRadius: AppRadii.borderLg,
       ),
       child: Text(
-        scope.label,
+        _scopeLabel(scope, i18n),
         style: Theme.of(context).textTheme.labelSmall?.copyWith(color: colors.foreground),
       ),
     );
   }
 }
+
+/// Localized badge label for [scope] (the model's [SkillScope.label] is the
+/// untranslated fallback used by non-UI callers).
+String _scopeLabel(SkillScope scope, Translations i18n) => switch (scope) {
+  SkillScope.user => i18n.skills.scopes.user,
+  SkillScope.plugin => i18n.skills.scopes.plugin,
+  SkillScope.repo => i18n.skills.scopes.repo,
+  SkillScope.project => i18n.skills.scopes.project,
+  SkillScope.admin => i18n.skills.scopes.admin,
+  SkillScope.system => i18n.skills.scopes.system,
+};
 
 /// One skill card — command + name, description, plugin/project badges,
 /// source path, delete when the skill is provider-managed.
@@ -604,6 +612,7 @@ class _SkillCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     final c = context.appColors;
     final tt = Theme.of(context).textTheme;
 
@@ -639,14 +648,14 @@ class _SkillCard extends StatelessWidget {
               ),
               if (onMove != null)
                 IconButton(
-                  tooltip: 'Move ${skill.name}',
+                  tooltip: t.skills.moveSkill(name: skill.name),
                   visualDensity: VisualDensity.compact,
                   onPressed: onMove,
                   icon: Icon(LucideIcons.arrowRightLeft, size: 16, color: c.mutedForeground),
                 ),
               if (onDelete != null)
                 IconButton(
-                  tooltip: 'Delete ${skill.name}',
+                  tooltip: t.skills.deleteSkill(name: skill.name),
                   visualDensity: VisualDensity.compact,
                   onPressed: onDelete,
                   icon: Icon(LucideIcons.trash2, size: 16, color: c.mutedForeground),
@@ -655,9 +664,7 @@ class _SkillCard extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.md),
           Text(
-            skill.description.isNotEmpty
-                ? skill.description
-                : 'No description provided in the skill front matter.',
+            skill.description.isNotEmpty ? skill.description : t.skills.screen.noDescription,
             style: tt.bodyMedium?.copyWith(color: c.mutedForeground, height: 1.4),
           ),
           if (skill.pluginName != null || skill.projectDisplayName != null)
@@ -667,9 +674,12 @@ class _SkillCard extends StatelessWidget {
                 spacing: AppSpacing.sm,
                 runSpacing: AppSpacing.xs,
                 children: [
-                  if (skill.pluginName != null) _MetaBadge(label: 'Plugin: ${skill.pluginName}'),
+                  if (skill.pluginName != null)
+                    _MetaBadge(label: t.skills.screen.pluginBadge(name: skill.pluginName!)),
                   if (skill.projectDisplayName != null)
-                    _MetaBadge(label: 'Project: ${skill.projectDisplayName}'),
+                    _MetaBadge(
+                      label: t.skills.screen.projectBadge(name: skill.projectDisplayName!),
+                    ),
                 ],
               ),
             ),
@@ -686,7 +696,7 @@ class _SkillCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'SOURCE',
+                  t.skills.screen.sourceLabel,
                   style: tt.labelSmall?.copyWith(
                     color: c.mutedForeground,
                     fontSize: 11,

@@ -2,6 +2,7 @@ import 'package:ddagent_app/core/network/api_error.dart';
 import 'package:ddagent_app/features/auth/state/auth_controller.dart';
 import 'package:ddagent_app/features/collab/data/collab_repository.dart';
 import 'package:ddagent_app/features/collab/role.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,6 +24,7 @@ class CollabSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final t = Translations.of(context);
     final users = ref.watch(collabUsersProvider);
     final activity = ref.watch(collabActivityProvider(projectId));
     final isOwner = roleAtLeast(
@@ -34,12 +36,12 @@ class CollabSection extends ConsumerWidget {
       children: [
         Row(
           children: [
-            Text('Team', style: Theme.of(context).textTheme.titleMedium),
+            Text(t.collab.team, style: Theme.of(context).textTheme.titleMedium),
             const Spacer(),
             if (isOwner)
               TextButton.icon(
                 icon: const Icon(Icons.person_add_alt_1, size: 16),
-                label: const Text('Invite'),
+                label: Text(t.collab.invite),
                 onPressed: () => showInviteDialog(context, ref),
               ),
           ],
@@ -66,10 +68,10 @@ class CollabSection extends ConsumerWidget {
           error: (e, _) => Text('$e'),
         ),
         const SizedBox(height: 8),
-        Text('Activity', style: Theme.of(context).textTheme.titleMedium),
+        Text(t.tasks.board.activity.title, style: Theme.of(context).textTheme.titleMedium),
         activity.when(
           data: (events) => events.isEmpty
-              ? const Text('No activity yet')
+              ? Text(t.tasks.board.activity.empty)
               : Column(
                   children: [
                     for (final e in events.take(20))
@@ -91,6 +93,7 @@ class CollabSection extends ConsumerWidget {
 
 /// Mints a single-use invite (owner only) and shows the shareable token.
 Future<void> showInviteDialog(BuildContext context, WidgetRef ref) async {
+  final t = Translations.of(context);
   String role = 'member';
   Map<String, dynamic>? invite;
   AppError? error;
@@ -98,30 +101,30 @@ Future<void> showInviteDialog(BuildContext context, WidgetRef ref) async {
     context: context,
     builder: (context) => StatefulBuilder(
       builder: (context, setState) => AlertDialog(
-        title: const Text('Invite teammate'),
+        title: Text(t.collab.inviteTeammate),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (invite == null) ...[
               SegmentedButton<String>(
-                segments: const [
-                  ButtonSegment(value: 'member', label: Text('Member')),
-                  ButtonSegment(value: 'viewer', label: Text('Viewer')),
+                segments: [
+                  ButtonSegment(value: 'member', label: Text(t.collab.roles.member)),
+                  ButtonSegment(value: 'viewer', label: Text(t.collab.roles.viewer)),
                 ],
                 selected: {role},
                 onSelectionChanged: (s) => setState(() => role = s.first),
               ),
               if (error != null) Text('$error', style: const TextStyle(color: Colors.red)),
             ] else ...[
-              const Text('Share this invite token — it is shown once and expires in 72h:'),
+              Text(t.collab.shareTokenHint),
               const SizedBox(height: 8),
               SelectableText('${invite!['token']}'),
             ],
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close')),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(t.chat.common.close)),
           if (invite == null)
             FilledButton(
               onPressed: () async {
@@ -132,12 +135,12 @@ Future<void> showInviteDialog(BuildContext context, WidgetRef ref) async {
                   setState(() => error = e);
                 }
               },
-              child: const Text('Create invite'),
+              child: Text(t.collab.createInvite),
             )
           else
             FilledButton.icon(
               icon: const Icon(Icons.copy, size: 16),
-              label: const Text('Copy token'),
+              label: Text(t.collab.copyToken),
               onPressed: () async {
                 await Clipboard.setData(ClipboardData(text: '${invite!['token']}'));
                 if (context.mounted) Navigator.pop(context);

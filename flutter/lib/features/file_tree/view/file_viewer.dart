@@ -8,6 +8,7 @@ import 'package:ddagent_app/core/widgets/auth_image.dart';
 import 'package:ddagent_app/features/file_tree/data/file_saver.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_node.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_repository.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -60,6 +61,7 @@ class ImageViewerDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     return AppDialog(
       title: node.name,
       content: SizedBox(
@@ -75,11 +77,11 @@ class ImageViewerDialog extends StatelessWidget {
           variant: AppButtonVariant.ghost,
           onPressed: () {
             Clipboard.setData(ClipboardData(text: node.path));
-            AppToast.show(context, 'Path copied');
+            AppToast.show(context, t.common.fileTree.toast.pathCopied);
           },
-          child: const Text('Copy path'),
+          child: Text(t.common.fileOperations.copyPath),
         ),
-        AppButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Close')),
+        AppButton(onPressed: () => Navigator.of(context).pop(), child: Text(t.chat.common.close)),
       ],
     );
   }
@@ -169,6 +171,7 @@ class _FileViewerPaneState extends ConsumerState<FileViewerPane> {
         child: Text(_error!, style: TextStyle(color: context.appColors.destructive)),
       );
     }
+    final t = Translations.of(context);
     return Column(
       children: [
         Row(
@@ -181,7 +184,7 @@ class _FileViewerPaneState extends ConsumerState<FileViewerPane> {
               ),
             ),
             IconButton(
-              tooltip: 'Copy contents',
+              tooltip: t.fileTree.copyContents,
               icon: const Icon(Icons.copy_outlined, size: 18),
               onPressed: () {
                 Clipboard.setData(ClipboardData(text: _content.text));
@@ -189,7 +192,7 @@ class _FileViewerPaneState extends ConsumerState<FileViewerPane> {
               },
             ),
             IconButton(
-              tooltip: 'Open in editor',
+              tooltip: t.common.fileOperations.openInEditor,
               icon: const Icon(Icons.edit_note, size: 18),
               onPressed: () => context.go(
                 '/editor?projectId=${widget.projectId}'
@@ -200,7 +203,7 @@ class _FileViewerPaneState extends ConsumerState<FileViewerPane> {
               size: AppButtonSize.sm,
               loading: _saving,
               onPressed: _dirty ? _save : null,
-              child: const Text('Save'),
+              child: Text(t.codeEditor.actions.save),
             ),
           ],
         ),
@@ -234,24 +237,25 @@ Future<void> downloadFile(
   required String projectId,
   required FileTreeNode node,
 }) async {
+  final t = Translations.of(context);
   if (kIsWeb) {
-    AppToast.show(context, 'Download unsupported on web', isError: true);
+    AppToast.show(context, t.fileTree.downloadUnsupportedOnWeb, isError: true);
     return;
   }
   final nameController = TextEditingController(text: node.path);
   final target = await AppDialog.show<String>(
     context,
-    title: 'Download ${node.name}',
-    content: AppInput(controller: nameController, hint: 'Save to path', autofocus: true),
+    title: t.fileTree.titles.download(name: node.name),
+    content: AppInput(controller: nameController, hint: t.fileTree.saveToPath, autofocus: true),
     actions: [
       AppButton(
         variant: AppButtonVariant.ghost,
         onPressed: () => AppDialog.pop(context),
-        child: const Text('Cancel'),
+        child: Text(t.chat.orchestrator.summary.cancelTasks),
       ),
       AppButton(
         onPressed: () => AppDialog.pop(context, nameController.text.trim()),
-        child: const Text('Save'),
+        child: Text(t.codeEditor.actions.save),
       ),
     ],
   );
@@ -262,7 +266,7 @@ Future<void> downloadFile(
     final bytes = await ref.read(fileTreeRepositoryProvider).readFileBlob(projectId, node.path);
     await saveBytesToPath(target, bytes);
     if (context.mounted) {
-      AppToast.show(context, 'Saved to $target');
+      AppToast.show(context, t.fileTree.savedTo(path: target));
     }
   } on AppError catch (e) {
     if (context.mounted) {

@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:ddagent_app/core/network/api_error.dart';
 import 'package:ddagent_app/core/realtime/realtime_providers.dart';
 import 'package:ddagent_app/features/notifications/data/notifications_repository.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -94,7 +95,7 @@ class DeviceNotificationsController extends Notifier<DeviceNotificationsState> {
       await channel.connect();
       channel.register(
         deviceId: deviceId,
-        label: 'ddagent Flutter',
+        label: t.notifications.deviceLabel,
         platform: kIsWeb ? 'web' : defaultTargetPlatform.name,
       );
       // Wait briefly for the server's `registered` ack so silent failures
@@ -103,7 +104,7 @@ class DeviceNotificationsController extends Notifier<DeviceNotificationsState> {
           .firstWhere((n) => n.isRegistered || n.isError)
           .timeout(const Duration(seconds: 5));
       if (ack.isError) {
-        throw const ServerError('Registration rejected by server', 0);
+        throw ServerError(t.notifications.errors.registrationRejected, 0);
       }
       await _persist(deviceId, true);
       if (!ref.mounted) return null;
@@ -115,14 +116,11 @@ class DeviceNotificationsController extends Notifier<DeviceNotificationsState> {
       }
       return e.message;
     } on TimeoutException {
+      final message = t.notifications.errors.noResponse;
       if (ref.mounted) {
-        state = const DeviceNotificationsState(
-          enabled: false,
-          loading: false,
-          error: 'No response from the server',
-        );
+        state = DeviceNotificationsState(enabled: false, loading: false, error: message);
       }
-      return 'No response from the server';
+      return message;
     } on Object catch (e) {
       if (ref.mounted) {
         state = DeviceNotificationsState(enabled: false, loading: false, error: e.toString());

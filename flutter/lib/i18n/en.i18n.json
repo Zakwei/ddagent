@@ -182,7 +182,8 @@
       "readFile": "Read file",
       "updateTodo": "Update todo list",
       "readTodo": "Read todo list",
-      "searchResults": "results"
+      "searchResults": "results",
+      "todoReadLabel": "TodoRead reading list"
     },
     "search": {
       "found": "Found {{count}} {{type}}",
@@ -221,7 +222,16 @@
       "addTo": "Adds {{entry}} to Allowed Tools.",
       "retry": "Permission saved. Retry the request to use the tool.",
       "error": "Unable to update permissions. Please try again.",
-      "openSettings": "Open settings"
+      "openSettings": "Open settings",
+      "allow": "Allow",
+      "always": "Always",
+      "editAndAllow": "Edit & allow",
+      "deny": "Deny",
+      "reject": "Reject",
+      "allowAll": "Allow all ({{count}})",
+      "editInput": "Edit input",
+      "invalidJson": "Invalid JSON",
+      "allowWithChanges": "Allow with changes"
     },
     "todo": {
       "updated": "Todo list has been updated successfully",
@@ -310,7 +320,8 @@
       "voiceStart": "Dictate a message",
       "voiceStop": "Stop dictation",
       "pinFile": "Pin file to context",
-      "voiceSettings": "Voice settings (STT)"
+      "voiceSettings": "Voice settings (STT)",
+      "cameraUnavailable": "Camera unavailable: {{error}}"
     },
     "composer": {
       "toolsAndActions": "Tools & actions",
@@ -393,8 +404,13 @@
         "loadingAll": "Loading all messages...",
         "allLoaded": "All messages loaded",
         "perfWarning": "All messages loaded — scrolling may be slower. Click \"Scroll to bottom\" to restore performance.",
-        "noSearchMatches": "No messages match your search."
-      }
+        "noSearchMatches": "No messages match your search.",
+        "loadOlder": "Load older messages",
+        "loadAllCount": "Load all ({{count}})",
+        "retryLoadOlder": "Retry loading older — {{error}}"
+      },
+      "deleteConfirm": "Removes the session and its transcript. Cannot be undone.",
+      "finishRunBeforeWorkspaceChange": "Finish the run before changing workspace"
     },
     "shell": {
       "selectProject": {
@@ -520,11 +536,15 @@
       "active": "Active"
     },
     "askUserQuestion": {
-      "needsInput": "{{provider}} needs your input"
+      "needsInput": "{{provider}} needs your input",
+      "skip": "Skip",
+      "other": "Other…",
+      "answerHint": "Type your answer…"
     },
     "attachments": {
       "downloadFailedRetry": "Download failed — click to retry",
-      "fileAttachment": "File attachment"
+      "fileAttachment": "File attachment",
+      "download": "Download {{name}}"
     },
     "checkpoint": {
       "creating": "Creating snapshot…",
@@ -532,7 +552,8 @@
       "undo": "Undo checkpoint",
       "undoAiRun": "Undo AI run",
       "undoing": "Undoing…",
-      "undone": "Undone"
+      "undone": "Undone",
+      "beforeAiTurn": "before AI turn"
     },
     "common": {
       "close": "Close"
@@ -541,7 +562,9 @@
       "saveToTask": "Task",
       "saved": "Saved",
       "saving": "Saving...",
-      "taskShort": "TASK"
+      "taskShort": "TASK",
+      "addToTask": "Add to TaskMaster",
+      "added": "Added to TaskMaster"
     },
     "tokenUsage": {
       "desc": "View session token consumption",
@@ -570,6 +593,54 @@
     "paneHeader": {
       "processing": "Processing…",
       "switchSession": "Switch session"
+    },
+    "export": {
+      "sessionTitle": "Session {{id}}",
+      "pdfFailed": "PDF export failed",
+      "transcriptDownloaded": "Transcript downloaded",
+      "savedTo": "Saved {{path}}"
+    },
+    "commandResult": {
+      "fallback": {
+        "models": "Browse available models for the active provider.",
+        "cost": "Review token usage for the active session.",
+        "status": "Inspect runtime, version, provider, and environment status.",
+        "memory": "Open the project CLAUDE.md memory file.",
+        "config": "Open settings and configuration.",
+        "help": "Show command documentation and syntax."
+      },
+      "filterCommands": "Filter commands...",
+      "searchModels": "Search {{provider}} models..."
+    },
+    "commands": {
+      "runConfirmTitle": "Run command?",
+      "executionCancelled": "Command execution cancelled"
+    },
+    "pinFile": {
+      "title": "Pin file",
+      "pathHint": "path/to/file.ext",
+      "action": "Pin"
+    },
+    "modelLibrary": {
+      "editTooltip": "Edit {{name}}",
+      "deleteTooltip": "Delete {{name}}",
+      "enterNameAndId": "Enter both a model name and model ID.",
+      "idNoSpaces": "Model IDs cannot contain spaces.",
+      "setAsDefault": "Set as default",
+      "defaultModel": "Default model"
+    },
+    "changes": {
+      "failedToLoad": "Failed to load changes",
+      "empty": "No file changes"
+    },
+    "message": {
+      "compactedSummary": "Compacted summary",
+      "resendHint": "Resend from the composer",
+      "rawView": "Raw view"
+    },
+    "permissionRequest": {
+      "title": "Permission request · {{tool}}",
+      "question": "Question"
     }
   },
   "codeEditor": {
@@ -581,7 +652,11 @@
       "showDiff": "Show diff highlighting",
       "settings": "Editor Settings",
       "collapse": "Collapse editor",
-      "expand": "Expand editor to full width"
+      "expand": "Expand editor to full width",
+      "toggleDock": "Toggle file dock",
+      "diffMerge": "Diff / merge",
+      "previewInBrowser": "Preview in browser",
+      "reload": "Reload from disk"
     },
     "loading": "Loading {{fileName}}...",
     "header": {
@@ -602,7 +677,8 @@
       "pinFile": "Pin file to context",
       "unpinFile": "Unpin file from context",
       "previewHtml": "Open HTML preview in new tab",
-      "retry": "Retry"
+      "retry": "Retry",
+      "saveAll": "Save all"
     },
     "footer": {
       "lines": "Lines:",
@@ -611,12 +687,49 @@
     },
     "binaryFile": {
       "title": "Binary File",
-      "message": "The file \"{{fileName}}\" cannot be displayed in the text editor because it is a binary file."
+      "message": "The file \"{{fileName}}\" cannot be displayed in the text editor because it is a binary file.",
+      "cannotDisplayAsText": "Cannot display as text"
     },
     "filePreview": {
       "loading": "Loading preview...",
       "error": "Unable to display this file.",
       "openInNewTab": "Open in new tab"
+    },
+    "unsavedChanges": "Unsaved changes in {{name}}",
+    "discardUnsavedChanges": "Discard unsaved changes?",
+    "mediaFile": {
+      "title": "Media file",
+      "subtitle": "Audio/video preview is not supported yet"
+    },
+    "failedToLoad": "Failed to load file",
+    "hexDump": {
+      "more": "… {{size}} more"
+    },
+    "settings": {
+      "minimap": "Minimap",
+      "tabSize": "Tab size: {{size}}",
+      "fontSizeDecrease": "Font size −  (now {{size}})",
+      "fontSizeIncrease": "Font size +"
+    },
+    "diff": {
+      "noChanges": "No changes",
+      "hunk": "Hunk {{number}}",
+      "close": "Close diff",
+      "base": "Base",
+      "current": "Current",
+      "applyMerge": "Apply merge",
+      "deletedOnDisk": "deleted on disk"
+    },
+    "emptyState": {
+      "title": "No file open"
+    },
+    "toasts": {
+      "savedFile": "Saved {{name}}",
+      "saveFailed": "Save failed",
+      "allSaved": "All saved",
+      "someSavesFailed": "Some saves failed",
+      "savedTo": "Saved to {{path}}",
+      "mergeApplied": "Merge applied — save to persist"
     }
   },
   "common": {
@@ -636,7 +749,9 @@
       "copy": "Copy",
       "download": "Download",
       "upload": "Upload",
-      "browse": "Browse"
+      "browse": "Browse",
+      "update": "Update",
+      "openDiagram": "Open diagram"
     },
     "tabs": {
       "chat": "Chat",
@@ -1531,6 +1646,20 @@
       "saving": "Saving…",
       "noProject": "Select a workspace to edit its shared context",
       "placeholder": "# Shared context\nConventions, decisions and pointers every agent should know…"
+    },
+    "codeBlock": {
+      "wrapLines": "Wrap lines",
+      "noWrap": "No wrap"
+    },
+    "update": {
+      "available": "Update available · v{{version}}",
+      "confirm": "Update to v{{version}}? The server updates itself and restarts — active sessions will be interrupted.",
+      "downloading": "Downloading and applying the update…",
+      "restarting": "Restarting the server — this takes a moment…",
+      "done": "Updated to v{{version}}. Reload the app to pick up the new bundle.",
+      "manualRestart": "The update was applied but the server did not restart on its own — restart it manually to finish.",
+      "failed": "Update failed.",
+      "failedTitle": "Update failed"
     }
   },
   "settings": {
@@ -1549,7 +1678,8 @@
       "restartConfirm": "Restart the ddagent server? Active sessions will be interrupted.",
       "restarting": "Restarting… the page will reload when the server is back.",
       "restartFailed": "Restart failed",
-      "unsupported": "Restart is only available when the server runs under the service manager."
+      "unsupported": "Restart is only available when the server runs under the service manager.",
+      "ok": "OK"
     },
     "updates": {
       "title": "App updates",
@@ -1606,7 +1736,12 @@
       "wordWrap": "Word Wrap",
       "showMinimap": "Show Minimap",
       "lineNumbers": "Line Numbers",
-      "fontSize": "Font Size"
+      "fontSize": "Font Size",
+      "themeModes": {
+        "system": "System",
+        "light": "Light",
+        "dark": "Dark"
+      }
     },
     "actions": {
       "saveChanges": "Save Changes",
@@ -1631,7 +1766,8 @@
         "openPanel": "Open settings panel",
         "draggingStatus": "Dragging...",
         "toggleAndMove": "Click to toggle, drag to move"
-      }
+      },
+      "sendWithCtrlEnter": "Send with Ctrl+Enter"
     },
     "terminalShortcuts": {
       "title": "Terminal Shortcuts",
@@ -1858,7 +1994,12 @@
         "telegramToken": "Bot token from @BotFather (123456:ABC…)",
         "telegramHint": "Send any message to your bot, then pair the chat below.",
         "discordWebhook": "https://discord.com/api/webhooks/…"
-      }
+      },
+      "channels": {
+        "telegram": "Telegram",
+        "discord": "Discord"
+      },
+      "unpair": "Unpair"
     },
     "appearanceSettings": {
       "darkMode": {
@@ -1959,11 +2100,13 @@
       "description": "Configure your git identity for commits. These settings will be applied globally via git config --global",
       "name": {
         "label": "Git Name",
-        "help": "Your name for git commits"
+        "help": "Your name for git commits",
+        "placeholder": "John Doe"
       },
       "email": {
         "label": "Git Email",
-        "help": "Your email for git commits"
+        "help": "Your email for git commits",
+        "placeholder": "john@example.com"
       },
       "actions": {
         "save": "Save Configuration",
@@ -2009,7 +2152,9 @@
           "descriptionPlaceholder": "Description (optional)",
           "addButton": "Add Token",
           "cancelButton": "Cancel",
-          "howToCreate": "How to create a GitHub Personal Access Token →"
+          "howToCreate": "How to create a GitHub Personal Access Token →",
+          "showToken": "Show token",
+          "hideToken": "Hide token"
         },
         "empty": "No GitHub tokens added yet.",
         "added": "Added:",
@@ -2337,7 +2482,8 @@
       "deleteTitle": "Remove workspace",
       "description": "Workspaces are directories ddagent can chat, run code, and browse inside.",
       "remove": "Remove workspace",
-      "title": "Workspaces"
+      "title": "Workspaces",
+      "pathRequired": "Path is required"
     },
     "stt": {
       "title": "Voice input (speech-to-text)",
@@ -2386,7 +2532,14 @@
     },
     "about": {
       "supportTitle": "Support the Project",
-      "buyMeACoffee": "Buy Me a Coffee"
+      "buyMeACoffee": "Buy Me a Coffee",
+      "tryHosted": "Try ddagent Hosted",
+      "learnMore": "Learn more",
+      "proFeatures": "ddagent Pro Features",
+      "pro": {
+        "syncSettings": "Sync Settings",
+        "teamManagement": "Team Management"
+      }
     },
     "shortcuts": {
       "description": "Every keyboard shortcut in ddagent, split by platform.",
@@ -2686,7 +2839,8 @@
         "progressVisualization": "Progress Visualization: Kanban boards and detailed task analytics",
         "cliIntegration": "CLI Integration: Use taskmaster commands for advanced workflows"
       },
-      "initializeButton": "Initialize TaskMaster AI"
+      "initializeButton": "Initialize TaskMaster AI",
+      "writePrdFirst": "Write PRD first"
     },
     "gettingStarted": {
       "title": "Getting Started with TaskMaster",
@@ -2802,7 +2956,16 @@
       "prdsAvailable": "{{count}} PRD(s) available"
     },
     "prd": {
-      "modified": "Modified: {{date}}"
+      "modified": "Modified: {{date}}",
+      "editorTitle": "PRD — {{name}}",
+      "newFile": "new file",
+      "template": "Template",
+      "parse": "Parse PRD",
+      "fileExistsTitle": "File already exists",
+      "fileExistsMessage": "A PRD named \"{{name}}\" already exists. Do you want to overwrite it?",
+      "fileNameHint": "file name (e.g. prd.txt)",
+      "saved": "PRD saved",
+      "tasksGenerated": "Tasks generated from PRD"
     },
     "statuses": {
       "pending": "Pending",
@@ -2810,7 +2973,8 @@
       "done": "Done",
       "blocked": "Blocked",
       "deferred": "Deferred",
-      "cancelled": "Cancelled"
+      "cancelled": "Cancelled",
+      "review": "Review"
     },
     "priorities": {
       "high": "High",
@@ -2927,7 +3091,9 @@
       "completedReopen": "Completed (click to reopen)",
       "inProgressComplete": "In progress (click to complete)",
       "markCompleted": "Mark completed",
-      "toggleStatusAria": "Toggle task {{id}} status"
+      "toggleStatusAria": "Toggle task {{id}} status",
+      "markDone": "Mark done",
+      "reopen": "Reopen"
     },
     "nextTask": {
       "allComplete": "All tasks complete",
@@ -2969,7 +3135,14 @@
       "taskTitle": "Task {{id}}: {{title}}",
       "testStrategy": "Test Strategy",
       "titleRequired": "Title is required",
-      "updateFailed": "Failed to update task"
+      "updateFailed": "Failed to update task",
+      "notFound": "Task not found",
+      "subtasks": "Subtasks",
+      "deleteConfirmMessage": "Task #{{id}} will be removed. This cannot be undone.",
+      "idCopied": "Task ID copied"
+    },
+    "toasts": {
+      "statusInProgress": "Task {{id}} set to in-progress"
     }
   },
   "knowledge": {
@@ -3074,6 +3247,556 @@
     },
     "settings": {
       "description": "Local memory layer for agents: memories, rules, skills and personal info."
+    },
+    "graph": {
+      "truncated": "truncated"
+    },
+    "importAll": {
+      "title": "Import everything into ddagent",
+      "projectsScanned": "Projects scanned: {{count}}",
+      "skillsFound": "Agent skills found: {{found}} (new: {{newSkills}})",
+      "rulesSummary": "Rules: {{total}} · duplicate groups: {{duplicates}}",
+      "mergeDuplicates": "Merge duplicate entries",
+      "mergeDuplicatesHint": "Collapses duplicate rows in ddagent (not files)",
+      "action": "Import everything"
+    },
+    "migrate": {
+      "title": "Migrate existing rules",
+      "scanned": "Scanned {{count}} project(s).",
+      "rulesSummary": "Rules: {{total}} total, {{critical}} critical.",
+      "duplicates": "Duplicate groups across projects: {{count}}",
+      "removedPromoted": "Removed: {{removed}}, promoted: {{promoted}}",
+      "mergeDuplicates": "Merge duplicates"
+    },
+    "importSkills": {
+      "title": "Import agent skills",
+      "found": "Found {{count}} skill(s) across your agents.",
+      "summary": "New: {{imported}} · skipped: {{skipped}}"
+    },
+    "critical": {
+      "make": "Make critical",
+      "makeAll": "Make all rules critical",
+      "makeAllHint": "Adds them to the injected context budget"
+    },
+    "contextBudget": {
+      "tokens": "~{{tokens}} / {{budget}} tok"
+    },
+    "linkOptions": {
+      "memory": "Memory: {{title}}",
+      "rule": "Rule: {{title}}",
+      "skill": "Skill: {{name}}",
+      "personal": "Personal: {{title}}"
+    },
+    "errors": {
+      "importFailed": "Import failed: {{error}}",
+      "migrationFailed": "Migration failed: {{error}}"
     }
+  },
+  "browser": {
+    "dialogTitle": "Agent Browser",
+    "viewError": "Browser view error",
+    "web": "Web"
+  },
+  "collab": {
+    "team": "Team",
+    "invite": "Invite",
+    "inviteTeammate": "Invite teammate",
+    "shareTokenHint": "Share this invite token — it is shown once and expires in 72h:",
+    "createInvite": "Create invite",
+    "copyToken": "Copy token",
+    "roles": {
+      "member": "Member",
+      "viewer": "Viewer"
+    }
+  },
+  "fileTree": {
+    "uploadTo": "Upload to",
+    "uploadHere": "Upload here",
+    "browseServerFilesystem": "Browse server filesystem",
+    "noFiles": "No files",
+    "copyContents": "Copy contents",
+    "chooseFolder": "Choose folder",
+    "search": {
+      "hint": "Filter names / Enter to search contents",
+      "prompt": "Type a query and press Enter",
+      "noMatches": "No matches",
+      "resultsTruncated": "Results truncated"
+    },
+    "titles": {
+      "rename": "Rename {{name}}",
+      "delete": "Delete {{name}}",
+      "download": "Download {{name}}"
+    },
+    "uploadedCount": "Uploaded {{count}} file(s)",
+    "newName": "New name",
+    "notRegisteredProject": "Not a registered project: {{path}}",
+    "showGitignoredFiles": "Show gitignored files",
+    "hideGitignoredFiles": "Hide gitignored files",
+    "downloadUnsupportedOnWeb": "Download unsupported on web",
+    "saveToPath": "Save to path",
+    "savedTo": "Saved to {{path}}"
+  },
+  "git": {
+    "checkpoints": {
+      "title": "Checkpoints",
+      "restoreTitle": "Restore checkpoint",
+      "restoreMessage": "Reset the working tree to this checkpoint? Current changes will be replaced.",
+      "restored": "Checkpoint restored",
+      "labelHint": "Checkpoint label (optional)",
+      "empty": "No checkpoints yet",
+      "create": "New"
+    },
+    "stagedChanges": "Staged Changes",
+    "statusStaged": "Staged",
+    "switchBranch": "Switch branch",
+    "unifiedDiff": "Unified diff",
+    "splitDiff": "Split diff",
+    "noDiff": "No diff available",
+    "largeDiff": "Large diff preview: rendering is limited to keep the tab responsive.",
+    "loadDiffFailed": "Failed to load diff: {{error}}",
+    "hunkStage": "+ Hunk",
+    "hunkUnstage": "− Hunk",
+    "stageHunk": "Stage hunk",
+    "unstageHunk": "Unstage hunk",
+    "deleteFile": "Delete file",
+    "commitMessage": "Commit message",
+    "aiButton": "✦ AI",
+    "commitCreated": "Commit created",
+    "noBranch": "no branch",
+    "selectProject": "Select a project"
+  },
+  "kanban": {
+    "card": {
+      "untitled": "Untitled"
+    },
+    "comments": {
+      "empty": "No comments yet",
+      "add": "Add comment"
+    },
+    "dialog": {
+      "saving": "Saving…"
+    },
+    "details": {
+      "title": "Card Details",
+      "status": "Status: {{status}}"
+    },
+    "empty": {
+      "noProject": "No project selected"
+    },
+    "saveFailed": "Failed to save card",
+    "time": {
+      "now": "now",
+      "minutesAgo(param=count)": {
+        "one": "1 minute ago",
+        "other": "{{count}} minutes ago"
+      },
+      "hoursAgo(param=count)": {
+        "one": "1 hour ago",
+        "other": "{{count}} hours ago"
+      },
+      "daysAgo(param=count)": {
+        "one": "1 day ago",
+        "other": "{{count}} days ago"
+      }
+    }
+  },
+  "mcp": {
+    "install": {
+      "title": "Install ddagent MCP server",
+      "description": "Lets the selected agents use the ddagent knowledge base and tools over MCP.",
+      "cardDescription": "Give your agents the knowledge base and ddagent tools over MCP — pick agents or install for all.",
+      "installSelected": "Install selected",
+      "installForAll": "Install for all",
+      "button": "Install",
+      "failed": "Install failed: {{error}}",
+      "installedCount(param=count)": {
+        "one": "Installed on {{count}} agent.",
+        "other": "Installed on {{count}} agents."
+      },
+      "partialFailure": "Installed on {{count}}; failed: {{failed}}",
+      "errorFallback": "error"
+    },
+    "servers": {
+      "loading": "Loading MCP servers...",
+      "refreshingScopes": "Refreshing project scopes...",
+      "descriptionGeneric": "Model Context Protocol servers provide additional tools and data sources to {{provider}}",
+      "addGlobalTitle": "Add Global MCP Server",
+      "addGlobalDescription": "Adds this MCP server to every provider: Claude, Cursor, Codex, OpenCode, and Devin. Only stdio and HTTP transports are supported because the same config must work across all providers.",
+      "addGlobalMenuDescription": "Add Global MCP Server writes one common stdio or HTTP server to Claude, Cursor, Codex, OpenCode, and Devin.",
+      "addProviderTitle": "Add {{provider}} MCP Server",
+      "addProviderDescription": "Add {{provider}} MCP Server only changes {{provider}}.",
+      "config": {
+        "cwd": "Cwd",
+        "envVars": "Env Vars"
+      }
+    },
+    "team": {
+      "title": "Team MCP Configs",
+      "description": "Share MCP server configurations across your team. Everyone stays in sync automatically.",
+      "cta": "Available with ddagent Pro"
+    },
+    "tokens": {
+      "scopeWrite": "Write"
+    },
+    "form": {
+      "submitTo": "Add Server to {{provider}}",
+      "scope": {
+        "userAllProviders": "User (All Providers)",
+        "claudeLocal": "Claude Local",
+        "projectAllProviders": "Project (All Providers)",
+        "description": {
+          "userGlobal": "Writes to each provider user config and is available across projects on this machine",
+          "user": "Available across all projects on your machine",
+          "local": "Stored in Claude user settings for the selected project",
+          "projectGlobal": "Writes to the selected project workspace for every provider",
+          "project": "Stored in the selected project workspace"
+        }
+      },
+      "fields": {
+        "workingDirectory": "Working Directory",
+        "envVarNames": "Environment Variable Names",
+        "bearerTokenEnvVar": "Bearer Token Environment Variable"
+      },
+      "validation": {
+        "unsupportedGlobal": "Add MCP Server supports only stdio and http across all providers, not {{type}}.",
+        "unsupportedProvider": "{{provider}} does not support {{type}} MCP servers"
+      }
+    }
+  },
+  "notifications": {
+    "deviceLabel": "ddagent Flutter",
+    "errors": {
+      "registrationRejected": "Registration rejected by server",
+      "noResponse": "No response from the server"
+    }
+  },
+  "onboarding": {
+    "gitHint": "Used for commits created by ddagent sessions.",
+    "completeSetup": "Complete Setup",
+    "errors": {
+      "nameAndEmailRequired": "Both git name and email are required.",
+      "invalidEmail": "Please enter a valid email address."
+    },
+    "agents": {
+      "title": "Connect Your AI Agents",
+      "description": "Login to one or more AI coding assistants. All are optional.",
+      "laterHint": "You can configure these later in Settings."
+    },
+    "mcp": {
+      "title": "Connect agents to ddagent",
+      "description": "Install the ddagent MCP server so your agents can use the knowledge base and ddagent tools. Pick agents, or install for all.",
+      "installSelected": "Install selected",
+      "installForAll": "Install for all",
+      "laterHint": "Optional — you can also install this later in Settings → MCP.",
+      "installedOn(param=count)": {
+        "one": "Installed on {{count}} agent.",
+        "other": "Installed on {{count}} agents."
+      },
+      "installedWithFailures": "Installed on {{installedCount}}; failed: {{failed}}"
+    }
+  },
+  "preview": {
+    "embeddedWebOnly": "Embedded preview is available on the web build",
+    "startDevServerHint": "Start a dev server (npm run dev, flutter run -d web-server…)\nand its port appears here."
+  },
+  "projects": {
+    "cloneRepository": "Clone repository",
+    "repositoryCloned": "Repository cloned",
+    "clone": "Clone",
+    "cloneFinished": "Clone finished. Refreshing project list…",
+    "cloneFailed": "Clone failed",
+    "repoUrlPlaceholder": "https://github.com/org/repo.git",
+    "destinationPath": "Destination path",
+    "destinationPathRequired": "Destination path is required",
+    "repositoryUrlRequired": "Repository URL is required",
+    "githubTokenOptional": "GitHub token (optional)",
+    "archive": "Archive",
+    "restore": "Restore",
+    "deletePermanently": "Delete permanently",
+    "deleteProjectTitle": "Delete project?",
+    "deleteProjectMessage": "Permanently removes \"{{name}}\" including all sessions and stored history (JSONL wipe). This cannot be undone.",
+    "archivedSection": "Archived ({{count}})",
+    "sessionCount": {
+      "one": "{{count}} session",
+      "other": "{{count}} sessions"
+    },
+    "newer": "Newer",
+    "older": "Older",
+    "projectArchived": "Project archived",
+    "projectRestored": "Project restored",
+    "projectRenamed": "Project renamed",
+    "projectDeleted": "Project deleted",
+    "failedToLoadTokens": "Failed to load GitHub tokens",
+    "displayNameOptional": "Display name (optional)",
+    "usingStoredToken": "Using stored token: {{name}}",
+    "unknown": "Unknown"
+  },
+  "quota": {
+    "section": {
+      "config": "Config"
+    },
+    "overview": {
+      "tokensAndCost": "Tokens and cost"
+    },
+    "agents": {
+      "statusCount": "{{status}} ({{count}})"
+    },
+    "config": {
+      "pollerTitle": "Poller & alerts",
+      "accountRouting": "Account routing",
+      "save": "Save config"
+    },
+    "chart": {
+      "show": "Show",
+      "hide": "Hide",
+      "noData": "Not enough data for a trend.",
+      "pointReadout": "{{date}} · {{tokens}} tokens · {{cost}}"
+    }
+  },
+  "scheduler": {
+    "newLabel": "New",
+    "runs": "Runs",
+    "editTitle": "Edit schedule",
+    "deleteTitle": "Delete schedule?",
+    "deleteMessage": "This removes the recurring job {{id}}. Existing sessions are kept.",
+    "checking": "Checking…",
+    "nextIn": "next in {{time}}",
+    "worktree": "worktree",
+    "session": "session {{id}}",
+    "cronHint": "Cron (min hour day month weekday) — e.g. 0 9 * * *",
+    "promptHint": "Prompt for the agent"
+  },
+  "serverConnect": {
+    "subtitle": "Connect to your ddagent server",
+    "enterUrl": "Enter a server URL",
+    "connectionFailed": "Connection failed ({{error}})",
+    "connect": "Connect",
+    "connecting": "Connecting…"
+  },
+  "sessions": {
+    "noSessions": "No sessions",
+    "noRecentSessions": "No recent sessions",
+    "archivedSessions": "Archived sessions",
+    "rename": "Rename",
+    "archive": "Archive",
+    "compareWith": "Compare with…",
+    "projectPath": "Project path",
+    "newSessionProvider": "New session — provider",
+    "autoOrchestrator": "Auto (orchestrator)",
+    "createFailed": "Failed to create session: {{error}}",
+    "deleteSessionMessage": "Removes \"{{name}}\" and its transcript. This cannot be undone.",
+    "toasts": {
+      "archived": "Session archived",
+      "restored": "Session restored",
+      "deleted": "Session deleted",
+      "renamed": "Session renamed",
+      "pinned": "Session pinned",
+      "unpinned": "Session unpinned",
+      "workspaceChanged": "Workspace changed"
+    },
+    "age": {
+      "lessThanMinute": "<1m",
+      "minutes": "{{count}}m",
+      "hours": "{{hours}}hr",
+      "days": "{{days}}d"
+    },
+    "activity": {
+      "subagentRunning": "Subagent running",
+      "readingFile": "Reading {{file}}",
+      "runningTool": "Running {{name}}",
+      "editingFile": "Editing {{file}}",
+      "editingFileGeneric": "Editing a file",
+      "runningShellCommand": "Running a shell command",
+      "runningCommand": "Running `{{command}}`",
+      "committingChanges": "Committing changes",
+      "pushingBranch": "Pushing branch",
+      "fetchingUrl": "Fetching {{url}}",
+      "searching": "Searching “{{query}}”"
+    }
+  },
+  "sharedContext": {
+    "title": "Shared Notes"
+  },
+  "skills": {
+    "moveSkill": "Move {{name}}",
+    "deleteSkill": "Delete {{name}}",
+    "projectLabel": "Project",
+    "addDialog": {
+      "title": "Add {{provider}} Skill",
+      "chooseFileTitle": "Choose SKILL.md",
+      "chooseFolderTitle": "Choose a skill folder",
+      "uploadHint": "Upload a SKILL.md file or a complete skill folder.",
+      "pickTitle": "Pick a skill folder or SKILL.md",
+      "pickHint": "Folders can include scripts, references, and assets.",
+      "chooseFiles": "Choose Files",
+      "chooseFolder": "Choose Folder",
+      "readyToInstall": "Ready to install",
+      "markdownFileMeta": "Markdown file · {{size}}",
+      "folderFilesMeta": {
+        "one": "{{count}} file · {{size}}",
+        "other": "{{count}} files · {{size}}"
+      },
+      "removeQueued": "Remove {{name}}",
+      "whereWillThisInstall": "Where will this install?",
+      "hideInstallLocation": "Hide install location",
+      "folderUploadsNote": "Folder uploads keep the selected folder name; standalone files use the `name` in `SKILL.md`.",
+      "installSkill": "Install Skill",
+      "installSkills": {
+        "one": "Install {{count}} Skill",
+        "other": "Install {{count}} Skills"
+      }
+    },
+    "moveDialog": {
+      "toProjectHint": "Choose the project that should own this skill. It moves out of the provider's global skills directory.",
+      "toGlobalHint": "Move this skill into the global skills directory so every project can use it.",
+      "moveToProject": "Move to project",
+      "moveToGlobal": "Move to global"
+    },
+    "screen": {
+      "manageDescription": "Manage {{provider}} skills from local files, complete folders, and project-aware locations.",
+      "searchHint": "Search skills...",
+      "clearSearch": "Clear skill search",
+      "addSkill": "Add Skill",
+      "scanningProjectSkills": "Scanning project skills...",
+      "savedSuccessfully": "Skills saved successfully.",
+      "loadingSkills": "Loading {{provider}} skills…",
+      "skillsCount": {
+        "one": "{{count}} SKILL",
+        "other": "{{count}} SKILLS"
+      },
+      "deleteTitle": "Delete {{name}}?",
+      "deleteDescription": "This removes the {{directory}} directory from {{provider}}'s managed skills directory. This cannot be undone.",
+      "noDescription": "No description provided in the skill front matter.",
+      "pluginBadge": "Plugin: {{name}}",
+      "projectBadge": "Project: {{name}}",
+      "sourceLabel": "SOURCE"
+    },
+    "empty": {
+      "noProjects": "No projects available",
+      "noProjectsDescription": "Add a project or workspace to browse its skills.",
+      "noSkillsInProject": "No skills in this project",
+      "noSkillsInProjectDescription": "Create a .claude/skills, .cursor/skills or .agents/skills folder in the selected project.",
+      "noGlobalSkills": "No global skills discovered yet",
+      "noGlobalSkillsDescription": "Add a global skill above to make it available across every project.",
+      "noMatchingSkills": "No matching skills",
+      "noMatchingSkillsDescription": "Try a different command, name, scope, project, or source path."
+    },
+    "scopes": {
+      "user": "User",
+      "plugin": "Plugin",
+      "repo": "Repo",
+      "project": "Project",
+      "admin": "Admin",
+      "system": "System"
+    },
+    "errors": {
+      "dropMarkdownOrFolder": "Drop one or more markdown files or a folder containing SKILL.md.",
+      "addMarkdownFirst": "Add one or more markdown files first.",
+      "importFailed": "Failed to import skills",
+      "folderReadFailed": "Failed to read skill folder",
+      "folderFileLimit": "A skill folder can contain up to {{count}} files.",
+      "folderSizeLimit": "Selected skill folders must be smaller than 30 MB in total.",
+      "missingSkillFile": "The selected folder does not contain a SKILL.md file.",
+      "couldNotReadSkillFile": "Could not read SKILL.md from {{name}}."
+    }
+  },
+  "terminal": {
+    "tabs": {
+      "shellName": "Shell {{index}}",
+      "plainShell": "Plain Shell",
+      "claudeCli": "Claude CLI",
+      "opencodeCli": "OpenCode CLI",
+      "commandCodeCli": "Command Code CLI",
+      "antigravityCli": "Antigravity CLI",
+      "cursorCli": "Cursor CLI",
+      "devinCli": "Devin CLI",
+      "loginTitle": "Login: {{provider}}"
+    },
+    "actions": {
+      "newTab": "New Terminal Tab",
+      "providerLogin": "Provider Login",
+      "restartSession": "Restart Session",
+      "clearOutput": "Clear Output",
+      "newShell": "New Shell",
+      "connect": "Connect"
+    },
+    "authUrl": {
+      "openInBrowser": "Open in browser"
+    },
+    "fileLink": {
+      "detected": "File detected: {{path}}"
+    },
+    "shortcuts": {
+      "interrupt": "Interrupt (SIGINT)",
+      "eof": "EOF",
+      "suspend": "Suspend (SIGTSTP)",
+      "hide": "Hide shortcuts bar",
+      "showTooltip": "Show Shortcuts",
+      "hideTooltip": "Hide Shortcuts"
+    },
+    "paste": {
+      "title": "Paste into terminal",
+      "hint": "Ctrl+V / right-click → Paste"
+    },
+    "errors": {
+      "couldNotOpenLink": "Could not open link: {{url}}"
+    }
+  },
+  "voice": {
+    "preview": "Preview",
+    "settingsSaved": "Voice input settings saved",
+    "saveFailed": "Failed to save STT configuration",
+    "apiKeySaved": "API Key (saved, enter to replace)"
+  },
+  "workspace": {
+    "exportChat": "Export chat",
+    "searchTranscript": "Search transcript",
+    "previousMatch": "Previous match",
+    "nextMatch": "Next match",
+    "closeSearch": "Close search",
+    "newChatProvider": "New chat — provider",
+    "closePane": "Close pane",
+    "jumpToSession": "Jump to session…",
+    "archivedWorkspaceName": "Archived",
+    "sendTo": "Send to {{count}}",
+    "deleteSessionNotice": "Removes the session and its transcript. Cannot be undone.",
+    "accountWithLabel": "Default · {{label}}",
+    "finishRunBeforeChangingWorkspace": "Finish the run before changing workspace",
+    "restored": "Workspace restored",
+    "maximizePane": "Maximize pane",
+    "restorePanes": "Restore panes",
+    "reviewChangedFiles": "Review changed files"
+  },
+  "worktrees": {
+    "scripts": "Scripts",
+    "emptyTitle": "No worktrees found",
+    "emptyDescription": "Create a worktree to isolate feature work or agent runs.",
+    "opened": "Opened worktree: {{branch}}",
+    "created": "Worktree created",
+    "removed": "Worktree removed",
+    "merged": "Worktree merged into {{branch}}",
+    "scriptsSaved": "Scripts configuration saved",
+    "setupLabel": "Setup: ",
+    "serverLabel": "Server: ",
+    "runRunning": "running",
+    "runRunningWithPort": "running :{{port}}",
+    "runButton": "Run",
+    "stopButton": "Stop",
+    "mainBadge": "main",
+    "headDetachedAt": "HEAD detached at {{sha}}",
+    "branchHint": "New branch name (e.g. feature/login)",
+    "branchingOff": "Branching off {{branch}}",
+    "mergeTitle": "Merge {{branch}}",
+    "mergeDescription": "Merge changes into {{branch}}.",
+    "squashDescription": "Combine all commits into a single commit",
+    "cleanupDescription": "Remove worktree and delete branch once merged",
+    "removeTitle": "Remove worktree {{branch}}?",
+    "removeDescription": "This deletes the worktree folder. Linked projects will be archived.",
+    "dirtyWarning": "Warning: This worktree has {{count}} uncommitted changes that will be lost.",
+    "forceRemoveLabel": "Force remove (discard changes)",
+    "deleteBranchLabel": "Delete branch as well",
+    "setupHint": "Setup command (e.g. npm install)",
+    "runHint": "Run command (e.g. npm run dev)",
+    "portHint": "Run port (optional, e.g. 3000)"
   }
 }

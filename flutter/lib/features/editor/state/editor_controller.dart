@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:ddagent_app/core/network/api_error.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_repository.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -189,11 +190,17 @@ Future<bool> confirmCloseTab(BuildContext context, EditorTab tab) async {
   final discard = await showDialog<bool>(
     context: context,
     builder: (ctx) => AlertDialog(
-      title: Text('Unsaved changes in ${tab.name}'),
-      content: const Text('Discard unsaved changes?'),
+      title: Text(t.codeEditor.unsavedChanges(name: tab.name)),
+      content: Text(t.codeEditor.discardUnsavedChanges),
       actions: [
-        TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancel')),
-        FilledButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Discard')),
+        TextButton(
+          onPressed: () => Navigator.of(ctx).pop(false),
+          child: Text(t.chat.orchestrator.summary.cancelTasks),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.of(ctx).pop(true),
+          child: Text(t.common.gitPanel.confirmActions.discard),
+        ),
       ],
     ),
   );

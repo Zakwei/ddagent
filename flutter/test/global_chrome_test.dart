@@ -9,6 +9,7 @@ import 'package:ddagent_app/features/settings/view/quick_settings_sheet.dart';
 import 'package:ddagent_app/features/system/data/system_repository.dart';
 import 'package:ddagent_app/features/system/state/update_controller.dart';
 import 'package:ddagent_app/features/workspace/view/session_quick_switcher.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -44,18 +45,22 @@ class _FakeSessions extends SessionsController {
   );
 }
 
-Widget _app(Widget child) => ProviderScope(
-  child: MaterialApp(
-    theme: AppTheme.light(),
-    home: Scaffold(body: child),
+Widget _app(Widget child) => TranslationProvider(
+  child: ProviderScope(
+    child: MaterialApp(
+      theme: AppTheme.light(),
+      home: Scaffold(body: child),
+    ),
   ),
 );
 
-Widget _badgeApp(SystemRepository repo) => ProviderScope(
-  overrides: [systemRepositoryProvider.overrideWithValue(repo)],
-  child: MaterialApp(
-    theme: AppTheme.light(),
-    home: const Scaffold(body: UpdateBadge()),
+Widget _badgeApp(SystemRepository repo) => TranslationProvider(
+  child: ProviderScope(
+    overrides: [systemRepositoryProvider.overrideWithValue(repo)],
+    child: MaterialApp(
+      theme: AppTheme.light(),
+      home: const Scaffold(body: UpdateBadge()),
+    ),
   ),
 );
 
@@ -156,9 +161,11 @@ void main() {
       );
 
       await tester.pumpWidget(
-        ProviderScope(
-          overrides: [sessionsProvider((null, null)).overrideWith(_FakeSessions.new)],
-          child: MaterialApp.router(theme: AppTheme.light(), routerConfig: router),
+        TranslationProvider(
+          child: ProviderScope(
+            overrides: [sessionsProvider((null, null)).overrideWith(_FakeSessions.new)],
+            child: MaterialApp.router(theme: AppTheme.light(), routerConfig: router),
+          ),
         ),
       );
       await tester.pumpAndSettle();

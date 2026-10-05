@@ -1,5 +1,6 @@
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/features/taskmaster/data/taskmaster_models.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 
 const taskStatuses = ['pending', 'in-progress', 'review', 'done', 'deferred', 'cancelled'];
@@ -57,6 +58,7 @@ class TaskmasterTaskTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     final done = task.status == 'done';
     final inProgress = task.status == 'in-progress';
     final subs = task.subtasks;
@@ -73,7 +75,7 @@ class TaskmasterTaskTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               IconButton(
-                tooltip: done ? 'Reopen' : 'Mark done',
+                tooltip: done ? i18n.tasks.list.reopen : i18n.tasks.list.markDone,
                 onPressed: busy ? null : onToggleDone,
                 icon: Icon(
                   taskStatusIcon(task.status),
@@ -167,7 +169,9 @@ class TaskmasterTaskTile extends StatelessWidget {
               ),
               if (!done)
                 IconButton(
-                  tooltip: inProgress ? 'Task in progress' : 'Start task',
+                  tooltip: inProgress
+                      ? i18n.tasks.card.taskInProgress
+                      : i18n.tasks.nextTask.startTask,
                   onPressed: busy || inProgress ? null : onRun,
                   icon: Icon(
                     Icons.play_arrow,

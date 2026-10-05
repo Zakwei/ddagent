@@ -8,6 +8,7 @@ import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/features/taskmaster/data/taskmaster_models.dart';
 import 'package:ddagent_app/features/taskmaster/state/taskmaster_controller.dart';
 import 'package:ddagent_app/features/taskmaster/view/task_tile.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -82,7 +83,7 @@ class _TaskDetailDialogState extends ConsumerState<TaskDetailDialog> {
 
   Future<void> _save(TaskmasterTask task) async {
     if (_title.text.trim().isEmpty) {
-      setState(() => _error = 'Title is required');
+      setState(() => _error = Translations.of(context).tasks.taskDetail.titleRequired);
       return;
     }
     final deps = [
@@ -123,7 +124,7 @@ class _TaskDetailDialogState extends ConsumerState<TaskDetailDialog> {
   Future<void> _copyId(String id) async {
     await Clipboard.setData(ClipboardData(text: id));
     if (!mounted) return;
-    AppToast.show(context, 'Task ID copied');
+    AppToast.show(context, Translations.of(context).tasks.taskDetail.idCopied);
   }
 
   /// Dependency chip — opens the referenced task (TaskDetailModal parity).
@@ -152,10 +153,11 @@ class _TaskDetailDialogState extends ConsumerState<TaskDetailDialog> {
   }
 
   Future<void> _delete(TaskmasterTask task) async {
+    final i18n = Translations.of(context);
     final ok = await AppDialog.confirm(
       context,
-      title: 'Delete task?',
-      message: 'Task #${task.idText} will be removed. This cannot be undone.',
+      title: i18n.tasks.taskDetail.deleteConfirmTitle,
+      message: i18n.tasks.taskDetail.deleteConfirmMessage(id: task.idText),
       confirmLabel: 'Delete',
     );
     if (!ok || !mounted) return;
@@ -170,13 +172,14 @@ class _TaskDetailDialogState extends ConsumerState<TaskDetailDialog> {
     final task = _task(state);
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     if (task == null) {
       return AppDialog(
-        title: 'Task #${widget.taskId}',
-        content: const SizedBox(
+        title: i18n.tasks.taskDetail.taskId(id: widget.taskId),
+        content: SizedBox(
           width: 420,
           height: 120,
-          child: Center(child: Text('Task not found')),
+          child: Center(child: Text(i18n.tasks.taskDetail.notFound)),
         ),
       );
     }
@@ -205,7 +208,10 @@ class _TaskDetailDialogState extends ConsumerState<TaskDetailDialog> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Status', style: t.labelSmall?.copyWith(color: c.mutedForeground)),
+                      Text(
+                        i18n.tasks.taskDetail.status,
+                        style: t.labelSmall?.copyWith(color: c.mutedForeground),
+                      ),
                       DropdownButton<String>(
                         value: task.status,
                         isDense: true,
@@ -229,12 +235,12 @@ class _TaskDetailDialogState extends ConsumerState<TaskDetailDialog> {
                   ),
                 ),
                 IconButton(
-                  tooltip: 'Copy task ID',
+                  tooltip: i18n.tasks.taskDetail.copyTaskId,
                   onPressed: busy ? null : () => unawaited(_copyId(task.idText)),
                   icon: Icon(Icons.copy, size: 16, color: c.mutedForeground),
                 ),
                 IconButton(
-                  tooltip: 'Delete task',
+                  tooltip: i18n.tasks.taskDetail.delete,
                   onPressed: busy ? null : () => unawaited(_delete(task)),
                   icon: Icon(Icons.delete_outline, size: 18, color: c.destructive),
                 ),
@@ -244,15 +250,18 @@ class _TaskDetailDialogState extends ConsumerState<TaskDetailDialog> {
             if (_editing) ...[
               field('Title', _title),
               const SizedBox(height: AppSpacing.sm),
-              field('Description', _description, lines: 3),
+              field(i18n.tasks.taskDetail.description, _description, lines: 3),
               const SizedBox(height: AppSpacing.sm),
-              field('Implementation details', _details, lines: 4),
+              field(i18n.tasks.taskDetail.implDetails, _details, lines: 4),
               const SizedBox(height: AppSpacing.sm),
-              field('Test strategy', _testStrategy, lines: 2),
+              field(i18n.tasks.taskDetail.testStrategy, _testStrategy, lines: 2),
               const SizedBox(height: AppSpacing.sm),
               field('Dependencies (comma-separated ids)', _deps),
               const SizedBox(height: AppSpacing.sm),
-              Text('Priority', style: t.labelSmall?.copyWith(color: c.mutedForeground)),
+              Text(
+                i18n.tasks.taskDetail.priority,
+                style: t.labelSmall?.copyWith(color: c.mutedForeground),
+              ),
               DropdownButton<String>(
                 value: _priority,
                 isDense: true,
@@ -261,7 +270,10 @@ class _TaskDetailDialogState extends ConsumerState<TaskDetailDialog> {
                 items: [for (final p in taskPriorities) DropdownMenuItem(value: p, child: Text(p))],
               ),
             ] else ...[
-              Text('Description', style: t.labelSmall?.copyWith(color: c.mutedForeground)),
+              Text(
+                i18n.tasks.taskDetail.description,
+                style: t.labelSmall?.copyWith(color: c.mutedForeground),
+              ),
               Text(
                 task.description.isEmpty ? 'No description provided' : task.description,
                 style: t.bodySmall,
@@ -270,7 +282,7 @@ class _TaskDetailDialogState extends ConsumerState<TaskDetailDialog> {
                 const SizedBox(height: AppSpacing.sm),
                 ExpansionTile(
                   tilePadding: EdgeInsets.zero,
-                  title: Text('Implementation details', style: t.labelMedium),
+                  title: Text(i18n.tasks.taskDetail.implDetails, style: t.labelMedium),
                   children: [
                     Align(
                       alignment: Alignment.centerLeft,
@@ -282,7 +294,7 @@ class _TaskDetailDialogState extends ConsumerState<TaskDetailDialog> {
               if (task.testStrategy.isNotEmpty) ...[
                 ExpansionTile(
                   tilePadding: EdgeInsets.zero,
-                  title: Text('Test strategy', style: t.labelMedium),
+                  title: Text(i18n.tasks.taskDetail.testStrategy, style: t.labelMedium),
                   children: [
                     Align(
                       alignment: Alignment.centerLeft,
@@ -293,7 +305,10 @@ class _TaskDetailDialogState extends ConsumerState<TaskDetailDialog> {
               ],
               if (task.dependencies.isNotEmpty) ...[
                 const SizedBox(height: AppSpacing.xs),
-                Text('Dependencies', style: t.labelSmall?.copyWith(color: c.mutedForeground)),
+                Text(
+                  i18n.tasks.taskDetail.dependencies,
+                  style: t.labelSmall?.copyWith(color: c.mutedForeground),
+                ),
                 const SizedBox(height: 4),
                 Wrap(
                   spacing: 6,
@@ -309,7 +324,7 @@ class _TaskDetailDialogState extends ConsumerState<TaskDetailDialog> {
               ),
             if (task.subtasks.isNotEmpty) ...[
               const SizedBox(height: AppSpacing.sm),
-              Text('Subtasks', style: t.labelMedium),
+              Text(i18n.tasks.taskDetail.subtasks, style: t.labelMedium),
               for (final s in task.subtasks)
                 Row(
                   children: [
@@ -333,19 +348,19 @@ class _TaskDetailDialogState extends ConsumerState<TaskDetailDialog> {
         AppButton(
           variant: AppButtonVariant.ghost,
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Close'),
+          child: Text(i18n.tasks.taskDetail.close),
         ),
         if (_editing)
           AppButton(
             loading: busy,
             onPressed: () => unawaited(_save(task)),
-            child: const Text('Save'),
+            child: Text(i18n.tasks.taskDetail.save),
           )
         else
           AppButton(
             variant: AppButtonVariant.secondary,
             onPressed: () => setState(() => _editing = true),
-            child: const Text('Edit'),
+            child: Text(i18n.common.buttons.edit),
           ),
       ],
     );
@@ -378,9 +393,10 @@ class _CreateTaskDialogState extends ConsumerState<CreateTaskDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final i18n = Translations.of(context);
     final busy = ref.watch(taskmasterProvider).busy;
     return AppDialog(
-      title: 'Add task',
+      title: i18n.tasks.createTask.title,
       content: SizedBox(
         width: 420,
         child: Column(
@@ -388,7 +404,7 @@ class _CreateTaskDialogState extends ConsumerState<CreateTaskDialog> {
           children: [
             AppInput(
               controller: _title,
-              hint: 'What needs to be done?',
+              hint: i18n.tasks.createTask.titlePlaceholder,
               autofocus: true,
               enabled: !busy,
               onChanged: (_) => setState(() {}),
@@ -396,7 +412,7 @@ class _CreateTaskDialogState extends ConsumerState<CreateTaskDialog> {
             const SizedBox(height: AppSpacing.sm),
             AppInput(
               controller: _description,
-              hint: 'Optional details',
+              hint: i18n.tasks.createTask.descriptionPlaceholder,
               maxLines: 3,
               enabled: !busy,
             ),
@@ -418,7 +434,7 @@ class _CreateTaskDialogState extends ConsumerState<CreateTaskDialog> {
         AppButton(
           variant: AppButtonVariant.ghost,
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(i18n.tasks.createTask.cancel),
         ),
         AppButton(
           loading: busy,
@@ -438,7 +454,7 @@ class _CreateTaskDialogState extends ConsumerState<CreateTaskDialog> {
                     if (err != null) AppToast.error(context, err);
                   }
                 },
-          child: const Text('Add Task'),
+          child: Text(i18n.tasks.createTask.submit),
         ),
       ],
     );

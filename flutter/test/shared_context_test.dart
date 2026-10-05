@@ -5,6 +5,7 @@ import 'package:ddagent_app/features/shared_context/data/shared_context_models.d
 import 'package:ddagent_app/features/shared_context/data/shared_context_repository.dart';
 import 'package:ddagent_app/features/shared_context/state/shared_context_controller.dart';
 import 'package:ddagent_app/features/shared_context/view/shared_notes_pane.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -77,16 +78,18 @@ Widget _buildApp({
   bool dark = false,
   bool useScreen = false,
 }) {
-  return ProviderScope(
-    overrides: [
-      sharedContextRepositoryProvider.overrideWithValue(repo),
-      projectsRepositoryProvider.overrideWithValue(_FakeProjectsRepo()),
-    ],
-    child: MaterialApp(
-      theme: dark ? AppTheme.dark() : AppTheme.light(),
-      home: useScreen
-          ? SharedNotesScreen(projectId: projectId)
-          : Scaffold(body: SharedNotesPane(projectId: projectId)),
+  return TranslationProvider(
+    child: ProviderScope(
+      overrides: [
+        sharedContextRepositoryProvider.overrideWithValue(repo),
+        projectsRepositoryProvider.overrideWithValue(_FakeProjectsRepo()),
+      ],
+      child: MaterialApp(
+        theme: dark ? AppTheme.dark() : AppTheme.light(),
+        home: useScreen
+            ? SharedNotesScreen(projectId: projectId)
+            : Scaffold(body: SharedNotesPane(projectId: projectId)),
+      ),
     ),
   );
 }

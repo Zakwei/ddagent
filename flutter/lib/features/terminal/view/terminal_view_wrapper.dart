@@ -8,6 +8,7 @@ import 'package:ddagent_app/core/utils/selection_copy.dart';
 import 'package:ddagent_app/features/settings/state/ui_preferences_controller.dart';
 import 'package:ddagent_app/features/terminal/state/terminal_state.dart';
 import 'package:ddagent_app/features/workspace/view/split_workspace_grid.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -115,8 +116,9 @@ class _TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
       } on Object {
         if (mounted) {
+          final t = Translations.of(context);
           ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text('Could not open link: $url')));
+              .showSnackBar(SnackBar(content: Text(t.terminal.errors.couldNotOpenLink(url: url))));
         }
       }
     }
@@ -177,11 +179,14 @@ class _TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
     if (widget.onFileOpen != null) {
       widget.onFileOpen!(filePath, line);
     } else {
+      final t = Translations.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('File detected: $filePath${line != null ? ':$line' : ''}'),
+          content: Text(
+            t.terminal.fileLink.detected(path: '$filePath${line != null ? ':$line' : ''}'),
+          ),
           action: SnackBarAction(
-            label: 'Open',
+            label: t.common.gitPanel.worktrees.open,
             onPressed: () => widget.onFileOpen?.call(filePath, line),
           ),
         ),
@@ -284,22 +289,26 @@ class _TerminalPasteDialogState extends State<_TerminalPasteDialog> {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final t = Translations.of(context);
     return AlertDialog(
       backgroundColor: colors.card,
-      title: const Text('Paste into terminal'),
+      title: Text(t.terminal.paste.title),
       content: SizedBox(
         width: 420,
         child: TextField(
           controller: _ctrl,
           autofocus: true,
-          decoration: const InputDecoration(hintText: 'Ctrl+V / right-click → Paste'),
+          decoration: InputDecoration(hintText: t.terminal.paste.hint),
           maxLines: null,
           onSubmitted: (_) => _submit(),
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cancel')),
-        FilledButton(onPressed: _submit, child: const Text('Paste')),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(t.common.buttons.cancel),
+        ),
+        FilledButton(onPressed: _submit, child: Text(t.settings.terminalShortcuts.paste)),
       ],
     );
   }

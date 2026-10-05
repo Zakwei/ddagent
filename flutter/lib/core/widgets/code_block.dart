@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/utils/clipboard.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_highlight/themes/atom-one-dark.dart';
 import 'package:flutter_highlight/themes/atom-one-light.dart';
@@ -76,6 +77,7 @@ class _CodeBlockState extends State<CodeBlock> {
   Widget _header(BuildContext context) {
     final theme = Theme.of(context);
     final colors = context.appColors;
+    final t = Translations.of(context);
     final label = widget.filename ?? widget.language ?? 'code';
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -96,13 +98,13 @@ class _CodeBlockState extends State<CodeBlock> {
             ),
           ),
           IconButton(
-            tooltip: _wrap ? 'No wrap' : 'Wrap lines',
+            tooltip: _wrap ? t.common.codeBlock.noWrap : t.common.codeBlock.wrapLines,
             visualDensity: VisualDensity.compact,
             icon: Icon(_wrap ? Icons.wrap_text : Icons.align_horizontal_left, size: 15),
             onPressed: () => setState(() => _wrap = !_wrap),
           ),
           IconButton(
-            tooltip: 'Copy',
+            tooltip: t.chat.codeBlock.copy,
             visualDensity: VisualDensity.compact,
             icon: const Icon(Icons.copy_outlined, size: 15),
             onPressed: () => unawaited(copyTextWithFeedback(context, widget.code)),

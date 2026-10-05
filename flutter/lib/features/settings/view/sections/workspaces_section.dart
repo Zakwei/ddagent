@@ -179,7 +179,7 @@ class _AddWorkspaceDialogState extends ConsumerState<_AddWorkspaceDialog> {
 
   Future<void> _create() async {
     if (_path.text.trim().isEmpty) {
-      setState(() => _error = 'Path is required');
+      setState(() => _error = Translations.of(context).settings.workspaces.pathRequired);
       return;
     }
     setState(() {
@@ -206,7 +206,8 @@ class _AddWorkspaceDialogState extends ConsumerState<_AddWorkspaceDialog> {
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
-    final t = Translations.of(context).settings.workspaces;
+    final i18n = Translations.of(context);
+    final t = i18n.settings.workspaces;
     return AppDialog(
       title: t.create,
       content: Column(
@@ -216,17 +217,21 @@ class _AddWorkspaceDialogState extends ConsumerState<_AddWorkspaceDialog> {
             spacing: AppSpacing.xs,
             children: [
               Expanded(
-                child: AppInput(controller: _path, hint: 'Project path', autofocus: true),
+                child: AppInput(
+                  controller: _path,
+                  hint: i18n.sessions.projectPath,
+                  autofocus: true,
+                ),
               ),
               IconButton(
-                tooltip: 'Browse',
+                tooltip: i18n.common.buttons.browse,
                 icon: const Icon(Icons.folder_open),
                 onPressed: () => unawaited(_browse()),
               ),
             ],
           ),
           const SizedBox(height: AppSpacing.md),
-          AppInput(controller: _name, hint: 'Display name (optional)'),
+          AppInput(controller: _name, hint: i18n.projects.displayNameOptional),
           if (_error != null) ...[
             const SizedBox(height: AppSpacing.sm),
             Text(_error!, style: TextStyle(color: c.destructive)),

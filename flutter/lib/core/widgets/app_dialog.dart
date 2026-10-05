@@ -1,5 +1,6 @@
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 
 /// Modal dialog — popover surface, lg radius.
@@ -41,6 +42,7 @@ class AppDialog extends StatelessWidget {
     required String message,
     String confirmLabel = 'Confirm',
   }) async {
+    final t = Translations.of(context);
     final result = await showDialog<bool>(
       context: context,
       builder: (ctx) => AppDialog(
@@ -50,7 +52,7 @@ class AppDialog extends StatelessWidget {
           AppButton(
             variant: AppButtonVariant.ghost,
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
+            child: Text(t.chat.orchestrator.summary.cancelTasks),
           ),
           AppButton(onPressed: () => Navigator.of(ctx).pop(true), child: Text(confirmLabel)),
         ],

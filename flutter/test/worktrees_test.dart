@@ -5,6 +5,7 @@ import 'package:ddagent_app/features/worktrees/data/worktrees_models.dart';
 import 'package:ddagent_app/features/worktrees/data/worktrees_repository.dart';
 import 'package:ddagent_app/features/worktrees/state/worktrees_controller.dart';
 import 'package:ddagent_app/features/worktrees/view/worktrees_screen.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -239,14 +240,16 @@ class _FakeProjectsRepo extends ProjectsRepository {
 }
 
 Widget _buildApp({required _FakeWorktreesRepo repo, bool dark = false}) {
-  return ProviderScope(
-    overrides: [
-      worktreesRepositoryProvider.overrideWithValue(repo),
-      projectsRepositoryProvider.overrideWithValue(_FakeProjectsRepo()),
-    ],
-    child: MaterialApp(
-      theme: dark ? AppTheme.dark() : AppTheme.light(),
-      home: const WorktreesScreen(projectId: 'p1'),
+  return TranslationProvider(
+    child: ProviderScope(
+      overrides: [
+        worktreesRepositoryProvider.overrideWithValue(repo),
+        projectsRepositoryProvider.overrideWithValue(_FakeProjectsRepo()),
+      ],
+      child: MaterialApp(
+        theme: dark ? AppTheme.dark() : AppTheme.light(),
+        home: const WorktreesScreen(projectId: 'p1'),
+      ),
     ),
   );
 }
@@ -499,7 +502,7 @@ void main() {
       expect(find.text('Worktrees'), findsOneWidget);
       expect(find.text('main'), findsWidgets);
       expect(find.text('feature/auth'), findsOneWidget);
-      expect(find.text('2 changes'), findsOneWidget);
+      expect(find.text('2 change(s)'), findsOneWidget);
       expect(find.text('1↑ 0↓'), findsOneWidget);
       expect(find.text('Add auth module'), findsOneWidget);
       expect(find.text('Open'), findsNWidgets(2));

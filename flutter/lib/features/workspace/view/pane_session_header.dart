@@ -64,19 +64,23 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
   bool _titleHover = false;
 
   Future<void> _renameDialog(BuildContext context) async {
+    final i18n = Translations.of(context);
     final field = TextEditingController(text: widget.title);
     final saved = await showDialog<bool>(
       context: context,
       builder: (ctx) => AppDialog(
-        title: 'Rename session',
+        title: i18n.common.sessions.renameSession,
         content: AppInput(controller: field, autofocus: true),
         actions: [
           AppButton(
             variant: AppButtonVariant.ghost,
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
+            child: Text(i18n.chat.orchestrator.summary.cancelTasks),
           ),
-          AppButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Save')),
+          AppButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(i18n.codeEditor.actions.save),
+          ),
         ],
       ),
     );
@@ -89,6 +93,7 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context);
+    final i18n = Translations.of(context);
     final c = context.appColors;
     // Delegated sessions carry an orchestrator parent — the arrow-left button
     // rebinds this pane to it (web `backToParent`). Orchestrator roots and
@@ -129,7 +134,7 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
             onEnter: (_) => setState(() => _titleHover = true),
             onExit: (_) => setState(() => _titleHover = false),
             child: Tooltip(
-              message: 'Rename session',
+              message: i18n.common.sessions.renameSession,
               child: GestureDetector(
                 onTap: () => unawaited(_renameDialog(context)),
                 behavior: HitTestBehavior.opaque,
@@ -173,7 +178,7 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
       // History — the web's "Switch session" h-4 w-4 button (h-3 icon).
       _headerIcon(
         icon: LucideIcons.history,
-        tooltip: 'Switch session',
+        tooltip: i18n.chat.paneHeader.switchSession,
         onPressed: widget.onChangeSession,
       ),
       PopupMenuButton<String>(
@@ -194,23 +199,30 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
           }
         },
         itemBuilder: (_) => [
-          const PopupMenuItem(value: 'rename', child: Text('Rename')),
-          const PopupMenuItem(value: 'change', child: Text('Change session')),
+          PopupMenuItem(value: 'rename', child: Text(i18n.common.fileOperations.rename)),
+          PopupMenuItem(value: 'change', child: Text(i18n.chat.sessionPicker.changeSession)),
           if (widget.onChangeWorkspace != null)
             PopupMenuItem(
               value: 'workspace',
               // Web disables cwd repoint mid-run — tools would run in the
               // wrong folder.
               enabled: !guarded,
-              child: const Text('Change workspace'),
+              child: Text(i18n.sidebar.workspace.submit),
             ),
           // Web disables archive/delete while processing or awaiting a
           // permission answer — the server rejects those mid-run anyway.
-          PopupMenuItem(value: 'archive', enabled: !guarded, child: const Text('Archive')),
+          PopupMenuItem(
+            value: 'archive',
+            enabled: !guarded,
+            child: Text(i18n.sidebar.search.archiveOnly),
+          ),
           PopupMenuItem(
             value: 'delete',
             enabled: !guarded,
-            child: Text('Delete permanently', style: TextStyle(color: c.destructive)),
+            child: Text(
+              i18n.sidebar.deleteConfirmation.deleteSessionPermanently,
+              style: TextStyle(color: c.destructive),
+            ),
           ),
         ],
         child: SizedBox(
@@ -277,6 +289,7 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
   List<Widget> _transcriptTools(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     final m = paneHeaderMetrics(context);
     final controller = ref.read(transcriptToolsProvider(widget.sessionId).notifier);
     final tools = ref.watch(transcriptToolsProvider(widget.sessionId));
@@ -302,7 +315,7 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
     return [
       // Export chat — markdown / html / pdf.
       PopupMenuButton<String>(
-        tooltip: 'Export chat',
+        tooltip: i18n.workspace.exportChat,
         padding: EdgeInsets.zero,
         position: PopupMenuPosition.under,
         offset: const Offset(0, 8),
@@ -348,7 +361,9 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
       // Review changed files.
       iconButton(
         icon: LucideIcons.filter,
-        tooltip: tools.reviewOpen ? 'Back to chat' : 'Review changed files',
+        tooltip: tools.reviewOpen
+            ? i18n.common.quota.backToChat
+            : i18n.workspace.reviewChangedFiles,
         active: tools.reviewOpen,
         onTap: controller.toggleReview,
       ),
@@ -356,7 +371,7 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
       if (!tools.searchActive)
         iconButton(
           icon: LucideIcons.search,
-          tooltip: 'Search transcript',
+          tooltip: i18n.workspace.searchTranscript,
           onTap: controller.openSearch,
         )
       else ...[
@@ -372,7 +387,7 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
           ),
           iconButton(
             icon: LucideIcons.chevronUp,
-            tooltip: 'Previous match',
+            tooltip: i18n.workspace.previousMatch,
             onTap: tools.matches.isEmpty
                 ? null
                 : () => controller.goToMatch(
@@ -381,7 +396,7 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
           ),
           iconButton(
             icon: LucideIcons.chevronDown,
-            tooltip: 'Next match',
+            tooltip: i18n.workspace.nextMatch,
             onTap: tools.matches.isEmpty
                 ? null
                 : () => controller.goToMatch((tools.matchPos + 1) % tools.matches.length),
@@ -401,8 +416,8 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
               controller: controller.searchController,
               focusNode: controller.searchFocus,
               style: t.labelSmall?.copyWith(fontSize: 12),
-              decoration: const InputDecoration(
-                hintText: 'Search',
+              decoration: InputDecoration(
+                hintText: i18n.common.buttons.search,
                 isDense: true,
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.zero,
@@ -411,7 +426,11 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
             ),
           ),
         ),
-        iconButton(icon: LucideIcons.x, tooltip: 'Close search', onTap: controller.closeSearch),
+        iconButton(
+          icon: LucideIcons.x,
+          tooltip: i18n.workspace.closeSearch,
+          onTap: controller.closeSearch,
+        ),
       ],
     ];
   }

@@ -1,5 +1,6 @@
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/theme/typography.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -26,6 +27,7 @@ class TerminalShortcutsBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final t = Translations.of(context);
 
     return Container(
       height: 40,
@@ -41,8 +43,14 @@ class TerminalShortcutsBar extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: Row(
                 children: [
-                  _ShortcutButton(label: 'ESC', onPressed: () => onSendInput('\x1b')),
-                  _ShortcutButton(label: 'TAB', onPressed: () => onSendInput('\t')),
+                  _ShortcutButton(
+                    label: t.settings.terminalShortcuts.escape,
+                    onPressed: () => onSendInput('\x1b'),
+                  ),
+                  _ShortcutButton(
+                    label: t.settings.terminalShortcuts.tab,
+                    onPressed: () => onSendInput('\t'),
+                  ),
                   _ShortcutButton(label: '▲', onPressed: () => onSendInput('\x1b[A')),
                   _ShortcutButton(label: '▼', onPressed: () => onSendInput('\x1b[B')),
                   _ShortcutButton(label: '◄', onPressed: () => onSendInput('\x1b[D')),
@@ -50,24 +58,28 @@ class TerminalShortcutsBar extends StatelessWidget {
                   _ShortcutButton(
                     label: 'Ctrl+C',
                     onPressed: () => onSendInput('\x03'),
-                    tooltip: 'Interrupt (SIGINT)',
+                    tooltip: t.terminal.shortcuts.interrupt,
                   ),
                   _ShortcutButton(
                     label: 'Ctrl+D',
                     onPressed: () => onSendInput('\x04'),
-                    tooltip: 'EOF',
+                    tooltip: t.terminal.shortcuts.eof,
                   ),
                   _ShortcutButton(
                     label: 'Ctrl+Z',
                     onPressed: () => onSendInput('\x1a'),
-                    tooltip: 'Suspend (SIGTSTP)',
+                    tooltip: t.terminal.shortcuts.suspend,
                   ),
                   _ShortcutButton(
-                    label: 'Paste',
+                    label: t.settings.terminalShortcuts.paste,
                     icon: Icons.paste_outlined,
                     onPressed: _handlePaste,
                   ),
-                  _ShortcutButton(label: 'Clear', icon: Icons.clear_all, onPressed: onClear),
+                  _ShortcutButton(
+                    label: t.common.buttons.clear,
+                    icon: Icons.clear_all,
+                    onPressed: onClear,
+                  ),
                 ],
               ),
             ),
@@ -75,7 +87,7 @@ class TerminalShortcutsBar extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.keyboard_hide, size: 18),
             padding: const EdgeInsets.symmetric(horizontal: 8),
-            tooltip: 'Hide shortcuts bar',
+            tooltip: t.terminal.shortcuts.hide,
             color: colors.mutedForeground,
             onPressed: onClose,
           ),

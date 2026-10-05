@@ -2,6 +2,7 @@ import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/shared_context/state/shared_context_controller.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -47,6 +48,7 @@ class _SharedNotesPaneState extends ConsumerState<SharedNotesPane> {
     final ctrl = ref.read(sharedContextProvider(widget.projectId).notifier);
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
 
     _syncTextFromState(state);
 
@@ -73,7 +75,7 @@ class _SharedNotesPaneState extends ConsumerState<SharedNotesPane> {
                 const SizedBox(width: AppSpacing.xs),
                 Expanded(
                   child: Text(
-                    'Shared memory — injected into every session of this project',
+                    i18n.common.sharedNotes.subtitle,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: t.labelSmall?.copyWith(color: c.mutedForeground),
@@ -101,7 +103,11 @@ class _SharedNotesPaneState extends ConsumerState<SharedNotesPane> {
                     children: [
                       const Icon(Icons.check, size: 14),
                       const SizedBox(width: 4),
-                      Text(state.saving ? 'Saving…' : 'Save'),
+                      Text(
+                        state.saving
+                            ? i18n.common.sharedNotes.saving
+                            : i18n.common.sharedNotes.save,
+                      ),
                     ],
                   ),
                 ),
@@ -132,7 +138,7 @@ class _SharedNotesPaneState extends ConsumerState<SharedNotesPane> {
             child: widget.projectId == null
                 ? Center(
                     child: Text(
-                      'Select a workspace to edit its shared context',
+                      i18n.common.sharedNotes.noProject,
                       style: t.bodySmall?.copyWith(color: c.mutedForeground),
                     ),
                   )
@@ -149,7 +155,7 @@ class _SharedNotesPaneState extends ConsumerState<SharedNotesPane> {
                       style: t.bodySmall?.copyWith(fontFamily: 'monospace', height: 1.5),
                       decoration: InputDecoration(
                         border: InputBorder.none,
-                        hintText: '# Shared context\nConventions, decisions and pointers every agent should know…',
+                        hintText: i18n.common.sharedNotes.placeholder,
                         hintStyle: t.bodySmall?.copyWith(
                           fontFamily: 'monospace',
                           color: c.mutedForeground.withValues(alpha: 0.6),
@@ -196,6 +202,7 @@ class _SharedNotesScreenState extends ConsumerState<SharedNotesScreen> {
     final projects = ref.watch(projectsProvider).projects;
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
 
     final activeId = _selectedProjectId ?? projects.firstOrNull?.projectId;
 
@@ -217,7 +224,7 @@ class _SharedNotesScreenState extends ConsumerState<SharedNotesScreen> {
                   children: [
                     Icon(Icons.notes, size: 20, color: c.mutedForeground),
                     const SizedBox(width: AppSpacing.xs),
-                    Text('Shared Notes', style: t.titleSmall),
+                    Text(i18n.sharedContext.title, style: t.titleSmall),
                     const SizedBox(width: AppSpacing.md),
                     if (projects.isNotEmpty)
                       DropdownButton<String>(

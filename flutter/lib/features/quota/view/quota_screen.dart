@@ -12,6 +12,7 @@ import 'package:ddagent_app/features/quota/view/account_quota_card.dart';
 import 'package:ddagent_app/features/quota/view/quota_charts.dart';
 import 'package:ddagent_app/features/quota/view/quota_tone.dart';
 import 'package:ddagent_app/features/quota/view/quota_usage_panel.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -32,12 +33,28 @@ class _QuotaScreenState extends ConsumerState<QuotaScreen> {
   _Section _section = _Section.overview;
 
   static const _sections = [
-    (_Section.overview, LucideIcons.layoutDashboard, 'Overview'),
-    (_Section.accounts, LucideIcons.gauge, 'Quotas'),
-    (_Section.usage, LucideIcons.barChart3, 'Usage'),
-    (_Section.fleet, LucideIcons.users, 'Agents'),
-    (_Section.config, LucideIcons.slidersHorizontal, 'Config'),
+    _Section.overview,
+    _Section.accounts,
+    _Section.usage,
+    _Section.fleet,
+    _Section.config,
   ];
+
+  static IconData _sectionIcon(_Section section) => switch (section) {
+    _Section.overview => LucideIcons.layoutDashboard,
+    _Section.accounts => LucideIcons.gauge,
+    _Section.usage => LucideIcons.barChart3,
+    _Section.fleet => LucideIcons.users,
+    _Section.config => LucideIcons.slidersHorizontal,
+  };
+
+  static String _sectionLabel(Translations i18n, _Section section) => switch (section) {
+    _Section.overview => i18n.common.quota.section.overview,
+    _Section.accounts => i18n.common.quota.section.quotas,
+    _Section.usage => i18n.common.quota.section.usage,
+    _Section.fleet => i18n.common.quota.section.agents,
+    _Section.config => i18n.quota.section.config,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +62,7 @@ class _QuotaScreenState extends ConsumerState<QuotaScreen> {
     final ctrl = ref.read(quotaProvider.notifier);
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     final compact = context.breakpoint.isCompact;
 
     return Scaffold(
@@ -53,7 +71,7 @@ class _QuotaScreenState extends ConsumerState<QuotaScreen> {
           children: [
             SubpageHeader(
               icon: LucideIcons.monitorCog,
-              title: 'AI Control Center',
+              title: i18n.common.quota.controlCenter,
               trailing: [
                 _RangePills(
                   // ControlCenterPage.tsx RANGES — the explorer keeps the
@@ -64,7 +82,7 @@ class _QuotaScreenState extends ConsumerState<QuotaScreen> {
                 ),
                 if (state.snapshot?.generatedAt != null && !compact)
                   Text(
-                    'Updated ${formatClock(state.snapshot!.generatedAt)}',
+                    i18n.common.quota.generatedAt(value: formatClock(state.snapshot!.generatedAt)),
                     style: t.labelSmall?.copyWith(color: c.mutedForeground),
                   ),
                 AppButton(
@@ -72,15 +90,18 @@ class _QuotaScreenState extends ConsumerState<QuotaScreen> {
                   size: AppButtonSize.sm,
                   loading: state.refreshing,
                   onPressed: () => unawaited(ctrl.refresh()),
-                  child: const Row(
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     spacing: AppSpacing.xs,
-                    children: [Icon(LucideIcons.refreshCw, size: 14), Text('Sync now')],
+                    children: [
+                      const Icon(LucideIcons.refreshCw, size: 14),
+                      Text(i18n.common.quota.syncNow),
+                    ],
                   ),
                 ),
                 IconButton(
                   icon: const Icon(LucideIcons.settings, size: 16),
-                  tooltip: 'Control Center settings',
+                  tooltip: i18n.common.quota.settings.tab,
                   visualDensity: VisualDensity.compact,
                   onPressed: () => setState(() => _section = _Section.config),
                 ),
@@ -110,12 +131,12 @@ class _QuotaScreenState extends ConsumerState<QuotaScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 4),
                 child: Row(
                   children: [
-                    for (final (s, icon, label) in _sections)
+                    for (final s in _sections)
                       Padding(
                         padding: const EdgeInsets.only(right: 4),
                         child: ChoiceChip(
-                          avatar: Icon(icon, size: 14),
-                          label: Text(label),
+                          avatar: Icon(_sectionIcon(s), size: 14),
+                          label: Text(_sectionLabel(i18n, s)),
                           selected: _section == s,
                           onSelected: (_) => setState(() => _section = s),
                           visualDensity: VisualDensity.compact,
@@ -143,7 +164,8 @@ class _QuotaScreenState extends ConsumerState<QuotaScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                for (final (s, icon, label) in _sections) _navItem(s, icon, label),
+                                for (final s in _sections)
+                                  _navItem(s, _sectionIcon(s), _sectionLabel(i18n, s)),
                               ],
                             ),
                           ),
@@ -223,6 +245,7 @@ class _OverviewPanel extends ConsumerWidget {
     final t = Theme.of(context).textTheme;
     final compact = context.breakpoint.isCompact;
     final cfg = state.config;
+    final i18n = Translations.of(context);
     final summary = ref.watch(usageChartProvider).summary;
     final snapshot = state.snapshot;
     final fleet = state.fleet;
@@ -280,9 +303,9 @@ class _OverviewPanel extends ConsumerWidget {
                   width: w,
                   child: _Kpi(
                     icon: LucideIcons.triangleAlert,
-                    label: 'Limits at risk',
+                    label: i18n.common.quota.kpi.atRisk,
                     value: '${snapshot?.overview.accountsAtRisk ?? 0}',
-                    hint: 'accounts over ${watch.toStringAsFixed(0)}%',
+                    hint: i18n.common.quota.kpi.atRiskHint(value: watch.toStringAsFixed(0)),
                     tone: (snapshot?.overview.accountsAtRisk ?? 0) > 0
                         ? QuotaTone.watch
                         : QuotaTone.safe,
@@ -293,10 +316,12 @@ class _OverviewPanel extends ConsumerWidget {
                   width: w,
                   child: _Kpi(
                     icon: LucideIcons.users,
-                    label: 'Active agents',
+                    label: i18n.common.quota.kpi.activeAgents,
                     value: '${fleet?.summary.running ?? 0}',
-                    hint:
-                        '${fleet?.summary.waiting ?? 0} waiting · ${fleet?.summary.queued ?? 0} queued',
+                    hint: i18n.common.quota.kpi.agentsHint(
+                      waiting: fleet?.summary.waiting ?? 0,
+                      queued: fleet?.summary.queued ?? 0,
+                    ),
                     tone: QuotaTone.neutral,
                     onTap: onOpenAgents,
                   ),
@@ -305,9 +330,9 @@ class _OverviewPanel extends ConsumerWidget {
                   width: w,
                   child: _Kpi(
                     icon: LucideIcons.hash,
-                    label: 'Tokens',
+                    label: i18n.common.quota.metric.tokens,
                     value: formatTokens(summary?.totals.tokensTotal ?? 0),
-                    hint: '${summary?.totals.sessions ?? 0} sessions',
+                    hint: i18n.common.quota.kpi.sessionsHint(value: summary?.totals.sessions ?? 0),
                     tone: QuotaTone.neutral,
                   ),
                 ),
@@ -315,9 +340,11 @@ class _OverviewPanel extends ConsumerWidget {
                   width: w,
                   child: _Kpi(
                     icon: LucideIcons.coins,
-                    label: 'Estimated cost',
+                    label: i18n.common.quota.kpi.cost,
                     value: formatCost(summary?.totals.costUsd ?? 0),
-                    hint: '${formatCost(summary?.subscriptionValueUsd ?? 0)} covered by plans',
+                    hint: i18n.common.quota.kpi.costHint(
+                      value: formatCost(summary?.subscriptionValueUsd ?? 0),
+                    ),
                     tone: QuotaTone.neutral,
                   ),
                 ),
@@ -334,11 +361,11 @@ class _OverviewPanel extends ConsumerWidget {
               flex: compact ? 0 : 1,
               child: _OverviewCard(
                 icon: LucideIcons.gauge,
-                title: 'Usage and limits',
-                action: 'All accounts',
+                title: i18n.common.quota.overview.limitsTitle,
+                action: i18n.common.quota.overview.viewAccounts,
                 onAction: onOpenQuotas,
                 child: accounts.isEmpty
-                    ? _EmptyLine(text: 'No accounts connected')
+                    ? _EmptyLine(text: i18n.common.quota.empty.title)
                     : Column(
                         children: [
                           for (final a in accounts) ...[
@@ -359,11 +386,11 @@ class _OverviewPanel extends ConsumerWidget {
               flex: compact ? 0 : 1,
               child: _OverviewCard(
                 icon: LucideIcons.activity,
-                title: 'Active tasks',
-                action: 'All agents',
+                title: i18n.common.quota.overview.activeTasks,
+                action: i18n.common.quota.overview.viewAgents,
                 onAction: onOpenAgents,
                 child: activeAgents.isEmpty
-                    ? _EmptyLine(text: 'No agents are running right now.')
+                    ? _EmptyLine(text: i18n.common.quota.overview.noTasks)
                     : Column(
                         children: [
                           for (final e in activeAgents.take(6)) ...[
@@ -379,7 +406,7 @@ class _OverviewPanel extends ConsumerWidget {
         const SizedBox(height: AppSpacing.md),
         _OverviewCard(
           icon: LucideIcons.trendingUp,
-          title: 'Tokens and cost',
+          title: i18n.quota.overview.tokensAndCost,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -398,25 +425,32 @@ class _OverviewPanel extends ConsumerWidget {
         const SizedBox(height: AppSpacing.md),
         _OverviewCard(
           icon: null,
-          title: 'Alerts',
+          title: i18n.common.quota.overview.alertsTitle,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (paceAlerts.isEmpty && riskyWindows.isEmpty)
-                _EmptyLine(text: 'Nothing needs attention right now.'),
+                _EmptyLine(text: i18n.common.quota.overview.noAlerts),
               for (final (a, w) in paceAlerts)
                 _AlertLine(
                   color: quotaToneColor(QuotaTone.watch),
-                  text:
-                      '${a.providerLabel} · ${w.label}: at the current pace the limit runs out in ${formatRelativeTo(w.projectedExhaustionAt)}',
+                  text: i18n.common.quota.alert.pace(
+                    account: a.providerLabel,
+                    window: w.label,
+                    value: formatRelativeTo(w.projectedExhaustionAt),
+                  ),
                 ),
               for (final (a, w) in riskyWindows)
                 _AlertLine(
                   color: w.percent >= danger
                       ? quotaToneColor(QuotaTone.danger)
                       : quotaToneColor(QuotaTone.watch),
-                  text:
-                      '${a.providerLabel} · ${w.label}: ${w.percent.toStringAsFixed(0)}% used (threshold ${watch.toStringAsFixed(0)}%)',
+                  text: i18n.common.quota.alert.threshold(
+                    account: a.providerLabel,
+                    window: w.label,
+                    value: w.percent.toStringAsFixed(0),
+                    watch: watch.toStringAsFixed(0),
+                  ),
                 ),
             ],
           ),
@@ -565,6 +599,7 @@ class _AccountLimitRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     final w = window;
     final tone = account.status == 'error'
         ? QuotaTone.danger
@@ -597,14 +632,17 @@ class _AccountLimitRow extends StatelessWidget {
             ),
             if (account.status == 'error')
               Text(
-                'Error',
+                i18n.common.quota.quality.error,
                 style: t.bodySmall?.copyWith(
                   color: quotaToneColor(QuotaTone.danger),
                   fontFeatures: const [FontFeature.tabularFigures()],
                 ),
               )
             else if (account.status == 'inactive')
-              Text('No subscription', style: t.bodySmall?.copyWith(color: c.mutedForeground))
+              Text(
+                i18n.common.quota.noSubscription,
+                style: t.bodySmall?.copyWith(color: c.mutedForeground),
+              )
             else if (w != null)
               Text(
                 '${w.percent.toStringAsFixed(0)}% · ${formatRelativeTo(w.resetsAt)}',
@@ -721,6 +759,7 @@ class _AccountsPanelState extends State<_AccountsPanel> {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     final accounts = widget.state.accounts;
     final providers = {for (final a in accounts) a.provider};
     final filtered = _provider == null
@@ -738,7 +777,7 @@ class _AccountsPanelState extends State<_AccountsPanel> {
             spacing: 4,
             children: [
               ChoiceChip(
-                label: const Text('All'),
+                label: Text(i18n.chat.providerSelection.all),
                 selected: _provider == null,
                 onSelected: (_) => setState(() => _provider = null),
                 visualDensity: VisualDensity.compact,
@@ -762,12 +801,11 @@ class _AccountsPanelState extends State<_AccountsPanel> {
                 Icon(Icons.speed, size: 32, color: c.mutedForeground),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
-                  'No accounts connected',
+                  i18n.common.quota.empty.title,
                   style: t.bodyMedium?.copyWith(color: c.mutedForeground),
                 ),
                 Text(
-                  'Sign in to Claude, OpenAI, Gemini or another provider so '
-                  'quota can be tracked here.',
+                  i18n.common.quota.empty.description,
                   textAlign: TextAlign.center,
                   style: t.bodySmall?.copyWith(color: c.mutedForeground),
                 ),
@@ -816,10 +854,20 @@ class _FleetPanelState extends State<_FleetPanel> {
 
   static const _statuses = ['running', 'waiting', 'queued', 'failed', 'finished'];
 
+  static String _statusLabel(Translations i18n, String status) => switch (status) {
+    'running' => i18n.common.quota.agentStatus.running,
+    'waiting' => i18n.common.quota.agentStatus.waiting,
+    'queued' => i18n.common.quota.agentStatus.queued,
+    'failed' => i18n.common.quota.agentStatus.failed,
+    'finished' => i18n.common.quota.agentStatus.finished,
+    _ => status,
+  };
+
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     final fleet = widget.fleet;
     final summary = fleet?.summary;
     final entries = (fleet?.entries ?? const <AgentFleetEntry>[])
@@ -834,7 +882,11 @@ class _FleetPanelState extends State<_FleetPanel> {
           runSpacing: 4,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
-            _summaryBadge(context, '${summary?.running ?? 0} running', QuotaTone.info),
+            _summaryBadge(
+              context,
+              i18n.common.quota.agents.runningCount(value: summary?.running ?? 0),
+              QuotaTone.info,
+            ),
             _summaryBadge(
               context,
               '${formatTokens(summary?.totalTokens ?? 0)} · '
@@ -843,7 +895,7 @@ class _FleetPanelState extends State<_FleetPanel> {
             ),
             const SizedBox(width: AppSpacing.sm),
             ChoiceChip(
-              label: const Text('All'),
+              label: Text(i18n.chat.providerSelection.all),
               selected: _status == null,
               onSelected: (_) => setState(() => _status = null),
               visualDensity: VisualDensity.compact,
@@ -852,13 +904,16 @@ class _FleetPanelState extends State<_FleetPanel> {
             for (final s in _statuses)
               ChoiceChip(
                 label: Text(
-                  '$s (${switch (s) {
-                    'running' => summary?.running ?? 0,
-                    'waiting' => summary?.waiting ?? 0,
-                    'queued' => summary?.queued ?? 0,
-                    'failed' => summary?.failed ?? 0,
-                    _ => summary?.finished ?? 0,
-                  }})',
+                  i18n.quota.agents.statusCount(
+                    status: _statusLabel(i18n, s),
+                    count: switch (s) {
+                      'running' => summary?.running ?? 0,
+                      'waiting' => summary?.waiting ?? 0,
+                      'queued' => summary?.queued ?? 0,
+                      'failed' => summary?.failed ?? 0,
+                      _ => summary?.finished ?? 0,
+                    },
+                  ),
                 ),
                 selected: _status == s,
                 onSelected: (_) => setState(() => _status = s),
@@ -875,7 +930,7 @@ class _FleetPanelState extends State<_FleetPanel> {
                   padding: const EdgeInsets.all(AppSpacing.lg),
                   child: Center(
                     child: Text(
-                      'No agents match this filter.',
+                      i18n.common.quota.agents.empty,
                       style: t.bodySmall?.copyWith(color: c.mutedForeground),
                     ),
                   ),
@@ -901,6 +956,7 @@ class _FleetPanelState extends State<_FleetPanel> {
   Widget _agentRow(AgentFleetEntry e) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     final tone = quotaToneColor(toneForAgentStatus(e.status));
     final expanded = _expanded == e.agentId;
     return Column(
@@ -944,7 +1000,10 @@ class _FleetPanelState extends State<_FleetPanel> {
                 const SizedBox(width: 4),
                 SizedBox(
                   width: 56,
-                  child: Text(e.status, style: t.labelSmall?.copyWith(color: tone)),
+                  child: Text(
+                    _statusLabel(i18n, e.status),
+                    style: t.labelSmall?.copyWith(color: tone),
+                  ),
                 ),
                 Expanded(
                   flex: 2,
@@ -992,18 +1051,21 @@ class _FleetPanelState extends State<_FleetPanel> {
               spacing: AppSpacing.lg,
               runSpacing: AppSpacing.xs,
               children: [
-                _detail('Task', e.taskTitle ?? '—'),
-                _detail('Session', e.sessionId ?? '—'),
-                _detail('Model', e.model ?? '—'),
+                _detail(i18n.common.quota.agents.colTask, e.taskTitle ?? '—'),
+                _detail(i18n.common.quota.agents.detailSession, e.sessionId ?? '—'),
+                _detail(i18n.common.quota.group.model, e.model ?? '—'),
                 _detail(
-                  'Started',
+                  i18n.common.quota.agents.detailStarted,
                   e.startedAt == null
                       ? '—'
                       : (DateTime.tryParse(e.startedAt!)?.toLocal().toString().split('.').first ??
                             '—'),
                 ),
-                _detail('Retries', e.retryCount == null ? 'not tracked' : '${e.retryCount}'),
-                _detail('Result', e.result ?? '—'),
+                _detail(
+                  i18n.common.quota.agents.detailRetries,
+                  e.retryCount == null ? i18n.common.quota.agents.notTracked : '${e.retryCount}',
+                ),
+                _detail(i18n.common.quota.agents.detailResult, e.result ?? '—'),
               ],
             ),
           ),
@@ -1047,6 +1109,13 @@ class _ConfigPanelState extends ConsumerState<_ConfigPanel> {
 
   static const _routingModes = ['manual', 'ask', 'auto-low-risk'];
 
+  static String _routingLabel(Translations i18n, String mode) => switch (mode) {
+    'manual' => i18n.common.quota.settings.routing.manual,
+    'ask' => i18n.common.quota.settings.routing.ask,
+    'auto-low-risk' => i18n.common.quota.settings.routing.autoLowRisk,
+    _ => mode,
+  };
+
   void _load(QuotaConfig cfg) {
     if (_loaded) return;
     _loaded = true;
@@ -1077,6 +1146,7 @@ class _ConfigPanelState extends ConsumerState<_ConfigPanel> {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     final state = widget.state;
     final cfg = state.config;
     if (cfg == null) {
@@ -1096,14 +1166,14 @@ class _ConfigPanelState extends ConsumerState<_ConfigPanel> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Poller & alerts', style: t.titleSmall),
+                Text(i18n.quota.config.pollerTitle, style: t.titleSmall),
                 const SizedBox(height: AppSpacing.sm),
                 SwitchListTile(
                   dense: true,
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('Predicted limit alerts'),
+                  title: Text(i18n.settings.quota.settings.alertsEnabled),
                   subtitle: Text(
-                    'Warn before a quota window runs out',
+                    i18n.common.quota.settings.alertsEnabledHint,
                     style: t.labelSmall?.copyWith(color: c.mutedForeground),
                   ),
                   value: _alerts,
@@ -1117,7 +1187,7 @@ class _ConfigPanelState extends ConsumerState<_ConfigPanel> {
                       width: 200,
                       child: AppInput(
                         controller: _watch,
-                        hint: 'Watch threshold (%)',
+                        hint: i18n.common.quota.settings.watchThreshold,
                         keyboardType: TextInputType.number,
                         onChanged: (_) => setState(() {}),
                       ),
@@ -1126,7 +1196,7 @@ class _ConfigPanelState extends ConsumerState<_ConfigPanel> {
                       width: 200,
                       child: AppInput(
                         controller: _danger,
-                        hint: 'Danger threshold (%)',
+                        hint: i18n.common.quota.settings.dangerThreshold,
                         keyboardType: TextInputType.number,
                         onChanged: (_) => setState(() {}),
                       ),
@@ -1134,14 +1204,14 @@ class _ConfigPanelState extends ConsumerState<_ConfigPanel> {
                   ],
                 ),
                 const SizedBox(height: AppSpacing.sm),
-                Text('Routing mode', style: t.labelMedium),
+                Text(i18n.common.quota.settings.routingMode, style: t.labelMedium),
                 const SizedBox(height: AppSpacing.xs),
                 Wrap(
                   spacing: 4,
                   children: [
                     for (final m in _routingModes)
                       ChoiceChip(
-                        label: Text(m),
+                        label: Text(_routingLabel(i18n, m)),
                         selected: _routing == m,
                         onSelected: (_) => setState(() => _routing = m),
                         visualDensity: VisualDensity.compact,
@@ -1151,7 +1221,7 @@ class _ConfigPanelState extends ConsumerState<_ConfigPanel> {
                 ),
                 if (state.accounts.isNotEmpty) ...[
                   const SizedBox(height: AppSpacing.md),
-                  Text('Account routing', style: t.labelMedium),
+                  Text(i18n.quota.config.accountRouting, style: t.labelMedium),
                   for (final a in state.accounts)
                     SwitchListTile(
                       dense: true,
@@ -1197,7 +1267,7 @@ class _ConfigPanelState extends ConsumerState<_ConfigPanel> {
                       );
                       await ref.read(quotaProvider.notifier).saveConfig(next);
                     },
-                    child: const Text('Save config'),
+                    child: Text(i18n.quota.config.save),
                   ),
                 ),
               ],
@@ -1218,10 +1288,18 @@ class _RangePills extends StatelessWidget {
   final String active;
   final ValueChanged<String> onPick;
 
+  static String _periodLabel(Translations i18n, String period) => switch (period) {
+    '24h' => i18n.common.quota.range.k24h,
+    '7d' => i18n.common.quota.range.k7d,
+    '30d' => i18n.common.quota.range.k30d,
+    _ => period,
+  };
+
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     return Container(
       padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(
@@ -1247,7 +1325,7 @@ class _RangePills extends StatelessWidget {
                   border: p == active ? Border.all(color: c.border.withValues(alpha: 0.5)) : null,
                 ),
                 child: Text(
-                  p,
+                  _periodLabel(i18n, p),
                   style: t.bodySmall?.copyWith(
                     fontWeight: FontWeight.w500,
                     color: p == active ? c.foreground : c.mutedForeground,

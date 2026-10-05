@@ -78,7 +78,8 @@
       "readFile": "Dosyayı oku",
       "updateTodo": "Yapılacaklar listesini güncelle",
       "readTodo": "Yapılacaklar listesini oku",
-      "searchResults": "sonuç"
+      "searchResults": "sonuç",
+      "todoReadLabel": "TodoRead yapılacaklar listesi"
     },
     "search": {
       "found": "{{count}} {{type}} bulundu",
@@ -117,7 +118,16 @@
       "addTo": "{{entry}} İzin Verilen Araçlar listesine ekleniyor.",
       "retry": "İzin kaydedildi. Aracı kullanmak için isteği tekrar dene.",
       "error": "İzinler güncellenemedi. Lütfen tekrar dene.",
-      "openSettings": "Ayarları aç"
+      "openSettings": "Ayarları aç",
+      "allow": "İzin ver",
+      "allowAll": "Tümüne izin ver ({{count}})",
+      "allowWithChanges": "Değişikliklerle izin ver",
+      "always": "Her zaman",
+      "deny": "Reddet",
+      "editAndAllow": "Düzenle ve izin ver",
+      "editInput": "Girdiyi düzenle",
+      "invalidJson": "Geçersiz JSON",
+      "reject": "Reddet"
     },
     "todo": {
       "updated": "Yapılacaklar listesi başarıyla güncellendi",
@@ -191,7 +201,8 @@
         "clearBtn": "İptal",
         "multiple": "{{count}} mesaj çevrimdışı kuyrukta — yeniden bağlanınca otomatik gönderilecek",
         "single": "1 mesaj çevrimdışı kuyrukta — yeniden bağlanınca otomatik gönderilecek"
-      }
+      },
+      "cameraUnavailable": "Kamera kullanılamıyor: {{error}}"
     },
     "providerSelection": {
       "title": "AI Asistanını Seç",
@@ -253,8 +264,13 @@
         "perfWarning": "Tüm mesajlar yüklendi — kaydırma yavaşlayabilir. Performansı geri getirmek için \"En alta git\"e tıkla.",
         "loadOlderFailed": "Eski mesajlar yüklenemedi.",
         "retry": "Yeniden dene",
-        "noSearchMatches": "Aramanızla eşleşen mesaj yok."
-      }
+        "noSearchMatches": "Aramanızla eşleşen mesaj yok.",
+        "loadAllCount": "Tümünü yükle ({{count}})",
+        "loadOlder": "Daha eski mesajları yükle",
+        "retryLoadOlder": "Eski mesajları yüklemeyi yeniden dene — {{error}}"
+      },
+      "deleteConfirm": "Oturumu ve transkriptini kaldırır. Geri alınamaz.",
+      "finishRunBeforeWorkspaceChange": "Çalışma alanını değiştirmeden önce çalıştırmayı bitir"
     },
     "shell": {
       "selectProject": {
@@ -397,16 +413,21 @@
       "active": "Etkin"
     },
     "askUserQuestion": {
-      "needsInput": "{{provider}} girdinizi bekliyor"
+      "needsInput": "{{provider}} girdinizi bekliyor",
+      "answerHint": "Yanıtınızı yazın…",
+      "other": "Diğer…",
+      "skip": "Atla"
     },
     "attachments": {
       "downloadFailedRetry": "İndirme başarısız — yeniden denemek için tıklayın",
-      "fileAttachment": "Dosya eki"
+      "fileAttachment": "Dosya eki",
+      "download": "{{name}} indir"
     },
     "checkpoint": {
       "creating": "Anlık görüntü oluşturuluyor…",
       "revertChanges": "Dosyaları son kontrol noktasına geri al",
-      "undo": "Kontrol noktasını geri al"
+      "undo": "Kontrol noktasını geri al",
+      "beforeAiTurn": "AI turundan önce"
     },
     "common": {
       "close": "Kapat"
@@ -415,7 +436,9 @@
       "saveToTask": "Görev",
       "saved": "Kaydedildi",
       "saving": "Kaydediliyor...",
-      "taskShort": "GÖREV"
+      "taskShort": "GÖREV",
+      "addToTask": "TaskMaster'a ekle",
+      "added": "TaskMaster'a eklendi"
     },
     "tokenUsage": {
       "desc": "Oturum token tüketimini görüntüle",
@@ -436,6 +459,54 @@
       "selectOrchestrators": "Düzenleyicileri seç",
       "orchestratorsOnly": "Yalnızca düzenleyiciler",
       "noOrchestrators": "Kullanılabilir düzenleyici oturumu yok"
+    },
+    "changes": {
+      "empty": "Dosya değişikliği yok",
+      "failedToLoad": "Değişiklikler yüklenemedi"
+    },
+    "commandResult": {
+      "fallback": {
+        "config": "Ayarları ve yapılandırmayı açın.",
+        "cost": "Etkin oturumun token kullanımını inceleyin.",
+        "help": "Komut belgelerini ve sözdizimini gösterin.",
+        "memory": "Projenin CLAUDE.md bellek dosyasını açın.",
+        "models": "Etkin sağlayıcı için kullanılabilir modellere göz atın.",
+        "status": "Çalışma zamanı, sürüm, sağlayıcı ve ortam durumunu inceleyin."
+      },
+      "filterCommands": "Komutları filtrele...",
+      "searchModels": "{{provider}} modellerini ara..."
+    },
+    "commands": {
+      "runConfirmTitle": "Komut çalıştırılsın mı?",
+      "executionCancelled": "Komut çalıştırma iptal edildi"
+    },
+    "export": {
+      "sessionTitle": "Oturum {{id}}",
+      "pdfFailed": "PDF dışa aktarma başarısız",
+      "transcriptDownloaded": "Transkript indirildi",
+      "savedTo": "Kaydedildi: {{path}}"
+    },
+    "message": {
+      "compactedSummary": "Sıkıştırılmış özet",
+      "rawView": "Ham görünüm",
+      "resendHint": "Düzenleyiciden yeniden gönderin"
+    },
+    "modelLibrary": {
+      "deleteTooltip": "{{name}} sil",
+      "editTooltip": "{{name}} düzenle",
+      "enterNameAndId": "Hem model adını hem de model ID'sini gir.",
+      "idNoSpaces": "Model ID'leri boşluk içeremez.",
+      "setAsDefault": "Varsayılan olarak ayarla",
+      "defaultModel": "Varsayılan model"
+    },
+    "pinFile": {
+      "action": "Sabitle",
+      "pathHint": "path/to/file.ext",
+      "title": "Dosyayı sabitle"
+    },
+    "permissionRequest": {
+      "title": "İzin isteği · {{tool}}",
+      "question": "Soru"
     }
   },
   "codeEditor": {
@@ -447,7 +518,11 @@
       "showDiff": "Diff vurgusunu göster",
       "settings": "Editör Ayarları",
       "collapse": "Editörü daralt",
-      "expand": "Editörü tüm genişliğe aç"
+      "expand": "Editörü tüm genişliğe aç",
+      "diffMerge": "Diff / birleştirme",
+      "previewInBrowser": "Tarayıcıda önizle",
+      "reload": "Diskten yeniden yükle",
+      "toggleDock": "Dosya panelini aç/kapat"
     },
     "loading": "{{fileName}} yükleniyor...",
     "header": {
@@ -468,7 +543,8 @@
       "pinFile": "Dosyayı bağlama sabitle",
       "unpinFile": "Dosyayı bağlamdan çıkar",
       "previewHtml": "HTML önizlemesini yeni sekmede aç",
-      "retry": "Yeniden dene"
+      "retry": "Yeniden dene",
+      "saveAll": "Tümünü kaydet"
     },
     "footer": {
       "lines": "Satır:",
@@ -477,12 +553,49 @@
     },
     "binaryFile": {
       "title": "Binary Dosya",
-      "message": "\"{{fileName}}\" dosyası binary olduğu için metin editöründe gösterilemez."
+      "message": "\"{{fileName}}\" dosyası binary olduğu için metin editöründe gösterilemez.",
+      "cannotDisplayAsText": "Metin olarak gösterilemez"
     },
     "filePreview": {
       "loading": "Önizleme yükleniyor...",
       "error": "Bu dosya görüntülenemiyor.",
       "openInNewTab": "Yeni sekmede aç"
+    },
+    "diff": {
+      "applyMerge": "Birleştirmeyi uygula",
+      "base": "Temel",
+      "close": "Diff'i kapat",
+      "current": "Geçerli",
+      "hunk": "Parça {{number}}",
+      "noChanges": "Değişiklik yok",
+      "deletedOnDisk": "diskte silindi"
+    },
+    "discardUnsavedChanges": "Kaydedilmemiş değişikliklerden vazgeçilsin mi?",
+    "emptyState": {
+      "title": "Açık dosya yok"
+    },
+    "failedToLoad": "Dosya yüklenemedi",
+    "hexDump": {
+      "more": "… {{size}} daha"
+    },
+    "mediaFile": {
+      "subtitle": "Ses/video önizlemesi henüz desteklenmiyor",
+      "title": "Medya dosyası"
+    },
+    "settings": {
+      "fontSizeDecrease": "Yazı tipi boyutu −  (şimdi {{size}})",
+      "fontSizeIncrease": "Yazı tipi boyutu +",
+      "minimap": "Minimap",
+      "tabSize": "Sekme boyutu: {{size}}"
+    },
+    "unsavedChanges": "{{name}} dosyasında kaydedilmemiş değişiklikler var",
+    "toasts": {
+      "savedFile": "{{name}} kaydedildi",
+      "saveFailed": "Kaydetme başarısız",
+      "allSaved": "Tümü kaydedildi",
+      "someSavesFailed": "Bazı kaydetmeler başarısız oldu",
+      "savedTo": "Şuraya kaydedildi: {{path}}",
+      "mergeApplied": "Birleştirme uygulandı — kalıcı olması için kaydet"
     }
   },
   "common": {
@@ -502,7 +615,9 @@
       "copy": "Kopyala",
       "download": "İndir",
       "upload": "Yükle",
-      "browse": "Gözat"
+      "browse": "Gözat",
+      "openDiagram": "Diyagramı aç",
+      "update": "Güncelle"
     },
     "tabs": {
       "chat": "Sohbet",
@@ -1363,6 +1478,20 @@
     },
     "projects": {
       "newSession": "Yeni oturum"
+    },
+    "codeBlock": {
+      "wrapLines": "Satırları kaydır",
+      "noWrap": "Kaydırma yok"
+    },
+    "update": {
+      "available": "Güncelleme mevcut · v{{version}}",
+      "confirm": "v{{version}} sürümüne güncellensin mi? Sunucu kendini günceller ve yeniden başlatır — etkin oturumlar kesintiye uğrayacak.",
+      "downloading": "Güncelleme indiriliyor ve uygulanıyor…",
+      "restarting": "Sunucu yeniden başlatılıyor — bu biraz sürer…",
+      "done": "v{{version}} sürümüne güncellendi. Yeni paketi almak için uygulamayı yeniden yükle.",
+      "manualRestart": "Güncelleme uygulandı ancak sunucu kendiliğinden yeniden başlamadı — tamamlamak için elle yeniden başlat.",
+      "failed": "Güncelleme başarısız oldu.",
+      "failedTitle": "Güncelleme başarısız"
     }
   },
   "settings": {
@@ -1381,7 +1510,8 @@
       "restartConfirm": "ddagent sunucusu yeniden başlatılsın mı? Aktif oturumlar kesintiye uğrayacak.",
       "restarting": "Yeniden başlatılıyor… sunucu döndüğünde sayfa yenilenecek.",
       "restartFailed": "Yeniden başlatma başarısız",
-      "unsupported": "Yeniden başlatma yalnızca sunucu servis yöneticisi altında çalışırken kullanılabilir."
+      "unsupported": "Yeniden başlatma yalnızca sunucu servis yöneticisi altında çalışırken kullanılabilir.",
+      "ok": "Tamam"
     },
     "updates": {
       "title": "Uygulama güncellemeleri",
@@ -1438,7 +1568,12 @@
       "wordWrap": "Kelime Kaydırma",
       "showMinimap": "Minimap'i Göster",
       "lineNumbers": "Satır Numaraları",
-      "fontSize": "Yazı Tipi Boyutu"
+      "fontSize": "Yazı Tipi Boyutu",
+      "themeModes": {
+        "dark": "Koyu",
+        "light": "Açık",
+        "system": "Sistem"
+      }
     },
     "actions": {
       "saveChanges": "Değişiklikleri Kaydet",
@@ -1463,7 +1598,8 @@
         "openPanel": "Ayarlar panelini aç",
         "draggingStatus": "Sürükleniyor...",
         "toggleAndMove": "Açıp kapamak için tıkla, taşımak için sürükle"
-      }
+      },
+      "sendWithCtrlEnter": "Ctrl+Enter ile gönder"
     },
     "terminalShortcuts": {
       "title": "Terminal Kısayolları",
@@ -1646,7 +1782,12 @@
         "disable": "Push Bildirimlerini Devre Dışı Bırak",
         "enabled": "Bu masaüstü uygulaması için bildirimler etkin",
         "unsupported": "Bu sistemde masaüstü bildirimleri desteklenmiyor."
-      }
+      },
+      "channels": {
+        "discord": "Discord",
+        "telegram": "Telegram"
+      },
+      "unpair": "Eşleştirmeyi kaldır"
     },
     "appearanceSettings": {
       "darkMode": {
@@ -1747,11 +1888,13 @@
       "description": "Commit'ler için git kimliğini yapılandır. Bu ayarlar git config --global ile genel olarak uygulanacak",
       "name": {
         "label": "Git Adı",
-        "help": "Git commit'leri için adın"
+        "help": "Git commit'leri için adın",
+        "placeholder": "John Doe"
       },
       "email": {
         "label": "Git E-postası",
-        "help": "Git commit'leri için e-postan"
+        "help": "Git commit'leri için e-postan",
+        "placeholder": "john@example.com"
       },
       "actions": {
         "save": "Yapılandırmayı Kaydet",
@@ -1797,7 +1940,9 @@
           "descriptionPlaceholder": "Açıklama (isteğe bağlı)",
           "addButton": "Token Ekle",
           "cancelButton": "İptal",
-          "howToCreate": "GitHub Kişisel Erişim Token'ı nasıl oluşturulur →"
+          "howToCreate": "GitHub Kişisel Erişim Token'ı nasıl oluşturulur →",
+          "showToken": "Token'ı göster",
+          "hideToken": "Token'ı gizle"
         },
         "empty": "Henüz GitHub token'ı eklenmemiş.",
         "added": "Eklendi:",
@@ -2112,11 +2257,19 @@
       "deleteTitle": "Çalışma alanını kaldır",
       "description": "Çalışma alanları, ddagent’ın sohbet edebildiği, kod çalıştırabildiği ve gezinebildiği dizinlerdir.",
       "remove": "Çalışma alanını kaldır",
-      "title": "Çalışma alanları"
+      "title": "Çalışma alanları",
+      "pathRequired": "Yol gerekli"
     },
     "about": {
       "supportTitle": "Projeyi destekle",
-      "buyMeACoffee": "Bana kahve ısmarla"
+      "buyMeACoffee": "Bana kahve ısmarla",
+      "learnMore": "Daha fazla bilgi",
+      "pro": {
+        "syncSettings": "Ayarları Senkronize Et",
+        "teamManagement": "Takım Yönetimi"
+      },
+      "proFeatures": "ddagent Pro Özellikleri",
+      "tryHosted": "ddagent Hosted'ı deneyin"
     }
   },
   "sidebar": {
@@ -2375,7 +2528,8 @@
         "progressVisualization": "İlerleme Görselleştirme: Kanban panoları ve detaylı görev analizleri",
         "cliIntegration": "CLI Entegrasyonu: İleri seviye iş akışları için taskmaster komutlarını kullan"
       },
-      "initializeButton": "TaskMaster AI'yi Başlat"
+      "initializeButton": "TaskMaster AI'yi Başlat",
+      "writePrdFirst": "Önce PRD yaz"
     },
     "gettingStarted": {
       "title": "TaskMaster'a Başlarken",
@@ -2491,7 +2645,16 @@
       "prdsAvailable": "{{count}} PRD mevcut"
     },
     "prd": {
-      "modified": "Değişiklik: {{date}}"
+      "modified": "Değişiklik: {{date}}",
+      "editorTitle": "PRD — {{name}}",
+      "fileExistsMessage": "\"{{name}}\" adlı bir PRD zaten var. Üzerine yazmak istiyor musunuz?",
+      "fileExistsTitle": "Dosya zaten var",
+      "newFile": "yeni dosya",
+      "parse": "PRD'yi ayrıştır",
+      "template": "Şablon",
+      "fileNameHint": "dosya adı (ör. prd.txt)",
+      "saved": "PRD kaydedildi",
+      "tasksGenerated": "PRD'den görevler oluşturuldu"
     },
     "statuses": {
       "pending": "Beklemede",
@@ -2499,7 +2662,8 @@
       "done": "Tamamlandı",
       "blocked": "Engellendi",
       "deferred": "Ertelendi",
-      "cancelled": "İptal Edildi"
+      "cancelled": "İptal Edildi",
+      "review": "İnceleme"
     },
     "priorities": {
       "high": "Yüksek",
@@ -2596,7 +2760,9 @@
       "completedReopen": "Tamamlandı (yeniden açmak için tıklayın)",
       "inProgressComplete": "Devam ediyor (tamamlamak için tıklayın)",
       "markCompleted": "Tamamlandı olarak işaretle",
-      "toggleStatusAria": "Görev {{id}} durumunu değiştir"
+      "toggleStatusAria": "Görev {{id}} durumunu değiştir",
+      "markDone": "Tamamlandı olarak işaretle",
+      "reopen": "Yeniden aç"
     },
     "nextTask": {
       "allComplete": "Tüm görevler tamamlandı",
@@ -2638,7 +2804,14 @@
       "taskTitle": "Görev {{id}}: {{title}}",
       "testStrategy": "Test Stratejisi",
       "titleRequired": "Başlık gerekli",
-      "updateFailed": "Görev güncellenemedi"
+      "updateFailed": "Görev güncellenemedi",
+      "deleteConfirmMessage": "#{{id}} görevi kaldırılacak. Bu işlem geri alınamaz.",
+      "notFound": "Görev bulunamadı",
+      "subtasks": "Alt görevler",
+      "idCopied": "Görev ID kopyalandı"
+    },
+    "toasts": {
+      "statusInProgress": "Görev {{id}} devam ediyor olarak ayarlandı"
     }
   },
   "knowledge": {
@@ -2743,6 +2916,556 @@
     },
     "settings": {
       "description": "Ajanlar için yerel bellek katmanı: anılar, kurallar, beceriler ve kişisel bilgiler."
+    },
+    "contextBudget": {
+      "tokens": "~{{tokens}} / {{budget}} tok"
+    },
+    "critical": {
+      "make": "Kritik yap",
+      "makeAll": "Tüm kuralları kritik yap",
+      "makeAllHint": "Bunları enjekte edilen bağlam bütçesine ekler"
+    },
+    "errors": {
+      "importFailed": "İçe aktarma başarısız: {{error}}",
+      "migrationFailed": "Taşıma başarısız: {{error}}"
+    },
+    "graph": {
+      "truncated": "kısaltıldı"
+    },
+    "importAll": {
+      "action": "Her şeyi içe aktar",
+      "mergeDuplicates": "Yinelenen kayıtları birleştir",
+      "mergeDuplicatesHint": "ddagent içindeki yinelenen satırları birleştirir (dosyaları değil)",
+      "projectsScanned": "Taranan projeler: {{count}}",
+      "rulesSummary": "Kurallar: {{total}} · yinelenen gruplar: {{duplicates}}",
+      "skillsFound": "Bulunan agent becerileri: {{found}} (yeni: {{newSkills}})",
+      "title": "Her şeyi ddagent'a aktar"
+    },
+    "importSkills": {
+      "found": "Agentlarınızda {{count}} beceri bulundu.",
+      "summary": "Yeni: {{imported}} · atlanan: {{skipped}}",
+      "title": "Agent becerilerini içe aktar"
+    },
+    "linkOptions": {
+      "memory": "Bellek: {{title}}",
+      "personal": "Kişisel: {{title}}",
+      "rule": "Kural: {{title}}",
+      "skill": "Beceri: {{name}}"
+    },
+    "migrate": {
+      "duplicates": "Projeler arası yinelenen gruplar: {{count}}",
+      "mergeDuplicates": "Yinelenenleri birleştir",
+      "removedPromoted": "Kaldırılan: {{removed}}, yükseltilen: {{promoted}}",
+      "rulesSummary": "Kurallar: toplam {{total}}, {{critical}} kritik.",
+      "scanned": "{{count}} proje tarandı.",
+      "title": "Mevcut kuralları taşı"
     }
+  },
+  "skills": {
+    "addDialog": {
+      "chooseFileTitle": "SKILL.md seç",
+      "chooseFiles": "Dosya Seç",
+      "chooseFolder": "Klasör Seç",
+      "chooseFolderTitle": "Bir beceri klasörü seçin",
+      "folderFilesMeta": {
+        "one": "{{count}} dosya · {{size}}",
+        "other": "{{count}} dosya · {{size}}"
+      },
+      "folderUploadsNote": "Klasör yüklemeleri seçilen klasör adını korur; tek başına dosyalar `SKILL.md` içindeki `name` değerini kullanır.",
+      "hideInstallLocation": "Kurulum konumunu gizle",
+      "installSkill": "Beceri Kur",
+      "installSkills": {
+        "one": "{{count}} Beceri Kur",
+        "other": "{{count}} Beceri Kur"
+      },
+      "markdownFileMeta": "Markdown dosyası · {{size}}",
+      "pickHint": "Klasörler script, referans ve varlık içerebilir.",
+      "pickTitle": "Bir beceri klasörü veya SKILL.md seçin",
+      "readyToInstall": "Kuruluma hazır",
+      "removeQueued": "{{name}} öğesini kaldır",
+      "title": "{{provider}} Becerisi Ekle",
+      "uploadHint": "Bir SKILL.md dosyası veya eksiksiz bir beceri klasörü yükleyin.",
+      "whereWillThisInstall": "Nereye kurulacak?"
+    },
+    "deleteSkill": "{{name}} sil",
+    "empty": {
+      "noGlobalSkills": "Henüz genel beceri bulunamadı",
+      "noGlobalSkillsDescription": "Her projede kullanılabilir olması için yukarıdan bir genel beceri ekleyin.",
+      "noMatchingSkills": "Eşleşen beceri yok",
+      "noMatchingSkillsDescription": "Farklı bir komut, ad, kapsam, proje veya kaynak yolu deneyin.",
+      "noProjects": "Kullanılabilir proje yok",
+      "noProjectsDescription": "Becerilerine göz atmak için bir proje veya çalışma alanı ekleyin.",
+      "noSkillsInProject": "Bu projede beceri yok",
+      "noSkillsInProjectDescription": "Seçili projede bir .claude/skills, .cursor/skills veya .agents/skills klasörü oluşturun."
+    },
+    "errors": {
+      "addMarkdownFirst": "Önce bir veya daha fazla markdown dosyası ekleyin.",
+      "couldNotReadSkillFile": "{{name}} içinden SKILL.md okunamadı.",
+      "dropMarkdownOrFolder": "Bir veya daha fazla markdown dosyası ya da SKILL.md içeren bir klasör bırakın.",
+      "folderFileLimit": "Bir beceri klasörü en fazla {{count}} dosya içerebilir.",
+      "folderReadFailed": "Beceri klasörü okunamadı",
+      "folderSizeLimit": "Seçilen beceri klasörleri toplamda 30 MB'den küçük olmalıdır.",
+      "importFailed": "Beceriler içe aktarılamadı",
+      "missingSkillFile": "Seçilen klasörde SKILL.md dosyası yok."
+    },
+    "moveDialog": {
+      "moveToGlobal": "Genele taşı",
+      "moveToProject": "Projeye taşı",
+      "toGlobalHint": "Bu beceriyi, her projenin kullanabilmesi için genel beceriler dizinine taşıyın.",
+      "toProjectHint": "Bu beceriye sahip olacak projeyi seçin. Beceri, sağlayıcının genel beceriler dizininden taşınır."
+    },
+    "moveSkill": "{{name}} öğesini taşı",
+    "projectLabel": "Proje",
+    "scopes": {
+      "admin": "Yönetici",
+      "plugin": "Eklenti",
+      "project": "Proje",
+      "repo": "Depo",
+      "system": "Sistem",
+      "user": "Kullanıcı"
+    },
+    "screen": {
+      "addSkill": "Beceri Ekle",
+      "clearSearch": "Beceri aramasını temizle",
+      "deleteDescription": "Bu, {{directory}} dizinini {{provider}} tarafından yönetilen beceriler dizininden kaldırır. Bu işlem geri alınamaz.",
+      "deleteTitle": "{{name}} silinsin mi?",
+      "loadingSkills": "{{provider}} becerileri yükleniyor…",
+      "manageDescription": "{{provider}} becerilerini yerel dosyalardan, eksiksiz klasörlerden ve proje bazlı konumlardan yönetin.",
+      "noDescription": "Beceri front matter bölümünde açıklama belirtilmemiş.",
+      "pluginBadge": "Eklenti: {{name}}",
+      "projectBadge": "Proje: {{name}}",
+      "savedSuccessfully": "Beceriler başarıyla kaydedildi.",
+      "scanningProjectSkills": "Proje becerileri taranıyor...",
+      "searchHint": "Beceri ara...",
+      "skillsCount": {
+        "one": "{{count}} BECERİ",
+        "other": "{{count}} BECERİ"
+      },
+      "sourceLabel": "KAYNAK"
+    }
+  },
+  "mcp": {
+    "form": {
+      "fields": {
+        "bearerTokenEnvVar": "Bearer Token Ortam Değişkeni",
+        "envVarNames": "Ortam Değişkeni Adları",
+        "workingDirectory": "Çalışma Dizini"
+      },
+      "scope": {
+        "claudeLocal": "Claude Yerel",
+        "description": {
+          "local": "Seçili proje için Claude kullanıcı ayarlarında saklanır",
+          "project": "Seçili proje çalışma alanında saklanır",
+          "projectGlobal": "Her sağlayıcı için seçili proje çalışma alanına yazar",
+          "user": "Makinenizdeki tüm projelerde kullanılabilir",
+          "userGlobal": "Her sağlayıcının kullanıcı yapılandırmasına yazar ve bu makinedeki projelerde kullanılabilir"
+        },
+        "projectAllProviders": "Proje (Tüm Sağlayıcılar)",
+        "userAllProviders": "Kullanıcı (Tüm Sağlayıcılar)"
+      },
+      "submitTo": "Sunucuyu {{provider}} için ekle",
+      "validation": {
+        "unsupportedGlobal": "MCP Sunucusu Ekle, tüm sağlayıcılarda yalnızca stdio ve http destekler; {{type}} desteklemez.",
+        "unsupportedProvider": "{{provider}}, {{type}} MCP sunucularını desteklemiyor"
+      }
+    },
+    "install": {
+      "button": "Kur",
+      "cardDescription": "Agentlarınıza MCP üzerinden bilgi tabanını ve ddagent araçlarını verin — agentları seçin veya tümü için kurun.",
+      "description": "Seçili agentların MCP üzerinden ddagent bilgi tabanını ve araçlarını kullanmasını sağlar.",
+      "errorFallback": "hata",
+      "failed": "Kurulum başarısız: {{error}}",
+      "installForAll": "Tümü için kur",
+      "installSelected": "Seçilenler için kur",
+      "installedCount(param=count)": {
+        "one": "{{count}} agenta kuruldu.",
+        "other": "{{count}} agenta kuruldu."
+      },
+      "partialFailure": "{{count}} agenta kuruldu; başarısız: {{failed}}",
+      "title": "ddagent MCP sunucusunu kur"
+    },
+    "servers": {
+      "addGlobalDescription": "Bu MCP sunucusunu tüm sağlayıcılara ekler: Claude, Cursor, Codex, OpenCode ve Devin. Aynı yapılandırmanın tüm sağlayıcılarda çalışması gerektiğinden yalnızca stdio ve HTTP taşımaları desteklenir.",
+      "addGlobalMenuDescription": "Genel MCP Sunucusu Ekle, Claude, Cursor, Codex, OpenCode ve Devin için ortak bir stdio veya HTTP sunucusu yazar.",
+      "addGlobalTitle": "Genel MCP Sunucusu Ekle",
+      "addProviderDescription": "{{provider}} MCP Sunucusu Ekle yalnızca {{provider}} yapılandırmasını değiştirir.",
+      "addProviderTitle": "{{provider}} MCP Sunucusu Ekle",
+      "config": {
+        "cwd": "Çalışma Dizini",
+        "envVars": "Ortam Değişkenleri"
+      },
+      "descriptionGeneric": "Model Context Protocol sunucuları {{provider}} için ek araçlar ve veri kaynakları sağlar",
+      "loading": "MCP sunucuları yükleniyor...",
+      "refreshingScopes": "Proje kapsamları yenileniyor..."
+    },
+    "team": {
+      "cta": "ddagent Pro ile kullanılabilir",
+      "description": "MCP sunucu yapılandırmalarını takımınızla paylaşın. Herkes otomatik olarak senkron kalır.",
+      "title": "Takım MCP Yapılandırmaları"
+    },
+    "tokens": {
+      "scopeWrite": "Yazma"
+    }
+  },
+  "terminal": {
+    "actions": {
+      "clearOutput": "Çıktıyı Temizle",
+      "connect": "Bağlan",
+      "newShell": "Yeni Shell",
+      "newTab": "Yeni Terminal Sekmesi",
+      "providerLogin": "Sağlayıcı Girişi",
+      "restartSession": "Oturumu Yeniden Başlat"
+    },
+    "authUrl": {
+      "openInBrowser": "Tarayıcıda aç"
+    },
+    "errors": {
+      "couldNotOpenLink": "Bağlantı açılamadı: {{url}}"
+    },
+    "fileLink": {
+      "detected": "Dosya algılandı: {{path}}"
+    },
+    "paste": {
+      "hint": "Ctrl+V / sağ tık → Yapıştır",
+      "title": "Terminale yapıştır"
+    },
+    "shortcuts": {
+      "eof": "EOF",
+      "hide": "Kısayol çubuğunu gizle",
+      "interrupt": "Kes (SIGINT)",
+      "suspend": "Askıya al (SIGTSTP)",
+      "showTooltip": "Kısayolları göster",
+      "hideTooltip": "Kısayolları gizle"
+    },
+    "tabs": {
+      "antigravityCli": "Antigravity CLI",
+      "claudeCli": "Claude CLI",
+      "commandCodeCli": "Command Code CLI",
+      "cursorCli": "Cursor CLI",
+      "devinCli": "Devin CLI",
+      "loginTitle": "Giriş: {{provider}}",
+      "opencodeCli": "OpenCode CLI",
+      "plainShell": "Basit Shell",
+      "shellName": "Shell {{index}}"
+    }
+  },
+  "worktrees": {
+    "branchHint": "Yeni dal adı (örn. feature/login)",
+    "branchingOff": "{{branch}} dalından ayrılıyor",
+    "cleanupDescription": "Birleştirildikten sonra worktree'yi kaldır ve dalı sil",
+    "created": "Worktree oluşturuldu",
+    "deleteBranchLabel": "Dalı da sil",
+    "dirtyWarning": "Uyarı: Bu worktree'de kaybolacak {{count}} commit edilmemiş değişiklik var.",
+    "emptyDescription": "Özellik çalışmalarını veya agent çalıştırmalarını yalıtmak için bir worktree oluşturun.",
+    "emptyTitle": "Worktree bulunamadı",
+    "forceRemoveLabel": "Zorla kaldır (değişikliklerden vazgeç)",
+    "headDetachedAt": "HEAD {{sha}} konumunda ayrık",
+    "mainBadge": "main",
+    "mergeDescription": "Değişiklikleri {{branch}} dalına birleştir.",
+    "mergeTitle": "{{branch}} dalını birleştir",
+    "merged": "Worktree {{branch}} dalına birleştirildi",
+    "opened": "Worktree açıldı: {{branch}}",
+    "portHint": "Çalıştırma portu (isteğe bağlı, örn. 3000)",
+    "removeDescription": "Bu, worktree klasörünü siler. Bağlı projeler arşivlenecek.",
+    "removeTitle": "{{branch}} worktree'si kaldırılsın mı?",
+    "removed": "Worktree kaldırıldı",
+    "runButton": "Çalıştır",
+    "runHint": "Çalıştırma komutu (örn. npm run dev)",
+    "runRunning": "çalışıyor",
+    "runRunningWithPort": "çalışıyor :{{port}}",
+    "scripts": "Scriptler",
+    "scriptsSaved": "Script yapılandırması kaydedildi",
+    "serverLabel": "Sunucu: ",
+    "setupHint": "Kurulum komutu (örn. npm install)",
+    "setupLabel": "Kurulum: ",
+    "squashDescription": "Tüm commitleri tek bir committe birleştir",
+    "stopButton": "Durdur"
+  },
+  "quota": {
+    "agents": {
+      "statusCount": "{{status}} ({{count}})"
+    },
+    "chart": {
+      "hide": "Gizle",
+      "noData": "Eğilim için yeterli veri yok.",
+      "pointReadout": "{{date}} · {{tokens}} token · {{cost}}",
+      "show": "Göster"
+    },
+    "config": {
+      "accountRouting": "Hesap yönlendirme",
+      "pollerTitle": "Sorgulama ve uyarılar",
+      "save": "Yapılandırmayı kaydet"
+    },
+    "overview": {
+      "tokensAndCost": "Tokenlar ve maliyet"
+    },
+    "section": {
+      "config": "Yapılandırma"
+    }
+  },
+  "scheduler": {
+    "checking": "Kontrol ediliyor…",
+    "cronHint": "Cron (dakika saat gün ay haftanın günü) — örn. 0 9 * * *",
+    "deleteMessage": "Bu, {{id}} yinelenen görevini kaldırır. Mevcut oturumlar korunur.",
+    "deleteTitle": "Zamanlama silinsin mi?",
+    "editTitle": "Zamanlamayı düzenle",
+    "newLabel": "Yeni",
+    "nextIn": "{{time}} sonra",
+    "promptHint": "Agent için prompt",
+    "runs": "Çalıştırmalar",
+    "session": "oturum {{id}}",
+    "worktree": "worktree"
+  },
+  "notifications": {
+    "deviceLabel": "ddagent Flutter",
+    "errors": {
+      "noResponse": "Sunucudan yanıt yok",
+      "registrationRejected": "Kayıt sunucu tarafından reddedildi"
+    }
+  },
+  "serverConnect": {
+    "connect": "Bağlan",
+    "connecting": "Bağlanılıyor…",
+    "connectionFailed": "Bağlantı başarısız ({{error}})",
+    "enterUrl": "Bir sunucu URL'si girin",
+    "subtitle": "ddagent sunucunuza bağlanın"
+  },
+  "voice": {
+    "apiKeySaved": "API Anahtarı (kayıtlı, değiştirmek için girin)",
+    "preview": "Önizle",
+    "saveFailed": "STT yapılandırması kaydedilemedi",
+    "settingsSaved": "Sesli giriş ayarları kaydedildi"
+  },
+  "preview": {
+    "embeddedWebOnly": "Gömülü önizleme yalnızca web sürümünde kullanılabilir",
+    "startDevServerHint": "Bir geliştirme sunucusu başlatın (npm run dev, flutter run -d web-server…)\nve portu burada görünecek."
+  },
+  "sharedContext": {
+    "title": "Paylaşılan Notlar"
+  },
+  "collab": {
+    "copyToken": "Token'ı kopyala",
+    "createInvite": "Davet oluştur",
+    "invite": "Davet et",
+    "inviteTeammate": "Takım arkadaşını davet et",
+    "roles": {
+      "member": "Üye",
+      "viewer": "Görüntüleyici"
+    },
+    "shareTokenHint": "Bu davet token'ını paylaşın — yalnızca bir kez gösterilir ve 72 saat içinde sona erer:",
+    "team": "Takım"
+  },
+  "browser": {
+    "dialogTitle": "Agent Tarayıcısı",
+    "viewError": "Tarayıcı görünümü hatası",
+    "web": "Web"
+  },
+  "projects": {
+    "archive": "Arşivle",
+    "archivedSection": "Arşivlenenler ({{count}})",
+    "clone": "Klonla",
+    "cloneFailed": "Klonlama başarısız",
+    "cloneFinished": "Klonlama tamamlandı. Proje listesi yenileniyor…",
+    "cloneRepository": "Depoyu klonla",
+    "deletePermanently": "Kalıcı olarak sil",
+    "deleteProjectMessage": "\"{{name}}\" öğesini tüm oturumları ve saklanan geçmişiyle (JSONL silme) kalıcı olarak kaldırır. Bu işlem geri alınamaz.",
+    "deleteProjectTitle": "Proje silinsin mi?",
+    "destinationPath": "Hedef yol",
+    "destinationPathRequired": "Hedef yol gerekli",
+    "displayNameOptional": "Görünen ad (isteğe bağlı)",
+    "failedToLoadTokens": "GitHub token'ları yüklenemedi",
+    "githubTokenOptional": "GitHub token'ı (isteğe bağlı)",
+    "newer": "Daha yeni",
+    "older": "Daha eski",
+    "projectArchived": "Proje arşivlendi",
+    "projectDeleted": "Proje silindi",
+    "projectRenamed": "Proje yeniden adlandırıldı",
+    "projectRestored": "Proje geri yüklendi",
+    "repoUrlPlaceholder": "https://github.com/org/repo.git",
+    "repositoryCloned": "Depo klonlandı",
+    "repositoryUrlRequired": "Depo URL'si gerekli",
+    "restore": "Geri yükle",
+    "sessionCount": {
+      "one": "{{count}} oturum",
+      "other": "{{count}} oturum"
+    },
+    "unknown": "Bilinmiyor",
+    "usingStoredToken": "Kayıtlı token kullanılıyor: {{name}}"
+  },
+  "sessions": {
+    "activity": {
+      "committingChanges": "Değişiklikler commit ediliyor",
+      "editingFile": "{{file}} düzenleniyor",
+      "editingFileGeneric": "Bir dosya düzenleniyor",
+      "fetchingUrl": "{{url}} getiriliyor",
+      "pushingBranch": "Dal gönderiliyor",
+      "readingFile": "{{file}} okunuyor",
+      "runningCommand": "`{{command}}` çalıştırılıyor",
+      "runningShellCommand": "Bir shell komutu çalıştırılıyor",
+      "runningTool": "{{name}} çalıştırılıyor",
+      "searching": "“{{query}}” aranıyor",
+      "subagentRunning": "Alt agent çalışıyor"
+    },
+    "age": {
+      "days": "{{days}}g",
+      "hours": "{{hours}}sa",
+      "lessThanMinute": "<1dk",
+      "minutes": "{{count}}dk"
+    },
+    "archive": "Arşivle",
+    "archivedSessions": "Arşivlenmiş oturumlar",
+    "autoOrchestrator": "Otomatik (düzenleyici)",
+    "compareWith": "Şununla karşılaştır…",
+    "createFailed": "Oturum oluşturulamadı: {{error}}",
+    "deleteSessionMessage": "\"{{name}}\" öğesini ve transkriptini kaldırır. Bu işlem geri alınamaz.",
+    "newSessionProvider": "Yeni oturum — sağlayıcı",
+    "noRecentSessions": "Yakın zamanda oturum yok",
+    "noSessions": "Oturum yok",
+    "projectPath": "Proje yolu",
+    "rename": "Yeniden adlandır",
+    "toasts": {
+      "archived": "Oturum arşivlendi",
+      "deleted": "Oturum silindi",
+      "pinned": "Oturum sabitlendi",
+      "renamed": "Oturum yeniden adlandırıldı",
+      "restored": "Oturum geri yüklendi",
+      "unpinned": "Oturum sabitlemesi kaldırıldı",
+      "workspaceChanged": "Çalışma alanı değiştirildi"
+    }
+  },
+  "git": {
+    "aiButton": "✦ AI",
+    "checkpoints": {
+      "create": "Yeni",
+      "empty": "Henüz kontrol noktası yok",
+      "labelHint": "Kontrol noktası etiketi (isteğe bağlı)",
+      "restoreMessage": "Çalışma ağacı bu kontrol noktasına sıfırlansın mı? Mevcut değişiklikler değiştirilecek.",
+      "restoreTitle": "Kontrol noktasını geri yükle",
+      "restored": "Kontrol noktası geri yüklendi",
+      "title": "Kontrol Noktaları"
+    },
+    "commitCreated": "Commit oluşturuldu",
+    "commitMessage": "Commit mesajı",
+    "deleteFile": "Dosyayı sil",
+    "hunkStage": "+ Parça",
+    "hunkUnstage": "− Parça",
+    "largeDiff": "Büyük diff önizlemesi: sekmeyi yanıt vermeye devam ettirmek için görüntüleme sınırlandırılır.",
+    "loadDiffFailed": "Diff yüklenemedi: {{error}}",
+    "noBranch": "dal yok",
+    "noDiff": "Diff yok",
+    "selectProject": "Bir proje seçin",
+    "splitDiff": "Diff'i böl",
+    "stageHunk": "Parçayı hazırla",
+    "stagedChanges": "Hazırlanan Değişiklikler",
+    "statusStaged": "Hazırlandı",
+    "switchBranch": "Dal değiştir",
+    "unifiedDiff": "Birleşik diff",
+    "unstageHunk": "Parçanın hazırlığını geri al"
+  },
+  "kanban": {
+    "card": {
+      "untitled": "Adsız"
+    },
+    "comments": {
+      "add": "Yorum ekle",
+      "empty": "Henüz yorum yok"
+    },
+    "details": {
+      "status": "Durum: {{status}}",
+      "title": "Kart Ayrıntıları"
+    },
+    "dialog": {
+      "saving": "Kaydediliyor…"
+    },
+    "empty": {
+      "noProject": "Proje seçilmedi"
+    },
+    "saveFailed": "Kart kaydedilemedi",
+    "time": {
+      "daysAgo(param=count)": {
+        "one": "1 gün önce",
+        "other": "{{count}} gün önce"
+      },
+      "hoursAgo(param=count)": {
+        "one": "1 saat önce",
+        "other": "{{count}} saat önce"
+      },
+      "minutesAgo(param=count)": {
+        "one": "1 dakika önce",
+        "other": "{{count}} dakika önce"
+      },
+      "now": "şimdi"
+    }
+  },
+  "onboarding": {
+    "agents": {
+      "description": "Bir veya daha fazla AI kodlama asistanına giriş yapın. Tümü isteğe bağlıdır.",
+      "laterHint": "Bunları daha sonra Ayarlar'dan yapılandırabilirsiniz.",
+      "title": "AI Agentlarınızı Bağlayın"
+    },
+    "completeSetup": "Kurulumu Tamamla",
+    "errors": {
+      "invalidEmail": "Lütfen geçerli bir e-posta adresi girin.",
+      "nameAndEmailRequired": "Hem git adı hem de e-posta gerekli."
+    },
+    "gitHint": "ddagent oturumlarının oluşturduğu commit'ler için kullanılır.",
+    "mcp": {
+      "description": "Agentlarınızın bilgi tabanını ve ddagent araçlarını kullanabilmesi için ddagent MCP sunucusunu kurun. Agentları seçin veya tümü için kurun.",
+      "installForAll": "Tümü için kur",
+      "installSelected": "Seçilenler için kur",
+      "installedOn(param=count)": {
+        "one": "{{count}} agenta kuruldu.",
+        "other": "{{count}} agenta kuruldu."
+      },
+      "installedWithFailures": "{{installedCount}} agenta kuruldu; başarısız: {{failed}}",
+      "laterHint": "İsteğe bağlı — bunu daha sonra Ayarlar → MCP bölümünden de kurabilirsiniz.",
+      "title": "Agentları ddagent'a bağlayın"
+    }
+  },
+  "fileTree": {
+    "browseServerFilesystem": "Sunucu dosya sistemine göz at",
+    "chooseFolder": "Klasör seç",
+    "copyContents": "İçeriği kopyala",
+    "noFiles": "Dosya yok",
+    "search": {
+      "hint": "Adları filtreleyin / içerikte aramak için Enter'a basın",
+      "noMatches": "Eşleşme yok",
+      "prompt": "Bir sorgu yazın ve Enter'a basın",
+      "resultsTruncated": "Sonuçlar kısaltıldı"
+    },
+    "titles": {
+      "delete": "{{name}} sil",
+      "download": "{{name}} indir",
+      "rename": "{{name}} öğesini yeniden adlandır"
+    },
+    "uploadHere": "Buraya yükle",
+    "uploadTo": "Şuraya yükle",
+    "uploadedCount": "{{count}} dosya yüklendi",
+    "newName": "Yeni ad",
+    "notRegisteredProject": "Kayıtlı bir proje değil: {{path}}",
+    "showGitignoredFiles": "Git tarafından yok sayılan dosyaları göster",
+    "hideGitignoredFiles": "Git tarafından yok sayılan dosyaları gizle",
+    "downloadUnsupportedOnWeb": "Web'de indirme desteklenmiyor",
+    "saveToPath": "Yola kaydet",
+    "savedTo": "Şuraya kaydedildi: {{path}}"
+  },
+  "workspace": {
+    "archivedWorkspaceName": "Arşivlenmiş",
+    "closePane": "Bölmeyi kapat",
+    "closeSearch": "Aramayı kapat",
+    "deleteSessionNotice": "Oturumu ve transkriptini kaldırır. Geri alınamaz.",
+    "exportChat": "Sohbeti dışa aktar",
+    "jumpToSession": "Oturuma git…",
+    "newChatProvider": "Yeni sohbet — sağlayıcı",
+    "nextMatch": "Sonraki eşleşme",
+    "previousMatch": "Önceki eşleşme",
+    "searchTranscript": "Transkriptte ara",
+    "sendTo": "{{count}} oturuma gönder",
+    "accountWithLabel": "Varsayılan · {{label}}",
+    "finishRunBeforeChangingWorkspace": "Çalışma alanını değiştirmeden önce çalıştırmayı bitir",
+    "restored": "Çalışma alanı geri yüklendi",
+    "maximizePane": "Bölmeyi büyüt",
+    "restorePanes": "Bölmeleri geri yükle",
+    "reviewChangedFiles": "Değişen dosyaları incele"
   }
 }

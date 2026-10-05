@@ -2,6 +2,7 @@ import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_node.dart';
 import 'package:ddagent_app/features/file_tree/state/file_tree_controller.dart';
 import 'package:ddagent_app/features/git/data/git_repository.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -46,6 +47,7 @@ class _EditorDockState extends ConsumerState<EditorDock> {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context);
+    final i18n = Translations.of(context);
     final status = ref.watch(gitStatusProvider(widget.projectId)).value;
     final tree = ref.watch(fileTreeProvider);
     return Container(
@@ -58,7 +60,10 @@ class _EditorDockState extends ConsumerState<EditorDock> {
           if (status != null) _ChangedSection(status: status, dock: widget),
           Padding(
             padding: const EdgeInsets.fromLTRB(AppSpacing.sm, AppSpacing.sm, AppSpacing.sm, 2),
-            child: Text('Files', style: t.textTheme.labelSmall?.copyWith(color: c.mutedForeground)),
+            child: Text(
+              i18n.common.tabs.files,
+              style: t.textTheme.labelSmall?.copyWith(color: c.mutedForeground),
+            ),
           ),
           if (tree.loading && tree.roots.isEmpty)
             const Padding(

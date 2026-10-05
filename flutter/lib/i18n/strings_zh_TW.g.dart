@@ -47,6 +47,26 @@ class TranslationsZhTw extends Translations with BaseTranslations<AppLocale, Tra
 	@override late final Translations$sidebar$zh_TW sidebar = Translations$sidebar$zh_TW.internal(_root);
 	@override late final Translations$tasks$zh_TW tasks = Translations$tasks$zh_TW.internal(_root);
 	@override late final Translations$knowledge$zh_TW knowledge = Translations$knowledge$zh_TW.internal(_root);
+	@override late final Translations$skills$zh_TW skills = Translations$skills$zh_TW.internal(_root);
+	@override late final Translations$mcp$zh_TW mcp = Translations$mcp$zh_TW.internal(_root);
+	@override late final Translations$terminal$zh_TW terminal = Translations$terminal$zh_TW.internal(_root);
+	@override late final Translations$worktrees$zh_TW worktrees = Translations$worktrees$zh_TW.internal(_root);
+	@override late final Translations$quota$zh_TW quota = Translations$quota$zh_TW.internal(_root);
+	@override late final Translations$scheduler$zh_TW scheduler = Translations$scheduler$zh_TW.internal(_root);
+	@override late final Translations$notifications$zh_TW notifications = Translations$notifications$zh_TW.internal(_root);
+	@override late final Translations$serverConnect$zh_TW serverConnect = Translations$serverConnect$zh_TW.internal(_root);
+	@override late final Translations$voice$zh_TW voice = Translations$voice$zh_TW.internal(_root);
+	@override late final Translations$preview$zh_TW preview = Translations$preview$zh_TW.internal(_root);
+	@override late final Translations$sharedContext$zh_TW sharedContext = Translations$sharedContext$zh_TW.internal(_root);
+	@override late final Translations$collab$zh_TW collab = Translations$collab$zh_TW.internal(_root);
+	@override late final Translations$browser$zh_TW browser = Translations$browser$zh_TW.internal(_root);
+	@override late final Translations$projects$zh_TW projects = Translations$projects$zh_TW.internal(_root);
+	@override late final Translations$sessions$zh_TW sessions = Translations$sessions$zh_TW.internal(_root);
+	@override late final Translations$git$zh_TW git = Translations$git$zh_TW.internal(_root);
+	@override late final Translations$kanban$zh_TW kanban = Translations$kanban$zh_TW.internal(_root);
+	@override late final Translations$onboarding$zh_TW onboarding = Translations$onboarding$zh_TW.internal(_root);
+	@override late final Translations$fileTree$zh_TW fileTree = Translations$fileTree$zh_TW.internal(_root);
+	@override late final Translations$workspace$zh_TW workspace = Translations$workspace$zh_TW.internal(_root);
 }
 
 // Path: auth
@@ -106,6 +126,14 @@ class Translations$chat$zh_TW extends Translations$chat$en {
 	@override late final Translations$chat$quotaBadge$zh_TW quotaBadge = Translations$chat$quotaBadge$zh_TW.internal(_root);
 	@override late final Translations$chat$paneHeader$zh_TW paneHeader = Translations$chat$paneHeader$zh_TW.internal(_root);
 	@override late final Translations$chat$broadcast$zh_TW broadcast = Translations$chat$broadcast$zh_TW.internal(_root);
+	@override late final Translations$chat$changes$zh_TW changes = Translations$chat$changes$zh_TW.internal(_root);
+	@override late final Translations$chat$commandResult$zh_TW commandResult = Translations$chat$commandResult$zh_TW.internal(_root);
+	@override late final Translations$chat$commands$zh_TW commands = Translations$chat$commands$zh_TW.internal(_root);
+	@override late final Translations$chat$export$zh_TW export = Translations$chat$export$zh_TW.internal(_root);
+	@override late final Translations$chat$message$zh_TW message = Translations$chat$message$zh_TW.internal(_root);
+	@override late final Translations$chat$modelLibrary$zh_TW modelLibrary = Translations$chat$modelLibrary$zh_TW.internal(_root);
+	@override late final Translations$chat$pinFile$zh_TW pinFile = Translations$chat$pinFile$zh_TW.internal(_root);
+	@override late final Translations$chat$permissionRequest$zh_TW permissionRequest = Translations$chat$permissionRequest$zh_TW.internal(_root);
 }
 
 // Path: codeEditor
@@ -122,6 +150,15 @@ class Translations$codeEditor$zh_TW extends Translations$codeEditor$en {
 	@override late final Translations$codeEditor$footer$zh_TW footer = Translations$codeEditor$footer$zh_TW.internal(_root);
 	@override late final Translations$codeEditor$binaryFile$zh_TW binaryFile = Translations$codeEditor$binaryFile$zh_TW.internal(_root);
 	@override late final Translations$codeEditor$filePreview$zh_TW filePreview = Translations$codeEditor$filePreview$zh_TW.internal(_root);
+	@override late final Translations$codeEditor$diff$zh_TW diff = Translations$codeEditor$diff$zh_TW.internal(_root);
+	@override String get discardUnsavedChanges => '捨棄未儲存的變更？';
+	@override late final Translations$codeEditor$emptyState$zh_TW emptyState = Translations$codeEditor$emptyState$zh_TW.internal(_root);
+	@override String get failedToLoad => '載入檔案失敗';
+	@override late final Translations$codeEditor$hexDump$zh_TW hexDump = Translations$codeEditor$hexDump$zh_TW.internal(_root);
+	@override late final Translations$codeEditor$mediaFile$zh_TW mediaFile = Translations$codeEditor$mediaFile$zh_TW.internal(_root);
+	@override late final Translations$codeEditor$settings$zh_TW settings = Translations$codeEditor$settings$zh_TW.internal(_root);
+	@override String unsavedChanges({required Object name}) => '${name} 中有未儲存的變更';
+	@override late final Translations$codeEditor$toasts$zh_TW toasts = Translations$codeEditor$toasts$zh_TW.internal(_root);
 }
 
 // Path: common
@@ -152,6 +189,8 @@ class Translations$common$zh_TW extends Translations$common$en {
 	@override late final Translations$common$gitPanel$zh_TW gitPanel = Translations$common$gitPanel$zh_TW.internal(_root);
 	@override late final Translations$common$sessions$zh_TW sessions = Translations$common$sessions$zh_TW.internal(_root);
 	@override late final Translations$common$projects$zh_TW projects = Translations$common$projects$zh_TW.internal(_root);
+	@override late final Translations$common$codeBlock$zh_TW codeBlock = Translations$common$codeBlock$zh_TW.internal(_root);
+	@override late final Translations$common$update$zh_TW update = Translations$common$update$zh_TW.internal(_root);
 }
 
 // Path: settings
@@ -245,6 +284,7 @@ class Translations$tasks$zh_TW extends Translations$tasks$en {
 	@override late final Translations$tasks$list$zh_TW list = Translations$tasks$list$zh_TW.internal(_root);
 	@override late final Translations$tasks$nextTask$zh_TW nextTask = Translations$tasks$nextTask$zh_TW.internal(_root);
 	@override late final Translations$tasks$taskDetail$zh_TW taskDetail = Translations$tasks$taskDetail$zh_TW.internal(_root);
+	@override late final Translations$tasks$toasts$zh_TW toasts = Translations$tasks$toasts$zh_TW.internal(_root);
 }
 
 // Path: knowledge
@@ -268,6 +308,393 @@ class Translations$knowledge$zh_TW extends Translations$knowledge$en {
 	@override late final Translations$knowledge$links$zh_TW links = Translations$knowledge$links$zh_TW.internal(_root);
 	@override late final Translations$knowledge$tags$zh_TW tags = Translations$knowledge$tags$zh_TW.internal(_root);
 	@override late final Translations$knowledge$settings$zh_TW settings = Translations$knowledge$settings$zh_TW.internal(_root);
+	@override late final Translations$knowledge$contextBudget$zh_TW contextBudget = Translations$knowledge$contextBudget$zh_TW.internal(_root);
+	@override late final Translations$knowledge$critical$zh_TW critical = Translations$knowledge$critical$zh_TW.internal(_root);
+	@override late final Translations$knowledge$errors$zh_TW errors = Translations$knowledge$errors$zh_TW.internal(_root);
+	@override late final Translations$knowledge$graph$zh_TW graph = Translations$knowledge$graph$zh_TW.internal(_root);
+	@override late final Translations$knowledge$importAll$zh_TW importAll = Translations$knowledge$importAll$zh_TW.internal(_root);
+	@override late final Translations$knowledge$importSkills$zh_TW importSkills = Translations$knowledge$importSkills$zh_TW.internal(_root);
+	@override late final Translations$knowledge$linkOptions$zh_TW linkOptions = Translations$knowledge$linkOptions$zh_TW.internal(_root);
+	@override late final Translations$knowledge$migrate$zh_TW migrate = Translations$knowledge$migrate$zh_TW.internal(_root);
+}
+
+// Path: skills
+class Translations$skills$zh_TW extends Translations$skills$en {
+	Translations$skills$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$skills$addDialog$zh_TW addDialog = Translations$skills$addDialog$zh_TW.internal(_root);
+	@override String deleteSkill({required Object name}) => '刪除 ${name}';
+	@override late final Translations$skills$empty$zh_TW empty = Translations$skills$empty$zh_TW.internal(_root);
+	@override late final Translations$skills$errors$zh_TW errors = Translations$skills$errors$zh_TW.internal(_root);
+	@override late final Translations$skills$moveDialog$zh_TW moveDialog = Translations$skills$moveDialog$zh_TW.internal(_root);
+	@override String moveSkill({required Object name}) => '移動 ${name}';
+	@override String get projectLabel => '專案';
+	@override late final Translations$skills$scopes$zh_TW scopes = Translations$skills$scopes$zh_TW.internal(_root);
+	@override late final Translations$skills$screen$zh_TW screen = Translations$skills$screen$zh_TW.internal(_root);
+}
+
+// Path: mcp
+class Translations$mcp$zh_TW extends Translations$mcp$en {
+	Translations$mcp$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$mcp$form$zh_TW form = Translations$mcp$form$zh_TW.internal(_root);
+	@override late final Translations$mcp$install$zh_TW install = Translations$mcp$install$zh_TW.internal(_root);
+	@override late final Translations$mcp$servers$zh_TW servers = Translations$mcp$servers$zh_TW.internal(_root);
+	@override late final Translations$mcp$team$zh_TW team = Translations$mcp$team$zh_TW.internal(_root);
+	@override late final Translations$mcp$tokens$zh_TW tokens = Translations$mcp$tokens$zh_TW.internal(_root);
+}
+
+// Path: terminal
+class Translations$terminal$zh_TW extends Translations$terminal$en {
+	Translations$terminal$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$terminal$actions$zh_TW actions = Translations$terminal$actions$zh_TW.internal(_root);
+	@override late final Translations$terminal$authUrl$zh_TW authUrl = Translations$terminal$authUrl$zh_TW.internal(_root);
+	@override late final Translations$terminal$errors$zh_TW errors = Translations$terminal$errors$zh_TW.internal(_root);
+	@override late final Translations$terminal$fileLink$zh_TW fileLink = Translations$terminal$fileLink$zh_TW.internal(_root);
+	@override late final Translations$terminal$paste$zh_TW paste = Translations$terminal$paste$zh_TW.internal(_root);
+	@override late final Translations$terminal$shortcuts$zh_TW shortcuts = Translations$terminal$shortcuts$zh_TW.internal(_root);
+	@override late final Translations$terminal$tabs$zh_TW tabs = Translations$terminal$tabs$zh_TW.internal(_root);
+}
+
+// Path: worktrees
+class Translations$worktrees$zh_TW extends Translations$worktrees$en {
+	Translations$worktrees$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get branchHint => '新分支名稱（例如 feature/login）';
+	@override String branchingOff({required Object branch}) => '從 ${branch} 建立分支';
+	@override String get cleanupDescription => '合併後移除 worktree 並刪除分支';
+	@override String get created => '已建立 worktree';
+	@override String get deleteBranchLabel => '同時刪除分支';
+	@override String dirtyWarning({required Object count}) => '警告：此 worktree 有 ${count} 個未提交的變更將會遺失。';
+	@override String get emptyDescription => '建立 worktree 以隔離功能開發或代理執行作業。';
+	@override String get emptyTitle => '找不到 worktree';
+	@override String get forceRemoveLabel => '強制移除（捨棄變更）';
+	@override String headDetachedAt({required Object sha}) => 'HEAD 分離於 ${sha}';
+	@override String get mainBadge => 'main';
+	@override String mergeDescription({required Object branch}) => '將變更合併至 ${branch}。';
+	@override String mergeTitle({required Object branch}) => '合併 ${branch}';
+	@override String merged({required Object branch}) => '已將 worktree 合併至 ${branch}';
+	@override String opened({required Object branch}) => '已開啟 worktree：${branch}';
+	@override String get portHint => '執行連接埠（選填，例如 3000）';
+	@override String get removeDescription => '這會刪除 worktree 資料夾。連結的專案將被封存。';
+	@override String removeTitle({required Object branch}) => '移除 worktree ${branch}？';
+	@override String get removed => '已移除 worktree';
+	@override String get runButton => '執行';
+	@override String get runHint => '執行指令（例如 npm run dev）';
+	@override String get runRunning => '執行中';
+	@override String runRunningWithPort({required Object port}) => '執行中 :${port}';
+	@override String get scripts => '指令碼';
+	@override String get scriptsSaved => '指令碼設定已儲存';
+	@override String get serverLabel => '伺服器：';
+	@override String get setupHint => '設定指令（例如 npm install）';
+	@override String get setupLabel => '設定：';
+	@override String get squashDescription => '將所有提交合併為單一提交';
+	@override String get stopButton => '停止';
+}
+
+// Path: quota
+class Translations$quota$zh_TW extends Translations$quota$en {
+	Translations$quota$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$quota$agents$zh_TW agents = Translations$quota$agents$zh_TW.internal(_root);
+	@override late final Translations$quota$chart$zh_TW chart = Translations$quota$chart$zh_TW.internal(_root);
+	@override late final Translations$quota$config$zh_TW config = Translations$quota$config$zh_TW.internal(_root);
+	@override late final Translations$quota$overview$zh_TW overview = Translations$quota$overview$zh_TW.internal(_root);
+	@override late final Translations$quota$section$zh_TW section = Translations$quota$section$zh_TW.internal(_root);
+}
+
+// Path: scheduler
+class Translations$scheduler$zh_TW extends Translations$scheduler$en {
+	Translations$scheduler$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get checking => '檢查中…';
+	@override String get cronHint => 'Cron（分 時 日 月 星期）— 例如 0 9 * * *';
+	@override String deleteMessage({required Object id}) => '這會移除週期性工作 ${id}。現有工作階段會保留。';
+	@override String get deleteTitle => '刪除排程？';
+	@override String get editTitle => '編輯排程';
+	@override String get newLabel => '新增';
+	@override String nextIn({required Object time}) => '${time} 後';
+	@override String get promptHint => '代理的提示詞';
+	@override String get runs => '執行次數';
+	@override String session({required Object id}) => '工作階段 ${id}';
+	@override String get worktree => 'worktree';
+}
+
+// Path: notifications
+class Translations$notifications$zh_TW extends Translations$notifications$en {
+	Translations$notifications$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get deviceLabel => 'ddagent Flutter';
+	@override late final Translations$notifications$errors$zh_TW errors = Translations$notifications$errors$zh_TW.internal(_root);
+}
+
+// Path: serverConnect
+class Translations$serverConnect$zh_TW extends Translations$serverConnect$en {
+	Translations$serverConnect$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get connect => '連線';
+	@override String get connecting => '正在連線…';
+	@override String connectionFailed({required Object error}) => '連線失敗（${error}）';
+	@override String get enterUrl => '輸入伺服器 URL';
+	@override String get subtitle => '連線到你的 ddagent 伺服器';
+}
+
+// Path: voice
+class Translations$voice$zh_TW extends Translations$voice$en {
+	Translations$voice$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get apiKeySaved => 'API 金鑰（已儲存，輸入以取代）';
+	@override String get preview => '預覽';
+	@override String get saveFailed => '儲存 STT 設定失敗';
+	@override String get settingsSaved => '語音輸入設定已儲存';
+}
+
+// Path: preview
+class Translations$preview$zh_TW extends Translations$preview$en {
+	Translations$preview$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get embeddedWebOnly => '內嵌預覽僅在網頁版本中提供';
+	@override String get startDevServerHint => '啟動開發伺服器（npm run dev、flutter run -d web-server…）\n其連接埠會顯示在這裡。';
+}
+
+// Path: sharedContext
+class Translations$sharedContext$zh_TW extends Translations$sharedContext$en {
+	Translations$sharedContext$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '共用筆記';
+}
+
+// Path: collab
+class Translations$collab$zh_TW extends Translations$collab$en {
+	Translations$collab$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get copyToken => '複製權杖';
+	@override String get createInvite => '建立邀請';
+	@override String get invite => '邀請';
+	@override String get inviteTeammate => '邀請隊友';
+	@override late final Translations$collab$roles$zh_TW roles = Translations$collab$roles$zh_TW.internal(_root);
+	@override String get shareTokenHint => '分享此邀請權杖 — 僅顯示一次，並在 72 小時後過期：';
+	@override String get team => '團隊';
+}
+
+// Path: browser
+class Translations$browser$zh_TW extends Translations$browser$en {
+	Translations$browser$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get dialogTitle => '代理瀏覽器';
+	@override String get viewError => '瀏覽器檢視錯誤';
+	@override String get web => '網頁';
+}
+
+// Path: projects
+class Translations$projects$zh_TW extends Translations$projects$en {
+	Translations$projects$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get archive => '封存';
+	@override String archivedSection({required Object count}) => '已封存（${count}）';
+	@override String get clone => '複製';
+	@override String get cloneFailed => '複製失敗';
+	@override String get cloneFinished => '複製完成。正在重新整理專案清單…';
+	@override String get cloneRepository => '複製儲存庫';
+	@override String get deletePermanently => '永久刪除';
+	@override String deleteProjectMessage({required Object name}) => '永久移除「${name}」，包括所有工作階段與儲存的歷史記錄（清除 JSONL）。此操作無法復原。';
+	@override String get deleteProjectTitle => '刪除專案？';
+	@override String get destinationPath => '目的地路徑';
+	@override String get destinationPathRequired => '目的地路徑為必填';
+	@override String get displayNameOptional => '顯示名稱（選填）';
+	@override String get failedToLoadTokens => '載入 GitHub 權杖失敗';
+	@override String get githubTokenOptional => 'GitHub 權杖（選填）';
+	@override String get newer => '較新';
+	@override String get older => '較舊';
+	@override String get projectArchived => '專案已封存';
+	@override String get projectDeleted => '專案已刪除';
+	@override String get projectRenamed => '專案已重新命名';
+	@override String get projectRestored => '專案已還原';
+	@override String get repoUrlPlaceholder => 'https://github.com/org/repo.git';
+	@override String get repositoryCloned => '儲存庫已複製';
+	@override String get repositoryUrlRequired => '儲存庫 URL 為必填';
+	@override String get restore => '還原';
+	@override String sessionCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
+		one: '${count} 個工作階段',
+		other: '${count} 個工作階段',
+	);
+	@override String get unknown => '未知';
+	@override String usingStoredToken({required Object name}) => '使用已儲存的權杖：${name}';
+}
+
+// Path: sessions
+class Translations$sessions$zh_TW extends Translations$sessions$en {
+	Translations$sessions$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$sessions$activity$zh_TW activity = Translations$sessions$activity$zh_TW.internal(_root);
+	@override late final Translations$sessions$age$zh_TW age = Translations$sessions$age$zh_TW.internal(_root);
+	@override String get archive => '封存';
+	@override String get archivedSessions => '已封存的工作階段';
+	@override String get autoOrchestrator => '自動（編排器）';
+	@override String get compareWith => '比較…';
+	@override String createFailed({required Object error}) => '建立工作階段失敗：${error}';
+	@override String deleteSessionMessage({required Object name}) => '移除「${name}」及其記錄。此操作無法復原。';
+	@override String get newSessionProvider => '新工作階段 — 提供者';
+	@override String get noRecentSessions => '沒有最近的工作階段';
+	@override String get noSessions => '沒有工作階段';
+	@override String get projectPath => '專案路徑';
+	@override String get rename => '重新命名';
+	@override late final Translations$sessions$toasts$zh_TW toasts = Translations$sessions$toasts$zh_TW.internal(_root);
+}
+
+// Path: git
+class Translations$git$zh_TW extends Translations$git$en {
+	Translations$git$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get aiButton => '✦ AI';
+	@override late final Translations$git$checkpoints$zh_TW checkpoints = Translations$git$checkpoints$zh_TW.internal(_root);
+	@override String get commitCreated => '已建立提交';
+	@override String get commitMessage => '提交訊息';
+	@override String get deleteFile => '刪除檔案';
+	@override String get hunkStage => '+ 區塊';
+	@override String get hunkUnstage => '− 區塊';
+	@override String get largeDiff => '大型差異預覽：為保持分頁順暢，渲染範圍已受限。';
+	@override String loadDiffFailed({required Object error}) => '載入差異失敗：${error}';
+	@override String get noBranch => '沒有分支';
+	@override String get noDiff => '沒有可用的差異';
+	@override String get selectProject => '選擇專案';
+	@override String get splitDiff => '並排差異';
+	@override String get stageHunk => '暫存區塊';
+	@override String get stagedChanges => '已暫存的變更';
+	@override String get statusStaged => '已暫存';
+	@override String get switchBranch => '切換分支';
+	@override String get unifiedDiff => '統一差異';
+	@override String get unstageHunk => '取消暫存區塊';
+}
+
+// Path: kanban
+class Translations$kanban$zh_TW extends Translations$kanban$en {
+	Translations$kanban$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$kanban$card$zh_TW card = Translations$kanban$card$zh_TW.internal(_root);
+	@override late final Translations$kanban$comments$zh_TW comments = Translations$kanban$comments$zh_TW.internal(_root);
+	@override late final Translations$kanban$details$zh_TW details = Translations$kanban$details$zh_TW.internal(_root);
+	@override late final Translations$kanban$dialog$zh_TW dialog = Translations$kanban$dialog$zh_TW.internal(_root);
+	@override late final Translations$kanban$empty$zh_TW empty = Translations$kanban$empty$zh_TW.internal(_root);
+	@override String get saveFailed => '儲存卡片失敗';
+	@override late final Translations$kanban$time$zh_TW time = Translations$kanban$time$zh_TW.internal(_root);
+}
+
+// Path: onboarding
+class Translations$onboarding$zh_TW extends Translations$onboarding$en {
+	Translations$onboarding$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$onboarding$agents$zh_TW agents = Translations$onboarding$agents$zh_TW.internal(_root);
+	@override String get completeSetup => '完成設定';
+	@override late final Translations$onboarding$errors$zh_TW errors = Translations$onboarding$errors$zh_TW.internal(_root);
+	@override String get gitHint => '用於 ddagent 工作階段建立的提交。';
+	@override late final Translations$onboarding$mcp$zh_TW mcp = Translations$onboarding$mcp$zh_TW.internal(_root);
+}
+
+// Path: fileTree
+class Translations$fileTree$zh_TW extends Translations$fileTree$en {
+	Translations$fileTree$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get browseServerFilesystem => '瀏覽伺服器檔案系統';
+	@override String get chooseFolder => '選擇資料夾';
+	@override String get copyContents => '複製內容';
+	@override String get noFiles => '沒有檔案';
+	@override late final Translations$fileTree$search$zh_TW search = Translations$fileTree$search$zh_TW.internal(_root);
+	@override late final Translations$fileTree$titles$zh_TW titles = Translations$fileTree$titles$zh_TW.internal(_root);
+	@override String get uploadHere => '上傳到此處';
+	@override String get uploadTo => '上傳至';
+	@override String uploadedCount({required Object count}) => '已上傳 ${count} 個檔案';
+	@override String get newName => '新名稱';
+	@override String notRegisteredProject({required Object path}) => '不是已註冊的專案：${path}';
+	@override String get showGitignoredFiles => '顯示被 gitignore 忽略的檔案';
+	@override String get hideGitignoredFiles => '隱藏被 gitignore 忽略的檔案';
+	@override String get downloadUnsupportedOnWeb => '網頁版不支援下載';
+	@override String get saveToPath => '儲存至路徑';
+	@override String savedTo({required Object path}) => '已儲存至 ${path}';
+}
+
+// Path: workspace
+class Translations$workspace$zh_TW extends Translations$workspace$en {
+	Translations$workspace$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get archivedWorkspaceName => '已封存';
+	@override String get closePane => '關閉窗格';
+	@override String get closeSearch => '關閉搜尋';
+	@override String get deleteSessionNotice => '移除工作階段及其記錄。無法復原。';
+	@override String get exportChat => '匯出對話';
+	@override String get jumpToSession => '跳至工作階段…';
+	@override String get newChatProvider => '新對話 — 提供者';
+	@override String get nextMatch => '下一個符合項目';
+	@override String get previousMatch => '上一個符合項目';
+	@override String get searchTranscript => '搜尋記錄';
+	@override String sendTo({required Object count}) => '傳送至 ${count}';
+	@override String accountWithLabel({required Object label}) => '預設 · ${label}';
+	@override String get finishRunBeforeChangingWorkspace => '變更工作區前請先完成執行';
+	@override String get restored => '工作區已還原';
+	@override String get maximizePane => '最大化窗格';
+	@override String get restorePanes => '還原窗格';
+	@override String get reviewChangedFiles => '檢閱已變更的檔案';
 }
 
 // Path: auth.login
@@ -381,6 +808,7 @@ class Translations$chat$tools$zh_TW extends Translations$chat$tools$en {
 	@override String get updateTodo => '更新待辦清單';
 	@override String get readTodo => '讀取待辦清單';
 	@override String get searchResults => '結果';
+	@override String get todoReadLabel => 'TodoRead 讀取清單';
 }
 
 // Path: chat.search
@@ -462,6 +890,15 @@ class Translations$chat$permissions$zh_TW extends Translations$chat$permissions$
 	@override String get retry => '權限已儲存。重試請求以使用該工具。';
 	@override String get error => '無法更新權限。請重試。';
 	@override String get openSettings => '開啟設定';
+	@override String get allow => '允許';
+	@override String allowAll({required Object count}) => '全部允許（${count}）';
+	@override String get allowWithChanges => '允許並修改';
+	@override String get always => '一律';
+	@override String get deny => '拒絕';
+	@override String get editAndAllow => '編輯並允許';
+	@override String get editInput => '編輯輸入';
+	@override String get invalidJson => '無效的 JSON';
+	@override String get reject => '拒絕';
 }
 
 // Path: chat.todo
@@ -540,6 +977,7 @@ class Translations$chat$input$zh_TW extends Translations$chat$input$en {
 	@override String get autoContinueTasks => '自動繼續';
 	@override String get autoContinueTasksTooltip => '啟用後讓 Devin 自動繼續下一個 Task Master 任務';
 	@override late final Translations$chat$input$offlineQueue$zh_TW offlineQueue = Translations$chat$input$offlineQueue$zh_TW.internal(_root);
+	@override String cameraUnavailable({required Object error}) => '相機無法使用：${error}';
 }
 
 // Path: chat.providerSelection
@@ -586,6 +1024,8 @@ class Translations$chat$session$zh_TW extends Translations$chat$session$en {
 	@override late final Translations$chat$session$kContinue$zh_TW kContinue = Translations$chat$session$kContinue$zh_TW.internal(_root);
 	@override late final Translations$chat$session$loading$zh_TW loading = Translations$chat$session$loading$zh_TW.internal(_root);
 	@override late final Translations$chat$session$messages$zh_TW messages = Translations$chat$session$messages$zh_TW.internal(_root);
+	@override String get deleteConfirm => '移除工作階段及其記錄。此操作無法復原。';
+	@override String get finishRunBeforeWorkspaceChange => '變更工作區前請先完成執行';
 }
 
 // Path: chat.shell
@@ -765,6 +1205,9 @@ class Translations$chat$askUserQuestion$zh_TW extends Translations$chat$askUserQ
 
 	// Translations
 	@override String needsInput({required Object provider}) => '${provider} 需要你的輸入';
+	@override String get answerHint => '輸入你的回答…';
+	@override String get other => '其他…';
+	@override String get skip => '略過';
 }
 
 // Path: chat.attachments
@@ -776,6 +1219,7 @@ class Translations$chat$attachments$zh_TW extends Translations$chat$attachments$
 	// Translations
 	@override String get downloadFailedRetry => '下載失敗 — 點擊重試';
 	@override String get fileAttachment => '檔案附件';
+	@override String download({required Object name}) => '下載 ${name}';
 }
 
 // Path: chat.checkpoint
@@ -788,6 +1232,7 @@ class Translations$chat$checkpoint$zh_TW extends Translations$chat$checkpoint$en
 	@override String get creating => '正在建立快照…';
 	@override String get revertChanges => '將檔案還原到上一個檢查點';
 	@override String get undo => '復原檢查點';
+	@override String get beforeAiTurn => 'AI 回合之前';
 }
 
 // Path: chat.common
@@ -811,6 +1256,8 @@ class Translations$chat$taskMaster$zh_TW extends Translations$chat$taskMaster$en
 	@override String get saved => '已儲存';
 	@override String get saving => '正在儲存...';
 	@override String get taskShort => '任務';
+	@override String get addToTask => '新增至 TaskMaster';
+	@override String get added => '已新增至 TaskMaster';
 }
 
 // Path: chat.tokenUsage
@@ -868,6 +1315,103 @@ class Translations$chat$broadcast$zh_TW extends Translations$chat$broadcast$en {
 	@override String get noOrchestrators => '沒有可用的編排器會話';
 }
 
+// Path: chat.changes
+class Translations$chat$changes$zh_TW extends Translations$chat$changes$en {
+	Translations$chat$changes$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get empty => '沒有檔案變更';
+	@override String get failedToLoad => '載入變更失敗';
+}
+
+// Path: chat.commandResult
+class Translations$chat$commandResult$zh_TW extends Translations$chat$commandResult$en {
+	Translations$chat$commandResult$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$chat$commandResult$fallback$zh_TW fallback = Translations$chat$commandResult$fallback$zh_TW.internal(_root);
+	@override String get filterCommands => '篩選指令...';
+	@override String searchModels({required Object provider}) => '搜尋 ${provider} 模型...';
+}
+
+// Path: chat.commands
+class Translations$chat$commands$zh_TW extends Translations$chat$commands$en {
+	Translations$chat$commands$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get runConfirmTitle => '執行指令？';
+	@override String get executionCancelled => '指令執行已取消';
+}
+
+// Path: chat.export
+class Translations$chat$export$zh_TW extends Translations$chat$export$en {
+	Translations$chat$export$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String sessionTitle({required Object id}) => '工作階段 ${id}';
+	@override String get pdfFailed => 'PDF 匯出失敗';
+	@override String get transcriptDownloaded => '記錄已下載';
+	@override String savedTo({required Object path}) => '已儲存 ${path}';
+}
+
+// Path: chat.message
+class Translations$chat$message$zh_TW extends Translations$chat$message$en {
+	Translations$chat$message$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get compactedSummary => '壓縮摘要';
+	@override String get rawView => '原始檢視';
+	@override String get resendHint => '從輸入框重新傳送';
+}
+
+// Path: chat.modelLibrary
+class Translations$chat$modelLibrary$zh_TW extends Translations$chat$modelLibrary$en {
+	Translations$chat$modelLibrary$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String deleteTooltip({required Object name}) => '刪除 ${name}';
+	@override String editTooltip({required Object name}) => '編輯 ${name}';
+	@override String get enterNameAndId => '請同時輸入模型名稱與模型 ID。';
+	@override String get idNoSpaces => '模型 ID 不能包含空格。';
+	@override String get setAsDefault => '設為預設';
+	@override String get defaultModel => '預設模型';
+}
+
+// Path: chat.pinFile
+class Translations$chat$pinFile$zh_TW extends Translations$chat$pinFile$en {
+	Translations$chat$pinFile$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get action => '釘選';
+	@override String get pathHint => 'path/to/file.ext';
+	@override String get title => '釘選檔案';
+}
+
+// Path: chat.permissionRequest
+class Translations$chat$permissionRequest$zh_TW extends Translations$chat$permissionRequest$en {
+	Translations$chat$permissionRequest$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String title({required Object tool}) => '權限要求 · ${tool}';
+	@override String get question => '問題';
+}
+
 // Path: codeEditor.toolbar
 class Translations$codeEditor$toolbar$zh_TW extends Translations$codeEditor$toolbar$en {
 	Translations$codeEditor$toolbar$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
@@ -883,6 +1427,10 @@ class Translations$codeEditor$toolbar$zh_TW extends Translations$codeEditor$tool
 	@override String get settings => '編輯器設定';
 	@override String get collapse => '收合編輯器';
 	@override String get expand => '展開編輯器到全寬';
+	@override String get diffMerge => '差異 / 合併';
+	@override String get previewInBrowser => '在瀏覽器中預覽';
+	@override String get reload => '從磁碟重新載入';
+	@override String get toggleDock => '切換檔案面板';
 }
 
 // Path: codeEditor.header
@@ -917,6 +1465,7 @@ class Translations$codeEditor$actions$zh_TW extends Translations$codeEditor$acti
 	@override String get unpinFile => '從上下文取消固定檔案';
 	@override String get previewHtml => '在新分頁中開啟 HTML 預覽';
 	@override String get retry => '重試';
+	@override String get saveAll => '全部儲存';
 }
 
 // Path: codeEditor.footer
@@ -940,6 +1489,7 @@ class Translations$codeEditor$binaryFile$zh_TW extends Translations$codeEditor$b
 	// Translations
 	@override String get title => '二進位檔案';
 	@override String message({required Object fileName}) => '檔案「${fileName}」無法在文字編輯器中顯示，因為它是二進位檔案。';
+	@override String get cannotDisplayAsText => '無法以文字顯示';
 }
 
 // Path: codeEditor.filePreview
@@ -952,6 +1502,81 @@ class Translations$codeEditor$filePreview$zh_TW extends Translations$codeEditor$
 	@override String get loading => '正在載入預覽...';
 	@override String get error => '無法顯示此檔案。';
 	@override String get openInNewTab => '在新分頁中開啟';
+}
+
+// Path: codeEditor.diff
+class Translations$codeEditor$diff$zh_TW extends Translations$codeEditor$diff$en {
+	Translations$codeEditor$diff$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get applyMerge => '套用合併';
+	@override String get base => '基礎';
+	@override String get close => '關閉差異';
+	@override String get current => '目前';
+	@override String hunk({required Object number}) => '區塊 ${number}';
+	@override String get noChanges => '沒有變更';
+	@override String get deletedOnDisk => '已從磁碟刪除';
+}
+
+// Path: codeEditor.emptyState
+class Translations$codeEditor$emptyState$zh_TW extends Translations$codeEditor$emptyState$en {
+	Translations$codeEditor$emptyState$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '未開啟任何檔案';
+}
+
+// Path: codeEditor.hexDump
+class Translations$codeEditor$hexDump$zh_TW extends Translations$codeEditor$hexDump$en {
+	Translations$codeEditor$hexDump$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String more({required Object size}) => '… 還有 ${size}';
+}
+
+// Path: codeEditor.mediaFile
+class Translations$codeEditor$mediaFile$zh_TW extends Translations$codeEditor$mediaFile$en {
+	Translations$codeEditor$mediaFile$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get subtitle => '尚不支援音訊/視訊預覽';
+	@override String get title => '媒體檔案';
+}
+
+// Path: codeEditor.settings
+class Translations$codeEditor$settings$zh_TW extends Translations$codeEditor$settings$en {
+	Translations$codeEditor$settings$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String fontSizeDecrease({required Object size}) => '字型大小 −  （目前 ${size}）';
+	@override String get fontSizeIncrease => '字型大小 +';
+	@override String get minimap => '縮圖';
+	@override String tabSize({required Object size}) => 'Tab 大小：${size}';
+}
+
+// Path: codeEditor.toasts
+class Translations$codeEditor$toasts$zh_TW extends Translations$codeEditor$toasts$en {
+	Translations$codeEditor$toasts$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String savedFile({required Object name}) => '已儲存 ${name}';
+	@override String get saveFailed => '儲存失敗';
+	@override String get allSaved => '已全部儲存';
+	@override String get someSavesFailed => '部分儲存失敗';
+	@override String savedTo({required Object path}) => '已儲存至 ${path}';
+	@override String get mergeApplied => '已套用合併 — 儲存以保留變更';
 }
 
 // Path: common.buttons
@@ -977,6 +1602,8 @@ class Translations$common$buttons$zh_TW extends Translations$common$buttons$en {
 	@override String get download => '下載';
 	@override String get upload => '上傳';
 	@override String get browse => '瀏覽';
+	@override String get openDiagram => '開啟圖表';
+	@override String get update => '更新';
 }
 
 // Path: common.tabs
@@ -1516,6 +2143,34 @@ class Translations$common$projects$zh_TW extends Translations$common$projects$en
 	@override String get newSession => '新工作階段';
 }
 
+// Path: common.codeBlock
+class Translations$common$codeBlock$zh_TW extends Translations$common$codeBlock$en {
+	Translations$common$codeBlock$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get wrapLines => '自動換行';
+	@override String get noWrap => '不換行';
+}
+
+// Path: common.update
+class Translations$common$update$zh_TW extends Translations$common$update$en {
+	Translations$common$update$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String available({required Object version}) => '有可用更新 · v${version}';
+	@override String confirm({required Object version}) => '要更新至 v${version} 嗎？伺服器會自行更新並重新啟動 — 進行中的工作階段將被中斷。';
+	@override String get downloading => '正在下載並套用更新…';
+	@override String get restarting => '正在重新啟動伺服器 — 這需要一點時間…';
+	@override String done({required Object version}) => '已更新至 v${version}。請重新載入應用程式以載入新版本。';
+	@override String get manualRestart => '更新已套用，但伺服器未自行重新啟動 — 請手動重新啟動以完成。';
+	@override String get failed => '更新失敗。';
+	@override String get failedTitle => '更新失敗';
+}
+
 // Path: settings.changelog
 class Translations$settings$changelog$zh_TW extends Translations$settings$changelog$en {
 	Translations$settings$changelog$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
@@ -1544,6 +2199,7 @@ class Translations$settings$server$zh_TW extends Translations$settings$server$en
 	@override String get restarting => '正在重新啟動… 伺服器恢復後頁面將自動重新整理。';
 	@override String get restartFailed => '重新啟動失敗';
 	@override String get unsupported => '僅當伺服器在服務管理員下執行時才可重新啟動。';
+	@override String get ok => '確定';
 }
 
 // Path: settings.updates
@@ -1632,6 +2288,7 @@ class Translations$settings$appearance$zh_TW extends Translations$settings$appea
 	@override String get showMinimap => '顯示縮圖';
 	@override String get lineNumbers => '行號';
 	@override String get fontSize => '字型大小';
+	@override late final Translations$settings$appearance$themeModes$zh_TW themeModes = Translations$settings$appearance$themeModes$zh_TW.internal(_root);
 }
 
 // Path: settings.actions
@@ -1661,6 +2318,7 @@ class Translations$settings$quickSettings$zh_TW extends Translations$settings$qu
 	@override String get sendByCtrlEnter => '使用 Ctrl+Enter 傳送';
 	@override String get sendByCtrlEnterDescription => '啟用後，按 Ctrl+Enter 傳送訊息，而不是僅按 Enter。這對於使用輸入法的使用者可以避免意外傳送。';
 	@override late final Translations$settings$quickSettings$dragHandle$zh_TW dragHandle = Translations$settings$quickSettings$dragHandle$zh_TW.internal(_root);
+	@override String get sendWithCtrlEnter => '使用 Ctrl+Enter 傳送';
 }
 
 // Path: settings.terminalShortcuts
@@ -1741,6 +2399,8 @@ class Translations$settings$notifications$zh_TW extends Translations$settings$no
 	@override late final Translations$settings$notifications$sound$zh_TW sound = Translations$settings$notifications$sound$zh_TW.internal(_root);
 	@override late final Translations$settings$notifications$events$zh_TW events = Translations$settings$notifications$events$zh_TW.internal(_root);
 	@override late final Translations$settings$notifications$desktop$zh_TW desktop = Translations$settings$notifications$desktop$zh_TW.internal(_root);
+	@override late final Translations$settings$notifications$channels$zh_TW channels = Translations$settings$notifications$channels$zh_TW.internal(_root);
+	@override String get unpair => '取消配對';
 }
 
 // Path: settings.appearanceSettings
@@ -1956,6 +2616,7 @@ class Translations$settings$workspaces$zh_TW extends Translations$settings$works
 	@override String get description => '工作區是 ddagent 可以聊天、執行程式碼和瀏覽的目錄。';
 	@override String get remove => '移除工作區';
 	@override String get title => '工作區';
+	@override String get pathRequired => '路徑為必填項。';
 }
 
 // Path: settings.about
@@ -1967,6 +2628,10 @@ class Translations$settings$about$zh_TW extends Translations$settings$about$en {
 	// Translations
 	@override String get supportTitle => '支持此專案';
 	@override String get buyMeACoffee => '請我喝杯咖啡';
+	@override String get learnMore => '深入了解';
+	@override late final Translations$settings$about$pro$zh_TW pro = Translations$settings$about$pro$zh_TW.internal(_root);
+	@override String get proFeatures => 'ddagent Pro 功能';
+	@override String get tryHosted => '試用 ddagent Hosted';
 }
 
 // Path: sidebar.projects
@@ -2349,6 +3014,7 @@ class Translations$tasks$notConfigured$zh_TW extends Translations$tasks$notConfi
 	@override String get whatIsTitle => '🎯 什麼是 TaskMaster？';
 	@override late final Translations$tasks$notConfigured$features$zh_TW features = Translations$tasks$notConfigured$features$zh_TW.internal(_root);
 	@override String get initializeButton => '初始化 TaskMaster AI';
+	@override String get writePrdFirst => '請先撰寫 PRD';
 }
 
 // Path: tasks.gettingStarted
@@ -2502,6 +3168,15 @@ class Translations$tasks$prd$zh_TW extends Translations$tasks$prd$en {
 
 	// Translations
 	@override String modified({required Object date}) => '修改時間：${date}';
+	@override String editorTitle({required Object name}) => 'PRD — ${name}';
+	@override String fileExistsMessage({required Object name}) => '已存在名為「${name}」的 PRD。要覆寫嗎？';
+	@override String get fileExistsTitle => '檔案已存在';
+	@override String get newFile => '新檔案';
+	@override String get parse => '解析 PRD';
+	@override String get template => '範本';
+	@override String get fileNameHint => '檔案名稱（例如 prd.txt）';
+	@override String get saved => 'PRD 已儲存';
+	@override String get tasksGenerated => '已從 PRD 產生任務';
 }
 
 // Path: tasks.statuses
@@ -2517,6 +3192,7 @@ class Translations$tasks$statuses$zh_TW extends Translations$tasks$statuses$en {
 	@override String get blocked => '已封鎖';
 	@override String get deferred => '已延後';
 	@override String get cancelled => '已取消';
+	@override String get review => '審查';
 }
 
 // Path: tasks.priorities
@@ -2619,6 +3295,8 @@ class Translations$tasks$list$zh_TW extends Translations$tasks$list$en {
 	@override String get inProgressComplete => '進行中（點擊完成）';
 	@override String get markCompleted => '標記為已完成';
 	@override String toggleStatusAria({required Object id}) => '切換任務 ${id} 的狀態';
+	@override String get markDone => '標記為完成';
+	@override String get reopen => '重新開啟';
 }
 
 // Path: tasks.nextTask
@@ -2675,6 +3353,20 @@ class Translations$tasks$taskDetail$zh_TW extends Translations$tasks$taskDetail$
 	@override String get testStrategy => '測試策略';
 	@override String get titleRequired => '標題為必填項';
 	@override String get updateFailed => '更新任務失敗';
+	@override String deleteConfirmMessage({required Object id}) => '任務 #${id} 將被移除。此操作無法復原。';
+	@override String get notFound => '找不到任務';
+	@override String get subtasks => '子任務';
+	@override String get idCopied => '已複製任務 ID';
+}
+
+// Path: tasks.toasts
+class Translations$tasks$toasts$zh_TW extends Translations$tasks$toasts$en {
+	Translations$tasks$toasts$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String statusInProgress({required Object id}) => '任務 ${id} 已設為進行中';
 }
 
 // Path: knowledge.tabs
@@ -2869,6 +3561,672 @@ class Translations$knowledge$settings$zh_TW extends Translations$knowledge$setti
 	@override String get description => '面向代理的本機記憶層：記憶、規則、技能和個人資訊。';
 }
 
+// Path: knowledge.contextBudget
+class Translations$knowledge$contextBudget$zh_TW extends Translations$knowledge$contextBudget$en {
+	Translations$knowledge$contextBudget$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String tokens({required Object tokens, required Object budget}) => '~${tokens} / ${budget} 權杖';
+}
+
+// Path: knowledge.critical
+class Translations$knowledge$critical$zh_TW extends Translations$knowledge$critical$en {
+	Translations$knowledge$critical$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get make => '設為嚴重';
+	@override String get makeAll => '將所有規則設為嚴重';
+	@override String get makeAllHint => '將它們加入注入的上下文預算';
+}
+
+// Path: knowledge.errors
+class Translations$knowledge$errors$zh_TW extends Translations$knowledge$errors$en {
+	Translations$knowledge$errors$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String importFailed({required Object error}) => '匯入失敗：${error}';
+	@override String migrationFailed({required Object error}) => '移轉失敗：${error}';
+}
+
+// Path: knowledge.graph
+class Translations$knowledge$graph$zh_TW extends Translations$knowledge$graph$en {
+	Translations$knowledge$graph$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get truncated => '已截斷';
+}
+
+// Path: knowledge.importAll
+class Translations$knowledge$importAll$zh_TW extends Translations$knowledge$importAll$en {
+	Translations$knowledge$importAll$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get action => '匯入全部';
+	@override String get mergeDuplicates => '合併重複項目';
+	@override String get mergeDuplicatesHint => '在 ddagent 中合併重複的資料列（非檔案）';
+	@override String projectsScanned({required Object count}) => '已掃描專案：${count}';
+	@override String rulesSummary({required Object total, required Object duplicates}) => '規則：${total} · 重複群組：${duplicates}';
+	@override String skillsFound({required Object found, required Object newSkills}) => '找到代理技能：${found}（新增：${newSkills}）';
+	@override String get title => '將所有內容匯入 ddagent';
+}
+
+// Path: knowledge.importSkills
+class Translations$knowledge$importSkills$zh_TW extends Translations$knowledge$importSkills$en {
+	Translations$knowledge$importSkills$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String found({required Object count}) => '在你的代理中找到 ${count} 個技能。';
+	@override String summary({required Object imported, required Object skipped}) => '新增：${imported} · 略過：${skipped}';
+	@override String get title => '匯入代理技能';
+}
+
+// Path: knowledge.linkOptions
+class Translations$knowledge$linkOptions$zh_TW extends Translations$knowledge$linkOptions$en {
+	Translations$knowledge$linkOptions$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String memory({required Object title}) => '記憶：${title}';
+	@override String personal({required Object title}) => '個人資訊：${title}';
+	@override String rule({required Object title}) => '規則：${title}';
+	@override String skill({required Object name}) => '技能：${name}';
+}
+
+// Path: knowledge.migrate
+class Translations$knowledge$migrate$zh_TW extends Translations$knowledge$migrate$en {
+	Translations$knowledge$migrate$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String duplicates({required Object count}) => '跨專案的重複群組：${count}';
+	@override String get mergeDuplicates => '合併重複項目';
+	@override String removedPromoted({required Object removed, required Object promoted}) => '已移除：${removed}，已提升：${promoted}';
+	@override String rulesSummary({required Object total, required Object critical}) => '規則：共 ${total} 條，${critical} 條嚴重。';
+	@override String scanned({required Object count}) => '已掃描 ${count} 個專案。';
+	@override String get title => '移轉現有規則';
+}
+
+// Path: skills.addDialog
+class Translations$skills$addDialog$zh_TW extends Translations$skills$addDialog$en {
+	Translations$skills$addDialog$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get chooseFileTitle => '選擇 SKILL.md';
+	@override String get chooseFiles => '選擇檔案';
+	@override String get chooseFolder => '選擇資料夾';
+	@override String get chooseFolderTitle => '選擇技能資料夾';
+	@override String folderFilesMeta({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
+		one: '${count} 個檔案 · ${size}',
+		other: '${count} 個檔案 · ${size}',
+	);
+	@override String get folderUploadsNote => '資料夾上傳會保留所選資料夾名稱；獨立檔案則使用 `SKILL.md` 中的 `name`。';
+	@override String get hideInstallLocation => '隱藏安裝位置';
+	@override String get installSkill => '安裝技能';
+	@override String installSkills({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
+		one: '安裝 ${count} 個技能',
+		other: '安裝 ${count} 個技能',
+	);
+	@override String markdownFileMeta({required Object size}) => 'Markdown 檔案 · ${size}';
+	@override String get pickHint => '資料夾可包含指令碼、參考資料與資源。';
+	@override String get pickTitle => '選擇技能資料夾或 SKILL.md';
+	@override String get readyToInstall => '可以安裝了';
+	@override String removeQueued({required Object name}) => '移除 ${name}';
+	@override String title({required Object provider}) => '新增 ${provider} 技能';
+	@override String get uploadHint => '上傳 SKILL.md 檔案或完整的技能資料夾。';
+	@override String get whereWillThisInstall => '這會安裝到哪裡？';
+}
+
+// Path: skills.empty
+class Translations$skills$empty$zh_TW extends Translations$skills$empty$en {
+	Translations$skills$empty$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get noGlobalSkills => '尚未找到全域技能';
+	@override String get noGlobalSkillsDescription => '在上方新增全域技能，即可在所有專案中使用。';
+	@override String get noMatchingSkills => '沒有符合的技能';
+	@override String get noMatchingSkillsDescription => '請嘗試不同的指令、名稱、範圍、專案或來源路徑。';
+	@override String get noProjects => '沒有可用的專案';
+	@override String get noProjectsDescription => '新增專案或工作區以瀏覽其技能。';
+	@override String get noSkillsInProject => '此專案沒有技能';
+	@override String get noSkillsInProjectDescription => '在所選專案中建立 .claude/skills、.cursor/skills 或 .agents/skills 資料夾。';
+}
+
+// Path: skills.errors
+class Translations$skills$errors$zh_TW extends Translations$skills$errors$en {
+	Translations$skills$errors$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get addMarkdownFirst => '請先新增一個或多個 Markdown 檔案。';
+	@override String couldNotReadSkillFile({required Object name}) => '無法從 ${name} 讀取 SKILL.md。';
+	@override String get dropMarkdownOrFolder => '拖放一個或多個 Markdown 檔案，或包含 SKILL.md 的資料夾。';
+	@override String folderFileLimit({required Object count}) => '一個技能資料夾最多可包含 ${count} 個檔案。';
+	@override String get folderReadFailed => '讀取技能資料夾失敗';
+	@override String get folderSizeLimit => '所選技能資料夾的總大小必須小於 30 MB。';
+	@override String get importFailed => '匯入技能失敗';
+	@override String get missingSkillFile => '所選資料夾不包含 SKILL.md 檔案。';
+}
+
+// Path: skills.moveDialog
+class Translations$skills$moveDialog$zh_TW extends Translations$skills$moveDialog$en {
+	Translations$skills$moveDialog$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get moveToGlobal => '移至全域';
+	@override String get moveToProject => '移至專案';
+	@override String get toGlobalHint => '將此技能移至全域技能目錄，讓所有專案都能使用。';
+	@override String get toProjectHint => '選擇應擁有此技能的專案。它會移出提供者的全域技能目錄。';
+}
+
+// Path: skills.scopes
+class Translations$skills$scopes$zh_TW extends Translations$skills$scopes$en {
+	Translations$skills$scopes$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get admin => '管理員';
+	@override String get plugin => '外掛';
+	@override String get project => '專案';
+	@override String get repo => '儲存庫';
+	@override String get system => '系統';
+	@override String get user => '使用者';
+}
+
+// Path: skills.screen
+class Translations$skills$screen$zh_TW extends Translations$skills$screen$en {
+	Translations$skills$screen$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get addSkill => '新增技能';
+	@override String get clearSearch => '清除技能搜尋';
+	@override String deleteDescription({required Object provider, required Object directory}) => '這會從 ${provider} 的受管理技能目錄中移除 ${directory} 目錄。此操作無法復原。';
+	@override String deleteTitle({required Object name}) => '刪除 ${name}？';
+	@override String loadingSkills({required Object provider}) => '正在載入 ${provider} 技能…';
+	@override String manageDescription({required Object provider}) => '從本機檔案、完整資料夾和專案感知位置管理 ${provider} 技能。';
+	@override String get noDescription => '技能前置資料中未提供說明。';
+	@override String pluginBadge({required Object name}) => '外掛：${name}';
+	@override String projectBadge({required Object name}) => '專案：${name}';
+	@override String get savedSuccessfully => '技能已成功儲存。';
+	@override String get scanningProjectSkills => '正在掃描專案技能...';
+	@override String get searchHint => '搜尋技能...';
+	@override String skillsCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
+		one: '${count} 個技能',
+		other: '${count} 個技能',
+	);
+	@override String get sourceLabel => '來源';
+}
+
+// Path: mcp.form
+class Translations$mcp$form$zh_TW extends Translations$mcp$form$en {
+	Translations$mcp$form$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$mcp$form$fields$zh_TW fields = Translations$mcp$form$fields$zh_TW.internal(_root);
+	@override late final Translations$mcp$form$scope$zh_TW scope = Translations$mcp$form$scope$zh_TW.internal(_root);
+	@override String submitTo({required Object provider}) => '將伺服器新增至 ${provider}';
+	@override late final Translations$mcp$form$validation$zh_TW validation = Translations$mcp$form$validation$zh_TW.internal(_root);
+}
+
+// Path: mcp.install
+class Translations$mcp$install$zh_TW extends Translations$mcp$install$en {
+	Translations$mcp$install$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get button => '安裝';
+	@override String get cardDescription => '透過 MCP 為你的代理提供知識庫與 ddagent 工具 — 選擇代理，或為全部安裝。';
+	@override String get description => '讓所選代理透過 MCP 使用 ddagent 知識庫與工具。';
+	@override String get errorFallback => '錯誤';
+	@override String failed({required Object error}) => '安裝失敗：${error}';
+	@override String get installForAll => '為全部安裝';
+	@override String get installSelected => '安裝所選項目';
+	@override String installedCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
+		one: '已安裝於 ${count} 個代理。',
+		other: '已安裝於 ${count} 個代理。',
+	);
+	@override String partialFailure({required Object count, required Object failed}) => '已安裝於 ${count} 個；失敗：${failed}';
+	@override String get title => '安裝 ddagent MCP 伺服器';
+}
+
+// Path: mcp.servers
+class Translations$mcp$servers$zh_TW extends Translations$mcp$servers$en {
+	Translations$mcp$servers$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get addGlobalDescription => '將此 MCP 伺服器新增至所有提供者：Claude、Cursor、Codex、OpenCode 和 Devin。由於相同設定必須在所有提供者中運作，因此僅支援 stdio 與 HTTP 傳輸。';
+	@override String get addGlobalMenuDescription => '新增全域 MCP 伺服器會將一個通用 stdio 或 HTTP 伺服器寫入 Claude、Cursor、Codex、OpenCode 和 Devin。';
+	@override String get addGlobalTitle => '新增全域 MCP 伺服器';
+	@override String addProviderDescription({required Object provider}) => '新增 ${provider} MCP 伺服器只會變更 ${provider}。';
+	@override String addProviderTitle({required Object provider}) => '新增 ${provider} MCP 伺服器';
+	@override late final Translations$mcp$servers$config$zh_TW config = Translations$mcp$servers$config$zh_TW.internal(_root);
+	@override String descriptionGeneric({required Object provider}) => 'Model Context Protocol 伺服器為 ${provider} 提供額外的工具和資料來源';
+	@override String get loading => '正在載入 MCP 伺服器...';
+	@override String get refreshingScopes => '正在重新整理專案範圍...';
+}
+
+// Path: mcp.team
+class Translations$mcp$team$zh_TW extends Translations$mcp$team$en {
+	Translations$mcp$team$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get cta => 'ddagent Pro 提供';
+	@override String get description => '在團隊中分享 MCP 伺服器設定。所有人都會自動保持同步。';
+	@override String get title => '團隊 MCP 設定';
+}
+
+// Path: mcp.tokens
+class Translations$mcp$tokens$zh_TW extends Translations$mcp$tokens$en {
+	Translations$mcp$tokens$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get scopeWrite => '寫入';
+}
+
+// Path: terminal.actions
+class Translations$terminal$actions$zh_TW extends Translations$terminal$actions$en {
+	Translations$terminal$actions$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get clearOutput => '清除輸出';
+	@override String get connect => '連線';
+	@override String get newShell => '新增 Shell';
+	@override String get newTab => '新增終端機分頁';
+	@override String get providerLogin => '提供者登入';
+	@override String get restartSession => '重新啟動工作階段';
+}
+
+// Path: terminal.authUrl
+class Translations$terminal$authUrl$zh_TW extends Translations$terminal$authUrl$en {
+	Translations$terminal$authUrl$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get openInBrowser => '在瀏覽器中開啟';
+}
+
+// Path: terminal.errors
+class Translations$terminal$errors$zh_TW extends Translations$terminal$errors$en {
+	Translations$terminal$errors$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String couldNotOpenLink({required Object url}) => '無法開啟連結：${url}';
+}
+
+// Path: terminal.fileLink
+class Translations$terminal$fileLink$zh_TW extends Translations$terminal$fileLink$en {
+	Translations$terminal$fileLink$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String detected({required Object path}) => '偵測到檔案：${path}';
+}
+
+// Path: terminal.paste
+class Translations$terminal$paste$zh_TW extends Translations$terminal$paste$en {
+	Translations$terminal$paste$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get hint => 'Ctrl+V / 按右鍵 → 貼上';
+	@override String get title => '貼上至終端機';
+}
+
+// Path: terminal.shortcuts
+class Translations$terminal$shortcuts$zh_TW extends Translations$terminal$shortcuts$en {
+	Translations$terminal$shortcuts$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get eof => 'EOF';
+	@override String get hide => '隱藏快速鍵列';
+	@override String get interrupt => '中斷 (SIGINT)';
+	@override String get suspend => '暫停 (SIGTSTP)';
+	@override String get showTooltip => '顯示快速鍵';
+	@override String get hideTooltip => '隱藏快速鍵';
+}
+
+// Path: terminal.tabs
+class Translations$terminal$tabs$zh_TW extends Translations$terminal$tabs$en {
+	Translations$terminal$tabs$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get antigravityCli => 'Antigravity CLI';
+	@override String get claudeCli => 'Claude CLI';
+	@override String get commandCodeCli => 'Command Code CLI';
+	@override String get cursorCli => 'Cursor CLI';
+	@override String get devinCli => 'Devin CLI';
+	@override String loginTitle({required Object provider}) => '登入：${provider}';
+	@override String get opencodeCli => 'OpenCode CLI';
+	@override String get plainShell => '一般 Shell';
+	@override String shellName({required Object index}) => 'Shell ${index}';
+}
+
+// Path: quota.agents
+class Translations$quota$agents$zh_TW extends Translations$quota$agents$en {
+	Translations$quota$agents$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String statusCount({required Object status, required Object count}) => '${status}（${count}）';
+}
+
+// Path: quota.chart
+class Translations$quota$chart$zh_TW extends Translations$quota$chart$en {
+	Translations$quota$chart$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get hide => '隱藏';
+	@override String get noData => '資料不足以顯示趨勢。';
+	@override String pointReadout({required Object date, required Object tokens, required Object cost}) => '${date} · ${tokens} 權杖 · ${cost}';
+	@override String get show => '顯示';
+}
+
+// Path: quota.config
+class Translations$quota$config$zh_TW extends Translations$quota$config$en {
+	Translations$quota$config$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get accountRouting => '帳戶路由';
+	@override String get pollerTitle => '輪詢器與警示';
+	@override String get save => '儲存設定';
+}
+
+// Path: quota.overview
+class Translations$quota$overview$zh_TW extends Translations$quota$overview$en {
+	Translations$quota$overview$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get tokensAndCost => '權杖與成本';
+}
+
+// Path: quota.section
+class Translations$quota$section$zh_TW extends Translations$quota$section$en {
+	Translations$quota$section$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get config => '設定';
+}
+
+// Path: notifications.errors
+class Translations$notifications$errors$zh_TW extends Translations$notifications$errors$en {
+	Translations$notifications$errors$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get noResponse => '伺服器沒有回應';
+	@override String get registrationRejected => '伺服器拒絕註冊';
+}
+
+// Path: collab.roles
+class Translations$collab$roles$zh_TW extends Translations$collab$roles$en {
+	Translations$collab$roles$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get member => '成員';
+	@override String get viewer => '檢視者';
+}
+
+// Path: sessions.activity
+class Translations$sessions$activity$zh_TW extends Translations$sessions$activity$en {
+	Translations$sessions$activity$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get committingChanges => '正在提交變更';
+	@override String editingFile({required Object file}) => '正在編輯 ${file}';
+	@override String get editingFileGeneric => '正在編輯檔案';
+	@override String fetchingUrl({required Object url}) => '正在取得 ${url}';
+	@override String get pushingBranch => '正在推送分支';
+	@override String readingFile({required Object file}) => '正在讀取 ${file}';
+	@override String runningCommand({required Object command}) => '正在執行 `${command}`';
+	@override String get runningShellCommand => '正在執行 Shell 指令';
+	@override String runningTool({required Object name}) => '正在執行 ${name}';
+	@override String searching({required Object query}) => '正在搜尋「${query}」';
+	@override String get subagentRunning => '子代理執行中';
+}
+
+// Path: sessions.age
+class Translations$sessions$age$zh_TW extends Translations$sessions$age$en {
+	Translations$sessions$age$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String days({required Object days}) => '${days} 天';
+	@override String hours({required Object hours}) => '${hours} 小時';
+	@override String get lessThanMinute => '<1 分鐘';
+	@override String minutes({required Object count}) => '${count} 分鐘';
+}
+
+// Path: sessions.toasts
+class Translations$sessions$toasts$zh_TW extends Translations$sessions$toasts$en {
+	Translations$sessions$toasts$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get archived => '工作階段已封存';
+	@override String get deleted => '工作階段已刪除';
+	@override String get pinned => '工作階段已釘選';
+	@override String get renamed => '工作階段已重新命名';
+	@override String get restored => '工作階段已還原';
+	@override String get unpinned => '工作階段已取消釘選';
+	@override String get workspaceChanged => '工作區已變更';
+}
+
+// Path: git.checkpoints
+class Translations$git$checkpoints$zh_TW extends Translations$git$checkpoints$en {
+	Translations$git$checkpoints$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get create => '新增';
+	@override String get empty => '尚無檢查點';
+	@override String get labelHint => '檢查點標籤（選填）';
+	@override String get restoreMessage => '要將工作樹重設到此檢查點嗎？目前的變更將被取代。';
+	@override String get restoreTitle => '還原檢查點';
+	@override String get restored => '檢查點已還原';
+	@override String get title => '檢查點';
+}
+
+// Path: kanban.card
+class Translations$kanban$card$zh_TW extends Translations$kanban$card$en {
+	Translations$kanban$card$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get untitled => '未命名';
+}
+
+// Path: kanban.comments
+class Translations$kanban$comments$zh_TW extends Translations$kanban$comments$en {
+	Translations$kanban$comments$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get add => '新增留言';
+	@override String get empty => '尚無留言';
+}
+
+// Path: kanban.details
+class Translations$kanban$details$zh_TW extends Translations$kanban$details$en {
+	Translations$kanban$details$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String status({required Object status}) => '狀態：${status}';
+	@override String get title => '卡片詳細資料';
+}
+
+// Path: kanban.dialog
+class Translations$kanban$dialog$zh_TW extends Translations$kanban$dialog$en {
+	Translations$kanban$dialog$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get saving => '儲存中…';
+}
+
+// Path: kanban.empty
+class Translations$kanban$empty$zh_TW extends Translations$kanban$empty$en {
+	Translations$kanban$empty$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get noProject => '未選擇專案';
+}
+
+// Path: kanban.time
+class Translations$kanban$time$zh_TW extends Translations$kanban$time$en {
+	Translations$kanban$time$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String daysAgo({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
+		one: '1 天前',
+		other: '${count} 天前',
+	);
+	@override String hoursAgo({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
+		one: '1 小時前',
+		other: '${count} 小時前',
+	);
+	@override String minutesAgo({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
+		one: '1 分鐘前',
+		other: '${count} 分鐘前',
+	);
+	@override String get now => '剛剛';
+}
+
+// Path: onboarding.agents
+class Translations$onboarding$agents$zh_TW extends Translations$onboarding$agents$en {
+	Translations$onboarding$agents$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => '登入一個或多個 AI 程式開發助手。全部皆為選填。';
+	@override String get laterHint => '你可以稍後在設定中進行設定。';
+	@override String get title => '連接你的 AI 代理';
+}
+
+// Path: onboarding.errors
+class Translations$onboarding$errors$zh_TW extends Translations$onboarding$errors$en {
+	Translations$onboarding$errors$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get invalidEmail => '請輸入有效的電子郵件地址。';
+	@override String get nameAndEmailRequired => 'git 名稱與電子郵件皆為必填。';
+}
+
+// Path: onboarding.mcp
+class Translations$onboarding$mcp$zh_TW extends Translations$onboarding$mcp$en {
+	Translations$onboarding$mcp$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => '安裝 ddagent MCP 伺服器，讓你的代理可以使用知識庫與 ddagent 工具。選擇代理，或為全部安裝。';
+	@override String get installForAll => '為全部安裝';
+	@override String get installSelected => '安裝所選項目';
+	@override String installedOn({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
+		one: '已安裝於 ${count} 個代理。',
+		other: '已安裝於 ${count} 個代理。',
+	);
+	@override String installedWithFailures({required Object installedCount, required Object failed}) => '已安裝於 ${installedCount} 個；失敗：${failed}';
+	@override String get laterHint => '選填 — 你也可以稍後在設定 → MCP 中安裝。';
+	@override String get title => '將代理連接到 ddagent';
+}
+
+// Path: fileTree.search
+class Translations$fileTree$search$zh_TW extends Translations$fileTree$search$en {
+	Translations$fileTree$search$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get hint => '篩選名稱 / 按 Enter 搜尋內容';
+	@override String get noMatches => '沒有符合項目';
+	@override String get prompt => '輸入查詢並按 Enter';
+	@override String get resultsTruncated => '結果已截斷';
+}
+
+// Path: fileTree.titles
+class Translations$fileTree$titles$zh_TW extends Translations$fileTree$titles$en {
+	Translations$fileTree$titles$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String delete({required Object name}) => '刪除 ${name}';
+	@override String download({required Object name}) => '下載 ${name}';
+	@override String rename({required Object name}) => '重新命名 ${name}';
+}
+
 // Path: auth.login.errors
 class Translations$auth$login$errors$zh_TW extends Translations$auth$login$errors$en {
 	Translations$auth$login$errors$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
@@ -3046,6 +4404,9 @@ class Translations$chat$session$messages$zh_TW extends Translations$chat$session
 	@override String get loadOlderFailed => '載入較早訊息失敗。';
 	@override String get retry => '重試';
 	@override String get noSearchMatches => '沒有訊息符合搜尋。';
+	@override String loadAllCount({required Object count}) => '載入全部（${count}）';
+	@override String get loadOlder => '載入較早的訊息';
+	@override String retryLoadOlder({required Object error}) => '重試載入較早訊息 — ${error}';
 }
 
 // Path: chat.shell.selectProject
@@ -3151,6 +4512,21 @@ class Translations$chat$claudeStatus$providers$zh_TW extends Translations$chat$c
 
 	// Translations
 	@override String get assistant => '助理';
+}
+
+// Path: chat.commandResult.fallback
+class Translations$chat$commandResult$fallback$zh_TW extends Translations$chat$commandResult$fallback$en {
+	Translations$chat$commandResult$fallback$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get config => '開啟設定與組態。';
+	@override String get cost => '檢視使用中工作階段的權杖用量。';
+	@override String get help => '顯示指令文件與語法。';
+	@override String get memory => '開啟專案的 CLAUDE.md 記憶檔案。';
+	@override String get models => '瀏覽使用中提供者的可用模型。';
+	@override String get status => '檢查執行階段、版本、提供者與環境狀態。';
 }
 
 // Path: common.fileTree.context
@@ -4045,6 +5421,18 @@ class Translations$settings$mcp$scope$zh_TW extends Translations$settings$mcp$sc
 	@override String get project => '專案';
 }
 
+// Path: settings.appearance.themeModes
+class Translations$settings$appearance$themeModes$zh_TW extends Translations$settings$appearance$themeModes$en {
+	Translations$settings$appearance$themeModes$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get dark => '深色';
+	@override String get light => '淺色';
+	@override String get system => '系統';
+}
+
 // Path: settings.quickSettings.sections
 class Translations$settings$quickSettings$sections$zh_TW extends Translations$settings$quickSettings$sections$en {
 	Translations$settings$quickSettings$sections$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
@@ -4252,6 +5640,17 @@ class Translations$settings$notifications$desktop$zh_TW extends Translations$set
 	@override String get unsupported => '此系統不支援桌面通知。';
 }
 
+// Path: settings.notifications.channels
+class Translations$settings$notifications$channels$zh_TW extends Translations$settings$notifications$channels$en {
+	Translations$settings$notifications$channels$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get discord => 'Discord';
+	@override String get telegram => 'Telegram';
+}
+
 // Path: settings.appearanceSettings.darkMode
 class Translations$settings$appearanceSettings$darkMode$zh_TW extends Translations$settings$appearanceSettings$darkMode$en {
 	Translations$settings$appearanceSettings$darkMode$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
@@ -4392,6 +5791,7 @@ class Translations$settings$git$name$zh_TW extends Translations$settings$git$nam
 	// Translations
 	@override String get label => 'Git 名稱';
 	@override String get help => '您的 git 提交名稱';
+	@override String get placeholder => '王小明';
 }
 
 // Path: settings.git.email
@@ -4403,6 +5803,7 @@ class Translations$settings$git$email$zh_TW extends Translations$settings$git$em
 	// Translations
 	@override String get label => 'Git 電子郵件';
 	@override String get help => '您的 git 提交電子郵件';
+	@override String get placeholder => 'john@example.com';
 }
 
 // Path: settings.git.actions
@@ -4901,6 +6302,17 @@ class Translations$settings$browser$errors$zh_TW extends Translations$settings$b
 	@override String get saveSettings => '儲存 Browser 設定失敗';
 }
 
+// Path: settings.about.pro
+class Translations$settings$about$pro$zh_TW extends Translations$settings$about$pro$en {
+	Translations$settings$about$pro$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get syncSettings => '同步設定';
+	@override String get teamManagement => '團隊管理';
+}
+
 // Path: tasks.notConfigured.features
 class Translations$tasks$notConfigured$features$zh_TW extends Translations$tasks$notConfigured$features$en {
 	Translations$tasks$notConfigured$features$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
@@ -5049,6 +6461,53 @@ class Translations$tasks$board$deleteConfirm$zh_TW extends Translations$tasks$bo
 	// Translations
 	@override String description({required Object cardTitle}) => '「${cardTitle}」將被永久刪除。';
 	@override String get title => '刪除卡片？';
+}
+
+// Path: mcp.form.fields
+class Translations$mcp$form$fields$zh_TW extends Translations$mcp$form$fields$en {
+	Translations$mcp$form$fields$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get bearerTokenEnvVar => 'Bearer 權杖環境變數';
+	@override String get envVarNames => '環境變數名稱';
+	@override String get workingDirectory => '工作目錄';
+}
+
+// Path: mcp.form.scope
+class Translations$mcp$form$scope$zh_TW extends Translations$mcp$form$scope$en {
+	Translations$mcp$form$scope$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get claudeLocal => 'Claude 本機';
+	@override late final Translations$mcp$form$scope$description$zh_TW description = Translations$mcp$form$scope$description$zh_TW.internal(_root);
+	@override String get projectAllProviders => '專案（所有提供者）';
+	@override String get userAllProviders => '使用者（所有提供者）';
+}
+
+// Path: mcp.form.validation
+class Translations$mcp$form$validation$zh_TW extends Translations$mcp$form$validation$en {
+	Translations$mcp$form$validation$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String unsupportedGlobal({required Object type}) => '新增 MCP 伺服器在所有提供者中僅支援 stdio 和 http，不支援 ${type}。';
+	@override String unsupportedProvider({required Object provider, required Object type}) => '${provider} 不支援 ${type} MCP 伺服器';
+}
+
+// Path: mcp.servers.config
+class Translations$mcp$servers$config$zh_TW extends Translations$mcp$servers$config$en {
+	Translations$mcp$servers$config$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get cwd => '工作目錄';
+	@override String get envVars => '環境變數';
 }
 
 // Path: common.projectWizard.step1.existing
@@ -5299,6 +6758,8 @@ class Translations$settings$apiKeys$github$form$zh_TW extends Translations$setti
 	@override String get addButton => '新增權杖';
 	@override String get cancelButton => '取消';
 	@override String get howToCreate => '如何建立 GitHub 個人存取權杖 →';
+	@override String get showToken => '顯示權杖';
+	@override String get hideToken => '隱藏權杖';
 }
 
 // Path: settings.tasks.notInstalled.steps
@@ -5480,6 +6941,20 @@ class Translations$tasks$gettingStarted$steps$startBuilding$zh_TW extends Transl
 	// Translations
 	@override String get title => '開始建構';
 	@override String get description => '請 AI 助手開始處理任務、更新狀態，並在專案演進時新增任務。';
+}
+
+// Path: mcp.form.scope.description
+class Translations$mcp$form$scope$description$zh_TW extends Translations$mcp$form$scope$description$en {
+	Translations$mcp$form$scope$description$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get local => '儲存在所選專案的 Claude 使用者設定中';
+	@override String get project => '儲存在所選專案工作區中';
+	@override String get projectGlobal => '為每個提供者寫入所選專案工作區';
+	@override String get user => '可在您機器上的所有專案中使用';
+	@override String get userGlobal => '寫入每個提供者的使用者設定，並可在此機器的所有專案中使用';
 }
 
 // Path: common.notifications.codes.generic.info
@@ -5677,6 +7152,7 @@ extension on TranslationsZhTw {
 			'chat.tools.updateTodo' => '更新待辦清單',
 			'chat.tools.readTodo' => '讀取待辦清單',
 			'chat.tools.searchResults' => '結果',
+			'chat.tools.todoReadLabel' => 'TodoRead 讀取清單',
 			'chat.search.found' => ({required Object count, required Object type}) => '找到 ${count} 個${type}',
 			'chat.search.file' => '檔案',
 			'chat.search.files' => '檔案',
@@ -5704,6 +7180,15 @@ extension on TranslationsZhTw {
 			'chat.permissions.retry' => '權限已儲存。重試請求以使用該工具。',
 			'chat.permissions.error' => '無法更新權限。請重試。',
 			'chat.permissions.openSettings' => '開啟設定',
+			'chat.permissions.allow' => '允許',
+			'chat.permissions.allowAll' => ({required Object count}) => '全部允許（${count}）',
+			'chat.permissions.allowWithChanges' => '允許並修改',
+			'chat.permissions.always' => '一律',
+			'chat.permissions.deny' => '拒絕',
+			'chat.permissions.editAndAllow' => '編輯並允許',
+			'chat.permissions.editInput' => '編輯輸入',
+			'chat.permissions.invalidJson' => '無效的 JSON',
+			'chat.permissions.reject' => '拒絕',
 			'chat.todo.updated' => '待辦清單已成功更新',
 			'chat.todo.current' => '目前待辦清單',
 			'chat.plan.viewPlan' => '📋 查看實作計畫',
@@ -5758,6 +7243,7 @@ extension on TranslationsZhTw {
 			'chat.input.offlineQueue.clearBtn' => '取消',
 			'chat.input.offlineQueue.multiple' => ({required Object count}) => '${count} 則訊息在離線佇列中 — 重新連線後將自動傳送',
 			'chat.input.offlineQueue.single' => '1 則訊息在離線佇列中 — 重新連線後將自動傳送',
+			'chat.input.cameraUnavailable' => ({required Object error}) => '相機無法使用：${error}',
 			'chat.providerSelection.title' => '選擇您的 AI 助手',
 			'chat.providerSelection.description' => '選擇一個提供者以開始新對話',
 			'chat.providerSelection.selectModel' => '選擇模型',
@@ -5807,6 +7293,11 @@ extension on TranslationsZhTw {
 			'chat.session.messages.loadOlderFailed' => '載入較早訊息失敗。',
 			'chat.session.messages.retry' => '重試',
 			'chat.session.messages.noSearchMatches' => '沒有訊息符合搜尋。',
+			'chat.session.messages.loadAllCount' => ({required Object count}) => '載入全部（${count}）',
+			'chat.session.messages.loadOlder' => '載入較早的訊息',
+			'chat.session.messages.retryLoadOlder' => ({required Object error}) => '重試載入較早訊息 — ${error}',
+			'chat.session.deleteConfirm' => '移除工作階段及其記錄。此操作無法復原。',
+			'chat.session.finishRunBeforeWorkspaceChange' => '變更工作區前請先完成執行',
 			'chat.shell.selectProject.title' => '選擇專案',
 			'chat.shell.selectProject.description' => '選擇一個專案以在該目錄中開啟互動式 Shell',
 			'chat.shell.status.newSession' => '新工作階段',
@@ -5912,16 +7403,23 @@ extension on TranslationsZhTw {
 			'chat.splitOverview.idle' => '閒置',
 			'chat.splitOverview.active' => '使用中',
 			'chat.askUserQuestion.needsInput' => ({required Object provider}) => '${provider} 需要你的輸入',
+			'chat.askUserQuestion.answerHint' => '輸入你的回答…',
+			'chat.askUserQuestion.other' => '其他…',
+			'chat.askUserQuestion.skip' => '略過',
 			'chat.attachments.downloadFailedRetry' => '下載失敗 — 點擊重試',
 			'chat.attachments.fileAttachment' => '檔案附件',
+			'chat.attachments.download' => ({required Object name}) => '下載 ${name}',
 			'chat.checkpoint.creating' => '正在建立快照…',
 			'chat.checkpoint.revertChanges' => '將檔案還原到上一個檢查點',
 			'chat.checkpoint.undo' => '復原檢查點',
+			'chat.checkpoint.beforeAiTurn' => 'AI 回合之前',
 			'chat.common.close' => '關閉',
 			'chat.taskMaster.saveToTask' => '任務',
 			'chat.taskMaster.saved' => '已儲存',
 			'chat.taskMaster.saving' => '正在儲存...',
 			'chat.taskMaster.taskShort' => '任務',
+			'chat.taskMaster.addToTask' => '新增至 TaskMaster',
+			'chat.taskMaster.added' => '已新增至 TaskMaster',
 			'chat.tokenUsage.desc' => '檢視工作階段權杖消耗',
 			'chat.tokenUsage.title' => '權杖用量',
 			'chat.tool.emptyResult' => '（暫無輸出 — 工具回傳了空結果）',
@@ -5932,6 +7430,36 @@ extension on TranslationsZhTw {
 			'chat.broadcast.selectOrchestrators' => '選擇編排器',
 			'chat.broadcast.orchestratorsOnly' => '僅編排器',
 			'chat.broadcast.noOrchestrators' => '沒有可用的編排器會話',
+			'chat.changes.empty' => '沒有檔案變更',
+			'chat.changes.failedToLoad' => '載入變更失敗',
+			'chat.commandResult.fallback.config' => '開啟設定與組態。',
+			'chat.commandResult.fallback.cost' => '檢視使用中工作階段的權杖用量。',
+			'chat.commandResult.fallback.help' => '顯示指令文件與語法。',
+			'chat.commandResult.fallback.memory' => '開啟專案的 CLAUDE.md 記憶檔案。',
+			'chat.commandResult.fallback.models' => '瀏覽使用中提供者的可用模型。',
+			'chat.commandResult.fallback.status' => '檢查執行階段、版本、提供者與環境狀態。',
+			'chat.commandResult.filterCommands' => '篩選指令...',
+			'chat.commandResult.searchModels' => ({required Object provider}) => '搜尋 ${provider} 模型...',
+			'chat.commands.runConfirmTitle' => '執行指令？',
+			'chat.commands.executionCancelled' => '指令執行已取消',
+			'chat.export.sessionTitle' => ({required Object id}) => '工作階段 ${id}',
+			'chat.export.pdfFailed' => 'PDF 匯出失敗',
+			'chat.export.transcriptDownloaded' => '記錄已下載',
+			'chat.export.savedTo' => ({required Object path}) => '已儲存 ${path}',
+			'chat.message.compactedSummary' => '壓縮摘要',
+			'chat.message.rawView' => '原始檢視',
+			'chat.message.resendHint' => '從輸入框重新傳送',
+			'chat.modelLibrary.deleteTooltip' => ({required Object name}) => '刪除 ${name}',
+			'chat.modelLibrary.editTooltip' => ({required Object name}) => '編輯 ${name}',
+			'chat.modelLibrary.enterNameAndId' => '請同時輸入模型名稱與模型 ID。',
+			'chat.modelLibrary.idNoSpaces' => '模型 ID 不能包含空格。',
+			'chat.modelLibrary.setAsDefault' => '設為預設',
+			'chat.modelLibrary.defaultModel' => '預設模型',
+			'chat.pinFile.action' => '釘選',
+			'chat.pinFile.pathHint' => 'path/to/file.ext',
+			'chat.pinFile.title' => '釘選檔案',
+			'chat.permissionRequest.title' => ({required Object tool}) => '權限要求 · ${tool}',
+			'chat.permissionRequest.question' => '問題',
 			'codeEditor.toolbar.changes' => '個變更',
 			'codeEditor.toolbar.previousChange' => '上一個變更',
 			'codeEditor.toolbar.nextChange' => '下一個變更',
@@ -5940,6 +7468,10 @@ extension on TranslationsZhTw {
 			'codeEditor.toolbar.settings' => '編輯器設定',
 			'codeEditor.toolbar.collapse' => '收合編輯器',
 			'codeEditor.toolbar.expand' => '展開編輯器到全寬',
+			'codeEditor.toolbar.diffMerge' => '差異 / 合併',
+			'codeEditor.toolbar.previewInBrowser' => '在瀏覽器中預覽',
+			'codeEditor.toolbar.reload' => '從磁碟重新載入',
+			'codeEditor.toolbar.toggleDock' => '切換檔案面板',
 			'codeEditor.loading' => ({required Object fileName}) => '正在載入 ${fileName}...',
 			'codeEditor.header.showingChanges' => '顯示變更',
 			'codeEditor.actions.copyPath' => '複製檔案路徑',
@@ -5957,14 +7489,40 @@ extension on TranslationsZhTw {
 			'codeEditor.actions.unpinFile' => '從上下文取消固定檔案',
 			'codeEditor.actions.previewHtml' => '在新分頁中開啟 HTML 預覽',
 			'codeEditor.actions.retry' => '重試',
+			'codeEditor.actions.saveAll' => '全部儲存',
 			'codeEditor.footer.lines' => '行數：',
 			'codeEditor.footer.characters' => '字元數：',
 			'codeEditor.footer.shortcuts' => '按 Ctrl+S 儲存 • Esc 關閉',
 			'codeEditor.binaryFile.title' => '二進位檔案',
 			'codeEditor.binaryFile.message' => ({required Object fileName}) => '檔案「${fileName}」無法在文字編輯器中顯示，因為它是二進位檔案。',
+			'codeEditor.binaryFile.cannotDisplayAsText' => '無法以文字顯示',
 			'codeEditor.filePreview.loading' => '正在載入預覽...',
 			'codeEditor.filePreview.error' => '無法顯示此檔案。',
 			'codeEditor.filePreview.openInNewTab' => '在新分頁中開啟',
+			'codeEditor.diff.applyMerge' => '套用合併',
+			'codeEditor.diff.base' => '基礎',
+			'codeEditor.diff.close' => '關閉差異',
+			'codeEditor.diff.current' => '目前',
+			'codeEditor.diff.hunk' => ({required Object number}) => '區塊 ${number}',
+			'codeEditor.diff.noChanges' => '沒有變更',
+			'codeEditor.diff.deletedOnDisk' => '已從磁碟刪除',
+			'codeEditor.discardUnsavedChanges' => '捨棄未儲存的變更？',
+			'codeEditor.emptyState.title' => '未開啟任何檔案',
+			'codeEditor.failedToLoad' => '載入檔案失敗',
+			'codeEditor.hexDump.more' => ({required Object size}) => '… 還有 ${size}',
+			'codeEditor.mediaFile.subtitle' => '尚不支援音訊/視訊預覽',
+			'codeEditor.mediaFile.title' => '媒體檔案',
+			'codeEditor.settings.fontSizeDecrease' => ({required Object size}) => '字型大小 −  （目前 ${size}）',
+			'codeEditor.settings.fontSizeIncrease' => '字型大小 +',
+			'codeEditor.settings.minimap' => '縮圖',
+			'codeEditor.settings.tabSize' => ({required Object size}) => 'Tab 大小：${size}',
+			'codeEditor.unsavedChanges' => ({required Object name}) => '${name} 中有未儲存的變更',
+			'codeEditor.toasts.savedFile' => ({required Object name}) => '已儲存 ${name}',
+			'codeEditor.toasts.saveFailed' => '儲存失敗',
+			'codeEditor.toasts.allSaved' => '已全部儲存',
+			'codeEditor.toasts.someSavesFailed' => '部分儲存失敗',
+			'codeEditor.toasts.savedTo' => ({required Object path}) => '已儲存至 ${path}',
+			'codeEditor.toasts.mergeApplied' => '已套用合併 — 儲存以保留變更',
 			'common.buttons.save' => '儲存',
 			'common.buttons.cancel' => '取消',
 			'common.buttons.delete' => '刪除',
@@ -5981,6 +7539,8 @@ extension on TranslationsZhTw {
 			'common.buttons.download' => '下載',
 			'common.buttons.upload' => '上傳',
 			'common.buttons.browse' => '瀏覽',
+			'common.buttons.openDiagram' => '開啟圖表',
+			'common.buttons.update' => '更新',
 			'common.tabs.chat' => '聊天',
 			'common.tabs.shell' => '終端機',
 			'common.tabs.files' => '檔案',
@@ -6046,6 +7606,8 @@ extension on TranslationsZhTw {
 			'common.mainContent.selectProjectDescription' => '從側邊欄選擇一個專案以開始使用 Claude 進行程式開發。每個專案包含您的聊天紀錄和檔案歷史。',
 			'common.mainContent.tip' => '提示',
 			'common.mainContent.createProjectMobile' => '點擊上方的選單按鈕以存取專案',
+			_ => null,
+		} ?? switch (path) {
 			'common.mainContent.createProjectDesktop' => '點擊側邊欄中的資料夾圖示以建立新專案',
 			'common.mainContent.newSession' => '新工作階段',
 			'common.mainContent.untitledSession' => '未命名工作階段',
@@ -6131,8 +7693,6 @@ extension on TranslationsZhTw {
 			'common.fileTree.validation.reserved' => '檔案名稱是保留名稱',
 			'common.projectWizard.title' => '建立新專案',
 			'common.projectWizard.steps.type' => '類型',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.steps.configure' => '設定',
 			'common.projectWizard.steps.confirm' => '確認',
 			'common.projectWizard.step1.question' => '您已經有工作區，還是想建立一個新的工作區？',
@@ -6560,6 +8120,8 @@ extension on TranslationsZhTw {
 			'common.gitPanel.mergeWorktree.commitCount' => ({required Object count}) => '${count} 個提交',
 			'common.gitPanel.mergeWorktree.merge' => '合併',
 			'common.gitPanel.mergeWorktree.mergeMessage' => ({required Object branch}) => '合併分支 \'${branch}\'',
+			_ => null,
+		} ?? switch (path) {
 			'common.gitPanel.mergeWorktree.messageLabel' => '提交訊息',
 			'common.gitPanel.mergeWorktree.squashDesc' => ({required Object commits, required Object branch}) => '將全部 ${commits} 個提交合併為 ${branch} 上的單一提交',
 			'common.gitPanel.mergeWorktree.squashLabel' => '壓縮提交（squash）',
@@ -6645,8 +8207,6 @@ extension on TranslationsZhTw {
 			'common.gitPanel.worktrees.changes' => ({required Object count}) => '${count} 個變更',
 			'common.gitPanel.worktrees.count' => ({required Object count}) => '${count} 個 worktree',
 			'common.gitPanel.worktrees.createFirst' => '建立你的第一個 worktree',
-			_ => null,
-		} ?? switch (path) {
 			'common.gitPanel.worktrees.detached' => '分離',
 			'common.gitPanel.worktrees.detachedAt' => ({required Object sha}) => '分離 @ ${sha}',
 			'common.gitPanel.worktrees.detachedHead' => '分離的 HEAD',
@@ -6669,6 +8229,16 @@ extension on TranslationsZhTw {
 			'common.gitPanel.tabs.worktrees' => '工作樹',
 			'common.sessions.renameSession' => '重新命名工作階段',
 			'common.projects.newSession' => '新工作階段',
+			'common.codeBlock.wrapLines' => '自動換行',
+			'common.codeBlock.noWrap' => '不換行',
+			'common.update.available' => ({required Object version}) => '有可用更新 · v${version}',
+			'common.update.confirm' => ({required Object version}) => '要更新至 v${version} 嗎？伺服器會自行更新並重新啟動 — 進行中的工作階段將被中斷。',
+			'common.update.downloading' => '正在下載並套用更新…',
+			'common.update.restarting' => '正在重新啟動伺服器 — 這需要一點時間…',
+			'common.update.done' => ({required Object version}) => '已更新至 v${version}。請重新載入應用程式以載入新版本。',
+			'common.update.manualRestart' => '更新已套用，但伺服器未自行重新啟動 — 請手動重新啟動以完成。',
+			'common.update.failed' => '更新失敗。',
+			'common.update.failedTitle' => '更新失敗',
 			'settings.title' => '設定',
 			'settings.changelog.title' => '更新日誌',
 			'settings.changelog.loading' => '載入中…',
@@ -6682,6 +8252,7 @@ extension on TranslationsZhTw {
 			'settings.server.restarting' => '正在重新啟動… 伺服器恢復後頁面將自動重新整理。',
 			'settings.server.restartFailed' => '重新啟動失敗',
 			'settings.server.unsupported' => '僅當伺服器在服務管理員下執行時才可重新啟動。',
+			'settings.server.ok' => '確定',
 			'settings.updates.title' => '應用程式更新',
 			'settings.updates.description' => '在 GitHub 上檢查更新的桌面版本。新版本會自動下載並在退出時安裝。',
 			'settings.updates.check' => '檢查更新',
@@ -6727,6 +8298,9 @@ extension on TranslationsZhTw {
 			'settings.appearance.showMinimap' => '顯示縮圖',
 			'settings.appearance.lineNumbers' => '行號',
 			'settings.appearance.fontSize' => '字型大小',
+			'settings.appearance.themeModes.dark' => '深色',
+			'settings.appearance.themeModes.light' => '淺色',
+			'settings.appearance.themeModes.system' => '系統',
 			'settings.actions.saveChanges' => '儲存變更',
 			'settings.actions.resetToDefaults' => '重設為預設值',
 			'settings.actions.cancelChanges' => '取消變更',
@@ -6744,6 +8318,7 @@ extension on TranslationsZhTw {
 			'settings.quickSettings.dragHandle.openPanel' => '開啟設定面板',
 			'settings.quickSettings.dragHandle.draggingStatus' => '正在拖曳...',
 			'settings.quickSettings.dragHandle.toggleAndMove' => '點擊切換，拖曳移動',
+			'settings.quickSettings.sendWithCtrlEnter' => '使用 Ctrl+Enter 傳送',
 			'settings.terminalShortcuts.title' => '終端機快速鍵',
 			'settings.terminalShortcuts.sectionKeys' => '按鍵',
 			'settings.terminalShortcuts.sectionNavigation' => '導覽',
@@ -6883,6 +8458,9 @@ extension on TranslationsZhTw {
 			'settings.notifications.desktop.disable' => '關閉推播通知',
 			'settings.notifications.desktop.enabled' => '此桌面應用程式已啟用通知',
 			'settings.notifications.desktop.unsupported' => '此系統不支援桌面通知。',
+			'settings.notifications.channels.discord' => 'Discord',
+			'settings.notifications.channels.telegram' => 'Telegram',
+			'settings.notifications.unpair' => '取消配對',
 			'settings.appearanceSettings.darkMode.label' => '深色模式',
 			'settings.appearanceSettings.darkMode.description' => '切換淺色和深色佈景主題',
 			'settings.appearanceSettings.codeEditor.title' => '程式碼編輯器',
@@ -6941,8 +8519,10 @@ extension on TranslationsZhTw {
 			'settings.git.description' => '設定您的 git 提交身分。這些設定將透過 git config --global 全域套用',
 			'settings.git.name.label' => 'Git 名稱',
 			'settings.git.name.help' => '您的 git 提交名稱',
+			'settings.git.name.placeholder' => '王小明',
 			'settings.git.email.label' => 'Git 電子郵件',
 			'settings.git.email.help' => '您的 git 提交電子郵件',
+			'settings.git.email.placeholder' => 'john@example.com',
 			'settings.git.actions.save' => '儲存設定',
 			'settings.git.actions.saving' => '儲存中...',
 			'settings.git.status.success' => '儲存成功',
@@ -6972,6 +8552,8 @@ extension on TranslationsZhTw {
 			'settings.apiKeys.github.form.addButton' => '新增權杖',
 			'settings.apiKeys.github.form.cancelButton' => '取消',
 			'settings.apiKeys.github.form.howToCreate' => '如何建立 GitHub 個人存取權杖 →',
+			'settings.apiKeys.github.form.showToken' => '顯示權杖',
+			'settings.apiKeys.github.form.hideToken' => '隱藏權杖',
 			'settings.apiKeys.github.empty' => '尚未新增 GitHub 權杖。',
 			'settings.apiKeys.github.added' => '新增時間：',
 			'settings.apiKeys.github.confirmDelete' => '確定要刪除此 GitHub 權杖嗎？',
@@ -7052,6 +8634,8 @@ extension on TranslationsZhTw {
 			'settings.permissions.toolExamples.bashRm' => '- 封鎖所有 rm 指令（危險）',
 			'settings.permissions.shellExamples.title' => 'Shell 指令範例：',
 			'settings.permissions.shellExamples.ls' => '- 允許 ls 指令',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.shellExamples.gitStatus' => '- 允許 git status',
 			'settings.permissions.shellExamples.npmInstall' => '- 允許 npm install',
 			'settings.permissions.shellExamples.rmRf' => '- 封鎖遞迴刪除',
@@ -7159,8 +8743,6 @@ extension on TranslationsZhTw {
 			'settings.browser.installed' => '已安裝',
 			'settings.browser.installing' => '正在安裝...',
 			'settings.browser.missing' => '缺失',
-			_ => null,
-		} ?? switch (path) {
 			'settings.browser.runtimeRequired' => '需要瀏覽器執行環境',
 			'settings.browser.statusDisabled' => '已停用',
 			'settings.browser.statusLabel' => '狀態',
@@ -7175,8 +8757,14 @@ extension on TranslationsZhTw {
 			'settings.workspaces.description' => '工作區是 ddagent 可以聊天、執行程式碼和瀏覽的目錄。',
 			'settings.workspaces.remove' => '移除工作區',
 			'settings.workspaces.title' => '工作區',
+			'settings.workspaces.pathRequired' => '路徑為必填項。',
 			'settings.about.supportTitle' => '支持此專案',
 			'settings.about.buyMeACoffee' => '請我喝杯咖啡',
+			'settings.about.learnMore' => '深入了解',
+			'settings.about.pro.syncSettings' => '同步設定',
+			'settings.about.pro.teamManagement' => '團隊管理',
+			'settings.about.proFeatures' => 'ddagent Pro 功能',
+			'settings.about.tryHosted' => '試用 ddagent Hosted',
 			'sidebar.projects.title' => '專案',
 			'sidebar.projects.newProject' => '新增專案',
 			'sidebar.projects.deleteProject' => '移除專案',
@@ -7371,6 +8959,7 @@ extension on TranslationsZhTw {
 			'tasks.notConfigured.features.progressVisualization' => '進度視覺化：看板和詳細的任務分析',
 			'tasks.notConfigured.features.cliIntegration' => 'CLI 整合：使用 taskmaster 指令進行進階工作流程',
 			'tasks.notConfigured.initializeButton' => '初始化 TaskMaster AI',
+			'tasks.notConfigured.writePrdFirst' => '請先撰寫 PRD',
 			'tasks.gettingStarted.title' => '開始使用 TaskMaster',
 			'tasks.gettingStarted.subtitle' => 'TaskMaster 已初始化！以下是接下來要做的事：',
 			'tasks.gettingStarted.steps.createPRD.title' => '建立產品需求文件（PRD）',
@@ -7451,12 +9040,22 @@ extension on TranslationsZhTw {
 			'tasks.buttons.createNewPRD' => '建立新 PRD',
 			'tasks.buttons.prdsAvailable' => ({required Object count}) => '${count} 個 PRD 可用',
 			'tasks.prd.modified' => ({required Object date}) => '修改時間：${date}',
+			'tasks.prd.editorTitle' => ({required Object name}) => 'PRD — ${name}',
+			'tasks.prd.fileExistsMessage' => ({required Object name}) => '已存在名為「${name}」的 PRD。要覆寫嗎？',
+			'tasks.prd.fileExistsTitle' => '檔案已存在',
+			'tasks.prd.newFile' => '新檔案',
+			'tasks.prd.parse' => '解析 PRD',
+			'tasks.prd.template' => '範本',
+			'tasks.prd.fileNameHint' => '檔案名稱（例如 prd.txt）',
+			'tasks.prd.saved' => 'PRD 已儲存',
+			'tasks.prd.tasksGenerated' => '已從 PRD 產生任務',
 			'tasks.statuses.pending' => '待處理',
 			'tasks.statuses.inProgress' => '進行中',
 			'tasks.statuses.done' => '已完成',
 			'tasks.statuses.blocked' => '已封鎖',
 			'tasks.statuses.deferred' => '已延後',
 			'tasks.statuses.cancelled' => '已取消',
+			'tasks.statuses.review' => '審查',
 			'tasks.priorities.high' => '高',
 			'tasks.priorities.medium' => '中',
 			'tasks.priorities.low' => '低',
@@ -7530,6 +9129,8 @@ extension on TranslationsZhTw {
 			'tasks.list.inProgressComplete' => '進行中（點擊完成）',
 			'tasks.list.markCompleted' => '標記為已完成',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => '切換任務 ${id} 的狀態',
+			'tasks.list.markDone' => '標記為完成',
+			'tasks.list.reopen' => '重新開啟',
 			'tasks.nextTask.allComplete' => '所有任務已完成',
 			'tasks.nextTask.feature1' => '- AI 任務管理，支援依賴和子任務。',
 			'tasks.nextTask.feature2' => '- PRD 驅動的任務產生，快速啟動專案。',
@@ -7547,6 +9148,8 @@ extension on TranslationsZhTw {
 			'tasks.taskDetail.cancelEdit' => '取消編輯',
 			'tasks.taskDetail.close' => '關閉',
 			'tasks.taskDetail.copyTaskId' => '複製任務 ID',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.delete' => '刪除任務',
 			'tasks.taskDetail.deleteConfirmDescription' => ({required Object title}) => '「${title}」將被永久刪除。',
 			'tasks.taskDetail.deleteConfirmTitle' => '刪除任務？',
@@ -7568,6 +9171,11 @@ extension on TranslationsZhTw {
 			'tasks.taskDetail.testStrategy' => '測試策略',
 			'tasks.taskDetail.titleRequired' => '標題為必填項',
 			'tasks.taskDetail.updateFailed' => '更新任務失敗',
+			'tasks.taskDetail.deleteConfirmMessage' => ({required Object id}) => '任務 #${id} 將被移除。此操作無法復原。',
+			'tasks.taskDetail.notFound' => '找不到任務',
+			'tasks.taskDetail.subtasks' => '子任務',
+			'tasks.taskDetail.idCopied' => '已複製任務 ID',
+			'tasks.toasts.statusInProgress' => ({required Object id}) => '任務 ${id} 已設為進行中',
 			'knowledge.title' => '知識',
 			'knowledge.tabs.dashboard' => '面板',
 			'knowledge.tabs.memories' => '記憶',
@@ -7644,6 +9252,383 @@ extension on TranslationsZhTw {
 			'knowledge.tags.manage' => '管理標籤',
 			'knowledge.tags.none' => '尚無標籤。',
 			'knowledge.settings.description' => '面向代理的本機記憶層：記憶、規則、技能和個人資訊。',
+			'knowledge.contextBudget.tokens' => ({required Object tokens, required Object budget}) => '~${tokens} / ${budget} 權杖',
+			'knowledge.critical.make' => '設為嚴重',
+			'knowledge.critical.makeAll' => '將所有規則設為嚴重',
+			'knowledge.critical.makeAllHint' => '將它們加入注入的上下文預算',
+			'knowledge.errors.importFailed' => ({required Object error}) => '匯入失敗：${error}',
+			'knowledge.errors.migrationFailed' => ({required Object error}) => '移轉失敗：${error}',
+			'knowledge.graph.truncated' => '已截斷',
+			'knowledge.importAll.action' => '匯入全部',
+			'knowledge.importAll.mergeDuplicates' => '合併重複項目',
+			'knowledge.importAll.mergeDuplicatesHint' => '在 ddagent 中合併重複的資料列（非檔案）',
+			'knowledge.importAll.projectsScanned' => ({required Object count}) => '已掃描專案：${count}',
+			'knowledge.importAll.rulesSummary' => ({required Object total, required Object duplicates}) => '規則：${total} · 重複群組：${duplicates}',
+			'knowledge.importAll.skillsFound' => ({required Object found, required Object newSkills}) => '找到代理技能：${found}（新增：${newSkills}）',
+			'knowledge.importAll.title' => '將所有內容匯入 ddagent',
+			'knowledge.importSkills.found' => ({required Object count}) => '在你的代理中找到 ${count} 個技能。',
+			'knowledge.importSkills.summary' => ({required Object imported, required Object skipped}) => '新增：${imported} · 略過：${skipped}',
+			'knowledge.importSkills.title' => '匯入代理技能',
+			'knowledge.linkOptions.memory' => ({required Object title}) => '記憶：${title}',
+			'knowledge.linkOptions.personal' => ({required Object title}) => '個人資訊：${title}',
+			'knowledge.linkOptions.rule' => ({required Object title}) => '規則：${title}',
+			'knowledge.linkOptions.skill' => ({required Object name}) => '技能：${name}',
+			'knowledge.migrate.duplicates' => ({required Object count}) => '跨專案的重複群組：${count}',
+			'knowledge.migrate.mergeDuplicates' => '合併重複項目',
+			'knowledge.migrate.removedPromoted' => ({required Object removed, required Object promoted}) => '已移除：${removed}，已提升：${promoted}',
+			'knowledge.migrate.rulesSummary' => ({required Object total, required Object critical}) => '規則：共 ${total} 條，${critical} 條嚴重。',
+			'knowledge.migrate.scanned' => ({required Object count}) => '已掃描 ${count} 個專案。',
+			'knowledge.migrate.title' => '移轉現有規則',
+			'skills.addDialog.chooseFileTitle' => '選擇 SKILL.md',
+			'skills.addDialog.chooseFiles' => '選擇檔案',
+			'skills.addDialog.chooseFolder' => '選擇資料夾',
+			'skills.addDialog.chooseFolderTitle' => '選擇技能資料夾',
+			'skills.addDialog.folderFilesMeta' => ({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '${count} 個檔案 · ${size}', other: '${count} 個檔案 · ${size}', ), 
+			'skills.addDialog.folderUploadsNote' => '資料夾上傳會保留所選資料夾名稱；獨立檔案則使用 `SKILL.md` 中的 `name`。',
+			'skills.addDialog.hideInstallLocation' => '隱藏安裝位置',
+			'skills.addDialog.installSkill' => '安裝技能',
+			'skills.addDialog.installSkills' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '安裝 ${count} 個技能', other: '安裝 ${count} 個技能', ), 
+			'skills.addDialog.markdownFileMeta' => ({required Object size}) => 'Markdown 檔案 · ${size}',
+			'skills.addDialog.pickHint' => '資料夾可包含指令碼、參考資料與資源。',
+			'skills.addDialog.pickTitle' => '選擇技能資料夾或 SKILL.md',
+			'skills.addDialog.readyToInstall' => '可以安裝了',
+			'skills.addDialog.removeQueued' => ({required Object name}) => '移除 ${name}',
+			'skills.addDialog.title' => ({required Object provider}) => '新增 ${provider} 技能',
+			'skills.addDialog.uploadHint' => '上傳 SKILL.md 檔案或完整的技能資料夾。',
+			'skills.addDialog.whereWillThisInstall' => '這會安裝到哪裡？',
+			'skills.deleteSkill' => ({required Object name}) => '刪除 ${name}',
+			'skills.empty.noGlobalSkills' => '尚未找到全域技能',
+			'skills.empty.noGlobalSkillsDescription' => '在上方新增全域技能，即可在所有專案中使用。',
+			'skills.empty.noMatchingSkills' => '沒有符合的技能',
+			'skills.empty.noMatchingSkillsDescription' => '請嘗試不同的指令、名稱、範圍、專案或來源路徑。',
+			'skills.empty.noProjects' => '沒有可用的專案',
+			'skills.empty.noProjectsDescription' => '新增專案或工作區以瀏覽其技能。',
+			'skills.empty.noSkillsInProject' => '此專案沒有技能',
+			'skills.empty.noSkillsInProjectDescription' => '在所選專案中建立 .claude/skills、.cursor/skills 或 .agents/skills 資料夾。',
+			'skills.errors.addMarkdownFirst' => '請先新增一個或多個 Markdown 檔案。',
+			'skills.errors.couldNotReadSkillFile' => ({required Object name}) => '無法從 ${name} 讀取 SKILL.md。',
+			'skills.errors.dropMarkdownOrFolder' => '拖放一個或多個 Markdown 檔案，或包含 SKILL.md 的資料夾。',
+			'skills.errors.folderFileLimit' => ({required Object count}) => '一個技能資料夾最多可包含 ${count} 個檔案。',
+			'skills.errors.folderReadFailed' => '讀取技能資料夾失敗',
+			'skills.errors.folderSizeLimit' => '所選技能資料夾的總大小必須小於 30 MB。',
+			'skills.errors.importFailed' => '匯入技能失敗',
+			'skills.errors.missingSkillFile' => '所選資料夾不包含 SKILL.md 檔案。',
+			'skills.moveDialog.moveToGlobal' => '移至全域',
+			'skills.moveDialog.moveToProject' => '移至專案',
+			'skills.moveDialog.toGlobalHint' => '將此技能移至全域技能目錄，讓所有專案都能使用。',
+			'skills.moveDialog.toProjectHint' => '選擇應擁有此技能的專案。它會移出提供者的全域技能目錄。',
+			'skills.moveSkill' => ({required Object name}) => '移動 ${name}',
+			'skills.projectLabel' => '專案',
+			'skills.scopes.admin' => '管理員',
+			'skills.scopes.plugin' => '外掛',
+			'skills.scopes.project' => '專案',
+			'skills.scopes.repo' => '儲存庫',
+			'skills.scopes.system' => '系統',
+			'skills.scopes.user' => '使用者',
+			'skills.screen.addSkill' => '新增技能',
+			'skills.screen.clearSearch' => '清除技能搜尋',
+			'skills.screen.deleteDescription' => ({required Object provider, required Object directory}) => '這會從 ${provider} 的受管理技能目錄中移除 ${directory} 目錄。此操作無法復原。',
+			'skills.screen.deleteTitle' => ({required Object name}) => '刪除 ${name}？',
+			'skills.screen.loadingSkills' => ({required Object provider}) => '正在載入 ${provider} 技能…',
+			'skills.screen.manageDescription' => ({required Object provider}) => '從本機檔案、完整資料夾和專案感知位置管理 ${provider} 技能。',
+			'skills.screen.noDescription' => '技能前置資料中未提供說明。',
+			'skills.screen.pluginBadge' => ({required Object name}) => '外掛：${name}',
+			'skills.screen.projectBadge' => ({required Object name}) => '專案：${name}',
+			'skills.screen.savedSuccessfully' => '技能已成功儲存。',
+			'skills.screen.scanningProjectSkills' => '正在掃描專案技能...',
+			'skills.screen.searchHint' => '搜尋技能...',
+			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '${count} 個技能', other: '${count} 個技能', ), 
+			'skills.screen.sourceLabel' => '來源',
+			'mcp.form.fields.bearerTokenEnvVar' => 'Bearer 權杖環境變數',
+			'mcp.form.fields.envVarNames' => '環境變數名稱',
+			'mcp.form.fields.workingDirectory' => '工作目錄',
+			'mcp.form.scope.claudeLocal' => 'Claude 本機',
+			'mcp.form.scope.description.local' => '儲存在所選專案的 Claude 使用者設定中',
+			'mcp.form.scope.description.project' => '儲存在所選專案工作區中',
+			'mcp.form.scope.description.projectGlobal' => '為每個提供者寫入所選專案工作區',
+			'mcp.form.scope.description.user' => '可在您機器上的所有專案中使用',
+			'mcp.form.scope.description.userGlobal' => '寫入每個提供者的使用者設定，並可在此機器的所有專案中使用',
+			'mcp.form.scope.projectAllProviders' => '專案（所有提供者）',
+			'mcp.form.scope.userAllProviders' => '使用者（所有提供者）',
+			'mcp.form.submitTo' => ({required Object provider}) => '將伺服器新增至 ${provider}',
+			'mcp.form.validation.unsupportedGlobal' => ({required Object type}) => '新增 MCP 伺服器在所有提供者中僅支援 stdio 和 http，不支援 ${type}。',
+			'mcp.form.validation.unsupportedProvider' => ({required Object provider, required Object type}) => '${provider} 不支援 ${type} MCP 伺服器',
+			'mcp.install.button' => '安裝',
+			'mcp.install.cardDescription' => '透過 MCP 為你的代理提供知識庫與 ddagent 工具 — 選擇代理，或為全部安裝。',
+			'mcp.install.description' => '讓所選代理透過 MCP 使用 ddagent 知識庫與工具。',
+			'mcp.install.errorFallback' => '錯誤',
+			'mcp.install.failed' => ({required Object error}) => '安裝失敗：${error}',
+			'mcp.install.installForAll' => '為全部安裝',
+			'mcp.install.installSelected' => '安裝所選項目',
+			'mcp.install.installedCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '已安裝於 ${count} 個代理。', other: '已安裝於 ${count} 個代理。', ), 
+			'mcp.install.partialFailure' => ({required Object count, required Object failed}) => '已安裝於 ${count} 個；失敗：${failed}',
+			'mcp.install.title' => '安裝 ddagent MCP 伺服器',
+			'mcp.servers.addGlobalDescription' => '將此 MCP 伺服器新增至所有提供者：Claude、Cursor、Codex、OpenCode 和 Devin。由於相同設定必須在所有提供者中運作，因此僅支援 stdio 與 HTTP 傳輸。',
+			'mcp.servers.addGlobalMenuDescription' => '新增全域 MCP 伺服器會將一個通用 stdio 或 HTTP 伺服器寫入 Claude、Cursor、Codex、OpenCode 和 Devin。',
+			'mcp.servers.addGlobalTitle' => '新增全域 MCP 伺服器',
+			'mcp.servers.addProviderDescription' => ({required Object provider}) => '新增 ${provider} MCP 伺服器只會變更 ${provider}。',
+			'mcp.servers.addProviderTitle' => ({required Object provider}) => '新增 ${provider} MCP 伺服器',
+			'mcp.servers.config.cwd' => '工作目錄',
+			'mcp.servers.config.envVars' => '環境變數',
+			'mcp.servers.descriptionGeneric' => ({required Object provider}) => 'Model Context Protocol 伺服器為 ${provider} 提供額外的工具和資料來源',
+			'mcp.servers.loading' => '正在載入 MCP 伺服器...',
+			'mcp.servers.refreshingScopes' => '正在重新整理專案範圍...',
+			'mcp.team.cta' => 'ddagent Pro 提供',
+			'mcp.team.description' => '在團隊中分享 MCP 伺服器設定。所有人都會自動保持同步。',
+			'mcp.team.title' => '團隊 MCP 設定',
+			'mcp.tokens.scopeWrite' => '寫入',
+			'terminal.actions.clearOutput' => '清除輸出',
+			'terminal.actions.connect' => '連線',
+			'terminal.actions.newShell' => '新增 Shell',
+			'terminal.actions.newTab' => '新增終端機分頁',
+			'terminal.actions.providerLogin' => '提供者登入',
+			'terminal.actions.restartSession' => '重新啟動工作階段',
+			'terminal.authUrl.openInBrowser' => '在瀏覽器中開啟',
+			'terminal.errors.couldNotOpenLink' => ({required Object url}) => '無法開啟連結：${url}',
+			'terminal.fileLink.detected' => ({required Object path}) => '偵測到檔案：${path}',
+			'terminal.paste.hint' => 'Ctrl+V / 按右鍵 → 貼上',
+			'terminal.paste.title' => '貼上至終端機',
+			'terminal.shortcuts.eof' => 'EOF',
+			'terminal.shortcuts.hide' => '隱藏快速鍵列',
+			'terminal.shortcuts.interrupt' => '中斷 (SIGINT)',
+			'terminal.shortcuts.suspend' => '暫停 (SIGTSTP)',
+			'terminal.shortcuts.showTooltip' => '顯示快速鍵',
+			'terminal.shortcuts.hideTooltip' => '隱藏快速鍵',
+			'terminal.tabs.antigravityCli' => 'Antigravity CLI',
+			'terminal.tabs.claudeCli' => 'Claude CLI',
+			'terminal.tabs.commandCodeCli' => 'Command Code CLI',
+			'terminal.tabs.cursorCli' => 'Cursor CLI',
+			'terminal.tabs.devinCli' => 'Devin CLI',
+			'terminal.tabs.loginTitle' => ({required Object provider}) => '登入：${provider}',
+			'terminal.tabs.opencodeCli' => 'OpenCode CLI',
+			'terminal.tabs.plainShell' => '一般 Shell',
+			'terminal.tabs.shellName' => ({required Object index}) => 'Shell ${index}',
+			'worktrees.branchHint' => '新分支名稱（例如 feature/login）',
+			'worktrees.branchingOff' => ({required Object branch}) => '從 ${branch} 建立分支',
+			'worktrees.cleanupDescription' => '合併後移除 worktree 並刪除分支',
+			'worktrees.created' => '已建立 worktree',
+			'worktrees.deleteBranchLabel' => '同時刪除分支',
+			'worktrees.dirtyWarning' => ({required Object count}) => '警告：此 worktree 有 ${count} 個未提交的變更將會遺失。',
+			'worktrees.emptyDescription' => '建立 worktree 以隔離功能開發或代理執行作業。',
+			'worktrees.emptyTitle' => '找不到 worktree',
+			'worktrees.forceRemoveLabel' => '強制移除（捨棄變更）',
+			'worktrees.headDetachedAt' => ({required Object sha}) => 'HEAD 分離於 ${sha}',
+			'worktrees.mainBadge' => 'main',
+			'worktrees.mergeDescription' => ({required Object branch}) => '將變更合併至 ${branch}。',
+			'worktrees.mergeTitle' => ({required Object branch}) => '合併 ${branch}',
+			'worktrees.merged' => ({required Object branch}) => '已將 worktree 合併至 ${branch}',
+			'worktrees.opened' => ({required Object branch}) => '已開啟 worktree：${branch}',
+			'worktrees.portHint' => '執行連接埠（選填，例如 3000）',
+			'worktrees.removeDescription' => '這會刪除 worktree 資料夾。連結的專案將被封存。',
+			'worktrees.removeTitle' => ({required Object branch}) => '移除 worktree ${branch}？',
+			'worktrees.removed' => '已移除 worktree',
+			'worktrees.runButton' => '執行',
+			'worktrees.runHint' => '執行指令（例如 npm run dev）',
+			'worktrees.runRunning' => '執行中',
+			'worktrees.runRunningWithPort' => ({required Object port}) => '執行中 :${port}',
+			'worktrees.scripts' => '指令碼',
+			'worktrees.scriptsSaved' => '指令碼設定已儲存',
+			'worktrees.serverLabel' => '伺服器：',
+			'worktrees.setupHint' => '設定指令（例如 npm install）',
+			'worktrees.setupLabel' => '設定：',
+			'worktrees.squashDescription' => '將所有提交合併為單一提交',
+			'worktrees.stopButton' => '停止',
+			'quota.agents.statusCount' => ({required Object status, required Object count}) => '${status}（${count}）',
+			'quota.chart.hide' => '隱藏',
+			'quota.chart.noData' => '資料不足以顯示趨勢。',
+			'quota.chart.pointReadout' => ({required Object date, required Object tokens, required Object cost}) => '${date} · ${tokens} 權杖 · ${cost}',
+			'quota.chart.show' => '顯示',
+			'quota.config.accountRouting' => '帳戶路由',
+			'quota.config.pollerTitle' => '輪詢器與警示',
+			'quota.config.save' => '儲存設定',
+			'quota.overview.tokensAndCost' => '權杖與成本',
+			'quota.section.config' => '設定',
+			'scheduler.checking' => '檢查中…',
+			'scheduler.cronHint' => 'Cron（分 時 日 月 星期）— 例如 0 9 * * *',
+			'scheduler.deleteMessage' => ({required Object id}) => '這會移除週期性工作 ${id}。現有工作階段會保留。',
+			'scheduler.deleteTitle' => '刪除排程？',
+			'scheduler.editTitle' => '編輯排程',
+			'scheduler.newLabel' => '新增',
+			'scheduler.nextIn' => ({required Object time}) => '${time} 後',
+			'scheduler.promptHint' => '代理的提示詞',
+			'scheduler.runs' => '執行次數',
+			'scheduler.session' => ({required Object id}) => '工作階段 ${id}',
+			'scheduler.worktree' => 'worktree',
+			'notifications.deviceLabel' => 'ddagent Flutter',
+			'notifications.errors.noResponse' => '伺服器沒有回應',
+			'notifications.errors.registrationRejected' => '伺服器拒絕註冊',
+			'serverConnect.connect' => '連線',
+			'serverConnect.connecting' => '正在連線…',
+			'serverConnect.connectionFailed' => ({required Object error}) => '連線失敗（${error}）',
+			'serverConnect.enterUrl' => '輸入伺服器 URL',
+			'serverConnect.subtitle' => '連線到你的 ddagent 伺服器',
+			'voice.apiKeySaved' => 'API 金鑰（已儲存，輸入以取代）',
+			'voice.preview' => '預覽',
+			'voice.saveFailed' => '儲存 STT 設定失敗',
+			'voice.settingsSaved' => '語音輸入設定已儲存',
+			'preview.embeddedWebOnly' => '內嵌預覽僅在網頁版本中提供',
+			'preview.startDevServerHint' => '啟動開發伺服器（npm run dev、flutter run -d web-server…）\n其連接埠會顯示在這裡。',
+			'sharedContext.title' => '共用筆記',
+			'collab.copyToken' => '複製權杖',
+			'collab.createInvite' => '建立邀請',
+			'collab.invite' => '邀請',
+			'collab.inviteTeammate' => '邀請隊友',
+			'collab.roles.member' => '成員',
+			'collab.roles.viewer' => '檢視者',
+			'collab.shareTokenHint' => '分享此邀請權杖 — 僅顯示一次，並在 72 小時後過期：',
+			'collab.team' => '團隊',
+			'browser.dialogTitle' => '代理瀏覽器',
+			'browser.viewError' => '瀏覽器檢視錯誤',
+			'browser.web' => '網頁',
+			'projects.archive' => '封存',
+			'projects.archivedSection' => ({required Object count}) => '已封存（${count}）',
+			'projects.clone' => '複製',
+			'projects.cloneFailed' => '複製失敗',
+			'projects.cloneFinished' => '複製完成。正在重新整理專案清單…',
+			'projects.cloneRepository' => '複製儲存庫',
+			'projects.deletePermanently' => '永久刪除',
+			'projects.deleteProjectMessage' => ({required Object name}) => '永久移除「${name}」，包括所有工作階段與儲存的歷史記錄（清除 JSONL）。此操作無法復原。',
+			'projects.deleteProjectTitle' => '刪除專案？',
+			'projects.destinationPath' => '目的地路徑',
+			'projects.destinationPathRequired' => '目的地路徑為必填',
+			'projects.displayNameOptional' => '顯示名稱（選填）',
+			'projects.failedToLoadTokens' => '載入 GitHub 權杖失敗',
+			'projects.githubTokenOptional' => 'GitHub 權杖（選填）',
+			'projects.newer' => '較新',
+			'projects.older' => '較舊',
+			'projects.projectArchived' => '專案已封存',
+			'projects.projectDeleted' => '專案已刪除',
+			'projects.projectRenamed' => '專案已重新命名',
+			'projects.projectRestored' => '專案已還原',
+			'projects.repoUrlPlaceholder' => 'https://github.com/org/repo.git',
+			'projects.repositoryCloned' => '儲存庫已複製',
+			'projects.repositoryUrlRequired' => '儲存庫 URL 為必填',
+			'projects.restore' => '還原',
+			'projects.sessionCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '${count} 個工作階段', other: '${count} 個工作階段', ), 
+			'projects.unknown' => '未知',
+			'projects.usingStoredToken' => ({required Object name}) => '使用已儲存的權杖：${name}',
+			'sessions.activity.committingChanges' => '正在提交變更',
+			'sessions.activity.editingFile' => ({required Object file}) => '正在編輯 ${file}',
+			'sessions.activity.editingFileGeneric' => '正在編輯檔案',
+			'sessions.activity.fetchingUrl' => ({required Object url}) => '正在取得 ${url}',
+			'sessions.activity.pushingBranch' => '正在推送分支',
+			'sessions.activity.readingFile' => ({required Object file}) => '正在讀取 ${file}',
+			'sessions.activity.runningCommand' => ({required Object command}) => '正在執行 `${command}`',
+			'sessions.activity.runningShellCommand' => '正在執行 Shell 指令',
+			'sessions.activity.runningTool' => ({required Object name}) => '正在執行 ${name}',
+			'sessions.activity.searching' => ({required Object query}) => '正在搜尋「${query}」',
+			'sessions.activity.subagentRunning' => '子代理執行中',
+			'sessions.age.days' => ({required Object days}) => '${days} 天',
+			'sessions.age.hours' => ({required Object hours}) => '${hours} 小時',
+			'sessions.age.lessThanMinute' => '<1 分鐘',
+			'sessions.age.minutes' => ({required Object count}) => '${count} 分鐘',
+			'sessions.archive' => '封存',
+			'sessions.archivedSessions' => '已封存的工作階段',
+			'sessions.autoOrchestrator' => '自動（編排器）',
+			'sessions.compareWith' => '比較…',
+			'sessions.createFailed' => ({required Object error}) => '建立工作階段失敗：${error}',
+			'sessions.deleteSessionMessage' => ({required Object name}) => '移除「${name}」及其記錄。此操作無法復原。',
+			'sessions.newSessionProvider' => '新工作階段 — 提供者',
+			'sessions.noRecentSessions' => '沒有最近的工作階段',
+			'sessions.noSessions' => '沒有工作階段',
+			'sessions.projectPath' => '專案路徑',
+			'sessions.rename' => '重新命名',
+			'sessions.toasts.archived' => '工作階段已封存',
+			'sessions.toasts.deleted' => '工作階段已刪除',
+			'sessions.toasts.pinned' => '工作階段已釘選',
+			'sessions.toasts.renamed' => '工作階段已重新命名',
+			'sessions.toasts.restored' => '工作階段已還原',
+			'sessions.toasts.unpinned' => '工作階段已取消釘選',
+			'sessions.toasts.workspaceChanged' => '工作區已變更',
+			'git.aiButton' => '✦ AI',
+			'git.checkpoints.create' => '新增',
+			'git.checkpoints.empty' => '尚無檢查點',
+			'git.checkpoints.labelHint' => '檢查點標籤（選填）',
+			'git.checkpoints.restoreMessage' => '要將工作樹重設到此檢查點嗎？目前的變更將被取代。',
+			'git.checkpoints.restoreTitle' => '還原檢查點',
+			'git.checkpoints.restored' => '檢查點已還原',
+			'git.checkpoints.title' => '檢查點',
+			'git.commitCreated' => '已建立提交',
+			'git.commitMessage' => '提交訊息',
+			'git.deleteFile' => '刪除檔案',
+			'git.hunkStage' => '+ 區塊',
+			'git.hunkUnstage' => '− 區塊',
+			'git.largeDiff' => '大型差異預覽：為保持分頁順暢，渲染範圍已受限。',
+			'git.loadDiffFailed' => ({required Object error}) => '載入差異失敗：${error}',
+			'git.noBranch' => '沒有分支',
+			'git.noDiff' => '沒有可用的差異',
+			'git.selectProject' => '選擇專案',
+			'git.splitDiff' => '並排差異',
+			'git.stageHunk' => '暫存區塊',
+			'git.stagedChanges' => '已暫存的變更',
+			'git.statusStaged' => '已暫存',
+			'git.switchBranch' => '切換分支',
+			'git.unifiedDiff' => '統一差異',
+			'git.unstageHunk' => '取消暫存區塊',
+			'kanban.card.untitled' => '未命名',
+			'kanban.comments.add' => '新增留言',
+			'kanban.comments.empty' => '尚無留言',
+			'kanban.details.status' => ({required Object status}) => '狀態：${status}',
+			'kanban.details.title' => '卡片詳細資料',
+			'kanban.dialog.saving' => '儲存中…',
+			'kanban.empty.noProject' => '未選擇專案',
+			'kanban.saveFailed' => '儲存卡片失敗',
+			'kanban.time.daysAgo' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '1 天前', other: '${count} 天前', ), 
+			'kanban.time.hoursAgo' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '1 小時前', other: '${count} 小時前', ), 
+			'kanban.time.minutesAgo' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '1 分鐘前', other: '${count} 分鐘前', ), 
+			'kanban.time.now' => '剛剛',
+			'onboarding.agents.description' => '登入一個或多個 AI 程式開發助手。全部皆為選填。',
+			'onboarding.agents.laterHint' => '你可以稍後在設定中進行設定。',
+			'onboarding.agents.title' => '連接你的 AI 代理',
+			'onboarding.completeSetup' => '完成設定',
+			'onboarding.errors.invalidEmail' => '請輸入有效的電子郵件地址。',
+			'onboarding.errors.nameAndEmailRequired' => 'git 名稱與電子郵件皆為必填。',
+			'onboarding.gitHint' => '用於 ddagent 工作階段建立的提交。',
+			'onboarding.mcp.description' => '安裝 ddagent MCP 伺服器，讓你的代理可以使用知識庫與 ddagent 工具。選擇代理，或為全部安裝。',
+			'onboarding.mcp.installForAll' => '為全部安裝',
+			'onboarding.mcp.installSelected' => '安裝所選項目',
+			'onboarding.mcp.installedOn' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '已安裝於 ${count} 個代理。', other: '已安裝於 ${count} 個代理。', ), 
+			'onboarding.mcp.installedWithFailures' => ({required Object installedCount, required Object failed}) => '已安裝於 ${installedCount} 個；失敗：${failed}',
+			'onboarding.mcp.laterHint' => '選填 — 你也可以稍後在設定 → MCP 中安裝。',
+			'onboarding.mcp.title' => '將代理連接到 ddagent',
+			'fileTree.browseServerFilesystem' => '瀏覽伺服器檔案系統',
+			'fileTree.chooseFolder' => '選擇資料夾',
+			'fileTree.copyContents' => '複製內容',
+			'fileTree.noFiles' => '沒有檔案',
+			'fileTree.search.hint' => '篩選名稱 / 按 Enter 搜尋內容',
+			'fileTree.search.noMatches' => '沒有符合項目',
+			'fileTree.search.prompt' => '輸入查詢並按 Enter',
+			'fileTree.search.resultsTruncated' => '結果已截斷',
+			'fileTree.titles.delete' => ({required Object name}) => '刪除 ${name}',
+			'fileTree.titles.download' => ({required Object name}) => '下載 ${name}',
+			'fileTree.titles.rename' => ({required Object name}) => '重新命名 ${name}',
+			'fileTree.uploadHere' => '上傳到此處',
+			'fileTree.uploadTo' => '上傳至',
+			'fileTree.uploadedCount' => ({required Object count}) => '已上傳 ${count} 個檔案',
+			'fileTree.newName' => '新名稱',
+			'fileTree.notRegisteredProject' => ({required Object path}) => '不是已註冊的專案：${path}',
+			'fileTree.showGitignoredFiles' => '顯示被 gitignore 忽略的檔案',
+			'fileTree.hideGitignoredFiles' => '隱藏被 gitignore 忽略的檔案',
+			'fileTree.downloadUnsupportedOnWeb' => '網頁版不支援下載',
+			'fileTree.saveToPath' => '儲存至路徑',
+			'fileTree.savedTo' => ({required Object path}) => '已儲存至 ${path}',
+			'workspace.archivedWorkspaceName' => '已封存',
+			'workspace.closePane' => '關閉窗格',
+			'workspace.closeSearch' => '關閉搜尋',
+			'workspace.deleteSessionNotice' => '移除工作階段及其記錄。無法復原。',
+			'workspace.exportChat' => '匯出對話',
+			'workspace.jumpToSession' => '跳至工作階段…',
+			'workspace.newChatProvider' => '新對話 — 提供者',
+			'workspace.nextMatch' => '下一個符合項目',
+			'workspace.previousMatch' => '上一個符合項目',
+			'workspace.searchTranscript' => '搜尋記錄',
+			'workspace.sendTo' => ({required Object count}) => '傳送至 ${count}',
+			'workspace.accountWithLabel' => ({required Object label}) => '預設 · ${label}',
+			'workspace.finishRunBeforeChangingWorkspace' => '變更工作區前請先完成執行',
+			'workspace.restored' => '工作區已還原',
+			'workspace.maximizePane' => '最大化窗格',
+			'workspace.restorePanes' => '還原窗格',
+			'workspace.reviewChangedFiles' => '檢閱已變更的檔案',
 			_ => null,
 		};
 	}

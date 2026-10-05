@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:ddagent_app/core/realtime/realtime_providers.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -238,10 +239,11 @@ class TokenUsageChip extends ConsumerWidget {
   }
 
   void _showUsageDialog(BuildContext context, UsageSummary u) {
+    final t = Translations.of(context);
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Token usage'),
+        title: Text(t.chat.tokenUsage.title),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -266,7 +268,9 @@ class TokenUsageChip extends ConsumerWidget {
               ),
           ],
         ),
-        actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Close'))],
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(t.chat.common.close)),
+        ],
       ),
     );
   }
@@ -393,9 +397,10 @@ class SessionCompareDialog extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final t = Translations.of(context);
     final repo = ref.watch(sessionsRepositoryProvider);
     return AlertDialog(
-      title: const Text('Compare sessions'),
+      title: Text(t.common.commandPalette.items.compareSessions),
       content: FutureBuilder(
         future: Future.wait([
           loadSessionUsage(repo, left.$1, provider: left.$2),
@@ -438,7 +443,9 @@ class SessionCompareDialog extends ConsumerWidget {
           );
         },
       ),
-      actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close'))],
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: Text(t.chat.common.close)),
+      ],
     );
   }
 }

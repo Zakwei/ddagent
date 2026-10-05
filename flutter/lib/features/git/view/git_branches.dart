@@ -6,6 +6,7 @@ import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
 import 'package:ddagent_app/features/git/state/git_controller.dart';
 import 'package:ddagent_app/features/git/view/git_confirm.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -29,17 +30,21 @@ class _GitBranchesViewState extends ConsumerState<GitBranchesView> {
   }
 
   Future<void> _newBranch() async {
+    final i18n = Translations.of(context);
     var input = '';
     final name = await showDialog<String>(
       context: context,
       builder: (ctx) => AppDialog(
-        title: 'New branch',
+        title: i18n.common.gitPanel.branches.kNew,
         content: AppInput(hint: 'branch-name', autofocus: true, onChanged: (v) => input = v),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(i18n.chat.orchestrator.summary.cancelTasks),
+          ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(input.trim()),
-            child: const Text('Create'),
+            child: Text(i18n.common.buttons.create),
           ),
         ],
       ),
@@ -52,12 +57,11 @@ class _GitBranchesViewState extends ConsumerState<GitBranchesView> {
   }
 
   Future<void> _switchBranch(String branch) async {
+    final i18n = Translations.of(context);
     final res = await gitConfirm(
       context,
       type: GitConfirmType.commit, // web reuses the neutral type for switch
-      message:
-          'Switch to branch "$branch"? Make sure you have no uncommitted '
-          'changes.',
+      message: i18n.common.gitPanel.branches.confirmSwitch(branch: branch),
     );
     if (res == false && mounted) {
       await ref.read(gitProvider.notifier).checkout(branch);
@@ -65,18 +69,15 @@ class _GitBranchesViewState extends ConsumerState<GitBranchesView> {
   }
 
   Future<void> _deleteBranch(String branch) async {
+    final i18n = Translations.of(context);
     final res = await gitConfirm(
       context,
       type: GitConfirmType.deleteBranch,
-      message:
-          'Delete branch "$branch"? A normal delete only succeeds when the '
-          'branch is fully merged. This cannot be undone.',
-      alternate: const GitAlternate(
-        label: 'Force delete this unmerged branch',
-        description:
-            'Permanently removes the branch even when it contains commits '
-            'that have not been merged elsewhere.',
-        actionLabel: 'Force delete',
+      message: i18n.common.gitPanel.branches.confirmDelete(branch: branch),
+      alternate: GitAlternate(
+        label: i18n.common.gitPanel.branches.forceDeleteLabel,
+        description: i18n.common.gitPanel.branches.forceDeleteDesc,
+        actionLabel: i18n.common.gitPanel.branches.forceDelete,
       ),
     );
     if (res != null && mounted) {
@@ -89,6 +90,7 @@ class _GitBranchesViewState extends ConsumerState<GitBranchesView> {
     final state = ref.watch(gitProvider);
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     final compact = context.breakpoint.isCompact;
     final current = state.status?.branch ?? '';
     final remote = state.remoteStatus;
@@ -117,9 +119,13 @@ class _GitBranchesViewState extends ConsumerState<GitBranchesView> {
               Expanded(
                 child: Text(
                   state.branches.remote.isNotEmpty
-                      ? '${state.branches.local.length} local, '
-                            '${state.branches.remote.length} remote'
-                      : '${state.branches.local.length} local',
+                      ? i18n.common.gitPanel.branches.countBoth(
+                          local: state.branches.local.length,
+                          remote: state.branches.remote.length,
+                        )
+                      : i18n.common.gitPanel.branches.countLocal(
+                          count: state.branches.local.length,
+                        ),
                   style: t.bodySmall?.copyWith(color: c.mutedForeground),
                 ),
               ),
@@ -138,7 +144,7 @@ class _GitBranchesViewState extends ConsumerState<GitBranchesView> {
                       Icon(LucideIcons.plus, size: 14, color: c.primary),
                       const SizedBox(width: 6),
                       Text(
-                        'New branch',
+                        i18n.common.gitPanel.branches.kNew,
                         style: t.bodySmall?.copyWith(color: c.primary, fontWeight: FontWeight.w500),
                       ),
                     ],
@@ -166,7 +172,7 @@ class _GitBranchesViewState extends ConsumerState<GitBranchesView> {
                   decoration: InputDecoration(
                     isDense: true,
                     border: InputBorder.none,
-                    hintText: 'Search branches...',
+                    hintText: i18n.common.gitPanel.searchBranches,
                     hintStyle: t.bodySmall?.copyWith(color: c.mutedForeground),
                   ),
                 ),
@@ -186,7 +192,9 @@ class _GitBranchesViewState extends ConsumerState<GitBranchesView> {
                   child: Padding(
                     padding: const EdgeInsets.all(AppSpacing.xl),
                     child: Text(
-                      query.isNotEmpty ? 'No branches match your search' : 'No branches found',
+                      query.isNotEmpty
+                          ? i18n.common.gitPanel.branches.noMatch
+                          : i18n.common.gitPanel.branches.none,
                       style: t.bodySmall?.copyWith(color: c.mutedForeground),
                     ),
                   ),
@@ -281,6 +289,7 @@ class _BranchRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     return Container(
       decoration: BoxDecoration(
         color: isCurrent ? c.primary.withValues(alpha: 0.05) : null,
@@ -332,7 +341,7 @@ class _BranchRow extends StatelessWidget {
                           borderRadius: BorderRadius.circular(999),
                         ),
                         child: Text(
-                          'current',
+                          i18n.common.gitPanel.branches.current,
                           style: t.labelSmall?.copyWith(
                             color: c.primary,
                             fontWeight: FontWeight.w600,
@@ -349,7 +358,7 @@ class _BranchRow extends StatelessWidget {
                           borderRadius: BorderRadius.circular(999),
                         ),
                         child: Text(
-                          'remote',
+                          i18n.common.gitPanel.branches.remote,
                           style: t.labelSmall?.copyWith(color: c.mutedForeground),
                         ),
                       ),
@@ -363,12 +372,15 @@ class _BranchRow extends StatelessWidget {
                       children: [
                         if (ahead > 0)
                           Text(
-                            '↑$ahead ahead',
+                            '↑${i18n.common.gitPanel.ahead(count: ahead)}',
                             style: t.labelSmall?.copyWith(color: const Color(0xFF2EA043)),
                           ),
                         if (ahead > 0 && behind > 0) const SizedBox(width: 8),
                         if (behind > 0)
-                          Text('↓$behind behind', style: t.labelSmall?.copyWith(color: c.primary)),
+                          Text(
+                            '↓${i18n.common.gitPanel.behind(count: behind)}',
+                            style: t.labelSmall?.copyWith(color: c.primary),
+                          ),
                       ],
                     ),
                   ),
@@ -381,11 +393,14 @@ class _BranchRow extends StatelessWidget {
               borderRadius: AppRadii.borderMd,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                child: Text('Switch', style: t.labelSmall?.copyWith(color: c.mutedForeground)),
+                child: Text(
+                  i18n.common.gitPanel.branches.kSwitch,
+                  style: t.labelSmall?.copyWith(color: c.mutedForeground),
+                ),
               ),
             ),
             IconButton(
-              tooltip: 'Delete $name',
+              tooltip: i18n.common.gitPanel.branches.deleteTitle(branch: name),
               onPressed: onDelete,
               icon: Icon(LucideIcons.trash2, size: 14, color: c.mutedForeground),
               visualDensity: VisualDensity.compact,

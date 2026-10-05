@@ -4,6 +4,7 @@ import 'package:ddagent_app/features/quota/data/quota_models.dart';
 import 'package:ddagent_app/features/quota/data/quota_repository.dart';
 import 'package:ddagent_app/features/quota/state/quota_controller.dart';
 import 'package:ddagent_app/features/quota/view/quota_screen.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -152,9 +153,11 @@ class _FakeQuotaRepo extends QuotaRepository {
       };
 }
 
-Widget _buildApp(_FakeQuotaRepo repo, {bool dark = false}) => ProviderScope(
-  overrides: [quotaRepositoryProvider.overrideWithValue(repo)],
-  child: MaterialApp(theme: dark ? AppTheme.dark() : AppTheme.light(), home: const QuotaScreen()),
+Widget _buildApp(_FakeQuotaRepo repo, {bool dark = false}) => TranslationProvider(
+  child: ProviderScope(
+    overrides: [quotaRepositoryProvider.overrideWithValue(repo)],
+    child: MaterialApp(theme: dark ? AppTheme.dark() : AppTheme.light(), home: const QuotaScreen()),
+  ),
 );
 
 Future<void> _pumpScreen(WidgetTester t, _FakeQuotaRepo repo) async {
@@ -648,16 +651,16 @@ void main() {
 
       await _switchNav(t, 'Usage');
       expect(find.text('Daily trend'), findsOneWidget);
-      expect(find.text('Breakdown by provider'), findsOneWidget);
+      expect(find.text('Breakdown by Provider'), findsOneWidget);
       expect(find.text('4'), findsWidgets); // apiCalls
 
       // Zmiana okresu na 30d
-      await t.tap(find.text('30d').last);
+      await t.tap(find.text('30 days').last);
       await t.pumpAndSettle();
       expect(repo.calls, contains('usage:30d:provider'));
 
       // Zmiana grupowania na model
-      await t.tap(find.text('model'));
+      await t.tap(find.text('Model'));
       await t.pumpAndSettle();
       expect(repo.calls, contains('usage:30d:model'));
     });
@@ -672,7 +675,7 @@ void main() {
       expect(find.text('a2'), findsOneWidget);
 
       // Filtr na 'failed (1)'
-      await t.tap(find.text('failed (1)'));
+      await t.tap(find.text('Failed (1)'));
       await t.pumpAndSettle();
       expect(find.text('a1'), findsNothing);
       expect(find.text('a2'), findsOneWidget);
@@ -692,7 +695,7 @@ void main() {
       expect(find.text('Poller & alerts'), findsOneWidget);
 
       // Wybór trybu auto-low-risk
-      await t.tap(find.text('auto-low-risk'));
+      await t.tap(find.text('Auto-switch for low-risk tasks'));
       await t.pumpAndSettle();
 
       // Zapis

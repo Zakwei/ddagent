@@ -5,6 +5,7 @@ import 'package:ddagent_app/features/quota/data/quota_models.dart';
 import 'package:ddagent_app/features/quota/state/quota_controller.dart';
 import 'package:ddagent_app/features/quota/view/quota_charts.dart';
 import 'package:ddagent_app/features/quota/view/quota_tone.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -27,6 +28,7 @@ class _AccountQuotaCardState extends ConsumerState<AccountQuotaCard> {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     final account = widget.account;
     final state = ref.watch(quotaProvider);
     final config = state.config;
@@ -87,12 +89,12 @@ class _AccountQuotaCardState extends ConsumerState<AccountQuotaCard> {
             const SizedBox(height: AppSpacing.sm),
             if (errored)
               Text(
-                account.syncError ?? 'Synchronization failed',
+                account.syncError ?? i18n.common.quota.syncFailed,
                 style: t.bodySmall?.copyWith(color: c.destructive),
               )
             else if (inactive)
               Text(
-                'The provider reports no active plan for this account.',
+                i18n.common.quota.noSubscriptionHint,
                 style: t.bodySmall?.copyWith(color: c.mutedForeground),
               )
             else
@@ -111,7 +113,7 @@ class _AccountQuotaCardState extends ConsumerState<AccountQuotaCard> {
               runSpacing: 4,
               children: [
                 if (account.assignedAgents.isEmpty)
-                  _chip(icon: Icons.group_outlined, label: 'No agents assigned', dashed: true)
+                  _chip(icon: Icons.group_outlined, label: i18n.common.quota.noAgents, dashed: true)
                 else
                   for (final a in account.assignedAgents)
                     _chip(
@@ -135,7 +137,10 @@ class _AccountQuotaCardState extends ConsumerState<AccountQuotaCard> {
                   children: [
                     Icon(Icons.history, size: 14, color: c.mutedForeground),
                     const SizedBox(width: 4),
-                    Text('History', style: t.labelSmall?.copyWith(color: c.mutedForeground)),
+                    Text(
+                      i18n.common.quota.history,
+                      style: t.labelSmall?.copyWith(color: c.mutedForeground),
+                    ),
                     Icon(
                       _historyOpen ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
                       size: 14,
@@ -152,8 +157,8 @@ class _AccountQuotaCardState extends ConsumerState<AccountQuotaCard> {
               ),
               Text(
                 history == null || history.points.isEmpty
-                    ? 'No history recorded yet'
-                    : '${history.points.length} readings recorded',
+                    ? i18n.common.quota.historyEmpty
+                    : i18n.common.quota.historyPoints(value: history.points.length),
                 style: t.labelSmall?.copyWith(fontSize: 10, color: c.mutedForeground),
               ),
             ],
@@ -170,7 +175,7 @@ class _AccountQuotaCardState extends ConsumerState<AccountQuotaCard> {
                 ),
                 if (account.lastSyncedAt != null)
                   Text(
-                    'synced ${formatAgo(account.lastSyncedAt)} ago',
+                    i18n.common.quota.syncedAgo(value: formatAgo(account.lastSyncedAt)),
                     style: t.labelSmall?.copyWith(fontSize: 10, color: c.mutedForeground),
                   ),
               ],
@@ -187,8 +192,17 @@ class _AccountQuotaCardState extends ConsumerState<AccountQuotaCard> {
     decoration: BoxDecoration(shape: BoxShape.circle, color: quotaToneColor(tone)),
   );
 
+  static String _qualityLabel(Translations i18n, String quality) => switch (quality) {
+    'live' => i18n.common.quota.quality.live,
+    'cached' => i18n.common.quota.quality.cached,
+    'estimate' => i18n.common.quota.quality.estimate,
+    'error' => i18n.common.quota.quality.error,
+    _ => i18n.common.quota.quality.unknown,
+  };
+
   Widget _qualityBadge(QuotaAccount a, bool inactive) {
-    final quality = inactive ? 'No subscription' : a.quality;
+    final i18n = Translations.of(context);
+    final quality = inactive ? i18n.common.quota.noSubscription : _qualityLabel(i18n, a.quality);
     final tone = inactive ? QuotaTone.neutral : toneForQuality(a.quality);
     final color = quotaToneColor(tone);
     return Container(
@@ -229,6 +243,7 @@ class _AccountQuotaCardState extends ConsumerState<AccountQuotaCard> {
   Widget _windowRow(QuotaWindow w, num watch, num danger, bool alertsEnabled, bool accountErrored) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     final tone = accountErrored ? QuotaTone.neutral : toneForPercent(w.percent, watch, danger);
     final color = quotaToneColor(tone);
     final reset = formatRelativeTo(w.resetsAt);
@@ -260,14 +275,14 @@ class _AccountQuotaCardState extends ConsumerState<AccountQuotaCard> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              '${w.remainingPercent.toStringAsFixed(0)}% left',
+              i18n.common.quota.remaining(value: w.remainingPercent.toStringAsFixed(0)),
               style: t.labelSmall?.copyWith(fontSize: 10, color: c.mutedForeground),
             ),
             if (reset != '—')
               Tooltip(
                 message: w.resetsAt ?? '',
                 child: Text(
-                  'reset in $reset',
+                  i18n.common.quota.resetsIn(value: reset),
                   style: t.labelSmall?.copyWith(fontSize: 10, color: c.mutedForeground),
                 ),
               ),
@@ -277,8 +292,7 @@ class _AccountQuotaCardState extends ConsumerState<AccountQuotaCard> {
           Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              'at the current pace this limit runs out in '
-              '${formatDuration(w.etaSeconds)}',
+              i18n.common.quota.projected(value: formatDuration(w.etaSeconds)),
               style: t.labelSmall?.copyWith(fontSize: 10, color: color),
             ),
           ),

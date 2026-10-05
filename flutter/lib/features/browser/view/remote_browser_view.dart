@@ -6,6 +6,7 @@ import 'package:ddagent_app/core/realtime/realtime_providers.dart';
 import 'package:ddagent_app/core/realtime/ws_client.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -119,7 +120,7 @@ class _RemoteBrowserViewState extends ConsumerState<RemoteBrowserView> {
         unawaited(_ch.close());
         setState(() {
           _status = 'closed';
-          _error = f.error ?? 'Browser view error';
+          _error = f.error ?? t.browser.viewError;
         });
       case 'navigation':
         final url = f.raw['url'] as String? ?? '';
@@ -253,6 +254,7 @@ class _RemoteBrowserViewState extends ConsumerState<RemoteBrowserView> {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -268,17 +270,17 @@ class _RemoteBrowserViewState extends ConsumerState<RemoteBrowserView> {
             children: [
               _navButton(
                 Icons.arrow_back,
-                'Back',
+                i18n.common.browserPane.back,
                 _nav.canGoBack ? () => _safeSend(_ch.back) : null,
               ),
               _navButton(
                 Icons.arrow_forward,
-                'Forward',
+                i18n.common.browserPane.forward,
                 _nav.canGoForward ? () => _safeSend(_ch.forward) : null,
               ),
               _navButton(
                 _nav.loading ? Icons.close : Icons.refresh,
-                _nav.loading ? 'Stop' : 'Reload',
+                _nav.loading ? i18n.common.browserPane.stop : i18n.common.browserPane.reload,
                 () => _safeSend(_nav.loading ? _ch.stop : _ch.reload),
               ),
               Expanded(
@@ -289,12 +291,12 @@ class _RemoteBrowserViewState extends ConsumerState<RemoteBrowserView> {
                   },
                   child: AppInput(
                     controller: _address,
-                    hint: 'Enter URL',
+                    hint: i18n.common.browserPane.enterUrl,
                     onSubmitted: (_) => _navigate(),
                   ),
                 ),
               ),
-              _navButton(Icons.open_in_new, 'Open in system browser', () {
+              _navButton(Icons.open_in_new, i18n.common.browserPane.openExternal, () {
                 final u = _nav.url.isEmpty ? widget.url : _nav.url;
                 if (_isHttp(u)) {
                   unawaited(launchUrl(Uri.parse(u!), mode: LaunchMode.externalApplication));
@@ -322,7 +324,7 @@ class _RemoteBrowserViewState extends ConsumerState<RemoteBrowserView> {
                       });
                       unawaited(_ch.connect());
                     },
-                    child: const Text('Retry'),
+                    child: Text(i18n.common.browserPane.retry),
                   ),
               ],
             ),
@@ -373,8 +375,8 @@ class _RemoteBrowserViewState extends ConsumerState<RemoteBrowserView> {
                             const SizedBox(height: AppSpacing.xs),
                             Text(
                               _status == 'connecting'
-                                  ? 'Connecting to browser…'
-                                  : 'Browser view disconnected',
+                                  ? i18n.common.browserPane.connecting
+                                  : i18n.common.browserPane.disconnected,
                               style: t.bodySmall?.copyWith(color: c.mutedForeground),
                             ),
                           ],

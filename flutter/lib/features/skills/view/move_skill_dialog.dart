@@ -6,6 +6,7 @@ import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/features/projects/data/projects_repository.dart';
 import 'package:ddagent_app/features/projects/view/project_menu_button.dart';
 import 'package:ddagent_app/features/skills/data/skill_models.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -117,12 +118,13 @@ class _MoveSkillDialogState extends State<MoveSkillDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     final c = context.appColors;
     final tt = Theme.of(context).textTheme;
     final label = widget.skill.command.isNotEmpty ? widget.skill.command : widget.skill.name;
 
     return AppDialog(
-      title: 'Move $label',
+      title: t.skills.moveSkill(name: label),
       content: SizedBox(
         width: 420,
         child: Column(
@@ -131,24 +133,22 @@ class _MoveSkillDialogState extends State<MoveSkillDialog> {
           children: [
             if (widget.toProject) ...[
               Text(
-                'Choose the project that should own this skill. It moves out of '
-                "the provider's global skills directory.",
+                t.skills.moveDialog.toProjectHint,
                 style: tt.bodySmall?.copyWith(color: c.mutedForeground),
               ),
               const SizedBox(height: AppSpacing.md),
               if (widget.projects.isEmpty)
-                Text('No projects available.', style: tt.bodySmall?.copyWith(color: c.destructive))
+                Text(t.skills.empty.noProjects, style: tt.bodySmall?.copyWith(color: c.destructive))
               else
                 ProjectMenuButton(
                   projects: widget.projects,
                   selected: _target,
-                  header: 'Project',
+                  header: t.skills.projectLabel,
                   onSelected: (project) => setState(() => _target = project),
                 ),
             ] else
               Text(
-                'Move this skill into the global skills directory so every '
-                'project can use it.',
+                t.skills.moveDialog.toGlobalHint,
                 style: tt.bodySmall?.copyWith(color: c.mutedForeground),
               ),
             if (_submitError != null) ...[
@@ -174,7 +174,7 @@ class _MoveSkillDialogState extends State<MoveSkillDialog> {
         AppButton(
           variant: AppButtonVariant.ghost,
           onPressed: _submitting ? null : () => Navigator.of(context).pop(false),
-          child: const Text('Cancel'),
+          child: Text(t.chat.orchestrator.summary.cancelTasks),
         ),
         AppButton(
           size: AppButtonSize.sm,
@@ -193,7 +193,11 @@ class _MoveSkillDialogState extends State<MoveSkillDialog> {
               else
                 const Icon(LucideIcons.arrowRightLeft, size: 14),
               const SizedBox(width: AppSpacing.xs),
-              Text(widget.toProject ? 'Move to project' : 'Move to global'),
+              Text(
+                widget.toProject
+                    ? t.skills.moveDialog.moveToProject
+                    : t.skills.moveDialog.moveToGlobal,
+              ),
             ],
           ),
         ),

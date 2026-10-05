@@ -11,6 +11,7 @@ import 'package:ddagent_app/features/quota/data/quota_repository.dart';
 import 'package:ddagent_app/features/quota/view/quota_tone.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/workspace/view/session_picker.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -144,26 +145,28 @@ Widget _harness({
 }) {
   final channel = ChatChannel(_FakeWs())..start();
   addTearDown(channel.dispose);
-  return ProviderScope(
-    overrides: [
-      chatChannelProvider.overrideWithValue(channel),
-      sessionsRepositoryProvider.overrideWithValue(_FakeSessions()),
-      projectsRepositoryProvider.overrideWithValue(_FakeProjects()),
-      providerAccountsRepositoryProvider.overrideWithValue(
-        _FakeAccounts(accounts, error: accountsError),
-      ),
-      quotaRepositoryProvider.overrideWithValue(_FakeQuota(quota ?? _quotaSnapshot)),
-    ],
-    child: MaterialApp(
-      theme: AppTheme.light(),
-      home: Scaffold(
-        body: SessionPickerPane(
-          openSessionIds: const {},
-          processingSessionIds: const {},
-          onSelectSession: (_) {},
-          onNewChat: (provider, {accountId}) => onNewChat(provider, accountId),
-          canCancel: true,
-          onCancel: () {},
+  return TranslationProvider(
+    child: ProviderScope(
+      overrides: [
+        chatChannelProvider.overrideWithValue(channel),
+        sessionsRepositoryProvider.overrideWithValue(_FakeSessions()),
+        projectsRepositoryProvider.overrideWithValue(_FakeProjects()),
+        providerAccountsRepositoryProvider.overrideWithValue(
+          _FakeAccounts(accounts, error: accountsError),
+        ),
+        quotaRepositoryProvider.overrideWithValue(_FakeQuota(quota ?? _quotaSnapshot)),
+      ],
+      child: MaterialApp(
+        theme: AppTheme.light(),
+        home: Scaffold(
+          body: SessionPickerPane(
+            openSessionIds: const {},
+            processingSessionIds: const {},
+            onSelectSession: (_) {},
+            onNewChat: (provider, {accountId}) => onNewChat(provider, accountId),
+            canCancel: true,
+            onCancel: () {},
+          ),
         ),
       ),
     ),

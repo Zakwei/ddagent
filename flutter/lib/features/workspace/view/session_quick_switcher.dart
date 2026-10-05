@@ -1,6 +1,7 @@
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -30,6 +31,7 @@ class _SessionQuickSwitcherDialogState extends ConsumerState<SessionQuickSwitche
 
   @override
   Widget build(BuildContext context) {
+    final i18n = Translations.of(context);
     final c = context.appColors;
     final sessions = ref
         .watch(sessionsProvider((null, null)))
@@ -64,7 +66,7 @@ class _SessionQuickSwitcherDialogState extends ConsumerState<SessionQuickSwitche
                 autofocus: true,
                 style: const TextStyle(fontSize: 14),
                 decoration: InputDecoration(
-                  hintText: 'Jump to session…',
+                  hintText: i18n.workspace.jumpToSession,
                   prefixIcon: const Icon(LucideIcons.search, size: 16),
                   isDense: true,
                   border: OutlineInputBorder(

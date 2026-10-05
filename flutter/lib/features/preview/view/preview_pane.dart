@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/features/preview/state/preview_controller.dart';
 import 'package:ddagent_app/features/preview/view/preview_embed.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -43,6 +44,7 @@ class _PreviewPaneState extends ConsumerState<PreviewPane> {
     final ctrl = ref.read(previewProvider(widget.projectPath).notifier);
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     final sel = state.selectedPort;
 
     // The embed URL is async (needs the auth token) — re-resolve whenever the
@@ -73,7 +75,9 @@ class _PreviewPaneState extends ConsumerState<PreviewPane> {
                   underline: const SizedBox.shrink(),
                   style: t.bodySmall,
                   hint: Text(
-                    state.error != null ? 'Could not load ports' : 'No dev servers detected',
+                    state.error != null
+                        ? i18n.common.previewPane.loadError
+                        : i18n.common.previewPane.noServers,
                     style: t.bodySmall?.copyWith(color: c.mutedForeground),
                   ),
                   items: [
@@ -91,7 +95,7 @@ class _PreviewPaneState extends ConsumerState<PreviewPane> {
                 ),
               ),
               IconButton(
-                tooltip: 'Reload preview',
+                tooltip: i18n.common.previewPane.reload,
                 onPressed: sel == null
                     ? null
                     : () => setState(() {
@@ -102,7 +106,7 @@ class _PreviewPaneState extends ConsumerState<PreviewPane> {
                 visualDensity: VisualDensity.compact,
               ),
               IconButton(
-                tooltip: 'Open in system browser',
+                tooltip: i18n.common.browserPane.openExternal,
                 onPressed: sel == null
                     ? null
                     : () async {
@@ -139,6 +143,7 @@ class _PreviewPaneState extends ConsumerState<PreviewPane> {
   Widget _empty(PreviewState state) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     if (state.loading && state.ports.isEmpty) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -151,7 +156,9 @@ class _PreviewPaneState extends ConsumerState<PreviewPane> {
             Icon(Icons.public_off, size: 28, color: c.mutedForeground),
             const SizedBox(height: AppSpacing.sm),
             Text(
-              state.error != null ? 'Could not load ports' : 'No dev servers detected',
+              state.error != null
+                  ? i18n.common.previewPane.loadError
+                  : i18n.common.previewPane.noServers,
               textAlign: TextAlign.center,
               style: t.bodySmall?.copyWith(color: c.mutedForeground),
             ),
@@ -159,12 +166,11 @@ class _PreviewPaneState extends ConsumerState<PreviewPane> {
               TextButton(
                 onPressed: () =>
                     unawaited(ref.read(previewProvider(widget.projectPath).notifier).refresh()),
-                child: const Text('Retry'),
+                child: Text(i18n.common.buttons.retry),
               ),
             if (state.error == null)
               Text(
-                'Start a dev server (npm run dev, flutter run -d web-server…)\n'
-                'and its port appears here.',
+                i18n.preview.startDevServerHint,
                 textAlign: TextAlign.center,
                 style: t.labelSmall?.copyWith(color: c.mutedForeground.withValues(alpha: 0.7)),
               ),
@@ -177,6 +183,7 @@ class _PreviewPaneState extends ConsumerState<PreviewPane> {
   Widget _desktopFallback(int port) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -184,7 +191,7 @@ class _PreviewPaneState extends ConsumerState<PreviewPane> {
           Icon(Icons.open_in_browser, size: 28, color: c.mutedForeground),
           const SizedBox(height: AppSpacing.sm),
           Text(
-            'Embedded preview is available on the web build',
+            i18n.preview.embeddedWebOnly,
             style: t.bodySmall?.copyWith(color: c.mutedForeground),
           ),
           const SizedBox(height: AppSpacing.xs),

@@ -1,6 +1,7 @@
 import 'package:ddagent_app/core/theme/app_theme.dart';
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
 import 'package:ddagent_app/features/workspace/view/split_workspace_grid.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -19,16 +20,18 @@ void main() {
       for (var i = 0; i < paneCount; i++) SplitPane(id: 'pane-$i', kind: PaneKind.chat),
     ];
     await tester.pumpWidget(
-      MaterialApp(
-        theme: AppTheme.light(),
-        home: Scaffold(
-          body: SplitWorkspaceGrid(
-            panes: panes,
-            activePaneId: 'pane-0',
-            onClosePane: (_) {},
-            onReorderPanes: (_, _) {},
-            renderPane: (pane, isActive) =>
-                ColoredBox(color: const Color(0xFFEEEEEE), child: SizedBox.expand()),
+      TranslationProvider(
+        child: MaterialApp(
+          theme: AppTheme.light(),
+          home: Scaffold(
+            body: SplitWorkspaceGrid(
+              panes: panes,
+              activePaneId: 'pane-0',
+              onClosePane: (_) {},
+              onReorderPanes: (_, _) {},
+              renderPane: (pane, isActive) =>
+                  ColoredBox(color: const Color(0xFFEEEEEE), child: SizedBox.expand()),
+            ),
           ),
         ),
       ),
@@ -54,21 +57,23 @@ void main() {
     String? moved;
     int? target;
     await tester.pumpWidget(
-      MaterialApp(
-        theme: AppTheme.light(),
-        home: Scaffold(
-          body: SplitWorkspaceGrid(
-            panes: const [
-              SplitPane(id: 'pane-0', kind: PaneKind.chat),
-              SplitPane(id: 'pane-1', kind: PaneKind.chat),
-            ],
-            paneTitle: (pane) => pane.id,
-            onClosePane: (_) {},
-            onReorderPanes: (id, index) {
-              moved = id;
-              target = index;
-            },
-            renderPane: (_, _) => const SizedBox.expand(),
+      TranslationProvider(
+        child: MaterialApp(
+          theme: AppTheme.light(),
+          home: Scaffold(
+            body: SplitWorkspaceGrid(
+              panes: const [
+                SplitPane(id: 'pane-0', kind: PaneKind.chat),
+                SplitPane(id: 'pane-1', kind: PaneKind.chat),
+              ],
+              paneTitle: (pane) => pane.id,
+              onClosePane: (_) {},
+              onReorderPanes: (id, index) {
+                moved = id;
+                target = index;
+              },
+              renderPane: (_, _) => const SizedBox.expand(),
+            ),
           ),
         ),
       ),

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/utils/clipboard.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 
 /// Unified-diff block (tool_result edit output) — add/del/context line
@@ -16,6 +17,7 @@ class DiffBlock extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = context.appColors;
+    final t = Translations.of(context);
     final mono = theme.textTheme.bodySmall!.copyWith(fontFamily: 'monospace', fontSize: 12.5);
 
     return Container(
@@ -47,7 +49,7 @@ class DiffBlock extends StatelessWidget {
                   ),
                 ),
                 IconButton(
-                  tooltip: 'Copy',
+                  tooltip: t.chat.codeBlock.copy,
                   visualDensity: VisualDensity.compact,
                   icon: const Icon(Icons.copy_outlined, size: 15),
                   onPressed: () => unawaited(copyTextWithFeedback(context, diff)),

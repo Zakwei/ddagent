@@ -2,6 +2,7 @@ import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
 import 'package:ddagent_app/features/workspace/view/pane_header_metrics.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 
 /// Kind icon per pane (port of PANE_KIND_ICONS in SplitWorkspaceGrid.tsx).
@@ -319,6 +320,7 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
     required bool draggable,
   }) {
     final c = context.appColors;
+    final i18n = Translations.of(context);
     final m = paneHeaderMetrics(context);
     final actions = <Widget>[
       if (draggable)
@@ -338,12 +340,12 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
       if (!tabMode && (widget.panes.length > 1 || isMaximized))
         _headerButton(
           icon: isMaximized ? Icons.close_fullscreen : Icons.open_in_full,
-          tooltip: isMaximized ? 'Restore panes' : 'Maximize pane',
+          tooltip: isMaximized ? i18n.workspace.restorePanes : i18n.workspace.maximizePane,
           onPressed: () => widget.onToggleMaximizePane?.call(pane.id),
         ),
       _headerButton(
         icon: Icons.close,
-        tooltip: 'Close pane',
+        tooltip: i18n.workspace.closePane,
         onPressed: () => widget.onClosePane(pane.id),
       ),
     ];

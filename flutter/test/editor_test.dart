@@ -8,6 +8,7 @@ import 'package:ddagent_app/features/editor/view/editor_screen.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_node.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_repository.dart';
 import 'package:ddagent_app/features/git/data/git_repository.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -88,14 +89,16 @@ Widget _app({
   required FakeFileTreeRepository files,
   required FakeGitRepository git,
   required Widget child,
-}) => ProviderScope(
-  overrides: [
-    fileTreeRepositoryProvider.overrideWithValue(files),
-    gitRepositoryProvider.overrideWithValue(git),
-  ],
-  child: MaterialApp(
-    theme: AppTheme.light(),
-    home: Scaffold(body: child),
+}) => TranslationProvider(
+  child: ProviderScope(
+    overrides: [
+      fileTreeRepositoryProvider.overrideWithValue(files),
+      gitRepositoryProvider.overrideWithValue(git),
+    ],
+    child: MaterialApp(
+      theme: AppTheme.light(),
+      home: Scaffold(body: child),
+    ),
   ),
 );
 
@@ -232,12 +235,14 @@ void main() {
       await c.read(editorProvider.notifier).open('p1', '/a.dart');
       late bool result;
       await tester.pumpWidget(
-        MaterialApp(
-          home: Builder(
-            builder: (ctx) => TextButton(
-              onPressed: () async =>
-                  result = await confirmCloseTab(ctx, c.read(editorProvider).active!),
-              child: const Text('go'),
+        TranslationProvider(
+          child: MaterialApp(
+            home: Builder(
+              builder: (ctx) => TextButton(
+                onPressed: () async =>
+                    result = await confirmCloseTab(ctx, c.read(editorProvider).active!),
+                child: const Text('go'),
+              ),
             ),
           ),
         ),
@@ -255,12 +260,14 @@ void main() {
           .updateContent(EditorController.tabId('p1', '/a.dart'), 'edited');
       late bool result;
       await tester.pumpWidget(
-        MaterialApp(
-          home: Builder(
-            builder: (ctx) => TextButton(
-              onPressed: () async =>
-                  result = await confirmCloseTab(ctx, c.read(editorProvider).active!),
-              child: const Text('go'),
+        TranslationProvider(
+          child: MaterialApp(
+            home: Builder(
+              builder: (ctx) => TextButton(
+                onPressed: () async =>
+                    result = await confirmCloseTab(ctx, c.read(editorProvider).active!),
+                child: const Text('go'),
+              ),
             ),
           ),
         ),
@@ -281,12 +288,14 @@ void main() {
           .updateContent(EditorController.tabId('p1', '/a.dart'), 'edited');
       late bool result;
       await tester.pumpWidget(
-        MaterialApp(
-          home: Builder(
-            builder: (ctx) => TextButton(
-              onPressed: () async =>
-                  result = await confirmCloseTab(ctx, c.read(editorProvider).active!),
-              child: const Text('go'),
+        TranslationProvider(
+          child: MaterialApp(
+            home: Builder(
+              builder: (ctx) => TextButton(
+                onPressed: () async =>
+                    result = await confirmCloseTab(ctx, c.read(editorProvider).active!),
+                child: const Text('go'),
+              ),
             ),
           ),
         ),
@@ -447,13 +456,15 @@ void main() {
       }
 
       Future<void> pump(double size) => tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.light(),
-          home: Scaffold(
-            body: CodeEditor(
-              content: 'void main() {\n  print(1);\n}\n',
-              language: 'dart',
-              fontSize: size,
+        TranslationProvider(
+          child: MaterialApp(
+            theme: AppTheme.light(),
+            home: Scaffold(
+              body: CodeEditor(
+                content: 'void main() {\n  print(1);\n}\n',
+                language: 'dart',
+                fontSize: size,
+              ),
             ),
           ),
         ),

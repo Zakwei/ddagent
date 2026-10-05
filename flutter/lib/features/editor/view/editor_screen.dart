@@ -11,6 +11,7 @@ import 'package:ddagent_app/features/editor/view/editor_dock.dart';
 import 'package:ddagent_app/features/editor/view/editor_preview.dart';
 import 'package:ddagent_app/features/file_tree/data/file_saver.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -84,16 +85,26 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   Future<void> _saveActive() async {
     final tab = ref.read(editorProvider).active;
     if (tab == null) return;
+    final t = Translations.of(context);
     final ok = await ref.read(editorProvider.notifier).save(tab.id);
     if (mounted) {
-      AppToast.show(context, ok ? 'Saved ${tab.name}' : 'Save failed', isError: !ok);
+      AppToast.show(
+        context,
+        ok ? t.codeEditor.toasts.savedFile(name: tab.name) : t.codeEditor.toasts.saveFailed,
+        isError: !ok,
+      );
     }
   }
 
   Future<void> _saveAll() async {
+    final t = Translations.of(context);
     final ok = await ref.read(editorProvider.notifier).saveAll();
     if (mounted) {
-      AppToast.show(context, ok ? 'All saved' : 'Some saves failed', isError: !ok);
+      AppToast.show(
+        context,
+        ok ? t.codeEditor.toasts.allSaved : t.codeEditor.toasts.someSavesFailed,
+        isError: !ok,
+      );
     }
   }
 
@@ -195,9 +206,10 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
 
   /// web handleDownload — saves the current buffer (unsaved edits included).
   Future<void> _downloadTab(EditorTab tab) async {
+    final t = Translations.of(context);
     final path = await downloadText(_fileName(tab.path), tab.content);
     if (path != null && mounted) {
-      AppToast.show(context, 'Saved to $path');
+      AppToast.show(context, t.codeEditor.toasts.savedTo(path: path));
     }
   }
 
@@ -205,6 +217,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     if (tab == null) {
       return const _EmptyState();
     }
+    final t = Translations.of(context);
     final kind = editorFileKind(tab.path);
     if (tab.loading) {
       return const Center(child: CircularProgressIndicator());
@@ -239,7 +252,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
         onApply: (merged) {
           ref.read(editorProvider.notifier).updateContent(tab.id, merged);
           setState(() => _diffOpen = false);
-          AppToast.show(context, 'Merge applied — save to persist');
+          AppToast.show(context, t.codeEditor.toasts.mergeApplied);
         },
         onDiscarded: () {
           setState(() => _diffOpen = false);
@@ -382,6 +395,7 @@ class _Toolbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final t = Translations.of(context);
     final kind = tab == null ? null : editorFileKind(tab!.path);
     final isHtml = tab != null && RegExp(r'\.html?$', caseSensitive: false).hasMatch(tab!.path);
     final isTextual = kind == EditorFileKind.text || kind == EditorFileKind.markdown;
@@ -390,7 +404,7 @@ class _Toolbar extends StatelessWidget {
       child: Row(
         children: [
           IconButton(
-            tooltip: 'Toggle file dock',
+            tooltip: t.codeEditor.toolbar.toggleDock,
             visualDensity: VisualDensity.compact,
             icon: Icon(
               Icons.view_sidebar_outlined,
@@ -415,7 +429,7 @@ class _Toolbar extends StatelessWidget {
             ),
           if (isTextual)
             IconButton(
-              tooltip: 'Diff / merge',
+              tooltip: t.codeEditor.toolbar.diffMerge,
               visualDensity: VisualDensity.compact,
               icon: Icon(
                 Icons.difference_outlined,
@@ -426,20 +440,20 @@ class _Toolbar extends StatelessWidget {
             ),
           if (isHtml)
             IconButton(
-              tooltip: 'Preview in browser',
+              tooltip: t.codeEditor.toolbar.previewInBrowser,
               visualDensity: VisualDensity.compact,
               icon: const Icon(Icons.visibility_outlined, size: 18),
               onPressed: onHtmlPreview,
             ),
           if (isTextual)
             IconButton(
-              tooltip: 'Reload from disk',
+              tooltip: t.codeEditor.toolbar.reload,
               visualDensity: VisualDensity.compact,
               icon: const Icon(Icons.refresh, size: 18),
               onPressed: onReload,
             ),
           IconButton(
-            tooltip: 'Download',
+            tooltip: t.common.buttons.download,
             visualDensity: VisualDensity.compact,
             icon: const Icon(Icons.download_outlined, size: 18),
             onPressed: onDownload,
@@ -448,10 +462,14 @@ class _Toolbar extends StatelessWidget {
             variant: AppButtonVariant.ghost,
             size: AppButtonSize.sm,
             onPressed: onSaveAll,
-            child: const Text('Save all'),
+            child: Text(t.codeEditor.actions.saveAll),
           ),
           const SizedBox(width: 4),
-          AppButton(size: AppButtonSize.sm, onPressed: onSave, child: const Text('Save')),
+          AppButton(
+            size: AppButtonSize.sm,
+            onPressed: onSave,
+            child: Text(t.codeEditor.actions.save),
+          ),
           const _SettingsMenu(),
         ],
       ),
@@ -466,8 +484,9 @@ class _SettingsMenu extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final s = ref.watch(editorSettingsProvider);
     final c = ref.read(editorSettingsProvider.notifier);
+    final t = Translations.of(context);
     return PopupMenuButton<String>(
-      tooltip: 'Editor settings',
+      tooltip: t.codeEditor.toolbar.settings,
       icon: const Icon(Icons.settings_outlined, size: 18),
       onSelected: (v) {
         switch (v) {
@@ -484,12 +503,26 @@ class _SettingsMenu extends ConsumerWidget {
         }
       },
       itemBuilder: (_) => [
-        CheckedPopupMenuItem(value: 'wrap', checked: s.wordWrap, child: const Text('Word wrap')),
-        CheckedPopupMenuItem(value: 'minimap', checked: s.minimap, child: const Text('Minimap')),
-        PopupMenuItem(value: 'tab', child: Text('Tab size: ${s.tabSize}')),
+        CheckedPopupMenuItem(
+          value: 'wrap',
+          checked: s.wordWrap,
+          child: Text(t.settings.appearance.wordWrap),
+        ),
+        CheckedPopupMenuItem(
+          value: 'minimap',
+          checked: s.minimap,
+          child: Text(t.codeEditor.settings.minimap),
+        ),
+        PopupMenuItem(
+          value: 'tab',
+          child: Text(t.codeEditor.settings.tabSize(size: s.tabSize)),
+        ),
         const PopupMenuDivider(),
-        PopupMenuItem(value: 'smaller', child: Text('Font size −  (now ${s.fontSize.toInt()})')),
-        const PopupMenuItem(value: 'bigger', child: Text('Font size +')),
+        PopupMenuItem(
+          value: 'smaller',
+          child: Text(t.codeEditor.settings.fontSizeDecrease(size: s.fontSize.toInt())),
+        ),
+        PopupMenuItem(value: 'bigger', child: Text(t.codeEditor.settings.fontSizeIncrease)),
       ],
     );
   }
@@ -526,13 +559,14 @@ class _EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final t = Translations.of(context);
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.edit_note, size: 48, color: colors.mutedForeground),
           const SizedBox(height: AppSpacing.sm),
-          Text('No file open', style: Theme.of(context).textTheme.titleSmall),
+          Text(t.codeEditor.emptyState.title, style: Theme.of(context).textTheme.titleSmall),
           Text(
             'Open files from the Files tab',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(color: colors.mutedForeground),
@@ -551,6 +585,7 @@ class _ErrorBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -560,7 +595,7 @@ class _ErrorBody extends StatelessWidget {
           AppButton(
             variant: AppButtonVariant.ghost,
             onPressed: onRetry,
-            child: const Text('Retry'),
+            child: Text(t.chat.session.messages.retry),
           ),
         ],
       ),

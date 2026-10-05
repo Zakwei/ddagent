@@ -1,6 +1,7 @@
 import 'package:ddagent_app/core/theme/app_theme.dart';
 import 'package:ddagent_app/features/chat/view/tool_blocks.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -178,10 +179,12 @@ void main() {
 
     // ProviderScope: tool rows watch uiPreferencesProvider for the
     // `showRawParameters` pref (defaults when no Hive box is open).
-    Widget app(Widget child, {bool dark = true}) => ProviderScope(
-      child: MaterialApp(
-        theme: dark ? AppTheme.ocChat() : AppTheme.light(),
-        home: Scaffold(body: SingleChildScrollView(child: child)),
+    Widget app(Widget child, {bool dark = true}) => TranslationProvider(
+      child: ProviderScope(
+        child: MaterialApp(
+          theme: dark ? AppTheme.ocChat() : AppTheme.light(),
+          home: Scaffold(body: SingleChildScrollView(child: child)),
+        ),
       ),
     );
 
@@ -268,10 +271,12 @@ void main() {
   });
 
   group('T56 renderers', () {
-    Widget app(Widget child) => ProviderScope(
-      child: MaterialApp(
-        theme: AppTheme.ocChat(),
-        home: Scaffold(body: SingleChildScrollView(child: child)),
+    Widget app(Widget child) => TranslationProvider(
+      child: ProviderScope(
+        child: MaterialApp(
+          theme: AppTheme.ocChat(),
+          home: Scaffold(body: SingleChildScrollView(child: child)),
+        ),
       ),
     );
 
@@ -289,9 +294,9 @@ void main() {
         toolResult: {'content': 'ok'},
       );
       await tester.pumpWidget(app(ToolUseTile(message: msg, childrenMap: const {})));
-      expect(find.text('Updating todo list'), findsOneWidget);
+      expect(find.text('Updating Todo List'), findsOneWidget);
       expect(find.text('First task'), findsNothing);
-      await tester.tap(find.text('Updating todo list'));
+      await tester.tap(find.text('Updating Todo List'));
       await tester.pump();
       expect(find.text('First task'), findsOneWidget);
       expect(find.text('Second task'), findsOneWidget);

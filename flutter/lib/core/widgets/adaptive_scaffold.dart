@@ -11,6 +11,7 @@ import 'package:ddagent_app/features/settings/state/ui_preferences_controller.da
 import 'package:ddagent_app/features/settings/view/quick_settings_sheet.dart';
 import 'package:ddagent_app/features/taskmaster/state/tasks_settings_controller.dart';
 import 'package:ddagent_app/features/workspace/view/session_quick_switcher.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -25,30 +26,32 @@ const _kCoffeeUrl = 'https://buymeacoffee.com/ddnet';
 /// Top-level destinations shown in the rail, mirroring the web client's
 /// SidebarRail order: pane workspace + sessions first, then standalone pages.
 /// New-app-only pages (projects, scheduler) sit in a second group below.
+/// Labels are resolved from i18n via [_destinationLabel] so the tables stay
+/// `const`.
 const _destinations = [
-  (icon: LucideIcons.messageSquarePlus, label: 'Panel', path: '/workspace'),
-  (icon: LucideIcons.history, label: 'Sessions', path: '/sessions'),
+  (icon: LucideIcons.messageSquarePlus, path: '/workspace'),
+  (icon: LucideIcons.history, path: '/sessions'),
 ];
 
 const _pageDestinations = [
-  (icon: LucideIcons.squareKanban, label: 'Agent Board', path: '/board'),
-  (icon: LucideIcons.clipboardCheck, label: 'Tasks', path: '/tasks'),
-  (icon: LucideIcons.gauge, label: 'Quota & Usage', path: '/quota'),
-  (icon: LucideIcons.gitBranch, label: 'Source Control', path: '/git'),
-  (icon: LucideIcons.folder, label: 'Files', path: '/files'),
+  (icon: LucideIcons.squareKanban, path: '/board'),
+  (icon: LucideIcons.clipboardCheck, path: '/tasks'),
+  (icon: LucideIcons.gauge, path: '/quota'),
+  (icon: LucideIcons.gitBranch, path: '/git'),
+  (icon: LucideIcons.folder, path: '/files'),
 ];
 
 const _extraDestinations = [
-  (icon: LucideIcons.brain, label: 'Knowledge', path: '/knowledge'),
-  (icon: LucideIcons.layoutGrid, label: 'Projects', path: '/projects'),
-  (icon: LucideIcons.calendarClock, label: 'Schedules', path: '/scheduler'),
+  (icon: LucideIcons.brain, path: '/knowledge'),
+  (icon: LucideIcons.layoutGrid, path: '/projects'),
+  (icon: LucideIcons.calendarClock, path: '/scheduler'),
 ];
 
 /// Shown only when the server reports browser-use enabled (the web app's
 /// `shouldShowBrowserTab` gate on `/api/browser-use/settings`).
-const _browserDestination = (icon: LucideIcons.monitorPlay, label: 'Browser', path: '/browser');
+const _browserDestination = (icon: LucideIcons.monitorPlay, path: '/browser');
 
-const _settingsDestination = (icon: LucideIcons.settings, label: 'Settings', path: '/settings');
+const _settingsDestination = (icon: LucideIcons.settings, path: '/settings');
 
 const _allDestinations = [
   ..._destinations,
@@ -57,6 +60,23 @@ const _allDestinations = [
   _browserDestination,
   _settingsDestination,
 ];
+
+/// Localized label for a destination entry in the rail/drawer.
+String _destinationLabel(Translations t, String path) => switch (path) {
+  '/workspace' => t.sidebar.panel.open,
+  '/sessions' => t.common.quota.metric.sessions,
+  '/board' => t.sidebar.tabs.board,
+  '/tasks' => t.common.tabs.tasks,
+  '/quota' => t.sidebar.tabs.usage,
+  '/git' => t.common.tabs.git,
+  '/files' => t.common.tabs.files,
+  '/knowledge' => t.knowledge.title,
+  '/projects' => t.sidebar.projects.title,
+  '/scheduler' => t.settings.schedules.title,
+  '/browser' => t.common.tabs.browser,
+  '/settings' => t.common.navigation.settings,
+  _ => path,
+};
 
 /// Adaptive shell: 48px icon rail (web SidebarRail parity) on medium+ widths,
 /// hamburger drawer (web MobileNavMenu parity) on compact.
@@ -235,6 +255,7 @@ class _AppRail extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.appColors;
     final nav = context.appNav;
+    final t = Translations.of(context);
     final runningCount = ref
         .watch(sessionsProvider((null, null)))
         .sessions
@@ -267,7 +288,7 @@ class _AppRail extends ConsumerWidget {
           ),
           _RailButton(
             icon: LucideIcons.history,
-            label: 'Sessions',
+            label: t.common.quota.metric.sessions,
             selected: selectedPath == '/sessions',
             onTap: () => context.go('/sessions'),
           ),
@@ -275,7 +296,7 @@ class _AppRail extends ConsumerWidget {
           for (final d in pageDestinations)
             _RailButton(
               icon: d.icon,
-              label: d.label,
+              label: _destinationLabel(t, d.path),
               selected: selectedPath == d.path,
               onTap: () => context.go(d.path),
             ),
@@ -283,14 +304,14 @@ class _AppRail extends ConsumerWidget {
           for (final d in _extraDestinations)
             _RailButton(
               icon: d.icon,
-              label: d.label,
+              label: _destinationLabel(t, d.path),
               selected: selectedPath == d.path,
               onTap: () => context.go(d.path),
             ),
           if (browserEnabled)
             _RailButton(
               icon: _browserDestination.icon,
-              label: _browserDestination.label,
+              label: _destinationLabel(t, _browserDestination.path),
               selected: selectedPath == _browserDestination.path,
               onTap: () => context.go(_browserDestination.path),
             ),
@@ -298,17 +319,17 @@ class _AppRail extends ConsumerWidget {
           const UpdateBadge(),
           _RailButton(
             icon: LucideIcons.slidersHorizontal,
-            label: 'Quick settings',
+            label: t.settings.quickSettings.title,
             onTap: () => showQuickSettings(context),
           ),
           _RailButton(
             icon: LucideIcons.coffee,
-            label: 'Buy Me a Coffee',
+            label: t.settings.about.buyMeACoffee,
             onTap: () => launchUrl(Uri.parse(_kCoffeeUrl)),
           ),
           _RailButton(
             icon: LucideIcons.settings,
-            label: 'Settings',
+            label: t.common.navigation.settings,
             selected: selectedPath == '/settings',
             onTap: () => context.go('/settings'),
           ),
@@ -448,6 +469,7 @@ class _CompactNavDrawer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.appColors;
     final nav = context.appNav;
+    final t = Translations.of(context);
     final runningCount = ref
         .watch(sessionsProvider((null, null)))
         .sessions
@@ -514,20 +536,30 @@ class _CompactNavDrawer extends ConsumerWidget {
                 ],
               ),
             ),
-            item(LucideIcons.messageSquarePlus, 'Panel', '/workspace', badge: runningCount),
-            item(LucideIcons.history, 'Sessions', '/sessions'),
+            item(
+              LucideIcons.messageSquarePlus,
+              _destinationLabel(t, '/workspace'),
+              '/workspace',
+              badge: runningCount,
+            ),
+            item(LucideIcons.history, _destinationLabel(t, '/sessions'), '/sessions'),
             _drawerDivider(nav.dividerColor),
             for (final d in _pageDestinations)
-              if (showTasks || d.path != '/tasks') item(d.icon, d.label, d.path),
+              if (showTasks || d.path != '/tasks')
+                item(d.icon, _destinationLabel(t, d.path), d.path),
             _drawerDivider(nav.dividerColor),
-            for (final d in _extraDestinations) item(d.icon, d.label, d.path),
+            for (final d in _extraDestinations) item(d.icon, _destinationLabel(t, d.path), d.path),
             if (browserEnabled)
-              item(_browserDestination.icon, _browserDestination.label, _browserDestination.path),
+              item(
+                _browserDestination.icon,
+                _destinationLabel(t, _browserDestination.path),
+                _browserDestination.path,
+              ),
             _drawerDivider(nav.dividerColor),
             const UpdateBadge(variant: UpdateBadgeVariant.row),
             ListTile(
               leading: const Icon(LucideIcons.slidersHorizontal, size: 18),
-              title: const Text('Quick settings', style: TextStyle(fontSize: 14)),
+              title: Text(t.settings.quickSettings.title, style: const TextStyle(fontSize: 14)),
               onTap: () {
                 Navigator.of(context).pop();
                 showQuickSettings(context);
@@ -535,13 +567,17 @@ class _CompactNavDrawer extends ConsumerWidget {
             ),
             ListTile(
               leading: const Icon(LucideIcons.coffee, size: 18),
-              title: const Text('Buy Me a Coffee', style: TextStyle(fontSize: 14)),
+              title: Text(t.settings.about.buyMeACoffee, style: const TextStyle(fontSize: 14)),
               onTap: () {
                 Navigator.of(context).pop();
                 launchUrl(Uri.parse(_kCoffeeUrl));
               },
             ),
-            item(_settingsDestination.icon, _settingsDestination.label, _settingsDestination.path),
+            item(
+              _settingsDestination.icon,
+              _destinationLabel(t, _settingsDestination.path),
+              _settingsDestination.path,
+            ),
           ],
         ),
       ),

@@ -7,6 +7,7 @@ import 'package:ddagent_app/features/terminal/state/terminal_state.dart';
 import 'package:ddagent_app/features/terminal/view/provider_login_dialog.dart';
 import 'package:ddagent_app/features/terminal/view/terminal_shortcuts_bar.dart';
 import 'package:ddagent_app/features/terminal/view/terminal_view_wrapper.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -74,11 +75,14 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
   void _ensureInitialTab() {
     final terminalState = ref.read(terminalControllerProvider);
     if (terminalState.tabs.isEmpty) {
+      final t = Translations.of(context);
       final path = _resolveProjectPath();
       ref
           .read(terminalControllerProvider.notifier)
           .createTab(
-            title: widget.sessionId != null ? 'Session ${widget.sessionId}' : 'Shell 1',
+            title: widget.sessionId != null
+                ? 'Session ${widget.sessionId}'
+                : t.terminal.tabs.shellName(index: 1),
             projectPath: path,
             sessionId: widget.sessionId,
             isPlainShell: widget.sessionId == null,
@@ -195,6 +199,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
 
   Widget _buildTabStrip(BuildContext context, TerminalState state, TerminalTab? activeTab) {
     final colors = context.appColors;
+    final t = Translations.of(context);
 
     return Container(
       height: 40,
@@ -230,7 +235,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
                   // Font zoom (9–24px, disabled at the bounds).
                   if (activeTab != null) ...[
                     IconButton(
-                      tooltip: 'Zoom out',
+                      tooltip: t.chat.shell.actions.zoomOutTitle,
                       icon: const Icon(LucideIcons.zoomOut, size: 16),
                       onPressed: activeTab.fontSize > terminalFontSizeMin
                           ? () =>
@@ -238,7 +243,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
                           : null,
                     ),
                     IconButton(
-                      tooltip: 'Zoom in',
+                      tooltip: t.chat.shell.actions.zoomInTitle,
                       icon: const Icon(LucideIcons.zoomIn, size: 16),
                       onPressed: activeTab.fontSize < terminalFontSizeMax
                           ? () => ref.read(terminalControllerProvider.notifier).zoomIn(activeTab.id)
@@ -246,7 +251,9 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
                     ),
                     // Copy output → 2s "copied" check.
                     IconButton(
-                      tooltip: _copied ? 'Copied!' : 'Copy terminal output',
+                      tooltip: _copied
+                          ? t.chat.shell.actions.copied
+                          : t.chat.shell.actions.copyOutputTitle,
                       icon: Icon(
                         _copied ? Icons.check : LucideIcons.copy,
                         size: 16,
@@ -258,7 +265,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
 
                   // New tab popup button
                   PopupMenuButton<String>(
-                    tooltip: 'New Terminal Tab',
+                    tooltip: t.terminal.actions.newTab,
                     icon: const Icon(Icons.add, size: 20),
                     onSelected: (choice) {
                       final path = _resolveProjectPath();
@@ -275,74 +282,74 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
                       }
                     },
                     itemBuilder: (context) => [
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'plain',
                         child: Row(
                           children: [
-                            Icon(Icons.terminal, size: 16),
-                            SizedBox(width: 8),
-                            Text('Plain Shell'),
+                            const Icon(Icons.terminal, size: 16),
+                            const SizedBox(width: 8),
+                            Text(t.terminal.tabs.plainShell),
                           ],
                         ),
                       ),
                       const PopupMenuDivider(),
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'claude',
                         child: Row(
                           children: [
-                            Icon(Icons.smart_toy_outlined, size: 16),
-                            SizedBox(width: 8),
-                            Text('Claude CLI'),
+                            const Icon(Icons.smart_toy_outlined, size: 16),
+                            const SizedBox(width: 8),
+                            Text(t.terminal.tabs.claudeCli),
                           ],
                         ),
                       ),
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'opencode',
                         child: Row(
                           children: [
-                            Icon(Icons.code, size: 16),
-                            SizedBox(width: 8),
-                            Text('OpenCode CLI'),
+                            const Icon(Icons.code, size: 16),
+                            const SizedBox(width: 8),
+                            Text(t.terminal.tabs.opencodeCli),
                           ],
                         ),
                       ),
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'commandcode',
                         child: Row(
                           children: [
-                            Icon(Icons.code, size: 16),
-                            SizedBox(width: 8),
-                            Text('Command Code CLI'),
+                            const Icon(Icons.code, size: 16),
+                            const SizedBox(width: 8),
+                            Text(t.terminal.tabs.commandCodeCli),
                           ],
                         ),
                       ),
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'antigravity',
                         child: Row(
                           children: [
-                            Icon(Icons.code, size: 16),
-                            SizedBox(width: 8),
-                            Text('Antigravity CLI'),
+                            const Icon(Icons.code, size: 16),
+                            const SizedBox(width: 8),
+                            Text(t.terminal.tabs.antigravityCli),
                           ],
                         ),
                       ),
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'cursor',
                         child: Row(
                           children: [
-                            Icon(Icons.computer, size: 16),
-                            SizedBox(width: 8),
-                            Text('Cursor CLI'),
+                            const Icon(Icons.computer, size: 16),
+                            const SizedBox(width: 8),
+                            Text(t.terminal.tabs.cursorCli),
                           ],
                         ),
                       ),
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'devin',
                         child: Row(
                           children: [
-                            Icon(Icons.psychology, size: 16),
-                            SizedBox(width: 8),
-                            Text('Devin CLI'),
+                            const Icon(Icons.psychology, size: 16),
+                            const SizedBox(width: 8),
+                            Text(t.terminal.tabs.devinCli),
                           ],
                         ),
                       ),
@@ -351,7 +358,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
 
                   // Provider Login action
                   IconButton(
-                    tooltip: 'Provider Login',
+                    tooltip: t.terminal.actions.providerLogin,
                     icon: const Icon(Icons.vpn_key_outlined, size: 18),
                     onPressed: () {
                       ProviderLoginDialog.show(
@@ -364,7 +371,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
                   // Kill running process (SIGINT) — connected only.
                   if (activeTab != null && activeTab.status == TerminalTabStatus.connected)
                     IconButton(
-                      tooltip: 'Kill running process (Ctrl+C)',
+                      tooltip: t.chat.shell.actions.killTitle,
                       icon: Icon(LucideIcons.square, size: 14, color: colors.destructive),
                       onPressed: () {
                         ref
@@ -376,7 +383,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
                   // Restart current session
                   if (activeTab != null)
                     IconButton(
-                      tooltip: 'Restart Session',
+                      tooltip: t.terminal.actions.restartSession,
                       icon: const Icon(Icons.refresh, size: 18),
                       onPressed: () {
                         ref.read(terminalControllerProvider.notifier).restartTab(activeTab.id);
@@ -386,7 +393,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
                   // Disconnect — connected only; overlay's Connect resumes.
                   if (activeTab != null && activeTab.status == TerminalTabStatus.connected)
                     IconButton(
-                      tooltip: 'Disconnect',
+                      tooltip: t.chat.shell.actions.disconnect,
                       icon: Icon(LucideIcons.x, size: 18, color: colors.destructive),
                       onPressed: () {
                         ref.read(terminalControllerProvider.notifier).disconnectTab(activeTab.id);
@@ -396,7 +403,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
                   // Clear terminal buffer
                   if (activeTab != null)
                     IconButton(
-                      tooltip: 'Clear Output',
+                      tooltip: t.terminal.actions.clearOutput,
                       icon: const Icon(Icons.clear_all, size: 18),
                       onPressed: () {
                         ref.read(terminalControllerProvider.notifier).clearTab(activeTab.id);
@@ -405,7 +412,9 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
 
                   // Toggle touch shortcuts bar
                   IconButton(
-                    tooltip: state.showShortcutsBar ? 'Hide Shortcuts' : 'Show Shortcuts',
+                    tooltip: state.showShortcutsBar
+                        ? t.terminal.shortcuts.hideTooltip
+                        : t.terminal.shortcuts.showTooltip,
                     icon: Icon(
                       Icons.keyboard,
                       size: 18,
@@ -484,6 +493,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
 
   Widget _buildAuthUrlBanner(String authUrl) {
     final colors = Theme.of(context).extension<AppColors>() ?? AppColors.dark;
+    final t = Translations.of(context);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -508,7 +518,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
           TextButton.icon(
             onPressed: () => _openAuthUrl(authUrl),
             icon: const Icon(Icons.open_in_new, size: 14),
-            label: const Text('Open'),
+            label: Text(t.common.gitPanel.worktrees.open),
             style: TextButton.styleFrom(
               visualDensity: VisualDensity.compact,
               padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -521,6 +531,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
 
   Widget _buildEmptyState() {
     final colors = context.appColors;
+    final t = Translations.of(context);
 
     return Center(
       child: Column(
@@ -543,10 +554,14 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
               final path = _resolveProjectPath();
               ref
                   .read(terminalControllerProvider.notifier)
-                  .createTab(title: 'Shell 1', projectPath: path, isPlainShell: true);
+                  .createTab(
+                    title: t.terminal.tabs.shellName(index: 1),
+                    projectPath: path,
+                    isPlainShell: true,
+                  );
             },
             icon: const Icon(Icons.add),
-            label: const Text('New Shell'),
+            label: Text(t.terminal.actions.newShell),
           ),
         ],
       ),
@@ -565,6 +580,7 @@ class _ConnectionOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     final connecting = tab.status == TerminalTabStatus.connecting;
     final description = switch (tab.status) {
       TerminalTabStatus.exited =>
@@ -622,7 +638,7 @@ class _ConnectionOverlay extends StatelessWidget {
                   FilledButton.icon(
                     onPressed: onConnect,
                     icon: const Icon(LucideIcons.rotateCcw, size: 16),
-                    label: const Text('Connect'),
+                    label: Text(t.terminal.actions.connect),
                     style: FilledButton.styleFrom(
                       backgroundColor: const Color(0xFF059669), // emerald-600
                       foregroundColor: Colors.white,

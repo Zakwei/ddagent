@@ -14,6 +14,7 @@ import 'package:ddagent_app/features/kanban/data/kanban_repository.dart';
 import 'package:ddagent_app/features/kanban/state/kanban_controller.dart';
 import 'package:ddagent_app/features/projects/data/projects_repository.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -50,10 +51,10 @@ class KanbanColumnDef {
   final double headerBgDarkAlpha;
 }
 
-const defaultKanbanColumns = <KanbanColumnDef>[
+List<KanbanColumnDef> kanbanColumns(Translations t) => <KanbanColumnDef>[
   KanbanColumnDef(
     status: 'backlog',
-    title: 'Backlog',
+    title: t.tasks.board.columns.backlog,
     accent: Color(0xFF94A3B8), // slate-400
     headerBgLight: Color(0xFFF1F5F9), // slate-100
     headerFgLight: Color(0xFF1E293B), // slate-800
@@ -62,7 +63,7 @@ const defaultKanbanColumns = <KanbanColumnDef>[
   ),
   KanbanColumnDef(
     status: 'ready',
-    title: 'Ready to start',
+    title: t.tasks.board.columns.ready,
     accent: Color(0xFF0EA5E9), // sky-500
     headerBgLight: Color(0xFFE0F2FE), // sky-100
     headerFgLight: Color(0xFF075985), // sky-800
@@ -72,7 +73,7 @@ const defaultKanbanColumns = <KanbanColumnDef>[
   ),
   KanbanColumnDef(
     status: 'working',
-    title: 'Working',
+    title: t.tasks.board.columns.working,
     accent: Color(0xFF3B82F6), // blue-500
     headerBgLight: Color(0xFFDBEAFE), // blue-100
     headerFgLight: Color(0xFF1E40AF), // blue-800
@@ -82,7 +83,7 @@ const defaultKanbanColumns = <KanbanColumnDef>[
   ),
   KanbanColumnDef(
     status: 'needs_decision',
-    title: 'Needs your decision',
+    title: t.tasks.board.columns.needsDecision,
     accent: Color(0xFFF59E0B), // amber-500
     headerBgLight: Color(0xFFFEF3C7), // amber-100
     headerFgLight: Color(0xFF78350F), // amber-900
@@ -92,7 +93,7 @@ const defaultKanbanColumns = <KanbanColumnDef>[
   ),
   KanbanColumnDef(
     status: 'done',
-    title: 'Done',
+    title: t.tasks.board.columns.done,
     accent: Color(0xFF10B981), // emerald-500
     headerBgLight: Color(0xFFD1FAE5), // emerald-100
     headerFgLight: Color(0xFF065F46), // emerald-800
@@ -102,7 +103,7 @@ const defaultKanbanColumns = <KanbanColumnDef>[
   ),
   KanbanColumnDef(
     status: 'archived',
-    title: 'Archived',
+    title: t.tasks.board.columns.archived,
     accent: Color(0xFF9CA3AF), // gray-400
     headerBgLight: Color(0xFFF3F4F6), // gray-100
     headerFgLight: Color(0xFF374151), // gray-700
@@ -152,15 +153,13 @@ String _relTime(String? iso) {
   if (dt == null) return '';
   // dart2js bit-shifts are 32-bit: `1 << 62` is 0 on web, clamping to 0s.
   final seconds = DateTime.now().difference(dt).inSeconds.clamp(0, double.infinity);
-  if (seconds < 60) return 'now';
+  if (seconds < 60) return t.kanban.time.now;
   final minutes = seconds ~/ 60;
-  if (minutes < 60) {
-    return minutes == 1 ? '1 minute ago' : '$minutes minutes ago';
-  }
+  if (minutes < 60) return t.kanban.time.minutesAgo(count: minutes);
   final hours = minutes ~/ 60;
-  if (hours < 24) return hours == 1 ? '1 hour ago' : '$hours hours ago';
+  if (hours < 24) return t.kanban.time.hoursAgo(count: hours);
   final days = hours ~/ 24;
-  return days == 1 ? '1 day ago' : '$days days ago';
+  return t.kanban.time.daysAgo(count: days);
 }
 
 String _initials(String name) {
@@ -265,13 +264,14 @@ class _KanbanScreenState extends ConsumerState<KanbanScreen> {
   }
 
   void _confirmDelete(KanbanCard card) {
+    final t = Translations.of(context);
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: context.appColors.popover,
-        title: const Text('Delete card?'),
+        title: Text(t.tasks.board.deleteConfirm.title),
         content: Text(
-          '"${card.title ?? ''}" will be permanently deleted.',
+          t.tasks.board.deleteConfirm.description(cardTitle: card.title ?? ''),
           style: TextStyle(color: context.appColors.mutedForeground, fontSize: 14),
         ),
         actions: [
@@ -279,7 +279,7 @@ class _KanbanScreenState extends ConsumerState<KanbanScreen> {
             variant: AppButtonVariant.ghost,
             size: AppButtonSize.sm,
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
+            child: Text(t.common.buttons.cancel),
           ),
           AppButton(
             variant: AppButtonVariant.destructive,
@@ -288,7 +288,7 @@ class _KanbanScreenState extends ConsumerState<KanbanScreen> {
               Navigator.of(ctx).pop();
               unawaited(ref.read(kanbanControllerProvider.notifier).deleteCard(card.cardId));
             },
-            child: const Text('Delete'),
+            child: Text(t.common.buttons.delete),
           ),
         ],
       ),
@@ -339,6 +339,8 @@ class _KanbanScreenState extends ConsumerState<KanbanScreen> {
     String pid,
     AppColors c,
   ) {
+    final t = Translations.of(context);
+    final columns = kanbanColumns(t);
     final users = ref.watch(collabUsersProvider).value ?? const [];
     final usersById = {for (final u in users) u.id: u};
     final roster = ref.watch(presenceProvider((kind: 'board', id: pid)));
@@ -378,8 +380,7 @@ class _KanbanScreenState extends ConsumerState<KanbanScreen> {
                         ),
                       ),
                     Text(
-                      'Move a card to Ready and the agent picks it up. '
-                      'Click a card to open its session.',
+                      t.tasks.board.subtitle,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(color: c.mutedForeground, fontSize: 11),
@@ -418,7 +419,7 @@ class _KanbanScreenState extends ConsumerState<KanbanScreen> {
                     else
                       const Icon(LucideIcons.refreshCw, size: 16),
                     const SizedBox(width: 4),
-                    const Text('Refresh', style: TextStyle(fontSize: 14)),
+                    Text(t.common.buttons.refresh, style: const TextStyle(fontSize: 14)),
                   ],
                 ),
               ),
@@ -427,12 +428,12 @@ class _KanbanScreenState extends ConsumerState<KanbanScreen> {
                 key: const Key('add-card-button'),
                 size: AppButtonSize.sm,
                 onPressed: () => _showCardDialog(context),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(LucideIcons.plus, size: 16),
-                    SizedBox(width: 4),
-                    Text('New card', style: TextStyle(fontSize: 14)),
+                    const Icon(LucideIcons.plus, size: 16),
+                    const SizedBox(width: 4),
+                    Text(t.tasks.board.newCard, style: const TextStyle(fontSize: 14)),
                   ],
                 ),
               ),
@@ -505,9 +506,9 @@ class _KanbanScreenState extends ConsumerState<KanbanScreen> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      for (var i = 0; i < defaultKanbanColumns.length; i++) ...[
+                      for (var i = 0; i < columns.length; i++) ...[
                         if (i > 0) const SizedBox(width: 16),
-                        colWidget(defaultKanbanColumns[i], w: 240),
+                        colWidget(columns[i], w: 240),
                       ],
                     ],
                   ),
@@ -520,9 +521,9 @@ class _KanbanScreenState extends ConsumerState<KanbanScreen> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        for (var i = 0; i < defaultKanbanColumns.length; i++) ...[
+                        for (var i = 0; i < columns.length; i++) ...[
                           if (i > 0) const SizedBox(width: 16),
-                          Expanded(child: colWidget(defaultKanbanColumns[i])),
+                          Expanded(child: colWidget(columns[i])),
                         ],
                       ],
                     ),
@@ -545,6 +546,7 @@ class _KanbanScreenState extends ConsumerState<KanbanScreen> {
 class _EmptyBoard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     final c = context.appColors;
     return Center(
       child: Column(
@@ -562,14 +564,11 @@ class _EmptyBoard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'No project selected',
+            t.kanban.empty.noProject,
             style: TextStyle(color: c.foreground, fontSize: 16, fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 4),
-          Text(
-            'Add a project first, then create cards for it.',
-            style: TextStyle(color: c.mutedForeground, fontSize: 14),
-          ),
+          Text(t.tasks.board.noProject, style: TextStyle(color: c.mutedForeground, fontSize: 14)),
         ],
       ),
     );
@@ -577,7 +576,7 @@ class _EmptyBoard extends StatelessWidget {
 }
 
 /// Ghost dropdown trigger for the project picker — `h-7 gap-1 px-2
-/// font-semibold text-foreground` with a 'Project' menu header.
+/// font-semibold text-foreground` with a localized project menu header.
 class _ProjectMenu extends StatelessWidget {
   const _ProjectMenu({required this.projects, required this.selected, required this.onSelect});
 
@@ -587,9 +586,10 @@ class _ProjectMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     final c = context.appColors;
     return PopupMenuButton<Project>(
-      tooltip: 'Project',
+      tooltip: t.tasks.board.projectLabel,
       position: PopupMenuPosition.under,
       offset: const Offset(0, 4),
       onSelected: onSelect,
@@ -597,7 +597,10 @@ class _ProjectMenu extends StatelessWidget {
         PopupMenuItem<Project>(
           enabled: false,
           height: 28,
-          child: Text('Project', style: TextStyle(color: c.mutedForeground, fontSize: 12)),
+          child: Text(
+            t.tasks.board.projectLabel,
+            style: TextStyle(color: c.mutedForeground, fontSize: 12),
+          ),
         ),
         for (final p in projects)
           PopupMenuItem<Project>(
@@ -634,7 +637,7 @@ class _ProjectMenu extends StatelessWidget {
             Flexible(
               child: Text(
                 selected == null
-                    ? 'Project'
+                    ? t.tasks.board.projectLabel
                     : (selected!.displayName.isEmpty ? selected!.projectId : selected!.displayName),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -696,14 +699,15 @@ class _AssigneeMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     final c = context.appColors;
     final label = switch (value) {
-      'all' => 'Assignee',
-      'none' => 'Unassigned',
+      'all' => t.tasks.board.assignee.label,
+      'none' => t.tasks.board.assignee.unassigned,
       _ => users.where((u) => '${u.id}' == value).firstOrNull?.displayName ?? value,
     };
     return PopupMenuButton<String>(
-      tooltip: 'Assignee',
+      tooltip: t.tasks.board.assignee.label,
       position: PopupMenuPosition.under,
       offset: const Offset(0, 4),
       onSelected: onChanged,
@@ -711,10 +715,13 @@ class _AssigneeMenu extends StatelessWidget {
         PopupMenuItem<String>(
           enabled: false,
           height: 28,
-          child: Text('Assignee', style: TextStyle(color: c.mutedForeground, fontSize: 12)),
+          child: Text(
+            t.tasks.board.assignee.label,
+            style: TextStyle(color: c.mutedForeground, fontSize: 12),
+          ),
         ),
-        _item(c, 'all', 'All assignees'),
-        _item(c, 'none', 'Unassigned'),
+        _item(c, 'all', t.tasks.board.assignee.all),
+        _item(c, 'none', t.tasks.board.assignee.unassigned),
         const PopupMenuDivider(height: 8),
         for (final u in users) _item(c, '${u.id}', u.displayName ?? u.username, subtitle: u.role),
       ],
@@ -789,6 +796,7 @@ class _BoardAgentChipsState extends ConsumerState<_BoardAgentChips> {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     final provider = widget.config['provider'] as String?;
     final model = widget.config['model'] as String?;
     final effort = widget.config['effort'] as String?;
@@ -802,10 +810,10 @@ class _BoardAgentChipsState extends ConsumerState<_BoardAgentChips> {
       children: [
         _chipMenu(
           icon: LucideIcons.bot,
-          label: provider ?? 'Any agent',
-          header: 'Agent',
+          label: provider ?? t.tasks.board.agent.anyProvider,
+          header: t.tasks.board.agent.provider,
           entries: [
-            (key: '__any', label: 'Any agent', subtitle: null),
+            (key: '__any', label: t.tasks.board.agent.anyProvider, subtitle: null),
             for (final p in _kAgentProviders) (key: p, label: p, subtitle: null),
           ],
           dividerAfterFirst: true,
@@ -816,11 +824,11 @@ class _BoardAgentChipsState extends ConsumerState<_BoardAgentChips> {
           const SizedBox(width: 4),
           _chipMenu(
             icon: LucideIcons.cpu,
-            label: model ?? 'Default model',
-            header: 'Model',
+            label: model ?? t.tasks.board.agent.defaultModel,
+            header: t.tasks.board.agent.model,
             loading: _loadingModels,
             entries: [
-              (key: '__default', label: 'Default model', subtitle: null),
+              (key: '__default', label: t.tasks.board.agent.defaultModel, subtitle: null),
               for (final m in _models)
                 (
                   key: '${m['value']}',
@@ -837,10 +845,10 @@ class _BoardAgentChipsState extends ConsumerState<_BoardAgentChips> {
         const SizedBox(width: 4),
         _chipMenu(
           icon: LucideIcons.gauge,
-          label: effort ?? 'Default',
-          header: 'Reasoning',
+          label: effort ?? t.tasks.board.agent.defaultEffort,
+          header: t.tasks.board.agent.effort,
           entries: [
-            (key: '__default', label: 'Default', subtitle: null),
+            (key: '__default', label: t.tasks.board.agent.defaultEffort, subtitle: null),
             for (final e in effortValues)
               (
                 key: '${(e as Map)['value']}',
@@ -1063,6 +1071,7 @@ class _AddCardButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     final c = context.appColors;
     return InkWell(
       onTap: onTap,
@@ -1079,7 +1088,7 @@ class _AddCardButton extends StatelessWidget {
             children: [
               Icon(LucideIcons.plus, size: 14, color: c.mutedForeground),
               const SizedBox(width: 4),
-              Text('Add card', style: TextStyle(color: c.mutedForeground, fontSize: 12)),
+              Text(t.tasks.board.addCard, style: TextStyle(color: c.mutedForeground, fontSize: 12)),
             ],
           ),
         ),
@@ -1155,6 +1164,7 @@ class _BoardCardState extends State<_BoardCard> with SingleTickerProviderStateMi
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     final c = context.appColors;
     final dark = Theme.of(context).brightness == Brightness.dark;
     final card = widget.card;
@@ -1191,7 +1201,7 @@ class _BoardCardState extends State<_BoardCard> with SingleTickerProviderStateMi
             children: [
               Expanded(
                 child: Text(
-                  card.title ?? 'Untitled',
+                  card.title ?? t.kanban.card.untitled,
                   key: Key('card-title-${card.cardId}'),
                   style: TextStyle(
                     color: c.foreground,
@@ -1269,14 +1279,14 @@ class _BoardCardState extends State<_BoardCard> with SingleTickerProviderStateMi
                   _metaItem(
                     c,
                     icon: LucideIcons.gitPullRequest,
-                    label: 'Pull request',
+                    label: t.tasks.board.card.pullRequest,
                     onTap: () => unawaited(launchUrl(Uri.parse(card.prUrl!))),
                   ),
                 if (card.sessionId != null && card.sessionId!.isNotEmpty)
                   _metaItem(
                     c,
                     icon: LucideIcons.messageSquare,
-                    label: 'Open session',
+                    label: t.tasks.board.card.openSession,
                     color: c.primary.withValues(alpha: 0.8),
                     onTap: widget.onOpen,
                   ),
@@ -1297,7 +1307,7 @@ class _BoardCardState extends State<_BoardCard> with SingleTickerProviderStateMi
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  'Running',
+                  t.tasks.board.card.running,
                   style: TextStyle(
                     color: dark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
                     fontSize: 11,
@@ -1311,7 +1321,10 @@ class _BoardCardState extends State<_BoardCard> with SingleTickerProviderStateMi
                   borderRadius: AppRadii.borderMd,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    child: Text('Abort', style: TextStyle(color: c.mutedForeground, fontSize: 11)),
+                    child: Text(
+                      t.tasks.board.card.abort,
+                      style: TextStyle(color: c.mutedForeground, fontSize: 11),
+                    ),
                   ),
                 ),
               ],
@@ -1323,7 +1336,7 @@ class _BoardCardState extends State<_BoardCard> with SingleTickerProviderStateMi
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 PopupMenuButton<String>(
-                  tooltip: 'Move to',
+                  tooltip: t.tasks.board.card.moveTo,
                   position: PopupMenuPosition.under,
                   iconSize: 12,
                   icon: Icon(LucideIcons.arrowRightLeft, size: 12, color: c.mutedForeground),
@@ -1333,7 +1346,7 @@ class _BoardCardState extends State<_BoardCard> with SingleTickerProviderStateMi
                       enabled: false,
                       height: 28,
                       child: Text(
-                        'Move to',
+                        t.tasks.board.card.moveTo,
                         style: TextStyle(color: c.mutedForeground, fontSize: 12),
                       ),
                     ),
@@ -1342,7 +1355,7 @@ class _BoardCardState extends State<_BoardCard> with SingleTickerProviderStateMi
                         value: s,
                         height: 32,
                         child: Text(
-                          _columnTitle(s),
+                          _columnTitle(t, s),
                           style: TextStyle(color: c.foreground, fontSize: 13),
                         ),
                       ),
@@ -1358,7 +1371,10 @@ class _BoardCardState extends State<_BoardCard> with SingleTickerProviderStateMi
                       children: [
                         Icon(LucideIcons.pencil, size: 12, color: c.mutedForeground),
                         const SizedBox(width: 2),
-                        Text('Edit', style: TextStyle(color: c.mutedForeground, fontSize: 11)),
+                        Text(
+                          t.common.buttons.edit,
+                          style: TextStyle(color: c.mutedForeground, fontSize: 11),
+                        ),
                       ],
                     ),
                   ),
@@ -1369,7 +1385,10 @@ class _BoardCardState extends State<_BoardCard> with SingleTickerProviderStateMi
                   borderRadius: AppRadii.borderSm,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                    child: Text('Delete', style: TextStyle(color: c.mutedForeground, fontSize: 11)),
+                    child: Text(
+                      t.common.buttons.delete,
+                      style: TextStyle(color: c.mutedForeground, fontSize: 11),
+                    ),
                   ),
                 ),
               ],
@@ -1400,8 +1419,8 @@ class _BoardCardState extends State<_BoardCard> with SingleTickerProviderStateMi
     );
   }
 
-  static String _columnTitle(String status) =>
-      defaultKanbanColumns.where((col) => col.status == status).firstOrNull?.title ?? status;
+  static String _columnTitle(Translations t, String status) =>
+      kanbanColumns(t).where((col) => col.status == status).firstOrNull?.title ?? status;
 
   Widget _metaItem(
     AppColors c, {
@@ -1460,6 +1479,7 @@ class _ActivityFooterState extends ConsumerState<_ActivityFooter> {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     final c = context.appColors;
     final activity = ref.watch(collabActivityProvider(widget.projectId));
 
@@ -1488,7 +1508,7 @@ class _ActivityFooterState extends ConsumerState<_ActivityFooter> {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    'Activity',
+                    t.tasks.board.activity.title,
                     style: TextStyle(
                       color: c.mutedForeground,
                       fontSize: 12,
@@ -1509,7 +1529,7 @@ class _ActivityFooterState extends ConsumerState<_ActivityFooter> {
                         child: Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            'No activity yet',
+                            t.tasks.board.activity.empty,
                             style: TextStyle(color: c.mutedForeground, fontSize: 12),
                           ),
                         ),
@@ -1685,7 +1705,7 @@ class _CreateCardDialogState extends ConsumerState<_CreateCardDialog> {
     if (saved == null) {
       setState(() {
         _saving = false;
-        _error = ref.read(kanbanControllerProvider).error ?? 'Failed to save card';
+        _error = ref.read(kanbanControllerProvider).error ?? t.kanban.saveFailed;
       });
       return;
     }
@@ -1694,6 +1714,7 @@ class _CreateCardDialogState extends ConsumerState<_CreateCardDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     final c = context.appColors;
     final editing = widget.card != null;
     final users = ref.watch(collabUsersProvider).value ?? const <CollabUser>[];
@@ -1703,7 +1724,7 @@ class _CreateCardDialogState extends ConsumerState<_CreateCardDialog> {
 
     return AlertDialog(
       backgroundColor: c.popover,
-      title: Text(editing ? 'Edit card' : 'New card'),
+      title: Text(editing ? t.tasks.board.dialog.editTitle : t.tasks.board.dialog.createTitle),
       content: SizedBox(
         width: 400,
         child: SingleChildScrollView(
@@ -1711,12 +1732,15 @@ class _CreateCardDialogState extends ConsumerState<_CreateCardDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Title', style: TextStyle(fontWeight: FontWeight.w600)),
+              Text(
+                t.tasks.board.dialog.titleLabel,
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
               const SizedBox(height: AppSpacing.xs),
               AppInput(
                 key: const Key('card-title-input'),
                 controller: _titleController,
-                hint: 'Title',
+                hint: t.tasks.board.dialog.titleLabel,
               ),
               ValueListenableBuilder<TextEditingValue>(
                 valueListenable: _titleController,
@@ -1724,24 +1748,30 @@ class _CreateCardDialogState extends ConsumerState<_CreateCardDialog> {
                     ? Padding(
                         padding: const EdgeInsets.only(top: AppSpacing.xs),
                         child: Text(
-                          'Title is required',
+                          t.tasks.taskDetail.titleRequired,
                           style: TextStyle(color: c.destructive, fontSize: 12),
                         ),
                       )
                     : const SizedBox.shrink(),
               ),
               const SizedBox(height: AppSpacing.md),
-              const Text('Description', style: TextStyle(fontWeight: FontWeight.w600)),
+              Text(
+                t.tasks.board.dialog.descriptionLabel,
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
               const SizedBox(height: AppSpacing.xs),
               AppInput(
                 key: const Key('card-description-input'),
                 controller: _descController,
-                hint: 'Description',
+                hint: t.tasks.board.dialog.descriptionLabel,
                 maxLines: 3,
               ),
               if (users.isNotEmpty) ...[
                 const SizedBox(height: AppSpacing.md),
-                const Text('Assignee', style: TextStyle(fontWeight: FontWeight.w600)),
+                Text(
+                  t.tasks.board.assignee.label,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
                 const SizedBox(height: AppSpacing.xs),
                 DropdownButton<int?>(
                   key: const Key('card-assignee-select'),
@@ -1751,7 +1781,10 @@ class _CreateCardDialogState extends ConsumerState<_CreateCardDialog> {
                   underline: const SizedBox.shrink(),
                   onChanged: _saving ? null : (v) => setState(() => _assigneeId = v),
                   items: [
-                    const DropdownMenuItem<int?>(value: null, child: Text('Unassigned')),
+                    DropdownMenuItem<int?>(
+                      value: null,
+                      child: Text(t.tasks.board.assignee.unassigned),
+                    ),
                     if (unknownAssignee)
                       DropdownMenuItem<int?>(value: _assigneeId, child: Text('#$_assigneeId')),
                     for (final u in users)
@@ -1775,14 +1808,14 @@ class _CreateCardDialogState extends ConsumerState<_CreateCardDialog> {
         AppButton(
           variant: AppButtonVariant.ghost,
           onPressed: _saving ? null : () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(t.common.buttons.cancel),
         ),
         ValueListenableBuilder<TextEditingValue>(
           valueListenable: _titleController,
           builder: (context, value, _) => AppButton(
             key: const Key('save-card-button'),
             onPressed: value.text.trim().isEmpty || _saving ? null : _save,
-            child: Text(_saving ? 'Saving…' : 'Save'),
+            child: Text(_saving ? t.kanban.dialog.saving : t.tasks.board.dialog.save),
           ),
         ),
       ],
@@ -1820,8 +1853,8 @@ class _CardCommentsState extends ConsumerState<_CardComments> {
     super.dispose();
   }
 
-  String _authorName(List<CollabUser> users, int? userId) {
-    if (userId == null) return 'Someone';
+  String _authorName(Translations t, List<CollabUser> users, int? userId) {
+    if (userId == null) return t.tasks.board.comments.unknownAuthor;
     for (final u in users) {
       if (u.id == userId) return u.displayName ?? u.username;
     }
@@ -1830,6 +1863,7 @@ class _CardCommentsState extends ConsumerState<_CardComments> {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     final state = ref.watch(kanbanControllerProvider);
     final users = ref.watch(collabUsersProvider).value ?? const <CollabUser>[];
     final comments = state.comments[widget.cardId] ?? const <KanbanComment>[];
@@ -1838,10 +1872,10 @@ class _CardCommentsState extends ConsumerState<_CardComments> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Comments', style: TextStyle(fontWeight: FontWeight.w600)),
+        Text(t.tasks.board.comments.label, style: const TextStyle(fontWeight: FontWeight.w600)),
         const SizedBox(height: AppSpacing.xs),
         if (comments.isEmpty)
-          Text('No comments yet', style: TextStyle(color: c.mutedForeground, fontSize: 13))
+          Text(t.kanban.comments.empty, style: TextStyle(color: c.mutedForeground, fontSize: 13))
         else
           Container(
             width: double.infinity,
@@ -1862,7 +1896,7 @@ class _CardCommentsState extends ConsumerState<_CardComments> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            _authorName(users, cm.userId),
+                            _authorName(t, users, cm.userId),
                             style: TextStyle(
                               color: c.foreground,
                               fontSize: 12,
@@ -1890,7 +1924,7 @@ class _CardCommentsState extends ConsumerState<_CardComments> {
               child: AppInput(
                 key: const Key('comment-input'),
                 controller: _commentController,
-                hint: 'Add comment',
+                hint: t.kanban.comments.add,
               ),
             ),
             const SizedBox(width: AppSpacing.sm),
@@ -1904,7 +1938,7 @@ class _CardCommentsState extends ConsumerState<_CardComments> {
                 await ref.read(kanbanControllerProvider.notifier).addComment(widget.cardId, body);
                 _commentController.clear();
               },
-              child: const Text('Add comment'),
+              child: Text(t.kanban.comments.add),
             ),
           ],
         ),
@@ -1921,11 +1955,12 @@ class _CardDetailsDialog extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final t = Translations.of(context);
     final c = context.appColors;
 
     return AlertDialog(
       backgroundColor: c.popover,
-      title: Text(card.title ?? 'Card Details'),
+      title: Text(card.title ?? t.kanban.details.title),
       content: SizedBox(
         width: 450,
         child: SingleChildScrollView(
@@ -1934,7 +1969,7 @@ class _CardDetailsDialog extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Status: ${card.status}',
+                t.kanban.details.status(status: card.status ?? ''),
                 style: TextStyle(color: c.mutedForeground, fontSize: 13),
               ),
               const SizedBox(height: AppSpacing.md),
@@ -1947,7 +1982,7 @@ class _CardDetailsDialog extends ConsumerWidget {
         AppButton(
           variant: AppButtonVariant.ghost,
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Close'),
+          child: Text(t.common.buttons.close),
         ),
       ],
     );

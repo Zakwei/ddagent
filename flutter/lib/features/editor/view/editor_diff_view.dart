@@ -5,6 +5,7 @@ import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/features/editor/data/line_diff.dart';
 import 'package:ddagent_app/features/editor/state/editor_controller.dart';
 import 'package:ddagent_app/features/git/data/git_repository.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -89,17 +90,21 @@ class _EditorDiffViewState extends ConsumerState<EditorDiffView> {
       widget.onApply?.call(widget.tab.savedContent);
       return;
     }
+    final t = Translations.of(context);
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Discard changes'),
+        title: Text(t.common.gitPanel.discardChanges),
         content: Text(
           base.isUntracked
               ? 'This untracked file will be deleted.'
               : 'Restore ${widget.tab.name} to its committed state?',
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(t.chat.orchestrator.summary.cancelTasks),
+          ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: context.appColors.destructive),
             onPressed: () => Navigator.of(ctx).pop(true),
@@ -123,6 +128,7 @@ class _EditorDiffViewState extends ConsumerState<EditorDiffView> {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     return FutureBuilder<_BaseContent>(
       future: _future,
       builder: (context, snap) {
@@ -148,7 +154,7 @@ class _EditorDiffViewState extends ConsumerState<EditorDiffView> {
                         for (var i = 0; i < diff.segments.length; i++) _segment(context, diff, i),
                       ],
                     )
-                  : const Center(child: Text('No changes')),
+                  : Center(child: Text(t.codeEditor.diff.noChanges)),
             ),
             _DiffFooter(
               busy: _busy,
@@ -165,6 +171,7 @@ class _EditorDiffViewState extends ConsumerState<EditorDiffView> {
   }
 
   Widget _segment(BuildContext context, FileDiff diff, int index) {
+    final t = Translations.of(context);
     final seg = diff.segments[index];
     switch (seg) {
       case ContextSegment(:final lines):
@@ -177,7 +184,7 @@ class _EditorDiffViewState extends ConsumerState<EditorDiffView> {
         final hunk = diff.changes.indexOf(seg);
         return _ChangeBlock(
           seg: seg,
-          label: 'Hunk ${hunk + 1}',
+          label: t.codeEditor.diff.hunk(number: hunk + 1),
           onChoice: (useOld) => setState(() => seg.useOld = useOld),
         );
     }
@@ -194,6 +201,7 @@ class _DiffHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final t = Translations.of(context);
     final label = base.fromGit ? 'HEAD vs working copy' : 'Last saved vs buffer (no git)';
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
@@ -206,7 +214,7 @@ class _DiffHeader extends StatelessWidget {
           if (base.isUntracked)
             _Tag(text: 'untracked', color: colors.primary)
           else if (base.isDeleted)
-            _Tag(text: 'deleted on disk', color: colors.destructive),
+            _Tag(text: t.codeEditor.diff.deletedOnDisk, color: colors.destructive),
           const Spacer(),
           Text(
             '+${diff.addedCount}  −${diff.removedCount}',
@@ -214,7 +222,7 @@ class _DiffHeader extends StatelessWidget {
           ),
           if (onClose != null)
             IconButton(
-              tooltip: 'Close diff',
+              tooltip: t.codeEditor.diff.close,
               icon: const Icon(Icons.close, size: 18),
               onPressed: onClose,
             ),
@@ -295,6 +303,7 @@ class _ChangeBlock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final t = Translations.of(context);
     return Column(
       children: [
         Container(
@@ -304,9 +313,17 @@ class _ChangeBlock extends StatelessWidget {
             children: [
               Text(label, style: Theme.of(context).textTheme.labelSmall),
               const Spacer(),
-              _ChoiceChip(label: 'Base', selected: seg.useOld, onTap: () => onChoice(true)),
+              _ChoiceChip(
+                label: t.codeEditor.diff.base,
+                selected: seg.useOld,
+                onTap: () => onChoice(true),
+              ),
               const SizedBox(width: 4),
-              _ChoiceChip(label: 'Current', selected: !seg.useOld, onTap: () => onChoice(false)),
+              _ChoiceChip(
+                label: t.codeEditor.diff.current,
+                selected: !seg.useOld,
+                onTap: () => onChoice(false),
+              ),
             ],
           ),
         ),
@@ -416,6 +433,7 @@ class _DiffFooter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final t = Translations.of(context);
     return Container(
       padding: const EdgeInsets.all(AppSpacing.sm),
       decoration: BoxDecoration(
@@ -434,11 +452,15 @@ class _DiffFooter extends StatelessWidget {
                   ? 'Revert to saved'
                   : untracked
                   ? 'Delete file'
-                  : 'Discard changes',
+                  : t.common.gitPanel.discardChanges,
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
-          AppButton(size: AppButtonSize.sm, onPressed: onApply, child: const Text('Apply merge')),
+          AppButton(
+            size: AppButtonSize.sm,
+            onPressed: onApply,
+            child: Text(t.codeEditor.diff.applyMerge),
+          ),
         ],
       ),
     );
@@ -453,6 +475,7 @@ class _ErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -462,7 +485,7 @@ class _ErrorState extends StatelessWidget {
           AppButton(
             variant: AppButtonVariant.ghost,
             onPressed: onRetry,
-            child: const Text('Retry'),
+            child: Text(t.chat.session.messages.retry),
           ),
         ],
       ),
