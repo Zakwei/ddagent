@@ -51,13 +51,14 @@ class LocalServerController extends Notifier<LocalServerStatus> {
   /// starting an installed bundle; null when nothing is installed — app start
   /// never installs the first bundle silently, but an installed bundle does
   /// self-update on launch (install() skips the download when current).
-  Future<String?> ensureRunning() =>
-      _inFlightEnsure ??= _ensureRunning().whenComplete(() => _inFlightEnsure = null);
+  Future<String?> ensureRunning() => _inFlightEnsure ??= _ensureRunning()
+      .whenComplete(() => _inFlightEnsure = null);
 
   Future<String?> _ensureRunning() async {
     // No early "running" return: a stale adopted/orphaned process must go
     // through install() + start() so it gets replaced with the bundle on disk.
-    if (await _service.installedVersion == null) {
+    if (await _service.installedVersion == null &&
+        !await _service.hasBundleRemains) {
       await refresh();
       return null; // nothing installed — app start never auto-downloads.
     }
@@ -79,6 +80,7 @@ class LocalServerController extends Notifier<LocalServerStatus> {
   Future<void> stop() => _service.stop();
 }
 
-final localServerProvider = NotifierProvider<LocalServerController, LocalServerStatus>(
-  LocalServerController.new,
-);
+final localServerProvider =
+    NotifierProvider<LocalServerController, LocalServerStatus>(
+      LocalServerController.new,
+    );
