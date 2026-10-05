@@ -787,7 +787,7 @@ class _ContextBudgetCard extends StatelessWidget {
                 const Icon(Icons.memory, size: 16),
                 const SizedBox(width: 8),
                 Text(
-                  'Injected context (first turn)',
+                  'Critical context (always served)',
                   style: Theme.of(context).textTheme.titleSmall,
                 ),
                 const Spacer(),
@@ -799,7 +799,7 @@ class _ContextBudgetCard extends StatelessWidget {
             if (!hasProject) ...[
               const SizedBox(height: 6),
               Text(
-                'Select a project to see its injection budget.',
+                'Select a project to see its critical-context size.',
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
