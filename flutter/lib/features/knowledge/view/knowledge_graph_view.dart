@@ -168,7 +168,7 @@ class _KnowledgeGraphViewState extends ConsumerState<KnowledgeGraphView> {
         leading: _EntityIcon(type: selected.nodeType),
         title: Text(selected.label),
         subtitle: Text(
-          [selected.nodeType.wire, if (relations.isNotEmpty) relations.join('\n')].join('\n'),
+          [selected.nodeType, if (relations.isNotEmpty) relations.join('\n')].join('\n'),
         ),
       ),
     );
@@ -278,15 +278,17 @@ class _KnowledgeGraphViewState extends ConsumerState<KnowledgeGraphView> {
 class _EntityIcon extends StatelessWidget {
   const _EntityIcon({required this.type});
 
-  final KnowledgeEntityType type;
+  final String type;
 
   @override
   Widget build(BuildContext context) {
     final icon = switch (type) {
-      KnowledgeEntityType.memory => Icons.psychology_outlined,
-      KnowledgeEntityType.rule => Icons.rule,
-      KnowledgeEntityType.skill => Icons.auto_awesome_outlined,
-      KnowledgeEntityType.personal => Icons.person_outline,
+      'rule' => Icons.rule,
+      'skill' => Icons.auto_awesome_outlined,
+      'personal' => Icons.person_outline,
+      'project' => Icons.folder_outlined,
+      'tag' => Icons.sell_outlined,
+      _ => Icons.psychology_outlined,
     };
     return Icon(icon);
   }
@@ -309,11 +311,13 @@ class _GraphPainter extends CustomPainter {
   final Set<String> neighbours;
   final ColorScheme colors;
 
-  Color _nodeColor(KnowledgeEntityType type) => switch (type) {
-    KnowledgeEntityType.memory => const Color(0xFF6366F1),
-    KnowledgeEntityType.rule => const Color(0xFFEF4444),
-    KnowledgeEntityType.skill => const Color(0xFF10B981),
-    KnowledgeEntityType.personal => const Color(0xFFF59E0B),
+  Color _nodeColor(String type) => switch (type) {
+    'rule' => const Color(0xFFEF4444),
+    'skill' => const Color(0xFF10B981),
+    'personal' => const Color(0xFFF59E0B),
+    'project' => const Color(0xFF0EA5E9),
+    'tag' => const Color(0xFFA855F7),
+    _ => const Color(0xFF6366F1),
   };
 
   @override

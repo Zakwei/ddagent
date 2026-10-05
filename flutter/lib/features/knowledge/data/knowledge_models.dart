@@ -328,7 +328,8 @@ class KbStats {
   );
 }
 
-/// One graph node — a knowledge entity (or tag) plus its display label.
+/// One graph node — a knowledge entity, or an implicit `project` / `tag` hub,
+/// plus its display label.
 class KbGraphNode {
   const KbGraphNode({
     required this.id,
@@ -340,7 +341,10 @@ class KbGraphNode {
   });
 
   final String id;
-  final KnowledgeEntityType nodeType;
+
+  /// Raw node type: `memory`/`rule`/`skill`/`personal`, plus the implicit
+  /// `project` and `tag` hubs the server adds so the graph has structure.
+  final String nodeType;
   final String label;
   final String? projectId;
 
@@ -350,7 +354,7 @@ class KbGraphNode {
 
   factory KbGraphNode.fromJson(Map<String, dynamic> json) => KbGraphNode(
     id: '${json['id'] ?? ''}',
-    nodeType: KnowledgeEntityType.parse(json['nodeType']),
+    nodeType: '${json['nodeType'] ?? 'memory'}',
     label: '${json['label'] ?? ''}',
     projectId: json['projectId'] as String?,
     priority: json['priority'] as String?,
