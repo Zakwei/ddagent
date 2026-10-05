@@ -2,10 +2,10 @@
   <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/logo.svg" alt="ddagent" width="72" height="72">
   <h1>ddagent</h1>
   <p><strong>一個 UI，管理你所有的 AI 程式代理。</strong><br>
-  為 Claude Code、Codex、Cursor CLI、OpenCode 和 Devin 打造的自架網頁與行動介面 —— 工作階段、檔案、git、終端機和任務，全部集中在一處。</p>
+  為 Claude Code、Codex、Cursor CLI、OpenCode 和 Devin 打造的自架介面（網頁、桌面與行動）—— 工作階段、檔案、git、終端機和任務，全部集中在一處。</p>
 
   <p>
-    <img src="https://img.shields.io/badge/version-0.5.9-0066FF" alt="版本">
+    <img src="https://img.shields.io/github/v/release/Zakwei/ddagent?label=版本&amp;color=0066FF" alt="版本">
     <img src="https://img.shields.io/badge/license-AGPL--3.0-blue" alt="授權: AGPL-3.0">
     <img src="https://img.shields.io/badge/node-%E2%89%A522-339933" alt="node >= 22">
     <img src="https://img.shields.io/badge/self--hosted-yes-success" alt="自架">
@@ -42,7 +42,7 @@
 
 ## ddagent 是什麼？
 
-ddagent 運行在你自己的機器或 VPS 上，為你已在使用的程式代理提供精緻的網頁 UI。它直接從磁碟發現代理的工作階段 —— 你的 `~/.claude`、Codex 和 Devin 歷史記錄會立即顯示，不會複製任何內容，也不會同步給第三方。
+ddagent 運行在你自己的機器或 VPS 上，為你已在使用的程式代理提供精緻的 UI（Flutter：網頁、桌面與行動）。它直接從磁碟發現代理的工作階段 —— 你的 `~/.claude`、Codex 和 Devin 歷史記錄會立即顯示，不會複製任何內容，也不會同步給第三方。
 
 可從網路中的任何瀏覽器或手機開啟。你的機器、你的代理、你的資料。
 
@@ -50,7 +50,7 @@ ddagent 運行在你自己的機器或 VPS 上，為你已在使用的程式代�
 
 - **多代理工作階段** —— 並排執行和恢復 Claude Code、Codex、Cursor CLI、OpenCode 和 Devin 工作階段，透過 WebSocket 即時串流
 - **分割面板** —— 在同一工作區中整合聊天、終端機、瀏覽器和檔案面板
-- **檔案瀏覽器與編輯器** —— 瀏覽工作區，用 CodeMirror 編輯程式碼
+- **檔案瀏覽器與編輯器** —— 瀏覽工作區，用內建編輯器編輯程式碼
 - **Git 面板** —— 不必離開介面即可暫存、提交、查看 diff 和切換分支
 - **整合終端機** —— 每個工作區都有完整終端機，外加獨立的 shell 分頁
 - **任務看板** —— 由 TaskMaster 驅動的看板檢視；將 PRD 轉換為可執行任務
@@ -69,7 +69,7 @@ ddagent 運行在你自己的機器或 VPS 上，為你已在使用的程式代�
 - **MCP 伺服器** —— 讓外部 MCP 用戶端（Claude Desktop、OpenClaw）建立任務並向工作階段傳送訊息（[文件](https://github.com/Zakwei/ddagent/blob/main/docs/mcp-server.md)）
 - **通知與 TTS** —— 當工作階段需要你時收到提醒（或語音播報）
 - **Docker 沙箱** —— 在 microVM 隔離環境中執行代理（[文件](https://github.com/Zakwei/ddagent/blob/main/docker/README.md)）
-- **桌面夥伴應用程式** —— 可選的 Electron 應用程式；**12 種語言**，深色與淺色主題
+- **Flutter 用戶端** —— 網頁、桌面與行動共用一套程式碼庫；**12 種語言**，深色與淺色主題
 
 ## 支援的代理
 
@@ -85,7 +85,7 @@ ddagent 運行在你自己的機器或 VPS 上，為你已在使用的程式代�
 
 ## 安裝
 
-執行伺服器的機器需要 **Node.js 22+**。伺服器提供網頁 UI 以及供桌面和行動應用程式遠端連接的 REST/WS API。
+執行伺服器的機器需要 **Node.js 22+**。伺服器提供供 Flutter 用戶端（網頁、桌面、行動）遠端連接的 REST/WS API。
 
 ### 自架伺服器 —— 安裝腳本
 
@@ -93,7 +93,7 @@ ddagent 運行在你自己的機器或 VPS 上，為你已在使用的程式代�
 curl -fsSL https://github.com/Zakwei/ddagent/releases/latest/download/install.sh | bash
 ```
 
-將最新的發行標籤複製到 `~/.ddagent/app`，建置網頁 UI 和後端，並留下 `start.sh` 啟動器。選項：`--version vX.Y.Z` · `--dir <path>` · `--port <port>` · `--systemd`（安裝並啟用使用者級 systemd 單元）。使用 `--version` 重新執行即可就地更新。
+將最新的發行標籤複製到 `~/.ddagent/app`，建置後端，並留下 `start.sh` 啟動器。選項：`--version vX.Y.Z` · `--dir <path>` · `--port <port>` · `--systemd`（安裝並啟用使用者級 systemd 單元）。使用 `--version` 重新執行即可就地更新。
 
 然後：
 
@@ -110,15 +110,16 @@ mkdir ddagent && tar xzf ddagent-server-*-linux-x64.tar.gz -C ddagent
 ./ddagent/start.sh           # start.bat on Windows
 ```
 
-### 桌面應用程式
+### Flutter 用戶端（網頁 · 桌面 · 行動）
 
-從 [Releases](https://github.com/Zakwei/ddagent/releases) 下載適合你作業系統的安裝程式：`.dmg`（macOS）· `.exe`（Windows）· `.AppImage` / `.deb`（Linux）。
+用戶端是一個 Flutter 應用程式（`flutter/`）—— 網頁、桌面（Linux/Windows）與行動共用一套程式碼庫。從原始碼建置：
 
-可獨立執行 —— 伺服器已內嵌，無需安裝其他元件 —— 也可以遠端模式連接自架伺服器 URL。透過發行中的 `latest*.yml` 來源自動更新。
+```bash
+cd flutter
+flutter build web        # → build/web (serve with scripts/serve-flutter-web.cjs)
+```
 
-### 行動應用程式（預覽）
-
-從 [Releases](https://github.com/Zakwei/ddagent/releases) 下載 `ddagent-mobile-<version>.apk` 並安裝到你的 Android 裝置；應用程式會連接到自架伺服器 URL。
+用戶端連接到自架伺服器 URL。
 
 ### 從原始碼建置
 

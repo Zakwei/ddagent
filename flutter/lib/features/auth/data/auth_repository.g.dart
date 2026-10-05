@@ -23,7 +23,8 @@ _AuthStatus _$AuthStatusFromJson(Map<String, dynamic> json) => _AuthStatus(
   authenticated: json['authenticated'] as bool? ?? false,
 );
 
-Map<String, dynamic> _$AuthStatusToJson(_AuthStatus instance) => <String, dynamic>{
-  'needsSetup': instance.needsSetup,
-  'authenticated': instance.authenticated,
-};
+Map<String, dynamic> _$AuthStatusToJson(_AuthStatus instance) =>
+    <String, dynamic>{
+      'needsSetup': instance.needsSetup,
+      'authenticated': instance.authenticated,
+    };

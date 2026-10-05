@@ -2,10 +2,10 @@
   <img src="public/logo.svg" alt="ddagent" width="72" height="72">
   <h1>ddagent</h1>
   <p><strong>One UI for all your AI coding agents.</strong><br>
-  Self-hosted web &amp; mobile interface for Claude Code, Codex, Cursor CLI, OpenCode and Devin — sessions, files, git, terminals and tasks in a single place.</p>
+  Self-hosted interface (web, desktop &amp; mobile) for Claude Code, Codex, Cursor CLI, OpenCode and Devin — sessions, files, git, terminals and tasks in a single place.</p>
 
   <p>
-    <img src="https://img.shields.io/badge/version-0.5.9-0066FF" alt="version">
+    <img src="https://img.shields.io/github/v/release/Zakwei/ddagent?label=version&amp;color=0066FF" alt="version">
     <img src="https://img.shields.io/badge/license-AGPL--3.0-blue" alt="license: AGPL-3.0">
     <img src="https://img.shields.io/badge/node-%E2%89%A522-339933" alt="node >= 22">
     <img src="https://img.shields.io/badge/self--hosted-yes-success" alt="self-hosted">
@@ -42,7 +42,7 @@
 
 ## What is ddagent?
 
-ddagent runs on your own machine or VPS and gives you a polished web UI on top of the coding agents you already use. It discovers their sessions directly from disk — your `~/.claude`, Codex and Devin history shows up instantly, nothing is duplicated or synced to a third party.
+ddagent runs on your own machine or VPS and gives you a polished UI (Flutter: web, desktop and mobile) on top of the coding agents you already use. It discovers their sessions directly from disk — your `~/.claude`, Codex and Devin history shows up instantly, nothing is duplicated or synced to a third party.
 
 Open it from any browser on your network, or from your phone. Your machine, your agents, your data.
 
@@ -50,7 +50,7 @@ Open it from any browser on your network, or from your phone. Your machine, your
 
 - **Multi-agent sessions** — run and resume Claude Code, Codex, Cursor CLI, OpenCode and Devin sessions side by side, with live streaming over WebSocket
 - **Split panes** — chat, terminal, browser and file panes in one workspace
-- **File explorer & editor** — browse the workspace, edit code with CodeMirror
+- **File explorer & editor** — browse the workspace and edit code in the built-in editor
 - **Git panel** — stage, commit, diff and switch branches without leaving the UI
 - **Integrated shell** — full terminal per workspace, plus a standalone shell tab
 - **Task board** — kanban view powered by TaskMaster; turn PRDs into executable tasks
@@ -69,7 +69,7 @@ Open it from any browser on your network, or from your phone. Your machine, your
 - **MCP server** — let external MCP clients (Claude Desktop, OpenClaw) create tasks and message sessions ([docs](docs/mcp-server.md))
 - **Notifications & TTS** — get pinged (or read aloud) when a session needs you
 - **Docker sandboxes** — run agents in microVM-isolated environments ([docs](docker/README.md))
-- **Desktop companion** — optional Electron app; **12 languages**, dark & light themes
+- **Flutter client** — one codebase for web, desktop and mobile; **12 languages**, dark & light themes
 
 ## Supported agents
 
@@ -85,7 +85,7 @@ You bring your own subscriptions — ddagent provides the environment, not the A
 
 ## Install
 
-Requires **Node.js 22+** on the machine that runs the server. The server serves the web UI and the REST/WS API that the desktop and mobile apps connect to remotely.
+Requires **Node.js 22+** on the machine that runs the server. The server serves the REST/WS API that the Flutter client (web, desktop, mobile) connects to remotely.
 
 ### Self-hosted server — installer script
 
@@ -93,7 +93,7 @@ Requires **Node.js 22+** on the machine that runs the server. The server serves 
 curl -fsSL https://github.com/Zakwei/ddagent/releases/latest/download/install.sh | bash
 ```
 
-Clones the latest release tag into `~/.ddagent/app`, builds the web UI + backend, and leaves a `start.sh` launcher. Options: `--version vX.Y.Z` · `--dir <path>` · `--port <port>` · `--systemd` (installs and enables a user systemd unit). Re-run with `--version` to update in place.
+Clones the latest release tag into `~/.ddagent/app`, builds the backend, and leaves a `start.sh` launcher. Options: `--version vX.Y.Z` · `--dir <path>` · `--port <port>` · `--systemd` (installs and enables a user systemd unit). Re-run with `--version` to update in place.
 
 Then:
 
@@ -110,15 +110,16 @@ mkdir ddagent && tar xzf ddagent-server-*-linux-x64.tar.gz -C ddagent
 ./ddagent/start.sh           # start.bat on Windows
 ```
 
-### Desktop app
+### Flutter client (web · desktop · mobile)
 
-Download the installer for your OS from [Releases](https://github.com/Zakwei/ddagent/releases): `.dmg` (macOS) · `.exe` (Windows) · `.AppImage` / `.deb` (Linux).
+The client is a Flutter app (`flutter/`) — one codebase for web, desktop (Linux/Windows) and mobile. Build from source:
 
-Runs standalone — the server is embedded, nothing else to install — or in remote mode against a self-hosted server URL. Auto-updates via the `latest*.yml` feeds on the release.
+```bash
+cd flutter
+flutter build web        # → build/web (serve with scripts/serve-flutter-web.cjs)
+```
 
-### Mobile app (preview)
-
-Download `ddagent-mobile-<version>.apk` from [Releases](https://github.com/Zakwei/ddagent/releases) and install it on your Android device; the app connects to a self-hosted server URL.
+The client connects to a self-hosted server URL.
 
 ### From source
 
@@ -173,10 +174,6 @@ npm run typecheck      # TypeScript check
 ```
 
 Backend code follows the module architecture described in `server/modules/` — see `server/modules/providers/README.md` for provider internals.
-
-## Code signing policy
-
-Release artifacts are unsigned today; we are applying to the SignPath Foundation program for Windows signing. See [CODE_SIGNING.md](CODE_SIGNING.md) for the full policy, team roles and privacy statement.
 
 ## Contributing
 

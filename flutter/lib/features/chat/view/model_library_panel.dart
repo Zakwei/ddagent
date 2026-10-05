@@ -7,6 +7,7 @@ import 'package:ddagent_app/core/widgets/app_input.dart';
 import 'package:ddagent_app/features/chat/view/chat_utilities.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/sessions/view/provider_logo.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -188,14 +189,15 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
   }
 
   Future<void> _submit() async {
+    final t = Translations.of(context);
     final name = _name.text.trim();
     final id = _id.text.trim();
     if (name.isEmpty || id.isEmpty) {
-      setState(() => _error = 'Enter both a model name and model ID.');
+      setState(() => _error = t.chat.modelLibrary.enterNameAndId);
       return;
     }
     if (RegExp(r'\s').hasMatch(id)) {
-      setState(() => _error = 'Model IDs cannot contain spaces.');
+      setState(() => _error = t.chat.modelLibrary.idNoSpaces);
       return;
     }
     setState(() {
@@ -546,6 +548,7 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
   }
 
   Widget _form(AppColors c) {
+    final t = Translations.of(context);
     final editing = _editing != null;
     return Container(
       padding: const EdgeInsets.all(12),
@@ -582,7 +585,7 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
               ),
               if (editing)
                 IconButton(
-                  tooltip: 'Cancel editing',
+                  tooltip: t.tasks.taskDetail.cancelEdit,
                   onPressed: () => setState(_resetForm),
                   icon: Icon(LucideIcons.x, size: 14, color: c.mutedForeground),
                   visualDensity: VisualDensity.compact,
@@ -672,9 +675,10 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
   /// Leading default-model picker — writes `${provider}-model`, the key the
   /// composer resolves before the catalog DEFAULT.
   Widget _defaultRadio(AppColors c, Map<String, dynamic> option, String? effectiveDefault) {
+    final t = Translations.of(context);
     final selected = _idOf(option) == effectiveDefault;
     return Tooltip(
-      message: selected ? 'Default model' : 'Set as default',
+      message: selected ? t.chat.modelLibrary.defaultModel : t.chat.modelLibrary.setAsDefault,
       child: InkWell(
         borderRadius: BorderRadius.circular(999),
         onTap: () => _pickDefault(option),
@@ -691,6 +695,7 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
   }
 
   Widget _customRow(AppColors c, Map<String, dynamic> option, String? effectiveDefault) {
+    final t = Translations.of(context);
     final recordId = _recordId(option);
     final confirming = recordId != null && _confirmDeleteId == recordId;
     final deleting = recordId != null && _deletingId == recordId;
@@ -746,13 +751,13 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
               ),
               if (!confirming) ...[
                 IconButton(
-                  tooltip: 'Edit ${_labelOf(option)}',
+                  tooltip: t.chat.modelLibrary.editTooltip(name: _labelOf(option)),
                   onPressed: () => _startEditing(option),
                   icon: Icon(LucideIcons.pencil, size: 13, color: c.mutedForeground),
                   visualDensity: VisualDensity.compact,
                 ),
                 IconButton(
-                  tooltip: 'Delete ${_labelOf(option)}',
+                  tooltip: t.chat.modelLibrary.deleteTooltip(name: _labelOf(option)),
                   onPressed: recordId == null
                       ? null
                       : () => setState(() => _confirmDeleteId = recordId),
@@ -781,7 +786,7 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
                     variant: AppButtonVariant.ghost,
                     size: AppButtonSize.sm,
                     onPressed: () => setState(() => _confirmDeleteId = null),
-                    child: const Text('Cancel'),
+                    child: Text(t.chat.orchestrator.summary.cancelTasks),
                   ),
                   const SizedBox(width: 6),
                   AppButton(
@@ -789,7 +794,7 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
                     size: AppButtonSize.sm,
                     loading: deleting,
                     onPressed: () => unawaited(_delete(option)),
-                    child: const Text('Delete'),
+                    child: Text(t.common.buttons.delete),
                   ),
                 ],
               ),

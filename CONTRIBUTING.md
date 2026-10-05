@@ -12,6 +12,7 @@ Thanks for your interest in contributing to ddagent UI! Before you start, please
 
 - [Node.js](https://nodejs.org/) 22 or later
 - At least one supported agent CLI installed — e.g. [Claude Code](https://docs.anthropic.com/en/docs/claude-code), Codex, Cursor CLI, OpenCode or Devin
+- For client work: [Flutter](https://docs.flutter.dev/get-started/install) 3.47.5 (stable) — the version pinned in CI
 
 ## Getting Started
 
@@ -42,8 +43,6 @@ ddagent/
 │   ├── modules/      # Feature modules (auth, providers, websocket, git, …)
 │   └── shared/       # Shared backend interfaces and types
 ├── flutter/          # Flutter web/desktop/mobile client
-├── mobile/           # Expo/React Native mobile client
-├── electron/         # Desktop companion app
 ├── docker/           # Docker sandbox templates
 ├── redirect-package/ # npm redirect package (@ddagent/ddagent)
 ├── shared/           # Code shared between client and server
@@ -57,6 +56,17 @@ ddagent/
 - `npm run build` — Server production build (`build:server`)
 - `npm test` — Backend tests
 - `npm run typecheck` — TypeScript check
+
+### Client (Flutter)
+
+```bash
+cd flutter
+flutter pub get
+flutter analyze
+flutter test
+```
+
+Run `dart format --line-length 100 lib test` before committing — CI enforces it (`flutter-ci.yml`).
 
 ## Making Changes
 
@@ -136,8 +146,8 @@ feat!: redesign settings page layout
 Releases are tag-driven — maintainers bump the version with:
 
 ```bash
-npm run release:desktop -- patch   # or minor / x.y.z
+npm run release -- patch   # or minor / x.y.z
 ```
 
-This bumps `package.json` and creates the release commit + `vX.Y.Z` tag. Pushing the tag runs CI (`desktop-release.yml`, `server-release.yml`), which builds the desktop installers, the server tarballs, and `install.sh` into a draft GitHub Release pre-seeded with per-locale notes. `CHANGELOG.md` is updated by hand.
+This bumps `package.json` and creates the release commit + `vX.Y.Z` tag. Pushing the tag runs CI (`.github/workflows/server-release.yml`), which builds the server tarballs and `install.sh` into a draft GitHub Release pre-seeded with per-locale notes. `CHANGELOG.md` is updated by hand.
 

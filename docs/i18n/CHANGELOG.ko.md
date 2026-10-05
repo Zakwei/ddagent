@@ -20,6 +20,13 @@ ddagent의 모든 주요 변경 사항은 여기에 기록됩니다.
   <a href="CHANGELOG.zh-TW.md">繁體中文</a>
 </p>
 
+## [Unreleased]
+
+### 변경
+
+- 클라이언트는 이제 단일 Flutter 앱입니다(웹, Linux 및 Windows 데스크톱, Android). 기존 Electron 데스크톱 런처와 Expo/React Native 모바일 앱은 폐기되었습니다
+- 서버는 독립 실행형 셀프호스팅 tarball로만 배포됩니다. Electron local-server 번들 및 데스크톱 설치 프로그램은 제거되었습니다
+
 ## [0.7.0] - 2026-09-27
 
 ### 새로운 기능

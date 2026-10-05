@@ -20,6 +20,13 @@ ve bu proje [Semantic Versioning](https://semver.org/) kurallarına uyar.
   <a href="CHANGELOG.zh-TW.md">繁體中文</a>
 </p>
 
+## [Unreleased]
+
+### Değişti
+
+- İstemci artık tek bir Flutter uygulaması (web, Linux ve Windows masaüstü, Android); eski Electron masaüstü başlatıcısı ve Expo/React Native mobil uygulaması kaldırıldı
+- Sunucu yalnızca bağımsız, self-hosted bir tarball olarak dağıtılıyor; Electron local-server paketi ve masaüstü yükleyicileri kaldırıldı
+
 ## [0.7.0] - 2026-09-27
 
 ### Yenilikler

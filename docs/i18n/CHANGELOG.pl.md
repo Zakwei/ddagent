@@ -20,6 +20,13 @@ a projekt stosuje [Semantic Versioning](https://semver.org/).
   <a href="CHANGELOG.zh-TW.md">繁體中文</a>
 </p>
 
+## [Unreleased]
+
+### Zmienione
+
+- Klient to teraz jedna aplikacja Flutter (web, desktop Linux i Windows, Android); dawny launcher Electron i aplikacja mobilna Expo/React Native zostały wycofane
+- Serwer jest dystrybuowany wyłącznie jako samodzielny, self-hosted tarball; pakiet local-server dla Electrona i instalatory desktopowe zostały usunięte
+
 ## [0.7.0] - 2026-09-27
 
 ### Nowości

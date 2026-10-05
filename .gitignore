@@ -136,19 +136,11 @@ dev-debug.log
 tasks.json
 tasks/ 
 
-# Translations
-!src/i18n/locales/*/tasks.json
-
 # Git worktrees
 .worktrees/
 
-# Local desktop packaging artifacts
-/.desktop-build/
+# Local server release bundles
 /release/
-/electron/server-bundle-config.json
-ddagent-sidebar-app-source.tar.gz
-ddagent-sidebar.html
-electron/*.tar.gz
 
 # Core dumps and local Playwright CLI artifacts
 /core

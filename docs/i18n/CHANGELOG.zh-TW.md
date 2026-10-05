@@ -20,6 +20,13 @@ ddagent 的所有重要變更都記錄在此。
   <strong>繁體中文</strong>
 </p>
 
+## [Unreleased]
+
+### 變更
+
+- 用戶端現在是單一的 Flutter 應用程式（網頁、Linux 與 Windows 桌面、Android）；先前的 Electron 桌面啟動器和 Expo/React Native 行動應用程式已停用
+- 伺服器僅以獨立的自架 tarball 形式發佈；Electron 本機伺服器套件與桌面安裝程式已移除
+
 ## [0.7.0] - 2026-09-27
 
 ### 新增功能

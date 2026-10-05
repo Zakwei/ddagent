@@ -18,12 +18,13 @@ _Session _$SessionFromJson(Map<String, dynamic> json) => _Session(
   isRunning: json['isRunning'] as bool? ?? false,
 );
 
-_SessionsPage _$SessionsPageFromJson(Map<String, dynamic> json) => _SessionsPage(
-  sessions:
-      (json['sessions'] as List<dynamic>?)
-          ?.map((e) => Session.fromJson(e as Map<String, dynamic>))
-          .toList() ??
-      const [],
-  hasMore: json['hasMore'] as bool? ?? false,
-  total: (json['total'] as num?)?.toInt() ?? 0,
-);
+_SessionsPage _$SessionsPageFromJson(Map<String, dynamic> json) =>
+    _SessionsPage(
+      sessions:
+          (json['sessions'] as List<dynamic>?)
+              ?.map((e) => Session.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
+      hasMore: json['hasMore'] as bool? ?? false,
+      total: (json['total'] as num?)?.toInt() ?? 0,
+    );

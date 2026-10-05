@@ -2,10 +2,10 @@
   <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/logo.svg" alt="ddagent" width="72" height="72">
   <h1>ddagent</h1>
   <p><strong>모든 AI 코딩 에이전트를 위한 하나의 UI.</strong><br>
-  Claude Code, Codex, Cursor CLI, OpenCode, Devin을 위한 셀프호스팅 웹 및 모바일 인터페이스 — 세션, 파일, git, 터미널, 작업을 한곳에서.</p>
+  Claude Code, Codex, Cursor CLI, OpenCode, Devin을 위한 셀프호스팅 인터페이스(웹, 데스크톱 및 모바일) — 세션, 파일, git, 터미널, 작업을 한곳에서.</p>
 
   <p>
-    <img src="https://img.shields.io/badge/version-0.5.9-0066FF" alt="버전">
+    <img src="https://img.shields.io/github/v/release/Zakwei/ddagent?label=버전&amp;color=0066FF" alt="버전">
     <img src="https://img.shields.io/badge/license-AGPL--3.0-blue" alt="라이선스: AGPL-3.0">
     <img src="https://img.shields.io/badge/node-%E2%89%A522-339933" alt="node >= 22">
     <img src="https://img.shields.io/badge/self--hosted-yes-success" alt="셀프호스트">
@@ -42,7 +42,7 @@
 
 ## ddagent란?
 
-ddagent는 사용자의 머신 또는 VPS에서 실행되며, 이미 사용 중인 코딩 에이전트 위에 세련된 웹 UI를 제공합니다. 디스크에서 에이전트 세션을 직접 검색합니다 — `~/.claude`, Codex, Devin 기록이 즉시 표시되며, 아무것도 복제되거나 제3자와 동기화되지 않습니다.
+ddagent는 사용자의 머신 또는 VPS에서 실행되며, 이미 사용 중인 코딩 에이전트 위에 세련된 UI(Flutter: 웹, 데스크톱 및 모바일)를 제공합니다. 디스크에서 에이전트 세션을 직접 검색합니다 — `~/.claude`, Codex, Devin 기록이 즉시 표시되며, 아무것도 복제되거나 제3자와 동기화되지 않습니다.
 
 네트워크상의 모든 브라우저나 휴대폰에서 열 수 있습니다. 당신의 머신, 당신의 에이전트, 당신의 데이터.
 
@@ -50,7 +50,7 @@ ddagent는 사용자의 머신 또는 VPS에서 실행되며, 이미 사용 중�
 
 - **멀티 에이전트 세션** — Claude Code, Codex, Cursor CLI, OpenCode, Devin 세션을 나란히 실행하고 재개하며, WebSocket을 통한 라이브 스트리밍 지원
 - **분할 패인** — 하나의 워크스페이스에 채팅, 터미널, 브라우저, 파일 패인
-- **파일 탐색기 및 편집기** — 워크스페이스를 탐색하고 CodeMirror로 코드 편집
+- **파일 탐색기 및 편집기** — 워크스페이스를 탐색하고 내장 편집기로 코드 편집
 - **Git 패널** — UI를 떠나지 않고 스테이징, 커밋, diff, 브랜치 전환
 - **통합 셸** — 워크스페이스별 전체 터미널과 독립 셸 탭
 - **작업 보드** — TaskMaster 기반 칸반 보기; PRD를 실행 가능한 작업으로 변환
@@ -69,7 +69,7 @@ ddagent는 사용자의 머신 또는 VPS에서 실행되며, 이미 사용 중�
 - **MCP 서버** — 외부 MCP 클라이언트(Claude Desktop, OpenClaw)가 작업을 생성하고 세션에 메시지를 보낼 수 있도록 허용 ([문서](https://github.com/Zakwei/ddagent/blob/main/docs/mcp-server.md))
 - **알림 및 TTS** — 세션이 당신을 필요로 할 때 알림 수신(또는 음성 안내)
 - **Docker 샌드박스** — microVM으로 격리된 환경에서 에이전트 실행 ([문서](https://github.com/Zakwei/ddagent/blob/main/docker/README.md))
-- **데스크톱 컴패니언** — 선택적 Electron 앱; **12개 언어**, 다크 및 라이트 테마
+- **Flutter 클라이언트** — 웹, 데스크톱, 모바일을 위한 하나의 코드베이스; **12개 언어**, 다크 및 라이트 테마
 
 ## 지원 에이전트
 
@@ -85,7 +85,7 @@ ddagent는 사용자의 머신 또는 VPS에서 실행되며, 이미 사용 중�
 
 ## 설치
 
-서버를 실행할 머신에 **Node.js 22+**가 필요합니다. 서버는 웹 UI와 데스크톱 및 모바일 앱이 원격으로 연결하는 REST/WS API를 제공합니다.
+서버를 실행할 머신에 **Node.js 22+**가 필요합니다. 서버는 Flutter 클라이언트(웹, 데스크톱, 모바일)가 원격으로 연결하는 REST/WS API를 제공합니다.
 
 ### 셀프호스트 서버 — 설치 스크립트
 
@@ -93,7 +93,7 @@ ddagent는 사용자의 머신 또는 VPS에서 실행되며, 이미 사용 중�
 curl -fsSL https://github.com/Zakwei/ddagent/releases/latest/download/install.sh | bash
 ```
 
-최신 릴리스 태그를 `~/.ddagent/app`에 클론하고, 웹 UI + 백엔드를 빌드한 뒤 `start.sh` 런처를 남깁니다. 옵션: `--version vX.Y.Z` · `--dir <path>` · `--port <port>` · `--systemd`(사용자 systemd 유닛 설치 및 활성화). `--version`으로 다시 실행하면 제자리에서 업데이트됩니다.
+최신 릴리스 태그를 `~/.ddagent/app`에 클론하고, 백엔드를 빌드한 뒤 `start.sh` 런처를 남깁니다. 옵션: `--version vX.Y.Z` · `--dir <path>` · `--port <port>` · `--systemd`(사용자 systemd 유닛 설치 및 활성화). `--version`으로 다시 실행하면 제자리에서 업데이트됩니다.
 
 다음으로:
 
@@ -110,15 +110,16 @@ mkdir ddagent && tar xzf ddagent-server-*-linux-x64.tar.gz -C ddagent
 ./ddagent/start.sh           # start.bat on Windows
 ```
 
-### 데스크톱 앱
+### Flutter 클라이언트(웹 · 데스크톱 · 모바일)
 
-[Releases](https://github.com/Zakwei/ddagent/releases)에서 OS용 설치 프로그램을 다운로드하세요: `.dmg`(macOS) · `.exe`(Windows) · `.AppImage` / `.deb`(Linux).
+클라이언트는 Flutter 앱(`flutter/`)입니다 — 웹, 데스크톱(Linux/Windows), 모바일을 위한 하나의 코드베이스. 소스에서 빌드:
 
-독립 실행 — 서버가 내장되어 있어 다른 설치가 필요 없음 — 또는 셀프호스트 서버 URL에 대한 원격 모드로 실행. 릴리스의 `latest*.yml` 피드를 통해 자동 업데이트됩니다.
+```bash
+cd flutter
+flutter build web        # → build/web (serve with scripts/serve-flutter-web.cjs)
+```
 
-### 모바일 앱(미리보기)
-
-[Releases](https://github.com/Zakwei/ddagent/releases)에서 `ddagent-mobile-<version>.apk`를 다운로드하여 Android 기기에 설치하세요; 앱은 셀프호스트 서버 URL에 연결됩니다.
+클라이언트는 셀프호스트 서버 URL에 연결됩니다.
 
 ### 소스에서
 

@@ -20,6 +20,13 @@ ddagent 的所有重要变更都记录在此。
   <a href="CHANGELOG.zh-TW.md">繁體中文</a>
 </p>
 
+## [Unreleased]
+
+### 变更
+
+- 客户端现在是一个统一的 Flutter 应用（网页、Linux 与 Windows 桌面、Android）；此前的 Electron 桌面启动器和 Expo/React Native 移动应用已停用
+- 服务器仅以独立的自托管 tarball 形式分发；Electron 本地服务器包和桌面安装程序已移除
+
 ## [0.7.0] - 2026-09-27
 
 ### 新增功能

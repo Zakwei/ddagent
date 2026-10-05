@@ -2,10 +2,10 @@
   <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/logo.svg" alt="ddagent" width="72" height="72">
   <h1>ddagent</h1>
   <p><strong>すべての AI コーディングエージェントをひとつの UI で。</strong><br>
-  Claude Code、Codex、Cursor CLI、OpenCode、Devin のためのセルフホスト型 Web＆モバイルインターフェース — セッション、ファイル、git、ターミナル、タスクをひとつの場所に。</p>
+  Claude Code、Codex、Cursor CLI、OpenCode、Devin のためのセルフホスト型インターフェース（Web、デスクトップ＆モバイル）— セッション、ファイル、git、ターミナル、タスクをひとつの場所に。</p>
 
   <p>
-    <img src="https://img.shields.io/badge/version-0.5.9-0066FF" alt="バージョン">
+    <img src="https://img.shields.io/github/v/release/Zakwei/ddagent?label=バージョン&amp;color=0066FF" alt="バージョン">
     <img src="https://img.shields.io/badge/license-AGPL--3.0-blue" alt="ライセンス: AGPL-3.0">
     <img src="https://img.shields.io/badge/node-%E2%89%A522-339933" alt="node >= 22">
     <img src="https://img.shields.io/badge/self--hosted-yes-success" alt="セルフホスト">
@@ -42,7 +42,7 @@
 
 ## ddagent とは？
 
-ddagent はあなた自身のマシンや VPS 上で動作し、すでに使っているコーディングエージェントの上に洗練された Web UI を提供します。エージェントのセッションをディスクから直接検出します — `~/.claude`、Codex、Devin の履歴が即座に表示され、何も複製されたり第三者へ同期されたりしません。
+ddagent はあなた自身のマシンや VPS 上で動作し、すでに使っているコーディングエージェントの上に洗練された UI（Flutter：Web、デスクトップ、モバイル）を提供します。エージェントのセッションをディスクから直接検出します — `~/.claude`、Codex、Devin の履歴が即座に表示され、何も複製されたり第三者へ同期されたりしません。
 
 ネットワーク上の任意のブラウザ、またはスマートフォンから開けます。あなたのマシン、あなたのエージェント、あなたのデータ。
 
@@ -50,7 +50,7 @@ ddagent はあなた自身のマシンや VPS 上で動作し、すでに使っ�
 
 - **マルチエージェントセッション** — Claude Code、Codex、Cursor CLI、OpenCode、Devin のセッションを並行して実行・再開。WebSocket 経由でライブストリーミング
 - **分割ペイン** — チャット、ターミナル、ブラウザ、ファイルペインをひとつのワークスペースに
-- **ファイルエクスプローラー＆エディター** — ワークスペースを閲覧し、CodeMirror でコードを編集
+- **ファイルエクスプローラー＆エディター** — ワークスペースを閲覧し、内蔵エディターでコードを編集
 - **Git パネル** — UI を離れずにステージ、コミット、diff、ブランチ切り替え
 - **統合シェル** — ワークスペースごとのフルターミナルに加え、独立したシェルタブ
 - **タスクボード** — TaskMaster 駆動のカンバンビュー。PRD を実行可能なタスクに変換
@@ -69,7 +69,7 @@ ddagent はあなた自身のマシンや VPS 上で動作し、すでに使っ�
 - **MCP サーバー** — 外部 MCP クライアント（Claude Desktop、OpenClaw）にタスク作成やセッションへのメッセージ送信を許可（[ドキュメント](https://github.com/Zakwei/ddagent/blob/main/docs/mcp-server.md)）
 - **通知＆TTS** — セッションがあなたを必要としたときに通知（または音声読み上げ）
 - **Docker サンドボックス** — microVM 分離環境でエージェントを実行（[ドキュメント](https://github.com/Zakwei/ddagent/blob/main/docker/README.md)）
-- **デスクトップコンパニオン** — オプションの Electron アプリ。**12 言語**、ダーク＆ライトテーマ
+- **Flutter クライアント** — Web、デスクトップ、モバイルをひとつのコードベースで。**12 言語**、ダーク＆ライトテーマ
 
 ## 対応エージェント
 
@@ -85,7 +85,7 @@ ddagent はあなた自身のマシンや VPS 上で動作し、すでに使っ�
 
 ## インストール
 
-サーバーを実行するマシンに **Node.js 22+** が必要です。サーバーは Web UI と、デスクトップ・モバイルアプリがリモートで接続する REST/WS API を提供します。
+サーバーを実行するマシンに **Node.js 22+** が必要です。サーバーは、Flutter クライアント（Web、デスクトップ、モバイル）がリモートで接続する REST/WS API を提供します。
 
 ### セルフホストサーバー — インストーラースクリプト
 
@@ -93,7 +93,7 @@ ddagent はあなた自身のマシンや VPS 上で動作し、すでに使っ�
 curl -fsSL https://github.com/Zakwei/ddagent/releases/latest/download/install.sh | bash
 ```
 
-最新のリリースタグを `~/.ddagent/app` にクローンし、Web UI＋バックエンドをビルドして、`start.sh` ランチャーを残します。オプション: `--version vX.Y.Z` · `--dir <path>` · `--port <port>` · `--systemd`（ユーザー systemd ユニットをインストールして有効化）。`--version` で再実行するとその場で更新できます。
+最新のリリースタグを `~/.ddagent/app` にクローンし、バックエンドをビルドして、`start.sh` ランチャーを残します。オプション: `--version vX.Y.Z` · `--dir <path>` · `--port <port>` · `--systemd`（ユーザー systemd ユニットをインストールして有効化）。`--version` で再実行するとその場で更新できます。
 
 その後:
 
@@ -110,15 +110,16 @@ mkdir ddagent && tar xzf ddagent-server-*-linux-x64.tar.gz -C ddagent
 ./ddagent/start.sh           # start.bat on Windows
 ```
 
-### デスクトップアプリ
+### Flutter クライアント（Web · デスクトップ · モバイル）
 
-[Releases](https://github.com/Zakwei/ddagent/releases) からお使いの OS 向けインストーラーをダウンロード: `.dmg`（macOS）· `.exe`（Windows）· `.AppImage` / `.deb`（Linux）。
+クライアントは Flutter アプリ（`flutter/`）です — Web、デスクトップ（Linux/Windows）、モバイルをひとつのコードベースで。ソースからビルド:
 
-スタンドアロンで動作 — サーバーが内蔵されているため他にインストールするものはありません — またはセルフホストサーバーの URL に対するリモートモードでも動作します。リリースの `latest*.yml` フィード経由で自動更新されます。
+```bash
+cd flutter
+flutter build web        # → build/web (serve with scripts/serve-flutter-web.cjs)
+```
 
-### モバイルアプリ（プレビュー）
-
-[Releases](https://github.com/Zakwei/ddagent/releases) から `ddagent-mobile-<version>.apk` をダウンロードして Android デバイスにインストールします。アプリはセルフホストサーバーの URL に接続します。
+クライアントはセルフホストサーバーの URL に接続します。
 
 ### ソースから
 

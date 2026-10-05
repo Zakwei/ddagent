@@ -1,7 +1,4 @@
-import js from "@eslint/js";
 import tseslint from "typescript-eslint";
-import react from "eslint-plugin-react";
-import reactHooks from "eslint-plugin-react-hooks";
 import { createNodeResolver, importX } from "eslint-plugin-import-x";
 import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
 import boundaries from "eslint-plugin-boundaries";
@@ -155,57 +152,6 @@ export default tseslint.config(
         },
       ],
       "boundaries/no-unknown": "error", // fail fast if boundaries cannot classify a dependency, which prevents silent rule bypasses
-    },
-  },
-  {
-    files: ["mobile/src/**/*.{ts,tsx}", "mobile/*.{ts,tsx}"],
-    ignores: [
-      "mobile/node_modules/**",
-      "mobile/dist/**",
-      "mobile/.expo/**",
-      "mobile/tests/**",
-    ],
-    extends: [js.configs.recommended, ...tseslint.configs.recommended],
-    plugins: {
-      react,
-      "react-hooks": reactHooks,
-      "unused-imports": unusedImports,
-    },
-    languageOptions: {
-      parser: tseslint.parser,
-      parserOptions: {
-        ecmaFeatures: { jsx: true },
-      },
-      globals: {
-        ...globals.browser,
-        ...globals.node,
-      },
-    },
-    settings: {
-      react: { version: "detect" },
-    },
-    rules: {
-      "unused-imports/no-unused-imports": "warn",
-      "unused-imports/no-unused-vars": [
-        "warn",
-        {
-          vars: "all",
-          varsIgnorePattern: "^_",
-          args: "after-used",
-          argsIgnorePattern: "^_",
-        },
-      ],
-      "no-unused-vars": "off",
-      "@typescript-eslint/no-unused-vars": "off",
-      "@typescript-eslint/no-explicit-any": "off",
-      "@typescript-eslint/no-require-imports": "off",
-      "react/react-in-jsx-scope": "off",
-      "react/jsx-key": "warn",
-      "react-hooks/rules-of-hooks": "error",
-      "react-hooks/exhaustive-deps": "warn",
-      "no-case-declarations": "off",
-      "no-control-regex": "off",
-      "no-useless-escape": "off",
     },
   }
 );

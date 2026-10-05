@@ -1,7 +1,7 @@
 # ddagent — Flutter app
 
-Natywny rebuild klienta ddagent (Electron → Flutter). Decyzje architektoniczne:
-`.taskmaster/docs/flutter-adr.md`. Plan zadań: `.taskmaster/tasks/tasks.json`.
+Natywny klient ddagent (Electron → Flutter) — jedno źródło dla web, desktopu i Androida.
+Decyzje architektoniczne i plan zadań prowadzimy wewnętrznie (poza publicznym repozytorium).
 
 Platformy: **Android, Windows, Web, Linux** (iOS/macOS opcjonalnie — T39).
 

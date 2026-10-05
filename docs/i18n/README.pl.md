@@ -2,10 +2,10 @@
   <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/logo.svg" alt="ddagent" width="72" height="72">
   <h1>ddagent</h1>
   <p><strong>Jeden interfejs dla wszystkich Twoich agentów AI do kodowania.</strong><br>
-  Self-hosted interfejs webowy i mobilny dla Claude Code, Codex, Cursor CLI, OpenCode i Devin — sesje, pliki, git, terminale i zadania w jednym miejscu.</p>
+  Self-hosted interfejs (web, desktop i mobilny) dla Claude Code, Codex, Cursor CLI, OpenCode i Devin — sesje, pliki, git, terminale i zadania w jednym miejscu.</p>
 
   <p>
-    <img src="https://img.shields.io/badge/version-0.5.9-0066FF" alt="wersja">
+    <img src="https://img.shields.io/github/v/release/Zakwei/ddagent?label=wersja&amp;color=0066FF" alt="wersja">
     <img src="https://img.shields.io/badge/license-AGPL--3.0-blue" alt="licencja: AGPL-3.0">
     <img src="https://img.shields.io/badge/node-%E2%89%A522-339933" alt="node >= 22">
     <img src="https://img.shields.io/badge/self--hosted-yes-success" alt="self-hosted">
@@ -42,7 +42,7 @@
 
 ## Czym jest ddagent?
 
-ddagent działa na Twojej własnej maszynie lub VPS-ie i daje dopracowany interfejs webowy ponad agentami do kodowania, których już używasz. Odkrywa ich sesje bezpośrednio z dysku — Twoja historia z `~/.claude`, Codex i Devin pojawia się natychmiast, nic nie jest duplikowane ani synchronizowane z podmiotami trzecimi.
+ddagent działa na Twojej własnej maszynie lub VPS-ie i daje dopracowany UI (Flutter: web, desktop i mobile) ponad agentami do kodowania, których już używasz. Odkrywa ich sesje bezpośrednio z dysku — Twoja historia z `~/.claude`, Codex i Devin pojawia się natychmiast, nic nie jest duplikowane ani synchronizowane z podmiotami trzecimi.
 
 Otwórz go w dowolnej przeglądarce w swojej sieci albo na telefonie. Twoja maszyna, Twoi agenci, Twoje dane.
 
@@ -50,7 +50,7 @@ Otwórz go w dowolnej przeglądarce w swojej sieci albo na telefonie. Twoja masz
 
 - **Sesje multi-agent** — uruchamiaj i wznawiaj sesje Claude Code, Codex, Cursor CLI, OpenCode i Devin obok siebie, z live streamingiem przez WebSocket
 - **Podział okien** — panele czatu, terminala, przeglądarki i plików w jednym workspace
-- **Eksplorator i edytor plików** — przeglądaj workspace, edytuj kod w CodeMirror
+- **Eksplorator i edytor plików** — przeglądaj workspace i edytuj kod w wbudowanym edytorze
 - **Panel Git** — stage, commit, diff i przełączanie branchy bez wychodzenia z UI
 - **Zintegrowana powłoka** — pełny terminal dla każdego workspace plus osobna karta powłoki
 - **Tablica zadań** — widok kanban napędzany przez TaskMaster; zamieniaj PRD-y na wykonywalne zadania
@@ -69,7 +69,7 @@ Otwórz go w dowolnej przeglądarce w swojej sieci albo na telefonie. Twoja masz
 - **Serwer MCP** — pozwól zewnętrznym klientom MCP (Claude Desktop, OpenClaw) tworzyć zadania i wysyłać wiadomości do sesji ([dokumentacja](https://github.com/Zakwei/ddagent/blob/main/docs/mcp-server.md))
 - **Powiadomienia i TTS** — otrzymuj ping (lub odczyt na głos), gdy sesja Cię potrzebuje
 - **Sandboxy Docker** — uruchamiaj agentów w środowiskach izolowanych przez microVM ([dokumentacja](https://github.com/Zakwei/ddagent/blob/main/docker/README.md))
-- **Aplikacja desktopowa** — opcjonalna aplikacja Electron; **12 języków**, motywy ciemny i jasny
+- **Klient Flutter** — jedna baza kodu dla web, desktop i mobile; **12 języków**, motywy ciemny i jasny
 
 ## Obsługiwani agenci
 
@@ -85,7 +85,7 @@ Przynosisz własne subskrypcje — ddagent dostarcza środowisko, nie AI.
 
 ## Instalacja
 
-Wymaga **Node.js 22+** na maszynie, na której działa serwer. Serwer serwuje interfejs webowy oraz REST/WS API, z którymi łączą się zdalnie aplikacje desktopowa i mobilna.
+Wymaga **Node.js 22+** na maszynie, na której działa serwer. Serwer serwuje REST/WS API, z którym łączy się zdalnie klient Flutter (web, desktop, mobile).
 
 ### Serwer self-hosted — skrypt instalacyjny
 
@@ -93,7 +93,7 @@ Wymaga **Node.js 22+** na maszynie, na której działa serwer. Serwer serwuje in
 curl -fsSL https://github.com/Zakwei/ddagent/releases/latest/download/install.sh | bash
 ```
 
-Klonuje tag najnowszego release'u do `~/.ddagent/app`, buduje web UI + backend i zostawia launcher `start.sh`. Opcje: `--version vX.Y.Z` · `--dir <path>` · `--port <port>` · `--systemd` (instaluje i włącza userową jednostkę systemd). Uruchom ponownie z `--version`, aby zaktualizować w miejscu.
+Klonuje tag najnowszego release'u do `~/.ddagent/app`, buduje backend i zostawia launcher `start.sh`. Opcje: `--version vX.Y.Z` · `--dir <path>` · `--port <port>` · `--systemd` (instaluje i włącza userową jednostkę systemd). Uruchom ponownie z `--version`, aby zaktualizować w miejscu.
 
 Następnie:
 
@@ -110,15 +110,16 @@ mkdir ddagent && tar xzf ddagent-server-*-linux-x64.tar.gz -C ddagent
 ./ddagent/start.sh           # start.bat on Windows
 ```
 
-### Aplikacja desktopowa
+### Klient Flutter (web · desktop · mobile)
 
-Pobierz instalator dla swojego systemu z [Releases](https://github.com/Zakwei/ddagent/releases): `.dmg` (macOS) · `.exe` (Windows) · `.AppImage` / `.deb` (Linux).
+Klient to aplikacja Flutter (`flutter/`) — jedna baza kodu dla web, desktop (Linux/Windows) i mobile. Zbuduj ze źródeł:
 
-Działa standalone — serwer jest wbudowany, nic więcej do instalacji — albo w trybie zdalnym względem URL serwera self-hosted. Auto-aktualizacje przez feedy `latest*.yml` z release'u.
+```bash
+cd flutter
+flutter build web        # → build/web (serve with scripts/serve-flutter-web.cjs)
+```
 
-### Aplikacja mobilna (wersja poglądowa)
-
-Pobierz `ddagent-mobile-<version>.apk` z [Releases](https://github.com/Zakwei/ddagent/releases) i zainstaluj ją na urządzeniu z Androidem; aplikacja łączy się z URL serwera self-hosted.
+Klient łączy się z URL serwera self-hosted.
 
 ### Ze źródeł
 

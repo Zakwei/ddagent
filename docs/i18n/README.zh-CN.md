@@ -2,10 +2,10 @@
   <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/logo.svg" alt="ddagent" width="72" height="72">
   <h1>ddagent</h1>
   <p><strong>一个 UI，管理你所有的 AI 编程智能体。</strong><br>
-  为 Claude Code、Codex、Cursor CLI、OpenCode 和 Devin 打造的自托管网页与移动端界面 —— 会话、文件、git、终端和任务，尽在一处。</p>
+  为 Claude Code、Codex、Cursor CLI、OpenCode 和 Devin 打造的自托管界面（网页、桌面与移动端）—— 会话、文件、git、终端和任务，尽在一处。</p>
 
   <p>
-    <img src="https://img.shields.io/badge/version-0.5.9-0066FF" alt="版本">
+    <img src="https://img.shields.io/github/v/release/Zakwei/ddagent?label=版本&amp;color=0066FF" alt="版本">
     <img src="https://img.shields.io/badge/license-AGPL--3.0-blue" alt="许可证: AGPL-3.0">
     <img src="https://img.shields.io/badge/node-%E2%89%A522-339933" alt="node >= 22">
     <img src="https://img.shields.io/badge/self--hosted-yes-success" alt="自托管">
@@ -42,7 +42,7 @@
 
 ## ddagent 是什么？
 
-ddagent 运行在你自己的机器或 VPS 上，为你已在使用的编程智能体提供一个精致的网页 UI。它直接从磁盘发现智能体会话 —— 你的 `~/.claude`、Codex 和 Devin 历史记录会立即显示，不会复制任何内容，也不会同步给第三方。
+ddagent 运行在你自己的机器或 VPS 上，为你已在使用的编程智能体提供一个精致的 UI（Flutter：网页、桌面与移动端）。它直接从磁盘发现智能体会话 —— 你的 `~/.claude`、Codex 和 Devin 历史记录会立即显示，不会复制任何内容，也不会同步给第三方。
 
 可从网络中的任意浏览器或手机打开。你的机器，你的智能体，你的数据。
 
@@ -50,7 +50,7 @@ ddagent 运行在你自己的机器或 VPS 上，为你已在使用的编程智�
 
 - **多智能体会话** —— 并排运行和恢复 Claude Code、Codex、Cursor CLI、OpenCode 和 Devin 会话，通过 WebSocket 实时流式传输
 - **分栏面板** —— 在一个工作区内集成聊天、终端、浏览器和文件面板
-- **文件浏览器与编辑器** —— 浏览工作区，用 CodeMirror 编辑代码
+- **文件浏览器与编辑器** —— 浏览工作区，用内置编辑器编辑代码
 - **Git 面板** —— 无需离开界面即可暂存、提交、查看 diff 和切换分支
 - **集成终端** —— 每个工作区都有完整终端，外加独立的 shell 标签页
 - **任务看板** —— 由 TaskMaster 驱动的看板视图；将 PRD 转化为可执行任务
@@ -69,7 +69,7 @@ ddagent 运行在你自己的机器或 VPS 上，为你已在使用的编程智�
 - **MCP 服务器** —— 让外部 MCP 客户端（Claude Desktop、OpenClaw）创建任务并向会话发消息（[文档](https://github.com/Zakwei/ddagent/blob/main/docs/mcp-server.md)）
 - **通知与 TTS** —— 当会话需要你时获得提醒（或语音播报）
 - **Docker 沙箱** —— 在 microVM 隔离环境中运行智能体（[文档](https://github.com/Zakwei/ddagent/blob/main/docker/README.md)）
-- **桌面伴侣应用** —— 可选的 Electron 应用；**12 种语言**，深色与浅色主题
+- **Flutter 客户端** —— 网页、桌面与移动端共用一套代码库；**12 种语言**，深色与浅色主题
 
 ## 支持的智能体
 
@@ -85,7 +85,7 @@ ddagent 运行在你自己的机器或 VPS 上，为你已在使用的编程智�
 
 ## 安装
 
-运行服务器的机器需要 **Node.js 22+**。服务器提供网页 UI 以及供桌面和移动应用远程连接的 REST/WS API。
+运行服务器的机器需要 **Node.js 22+**。服务器提供供 Flutter 客户端（网页、桌面、移动端）远程连接的 REST/WS API。
 
 ### 自托管服务器 —— 安装脚本
 
@@ -93,7 +93,7 @@ ddagent 运行在你自己的机器或 VPS 上，为你已在使用的编程智�
 curl -fsSL https://github.com/Zakwei/ddagent/releases/latest/download/install.sh | bash
 ```
 
-将最新的发布标签克隆到 `~/.ddagent/app`，构建网页 UI 和后端，并留下 `start.sh` 启动器。选项：`--version vX.Y.Z` · `--dir <path>` · `--port <port>` · `--systemd`（安装并启用用户级 systemd 单元）。使用 `--version` 重新运行即可原地更新。
+将最新的发布标签克隆到 `~/.ddagent/app`，构建后端，并留下 `start.sh` 启动器。选项：`--version vX.Y.Z` · `--dir <path>` · `--port <port>` · `--systemd`（安装并启用用户级 systemd 单元）。使用 `--version` 重新运行即可原地更新。
 
 然后：
 
@@ -110,15 +110,16 @@ mkdir ddagent && tar xzf ddagent-server-*-linux-x64.tar.gz -C ddagent
 ./ddagent/start.sh           # start.bat on Windows
 ```
 
-### 桌面应用
+### Flutter 客户端（网页 · 桌面 · 移动端）
 
-从 [Releases](https://github.com/Zakwei/ddagent/releases) 下载适合你操作系统的安装包：`.dmg`（macOS）· `.exe`（Windows）· `.AppImage` / `.deb`（Linux）。
+客户端是一个 Flutter 应用（`flutter/`）—— 网页、桌面（Linux/Windows）与移动端共用一套代码库。从源码构建：
 
-可独立运行 —— 服务器已内嵌，无需安装其他组件 —— 也可以远程模式连接到自托管服务器 URL。通过发布中的 `latest*.yml` 源自动更新。
+```bash
+cd flutter
+flutter build web        # → build/web (serve with scripts/serve-flutter-web.cjs)
+```
 
-### 移动应用（预览）
-
-从 [Releases](https://github.com/Zakwei/ddagent/releases) 下载 `ddagent-mobile-<version>.apk` 并安装到你的 Android 设备；应用会连接到自托管服务器 URL。
+客户端连接到自托管服务器 URL。
 
 ### 从源码构建
 

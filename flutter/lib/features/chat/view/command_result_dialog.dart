@@ -6,6 +6,7 @@ import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/features/chat/state/composer_controller.dart';
 import 'package:ddagent_app/features/chat/view/chat_utilities.dart';
 import 'package:ddagent_app/features/chat/view/composer_model_menu.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -72,6 +73,7 @@ class CommandResultDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
+    final t = Translations.of(context);
     final action = result.action ?? '';
     final meta = _meta[action];
     final height = MediaQuery.sizeOf(context).height;
@@ -137,7 +139,7 @@ class CommandResultDialog extends StatelessWidget {
                     ),
                   ),
                   IconButton(
-                    tooltip: 'Close',
+                    tooltip: t.chat.common.close,
                     onPressed: () => Navigator.of(context).pop(),
                     icon: Icon(LucideIcons.x, size: 16, color: c.mutedForeground),
                     visualDensity: VisualDensity.compact,
@@ -175,7 +177,7 @@ class CommandResultDialog extends StatelessWidget {
                     variant: AppButtonVariant.outline,
                     size: AppButtonSize.sm,
                     onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Close'),
+                    child: Text(t.chat.common.close),
                   ),
                 ],
               ),
@@ -305,17 +307,20 @@ class _HelpContentState extends State<_HelpContent> {
   String _query = '';
 
   /// `FALLBACK_COMMANDS` — used when the payload carries no command list.
-  static const _fallback = [
-    (name: '/models', description: 'Browse available models for the active provider.'),
-    (name: '/cost', description: 'Review token usage for the active session.'),
-    (name: '/status', description: 'Inspect runtime, version, provider, and environment status.'),
-    (name: '/memory', description: 'Open the project CLAUDE.md memory file.'),
-    (name: '/config', description: 'Open settings and configuration.'),
-    (name: '/help', description: 'Show command documentation and syntax.'),
+  /// Built from the global translations accessor: this is static data with no
+  /// `BuildContext` to resolve — the entries are rendered by `build` below.
+  static List<({String name, String description})> get _fallback => [
+    (name: '/models', description: t.chat.commandResult.fallback.models),
+    (name: '/cost', description: t.chat.commandResult.fallback.cost),
+    (name: '/status', description: t.chat.commandResult.fallback.status),
+    (name: '/memory', description: t.chat.commandResult.fallback.memory),
+    (name: '/config', description: t.chat.commandResult.fallback.config),
+    (name: '/help', description: t.chat.commandResult.fallback.help),
   ];
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     final c = context.appColors;
     final raw = widget.data['commands'];
     final commands = raw is List && raw.isNotEmpty
@@ -345,7 +350,7 @@ class _HelpContentState extends State<_HelpContent> {
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
           child: _SearchField(
-            hint: 'Filter commands...',
+            hint: t.chat.commandResult.filterCommands,
             onChanged: (v) => setState(() => _query = v),
           ),
         ),
@@ -536,6 +541,7 @@ class _ModelsContentState extends ConsumerState<_ModelsContent> {
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
+    final t = Translations.of(context);
     final state = ref.watch(composerProvider(widget.arg));
     final current = widget.data['current'] is Map
         ? widget.data['current'] as Map
@@ -609,7 +615,7 @@ class _ModelsContentState extends ConsumerState<_ModelsContent> {
                     Navigator.of(context).pop();
                     router.go('/settings/agents?agent=$provider&category=models');
                   },
-                  child: const Text('Manage models'),
+                  child: Text(t.chat.providerSelection.manageModels),
                 ),
               ],
             ),
@@ -624,7 +630,7 @@ class _ModelsContentState extends ConsumerState<_ModelsContent> {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
             child: _SearchField(
-              hint: 'Search $pLabel models...',
+              hint: t.chat.commandResult.searchModels(provider: pLabel),
               onChanged: (v) => setState(() => _query = v),
             ),
           ),

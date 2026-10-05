@@ -2,12 +2,11 @@
 # ddagent self-hosted server installer.
 #
 # Clones a release tag of this repository, installs dependencies, builds the
-# web UI + backend, and leaves a runnable server:
+# backend, and leaves a runnable server:
 #
 #   <dir>/start.sh                      (node dist-server/server/index.js)
 #
-# The server serves the web UI and the REST/WS API that ddagent Desktop and
-# Mobile connect to remotely.
+# The server serves the REST/WS API that the ddagent client connects to remotely.
 #
 # Usage:
 #   ./install.sh [--version vX.Y.Z] [--dir <path>] [--systemd] [--port <port>]
@@ -65,15 +64,9 @@ else
 fi
 cd "$INSTALL_DIR"
 
-# electron is a devDependency and its postinstall downloads a ~100MB binary the
-# server never runs — skip just that download, keep every other install script
-# (natives, ripgrep).
-export ELECTRON_SKIP_BINARY_DOWNLOAD=1
 npm ci
 
-# Platform build: without this flag vite emits an OSS-mode bundle whose login
-# screen never connects (see .github/workflows/desktop-release.yml).
-VITE_IS_PLATFORM=true npm run build
+npm run build
 
 # Drop devDependencies — the server only needs the production set.
 npm prune --omit=dev

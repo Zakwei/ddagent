@@ -2,10 +2,10 @@
   <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/logo.svg" alt="ddagent" width="72" height="72">
   <h1>ddagent</h1>
   <p><strong>Tüm AI kodlama ajanlarınız için tek bir arayüz.</strong><br>
-  Claude Code, Codex, Cursor CLI, OpenCode ve Devin için self-hosted web ve mobil arayüz — oturumlar, dosyalar, git, terminaller ve görevler tek bir yerde.</p>
+  Claude Code, Codex, Cursor CLI, OpenCode ve Devin için self-hosted arayüz (web, masaüstü ve mobil) — oturumlar, dosyalar, git, terminaller ve görevler tek bir yerde.</p>
 
   <p>
-    <img src="https://img.shields.io/badge/version-0.5.9-0066FF" alt="sürüm">
+    <img src="https://img.shields.io/github/v/release/Zakwei/ddagent?label=sürüm&amp;color=0066FF" alt="sürüm">
     <img src="https://img.shields.io/badge/license-AGPL--3.0-blue" alt="lisans: AGPL-3.0">
     <img src="https://img.shields.io/badge/node-%E2%89%A522-339933" alt="node >= 22">
     <img src="https://img.shields.io/badge/self--hosted-yes-success" alt="self-hosted">
@@ -42,7 +42,7 @@
 
 ## ddagent nedir?
 
-ddagent kendi makinenizde veya VPS'inizde çalışır ve halihazırda kullandığınız kodlama ajanlarının üzerine cilalanmış bir web arayüzü sunar. Oturumlarını doğrudan diskten keşfeder — `~/.claude`, Codex ve Devin geçmişiniz anında görünür; hiçbir şey kopyalanmaz veya üçüncü taraflarla senkronize edilmez.
+ddagent kendi makinenizde veya VPS'inizde çalışır ve halihazırda kullandığınız kodlama ajanlarının üzerine cilalanmış bir arayüz (Flutter: web, masaüstü ve mobil) sunar. Oturumlarını doğrudan diskten keşfeder — `~/.claude`, Codex ve Devin geçmişiniz anında görünür; hiçbir şey kopyalanmaz veya üçüncü taraflarla senkronize edilmez.
 
 Ağınızdaki herhangi bir tarayıcıdan veya telefonunuzdan açın. Sizin makineniz, sizin ajanlarınız, sizin verileriniz.
 
@@ -50,7 +50,7 @@ Ağınızdaki herhangi bir tarayıcıdan veya telefonunuzdan açın. Sizin makin
 
 - **Çoklu ajan oturumları** — Claude Code, Codex, Cursor CLI, OpenCode ve Devin oturumlarını yan yana çalıştırın ve sürdürün, WebSocket üzerinden canlı akışla
 - **Bölünmüş paneller** — tek çalışma alanında sohbet, terminal, tarayıcı ve dosya panelleri
-- **Dosya gezgini ve editör** — çalışma alanına göz atın, CodeMirror ile kod düzenleyin
+- **Dosya gezgini ve editör** — çalışma alanına göz atın ve kodu yerleşik editörde düzenleyin
 - **Git paneli** — arayüzden ayrılmadan stage, commit, diff yapın ve dal değiştirin
 - **Entegre kabuk** — çalışma alanı başına tam terminal, artı bağımsız bir kabuk sekmesi
 - **Görev panosu** — TaskMaster destekli kanban görünümü; PRD'leri çalıştırılabilir görevlere dönüştürün
@@ -69,7 +69,7 @@ Ağınızdaki herhangi bir tarayıcıdan veya telefonunuzdan açın. Sizin makin
 - **MCP sunucusu** — harici MCP istemcilerinin (Claude Desktop, OpenClaw) görev oluşturmasına ve oturumlara mesaj göndermesine izin verin ([dokümanlar](https://github.com/Zakwei/ddagent/blob/main/docs/mcp-server.md))
 - **Bildirimler ve TTS** — bir oturum size ihtiyaç duyduğunda ping alın (veya sesli okutun)
 - **Docker sandbox'ları** — ajanları microVM izoleli ortamlarda çalıştırın ([dokümanlar](https://github.com/Zakwei/ddagent/blob/main/docker/README.md))
-- **Masaüstü yardımcısı** — isteğe bağlı Electron uygulaması; **12 dil**, koyu ve açık temalar
+- **Flutter istemcisi** — web, masaüstü ve mobil için tek kod tabanı; **12 dil**, koyu ve açık temalar
 
 ## Desteklenen ajanlar
 
@@ -85,7 +85,7 @@ Kendi aboneliklerinizi getirirsiniz — ddagent ortamı sağlar, AI'ı değil.
 
 ## Kurulum
 
-Sunucuyu çalıştıran makinede **Node.js 22+** gerekir. Sunucu, web arayüzünü ve masaüstü ile mobil uygulamaların uzaktan bağlandığı REST/WS API'sini sunar.
+Sunucuyu çalıştıran makinede **Node.js 22+** gerekir. Sunucu, Flutter istemcisinin (web, masaüstü, mobil) uzaktan bağlandığı REST/WS API'sini sunar.
 
 ### Self-hosted sunucu — kurulum betiği
 
@@ -93,7 +93,7 @@ Sunucuyu çalıştıran makinede **Node.js 22+** gerekir. Sunucu, web arayüzün
 curl -fsSL https://github.com/Zakwei/ddagent/releases/latest/download/install.sh | bash
 ```
 
-En son sürüm etiketini `~/.ddagent/app` içine klonlar, web arayüzünü ve backend'i derler ve bir `start.sh` başlatıcısı bırakır. Seçenekler: `--version vX.Y.Z` · `--dir <path>` · `--port <port>` · `--systemd` (kullanıcı systemd birimini kurar ve etkinleştirir). `--version` ile yeniden çalıştırarak yerinde güncelleyin.
+En son sürüm etiketini `~/.ddagent/app` içine klonlar, backend'i derler ve bir `start.sh` başlatıcısı bırakır. Seçenekler: `--version vX.Y.Z` · `--dir <path>` · `--port <port>` · `--systemd` (kullanıcı systemd birimini kurar ve etkinleştirir). `--version` ile yeniden çalıştırarak yerinde güncelleyin.
 
 Ardından:
 
@@ -110,15 +110,16 @@ mkdir ddagent && tar xzf ddagent-server-*-linux-x64.tar.gz -C ddagent
 ./ddagent/start.sh           # start.bat on Windows
 ```
 
-### Masaüstü uygulaması
+### Flutter istemcisi (web · masaüstü · mobil)
 
-[Releases](https://github.com/Zakwei/ddagent/releases) sayfasından işletim sisteminize uygun yükleyiciyi indirin: `.dmg` (macOS) · `.exe` (Windows) · `.AppImage` / `.deb` (Linux).
+İstemci bir Flutter uygulamasıdır (`flutter/`) — web, masaüstü (Linux/Windows) ve mobil için tek kod tabanı. Kaynaktan derleyin:
 
-Bağımsız çalışır — sunucu gömülüdür, başka bir şey kurmaya gerek yok — veya self-hosted bir sunucu URL'sine karşı uzak modda çalışır. Sürümdeki `latest*.yml` beslemeleriyle otomatik güncellenir.
+```bash
+cd flutter
+flutter build web        # → build/web (serve with scripts/serve-flutter-web.cjs)
+```
 
-### Mobil uygulama (önizleme)
-
-[Releases](https://github.com/Zakwei/ddagent/releases) sayfasından `ddagent-mobile-<version>.apk` dosyasını indirin ve Android cihazınıza kurun; uygulama self-hosted bir sunucu URL'sine bağlanır.
+İstemci self-hosted bir sunucu URL'sine bağlanır.
 
 ### Kaynaktan
 

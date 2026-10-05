@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import crypto from 'node:crypto';
-import { createReadStream, readFileSync } from 'node:fs';
+import { createReadStream } from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
@@ -11,22 +11,6 @@ const rootDir = path.resolve(__dirname, '..', '..');
 const packageJson = JSON.parse(
   await fs.readFile(path.join(rootDir, 'package.json'), 'utf8'),
 );
-
-function getElectronVersion() {
-  try {
-    return JSON.parse(
-      readFileSync(path.join(rootDir, 'node_modules', 'electron', 'package.json'), 'utf8'),
-    ).version;
-  } catch {
-    try {
-      return JSON.parse(
-        readFileSync(path.join(rootDir, 'package-lock.json'), 'utf8'),
-      ).packages['node_modules/electron'].version;
-    } catch {
-      throw new Error('Could not resolve an exact Electron version for server native rebuild.');
-    }
-  }
-}
 
 function mapArch(arch = process.arch) {
   return arch === 'arm64' ? 'arm64' : 'x64';
@@ -96,16 +80,16 @@ async function writeServerPackageJson(stageDir) {
   );
 }
 
-// Self-hosted launchers for the standalone variant: they let users start the
-// bundle under plain Node.js without knowing the server entrypoint path.
+// Self-hosted launchers let users start the bundle under plain Node.js
+// without knowing the server entrypoint path.
 async function writeStandaloneLaunchers(stageDir) {
   const startShPath = path.join(stageDir, 'start.sh');
   await fs.writeFile(
     startShPath,
     [
       '#!/bin/sh',
-      '# Self-hosted ddagent server — serves the web UI and the API/WS that ddagent',
-      '# Desktop and Mobile connect to. Node.js 22+ required.',
+      '# Self-hosted ddagent server — serves the API/WS that the ddagent client',
+      '# connects to. Node.js 22+ required.',
       '# Env: SERVER_PORT (default 3001), HOST (default 0.0.0.0). Optional .env file here.',
       'exec node "$(dirname "$0")/dist-server/server/index.js" "$@"',
       '',
@@ -137,17 +121,12 @@ function sha256(filePath) {
   });
 }
 
-// DDAGENT_BUNDLE_VARIANT=standalone builds a self-hosted bundle that users run
-// under plain Node.js; any other value builds the default "local" bundle that
-// the desktop app downloads and runs via ELECTRON_RUN_AS_NODE.
-const standalone = process.env.DDAGENT_BUNDLE_VARIANT === 'standalone';
+// Self-hosted bundle that users run under plain Node.js.
 const platform = mapPlatform(process.env.DDAGENT_BUNDLE_PLATFORM || process.platform);
 const arch = mapArch(process.env.DDAGENT_BUNDLE_ARCH || process.arch);
 const version = packageJson.version;
-const bundleName = standalone
-  ? `ddagent-server-${version}-${platform}-${arch}.tar.gz`
-  : `ddagent-local-server-${version}-${platform}-${arch}.tar.gz`;
-const bundleRoot = path.join(rootDir, 'release', standalone ? 'server' : 'local-server');
+const bundleName = `ddagent-server-${version}-${platform}-${arch}.tar.gz`;
+const bundleRoot = path.join(rootDir, 'release', 'server');
 const stageDir = path.join(bundleRoot, `.stage-${version}-${platform}-${arch}`);
 const archivePath = path.join(bundleRoot, bundleName);
 
@@ -155,9 +134,8 @@ await fs.rm(stageDir, { recursive: true, force: true });
 await fs.mkdir(stageDir, { recursive: true });
 await fs.mkdir(bundleRoot, { recursive: true });
 
-console.log(`Building ${standalone ? 'standalone' : 'local'} server bundle ${bundleName}...`);
+console.log(`Building server bundle ${bundleName}...`);
 
-await copyRequired(stageDir, 'dist');
 await copyRequired(stageDir, 'dist-server');
 await copyRequired(stageDir, 'public');
 await copyRequired(stageDir, 'shared');
@@ -166,9 +144,7 @@ await copyIfExists(stageDir, 'scripts/fix-node-pty.js');
 await copyIfExists(stageDir, 'LICENSE');
 await copyIfExists(stageDir, 'THIRD_PARTY_NOTICES.md');
 await writeServerPackageJson(stageDir);
-if (standalone) {
-  await writeStandaloneLaunchers(stageDir);
-}
+await writeStandaloneLaunchers(stageDir);
 
 console.log('Installing production server dependencies into bundle stage...');
 await run('npm', ['ci', '--omit=dev'], {
@@ -179,25 +155,6 @@ await run('npm', ['ci', '--omit=dev'], {
     npm_config_fund: 'false',
   },
 });
-
-// Only the local bundle is rebuilt for the Electron ABI (the desktop app runs
-// it via ELECTRON_RUN_AS_NODE). The standalone bundle runs under plain Node.js
-// and must keep the Node ABI that npm ci produced, so it skips this step.
-if (!standalone) {
-  const electronVersion = getElectronVersion();
-  const electronRebuild = process.platform === 'win32'
-    ? path.join(rootDir, 'node_modules', '.bin', 'electron-rebuild.cmd')
-    : path.join(rootDir, 'node_modules', '.bin', 'electron-rebuild');
-  console.log(`Rebuilding native server dependencies for Electron ${electronVersion} (${arch})...`);
-  await run(electronRebuild, ['--version', electronVersion, '--module-dir', stageDir, '--arch', arch, '--force'], {
-    cwd: rootDir,
-    env: {
-      ...process.env,
-      npm_config_audit: 'false',
-      npm_config_fund: 'false',
-    },
-  });
-}
 
 if (await pathExists(path.join(stageDir, 'scripts', 'fix-node-pty.js'))) {
   await run(process.execPath, ['scripts/fix-node-pty.js'], { cwd: stageDir });

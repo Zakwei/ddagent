@@ -67,10 +67,10 @@ info "Step 2 — Bump version ($BUMP)"
 
 if [[ "$DRY_RUN" == "true" ]]; then
   CURRENT_VER=$(node -p "require('./package.json').version")
-  warn "[DRY RUN] Would run: npm run release:desktop -- $BUMP (current: $CURRENT_VER)"
+  warn "[DRY RUN] Would run: npm run release -- $BUMP (current: $CURRENT_VER)"
   NEXT_VERSION="$CURRENT_VER"   # no actual bump in dry-run
 else
-  npm run release:desktop -- "$BUMP"
+  npm run release -- "$BUMP"
   NEXT_VERSION=$(node -p "require('./package.json').version")
   TAG="v${NEXT_VERSION}"
   git tag | grep -qx "$TAG" || abort "Tag $TAG not found after bump. Something went wrong."

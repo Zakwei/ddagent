@@ -1,21 +1,13 @@
 name: Server release
 
-# Builds the two server tarball kinds on release tags (v*) and on manual
-# dispatch, publishing them onto the same per-version GitHub draft release
-# that desktop-release.yml creates (whichever job gets there first creates
-# the draft):
+# Builds the server tarball on release tags (v*) and on manual dispatch,
+# publishing it onto the per-version GitHub draft release:
 #
 #   release/server/ddagent-server-<version>-<platform>-<arch>.tar.gz (+ .sha256)
-#     STANDALONE self-hosted server — Node 22+, serves the built web UI
-#     (dist/) plus the REST/WS API that ddagent Desktop and Mobile connect
-#     to remotely. Built by `DDAGENT_BUNDLE_VARIANT=standalone node
+#     STANDALONE self-hosted server — Node 22+, serves the REST/WS API that
+#     the Flutter client connects to remotely. Built by
+#     `DDAGENT_BUNDLE_VARIANT=standalone node
 #     scripts/release/build-server-bundle.js`.
-#
-#   release/local-server/ddagent-local-server-<version>-<platform>-<arch>.tar.gz (+ .sha256)
-#     Consumed by the DESKTOP app at runtime — electron/serverInstaller.js
-#     downloads exactly this name + .sha256 from releases/download/<tag>/.
-#     Built by plain `node scripts/release/build-server-bundle.js`.
-#     Electron-ABI natives inside — do not rename.
 #
 #   install.sh — descriptive alternative to the tarballs: clones the tag,
 #   npm ci, builds, prunes devDeps (works on any platform/arch, incl. ones
@@ -39,11 +31,8 @@ jobs:
       # One platform failing must not cancel the other artifact builds.
       fail-fast: false
       matrix:
-        # ddagent-local-server is downloaded per DESKTOP platform — mac
-        # arm64 / win x64 / linux x64 — matching the installers
-        # desktop-release.yml ships. Add `os: ubuntu-24.04-arm` later for
-        # linux-arm64 standalone builds — arm runners are billed on
-        # private repos.
+        # Add `os: ubuntu-24.04-arm` later for linux-arm64 standalone
+        # builds — arm runners are billed on private repos.
         include:
           - name: Linux
             os: ubuntu-latest
@@ -62,17 +51,17 @@ jobs:
           node-version: '22' # README floor: Node.js 22+
           cache: npm
 
-      # electron-builder names the GH release `v` + package.json version, not
-      # the pushed git tag — a mismatched tag would silently publish
-      # v<package.json> under the wrong ref. Bump via `npm run release:desktop`
-      # so tag and version can never diverge.
+      # The GH release is named `v` + package.json version, not the pushed git
+      # tag — a mismatched tag would silently publish v<package.json> under the
+      # wrong ref. Bump via `npm run release` so tag and version can never
+      # diverge.
       - name: Verify tag matches package.json version
         if: github.ref_type == 'tag'
         shell: bash
         run: |
           PKG_TAG="v$(node -p "require('./package.json').version")"
           if [ "$GITHUB_REF_NAME" != "$PKG_TAG" ]; then
-            echo "::error::tag $GITHUB_REF_NAME does not match package.json version ($PKG_TAG) — bump via 'npm run release:desktop -- <x.y.z>'"
+            echo "::error::tag $GITHUB_REF_NAME does not match package.json version ($PKG_TAG) — bump via 'npm run release -- <x.y.z>'"
             exit 1
           fi
 
@@ -83,12 +72,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # VITE_IS_PLATFORM=true — same as desktop-release.yml: without it vite
-      # emits an OSS-mode bundle whose WebSocketProvider waits for a login
-      # token that embedded local mode never supplies.
       - run: npm run build
-        env:
-          VITE_IS_PLATFORM: 'true'
 
       # STANDALONE self-hosted server tarball → release/server/.
       - name: Build standalone server bundle
@@ -96,17 +80,9 @@ jobs:
         env:
           DDAGENT_BUNDLE_VARIANT: standalone
 
-      # DESKTOP local-server tarball → release/local-server/ — the exact
-      # name + .sha256 that electron/serverInstaller.js downloads.
-      - name: Build desktop local-server bundle
-        run: node scripts/release/build-server-bundle.js
-
-      # The draft release for the tag is created by whichever job gets there
-      # first (electron-builder --publish onTag in desktop-release.yml, or
-      # this step). `gh release create` may lose the race — loop until the
-      # release is visible, then upload; --clobber makes re-runs idempotent.
-      # The notes-file pre-fills the draft body with the per-locale template
-      # when this job wins the race — same file electron-builder would use.
+      # `gh release create` creates the draft release; the notes-file pre-fills
+      # the draft body with the per-locale template. --clobber makes re-runs
+      # idempotent.
       - name: Publish bundles to GitHub release
         if: github.ref_type == 'tag'
         shell: bash
@@ -114,27 +90,19 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TAG="$GITHUB_REF_NAME"
-          for i in $(seq 1 15); do
-            gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 && break
-            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --draft \
-              --title "$TAG" --notes-file scripts/release/release-notes-template.md && break
-            sleep 20
-          done
-          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 \
+            || gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --draft \
+              --title "$TAG" --notes-file scripts/release/release-notes-template.md
           gh release upload "$TAG" --repo "$GITHUB_REPOSITORY" --clobber \
             install.sh \
-            release/server/*.tar.gz release/server/*.sha256 \
-            release/local-server/*.tar.gz release/local-server/*.sha256
+            release/server/*.tar.gz release/server/*.sha256
 
       # Tag builds upload their tarballs straight onto the GitHub release —
-      # keep Actions artifacts only for manual (branch) builds, same split
-      # as desktop-release.yml.
+      # keep Actions artifacts only for manual (branch) builds.
       - uses: actions/upload-artifact@v4
         if: github.ref_type != 'tag'
         continue-on-error: true # storage-quota exhaustion must not fail a verification build
         with:
           name: ddagent-server-${{ matrix.artifact-suffix }}-${{ github.ref_name }}
-          path: |
-            release/server/
-            release/local-server/
+          path: release/server/
           if-no-files-found: error
