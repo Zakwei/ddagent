@@ -1853,6 +1853,7 @@ class Translations$settings$agents$ru extends Translations$settings$agents$en {
 
 	// Translations
 	@override late final Translations$settings$agents$authStatus$ru authStatus = Translations$settings$agents$authStatus$ru._(_root);
+	@override late final Translations$settings$agents$install$ru install = Translations$settings$agents$install$ru._(_root);
 	@override late final Translations$settings$agents$account$ru account = Translations$settings$agents$account$ru._(_root);
 	@override String get connectionStatus => 'Статус подключения';
 	@override late final Translations$settings$agents$login$ru login = Translations$settings$agents$login$ru._(_root);
@@ -4559,6 +4560,23 @@ class Translations$settings$agents$authStatus$ru extends Translations$settings$a
 	@override String get authenticatedUser => 'аутентифицированный пользователь';
 }
 
+// Path: settings.agents.install
+class Translations$settings$agents$install$ru extends Translations$settings$agents$install$en {
+	Translations$settings$agents$install$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String title({required Object agent}) => 'CLI ${agent} не установлен';
+	@override String description({required Object agent}) => 'Установите CLI ${agent}, чтобы войти и запускать сессии.';
+	@override String get button => 'Установить';
+	@override String get installing => 'Установка…';
+	@override String get copyCommand => 'Копировать команду';
+	@override String get docs => 'Документация';
+	@override String success({required Object agent}) => 'CLI ${agent} установлен';
+	@override String get failed => 'Установка не удалась — проверьте вывод терминала';
+}
+
 // Path: settings.agents.account
 class Translations$settings$agents$account$ru extends Translations$settings$agents$account$en {
 	Translations$settings$agents$account$ru._(TranslationsRu root) : this._root = root, super.internal(root);
@@ -6982,6 +7000,14 @@ extension on TranslationsRu {
 			'settings.agents.authStatus.loggedInAs' => ({required Object email}) => 'Вошли как ${email}',
 			'settings.agents.authStatus.providerAccount' => ({required Object provider}) => 'Аккаунт ${provider}',
 			'settings.agents.authStatus.authenticatedUser' => 'аутентифицированный пользователь',
+			'settings.agents.install.title' => ({required Object agent}) => 'CLI ${agent} не установлен',
+			'settings.agents.install.description' => ({required Object agent}) => 'Установите CLI ${agent}, чтобы войти и запускать сессии.',
+			'settings.agents.install.button' => 'Установить',
+			'settings.agents.install.installing' => 'Установка…',
+			'settings.agents.install.copyCommand' => 'Копировать команду',
+			'settings.agents.install.docs' => 'Документация',
+			'settings.agents.install.success' => ({required Object agent}) => 'CLI ${agent} установлен',
+			'settings.agents.install.failed' => 'Установка не удалась — проверьте вывод терминала',
 			'settings.agents.account.claude.description' => 'AI-ассистент Anthropic Claude',
 			'settings.agents.account.cursor.description' => 'Редактор кода с AI Cursor',
 			'settings.agents.account.codex.description' => 'AI-ассистент OpenAI Codex',
@@ -7134,14 +7160,14 @@ extension on TranslationsRu {
 			'settings.browser.installing' => 'Установка...',
 			'settings.browser.missing' => 'отсутствует',
 			'settings.browser.runtimeRequired' => 'Требуется среда выполнения браузера',
+			_ => null,
+		} ?? switch (path) {
 			'settings.browser.statusDisabled' => 'отключён',
 			'settings.browser.statusLabel' => 'Статус',
 			'settings.browser.statusReady' => 'готов',
 			'settings.browser.statusSetupRequired' => 'требуется настройка',
 			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => 'Отмена',
-			_ => null,
-		} ?? switch (path) {
 			'settings.workspaces.create' => 'Добавить рабочую область',
 			'settings.workspaces.deleteConfirm' => 'Удалить эту рабочую область из ddagent? Её файлы останутся на диске.',
 			'settings.workspaces.deleteFailed' => 'Не удалось удалить рабочую область.',

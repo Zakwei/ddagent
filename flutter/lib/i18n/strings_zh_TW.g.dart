@@ -1853,6 +1853,7 @@ class Translations$settings$agents$zh_TW extends Translations$settings$agents$en
 
 	// Translations
 	@override late final Translations$settings$agents$authStatus$zh_TW authStatus = Translations$settings$agents$authStatus$zh_TW.internal(_root);
+	@override late final Translations$settings$agents$install$zh_TW install = Translations$settings$agents$install$zh_TW.internal(_root);
 	@override late final Translations$settings$agents$account$zh_TW account = Translations$settings$agents$account$zh_TW.internal(_root);
 	@override String get connectionStatus => '連線狀態';
 	@override late final Translations$settings$agents$login$zh_TW login = Translations$settings$agents$login$zh_TW.internal(_root);
@@ -4553,6 +4554,23 @@ class Translations$settings$agents$authStatus$zh_TW extends Translations$setting
 	@override String get authenticatedUser => '已驗證使用者';
 }
 
+// Path: settings.agents.install
+class Translations$settings$agents$install$zh_TW extends Translations$settings$agents$install$en {
+	Translations$settings$agents$install$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String title({required Object agent}) => '未安裝 ${agent} CLI';
+	@override String description({required Object agent}) => '安裝 ${agent} CLI 以登入並執行工作階段。';
+	@override String get button => '安裝';
+	@override String get installing => '安裝中…';
+	@override String get copyCommand => '複製指令';
+	@override String get docs => '文件';
+	@override String success({required Object agent}) => '${agent} CLI 已安裝';
+	@override String get failed => '安裝失敗 — 請檢查終端機輸出';
+}
+
 // Path: settings.agents.account
 class Translations$settings$agents$account$zh_TW extends Translations$settings$agents$account$en {
 	Translations$settings$agents$account$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
@@ -6976,6 +6994,14 @@ extension on TranslationsZhTw {
 			'settings.agents.authStatus.loggedInAs' => ({required Object email}) => '登入為 ${email}',
 			'settings.agents.authStatus.providerAccount' => ({required Object provider}) => '${provider} 帳戶',
 			'settings.agents.authStatus.authenticatedUser' => '已驗證使用者',
+			'settings.agents.install.title' => ({required Object agent}) => '未安裝 ${agent} CLI',
+			'settings.agents.install.description' => ({required Object agent}) => '安裝 ${agent} CLI 以登入並執行工作階段。',
+			'settings.agents.install.button' => '安裝',
+			'settings.agents.install.installing' => '安裝中…',
+			'settings.agents.install.copyCommand' => '複製指令',
+			'settings.agents.install.docs' => '文件',
+			'settings.agents.install.success' => ({required Object agent}) => '${agent} CLI 已安裝',
+			'settings.agents.install.failed' => '安裝失敗 — 請檢查終端機輸出',
 			'settings.agents.account.claude.description' => 'Anthropic Claude AI 助手',
 			'settings.agents.account.cursor.description' => 'Cursor AI 驅動的程式碼編輯器',
 			'settings.agents.account.codex.description' => 'OpenAI Codex AI 助手',
@@ -7128,14 +7154,14 @@ extension on TranslationsZhTw {
 			'settings.browser.installing' => '正在安裝...',
 			'settings.browser.missing' => '缺失',
 			'settings.browser.runtimeRequired' => '需要瀏覽器執行環境',
+			_ => null,
+		} ?? switch (path) {
 			'settings.browser.statusDisabled' => '已停用',
 			'settings.browser.statusLabel' => '狀態',
 			'settings.browser.statusReady' => '就緒',
 			'settings.browser.statusSetupRequired' => '需要設定',
 			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => '取消',
-			_ => null,
-		} ?? switch (path) {
 			'settings.workspaces.create' => '新增工作區',
 			'settings.workspaces.deleteConfirm' => '從 ddagent 移除此工作區？檔案將保留在磁碟上。',
 			'settings.workspaces.deleteFailed' => '移除工作區失敗。',

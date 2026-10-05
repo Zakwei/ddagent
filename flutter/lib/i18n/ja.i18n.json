@@ -1841,6 +1841,16 @@
         "providerAccount": "{{provider}} アカウント",
         "authenticatedUser": "認証済みユーザー"
       },
+      "install": {
+        "title": "{{agent}} CLI がインストールされていません",
+        "description": "ログインしてセッションを実行するには {{agent}} CLI をインストールしてください。",
+        "button": "インストール",
+        "installing": "インストール中…",
+        "copyCommand": "コマンドをコピー",
+        "docs": "ドキュメント",
+        "success": "{{agent}} CLI をインストールしました",
+        "failed": "インストールに失敗しました — ターミナルの出力を確認してください"
+      },
       "account": {
         "claude": {
           "description": "Anthropic Claude AIアシスタント"

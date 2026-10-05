@@ -1853,6 +1853,7 @@ class Translations$settings$agents$ja extends Translations$settings$agents$en {
 
 	// Translations
 	@override late final Translations$settings$agents$authStatus$ja authStatus = Translations$settings$agents$authStatus$ja._(_root);
+	@override late final Translations$settings$agents$install$ja install = Translations$settings$agents$install$ja._(_root);
 	@override late final Translations$settings$agents$account$ja account = Translations$settings$agents$account$ja._(_root);
 	@override String get connectionStatus => '接続状態';
 	@override late final Translations$settings$agents$login$ja login = Translations$settings$agents$login$ja._(_root);
@@ -4553,6 +4554,23 @@ class Translations$settings$agents$authStatus$ja extends Translations$settings$a
 	@override String get authenticatedUser => '認証済みユーザー';
 }
 
+// Path: settings.agents.install
+class Translations$settings$agents$install$ja extends Translations$settings$agents$install$en {
+	Translations$settings$agents$install$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String title({required Object agent}) => '${agent} CLI がインストールされていません';
+	@override String description({required Object agent}) => 'ログインしてセッションを実行するには ${agent} CLI をインストールしてください。';
+	@override String get button => 'インストール';
+	@override String get installing => 'インストール中…';
+	@override String get copyCommand => 'コマンドをコピー';
+	@override String get docs => 'ドキュメント';
+	@override String success({required Object agent}) => '${agent} CLI をインストールしました';
+	@override String get failed => 'インストールに失敗しました — ターミナルの出力を確認してください';
+}
+
 // Path: settings.agents.account
 class Translations$settings$agents$account$ja extends Translations$settings$agents$account$en {
 	Translations$settings$agents$account$ja._(TranslationsJa root) : this._root = root, super.internal(root);
@@ -6976,6 +6994,14 @@ extension on TranslationsJa {
 			'settings.agents.authStatus.loggedInAs' => ({required Object email}) => '${email}でログイン中',
 			'settings.agents.authStatus.providerAccount' => ({required Object provider}) => '${provider} アカウント',
 			'settings.agents.authStatus.authenticatedUser' => '認証済みユーザー',
+			'settings.agents.install.title' => ({required Object agent}) => '${agent} CLI がインストールされていません',
+			'settings.agents.install.description' => ({required Object agent}) => 'ログインしてセッションを実行するには ${agent} CLI をインストールしてください。',
+			'settings.agents.install.button' => 'インストール',
+			'settings.agents.install.installing' => 'インストール中…',
+			'settings.agents.install.copyCommand' => 'コマンドをコピー',
+			'settings.agents.install.docs' => 'ドキュメント',
+			'settings.agents.install.success' => ({required Object agent}) => '${agent} CLI をインストールしました',
+			'settings.agents.install.failed' => 'インストールに失敗しました — ターミナルの出力を確認してください',
 			'settings.agents.account.claude.description' => 'Anthropic Claude AIアシスタント',
 			'settings.agents.account.cursor.description' => 'Cursor AI搭載コードエディタ',
 			'settings.agents.account.codex.description' => 'OpenAI Codex AIアシスタント',
@@ -7128,14 +7154,14 @@ extension on TranslationsJa {
 			'settings.browser.installing' => 'インストール中...',
 			'settings.browser.missing' => '未インストール',
 			'settings.browser.runtimeRequired' => 'ブラウザランタイムが必要です',
+			_ => null,
+		} ?? switch (path) {
 			'settings.browser.statusDisabled' => '無効',
 			'settings.browser.statusLabel' => 'ステータス',
 			'settings.browser.statusReady' => '準備完了',
 			'settings.browser.statusSetupRequired' => 'セットアップが必要',
 			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => 'キャンセル',
-			_ => null,
-		} ?? switch (path) {
 			'settings.workspaces.create' => 'ワークスペースを追加',
 			'settings.workspaces.deleteConfirm' => 'このワークスペースを ddagent から削除しますか？ファイルはディスクに残ります。',
 			'settings.workspaces.deleteFailed' => 'ワークスペースの削除に失敗しました。',

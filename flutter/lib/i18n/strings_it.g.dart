@@ -1853,6 +1853,7 @@ class Translations$settings$agents$it extends Translations$settings$agents$en {
 
 	// Translations
 	@override late final Translations$settings$agents$authStatus$it authStatus = Translations$settings$agents$authStatus$it._(_root);
+	@override late final Translations$settings$agents$install$it install = Translations$settings$agents$install$it._(_root);
 	@override late final Translations$settings$agents$account$it account = Translations$settings$agents$account$it._(_root);
 	@override String get connectionStatus => 'Stato connessione';
 	@override late final Translations$settings$agents$login$it login = Translations$settings$agents$login$it._(_root);
@@ -4553,6 +4554,23 @@ class Translations$settings$agents$authStatus$it extends Translations$settings$a
 	@override String get authenticatedUser => 'utente autenticato';
 }
 
+// Path: settings.agents.install
+class Translations$settings$agents$install$it extends Translations$settings$agents$install$en {
+	Translations$settings$agents$install$it._(TranslationsIt root) : this._root = root, super.internal(root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String title({required Object agent}) => 'La CLI ${agent} non è installata';
+	@override String description({required Object agent}) => 'Installa la CLI ${agent} per accedere ed eseguire sessioni.';
+	@override String get button => 'Installa';
+	@override String get installing => 'Installazione…';
+	@override String get copyCommand => 'Copia comando';
+	@override String get docs => 'Documentazione';
+	@override String success({required Object agent}) => 'CLI ${agent} installata';
+	@override String get failed => 'Installazione non riuscita — controlla l\'output del terminale';
+}
+
 // Path: settings.agents.account
 class Translations$settings$agents$account$it extends Translations$settings$agents$account$en {
 	Translations$settings$agents$account$it._(TranslationsIt root) : this._root = root, super.internal(root);
@@ -6976,6 +6994,14 @@ extension on TranslationsIt {
 			'settings.agents.authStatus.loggedInAs' => ({required Object email}) => 'Connesso come ${email}',
 			'settings.agents.authStatus.providerAccount' => ({required Object provider}) => 'Account ${provider}',
 			'settings.agents.authStatus.authenticatedUser' => 'utente autenticato',
+			'settings.agents.install.title' => ({required Object agent}) => 'La CLI ${agent} non è installata',
+			'settings.agents.install.description' => ({required Object agent}) => 'Installa la CLI ${agent} per accedere ed eseguire sessioni.',
+			'settings.agents.install.button' => 'Installa',
+			'settings.agents.install.installing' => 'Installazione…',
+			'settings.agents.install.copyCommand' => 'Copia comando',
+			'settings.agents.install.docs' => 'Documentazione',
+			'settings.agents.install.success' => ({required Object agent}) => 'CLI ${agent} installata',
+			'settings.agents.install.failed' => 'Installazione non riuscita — controlla l\'output del terminale',
 			'settings.agents.account.claude.description' => 'Assistente AI Anthropic Claude',
 			'settings.agents.account.cursor.description' => 'Editor di codice potenziato da AI Cursor',
 			'settings.agents.account.codex.description' => 'Assistente AI OpenAI Codex',
@@ -7128,14 +7154,14 @@ extension on TranslationsIt {
 			'settings.browser.installing' => 'Installazione...',
 			'settings.browser.missing' => 'mancante',
 			'settings.browser.runtimeRequired' => 'Runtime del browser richiesto',
+			_ => null,
+		} ?? switch (path) {
 			'settings.browser.statusDisabled' => 'disabilitato',
 			'settings.browser.statusLabel' => 'Stato',
 			'settings.browser.statusReady' => 'pronto',
 			'settings.browser.statusSetupRequired' => 'configurazione richiesta',
 			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => 'Annulla',
-			_ => null,
-		} ?? switch (path) {
 			'settings.workspaces.create' => 'Aggiungi workspace',
 			'settings.workspaces.deleteConfirm' => 'Rimuovere questo workspace da ddagent? I suoi file restano sul disco.',
 			'settings.workspaces.deleteFailed' => 'Impossibile rimuovere il workspace.',

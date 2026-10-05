@@ -1920,6 +1920,7 @@ class Translations$settings$agents$pl extends Translations$settings$agents$en {
 
 	// Translations
 	@override late final Translations$settings$agents$authStatus$pl authStatus = Translations$settings$agents$authStatus$pl._(_root);
+	@override late final Translations$settings$agents$install$pl install = Translations$settings$agents$install$pl._(_root);
 	@override late final Translations$settings$agents$account$pl account = Translations$settings$agents$account$pl._(_root);
 	@override String get connectionStatus => 'Stan połączenia';
 	@override late final Translations$settings$agents$login$pl login = Translations$settings$agents$login$pl._(_root);
@@ -4864,6 +4865,23 @@ class Translations$settings$agents$authStatus$pl extends Translations$settings$a
 	@override String get authenticatedUser => 'uwierzytelniony użytkownik';
 }
 
+// Path: settings.agents.install
+class Translations$settings$agents$install$pl extends Translations$settings$agents$install$en {
+	Translations$settings$agents$install$pl._(TranslationsPl root) : this._root = root, super.internal(root);
+
+	final TranslationsPl _root; // ignore: unused_field
+
+	// Translations
+	@override String title({required Object agent}) => 'CLI ${agent} nie jest zainstalowane';
+	@override String description({required Object agent}) => 'Zainstaluj CLI ${agent}, aby się zalogować i uruchamiać sesje.';
+	@override String get button => 'Zainstaluj';
+	@override String get installing => 'Instalowanie…';
+	@override String get copyCommand => 'Kopiuj polecenie';
+	@override String get docs => 'Dokumentacja';
+	@override String success({required Object agent}) => 'CLI ${agent} zainstalowane';
+	@override String get failed => 'Instalacja nie powiodła się — sprawdź dane wyjściowe terminala';
+}
+
 // Path: settings.agents.account
 class Translations$settings$agents$account$pl extends Translations$settings$agents$account$en {
 	Translations$settings$agents$account$pl._(TranslationsPl root) : this._root = root, super.internal(root);
@@ -7500,6 +7518,14 @@ extension on TranslationsPl {
 			'settings.agents.authStatus.loggedInAs' => ({required Object email}) => 'Zalogowano jako ${email}',
 			'settings.agents.authStatus.providerAccount' => ({required Object provider}) => 'Konto ${provider}',
 			'settings.agents.authStatus.authenticatedUser' => 'uwierzytelniony użytkownik',
+			'settings.agents.install.title' => ({required Object agent}) => 'CLI ${agent} nie jest zainstalowane',
+			'settings.agents.install.description' => ({required Object agent}) => 'Zainstaluj CLI ${agent}, aby się zalogować i uruchamiać sesje.',
+			'settings.agents.install.button' => 'Zainstaluj',
+			'settings.agents.install.installing' => 'Instalowanie…',
+			'settings.agents.install.copyCommand' => 'Kopiuj polecenie',
+			'settings.agents.install.docs' => 'Dokumentacja',
+			'settings.agents.install.success' => ({required Object agent}) => 'CLI ${agent} zainstalowane',
+			'settings.agents.install.failed' => 'Instalacja nie powiodła się — sprawdź dane wyjściowe terminala',
 			'settings.agents.account.claude.description' => 'Asystent AI Anthropic Claude',
 			'settings.agents.account.cursor.description' => 'Edytor kodu Cursor napędzany AI',
 			'settings.agents.account.codex.description' => 'Asystent AI OpenAI Codex',
@@ -7547,14 +7573,14 @@ extension on TranslationsPl {
 			'settings.permissions.blockedCommands.title' => 'Zablokowane polecenia powłoki',
 			'settings.permissions.blockedCommands.description' => 'Polecenia powłoki automatycznie blokowane',
 			'settings.permissions.blockedCommands.placeholder' => 'np. "Shell(rm -rf)" lub "Shell(sudo)"',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.blockedCommands.empty' => 'Brak skonfigurowanych zablokowanych poleceń',
 			'settings.permissions.toolExamples.title' => 'Przykłady wzorców narzędzi:',
 			'settings.permissions.toolExamples.bashGitLog' => '- Zezwól na wszystkie polecenia git log',
 			'settings.permissions.toolExamples.bashGitDiff' => '- Zezwól na wszystkie polecenia git diff',
 			'settings.permissions.toolExamples.write' => '- Zezwól na każde użycie narzędzia Write',
 			'settings.permissions.toolExamples.bashRm' => '- Blokuj wszystkie polecenia rm (niebezpieczne)',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.shellExamples.title' => 'Przykłady poleceń powłoki:',
 			'settings.permissions.shellExamples.ls' => '- Zezwól na polecenie ls',
 			'settings.permissions.shellExamples.gitStatus' => '- Zezwól na git status',
@@ -8061,14 +8087,14 @@ extension on TranslationsPl {
 			'tasks.board.card.delete' => 'Usuń',
 			'tasks.board.card.openSession' => 'Otwórz sesję',
 			'tasks.board.card.pullRequest' => 'Pull request',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.board.card.edit' => 'Edytuj',
 			'tasks.board.card.moveTo' => 'Przenieś do',
 			'tasks.board.dialog.createTitle' => 'Nowa karta',
 			'tasks.board.dialog.editTitle' => 'Edytuj kartę',
 			'tasks.board.dialog.titleLabel' => 'Tytuł',
 			'tasks.board.dialog.titlePlaceholder' => 'Co ma zrobić agent?',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.board.dialog.descriptionLabel' => 'Opis',
 			'tasks.board.dialog.descriptionPlaceholder' => 'Dodaj kontekst, kryteria akceptacji, linki...',
 			'tasks.board.dialog.cancel' => 'Anuluj',

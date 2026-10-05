@@ -1853,6 +1853,7 @@ class Translations$settings$agents$ko extends Translations$settings$agents$en {
 
 	// Translations
 	@override late final Translations$settings$agents$authStatus$ko authStatus = Translations$settings$agents$authStatus$ko._(_root);
+	@override late final Translations$settings$agents$install$ko install = Translations$settings$agents$install$ko._(_root);
 	@override late final Translations$settings$agents$account$ko account = Translations$settings$agents$account$ko._(_root);
 	@override String get connectionStatus => '연결 상태';
 	@override late final Translations$settings$agents$login$ko login = Translations$settings$agents$login$ko._(_root);
@@ -4553,6 +4554,23 @@ class Translations$settings$agents$authStatus$ko extends Translations$settings$a
 	@override String get authenticatedUser => '인증된 사용자';
 }
 
+// Path: settings.agents.install
+class Translations$settings$agents$install$ko extends Translations$settings$agents$install$en {
+	Translations$settings$agents$install$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String title({required Object agent}) => '${agent} CLI가 설치되어 있지 않습니다';
+	@override String description({required Object agent}) => '로그인하고 세션을 실행하려면 ${agent} CLI를 설치하세요.';
+	@override String get button => '설치';
+	@override String get installing => '설치 중…';
+	@override String get copyCommand => '명령 복사';
+	@override String get docs => '문서';
+	@override String success({required Object agent}) => '${agent} CLI 설치됨';
+	@override String get failed => '설치 실패 — 터미널 출력을 확인하세요';
+}
+
 // Path: settings.agents.account
 class Translations$settings$agents$account$ko extends Translations$settings$agents$account$en {
 	Translations$settings$agents$account$ko._(TranslationsKo root) : this._root = root, super.internal(root);
@@ -6976,6 +6994,14 @@ extension on TranslationsKo {
 			'settings.agents.authStatus.loggedInAs' => ({required Object email}) => '${email}(으)로 로그인됨',
 			'settings.agents.authStatus.providerAccount' => ({required Object provider}) => '${provider} 계정',
 			'settings.agents.authStatus.authenticatedUser' => '인증된 사용자',
+			'settings.agents.install.title' => ({required Object agent}) => '${agent} CLI가 설치되어 있지 않습니다',
+			'settings.agents.install.description' => ({required Object agent}) => '로그인하고 세션을 실행하려면 ${agent} CLI를 설치하세요.',
+			'settings.agents.install.button' => '설치',
+			'settings.agents.install.installing' => '설치 중…',
+			'settings.agents.install.copyCommand' => '명령 복사',
+			'settings.agents.install.docs' => '문서',
+			'settings.agents.install.success' => ({required Object agent}) => '${agent} CLI 설치됨',
+			'settings.agents.install.failed' => '설치 실패 — 터미널 출력을 확인하세요',
 			'settings.agents.account.claude.description' => 'Anthropic Claude AI 어시스턴트',
 			'settings.agents.account.cursor.description' => 'Cursor AI 기반 코드 에디터',
 			'settings.agents.account.codex.description' => 'OpenAI Codex AI 어시스턴트',
@@ -7128,14 +7154,14 @@ extension on TranslationsKo {
 			'settings.browser.installing' => '설치 중...',
 			'settings.browser.missing' => '없음',
 			'settings.browser.runtimeRequired' => '브라우저 런타임 필요',
+			_ => null,
+		} ?? switch (path) {
 			'settings.browser.statusDisabled' => '비활성화됨',
 			'settings.browser.statusLabel' => '상태',
 			'settings.browser.statusReady' => '준비됨',
 			'settings.browser.statusSetupRequired' => '설정 필요',
 			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => '취소',
-			_ => null,
-		} ?? switch (path) {
 			'settings.workspaces.create' => '작업 영역 추가',
 			'settings.workspaces.deleteConfirm' => '이 작업 영역을 ddagent에서 제거하시겠습니까? 파일은 디스크에 남습니다.',
 			'settings.workspaces.deleteFailed' => '작업 영역 제거에 실패했습니다.',

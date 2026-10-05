@@ -1853,6 +1853,7 @@ class Translations$settings$agents$tr extends Translations$settings$agents$en {
 
 	// Translations
 	@override late final Translations$settings$agents$authStatus$tr authStatus = Translations$settings$agents$authStatus$tr._(_root);
+	@override late final Translations$settings$agents$install$tr install = Translations$settings$agents$install$tr._(_root);
 	@override late final Translations$settings$agents$account$tr account = Translations$settings$agents$account$tr._(_root);
 	@override String get connectionStatus => 'Bağlantı Durumu';
 	@override late final Translations$settings$agents$login$tr login = Translations$settings$agents$login$tr._(_root);
@@ -4553,6 +4554,23 @@ class Translations$settings$agents$authStatus$tr extends Translations$settings$a
 	@override String get authenticatedUser => 'kimliği doğrulanmış kullanıcı';
 }
 
+// Path: settings.agents.install
+class Translations$settings$agents$install$tr extends Translations$settings$agents$install$en {
+	Translations$settings$agents$install$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String title({required Object agent}) => '${agent} CLI kurulu değil';
+	@override String description({required Object agent}) => 'Oturum açmak ve oturumları çalıştırmak için ${agent} CLI\'yı kurun.';
+	@override String get button => 'Kur';
+	@override String get installing => 'Kuruluyor…';
+	@override String get copyCommand => 'Komutu kopyala';
+	@override String get docs => 'Belgeler';
+	@override String success({required Object agent}) => '${agent} CLI kuruldu';
+	@override String get failed => 'Kurulum başarısız — terminal çıktısını kontrol edin';
+}
+
 // Path: settings.agents.account
 class Translations$settings$agents$account$tr extends Translations$settings$agents$account$en {
 	Translations$settings$agents$account$tr._(TranslationsTr root) : this._root = root, super.internal(root);
@@ -6976,6 +6994,14 @@ extension on TranslationsTr {
 			'settings.agents.authStatus.loggedInAs' => ({required Object email}) => '${email} olarak giriş yapıldı',
 			'settings.agents.authStatus.providerAccount' => ({required Object provider}) => '${provider} hesabı',
 			'settings.agents.authStatus.authenticatedUser' => 'kimliği doğrulanmış kullanıcı',
+			'settings.agents.install.title' => ({required Object agent}) => '${agent} CLI kurulu değil',
+			'settings.agents.install.description' => ({required Object agent}) => 'Oturum açmak ve oturumları çalıştırmak için ${agent} CLI\'yı kurun.',
+			'settings.agents.install.button' => 'Kur',
+			'settings.agents.install.installing' => 'Kuruluyor…',
+			'settings.agents.install.copyCommand' => 'Komutu kopyala',
+			'settings.agents.install.docs' => 'Belgeler',
+			'settings.agents.install.success' => ({required Object agent}) => '${agent} CLI kuruldu',
+			'settings.agents.install.failed' => 'Kurulum başarısız — terminal çıktısını kontrol edin',
 			'settings.agents.account.claude.description' => 'Anthropic Claude AI asistanı',
 			'settings.agents.account.cursor.description' => 'Cursor AI destekli kod editörü',
 			'settings.agents.account.codex.description' => 'OpenAI Codex AI asistanı',
@@ -7128,14 +7154,14 @@ extension on TranslationsTr {
 			'settings.browser.installing' => 'Kuruluyor...',
 			'settings.browser.missing' => 'eksik',
 			'settings.browser.runtimeRequired' => 'Tarayıcı runtime’ı gerekli',
+			_ => null,
+		} ?? switch (path) {
 			'settings.browser.statusDisabled' => 'devre dışı',
 			'settings.browser.statusLabel' => 'Durum',
 			'settings.browser.statusReady' => 'hazır',
 			'settings.browser.statusSetupRequired' => 'kurulum gerekli',
 			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => 'İptal',
-			_ => null,
-		} ?? switch (path) {
 			'settings.workspaces.create' => 'Çalışma alanı ekle',
 			'settings.workspaces.deleteConfirm' => 'Bu çalışma alanı ddagent’tan kaldırılsın mı? Dosyaları diskte kalır.',
 			'settings.workspaces.deleteFailed' => 'Çalışma alanı kaldırılamadı.',

@@ -1853,6 +1853,7 @@ class Translations$settings$agents$de extends Translations$settings$agents$en {
 
 	// Translations
 	@override late final Translations$settings$agents$authStatus$de authStatus = Translations$settings$agents$authStatus$de._(_root);
+	@override late final Translations$settings$agents$install$de install = Translations$settings$agents$install$de._(_root);
 	@override late final Translations$settings$agents$account$de account = Translations$settings$agents$account$de._(_root);
 	@override String get connectionStatus => 'Verbindungsstatus';
 	@override late final Translations$settings$agents$login$de login = Translations$settings$agents$login$de._(_root);
@@ -4553,6 +4554,23 @@ class Translations$settings$agents$authStatus$de extends Translations$settings$a
 	@override String get authenticatedUser => 'authentifizierte:r Benutzer:in';
 }
 
+// Path: settings.agents.install
+class Translations$settings$agents$install$de extends Translations$settings$agents$install$en {
+	Translations$settings$agents$install$de._(TranslationsDe root) : this._root = root, super.internal(root);
+
+	final TranslationsDe _root; // ignore: unused_field
+
+	// Translations
+	@override String title({required Object agent}) => '${agent}-CLI ist nicht installiert';
+	@override String description({required Object agent}) => 'Installiere die ${agent}-CLI, um dich anzumelden und Sitzungen auszuführen.';
+	@override String get button => 'Installieren';
+	@override String get installing => 'Wird installiert…';
+	@override String get copyCommand => 'Befehl kopieren';
+	@override String get docs => 'Dokumentation';
+	@override String success({required Object agent}) => '${agent}-CLI installiert';
+	@override String get failed => 'Installation fehlgeschlagen — prüfe die Terminal-Ausgabe';
+}
+
 // Path: settings.agents.account
 class Translations$settings$agents$account$de extends Translations$settings$agents$account$en {
 	Translations$settings$agents$account$de._(TranslationsDe root) : this._root = root, super.internal(root);
@@ -6976,6 +6994,14 @@ extension on TranslationsDe {
 			'settings.agents.authStatus.loggedInAs' => ({required Object email}) => 'Angemeldet als ${email}',
 			'settings.agents.authStatus.providerAccount' => ({required Object provider}) => '${provider}-Konto',
 			'settings.agents.authStatus.authenticatedUser' => 'authentifizierte:r Benutzer:in',
+			'settings.agents.install.title' => ({required Object agent}) => '${agent}-CLI ist nicht installiert',
+			'settings.agents.install.description' => ({required Object agent}) => 'Installiere die ${agent}-CLI, um dich anzumelden und Sitzungen auszuführen.',
+			'settings.agents.install.button' => 'Installieren',
+			'settings.agents.install.installing' => 'Wird installiert…',
+			'settings.agents.install.copyCommand' => 'Befehl kopieren',
+			'settings.agents.install.docs' => 'Dokumentation',
+			'settings.agents.install.success' => ({required Object agent}) => '${agent}-CLI installiert',
+			'settings.agents.install.failed' => 'Installation fehlgeschlagen — prüfe die Terminal-Ausgabe',
 			'settings.agents.account.claude.description' => 'Anthropic Claude KI-Assistent',
 			'settings.agents.account.cursor.description' => 'Cursor KI-gestützter Code-Editor',
 			'settings.agents.account.codex.description' => 'OpenAI Codex KI-Assistent',
@@ -7128,14 +7154,14 @@ extension on TranslationsDe {
 			'settings.browser.installing' => 'Installiere...',
 			'settings.browser.missing' => 'fehlt',
 			'settings.browser.runtimeRequired' => 'Browser-Runtime erforderlich',
+			_ => null,
+		} ?? switch (path) {
 			'settings.browser.statusDisabled' => 'deaktiviert',
 			'settings.browser.statusLabel' => 'Status',
 			'settings.browser.statusReady' => 'bereit',
 			'settings.browser.statusSetupRequired' => 'Einrichtung erforderlich',
 			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => 'Abbrechen',
-			_ => null,
-		} ?? switch (path) {
 			'settings.workspaces.create' => 'Workspace hinzufügen',
 			'settings.workspaces.deleteConfirm' => 'Diesen Workspace aus ddagent entfernen? Seine Dateien bleiben auf der Festplatte.',
 			'settings.workspaces.deleteFailed' => 'Workspace konnte nicht entfernt werden.',

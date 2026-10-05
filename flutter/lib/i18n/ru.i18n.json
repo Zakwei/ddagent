@@ -1841,6 +1841,16 @@
         "providerAccount": "Аккаунт {{provider}}",
         "authenticatedUser": "аутентифицированный пользователь"
       },
+      "install": {
+        "title": "CLI {{agent}} не установлен",
+        "description": "Установите CLI {{agent}}, чтобы войти и запускать сессии.",
+        "button": "Установить",
+        "installing": "Установка…",
+        "copyCommand": "Копировать команду",
+        "docs": "Документация",
+        "success": "CLI {{agent}} установлен",
+        "failed": "Установка не удалась — проверьте вывод терминала"
+      },
       "account": {
         "claude": {
           "description": "AI-ассистент Anthropic Claude"

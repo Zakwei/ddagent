@@ -11,12 +11,17 @@ class ProviderLoginDialog extends ConsumerStatefulWidget {
     this.provider = 'claude',
     required this.projectPath,
     this.customCommand,
+    this.title,
     this.onComplete,
   });
 
   final String provider;
   final String projectPath;
   final String? customCommand;
+
+  /// Header/tab title override — the install flow reuses this dialog to run a
+  /// provider's install command, so "… Login" would be wrong there.
+  final String? title;
   final void Function(int exitCode)? onComplete;
 
   /// The provider's login shell command — exposed so per-account logins can
@@ -28,6 +33,7 @@ class ProviderLoginDialog extends ConsumerStatefulWidget {
     String provider = 'claude',
     required String projectPath,
     String? customCommand,
+    String? title,
     void Function(int exitCode)? onComplete,
   }) {
     return showDialog(
@@ -37,6 +43,7 @@ class ProviderLoginDialog extends ConsumerStatefulWidget {
         provider: provider,
         projectPath: projectPath,
         customCommand: customCommand,
+        title: title,
         onComplete: onComplete,
       ),
     );
@@ -77,6 +84,8 @@ class _ProviderLoginDialogState extends ConsumerState<ProviderLoginDialog> {
   }
 
   String _getTitle(String provider) {
+    final override = widget.title;
+    if (override != null && override.isNotEmpty) return override;
     return switch (provider) {
       'claude' => 'Claude CLI Login',
       'cursor' => 'Cursor CLI Login',

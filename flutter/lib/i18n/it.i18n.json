@@ -1841,6 +1841,16 @@
         "providerAccount": "Account {{provider}}",
         "authenticatedUser": "utente autenticato"
       },
+      "install": {
+        "title": "La CLI {{agent}} non è installata",
+        "description": "Installa la CLI {{agent}} per accedere ed eseguire sessioni.",
+        "button": "Installa",
+        "installing": "Installazione…",
+        "copyCommand": "Copia comando",
+        "docs": "Documentazione",
+        "success": "CLI {{agent}} installata",
+        "failed": "Installazione non riuscita — controlla l'output del terminale"
+      },
       "account": {
         "claude": {
           "description": "Assistente AI Anthropic Claude"

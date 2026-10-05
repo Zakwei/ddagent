@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:ddagent_app/core/network/api_providers.dart';
 import 'package:ddagent_app/core/theme/app_theme.dart';
+import 'package:ddagent_app/features/settings/data/agent_install.dart';
 import 'package:ddagent_app/features/settings/state/provider_auth_controller.dart';
 import 'package:ddagent_app/features/settings/view/sections/agents_section.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
@@ -251,4 +252,37 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   }
+
+  testWidgets('missing CLI shows the install card instead of login', (tester) async {
+    tester.view.physicalSize = const Size(1600, 1200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    LocaleSettings.setLocaleSync(AppLocale.pl);
+    addTearDown(() => LocaleSettings.setLocaleSync(AppLocale.en));
+
+    final backend = _Backend();
+    backend.auth = (_) async => {'installed': false, 'authenticated': false};
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [dioProvider.overrideWithValue(backend.dio)],
+        child: TranslationProvider(
+          child: MaterialApp(
+            theme: AppTheme.light(),
+            home: const Scaffold(body: AgentsSection()),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final installT = t.settings.agents.install;
+    expect(find.text(installT.title(agent: 'Claude')), findsOneWidget);
+    expect(find.text(providerInstallCommand('claude')), findsOneWidget);
+    expect(find.text(installT.button), findsOneWidget);
+    expect(find.text(installT.docs), findsOneWidget);
+    expect(find.text(t.settings.agents.accounts.title), findsNothing);
+    expect(find.text(t.settings.agents.login.button), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
 }

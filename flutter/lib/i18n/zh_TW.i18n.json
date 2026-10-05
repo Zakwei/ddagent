@@ -1841,6 +1841,16 @@
         "providerAccount": "{{provider}} 帳戶",
         "authenticatedUser": "已驗證使用者"
       },
+      "install": {
+        "title": "未安裝 {{agent}} CLI",
+        "description": "安裝 {{agent}} CLI 以登入並執行工作階段。",
+        "button": "安裝",
+        "installing": "安裝中…",
+        "copyCommand": "複製指令",
+        "docs": "文件",
+        "success": "{{agent}} CLI 已安裝",
+        "failed": "安裝失敗 — 請檢查終端機輸出"
+      },
       "account": {
         "claude": {
           "description": "Anthropic Claude AI 助手"

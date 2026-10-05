@@ -1841,6 +1841,16 @@
         "providerAccount": "{{provider}} hesabı",
         "authenticatedUser": "kimliği doğrulanmış kullanıcı"
       },
+      "install": {
+        "title": "{{agent}} CLI kurulu değil",
+        "description": "Oturum açmak ve oturumları çalıştırmak için {{agent}} CLI'yı kurun.",
+        "button": "Kur",
+        "installing": "Kuruluyor…",
+        "copyCommand": "Komutu kopyala",
+        "docs": "Belgeler",
+        "success": "{{agent}} CLI kuruldu",
+        "failed": "Kurulum başarısız — terminal çıktısını kontrol edin"
+      },
       "account": {
         "claude": {
           "description": "Anthropic Claude AI asistanı"

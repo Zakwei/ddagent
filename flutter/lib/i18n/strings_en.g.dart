@@ -3447,6 +3447,7 @@ class Translations$settings$agents$en {
 
 	// Translations
 	late final Translations$settings$agents$authStatus$en authStatus = Translations$settings$agents$authStatus$en.internal(_root);
+	late final Translations$settings$agents$install$en install = Translations$settings$agents$install$en.internal(_root);
 	late final Translations$settings$agents$account$en account = Translations$settings$agents$account$en.internal(_root);
 
 	/// en: 'Connection Status'
@@ -8937,6 +8938,39 @@ class Translations$settings$agents$authStatus$en {
 	String get authenticatedUser => 'authenticated user';
 }
 
+// Path: settings.agents.install
+class Translations$settings$agents$install$en {
+	Translations$settings$agents$install$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: '{{agent}} CLI is not installed'
+	String title({required Object agent}) => '${agent} CLI is not installed';
+
+	/// en: 'Install the {{agent}} CLI to sign in and run sessions.'
+	String description({required Object agent}) => 'Install the ${agent} CLI to sign in and run sessions.';
+
+	/// en: 'Install'
+	String get button => 'Install';
+
+	/// en: 'Installing…'
+	String get installing => 'Installing…';
+
+	/// en: 'Copy command'
+	String get copyCommand => 'Copy command';
+
+	/// en: 'Documentation'
+	String get docs => 'Documentation';
+
+	/// en: '{{agent}} CLI installed'
+	String success({required Object agent}) => '${agent} CLI installed';
+
+	/// en: 'Installation failed — check the terminal output'
+	String get failed => 'Installation failed — check the terminal output';
+}
+
 // Path: settings.agents.account
 class Translations$settings$agents$account$en {
 	Translations$settings$agents$account$en.internal(this._root);
@@ -12321,12 +12355,20 @@ extension on Translations {
 			'settings.agents.authStatus.connected' => 'Connected',
 			'settings.agents.authStatus.notConnected' => 'Not connected',
 			'settings.agents.authStatus.disconnected' => 'Disconnected',
-			_ => null,
-		} ?? switch (path) {
 			'settings.agents.authStatus.checkingAuth' => 'Checking authentication status...',
 			'settings.agents.authStatus.loggedInAs' => ({required Object email}) => 'Logged in as ${email}',
+			_ => null,
+		} ?? switch (path) {
 			'settings.agents.authStatus.providerAccount' => ({required Object provider}) => '${provider} account',
 			'settings.agents.authStatus.authenticatedUser' => 'authenticated user',
+			'settings.agents.install.title' => ({required Object agent}) => '${agent} CLI is not installed',
+			'settings.agents.install.description' => ({required Object agent}) => 'Install the ${agent} CLI to sign in and run sessions.',
+			'settings.agents.install.button' => 'Install',
+			'settings.agents.install.installing' => 'Installing…',
+			'settings.agents.install.copyCommand' => 'Copy command',
+			'settings.agents.install.docs' => 'Documentation',
+			'settings.agents.install.success' => ({required Object agent}) => '${agent} CLI installed',
+			'settings.agents.install.failed' => 'Installation failed — check the terminal output',
 			'settings.agents.account.claude.description' => 'Anthropic Claude AI assistant',
 			'settings.agents.account.cursor.description' => 'Cursor AI-powered code editor',
 			'settings.agents.account.codex.description' => 'OpenAI Codex AI assistant',
@@ -12829,14 +12871,14 @@ extension on Translations {
 			'tasks.sort.priority' => 'Priority',
 			'tasks.sort.idAsc' => 'ID (Ascending)',
 			'tasks.sort.idDesc' => 'ID (Descending)',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.sort.titleAsc' => 'Title (A-Z)',
 			'tasks.sort.titleDesc' => 'Title (Z-A)',
 			'tasks.sort.statusAsc' => 'Status (Pending First)',
 			'tasks.sort.statusDesc' => 'Status (Done First)',
 			'tasks.sort.priorityAsc' => 'Priority (High First)',
 			'tasks.sort.priorityDesc' => 'Priority (Low First)',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.views.kanban' => 'Kanban view',
 			'tasks.views.list' => 'List view',
 			'tasks.views.grid' => 'Grid view',

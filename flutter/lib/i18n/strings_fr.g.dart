@@ -1853,6 +1853,7 @@ class Translations$settings$agents$fr extends Translations$settings$agents$en {
 
 	// Translations
 	@override late final Translations$settings$agents$authStatus$fr authStatus = Translations$settings$agents$authStatus$fr._(_root);
+	@override late final Translations$settings$agents$install$fr install = Translations$settings$agents$install$fr._(_root);
 	@override late final Translations$settings$agents$account$fr account = Translations$settings$agents$account$fr._(_root);
 	@override String get connectionStatus => 'Statut de la connexion';
 	@override late final Translations$settings$agents$login$fr login = Translations$settings$agents$login$fr._(_root);
@@ -4553,6 +4554,23 @@ class Translations$settings$agents$authStatus$fr extends Translations$settings$a
 	@override String get authenticatedUser => 'utilisateur authentifié';
 }
 
+// Path: settings.agents.install
+class Translations$settings$agents$install$fr extends Translations$settings$agents$install$en {
+	Translations$settings$agents$install$fr._(TranslationsFr root) : this._root = root, super.internal(root);
+
+	final TranslationsFr _root; // ignore: unused_field
+
+	// Translations
+	@override String title({required Object agent}) => 'La CLI ${agent} n\'est pas installée';
+	@override String description({required Object agent}) => 'Installez la CLI ${agent} pour vous connecter et lancer des sessions.';
+	@override String get button => 'Installer';
+	@override String get installing => 'Installation…';
+	@override String get copyCommand => 'Copier la commande';
+	@override String get docs => 'Documentation';
+	@override String success({required Object agent}) => 'CLI ${agent} installée';
+	@override String get failed => 'Échec de l\'installation — vérifiez la sortie du terminal';
+}
+
 // Path: settings.agents.account
 class Translations$settings$agents$account$fr extends Translations$settings$agents$account$en {
 	Translations$settings$agents$account$fr._(TranslationsFr root) : this._root = root, super.internal(root);
@@ -6976,6 +6994,14 @@ extension on TranslationsFr {
 			'settings.agents.authStatus.loggedInAs' => ({required Object email}) => 'Connecté en tant que ${email}',
 			'settings.agents.authStatus.providerAccount' => ({required Object provider}) => 'Compte ${provider}',
 			'settings.agents.authStatus.authenticatedUser' => 'utilisateur authentifié',
+			'settings.agents.install.title' => ({required Object agent}) => 'La CLI ${agent} n\'est pas installée',
+			'settings.agents.install.description' => ({required Object agent}) => 'Installez la CLI ${agent} pour vous connecter et lancer des sessions.',
+			'settings.agents.install.button' => 'Installer',
+			'settings.agents.install.installing' => 'Installation…',
+			'settings.agents.install.copyCommand' => 'Copier la commande',
+			'settings.agents.install.docs' => 'Documentation',
+			'settings.agents.install.success' => ({required Object agent}) => 'CLI ${agent} installée',
+			'settings.agents.install.failed' => 'Échec de l\'installation — vérifiez la sortie du terminal',
 			'settings.agents.account.claude.description' => 'Assistant IA Claude d\'Anthropic',
 			'settings.agents.account.cursor.description' => 'Éditeur de code IA Cursor',
 			'settings.agents.account.codex.description' => 'Assistant IA Codex d\'OpenAI',
@@ -7128,14 +7154,14 @@ extension on TranslationsFr {
 			'settings.browser.installing' => 'Installation...',
 			'settings.browser.missing' => 'manquant',
 			'settings.browser.runtimeRequired' => 'Runtime du navigateur requis',
+			_ => null,
+		} ?? switch (path) {
 			'settings.browser.statusDisabled' => 'désactivé',
 			'settings.browser.statusLabel' => 'Statut',
 			'settings.browser.statusReady' => 'prêt',
 			'settings.browser.statusSetupRequired' => 'configuration requise',
 			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => 'Annuler',
-			_ => null,
-		} ?? switch (path) {
 			'settings.workspaces.create' => 'Ajouter un espace de travail',
 			'settings.workspaces.deleteConfirm' => 'Retirer cet espace de travail de ddagent ? Ses fichiers restent sur le disque.',
 			'settings.workspaces.deleteFailed' => 'Échec de la suppression de l’espace de travail.',

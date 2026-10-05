@@ -1841,6 +1841,16 @@
         "providerAccount": "Compte {{provider}}",
         "authenticatedUser": "utilisateur authentifié"
       },
+      "install": {
+        "title": "La CLI {{agent}} n'est pas installée",
+        "description": "Installez la CLI {{agent}} pour vous connecter et lancer des sessions.",
+        "button": "Installer",
+        "installing": "Installation…",
+        "copyCommand": "Copier la commande",
+        "docs": "Documentation",
+        "success": "CLI {{agent}} installée",
+        "failed": "Échec de l'installation — vérifiez la sortie du terminal"
+      },
       "account": {
         "claude": {
           "description": "Assistant IA Claude d'Anthropic"

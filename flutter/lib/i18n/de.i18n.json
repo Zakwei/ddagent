@@ -1841,6 +1841,16 @@
         "providerAccount": "{{provider}}-Konto",
         "authenticatedUser": "authentifizierte:r Benutzer:in"
       },
+      "install": {
+        "title": "{{agent}}-CLI ist nicht installiert",
+        "description": "Installiere die {{agent}}-CLI, um dich anzumelden und Sitzungen auszuführen.",
+        "button": "Installieren",
+        "installing": "Wird installiert…",
+        "copyCommand": "Befehl kopieren",
+        "docs": "Dokumentation",
+        "success": "{{agent}}-CLI installiert",
+        "failed": "Installation fehlgeschlagen — prüfe die Terminal-Ausgabe"
+      },
       "account": {
         "claude": {
           "description": "Anthropic Claude KI-Assistent"

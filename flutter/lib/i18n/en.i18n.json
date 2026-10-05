@@ -2053,6 +2053,16 @@
         "providerAccount": "{{provider}} account",
         "authenticatedUser": "authenticated user"
       },
+      "install": {
+        "title": "{{agent}} CLI is not installed",
+        "description": "Install the {{agent}} CLI to sign in and run sessions.",
+        "button": "Install",
+        "installing": "Installing…",
+        "copyCommand": "Copy command",
+        "docs": "Documentation",
+        "success": "{{agent}} CLI installed",
+        "failed": "Installation failed — check the terminal output"
+      },
       "account": {
         "claude": {
           "description": "Anthropic Claude AI assistant"

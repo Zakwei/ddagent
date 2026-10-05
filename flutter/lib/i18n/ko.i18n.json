@@ -1841,6 +1841,16 @@
         "providerAccount": "{{provider}} 계정",
         "authenticatedUser": "인증된 사용자"
       },
+      "install": {
+        "title": "{{agent}} CLI가 설치되어 있지 않습니다",
+        "description": "로그인하고 세션을 실행하려면 {{agent}} CLI를 설치하세요.",
+        "button": "설치",
+        "installing": "설치 중…",
+        "copyCommand": "명령 복사",
+        "docs": "문서",
+        "success": "{{agent}} CLI 설치됨",
+        "failed": "설치 실패 — 터미널 출력을 확인하세요"
+      },
       "account": {
         "claude": {
           "description": "Anthropic Claude AI 어시스턴트"

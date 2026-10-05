@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/theme/typography.dart';
+import 'package:ddagent_app/core/utils/clipboard.dart';
 import 'package:ddagent_app/core/widgets/app_badge.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
@@ -12,6 +13,7 @@ import 'package:ddagent_app/features/mcp/view/mcp_servers_screen.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/provider_accounts/state/provider_accounts_controller.dart';
 import 'package:ddagent_app/features/sessions/view/provider_logo.dart';
+import 'package:ddagent_app/features/settings/data/agent_install.dart';
 import 'package:ddagent_app/features/settings/state/agent_permissions_controller.dart';
 import 'package:ddagent_app/features/settings/state/provider_auth_controller.dart';
 import 'package:ddagent_app/features/skills/view/skills_screen.dart';
@@ -20,6 +22,7 @@ import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Agents settings section — port of `AgentsSettingsTab.tsx`: a provider
 /// pill selector (claude/cursor/codex/opencode/commandcode/antigravity/devin), category tabs
@@ -336,60 +339,19 @@ class _AccountContent extends ConsumerWidget {
         ),
         const SizedBox(height: AppSpacing.lg),
 
-        Container(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          decoration: BoxDecoration(
-            color: accent.withValues(alpha: isDark ? 0.14 : 0.06),
-            border: Border.all(color: accent.withValues(alpha: 0.35)),
-            borderRadius: AppRadii.borderLg,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          t.settings.agents.connectionStatus,
-                          style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          loading
-                              ? t.settings.agents.authStatus.checkingAuth
-                              : authenticated
-                              ? status!.hasRealIdentity
-                                    ? t.settings.agents.authStatus.loggedInAs(email: status.email!)
-                                    : fallbackAccount ?? t.settings.agents.authStatus.connected
-                              : t.settings.agents.authStatus.notConnected,
-                          style: tt.bodySmall?.copyWith(color: c.mutedForeground),
-                        ),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    tooltip: t.common.buttons.refresh,
-                    onPressed: loading
-                        ? null
-                        : () => ref.invalidate(providerAuthStatusProvider(agent)),
-                    icon: const Icon(LucideIcons.refreshCw, size: 16),
-                  ),
-                  AppBadge(
-                    label: loading
-                        ? t.settings.agents.authStatus.checking
-                        : authenticated
-                        ? t.settings.agents.authStatus.connected
-                        : t.settings.agents.authStatus.disconnected,
-                  ),
-                ],
-              ),
-
-              // env-var credentials (`method === 'api_key'`) hide the login row.
-              if (status?.method != 'api_key') ...[
-                Divider(height: AppSpacing.xl, color: c.border),
+        if (showInstall)
+          _AgentNotInstalledCard(agent: agent)
+        else
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            decoration: BoxDecoration(
+              color: accent.withValues(alpha: isDark ? 0.14 : 0.06),
+              border: Border.all(color: accent.withValues(alpha: 0.35)),
+              borderRadius: AppRadii.borderLg,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Row(
                   children: [
                     Expanded(
@@ -397,55 +359,103 @@ class _AccountContent extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            authenticated
-                                ? t.settings.agents.login.reAuthenticate
-                                : t.settings.agents.login.title,
+                            t.settings.agents.connectionStatus,
                             style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            authenticated
-                                ? t.settings.agents.login.reAuthDescription
-                                : t.settings.agents.login.description(agent: name),
+                            loading
+                                ? t.settings.agents.authStatus.checkingAuth
+                                : authenticated
+                                ? status!.hasRealIdentity
+                                      ? t.settings.agents.authStatus.loggedInAs(
+                                          email: status.email!,
+                                        )
+                                      : fallbackAccount ?? t.settings.agents.authStatus.connected
+                                : t.settings.agents.authStatus.notConnected,
                             style: tt.bodySmall?.copyWith(color: c.mutedForeground),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(width: AppSpacing.sm),
-                    AppButton(
-                      size: AppButtonSize.sm,
-                      onPressed: () => _openLogin(context, ref),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(LucideIcons.logIn, size: 14),
-                          const SizedBox(width: AppSpacing.xs),
-                          Text(
-                            authenticated
-                                ? t.settings.agents.login.reLoginButton
-                                : t.settings.agents.login.button,
-                          ),
-                        ],
-                      ),
+                    IconButton(
+                      tooltip: t.common.buttons.refresh,
+                      onPressed: loading
+                          ? null
+                          : () => ref.invalidate(providerAuthStatusProvider(agent)),
+                      icon: const Icon(LucideIcons.refreshCw, size: 16),
+                    ),
+                    AppBadge(
+                      label: loading
+                          ? t.settings.agents.authStatus.checking
+                          : authenticated
+                          ? t.settings.agents.authStatus.connected
+                          : t.settings.agents.authStatus.disconnected,
                     ),
                   ],
                 ),
-              ],
 
-              if (error != null) ...[
-                Divider(height: AppSpacing.xl, color: c.border),
-                Text(
-                  t.settings.agents.error(error: error),
-                  style: tt.bodySmall?.copyWith(color: c.destructive),
-                ),
+                // env-var credentials (`method === 'api_key'`) hide the login row.
+                if (status?.method != 'api_key') ...[
+                  Divider(height: AppSpacing.xl, color: c.border),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              authenticated
+                                  ? t.settings.agents.login.reAuthenticate
+                                  : t.settings.agents.login.title,
+                              style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              authenticated
+                                  ? t.settings.agents.login.reAuthDescription
+                                  : t.settings.agents.login.description(agent: name),
+                              style: tt.bodySmall?.copyWith(color: c.mutedForeground),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      AppButton(
+                        size: AppButtonSize.sm,
+                        onPressed: () => _openLogin(context, ref),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(LucideIcons.logIn, size: 14),
+                            const SizedBox(width: AppSpacing.xs),
+                            Text(
+                              authenticated
+                                  ? t.settings.agents.login.reLoginButton
+                                  : t.settings.agents.login.button,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+
+                if (error != null) ...[
+                  Divider(height: AppSpacing.xl, color: c.border),
+                  Text(
+                    t.settings.agents.error(error: error),
+                    style: tt.bodySmall?.copyWith(color: c.destructive),
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
-        ),
 
-        const SizedBox(height: AppSpacing.xl),
-        _ProviderAccountsCard(agent: agent),
+        if (!showInstall) ...[
+          const SizedBox(height: AppSpacing.xl),
+          _ProviderAccountsCard(agent: agent),
+        ],
       ],
     );
   }
@@ -471,6 +481,158 @@ class _AccountContent extends ConsumerWidget {
             isError: exitCode != 0,
           );
         },
+      ),
+    );
+  }
+}
+
+/// Orange "CLI not installed" card — Account-tab replacement when the provider
+/// binary is missing. Shows the install command with a copy action, an Install
+/// button that runs it in the terminal dialog and a docs link.
+class _AgentNotInstalledCard extends ConsumerWidget {
+  const _AgentNotInstalledCard({required this.agent});
+
+  final String agent;
+
+  static const _orange = Color(0xFFEA580C);
+
+  String _projectPath(WidgetRef ref) {
+    final projects = ref.read(projectsProvider).projects;
+    if (projects.isEmpty) return '/workspace';
+    final first = projects.first;
+    return (first.fullPath?.isNotEmpty ?? false) ? first.fullPath! : first.path;
+  }
+
+  void _install(BuildContext context, WidgetRef ref) {
+    final t = Translations.of(context).settings.agents.install;
+    final name = AgentsSection._names[agent] ?? agent;
+    unawaited(
+      ProviderLoginDialog.show(
+        context: context,
+        provider: agent,
+        projectPath: _projectPath(ref),
+        customCommand: providerInstallCommand(agent),
+        title: '${t.button} · $name',
+        onComplete: (exitCode) {
+          ref.invalidate(providerAuthStatusProvider(agent));
+          if (!context.mounted) return;
+          AppToast.show(
+            context,
+            exitCode == 0 ? t.success(agent: name) : t.failed,
+            isError: exitCode != 0,
+          );
+        },
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = Translations.of(context).settings.agents.install;
+    final c = context.appColors;
+    final tt = Theme.of(context).textTheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final name = AgentsSection._names[agent] ?? agent;
+    final command = providerInstallCommand(agent);
+    final docsUrl = providerInstallDocsUrl(agent);
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: BoxDecoration(
+        color: _orange.withValues(alpha: isDark ? 0.14 : 0.06),
+        border: Border.all(color: _orange.withValues(alpha: 0.35)),
+        borderRadius: AppRadii.borderLg,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                margin: const EdgeInsets.only(top: 2),
+                decoration: BoxDecoration(
+                  color: _orange.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(LucideIcons.triangleAlert, size: 16, color: _orange),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      t.title(agent: name),
+                      style: tt.titleSmall?.copyWith(color: _orange),
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      t.description(agent: name),
+                      style: tt.bodySmall?.copyWith(color: c.mutedForeground),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
+            decoration: BoxDecoration(
+              color: c.muted.withValues(alpha: 0.5),
+              borderRadius: AppRadii.borderMd,
+            ),
+            child: Row(
+              children: [
+                Expanded(child: Text(command, style: monoStyle(c.foreground, size: 12))),
+                IconButton(
+                  tooltip: t.copyCommand,
+                  visualDensity: VisualDensity.compact,
+                  icon: const Icon(LucideIcons.copy, size: 16),
+                  onPressed: () => unawaited(copyTextWithFeedback(context, command)),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Wrap(
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.sm,
+            children: [
+              AppButton(
+                size: AppButtonSize.sm,
+                onPressed: () => _install(context, ref),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(LucideIcons.download, size: 14),
+                    const SizedBox(width: AppSpacing.xs),
+                    Text(t.button),
+                  ],
+                ),
+              ),
+              if (docsUrl != null)
+                AppButton(
+                  variant: AppButtonVariant.outline,
+                  size: AppButtonSize.sm,
+                  onPressed: () => unawaited(
+                    launchUrl(Uri.parse(docsUrl), mode: LaunchMode.externalApplication),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(LucideIcons.externalLink, size: 14),
+                      const SizedBox(width: AppSpacing.xs),
+                      Text(t.docs),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        ],
       ),
     );
   }

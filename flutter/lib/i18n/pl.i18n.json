@@ -1973,6 +1973,16 @@
         "providerAccount": "Konto {{provider}}",
         "authenticatedUser": "uwierzytelniony użytkownik"
       },
+      "install": {
+        "title": "CLI {{agent}} nie jest zainstalowane",
+        "description": "Zainstaluj CLI {{agent}}, aby się zalogować i uruchamiać sesje.",
+        "button": "Zainstaluj",
+        "installing": "Instalowanie…",
+        "copyCommand": "Kopiuj polecenie",
+        "docs": "Dokumentacja",
+        "success": "CLI {{agent}} zainstalowane",
+        "failed": "Instalacja nie powiodła się — sprawdź dane wyjściowe terminala"
+      },
       "account": {
         "claude": {
           "description": "Asystent AI Anthropic Claude"

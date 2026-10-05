@@ -1841,6 +1841,16 @@
         "providerAccount": "{{provider}} 账户",
         "authenticatedUser": "已认证用户"
       },
+      "install": {
+        "title": "未安装 {{agent}} CLI",
+        "description": "安装 {{agent}} CLI 以登录并运行会话。",
+        "button": "安装",
+        "installing": "安装中…",
+        "copyCommand": "复制命令",
+        "docs": "文档",
+        "success": "{{agent}} CLI 已安装",
+        "failed": "安装失败 — 请检查终端输出"
+      },
       "account": {
         "claude": {
           "description": "Anthropic Claude AI 助手"
