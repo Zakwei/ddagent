@@ -784,9 +784,9 @@ class _CandidatePoolSection extends ConsumerWidget {
               if (poolIds.contains(id)) id,
           ],
       };
-      final plannerCandidateId = poolIds.contains(current.planner.candidateId)
-          ? current.planner.candidateId
-          : (nextPool.isEmpty ? '' : nextPool.first.id);
+      // `candidateId` mirrors the primary planner model (head of rules.plan),
+      // so pruning a removed primary keeps the two in sync.
+      final plannerCandidateId = (rules['plan']?.isNotEmpty ?? false) ? rules['plan']!.first : '';
       return current.copyWith(
         pool: nextPool,
         rules: rules,
@@ -1134,7 +1134,10 @@ class _RoutingRulesSection extends ConsumerWidget {
       children: [
         _DividedCard(
           children: [
-            for (final taskType in orchRuleLanes)
+            // The `plan` lane is authored in the Planner section (its ordered
+            // failover list), so it is omitted here to avoid two editors for
+            // the same list.
+            for (final taskType in orchRuleLanes.where((lane) => lane != 'plan'))
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
                 child: Row(
@@ -1221,6 +1224,7 @@ class _PlannerSection extends ConsumerWidget {
     final c = context.appColors;
     final tt = Theme.of(context).textTheme;
     final plannerT = t.settings.orchestration.planner;
+    final rulesT = t.settings.orchestration.rules;
     final draft = ref.watch(orchestratorConfigProvider).draft!;
     final ctrl = ref.read(orchestratorConfigProvider.notifier);
     final planner = draft.planner;
@@ -1257,31 +1261,72 @@ class _PlannerSection extends ConsumerWidget {
                     ctrl.update((d) => d.copyWith(planner: planner.copyWith(mode: s.first))),
               ),
             ),
-            SettingsRow(
-              label: plannerT.candidateLabel,
-              description: plannerT.candidateDescription,
-              child: SizedBox(
-                width: 224,
-                child: _FieldSelect<String>(
-                  value: planner.candidateId,
-                  enabled: planner.mode != 'off',
-                  hint: plannerT.candidatePlaceholder,
-                  items: [
-                    DropdownMenuItem(value: '', child: Text(plannerT.candidatePlaceholder)),
-                    for (final cand in draft.pool)
-                      DropdownMenuItem(
-                        value: cand.id,
-                        child: Text(
-                          cand.label.isEmpty ? cand.model : cand.label,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                  ],
-                  onChanged: (v) => ctrl.update(
-                    (d) => d.copyWith(planner: planner.copyWith(candidateId: v ?? '')),
-                  ),
+            // The supervisor routes goal/decision calls through `rules.plan`,
+            // an ordered failover lane: the first available candidate wins and
+            // a quota-exhausted model is skipped. Alternatives are authored
+            // here, so `planner.candidateId` stays pinned to the primary.
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(plannerT.candidateLabel, style: tt.bodyMedium),
+                const SizedBox(height: 2),
+                Text(
+                  plannerT.candidateDescription,
+                  style: tt.bodySmall?.copyWith(color: c.mutedForeground),
                 ),
-              ),
+                const SizedBox(height: AppSpacing.sm),
+                Builder(
+                  builder: (context) {
+                    final list = draft.rules['plan'] ?? const <String>[];
+                    final poolById = {for (final cc in draft.pool) cc.id: cc};
+                    void updatePlannerModels(List<String> next) => ctrl.update(
+                      (d) => d.copyWith(
+                        rules: {...d.rules, 'plan': next},
+                        planner: d.planner.copyWith(candidateId: next.isEmpty ? '' : next.first),
+                      ),
+                    );
+                    return _OrderedEditor(
+                      entries: [
+                        for (final id in list)
+                          (
+                            id: id,
+                            content: poolById[id] != null
+                                ? _CandidateChip(candidate: poolById[id]!)
+                                : Text(
+                                    '$id ${rulesT.missing}',
+                                    overflow: TextOverflow.ellipsis,
+                                    style: tt.bodySmall?.copyWith(color: c.mutedForeground),
+                                  ),
+                          ),
+                      ],
+                      onMove: (index, dir) {
+                        final next = [...list];
+                        final entry = next.removeAt(index);
+                        next.insert(index + dir, entry);
+                        updatePlannerModels(next);
+                      },
+                      onRemove: (id) => updatePlannerModels([
+                        for (final x in list)
+                          if (x != id) x,
+                      ]),
+                      addOptions: [
+                        for (final cand in draft.pool)
+                          if (!list.contains(cand.id))
+                            (
+                              value: cand.id,
+                              label:
+                                  '${cand.label.isEmpty ? cand.model : cand.label}'
+                                  ' · ${_tierLabel(t, cand.tier)}',
+                            ),
+                      ],
+                      addPlaceholder: rulesT.addCandidate,
+                      onAdd: (id) => updatePlannerModels([...list, id]),
+                      emptyLabel: rulesT.empty,
+                      removeTooltip: rulesT.remove,
+                    );
+                  },
+                ),
+              ],
             ),
             SettingsRow(
               label: plannerT.requireConfirm,

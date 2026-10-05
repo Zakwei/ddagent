@@ -28,6 +28,7 @@ Map<String, dynamic> _config() => {
     _cand('a0', 'antigravity', ''),
   ],
   'rules': {
+    'plan': ['d0', 'a0'],
     'code': ['d0', 'a0'],
   },
   'planner': {'mode': 'auto', 'candidateId': 'd0'},
@@ -124,6 +125,22 @@ void main() {
     // The 721-model Devin catalog must not be inflated into dropdown items.
     final built = find.byType(DropdownMenuItem<String>, skipOffstage: false).evaluate().length;
     expect(built, lessThan(1000));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('planner models render as an ordered failover list', (tester) async {
+    await _pumpSection(tester);
+
+    // The planner lane lists rules.plan in order (primary first, fallbacks
+    // after) instead of a single deprecated candidate picker. It sits below
+    // the fold in the lazy ListView, so scroll it into view first.
+    await tester.scrollUntilVisible(
+      find.text('Planner model'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Planner model'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
