@@ -35,25 +35,23 @@ There are three layers, and it helps to know which is which:
   reads `CLAUDE.md`, Codex/Cursor read `AGENTS.md`, Cursor reads `.cursorrules`,
   and several read `skills/` and `.agents/skills/`. This is the CLI's job, not
   the model's choice — ddagent does not turn it off.
-- **ddagent injection** — on a session's first turn ddagent prepends a
-  `<knowledge>` block (details below). This works for every provider and needs
-  no configuration from the agent.
-- **MCP tools** — once you install ddagent's MCP server into an agent, its tool
-  list includes `knowledge_search` and friends. The model decides when to call
-  them, guided by the tool descriptions and by any instruction rules you keep in
-  the knowledge base.
+- **MCP retrieval (on demand)** — once you install ddagent's MCP server into an
+  agent, its tool list includes `knowledge_get_context`, `knowledge_search` and
+  friends. Following Contexta, nothing is injected automatically: the agent
+  calls the context builder with a query and gets back the critical rules plus
+  whatever matches. The model decides when to call it, guided by the tool
+  descriptions and by any instruction rules you keep in the knowledge base.
 
-So "one place" means **one place to curate the injected content and one budget**
-— it does not (and cannot) stop a CLI from reading its own native files. To avoid
-duplicates we keep the workspace `AGENTS.md` at `high` priority so the knowledge
-block never repeats what unified-rules already injects.
+So "one place" means **one place to curate the knowledge** — it does not (and
+cannot) stop a CLI from reading its own native files. ddagent does not
+auto-inject the knowledge base into sessions at all.
 
 ## Entities
 
 | Entity | Scope | Notes |
 |---|---|---|
 | Memory | project or global | `memory_type` (`fact`/`decision`/`note`/`reference`), `priority`, `source`, tags |
-| Rule | project or global | `enabled` toggle; `critical` rules are injected into sessions |
+| Rule | project or global | `enabled` toggle; `critical` rules are always returned first by the context builder |
 | Skill | global | unique name, category, optional icon (base64 data URL) |
 | Personal info | global | unique `key` |
 | Tag / Connection | — | tags on memories; connections link any two entities |
@@ -63,23 +61,24 @@ Priorities: `critical > high > normal > low`. An entity can be scoped to one
 project or be global (applies everywhere). `project_id` is a plain column (no
 foreign key) because the projects table is rebuilt during migrations.
 
-## First-turn injection (what every agent gets, automatically)
+## Retrieving context (on demand)
 
-On a session's **first** outbound message, ddagent prepends a `<knowledge>`
-block containing:
+Agents fetch context through the MCP tool `knowledge_get_context` (the Contexta
+model). Given a project and a query it returns, in order:
 
-- `critical` **rules** (project + global, enabled only),
-- `critical` **memories**,
-- every **personal-information** entry,
-- the **1-hop neighbours** of the included memories (reached through explicit
-  connections).
+- the project's `critical` **rules** (always),
+- query-matched **rules**,
+- relevant **memories** (FTS-ranked, plus their 1-hop neighbours reached through
+  connections),
+- **skills** whose name/description/category matches the query,
+- **personal information** only when the query matches it,
 
-The whole block is capped to ~4000 tokens. It rides the same first-turn gate as
-`.ddagent/shared-context.md` and unified rules, so it costs no per-turn tokens.
-Set `DDAGENT_KNOWLEDGE=0` to opt out.
+rendered as a token-budgeted Markdown block (`maxTokens`, default ~4000). With
+no query it returns the critical rules plus the top memories.
 
-The dashboard shows an **injected-context meter** (`~X / 4000 tok`) for the
-selected project, so you can see and control what enters the context.
+The dashboard shows a **critical-context meter** (`~X / 4000 tok`) for the
+selected project — the size of what every `knowledge_get_context` call always
+includes. Nothing is auto-injected into sessions.
 
 ## MCP tools (on demand)
 
@@ -108,9 +107,10 @@ include the `knowledge_*` group alongside `create_task`, `send_message`, etc.
 
 How does an agent know *when* to use MCP? It does not guess — tell it. Keep a
 `critical` rule such as: *"Before answering questions about this project, call
-`knowledge_search`; when you settle a decision, persist it with
-`knowledge_add_memory`."* Because that rule is injected on every first turn, all
-your agents get the same operating instructions.
+`knowledge_get_context`; when you settle a decision, persist it with
+`knowledge_add_memory`."* Because `critical` rules are always returned by the
+context builder, every agent that calls the tool gets the same operating
+instructions.
 
 ## Project scan
 
@@ -146,9 +146,10 @@ structure.
 1. **Scan** each active project once (Knowledge → select project → scan);
    re-scan after big changes to its instruction files.
 2. **Promote deliberately**: only truly binding rules should be `critical`
-   (they are injected). Use the star on a row, and watch the budget meter.
+   (they are always served by the context builder). Use the star on a row, and
+   watch the critical-context meter.
 3. **Keep the rest `high`/`normal`** — still searchable and available over MCP
-   without spending context on every turn.
+   only when a query matches, so they cost nothing when irrelevant.
 4. **Personal info** for cross-project preferences (timezone, editor, naming).
 5. **Link related memories** so 1-hop neighbours ride along.
 6. **Install MCP** for the agents that should search the base and persist
@@ -178,10 +179,11 @@ skills are imported by the project scan instead.
 ## Good to know
 
 - Everything is **local** to this ddagent instance; no cloud, no sync.
-- Injection happens **once per session** (first turn) — new sessions pick up
-  changes.
-- Scanned skills are **not injected**; they are reachable through MCP search,
-  which keeps the always-on context lean.
+- The knowledge base is **not auto-injected** — agents retrieve it over MCP on
+  demand (Contexta model). Agents without the MCP server installed get nothing
+  from it.
+- Scanned skills are reachable through MCP (`knowledge_get_context` /
+  `knowledge_search`), not pushed into context.
 - A rule or memory can be edited by an agent over MCP; review changes in the
   entity's **History** and restore a previous version if needed.
 
@@ -199,7 +201,7 @@ POST   /skills              PATCH /skills/:id      DELETE /skills/:id
 GET    /personal            POST /personal         PATCH/DELETE /personal/:id
 GET    /search              ?q=&type=&projectId=&limit=
 GET    /graph               ?projectId=&types=&limit=
-GET    /context             ?projectId=            (injection preview + budget)
+GET    /context             ?projectId=            (critical-context size + budget)
 GET    /tags                DELETE /tags/:id
 GET    /connections         POST /connections      DELETE /connections/:id
 GET    /history             ?entityType=&entityId=&limit=
