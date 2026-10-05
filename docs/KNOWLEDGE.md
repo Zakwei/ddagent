@@ -82,6 +82,10 @@ The dashboard shows a **rules-context meter** (`~X / 4000 tok`) for the selected
 project — the size of the rules block every `knowledge_get_context` call always
 includes. Nothing is auto-injected into sessions.
 
+Search ranking is hybrid, like Contexta's `search.rs`: FTS5 **prefix** matching
+(`auth` also matches `authentication`) plus a fuzzy **trigram** pass that catches
+typos and near-synonyms, then a rerank by `bm25 + priority + recency`.
+
 ## MCP tools (on demand)
 
 ddagent's MCP server (`POST /mcp`) exposes the knowledge base to any MCP client.
