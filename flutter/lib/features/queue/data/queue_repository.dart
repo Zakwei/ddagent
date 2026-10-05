@@ -47,7 +47,8 @@ class QueueRepository {
     ],
   );
 
-  /// Dispatches one queued message immediately, aborting the active turn.
+  /// Moves one queued message to the front of its session's queue so it is
+  /// the next turn sent — it never interrupts the turn already running.
   Future<void> sendNow(String id) =>
       apiCall(() => _dio.post<dynamic>('/api/queue/$id/send-now'), (_) {});
 

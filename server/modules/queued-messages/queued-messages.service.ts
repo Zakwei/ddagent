@@ -24,15 +24,6 @@ export type QueuedDispatchResult = { ok: true } | { ok: false; error: string };
 export type QueuedMessagesRunRegistry = {
   isProcessing(sessionId: string): boolean;
   onRunCompleted(listener: (sessionId: string) => void): () => void;
-  completeRun(sessionId: string, opts: { exitCode: number; aborted?: boolean }): void;
-  /**
-   * Flags the live run as aborted before the provider abort is awaited — a
-   * dispatcher whose promise settles mid-abort fires its safety-net complete
-   * first, and only the flag makes that net report `aborted` instead of a
-   * spurious exitCode-1 failure. Pass `false` to roll the flag back when the
-   * provider refused the abort.
-   */
-  markAborted(sessionId: string, aborted?: boolean): void;
 };
 
 type QueuedMessagesServiceDeps = {
@@ -50,13 +41,6 @@ type QueuedMessagesServiceDeps = {
     userId: string | number | null;
     connection: unknown;
   }) => Promise<QueuedDispatchResult>;
-  /**
-   * Aborts the session's in-flight run so `sendNow` can take over. Returns
-   * `false` when the provider reports nothing was actually aborted — callers
-   * must then leave the run registry alone instead of dispatching into a
-   * turn that is still alive. `undefined` means "no signal".
-   */
-  abort: (sessionId: string) => Promise<boolean | void>;
   /**
    * Live connection for the session, when a browser has it open. A queued
    * message still sends without one, so an absent connection is normal.
@@ -86,9 +70,10 @@ const BACKGROUND_CONNECTION = {
  * and closed tabs. Two triggers drain a session's queue: a run completing
  * (via the registry listener) and a fresh enqueue while the session is idle.
  *
- * `sendNow` promotes one message to the front and dispatches it immediately,
- * aborting the session's current run first — the only way to honour "send this
- * now" while a turn is in flight, since a session runs one turn at a time.
+ * `sendNow` promotes one message to the front of its session's queue so it is
+ * the next turn dispatched. It never interrupts the turn that is already
+ * running — sending a queued message must not stop the session's in-flight
+ * work; the current turn's completion drains the promoted message first.
  */
 export function createQueuedMessagesService(deps: QueuedMessagesServiceDeps): QueuedMessagesService {
   /** Sessions with a dispatch in progress, so completion callbacks do not re-enter. */
@@ -246,26 +231,13 @@ export function createQueuedMessagesService(deps: QueuedMessagesServiceDeps): Qu
         deps.repository.requeue(id);
       }
 
-      // A "send now" must not wait for the in-flight turn: abort it, which
-      // emits a terminal complete, then dispatch the promoted message.
-      if (deps.runs.isProcessing(sessionId)) {
-        // Mark before awaiting the provider abort — a runtime that settles
-        // its dispatch promise mid-abort triggers the dispatcher's safety
-        // net first, and it must report an aborted run, not exitCode 1.
-        deps.runs.markAborted(sessionId);
-        const aborted = await deps.abort(sessionId).catch(() => false);
-        if (aborted === false) {
-          // The provider refused to abort — the turn is still alive. Leave
-          // the registry alone; its own completion drains the queue and the
-          // promoted message goes first. Dispatching now would hit a busy
-          // provider or, worse, mark this message failed on RUN_IN_PROGRESS.
-          deps.runs.markAborted(sessionId, false);
-          return deps.repository.getById(id) ?? message;
-        }
-        deps.runs.completeRun(sessionId, { exitCode: 0, aborted: true });
+      // Promote-only while a turn is live: sending a queued message must NOT
+      // abort the session's in-flight work. The running turn's completion
+      // drains the queue, so the promoted message goes out next. When the
+      // session is idle, dispatch it right away.
+      if (!deps.runs.isProcessing(sessionId)) {
+        await dispatchNext(sessionId);
       }
-
-      await dispatchNext(sessionId);
 
       return deps.repository.getById(id) ?? message;
     },

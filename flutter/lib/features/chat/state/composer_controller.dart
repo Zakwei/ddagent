@@ -508,7 +508,8 @@ class ComposerController extends Notifier<ComposerState> {
     if (sid != null) ref.read(chatChannelProvider).abort(sid);
   }
 
-  /// `/api/queue/:id/send-now` — aborts the active turn and dispatches.
+  /// `/api/queue/:id/send-now` — promotes the message to the front of the
+  /// queue; the active turn keeps running and the completion sends it next.
   Future<void> sendNow(String id) async {
     await ref.read(queueRepositoryProvider).sendNow(id);
     await refreshQueue();

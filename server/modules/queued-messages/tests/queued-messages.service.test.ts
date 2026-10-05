@@ -97,29 +97,15 @@ function createMemoryRepository(): QueuedMessagesRepository {
 }
 
 function createRunRegistry(initialProcessing = false): QueuedMessagesRunRegistry & {
-  setProcessing(value: boolean): void;
   emitCompleted(sessionId: string): void;
-  /** Sessions marked aborted, in call order (false = flag rolled back). */
-  abortMarks: Array<{ sessionId: string; aborted: boolean }>;
 } {
   let processing = initialProcessing;
   const listeners = new Set<(sessionId: string) => void>();
-  const abortMarks: Array<{ sessionId: string; aborted: boolean }> = [];
   return {
     isProcessing: () => processing,
     onRunCompleted: (listener) => {
       listeners.add(listener);
       return () => listeners.delete(listener);
-    },
-    completeRun: () => {
-      processing = false;
-    },
-    markAborted: (sessionId, aborted = true) => {
-      abortMarks.push({ sessionId, aborted });
-    },
-    abortMarks,
-    setProcessing(value) {
-      processing = value;
     },
     emitCompleted(sessionId) {
       processing = false;
@@ -140,7 +126,6 @@ test('enqueue dispatches immediately when the session is idle', async () => {
       dispatched.push(input.content);
       return { ok: true };
     },
-    abort: async () => undefined,
   });
 
   const message = service.enqueue({ sessionId: SESSION, content: 'hello' });
@@ -162,7 +147,6 @@ test('enqueue holds messages while the session is processing and drains on compl
       dispatched.push(input.content);
       return { ok: true };
     },
-    abort: async () => undefined,
   });
 
   service.enqueue({ sessionId: SESSION, content: 'first' });
@@ -177,11 +161,10 @@ test('enqueue holds messages while the session is processing and drains on compl
   assert.deepEqual(dispatched, ['first', 'second']);
 });
 
-test('sendNow aborts the active run and sends the promoted message', async () => {
+test('sendNow promotes a queued message without interrupting the active run', async () => {
   const repository = createMemoryRepository();
   const runs = createRunRegistry(true);
   const dispatched: string[] = [];
-  const aborted: string[] = [];
 
   const service = createQueuedMessagesService({
     repository,
@@ -189,9 +172,6 @@ test('sendNow aborts the active run and sends the promoted message', async () =>
     dispatch: async (input): Promise<QueuedDispatchResult> => {
       dispatched.push(input.content);
       return { ok: true };
-    },
-    abort: async (sessionId) => {
-      aborted.push(sessionId);
     },
   });
 
@@ -200,87 +180,16 @@ test('sendNow aborts the active run and sends the promoted message', async () =>
   await new Promise((resolve) => setTimeout(resolve, 0));
   assert.deepEqual(dispatched, []);
 
-  // Promote the second message to the front and send it before the first.
-  runs.setProcessing(true);
+  // Promote the second message to the front — the live turn keeps running,
+  // so nothing dispatches yet.
   await service.sendNow(second.id);
-  assert.deepEqual(aborted, [SESSION]);
-  assert.deepEqual(dispatched, ['second']);
-  assert.equal(repository.getById(second.id)?.status, 'sent');
-  assert.equal(repository.getById(first.id)?.status, 'queued');
-});
-
-test('sendNow marks the run aborted before the provider abort resolves', async () => {
-  const repository = createMemoryRepository();
-  const runs = createRunRegistry(true);
-  let abortObservedMark = false;
-
-  const service = createQueuedMessagesService({
-    repository,
-    runs,
-    dispatch: async (): Promise<QueuedDispatchResult> => ({ ok: true }),
-    abort: async () => {
-      // The safety net in dispatchChatCommand can fire while this await is
-      // still in flight — the aborted flag must already be set by then.
-      abortObservedMark = runs.abortMarks.some(
-        (mark) => mark.sessionId === SESSION && mark.aborted === true,
-      );
-      return true;
-    },
-  });
-
-  const message = service.enqueue({ sessionId: SESSION, content: 'now' });
-  await new Promise((resolve) => setTimeout(resolve, 0));
-
-  await service.sendNow(message.id);
-  assert.equal(abortObservedMark, true);
-});
-
-test('sendNow rolls the aborted flag back when the provider refuses to abort', async () => {
-  const repository = createMemoryRepository();
-  const runs = createRunRegistry(true);
-
-  const service = createQueuedMessagesService({
-    repository,
-    runs,
-    dispatch: async (): Promise<QueuedDispatchResult> => ({ ok: true }),
-    abort: async () => false,
-  });
-
-  const message = service.enqueue({ sessionId: SESSION, content: 'later' });
-  await new Promise((resolve) => setTimeout(resolve, 0));
-
-  await service.sendNow(message.id);
-  assert.deepEqual(runs.abortMarks, [
-    { sessionId: SESSION, aborted: true },
-    { sessionId: SESSION, aborted: false },
-  ]);
-});
-
-test('sendNow leaves the message queued when the provider refuses to abort', async () => {
-  const repository = createMemoryRepository();
-  const runs = createRunRegistry(true);
-  const dispatched: string[] = [];
-
-  const service = createQueuedMessagesService({
-    repository,
-    runs,
-    dispatch: async (input): Promise<QueuedDispatchResult> => {
-      dispatched.push(input.content);
-      return { ok: true };
-    },
-    // The provider reports nothing was aborted — the turn is still alive.
-    abort: async () => false,
-  });
-
-  const message = service.enqueue({ sessionId: SESSION, content: 'later' });
-  await new Promise((resolve) => setTimeout(resolve, 0));
-
-  const result = await service.sendNow(message.id);
-  // No dispatch into a busy provider, no registry force-clear: the message
-  // stays queued and the live turn's completion drains it.
   assert.deepEqual(dispatched, []);
-  assert.equal(result.status, 'queued');
-  assert.equal(repository.getById(message.id)?.status, 'queued');
+  assert.equal(repository.getById(second.id)?.status, 'queued');
+
+  // The active turn's completion drains the promoted message first.
+  runs.emitCompleted(SESSION);
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  assert.deepEqual(dispatched, ['second', 'first']);
 });
 
 test('a failed dispatch marks the row failed rather than dropping it', async () => {
@@ -291,7 +200,6 @@ test('a failed dispatch marks the row failed rather than dropping it', async () 
     repository,
     runs,
     dispatch: async (): Promise<QueuedDispatchResult> => ({ ok: false, error: 'boom' }),
-    abort: async () => undefined,
   });
 
   const message = service.enqueue({ sessionId: SESSION, content: 'hello' });
@@ -320,7 +228,6 @@ test('sendNow retries a failed message', async () => {
       dispatched.push(input.content);
       return { ok: true };
     },
-    abort: async () => undefined,
   });
 
   const message = service.enqueue({ sessionId: SESSION, content: 'hello' });
@@ -342,7 +249,6 @@ test('remove deletes a queued message and broadcasts the new queue', () => {
     repository,
     runs,
     dispatch: async (): Promise<QueuedDispatchResult> => ({ ok: true }),
-    abort: async () => undefined,
     broadcast: (payload) => broadcasts.push(payload.messages.map((message) => message.content)),
   });
 
@@ -358,7 +264,6 @@ test('sendNow rejects an unknown message id', async () => {
     repository: createMemoryRepository(),
     runs: createRunRegistry(false),
     dispatch: async (): Promise<QueuedDispatchResult> => ({ ok: true }),
-    abort: async () => undefined,
   });
 
   await assert.rejects(() => service.sendNow(999), /was not found/);
@@ -378,7 +283,6 @@ test('drains the next queued message only after the previous turn resolves', asy
         dispatched.push(input.content);
         releases.push(() => resolve({ ok: true }));
       }),
-    abort: async () => undefined,
   });
 
   service.enqueue({ sessionId: SESSION, content: 'first' });
@@ -418,7 +322,6 @@ test('rows orphaned in `sending` are requeued and drained at service creation', 
       dispatched.push(input.content);
       return { ok: true };
     },
-    abort: async () => undefined,
   });
 
   await new Promise((resolve) => setTimeout(resolve, 0));
@@ -442,7 +345,6 @@ test('startup drains `queued` rows parked before the process restarted', async (
       dispatched.push(input.content);
       return { ok: true };
     },
-    abort: async () => undefined,
   });
 
   await new Promise((resolve) => setTimeout(resolve, 0));
@@ -464,7 +366,6 @@ test('sendNow on an in-flight `sending` row does not dispatch twice', async () =
         dispatched.push(input.content);
         release = () => resolve({ ok: true });
       }),
-    abort: async () => undefined,
   });
 
   const message = service.enqueue({ sessionId: SESSION, content: 'hello' });
@@ -495,7 +396,6 @@ test('a dispatching message leaves the queue list as soon as its turn starts', a
       new Promise<QueuedDispatchResult>((resolve) => {
         release = () => resolve({ ok: true });
       }),
-    abort: async () => undefined,
     broadcast: (payload) => broadcasts.push(payload.messages.map((message) => message.content)),
   });
 

@@ -3,7 +3,7 @@ import { createInboxRouter, createQueuedMessagesRouter } from '@/modules/queued-
 import { createQueuedMessagesService } from '@/modules/queued-messages/queued-messages.service.js';
 import { providerRuntimeService } from '@/modules/providers/index.js';
 import { chatRunRegistry, connectedClients, dispatchChatCommand, WS_OPEN_STATE } from '@/modules/websocket/index.js';
-import type { LLMProvider, QueuedMessage } from '@/shared/types.js';
+import type { QueuedMessage } from '@/shared/types.js';
 import { safeSocketSend } from '@/shared/utils.js';
 
 /** Broadcasts a queue snapshot to every connected client. */
@@ -40,15 +40,6 @@ export const queuedMessagesService = createQueuedMessagesService({
       connection: input.connection as never,
     });
     return result.ok ? { ok: true } : { ok: false, error: result.error };
-  },
-  abort: async (sessionId) => {
-    const run = chatRunRegistry.getRun(sessionId);
-    if (!run) {
-      return;
-    }
-    // Propagate the provider's verdict: `false` tells sendNow the turn is
-    // still alive, so it must not force-clear the run registry.
-    return providerRuntimeService.abort(run.provider as LLMProvider, sessionId).catch(() => false);
   },
   // The run's writer wraps the live socket — hand the socket itself, not
   // the writer (it has no readyState and would be a dead delivery target).
