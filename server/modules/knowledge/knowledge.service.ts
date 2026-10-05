@@ -1,5 +1,8 @@
+import path from 'node:path';
+
 import {
   knowledgeDb,
+  projectsDb,
   type KbConnection,
   type KbHistoryEntry,
   type KbMemory,
@@ -213,6 +216,15 @@ function collectAll<T>(fetch: (offset: number) => KbPage<T>): T[] {
     offset += page.items.length;
   }
   return out;
+}
+
+/** Human label for a project hub: custom name, else the folder name. */
+function projectLabel(projectId: string): string {
+  const project = projectsDb.getProjectById(projectId);
+  if (!project) return projectId;
+  const custom = project.custom_project_name?.trim();
+  if (custom) return custom;
+  return path.basename(project.project_path) || projectId;
 }
 
 export const knowledgeService = {
@@ -561,19 +573,38 @@ export const knowledgeService = {
 
   /**
    * Assembles the relation graph for the UI: capped entity nodes (optionally
-   * scoped to a project) plus the explicit connections whose endpoints are both
-   * present. Never materializes the whole database — the node cap is hard.
+   * scoped to a project), the explicit connections whose endpoints are both
+   * present, plus implicit hub edges so the graph is never empty of structure —
+   * each project-scoped entity links to its project (`belongs_to`) and memories
+   * sharing a tag link to a tag node (`tagged`). Never materializes the whole
+   * database — the entity node cap is hard.
    */
   graph(filter: { projectId?: string | null; entityTypes?: string[]; limit?: number } = {}): KnowledgeGraph {
     const limit = Math.min(Math.max(filter.limit ?? 300, 1), 500);
     const wanted = (kind: string) => !filter.entityTypes || filter.entityTypes.includes(kind);
     const scope = { projectId: filter.projectId, includeGlobal: true, limit };
-    const nodes: KnowledgeGraph['nodes'] = [];
-    const counts: Record<string, number> = { memory: 0, rule: 0, skill: 0, personal: 0 };
+    const entityNodes: KnowledgeGraph['nodes'] = [];
+    const counts: Record<string, number> = {
+      memory: 0,
+      rule: 0,
+      skill: 0,
+      personal: 0,
+      project: 0,
+      tag: 0,
+    };
+
+    // Hub membership gathered while building entity nodes.
+    const projectMembers = new Map<string, string[]>();
+    const tagMembers = new Map<string, string[]>();
+    const addMember = (map: Map<string, string[]>, key: string, id: string) => {
+      const list = map.get(key);
+      if (list) list.push(id);
+      else map.set(key, [id]);
+    };
 
     if (wanted('memory')) {
       for (const memory of knowledgeDb.listMemories(scope).items) {
-        nodes.push({
+        entityNodes.push({
           id: memory.id,
           nodeType: 'memory',
           label: memory.title,
@@ -581,11 +612,13 @@ export const knowledgeService = {
           priority: memory.priority,
           icon: null,
         });
+        if (memory.projectId) addMember(projectMembers, memory.projectId, memory.id);
+        for (const tag of memory.tags) addMember(tagMembers, tag, memory.id);
       }
     }
     if (wanted('rule')) {
       for (const rule of knowledgeDb.listRules(scope).items) {
-        nodes.push({
+        entityNodes.push({
           id: rule.id,
           nodeType: 'rule',
           label: rule.title,
@@ -593,11 +626,12 @@ export const knowledgeService = {
           priority: rule.priority,
           icon: null,
         });
+        if (rule.projectId) addMember(projectMembers, rule.projectId, rule.id);
       }
     }
     if (wanted('skill')) {
       for (const skill of knowledgeDb.listSkills({ limit }).items) {
-        nodes.push({
+        entityNodes.push({
           id: skill.id,
           nodeType: 'skill',
           label: skill.name,
@@ -609,7 +643,7 @@ export const knowledgeService = {
     }
     if (wanted('personal')) {
       for (const info of knowledgeDb.listPersonal({ limit }).items) {
-        nodes.push({
+        entityNodes.push({
           id: info.id,
           nodeType: 'personal',
           label: info.title,
@@ -620,21 +654,77 @@ export const knowledgeService = {
       }
     }
 
-    const truncated = nodes.length > limit;
-    const capped = nodes.slice(0, limit);
-    for (const node of capped) counts[node.nodeType] = (counts[node.nodeType] ?? 0) + 1;
+    const truncated = entityNodes.length > limit;
+    const capped = entityNodes.slice(0, limit);
     const included = new Set(capped.map((node) => node.id));
-    const edges = knowledgeDb
-      .listConnections({ limit: 5000 })
-      .filter((edge) => included.has(edge.sourceId) && included.has(edge.targetId))
-      .map((edge) => ({
+    for (const node of capped) counts[node.nodeType] = (counts[node.nodeType] ?? 0) + 1;
+
+    const nodes: KnowledgeGraph['nodes'] = [...capped];
+    const edges: KnowledgeGraph['edges'] = [];
+
+    // Explicit connections whose endpoints are both present.
+    for (const edge of knowledgeDb.listConnections({ limit: 5000 })) {
+      if (!included.has(edge.sourceId) || !included.has(edge.targetId)) continue;
+      edges.push({
         id: edge.id,
         source: edge.sourceId,
         target: edge.targetId,
         relationship: edge.relationship,
         weight: edge.weight,
-      }));
-    return { nodes: capped, edges, truncated, counts };
+      });
+    }
+
+    // Implicit project hubs: every project-scoped entity links to its project.
+    for (const [projectId, memberIds] of projectMembers) {
+      const members = memberIds.filter((id) => included.has(id));
+      if (members.length === 0) continue;
+      const hubId = `project:${projectId}`;
+      nodes.push({
+        id: hubId,
+        nodeType: 'project',
+        label: projectLabel(projectId),
+        projectId,
+        priority: null,
+        icon: null,
+      });
+      counts.project += 1;
+      for (const id of members) {
+        edges.push({
+          id: `belongs_to:${id}:${hubId}`,
+          source: id,
+          target: hubId,
+          relationship: 'belongs_to',
+          weight: 0.4,
+        });
+      }
+    }
+
+    // Implicit tag hubs: memories sharing a tag link to a tag node.
+    for (const [tag, memberIds] of tagMembers) {
+      const members = memberIds.filter((id) => included.has(id));
+      if (members.length < 2) continue;
+      const hubId = `tag:${tag}`;
+      nodes.push({
+        id: hubId,
+        nodeType: 'tag',
+        label: `#${tag}`,
+        projectId: null,
+        priority: null,
+        icon: null,
+      });
+      counts.tag += 1;
+      for (const id of members) {
+        edges.push({
+          id: `tagged:${id}:${hubId}`,
+          source: id,
+          target: hubId,
+          relationship: 'tagged',
+          weight: 0.3,
+        });
+      }
+    }
+
+    return { nodes, edges, truncated, counts };
   },
 
   // ---------------------------------------------------------- export/import

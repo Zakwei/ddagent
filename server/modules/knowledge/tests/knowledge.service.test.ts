@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { closeConnection, initializeDatabase } from '@/modules/database/index.js';
+import { closeConnection, getConnection, initializeDatabase } from '@/modules/database/index.js';
 import { knowledgeService } from '@/modules/knowledge/index.js';
 import { AppError } from '@/shared/utils.js';
 
@@ -134,6 +134,44 @@ test('graph assembles nodes and only edges whose endpoints are present', async (
     assert.equal(all.edges.length, 2);
     assert.equal(all.counts.memory, 2);
     assert.equal(all.counts.rule, 1);
+  });
+});
+
+test('graph adds implicit project and tag hubs so it is never edgeless', async () => {
+  await withIsolatedDatabase(() => {
+    getConnection()
+      .prepare('INSERT INTO projects (project_id, project_path, custom_project_name) VALUES (?, ?, ?)')
+      .run('p1', '/workspace/demo', 'Demo');
+    const a = knowledgeService.createMemory({
+      projectId: 'p1',
+      title: 'A',
+      content: 'a',
+      tags: ['shared'],
+    });
+    const b = knowledgeService.createMemory({
+      projectId: 'p1',
+      title: 'B',
+      content: 'b',
+      tags: ['shared'],
+    });
+    knowledgeService.createRule({ projectId: 'p1', title: 'R', content: 'r' });
+
+    const graph = knowledgeService.graph();
+    const projectNodes = graph.nodes.filter((node) => node.nodeType === 'project');
+    const tagNodes = graph.nodes.filter((node) => node.nodeType === 'tag');
+    assert.equal(projectNodes.length, 1);
+    assert.equal(projectNodes[0]?.label, 'Demo');
+    assert.equal(tagNodes.length, 1);
+    assert.equal(tagNodes[0]?.label, '#shared');
+
+    const belongs = graph.edges.filter((edge) => edge.relationship === 'belongs_to');
+    assert.equal(belongs.length, 3); // A, B and the rule all belong to the project
+    assert.ok(belongs.some((edge) => edge.source === a.id));
+    assert.ok(belongs.some((edge) => edge.source === b.id));
+    const tagged = graph.edges.filter((edge) => edge.relationship === 'tagged');
+    assert.equal(tagged.length, 2);
+    assert.equal(graph.counts.project, 1);
+    assert.equal(graph.counts.tag, 1);
   });
 });
 
