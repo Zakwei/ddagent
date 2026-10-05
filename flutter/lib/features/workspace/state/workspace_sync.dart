@@ -31,7 +31,9 @@ class WorkspaceSync {
   // Serialized state as last seen by the server. Null until the first
   // workspace_state frame or successful push — NOT seeded with the boot state,
   // because the notifier's `state` isn't readable while build() is still
-  // running.
+  // running. Doubles as the cold-boot marker: null means this app run has
+  // never seen the server, so pushes stay gated (see _push) and the first
+  // snapshot is adopted rather than fought.
   String? _lastSyncedJson;
   // True when a local edit couldn't reach the server (socket down). The next
   // workspace_state reply then loses to our push — unsent edits beat remote
@@ -58,6 +60,13 @@ class WorkspaceSync {
   void pushLocal() => _push(_getState());
 
   bool _push(WorkspaceState state) {
+    // Never write server state before reading it: a boot-time push (restored
+    // Hive panes or the auto-seeded picker pane) would broadcast this
+    // device's stale layout over every other device's live workspace — that
+    // push is what wiped the desktop's panes whenever the app opened on
+    // mobile. Not marked dirty: the first workspace_state frame resolves
+    // what wins, and an empty server is seeded by the branch below anyway.
+    if (_lastSyncedJson == null) return false;
     final json = _serialize(state);
     if (json == _lastSyncedJson) return true;
     if (_send({'type': 'workspace.update', 'state': state.toJson(), 'deviceId': _deviceId()})) {
@@ -83,17 +92,18 @@ class WorkspaceSync {
 
     final remote = frame['state'];
     if (remote is Map) {
+      // `_lastSyncedJson == null` marks the first frame of this app run — a
+      // cold boot, where local panes are restored-from-disk or auto-seeded
+      // guesses, not live state. The server's copy reflects devices that were
+      // actually connected, so a cold boot adopts it even over non-empty
+      // local panes (a second device opening the app must not clobber the
+      // first). On a reconnect `_lastSyncedJson` survives and the snapshot
+      // (originDeviceId null) still loses to non-empty local panes — the
+      // server may predate this device's panes — so keep local and push it.
+      final coldBoot = _lastSyncedJson == null;
       final next = WorkspaceState.sanitize(remote);
       _lastSyncedJson = _serialize(next);
-      // A snapshot reply to `workspace.get` carries originDeviceId:null; a
-      // genuine edit from another device carries its deviceId (server's
-      // sendCurrent vs applyUpdate). A snapshot is a *reply*, not an edit: it
-      // can be stale or partial (the server may predate this device's panes),
-      // and clobbering a non-empty local workspace with it is what silently
-      // closed the user's panes on every socket reconnect. Keep local and push
-      // it so the server catches up; only adopt a snapshot when local is empty
-      // (fresh device — the intended way to pick up another device's panes).
-      if (frame['originDeviceId'] == null && _getState().panes.isNotEmpty) {
+      if (frame['originDeviceId'] == null && !coldBoot && _getState().panes.isNotEmpty) {
         pushLocal();
         return;
       }

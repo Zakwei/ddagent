@@ -39,6 +39,20 @@ class _Harness {
   WorkspaceState? applied;
   WorkspaceState current = _local;
   bool sendOk = true;
+
+  /// Marks the boot handshake as done: feeds a snapshot echoing the current
+  /// local state so `_lastSyncedJson` is set (this is a reconnect, not a cold
+  /// boot), then clears the captured side-effects.
+  void synced() {
+    sync.handleFrame({
+      'kind': 'workspace_state',
+      'state': current.toJson(),
+      'revision': 1,
+      'originDeviceId': null,
+    });
+    sent.clear();
+    applied = null;
+  }
 }
 
 void main() {
@@ -50,8 +64,33 @@ void main() {
     ]);
   });
 
-  test('a snapshot reply never clobbers a non-empty local workspace', () {
+  test('a cold boot adopts the server snapshot over stale local panes', () {
     final h = _Harness();
+    // First frame of the app run — local panes are restored-from-disk or
+    // auto-seeded guesses, the snapshot carries another device's live
+    // workspace. Remote wins and nothing is pushed back over it.
+    h.sync.handleFrame({
+      'kind': 'workspace_state',
+      'state': _remote.toJson(),
+      'revision': 3,
+      'originDeviceId': null,
+    });
+
+    expect(h.applied?.panes.length, 2);
+    expect(h.applied?.panes.first.id, 'p9');
+    expect(h.sent, isEmpty);
+  });
+
+  test('pre-sync pushes stay silent so boot state never reaches the server', () {
+    final h = _Harness();
+    h.sync.pushLocal(); // e.g. the auto-seeded picker pane firing pre-snapshot
+    expect(h.sent, isEmpty);
+    expect(h.sync.dirty, isFalse);
+  });
+
+  test('a snapshot reply never clobbers a non-empty local workspace on reconnect', () {
+    final h = _Harness();
+    h.synced(); // past the boot handshake — this socket already saw the server
     // Server reply to workspace.get → originDeviceId null, may be stale.
     h.sync.handleFrame({
       'kind': 'workspace_state',
@@ -104,6 +143,7 @@ void main() {
 
   test('local change pushes one workspace.update; unchanged state stays silent', () {
     final h = _Harness();
+    h.synced();
 
     h.current = _remote;
     h.sync.pushLocal();
@@ -126,6 +166,7 @@ void main() {
 
   test('unsent local edits win over an incoming remote state (dirty tie-break)', () {
     final h = _Harness();
+    h.synced();
     h.current = _remote;
     h.sendOk = false;
     h.sync.pushLocal(); // socket down → dirty, nothing sent
