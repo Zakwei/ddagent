@@ -448,6 +448,7 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
     }
 
     final recentOnly = ref.watch(fileTreeRecentOnlyProvider);
+    final respectGitignore = ref.watch(fileTreeRespectGitignoreProvider);
     final base = recentOnly
         ? filterFileTreeByModified(state.roots, DateTime.now().subtract(kFileTreeRecentWindow))
         : state.roots;
@@ -508,6 +509,11 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
           onViewMode: (m) => ref.read(fileTreeViewModeProvider.notifier).set(m),
           recentOnly: recentOnly,
           onToggleRecentOnly: () => ref.read(fileTreeRecentOnlyProvider.notifier).toggle(),
+          respectGitignore: respectGitignore,
+          onToggleRespectGitignore: () {
+            ref.read(fileTreeRespectGitignoreProvider.notifier).toggle();
+            unawaited(ref.read(fileTreeProvider.notifier).refresh());
+          },
         ),
         Expanded(
           child: DropTarget(
@@ -718,6 +724,8 @@ class _TreeToolbar extends StatelessWidget {
     required this.onViewMode,
     required this.recentOnly,
     required this.onToggleRecentOnly,
+    required this.respectGitignore,
+    required this.onToggleRespectGitignore,
   });
 
   final TextEditingController search;
@@ -737,6 +745,8 @@ class _TreeToolbar extends StatelessWidget {
   final ValueChanged<FileTreeViewMode> onViewMode;
   final bool recentOnly;
   final VoidCallback onToggleRecentOnly;
+  final bool respectGitignore;
+  final VoidCallback onToggleRespectGitignore;
 
   @override
   Widget build(BuildContext context) {
@@ -810,6 +820,12 @@ class _TreeToolbar extends StatelessWidget {
                 icon: LucideIcons.calendarClock,
                 active: recentOnly,
                 onTap: onToggleRecentOnly,
+              ),
+              _IconBtn(
+                tooltip: respectGitignore ? 'Show gitignored files' : 'Hide gitignored files',
+                icon: LucideIcons.eyeOff,
+                active: !respectGitignore,
+                onTap: canEdit ? onToggleRespectGitignore : null,
               ),
             ],
           ),

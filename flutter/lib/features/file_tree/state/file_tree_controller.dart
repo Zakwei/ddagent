@@ -74,7 +74,10 @@ class FileTreeController extends Notifier<FileTreeState> {
     }
     state = state.copyWith(loading: true, error: () => null);
     try {
-      final roots = await _repo.listFiles(projectId);
+      final roots = await _repo.listFiles(
+        projectId,
+        respectGitignore: ref.read(fileTreeRespectGitignoreProvider),
+      );
       if (state.projectId != projectId) {
         return; // switched projects mid-flight
       }
@@ -217,6 +220,40 @@ class FileTreeRecentOnlyController extends Notifier<bool> {
 
 final fileTreeRecentOnlyProvider = NotifierProvider<FileTreeRecentOnlyController, bool>(
   FileTreeRecentOnlyController.new,
+);
+
+/// "Respect gitignore" — the tree hides entries matched by the project's
+/// `.gitignore` by default; the toolbar switch flips it to reveal them
+/// (`respectGitignore=false` on `/projects/:id/files`).
+const kFileTreeRespectGitignoreKey = 'file_tree_respect_gitignore';
+const kDefaultFileTreeRespectGitignore = true;
+
+bool readFileTreeRespectGitignore() {
+  if (!Hive.isBoxOpen(_viewModeBox)) {
+    return kDefaultFileTreeRespectGitignore;
+  }
+  return Hive.box<dynamic>(_viewModeBox).get(kFileTreeRespectGitignoreKey) as bool? ??
+      kDefaultFileTreeRespectGitignore;
+}
+
+void persistFileTreeRespectGitignore(bool value) {
+  if (Hive.isBoxOpen(_viewModeBox)) {
+    Hive.box<dynamic>(_viewModeBox).put(kFileTreeRespectGitignoreKey, value);
+  }
+}
+
+class FileTreeRespectGitignoreController extends Notifier<bool> {
+  @override
+  bool build() => readFileTreeRespectGitignore();
+
+  void toggle() {
+    state = !state;
+    persistFileTreeRespectGitignore(state);
+  }
+}
+
+final fileTreeRespectGitignoreProvider = NotifierProvider<FileTreeRespectGitignoreController, bool>(
+  FileTreeRespectGitignoreController.new,
 );
 
 /// Extracted so persistence is testable without a Riverpod container.

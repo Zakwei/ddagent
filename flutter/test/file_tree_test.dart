@@ -5,6 +5,7 @@ import 'package:ddagent_app/features/file_tree/data/file_tree_node.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_repository.dart';
 import 'package:ddagent_app/features/file_tree/state/file_tree_controller.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 
@@ -239,5 +240,44 @@ void main() {
       await Hive.box<dynamic>('settings').put(kFileTreeViewModeKey, 'bogus');
       expect(readFileTreeViewMode(), kDefaultFileTreeViewMode);
     });
+
+    test('gitignore toggle defaults to respecting and persists', () async {
+      expect(readFileTreeRespectGitignore(), isTrue);
+      persistFileTreeRespectGitignore(false);
+      expect(Hive.box<dynamic>('settings').get(kFileTreeRespectGitignoreKey), false);
+      expect(readFileTreeRespectGitignore(), isFalse);
+    });
   });
+
+  group('respect-gitignore toggle', () {
+    test('reload follows the provider flag', () async {
+      final repo = _RecordingFileTreeRepository();
+      final container = ProviderContainer(
+        overrides: [fileTreeRepositoryProvider.overrideWithValue(repo)],
+      );
+      addTearDown(container.dispose);
+
+      final controller = container.read(fileTreeProvider.notifier);
+      controller.selectProject('p1');
+      await controller.refresh();
+      expect(repo.respectGitignoreCalls.last, isTrue);
+
+      container.read(fileTreeRespectGitignoreProvider.notifier).toggle();
+      await controller.refresh();
+      expect(repo.respectGitignoreCalls.last, isFalse);
+    });
+  });
+}
+
+/// Records the `respectGitignore` flag every `listFiles` call receives.
+class _RecordingFileTreeRepository extends FileTreeRepository {
+  _RecordingFileTreeRepository() : super(Dio());
+
+  final respectGitignoreCalls = <bool>[];
+
+  @override
+  Future<List<FileTreeNode>> listFiles(String projectId, {bool respectGitignore = true}) async {
+    respectGitignoreCalls.add(respectGitignore);
+    return const [];
+  }
 }
