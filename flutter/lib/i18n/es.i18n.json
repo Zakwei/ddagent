@@ -1650,12 +1650,6 @@
         "label": "Modo oscuro",
         "description": "Alterna entre el tema claro y el oscuro"
       },
-      "projectSorting": {
-        "label": "Orden de proyectos",
-        "description": "Cómo se ordenan los proyectos en la barra lateral",
-        "alphabetical": "Alfabético",
-        "recentActivity": "Actividad reciente"
-      },
       "codeEditor": {
         "title": "Editor de código",
         "theme": {

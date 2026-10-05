@@ -1750,7 +1750,6 @@ class Translations$settings$appearanceSettings$de extends Translations$settings$
 
 	// Translations
 	@override late final Translations$settings$appearanceSettings$darkMode$de darkMode = Translations$settings$appearanceSettings$darkMode$de._(_root);
-	@override late final Translations$settings$appearanceSettings$projectSorting$de projectSorting = Translations$settings$appearanceSettings$projectSorting$de._(_root);
 	@override late final Translations$settings$appearanceSettings$codeEditor$de codeEditor = Translations$settings$appearanceSettings$codeEditor$de._(_root);
 	@override late final Translations$settings$appearanceSettings$terminal$de terminal = Translations$settings$appearanceSettings$terminal$de._(_root);
 }
@@ -4260,19 +4259,6 @@ class Translations$settings$appearanceSettings$darkMode$de extends Translations$
 	// Translations
 	@override String get label => 'Darkmode';
 	@override String get description => 'Zwischen hellem und dunklem Design wechseln';
-}
-
-// Path: settings.appearanceSettings.projectSorting
-class Translations$settings$appearanceSettings$projectSorting$de extends Translations$settings$appearanceSettings$projectSorting$en {
-	Translations$settings$appearanceSettings$projectSorting$de._(TranslationsDe root) : this._root = root, super.internal(root);
-
-	final TranslationsDe _root; // ignore: unused_field
-
-	// Translations
-	@override String get label => 'Projektsortierung';
-	@override String get description => 'Wie Projekte in der Seitenleiste angeordnet werden';
-	@override String get alphabetical => 'Alphabetisch';
-	@override String get recentActivity => 'Letzte Aktivität';
 }
 
 // Path: settings.appearanceSettings.codeEditor
@@ -6875,10 +6861,6 @@ extension on TranslationsDe {
 			'settings.notifications.desktop.unsupported' => 'Desktop-Benachrichtigungen werden auf diesem System nicht unterstützt.',
 			'settings.appearanceSettings.darkMode.label' => 'Darkmode',
 			'settings.appearanceSettings.darkMode.description' => 'Zwischen hellem und dunklem Design wechseln',
-			'settings.appearanceSettings.projectSorting.label' => 'Projektsortierung',
-			'settings.appearanceSettings.projectSorting.description' => 'Wie Projekte in der Seitenleiste angeordnet werden',
-			'settings.appearanceSettings.projectSorting.alphabetical' => 'Alphabetisch',
-			'settings.appearanceSettings.projectSorting.recentActivity' => 'Letzte Aktivität',
 			'settings.appearanceSettings.codeEditor.title' => 'Code-Editor',
 			'settings.appearanceSettings.codeEditor.theme.label' => 'Editor-Design',
 			'settings.appearanceSettings.codeEditor.theme.description' => 'Standarddesign für den Code-Editor',

@@ -1750,7 +1750,6 @@ class Translations$settings$appearanceSettings$zh_TW extends Translations$settin
 
 	// Translations
 	@override late final Translations$settings$appearanceSettings$darkMode$zh_TW darkMode = Translations$settings$appearanceSettings$darkMode$zh_TW.internal(_root);
-	@override late final Translations$settings$appearanceSettings$projectSorting$zh_TW projectSorting = Translations$settings$appearanceSettings$projectSorting$zh_TW.internal(_root);
 	@override late final Translations$settings$appearanceSettings$codeEditor$zh_TW codeEditor = Translations$settings$appearanceSettings$codeEditor$zh_TW.internal(_root);
 	@override late final Translations$settings$appearanceSettings$terminal$zh_TW terminal = Translations$settings$appearanceSettings$terminal$zh_TW.internal(_root);
 }
@@ -4260,19 +4259,6 @@ class Translations$settings$appearanceSettings$darkMode$zh_TW extends Translatio
 	// Translations
 	@override String get label => '深色模式';
 	@override String get description => '切換淺色和深色佈景主題';
-}
-
-// Path: settings.appearanceSettings.projectSorting
-class Translations$settings$appearanceSettings$projectSorting$zh_TW extends Translations$settings$appearanceSettings$projectSorting$en {
-	Translations$settings$appearanceSettings$projectSorting$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
-
-	final TranslationsZhTw _root; // ignore: unused_field
-
-	// Translations
-	@override String get label => '專案排序';
-	@override String get description => '專案在側邊欄中的排列方式';
-	@override String get alphabetical => '依字母順序';
-	@override String get recentActivity => '最近活動';
 }
 
 // Path: settings.appearanceSettings.codeEditor
@@ -6875,10 +6861,6 @@ extension on TranslationsZhTw {
 			'settings.notifications.desktop.unsupported' => '此系統不支援桌面通知。',
 			'settings.appearanceSettings.darkMode.label' => '深色模式',
 			'settings.appearanceSettings.darkMode.description' => '切換淺色和深色佈景主題',
-			'settings.appearanceSettings.projectSorting.label' => '專案排序',
-			'settings.appearanceSettings.projectSorting.description' => '專案在側邊欄中的排列方式',
-			'settings.appearanceSettings.projectSorting.alphabetical' => '依字母順序',
-			'settings.appearanceSettings.projectSorting.recentActivity' => '最近活動',
 			'settings.appearanceSettings.codeEditor.title' => '程式碼編輯器',
 			'settings.appearanceSettings.codeEditor.theme.label' => '編輯器佈景主題',
 			'settings.appearanceSettings.codeEditor.theme.description' => '程式碼編輯器的預設佈景主題',

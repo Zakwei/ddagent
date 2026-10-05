@@ -1750,7 +1750,6 @@ class Translations$settings$appearanceSettings$tr extends Translations$settings$
 
 	// Translations
 	@override late final Translations$settings$appearanceSettings$darkMode$tr darkMode = Translations$settings$appearanceSettings$darkMode$tr._(_root);
-	@override late final Translations$settings$appearanceSettings$projectSorting$tr projectSorting = Translations$settings$appearanceSettings$projectSorting$tr._(_root);
 	@override late final Translations$settings$appearanceSettings$codeEditor$tr codeEditor = Translations$settings$appearanceSettings$codeEditor$tr._(_root);
 	@override late final Translations$settings$appearanceSettings$terminal$tr terminal = Translations$settings$appearanceSettings$terminal$tr._(_root);
 }
@@ -4260,19 +4259,6 @@ class Translations$settings$appearanceSettings$darkMode$tr extends Translations$
 	// Translations
 	@override String get label => 'Koyu Mod';
 	@override String get description => 'Açık ve koyu temalar arasında geçiş yap';
-}
-
-// Path: settings.appearanceSettings.projectSorting
-class Translations$settings$appearanceSettings$projectSorting$tr extends Translations$settings$appearanceSettings$projectSorting$en {
-	Translations$settings$appearanceSettings$projectSorting$tr._(TranslationsTr root) : this._root = root, super.internal(root);
-
-	final TranslationsTr _root; // ignore: unused_field
-
-	// Translations
-	@override String get label => 'Proje Sıralama';
-	@override String get description => 'Projelerin kenar çubuğunda nasıl sıralanacağı';
-	@override String get alphabetical => 'Alfabetik';
-	@override String get recentActivity => 'Son Etkinlik';
 }
 
 // Path: settings.appearanceSettings.codeEditor
@@ -6875,10 +6861,6 @@ extension on TranslationsTr {
 			'settings.notifications.desktop.unsupported' => 'Bu sistemde masaüstü bildirimleri desteklenmiyor.',
 			'settings.appearanceSettings.darkMode.label' => 'Koyu Mod',
 			'settings.appearanceSettings.darkMode.description' => 'Açık ve koyu temalar arasında geçiş yap',
-			'settings.appearanceSettings.projectSorting.label' => 'Proje Sıralama',
-			'settings.appearanceSettings.projectSorting.description' => 'Projelerin kenar çubuğunda nasıl sıralanacağı',
-			'settings.appearanceSettings.projectSorting.alphabetical' => 'Alfabetik',
-			'settings.appearanceSettings.projectSorting.recentActivity' => 'Son Etkinlik',
 			'settings.appearanceSettings.codeEditor.title' => 'Kod Editörü',
 			'settings.appearanceSettings.codeEditor.theme.label' => 'Editör Teması',
 			'settings.appearanceSettings.codeEditor.theme.description' => 'Kod editörü için varsayılan tema',

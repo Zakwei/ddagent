@@ -1750,7 +1750,6 @@ class Translations$settings$appearanceSettings$ko extends Translations$settings$
 
 	// Translations
 	@override late final Translations$settings$appearanceSettings$darkMode$ko darkMode = Translations$settings$appearanceSettings$darkMode$ko._(_root);
-	@override late final Translations$settings$appearanceSettings$projectSorting$ko projectSorting = Translations$settings$appearanceSettings$projectSorting$ko._(_root);
 	@override late final Translations$settings$appearanceSettings$codeEditor$ko codeEditor = Translations$settings$appearanceSettings$codeEditor$ko._(_root);
 	@override late final Translations$settings$appearanceSettings$terminal$ko terminal = Translations$settings$appearanceSettings$terminal$ko._(_root);
 }
@@ -4260,19 +4259,6 @@ class Translations$settings$appearanceSettings$darkMode$ko extends Translations$
 	// Translations
 	@override String get label => '다크 모드';
 	@override String get description => '라이트/다크 테마 전환';
-}
-
-// Path: settings.appearanceSettings.projectSorting
-class Translations$settings$appearanceSettings$projectSorting$ko extends Translations$settings$appearanceSettings$projectSorting$en {
-	Translations$settings$appearanceSettings$projectSorting$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get label => '프로젝트 정렬';
-	@override String get description => '사이드바에서 프로젝트 정렬 방식';
-	@override String get alphabetical => '알파벳순';
-	@override String get recentActivity => '최근 활동순';
 }
 
 // Path: settings.appearanceSettings.codeEditor
@@ -6875,10 +6861,6 @@ extension on TranslationsKo {
 			'settings.notifications.events.error' => '실행 실패',
 			'settings.appearanceSettings.darkMode.label' => '다크 모드',
 			'settings.appearanceSettings.darkMode.description' => '라이트/다크 테마 전환',
-			'settings.appearanceSettings.projectSorting.label' => '프로젝트 정렬',
-			'settings.appearanceSettings.projectSorting.description' => '사이드바에서 프로젝트 정렬 방식',
-			'settings.appearanceSettings.projectSorting.alphabetical' => '알파벳순',
-			'settings.appearanceSettings.projectSorting.recentActivity' => '최근 활동순',
 			'settings.appearanceSettings.codeEditor.title' => '코드 에디터',
 			'settings.appearanceSettings.codeEditor.theme.label' => '에디터 테마',
 			'settings.appearanceSettings.codeEditor.theme.description' => '코드 에디터의 기본 테마',

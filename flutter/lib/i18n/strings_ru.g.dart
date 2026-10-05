@@ -1750,7 +1750,6 @@ class Translations$settings$appearanceSettings$ru extends Translations$settings$
 
 	// Translations
 	@override late final Translations$settings$appearanceSettings$darkMode$ru darkMode = Translations$settings$appearanceSettings$darkMode$ru._(_root);
-	@override late final Translations$settings$appearanceSettings$projectSorting$ru projectSorting = Translations$settings$appearanceSettings$projectSorting$ru._(_root);
 	@override late final Translations$settings$appearanceSettings$codeEditor$ru codeEditor = Translations$settings$appearanceSettings$codeEditor$ru._(_root);
 	@override late final Translations$settings$appearanceSettings$terminal$ru terminal = Translations$settings$appearanceSettings$terminal$ru._(_root);
 }
@@ -4266,19 +4265,6 @@ class Translations$settings$appearanceSettings$darkMode$ru extends Translations$
 	// Translations
 	@override String get label => 'Темная тема';
 	@override String get description => 'Переключение между светлой и темной темами';
-}
-
-// Path: settings.appearanceSettings.projectSorting
-class Translations$settings$appearanceSettings$projectSorting$ru extends Translations$settings$appearanceSettings$projectSorting$en {
-	Translations$settings$appearanceSettings$projectSorting$ru._(TranslationsRu root) : this._root = root, super.internal(root);
-
-	final TranslationsRu _root; // ignore: unused_field
-
-	// Translations
-	@override String get label => 'Сортировка проектов';
-	@override String get description => 'Как проекты упорядочены на боковой панели';
-	@override String get alphabetical => 'По алфавиту';
-	@override String get recentActivity => 'По недавней активности';
 }
 
 // Path: settings.appearanceSettings.codeEditor
@@ -6881,10 +6867,6 @@ extension on TranslationsRu {
 			'settings.notifications.desktop.unsupported' => 'Десктопные уведомления не поддерживаются в этой системе.',
 			'settings.appearanceSettings.darkMode.label' => 'Темная тема',
 			'settings.appearanceSettings.darkMode.description' => 'Переключение между светлой и темной темами',
-			'settings.appearanceSettings.projectSorting.label' => 'Сортировка проектов',
-			'settings.appearanceSettings.projectSorting.description' => 'Как проекты упорядочены на боковой панели',
-			'settings.appearanceSettings.projectSorting.alphabetical' => 'По алфавиту',
-			'settings.appearanceSettings.projectSorting.recentActivity' => 'По недавней активности',
 			'settings.appearanceSettings.codeEditor.title' => 'Редактор кода',
 			'settings.appearanceSettings.codeEditor.theme.label' => 'Тема редактора',
 			'settings.appearanceSettings.codeEditor.theme.description' => 'Тема по умолчанию для редактора кода',

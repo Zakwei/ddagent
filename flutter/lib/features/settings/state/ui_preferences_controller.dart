@@ -103,36 +103,3 @@ class UiPreferencesController extends Notifier<UiPreferences> {
 final uiPreferencesProvider = NotifierProvider<UiPreferencesController, UiPreferences>(
   UiPreferencesController.new,
 );
-
-/// Project list ordering — web stores it in `claude-settings.projectSortOrder`
-/// (`'name' | 'date'`, default `'name'`); here it lives in the `settings`
-/// Hive box under `projectSortOrder`.
-enum ProjectSortOrder {
-  name,
-  date;
-
-  static ProjectSortOrder parse(Object? value) =>
-      value == 'date' ? ProjectSortOrder.date : ProjectSortOrder.name;
-}
-
-class ProjectSortOrderController extends Notifier<ProjectSortOrder> {
-  static const _boxName = 'settings';
-  static const _key = 'projectSortOrder';
-
-  @override
-  ProjectSortOrder build() {
-    if (!Hive.isBoxOpen(_boxName)) return ProjectSortOrder.name;
-    return ProjectSortOrder.parse(Hive.box<dynamic>(_boxName).get(_key));
-  }
-
-  Future<void> set(ProjectSortOrder order) async {
-    state = order;
-    if (Hive.isBoxOpen(_boxName)) {
-      await Hive.box<dynamic>(_boxName).put(_key, order.name);
-    }
-  }
-}
-
-final projectSortOrderProvider = NotifierProvider<ProjectSortOrderController, ProjectSortOrder>(
-  ProjectSortOrderController.new,
-);

@@ -1650,12 +1650,6 @@
         "label": "ダークモード",
         "description": "ライトテーマとダークテーマを切り替えます"
       },
-      "projectSorting": {
-        "label": "プロジェクトの並び順",
-        "description": "サイドバーでのプロジェクトの並び順を設定します",
-        "alphabetical": "アルファベット順",
-        "recentActivity": "最近のアクティビティ順"
-      },
       "codeEditor": {
         "title": "コードエディタ",
         "theme": {

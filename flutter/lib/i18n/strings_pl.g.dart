@@ -1817,7 +1817,6 @@ class Translations$settings$appearanceSettings$pl extends Translations$settings$
 
 	// Translations
 	@override late final Translations$settings$appearanceSettings$darkMode$pl darkMode = Translations$settings$appearanceSettings$darkMode$pl._(_root);
-	@override late final Translations$settings$appearanceSettings$projectSorting$pl projectSorting = Translations$settings$appearanceSettings$projectSorting$pl._(_root);
 	@override late final Translations$settings$appearanceSettings$codeEditor$pl codeEditor = Translations$settings$appearanceSettings$codeEditor$pl._(_root);
 	@override late final Translations$settings$appearanceSettings$terminal$pl terminal = Translations$settings$appearanceSettings$terminal$pl._(_root);
 }
@@ -4571,19 +4570,6 @@ class Translations$settings$appearanceSettings$darkMode$pl extends Translations$
 	// Translations
 	@override String get label => 'Tryb ciemny';
 	@override String get description => 'Przełączaj między motywem jasnym i ciemnym';
-}
-
-// Path: settings.appearanceSettings.projectSorting
-class Translations$settings$appearanceSettings$projectSorting$pl extends Translations$settings$appearanceSettings$projectSorting$en {
-	Translations$settings$appearanceSettings$projectSorting$pl._(TranslationsPl root) : this._root = root, super.internal(root);
-
-	final TranslationsPl _root; // ignore: unused_field
-
-	// Translations
-	@override String get label => 'Sortowanie projektów';
-	@override String get description => 'Kolejność projektów w panelu bocznym';
-	@override String get alphabetical => 'Alfabetyczne';
-	@override String get recentActivity => 'Ostatnia aktywność';
 }
 
 // Path: settings.appearanceSettings.codeEditor
@@ -7399,10 +7385,6 @@ extension on TranslationsPl {
 			'settings.notifications.events.error' => 'Uruchomienie nie powiodło się',
 			'settings.appearanceSettings.darkMode.label' => 'Tryb ciemny',
 			'settings.appearanceSettings.darkMode.description' => 'Przełączaj między motywem jasnym i ciemnym',
-			'settings.appearanceSettings.projectSorting.label' => 'Sortowanie projektów',
-			'settings.appearanceSettings.projectSorting.description' => 'Kolejność projektów w panelu bocznym',
-			'settings.appearanceSettings.projectSorting.alphabetical' => 'Alfabetyczne',
-			'settings.appearanceSettings.projectSorting.recentActivity' => 'Ostatnia aktywność',
 			'settings.appearanceSettings.codeEditor.title' => 'Edytor kodu',
 			'settings.appearanceSettings.codeEditor.theme.label' => 'Motyw edytora',
 			'settings.appearanceSettings.codeEditor.theme.description' => 'Domyślny motyw edytora kodu',

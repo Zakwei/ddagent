@@ -11,8 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Appearance section — port of `AppearanceSettingsTab.tsx`: theme, language,
-/// read-aloud voice, focus-follows-pointer, project sorting, code-editor
-/// prefs. All controls bind to persisted controllers (Hive `settings` box).
+/// read-aloud voice, focus-follows-pointer, code-editor prefs. All controls
+/// bind to persisted controllers (Hive `settings` box).
 class AppearanceSection extends ConsumerWidget {
   const AppearanceSection({super.key});
 
@@ -26,7 +26,6 @@ class AppearanceSection extends ConsumerWidget {
     final mode = ref.watch(themeModeProvider);
     final editor = ref.watch(editorSettingsProvider);
     final prefs = ref.watch(uiPreferencesProvider);
-    final sortOrder = ref.watch(projectSortOrderProvider);
     final appearance = t.settings.appearanceSettings;
 
     Widget card(List<Widget> rows, {bool divided = false}) => AppCard(
@@ -93,37 +92,6 @@ class AppearanceSection extends ConsumerWidget {
                   value: prefs.focusFollowsPointer,
                   onChanged: (v) =>
                       ref.read(uiPreferencesProvider.notifier).setFocusFollowsPointer(v),
-                ),
-              ),
-            ]),
-          ],
-        ),
-        const SizedBox(height: AppSpacing.xl),
-        SettingsSectionBlock(
-          title: appearance.projectSorting.label,
-          children: [
-            card([
-              SettingsRow(
-                label: appearance.projectSorting.label,
-                description: appearance.projectSorting.description,
-                child: DropdownButton<ProjectSortOrder>(
-                  value: sortOrder,
-                  underline: const SizedBox.shrink(),
-                  items: [
-                    DropdownMenuItem(
-                      value: ProjectSortOrder.name,
-                      child: Text(appearance.projectSorting.alphabetical),
-                    ),
-                    DropdownMenuItem(
-                      value: ProjectSortOrder.date,
-                      child: Text(appearance.projectSorting.recentActivity),
-                    ),
-                  ],
-                  onChanged: (v) {
-                    if (v != null) {
-                      ref.read(projectSortOrderProvider.notifier).set(v);
-                    }
-                  },
                 ),
               ),
             ]),

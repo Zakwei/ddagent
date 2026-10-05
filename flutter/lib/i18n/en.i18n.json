@@ -1862,12 +1862,6 @@
         "label": "Dark Mode",
         "description": "Toggle between light and dark themes"
       },
-      "projectSorting": {
-        "label": "Project Sorting",
-        "description": "How projects are ordered in the sidebar",
-        "alphabetical": "Alphabetical",
-        "recentActivity": "Recent Activity"
-      },
       "codeEditor": {
         "title": "Code Editor",
         "theme": {

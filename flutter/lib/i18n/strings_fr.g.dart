@@ -1750,7 +1750,6 @@ class Translations$settings$appearanceSettings$fr extends Translations$settings$
 
 	// Translations
 	@override late final Translations$settings$appearanceSettings$darkMode$fr darkMode = Translations$settings$appearanceSettings$darkMode$fr._(_root);
-	@override late final Translations$settings$appearanceSettings$projectSorting$fr projectSorting = Translations$settings$appearanceSettings$projectSorting$fr._(_root);
 	@override late final Translations$settings$appearanceSettings$codeEditor$fr codeEditor = Translations$settings$appearanceSettings$codeEditor$fr._(_root);
 	@override late final Translations$settings$appearanceSettings$terminal$fr terminal = Translations$settings$appearanceSettings$terminal$fr._(_root);
 }
@@ -4260,19 +4259,6 @@ class Translations$settings$appearanceSettings$darkMode$fr extends Translations$
 	// Translations
 	@override String get label => 'Mode sombre';
 	@override String get description => 'Basculer entre les thèmes clair et sombre';
-}
-
-// Path: settings.appearanceSettings.projectSorting
-class Translations$settings$appearanceSettings$projectSorting$fr extends Translations$settings$appearanceSettings$projectSorting$en {
-	Translations$settings$appearanceSettings$projectSorting$fr._(TranslationsFr root) : this._root = root, super.internal(root);
-
-	final TranslationsFr _root; // ignore: unused_field
-
-	// Translations
-	@override String get label => 'Tri des projets';
-	@override String get description => 'Ordre d\'affichage des projets dans la barre latérale';
-	@override String get alphabetical => 'Alphabétique';
-	@override String get recentActivity => 'Activité récente';
 }
 
 // Path: settings.appearanceSettings.codeEditor
@@ -6875,10 +6861,6 @@ extension on TranslationsFr {
 			'settings.notifications.desktop.unsupported' => 'Les notifications de bureau ne sont pas prises en charge sur ce système.',
 			'settings.appearanceSettings.darkMode.label' => 'Mode sombre',
 			'settings.appearanceSettings.darkMode.description' => 'Basculer entre les thèmes clair et sombre',
-			'settings.appearanceSettings.projectSorting.label' => 'Tri des projets',
-			'settings.appearanceSettings.projectSorting.description' => 'Ordre d\'affichage des projets dans la barre latérale',
-			'settings.appearanceSettings.projectSorting.alphabetical' => 'Alphabétique',
-			'settings.appearanceSettings.projectSorting.recentActivity' => 'Activité récente',
 			'settings.appearanceSettings.codeEditor.title' => 'Éditeur de code',
 			'settings.appearanceSettings.codeEditor.theme.label' => 'Thème de l\'éditeur',
 			'settings.appearanceSettings.codeEditor.theme.description' => 'Thème par défaut pour l\'éditeur de code',

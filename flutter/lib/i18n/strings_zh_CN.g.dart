@@ -1750,7 +1750,6 @@ class Translations$settings$appearanceSettings$zh_CN extends Translations$settin
 
 	// Translations
 	@override late final Translations$settings$appearanceSettings$darkMode$zh_CN darkMode = Translations$settings$appearanceSettings$darkMode$zh_CN.internal(_root);
-	@override late final Translations$settings$appearanceSettings$projectSorting$zh_CN projectSorting = Translations$settings$appearanceSettings$projectSorting$zh_CN.internal(_root);
 	@override late final Translations$settings$appearanceSettings$codeEditor$zh_CN codeEditor = Translations$settings$appearanceSettings$codeEditor$zh_CN.internal(_root);
 	@override late final Translations$settings$appearanceSettings$terminal$zh_CN terminal = Translations$settings$appearanceSettings$terminal$zh_CN.internal(_root);
 }
@@ -4260,19 +4259,6 @@ class Translations$settings$appearanceSettings$darkMode$zh_CN extends Translatio
 	// Translations
 	@override String get label => '深色模式';
 	@override String get description => '切换浅色和深色主题';
-}
-
-// Path: settings.appearanceSettings.projectSorting
-class Translations$settings$appearanceSettings$projectSorting$zh_CN extends Translations$settings$appearanceSettings$projectSorting$en {
-	Translations$settings$appearanceSettings$projectSorting$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get label => '项目排序';
-	@override String get description => '项目在侧边栏中的排列方式';
-	@override String get alphabetical => '按字母顺序';
-	@override String get recentActivity => '最近活动';
 }
 
 // Path: settings.appearanceSettings.codeEditor
@@ -6875,10 +6861,6 @@ extension on TranslationsZhCn {
 			'settings.notifications.events.error' => '运行失败',
 			'settings.appearanceSettings.darkMode.label' => '深色模式',
 			'settings.appearanceSettings.darkMode.description' => '切换浅色和深色主题',
-			'settings.appearanceSettings.projectSorting.label' => '项目排序',
-			'settings.appearanceSettings.projectSorting.description' => '项目在侧边栏中的排列方式',
-			'settings.appearanceSettings.projectSorting.alphabetical' => '按字母顺序',
-			'settings.appearanceSettings.projectSorting.recentActivity' => '最近活动',
 			'settings.appearanceSettings.codeEditor.title' => '代码编辑器',
 			'settings.appearanceSettings.codeEditor.theme.label' => '编辑器主题',
 			'settings.appearanceSettings.codeEditor.theme.description' => '代码编辑器的默认主题',

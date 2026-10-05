@@ -3302,7 +3302,6 @@ class Translations$settings$appearanceSettings$en {
 
 	// Translations
 	late final Translations$settings$appearanceSettings$darkMode$en darkMode = Translations$settings$appearanceSettings$darkMode$en.internal(_root);
-	late final Translations$settings$appearanceSettings$projectSorting$en projectSorting = Translations$settings$appearanceSettings$projectSorting$en.internal(_root);
 	late final Translations$settings$appearanceSettings$codeEditor$en codeEditor = Translations$settings$appearanceSettings$codeEditor$en.internal(_root);
 	late final Translations$settings$appearanceSettings$terminal$en terminal = Translations$settings$appearanceSettings$terminal$en.internal(_root);
 }
@@ -8488,27 +8487,6 @@ class Translations$settings$appearanceSettings$darkMode$en {
 	String get description => 'Toggle between light and dark themes';
 }
 
-// Path: settings.appearanceSettings.projectSorting
-class Translations$settings$appearanceSettings$projectSorting$en {
-	Translations$settings$appearanceSettings$projectSorting$en.internal(this._root);
-
-	final Translations _root; // ignore: unused_field
-
-	// Translations
-
-	/// en: 'Project Sorting'
-	String get label => 'Project Sorting';
-
-	/// en: 'How projects are ordered in the sidebar'
-	String get description => 'How projects are ordered in the sidebar';
-
-	/// en: 'Alphabetical'
-	String get alphabetical => 'Alphabetical';
-
-	/// en: 'Recent Activity'
-	String get recentActivity => 'Recent Activity';
-}
-
 // Path: settings.appearanceSettings.codeEditor
 class Translations$settings$appearanceSettings$codeEditor$en {
 	Translations$settings$appearanceSettings$codeEditor$en.internal(this._root);
@@ -12232,10 +12210,6 @@ extension on Translations {
 			'settings.notifications.messaging.discordWebhook' => 'https://discord.com/api/webhooks/…',
 			'settings.appearanceSettings.darkMode.label' => 'Dark Mode',
 			'settings.appearanceSettings.darkMode.description' => 'Toggle between light and dark themes',
-			'settings.appearanceSettings.projectSorting.label' => 'Project Sorting',
-			'settings.appearanceSettings.projectSorting.description' => 'How projects are ordered in the sidebar',
-			'settings.appearanceSettings.projectSorting.alphabetical' => 'Alphabetical',
-			'settings.appearanceSettings.projectSorting.recentActivity' => 'Recent Activity',
 			'settings.appearanceSettings.codeEditor.title' => 'Code Editor',
 			'settings.appearanceSettings.codeEditor.theme.label' => 'Editor Theme',
 			'settings.appearanceSettings.codeEditor.theme.description' => 'Default theme for the code editor',

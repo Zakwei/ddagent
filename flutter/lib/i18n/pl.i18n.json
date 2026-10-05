@@ -1782,12 +1782,6 @@
         "label": "Tryb ciemny",
         "description": "Przełączaj między motywem jasnym i ciemnym"
       },
-      "projectSorting": {
-        "label": "Sortowanie projektów",
-        "description": "Kolejność projektów w panelu bocznym",
-        "alphabetical": "Alfabetyczne",
-        "recentActivity": "Ostatnia aktywność"
-      },
       "codeEditor": {
         "title": "Edytor kodu",
         "theme": {

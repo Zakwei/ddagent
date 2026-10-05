@@ -67,16 +67,6 @@ void main() {
     });
   });
 
-  group('ProjectSortOrderController', () {
-    test('defaults to name, persists date', () async {
-      final container = _container({});
-      expect(container.read(projectSortOrderProvider), ProjectSortOrder.name);
-      await container.read(projectSortOrderProvider.notifier).set(ProjectSortOrder.date);
-      expect(Hive.box<dynamic>('settings').get('projectSortOrder'), 'date');
-      expect(_container({}).read(projectSortOrderProvider), ProjectSortOrder.date);
-    });
-  });
-
   group('ApiCredentialsController', () {
     test('loads snake_case keys + github_token credentials', () async {
       final container = _container({

@@ -1750,7 +1750,6 @@ class Translations$settings$appearanceSettings$ja extends Translations$settings$
 
 	// Translations
 	@override late final Translations$settings$appearanceSettings$darkMode$ja darkMode = Translations$settings$appearanceSettings$darkMode$ja._(_root);
-	@override late final Translations$settings$appearanceSettings$projectSorting$ja projectSorting = Translations$settings$appearanceSettings$projectSorting$ja._(_root);
 	@override late final Translations$settings$appearanceSettings$codeEditor$ja codeEditor = Translations$settings$appearanceSettings$codeEditor$ja._(_root);
 	@override late final Translations$settings$appearanceSettings$terminal$ja terminal = Translations$settings$appearanceSettings$terminal$ja._(_root);
 }
@@ -4260,19 +4259,6 @@ class Translations$settings$appearanceSettings$darkMode$ja extends Translations$
 	// Translations
 	@override String get label => 'ダークモード';
 	@override String get description => 'ライトテーマとダークテーマを切り替えます';
-}
-
-// Path: settings.appearanceSettings.projectSorting
-class Translations$settings$appearanceSettings$projectSorting$ja extends Translations$settings$appearanceSettings$projectSorting$en {
-	Translations$settings$appearanceSettings$projectSorting$ja._(TranslationsJa root) : this._root = root, super.internal(root);
-
-	final TranslationsJa _root; // ignore: unused_field
-
-	// Translations
-	@override String get label => 'プロジェクトの並び順';
-	@override String get description => 'サイドバーでのプロジェクトの並び順を設定します';
-	@override String get alphabetical => 'アルファベット順';
-	@override String get recentActivity => '最近のアクティビティ順';
 }
 
 // Path: settings.appearanceSettings.codeEditor
@@ -6875,10 +6861,6 @@ extension on TranslationsJa {
 			'settings.notifications.desktop.unsupported' => 'このシステムではデスクトップ通知はサポートされていません。',
 			'settings.appearanceSettings.darkMode.label' => 'ダークモード',
 			'settings.appearanceSettings.darkMode.description' => 'ライトテーマとダークテーマを切り替えます',
-			'settings.appearanceSettings.projectSorting.label' => 'プロジェクトの並び順',
-			'settings.appearanceSettings.projectSorting.description' => 'サイドバーでのプロジェクトの並び順を設定します',
-			'settings.appearanceSettings.projectSorting.alphabetical' => 'アルファベット順',
-			'settings.appearanceSettings.projectSorting.recentActivity' => '最近のアクティビティ順',
 			'settings.appearanceSettings.codeEditor.title' => 'コードエディタ',
 			'settings.appearanceSettings.codeEditor.theme.label' => 'エディタのテーマ',
 			'settings.appearanceSettings.codeEditor.theme.description' => 'コードエディタのデフォルトテーマ',

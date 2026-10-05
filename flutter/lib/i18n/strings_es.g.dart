@@ -1750,7 +1750,6 @@ class Translations$settings$appearanceSettings$es extends Translations$settings$
 
 	// Translations
 	@override late final Translations$settings$appearanceSettings$darkMode$es darkMode = Translations$settings$appearanceSettings$darkMode$es._(_root);
-	@override late final Translations$settings$appearanceSettings$projectSorting$es projectSorting = Translations$settings$appearanceSettings$projectSorting$es._(_root);
 	@override late final Translations$settings$appearanceSettings$codeEditor$es codeEditor = Translations$settings$appearanceSettings$codeEditor$es._(_root);
 	@override late final Translations$settings$appearanceSettings$terminal$es terminal = Translations$settings$appearanceSettings$terminal$es._(_root);
 }
@@ -4260,19 +4259,6 @@ class Translations$settings$appearanceSettings$darkMode$es extends Translations$
 	// Translations
 	@override String get label => 'Modo oscuro';
 	@override String get description => 'Alterna entre el tema claro y el oscuro';
-}
-
-// Path: settings.appearanceSettings.projectSorting
-class Translations$settings$appearanceSettings$projectSorting$es extends Translations$settings$appearanceSettings$projectSorting$en {
-	Translations$settings$appearanceSettings$projectSorting$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String get label => 'Orden de proyectos';
-	@override String get description => 'Cómo se ordenan los proyectos en la barra lateral';
-	@override String get alphabetical => 'Alfabético';
-	@override String get recentActivity => 'Actividad reciente';
 }
 
 // Path: settings.appearanceSettings.codeEditor
@@ -6875,10 +6861,6 @@ extension on TranslationsEs {
 			'settings.notifications.events.error' => 'Ejecución fallida',
 			'settings.appearanceSettings.darkMode.label' => 'Modo oscuro',
 			'settings.appearanceSettings.darkMode.description' => 'Alterna entre el tema claro y el oscuro',
-			'settings.appearanceSettings.projectSorting.label' => 'Orden de proyectos',
-			'settings.appearanceSettings.projectSorting.description' => 'Cómo se ordenan los proyectos en la barra lateral',
-			'settings.appearanceSettings.projectSorting.alphabetical' => 'Alfabético',
-			'settings.appearanceSettings.projectSorting.recentActivity' => 'Actividad reciente',
 			'settings.appearanceSettings.codeEditor.title' => 'Editor de código',
 			'settings.appearanceSettings.codeEditor.theme.label' => 'Tema del editor',
 			'settings.appearanceSettings.codeEditor.theme.description' => 'Tema por defecto del editor de código',

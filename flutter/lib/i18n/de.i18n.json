@@ -1650,12 +1650,6 @@
         "label": "Darkmode",
         "description": "Zwischen hellem und dunklem Design wechseln"
       },
-      "projectSorting": {
-        "label": "Projektsortierung",
-        "description": "Wie Projekte in der Seitenleiste angeordnet werden",
-        "alphabetical": "Alphabetisch",
-        "recentActivity": "Letzte Aktivität"
-      },
       "codeEditor": {
         "title": "Code-Editor",
         "theme": {
