@@ -10,13 +10,24 @@ class QueueRepository {
 
   final Dio _dio;
 
+  /// The queue as the UI renders it. Rows flagged `options.silent` are internal
+  /// auto-continuations (an ACP question's typed free text): they must drain
+  /// into the session but never show a queue card, so they are hidden here.
   Future<List<Map<String, dynamic>>> list(String sessionId) => apiCall(
     () => _dio.get<dynamic>('/api/queue', queryParameters: {'sessionId': sessionId}),
     (d) {
       final list = d is List ? d : (d as Map<String, dynamic>)['messages'] as List? ?? const [];
-      return [for (final m in list) m as Map<String, dynamic>];
+      return [
+        for (final m in list)
+          if (m is Map && !_isSilent(m)) m as Map<String, dynamic>,
+      ];
     },
   );
+
+  static bool _isSilent(Map<dynamic, dynamic> row) {
+    final options = row['options'];
+    return options is Map && options['silent'] == true;
+  }
 
   Future<Map<String, dynamic>> enqueue(
     String sessionId, {
