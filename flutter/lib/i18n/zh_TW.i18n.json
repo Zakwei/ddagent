@@ -1523,6 +1523,8 @@
           "effortPlaceholder": "default",
           "account": "Account",
           "accountDefault": "Provider default",
+          "redundantAccounts": "備援帳號",
+          "redundantAccountsNone": "此供應商沒有其他帳號",
           "tier": "Cost tier",
           "remove": "Remove candidate",
           "moveUp": "Move up",

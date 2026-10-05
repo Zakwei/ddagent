@@ -5142,6 +5142,8 @@ class Translations$settings$orchestration$pool$fields$ja extends Translations$se
 	@override String get effortPlaceholder => 'default';
 	@override String get account => 'Account';
 	@override String get accountDefault => 'Provider default';
+	@override String get redundantAccounts => '冗長アカウント';
+	@override String get redundantAccountsNone => 'このプロバイダーの他のアカウントはありません';
 	@override String get tier => 'Cost tier';
 	@override String get remove => 'Remove candidate';
 	@override String get moveUp => 'Move up';
@@ -6788,6 +6790,8 @@ extension on TranslationsJa {
 			'settings.orchestration.pool.fields.effortPlaceholder' => 'default',
 			'settings.orchestration.pool.fields.account' => 'Account',
 			'settings.orchestration.pool.fields.accountDefault' => 'Provider default',
+			'settings.orchestration.pool.fields.redundantAccounts' => '冗長アカウント',
+			'settings.orchestration.pool.fields.redundantAccountsNone' => 'このプロバイダーの他のアカウントはありません',
 			'settings.orchestration.pool.fields.tier' => 'Cost tier',
 			'settings.orchestration.pool.fields.remove' => 'Remove candidate',
 			'settings.orchestration.pool.fields.moveUp' => 'Move up',

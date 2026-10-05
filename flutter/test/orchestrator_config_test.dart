@@ -13,6 +13,7 @@ void main() {
         'model': 'claude-sonnet-4-5',
         'effort': 'high',
         'accountId': 'acct-9',
+        'fallbackAccountIds': ['acct-7', 'acct-8'],
         'tier': 'premium',
         'label': 'Main',
       },
@@ -63,6 +64,8 @@ void main() {
     expect(config.enabled, isTrue);
     expect(config.pool, hasLength(2));
     expect(config.pool.first.accountId, 'acct-9');
+    expect(config.pool.first.fallbackAccountIds, ['acct-7', 'acct-8']);
+    expect(config.pool[1].fallbackAccountIds, isEmpty);
     expect(config.rules['code'], ['cand-1', 'cand-2']);
     expect(config.planner.checkpoint.mode, 'every-n');
     expect(config.planner.checkpoint.interval, 3);

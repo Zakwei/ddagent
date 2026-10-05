@@ -1172,7 +1172,13 @@ export function createOrchestratorExecutor(deps: {
       let delegationRow: { id: number };
       if (resumeRowId !== undefined) {
         delegationRow = { id: resumeRowId };
-        patch(resumeRowId, { status: 'queued', attempt: 1, error: null, candidateId: routed.candidate.id });
+        patch(resumeRowId, {
+          status: 'queued',
+          attempt: 1,
+          error: null,
+          candidateId: routed.candidate.id,
+          accountId: routed.candidate.accountId,
+        });
       } else {
         delegationRow = append(sessionId, 'delegation', {
           stepId: step.id,
@@ -1182,6 +1188,7 @@ export function createOrchestratorExecutor(deps: {
           provider: routed.candidate.provider,
           model: routed.candidate.model,
           effort: routed.decision.effort,
+          accountId: routed.candidate.accountId,
           tier: routed.candidate.tier,
           status: 'queued',
         });
@@ -1223,6 +1230,15 @@ export function createOrchestratorExecutor(deps: {
           .filter((c): c is OrchestratorCandidate => Boolean(c)),
       ].filter((c) => !cooldown.has(c.id));
 
+      // Redundant operation: a candidate may pin several provider accounts
+      // (primary first, then ordered fallbacks). `accountIndex` walks that
+      // list before the candidate itself is abandoned; it resets to 0
+      // whenever `candidateIndex` advances to another lane.
+      const accountsFor = (c: OrchestratorCandidate): Array<string | null> => [
+        c.accountId,
+        ...c.fallbackAccountIds,
+      ];
+
       // Changed-file baseline probed once before the first attempt; the
       // step artifact's diff is measured against it on success.
       const baseline = cwd ? await probeChangedFiles(cwd) : new Set<string>();
@@ -1231,9 +1247,11 @@ export function createOrchestratorExecutor(deps: {
 
       let attempt = 0;
       let candidateIndex = 0;
+      let accountIndex = 0;
       for (;;) {
         while (candidateIndex < candidates.length && cooldown.has(candidates[candidateIndex].id)) {
           candidateIndex += 1;
+          accountIndex = 0;
         }
         if (runDeadline > 0 && Date.now() > runDeadline) {
           runTimedOut = true;
@@ -1251,6 +1269,7 @@ export function createOrchestratorExecutor(deps: {
           break;
         }
         attempt += 1;
+        const accountId = accountsFor(candidate)[accountIndex] ?? null;
         if (attempt > 1) {
           patch(delegationRow.id, {
             status: 'queued',
@@ -1268,7 +1287,7 @@ export function createOrchestratorExecutor(deps: {
           provider: candidate.provider,
           model: candidate.model,
           effort: candidate.effort ?? routed.decision.effort,
-          accountId: candidate.accountId,
+          accountId,
           cwd,
           command: command + langConstraint + reviewHint,
           // Delegated steps always bypass: nobody watches the child session to
@@ -1412,6 +1431,24 @@ export function createOrchestratorExecutor(deps: {
           continue; // candidateIndex unchanged → the retry stays on this lane.
         }
 
+        // Redundant operation: a spent quota, lost auth, or exhausted
+        // rate-limit budget is account-specific, so the candidate's next
+        // account gets the attempt on the same lane before the candidate
+        // itself is cooled and abandoned.
+        if (
+          (cls === 'quota' || cls === 'auth' || cls === 'rate_limit')
+          && accountIndex + 1 < accountsFor(candidate).length
+        ) {
+          accountIndex += 1;
+          patch(delegationRow.id, {
+            status: 'queued',
+            rateLimited: cls === 'rate_limit',
+            errorClass: cls,
+            attempt,
+          });
+          continue;
+        }
+
         // Budget spent — the breaker decides whether this lane may serve
         // later steps: quota/auth are sticky, an exhausted rate-limit
         // budget cools the lane too, and transient/timeout failures only
@@ -1426,6 +1463,7 @@ export function createOrchestratorExecutor(deps: {
         // Advance — the loop top skips cooled lanes and fails the step
         // when no candidate or attempt budget is left.
         candidateIndex += 1;
+        accountIndex = 0;
         continue;
       }
       settled.add(step.id);

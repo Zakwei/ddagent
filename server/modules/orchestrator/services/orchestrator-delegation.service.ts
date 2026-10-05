@@ -85,15 +85,18 @@ function patchDelegation(
 }
 
 /**
- * Finds a reusable child session for (parent, provider, model): scans the
- * parent's delegation rows for a previous run on the same target, so a second
- * routed message resumes the child's native transcript instead of starting
- * context-free.
+ * Finds a reusable child session for (parent, provider, model, account): scans
+ * the parent's delegation rows for a previous run on the same target, so a
+ * second routed message resumes the child's native transcript instead of
+ * starting context-free. `accountId` is part of the match so redundant account
+ * failover builds a fresh child bound to the next account instead of reusing
+ * the previous account's environment (`null` = provider default).
  */
 export function findReusableChildSession(
   parentSessionId: string,
   provider: LLMProvider,
   model: string,
+  accountId: string | null = null,
 ): string | null {
   const rows = orchestratorMessagesDb.list(parentSessionId);
   // Newest-first: a still-running sibling step must never be reused — sharing
@@ -107,6 +110,7 @@ export function findReusableChildSession(
       row.kind !== 'delegation' ||
       row.payload.provider !== provider ||
       row.payload.model !== model ||
+      (row.payload.accountId ?? null) !== accountId ||
       row.payload.status === 'running' ||
       typeof row.payload.childSessionId !== 'string'
     ) {
@@ -139,7 +143,12 @@ export function createOrchestratorDelegationService(deps: {
     async run(input: DelegatedRunInput): Promise<DelegatedRunHandle> {
       const reusable =
         !input.hidden && input.model !== null
-          ? findReusableChildSession(input.parentSessionId, input.provider, input.model)
+          ? findReusableChildSession(
+              input.parentSessionId,
+              input.provider,
+              input.model,
+              input.accountId,
+            )
           : null;
 
       let childSessionId: string;
@@ -170,7 +179,14 @@ export function createOrchestratorDelegationService(deps: {
       const startedAt = Date.now();
       patchDelegation(
         input.delegationRowId,
-        { childSessionId, status: 'running', startedAt: new Date(startedAt).toISOString() },
+        {
+          childSessionId,
+          // Record the account actually bound to this child so a later
+          // redundant-failover attempt on another account does not reuse it.
+          accountId: input.accountId,
+          status: 'running',
+          startedAt: new Date(startedAt).toISOString(),
+        },
         deps.onDelegationUpdate,
         input.parentSessionId,
       );

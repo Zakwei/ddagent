@@ -1523,6 +1523,8 @@
           "effortPlaceholder": "default",
           "account": "Account",
           "accountDefault": "Provider default",
+          "redundantAccounts": "冗余账户",
+          "redundantAccountsNone": "此提供商没有其他账户",
           "tier": "Cost tier",
           "remove": "Remove candidate",
           "moveUp": "Move up",

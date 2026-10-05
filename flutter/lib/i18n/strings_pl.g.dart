@@ -5561,6 +5561,8 @@ class Translations$settings$orchestration$pool$fields$pl extends Translations$se
 	@override String get effortPlaceholder => 'domyślny';
 	@override String get account => 'Konto';
 	@override String get accountDefault => 'Domyślne dostawcy';
+	@override String get redundantAccounts => 'Konta zapasowe (redundancja)';
+	@override String get redundantAccountsNone => 'Brak innych kont dla tego dostawcy';
 	@override String get tier => 'Próg kosztu';
 	@override String get remove => 'Usuń kandydata';
 	@override String get moveUp => 'Przesuń w górę';
@@ -7312,6 +7314,8 @@ extension on TranslationsPl {
 			'settings.orchestration.pool.fields.effortPlaceholder' => 'domyślny',
 			'settings.orchestration.pool.fields.account' => 'Konto',
 			'settings.orchestration.pool.fields.accountDefault' => 'Domyślne dostawcy',
+			'settings.orchestration.pool.fields.redundantAccounts' => 'Konta zapasowe (redundancja)',
+			'settings.orchestration.pool.fields.redundantAccountsNone' => 'Brak innych kont dla tego dostawcy',
 			'settings.orchestration.pool.fields.tier' => 'Próg kosztu',
 			'settings.orchestration.pool.fields.remove' => 'Usuń kandydata',
 			'settings.orchestration.pool.fields.moveUp' => 'Przesuń w górę',

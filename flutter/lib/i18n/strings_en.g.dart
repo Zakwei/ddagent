@@ -10089,6 +10089,12 @@ class Translations$settings$orchestration$pool$fields$en {
 	/// en: 'Provider default'
 	String get accountDefault => 'Provider default';
 
+	/// en: 'Redundant accounts'
+	String get redundantAccounts => 'Redundant accounts';
+
+	/// en: 'No other accounts for this provider'
+	String get redundantAccountsNone => 'No other accounts for this provider';
+
 	/// en: 'Cost tier'
 	String get tier => 'Cost tier';
 
@@ -12118,6 +12124,8 @@ extension on Translations {
 			'settings.orchestration.pool.fields.effortPlaceholder' => 'default',
 			'settings.orchestration.pool.fields.account' => 'Account',
 			'settings.orchestration.pool.fields.accountDefault' => 'Provider default',
+			'settings.orchestration.pool.fields.redundantAccounts' => 'Redundant accounts',
+			'settings.orchestration.pool.fields.redundantAccountsNone' => 'No other accounts for this provider',
 			'settings.orchestration.pool.fields.tier' => 'Cost tier',
 			'settings.orchestration.pool.fields.remove' => 'Remove candidate',
 			'settings.orchestration.pool.fields.moveUp' => 'Move up',

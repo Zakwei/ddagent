@@ -1655,6 +1655,8 @@
           "effortPlaceholder": "domyślny",
           "account": "Konto",
           "accountDefault": "Domyślne dostawcy",
+          "redundantAccounts": "Konta zapasowe (redundancja)",
+          "redundantAccountsNone": "Brak innych kont dla tego dostawcy",
           "tier": "Próg kosztu",
           "remove": "Usuń kandydata",
           "moveUp": "Przesuń w górę",

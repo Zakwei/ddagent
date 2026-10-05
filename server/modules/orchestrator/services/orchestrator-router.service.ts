@@ -188,12 +188,18 @@ export function createOrchestratorRouterService(deps: {
     // limit, which the executor's retry loop absorbs.
     if (candidate.tier === 'free') return { ok: true };
     const { section, label } = quotaCheckFor(candidate);
-    if (
-      section !== 'byok' &&
-      isSectionExhausted(section, deps.availability.accounts, label, candidate.accountId)
-    ) {
-      rejected.push(`${candidate.id}: ${section} quota exhausted`);
-      return { ok: false, reason: 'quota exhausted' };
+    if (section !== 'byok') {
+      // Redundant operation: the candidate stays viable while at least one of
+      // its accounts (primary + ordered fallbacks) still has headroom — the
+      // executor tries them in order and skips the exhausted ones.
+      const accountIds: Array<string | null> = [candidate.accountId, ...candidate.fallbackAccountIds];
+      const exhausted = accountIds.every((accountId) =>
+        isSectionExhausted(section, deps.availability.accounts, label, accountId),
+      );
+      if (exhausted) {
+        rejected.push(`${candidate.id}: ${section} quota exhausted`);
+        return { ok: false, reason: 'quota exhausted' };
+      }
     }
     return { ok: true };
   }

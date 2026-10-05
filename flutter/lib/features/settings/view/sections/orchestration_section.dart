@@ -925,6 +925,23 @@ class _CandidateCard extends StatelessWidget {
     final fields = t.settings.orchestration.pool.fields;
     final selectedOption = modelOptions.where((o) => o.value == candidate.model).firstOrNull;
     final effortValues = selectedOption?.effortValues ?? const <String>[];
+    final accountItems = <DropdownMenuItem<String>>[
+      DropdownMenuItem(value: '', child: Text(fields.accountDefault)),
+      for (final a in accounts)
+        DropdownMenuItem(
+          value: a.id,
+          child: Text(
+            a.isDefault ? '${a.label} (${fields.accountDefault})' : a.label,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+    ];
+    // A pinned account that no longer resolves (deleted, or a different
+    // provider's row) must never be handed to the dropdown: a `value` outside
+    // `items` trips an assertion and blanks the candidate card.
+    final selectedAccount = candidate.accountId ?? '';
+    final accountValue =
+        accountItems.any((item) => item.value == selectedAccount) ? selectedAccount : '';
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.md),
@@ -985,6 +1002,7 @@ class _CandidateCard extends StatelessWidget {
                                 model: '',
                                 effort: () => null,
                                 accountId: () => null,
+                                fallbackAccountIds: const [],
                               ),
                             );
                           },
@@ -1037,18 +1055,8 @@ class _CandidateCard extends StatelessWidget {
                       child: _Field(
                         label: fields.account,
                         child: _FieldSelect<String>(
-                          value: candidate.accountId ?? '',
-                          items: [
-                            DropdownMenuItem(value: '', child: Text(fields.accountDefault)),
-                            for (final a in accounts)
-                              DropdownMenuItem(
-                                value: a.id,
-                                child: Text(
-                                  a.isDefault ? '${a.label} (${fields.accountDefault})' : a.label,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                          ],
+                          value: accountValue,
+                          items: accountItems,
                           onChanged: (v) => onPatch(
                             (cc) =>
                                 cc.copyWith(accountId: () => (v == null || v.isEmpty) ? null : v),
@@ -1078,9 +1086,70 @@ class _CandidateCard extends StatelessWidget {
                 );
               },
             ),
+            const SizedBox(height: AppSpacing.sm),
+            _Field(
+              label: fields.redundantAccounts,
+              child: _RedundantAccountsField(
+                selected: candidate.fallbackAccountIds,
+                options: [for (final a in accounts) if (a.id != candidate.accountId) a],
+                emptyHint: fields.redundantAccountsNone,
+                onChanged: (ids) => onPatch((cc) => cc.copyWith(fallbackAccountIds: ids)),
+              ),
+            ),
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Ordered multi-select of a candidate's standby provider accounts. A selected
+/// id means "if the primary account's lane dies (quota/rate limit/auth), retry
+/// on this account before dropping the candidate" (redundant operation).
+class _RedundantAccountsField extends StatelessWidget {
+  const _RedundantAccountsField({
+    required this.selected,
+    required this.options,
+    required this.emptyHint,
+    required this.onChanged,
+  });
+
+  final List<String> selected;
+  final List<ProviderAccountEntry> options;
+  final String emptyHint;
+  final ValueChanged<List<String>> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.appColors;
+    if (options.isEmpty) {
+      return Text(
+        emptyHint,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(color: c.mutedForeground),
+      );
+    }
+    return Wrap(
+      spacing: AppSpacing.xs,
+      runSpacing: AppSpacing.xs,
+      children: [
+        for (final a in options)
+          FilterChip(
+            label: Text(a.label, overflow: TextOverflow.ellipsis),
+            selected: selected.contains(a.id),
+            visualDensity: VisualDensity.compact,
+            onSelected: (on) {
+              // Append preserves the user's failover order; the executor walks
+              // `fallbackAccountIds` in list order.
+              final next = [...selected];
+              if (on) {
+                if (!next.contains(a.id)) next.add(a.id);
+              } else {
+                next.remove(a.id);
+              }
+              onChanged(next);
+            },
+          ),
+      ],
     );
   }
 }

@@ -5142,6 +5142,8 @@ class Translations$settings$orchestration$pool$fields$ko extends Translations$se
 	@override String get effortPlaceholder => 'default';
 	@override String get account => 'Account';
 	@override String get accountDefault => 'Provider default';
+	@override String get redundantAccounts => '중복 계정';
+	@override String get redundantAccountsNone => '이 공급자의 다른 계정이 없습니다';
 	@override String get tier => 'Cost tier';
 	@override String get remove => 'Remove candidate';
 	@override String get moveUp => 'Move up';
@@ -6788,6 +6790,8 @@ extension on TranslationsKo {
 			'settings.orchestration.pool.fields.effortPlaceholder' => 'default',
 			'settings.orchestration.pool.fields.account' => 'Account',
 			'settings.orchestration.pool.fields.accountDefault' => 'Provider default',
+			'settings.orchestration.pool.fields.redundantAccounts' => '중복 계정',
+			'settings.orchestration.pool.fields.redundantAccountsNone' => '이 공급자의 다른 계정이 없습니다',
 			'settings.orchestration.pool.fields.tier' => 'Cost tier',
 			'settings.orchestration.pool.fields.remove' => 'Remove candidate',
 			'settings.orchestration.pool.fields.moveUp' => 'Move up',

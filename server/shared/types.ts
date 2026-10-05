@@ -2280,6 +2280,13 @@ export type OrchestratorCandidate = {
   effort: string | null;
   /** provider_accounts.id override; null = provider default environment. */
   accountId: string | null;
+  /**
+   * Ordered provider_accounts.id backups for redundant ("failover") operation.
+   * After the primary `accountId` exhausts its quota or starts rate-limiting,
+   * the executor retries the same lane on the next fallback account before it
+   * gives up on the candidate. Empty = no account redundancy.
+   */
+  fallbackAccountIds: string[];
   tier: OrchestratorCostTier;
   label: string;
 };

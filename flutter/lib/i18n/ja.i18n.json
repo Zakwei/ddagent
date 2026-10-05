@@ -1523,6 +1523,8 @@
           "effortPlaceholder": "default",
           "account": "Account",
           "accountDefault": "Provider default",
+          "redundantAccounts": "冗長アカウント",
+          "redundantAccountsNone": "このプロバイダーの他のアカウントはありません",
           "tier": "Cost tier",
           "remove": "Remove candidate",
           "moveUp": "Move up",

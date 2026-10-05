@@ -1523,6 +1523,8 @@
           "effortPlaceholder": "default",
           "account": "Account",
           "accountDefault": "Provider default",
+          "redundantAccounts": "Yedek hesaplar",
+          "redundantAccountsNone": "Bu sağlayıcı için başka hesap yok",
           "tier": "Cost tier",
           "remove": "Remove candidate",
           "moveUp": "Move up",

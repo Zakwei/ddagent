@@ -1523,6 +1523,8 @@
           "effortPlaceholder": "default",
           "account": "Account",
           "accountDefault": "Provider default",
+          "redundantAccounts": "중복 계정",
+          "redundantAccountsNone": "이 공급자의 다른 계정이 없습니다",
           "tier": "Cost tier",
           "remove": "Remove candidate",
           "moveUp": "Move up",

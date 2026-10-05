@@ -1523,6 +1523,8 @@
           "effortPlaceholder": "default",
           "account": "Account",
           "accountDefault": "Provider default",
+          "redundantAccounts": "Comptes redondants",
+          "redundantAccountsNone": "Aucun autre compte pour ce fournisseur",
           "tier": "Cost tier",
           "remove": "Remove candidate",
           "moveUp": "Move up",

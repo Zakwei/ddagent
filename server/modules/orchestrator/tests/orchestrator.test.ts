@@ -175,8 +175,8 @@ test('router: opencode candidates are billed to their own subscription section',
   // Candidates for plugin-provided models are gone from the seed, but users
   // can re-add them via settings — the billing logic still has to split them.
   config.pool.push(
-    { id: 'oc-gem38f', provider: 'opencode', model: 'google/antigravity-gemini-3.8-flash', effort: null, accountId: null, tier: 'mid', label: 'x' },
-    { id: 'oc-cc-ds41f', provider: 'opencode', model: 'commandcode/deepseek/deepseek-v4.1-flash', effort: null, accountId: null, tier: 'mid', label: 'x' },
+    { id: 'oc-gem38f', provider: 'opencode', model: 'google/antigravity-gemini-3.8-flash', effort: null, fallbackAccountIds: [], accountId: null, tier: 'mid', label: 'x' },
+    { id: 'oc-cc-ds41f', provider: 'opencode', model: 'commandcode/deepseek/deepseek-v4.1-flash', effort: null, fallbackAccountIds: [], accountId: null, tier: 'mid', label: 'x' },
   );
   config.rules.research = ['oc-gem38f', 'oc-cc-ds41f', 'oc-nv-glm53f'];
   // The label must name a real Antigravity pool — unmatched labels fail open.
@@ -223,9 +223,9 @@ test('router: antigravity Claude/GPT check the 3p bucket, not the Gemini one', (
   };
   const config = makeConfig();
   config.pool.push(
-    { id: 'oc-gem38f', provider: 'opencode', model: 'google/antigravity-gemini-3.8-flash', effort: null, accountId: null, tier: 'mid', label: 'x' },
-    { id: 'oc-agy-opus', provider: 'opencode', model: 'google/antigravity-claude-opus-4-6-thinking', effort: null, accountId: null, tier: 'premium', label: 'x' },
-    { id: 'oc-cc-ds41f', provider: 'opencode', model: 'commandcode/deepseek/deepseek-v4.1-flash', effort: null, accountId: null, tier: 'mid', label: 'x' },
+    { id: 'oc-gem38f', provider: 'opencode', model: 'google/antigravity-gemini-3.8-flash', effort: null, fallbackAccountIds: [], accountId: null, tier: 'mid', label: 'x' },
+    { id: 'oc-agy-opus', provider: 'opencode', model: 'google/antigravity-claude-opus-4-6-thinking', effort: null, fallbackAccountIds: [], accountId: null, tier: 'premium', label: 'x' },
+    { id: 'oc-cc-ds41f', provider: 'opencode', model: 'commandcode/deepseek/deepseek-v4.1-flash', effort: null, fallbackAccountIds: [], accountId: null, tier: 'mid', label: 'x' },
   );
   config.rules.review = ['oc-gem38f', 'oc-agy-opus', 'oc-cc-ds41f'];
   const res = makeRouter([geminiMixed, quotaAccount('commandcode', 'active')], ['opencode'], config).route('review');
@@ -1820,8 +1820,8 @@ test('executor: a quota failure cools the lane for the rest of the run', async (
   await withIsolatedDatabase(async () => {
     const config = makeConfig();
     config.pool = [
-      { id: 'aa', provider: 'devin', model: 'm-aa', effort: null, accountId: null, tier: 'free', label: 'AA' },
-      { id: 'bb', provider: 'devin', model: 'm-bb', effort: null, accountId: null, tier: 'free', label: 'BB' },
+      { id: 'aa', provider: 'devin', model: 'm-aa', effort: null, fallbackAccountIds: [], accountId: null, tier: 'free', label: 'AA' },
+      { id: 'bb', provider: 'devin', model: 'm-bb', effort: null, fallbackAccountIds: [], accountId: null, tier: 'free', label: 'BB' },
     ];
     config.rules.code = ['aa', 'bb'];
 
@@ -1861,6 +1861,52 @@ test('executor: a quota failure cools the lane for the rest of the run', async (
     // 'aa' ate one quota error, cooled down for the rest of the run —
     // step b routed straight to 'bb' without touching 'aa' again.
     assert.deepEqual(lanes, ['m-aa', 'm-bb', 'm-bb']);
+  });
+});
+
+test("executor: a quota failure fails over to the candidate's redundant account first", async () => {
+  await withIsolatedDatabase(async () => {
+    const config = makeConfig();
+    config.pool = [
+      { id: 'aa', provider: 'devin', model: 'm-aa', effort: null, fallbackAccountIds: ['acc-b'], accountId: 'acc-a', tier: 'free', label: 'AA' },
+      { id: 'bb', provider: 'devin', model: 'm-bb', effort: null, fallbackAccountIds: [], accountId: null, tier: 'free', label: 'BB' },
+    ];
+    config.rules.code = ['aa', 'bb'];
+
+    const accounts: Array<string | null> = [];
+    const delegation = {
+      async run(input: { accountId: string | null }) {
+        accounts.push(input.accountId);
+        // acc-a is out of quota; acc-b (the fallback) answers.
+        const first = accounts.length === 1;
+        return {
+          childSessionId: `child-${accounts.length}`,
+          completed: Promise.resolve(
+            first
+              ? { ok: false, error: 'quota exceeded for plan', finalText: '', aborted: false }
+              : { ok: true, error: null, finalText: 'done', aborted: false },
+          ),
+          abort: async () => undefined,
+        };
+      },
+    };
+    const executor = createOrchestratorExecutor({
+      getConfig: () => config,
+      router: makeRouter(null, ['devin'], config),
+      delegation,
+      resolveSessionCwd: () => '/repo',
+      sleep: async () => undefined,
+    });
+
+    const steps = normalizeEditableSteps(
+      [{ id: 'a', type: 'code', title: 'A', prompt: 'pa', dependsOn: [] }],
+      'fallback',
+    );
+    const result = await executor.confirm('sess-redundant', steps, {});
+    assert.ok(result.ok);
+    // The same candidate ran again on its fallback account — it did not
+    // jump straight to candidate 'bb'.
+    assert.deepEqual(accounts, ['acc-a', 'acc-b']);
   });
 });
 
@@ -2054,7 +2100,7 @@ test('executor: a step timeout aborts the child and fails over to the next lane'
 
 test('router: native Codex quota blocks an exhausted paid lane', () => {
   const config = makeConfig();
-  config.pool = [{ id: 'native', provider: 'codex', model: 'gpt-5', tier: 'premium', effort: null, accountId: null, label: 'Codex' }];
+  config.pool = [{ id: 'native', provider: 'codex', model: 'gpt-5', tier: 'premium', effort: null, fallbackAccountIds: [], accountId: null, label: 'Codex' }];
   config.rules.code = ['native'];
   assert.equal(makeRouter([quotaAccount('codex', 'active', true)], ['codex'], config).route('code').ok, false);
   assert.equal(makeRouter([quotaAccount('codex', 'active')], ['codex'], config).route('code').ok, true);
@@ -2062,7 +2108,7 @@ test('router: native Codex quota blocks an exhausted paid lane', () => {
 
 test('router: Claude scoped quota only blocks the matching model', () => {
   const config = makeConfig();
-  config.pool = [{ id: 'native', provider: 'claude', model: 'claude-opus-4', tier: 'premium', effort: null, accountId: null, label: 'Claude' }];
+  config.pool = [{ id: 'native', provider: 'claude', model: 'claude-opus-4', tier: 'premium', effort: null, fallbackAccountIds: [], accountId: null, label: 'Claude' }];
   config.rules.code = ['native'];
   const account = quotaAccount('claude', 'active');
   account.windows = [
@@ -2076,7 +2122,7 @@ test('router: Claude scoped quota only blocks the matching model', () => {
 
 test('router: standalone Antigravity checks its Gemini quota pool', () => {
   const config = makeConfig();
-  config.pool = [{ id: 'native', provider: 'antigravity', model: 'gemini-pro', tier: 'premium', effort: null, accountId: null, label: 'Antigravity' }];
+  config.pool = [{ id: 'native', provider: 'antigravity', model: 'gemini-pro', tier: 'premium', effort: null, fallbackAccountIds: [], accountId: null, label: 'Antigravity' }];
   config.rules.code = ['native'];
   const account = quotaAccount('gemini', 'active', true);
   account.windows[0].label = 'Gemini Models · weekly';
@@ -2086,8 +2132,8 @@ test('router: standalone Antigravity checks its Gemini quota pool', () => {
 test('router: per-account quota only blocks the exhausted provider_accounts row', () => {
   const config = makeConfig();
   config.pool = [
-    { id: 'agy-a', provider: 'antigravity', model: 'gemini-pro', tier: 'premium', effort: null, accountId: 'acc-a', label: 'Agy A' },
-    { id: 'agy-b', provider: 'antigravity', model: 'gemini-pro', tier: 'premium', effort: null, accountId: 'acc-b', label: 'Agy B' },
+    { id: 'agy-a', provider: 'antigravity', model: 'gemini-pro', tier: 'premium', effort: null, fallbackAccountIds: [], accountId: 'acc-a', label: 'Agy A' },
+    { id: 'agy-b', provider: 'antigravity', model: 'gemini-pro', tier: 'premium', effort: null, fallbackAccountIds: [], accountId: 'acc-b', label: 'Agy B' },
   ];
   config.rules.code = ['agy-a', 'agy-b'];
   const accA: QuotaAccount = {
@@ -2113,4 +2159,36 @@ test('router: per-account quota only blocks the exhausted provider_accounts row'
   // acc-a's Gemini pool is spent but acc-b's is not — the pinned
   // candidate must not be dragged down by a sibling account.
   assert.equal(res.candidate.id, 'agy-b');
+});
+
+test('router: a redundant fallback account keeps the candidate viable when the primary is spent', () => {
+  const config = makeConfig();
+  config.pool = [
+    { id: 'agy', provider: 'antigravity', model: 'gemini-pro', tier: 'premium', effort: null, fallbackAccountIds: ['acc-b'], accountId: 'acc-a', label: 'Agy' },
+  ];
+  config.rules.code = ['agy'];
+  const geminiWindows = (exhausted: boolean) =>
+    quotaAccount('gemini', 'active', exhausted).windows.map((w) => ({
+      ...w,
+      label: 'Gemini Models · weekly',
+    }));
+  const accA: QuotaAccount = { ...quotaAccount('gemini', 'active', true), id: 'acc-a', accountId: 'acc-a', windows: geminiWindows(true) };
+  const accB: QuotaAccount = { ...quotaAccount('gemini', 'active'), id: 'acc-b', accountId: 'acc-b', windows: geminiWindows(false) };
+  const res = makeRouter([accA, accB], ['antigravity'], config).route('code');
+  assert.ok(res.ok);
+  assert.equal(res.candidate.id, 'agy');
+});
+
+test('router: a candidate is blocked only when its primary and all fallback accounts are spent', () => {
+  const config = makeConfig();
+  config.pool = [
+    { id: 'agy', provider: 'antigravity', model: 'gemini-pro', tier: 'premium', effort: null, fallbackAccountIds: ['acc-b'], accountId: 'acc-a', label: 'Agy' },
+  ];
+  config.rules.code = ['agy'];
+  const spent = quotaAccount('gemini', 'active', true);
+  const geminiWindows = spent.windows.map((w) => ({ ...w, label: 'Gemini Models · weekly' }));
+  const accA: QuotaAccount = { ...spent, id: 'acc-a', accountId: 'acc-a', windows: geminiWindows };
+  const accB: QuotaAccount = { ...spent, id: 'acc-b', accountId: 'acc-b', windows: geminiWindows };
+  const res = makeRouter([accA, accB], ['antigravity'], config).route('code');
+  assert.equal(res.ok, false);
 });

@@ -67,6 +67,7 @@ class OrchCandidate {
     required this.model,
     this.effort,
     this.accountId,
+    this.fallbackAccountIds = const [],
     this.tier = 'mid',
     this.label = '',
   });
@@ -78,6 +79,11 @@ class OrchCandidate {
 
   /// provider_accounts.id override; null = provider default environment.
   final String? accountId;
+
+  /// Ordered provider_accounts.id backups for redundant ("failover") operation:
+  /// when the primary account's lane dies (quota/rate limit/auth), the
+  /// executor retries on the next fallback account before dropping the lane.
+  final List<String> fallbackAccountIds;
   final String tier;
   final String label;
 
@@ -87,6 +93,7 @@ class OrchCandidate {
     String? model,
     String? Function()? effort,
     String? Function()? accountId,
+    List<String>? fallbackAccountIds,
     String? tier,
     String? label,
   }) => OrchCandidate(
@@ -95,6 +102,7 @@ class OrchCandidate {
     model: model ?? this.model,
     effort: effort != null ? effort() : this.effort,
     accountId: accountId != null ? accountId() : this.accountId,
+    fallbackAccountIds: fallbackAccountIds ?? this.fallbackAccountIds,
     tier: tier ?? this.tier,
     label: label ?? this.label,
   );
@@ -105,6 +113,7 @@ class OrchCandidate {
     'model': model,
     'effort': effort,
     'accountId': accountId,
+    'fallbackAccountIds': fallbackAccountIds,
     'tier': tier,
     'label': label,
   };
@@ -115,6 +124,7 @@ class OrchCandidate {
     model: _str(json['model']),
     effort: json['effort']?.toString(),
     accountId: json['accountId']?.toString(),
+    fallbackAccountIds: _strList(json['fallbackAccountIds']),
     tier: _str(json['tier'], 'mid'),
     label: _str(json['label']),
   );

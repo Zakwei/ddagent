@@ -41,6 +41,7 @@ const candidate = (
   model,
   effort: null,
   accountId: null,
+  fallbackAccountIds: [],
   tier,
   label,
 });
@@ -172,12 +173,19 @@ function readCandidate(value: unknown, index: number): OrchestratorCandidate {
   const effort = raw.effort === null || raw.effort === undefined ? null : String(raw.effort).trim();
   const accountId =
     raw.accountId === null || raw.accountId === undefined ? null : String(raw.accountId).trim();
+  // Redundant accounts: ordered, non-empty, de-duplicated, never the primary.
+  const fallbackAccountIds = Array.isArray(raw.fallbackAccountIds)
+    ? raw.fallbackAccountIds
+        .map((entry) => String(entry).trim())
+        .filter((entry, index, all) => entry.length > 0 && entry !== accountId && all.indexOf(entry) === index)
+    : [];
   return {
     id,
     provider: raw.provider as LLMProvider,
     model,
     effort: effort || null,
     accountId: accountId || null,
+    fallbackAccountIds,
     tier: raw.tier as OrchestratorCostTier,
     label: typeof raw.label === 'string' && raw.label.trim() ? raw.label.trim() : model,
   };
