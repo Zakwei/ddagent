@@ -4,6 +4,7 @@ import 'package:ddagent_app/core/network/api_providers.dart';
 import 'package:ddagent_app/core/realtime/chat_channel.dart';
 import 'package:ddagent_app/core/realtime/realtime_providers.dart';
 import 'package:ddagent_app/core/realtime/ws_client.dart';
+import 'package:ddagent_app/features/chat/state/pending_permissions.dart';
 import 'package:ddagent_app/features/chat/state/transcript_controller.dart';
 import 'package:ddagent_app/features/sessions/data/chat_storage.dart';
 import 'package:ddagent_app/features/sessions/state/activity_poller.dart';
@@ -198,6 +199,55 @@ void main() {
     // The elapsed timer anchors on the server's run start, not the ack's
     // arrival — otherwise a reload mid-run would reset the displayed time.
     expect(entry!.startedAt, 12345);
+  });
+
+  test('pending permissions: subscribe ack rehydrates answerable asks', () async {
+    container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
+    container.listen(transcriptProvider('s1'), (_, _) {});
+    await pump();
+
+    // The agent is blocked on a question and this client subscribed after the
+    // live `permission_request` frame — a fresh window or a reload only has
+    // the ack to rebuild the answerable panel from.
+    ws.emitFrame({
+      'kind': 'chat_subscribed',
+      'sessionId': 's1',
+      'isProcessing': true,
+      'pendingPermissions': [
+        {
+          'requestId': 'q1',
+          'toolName': 'AskUserQuestion',
+          'input': {
+            'questions': [
+              {
+                'question': 'Which scope?',
+                'options': [
+                  {'label': 'MVP'},
+                ],
+              },
+            ],
+          },
+          'sessionId': 's1',
+        },
+      ],
+    });
+    await pump();
+
+    final pending = container.read(pendingPermissionsProvider);
+    expect(pending.containsKey('q1'), isTrue);
+    expect(pending['q1']!.toolName, 'AskUserQuestion');
+    expect(pending['q1']!.sessionId, 's1');
+
+    // A later ack without the ask clears it — it was answered on another
+    // window, so this one must stop offering the decision.
+    ws.emitFrame({
+      'kind': 'chat_subscribed',
+      'sessionId': 's1',
+      'isProcessing': false,
+      'pendingPermissions': const <dynamic>[],
+    });
+    await pump();
+    expect(container.read(pendingPermissionsProvider).containsKey('q1'), isFalse);
   });
 
   test('activity: stream_end and error are not terminal — only complete is', () async {

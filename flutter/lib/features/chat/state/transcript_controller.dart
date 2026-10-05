@@ -110,6 +110,7 @@ class TranscriptController extends Notifier<TranscriptState> {
   /// ChatChannel filters replies issued before a newer local send, so this
   /// acknowledgement can settle both the activity indicator and composer.
   void _applySubscribeAck(Map<String, dynamic> raw) {
+    _syncPendingPermissions(raw['pendingPermissions']);
     if (raw['isProcessing'] == true) {
       _activity.markProcessing(
         _sessionId,
@@ -129,6 +130,37 @@ class TranscriptController extends Notifier<TranscriptState> {
     final fresh = slot != null && !_store.isStale(_sessionId);
     if (hasLiveRows || !fresh || raw['runId'] != null) {
       unawaited(_refreshLatestSafely());
+    }
+  }
+
+  /// Rebuilds this session's answerable asks from the subscribe ack, which
+  /// carries the server's authoritative pending set. A client that subscribed
+  /// after the live `permission_request` frame — a freshly opened window, a
+  /// reload, or a reconnected socket — otherwise sees the persisted ask as a
+  /// read-only recap and can never deliver its answer. Runs before the
+  /// `isProcessing` early-return because an agent blocked on a question is
+  /// exactly the processing case that must still show the panel.
+  void _syncPendingPermissions(dynamic raw) {
+    if (raw is! List) return;
+    final notifier = ref.read(pendingPermissionsProvider.notifier);
+    notifier.removeForSession(_sessionId);
+    for (final entry in raw) {
+      if (entry is! Map) continue;
+      final requestId = entry['requestId']?.toString();
+      if (requestId == null || requestId.isEmpty) continue;
+      notifier.add(
+        PendingPermission(
+          sessionId: entry['sessionId']?.toString() ?? _sessionId,
+          requestId: requestId,
+          toolName: entry['toolName']?.toString() ?? 'UnknownTool',
+          input: entry['input'] is Map
+              ? Map<String, dynamic>.from(entry['input'] as Map)
+              : const <String, dynamic>{},
+          context: entry['context'] is Map
+              ? Map<String, dynamic>.from(entry['context'] as Map)
+              : null,
+        ),
+      );
     }
   }
 
