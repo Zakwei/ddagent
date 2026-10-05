@@ -84,6 +84,11 @@ wybranego projektu — rozmiar bloku reguł, który każde wywołanie
 `knowledge_get_context` zawsze zawiera. Do sesji nie jest automatycznie
 wstrzykiwane nic.
 
+Ranking wyszukiwania jest hybrydowy, podobnie jak w `search.rs` Contexty:
+dopasowanie **prefix** FTS5 (`auth` pasuje także do `authentication`) plus rozmyty
+przebieg **trigram**, który wychwytuje literówki i quasi-synonimy, a następnie
+rerank według `bm25 + priority + recency`.
+
 ## Narzędzia MCP (na żądanie)
 
 Serwer MCP ddagent (`POST /mcp`) udostępnia bazę wiedzy każdemu klientowi MCP.

@@ -84,6 +84,11 @@ ausgewählte Projekt — die Größe des Regelblocks, den jeder
 `knowledge_get_context`-Aufruf immer enthält. In Sitzungen wird nichts
 automatisch injiziert.
 
+Das Such-Ranking ist hybrid, wie in Contextas `search.rs`: FTS5 **prefix**-Abgleich
+(`auth` passt auch auf `authentication`) plus ein unscharfer **trigram**-Durchlauf,
+der Tippfehler und Quasi-Synonyme erfasst, danach ein Rerank nach
+`bm25 + priority + recency`.
+
 ## MCP-Tools (auf Abruf)
 
 Der MCP-Server von ddagent (`POST /mcp`) stellt die Wissensbasis jedem MCP-Client

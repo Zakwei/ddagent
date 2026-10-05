@@ -84,6 +84,11 @@ per il progetto selezionato — la dimensione del blocco di regole che ogni chia
 a `knowledge_get_context` include sempre. Niente viene iniettato automaticamente
 nelle sessioni.
 
+La classificazione della ricerca è ibrida, come nel `search.rs` di Contexta:
+corrispondenza **prefix** di FTS5 (`auth` corrisponde anche a `authentication`)
+più una passata fuzzy per **trigram** che intercetta refusi e quasi-sinonimi, poi
+un rerank per `bm25 + priority + recency`.
+
 ## Strumenti MCP (su richiesta)
 
 Il server MCP di ddagent (`POST /mcp`) espone la base di conoscenza a qualsiasi client

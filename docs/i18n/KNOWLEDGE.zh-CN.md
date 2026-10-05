@@ -75,6 +75,8 @@ ContextBuilder 的忠实移植）。给定项目和查询，它会按顺序返�
 仪表盘会为所选项目显示一个**规则上下文计量表**（`~X / 4000 tok`）——
 每次 `knowledge_get_context` 调用始终包含的规则块大小。不会向会话自动注入任何内容。
 
+搜索排名是混合式的，就像 Contexta 的 `search.rs`：FTS5 **prefix** 匹配（`auth` 也会匹配 `authentication`），加上一遍模糊的 **trigram** 处理，用来捕捉拼写错误和近义词，然后按 `bm25 + priority + recency` 重新排序。
+
 ## MCP 工具（按需）
 
 ddagent 的 MCP 服务器（`POST /mcp`）把知识库暴露给任何 MCP 客户端。

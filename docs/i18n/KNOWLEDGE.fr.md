@@ -85,6 +85,11 @@ pour le projet sélectionné — la taille du bloc de règles que chaque appel �
 `knowledge_get_context` inclut toujours. Rien n’est injecté automatiquement dans
 les sessions.
 
+Le classement de la recherche est hybride, comme dans `search.rs` de Contexta :
+correspondance **prefix** de FTS5 (`auth` correspond aussi à `authentication`)
+plus une passe floue par **trigram** qui attrape les fautes de frappe et les
+quasi-synonymes, puis un rerank par `bm25 + priority + recency`.
+
 ## Outils MCP (à la demande)
 
 Le serveur MCP de ddagent (`POST /mcp`) expose la base de connaissances à tout client

@@ -79,6 +79,8 @@ Markdown 블록으로 렌더링됩니다; 더 이상 들어가지 않는 항목�
 표시합니다 — 모든 `knowledge_get_context` 호출이 항상 포함하는 규칙 블록의
 크기입니다. 세션에 자동으로 주입되는 것은 없습니다.
 
+검색 순위는 하이브리드입니다. Contexta의 `search.rs`처럼 FTS5 **prefix** 매칭(`auth`는 `authentication`도 매칭)에 오타와 유사 동의어를 잡아내는 퍼지 **trigram** 패스를 더한 뒤 `bm25 + priority + recency`로 재정렬합니다.
+
 ## MCP 도구 (온디맨드)
 
 ddagent의 MCP 서버(`POST /mcp`)는 지식 베이스를 모든 MCP 클라이언트에 노출합니다.

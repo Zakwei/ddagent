@@ -81,6 +81,8 @@ ddagent はナレッジベースをセッションに自動注入することは
 （`~X / 4000 tok`）を表示します — すべての `knowledge_get_context` 呼び出しが常に含む
 ルールブロックのサイズです。セッションに自動的に注入されるものは何もありません。
 
+検索ランキングはハイブリッドです。Contexta の `search.rs` と同様に、FTS5 の **prefix** 一致（`auth` は `authentication` にも一致）に加え、タイプミスや準同義語を拾うあいまいな **trigram** パスを行い、その後 `bm25 + priority + recency` で再ランクします。
+
 ## MCP ツール（オンデマンド）
 
 ddagent の MCP サーバー（`POST /mcp`）はナレッジベースを任意の MCP クライアントに公開します。

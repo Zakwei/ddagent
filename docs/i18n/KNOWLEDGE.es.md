@@ -84,6 +84,11 @@ proyecto seleccionado: el tamaño del bloque de reglas que toda llamada a
 `knowledge_get_context` incluye siempre. No se inyecta nada automáticamente en las
 sesiones.
 
+La ordenación de la búsqueda es híbrida, como en `search.rs` de Contexta:
+coincidencia **prefix** de FTS5 (`auth` también coincide con `authentication`)
+más una pasada difusa por **trigram** que captura erratas y cuasi sinónimos, luego
+un rerank por `bm25 + priority + recency`.
+
 ## Herramientas MCP (bajo demanda)
 
 El servidor MCP de ddagent (`POST /mcp`) expone la base de conocimiento a cualquier

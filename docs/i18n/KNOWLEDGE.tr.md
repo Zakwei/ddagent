@@ -81,6 +81,11 @@ Panel, seçilen proje için bir **kural bağlamı ölçeri** (`~X / 4000 tok`) g
 her `knowledge_get_context` çağrısının her zaman içerdiği kural bloğunun boyutu.
 Oturumlara otomatik olarak hiçbir şey enjekte edilmez.
 
+Arama sıralaması, Contexta'nın `search.rs` dosyasındaki gibi hibrittir: FTS5
+**prefix** eşleşmesi (`auth` aynı zamanda `authentication` ile eşleşir) artı yazım
+hatalarını ve yarı eşanlamlıları yakalayan bulanık bir **trigram** geçişi, ardından
+`bm25 + priority + recency` ile yeniden sıralama.
+
 ## MCP araçları (isteğe bağlı)
 
 ddagent'ın MCP sunucusu (`POST /mcp`) bilgi tabanını her MCP istemcisine açar.
