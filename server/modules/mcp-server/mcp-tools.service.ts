@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 
 import { kanbanCardsDb, projectsDb, sessionsDb, type McpTokenScope } from '@/modules/database/index.js';
-import { knowledgeService } from '@/modules/knowledge/index.js';
+import { buildProjectContext, knowledgeService } from '@/modules/knowledge/index.js';
 import { queuedMessagesService } from '@/modules/queued-messages/index.js';
 import { chatRunRegistry } from '@/modules/websocket/index.js';
 import { worktreeServices } from '@/modules/worktrees/index.js';
@@ -107,11 +107,18 @@ const MCP_TOOL_DEFINITIONS: McpToolDefinition[] = [
   },
   {
     name: 'knowledge_get_context',
-    description: 'Return the critical rules and memories for a project folder.',
+    description:
+      'Build the project context for a query: critical rules first, then query-matched rules, memories (+1-hop), skills and personal info, as a token-budgeted Markdown block.',
     scope: 'read',
     inputSchema: {
       type: 'object',
-      properties: { projectId: STRING, projectPath: STRING },
+      properties: {
+        projectId: STRING,
+        projectPath: STRING,
+        query: STRING,
+        maxResults: { type: 'integer' },
+        maxTokens: { type: 'integer' },
+      },
     },
   },
   {
@@ -515,21 +522,13 @@ export async function callMcpTool(
     }
 
     case 'knowledge_get_context': {
-      const projectId = resolveKnowledgeProjectId(input);
-      return {
-        projectId: projectId ?? null,
-        rules: knowledgeService.listRules({
-          projectId,
-          includeGlobal: true,
-          enabledOnly: true,
-          priority: 'critical',
-        }).items,
-        memories: knowledgeService.listMemories({
-          projectId,
-          includeGlobal: true,
-          priority: 'critical',
-        }).items,
-      };
+      return buildProjectContext({
+        projectId: resolveKnowledgeProjectId(input),
+        projectPath: readOptionalString(input.projectPath),
+        query: readOptionalString(input.query),
+        maxResults: readOptionalNumber(input.maxResults),
+        maxTokens: readOptionalNumber(input.maxTokens),
+      });
     }
 
     case 'knowledge_get_rules': {

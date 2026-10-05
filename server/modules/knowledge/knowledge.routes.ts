@@ -402,12 +402,12 @@ export function createKnowledgeRouter() {
     }),
   );
 
-  // Preview of the `<knowledge>` block injected into a session's first turn.
+  // Preview of the always-included critical block (size vs budget).
   router.get(
     '/context',
     asyncHandler(async (req: Request, res: Response) => {
       const projectId = readOptionalString(req.query.projectId) ?? null;
-      const preview = await buildKnowledgeContextPreview(projectId);
+      const preview = buildKnowledgeContextPreview(projectId);
       res.json(createApiSuccessResponse(preview));
     }),
   );

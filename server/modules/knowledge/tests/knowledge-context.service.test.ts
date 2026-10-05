@@ -7,7 +7,7 @@ import test from 'node:test';
 import { closeConnection, getConnection, initializeDatabase } from '@/modules/database/index.js';
 import {
   buildKnowledgeContextPreview,
-  buildKnowledgePrefix,
+  buildProjectContext,
   knowledgeService,
 } from '@/modules/knowledge/index.js';
 
@@ -39,69 +39,67 @@ const registerProject = (projectId: string, projectPath: string): void => {
     .run(projectId, projectPath);
 };
 
-test('prefix includes project and global critical rules/memories only', async () => {
+test('context always includes critical rules; the query adds matched rules/skills/personal', async () => {
   await withIsolatedDatabase(async () => {
     const root = await mkdtemp(path.join(tmpdir(), 'knowledge-ctx-project-'));
     registerProject('p1', root);
 
     knowledgeService.createRule({ title: 'Global critical', content: 'always', priority: 'critical' });
-    knowledgeService.createRule({ projectId: 'p1', title: 'Project critical', content: 'binding', priority: 'critical' });
-    knowledgeService.createRule({ title: 'Not critical', content: 'later', priority: 'low' });
-    knowledgeService.createMemory({ title: 'Critical memory', content: 'durable fact', priority: 'critical' });
-    knowledgeService.createMemory({ title: 'Loose memory', content: 'nope', priority: 'normal' });
+    knowledgeService.createRule({
+      projectId: 'p1',
+      title: 'Project critical',
+      content: 'binding',
+      priority: 'critical',
+    });
+    knowledgeService.createRule({
+      title: 'Deploy steps',
+      content: 'Run the deploy script',
+      priority: 'low',
+    });
+    knowledgeService.createSkill({ name: 'deploy-helper', description: 'Helps deploy' });
+    knowledgeService.createPersonal({ key: 'timezone', title: 'Timezone', content: 'Europe/Warsaw' });
 
-    const prefix = await buildKnowledgePrefix(root);
-    assert.ok(prefix);
-    assert.ok(prefix.includes('Global critical'));
-    assert.ok(prefix.includes('Project critical'));
-    assert.ok(prefix.includes('Critical memory'));
-    assert.ok(!prefix.includes('Not critical'));
-    assert.ok(!prefix.includes('Loose memory'));
-    assert.ok(prefix.startsWith('<knowledge>'));
-    assert.ok(prefix.endsWith('</knowledge>\n\n'));
+    // No query: only the always-on critical rules; no skills/personal.
+    const plain = await buildProjectContext({ projectId: 'p1' });
+    assert.ok(plain.markdown.includes('Global critical'));
+    assert.ok(plain.markdown.includes('Project critical'));
+    assert.ok(!plain.markdown.includes('Deploy steps'));
+    assert.equal(plain.skills.length, 0);
+    assert.equal(plain.personal.length, 0);
+
+    // Query: matched rule + keyword-matched skill.
+    const query = await buildProjectContext({ projectId: 'p1', query: 'deploy' });
+    assert.ok(query.rules.some((rule) => rule.title === 'Deploy steps'));
+    assert.ok(query.skills.some((skill) => skill.name === 'deploy-helper'));
+    assert.ok(query.markdown.includes('deploy-helper'));
+
+    // Personal only when the query matches it.
+    const personal = await buildProjectContext({ projectId: 'p1', query: 'timezone Warsaw' });
+    assert.ok(personal.personal.some((info) => info.key === 'timezone'));
   });
 });
 
-test('oversized entries are skipped without starving the rest of the budget', async () => {
+test('oversized critical entries are skipped without starving the rest', async () => {
   await withIsolatedDatabase(async () => {
     const root = await mkdtemp(path.join(tmpdir(), 'knowledge-ctx-budget-'));
     registerProject('p2', root);
+    knowledgeService.createRule({ title: 'Small', content: 'ok', priority: 'critical' });
+    knowledgeService.createRule({ title: 'Big', content: 'x'.repeat(30_000), priority: 'critical' });
 
-    knowledgeService.createMemory({ title: 'Small memory', content: 'short', priority: 'critical' });
-    knowledgeService.createMemory({ title: 'Huge memory', content: 'x'.repeat(20_000), priority: 'critical' });
-
-    const prefix = await buildKnowledgePrefix(root);
-    assert.ok(prefix);
-    assert.ok(prefix.includes('Small memory'));
-    assert.ok(!prefix.includes('Huge memory'));
+    const context = await buildProjectContext({ projectId: 'p2' });
+    assert.ok(context.markdown.includes('Small'));
+    assert.ok(!context.markdown.includes('Big'));
+    // Both rules are still returned structurally.
+    assert.equal(context.rules.length, 2);
   });
 });
 
-test('prefix is null when disabled or when nothing critical is stored', async () => {
-  await withIsolatedDatabase(async () => {
-    const root = await mkdtemp(path.join(tmpdir(), 'knowledge-ctx-empty-'));
-    registerProject('p3', root);
-    assert.equal(await buildKnowledgePrefix(root), null);
-
-    knowledgeService.createRule({ title: 'Only rule', content: 'x', priority: 'critical' });
-    process.env.DDAGENT_KNOWLEDGE = '0';
-    try {
-      assert.equal(await buildKnowledgePrefix(root), null);
-    } finally {
-      delete process.env.DDAGENT_KNOWLEDGE;
-    }
-    assert.ok(await buildKnowledgePrefix(root));
-  });
-});
-
-test('prefix includes personal info and 1-hop relations of critical memories', async () => {
+test('a query expands matched memories through 1-hop connections', async () => {
   await withIsolatedDatabase(async () => {
     const root = await mkdtemp(path.join(tmpdir(), 'knowledge-ctx-related-'));
     registerProject('p4', root);
-
-    knowledgeService.createPersonal({ key: 'timezone', title: 'Timezone', content: 'Europe/Warsaw' });
-    const memory = knowledgeService.createMemory({ title: 'Critical fact', content: 'body', priority: 'critical' });
-    const related = knowledgeService.createMemory({ title: 'Related note', content: 'neighbour' });
+    const memory = knowledgeService.createMemory({ title: 'Auth uses JWT', content: 'tokens' });
+    const related = knowledgeService.createMemory({ title: 'Refresh note', content: 'neighbour detail' });
     knowledgeService.createConnection({
       sourceId: memory.id,
       sourceType: 'memory',
@@ -109,30 +107,33 @@ test('prefix includes personal info and 1-hop relations of critical memories', a
       targetType: 'memory',
     });
 
-    const prefix = await buildKnowledgePrefix(root);
-    assert.ok(prefix);
-    assert.ok(prefix.includes('Timezone: Europe/Warsaw'));
-    assert.ok(prefix.includes('Related note (memory)'));
+    const context = await buildProjectContext({ projectId: 'p4', query: 'JWT' });
+    const ids = context.memories.map((entry) => entry.id);
+    assert.ok(ids.includes(memory.id));
+    assert.ok(ids.includes(related.id));
   });
 });
 
-test('context preview reports the injected size and budget for a project', async () => {
+test('context preview reports the critical block size and budget', async () => {
   await withIsolatedDatabase(async () => {
     const root = await mkdtemp(path.join(tmpdir(), 'knowledge-preview-'));
     registerProject('p5', root);
-    knowledgeService.createRule({ title: 'Binding rule', content: 'do it', priority: 'critical' });
+    knowledgeService.createRule({
+      projectId: 'p5',
+      title: 'Binding rule',
+      content: 'do it',
+      priority: 'critical',
+    });
 
-    const preview = await buildKnowledgeContextPreview('p5');
+    const preview = buildKnowledgeContextPreview('p5');
     assert.equal(preview.projectId, 'p5');
     assert.ok(preview.markdown);
+    assert.ok(preview.markdown!.includes('Binding rule'));
     assert.equal(preview.chars, preview.markdown!.length);
     assert.equal(preview.estimatedTokens, Math.ceil(preview.chars / 4));
     assert.equal(preview.tokenBudget, 4000);
 
-    // No project / unknown project -> empty preview, still reporting the budget.
-    assert.equal((await buildKnowledgeContextPreview(null)).markdown, null);
-    const unknown = await buildKnowledgeContextPreview('nope');
-    assert.equal(unknown.markdown, null);
-    assert.equal(unknown.tokenBudget, 4000);
+    assert.equal(buildKnowledgeContextPreview(null).markdown, null);
+    assert.equal(buildKnowledgeContextPreview('nope').markdown, null);
   });
 });

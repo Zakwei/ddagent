@@ -1823,6 +1823,20 @@ function resolveOpenCodePermission(requestId: string, decision: ProviderPermissi
   }
   pendingPermissions.delete(requestId);
 
+  // The ask was answered on one client — every other viewer still shows the
+  // prompt, so drop it session-wide, not just on the answering device. The
+  // provider's own `question.replied`/`permission.replied` event cannot do
+  // this: it lands after this delete, so `handleQuestionSettled` /
+  // `handlePermissionReplied` find nothing left to cancel.
+  const run = pending.appSessionId ? activeRuns.get(pending.appSessionId) : undefined;
+  run?.writer.send(createNormalizedMessage({
+    kind: 'permission_cancelled',
+    requestId,
+    reason: 'resolved',
+    sessionId: pending.providerSessionId,
+    provider: PROVIDER,
+  }));
+
   if (pending.kind === 'question') {
     if (decision.allow) {
       const answers = questionAnswersToApi(

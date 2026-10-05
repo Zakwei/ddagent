@@ -12,10 +12,11 @@ export { knowledgeSkillImportService } from './services/knowledge-skill-import.s
 export type { KnowledgeSkillImportReport } from './services/knowledge-skill-import.service.js';
 export { knowledgeImportService } from './services/knowledge-import.service.js';
 export type { KnowledgeImportAllReport } from './services/knowledge-import.service.js';
-// applyKnowledgePrefix: used by chat-dispatch to prepend critical knowledge to a
-// session's first outbound message.
-export { applyKnowledgePrefix, buildKnowledgePrefix } from './services/knowledge-context.service.js';
+// buildProjectContext: used by the MCP tool `knowledge_get_context` to build
+// the Contexta-style, query-driven context for a project.
+export { buildProjectContext } from './services/knowledge-context.service.js';
+export type { KnowledgeContextResult } from './services/knowledge-context.service.js';
 // buildKnowledgeContextPreview: used by the knowledge routes to show the
-// injected-context size in the client.
+// always-included critical-context size in the client.
 export { buildKnowledgeContextPreview } from './services/knowledge-context.service.js';
 export type { KnowledgeContextPreview } from './services/knowledge-context.service.js';

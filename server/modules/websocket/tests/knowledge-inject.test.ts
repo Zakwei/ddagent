@@ -63,7 +63,7 @@ function capturingRuntime(): { runtime: ProviderRuntimeGateway; sent: string[] }
   };
 }
 
-test('critical knowledge prefixes the session\'s first message only', async () => {
+test('knowledge is not auto-injected; agents fetch it over MCP', async () => {
   process.env.DDAGENT_UNIFIED_RULES = '0';
   await withIsolatedDatabase(async (dir) => {
     const projectPath = path.join(dir, 'repo');
@@ -71,8 +71,12 @@ test('critical knowledge prefixes the session\'s first message only', async () =
     getConnection()
       .prepare('INSERT INTO projects (project_id, project_path) VALUES (?, ?)')
       .run('proj-knowledge', projectPath);
-    knowledgeService.createRule({ title: 'No direct DB access', content: 'Use services.', priority: 'critical' });
-    knowledgeService.createRule({ title: 'Low priority', content: 'optional', priority: 'low' });
+    // Even a critical rule must NOT be prepended to the first turn.
+    knowledgeService.createRule({
+      title: 'No direct DB access',
+      content: 'Use services.',
+      priority: 'critical',
+    });
 
     sessionsDb.createAppSession('sess-knowledge', 'devin', projectPath);
     const { runtime, sent } = capturingRuntime();
@@ -85,44 +89,10 @@ test('critical knowledge prefixes the session\'s first message only', async () =
       connection: new FakeConnection() as never,
     });
     assert.deepEqual(first, { ok: true });
-    assert.ok(sent[0].startsWith('<knowledge>'));
-    assert.ok(sent[0].includes('No direct DB access'));
-    assert.ok(!sent[0].includes('Low priority'));
-    assert.ok(sent[0].endsWith('hello agent'));
-
-    const second = await dispatchChatCommand(runtime, {
-      sessionId: 'sess-knowledge',
-      content: 'second message',
-      options: {},
-      userId: null,
-      connection: new FakeConnection() as never,
-    });
-    assert.deepEqual(second, { ok: true });
-    assert.equal(sent[1], 'second message');
+    assert.equal(sent[0], 'hello agent');
+    assert.ok(!sent[0].includes('<knowledge>'));
+    assert.ok(!sent[0].includes('No direct DB access'));
   });
   delete process.env.DDAGENT_UNIFIED_RULES;
 });
 
-test('DDAGENT_KNOWLEDGE=0 leaves the message untouched', async () => {
-  process.env.DDAGENT_UNIFIED_RULES = '0';
-  process.env.DDAGENT_KNOWLEDGE = '0';
-  await withIsolatedDatabase(async (dir) => {
-    const projectPath = path.join(dir, 'repo');
-    await mkdir(projectPath, { recursive: true });
-    knowledgeService.createRule({ title: 'Hidden rule', content: 'x', priority: 'critical' });
-
-    sessionsDb.createAppSession('sess-opt-out', 'devin', projectPath);
-    const { runtime, sent } = capturingRuntime();
-
-    await dispatchChatCommand(runtime, {
-      sessionId: 'sess-opt-out',
-      content: 'plain message',
-      options: {},
-      userId: null,
-      connection: new FakeConnection() as never,
-    });
-    assert.equal(sent[0], 'plain message');
-  });
-  delete process.env.DDAGENT_UNIFIED_RULES;
-  delete process.env.DDAGENT_KNOWLEDGE;
-});
