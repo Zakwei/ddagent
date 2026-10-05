@@ -4,64 +4,11 @@ import 'dart:developer' as developer;
 import 'dart:ffi';
 import 'dart:io';
 
+import 'package:ddagent_app/features/server_connect/data/local_server_status.dart';
 import 'package:dio/dio.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 
-/// Lifecycle of the self-hosted ddagent server running on this device.
-enum LocalServerStage {
-  /// Platform can't host the server (web/mobile/macOS, or a CPU ABI with no
-  /// published tarball — e.g. windows_arm64, linux_ia32).
-  unsupported,
-  checking,
-  notInstalled,
-  downloading,
-  installing,
-  starting,
-  running,
-  stopped,
-  error,
-}
-
-/// Runtime status of the local server — enums and raw values only, no
-/// translated strings (the UI maps `stage`/`message` to i18n keys).
-class LocalServerStatus {
-  const LocalServerStatus({
-    required this.stage,
-    this.progress = 0,
-    this.message,
-    this.url,
-    this.version,
-  });
-
-  final LocalServerStage stage;
-
-  /// 0..1 while `downloading`/`installing`.
-  final double progress;
-
-  /// Error detail or note (not localized).
-  final String? message;
-
-  /// `http://127.0.0.1:10087` once running or adopted.
-  final String? url;
-
-  /// Bundle version read from `.installed.json`.
-  final String? version;
-
-  LocalServerStatus copyWith({
-    LocalServerStage? stage,
-    double? progress,
-    String? message,
-    String? url,
-    String? version,
-  }) => LocalServerStatus(
-    stage: stage ?? this.stage,
-    progress: progress ?? this.progress,
-    message: message ?? this.message,
-    url: url ?? this.url,
-    version: version ?? this.version,
-  );
-}
+export 'local_server_status.dart';
 
 /// Parses `node --version` output (`v22.20.0`, `24.0.0`) into a major version.
 /// Returns null for anything that doesn't start with `v?<digits>`.
@@ -94,9 +41,9 @@ bool sameServerVersion(String a, String b) {
 }
 
 /// Release asset URL produced by `scripts/release/build-server-bundle.js`.
-String serverAssetUrl(String appVersion, String suffix) =>
+String serverAssetUrl(String serverVersion, String suffix) =>
     'https://github.com/Zakwei/ddagent/releases/download/'
-    'v$appVersion/ddagent-server-$appVersion-$suffix.tar.gz';
+    'v$serverVersion/ddagent-server-$serverVersion-$suffix.tar.gz';
 
 /// Manages an on-device ddagent server: downloads the published release
 /// tarball, finds (or downloads) a Node >=22 runtime, and spawns/stops the
@@ -109,7 +56,7 @@ class LocalServerService {
     Abi? abi,
     bool? isWindows,
     bool? isLinux,
-    String? appVersion,
+    String? serverVersion,
     this.onStatus,
   }) : _dio = dio ?? Dio(),
        // ignore: prefer_initializing_formals — named params can't be private.
@@ -117,11 +64,10 @@ class LocalServerService {
        _abi = abi ?? Abi.current(),
        _isWindows = isWindows ?? Platform.isWindows,
        _isLinux = isLinux ?? Platform.isLinux,
-       _appVersionOverride = appVersion;
+       _serverVersionOverride = serverVersion;
 
-  /// Fixed loopback URL the local server always binds — the UI pre-fills a
-  /// server profile with this when local mode is active.
-  static const String localUrl = 'http://127.0.0.1:10087';
+  /// Alias kept for call sites that referenced the service-level constant.
+  static const String localUrl = kLocalServerUrl;
   static const int localPort = 10087;
 
   /// Minimum Node.js major the server bundle needs.
@@ -144,7 +90,8 @@ class LocalServerService {
   final Abi _abi;
   final bool _isWindows;
   final bool _isLinux;
-  final String? _appVersionOverride;
+  final String? _serverVersionOverride;
+  String? _resolvedServerVersion;
 
   /// The spawned server process. Stays null when we adopt a server that was
   /// already answering on [localUrl] — adopted servers are never killed.
@@ -174,8 +121,23 @@ class LocalServerService {
   /// `<root>/node/` — portable Node.js runtime when the system one is missing.
   Future<Directory> get _nodeDir async => Directory('${(await _root).path}/node');
 
-  Future<String> get _appVersion async =>
-      _appVersionOverride ?? (await PackageInfo.fromPlatform()).version;
+  /// Server version = the newest GitHub release tag, minus the `v` prefix.
+  /// The app's own pubspec version is unrelated — server tarballs are
+  /// versioned by the repo `package.json`, so the release API is the only
+  /// reliable source. Cached; [serverVersion] overrides it (tests).
+  Future<String> get _serverVersion async =>
+      _resolvedServerVersion ??= _serverVersionOverride ?? await _latestReleaseVersion();
+
+  Future<String> _latestReleaseVersion() async {
+    final res = await _dio.get<Map<String, dynamic>>(
+      'https://api.github.com/repos/Zakwei/ddagent/releases/latest',
+    );
+    final tag = res.data?['tag_name'] as String?;
+    if (tag == null || tag.isEmpty) {
+      throw StateError('Could not resolve the latest ddagent release tag.');
+    }
+    return tag.replaceFirst(RegExp('^v', caseSensitive: false), '');
+  }
 
   Dio get _probe => _probeClient ??= Dio(
     BaseOptions(connectTimeout: _probeTimeout, receiveTimeout: _probeTimeout),
@@ -330,26 +292,25 @@ class LocalServerService {
     }
   }
 
-  /// Downloads the release tarball matching this app's version and extracts it
-  /// into `server/`. Skips the download when `.installed.json` already records
-  /// the same version.
+  /// Downloads the newest release tarball and extracts it into `server/`.
+  /// Skips the download when `.installed.json` already records that version.
   Future<void> install({required void Function(double progress)? onProgress}) async {
     _requireSupported();
     final suffix = tarballSuffixForAbi(_abi)!;
-    final appVersion = await _appVersion;
+    final serverVersion = await _serverVersion;
     final installed = await installedVersion;
-    if (installed != null && sameServerVersion(installed, appVersion)) {
+    if (installed != null && sameServerVersion(installed, serverVersion)) {
       onProgress?.call(1);
       _emit(LocalServerStatus(stage: LocalServerStage.installing, progress: 1, version: installed));
       return;
     }
     final root = await _root;
     await root.create(recursive: true);
-    final archive = File('${root.path}/ddagent-server-$appVersion-$suffix.tar.gz');
+    final archive = File('${root.path}/ddagent-server-$serverVersion-$suffix.tar.gz');
     _emit(LocalServerStatus(stage: LocalServerStage.downloading, version: installed));
     try {
       await _dio.download(
-        serverAssetUrl(appVersion, suffix),
+        serverAssetUrl(serverVersion, suffix),
         archive.path,
         onReceiveProgress: (received, total) {
           final progress = total > 0 ? (received / total).clamp(0.0, 1.0).toDouble() : 0.0;
@@ -382,7 +343,7 @@ class LocalServerService {
       await bundle.create(recursive: true);
       await _tar(['-xf', archive.path, '-C', bundle.path]);
       _emit(
-        LocalServerStatus(stage: LocalServerStage.installing, progress: 1, version: appVersion),
+        LocalServerStatus(stage: LocalServerStage.installing, progress: 1, version: serverVersion),
       );
     } on Object catch (e) {
       _emit(

@@ -3568,7 +3568,22 @@
     "enterUrl": "Enter a server URL",
     "connectionFailed": "Connection failed ({{error}})",
     "connect": "Connect",
-    "connecting": "Connecting…"
+    "connecting": "Connecting…",
+    "local": {
+      "title": "This device",
+      "subtitle": "Run the ddagent server on this machine",
+      "install": "Install local server",
+      "start": "Start local server",
+      "stop": "Stop",
+      "starting": "Starting local server…",
+      "downloading": "Downloading server… {{percent}}%",
+      "installing": "Installing…",
+      "running": "Running at {{url}}",
+      "installed": "Installed (v{{version}})",
+      "connect": "Use this server",
+      "error": "Local server error: {{error}}",
+      "or": "or connect to a remote server"
+    }
   },
   "sessions": {
     "noSessions": "No sessions",

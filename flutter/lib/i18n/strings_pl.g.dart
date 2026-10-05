@@ -10069,9 +10069,9 @@ extension on TranslationsPl {
 			'scheduler.worktree' => 'worktree',
 			'notifications.deviceLabel' => 'ddagent Flutter',
 			'notifications.errors.noResponse' => 'Brak odpowiedzi z serwera',
+			'notifications.errors.registrationRejected' => 'Serwer odrzucił rejestrację',
 			_ => null,
 		} ?? switch (path) {
-			'notifications.errors.registrationRejected' => 'Serwer odrzucił rejestrację',
 			'serverConnect.connect' => 'Połącz',
 			'serverConnect.connecting' => 'Łączenie…',
 			'serverConnect.connectionFailed' => ({required Object error}) => 'Połączenie nie powiodło się (${error})',

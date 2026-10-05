@@ -19,17 +19,24 @@ String wsBaseFor(String base) =>
     base.replaceFirst(RegExp('^http:'), 'ws:').replaceFirst(RegExp('^https:'), 'wss:');
 
 class ServerProfile {
-  const ServerProfile({required this.url, this.name = ''});
+  const ServerProfile({required this.url, this.name = '', this.isLocal = false});
 
   final String url;
   final String name;
 
+  /// Server runs on this device (spawned by the app) — the router guard
+  /// asks the local-server controller to make sure it is up before use.
+  final bool isLocal;
+
   String get label => name.isEmpty ? url : name;
 
-  Map<String, dynamic> toJson() => {'url': url, 'name': name};
+  Map<String, dynamic> toJson() => {'url': url, 'name': name, 'isLocal': isLocal};
 
-  factory ServerProfile.fromJson(Map<String, dynamic> j) =>
-      ServerProfile(url: j['url'] as String? ?? '', name: j['name'] as String? ?? '');
+  factory ServerProfile.fromJson(Map<String, dynamic> j) => ServerProfile(
+    url: j['url'] as String? ?? '',
+    name: j['name'] as String? ?? '',
+    isLocal: j['isLocal'] as bool? ?? false,
+  );
 }
 
 class ServerProfilesState {
@@ -72,12 +79,20 @@ class ServerProfilesController extends Notifier<ServerProfilesState> {
   }
 
   /// Adds (or selects) a profile and persists it.
-  Future<void> select(String rawUrl, {String name = ''}) async {
+  Future<void> select(String rawUrl, {String name = '', bool isLocal = false}) async {
     final url = normalizeServerUrl(rawUrl);
     if (url.isEmpty) return;
     final profiles = [...state.profiles];
-    if (!profiles.any((p) => p.url == url)) {
-      profiles.add(ServerProfile(url: url, name: name));
+    final idx = profiles.indexWhere((p) => p.url == url);
+    if (idx == -1) {
+      profiles.add(ServerProfile(url: url, name: name, isLocal: isLocal));
+    } else if (profiles[idx].isLocal != isLocal ||
+        (name.isNotEmpty && profiles[idx].name != name)) {
+      profiles[idx] = ServerProfile(
+        url: url,
+        name: name.isEmpty ? profiles[idx].name : name,
+        isLocal: isLocal,
+      );
     }
     if (Hive.isBoxOpen('settings')) {
       await _box.put(_profilesKey, jsonEncode([for (final p in profiles) p.toJson()]));

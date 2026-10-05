@@ -763,6 +763,8 @@ class Translations$serverConnect$en {
 
 	/// en: 'Connecting…'
 	String get connecting => 'Connecting…';
+
+	late final Translations$serverConnect$local$en local = Translations$serverConnect$local$en.internal(_root);
 }
 
 // Path: sessions
@@ -7473,6 +7475,54 @@ class Translations$quota$chart$en {
 
 	/// en: '{{date}} · {{tokens}} tokens · {{cost}}'
 	String pointReadout({required Object date, required Object tokens, required Object cost}) => '${date} · ${tokens} tokens · ${cost}';
+}
+
+// Path: serverConnect.local
+class Translations$serverConnect$local$en {
+	Translations$serverConnect$local$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'This device'
+	String get title => 'This device';
+
+	/// en: 'Run the ddagent server on this machine'
+	String get subtitle => 'Run the ddagent server on this machine';
+
+	/// en: 'Install local server'
+	String get install => 'Install local server';
+
+	/// en: 'Start local server'
+	String get start => 'Start local server';
+
+	/// en: 'Stop'
+	String get stop => 'Stop';
+
+	/// en: 'Starting local server…'
+	String get starting => 'Starting local server…';
+
+	/// en: 'Downloading server… {{percent}}%'
+	String downloading({required Object percent}) => 'Downloading server… ${percent}%';
+
+	/// en: 'Installing…'
+	String get installing => 'Installing…';
+
+	/// en: 'Running at {{url}}'
+	String running({required Object url}) => 'Running at ${url}';
+
+	/// en: 'Installed (v{{version}})'
+	String installed({required Object version}) => 'Installed (v${version})';
+
+	/// en: 'Use this server'
+	String get connect => 'Use this server';
+
+	/// en: 'Local server error: {{error}}'
+	String error({required Object error}) => 'Local server error: ${error}';
+
+	/// en: 'or connect to a remote server'
+	String get or => 'or connect to a remote server';
 }
 
 // Path: sessions.toasts
@@ -15887,6 +15937,7 @@ extension on Translations {
 			'onboarding.mcp.title' => 'Connect agents to ddagent',
 			'onboarding.mcp.description' => 'Install the ddagent MCP server so your agents can use the knowledge base and ddagent tools. Pick agents, or install for all.',
 			'onboarding.mcp.installSelected' => 'Install selected',
+			'onboarding.mcp.installForAll' => 'Install for all',
 			_ => null,
 		} ?? switch (path) {
 			'onboarding.mcp.laterHint' => 'Optional — you can also install this later in Settings → MCP.',
@@ -15947,6 +15998,19 @@ extension on Translations {
 			'serverConnect.connectionFailed' => ({required Object error}) => 'Connection failed (${error})',
 			'serverConnect.connect' => 'Connect',
 			'serverConnect.connecting' => 'Connecting…',
+			'serverConnect.local.title' => 'This device',
+			'serverConnect.local.subtitle' => 'Run the ddagent server on this machine',
+			'serverConnect.local.install' => 'Install local server',
+			'serverConnect.local.start' => 'Start local server',
+			'serverConnect.local.stop' => 'Stop',
+			'serverConnect.local.starting' => 'Starting local server…',
+			'serverConnect.local.downloading' => ({required Object percent}) => 'Downloading server… ${percent}%',
+			'serverConnect.local.installing' => 'Installing…',
+			'serverConnect.local.running' => ({required Object url}) => 'Running at ${url}',
+			'serverConnect.local.installed' => ({required Object version}) => 'Installed (v${version})',
+			'serverConnect.local.connect' => 'Use this server',
+			'serverConnect.local.error' => ({required Object error}) => 'Local server error: ${error}',
+			'serverConnect.local.or' => 'or connect to a remote server',
 			'sessions.noSessions' => 'No sessions',
 			'sessions.noRecentSessions' => 'No recent sessions',
 			'sessions.archivedSessions' => 'Archived sessions',

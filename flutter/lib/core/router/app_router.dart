@@ -18,6 +18,7 @@ import 'package:ddagent_app/features/projects/view/projects_screen.dart';
 import 'package:ddagent_app/features/quota/view/quota_screen.dart';
 import 'package:ddagent_app/features/scheduler/view/scheduler_screen.dart';
 import 'package:ddagent_app/features/server_connect/data/server_profiles.dart';
+import 'package:ddagent_app/features/server_connect/state/local_server_controller.dart';
 import 'package:ddagent_app/features/server_connect/view/server_connect_screen.dart';
 import 'package:ddagent_app/features/sessions/view/sessions_screen.dart';
 import 'package:ddagent_app/features/settings/view/settings_screen.dart';
@@ -125,10 +126,17 @@ final routerProvider = Provider<GoRouter>((ref) {
         return authPaths.contains(path) ? '/projects' : remapped;
       }
       // No server configured → connect screen first.
-      if (ref.read(serverProfilesProvider).activeUrl == null &&
-          Env.defaultServerUrl.isEmpty &&
-          path != '/connect') {
+      final profilesState = ref.read(serverProfilesProvider);
+      if (profilesState.activeUrl == null && Env.defaultServerUrl.isEmpty && path != '/connect') {
         return '/connect';
+      }
+      // Active profile is the on-device server → make sure it's running
+      // before any API call can fire. Idempotent and shared across callers.
+      final activeProfile = profilesState.profiles
+          .where((p) => p.url == profilesState.activeUrl)
+          .firstOrNull;
+      if (activeProfile?.isLocal ?? false) {
+        await ref.read(localServerProvider.notifier).ensureRunning();
       }
       final auth = ref.read(authControllerProvider);
       // First-run servers need the owner registration before anything else.
