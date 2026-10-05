@@ -598,15 +598,16 @@ class _ModelsContentState extends ConsumerState<_ModelsContent> {
                     ],
                   ),
                 ),
-                // Custom-model CRUD moved to Settings → Models (web parity —
-                // the web repoints this button to the models settings tab).
+                // Custom-model CRUD lives in Agents → Models, scoped to the
+                // active provider (the web repoints this button to the models
+                // settings tab).
                 AppButton(
                   variant: AppButtonVariant.outline,
                   size: AppButtonSize.sm,
                   onPressed: () {
                     final router = GoRouter.of(context);
                     Navigator.of(context).pop();
-                    router.go('/settings/models');
+                    router.go('/settings/agents?agent=$provider&category=models');
                   },
                   child: const Text('Manage models'),
                 ),

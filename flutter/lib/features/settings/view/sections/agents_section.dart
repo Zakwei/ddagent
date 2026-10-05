@@ -8,6 +8,7 @@ import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
 import 'package:ddagent_app/core/widgets/app_spinner.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
+import 'package:ddagent_app/features/chat/view/model_library_panel.dart';
 import 'package:ddagent_app/features/mcp/view/ddagent_mcp_install_card.dart';
 import 'package:ddagent_app/features/mcp/view/mcp_servers_screen.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
@@ -21,13 +22,14 @@ import 'package:ddagent_app/features/terminal/view/provider_login_dialog.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Agents settings section — port of `AgentsSettingsTab.tsx`: a provider
 /// pill selector (claude/cursor/codex/opencode/commandcode/antigravity/devin), category tabs
-/// (account/permissions/mcp/skills — `VISIBLE_CATEGORIES`) and the per-agent
-/// content below.
+/// (account/permissions/models/mcp/skills — `VISIBLE_CATEGORIES`) and the
+/// per-agent content below.
 class AgentsSection extends ConsumerStatefulWidget {
   const AgentsSection({super.key});
 
@@ -40,7 +42,7 @@ class AgentsSection extends ConsumerStatefulWidget {
     'antigravity',
     'devin',
   ];
-  static const categories = ['account', 'permissions', 'mcp', 'skills'];
+  static const categories = ['account', 'permissions', 'models', 'mcp', 'skills'];
 
   static const _names = {
     'claude': 'Claude',
@@ -75,9 +77,40 @@ class _AgentsSectionState extends ConsumerState<AgentsSection> {
   String _agent = AgentsSection.agents.first;
   String _category = AgentsSection.categories.first;
 
+  /// Last `?agent=&category=` intent applied — lets deep links (e.g. the chat
+  /// `/models` command) preselect an agent pill + sub-tab.
+  String? _appliedAgent;
+  String? _appliedCategory;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final Map<String, String> query;
+    try {
+      query = GoRouterState.of(context).uri.queryParameters;
+    } on Object {
+      // No router above (e.g. widget tests mount AgentsSection directly).
+      return;
+    }
+    final agent = query['agent'];
+    final category = query['category'];
+    if (agent == _appliedAgent && category == _appliedCategory) return;
+    _appliedAgent = agent;
+    _appliedCategory = category;
+    if (agent != null && AgentsSection.agents.contains(agent)) {
+      _agent = agent;
+    }
+    if (category != null && AgentsSection.categories.contains(category)) {
+      _category = category;
+    }
+  }
+
   String _categoryLabel(Translations t, String category) => switch (category) {
     'account' => t.settings.tabs.account,
     'permissions' => t.settings.tabs.permissions,
+    // The standalone Models section was folded into this tab per agent; its
+    // label reuses the (now agent-scoped) main-tab translation.
+    'models' => t.settings.mainTabs.models,
     'mcp' => t.settings.tabs.mcpServers,
     // The web shows "Shared Skills" for opencode/devin via a defaultValue —
     // the single `skills` key already localizes the concept.
@@ -167,6 +200,9 @@ class _AgentsSectionState extends ConsumerState<AgentsSection> {
               switch (_category) {
                 'account' => _AccountContent(agent: _agent),
                 'permissions' => _PermissionsContent(agent: _agent),
+                // T12 — Models moved here from the standalone settings section;
+                // the agent pill above drives the provider.
+                'models' => ModelLibraryPanel(initialProvider: _agent, embedded: true),
                 // T52 — web renders `<McpServers/><McpServerTokens/>` here.
                 'mcp' => Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,

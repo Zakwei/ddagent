@@ -40,7 +40,6 @@ void main() {
       'appearance',
       'git',
       'api',
-      'models',
       'tools',
       'notifications',
       'workspaces',

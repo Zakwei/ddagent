@@ -22,9 +22,14 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 /// `{OPTIONS, DEFAULT}` catalog, applied straight to the local per-provider
 /// cache instead of refetching (web `applyProviderCatalog` parity).
 class ModelLibraryPanel extends ConsumerStatefulWidget {
-  const ModelLibraryPanel({this.initialProvider, super.key});
+  const ModelLibraryPanel({this.initialProvider, this.embedded = false, super.key});
 
   final String? initialProvider;
+
+  /// Embedded in the Agents settings tab: the agent pills above pick the
+  /// provider, so the internal provider tabs are hidden and the body flows with
+  /// the parent scroll view instead of owning one.
+  final bool embedded;
 
   @override
   ConsumerState<ModelLibraryPanel> createState() => _ModelLibraryPanelState();
@@ -88,6 +93,25 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
   void initState() {
     super.initState();
     unawaited(_load(_provider));
+  }
+
+  @override
+  void didUpdateWidget(covariant ModelLibraryPanel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final next = widget.initialProvider;
+    // Embedded mode follows the agent pills: switch provider when the parent
+    // rebuilds this panel for a different agent. Fields reset without setState —
+    // the framework rebuilds right after didUpdateWidget.
+    if (next != null && next != oldWidget.initialProvider && next != _provider) {
+      _provider = next;
+      _confirmDeleteId = null;
+      _notice = null;
+      _error = null;
+      _editing = null;
+      _name.clear();
+      _id.clear();
+      unawaited(_load(next));
+    }
   }
 
   @override
@@ -249,54 +273,185 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
     // DEFAULT (web `selectedModel ?? catalog.defaultModel` parity).
     final effectiveDefault = _storedDefault(_provider) ?? _defaults[_provider];
 
+    // Header — web's `Plus` tile + title (the section nav replaces the old
+    // dialog's close button).
+    final header = Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: c.primary.withValues(alpha: 0.1),
+              border: Border.all(color: c.primary.withValues(alpha: 0.25)),
+              borderRadius: AppRadii.borderLg,
+            ),
+            child: Icon(LucideIcons.plus, size: 16, color: c.primary),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Model library',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    height: 24 / 16,
+                    color: c.foreground,
+                  ),
+                ),
+                Text(
+                  'Add model IDs supported by your provider. Built-in models stay locked. '
+                  'The circle marks the default model.',
+                  style: TextStyle(fontSize: 12, height: 16 / 12, color: c.mutedForeground),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+
+    // Embedded in the Agents tab the parent owns the scroll view, so the body
+    // shrink-wraps and inherits the outer padding; the standalone section fills
+    // the viewport and pads itself.
+    final content = ListView(
+      shrinkWrap: widget.embedded,
+      physics: widget.embedded
+          ? const NeverScrollableScrollPhysics()
+          : const AlwaysScrollableScrollPhysics(),
+      padding: widget.embedded ? EdgeInsets.zero : const EdgeInsets.all(AppSpacing.lg),
+      children: [
+        _form(c),
+        const SizedBox(height: 16),
+        _sectionHeader(c, 'Your models', 'Editable and stored in auth.db', customModels.length),
+        const SizedBox(height: 6),
+        if (customModels.isEmpty)
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+            decoration: BoxDecoration(
+              border: Border.all(color: c.border.withValues(alpha: 0.7)),
+              borderRadius: AppRadii.borderLg,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(LucideIcons.package, size: 18, color: c.mutedForeground),
+                const SizedBox(height: 6),
+                Text(
+                  'No custom models yet',
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: c.foreground),
+                ),
+                Text(
+                  'Add one with the form and it will appear in every model picker.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 12, color: c.mutedForeground),
+                ),
+              ],
+            ),
+          )
+        else
+          for (final m in customModels) _customRow(c, m, effectiveDefault),
+        const SizedBox(height: 16),
+        _sectionHeader(
+          c,
+          'Built-in models',
+          'Maintained by ddagent and read-only',
+          predefined.length,
+        ),
+        const SizedBox(height: 6),
+        Container(
+          decoration: BoxDecoration(
+            color: c.background.withValues(alpha: 0.6),
+            border: Border.all(color: c.border.withValues(alpha: 0.7)),
+            borderRadius: AppRadii.borderLg,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (var i = 0; i < predefined.length; i++)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  decoration: BoxDecoration(
+                    border: i < predefined.length - 1
+                        ? Border(bottom: BorderSide(color: c.border.withValues(alpha: 0.6)))
+                        : null,
+                  ),
+                  child: Row(
+                    children: [
+                      _defaultRadio(c, predefined[i], effectiveDefault),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              _labelOf(predefined[i]),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: c.foreground,
+                              ),
+                            ),
+                            Text(
+                              _idOf(predefined[i]),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontFamily: 'monospace',
+                                fontSize: 10,
+                                color: c.mutedForeground,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Icon(
+                        LucideIcons.lockKeyhole,
+                        size: 12,
+                        color: c.mutedForeground.withValues(alpha: 0.7),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+
+    // Embedded: the agent pills above already pick the provider, so drop the
+    // provider tabs and let the body flow with the Agents tab's outer scroll.
+    if (widget.embedded) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          header,
+          if (loading)
+            const SizedBox(
+              height: 80,
+              child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+            )
+          else
+            content,
+        ],
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.sm, AppSpacing.lg, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header — web's `Plus` tile + title (the section nav replaces the
-          // old dialog's close button).
-          Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: c.primary.withValues(alpha: 0.1),
-                    border: Border.all(color: c.primary.withValues(alpha: 0.25)),
-                    borderRadius: AppRadii.borderLg,
-                  ),
-                  child: Icon(LucideIcons.plus, size: 16, color: c.primary),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Model library',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          height: 24 / 16,
-                          color: c.foreground,
-                        ),
-                      ),
-                      Text(
-                        'Add model IDs supported by your provider. Built-in models stay locked. '
-                        'The circle marks the default model.',
-                        style: TextStyle(fontSize: 12, height: 16 / 12, color: c.mutedForeground),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
+          header,
           // Provider tabs — scrollable like the web's overflow-x-auto row.
           Padding(
             padding: const EdgeInsets.only(bottom: 10),
@@ -324,122 +479,7 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
                       child: CircularProgressIndicator(strokeWidth: 2),
                     ),
                   )
-                : ListView(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    children: [
-                      _form(c),
-                      const SizedBox(height: 16),
-                      _sectionHeader(
-                        c,
-                        'Your models',
-                        'Editable and stored in auth.db',
-                        customModels.length,
-                      ),
-                      const SizedBox(height: 6),
-                      if (customModels.isEmpty)
-                        Container(
-                          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: c.border.withValues(alpha: 0.7)),
-                            borderRadius: AppRadii.borderLg,
-                          ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(LucideIcons.package, size: 18, color: c.mutedForeground),
-                              const SizedBox(height: 6),
-                              Text(
-                                'No custom models yet',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: c.foreground,
-                                ),
-                              ),
-                              Text(
-                                'Add one with the form and it will appear in every model picker.',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: 12, color: c.mutedForeground),
-                              ),
-                            ],
-                          ),
-                        )
-                      else
-                        for (final m in customModels) _customRow(c, m, effectiveDefault),
-                      const SizedBox(height: 16),
-                      _sectionHeader(
-                        c,
-                        'Built-in models',
-                        'Maintained by ddagent and read-only',
-                        predefined.length,
-                      ),
-                      const SizedBox(height: 6),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: c.background.withValues(alpha: 0.6),
-                          border: Border.all(color: c.border.withValues(alpha: 0.7)),
-                          borderRadius: AppRadii.borderLg,
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            for (var i = 0; i < predefined.length; i++)
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                                decoration: BoxDecoration(
-                                  border: i < predefined.length - 1
-                                      ? Border(
-                                          bottom: BorderSide(
-                                            color: c.border.withValues(alpha: 0.6),
-                                          ),
-                                        )
-                                      : null,
-                                ),
-                                child: Row(
-                                  children: [
-                                    _defaultRadio(c, predefined[i], effectiveDefault),
-                                    const SizedBox(width: 6),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            _labelOf(predefined[i]),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w500,
-                                              color: c.foreground,
-                                            ),
-                                          ),
-                                          Text(
-                                            _idOf(predefined[i]),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                              fontFamily: 'monospace',
-                                              fontSize: 10,
-                                              color: c.mutedForeground,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Icon(
-                                      LucideIcons.lockKeyhole,
-                                      size: 12,
-                                      color: c.mutedForeground.withValues(alpha: 0.7),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                : content,
           ),
         ],
       ),
