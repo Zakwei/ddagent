@@ -55,7 +55,7 @@ ddagent se ejecuta en tu propia máquina o VPS y te ofrece una interfaz web puli
 - **Shell integrada** — terminal completo por workspace, más una pestaña de shell independiente
 - **Tablero de tareas** — vista kanban impulsada por TaskMaster; convierte PRDs en tareas ejecutables
 - **Gestión de MCP** — añade, edita y sincroniza servidores MCP entre agentes
-- **Base de conocimiento** — una memoria local y consultable para cada agente: reglas, skills, memorias e información personal, inyectada en el primer turno y compartida por MCP ([documentación](KNOWLEDGE.es.md))
+- **Base de conocimiento** — una memoria local y consultable para cada agente: reglas, skills, memorias e información personal, recuperada bajo demanda por MCP (modelo Contexta) ([documentación](KNOWLEDGE.es.md))
 - **Navegador de skills** — gestiona las skills de los agentes desde la UI
 - **Cuota y uso** — uso de tokens y límites de suscripción por agente, de un vistazo
 - **Browser-use** — sesiones de navegador dirigidas por el agente para investigación y pruebas

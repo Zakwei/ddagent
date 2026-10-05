@@ -35,25 +35,24 @@ Ci sono tre livelli, ed è utile sapere qual è quale:
   proprio: Claude Code legge `CLAUDE.md`, Codex/Cursor leggono `AGENTS.md`, Cursor legge
   `.cursorrules`, e diversi leggono `skills/` e `.agents/skills/`. Questo è compito del CLI, non
   una scelta del modello — ddagent non lo disattiva.
-- **Iniezione di ddagent** — al primo turno di una sessione ddagent antepone un
-  blocco `<knowledge>` (dettagli sotto). Funziona per ogni provider e non
-  richiede configurazione da parte dell’agente.
-- **Strumenti MCP** — una volta installato il server MCP di ddagent in un agente, la sua
-  lista di strumenti include `knowledge_search` e simili. Il modello decide quando
-  chiamarli, guidato dalle descrizioni degli strumenti e da eventuali regole
-  di istruzione che tieni nella base di conoscenza.
+- **Recupero via MCP (su richiesta)** — una volta installato il server MCP di ddagent
+  in un agente, la sua lista di strumenti include `knowledge_get_context`,
+  `knowledge_search` e simili. Come in Contexta, niente viene iniettato
+  automaticamente: l’agente chiama il costruttore di contesto con una query e riceve
+  indietro le regole `critical` più tutto ciò che corrisponde. Il modello decide quando
+  chiamarlo, guidato dalle descrizioni degli strumenti e da eventuali regole di
+  istruzione che tieni nella base di conoscenza.
 
-Quindi «un solo posto» significa **un solo posto dove curare il contenuto iniettato e un solo budget**
-— non impedisce (e non può impedire) a un CLI di leggere i propri file nativi. Per evitare
-duplicati teniamo l’`AGENTS.md` del workspace a priorità `high`, così il blocco di
-conoscenza non ripete mai ciò che unified-rules inietta già.
+Quindi «un solo posto» significa **un solo posto dove curare la conoscenza**
+— non impedisce (e non può impedire) a un CLI di leggere i propri file nativi.
+ddagent non inietta affatto automaticamente la base di conoscenza nelle sessioni.
 
 ## Entità
 
 | Entità | Ambito | Note |
 |---|---|---|
 | Memoria | progetto o globale | `memory_type` (`fact`/`decision`/`note`/`reference`), `priority`, `source`, tag |
-| Regola | progetto o globale | interruttore `enabled`; le regole `critical` vengono iniettate nelle sessioni |
+| Regola | progetto o globale | interruttore `enabled`; le regole `critical` vengono sempre restituite per prime dal costruttore di contesto |
 | Skill | globale | nome univoco, categoria, icona opzionale (base64 data URL) |
 | Informazioni personali | globale | `key` univoca |
 | Tag / Connessione | — | tag sulle memorie; le connessioni collegano due entità qualsiasi |
@@ -63,23 +62,25 @@ Priorità: `critical > high > normal > low`. Un’entità può essere limitata a
 progetto o essere globale (vale ovunque). `project_id` è una colonna semplice (nessuna
 chiave esterna) perché la tabella dei progetti viene ricostruita durante le migrazioni.
 
-## Iniezione al primo turno (ciò che ogni agente riceve, automaticamente)
+## Recuperare il contesto (su richiesta)
 
-Al **primo** messaggio in uscita di una sessione, ddagent antepone un blocco
-`<knowledge>` contenente:
+Gli agenti ottengono il contesto tramite lo strumento MCP `knowledge_get_context`
+(il modello Contexta). Dati un progetto e una query, restituisce, in ordine:
 
-- **regole** `critical` (di progetto + globali, solo abilitate),
-- **memorie** `critical`,
-- ogni voce di **informazioni personali**,
-- i **vicini a 1 salto** delle memorie incluse (raggiunti tramite connessioni
-  esplicite).
+- le **regole** `critical` del progetto (sempre),
+- le **regole** che corrispondono alla query,
+- le **memorie** rilevanti (ordinate per FTS, più i loro vicini a 1 salto
+  raggiunti tramite le connessioni),
+- le **skill** il cui nome/descrizione/categoria corrisponde alla query,
+- le **informazioni personali** solo quando la query vi corrisponde,
 
-L’intero blocco è limitato a ~4000 token. Passa dallo stesso gate del primo turno di
-`.ddagent/shared-context.md` e unified rules, quindi non costa token per turno.
-Imposta `DDAGENT_KNOWLEDGE=0` per disattivarlo.
+il tutto reso come blocco Markdown con budget di token (`maxTokens`, predefinito
+~4000). Senza query restituisce le regole `critical` più le memorie principali.
 
-La dashboard mostra un **misuratore del contesto iniettato** (`~X / 4000 tok`) per il
-progetto selezionato, così puoi vedere e controllare cosa entra nel contesto.
+La dashboard mostra un **misuratore del contesto critico** (`~X / 4000 tok`) per il
+progetto selezionato — la dimensione di ciò che ogni chiamata a
+`knowledge_get_context` include sempre. Niente viene iniettato automaticamente
+nelle sessioni.
 
 ## Strumenti MCP (su richiesta)
 
@@ -109,9 +110,10 @@ includono il gruppo `knowledge_*` accanto a `create_task`, `send_message`, ecc.
 
 Come fa un agente a sapere *quando* usare MCP? Non tira a indovinare — diglielo. Tieni una
 regola `critical` come: *«Prima di rispondere a domande su questo progetto, chiama
-`knowledge_search`; quando prendi una decisione, rendila persistente con
-`knowledge_add_memory`.»* Poiché quella regola viene iniettata a ogni primo turno, tutti
-i tuoi agenti ricevono le stesse istruzioni operative.
+`knowledge_get_context`; quando prendi una decisione, rendila persistente con
+`knowledge_add_memory`.»* Poiché le regole `critical` vengono sempre restituite dal
+costruttore di contesto, ogni agente che chiama lo strumento riceve le stesse
+istruzioni operative.
 
 ## Scansione del progetto
 
@@ -145,9 +147,10 @@ Il grafo disegna le tue connessioni esplicite più gli hub impliciti — ogni en
 1. **Scansiona** ogni progetto attivo una volta (Knowledge → seleziona progetto → scan);
    ripeti la scansione dopo grandi cambiamenti ai suoi file di istruzioni.
 2. **Promuovi con criterio**: solo le regole davvero vincolanti dovrebbero essere `critical`
-   (vengono iniettate). Usa la stella su una riga e tieni d’occhio il misuratore del budget.
+   (vengono sempre servite dal costruttore di contesto). Usa la stella su una riga e
+   tieni d’occhio il misuratore del contesto critico.
 3. **Mantieni il resto su `high`/`normal`** — comunque ricercabile e disponibile via MCP
-   senza spendere contesto a ogni turno.
+   solo quando una query corrisponde, quindi non costano nulla quando sono irrilevanti.
 4. **Informazioni personali** per preferenze trasversali ai progetti (fuso orario, editor, denominazione).
 5. **Collega le memorie correlate** così i vicini a 1 salto viaggiano insieme.
 6. **Installa MCP** per gli agenti che devono cercare nella base e rendere persistenti
@@ -168,10 +171,11 @@ Lo stesso menu ha **Importa le skill degli agenti**: elenca le skill globali/pre
 ## Utile sapere
 
 - Tutto è **locale** a questa istanza ddagent; niente cloud, niente sync.
-- L’iniezione avviene **una volta per sessione** (primo turno) — le nuove sessioni recepiscono
-  i cambiamenti.
-- Le skill scansionate **non vengono iniettate**; sono raggiungibili tramite la ricerca
-  MCP, il che mantiene snello il contesto sempre attivo.
+- La base di conoscenza **non viene iniettata automaticamente** — gli agenti la
+  recuperano via MCP su richiesta (modello Contexta). Gli agenti senza il server MCP
+  installato non ne ricavano nulla.
+- Le skill scansionate sono raggiungibili tramite MCP (`knowledge_get_context` /
+  `knowledge_search`), non spinte nel contesto.
 - Una regola o una memoria può essere modificata da un agente via MCP; rivedi le modifiche nella
   **History** dell’entità e ripristina una versione precedente se serve.
 
@@ -189,7 +193,7 @@ POST   /skills              PATCH /skills/:id      DELETE /skills/:id
 GET    /personal            POST /personal         PATCH/DELETE /personal/:id
 GET    /search              ?q=&type=&projectId=&limit=
 GET    /graph               ?projectId=&types=&limit=
-GET    /context             ?projectId=            (injection preview + budget)
+GET    /context             ?projectId=            (dimensione del contesto critico + budget)
 GET    /tags                DELETE /tags/:id
 GET    /connections         POST /connections      DELETE /connections/:id
 GET    /history             ?entityType=&entityId=&limit=

@@ -55,7 +55,7 @@ Ağınızdaki herhangi bir tarayıcıdan veya telefonunuzdan açın. Sizin makin
 - **Entegre kabuk** — çalışma alanı başına tam terminal, artı bağımsız bir kabuk sekmesi
 - **Görev panosu** — TaskMaster destekli kanban görünümü; PRD'leri çalıştırılabilir görevlere dönüştürün
 - **MCP yönetimi** — ajanlar arasında MCP sunucuları ekleyin, düzenleyin ve senkronize edin
-- **Bilgi tabanı** — her ajan için tek, yerel ve aranabilir bir bellek: kurallar, beceriler, anılar ve kişisel bilgiler, ilk turda enjekte edilir ve MCP üzerinden paylaşılır ([dokümanlar](KNOWLEDGE.tr.md))
+- **Bilgi tabanı** — her ajan için tek, yerel ve aranabilir bir bellek: kurallar, beceriler, anılar ve kişisel bilgiler, MCP üzerinden isteğe bağlı olarak alınır (Contexta modeli) ([dokümanlar](KNOWLEDGE.tr.md))
 - **Yetenek tarayıcısı** — ajan yeteneklerini arayüzden yönetin
 - **Kota ve kullanım** — ajan başına token kullanımı ve abonelik limitleri, bir bakışta
 - **Browser-use** — araştırma ve test için ajan kontrollü tarayıcı oturumları

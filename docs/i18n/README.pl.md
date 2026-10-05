@@ -55,7 +55,7 @@ Otwórz go w dowolnej przeglądarce w swojej sieci albo na telefonie. Twoja masz
 - **Zintegrowana powłoka** — pełny terminal dla każdego workspace plus osobna karta powłoki
 - **Tablica zadań** — widok kanban napędzany przez TaskMaster; zamieniaj PRD-y na wykonywalne zadania
 - **Zarządzanie MCP** — dodawaj, edytuj i synchronizuj serwery MCP między agentami
-- **Baza wiedzy** — jedna lokalna, przeszukiwalna pamięć dla każdego agenta: reguły, skille, wspomnienia i informacje osobiste, wstrzykiwana w pierwszej turze i współdzielona przez MCP ([dokumentacja](KNOWLEDGE.pl.md))
+- **Baza wiedzy** — jedna lokalna, przeszukiwalna pamięć dla każdego agenta: reguły, skille, wspomnienia i informacje osobiste, pobierana przez MCP na żądanie (model Contexta) ([dokumentacja](KNOWLEDGE.pl.md))
 - **Przeglądarka skilli** — zarządzaj skillami agentów z poziomu UI
 - **Limity i zużycie** — zużycie tokenów i limity subskrypcji per agent, na pierwszy rzut oka
 - **Browser-use** — sesje przeglądarki sterowane przez agenta do researchu i testów

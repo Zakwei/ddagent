@@ -35,25 +35,23 @@ dosyaları okuyanlar da MCP konuşanlar da.
   `CLAUDE.md` okur, Codex/Cursor `AGENTS.md` okur, Cursor `.cursorrules` okur,
   birkaçı da `skills/` ve `.agents/skills/` okur. Bu CLI'ın işidir, modelin
   seçimi değil — ddagent bunu kapatmaz.
-- **ddagent enjeksiyonu** — bir oturumun ilk turunda ddagent başa bir
-  `<knowledge>` bloğu ekler (ayrıntılar aşağıda). Bu her sağlayıcı için çalışır ve
-  ajan tarafından hiçbir yapılandırma gerektirmez.
-- **MCP araçları** — ddagent'ın MCP sunucusunu bir ajana kurduğunuzda, araç
-  listesi `knowledge_search` ve benzerlerini içerir. Model bunları ne zaman
-  çağıracağına, araç açıklamaları ve bilgi tabanında tuttuğunuz talimat kuralları
-  doğrultusunda karar verir.
+- **MCP ile alma (isteğe bağlı)** — ddagent'ın MCP sunucusunu bir ajana
+  kurduğunuzda, araç listesi `knowledge_get_context`, `knowledge_search` ve
+  benzerlerini içerir. Contexta'yı izleyerek, hiçbir şey otomatik olarak enjekte
+  edilmez: ajan bağlam oluşturucuyu bir sorguyla çağırır ve `critical` kurallar ile
+  eşleşen her şeyi geri alır. Model, araç açıklamaları ve bilgi tabanında tuttuğunuz
+  talimat kuralları doğrultusunda ne zaman çağıracağına karar verir.
 
-Yani "tek yer", **enjekte edilen içeriği düzenlemek için tek yer ve tek bütçe**
-anlamına gelir — bir CLI'ın kendi yerel dosyalarını okumasını durdurmaz (durdurması da mümkün değildir).
-Yinelenenleri önlemek için çalışma alanı `AGENTS.md`'sini `high` önceliğinde tutarız, böylece bilgi
-bloğu unified-rules'ın zaten enjekte ettiklerini asla tekrarlamaz.
+Yani "tek yer", **bilgiyi düzenlemek için tek yer** anlamına gelir
+— bir CLI'ın kendi yerel dosyalarını okumasını durdurmaz (durdurması da mümkün değildir).
+ddagent bilgi tabanını oturumlara otomatik olarak enjekte etmez.
 
 ## Varlıklar
 
 | Varlık | Kapsam | Notlar |
 |---|---|---|
 | Anı | proje veya genel | `memory_type` (`fact`/`decision`/`note`/`reference`), `priority`, `source`, etiketler |
-| Kural | proje veya genel | `enabled` anahtarı; `critical` kurallar oturumlara enjekte edilir |
+| Kural | proje veya genel | `enabled` anahtarı; `critical` kurallar bağlam oluşturucu tarafından her zaman önce döndürülür |
 | Beceri | genel | benzersiz ad, kategori, isteğe bağlı simge (base64 data URL) |
 | Kişisel bilgi | genel | benzersiz `key` |
 | Etiket / Bağlantı | — | anılardaki etiketler; bağlantılar herhangi iki varlığı birleştirir |
@@ -63,23 +61,24 @@ bloğu unified-rules'ın zaten enjekte ettiklerini asla tekrarlamaz.
 projeye kapsanabilir veya genel olabilir (her yerde geçerlidir). `project_id` düz bir sütundur (yabancı
 anahtar değil), çünkü projeler tablosu geçişler sırasında yeniden oluşturulur.
 
-## İlk tur enjeksiyonu (her ajanın otomatik olarak aldığı şey)
+## Bağlamı alma (isteğe bağlı)
 
-Bir oturumun **ilk** giden mesajında ddagent, şunları içeren bir `<knowledge>`
-bloğu ekler:
+Ajanlar bağlamı MCP aracı `knowledge_get_context` üzerinden alır (Contexta
+modeli). Bir proje ve sorgu verildiğinde sırayla şunları döndürür:
 
-- `critical` **kurallar** (proje + genel, yalnızca etkin),
-- `critical` **anılar**,
-- her **kişisel bilgi** girdisi,
-- dahil edilen anıların **1 atlamalı komşuları** (açık bağlantılar
-  üzerinden ulaşılan).
+- projenin `critical` **kuralları** (her zaman),
+- sorguyla eşleşen **kurallar**,
+- ilgili **anılar** (FTS ile sıralanmış, ayrıca bağlantılar üzerinden ulaşılan
+  1 atlamalı komşuları),
+- adı/açıklaması/kategorisi sorguyla eşleşen **beceriler**,
+- yalnızca sorgu eşleştiğinde **kişisel bilgiler**,
 
-Bloğun tamamı ~4000 token ile sınırlıdır. `.ddagent/shared-context.md` ve unified rules ile
-aynı ilk tur kapısından geçer, bu yüzden tur başına token harcamaz.
-Devre dışı bırakmak için `DDAGENT_KNOWLEDGE=0` ayarlayın.
+token bütçeli bir Markdown bloğu olarak oluşturulur (`maxTokens`, varsayılan ~4000).
+Sorgu yoksa `critical` kuralları ve en iyi anıları döndürür.
 
-Panel, seçilen proje için bir **enjekte edilen bağlam ölçer** (`~X / 4000 tok`) gösterir,
-böylece bağlama ne girdiğini görüp kontrol edebilirsiniz.
+Panel, seçilen proje için bir **kritik bağlam ölçeri** (`~X / 4000 tok`) gösterir —
+her `knowledge_get_context` çağrısının her zaman içerdiği şeyin boyutu. Oturumlara
+otomatik olarak hiçbir şey enjekte edilmez.
 
 ## MCP araçları (isteğe bağlı)
 
@@ -108,9 +107,9 @@ kapsamı) yazar (yeniden kurmak öncekini iptal eder). Kurulduktan sonra, o ajan
 
 Bir ajan MCP'yi *ne zaman* kullanacağını nasıl bilir? Tahmin etmez — ona söyleyin.
 Şöyle bir `critical` kural tutun: *"Bu proje hakkındaki soruları yanıtlamadan önce
-`knowledge_search` çağır; bir karara vardığında onu `knowledge_add_memory` ile
-kalıcılaştır."* Bu kural her ilk turda enjekte edildiği için tüm
-ajanlarınız aynı çalışma talimatlarını alır.
+`knowledge_get_context` çağır; bir karara vardığında onu `knowledge_add_memory` ile
+kalıcılaştır."* `critical` kurallar bağlam oluşturucu tarafından her zaman
+döndürüldüğü için, bu aracı çağıran her ajan aynı çalışma talimatlarını alır.
 
 ## Proje taraması
 
@@ -144,9 +143,10 @@ Grafik, açık bağlantılarınız ile örtük merkezleri çizer — proje kapsa
 1. Her etkin projeyi bir kez **tarayın** (Knowledge → proje seç → scan);
    talimat dosyalarında büyük değişikliklerden sonra yeniden tarayın.
 2. **Bilinçli olarak yükseltin**: yalnızca gerçekten bağlayıcı kurallar `critical`
-   olmalıdır (enjekte edilirler). Bir satırdaki yıldızı kullanın ve bütçe ölçerini izleyin.
+   olmalıdır (bağlam oluşturucu tarafından her zaman sunulurlar). Bir satırdaki
+   yıldızı kullanın ve kritik bağlam ölçerini izleyin.
 3. **Gerisini `high`/`normal` tutun** — yine aranabilir ve MCP üzerinden kullanılabilir,
-   her turda bağlam harcamadan.
+   yalnızca bir sorgu eşleştiğinde, dolayısıyla ilgisiz olduklarında hiçbir maliyeti yoktur.
 4. Projeler arası tercihler (saat dilimi, düzenleyici, adlandırma) için **kişisel bilgi**.
 5. **İlgili anıları bağlayın** ki 1 atlamalı komşular birlikte gelsin.
 6. Bilgi tabanını araması ve öğrendiklerini kalıcılaştırması gereken ajanlar için **MCP kurun**;
@@ -167,10 +167,11 @@ Aynı menüde **Ajan becerilerini içe aktar** vardır: ajanlarınızın zaten s
 ## Bilinmesi iyi olanlar
 
 - Her şey bu ddagent örneğine **yereldir**; bulut yok, senkronizasyon yok.
-- Enjeksiyon **oturum başına bir kez** (ilk tur) gerçekleşir — yeni oturumlar
-  değişiklikleri alır.
-- Taranan beceriler **enjekte edilmez**; MCP aramasıyla erişilebilirler,
-  bu da sürekli açık bağlamı yalın tutar.
+- Bilgi tabanı **otomatik olarak enjekte edilmez** — ajanlar onu MCP üzerinden
+  isteğe bağlı olarak alır (Contexta modeli). MCP sunucusu kurulu olmayan ajanlar
+  ondan hiçbir şey almaz.
+- Taranan beceriler MCP (`knowledge_get_context` / `knowledge_search`) üzerinden
+  erişilebilir, bağlama itilmez.
 - Bir kural ya da anı, bir ajan tarafından MCP üzerinden düzenlenebilir; değişiklikleri
   varlığın **History**'sinde inceleyin ve gerekirse önceki bir sürümü geri yükleyin.
 
@@ -188,7 +189,7 @@ POST   /skills              PATCH /skills/:id      DELETE /skills/:id
 GET    /personal            POST /personal         PATCH/DELETE /personal/:id
 GET    /search              ?q=&type=&projectId=&limit=
 GET    /graph               ?projectId=&types=&limit=
-GET    /context             ?projectId=            (injection preview + budget)
+GET    /context             ?projectId=            (kritik bağlam boyutu + bütçe)
 GET    /tags                DELETE /tags/:id
 GET    /connections         POST /connections      DELETE /connections/:id
 GET    /history             ?entityType=&entityId=&limit=

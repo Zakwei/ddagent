@@ -55,7 +55,7 @@ ddagent läuft auf deinem eigenen Rechner oder VPS und liefert dir eine ausgefei
 - **Integrierte Shell** — vollständiges Terminal pro Workspace plus ein eigenständiger Shell-Tab
 - **Task-Board** — Kanban-Ansicht auf Basis von TaskMaster; PRDs in ausführbare Tasks verwandeln
 - **MCP-Verwaltung** — MCP-Server hinzufügen, bearbeiten und agentenübergreifend synchronisieren
-- **Wissensbasis** — ein lokaler, durchsuchbarer Speicher für jeden Agenten: Regeln, Skills, Memories und persönliche Infos, in der ersten Runde injiziert und über MCP geteilt ([Doku](KNOWLEDGE.de.md))
+- **Wissensbasis** — ein lokaler, durchsuchbarer Speicher für jeden Agenten: Regeln, Skills, Memories und persönliche Infos, über MCP auf Abruf abgerufen (Contexta-Modell) ([Doku](KNOWLEDGE.de.md))
 - **Skills-Browser** — Agent-Skills direkt in der UI verwalten
 - **Quota & Nutzung** — Token-Verbrauch und Abo-Limits pro Agent auf einen Blick
 - **Browser-use** — agentengesteuerte Browser-Sessions für Recherche und Tests

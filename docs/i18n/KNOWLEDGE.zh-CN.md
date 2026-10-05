@@ -34,24 +34,21 @@ ddagent 为你的智能体提供一个**本地优先的知识库**：记忆、�
   读取 `CLAUDE.md`，Codex/Cursor 读取 `AGENTS.md`，Cursor 读取 `.cursorrules`，
   还有一些读取 `skills/` 和 `.agents/skills/`。这是 CLI 的职责，而非
   模型的选择——ddagent 不会关闭它。
-- **ddagent 注入** — 在会话的第一轮，ddagent 会在前面加上一个
-  `<knowledge>` 块（详见下文）。这对所有提供商都有效，且
-  无需智能体做任何配置。
-- **MCP 工具** — 一旦你把 ddagent 的 MCP 服务器安装到某个智能体，它的工具
-  列表就会包含 `knowledge_search` 之类。模型会根据工具描述以及你在
-  知识库中保存的指令规则，决定何时调用它们。
+- **MCP 检索（按需）** — 一旦你把 ddagent 的 MCP 服务器安装到某个智能体，它的
+  工具列表就会包含 `knowledge_get_context`、`knowledge_search` 之类。遵循
+  Contexta，不会有任何东西被自动注入：智能体用查询调用上下文构建器，取回
+  `critical` 规则以及所有匹配的内容。模型会根据工具描述以及你在知识库中保存的
+  指令规则，决定何时调用它。
 
-所以“一个位置”意味着**一个整理注入内容的位置和一个预算**
-——它不会（也无法）阻止 CLI 读取自己的原生文件。为了避免
-重复，我们把工作区的 `AGENTS.md` 保持在 `high` 优先级，这样知识
-块永远不会重复 unified-rules 已经注入的内容。
+所以“一个位置”意味着**一个整理知识的位置**——它不会（也无法）阻止 CLI
+读取自己的原生文件。ddagent 完全不会把知识库自动注入会话。
 
 ## 实体
 
 | 实体 | 范围 | 说明 |
 |---|---|---|
 | 记忆 | 项目或全局 | `memory_type`（`fact`/`decision`/`note`/`reference`）、`priority`、`source`、标签 |
-| 规则 | 项目或全局 | `enabled` 开关；`critical` 规则会注入会话 |
+| 规则 | 项目或全局 | `enabled` 开关；`critical` 规则总是由上下文构建器优先返回 |
 | 技能 | 全局 | 唯一名称、分类、可选图标（base64 data URL） |
 | 个人信息 | 全局 | 唯一 `key` |
 | 标签 / 连接 | — | 记忆上的标签；连接可连接任意两个实体 |
@@ -61,23 +58,22 @@ ddagent 为你的智能体提供一个**本地优先的知识库**：记忆、�
 项目，也可以是全局的（适用于所有地方）。`project_id` 是普通列（没有
 外键），因为项目表在迁移期间会被重建。
 
-## 首轮注入（每个智能体自动获得的内容）
+## 检索上下文（按需）
 
-在会话的**第一**条出站消息中，ddagent 会在前面加上一个 `<knowledge>`
-块，包含：
+智能体通过 MCP 工具 `knowledge_get_context` 获取上下文（Contexta
+模型）。给定项目和查询，它会按顺序返回：
 
-- `critical` **规则**（项目 + 全局，仅启用的），
-- `critical` **记忆**，
-- 每一条**个人信息**条目，
-- 所含记忆的**1 跳邻居**（通过显式
-  连接到达）。
+- 项目的 `critical` **规则**（始终），
+- 与查询匹配的**规则**，
+- 相关的**记忆**（按 FTS 排序，外加通过连接到达的 1 跳邻居），
+- 名称/描述/分类与查询匹配的**技能**，
+- 仅在查询匹配时才返回的**个人信息**，
 
-整个块上限约为 4000 个 token。它走与
-`.ddagent/shared-context.md` 和 unified rules 相同的首轮闸门，因此不会消耗每轮 token。
-设置 `DDAGENT_KNOWLEDGE=0` 可退出。
+渲染为一个带 token 预算的 Markdown 块（`maxTokens`，默认约 4000）。
+没有查询时，它返回 `critical` 规则以及排名靠前的记忆。
 
-仪表盘会为所选项目显示一个**注入上下文计量表**（`~X / 4000 tok`），
-这样你可以看到并控制进入上下文的内容。
+仪表盘会为所选项目显示一个**关键上下文计量表**（`~X / 4000 tok`）——
+每次 `knowledge_get_context` 调用始终包含的内容大小。不会向会话自动注入任何内容。
 
 ## MCP 工具（按需）
 
@@ -106,9 +102,9 @@ Install ddagent MCP server**（在引导流程中也会作为一步提供）并�
 
 智能体怎么知道*何时*使用 MCP？它不会猜——告诉它。保存一条
 `critical` 规则，例如：*“在回答关于此项目的问题之前，调用
-`knowledge_search`；当你定下一项决定时，用
-`knowledge_add_memory` 将其持久化。”* 因为这条规则在每一轮首轮都会注入，所有
-智能体都会得到相同的操作指令。
+`knowledge_get_context`；当你定下一项决定时，用
+`knowledge_add_memory` 将其持久化。”* 因为 `critical` 规则总是由上下文构建器返回，
+每个调用该工具的智能体都会得到相同的操作指令。
 
 ## 项目扫描
 
@@ -141,9 +137,9 @@ Graph 标签页是一个力导向关系视图，带平移/缩放、节点
 1. 对每个活跃项目**扫描**一次（Knowledge → 选择项目 → scan）；
    在其指令文件发生大改动后重新扫描。
 2. **有意识地提升**：只有真正有约束力的规则才应该是 `critical`
-   （它们会被注入）。使用行上的星标，并留意预算计量表。
+   （总是由上下文构建器提供）。使用行上的星标，并留意关键上下文计量表。
 3. **其余保持 `high`/`normal`**——仍然可搜索、可通过 MCP 使用，
-   而不在每轮消耗上下文。
+   只在查询匹配时才可用，因此在无关时不会产生任何成本。
 4. 用**个人信息**存跨项目偏好（时区、编辑器、命名）。
 5. **链接相关记忆**，让 1 跳邻居一起带上。
 6. 对应当搜索知识库并持久化所学内容的智能体**安装 MCP**；
@@ -164,10 +160,10 @@ Knowledge → 菜单 → **Migrate existing rules** 会运行一份 **dry-run** 
 ## 须知
 
 - 一切都**本地**于这个 ddagent 实例；没有云，没有同步。
-- 注入**每个会话一次**（首轮）——新会话会获取
-  更改。
-- 扫描到的技能**不会注入**；它们可通过 MCP 搜索到达，
-  这让常驻上下文保持精简。
+- 知识库**不会自动注入**——智能体通过 MCP 按需检索（Contexta 模型）。
+  没有安装 MCP 服务器的智能体不会从中获得任何内容。
+- 扫描到的技能可通过 MCP（`knowledge_get_context` / `knowledge_search`）到达，
+  而不会被推入上下文。
 - 规则或记忆可由智能体通过 MCP 编辑；在实体的 **History** 中查看
   更改，必要时恢复之前的版本。
 
@@ -185,7 +181,7 @@ POST   /skills              PATCH /skills/:id      DELETE /skills/:id
 GET    /personal            POST /personal         PATCH/DELETE /personal/:id
 GET    /search              ?q=&type=&projectId=&limit=
 GET    /graph               ?projectId=&types=&limit=
-GET    /context             ?projectId=            (injection preview + budget)
+GET    /context             ?projectId=            （关键上下文大小 + 预算）
 GET    /tags                DELETE /tags/:id
 GET    /connections         POST /connections      DELETE /connections/:id
 GET    /history             ?entityType=&entityId=&limit=

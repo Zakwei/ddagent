@@ -55,7 +55,7 @@ Ouvrez-le depuis n'importe quel navigateur de votre réseau, ou depuis votre té
 - **Shell intégré** — terminal complet par workspace, plus un onglet shell autonome
 - **Tableau de tâches** — vue kanban propulsée par TaskMaster ; transformez des PRDs en tâches exécutables
 - **Gestion MCP** — ajoutez, modifiez et synchronisez les serveurs MCP entre agents
-- **Base de connaissances** — une mémoire locale et interrogeable pour chaque agent : règles, skills, mémoires et informations personnelles, injectée au premier tour et partagée via MCP ([documentation](KNOWLEDGE.fr.md))
+- **Base de connaissances** — une mémoire locale et interrogeable pour chaque agent : règles, skills, mémoires et informations personnelles, récupérée à la demande via MCP (modèle Contexta) ([documentation](KNOWLEDGE.fr.md))
 - **Navigateur de skills** — gérez les skills des agents depuis l'UI
 - **Quota & utilisation** — consommation de tokens et limites d'abonnement par agent, en un coup d'œil
 - **Browser-use** — sessions de navigateur pilotées par l'agent pour la recherche et les tests

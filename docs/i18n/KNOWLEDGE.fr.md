@@ -35,25 +35,25 @@ Il y a trois couches, et il est utile de savoir laquelle est laquelle :
   Claude Code lit `CLAUDE.md`, Codex/Cursor lisent `AGENTS.md`, Cursor lit
   `.cursorrules`, et plusieurs lisent `skills/` et `.agents/skills/`. C’est le travail du
   CLI, pas le choix du modèle — ddagent ne le désactive pas.
-- **Injection par ddagent** — au premier tour d’une session, ddagent préfixe un
-  bloc `<knowledge>` (détails ci-dessous). Cela fonctionne pour tous les fournisseurs et ne
-  demande aucune configuration de la part de l’agent.
-- **Outils MCP** — dès que vous installez le serveur MCP de ddagent dans un agent, sa liste
-  d’outils inclut `knowledge_search` et compagnie. Le modèle décide quand les appeler,
-  guidé par les descriptions des outils et par les règles d’instruction que vous gardez dans
-  la base de connaissances.
+- **Récupération via MCP (à la demande)** — dès que vous installez le serveur MCP de
+  ddagent dans un agent, sa liste d’outils inclut `knowledge_get_context`,
+  `knowledge_search` et compagnie. Comme chez Contexta, rien n’est injecté
+  automatiquement : l’agent appelle le constructeur de contexte avec une requête et
+  reçoit en retour les règles `critical` plus tout ce qui correspond. Le modèle décide
+  quand l’appeler, guidé par les descriptions des outils et par les règles
+  d’instruction que vous gardez dans la base de connaissances.
 
-Donc « un seul endroit » signifie **un seul endroit pour curer le contenu injecté et un seul budget**
-— cela n’empêche pas (et ne peut pas empêcher) un CLI de lire ses propres fichiers natifs. Pour
-éviter les doublons, nous gardons l’`AGENTS.md` du workspace en priorité `high` afin que le bloc
-de connaissances ne répète jamais ce qu’unified-rules injecte déjà.
+Donc « un seul endroit » signifie **un seul endroit pour curer la connaissance**
+— cela n’empêche pas (et ne peut pas empêcher) un CLI de lire ses propres fichiers
+natifs. ddagent n’injecte pas du tout la base de connaissances automatiquement dans
+les sessions.
 
 ## Entités
 
 | Entité | Portée | Remarques |
 |---|---|---|
 | Mémoire | projet ou global | `memory_type` (`fact`/`decision`/`note`/`reference`), `priority`, `source`, étiquettes |
-| Règle | projet ou global | bascule `enabled` ; les règles `critical` sont injectées dans les sessions |
+| Règle | projet ou global | bascule `enabled` ; les règles `critical` sont toujours renvoyées en premier par le constructeur de contexte |
 | Skill | global | nom unique, catégorie, icône optionnelle (base64 data URL) |
 | Informations personnelles | global | `key` unique |
 | Étiquette / Connexion | — | étiquettes sur les mémoires ; les connexions relient deux entités quelconques |
@@ -63,23 +63,24 @@ Priorités : `critical > high > normal > low`. Une entité peut être limitée �
 projet ou être globale (s’applique partout). `project_id` est une simple colonne (pas de
 clé étrangère) car la table des projets est reconstruite pendant les migrations.
 
-## Injection au premier tour (ce que chaque agent reçoit, automatiquement)
+## Récupérer le contexte (à la demande)
 
-Au **premier** message sortant d’une session, ddagent préfixe un bloc `<knowledge>`
-contenant :
+Les agents récupèrent le contexte via l’outil MCP `knowledge_get_context` (le modèle
+Contexta). Pour un projet et une requête donnés, il renvoie, dans l’ordre :
 
-- les **règles** `critical` (projet + globales, activées uniquement),
-- les **mémoires** `critical`,
-- chaque entrée d’**informations personnelles**,
-- les **voisins à 1 saut** des mémoires incluses (atteints via des
-  connexions explicites).
+- les **règles** `critical` du projet (toujours),
+- les **règles** correspondant à la requête,
+- les **mémoires** pertinentes (classées par FTS, plus leurs voisins à 1 saut
+  atteints via les connexions),
+- les **skills** dont le nom/la description/la catégorie correspond à la requête,
+- les **informations personnelles** uniquement quand la requête y correspond,
 
-Tout le bloc est plafonné à ~4000 tokens. Il passe par la même porte du premier tour que
-`.ddagent/shared-context.md` et unified rules, donc il ne coûte aucun token par tour.
-Définissez `DDAGENT_KNOWLEDGE=0` pour le désactiver.
+le tout rendu sous forme de bloc Markdown à budget de tokens (`maxTokens`, ~4000 par
+défaut). Sans requête, il renvoie les règles `critical` plus les meilleures mémoires.
 
-Le tableau de bord affiche un **compteur de contexte injecté** (`~X / 4000 tok`) pour le
-projet sélectionné, afin que vous puissiez voir et contrôler ce qui entre dans le contexte.
+Le tableau de bord affiche un **compteur de contexte critique** (`~X / 4000 tok`) pour le
+projet sélectionné — la taille de ce que chaque appel à `knowledge_get_context`
+inclut toujours. Rien n’est injecté automatiquement dans les sessions.
 
 ## Outils MCP (à la demande)
 
@@ -109,9 +110,10 @@ incluent le groupe `knowledge_*` aux côtés de `create_task`, `send_message`, e
 
 Comment un agent sait-il *quand* utiliser MCP ? Il ne devine pas — dites-le-lui. Gardez une
 règle `critical` telle que : *« Avant de répondre aux questions sur ce projet, appelle
-`knowledge_search` ; quand tu tranches une décision, persiste-la avec
-`knowledge_add_memory`. »* Comme cette règle est injectée à chaque premier tour, tous
-vos agents reçoivent les mêmes instructions de fonctionnement.
+`knowledge_get_context` ; quand tu tranches une décision, persiste-la avec
+`knowledge_add_memory`. »* Comme les règles `critical` sont toujours renvoyées par le
+constructeur de contexte, chaque agent qui appelle l’outil reçoit les mêmes
+instructions de fonctionnement.
 
 ## Analyse de projet
 
@@ -146,9 +148,10 @@ Le graphe dessine vos liens explicites ainsi que les hubs implicites — chaque 
 1. **Analysez** chaque projet actif une fois (Knowledge → sélectionnez le projet → scan) ;
    réanalysez après de gros changements de ses fichiers d’instructions.
 2. **Promouvez délibérément** : seules les règles réellement contraignantes devraient être
-   `critical` (elles sont injectées). Utilisez l’étoile sur une ligne et surveillez le compteur de budget.
+   `critical` (elles sont toujours servies par le constructeur de contexte). Utilisez
+   l’étoile sur une ligne et surveillez le compteur de contexte critique.
 3. **Gardez le reste en `high`/`normal`** — toujours interrogeable et disponible via MCP
-   sans dépenser de contexte à chaque tour.
+   uniquement lorsqu’une requête correspond, donc elles ne coûtent rien quand elles sont hors sujet.
 4. **Informations personnelles** pour les préférences inter-projets (fuseau horaire, éditeur, nommage).
 5. **Reliez les mémoires liées** pour que les voisins à 1 saut suivent.
 6. **Installez MCP** pour les agents qui doivent interroger la base et persister
@@ -169,10 +172,11 @@ Le même menu contient **Importer les skills des agents** : il liste les skills 
 ## Bon à savoir
 
 - Tout est **local** à cette instance ddagent ; pas de cloud, pas de sync.
-- L’injection a lieu **une fois par session** (premier tour) — les nouvelles sessions prennent
-  les changements.
-- Les skills analysées ne sont **pas injectées** ; elles sont accessibles via la recherche
-  MCP, ce qui garde le contexte permanent léger.
+- La base de connaissances n’est **pas injectée automatiquement** — les agents la
+  récupèrent via MCP à la demande (modèle Contexta). Les agents sans le serveur MCP
+  installé n’en tirent rien.
+- Les skills analysées sont accessibles via MCP (`knowledge_get_context` /
+  `knowledge_search`), elles ne sont pas poussées dans le contexte.
 - Une règle ou une mémoire peut être modifiée par un agent via MCP ; consultez les changements dans
   l’**History** de l’entité et restaurez une version précédente si besoin.
 
@@ -190,7 +194,7 @@ POST   /skills              PATCH /skills/:id      DELETE /skills/:id
 GET    /personal            POST /personal         PATCH/DELETE /personal/:id
 GET    /search              ?q=&type=&projectId=&limit=
 GET    /graph               ?projectId=&types=&limit=
-GET    /context             ?projectId=            (injection preview + budget)
+GET    /context             ?projectId=            (taille du contexte critique + budget)
 GET    /tags                DELETE /tags/:id
 GET    /connections         POST /connections      DELETE /connections/:id
 GET    /history             ?entityType=&entityId=&limit=

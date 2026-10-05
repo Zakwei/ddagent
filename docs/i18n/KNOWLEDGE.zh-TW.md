@@ -34,24 +34,21 @@ ddagent 為你的代理提供一個**本地優先的知識庫**：記憶、規�
   讀取 `CLAUDE.md`，Codex/Cursor 讀取 `AGENTS.md`，Cursor 讀取 `.cursorrules`，
   還有一些讀取 `skills/` 和 `.agents/skills/`。這是 CLI 的職責，而非
   模型的選擇——ddagent 不會關閉它。
-- **ddagent 注入** — 在對話的第一輪，ddagent 會在前面加上一個
-  `<knowledge>` 區塊（詳見下文）。這對所有供應商都有效，且
-  無需代理做任何設定。
-- **MCP 工具** — 一旦你把 ddagent 的 MCP 伺服器安裝到某個代理，它的工具
-  清單就會包含 `knowledge_search` 之類。模型會根據工具描述以及你在
-  知識庫中保存的指令規則，決定何時呼叫它們。
+- **MCP 檢索（隨需）** — 一旦你把 ddagent 的 MCP 伺服器安裝到某個代理，它的
+  工具清單就會包含 `knowledge_get_context`、`knowledge_search` 之類。遵循
+  Contexta，不會有任何東西被自動注入：代理用查詢呼叫上下文建構器，取回
+  `critical` 規則以及所有匹配的內容。模型會根據工具描述以及你在知識庫中保存的
+  指令規則，決定何時呼叫它。
 
-所以「一個位置」意味著**一個整理注入內容的位置和一個預算**
-——它不會（也無法）阻止 CLI 讀取自己的原生檔案。為了避免
-重複，我們把工作區的 `AGENTS.md` 保持在 `high` 優先級，這樣知識
-區塊永遠不會重複 unified-rules 已經注入的內容。
+所以「一個位置」意味著**一個整理知識的位置**——它不會（也無法）阻止 CLI
+讀取自己的原生檔案。ddagent 完全不會把知識庫自動注入對話。
 
 ## 實體
 
 | 實體 | 範圍 | 說明 |
 |---|---|---|
 | 記憶 | 專案或全域 | `memory_type`（`fact`/`decision`/`note`/`reference`）、`priority`、`source`、標籤 |
-| 規則 | 專案或全域 | `enabled` 開關；`critical` 規則會注入工作階段 |
+| 規則 | 專案或全域 | `enabled` 開關；`critical` 規則總是會由上下文建構器優先回傳 |
 | 技能 | 全域 | 唯一名稱、分類、可選圖示（base64 data URL） |
 | 個人資訊 | 全域 | 唯一 `key` |
 | 標籤 / 連接 | — | 記憶上的標籤；連接可連接任意兩個實體 |
@@ -61,23 +58,22 @@ ddagent 為你的代理提供一個**本地優先的知識庫**：記憶、規�
 專案，也可以是全域的（適用於所有地方）。`project_id` 是普通欄（沒有
 外鍵），因為專案表在遷移期間會被重建。
 
-## 首輪注入（每個代理自動獲得的內容）
+## 檢索上下文（隨需）
 
-在對話的**第一**則外送訊息中，ddagent 會在前面加上一個 `<knowledge>`
-區塊，包含：
+代理透過 MCP 工具 `knowledge_get_context` 取得上下文（Contexta
+模型）。給定專案和查詢，它會按順序回傳：
 
-- `critical` **規則**（專案 + 全域，僅啟用的），
-- `critical` **記憶**，
-- 每一條**個人資訊**項目，
-- 所含記憶的**1 跳鄰居**（透過明確
-  連接到達）。
+- 專案的 `critical` **規則**（始終），
+- 與查詢匹配的**規則**，
+- 相關的**記憶**（按 FTS 排序，外加透過連接到達的 1 跳鄰居），
+- 名稱/描述/分類與查詢匹配的**技能**，
+- 僅在查詢匹配時才回傳的**個人資訊**，
 
-整個區塊上限約為 4000 個 token。它走與
-`.ddagent/shared-context.md` 和 unified rules 相同的首輪閘門，因此不會消耗每輪 token。
-設定 `DDAGENT_KNOWLEDGE=0` 可退出。
+渲染為一個帶 token 預算的 Markdown 區塊（`maxTokens`，預設約 4000）。
+沒有查詢時，它回傳 `critical` 規則以及排名靠前的記憶。
 
-儀表板會為所選專案顯示一個**注入上下文計量表**（`~X / 4000 tok`），
-這樣你可以看到並控制進入上下文的內容。
+儀表板會為所選專案顯示一個**關鍵上下文計量表**（`~X / 4000 tok`）——
+每次 `knowledge_get_context` 呼叫始終包含的內容大小。不會向對話自動注入任何內容。
 
 ## MCP 工具（隨需）
 
@@ -106,9 +102,9 @@ Install ddagent MCP server**（在引導流程中也會作為一步提供）並�
 
 代理怎麼知道*何時*使用 MCP？它不會猜——告訴它。保存一條
 `critical` 規則，例如：*「在回答關於此專案的問題之前，呼叫
-`knowledge_search`；當你定下一項決定時，用
-`knowledge_add_memory` 將其持久化。」* 因為這條規則在每輪首輪都會注入，所有
-代理都會得到相同的操作指令。
+`knowledge_get_context`；當你定下一項決定時，用
+`knowledge_add_memory` 將其持久化。」* 因為 `critical` 規則總是會由上下文建構器回傳，
+每個呼叫該工具的代理都會得到相同的操作指令。
 
 ## 專案掃描
 
@@ -141,9 +137,9 @@ Graph 分頁是一個力導向關係檢視，帶平移/縮放、節點
 1. 對每個使用中的專案**掃描**一次（Knowledge → 選擇專案 → scan）；
    在其指令檔案發生大改動後重新掃描。
 2. **有意識地提升**：只有真正有約束力的規則才應該是 `critical`
-   （它們會被注入）。使用列上的星號，並留意預算計量表。
+   （總是會由上下文建構器提供）。使用列上的星號，並留意關鍵上下文計量表。
 3. **其餘保持 `high`/`normal`**——仍然可搜尋、可透過 MCP 使用，
-   而不在每輪消耗上下文。
+   只在查詢匹配時才可用，因此在無關時不會產生任何成本。
 4. 用**個人資訊**存跨專案偏好（時區、編輯器、命名）。
 5. **連結相關記憶**，讓 1 跳鄰居一起帶上。
 6. 對應當搜尋知識庫並持久化所學內容的代理**安裝 MCP**；
@@ -164,10 +160,10 @@ Knowledge → 選單 → **Migrate existing rules** 會執行一份 **dry-run** 
 ## 須知
 
 - 一切都**本地**於這個 ddagent 實例；沒有雲端，沒有同步。
-- 注入**每個工作階段一次**（首輪）——新工作階段會取得
-  變更。
-- 掃描到的技能**不會注入**；它們可透過 MCP 搜尋到達，
-   這讓常駐上下文保持精簡。
+- 知識庫**不會自動注入**——代理透過 MCP 隨需檢索（Contexta 模型）。
+  沒有安裝 MCP 伺服器的代理不會從中獲得任何內容。
+- 掃描到的技能可透過 MCP（`knowledge_get_context` / `knowledge_search`）到達，
+  而不會被推入上下文。
 - 規則或記憶可由代理透過 MCP 編輯；在實體的 **History** 中檢視
   變更，必要時還原之前的版本。
 
@@ -185,7 +181,7 @@ POST   /skills              PATCH /skills/:id      DELETE /skills/:id
 GET    /personal            POST /personal         PATCH/DELETE /personal/:id
 GET    /search              ?q=&type=&projectId=&limit=
 GET    /graph               ?projectId=&types=&limit=
-GET    /context             ?projectId=            (injection preview + budget)
+GET    /context             ?projectId=            （關鍵上下文大小 + 預算）
 GET    /tags                DELETE /tags/:id
 GET    /connections         POST /connections      DELETE /connections/:id
 GET    /history             ?entityType=&entityId=&limit=
