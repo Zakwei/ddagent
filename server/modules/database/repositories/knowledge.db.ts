@@ -390,7 +390,7 @@ export const knowledgeDb = {
       sets.push(`${column} = ?`);
       params.push(value);
     };
-    assign('project_id', patch.projectId, 'projectId' in patch);
+    assign('project_id', patch.projectId, patch.projectId !== undefined);
     assign('title', patch.title, patch.title !== undefined);
     assign('content', patch.content, patch.content !== undefined);
     assign('memory_type', patch.memoryType, patch.memoryType !== undefined);
@@ -563,7 +563,7 @@ export const knowledgeDb = {
       sets.push(`${column} = ?`);
       params.push(value);
     };
-    assign('project_id', patch.projectId, 'projectId' in patch);
+    assign('project_id', patch.projectId, patch.projectId !== undefined);
     assign('title', patch.title, patch.title !== undefined);
     assign('content', patch.content, patch.content !== undefined);
     assign('priority', patch.priority, patch.priority !== undefined);

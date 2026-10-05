@@ -122,6 +122,36 @@ test('rules support enable toggling and priority filtering', async () => {
   });
 });
 
+test('partial updates keep project scope when projectId is omitted', async () => {
+  await withIsolatedDatabase(() => {
+    // The service layer always passes the key (undefined when absent), so an
+    // explicit undefined must behave like "not provided" — only null clears scope.
+    const rule = knowledgeDb.createRule({
+      projectId: 'proj-x',
+      title: 'Scoped rule',
+      content: 'x',
+      priority: 'normal',
+    });
+    knowledgeDb.updateRule(rule.id, { projectId: undefined, priority: 'high' });
+    assert.equal(knowledgeDb.getRule(rule.id)?.projectId, 'proj-x');
+    knowledgeDb.updateRule(rule.id, { projectId: null });
+    assert.equal(knowledgeDb.getRule(rule.id)?.projectId, null);
+
+    const memory = knowledgeDb.createMemory({
+      projectId: 'proj-x',
+      title: 'Scoped memory',
+      content: 'x',
+      memoryType: 'note',
+      priority: 'normal',
+      tags: [],
+    });
+    knowledgeDb.updateMemory(memory.id, { projectId: undefined, title: 'Renamed' });
+    assert.equal(knowledgeDb.getMemory(memory.id)?.projectId, 'proj-x');
+    knowledgeDb.updateMemory(memory.id, { projectId: null });
+    assert.equal(knowledgeDb.getMemory(memory.id)?.projectId, null);
+  });
+});
+
 test('skills and personal information enforce unique names/keys', async () => {
   await withIsolatedDatabase(() => {
     const skill = knowledgeDb.createSkill({
