@@ -172,4 +172,52 @@ void main() {
       'just my own text',
     );
   });
+
+  test('extractQuestionFreeText keeps an option label that contains a comma intact', () {
+    final input = {
+      'questions': [
+        {
+          'question': 'Plan ready for review. Begin implementation?',
+          'options': [
+            {'label': 'Yes, auto-accept edits'},
+            {'label': 'Cancel'},
+          ],
+        },
+      ],
+    };
+    // A plain pick whose label itself contains ", " is not free text — splitting
+    // it would emit "Yes\nauto-accept edits" as a phantom follow-up message.
+    expect(
+      extractQuestionFreeText(input, {
+        'answers': {'Plan ready for review. Begin implementation?': 'Yes, auto-accept edits'},
+      }),
+      '',
+    );
+    expect(
+      extractQuestionFreeText(input, {
+        'answers': {'Plan ready for review. Begin implementation?': 'Cancel'},
+      }),
+      '',
+    );
+  });
+
+  test('extractQuestionFreeText drops plain labels from a joined multi-select', () {
+    final input = {
+      'questions': [
+        {
+          'question': 'Pick a scope?',
+          'options': [
+            {'label': 'MVP'},
+            {'label': 'Full clone'},
+          ],
+        },
+      ],
+    };
+    expect(
+      extractQuestionFreeText(input, {
+        'answers': {'Pick a scope?': 'MVP, Full clone'},
+      }),
+      '',
+    );
+  });
 }

@@ -972,6 +972,11 @@ bool _isFreeTextOption(String label) {
 /// The text the user typed that is not one of the offered option labels.
 /// ACP providers (command-code / Devin) can only echo a picked option id, so
 /// this is relayed as a normal follow-up message or the agent never sees it.
+///
+/// A value equal to a whole label is a plain pick, not free text — labels may
+/// themselves contain ", " (e.g. "Yes, auto-accept edits"), so the whole value
+/// is checked before splitting; this mirrors the server's
+/// `questionAnswerOptionId`.
 String extractQuestionFreeText(dynamic input, dynamic updatedInput) {
   final questions = input is Map ? input['questions'] : null;
   final answers = updatedInput is Map ? updatedInput['answers'] : null;
@@ -985,10 +990,16 @@ String extractQuestionFreeText(dynamic input, dynamic updatedInput) {
         if (o is Map) (o['label'] ?? o['text'] ?? '$o').toString() else '$o',
     };
     final raw = answers[q['question']?.toString() ?? 'q$i'];
-    final text = raw is String ? raw : (raw is List ? raw.join(', ') : '');
-    for (final part in text.split(', ')) {
-      final t = part.trim();
-      if (t.isNotEmpty && !labels.contains(t)) parts.add(t);
+    final values = raw is String
+        ? [raw]
+        : (raw is List ? raw.map((e) => '$e').toList() : const <String>[]);
+    for (final value in values) {
+      final text = value.trim();
+      if (text.isEmpty || labels.contains(text)) continue;
+      for (final part in text.split(', ')) {
+        final t = part.trim();
+        if (t.isNotEmpty && !labels.contains(t)) parts.add(t);
+      }
     }
   }
   return parts.join('\n');
