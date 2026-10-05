@@ -28,6 +28,21 @@ String? tarballSuffixForAbi(Abi abi) => switch (abi.toString()) {
   _ => null,
 };
 
+/// Picks the newest LTS entry for [major] from nodejs.org's dist index
+/// (`[{version: 'v22.20.0', lts: 'Jod'}, ...]` — newest first). Returns null
+/// when no entry qualifies.
+String? latestLtsInMajor(List<dynamic> index, int major) {
+  for (final entry in index) {
+    if (entry is Map<String, dynamic> &&
+        entry['lts'] != false &&
+        entry['version'] is String &&
+        parseNodeMajorVersion(entry['version'] as String) == major) {
+      return entry['version'] as String;
+    }
+  }
+  return null;
+}
+
 /// File name of the portable Node distribution on nodejs.org/dist.
 String nodeDistFileName(String nodeVersion, {required bool windows, required bool arm64}) => windows
     ? 'node-$nodeVersion-win-x64.zip'
@@ -46,7 +61,7 @@ String serverAssetUrl(String serverVersion, String suffix) =>
     'v$serverVersion/ddagent-server-$serverVersion-$suffix.tar.gz';
 
 /// Manages an on-device ddagent server: downloads the published release
-/// tarball, finds (or downloads) a Node >=22 runtime, and spawns/stops the
+/// tarball, finds (or downloads) a Node 22.x runtime, and spawns/stops the
 /// process. Runtime-only state — the only persistence is the extracted bundle
 /// on disk. Supported targets: Windows x64, Linux x64/arm64.
 class LocalServerService {
@@ -70,8 +85,10 @@ class LocalServerService {
   static const String localUrl = kLocalServerUrl;
   static const int localPort = 10087;
 
-  /// Minimum Node.js major the server bundle needs.
-  static const int minNodeMajor = 22;
+  /// Exact Node.js major the bundle's native modules are built against.
+  /// CI compiles better-sqlite3/node-pty with Node 22 (ABI 127) — a newer
+  /// system Node (24+) fails to dlopen them, so only 22.x is acceptable.
+  static const int requiredNodeMajor = 22;
 
   /// Used when nodejs.org's dist index can't be fetched.
   static const String pinnedNodeVersion = 'v22.20.0';
@@ -202,7 +219,7 @@ class LocalServerService {
     }
   }
 
-  /// Resolves a Node >=[minNodeMajor] executable and returns its path/name.
+  /// Resolves a Node [requiredNodeMajor].x executable and returns its path.
   ///
   /// Order: system `node` on PATH → cached portable runtime in `nodeDir` →
   /// download the latest LTS from nodejs.org (pinned fallback when the dist
@@ -212,13 +229,13 @@ class LocalServerService {
     // 1) System node.
     for (final name in _isWindows ? const ['node', 'node.exe'] : const ['node']) {
       final major = await _nodeMajorOf(name);
-      if (major != null && major >= minNodeMajor) return _nodeExe = name;
+      if (major == requiredNodeMajor) return _nodeExe = name;
     }
     // 2) Portable node cached from a previous run.
     final exe = await _portableNodeExe();
     if (await File(exe).exists()) {
       final major = await _nodeMajorOf(exe);
-      if (major != null && major >= minNodeMajor) return _nodeExe = exe;
+      if (major == requiredNodeMajor) return _nodeExe = exe;
     }
     // 3) Download + extract a portable LTS into nodeDir.
     await _downloadPortableNode();
@@ -241,16 +258,15 @@ class LocalServerService {
     }
   }
 
-  /// Latest LTS line from the nodejs.org dist index; [pinnedNodeVersion] when
-  /// the index can't be fetched or parsed.
+  /// Latest LTS **within [requiredNodeMajor]** from the nodejs.org dist
+  /// index; [pinnedNodeVersion] when the index can't be fetched or parsed.
+  /// The newest LTS overall is a newer major — its ABI won't match the
+  /// bundled native modules.
   Future<String> _latestNodeLtsVersion() async {
     try {
       final res = await _dio.get<List<dynamic>>('https://nodejs.org/dist/index.json');
-      for (final entry in res.data ?? const <dynamic>[]) {
-        if (entry is Map<String, dynamic> && entry['lts'] != false && entry['version'] is String) {
-          return entry['version'] as String;
-        }
-      }
+      final found = latestLtsInMajor(res.data ?? const <dynamic>[], requiredNodeMajor);
+      if (found != null) return found;
     } on Object {
       // Fall through to the pinned version.
     }

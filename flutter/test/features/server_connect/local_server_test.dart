@@ -61,6 +61,31 @@ void main() {
     );
   });
 
+  group('latestLtsInMajor', () {
+    final index = <Map<String, dynamic>>[
+      {'version': 'v24.10.0', 'lts': 'Krypton'},
+      {'version': 'v24.9.0', 'lts': 'Krypton'},
+      {'version': 'v23.6.0', 'lts': false},
+      {'version': 'v22.20.0', 'lts': 'Jod'},
+      {'version': 'v22.19.0', 'lts': 'Jod'},
+      {'version': 'v22.18.0', 'lts': 'Jod'},
+      {'version': 'v20.19.0', 'lts': 'Iron'},
+    ];
+
+    test('returns the newest LTS within the requested major', () {
+      // Newest LTS overall is v24 — the bundle's natives need 22.x.
+      expect(latestLtsInMajor(index, 22), 'v22.20.0');
+      expect(latestLtsInMajor(index, 24), 'v24.10.0');
+      expect(latestLtsInMajor(index, 20), 'v20.19.0');
+    });
+
+    test('skips non-LTS majors and misses cleanly', () {
+      expect(latestLtsInMajor(index, 23), isNull);
+      expect(latestLtsInMajor(index, 18), isNull);
+      expect(latestLtsInMajor(const <dynamic>[], 22), isNull);
+    });
+  });
+
   group('nodeDistFileName', () {
     test('windows gets the x64 zip', () {
       expect(
