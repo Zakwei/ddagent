@@ -139,6 +139,7 @@ etiquetas (con gestión de etiquetas), la barra de la app tiene búsqueda de tex
 diálogo de crear enlace y una acción de migración, y la pestaña Graph es una vista de relaciones
 dirigida por fuerzas con pan/zoom, arrastre de nodos, filtros por tipo de entidad y resaltado
 de vecinos.
+El grafo dibuja tus enlaces explícitos más los hubs implícitos — cada entidad con ámbito de proyecto se conecta a su proyecto, y las memorias que comparten una etiqueta se conectan a un nodo de etiqueta — así que siempre muestra estructura.
 
 ## Curarlo bien
 

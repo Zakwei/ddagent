@@ -136,7 +136,10 @@ create/edit form, per-entity version history with restore, skill icon upload and
 JSON export/import. The Memories tab has a tag filter bar (with tag management),
 the app bar has full-text search, a create-link dialog and a migration action,
 and the Graph tab is a force-directed relation view with pan/zoom, node
-dragging, entity-type filters and neighbour highlighting.
+dragging, entity-type filters and neighbour highlighting. The graph draws your
+explicit links plus implicit hubs — every project-scoped entity connects to its
+project, and memories sharing a tag connect to a tag node — so it always shows
+structure.
 
 ## Curating it well
 

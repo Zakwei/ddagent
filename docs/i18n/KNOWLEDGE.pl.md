@@ -137,6 +137,7 @@ eksport/import JSON. Zakładka Memories ma pasek filtrów tagów (z zarządzanie
 pasek aplikacji ma wyszukiwanie pełnotekstowe, dialog tworzenia połączenia i akcję migracji,
 a zakładka Graph to widok relacji siłowo-kierunkowy z pan/zoom, przeciąganiem węzłów,
 filtrami typów encji i podświetlaniem sąsiadów.
+Graf rysuje Twoje jawne połączenia oraz niejawne huby — każda encja w zasięgu projektu łączy się ze swoim projektem, a wspomnienia dzielące tag łączą się z węzłem tagu — więc zawsze pokazuje strukturę.
 
 ## Dobre kuratorowanie
 

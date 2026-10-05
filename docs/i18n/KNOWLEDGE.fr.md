@@ -139,6 +139,7 @@ gestion des étiquettes), la barre d’app a une recherche plein texte, une boî
 création de lien et une action de migration, et l’onglet Graph est une vue de relations dirigée
 par les forces avec pan/zoom, glisser-déposer des nœuds, filtres par type d’entité et mise en
 évidence des voisins.
+Le graphe dessine vos liens explicites ainsi que les hubs implicites — chaque entité de portée projet se connecte à son projet, et les mémoires partageant une étiquette se connectent à un nœud d’étiquette — il montre donc toujours la structure.
 
 ## Bien la curer
 

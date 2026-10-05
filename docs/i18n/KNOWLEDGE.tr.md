@@ -137,6 +137,7 @@ JSON dışa/içe aktarmaya sahiptir. Memories sekmesinde bir etiket filtre çubu
 uygulama çubuğunda tam metin arama, bir bağlantı oluşturma diyaloğu ve bir geçiş eylemi vardır
 ve Graph sekmesi kaydırma/yakınlaştırma, düğüm sürükleme, varlık türü filtreleri ve komşu
 vurgulama ile kuvvet yönelimli bir ilişki görünümüdür.
+Grafik, açık bağlantılarınız ile örtük merkezleri çizer — proje kapsamındaki her varlık kendi projesine bağlanır ve bir etiketi paylaşan anılar bir etiket düğümüne bağlanır — böylece her zaman yapıyı gösterir.
 
 ## İyi düzenlemek
 

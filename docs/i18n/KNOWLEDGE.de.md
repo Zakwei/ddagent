@@ -139,6 +139,7 @@ Tag-Filterleiste (mit Tag-Verwaltung), die App-Leiste hat Volltextsuche, einen
 Link-erstellen-Dialog und eine Migrationsaktion, und der Graph-Tab ist eine
 kraftgerichtete Relationsansicht mit Pan/Zoom, Knoten-Ziehen, Entitätstyp-Filtern und
 Nachbar-Hervorhebung.
+Der Graph zeichnet deine expliziten Links plus implizite Hubs — jede projektbezogene Entität verbindet sich mit ihrem Projekt, und Memories, die sich einen Tag teilen, verbinden sich mit einem Tag-Knoten — sodass er immer Struktur zeigt.
 
 ## Gut kuratieren
 

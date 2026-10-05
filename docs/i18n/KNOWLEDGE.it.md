@@ -138,6 +138,7 @@ delle skill e l’export/import JSON. La scheda Memories ha una barra di filtro 
 gestione dei tag), la barra dell’app ha la ricerca full-text, una finestra di creazione link e
 un’azione di migrazione, e la scheda Graph è una vista delle relazioni force-directed con
 pan/zoom, trascinamento dei nodi, filtri per tipo di entità ed evidenziazione dei vicini.
+Il grafo disegna le tue connessioni esplicite più gli hub impliciti — ogni entità con ambito di progetto si collega al suo progetto, e le memorie che condividono un tag si collegano a un nodo tag — quindi mostra sempre la struttura.
 
 ## Curarla bene
 
