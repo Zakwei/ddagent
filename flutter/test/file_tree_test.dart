@@ -267,6 +267,42 @@ void main() {
       expect(repo.respectGitignoreCalls.last, isFalse);
     });
   });
+
+  group('file tree UI context', () {
+    test('keeps query, opened pane and scroll offset', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      final controller = container.read(fileTreeUiProvider.notifier);
+
+      expect(container.read(fileTreeUiProvider).query, '');
+      controller.setQuery('main');
+      controller.openFile('p1', '/p1/lib/main.dart');
+      controller.setScrollOffset(120);
+
+      final state = container.read(fileTreeUiProvider);
+      expect(state.query, 'main');
+      expect(state.openProjectId, 'p1');
+      expect(state.openPath, '/p1/lib/main.dart');
+      expect(state.scrollOffset, 120);
+    });
+
+    test('closeFile clears the pane but keeps the query and offset', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      final controller = container.read(fileTreeUiProvider.notifier);
+
+      controller.setQuery('main');
+      controller.openFile('p1', '/p1/lib/main.dart');
+      controller.setScrollOffset(64);
+      controller.closeFile();
+
+      final state = container.read(fileTreeUiProvider);
+      expect(state.openProjectId, isNull);
+      expect(state.openPath, isNull);
+      expect(state.query, 'main');
+      expect(state.scrollOffset, 64);
+    });
+  });
 }
 
 /// Records the `respectGitignore` flag every `listFiles` call receives.

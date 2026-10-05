@@ -93,35 +93,82 @@ class FileTreeScreen extends ConsumerStatefulWidget {
 
 class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
   final _search = TextEditingController();
+  final _scroll = ScrollController();
   FileTreeNode? _openNode;
   bool _searching = false;
   FileSearchResult? _searchResult;
   bool _autoSelected = false;
   bool _dragOver = false;
+  bool _scrollRestored = false;
 
   @override
   void initState() {
     super.initState();
+    // Restore the tab context saved in [fileTreeUiProvider] before the first
+    // build so leaving/returning to Files keeps the opened pane + query.
+    final ui = ref.read(fileTreeUiProvider);
+    _search.text = ui.query;
+    if (ui.openPath != null && ui.openProjectId == ref.read(fileTreeProvider).projectId) {
+      _openNode = FileTreeNode(
+        name: _basename(ui.openPath!),
+        path: ui.openPath!,
+        isDirectory: false,
+      );
+    }
+    _scroll.addListener(_persistScrollOffset);
     WidgetsBinding.instance.addPostFrameCallback((_) => _ensureProject());
+  }
+
+  void _persistScrollOffset() {
+    if (_scroll.hasClients) {
+      ref.read(fileTreeUiProvider.notifier).setScrollOffset(_scroll.offset);
+    }
   }
 
   void _ensureProject() {
     final id = widget.projectId;
     if (id != null) {
       ref.read(fileTreeProvider.notifier).selectProject(id);
+    } else {
+      // Deep-link without projectId: default to the first project once known.
+      final first = ref.read(projectsProvider).projects.firstOrNull?.projectId;
+      if (first != null) {
+        _autoSelected = true;
+        ref.read(fileTreeProvider.notifier).selectProject(first);
+      }
+    }
+    _restoreSearch();
+  }
+
+  /// Re-runs a content search left open in the tab — the query survived in
+  /// [fileTreeUiProvider] but the async results did not.
+  void _restoreSearch() {
+    final query = ref.read(fileTreeUiProvider).query;
+    if (query.trim().isEmpty || ref.read(fileTreeProvider).projectId == null) {
       return;
     }
-    // Deep-link without projectId: default to the first project once known.
-    final first = ref.read(projectsProvider).projects.firstOrNull?.projectId;
-    if (first != null) {
-      _autoSelected = true;
-      ref.read(fileTreeProvider.notifier).selectProject(first);
-    }
+    unawaited(_runSearch(query));
+  }
+
+  /// Jumps the tree back to the offset saved before the tab was left, once
+  /// the list has rows to scroll.
+  void _scheduleScrollRestore() {
+    final target = ref.read(fileTreeUiProvider).scrollOffset;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _scrollRestored || !_scroll.hasClients) {
+        return;
+      }
+      _scrollRestored = true;
+      if (target > 0) {
+        _scroll.jumpTo(target.clamp(0.0, _scroll.position.maxScrollExtent));
+      }
+    });
   }
 
   @override
   void dispose() {
     _search.dispose();
+    _scroll.dispose();
     super.dispose();
   }
 
@@ -134,6 +181,7 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
       openFileNode(context, projectId: _projectId, node: node, asDialog: true);
     } else {
       setState(() => _openNode = node);
+      ref.read(fileTreeUiProvider.notifier).openFile(_projectId, node.path);
     }
   }
 
@@ -333,6 +381,7 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
       AppToast.show(context, err, isError: true);
     } else if (_openNode?.path == node.path) {
       setState(() => _openNode = null);
+      ref.read(fileTreeUiProvider.notifier).closeFile();
     }
   }
 
@@ -358,6 +407,7 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
       AppToast.show(context, err, isError: true);
     } else if (_openNode != null && _openNode!.path.startsWith(node.path)) {
       setState(() => _openNode = null);
+      ref.read(fileTreeUiProvider.notifier).closeFile();
     }
   }
 
@@ -444,6 +494,7 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
       _autoSelected = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ref.read(fileTreeProvider.notifier).selectProject(projects.first.projectId);
+        _restoreSearch();
       });
     }
 
@@ -457,6 +508,10 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
       roots,
       _search.text.isEmpty ? state.expanded : collectExpandedDirectoryPaths(roots),
     );
+
+    if (!_scrollRestored && _search.text.isEmpty && !state.loading && visible.isNotEmpty) {
+      _scheduleScrollRestore();
+    }
 
     final tree = _buildTree(state, viewMode, visible);
 
@@ -495,6 +550,7 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
           onCollapseAll: () => ref.read(fileTreeProvider.notifier).collapseAll(),
           onSearchChanged: (q) {
             setState(() {});
+            ref.read(fileTreeUiProvider.notifier).setQuery(q);
             if (q.trim().isNotEmpty) {
               _runSearch(q);
             } else {
@@ -504,6 +560,7 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
           onSearchSubmitted: _runSearch,
           onCloseSearch: () {
             _search.clear();
+            ref.read(fileTreeUiProvider.notifier).setQuery('');
             setState(() => _searchResult = null);
           },
           onViewMode: (m) => ref.read(fileTreeViewModeProvider.notifier).set(m),
@@ -588,6 +645,7 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
       return const Center(child: Text('No files'));
     }
     return ListView.builder(
+      controller: _scroll,
       itemCount: visible.length,
       itemBuilder: (context, i) {
         final flat = visible[i];

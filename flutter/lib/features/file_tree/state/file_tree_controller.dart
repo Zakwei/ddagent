@@ -273,3 +273,51 @@ void persistFileTreeViewMode(FileTreeViewMode mode) {
 final fileTreeViewModeProvider = NotifierProvider<FileTreeViewModeController, FileTreeViewMode>(
   FileTreeViewModeController.new,
 );
+
+/// Screen-local context of the Files tab that must outlive the route: the
+/// search query, the file shown in the side pane, and the tree scroll offset.
+/// The ShellRoute rebuilds [FileTreeScreen] on every tab switch, so without
+/// this the opened pane and position reset when the user leaves and returns.
+class FileTreeUiState {
+  const FileTreeUiState({
+    this.query = '',
+    this.openProjectId,
+    this.openPath,
+    this.scrollOffset = 0,
+  });
+
+  final String query;
+  final String? openProjectId;
+  final String? openPath;
+  final double scrollOffset;
+
+  FileTreeUiState copyWith({
+    String? query,
+    String? Function()? openProjectId,
+    String? Function()? openPath,
+    double? scrollOffset,
+  }) => FileTreeUiState(
+    query: query ?? this.query,
+    openProjectId: openProjectId != null ? openProjectId() : this.openProjectId,
+    openPath: openPath != null ? openPath() : this.openPath,
+    scrollOffset: scrollOffset ?? this.scrollOffset,
+  );
+}
+
+class FileTreeUiController extends Notifier<FileTreeUiState> {
+  @override
+  FileTreeUiState build() => const FileTreeUiState();
+
+  void setQuery(String query) => state = state.copyWith(query: query);
+
+  void openFile(String projectId, String path) =>
+      state = state.copyWith(openProjectId: () => projectId, openPath: () => path);
+
+  void closeFile() => state = state.copyWith(openProjectId: () => null, openPath: () => null);
+
+  void setScrollOffset(double offset) => state = state.copyWith(scrollOffset: offset);
+}
+
+final fileTreeUiProvider = NotifierProvider<FileTreeUiController, FileTreeUiState>(
+  FileTreeUiController.new,
+);
