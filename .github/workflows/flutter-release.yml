@@ -81,7 +81,7 @@ jobs:
         if: inputs.version != ''
         run: |
           git fetch origin main --depth=1
-          git checkout FETCH_HEAD -- flutter/packaging
+          git checkout FETCH_HEAD -- packaging
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.47.5'
@@ -120,7 +120,7 @@ jobs:
         shell: bash
         run: |
           git fetch origin main --depth=1
-          git checkout FETCH_HEAD -- flutter/packaging
+          git checkout FETCH_HEAD -- packaging
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.47.5'
