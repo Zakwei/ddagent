@@ -27,7 +27,8 @@ class LocalServerController extends Notifier<LocalServerStatus> {
   /// Re-probe disk + port and update the status.
   Future<void> refresh() => _service.refresh();
 
-  /// Full pipeline: download (when not installed) → ensure Node → start.
+  /// Full pipeline: install/update (download skipped when current, installed
+  /// bundle kept when offline) → ensure Node → start.
   /// Returns [LocalServerService.localUrl]. Rethrows after pushing the `error`
   /// stage so callers can decide whether to surface it.
   Future<String> installAndStart() async {
@@ -36,9 +37,7 @@ class LocalServerController extends Notifier<LocalServerStatus> {
       return current.url!;
     }
     try {
-      if (await _service.installedVersion == null) {
-        await _service.install(onProgress: null);
-      }
+      await _service.install(onProgress: null);
       await _service.ensureNode();
       return await _service.start();
     } on Object catch (e) {
@@ -53,7 +52,8 @@ class LocalServerController extends Notifier<LocalServerStatus> {
 
   /// Router-guard safe startup: returns the URL when already running or after
   /// starting an installed bundle; null when nothing is installed — app start
-  /// never auto-downloads.
+  /// never installs the first bundle silently, but an installed bundle does
+  /// self-update on launch (install() skips the download when current).
   Future<String?> ensureRunning() =>
       _inFlightEnsure ??= _ensureRunning().whenComplete(() => _inFlightEnsure = null);
 
@@ -64,7 +64,15 @@ class LocalServerController extends Notifier<LocalServerStatus> {
     }
     if (await _service.installedVersion == null) {
       await refresh();
-      return null;
+      return null; // nothing installed — app start never auto-downloads.
+    }
+    try {
+      // Installed bundle → refresh to the newest release when reachable;
+      // install() already keeps the current one when it matches or the
+      // version check fails.
+      await _service.install(onProgress: null);
+    } on Object {
+      // A failed update must not block startup — boot what we have.
     }
     try {
       return await _service.start();

@@ -310,11 +310,25 @@ class LocalServerService {
 
   /// Downloads the newest release tarball and extracts it into `server/`.
   /// Skips the download when `.installed.json` already records that version.
+  /// When the latest release can't be resolved (offline, GitHub down) an
+  /// already-installed bundle is kept as-is instead of erroring — a usable
+  /// local server must survive network loss.
   Future<void> install({required void Function(double progress)? onProgress}) async {
     _requireSupported();
     final suffix = tarballSuffixForAbi(_abi)!;
-    final serverVersion = await _serverVersion;
     final installed = await installedVersion;
+    String serverVersion;
+    try {
+      serverVersion = await _serverVersion;
+    } on Object {
+      if (installed != null) {
+        _emit(
+          LocalServerStatus(stage: LocalServerStage.installing, progress: 1, version: installed),
+        );
+        return;
+      }
+      rethrow;
+    }
     if (installed != null && sameServerVersion(installed, serverVersion)) {
       onProgress?.call(1);
       _emit(LocalServerStatus(stage: LocalServerStage.installing, progress: 1, version: installed));
@@ -354,10 +368,15 @@ class LocalServerService {
     _emit(LocalServerStatus(stage: LocalServerStage.installing, progress: 1, version: installed));
     try {
       final bundle = await _bundle;
+      // Extract to a staging dir, then swap: a failed extraction must never
+      // leave a working installed bundle half-deleted.
+      final staging = Directory('${(await _root).path}/server.tmp');
+      if (await staging.exists()) await staging.delete(recursive: true);
+      await staging.create(recursive: true);
+      await _tar(['-xf', archive.path, '-C', staging.path]);
       // Version bump: wipe first so files removed between releases can't linger.
-      if (installed != null && await bundle.exists()) await bundle.delete(recursive: true);
-      await bundle.create(recursive: true);
-      await _tar(['-xf', archive.path, '-C', bundle.path]);
+      if (await bundle.exists()) await bundle.delete(recursive: true);
+      await staging.rename(bundle.path);
       _emit(
         LocalServerStatus(stage: LocalServerStage.installing, progress: 1, version: serverVersion),
       );
