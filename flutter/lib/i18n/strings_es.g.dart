@@ -1700,6 +1700,7 @@ class Translations$settings$mainTabs$es extends Translations$settings$mainTabs$e
 	@override String get models => 'Modelos';
 	@override String get tasks => 'Tareas';
 	@override String get browser => 'Navegador';
+	@override String get tools => 'Herramientas';
 	@override String get notifications => 'Notificaciones';
 	@override String get about => 'Acerca de';
 	@override String get workspaces => 'Espacios de trabajo';
@@ -6765,6 +6766,7 @@ extension on TranslationsEs {
 			'settings.mainTabs.models' => 'Modelos',
 			'settings.mainTabs.tasks' => 'Tareas',
 			'settings.mainTabs.browser' => 'Navegador',
+			'settings.mainTabs.tools' => 'Herramientas',
 			'settings.mainTabs.notifications' => 'Notificaciones',
 			'settings.mainTabs.about' => 'Acerca de',
 			'settings.mainTabs.workspaces' => 'Espacios de trabajo',
@@ -7157,9 +7159,9 @@ extension on TranslationsEs {
 			'settings.browser.installed' => 'instalado',
 			'settings.browser.installing' => 'Instalando...',
 			'settings.browser.missing' => 'faltante',
-			'settings.browser.runtimeRequired' => 'Se requiere el runtime del navegador',
 			_ => null,
 		} ?? switch (path) {
+			'settings.browser.runtimeRequired' => 'Se requiere el runtime del navegador',
 			'settings.browser.statusDisabled' => 'desactivado',
 			'settings.browser.statusLabel' => 'Estado',
 			'settings.browser.statusReady' => 'listo',

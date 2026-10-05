@@ -1703,6 +1703,7 @@ class Translations$settings$mainTabs$it extends Translations$settings$mainTabs$e
 	@override String get about => 'Informazioni';
 	@override String get workspaces => 'Workspace';
 	@override String get browser => 'Browser';
+	@override String get tools => 'Strumenti';
 	@override String get quota => 'Control Center';
 }
 
@@ -6768,6 +6769,7 @@ extension on TranslationsIt {
 			'settings.mainTabs.about' => 'Informazioni',
 			'settings.mainTabs.workspaces' => 'Workspace',
 			'settings.mainTabs.browser' => 'Browser',
+			'settings.mainTabs.tools' => 'Strumenti',
 			'settings.mainTabs.quota' => 'Control Center',
 			'settings.orchestration.title' => 'Orchestration',
 			'settings.orchestration.description' => 'Route chat tasks across your providers and models.',
@@ -7157,9 +7159,9 @@ extension on TranslationsIt {
 			'settings.browser.installed' => 'installato',
 			'settings.browser.installing' => 'Installazione...',
 			'settings.browser.missing' => 'mancante',
-			'settings.browser.runtimeRequired' => 'Runtime del browser richiesto',
 			_ => null,
 		} ?? switch (path) {
+			'settings.browser.runtimeRequired' => 'Runtime del browser richiesto',
 			'settings.browser.statusDisabled' => 'disabilitato',
 			'settings.browser.statusLabel' => 'Stato',
 			'settings.browser.statusReady' => 'pronto',

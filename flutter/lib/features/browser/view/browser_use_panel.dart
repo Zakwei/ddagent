@@ -103,7 +103,7 @@ class _BrowserUsePanelState extends ConsumerState<BrowserUsePanel> {
                 tooltip: 'Open Browser settings',
                 icon: const Icon(LucideIcons.settings, size: 14),
                 visualDensity: VisualDensity.compact,
-                onPressed: () => context.go('/settings/browser'),
+                onPressed: () => context.go('/settings/tools'),
               ),
               IconButton(
                 tooltip: 'Refresh browser sessions',

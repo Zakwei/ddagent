@@ -1703,6 +1703,7 @@ class Translations$settings$mainTabs$ru extends Translations$settings$mainTabs$e
 	@override String get about => 'О программе';
 	@override String get workspaces => 'Рабочие области';
 	@override String get browser => 'Browser';
+	@override String get tools => 'Инструменты';
 	@override String get quota => 'Control Center';
 }
 
@@ -6774,6 +6775,7 @@ extension on TranslationsRu {
 			'settings.mainTabs.about' => 'О программе',
 			'settings.mainTabs.workspaces' => 'Рабочие области',
 			'settings.mainTabs.browser' => 'Browser',
+			'settings.mainTabs.tools' => 'Инструменты',
 			'settings.mainTabs.quota' => 'Control Center',
 			'settings.orchestration.title' => 'Orchestration',
 			'settings.orchestration.description' => 'Route chat tasks across your providers and models.',
@@ -7163,9 +7165,9 @@ extension on TranslationsRu {
 			'settings.browser.installed' => 'установлено',
 			'settings.browser.installing' => 'Установка...',
 			'settings.browser.missing' => 'отсутствует',
-			'settings.browser.runtimeRequired' => 'Требуется среда выполнения браузера',
 			_ => null,
 		} ?? switch (path) {
+			'settings.browser.runtimeRequired' => 'Требуется среда выполнения браузера',
 			'settings.browser.statusDisabled' => 'отключён',
 			'settings.browser.statusLabel' => 'Статус',
 			'settings.browser.statusReady' => 'готов',

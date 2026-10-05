@@ -1703,6 +1703,7 @@ class Translations$settings$mainTabs$zh_TW extends Translations$settings$mainTab
 	@override String get about => '關於';
 	@override String get workspaces => '工作區';
 	@override String get browser => 'Browser';
+	@override String get tools => '工具';
 	@override String get quota => 'Control Center';
 }
 
@@ -6768,6 +6769,7 @@ extension on TranslationsZhTw {
 			'settings.mainTabs.about' => '關於',
 			'settings.mainTabs.workspaces' => '工作區',
 			'settings.mainTabs.browser' => 'Browser',
+			'settings.mainTabs.tools' => '工具',
 			'settings.mainTabs.quota' => 'Control Center',
 			'settings.orchestration.title' => 'Orchestration',
 			'settings.orchestration.description' => 'Route chat tasks across your providers and models.',
@@ -7157,9 +7159,9 @@ extension on TranslationsZhTw {
 			'settings.browser.installed' => '已安裝',
 			'settings.browser.installing' => '正在安裝...',
 			'settings.browser.missing' => '缺失',
-			'settings.browser.runtimeRequired' => '需要瀏覽器執行環境',
 			_ => null,
 		} ?? switch (path) {
+			'settings.browser.runtimeRequired' => '需要瀏覽器執行環境',
 			'settings.browser.statusDisabled' => '已停用',
 			'settings.browser.statusLabel' => '狀態',
 			'settings.browser.statusReady' => '就緒',

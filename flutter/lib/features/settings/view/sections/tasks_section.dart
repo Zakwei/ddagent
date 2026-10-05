@@ -11,12 +11,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-/// Tasks section — port of `tasks-settings/TasksSettingsTab.tsx`:
-/// TaskMaster installation-status check (spinner → warning card or the
-/// global `tasks-enabled` toggle). `isReady`/`installationStatus` details
-/// beyond installed/not-installed are not surfaced by the web tab either.
-class TasksSection extends ConsumerWidget {
-  const TasksSection({super.key});
+/// TaskMaster block — port of `tasks-settings/TasksSettingsTab.tsx`:
+/// installation-status check (spinner → warning card or the global
+/// `tasks-enabled` toggle). `isReady`/`installationStatus` details beyond
+/// installed/not-installed are not surfaced by the web tab either. Rendered
+/// inside the merged "Tools" settings page.
+class TasksSettingsBlock extends ConsumerWidget {
+  const TasksSettingsBlock({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -25,42 +26,36 @@ class TasksSection extends ConsumerWidget {
     final tasksEnabled = ref.watch(tasksEnabledProvider);
     final tasks = t.settings.tasks;
 
-    return ListView(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+    return SettingsSectionBlock(
+      title: t.settings.mainTabs.tasks,
       children: [
-        SettingsSectionBlock(
-          title: t.settings.mainTabs.tasks,
-          children: [
-            install.when(
-              loading: () => AppCard(
-                child: Row(
-                  spacing: AppSpacing.md,
-                  children: [
-                    const AppSpinner(),
-                    Text(tasks.checking, style: Theme.of(context).textTheme.bodySmall),
-                  ],
-                ),
-              ),
-              error: (e, _) => const _TaskmasterNotInstalled(),
-              data: (config) => config.isInstalled
-                  ? AppCard(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.lg,
-                        vertical: AppSpacing.xs,
-                      ),
-                      child: SettingsRow(
-                        label: tasks.settings.enableLabel,
-                        description: tasks.settings.enableDescription,
-                        child: Switch(
-                          value: tasksEnabled,
-                          onChanged: (v) =>
-                              unawaited(ref.read(tasksEnabledProvider.notifier).set(v)),
-                        ),
-                      ),
-                    )
-                  : const _TaskmasterNotInstalled(),
+        install.when(
+          loading: () => AppCard(
+            child: Row(
+              spacing: AppSpacing.md,
+              children: [
+                const AppSpinner(),
+                Text(tasks.checking, style: Theme.of(context).textTheme.bodySmall),
+              ],
             ),
-          ],
+          ),
+          error: (e, _) => const _TaskmasterNotInstalled(),
+          data: (config) => config.isInstalled
+              ? AppCard(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.lg,
+                    vertical: AppSpacing.xs,
+                  ),
+                  child: SettingsRow(
+                    label: tasks.settings.enableLabel,
+                    description: tasks.settings.enableDescription,
+                    child: Switch(
+                      value: tasksEnabled,
+                      onChanged: (v) => unawaited(ref.read(tasksEnabledProvider.notifier).set(v)),
+                    ),
+                  ),
+                )
+              : const _TaskmasterNotInstalled(),
         ),
       ],
     );

@@ -1495,6 +1495,7 @@
       "about": "Info",
       "workspaces": "Arbeitsbereiche",
       "browser": "Browser",
+      "tools": "Werkzeuge",
       "quota": "Control Center"
     },
     "orchestration": {

@@ -1766,6 +1766,7 @@ class Translations$settings$mainTabs$pl extends Translations$settings$mainTabs$e
 	@override String get models => 'Modele';
 	@override String get tasks => 'Zadania';
 	@override String get browser => 'Przeglądarka';
+	@override String get tools => 'Narzędzia';
 	@override String get notifications => 'Powiadomienia';
 	@override String get about => 'O aplikacji';
 	@override String get quota => 'Control Center';
@@ -7288,6 +7289,7 @@ extension on TranslationsPl {
 			'settings.mainTabs.models' => 'Modele',
 			'settings.mainTabs.tasks' => 'Zadania',
 			'settings.mainTabs.browser' => 'Przeglądarka',
+			'settings.mainTabs.tools' => 'Narzędzia',
 			'settings.mainTabs.notifications' => 'Powiadomienia',
 			'settings.mainTabs.about' => 'O aplikacji',
 			'settings.mainTabs.quota' => 'Control Center',
@@ -7576,9 +7578,9 @@ extension on TranslationsPl {
 			'settings.permissions.allowedCommands.empty' => 'Brak skonfigurowanych dozwolonych poleceń',
 			'settings.permissions.blockedCommands.title' => 'Zablokowane polecenia powłoki',
 			'settings.permissions.blockedCommands.description' => 'Polecenia powłoki automatycznie blokowane',
-			'settings.permissions.blockedCommands.placeholder' => 'np. "Shell(rm -rf)" lub "Shell(sudo)"',
 			_ => null,
 		} ?? switch (path) {
+			'settings.permissions.blockedCommands.placeholder' => 'np. "Shell(rm -rf)" lub "Shell(sudo)"',
 			'settings.permissions.blockedCommands.empty' => 'Brak skonfigurowanych zablokowanych poleceń',
 			'settings.permissions.toolExamples.title' => 'Przykłady wzorców narzędzi:',
 			'settings.permissions.toolExamples.bashGitLog' => '- Zezwól na wszystkie polecenia git log',
@@ -8090,9 +8092,9 @@ extension on TranslationsPl {
 			'tasks.board.card.abort' => 'Przerwij',
 			'tasks.board.card.delete' => 'Usuń',
 			'tasks.board.card.openSession' => 'Otwórz sesję',
-			'tasks.board.card.pullRequest' => 'Pull request',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.board.card.pullRequest' => 'Pull request',
 			'tasks.board.card.edit' => 'Edytuj',
 			'tasks.board.card.moveTo' => 'Przenieś do',
 			'tasks.board.dialog.createTitle' => 'Nowa karta',

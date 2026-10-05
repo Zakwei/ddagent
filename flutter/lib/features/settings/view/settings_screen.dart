@@ -11,13 +11,12 @@ import 'package:ddagent_app/features/settings/view/sections/about_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/agents_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/api_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/appearance_section.dart';
-import 'package:ddagent_app/features/settings/view/sections/browser_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/git_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/notifications_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/orchestration_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/settings_section_layout.dart';
 import 'package:ddagent_app/features/settings/view/sections/shortcuts_section.dart';
-import 'package:ddagent_app/features/settings/view/sections/tasks_section.dart';
+import 'package:ddagent_app/features/settings/view/sections/tools_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/workspaces_section.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
@@ -86,17 +85,13 @@ final settingsSections = <SettingsSection>[
     label: (t) => t.settings.mainTabs.models,
     build: (_) => const ModelLibraryPanel(),
   ),
+  // Merged Tasks + Browser into one "Tools" page — both are optional agent
+  // capabilities. In the web client these were separate `SettingsMainTab`s.
   SettingsSection(
-    id: 'tasks',
-    icon: LucideIcons.listChecks,
-    label: (t) => t.settings.mainTabs.tasks,
-    build: (_) => const TasksSection(),
-  ),
-  SettingsSection(
-    id: 'browser',
-    icon: LucideIcons.monitorPlay,
-    label: (t) => t.settings.mainTabs.browser,
-    build: (_) => const BrowserSection(),
+    id: 'tools',
+    icon: LucideIcons.wrench,
+    label: (t) => t.settings.mainTabs.tools,
+    build: (_) => const ToolsSection(),
   ),
   SettingsSection(
     id: 'notifications',

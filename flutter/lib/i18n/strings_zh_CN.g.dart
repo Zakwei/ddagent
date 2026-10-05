@@ -1700,6 +1700,7 @@ class Translations$settings$mainTabs$zh_CN extends Translations$settings$mainTab
 	@override String get models => '模型';
 	@override String get tasks => '任务';
 	@override String get browser => '浏览器';
+	@override String get tools => '工具';
 	@override String get notifications => '通知';
 	@override String get about => '关于';
 	@override String get workspaces => '工作区';
@@ -6765,6 +6766,7 @@ extension on TranslationsZhCn {
 			'settings.mainTabs.models' => '模型',
 			'settings.mainTabs.tasks' => '任务',
 			'settings.mainTabs.browser' => '浏览器',
+			'settings.mainTabs.tools' => '工具',
 			'settings.mainTabs.notifications' => '通知',
 			'settings.mainTabs.about' => '关于',
 			'settings.mainTabs.workspaces' => '工作区',
@@ -7157,9 +7159,9 @@ extension on TranslationsZhCn {
 			'settings.browser.installed' => '已安装',
 			'settings.browser.installing' => '正在安装...',
 			'settings.browser.missing' => '缺失',
-			'settings.browser.runtimeRequired' => '需要浏览器运行时',
 			_ => null,
 		} ?? switch (path) {
+			'settings.browser.runtimeRequired' => '需要浏览器运行时',
 			'settings.browser.statusDisabled' => '已禁用',
 			'settings.browser.statusLabel' => '状态',
 			'settings.browser.statusReady' => '就绪',

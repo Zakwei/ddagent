@@ -3228,6 +3228,9 @@ class Translations$settings$mainTabs$en {
 	/// en: 'Browser'
 	String get browser => 'Browser';
 
+	/// en: 'Tools'
+	String get tools => 'Tools';
+
 	/// en: 'Notifications'
 	String get notifications => 'Notifications';
 
@@ -12099,6 +12102,7 @@ extension on Translations {
 			'settings.mainTabs.models' => 'Models',
 			'settings.mainTabs.tasks' => 'Tasks',
 			'settings.mainTabs.browser' => 'Browser',
+			'settings.mainTabs.tools' => 'Tools',
 			'settings.mainTabs.notifications' => 'Notifications',
 			'settings.mainTabs.about' => 'About',
 			'settings.mainTabs.quota' => 'Control Center',
@@ -12364,9 +12368,9 @@ extension on Translations {
 			'settings.agents.authStatus.notConnected' => 'Not connected',
 			'settings.agents.authStatus.disconnected' => 'Disconnected',
 			'settings.agents.authStatus.checkingAuth' => 'Checking authentication status...',
-			'settings.agents.authStatus.loggedInAs' => ({required Object email}) => 'Logged in as ${email}',
 			_ => null,
 		} ?? switch (path) {
+			'settings.agents.authStatus.loggedInAs' => ({required Object email}) => 'Logged in as ${email}',
 			'settings.agents.authStatus.providerAccount' => ({required Object provider}) => '${provider} account',
 			'settings.agents.authStatus.authenticatedUser' => 'authenticated user',
 			'settings.agents.install.title' => ({required Object agent}) => '${agent} CLI is not installed',
@@ -12878,9 +12882,9 @@ extension on Translations {
 			'tasks.sort.status' => 'Status',
 			'tasks.sort.priority' => 'Priority',
 			'tasks.sort.idAsc' => 'ID (Ascending)',
-			'tasks.sort.idDesc' => 'ID (Descending)',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.sort.idDesc' => 'ID (Descending)',
 			'tasks.sort.titleAsc' => 'Title (A-Z)',
 			'tasks.sort.titleDesc' => 'Title (Z-A)',
 			'tasks.sort.statusAsc' => 'Status (Pending First)',

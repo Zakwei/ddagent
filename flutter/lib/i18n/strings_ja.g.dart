@@ -1703,6 +1703,7 @@ class Translations$settings$mainTabs$ja extends Translations$settings$mainTabs$e
 	@override String get about => '概要';
 	@override String get workspaces => 'ワークスペース';
 	@override String get browser => 'Browser';
+	@override String get tools => 'ツール';
 	@override String get quota => 'Control Center';
 }
 
@@ -6768,6 +6769,7 @@ extension on TranslationsJa {
 			'settings.mainTabs.about' => '概要',
 			'settings.mainTabs.workspaces' => 'ワークスペース',
 			'settings.mainTabs.browser' => 'Browser',
+			'settings.mainTabs.tools' => 'ツール',
 			'settings.mainTabs.quota' => 'Control Center',
 			'settings.orchestration.title' => 'Orchestration',
 			'settings.orchestration.description' => 'Route chat tasks across your providers and models.',
@@ -7157,9 +7159,9 @@ extension on TranslationsJa {
 			'settings.browser.installed' => 'インストール済み',
 			'settings.browser.installing' => 'インストール中...',
 			'settings.browser.missing' => '未インストール',
-			'settings.browser.runtimeRequired' => 'ブラウザランタイムが必要です',
 			_ => null,
 		} ?? switch (path) {
+			'settings.browser.runtimeRequired' => 'ブラウザランタイムが必要です',
 			'settings.browser.statusDisabled' => '無効',
 			'settings.browser.statusLabel' => 'ステータス',
 			'settings.browser.statusReady' => '準備完了',

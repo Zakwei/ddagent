@@ -1703,6 +1703,7 @@ class Translations$settings$mainTabs$tr extends Translations$settings$mainTabs$e
 	@override String get about => 'Hakkında';
 	@override String get workspaces => 'Çalışma alanları';
 	@override String get browser => 'Browser';
+	@override String get tools => 'Araçlar';
 	@override String get quota => 'Control Center';
 }
 
@@ -6768,6 +6769,7 @@ extension on TranslationsTr {
 			'settings.mainTabs.about' => 'Hakkında',
 			'settings.mainTabs.workspaces' => 'Çalışma alanları',
 			'settings.mainTabs.browser' => 'Browser',
+			'settings.mainTabs.tools' => 'Araçlar',
 			'settings.mainTabs.quota' => 'Control Center',
 			'settings.orchestration.title' => 'Orchestration',
 			'settings.orchestration.description' => 'Route chat tasks across your providers and models.',
@@ -7157,9 +7159,9 @@ extension on TranslationsTr {
 			'settings.browser.installed' => 'kurulu',
 			'settings.browser.installing' => 'Kuruluyor...',
 			'settings.browser.missing' => 'eksik',
-			'settings.browser.runtimeRequired' => 'Tarayıcı runtime’ı gerekli',
 			_ => null,
 		} ?? switch (path) {
+			'settings.browser.runtimeRequired' => 'Tarayıcı runtime’ı gerekli',
 			'settings.browser.statusDisabled' => 'devre dışı',
 			'settings.browser.statusLabel' => 'Durum',
 			'settings.browser.statusReady' => 'hazır',

@@ -11,19 +11,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-/// Browser section — port of `browser-use-settings/BrowserUseSettingsTab.tsx`:
+/// Browser block — port of `browser-use-settings/BrowserUseSettingsTab.tsx`:
 /// enable/disable toggle (`PUT /api/browser-use/settings`), runtime status
 /// badges (Playwright/Chromium/Status) and the "Install Runtime" button when
 /// binaries are missing. Local state mirrors the web tab's useState trio;
-/// `browserUseProvider` stays untouched (it owns the sessions panel).
-class BrowserSection extends ConsumerStatefulWidget {
-  const BrowserSection({super.key});
+/// `browserUseProvider` stays untouched (it owns the sessions panel). Rendered
+/// inside the merged "Tools" settings page.
+class BrowserSettingsBlock extends ConsumerStatefulWidget {
+  const BrowserSettingsBlock({super.key});
 
   @override
-  ConsumerState<BrowserSection> createState() => _BrowserSectionState();
+  ConsumerState<BrowserSettingsBlock> createState() => _BrowserSettingsBlockState();
 }
 
-class _BrowserSectionState extends ConsumerState<BrowserSection> {
+class _BrowserSettingsBlockState extends ConsumerState<BrowserSettingsBlock> {
   bool? _enabled;
   BrowserUseStatus? _status;
   bool _settingsLoading = true;
@@ -159,119 +160,106 @@ class _BrowserSectionState extends ConsumerState<BrowserSection> {
       child: Text(label, style: tt.labelSmall?.copyWith(color: c.mutedForeground)),
     );
 
-    return ListView(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+    return SettingsSectionBlock(
+      title: browser.title,
+      icon: LucideIcons.monitorPlay,
+      description: browser.description,
       children: [
-        SettingsSectionBlock(
-          title: browser.title,
-          icon: LucideIcons.monitorPlay,
-          description: browser.description,
-          children: [
-            AppCard(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.lg,
-                vertical: AppSpacing.xs,
+        AppCard(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.xs),
+          child: Column(
+            children: [
+              SettingsRow(
+                label: browser.enableLabel,
+                description: browser.enableDescription,
+                child: _settingsLoading && _enabled == null
+                    ? const SizedBox.square(
+                        dimension: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : Switch(
+                        value: enabled,
+                        onChanged: _saving ? null : (v) => unawaited(_setEnabled(v)),
+                      ),
               ),
-              child: Column(
-                children: [
-                  SettingsRow(
-                    label: browser.enableLabel,
-                    description: browser.enableDescription,
-                    child: _settingsLoading && _enabled == null
-                        ? const SizedBox.square(
-                            dimension: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : Switch(
-                            value: enabled,
-                            onChanged: _saving ? null : (v) => unawaited(_setEnabled(v)),
-                          ),
-                  ),
-                  Divider(height: 1, color: c.border),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+              Divider(height: 1, color: c.border),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Wrap(
+                      spacing: AppSpacing.sm,
+                      runSpacing: AppSpacing.sm,
                       children: [
-                        Wrap(
-                          spacing: AppSpacing.sm,
-                          runSpacing: AppSpacing.sm,
-                          children: [
-                            badge(
-                              'Playwright: ${_runtimeLabel(_status?.playwrightInstalled, t: t)}',
-                            ),
-                            badge('Chromium: ${_runtimeLabel(_status?.chromiumInstalled, t: t)}'),
-                            badge('${browser.statusLabel}: $statusLabel'),
-                          ],
-                        ),
-                        if (needsBinaries) ...[
-                          const SizedBox(height: AppSpacing.md),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            spacing: AppSpacing.md,
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      browser.runtimeRequired,
-                                      style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      _status?.message ?? browser.installHint,
-                                      style: tt.bodySmall?.copyWith(color: c.mutedForeground),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              AppButton(
-                                size: AppButtonSize.sm,
-                                loading: _installing || _status?.installInProgress == true,
-                                onPressed: () => unawaited(_installRuntime()),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  spacing: AppSpacing.xs,
-                                  children: [
-                                    const Icon(LucideIcons.download, size: 14),
-                                    Text(
-                                      _installing || _status?.installInProgress == true
-                                          ? browser.installing
-                                          : browser.installRuntime,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                        if (_error != null) ...[
-                          const SizedBox(height: AppSpacing.sm),
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.md,
-                              vertical: AppSpacing.sm,
-                            ),
-                            decoration: BoxDecoration(
-                              color: c.destructive.withValues(alpha: 0.08),
-                              border: Border.all(color: c.destructive.withValues(alpha: 0.3)),
-                              borderRadius: AppRadii.borderMd,
-                            ),
-                            child: Text(
-                              _error!,
-                              style: tt.bodySmall?.copyWith(color: c.destructive),
-                            ),
-                          ),
-                        ],
+                        badge('Playwright: ${_runtimeLabel(_status?.playwrightInstalled, t: t)}'),
+                        badge('Chromium: ${_runtimeLabel(_status?.chromiumInstalled, t: t)}'),
+                        badge('${browser.statusLabel}: $statusLabel'),
                       ],
                     ),
-                  ),
-                ],
+                    if (needsBinaries) ...[
+                      const SizedBox(height: AppSpacing.md),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        spacing: AppSpacing.md,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  browser.runtimeRequired,
+                                  style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  _status?.message ?? browser.installHint,
+                                  style: tt.bodySmall?.copyWith(color: c.mutedForeground),
+                                ),
+                              ],
+                            ),
+                          ),
+                          AppButton(
+                            size: AppButtonSize.sm,
+                            loading: _installing || _status?.installInProgress == true,
+                            onPressed: () => unawaited(_installRuntime()),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              spacing: AppSpacing.xs,
+                              children: [
+                                const Icon(LucideIcons.download, size: 14),
+                                Text(
+                                  _installing || _status?.installInProgress == true
+                                      ? browser.installing
+                                      : browser.installRuntime,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                    if (_error != null) ...[
+                      const SizedBox(height: AppSpacing.sm),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.md,
+                          vertical: AppSpacing.sm,
+                        ),
+                        decoration: BoxDecoration(
+                          color: c.destructive.withValues(alpha: 0.08),
+                          border: Border.all(color: c.destructive.withValues(alpha: 0.3)),
+                          borderRadius: AppRadii.borderMd,
+                        ),
+                        child: Text(_error!, style: tt.bodySmall?.copyWith(color: c.destructive)),
+                      ),
+                    ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     );

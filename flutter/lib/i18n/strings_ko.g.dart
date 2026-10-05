@@ -1700,6 +1700,7 @@ class Translations$settings$mainTabs$ko extends Translations$settings$mainTabs$e
 	@override String get models => '모델';
 	@override String get tasks => '작업';
 	@override String get browser => '브라우저';
+	@override String get tools => '도구';
 	@override String get notifications => '알림';
 	@override String get about => '정보';
 	@override String get workspaces => '작업 영역';
@@ -6765,6 +6766,7 @@ extension on TranslationsKo {
 			'settings.mainTabs.models' => '모델',
 			'settings.mainTabs.tasks' => '작업',
 			'settings.mainTabs.browser' => '브라우저',
+			'settings.mainTabs.tools' => '도구',
 			'settings.mainTabs.notifications' => '알림',
 			'settings.mainTabs.about' => '정보',
 			'settings.mainTabs.workspaces' => '작업 영역',
@@ -7157,9 +7159,9 @@ extension on TranslationsKo {
 			'settings.browser.installed' => '설치됨',
 			'settings.browser.installing' => '설치 중...',
 			'settings.browser.missing' => '없음',
-			'settings.browser.runtimeRequired' => '브라우저 런타임 필요',
 			_ => null,
 		} ?? switch (path) {
+			'settings.browser.runtimeRequired' => '브라우저 런타임 필요',
 			'settings.browser.statusDisabled' => '비활성화됨',
 			'settings.browser.statusLabel' => '상태',
 			'settings.browser.statusReady' => '준비됨',
