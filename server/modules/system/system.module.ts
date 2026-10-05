@@ -10,7 +10,7 @@ import { createSystemUpdateService } from './system.service.js';
 
 type SystemModuleOptions = {
   appRoot: string;
-  installMode: 'git' | 'npm';
+  installMode: 'git' | 'npm' | 'bundle';
   isPlatform: boolean;
 };
 

@@ -182,6 +182,75 @@ class LocalServerService {
     }
   }
 
+  /// Version the currently-answering server reports via `GET /health` — null
+  /// when nothing (or something that isn't ddagent) is listening.
+  Future<String?> _runningVersion() async {
+    try {
+      final res = await _probe.get<dynamic>('$localUrl/health');
+      final data = res.data;
+      if (res.statusCode == 200 && data is Map<String, dynamic>) {
+        return data['version']?.toString();
+      }
+      return null;
+    } on DioException {
+      return null;
+    }
+  }
+
+  /// `~/.ddagent/local-server.json` — the marker every server writes at
+  /// startup (`writeLocalServerMarker` in server/index.ts). Identifies an
+  /// orphan spawned from *this* bundle install: `installMode: 'bundle'` and
+  /// `appRoot` equal to our bundle dir. A foreign server (systemd, manual
+  /// start, another bundle) reports a different mode/appRoot.
+  Future<Map<String, dynamic>?> _readLocalMarker() async {
+    final home = Platform.environment['HOME'] ?? Platform.environment['USERPROFILE'];
+    if (home == null) return null;
+    try {
+      final marker = File(
+        '$home${Platform.pathSeparator}.ddagent${Platform.pathSeparator}local-server.json',
+      );
+      final decoded = jsonDecode(await marker.readAsString());
+      return decoded is Map<String, dynamic> ? decoded : null;
+    } on Object {
+      return null;
+    }
+  }
+
+  /// PID of an orphan spawned from *this* bundle — identified by the startup
+  /// marker's `installMode: 'bundle'` + `appRoot` equal to our bundle dir —
+  /// or null. A foreign server (systemd, manual start, another bundle)
+  /// reports a different mode/appRoot and is never touched.
+  Future<int?> _ourBundleOrphanPid() async {
+    final marker = await _readLocalMarker();
+    final pid = marker?['pid'];
+    if (marker == null || marker['installMode'] != 'bundle' || pid is! int) {
+      return null;
+    }
+    final bundle = await _bundle;
+    final markerRoot = marker['appRoot']?.toString().replaceAll('/', Platform.pathSeparator);
+    if (markerRoot == null || markerRoot.toLowerCase() != bundle.path.toLowerCase()) {
+      return null;
+    }
+    return pid;
+  }
+
+  /// SIGTERMs the marked orphan (ours only — verified by
+  /// [_ourBundleOrphanPid]) and waits until the port stops answering, so the
+  /// fresh spawn can bind.
+  Future<void> _killMarkedOrphan(int pid) async {
+    Process.killPid(pid);
+    await _waitForPortFree();
+  }
+
+  /// Polls until nothing answers on [localUrl] (max 5 s) — used after killing
+  /// a stale process before respawning.
+  Future<void> _waitForPortFree() async {
+    final deadline = DateTime.now().add(const Duration(seconds: 5));
+    while (DateTime.now().isBefore(deadline) && await _probeAlive()) {
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+    }
+  }
+
   /// Bundle version recorded in `server/.installed.json` (the marker ships
   /// inside the release tarball), or null when nothing is installed.
   Future<String?> get installedVersion async {
@@ -408,8 +477,28 @@ class LocalServerService {
     final version = await installedVersion;
     _emit(LocalServerStatus(stage: LocalServerStage.starting, version: version));
     if (await _probeAlive()) {
-      _emit(LocalServerStatus(stage: LocalServerStage.running, url: localUrl, version: version));
-      return localUrl;
+      final running = await _runningVersion();
+      // A foreign or already-current server owns the port → adopt as-is.
+      // A stale process (older bundle on disk — e.g. an orphan left by an
+      // older app build, or our own child after a bundle swap) is replaced,
+      // but only when it's provably ours: our spawned `_process`, or a
+      // marker-verified bundle orphan. Anything else stays untouched.
+      final adopted = version == null || (running != null && sameServerVersion(running, version));
+      if (!adopted) {
+        if (_process != null) {
+          final proc = _process!;
+          _process = null;
+          proc.kill();
+          await _waitForPortFree();
+        } else {
+          final orphanPid = await _ourBundleOrphanPid();
+          if (orphanPid != null) await _killMarkedOrphan(orphanPid);
+        }
+      }
+      if (await _probeAlive()) {
+        _emit(LocalServerStatus(stage: LocalServerStage.running, url: localUrl, version: version));
+        return localUrl;
+      }
     }
     if (version == null) {
       const message = 'Server bundle is not installed.';

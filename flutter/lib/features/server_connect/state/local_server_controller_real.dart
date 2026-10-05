@@ -28,14 +28,11 @@ class LocalServerController extends Notifier<LocalServerStatus> {
   Future<void> refresh() => _service.refresh();
 
   /// Full pipeline: install/update (download skipped when current, installed
-  /// bundle kept when offline) → ensure Node → start.
+  /// bundle kept when offline) → ensure Node → start. Always runs install() —
+  /// a running-but-stale process must be replaced with the bundle on disk.
   /// Returns [LocalServerService.localUrl]. Rethrows after pushing the `error`
   /// stage so callers can decide whether to surface it.
   Future<String> installAndStart() async {
-    final current = state;
-    if (current.stage == LocalServerStage.running && current.url != null) {
-      return current.url!;
-    }
     try {
       await _service.install(onProgress: null);
       await _service.ensureNode();
@@ -58,10 +55,8 @@ class LocalServerController extends Notifier<LocalServerStatus> {
       _inFlightEnsure ??= _ensureRunning().whenComplete(() => _inFlightEnsure = null);
 
   Future<String?> _ensureRunning() async {
-    final current = state;
-    if (current.stage == LocalServerStage.running && current.url != null) {
-      return current.url!;
-    }
+    // No early "running" return: a stale adopted/orphaned process must go
+    // through install() + start() so it gets replaced with the bundle on disk.
     if (await _service.installedVersion == null) {
       await refresh();
       return null; // nothing installed — app start never auto-downloads.

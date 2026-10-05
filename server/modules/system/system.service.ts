@@ -10,7 +10,7 @@ type SystemUpdateCommandResult = {
 type SystemUpdateDependencies = {
   appRoot: string;
   homeDirectory: string;
-  installMode: 'git' | 'npm';
+  installMode: 'git' | 'npm' | 'bundle';
   isPlatform: boolean;
   environment: NodeJS.ProcessEnv;
   githubTokens: {
@@ -42,6 +42,17 @@ export function createSystemUpdateService(dependencies: SystemUpdateDependencies
   return {
     /** Selects and executes the correct update workflow for this installation. */
     async updateSystem() {
+      // Release bundles have no shell-level update path: the ddagent app's
+      // local-server flow downloads the new tarball itself, and install.sh
+      // deployments are re-run. `npm install -g`/git commands would also fail
+      // on Windows bundles where no `sh` exists (spawn ENOENT).
+      if (dependencies.installMode === 'bundle') {
+        return {
+          success: false as const,
+          error: 'This server is a release bundle and cannot self-update — update it from the ddagent app or re-run install.sh.',
+        };
+      }
+
       // Platform mode on a git checkout (this deployment) has no platform
       // updater — git pull is the real upgrade path there.
       const updateCommand = dependencies.isPlatform && dependencies.installMode !== 'git'

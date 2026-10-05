@@ -21,7 +21,7 @@ const HOST = process.env.HOST || '0.0.0.0';
 const DISPLAY_HOST = getConnectableHost(HOST);
 const LOCAL_SERVER_MARKER_PATH = path.join(os.homedir(), '.ddagent', 'local-server.json');
 
-async function writeLocalServerMarker(installMode: 'git' | 'npm', appRoot: string) {
+async function writeLocalServerMarker(installMode: 'git' | 'npm' | 'bundle', appRoot: string) {
     const marker = {
         pid: process.pid,
         host: HOST,

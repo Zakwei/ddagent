@@ -135,6 +135,23 @@ test('platform installations use the platform workflow regardless of install mod
   ]]);
 });
 
+test('release bundles refuse shell self-update without spawning commands', async () => {
+  const calls: unknown[] = [];
+  const service = createSystemUpdateService(createDependencies({
+    installMode: 'bundle',
+    runShellCommand: async (command) => {
+      calls.push(command);
+      return { exitCode: 0, output: '', errorOutput: '' };
+    },
+  }));
+
+  const result = await service.updateSystem();
+
+  assert.equal(result.success, false);
+  assert.match((result as { error: string }).error, /release bundle/);
+  assert.equal(calls.length, 0); // never reaches `sh` — absent on Windows.
+});
+
 test('failed update commands retain stdout and stderr for the existing API contract', async () => {
   const service = createSystemUpdateService(createDependencies({
     runShellCommand: async () => ({

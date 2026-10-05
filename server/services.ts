@@ -75,9 +75,10 @@ export type CreateServicesOptions = {
     appRoot?: string;
     /**
      * Install flavor reported by /health and used by the system module's
-     * update paths. Defaults to 'git' when `<appRoot>/.git` exists, else 'npm'.
+     * update paths. Defaults to 'bundle' when `<appRoot>/.installed.json`
+     * exists (release bundle), 'git' when `<appRoot>/.git` exists, else 'npm'.
      */
-    installMode?: 'git' | 'npm';
+    installMode?: 'git' | 'npm' | 'bundle';
     /**
      * Hosted-platform flag forwarded to the websocket verifier and the system
      * module. Defaults to the env-derived IS_PLATFORM. Feature modules that
@@ -112,7 +113,7 @@ export type CreateServicesResult = {
     wsDeps: WebSocketServerDependencies;
     /** Resolved composition settings, defaults applied. */
     appRoot: string;
-    installMode: 'git' | 'npm';
+    installMode: 'git' | 'npm' | 'bundle';
     isPlatform: boolean;
     /**
      * Version of the running code captured at composition time. Intentionally
@@ -166,7 +167,13 @@ export async function createServices(options: CreateServicesOptions = {}): Promi
     }
 
     const appRoot = options.appRoot ?? findApplicationRoot(getModuleDirectory(import.meta.url));
-    const installMode = options.installMode ?? (fs.existsSync(path.join(appRoot, '.git')) ? 'git' : 'npm');
+    // Release bundles ship `.installed.json` at the app root (written by
+    // scripts/release/build-server-bundle.js) — neither `git` nor `npm`
+    // self-update paths apply to them.
+    const installMode = options.installMode
+      ?? (fs.existsSync(path.join(appRoot, '.installed.json'))
+        ? 'bundle'
+        : fs.existsSync(path.join(appRoot, '.git')) ? 'git' : 'npm');
     const isPlatform = options.isPlatform ?? IS_PLATFORM;
     // Version of the code that is actually running, captured once at process
     // startup. This intentionally does NOT re-read package.json per request: after

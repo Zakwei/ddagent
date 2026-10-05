@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
+import 'package:ddagent_app/features/server_connect/data/server_profiles.dart';
 import 'package:ddagent_app/features/system/data/system_repository.dart';
 import 'package:ddagent_app/features/system/state/update_controller.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
@@ -22,6 +23,12 @@ class UpdateBadge extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // The local server self-updates through the app's own bundle pipeline —
+    // POST /api/system/update can't work on a release bundle, so the badge
+    // would only lead to a guaranteed failure. Remote servers keep it.
+    final profiles = ref.watch(serverProfilesProvider);
+    final active = profiles.profiles.where((p) => p.url == profiles.activeUrl).firstOrNull;
+    if (active?.isLocal ?? false) return const SizedBox.shrink();
     if (!ref.watch(updateAvailableProvider)) return const SizedBox.shrink();
     final t = Translations.of(context);
     final version = normalizeVersion(ref.watch(latestReleaseProvider).value!.tagName);
