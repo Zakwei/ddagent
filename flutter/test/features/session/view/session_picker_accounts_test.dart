@@ -215,6 +215,55 @@ void main() {
     expect(picks.single.$2, 'claude-2');
   });
 
+  testWidgets('names the ambient login for providers without named accounts', (t) async {
+    final picks = <(String, String?)>[];
+    // Only antigravity has a named account configured; codex relies on the
+    // quota adapter's ambient label to show its account name.
+    final accounts = <ProviderAccount>[
+      const ProviderAccount(
+        id: 'antigravity-1',
+        provider: 'antigravity',
+        label: 'napek9777@gmail.com',
+      ),
+    ];
+    final quota = <String, dynamic>{
+      'overview': {'watchThreshold': 75, 'dangerThreshold': 90},
+      'accounts': [
+        {
+          'id': 'codex',
+          'provider': 'codex',
+          'status': 'active',
+          'quality': 'cached',
+          'accountLabel': 'codex-user@example.com',
+          'windows': <dynamic>[],
+        },
+        {
+          'id': 'gemini',
+          'provider': 'gemini',
+          'status': 'active',
+          'quality': 'cached',
+          'accountLabel': 'ambient-antigravity@example.com',
+          'windows': <dynamic>[],
+        },
+      ],
+    };
+    await t.pumpWidget(
+      _harness(accounts: accounts, quota: quota, onNewChat: (p, a) => picks.add((p, a))),
+    );
+    await t.pumpAndSettle();
+
+    await _openPicker(t);
+
+    // codex shows its ambient account name instead of a bare provider row.
+    expect(find.textContaining('codex-user@example.com'), findsOneWidget);
+    await t.tap(find.textContaining('codex-user@example.com'));
+    await t.pumpAndSettle();
+
+    expect(picks, hasLength(1));
+    expect(picks.single.$1, 'codex');
+    expect(picks.single.$2, isNull);
+  });
+
   testWidgets('falls back to a flat provider list when the accounts API errors', (t) async {
     final picks = <(String, String?)>[];
     await t.pumpWidget(

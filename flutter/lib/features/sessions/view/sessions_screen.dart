@@ -14,6 +14,7 @@ import 'package:ddagent_app/features/orchestrator/state/orchestrator_controller.
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
+import 'package:ddagent_app/features/sessions/view/provider_account_picker.dart';
 import 'package:ddagent_app/features/sessions/view/session_list_row.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
@@ -550,13 +551,14 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
     field.dispose();
   }
 
-  /// New session: pick provider from capabilities (multi-provider prompt,
-  /// same as web/mobile), then open the (not-yet-implemented) chat route.
+  /// New session: pick a provider/account (grouped dialog, same as the
+  /// chat-pane picker) from capabilities, then open the chat route.
   /// 'Auto (orchestrator)' is a static extra entry (T18.1) — it needs a
   /// concrete projectPath, so it's only offered when one is known.
   Future<void> _newSession() async {
     final t = Translations.of(context);
     String provider = 'claude';
+    String? accountId;
     final canOrchestrate = (widget.projectPath ?? '').isNotEmpty;
     try {
       final caps = await ref.read(sessionsRepositoryProvider).capabilities();
@@ -566,27 +568,46 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
           if ((p as Map)['provider'] != null) p['provider'].toString(),
         if (canOrchestrate) 'orchestrator',
       ];
-      if (providers.length > 1 && mounted) {
-        final picked = await showDialog<String>(
+      if (mounted) {
+        // Grouped picker (provider → accounts). Returns null when no accounts
+        // are configured or the accounts API is unavailable, in which case we
+        // keep the flat provider list.
+        final result = await showProviderAccountPicker(
           context: context,
-          builder: (ctx) => AppDialog(
-            title: t.sessions.newSessionProvider,
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                for (final p in providers)
-                  ListTile(
-                    title: Text(p == 'orchestrator' ? t.sessions.autoOrchestrator : p),
-                    onTap: () => Navigator.of(ctx).pop(p),
-                  ),
-              ],
-            ),
-          ),
+          ref: ref,
+          providers: providers,
+          title: t.sessions.newSessionProvider,
         );
-        if (picked == null) return;
-        provider = picked;
-      } else if (providers.isNotEmpty) {
-        provider = providers.first;
+        if (result == null) {
+          if (providers.length > 1) {
+            if (!mounted) return;
+            final picked = await showDialog<String>(
+              context: context,
+              builder: (ctx) => AppDialog(
+                title: t.sessions.newSessionProvider,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    for (final p in providers)
+                      ListTile(
+                        title: Text(p == 'orchestrator' ? t.sessions.autoOrchestrator : p),
+                        onTap: () => Navigator.of(ctx).pop(p),
+                      ),
+                  ],
+                ),
+              ),
+            );
+            if (picked == null) return;
+            provider = picked;
+          } else if (providers.isNotEmpty) {
+            provider = providers.first;
+          }
+        } else {
+          final pick = result.selection;
+          if (pick == null) return;
+          provider = pick.provider;
+          accountId = pick.accountId;
+        }
       }
     } on AppError {
       // Fall back to the default provider.
@@ -602,7 +623,16 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
       }
       return;
     }
-    context.go('/chat/new?projectId=${widget.projectId ?? ''}&provider=$provider');
+    context.go(
+      Uri(
+        path: '/chat/new',
+        queryParameters: {
+          'projectId': widget.projectId ?? '',
+          'provider': provider,
+          'accountId': ?accountId,
+        },
+      ).toString(),
+    );
   }
 }
 

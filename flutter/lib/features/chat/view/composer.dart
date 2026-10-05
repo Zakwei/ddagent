@@ -37,6 +37,7 @@ class ChatComposer extends ConsumerStatefulWidget {
     this.projectId,
     this.projectPath,
     this.provider = 'claude',
+    this.initialAccountId,
     this.dense = false,
     this.focusNode,
     super.key,
@@ -46,6 +47,10 @@ class ChatComposer extends ConsumerStatefulWidget {
   final String? projectId;
   final String? projectPath;
   final String provider;
+
+  /// Account picked in the new-chat dialog for a draft session — selected once
+  /// on mount so the first send runs under it.
+  final String? initialAccountId;
 
   /// `[data-split-rows="2"]` parity — slimmed-down composer: the submit
   /// hint never renders and outer spacing shrinks.
@@ -105,6 +110,13 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final text = ref.read(composerProvider(_arg)).input;
       if (text.isNotEmpty && _input.text != text) _input.text = text;
+      // Draft account chosen in the new-chat dialog — pin it once so the first
+      // send carries `accountId` (the load may still be in flight; `_init`
+      // preserves the selection when the accounts list lands).
+      final initialAccountId = widget.initialAccountId;
+      if (initialAccountId != null && ref.read(composerProvider(_arg)).accountId == null) {
+        ref.read(composerProvider(_arg).notifier).selectAccount(initialAccountId);
+      }
     });
   }
 

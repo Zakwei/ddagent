@@ -192,6 +192,10 @@ final routerProvider = Provider<GoRouter>((ref) {
               sessionId: s.pathParameters['id'] ?? '',
               projectId: s.uri.queryParameters['projectId'],
               projectPath: s.uri.queryParameters['projectPath'],
+              // Draft `/chat/new` carries the provider/account the user picked
+              // in the provider dialog so the composer mounts on the right one.
+              initialProvider: s.uri.queryParameters['provider'],
+              initialAccountId: s.uri.queryParameters['accountId'],
               standalone: true,
             ),
           ),

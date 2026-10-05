@@ -56,6 +56,8 @@ class TranscriptView extends ConsumerStatefulWidget {
     required this.sessionId,
     this.projectId,
     this.projectPath,
+    this.initialProvider,
+    this.initialAccountId,
     this.dense = false,
     this.standalone = false,
     this.onOpenFile,
@@ -65,6 +67,12 @@ class TranscriptView extends ConsumerStatefulWidget {
   final String sessionId;
   final String? projectId;
   final String? projectPath;
+
+  /// Draft (`/chat/new`) provider/account picked in the new-chat dialog — used
+  /// until the session row resolves, so a fresh session mounts the composer on
+  /// the chosen provider with the chosen account pre-selected.
+  final String? initialProvider;
+  final String? initialAccountId;
 
   /// In-pane editor open (web `onFileOpen`) — the workspace wires this to
   /// `openFileInEditor`; standalone routes fall back to `/editor`.
@@ -655,7 +663,9 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
         _resolvedProvider ??
         ((details?.provider?.isNotEmpty ?? false) ? details!.provider! : null) ??
         messages.lastOrNull?.provider ??
-        (detailsAsync.hasError ? 'claude' : '');
+        // A draft (`/chat/new`) with no session row yet falls back to the
+        // provider the user picked in the new-chat dialog.
+        (detailsAsync.hasError ? (widget.initialProvider ?? 'claude') : '');
     if (provider.isNotEmpty) _resolvedProvider = provider;
     // The route may carry no projectPath (deep links); the session row knows
     // the workspace path, and the banner renders it like the web's
@@ -865,6 +875,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                                   projectId: projectId,
                                   projectPath: projectPath,
                                   provider: provider,
+                                  initialAccountId: widget.initialAccountId,
                                   dense: widget.dense,
                                   focusNode: _composerHoverFocus,
                                 ),
