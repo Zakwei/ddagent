@@ -22,6 +22,10 @@ class KnowledgeScreen extends ConsumerStatefulWidget {
 }
 
 class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
+  /// True while the "import everything" flow is running — the dashboard card
+  /// shows a spinner so a slow request never looks like "nothing happened".
+  bool _importing = false;
+
   Future<void> _exportKnowledge() async {
     final t = Translations.of(context);
     try {
@@ -95,19 +99,23 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
   /// One global action: import everything (project migration + agent skills).
   /// Reads the agents' files, writes only ddagent's database.
   Future<void> _openImportAll() async {
+    if (_importing) return;
     final t = Translations.of(context);
     final repo = ref.read(knowledgeRepositoryProvider);
+    setState(() => _importing = true);
     Map<String, dynamic> report;
     try {
       report = await repo.importEverything(dryRun: true);
     } on Object catch (error) {
       if (mounted) {
+        setState(() => _importing = false);
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(t.knowledge.errors.importFailed(error: error))));
       }
       return;
     }
     if (!mounted) return;
+    setState(() => _importing = false);
     var mergeDuplicates = true;
     var promoteRules = false;
     await showDialog<void>(
@@ -192,13 +200,34 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
                 onPressed: !dryRun
                     ? null
                     : () async {
-                        final result = await repo.importEverything(
-                          dryRun: false,
-                          dedupe: mergeDuplicates,
-                          promoteRules: promoteRules,
-                        );
-                        await ref.read(knowledgeControllerProvider.notifier).refresh();
-                        setState(() => report = result);
+                        this.setState(() => _importing = true);
+                        try {
+                          final result = await repo.importEverything(
+                            dryRun: false,
+                            dedupe: mergeDuplicates,
+                            promoteRules: promoteRules,
+                          );
+                          await ref.read(knowledgeControllerProvider.notifier).refresh();
+                          if (ctx.mounted) setState(() => report = result);
+                          final migration =
+                              result['migration'] as Map<String, dynamic>? ?? const {};
+                          final skills = result['skills'] as Map<String, dynamic>? ?? const {};
+                          final rules = migration['rules'] as Map<String, dynamic>? ?? const {};
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Imported — rules: ${rules['total'] ?? 0}, '
+                                  'new skills: ${skills['imported'] ?? 0}, '
+                                  'removed: ${migration['removed'] ?? 0}, '
+                                  'promoted: ${migration['promoted'] ?? 0}',
+                                ),
+                              ),
+                            );
+                          }
+                        } finally {
+                          if (mounted) this.setState(() => _importing = false);
+                        }
                       },
                 child: Text(t.knowledge.importAll.action),
               ),
@@ -653,6 +682,7 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
                     projects: projects,
                     controller: controller,
                     onImportAll: _openImportAll,
+                    importing: _importing,
                   ),
                   _MemoriesTab(state: state, projects: projects, controller: controller),
                   _RulesTab(state: state, projects: projects, controller: controller),
@@ -782,9 +812,12 @@ class _ContextBudgetCard extends StatelessWidget {
 
 /// Prominent one-click "import everything into ddagent" entry point.
 class _ImportAllCard extends StatelessWidget {
-  const _ImportAllCard({required this.onPressed});
+  const _ImportAllCard({required this.onPressed, required this.busy});
 
   final VoidCallback onPressed;
+
+  /// Shows a spinner while the import request is in flight.
+  final bool busy;
 
   @override
   Widget build(BuildContext context) {
@@ -813,7 +846,16 @@ class _ImportAllCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 16),
-            FilledButton(onPressed: onPressed, child: Text(i18n.knowledge.importAll.action)),
+            FilledButton(
+              onPressed: busy ? null : onPressed,
+              child: busy
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Text(i18n.knowledge.importAll.action),
+            ),
           ],
         ),
       ),
@@ -827,12 +869,14 @@ class _DashboardTab extends StatelessWidget {
     required this.projects,
     required this.controller,
     required this.onImportAll,
+    required this.importing,
   });
 
   final KnowledgeState state;
   final List<KnowledgeProjectOption> projects;
   final KnowledgeController controller;
   final VoidCallback onImportAll;
+  final bool importing;
 
   @override
   Widget build(BuildContext context) {
@@ -841,7 +885,7 @@ class _DashboardTab extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        _ImportAllCard(onPressed: onImportAll),
+        _ImportAllCard(onPressed: onImportAll, busy: importing),
         const SizedBox(height: 24),
         Wrap(
           spacing: 12,
