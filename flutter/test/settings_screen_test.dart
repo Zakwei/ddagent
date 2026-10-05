@@ -43,9 +43,7 @@ void main() {
       'tools',
       'notifications',
       'workspaces',
-      'schedules',
       'shortcuts',
-      'knowledge',
       'about',
     ]);
   });

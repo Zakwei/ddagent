@@ -2,10 +2,8 @@ import 'dart:async';
 
 import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
-import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/subpage_header.dart';
 import 'package:ddagent_app/features/auth/view/auth_screens.dart';
-import 'package:ddagent_app/features/settings/state/ui_preferences_controller.dart';
 import 'package:ddagent_app/features/settings/view/sections/about_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/agents_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/api_section.dart';
@@ -13,7 +11,6 @@ import 'package:ddagent_app/features/settings/view/sections/appearance_section.d
 import 'package:ddagent_app/features/settings/view/sections/git_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/notifications_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/orchestration_section.dart';
-import 'package:ddagent_app/features/settings/view/sections/settings_section_layout.dart';
 import 'package:ddagent_app/features/settings/view/sections/shortcuts_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/tools_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/workspaces_section.dart';
@@ -43,9 +40,7 @@ class SettingsSection {
 }
 
 /// Settings sections — mirrors the web client's `SettingsMainTab` order
-/// (src/components/settings/types/types.ts). The old `SettingsSidebar` has no
-/// entry for `schedules`; it keeps its union position here and deep-links to
-/// the standalone `/scheduler` screen, same as `knowledge` → `/knowledge`.
+/// (src/components/settings/types/types.ts).
 final settingsSections = <SettingsSection>[
   SettingsSection(
     id: 'agents',
@@ -98,31 +93,10 @@ final settingsSections = <SettingsSection>[
     build: (_) => const WorkspacesSection(),
   ),
   SettingsSection(
-    id: 'schedules',
-    icon: LucideIcons.calendarClock,
-    label: (t) => t.settings.schedules.title,
-    build: (_) => _LinkedSection(
-      'schedules',
-      '/scheduler',
-      (t) => t.settings.schedules.description,
-      // Web SchedulesSettingsTab row — the only pref living on that tab.
-      const _PreventSleepToggle(),
-    ),
-  ),
-  SettingsSection(
     id: 'shortcuts',
     icon: LucideIcons.keyboard,
     label: (t) => t.settings.mainTabs.shortcuts,
     build: (_) => const ShortcutsSection(),
-  ),
-  // ddagent-only section (no web `SettingsMainTab` entry): deep-links to the
-  // standalone Knowledge screen, same shape as the `schedules` link above.
-  SettingsSection(
-    id: 'knowledge',
-    icon: LucideIcons.brain,
-    label: (t) => t.knowledge.title,
-    build: (_) =>
-        _LinkedSection('knowledge', '/knowledge', (t) => t.knowledge.settings.description),
   ),
   SettingsSection(
     id: 'about',
@@ -285,82 +259,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-/// Body for sections that already exist as standalone screens — link card
-/// instead of nesting a second Scaffold inside the settings shell.
-class _LinkedSection extends StatelessWidget {
-  const _LinkedSection(this.id, this.route, [this.description, this.extra]);
-
-  final String id;
-  final String route;
-  final String Function(Translations t)? description;
-
-  /// Optional content between the description and the open-link button.
-  final Widget? extra;
-
-  @override
-  Widget build(BuildContext context) {
-    final t = Translations.of(context);
-    final c = context.appColors;
-    final tt = Theme.of(context).textTheme;
-    final s = settingsSectionFor(id)!;
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(s.icon, size: 28, color: c.mutedForeground),
-            const SizedBox(height: AppSpacing.sm),
-            Text(s.label(t), style: tt.titleMedium),
-            if (description != null) ...[
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                description!(t),
-                textAlign: TextAlign.center,
-                style: tt.bodySmall?.copyWith(color: c.mutedForeground),
-              ),
-            ],
-            if (extra != null) ...[const SizedBox(height: AppSpacing.md), extra!],
-            const SizedBox(height: AppSpacing.md),
-            AppButton(
-              variant: AppButtonVariant.outline,
-              size: AppButtonSize.sm,
-              onPressed: () => context.go(route),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                spacing: AppSpacing.xs,
-                children: [Icon(LucideIcons.arrowRight, size: 14), Text('Open')],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// `preventSleep` toggle — the only pref on the web SchedulesSettingsTab
-/// (keeps display awake while agents run). Consumers live in
-/// `AdaptiveScaffold` (wakelock sync).
-class _PreventSleepToggle extends ConsumerWidget {
-  const _PreventSleepToggle();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final t = Translations.of(context);
-    final prefs = ref.watch(uiPreferencesProvider);
-    return SettingsRow(
-      label: t.settings.schedules.preventSleep,
-      description: t.settings.schedules.preventSleepHint,
-      child: Switch(
-        value: prefs.preventSleep,
-        onChanged: (v) =>
-            ref.read(uiPreferencesProvider.notifier).update((p) => p.copyWith(preventSleep: v)),
       ),
     );
   }

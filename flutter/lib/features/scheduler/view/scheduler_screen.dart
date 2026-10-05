@@ -10,6 +10,7 @@ import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/quota/view/quota_tone.dart';
 import 'package:ddagent_app/features/scheduler/data/scheduler_models.dart';
 import 'package:ddagent_app/features/scheduler/state/scheduler_controller.dart';
+import 'package:ddagent_app/features/settings/state/ui_preferences_controller.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -71,6 +72,7 @@ class SchedulerScreen extends ConsumerWidget {
                 ],
               ),
             ),
+            const _SchedulerPrefsBar(),
             if (state.error != null)
               Container(
                 width: double.infinity,
@@ -122,6 +124,49 @@ class SchedulerScreen extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Scheduler preference strip — the `preventSleep` toggle that used to live on
+/// the settings "Schedules" tab (removed there as a duplicate of this screen).
+/// Consumers of the pref live in `AdaptiveScaffold` (wakelock sync).
+class _SchedulerPrefsBar extends ConsumerWidget {
+  const _SchedulerPrefsBar();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = Translations.of(context);
+    final c = context.appColors;
+    final tt = Theme.of(context).textTheme;
+    final prefs = ref.watch(uiPreferencesProvider);
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: c.border))),
+      child: Row(
+        children: [
+          Icon(Icons.bedtime_outlined, size: 16, color: c.mutedForeground),
+          const SizedBox(width: AppSpacing.xs),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(t.settings.schedules.preventSleep, style: tt.bodySmall),
+                Text(
+                  t.settings.schedules.preventSleepHint,
+                  style: tt.labelSmall?.copyWith(color: c.mutedForeground),
+                ),
+              ],
+            ),
+          ),
+          Switch(
+            value: prefs.preventSleep,
+            onChanged: (v) =>
+                ref.read(uiPreferencesProvider.notifier).update((p) => p.copyWith(preventSleep: v)),
+          ),
+        ],
       ),
     );
   }
