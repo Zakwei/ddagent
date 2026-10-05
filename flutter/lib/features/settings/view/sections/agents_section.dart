@@ -306,6 +306,8 @@ class _AccountContent extends ConsumerWidget {
 
     final loading = statusAsync.isLoading;
     final authenticated = status?.authenticated ?? false;
+    final installed = status?.installed ?? true;
+    final showInstall = !loading && !installed;
     final error = status?.error ?? (statusAsync.hasError ? statusAsync.error.toString() : null);
     // A login whose credential store exposes no account name (API-key logins,
     // providers without an identity source) still gets a provider-scoped label,
@@ -746,8 +748,7 @@ class _PermissionsContent extends StatelessWidget {
   Widget build(BuildContext context) => switch (agent) {
     'claude' => const _ToolPermissions(provider: 'claude', quickAdd: _commonClaudeTools),
     'cursor' => const _ToolPermissions(provider: 'cursor', quickAdd: _commonCursorCommands),
-    'codex' => const _CodexPermissions(),
-    _ => _ProviderModePermissions(provider: agent),
+    _ => _ModePermissions(provider: agent),
   };
 }
 
@@ -814,13 +815,7 @@ class _ToolPermissions extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Skip-permissions warning card.
-        Row(
-          children: [
-            const Icon(LucideIcons.triangleAlert, size: 20, color: warning),
-            const SizedBox(width: AppSpacing.md),
-            Text(p.title, style: tt.titleMedium),
-          ],
-        ),
+        _SettingsHeader(icon: LucideIcons.shield, color: const Color(0xFF16A34A), title: p.title),
         const SizedBox(height: AppSpacing.md),
         Container(
           padding: const EdgeInsets.all(AppSpacing.lg),
@@ -934,19 +929,12 @@ class _ListEditorState extends ConsumerState<_ListEditor> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Icon(
-              widget.isAllowed ? LucideIcons.shield : LucideIcons.triangleAlert,
-              size: 20,
-              color: tone,
-            ),
-            const SizedBox(width: AppSpacing.md),
-            Text(title, style: tt.titleMedium),
-          ],
+        _SettingsHeader(
+          icon: widget.isAllowed ? LucideIcons.shield : LucideIcons.triangleAlert,
+          color: tone,
+          title: title,
+          description: description,
         ),
-        const SizedBox(height: AppSpacing.xs),
-        Text(description, style: tt.bodySmall?.copyWith(color: c.mutedForeground)),
         const SizedBox(height: AppSpacing.md),
 
         Row(
@@ -1211,127 +1199,48 @@ class _ModeCard extends StatelessWidget {
   }
 }
 
-/// Codex permission mode cards + the `<details>` technical block.
-class _CodexPermissions extends ConsumerWidget {
-  const _CodexPermissions();
+/// Shared permissions header — icon, title and an optional muted description.
+/// Every agent's permissions view starts with this so the layout is uniform.
+class _SettingsHeader extends StatelessWidget {
+  const _SettingsHeader({
+    required this.icon,
+    required this.color,
+    required this.title,
+    this.description,
+  });
+
+  final IconData icon;
+  final Color color;
+  final String title;
+  final String? description;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final t = Translations.of(context);
+  Widget build(BuildContext context) {
     final c = context.appColors;
     final tt = Theme.of(context).textTheme;
-    final p = t.settings.permissions.codex;
-    final perms = ref.watch(agentPermissionsProvider('codex'));
-    final ctrl = ref.read(agentPermissionsProvider('codex').notifier);
-
-    (String, String, Color?, bool) modeData(String mode) => switch (mode) {
-      'acceptEdits' => (
-        p.modes.acceptEdits.title,
-        p.modes.acceptEdits.description,
-        const Color(0xFF16A34A),
-        false,
-      ),
-      'bypassPermissions' => (
-        p.modes.bypassPermissions.title,
-        p.modes.bypassPermissions.description,
-        const Color(0xFFEA580C),
-        true,
-      ),
-      _ => (p.modes.kDefault.title, p.modes.kDefault.description, null, false),
-    };
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            const Icon(LucideIcons.shield, size: 20, color: Color(0xFF16A34A)),
+            Icon(icon, size: 20, color: color),
             const SizedBox(width: AppSpacing.md),
-            Text(p.permissionMode, style: tt.titleMedium),
+            Text(title, style: tt.titleMedium),
           ],
         ),
-        const SizedBox(height: AppSpacing.xs),
-        Text(p.description, style: tt.bodySmall?.copyWith(color: c.mutedForeground)),
-        const SizedBox(height: AppSpacing.md),
-
-        for (final mode in agentPermissionModes['codex']!)
-          Builder(
-            builder: (context) {
-              final (title, desc, tone, warn) = modeData(mode);
-              return _ModeCard(
-                title: title,
-                description: desc,
-                selected: perms.permissionMode == mode,
-                tone: tone,
-                showWarning: warn,
-                onTap: () => ctrl.setPermissionMode(mode),
-              );
-            },
-          ),
-
-        // `<details>` parity — collapsible technical info.
-        Theme(
-          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-          child: ExpansionTile(
-            tilePadding: EdgeInsets.zero,
-            childrenPadding: EdgeInsets.zero,
-            title: Text(
-              p.technicalDetails,
-              style: tt.bodySmall?.copyWith(color: c.mutedForeground),
-            ),
-            children: [
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(AppSpacing.md),
-                decoration: BoxDecoration(
-                  color: c.muted.withValues(alpha: 0.5),
-                  borderRadius: AppRadii.borderLg,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    for (final (label, info) in [
-                      (p.modes.kDefault.title, p.technicalInfo.kDefault),
-                      (p.modes.acceptEdits.title, p.technicalInfo.acceptEdits),
-                      (p.modes.bypassPermissions.title, p.technicalInfo.bypassPermissions),
-                    ])
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                        child: Text.rich(
-                          TextSpan(
-                            children: [
-                              TextSpan(
-                                text: '$label: ',
-                                style: tt.labelSmall?.copyWith(fontWeight: FontWeight.w700),
-                              ),
-                              TextSpan(
-                                text: info,
-                                style: tt.labelSmall?.copyWith(color: c.mutedForeground),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    Text(
-                      p.technicalInfo.overrideNote,
-                      style: tt.labelSmall?.copyWith(
-                        color: c.mutedForeground.withValues(alpha: 0.75),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
+        if (description != null) ...[
+          const SizedBox(height: AppSpacing.xs),
+          Text(description!, style: tt.bodySmall?.copyWith(color: c.mutedForeground)),
+        ],
       ],
     );
   }
 }
 
-/// opencode/commandcode/antigravity/devin permission mode cards — `ProviderPermissionModeSettings`.
-class _ProviderModePermissions extends ConsumerWidget {
-  const _ProviderModePermissions({required this.provider});
+/// Permission-mode cards — one shared editor for every mode-based agent
+/// (codex/opencode/commandcode/antigravity/devin).
+class _ModePermissions extends ConsumerWidget {
+  const _ModePermissions({required this.provider});
 
   final String provider;
 
@@ -1339,7 +1248,6 @@ class _ProviderModePermissions extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = Translations.of(context);
     final c = context.appColors;
-    final tt = Theme.of(context).textTheme;
     final p = t.settings.permissions.permissionMode;
     final perms = ref.watch(agentPermissionsProvider(provider));
     final ctrl = ref.read(agentPermissionsProvider(provider).notifier);
@@ -1365,17 +1273,11 @@ class _ProviderModePermissions extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            const Icon(LucideIcons.shield, size: 20, color: Color(0xFF16A34A)),
-            const SizedBox(width: AppSpacing.md),
-            Text(p.title, style: tt.titleMedium),
-          ],
-        ),
-        const SizedBox(height: AppSpacing.xs),
-        Text(
-          p.description(provider: name),
-          style: tt.bodySmall?.copyWith(color: c.mutedForeground),
+        _SettingsHeader(
+          icon: LucideIcons.shield,
+          color: const Color(0xFF16A34A),
+          title: t.settings.permissions.title,
+          description: p.description(provider: name),
         ),
         const SizedBox(height: AppSpacing.md),
 
