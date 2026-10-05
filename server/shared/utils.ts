@@ -1053,20 +1053,36 @@ export const parseIncomingJsonObject = (payload: unknown): AnyRecord | null => {
 /**
  * Reads a JSON config file and guarantees a plain object result.
  *
- * Missing files are treated as an empty config object so provider-specific MCP
- * readers can operate against first-run environments without special-case file
+ * Missing or empty files are treated as an empty config object so provider-specific
+ * MCP readers can operate against first-run environments without special-case file
  * existence checks. If the file exists but contains invalid JSON, the parse error
- * is preserved and rethrown.
+ * is rethrown as an AppError naming the file — raw SyntaxError messages carry no
+ * path and are undiagnosable in install result lists.
  */
 export const readJsonConfig = async (filePath: string): Promise<Record<string, unknown>> => {
   try {
     const content = await readFile(filePath, 'utf8');
+    // An existing-but-empty file is not malformed — provider CLIs (e.g.
+    // Antigravity's mcp_config.json) can touch their config before ever
+    // writing JSON into it. Treat it like a missing file instead of failing
+    // JSON.parse on an empty string.
+    if (!content.trim()) {
+      return {};
+    }
     const parsed = JSON.parse(content) as Record<string, unknown>;
     return readObjectRecord(parsed) ?? {};
   } catch (error) {
     const code = (error as NodeJS.ErrnoException).code;
     if (code === 'ENOENT') {
       return {};
+    }
+
+    if (error instanceof SyntaxError) {
+      throw new AppError(`Invalid JSON in ${filePath}: ${error.message}`, {
+        code: 'INVALID_JSON_CONFIG',
+        statusCode: 400,
+        details: { filePath },
+      });
     }
 
     throw error;
