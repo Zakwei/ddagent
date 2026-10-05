@@ -64,22 +64,25 @@ klucza obcego), bo tabela projektów jest odtwarzana podczas migracji.
 
 ## Pobieranie kontekstu (na żądanie)
 
-Agenci pobierają kontekst przez narzędzie MCP `knowledge_get_context` (model
-Contexta). Dla danego projektu i zapytania zwraca ono po kolei:
+Agenci pobierają kontekst przez narzędzie MCP `knowledge_get_context` (wierny
+port ContextBuilder z Contexta). Dla danego projektu i zapytania zwraca ono po
+kolei:
 
-- **reguły** `critical` projektu (zawsze),
-- **reguły** dopasowane do zapytania,
-- odpowiednie **wspomnienia** (rankingowane przez FTS, plus ich sąsiedzi 1 skoku
-  osiągnięci przez połączenia),
-- **skille**, których nazwa/opis/kategoria pasuje do zapytania,
-- **informacje osobiste** tylko wtedy, gdy zapytanie do nich pasuje,
+- **wszystkie włączone reguły** (projektowe + globalne), `critical` najpierw (limit 20),
+- **wspomnienia** rankingowane przez zapytanie (FTS), plus ich sąsiedzi 1 skoku
+  osiągnięci przez połączenia (limit 5); bez zapytania najlepsze wspomnienia
+  projektu według priorytetu,
+- **skille** rankingowane przez zapytanie; bez zapytania najnowsze skille,
+- **informacje osobiste** tylko wtedy, gdy zapytanie do nich pasuje (limit 3),
 
-renderowane jako blok Markdown z budżetem tokenów (`maxTokens`, domyślnie ~4000).
-Bez zapytania zwraca reguły `critical` plus najlepsze wspomnienia.
+renderowane jako blok Markdown, którego elementy są przycinane osobno dla każdej
+sekcji (800/1000/600 znaków) i ograniczane przez `maxTokens` (domyślnie ~4000);
+elementy, które już się nie mieszczą, są liczone jako pominięte.
 
-Dashboard pokazuje **miernik kontekstu krytycznego** (`~X / 4000 tok`) dla
-wybranego projektu — rozmiar tego, co każde wywołanie `knowledge_get_context`
-zawsze zawiera. Do sesji nie jest automatycznie wstrzykiwane nic.
+Dashboard pokazuje **miernik kontekstu reguł** (`~X / 4000 tok`) dla
+wybranego projektu — rozmiar bloku reguł, który każde wywołanie
+`knowledge_get_context` zawsze zawiera. Do sesji nie jest automatycznie
+wstrzykiwane nic.
 
 ## Narzędzia MCP (na żądanie)
 

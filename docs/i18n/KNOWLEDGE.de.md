@@ -64,22 +64,25 @@ Fremdschlüssel), weil die Projekttabelle bei Migrationen neu aufgebaut wird.
 
 ## Kontext abrufen (auf Abruf)
 
-Agenten holen Kontext über das MCP-Tool `knowledge_get_context` (das Contexta-Modell).
-Für ein Projekt und eine Anfrage gibt es der Reihe nach zurück:
+Agenten holen Kontext über das MCP-Tool `knowledge_get_context` (eine getreue
+Portierung von Contextas ContextBuilder). Für ein Projekt und eine Anfrage gibt
+es der Reihe nach zurück:
 
-- die `critical` **Regeln** des Projekts (immer),
-- an die Anfrage angepasste **Regeln**,
-- relevante **Memories** (FTS-gereiht, plus ihre 1-Hop-Nachbarn, die über
-  Verbindungen erreicht werden),
-- **Skills**, deren Name/Beschreibung/Kategorie zur Anfrage passt,
-- **persönliche Informationen** nur, wenn die Anfrage darauf passt,
+- **alle aktivierten Regeln** (Projekt- + globale Regeln), `critical` zuerst (Limit 20),
+- **Memories**, nach der Anfrage gereiht (FTS), plus ihre 1-Hop-Nachbarn, die über
+  Verbindungen erreicht werden (Limit 5); ohne Anfrage die Top-Memories des Projekts
+  nach Priorität,
+- **Skills**, nach der Anfrage gereiht; ohne Anfrage die neuesten Skills,
+- **persönliche Informationen** nur, wenn die Anfrage darauf passt (Limit 3),
 
-gerendert als token-begrenzter Markdown-Block (`maxTokens`, Standard ~4000). Ohne
-Anfrage gibt es die `critical`-Regeln plus die Top-Memories zurück.
+gerendert als Markdown-Block, dessen Elemente pro Abschnitt gekürzt werden
+(800/1000/600 Zeichen) und durch `maxTokens` begrenzt sind (Standard ~4000);
+Elemente, die nicht mehr passen, werden als ausgelassen gezählt.
 
-Das Dashboard zeigt einen **Critical-Context-Meter** (`~X / 4000 tok`) für das
-ausgewählte Projekt — die Größe dessen, was jeder `knowledge_get_context`-Aufruf
-immer enthält. In Sitzungen wird nichts automatisch injiziert.
+Das Dashboard zeigt einen **Regelkontext-Meter** (`~X / 4000 tok`) für das
+ausgewählte Projekt — die Größe des Regelblocks, den jeder
+`knowledge_get_context`-Aufruf immer enthält. In Sitzungen wird nichts
+automatisch injiziert.
 
 ## MCP-Tools (auf Abruf)
 

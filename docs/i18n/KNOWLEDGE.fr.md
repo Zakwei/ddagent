@@ -65,22 +65,25 @@ clé étrangère) car la table des projets est reconstruite pendant les migratio
 
 ## Récupérer le contexte (à la demande)
 
-Les agents récupèrent le contexte via l’outil MCP `knowledge_get_context` (le modèle
-Contexta). Pour un projet et une requête donnés, il renvoie, dans l’ordre :
+Les agents récupèrent le contexte via l’outil MCP `knowledge_get_context` (un port
+fidèle du ContextBuilder de Contexta). Pour un projet et une requête donnés, il
+renvoie, dans l’ordre :
 
-- les **règles** `critical` du projet (toujours),
-- les **règles** correspondant à la requête,
-- les **mémoires** pertinentes (classées par FTS, plus leurs voisins à 1 saut
-  atteints via les connexions),
-- les **skills** dont le nom/la description/la catégorie correspond à la requête,
-- les **informations personnelles** uniquement quand la requête y correspond,
+- **toutes les règles activées** (projet + globales), `critical` en premier (limite 20),
+- les **mémoires** classées par la requête (FTS), plus leurs voisins à 1 saut
+  atteints via les connexions (limite 5) ; sans requête, les meilleures mémoires
+  du projet par priorité,
+- les **skills** classées par la requête ; sans requête, les skills les plus récentes,
+- les **informations personnelles** uniquement quand la requête y correspond (limite 3),
 
-le tout rendu sous forme de bloc Markdown à budget de tokens (`maxTokens`, ~4000 par
-défaut). Sans requête, il renvoie les règles `critical` plus les meilleures mémoires.
+le tout rendu sous forme de bloc Markdown dont les éléments sont tronqués par
+section (800/1000/600 caractères) et plafonnés par `maxTokens` (~4000 par défaut) ;
+les éléments qui ne rentrent plus sont comptés comme omis.
 
-Le tableau de bord affiche un **compteur de contexte critique** (`~X / 4000 tok`) pour le
-projet sélectionné — la taille de ce que chaque appel à `knowledge_get_context`
-inclut toujours. Rien n’est injecté automatiquement dans les sessions.
+Le tableau de bord affiche un **compteur de contexte de règles** (`~X / 4000 tok`)
+pour le projet sélectionné — la taille du bloc de règles que chaque appel à
+`knowledge_get_context` inclut toujours. Rien n’est injecté automatiquement dans
+les sessions.
 
 ## Outils MCP (à la demande)
 

@@ -65,23 +65,24 @@ clave foránea) porque la tabla de proyectos se reconstruye durante las migracio
 ## Recuperar contexto (bajo demanda)
 
 Los agentes obtienen contexto a través de la herramienta MCP
-`knowledge_get_context` (el modelo Contexta). Dado un proyecto y una consulta,
-devuelve, en orden:
+`knowledge_get_context` (un port fiel del ContextBuilder de Contexta). Dado un
+proyecto y una consulta, devuelve, en orden:
 
-- las **reglas** `critical` del proyecto (siempre),
-- **reglas** que coinciden con la consulta,
-- **memorias** relevantes (clasificadas por FTS, más sus vecinos a 1 salto
-  alcanzados a través de conexiones),
-- **skills** cuyo nombre/descripción/categoría coincide con la consulta,
-- **información personal** solo cuando la consulta coincide con ella,
+- **todas las reglas habilitadas** (de proyecto + globales), `critical` primero (límite 20),
+- **memorias** clasificadas por la consulta (FTS), más sus vecinos a 1 salto
+  alcanzados a través de conexiones (límite 5); sin consulta, las mejores memorias
+  del proyecto por prioridad,
+- **skills** clasificadas por la consulta; sin consulta, las skills más recientes,
+- **información personal** solo cuando la consulta coincide con ella (límite 3),
 
-renderizado como un bloque Markdown con presupuesto de tokens (`maxTokens`, por
-defecto ~4000). Sin consulta devuelve las reglas `critical` más las mejores
-memorias.
+renderizado como un bloque Markdown cuyos elementos se truncan por sección
+(800/1000/600 caracteres) y se limitan por `maxTokens` (por defecto ~4000); los
+elementos que ya no caben se cuentan como omitidos.
 
-El panel muestra un **medidor de contexto crítico** (`~X / 4000 tok`) para el
-proyecto seleccionado: el tamaño de lo que toda llamada a `knowledge_get_context`
-incluye siempre. No se inyecta nada automáticamente en las sesiones.
+El panel muestra un **medidor de contexto de reglas** (`~X / 4000 tok`) para el
+proyecto seleccionado: el tamaño del bloque de reglas que toda llamada a
+`knowledge_get_context` incluye siempre. No se inyecta nada automáticamente en las
+sesiones.
 
 ## Herramientas MCP (bajo demanda)
 

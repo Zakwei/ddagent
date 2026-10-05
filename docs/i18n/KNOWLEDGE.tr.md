@@ -63,22 +63,23 @@ anahtar değil), çünkü projeler tablosu geçişler sırasında yeniden oluşt
 
 ## Bağlamı alma (isteğe bağlı)
 
-Ajanlar bağlamı MCP aracı `knowledge_get_context` üzerinden alır (Contexta
-modeli). Bir proje ve sorgu verildiğinde sırayla şunları döndürür:
+Ajanlar bağlamı MCP aracı `knowledge_get_context` üzerinden alır (Contexta'nın
+ContextBuilder'ının birebir portu). Bir proje ve sorgu verildiğinde sırayla
+şunları döndürür:
 
-- projenin `critical` **kuralları** (her zaman),
-- sorguyla eşleşen **kurallar**,
-- ilgili **anılar** (FTS ile sıralanmış, ayrıca bağlantılar üzerinden ulaşılan
-  1 atlamalı komşuları),
-- adı/açıklaması/kategorisi sorguyla eşleşen **beceriler**,
-- yalnızca sorgu eşleştiğinde **kişisel bilgiler**,
+- **etkin tüm kurallar** (proje + genel), `critical` önce (üst sınır 20),
+- sorguya göre sıralanmış **anılar** (FTS), ayrıca bağlantılar üzerinden ulaşılan
+  1 atlamalı komşuları (üst sınır 5); sorgu yoksa, projenin önceliğe göre en iyi anıları,
+- sorguya göre sıralanmış **beceriler**; sorgu yoksa, en yeni beceriler,
+- yalnızca sorgu eşleştiğinde **kişisel bilgiler** (üst sınır 3),
 
-token bütçeli bir Markdown bloğu olarak oluşturulur (`maxTokens`, varsayılan ~4000).
-Sorgu yoksa `critical` kuralları ve en iyi anıları döndürür.
+her bölüm için öğeleri kısaltılan (800/1000/600 karakter) ve `maxTokens` ile
+sınırlanan (varsayılan ~4000) bir Markdown bloğu olarak oluşturulur; artık sığmayan
+öğeler atlanmış olarak sayılır.
 
-Panel, seçilen proje için bir **kritik bağlam ölçeri** (`~X / 4000 tok`) gösterir —
-her `knowledge_get_context` çağrısının her zaman içerdiği şeyin boyutu. Oturumlara
-otomatik olarak hiçbir şey enjekte edilmez.
+Panel, seçilen proje için bir **kural bağlamı ölçeri** (`~X / 4000 tok`) gösterir —
+her `knowledge_get_context` çağrısının her zaman içerdiği kural bloğunun boyutu.
+Oturumlara otomatik olarak hiçbir şey enjekte edilmez.
 
 ## MCP araçları (isteğe bağlı)
 

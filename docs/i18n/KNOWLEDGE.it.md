@@ -65,21 +65,23 @@ chiave esterna) perché la tabella dei progetti viene ricostruita durante le mig
 ## Recuperare il contesto (su richiesta)
 
 Gli agenti ottengono il contesto tramite lo strumento MCP `knowledge_get_context`
-(il modello Contexta). Dati un progetto e una query, restituisce, in ordine:
+(un port fedele del ContextBuilder di Contexta). Dati un progetto e una query,
+restituisce, in ordine:
 
-- le **regole** `critical` del progetto (sempre),
-- le **regole** che corrispondono alla query,
-- le **memorie** rilevanti (ordinate per FTS, più i loro vicini a 1 salto
-  raggiunti tramite le connessioni),
-- le **skill** il cui nome/descrizione/categoria corrisponde alla query,
-- le **informazioni personali** solo quando la query vi corrisponde,
+- **tutte le regole abilitate** (di progetto + globali), `critical` per prime (limite 20),
+- **memorie** ordinate per la query (FTS), più i loro vicini a 1 salto raggiunti
+  tramite le connessioni (limite 5); senza query, le memorie principali del progetto
+  per priorità,
+- **skill** ordinate per la query; senza query, le skill più recenti,
+- **informazioni personali** solo quando la query vi corrisponde (limite 3),
 
-il tutto reso come blocco Markdown con budget di token (`maxTokens`, predefinito
-~4000). Senza query restituisce le regole `critical` più le memorie principali.
+il tutto reso come blocco Markdown i cui elementi sono troncati per sezione
+(800/1000/600 caratteri) e limitati da `maxTokens` (predefinito ~4000); gli
+elementi che non entrano più sono contati come omessi.
 
-La dashboard mostra un **misuratore del contesto critico** (`~X / 4000 tok`) per il
-progetto selezionato — la dimensione di ciò che ogni chiamata a
-`knowledge_get_context` include sempre. Niente viene iniettato automaticamente
+La dashboard mostra un **misuratore del contesto delle regole** (`~X / 4000 tok`)
+per il progetto selezionato — la dimensione del blocco di regole che ogni chiamata
+a `knowledge_get_context` include sempre. Niente viene iniettato automaticamente
 nelle sessioni.
 
 ## Strumenti MCP (su richiesta)
