@@ -14,252 +14,108 @@
 -->
 <!-- lang:en -->
 ### What's new
-- The app is now a single Flutter client — web, Linux & Windows desktop, and Android — replacing the old web UI, the Electron desktop app, and the Expo mobile app
-- Knowledge base: rules, memories, and skills with hybrid full-text search, a relation graph, project/tag hubs, and one-click import of project AI-context files and agent skills
-- Knowledge context is now query-driven (Contexta-style) — agents pull relevant rules instead of auto-injection, with a critical-rules budget meter
-- Orchestrator: supervised auto mode with a goal contract, decision loop, checkpoints, and a final report; redundant provider accounts with automatic failover and ordered planner-model fallbacks
-- New providers: native Antigravity (agy) CLI and Command Code via ACP, plus a live Codex model catalog
-- Provider accounts: per-account quota, account names in pickers, the ambient login shown as a Default account, and per-account login in settings
-- ddagent MCP server installer — one click in Settings → Agents → MCP or during onboarding installs it into your agent configs
-- Workspace panes sync across devices — open sessions, editor, and git panes follow you between the web UI and the Flutter app
-- Unified skills/rules/context pipeline shared by all providers
-- Quota: per-window usage pills (daily/weekly/monthly) colored by burn rate, with Codex, Claude, and Cursor subscription support
+- The desktop app can now run the ddagent server on this device — choose "This device" on the connect screen: it downloads the matching server bundle, finds or installs a Node.js 22+ runtime, and starts it on 127.0.0.1. Connecting to a remote server still works as before
+- An already-running server on this machine (e.g. a systemd service) is adopted instead of duplicated, and is never stopped when the app exits
+- New installers: a Windows setup.exe wizard and a Linux .deb package alongside the plain archives
 
 ### Bug fixes
-- Agent questions now reach the UI — pending asks merge into one stepped panel and free-text answers are delivered back to ACP agents
-- "Send now" promotes the queued message instead of aborting the active turn; question answers no longer leak into the send queue
-- Notifications: "notify this device" actually delivers
-- Workspace: cold-boot devices and reconnect snapshots no longer clobber or close live panes
-- Fixed terminal auth URLs, transcript copy/paste over plain HTTP, and scroll pinning
-- Performance: transcript caching, bounded render windows, a 30-minute model-catalog cache, and a gzip-compressed Flutter web payload (6.9 MB → 2.0 MB)
+- Fixed the missing libsecret dependency that blocked the Linux desktop build
 
 <!-- lang:pl -->
 ### Co nowego
-- Aplikacja to teraz jeden klient Flutter — web, desktop Linux i Windows oraz Android — zastępujący stary web UI, aplikację Electron i aplikację mobilną Expo
-- Baza wiedzy: reguły, wspomnienia i skille z hybrydowym wyszukiwaniem pełnotekstowym, grafem relacji, hubami projektów/tagów oraz importem jednym kliknięciem plików AI-context projektu i skilli agentów
-- Kontekst wiedzy jest teraz query-driven (w stylu Contexta) — agenci pobierają relevantne reguły zamiast auto-injekcji, z miernikiem budżetu reguł krytycznych
-- Orkiestrator: nadzorowany tryb auto z kontraktem celu, pętlą decyzyjną, checkpointami i raportem końcowym; redundantne konta providerów z automatycznym failoverem i uporządkowanymi fallbackami modelu plannera
-- Nowi providerzy: natywny Antigravity (agy) CLI i Command Code przez ACP, plus live katalog modeli Codex
-- Konta providerów: quota per konto, nazwy kont w pickerach, ambient login jako konto Default i logowanie per konto w ustawieniach
-- Instalator serwera ddagent MCP — jedno kliknięcie w Ustawienia → Agenci → MCP lub podczas onboardingu instaluje go w konfiguracjach agentów
-- Panele workspace synchronizują się między urządzeniami — otwarte sesje, edytor i panele gita podążają za Tobą między web UI a aplikacją Flutter
-- Ujednolicony pipeline skills/rules/context współdzielony przez wszystkich providerów
-- Quota: pigułki zużycia per okno (dzienne/tygodniowe/miesięczne) kolorowane wg tempa zużycia, z obsługą subskrypcji Codex, Claude i Cursor
+- Aplikacja desktopowa może teraz uruchomić serwer ddagent na tym urządzeniu — wybierz „To urządzenie” na ekranie połączenia: pobierze pasujący pakiet serwera, znajdzie lub zainstaluje Node.js 22+ i uruchomi go na 127.0.0.1. Łączenie ze zdalnym serwerem działa jak dotychczas
+- Już działający serwer na tym komputerze (np. usługa systemd) zostanie przejęty zamiast zdublowany i nigdy nie jest zatrzymywany przy zamykaniu aplikacji
+- Nowe instalatory: kreator setup.exe dla Windows i pakiet .deb dla Linuksa obok zwykłych archiwów
 
-### Poprawki
-- Pytania agentów docierają teraz do UI — oczekujące zapytania są scalone w jeden panel krokowy, a odpowiedzi wolnym tekstem trafiają z powrotem do agentów ACP
-- „Wyślij teraz" promuje wiadomość z kolejki zamiast przerywać aktywny turn; odpowiedzi na pytania nie wpadają już do kolejki wysyłania
-- Powiadomienia: „powiadom to urządzenie" faktycznie dostarcza
-- Workspace: urządzenia po cold-boocie i snapshoty reconnect nie nadpisują i nie zamykają już aktywnych paneli
-- Naprawiono URL-e autoryzacji w terminalu, kopiowanie/wklejanie transcriptu po zwykłym HTTP i przypinanie scrolla
-- Wydajność: cache transcriptów, ograniczone okno renderowania, 30-minutowy cache katalogów modeli i gzip payloadu Flutter web (6,9 MB → 2,0 MB)
+### Poprawki błędów
+- Naprawiono brakującą zależność libsecret, która blokowała build desktopowy dla Linuksa
 
 <!-- lang:de -->
-### Neuigkeiten
-- Die App ist jetzt ein einziger Flutter-Client — Web, Linux- & Windows-Desktop sowie Android — und ersetzt die alte Web-UI, die Electron-Desktop-App und die Expo-Mobil-App
-- Wissensdatenbank: Regeln, Erinnerungen und Skills mit hybrider Volltextsuche, Relationsgraph, Projekt-/Tag-Hubs und One-Click-Import von KI-Kontextdateien des Projekts und Agenten-Skills
-- Wissenskontext ist jetzt query-driven (Contexta-Stil) — Agenten rufen relevante Regeln ab statt Auto-Injection, mit Budget-Anzeige für kritische Regeln
-- Orchestrator: überwachter Auto-Modus mit Zielvertrag, Entscheidungsschleife, Checkpoints und Abschlussbericht; redundante Provider-Konten mit automatischem Failover und geordneten Planner-Modell-Fallbacks
-- Neue Provider: natives Antigravity (agy) CLI und Command Code via ACP, plus Live-Modellkatalog für Codex
-- Provider-Konten: Quota pro Konto, Kontonamen in den Auswahllisten, Ambient-Login als Default-Konto und Login pro Konto in den Einstellungen
-- ddagent-MCP-Server-Installer — ein Klick in Einstellungen → Agents → MCP oder im Onboarding installiert ihn in die Agenten-Konfigurationen
-- Workspace-Panes synchronisieren sich über Geräte hinweg — offene Sessions, Editor- und Git-Panes folgen dir zwischen Web-UI und Flutter-App
-- Einheitliche Skills/Rules/Context-Pipeline für alle Provider
-- Quota: Verbrauchs-Pills pro Fenster (täglich/wöchentlich/monatlich), gefärbt nach Verbrauchstempo, mit Codex-, Claude- und Cursor-Abo-Unterstützung
+### Neu
+- Die Desktop-App kann den ddagent-Server jetzt auf diesem Gerät ausführen — wähle „Dieses Gerät“ im Verbindungsbildschirm: Es lädt das passende Server-Bundle herunter, findet oder installiert eine Node.js-22+-Laufzeit und startet ihn auf 127.0.0.1. Die Verbindung zu einem Remote-Server funktioniert weiterhin wie gewohnt
+- Ein bereits laufender Server auf diesem Rechner (z. B. ein systemd-Dienst) wird übernommen statt dupliziert und beim Beenden der App nie gestoppt
+- Neue Installer: ein Windows-setup.exe-Assistent und ein Linux-.deb-Paket neben den einfachen Archiven
 
 ### Fehlerbehebungen
-- Agenten-Fragen erreichen jetzt die UI — ausstehende Anfragen werden in einem gestuften Panel zusammengefasst und Freitext-Antworten an ACP-Agenten zurückgeliefert
-- „Jetzt senden" befördert die wartende Nachricht statt den aktiven Turn abzubrechen; Frage-Antworten landen nicht mehr in der Sende-Queue
-- Benachrichtigungen: „Dieses Gerät benachrichtigen" liefert jetzt tatsächlich
-- Workspace: Cold-Boot-Geräte und Reconnect-Snapshots überschreiben bzw. schließen keine aktiven Panes mehr
-- Terminal-Auth-URLs, Transcript-Copy/Paste über HTTP und Scroll-Pinning korrigiert
-- Performance: Transcript-Caching, begrenzte Render-Fenster, 30-Minuten-Modellkatalog-Cache und gzip-komprimierte Flutter-Web-Payload (6,9 MB → 2,0 MB)
+- Fehlende libsecret-Abhängigkeit behoben, die den Linux-Desktop-Build blockierte
 
 <!-- lang:es -->
 ### Novedades
-- La app es ahora un único cliente Flutter — web, escritorio Linux y Windows, y Android — que reemplaza la antigua UI web, la app de escritorio Electron y la app móvil Expo
-- Base de conocimiento: reglas, memorias y skills con búsqueda híbrida de texto completo, grafo de relaciones, hubs de proyectos/etiquetas e importación con un clic de archivos de contexto IA del proyecto y skills de agentes
-- El contexto de conocimiento ahora es query-driven (estilo Contexta): los agentes consultan las reglas relevantes en lugar de auto-inyección, con medidor de presupuesto de reglas críticas
-- Orquestador: modo auto supervisado con contrato de objetivo, bucle de decisiones, checkpoints e informe final; cuentas de proveedor redundantes con failover automático y fallbacks ordenados del modelo planificador
-- Nuevos proveedores: Antigravity (agy) CLI nativo y Command Code vía ACP, además del catálogo de modelos Codex en vivo
-- Cuentas de proveedor: cuota por cuenta, nombres de cuenta en los selectores, login ambient como cuenta Default y login por cuenta en ajustes
-- Instalador del servidor MCP de ddagent — un clic en Ajustes → Agentes → MCP o durante el onboarding lo instala en las configuraciones de tus agentes
-- Los paneles del workspace se sincronizan entre dispositivos: sesiones abiertas, editor y paneles de git te siguen entre la UI web y la app Flutter
-- Pipeline unificado de skills/rules/context compartido por todos los proveedores
-- Cuota: píldoras de uso por ventana (diaria/semanal/mensual) coloreadas según el ritmo de consumo, con soporte de suscripciones Codex, Claude y Cursor
+- La aplicación de escritorio ahora puede ejecutar el servidor ddagent en este dispositivo — elige «Este dispositivo» en la pantalla de conexión: descarga el paquete de servidor correspondiente, encuentra o instala un runtime de Node.js 22+ y lo inicia en 127.0.0.1. La conexión a un servidor remoto sigue funcionando como antes
+- Un servidor ya en ejecución en esta máquina (p. ej. un servicio systemd) se adopta en lugar de duplicarse y nunca se detiene al cerrar la aplicación
+- Nuevos instaladores: un asistente setup.exe para Windows y un paquete .deb para Linux junto a los archivos comprimidos
 
-### Correcciones
-- Las preguntas de los agentes llegan ahora a la UI: las solicitudes pendientes se combinan en un panel por pasos y las respuestas de texto libre se entregan a los agentes ACP
-- «Enviar ahora» promueve el mensaje en cola en lugar de abortar el turno activo; las respuestas a preguntas ya no se cuelan en la cola de envío
-- Notificaciones: «notificar a este dispositivo» ahora sí entrega
-- Workspace: los dispositivos en cold-boot y los snapshots de reconnect ya no sobrescriben ni cierran paneles activos
-- Corregidas las URLs de autenticación del terminal, copiar/pegar del transcript por HTTP plano y la fijación del scroll
-- Rendimiento: caché de transcripts, ventanas de renderizado acotadas, caché de catálogos de modelos de 30 min y payload Flutter web comprimido con gzip (6,9 MB → 2,0 MB)
+### Correcciones de errores
+- Se corrigió la dependencia libsecret que faltaba y bloqueaba la compilación de escritorio en Linux
 
 <!-- lang:fr -->
 ### Nouveautés
-- L'application est désormais un unique client Flutter — web, desktop Linux & Windows et Android — qui remplace l'ancienne UI web, l'app desktop Electron et l'app mobile Expo
-- Base de connaissances : règles, mémoires et skills avec recherche hybride plein texte, graphe de relations, hubs de projets/tags et import en un clic des fichiers de contexte IA du projet et des skills d'agents
-- Le contexte de connaissances est désormais query-driven (style Contexta) : les agents récupèrent les règles pertinentes au lieu d'une auto-injection, avec une jauge de budget pour les règles critiques
-- Orchestrateur : mode auto supervisé avec contrat d'objectif, boucle de décision, checkpoints et rapport final ; comptes provider redondants avec failover automatique et fallbacks ordonnés du modèle planificateur
-- Nouveaux providers : Antigravity (agy) CLI natif et Command Code via ACP, plus le catalogue de modèles Codex en direct
-- Comptes provider : quota par compte, noms de comptes dans les sélecteurs, login ambient comme compte Default et login par compte dans les réglages
-- Installeur du serveur MCP ddagent — un clic dans Réglages → Agents → MCP ou pendant l'onboarding l'installe dans les configs de vos agents
-- Les panes du workspace se synchronisent entre appareils — sessions ouvertes, éditeur et panes git vous suivent entre la UI web et l'app Flutter
-- Pipeline unifié skills/rules/context partagé par tous les providers
-- Quota : pilules d'usage par fenêtre (journalière/hebdomadaire/mensuelle) colorées selon le rythme de consommation, avec support des abonnements Codex, Claude et Cursor
+- L'application de bureau peut désormais exécuter le serveur ddagent sur cet appareil — choisissez « Cet appareil » sur l'écran de connexion : elle télécharge le bundle serveur correspondant, trouve ou installe un runtime Node.js 22+ et le démarre sur 127.0.0.1. La connexion à un serveur distant fonctionne toujours comme avant
+- Un serveur déjà en cours d'exécution sur cette machine (par ex. un service systemd) est adopté au lieu d'être dupliqué et n'est jamais arrêté à la fermeture de l'application
+- Nouveaux installateurs : un assistant setup.exe pour Windows et un paquet .deb pour Linux en plus des archives simples
 
-### Corrections
-- Les questions des agents arrivent désormais dans la UI — les demandes en attente sont fusionnées dans un panneau par étapes et les réponses en texte libre sont renvoyées aux agents ACP
-- « Envoyer maintenant » promeut le message en file au lieu d'interrompre le tour actif ; les réponses aux questions ne fuient plus dans la file d'envoi
-- Notifications : « notifier cet appareil » fonctionne réellement
-- Workspace : les appareils en cold-boot et les snapshots de reconnexion n'écrasent ni ne ferment plus les panes actifs
-- URLs d'auth du terminal, copier/coller du transcript en HTTP simple et pinning du scroll corrigés
-- Performance : cache des transcripts, fenêtres de rendu bornées, cache des catalogues de modèles de 30 min et payload Flutter web compressé en gzip (6,9 Mo → 2,0 Mo)
+### Corrections de bugs
+- Correction de la dépendance libsecret manquante qui bloquait le build Linux de bureau
 
 <!-- lang:it -->
 ### Novità
-- L'app è ora un unico client Flutter — web, desktop Linux e Windows e Android — che sostituisce la vecchia UI web, l'app desktop Electron e l'app mobile Expo
-- Knowledge base: regole, memorie e skill con ricerca ibrida full-text, grafo delle relazioni, hub di progetti/tag e importazione con un clic dei file di contesto AI del progetto e delle skill degli agenti
-- Il contesto della conoscenza è ora query-driven (stile Contexta): gli agenti recuperano le regole rilevanti invece dell'auto-iniezione, con misuratore del budget delle regole critiche
-- Orchestrator: modalità auto supervisionata con contratto d'obiettivo, ciclo decisionale, checkpoint e report finale; account provider ridondanti con failover automatico e fallback ordinati del modello planner
-- Nuovi provider: Antigravity (agy) CLI nativo e Command Code via ACP, oltre al catalogo modelli Codex in tempo reale
-- Account provider: quota per account, nomi degli account nei selettori, login ambient come account Default e login per account nelle impostazioni
-- Installer del server MCP ddagent — un clic in Impostazioni → Agenti → MCP o durante l'onboarding lo installa nelle configurazioni degli agenti
-- I pannelli del workspace si sincronizzano tra dispositivi — sessioni aperte, editor e pannelli git ti seguono tra la UI web e l'app Flutter
-- Pipeline unificata skills/rules/context condivisa da tutti i provider
-- Quota: pillole di utilizzo per finestra (giornaliera/settimanale/mensile) colorate in base al ritmo di consumo, con supporto agli abbonamenti Codex, Claude e Cursor
+- L'app desktop ora può eseguire il server ddagent su questo dispositivo — scegli «Questo dispositivo» nella schermata di connessione: scarica il bundle server corrispondente, trova o installa un runtime Node.js 22+ e lo avvia su 127.0.0.1. La connessione a un server remoto funziona ancora come prima
+- Un server già in esecuzione su questa macchina (ad es. un servizio systemd) viene adottato invece di essere duplicato e non viene mai arrestato all'uscita dell'app
+- Nuovi installer: una procedura guidata setup.exe per Windows e un pacchetto .deb per Linux insieme ai semplici archivi
 
-### Correzioni
-- Le domande degli agenti ora raggiungono la UI — le richieste in sospeso sono unite in un pannello a step e le risposte in testo libero vengono consegnate agli agenti ACP
-- «Invia ora» promuove il messaggio in coda invece di interrompere il turno attivo; le risposte alle domande non finiscono più nella coda di invio
-- Notifiche: «notifica questo dispositivo» ora funziona davvero
-- Workspace: i dispositivi in cold-boot e gli snapshot di reconnect non sovrascrivono né chiudono più i pannelli attivi
-- Corretti URL di autenticazione del terminale, copia/incolla del transcript su HTTP semplice e pinning dello scroll
-- Prestazioni: cache dei transcript, finestre di rendering limitate, cache dei cataloghi modelli di 30 min e payload Flutter web compresso in gzip (6,9 MB → 2,0 MB)
+### Correzioni di bug
+- Corretta la dipendenza libsecret mancante che bloccava la build desktop per Linux
 
 <!-- lang:ja -->
 ### 新機能
-- アプリは単一の Flutter クライアント（Web、Linux & Windows デスクトップ、Android）になり、旧 Web UI・Electron デスクトップアプリ・Expo モバイルアプリを置き換えました
-- ナレッジベース：ルール・メモリ・スキルを管理。全文ハイブリッド検索、リレーショングラフ、プロジェクト/タグのハブ、プロジェクトの AI コンテキストファイルとエージェントスキルのワンクリックインポート
-- ナレッジコンテキストはクエリ駆動（Contexta 方式）に — 自動注入ではなくエージェントが関連ルールを取得。クリティカルルールの予算メーター付き
-- オーケストレーター：ゴール契約・意思決定ループ・チェックポイント・最終レポートを備えた監督付き自動モード。自動フェイルオーバー付き冗長プロバイダーアカウントと順序付きプランナーモデルフォールバック
-- 新プロバイダー：ネイティブ Antigravity (agy) CLI と ACP 経由の Command Code、Codex のライブモデルカタログ
-- プロバイダーアカウント：アカウント単位のクォータ、ピッカー内のアカウント名表示、ambient ログインの Default アカウント化、設定での個別ログイン
-- ddagent MCP サーバーインストーラー — 設定 → エージェント → MCP またはオンボーディングからワンクリックでエージェント設定にインストール
-- ワークスペースのペインがデバイス間で同期 — 開いているセッション・エディタ・Git ペインが Web UI と Flutter アプリ間で引き継がれます
-- 全プロバイダー共通の統一 skills/rules/context パイプライン
-- クォータ：ウィンドウ別（日/週/月）の使用量ピルを消費ペースで色分け。Codex・Claude・Cursor サブスクリプション対応
+- デスクトップアプリがこのデバイス上でddagentサーバーを実行できるようになりました — 接続画面で「このデバイス」を選択すると、対応するサーバーバンドルをダウンロードし、Node.js 22以降のランタイムを検出またはインストールして、127.0.0.1で起動します。リモートサーバーへの接続は従来どおり利用できます
+- このマシンですでに実行中のサーバー（systemdサービスなど）は重複起動せず引き継がれ、アプリ終了時に停止されることはありません
+- 新しいインストーラー：通常のアーカイブに加えて、Windows用setup.exeウィザードとLinux用.debパッケージ
 
-### 修正
-- エージェントの質問が UI に届くように — 保留中の質問はステップ式パネルに統合され、自由記述の回答は ACP エージェントへ返されます
-- 「今すぐ送信」はアクティブなターンを中断せずキューのメッセージを優先送信。質問への回答が送信キューに漏れなくなりました
-- 通知：「このデバイスに通知」が実際に届くように
-- ワークスペース：cold-boot したデバイスや再接続スナップショットがアクティブなペインを上書き・閉じなくなりました
-- ターミナルの認証 URL、平文 HTTP でのトランスクリプトのコピー/ペースト、スクロールのピン留めを修正
-- パフォーマンス：トランスクリプトのキャッシュ、描画ウィンドウの限定、モデルカタログの 30 分キャッシュ、Flutter Web ペイロードの gzip 圧縮（6.9 MB → 2.0 MB）
+### バグ修正
+- Linuxデスクトップビルドを妨げていたlibsecret依存関係の不足を修正しました
 
 <!-- lang:ko -->
 ### 새로운 기능
-- 앱이 이제 단일 Flutter 클라이언트(웹, Linux & Windows 데스크톱, Android)로 통합되어 기존 웹 UI, Electron 데스크톱 앱, Expo 모바일 앱을 대체합니다
-- 지식 베이스: 규칙, 메모리, 스킬 관리 — 전문 하이브리드 검색, 관계 그래프, 프로젝트/태그 허브, 프로젝트 AI 컨텍스트 파일 및 에이전트 스킬 원클릭 가져오기
-- 지식 컨텍스트가 쿼리 기반(Contexta 방식)으로 변경 — 자동 주입 대신 에이전트가 관련 규칙을 가져오며, 크리티컬 규칙 예산 미터 제공
-- 오케스트레이터: 목표 계약, 의사결정 루프, 체크포인트, 최종 리포트를 갖춘 감독형 자동 모드. 자동 페일오버가 있는 중복 프로바이더 계정과 순서 있는 플래너 모델 폴백
-- 새 프로바이더: 네이티브 Antigravity (agy) CLI와 ACP 기반 Command Code, Codex 실시간 모델 카탈로그
-- 프로바이더 계정: 계정별 쿼터, 선택기의 계정 이름 표시, ambient 로그인의 Default 계정화, 설정에서 계정별 로그인
-- ddagent MCP 서버 인스톨러 — 설정 → 에이전트 → MCP 또는 온보딩에서 한 번의 클릭으로 에이전트 설정에 설치
-- 워크스페이스 패인이 기기 간 동기화 — 열린 세션, 에디터, Git 패인이 웹 UI와 Flutter 앱 사이를 따라다닙니다
-- 모든 프로바이더가 공유하는 통합 skills/rules/context 파이프라인
-- 쿼터: 윈도우별(일/주/월) 사용량 pill을 소모 속도에 따라 색상 표시, Codex·Claude·Cursor 구독 지원
+- 데스크톱 앱이 이제 이 기기에서 ddagent 서버를 실행할 수 있습니다 — 연결 화면에서 "이 기기"를 선택하면 해당 서버 번들을 다운로드하고, Node.js 22+ 런타임을 찾거나 설치한 뒤 127.0.0.1에서 시작합니다. 원격 서버 연결도 이전과 같이 사용할 수 있습니다
+- 이 컴퓨터에서 이미 실행 중인 서버(예: systemd 서비스)는 중복 실행하지 않고 그대로 사용하며, 앱 종료 시에도 중지되지 않습니다
+- 새로운 설치 프로그램: 일반 아카이브와 함께 Windows용 setup.exe 마법사와 Linux용 .deb 패키지
 
 ### 버그 수정
-- 에이전트 질문이 이제 UI에 도달 — 대기 중인 질문은 단계별 패널로 통합되고 자유 텍스트 답변은 ACP 에이전트로 전달됩니다
-- "지금 보내기"가 활성 턴을 중단하지 않고 큐의 메시지를 우선 전송. 질문 답변이 전송 큐로 새지 않습니다
-- 알림: "이 기기에 알림"이 실제로 전달됩니다
-- 워크스페이스: 콜드 부트 기기와 재접속 스냅샷이 활성 패인을 덮어쓰거나 닫지 않습니다
-- 터미널 인증 URL, 일반 HTTP에서의 트랜스크립트 복사/붙여넣기, 스크롤 고정 수정
-- 성능: 트랜스크립트 캐싱, 렌더 윈도우 제한, 모델 카탈로그 30분 캐시, Flutter 웹 페이로드 gzip 압축(6.9MB → 2.0MB)
+- Linux 데스크톱 빌드를 차단하던 libsecret 종속성 누락 문제를 수정했습니다
 
 <!-- lang:ru -->
-### Новое
-- Приложение теперь единый Flutter-клиент — web, десктоп Linux и Windows, Android — заменяющий старый web UI, десктопное приложение Electron и мобильное Expo
-- База знаний: правила, воспоминания и скиллы с гибридным полнотекстовым поиском, графом связей, хабами проектов/тегов и импортом в один клик AI-контекстных файлов проекта и скиллов агентов
-- Контекст знаний теперь query-driven (в стиле Contexta) — агенты запрашивают релевантные правила вместо автоинъекции, с индикатором бюджета критических правил
-- Оркестратор: супервизированный авто-режим с контрактом цели, циклом решений, чекпоинтами и финальным отчётом; резервные аккаунты провайдеров с автоматическим failover и упорядоченными fallback модели планировщика
-- Новые провайдеры: нативный Antigravity (agy) CLI и Command Code через ACP, плюс живой каталог моделей Codex
-- Аккаунты провайдеров: квота на аккаунт, имена аккаунтов в селекторах, ambient-логин как аккаунт Default и вход по аккаунтам в настройках
-- Установщик MCP-сервера ddagent — один клик в Настройки → Агенты → MCP или при онбординге устанавливает его в конфиги агентов
-- Панели workspace синхронизируются между устройствами — открытые сессии, редактор и git-панели следуют за вами между web UI и приложением Flutter
-- Единый пайплайн skills/rules/context для всех провайдеров
-- Квота: пилюли использования по окнам (день/неделя/месяц), окрашенные по темпу расхода, с поддержкой подписок Codex, Claude и Cursor
+### Что нового
+- Десктопное приложение теперь может запускать сервер ddagent на этом устройстве — выберите «Это устройство» на экране подключения: оно скачает подходящий пакет сервера, найдёт или установит Node.js 22+ и запустит его на 127.0.0.1. Подключение к удалённому серверу работает как прежде
+- Уже запущенный сервер на этой машине (например, служба systemd) будет использован вместо создания дубликата и никогда не останавливается при выходе из приложения
+- Новые установщики: мастер setup.exe для Windows и пакет .deb для Linux в дополнение к обычным архивам
 
-### Исправления
-- Вопросы агентов теперь доходят до UI — ожидающие запросы объединены в пошаговую панель, а ответы свободным текстом доставляются агентам ACP
-- «Отправить сейчас» продвигает сообщение из очереди вместо прерывания активного хода; ответы на вопросы больше не попадают в очередь отправки
-- Уведомления: «уведомить это устройство» теперь реально доставляет
-- Workspace: устройства после cold-boot и снапшоты реконнекта больше не затирают и не закрывают активные панели
-- Исправлены URL авторизации в терминале, копирование/вставка транскрипта по обычному HTTP и закрепление скролла
-- Производительность: кэш транскриптов, ограниченное окно рендера, 30-минутный кэш каталогов моделей и gzip-сжатие payload Flutter web (6,9 МБ → 2,0 МБ)
+### Исправления ошибок
+- Исправлена отсутствующая зависимость libsecret, блокировавшая сборку десктопной версии для Linux
 
 <!-- lang:tr -->
 ### Yenilikler
-- Uygulama artık tek bir Flutter istemcisi — web, Linux & Windows masaüstü ve Android — eski web UI'ın, Electron masaüstü uygulamasının ve Expo mobil uygulamasının yerini alıyor
-- Bilgi tabanı: kurallar, anılar ve skill'ler; tam metin hibrit arama, ilişki grafiği, proje/etiket hub'ları ve proje AI-bağlam dosyaları ile ajan skill'lerinin tek tıkla içe aktarımı
-- Bilgi bağlamı artık sorgu odaklı (Contexta tarzı) — ajanlar otomatik enjeksiyon yerine ilgili kuralları çekiyor; kritik kurallar için bütçe göstergesi
-- Orkestratör: hedef sözleşmesi, karar döngüsü, checkpoint'ler ve final raporu içeren denetimli otomatik mod; otomatik failover'lı yedekli provider hesapları ve sıralı planner modeli fallback'leri
-- Yeni provider'lar: yerel Antigravity (agy) CLI ve ACP üzerinden Command Code, ayrıca canlı Codex model kataloğu
-- Provider hesapları: hesap başına kota, seçicilerde hesap adları, ambient login'in Default hesabı olması ve ayarlarda hesap bazında giriş
-- ddagent MCP sunucu yükleyicisi — Ayarlar → Ajanlar → MCP'de veya onboarding sırasında tek tıkla ajan yapılandırmalarına kurulur
-- Workspace panelleri cihazlar arasında senkronize — açık oturumlar, editör ve git panelleri web UI ile Flutter uygulaması arasında sizi takip eder
-- Tüm provider'ların paylaştığı birleşik skills/rules/context hattı
-- Kota: pencere bazında (günlük/haftalık/aylık) kullanım hapları tüketim hızına göre renklendirilir; Codex, Claude ve Cursor abonelik desteği
+- Masaüstü uygulaması artık ddagent sunucusunu bu cihazda çalıştırabilir — bağlantı ekranında "Bu cihaz"ı seçin: eşleşen sunucu paketini indirir, Node.js 22+ çalışma ortamını bulur veya kurar ve 127.0.0.1 üzerinde başlatır. Uzak sunucuya bağlanma eskisi gibi çalışır
+- Bu makinede zaten çalışan bir sunucu (ör. bir systemd servisi) çoğaltılmak yerine devralınır ve uygulama kapanırken asla durdurulmaz
+- Yeni kurulum programları: sade arşivlerin yanında Windows için setup.exe sihirbazı ve Linux için .deb paketi
 
 ### Hata düzeltmeleri
-- Ajan soruları artık UI'ya ulaşıyor — bekleyen istekler tek bir adımlı panelde birleşiyor ve serbest metin cevapları ACP ajanlarına geri iletiliyor
-- "Şimdi gönder" aktif turu iptal etmek yerine kuyruktaki mesajı öne alıyor; soru cevapları artık gönderim kuyruğuna sızmıyor
-- Bildirimler: "bu cihaza bildir" artık gerçekten iletiliyor
-- Workspace: cold-boot cihazlar ve reconnect snapshot'ları artık canlı panelleri ezmez veya kapatmaz
-- Terminal auth URL'leri, düz HTTP'de transcript kopyala/yapıştır ve scroll sabitleme düzeltildi
-- Performans: transcript önbelleği, sınırlı render penceresi, 30 dk model kataloğu önbelleği ve gzip sıkıştırmalı Flutter web payload'u (6,9 MB → 2,0 MB)
+- Linux masaüstü derlemesini engelleyen eksik libsecret bağımlılığı düzeltildi
 
 <!-- lang:zh-CN -->
 ### 新功能
-- 应用现在是单一的 Flutter 客户端 —— Web、Linux 和 Windows 桌面端以及 Android —— 取代了旧的 Web UI、Electron 桌面应用和 Expo 移动应用
-- 知识库：规则、记忆和技能，支持全文混合搜索、关系图谱、项目/标签枢纽，以及一键导入项目 AI 上下文文件和代理技能
-- 知识上下文改为查询驱动（Contexta 风格）—— 代理按需拉取相关规则而非自动注入，并带有关键规则预算指示器
-- 编排器：带目标契约、决策循环、检查点和最终报告的监督式自动模式；冗余提供商账户自动故障转移及有序的规划器模型回退
-- 新提供商：原生 Antigravity (agy) CLI 和通过 ACP 的 Command Code，以及 Codex 实时模型目录
-- 提供商账户：按账户统计配额、选择器中显示账户名、ambient 登录显示为 Default 账户、设置中按账户登录
-- ddagent MCP 服务器安装器 —— 在 设置 → 代理 → MCP 或引导流程中一键安装到代理配置
-- 工作区窗格跨设备同步 —— 打开的会话、编辑器和 git 窗格在 Web UI 与 Flutter 应用之间跟随你
-- 所有提供商共享的统一 skills/rules/context 流水线
-- 配额：按窗口（日/周/月）显示的用量胶囊，按消耗速度着色，支持 Codex、Claude 和 Cursor 订阅
+- 桌面应用现在可以在本设备上运行 ddagent 服务器 — 在连接界面选择"本设备"：它会下载对应的服务器包，查找或安装 Node.js 22+ 运行时，并在 127.0.0.1 上启动。连接远程服务器的方式保持不变
+- 本机已在运行的服务器（如 systemd 服务）会被直接使用而不会重复启动，应用退出时也绝不会将其停止
+- 新增安装程序：Windows setup.exe 安装向导和 Linux .deb 软件包，与压缩包同时提供
 
 ### 问题修复
-- 代理提问现在能到达 UI —— 待处理请求合并为一个分步面板，自由文本答案会回传给 ACP 代理
-- "立即发送"会提升队列中的消息而不是中断当前回合；问题答案不再泄漏到发送队列
-- 通知："通知此设备"现在可以真正送达
-- 工作区：冷启动设备和重连快照不再覆盖或关闭活动窗格
-- 修复了终端认证 URL、纯 HTTP 下转录文本的复制/粘贴以及滚动固定
-- 性能：转录缓存、有界渲染窗口、30 分钟模型目录缓存、Flutter Web 负载 gzip 压缩（6.9 MB → 2.0 MB）
+- 修复了阻碍 Linux 桌面构建的缺失 libsecret 依赖
 
 <!-- lang:zh-TW -->
 ### 新功能
-- 應用程式現在是單一 Flutter 用戶端 —— Web、Linux 與 Windows 桌面版以及 Android —— 取代舊的 Web UI、Electron 桌面應用與 Expo 行動應用
-- 知識庫：規則、記憶與技能，支援全文混合搜尋、關係圖譜、專案/標籤樞紐，以及一鍵匯入專案 AI 脈絡檔案與代理技能
-- 知識脈絡改為查詢驅動（Contexta 風格）—— 代理按需擷取相關規則而非自動注入，並附關鍵規則預算指示器
-- 編排器：具備目標契約、決策迴圈、檢查點與最終報告的監督式自動模式；冗餘提供商帳戶自動容錯移轉與有序的規劃器模型回退
-- 新提供商：原生 Antigravity (agy) CLI 與透過 ACP 的 Command Code，以及 Codex 即時模型目錄
-- 提供商帳戶：按帳戶配額、選擇器中的帳戶名稱、ambient 登入顯示為 Default 帳戶、設定中按帳戶登入
-- ddagent MCP 伺服器安裝程式 —— 在 設定 → 代理 → MCP 或引導流程中一鍵安裝至代理設定
-- 工作區窗格跨裝置同步 —— 開啟的工作階段、編輯器與 git 窗格在 Web UI 與 Flutter 應用間跟隨你
-- 所有提供商共用的統一 skills/rules/context 管線
-- 配額：按窗口（日/週/月）的用量膠囊依消耗速度著色，支援 Codex、Claude 與 Cursor 訂閱
+- 桌面應用程式現在可以在本裝置上執行 ddagent 伺服器 — 在連線畫面選擇「此裝置」：它會下載對應的伺服器套件，尋找或安裝 Node.js 22+ 執行環境，並在 127.0.0.1 上啟動。連線到遠端伺服器的方式維持不變
+- 本機已在執行的伺服器（如 systemd 服務）會被直接使用而不會重複啟動，應用程式結束時也絕不會將其停止
+- 新增安裝程式：Windows setup.exe 安裝精靈與 Linux .deb 套件，與壓縮檔一併提供
 
 ### 問題修復
-- 代理提問現在會送達 UI —— 待處理請求合併為單一分步面板，自由文字答案會回傳給 ACP 代理
-- 「立即傳送」會提升佇列中的訊息而非中斷目前回合；問題答案不再洩漏到傳送佇列
-- 通知：「通知此裝置」現在真正能送達
-- 工作區：冷啟動裝置與重新連線快照不再覆寫或關閉使用中的窗格
-- 修正終端機驗證 URL、純 HTTP 下逐字稿的複製/貼上以及捲動固定
-- 效能：逐字稿快取、有界渲染窗口、30 分鐘模型目錄快取、Flutter Web 負載 gzip 壓縮（6.9 MB → 2.0 MB）
+- 修復了阻礙 Linux 桌面建置的缺少 libsecret 相依性
