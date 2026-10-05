@@ -787,7 +787,7 @@ class _ContextBudgetCard extends StatelessWidget {
                 const Icon(Icons.memory, size: 16),
                 const SizedBox(width: 8),
                 Text(
-                  'Critical context (always served)',
+                  'Rules context (always served)',
                   style: Theme.of(context).textTheme.titleSmall,
                 ),
                 const Spacer(),
