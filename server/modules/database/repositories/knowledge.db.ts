@@ -172,19 +172,83 @@ type ScanStateDbRow = {
 };
 
 /**
- * Turns arbitrary user text into a safe FTS5 MATCH expression.
- *
- * Raw text must never reach MATCH directly: characters like `-`, `*`, `:` or
- * `"` are FTS query operators and produce SQLITE_ERROR (or surprising matches)
- * on ordinary input such as "Short-lived". Every alphanumeric/underscore run is
- * kept and double-quoted as a term; terms combine with implicit AND. Returns
- * null when the text holds no searchable token.
+ * Turns arbitrary user text into a safe FTS5 MATCH expression (Contexta's
+ * `sanitize_match`): each whitespace word is reduced to its alphanumeric /
+ * `_` / `-` characters, the first 10 are kept, and every term becomes a
+ * double-quoted **prefix** query (`"term"*`), joined with implicit AND. A
+ * prefix lets "auth" match "authentication". Returns null when no usable term
+ * remains (caller falls back to a recency listing).
  */
 function buildFtsQuery(raw: string): string | null {
-  const tokens = raw.match(/[\p{L}\p{N}_]+/gu) ?? [];
-  if (tokens.length === 0) return null;
-  return tokens.map((token) => `"${token}"`).join(' ');
+  const terms = raw
+    .split(/\s+/)
+    .map((token) => token.replace(/[^\p{L}\p{N}_-]+/gu, ''))
+    .filter((token) => token.length > 0)
+    .slice(0, 10);
+  if (terms.length === 0) return null;
+  return terms.map((term) => `"${term}"*`).join(' ');
 }
+
+// ---------------------------------------------------------------------------
+// Hybrid search helpers (Contexta's search.rs: fuzzy trigram + priority/recency)
+// ---------------------------------------------------------------------------
+
+/** Char-trigram counts over words of length >= 3 (padded so short words yield one). */
+function trigramCounts(value: string): Map<string, number> {
+  const counts = new Map<string, number>();
+  const words = value
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}\s]+/gu, '')
+    .split(/\s+/)
+    .filter((word) => word.length >= 3);
+  for (const word of words) {
+    const padded = ` ${word} `;
+    for (let i = 0; i + 3 <= padded.length; i += 1) {
+      const trigram = padded.slice(i, i + 3);
+      counts.set(trigram, (counts.get(trigram) ?? 0) + 1);
+    }
+  }
+  return counts;
+}
+
+/** Cosine similarity of two trigram-count vectors. */
+function cosine(a: Map<string, number>, b: Map<string, number>): number {
+  if (a.size === 0 || b.size === 0) return 0;
+  const [small, big] = a.size <= b.size ? [a, b] : [b, a];
+  let dot = 0;
+  for (const [key, value] of small) dot += value * (big.get(key) ?? 0);
+  const norm = (map: Map<string, number>) =>
+    Math.sqrt([...map.values()].reduce((sum, value) => sum + value * value, 0));
+  return dot / (norm(a) * norm(b));
+}
+
+/** Contexta's priority bonus (lower priorities rank well below critical). */
+function priorityBonus(priority: string | null): number {
+  switch (priority) {
+    case 'critical':
+      return 8;
+    case 'high':
+      return 4;
+    case 'normal':
+      return 1.5;
+    case 'low':
+      return 0;
+    default:
+      return 1;
+  }
+}
+
+/** Contexta's recency bonus over an ISO/SQLite timestamp. */
+function recencyBonus(updatedAt: string): number {
+  const timestamp = Date.parse(updatedAt.includes('T') ? updatedAt : `${updatedAt.replace(' ', 'T')}Z`);
+  if (Number.isNaN(timestamp)) return 0;
+  const days = (Date.now() - timestamp) / 86_400_000;
+  if (days < 1) return 3;
+  if (days < 7) return 2;
+  if (days < 30) return 1;
+  return 0;
+}
+
 
 const toMemory = (row: MemoryRow): KbMemory => ({
   id: row.id,
@@ -271,6 +335,142 @@ function projectScopeClause(
 
 /** Paged result shared by every knowledge list endpoint. */
 export type KbPage<T> = { items: T[]; total: number };
+
+type FtsHit = {
+  entity_type: string;
+  entity_id: string;
+  project_id: string | null;
+  title: string;
+  snippet: string;
+  rank: number;
+};
+
+type MergedHit = {
+  entityType: string;
+  entityId: string;
+  projectId: string | null;
+  title: string;
+  snippet: string;
+  fts: number;
+  similarity: number;
+};
+
+/** Entity tables fuzzy search scans (title col, content col, project-scoped). */
+const FUZZY_BRANCHES: Array<{
+  entityType: string;
+  table: string;
+  titleCol: string;
+  contentCol: string;
+  projectScoped: boolean;
+}> = [
+  { entityType: 'memory', table: 'kb_memories', titleCol: 'title', contentCol: 'content', projectScoped: true },
+  { entityType: 'rule', table: 'kb_rules', titleCol: 'title', contentCol: 'content', projectScoped: true },
+  { entityType: 'skill', table: 'kb_skills', titleCol: 'name', contentCol: 'description', projectScoped: false },
+  {
+    entityType: 'personal',
+    table: 'kb_personal_information',
+    titleCol: 'title',
+    contentCol: 'content',
+    projectScoped: false,
+  },
+];
+
+/**
+ * Contexta's `fuzzy_hits`: char-trigram cosine over `title + content head` of
+ * the 120 most-recent rows per table, keeping hits above 0.12. Catches typos
+ * and near-synonyms FTS prefix matching misses. Bounded — never scans a whole
+ * table.
+ */
+function fuzzyHits(
+  db: ReturnType<typeof getConnection>,
+  query: string,
+  filter: { entityType?: KbEntityType; projectId?: string | null },
+  cap: number,
+): Array<{
+  entityType: string;
+  entityId: string;
+  projectId: string | null;
+  title: string;
+  snippet: string;
+  similarity: number;
+}> {
+  const queryVector = trigramCounts(query);
+  if (queryVector.size === 0) return [];
+  const hits: Array<{
+    entityType: string;
+    entityId: string;
+    projectId: string | null;
+    title: string;
+    snippet: string;
+    similarity: number;
+  }> = [];
+  for (const branch of FUZZY_BRANCHES) {
+    if (filter.entityType && filter.entityType !== branch.entityType) continue;
+    const projectCol = branch.projectScoped ? 'project_id' : 'NULL';
+    const rows = db
+      .prepare(
+        `SELECT id AS id, ${branch.titleCol} AS title,
+                ${branch.titleCol} || ' ' || substr(${branch.contentCol}, 1, 200) AS text,
+                ${projectCol} AS project_id
+         FROM ${branch.table} ORDER BY updated_at DESC LIMIT 120`,
+      )
+      .all() as Array<{ id: string; title: string; text: string; project_id: string | null }>;
+    for (const row of rows) {
+      if (branch.projectScoped && filter.projectId !== undefined) {
+        if (filter.projectId === null) {
+          if (row.project_id !== null) continue;
+        } else if (row.project_id !== filter.projectId) {
+          continue;
+        }
+      }
+      const similarity = cosine(queryVector, trigramCounts(row.text));
+      if (similarity > 0.12) {
+        hits.push({
+          entityType: branch.entityType,
+          entityId: row.id,
+          projectId: row.project_id,
+          title: row.title,
+          snippet: row.text.slice(0, 160),
+          similarity,
+        });
+      }
+    }
+  }
+  hits.sort((a, b) => b.similarity - a.similarity);
+  return hits.slice(0, Math.min(Math.max(cap, 1), 50));
+}
+
+/** Loads `{ priority, updatedAt }` for a batch of hits, grouped by entity type. */
+function hydrateMeta(
+  db: ReturnType<typeof getConnection>,
+  hits: MergedHit[],
+): Map<string, { priority: string | null; updatedAt: string }> {
+  const meta = new Map<string, { priority: string | null; updatedAt: string }>();
+  const byType = new Map<string, string[]>();
+  for (const hit of hits) {
+    const list = byType.get(hit.entityType) ?? [];
+    list.push(hit.entityId);
+    byType.set(hit.entityType, list);
+  }
+  const table = (entityType: string) =>
+    FUZZY_BRANCHES.find((branch) => branch.entityType === entityType)?.table;
+  for (const [entityType, ids] of byType) {
+    const source = table(entityType);
+    if (!source) continue;
+    const placeholders = ids.map(() => '?').join(', ');
+    const hasPriority = entityType === 'memory' || entityType === 'rule';
+    const rows = db
+      .prepare(
+        `SELECT id, ${hasPriority ? 'priority' : 'NULL'} AS priority, updated_at
+         FROM ${source} WHERE id IN (${placeholders})`,
+      )
+      .all(...ids) as Array<{ id: string; priority: string | null; updated_at: string }>;
+    for (const row of rows) {
+      meta.set(`${entityType}:${row.id}`, { priority: row.priority, updatedAt: row.updated_at });
+    }
+  }
+  return meta;
+}
 
 export const knowledgeDb = {
   // ----------------------------------------------------------------- memories
@@ -901,19 +1101,21 @@ export const knowledgeDb = {
   // -------------------------------------------------------------------- search
 
   /**
-   * FTS5 search over the synced `kb_search_index_fts` index. `bm25()` gives a
-   * relevance score (lower is better); results are ordered by score with the
-   * snippet highlighting the matched terms.
+   * Hybrid search (Contexta's `search_hybrid`): FTS5 prefix matching first,
+   * fuzzy trigram hits merged in, then reranked by `bm25 + priority + recency`
+   * (`-bm25 * 2 + similarity * 10 + priorityBonus + recencyBonus`).
    */
   search(
     query: string,
     filter: { entityType?: KbEntityType; projectId?: string | null; limit?: number } = {},
   ): KbSearchResult[] {
-    const matchExpression = buildFtsQuery(query);
-    if (!matchExpression) return [];
+    const matcher = buildFtsQuery(query);
+    if (!matcher) return [];
     const db = getConnection();
+    const limit = Math.min(Math.max(filter.limit ?? 30, 1), 100);
+
     const clauses: string[] = ['kb_search_index_fts MATCH ?'];
-    const params: unknown[] = [matchExpression];
+    const params: unknown[] = [matcher];
     if (filter.entityType) {
       clauses.push('entity_type = ?');
       params.push(filter.entityType);
@@ -926,32 +1128,66 @@ export const knowledgeDb = {
         params.push(filter.projectId);
       }
     }
-    const limit = Math.min(Math.max(filter.limit ?? 30, 1), 100);
-    const rows = db
+    const ftsRows = db
       .prepare(
         `SELECT entity_type, entity_id, project_id, title,
                 snippet(kb_search_index_fts, 4, '[', ']', ' … ', 12) AS snippet,
-                bm25(kb_search_index_fts) AS score
+                bm25(kb_search_index_fts) AS rank
          FROM kb_search_index_fts
          WHERE ${clauses.join(' AND ')}
-         ORDER BY score LIMIT ?`,
+         ORDER BY rank LIMIT ?`,
       )
-      .all(...params, limit) as Array<{
-      entity_type: string;
-      entity_id: string;
-      project_id: string | null;
-      title: string;
-      snippet: string;
-      score: number;
-    }>;
-    return rows.map((row) => ({
-      entityType: row.entity_type,
-      entityId: row.entity_id,
-      projectId: row.project_id,
-      title: row.title,
-      snippet: row.snippet,
-      score: row.score,
-    }));
+      .all(...params, limit * 2) as FtsHit[];
+
+    const merged = new Map<string, MergedHit>();
+    for (const row of ftsRows) {
+      merged.set(`${row.entity_type}:${row.entity_id}`, {
+        entityType: row.entity_type,
+        entityId: row.entity_id,
+        projectId: row.project_id,
+        title: row.title,
+        snippet: row.snippet,
+        fts: -row.rank,
+        similarity: 0,
+      });
+    }
+    for (const hit of fuzzyHits(db, query, filter, limit)) {
+      const key = `${hit.entityType}:${hit.entityId}`;
+      const existing = merged.get(key);
+      if (existing) {
+        existing.similarity = hit.similarity;
+      } else {
+        merged.set(key, {
+          entityType: hit.entityType,
+          entityId: hit.entityId,
+          projectId: hit.projectId,
+          title: hit.title,
+          snippet: hit.snippet,
+          fts: 0,
+          similarity: hit.similarity,
+        });
+      }
+    }
+
+    const hits = [...merged.values()];
+    const meta = hydrateMeta(db, hits);
+    const results = hits.map((hit) => {
+      const info = meta.get(`${hit.entityType}:${hit.entityId}`);
+      return {
+        entityType: hit.entityType,
+        entityId: hit.entityId,
+        projectId: hit.projectId,
+        title: hit.title,
+        snippet: hit.snippet,
+        score:
+          hit.fts * 2 +
+          hit.similarity * 10 +
+          priorityBonus(info?.priority ?? null) +
+          recencyBonus(info?.updatedAt ?? ''),
+      };
+    });
+    results.sort((a, b) => b.score - a.score);
+    return results.slice(0, limit);
   },
 
   // --------------------------------------------------------------- scan state

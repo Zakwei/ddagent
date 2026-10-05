@@ -233,3 +233,25 @@ test('scan state upserts per project path and stats count rows', async () => {
     assert.equal(knowledgeDb.getScanState('p1').length, 0);
   });
 });
+
+test('search is prefix-aware, fuzzy and priority-reranked', async () => {
+  await withIsolatedDatabase(() => {
+    const critical = knowledgeDb.createMemory({
+      title: 'Authentication flow',
+      content: 'JWT tokens',
+      priority: 'critical',
+    });
+    const low = knowledgeDb.createMemory({ title: 'Auth notes', content: 'misc', priority: 'low' });
+
+    // Prefix matching: "auth" matches both "Authentication…" and "Auth notes".
+    const prefix = knowledgeDb.search('auth', {});
+    assert.ok(prefix.some((row) => row.entityId === critical.id));
+    assert.ok(prefix.some((row) => row.entityId === low.id));
+    // Priority rerank puts the critical memory first.
+    assert.equal(prefix[0]?.entityId, critical.id);
+
+    // Fuzzy trigram fallback catches a typo that FTS prefix matching misses.
+    const fuzzy = knowledgeDb.search('authentcation', {});
+    assert.ok(fuzzy.some((row) => row.entityId === critical.id));
+  });
+});
