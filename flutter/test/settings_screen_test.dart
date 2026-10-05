@@ -43,7 +43,6 @@ void main() {
       'models',
       'tools',
       'notifications',
-      'quota',
       'workspaces',
       'schedules',
       'shortcuts',

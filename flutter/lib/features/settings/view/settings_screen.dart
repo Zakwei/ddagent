@@ -46,7 +46,7 @@ class SettingsSection {
 /// Settings sections — mirrors the web client's `SettingsMainTab` order
 /// (src/components/settings/types/types.ts). The old `SettingsSidebar` has no
 /// entry for `schedules`; it keeps its union position here and deep-links to
-/// the standalone `/scheduler` screen, same as `quota` → `/quota`.
+/// the standalone `/scheduler` screen, same as `knowledge` → `/knowledge`.
 final settingsSections = <SettingsSection>[
   SettingsSection(
     id: 'agents',
@@ -98,19 +98,6 @@ final settingsSections = <SettingsSection>[
     icon: LucideIcons.bell,
     label: (t) => t.settings.mainTabs.notifications,
     build: (_) => const NotificationsSection(),
-  ),
-  SettingsSection(
-    id: 'quota',
-    icon: LucideIcons.gauge,
-    label: (t) => t.settings.mainTabs.quota,
-    build: (_) => _LinkedSection(
-      'quota',
-      '/quota',
-      // No dedicated key — literal is fine per project i18n convention.
-      (_) =>
-          'Usage limits, account quotas and the agent fleet live in the '
-          'AI Control Center.',
-    ),
   ),
   SettingsSection(
     id: 'workspaces',
