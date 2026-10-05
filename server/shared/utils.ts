@@ -2030,6 +2030,16 @@ export function getErrorMessage(error: unknown): string {
 }
 
 /**
+ * Suffix appended to the custom name of a technical session that must never
+ * appear in the UI's session lists (delegated subagent work and the
+ * orchestrator's internal lane calls). Kept next to the SQL filter and
+ * `isSubagentSessionTitle` so the writer and both readers share one definition.
+ * Consumed by the orchestrator delegation service and the legacy-session
+ * cleanup migration.
+ */
+export const SUBAGENT_SESSION_MARKER = ' (subagent)';
+
+/**
  * SQL WHERE clause fragment to exclude technical subagent sessions from query results.
  * Excludes sessions whose custom_name/title indicates a technical subagent session.
  */

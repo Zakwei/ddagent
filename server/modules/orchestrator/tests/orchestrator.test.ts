@@ -1276,10 +1276,10 @@ test('continueSession: continuation with prompt plans next steps building on pri
       aborted: false,
     });
 
-    const calls: Array<{ command: string; cwd: string }> = [];
+    const calls: Array<{ command: string; cwd: string; hidden?: boolean }> = [];
     const fakeDelegationWithPlanner = {
-      async run(input: { command: string; cwd: string; delegationRowId: number | null }) {
-        calls.push({ command: input.command, cwd: input.cwd });
+      async run(input: { command: string; cwd: string; delegationRowId: number | null; hidden?: boolean }) {
+        calls.push({ command: input.command, cwd: input.cwd, hidden: input.hidden });
         let finalText = 'done';
         if (input.command.includes('You are a task planner')) {
           finalText = JSON.stringify([
@@ -1308,14 +1308,16 @@ test('continueSession: continuation with prompt plans next steps building on pri
     const result = await executor.continueSession(sessionId, 'Add integration tests for /api/v1');
     assert.ok(result.ok);
 
-    // Call 0 was the planner candidate prompt:
+    // Call 0 was the planner candidate prompt (internal lane → hidden):
     assert.match(calls[0].command, /CONTEXT FROM EARLIER COMPLETED STEPS/);
     assert.match(calls[0].command, /API is ready at \/api\/v1/);
     assert.match(calls[0].command, /CRITICAL: The new steps MUST be coherent with and build upon the child agents' responses/);
+    assert.equal(calls[0].hidden, true);
 
     // Call 1 was step-2 (test step), which received step-1 output:
     assert.match(calls[1].command, /Result of earlier step "step-1":/);
     assert.match(calls[1].command, /API is ready at \/api\/v1/);
+    assert.notEqual(calls[1].hidden, true);
 
     const planRow = orchestratorMessagesDb.list(sessionId).find((r) => r.kind === 'plan');
     const steps = planRow?.payload.steps as OrchestratorPlanStep[];

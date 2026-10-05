@@ -162,3 +162,29 @@ test('repair keeps disk-discovered and antigravity rows resumable', async () => 
     );
   });
 });
+
+test('migrations hide legacy technical sessions and leave real sessions alone', async () => {
+  await withIsolatedDatabase(() => {
+    // Rows a previous build persisted for internal lane calls: the titler and
+    // the supervisor, including a provider-renamed uppercase variant.
+    sessionsDb.createAppSession(
+      'tech-title',
+      'devin',
+      '/workspace/demo',
+      "You name chat sessions. Given the user's first message, reply with ONLY a short title",
+    );
+    sessionsDb.createAppSession('tech-supervisor', 'codex', '/workspace/demo', 'Are the supervisor of');
+    sessionsDb.createAppSession('real-session', 'devin', '/workspace/demo', 'Fix the login bug');
+
+    runMigrations(getConnection());
+
+    assert.ok(sessionsDb.getSessionById('tech-title')?.custom_name?.endsWith(' (subagent)'));
+    assert.ok(sessionsDb.getSessionById('tech-supervisor')?.custom_name?.endsWith(' (subagent)'));
+    assert.equal(sessionsDb.getSessionById('real-session')?.custom_name, 'Fix the login bug');
+
+    // Re-running on the next boot is idempotent — the marker is never doubled.
+    runMigrations(getConnection());
+    assert.ok(sessionsDb.getSessionById('tech-title')?.custom_name?.endsWith(' (subagent)'));
+    assert.ok(!sessionsDb.getSessionById('tech-title')?.custom_name?.includes('(subagent) (subagent)'));
+  });
+});

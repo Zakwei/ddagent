@@ -2,6 +2,7 @@ import { orchestratorMessagesDb, providerAccountsDb, sessionsDb } from '@/module
 import { providerModelsService, sessionsService } from '@/modules/providers/index.js';
 import { chatRunRegistry } from '@/modules/websocket/index.js';
 import type { ProviderRuntimeGateway } from '@/modules/websocket/index.js';
+import { SUBAGENT_SESSION_MARKER } from '@/shared/utils.js';
 import type { LLMProvider, NormalizedMessage } from '@/shared/types.js';
 
 export type DelegatedRunInput = {
@@ -18,9 +19,10 @@ export type DelegatedRunInput = {
   command: string;
   permissionMode: string;
   /**
-   * Internal helper run (e.g. background session titling): the child is never
-   * reused and is named with the subagent marker so the sidebar's
-   * `SUBAGENT_SESSION_SQL_FILTER` keeps it out of session lists.
+   * Internal helper run (the background session titler and the executor's
+   * planner/supervisor/report lane calls): the child is never reused and is
+   * named with the subagent marker so `SUBAGENT_SESSION_SQL_FILTER` keeps it
+   * out of session lists.
    */
   hidden?: boolean;
 };
@@ -165,7 +167,10 @@ export function createOrchestratorDelegationService(deps: {
         if (input.hidden) {
           // The derived name never contains the "(subagent)" marker (the
           // normalization strips parentheses), so append it explicitly.
-          sessionsDb.updateSessionCustomName(childSessionId, `${created.sessionName} (subagent)`);
+          sessionsDb.updateSessionCustomName(
+            childSessionId,
+            `${created.sessionName}${SUBAGENT_SESSION_MARKER}`,
+          );
         }
       }
 

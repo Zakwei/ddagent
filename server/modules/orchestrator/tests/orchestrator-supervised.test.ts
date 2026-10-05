@@ -82,7 +82,13 @@ const orchestrateInput = (sessionId: string, content: string, options: AnyRecord
   connection: { readyState: 0, send: () => undefined } as never,
 });
 
-type LaneCall = { command: string; cwd: string; provider?: string; model?: string | null };
+type LaneCall = {
+  command: string;
+  cwd: string;
+  provider?: string;
+  model?: string | null;
+  hidden?: boolean;
+};
 
 /**
  * Delegation stand-in for supervised runs. Goals calls embed the JSON shape
@@ -101,8 +107,8 @@ function scriptedDelegation(
 ) {
   let decisionCalls = 0;
   return {
-    async run(input: { command: string; cwd: string; provider?: string; model?: string | null }) {
-      calls.push({ command: input.command, cwd: input.cwd, provider: input.provider, model: input.model });
+    async run(input: { command: string; cwd: string; provider?: string; model?: string | null; hidden?: boolean }) {
+      calls.push({ command: input.command, cwd: input.cwd, provider: input.provider, model: input.model, hidden: input.hidden });
       let finalText = typeof script.stepReply === 'function' ? script.stepReply(input.command) : script.stepReply ?? 'done';
       if (input.command.includes('final report')) {
         finalText = script.report ?? 'report body';
@@ -153,6 +159,12 @@ test('supervised: happy path — goals, one decision batch, done, report', async
 
     // goals → decision(continue) → step → decision(done) → report
     assert.equal(calls.length, 5);
+    // Only the real delegated step may surface as a sidebar session; every
+    // internal lane call (goals, decisions, report) must be hidden.
+    assert.deepEqual(
+      calls.map((call) => call.hidden === true),
+      [true, true, false, true, true],
+    );
     const plan = rowsOf('sup-1', 'plan')[0];
     assert.equal(plan.payload.source, 'supervised');
     assert.equal(plan.payload.goals, 'g');

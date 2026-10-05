@@ -18,6 +18,7 @@ import {
 } from '@/modules/database/schema.js';
 import { MCP_TOKENS_TABLE_SCHEMA_SQL } from '@/modules/database/repositories/mcp-tokens.db.js';
 import { ORCHESTRATOR_MESSAGES_TABLE_SCHEMA_SQL } from '@/modules/database/repositories/orchestrator-messages.db.js';
+import { SUBAGENT_SESSION_MARKER } from '@/shared/utils.js';
 
 const SQLITE_UUID_SQL = `
 lower(hex(randomblob(4))) || '-' ||
@@ -604,6 +605,46 @@ const ensureProjectsForSessionPaths = (db: Database): void => {
   `);
 };
 
+/**
+ * Hides technical sessions that older builds persisted as standalone rows.
+ *
+ * The orchestrator's internal lane calls (planner, supervisor, report) and the
+ * background session titler run through the delegation service, which names the
+ * child from the internal prompt. They have no delegation card and must never
+ * render as sidebar entries, so every such legacy row is stamped with the
+ * subagent marker that the session-list queries already exclude
+ * (`SUBAGENT_SESSION_SQL_FILTER`). Provider-renamed variants ("YOU ARE THE
+ * SUPERVISOR", "Are the supervisor of", ...) are matched case-insensitively by
+ * their prompt prefix. Idempotent: a row already carrying the marker is left
+ * untouched, so re-running on every boot is safe.
+ */
+const hideLegacyTechnicalSessions = (db: Database): void => {
+  if (!tableExists(db, 'sessions')) {
+    return;
+  }
+
+  const result = db
+    .prepare(
+      `UPDATE sessions
+       SET custom_name = custom_name || ?
+       WHERE isArchived = 0
+         AND custom_name IS NOT NULL
+         AND custom_name NOT LIKE '%(subagent)%'
+         AND (
+           lower(custom_name) LIKE 'you name chat sessions%'
+           OR lower(custom_name) LIKE 'you are the supervisor%'
+           OR lower(custom_name) LIKE 'are the supervisor of%'
+           OR lower(custom_name) LIKE 'you write the final%'
+           OR lower(custom_name) LIKE 'you are a task%'
+         )`
+    )
+    .run(SUBAGENT_SESSION_MARKER);
+
+  if (result.changes > 0) {
+    console.log(`Running migration: Hiding ${result.changes} legacy technical session(s)`);
+  }
+};
+
 export const runMigrations = (db: Database) => {
   try {
     const usersTableInfo = db.prepare('PRAGMA table_info(users)').all() as { name: string }[];
@@ -668,6 +709,7 @@ export const runMigrations = (db: Database) => {
     addSessionLastViewedAtColumn(db);
     addSessionSharedContextColumn(db);
     ensureProjectsForSessionPaths(db);
+    hideLegacyTechnicalSessions(db);
 
     db.exec('CREATE INDEX IF NOT EXISTS idx_session_ids_lookup ON sessions(session_id)');
     db.exec('CREATE INDEX IF NOT EXISTS idx_sessions_provider_session_id ON sessions(provider_session_id)');

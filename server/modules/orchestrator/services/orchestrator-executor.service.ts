@@ -865,6 +865,9 @@ export function createOrchestratorExecutor(deps: {
         cwd: planCwd,
         command,
         permissionMode: 'bypassPermissions',
+        // Internal lane call with no delegation card: its child must not appear
+        // as a standalone session in the sidebar.
+        hidden: true,
       });
       const untrack = trackAbort(input.sessionId, handle.abort);
       const result = await handle.completed;
@@ -1657,6 +1660,9 @@ export function createOrchestratorExecutor(deps: {
         cwd,
         command,
         permissionMode: 'bypassPermissions',
+        // Supervisor goals/decisions and the final report are internal lane
+        // calls with no delegation card — hide their child from session lists.
+        hidden: true,
       });
       const untrack = trackAbort(sessionId, handle.abort);
       const timeout = config.execution.stepTimeoutMs;
