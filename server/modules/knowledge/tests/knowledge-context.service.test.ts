@@ -39,7 +39,7 @@ const registerProject = (projectId: string, projectPath: string): void => {
     .run(projectId, projectPath);
 };
 
-test('context always includes critical rules; the query adds matched rules/skills/personal', async () => {
+test('context includes all enabled rules (critical first); query drives memories/skills/personal', async () => {
   await withIsolatedDatabase(async () => {
     const root = await mkdtemp(path.join(tmpdir(), 'knowledge-ctx-project-'));
     registerProject('p1', root);
@@ -59,19 +59,18 @@ test('context always includes critical rules; the query adds matched rules/skill
     knowledgeService.createSkill({ name: 'deploy-helper', description: 'Helps deploy' });
     knowledgeService.createPersonal({ key: 'timezone', title: 'Timezone', content: 'Europe/Warsaw' });
 
-    // No query: only the always-on critical rules; no skills/personal.
+    // No query: ALL enabled rules (not query-filtered), recent skills, no personal.
     const plain = await buildProjectContext({ projectId: 'p1' });
     assert.ok(plain.markdown.includes('Global critical'));
     assert.ok(plain.markdown.includes('Project critical'));
-    assert.ok(!plain.markdown.includes('Deploy steps'));
-    assert.equal(plain.skills.length, 0);
+    assert.ok(plain.markdown.includes('Deploy steps'));
+    assert.equal(plain.rules[0]?.priority, 'critical');
+    assert.ok(plain.skills.some((skill) => skill.name === 'deploy-helper'));
     assert.equal(plain.personal.length, 0);
 
-    // Query: matched rule + keyword-matched skill.
+    // Query: skills matched by FTS.
     const query = await buildProjectContext({ projectId: 'p1', query: 'deploy' });
-    assert.ok(query.rules.some((rule) => rule.title === 'Deploy steps'));
     assert.ok(query.skills.some((skill) => skill.name === 'deploy-helper'));
-    assert.ok(query.markdown.includes('deploy-helper'));
 
     // Personal only when the query matches it.
     const personal = await buildProjectContext({ projectId: 'p1', query: 'timezone Warsaw' });
@@ -79,7 +78,7 @@ test('context always includes critical rules; the query adds matched rules/skill
   });
 });
 
-test('oversized critical entries are skipped without starving the rest', async () => {
+test('context truncates oversized item content within the budget', async () => {
   await withIsolatedDatabase(async () => {
     const root = await mkdtemp(path.join(tmpdir(), 'knowledge-ctx-budget-'));
     registerProject('p2', root);
@@ -88,8 +87,9 @@ test('oversized critical entries are skipped without starving the rest', async (
 
     const context = await buildProjectContext({ projectId: 'p2' });
     assert.ok(context.markdown.includes('Small'));
-    assert.ok(!context.markdown.includes('Big'));
-    // Both rules are still returned structurally.
+    assert.ok(context.markdown.includes('Big'));
+    // The 30k-char body is truncated to Contexta's 800-char item cap.
+    assert.ok(!context.markdown.includes('x'.repeat(900)));
     assert.equal(context.rules.length, 2);
   });
 });
@@ -98,8 +98,16 @@ test('a query expands matched memories through 1-hop connections', async () => {
   await withIsolatedDatabase(async () => {
     const root = await mkdtemp(path.join(tmpdir(), 'knowledge-ctx-related-'));
     registerProject('p4', root);
-    const memory = knowledgeService.createMemory({ title: 'Auth uses JWT', content: 'tokens' });
-    const related = knowledgeService.createMemory({ title: 'Refresh note', content: 'neighbour detail' });
+    const memory = knowledgeService.createMemory({
+      projectId: 'p4',
+      title: 'Auth uses JWT',
+      content: 'tokens',
+    });
+    const related = knowledgeService.createMemory({
+      projectId: 'p4',
+      title: 'Refresh note',
+      content: 'neighbour detail',
+    });
     knowledgeService.createConnection({
       sourceId: memory.id,
       sourceType: 'memory',
@@ -114,7 +122,7 @@ test('a query expands matched memories through 1-hop connections', async () => {
   });
 });
 
-test('context preview reports the critical block size and budget', async () => {
+test('context preview reports the always-served rules size and budget', async () => {
   await withIsolatedDatabase(async () => {
     const root = await mkdtemp(path.join(tmpdir(), 'knowledge-preview-'));
     registerProject('p5', root);
