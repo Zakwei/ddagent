@@ -2,15 +2,18 @@ import 'package:ddagent_app/core/theme/app_theme.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/features/taskmaster/data/taskmaster_models.dart';
 import 'package:ddagent_app/features/taskmaster/view/task_tile.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// T40.8 — accessibility pass: icon-only controls must expose a tooltip or
 /// semantic label, and primary actions must meet the 44px touch-target floor.
 void main() {
-  Widget harness(Widget child) => MaterialApp(
-    theme: AppTheme.light(),
-    home: Scaffold(body: child),
+  Widget harness(Widget child) => TranslationProvider(
+    child: MaterialApp(
+      theme: AppTheme.light(),
+      home: Scaffold(body: child),
+    ),
   );
 
   testWidgets('icon-only buttons carry tooltips', (tester) async {

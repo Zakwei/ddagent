@@ -1,6 +1,7 @@
 import 'package:ddagent_app/core/theme/app_theme.dart';
 import 'package:ddagent_app/features/taskmaster/data/taskmaster_models.dart';
 import 'package:ddagent_app/features/taskmaster/view/task_tile.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -23,10 +24,12 @@ void main() {
     priority: 'high',
   );
 
-  Widget harness(Widget child) => MaterialApp(
-    theme: AppTheme.light(),
-    home: Scaffold(
-      body: Center(child: SizedBox(child: child)),
+  Widget harness(Widget child) => TranslationProvider(
+    child: MaterialApp(
+      theme: AppTheme.light(),
+      home: Scaffold(
+        body: Center(child: SizedBox(child: child)),
+      ),
     ),
   );
 
