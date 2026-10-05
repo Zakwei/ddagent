@@ -1,11 +1,13 @@
 name: Flutter release
 
 # Builds the Flutter client for every shipped platform and attaches the
-# artifacts to the GitHub draft release created for the v* tag:
+# artifacts to the GitHub draft release created for a v* tag:
 #
 #   release/flutter/ddagent-flutter-web-<tag>.zip
 #   release/flutter/ddagent-flutter-linux-x64-<tag>.tar.gz
+#   release/flutter/ddagent-flutter-linux-x64-<tag>.deb
 #   release/flutter/ddagent-flutter-windows-x64-<tag>.zip
+#   release/flutter/ddagent-flutter-windows-x64-<tag>-setup.exe
 #   release/flutter/ddagent-flutter-android-<tag>.apk
 #   release/flutter/ddagent-flutter-android-<tag>.aab
 #
@@ -14,13 +16,26 @@ name: Flutter release
 # ANDROID_KEYSTORE_BASE64 / ANDROID_KEYSTORE_PASSWORD / ANDROID_KEY_PASSWORD /
 # ANDROID_KEY_ALIAS secrets when present, otherwise falls back to the debug key
 # configured in android/app/build.gradle.kts.
+#
+# workflow_dispatch with `version` (e.g. v0.8.0) rebuilds that tag's checkout
+# and uploads onto the existing release — use it to add/replace artifacts
+# without re-tagging. Packaging scripts missing on old tags are fetched from
+# main. Empty `version` produces Actions artifacts only.
 on:
   push:
     tags: ['v*']
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Tag to build and upload to (e.g. v0.8.0). Empty = artifact-only run.'
+        required: false
+        default: ''
 
 permissions:
   contents: write
+
+env:
+  VERSION: ${{ inputs.version || github.ref_name }}
 
 jobs:
   web:
@@ -29,6 +44,7 @@ jobs:
     defaults: { run: { working-directory: flutter } }
     steps:
       - uses: actions/checkout@v4
+        with: { ref: ${{ inputs.version || github.ref }} }
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.47.5'
@@ -39,10 +55,18 @@ jobs:
         run: |
           flutter build web --release
           mkdir -p ../release/flutter
-          (cd build/web && zip -qr "$GITHUB_WORKSPACE/release/flutter/ddagent-flutter-web-${{ github.ref_name }}.zip" .)
+          (cd build/web && zip -qr "$GITHUB_WORKSPACE/release/flutter/ddagent-flutter-web-$VERSION.zip" .)
       - uses: ./.github/actions/flutter-publish
+        if: inputs.version == ''
         with:
           name: ${{ github.job }}
+      - name: Upload to existing release
+        if: inputs.version != ''
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "$VERSION" --clobber release/flutter/*
 
   linux:
     name: linux
@@ -50,6 +74,12 @@ jobs:
     defaults: { run: { working-directory: flutter } }
     steps:
       - uses: actions/checkout@v4
+        with: { ref: ${{ inputs.version || github.ref }} }
+      - name: Fetch packaging scripts (manual rebuild of old tag)
+        if: inputs.version != ''
+        run: |
+          git fetch origin main --depth=1
+          git checkout FETCH_HEAD -- flutter/packaging
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.47.5'
@@ -61,10 +91,19 @@ jobs:
         run: |
           flutter build linux --release
           mkdir -p ../release/flutter
-          tar -C build/linux/x64/release -czf "../release/flutter/ddagent-flutter-linux-x64-${{ github.ref_name }}.tar.gz" bundle
+          tar -C build/linux/x64/release -czf "../release/flutter/ddagent-flutter-linux-x64-$VERSION.tar.gz" bundle
+          bash packaging/linux/build-deb.sh "$VERSION"
       - uses: ./.github/actions/flutter-publish
+        if: inputs.version == ''
         with:
           name: ${{ github.job }}
+      - name: Upload to existing release
+        if: inputs.version != ''
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "$VERSION" --clobber release/flutter/*
 
   windows:
     name: windows
@@ -72,6 +111,13 @@ jobs:
     defaults: { run: { working-directory: flutter } }
     steps:
       - uses: actions/checkout@v4
+        with: { ref: ${{ inputs.version || github.ref }} }
+      - name: Fetch packaging scripts (manual rebuild of old tag)
+        if: inputs.version != ''
+        shell: bash
+        run: |
+          git fetch origin main --depth=1
+          git checkout FETCH_HEAD -- flutter/packaging
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.47.5'
@@ -83,10 +129,25 @@ jobs:
         run: |
           flutter build windows --release
           New-Item -ItemType Directory -Force -Path ../release/flutter | Out-Null
-          Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath "../release/flutter/ddagent-flutter-windows-x64-${{ github.ref_name }}.zip"
+          Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath "../release/flutter/ddagent-flutter-windows-x64-$env:VERSION.zip"
+      - name: Inno Setup installer
+        shell: pwsh
+        run: |
+          choco install innosetup --no-progress -y
+          $verNoV = "$env:VERSION" -replace '^v',''
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "/DAppVersion=$verNoV" "/DVerTag=$env:VERSION" packaging\windows\installer.iss
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - uses: ./.github/actions/flutter-publish
+        if: inputs.version == ''
         with:
           name: ${{ github.job }}
+      - name: Upload to existing release
+        if: inputs.version != ''
+        shell: pwsh
+        working-directory: ${{ github.workspace }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "$env:VERSION" --clobber release/flutter/*
 
   android:
     name: android
@@ -94,6 +155,7 @@ jobs:
     defaults: { run: { working-directory: flutter } }
     steps:
       - uses: actions/checkout@v4
+        with: { ref: ${{ inputs.version || github.ref }} }
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -126,8 +188,16 @@ jobs:
           flutter build apk --release
           flutter build appbundle --release
           mkdir -p ../release/flutter
-          cp build/app/outputs/flutter-apk/app-release.apk "../release/flutter/ddagent-flutter-android-${{ github.ref_name }}.apk"
-          cp build/app/outputs/bundle/release/app-release.aab "../release/flutter/ddagent-flutter-android-${{ github.ref_name }}.aab"
+          cp build/app/outputs/flutter-apk/app-release.apk "../release/flutter/ddagent-flutter-android-$VERSION.apk"
+          cp build/app/outputs/bundle/release/app-release.aab "../release/flutter/ddagent-flutter-android-$VERSION.aab"
       - uses: ./.github/actions/flutter-publish
+        if: inputs.version == ''
         with:
           name: ${{ github.job }}
+      - name: Upload to existing release
+        if: inputs.version != ''
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "$VERSION" --clobber release/flutter/*

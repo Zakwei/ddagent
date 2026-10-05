@@ -1,31 +1,36 @@
 name: Publish Flutter artifacts
 description: >-
   Upload the per-platform artifacts from release/flutter/ (in the repo root)
-  onto the draft GitHub release for a v* tag, or as Actions artifacts on
-  manual runs.
+  onto the draft GitHub release for a v* tag — or, when `tag` is given on a
+  manual run, onto that tag's existing release. Otherwise uploads them as
+  Actions artifacts.
 
 inputs:
   name:
     description: Artifact name suffix for manual (non-tag) runs.
     required: true
+  tag:
+    description: Release tag to upload to on manual runs (e.g. v0.8.0).
+    required: false
+    default: ''
 
 runs:
   using: composite
   steps:
     - name: Publish to GitHub release
-      if: github.ref_type == 'tag'
+      if: github.ref_type == 'tag' || inputs.tag != ''
       shell: bash
       working-directory: ${{ github.workspace }}
       env:
         GH_TOKEN: ${{ github.token }}
+        UPLOAD_TAG: ${{ inputs.tag || github.ref_name }}
       run: |
-        TAG="$GITHUB_REF_NAME"
-        gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 \
-          || gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --draft \
-            --title "$TAG" --notes-file scripts/release/release-notes-template.md
-        gh release upload "$TAG" --repo "$GITHUB_REPOSITORY" --clobber release/flutter/*
+        gh release view "$UPLOAD_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 \
+          || gh release create "$UPLOAD_TAG" --repo "$GITHUB_REPOSITORY" --draft \
+            --title "$UPLOAD_TAG" --notes-file scripts/release/release-notes-template.md
+        gh release upload "$UPLOAD_TAG" --repo "$GITHUB_REPOSITORY" --clobber release/flutter/*
 
-    - if: github.ref_type != 'tag'
+    - if: github.ref_type != 'tag' && inputs.tag == ''
       uses: actions/upload-artifact@v4
       with:
         name: ddagent-flutter-${{ inputs.name }}-${{ github.ref_name }}
