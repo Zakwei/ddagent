@@ -44,7 +44,8 @@ jobs:
     defaults: { run: { working-directory: flutter } }
     steps:
       - uses: actions/checkout@v4
-        with: { ref: ${{ inputs.version || github.ref }} }
+        with:
+          ref: ${{ inputs.version || github.ref }}
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.47.5'
@@ -74,7 +75,8 @@ jobs:
     defaults: { run: { working-directory: flutter } }
     steps:
       - uses: actions/checkout@v4
-        with: { ref: ${{ inputs.version || github.ref }} }
+        with:
+          ref: ${{ inputs.version || github.ref }}
       - name: Fetch packaging scripts (manual rebuild of old tag)
         if: inputs.version != ''
         run: |
@@ -111,7 +113,8 @@ jobs:
     defaults: { run: { working-directory: flutter } }
     steps:
       - uses: actions/checkout@v4
-        with: { ref: ${{ inputs.version || github.ref }} }
+        with:
+          ref: ${{ inputs.version || github.ref }}
       - name: Fetch packaging scripts (manual rebuild of old tag)
         if: inputs.version != ''
         shell: bash
@@ -155,7 +158,8 @@ jobs:
     defaults: { run: { working-directory: flutter } }
     steps:
       - uses: actions/checkout@v4
-        with: { ref: ${{ inputs.version || github.ref }} }
+        with:
+          ref: ${{ inputs.version || github.ref }}
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
