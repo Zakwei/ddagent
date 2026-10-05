@@ -3225,6 +3225,21 @@
     "connecting": "Verbinde…",
     "connectionFailed": "Verbindung fehlgeschlagen ({{error}})",
     "enterUrl": "Server-URL eingeben",
+    "local": {
+      "title": "Dieses Gerät",
+      "subtitle": "ddagent-Server auf diesem Rechner ausführen",
+      "install": "Lokalen Server installieren",
+      "start": "Lokalen Server starten",
+      "stop": "Stoppen",
+      "starting": "Lokaler Server wird gestartet…",
+      "downloading": "Server wird heruntergeladen… {{percent}}%",
+      "installing": "Wird installiert…",
+      "running": "Läuft unter {{url}}",
+      "installed": "Installiert (v{{version}})",
+      "connect": "Diesen Server verwenden",
+      "error": "Fehler des lokalen Servers: {{error}}",
+      "or": "oder mit einem Remote-Server verbinden"
+    },
     "subtitle": "Mit deinem ddagent-Server verbinden"
   },
   "voice": {

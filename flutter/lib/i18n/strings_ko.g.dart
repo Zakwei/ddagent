@@ -460,6 +460,7 @@ class Translations$serverConnect$ko extends Translations$serverConnect$en {
 	@override String get connecting => '연결 중…';
 	@override String connectionFailed({required Object error}) => '연결 실패 (${error})';
 	@override String get enterUrl => '서버 URL을 입력하세요';
+	@override late final Translations$serverConnect$local$ko local = Translations$serverConnect$local$ko._(_root);
 	@override String get subtitle => 'ddagent 서버에 연결하세요';
 }
 
@@ -3997,6 +3998,28 @@ class Translations$notifications$errors$ko extends Translations$notifications$er
 	// Translations
 	@override String get noResponse => '서버에서 응답이 없습니다';
 	@override String get registrationRejected => '서버에서 등록을 거부했습니다';
+}
+
+// Path: serverConnect.local
+class Translations$serverConnect$local$ko extends Translations$serverConnect$local$en {
+	Translations$serverConnect$local$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '이 기기';
+	@override String get subtitle => '이 컴퓨터에서 ddagent 서버를 실행합니다';
+	@override String get install => '로컬 서버 설치';
+	@override String get start => '로컬 서버 시작';
+	@override String get stop => '중지';
+	@override String get starting => '로컬 서버 시작 중…';
+	@override String downloading({required Object percent}) => '서버 다운로드 중… ${percent}%';
+	@override String get installing => '설치 중…';
+	@override String running({required Object url}) => '${url}에서 실행 중';
+	@override String installed({required Object version}) => '설치됨 (v${version})';
+	@override String get connect => '이 서버 사용';
+	@override String error({required Object error}) => '로컬 서버 오류: ${error}';
+	@override String get or => '또는 원격 서버에 연결';
 }
 
 // Path: collab.roles
@@ -9449,6 +9472,19 @@ extension on TranslationsKo {
 			'serverConnect.connecting' => '연결 중…',
 			'serverConnect.connectionFailed' => ({required Object error}) => '연결 실패 (${error})',
 			'serverConnect.enterUrl' => '서버 URL을 입력하세요',
+			'serverConnect.local.title' => '이 기기',
+			'serverConnect.local.subtitle' => '이 컴퓨터에서 ddagent 서버를 실행합니다',
+			'serverConnect.local.install' => '로컬 서버 설치',
+			'serverConnect.local.start' => '로컬 서버 시작',
+			'serverConnect.local.stop' => '중지',
+			'serverConnect.local.starting' => '로컬 서버 시작 중…',
+			'serverConnect.local.downloading' => ({required Object percent}) => '서버 다운로드 중… ${percent}%',
+			'serverConnect.local.installing' => '설치 중…',
+			'serverConnect.local.running' => ({required Object url}) => '${url}에서 실행 중',
+			'serverConnect.local.installed' => ({required Object version}) => '설치됨 (v${version})',
+			'serverConnect.local.connect' => '이 서버 사용',
+			'serverConnect.local.error' => ({required Object error}) => '로컬 서버 오류: ${error}',
+			'serverConnect.local.or' => '또는 원격 서버에 연결',
 			'serverConnect.subtitle' => 'ddagent 서버에 연결하세요',
 			'voice.apiKeySaved' => 'API 키 (저장됨, 교체하려면 입력)',
 			'voice.preview' => '미리보기',

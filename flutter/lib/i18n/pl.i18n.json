@@ -3484,6 +3484,21 @@
     "connecting": "Łączenie…",
     "connectionFailed": "Połączenie nie powiodło się ({{error}})",
     "enterUrl": "Wpisz adres URL serwera",
+    "local": {
+      "title": "To urządzenie",
+      "subtitle": "Uruchom serwer ddagent na tym komputerze",
+      "install": "Zainstaluj serwer lokalny",
+      "start": "Uruchom serwer lokalny",
+      "stop": "Zatrzymaj",
+      "starting": "Uruchamianie serwera lokalnego…",
+      "downloading": "Pobieranie serwera… {{percent}}%",
+      "installing": "Instalowanie…",
+      "running": "Działa pod adresem {{url}}",
+      "installed": "Zainstalowany (v{{version}})",
+      "connect": "Użyj tego serwera",
+      "error": "Błąd serwera lokalnego: {{error}}",
+      "or": "lub połącz się ze zdalnym serwerem"
+    },
     "subtitle": "Połącz się ze swoim serwerem ddagent"
   },
   "voice": {

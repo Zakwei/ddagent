@@ -3225,6 +3225,21 @@
     "connecting": "Connexion…",
     "connectionFailed": "Échec de la connexion ({{error}})",
     "enterUrl": "Saisir une URL de serveur",
+    "local": {
+      "title": "Cet appareil",
+      "subtitle": "Exécuter le serveur ddagent sur cette machine",
+      "install": "Installer le serveur local",
+      "start": "Démarrer le serveur local",
+      "stop": "Arrêter",
+      "starting": "Démarrage du serveur local…",
+      "downloading": "Téléchargement du serveur… {{percent}} %",
+      "installing": "Installation…",
+      "running": "En cours d'exécution sur {{url}}",
+      "installed": "Installé (v{{version}})",
+      "connect": "Utiliser ce serveur",
+      "error": "Erreur du serveur local : {{error}}",
+      "or": "ou connectez-vous à un serveur distant"
+    },
     "subtitle": "Connectez-vous à votre serveur ddagent"
   },
   "voice": {

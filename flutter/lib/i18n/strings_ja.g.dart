@@ -460,6 +460,7 @@ class Translations$serverConnect$ja extends Translations$serverConnect$en {
 	@override String get connecting => '接続中…';
 	@override String connectionFailed({required Object error}) => '接続に失敗しました (${error})';
 	@override String get enterUrl => 'サーバーのURLを入力';
+	@override late final Translations$serverConnect$local$ja local = Translations$serverConnect$local$ja._(_root);
 	@override String get subtitle => 'ddagent サーバーに接続';
 }
 
@@ -3997,6 +3998,28 @@ class Translations$notifications$errors$ja extends Translations$notifications$er
 	// Translations
 	@override String get noResponse => 'サーバーから応答がありません';
 	@override String get registrationRejected => 'サーバーに登録を拒否されました';
+}
+
+// Path: serverConnect.local
+class Translations$serverConnect$local$ja extends Translations$serverConnect$local$en {
+	Translations$serverConnect$local$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'このデバイス';
+	@override String get subtitle => 'このマシンでddagentサーバーを実行します';
+	@override String get install => 'ローカルサーバーをインストール';
+	@override String get start => 'ローカルサーバーを起動';
+	@override String get stop => '停止';
+	@override String get starting => 'ローカルサーバーを起動中…';
+	@override String downloading({required Object percent}) => 'サーバーをダウンロード中… ${percent}%';
+	@override String get installing => 'インストール中…';
+	@override String running({required Object url}) => '${url} で実行中';
+	@override String installed({required Object version}) => 'インストール済み (v${version})';
+	@override String get connect => 'このサーバーを使用';
+	@override String error({required Object error}) => 'ローカルサーバーエラー: ${error}';
+	@override String get or => 'またはリモートサーバーに接続';
 }
 
 // Path: collab.roles
@@ -9449,6 +9472,19 @@ extension on TranslationsJa {
 			'serverConnect.connecting' => '接続中…',
 			'serverConnect.connectionFailed' => ({required Object error}) => '接続に失敗しました (${error})',
 			'serverConnect.enterUrl' => 'サーバーのURLを入力',
+			'serverConnect.local.title' => 'このデバイス',
+			'serverConnect.local.subtitle' => 'このマシンでddagentサーバーを実行します',
+			'serverConnect.local.install' => 'ローカルサーバーをインストール',
+			'serverConnect.local.start' => 'ローカルサーバーを起動',
+			'serverConnect.local.stop' => '停止',
+			'serverConnect.local.starting' => 'ローカルサーバーを起動中…',
+			'serverConnect.local.downloading' => ({required Object percent}) => 'サーバーをダウンロード中… ${percent}%',
+			'serverConnect.local.installing' => 'インストール中…',
+			'serverConnect.local.running' => ({required Object url}) => '${url} で実行中',
+			'serverConnect.local.installed' => ({required Object version}) => 'インストール済み (v${version})',
+			'serverConnect.local.connect' => 'このサーバーを使用',
+			'serverConnect.local.error' => ({required Object error}) => 'ローカルサーバーエラー: ${error}',
+			'serverConnect.local.or' => 'またはリモートサーバーに接続',
 			'serverConnect.subtitle' => 'ddagent サーバーに接続',
 			'voice.apiKeySaved' => 'APIキー（保存済み、変更するには入力）',
 			'voice.preview' => 'プレビュー',

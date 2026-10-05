@@ -3225,6 +3225,21 @@
     "connecting": "연결 중…",
     "connectionFailed": "연결 실패 ({{error}})",
     "enterUrl": "서버 URL을 입력하세요",
+    "local": {
+      "title": "이 기기",
+      "subtitle": "이 컴퓨터에서 ddagent 서버를 실행합니다",
+      "install": "로컬 서버 설치",
+      "start": "로컬 서버 시작",
+      "stop": "중지",
+      "starting": "로컬 서버 시작 중…",
+      "downloading": "서버 다운로드 중… {{percent}}%",
+      "installing": "설치 중…",
+      "running": "{{url}}에서 실행 중",
+      "installed": "설치됨 (v{{version}})",
+      "connect": "이 서버 사용",
+      "error": "로컬 서버 오류: {{error}}",
+      "or": "또는 원격 서버에 연결"
+    },
     "subtitle": "ddagent 서버에 연결하세요"
   },
   "voice": {

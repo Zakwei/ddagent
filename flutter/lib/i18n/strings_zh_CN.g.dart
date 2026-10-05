@@ -460,6 +460,7 @@ class Translations$serverConnect$zh_CN extends Translations$serverConnect$en {
 	@override String get connecting => '正在连接…';
 	@override String connectionFailed({required Object error}) => '连接失败（${error}）';
 	@override String get enterUrl => '输入服务器 URL';
+	@override late final Translations$serverConnect$local$zh_CN local = Translations$serverConnect$local$zh_CN.internal(_root);
 	@override String get subtitle => '连接到你的 ddagent 服务器';
 }
 
@@ -3997,6 +3998,28 @@ class Translations$notifications$errors$zh_CN extends Translations$notifications
 	// Translations
 	@override String get noResponse => '服务器无响应';
 	@override String get registrationRejected => '注册被服务器拒绝';
+}
+
+// Path: serverConnect.local
+class Translations$serverConnect$local$zh_CN extends Translations$serverConnect$local$en {
+	Translations$serverConnect$local$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '本设备';
+	@override String get subtitle => '在此计算机上运行 ddagent 服务器';
+	@override String get install => '安装本地服务器';
+	@override String get start => '启动本地服务器';
+	@override String get stop => '停止';
+	@override String get starting => '正在启动本地服务器…';
+	@override String downloading({required Object percent}) => '正在下载服务器… ${percent}%';
+	@override String get installing => '正在安装…';
+	@override String running({required Object url}) => '正在 ${url} 上运行';
+	@override String installed({required Object version}) => '已安装 (v${version})';
+	@override String get connect => '使用此服务器';
+	@override String error({required Object error}) => '本地服务器错误：${error}';
+	@override String get or => '或连接到远程服务器';
 }
 
 // Path: collab.roles
@@ -9449,6 +9472,19 @@ extension on TranslationsZhCn {
 			'serverConnect.connecting' => '正在连接…',
 			'serverConnect.connectionFailed' => ({required Object error}) => '连接失败（${error}）',
 			'serverConnect.enterUrl' => '输入服务器 URL',
+			'serverConnect.local.title' => '本设备',
+			'serverConnect.local.subtitle' => '在此计算机上运行 ddagent 服务器',
+			'serverConnect.local.install' => '安装本地服务器',
+			'serverConnect.local.start' => '启动本地服务器',
+			'serverConnect.local.stop' => '停止',
+			'serverConnect.local.starting' => '正在启动本地服务器…',
+			'serverConnect.local.downloading' => ({required Object percent}) => '正在下载服务器… ${percent}%',
+			'serverConnect.local.installing' => '正在安装…',
+			'serverConnect.local.running' => ({required Object url}) => '正在 ${url} 上运行',
+			'serverConnect.local.installed' => ({required Object version}) => '已安装 (v${version})',
+			'serverConnect.local.connect' => '使用此服务器',
+			'serverConnect.local.error' => ({required Object error}) => '本地服务器错误：${error}',
+			'serverConnect.local.or' => '或连接到远程服务器',
 			'serverConnect.subtitle' => '连接到你的 ddagent 服务器',
 			'voice.apiKeySaved' => 'API 密钥（已保存，输入以替换）',
 			'voice.preview' => '预览',

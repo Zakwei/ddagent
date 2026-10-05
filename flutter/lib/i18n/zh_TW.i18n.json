@@ -3225,6 +3225,21 @@
     "connecting": "正在連線…",
     "connectionFailed": "連線失敗（{{error}}）",
     "enterUrl": "輸入伺服器 URL",
+    "local": {
+      "title": "此裝置",
+      "subtitle": "在此電腦上執行 ddagent 伺服器",
+      "install": "安裝本機伺服器",
+      "start": "啟動本機伺服器",
+      "stop": "停止",
+      "starting": "正在啟動本機伺服器…",
+      "downloading": "正在下載伺服器… {{percent}}%",
+      "installing": "正在安裝…",
+      "running": "正在 {{url}} 上執行",
+      "installed": "已安裝 (v{{version}})",
+      "connect": "使用此伺服器",
+      "error": "本機伺服器錯誤：{{error}}",
+      "or": "或連線到遠端伺服器"
+    },
     "subtitle": "連線到你的 ddagent 伺服器"
   },
   "voice": {

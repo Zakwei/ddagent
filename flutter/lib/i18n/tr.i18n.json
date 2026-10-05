@@ -3225,6 +3225,21 @@
     "connecting": "Bağlanılıyor…",
     "connectionFailed": "Bağlantı başarısız ({{error}})",
     "enterUrl": "Bir sunucu URL'si girin",
+    "local": {
+      "title": "Bu cihaz",
+      "subtitle": "ddagent sunucusunu bu makinede çalıştırın",
+      "install": "Yerel sunucuyu kur",
+      "start": "Yerel sunucuyu başlat",
+      "stop": "Durdur",
+      "starting": "Yerel sunucu başlatılıyor…",
+      "downloading": "Sunucu indiriliyor… %{{percent}}",
+      "installing": "Kuruluyor…",
+      "running": "{{url}} adresinde çalışıyor",
+      "installed": "Kurulu (v{{version}})",
+      "connect": "Bu sunucuyu kullan",
+      "error": "Yerel sunucu hatası: {{error}}",
+      "or": "veya uzak bir sunucuya bağlanın"
+    },
     "subtitle": "ddagent sunucunuza bağlanın"
   },
   "voice": {

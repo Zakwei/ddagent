@@ -460,6 +460,7 @@ class Translations$serverConnect$zh_TW extends Translations$serverConnect$en {
 	@override String get connecting => '正在連線…';
 	@override String connectionFailed({required Object error}) => '連線失敗（${error}）';
 	@override String get enterUrl => '輸入伺服器 URL';
+	@override late final Translations$serverConnect$local$zh_TW local = Translations$serverConnect$local$zh_TW.internal(_root);
 	@override String get subtitle => '連線到你的 ddagent 伺服器';
 }
 
@@ -3997,6 +3998,28 @@ class Translations$notifications$errors$zh_TW extends Translations$notifications
 	// Translations
 	@override String get noResponse => '伺服器沒有回應';
 	@override String get registrationRejected => '伺服器拒絕註冊';
+}
+
+// Path: serverConnect.local
+class Translations$serverConnect$local$zh_TW extends Translations$serverConnect$local$en {
+	Translations$serverConnect$local$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '此裝置';
+	@override String get subtitle => '在此電腦上執行 ddagent 伺服器';
+	@override String get install => '安裝本機伺服器';
+	@override String get start => '啟動本機伺服器';
+	@override String get stop => '停止';
+	@override String get starting => '正在啟動本機伺服器…';
+	@override String downloading({required Object percent}) => '正在下載伺服器… ${percent}%';
+	@override String get installing => '正在安裝…';
+	@override String running({required Object url}) => '正在 ${url} 上執行';
+	@override String installed({required Object version}) => '已安裝 (v${version})';
+	@override String get connect => '使用此伺服器';
+	@override String error({required Object error}) => '本機伺服器錯誤：${error}';
+	@override String get or => '或連線到遠端伺服器';
 }
 
 // Path: collab.roles
@@ -9449,6 +9472,19 @@ extension on TranslationsZhTw {
 			'serverConnect.connecting' => '正在連線…',
 			'serverConnect.connectionFailed' => ({required Object error}) => '連線失敗（${error}）',
 			'serverConnect.enterUrl' => '輸入伺服器 URL',
+			'serverConnect.local.title' => '此裝置',
+			'serverConnect.local.subtitle' => '在此電腦上執行 ddagent 伺服器',
+			'serverConnect.local.install' => '安裝本機伺服器',
+			'serverConnect.local.start' => '啟動本機伺服器',
+			'serverConnect.local.stop' => '停止',
+			'serverConnect.local.starting' => '正在啟動本機伺服器…',
+			'serverConnect.local.downloading' => ({required Object percent}) => '正在下載伺服器… ${percent}%',
+			'serverConnect.local.installing' => '正在安裝…',
+			'serverConnect.local.running' => ({required Object url}) => '正在 ${url} 上執行',
+			'serverConnect.local.installed' => ({required Object version}) => '已安裝 (v${version})',
+			'serverConnect.local.connect' => '使用此伺服器',
+			'serverConnect.local.error' => ({required Object error}) => '本機伺服器錯誤：${error}',
+			'serverConnect.local.or' => '或連線到遠端伺服器',
 			'serverConnect.subtitle' => '連線到你的 ddagent 伺服器',
 			'voice.apiKeySaved' => 'API 金鑰（已儲存，輸入以取代）',
 			'voice.preview' => '預覽',

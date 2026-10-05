@@ -460,6 +460,7 @@ class Translations$serverConnect$tr extends Translations$serverConnect$en {
 	@override String get connecting => 'Bağlanılıyor…';
 	@override String connectionFailed({required Object error}) => 'Bağlantı başarısız (${error})';
 	@override String get enterUrl => 'Bir sunucu URL\'si girin';
+	@override late final Translations$serverConnect$local$tr local = Translations$serverConnect$local$tr._(_root);
 	@override String get subtitle => 'ddagent sunucunuza bağlanın';
 }
 
@@ -3997,6 +3998,28 @@ class Translations$notifications$errors$tr extends Translations$notifications$er
 	// Translations
 	@override String get noResponse => 'Sunucudan yanıt yok';
 	@override String get registrationRejected => 'Kayıt sunucu tarafından reddedildi';
+}
+
+// Path: serverConnect.local
+class Translations$serverConnect$local$tr extends Translations$serverConnect$local$en {
+	Translations$serverConnect$local$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Bu cihaz';
+	@override String get subtitle => 'ddagent sunucusunu bu makinede çalıştırın';
+	@override String get install => 'Yerel sunucuyu kur';
+	@override String get start => 'Yerel sunucuyu başlat';
+	@override String get stop => 'Durdur';
+	@override String get starting => 'Yerel sunucu başlatılıyor…';
+	@override String downloading({required Object percent}) => 'Sunucu indiriliyor… %${percent}';
+	@override String get installing => 'Kuruluyor…';
+	@override String running({required Object url}) => '${url} adresinde çalışıyor';
+	@override String installed({required Object version}) => 'Kurulu (v${version})';
+	@override String get connect => 'Bu sunucuyu kullan';
+	@override String error({required Object error}) => 'Yerel sunucu hatası: ${error}';
+	@override String get or => 'veya uzak bir sunucuya bağlanın';
 }
 
 // Path: collab.roles
@@ -9449,6 +9472,19 @@ extension on TranslationsTr {
 			'serverConnect.connecting' => 'Bağlanılıyor…',
 			'serverConnect.connectionFailed' => ({required Object error}) => 'Bağlantı başarısız (${error})',
 			'serverConnect.enterUrl' => 'Bir sunucu URL\'si girin',
+			'serverConnect.local.title' => 'Bu cihaz',
+			'serverConnect.local.subtitle' => 'ddagent sunucusunu bu makinede çalıştırın',
+			'serverConnect.local.install' => 'Yerel sunucuyu kur',
+			'serverConnect.local.start' => 'Yerel sunucuyu başlat',
+			'serverConnect.local.stop' => 'Durdur',
+			'serverConnect.local.starting' => 'Yerel sunucu başlatılıyor…',
+			'serverConnect.local.downloading' => ({required Object percent}) => 'Sunucu indiriliyor… %${percent}',
+			'serverConnect.local.installing' => 'Kuruluyor…',
+			'serverConnect.local.running' => ({required Object url}) => '${url} adresinde çalışıyor',
+			'serverConnect.local.installed' => ({required Object version}) => 'Kurulu (v${version})',
+			'serverConnect.local.connect' => 'Bu sunucuyu kullan',
+			'serverConnect.local.error' => ({required Object error}) => 'Yerel sunucu hatası: ${error}',
+			'serverConnect.local.or' => 'veya uzak bir sunucuya bağlanın',
 			'serverConnect.subtitle' => 'ddagent sunucunuza bağlanın',
 			'voice.apiKeySaved' => 'API Anahtarı (kayıtlı, değiştirmek için girin)',
 			'voice.preview' => 'Önizle',

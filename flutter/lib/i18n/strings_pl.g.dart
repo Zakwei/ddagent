@@ -466,6 +466,7 @@ class Translations$serverConnect$pl extends Translations$serverConnect$en {
 	@override String get connecting => 'Łączenie…';
 	@override String connectionFailed({required Object error}) => 'Połączenie nie powiodło się (${error})';
 	@override String get enterUrl => 'Wpisz adres URL serwera';
+	@override late final Translations$serverConnect$local$pl local = Translations$serverConnect$local$pl._(_root);
 	@override String get subtitle => 'Połącz się ze swoim serwerem ddagent';
 }
 
@@ -4191,6 +4192,28 @@ class Translations$notifications$errors$pl extends Translations$notifications$er
 	// Translations
 	@override String get noResponse => 'Brak odpowiedzi z serwera';
 	@override String get registrationRejected => 'Serwer odrzucił rejestrację';
+}
+
+// Path: serverConnect.local
+class Translations$serverConnect$local$pl extends Translations$serverConnect$local$en {
+	Translations$serverConnect$local$pl._(TranslationsPl root) : this._root = root, super.internal(root);
+
+	final TranslationsPl _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'To urządzenie';
+	@override String get subtitle => 'Uruchom serwer ddagent na tym komputerze';
+	@override String get install => 'Zainstaluj serwer lokalny';
+	@override String get start => 'Uruchom serwer lokalny';
+	@override String get stop => 'Zatrzymaj';
+	@override String get starting => 'Uruchamianie serwera lokalnego…';
+	@override String downloading({required Object percent}) => 'Pobieranie serwera… ${percent}%';
+	@override String get installing => 'Instalowanie…';
+	@override String running({required Object url}) => 'Działa pod adresem ${url}';
+	@override String installed({required Object version}) => 'Zainstalowany (v${version})';
+	@override String get connect => 'Użyj tego serwera';
+	@override String error({required Object error}) => 'Błąd serwera lokalnego: ${error}';
+	@override String get or => 'lub połącz się ze zdalnym serwerem';
 }
 
 // Path: collab.roles
@@ -10076,6 +10099,19 @@ extension on TranslationsPl {
 			'serverConnect.connecting' => 'Łączenie…',
 			'serverConnect.connectionFailed' => ({required Object error}) => 'Połączenie nie powiodło się (${error})',
 			'serverConnect.enterUrl' => 'Wpisz adres URL serwera',
+			'serverConnect.local.title' => 'To urządzenie',
+			'serverConnect.local.subtitle' => 'Uruchom serwer ddagent na tym komputerze',
+			'serverConnect.local.install' => 'Zainstaluj serwer lokalny',
+			'serverConnect.local.start' => 'Uruchom serwer lokalny',
+			'serverConnect.local.stop' => 'Zatrzymaj',
+			'serverConnect.local.starting' => 'Uruchamianie serwera lokalnego…',
+			'serverConnect.local.downloading' => ({required Object percent}) => 'Pobieranie serwera… ${percent}%',
+			'serverConnect.local.installing' => 'Instalowanie…',
+			'serverConnect.local.running' => ({required Object url}) => 'Działa pod adresem ${url}',
+			'serverConnect.local.installed' => ({required Object version}) => 'Zainstalowany (v${version})',
+			'serverConnect.local.connect' => 'Użyj tego serwera',
+			'serverConnect.local.error' => ({required Object error}) => 'Błąd serwera lokalnego: ${error}',
+			'serverConnect.local.or' => 'lub połącz się ze zdalnym serwerem',
 			'serverConnect.subtitle' => 'Połącz się ze swoim serwerem ddagent',
 			'voice.apiKeySaved' => 'Klucz API (zapisany, wpisz nowy, aby zastąpić)',
 			'voice.preview' => 'Podgląd',

@@ -460,6 +460,7 @@ class Translations$serverConnect$ru extends Translations$serverConnect$en {
 	@override String get connecting => 'Подключение…';
 	@override String connectionFailed({required Object error}) => 'Не удалось подключиться (${error})';
 	@override String get enterUrl => 'Введите URL сервера';
+	@override late final Translations$serverConnect$local$ru local = Translations$serverConnect$local$ru._(_root);
 	@override String get subtitle => 'Подключитесь к вашему серверу ddagent';
 }
 
@@ -4003,6 +4004,28 @@ class Translations$notifications$errors$ru extends Translations$notifications$er
 	// Translations
 	@override String get noResponse => 'Нет ответа от сервера';
 	@override String get registrationRejected => 'Сервер отклонил регистрацию';
+}
+
+// Path: serverConnect.local
+class Translations$serverConnect$local$ru extends Translations$serverConnect$local$en {
+	Translations$serverConnect$local$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Это устройство';
+	@override String get subtitle => 'Запустить сервер ddagent на этой машине';
+	@override String get install => 'Установить локальный сервер';
+	@override String get start => 'Запустить локальный сервер';
+	@override String get stop => 'Остановить';
+	@override String get starting => 'Запуск локального сервера…';
+	@override String downloading({required Object percent}) => 'Загрузка сервера… ${percent}%';
+	@override String get installing => 'Установка…';
+	@override String running({required Object url}) => 'Запущен по адресу ${url}';
+	@override String installed({required Object version}) => 'Установлен (v${version})';
+	@override String get connect => 'Использовать этот сервер';
+	@override String error({required Object error}) => 'Ошибка локального сервера: ${error}';
+	@override String get or => 'или подключитесь к удалённому серверу';
 }
 
 // Path: collab.roles
@@ -9455,6 +9478,19 @@ extension on TranslationsRu {
 			'serverConnect.connecting' => 'Подключение…',
 			'serverConnect.connectionFailed' => ({required Object error}) => 'Не удалось подключиться (${error})',
 			'serverConnect.enterUrl' => 'Введите URL сервера',
+			'serverConnect.local.title' => 'Это устройство',
+			'serverConnect.local.subtitle' => 'Запустить сервер ddagent на этой машине',
+			'serverConnect.local.install' => 'Установить локальный сервер',
+			'serverConnect.local.start' => 'Запустить локальный сервер',
+			'serverConnect.local.stop' => 'Остановить',
+			'serverConnect.local.starting' => 'Запуск локального сервера…',
+			'serverConnect.local.downloading' => ({required Object percent}) => 'Загрузка сервера… ${percent}%',
+			'serverConnect.local.installing' => 'Установка…',
+			'serverConnect.local.running' => ({required Object url}) => 'Запущен по адресу ${url}',
+			'serverConnect.local.installed' => ({required Object version}) => 'Установлен (v${version})',
+			'serverConnect.local.connect' => 'Использовать этот сервер',
+			'serverConnect.local.error' => ({required Object error}) => 'Ошибка локального сервера: ${error}',
+			'serverConnect.local.or' => 'или подключитесь к удалённому серверу',
 			'serverConnect.subtitle' => 'Подключитесь к вашему серверу ddagent',
 			'voice.apiKeySaved' => 'API-ключ (сохранён, введите, чтобы заменить)',
 			'voice.preview' => 'Предпросмотр',

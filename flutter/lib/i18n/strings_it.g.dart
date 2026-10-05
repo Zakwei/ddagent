@@ -460,6 +460,7 @@ class Translations$serverConnect$it extends Translations$serverConnect$en {
 	@override String get connecting => 'Connessione…';
 	@override String connectionFailed({required Object error}) => 'Connessione non riuscita (${error})';
 	@override String get enterUrl => 'Inserisci l\'URL del server';
+	@override late final Translations$serverConnect$local$it local = Translations$serverConnect$local$it._(_root);
 	@override String get subtitle => 'Connettiti al tuo server ddagent';
 }
 
@@ -3997,6 +3998,28 @@ class Translations$notifications$errors$it extends Translations$notifications$er
 	// Translations
 	@override String get noResponse => 'Nessuna risposta dal server';
 	@override String get registrationRejected => 'Registrazione rifiutata dal server';
+}
+
+// Path: serverConnect.local
+class Translations$serverConnect$local$it extends Translations$serverConnect$local$en {
+	Translations$serverConnect$local$it._(TranslationsIt root) : this._root = root, super.internal(root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Questo dispositivo';
+	@override String get subtitle => 'Esegui il server ddagent su questa macchina';
+	@override String get install => 'Installa il server locale';
+	@override String get start => 'Avvia il server locale';
+	@override String get stop => 'Arresta';
+	@override String get starting => 'Avvio del server locale…';
+	@override String downloading({required Object percent}) => 'Download del server… ${percent}%';
+	@override String get installing => 'Installazione…';
+	@override String running({required Object url}) => 'In esecuzione su ${url}';
+	@override String installed({required Object version}) => 'Installato (v${version})';
+	@override String get connect => 'Usa questo server';
+	@override String error({required Object error}) => 'Errore del server locale: ${error}';
+	@override String get or => 'oppure connettiti a un server remoto';
 }
 
 // Path: collab.roles
@@ -9449,6 +9472,19 @@ extension on TranslationsIt {
 			'serverConnect.connecting' => 'Connessione…',
 			'serverConnect.connectionFailed' => ({required Object error}) => 'Connessione non riuscita (${error})',
 			'serverConnect.enterUrl' => 'Inserisci l\'URL del server',
+			'serverConnect.local.title' => 'Questo dispositivo',
+			'serverConnect.local.subtitle' => 'Esegui il server ddagent su questa macchina',
+			'serverConnect.local.install' => 'Installa il server locale',
+			'serverConnect.local.start' => 'Avvia il server locale',
+			'serverConnect.local.stop' => 'Arresta',
+			'serverConnect.local.starting' => 'Avvio del server locale…',
+			'serverConnect.local.downloading' => ({required Object percent}) => 'Download del server… ${percent}%',
+			'serverConnect.local.installing' => 'Installazione…',
+			'serverConnect.local.running' => ({required Object url}) => 'In esecuzione su ${url}',
+			'serverConnect.local.installed' => ({required Object version}) => 'Installato (v${version})',
+			'serverConnect.local.connect' => 'Usa questo server',
+			'serverConnect.local.error' => ({required Object error}) => 'Errore del server locale: ${error}',
+			'serverConnect.local.or' => 'oppure connettiti a un server remoto',
 			'serverConnect.subtitle' => 'Connettiti al tuo server ddagent',
 			'voice.apiKeySaved' => 'Chiave API (salvata, inserisci per sostituire)',
 			'voice.preview' => 'Anteprima',

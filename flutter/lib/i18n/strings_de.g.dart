@@ -460,6 +460,7 @@ class Translations$serverConnect$de extends Translations$serverConnect$en {
 	@override String get connecting => 'Verbinde…';
 	@override String connectionFailed({required Object error}) => 'Verbindung fehlgeschlagen (${error})';
 	@override String get enterUrl => 'Server-URL eingeben';
+	@override late final Translations$serverConnect$local$de local = Translations$serverConnect$local$de._(_root);
 	@override String get subtitle => 'Mit deinem ddagent-Server verbinden';
 }
 
@@ -3997,6 +3998,28 @@ class Translations$notifications$errors$de extends Translations$notifications$er
 	// Translations
 	@override String get noResponse => 'Keine Antwort vom Server';
 	@override String get registrationRejected => 'Registrierung vom Server abgelehnt';
+}
+
+// Path: serverConnect.local
+class Translations$serverConnect$local$de extends Translations$serverConnect$local$en {
+	Translations$serverConnect$local$de._(TranslationsDe root) : this._root = root, super.internal(root);
+
+	final TranslationsDe _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Dieses Gerät';
+	@override String get subtitle => 'ddagent-Server auf diesem Rechner ausführen';
+	@override String get install => 'Lokalen Server installieren';
+	@override String get start => 'Lokalen Server starten';
+	@override String get stop => 'Stoppen';
+	@override String get starting => 'Lokaler Server wird gestartet…';
+	@override String downloading({required Object percent}) => 'Server wird heruntergeladen… ${percent}%';
+	@override String get installing => 'Wird installiert…';
+	@override String running({required Object url}) => 'Läuft unter ${url}';
+	@override String installed({required Object version}) => 'Installiert (v${version})';
+	@override String get connect => 'Diesen Server verwenden';
+	@override String error({required Object error}) => 'Fehler des lokalen Servers: ${error}';
+	@override String get or => 'oder mit einem Remote-Server verbinden';
 }
 
 // Path: collab.roles
@@ -9449,6 +9472,19 @@ extension on TranslationsDe {
 			'serverConnect.connecting' => 'Verbinde…',
 			'serverConnect.connectionFailed' => ({required Object error}) => 'Verbindung fehlgeschlagen (${error})',
 			'serverConnect.enterUrl' => 'Server-URL eingeben',
+			'serverConnect.local.title' => 'Dieses Gerät',
+			'serverConnect.local.subtitle' => 'ddagent-Server auf diesem Rechner ausführen',
+			'serverConnect.local.install' => 'Lokalen Server installieren',
+			'serverConnect.local.start' => 'Lokalen Server starten',
+			'serverConnect.local.stop' => 'Stoppen',
+			'serverConnect.local.starting' => 'Lokaler Server wird gestartet…',
+			'serverConnect.local.downloading' => ({required Object percent}) => 'Server wird heruntergeladen… ${percent}%',
+			'serverConnect.local.installing' => 'Wird installiert…',
+			'serverConnect.local.running' => ({required Object url}) => 'Läuft unter ${url}',
+			'serverConnect.local.installed' => ({required Object version}) => 'Installiert (v${version})',
+			'serverConnect.local.connect' => 'Diesen Server verwenden',
+			'serverConnect.local.error' => ({required Object error}) => 'Fehler des lokalen Servers: ${error}',
+			'serverConnect.local.or' => 'oder mit einem Remote-Server verbinden',
 			'serverConnect.subtitle' => 'Mit deinem ddagent-Server verbinden',
 			'voice.apiKeySaved' => 'API-Schlüssel (gespeichert, zum Ersetzen eingeben)',
 			'voice.preview' => 'Vorschau',

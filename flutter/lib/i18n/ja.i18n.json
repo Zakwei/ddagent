@@ -3225,6 +3225,21 @@
     "connecting": "接続中…",
     "connectionFailed": "接続に失敗しました ({{error}})",
     "enterUrl": "サーバーのURLを入力",
+    "local": {
+      "title": "このデバイス",
+      "subtitle": "このマシンでddagentサーバーを実行します",
+      "install": "ローカルサーバーをインストール",
+      "start": "ローカルサーバーを起動",
+      "stop": "停止",
+      "starting": "ローカルサーバーを起動中…",
+      "downloading": "サーバーをダウンロード中… {{percent}}%",
+      "installing": "インストール中…",
+      "running": "{{url}} で実行中",
+      "installed": "インストール済み (v{{version}})",
+      "connect": "このサーバーを使用",
+      "error": "ローカルサーバーエラー: {{error}}",
+      "or": "またはリモートサーバーに接続"
+    },
     "subtitle": "ddagent サーバーに接続"
   },
   "voice": {
