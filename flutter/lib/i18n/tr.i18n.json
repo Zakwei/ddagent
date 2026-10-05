@@ -2914,9 +2914,6 @@
       "manage": "Etiketleri yönet",
       "none": "Henüz etiket yok."
     },
-    "settings": {
-      "description": "Ajanlar için yerel bellek katmanı: anılar, kurallar, beceriler ve kişisel bilgiler."
-    },
     "contextBudget": {
       "tokens": "~{{tokens}} / {{budget}} tok"
     },

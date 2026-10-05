@@ -2914,9 +2914,6 @@
       "manage": "Gérer les étiquettes",
       "none": "Aucune étiquette."
     },
-    "settings": {
-      "description": "Couche de mémoire locale pour les agents : souvenirs, règles, compétences et informations personnelles."
-    },
     "contextBudget": {
       "tokens": "~{{tokens}} / {{budget}} tok"
     },

@@ -138,8 +138,7 @@ Wiederherstellung, Skill-Icon-Upload und JSON-Export/-Import. Der Memories-Tab h
 Tag-Filterleiste (mit Tag-Verwaltung), die App-Leiste hat Volltextsuche, einen
 Link-erstellen-Dialog und eine Migrationsaktion, und der Graph-Tab ist eine
 kraftgerichtete Relationsansicht mit Pan/Zoom, Knoten-Ziehen, Entitätstyp-Filtern und
-Nachbar-Hervorhebung. Settings → Knowledge
-verlinkt direkt auf denselben Bildschirm.
+Nachbar-Hervorhebung.
 
 ## Gut kuratieren
 

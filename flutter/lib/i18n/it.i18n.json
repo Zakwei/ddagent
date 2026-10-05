@@ -2914,9 +2914,6 @@
       "manage": "Gestisci tag",
       "none": "Nessun tag."
     },
-    "settings": {
-      "description": "Livello di memoria locale per agenti: ricordi, regole, competenze e informazioni personali."
-    },
     "contextBudget": {
       "tokens": "~{{tokens}} / {{budget}} tok"
     },

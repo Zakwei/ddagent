@@ -307,7 +307,6 @@ class Translations$knowledge$ja extends Translations$knowledge$en {
 	@override late final Translations$knowledge$search$ja search = Translations$knowledge$search$ja._(_root);
 	@override late final Translations$knowledge$links$ja links = Translations$knowledge$links$ja._(_root);
 	@override late final Translations$knowledge$tags$ja tags = Translations$knowledge$tags$ja._(_root);
-	@override late final Translations$knowledge$settings$ja settings = Translations$knowledge$settings$ja._(_root);
 	@override late final Translations$knowledge$contextBudget$ja contextBudget = Translations$knowledge$contextBudget$ja._(_root);
 	@override late final Translations$knowledge$critical$ja critical = Translations$knowledge$critical$ja._(_root);
 	@override late final Translations$knowledge$errors$ja errors = Translations$knowledge$errors$ja._(_root);
@@ -3549,16 +3548,6 @@ class Translations$knowledge$tags$ja extends Translations$knowledge$tags$en {
 	@override String get all => 'すべてのタグ';
 	@override String get manage => 'タグを管理';
 	@override String get none => 'タグがありません。';
-}
-
-// Path: knowledge.settings
-class Translations$knowledge$settings$ja extends Translations$knowledge$settings$en {
-	Translations$knowledge$settings$ja._(TranslationsJa root) : this._root = root, super.internal(root);
-
-	final TranslationsJa _root; // ignore: unused_field
-
-	// Translations
-	@override String get description => 'エージェント向けのローカルメモリ層：メモリ、ルール、スキル、個人情報。';
 }
 
 // Path: knowledge.contextBudget
@@ -9251,7 +9240,6 @@ extension on TranslationsJa {
 			'knowledge.tags.all' => 'すべてのタグ',
 			'knowledge.tags.manage' => 'タグを管理',
 			'knowledge.tags.none' => 'タグがありません。',
-			'knowledge.settings.description' => 'エージェント向けのローカルメモリ層：メモリ、ルール、スキル、個人情報。',
 			'knowledge.contextBudget.tokens' => ({required Object tokens, required Object budget}) => '~${tokens} / ${budget} tok',
 			'knowledge.critical.make' => 'クリティカルにする',
 			'knowledge.critical.makeAll' => 'すべてのルールをクリティカルにする',

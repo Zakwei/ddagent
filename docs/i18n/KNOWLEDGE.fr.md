@@ -138,7 +138,7 @@ skill et l’export/import JSON. L’onglet Memories a une barre de filtre d’�
 gestion des étiquettes), la barre d’app a une recherche plein texte, une boîte de dialogue de
 création de lien et une action de migration, et l’onglet Graph est une vue de relations dirigée
 par les forces avec pan/zoom, glisser-déposer des nœuds, filtres par type d’entité et mise en
-évidence des voisins. Settings → Knowledge renvoie directement au même écran.
+évidence des voisins.
 
 ## Bien la curer
 

@@ -307,7 +307,6 @@ class Translations$knowledge$ko extends Translations$knowledge$en {
 	@override late final Translations$knowledge$search$ko search = Translations$knowledge$search$ko._(_root);
 	@override late final Translations$knowledge$links$ko links = Translations$knowledge$links$ko._(_root);
 	@override late final Translations$knowledge$tags$ko tags = Translations$knowledge$tags$ko._(_root);
-	@override late final Translations$knowledge$settings$ko settings = Translations$knowledge$settings$ko._(_root);
 	@override late final Translations$knowledge$contextBudget$ko contextBudget = Translations$knowledge$contextBudget$ko._(_root);
 	@override late final Translations$knowledge$critical$ko critical = Translations$knowledge$critical$ko._(_root);
 	@override late final Translations$knowledge$errors$ko errors = Translations$knowledge$errors$ko._(_root);
@@ -3549,16 +3548,6 @@ class Translations$knowledge$tags$ko extends Translations$knowledge$tags$en {
 	@override String get all => '모든 태그';
 	@override String get manage => '태그 관리';
 	@override String get none => '태그가 없습니다.';
-}
-
-// Path: knowledge.settings
-class Translations$knowledge$settings$ko extends Translations$knowledge$settings$en {
-	Translations$knowledge$settings$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get description => '에이전트를 위한 로컬 메모리 계층: 메모리, 규칙, 스킬, 개인정보.';
 }
 
 // Path: knowledge.contextBudget
@@ -9251,7 +9240,6 @@ extension on TranslationsKo {
 			'knowledge.tags.all' => '모든 태그',
 			'knowledge.tags.manage' => '태그 관리',
 			'knowledge.tags.none' => '태그가 없습니다.',
-			'knowledge.settings.description' => '에이전트를 위한 로컬 메모리 계층: 메모리, 규칙, 스킬, 개인정보.',
 			'knowledge.contextBudget.tokens' => ({required Object tokens, required Object budget}) => '~${tokens} / ${budget} 토큰',
 			'knowledge.critical.make' => '치명적으로 표시',
 			'knowledge.critical.makeAll' => '모든 규칙을 치명적으로 표시',

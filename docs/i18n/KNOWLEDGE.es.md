@@ -138,7 +138,7 @@ skills y exportación/importación JSON. La pestaña Memories tiene una barra de
 etiquetas (con gestión de etiquetas), la barra de la app tiene búsqueda de texto completo, un
 diálogo de crear enlace y una acción de migración, y la pestaña Graph es una vista de relaciones
 dirigida por fuerzas con pan/zoom, arrastre de nodos, filtros por tipo de entidad y resaltado
-de vecinos. Settings → Knowledge enlaza directamente con la misma pantalla.
+de vecinos.
 
 ## Curarlo bien
 

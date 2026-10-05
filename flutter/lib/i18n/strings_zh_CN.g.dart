@@ -307,7 +307,6 @@ class Translations$knowledge$zh_CN extends Translations$knowledge$en {
 	@override late final Translations$knowledge$search$zh_CN search = Translations$knowledge$search$zh_CN.internal(_root);
 	@override late final Translations$knowledge$links$zh_CN links = Translations$knowledge$links$zh_CN.internal(_root);
 	@override late final Translations$knowledge$tags$zh_CN tags = Translations$knowledge$tags$zh_CN.internal(_root);
-	@override late final Translations$knowledge$settings$zh_CN settings = Translations$knowledge$settings$zh_CN.internal(_root);
 	@override late final Translations$knowledge$contextBudget$zh_CN contextBudget = Translations$knowledge$contextBudget$zh_CN.internal(_root);
 	@override late final Translations$knowledge$critical$zh_CN critical = Translations$knowledge$critical$zh_CN.internal(_root);
 	@override late final Translations$knowledge$errors$zh_CN errors = Translations$knowledge$errors$zh_CN.internal(_root);
@@ -3549,16 +3548,6 @@ class Translations$knowledge$tags$zh_CN extends Translations$knowledge$tags$en {
 	@override String get all => '所有标签';
 	@override String get manage => '管理标签';
 	@override String get none => '还没有标签。';
-}
-
-// Path: knowledge.settings
-class Translations$knowledge$settings$zh_CN extends Translations$knowledge$settings$en {
-	Translations$knowledge$settings$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get description => '面向代理的本地记忆层：记忆、规则、技能和个人信息。';
 }
 
 // Path: knowledge.contextBudget
@@ -9251,7 +9240,6 @@ extension on TranslationsZhCn {
 			'knowledge.tags.all' => '所有标签',
 			'knowledge.tags.manage' => '管理标签',
 			'knowledge.tags.none' => '还没有标签。',
-			'knowledge.settings.description' => '面向代理的本地记忆层：记忆、规则、技能和个人信息。',
 			'knowledge.contextBudget.tokens' => ({required Object tokens, required Object budget}) => '~${tokens} / ${budget} 令牌',
 			'knowledge.critical.make' => '标记为严重',
 			'knowledge.critical.makeAll' => '将所有规则设为严重',

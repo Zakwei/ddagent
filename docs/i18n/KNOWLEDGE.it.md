@@ -138,7 +138,6 @@ delle skill e l’export/import JSON. La scheda Memories ha una barra di filtro 
 gestione dei tag), la barra dell’app ha la ricerca full-text, una finestra di creazione link e
 un’azione di migrazione, e la scheda Graph è una vista delle relazioni force-directed con
 pan/zoom, trascinamento dei nodi, filtri per tipo di entità ed evidenziazione dei vicini.
-Settings → Knowledge collega direttamente alla stessa schermata.
 
 ## Curarla bene
 

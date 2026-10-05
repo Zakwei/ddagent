@@ -307,7 +307,6 @@ class Translations$knowledge$zh_TW extends Translations$knowledge$en {
 	@override late final Translations$knowledge$search$zh_TW search = Translations$knowledge$search$zh_TW.internal(_root);
 	@override late final Translations$knowledge$links$zh_TW links = Translations$knowledge$links$zh_TW.internal(_root);
 	@override late final Translations$knowledge$tags$zh_TW tags = Translations$knowledge$tags$zh_TW.internal(_root);
-	@override late final Translations$knowledge$settings$zh_TW settings = Translations$knowledge$settings$zh_TW.internal(_root);
 	@override late final Translations$knowledge$contextBudget$zh_TW contextBudget = Translations$knowledge$contextBudget$zh_TW.internal(_root);
 	@override late final Translations$knowledge$critical$zh_TW critical = Translations$knowledge$critical$zh_TW.internal(_root);
 	@override late final Translations$knowledge$errors$zh_TW errors = Translations$knowledge$errors$zh_TW.internal(_root);
@@ -3549,16 +3548,6 @@ class Translations$knowledge$tags$zh_TW extends Translations$knowledge$tags$en {
 	@override String get all => '所有標籤';
 	@override String get manage => '管理標籤';
 	@override String get none => '尚無標籤。';
-}
-
-// Path: knowledge.settings
-class Translations$knowledge$settings$zh_TW extends Translations$knowledge$settings$en {
-	Translations$knowledge$settings$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
-
-	final TranslationsZhTw _root; // ignore: unused_field
-
-	// Translations
-	@override String get description => '面向代理的本機記憶層：記憶、規則、技能和個人資訊。';
 }
 
 // Path: knowledge.contextBudget
@@ -9251,7 +9240,6 @@ extension on TranslationsZhTw {
 			'knowledge.tags.all' => '所有標籤',
 			'knowledge.tags.manage' => '管理標籤',
 			'knowledge.tags.none' => '尚無標籤。',
-			'knowledge.settings.description' => '面向代理的本機記憶層：記憶、規則、技能和個人資訊。',
 			'knowledge.contextBudget.tokens' => ({required Object tokens, required Object budget}) => '~${tokens} / ${budget} 權杖',
 			'knowledge.critical.make' => '設為嚴重',
 			'knowledge.critical.makeAll' => '將所有規則設為嚴重',

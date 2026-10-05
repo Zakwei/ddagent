@@ -307,7 +307,6 @@ class Translations$knowledge$it extends Translations$knowledge$en {
 	@override late final Translations$knowledge$search$it search = Translations$knowledge$search$it._(_root);
 	@override late final Translations$knowledge$links$it links = Translations$knowledge$links$it._(_root);
 	@override late final Translations$knowledge$tags$it tags = Translations$knowledge$tags$it._(_root);
-	@override late final Translations$knowledge$settings$it settings = Translations$knowledge$settings$it._(_root);
 	@override late final Translations$knowledge$contextBudget$it contextBudget = Translations$knowledge$contextBudget$it._(_root);
 	@override late final Translations$knowledge$critical$it critical = Translations$knowledge$critical$it._(_root);
 	@override late final Translations$knowledge$errors$it errors = Translations$knowledge$errors$it._(_root);
@@ -3549,16 +3548,6 @@ class Translations$knowledge$tags$it extends Translations$knowledge$tags$en {
 	@override String get all => 'Tutti i tag';
 	@override String get manage => 'Gestisci tag';
 	@override String get none => 'Nessun tag.';
-}
-
-// Path: knowledge.settings
-class Translations$knowledge$settings$it extends Translations$knowledge$settings$en {
-	Translations$knowledge$settings$it._(TranslationsIt root) : this._root = root, super.internal(root);
-
-	final TranslationsIt _root; // ignore: unused_field
-
-	// Translations
-	@override String get description => 'Livello di memoria locale per agenti: ricordi, regole, competenze e informazioni personali.';
 }
 
 // Path: knowledge.contextBudget
@@ -9251,7 +9240,6 @@ extension on TranslationsIt {
 			'knowledge.tags.all' => 'Tutti i tag',
 			'knowledge.tags.manage' => 'Gestisci tag',
 			'knowledge.tags.none' => 'Nessun tag.',
-			'knowledge.settings.description' => 'Livello di memoria locale per agenti: ricordi, regole, competenze e informazioni personali.',
 			'knowledge.contextBudget.tokens' => ({required Object tokens, required Object budget}) => '~${tokens} / ${budget} tok',
 			'knowledge.critical.make' => 'Rendi critica',
 			'knowledge.critical.makeAll' => 'Rendi tutte le regole critiche',

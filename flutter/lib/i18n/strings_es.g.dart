@@ -307,7 +307,6 @@ class Translations$knowledge$es extends Translations$knowledge$en {
 	@override late final Translations$knowledge$search$es search = Translations$knowledge$search$es._(_root);
 	@override late final Translations$knowledge$links$es links = Translations$knowledge$links$es._(_root);
 	@override late final Translations$knowledge$tags$es tags = Translations$knowledge$tags$es._(_root);
-	@override late final Translations$knowledge$settings$es settings = Translations$knowledge$settings$es._(_root);
 	@override late final Translations$knowledge$contextBudget$es contextBudget = Translations$knowledge$contextBudget$es._(_root);
 	@override late final Translations$knowledge$critical$es critical = Translations$knowledge$critical$es._(_root);
 	@override late final Translations$knowledge$errors$es errors = Translations$knowledge$errors$es._(_root);
@@ -3549,16 +3548,6 @@ class Translations$knowledge$tags$es extends Translations$knowledge$tags$en {
 	@override String get all => 'Todas las etiquetas';
 	@override String get manage => 'Gestionar etiquetas';
 	@override String get none => 'Aún no hay etiquetas.';
-}
-
-// Path: knowledge.settings
-class Translations$knowledge$settings$es extends Translations$knowledge$settings$en {
-	Translations$knowledge$settings$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String get description => 'Capa de memoria local para agentes: recuerdos, reglas, habilidades e información personal.';
 }
 
 // Path: knowledge.contextBudget
@@ -9251,7 +9240,6 @@ extension on TranslationsEs {
 			'knowledge.tags.all' => 'Todas las etiquetas',
 			'knowledge.tags.manage' => 'Gestionar etiquetas',
 			'knowledge.tags.none' => 'Aún no hay etiquetas.',
-			'knowledge.settings.description' => 'Capa de memoria local para agentes: recuerdos, reglas, habilidades e información personal.',
 			'knowledge.contextBudget.tokens' => ({required Object tokens, required Object budget}) => '~${tokens} / ${budget} tok',
 			'knowledge.critical.make' => 'Marcar como crítica',
 			'knowledge.critical.makeAll' => 'Marcar todas las reglas como críticas',

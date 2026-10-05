@@ -2914,9 +2914,6 @@
       "manage": "태그 관리",
       "none": "태그가 없습니다."
     },
-    "settings": {
-      "description": "에이전트를 위한 로컬 메모리 계층: 메모리, 규칙, 스킬, 개인정보."
-    },
     "contextBudget": {
       "tokens": "~{{tokens}} / {{budget}} 토큰"
     },

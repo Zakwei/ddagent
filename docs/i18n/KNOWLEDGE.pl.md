@@ -136,8 +136,7 @@ tworzenia/edycji, historię wersji per encja z przywracaniem, wgrywanie ikon ski
 eksport/import JSON. Zakładka Memories ma pasek filtrów tagów (z zarządzaniem tagami),
 pasek aplikacji ma wyszukiwanie pełnotekstowe, dialog tworzenia połączenia i akcję migracji,
 a zakładka Graph to widok relacji siłowo-kierunkowy z pan/zoom, przeciąganiem węzłów,
-filtrami typów encji i podświetlaniem sąsiadów. Settings → Knowledge
-prowadzi bezpośrednio do tego samego ekranu.
+filtrami typów encji i podświetlaniem sąsiadów.
 
 ## Dobre kuratorowanie
 

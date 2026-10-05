@@ -307,7 +307,6 @@ class Translations$knowledge$tr extends Translations$knowledge$en {
 	@override late final Translations$knowledge$search$tr search = Translations$knowledge$search$tr._(_root);
 	@override late final Translations$knowledge$links$tr links = Translations$knowledge$links$tr._(_root);
 	@override late final Translations$knowledge$tags$tr tags = Translations$knowledge$tags$tr._(_root);
-	@override late final Translations$knowledge$settings$tr settings = Translations$knowledge$settings$tr._(_root);
 	@override late final Translations$knowledge$contextBudget$tr contextBudget = Translations$knowledge$contextBudget$tr._(_root);
 	@override late final Translations$knowledge$critical$tr critical = Translations$knowledge$critical$tr._(_root);
 	@override late final Translations$knowledge$errors$tr errors = Translations$knowledge$errors$tr._(_root);
@@ -3549,16 +3548,6 @@ class Translations$knowledge$tags$tr extends Translations$knowledge$tags$en {
 	@override String get all => 'Tüm etiketler';
 	@override String get manage => 'Etiketleri yönet';
 	@override String get none => 'Henüz etiket yok.';
-}
-
-// Path: knowledge.settings
-class Translations$knowledge$settings$tr extends Translations$knowledge$settings$en {
-	Translations$knowledge$settings$tr._(TranslationsTr root) : this._root = root, super.internal(root);
-
-	final TranslationsTr _root; // ignore: unused_field
-
-	// Translations
-	@override String get description => 'Ajanlar için yerel bellek katmanı: anılar, kurallar, beceriler ve kişisel bilgiler.';
 }
 
 // Path: knowledge.contextBudget
@@ -9251,7 +9240,6 @@ extension on TranslationsTr {
 			'knowledge.tags.all' => 'Tüm etiketler',
 			'knowledge.tags.manage' => 'Etiketleri yönet',
 			'knowledge.tags.none' => 'Henüz etiket yok.',
-			'knowledge.settings.description' => 'Ajanlar için yerel bellek katmanı: anılar, kurallar, beceriler ve kişisel bilgiler.',
 			'knowledge.contextBudget.tokens' => ({required Object tokens, required Object budget}) => '~${tokens} / ${budget} tok',
 			'knowledge.critical.make' => 'Kritik yap',
 			'knowledge.critical.makeAll' => 'Tüm kuralları kritik yap',

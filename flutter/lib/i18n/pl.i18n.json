@@ -3173,9 +3173,6 @@
       "manage": "Zarządzaj tagami",
       "none": "Brak tagów."
     },
-    "settings": {
-      "description": "Lokalna warstwa pamięci dla agentów: pamięci, reguły, skille i dane osobowe."
-    },
     "contextBudget": {
       "tokens": "~{{tokens}} / {{budget}} tok"
     },

@@ -313,7 +313,6 @@ class Translations$knowledge$pl extends Translations$knowledge$en {
 	@override late final Translations$knowledge$search$pl search = Translations$knowledge$search$pl._(_root);
 	@override late final Translations$knowledge$links$pl links = Translations$knowledge$links$pl._(_root);
 	@override late final Translations$knowledge$tags$pl tags = Translations$knowledge$tags$pl._(_root);
-	@override late final Translations$knowledge$settings$pl settings = Translations$knowledge$settings$pl._(_root);
 	@override late final Translations$knowledge$contextBudget$pl contextBudget = Translations$knowledge$contextBudget$pl._(_root);
 	@override late final Translations$knowledge$critical$pl critical = Translations$knowledge$critical$pl._(_root);
 	@override late final Translations$knowledge$errors$pl errors = Translations$knowledge$errors$pl._(_root);
@@ -3743,16 +3742,6 @@ class Translations$knowledge$tags$pl extends Translations$knowledge$tags$en {
 	@override String get all => 'Wszystkie tagi';
 	@override String get manage => 'Zarządzaj tagami';
 	@override String get none => 'Brak tagów.';
-}
-
-// Path: knowledge.settings
-class Translations$knowledge$settings$pl extends Translations$knowledge$settings$en {
-	Translations$knowledge$settings$pl._(TranslationsPl root) : this._root = root, super.internal(root);
-
-	final TranslationsPl _root; // ignore: unused_field
-
-	// Translations
-	@override String get description => 'Lokalna warstwa pamięci dla agentów: pamięci, reguły, skille i dane osobowe.';
 }
 
 // Path: knowledge.contextBudget
@@ -9876,7 +9865,6 @@ extension on TranslationsPl {
 			'knowledge.tags.all' => 'Wszystkie tagi',
 			'knowledge.tags.manage' => 'Zarządzaj tagami',
 			'knowledge.tags.none' => 'Brak tagów.',
-			'knowledge.settings.description' => 'Lokalna warstwa pamięci dla agentów: pamięci, reguły, skille i dane osobowe.',
 			'knowledge.contextBudget.tokens' => ({required Object tokens, required Object budget}) => '~${tokens} / ${budget} tok',
 			'knowledge.critical.make' => 'Oznacz jako krytyczne',
 			'knowledge.critical.makeAll' => 'Oznacz wszystkie reguły jako krytyczne',

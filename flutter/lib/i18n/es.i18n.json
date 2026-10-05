@@ -2914,9 +2914,6 @@
       "manage": "Gestionar etiquetas",
       "none": "Aún no hay etiquetas."
     },
-    "settings": {
-      "description": "Capa de memoria local para agentes: recuerdos, reglas, habilidades e información personal."
-    },
     "contextBudget": {
       "tokens": "~{{tokens}} / {{budget}} tok"
     },

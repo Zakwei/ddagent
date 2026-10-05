@@ -2914,9 +2914,6 @@
       "manage": "管理標籤",
       "none": "尚無標籤。"
     },
-    "settings": {
-      "description": "面向代理的本機記憶層：記憶、規則、技能和個人資訊。"
-    },
     "contextBudget": {
       "tokens": "~{{tokens}} / {{budget}} 權杖"
     },

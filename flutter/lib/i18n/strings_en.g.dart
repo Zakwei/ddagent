@@ -336,7 +336,6 @@ class Translations$knowledge$en {
 	late final Translations$knowledge$search$en search = Translations$knowledge$search$en.internal(_root);
 	late final Translations$knowledge$links$en links = Translations$knowledge$links$en.internal(_root);
 	late final Translations$knowledge$tags$en tags = Translations$knowledge$tags$en.internal(_root);
-	late final Translations$knowledge$settings$en settings = Translations$knowledge$settings$en.internal(_root);
 	late final Translations$knowledge$graph$en graph = Translations$knowledge$graph$en.internal(_root);
 	late final Translations$knowledge$importAll$en importAll = Translations$knowledge$importAll$en.internal(_root);
 	late final Translations$knowledge$migrate$en migrate = Translations$knowledge$migrate$en.internal(_root);
@@ -6862,18 +6861,6 @@ class Translations$knowledge$tags$en {
 
 	/// en: 'No tags yet.'
 	String get none => 'No tags yet.';
-}
-
-// Path: knowledge.settings
-class Translations$knowledge$settings$en {
-	Translations$knowledge$settings$en.internal(this._root);
-
-	final Translations _root; // ignore: unused_field
-
-	// Translations
-
-	/// en: 'Local memory layer for agents: memories, rules, skills and personal info.'
-	String get description => 'Local memory layer for agents: memories, rules, skills and personal info.';
 }
 
 // Path: knowledge.graph
@@ -15753,7 +15740,6 @@ extension on Translations {
 			'knowledge.tags.all' => 'All tags',
 			'knowledge.tags.manage' => 'Manage tags',
 			'knowledge.tags.none' => 'No tags yet.',
-			'knowledge.settings.description' => 'Local memory layer for agents: memories, rules, skills and personal info.',
 			'knowledge.graph.truncated' => 'truncated',
 			'knowledge.importAll.title' => 'Import everything into ddagent',
 			'knowledge.importAll.projectsScanned' => ({required Object count}) => 'Projects scanned: ${count}',
@@ -15903,7 +15889,6 @@ extension on Translations {
 			'onboarding.mcp.installSelected' => 'Install selected',
 			_ => null,
 		} ?? switch (path) {
-			'onboarding.mcp.installForAll' => 'Install for all',
 			'onboarding.mcp.laterHint' => 'Optional — you can also install this later in Settings → MCP.',
 			'onboarding.mcp.installedOn' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: 'Installed on ${count} agent.', other: 'Installed on ${count} agents.', ), 
 			'onboarding.mcp.installedWithFailures' => ({required Object installedCount, required Object failed}) => 'Installed on ${installedCount}; failed: ${failed}',

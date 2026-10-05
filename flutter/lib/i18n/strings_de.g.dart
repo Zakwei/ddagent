@@ -307,7 +307,6 @@ class Translations$knowledge$de extends Translations$knowledge$en {
 	@override late final Translations$knowledge$search$de search = Translations$knowledge$search$de._(_root);
 	@override late final Translations$knowledge$links$de links = Translations$knowledge$links$de._(_root);
 	@override late final Translations$knowledge$tags$de tags = Translations$knowledge$tags$de._(_root);
-	@override late final Translations$knowledge$settings$de settings = Translations$knowledge$settings$de._(_root);
 	@override late final Translations$knowledge$contextBudget$de contextBudget = Translations$knowledge$contextBudget$de._(_root);
 	@override late final Translations$knowledge$critical$de critical = Translations$knowledge$critical$de._(_root);
 	@override late final Translations$knowledge$errors$de errors = Translations$knowledge$errors$de._(_root);
@@ -3549,16 +3548,6 @@ class Translations$knowledge$tags$de extends Translations$knowledge$tags$en {
 	@override String get all => 'Alle Tags';
 	@override String get manage => 'Tags verwalten';
 	@override String get none => 'Noch keine Tags.';
-}
-
-// Path: knowledge.settings
-class Translations$knowledge$settings$de extends Translations$knowledge$settings$en {
-	Translations$knowledge$settings$de._(TranslationsDe root) : this._root = root, super.internal(root);
-
-	final TranslationsDe _root; // ignore: unused_field
-
-	// Translations
-	@override String get description => 'Lokale Gedächtnisschicht für Agenten: Erinnerungen, Regeln, Fähigkeiten und persönliche Daten.';
 }
 
 // Path: knowledge.contextBudget
@@ -9251,7 +9240,6 @@ extension on TranslationsDe {
 			'knowledge.tags.all' => 'Alle Tags',
 			'knowledge.tags.manage' => 'Tags verwalten',
 			'knowledge.tags.none' => 'Noch keine Tags.',
-			'knowledge.settings.description' => 'Lokale Gedächtnisschicht für Agenten: Erinnerungen, Regeln, Fähigkeiten und persönliche Daten.',
 			'knowledge.contextBudget.tokens' => ({required Object tokens, required Object budget}) => '~${tokens} / ${budget} tok',
 			'knowledge.critical.make' => 'Als kritisch markieren',
 			'knowledge.critical.makeAll' => 'Alle Regeln als kritisch markieren',

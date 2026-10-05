@@ -2914,9 +2914,6 @@
       "manage": "Tags verwalten",
       "none": "Noch keine Tags."
     },
-    "settings": {
-      "description": "Lokale Gedächtnisschicht für Agenten: Erinnerungen, Regeln, Fähigkeiten und persönliche Daten."
-    },
     "contextBudget": {
       "tokens": "~{{tokens}} / {{budget}} tok"
     },

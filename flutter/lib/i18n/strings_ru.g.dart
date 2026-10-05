@@ -307,7 +307,6 @@ class Translations$knowledge$ru extends Translations$knowledge$en {
 	@override late final Translations$knowledge$search$ru search = Translations$knowledge$search$ru._(_root);
 	@override late final Translations$knowledge$links$ru links = Translations$knowledge$links$ru._(_root);
 	@override late final Translations$knowledge$tags$ru tags = Translations$knowledge$tags$ru._(_root);
-	@override late final Translations$knowledge$settings$ru settings = Translations$knowledge$settings$ru._(_root);
 	@override late final Translations$knowledge$contextBudget$ru contextBudget = Translations$knowledge$contextBudget$ru._(_root);
 	@override late final Translations$knowledge$critical$ru critical = Translations$knowledge$critical$ru._(_root);
 	@override late final Translations$knowledge$errors$ru errors = Translations$knowledge$errors$ru._(_root);
@@ -3555,16 +3554,6 @@ class Translations$knowledge$tags$ru extends Translations$knowledge$tags$en {
 	@override String get all => 'Все теги';
 	@override String get manage => 'Управление тегами';
 	@override String get none => 'Тегов нет.';
-}
-
-// Path: knowledge.settings
-class Translations$knowledge$settings$ru extends Translations$knowledge$settings$en {
-	Translations$knowledge$settings$ru._(TranslationsRu root) : this._root = root, super.internal(root);
-
-	final TranslationsRu _root; // ignore: unused_field
-
-	// Translations
-	@override String get description => 'Локальный слой памяти для агентов: память, правила, навыки и личные данные.';
 }
 
 // Path: knowledge.contextBudget
@@ -9257,7 +9246,6 @@ extension on TranslationsRu {
 			'knowledge.tags.all' => 'Все теги',
 			'knowledge.tags.manage' => 'Управление тегами',
 			'knowledge.tags.none' => 'Тегов нет.',
-			'knowledge.settings.description' => 'Локальный слой памяти для агентов: память, правила, навыки и личные данные.',
 			'knowledge.contextBudget.tokens' => ({required Object tokens, required Object budget}) => '~${tokens} / ${budget} токенов',
 			'knowledge.critical.make' => 'Сделать критическим',
 			'knowledge.critical.makeAll' => 'Сделать все правила критическими',

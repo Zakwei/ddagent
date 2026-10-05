@@ -2914,9 +2914,6 @@
       "manage": "タグを管理",
       "none": "タグがありません。"
     },
-    "settings": {
-      "description": "エージェント向けのローカルメモリ層：メモリ、ルール、スキル、個人情報。"
-    },
     "contextBudget": {
       "tokens": "~{{tokens}} / {{budget}} tok"
     },

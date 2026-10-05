@@ -3245,9 +3245,6 @@
       "manage": "Manage tags",
       "none": "No tags yet."
     },
-    "settings": {
-      "description": "Local memory layer for agents: memories, rules, skills and personal info."
-    },
     "graph": {
       "truncated": "truncated"
     },

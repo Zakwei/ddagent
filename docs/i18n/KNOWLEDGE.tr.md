@@ -136,8 +136,7 @@ oluştur/düzenle formuna, geri yükleme ile varlık başına sürüm geçmişin
 JSON dışa/içe aktarmaya sahiptir. Memories sekmesinde bir etiket filtre çubuğu (etiket yönetimiyle),
 uygulama çubuğunda tam metin arama, bir bağlantı oluşturma diyaloğu ve bir geçiş eylemi vardır
 ve Graph sekmesi kaydırma/yakınlaştırma, düğüm sürükleme, varlık türü filtreleri ve komşu
-vurgulama ile kuvvet yönelimli bir ilişki görünümüdür. Settings → Knowledge
-aynı ekrana doğrudan bağlanır.
+vurgulama ile kuvvet yönelimli bir ilişki görünümüdür.
 
 ## İyi düzenlemek
 
