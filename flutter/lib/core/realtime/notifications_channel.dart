@@ -13,8 +13,16 @@ class DesktopNotification {
   bool get isRegistered => type == 'registered';
   bool get isError => type == 'error';
   String? get id => raw['id'] as String?;
-  String? get title => (raw['data'] as Map?)?['title'] as String? ?? raw['title'] as String?;
-  String? get body => (raw['data'] as Map?)?['body'] as String? ?? raw['body'] as String?;
+
+  /// `notification` frames nest the payload under `payload` (server
+  /// `buildNotificationPayload`); `data` is accepted for older/other shapes.
+  Map<String, dynamic>? get payload {
+    final value = raw['payload'] ?? raw['data'];
+    return value is Map ? Map<String, dynamic>.from(value) : null;
+  }
+
+  String? get title => payload?['title'] as String? ?? raw['title'] as String?;
+  String? get body => payload?['body'] as String? ?? raw['body'] as String?;
 }
 
 /// `/desktop-notifications` channel (desktop builds).

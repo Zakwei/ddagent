@@ -69,4 +69,14 @@ final desktopNotificationsChannelProvider = Provider<DesktopNotificationsChannel
   return channel;
 });
 
+/// Inbound `/desktop-notifications` frames filtered to actual notifications.
+/// The app root listens to this to surface an OS notification / toast; the
+/// [DeviceNotificationsController] owns connecting and registering the socket.
+final desktopNotificationEventsProvider = StreamProvider<DesktopNotification>(
+  (ref) => ref
+      .watch(desktopNotificationsChannelProvider)
+      .notifications
+      .where((notification) => notification.isNotification),
+);
+
 final sseClientProvider = Provider<SseClient>((ref) => SseClient(ref.watch(dioProvider)));

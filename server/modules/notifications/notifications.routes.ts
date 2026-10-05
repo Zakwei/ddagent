@@ -1,7 +1,8 @@
 import express from 'express';
 
 import { requireRole } from '@/modules/collab/index.js';
-import { notificationChannelEndpointsDb, notificationPreferencesDb } from '@/modules/database/index.js';
+import { notificationChannelEndpointsDb } from '@/modules/database/index.js';
+import { syncChannelPreference } from '@/modules/notifications/services/channel-preferences.service.js';
 import {
   discordChannel,
   getDiscordWebhookUrl,
@@ -45,15 +46,6 @@ function readUserId(req: express.Request): number {
   return userId;
 }
 
-function updateChannelPreference(userId: number, channel: string): unknown {
-  const currentPrefs = notificationPreferencesDb.getPreferences(userId);
-  const hasEnabledEndpoint = notificationChannelEndpointsDb.getEnabledEndpoints(userId, channel).length > 0;
-  return notificationPreferencesDb.updatePreferences(userId, {
-    ...currentPrefs,
-    channels: { ...currentPrefs.channels, [channel]: hasEnabledEndpoint },
-  });
-}
-
 router.get('/endpoints', (req, res) => {
   try {
     const channel = readText(req.query.channel);
@@ -91,7 +83,7 @@ router.post('/endpoints/current', (req, res) => {
       enabled: enabled !== false,
     });
 
-    const preferences = updateChannelPreference(userId, normalizedChannel);
+    const preferences = syncChannelPreference(userId, normalizedChannel);
     return res.json({ success: true, endpoint: sanitizeEndpoint(endpoint), preferences });
   } catch (error) {
     console.error('Error registering notification endpoint:', error);
@@ -114,7 +106,7 @@ router.patch('/endpoints/:channel/:endpointId', (req, res) => {
     }
 
     const endpoint = notificationChannelEndpointsDb.getEndpoint(userId, channel, endpointId);
-    const preferences = updateChannelPreference(userId, channel);
+    const preferences = syncChannelPreference(userId, channel);
     return res.json({ success: true, endpoint: endpoint ? sanitizeEndpoint(endpoint) : null, preferences });
   } catch (error) {
     console.error('Error updating notification endpoint:', error);
@@ -131,7 +123,7 @@ router.delete('/endpoints/:channel/:endpointId', (req, res) => {
       return res.status(404).json({ error: 'Notification endpoint not found' });
     }
 
-    const preferences = updateChannelPreference(userId, channel);
+    const preferences = syncChannelPreference(userId, channel);
     return res.json({ success: true, preferences });
   } catch (error) {
     console.error('Error removing notification endpoint:', error);

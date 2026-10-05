@@ -49,6 +49,8 @@ class DeviceNotificationsController extends Notifier<DeviceNotificationsState> {
     return Hive.box<dynamic>(_boxName).get(_deviceIdKey) as String?;
   }
 
+  String get _platformLabel => kIsWeb ? 'web' : defaultTargetPlatform.name;
+
   Future<void> _load() async {
     try {
       final res = await _repo.endpoints(channel: _channel);
@@ -64,6 +66,7 @@ class DeviceNotificationsController extends Notifier<DeviceNotificationsState> {
       final enabled =
           deviceId != null && mine != null && mine.isNotEmpty && mine['enabled'] == true;
       state = DeviceNotificationsState(enabled: enabled, loading: false);
+      if (enabled) unawaited(_rearm(deviceId));
     } on AppError {
       // Server pre-dates the endpoints API — fall back to the local flag.
       if (ref.mounted) {
@@ -71,7 +74,27 @@ class DeviceNotificationsController extends Notifier<DeviceNotificationsState> {
             ? Hive.box<dynamic>(_boxName).get(_enabledKey) == true
             : false;
         state = DeviceNotificationsState(enabled: stored, loading: false);
+        final deviceId = _deviceId;
+        if (stored && deviceId != null) unawaited(_rearm(deviceId));
       }
+    }
+  }
+
+  /// Reconnects and re-registers a device that was enabled in a previous
+  /// session, so its socket is live again without reopening the settings page.
+  /// Best-effort — the enable button surfaces real errors; a failure here just
+  /// means no push until the next re-arm.
+  Future<void> _rearm(String deviceId) async {
+    try {
+      final channel = ref.read(desktopNotificationsChannelProvider);
+      await channel.connect();
+      channel.register(
+        deviceId: deviceId,
+        label: t.notifications.deviceLabel,
+        platform: _platformLabel,
+      );
+    } on Object {
+      // Ignore — retried on the next app launch.
     }
   }
 
@@ -86,7 +109,7 @@ class DeviceNotificationsController extends Notifier<DeviceNotificationsState> {
   /// message on failure (no `registered` frame / transport error).
   Future<String?> enable() async {
     if (state.busy) return null;
-    state = DeviceNotificationsState(enabled: state.enabled, busy: true);
+    state = DeviceNotificationsState(enabled: state.enabled, busy: true, loading: false);
     final deviceId =
         _deviceId ??
         'flutter-${DateTime.now().microsecondsSinceEpoch}-${Random().nextInt(1 << 32)}';
@@ -96,7 +119,7 @@ class DeviceNotificationsController extends Notifier<DeviceNotificationsState> {
       channel.register(
         deviceId: deviceId,
         label: t.notifications.deviceLabel,
-        platform: kIsWeb ? 'web' : defaultTargetPlatform.name,
+        platform: _platformLabel,
       );
       // Wait briefly for the server's `registered` ack so silent failures
       // (closed socket, missing deviceId) surface instead of a fake "on".
@@ -134,7 +157,7 @@ class DeviceNotificationsController extends Notifier<DeviceNotificationsState> {
   Future<String?> disable() async {
     if (state.busy) return null;
     final deviceId = _deviceId;
-    state = DeviceNotificationsState(enabled: true, busy: true);
+    state = DeviceNotificationsState(enabled: true, busy: true, loading: false);
     try {
       if (deviceId != null) {
         await _repo.updateEndpoint(_channel, deviceId, {'enabled': false});

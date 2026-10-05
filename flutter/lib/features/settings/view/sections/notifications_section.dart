@@ -5,6 +5,7 @@ import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_card.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
+import 'package:ddagent_app/features/notifications/data/desktop_notification_presenter.dart';
 import 'package:ddagent_app/features/notifications/data/notifications_repository.dart';
 import 'package:ddagent_app/features/notifications/state/device_notifications_controller.dart';
 import 'package:ddagent_app/features/notifications/state/notification_preferences_controller.dart';
@@ -65,6 +66,10 @@ class _DevicePushCardState extends ConsumerState<_DevicePushCard> {
   bool? _testOk;
 
   Future<void> _toggle(bool enabled) async {
+    // Ask for the OS/browser permission inside the tap gesture, before any
+    // await, so the prompt isn't blocked for lack of user activation. A denial
+    // is fine — inbound alerts then fall back to an in-app toast.
+    if (!enabled) unawaited(requestDesktopNotificationPermission());
     final ctrl = ref.read(deviceNotificationsProvider.notifier);
     final error = enabled ? await ctrl.disable() : await ctrl.enable();
     if (error != null && mounted) AppToast.error(context, error);

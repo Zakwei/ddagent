@@ -1,6 +1,7 @@
 import type { WebSocket } from 'ws';
 
 import { notificationChannelEndpointsDb } from '@/modules/database/index.js';
+import { syncChannelPreference } from '@/modules/notifications/services/channel-preferences.service.js';
 
 const DESKTOP_CHANNEL = 'desktop';
 
@@ -57,6 +58,10 @@ export function registerDesktopNotificationClient({
     metadata: { platform, appVersion },
     enabled: true,
   });
+  // Registering re-enables the endpoint, so the orchestrator's `desktop`
+  // channel preference must follow — otherwise the socket is live but no
+  // notification is ever delivered (the REST endpoint routes do the same).
+  syncChannelPreference(normalizedUserId, DESKTOP_CHANNEL);
 
   const clients = getUserClients(normalizedUserId, true)!;
   const previous = clients.get(endpointId);
