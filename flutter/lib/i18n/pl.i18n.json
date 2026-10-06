@@ -2464,7 +2464,14 @@
         "teamManagement": "Zarządzanie zespołem"
       },
       "proFeatures": "Funkcje ddagent Pro",
-      "tryHosted": "Wypróbuj ddagent Hosted"
+      "tryHosted": "Wypróbuj ddagent Hosted",
+      "versionInfo": "Informacje o wersji",
+      "client": "Aplikacja",
+      "server": "Serwer",
+      "platformMobile": "Mobilna",
+      "platformDesktop": "Desktopowa",
+      "platformWeb": "Web",
+      "unknown": "nieznana"
     },
     "shortcuts": {
       "description": "Wszystkie skróty klawiszowe w ddagent, wg platformy.",

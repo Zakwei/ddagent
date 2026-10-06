@@ -2634,6 +2634,13 @@ class Translations$settings$about$it extends Translations$settings$about$en {
 	@override late final Translations$settings$about$pro$it pro = Translations$settings$about$pro$it._(_root);
 	@override String get proFeatures => 'Funzionalità ddagent Pro';
 	@override String get tryHosted => 'Prova ddagent Hosted';
+	@override String get versionInfo => 'Informazioni sulla versione';
+	@override String get client => 'App';
+	@override String get server => 'Server';
+	@override String get platformMobile => 'Mobile';
+	@override String get platformDesktop => 'Desktop';
+	@override String get platformWeb => 'Web';
+	@override String get unknown => 'sconosciuta';
 }
 
 // Path: sidebar.projects
@@ -8794,6 +8801,13 @@ extension on TranslationsIt {
 			'settings.about.pro.teamManagement' => 'Gestione del team',
 			'settings.about.proFeatures' => 'Funzionalità ddagent Pro',
 			'settings.about.tryHosted' => 'Prova ddagent Hosted',
+			'settings.about.versionInfo' => 'Informazioni sulla versione',
+			'settings.about.client' => 'App',
+			'settings.about.server' => 'Server',
+			'settings.about.platformMobile' => 'Mobile',
+			'settings.about.platformDesktop' => 'Desktop',
+			'settings.about.platformWeb' => 'Web',
+			'settings.about.unknown' => 'sconosciuta',
 			'sidebar.projects.title' => 'Progetti',
 			'sidebar.projects.newProject' => 'Nuovo progetto',
 			'sidebar.projects.deleteProject' => 'Rimuovi progetto',
@@ -9167,6 +9181,8 @@ extension on TranslationsIt {
 			'tasks.nextTask.hideDetails' => 'Nascondi dettagli',
 			'tasks.nextTask.initialize' => 'Inizializza',
 			'tasks.nextTask.noPending' => 'Nessuna attività in sospeso',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI non è configurato',
 			'tasks.nextTask.review' => 'Revisiona',
 			'tasks.nextTask.startTask' => 'Avvia attività',
@@ -9174,8 +9190,6 @@ extension on TranslationsIt {
 			'tasks.nextTask.viewAll' => 'Vedi tutte le attività',
 			'tasks.nextTask.viewDetails' => 'Vedi dettagli attività',
 			'tasks.nextTask.whatIs' => 'Cos’è TaskMaster?',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.cancelEdit' => 'Annulla modifica',
 			'tasks.taskDetail.close' => 'Chiudi',
 			'tasks.taskDetail.copyTaskId' => 'Copia ID attività',

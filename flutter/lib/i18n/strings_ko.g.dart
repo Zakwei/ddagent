@@ -2634,6 +2634,13 @@ class Translations$settings$about$ko extends Translations$settings$about$en {
 	@override late final Translations$settings$about$pro$ko pro = Translations$settings$about$pro$ko._(_root);
 	@override String get proFeatures => 'ddagent Pro 기능';
 	@override String get tryHosted => 'ddagent Hosted 사용해보기';
+	@override String get versionInfo => '버전 정보';
+	@override String get client => '앱';
+	@override String get server => '서버';
+	@override String get platformMobile => '모바일';
+	@override String get platformDesktop => '데스크톱';
+	@override String get platformWeb => 'Web';
+	@override String get unknown => '알 수 없음';
 }
 
 // Path: sidebar.projects
@@ -8794,6 +8801,13 @@ extension on TranslationsKo {
 			'settings.about.pro.teamManagement' => '팀 관리',
 			'settings.about.proFeatures' => 'ddagent Pro 기능',
 			'settings.about.tryHosted' => 'ddagent Hosted 사용해보기',
+			'settings.about.versionInfo' => '버전 정보',
+			'settings.about.client' => '앱',
+			'settings.about.server' => '서버',
+			'settings.about.platformMobile' => '모바일',
+			'settings.about.platformDesktop' => '데스크톱',
+			'settings.about.platformWeb' => 'Web',
+			'settings.about.unknown' => '알 수 없음',
 			'sidebar.projects.title' => '프로젝트',
 			'sidebar.projects.newProject' => '새 프로젝트',
 			'sidebar.projects.deleteProject' => '프로젝트 제거',
@@ -9167,6 +9181,8 @@ extension on TranslationsKo {
 			'tasks.nextTask.hideDetails' => '세부 정보 숨기기',
 			'tasks.nextTask.initialize' => '초기화',
 			'tasks.nextTask.noPending' => '대기 중인 작업 없음',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI가 구성되지 않았습니다',
 			'tasks.nextTask.review' => '검토',
 			'tasks.nextTask.startTask' => '작업 시작',
@@ -9174,8 +9190,6 @@ extension on TranslationsKo {
 			'tasks.nextTask.viewAll' => '모든 작업 보기',
 			'tasks.nextTask.viewDetails' => '작업 세부 정보 보기',
 			'tasks.nextTask.whatIs' => 'TaskMaster란?',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.cancelEdit' => '편집 취소',
 			'tasks.taskDetail.close' => '닫기',
 			'tasks.taskDetail.copyTaskId' => '작업 ID 복사',

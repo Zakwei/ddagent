@@ -2634,6 +2634,13 @@ class Translations$settings$about$ru extends Translations$settings$about$en {
 	@override late final Translations$settings$about$pro$ru pro = Translations$settings$about$pro$ru._(_root);
 	@override String get proFeatures => 'Возможности ddagent Pro';
 	@override String get tryHosted => 'Попробовать ddagent Hosted';
+	@override String get versionInfo => 'Информация о версии';
+	@override String get client => 'Приложение';
+	@override String get server => 'Сервер';
+	@override String get platformMobile => 'Мобильное';
+	@override String get platformDesktop => 'Десктоп';
+	@override String get platformWeb => 'Веб';
+	@override String get unknown => 'неизвестно';
 }
 
 // Path: sidebar.projects
@@ -8800,6 +8807,13 @@ extension on TranslationsRu {
 			'settings.about.pro.teamManagement' => 'Управление командой',
 			'settings.about.proFeatures' => 'Возможности ddagent Pro',
 			'settings.about.tryHosted' => 'Попробовать ddagent Hosted',
+			'settings.about.versionInfo' => 'Информация о версии',
+			'settings.about.client' => 'Приложение',
+			'settings.about.server' => 'Сервер',
+			'settings.about.platformMobile' => 'Мобильное',
+			'settings.about.platformDesktop' => 'Десктоп',
+			'settings.about.platformWeb' => 'Веб',
+			'settings.about.unknown' => 'неизвестно',
 			'sidebar.projects.title' => 'Проекты',
 			'sidebar.projects.newProject' => 'Новый проект',
 			'sidebar.projects.deleteProject' => 'Убрать проект',
@@ -9173,6 +9187,8 @@ extension on TranslationsRu {
 			'tasks.nextTask.hideDetails' => 'Скрыть детали',
 			'tasks.nextTask.initialize' => 'Инициализировать',
 			'tasks.nextTask.noPending' => 'Нет ожидающих задач',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI не настроен',
 			'tasks.nextTask.review' => 'Проверить',
 			'tasks.nextTask.startTask' => 'Начать задачу',
@@ -9180,8 +9196,6 @@ extension on TranslationsRu {
 			'tasks.nextTask.viewAll' => 'Все задачи',
 			'tasks.nextTask.viewDetails' => 'Детали задачи',
 			'tasks.nextTask.whatIs' => 'Что такое TaskMaster?',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.cancelEdit' => 'Отменить редактирование',
 			'tasks.taskDetail.close' => 'Закрыть',
 			'tasks.taskDetail.copyTaskId' => 'Копировать ID задачи',

@@ -2274,7 +2274,14 @@
         "teamManagement": "Gestion d’équipe"
       },
       "proFeatures": "Fonctionnalités de ddagent Pro",
-      "tryHosted": "Essayer ddagent Hosted"
+      "tryHosted": "Essayer ddagent Hosted",
+      "versionInfo": "Informations de version",
+      "client": "Application",
+      "server": "Serveur",
+      "platformMobile": "Mobile",
+      "platformDesktop": "Bureau",
+      "platformWeb": "Web",
+      "unknown": "inconnue"
     }
   },
   "sidebar": {

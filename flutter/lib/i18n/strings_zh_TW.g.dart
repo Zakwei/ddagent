@@ -2634,6 +2634,13 @@ class Translations$settings$about$zh_TW extends Translations$settings$about$en {
 	@override late final Translations$settings$about$pro$zh_TW pro = Translations$settings$about$pro$zh_TW.internal(_root);
 	@override String get proFeatures => 'ddagent Pro 功能';
 	@override String get tryHosted => '試用 ddagent Hosted';
+	@override String get versionInfo => '版本資訊';
+	@override String get client => '應用程式';
+	@override String get server => '伺服器';
+	@override String get platformMobile => '行動裝置';
+	@override String get platformDesktop => '桌面版';
+	@override String get platformWeb => '網頁';
+	@override String get unknown => '未知';
 }
 
 // Path: sidebar.projects
@@ -8794,6 +8801,13 @@ extension on TranslationsZhTw {
 			'settings.about.pro.teamManagement' => '團隊管理',
 			'settings.about.proFeatures' => 'ddagent Pro 功能',
 			'settings.about.tryHosted' => '試用 ddagent Hosted',
+			'settings.about.versionInfo' => '版本資訊',
+			'settings.about.client' => '應用程式',
+			'settings.about.server' => '伺服器',
+			'settings.about.platformMobile' => '行動裝置',
+			'settings.about.platformDesktop' => '桌面版',
+			'settings.about.platformWeb' => '網頁',
+			'settings.about.unknown' => '未知',
 			'sidebar.projects.title' => '專案',
 			'sidebar.projects.newProject' => '新增專案',
 			'sidebar.projects.deleteProject' => '移除專案',
@@ -9167,6 +9181,8 @@ extension on TranslationsZhTw {
 			'tasks.nextTask.hideDetails' => '隱藏詳情',
 			'tasks.nextTask.initialize' => '初始化',
 			'tasks.nextTask.noPending' => '沒有待處理任務',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI 未設定',
 			'tasks.nextTask.review' => '審查',
 			'tasks.nextTask.startTask' => '開始任務',
@@ -9174,8 +9190,6 @@ extension on TranslationsZhTw {
 			'tasks.nextTask.viewAll' => '檢視所有任務',
 			'tasks.nextTask.viewDetails' => '檢視任務詳情',
 			'tasks.nextTask.whatIs' => '什麼是 TaskMaster？',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.cancelEdit' => '取消編輯',
 			'tasks.taskDetail.close' => '關閉',
 			'tasks.taskDetail.copyTaskId' => '複製任務 ID',

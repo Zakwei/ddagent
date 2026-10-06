@@ -2634,6 +2634,13 @@ class Translations$settings$about$zh_CN extends Translations$settings$about$en {
 	@override late final Translations$settings$about$pro$zh_CN pro = Translations$settings$about$pro$zh_CN.internal(_root);
 	@override String get proFeatures => 'ddagent Pro 功能';
 	@override String get tryHosted => '试用 ddagent Hosted';
+	@override String get versionInfo => '版本信息';
+	@override String get client => '应用';
+	@override String get server => '服务器';
+	@override String get platformMobile => '移动端';
+	@override String get platformDesktop => '桌面端';
+	@override String get platformWeb => '网页';
+	@override String get unknown => '未知';
 }
 
 // Path: sidebar.projects
@@ -8794,6 +8801,13 @@ extension on TranslationsZhCn {
 			'settings.about.pro.teamManagement' => '团队管理',
 			'settings.about.proFeatures' => 'ddagent Pro 功能',
 			'settings.about.tryHosted' => '试用 ddagent Hosted',
+			'settings.about.versionInfo' => '版本信息',
+			'settings.about.client' => '应用',
+			'settings.about.server' => '服务器',
+			'settings.about.platformMobile' => '移动端',
+			'settings.about.platformDesktop' => '桌面端',
+			'settings.about.platformWeb' => '网页',
+			'settings.about.unknown' => '未知',
 			'sidebar.projects.title' => '项目',
 			'sidebar.projects.newProject' => '新建项目',
 			'sidebar.projects.deleteProject' => '移除项目',
@@ -9167,6 +9181,8 @@ extension on TranslationsZhCn {
 			'tasks.nextTask.hideDetails' => '隐藏详情',
 			'tasks.nextTask.initialize' => '初始化',
 			'tasks.nextTask.noPending' => '没有待处理任务',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI 未配置',
 			'tasks.nextTask.review' => '审查',
 			'tasks.nextTask.startTask' => '开始任务',
@@ -9174,8 +9190,6 @@ extension on TranslationsZhCn {
 			'tasks.nextTask.viewAll' => '查看所有任务',
 			'tasks.nextTask.viewDetails' => '查看任务详情',
 			'tasks.nextTask.whatIs' => '什么是 TaskMaster？',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.cancelEdit' => '取消编辑',
 			'tasks.taskDetail.close' => '关闭',
 			'tasks.taskDetail.copyTaskId' => '复制任务 ID',

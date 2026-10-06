@@ -2274,7 +2274,14 @@
         "teamManagement": "Teamverwaltung"
       },
       "proFeatures": "ddagent Pro-Funktionen",
-      "tryHosted": "ddagent Hosted testen"
+      "tryHosted": "ddagent Hosted testen",
+      "versionInfo": "Versionsinfo",
+      "client": "App",
+      "server": "Server",
+      "platformMobile": "Mobil",
+      "platformDesktop": "Desktop",
+      "platformWeb": "Web",
+      "unknown": "unbekannt"
     }
   },
   "sidebar": {

@@ -2768,6 +2768,13 @@ class Translations$settings$about$pl extends Translations$settings$about$en {
 	@override late final Translations$settings$about$pro$pl pro = Translations$settings$about$pro$pl._(_root);
 	@override String get proFeatures => 'Funkcje ddagent Pro';
 	@override String get tryHosted => 'Wypróbuj ddagent Hosted';
+	@override String get versionInfo => 'Informacje o wersji';
+	@override String get client => 'Aplikacja';
+	@override String get server => 'Serwer';
+	@override String get platformMobile => 'Mobilna';
+	@override String get platformDesktop => 'Desktopowa';
+	@override String get platformWeb => 'Web';
+	@override String get unknown => 'nieznana';
 }
 
 // Path: settings.shortcuts
@@ -9368,6 +9375,13 @@ extension on TranslationsPl {
 			'settings.about.pro.teamManagement' => 'Zarządzanie zespołem',
 			'settings.about.proFeatures' => 'Funkcje ddagent Pro',
 			'settings.about.tryHosted' => 'Wypróbuj ddagent Hosted',
+			'settings.about.versionInfo' => 'Informacje o wersji',
+			'settings.about.client' => 'Aplikacja',
+			'settings.about.server' => 'Serwer',
+			'settings.about.platformMobile' => 'Mobilna',
+			'settings.about.platformDesktop' => 'Desktopowa',
+			'settings.about.platformWeb' => 'Web',
+			'settings.about.unknown' => 'nieznana',
 			'settings.shortcuts.description' => 'Wszystkie skróty klawiszowe w ddagent, wg platformy.',
 			'settings.shortcuts.action' => 'Akcja',
 			'settings.shortcuts.winLinux' => 'Windows / Linux',
@@ -9586,6 +9600,8 @@ extension on TranslationsPl {
 			'sidebar.zones.yesterday' => 'Wczoraj',
 			'sidebar.zones.thisWeek' => 'W tym tygodniu',
 			'sidebar.zones.showMore' => ({required Object count}) => 'Pokaż jeszcze ${count}',
+			_ => null,
+		} ?? switch (path) {
 			'sidebar.zones.showLess' => 'Pokaż mniej',
 			'sidebar.tabs.board' => 'Tablica agentów',
 			'sidebar.tabs.files' => 'Pliki',
@@ -9593,8 +9609,6 @@ extension on TranslationsPl {
 			'sidebar.tabs.tasks' => 'Zadania',
 			'sidebar.tabs.usage' => 'Limity i zużycie',
 			'tasks.notConfigured.title' => 'TaskMaster AI nie jest skonfigurowany',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.notConfigured.description' => 'TaskMaster pomaga dzielić złożone projekty na łatwe w realizacji zadania dzięki wsparciu AI',
 			'tasks.notConfigured.whatIsTitle' => '🎯 Czym jest TaskMaster?',
 			'tasks.notConfigured.features.aiPowered' => 'Zarządzanie zadaniami oparte na AI: dziel złożone projekty na łatwe w realizacji podzadania',
@@ -10100,6 +10114,8 @@ extension on TranslationsPl {
 			'scheduler.cronHint' => 'Cron (min godz dzień mies dzień-tyg) — np. 0 9 * * *',
 			'scheduler.deleteMessage' => ({required Object id}) => 'Spowoduje to usunięcie zadania cyklicznego ${id}. Istniejące sesje zostaną zachowane.',
 			'scheduler.deleteTitle' => 'Usunąć harmonogram?',
+			_ => null,
+		} ?? switch (path) {
 			'scheduler.editTitle' => 'Edytuj harmonogram',
 			'scheduler.newLabel' => 'Nowy',
 			'scheduler.nextIn' => ({required Object time}) => 'następne za ${time}',
@@ -10107,8 +10123,6 @@ extension on TranslationsPl {
 			'scheduler.runs' => 'Uruchomienia',
 			'scheduler.session' => ({required Object id}) => 'sesja ${id}',
 			'scheduler.worktree' => 'worktree',
-			_ => null,
-		} ?? switch (path) {
 			'notifications.deviceLabel' => 'ddagent Flutter',
 			'notifications.errors.noResponse' => 'Brak odpowiedzi z serwera',
 			'notifications.errors.registrationRejected' => 'Serwer odrzucił rejestrację',

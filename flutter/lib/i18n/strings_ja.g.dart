@@ -2634,6 +2634,13 @@ class Translations$settings$about$ja extends Translations$settings$about$en {
 	@override late final Translations$settings$about$pro$ja pro = Translations$settings$about$pro$ja._(_root);
 	@override String get proFeatures => 'ddagent Pro の機能';
 	@override String get tryHosted => 'ddagent Hosted を試す';
+	@override String get versionInfo => 'バージョン情報';
+	@override String get client => 'アプリ';
+	@override String get server => 'サーバー';
+	@override String get platformMobile => 'モバイル';
+	@override String get platformDesktop => 'デスクトップ';
+	@override String get platformWeb => 'Web';
+	@override String get unknown => '不明';
 }
 
 // Path: sidebar.projects
@@ -8794,6 +8801,13 @@ extension on TranslationsJa {
 			'settings.about.pro.teamManagement' => 'チーム管理',
 			'settings.about.proFeatures' => 'ddagent Pro の機能',
 			'settings.about.tryHosted' => 'ddagent Hosted を試す',
+			'settings.about.versionInfo' => 'バージョン情報',
+			'settings.about.client' => 'アプリ',
+			'settings.about.server' => 'サーバー',
+			'settings.about.platformMobile' => 'モバイル',
+			'settings.about.platformDesktop' => 'デスクトップ',
+			'settings.about.platformWeb' => 'Web',
+			'settings.about.unknown' => '不明',
 			'sidebar.projects.title' => 'プロジェクト',
 			'sidebar.projects.newProject' => '新規プロジェクト',
 			'sidebar.projects.deleteProject' => 'プロジェクトを除去',
@@ -9167,6 +9181,8 @@ extension on TranslationsJa {
 			'tasks.nextTask.hideDetails' => '詳細を隠す',
 			'tasks.nextTask.initialize' => '初期化',
 			'tasks.nextTask.noPending' => '保留中のタスクはありません',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI が設定されていません',
 			'tasks.nextTask.review' => '確認',
 			'tasks.nextTask.startTask' => 'タスクを開始',
@@ -9174,8 +9190,6 @@ extension on TranslationsJa {
 			'tasks.nextTask.viewAll' => 'すべてのタスクを表示',
 			'tasks.nextTask.viewDetails' => 'タスクの詳細を表示',
 			'tasks.nextTask.whatIs' => 'TaskMaster とは？',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.cancelEdit' => '編集をキャンセル',
 			'tasks.taskDetail.close' => '閉じる',
 			'tasks.taskDetail.copyTaskId' => 'タスクIDをコピー',

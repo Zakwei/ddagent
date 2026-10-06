@@ -2634,6 +2634,13 @@ class Translations$settings$about$fr extends Translations$settings$about$en {
 	@override late final Translations$settings$about$pro$fr pro = Translations$settings$about$pro$fr._(_root);
 	@override String get proFeatures => 'Fonctionnalités de ddagent Pro';
 	@override String get tryHosted => 'Essayer ddagent Hosted';
+	@override String get versionInfo => 'Informations de version';
+	@override String get client => 'Application';
+	@override String get server => 'Serveur';
+	@override String get platformMobile => 'Mobile';
+	@override String get platformDesktop => 'Bureau';
+	@override String get platformWeb => 'Web';
+	@override String get unknown => 'inconnue';
 }
 
 // Path: sidebar.projects
@@ -8794,6 +8801,13 @@ extension on TranslationsFr {
 			'settings.about.pro.teamManagement' => 'Gestion d’équipe',
 			'settings.about.proFeatures' => 'Fonctionnalités de ddagent Pro',
 			'settings.about.tryHosted' => 'Essayer ddagent Hosted',
+			'settings.about.versionInfo' => 'Informations de version',
+			'settings.about.client' => 'Application',
+			'settings.about.server' => 'Serveur',
+			'settings.about.platformMobile' => 'Mobile',
+			'settings.about.platformDesktop' => 'Bureau',
+			'settings.about.platformWeb' => 'Web',
+			'settings.about.unknown' => 'inconnue',
 			'sidebar.projects.title' => 'Projets',
 			'sidebar.projects.newProject' => 'Nouveau projet',
 			'sidebar.projects.deleteProject' => 'Supprimer le projet',
@@ -9167,6 +9181,8 @@ extension on TranslationsFr {
 			'tasks.nextTask.hideDetails' => 'Masquer les détails',
 			'tasks.nextTask.initialize' => 'Initialiser',
 			'tasks.nextTask.noPending' => 'Aucune tâche en attente',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI n’est pas configuré',
 			'tasks.nextTask.review' => 'Vérifier',
 			'tasks.nextTask.startTask' => 'Démarrer la tâche',
@@ -9174,8 +9190,6 @@ extension on TranslationsFr {
 			'tasks.nextTask.viewAll' => 'Voir toutes les tâches',
 			'tasks.nextTask.viewDetails' => 'Voir les détails de la tâche',
 			'tasks.nextTask.whatIs' => 'Qu’est-ce que TaskMaster ?',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.cancelEdit' => 'Annuler la modification',
 			'tasks.taskDetail.close' => 'Fermer',
 			'tasks.taskDetail.copyTaskId' => 'Copier l’ID de la tâche',

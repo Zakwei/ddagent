@@ -5,14 +5,17 @@ import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/core/widgets/app_markdown.dart';
+import 'package:ddagent_app/features/server_connect/data/server_profiles.dart';
 import 'package:ddagent_app/features/settings/state/locale_controller.dart';
 import 'package:ddagent_app/features/settings/view/sections/general_section.dart';
 import 'package:ddagent_app/features/system/data/system_repository.dart';
 import 'package:ddagent_app/features/system/state/system_providers.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 const _githubRepoUrl = 'https://github.com/Zakwei/ddagent';
@@ -36,6 +39,8 @@ class AboutSection extends ConsumerWidget {
         const SizedBox(height: AppSpacing.xl),
         const _BrandHeader(),
         const SizedBox(height: AppSpacing.md),
+        const _VersionInfoBlock(),
+        const SizedBox(height: AppSpacing.xl),
         const _LinksBlock(),
         const SizedBox(height: AppSpacing.xl),
         const _UpdateCheckBlock(),
@@ -56,6 +61,139 @@ class AboutSection extends ConsumerWidget {
 
 void _openUrl(String url) =>
     unawaited(launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication));
+
+/// Running client build's version/build number. Null on platforms/tests where
+/// `PackageInfo` is unavailable, so the block renders a placeholder instead.
+final _packageInfoProvider = FutureProvider<PackageInfo?>((ref) async {
+  try {
+    return await PackageInfo.fromPlatform();
+  } on Object {
+    return null;
+  }
+});
+
+enum _ClientKind { mobile, desktop, web }
+
+/// Whether the running build is a mobile, desktop or web client.
+_ClientKind _currentClientKind() {
+  if (kIsWeb) return _ClientKind.web;
+  return switch (defaultTargetPlatform) {
+    TargetPlatform.android || TargetPlatform.iOS => _ClientKind.mobile,
+    _ => _ClientKind.desktop,
+  };
+}
+
+/// Human-readable name of the platform the client runs on.
+String _currentPlatformName() {
+  if (kIsWeb) return 'Web';
+  return switch (defaultTargetPlatform) {
+    TargetPlatform.android => 'Android',
+    TargetPlatform.iOS => 'iOS',
+    TargetPlatform.macOS => 'macOS',
+    TargetPlatform.windows => 'Windows',
+    TargetPlatform.linux => 'Linux',
+    TargetPlatform.fuchsia => 'Fuchsia',
+  };
+}
+
+/// `host[:port]` of a configured server URL, or null when unset/malformed.
+String? _serverHost(String? url) {
+  final trimmed = url?.trim() ?? '';
+  if (trimmed.isEmpty) return null;
+  final uri = Uri.tryParse(trimmed);
+  if (uri == null || uri.host.isEmpty) return trimmed;
+  return uri.hasPort ? '${uri.host}:${uri.port}' : uri.host;
+}
+
+/// Version markers — which client build (mobile/desktop/web + platform + app
+/// version) is talking to which server version and host. Mobile and desktop
+/// builds are indistinguishable otherwise.
+class _VersionInfoBlock extends ConsumerWidget {
+  const _VersionInfoBlock();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = Translations.of(context).settings.about;
+    final c = context.appColors;
+    final tt = Theme.of(context).textTheme;
+
+    final info = ref.watch(_packageInfoProvider).value;
+    final health = ref.watch(serverHealthProvider).value;
+    final serverVersion = health?['version']?.toString() ?? '';
+    final serverHost = _serverHost(ref.watch(serverProfilesProvider).activeUrl);
+
+    final kind = _currentClientKind();
+    final kindLabel = switch (kind) {
+      _ClientKind.mobile => t.platformMobile,
+      _ClientKind.desktop => t.platformDesktop,
+      _ClientKind.web => t.platformWeb,
+    };
+    final clientIcon = switch (kind) {
+      _ClientKind.mobile => LucideIcons.smartphone,
+      _ClientKind.desktop => LucideIcons.monitor,
+      _ClientKind.web => LucideIcons.globe,
+    };
+    final clientVersion = info == null
+        ? '…'
+        : 'v${info.version}${info.buildNumber.isEmpty ? '' : ' (${info.buildNumber})'}';
+
+    Widget row(IconData icon, String label, String value, String? secondary) => Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: AppSpacing.md,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 2),
+          child: Icon(icon, size: 16, color: c.mutedForeground),
+        ),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label, style: tt.labelSmall?.copyWith(color: c.mutedForeground)),
+              Text(value, style: tt.bodySmall?.copyWith(fontWeight: FontWeight.w600)),
+              if (secondary != null && secondary.isNotEmpty)
+                Text(secondary, style: tt.labelSmall?.copyWith(color: c.mutedForeground)),
+            ],
+          ),
+        ),
+      ],
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          spacing: AppSpacing.sm,
+          children: [
+            Icon(LucideIcons.info, size: 16, color: c.mutedForeground),
+            Text(t.versionInfo, style: tt.titleSmall),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(AppSpacing.md),
+          decoration: BoxDecoration(
+            border: Border.all(color: c.border.withValues(alpha: 0.6)),
+            borderRadius: AppRadii.borderLg,
+          ),
+          child: Column(
+            children: [
+              row(clientIcon, t.client, '$kindLabel · ${_currentPlatformName()}', clientVersion),
+              Divider(height: AppSpacing.lg, color: c.border.withValues(alpha: 0.4)),
+              row(
+                LucideIcons.server,
+                t.server,
+                serverVersion.isEmpty ? t.unknown : 'v$serverVersion',
+                serverHost,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
 
 /// Logo + wordmark + server-version badge + "update available" chip —
 /// the header row of `AboutTab`.

@@ -2274,7 +2274,14 @@
         "teamManagement": "Управление командой"
       },
       "proFeatures": "Возможности ddagent Pro",
-      "tryHosted": "Попробовать ddagent Hosted"
+      "tryHosted": "Попробовать ddagent Hosted",
+      "versionInfo": "Информация о версии",
+      "client": "Приложение",
+      "server": "Сервер",
+      "platformMobile": "Мобильное",
+      "platformDesktop": "Десктоп",
+      "platformWeb": "Веб",
+      "unknown": "неизвестно"
     }
   },
   "sidebar": {

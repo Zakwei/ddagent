@@ -2274,7 +2274,14 @@
         "teamManagement": "チーム管理"
       },
       "proFeatures": "ddagent Pro の機能",
-      "tryHosted": "ddagent Hosted を試す"
+      "tryHosted": "ddagent Hosted を試す",
+      "versionInfo": "バージョン情報",
+      "client": "アプリ",
+      "server": "サーバー",
+      "platformMobile": "モバイル",
+      "platformDesktop": "デスクトップ",
+      "platformWeb": "Web",
+      "unknown": "不明"
     }
   },
   "sidebar": {

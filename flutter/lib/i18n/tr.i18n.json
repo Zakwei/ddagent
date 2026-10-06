@@ -2274,7 +2274,14 @@
         "teamManagement": "Takım Yönetimi"
       },
       "proFeatures": "ddagent Pro Özellikleri",
-      "tryHosted": "ddagent Hosted'ı deneyin"
+      "tryHosted": "ddagent Hosted'ı deneyin",
+      "versionInfo": "Sürüm bilgisi",
+      "client": "Uygulama",
+      "server": "Sunucu",
+      "platformMobile": "Mobil",
+      "platformDesktop": "Masaüstü",
+      "platformWeb": "Web",
+      "unknown": "bilinmiyor"
     }
   },
   "sidebar": {

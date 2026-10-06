@@ -2274,7 +2274,14 @@
         "teamManagement": "團隊管理"
       },
       "proFeatures": "ddagent Pro 功能",
-      "tryHosted": "試用 ddagent Hosted"
+      "tryHosted": "試用 ddagent Hosted",
+      "versionInfo": "版本資訊",
+      "client": "應用程式",
+      "server": "伺服器",
+      "platformMobile": "行動裝置",
+      "platformDesktop": "桌面版",
+      "platformWeb": "網頁",
+      "unknown": "未知"
     }
   },
   "sidebar": {

@@ -4961,6 +4961,27 @@ class Translations$settings$about$en {
 	String get proFeatures => 'ddagent Pro Features';
 
 	late final Translations$settings$about$pro$en pro = Translations$settings$about$pro$en.internal(_root);
+
+	/// en: 'Version info'
+	String get versionInfo => 'Version info';
+
+	/// en: 'App'
+	String get client => 'App';
+
+	/// en: 'Server'
+	String get server => 'Server';
+
+	/// en: 'Mobile'
+	String get platformMobile => 'Mobile';
+
+	/// en: 'Desktop'
+	String get platformDesktop => 'Desktop';
+
+	/// en: 'Web'
+	String get platformWeb => 'Web';
+
+	/// en: 'unknown'
+	String get unknown => 'unknown';
 }
 
 // Path: settings.shortcuts
@@ -15278,6 +15299,13 @@ extension on Translations {
 			'settings.about.proFeatures' => 'ddagent Pro Features',
 			'settings.about.pro.syncSettings' => 'Sync Settings',
 			'settings.about.pro.teamManagement' => 'Team Management',
+			'settings.about.versionInfo' => 'Version info',
+			'settings.about.client' => 'App',
+			'settings.about.server' => 'Server',
+			'settings.about.platformMobile' => 'Mobile',
+			'settings.about.platformDesktop' => 'Desktop',
+			'settings.about.platformWeb' => 'Web',
+			'settings.about.unknown' => 'unknown',
 			'settings.shortcuts.description' => 'Every keyboard shortcut in ddagent, split by platform.',
 			'settings.shortcuts.action' => 'Action',
 			'settings.shortcuts.winLinux' => 'Windows / Linux',
@@ -15439,6 +15467,8 @@ extension on Translations {
 			'sidebar.messages.restoreProjectFailed' => 'Failed to restore project. Please try again.',
 			'sidebar.messages.restoreProjectError' => 'Error restoring project. Please try again.',
 			'sidebar.messages.restoreSessionFailed' => 'Failed to restore session. Please try again.',
+			_ => null,
+		} ?? switch (path) {
 			'sidebar.messages.restoreSessionError' => 'Error restoring session. Please try again.',
 			'sidebar.messages.bulkDeleteSessionsFailed' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: 'Failed to delete ${count} session. Please try again.', other: 'Failed to delete ${count} sessions. Please try again.', ), 
 			'sidebar.version.updateAvailable' => 'Update available',
@@ -15446,8 +15476,6 @@ extension on Translations {
 			'sidebar.version.updateNow' => 'Update now',
 			'sidebar.version.updateConfirm' => ({required Object version}) => 'Update ddagent to v${version}? The latest code will be pulled, rebuilt, and the server will restart — active sessions are interrupted.',
 			'sidebar.version.updating' => 'Updating… this can take a few minutes',
-			_ => null,
-		} ?? switch (path) {
 			'sidebar.version.restarting' => 'Update installed — restarting…',
 			'sidebar.version.updateFailed' => 'Update failed',
 			'sidebar.version.releaseNotes' => 'Release notes',
@@ -15953,6 +15981,8 @@ extension on Translations {
 			'notifications.errors.registrationRejected' => 'Registration rejected by server',
 			'notifications.errors.noResponse' => 'No response from the server',
 			'onboarding.gitHint' => 'Used for commits created by ddagent sessions.',
+			_ => null,
+		} ?? switch (path) {
 			'onboarding.completeSetup' => 'Complete Setup',
 			'onboarding.errors.nameAndEmailRequired' => 'Both git name and email are required.',
 			'onboarding.errors.invalidEmail' => 'Please enter a valid email address.',
@@ -15960,8 +15990,6 @@ extension on Translations {
 			'onboarding.agents.description' => 'Login to one or more AI coding assistants. All are optional.',
 			'onboarding.agents.laterHint' => 'You can configure these later in Settings.',
 			'onboarding.mcp.title' => 'Connect agents to ddagent',
-			_ => null,
-		} ?? switch (path) {
 			'onboarding.mcp.description' => 'Install the ddagent MCP server so your agents can use the knowledge base and ddagent tools. Pick agents, or install for all.',
 			'onboarding.mcp.installSelected' => 'Install selected',
 			'onboarding.mcp.installForAll' => 'Install for all',

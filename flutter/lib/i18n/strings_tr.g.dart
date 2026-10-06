@@ -2634,6 +2634,13 @@ class Translations$settings$about$tr extends Translations$settings$about$en {
 	@override late final Translations$settings$about$pro$tr pro = Translations$settings$about$pro$tr._(_root);
 	@override String get proFeatures => 'ddagent Pro Özellikleri';
 	@override String get tryHosted => 'ddagent Hosted\'ı deneyin';
+	@override String get versionInfo => 'Sürüm bilgisi';
+	@override String get client => 'Uygulama';
+	@override String get server => 'Sunucu';
+	@override String get platformMobile => 'Mobil';
+	@override String get platformDesktop => 'Masaüstü';
+	@override String get platformWeb => 'Web';
+	@override String get unknown => 'bilinmiyor';
 }
 
 // Path: sidebar.projects
@@ -8794,6 +8801,13 @@ extension on TranslationsTr {
 			'settings.about.pro.teamManagement' => 'Takım Yönetimi',
 			'settings.about.proFeatures' => 'ddagent Pro Özellikleri',
 			'settings.about.tryHosted' => 'ddagent Hosted\'ı deneyin',
+			'settings.about.versionInfo' => 'Sürüm bilgisi',
+			'settings.about.client' => 'Uygulama',
+			'settings.about.server' => 'Sunucu',
+			'settings.about.platformMobile' => 'Mobil',
+			'settings.about.platformDesktop' => 'Masaüstü',
+			'settings.about.platformWeb' => 'Web',
+			'settings.about.unknown' => 'bilinmiyor',
 			'sidebar.projects.title' => 'Projeler',
 			'sidebar.projects.newProject' => 'Yeni Proje',
 			'sidebar.projects.deleteProject' => 'Projeyi Kaldır',
@@ -9167,6 +9181,8 @@ extension on TranslationsTr {
 			'tasks.nextTask.hideDetails' => 'Ayrıntıları gizle',
 			'tasks.nextTask.initialize' => 'Başlat',
 			'tasks.nextTask.noPending' => 'Bekleyen görev yok',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI yapılandırılmamış',
 			'tasks.nextTask.review' => 'İncele',
 			'tasks.nextTask.startTask' => 'Görevi Başlat',
@@ -9174,8 +9190,6 @@ extension on TranslationsTr {
 			'tasks.nextTask.viewAll' => 'Tüm görevleri görüntüle',
 			'tasks.nextTask.viewDetails' => 'Görev ayrıntılarını görüntüle',
 			'tasks.nextTask.whatIs' => 'TaskMaster nedir?',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.cancelEdit' => 'Düzenlemeyi iptal et',
 			'tasks.taskDetail.close' => 'Kapat',
 			'tasks.taskDetail.copyTaskId' => 'Görev ID’sini kopyala',

@@ -2274,7 +2274,14 @@
         "teamManagement": "팀 관리"
       },
       "proFeatures": "ddagent Pro 기능",
-      "tryHosted": "ddagent Hosted 사용해보기"
+      "tryHosted": "ddagent Hosted 사용해보기",
+      "versionInfo": "버전 정보",
+      "client": "앱",
+      "server": "서버",
+      "platformMobile": "모바일",
+      "platformDesktop": "데스크톱",
+      "platformWeb": "Web",
+      "unknown": "알 수 없음"
     }
   },
   "sidebar": {

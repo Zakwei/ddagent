@@ -2544,7 +2544,14 @@
       "pro": {
         "syncSettings": "Sync Settings",
         "teamManagement": "Team Management"
-      }
+      },
+      "versionInfo": "Version info",
+      "client": "App",
+      "server": "Server",
+      "platformMobile": "Mobile",
+      "platformDesktop": "Desktop",
+      "platformWeb": "Web",
+      "unknown": "unknown"
     },
     "shortcuts": {
       "description": "Every keyboard shortcut in ddagent, split by platform.",
