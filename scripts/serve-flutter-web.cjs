@@ -95,6 +95,30 @@ app.use('/api', (req, res) => {
   });
 });
 
+// The server's unauthenticated health probe lives at the root (`/health`, not
+// under `/api`), but the same-origin web client calls `/health` directly for
+// the version/update checks. Without this proxy it falls through to the SPA
+// fallback below and returns index.html, which the client fails to decode.
+app.get('/health', (req, res) => {
+  const proxyReq = http.request(
+    {
+      hostname: '127.0.0.1',
+      port: BACKEND_PORT,
+      path: '/health',
+      method: 'GET',
+      headers: { host: `127.0.0.1:${BACKEND_PORT}` },
+    },
+    (proxyRes) => {
+      res.writeHead(proxyRes.statusCode, proxyRes.headers);
+      proxyRes.pipe(res);
+    }
+  );
+  proxyReq.on('error', (err) => {
+    res.status(502).json({ error: 'Backend proxy error', details: err.message });
+  });
+  proxyReq.end();
+});
+
 // Serve Flutter Web static build
 app.use(express.static(WEB_DIR));
 
