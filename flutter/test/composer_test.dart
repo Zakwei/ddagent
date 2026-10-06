@@ -52,6 +52,7 @@ void main() {
   late FakeWs ws;
   late ProviderContainer container;
   final posted = <Map<String, dynamic>>[];
+  final requests = <String>[];
 
   const arg = (sessionId: 's1', projectId: 'p1', provider: 'claude', projectPath: '/p');
 
@@ -60,8 +61,15 @@ void main() {
     dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (o, h) {
+          requests.add('${o.method} ${o.path}');
           if (o.method == 'POST') {
             posted.add({'path': o.path, 'data': o.data});
+          }
+          // A long provider turn holds send-now past Dio's receive timeout —
+          // the request fails even though the server already dispatched.
+          if (o.method == 'POST' && o.path.endsWith('/send-now')) {
+            h.reject(DioException(requestOptions: o, type: DioExceptionType.receiveTimeout), true);
+            return;
           }
           final data = switch (o.path) {
             '/api/providers/claude/models' => {
@@ -117,6 +125,7 @@ void main() {
 
   setUp(() {
     posted.clear();
+    requests.clear();
     ws = FakeWs();
     ChatStorage.writeDraft(ChatStorage.draftKey(sessionId: 's1'), '');
     final prefs = Hive.box<dynamic>('settings');
@@ -184,6 +193,18 @@ void main() {
     final post = posted.firstWhere((p) => p['path'] == '/api/queue');
     expect((post['data'] as Map)['sessionId'], 's1');
     expect((post['data'] as Map)['content'], 'queued msg');
+  });
+
+  test('sendNow refreshes the queue even when the request times out', () async {
+    container = make();
+    container.listen(composerProvider(arg), (_, _) {});
+    await pump();
+    // Must not throw out of the button handler, and must still re-read the
+    // queue afterwards so the card does not look frozen.
+    await container.read(composerProvider(arg).notifier).sendNow('7');
+    expect(requests, contains('POST /api/queue/7/send-now'));
+    final at = requests.indexOf('POST /api/queue/7/send-now');
+    expect(requests.sublist(at), contains('GET /api/queue'));
   });
 
   test('abort without a known run does not send an unscoped Stop', () async {

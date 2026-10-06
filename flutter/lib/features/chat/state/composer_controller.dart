@@ -511,8 +511,14 @@ class ComposerController extends Notifier<ComposerState> {
   /// `/api/queue/:id/send-now` — promotes the message to the front of the
   /// queue; the active turn keeps running and the completion sends it next.
   Future<void> sendNow(String id) async {
-    await ref.read(queueRepositoryProvider).sendNow(id);
-    await refreshQueue();
+    try {
+      await ref.read(queueRepositoryProvider).sendNow(id);
+    } on Object {
+      // The dispatch can outlive the request (a long provider turn) or the row
+      // may already be gone; the refreshed queue below is authoritative.
+    } finally {
+      await refreshQueue();
+    }
   }
 
   Future<void> deleteQueued(String id) async {

@@ -289,8 +289,15 @@ export function createQueuedMessagesService(deps: QueuedMessagesServiceDeps): Qu
       // abort the session's in-flight work. The running turn's completion
       // drains the queue, so the promoted message goes out next. When the
       // session is idle, dispatch it right away.
+      //
+      // Fire-and-forget: `dispatchNext` resolves only when the whole provider
+      // turn ends (often minutes), so awaiting it would hold the HTTP response
+      // past the client's receive timeout — the caller would see "send now"
+      // hang and never refresh its queue. The dispatch still marks the row
+      // `sending` synchronously and broadcasts the new queue before it awaits
+      // the provider, which is what updates every connected client.
       if (!deps.runs.isProcessing(sessionId)) {
-        await dispatchNext(sessionId);
+        void dispatchNext(sessionId);
       }
 
       return deps.repository.getById(id) ?? message;

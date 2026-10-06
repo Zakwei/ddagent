@@ -255,7 +255,41 @@ test('sendNow retries a failed message', async () => {
 
   fail = false;
   await service.sendNow(message.id);
+  // The dispatch is fire-and-forget so the REST call is not held for the whole
+  // turn — the row is `sending` synchronously and settles a tick later.
   assert.deepEqual(dispatched, ['hello']);
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  assert.equal(repository.getById(message.id)?.status, 'sent');
+});
+
+test('sendNow on an idle session does not wait for the dispatched turn', async () => {
+  const repository = createMemoryRepository();
+  const runs = createRunRegistry(true);
+  let release: () => void = () => {};
+
+  const service = createQueuedMessagesService({
+    repository,
+    runs,
+    dispatch: () =>
+      new Promise<QueuedDispatchResult>((resolve) => {
+        release = () => resolve({ ok: true });
+      }),
+  });
+
+  // Queue while the session looks busy, then go idle WITHOUT firing the
+  // completion listener (a lost frame): only sendNow can start the turn.
+  const message = service.enqueue({ sessionId: SESSION, content: 'hold' });
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  runs.setIdle(SESSION);
+
+  // The row flips to `sending` and the call returns while the provider turn
+  // (the `dispatch` promise) is still pending — a REST client must never be
+  // held for the length of a turn.
+  const returned = await service.sendNow(message.id);
+  assert.equal(returned.status, 'sending');
+
+  release();
+  await new Promise((resolve) => setTimeout(resolve, 0));
   assert.equal(repository.getById(message.id)?.status, 'sent');
 });
 
