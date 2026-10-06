@@ -17,6 +17,12 @@ export type ListeningPort = {
   processName: string | null;
   /** Process working directory — used to attribute ports to a project. */
   cwd: string | null;
+  /**
+   * Full command line (Windows only — there is no userspace API for another
+   * process's cwd, so attribution there matches the project path inside the
+   * command line instead). Null elsewhere.
+   */
+  commandLine?: string | null;
 };
 
 type SsEntry = {
@@ -42,6 +48,16 @@ export type PortDiscoveryDependencies = {
   selfPid?: number;
   /** ddagent's own listen port — excluded even when the owning pid is unreadable. */
   selfPort?: number;
+  /** Platform override for tests ('linux' | 'win32' | 'darwin'). */
+  platform?: NodeJS.Platform;
+  /** Returns `netstat -ano -p tcp` stdout on Windows. */
+  runNetstat?: () => Promise<string | null>;
+  /** Resolves pid -> {name, commandLine} on Windows (one PowerShell batch). */
+  runWinProcessInfo?: (pids: number[]) => Promise<Map<number, WinProcessInfo>>;
+  /** Returns `lsof -nP -iTCP -sTCP:LISTEN` stdout on macOS. */
+  runLsof?: () => Promise<string | null>;
+  /** Resolves pid -> cwd on macOS (`lsof -d cwd`). */
+  runLsofCwd?: (pids: number[]) => Promise<Map<number, string>>;
 };
 
 const DEFAULT_CACHE_TTL_MS = 2000;
@@ -55,12 +71,133 @@ const LOOPBACK_SS_ADDRESSES = new Set([
   'localhost',
 ]);
 
-function runSsCommand(): Promise<string | null> {
+function runCommand(file: string, args: string[], timeout = 5000): Promise<string | null> {
   return new Promise((resolve) => {
-    execFile('ss', ['-tlnp'], { timeout: 5000 }, (error, stdout) => {
+    execFile(file, args, { timeout }, (error, stdout) => {
       resolve(error ? null : stdout);
     });
   });
+}
+
+function runSsCommand(): Promise<string | null> {
+  return runCommand('ss', ['-tlnp']);
+}
+
+// --------------------------- Windows (netstat + Get-CimInstance) ---------------------------
+
+type WinProcessInfo = {
+  name: string | null;
+  commandLine: string | null;
+};
+
+/** `netstat -ano -p tcp` — LISTENING rows carry the owning PID, no admin needed. */
+function runNetstatCommand(): Promise<string | null> {
+  return runCommand('netstat', ['-ano', '-p', 'tcp']);
+}
+
+/**
+ * One PowerShell batch resolving name + command line for every discovered
+ * PID. CommandLine is the cwd surrogate on Windows — there is no documented
+ * userspace API for another process's working directory, so project
+ * attribution matches the project path inside the command line instead.
+ */
+async function runWinProcessInfoCommand(pids: number[]): Promise<Map<number, WinProcessInfo>> {
+  const out = new Map<number, WinProcessInfo>();
+  if (pids.length === 0) return out;
+  const filter = pids.map((pid) => `ProcessId=${pid}`).join(' OR ');
+  const stdout = await runCommand(
+    'powershell.exe',
+    [
+      '-NoProfile',
+      '-NonInteractive',
+      '-Command',
+      `Get-CimInstance Win32_Process -Filter "${filter}" | Select-Object -Property ProcessId,Name,CommandLine | ConvertTo-Json -Compress`,
+    ],
+    10000,
+  );
+  if (stdout === null) return out;
+  try {
+    const parsed: unknown = JSON.parse(stdout);
+    const rows = (Array.isArray(parsed) ? parsed : [parsed]) as Array<Record<string, unknown>>;
+    for (const row of rows) {
+      const pid = typeof row?.ProcessId === 'number' ? row.ProcessId : null;
+      if (pid === null) continue;
+      out.set(pid, {
+        name: typeof row.Name === 'string' ? row.Name : null,
+        commandLine: typeof row.CommandLine === 'string' ? row.CommandLine : null,
+      });
+    }
+  } catch {
+    // malformed output — leave names/cmdlines null
+  }
+  return out;
+}
+
+/** Parses `netstat -ano -p tcp`: `TCP  <local>  <foreign>  LISTENING  <pid>`. */
+function parseNetstatOutput(output: string): Array<{ address: string; port: number; pid: number }> {
+  const entries: Array<{ address: string; port: number; pid: number }> = [];
+  for (const line of output.split('\n')) {
+    const fields = line.trim().split(/\s+/);
+    if (fields.length < 5 || fields[0] !== 'TCP' || fields[3] !== 'LISTENING') continue;
+    const local = fields[1];
+    const separator = local.lastIndexOf(':');
+    if (separator === -1) continue;
+    const address = local.slice(0, separator).replace(/^\[|\]$/g, '');
+    const port = Number.parseInt(local.slice(separator + 1), 10);
+    const pid = Number.parseInt(fields[4], 10);
+    if (!Number.isInteger(port) || !Number.isInteger(pid)) continue;
+    if (!LOOPBACK_SS_ADDRESSES.has(address)) continue;
+    entries.push({ address, port, pid });
+  }
+  return entries;
+}
+
+// --------------------------- macOS (lsof) ---------------------------
+
+function runLsofCommand(): Promise<string | null> {
+  return runCommand('lsof', ['-nP', '-iTCP', '-sTCP:LISTEN']);
+}
+
+/**
+ * `lsof -a -d cwd -Fn -p <pids>` — field output gives one `n/path` row per
+ * `p<pid>` row, so a single call resolves every cwd at once.
+ */
+async function runLsofCwdCommand(pids: number[]): Promise<Map<number, string>> {
+  const out = new Map<number, string>();
+  if (pids.length === 0) return out;
+  const stdout = await runCommand('lsof', ['-a', '-d', 'cwd', '-Fn', '-p', pids.join(',')]);
+  if (stdout === null) return out;
+  let pid: number | null = null;
+  for (const line of stdout.split('\n')) {
+    if (line.startsWith('p')) {
+      pid = Number.parseInt(line.slice(1), 10);
+      if (!Number.isInteger(pid)) pid = null;
+    } else if (pid !== null && line.startsWith('n')) {
+      out.set(pid, line.slice(1));
+    }
+  }
+  return out;
+}
+
+/**
+ * Parses `lsof -nP -iTCP -sTCP:LISTEN` rows:
+ * `node  123 user  20u IPv4 ... TCP 127.0.0.1:3000 (LISTEN)`.
+ */
+function parseLsofOutput(output: string): Array<{ address: string; port: number; pid: number; name: string | null }> {
+  const entries: Array<{ address: string; port: number; pid: number; name: string | null }> = [];
+  for (const line of output.split('\n')) {
+    const fields = line.trim().split(/\s+/);
+    if (fields.length < 9 || !line.includes('(LISTEN)')) continue;
+    const pid = Number.parseInt(fields[1], 10);
+    const nameField = fields[fields.length - 2]; // last is "(LISTEN)"
+    const separator = nameField?.lastIndexOf(':') ?? -1;
+    if (!Number.isInteger(pid) || separator === -1) continue;
+    const address = nameField!.slice(0, separator);
+    const port = Number.parseInt(nameField!.slice(separator + 1), 10);
+    if (!Number.isInteger(port) || !LOOPBACK_SS_ADDRESSES.has(address)) continue;
+    entries.push({ address, port, pid, name: fields[0] || null });
+  }
+  return entries;
 }
 
 /**
@@ -256,7 +393,12 @@ function isInsideDirectory(candidate: string, directory: string): boolean {
  * dev-server candidates to the PreviewPane dropdown.
  */
 export function createPortDiscoveryService(dependencies: PortDiscoveryDependencies = {}) {
+  const platform = dependencies.platform ?? process.platform;
   const runSs = dependencies.runSs ?? runSsCommand;
+  const runNetstat = dependencies.runNetstat ?? runNetstatCommand;
+  const runWinProcessInfo = dependencies.runWinProcessInfo ?? runWinProcessInfoCommand;
+  const runLsof = dependencies.runLsof ?? runLsofCommand;
+  const runLsofCwd = dependencies.runLsofCwd ?? runLsofCwdCommand;
   const procRoot = dependencies.procRoot ?? '/proc';
   const now = dependencies.now ?? Date.now;
   const cacheTtlMs = dependencies.cacheTtlMs ?? DEFAULT_CACHE_TTL_MS;
@@ -266,9 +408,57 @@ export function createPortDiscoveryService(dependencies: PortDiscoveryDependenci
   const cache = new Map<string, { at: number; ports: ListeningPort[] }>();
   const inflight = new Map<string, Promise<ListeningPort[]>>();
 
-  // ss needs root to see other users' processes; when it is missing or returns
-  // nothing usable the /proc scan is the equivalent fallback.
-  const listAll = async (): Promise<ListeningPort[]> => {
+  // Windows: netstat -ano carries the pid; a single PowerShell batch adds
+  // name + command line (cwd surrogate — see ListeningPort.commandLine).
+  const listWindows = async (): Promise<ListeningPort[]> => {
+    const output = await runNetstat();
+    if (output === null) return [];
+    const rows = parseNetstatOutput(output);
+    const infos = await runWinProcessInfo([...new Set(rows.map((row) => row.pid))]);
+    const byPort = new Map<number, ListeningPort>();
+    for (const row of rows) {
+      const info = infos.get(row.pid);
+      const existing = byPort.get(row.port);
+      if (!existing || (existing.pid === null && row.pid !== null)) {
+        byPort.set(row.port, {
+          port: row.port,
+          address: row.address,
+          pid: row.pid,
+          processName: info?.name ?? null,
+          cwd: null,
+          commandLine: info?.commandLine ?? null,
+        });
+      }
+    }
+    return [...byPort.values()].sort((a, b) => a.port - b.port);
+  };
+
+  // macOS: lsof lists listeners with pid+name, a second batched call resolves
+  // each pid's cwd (real cwd — needed for project attribution).
+  const listDarwin = async (): Promise<ListeningPort[]> => {
+    const output = await runLsof();
+    if (output === null) return [];
+    const rows = parseLsofOutput(output);
+    const cwds = await runLsofCwd([...new Set(rows.map((row) => row.pid))]);
+    const byPort = new Map<number, ListeningPort>();
+    for (const row of rows) {
+      const existing = byPort.get(row.port);
+      if (!existing || existing.cwd === null) {
+        byPort.set(row.port, {
+          port: row.port,
+          address: row.address,
+          pid: row.pid,
+          processName: row.name,
+          cwd: cwds.get(row.pid) ?? null,
+        });
+      }
+    }
+    return [...byPort.values()].sort((a, b) => a.port - b.port);
+  };
+
+  // Linux: ss needs root to see other users' processes; when it is missing or
+  // returns nothing usable the /proc scan is the equivalent fallback.
+  const listLinux = async (): Promise<ListeningPort[]> => {
     const byPort = new Map<number, ListeningPort>();
 
     const ssOutput = await runSs();
@@ -323,6 +513,24 @@ export function createPortDiscoveryService(dependencies: PortDiscoveryDependenci
     return [...byPort.values()].sort((a, b) => a.port - b.port);
   };
 
+  const listAll = (): Promise<ListeningPort[]> =>
+    platform === 'win32' ? listWindows() : platform === 'darwin' ? listDarwin() : listLinux();
+
+  /**
+   * Project attribution: on POSIX the process cwd must sit inside the project.
+   * On Windows cwd is unreadable for other processes — the command line is the
+   * documented surrogate, matched path-insensitively against the project dir.
+   */
+  const belongsToProject = (port: ListeningPort, projectPath: string): boolean => {
+    if (port.cwd !== null) return isInsideDirectory(port.cwd, projectPath);
+    if (platform === 'win32' && port.commandLine) {
+      const norm = (value: string) => value.replace(/\\/g, '/').toLowerCase();
+      const project = norm(path.win32.normalize(projectPath)).replace(/\/+$/, '');
+      return norm(port.commandLine).includes(project);
+    }
+    return false;
+  };
+
   return {
     /**
      * Lists localhost TCP listeners owned by processes whose cwd sits inside
@@ -349,8 +557,7 @@ export function createPortDiscoveryService(dependencies: PortDiscoveryDependenci
             (port) =>
               port.pid !== selfPid &&
               port.port !== selfPort &&
-              port.cwd !== null &&
-              isInsideDirectory(port.cwd, projectPath),
+              belongsToProject(port, projectPath),
           );
           cache.set(cacheKey, { at: now(), ports: filtered });
           return filtered;

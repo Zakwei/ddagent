@@ -190,7 +190,7 @@ const COMMAND_CODE_EXECUTABLE_CANDIDATES: readonly string[] =
  * a sanitized environment never inherits — the CLI then answers `--version`
  * in the user's terminal while the backend keeps reporting it as missing.
  */
-const commandCodeWindowsShimCandidates = (): string[] => {
+const windowsShimCandidates = (executableNames: readonly string[]): string[] => {
   const dirs = [
     process.env.APPDATA && path.join(process.env.APPDATA, 'npm'),
     process.env.LOCALAPPDATA && path.join(process.env.LOCALAPPDATA, 'pnpm'),
@@ -199,7 +199,7 @@ const commandCodeWindowsShimCandidates = (): string[] => {
   const shims: string[] = [];
   for (const dir of dirs) {
     if (!dir) continue;
-    for (const name of COMMAND_CODE_EXECUTABLE_CANDIDATES) {
+    for (const name of executableNames) {
       const shim = path.join(dir, `${name}.cmd`);
       try {
         if (fs.existsSync(shim)) {
@@ -212,6 +212,9 @@ const commandCodeWindowsShimCandidates = (): string[] => {
   }
   return shims;
 };
+
+const commandCodeWindowsShimCandidates = (): string[] =>
+  windowsShimCandidates(COMMAND_CODE_EXECUTABLE_CANDIDATES);
 
 let resolvedCommandCodeExecutable: string | null | undefined;
 
@@ -335,21 +338,38 @@ let resolvedAntigravityExecutable: string | null | undefined;
 /**
  * Resolves the Antigravity CLI executable. `agy` is the documented binary
  * name; the longer spellings are accepted as fallbacks for alternate
- * installs. Returns `null` when no candidate answers `--version`. The result
- * is cached for the process lifetime; pass a `spawnSync` override in tests.
+ * installs. `ANTIGRAVITY_CLI_PATH` overrides detection entirely (mirrors
+ * `COMMAND_CODE_CLI_PATH`); on Windows the well-known npm/pnpm/bun global-bin
+ * dirs are probed after the PATH misses — npm installs `agy.cmd` under the
+ * user profile, which a sanitized service PATH never inherits. Returns `null`
+ * when no candidate answers `--version`. The result is cached for the process
+ * lifetime; pass a `spawnSync` override in tests.
  */
 export function resolveAntigravityExecutable(
   spawnSync?: (command: string, args: string[]) => { error?: unknown; status?: number | null },
 ): string | null {
+  const override = readOptionalString(process.env.ANTIGRAVITY_CLI_PATH);
+  if (override) {
+    if (spawnSync === undefined) {
+      resolvedAntigravityExecutable = override;
+    }
+    return override;
+  }
+
   if (spawnSync === undefined && resolvedAntigravityExecutable !== undefined) {
     return resolvedAntigravityExecutable;
   }
 
   const run = spawnSync ?? ((command: string, args: string[]) =>
-    crossSpawn.sync(command, args, { stdio: 'ignore', timeout: 5000 }));
+    crossSpawn.sync(command, args, { stdio: 'ignore', timeout: 10_000 }));
+
+  const candidates: string[] = [...ANTIGRAVITY_EXECUTABLE_CANDIDATES];
+  if (process.platform === 'win32') {
+    candidates.push(...windowsShimCandidates(ANTIGRAVITY_EXECUTABLE_CANDIDATES));
+  }
 
   let resolved: string | null = null;
-  for (const candidate of ANTIGRAVITY_EXECUTABLE_CANDIDATES) {
+  for (const candidate of candidates) {
     try {
       const result = run(candidate, ['--version']);
       if (!result.error && result.status === 0) {
@@ -564,7 +584,15 @@ export async function validateWorkspacePath(requestedPath: string): Promise<Work
     const absolutePath = path.resolve(normalizedRequestedPath);
     const normalizedPath = normalizeProjectPath(absolutePath);
 
-    if (FORBIDDEN_WORKSPACE_PATHS.includes(normalizedPath) || normalizedPath === '/') {
+    // Windows-style paths compare case-insensitively and accept either
+    // separator — otherwise `c:\windows` or `C:/Windows` slip past the
+    // forbidden list, which stores `C:\...` spellings.
+    const windowsRules = shouldUseWindowsPathNormalization(normalizedPath);
+    const compareForm = (value: string): string =>
+      windowsRules ? value.replace(/\\/g, '/').toLowerCase() : value;
+    const comparePath = compareForm(normalizedPath);
+
+    if (FORBIDDEN_WORKSPACE_PATHS.map(compareForm).includes(comparePath) || comparePath === '/') {
       return {
         valid: false,
         error: 'Cannot use system-critical directories as workspace locations',
@@ -573,9 +601,10 @@ export async function validateWorkspacePath(requestedPath: string): Promise<Work
 
     for (const forbiddenPath of FORBIDDEN_WORKSPACE_PATHS) {
       const normalizedForbiddenPath = normalizeProjectPath(forbiddenPath);
+      const compareForbiddenPath = compareForm(normalizedForbiddenPath);
       if (
-        normalizedPath === normalizedForbiddenPath
-        || normalizedPath.startsWith(`${normalizedForbiddenPath}${path.sep}`)
+        comparePath === compareForbiddenPath
+        || comparePath.startsWith(`${compareForbiddenPath}/`)
       ) {
         // Allow specific user-writable folders under /var.
         if (
@@ -1866,10 +1895,14 @@ export function flattenPromptForWindowsShell(prompt: string): string {
 export function execCliFile(
   file: string,
   args: string[],
-  options: { encoding?: 'utf8'; timeout?: number; maxBuffer?: number },
+  options: { encoding?: 'utf8'; timeout?: number; maxBuffer?: number; cwd?: string; env?: NodeJS.ProcessEnv },
 ): Promise<{ stdout: string; stderr: string }> {
   return new Promise((resolve, reject) => {
-    const child = crossSpawn(file, args, { stdio: ['ignore', 'pipe', 'pipe'] });
+    const child = crossSpawn(file, args, {
+      stdio: ['ignore', 'pipe', 'pipe'],
+      cwd: options.cwd,
+      env: options.env,
+    });
     const stdoutChunks: Buffer[] = [];
     const stderrChunks: Buffer[] = [];
     let settled = false;

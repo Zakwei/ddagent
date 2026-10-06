@@ -1,4 +1,4 @@
-import { execFileSync, execSync } from 'node:child_process';
+import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -44,11 +44,12 @@ export function createCliApplication(): CliApplication {
     fileSystem,
     output,
     runSandboxCommand: (argumentsList, inheritOutput = false) => {
-      const result = execFileSync('sbx', argumentsList, {
+      const result = spawn.sync('sbx', argumentsList, {
         encoding: 'utf8',
         stdio: inheritOutput ? 'inherit' : 'pipe',
       });
-      return result || '';
+      if (result.error) throw result.error;
+      return result.stdout || '';
     },
     spawnDetachedSandbox: (argumentsList) => {
       const childProcess = spawn('sbx', argumentsList, {

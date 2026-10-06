@@ -1,4 +1,5 @@
 import fsSync from 'node:fs';
+import os from 'node:os';
 
 import { antigravityCredentialEmail, idTokenEmail, readObjectRecord, readOptionalString } from '@/shared/index.js';
 import type { QuotaAccount, QuotaWindow, QuotaWindowKind } from '@/shared/index.js';
@@ -791,7 +792,7 @@ export function createQuotaProviders(
   } = {},
 ) {
   const dependencies: QuotaProviderDependencies = {
-    homeDirectory: process.env.HOME ?? '',
+    homeDirectory: os.homedir(),
     env: process.env,
     readTextFile: (filePath) => {
       try {

@@ -48,7 +48,9 @@ export async function ensureClaudeMirror(): Promise<{ mirrored: boolean; target:
     return { mirrored: false, target };
   } catch {
     await mkdir(path.dirname(linkPath), { recursive: true });
-    await symlink(target, linkPath);
+    // On Windows a directory symlink requires Developer Mode/admin; junctions
+    // don't, and Claude follows them identically for a local dir target.
+    await symlink(target, linkPath, process.platform === 'win32' ? 'junction' : 'dir');
     return { mirrored: true, target };
   }
 }

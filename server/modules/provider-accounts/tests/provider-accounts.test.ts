@@ -108,6 +108,35 @@ test('providerAccountsService.create rejects invalid env keys and applies preset
   });
 });
 
+test('account presets redirect Windows home/config vars on win32', async () => {
+  const real = Object.getOwnPropertyDescriptor(process, 'platform');
+  Object.defineProperty(process, 'platform', { value: 'win32' });
+  try {
+    await withIsolatedDatabase(() => {
+      // HOME-redirect providers must cover USERPROFILE + HOMEDRIVE/HOMEPATH —
+      // Windows CLIs read USERPROFILE, not HOME.
+      const cmd = providerAccountsService.create({ provider: 'commandcode', label: 'cc' });
+      assert.ok(cmd.envOverrides.USERPROFILE?.includes(cmd.id));
+      assert.ok(cmd.envOverrides.HOME?.includes(cmd.id));
+      assert.ok('HOMEDRIVE' in cmd.envOverrides);
+      assert.ok('HOMEPATH' in cmd.envOverrides);
+
+      // XDG-based providers must redirect APPDATA/LOCALAPPDATA instead.
+      const opencode = providerAccountsService.create({ provider: 'opencode', label: 'oc' });
+      assert.ok(opencode.envOverrides.APPDATA);
+      assert.ok(opencode.envOverrides.LOCALAPPDATA);
+      assert.ok(opencode.envOverrides.XDG_CONFIG_HOME?.includes(opencode.id));
+
+      // Dedicated config-dir vars work cross-platform unchanged.
+      const claude = providerAccountsService.create({ provider: 'claude', label: 'cl' });
+      assert.ok(claude.envOverrides.CLAUDE_CONFIG_DIR);
+      assert.equal(claude.envOverrides.USERPROFILE, undefined);
+    });
+  } finally {
+    if (real) Object.defineProperty(process, 'platform', real);
+  }
+});
+
 // ---------------------------------------------------------------------------
 // Session binding + fallback
 // ---------------------------------------------------------------------------

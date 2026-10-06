@@ -1,4 +1,4 @@
-import { exec, execFile } from 'node:child_process';
+import { exec } from 'node:child_process';
 import { appendFile, mkdir, readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
@@ -28,6 +28,7 @@ import type {
   OrchestratorTaskType,
   RealtimeClientConnection,
 } from '@/shared/types.js';
+import { execCliFile } from '@/shared/utils.js';
 
 export type OrchestrateInput = {
   sessionId: string;
@@ -119,7 +120,7 @@ export function classifyStepError(error: string | null | undefined): Orchestrato
 export type GateRunResult = { code: number; output: string; timedOut: boolean };
 
 const execAsync = promisify(exec);
-const execFileAsync = promisify(execFile);
+const execFileAsync = execCliFile;
 
 /**
  * Default gate runner: executes the gate command in the step's working

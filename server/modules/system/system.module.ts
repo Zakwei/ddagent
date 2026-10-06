@@ -22,7 +22,12 @@ function runShellCommand(
   onErrorOutput: (errorOutput: string) => void,
 ): Promise<{ exitCode: number | null; output: string; errorOutput: string }> {
   return new Promise((resolve, reject) => {
-    const childProcess = spawn('sh', ['-c', command], {
+    // The update commands are plain `git`/`npm` invocations — `cmd /c` covers
+    // them on Windows where `sh` does not exist.
+    const [shell, shellArgs] = process.platform === 'win32'
+      ? ['cmd.exe', ['/d', '/s', '/c', command]]
+      : ['sh', ['-c', command]];
+    const childProcess = spawn(shell, shellArgs, {
       cwd: workingDirectory,
       env: environment,
     });

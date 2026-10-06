@@ -1,10 +1,9 @@
 import path from 'node:path';
-import { execFile } from 'node:child_process';
-import { promisify } from 'node:util';
-import { McpProvider } from '../../../../modules/providers/shared/mcp/mcp.provider.js';
-import { AppError, devinConfigDir, readJsonConfig, readObjectRecord, readOptionalString, readStringArray, readStringRecord, writeJsonConfig, } from '../../../../shared/utils.js';
 
-const execFileAsync = promisify(execFile);
+import { McpProvider } from '../../shared/mcp/mcp.provider.js';
+import { AppError, devinConfigDir, execCliFile, readJsonConfig, readObjectRecord, readOptionalString, readStringArray, readStringRecord, writeJsonConfig, } from '../../../../shared/utils.js';
+
+const execFileAsync = execCliFile;
 
 const resolveDevinConfigPath = (scope, workspacePath) => {
     if (scope === 'user') {

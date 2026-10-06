@@ -249,6 +249,78 @@ test('/proc fallback maps socket inodes to pids and cwd', async () => {
   }
 });
 
+const NETSTAT_FIXTURE = `
+Active Connections
+
+  Proto  Local Address          Foreign Address        State           PID
+  TCP    0.0.0.0:3000           0.0.0.0:0              LISTENING       1002
+  TCP    127.0.0.1:10087        0.0.0.0:0              LISTENING       1000
+  TCP    127.0.0.1:5173         0.0.0.0:0              LISTENING       1001
+  TCP    192.168.1.10:8080      0.0.0.0:0              LISTENING       1003
+  TCP    [::]:5174              [::]:0                 LISTENING       1004
+`;
+
+const LSOF_FIXTURE = `COMMAND  PID  USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
+ddagent 1000  user   20u  IPv4 0xdeadbeef      0t0  TCP 127.0.0.1:10087 (LISTEN)
+node    1001  user   32u  IPv6 0xdeadbee0      0t0  TCP *:5173 (LISTEN)
+node    1002  user   19u  IPv4 0xdeadbee1      0t0  TCP 0.0.0.0:3000 (LISTEN)
+node    1003  user    7u  IPv4 0xdeadbee2      0t0  TCP 192.168.1.10:8080 (LISTEN)
+`;
+
+test('windows: netstat + command line attributes ports to the project', async () => {
+  const projectDir = 'C:\\Users\\dev\\myproj';
+  const service = createPortDiscoveryService({
+    platform: 'win32',
+    runNetstat: async () => NETSTAT_FIXTURE,
+    runWinProcessInfo: async () =>
+      new Map([
+        [1000, { name: 'ddagent.exe', commandLine: 'C:\\ddagent\\server.exe' }],
+        [1001, { name: 'node.exe', commandLine: `"C:\\Program Files\\node.exe" c:\\users\\dev\\myproj\\node_modules\\vite\\bin\\vite.js` }],
+        [1002, { name: 'node.exe', commandLine: '"C:\\other\\tool.js"' }],
+        [1003, { name: 'svc.exe', commandLine: null }],
+        [1004, { name: 'node.exe', commandLine: 'node C:\\Users\\dev\\myproj\\serve.mjs' }],
+      ]),
+    selfPid: 99999,
+    selfPort: 99999,
+  });
+
+  const ports = await service.listListeningPorts(projectDir);
+  const byPort = new Map(ports.map((entry) => [entry.port, entry]));
+  // Command line carries the project path (case + separators normalized).
+  assert.ok(byPort.has(5173));
+  assert.ok(byPort.has(5174));
+  assert.equal(byPort.get(5173)?.processName, 'node.exe');
+  // Outside command line → not attributable.
+  assert.ok(!byPort.has(3000));
+  // LAN-only bind and null command line both dropped.
+  assert.ok(!byPort.has(8080));
+  assert.ok(!byPort.has(10087));
+});
+
+test('darwin: lsof resolves real cwd for project attribution', async () => {
+  const projectDir = '/Users/dev/myproj';
+  const service = createPortDiscoveryService({
+    platform: 'darwin',
+    runLsof: async () => LSOF_FIXTURE,
+    runLsofCwd: async () =>
+      new Map([
+        [1000, '/opt/ddagent'],
+        [1001, `${projectDir}/web`],
+        [1002, '/tmp/outside'],
+      ]),
+    selfPid: 99999,
+    selfPort: 99999,
+  });
+
+  const ports = await service.listListeningPorts(projectDir);
+  const byPort = new Map(ports.map((entry) => [entry.port, entry]));
+  assert.ok(byPort.has(5173));
+  assert.equal(byPort.get(5173)?.cwd, `${projectDir}/web`);
+  assert.ok(!byPort.has(3000));
+  assert.ok(!byPort.has(8080));
+  assert.ok(!byPort.has(10087));
+});
+
 test('/proc fallback excludes selfPid and selfPort', async () => {
   const procRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'ddagent-proc-'));
   const projectDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ddagent-proj-'));

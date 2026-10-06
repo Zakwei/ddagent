@@ -20,10 +20,33 @@ const LABEL_MAX_LENGTH = 80;
  * - claude: CLAUDE_CONFIG_DIR replaces ~/.claude entirely (credentials + settings).
  * - codex: CODEX_HOME replaces ~/.codex (auth.json lives there).
  * - cursor/opencode/devin: XDG_CONFIG_HOME (+XDG_DATA_HOME for opencode's
- *   auth store under ~/.local/share) relocates the whole per-user config tree.
+ *   auth store under ~/.local/share) relocates the whole per-user config tree
+ *   on POSIX; on Windows those CLIs read %APPDATA%/%LOCALAPPDATA% instead, so
+ *   the preset redirects both.
+ * - commandcode/antigravity: the CLIs resolve ~ straight from HOME on POSIX
+ *   and %USERPROFILE% on Windows, so the account redirects the home vars
+ *   themselves (HOME is kept too — git-bash-style tools still read it).
  */
 function buildAccountEnvPreset(provider: LLMProvider, accountId: string): Record<string, string> {
   const base = path.join(os.homedir(), '.ddagent', 'accounts', accountId);
+  const isWindows = process.platform === 'win32';
+  // Redirects every home resolution path a child might take on Windows:
+  // USERPROFILE (Node os.homedir(), .NET), HOMEDRIVE+HOMEPATH (older Win32
+  // APIs), HOME (MSYS/git-bash-aware tools).
+  const homeVars = (dir: string): Record<string, string> => {
+    if (!isWindows) return { HOME: dir };
+    const parsed = path.parse(dir);
+    return {
+      USERPROFILE: dir,
+      HOME: dir,
+      HOMEDRIVE: parsed.root.slice(0, 2),
+      HOMEPATH: dir.slice(parsed.root.slice(0, 2).length),
+    };
+  };
+  const configVars = (dir: string, extra: Record<string, string> = {}): Record<string, string> =>
+    isWindows
+      ? { APPDATA: path.join(dir, 'Roaming'), LOCALAPPDATA: path.join(dir, 'Local'), ...extra }
+      : extra;
   switch (provider) {
     case 'claude':
       return { CLAUDE_CONFIG_DIR: path.join(base, 'claude') };
@@ -33,19 +56,23 @@ function buildAccountEnvPreset(provider: LLMProvider, accountId: string): Record
       return {
         XDG_CONFIG_HOME: path.join(base, 'config'),
         XDG_DATA_HOME: path.join(base, 'data'),
+        ...configVars(path.join(base, 'appdata')),
       };
     case 'commandcode':
-      // Command Code resolves ~/.commandcode straight from HOME and exposes
-      // no dedicated config-dir env var, so the account redirects HOME itself.
-      return { HOME: path.join(base, 'commandcode') };
+      // Command Code resolves ~/.commandcode straight from HOME/USERPROFILE and
+      // exposes no dedicated config-dir env var, so the account redirects home.
+      return homeVars(path.join(base, 'commandcode'));
     case 'antigravity':
       // Antigravity resolves ~/.gemini (auth token, conversations, MCP config)
-      // straight from HOME, so the account redirects HOME itself.
-      return { HOME: path.join(base, 'antigravity') };
+      // straight from HOME/USERPROFILE, so the account redirects home.
+      return homeVars(path.join(base, 'antigravity'));
     case 'cursor':
     case 'devin':
     default:
-      return { XDG_CONFIG_HOME: path.join(base, 'config') };
+      return {
+        XDG_CONFIG_HOME: path.join(base, 'config'),
+        ...configVars(path.join(base, 'appdata')),
+      };
   }
 }
 

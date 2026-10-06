@@ -1,16 +1,15 @@
 import os from 'node:os';
 import path from 'node:path';
-import { execFile } from 'node:child_process';
-import { promisify } from 'node:util';
 import { stat } from 'node:fs/promises';
-import { SkillsProvider } from '../../../../modules/providers/shared/skills/skills.provider.js';
-import { devinDataDir } from '../../../../shared/utils.js';
 
-const execFileAsync = promisify(execFile);
+import { SkillsProvider } from '../../shared/skills/skills.provider.js';
+import { devinConfigDir, devinDataDir, execCliFile } from '../../../../shared/utils.js';
+
+const execFileAsync = execCliFile;
 
 const GLOBAL_SKILL_ROOTS = [
     path.join(devinDataDir(), 'skills'),
-    path.join(os.homedir(), '.config', 'devin', 'skills'),
+    path.join(devinConfigDir(), 'skills'),
     path.join(os.homedir(), '.agents', 'skills'),
 ];
 
