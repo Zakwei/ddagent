@@ -28,6 +28,25 @@ type SystemUpdateDependencies = {
 };
 
 /**
+ * Build artifacts the deployment launcher restores from the patch mirror on
+ * every start. `source` is relative to the app root; `mirrorName` is the file
+ * name inside the mirror directory. Only files the launcher actually reads
+ * belong here — the legacy `dist/` client bundle is gone (the Flutter client is
+ * served separately), and mirroring it made every git update fail once the
+ * directory disappeared.
+ */
+const MIRRORED_PROVIDER_FILES = [
+  {
+    source: 'dist-server/server/modules/providers/list/claude/claude-runtime.provider.js',
+    mirrorName: 'claude-runtime.provider.js',
+  },
+  {
+    source: 'dist-server/server/modules/providers/list/devin/devin-sessions.provider.js',
+    mirrorName: 'devin-sessions.provider.js',
+  },
+] as const;
+
+/**
  * Creates the update workflow used by the system module and its focused tests.
  * Runtime-specific process spawning stays behind the injected command adapter.
  */
@@ -88,19 +107,24 @@ export function createSystemUpdateService(dependencies: SystemUpdateDependencies
         }
 
         if (dependencies.installMode === 'git' && fs.existsSync(patchMirrorDirectory)) {
-          const sync = await dependencies.runShellCommand(
-            `mkdir -p "${patchMirrorDirectory}/dist" && cp -r dist/. "${patchMirrorDirectory}/dist/"` +
-            ` && cp dist-server/server/modules/providers/list/claude/claude-runtime.provider.js "${patchMirrorDirectory}/claude-runtime.provider.js"` +
-            ` && cp dist-server/server/modules/providers/list/devin/devin-sessions.provider.js "${patchMirrorDirectory}/devin-sessions.provider.js"`,
-            ...runOptions,
-          );
-          if (sync.exitCode !== 0) {
-            return {
-              success: false as const,
-              error: 'Patch mirror sync failed',
-              output: sync.output,
-              errorOutput: sync.errorOutput,
-            };
+          // Copy sources only when they exist — the same guard the launcher
+          // applies when it restores them, so a missing artifact cannot fail
+          // an otherwise successful update.
+          const syncCommand = MIRRORED_PROVIDER_FILES
+            .filter(({ source }) => fs.existsSync(path.join(dependencies.appRoot, source)))
+            .map(({ source, mirrorName }) =>
+              `cp "${source}" "${path.join(patchMirrorDirectory, mirrorName)}"`)
+            .join(' && ');
+          if (syncCommand) {
+            const sync = await dependencies.runShellCommand(syncCommand, ...runOptions);
+            if (sync.exitCode !== 0) {
+              return {
+                success: false as const,
+                error: 'Patch mirror sync failed',
+                output: sync.output,
+                errorOutput: sync.errorOutput,
+              };
+            }
           }
         }
 

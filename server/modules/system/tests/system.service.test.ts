@@ -49,11 +49,20 @@ test('git installations update from the application root', async () => {
   });
 });
 
-test('git updates sync the launcher patch mirror when it exists', async () => {
+test('git updates sync the launcher patch mirror for the provider overrides', async () => {
+  const appRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'ddagent-app-'));
   const patchDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ddagent-patch-'));
   try {
+    for (const source of [
+      'dist-server/server/modules/providers/list/claude/claude-runtime.provider.js',
+      'dist-server/server/modules/providers/list/devin/devin-sessions.provider.js',
+    ]) {
+      fs.mkdirSync(path.dirname(path.join(appRoot, source)), { recursive: true });
+      fs.writeFileSync(path.join(appRoot, source), '// built provider');
+    }
     const calls: unknown[][] = [];
     const dependencies = createDependencies({
+      appRoot,
       environment: { DDAGENT_PATCH_DIR: patchDir },
       runShellCommand: async (command, workingDirectory) => {
         calls.push([command, workingDirectory]);
@@ -65,11 +74,39 @@ test('git updates sync the launcher patch mirror when it exists', async () => {
     const result = await service.updateSystem();
 
     assert.equal(calls.length, 2);
-    assert.match(String(calls[1][0]), /cp -r dist\//);
-    assert.match(String(calls[1][0]), /claude-runtime\.provider\.js/);
-    assert.match(String(calls[1][0]), /devin-sessions\.provider\.js/);
+    const syncCommand = String(calls[1][0]);
+    assert.match(syncCommand, /claude-runtime\.provider\.js/);
+    assert.match(syncCommand, /devin-sessions\.provider\.js/);
+    // The removed React client bundle must never be mirrored again.
+    assert.doesNotMatch(syncCommand, /dist\/\./);
     assert.equal(result.success, true);
   } finally {
+    fs.rmSync(appRoot, { recursive: true, force: true });
+    fs.rmSync(patchDir, { recursive: true, force: true });
+  }
+});
+
+test('git updates skip the patch mirror when no provider artifact was built', async () => {
+  const appRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'ddagent-app-'));
+  const patchDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ddagent-patch-'));
+  try {
+    const calls: unknown[][] = [];
+    const dependencies = createDependencies({
+      appRoot,
+      environment: { DDAGENT_PATCH_DIR: patchDir },
+      runShellCommand: async (command, workingDirectory) => {
+        calls.push([command, workingDirectory]);
+        return { exitCode: 0, output: '', errorOutput: '' };
+      },
+    });
+    const service = createSystemUpdateService(dependencies);
+
+    const result = await service.updateSystem();
+
+    assert.equal(calls.length, 1);
+    assert.equal(result.success, true);
+  } finally {
+    fs.rmSync(appRoot, { recursive: true, force: true });
     fs.rmSync(patchDir, { recursive: true, force: true });
   }
 });
