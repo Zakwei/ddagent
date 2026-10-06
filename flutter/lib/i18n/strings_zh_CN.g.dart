@@ -458,6 +458,7 @@ class Translations$serverConnect$zh_CN extends Translations$serverConnect$en {
 	// Translations
 	@override String get connect => '连接';
 	@override String get connecting => '正在连接…';
+	@override String get changeServer => '更换服务器';
 	@override String connectionFailed({required Object error}) => '连接失败（${error}）';
 	@override String get enterUrl => '输入服务器 URL';
 	@override late final Translations$serverConnect$local$zh_CN local = Translations$serverConnect$local$zh_CN.internal(_root);
@@ -9470,6 +9471,7 @@ extension on TranslationsZhCn {
 			'notifications.errors.registrationRejected' => '注册被服务器拒绝',
 			'serverConnect.connect' => '连接',
 			'serverConnect.connecting' => '正在连接…',
+			'serverConnect.changeServer' => '更换服务器',
 			'serverConnect.connectionFailed' => ({required Object error}) => '连接失败（${error}）',
 			'serverConnect.enterUrl' => '输入服务器 URL',
 			'serverConnect.local.title' => '本设备',

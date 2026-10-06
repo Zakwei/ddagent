@@ -3482,6 +3482,7 @@
   "serverConnect": {
     "connect": "Połącz",
     "connecting": "Łączenie…",
+    "changeServer": "Zmień serwer",
     "connectionFailed": "Połączenie nie powiodło się ({{error}})",
     "enterUrl": "Wpisz adres URL serwera",
     "local": {

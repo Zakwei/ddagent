@@ -464,6 +464,7 @@ class Translations$serverConnect$pl extends Translations$serverConnect$en {
 	// Translations
 	@override String get connect => 'Połącz';
 	@override String get connecting => 'Łączenie…';
+	@override String get changeServer => 'Zmień serwer';
 	@override String connectionFailed({required Object error}) => 'Połączenie nie powiodło się (${error})';
 	@override String get enterUrl => 'Wpisz adres URL serwera';
 	@override late final Translations$serverConnect$local$pl local = Translations$serverConnect$local$pl._(_root);
@@ -10097,6 +10098,7 @@ extension on TranslationsPl {
 		} ?? switch (path) {
 			'serverConnect.connect' => 'Połącz',
 			'serverConnect.connecting' => 'Łączenie…',
+			'serverConnect.changeServer' => 'Zmień serwer',
 			'serverConnect.connectionFailed' => ({required Object error}) => 'Połączenie nie powiodło się (${error})',
 			'serverConnect.enterUrl' => 'Wpisz adres URL serwera',
 			'serverConnect.local.title' => 'To urządzenie',

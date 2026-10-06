@@ -458,6 +458,7 @@ class Translations$serverConnect$ja extends Translations$serverConnect$en {
 	// Translations
 	@override String get connect => '接続';
 	@override String get connecting => '接続中…';
+	@override String get changeServer => 'サーバーを変更';
 	@override String connectionFailed({required Object error}) => '接続に失敗しました (${error})';
 	@override String get enterUrl => 'サーバーのURLを入力';
 	@override late final Translations$serverConnect$local$ja local = Translations$serverConnect$local$ja._(_root);
@@ -9470,6 +9471,7 @@ extension on TranslationsJa {
 			'notifications.errors.registrationRejected' => 'サーバーに登録を拒否されました',
 			'serverConnect.connect' => '接続',
 			'serverConnect.connecting' => '接続中…',
+			'serverConnect.changeServer' => 'サーバーを変更',
 			'serverConnect.connectionFailed' => ({required Object error}) => '接続に失敗しました (${error})',
 			'serverConnect.enterUrl' => 'サーバーのURLを入力',
 			'serverConnect.local.title' => 'このデバイス',

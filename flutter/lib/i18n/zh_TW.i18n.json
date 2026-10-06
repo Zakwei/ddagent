@@ -3223,6 +3223,7 @@
   "serverConnect": {
     "connect": "連線",
     "connecting": "正在連線…",
+    "changeServer": "更換伺服器",
     "connectionFailed": "連線失敗（{{error}}）",
     "enterUrl": "輸入伺服器 URL",
     "local": {

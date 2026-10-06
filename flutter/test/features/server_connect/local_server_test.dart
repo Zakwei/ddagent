@@ -5,7 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 /// Looks up an ABI token by its `'os_arch'` name — `Abi` constants are private,
 /// so tests pick entries out of `Abi.values` instead of referencing them.
-Abi abiNamed(String name) => Abi.values.firstWhere((abi) => abi.toString() == name);
+Abi abiNamed(String name) =>
+    Abi.values.firstWhere((abi) => abi.toString() == name);
 
 void main() {
   group('parseNodeMajorVersion', () {
@@ -33,7 +34,12 @@ void main() {
     });
 
     test('returns null for unpublished ABIs', () {
-      for (final name in ['macos_x64', 'macos_arm64', 'windows_arm64', 'android_arm64']) {
+      for (final name in [
+        'macos_x64',
+        'macos_arm64',
+        'windows_arm64',
+        'android_arm64',
+      ]) {
         expect(tarballSuffixForAbi(abiNamed(name)), isNull, reason: name);
       }
     });

@@ -3569,6 +3569,7 @@
     "connectionFailed": "Connection failed ({{error}})",
     "connect": "Connect",
     "connecting": "Connecting…",
+    "changeServer": "Change server",
     "local": {
       "title": "This device",
       "subtitle": "Run the ddagent server on this machine",

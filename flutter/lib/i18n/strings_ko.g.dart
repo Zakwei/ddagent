@@ -458,6 +458,7 @@ class Translations$serverConnect$ko extends Translations$serverConnect$en {
 	// Translations
 	@override String get connect => '연결';
 	@override String get connecting => '연결 중…';
+	@override String get changeServer => '서버 변경';
 	@override String connectionFailed({required Object error}) => '연결 실패 (${error})';
 	@override String get enterUrl => '서버 URL을 입력하세요';
 	@override late final Translations$serverConnect$local$ko local = Translations$serverConnect$local$ko._(_root);
@@ -9470,6 +9471,7 @@ extension on TranslationsKo {
 			'notifications.errors.registrationRejected' => '서버에서 등록을 거부했습니다',
 			'serverConnect.connect' => '연결',
 			'serverConnect.connecting' => '연결 중…',
+			'serverConnect.changeServer' => '서버 변경',
 			'serverConnect.connectionFailed' => ({required Object error}) => '연결 실패 (${error})',
 			'serverConnect.enterUrl' => '서버 URL을 입력하세요',
 			'serverConnect.local.title' => '이 기기',

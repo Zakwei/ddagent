@@ -3223,6 +3223,7 @@
   "serverConnect": {
     "connect": "Connetti",
     "connecting": "Connessione…",
+    "changeServer": "Cambia server",
     "connectionFailed": "Connessione non riuscita ({{error}})",
     "enterUrl": "Inserisci l'URL del server",
     "local": {

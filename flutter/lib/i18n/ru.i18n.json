@@ -3229,6 +3229,7 @@
   "serverConnect": {
     "connect": "Подключить",
     "connecting": "Подключение…",
+    "changeServer": "Сменить сервер",
     "connectionFailed": "Не удалось подключиться ({{error}})",
     "enterUrl": "Введите URL сервера",
     "local": {

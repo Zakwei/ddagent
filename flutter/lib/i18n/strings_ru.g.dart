@@ -458,6 +458,7 @@ class Translations$serverConnect$ru extends Translations$serverConnect$en {
 	// Translations
 	@override String get connect => 'Подключить';
 	@override String get connecting => 'Подключение…';
+	@override String get changeServer => 'Сменить сервер';
 	@override String connectionFailed({required Object error}) => 'Не удалось подключиться (${error})';
 	@override String get enterUrl => 'Введите URL сервера';
 	@override late final Translations$serverConnect$local$ru local = Translations$serverConnect$local$ru._(_root);
@@ -9476,6 +9477,7 @@ extension on TranslationsRu {
 			'notifications.errors.registrationRejected' => 'Сервер отклонил регистрацию',
 			'serverConnect.connect' => 'Подключить',
 			'serverConnect.connecting' => 'Подключение…',
+			'serverConnect.changeServer' => 'Сменить сервер',
 			'serverConnect.connectionFailed' => ({required Object error}) => 'Не удалось подключиться (${error})',
 			'serverConnect.enterUrl' => 'Введите URL сервера',
 			'serverConnect.local.title' => 'Это устройство',

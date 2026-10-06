@@ -3223,6 +3223,7 @@
   "serverConnect": {
     "connect": "Bağlan",
     "connecting": "Bağlanılıyor…",
+    "changeServer": "Sunucuyu değiştir",
     "connectionFailed": "Bağlantı başarısız ({{error}})",
     "enterUrl": "Bir sunucu URL'si girin",
     "local": {

@@ -1,3 +1,4 @@
+import 'package:ddagent_app/core/network/api_providers.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_card.dart';
@@ -18,7 +19,8 @@ class ServerConnectScreen extends ConsumerStatefulWidget {
   const ServerConnectScreen({super.key});
 
   @override
-  ConsumerState<ServerConnectScreen> createState() => _ServerConnectScreenState();
+  ConsumerState<ServerConnectScreen> createState() =>
+      _ServerConnectScreenState();
 }
 
 class _ServerConnectScreenState extends ConsumerState<ServerConnectScreen> {
@@ -43,6 +45,12 @@ class _ServerConnectScreenState extends ConsumerState<ServerConnectScreen> {
       _busy = true;
       _error = null;
     });
+    if (isLocal) {
+      // Saved local profile: the server may be stopped — start it before
+      // probing. ensureRunning is a no-op when it's already up.
+      await ref.read(localServerProvider.notifier).ensureRunning();
+      if (!mounted) return;
+    }
     final probe = await probeServer(url);
     if (!mounted) return;
     if (!probe.ok) {
@@ -52,9 +60,18 @@ class _ServerConnectScreenState extends ConsumerState<ServerConnectScreen> {
       });
       return;
     }
+    // A different server won't accept the current JWT — drop it so the
+    // login flow on the new server starts clean.
+    if (normalizeServerUrl(url) != ref.read(serverProfilesProvider).activeUrl) {
+      await ref.read(authTokenStoreProvider).clear();
+    }
     await ref
         .read(serverProfilesProvider.notifier)
-        .select(url, name: isLocal ? i18n.serverConnect.local.title : '', isLocal: isLocal);
+        .select(
+          url,
+          name: isLocal ? i18n.serverConnect.local.title : '',
+          isLocal: isLocal,
+        );
     // Re-check status against the new server — may flip needsSetup → /setup.
     await ref.read(authControllerProvider.notifier).checkStatus();
     if (!mounted) return;
@@ -72,7 +89,8 @@ class _ServerConnectScreenState extends ConsumerState<ServerConnectScreen> {
     final t = Theme.of(context);
     final i18n = Translations.of(context);
     final c = context.appColors;
-    final profiles = ref.watch(serverProfilesProvider).profiles;
+    final profilesState = ref.watch(serverProfilesProvider);
+    final profiles = profilesState.profiles;
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
@@ -92,7 +110,9 @@ class _ServerConnectScreenState extends ConsumerState<ServerConnectScreen> {
                   const SizedBox(height: AppSpacing.xs),
                   Text(
                     i18n.serverConnect.subtitle,
-                    style: t.textTheme.bodyMedium?.copyWith(color: c.mutedForeground),
+                    style: t.textTheme.bodyMedium?.copyWith(
+                      color: c.mutedForeground,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: AppSpacing.lg),
@@ -104,10 +124,14 @@ class _ServerConnectScreenState extends ConsumerState<ServerConnectScreen> {
                       children: [
                         const Expanded(child: Divider()),
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.sm,
+                          ),
                           child: Text(
                             i18n.serverConnect.local.or,
-                            style: t.textTheme.bodySmall?.copyWith(color: c.mutedForeground),
+                            style: t.textTheme.bodySmall?.copyWith(
+                              color: c.mutedForeground,
+                            ),
                           ),
                         ),
                         const Expanded(child: Divider()),
@@ -120,13 +144,22 @@ class _ServerConnectScreenState extends ConsumerState<ServerConnectScreen> {
                       ListTile(
                         dense: true,
                         contentPadding: EdgeInsets.zero,
+                        selected: p.url == profilesState.activeUrl,
+                        leading: Icon(
+                          p.isLocal ? Icons.dns_outlined : Icons.cloud_outlined,
+                          size: 18,
+                          color: c.mutedForeground,
+                        ),
                         title: Text(p.label, overflow: TextOverflow.ellipsis),
+                        subtitle: p.label == p.url
+                            ? null
+                            : Text(p.url, overflow: TextOverflow.ellipsis),
                         trailing: IconButton(
                           icon: const Icon(Icons.close, size: 18),
                           tooltip: i18n.common.gitPanel.remove,
                           onPressed: () => _remove(p.url),
                         ),
-                        onTap: _busy ? null : () => _connect(p.url),
+                        onTap: _busy ? null : () => _connect(p.url, p.isLocal),
                       ),
                     const Divider(height: AppSpacing.lg),
                   ],
@@ -145,7 +178,11 @@ class _ServerConnectScreenState extends ConsumerState<ServerConnectScreen> {
                   AppButton(
                     onPressed: _connect,
                     loading: _busy,
-                    child: Text(_busy ? i18n.serverConnect.connecting : i18n.serverConnect.connect),
+                    child: Text(
+                      _busy
+                          ? i18n.serverConnect.connecting
+                          : i18n.serverConnect.connect,
+                    ),
                   ),
                 ],
               ),
@@ -198,10 +235,16 @@ class _LocalServerCard extends ConsumerWidget {
                     Text(local.title, style: t.textTheme.titleSmall),
                     Text(
                       switch (s.stage) {
-                        LocalServerStage.running => local.running(url: s.url ?? ''),
+                        LocalServerStage.running => local.running(
+                          url: s.url ?? '',
+                        ),
                         LocalServerStage.stopped =>
-                          s.version != null ? local.installed(version: s.version!) : local.subtitle,
-                        LocalServerStage.error => local.error(error: s.message ?? ''),
+                          s.version != null
+                              ? local.installed(version: s.version!)
+                              : local.subtitle,
+                        LocalServerStage.error => local.error(
+                          error: s.message ?? '',
+                        ),
                         _ => local.subtitle,
                       },
                       style: t.textTheme.bodySmall?.copyWith(
@@ -230,7 +273,9 @@ class _LocalServerCard extends ConsumerWidget {
             const LinearProgressIndicator(),
             const SizedBox(height: AppSpacing.xs),
             Text(
-              s.stage == LocalServerStage.installing ? local.installing : local.starting,
+              s.stage == LocalServerStage.installing
+                  ? local.installing
+                  : local.starting,
               style: t.textTheme.bodySmall?.copyWith(color: c.mutedForeground),
             ),
           ],
@@ -266,7 +311,8 @@ class _LocalServerCard extends ConsumerWidget {
                 percent: (s.progress * 100).round(),
               ),
               LocalServerStage.installing => local.installing,
-              LocalServerStage.starting || LocalServerStage.checking => local.starting,
+              LocalServerStage.starting ||
+              LocalServerStage.checking => local.starting,
               _ => local.install,
             }),
           ),

@@ -458,6 +458,7 @@ class Translations$serverConnect$tr extends Translations$serverConnect$en {
 	// Translations
 	@override String get connect => 'Bağlan';
 	@override String get connecting => 'Bağlanılıyor…';
+	@override String get changeServer => 'Sunucuyu değiştir';
 	@override String connectionFailed({required Object error}) => 'Bağlantı başarısız (${error})';
 	@override String get enterUrl => 'Bir sunucu URL\'si girin';
 	@override late final Translations$serverConnect$local$tr local = Translations$serverConnect$local$tr._(_root);
@@ -9470,6 +9471,7 @@ extension on TranslationsTr {
 			'notifications.errors.registrationRejected' => 'Kayıt sunucu tarafından reddedildi',
 			'serverConnect.connect' => 'Bağlan',
 			'serverConnect.connecting' => 'Bağlanılıyor…',
+			'serverConnect.changeServer' => 'Sunucuyu değiştir',
 			'serverConnect.connectionFailed' => ({required Object error}) => 'Bağlantı başarısız (${error})',
 			'serverConnect.enterUrl' => 'Bir sunucu URL\'si girin',
 			'serverConnect.local.title' => 'Bu cihaz',

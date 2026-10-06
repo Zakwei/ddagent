@@ -764,6 +764,9 @@ class Translations$serverConnect$en {
 	/// en: 'Connecting…'
 	String get connecting => 'Connecting…';
 
+	/// en: 'Change server'
+	String get changeServer => 'Change server';
+
 	late final Translations$serverConnect$local$en local = Translations$serverConnect$local$en.internal(_root);
 }
 
@@ -15998,6 +16001,7 @@ extension on Translations {
 			'serverConnect.connectionFailed' => ({required Object error}) => 'Connection failed (${error})',
 			'serverConnect.connect' => 'Connect',
 			'serverConnect.connecting' => 'Connecting…',
+			'serverConnect.changeServer' => 'Change server',
 			'serverConnect.local.title' => 'This device',
 			'serverConnect.local.subtitle' => 'Run the ddagent server on this machine',
 			'serverConnect.local.install' => 'Install local server',

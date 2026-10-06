@@ -458,6 +458,7 @@ class Translations$serverConnect$it extends Translations$serverConnect$en {
 	// Translations
 	@override String get connect => 'Connetti';
 	@override String get connecting => 'Connessione…';
+	@override String get changeServer => 'Cambia server';
 	@override String connectionFailed({required Object error}) => 'Connessione non riuscita (${error})';
 	@override String get enterUrl => 'Inserisci l\'URL del server';
 	@override late final Translations$serverConnect$local$it local = Translations$serverConnect$local$it._(_root);
@@ -9470,6 +9471,7 @@ extension on TranslationsIt {
 			'notifications.errors.registrationRejected' => 'Registrazione rifiutata dal server',
 			'serverConnect.connect' => 'Connetti',
 			'serverConnect.connecting' => 'Connessione…',
+			'serverConnect.changeServer' => 'Cambia server',
 			'serverConnect.connectionFailed' => ({required Object error}) => 'Connessione non riuscita (${error})',
 			'serverConnect.enterUrl' => 'Inserisci l\'URL del server',
 			'serverConnect.local.title' => 'Questo dispositivo',
