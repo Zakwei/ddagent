@@ -1762,7 +1762,12 @@
         "iosHint": "iPhone/iPad’de bildirimler yalnızca ddagent ana ekrana eklendikten sonra (Paylaş → Ana Ekrana Ekle) ve kurulu uygulamada etkinleştirildikten sonra çalışır.",
         "test": "Test bildirimi gönder",
         "testNoSubscription": "Abone cihaz yok. Önce telefonda “Etkinleştir”e dokunun.",
-        "testSuccess": "{{count}} cihaza gönderildi. Telefonda bir şey görünmezse ddagent’ı ana ekrana ekleyin (iOS bunu gerektirir)."
+        "testSuccess": "{{count}} cihaza gönderildi. Telefonda bir şey görünmezse ddagent’ı ana ekrana ekleyin (iOS bunu gerektirir).",
+        "testNotDelivered": "Erişilebilir cihaz yoktu. Uygulamanın çalıştığından ve bildirimlerin etkin olduğundan emin olun."
+      },
+      "device": {
+        "title": "Bu cihazı bilgilendir",
+        "enabled": "Bu cihaz için bildirimler etkin"
       },
       "sound": {
         "title": "Ses",

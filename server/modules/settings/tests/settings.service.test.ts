@@ -18,6 +18,7 @@ function dependencies(overrides: Partial<Dependencies> = {}): Dependencies {
     pushSubscriptions: { save: () => undefined, remove: () => undefined, count: () => 0 },
     getVapidPublicKey: () => null,
     sendTestPush: async () => [],
+    sendDesktopTestNotification: () => ({ attempted: 0, sent: 0 }),
     isWebPushConfigured: () => false,
     ...overrides,
   };
@@ -64,6 +65,7 @@ test('testPush reports subscription count, config state and delivery results', a
       sent += 1;
       return [{ endpointHost: 'fcm.googleapis.com', ok: true, statusCode: 201, error: null }];
     },
+    sendDesktopTestNotification: () => ({ attempted: 1, sent: 1 }),
     isWebPushConfigured: () => true,
   }));
 
@@ -72,17 +74,27 @@ test('testPush reports subscription count, config state and delivery results', a
   assert.equal(result.subscriptionCount, 2);
   assert.equal(result.webPushConfigured, true);
   assert.equal(result.results[0]?.ok, true);
+  assert.equal(result.desktopAttempted, 1);
+  assert.equal(result.desktopSent, 1);
 });
 
-test('testPush skips sending when no subscription is registered', async () => {
+test('testPush still delivers to desktop clients when no Web Push subscription exists', async () => {
   let sent = 0;
+  let desktopSent = 0;
   const service = createSettingsService(dependencies({
     pushSubscriptions: { save: () => undefined, remove: () => undefined, count: () => 0 },
     sendTestPush: async () => { sent += 1; return []; },
+    sendDesktopTestNotification: () => {
+      desktopSent += 1;
+      return { attempted: 2, sent: 1 };
+    },
   }));
 
   const result = await service.testPush(1);
   assert.equal(sent, 0);
+  assert.equal(desktopSent, 1);
   assert.equal(result.subscriptionCount, 0);
   assert.deepEqual(result.results, []);
+  assert.equal(result.desktopAttempted, 2);
+  assert.equal(result.desktopSent, 1);
 });

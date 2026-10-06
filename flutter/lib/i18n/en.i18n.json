@@ -1963,7 +1963,12 @@
         "iosHint": "On iPhone/iPad, notifications only work after adding ddagent to the home screen (Share → Add to Home Screen) and enabling them from that installed app.",
         "test": "Send test notification",
         "testNoSubscription": "No device is subscribed. Tap \"Enable\" on the phone first.",
-        "testSuccess": "Sent to {{count}} device(s). If nothing appeared on the phone, add ddagent to the home screen (iOS requires this)."
+        "testSuccess": "Sent to {{count}} device(s). If nothing appeared on the phone, add ddagent to the home screen (iOS requires this).",
+        "testNotDelivered": "No device was reachable. Make sure the app is running and notifications are enabled."
+      },
+      "device": {
+        "title": "Notify this device",
+        "enabled": "Notifications are enabled for this device"
       },
       "desktop": {
         "title": "Notify this desktop app",

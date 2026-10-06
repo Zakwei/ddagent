@@ -2397,6 +2397,7 @@ class Translations$settings$notifications$fr extends Translations$settings$notif
 	@override String get title => 'Notifications';
 	@override String get description => 'Contrôlez les événements de notification que vous recevez.';
 	@override late final Translations$settings$notifications$webPush$fr webPush = Translations$settings$notifications$webPush$fr._(_root);
+	@override late final Translations$settings$notifications$device$fr device = Translations$settings$notifications$device$fr._(_root);
 	@override late final Translations$settings$notifications$sound$fr sound = Translations$settings$notifications$sound$fr._(_root);
 	@override late final Translations$settings$notifications$events$fr events = Translations$settings$notifications$events$fr._(_root);
 	@override late final Translations$settings$notifications$desktop$fr desktop = Translations$settings$notifications$desktop$fr._(_root);
@@ -5611,6 +5612,18 @@ class Translations$settings$notifications$webPush$fr extends Translations$settin
 	@override String get test => 'Envoyer une notification de test';
 	@override String get testNoSubscription => 'Aucun appareil n’est abonné. Touchez d’abord « Activer » sur le téléphone.';
 	@override String testSuccess({required Object count}) => 'Envoyé à ${count} appareil(s). Si rien n’apparaît sur le téléphone, ajoutez ddagent à l’écran d’accueil (requis par iOS).';
+	@override String get testNotDelivered => 'Aucun appareil n\'était joignable. Vérifiez que l\'application est en cours d\'exécution et que les notifications sont activées.';
+}
+
+// Path: settings.notifications.device
+class Translations$settings$notifications$device$fr extends Translations$settings$notifications$device$en {
+	Translations$settings$notifications$device$fr._(TranslationsFr root) : this._root = root, super.internal(root);
+
+	final TranslationsFr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Notifier cet appareil';
+	@override String get enabled => 'Les notifications sont activées pour cet appareil';
 }
 
 // Path: settings.notifications.sound
@@ -8458,6 +8471,9 @@ extension on TranslationsFr {
 			'settings.notifications.webPush.test' => 'Envoyer une notification de test',
 			'settings.notifications.webPush.testNoSubscription' => 'Aucun appareil n’est abonné. Touchez d’abord « Activer » sur le téléphone.',
 			'settings.notifications.webPush.testSuccess' => ({required Object count}) => 'Envoyé à ${count} appareil(s). Si rien n’apparaît sur le téléphone, ajoutez ddagent à l’écran d’accueil (requis par iOS).',
+			'settings.notifications.webPush.testNotDelivered' => 'Aucun appareil n\'était joignable. Vérifiez que l\'application est en cours d\'exécution et que les notifications sont activées.',
+			'settings.notifications.device.title' => 'Notifier cet appareil',
+			'settings.notifications.device.enabled' => 'Les notifications sont activées pour cet appareil',
 			'settings.notifications.sound.title' => 'Son',
 			'settings.notifications.sound.description' => 'Jouer un court son lorsqu\'une exécution de chat se termine.',
 			'settings.notifications.sound.enabled' => 'Activé',
@@ -8644,11 +8660,11 @@ extension on TranslationsFr {
 			'settings.permissions.toolExamples.bashGitLog' => '- Autoriser toutes les commandes git log',
 			'settings.permissions.toolExamples.bashGitDiff' => '- Autoriser toutes les commandes git diff',
 			'settings.permissions.toolExamples.write' => '- Autoriser toutes les utilisations de l\'outil Write',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.toolExamples.bashRm' => '- Bloquer toutes les commandes rm (dangereux)',
 			'settings.permissions.shellExamples.title' => 'Exemples de commandes shell :',
 			'settings.permissions.shellExamples.ls' => '- Autoriser la commande ls',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.shellExamples.gitStatus' => '- Autoriser git status',
 			'settings.permissions.shellExamples.npmInstall' => '- Autoriser npm install',
 			'settings.permissions.shellExamples.rmRf' => '- Bloquer la suppression récursive',
@@ -9158,11 +9174,11 @@ extension on TranslationsFr {
 			'tasks.nextTask.viewAll' => 'Voir toutes les tâches',
 			'tasks.nextTask.viewDetails' => 'Voir les détails de la tâche',
 			'tasks.nextTask.whatIs' => 'Qu’est-ce que TaskMaster ?',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.cancelEdit' => 'Annuler la modification',
 			'tasks.taskDetail.close' => 'Fermer',
 			'tasks.taskDetail.copyTaskId' => 'Copier l’ID de la tâche',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.delete' => 'Supprimer la tâche',
 			'tasks.taskDetail.deleteConfirmDescription' => ({required Object title}) => '« ${title} » sera définitivement supprimée.',
 			'tasks.taskDetail.deleteConfirmTitle' => 'Supprimer la tâche ?',

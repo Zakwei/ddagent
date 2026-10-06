@@ -2397,6 +2397,7 @@ class Translations$settings$notifications$ja extends Translations$settings$notif
 	@override String get title => '通知';
 	@override String get description => '受信する通知イベントを設定します。';
 	@override late final Translations$settings$notifications$webPush$ja webPush = Translations$settings$notifications$webPush$ja._(_root);
+	@override late final Translations$settings$notifications$device$ja device = Translations$settings$notifications$device$ja._(_root);
 	@override late final Translations$settings$notifications$sound$ja sound = Translations$settings$notifications$sound$ja._(_root);
 	@override late final Translations$settings$notifications$events$ja events = Translations$settings$notifications$events$ja._(_root);
 	@override late final Translations$settings$notifications$desktop$ja desktop = Translations$settings$notifications$desktop$ja._(_root);
@@ -5611,6 +5612,18 @@ class Translations$settings$notifications$webPush$ja extends Translations$settin
 	@override String get test => 'テスト通知を送信';
 	@override String get testNoSubscription => '登録済みデバイスがありません。先にスマホで「有効にする」をタップしてください。';
 	@override String testSuccess({required Object count}) => '${count} 台のデバイスに送信しました。スマホに表示されない場合は ddagent をホーム画面に追加してください（iOS の要件）。';
+	@override String get testNotDelivered => '到達可能なデバイスがありませんでした。アプリが実行中で、通知が有効になっていることを確認してください。';
+}
+
+// Path: settings.notifications.device
+class Translations$settings$notifications$device$ja extends Translations$settings$notifications$device$en {
+	Translations$settings$notifications$device$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'このデバイスに通知';
+	@override String get enabled => 'このデバイスの通知が有効になっています';
 }
 
 // Path: settings.notifications.sound
@@ -8458,6 +8471,9 @@ extension on TranslationsJa {
 			'settings.notifications.webPush.test' => 'テスト通知を送信',
 			'settings.notifications.webPush.testNoSubscription' => '登録済みデバイスがありません。先にスマホで「有効にする」をタップしてください。',
 			'settings.notifications.webPush.testSuccess' => ({required Object count}) => '${count} 台のデバイスに送信しました。スマホに表示されない場合は ddagent をホーム画面に追加してください（iOS の要件）。',
+			'settings.notifications.webPush.testNotDelivered' => '到達可能なデバイスがありませんでした。アプリが実行中で、通知が有効になっていることを確認してください。',
+			'settings.notifications.device.title' => 'このデバイスに通知',
+			'settings.notifications.device.enabled' => 'このデバイスの通知が有効になっています',
 			'settings.notifications.sound.title' => 'サウンド',
 			'settings.notifications.sound.description' => 'チャット実行が完了したときに短い音を再生します。',
 			'settings.notifications.sound.enabled' => '有効',
@@ -8644,11 +8660,11 @@ extension on TranslationsJa {
 			'settings.permissions.toolExamples.bashGitLog' => '- すべてのgit logコマンドを許可',
 			'settings.permissions.toolExamples.bashGitDiff' => '- すべてのgit diffコマンドを許可',
 			'settings.permissions.toolExamples.write' => '- すべてのWriteツールの使用を許可',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.toolExamples.bashRm' => '- すべてのrmコマンドをブロック（危険）',
 			'settings.permissions.shellExamples.title' => 'シェルコマンドの例:',
 			'settings.permissions.shellExamples.ls' => '- lsコマンドを許可',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.shellExamples.gitStatus' => '- git statusを許可',
 			'settings.permissions.shellExamples.npmInstall' => '- npm installを許可',
 			'settings.permissions.shellExamples.rmRf' => '- 再帰的削除をブロック',
@@ -9158,11 +9174,11 @@ extension on TranslationsJa {
 			'tasks.nextTask.viewAll' => 'すべてのタスクを表示',
 			'tasks.nextTask.viewDetails' => 'タスクの詳細を表示',
 			'tasks.nextTask.whatIs' => 'TaskMaster とは？',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.cancelEdit' => '編集をキャンセル',
 			'tasks.taskDetail.close' => '閉じる',
 			'tasks.taskDetail.copyTaskId' => 'タスクIDをコピー',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.delete' => 'タスクを削除',
 			'tasks.taskDetail.deleteConfirmDescription' => ({required Object title}) => '「${title}」は完全に削除されます。',
 			'tasks.taskDetail.deleteConfirmTitle' => 'タスクを削除しますか？',

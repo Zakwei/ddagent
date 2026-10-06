@@ -1762,7 +1762,12 @@
         "iosHint": "Auf iPhone/iPad funktionieren Benachrichtigungen erst, nachdem ddagent zum Home-Bildschirm hinzugefügt wurde (Teilen → Zum Home-Bildschirm) und sie in der installierten App aktiviert wurden.",
         "test": "Test-Benachrichtigung senden",
         "testNoSubscription": "Kein Gerät ist angemeldet. Tippe zuerst auf dem Telefon auf „Aktivieren“.",
-        "testSuccess": "An {{count}} Gerät(e) gesendet. Falls nichts auf dem Telefon erscheint, füge ddagent zum Home-Bildschirm hinzu (iOS erfordert dies)."
+        "testSuccess": "An {{count}} Gerät(e) gesendet. Falls nichts auf dem Telefon erscheint, füge ddagent zum Home-Bildschirm hinzu (iOS erfordert dies).",
+        "testNotDelivered": "Kein Gerät war erreichbar. Stelle sicher, dass die App läuft und Benachrichtigungen aktiviert sind."
+      },
+      "device": {
+        "title": "Dieses Gerät benachrichtigen",
+        "enabled": "Benachrichtigungen sind für dieses Gerät aktiviert"
       },
       "sound": {
         "title": "Ton",

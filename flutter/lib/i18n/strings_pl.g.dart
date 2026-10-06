@@ -2464,6 +2464,7 @@ class Translations$settings$notifications$pl extends Translations$settings$notif
 	@override String get title => 'Powiadomienia';
 	@override String get description => 'Kontroluj, które zdarzenia powiadomień otrzymujesz.';
 	@override late final Translations$settings$notifications$webPush$pl webPush = Translations$settings$notifications$webPush$pl._(_root);
+	@override late final Translations$settings$notifications$device$pl device = Translations$settings$notifications$device$pl._(_root);
 	@override late final Translations$settings$notifications$desktop$pl desktop = Translations$settings$notifications$desktop$pl._(_root);
 	@override late final Translations$settings$notifications$sound$pl sound = Translations$settings$notifications$sound$pl._(_root);
 	@override late final Translations$settings$notifications$events$pl events = Translations$settings$notifications$events$pl._(_root);
@@ -5922,6 +5923,18 @@ class Translations$settings$notifications$webPush$pl extends Translations$settin
 	@override String get test => 'Wyślij powiadomienie testowe';
 	@override String get testNoSubscription => 'Żadne urządzenie nie jest zasubskrybowane. Najpierw dotknij „Włącz” na telefonie.';
 	@override String testSuccess({required Object count}) => 'Wysłano do ${count} urządzeń. Jeśli nic się nie pojawiło na telefonie, dodaj ddagent do ekranu głównego (iOS tego wymaga).';
+	@override String get testNotDelivered => 'Nie udało się dotrzeć do żadnego urządzenia. Upewnij się, że aplikacja działa, a powiadomienia są włączone.';
+}
+
+// Path: settings.notifications.device
+class Translations$settings$notifications$device$pl extends Translations$settings$notifications$device$en {
+	Translations$settings$notifications$device$pl._(TranslationsPl root) : this._root = root, super.internal(root);
+
+	final TranslationsPl _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Powiadamiaj to urządzenie';
+	@override String get enabled => 'Powiadomienia są włączone dla tego urządzenia';
 }
 
 // Path: settings.notifications.desktop
@@ -8982,6 +8995,9 @@ extension on TranslationsPl {
 			'settings.notifications.webPush.test' => 'Wyślij powiadomienie testowe',
 			'settings.notifications.webPush.testNoSubscription' => 'Żadne urządzenie nie jest zasubskrybowane. Najpierw dotknij „Włącz” na telefonie.',
 			'settings.notifications.webPush.testSuccess' => ({required Object count}) => 'Wysłano do ${count} urządzeń. Jeśli nic się nie pojawiło na telefonie, dodaj ddagent do ekranu głównego (iOS tego wymaga).',
+			'settings.notifications.webPush.testNotDelivered' => 'Nie udało się dotrzeć do żadnego urządzenia. Upewnij się, że aplikacja działa, a powiadomienia są włączone.',
+			'settings.notifications.device.title' => 'Powiadamiaj to urządzenie',
+			'settings.notifications.device.enabled' => 'Powiadomienia są włączone dla tego urządzenia',
 			'settings.notifications.desktop.title' => 'Powiadamiaj tę aplikację desktopową',
 			'settings.notifications.desktop.enable' => 'Włącz powiadomienia',
 			'settings.notifications.desktop.disable' => 'Wyłącz powiadomienia',
@@ -9063,11 +9079,11 @@ extension on TranslationsPl {
 			'settings.git.actions.save' => 'Zapisz konfigurację',
 			'settings.git.actions.saving' => 'Zapisywanie...',
 			'settings.git.status.success' => 'Zapisano pomyślnie',
+			_ => null,
+		} ?? switch (path) {
 			'settings.git.status.error' => 'Nie udało się zapisać',
 			'settings.apiKeys.title' => 'Klucze API',
 			'settings.apiKeys.description' => 'Generuj klucze API, aby uzyskiwać dostęp do zewnętrznego API z innych aplikacji.',
-			_ => null,
-		} ?? switch (path) {
 			'settings.apiKeys.newKey.alertTitle' => '⚠️ Zapisz swój klucz API',
 			'settings.apiKeys.newKey.alertMessage' => 'To jedyny raz, gdy zobaczysz ten klucz. Przechowuj go w bezpiecznym miejscu.',
 			'settings.apiKeys.newKey.iveSavedIt' => 'Zapisałem go',
@@ -9577,11 +9593,11 @@ extension on TranslationsPl {
 			'sidebar.tabs.tasks' => 'Zadania',
 			'sidebar.tabs.usage' => 'Limity i zużycie',
 			'tasks.notConfigured.title' => 'TaskMaster AI nie jest skonfigurowany',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.notConfigured.description' => 'TaskMaster pomaga dzielić złożone projekty na łatwe w realizacji zadania dzięki wsparciu AI',
 			'tasks.notConfigured.whatIsTitle' => '🎯 Czym jest TaskMaster?',
 			'tasks.notConfigured.features.aiPowered' => 'Zarządzanie zadaniami oparte na AI: dziel złożone projekty na łatwe w realizacji podzadania',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.notConfigured.features.prdTemplates' => 'Szablony PRD: generuj zadania z dokumentów wymagań produktu',
 			'tasks.notConfigured.features.dependencyTracking' => 'Śledzenie zależności: poznaj relacje między zadaniami i kolejność ich wykonywania',
 			'tasks.notConfigured.features.progressVisualization' => 'Wizualizacja postępów: tablice Kanban i szczegółowe statystyki zadań',
@@ -10091,11 +10107,11 @@ extension on TranslationsPl {
 			'scheduler.runs' => 'Uruchomienia',
 			'scheduler.session' => ({required Object id}) => 'sesja ${id}',
 			'scheduler.worktree' => 'worktree',
+			_ => null,
+		} ?? switch (path) {
 			'notifications.deviceLabel' => 'ddagent Flutter',
 			'notifications.errors.noResponse' => 'Brak odpowiedzi z serwera',
 			'notifications.errors.registrationRejected' => 'Serwer odrzucił rejestrację',
-			_ => null,
-		} ?? switch (path) {
 			'serverConnect.connect' => 'Połącz',
 			'serverConnect.connecting' => 'Łączenie…',
 			'serverConnect.changeServer' => 'Zmień serwer',

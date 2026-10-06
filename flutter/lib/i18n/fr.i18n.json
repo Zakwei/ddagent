@@ -1762,7 +1762,12 @@
         "iosHint": "Sur iPhone/iPad, les notifications ne fonctionnent qu’après avoir ajouté ddagent à l’écran d’accueil (Partager → Ajouter à l’écran d’accueil) et les avoir activées depuis l’app installée.",
         "test": "Envoyer une notification de test",
         "testNoSubscription": "Aucun appareil n’est abonné. Touchez d’abord « Activer » sur le téléphone.",
-        "testSuccess": "Envoyé à {{count}} appareil(s). Si rien n’apparaît sur le téléphone, ajoutez ddagent à l’écran d’accueil (requis par iOS)."
+        "testSuccess": "Envoyé à {{count}} appareil(s). Si rien n’apparaît sur le téléphone, ajoutez ddagent à l’écran d’accueil (requis par iOS).",
+        "testNotDelivered": "Aucun appareil n'était joignable. Vérifiez que l'application est en cours d'exécution et que les notifications sont activées."
+      },
+      "device": {
+        "title": "Notifier cet appareil",
+        "enabled": "Les notifications sont activées pour cet appareil"
       },
       "sound": {
         "title": "Son",

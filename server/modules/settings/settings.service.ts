@@ -37,6 +37,8 @@ type SettingsDependencies = {
   };
   getVapidPublicKey(): string | null;
   sendTestPush(userId: number): Promise<PushDeliveryResult[]>;
+  /** Delivers a test notification over the desktop (WebSocket) channel. */
+  sendDesktopTestNotification(userId: number): { attempted: number; sent: number };
   isWebPushConfigured(): boolean;
 };
 
@@ -194,13 +196,15 @@ export function createSettingsService(dependencies: SettingsDependencies) {
       return { success: true };
     },
     /**
-     * Sends a test push and reports whether the server could hand it to each
-     * subscription's push service, plus how many are registered and whether
-     * VAPID keys are configured. This is what the Settings "Test notification"
-     * button uses to diagnose a silent phone.
+     * Sends a test notification over every device transport and reports the
+     * outcome: per-subscription Web Push results, the desktop (WebSocket)
+     * delivery counts, how many subscriptions are registered, and whether VAPID
+     * keys are configured. This is what the Settings "Test notification" button
+     * uses to diagnose a silent phone.
      */
     async testPush(userId: number) {
       const subscriptionCount = dependencies.pushSubscriptions.count(userId);
+      const desktop = dependencies.sendDesktopTestNotification(userId);
       const results = subscriptionCount > 0
         ? await dependencies.sendTestPush(userId)
         : [];
@@ -209,6 +213,8 @@ export function createSettingsService(dependencies: SettingsDependencies) {
         subscriptionCount,
         webPushConfigured: dependencies.isWebPushConfigured(),
         results,
+        desktopAttempted: desktop.attempted,
+        desktopSent: desktop.sent,
       };
     },
   };

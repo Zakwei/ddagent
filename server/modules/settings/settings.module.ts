@@ -5,10 +5,12 @@ import {
   pushSubscriptionsDb,
 } from '@/modules/database/index.js';
 import {
+  buildNotificationPayload,
   createNotificationEvent,
   getPublicKey,
   isWebPushConfigured,
   notifyUserIfEnabled,
+  sendDesktopNotification,
   sendTestPush,
 } from '@/modules/notifications/index.js';
 
@@ -48,6 +50,20 @@ const settingsService = createSettingsService({
   },
   getVapidPublicKey: getPublicKey,
   sendTestPush: (userId) => sendTestPush(userId),
+  // Desktop/WebSocket clients (the Flutter mobile + desktop apps) are not push
+  // subscriptions, so the Web Push test never reaches them — deliver the same
+  // test payload over that channel too.
+  sendDesktopTestNotification: (userId) =>
+    sendDesktopNotification(
+      userId,
+      buildNotificationPayload({
+        provider: 'system',
+        kind: 'info',
+        code: 'agent.notification',
+        meta: { message: 'Test notification from ddagent' },
+        createdAt: new Date().toISOString(),
+      }),
+    ),
   isWebPushConfigured,
 });
 

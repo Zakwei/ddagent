@@ -2397,6 +2397,7 @@ class Translations$settings$notifications$zh_CN extends Translations$settings$no
 	@override String get title => '通知';
 	@override String get description => '控制你希望接收的通知事件。';
 	@override late final Translations$settings$notifications$webPush$zh_CN webPush = Translations$settings$notifications$webPush$zh_CN.internal(_root);
+	@override late final Translations$settings$notifications$device$zh_CN device = Translations$settings$notifications$device$zh_CN.internal(_root);
 	@override late final Translations$settings$notifications$desktop$zh_CN desktop = Translations$settings$notifications$desktop$zh_CN.internal(_root);
 	@override late final Translations$settings$notifications$sound$zh_CN sound = Translations$settings$notifications$sound$zh_CN.internal(_root);
 	@override late final Translations$settings$notifications$events$zh_CN events = Translations$settings$notifications$events$zh_CN.internal(_root);
@@ -5611,6 +5612,18 @@ class Translations$settings$notifications$webPush$zh_CN extends Translations$set
 	@override String get test => '发送测试通知';
 	@override String get testNoSubscription => '没有已订阅的设备。请先在手机上点击“启用”。';
 	@override String testSuccess({required Object count}) => '已发送到 ${count} 台设备。如果手机上没有显示，请将 ddagent 添加到主屏幕（iOS 要求）。';
+	@override String get testNotDelivered => '没有可访问的设备。请确保应用正在运行且通知已启用。';
+}
+
+// Path: settings.notifications.device
+class Translations$settings$notifications$device$zh_CN extends Translations$settings$notifications$device$en {
+	Translations$settings$notifications$device$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '通知此设备';
+	@override String get enabled => '此设备的通知已启用';
 }
 
 // Path: settings.notifications.desktop
@@ -8458,6 +8471,9 @@ extension on TranslationsZhCn {
 			'settings.notifications.webPush.test' => '发送测试通知',
 			'settings.notifications.webPush.testNoSubscription' => '没有已订阅的设备。请先在手机上点击“启用”。',
 			'settings.notifications.webPush.testSuccess' => ({required Object count}) => '已发送到 ${count} 台设备。如果手机上没有显示，请将 ddagent 添加到主屏幕（iOS 要求）。',
+			'settings.notifications.webPush.testNotDelivered' => '没有可访问的设备。请确保应用正在运行且通知已启用。',
+			'settings.notifications.device.title' => '通知此设备',
+			'settings.notifications.device.enabled' => '此设备的通知已启用',
 			'settings.notifications.desktop.title' => '通知此桌面应用',
 			'settings.notifications.desktop.enable' => '启用通知',
 			'settings.notifications.desktop.disable' => '关闭通知',
@@ -8644,11 +8660,11 @@ extension on TranslationsZhCn {
 			'settings.permissions.toolExamples.bashGitLog' => '- 允许所有 git log 命令',
 			'settings.permissions.toolExamples.bashGitDiff' => '- 允许所有 git diff 命令',
 			'settings.permissions.toolExamples.write' => '- 允许所有 Write 工具使用',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.toolExamples.bashRm' => '- 阻止所有 rm 命令（危险）',
 			'settings.permissions.shellExamples.title' => 'Shell 命令示例：',
 			'settings.permissions.shellExamples.ls' => '- 允许 ls 命令',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.shellExamples.gitStatus' => '- 允许 git status',
 			'settings.permissions.shellExamples.npmInstall' => '- 允许 npm install',
 			'settings.permissions.shellExamples.rmRf' => '- 阻止递归删除',
@@ -9158,11 +9174,11 @@ extension on TranslationsZhCn {
 			'tasks.nextTask.viewAll' => '查看所有任务',
 			'tasks.nextTask.viewDetails' => '查看任务详情',
 			'tasks.nextTask.whatIs' => '什么是 TaskMaster？',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.cancelEdit' => '取消编辑',
 			'tasks.taskDetail.close' => '关闭',
 			'tasks.taskDetail.copyTaskId' => '复制任务 ID',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.delete' => '删除任务',
 			'tasks.taskDetail.deleteConfirmDescription' => ({required Object title}) => '“${title}”将被永久删除。',
 			'tasks.taskDetail.deleteConfirmTitle' => '删除任务？',

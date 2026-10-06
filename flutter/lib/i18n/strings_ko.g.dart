@@ -2397,6 +2397,7 @@ class Translations$settings$notifications$ko extends Translations$settings$notif
 	@override String get title => '알림';
 	@override String get description => '수신할 알림 이벤트를 설정합니다.';
 	@override late final Translations$settings$notifications$webPush$ko webPush = Translations$settings$notifications$webPush$ko._(_root);
+	@override late final Translations$settings$notifications$device$ko device = Translations$settings$notifications$device$ko._(_root);
 	@override late final Translations$settings$notifications$desktop$ko desktop = Translations$settings$notifications$desktop$ko._(_root);
 	@override late final Translations$settings$notifications$sound$ko sound = Translations$settings$notifications$sound$ko._(_root);
 	@override late final Translations$settings$notifications$events$ko events = Translations$settings$notifications$events$ko._(_root);
@@ -5611,6 +5612,18 @@ class Translations$settings$notifications$webPush$ko extends Translations$settin
 	@override String get test => '테스트 알림 보내기';
 	@override String get testNoSubscription => '구독 중인 기기가 없습니다. 먼저 휴대폰에서 "활성화"를 누르세요.';
 	@override String testSuccess({required Object count}) => '${count}개 기기에 전송했습니다. 휴대폰에 아무것도 표시되지 않으면 ddagent를 홈 화면에 추가하세요(iOS 요구 사항).';
+	@override String get testNotDelivered => '연결 가능한 기기가 없습니다. 앱이 실행 중이고 알림이 활성화되어 있는지 확인하세요.';
+}
+
+// Path: settings.notifications.device
+class Translations$settings$notifications$device$ko extends Translations$settings$notifications$device$en {
+	Translations$settings$notifications$device$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '이 기기에 알림';
+	@override String get enabled => '이 기기의 알림이 활성화되어 있습니다';
 }
 
 // Path: settings.notifications.desktop
@@ -8458,6 +8471,9 @@ extension on TranslationsKo {
 			'settings.notifications.webPush.test' => '테스트 알림 보내기',
 			'settings.notifications.webPush.testNoSubscription' => '구독 중인 기기가 없습니다. 먼저 휴대폰에서 "활성화"를 누르세요.',
 			'settings.notifications.webPush.testSuccess' => ({required Object count}) => '${count}개 기기에 전송했습니다. 휴대폰에 아무것도 표시되지 않으면 ddagent를 홈 화면에 추가하세요(iOS 요구 사항).',
+			'settings.notifications.webPush.testNotDelivered' => '연결 가능한 기기가 없습니다. 앱이 실행 중이고 알림이 활성화되어 있는지 확인하세요.',
+			'settings.notifications.device.title' => '이 기기에 알림',
+			'settings.notifications.device.enabled' => '이 기기의 알림이 활성화되어 있습니다',
 			'settings.notifications.desktop.title' => '데스크톱 앱 알림',
 			'settings.notifications.desktop.enable' => '알림 활성화',
 			'settings.notifications.desktop.disable' => '알림 비활성화',
@@ -8644,11 +8660,11 @@ extension on TranslationsKo {
 			'settings.permissions.toolExamples.bashGitLog' => '- 모든 git log 명령어 허용',
 			'settings.permissions.toolExamples.bashGitDiff' => '- 모든 git diff 명령어 허용',
 			'settings.permissions.toolExamples.write' => '- 모든 Write 도구 사용 허용',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.toolExamples.bashRm' => '- 모든 rm 명령어 차단 (위험)',
 			'settings.permissions.shellExamples.title' => 'Shell 명령어 예시:',
 			'settings.permissions.shellExamples.ls' => '- ls 명령어 허용',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.shellExamples.gitStatus' => '- git status 허용',
 			'settings.permissions.shellExamples.npmInstall' => '- npm install 허용',
 			'settings.permissions.shellExamples.rmRf' => '- 재귀 삭제 차단',
@@ -9158,11 +9174,11 @@ extension on TranslationsKo {
 			'tasks.nextTask.viewAll' => '모든 작업 보기',
 			'tasks.nextTask.viewDetails' => '작업 세부 정보 보기',
 			'tasks.nextTask.whatIs' => 'TaskMaster란?',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.cancelEdit' => '편집 취소',
 			'tasks.taskDetail.close' => '닫기',
 			'tasks.taskDetail.copyTaskId' => '작업 ID 복사',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.delete' => '작업 삭제',
 			'tasks.taskDetail.deleteConfirmDescription' => ({required Object title}) => '"${title}"이(가) 영구적으로 삭제됩니다.',
 			'tasks.taskDetail.deleteConfirmTitle' => '작업을 삭제하시겠습니까?',

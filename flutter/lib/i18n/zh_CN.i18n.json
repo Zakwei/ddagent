@@ -1762,7 +1762,12 @@
         "iosHint": "在 iPhone/iPad 上，只有将 ddagent 添加到主屏幕（分享 → 添加到主屏幕）并在安装的应用中启用通知后，通知才有效。",
         "test": "发送测试通知",
         "testNoSubscription": "没有已订阅的设备。请先在手机上点击“启用”。",
-        "testSuccess": "已发送到 {{count}} 台设备。如果手机上没有显示，请将 ddagent 添加到主屏幕（iOS 要求）。"
+        "testSuccess": "已发送到 {{count}} 台设备。如果手机上没有显示，请将 ddagent 添加到主屏幕（iOS 要求）。",
+        "testNotDelivered": "没有可访问的设备。请确保应用正在运行且通知已启用。"
+      },
+      "device": {
+        "title": "通知此设备",
+        "enabled": "此设备的通知已启用"
       },
       "desktop": {
         "title": "通知此桌面应用",

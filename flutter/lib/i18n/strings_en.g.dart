@@ -4451,6 +4451,7 @@ class Translations$settings$notifications$en {
 	String get description => 'Control which notification events you receive.';
 
 	late final Translations$settings$notifications$webPush$en webPush = Translations$settings$notifications$webPush$en.internal(_root);
+	late final Translations$settings$notifications$device$en device = Translations$settings$notifications$device$en.internal(_root);
 	late final Translations$settings$notifications$desktop$en desktop = Translations$settings$notifications$desktop$en.internal(_root);
 	late final Translations$settings$notifications$sound$en sound = Translations$settings$notifications$sound$en.internal(_root);
 	late final Translations$settings$notifications$events$en events = Translations$settings$notifications$events$en.internal(_root);
@@ -10783,6 +10784,24 @@ class Translations$settings$notifications$webPush$en {
 
 	/// en: 'Sent to {{count}} device(s). If nothing appeared on the phone, add ddagent to the home screen (iOS requires this).'
 	String testSuccess({required Object count}) => 'Sent to ${count} device(s). If nothing appeared on the phone, add ddagent to the home screen (iOS requires this).';
+
+	/// en: 'No device was reachable. Make sure the app is running and notifications are enabled.'
+	String get testNotDelivered => 'No device was reachable. Make sure the app is running and notifications are enabled.';
+}
+
+// Path: settings.notifications.device
+class Translations$settings$notifications$device$en {
+	Translations$settings$notifications$device$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Notify this device'
+	String get title => 'Notify this device';
+
+	/// en: 'Notifications are enabled for this device'
+	String get enabled => 'Notifications are enabled for this device';
 }
 
 // Path: settings.notifications.desktop
@@ -14877,6 +14896,9 @@ extension on Translations {
 			'settings.notifications.webPush.test' => 'Send test notification',
 			'settings.notifications.webPush.testNoSubscription' => 'No device is subscribed. Tap "Enable" on the phone first.',
 			'settings.notifications.webPush.testSuccess' => ({required Object count}) => 'Sent to ${count} device(s). If nothing appeared on the phone, add ddagent to the home screen (iOS requires this).',
+			'settings.notifications.webPush.testNotDelivered' => 'No device was reachable. Make sure the app is running and notifications are enabled.',
+			'settings.notifications.device.title' => 'Notify this device',
+			'settings.notifications.device.enabled' => 'Notifications are enabled for this device',
 			'settings.notifications.desktop.title' => 'Notify this desktop app',
 			'settings.notifications.desktop.enable' => 'Enable notifications',
 			'settings.notifications.desktop.disable' => 'Disable notifications',
@@ -14910,11 +14932,11 @@ extension on Translations {
 			'settings.appearanceSettings.codeEditor.wordWrap.label' => 'Word Wrap',
 			'settings.appearanceSettings.codeEditor.wordWrap.description' => 'Enable word wrapping by default in the editor',
 			'settings.appearanceSettings.codeEditor.showMinimap.label' => 'Show Minimap',
+			_ => null,
+		} ?? switch (path) {
 			'settings.appearanceSettings.codeEditor.showMinimap.description' => 'Display a minimap for easier navigation in diff view',
 			'settings.appearanceSettings.codeEditor.lineNumbers.label' => 'Show Line Numbers',
 			'settings.appearanceSettings.codeEditor.lineNumbers.description' => 'Display line numbers in the editor',
-			_ => null,
-		} ?? switch (path) {
 			'settings.appearanceSettings.codeEditor.fontSize.label' => 'Font Size',
 			'settings.appearanceSettings.codeEditor.fontSize.description' => 'Editor font size in pixels',
 			'settings.appearanceSettings.terminal.title' => 'Terminal',
@@ -15424,11 +15446,11 @@ extension on Translations {
 			'sidebar.version.updateNow' => 'Update now',
 			'sidebar.version.updateConfirm' => ({required Object version}) => 'Update ddagent to v${version}? The latest code will be pulled, rebuilt, and the server will restart — active sessions are interrupted.',
 			'sidebar.version.updating' => 'Updating… this can take a few minutes',
+			_ => null,
+		} ?? switch (path) {
 			'sidebar.version.restarting' => 'Update installed — restarting…',
 			'sidebar.version.updateFailed' => 'Update failed',
 			'sidebar.version.releaseNotes' => 'Release notes',
-			_ => null,
-		} ?? switch (path) {
 			'sidebar.search.modeProjects' => 'Projects',
 			'sidebar.search.modeConversations' => 'Conversations',
 			'sidebar.search.conversationsPlaceholder' => 'Search in conversations...',
@@ -15938,11 +15960,11 @@ extension on Translations {
 			'onboarding.agents.description' => 'Login to one or more AI coding assistants. All are optional.',
 			'onboarding.agents.laterHint' => 'You can configure these later in Settings.',
 			'onboarding.mcp.title' => 'Connect agents to ddagent',
+			_ => null,
+		} ?? switch (path) {
 			'onboarding.mcp.description' => 'Install the ddagent MCP server so your agents can use the knowledge base and ddagent tools. Pick agents, or install for all.',
 			'onboarding.mcp.installSelected' => 'Install selected',
 			'onboarding.mcp.installForAll' => 'Install for all',
-			_ => null,
-		} ?? switch (path) {
 			'onboarding.mcp.laterHint' => 'Optional — you can also install this later in Settings → MCP.',
 			'onboarding.mcp.installedOn' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: 'Installed on ${count} agent.', other: 'Installed on ${count} agents.', ), 
 			'onboarding.mcp.installedWithFailures' => ({required Object installedCount, required Object failed}) => 'Installed on ${installedCount}; failed: ${failed}',

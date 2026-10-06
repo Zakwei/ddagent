@@ -2397,6 +2397,7 @@ class Translations$settings$notifications$ru extends Translations$settings$notif
 	@override String get title => 'Уведомления';
 	@override String get description => 'Управляйте тем, какие события уведомлений вы получаете.';
 	@override late final Translations$settings$notifications$webPush$ru webPush = Translations$settings$notifications$webPush$ru._(_root);
+	@override late final Translations$settings$notifications$device$ru device = Translations$settings$notifications$device$ru._(_root);
 	@override late final Translations$settings$notifications$sound$ru sound = Translations$settings$notifications$sound$ru._(_root);
 	@override late final Translations$settings$notifications$events$ru events = Translations$settings$notifications$events$ru._(_root);
 	@override late final Translations$settings$notifications$desktop$ru desktop = Translations$settings$notifications$desktop$ru._(_root);
@@ -5617,6 +5618,18 @@ class Translations$settings$notifications$webPush$ru extends Translations$settin
 	@override String get test => 'Отправить тестовое уведомление';
 	@override String get testNoSubscription => 'Нет подписанных устройств. Сначала нажмите «Включить» на телефоне.';
 	@override String testSuccess({required Object count}) => 'Отправлено на ${count} устройств. Если на телефоне ничего не появилось, добавьте ddagent на домашний экран (это требование iOS).';
+	@override String get testNotDelivered => 'Ни одно устройство не было доступно. Убедитесь, что приложение запущено и уведомления включены.';
+}
+
+// Path: settings.notifications.device
+class Translations$settings$notifications$device$ru extends Translations$settings$notifications$device$en {
+	Translations$settings$notifications$device$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Уведомлять это устройство';
+	@override String get enabled => 'Уведомления включены для этого устройства';
 }
 
 // Path: settings.notifications.sound
@@ -8464,6 +8477,9 @@ extension on TranslationsRu {
 			'settings.notifications.webPush.test' => 'Отправить тестовое уведомление',
 			'settings.notifications.webPush.testNoSubscription' => 'Нет подписанных устройств. Сначала нажмите «Включить» на телефоне.',
 			'settings.notifications.webPush.testSuccess' => ({required Object count}) => 'Отправлено на ${count} устройств. Если на телефоне ничего не появилось, добавьте ddagent на домашний экран (это требование iOS).',
+			'settings.notifications.webPush.testNotDelivered' => 'Ни одно устройство не было доступно. Убедитесь, что приложение запущено и уведомления включены.',
+			'settings.notifications.device.title' => 'Уведомлять это устройство',
+			'settings.notifications.device.enabled' => 'Уведомления включены для этого устройства',
 			'settings.notifications.sound.title' => 'Звук',
 			'settings.notifications.sound.description' => 'Воспроизводить короткий сигнал при завершении запуска чата.',
 			'settings.notifications.sound.enabled' => 'Включено',
@@ -8650,11 +8666,11 @@ extension on TranslationsRu {
 			'settings.permissions.toolExamples.bashGitLog' => '- Разрешить все команды git log',
 			'settings.permissions.toolExamples.bashGitDiff' => '- Разрешить все команды git diff',
 			'settings.permissions.toolExamples.write' => '- Разрешить все использование инструмента Write',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.toolExamples.bashRm' => '- Заблокировать все команды rm (опасно)',
 			'settings.permissions.shellExamples.title' => 'Примеры команд оболочки:',
 			'settings.permissions.shellExamples.ls' => '- Разрешить команду ls',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.shellExamples.gitStatus' => '- Разрешить git status',
 			'settings.permissions.shellExamples.npmInstall' => '- Разрешить npm install',
 			'settings.permissions.shellExamples.rmRf' => '- Заблокировать рекурсивное удаление',
@@ -9164,11 +9180,11 @@ extension on TranslationsRu {
 			'tasks.nextTask.viewAll' => 'Все задачи',
 			'tasks.nextTask.viewDetails' => 'Детали задачи',
 			'tasks.nextTask.whatIs' => 'Что такое TaskMaster?',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.cancelEdit' => 'Отменить редактирование',
 			'tasks.taskDetail.close' => 'Закрыть',
 			'tasks.taskDetail.copyTaskId' => 'Копировать ID задачи',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.delete' => 'Удалить задачу',
 			'tasks.taskDetail.deleteConfirmDescription' => ({required Object title}) => '«${title}» будет безвозвратно удалена.',
 			'tasks.taskDetail.deleteConfirmTitle' => 'Удалить задачу?',

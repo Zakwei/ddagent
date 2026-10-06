@@ -84,30 +84,38 @@ class _DevicePushCardState extends ConsumerState<_DevicePushCard> {
       final res = await ref.read(settingsRepositoryProvider).pushTest();
       if (!mounted) return;
       final t = Translations.of(context).settings.notifications.webPush;
-      final count = (res['subscriptionCount'] as num?)?.toInt() ?? 0;
       final results = res['results'] as List? ?? const [];
-      if (count == 0) {
-        setState(() {
-          _testOk = false;
-          _testResult = t.testNoSubscription;
-          _testing = false;
-        });
-        return;
-      }
+      // The desktop (WebSocket) channel reaches mobile/desktop apps that are
+      // not Web Push subscriptions; the server reports those counts separately.
+      final desktopSent = (res['desktopSent'] as num?)?.toInt() ?? 0;
+      final desktopAttempted = (res['desktopAttempted'] as num?)?.toInt() ?? 0;
+      final okResults = [
+        for (final r in results)
+          if (r is Map && r['ok'] == true) r,
+      ];
       final failed = [
         for (final r in results)
           if (r is Map && r['ok'] != true) r,
       ];
+      final delivered = okResults.length + desktopSent;
+      final attempted = results.length + desktopAttempted;
       setState(() {
         _testing = false;
-        if (failed.isEmpty) {
-          _testOk = true;
-          _testResult = t.testSuccess(count: results.length);
-        } else {
+        if (attempted == 0) {
           _testOk = false;
-          _testResult = failed
-              .map((r) => '${r['endpointHost']}: ${r['statusCode'] ?? r['error'] ?? 'failed'}')
-              .join(' · ');
+          _testResult = t.testNoSubscription;
+        } else if (delivered == 0) {
+          _testOk = false;
+          _testResult = failed.isEmpty
+              ? t.testNotDelivered
+              : failed
+                    .map(
+                      (r) => '${r['endpointHost']}: ${r['statusCode'] ?? r['error'] ?? 'failed'}',
+                    )
+                    .join(' · ');
+        } else {
+          _testOk = true;
+          _testResult = t.testSuccess(count: delivered);
         }
       });
     } on Object catch (e) {
@@ -134,7 +142,7 @@ class _DevicePushCardState extends ConsumerState<_DevicePushCard> {
         children: [
           Text(
             // Native build — "device" replaces the web "browser" wording.
-            'Notify this device',
+            t.device.title,
             style: tt.titleSmall,
           ),
           const SizedBox(height: AppSpacing.md),
@@ -175,7 +183,7 @@ class _DevicePushCardState extends ConsumerState<_DevicePushCard> {
                   ),
                 ),
                 if (state.enabled)
-                  Text(t.desktop.enabled, style: tt.bodySmall?.copyWith(color: Colors.green)),
+                  Text(t.device.enabled, style: tt.bodySmall?.copyWith(color: Colors.green)),
                 AppButton(
                   variant: AppButtonVariant.outline,
                   size: AppButtonSize.sm,

@@ -1894,7 +1894,12 @@
         "iosHint": "Na iPhone/iPadzie powiadomienia działają dopiero po dodaniu ddagent do ekranu głównego (Udostępnij → Dodaj do ekranu głównego) i włączeniu ich w zainstalowanej aplikacji.",
         "test": "Wyślij powiadomienie testowe",
         "testNoSubscription": "Żadne urządzenie nie jest zasubskrybowane. Najpierw dotknij „Włącz” na telefonie.",
-        "testSuccess": "Wysłano do {{count}} urządzeń. Jeśli nic się nie pojawiło na telefonie, dodaj ddagent do ekranu głównego (iOS tego wymaga)."
+        "testSuccess": "Wysłano do {{count}} urządzeń. Jeśli nic się nie pojawiło na telefonie, dodaj ddagent do ekranu głównego (iOS tego wymaga).",
+        "testNotDelivered": "Nie udało się dotrzeć do żadnego urządzenia. Upewnij się, że aplikacja działa, a powiadomienia są włączone."
+      },
+      "device": {
+        "title": "Powiadamiaj to urządzenie",
+        "enabled": "Powiadomienia są włączone dla tego urządzenia"
       },
       "desktop": {
         "title": "Powiadamiaj tę aplikację desktopową",

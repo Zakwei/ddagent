@@ -1762,7 +1762,12 @@
         "iosHint": "在 iPhone/iPad 上，只有將 ddagent 加入主畫面（分享 → 加入主畫面）並在安裝的 App 中啟用通知後，通知才有效。",
         "test": "傳送測試通知",
         "testNoSubscription": "沒有已訂閱的裝置。請先在手機上點擊「啟用」。",
-        "testSuccess": "已傳送到 {{count}} 台裝置。如果手機上沒有顯示，請將 ddagent 加入主畫面（iOS 要求）。"
+        "testSuccess": "已傳送到 {{count}} 台裝置。如果手機上沒有顯示，請將 ddagent 加入主畫面（iOS 要求）。",
+        "testNotDelivered": "沒有可連線的裝置。請確認應用程式正在執行且通知已開啟。"
+      },
+      "device": {
+        "title": "通知此裝置",
+        "enabled": "此裝置的通知已啟用"
       },
       "sound": {
         "title": "聲音",

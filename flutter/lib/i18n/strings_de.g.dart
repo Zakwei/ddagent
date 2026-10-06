@@ -2397,6 +2397,7 @@ class Translations$settings$notifications$de extends Translations$settings$notif
 	@override String get title => 'Benachrichtigungen';
 	@override String get description => 'Lege fest, welche Benachrichtigungen du erhältst.';
 	@override late final Translations$settings$notifications$webPush$de webPush = Translations$settings$notifications$webPush$de._(_root);
+	@override late final Translations$settings$notifications$device$de device = Translations$settings$notifications$device$de._(_root);
 	@override late final Translations$settings$notifications$sound$de sound = Translations$settings$notifications$sound$de._(_root);
 	@override late final Translations$settings$notifications$events$de events = Translations$settings$notifications$events$de._(_root);
 	@override late final Translations$settings$notifications$desktop$de desktop = Translations$settings$notifications$desktop$de._(_root);
@@ -5611,6 +5612,18 @@ class Translations$settings$notifications$webPush$de extends Translations$settin
 	@override String get test => 'Test-Benachrichtigung senden';
 	@override String get testNoSubscription => 'Kein Gerät ist angemeldet. Tippe zuerst auf dem Telefon auf „Aktivieren“.';
 	@override String testSuccess({required Object count}) => 'An ${count} Gerät(e) gesendet. Falls nichts auf dem Telefon erscheint, füge ddagent zum Home-Bildschirm hinzu (iOS erfordert dies).';
+	@override String get testNotDelivered => 'Kein Gerät war erreichbar. Stelle sicher, dass die App läuft und Benachrichtigungen aktiviert sind.';
+}
+
+// Path: settings.notifications.device
+class Translations$settings$notifications$device$de extends Translations$settings$notifications$device$en {
+	Translations$settings$notifications$device$de._(TranslationsDe root) : this._root = root, super.internal(root);
+
+	final TranslationsDe _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Dieses Gerät benachrichtigen';
+	@override String get enabled => 'Benachrichtigungen sind für dieses Gerät aktiviert';
 }
 
 // Path: settings.notifications.sound
@@ -8458,6 +8471,9 @@ extension on TranslationsDe {
 			'settings.notifications.webPush.test' => 'Test-Benachrichtigung senden',
 			'settings.notifications.webPush.testNoSubscription' => 'Kein Gerät ist angemeldet. Tippe zuerst auf dem Telefon auf „Aktivieren“.',
 			'settings.notifications.webPush.testSuccess' => ({required Object count}) => 'An ${count} Gerät(e) gesendet. Falls nichts auf dem Telefon erscheint, füge ddagent zum Home-Bildschirm hinzu (iOS erfordert dies).',
+			'settings.notifications.webPush.testNotDelivered' => 'Kein Gerät war erreichbar. Stelle sicher, dass die App läuft und Benachrichtigungen aktiviert sind.',
+			'settings.notifications.device.title' => 'Dieses Gerät benachrichtigen',
+			'settings.notifications.device.enabled' => 'Benachrichtigungen sind für dieses Gerät aktiviert',
 			'settings.notifications.sound.title' => 'Ton',
 			'settings.notifications.sound.description' => 'Spielt einen kurzen Ton ab, wenn ein Chat-Lauf abgeschlossen ist.',
 			'settings.notifications.sound.enabled' => 'Aktiviert',
@@ -8644,11 +8660,11 @@ extension on TranslationsDe {
 			'settings.permissions.toolExamples.bashGitLog' => '- Alle git log-Befehle erlauben',
 			'settings.permissions.toolExamples.bashGitDiff' => '- Alle git diff-Befehle erlauben',
 			'settings.permissions.toolExamples.write' => '- Alle Write-Werkzeugnutzungen erlauben',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.toolExamples.bashRm' => '- Alle rm-Befehle sperren (gefährlich)',
 			'settings.permissions.shellExamples.title' => 'Shell-Befehl-Beispiele:',
 			'settings.permissions.shellExamples.ls' => '- ls-Befehl erlauben',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.shellExamples.gitStatus' => '- git status erlauben',
 			'settings.permissions.shellExamples.npmInstall' => '- npm install erlauben',
 			'settings.permissions.shellExamples.rmRf' => '- Rekursives Löschen sperren',
@@ -9158,11 +9174,11 @@ extension on TranslationsDe {
 			'tasks.nextTask.viewAll' => 'Alle Aufgaben anzeigen',
 			'tasks.nextTask.viewDetails' => 'Aufgabendetails anzeigen',
 			'tasks.nextTask.whatIs' => 'Was ist TaskMaster?',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.cancelEdit' => 'Bearbeiten abbrechen',
 			'tasks.taskDetail.close' => 'Schließen',
 			'tasks.taskDetail.copyTaskId' => 'Aufgaben-ID kopieren',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.delete' => 'Aufgabe löschen',
 			'tasks.taskDetail.deleteConfirmDescription' => ({required Object title}) => '„${title}" wird dauerhaft gelöscht.',
 			'tasks.taskDetail.deleteConfirmTitle' => 'Aufgabe löschen?',

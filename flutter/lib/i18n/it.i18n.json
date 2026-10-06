@@ -1762,7 +1762,12 @@
         "iosHint": "Su iPhone/iPad le notifiche funzionano solo dopo aver aggiunto ddagent alla schermata Home (Condividi → Aggiungi a Home) e averle attivate dall’app installata.",
         "test": "Invia notifica di prova",
         "testNoSubscription": "Nessun dispositivo iscritto. Tocca prima «Abilita» sul telefono.",
-        "testSuccess": "Inviato a {{count}} dispositivi. Se non appare nulla sul telefono, aggiungi ddagent alla schermata Home (richiesto da iOS)."
+        "testSuccess": "Inviato a {{count}} dispositivi. Se non appare nulla sul telefono, aggiungi ddagent alla schermata Home (richiesto da iOS).",
+        "testNotDelivered": "Nessun dispositivo era raggiungibile. Assicurati che l'app sia in esecuzione e che le notifiche siano attive."
+      },
+      "device": {
+        "title": "Notifica questo dispositivo",
+        "enabled": "Le notifiche sono attive per questo dispositivo"
       },
       "sound": {
         "title": "Suono",

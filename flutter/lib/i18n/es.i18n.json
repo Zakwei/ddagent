@@ -1762,7 +1762,12 @@
         "iosHint": "En iPhone/iPad, las notificaciones solo funcionan tras añadir ddagent a la pantalla de inicio (Compartir → Añadir a pantalla de inicio) y activarlas desde la app instalada.",
         "test": "Enviar notificación de prueba",
         "testNoSubscription": "Ningún dispositivo está suscrito. Toca «Activar» en el teléfono primero.",
-        "testSuccess": "Enviado a {{count}} dispositivo(s). Si no aparece nada en el teléfono, añade ddagent a la pantalla de inicio (iOS lo requiere)."
+        "testSuccess": "Enviado a {{count}} dispositivo(s). Si no aparece nada en el teléfono, añade ddagent a la pantalla de inicio (iOS lo requiere).",
+        "testNotDelivered": "Ningún dispositivo estaba disponible. Asegúrate de que la app esté en ejecución y las notificaciones activadas."
+      },
+      "device": {
+        "title": "Notificar a este dispositivo",
+        "enabled": "Las notificaciones están activadas para este dispositivo"
       },
       "desktop": {
         "title": "Notificar en esta app de escritorio",

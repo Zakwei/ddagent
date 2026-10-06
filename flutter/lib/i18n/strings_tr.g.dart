@@ -2397,6 +2397,7 @@ class Translations$settings$notifications$tr extends Translations$settings$notif
 	@override String get title => 'Bildirimler';
 	@override String get description => 'Hangi bildirim etkinliklerini alacağını kontrol et.';
 	@override late final Translations$settings$notifications$webPush$tr webPush = Translations$settings$notifications$webPush$tr._(_root);
+	@override late final Translations$settings$notifications$device$tr device = Translations$settings$notifications$device$tr._(_root);
 	@override late final Translations$settings$notifications$sound$tr sound = Translations$settings$notifications$sound$tr._(_root);
 	@override late final Translations$settings$notifications$events$tr events = Translations$settings$notifications$events$tr._(_root);
 	@override late final Translations$settings$notifications$desktop$tr desktop = Translations$settings$notifications$desktop$tr._(_root);
@@ -5611,6 +5612,18 @@ class Translations$settings$notifications$webPush$tr extends Translations$settin
 	@override String get test => 'Test bildirimi gönder';
 	@override String get testNoSubscription => 'Abone cihaz yok. Önce telefonda “Etkinleştir”e dokunun.';
 	@override String testSuccess({required Object count}) => '${count} cihaza gönderildi. Telefonda bir şey görünmezse ddagent’ı ana ekrana ekleyin (iOS bunu gerektirir).';
+	@override String get testNotDelivered => 'Erişilebilir cihaz yoktu. Uygulamanın çalıştığından ve bildirimlerin etkin olduğundan emin olun.';
+}
+
+// Path: settings.notifications.device
+class Translations$settings$notifications$device$tr extends Translations$settings$notifications$device$en {
+	Translations$settings$notifications$device$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Bu cihazı bilgilendir';
+	@override String get enabled => 'Bu cihaz için bildirimler etkin';
 }
 
 // Path: settings.notifications.sound
@@ -8458,6 +8471,9 @@ extension on TranslationsTr {
 			'settings.notifications.webPush.test' => 'Test bildirimi gönder',
 			'settings.notifications.webPush.testNoSubscription' => 'Abone cihaz yok. Önce telefonda “Etkinleştir”e dokunun.',
 			'settings.notifications.webPush.testSuccess' => ({required Object count}) => '${count} cihaza gönderildi. Telefonda bir şey görünmezse ddagent’ı ana ekrana ekleyin (iOS bunu gerektirir).',
+			'settings.notifications.webPush.testNotDelivered' => 'Erişilebilir cihaz yoktu. Uygulamanın çalıştığından ve bildirimlerin etkin olduğundan emin olun.',
+			'settings.notifications.device.title' => 'Bu cihazı bilgilendir',
+			'settings.notifications.device.enabled' => 'Bu cihaz için bildirimler etkin',
 			'settings.notifications.sound.title' => 'Ses',
 			'settings.notifications.sound.description' => 'Sohbet çalışması tamamlandığında kısa bir ton çal.',
 			'settings.notifications.sound.enabled' => 'Etkin',
@@ -8644,11 +8660,11 @@ extension on TranslationsTr {
 			'settings.permissions.toolExamples.bashGitLog' => '- Tüm git log komutlarına izin ver',
 			'settings.permissions.toolExamples.bashGitDiff' => '- Tüm git diff komutlarına izin ver',
 			'settings.permissions.toolExamples.write' => '- Tüm Write aracı kullanımına izin ver',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.toolExamples.bashRm' => '- Tüm rm komutlarını engelle (tehlikeli)',
 			'settings.permissions.shellExamples.title' => 'Shell Komut Örnekleri:',
 			'settings.permissions.shellExamples.ls' => '- ls komutuna izin ver',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.shellExamples.gitStatus' => '- git status\'a izin ver',
 			'settings.permissions.shellExamples.npmInstall' => '- npm install\'a izin ver',
 			'settings.permissions.shellExamples.rmRf' => '- Özyinelemeli silmeyi engelle',
@@ -9158,11 +9174,11 @@ extension on TranslationsTr {
 			'tasks.nextTask.viewAll' => 'Tüm görevleri görüntüle',
 			'tasks.nextTask.viewDetails' => 'Görev ayrıntılarını görüntüle',
 			'tasks.nextTask.whatIs' => 'TaskMaster nedir?',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.cancelEdit' => 'Düzenlemeyi iptal et',
 			'tasks.taskDetail.close' => 'Kapat',
 			'tasks.taskDetail.copyTaskId' => 'Görev ID’sini kopyala',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.delete' => 'Görevi sil',
 			'tasks.taskDetail.deleteConfirmDescription' => ({required Object title}) => '"${title}" kalıcı olarak silinecek.',
 			'tasks.taskDetail.deleteConfirmTitle' => 'Görev silinsin mi?',

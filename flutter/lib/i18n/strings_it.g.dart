@@ -2397,6 +2397,7 @@ class Translations$settings$notifications$it extends Translations$settings$notif
 	@override String get title => 'Notifiche';
 	@override String get description => 'Controlla quali notifiche ricevere.';
 	@override late final Translations$settings$notifications$webPush$it webPush = Translations$settings$notifications$webPush$it._(_root);
+	@override late final Translations$settings$notifications$device$it device = Translations$settings$notifications$device$it._(_root);
 	@override late final Translations$settings$notifications$sound$it sound = Translations$settings$notifications$sound$it._(_root);
 	@override late final Translations$settings$notifications$events$it events = Translations$settings$notifications$events$it._(_root);
 	@override late final Translations$settings$notifications$desktop$it desktop = Translations$settings$notifications$desktop$it._(_root);
@@ -5611,6 +5612,18 @@ class Translations$settings$notifications$webPush$it extends Translations$settin
 	@override String get test => 'Invia notifica di prova';
 	@override String get testNoSubscription => 'Nessun dispositivo iscritto. Tocca prima «Abilita» sul telefono.';
 	@override String testSuccess({required Object count}) => 'Inviato a ${count} dispositivi. Se non appare nulla sul telefono, aggiungi ddagent alla schermata Home (richiesto da iOS).';
+	@override String get testNotDelivered => 'Nessun dispositivo era raggiungibile. Assicurati che l\'app sia in esecuzione e che le notifiche siano attive.';
+}
+
+// Path: settings.notifications.device
+class Translations$settings$notifications$device$it extends Translations$settings$notifications$device$en {
+	Translations$settings$notifications$device$it._(TranslationsIt root) : this._root = root, super.internal(root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Notifica questo dispositivo';
+	@override String get enabled => 'Le notifiche sono attive per questo dispositivo';
 }
 
 // Path: settings.notifications.sound
@@ -8458,6 +8471,9 @@ extension on TranslationsIt {
 			'settings.notifications.webPush.test' => 'Invia notifica di prova',
 			'settings.notifications.webPush.testNoSubscription' => 'Nessun dispositivo iscritto. Tocca prima «Abilita» sul telefono.',
 			'settings.notifications.webPush.testSuccess' => ({required Object count}) => 'Inviato a ${count} dispositivi. Se non appare nulla sul telefono, aggiungi ddagent alla schermata Home (richiesto da iOS).',
+			'settings.notifications.webPush.testNotDelivered' => 'Nessun dispositivo era raggiungibile. Assicurati che l\'app sia in esecuzione e che le notifiche siano attive.',
+			'settings.notifications.device.title' => 'Notifica questo dispositivo',
+			'settings.notifications.device.enabled' => 'Le notifiche sono attive per questo dispositivo',
 			'settings.notifications.sound.title' => 'Suono',
 			'settings.notifications.sound.description' => 'Riproduci un breve tono quando termina un\'esecuzione della chat.',
 			'settings.notifications.sound.enabled' => 'Attivato',
@@ -8644,11 +8660,11 @@ extension on TranslationsIt {
 			'settings.permissions.toolExamples.bashGitLog' => '- Consenti tutti i comandi git log',
 			'settings.permissions.toolExamples.bashGitDiff' => '- Consenti tutti i comandi git diff',
 			'settings.permissions.toolExamples.write' => '- Consenti tutti gli utilizzi dello strumento Write',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.toolExamples.bashRm' => '- Blocca tutti i comandi rm (pericoloso)',
 			'settings.permissions.shellExamples.title' => 'Esempi comandi shell:',
 			'settings.permissions.shellExamples.ls' => '- Consenti comando ls',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.shellExamples.gitStatus' => '- Consenti git status',
 			'settings.permissions.shellExamples.npmInstall' => '- Consenti npm install',
 			'settings.permissions.shellExamples.rmRf' => '- Blocca eliminazione ricorsiva',
@@ -9158,11 +9174,11 @@ extension on TranslationsIt {
 			'tasks.nextTask.viewAll' => 'Vedi tutte le attività',
 			'tasks.nextTask.viewDetails' => 'Vedi dettagli attività',
 			'tasks.nextTask.whatIs' => 'Cos’è TaskMaster?',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.cancelEdit' => 'Annulla modifica',
 			'tasks.taskDetail.close' => 'Chiudi',
 			'tasks.taskDetail.copyTaskId' => 'Copia ID attività',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.delete' => 'Elimina attività',
 			'tasks.taskDetail.deleteConfirmDescription' => ({required Object title}) => '"${title}" verrà eliminata definitivamente.',
 			'tasks.taskDetail.deleteConfirmTitle' => 'Eliminare l\'attività?',

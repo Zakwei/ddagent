@@ -2397,6 +2397,7 @@ class Translations$settings$notifications$zh_TW extends Translations$settings$no
 	@override String get title => '通知';
 	@override String get description => '控制你希望接收的通知事件。';
 	@override late final Translations$settings$notifications$webPush$zh_TW webPush = Translations$settings$notifications$webPush$zh_TW.internal(_root);
+	@override late final Translations$settings$notifications$device$zh_TW device = Translations$settings$notifications$device$zh_TW.internal(_root);
 	@override late final Translations$settings$notifications$sound$zh_TW sound = Translations$settings$notifications$sound$zh_TW.internal(_root);
 	@override late final Translations$settings$notifications$events$zh_TW events = Translations$settings$notifications$events$zh_TW.internal(_root);
 	@override late final Translations$settings$notifications$desktop$zh_TW desktop = Translations$settings$notifications$desktop$zh_TW.internal(_root);
@@ -5611,6 +5612,18 @@ class Translations$settings$notifications$webPush$zh_TW extends Translations$set
 	@override String get test => '傳送測試通知';
 	@override String get testNoSubscription => '沒有已訂閱的裝置。請先在手機上點擊「啟用」。';
 	@override String testSuccess({required Object count}) => '已傳送到 ${count} 台裝置。如果手機上沒有顯示，請將 ddagent 加入主畫面（iOS 要求）。';
+	@override String get testNotDelivered => '沒有可連線的裝置。請確認應用程式正在執行且通知已開啟。';
+}
+
+// Path: settings.notifications.device
+class Translations$settings$notifications$device$zh_TW extends Translations$settings$notifications$device$en {
+	Translations$settings$notifications$device$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '通知此裝置';
+	@override String get enabled => '此裝置的通知已啟用';
 }
 
 // Path: settings.notifications.sound
@@ -8458,6 +8471,9 @@ extension on TranslationsZhTw {
 			'settings.notifications.webPush.test' => '傳送測試通知',
 			'settings.notifications.webPush.testNoSubscription' => '沒有已訂閱的裝置。請先在手機上點擊「啟用」。',
 			'settings.notifications.webPush.testSuccess' => ({required Object count}) => '已傳送到 ${count} 台裝置。如果手機上沒有顯示，請將 ddagent 加入主畫面（iOS 要求）。',
+			'settings.notifications.webPush.testNotDelivered' => '沒有可連線的裝置。請確認應用程式正在執行且通知已開啟。',
+			'settings.notifications.device.title' => '通知此裝置',
+			'settings.notifications.device.enabled' => '此裝置的通知已啟用',
 			'settings.notifications.sound.title' => '聲音',
 			'settings.notifications.sound.description' => '聊天執行完成時播放短提示音。',
 			'settings.notifications.sound.enabled' => '已啟用',
@@ -8644,11 +8660,11 @@ extension on TranslationsZhTw {
 			'settings.permissions.toolExamples.bashGitLog' => '- 允許所有 git log 指令',
 			'settings.permissions.toolExamples.bashGitDiff' => '- 允許所有 git diff 指令',
 			'settings.permissions.toolExamples.write' => '- 允許所有 Write 工具使用',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.toolExamples.bashRm' => '- 封鎖所有 rm 指令（危險）',
 			'settings.permissions.shellExamples.title' => 'Shell 指令範例：',
 			'settings.permissions.shellExamples.ls' => '- 允許 ls 指令',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.shellExamples.gitStatus' => '- 允許 git status',
 			'settings.permissions.shellExamples.npmInstall' => '- 允許 npm install',
 			'settings.permissions.shellExamples.rmRf' => '- 封鎖遞迴刪除',
@@ -9158,11 +9174,11 @@ extension on TranslationsZhTw {
 			'tasks.nextTask.viewAll' => '檢視所有任務',
 			'tasks.nextTask.viewDetails' => '檢視任務詳情',
 			'tasks.nextTask.whatIs' => '什麼是 TaskMaster？',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.cancelEdit' => '取消編輯',
 			'tasks.taskDetail.close' => '關閉',
 			'tasks.taskDetail.copyTaskId' => '複製任務 ID',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.delete' => '刪除任務',
 			'tasks.taskDetail.deleteConfirmDescription' => ({required Object title}) => '「${title}」將被永久刪除。',
 			'tasks.taskDetail.deleteConfirmTitle' => '刪除任務？',
