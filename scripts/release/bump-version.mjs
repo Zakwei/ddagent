@@ -43,10 +43,14 @@ if (!/^version: .+$/m.test(pubspec)) {
 writeFileSync(pubspecPath, pubspec.replace(/^version: .+$/m, versionLine));
 execFileSync('git', ['add', 'flutter/pubspec.yaml'], { cwd: rootDir });
 
-// `npm version` does bump + release commit + `v*` tag in one step and refuses
-// a dirty working tree on its own. The push stays explicit on purpose.
-execFileSync('npm', ['version', spec], { cwd: rootDir, stdio: 'inherit' });
-
+// `npm version` refuses to touch a dirty working tree, and pubspec.yaml must
+// ride in the same commit — so bump the manifests only, then commit + tag
+// by hand. The push stays explicit on purpose.
+execFileSync('npm', ['version', '--no-git-tag-version', spec], { cwd: rootDir, stdio: 'inherit' });
 const { version } = JSON.parse(readFileSync(path.join(rootDir, 'package.json'), 'utf8'));
+execFileSync('git', ['add', 'package.json', 'package-lock.json'], { cwd: rootDir });
+execFileSync('git', ['commit', '-m', version], { cwd: rootDir, stdio: 'inherit' });
+execFileSync('git', ['tag', `v${version}`], { cwd: rootDir });
+
 console.log(`\nTagged v${version}. Push the commit + tag to trigger the server release build:`);
 console.log(`  git push origin HEAD v${version}`);
