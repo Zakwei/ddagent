@@ -85,6 +85,38 @@ for (const [name, map, nativeId, abort] of [
   });
 }
 
+// The chat.subscribe ack carries pending asks the client filters by the app
+// session id, so listPending must report that id — never the provider-native
+// one, or the answerable question panel silently disappears (only the greyed
+// read-only recap remains). See chat-websocket.service.ts.
+for (const [name, map, nativeId, runtimeName] of [
+  ['devin', 'devinPendingPermissions', 'devinSessionId', 'devinRuntime'],
+  ['commandcode', 'commandCodePendingPermissions', 'commandCodeSessionId', 'commandCodeRuntime'],
+]) {
+  test(`${name}: listPending reports the app session id for a pending ask`, async () => {
+    const runtime = await loadRuntime(name!, map!);
+    const params = {
+      toolCall: { title: 'Zakres: Pytanie?', rawInput: { question: 'Pytanie?', options: ['A', 'B'] } },
+      options: [
+        { optionId: 'o0', name: 'A: a' },
+        { optionId: 'o1', name: 'B: b' },
+      ],
+    };
+    runtime.lifecycleHooks[map!].set('req-1', {
+      appSessionId: 'app',
+      [nativeId!]: 'native',
+      params,
+      state: {},
+    });
+
+    const pending = runtime[runtimeName!].permissions.listPending('app');
+    assert.equal(pending.length, 1);
+    assert.equal(pending[0].sessionId, 'app');
+    assert.equal(pending[0].toolName, 'AskUserQuestion');
+    assert.equal(runtime[runtimeName!].permissions.listPending('other').length, 0);
+  });
+}
+
 for (const [name, spawn, abort, map] of [
   ['cursor', 'spawnCursor', 'abortCursorSession', 'activeCursorProcesses'],
   ['antigravity', 'spawnAntigravity', 'abortAntigravitySession', 'activeProcesses'],

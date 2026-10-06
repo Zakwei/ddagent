@@ -641,7 +641,10 @@ function listCommandCodePendingPermissions(sessionId: any) {
                     ? { questions: [attachPlanReviewContent(pending.state, questionAsk)] }
                     : readObjectRecord(toolCall?.rawInput) ?? pending.params?.rawInput ?? {},
                 context: { options: Array.isArray(pending.params.options) ? pending.params.options : [] },
-                sessionId: pending.commandCodeSessionId,
+                // The client filters pending asks by the app session id, so the
+                // ack must carry that id — not the provider-native one (which
+                // never leaves the backend). See chat-websocket.service.ts.
+                sessionId,
             });
         }
     }
