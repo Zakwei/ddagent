@@ -397,7 +397,7 @@ class _AgentConnectionCard extends ConsumerWidget {
   /// Same project-path resolution the settings agents section uses.
   String _projectPath(WidgetRef ref) {
     final projects = ref.read(projectsProvider).projects;
-    if (projects.isEmpty) return '/workspace';
+    if (projects.isEmpty) return '';
     final first = projects.first;
     return (first.fullPath?.isNotEmpty ?? false) ? first.fullPath! : first.path;
   }

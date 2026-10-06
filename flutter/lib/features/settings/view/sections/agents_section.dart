@@ -327,7 +327,7 @@ class _AccountContent extends ConsumerWidget {
   /// Same resolution the terminal header uses for the login shell.
   String _projectPath(WidgetRef ref) {
     final projects = ref.read(projectsProvider).projects;
-    if (projects.isEmpty) return '/workspace';
+    if (projects.isEmpty) return '';
     final first = projects.first;
     return (first.fullPath?.isNotEmpty ?? false) ? first.fullPath! : first.path;
   }
@@ -534,7 +534,7 @@ class _AgentNotInstalledCard extends ConsumerWidget {
 
   String _projectPath(WidgetRef ref) {
     final projects = ref.read(projectsProvider).projects;
-    if (projects.isEmpty) return '/workspace';
+    if (projects.isEmpty) return '';
     final first = projects.first;
     return (first.fullPath?.isNotEmpty ?? false) ? first.fullPath! : first.path;
   }
@@ -720,7 +720,7 @@ class _ProviderAccountsCardState extends ConsumerState<_ProviderAccountsCard> {
   /// Same resolution _AccountContent uses for the login shell.
   String _projectPath() {
     final projects = ref.read(projectsProvider).projects;
-    if (projects.isEmpty) return '/workspace';
+    if (projects.isEmpty) return '';
     final first = projects.first;
     return (first.fullPath?.isNotEmpty ?? false) ? first.fullPath! : first.path;
   }

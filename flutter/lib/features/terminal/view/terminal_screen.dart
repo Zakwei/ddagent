@@ -69,7 +69,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
     if (first != null) {
       return (first.fullPath?.isNotEmpty ?? false) ? first.fullPath! : first.path;
     }
-    return '/workspace';
+    return '';
   }
 
   void _ensureInitialTab() {
