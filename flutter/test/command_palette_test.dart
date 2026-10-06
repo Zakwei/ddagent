@@ -240,6 +240,8 @@ void main() {
       expect(find.text('PAGE:/workspace'), findsOneWidget);
       final panes = h.container.read(workspaceProvider).panes;
       expect(panes.any((p) => p.kind == PaneKind.chat && p.sessionId == 's-1'), isTrue);
+      // Drain the workspace sync debounce scheduled when the pane opened.
+      await tester.pump(const Duration(milliseconds: 400));
     });
 
     testWidgets('file opens an in-pane editor', (tester) async {
