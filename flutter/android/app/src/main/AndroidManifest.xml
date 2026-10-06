@@ -1,8 +1,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- INTERNET lives in main too — debug/profile manifests inject it, but
+         release builds take only this file; without it every request dies
+         with "Failed host lookup". Cleartext is required for http:// LAN
+         servers (self-hosted installs without TLS). -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="ddagent_app"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true">
         <activity
             android:name=".MainActivity"
             android:exported="true"
