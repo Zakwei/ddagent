@@ -1612,6 +1612,18 @@ export type QueuedMessagesRepository = {
   markFailed(id: number, error?: string | null): void;
   requeue(id: number): void;
   /**
+   * Every row currently in `sending`. The idle sweep cross-checks these against
+   * its in-flight set: a `sending` row whose dispatch is gone is an orphan that
+   * must be returned to `queued` or it will never be delivered.
+   */
+  listSending(): QueuedMessage[];
+  /**
+   * Distinct session ids with a row that still needs dispatch (`queued` or
+   * `sending`). The idle sweep drains these whenever their session is idle, so
+   * a lost completion notification cannot park a message forever.
+   */
+  listPendingSessionIds(): string[];
+  /**
    * Returns every row stuck in `sending` back to `queued` and reports the
    * affected session ids. A restart mid-dispatch orphans `sending` rows —
    * neither `listBySession` nor `peekNext` can see them, so without this

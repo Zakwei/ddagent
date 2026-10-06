@@ -10,6 +10,9 @@ import type { QueuedMessage, QueuedMessagesRepository } from '@/shared/types.js'
 
 const SESSION = 'session-1';
 
+/** Waits long enough for a short sweep interval to fire at least once. */
+const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
+
 function createMemoryRepository(): QueuedMessagesRepository {
   let nextId = 1;
   const rows = new Map<number, QueuedMessage>();
@@ -63,6 +66,17 @@ function createMemoryRepository(): QueuedMessagesRepository {
       const row = rows.get(id);
       if (row && (row.status === 'sending' || row.status === 'failed')) row.status = 'queued';
     },
+    listSending: () =>
+      [...rows.values()]
+        .filter((row) => row.status === 'sending')
+        .sort((a, b) => a.position - b.position || a.id - b.id),
+    listPendingSessionIds: () => [
+      ...new Set(
+        [...rows.values()]
+          .filter((row) => row.status === 'queued' || row.status === 'sending')
+          .map((row) => row.sessionId),
+      ),
+    ],
     requeueStaleSending() {
       // Mirrors the SQL: report sessions with `queued` or `sending` rows,
       // and flip only `sending` back to `queued`.
@@ -98,6 +112,8 @@ function createMemoryRepository(): QueuedMessagesRepository {
 
 function createRunRegistry(initialProcessing = false): QueuedMessagesRunRegistry & {
   emitCompleted(sessionId: string): void;
+  /** Flips the session idle WITHOUT notifying listeners — a lost completion frame. */
+  setIdle(sessionId: string): void;
 } {
   let processing = initialProcessing;
   const listeners = new Set<(sessionId: string) => void>();
@@ -110,6 +126,9 @@ function createRunRegistry(initialProcessing = false): QueuedMessagesRunRegistry
     emitCompleted(sessionId) {
       processing = false;
       for (const listener of listeners) listener(sessionId);
+    },
+    setIdle() {
+      processing = false;
     },
   };
 }
@@ -409,4 +428,60 @@ test('a dispatching message leaves the queue list as soon as its turn starts', a
   release();
   await new Promise((resolve) => setTimeout(resolve, 0));
   assert.equal(repository.getById(message.id)?.status, 'sent');
+});
+
+test('the idle sweep drains a queued message when the completion notification is lost', async () => {
+  const repository = createMemoryRepository();
+  const runs = createRunRegistry(true);
+  const dispatched: string[] = [];
+
+  const service = createQueuedMessagesService({
+    repository,
+    runs,
+    dispatch: async (input): Promise<QueuedDispatchResult> => {
+      dispatched.push(input.content);
+      return { ok: true };
+    },
+    sweepIntervalMs: 5,
+  });
+
+  const message = service.enqueue({ sessionId: SESSION, content: 'lost' });
+  await sleep(20);
+  // Still processing — the message correctly waits.
+  assert.deepEqual(dispatched, []);
+
+  // The run went idle but no `complete` frame reached the listener, so the
+  // completion-driven drain never runs. The sweep must still deliver it.
+  runs.setIdle(SESSION);
+  await sleep(40);
+  assert.deepEqual(dispatched, ['lost']);
+  assert.equal(repository.getById(message.id)?.status, 'sent');
+});
+
+test('the idle sweep recovers a row orphaned in `sending`', async () => {
+  const repository = createMemoryRepository();
+  const runs = createRunRegistry(true);
+  const dispatched: string[] = [];
+
+  const service = createQueuedMessagesService({
+    repository,
+    runs,
+    dispatch: async (input): Promise<QueuedDispatchResult> => {
+      dispatched.push(input.content);
+      return { ok: true };
+    },
+    sweepIntervalMs: 5,
+  });
+
+  // A dispatcher claimed this row and then died without finalizing it — the
+  // row is invisible to both `peekNext` and `listBySession`.
+  const orphan = repository.enqueue({ sessionId: SESSION, content: 'orphan' });
+  repository.markSending(orphan.id);
+  await sleep(20);
+  assert.deepEqual(dispatched, []);
+
+  runs.setIdle(SESSION);
+  await sleep(40);
+  assert.deepEqual(dispatched, ['orphan']);
+  assert.equal(repository.getById(orphan.id)?.status, 'sent');
 });

@@ -198,6 +198,31 @@ export const queuedMessagesDb: QueuedMessagesRepository = {
     ).run(id);
   },
 
+  /** Returns every row currently claimed as `sending`, in queue order. */
+  listSending(): QueuedMessage[] {
+    const db = getConnection();
+    const rows = db
+      .prepare(
+        `SELECT * FROM queued_messages
+         WHERE status = 'sending'
+         ORDER BY position ASC, id ASC`,
+      )
+      .all() as QueuedMessageRow[];
+    return rows.map(mapRow);
+  },
+
+  /** Distinct sessions with a row still awaiting dispatch (`queued` or `sending`). */
+  listPendingSessionIds(): string[] {
+    const db = getConnection();
+    const rows = db
+      .prepare(
+        `SELECT DISTINCT session_id FROM queued_messages
+         WHERE status IN ('queued', 'sending')`,
+      )
+      .all() as { session_id: string }[];
+    return rows.map((row) => row.session_id);
+  },
+
   /** Deletes one message regardless of status. */
   remove(id): void {
     const db = getConnection();

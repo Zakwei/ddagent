@@ -52,6 +52,11 @@ type QueuedMessagesServiceDeps = {
     sessionId: string;
     messages: QueuedMessage[];
   }) => void;
+  /**
+   * How often the idle safety-net sweep runs, in milliseconds. Defaults to 30 s;
+   * pass a smaller value in tests, or `0` to disable the timer entirely.
+   */
+  sweepIntervalMs?: number;
 };
 
 /** No-op connection used when no browser socket is attached to the session. */
@@ -156,6 +161,46 @@ export function createQueuedMessagesService(deps: QueuedMessagesServiceDeps): Qu
     void drainSession(sessionId);
   });
 
+  /**
+   * Returns rows orphaned in `sending` back to `queued` and reports every
+   * session that still has a message to deliver.
+   *
+   * A `sending` row whose id is still in `dispatching` is a live dispatch and
+   * is left untouched; anything else settled without finalizing (a thrown
+   * finalizer) and would otherwise stay invisible forever.
+   */
+  function recoverOrphanedSending(): Set<string> {
+    const sessions = new Set<string>();
+    for (const row of deps.repository.listSending()) {
+      if (dispatching.has(row.id)) {
+        continue;
+      }
+      deps.repository.requeue(row.id);
+      sessions.add(row.sessionId);
+    }
+    return sessions;
+  }
+
+  /**
+   * Safety net for the completion-driven drain.
+   *
+   * Delivery normally hinges on a `complete` notification reaching the run
+   * registry's listener. When that frame is lost (a run superseded mid-abort, a
+   * provider that exits without a terminal event) the queue parks indefinitely,
+   * because `listBySession`/`peekNext` cannot see a stalled session. This sweep
+   * fires whenever a session with pending messages is idle, so a queued message
+   * is still delivered after the turn ends.
+   */
+  function sweepPendingSessions(): void {
+    const sessions = recoverOrphanedSending();
+    for (const sessionId of deps.repository.listPendingSessionIds()) {
+      sessions.add(sessionId);
+    }
+    for (const sessionId of sessions) {
+      void drainSession(sessionId);
+    }
+  }
+
   // A restart mid-dispatch orphans rows in `sending` — invisible to both
   // listBySession and peekNext. Requeue and drain them right away: the user
   // already watched these go out, so parking them queued-but-still would
@@ -175,6 +220,15 @@ export function createQueuedMessagesService(deps: QueuedMessagesServiceDeps): Qu
     } else {
       throw error;
     }
+  }
+
+  // Idle safety net: keeps a message moving even when the completion-driven
+  // drain never fires (lost terminal frame). `unref` so the timer never keeps
+  // the process alive on its own; disabled with `sweepIntervalMs: 0`.
+  const sweepIntervalMs = deps.sweepIntervalMs ?? 30_000;
+  if (sweepIntervalMs > 0) {
+    const sweepTimer = setInterval(sweepPendingSessions, sweepIntervalMs);
+    sweepTimer.unref?.();
   }
 
   return {
