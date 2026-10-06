@@ -12,11 +12,7 @@ import 'package:go_router/go_router.dart';
 
 /// Centered card shell shared by login/setup (AuthScreenLayout parity).
 class _AuthShell extends StatelessWidget {
-  const _AuthShell({
-    required this.title,
-    this.description,
-    required this.child,
-  });
+  const _AuthShell({required this.title, this.description, required this.child});
 
   final String title;
   final String? description;
@@ -38,18 +34,12 @@ class _AuthShell extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text(
-                      title,
-                      style: theme.textTheme.headlineSmall,
-                      textAlign: TextAlign.center,
-                    ),
+                    Text(title, style: theme.textTheme.headlineSmall, textAlign: TextAlign.center),
                     if (description != null) ...[
                       const SizedBox(height: AppSpacing.sm),
                       Text(
                         description!,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: c.mutedForeground,
-                        ),
+                        style: theme.textTheme.bodyMedium?.copyWith(color: c.mutedForeground),
                         textAlign: TextAlign.center,
                       ),
                     ],
@@ -57,9 +47,7 @@ class _AuthShell extends StatelessWidget {
                     child,
                     TextButton(
                       onPressed: () => context.go('/connect'),
-                      child: Text(
-                        Translations.of(context).serverConnect.changeServer,
-                      ),
+                      child: Text(Translations.of(context).serverConnect.changeServer),
                     ),
                   ],
                 ),
@@ -108,9 +96,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       context.go(from != null && from.startsWith('/') ? from : '/projects');
     } else {
       setState(
-        () => _error = error is AuthError
-            ? t.auth.login.errors.invalidCredentials
-            : error.message,
+        () => _error = error is AuthError ? t.auth.login.errors.invalidCredentials : error.message,
       );
     }
   }
@@ -145,10 +131,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
           if (_error != null) ...[
             const SizedBox(height: AppSpacing.md),
-            Text(
-              _error!,
-              style: TextStyle(color: context.appColors.destructive),
-            ),
+            Text(_error!, style: TextStyle(color: context.appColors.destructive)),
           ],
           const SizedBox(height: AppSpacing.lg),
           AppButton(
@@ -188,9 +171,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
   Future<void> _submit() async {
     final t = Translations.of(context);
     // web SetupForm order: required → username ≥3 → password ≥6 → match.
-    if (_username.text.trim().isEmpty ||
-        _password.text.isEmpty ||
-        _confirm.text.isEmpty) {
+    if (_username.text.trim().isEmpty || _password.text.isEmpty || _confirm.text.isEmpty) {
       setState(() => _error = t.auth.login.errors.requiredFields);
       return;
     }
@@ -249,18 +230,13 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
           ),
           if (_error != null) ...[
             const SizedBox(height: AppSpacing.md),
-            Text(
-              _error!,
-              style: TextStyle(color: context.appColors.destructive),
-            ),
+            Text(_error!, style: TextStyle(color: context.appColors.destructive)),
           ],
           const SizedBox(height: AppSpacing.lg),
           AppButton(
             onPressed: _submit,
             loading: loading,
-            child: Text(
-              loading ? t.auth.register.loading : t.auth.register.submit,
-            ),
+            child: Text(loading ? t.auth.register.loading : t.auth.register.submit),
           ),
         ],
       ),

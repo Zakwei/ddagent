@@ -144,7 +144,9 @@ class _SchedulerPrefsBar extends ConsumerWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
-      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: c.border))),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: c.border)),
+      ),
       child: Row(
         children: [
           Icon(Icons.bedtime_outlined, size: 16, color: c.mutedForeground),

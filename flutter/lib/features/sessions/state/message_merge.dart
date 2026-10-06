@@ -544,7 +544,10 @@ String _restampKey(SessionMessage m) => _serialized({
 /// identity (and expansion/scroll state) for rows that are the same logical
 /// messages. Queued per fingerprint so repeated identical rows adopt in
 /// order — mirrors the server's graftJsonlUserIdentity.
-List<SessionMessage> restampRewrittenIds(List<SessionMessage> fetched, List<SessionMessage> cached) {
+List<SessionMessage> restampRewrittenIds(
+  List<SessionMessage> fetched,
+  List<SessionMessage> cached,
+) {
   if (cached.isEmpty || fetched.isEmpty) return fetched;
   final idsByKey = <String, List<String>>{};
   for (final m in cached) {

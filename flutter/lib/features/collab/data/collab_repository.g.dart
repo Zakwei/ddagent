@@ -13,10 +13,9 @@ _CollabUser _$CollabUserFromJson(Map<String, dynamic> json) => _CollabUser(
   displayName: json['displayName'] as String?,
 );
 
-Map<String, dynamic> _$CollabUserToJson(_CollabUser instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'username': instance.username,
-      'role': instance.role,
-      'displayName': instance.displayName,
-    };
+Map<String, dynamic> _$CollabUserToJson(_CollabUser instance) => <String, dynamic>{
+  'id': instance.id,
+  'username': instance.username,
+  'role': instance.role,
+  'displayName': instance.displayName,
+};

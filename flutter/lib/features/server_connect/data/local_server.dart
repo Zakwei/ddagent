@@ -44,19 +44,14 @@ String? latestLtsInMajor(List<dynamic> index, int major) {
 }
 
 /// File name of the portable Node distribution on nodejs.org/dist.
-String nodeDistFileName(
-  String nodeVersion, {
-  required bool windows,
-  required bool arm64,
-}) => windows
+String nodeDistFileName(String nodeVersion, {required bool windows, required bool arm64}) => windows
     ? 'node-$nodeVersion-win-x64.zip'
     : 'node-$nodeVersion-linux-${arm64 ? 'arm64' : 'x64'}.tar.xz';
 
 /// Version equality tolerant of a leading `v` (`0.8.0` == `v0.8.0`) — pubspec
 /// versions never carry the prefix but release tags/markers might.
 bool sameServerVersion(String a, String b) {
-  String norm(String v) =>
-      v.trim().replaceFirst(RegExp('^v', caseSensitive: false), '');
+  String norm(String v) => v.trim().replaceFirst(RegExp('^v', caseSensitive: false), '');
   return norm(a) == norm(b);
 }
 
@@ -122,40 +117,33 @@ class LocalServerService {
   String? _nodeExe;
   Dio? _probeClient;
 
-  LocalServerStatus _status = const LocalServerStatus(
-    stage: LocalServerStage.checking,
-  );
+  LocalServerStatus _status = const LocalServerStatus(stage: LocalServerStage.checking);
 
   LocalServerStatus get status => _status;
 
   /// True only where a server tarball is published: Windows x64, Linux x64,
   /// Linux arm64. Everything else reports `unsupported` from [refresh] on and
   /// lifecycle calls throw [UnsupportedError].
-  bool get isSupported =>
-      (_isWindows || _isLinux) && tarballSuffixForAbi(_abi) != null;
+  bool get isSupported => (_isWindows || _isLinux) && tarballSuffixForAbi(_abi) != null;
 
   /// `<app-support>/ddagent-local-server/` — holds the extracted bundle and
   /// the portable Node runtime.
   Future<Directory> get _root async =>
       _rootDir ??
-      Directory(
-        '${(await getApplicationSupportDirectory()).path}/ddagent-local-server',
-      );
+      Directory('${(await getApplicationSupportDirectory()).path}/ddagent-local-server');
 
   /// `<root>/server/` — the extracted release tarball.
-  Future<Directory> get _bundle async =>
-      Directory('${(await _root).path}/server');
+  Future<Directory> get _bundle async => Directory('${(await _root).path}/server');
 
   /// `<root>/node/` — portable Node.js runtime when the system one is missing.
-  Future<Directory> get _nodeDir async =>
-      Directory('${(await _root).path}/node');
+  Future<Directory> get _nodeDir async => Directory('${(await _root).path}/node');
 
   /// Server version = the newest GitHub release tag, minus the `v` prefix.
   /// The app's own pubspec version is unrelated — server tarballs are
   /// versioned by the repo `package.json`, so the release API is the only
   /// reliable source. Cached; [serverVersion] overrides it (tests).
-  Future<String> get _serverVersion async => _resolvedServerVersion ??=
-      _serverVersionOverride ?? await _latestReleaseVersion();
+  Future<String> get _serverVersion async =>
+      _resolvedServerVersion ??= _serverVersionOverride ?? await _latestReleaseVersion();
 
   Future<String> _latestReleaseVersion() async {
     final res = await _dio.get<Map<String, dynamic>>(
@@ -179,9 +167,7 @@ class LocalServerService {
 
   void _requireSupported() {
     if (!isSupported) {
-      throw UnsupportedError(
-        'Local server is not supported on this platform ($_abi).',
-      );
+      throw UnsupportedError('Local server is not supported on this platform ($_abi).');
     }
   }
 
@@ -217,8 +203,7 @@ class LocalServerService {
   /// bundle dir (plus a live node pid). A foreign server (systemd, manual
   /// start, another bundle) reports a different appRoot.
   Future<Map<String, dynamic>?> _readLocalMarker() async {
-    final home =
-        Platform.environment['HOME'] ?? Platform.environment['USERPROFILE'];
+    final home = Platform.environment['HOME'] ?? Platform.environment['USERPROFILE'];
     if (home == null) return null;
     try {
       final marker = File(
@@ -244,12 +229,8 @@ class LocalServerService {
     final pid = marker?['pid'];
     if (marker == null || pid is! int) return null;
     final bundle = await _bundle;
-    final markerRoot = marker['appRoot']?.toString().replaceAll(
-      '/',
-      Platform.pathSeparator,
-    );
-    if (markerRoot == null ||
-        markerRoot.toLowerCase() != bundle.path.toLowerCase()) {
+    final markerRoot = marker['appRoot']?.toString().replaceAll('/', Platform.pathSeparator);
+    if (markerRoot == null || markerRoot.toLowerCase() != bundle.path.toLowerCase()) {
       return null;
     }
     return await _isNodeProcess(pid) ? pid : null;
@@ -259,13 +240,7 @@ class LocalServerService {
   Future<bool> _isNodeProcess(int pid) async {
     try {
       if (_isWindows) {
-        final res = await Process.run('tasklist', [
-          '/FI',
-          'PID eq $pid',
-          '/NH',
-          '/FO',
-          'CSV',
-        ]);
+        final res = await Process.run('tasklist', ['/FI', 'PID eq $pid', '/NH', '/FO', 'CSV']);
         return '${res.stdout}'.toLowerCase().contains('node');
       }
       final comm = await File('/proc/$pid/comm').readAsString();
@@ -317,9 +292,7 @@ class LocalServerService {
       final marker = File('${(await _bundle).path}/.installed.json');
       if (!await marker.exists()) return null;
       final decoded = jsonDecode(await marker.readAsString());
-      return decoded is Map<String, dynamic>
-          ? decoded['version'] as String?
-          : null;
+      return decoded is Map<String, dynamic> ? decoded['version'] as String? : null;
     } on Object {
       return null;
     }
@@ -335,19 +308,11 @@ class LocalServerService {
     try {
       final version = await installedVersion;
       if (await _probeAlive()) {
-        _emit(
-          LocalServerStatus(
-            stage: LocalServerStage.running,
-            url: localUrl,
-            version: version,
-          ),
-        );
+        _emit(LocalServerStatus(stage: LocalServerStage.running, url: localUrl, version: version));
       } else {
         _emit(
           LocalServerStatus(
-            stage: version == null
-                ? LocalServerStage.notInstalled
-                : LocalServerStage.stopped,
+            stage: version == null ? LocalServerStage.notInstalled : LocalServerStage.stopped,
             version: version,
           ),
         );
@@ -365,8 +330,7 @@ class LocalServerService {
   Future<String> ensureNode() async {
     _requireSupported();
     // 1) System node.
-    for (final name
-        in _isWindows ? const ['node', 'node.exe'] : const ['node']) {
+    for (final name in _isWindows ? const ['node', 'node.exe'] : const ['node']) {
       final major = await _nodeMajorOf(name);
       if (major == requiredNodeMajor) return _nodeExe = name;
     }
@@ -384,9 +348,8 @@ class LocalServerService {
     return _nodeExe = exe;
   }
 
-  Future<String> _portableNodeExe() async => _isWindows
-      ? '${(await _nodeDir).path}/node.exe'
-      : '${(await _nodeDir).path}/bin/node';
+  Future<String> _portableNodeExe() async =>
+      _isWindows ? '${(await _nodeDir).path}/node.exe' : '${(await _nodeDir).path}/bin/node';
 
   Future<int?> _nodeMajorOf(String exe) async {
     try {
@@ -404,13 +367,8 @@ class LocalServerService {
   /// bundled native modules.
   Future<String> _latestNodeLtsVersion() async {
     try {
-      final res = await _dio.get<List<dynamic>>(
-        'https://nodejs.org/dist/index.json',
-      );
-      final found = latestLtsInMajor(
-        res.data ?? const <dynamic>[],
-        requiredNodeMajor,
-      );
+      final res = await _dio.get<List<dynamic>>('https://nodejs.org/dist/index.json');
+      final found = latestLtsInMajor(res.data ?? const <dynamic>[], requiredNodeMajor);
       if (found != null) return found;
     } on Object {
       // Fall through to the pinned version.
@@ -437,9 +395,7 @@ class LocalServerService {
           _emit(
             LocalServerStatus(
               stage: LocalServerStage.installing,
-              progress: total > 0
-                  ? (received / total).clamp(0.0, 1.0).toDouble()
-                  : 0,
+              progress: total > 0 ? (received / total).clamp(0.0, 1.0).toDouble() : 0,
               version: _status.version,
             ),
           );
@@ -449,13 +405,7 @@ class LocalServerService {
       await nodeDir.create(recursive: true);
       // Archives contain a top node-<ver>-<plat>-<arch>/ dir — strip it so
       // nodeDir/bin/node (linux) or nodeDir/node.exe (windows) lands directly.
-      await _tar([
-        '-xf',
-        archive.path,
-        '-C',
-        nodeDir.path,
-        '--strip-components=1',
-      ]);
+      await _tar(['-xf', archive.path, '-C', nodeDir.path, '--strip-components=1']);
     } finally {
       await _deleteQuietly(archive);
     }
@@ -477,9 +427,7 @@ class LocalServerService {
   /// When the latest release can't be resolved (offline, GitHub down) an
   /// already-installed bundle is kept as-is instead of erroring — a usable
   /// local server must survive network loss.
-  Future<void> install({
-    required void Function(double progress)? onProgress,
-  }) async {
+  Future<void> install({required void Function(double progress)? onProgress}) async {
     _requireSupported();
     final suffix = tarballSuffixForAbi(_abi)!;
     final root = await _root;
@@ -504,11 +452,7 @@ class LocalServerService {
     } on Object {
       if (installed != null) {
         _emit(
-          LocalServerStatus(
-            stage: LocalServerStage.installing,
-            progress: 1,
-            version: installed,
-          ),
+          LocalServerStatus(stage: LocalServerStage.installing, progress: 1, version: installed),
         );
         return;
       }
@@ -516,33 +460,18 @@ class LocalServerService {
     }
     if (installed != null && sameServerVersion(installed, serverVersion)) {
       onProgress?.call(1);
-      _emit(
-        LocalServerStatus(
-          stage: LocalServerStage.installing,
-          progress: 1,
-          version: installed,
-        ),
-      );
+      _emit(LocalServerStatus(stage: LocalServerStage.installing, progress: 1, version: installed));
       return;
     }
     await root.create(recursive: true);
-    final archive = File(
-      '${root.path}/ddagent-server-$serverVersion-$suffix.tar.gz',
-    );
-    _emit(
-      LocalServerStatus(
-        stage: LocalServerStage.downloading,
-        version: installed,
-      ),
-    );
+    final archive = File('${root.path}/ddagent-server-$serverVersion-$suffix.tar.gz');
+    _emit(LocalServerStatus(stage: LocalServerStage.downloading, version: installed));
     try {
       await _dio.download(
         serverAssetUrl(serverVersion, suffix),
         archive.path,
         onReceiveProgress: (received, total) {
-          final progress = total > 0
-              ? (received / total).clamp(0.0, 1.0).toDouble()
-              : 0.0;
+          final progress = total > 0 ? (received / total).clamp(0.0, 1.0).toDouble() : 0.0;
           onProgress?.call(progress);
           _emit(
             LocalServerStatus(
@@ -564,13 +493,7 @@ class LocalServerService {
       );
       rethrow;
     }
-    _emit(
-      LocalServerStatus(
-        stage: LocalServerStage.installing,
-        progress: 1,
-        version: installed,
-      ),
-    );
+    _emit(LocalServerStatus(stage: LocalServerStage.installing, progress: 1, version: installed));
     try {
       // Extract to a staging dir, then swap with renames: a recursive delete
       // of the live bundle dies halfway on files locked by a still-running
@@ -583,11 +506,7 @@ class LocalServerService {
       await staging.rename(bundle.path);
       await _deleteDirQuietly(backup);
       _emit(
-        LocalServerStatus(
-          stage: LocalServerStage.installing,
-          progress: 1,
-          version: serverVersion,
-        ),
+        LocalServerStatus(stage: LocalServerStage.installing, progress: 1, version: serverVersion),
       );
     } on Object catch (e) {
       _emit(
@@ -615,9 +534,7 @@ class LocalServerService {
   Future<String> start() async {
     _requireSupported();
     final version = await installedVersion;
-    _emit(
-      LocalServerStatus(stage: LocalServerStage.starting, version: version),
-    );
+    _emit(LocalServerStatus(stage: LocalServerStage.starting, version: version));
     if (await _probeAlive()) {
       final running = await _runningVersion();
       // A foreign or already-current server owns the port → adopt as-is.
@@ -625,29 +542,16 @@ class LocalServerService {
       // older app build, or our own child after a bundle swap) is replaced,
       // but only when it's provably ours: our spawned `_process`, or a
       // marker-verified bundle orphan. Anything else stays untouched.
-      final adopted =
-          version == null ||
-          (running != null && sameServerVersion(running, version));
+      final adopted = version == null || (running != null && sameServerVersion(running, version));
       if (!adopted) await _stopBundleProcess();
       if (await _probeAlive()) {
-        _emit(
-          LocalServerStatus(
-            stage: LocalServerStage.running,
-            url: localUrl,
-            version: version,
-          ),
-        );
+        _emit(LocalServerStatus(stage: LocalServerStage.running, url: localUrl, version: version));
         return localUrl;
       }
     }
     if (version == null) {
       const message = 'Server bundle is not installed.';
-      _emit(
-        const LocalServerStatus(
-          stage: LocalServerStage.error,
-          message: message,
-        ),
-      );
+      _emit(const LocalServerStatus(stage: LocalServerStage.error, message: message));
       throw StateError(message);
     }
     final exe = _nodeExe ?? await ensureNode();
@@ -658,21 +562,11 @@ class LocalServerService {
         exe,
         const ['dist-server/server/index.js'],
         workingDirectory: bundle.path,
-        environment: {
-          ...Platform.environment,
-          'SERVER_PORT': '$localPort',
-          'HOST': '127.0.0.1',
-        },
+        environment: {...Platform.environment, 'SERVER_PORT': '$localPort', 'HOST': '127.0.0.1'},
       );
     } on Object catch (e) {
       final message = 'Failed to spawn the local server: $e';
-      _emit(
-        LocalServerStatus(
-          stage: LocalServerStage.error,
-          message: message,
-          version: version,
-        ),
-      );
+      _emit(LocalServerStatus(stage: LocalServerStage.error, message: message, version: version));
       throw StateError(message);
     }
     _process = proc;
@@ -694,13 +588,7 @@ class LocalServerService {
     final deadline = DateTime.now().add(_startupTimeout);
     while (DateTime.now().isBefore(deadline)) {
       if (await _probeAlive()) {
-        _emit(
-          LocalServerStatus(
-            stage: LocalServerStage.running,
-            url: localUrl,
-            version: version,
-          ),
-        );
+        _emit(LocalServerStatus(stage: LocalServerStage.running, url: localUrl, version: version));
         return localUrl;
       }
       if (exited) break;
@@ -715,20 +603,13 @@ class LocalServerService {
       final tail = stderrText.length > 300
           ? '…${stderrText.substring(stderrText.length - 300)}'
           : stderrText;
-      message =
-          'Local server exited during startup${tail.isEmpty ? '.' : ': $tail'}';
+      message = 'Local server exited during startup${tail.isEmpty ? '.' : ': $tail'}';
     } else {
       message = 'Timed out waiting for the local server to start.';
     }
     if (!exited) proc.kill();
     _process = null;
-    _emit(
-      LocalServerStatus(
-        stage: LocalServerStage.error,
-        message: message,
-        version: version,
-      ),
-    );
+    _emit(LocalServerStatus(stage: LocalServerStage.error, message: message, version: version));
     throw StateError(message);
   }
 
@@ -739,12 +620,7 @@ class LocalServerService {
     final proc = _process;
     _process = null;
     if (proc != null) proc.kill();
-    _emit(
-      LocalServerStatus(
-        stage: LocalServerStage.stopped,
-        version: await installedVersion,
-      ),
-    );
+    _emit(LocalServerStatus(stage: LocalServerStage.stopped, version: await installedVersion));
   }
 
   /// System `tar` — bsdtar on Windows 10+ (reads .zip too), GNU tar on Linux.
@@ -752,14 +628,10 @@ class LocalServerService {
     final proc = await Process.start('tar', args);
     unawaited(proc.stdout.drain<void>());
     final stderr = StringBuffer();
-    proc.stderr
-        .transform(const Utf8Decoder(allowMalformed: true))
-        .listen(stderr.write);
+    proc.stderr.transform(const Utf8Decoder(allowMalformed: true)).listen(stderr.write);
     final code = await proc.exitCode;
     if (code != 0) {
-      throw StateError(
-        'tar ${args.join(' ')} failed (exit $code): ${stderr.toString().trim()}',
-      );
+      throw StateError('tar ${args.join(' ')} failed (exit $code): ${stderr.toString().trim()}');
     }
   }
 

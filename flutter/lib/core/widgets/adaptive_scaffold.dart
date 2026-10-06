@@ -143,20 +143,14 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
     }
 
     // 2. Ctrl/Cmd+Shift+F — focus mode (desktop only; compact uses drawer).
-    if (ctrlOrMeta &&
-        kb.isShiftPressed &&
-        !kb.isAltPressed &&
-        key == LogicalKeyboardKey.keyF) {
+    if (ctrlOrMeta && kb.isShiftPressed && !kb.isAltPressed && key == LogicalKeyboardKey.keyF) {
       if (_modalOpen || context.breakpoint.isCompact) return false;
       ref.read(uiPreferencesProvider.notifier).toggleSidebar();
       return true;
     }
 
     // 3. Ctrl/Cmd+K — session quick switcher.
-    if (ctrlOrMeta &&
-        !kb.isShiftPressed &&
-        !kb.isAltPressed &&
-        key == LogicalKeyboardKey.keyK) {
+    if (ctrlOrMeta && !kb.isShiftPressed && !kb.isAltPressed && key == LogicalKeyboardKey.keyK) {
       if (_modalOpen) return false;
       unawaited(showSessionQuickSwitcher(context));
       return true;
@@ -164,28 +158,20 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
 
     // 4. Ctrl/Cmd+Shift+K — command palette (web CommandPalette). Toggles:
     // when the palette itself is the top modal, the shortcut closes it.
-    if (ctrlOrMeta &&
-        kb.isShiftPressed &&
-        !kb.isAltPressed &&
-        key == LogicalKeyboardKey.keyK) {
+    if (ctrlOrMeta && kb.isShiftPressed && !kb.isAltPressed && key == LogicalKeyboardKey.keyK) {
       if (_paletteOpen) {
         Navigator.of(context, rootNavigator: true).pop();
         return true;
       }
       if (_modalOpen) return false;
       _paletteOpen = true;
-      unawaited(
-        showCommandPalette(context).whenComplete(() => _paletteOpen = false),
-      );
+      unawaited(showCommandPalette(context).whenComplete(() => _paletteOpen = false));
       return true;
     }
 
     // 5. Ctrl/Cmd+, — open settings (web CommandPalette's second binding;
     // also backs the shortcut badge it renders).
-    if (ctrlOrMeta &&
-        !kb.isShiftPressed &&
-        !kb.isAltPressed &&
-        key == LogicalKeyboardKey.comma) {
+    if (ctrlOrMeta && !kb.isShiftPressed && !kb.isAltPressed && key == LogicalKeyboardKey.comma) {
       if (_modalOpen) return false;
       context.go('/settings');
       return true;
@@ -199,10 +185,7 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
   void _syncKeepAwake() {
     final enabled =
         ref.read(uiPreferencesProvider).preventSleep &&
-        ref
-            .read(sessionsProvider((null, null)))
-            .sessions
-            .any((s) => s.isRunning && !s.isArchived);
+        ref.read(sessionsProvider((null, null))).sessions.any((s) => s.isRunning && !s.isArchived);
     // WakelockPlus throws on unsupported platforms (e.g. Linux) — ignore.
     unawaited(WakelockPlus.toggle(enable: enabled).catchError((_) {}));
   }
@@ -213,12 +196,8 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
     // Watched early so they stay alive for the key handler even in focus mode.
     _showTasks =
         ref.watch(tasksEnabledProvider) &&
-        (ref.watch(taskmasterInstallStatusProvider).value?.isInstalled ??
-            false);
-    ref.listen(
-      uiPreferencesProvider.select((p) => p.preventSleep),
-      (_, _) => _syncKeepAwake(),
-    );
+        (ref.watch(taskmasterInstallStatusProvider).value?.isInstalled ?? false);
+    ref.listen(uiPreferencesProvider.select((p) => p.preventSleep), (_, _) => _syncKeepAwake());
     ref.listen(
       sessionsProvider((null, null))
           .select((s) => s.sessions.any((x) => x.isRunning && !x.isArchived)),
@@ -233,10 +212,7 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
         drawerKey: _drawerKey,
         child: Scaffold(
           key: _drawerKey,
-          drawer: _CompactNavDrawer(
-            selectedPath: _selectedPath(context),
-            showTasks: _showTasks,
-          ),
+          drawer: _CompactNavDrawer(selectedPath: _selectedPath(context), showTasks: _showTasks),
           // Edge-to-edge (Android 15+): keep content off the status/nav bars.
           body: SafeArea(child: widget.child),
         ),
@@ -251,10 +227,7 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
       body: SafeArea(
         child: Row(
           children: [
-            _AppRail(
-              selectedPath: _selectedPath(context),
-              showTasks: _showTasks,
-            ),
+            _AppRail(selectedPath: _selectedPath(context), showTasks: _showTasks),
             Expanded(child: widget.child),
           ],
         ),
@@ -304,9 +277,7 @@ class _AppRail extends ConsumerWidget {
       decoration: BoxDecoration(
         color: c.background.withValues(alpha: 0.8),
         // React wraps the rail in `border-r border-border/50`.
-        border: Border(
-          right: BorderSide(color: c.border.withValues(alpha: 0.5)),
-        ),
+        border: Border(right: BorderSide(color: c.border.withValues(alpha: 0.5))),
       ),
       child: Column(
         spacing: 4,
@@ -390,11 +361,7 @@ class _NavDivider extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 4),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            color.withValues(alpha: 0),
-            color,
-            color.withValues(alpha: 0),
-          ],
+          colors: [color.withValues(alpha: 0), color, color.withValues(alpha: 0)],
           stops: const [0, 0.2, 1],
         ),
       ),
@@ -499,10 +466,7 @@ class _RailButtonState extends State<_RailButton> {
 /// Compact navigation drawer — web `MobileNavMenu` parity: a modal side panel
 /// with the app-level destinations, no session/project lists.
 class _CompactNavDrawer extends ConsumerWidget {
-  const _CompactNavDrawer({
-    required this.selectedPath,
-    required this.showTasks,
-  });
+  const _CompactNavDrawer({required this.selectedPath, required this.showTasks});
 
   final String? selectedPath;
 
@@ -586,18 +550,13 @@ class _CompactNavDrawer extends ConsumerWidget {
               '/workspace',
               badge: runningCount,
             ),
-            item(
-              LucideIcons.history,
-              _destinationLabel(t, '/sessions'),
-              '/sessions',
-            ),
+            item(LucideIcons.history, _destinationLabel(t, '/sessions'), '/sessions'),
             _drawerDivider(nav.dividerColor),
             for (final d in _pageDestinations)
               if (showTasks || d.path != '/tasks')
                 item(d.icon, _destinationLabel(t, d.path), d.path),
             _drawerDivider(nav.dividerColor),
-            for (final d in _extraDestinations)
-              item(d.icon, _destinationLabel(t, d.path), d.path),
+            for (final d in _extraDestinations) item(d.icon, _destinationLabel(t, d.path), d.path),
             if (browserEnabled)
               item(
                 _browserDestination.icon,
@@ -608,10 +567,7 @@ class _CompactNavDrawer extends ConsumerWidget {
             const UpdateBadge(variant: UpdateBadgeVariant.row),
             ListTile(
               leading: const Icon(LucideIcons.server, size: 18),
-              title: Text(
-                t.serverConnect.changeServer,
-                style: const TextStyle(fontSize: 14),
-              ),
+              title: Text(t.serverConnect.changeServer, style: const TextStyle(fontSize: 14)),
               onTap: () {
                 Navigator.of(context).pop();
                 context.go('/connect');
@@ -619,10 +575,7 @@ class _CompactNavDrawer extends ConsumerWidget {
             ),
             ListTile(
               leading: const Icon(LucideIcons.slidersHorizontal, size: 18),
-              title: Text(
-                t.settings.quickSettings.title,
-                style: const TextStyle(fontSize: 14),
-              ),
+              title: Text(t.settings.quickSettings.title, style: const TextStyle(fontSize: 14)),
               onTap: () {
                 Navigator.of(context).pop();
                 showQuickSettings(context);
@@ -630,10 +583,7 @@ class _CompactNavDrawer extends ConsumerWidget {
             ),
             ListTile(
               leading: const Icon(LucideIcons.coffee, size: 18),
-              title: Text(
-                t.settings.about.buyMeACoffee,
-                style: const TextStyle(fontSize: 14),
-              ),
+              title: Text(t.settings.about.buyMeACoffee, style: const TextStyle(fontSize: 14)),
               onTap: () {
                 Navigator.of(context).pop();
                 launchUrl(Uri.parse(_kCoffeeUrl));

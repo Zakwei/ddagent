@@ -6,8 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// available on this platform" (the card is hidden anyway).
 class LocalServerController extends Notifier<LocalServerStatus> {
   @override
-  LocalServerStatus build() =>
-      const LocalServerStatus(stage: LocalServerStage.unsupported);
+  LocalServerStatus build() => const LocalServerStatus(stage: LocalServerStage.unsupported);
 
   Future<void> refresh() async {}
 
@@ -19,7 +18,6 @@ class LocalServerController extends Notifier<LocalServerStatus> {
   Future<void> stop() async {}
 }
 
-final localServerProvider =
-    NotifierProvider<LocalServerController, LocalServerStatus>(
-      LocalServerController.new,
-    );
+final localServerProvider = NotifierProvider<LocalServerController, LocalServerStatus>(
+  LocalServerController.new,
+);

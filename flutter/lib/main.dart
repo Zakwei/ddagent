@@ -49,10 +49,7 @@ Future<void> presentDesktopNotification(DesktopNotification event) async {
   if (await showDesktopNotification(title: resolvedTitle, body: body)) return;
   final context = rootMessengerKey.currentContext;
   if (context != null && context.mounted) {
-    AppToast.show(
-      context,
-      body.isEmpty ? resolvedTitle : '$resolvedTitle: $body',
-    );
+    AppToast.show(context, body.isEmpty ? resolvedTitle : '$resolvedTitle: $body');
   }
 }
 
@@ -92,8 +89,7 @@ class _DdagentAppState extends ConsumerState<DdagentApp> {
     // X-Auth-Error / expired JWT → toast + back to login (T8.5).
     ref.listen(sessionExpiredProvider, (_, _) {
       final ctx = rootMessengerKey.currentContext;
-      if (ctx != null)
-        AppToast.error(ctx, Translations.of(ctx).auth.sessionExpired);
+      if (ctx != null) AppToast.error(ctx, Translations.of(ctx).auth.sessionExpired);
       ref.read(routerProvider).go('/login');
     });
     final themeMode = ref.watch(themeModeProvider);
@@ -116,9 +112,7 @@ class _DdagentAppState extends ConsumerState<DdagentApp> {
           statusBarColor: Colors.transparent,
           statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
           systemNavigationBarColor: Colors.transparent,
-          systemNavigationBarIconBrightness: isDark
-              ? Brightness.light
-              : Brightness.dark,
+          systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
         ),
         child: child ?? const SizedBox.shrink(),
       ),

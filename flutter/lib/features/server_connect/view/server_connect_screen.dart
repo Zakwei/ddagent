@@ -19,8 +19,7 @@ class ServerConnectScreen extends ConsumerStatefulWidget {
   const ServerConnectScreen({super.key});
 
   @override
-  ConsumerState<ServerConnectScreen> createState() =>
-      _ServerConnectScreenState();
+  ConsumerState<ServerConnectScreen> createState() => _ServerConnectScreenState();
 }
 
 class _ServerConnectScreenState extends ConsumerState<ServerConnectScreen> {
@@ -67,11 +66,7 @@ class _ServerConnectScreenState extends ConsumerState<ServerConnectScreen> {
     }
     await ref
         .read(serverProfilesProvider.notifier)
-        .select(
-          url,
-          name: isLocal ? i18n.serverConnect.local.title : '',
-          isLocal: isLocal,
-        );
+        .select(url, name: isLocal ? i18n.serverConnect.local.title : '', isLocal: isLocal);
     // Re-check status against the new server — may flip needsSetup → /setup.
     await ref.read(authControllerProvider.notifier).checkStatus();
     if (!mounted) return;
@@ -111,9 +106,7 @@ class _ServerConnectScreenState extends ConsumerState<ServerConnectScreen> {
                     const SizedBox(height: AppSpacing.xs),
                     Text(
                       i18n.serverConnect.subtitle,
-                      style: t.textTheme.bodyMedium?.copyWith(
-                        color: c.mutedForeground,
-                      ),
+                      style: t.textTheme.bodyMedium?.copyWith(color: c.mutedForeground),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: AppSpacing.lg),
@@ -125,14 +118,10 @@ class _ServerConnectScreenState extends ConsumerState<ServerConnectScreen> {
                         children: [
                           const Expanded(child: Divider()),
                           Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.sm,
-                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
                             child: Text(
                               i18n.serverConnect.local.or,
-                              style: t.textTheme.bodySmall?.copyWith(
-                                color: c.mutedForeground,
-                              ),
+                              style: t.textTheme.bodySmall?.copyWith(color: c.mutedForeground),
                             ),
                           ),
                           const Expanded(child: Divider()),
@@ -147,9 +136,7 @@ class _ServerConnectScreenState extends ConsumerState<ServerConnectScreen> {
                           contentPadding: EdgeInsets.zero,
                           selected: p.url == profilesState.activeUrl,
                           leading: Icon(
-                            p.isLocal
-                                ? Icons.dns_outlined
-                                : Icons.cloud_outlined,
+                            p.isLocal ? Icons.dns_outlined : Icons.cloud_outlined,
                             size: 18,
                             color: c.mutedForeground,
                           ),
@@ -162,9 +149,7 @@ class _ServerConnectScreenState extends ConsumerState<ServerConnectScreen> {
                             tooltip: i18n.common.gitPanel.remove,
                             onPressed: () => _remove(p.url),
                           ),
-                          onTap: _busy
-                              ? null
-                              : () => _connect(p.url, p.isLocal),
+                          onTap: _busy ? null : () => _connect(p.url, p.isLocal),
                         ),
                       const Divider(height: AppSpacing.lg),
                     ],
@@ -184,9 +169,7 @@ class _ServerConnectScreenState extends ConsumerState<ServerConnectScreen> {
                       onPressed: _connect,
                       loading: _busy,
                       child: Text(
-                        _busy
-                            ? i18n.serverConnect.connecting
-                            : i18n.serverConnect.connect,
+                        _busy ? i18n.serverConnect.connecting : i18n.serverConnect.connect,
                       ),
                     ),
                   ],
@@ -241,16 +224,10 @@ class _LocalServerCard extends ConsumerWidget {
                     Text(local.title, style: t.textTheme.titleSmall),
                     Text(
                       switch (s.stage) {
-                        LocalServerStage.running => local.running(
-                          url: s.url ?? '',
-                        ),
+                        LocalServerStage.running => local.running(url: s.url ?? ''),
                         LocalServerStage.stopped =>
-                          s.version != null
-                              ? local.installed(version: s.version!)
-                              : local.subtitle,
-                        LocalServerStage.error => local.error(
-                          error: s.message ?? '',
-                        ),
+                          s.version != null ? local.installed(version: s.version!) : local.subtitle,
+                        LocalServerStage.error => local.error(error: s.message ?? ''),
                         _ => local.subtitle,
                       },
                       style: t.textTheme.bodySmall?.copyWith(
@@ -279,9 +256,7 @@ class _LocalServerCard extends ConsumerWidget {
             const LinearProgressIndicator(),
             const SizedBox(height: AppSpacing.xs),
             Text(
-              s.stage == LocalServerStage.installing
-                  ? local.installing
-                  : local.starting,
+              s.stage == LocalServerStage.installing ? local.installing : local.starting,
               style: t.textTheme.bodySmall?.copyWith(color: c.mutedForeground),
             ),
           ],
@@ -317,8 +292,7 @@ class _LocalServerCard extends ConsumerWidget {
                 percent: (s.progress * 100).round(),
               ),
               LocalServerStage.installing => local.installing,
-              LocalServerStage.starting ||
-              LocalServerStage.checking => local.starting,
+              LocalServerStage.starting || LocalServerStage.checking => local.starting,
               _ => local.install,
             }),
           ),

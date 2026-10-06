@@ -84,10 +84,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       try {
         await ref
             .read(userRepositoryProvider)
-            .updateGitConfig(
-              gitName: _name.text.trim(),
-              gitEmail: _email.text.trim(),
-            );
+            .updateGitConfig(gitName: _name.text.trim(), gitEmail: _email.text.trim());
       } on AppError catch (e) {
         setState(() {
           _busy = false;
@@ -144,9 +141,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           Icon(
                             i < _step
                                 ? Icons.check_circle
-                                : (i == _step
-                                      ? Icons.radio_button_checked
-                                      : Icons.circle_outlined),
+                                : (i == _step ? Icons.radio_button_checked : Icons.circle_outlined),
                             size: 18,
                             color: i <= _step ? c.primary : c.mutedForeground,
                           ),
@@ -155,16 +150,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     if (_step == 0) ...[
-                      Text(
-                        i18n.settings.git.title,
-                        style: t.textTheme.titleLarge,
-                      ),
+                      Text(i18n.settings.git.title, style: t.textTheme.titleLarge),
                       const SizedBox(height: AppSpacing.sm),
                       Text(
                         i18n.onboarding.gitHint,
-                        style: t.textTheme.bodyMedium?.copyWith(
-                          color: c.mutedForeground,
-                        ),
+                        style: t.textTheme.bodyMedium?.copyWith(color: c.mutedForeground),
                       ),
                       const SizedBox(height: AppSpacing.lg),
                       AppInput(
@@ -196,9 +186,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       children: [
                         AppButton(
                           variant: AppButtonVariant.ghost,
-                          onPressed: _step == 0 || _busy
-                              ? null
-                              : () => setState(() => _step--),
+                          onPressed: _step == 0 || _busy ? null : () => setState(() => _step--),
                           child: Text(i18n.common.navigation.previous),
                         ),
                         const Spacer(),
@@ -244,9 +232,7 @@ class _McpInstallStepState extends ConsumerState<_McpInstallStep> {
     final i18n = Translations.of(context);
     setState(() => _busy = true);
     try {
-      final results = await ref
-          .read(mcpRepositoryProvider)
-          .installDdagent(providers: providers);
+      final results = await ref.read(mcpRepositoryProvider).installDdagent(providers: providers);
       if (!mounted) return;
       final ok = results.where((result) => result.created).length;
       final failed = results.where((result) => !result.created).toList();
@@ -281,11 +267,7 @@ class _McpInstallStepState extends ConsumerState<_McpInstallStep> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          i18n.onboarding.mcp.title,
-          style: t.textTheme.titleLarge,
-          textAlign: TextAlign.center,
-        ),
+        Text(i18n.onboarding.mcp.title, style: t.textTheme.titleLarge, textAlign: TextAlign.center),
         const SizedBox(height: AppSpacing.sm),
         Text(
           i18n.onboarding.mcp.description,
@@ -388,11 +370,7 @@ class _AgentConnectionsStep extends StatelessWidget {
             shrinkWrap: true,
             children: [
               for (final (id, title, accent) in _providers) ...[
-                _AgentConnectionCard(
-                  provider: id,
-                  title: title,
-                  accent: accent,
-                ),
+                _AgentConnectionCard(provider: id, title: title, accent: accent),
                 const SizedBox(height: AppSpacing.sm),
               ],
             ],
@@ -410,11 +388,7 @@ class _AgentConnectionsStep extends StatelessWidget {
 }
 
 class _AgentConnectionCard extends ConsumerWidget {
-  const _AgentConnectionCard({
-    required this.provider,
-    required this.title,
-    required this.accent,
-  });
+  const _AgentConnectionCard({required this.provider, required this.title, required this.accent});
 
   final String provider;
   final String title;
@@ -446,9 +420,7 @@ class _AgentConnectionCard extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
         color: connected ? accent.withValues(alpha: 0.08) : c.card,
-        border: Border.all(
-          color: connected ? accent.withValues(alpha: 0.5) : c.border,
-        ),
+        border: Border.all(color: connected ? accent.withValues(alpha: 0.5) : c.border),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -472,10 +444,7 @@ class _AgentConnectionCard extends ConsumerWidget {
                     Flexible(
                       child: Text(
                         title,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -524,15 +493,9 @@ class _AgentConnectionCard extends ConsumerWidget {
               style: FilledButton.styleFrom(
                 backgroundColor: accent,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 6,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                 minimumSize: Size.zero,
-                textStyle: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
+                textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
               ),
               child: Text(i18n.settings.agents.login.title),
             ),

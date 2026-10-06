@@ -10,22 +10,16 @@ import 'package:hive_flutter/hive_flutter.dart';
 String normalizeServerUrl(String raw) {
   var url = raw.trim();
   if (url.isEmpty) return '';
-  if (!RegExp('^https?://', caseSensitive: false).hasMatch(url))
-    url = 'https://$url';
+  if (!RegExp('^https?://', caseSensitive: false).hasMatch(url)) url = 'https://$url';
   return url.replaceAll(RegExp(r'/+$'), '');
 }
 
 /// WS base for a given http(s) server URL.
-String wsBaseFor(String base) => base
-    .replaceFirst(RegExp('^http:'), 'ws:')
-    .replaceFirst(RegExp('^https:'), 'wss:');
+String wsBaseFor(String base) =>
+    base.replaceFirst(RegExp('^http:'), 'ws:').replaceFirst(RegExp('^https:'), 'wss:');
 
 class ServerProfile {
-  const ServerProfile({
-    required this.url,
-    this.name = '',
-    this.isLocal = false,
-  });
+  const ServerProfile({required this.url, this.name = '', this.isLocal = false});
 
   final String url;
   final String name;
@@ -36,11 +30,7 @@ class ServerProfile {
 
   String get label => name.isEmpty ? url : name;
 
-  Map<String, dynamic> toJson() => {
-    'url': url,
-    'name': name,
-    'isLocal': isLocal,
-  };
+  Map<String, dynamic> toJson() => {'url': url, 'name': name, 'isLocal': isLocal};
 
   factory ServerProfile.fromJson(Map<String, dynamic> j) => ServerProfile(
     url: j['url'] as String? ?? '',
@@ -89,11 +79,7 @@ class ServerProfilesController extends Notifier<ServerProfilesState> {
   }
 
   /// Adds (or selects) a profile and persists it.
-  Future<void> select(
-    String rawUrl, {
-    String name = '',
-    bool isLocal = false,
-  }) async {
+  Future<void> select(String rawUrl, {String name = '', bool isLocal = false}) async {
     final url = normalizeServerUrl(rawUrl);
     if (url.isEmpty) return;
     final profiles = [...state.profiles];
@@ -109,10 +95,7 @@ class ServerProfilesController extends Notifier<ServerProfilesState> {
       );
     }
     if (Hive.isBoxOpen('settings')) {
-      await _box.put(
-        _profilesKey,
-        jsonEncode([for (final p in profiles) p.toJson()]),
-      );
+      await _box.put(_profilesKey, jsonEncode([for (final p in profiles) p.toJson()]));
       await _box.put(_activeKey, url);
     }
     state = ServerProfilesState(profiles: profiles, activeUrl: url);
@@ -125,10 +108,7 @@ class ServerProfilesController extends Notifier<ServerProfilesState> {
       active = profiles.isEmpty ? null : profiles.first.url;
     }
     if (Hive.isBoxOpen('settings')) {
-      await _box.put(
-        _profilesKey,
-        jsonEncode([for (final p in profiles) p.toJson()]),
-      );
+      await _box.put(_profilesKey, jsonEncode([for (final p in profiles) p.toJson()]));
       if (active == null) {
         await _box.delete(_activeKey);
       } else {
@@ -139,10 +119,9 @@ class ServerProfilesController extends Notifier<ServerProfilesState> {
   }
 }
 
-final serverProfilesProvider =
-    NotifierProvider<ServerProfilesController, ServerProfilesState>(
-      ServerProfilesController.new,
-    );
+final serverProfilesProvider = NotifierProvider<ServerProfilesController, ServerProfilesState>(
+  ServerProfilesController.new,
+);
 
 /// GET /api/auth/status on a bare client — verifies the URL is a ddagent
 /// server without touching the authed Dio instance (port of testConnection).

@@ -940,8 +940,9 @@ class _CandidateCard extends StatelessWidget {
     // provider's row) must never be handed to the dropdown: a `value` outside
     // `items` trips an assertion and blanks the candidate card.
     final selectedAccount = candidate.accountId ?? '';
-    final accountValue =
-        accountItems.any((item) => item.value == selectedAccount) ? selectedAccount : '';
+    final accountValue = accountItems.any((item) => item.value == selectedAccount)
+        ? selectedAccount
+        : '';
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.md),
@@ -1091,7 +1092,10 @@ class _CandidateCard extends StatelessWidget {
               label: fields.redundantAccounts,
               child: _RedundantAccountsField(
                 selected: candidate.fallbackAccountIds,
-                options: [for (final a in accounts) if (a.id != candidate.accountId) a],
+                options: [
+                  for (final a in accounts)
+                    if (a.id != candidate.accountId) a,
+                ],
                 emptyHint: fields.redundantAccountsNone,
                 onChanged: (ids) => onPatch((cc) => cc.copyWith(fallbackAccountIds: ids)),
               ),
