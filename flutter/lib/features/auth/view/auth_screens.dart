@@ -27,40 +27,42 @@ class _AuthShell extends StatelessWidget {
     final theme = Theme.of(context);
     final c = context.appColors;
     return Scaffold(
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 400),
-            child: AppCard(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    title,
-                    style: theme.textTheme.headlineSmall,
-                    textAlign: TextAlign.center,
-                  ),
-                  if (description != null) ...[
-                    const SizedBox(height: AppSpacing.sm),
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 400),
+              child: AppCard(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
                     Text(
-                      description!,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: c.mutedForeground,
-                      ),
+                      title,
+                      style: theme.textTheme.headlineSmall,
                       textAlign: TextAlign.center,
                     ),
-                  ],
-                  const SizedBox(height: AppSpacing.lg),
-                  child,
-                  TextButton(
-                    onPressed: () => context.go('/connect'),
-                    child: Text(
-                      Translations.of(context).serverConnect.changeServer,
+                    if (description != null) ...[
+                      const SizedBox(height: AppSpacing.sm),
+                      Text(
+                        description!,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: c.mutedForeground,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                    const SizedBox(height: AppSpacing.lg),
+                    child,
+                    TextButton(
+                      onPressed: () => context.go('/connect'),
+                      child: Text(
+                        Translations.of(context).serverConnect.changeServer,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

@@ -5,10 +5,12 @@
          servers (self-hosted installs without TLS). -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="ddagent_app"
+        android:label="ddagent"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+        android:allowBackup="false"
+        android:enableOnBackInvokedCallback="true">
         <activity
             android:name=".MainActivity"
             android:exported="true"

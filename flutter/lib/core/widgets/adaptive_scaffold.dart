@@ -237,21 +237,27 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
             selectedPath: _selectedPath(context),
             showTasks: _showTasks,
           ),
-          body: widget.child,
+          // Edge-to-edge (Android 15+): keep content off the status/nav bars.
+          body: SafeArea(child: widget.child),
         ),
       );
     }
     // Focus mode — web `sidebarVisible` pref: hiding the rail is the desktop
     // focus affordance (the Flutter shell has no second sidebar to collapse).
     if (!ref.watch(uiPreferencesProvider).sidebarVisible) {
-      return Scaffold(body: widget.child);
+      return Scaffold(body: SafeArea(child: widget.child));
     }
     return Scaffold(
-      body: Row(
-        children: [
-          _AppRail(selectedPath: _selectedPath(context), showTasks: _showTasks),
-          Expanded(child: widget.child),
-        ],
+      body: SafeArea(
+        child: Row(
+          children: [
+            _AppRail(
+              selectedPath: _selectedPath(context),
+              showTasks: _showTasks,
+            ),
+            Expanded(child: widget.child),
+          ],
+        ),
       ),
     );
   }

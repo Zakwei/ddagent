@@ -92,99 +92,105 @@ class _ServerConnectScreenState extends ConsumerState<ServerConnectScreen> {
     final profilesState = ref.watch(serverProfilesProvider);
     final profiles = profilesState.profiles;
     return Scaffold(
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 400),
-            child: AppCard(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    i18n.sidebar.app.title,
-                    style: t.textTheme.headlineMedium,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    i18n.serverConnect.subtitle,
-                    style: t.textTheme.bodyMedium?.copyWith(
-                      color: c.mutedForeground,
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 400),
+              child: AppCard(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      i18n.sidebar.app.title,
+                      style: t.textTheme.headlineMedium,
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  if (!kIsWeb &&
-                      (defaultTargetPlatform == TargetPlatform.windows ||
-                          defaultTargetPlatform == TargetPlatform.linux)) ...[
-                    _LocalServerCard(onConnect: (url) => _connect(url, true)),
-                    Row(
-                      children: [
-                        const Expanded(child: Divider()),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.sm,
-                          ),
-                          child: Text(
-                            i18n.serverConnect.local.or,
-                            style: t.textTheme.bodySmall?.copyWith(
-                              color: c.mutedForeground,
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      i18n.serverConnect.subtitle,
+                      style: t.textTheme.bodyMedium?.copyWith(
+                        color: c.mutedForeground,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    if (!kIsWeb &&
+                        (defaultTargetPlatform == TargetPlatform.windows ||
+                            defaultTargetPlatform == TargetPlatform.linux)) ...[
+                      _LocalServerCard(onConnect: (url) => _connect(url, true)),
+                      Row(
+                        children: [
+                          const Expanded(child: Divider()),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.sm,
+                            ),
+                            child: Text(
+                              i18n.serverConnect.local.or,
+                              style: t.textTheme.bodySmall?.copyWith(
+                                color: c.mutedForeground,
+                              ),
                             ),
                           ),
-                        ),
-                        const Expanded(child: Divider()),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                  ],
-                  if (profiles.isNotEmpty) ...[
-                    for (final p in profiles)
-                      ListTile(
-                        dense: true,
-                        contentPadding: EdgeInsets.zero,
-                        selected: p.url == profilesState.activeUrl,
-                        leading: Icon(
-                          p.isLocal ? Icons.dns_outlined : Icons.cloud_outlined,
-                          size: 18,
-                          color: c.mutedForeground,
-                        ),
-                        title: Text(p.label, overflow: TextOverflow.ellipsis),
-                        subtitle: p.label == p.url
-                            ? null
-                            : Text(p.url, overflow: TextOverflow.ellipsis),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.close, size: 18),
-                          tooltip: i18n.common.gitPanel.remove,
-                          onPressed: () => _remove(p.url),
-                        ),
-                        onTap: _busy ? null : () => _connect(p.url, p.isLocal),
+                          const Expanded(child: Divider()),
+                        ],
                       ),
-                    const Divider(height: AppSpacing.lg),
-                  ],
-                  AppInput(
-                    controller: _url,
-                    hint: 'https://your-server:10087',
-                    keyboardType: TextInputType.url,
-                    autofocus: profiles.isEmpty,
-                    onSubmitted: (_) => _connect(),
-                  ),
-                  if (_error != null) ...[
-                    const SizedBox(height: AppSpacing.md),
-                    Text(_error!, style: TextStyle(color: c.destructive)),
-                  ],
-                  const SizedBox(height: AppSpacing.lg),
-                  AppButton(
-                    onPressed: _connect,
-                    loading: _busy,
-                    child: Text(
-                      _busy
-                          ? i18n.serverConnect.connecting
-                          : i18n.serverConnect.connect,
+                      const SizedBox(height: AppSpacing.md),
+                    ],
+                    if (profiles.isNotEmpty) ...[
+                      for (final p in profiles)
+                        ListTile(
+                          dense: true,
+                          contentPadding: EdgeInsets.zero,
+                          selected: p.url == profilesState.activeUrl,
+                          leading: Icon(
+                            p.isLocal
+                                ? Icons.dns_outlined
+                                : Icons.cloud_outlined,
+                            size: 18,
+                            color: c.mutedForeground,
+                          ),
+                          title: Text(p.label, overflow: TextOverflow.ellipsis),
+                          subtitle: p.label == p.url
+                              ? null
+                              : Text(p.url, overflow: TextOverflow.ellipsis),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.close, size: 18),
+                            tooltip: i18n.common.gitPanel.remove,
+                            onPressed: () => _remove(p.url),
+                          ),
+                          onTap: _busy
+                              ? null
+                              : () => _connect(p.url, p.isLocal),
+                        ),
+                      const Divider(height: AppSpacing.lg),
+                    ],
+                    AppInput(
+                      controller: _url,
+                      hint: 'https://your-server:10087',
+                      keyboardType: TextInputType.url,
+                      autofocus: profiles.isEmpty,
+                      onSubmitted: (_) => _connect(),
                     ),
-                  ),
-                ],
+                    if (_error != null) ...[
+                      const SizedBox(height: AppSpacing.md),
+                      Text(_error!, style: TextStyle(color: c.destructive)),
+                    ],
+                    const SizedBox(height: AppSpacing.lg),
+                    AppButton(
+                      onPressed: _connect,
+                      loading: _busy,
+                      child: Text(
+                        _busy
+                            ? i18n.serverConnect.connecting
+                            : i18n.serverConnect.connect,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
