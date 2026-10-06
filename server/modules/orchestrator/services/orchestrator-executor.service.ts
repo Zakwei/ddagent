@@ -1303,7 +1303,9 @@ export function createOrchestratorExecutor(deps: {
         // The step timeout races the child on a REAL timer — the injected
         // sleep is stubbed in tests and must not gate this. Expiry aborts
         // the child and counts as a 'timeout'-class failure so the normal
-        // budget/failover path handles it.
+        // budget/failover path handles it. The timer stays referenced: an
+        // unref'd timer is dropped once the event loop drains, which cancels
+        // the race before the timeout can fire.
         let stepTimer: ReturnType<typeof setTimeout> | undefined;
         let result: { ok: boolean; error: string | null; finalText: string; aborted: boolean };
         try {
@@ -1314,7 +1316,6 @@ export function createOrchestratorExecutor(deps: {
                   handle.completed,
                   new Promise<'timed-out'>((resolve) => {
                     stepTimer = setTimeout(() => resolve('timed-out'), timeout);
-                    stepTimer.unref?.();
                   }),
                 ])
               : await handle.completed;
@@ -1675,8 +1676,8 @@ export function createOrchestratorExecutor(deps: {
             ? await Promise.race([
                 handle.completed,
                 new Promise<'timed-out'>((resolve) => {
+                  // Referenced on purpose — see the step-timer note above.
                   timer = setTimeout(() => resolve('timed-out'), timeout);
-                  timer.unref?.();
                 }),
               ])
             : await handle.completed;

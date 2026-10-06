@@ -249,7 +249,9 @@ test('Cursor maps plan and on-demand usage into monthly windows', async () => {
   const jwt = `h.${Buffer.from(JSON.stringify({ sub: 'auth0|user_1', exp: 4_102_444_800, email: 'cursor@example.com' })).toString('base64url')}.s`;
   const providers = createQuotaProviders({
     homeDirectory: '/home/test',
-    env: { ...process.env, HOME: '/home/test' },
+    // Pin the config root: the Cursor adapter honors XDG_CONFIG_HOME, and an
+    // inherited value on the runner would point it away from the fake auth file.
+    env: { ...process.env, HOME: '/home/test', XDG_CONFIG_HOME: '/home/test/.config' },
     readTextFile: (filePath) =>
       filePath === '/home/test/.config/cursor/auth.json' ? JSON.stringify({ accessToken: jwt }) : null,
     request: async (url, options) => {

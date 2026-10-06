@@ -1,4 +1,6 @@
 import { spawn } from 'node:child_process';
+import { existsSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import readline from 'node:readline';
 
@@ -61,7 +63,34 @@ const MAXIMUM_SEARCH_RESULTS = 500;
 // Prefer the system ripgrep (usually /usr/bin/rg) so the same binary is used
 // whether the server runs from source, a compiled dist, or the installed npm
 // package, without depending on the exact @vscode/ripgrep layout.
-const RIPGREP_BINARY_PATH = process.env.RIPGREP_PATH || 'rg';
+//
+// `@vscode/ripgrep` is a runtime dependency, so the bundled binary is the
+// fallback whenever the host has no `rg` on PATH (minimal containers, CI
+// runners) — a missing system ripgrep must not fail every project search.
+function resolveRipgrepBinaryPath(): string {
+  const override = process.env.RIPGREP_PATH;
+  if (override) {
+    return override;
+  }
+  const binaryName = process.platform === 'win32' ? 'rg.exe' : 'rg';
+  for (const directory of (process.env.PATH ?? '').split(path.delimiter)) {
+    const candidate = directory ? path.join(directory, binaryName) : '';
+    if (candidate && existsSync(candidate)) {
+      return candidate;
+    }
+  }
+  try {
+    const { rgPath } = createRequire(import.meta.url)('@vscode/ripgrep') as { rgPath?: string };
+    if (rgPath && existsSync(rgPath)) {
+      return rgPath;
+    }
+  } catch {
+    // The bundled ripgrep is optional at runtime; fall back to PATH lookup.
+  }
+  return binaryName;
+}
+
+const RIPGREP_BINARY_PATH = resolveRipgrepBinaryPath();
 
 type FileTreeEntryFilter = (entryPath: string, isDirectory: boolean) => boolean;
 
