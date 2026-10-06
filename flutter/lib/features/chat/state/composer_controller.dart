@@ -565,7 +565,9 @@ class ComposerController extends Notifier<ComposerState> {
   /// the first time its Model section expands; a stale list stays on error.
   Future<void> refreshModels() async {
     try {
-      final catalog = await ref.read(sessionsRepositoryProvider).models(_arg.provider);
+      final catalog = await ref
+          .read(sessionsRepositoryProvider)
+          .models(_arg.provider, refresh: true);
       if (ref.mounted) state = state.copyWith(models: catalog.options);
     } on Object {
       // Keep the stale catalog — the menu stays usable.

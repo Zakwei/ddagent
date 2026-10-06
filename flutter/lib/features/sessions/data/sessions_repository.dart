@@ -177,21 +177,31 @@ class SessionsRepository {
   /// `{models: {OPTIONS: [...], DEFAULT: "…"}}` payload the web app reads.
   /// The catalog's DEFAULT feeds `providerModels[provider]` — the banner and
   /// draft composer show it before a session-pinned model resolves.
-  Future<({List<Map<String, dynamic>> options, String? defaultModel})> models(String provider) =>
-      apiCall(() => _dio.get<dynamic>('/api/providers/$provider/models'), (d) {
-        if (d is List) {
-          return (
-            options: [for (final m in d) Map<String, dynamic>.from(m as Map)],
-            defaultModel: null,
-          );
-        }
-        final grouped = (d as Map<String, dynamic>)['models'];
-        final list = grouped is Map ? grouped['OPTIONS'] : grouped;
+  /// `refresh` maps to `?refresh=true` — the server then awaits a live
+  /// catalog reload instead of answering from its cached/fallback list.
+  Future<({List<Map<String, dynamic>> options, String? defaultModel})> models(
+    String provider, {
+    bool refresh = false,
+  }) => apiCall(
+    () => _dio.get<dynamic>(
+      '/api/providers/$provider/models',
+      queryParameters: refresh ? {'refresh': 'true'} : null,
+    ),
+    (d) {
+      if (d is List) {
         return (
-          options: [for (final m in list as List? ?? const []) Map<String, dynamic>.from(m as Map)],
-          defaultModel: grouped is Map ? grouped['DEFAULT']?.toString() : null,
+          options: [for (final m in d) Map<String, dynamic>.from(m as Map)],
+          defaultModel: null,
         );
-      });
+      }
+      final grouped = (d as Map<String, dynamic>)['models'];
+      final list = grouped is Map ? grouped['OPTIONS'] : grouped;
+      return (
+        options: [for (final m in list as List? ?? const []) Map<String, dynamic>.from(m as Map)],
+        defaultModel: grouped is Map ? grouped['DEFAULT']?.toString() : null,
+      );
+    },
+  );
 
   /// All three model mutations answer `{provider, model, models}` — `models`
   /// is the merged catalog (`{OPTIONS, DEFAULT}`) the web applies straight to
