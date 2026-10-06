@@ -546,6 +546,12 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
 /// `useComposerMenuAnchor` — fixed `right`/`bottom` from the trigger and the
 /// `[data-slot="prompt-input"]` composer box, so the popover grows upward
 /// without measuring first.
+///
+/// When the trigger lives in a different route than the composer box — the
+/// compact `+` action sheet re-hosts the option bar, so its copies of the
+/// model/mode triggers sit in the sheet's route — anchoring to the composer
+/// would drop the popover behind the sheet, far from the tapped control. In
+/// that case anchor to the trigger itself so it opens right above it.
 (double right, double bottom, double maxHeight, double maxWidth) composerMenuAnchor(
   BuildContext triggerContext,
   GlobalKey promptBoxKey,
@@ -556,9 +562,20 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
   const gap = 8.0;
   final box = triggerContext.findRenderObject()! as RenderBox;
   final rect = box.localToGlobal(Offset.zero) & box.size;
-  final composer = promptBoxKey.currentContext?.findRenderObject() as RenderBox?;
+  final composerContext = promptBoxKey.currentContext;
+  final composer = composerContext?.findRenderObject() as RenderBox?;
   final composerOffset = composer?.localToGlobal(Offset.zero) ?? Offset.zero;
   final right = math.max(margin, screen.width - rect.right);
+
+  final sameRoute =
+      composerContext != null && ModalRoute.of(triggerContext) == ModalRoute.of(composerContext);
+  if (!sameRoute) {
+    final width = math.min(preferredWidth, math.max(200.0, screen.width - right - margin));
+    final maxHeight = math.max(160.0, rect.top - gap - margin);
+    final bottom = screen.height - rect.top + gap;
+    return (right, bottom, maxHeight, width);
+  }
+
   final bottom = screen.height - composerOffset.dy + gap;
   final maxHeight = math.max(160.0, composerOffset.dy - gap - margin);
   final maxWidth = math.max(
