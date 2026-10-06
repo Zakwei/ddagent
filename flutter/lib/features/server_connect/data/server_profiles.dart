@@ -140,5 +140,9 @@ Future<({bool ok, String? error})> probeServer(String raw) async {
         : (ok: false, error: 'http-${res.statusCode}');
   } on DioException catch (e) {
     return (ok: false, error: e.message ?? 'network-error');
+  } on Object catch (e) {
+    // Malformed URL / parse failures never surface as DioException — treat
+    // them as a failed probe instead of letting the throw escape the caller.
+    return (ok: false, error: '$e');
   }
 }

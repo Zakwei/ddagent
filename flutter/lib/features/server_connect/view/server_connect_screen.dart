@@ -44,34 +44,44 @@ class _ServerConnectScreenState extends ConsumerState<ServerConnectScreen> {
       _busy = true;
       _error = null;
     });
-    if (isLocal) {
-      // Saved local profile: the server may be stopped — start it before
-      // probing. ensureRunning is a no-op when it's already up.
-      await ref.read(localServerProvider.notifier).ensureRunning();
+    // _busy gates the only retry affordance (the button is disabled while
+    // loading), so it must always be cleared — otherwise any throw or stall
+    // below leaves the screen spinning forever with no way back.
+    var navigated = false;
+    try {
+      if (isLocal) {
+        // Saved local profile: the server may be stopped — start it before
+        // probing. ensureRunning is a no-op when it's already up.
+        await ref.read(localServerProvider.notifier).ensureRunning();
+        if (!mounted) return;
+      }
+      final probe = await probeServer(url);
       if (!mounted) return;
+      if (!probe.ok) {
+        setState(() => _error = i18n.serverConnect.connectionFailed(error: probe.error ?? ''));
+        return;
+      }
+      // A different server won't accept the current JWT — drop it so the
+      // login flow on the new server starts clean.
+      if (normalizeServerUrl(url) != ref.read(serverProfilesProvider).activeUrl) {
+        await ref.read(authTokenStoreProvider).clear();
+      }
+      await ref
+          .read(serverProfilesProvider.notifier)
+          .select(url, name: isLocal ? i18n.serverConnect.local.title : '', isLocal: isLocal);
+      // Re-check status against the new server — may flip needsSetup → /setup.
+      await ref.read(authControllerProvider.notifier).checkStatus();
+      if (!mounted) return;
+      final from = GoRouterState.of(context).uri.queryParameters['from'];
+      context.go(from != null && from.startsWith('/') ? from : '/login');
+      navigated = true;
+    } on Object catch (e) {
+      if (mounted) {
+        setState(() => _error = i18n.serverConnect.connectionFailed(error: '$e'));
+      }
+    } finally {
+      if (mounted && !navigated) setState(() => _busy = false);
     }
-    final probe = await probeServer(url);
-    if (!mounted) return;
-    if (!probe.ok) {
-      setState(() {
-        _busy = false;
-        _error = i18n.serverConnect.connectionFailed(error: probe.error ?? '');
-      });
-      return;
-    }
-    // A different server won't accept the current JWT — drop it so the
-    // login flow on the new server starts clean.
-    if (normalizeServerUrl(url) != ref.read(serverProfilesProvider).activeUrl) {
-      await ref.read(authTokenStoreProvider).clear();
-    }
-    await ref
-        .read(serverProfilesProvider.notifier)
-        .select(url, name: isLocal ? i18n.serverConnect.local.title : '', isLocal: isLocal);
-    // Re-check status against the new server — may flip needsSetup → /setup.
-    await ref.read(authControllerProvider.notifier).checkStatus();
-    if (!mounted) return;
-    final from = GoRouterState.of(context).uri.queryParameters['from'];
-    context.go(from != null && from.startsWith('/') ? from : '/login');
   }
 
   Future<void> _remove(String url) async {
