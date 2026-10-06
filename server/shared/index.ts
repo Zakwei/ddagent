@@ -30,6 +30,7 @@ export {
   createOrchestratorStatusFrame,
   devinConfigDir,
   devinDataDir,
+  execCliFile,
   flattenPromptForWindowsShell,
   generateMessageId,
   getOpenCodeDatabasePath,

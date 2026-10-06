@@ -1,18 +1,15 @@
-import { execFile } from 'node:child_process';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
-import { promisify } from 'node:util';
 
 import type { IProviderAuth, ProviderAuthStatus } from '@/shared/index.js';
 import {
   antigravityCredentialEmail,
   antigravityDir,
+  execCliFile,
   readObjectRecord,
   readOptionalString,
   resolveAntigravityExecutable,
 } from '@/shared/index.js';
-
-const execFileAsync = promisify(execFile);
 
 const ANTIGRAVITY_VERSION_TIMEOUT_MS = 5_000;
 
@@ -32,7 +29,7 @@ export class AntigravityProviderAuth implements IProviderAuth {
    */
   private async readVersion(executable: string): Promise<string | null> {
     try {
-      const { stdout } = await execFileAsync(executable, ['--version'], {
+      const { stdout } = await execCliFile(executable, ['--version'], {
         encoding: 'utf8',
         timeout: ANTIGRAVITY_VERSION_TIMEOUT_MS,
       });

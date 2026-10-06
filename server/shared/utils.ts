@@ -183,6 +183,36 @@ const COMMAND_CODE_EXECUTABLE_CANDIDATES: readonly string[] =
     ? ['command-code', 'cmdc', 'commandcode']
     : ['command-code', 'cmd', 'commandcode'];
 
+/**
+ * Global-bin directories probed on Windows when every PATH candidate misses.
+ * npm, pnpm, and bun install CLI shims under the *user* profile, which a
+ * backend started from a service context, scheduled task, or a launcher with
+ * a sanitized environment never inherits — the CLI then answers `--version`
+ * in the user's terminal while the backend keeps reporting it as missing.
+ */
+const commandCodeWindowsShimCandidates = (): string[] => {
+  const dirs = [
+    process.env.APPDATA && path.join(process.env.APPDATA, 'npm'),
+    process.env.LOCALAPPDATA && path.join(process.env.LOCALAPPDATA, 'pnpm'),
+    path.join(os.homedir(), '.bun', 'bin'),
+  ];
+  const shims: string[] = [];
+  for (const dir of dirs) {
+    if (!dir) continue;
+    for (const name of COMMAND_CODE_EXECUTABLE_CANDIDATES) {
+      const shim = path.join(dir, `${name}.cmd`);
+      try {
+        if (fs.existsSync(shim)) {
+          shims.push(shim);
+        }
+      } catch {
+        // Unreadable profile dir — treat like a PATH miss.
+      }
+    }
+  }
+  return shims;
+};
+
 let resolvedCommandCodeExecutable: string | null | undefined;
 
 /**
@@ -190,22 +220,37 @@ let resolvedCommandCodeExecutable: string | null | undefined;
  * `command-code`, then the short alias (`cmdc` on Windows, `cmd` elsewhere —
  * `cmd.exe` is never reachable here because spawn resolves `cmd` to the npm
  * shim only when it exists on PATH ahead of the system shell, and cross-spawn
- * appends the PATHEXT variants), then `commandcode`. Returns `null` when none
- * of the names answers `--version`. The result is cached for the process
+ * appends the PATHEXT variants), then `commandcode`. `COMMAND_CODE_CLI_PATH`
+ * overrides detection entirely (mirrors `CLAUDE_CLI_PATH`); on Windows the
+ * well-known global-bin dirs above are probed after the PATH misses. Returns
+ * `null` when none answers `--version`. The result is cached for the process
  * lifetime; pass a `spawnSync` override in tests.
  */
 export function resolveCommandCodeExecutable(
   spawnSync?: (command: string, args: string[]) => { error?: unknown; status?: number | null },
 ): string | null {
+  const override = readOptionalString(process.env.COMMAND_CODE_CLI_PATH);
+  if (override) {
+    if (spawnSync === undefined) {
+      resolvedCommandCodeExecutable = override;
+    }
+    return override;
+  }
+
   if (spawnSync === undefined && resolvedCommandCodeExecutable !== undefined) {
     return resolvedCommandCodeExecutable;
   }
 
   const run = spawnSync ?? ((command: string, args: string[]) =>
-    crossSpawn.sync(command, args, { stdio: 'ignore', timeout: 5000 }));
+    crossSpawn.sync(command, args, { stdio: 'ignore', timeout: 10_000 }));
+
+  const candidates: string[] = [...COMMAND_CODE_EXECUTABLE_CANDIDATES];
+  if (process.platform === 'win32') {
+    candidates.push(...commandCodeWindowsShimCandidates());
+  }
 
   let resolved: string | null = null;
-  for (const candidate of COMMAND_CODE_EXECUTABLE_CANDIDATES) {
+  for (const candidate of candidates) {
     try {
       const result = run(candidate, ['--version']);
       if (!result.error && result.status === 0) {
@@ -944,8 +989,10 @@ export type RefreshingCache<T> = {
  * The first call awaits `load`. Later calls return the cached value; after
  * `ttlMs` the next call serves the stale value instantly and re-polls in the
  * background, so reads never block on the loader. A failed load keeps the
- * previous cache (or serves `fallback` when nothing was ever loaded) and backs
- * off until the next TTL window — a down agent is not retried on every read.
+ * previous cache (or serves `fallback` when nothing was ever loaded), logs the
+ * reason once per attempt, and retries after `failureRetryMs` instead of the
+ * full TTL — an agent CLI installed or fixed while the server runs is picked
+ * up within a minute rather than after half an hour of fallback reads.
  * Concurrent loads are deduplicated through one in-flight promise.
  *
  * Consumed by provider model adapters (opencode-models.provider.ts,
@@ -955,9 +1002,12 @@ export const createRefreshingCache = <T>(
   load: () => Promise<T>,
   ttlMs: number,
   fallback: T,
+  options?: { failureRetryMs?: number },
 ): RefreshingCache<T> => {
+  const failureRetryMs = options?.failureRetryMs ?? 60_000;
   let cache: T | null = null;
   let attemptedAt = 0;
+  let failedAt = 0;
   let pending: Promise<T> | null = null;
 
   const refresh = (): Promise<T> => {
@@ -966,8 +1016,13 @@ export const createRefreshingCache = <T>(
         attemptedAt = Date.now();
         try {
           cache = await load();
+          failedAt = 0;
           return cache;
-        } catch {
+        } catch (error) {
+          failedAt = Date.now();
+          console.warn(
+            `[provider-models] catalog refresh failed: ${error instanceof Error ? error.message : String(error)}`,
+          );
           return cache ?? fallback;
         } finally {
           pending = null;
@@ -982,7 +1037,8 @@ export const createRefreshingCache = <T>(
       if (forceRefresh) {
         return refresh();
       }
-      if (Date.now() - attemptedAt >= ttlMs) {
+      const staleAfter = failedAt > 0 ? failureRetryMs : ttlMs;
+      if (Date.now() - attemptedAt >= staleAfter) {
         void refresh();
       }
       if (cache === null) {
@@ -1791,6 +1847,88 @@ export function flattenPromptForWindowsShell(prompt: string): string {
     return prompt;
   }
   return prompt.replace(/\s*\r?\n\s*/g, ' ').trim();
+}
+
+/**
+ * Promisified `child_process.execFile` that spawns through cross-spawn, so
+ * `.cmd`/PATHEXT npm shims resolve on Windows — plain execFile cannot run
+ * batch shims and fails with ENOENT even though the CLI sits on PATH (which
+ * silently downgraded every CLI-backed model catalog to its static fallback
+ * on Windows installs). Buffers stdout/stderr as utf8, kills on `timeout`,
+ * aborts once stdout exceeds `maxBuffer`, and rejects non-zero exits with an
+ * error carrying `code`/`stdout`/`stderr` like real execFile.
+ *
+ * Consumed by the provider model catalogs (Command Code, OpenCode,
+ * Antigravity, Codex, Devin) and the provider auth `--version` probes — each
+ * accepts this exact shape through its `deps.execFile` injection seam, so
+ * tests keep their fakes.
+ */
+export function execCliFile(
+  file: string,
+  args: string[],
+  options: { encoding?: 'utf8'; timeout?: number; maxBuffer?: number },
+): Promise<{ stdout: string; stderr: string }> {
+  return new Promise((resolve, reject) => {
+    const child = crossSpawn(file, args, { stdio: ['ignore', 'pipe', 'pipe'] });
+    const stdoutChunks: Buffer[] = [];
+    const stderrChunks: Buffer[] = [];
+    let settled = false;
+
+    const finish = (error: Error | null, result?: { stdout: string; stderr: string }) => {
+      if (settled) return;
+      settled = true;
+      if (timer) clearTimeout(timer);
+      if (error) reject(error);
+      else resolve(result ?? { stdout: '', stderr: '' });
+    };
+    const kill = () => {
+      try {
+        child.kill('SIGKILL');
+      } catch {
+        // Process already gone — the close handler reports the real outcome.
+      }
+    };
+    const timer = options.timeout
+      ? setTimeout(() => {
+          kill();
+          finish(
+            Object.assign(new Error(`${file} timed out after ${options.timeout}ms`), {
+              killed: true,
+              signal: 'SIGKILL',
+            }),
+          );
+        }, options.timeout)
+      : undefined;
+
+    let stdoutSize = 0;
+    child.stdout?.on('data', (chunk: Buffer) => {
+      stdoutSize += chunk.length;
+      if (stdoutSize > (options.maxBuffer ?? Infinity)) {
+        kill();
+        finish(new Error(`${file} output exceeded maxBuffer`));
+        return;
+      }
+      stdoutChunks.push(chunk);
+    });
+    child.stderr?.on('data', (chunk: Buffer) => stderrChunks.push(chunk));
+    child.on('error', (error) => finish(error));
+    child.on('close', (code, signal) => {
+      const stdout = Buffer.concat(stdoutChunks).toString('utf8');
+      const stderr = Buffer.concat(stderrChunks).toString('utf8');
+      if (code === 0) {
+        finish(null, { stdout, stderr });
+      } else {
+        finish(
+          Object.assign(new Error(`Command failed: ${file} ${args.join(' ')}\n${stderr}`), {
+            code,
+            signal,
+            stdout,
+            stderr,
+          }),
+        );
+      }
+    });
+  });
 }
 
 // ---------------------------

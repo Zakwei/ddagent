@@ -1,5 +1,3 @@
-import { execFile } from 'node:child_process';
-import { promisify } from 'node:util';
 import path from 'node:path';
 
 import spawn from 'cross-spawn';
@@ -8,14 +6,13 @@ import type { IProviderAuth, ProviderAuthStatus } from '@/shared/index.js';
 import {
   cachedCliIdentity,
   commandCodeDir,
+  execCliFile,
   readCliField,
   readJsonConfig,
   readObjectRecord,
   readOptionalString,
   resolveCommandCodeExecutable,
 } from '@/shared/index.js';
-
-const execFileAsync = promisify(execFile);
 
 const COMMAND_CODE_VERSION_TIMEOUT_MS = 5_000;
 const COMMAND_CODE_IDENTITY_TIMEOUT_MS = 5_000;
@@ -36,7 +33,7 @@ export class CommandCodeProviderAuth implements IProviderAuth {
    */
   private async readVersion(executable: string): Promise<string | null> {
     try {
-      const { stdout } = await execFileAsync(executable, ['--version'], {
+      const { stdout } = await execCliFile(executable, ['--version'], {
         encoding: 'utf8',
         timeout: COMMAND_CODE_VERSION_TIMEOUT_MS,
       });

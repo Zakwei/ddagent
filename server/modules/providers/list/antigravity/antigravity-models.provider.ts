@@ -1,6 +1,3 @@
-import { execFile } from 'node:child_process';
-import { promisify } from 'node:util';
-
 import type { IProviderModels } from '@/shared/interfaces.js';
 import type {
   AnyRecord,
@@ -11,6 +8,7 @@ import type {
 import {
   buildDefaultProviderCurrentActiveModel,
   createRefreshingCache,
+  execCliFile,
   PROVIDER_MODEL_CACHE_TTL_MS,
   readFileTail,
   readObjectRecord,
@@ -20,8 +18,6 @@ import {
 import { sessionsDb } from '@/modules/database/index.js';
 
 import { findAntigravityTranscriptPath } from './antigravity-sessions.provider.js';
-
-const execFileAsync = promisify(execFile);
 
 type AntigravityExecFile = (
   file: string,
@@ -141,7 +137,7 @@ const loadAntigravityModels = async (
   if (!executable) {
     throw new Error('Antigravity CLI is not installed.');
   }
-  const run = deps.execFile ?? execFileAsync;
+  const run = deps.execFile ?? execCliFile;
   const { stdout } = await run(executable, ['models'], {
     encoding: 'utf8',
     timeout: ANTIGRAVITY_MODEL_LIST_TIMEOUT_MS,

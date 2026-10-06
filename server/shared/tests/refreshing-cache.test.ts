@@ -44,19 +44,55 @@ test('createRefreshingCache serves a stale value instantly and re-polls in the b
   assert.equal(await cache.get(), 'v2');
 });
 
-test('createRefreshingCache serves the fallback on failure and backs off until the next window', async () => {
+test('createRefreshingCache serves the fallback on failure and backs off for the failure window', async () => {
   let loads = 0;
-  const cache = createRefreshingCache(async () => {
-    loads += 1;
-    throw new Error('agent down');
-  }, TTL_MS, 'fallback');
+  const cache = createRefreshingCache(
+    async () => {
+      loads += 1;
+      throw new Error('agent down');
+    },
+    TTL_MS,
+    'fallback',
+    { failureRetryMs: TTL_MS * 10 },
+  );
 
   assert.equal(await cache.get(), 'fallback');
   assert.equal(await cache.get(), 'fallback');
   assert.equal(loads, 1);
 
+  // Past the normal TTL but inside the failure backoff — still no reload.
   await delay(TTL_MS * 2);
   assert.equal(await cache.get(), 'fallback');
+  assert.equal(loads, 1);
+
+  // Past the failure backoff — the next read kicks a background reload.
+  await delay(TTL_MS * 10);
+  assert.equal(await cache.get(), 'fallback');
+  assert.equal(loads, 2);
+});
+
+test('createRefreshingCache recovers quickly after a failure once the loader is healthy', async () => {
+  let loads = 0;
+  let down = true;
+  const cache = createRefreshingCache(
+    async () => {
+      loads += 1;
+      if (down) throw new Error('agent down');
+      return 'v1';
+    },
+    TTL_MS * 100,
+    'fallback',
+    { failureRetryMs: TTL_MS },
+  );
+
+  assert.equal(await cache.get(), 'fallback');
+  assert.equal(loads, 1);
+
+  down = false;
+  await delay(TTL_MS * 2);
+  // With nothing cached, the get() that re-polls returns the in-flight load —
+  // so the first read past the failure window already serves the live value.
+  assert.equal(await cache.get(), 'v1');
   assert.equal(loads, 2);
 });
 

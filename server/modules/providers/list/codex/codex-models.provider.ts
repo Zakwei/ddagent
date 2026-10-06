@@ -1,8 +1,6 @@
-import { execFile } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { promisify } from 'node:util';
 
 import TOML from '@iarna/toml';
 
@@ -16,12 +14,11 @@ import type {
 import {
   buildDefaultProviderCurrentActiveModel,
   createRefreshingCache,
+  execCliFile,
   PROVIDER_MODEL_CACHE_TTL_MS,
   readObjectRecord,
   readOptionalString,
 } from '@/shared/utils.js';
-
-const execFileAsync = promisify(execFile);
 
 type CodexExecFile = (
   file: string,
@@ -160,7 +157,7 @@ export function parseCodexDebugModels(stdout: string): ProviderModelsDefinition 
 const loadCodexModels = async (
   deps: { execFile?: CodexExecFile } = {},
 ): Promise<ProviderModelsDefinition> => {
-  const run = deps.execFile ?? execFileAsync;
+  const run = deps.execFile ?? execCliFile;
   const { stdout } = await run('codex', ['debug', 'models'], {
     encoding: 'utf8',
     timeout: CODEX_MODEL_LIST_TIMEOUT_MS,

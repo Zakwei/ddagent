@@ -57,6 +57,26 @@ test('resolveCommandCodeExecutable picks the first working documented alias', ()
   assert.equal(none, null);
 });
 
+test('resolveCommandCodeExecutable honors COMMAND_CODE_CLI_PATH before probing', () => {
+  const previous = process.env.COMMAND_CODE_CLI_PATH;
+  process.env.COMMAND_CODE_CLI_PATH = '  /opt/cc/bin/command-code  ';
+  try {
+    let probed = 0;
+    const resolved = resolveCommandCodeExecutable(() => {
+      probed += 1;
+      return { status: 0 };
+    });
+    assert.equal(resolved, '/opt/cc/bin/command-code');
+    assert.equal(probed, 0);
+  } finally {
+    if (previous === undefined) {
+      delete process.env.COMMAND_CODE_CLI_PATH;
+    } else {
+      process.env.COMMAND_CODE_CLI_PATH = previous;
+    }
+  }
+});
+
 test('parseCommandCodeModelList parses the --list-models table', () => {
   const stdout = [
     'Available models  ·  3 models',

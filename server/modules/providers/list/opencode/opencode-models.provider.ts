@@ -1,6 +1,3 @@
-import { execFile } from 'node:child_process';
-import { promisify } from 'node:util';
-
 import { sessionsDb } from '@/modules/database/index.js';
 import type { IProviderModels } from '@/shared/interfaces.js';
 import type {
@@ -11,14 +8,13 @@ import type {
 import {
   buildDefaultProviderCurrentActiveModel,
   createRefreshingCache,
+  execCliFile,
   getOpenCodeDatabasePath,
   openSqliteReadonlyDatabase,
   PROVIDER_MODEL_CACHE_TTL_MS,
   readObjectRecord,
   readOptionalString,
 } from '@/shared/utils.js';
-
-const execFileAsync = promisify(execFile);
 
 const OPENCODE_MODEL_LIST_TIMEOUT_MS = 30_000;
 
@@ -252,7 +248,7 @@ const parseOpenCodeVerboseOutput = (stdout: string): ProviderModelOption[] => {
 const loadOpenCodeModels = async (
   deps: { execFile?: OpenCodeExecFile } = {},
 ): Promise<ProviderModelsDefinition> => {
-  const run = deps.execFile ?? execFileAsync;
+  const run = deps.execFile ?? execCliFile;
 
   try {
     const { stdout } = await run(
