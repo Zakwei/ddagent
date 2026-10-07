@@ -163,18 +163,31 @@ void main() {
     });
 
     test('toolStatusFor: running → completed/error', () {
-      expect(toolStatusFor(_m('a', 'tool_use', toolName: 'bash')), ToolStatus.running);
       expect(
-        toolStatusFor(_m('b', 'tool_use', toolName: 'bash', toolResult: {'content': 'ok'})),
+        toolStatusFor(_m('a', 'tool_use', toolName: 'bash')),
+        ToolStatus.running,
+      );
+      expect(
+        toolStatusFor(
+          _m('b', 'tool_use', toolName: 'bash', toolResult: {'content': 'ok'}),
+        ),
         ToolStatus.completed,
       );
       expect(
         toolStatusFor(
-          _m('c', 'tool_use', toolName: 'bash', toolResult: {'exitCode': 2, 'content': 'fail'}),
+          _m(
+            'c',
+            'tool_use',
+            toolName: 'bash',
+            toolResult: {'exitCode': 2, 'content': 'fail'},
+          ),
         ),
         ToolStatus.error,
       );
-      expect(toolStatusFor(_m('d', 'tool_use', toolName: 'bash', isError: true)), ToolStatus.error);
+      expect(
+        toolStatusFor(_m('d', 'tool_use', toolName: 'bash', isError: true)),
+        ToolStatus.error,
+      );
     });
 
     // ProviderScope: tool rows watch uiPreferencesProvider for the
@@ -188,40 +201,93 @@ void main() {
       ),
     );
 
-    testWidgets(r'bash row: card, $ glyph, Running badge, lines count, expand → output', (
-      tester,
-    ) async {
-      final msg = _m(
-        't1',
-        'tool_use',
-        toolName: 'bash',
-        toolInput: {'command': 'ls -la', 'description': 'list files'},
-        toolResult: {'content': 'a\nb\nc\nd'},
-      );
-      await tester.pumpWidget(app(ToolUseTile(message: msg, childrenMap: const {})));
+    testWidgets(
+      r'bash row: card, $ glyph, Running badge, lines count, expand → output',
+      (tester) async {
+        final msg = _m(
+          't1',
+          'tool_use',
+          toolName: 'bash',
+          toolInput: {'command': 'ls -la', 'description': 'list files'},
+          toolResult: {'content': 'a\nb\nc\nd'},
+        );
+        await tester.pumpWidget(
+          app(ToolUseTile(message: msg, childrenMap: const {})),
+        );
 
-      // Completed bash with output → card, no status badge (web passes
-      // `status` only when not completed), "4 lines".
-      expect(find.text(r'$'), findsOneWidget);
-      expect(find.text('ls -la'), findsOneWidget);
-      expect(find.text('Completed'), findsNothing);
-      expect(find.text('4 lines'), findsOneWidget);
-      expect(find.text('a\nb\nc\nd'), findsNothing);
+        // Completed bash with output → card, no status badge (web passes
+        // `status` only when not completed), "4 lines".
+        expect(find.text(r'$'), findsOneWidget);
+        expect(find.text('ls -la'), findsOneWidget);
+        expect(find.text('Completed'), findsNothing);
+        expect(find.text('4 lines'), findsOneWidget);
+        expect(find.text('a\nb\nc\nd'), findsNothing);
 
-      await tester.tap(find.text('ls -la'));
-      await tester.pump();
-      expect(find.text('a\nb\nc\nd'), findsOneWidget);
-    });
+        await tester.tap(find.text('ls -la'));
+        await tester.pump();
+        expect(find.text('a\nb\nc\nd'), findsOneWidget);
+      },
+    );
 
     testWidgets('running tool shows spinner, no badge', (tester) async {
-      final msg = _m('t2', 'tool_use', toolName: 'bash', toolInput: {'command': 'sleep 5'});
-      await tester.pumpWidget(app(ToolUseTile(message: msg, childrenMap: const {})));
+      final msg = _m(
+        't2',
+        'tool_use',
+        toolName: 'bash',
+        toolInput: {'command': 'sleep 5'},
+      );
+      await tester.pumpWidget(
+        app(ToolUseTile(message: msg, childrenMap: const {})),
+      );
       // status derived as running → spinner, never a badge.
       expect(find.byType(CircularProgressIndicator), findsWidgets);
       expect(find.text('Running'), findsNothing);
     });
 
-    testWidgets('read row: one-line `→` glyph, expand shows result', (tester) async {
+    testWidgets(
+      'Claude `Agent` call renders as a subagent with its children and result',
+      (tester) async {
+        final parent = _m(
+          'a1',
+          'tool_use',
+          toolId: 'a1',
+          toolName: 'Agent',
+          toolInput: {
+            'description': 'Audit the parser',
+            'prompt': 'long prompt',
+          },
+          toolResult: {'content': 'Parser is fine.'},
+        );
+        final child = _m(
+          'c1',
+          'tool_use',
+          toolName: 'bash',
+          toolInput: {'command': 'ls'},
+          toolResult: {'content': 'a'},
+        );
+        await tester.pumpWidget(
+          app(
+            ToolUseTile(
+              message: parent,
+              childrenMap: {
+                'a1': [child],
+              },
+            ),
+          ),
+        );
+
+        expect(find.text('Audit the parser'), findsOneWidget);
+        expect(find.text('1 tool'), findsOneWidget);
+        await tester.tap(find.text('Audit the parser'));
+        await tester.pumpAndSettle();
+        expect(find.text('ls'), findsOneWidget);
+        expect(find.text('Parser is fine.'), findsOneWidget);
+      },
+    );
+
+    testWidgets('read row: one-line `→` glyph, expand shows result', (
+      tester,
+    ) async {
       final msg = _m(
         't3',
         'tool_use',
@@ -229,7 +295,9 @@ void main() {
         toolInput: {'path': 'lib/a.dart'},
         toolResult: {'content': 'file body'},
       );
-      await tester.pumpWidget(app(ToolUseTile(message: msg, childrenMap: const {})));
+      await tester.pumpWidget(
+        app(ToolUseTile(message: msg, childrenMap: const {})),
+      );
       expect(find.text('→'), findsOneWidget);
       expect(find.text('Read lib/a.dart'), findsOneWidget);
       await tester.tap(find.text('Read lib/a.dart'));
@@ -237,7 +305,9 @@ void main() {
       expect(find.text('file body'), findsOneWidget);
     });
 
-    testWidgets('long output collapses with "Show N more lines"', (tester) async {
+    testWidgets('long output collapses with "Show N more lines"', (
+      tester,
+    ) async {
       final out = List.generate(20, (i) => 'line $i').join('\n');
       final msg = _m(
         't4',
@@ -246,7 +316,9 @@ void main() {
         toolInput: {'command': 'seq 20'},
         toolResult: {'content': out},
       );
-      await tester.pumpWidget(app(ToolUseTile(message: msg, childrenMap: const {})));
+      await tester.pumpWidget(
+        app(ToolUseTile(message: msg, childrenMap: const {})),
+      );
       await tester.tap(find.text('seq 20'));
       await tester.pump();
       expect(find.text('Show 8 more lines'), findsOneWidget);
@@ -263,7 +335,9 @@ void main() {
         toolInput: {'command': 'true'},
         toolResult: {'content': 'ok'},
       );
-      await tester.pumpWidget(app(ToolUseTile(message: msg, childrenMap: const {}), dark: false));
+      await tester.pumpWidget(
+        app(ToolUseTile(message: msg, childrenMap: const {}), dark: false),
+      );
       // Completed rows carry no badge — only the card styling remains.
       expect(find.text('Completed'), findsNothing);
       expect(find.text('true'), findsOneWidget);
@@ -280,7 +354,9 @@ void main() {
       ),
     );
 
-    testWidgets('todo_write expands into the TodoListContent rows', (tester) async {
+    testWidgets('todo_write expands into the TodoListContent rows', (
+      tester,
+    ) async {
       final msg = _m(
         'tw',
         'tool_use',
@@ -293,7 +369,9 @@ void main() {
         },
         toolResult: {'content': 'ok'},
       );
-      await tester.pumpWidget(app(ToolUseTile(message: msg, childrenMap: const {})));
+      await tester.pumpWidget(
+        app(ToolUseTile(message: msg, childrenMap: const {})),
+      );
       expect(find.text('Updating Todo List'), findsOneWidget);
       expect(find.text('First task'), findsNothing);
       await tester.tap(find.text('Updating Todo List'));
@@ -308,9 +386,13 @@ void main() {
         'tl',
         'tool_use',
         toolName: 'tasklist',
-        toolResult: {'content': '#1 [completed] Setup repo\n#2 [in_progress] Wire API\n'},
+        toolResult: {
+          'content': '#1 [completed] Setup repo\n#2 [in_progress] Wire API\n',
+        },
       );
-      await tester.pumpWidget(app(ToolUseTile(message: msg, childrenMap: const {})));
+      await tester.pumpWidget(
+        app(ToolUseTile(message: msg, childrenMap: const {})),
+      );
       await tester.tap(find.text('Tasks listing tasks'));
       await tester.pump();
       expect(find.text('#1'), findsOneWidget);
@@ -333,7 +415,13 @@ void main() {
         },
       );
       await tester.pumpWidget(
-        app(ToolUseTile(message: msg, childrenMap: const {}, onFileOpen: (p) => opened = p)),
+        app(
+          ToolUseTile(
+            message: msg,
+            childrenMap: const {},
+            onFileOpen: (p) => opened = p,
+          ),
+        ),
       );
       // Raw result text is replaced by the file list.
       await tester.tap(find.textContaining('foo'));
@@ -355,7 +443,13 @@ void main() {
         toolResult: {'content': 'ok'},
       );
       await tester.pumpWidget(
-        app(ToolUseTile(message: msg, childrenMap: const {}, onFileOpen: (p) => opened = p)),
+        app(
+          ToolUseTile(
+            message: msg,
+            childrenMap: const {},
+            onFileOpen: (p) => opened = p,
+          ),
+        ),
       );
       await tester.tap(find.text('edit lib/x.dart'));
       await tester.pump();

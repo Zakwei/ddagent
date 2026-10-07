@@ -30,8 +30,19 @@ const _todoReadTools = {'todo_read', 'todoread'};
 const _taskListTools = {'tasklist', 'task_list', 'taskget', 'task_get'};
 
 /// TaskCreate/TaskUpdate — one-line input, result hidden on success.
-const _taskWriteTools = {'taskcreate', 'task_create', 'taskupdate', 'task_update'};
-const _planTools = {'exit_plan_mode', 'exitplanmode', 'plan', 'plan_review', 'planreview'};
+const _taskWriteTools = {
+  'taskcreate',
+  'task_create',
+  'taskupdate',
+  'task_update',
+};
+const _planTools = {
+  'exit_plan_mode',
+  'exitplanmode',
+  'plan',
+  'plan_review',
+  'planreview',
+};
 const _oneLineTools = {
   'read_file',
   'list_files',
@@ -51,11 +62,26 @@ const _fileTools = {
   'delete_file',
   'update_file',
 };
-const _bashTools = {'bash', 'execute_command', 'run_command', 'shell', 'terminal'};
-const _searchTools = {'search_files', 'grep', 'glob', 'list_files', 'web_search', 'websearch'};
-const _subagentTools = {'task', 'delegate', 'subagent', 'spawn_agent'};
+const _bashTools = {
+  'bash',
+  'execute_command',
+  'run_command',
+  'shell',
+  'terminal',
+};
+const _searchTools = {
+  'search_files',
+  'grep',
+  'glob',
+  'list_files',
+  'web_search',
+  'websearch',
+};
+// Claude Code names its subagent tool `Agent` (older builds: `Task`).
+const _subagentTools = {'task', 'agent', 'delegate', 'subagent', 'spawn_agent'};
 
-String _norm(String? toolName) => (toolName ?? '').toLowerCase().replaceAll(' ', '_');
+String _norm(String? toolName) =>
+    (toolName ?? '').toLowerCase().replaceAll(' ', '_');
 
 /// Canonical names the renderers below know about (runtime set — the source
 /// buckets overlap, e.g. `read_file` is both one-line and a file tool).
@@ -146,19 +172,35 @@ class ToolStatusBadge extends StatelessWidget {
     final (bg, fg, label) = switch (status) {
       ToolStatus.running =>
         dark
-            ? (const Color(0xFF1E3A8A).withValues(alpha: 0.3), const Color(0xFF93C5FD), 'Running')
+            ? (
+                const Color(0xFF1E3A8A).withValues(alpha: 0.3),
+                const Color(0xFF93C5FD),
+                'Running',
+              )
             : (const Color(0xFFDBEAFE), const Color(0xFF1D4ED8), 'Running'),
       ToolStatus.completed =>
         dark
-            ? (const Color(0xFF14532D).withValues(alpha: 0.3), const Color(0xFF86EFAC), 'Completed')
+            ? (
+                const Color(0xFF14532D).withValues(alpha: 0.3),
+                const Color(0xFF86EFAC),
+                'Completed',
+              )
             : (const Color(0xFFDCFCE7), const Color(0xFF15803D), 'Completed'),
       ToolStatus.error =>
         dark
-            ? (const Color(0xFF7F1D1D).withValues(alpha: 0.3), const Color(0xFFFCA5A5), 'Error')
+            ? (
+                const Color(0xFF7F1D1D).withValues(alpha: 0.3),
+                const Color(0xFFFCA5A5),
+                'Error',
+              )
             : (const Color(0xFFFEE2E2), const Color(0xFFB91C1C), 'Error'),
       ToolStatus.denied =>
         dark
-            ? (const Color(0xFF7C2D12).withValues(alpha: 0.3), const Color(0xFFFDBA74), 'Denied')
+            ? (
+                const Color(0xFF7C2D12).withValues(alpha: 0.3),
+                const Color(0xFFFDBA74),
+                'Denied',
+              )
             : (const Color(0xFFFFEDD5), const Color(0xFFC2410C), 'Denied'),
     };
     return Container(
@@ -178,7 +220,11 @@ class ToolStatusBadge extends StatelessWidget {
 /// `CollapsibleOutput` — mono 12px pre, collapsed to 12 lines / 400 chars,
 /// `Show N more lines` / `Show less` toggle.
 class ToolOutputPreview extends StatefulWidget {
-  const ToolOutputPreview({required this.content, this.isError = false, super.key});
+  const ToolOutputPreview({
+    required this.content,
+    this.isError = false,
+    super.key,
+  });
 
   final String content;
   final bool isError;
@@ -214,7 +260,9 @@ class _ToolOutputPreviewState extends State<ToolOutputPreview> {
             fontSize: 12,
             fontFamily: 'monospace',
             height: 1.55,
-            color: widget.isError ? Theme.of(context).colorScheme.error : c.mutedForeground,
+            color: widget.isError
+                ? Theme.of(context).colorScheme.error
+                : c.mutedForeground,
           ),
         ),
         if (isLong)
@@ -223,14 +271,18 @@ class _ToolOutputPreviewState extends State<ToolOutputPreview> {
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 4),
               decoration: BoxDecoration(
-                border: Border(top: BorderSide(color: c.border.withValues(alpha: 0.4))),
+                border: Border(
+                  top: BorderSide(color: c.border.withValues(alpha: 0.4)),
+                ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 spacing: 6,
                 children: [
                   Icon(
-                    _expanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                    _expanded
+                        ? Icons.keyboard_arrow_up
+                        : Icons.keyboard_arrow_down,
                     size: 14,
                     color: c.mutedForeground,
                   ),
@@ -267,7 +319,11 @@ class ToolGroup {
 
 /// Web `toolConfigs` input labels — the group header names the repeated tool.
 String ocToolLabel(String? toolName) => switch (_norm(toolName)) {
-  'bash' || 'execute_command' || 'run_command' || 'shell' || 'terminal' => 'Bash',
+  'bash' ||
+  'execute_command' ||
+  'run_command' ||
+  'shell' ||
+  'terminal' => 'Bash',
   'read_file' || 'read' => 'Read',
   'write_file' || 'create_file' || 'update_file' => 'Write',
   'edit_file' => 'Edit',
@@ -353,7 +409,8 @@ GroupedTranscript groupToolRuns(List<SessionMessage> messages) {
     }
     var j = i;
     // thinking/thought_delta rows are display-hidden mid-run — don't split.
-    while (j < top.length && (_isToolRow(top[j].kind) || _isThinking(top[j].kind))) {
+    while (j < top.length &&
+        (_isToolRow(top[j].kind) || _isThinking(top[j].kind))) {
       j++;
     }
     // Emit in order: consecutive groupable rows of ONE repeated tool collapse
@@ -427,7 +484,12 @@ bool _groupable(SessionMessage m, Map<String, List<SessionMessage>> children) {
 // Per-tool renderers (T15.1/2)
 
 class ToolUseTile extends StatelessWidget {
-  const ToolUseTile({required this.message, required this.childrenMap, this.onFileOpen, super.key});
+  const ToolUseTile({
+    required this.message,
+    required this.childrenMap,
+    this.onFileOpen,
+    super.key,
+  });
 
   final SessionMessage message;
   final Map<String, List<SessionMessage>> childrenMap;
@@ -436,8 +498,9 @@ class ToolUseTile extends StatelessWidget {
   /// File rows, file-list results and edit-tile titles call it.
   final void Function(String path)? onFileOpen;
 
-  List<SessionMessage> get children =>
-      message.toolId == null ? const [] : childrenMap[message.toolId] ?? const [];
+  List<SessionMessage> get children => message.toolId == null
+      ? const []
+      : childrenMap[message.toolId] ?? const [];
 
   @override
   Widget build(BuildContext context) {
@@ -467,12 +530,17 @@ class ToolUseTile extends StatelessWidget {
         // Grep/Glob results carry `toolUseResult.filenames` — web
         // FileListContent renders them as clickable names opening the
         // editor instead of the raw path dump.
-        final files = _searchTools.contains(n) ? _resultFilenames() : const <String>[];
+        final files = _searchTools.contains(n)
+            ? _resultFilenames()
+            : const <String>[];
         return _ToolRow(
           message: message,
           glyph: ocToolGlyph(name),
           label: _oneLineSummary(n, input),
-          extras: [if (files.isNotEmpty) _FileListLinks(files: files, onFileOpen: onFileOpen)],
+          extras: [
+            if (files.isNotEmpty)
+              _FileListLinks(files: files, onFileOpen: onFileOpen),
+          ],
           output: files.isNotEmpty ? '' : _resultText(),
         );
       case ToolDisplay.collapsible:
@@ -499,7 +567,8 @@ class ToolUseTile extends StatelessWidget {
 
   /// Tool output text — the web transcript folds it into the tool row
   /// instead of a second `result` line.
-  String _resultText() => message.toolResult?['content']?.toString() ?? message.content ?? '';
+  String _resultText() =>
+      message.toolResult?['content']?.toString() ?? message.content ?? '';
 
   /// `toolUseResult.filenames` — Grep/Glob file-list payloads.
   List<String> _resultFilenames() {
@@ -526,7 +595,8 @@ class ToolUseTile extends StatelessWidget {
       label: t.chat.tools.updatingTodo,
       extras: [
         if (list.isNotEmpty) TodoListView(todos: list),
-        if (toolStatusFor(message) == ToolStatus.completed) const _SuccessLine('Todo list updated'),
+        if (toolStatusFor(message) == ToolStatus.completed)
+          const _SuccessLine('Todo list updated'),
       ],
     );
   }
@@ -548,7 +618,9 @@ class ToolUseTile extends StatelessWidget {
       message: message,
       glyph: ocToolGlyph('read'),
       label: t.chat.tools.todoReadLabel,
-      extras: [if (todos.isNotEmpty) TodoListView(todos: todos, isResult: true)],
+      extras: [
+        if (todos.isNotEmpty) TodoListView(todos: todos, isResult: true),
+      ],
       output: todos.isNotEmpty ? '' : content,
     );
   }
@@ -557,7 +629,8 @@ class ToolUseTile extends StatelessWidget {
   /// (web `hideOnSuccess`).
   Widget _taskWrite(String n, Map<String, dynamic> input) {
     final label = switch (n) {
-      'taskcreate' || 'task_create' => 'Task ${input['subject'] ?? 'Creating task'}',
+      'taskcreate' ||
+      'task_create' => 'Task ${input['subject'] ?? 'Creating task'}',
       _ => () {
         final parts = [
           if (input['taskId'] != null) '#${input['taskId']}',
@@ -571,7 +644,9 @@ class ToolUseTile extends StatelessWidget {
       message: message,
       glyph: '☰',
       label: label,
-      output: toolStatusFor(message) == ToolStatus.completed ? '' : _resultText(),
+      output: toolStatusFor(message) == ToolStatus.completed
+          ? ''
+          : _resultText(),
     );
   }
 
@@ -579,8 +654,8 @@ class ToolUseTile extends StatelessWidget {
   /// `#id [status] subject` TaskListContent rows.
   Widget _taskList(String n, Map<String, dynamic> input) {
     final label = switch (n) {
-      'taskget' ||
-      'task_get' => 'Task ${input['taskId'] != null ? '#${input['taskId']}' : 'fetching'}',
+      'taskget' || 'task_get' =>
+        'Task ${input['taskId'] != null ? '#${input['taskId']}' : 'fetching'}',
       _ => 'Tasks listing tasks',
     };
     final content = _resultText();
@@ -594,12 +669,17 @@ class ToolUseTile extends StatelessWidget {
   }
 
   String _oneLineSummary(String n, Map<String, dynamic> input) {
-    final path = input['path'] ?? input['file_path'] ?? input['filePath'] ?? input['pattern'];
+    final path =
+        input['path'] ??
+        input['file_path'] ??
+        input['filePath'] ??
+        input['pattern'];
     final query = input['query'] ?? input['pattern'] ?? input['path'];
     return switch (n) {
       'read_file' => 'Read ${path ?? ''}',
       'list_files' => 'List ${path ?? '.'}',
-      'grep' || 'search_files' => 'Search ${input['pattern'] ?? input['query'] ?? ''}',
+      'grep' ||
+      'search_files' => 'Search ${input['pattern'] ?? input['query'] ?? ''}',
       'glob' => 'Glob ${path ?? ''}',
       'web_search' || 'websearch' => 'Web: $query',
       _ => query?.toString() ?? path?.toString() ?? '',
@@ -608,10 +688,16 @@ class ToolUseTile extends StatelessWidget {
 
   /// `.oc-tool-block` — file tools (Write/Edit/…): square panel block with
   /// a 3px `--oc-bg` left border; the diff expands under the title.
-  Widget _fileTool(BuildContext context, ColorScheme cs, String n, Map<String, dynamic> input) {
+  Widget _fileTool(
+    BuildContext context,
+    ColorScheme cs,
+    String n,
+    Map<String, dynamic> input,
+  ) {
     final path = input['path'] ?? input['file_path'] ?? input['filePath'] ?? '';
     final diff = input['diff']?.toString() ?? input['edits']?.toString();
-    final content = input['content']?.toString() ?? input['new_content']?.toString();
+    final content =
+        input['content']?.toString() ?? input['new_content']?.toString();
     return _ToolRow(
       message: message,
       glyph: ocToolGlyph(n),
@@ -621,7 +707,10 @@ class ToolUseTile extends StatelessWidget {
       openPath: '$path',
       onFileOpen: onFileOpen,
       extras: [
-        AppMarkdown(data: '```diff\n${diff ?? content ?? _json(input)}\n```', selectable: false),
+        AppMarkdown(
+          data: '```diff\n${diff ?? content ?? _json(input)}\n```',
+          selectable: false,
+        ),
       ],
       output: _resultText(),
       block: true,
@@ -639,8 +728,13 @@ class ToolUseTile extends StatelessWidget {
 
   /// `BashCommandDisplay` — always a rounded card: chevron + emerald `$` +
   /// command + status/lines, expanding to the combined stdout/stderr.
-  Widget _bashTool(BuildContext context, ColorScheme cs, Map<String, dynamic> input) {
-    final cmd = '${input['command'] ?? input['cmd'] ?? input['script'] ?? _json(input)}';
+  Widget _bashTool(
+    BuildContext context,
+    ColorScheme cs,
+    Map<String, dynamic> input,
+  ) {
+    final cmd =
+        '${input['command'] ?? input['cmd'] ?? input['script'] ?? _json(input)}';
     final description = input['description']?.toString();
     return _ToolRow(
       message: message,
@@ -664,10 +758,18 @@ class ToolUseTile extends StatelessWidget {
   }
 
   /// Web row label: the tool name followed by the command line.
-  String _commandLabel(String cmd) => cmd.replaceAll(RegExp(r'\s+'), ' ').trim();
+  String _commandLabel(String cmd) =>
+      cmd.replaceAll(RegExp(r'\s+'), ' ').trim();
 
-  Widget _subagent(BuildContext context, ColorScheme cs, Map<String, dynamic> input) {
-    final label = input['description'] ?? input['prompt'] ?? input['task'] ?? 'Subagent';
+  Widget _subagent(
+    BuildContext context,
+    ColorScheme cs,
+    Map<String, dynamic> input,
+  ) {
+    final label =
+        input['description'] ?? input['prompt'] ?? input['task'] ?? 'Subagent';
+    // The subagent's final answer arrives as this call's tool result.
+    final result = message.toolResult?['content']?.toString() ?? '';
     return ExpansionTile(
       dense: true,
       tilePadding: EdgeInsets.zero,
@@ -692,8 +794,17 @@ class ToolUseTile extends StatelessWidget {
             children: [
               for (final c in children)
                 c.kind == 'tool_use'
-                    ? ToolUseTile(message: c, childrenMap: childrenMap, onFileOpen: onFileOpen)
+                    ? ToolUseTile(
+                        message: c,
+                        childrenMap: childrenMap,
+                        onFileOpen: onFileOpen,
+                      )
                     : ToolResultTile(message: c),
+              if (result.isNotEmpty)
+                ToolOutputPreview(
+                  content: result,
+                  isError: toolStatusFor(message) == ToolStatus.error,
+                ),
             ],
           ),
         ),
@@ -708,8 +819,14 @@ class ToolUseTile extends StatelessWidget {
   /// description), with the picked answer highlighted when the transcript
   /// carries one. The interactive panel lives in the chat pane's
   /// `_PermissionBanner` for the ACP live path.
-  Widget _qaContent(BuildContext context, ColorScheme cs, Map<String, dynamic> input) {
-    final questions = input['questions'] is List ? input['questions'] as List : const <dynamic>[];
+  Widget _qaContent(
+    BuildContext context,
+    ColorScheme cs,
+    Map<String, dynamic> input,
+  ) {
+    final questions = input['questions'] is List
+        ? input['questions'] as List
+        : const <dynamic>[];
     if (questions.isEmpty) return const SizedBox.shrink();
     final answers = input['answers'] is Map
         ? Map<String, dynamic>.from(input['answers'] as Map)
@@ -734,7 +851,10 @@ class ToolUseTile extends StatelessWidget {
               Expanded(
                 child: Text(
                   t.chat.permissionRequest.question,
-                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                  ),
                 ),
               ),
             ],
@@ -750,11 +870,17 @@ class ToolUseTile extends StatelessWidget {
   }
 
   /// One question inside [_qaContent] — header, text and its option rows.
-  Widget _qaQuestion(ColorScheme cs, Map<String, dynamic> q, Map<String, dynamic> answers) {
+  Widget _qaQuestion(
+    ColorScheme cs,
+    Map<String, dynamic> q,
+    Map<String, dynamic> answers,
+  ) {
     final header = q['header']?.toString();
     final question = q['question']?.toString();
     final multi = q['multiSelect'] == true;
-    final rawOptions = q['options'] is List ? q['options'] as List : const <dynamic>[];
+    final rawOptions = q['options'] is List
+        ? q['options'] as List
+        : const <dynamic>[];
     final answer = question != null ? answers[question] : null;
     final picked = <String>{};
     if (answer is String) {
@@ -765,7 +891,10 @@ class ToolUseTile extends StatelessWidget {
     final options = [
       for (final o in rawOptions)
         if (o is Map)
-          (label: '${o['label'] ?? o['text'] ?? ''}', description: o['description']?.toString())
+          (
+            label: '${o['label'] ?? o['text'] ?? ''}',
+            description: o['description']?.toString(),
+          )
         else
           (label: '$o', description: null),
     ];
@@ -773,11 +902,17 @@ class ToolUseTile extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (header?.trim().isNotEmpty ?? false)
-          Text(header!, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+          Text(
+            header!,
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+          ),
         if (question?.trim().isNotEmpty ?? false)
           Padding(
             padding: const EdgeInsets.only(top: 2),
-            child: Text(question!, style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant)),
+            child: Text(
+              question!,
+              style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
+            ),
           ),
         for (final o in options)
           Padding(
@@ -790,7 +925,9 @@ class ToolUseTile extends StatelessWidget {
                   child: Icon(
                     picked.contains(o.label)
                         ? (multi ? Icons.check_box : Icons.radio_button_checked)
-                        : (multi ? Icons.check_box_outline_blank : Icons.radio_button_off),
+                        : (multi
+                              ? Icons.check_box_outline_blank
+                              : Icons.radio_button_off),
                     size: 16,
                     color: picked.contains(o.label) ? cs.primary : cs.outline,
                   ),
@@ -802,7 +939,10 @@ class ToolUseTile extends StatelessWidget {
                     children: [
                       Text(o.label, style: const TextStyle(fontSize: 13)),
                       if (o.description?.trim().isNotEmpty ?? false)
-                        Text(o.description!, style: TextStyle(fontSize: 11, color: cs.outline)),
+                        Text(
+                          o.description!,
+                          style: TextStyle(fontSize: 11, color: cs.outline),
+                        ),
                     ],
                   ),
                 ),
@@ -812,21 +952,33 @@ class ToolUseTile extends StatelessWidget {
         if (answer != null && picked.isEmpty)
           Padding(
             padding: const EdgeInsets.only(top: 4),
-            child: Text('→ $answer', style: TextStyle(fontSize: 12, color: cs.primary)),
+            child: Text(
+              '→ $answer',
+              style: TextStyle(fontSize: 12, color: cs.primary),
+            ),
           ),
       ],
     );
   }
 
-  Widget _default(BuildContext context, ColorScheme cs, String name, Map<String, dynamic> input) =>
-      _ToolRow(
-        message: message,
-        glyph: ocToolGlyph(name),
-        label: name,
-        copyText: _json(input),
-        extras: [Text(_json(input), style: const TextStyle(fontSize: 12, fontFamily: 'monospace'))],
-        output: _resultText(),
-      );
+  Widget _default(
+    BuildContext context,
+    ColorScheme cs,
+    String name,
+    Map<String, dynamic> input,
+  ) => _ToolRow(
+    message: message,
+    glyph: ocToolGlyph(name),
+    label: name,
+    copyText: _json(input),
+    extras: [
+      Text(
+        _json(input),
+        style: const TextStyle(fontSize: 12, fontFamily: 'monospace'),
+      ),
+    ],
+    output: _resultText(),
+  );
 
   String _json(Map<String, dynamic> input) =>
       input.isEmpty ? '{}' : const JsonEncoder.withIndent('  ').convert(input);
@@ -840,7 +992,8 @@ class ToolResultTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final content = message.toolResult?['content']?.toString() ?? message.content ?? '';
+    final content =
+        message.toolResult?['content']?.toString() ?? message.content ?? '';
     return ExpansionTile(
       dense: true,
       tilePadding: EdgeInsets.zero,
@@ -851,7 +1004,10 @@ class ToolResultTile extends StatelessWidget {
       ),
       title: Text(
         message.toolName ?? 'result',
-        style: TextStyle(fontSize: 12, color: message.isError ? cs.error : cs.outline),
+        style: TextStyle(
+          fontSize: 12,
+          color: message.isError ? cs.error : cs.outline,
+        ),
       ),
       children: [
         Align(
@@ -873,7 +1029,11 @@ class ToolResultTile extends StatelessWidget {
 
 /// Collapsed run of tool rows (T15.11).
 class ToolGroupTile extends StatelessWidget {
-  const ToolGroupTile({required this.group, required this.tileBuilder, super.key});
+  const ToolGroupTile({
+    required this.group,
+    required this.tileBuilder,
+    super.key,
+  });
 
   final ToolGroup group;
   final Widget Function(SessionMessage) tileBuilder;
@@ -889,7 +1049,11 @@ class ToolGroupTile extends StatelessWidget {
     ];
     final name = _norm(tools.firstOrNull?.toolName);
     final status = groupStatus(group.messages);
-    final previews = tools.take(2).map(toolGroupPreview).where((p) => p.isNotEmpty).toList();
+    final previews = tools
+        .take(2)
+        .map(toolGroupPreview)
+        .where((p) => p.isNotEmpty)
+        .toList();
     final extra = tools.length - previews.length;
     final preview = previews.isEmpty
         ? (extra > 0 ? '+$extra more' : '')
@@ -906,15 +1070,25 @@ class ToolGroupTile extends StatelessWidget {
       tilePadding: EdgeInsets.zero,
       leading: Text(
         ocToolGlyph(name),
-        style: TextStyle(fontFamily: 'monospace', fontSize: 13, color: c.primary),
+        style: TextStyle(
+          fontFamily: 'monospace',
+          fontSize: 13,
+          color: c.primary,
+        ),
       ),
       title: Row(
         spacing: 6,
         children: [
-          Text(ocToolLabel(name), style: TextStyle(fontSize: 13, color: c.foreground)),
+          Text(
+            ocToolLabel(name),
+            style: TextStyle(fontSize: 13, color: c.foreground),
+          ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-            decoration: BoxDecoration(color: c.secondary, borderRadius: BorderRadius.circular(999)),
+            decoration: BoxDecoration(
+              color: c.secondary,
+              borderRadius: BorderRadius.circular(999),
+            ),
             child: Text('x${tools.length}', style: badgeStyle),
           ),
           if (preview.isNotEmpty)
@@ -923,7 +1097,11 @@ class ToolGroupTile extends StatelessWidget {
                 preview,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontFamily: 'monospace', fontSize: 12, color: c.mutedForeground),
+                style: TextStyle(
+                  fontFamily: 'monospace',
+                  fontSize: 12,
+                  color: c.mutedForeground,
+                ),
               ),
             ),
           if (status != ToolStatus.completed) ToolStatusBadge(status: status),
@@ -983,7 +1161,9 @@ class _PlanReviewPanelState extends State<PlanReviewPanel> {
               child: Row(
                 children: [
                   Icon(
-                    _expanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_right,
+                    _expanded
+                        ? Icons.keyboard_arrow_down
+                        : Icons.keyboard_arrow_right,
                     size: 16,
                     color: cs.outline,
                   ),
@@ -1014,7 +1194,10 @@ class _PlanReviewPanelState extends State<PlanReviewPanel> {
                 border: Border(top: BorderSide(color: cs.outlineVariant)),
               ),
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 8,
+                ),
                 child: AppMarkdown(data: widget.content, selectable: false),
               ),
             ),
@@ -1128,7 +1311,8 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
     for (var i = 0; i < _questions.length; i++) {
       final q = _questions[i];
       final sel = <String>{...?_selections[i]};
-      if (_otherActive[i] == true && (_otherText[i]?.text.trim().isNotEmpty ?? false)) {
+      if (_otherActive[i] == true &&
+          (_otherText[i]?.text.trim().isNotEmpty ?? false)) {
         sel.add(_otherText[i]!.text.trim());
       }
       if (sel.isNotEmpty) {
@@ -1156,7 +1340,10 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
     final q = qs[_step];
     final options = [
       for (final o in q['options'] as List? ?? const [])
-        if (o is Map) o['label']?.toString() ?? o['text']?.toString() ?? '$o' else '$o',
+        if (o is Map)
+          o['label']?.toString() ?? o['text']?.toString() ?? '$o'
+        else
+          '$o',
     ];
     final multi = q['multiSelect'] == true;
     final selected = _selections[_step] ??= {};
@@ -1178,8 +1365,12 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
-                  q['header']?.toString() ?? 'Question ${_step + 1}/${qs.length}',
-                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                  q['header']?.toString() ??
+                      'Question ${_step + 1}/${qs.length}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                  ),
                 ),
               ),
               if (qs.length > 1)
@@ -1190,7 +1381,10 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
             ],
           ),
           if (q['question'] != null)
-            Padding(padding: const EdgeInsets.only(top: 4), child: Text(q['question'].toString())),
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(q['question'].toString()),
+            ),
           if ((q['planContent']?.toString() ?? '').isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(top: 8),
@@ -1208,7 +1402,11 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
                 onTap: () {
                   final freeText = _isFreeTextOption(o);
                   if (multi) {
-                    setState(() => selected.contains(o) ? selected.remove(o) : selected.add(o));
+                    setState(
+                      () => selected.contains(o)
+                          ? selected.remove(o)
+                          : selected.add(o),
+                    );
                     return;
                   }
                   setState(() {
@@ -1224,14 +1422,19 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
                   if (_step < qs.length - 1) {
                     setState(() => _step++);
                   } else {
-                    widget.onDecision(true, {...widget.input, 'answers': _answers()});
+                    widget.onDecision(true, {
+                      ...widget.input,
+                      'answers': _answers(),
+                    });
                   }
                 },
                 child: Row(
                   children: [
                     Icon(
                       multi
-                          ? (selected.contains(o) ? Icons.check_box : Icons.check_box_outline_blank)
+                          ? (selected.contains(o)
+                                ? Icons.check_box
+                                : Icons.check_box_outline_blank)
                           : (selected.contains(o)
                                 ? Icons.radio_button_checked
                                 : Icons.radio_button_off),
@@ -1239,7 +1442,9 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
                       color: selected.contains(o) ? cs.primary : cs.outline,
                     ),
                     const SizedBox(width: 6),
-                    Expanded(child: Text(o, style: const TextStyle(fontSize: 13))),
+                    Expanded(
+                      child: Text(o, style: const TextStyle(fontSize: 13)),
+                    ),
                   ],
                 ),
               ),
@@ -1255,15 +1460,20 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
                 ),
               const Spacer(),
               TextButton(
-                onPressed: () =>
-                    widget.onDecision(true, {...widget.input, 'answers': <String, dynamic>{}}),
+                onPressed: () => widget.onDecision(true, {
+                  ...widget.input,
+                  'answers': <String, dynamic>{},
+                }),
                 child: Text(t.chat.askUserQuestion.skip),
               ),
               const SizedBox(width: 8),
               FilledButton(
                 onPressed: _step < qs.length - 1
                     ? () => setState(() => _step++)
-                    : () => widget.onDecision(true, {...widget.input, 'answers': _answers()}),
+                    : () => widget.onDecision(true, {
+                        ...widget.input,
+                        'answers': _answers(),
+                      }),
                 child: Text(_step < qs.length - 1 ? 'Next' : 'Submit'),
               ),
             ],
@@ -1289,7 +1499,10 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
             children: [
               const Icon(Icons.radio_button_off, size: 18),
               const SizedBox(width: 6),
-              Text(t.chat.askUserQuestion.other, style: TextStyle(fontSize: 13, color: cs.outline)),
+              Text(
+                t.chat.askUserQuestion.other,
+                style: TextStyle(fontSize: 13, color: cs.outline),
+              ),
             ],
           ),
         ),
@@ -1383,7 +1596,9 @@ class _ToolRowState extends ConsumerState<_ToolRow> {
             child: Icon(
               Icons.chevron_right,
               size: 16,
-              color: hasBody ? c.mutedForeground : c.mutedForeground.withValues(alpha: 0),
+              color: hasBody
+                  ? c.mutedForeground
+                  : c.mutedForeground.withValues(alpha: 0),
             ),
           ),
           // `.oc-tool-icon` — 2ch glyph; emerald `$` for shell rows.
@@ -1414,7 +1629,9 @@ class _ToolRowState extends ConsumerState<_ToolRow> {
                         fontSize: 13,
                         fontFamily: 'monospace',
                         color: error ? cs.error : c.primary,
-                        decoration: error ? TextDecoration.lineThrough : TextDecoration.underline,
+                        decoration: error
+                            ? TextDecoration.lineThrough
+                            : TextDecoration.underline,
                         decorationColor: error ? cs.error : c.primary,
                       ),
                     ),
@@ -1438,7 +1655,10 @@ class _ToolRowState extends ConsumerState<_ToolRow> {
           if (status == ToolStatus.running && bash)
             SizedBox.square(
               dimension: 10,
-              child: CircularProgressIndicator(strokeWidth: 1.5, color: c.mutedForeground),
+              child: CircularProgressIndicator(
+                strokeWidth: 1.5,
+                color: c.mutedForeground,
+              ),
             )
           else if (status != ToolStatus.completed)
             ToolStatusBadge(status: status),
@@ -1453,8 +1673,13 @@ class _ToolRowState extends ConsumerState<_ToolRow> {
             ),
           if (widget.copyText != null)
             GestureDetector(
-              onTap: () => unawaited(copyTextWithFeedback(context, widget.copyText!)),
-              child: Icon(Icons.copy_outlined, size: 13, color: c.mutedForeground),
+              onTap: () =>
+                  unawaited(copyTextWithFeedback(context, widget.copyText!)),
+              child: Icon(
+                Icons.copy_outlined,
+                size: 13,
+                color: c.mutedForeground,
+              ),
             ),
         ],
       ),
@@ -1465,7 +1690,9 @@ class _ToolRowState extends ConsumerState<_ToolRow> {
         : Container(
             width: double.infinity,
             decoration: BoxDecoration(
-              border: Border(top: BorderSide(color: c.border.withValues(alpha: 0.5))),
+              border: Border(
+                top: BorderSide(color: c.border.withValues(alpha: 0.5)),
+              ),
             ),
             padding: const EdgeInsets.fromLTRB(12, 8, 12, 10),
             child: Column(
@@ -1478,21 +1705,26 @@ class _ToolRowState extends ConsumerState<_ToolRow> {
                 if (ref.watch(uiPreferencesProvider).showRawParameters &&
                     widget.message.toolInput != null)
                   Text(
-                    const JsonEncoder.withIndent('  ').convert(widget.message.toolInput),
+                    const JsonEncoder.withIndent('  ')
+                        .convert(widget.message.toolInput),
                     style: TextStyle(
                       fontSize: 11,
                       fontFamily: 'monospace',
                       color: c.mutedForeground,
                     ),
                   ),
-                if (hasOutput) ToolOutputPreview(content: output, isError: error),
+                if (hasOutput)
+                  ToolOutputPreview(content: output, isError: error),
               ],
             ),
           );
 
     // `.oc-tool-row` — bare baseline row, nothing to expand.
     if (!widget.alwaysCard && !widget.block && !hasBody) {
-      return Padding(padding: const EdgeInsets.only(left: 12, top: 3), child: header);
+      return Padding(
+        padding: const EdgeInsets.only(left: 12, top: 3),
+        child: header,
+      );
     }
 
     final decoration = widget.block
@@ -1505,7 +1737,9 @@ class _ToolRowState extends ConsumerState<_ToolRow> {
             color: c.muted.withValues(alpha: 0.55),
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: error ? cs.error.withValues(alpha: 0.5) : c.border.withValues(alpha: 0.9),
+              color: error
+                  ? cs.error.withValues(alpha: 0.5)
+                  : c.border.withValues(alpha: 0.9),
             ),
           );
 
@@ -1516,7 +1750,10 @@ class _ToolRowState extends ConsumerState<_ToolRow> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          InkWell(onTap: hasBody ? () => setState(() => _open = !_open) : null, child: header),
+          InkWell(
+            onTap: hasBody ? () => setState(() => _open = !_open) : null,
+            child: header,
+          ),
           if (_open && body != null) body,
         ],
       ),
@@ -1549,7 +1786,10 @@ class TodoListView extends StatelessWidget {
     final t = Theme.of(context).textTheme;
     final items = [
       for (final todo in todos)
-        if (todo is Map && todo['content'] is String && todo['status'] is String) todo,
+        if (todo is Map &&
+            todo['content'] is String &&
+            todo['status'] is String)
+          todo,
     ];
     if (items.isEmpty) return const SizedBox.shrink();
     return Column(
@@ -1572,9 +1812,13 @@ class TodoListView extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(top: 1),
                   child: Icon(
-                    (_statusIcons[todo['status']] ?? _statusIcons['pending']!).$1,
+                    (_statusIcons[todo['status']] ?? _statusIcons['pending']!)
+                        .$1,
                     size: 14,
-                    color: (_statusIcons[todo['status']] ?? _statusIcons['pending']!).$2,
+                    color:
+                        (_statusIcons[todo['status']] ??
+                                _statusIcons['pending']!)
+                            .$2,
                   ),
                 ),
                 const SizedBox(width: 6),
@@ -1582,8 +1826,12 @@ class TodoListView extends StatelessWidget {
                   child: Text(
                     '${todo['content']}',
                     style: t.bodySmall?.copyWith(
-                      decoration: todo['status'] == 'completed' ? TextDecoration.lineThrough : null,
-                      color: todo['status'] == 'completed' ? c.mutedForeground : c.foreground,
+                      decoration: todo['status'] == 'completed'
+                          ? TextDecoration.lineThrough
+                          : null,
+                      color: todo['status'] == 'completed'
+                          ? c.mutedForeground
+                          : c.foreground,
                     ),
                   ),
                 ),
@@ -1624,14 +1872,20 @@ class TaskListView extends StatelessWidget {
       final status = m.group(2) ?? 'pending';
       tasks.add((
         id: m.group(1)!,
-        status: const {'completed', 'in_progress'}.contains(status) ? status : 'pending',
+        status: const {'completed', 'in_progress'}.contains(status)
+            ? status
+            : 'pending',
         subject: m.group(3)!.trim(),
       ));
     }
     if (tasks.isEmpty) {
       return Text(
         content,
-        style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: c.mutedForeground),
+        style: TextStyle(
+          fontSize: 11,
+          fontFamily: 'monospace',
+          color: c.mutedForeground,
+        ),
       );
     }
     final done = tasks.where((x) => x.status == 'completed').length;
@@ -1676,7 +1930,10 @@ class TaskListView extends StatelessWidget {
                 const SizedBox(width: 6),
                 Text(
                   '#${task.id}',
-                  style: t.labelSmall?.copyWith(fontFamily: 'monospace', color: c.mutedForeground),
+                  style: t.labelSmall?.copyWith(
+                    fontFamily: 'monospace',
+                    color: c.mutedForeground,
+                  ),
                 ),
                 const SizedBox(width: 6),
                 Expanded(
@@ -1685,22 +1942,34 @@ class TaskListView extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: t.bodySmall?.copyWith(
-                      decoration: task.status == 'completed' ? TextDecoration.lineThrough : null,
-                      color: task.status == 'completed' ? c.mutedForeground : null,
+                      decoration: task.status == 'completed'
+                          ? TextDecoration.lineThrough
+                          : null,
+                      color: task.status == 'completed'
+                          ? c.mutedForeground
+                          : null,
                     ),
                   ),
                 ),
                 const SizedBox(width: 6),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 4,
+                    vertical: 1,
+                  ),
                   decoration: BoxDecoration(
-                    border: Border.all(color: _statusColors[task.status]!.withValues(alpha: 0.4)),
+                    border: Border.all(
+                      color: _statusColors[task.status]!.withValues(alpha: 0.4),
+                    ),
                     borderRadius: BorderRadius.circular(3),
                     color: _statusColors[task.status]!.withValues(alpha: 0.12),
                   ),
                   child: Text(
                     task.status.replaceAll('_', ' '),
-                    style: TextStyle(fontSize: 10, color: _statusColors[task.status]),
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: _statusColors[task.status],
+                    ),
                   ),
                 ),
               ],
@@ -1724,7 +1993,10 @@ class _SuccessLine extends StatelessWidget {
       children: [
         const Icon(Icons.check, size: 12, color: Color(0xFF22C55E)),
         const SizedBox(width: 6),
-        Text(text, style: const TextStyle(fontSize: 12, color: Color(0xFF22C55E))),
+        Text(
+          text,
+          style: const TextStyle(fontSize: 12, color: Color(0xFF22C55E)),
+        ),
       ],
     );
   }
@@ -1766,7 +2038,10 @@ class _FileListLinks extends StatelessWidget {
                 ),
               ),
               if (i < files.length - 1)
-                Text(',', style: TextStyle(fontSize: 10, color: c.mutedForeground)),
+                Text(
+                  ',',
+                  style: TextStyle(fontSize: 10, color: c.mutedForeground),
+                ),
             ],
           ),
       ],
