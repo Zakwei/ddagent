@@ -171,6 +171,8 @@ void main() {
       expect(windowMatchesModel('Sonnet · Weekly', 'opus[1m]'), isFalse);
       expect(windowMatchesModel('Opus · Weekly', 'claude-opus-4-1'), isTrue);
       expect(windowMatchesModel('Opus · Weekly', 'sonnet'), isFalse);
+      expect(windowMatchesModel('Fable · Weekly', 'claude-fable-5-1'), isTrue);
+      expect(windowMatchesModel('Fable · Weekly', 'opus'), isFalse);
     },
   );
 
@@ -203,13 +205,35 @@ void main() {
         ],
       );
       expect(quotaPeriodSegments(account, 'commandcode/x'), [
-        ('session', 0.0, null),
-        ('weekly', 17.0, null),
-        ('monthly', 35.0, null),
+        ('session', 0.0, null, '5h'),
+        ('weekly', 17.0, null, 'W'),
+        ('monthly', 35.0, null, 'M'),
       ]);
       expect(quotaPeriodSegments(null, 'devin'), isEmpty);
     },
   );
+
+  test('quotaPeriodSegments marks Claude model-scoped weekly caps apart', () {
+    const account = QuotaAccount(
+      id: 'claude',
+      windows: [
+        QuotaWindow(label: '5h', kind: 'session', percent: 6),
+        QuotaWindow(label: 'Weekly', kind: 'weekly', percent: 20),
+        QuotaWindow(label: 'Fable · Weekly', kind: 'weekly', percent: 3),
+        QuotaWindow(label: 'Opus · Weekly', kind: 'weekly', percent: 50),
+      ],
+    );
+    expect(quotaPeriodSegments(account, 'claude-fable-5-1'), [
+      ('session', 6.0, null, '5h'),
+      ('weekly', 20.0, null, 'W'),
+      ('weekly', 3.0, null, 'FW'),
+    ]);
+    expect(quotaPeriodSegments(account, 'opus').map((s) => s.$4), [
+      '5h',
+      'W',
+      'OW',
+    ]);
+  });
 
   test('quotaTimeRemainingPercent measures the clock until reset', () {
     final now = DateTime.utc(2026, 9, 30).millisecondsSinceEpoch;

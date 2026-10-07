@@ -46,7 +46,8 @@ function quotaCheckFor(candidate: OrchestratorCandidate): { section: string; lab
   if (candidate.provider === 'claude') {
     // Global windows always apply; a scoped weekly limit only applies to its model.
     const label = /sonnet/i.test(m) ? /^(5h|Weekly|Sonnet · Weekly)$/
-      : /opus/i.test(m) ? /^(5h|Weekly|Opus · Weekly)$/ : /^(5h|Weekly)$/;
+      : /opus/i.test(m) ? /^(5h|Weekly|Opus · Weekly)$/
+        : /fable/i.test(m) ? /^(5h|Weekly|Fable · Weekly)$/ : /^(5h|Weekly)$/;
     return { section: 'claude', label };
   }
   if (candidate.provider !== 'opencode') return { section: candidate.provider };

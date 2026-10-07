@@ -2120,6 +2120,10 @@ test('router: Claude scoped quota only blocks the matching model', () => {
   assert.equal(makeRouter([account], ['claude'], config).route('code').ok, true);
   config.pool[0].model = 'claude-sonnet-4';
   assert.equal(makeRouter([account], ['claude'], config).route('code').ok, false);
+  account.windows[1].label = 'Fable · Weekly';
+  assert.equal(makeRouter([account], ['claude'], config).route('code').ok, true);
+  config.pool[0].model = 'claude-fable-5-1';
+  assert.equal(makeRouter([account], ['claude'], config).route('code').ok, false);
 });
 
 test('router: standalone Antigravity checks its Gemini quota pool', () => {

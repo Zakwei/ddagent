@@ -160,6 +160,18 @@ async function fetchClaude(dependencies: QuotaProviderDependencies): Promise<Quo
       windows.push(window(label, kind, usage.utilization, readOptionalString(usage.resets_at) ?? null));
     }
   }
+  // Newer caps (e.g. Fable) only appear in `limits` as model-scoped weekly
+  // entries; the `<Model> · Weekly` label is what the client filters on.
+  for (const entry of Array.isArray(data.limits) ? data.limits : []) {
+    const limit = readObjectRecord(entry);
+    const model = readObjectRecord(readObjectRecord(limit?.scope)?.model);
+    const name = readOptionalString(model?.display_name);
+    if (limit?.kind !== 'weekly_scoped' || !name) continue;
+    if (typeof limit.percent !== 'number' || !Number.isFinite(limit.percent)) continue;
+    const label = `${name} · Weekly`;
+    if (windows.some((w) => w.label === label)) continue;
+    windows.push(window(label, 'weekly', limit.percent, readOptionalString(limit.resets_at) ?? null));
+  }
   const plan = readOptionalString(oauth?.subscriptionType);
   // Same field the auth provider reads for the ambient account label.
   const label = readOptionalString(auth.email) ?? readOptionalString(auth.user) ?? '';

@@ -315,6 +315,7 @@ bool windowMatchesModel(String windowKey, String? model) {
   if (windowKey.startsWith('Claude and GPT')) return isClaudeOrGpt;
   if (windowKey.startsWith('Sonnet ·')) return m.contains('sonnet');
   if (windowKey.startsWith('Opus ·')) return m.contains('opus');
+  if (windowKey.startsWith('Fable ·')) return m.contains('fable');
   return true;
 }
 
@@ -349,17 +350,26 @@ const quotaPeriodLetter = {
   'monthly': 'M',
 };
 
-/// `(kind, percent, resetsAt)` for every present period window, in
+/// Pill marker for [w]: the period letter, prefixed with the model-family
+/// initial for Claude's model-scoped caps (`Fable · Weekly` → `FW`) so they
+/// never read as the global weekly window.
+String quotaSegmentLetter(QuotaWindow w) {
+  final letter = quotaPeriodLetter[w.kind] ?? w.kind;
+  final scope = RegExp(r'^(Sonnet|Opus|Fable) · ').firstMatch(w.label);
+  return scope == null ? letter : '${scope.group(1)![0]}$letter';
+}
+
+/// `(kind, percent, resetsAt, letter)` for every present period window, in
 /// [quotaPeriodKinds] order — parity with the web `sectionPeriodWindows`.
 /// Windows with an unrecognised kind are skipped; zero-percent windows kept.
-List<(String, double, String?)> quotaPeriodSegments(
+List<(String, double, String?, String)> quotaPeriodSegments(
   QuotaAccount? account,
   String? model,
 ) => [
   for (final kind in quotaPeriodKinds)
     for (final w in account?.windows ?? const <QuotaWindow>[])
       if (w.kind == kind && windowMatchesModel(w.label, model))
-        (kind, w.percent, w.resetsAt),
+        (kind, w.percent, w.resetsAt, quotaSegmentLetter(w)),
 ];
 
 /// Full length of each period window — used to measure remaining clock time.
@@ -533,7 +543,7 @@ class QuotaBadge extends ConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 spacing: 3,
                 children: [
-                  for (final (kind, segPercent, resetsAt) in segments)
+                  for (final (kind, segPercent, resetsAt, letter) in segments)
                     Builder(
                       builder: (context) {
                         // Pill colour = usage pace vs the elapsed window
@@ -561,7 +571,7 @@ class QuotaBadge extends ConsumerWidget {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              '${_percentText(segPercent)}%${quotaPeriodLetter[kind] ?? kind}',
+                              '${_percentText(segPercent)}%$letter',
                               style: Theme.of(context).textTheme.bodySmall
                                   ?.copyWith(
                                     fontSize: 10,

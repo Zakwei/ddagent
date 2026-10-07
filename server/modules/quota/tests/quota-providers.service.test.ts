@@ -454,6 +454,15 @@ test('Claude maps session, weekly and model-specific windows without inventing n
       return httpResponse(200, JSON.stringify({
         five_hour: { utilization: 0, resets_at: '2099-01-01T00:00:00Z' },
         seven_day: { utilization: 75 }, seven_day_sonnet: { utilization: 100 }, seven_day_opus: null,
+        limits: [
+          { kind: 'session', percent: 0, scope: null },
+          { kind: 'weekly_scoped', percent: 100, scope: { model: { display_name: 'Sonnet' } } },
+          {
+            kind: 'weekly_scoped', percent: 12, resets_at: '2099-01-07T00:00:00Z',
+            scope: { model: { id: null, display_name: 'Fable' } },
+          },
+          { kind: 'weekly_scoped', percent: null, scope: { model: { display_name: 'Opus' } } },
+        ],
       }));
     },
   });
@@ -461,8 +470,10 @@ test('Claude maps session, weekly and model-specific windows without inventing n
   assert.equal(claude.plan, 'Claude max');
   assert.equal(claude.status, 'active');
   assert.equal(claude.accountLabel, 'claude@example.com');
-  assert.deepEqual(claude.windows.map((w) => [w.label, w.percent]),
-    [['5h', 0], ['Weekly', 75], ['Sonnet · Weekly', 100]]);
+  // Scoped `limits` add new families (Fable) without duplicating seven_day_* ones.
+  assert.deepEqual(claude.windows.map((w) => [w.label, w.kind, w.percent]),
+    [['5h', 'session', 0], ['Weekly', 'weekly', 75], ['Sonnet · Weekly', 'weekly', 100],
+      ['Fable · Weekly', 'weekly', 12]]);
 });
 
 test('native subscription errors stay isolated and do not expose response bodies', async () => {
