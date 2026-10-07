@@ -7,80 +7,149 @@
   AGENTS.md requires per-language release notes split by
   `<!-- lang:<code> -->` markers — the Flutter Settings → About changelog
   renders only the section matching the active UI language, `en` is the
-  fallback. All 12 UI locales are below; replace the TODO lines in EVERY
-  section, then publish the draft. (This header comment never renders — it
-  sits before the first lang marker and markdown comments are invisible
-  anyway.)
+  fallback. All 12 UI locales are below.
 -->
 <!-- lang:en -->
+### What's new
+- Android: the app now updates itself. When a newer release exists, the update banner downloads the APK and hands it to the Android installer — tap Update and confirm the install.
+- Android builds are signed with a permanent release key from now on, so each version installs over the previous one without reinstalling.
+
 ### Bug fixes
-- Queue: queued messages are now also drained by a periodic idle sweep, so a message queued during a session no longer stays stuck when the provider's "turn complete" notification is missed.
-- Web client: the flutter-web server now proxies `/health` to the backend, so Settings → About shows the server version again and "check for updates" works instead of failing to decode the response.
-- Mobile: the server-connect screen no longer spins forever — the connect flow is guarded, so an unexpected error still leaves a working retry button.
-- Mobile: a mode or model menu opened from the compact `+` sheet now appears next to the tapped control instead of at the top of the screen.
+- The update banner on a phone no longer updates only the connected server: it compares the app's own version and installs the new APK.
+- Server: release info now lists the downloadable files, so the app can pick the right asset.
+- Android: the release build resolves the signing keystore correctly — the wrong path made properly signed releases impossible.
+
+### One-time step
+- Builds up to v0.8.8 were signed with a temporary key, so Android refuses to install v0.8.9 over them. Uninstall the app once, install v0.8.9, and in-app updates work from then on.
 <!-- lang:pl -->
+### Nowości
+- Android: aplikacja aktualizuje się teraz sama. Gdy pojawi się nowsze wydanie, banner aktualizacji pobiera APK i przekazuje go instalatorowi Androida — dotknij Aktualizuj i potwierdź instalację.
+- Wydania na Androida są od teraz podpisywane stałym kluczem, więc każda wersja instaluje się na poprzednią bez przeinstalowywania.
+
 ### Poprawki błędów
-- Kolejka: zakolejkowane wiadomości są teraz dosyłane także przez okresowy sweep bezczynności — wiadomość zakolejkowana w trakcie sesji nie zostaje już zablokowana, gdy powiadomienie o zakończeniu tury od providera nie dotrze.
-- Klient web: serwer flutter-web przekazuje teraz `/health` do backendu, więc Ustawienia → O aplikacji znów pokazują wersję serwera, a „sprawdź aktualizacje” działa zamiast wywalać się na dekodowaniu odpowiedzi.
-- Mobile: ekran łączenia z serwerem nie kręci się już w nieskończoność — przepływ połączenia jest zabezpieczony, więc nieoczekiwany błąd zostawia działający przycisk ponowienia.
-- Mobile: menu trybu lub modelu otwierane z kompaktowego arkusza `+` pojawia się teraz przy dotkniętym elemencie, a nie na górze ekranu.
+- Banner aktualizacji na telefonie nie aktualizuje już tylko podłączonego serwera: porównuje wersję samej aplikacji i instaluje nowy APK.
+- Serwer: informacje o wydaniu zawierają teraz listę plików do pobrania, więc aplikacja wybiera właściwy artefakt.
+- Android: build wydania poprawnie odnajduje keystore — błędna ścieżka uniemożliwiała podpisane wydania.
+
+### Jednorazowy krok
+- Wersje do v0.8.8 włącznie były podpisane tymczasowym kluczem, więc Android nie zainstaluje na nie v0.8.9. Odinstaluj aplikację raz, zainstaluj v0.8.9 — od tego momentu aktualizacje w aplikacji działają.
 <!-- lang:de -->
+### Neu
+- Android: Die App aktualisiert sich jetzt selbst. Gibt es eine neuere Version, lädt das Update-Banner die APK herunter und übergibt sie an den Android-Installer — auf Aktualisieren tippen und die Installation bestätigen.
+- Android-Builds werden ab jetzt mit einem festen Release-Schlüssel signiert, sodass jede Version über die vorherige installiert wird — ohne Neuinstallation.
+
 ### Fehlerbehebungen
-- Warteschlange: Wartende Nachrichten werden jetzt zusätzlich durch einen periodischen Idle-Sweep zugestellt — eine während einer Sitzung eingereihte Nachricht bleibt nicht mehr hängen, wenn die „Turn beendet"-Benachrichtigung des Providers ausbleibt.
-- Web-Client: Der flutter-web-Server leitet `/health` jetzt an das Backend weiter, sodass Einstellungen → Über wieder die Serverversion anzeigt und „Nach Updates suchen" funktioniert, statt an der Antwort zu scheitern.
-- Mobil: Der Server-Verbindungsbildschirm dreht sich nicht mehr endlos — der Verbindungsablauf ist abgesichert, sodass ein unerwarteter Fehler eine funktionierende Wiederholen-Schaltfläche hinterlässt.
-- Mobil: Ein Modus- oder Modellmenü, das aus dem kompakten `+`-Blatt geöffnet wird, erscheint jetzt neben dem angetippten Element statt oben auf dem Bildschirm.
+- Das Update-Banner auf dem Telefon aktualisiert nicht mehr nur den verbundenen Server: Es vergleicht die eigene App-Version und installiert die neue APK.
+- Server: Die Release-Informationen listen nun die herunterladbaren Dateien auf, damit die App das richtige Artefakt findet.
+- Android: Der Release-Build findet den Signatur-Keystore korrekt — der falsche Pfad machte signierte Releases unmöglich.
+
+### Einmaliger Schritt
+- Builds bis v0.8.8 waren mit einem temporären Schlüssel signiert, daher verweigert Android die Installation von v0.8.9 darüber. Deinstalliere die App einmal, installiere v0.8.9 — danach funktionieren In-App-Updates.
 <!-- lang:es -->
+### Novedades
+- Android: la app ahora se actualiza sola. Cuando hay una versión más nueva, el aviso de actualización descarga el APK y lo entrega al instalador de Android — pulsa Actualizar y confirma la instalación.
+- Las compilaciones de Android se firman a partir de ahora con una clave permanente, así cada versión se instala sobre la anterior sin reinstalar.
+
 ### Correcciones de errores
-- Cola: los mensajes en cola ahora se entregan también mediante un barrido periódico de inactividad, así un mensaje encolado durante una sesión ya no se queda atascado cuando se pierde la notificación de «turno completado» del proveedor.
-- Cliente web: el servidor flutter-web ahora redirige `/health` al backend, así Ajustes → Acerca de vuelve a mostrar la versión del servidor y «buscar actualizaciones» funciona en lugar de fallar al decodificar la respuesta.
-- Móvil: la pantalla de conexión con el servidor ya no gira sin fin — el flujo de conexión está protegido, así un error inesperado deja un botón de reintento funcional.
-- Móvil: un menú de modo o modelo abierto desde la hoja compacta `+` ahora aparece junto al control pulsado en lugar de la parte superior de la pantalla.
+- El aviso de actualización en el teléfono ya no actualiza solo el servidor conectado: compara la versión de la propia app e instala el nuevo APK.
+- Servidor: la información del lanzamiento ahora lista los archivos descargables, así la app elige el artefacto correcto.
+- Android: la compilación de lanzamiento resuelve bien el keystore de firma — la ruta incorrecta impedía las versiones firmadas.
+
+### Paso único
+- Las versiones hasta v0.8.8 se firmaron con una clave temporal, así que Android no instala v0.8.9 sobre ellas. Desinstala la app una vez, instala v0.8.9 y desde entonces las actualizaciones en la app funcionan.
 <!-- lang:fr -->
+### Nouveautés
+- Android : l'application se met désormais à jour toute seule. Quand une version plus récente existe, la bannière de mise à jour télécharge l'APK et le remet à l'installeur Android — appuyez sur Mettre à jour et confirmez l'installation.
+- Les builds Android sont désormais signés avec une clé de release permanente, donc chaque version s'installe par-dessus la précédente sans réinstallation.
+
 ### Corrections de bugs
-- File d'attente : les messages en attente sont désormais aussi livrés par un balayage périodique d'inactivité — un message mis en file pendant une session ne reste plus bloqué lorsque la notification « tour terminé » du fournisseur est manquée.
-- Client web : le serveur flutter-web redirige maintenant `/health` vers le backend, donc Paramètres → À propos réaffiche la version du serveur et « rechercher des mises à jour » fonctionne au lieu d'échouer au décodage de la réponse.
-- Mobile : l'écran de connexion au serveur ne tourne plus indéfiniment — le flux de connexion est protégé, donc une erreur inattendue laisse un bouton de nouvelle tentative fonctionnel.
-- Mobile : un menu de mode ou de modèle ouvert depuis la feuille compacte `+` apparaît désormais à côté du contrôle touché au lieu du haut de l'écran.
+- La bannière de mise à jour sur téléphone ne met plus à jour uniquement le serveur connecté : elle compare la version de l'application elle-même et installe le nouvel APK.
+- Serveur : les informations de version listent maintenant les fichiers téléchargeables, pour que l'application choisisse le bon artefact.
+- Android : le build de release trouve correctement le keystore de signature — le mauvais chemin rendait toute release signée impossible.
+
+### Étape unique
+- Les versions jusqu'à v0.8.8 étaient signées avec une clé temporaire, donc Android refuse d'installer v0.8.9 par-dessus. Désinstallez l'application une fois, installez v0.8.9, et les mises à jour dans l'application fonctionneront ensuite.
 <!-- lang:it -->
+### Novità
+- Android: l'app ora si aggiorna da sola. Quando esce una versione più recente, il banner di aggiornamento scarica l'APK e lo passa all'installer di Android — tocca Aggiorna e conferma l'installazione.
+- Le build Android sono d'ora in poi firmate con una chiave di release permanente, così ogni versione si installa sopra la precedente senza reinstallare.
+
 ### Correzioni di bug
-- Coda: i messaggi in coda vengono ora consegnati anche da una scansione periodica di inattività — un messaggio messo in coda durante una sessione non resta più bloccato quando la notifica di «turno completato» del provider va persa.
-- Client web: il server flutter-web ora inoltra `/health` al backend, così Impostazioni → Informazioni mostra di nuovo la versione del server e «controlla aggiornamenti» funziona invece di fallire nella decodifica della risposta.
-- Mobile: la schermata di connessione al server non gira più all'infinito — il flusso di connessione è protetto, quindi un errore imprevisto lascia un pulsante di riprova funzionante.
-- Mobile: un menu di modalità o modello aperto dal foglio compatto `+` ora compare accanto al controllo toccato invece che in cima allo schermo.
+- Il banner di aggiornamento sul telefono non aggiorna più solo il server collegato: confronta la versione dell'app stessa e installa il nuovo APK.
+- Server: le informazioni sulla release ora elencano i file scaricabili, così l'app sceglie l'artefatto giusto.
+- Android: la build di release trova correttamente il keystore di firma — il percorso sbagliato rendeva impossibili le release firmate.
+
+### Passo una tantum
+- Le versioni fino alla v0.8.8 erano firmate con una chiave temporanea, quindi Android rifiuta di installare la v0.8.9 sopra di esse. Disinstalla l'app una volta, installa la v0.8.9 e da quel momento gli aggiornamenti in-app funzionano.
 <!-- lang:ja -->
+### 新機能
+- Android: アプリが自分で更新できるようになりました。新しいリリースがあると、更新バナーが APK をダウンロードして Android のインストーラーに渡します — 「更新」を押してインストールを確認してください。
+- Android ビルドは今後、恒久的なリリースキーで署名されます。以降のバージョンは再インストールなしで上書き更新できます。
+
 ### バグ修正
-- キュー: キューに入れたメッセージが定期的なアイドルスイープでも送信されるようになりました — プロバイダーの「ターン完了」通知が届かなくても、セッション中にキューしたメッセージが止まったままにならなくなりました。
-- Web クライアント: flutter-web サーバーが `/health` をバックエンドにプロキシするようになり、設定 → このアプリでサーバーのバージョンが再び表示され、「アップデートを確認」も応答のデコードに失敗せず動作します。
-- モバイル: サーバー接続画面が永遠に読み込み続けることがなくなりました — 接続フローを保護したので、予期しないエラーでも再試行ボタンが機能します。
-- モバイル: コンパクトな `+` シートから開いたモード/モデルメニューが、画面の上部ではなくタップしたコントロールの隣に表示されるようになりました。
+- スマホの更新バナーが接続中のサーバーだけを更新することはなくなりました: アプリ自身のバージョンを比較し、新しい APK をインストールします。
+- サーバー: リリース情報にダウンロード可能なファイルの一覧が含まれ、アプリが適切な成果物を選べます。
+- Android: リリースビルドが署名用キーストアを正しく解決するようになりました — 誤ったパスが署名済みリリースを不可能にしていました。
+
+### 一度だけの手順
+- v0.8.8 以前のビルドは一時的なキーで署名されているため、Android は v0.8.9 を上書きできません。一度アプリをアンインストールして v0.8.9 をインストールしてください。以降はアプリ内更新が機能します。
 <!-- lang:ko -->
+### 새로운 기능
+- Android: 이제 앱이 스스로 업데이트합니다. 새 릴리스가 있으면 업데이트 배너가 APK를 내려받아 Android 설치 프로그램에 넘깁니다 — 업데이트를 누르고 설치를 확인하세요.
+- Android 빌드는 이제 영구 릴리스 키로 서명되므로, 이후 버전은 재설치 없이 이전 버전 위에 설치됩니다.
+
 ### 버그 수정
-- 큐: 대기 중인 메시지가 이제 주기적인 유휴 스윕으로도 전달됩니다 — 프로바이더의 "턴 완료" 알림이 유실되어도 세션 중 큐에 넣은 메시지가 멈춰 있지 않습니다.
-- 웹 클라이언트: flutter-web 서버가 이제 `/health`를 백엔드로 프록시하므로, 설정 → 앱 정보에 서버 버전이 다시 표시되고 "업데이트 확인"도 응답 디코딩 실패 없이 작동합니다.
-- 모바일: 서버 연결 화면이 더 이상 무한히 로딩되지 않습니다 — 연결 흐름을 보호하여 예기치 않은 오류가 나도 다시 시도 버튼이 정상 동작합니다.
-- 모바일: 컴팩트한 `+` 시트에서 연 모드/모델 메뉴가 화면 상단이 아니라 탭한 컨트롤 옆에 나타납니다.
+- 휴대폰의 업데이트 배너가 더 이상 연결된 서버만 업데이트하지 않습니다: 앱 자체의 버전을 비교해 새 APK를 설치합니다.
+- 서버: 릴리스 정보에 내려받을 수 있는 파일 목록이 포함되어 앱이 올바른 파일을 찾습니다.
+- Android: 릴리스 빌드가 서명 키스토어를 올바르게 찾습니다 — 잘못된 경로 때문에 서명된 릴리스가 불가능했습니다.
+
+### 일회성 단계
+- v0.8.8까지의 빌드는 임시 키로 서명되어 Android가 v0.8.9를 덮어 설치할 수 없습니다. 앱을 한 번 삭제하고 v0.8.9를 설치하세요. 이후부터는 앱 내 업데이트가 동작합니다.
 <!-- lang:ru -->
+### Новое
+- Android: приложение теперь обновляет себя само. Когда выходит новая версия, баннер обновления скачивает APK и передаёт его установщику Android — нажмите «Обновить» и подтвердите установку.
+- Сборки Android теперь подписываются постоянным ключом, поэтому каждая версия ставится поверх предыдущей без переустановки.
+
 ### Исправления ошибок
-- Очередь: сообщения из очереди теперь доставляются и периодической проверкой простоя — сообщение, поставленное в очередь во время сессии, больше не зависает, если уведомление «ход завершён» от провайдера не пришло.
-- Веб-клиент: сервер flutter-web теперь проксирует `/health` на бэкенд, поэтому Настройки → О приложении снова показывают версию сервера, а «проверить обновления» работает вместо ошибки декодирования ответа.
-- Мобильные: экран подключения к серверу больше не крутится бесконечно — поток подключения защищён, поэтому при неожиданной ошибке остаётся рабочая кнопка повтора.
-- Мобильные: меню режима или модели, открытое из компактного листа `+`, теперь появляется рядом с нажатым элементом, а не в верхней части экрана.
+- Баннер обновления на телефоне больше не обновляет только подключённый сервер: он сравнивает версию самого приложения и устанавливает новый APK.
+- Сервер: информация о релизе теперь содержит список файлов для загрузки, поэтому приложение выбирает нужный артефакт.
+- Android: релизная сборка корректно находит keystore для подписи — неверный путь делал подписанные релизы невозможными.
+
+### Однократный шаг
+- Версии до v0.8.8 включительно подписаны временным ключом, поэтому Android не установит v0.8.9 поверх них. Удалите приложение один раз, установите v0.8.9 — дальше обновления из приложения работают.
 <!-- lang:tr -->
+### Yenilikler
+- Android: uygulama artık kendini güncelliyor. Yeni bir sürüm çıktığında güncelleme şeridi APK'yı indirip Android yükleyicisine verir — Güncelle'ye dokunun ve kurulumu onaylayın.
+- Android derlemeleri artık kalıcı bir sürüm anahtarıyla imzalanıyor; böylece her sürüm yeniden kurulum olmadan öncekinin üzerine kurulur.
+
 ### Hata düzeltmeleri
-- Kuyruk: kuyruktaki mesajlar artık periyodik bir boşta taramasıyla da gönderiliyor — sağlayıcının "tur tamamlandı" bildirimi kaçırılsa bile oturum sırasında kuyruğa alınan bir mesaj takılı kalmıyor.
-- Web istemcisi: flutter-web sunucusu artık `/health` isteğini arka uca yönlendiriyor, böylece Ayarlar → Uygulama hakkında sunucu sürümünü yeniden gösteriyor ve "güncellemeleri denetle" yanıtı çözümlemede hata vermek yerine çalışıyor.
-- Mobil: sunucu bağlantı ekranı artık sonsuza dek dönmüyor — bağlantı akışı korunuyor, bu yüzden beklenmedik bir hata çalışan bir yeniden deneme düğmesi bırakıyor.
-- Mobil: kompakt `+` sayfasından açılan mod veya model menüsü artık ekranın üstü yerine dokunulan denetimin yanında görünüyor.
+- Telefondaki güncelleme şeridi artık yalnızca bağlı sunucuyu güncellemiyor: uygulamanın kendi sürümünü karşılaştırıp yeni APK'yı kuruyor.
+- Sunucu: sürüm bilgisi artık indirilebilir dosyaları listeliyor, böylece uygulama doğru dosyayı buluyor.
+- Android: sürüm derlemesi imzalama anahtar deposunu doğru buluyor — yanlış yol imzalı sürümleri imkânsız kılıyordu.
+
+### Tek seferlik adım
+- v0.8.8'e kadarki derlemeler geçici bir anahtarla imzalandığı için Android v0.8.9'u üzerlerine kurmaz. Uygulamayı bir kez kaldırın, v0.8.9'u kurun; sonrasında uygulama içi güncellemeler çalışır.
 <!-- lang:zh-CN -->
+### 新功能
+- Android：应用现在可以自我更新。有新版本时，更新横幅会下载 APK 并交给 Android 安装程序 — 点“更新”并确认安装。
+- Android 构建从今以后使用固定的发布密钥签名，因此每个版本都能直接覆盖安装上一个版本，无需重装。
+
 ### 错误修复
-- 队列：排队消息现在也会通过周期性的空闲扫描发送 — 即使错过了提供商“回合完成”的通知，会话期间排队的消息也不会再卡住。
-- Web 客户端：flutter-web 服务器现在将 `/health` 代理到后端，因此设置 → 关于会重新显示服务器版本，“检查更新”也能正常工作，而不再因解码响应而失败。
-- 移动端：连接服务器的界面不再无限加载 — 连接流程已加保护，即使出现意外错误，重试按钮仍然可用。
-- 移动端：从紧凑的 `+` 面板打开的模式/模型菜单现在显示在被点击控件旁边，而不是屏幕顶部。
+- 手机上的更新横幅不再只更新已连接的服务器：它会比较应用自身的版本并安装新的 APK。
+- 服务器：版本信息现在会列出可下载的文件，应用能选到正确的产物。
+- Android：发布构建现在能正确解析签名密钥库 — 错误的路径此前让签名发布无法实现。
+
+### 一次性步骤
+- v0.8.8 及更早的构建使用临时密钥签名，因此 Android 不允许在其上安装 v0.8.9。请先卸载应用一次，再安装 v0.8.9，之后应用内更新即可正常工作。
 <!-- lang:zh-TW -->
+### 新功能
+- Android：應用程式現在會自我更新。有新版本時，更新橫幅會下載 APK 並交給 Android 安裝程式 — 點「更新」並確認安裝。
+- Android 組建從現在起使用固定的發行金鑰簽署，因此每個版本都能直接覆蓋安裝上一版，無需重新安裝。
+
 ### 錯誤修復
-- 佇列：排隊訊息現在也會透過定期的閒置掃描送出 — 即使錯過了供應商「回合完成」的通知，工作階段期間排隊的訊息也不會再卡住。
-- 網頁用戶端：flutter-web 伺服器現在會將 `/health` 代理到後端，因此設定 → 關於會重新顯示伺服器版本，「檢查更新」也能正常運作，而不再因解碼回應而失敗。
-- 行動裝置：連接伺服器的畫面不再無限載入 — 連接流程已加上保護，即使發生非預期錯誤，重試按鈕仍可運作。
-- 行動裝置：從精簡的 `+` 面板開啟的模式/模型選單現在會顯示在被點擊控制項旁邊，而不是畫面頂端。
+- 手機上的更新橫幅不再只更新已連接的伺服器：它會比較應用程式本身的版本並安裝新的 APK。
+- 伺服器：發行資訊現在會列出可下載的檔案，應用程式能選到正確的產物。
+- Android：發行組建現在能正確解析簽署金鑰庫 — 錯誤的路徑先前讓簽署發行無法實現。
+
+### 一次性步驟
+- v0.8.8 及更早的組建使用臨時金鑰簽署，因此 Android 不允許在其上安裝 v0.8.9。請先解除安裝應用程式一次，再安裝 v0.8.9，之後應用程式內更新即可正常運作。
