@@ -26,7 +26,6 @@ import 'package:ddagent_app/features/file_tree/data/file_saver.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_repository.dart';
 import 'package:ddagent_app/features/misc/data/misc_repository.dart';
 import 'package:ddagent_app/features/orchestrator/view/orchestrator_cards.dart';
-import 'package:ddagent_app/features/queue/data/queue_repository.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/sessions/state/activity_poller.dart';
@@ -1989,19 +1988,14 @@ class _PermissionBanner extends ConsumerWidget {
                     updatedInput: updatedInput,
                   );
                   // ACP providers (command-code / Devin) answer a question with
-                  // a picked option id only — typed free text would be dropped,
-                  // so relay it. Enqueue it as a silent auto-continuation: it
-                  // drains when this turn ends but never renders as a queue
-                  // card (a normal chat.send would land visibly in the queue).
+                  // a picked option id only — typed free text cannot ride the
+                  // ACP answer, so it is sent as a normal user message instead:
+                  // it renders immediately under the question and the server
+                  // delivers it when this turn ends.
                   if (provider == 'commandcode' || provider == 'devin') {
                     final freeText = extractQuestionFreeText(questions.first.input, updatedInput);
                     if (freeText.isNotEmpty) {
-                      unawaited(
-                        ref
-                            .read(queueRepositoryProvider)
-                            .enqueue(sessionId, content: freeText, options: const {'silent': true})
-                            .then<void>((_) {}, onError: (_) {}),
-                      );
+                      notifier.send(freeText);
                     }
                   }
                 },
