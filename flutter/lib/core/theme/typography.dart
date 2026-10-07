@@ -28,6 +28,16 @@ abstract final class AppFonts {
     'Liberation Mono',
     'monospace',
   ];
+
+  /// Bundled monospace face for the terminal (JetBrains Mono, OFL-1.1).
+  /// Flutter web (CanvasKit) ships no monospace fallback and Android has no
+  /// `Menlo`/`Consolas`, so an unbundled stack rendered the terminal in a
+  /// proportional font — misaligned columns and unreadable output.
+  static const String terminalFamily = 'JetBrainsMono';
+
+  /// Terminal font stack — the bundled face first, platform monospace after
+  /// (covers glyphs JetBrains Mono lacks, e.g. CJK and emoji).
+  static const List<String> terminal = ['JetBrainsMono', ...mono];
 }
 
 TextTheme buildTextTheme(Color foreground, Color mutedForeground) {

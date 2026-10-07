@@ -117,6 +117,17 @@ flutter:
         - asset: fonts/Inter-Bold.ttf
           weight: 700
 
+    # JetBrains Mono (OFL-1.1) — bundled so terminal/code surfaces render in a
+    # real monospace everywhere. Flutter web (CanvasKit) ships no monospace
+    # fallback, and Android has no `Menlo`/`Consolas`, so without a bundled
+    # face the columns misaligned and the text read as proportional.
+    - family: JetBrainsMono
+      fonts:
+        - asset: fonts/JetBrainsMono-Regular.ttf
+          weight: 400
+        - asset: fonts/JetBrainsMono-Bold.ttf
+          weight: 700
+
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

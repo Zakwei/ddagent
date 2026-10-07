@@ -9,6 +9,7 @@ import 'package:ddagent_app/features/settings/state/ui_preferences_controller.da
 import 'package:ddagent_app/features/terminal/state/terminal_state.dart';
 import 'package:ddagent_app/features/workspace/view/split_workspace_grid.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -236,6 +237,13 @@ class _TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
     _focusNode.requestFocus();
   }
 
+  /// Touch platforms whose soft keyboard needs the delete-detection workaround
+  /// and the on-screen key bar.
+  bool get _isMobile =>
+      !kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.android ||
+          defaultTargetPlatform == TargetPlatform.iOS);
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -248,13 +256,18 @@ class _TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
           widget.tab.terminal,
           controller: _terminalViewController,
           theme: _buildTheme(context),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
           textStyle: xt.TerminalStyle(
-            fontFamilyFallback: AppFonts.mono,
+            fontFamily: AppFonts.terminalFamily,
+            fontFamilyFallback: AppFonts.terminal,
             fontSize: widget.tab.fontSize,
-            height: 1.3,
+            height: 1.35,
           ),
           focusNode: _focusNode,
           autofocus: widget.autofocus,
+          // Android/iOS soft keyboards don't emit a hardware delete event — the
+          // IME reports backspace textually, which xterm otherwise drops.
+          deleteDetection: _isMobile,
           onTapUp: _handleTapUp,
           onSecondaryTapUp: (_, _) => unawaited(_paste()),
           onKeyEvent: _onKeyEvent,
