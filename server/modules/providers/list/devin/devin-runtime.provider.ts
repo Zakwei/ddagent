@@ -990,14 +990,46 @@ function hasUnresolvedSubagent(jsonlPath: any) {
     }
 }
 
-// Reads the active model out of an ACP config-option payload (the
-// `configOptions` array on a session/new, session/load or
-// session/set_config_option result, or on a config_option_update update).
-// Consumed by provider runtime services and lifecycle tests.
-export function readModelConfigValue(source: any) {
+// Mirrors the ACP-side config (running model, thought_level and the model
+// values the session accepts) from a configOptions payload into `state`.
+// Fields absent from the payload are left untouched.
+function syncDevinConfigState(state: any, source: any) {
     const options = Array.isArray(source?.configOptions) ? source.configOptions : [];
     const modelOption = options.find((option: any) => option?.id === 'model' || option?.category === 'model');
-    return readOptionalString(modelOption?.currentValue);
+    const levelOption = options.find((option: any) => option?.id === 'thought_level');
+    const model = readOptionalString(modelOption?.currentValue);
+    if (model) state.model = model;
+    if (levelOption) state.thoughtLevel = readOptionalString(levelOption.currentValue) ?? null;
+    const modelValues = (Array.isArray(modelOption?.options) ? modelOption.options : [])
+        .map((entry: any) => readOptionalString(entry?.value))
+        .filter(Boolean);
+    if (modelValues.length) state.modelOptions = modelValues;
+    return { model, levelOption };
+}
+
+// Catalog ids encode the thinking level as a suffix, optionally followed by
+// the 1M-context marker (`glm-5-3-flash-low`, `glm-5-2-max-1m`).
+const DEVIN_THOUGHT_LEVEL_SUFFIX = /^(.*)-(none|minimal|low|medium|high|xhigh|max)(-1m)?$/;
+
+function splitDevinThoughtLevel(id: string) {
+    const match = DEVIN_THOUGHT_LEVEL_SUFFIX.exec(id);
+    return match ? { base: match[1] + (match[3] ?? ''), level: match[2] } : { base: id, level: null };
+}
+
+// `devin models list` (the composer catalog) lists one id per thinking level,
+// but ACP exposes a single `model` value per family plus a separate
+// `thought_level` option — `glm-5-3-flash-low` is `glm-5-3-flash-max` with
+// thought_level `low`. Sending a catalog id ACP does not list is rejected with
+// "Invalid params", so map it onto the family's ACP value + level instead.
+// Without a known ACP model list the id is passed through unchanged.
+// Consumed by lifecycle tests.
+export function resolveDevinAcpModel(requested: string, acpModels: string[] = []) {
+    const { base, level } = splitDevinThoughtLevel(requested);
+    if (!acpModels.length || acpModels.includes(requested)) {
+        return { model: requested, thoughtLevel: acpModels.length ? level : null };
+    }
+    const familyModel = acpModels.find((value) => splitDevinThoughtLevel(value).base === base);
+    return familyModel ? { model: familyModel, thoughtLevel: level } : { model: requested, thoughtLevel: null };
 }
 
 // `devin acp --model` only sets the default for a NEW ACP session: a resumed
@@ -1005,33 +1037,40 @@ export function readModelConfigValue(source: any) {
 // it was spawned with. Pushing the composer's selection explicitly is what
 // makes a model change actually apply — otherwise a session created with e.g.
 // SWE-2 Max keeps running it while the UI shows the newly picked model.
+// `state.model`/`state.thoughtLevel` track what ACP reports it runs, so a turn
+// only pushes a real change.
 // Consumed by provider runtime services and lifecycle tests.
 export async function applyModelToDevinSession(state: any, model: any) {
-    // Compound SWE-2 ids (`swe-2-medium`/`swe-2-high`/`swe-2-max`) are not
-    // valid `model` values for ACP — they select the `swe-2-high` model
-    // plus a `thought_level` option. Sending the compound id as the model
-    // makes the turn end immediately with no assistant output.
-    const thoughtLevel = /^swe-2-(medium|high|max)$/.exec(model)?.[1] ?? null;
-    // Skip only when BOTH halves are already applied: the reported model is
-    // always the base (`swe-2-high`), so a session previously running
-    // `swe-2-max` reports `swe-2-high` — skipping on model alone would leave
-    // the persisted `thought_level` at `max` while the UI shows High.
-    if (!model || (state.model === model && (!thoughtLevel || state.thoughtLevel === thoughtLevel))) return;
+    if (!model) return;
+    const target = resolveDevinAcpModel(String(model), state.modelOptions);
+    if (state.model === target.model && (!target.thoughtLevel || state.thoughtLevel === target.thoughtLevel)) return;
     try {
-        const applied = await state.sendRequest('session/set_config_option', {
-            sessionId: state.devinSessionId,
-            configId: 'model',
-            value: thoughtLevel ? 'swe-2-high' : model,
-        });
-        if (thoughtLevel) {
+        if (state.model !== target.model) {
+            const applied = await state.sendRequest('session/set_config_option', {
+                sessionId: state.devinSessionId,
+                configId: 'model',
+                value: target.model,
+            });
+            state.model = target.model;
+            const { levelOption } = syncDevinConfigState(state, applied);
+            // A result without a thought_level option means the new model
+            // has none; only an absent payload leaves the levels unknown.
+            const levels = levelOption
+                ? (Array.isArray(levelOption.options) ? levelOption.options.map((entry: any) => entry?.value) : null)
+                : (Array.isArray(applied?.configOptions) ? [] : null);
+            if (target.thoughtLevel && levels && !levels.includes(target.thoughtLevel)) {
+                console.warn(`[Devin] Model ${target.model} has no thought_level '${target.thoughtLevel}'; keeping ${state.thoughtLevel ?? 'the default'}`);
+                return;
+            }
+        }
+        if (target.thoughtLevel && state.thoughtLevel !== target.thoughtLevel) {
             await state.sendRequest('session/set_config_option', {
                 sessionId: state.devinSessionId,
                 configId: 'thought_level',
-                value: thoughtLevel,
+                value: target.thoughtLevel,
             });
+            state.thoughtLevel = target.thoughtLevel;
         }
-        state.thoughtLevel = thoughtLevel;
-        state.model = thoughtLevel ? model : (readModelConfigValue(applied) ?? model);
     } catch (error: any) {
         console.warn('[Devin] Failed to apply the selected model to the session:', error instanceof Error ? error.message : error);
     }
@@ -1061,10 +1100,10 @@ function createDevinProcess(sessionId: any, workingDir: any, model: any, ws: any
             currentWriter: ws,
             workingDir,
             model,
-            // The `thought_level` half of a compound SWE-2 selection; null for
-            // plain models. Tracked separately because ACP only ever reports
-            // the base `swe-2-high` model back.
+            // ACP-side `thought_level` and accepted `model` values, mirrored
+            // from configOptions payloads (see syncDevinConfigState).
             thoughtLevel: null,
+            modelOptions: [],
             appSessionId: sessionId,
             jsonlPath: null,
             assistantBuffer: '',
@@ -1459,13 +1498,7 @@ function createDevinProcess(sessionId: any, workingDir: any, model: any, ws: any
                 else if (sessionUpdate === 'config_option_update') {
                     // Keep the tracked model in step with what the ACP session
                     // actually runs, so a later turn only pushes a real change.
-                    const activeModel = readModelConfigValue(update);
-                    // A compound SWE-2 selection keeps its compound id in
-                    // state.model; ACP reports only the base `swe-2-high`
-                    // back, and overwriting would force a per-turn re-push.
-                    if (activeModel && !(state.thoughtLevel && activeModel === 'swe-2-high')) {
-                        state.model = activeModel;
-                    }
+                    syncDevinConfigState(state, update);
                 }
                 return;
             }
@@ -1662,10 +1695,8 @@ function createDevinProcess(sessionId: any, workingDir: any, model: any, ws: any
             // session keeps its saved model (announced through the load result
             // or a config_option_update). Track what the session actually runs
             // so run() only pushes a model the user really chose.
-            const loadedModel = readModelConfigValue(sessionResult);
-            if (loadedModel) {
-                state.model = loadedModel;
-            } else if (didLoad) {
+            const { model: loadedModel } = syncDevinConfigState(state, sessionResult);
+            if (!loadedModel && didLoad) {
                 // Resumed without a model report: unknown, so run() pushes the
                 // chosen model instead of assuming the spawn flag applied.
                 state.model = null;

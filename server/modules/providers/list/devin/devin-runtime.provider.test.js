@@ -4,17 +4,10 @@ import test from 'node:test';
 import {
   applyModelToDevinSession,
   createUserTurnMessage,
-  readModelConfigValue,
+  resolveDevinAcpModel,
   sendFinalAssistantMessage,
 } from './devin-runtime.provider.js';
 import { DevinSessionsProvider, hasAssistantInJsonl } from './devin-sessions.provider.js';
-
-const configPayload = (currentValue) => ({
-  configOptions: [
-    { id: 'mode', name: 'Session Mode', category: 'mode', currentValue: 'accept-edits' },
-    { id: 'model', name: 'Model', category: 'model', currentValue },
-  ],
-});
 
 test('createUserTurnMessage keeps the turn attachments for the transcript and echo', () => {
   const turn = createUserTurnMessage('popraw quota w opencode go', {
@@ -56,116 +49,119 @@ test('hasAssistantInJsonl treats a persisted error as terminal content', () => {
   ]), false);
 });
 
-test('readModelConfigValue reads the model option from a config payload', () => {
-  assert.equal(readModelConfigValue(configPayload('swe-2-max')), 'swe-2-max');
-  assert.equal(readModelConfigValue({ configOptions: [{ id: 'mode', currentValue: 'accept-edits' }] }), undefined);
-  assert.equal(readModelConfigValue(undefined), undefined);
+const ACP_MODELS = ['swe-2-high', 'glm-5-2', 'glm-5-2-1m', 'glm-5-3-flash-max', 'deepseek-v4-1-flash-high', 'swe-1-7-medium'];
+const ACP_LEVELS = {
+  'swe-2-high': ['medium', 'high', 'max'],
+  'glm-5-3-flash-max': ['low', 'high', 'max'],
+  'deepseek-v4-1-flash-high': ['high', 'max'],
+};
+
+// Shaped like a real `session/set_config_option` result from `devin acp`.
+const acpConfig = (model, thoughtLevel) => ({
+  configOptions: [
+    { id: 'mode', category: 'mode', currentValue: 'accept-edits' },
+    { id: 'model', category: 'model', currentValue: model, options: ACP_MODELS.map((value) => ({ value })) },
+    ...(ACP_LEVELS[model] ? [{
+      id: 'thought_level',
+      category: 'thought_level',
+      currentValue: thoughtLevel ?? ACP_LEVELS[model].at(-1),
+      options: ACP_LEVELS[model].map((value) => ({ value })),
+    }] : []),
+  ],
 });
 
-test('applyModelToDevinSession switches a resumed session to the chosen model', async () => {
-  const calls = [];
-  const state = {
-    model: 'swe-2-max',
-    devinSessionId: 'devin-session-1',
-    async sendRequest(method, params) {
-      calls.push({ method, params });
-      return configPayload(params.value);
-    },
-  };
-
-  await applyModelToDevinSession(state, 'deepseek-v4-1-flash-max');
-
-  assert.deepEqual(calls, [{
-    method: 'session/set_config_option',
-    params: { sessionId: 'devin-session-1', configId: 'model', value: 'deepseek-v4-1-flash-max' },
-  }]);
-  assert.equal(state.model, 'deepseek-v4-1-flash-max');
-
-  // The model is already active — a later turn must not re-send it.
-  await applyModelToDevinSession(state, 'deepseek-v4-1-flash-max');
-  assert.equal(calls.length, 1);
-});
-
-test('applyModelToDevinSession keeps the turn alive when the switch fails', async () => {
-  const state = {
-    model: 'swe-2-max',
-    devinSessionId: 'devin-session-2',
-    async sendRequest() {
-      throw new Error('ACP error');
-    },
-  };
-
-  await applyModelToDevinSession(state, 'deepseek-v4-1-flash-max');
-  assert.equal(state.model, 'swe-2-max');
-});
-
-test('applyModelToDevinSession maps compound SWE-2 ids to model + thought_level', async () => {
-  const calls = [];
-  const state = {
-    model: null,
-    devinSessionId: 'devin-session-4',
-    async sendRequest(method, params) {
-      calls.push({ method, params });
-      return configPayload(params.value);
-    },
-  };
-
-  await applyModelToDevinSession(state, 'swe-2-max');
-
-  assert.deepEqual(calls, [
-    {
-      method: 'session/set_config_option',
-      params: { sessionId: 'devin-session-4', configId: 'model', value: 'swe-2-high' },
-    },
-    {
-      method: 'session/set_config_option',
-      params: { sessionId: 'devin-session-4', configId: 'thought_level', value: 'max' },
-    },
-  ]);
-  assert.equal(state.model, 'swe-2-max');
-
-  // Already applied — later turns must not re-send it.
-  await applyModelToDevinSession(state, 'swe-2-max');
-  assert.equal(calls.length, 2);
-});
-
-test('applyModelToDevinSession pushes thought_level when the base model already matches', async () => {
-  // Resumed session reports the base model — state.model is 'swe-2-high' but
-  // the persisted thought_level is unknown (null). Requesting the compound
-  // 'swe-2-high' must still push the level, or a session previously at
-  // swe-2-max keeps running 'max'.
+const fakeDevinState = (overrides = {}) => {
   const calls = [];
   const state = {
     model: 'swe-2-high',
-    thoughtLevel: null,
-    devinSessionId: 'devin-session-5',
+    thoughtLevel: 'max',
+    modelOptions: ACP_MODELS,
+    devinSessionId: 'devin-session',
     async sendRequest(method, params) {
       calls.push({ method, params });
-      return configPayload(params.value);
+      return params.configId === 'model' ? acpConfig(params.value) : acpConfig(state.model, params.value);
     },
+    ...overrides,
   };
+  return { state, calls };
+};
+
+test('resolveDevinAcpModel maps catalog variant ids onto the ACP family model + thought_level', () => {
+  assert.deepEqual(resolveDevinAcpModel('glm-5-3-flash-low', ACP_MODELS), { model: 'glm-5-3-flash-max', thoughtLevel: 'low' });
+  assert.deepEqual(resolveDevinAcpModel('deepseek-v4-1-flash-max', ACP_MODELS), { model: 'deepseek-v4-1-flash-high', thoughtLevel: 'max' });
+  assert.deepEqual(resolveDevinAcpModel('swe-2-medium', ACP_MODELS), { model: 'swe-2-high', thoughtLevel: 'medium' });
+  assert.deepEqual(resolveDevinAcpModel('swe-2-high', ACP_MODELS), { model: 'swe-2-high', thoughtLevel: 'high' });
+  assert.deepEqual(resolveDevinAcpModel('glm-5-2-max-1m', ACP_MODELS), { model: 'glm-5-2-1m', thoughtLevel: 'max' });
+  assert.deepEqual(resolveDevinAcpModel('glm-5-2-none', ACP_MODELS), { model: 'glm-5-2', thoughtLevel: 'none' });
+  assert.deepEqual(resolveDevinAcpModel('glm-5-2', ACP_MODELS), { model: 'glm-5-2', thoughtLevel: null });
+  assert.deepEqual(resolveDevinAcpModel('swe-1-7', ACP_MODELS), { model: 'swe-1-7-medium', thoughtLevel: null });
+  // Unknown family or unknown ACP list: passed through untouched.
+  assert.deepEqual(resolveDevinAcpModel('mystery-model-high', ACP_MODELS), { model: 'mystery-model-high', thoughtLevel: null });
+  assert.deepEqual(resolveDevinAcpModel('glm-5-3-flash-low', []), { model: 'glm-5-3-flash-low', thoughtLevel: null });
+});
+
+test('applyModelToDevinSession switches to a catalog variant via model + thought_level', async () => {
+  const { state, calls } = fakeDevinState();
+
+  await applyModelToDevinSession(state, 'glm-5-3-flash-low');
+
+  assert.deepEqual(calls.map((call) => [call.params.configId, call.params.value]), [
+    ['model', 'glm-5-3-flash-max'],
+    ['thought_level', 'low'],
+  ]);
+  assert.equal(calls[0].params.sessionId, 'devin-session');
+  assert.equal(state.model, 'glm-5-3-flash-max');
+  assert.equal(state.thoughtLevel, 'low');
+
+  // Already applied — a later turn must not re-send it.
+  await applyModelToDevinSession(state, 'glm-5-3-flash-low');
+  assert.equal(calls.length, 2);
+});
+
+test('applyModelToDevinSession only pushes thought_level when the family model already runs', async () => {
+  // A session at swe-2-max reports model swe-2-high + level max; picking
+  // swe-2-high must still lower the level.
+  const { state, calls } = fakeDevinState();
 
   await applyModelToDevinSession(state, 'swe-2-high');
 
-  assert.equal(calls.length, 2);
-  assert.equal(calls[1].params.configId, 'thought_level');
-  assert.equal(calls[1].params.value, 'high');
+  assert.deepEqual(calls.map((call) => [call.params.configId, call.params.value]), [['thought_level', 'high']]);
   assert.equal(state.thoughtLevel, 'high');
 });
 
-test('applyModelToDevinSession ignores an empty model', async () => {
-  let called = false;
-  const state = {
-    model: null,
-    devinSessionId: 'devin-session-3',
+test('applyModelToDevinSession skips a thought_level the new model does not offer', async () => {
+  const { state, calls } = fakeDevinState({
+    modelOptions: [...ACP_MODELS, 'claude-opus-5-medium'],
+  });
+
+  // `claude-opus-5-low` resolves to claude-opus-5-medium + low, but the
+  // fake reports no thought_level option for it, so only the model is set.
+  await applyModelToDevinSession(state, 'claude-opus-5-low');
+  assert.deepEqual(calls.map((call) => call.params.configId), ['model']);
+
+  const { state: deepseek, calls: deepseekCalls } = fakeDevinState();
+  await applyModelToDevinSession(deepseek, 'deepseek-v4-1-flash-low');
+  assert.deepEqual(deepseekCalls.map((call) => call.params.configId), ['model']);
+  assert.equal(deepseek.model, 'deepseek-v4-1-flash-high');
+});
+
+test('applyModelToDevinSession keeps the turn alive when the switch fails', async () => {
+  const { state } = fakeDevinState({
     async sendRequest() {
-      called = true;
+      throw new Error('ACP error');
     },
-  };
+  });
+
+  await applyModelToDevinSession(state, 'deepseek-v4-1-flash-max');
+  assert.equal(state.model, 'swe-2-high');
+});
+
+test('applyModelToDevinSession ignores an empty model', async () => {
+  const { state, calls } = fakeDevinState();
 
   await applyModelToDevinSession(state, null);
   await applyModelToDevinSession(state, '');
-  assert.equal(called, false);
+  assert.equal(calls.length, 0);
 });
 
 const stubHistory = (t, messages) => {

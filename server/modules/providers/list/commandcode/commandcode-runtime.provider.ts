@@ -972,6 +972,16 @@ export function readModelConfigValue(source: any) {
     return readOptionalString(modelOption?.currentValue);
 }
 
+// Lists the `model` values an ACP config-option payload says the session
+// accepts; empty when the payload carries no option list.
+function readModelOptionValues(source: any): string[] {
+    const options = Array.isArray(source?.configOptions) ? source.configOptions : [];
+    const modelOption = options.find((option: any) => option?.id === 'model' || option?.category === 'model');
+    return (Array.isArray(modelOption?.options) ? modelOption.options : [])
+        .map((entry: any) => readOptionalString(entry?.value))
+        .filter(Boolean);
+}
+
 /**
  * Pushes the composer's model selection onto the live ACP session —
  * `command-code acp` takes no `--model` flag, so the pick only ever applies
@@ -981,7 +991,13 @@ export function readModelConfigValue(source: any) {
  */
 // Consumed by provider runtime services and lifecycle tests.
 export async function applyModelToCommandCodeSession(state: any, model: any) {
-    if (!model || state.model === model) return;
+    if (!model) return;
+    // `--list-models` (the composer catalog) prints ids lowercased, but ACP
+    // only accepts its canonical spelling (`zai-org/glm-5.3` vs
+    // `zai-org/GLM-5.3`) and rejects the rest as "Unknown model".
+    const requested = String(model).toLowerCase();
+    model = (state.modelOptions ?? []).find((value: string) => value.toLowerCase() === requested) ?? model;
+    if (state.model === model) return;
     let applied: any = null;
     try {
         applied = await state.sendRequest('session/set_config_option', {
@@ -1603,6 +1619,7 @@ function createCommandCodeProcess(sessionId: any, workingDir: any, model: any, w
             // session keeps whatever it was saved with and run() pushes the
             // composer's choice explicitly.
             const loadedModel = readModelConfigValue(sessionResult);
+            state.modelOptions = readModelOptionValues(sessionResult);
             if (loadedModel) {
                 state.model = loadedModel;
             } else if (didLoad) {
