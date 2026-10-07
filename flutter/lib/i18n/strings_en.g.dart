@@ -4100,6 +4100,9 @@ class Translations$settings$updates$en {
 	/// en: 'Check GitHub for a newer desktop build. New versions download automatically and install when you quit.'
 	String get description => 'Check GitHub for a newer desktop build. New versions download automatically and install when you quit.';
 
+	/// en: 'Check GitHub for a newer build of this app. Updates are installed by your device's system installer.'
+	String get descriptionMobile => 'Check GitHub for a newer build of this app. Updates are installed by your device\'s system installer.';
+
 	/// en: 'Check for updates'
 	String get check => 'Check for updates';
 
@@ -4111,6 +4114,9 @@ class Translations$settings$updates$en {
 
 	/// en: 'Update v{{version}} found — downloading in the background; it installs when you quit ddagent.'
 	String available({required Object version}) => 'Update v${version} found — downloading in the background; it installs when you quit ddagent.';
+
+	/// en: 'App update v{{version}} available — tap Update to install it on this device.'
+	String appAvailable({required Object version}) => 'App update v${version} available — tap Update to install it on this device.';
 
 	/// en: 'Update v{{version}} downloaded — quit and relaunch ddagent to install.'
 	String downloaded({required Object version}) => 'Update v${version} downloaded — quit and relaunch ddagent to install.';
@@ -14856,10 +14862,12 @@ extension on Translations {
 			'settings.server.ok' => 'OK',
 			'settings.updates.title' => 'App updates',
 			'settings.updates.description' => 'Check GitHub for a newer desktop build. New versions download automatically and install when you quit.',
+			'settings.updates.descriptionMobile' => 'Check GitHub for a newer build of this app. Updates are installed by your device\'s system installer.',
 			'settings.updates.check' => 'Check for updates',
 			'settings.updates.checking' => 'Checking…',
 			'settings.updates.upToDate' => ({required Object version}) => 'You are on the latest version (v${version}).',
 			'settings.updates.available' => ({required Object version}) => 'Update v${version} found — downloading in the background; it installs when you quit ddagent.',
+			'settings.updates.appAvailable' => ({required Object version}) => 'App update v${version} available — tap Update to install it on this device.',
 			'settings.updates.downloaded' => ({required Object version}) => 'Update v${version} downloaded — quit and relaunch ddagent to install.',
 			'settings.updates.unavailable' => 'Update checks are only available in packaged desktop builds.',
 			'settings.updates.error' => ({required Object message}) => 'Update check failed: ${message}',
@@ -15105,10 +15113,10 @@ extension on Translations {
 			'settings.notifications.desktop.unsupported' => 'Desktop notifications are not supported on this system.',
 			'settings.notifications.sound.title' => 'Sound',
 			'settings.notifications.sound.description' => 'Play a short tone when a chat run finishes or needs tool approval.',
-			'settings.notifications.sound.enabled' => 'Enabled',
-			'settings.notifications.sound.test' => 'Test sound',
 			_ => null,
 		} ?? switch (path) {
+			'settings.notifications.sound.enabled' => 'Enabled',
+			'settings.notifications.sound.test' => 'Test sound',
 			'settings.notifications.events.title' => 'Event Types',
 			'settings.notifications.events.actionRequired' => 'Action required',
 			'settings.notifications.events.stop' => 'Run stopped',
@@ -15619,10 +15627,10 @@ extension on Translations {
 			'sidebar.time.justNow' => 'Just now',
 			'sidebar.time.oneMinuteAgo' => '1 min ago',
 			'sidebar.time.minutesAgo' => ({required Object count}) => '${count} mins ago',
-			'sidebar.time.oneHourAgo' => '1 hour ago',
-			'sidebar.time.hoursAgo' => ({required Object count}) => '${count} hours ago',
 			_ => null,
 		} ?? switch (path) {
+			'sidebar.time.oneHourAgo' => '1 hour ago',
+			'sidebar.time.hoursAgo' => ({required Object count}) => '${count} hours ago',
 			'sidebar.time.oneDayAgo' => '1 day ago',
 			'sidebar.time.daysAgo' => ({required Object count}) => '${count} days ago',
 			'sidebar.messages.deleteConfirm' => 'Are you sure you want to delete this?',
@@ -16133,10 +16141,10 @@ extension on Translations {
 			'mcp.servers.addGlobalTitle' => 'Add Global MCP Server',
 			'mcp.servers.addGlobalDescription' => 'Adds this MCP server to every provider: Claude, Cursor, Codex, OpenCode, and Devin. Only stdio and HTTP transports are supported because the same config must work across all providers.',
 			'mcp.servers.addGlobalMenuDescription' => 'Add Global MCP Server writes one common stdio or HTTP server to Claude, Cursor, Codex, OpenCode, and Devin.',
-			'mcp.servers.addProviderTitle' => ({required Object provider}) => 'Add ${provider} MCP Server',
-			'mcp.servers.addProviderDescription' => ({required Object provider}) => 'Add ${provider} MCP Server only changes ${provider}.',
 			_ => null,
 		} ?? switch (path) {
+			'mcp.servers.addProviderTitle' => ({required Object provider}) => 'Add ${provider} MCP Server',
+			'mcp.servers.addProviderDescription' => ({required Object provider}) => 'Add ${provider} MCP Server only changes ${provider}.',
 			'mcp.servers.config.cwd' => 'Cwd',
 			'mcp.servers.config.envVars' => 'Env Vars',
 			'mcp.team.title' => 'Team MCP Configs',

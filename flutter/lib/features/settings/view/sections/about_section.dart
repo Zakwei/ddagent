@@ -553,6 +553,26 @@ class _UpdateCheckBlockState extends ConsumerState<_UpdateCheckBlock> {
       ref.read(desktopUpdateProvider.notifier).recheck();
       return;
     }
+    // Android: re-read the release and this build's own version (the APK) so the
+    // section tracks the app, not the connected server.
+    if (ref.read(appUpdateChannelProvider) == AppUpdateChannel.android) {
+      setState(() {
+        _status = _CheckStatus.checking;
+        _detail = '';
+      });
+      ref.invalidate(latestReleaseProvider);
+      ref.invalidate(appVersionProvider);
+      try {
+        await Future.wait<Object?>([
+          ref.read(latestReleaseProvider.future),
+          ref.read(appVersionProvider.future),
+        ]);
+      } on Object {
+        // The providers carry their own error state; nothing to show here.
+      }
+      if (mounted) setState(() => _status = _CheckStatus.idle);
+      return;
+    }
     setState(() {
       _status = _CheckStatus.checking;
       _detail = '';
@@ -595,13 +615,13 @@ class _UpdateCheckBlockState extends ConsumerState<_UpdateCheckBlock> {
     final c = context.appColors;
     final tt = Theme.of(context).textTheme;
 
-    final desktopChannel = ref.watch(appUpdateChannelProvider);
+    final channel = ref.watch(appUpdateChannelProvider);
 
     String? result;
     var good = false;
     var checking = _status == _CheckStatus.checking;
 
-    if (isDesktopChannel(desktopChannel)) {
+    if (isDesktopChannel(channel)) {
       // Desktop self-update state, read from the background updater.
       final state = ref.watch(desktopUpdateProvider);
       final installed = ref.watch(appVersionProvider).value ?? '';
@@ -625,6 +645,21 @@ class _UpdateCheckBlockState extends ConsumerState<_UpdateCheckBlock> {
             result = t.updates.upToDate(version: installed);
             good = true;
           }
+      }
+    } else if (channel == AppUpdateChannel.android) {
+      // Android self-update: report this build's own APK version (and whether a
+      // newer APK exists) — never the connected server's version.
+      final installed = ref.watch(appVersionProvider).value ?? '';
+      final latest = (ref.watch(latestReleaseProvider).value?.tagName ?? '').replaceFirst(
+        RegExp('^v'),
+        '',
+      );
+      if (latest.isNotEmpty && installed.isNotEmpty && compareVersions(latest, installed) > 0) {
+        result = t.updates.appAvailable(version: latest);
+        good = true;
+      } else if (installed.isNotEmpty) {
+        result = t.updates.upToDate(version: installed);
+        good = true;
       }
     } else {
       switch (_status) {
@@ -660,7 +695,9 @@ class _UpdateCheckBlockState extends ConsumerState<_UpdateCheckBlock> {
                   ),
                   const SizedBox(height: AppSpacing.xs),
                   Text(
-                    t.updates.description,
+                    channel == AppUpdateChannel.android
+                        ? t.updates.descriptionMobile
+                        : t.updates.description,
                     style: tt.labelSmall?.copyWith(color: c.mutedForeground),
                   ),
                 ],

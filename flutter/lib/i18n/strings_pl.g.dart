@@ -2280,10 +2280,12 @@ class Translations$settings$updates$pl extends Translations$settings$updates$en 
 	// Translations
 	@override String get title => 'Aktualizacje aplikacji';
 	@override String get description => 'Sprawdź GitHub w poszukiwaniu nowszej wersji desktopowej. Nowe wersje pobierają się automatycznie i instalują przy zamknięciu.';
+	@override String get descriptionMobile => 'Sprawdź GitHub w poszukiwaniu nowszej wersji tej aplikacji. Aktualizację instaluje instalator systemowy urządzenia.';
 	@override String get check => 'Sprawdź aktualizacje';
 	@override String get checking => 'Sprawdzanie…';
 	@override String upToDate({required Object version}) => 'Masz najnowszą wersję (v${version}).';
 	@override String available({required Object version}) => 'Znaleziono aktualizację v${version} — pobieranie w tle; zainstaluje się przy zamknięciu ddagent.';
+	@override String appAvailable({required Object version}) => 'Dostępna aktualizacja aplikacji v${version} — dotknij Aktualizuj, aby zainstalować ją na tym urządzeniu.';
 	@override String downloaded({required Object version}) => 'Aktualizacja v${version} pobrana — zamknij i uruchom ddagent ponownie, aby ją zainstalować.';
 	@override String get unavailable => 'Sprawdzanie aktualizacji dostępne tylko w spakietowanej aplikacji desktopowej.';
 	@override String error({required Object message}) => 'Sprawdzanie aktualizacji nie powiodło się: ${message}';
@@ -8815,10 +8817,12 @@ extension on TranslationsPl {
 			'settings.server.ok' => 'OK',
 			'settings.updates.title' => 'Aktualizacje aplikacji',
 			'settings.updates.description' => 'Sprawdź GitHub w poszukiwaniu nowszej wersji desktopowej. Nowe wersje pobierają się automatycznie i instalują przy zamknięciu.',
+			'settings.updates.descriptionMobile' => 'Sprawdź GitHub w poszukiwaniu nowszej wersji tej aplikacji. Aktualizację instaluje instalator systemowy urządzenia.',
 			'settings.updates.check' => 'Sprawdź aktualizacje',
 			'settings.updates.checking' => 'Sprawdzanie…',
 			'settings.updates.upToDate' => ({required Object version}) => 'Masz najnowszą wersję (v${version}).',
 			'settings.updates.available' => ({required Object version}) => 'Znaleziono aktualizację v${version} — pobieranie w tle; zainstaluje się przy zamknięciu ddagent.',
+			'settings.updates.appAvailable' => ({required Object version}) => 'Dostępna aktualizacja aplikacji v${version} — dotknij Aktualizuj, aby zainstalować ją na tym urządzeniu.',
 			'settings.updates.downloaded' => ({required Object version}) => 'Aktualizacja v${version} pobrana — zamknij i uruchom ddagent ponownie, aby ją zainstalować.',
 			'settings.updates.unavailable' => 'Sprawdzanie aktualizacji dostępne tylko w spakietowanej aplikacji desktopowej.',
 			'settings.updates.error' => ({required Object message}) => 'Sprawdzanie aktualizacji nie powiodło się: ${message}',
@@ -9086,10 +9090,10 @@ extension on TranslationsPl {
 			'settings.git.name.placeholder' => 'John Doe',
 			'settings.git.email.label' => 'E-mail Git',
 			'settings.git.email.help' => 'Twój e-mail do commitów Git',
-			'settings.git.email.placeholder' => 'john@example.com',
-			'settings.git.actions.save' => 'Zapisz konfigurację',
 			_ => null,
 		} ?? switch (path) {
+			'settings.git.email.placeholder' => 'john@example.com',
+			'settings.git.actions.save' => 'Zapisz konfigurację',
 			'settings.git.actions.saving' => 'Zapisywanie...',
 			'settings.git.status.success' => 'Zapisano pomyślnie',
 			'settings.git.status.error' => 'Nie udało się zapisać',
@@ -9600,10 +9604,10 @@ extension on TranslationsPl {
 			'sidebar.deleteConfirmation.archiveSelectedSessions' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('pl'))(count, one: 'Archiwizuj sesję', few: 'Archiwizuj ${count} sesje', many: 'Archiwizuj ${count} sesji', other: 'Archiwizuj ${count} sesji', ), 
 			'sidebar.zones.activeNow' => 'Aktywne teraz',
 			'sidebar.zones.recent' => 'Ostatnio używane',
-			'sidebar.zones.today' => 'Dzisiaj',
-			'sidebar.zones.yesterday' => 'Wczoraj',
 			_ => null,
 		} ?? switch (path) {
+			'sidebar.zones.today' => 'Dzisiaj',
+			'sidebar.zones.yesterday' => 'Wczoraj',
 			'sidebar.zones.thisWeek' => 'W tym tygodniu',
 			'sidebar.zones.showMore' => ({required Object count}) => 'Pokaż jeszcze ${count}',
 			'sidebar.zones.showLess' => 'Pokaż mniej',
@@ -10114,10 +10118,10 @@ extension on TranslationsPl {
 			'quota.config.save' => 'Zapisz konfigurację',
 			'quota.overview.tokensAndCost' => 'Tokeny i koszt',
 			'quota.section.config' => 'Konfiguracja',
-			'scheduler.checking' => 'Sprawdzanie…',
-			'scheduler.cronHint' => 'Cron (min godz dzień mies dzień-tyg) — np. 0 9 * * *',
 			_ => null,
 		} ?? switch (path) {
+			'scheduler.checking' => 'Sprawdzanie…',
+			'scheduler.cronHint' => 'Cron (min godz dzień mies dzień-tyg) — np. 0 9 * * *',
 			'scheduler.deleteMessage' => ({required Object id}) => 'Spowoduje to usunięcie zadania cyklicznego ${id}. Istniejące sesje zostaną zachowane.',
 			'scheduler.deleteTitle' => 'Usunąć harmonogram?',
 			'scheduler.editTitle' => 'Edytuj harmonogram',

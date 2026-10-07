@@ -1686,10 +1686,12 @@
     "updates": {
       "title": "App updates",
       "description": "Check GitHub for a newer desktop build. New versions download automatically and install when you quit.",
+      "descriptionMobile": "Check GitHub for a newer build of this app. Updates are installed by your device's system installer.",
       "check": "Check for updates",
       "checking": "Checking…",
       "upToDate": "You are on the latest version (v{{version}}).",
       "available": "Update v{{version}} found — downloading in the background; it installs when you quit ddagent.",
+      "appAvailable": "App update v{{version}} available — tap Update to install it on this device.",
       "downloaded": "Update v{{version}} downloaded — quit and relaunch ddagent to install.",
       "unavailable": "Update checks are only available in packaged desktop builds.",
       "error": "Update check failed: {{message}}",

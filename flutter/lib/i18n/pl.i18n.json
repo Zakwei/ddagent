@@ -1649,10 +1649,12 @@
     "updates": {
       "title": "Aktualizacje aplikacji",
       "description": "Sprawdź GitHub w poszukiwaniu nowszej wersji desktopowej. Nowe wersje pobierają się automatycznie i instalują przy zamknięciu.",
+      "descriptionMobile": "Sprawdź GitHub w poszukiwaniu nowszej wersji tej aplikacji. Aktualizację instaluje instalator systemowy urządzenia.",
       "check": "Sprawdź aktualizacje",
       "checking": "Sprawdzanie…",
       "upToDate": "Masz najnowszą wersję (v{{version}}).",
       "available": "Znaleziono aktualizację v{{version}} — pobieranie w tle; zainstaluje się przy zamknięciu ddagent.",
+      "appAvailable": "Dostępna aktualizacja aplikacji v{{version}} — dotknij Aktualizuj, aby zainstalować ją na tym urządzeniu.",
       "downloaded": "Aktualizacja v{{version}} pobrana — zamknij i uruchom ddagent ponownie, aby ją zainstalować.",
       "unavailable": "Sprawdzanie aktualizacji dostępne tylko w spakietowanej aplikacji desktopowej.",
       "error": "Sprawdzanie aktualizacji nie powiodło się: {{message}}",
