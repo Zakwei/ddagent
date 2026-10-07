@@ -964,6 +964,11 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
   /// `MobileComposerActionSheet` parity — compact panes collapse the
   /// toolbar under `+`.
   void _showActionSheet(BuildContext context, Widget child) {
+    // The sheet is a route on top of the window and does not move with the
+    // keyboard, so with the composer still focused it would open behind the
+    // keyboard — hiding the option bar (model/mode triggers) it re-hosts.
+    // Dropping focus closes the keyboard first, like the web sheet does.
+    _focus.unfocus();
     final t = Translations.of(context);
     final sttConfigured = ref.read(sttConfigProvider).configured;
     final commandCount = ref.read(composerProvider(_arg)).slashCommands.length;

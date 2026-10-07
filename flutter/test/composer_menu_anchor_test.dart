@@ -68,7 +68,18 @@ Dio _fakeDio() {
   return dio;
 }
 
-Widget _app({double width = 400}) => TranslationProvider(
+/// Insets must be set on the test view (not an injected `MediaQuery`), because
+/// the popover lives in the app's `Overlay` — above the route, so it only sees
+/// the view-derived `MediaQuery`.
+void _setView(WidgetTester tester, {double keyboard = 0, double topInset = 0}) {
+  tester.view.devicePixelRatio = 1.0;
+  tester.view.physicalSize = const Size(400, 800);
+  tester.view.padding = FakeViewPadding(top: topInset);
+  tester.view.viewInsets = FakeViewPadding(bottom: keyboard);
+  addTearDown(tester.view.reset);
+}
+
+Widget _app() => TranslationProvider(
   child: ProviderScope(
     overrides: [
       dioProvider.overrideWithValue(_fakeDio()),
@@ -76,15 +87,12 @@ Widget _app({double width = 400}) => TranslationProvider(
     ],
     child: MaterialApp(
       theme: AppTheme.ocChat(),
-      home: MediaQuery(
-        data: MediaQueryData(size: Size(width, 800)),
-        child: Scaffold(
-          body: Align(
-            alignment: Alignment.bottomCenter,
-            child: SizedBox(
-              width: width,
-              child: const ChatComposer(sessionId: 's1', projectId: 'p1'),
-            ),
+      home: const Scaffold(
+        body: Align(
+          alignment: Alignment.bottomCenter,
+          child: SizedBox(
+            width: 400,
+            child: ChatComposer(sessionId: 's1', projectId: 'p1'),
           ),
         ),
       ),
@@ -107,9 +115,7 @@ void main() {
   });
 
   testWidgets('compact footer: mode menu opens just above the composer', (tester) async {
-    tester.view.devicePixelRatio = 1.0;
-    tester.view.physicalSize = const Size(400, 800);
-    addTearDown(tester.view.reset);
+    _setView(tester);
 
     await tester.pumpWidget(_app());
     await tester.pumpAndSettle();
@@ -130,9 +136,7 @@ void main() {
   });
 
   testWidgets('compact action sheet: mode menu opens next to its trigger', (tester) async {
-    tester.view.devicePixelRatio = 1.0;
-    tester.view.physicalSize = const Size(400, 800);
-    addTearDown(tester.view.reset);
+    _setView(tester);
 
     await tester.pumpWidget(_app());
     await tester.pumpAndSettle();
@@ -157,5 +161,62 @@ void main() {
     expect(trigRect.top - menu.bottom, moreOrLessEquals(8, epsilon: 1));
     expect(menu.right, moreOrLessEquals(trigRect.right, epsilon: 1));
     expect(menu.bottom, greaterThan(sheetRect.top));
+  });
+
+  testWidgets('footer menu with the keyboard open stays between status bar and keyboard', (
+    tester,
+  ) async {
+    // Keyboard open (300px) and a 40px status bar.
+    _setView(tester, keyboard: 300, topInset: 40);
+    await tester.pumpWidget(_app());
+    await tester.pumpAndSettle();
+
+    await tester.tap(_modeTrigger());
+    await tester.pumpAndSettle();
+
+    final menu = tester.getRect(find.byType(ComposerMenuSurface));
+    // Never behind the status bar, never behind the keyboard.
+    expect(menu.top, greaterThanOrEqualTo(40 - 0.5));
+    expect(menu.bottom, lessThanOrEqualTo(800 - 300 + 0.5));
+  });
+
+  testWidgets('action-sheet menu with the keyboard open does not fall behind it', (tester) async {
+    _setView(tester, keyboard: 300, topInset: 40);
+    await tester.pumpWidget(_app());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pumpAndSettle();
+
+    final sheetTrigger = find.descendant(of: find.byType(BottomSheet), matching: _modeTrigger());
+    await tester.tap(sheetTrigger);
+    await tester.pumpAndSettle();
+
+    final menu = tester.getRect(find.byType(ComposerMenuSurface));
+    expect(menu.top, greaterThanOrEqualTo(40 - 0.5));
+    expect(menu.bottom, lessThanOrEqualTo(800 - 300 + 0.5));
+  });
+
+  testWidgets('opening the compact + sheet drops the composer focus (keyboard closes)', (
+    tester,
+  ) async {
+    _setView(tester);
+
+    await tester.pumpWidget(_app());
+    await tester.pumpAndSettle();
+
+    final field = find.byType(TextField).first;
+    await tester.tap(field);
+    await tester.pumpAndSettle();
+    final node = tester.widget<TextField>(field).focusNode;
+    expect(node?.hasFocus, isTrue);
+
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pumpAndSettle();
+
+    // A route-level sheet cannot dodge the keyboard, so focus must be dropped
+    // first — otherwise the sheet (and the option bar it re-hosts) opens behind
+    // it.
+    expect(node?.hasFocus, isFalse);
   });
 }

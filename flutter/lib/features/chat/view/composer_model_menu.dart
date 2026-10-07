@@ -552,11 +552,21 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
 /// model/mode triggers sit in the sheet's route — anchoring to the composer
 /// would drop the popover behind the sheet, far from the tapped control. In
 /// that case anchor to the trigger itself so it opens right above it.
+///
+/// [topInset]/[bottomInset] are the ambient `padding.top`/`viewInsets.bottom`,
+/// i.e. the status bar and the on-screen keyboard. The popover only grows
+/// upward, so it is clamped into the strip between them: with a keyboard open
+/// the anchor (the composer, or a trigger re-hosted in the `+` sheet, which
+/// does not move with the keyboard) can sit below the keyboard, and anchoring
+/// blind would stretch the popover from behind the keyboard up past the top of
+/// the screen.
 (double right, double bottom, double maxHeight, double maxWidth) composerMenuAnchor(
   BuildContext triggerContext,
   GlobalKey promptBoxKey,
   Size screen, {
   double preferredWidth = 320,
+  double topInset = 0,
+  double bottomInset = 0,
 }) {
   const margin = 8.0;
   const gap = 8.0;
@@ -569,15 +579,21 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
 
   final sameRoute =
       composerContext != null && ModalRoute.of(triggerContext) == ModalRoute.of(composerContext);
+  final rawAnchorY = sameRoute ? composerOffset.dy - gap : rect.top - gap;
+
+  // Visible strip: below the status bar, above the keyboard.
+  final topBound = topInset + margin;
+  final bottomBound = math.max(topBound + gap, screen.height - bottomInset - gap);
+  final anchorY = rawAnchorY.clamp(topBound + gap, bottomBound);
+
+  final bottom = screen.height - anchorY;
+  final maxHeight = math.max(160.0, anchorY - topBound);
+
   if (!sameRoute) {
     final width = math.min(preferredWidth, math.max(200.0, screen.width - right - margin));
-    final maxHeight = math.max(160.0, rect.top - gap - margin);
-    final bottom = screen.height - rect.top + gap;
     return (right, bottom, maxHeight, width);
   }
 
-  final bottom = screen.height - composerOffset.dy + gap;
-  final maxHeight = math.max(160.0, composerOffset.dy - gap - margin);
   final maxWidth = math.max(
     200.0,
     math.min(
@@ -601,12 +617,18 @@ OverlayEntry composerMenuEntry({
   double preferredWidth = 320,
 }) {
   Widget build(BuildContext ctx) {
-    final screen = MediaQuery.sizeOf(ctx);
+    // Reading the whole MediaQuery (not just `sizeOf`) keeps the popover
+    // reactive to the keyboard: `viewInsets.bottom` grows when it opens, so the
+    // entry rebuilds and re-clamps instead of staying where it was placed.
+    final media = MediaQuery.of(ctx);
+    final screen = media.size;
     final (right, bottom, maxHeight, maxWidth) = composerMenuAnchor(
       triggerContext,
       promptBoxKey,
       screen,
       preferredWidth: preferredWidth,
+      topInset: media.padding.top,
+      bottomInset: media.viewInsets.bottom,
     );
     return Stack(
       children: [
