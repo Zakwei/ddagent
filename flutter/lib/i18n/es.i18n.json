@@ -2038,6 +2038,15 @@
         "button": "Iniciar sesión",
         "reLoginButton": "Volver a iniciar sesión"
       },
+      "logout": {
+        "title": "Cerrar sesión",
+        "description": "Cierra la sesión de este proveedor y borra sus credenciales guardadas",
+        "button": "Cerrar sesión",
+        "confirmTitle": "¿Cerrar sesión de {{agent}}?",
+        "confirmDescription": "Esto elimina las credenciales guardadas de {{agent}} en el servidor. Vuelve a iniciar sesión para seguir usando {{agent}}.",
+        "success": "Sesión cerrada",
+        "failed": "No se pudo cerrar la sesión"
+      },
       "error": "Error: {{error}}"
     },
     "permissions": {

@@ -394,9 +394,17 @@ alongside the implementation.
 ### Ambient login identity for Flutter
 
 `GET /api/providers/:provider/auth/status` returns
-`{ success: true, data: { installed, provider, authenticated, email, method, error? } }`
+`{ success: true, data: { installed, provider, authenticated, email, method, canLogout, error? } }`
 with `Cache-Control: no-store`. It describes the server's ambient/default CLI
 credentials, not an isolated account selected through `provider-accounts`.
+
+`canLogout` is `true` only when the provider adapter implements
+`IProviderAuth.logout`. `POST /api/providers/:provider/auth/logout` clears that
+adapter's stored credential file (best-effort — a missing file still succeeds)
+and returns the same status shape with `Cache-Control: no-store`. Providers whose
+login is owned by an environment variable or an OS keyring omit `logout` and
+answer `501 LOGOUT_UNSUPPORTED`. Credentials injected through the server
+environment cannot be cleared by the endpoint.
 
 `email` is the existing nullable **display identity** field. It contains an email
 or a credential-store username (notably Command Code's `userName`, and legacy

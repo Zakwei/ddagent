@@ -2522,6 +2522,7 @@ class Translations$settings$agents$ru extends Translations$settings$agents$en {
 	@override late final Translations$settings$agents$account$ru account = Translations$settings$agents$account$ru._(_root);
 	@override String get connectionStatus => 'Статус подключения';
 	@override late final Translations$settings$agents$login$ru login = Translations$settings$agents$login$ru._(_root);
+	@override late final Translations$settings$agents$logout$ru logout = Translations$settings$agents$logout$ru._(_root);
 	@override String error({required Object error}) => 'Ошибка: ${error}';
 }
 
@@ -6045,6 +6046,22 @@ class Translations$settings$agents$login$ru extends Translations$settings$agents
 	@override String get reLoginButton => 'Войти снова';
 }
 
+// Path: settings.agents.logout
+class Translations$settings$agents$logout$ru extends Translations$settings$agents$logout$en {
+	Translations$settings$agents$logout$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Выйти';
+	@override String get description => 'Выйти из этого провайдера и удалить сохранённые учётные данные';
+	@override String get button => 'Выйти';
+	@override String confirmTitle({required Object agent}) => 'Выйти из ${agent}?';
+	@override String confirmDescription({required Object agent}) => 'Это удалит сохранённые учётные данные ${agent} на сервере. Войдите снова, чтобы продолжить использовать ${agent}.';
+	@override String get success => 'Вы вышли';
+	@override String get failed => 'Не удалось выйти';
+}
+
 // Path: settings.permissions.skipPermissions
 class Translations$settings$permissions$skipPermissions$ru extends Translations$settings$permissions$skipPermissions$en {
 	Translations$settings$permissions$skipPermissions$ru._(TranslationsRu root) : this._root = root, super.internal(root);
@@ -8650,6 +8667,13 @@ extension on TranslationsRu {
 			'settings.agents.login.reAuthDescription' => 'Войдите с другим аккаунтом или обновите учетные данные',
 			'settings.agents.login.button' => 'Войти',
 			'settings.agents.login.reLoginButton' => 'Войти снова',
+			'settings.agents.logout.title' => 'Выйти',
+			'settings.agents.logout.description' => 'Выйти из этого провайдера и удалить сохранённые учётные данные',
+			'settings.agents.logout.button' => 'Выйти',
+			'settings.agents.logout.confirmTitle' => ({required Object agent}) => 'Выйти из ${agent}?',
+			'settings.agents.logout.confirmDescription' => ({required Object agent}) => 'Это удалит сохранённые учётные данные ${agent} на сервере. Войдите снова, чтобы продолжить использовать ${agent}.',
+			'settings.agents.logout.success' => 'Вы вышли',
+			'settings.agents.logout.failed' => 'Не удалось выйти',
 			'settings.agents.error' => ({required Object error}) => 'Ошибка: ${error}',
 			'settings.permissions.title' => 'Настройки разрешений',
 			'settings.permissions.skipPermissions.label' => 'Пропускать запросы разрешений (используйте с осторожностью)',
@@ -8668,6 +8692,8 @@ extension on TranslationsRu {
 			'settings.permissions.allowedCommands.description' => 'Команды оболочки, которые автоматически разрешены без запроса',
 			'settings.permissions.allowedCommands.placeholder' => 'например, "Shell(ls)" или "Shell(git status)"',
 			'settings.permissions.allowedCommands.quickAdd' => 'Быстро добавить общие команды:',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.allowedCommands.empty' => 'Разрешенные команды не настроены',
 			'settings.permissions.blockedCommands.title' => 'Заблокированные команды оболочки',
 			'settings.permissions.blockedCommands.description' => 'Команды оболочки, которые автоматически блокируются',
@@ -8675,8 +8701,6 @@ extension on TranslationsRu {
 			'settings.permissions.blockedCommands.empty' => 'Заблокированные команды не настроены',
 			'settings.permissions.toolExamples.title' => 'Примеры шаблонов инструментов:',
 			'settings.permissions.toolExamples.bashGitLog' => '- Разрешить все команды git log',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.toolExamples.bashGitDiff' => '- Разрешить все команды git diff',
 			'settings.permissions.toolExamples.write' => '- Разрешить все использование инструмента Write',
 			'settings.permissions.toolExamples.bashRm' => '- Заблокировать все команды rm (опасно)',
@@ -9182,6 +9206,8 @@ extension on TranslationsRu {
 			'tasks.list.inProgressComplete' => 'Выполняется (нажмите, чтобы завершить)',
 			'tasks.list.markCompleted' => 'Отметить как выполненную',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => 'Переключить статус задачи ${id}',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.list.markDone' => 'Отметить как выполненную',
 			'tasks.list.reopen' => 'Возобновить',
 			'tasks.nextTask.allComplete' => 'Все задачи выполнены',
@@ -9189,8 +9215,6 @@ extension on TranslationsRu {
 			'tasks.nextTask.feature2' => '- Генерация задач из PRD для быстрого старта проекта.',
 			'tasks.nextTask.feature3' => '- Kanban и список для повседневной работы.',
 			'tasks.nextTask.hideDetails' => 'Скрыть детали',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.nextTask.initialize' => 'Инициализировать',
 			'tasks.nextTask.noPending' => 'Нет ожидающих задач',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI не настроен',

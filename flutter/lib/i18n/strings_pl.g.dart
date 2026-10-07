@@ -2591,6 +2591,7 @@ class Translations$settings$agents$pl extends Translations$settings$agents$en {
 	@override late final Translations$settings$agents$account$pl account = Translations$settings$agents$account$pl._(_root);
 	@override String get connectionStatus => 'Stan połączenia';
 	@override late final Translations$settings$agents$login$pl login = Translations$settings$agents$login$pl._(_root);
+	@override late final Translations$settings$agents$logout$pl logout = Translations$settings$agents$logout$pl._(_root);
 	@override String error({required Object error}) => 'Błąd: ${error}';
 	@override late final Translations$settings$agents$accounts$pl accounts = Translations$settings$agents$accounts$pl._(_root);
 }
@@ -6352,6 +6353,22 @@ class Translations$settings$agents$login$pl extends Translations$settings$agents
 	@override String get reLoginButton => 'Zaloguj ponownie';
 }
 
+// Path: settings.agents.logout
+class Translations$settings$agents$logout$pl extends Translations$settings$agents$logout$en {
+	Translations$settings$agents$logout$pl._(TranslationsPl root) : this._root = root, super.internal(root);
+
+	final TranslationsPl _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Wyloguj';
+	@override String get description => 'Wyloguj się z tego dostawcy i usuń zapisane poświadczenia';
+	@override String get button => 'Wyloguj';
+	@override String confirmTitle({required Object agent}) => 'Wylogować z ${agent}?';
+	@override String confirmDescription({required Object agent}) => 'Spowoduje to usunięcie zapisanych poświadczeń ${agent} na serwerze. Zaloguj się ponownie, aby dalej korzystać z ${agent}.';
+	@override String get success => 'Wylogowano';
+	@override String get failed => 'Wylogowanie nie powiodło się';
+}
+
 // Path: settings.agents.accounts
 class Translations$settings$agents$accounts$pl extends Translations$settings$agents$accounts$en {
 	Translations$settings$agents$accounts$pl._(TranslationsPl root) : this._root = root, super.internal(root);
@@ -9174,6 +9191,13 @@ extension on TranslationsPl {
 			'settings.agents.login.reAuthDescription' => 'Zaloguj się innym kontem lub odśwież poświadczenia',
 			'settings.agents.login.button' => 'Zaloguj się',
 			'settings.agents.login.reLoginButton' => 'Zaloguj ponownie',
+			'settings.agents.logout.title' => 'Wyloguj',
+			'settings.agents.logout.description' => 'Wyloguj się z tego dostawcy i usuń zapisane poświadczenia',
+			'settings.agents.logout.button' => 'Wyloguj',
+			'settings.agents.logout.confirmTitle' => ({required Object agent}) => 'Wylogować z ${agent}?',
+			'settings.agents.logout.confirmDescription' => ({required Object agent}) => 'Spowoduje to usunięcie zapisanych poświadczeń ${agent} na serwerze. Zaloguj się ponownie, aby dalej korzystać z ${agent}.',
+			'settings.agents.logout.success' => 'Wylogowano',
+			'settings.agents.logout.failed' => 'Wylogowanie nie powiodło się',
 			'settings.agents.error' => ({required Object error}) => 'Błąd: ${error}',
 			'settings.agents.accounts.title' => 'Nazwane konta',
 			'settings.agents.accounts.description' => 'Dodatkowe zestawy poświadczeń. Sesja przypięta do konta uruchamia CLI z izolowanym katalogiem konfiguracji. Zaloguj się, uruchamiając raz CLI providera z pokazanymi zmiennymi.',
@@ -9597,6 +9621,8 @@ extension on TranslationsPl {
 			'sidebar.deleteConfirmation.archiveSession' => 'Archiwizuj sesję',
 			'sidebar.deleteConfirmation.archiveSessionNotice' => 'Archiwizacja ukryje sesję na liście aktywnych, zachowując jej historię.',
 			'sidebar.deleteConfirmation.archivedSessionNotice' => 'Ta sesja jest już zarchiwizowana. Możesz ją pozostawić ukrytą lub usunąć trwale.',
+			_ => null,
+		} ?? switch (path) {
 			'sidebar.deleteConfirmation.deleteSessionNotice' => 'To trwale usunie sesję wraz z transkryptem. Tej operacji nie można cofnąć.',
 			'sidebar.deleteConfirmation.deleteSessionPermanently' => 'Usuń trwale',
 			'sidebar.deleteConfirmation.sessionCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('pl'))(count, one: 'Ten projekt zawiera ${count} rozmowę.', other: 'Ten projekt zawiera ${count} rozmów.', ), 
@@ -9604,8 +9630,6 @@ extension on TranslationsPl {
 			'sidebar.deleteConfirmation.archiveSelectedSessions' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('pl'))(count, one: 'Archiwizuj sesję', few: 'Archiwizuj ${count} sesje', many: 'Archiwizuj ${count} sesji', other: 'Archiwizuj ${count} sesji', ), 
 			'sidebar.zones.activeNow' => 'Aktywne teraz',
 			'sidebar.zones.recent' => 'Ostatnio używane',
-			_ => null,
-		} ?? switch (path) {
 			'sidebar.zones.today' => 'Dzisiaj',
 			'sidebar.zones.yesterday' => 'Wczoraj',
 			'sidebar.zones.thisWeek' => 'W tym tygodniu',
@@ -10111,6 +10135,8 @@ extension on TranslationsPl {
 			'quota.agents.statusCount' => ({required Object status, required Object count}) => '${status} (${count})',
 			'quota.chart.hide' => 'Ukryj',
 			'quota.chart.noData' => 'Za mało danych, aby pokazać trend.',
+			_ => null,
+		} ?? switch (path) {
 			'quota.chart.pointReadout' => ({required Object date, required Object tokens, required Object cost}) => '${date} · ${tokens} tokenów · ${cost}',
 			'quota.chart.show' => 'Pokaż',
 			'quota.config.accountRouting' => 'Routing kont',
@@ -10118,8 +10144,6 @@ extension on TranslationsPl {
 			'quota.config.save' => 'Zapisz konfigurację',
 			'quota.overview.tokensAndCost' => 'Tokeny i koszt',
 			'quota.section.config' => 'Konfiguracja',
-			_ => null,
-		} ?? switch (path) {
 			'scheduler.checking' => 'Sprawdzanie…',
 			'scheduler.cronHint' => 'Cron (min godz dzień mies dzień-tyg) — np. 0 9 * * *',
 			'scheduler.deleteMessage' => ({required Object id}) => 'Spowoduje to usunięcie zadania cyklicznego ${id}. Istniejące sesje zostaną zachowane.',

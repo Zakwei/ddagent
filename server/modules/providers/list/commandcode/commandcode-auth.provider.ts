@@ -1,3 +1,4 @@
+import { rm } from 'node:fs/promises';
 import path from 'node:path';
 
 import spawn from 'cross-spawn';
@@ -85,6 +86,15 @@ export class CommandCodeProviderAuth implements IProviderAuth {
         ?? readCliField(result.stdout, 'Username')
         ?? readCliField(result.stdout, 'Name');
     });
+  }
+
+  /**
+   * Removes Command Code's auth store so the next status check reports
+   * unauthenticated. Credentials injected through the environment cannot be
+   * cleared here. Consumed by the settings "Log out" action.
+   */
+  async logout(): Promise<void> {
+    await rm(path.join(commandCodeDir(), 'auth.json'), { force: true });
   }
 
   /**

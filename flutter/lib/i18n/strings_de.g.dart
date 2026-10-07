@@ -2522,6 +2522,7 @@ class Translations$settings$agents$de extends Translations$settings$agents$en {
 	@override late final Translations$settings$agents$account$de account = Translations$settings$agents$account$de._(_root);
 	@override String get connectionStatus => 'Verbindungsstatus';
 	@override late final Translations$settings$agents$login$de login = Translations$settings$agents$login$de._(_root);
+	@override late final Translations$settings$agents$logout$de logout = Translations$settings$agents$logout$de._(_root);
 	@override String error({required Object error}) => 'Fehler: ${error}';
 }
 
@@ -6039,6 +6040,22 @@ class Translations$settings$agents$login$de extends Translations$settings$agents
 	@override String get reLoginButton => 'Erneut anmelden';
 }
 
+// Path: settings.agents.logout
+class Translations$settings$agents$logout$de extends Translations$settings$agents$logout$en {
+	Translations$settings$agents$logout$de._(TranslationsDe root) : this._root = root, super.internal(root);
+
+	final TranslationsDe _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Abmelden';
+	@override String get description => 'Von diesem Anbieter abmelden und gespeicherte Zugangsdaten löschen';
+	@override String get button => 'Abmelden';
+	@override String confirmTitle({required Object agent}) => 'Von ${agent} abmelden?';
+	@override String confirmDescription({required Object agent}) => 'Dadurch werden die gespeicherten ${agent}-Zugangsdaten auf dem Server entfernt. Melde dich erneut an, um ${agent} weiter zu nutzen.';
+	@override String get success => 'Abgemeldet';
+	@override String get failed => 'Abmelden fehlgeschlagen';
+}
+
 // Path: settings.permissions.skipPermissions
 class Translations$settings$permissions$skipPermissions$de extends Translations$settings$permissions$skipPermissions$en {
 	Translations$settings$permissions$skipPermissions$de._(TranslationsDe root) : this._root = root, super.internal(root);
@@ -8644,6 +8661,13 @@ extension on TranslationsDe {
 			'settings.agents.login.reAuthDescription' => 'Mit einem anderen Konto anmelden oder Anmeldedaten aktualisieren',
 			'settings.agents.login.button' => 'Anmelden',
 			'settings.agents.login.reLoginButton' => 'Erneut anmelden',
+			'settings.agents.logout.title' => 'Abmelden',
+			'settings.agents.logout.description' => 'Von diesem Anbieter abmelden und gespeicherte Zugangsdaten löschen',
+			'settings.agents.logout.button' => 'Abmelden',
+			'settings.agents.logout.confirmTitle' => ({required Object agent}) => 'Von ${agent} abmelden?',
+			'settings.agents.logout.confirmDescription' => ({required Object agent}) => 'Dadurch werden die gespeicherten ${agent}-Zugangsdaten auf dem Server entfernt. Melde dich erneut an, um ${agent} weiter zu nutzen.',
+			'settings.agents.logout.success' => 'Abgemeldet',
+			'settings.agents.logout.failed' => 'Abmelden fehlgeschlagen',
 			'settings.agents.error' => ({required Object error}) => 'Fehler: ${error}',
 			'settings.permissions.title' => 'Berechtigungseinstellungen',
 			'settings.permissions.skipPermissions.label' => 'Berechtigungsaufforderungen überspringen (mit Vorsicht verwenden)',
@@ -8662,6 +8686,8 @@ extension on TranslationsDe {
 			'settings.permissions.allowedCommands.description' => 'Shell-Befehle, die automatisch ohne Aufforderung erlaubt werden',
 			'settings.permissions.allowedCommands.placeholder' => 'z. B. "Shell(ls)" oder "Shell(git status)"',
 			'settings.permissions.allowedCommands.quickAdd' => 'Häufige Befehle schnell hinzufügen:',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.allowedCommands.empty' => 'Keine erlaubten Befehle konfiguriert',
 			'settings.permissions.blockedCommands.title' => 'Gesperrte Shell-Befehle',
 			'settings.permissions.blockedCommands.description' => 'Shell-Befehle, die automatisch gesperrt werden',
@@ -8669,8 +8695,6 @@ extension on TranslationsDe {
 			'settings.permissions.blockedCommands.empty' => 'Keine gesperrten Befehle konfiguriert',
 			'settings.permissions.toolExamples.title' => 'Werkzeugmuster-Beispiele:',
 			'settings.permissions.toolExamples.bashGitLog' => '- Alle git log-Befehle erlauben',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.toolExamples.bashGitDiff' => '- Alle git diff-Befehle erlauben',
 			'settings.permissions.toolExamples.write' => '- Alle Write-Werkzeugnutzungen erlauben',
 			'settings.permissions.toolExamples.bashRm' => '- Alle rm-Befehle sperren (gefährlich)',
@@ -9176,6 +9200,8 @@ extension on TranslationsDe {
 			'tasks.list.inProgressComplete' => 'In Bearbeitung (klicken zum Abschließen)',
 			'tasks.list.markCompleted' => 'Als abgeschlossen markieren',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => 'Status von Aufgabe ${id} umschalten',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.list.markDone' => 'Als erledigt markieren',
 			'tasks.list.reopen' => 'Wieder öffnen',
 			'tasks.nextTask.allComplete' => 'Alle Aufgaben abgeschlossen',
@@ -9183,8 +9209,6 @@ extension on TranslationsDe {
 			'tasks.nextTask.feature2' => '- PRD-basierte Aufgabengenerierung für schnelleren Projektstart.',
 			'tasks.nextTask.feature3' => '- Kanban- und Listenansichten für die tägliche Arbeit.',
 			'tasks.nextTask.hideDetails' => 'Details ausblenden',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.nextTask.initialize' => 'Initialisieren',
 			'tasks.nextTask.noPending' => 'Keine ausstehenden Aufgaben',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI ist nicht konfiguriert',

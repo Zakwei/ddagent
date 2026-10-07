@@ -2522,6 +2522,7 @@ class Translations$settings$agents$ko extends Translations$settings$agents$en {
 	@override late final Translations$settings$agents$account$ko account = Translations$settings$agents$account$ko._(_root);
 	@override String get connectionStatus => '연결 상태';
 	@override late final Translations$settings$agents$login$ko login = Translations$settings$agents$login$ko._(_root);
+	@override late final Translations$settings$agents$logout$ko logout = Translations$settings$agents$logout$ko._(_root);
 	@override String error({required Object error}) => '오류: ${error}';
 }
 
@@ -6039,6 +6040,22 @@ class Translations$settings$agents$login$ko extends Translations$settings$agents
 	@override String get reLoginButton => '재로그인';
 }
 
+// Path: settings.agents.logout
+class Translations$settings$agents$logout$ko extends Translations$settings$agents$logout$en {
+	Translations$settings$agents$logout$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '로그아웃';
+	@override String get description => '이 제공자에서 로그아웃하고 저장된 자격 증명을 지웁니다';
+	@override String get button => '로그아웃';
+	@override String confirmTitle({required Object agent}) => '${agent}에서 로그아웃하시겠습니까?';
+	@override String confirmDescription({required Object agent}) => '서버에 저장된 ${agent} 자격 증명이 삭제됩니다. ${agent}을(를) 계속 사용하려면 다시 로그인하세요.';
+	@override String get success => '로그아웃되었습니다';
+	@override String get failed => '로그아웃 실패';
+}
+
 // Path: settings.permissions.skipPermissions
 class Translations$settings$permissions$skipPermissions$ko extends Translations$settings$permissions$skipPermissions$en {
 	Translations$settings$permissions$skipPermissions$ko._(TranslationsKo root) : this._root = root, super.internal(root);
@@ -8644,6 +8661,13 @@ extension on TranslationsKo {
 			'settings.agents.login.reAuthDescription' => '다른 계정으로 로그인하거나 자격 증명을 새로고침하세요',
 			'settings.agents.login.button' => '로그인',
 			'settings.agents.login.reLoginButton' => '재로그인',
+			'settings.agents.logout.title' => '로그아웃',
+			'settings.agents.logout.description' => '이 제공자에서 로그아웃하고 저장된 자격 증명을 지웁니다',
+			'settings.agents.logout.button' => '로그아웃',
+			'settings.agents.logout.confirmTitle' => ({required Object agent}) => '${agent}에서 로그아웃하시겠습니까?',
+			'settings.agents.logout.confirmDescription' => ({required Object agent}) => '서버에 저장된 ${agent} 자격 증명이 삭제됩니다. ${agent}을(를) 계속 사용하려면 다시 로그인하세요.',
+			'settings.agents.logout.success' => '로그아웃되었습니다',
+			'settings.agents.logout.failed' => '로그아웃 실패',
 			'settings.agents.error' => ({required Object error}) => '오류: ${error}',
 			'settings.permissions.title' => '권한 설정',
 			'settings.permissions.skipPermissions.label' => '권한 확인 건너뛰기 (주의해서 사용)',
@@ -8662,6 +8686,8 @@ extension on TranslationsKo {
 			'settings.permissions.allowedCommands.description' => '권한 확인 없이 자동으로 허용되는 Shell 명령어',
 			'settings.permissions.allowedCommands.placeholder' => '예: "Shell(ls)" 또는 "Shell(git status)"',
 			'settings.permissions.allowedCommands.quickAdd' => '자주 쓰는 명령어 빠른 추가:',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.allowedCommands.empty' => '설정된 허용 명령어 없음',
 			'settings.permissions.blockedCommands.title' => '차단된 Shell 명령어',
 			'settings.permissions.blockedCommands.description' => '자동으로 차단되는 Shell 명령어',
@@ -8669,8 +8695,6 @@ extension on TranslationsKo {
 			'settings.permissions.blockedCommands.empty' => '설정된 차단 명령어 없음',
 			'settings.permissions.toolExamples.title' => '도구 패턴 예시:',
 			'settings.permissions.toolExamples.bashGitLog' => '- 모든 git log 명령어 허용',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.toolExamples.bashGitDiff' => '- 모든 git diff 명령어 허용',
 			'settings.permissions.toolExamples.write' => '- 모든 Write 도구 사용 허용',
 			'settings.permissions.toolExamples.bashRm' => '- 모든 rm 명령어 차단 (위험)',
@@ -9176,6 +9200,8 @@ extension on TranslationsKo {
 			'tasks.list.inProgressComplete' => '진행 중 (클릭하여 완료)',
 			'tasks.list.markCompleted' => '완료로 표시',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => '작업 ${id} 상태 전환',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.list.markDone' => '완료로 표시',
 			'tasks.list.reopen' => '다시 열기',
 			'tasks.nextTask.allComplete' => '모든 작업 완료',
@@ -9183,8 +9209,6 @@ extension on TranslationsKo {
 			'tasks.nextTask.feature2' => '- PRD 기반 작업 생성으로 프로젝트 빠른 시작.',
 			'tasks.nextTask.feature3' => '- 일상 작업을 위한 칸반 및 목록 보기.',
 			'tasks.nextTask.hideDetails' => '세부 정보 숨기기',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.nextTask.initialize' => '초기화',
 			'tasks.nextTask.noPending' => '대기 중인 작업 없음',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI가 구성되지 않았습니다',

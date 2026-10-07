@@ -59,6 +59,15 @@ export class AntigravityProviderAuth implements IProviderAuth {
   }
 
   /**
+   * Removes Antigravity's OAuth token file so the next status check reports
+   * unauthenticated. `GEMINI_API_KEY` supplied through the environment cannot
+   * be cleared here. Consumed by the settings "Log out" action.
+   */
+  async logout(): Promise<void> {
+    await fs.rm(path.join(antigravityDir(), 'antigravity-oauth-token'), { force: true });
+  }
+
+  /**
    * Detects Antigravity credentials offline: the CLI writes an OAuth token
    * file at `~/.gemini/antigravity-cli/antigravity-oauth-token` after a
    * successful sign-in (Google account via system keyring/flow), and headless

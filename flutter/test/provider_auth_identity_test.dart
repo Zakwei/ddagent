@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:ddagent_app/core/network/api_providers.dart';
 import 'package:ddagent_app/core/theme/app_theme.dart';
+import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/features/settings/data/agent_install.dart';
 import 'package:ddagent_app/features/settings/state/provider_auth_controller.dart';
 import 'package:ddagent_app/features/settings/view/sections/agents_section.dart';
@@ -55,6 +56,9 @@ class _Backend {
             final Object data;
             if (options.path.endsWith('/auth/status')) {
               data = await auth(options.path.split('/')[3]);
+            } else if (options.path.endsWith('/auth/logout')) {
+              logoutCalls += 1;
+              data = await auth(options.path.split('/')[3]);
             } else if (options.path == '/api/provider-accounts') {
               data = {
                 'accounts': [
@@ -83,6 +87,7 @@ class _Backend {
 
   final dio = Dio(BaseOptions(baseUrl: 'http://test.invalid'));
   Future<Map<String, dynamic>> Function(String) auth = (_) async => {'authenticated': false};
+  int logoutCalls = 0;
 }
 
 void main() {
@@ -283,6 +288,58 @@ void main() {
     expect(find.text(installT.docs), findsOneWidget);
     expect(find.text(t.settings.agents.accounts.title), findsNothing);
     expect(find.text(t.settings.agents.login.button), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('logout confirms, calls the server, and refreshes the status', (tester) async {
+    tester.view.physicalSize = const Size(1600, 1200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    LocaleSettings.setLocaleSync(AppLocale.pl);
+    addTearDown(() => LocaleSettings.setLocaleSync(AppLocale.en));
+
+    final backend = _Backend();
+    var loggedOut = false;
+    backend.auth = (provider) async => provider == 'claude' && !loggedOut
+        ? {'authenticated': true, 'email': 'person@example.com', 'canLogout': true}
+        : {'authenticated': false, 'canLogout': true};
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [dioProvider.overrideWithValue(backend.dio)],
+        child: TranslationProvider(
+          child: MaterialApp(
+            theme: AppTheme.light(),
+            home: const Scaffold(body: AgentsSection()),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Claude').first);
+    await tester.pumpAndSettle();
+
+    final logoutT = t.settings.agents.logout;
+    Finder logoutButton() => find.widgetWithText(AppButton, logoutT.button);
+    expect(logoutButton(), findsOneWidget);
+
+    // Cancelling the confirmation leaves the login untouched.
+    await tester.tap(logoutButton());
+    await tester.pumpAndSettle();
+    expect(find.text(logoutT.confirmTitle(agent: 'Claude')), findsOneWidget);
+    await tester.tap(find.widgetWithText(AppButton, t.common.buttons.cancel));
+    await tester.pumpAndSettle();
+    expect(backend.logoutCalls, 0);
+
+    loggedOut = true;
+    await tester.tap(logoutButton());
+    await tester.pumpAndSettle();
+    await tester.tap(logoutButton().last);
+    await tester.pumpAndSettle();
+
+    expect(backend.logoutCalls, 1);
+    expect(find.text(t.settings.agents.authStatus.notConnected), findsOneWidget);
+    expect(find.text(logoutT.success), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }

@@ -105,6 +105,18 @@ export interface IProviderAuth {
    * Checks whether the provider is installed and has usable credentials.
    */
   getStatus(): Promise<ProviderAuthStatus>;
+
+  /**
+   * Clears the provider's stored credentials so a later `getStatus()` reports
+   * unauthenticated, restoring a fresh-login state.
+   *
+   * Optional capability: providers whose login is owned by an environment
+   * variable or an OS keyring have no store to clear and omit this method.
+   * Callers (the auth service and its logout route) must treat its absence as
+   * "logout unsupported" rather than an error. Implementations delete files
+   * best-effort — a missing credential file is still a successful logout.
+   */
+  logout?(): Promise<void>;
 }
 
 // ---------------------------

@@ -2522,6 +2522,7 @@ class Translations$settings$agents$zh_CN extends Translations$settings$agents$en
 	@override late final Translations$settings$agents$account$zh_CN account = Translations$settings$agents$account$zh_CN.internal(_root);
 	@override String get connectionStatus => '连接状态';
 	@override late final Translations$settings$agents$login$zh_CN login = Translations$settings$agents$login$zh_CN.internal(_root);
+	@override late final Translations$settings$agents$logout$zh_CN logout = Translations$settings$agents$logout$zh_CN.internal(_root);
 	@override String error({required Object error}) => '错误：${error}';
 }
 
@@ -6039,6 +6040,22 @@ class Translations$settings$agents$login$zh_CN extends Translations$settings$age
 	@override String get reLoginButton => '重新登录';
 }
 
+// Path: settings.agents.logout
+class Translations$settings$agents$logout$zh_CN extends Translations$settings$agents$logout$en {
+	Translations$settings$agents$logout$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '退出登录';
+	@override String get description => '退出此提供商并清除已保存的凭据';
+	@override String get button => '退出登录';
+	@override String confirmTitle({required Object agent}) => '退出 ${agent}？';
+	@override String confirmDescription({required Object agent}) => '这将删除服务器上保存的 ${agent} 凭据。请重新登录以继续使用 ${agent}。';
+	@override String get success => '已退出登录';
+	@override String get failed => '退出登录失败';
+}
+
 // Path: settings.permissions.skipPermissions
 class Translations$settings$permissions$skipPermissions$zh_CN extends Translations$settings$permissions$skipPermissions$en {
 	Translations$settings$permissions$skipPermissions$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
@@ -8644,6 +8661,13 @@ extension on TranslationsZhCn {
 			'settings.agents.login.reAuthDescription' => '使用其他账户登录或刷新凭据',
 			'settings.agents.login.button' => '登录',
 			'settings.agents.login.reLoginButton' => '重新登录',
+			'settings.agents.logout.title' => '退出登录',
+			'settings.agents.logout.description' => '退出此提供商并清除已保存的凭据',
+			'settings.agents.logout.button' => '退出登录',
+			'settings.agents.logout.confirmTitle' => ({required Object agent}) => '退出 ${agent}？',
+			'settings.agents.logout.confirmDescription' => ({required Object agent}) => '这将删除服务器上保存的 ${agent} 凭据。请重新登录以继续使用 ${agent}。',
+			'settings.agents.logout.success' => '已退出登录',
+			'settings.agents.logout.failed' => '退出登录失败',
 			'settings.agents.error' => ({required Object error}) => '错误：${error}',
 			'settings.permissions.title' => '权限设置',
 			'settings.permissions.skipPermissions.label' => '跳过权限提示（请谨慎使用）',
@@ -8662,6 +8686,8 @@ extension on TranslationsZhCn {
 			'settings.permissions.allowedCommands.description' => '无需权限提示即可自动执行的 Shell 命令',
 			'settings.permissions.allowedCommands.placeholder' => '例如："Shell(ls)" 或 "Shell(git status)"',
 			'settings.permissions.allowedCommands.quickAdd' => '快速添加常用命令：',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.allowedCommands.empty' => '未配置允许的命令',
 			'settings.permissions.blockedCommands.title' => '阻止的 Shell 命令',
 			'settings.permissions.blockedCommands.description' => '自动阻止的 Shell 命令',
@@ -8669,8 +8695,6 @@ extension on TranslationsZhCn {
 			'settings.permissions.blockedCommands.empty' => '未配置阻止的命令',
 			'settings.permissions.toolExamples.title' => '工具模式示例：',
 			'settings.permissions.toolExamples.bashGitLog' => '- 允许所有 git log 命令',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.toolExamples.bashGitDiff' => '- 允许所有 git diff 命令',
 			'settings.permissions.toolExamples.write' => '- 允许所有 Write 工具使用',
 			'settings.permissions.toolExamples.bashRm' => '- 阻止所有 rm 命令（危险）',
@@ -9176,6 +9200,8 @@ extension on TranslationsZhCn {
 			'tasks.list.inProgressComplete' => '进行中（点击完成）',
 			'tasks.list.markCompleted' => '标记为已完成',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => '切换任务 ${id} 的状态',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.list.markDone' => '标记为已完成',
 			'tasks.list.reopen' => '重新打开',
 			'tasks.nextTask.allComplete' => '所有任务已完成',
@@ -9183,8 +9209,6 @@ extension on TranslationsZhCn {
 			'tasks.nextTask.feature2' => '- PRD 驱动的任务生成，快速启动项目。',
 			'tasks.nextTask.feature3' => '- 看板和列表视图，适合日常工作。',
 			'tasks.nextTask.hideDetails' => '隐藏详情',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.nextTask.initialize' => '初始化',
 			'tasks.nextTask.noPending' => '没有待处理任务',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI 未配置',

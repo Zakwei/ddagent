@@ -1,4 +1,4 @@
-import { readFile } from 'node:fs/promises';
+import { readFile, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 
@@ -13,6 +13,13 @@ type ClaudeCredentialsStatus = {
   method: string | null;
   error?: string;
 };
+
+/** Env keys in `settings.json` that carry login material rather than preferences. */
+const CLAUDE_CREDENTIAL_ENV_KEYS = [
+  'ANTHROPIC_AUTH_TOKEN',
+  'ANTHROPIC_API_KEY',
+  'CLAUDE_CODE_OAUTH_TOKEN',
+] as const;
 
 const hasErrorCode = (error: unknown, code: string): boolean => (
   error instanceof Error && 'code' in error && error.code === code
@@ -63,16 +70,77 @@ export class ClaudeProviderAuth implements IProviderAuth {
   }
 
   /**
+   * Directory holding Claude Code's credentials and settings. `CLAUDE_CONFIG_DIR`
+   * replaces `~/.claude` entirely — the same env var provider accounts use to
+   * isolate their credential store.
+   */
+  private claudeDir(): string {
+    const configured = process.env.CLAUDE_CONFIG_DIR?.trim();
+    return configured && configured.length > 0 ? configured : path.join(os.homedir(), '.claude');
+  }
+
+  /**
    * Reads Claude settings env values that the CLI can use even when the server process env is empty.
    */
   private async loadSettingsEnv(): Promise<Record<string, unknown>> {
     try {
-      const settingsPath = path.join(os.homedir(), '.claude', 'settings.json');
-      const content = await readFile(settingsPath, 'utf8');
+      const content = await readFile(path.join(this.claudeDir(), 'settings.json'), 'utf8');
       const settings = readObjectRecord(JSON.parse(content));
       return readObjectRecord(settings?.env) ?? {};
     } catch {
       return {};
+    }
+  }
+
+  /**
+   * Clears Claude's stored login: removes the OAuth credentials file and strips
+   * the credential env keys from `settings.json` (preferences are preserved).
+   *
+   * Credentials supplied through the server process environment cannot be
+   * removed here — status keeps reporting them until the deployment stops
+   * exporting them. Consumed by the settings "Log out" action via
+   * IProviderAuth.logout.
+   */
+  async logout(): Promise<void> {
+    const dir = this.claudeDir();
+    await rm(path.join(dir, '.credentials.json'), { force: true });
+    await this.clearSettingsCredentials(path.join(dir, 'settings.json'));
+  }
+
+  /**
+   * Removes credential env keys from a Claude `settings.json`, preserving every
+   * other key and leaving a malformed/missing file untouched.
+   */
+  private async clearSettingsCredentials(settingsPath: string): Promise<void> {
+    let raw: string;
+    try {
+      raw = await readFile(settingsPath, 'utf8');
+    } catch {
+      return;
+    }
+
+    let settings: Record<string, unknown>;
+    try {
+      settings = JSON.parse(raw) as Record<string, unknown>;
+    } catch {
+      return;
+    }
+
+    const env = readObjectRecord(settings.env);
+    if (!env) {
+      return;
+    }
+
+    let changed = false;
+    for (const key of CLAUDE_CREDENTIAL_ENV_KEYS) {
+      if (key in env) {
+        delete env[key];
+        changed = true;
+      }
+    }
+
+    if (changed) {
+      await writeFile(settingsPath, `${JSON.stringify({ ...settings, env }, null, 2)}\n`);
     }
   }
 
@@ -108,7 +176,7 @@ export class ClaudeProviderAuth implements IProviderAuth {
     }
 
     try {
-      const credPath = path.join(os.homedir(), '.claude', '.credentials.json');
+      const credPath = path.join(this.claudeDir(), '.credentials.json');
       const content = await readFile(credPath, 'utf8');
       const creds = readObjectRecord(JSON.parse(content)) ?? {};
       const oauth = readObjectRecord(creds.claudeAiOauth);

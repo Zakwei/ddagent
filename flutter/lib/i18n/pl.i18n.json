@@ -2172,6 +2172,15 @@
         "button": "Zaloguj się",
         "reLoginButton": "Zaloguj ponownie"
       },
+      "logout": {
+        "title": "Wyloguj",
+        "description": "Wyloguj się z tego dostawcy i usuń zapisane poświadczenia",
+        "button": "Wyloguj",
+        "confirmTitle": "Wylogować z {{agent}}?",
+        "confirmDescription": "Spowoduje to usunięcie zapisanych poświadczeń {{agent}} na serwerze. Zaloguj się ponownie, aby dalej korzystać z {{agent}}.",
+        "success": "Wylogowano",
+        "failed": "Wylogowanie nie powiodło się"
+      },
       "error": "Błąd: {{error}}",
       "accounts": {
         "title": "Nazwane konta",

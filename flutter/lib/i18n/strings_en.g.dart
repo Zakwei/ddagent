@@ -4666,6 +4666,7 @@ class Translations$settings$agents$en {
 	String get connectionStatus => 'Connection Status';
 
 	late final Translations$settings$agents$login$en login = Translations$settings$agents$login$en.internal(_root);
+	late final Translations$settings$agents$logout$en logout = Translations$settings$agents$logout$en.internal(_root);
 
 	/// en: 'Error: {{error}}'
 	String error({required Object error}) => 'Error: ${error}';
@@ -11634,6 +11635,36 @@ class Translations$settings$agents$login$en {
 	String get reLoginButton => 'Re-login';
 }
 
+// Path: settings.agents.logout
+class Translations$settings$agents$logout$en {
+	Translations$settings$agents$logout$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Log out'
+	String get title => 'Log out';
+
+	/// en: 'Sign out of this provider and clear its saved credentials'
+	String get description => 'Sign out of this provider and clear its saved credentials';
+
+	/// en: 'Log out'
+	String get button => 'Log out';
+
+	/// en: 'Log out of {{agent}}?'
+	String confirmTitle({required Object agent}) => 'Log out of ${agent}?';
+
+	/// en: 'This removes the saved {{agent}} credentials on the server. Sign in again to keep using {{agent}}.'
+	String confirmDescription({required Object agent}) => 'This removes the saved ${agent} credentials on the server. Sign in again to keep using ${agent}.';
+
+	/// en: 'Logged out'
+	String get success => 'Logged out';
+
+	/// en: 'Logout failed'
+	String get failed => 'Logout failed';
+}
+
 // Path: settings.agents.accounts
 class Translations$settings$agents$accounts$en {
 	Translations$settings$agents$accounts$en.internal(this._root);
@@ -15276,6 +15307,13 @@ extension on Translations {
 			'settings.agents.login.reAuthDescription' => 'Sign in with a different account or refresh credentials',
 			'settings.agents.login.button' => 'Login',
 			'settings.agents.login.reLoginButton' => 'Re-login',
+			'settings.agents.logout.title' => 'Log out',
+			'settings.agents.logout.description' => 'Sign out of this provider and clear its saved credentials',
+			'settings.agents.logout.button' => 'Log out',
+			'settings.agents.logout.confirmTitle' => ({required Object agent}) => 'Log out of ${agent}?',
+			'settings.agents.logout.confirmDescription' => ({required Object agent}) => 'This removes the saved ${agent} credentials on the server. Sign in again to keep using ${agent}.',
+			'settings.agents.logout.success' => 'Logged out',
+			'settings.agents.logout.failed' => 'Logout failed',
 			'settings.agents.error' => ({required Object error}) => 'Error: ${error}',
 			'settings.agents.accounts.title' => 'Named accounts',
 			'settings.agents.accounts.description' => 'Additional credential sets. A session pinned to an account launches the CLI with its isolated config directory. Log in by running the provider CLI once with the shown env vars.',
@@ -15620,6 +15658,8 @@ extension on Translations {
 			'sidebar.branding.openSource' => 'Open Source',
 			'sidebar.status.active' => 'Active',
 			'sidebar.status.inactive' => 'Inactive',
+			_ => null,
+		} ?? switch (path) {
 			'sidebar.status.thinking' => 'Thinking...',
 			'sidebar.status.error' => 'Error',
 			'sidebar.status.aborted' => 'Aborted',
@@ -15627,8 +15667,6 @@ extension on Translations {
 			'sidebar.time.justNow' => 'Just now',
 			'sidebar.time.oneMinuteAgo' => '1 min ago',
 			'sidebar.time.minutesAgo' => ({required Object count}) => '${count} mins ago',
-			_ => null,
-		} ?? switch (path) {
 			'sidebar.time.oneHourAgo' => '1 hour ago',
 			'sidebar.time.hoursAgo' => ({required Object count}) => '${count} hours ago',
 			'sidebar.time.oneDayAgo' => '1 day ago',
@@ -16134,6 +16172,8 @@ extension on Translations {
 			'mcp.install.failed' => ({required Object error}) => 'Install failed: ${error}',
 			'mcp.install.installedCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: 'Installed on ${count} agent.', other: 'Installed on ${count} agents.', ), 
 			'mcp.install.partialFailure' => ({required Object count, required Object failed}) => 'Installed on ${count}; failed: ${failed}',
+			_ => null,
+		} ?? switch (path) {
 			'mcp.install.errorFallback' => 'error',
 			'mcp.servers.loading' => 'Loading MCP servers...',
 			'mcp.servers.refreshingScopes' => 'Refreshing project scopes...',
@@ -16141,8 +16181,6 @@ extension on Translations {
 			'mcp.servers.addGlobalTitle' => 'Add Global MCP Server',
 			'mcp.servers.addGlobalDescription' => 'Adds this MCP server to every provider: Claude, Cursor, Codex, OpenCode, and Devin. Only stdio and HTTP transports are supported because the same config must work across all providers.',
 			'mcp.servers.addGlobalMenuDescription' => 'Add Global MCP Server writes one common stdio or HTTP server to Claude, Cursor, Codex, OpenCode, and Devin.',
-			_ => null,
-		} ?? switch (path) {
 			'mcp.servers.addProviderTitle' => ({required Object provider}) => 'Add ${provider} MCP Server',
 			'mcp.servers.addProviderDescription' => ({required Object provider}) => 'Add ${provider} MCP Server only changes ${provider}.',
 			'mcp.servers.config.cwd' => 'Cwd',

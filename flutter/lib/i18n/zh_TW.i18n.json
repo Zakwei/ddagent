@@ -2038,6 +2038,15 @@
         "button": "登入",
         "reLoginButton": "重新登入"
       },
+      "logout": {
+        "title": "登出",
+        "description": "登出此提供者並清除已儲存的認證資訊",
+        "button": "登出",
+        "confirmTitle": "登出 {{agent}}？",
+        "confirmDescription": "這會刪除伺服器上儲存的 {{agent}} 認證資訊。請重新登入以繼續使用 {{agent}}。",
+        "success": "已登出",
+        "failed": "登出失敗"
+      },
       "error": "錯誤：{{error}}"
     },
     "permissions": {

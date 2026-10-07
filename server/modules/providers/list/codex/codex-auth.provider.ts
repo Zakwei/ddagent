@@ -1,4 +1,4 @@
-import { readFile } from 'node:fs/promises';
+import { readFile, rm } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 
@@ -46,11 +46,29 @@ export class CodexProviderAuth implements IProviderAuth {
   }
 
   /**
+   * Directory holding Codex's `auth.json`. `CODEX_HOME` replaces `~/.codex` —
+   * the same env var provider accounts use to isolate their credential store.
+   */
+  private codexHome(): string {
+    const configured = process.env.CODEX_HOME?.trim();
+    return configured && configured.length > 0 ? configured : path.join(os.homedir(), '.codex');
+  }
+
+  /**
+   * Removes Codex's login store so the next status check reports unauthenticated.
+   * Credentials injected through the environment cannot be cleared here.
+   * Consumed by the settings "Log out" action via IProviderAuth.logout.
+   */
+  async logout(): Promise<void> {
+    await rm(path.join(this.codexHome(), 'auth.json'), { force: true });
+  }
+
+  /**
    * Reads Codex auth.json and checks OAuth tokens or an API key fallback.
    */
   private async checkCredentials(): Promise<CodexCredentialsStatus> {
     try {
-      const authPath = path.join(os.homedir(), '.codex', 'auth.json');
+      const authPath = path.join(this.codexHome(), 'auth.json');
       const content = await readFile(authPath, 'utf8');
       const auth = readObjectRecord(JSON.parse(content)) ?? {};
       const tokens = readObjectRecord(auth.tokens) ?? {};

@@ -2522,6 +2522,7 @@ class Translations$settings$agents$zh_TW extends Translations$settings$agents$en
 	@override late final Translations$settings$agents$account$zh_TW account = Translations$settings$agents$account$zh_TW.internal(_root);
 	@override String get connectionStatus => '連線狀態';
 	@override late final Translations$settings$agents$login$zh_TW login = Translations$settings$agents$login$zh_TW.internal(_root);
+	@override late final Translations$settings$agents$logout$zh_TW logout = Translations$settings$agents$logout$zh_TW.internal(_root);
 	@override String error({required Object error}) => '錯誤：${error}';
 }
 
@@ -6039,6 +6040,22 @@ class Translations$settings$agents$login$zh_TW extends Translations$settings$age
 	@override String get reLoginButton => '重新登入';
 }
 
+// Path: settings.agents.logout
+class Translations$settings$agents$logout$zh_TW extends Translations$settings$agents$logout$en {
+	Translations$settings$agents$logout$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '登出';
+	@override String get description => '登出此提供者並清除已儲存的認證資訊';
+	@override String get button => '登出';
+	@override String confirmTitle({required Object agent}) => '登出 ${agent}？';
+	@override String confirmDescription({required Object agent}) => '這會刪除伺服器上儲存的 ${agent} 認證資訊。請重新登入以繼續使用 ${agent}。';
+	@override String get success => '已登出';
+	@override String get failed => '登出失敗';
+}
+
 // Path: settings.permissions.skipPermissions
 class Translations$settings$permissions$skipPermissions$zh_TW extends Translations$settings$permissions$skipPermissions$en {
 	Translations$settings$permissions$skipPermissions$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
@@ -8644,6 +8661,13 @@ extension on TranslationsZhTw {
 			'settings.agents.login.reAuthDescription' => '使用其他帳戶登入或重新整理憑證',
 			'settings.agents.login.button' => '登入',
 			'settings.agents.login.reLoginButton' => '重新登入',
+			'settings.agents.logout.title' => '登出',
+			'settings.agents.logout.description' => '登出此提供者並清除已儲存的認證資訊',
+			'settings.agents.logout.button' => '登出',
+			'settings.agents.logout.confirmTitle' => ({required Object agent}) => '登出 ${agent}？',
+			'settings.agents.logout.confirmDescription' => ({required Object agent}) => '這會刪除伺服器上儲存的 ${agent} 認證資訊。請重新登入以繼續使用 ${agent}。',
+			'settings.agents.logout.success' => '已登出',
+			'settings.agents.logout.failed' => '登出失敗',
 			'settings.agents.error' => ({required Object error}) => '錯誤：${error}',
 			'settings.permissions.title' => '權限設定',
 			'settings.permissions.skipPermissions.label' => '略過權限提示（請謹慎使用）',
@@ -8662,6 +8686,8 @@ extension on TranslationsZhTw {
 			'settings.permissions.allowedCommands.description' => '無需權限提示即可自動執行的 Shell 指令',
 			'settings.permissions.allowedCommands.placeholder' => '例如："Shell(ls)" 或 "Shell(git status)"',
 			'settings.permissions.allowedCommands.quickAdd' => '快速新增常用指令：',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.allowedCommands.empty' => '未設定允許的指令',
 			'settings.permissions.blockedCommands.title' => '封鎖的 Shell 指令',
 			'settings.permissions.blockedCommands.description' => '自動封鎖的 Shell 指令',
@@ -8669,8 +8695,6 @@ extension on TranslationsZhTw {
 			'settings.permissions.blockedCommands.empty' => '未設定封鎖的指令',
 			'settings.permissions.toolExamples.title' => '工具模式範例：',
 			'settings.permissions.toolExamples.bashGitLog' => '- 允許所有 git log 指令',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.toolExamples.bashGitDiff' => '- 允許所有 git diff 指令',
 			'settings.permissions.toolExamples.write' => '- 允許所有 Write 工具使用',
 			'settings.permissions.toolExamples.bashRm' => '- 封鎖所有 rm 指令（危險）',
@@ -9176,6 +9200,8 @@ extension on TranslationsZhTw {
 			'tasks.list.inProgressComplete' => '進行中（點擊完成）',
 			'tasks.list.markCompleted' => '標記為已完成',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => '切換任務 ${id} 的狀態',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.list.markDone' => '標記為完成',
 			'tasks.list.reopen' => '重新開啟',
 			'tasks.nextTask.allComplete' => '所有任務已完成',
@@ -9183,8 +9209,6 @@ extension on TranslationsZhTw {
 			'tasks.nextTask.feature2' => '- PRD 驅動的任務產生，快速啟動專案。',
 			'tasks.nextTask.feature3' => '- 看板和清單檢視，適合日常工作。',
 			'tasks.nextTask.hideDetails' => '隱藏詳情',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.nextTask.initialize' => '初始化',
 			'tasks.nextTask.noPending' => '沒有待處理任務',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI 未設定',

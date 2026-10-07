@@ -2522,6 +2522,7 @@ class Translations$settings$agents$tr extends Translations$settings$agents$en {
 	@override late final Translations$settings$agents$account$tr account = Translations$settings$agents$account$tr._(_root);
 	@override String get connectionStatus => 'Bağlantı Durumu';
 	@override late final Translations$settings$agents$login$tr login = Translations$settings$agents$login$tr._(_root);
+	@override late final Translations$settings$agents$logout$tr logout = Translations$settings$agents$logout$tr._(_root);
 	@override String error({required Object error}) => 'Hata: ${error}';
 }
 
@@ -6039,6 +6040,22 @@ class Translations$settings$agents$login$tr extends Translations$settings$agents
 	@override String get reLoginButton => 'Tekrar Giriş Yap';
 }
 
+// Path: settings.agents.logout
+class Translations$settings$agents$logout$tr extends Translations$settings$agents$logout$en {
+	Translations$settings$agents$logout$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Çıkış yap';
+	@override String get description => 'Bu sağlayıcıdan çıkış yap ve kayıtlı kimlik bilgilerini sil';
+	@override String get button => 'Çıkış yap';
+	@override String confirmTitle({required Object agent}) => '${agent} oturumunu kapat?';
+	@override String confirmDescription({required Object agent}) => 'Bu, sunucudaki kayıtlı ${agent} kimlik bilgilerini siler. ${agent} kullanmaya devam etmek için tekrar giriş yap.';
+	@override String get success => 'Çıkış yapıldı';
+	@override String get failed => 'Çıkış yapılamadı';
+}
+
 // Path: settings.permissions.skipPermissions
 class Translations$settings$permissions$skipPermissions$tr extends Translations$settings$permissions$skipPermissions$en {
 	Translations$settings$permissions$skipPermissions$tr._(TranslationsTr root) : this._root = root, super.internal(root);
@@ -8644,6 +8661,13 @@ extension on TranslationsTr {
 			'settings.agents.login.reAuthDescription' => 'Farklı bir hesapla giriş yap veya kimlik bilgilerini yenile',
 			'settings.agents.login.button' => 'Giriş Yap',
 			'settings.agents.login.reLoginButton' => 'Tekrar Giriş Yap',
+			'settings.agents.logout.title' => 'Çıkış yap',
+			'settings.agents.logout.description' => 'Bu sağlayıcıdan çıkış yap ve kayıtlı kimlik bilgilerini sil',
+			'settings.agents.logout.button' => 'Çıkış yap',
+			'settings.agents.logout.confirmTitle' => ({required Object agent}) => '${agent} oturumunu kapat?',
+			'settings.agents.logout.confirmDescription' => ({required Object agent}) => 'Bu, sunucudaki kayıtlı ${agent} kimlik bilgilerini siler. ${agent} kullanmaya devam etmek için tekrar giriş yap.',
+			'settings.agents.logout.success' => 'Çıkış yapıldı',
+			'settings.agents.logout.failed' => 'Çıkış yapılamadı',
 			'settings.agents.error' => ({required Object error}) => 'Hata: ${error}',
 			'settings.permissions.title' => 'İzin Ayarları',
 			'settings.permissions.skipPermissions.label' => 'İzin istemlerini atla (dikkatli kullan)',
@@ -8662,6 +8686,8 @@ extension on TranslationsTr {
 			'settings.permissions.allowedCommands.description' => 'İzin istemeden otomatik olarak izin verilen shell komutları',
 			'settings.permissions.allowedCommands.placeholder' => 'ör. "Shell(ls)" veya "Shell(git status)"',
 			'settings.permissions.allowedCommands.quickAdd' => 'Yaygın komutları hızlı ekle:',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.allowedCommands.empty' => 'İzin verilen komut yapılandırılmamış',
 			'settings.permissions.blockedCommands.title' => 'Engellenen Shell Komutları',
 			'settings.permissions.blockedCommands.description' => 'Otomatik olarak engellenen shell komutları',
@@ -8669,8 +8695,6 @@ extension on TranslationsTr {
 			'settings.permissions.blockedCommands.empty' => 'Engellenen komut yapılandırılmamış',
 			'settings.permissions.toolExamples.title' => 'Araç Desen Örnekleri:',
 			'settings.permissions.toolExamples.bashGitLog' => '- Tüm git log komutlarına izin ver',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.toolExamples.bashGitDiff' => '- Tüm git diff komutlarına izin ver',
 			'settings.permissions.toolExamples.write' => '- Tüm Write aracı kullanımına izin ver',
 			'settings.permissions.toolExamples.bashRm' => '- Tüm rm komutlarını engelle (tehlikeli)',
@@ -9176,6 +9200,8 @@ extension on TranslationsTr {
 			'tasks.list.inProgressComplete' => 'Devam ediyor (tamamlamak için tıklayın)',
 			'tasks.list.markCompleted' => 'Tamamlandı olarak işaretle',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => 'Görev ${id} durumunu değiştir',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.list.markDone' => 'Tamamlandı olarak işaretle',
 			'tasks.list.reopen' => 'Yeniden aç',
 			'tasks.nextTask.allComplete' => 'Tüm görevler tamamlandı',
@@ -9183,8 +9209,6 @@ extension on TranslationsTr {
 			'tasks.nextTask.feature2' => '- Daha hızlı proje başlangıcı için PRD tabanlı görev oluşturma.',
 			'tasks.nextTask.feature3' => '- Günlük işler için kanban ve liste görünümleri.',
 			'tasks.nextTask.hideDetails' => 'Ayrıntıları gizle',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.nextTask.initialize' => 'Başlat',
 			'tasks.nextTask.noPending' => 'Bekleyen görev yok',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI yapılandırılmamış',

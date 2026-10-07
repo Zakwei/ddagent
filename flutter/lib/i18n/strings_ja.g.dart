@@ -2522,6 +2522,7 @@ class Translations$settings$agents$ja extends Translations$settings$agents$en {
 	@override late final Translations$settings$agents$account$ja account = Translations$settings$agents$account$ja._(_root);
 	@override String get connectionStatus => '接続状態';
 	@override late final Translations$settings$agents$login$ja login = Translations$settings$agents$login$ja._(_root);
+	@override late final Translations$settings$agents$logout$ja logout = Translations$settings$agents$logout$ja._(_root);
 	@override String error({required Object error}) => 'エラー: ${error}';
 }
 
@@ -6039,6 +6040,22 @@ class Translations$settings$agents$login$ja extends Translations$settings$agents
 	@override String get reLoginButton => '再ログイン';
 }
 
+// Path: settings.agents.logout
+class Translations$settings$agents$logout$ja extends Translations$settings$agents$logout$en {
+	Translations$settings$agents$logout$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'ログアウト';
+	@override String get description => 'このプロバイダーからログアウトし、保存された認証情報を削除します';
+	@override String get button => 'ログアウト';
+	@override String confirmTitle({required Object agent}) => '${agent} からログアウトしますか？';
+	@override String confirmDescription({required Object agent}) => 'サーバーに保存された ${agent} の認証情報を削除します。${agent} を使い続けるには再度ログインしてください。';
+	@override String get success => 'ログアウトしました';
+	@override String get failed => 'ログアウトに失敗しました';
+}
+
 // Path: settings.permissions.skipPermissions
 class Translations$settings$permissions$skipPermissions$ja extends Translations$settings$permissions$skipPermissions$en {
 	Translations$settings$permissions$skipPermissions$ja._(TranslationsJa root) : this._root = root, super.internal(root);
@@ -8644,6 +8661,13 @@ extension on TranslationsJa {
 			'settings.agents.login.reAuthDescription' => '別のアカウントでサインインするか、認証情報を更新します',
 			'settings.agents.login.button' => 'ログイン',
 			'settings.agents.login.reLoginButton' => '再ログイン',
+			'settings.agents.logout.title' => 'ログアウト',
+			'settings.agents.logout.description' => 'このプロバイダーからログアウトし、保存された認証情報を削除します',
+			'settings.agents.logout.button' => 'ログアウト',
+			'settings.agents.logout.confirmTitle' => ({required Object agent}) => '${agent} からログアウトしますか？',
+			'settings.agents.logout.confirmDescription' => ({required Object agent}) => 'サーバーに保存された ${agent} の認証情報を削除します。${agent} を使い続けるには再度ログインしてください。',
+			'settings.agents.logout.success' => 'ログアウトしました',
+			'settings.agents.logout.failed' => 'ログアウトに失敗しました',
 			'settings.agents.error' => ({required Object error}) => 'エラー: ${error}',
 			'settings.permissions.title' => '権限設定',
 			'settings.permissions.skipPermissions.label' => '権限プロンプトをスキップ（注意して使用）',
@@ -8662,6 +8686,8 @@ extension on TranslationsJa {
 			'settings.permissions.allowedCommands.description' => '権限の確認なしに自動的に許可されるシェルコマンド',
 			'settings.permissions.allowedCommands.placeholder' => '例: "Shell(ls)" または "Shell(git status)"',
 			'settings.permissions.allowedCommands.quickAdd' => 'よく使うコマンドを追加:',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.allowedCommands.empty' => '許可されたコマンドはありません',
 			'settings.permissions.blockedCommands.title' => 'ブロックされたシェルコマンド',
 			'settings.permissions.blockedCommands.description' => '自動的にブロックされるシェルコマンド',
@@ -8669,8 +8695,6 @@ extension on TranslationsJa {
 			'settings.permissions.blockedCommands.empty' => 'ブロックされたコマンドはありません',
 			'settings.permissions.toolExamples.title' => 'ツールパターンの例:',
 			'settings.permissions.toolExamples.bashGitLog' => '- すべてのgit logコマンドを許可',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.toolExamples.bashGitDiff' => '- すべてのgit diffコマンドを許可',
 			'settings.permissions.toolExamples.write' => '- すべてのWriteツールの使用を許可',
 			'settings.permissions.toolExamples.bashRm' => '- すべてのrmコマンドをブロック（危険）',
@@ -9176,6 +9200,8 @@ extension on TranslationsJa {
 			'tasks.list.inProgressComplete' => '進行中（クリックで完了）',
 			'tasks.list.markCompleted' => '完了としてマーク',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => 'タスク ${id} のステータスを切り替え',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.list.markDone' => '完了にする',
 			'tasks.list.reopen' => '再開',
 			'tasks.nextTask.allComplete' => 'すべてのタスクが完了',
@@ -9183,8 +9209,6 @@ extension on TranslationsJa {
 			'tasks.nextTask.feature2' => '- PRD駆動のタスク生成でプロジェクトを迅速に開始。',
 			'tasks.nextTask.feature3' => '- 日常作業向けのカンバンとリストビュー。',
 			'tasks.nextTask.hideDetails' => '詳細を隠す',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.nextTask.initialize' => '初期化',
 			'tasks.nextTask.noPending' => '保留中のタスクはありません',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI が設定されていません',

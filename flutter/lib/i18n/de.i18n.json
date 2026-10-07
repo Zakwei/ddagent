@@ -2038,6 +2038,15 @@
         "button": "Anmelden",
         "reLoginButton": "Erneut anmelden"
       },
+      "logout": {
+        "title": "Abmelden",
+        "description": "Von diesem Anbieter abmelden und gespeicherte Zugangsdaten löschen",
+        "button": "Abmelden",
+        "confirmTitle": "Von {{agent}} abmelden?",
+        "confirmDescription": "Dadurch werden die gespeicherten {{agent}}-Zugangsdaten auf dem Server entfernt. Melde dich erneut an, um {{agent}} weiter zu nutzen.",
+        "success": "Abgemeldet",
+        "failed": "Abmelden fehlgeschlagen"
+      },
       "error": "Fehler: {{error}}"
     },
     "permissions": {

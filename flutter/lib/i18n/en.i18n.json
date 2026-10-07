@@ -2290,6 +2290,15 @@
         "button": "Login",
         "reLoginButton": "Re-login"
       },
+      "logout": {
+        "title": "Log out",
+        "description": "Sign out of this provider and clear its saved credentials",
+        "button": "Log out",
+        "confirmTitle": "Log out of {{agent}}?",
+        "confirmDescription": "This removes the saved {{agent}} credentials on the server. Sign in again to keep using {{agent}}.",
+        "success": "Logged out",
+        "failed": "Logout failed"
+      },
       "error": "Error: {{error}}",
       "accounts": {
         "title": "Named accounts",

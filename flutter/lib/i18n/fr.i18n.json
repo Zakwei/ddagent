@@ -2038,6 +2038,15 @@
         "button": "Se connecter",
         "reLoginButton": "Se reconnecter"
       },
+      "logout": {
+        "title": "Se déconnecter",
+        "description": "Se déconnecter de ce fournisseur et effacer ses identifiants enregistrés",
+        "button": "Se déconnecter",
+        "confirmTitle": "Se déconnecter de {{agent}} ?",
+        "confirmDescription": "Cela supprime les identifiants {{agent}} enregistrés sur le serveur. Reconnectez-vous pour continuer à utiliser {{agent}}.",
+        "success": "Déconnecté",
+        "failed": "Échec de la déconnexion"
+      },
       "error": "Erreur : {{error}}"
     },
     "permissions": {

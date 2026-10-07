@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
@@ -20,7 +20,12 @@ type CheckCredentialsResult = {
 const checkCredentials = (auth: ClaudeProviderAuth): Promise<CheckCredentialsResult> =>
   (auth as unknown as { checkCredentials: () => Promise<CheckCredentialsResult> }).checkCredentials();
 
-const ENV_KEYS = ['CLAUDE_CODE_OAUTH_TOKEN', 'ANTHROPIC_API_KEY', 'ANTHROPIC_AUTH_TOKEN'] as const;
+const ENV_KEYS = [
+  'CLAUDE_CONFIG_DIR',
+  'CLAUDE_CODE_OAUTH_TOKEN',
+  'ANTHROPIC_API_KEY',
+  'ANTHROPIC_AUTH_TOKEN',
+] as const;
 
 const withEnv = async (
   overrides: Partial<Record<(typeof ENV_KEYS)[number], string>>,
@@ -146,5 +151,66 @@ test('checkCredentials: ANTHROPIC_API_KEY takes precedence over CLAUDE_CODE_OAUT
         assert.equal(status.method, 'api_key');
       },
     );
+  });
+});
+
+test('logout removes the credentials file and credential env keys, preserving preferences', async () => {
+  await withTempHome(async (homeDir) => {
+    await writeCredentialsFile(homeDir, {
+      claudeAiOauth: { accessToken: 'valid-token', expiresAt: Date.now() + 60 * 60 * 1000 },
+    });
+    const claudeDir = path.join(homeDir, '.claude');
+    await writeFile(path.join(claudeDir, 'settings.json'), JSON.stringify({
+      env: {
+        ANTHROPIC_AUTH_TOKEN: 'proxy-token',
+        ANTHROPIC_API_KEY: 'proxy-token',
+        CLAUDE_CODE_OAUTH_TOKEN: 'oauth-token',
+        ANTHROPIC_MODEL: 'sonnet',
+      },
+      theme: 'dark',
+    }));
+
+    await withEnv({}, async () => {
+      const auth = new ClaudeProviderAuth();
+      await auth.logout();
+
+      const status = await checkCredentials(auth);
+      assert.equal(status.authenticated, false);
+
+      await assert.rejects(readFile(path.join(claudeDir, '.credentials.json'), 'utf8'), { code: 'ENOENT' });
+
+      const settings = JSON.parse(await readFile(path.join(claudeDir, 'settings.json'), 'utf8'));
+      assert.deepEqual(settings.env, { ANTHROPIC_MODEL: 'sonnet' });
+      assert.equal(settings.theme, 'dark');
+    });
+  });
+});
+
+test('logout targets CLAUDE_CONFIG_DIR when configured', async () => {
+  await withTempHome(async (homeDir) => {
+    const isolatedDir = path.join(homeDir, 'isolated-claude');
+    await mkdir(isolatedDir, { recursive: true });
+    await writeFile(
+      path.join(isolatedDir, '.credentials.json'),
+      JSON.stringify({ claudeAiOauth: { accessToken: 'valid-token' } }),
+    );
+
+    await withEnv({ CLAUDE_CONFIG_DIR: isolatedDir }, async () => {
+      await new ClaudeProviderAuth().logout();
+      await assert.rejects(readFile(path.join(isolatedDir, '.credentials.json'), 'utf8'), { code: 'ENOENT' });
+    });
+  });
+});
+
+test('logout tolerates missing credentials and malformed settings', async () => {
+  await withTempHome(async (homeDir) => {
+    const claudeDir = path.join(homeDir, '.claude');
+    await mkdir(claudeDir, { recursive: true });
+    await writeFile(path.join(claudeDir, 'settings.json'), '{ not json');
+
+    await withEnv({}, async () => {
+      await new ClaudeProviderAuth().logout();
+      assert.equal(await readFile(path.join(claudeDir, 'settings.json'), 'utf8'), '{ not json');
+    });
   });
 });

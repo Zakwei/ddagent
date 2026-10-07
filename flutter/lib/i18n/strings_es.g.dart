@@ -2522,6 +2522,7 @@ class Translations$settings$agents$es extends Translations$settings$agents$en {
 	@override late final Translations$settings$agents$account$es account = Translations$settings$agents$account$es._(_root);
 	@override String get connectionStatus => 'Estado de la conexión';
 	@override late final Translations$settings$agents$login$es login = Translations$settings$agents$login$es._(_root);
+	@override late final Translations$settings$agents$logout$es logout = Translations$settings$agents$logout$es._(_root);
 	@override String error({required Object error}) => 'Error: ${error}';
 }
 
@@ -6039,6 +6040,22 @@ class Translations$settings$agents$login$es extends Translations$settings$agents
 	@override String get reLoginButton => 'Volver a iniciar sesión';
 }
 
+// Path: settings.agents.logout
+class Translations$settings$agents$logout$es extends Translations$settings$agents$logout$en {
+	Translations$settings$agents$logout$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Cerrar sesión';
+	@override String get description => 'Cierra la sesión de este proveedor y borra sus credenciales guardadas';
+	@override String get button => 'Cerrar sesión';
+	@override String confirmTitle({required Object agent}) => '¿Cerrar sesión de ${agent}?';
+	@override String confirmDescription({required Object agent}) => 'Esto elimina las credenciales guardadas de ${agent} en el servidor. Vuelve a iniciar sesión para seguir usando ${agent}.';
+	@override String get success => 'Sesión cerrada';
+	@override String get failed => 'No se pudo cerrar la sesión';
+}
+
 // Path: settings.permissions.skipPermissions
 class Translations$settings$permissions$skipPermissions$es extends Translations$settings$permissions$skipPermissions$en {
 	Translations$settings$permissions$skipPermissions$es._(TranslationsEs root) : this._root = root, super.internal(root);
@@ -8644,6 +8661,13 @@ extension on TranslationsEs {
 			'settings.agents.login.reAuthDescription' => 'Inicia sesión con otra cuenta o actualiza las credenciales',
 			'settings.agents.login.button' => 'Iniciar sesión',
 			'settings.agents.login.reLoginButton' => 'Volver a iniciar sesión',
+			'settings.agents.logout.title' => 'Cerrar sesión',
+			'settings.agents.logout.description' => 'Cierra la sesión de este proveedor y borra sus credenciales guardadas',
+			'settings.agents.logout.button' => 'Cerrar sesión',
+			'settings.agents.logout.confirmTitle' => ({required Object agent}) => '¿Cerrar sesión de ${agent}?',
+			'settings.agents.logout.confirmDescription' => ({required Object agent}) => 'Esto elimina las credenciales guardadas de ${agent} en el servidor. Vuelve a iniciar sesión para seguir usando ${agent}.',
+			'settings.agents.logout.success' => 'Sesión cerrada',
+			'settings.agents.logout.failed' => 'No se pudo cerrar la sesión',
 			'settings.agents.error' => ({required Object error}) => 'Error: ${error}',
 			'settings.permissions.title' => 'Ajustes de permisos',
 			'settings.permissions.skipPermissions.label' => 'Omitir avisos de permisos (usar con precaución)',
@@ -8662,6 +8686,8 @@ extension on TranslationsEs {
 			'settings.permissions.allowedCommands.description' => 'Comandos de shell que se permiten automáticamente sin preguntar',
 			'settings.permissions.allowedCommands.placeholder' => 'p. ej., "Shell(ls)" o "Shell(git status)"',
 			'settings.permissions.allowedCommands.quickAdd' => 'Añadir rápido comandos comunes:',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.allowedCommands.empty' => 'No hay comandos permitidos configurados',
 			'settings.permissions.blockedCommands.title' => 'Comandos de shell bloqueados',
 			'settings.permissions.blockedCommands.description' => 'Comandos de shell que se bloquean automáticamente',
@@ -8669,8 +8695,6 @@ extension on TranslationsEs {
 			'settings.permissions.blockedCommands.empty' => 'No hay comandos bloqueados configurados',
 			'settings.permissions.toolExamples.title' => 'Ejemplos de patrones de herramientas:',
 			'settings.permissions.toolExamples.bashGitLog' => '- Permitir todos los comandos git log',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.toolExamples.bashGitDiff' => '- Permitir todos los comandos git diff',
 			'settings.permissions.toolExamples.write' => '- Permitir todo uso de la herramienta Write',
 			'settings.permissions.toolExamples.bashRm' => '- Bloquear todos los comandos rm (peligroso)',
@@ -9176,6 +9200,8 @@ extension on TranslationsEs {
 			'tasks.list.inProgressComplete' => 'En curso (clic para completar)',
 			'tasks.list.markCompleted' => 'Marcar como completada',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => 'Alternar estado de la tarea ${id}',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.list.markDone' => 'Marcar como completada',
 			'tasks.list.reopen' => 'Reabrir',
 			'tasks.nextTask.allComplete' => 'Todas las tareas completadas',
@@ -9183,8 +9209,6 @@ extension on TranslationsEs {
 			'tasks.nextTask.feature2' => '- Generación de tareas desde PRD para un arranque más rápido.',
 			'tasks.nextTask.feature3' => '- Vistas kanban y lista para el día a día.',
 			'tasks.nextTask.hideDetails' => 'Ocultar detalles',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.nextTask.initialize' => 'Inicializar',
 			'tasks.nextTask.noPending' => 'No hay tareas pendientes',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI no está configurado',

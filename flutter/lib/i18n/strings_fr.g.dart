@@ -2522,6 +2522,7 @@ class Translations$settings$agents$fr extends Translations$settings$agents$en {
 	@override late final Translations$settings$agents$account$fr account = Translations$settings$agents$account$fr._(_root);
 	@override String get connectionStatus => 'Statut de la connexion';
 	@override late final Translations$settings$agents$login$fr login = Translations$settings$agents$login$fr._(_root);
+	@override late final Translations$settings$agents$logout$fr logout = Translations$settings$agents$logout$fr._(_root);
 	@override String error({required Object error}) => 'Erreur : ${error}';
 }
 
@@ -6039,6 +6040,22 @@ class Translations$settings$agents$login$fr extends Translations$settings$agents
 	@override String get reLoginButton => 'Se reconnecter';
 }
 
+// Path: settings.agents.logout
+class Translations$settings$agents$logout$fr extends Translations$settings$agents$logout$en {
+	Translations$settings$agents$logout$fr._(TranslationsFr root) : this._root = root, super.internal(root);
+
+	final TranslationsFr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Se déconnecter';
+	@override String get description => 'Se déconnecter de ce fournisseur et effacer ses identifiants enregistrés';
+	@override String get button => 'Se déconnecter';
+	@override String confirmTitle({required Object agent}) => 'Se déconnecter de ${agent} ?';
+	@override String confirmDescription({required Object agent}) => 'Cela supprime les identifiants ${agent} enregistrés sur le serveur. Reconnectez-vous pour continuer à utiliser ${agent}.';
+	@override String get success => 'Déconnecté';
+	@override String get failed => 'Échec de la déconnexion';
+}
+
 // Path: settings.permissions.skipPermissions
 class Translations$settings$permissions$skipPermissions$fr extends Translations$settings$permissions$skipPermissions$en {
 	Translations$settings$permissions$skipPermissions$fr._(TranslationsFr root) : this._root = root, super.internal(root);
@@ -8644,6 +8661,13 @@ extension on TranslationsFr {
 			'settings.agents.login.reAuthDescription' => 'Connectez-vous avec un autre compte ou actualisez les identifiants',
 			'settings.agents.login.button' => 'Se connecter',
 			'settings.agents.login.reLoginButton' => 'Se reconnecter',
+			'settings.agents.logout.title' => 'Se déconnecter',
+			'settings.agents.logout.description' => 'Se déconnecter de ce fournisseur et effacer ses identifiants enregistrés',
+			'settings.agents.logout.button' => 'Se déconnecter',
+			'settings.agents.logout.confirmTitle' => ({required Object agent}) => 'Se déconnecter de ${agent} ?',
+			'settings.agents.logout.confirmDescription' => ({required Object agent}) => 'Cela supprime les identifiants ${agent} enregistrés sur le serveur. Reconnectez-vous pour continuer à utiliser ${agent}.',
+			'settings.agents.logout.success' => 'Déconnecté',
+			'settings.agents.logout.failed' => 'Échec de la déconnexion',
 			'settings.agents.error' => ({required Object error}) => 'Erreur : ${error}',
 			'settings.permissions.title' => 'Paramètres de permission',
 			'settings.permissions.skipPermissions.label' => 'Ignorer les invites de permission (à utiliser avec précaution)',
@@ -8662,6 +8686,8 @@ extension on TranslationsFr {
 			'settings.permissions.allowedCommands.description' => 'Commandes shell automatiquement autorisées sans demande',
 			'settings.permissions.allowedCommands.placeholder' => 'ex. : "Shell(ls)" ou "Shell(git status)"',
 			'settings.permissions.allowedCommands.quickAdd' => 'Ajout rapide de commandes courantes :',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.allowedCommands.empty' => 'Aucune commande autorisée configurée',
 			'settings.permissions.blockedCommands.title' => 'Commandes shell bloquées',
 			'settings.permissions.blockedCommands.description' => 'Commandes shell automatiquement bloquées',
@@ -8669,8 +8695,6 @@ extension on TranslationsFr {
 			'settings.permissions.blockedCommands.empty' => 'Aucune commande bloquée configurée',
 			'settings.permissions.toolExamples.title' => 'Exemples de motifs d\'outils :',
 			'settings.permissions.toolExamples.bashGitLog' => '- Autoriser toutes les commandes git log',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.toolExamples.bashGitDiff' => '- Autoriser toutes les commandes git diff',
 			'settings.permissions.toolExamples.write' => '- Autoriser toutes les utilisations de l\'outil Write',
 			'settings.permissions.toolExamples.bashRm' => '- Bloquer toutes les commandes rm (dangereux)',
@@ -9176,6 +9200,8 @@ extension on TranslationsFr {
 			'tasks.list.inProgressComplete' => 'En cours (cliquer pour terminer)',
 			'tasks.list.markCompleted' => 'Marquer comme terminée',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => 'Basculer le statut de la tâche ${id}',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.list.markDone' => 'Marquer comme terminé',
 			'tasks.list.reopen' => 'Rouvrir',
 			'tasks.nextTask.allComplete' => 'Toutes les tâches sont terminées',
@@ -9183,8 +9209,6 @@ extension on TranslationsFr {
 			'tasks.nextTask.feature2' => '- Génération de tâches à partir de PRD pour un démarrage rapide.',
 			'tasks.nextTask.feature3' => '- Vues kanban et liste pour l’exécution quotidienne.',
 			'tasks.nextTask.hideDetails' => 'Masquer les détails',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.nextTask.initialize' => 'Initialiser',
 			'tasks.nextTask.noPending' => 'Aucune tâche en attente',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI n’est pas configuré',

@@ -2038,6 +2038,15 @@
         "button": "Accedi",
         "reLoginButton": "Ri-accedi"
       },
+      "logout": {
+        "title": "Disconnetti",
+        "description": "Disconnetti da questo provider e cancella le credenziali salvate",
+        "button": "Disconnetti",
+        "confirmTitle": "Disconnettersi da {{agent}}?",
+        "confirmDescription": "Questa operazione rimuove le credenziali {{agent}} salvate sul server. Accedi di nuovo per continuare a usare {{agent}}.",
+        "success": "Disconnesso",
+        "failed": "Disconnessione non riuscita"
+      },
       "error": "Errore: {{error}}"
     },
     "permissions": {

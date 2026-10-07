@@ -2522,6 +2522,7 @@ class Translations$settings$agents$it extends Translations$settings$agents$en {
 	@override late final Translations$settings$agents$account$it account = Translations$settings$agents$account$it._(_root);
 	@override String get connectionStatus => 'Stato connessione';
 	@override late final Translations$settings$agents$login$it login = Translations$settings$agents$login$it._(_root);
+	@override late final Translations$settings$agents$logout$it logout = Translations$settings$agents$logout$it._(_root);
 	@override String error({required Object error}) => 'Errore: ${error}';
 }
 
@@ -6039,6 +6040,22 @@ class Translations$settings$agents$login$it extends Translations$settings$agents
 	@override String get reLoginButton => 'Ri-accedi';
 }
 
+// Path: settings.agents.logout
+class Translations$settings$agents$logout$it extends Translations$settings$agents$logout$en {
+	Translations$settings$agents$logout$it._(TranslationsIt root) : this._root = root, super.internal(root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Disconnetti';
+	@override String get description => 'Disconnetti da questo provider e cancella le credenziali salvate';
+	@override String get button => 'Disconnetti';
+	@override String confirmTitle({required Object agent}) => 'Disconnettersi da ${agent}?';
+	@override String confirmDescription({required Object agent}) => 'Questa operazione rimuove le credenziali ${agent} salvate sul server. Accedi di nuovo per continuare a usare ${agent}.';
+	@override String get success => 'Disconnesso';
+	@override String get failed => 'Disconnessione non riuscita';
+}
+
 // Path: settings.permissions.skipPermissions
 class Translations$settings$permissions$skipPermissions$it extends Translations$settings$permissions$skipPermissions$en {
 	Translations$settings$permissions$skipPermissions$it._(TranslationsIt root) : this._root = root, super.internal(root);
@@ -8644,6 +8661,13 @@ extension on TranslationsIt {
 			'settings.agents.login.reAuthDescription' => 'Accedi con un account diverso o aggiorna le credenziali',
 			'settings.agents.login.button' => 'Accedi',
 			'settings.agents.login.reLoginButton' => 'Ri-accedi',
+			'settings.agents.logout.title' => 'Disconnetti',
+			'settings.agents.logout.description' => 'Disconnetti da questo provider e cancella le credenziali salvate',
+			'settings.agents.logout.button' => 'Disconnetti',
+			'settings.agents.logout.confirmTitle' => ({required Object agent}) => 'Disconnettersi da ${agent}?',
+			'settings.agents.logout.confirmDescription' => ({required Object agent}) => 'Questa operazione rimuove le credenziali ${agent} salvate sul server. Accedi di nuovo per continuare a usare ${agent}.',
+			'settings.agents.logout.success' => 'Disconnesso',
+			'settings.agents.logout.failed' => 'Disconnessione non riuscita',
 			'settings.agents.error' => ({required Object error}) => 'Errore: ${error}',
 			'settings.permissions.title' => 'Impostazioni permessi',
 			'settings.permissions.skipPermissions.label' => 'Salta richieste di permesso (usa con cautela)',
@@ -8662,6 +8686,8 @@ extension on TranslationsIt {
 			'settings.permissions.allowedCommands.description' => 'Comandi shell automaticamente consentiti senza richiedere permesso',
 			'settings.permissions.allowedCommands.placeholder' => 'es. "Shell(ls)" o "Shell(git status)"',
 			'settings.permissions.allowedCommands.quickAdd' => 'Aggiunta rapida comandi comuni:',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.allowedCommands.empty' => 'Nessun comando consentito configurato',
 			'settings.permissions.blockedCommands.title' => 'Comandi shell bloccati',
 			'settings.permissions.blockedCommands.description' => 'Comandi shell automaticamente bloccati',
@@ -8669,8 +8695,6 @@ extension on TranslationsIt {
 			'settings.permissions.blockedCommands.empty' => 'Nessun comando bloccato configurato',
 			'settings.permissions.toolExamples.title' => 'Esempi pattern strumenti:',
 			'settings.permissions.toolExamples.bashGitLog' => '- Consenti tutti i comandi git log',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.toolExamples.bashGitDiff' => '- Consenti tutti i comandi git diff',
 			'settings.permissions.toolExamples.write' => '- Consenti tutti gli utilizzi dello strumento Write',
 			'settings.permissions.toolExamples.bashRm' => '- Blocca tutti i comandi rm (pericoloso)',
@@ -9176,6 +9200,8 @@ extension on TranslationsIt {
 			'tasks.list.inProgressComplete' => 'In corso (clicca per completare)',
 			'tasks.list.markCompleted' => 'Segna come completata',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => 'Cambia stato dell’attività ${id}',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.list.markDone' => 'Segna come completata',
 			'tasks.list.reopen' => 'Riapri',
 			'tasks.nextTask.allComplete' => 'Tutte le attività completate',
@@ -9183,8 +9209,6 @@ extension on TranslationsIt {
 			'tasks.nextTask.feature2' => '- Generazione attività da PRD per un avvio più rapido.',
 			'tasks.nextTask.feature3' => '- Viste kanban e lista per il lavoro quotidiano.',
 			'tasks.nextTask.hideDetails' => 'Nascondi dettagli',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.nextTask.initialize' => 'Inizializza',
 			'tasks.nextTask.noPending' => 'Nessuna attività in sospeso',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI non è configurato',

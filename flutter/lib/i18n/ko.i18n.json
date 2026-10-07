@@ -2038,6 +2038,15 @@
         "button": "로그인",
         "reLoginButton": "재로그인"
       },
+      "logout": {
+        "title": "로그아웃",
+        "description": "이 제공자에서 로그아웃하고 저장된 자격 증명을 지웁니다",
+        "button": "로그아웃",
+        "confirmTitle": "{{agent}}에서 로그아웃하시겠습니까?",
+        "confirmDescription": "서버에 저장된 {{agent}} 자격 증명이 삭제됩니다. {{agent}}을(를) 계속 사용하려면 다시 로그인하세요.",
+        "success": "로그아웃되었습니다",
+        "failed": "로그아웃 실패"
+      },
       "error": "오류: {{error}}"
     },
     "permissions": {

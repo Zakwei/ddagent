@@ -291,6 +291,52 @@ test('auth status replaces cached identity after logout or missing data and disa
   });
 });
 
+test('auth logout route clears credentials, exposes canLogout, and rejects unsupported providers', async (t) => {
+  const { providerRegistry } = await import('@/modules/providers/provider.registry.js');
+  const claude = providerRegistry.resolveProvider('claude');
+  const cursor = providerRegistry.resolveProvider('cursor');
+  t.mock.method(claude.auth, 'getStatus', async () => ({
+    installed: true,
+    provider: 'claude' as const,
+    authenticated: false,
+    email: null,
+    method: null,
+  }));
+  t.mock.method(cursor.auth, 'getStatus', async () => ({
+    installed: true,
+    provider: 'cursor' as const,
+    authenticated: true,
+    email: ' someone@example.com ',
+    method: 'cli',
+  }));
+  let logoutCalls = 0;
+  // `logout` is an optional capability, so narrow the adapter before mocking it.
+  const logoutAuth = claude.auth as { logout: () => Promise<void> };
+  t.mock.method(logoutAuth, 'logout', async () => {
+    logoutCalls += 1;
+  });
+
+  await withProviderServer(async (baseUrl) => {
+    const claudeStatus = await fetch(`${baseUrl}/api/providers/claude/auth/status`);
+    const claudePayload = await claudeStatus.json() as { data: { canLogout: boolean } };
+    assert.equal(claudePayload.data.canLogout, true);
+
+    const cursorStatus = await fetch(`${baseUrl}/api/providers/cursor/auth/status`);
+    const cursorPayload = await cursorStatus.json() as { data: { canLogout: boolean } };
+    assert.equal(cursorPayload.data.canLogout, false);
+
+    const logout = await fetch(`${baseUrl}/api/providers/claude/auth/logout`, { method: 'POST' });
+    assert.equal(logout.status, 200);
+    assert.equal(logout.headers.get('cache-control'), 'no-store');
+    assert.equal(logoutCalls, 1);
+
+    const unsupported = await fetch(`${baseUrl}/api/providers/cursor/auth/logout`, { method: 'POST' });
+    assert.equal(unsupported.status, 501);
+    const unsupportedPayload = await unsupported.json() as { error: { code: string } };
+    assert.equal(unsupportedPayload.error.code, 'LOGOUT_UNSUPPORTED');
+  });
+});
+
 test('skill move route validates input and relocates a managed global skill', async () => {
   await withProviderServer(async (baseUrl, workspacePath) => {
     const homeDir = path.dirname(workspacePath);

@@ -620,6 +620,13 @@ export type ProviderAuthStatus = {
   email: string | null;
   method: string | null;
   error?: string;
+  /**
+   * Whether the provider exposes a logout operation the settings UI can call
+   * (`IProviderAuth.logout`). Set by the auth service from the resolved adapter;
+   * individual `getStatus()` implementations leave it undefined. Clients hide
+   * the logout control when this is not `true`.
+   */
+  canLogout?: boolean;
 };
 
 // ---------------------------

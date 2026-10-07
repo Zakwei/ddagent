@@ -12,6 +12,7 @@ class ProviderAuthStatus {
     String? email,
     this.method,
     this.error,
+    this.canLogout = false,
   }) : email = authenticated ? _identity(email) : null;
 
   /// Whether the provider CLI binary is present on the host. Unknown status
@@ -22,6 +23,10 @@ class ProviderAuthStatus {
   final String? email;
   final String? method;
   final String? error;
+
+  /// Whether the server exposes a logout operation for this provider. Older
+  /// servers omit the field, so the logout control stays hidden by default.
+  final bool canLogout;
 
   bool get hasRealIdentity => email != null;
 
@@ -59,6 +64,7 @@ class ProviderAuthStatus {
     email: json['email'] is String ? json['email'] as String : null,
     method: json['method'] is String ? json['method'] as String : null,
     error: json['error'] is String ? json['error'] as String : null,
+    canLogout: json['canLogout'] == true,
   );
 }
 
@@ -86,6 +92,15 @@ class ProviderAuthController extends Notifier<AsyncValue<ProviderAuthStatus>> {
 
     unawaited(load());
     return const AsyncLoading();
+  }
+
+  /// Clears this provider's stored credentials on the server and returns the
+  /// refreshed status. Throws on transport failure so the caller can surface
+  /// it; callers invalidate [providerAuthStatusProvider] to refresh shared
+  /// state, exactly like the post-login flow.
+  Future<ProviderAuthStatus> logout() async {
+    final repository = ref.read(sessionsRepositoryProvider);
+    return ProviderAuthStatus.fromJson(await repository.logoutProvider(provider));
   }
 }
 

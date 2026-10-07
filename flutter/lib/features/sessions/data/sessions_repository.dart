@@ -173,6 +173,12 @@ class SessionsRepository {
     (d) => d as Map<String, dynamic>,
   );
 
+  /// Clears a provider's stored CLI login and returns the fresh auth status.
+  Future<Map<String, dynamic>> logoutProvider(String provider) => apiCall(
+    () => _dio.post<dynamic>('/api/providers/$provider/auth/logout'),
+    (d) => d as Map<String, dynamic>,
+  );
+
   /// `/models` returns either a flat list or the grouped
   /// `{models: {OPTIONS: [...], DEFAULT: "…"}}` payload the web app reads.
   /// The catalog's DEFAULT feeds `providerModels[provider]` — the banner and

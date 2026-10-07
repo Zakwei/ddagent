@@ -431,6 +431,46 @@ class _AccountContent extends ConsumerWidget {
                   ],
                 ),
 
+                // Stored-credential logout. Kept outside the api_key-gated login
+                // row so env-injected logins can still clear any saved store.
+                if (authenticated && status?.canLogout == true) ...[
+                  Divider(height: AppSpacing.xl, color: c.border),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              t.settings.agents.logout.title,
+                              style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              t.settings.agents.logout.description,
+                              style: tt.bodySmall?.copyWith(color: c.mutedForeground),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      AppButton(
+                        variant: AppButtonVariant.outline,
+                        size: AppButtonSize.sm,
+                        onPressed: () => _confirmLogout(context, ref),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(LucideIcons.logOut, size: 14),
+                            const SizedBox(width: AppSpacing.xs),
+                            Text(t.settings.agents.logout.button),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+
                 // env-var credentials (`method === 'api_key'`) hide the login row.
                 if (status?.method != 'api_key') ...[
                   Divider(height: AppSpacing.xl, color: c.border),
@@ -520,11 +560,46 @@ class _AccountContent extends ConsumerWidget {
       ),
     );
   }
-}
 
-/// Orange "CLI not installed" card — Account-tab replacement when the provider
-/// binary is missing. Shows the install command with a copy action, an Install
-/// button that runs it in the terminal dialog and a docs link.
+  /// Confirms and performs provider logout: the server clears the stored
+  /// credentials, then the shared auth status refreshes (mirrors login flow).
+  Future<void> _confirmLogout(BuildContext context, WidgetRef ref) async {
+    final t = Translations.of(context);
+    final name = AgentsSection._names[agent] ?? agent;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(t.settings.agents.logout.confirmTitle(agent: name)),
+        content: Text(t.settings.agents.logout.confirmDescription(agent: name)),
+        actions: [
+          AppButton(
+            variant: AppButtonVariant.ghost,
+            size: AppButtonSize.sm,
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(t.common.buttons.cancel),
+          ),
+          AppButton(
+            variant: AppButtonVariant.destructive,
+            size: AppButtonSize.sm,
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(t.settings.agents.logout.button),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+
+    try {
+      await ref.read(providerAuthStatusProvider(agent).notifier).logout();
+      ref.invalidate(providerAuthStatusProvider(agent));
+      if (!context.mounted) return;
+      AppToast.show(context, t.settings.agents.logout.success);
+    } on Object {
+      if (!context.mounted) return;
+      AppToast.show(context, t.settings.agents.logout.failed, isError: true);
+    }
+  }
+}
 class _AgentNotInstalledCard extends ConsumerWidget {
   const _AgentNotInstalledCard({required this.agent});
 

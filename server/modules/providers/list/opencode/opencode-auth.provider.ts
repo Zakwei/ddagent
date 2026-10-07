@@ -1,4 +1,4 @@
-import { readFile } from 'node:fs/promises';
+import { readFile, rm } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 
@@ -54,11 +54,30 @@ export class OpenCodeProviderAuth implements IProviderAuth {
   }
 
   /**
+   * Path to OpenCode's auth store. `XDG_DATA_HOME` replaces `~/.local/share`,
+   * the same relocation provider accounts use to isolate the store.
+   */
+  private authStorePath(): string {
+    const dataHome = process.env.XDG_DATA_HOME?.trim();
+    const base = dataHome && dataHome.length > 0 ? dataHome : path.join(os.homedir(), '.local', 'share');
+    return path.join(base, 'opencode', 'auth.json');
+  }
+
+  /**
+   * Removes OpenCode's auth store so the next status check reports
+   * unauthenticated. Credentials injected through the environment cannot be
+   * cleared here. Consumed by the settings "Log out" action.
+   */
+  async logout(): Promise<void> {
+    await rm(this.authStorePath(), { force: true });
+  }
+
+  /**
    * Reads OpenCode's auth store or falls back to provider API key environment variables.
    */
   private async checkCredentials(): Promise<OpenCodeCredentialsStatus> {
     try {
-      const authPath = path.join(os.homedir(), '.local', 'share', 'opencode', 'auth.json');
+      const authPath = this.authStorePath();
       const content = await readFile(authPath, 'utf8');
       const auth = readObjectRecord(JSON.parse(content)) ?? {};
 

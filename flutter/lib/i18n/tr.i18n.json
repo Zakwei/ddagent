@@ -2038,6 +2038,15 @@
         "button": "Giriş Yap",
         "reLoginButton": "Tekrar Giriş Yap"
       },
+      "logout": {
+        "title": "Çıkış yap",
+        "description": "Bu sağlayıcıdan çıkış yap ve kayıtlı kimlik bilgilerini sil",
+        "button": "Çıkış yap",
+        "confirmTitle": "{{agent}} oturumunu kapat?",
+        "confirmDescription": "Bu, sunucudaki kayıtlı {{agent}} kimlik bilgilerini siler. {{agent}} kullanmaya devam etmek için tekrar giriş yap.",
+        "success": "Çıkış yapıldı",
+        "failed": "Çıkış yapılamadı"
+      },
       "error": "Hata: {{error}}"
     },
     "permissions": {

@@ -2038,6 +2038,15 @@
         "button": "ログイン",
         "reLoginButton": "再ログイン"
       },
+      "logout": {
+        "title": "ログアウト",
+        "description": "このプロバイダーからログアウトし、保存された認証情報を削除します",
+        "button": "ログアウト",
+        "confirmTitle": "{{agent}} からログアウトしますか？",
+        "confirmDescription": "サーバーに保存された {{agent}} の認証情報を削除します。{{agent}} を使い続けるには再度ログインしてください。",
+        "success": "ログアウトしました",
+        "failed": "ログアウトに失敗しました"
+      },
       "error": "エラー: {{error}}"
     },
     "permissions": {
