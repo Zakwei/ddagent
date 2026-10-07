@@ -4,6 +4,7 @@ import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
+import 'package:ddagent_app/core/widgets/auth_image.dart';
 import 'package:ddagent_app/features/chat/data/chat_drop.dart';
 import 'package:ddagent_app/features/chat/state/composer_controller.dart';
 import 'package:ddagent_app/features/chat/state/transcript_controller.dart';
@@ -1300,6 +1301,23 @@ class _AttachmentChip extends StatelessWidget {
     return tag.length <= 4 ? tag : tag.substring(0, 3);
   }
 
+  /// `/api/assets/images/<file>` for an uploaded image record (`path` is the
+  /// absolute stored path), or null when there is nothing to preview.
+  String? get _imageUrl {
+    final path = '${record['path'] ?? ''}';
+    if (!_isImage || path.isEmpty) return null;
+    return '/api/assets/images/${path.split(RegExp(r'[\\/]')).last}';
+  }
+
+  void _openPreview(BuildContext context, String url) {
+    showDialog<void>(
+      context: context,
+      builder: (context) => Dialog(
+        child: InteractiveViewer(child: AuthImage(url: url)),
+      ),
+    );
+  }
+
   String get _size {
     final n = record['size'];
     if (n is! num || n <= 0) return '';
@@ -1313,7 +1331,8 @@ class _AttachmentChip extends StatelessWidget {
     final c = context.appColors;
     final style = Theme.of(context).textTheme.bodySmall
         ?.copyWith(fontSize: 12, color: c.foreground);
-    return Container(
+    final imageUrl = _imageUrl;
+    final chip = Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
         border: Border.all(color: const Color(0xFF3C3C3C)), // subtle
@@ -1323,7 +1342,16 @@ class _AttachmentChip extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         spacing: 6,
         children: [
-          if (_isImage)
+          if (imageUrl != null)
+            ClipRRect(
+              borderRadius: BorderRadius.circular(2),
+              child: SizedBox(
+                width: 20,
+                height: 20,
+                child: AuthImage(url: imageUrl, fit: BoxFit.cover),
+              ),
+            )
+          else if (_isImage)
             Icon(Icons.image_outlined, size: 14, color: c.mutedForeground)
           else
             Text(
@@ -1344,6 +1372,11 @@ class _AttachmentChip extends StatelessWidget {
           ),
         ],
       ),
+    );
+    if (imageUrl == null) return chip;
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(onTap: () => _openPreview(context, imageUrl), child: chip),
     );
   }
 }
