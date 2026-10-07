@@ -739,6 +739,40 @@ export function createNormalizedMessage(fields: NormalizedMessageInput): Normali
   };
 }
 
+const ACP_TOOL_SNAPSHOT_LIMIT = 500;
+
+/**
+ * Folds one ACP `tool_call_update` snapshot into the running result of its
+ * tool call and returns the combined result to emit.
+ *
+ * ACP agents (Devin, Command Code) send several updates per call — usually an
+ * empty in-progress one first and often an empty trailing one — all of which
+ * the runtimes publish under the same `${toolId}__result` id. The client keeps
+ * the latest row per id, so every emitted snapshot must carry the call's full
+ * state: the last non-empty content, and `isError` once any update failed.
+ * `snapshots` is per-turn runtime state owned by the caller.
+ */
+export function foldAcpToolResultSnapshot(
+  snapshots: Map<string, { content: string; isError: boolean }>,
+  toolId: string,
+  content: string,
+  isError: boolean,
+): { content: string; isError: boolean } {
+  const previous = snapshots.get(toolId);
+  const folded = {
+    content: content.trim() ? content : (previous?.content ?? ''),
+    isError: isError || Boolean(previous?.isError),
+  };
+  // Re-insert so the map stays in recency order, then cap it: a trailing
+  // snapshot may land after the next turn started, so entries outlive turns.
+  snapshots.delete(toolId);
+  snapshots.set(toolId, folded);
+  if (snapshots.size > ACP_TOOL_SNAPSHOT_LIMIT) {
+    snapshots.delete(snapshots.keys().next().value as string);
+  }
+  return folded;
+}
+
 /**
  * Build the unified terminal `complete` lifecycle message.
  *

@@ -12,6 +12,7 @@ import type {
 import {
   createCompleteMessage,
   createNormalizedMessage,
+  foldAcpToolResultSnapshot,
   devinConfigDir,
   isDevinContinuationPrompt,
   isDevinSummaryArtifact,
@@ -1478,13 +1479,24 @@ function createDevinProcess(sessionId: any, workingDir: any, model: any, ws: any
                         ? update.content.map((c: any) => extractTextContent(c.content ?? c)).filter(Boolean).join('\n')
                         : '';
                     const toolId = readOptionalString(update.toolCallId) ?? `devin_tool_${nextRequestId()}`;
-                    const isError = update.status === 'failed';
+                    // An empty in-progress update carries nothing yet; as a
+                    // tool_result it would flip the card to Completed.
+                    const terminal = update.status === 'completed' || update.status === 'failed';
+                    if (!terminal && !contentBlocks.trim() && !state.toolResultSnapshots?.has(toolId)) return;
+                    // Every snapshot shares one id, so emit the folded state
+                    // of the call rather than this (often empty) update.
+                    const folded = foldAcpToolResultSnapshot(
+                        (state.toolResultSnapshots ??= new Map()),
+                        toolId,
+                        contentBlocks,
+                        update.status === 'failed',
+                    );
                     const toolResultMessage = createNormalizedMessage({
                         id: `${toolId}__result`,
                         kind: 'tool_result',
                         toolId,
-                        content: contentBlocks,
-                        isError,
+                        content: folded.content,
+                        isError: folded.isError,
                         sessionId: state.devinSessionId,
                         provider: 'devin',
                         timestamp: new Date().toISOString(),

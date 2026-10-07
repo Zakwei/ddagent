@@ -32,15 +32,18 @@ class SessionMessageStore extends Notifier<Map<String, SessionSlot>> {
   @override
   Map<String, SessionSlot> build() => {};
 
-  SessionSlot slot(String sessionId) => state.putIfAbsent(sessionId, SessionSlot.new);
+  SessionSlot slot(String sessionId) =>
+      state.putIfAbsent(sessionId, SessionSlot.new);
 
   void _notify() => state = {...state};
 
-  List<SessionMessage> messages(String sessionId) => state[sessionId]?.merged ?? const [];
+  List<SessionMessage> messages(String sessionId) =>
+      state[sessionId]?.merged ?? const [];
 
   bool isStale(String sessionId) {
     final s = state[sessionId];
-    return s == null || DateTime.now().millisecondsSinceEpoch - s.fetchedAt > staleThresholdMs;
+    return s == null ||
+        DateTime.now().millisecondsSinceEpoch - s.fetchedAt > staleThresholdMs;
   }
 
   /// Apply a fetched latest page: splice over the cached tail by overlap.
@@ -83,7 +86,11 @@ class SessionMessageStore extends Notifier<Map<String, SessionSlot>> {
   }
 
   /// Prepend an older page (load-more cursor).
-  void prependOlderPage(String sessionId, List<SessionMessage> older, {required bool hasMore}) {
+  void prependOlderPage(
+    String sessionId,
+    List<SessionMessage> older, {
+    required bool hasMore,
+  }) {
     final s = slot(sessionId);
     s.serverMessages = mergeOlderServerPage(s.serverMessages, older).messages;
     s.hasMore = hasMore;
@@ -93,12 +100,14 @@ class SessionMessageStore extends Notifier<Map<String, SessionSlot>> {
 
   /// Append one live frame — dedupe by id (replays) before storing.
   void appendRealtime(String sessionId, SessionMessage msg) {
-    final s = slot(sessionId);
-    if (s.realtimeMessages.any((m) => m.id == msg.id)) return;
-    s.realtimeMessages = _upserted(s.realtimeMessages, msg);
-    s._mergedCache = null;
-    _notify();
+    appendRealtimeBatch(sessionId, [msg]);
   }
+
+  /// Tool rows are re-published under the same id as the call progresses
+  /// (ACP `tool_call_update` snapshots, OpenCode part updates): the newer
+  /// frame replaces the row in place. Every other kind is a replay.
+  static bool _isSnapshotKind(SessionMessage msg) =>
+      msg.kind == 'tool_result' || msg.kind == 'tool_use';
 
   void appendRealtimeBatch(String sessionId, List<SessionMessage> msgs) {
     final s = slot(sessionId);
@@ -106,7 +115,14 @@ class SessionMessageStore extends Notifier<Map<String, SessionSlot>> {
     var list = s.realtimeMessages;
     var changed = false;
     for (final msg in msgs) {
-      if (!seen.add(msg.id)) continue;
+      if (!seen.add(msg.id)) {
+        if (!_isSnapshotKind(msg)) continue;
+        final idx = list.indexWhere((m) => m.id == msg.id);
+        if (idx < 0 || list[idx] == msg) continue;
+        list = [...list]..[idx] = msg.copyWith(timestamp: list[idx].timestamp);
+        changed = true;
+        continue;
+      }
       list = _upserted(list, msg);
       changed = true;
     }
@@ -121,7 +137,10 @@ class SessionMessageStore extends Notifier<Map<String, SessionSlot>> {
   /// delegation renders as one card whose status updates in place instead of
   /// stacking stale snapshots. The first frame's timestamp is kept so the
   /// card doesn't re-sort to the tail on every patch.
-  static List<SessionMessage> _upserted(List<SessionMessage> rows, SessionMessage msg) {
+  static List<SessionMessage> _upserted(
+    List<SessionMessage> rows,
+    SessionMessage msg,
+  ) {
     final rowId = orchestratorRowId(msg);
     if (rowId == null) return [...rows, msg];
     final idx = rows.indexWhere((m) => orchestratorRowId(m) == rowId);
@@ -185,7 +204,9 @@ class SessionMessageStore extends Notifier<Map<String, SessionSlot>> {
       sessionId: sessionId,
       // Keep the row's creation timestamp so timestamp-sorted merges and
       // header boundaries don't jump on every delta.
-      timestamp: idx >= 0 ? s.realtimeMessages[idx].timestamp : DateTime.now().toIso8601String(),
+      timestamp: idx >= 0
+          ? s.realtimeMessages[idx].timestamp
+          : DateTime.now().toIso8601String(),
       provider: provider,
       kind: kind,
       content: accumulatedText,
@@ -252,15 +273,21 @@ class SessionMessageStore extends Notifier<Map<String, SessionSlot>> {
   void reconcileRealtime(String sessionId, List<SessionMessage> snapshot) {
     final s = state[sessionId];
     if (s == null || s.serverMessages.isEmpty) return;
-    final retained = computeMerged(s.serverMessages, snapshot).map((m) => m.id).toSet();
+    final retained = computeMerged(
+      s.serverMessages,
+      snapshot,
+    ).map((m) => m.id).toSet();
     final persistedIds = s.serverMessages.map((m) => m.id).toSet();
     final removed = snapshot
         .where(
           (m) =>
-              !m.id.startsWith('__') && (!retained.contains(m.id) || persistedIds.contains(m.id)),
+              !m.id.startsWith('__') &&
+              (!retained.contains(m.id) || persistedIds.contains(m.id)),
         )
         .toSet();
-    s.realtimeMessages = s.realtimeMessages.where((m) => !removed.contains(m)).toList();
+    s.realtimeMessages = s.realtimeMessages
+        .where((m) => !removed.contains(m))
+        .toList();
     s._mergedCache = null;
     _notify();
   }
@@ -284,14 +311,16 @@ class SessionMessageStore extends Notifier<Map<String, SessionSlot>> {
   }
 }
 
-final sessionMessageStoreProvider = NotifierProvider<SessionMessageStore, Map<String, SessionSlot>>(
-  SessionMessageStore.new,
-);
+final sessionMessageStoreProvider =
+    NotifierProvider<SessionMessageStore, Map<String, SessionSlot>>(
+      SessionMessageStore.new,
+    );
 
 /// Merged message list for one session — recomputes only when the slot's
 /// inputs changed.
 final sessionMessagesProvider = Provider.family<List<SessionMessage>, String>(
-  (ref, sessionId) => ref.watch(sessionMessageStoreProvider)[sessionId]?.merged ?? const [],
+  (ref, sessionId) =>
+      ref.watch(sessionMessageStoreProvider)[sessionId]?.merged ?? const [],
 );
 
 /// 60 ms delta buffer — batches stream_delta/thought_delta chunks into a
@@ -310,10 +339,18 @@ class StreamDeltaBuffer {
       kind == 'thinking' ? '$sessionId::thought' : sessionId;
 
   /// Buffer one delta chunk; flushes at most once per 60 ms window.
-  void add(String sessionId, String text, String provider, [String kind = 'stream_delta']) {
+  void add(
+    String sessionId,
+    String text,
+    String provider, [
+    String kind = 'stream_delta',
+  ]) {
     final key = _key(sessionId, kind);
     _pending[key] = (_pending[key] ?? '') + text;
-    _timers.putIfAbsent(key, () => Timer(flushInterval, () => flush(sessionId, kind, provider)));
+    _timers.putIfAbsent(
+      key,
+      () => Timer(flushInterval, () => flush(sessionId, kind, provider)),
+    );
   }
 
   /// Timer path: push the *accumulated* text into the live row without

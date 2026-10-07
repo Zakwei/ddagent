@@ -17,7 +17,9 @@ SessionMessage _m(
   sessionId: 's1',
   // Distinct per-id defaults: timestamp equality is a persisted-row
   // fingerprint field, so identical fixtures would falsely dedupe.
-  timestamp: ts ?? '2026-01-01T00:00:${(id.hashCode.abs() % 60).toString().padLeft(2, '0')}Z',
+  timestamp:
+      ts ??
+      '2026-01-01T00:00:${(id.hashCode.abs() % 60).toString().padLeft(2, '0')}Z',
   provider: 'claude',
   kind: kind,
   role: role,
@@ -28,25 +30,57 @@ SessionMessage _m(
 void main() {
   group('merge/dedupe', () {
     test('optimistic local_ echo dropped once server turn persists', () {
-      final local = _m('local_1', role: 'user', content: 'hi', ts: '2026-01-01T00:00:00Z');
-      final server = _m('srv_1', role: 'user', content: 'hi', ts: '2026-01-01T00:00:02Z');
+      final local = _m(
+        'local_1',
+        role: 'user',
+        content: 'hi',
+        ts: '2026-01-01T00:00:00Z',
+      );
+      final server = _m(
+        'srv_1',
+        role: 'user',
+        content: 'hi',
+        ts: '2026-01-01T00:00:02Z',
+      );
       final merged = computeMerged([server], [local]);
       expect(merged.map((m) => m.id), ['srv_1']);
     });
 
     test('realtime user row within 3s of persisted row is collapsed', () {
-      final server = _m('srv', role: 'user', content: 'x', ts: '2026-01-01T00:00:00Z');
-      final rt = _m('rt', role: 'user', content: 'x', ts: '2026-01-01T00:00:02Z');
+      final server = _m(
+        'srv',
+        role: 'user',
+        content: 'x',
+        ts: '2026-01-01T00:00:00Z',
+      );
+      final rt = _m(
+        'rt',
+        role: 'user',
+        content: 'x',
+        ts: '2026-01-01T00:00:02Z',
+      );
       expect(computeMerged([server], [rt]).map((m) => m.id), ['srv']);
     });
 
     test('realtime rows interleave by timestamp, dedupe by id/tool', () {
       final server = [
         _m('a', content: 'first', ts: '2026-01-01T00:00:01Z'),
-        _m('c', kind: 'tool_use', role: null, toolId: 't1', ts: '2026-01-01T00:00:03Z'),
+        _m(
+          'c',
+          kind: 'tool_use',
+          role: null,
+          toolId: 't1',
+          ts: '2026-01-01T00:00:03Z',
+        ),
       ];
       final rt = [
-        _m('c', kind: 'tool_use', role: null, toolId: 't1', ts: '2026-01-01T00:00:03Z'),
+        _m(
+          'c',
+          kind: 'tool_use',
+          role: null,
+          toolId: 't1',
+          ts: '2026-01-01T00:00:03Z',
+        ),
         _m('b', role: 'user', content: 'second', ts: '2026-01-01T00:00:02Z'),
       ];
       expect(computeMerged(server, rt).map((m) => m.id), ['a', 'b', 'c']);
@@ -69,11 +103,33 @@ void main() {
     // leaves the following local echo permanently orphaned (visible dupe).
     test('local echo claims its prefixed first-turn twin, not the next same-text row', () {
       const prefixed = '<unified-rules>\nrules…\n</unified-rules>\n\nsiema';
-      final server = [_m('srv_rules', role: 'user', content: prefixed, ts: '2026-01-01T00:00:00Z')];
+      final server = [
+        _m(
+          'srv_rules',
+          role: 'user',
+          content: prefixed,
+          ts: '2026-01-01T00:00:00Z',
+        ),
+      ];
       final rt = [
-        _m('local_1', role: 'user', content: 'siema', ts: '2026-01-01T00:00:00Z'),
-        _m('rt_rules', role: 'user', content: prefixed, ts: '2026-01-01T00:00:00Z'),
-        _m('local_2', role: 'user', content: 'siema', ts: '2026-01-01T00:00:04Z'),
+        _m(
+          'local_1',
+          role: 'user',
+          content: 'siema',
+          ts: '2026-01-01T00:00:00Z',
+        ),
+        _m(
+          'rt_rules',
+          role: 'user',
+          content: prefixed,
+          ts: '2026-01-01T00:00:00Z',
+        ),
+        _m(
+          'local_2',
+          role: 'user',
+          content: 'siema',
+          ts: '2026-01-01T00:00:04Z',
+        ),
         _m('rt_2', role: 'user', content: 'siema', ts: '2026-01-01T00:00:04Z'),
       ];
       expect(computeMerged(server, rt).map((m) => m.id), ['srv_rules', 'rt_2']);
@@ -82,22 +138,43 @@ void main() {
     test('prefixed local echo resolves once all sends are persisted', () {
       const prefixed = '<unified-rules>\nrules…\n</unified-rules>\n\nsiema';
       final server = [
-        _m('srv_rules', role: 'user', content: prefixed, ts: '2026-01-01T00:00:00Z'),
+        _m(
+          'srv_rules',
+          role: 'user',
+          content: prefixed,
+          ts: '2026-01-01T00:00:00Z',
+        ),
         _m('srv_2', role: 'user', content: 'siema', ts: '2026-01-01T00:00:04Z'),
       ];
       final rt = [
-        _m('local_1', role: 'user', content: 'siema', ts: '2026-01-01T00:00:00Z'),
-        _m('local_2', role: 'user', content: 'siema', ts: '2026-01-01T00:00:04Z'),
+        _m(
+          'local_1',
+          role: 'user',
+          content: 'siema',
+          ts: '2026-01-01T00:00:00Z',
+        ),
+        _m(
+          'local_2',
+          role: 'user',
+          content: 'siema',
+          ts: '2026-01-01T00:00:04Z',
+        ),
         _m('rt_2', role: 'user', content: 'siema', ts: '2026-01-01T00:00:04Z'),
       ];
-      expect(computeMerged(server, rt).map((m) => m.id), ['srv_rules', 'srv_2']);
+      expect(computeMerged(server, rt).map((m) => m.id), [
+        'srv_rules',
+        'srv_2',
+      ]);
     });
 
     test('adjacent identical assistant echoes collapse', () {
       final dup = _m('d1', content: 'same', ts: '2026-01-01T00:00:01Z');
       final dup2 = _m('d2', content: 'same', ts: '2026-01-01T00:00:02Z');
       final ok = _m('ok', content: 'other', ts: '2026-01-01T00:00:03Z');
-      expect(dedupeAdjacentAssistantEchoes([dup, dup2, ok]).map((m) => m.id), ['d1', 'ok']);
+      expect(dedupeAdjacentAssistantEchoes([dup, dup2, ok]).map((m) => m.id), [
+        'd1',
+        'ok',
+      ]);
     });
   });
 
@@ -118,14 +195,17 @@ void main() {
       expect(r.prependedCount, 2);
     });
 
-    test('bridge planned only when page has no overlap and transcript grew', () {
-      final cached = [_m('1')];
-      final latest = [_m('9'), _m('10')];
-      final plan = planLatestPageBridge(cached, latest, 1, 10);
-      expect(plan, isNotNull);
-      expect(plan!.offset, 2);
-      expect(planLatestPageBridge(latest, latest, 0, 0), isNull);
-    });
+    test(
+      'bridge planned only when page has no overlap and transcript grew',
+      () {
+        final cached = [_m('1')];
+        final latest = [_m('9'), _m('10')];
+        final plan = planLatestPageBridge(cached, latest, 1, 10);
+        expect(plan, isNotNull);
+        expect(plan!.offset, 2);
+        expect(planLatestPageBridge(latest, latest, 0, 0), isNull);
+      },
+    );
   });
 
   group('SessionMessageStore', () {
@@ -140,6 +220,36 @@ void main() {
       final msgs = c.read(sessionMessagesProvider('s1'));
       expect(msgs.length, 2);
       expect(msgs.last.content, 'hello');
+    });
+
+    test('a re-published tool row replaces the earlier snapshot in place', () {
+      final c = ProviderContainer();
+      addTearDown(c.dispose);
+      final store = c.read(sessionMessageStoreProvider.notifier);
+      store.appendRealtime(
+        's1',
+        _m('t1', kind: 'tool_use', toolId: 't1', content: ''),
+      );
+      store.appendRealtime(
+        's1',
+        _m('t1__result', kind: 'tool_result', toolId: 't1', content: ''),
+      );
+      store.appendRealtime(
+        's1',
+        _m(
+          't1__result',
+          kind: 'tool_result',
+          toolId: 't1',
+          content: 'final output',
+        ),
+      );
+      final results = c
+          .read(sessionMessageStoreProvider)['s1']!
+          .realtimeMessages
+          .where((m) => m.kind == 'tool_result')
+          .toList();
+      expect(results.length, 1);
+      expect(results.single.content, 'final output');
     });
 
     test('delta buffer accumulates across flush windows', () async {
@@ -190,21 +300,30 @@ void main() {
       },
     );
 
-    test('repeated live patches to one delegation row collapse into one card', () {
-      final c = ProviderContainer();
-      addTearDown(c.dispose);
-      final store = c.read(sessionMessageStoreProvider.notifier);
-      store.appendRealtimeBatch('s1', [
-        orchStatus('f1', 7, 'running', ts: '2026-01-01T00:00:01Z'),
-        orchStatus('f2', 7, 'running', ts: '2026-01-01T00:00:02Z', lastEvent: 'tool: X'),
-        orchStatus('f3', 7, 'done', ts: '2026-01-01T00:00:03Z'),
-      ]);
-      final msgs = c.read(sessionMessagesProvider('s1'));
-      expect(msgs.length, 1);
-      expect(msgs.single.context?['status'], 'done');
-      // First-seen timestamp survives so the card does not jump to the tail.
-      expect(msgs.single.timestamp, '2026-01-01T00:00:01Z');
-    });
+    test(
+      'repeated live patches to one delegation row collapse into one card',
+      () {
+        final c = ProviderContainer();
+        addTearDown(c.dispose);
+        final store = c.read(sessionMessageStoreProvider.notifier);
+        store.appendRealtimeBatch('s1', [
+          orchStatus('f1', 7, 'running', ts: '2026-01-01T00:00:01Z'),
+          orchStatus(
+            'f2',
+            7,
+            'running',
+            ts: '2026-01-01T00:00:02Z',
+            lastEvent: 'tool: X',
+          ),
+          orchStatus('f3', 7, 'done', ts: '2026-01-01T00:00:03Z'),
+        ]);
+        final msgs = c.read(sessionMessagesProvider('s1'));
+        expect(msgs.length, 1);
+        expect(msgs.single.context?['status'], 'done');
+        // First-seen timestamp survives so the card does not jump to the tail.
+        expect(msgs.single.timestamp, '2026-01-01T00:00:01Z');
+      },
+    );
 
     test('distinct row ids keep separate cards', () {
       final c = ProviderContainer();
@@ -217,47 +336,60 @@ void main() {
       expect(c.read(sessionMessagesProvider('s1')).length, 2);
     });
 
-    test('status frames without a row id stay separate (taskmaster milestones)', () {
-      final c = ProviderContainer();
-      addTearDown(c.dispose);
-      final store = c.read(sessionMessageStoreProvider.notifier);
-      for (final (i, status) in ['pending', 'in-progress', 'done'].indexed) {
-        store.appendRealtime(
-          's1',
-          SessionMessage(
-            id: 'tm$i',
-            sessionId: 's1',
-            timestamp: '2026-01-01T00:00:0${i + 1}Z',
-            provider: 'orchestrator',
-            kind: 'status',
-            role: 'assistant',
-            context: {'orchestratorKind': 'taskmaster', 'taskId': '7', 'status': status},
-          ),
-        );
-      }
-      expect(c.read(sessionMessagesProvider('s1')).length, 3);
-    });
+    test(
+      'status frames without a row id stay separate (taskmaster milestones)',
+      () {
+        final c = ProviderContainer();
+        addTearDown(c.dispose);
+        final store = c.read(sessionMessageStoreProvider.notifier);
+        for (final (i, status) in ['pending', 'in-progress', 'done'].indexed) {
+          store.appendRealtime(
+            's1',
+            SessionMessage(
+              id: 'tm$i',
+              sessionId: 's1',
+              timestamp: '2026-01-01T00:00:0${i + 1}Z',
+              provider: 'orchestrator',
+              kind: 'status',
+              role: 'assistant',
+              context: {
+                'orchestratorKind': 'taskmaster',
+                'taskId': '7',
+                'status': status,
+              },
+            ),
+          );
+        }
+        expect(c.read(sessionMessagesProvider('s1')).length, 3);
+      },
+    );
 
-    test('newer live frame folds into the persisted row, keeping its position', () {
-      final server = [
-        orchStatus('orch-6', 6, 'done', ts: '2026-01-01T00:00:01Z'),
-        orchStatus('orch-7', 7, 'running', ts: '2026-01-01T00:00:02Z'),
-        orchStatus('orch-8', 8, 'done', ts: '2026-01-01T00:00:03Z'),
-      ];
-      final live = orchStatus('f9', 7, 'done', ts: '2026-01-01T00:00:09Z');
-      final merged = computeMerged(server, [live]);
-      expect(merged.map((m) => m.id), ['orch-6', 'orch-7', 'orch-8']);
-      expect(merged[1].context?['status'], 'done');
-      expect(merged[1].timestamp, '2026-01-01T00:00:02Z');
-    });
+    test(
+      'newer live frame folds into the persisted row, keeping its position',
+      () {
+        final server = [
+          orchStatus('orch-6', 6, 'done', ts: '2026-01-01T00:00:01Z'),
+          orchStatus('orch-7', 7, 'running', ts: '2026-01-01T00:00:02Z'),
+          orchStatus('orch-8', 8, 'done', ts: '2026-01-01T00:00:03Z'),
+        ];
+        final live = orchStatus('f9', 7, 'done', ts: '2026-01-01T00:00:09Z');
+        final merged = computeMerged(server, [live]);
+        expect(merged.map((m) => m.id), ['orch-6', 'orch-7', 'orch-8']);
+        expect(merged[1].context?['status'], 'done');
+        expect(merged[1].timestamp, '2026-01-01T00:00:02Z');
+      },
+    );
 
-    test('only the newest live frame survives when the row is not persisted yet', () {
-      final merged = computeMerged(const [], [
-        orchStatus('f1', 7, 'running', ts: '2026-01-01T00:00:01Z'),
-        orchStatus('f2', 7, 'done', ts: '2026-01-01T00:00:02Z'),
-      ]);
-      expect(merged.map((m) => m.id), ['f2']);
-    });
+    test(
+      'only the newest live frame survives when the row is not persisted yet',
+      () {
+        final merged = computeMerged(const [], [
+          orchStatus('f1', 7, 'running', ts: '2026-01-01T00:00:01Z'),
+          orchStatus('f2', 7, 'done', ts: '2026-01-01T00:00:02Z'),
+        ]);
+        expect(merged.map((m) => m.id), ['f2']);
+      },
+    );
   });
 
   group('SessionActivityController', () {
@@ -278,7 +410,14 @@ void main() {
       addTearDown(c.dispose);
       final act = c.read(sessionActivityProvider.notifier);
       act.markProcessing('local');
-      act.sync([(sessionId: 'server', statusText: null, canInterrupt: true, startedAt: 1)]);
+      act.sync([
+        (
+          sessionId: 'server',
+          statusText: null,
+          canInterrupt: true,
+          startedAt: 1,
+        ),
+      ]);
       final state = c.read(sessionActivityProvider);
       expect(state.keys, containsAll(['local', 'server']));
     });

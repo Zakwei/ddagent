@@ -38,6 +38,7 @@ import {
   commandCodeProjectSlug,
   createCompleteMessage,
   createNormalizedMessage,
+  foldAcpToolResultSnapshot,
   providerChildEnv,
   readJsonConfig,
   readObjectRecord,
@@ -1400,13 +1401,24 @@ function createCommandCodeProcess(sessionId: any, workingDir: any, model: any, w
                         ? update.content.map((c: any) => extractTextContent(c.content ?? c)).filter(Boolean).join('\n')
                         : '';
                     const toolId = readOptionalString(update.toolCallId) ?? `commandcode_tool_${nextRequestId()}`;
-                    const isError = update.status === 'failed';
+                    // An empty in-progress update carries nothing yet; as a
+                    // tool_result it would flip the card to Completed.
+                    const terminal = update.status === 'completed' || update.status === 'failed';
+                    if (!terminal && !contentBlocks.trim() && !state.toolResultSnapshots?.has(toolId)) return;
+                    // Every snapshot shares one id, so emit the folded state
+                    // of the call rather than this (often empty) update.
+                    const folded = foldAcpToolResultSnapshot(
+                        (state.toolResultSnapshots ??= new Map()),
+                        toolId,
+                        contentBlocks,
+                        update.status === 'failed',
+                    );
                     state.currentWriter?.send(createNormalizedMessage({
                         id: `${toolId}__result`,
                         kind: 'tool_result',
                         toolId,
-                        content: contentBlocks,
-                        isError,
+                        content: folded.content,
+                        isError: folded.isError,
                         sessionId: state.commandCodeSessionId,
                         provider: 'commandcode',
                         timestamp: new Date().toISOString(),

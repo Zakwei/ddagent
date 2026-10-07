@@ -29,6 +29,7 @@ export {
   commandCodeProjectsDir,
   createCompleteMessage,
   createNormalizedMessage,
+  foldAcpToolResultSnapshot,
   createOrchestratorStatusFrame,
   devinConfigDir,
   devinDataDir,
