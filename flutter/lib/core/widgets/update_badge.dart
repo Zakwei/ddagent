@@ -1,8 +1,11 @@
 import 'dart:async';
 
 import 'package:ddagent_app/core/theme/tokens.dart';
+import 'package:ddagent_app/core/utils/app_quit.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/features/server_connect/data/server_profiles.dart';
+import 'package:ddagent_app/features/server_connect/state/local_server_controller.dart';
+import 'package:ddagent_app/features/system/data/app_update_channel.dart';
 import 'package:ddagent_app/features/system/data/system_repository.dart';
 import 'package:ddagent_app/features/system/state/update_controller.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
@@ -28,14 +31,15 @@ class UpdateBadge extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // The local server self-updates through the app's own bundle pipeline —
-    // POST /api/system/update can't work on a release bundle, so the badge
-    // would only lead to a guaranteed failure. Remote servers keep it.
+    // POST /api/system/update can't work on a release bundle, so a *server*
+    // update on a local profile would only lead to a guaranteed failure. A
+    // self-update of THIS app still applies everywhere.
     final profiles = ref.watch(serverProfilesProvider);
     final active = profiles.profiles.where((p) => p.url == profiles.activeUrl).firstOrNull;
-    if (active?.isLocal ?? false) return const SizedBox.shrink();
-    // The server falling behind applies everywhere; an app update only exists
-    // where the client can install its own APK (Android).
-    if (!ref.watch(updateAvailableProvider) && !ref.watch(appUpdateAvailableProvider)) {
+    final serverUpdate = !(active?.isLocal ?? false) && ref.watch(updateAvailableProvider);
+    // A `_Status.updateAvailable` (above) still drives the badge on server
+    // updates; an app update only exists where the client can install itself.
+    if (!serverUpdate && !ref.watch(appUpdateAvailableProvider)) {
       return const SizedBox.shrink();
     }
     final t = Translations.of(context);
@@ -152,6 +156,12 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
   }
 
   Future<void> _runUpdate() async {
+    // Desktop (Linux/Windows) stages the new build in the background and
+    // installs it on quit — the button only re-checks or applies a staged one.
+    if (isDesktopChannel(ref.read(appUpdateChannelProvider)) &&
+        ref.read(appUpdateAvailableProvider)) {
+      return _runDesktopUpdate();
+    }
     // Android can install a newer APK of this app itself; every other case is
     // the connected server updating itself.
     final asset = ref.read(appUpdateAssetProvider);
@@ -220,6 +230,24 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
     if (mounted) Navigator.of(context).pop();
   }
 
+  /// Desktop: install now when a build is already staged, otherwise re-check
+  /// and let the background downloader stage it.
+  Future<void> _runDesktopUpdate() async {
+    if (ref.read(desktopUpdateProvider).stage == DesktopUpdateStage.ready) {
+      return _applyDesktopNow();
+    }
+    ref.read(desktopUpdateProvider.notifier).recheck();
+  }
+
+  /// Hands the staged update to the detached installer and quits so it can
+  /// replace the running binary. On web (no process to exit) the dialog just
+  /// closes.
+  Future<void> _applyDesktopNow() async {
+    await ref.read(desktopUpdateProvider.notifier).applyOnExit();
+    await ref.read(localServerProvider.notifier).stop();
+    if (!quitApp() && mounted) Navigator.of(context).pop();
+  }
+
   /// `/health` poll until the restarted process reports the new version —
   /// 90s deadline then 'manual-restart' (same as web).
   void _pollForVersion(SystemRepository repo) {
@@ -254,6 +282,15 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
     final t = Translations.of(context);
     final release = ref.watch(latestReleaseProvider).value;
     final version = release != null ? normalizeVersion(release.tagName) : '?';
+
+    // Desktop self-update stages in the background and installs on quit, so its
+    // dialog is driven by [desktopUpdateProvider] rather than the poll-based
+    // server flow below.
+    if (isDesktopChannel(ref.watch(appUpdateChannelProvider)) &&
+        ref.watch(appUpdateAvailableProvider)) {
+      return _buildDesktop(context, t, c, release, version);
+    }
+
     final busy = _status == _Status.updating || _status == _Status.restarting;
 
     final body = switch (_status) {
@@ -330,6 +367,95 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
             if (_status == _Status.failed || _status == _Status.permission) ...[
               const SizedBox(width: 12),
               AppButton(onPressed: _runUpdate, child: Text(t.chat.session.messages.retry)),
+            ],
+          ],
+        ),
+      ],
+    );
+  }
+
+  /// Desktop update dialog — reflects [desktopUpdateProvider]: the background
+  /// downloader either is mid-download, has a build staged (offer to quit and
+  /// install now), or failed (offer a retry).
+  Widget _buildDesktop(
+    BuildContext context,
+    Translations t,
+    AppColors c,
+    Release? release,
+    String version,
+  ) {
+    final stage = ref.watch(desktopUpdateProvider).stage;
+    final progress = ref.watch(desktopUpdateProvider).progress;
+    final error = ref.watch(desktopUpdateProvider).error;
+    final busy = stage == DesktopUpdateStage.idle || stage == DesktopUpdateStage.downloading;
+
+    final body = switch (stage) {
+      DesktopUpdateStage.idle || DesktopUpdateStage.downloading =>
+        progress > 0
+            ? '${t.common.update.downloading} ${(progress * 100).round()}%'
+            : t.common.update.downloading,
+      DesktopUpdateStage.ready => t.settings.updates.downloaded(version: version),
+      DesktopUpdateStage.failed => t.settings.updates.error(
+        message: error ?? t.settings.updates.errorGeneric,
+      ),
+    };
+
+    return AlertDialog(
+      backgroundColor: c.card,
+      icon: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: const Color(0xFF10B981).withValues(alpha: 0.1),
+          shape: BoxShape.circle,
+        ),
+        child: busy
+            ? const SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : const Icon(LucideIcons.circleArrowUp, size: 16, color: Color(0xFF10B981)),
+      ),
+      title: Text(
+        stage == DesktopUpdateStage.failed
+            ? t.common.update.failedTitle
+            : t.common.update.available(version: version),
+        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+      ),
+      content: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 400, maxHeight: 288),
+        child: SingleChildScrollView(
+          child: Text(body, style: TextStyle(fontSize: 14, color: c.mutedForeground)),
+        ),
+      ),
+      actionsAlignment: MainAxisAlignment.spaceBetween,
+      actions: [
+        if (release?.htmlUrl != null)
+          TextButton.icon(
+            onPressed: () => launchUrl(Uri.parse(release!.htmlUrl!)),
+            icon: const Icon(LucideIcons.externalLink, size: 12),
+            label: Text(t.sidebar.version.releaseNotes, style: const TextStyle(fontSize: 12)),
+          )
+        else
+          const SizedBox.shrink(),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AppButton(
+              variant: AppButtonVariant.secondary,
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(t.chat.common.close),
+            ),
+            if (stage == DesktopUpdateStage.ready) ...[
+              const SizedBox(width: 12),
+              AppButton(onPressed: _applyDesktopNow, child: Text(t.common.buttons.update)),
+            ],
+            if (stage == DesktopUpdateStage.failed) ...[
+              const SizedBox(width: 12),
+              AppButton(
+                onPressed: () => ref.read(desktopUpdateProvider.notifier).recheck(),
+                child: Text(t.chat.session.messages.retry),
+              ),
             ],
           ],
         ),

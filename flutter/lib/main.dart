@@ -14,6 +14,7 @@ import 'package:ddagent_app/features/notifications/data/desktop_notification_pre
 import 'package:ddagent_app/features/notifications/state/device_notifications_controller.dart';
 import 'package:ddagent_app/features/server_connect/state/local_server_controller.dart';
 import 'package:ddagent_app/features/settings/state/locale_controller.dart';
+import 'package:ddagent_app/features/system/state/update_controller.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -61,10 +62,16 @@ class DdagentApp extends ConsumerStatefulWidget {
 }
 
 class _DdagentAppState extends ConsumerState<DdagentApp> {
-  // Kill the app-spawned local server on quit (an adopted external server is
-  // left alone; orphans are re-adopted on next launch anyway).
+  // On quit: apply a staged desktop update (detached installer), then kill the
+  // app-spawned local server (an adopted external server is left alone;
+  // orphans are re-adopted on next launch anyway).
   late final AppLifecycleListener _lifecycle = AppLifecycleListener(
     onExitRequested: () async {
+      try {
+        await ref.read(desktopUpdateProvider.notifier).applyOnExit();
+      } on Object catch (_) {
+        // A failed hand-off must never block quitting.
+      }
       await ref.read(localServerProvider.notifier).stop();
       return AppExitResponse.exit;
     },
@@ -82,6 +89,9 @@ class _DdagentAppState extends ConsumerState<DdagentApp> {
     // Keep the device-notification subscription alive app-wide so an enabled
     // device re-arms after reload, and surface inbound alerts as they arrive.
     ref.watch(deviceNotificationsProvider);
+    // Keep the desktop self-updater alive app-wide so it stages a newer build
+    // in the background (install-on-quit); inert on mobile/web.
+    ref.watch(desktopUpdateProvider);
     ref.listen(desktopNotificationEventsProvider, (_, next) {
       final event = next.value;
       if (event != null) unawaited(presentDesktopNotification(event));

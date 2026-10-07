@@ -9,8 +9,11 @@ import 'package:ddagent_app/core/widgets/app_markdown.dart';
 import 'package:ddagent_app/features/server_connect/data/server_profiles.dart';
 import 'package:ddagent_app/features/settings/state/locale_controller.dart';
 import 'package:ddagent_app/features/settings/view/sections/general_section.dart';
+import 'package:ddagent_app/features/system/data/app_update_channel.dart';
 import 'package:ddagent_app/features/system/data/system_repository.dart';
 import 'package:ddagent_app/features/system/state/system_providers.dart';
+import 'package:ddagent_app/features/system/state/update_controller.dart'
+    show DesktopUpdateStage, appUpdateChannelProvider, appVersionProvider, desktopUpdateProvider;
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -526,10 +529,12 @@ class _ProCard extends StatelessWidget {
 
 enum _CheckStatus { idle, checking, upToDate, updateAvailable, error }
 
-/// "App updates" — the web's `UpdateCheckSection` talks to the Electron
-/// bridge, which doesn't exist here; the equivalent for a remote client is
-/// `GET /api/system/latest-release` (server-side GitHub check, same as
-/// `useVersionCheck`) compared against the server's running version.
+/// "App updates" — on desktop this reflects the background self-updater
+/// ([desktopUpdateProvider]): a newer build downloads automatically and installs
+/// on quit. Elsewhere it keeps the server-side check — the web's
+/// `UpdateCheckSection` talked to the Electron bridge, which doesn't exist here,
+/// so the equivalent is `GET /api/system/latest-release` (server-side GitHub
+/// check, same as `useVersionCheck`) compared against the server's version.
 class _UpdateCheckBlock extends ConsumerStatefulWidget {
   const _UpdateCheckBlock();
 
@@ -542,6 +547,12 @@ class _UpdateCheckBlockState extends ConsumerState<_UpdateCheckBlock> {
   String _detail = '';
 
   Future<void> _check() async {
+    // Desktop: re-run the release check and let the background self-updater
+    // stage the new build (applied on quit).
+    if (isDesktopChannel(ref.read(appUpdateChannelProvider))) {
+      ref.read(desktopUpdateProvider.notifier).recheck();
+      return;
+    }
     setState(() {
       _status = _CheckStatus.checking;
       _detail = '';
@@ -584,19 +595,50 @@ class _UpdateCheckBlockState extends ConsumerState<_UpdateCheckBlock> {
     final c = context.appColors;
     final tt = Theme.of(context).textTheme;
 
+    final desktopChannel = ref.watch(appUpdateChannelProvider);
+
     String? result;
     var good = false;
-    switch (_status) {
-      case _CheckStatus.upToDate:
-        result = t.updates.upToDate(version: _detail);
-        good = true;
-      case _CheckStatus.updateAvailable:
-        result = t.apiKeys.version.updateAvailable(version: _detail);
-        good = true;
-      case _CheckStatus.error:
-        result = _detail.isEmpty ? t.updates.errorGeneric : t.updates.error(message: _detail);
-      case _CheckStatus.idle || _CheckStatus.checking:
-        result = null;
+    var checking = _status == _CheckStatus.checking;
+
+    if (isDesktopChannel(desktopChannel)) {
+      // Desktop self-update state, read from the background updater.
+      final state = ref.watch(desktopUpdateProvider);
+      final installed = ref.watch(appVersionProvider).value ?? '';
+      final latest =
+          ref.watch(latestReleaseProvider).value?.tagName.replaceFirst(RegExp('^v'), '') ?? '';
+      checking = state.stage == DesktopUpdateStage.downloading;
+      switch (state.stage) {
+        case DesktopUpdateStage.ready:
+          result = t.updates.downloaded(version: state.version);
+          good = true;
+        case DesktopUpdateStage.downloading:
+          result = t.updates.available(version: state.version);
+          good = true;
+        case DesktopUpdateStage.failed:
+          result = t.updates.error(message: state.error ?? t.updates.errorGeneric);
+        case DesktopUpdateStage.idle:
+          if (latest.isNotEmpty && compareVersions(latest, installed) > 0) {
+            result = t.updates.available(version: latest);
+            good = true;
+          } else if (installed.isNotEmpty) {
+            result = t.updates.upToDate(version: installed);
+            good = true;
+          }
+      }
+    } else {
+      switch (_status) {
+        case _CheckStatus.upToDate:
+          result = t.updates.upToDate(version: _detail);
+          good = true;
+        case _CheckStatus.updateAvailable:
+          result = t.apiKeys.version.updateAvailable(version: _detail);
+          good = true;
+        case _CheckStatus.error:
+          result = _detail.isEmpty ? t.updates.errorGeneric : t.updates.error(message: _detail);
+        case _CheckStatus.idle || _CheckStatus.checking:
+          result = null;
+      }
     }
 
     return Column(
@@ -627,14 +669,14 @@ class _UpdateCheckBlockState extends ConsumerState<_UpdateCheckBlock> {
             AppButton(
               variant: AppButtonVariant.outline,
               size: AppButtonSize.sm,
-              loading: _status == _CheckStatus.checking,
+              loading: checking,
               onPressed: () => unawaited(_check()),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 spacing: AppSpacing.xs,
                 children: [
                   const Icon(LucideIcons.refreshCw, size: 12),
-                  Text(_status == _CheckStatus.checking ? t.updates.checking : t.updates.check),
+                  Text(checking ? t.updates.checking : t.updates.check),
                 ],
               ),
             ),
