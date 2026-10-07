@@ -6,6 +6,10 @@ import type {
   OrchestratorTaskType,
   QuotaAccount,
 } from '@/shared/index.js';
+import { classifyTaskType } from '@/shared/index.js';
+
+/** Re-exported so existing router consumers/tests keep importing it from here. */
+export { classifyTaskType };
 
 /**
  * One row of per-provider subscription state the router filters on. Derived
@@ -21,71 +25,6 @@ export type RouterAvailability = {
 export type RouteResult =
   | { ok: true; decision: OrchestratorRoutingDecision; candidate: OrchestratorCandidate }
   | { ok: false; reason: string; alternatives: OrchestratorCandidate[] };
-
-const TASK_TYPES: OrchestratorTaskType[] = [
-  'plan',
-  'quick',
-  'research',
-  'docs',
-  'code',
-  'code-hard',
-  'test',
-  'review',
-  'gate',
-];
-
-/**
- * Slash-prefix → task type. An explicit prefix in the composer always wins
- * over keyword heuristics.
- */
-const SLASH_TYPES: Record<string, OrchestratorTaskType> = {
-  plan: 'plan',
-  quick: 'quick',
-  ask: 'quick',
-  research: 'research',
-  docs: 'docs',
-  code: 'code',
-  test: 'test',
-  review: 'review',
-};
-
-const KEYWORD_RULES: Array<[OrchestratorTaskType, RegExp]> = [
-  ['review', /\b(review|przegląd|audyt|audit|sprawdź|check)\b/i],
-  ['research', /\b(research|find out|explore|investigate|search|poszukaj|research)\b/i],
-  ['docs', /\b(document|docs|dokumentacj|readme|changelog|opisz)\b/i],
-  ['test', /\b(test|tests|coverage|napraw test|fix test)\b/i],
-  [
-    'code-hard',
-    /\b(refactor|rearchitect|migrat|rewrite|przepisz|przenieś|przebuduj)\b/i,
-  ],
-  ['code', /\b(implement|fix|add|create|build|napraw|dodaj|zrobić|zrób|napisz|zmień)\b/i],
-];
-
-/**
- * Classifies one user message into a task type. Order of precedence: explicit
- * `taskType` hint from the composer chip → `/type` slash prefix → keyword
- * heuristics → `quick` (the cheapest lane is the safe default for chatter).
- */
-export function classifyTaskType(
-  content: string,
-  hint?: string | null,
-): OrchestratorTaskType {
-  // `gate` is excluded on purpose: it executes the prompt as a shell command,
-  // so it may only originate from a plan/template — never from a hint that
-  // would turn raw user text into a command.
-  if (hint && hint !== 'gate' && TASK_TYPES.includes(hint as OrchestratorTaskType)) {
-    return hint as OrchestratorTaskType;
-  }
-  const trimmed = content.trim();
-  const slash = trimmed.match(/^\/([a-z-]+)\s/i);
-  if (slash && SLASH_TYPES[slash[1].toLowerCase()]) {
-    return SLASH_TYPES[slash[1].toLowerCase()];
-  }
-  for (const [type, pattern] of KEYWORD_RULES) {
-    if (pattern.test(trimmed)) return type;
-  }
-  return 'quick';
-}
 
 /**
  * Maps a candidate onto the quota check that actually bills it. OpenCode

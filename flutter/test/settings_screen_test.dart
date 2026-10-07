@@ -39,6 +39,7 @@ void main() {
     expect(settingsSections.map((s) => s.id).toList(), [
       'agents',
       'orchestration',
+      'mini-orchestration',
       'appearance',
       'git',
       'api',

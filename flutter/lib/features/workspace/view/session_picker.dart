@@ -155,6 +155,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
             in (caps['data']?['providers'] ?? caps['providers'] ?? const <dynamic>[]) as List)
           if ((p as Map)['provider'] != null) p['provider'].toString(),
         if (widget.allowOrchestrator) 'orchestrator',
+        if (widget.allowOrchestrator) 'mini-orchestrator',
       ];
       if (mounted) {
         // Grouped picker (provider → accounts). Returns null when no accounts
@@ -177,7 +178,13 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
                   children: [
                     for (final p in providers)
                       ListTile(
-                        title: Text(p == 'orchestrator' ? 'Auto (orchestrator)' : p),
+                        title: Text(
+                          p == 'orchestrator'
+                              ? 'Auto (orchestrator)'
+                              : p == 'mini-orchestrator'
+                              ? 'Auto (mini)'
+                              : p,
+                        ),
                         onTap: () => Navigator.of(ctx).pop(p),
                       ),
                   ],

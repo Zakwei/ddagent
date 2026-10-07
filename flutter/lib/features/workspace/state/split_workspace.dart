@@ -309,5 +309,7 @@ class WorkspaceStorage {
 
 // ─── Broadcast helpers (port of broadcastSessionUtils.ts) ──────────────────
 
-bool isOrchestratorSession(Map<String, dynamic> session) =>
-    (session['provider'] ?? session['__provider']) == 'orchestrator';
+bool isOrchestratorSession(Map<String, dynamic> session) {
+  final provider = session['provider'] ?? session['__provider'];
+  return provider == 'orchestrator' || provider == 'mini-orchestrator';
+}

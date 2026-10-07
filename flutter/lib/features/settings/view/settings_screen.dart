@@ -4,6 +4,7 @@ import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/subpage_header.dart';
 import 'package:ddagent_app/features/auth/view/auth_screens.dart';
+import 'package:ddagent_app/features/mini_orchestrator/view/mini_orchestration_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/about_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/agents_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/api_section.dart';
@@ -53,6 +54,12 @@ final settingsSections = <SettingsSection>[
     icon: LucideIcons.workflow,
     label: (t) => t.settings.mainTabs.orchestration,
     build: (_) => const OrchestrationSection(),
+  ),
+  SettingsSection(
+    id: 'mini-orchestration',
+    icon: LucideIcons.zap,
+    label: (t) => t.settings.mainTabs.miniOrchestration,
+    build: (_) => const MiniOrchestrationSection(),
   ),
   SettingsSection(
     id: 'appearance',

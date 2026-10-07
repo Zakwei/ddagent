@@ -10,6 +10,7 @@ import 'package:ddagent_app/core/widgets/app_input.dart';
 import 'package:ddagent_app/core/widgets/app_nav_menu.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/features/chat/view/chat_utilities.dart';
+import 'package:ddagent_app/features/mini_orchestrator/state/mini_orchestrator_controller.dart';
 import 'package:ddagent_app/features/orchestrator/state/orchestrator_controller.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
@@ -567,6 +568,7 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
             in (caps['data']?['providers'] ?? caps['providers'] ?? const <dynamic>[]) as List)
           if ((p as Map)['provider'] != null) p['provider'].toString(),
         if (canOrchestrate) 'orchestrator',
+        if (canOrchestrate) 'mini-orchestrator',
       ];
       if (mounted) {
         // Grouped picker (provider → accounts). Returns null when no accounts
@@ -590,7 +592,13 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
                   children: [
                     for (final p in providers)
                       ListTile(
-                        title: Text(p == 'orchestrator' ? t.sessions.autoOrchestrator : p),
+                        title: Text(
+                          p == 'orchestrator'
+                              ? t.sessions.autoOrchestrator
+                              : p == 'mini-orchestrator'
+                              ? 'Auto (mini)'
+                              : p,
+                        ),
                         onTap: () => Navigator.of(ctx).pop(p),
                       ),
                   ],
@@ -613,9 +621,11 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
       // Fall back to the default provider.
     }
     if (!mounted) return;
-    if (provider == 'orchestrator' && canOrchestrate) {
+    if ((provider == 'orchestrator' || provider == 'mini-orchestrator') && canOrchestrate) {
       try {
-        final sessionId = await createOrchestratorSession(ref, projectPath: widget.projectPath!);
+        final sessionId = provider == 'mini-orchestrator'
+            ? await createMiniOrchestratorSession(ref, projectPath: widget.projectPath!)
+            : await createOrchestratorSession(ref, projectPath: widget.projectPath!);
         if (!mounted) return;
         _open(sessionId);
       } on Object catch (e) {

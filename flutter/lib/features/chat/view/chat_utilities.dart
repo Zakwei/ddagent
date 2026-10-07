@@ -459,6 +459,7 @@ String providerLabel(String provider) => switch (provider) {
   'antigravity' => 'Antigravity',
   'devin' => 'Devin',
   'orchestrator' => 'Auto',
+  'mini-orchestrator' => 'Auto (mini)',
   _ => 'Claude',
 };
 

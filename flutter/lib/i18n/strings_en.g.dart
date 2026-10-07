@@ -234,6 +234,7 @@ class Translations$settings$en {
 	late final Translations$settings$quickSettings$en quickSettings = Translations$settings$quickSettings$en.internal(_root);
 	late final Translations$settings$terminalShortcuts$en terminalShortcuts = Translations$settings$terminalShortcuts$en.internal(_root);
 	late final Translations$settings$mainTabs$en mainTabs = Translations$settings$mainTabs$en.internal(_root);
+	late final Translations$settings$miniOrchestration$en miniOrchestration = Translations$settings$miniOrchestration$en.internal(_root);
 	late final Translations$settings$orchestration$en orchestration = Translations$settings$orchestration$en.internal(_root);
 	late final Translations$settings$notifications$en notifications = Translations$settings$notifications$en.internal(_root);
 	late final Translations$settings$appearanceSettings$en appearanceSettings = Translations$settings$appearanceSettings$en.internal(_root);
@@ -4373,6 +4374,9 @@ class Translations$settings$mainTabs$en {
 	/// en: 'Orchestration'
 	String get orchestration => 'Orchestration';
 
+	/// en: 'Mini orchestration'
+	String get miniOrchestration => 'Mini orchestration';
+
 	/// en: 'Appearance'
 	String get appearance => 'Appearance';
 
@@ -4408,6 +4412,34 @@ class Translations$settings$mainTabs$en {
 
 	/// en: 'Keyboard shortcuts'
 	String get shortcuts => 'Keyboard shortcuts';
+}
+
+// Path: settings.miniOrchestration
+class Translations$settings$miniOrchestration$en {
+	Translations$settings$miniOrchestration$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Mini orchestration'
+	String get title => 'Mini orchestration';
+
+	/// en: 'A two-model pipeline: a non-flash thinker plans, a flash worker executes.'
+	String get description => 'A two-model pipeline: a non-flash thinker plans, a flash worker executes.';
+
+	/// en: 'Loading mini orchestration settings…'
+	String get loading => 'Loading mini orchestration settings…';
+
+	/// en: 'Could not load the mini orchestration settings.'
+	String get loadError => 'Could not load the mini orchestration settings.';
+
+	late final Translations$settings$miniOrchestration$enable$en enable = Translations$settings$miniOrchestration$enable$en.internal(_root);
+	late final Translations$settings$miniOrchestration$thinker$en thinker = Translations$settings$miniOrchestration$thinker$en.internal(_root);
+	late final Translations$settings$miniOrchestration$worker$en worker = Translations$settings$miniOrchestration$worker$en.internal(_root);
+	late final Translations$settings$miniOrchestration$fields$en fields = Translations$settings$miniOrchestration$fields$en.internal(_root);
+	late final Translations$settings$miniOrchestration$roles$en roles = Translations$settings$miniOrchestration$roles$en.internal(_root);
+	late final Translations$settings$miniOrchestration$planner$en planner = Translations$settings$miniOrchestration$planner$en.internal(_root);
 }
 
 // Path: settings.orchestration
@@ -10527,6 +10559,107 @@ class Translations$settings$terminalShortcuts$handle$en {
 	String get openPanel => 'Open shortcuts panel';
 }
 
+// Path: settings.miniOrchestration.enable
+class Translations$settings$miniOrchestration$enable$en {
+	Translations$settings$miniOrchestration$enable$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Enable mini orchestration'
+	String get label => 'Enable mini orchestration';
+
+	/// en: 'Route Auto (mini) sessions through the two-role engine instead of the full orchestrator.'
+	String get description => 'Route Auto (mini) sessions through the two-role engine instead of the full orchestrator.';
+}
+
+// Path: settings.miniOrchestration.thinker
+class Translations$settings$miniOrchestration$thinker$en {
+	Translations$settings$miniOrchestration$thinker$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Thinker (non-flash)'
+	String get title => 'Thinker (non-flash)';
+
+	/// en: 'Plans, decides, reviews and writes the final report.'
+	String get description => 'Plans, decides, reviews and writes the final report.';
+}
+
+// Path: settings.miniOrchestration.worker
+class Translations$settings$miniOrchestration$worker$en {
+	Translations$settings$miniOrchestration$worker$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Worker (flash)'
+	String get title => 'Worker (flash)';
+
+	/// en: 'Executes each planned step.'
+	String get description => 'Executes each planned step.';
+}
+
+// Path: settings.miniOrchestration.fields
+class Translations$settings$miniOrchestration$fields$en {
+	Translations$settings$miniOrchestration$fields$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Provider'
+	String get provider => 'Provider';
+
+	/// en: 'Model'
+	String get model => 'Model';
+
+	/// en: 'Model id'
+	String get modelPlaceholder => 'Model id';
+
+	/// en: 'Tier'
+	String get tier => 'Tier';
+}
+
+// Path: settings.miniOrchestration.roles
+class Translations$settings$miniOrchestration$roles$en {
+	Translations$settings$miniOrchestration$roles$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Per-task model'
+	String get title => 'Per-task model';
+
+	/// en: 'Which model (role) handles each task type.'
+	String get description => 'Which model (role) handles each task type.';
+}
+
+// Path: settings.miniOrchestration.planner
+class Translations$settings$miniOrchestration$planner$en {
+	Translations$settings$miniOrchestration$planner$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Planner'
+	String get title => 'Planner';
+
+	/// en: 'Mode'
+	String get mode => 'Mode';
+
+	late final Translations$settings$miniOrchestration$planner$modes$en modes = Translations$settings$miniOrchestration$planner$modes$en.internal(_root);
+
+	/// en: 'Confirm the plan before running'
+	String get requireConfirmLabel => 'Confirm the plan before running';
+}
+
 // Path: settings.orchestration.enable
 class Translations$settings$orchestration$enable$en {
 	Translations$settings$orchestration$enable$en.internal(this._root);
@@ -12613,6 +12746,21 @@ class Translations$common$notifications$codes$agent$en {
 
 	// Translations
 	late final Translations$common$notifications$codes$agent$notification$en notification = Translations$common$notifications$codes$agent$notification$en.internal(_root);
+}
+
+// Path: settings.miniOrchestration.planner.modes
+class Translations$settings$miniOrchestration$planner$modes$en {
+	Translations$settings$miniOrchestration$planner$modes$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Plan with the thinker'
+	String get auto => 'Plan with the thinker';
+
+	/// en: 'Single step'
+	String get off => 'Single step';
 }
 
 // Path: settings.orchestration.pool.fields
@@ -14788,6 +14936,7 @@ extension on Translations {
 			'settings.mainTabs.label' => 'Settings',
 			'settings.mainTabs.agents' => 'Agents',
 			'settings.mainTabs.orchestration' => 'Orchestration',
+			'settings.mainTabs.miniOrchestration' => 'Mini orchestration',
 			'settings.mainTabs.appearance' => 'Appearance',
 			'settings.mainTabs.workspaces' => 'Workspaces',
 			'settings.mainTabs.git' => 'Git',
@@ -14800,6 +14949,27 @@ extension on Translations {
 			'settings.mainTabs.about' => 'About',
 			'settings.mainTabs.quota' => 'Control Center',
 			'settings.mainTabs.shortcuts' => 'Keyboard shortcuts',
+			'settings.miniOrchestration.title' => 'Mini orchestration',
+			'settings.miniOrchestration.description' => 'A two-model pipeline: a non-flash thinker plans, a flash worker executes.',
+			'settings.miniOrchestration.loading' => 'Loading mini orchestration settings…',
+			'settings.miniOrchestration.loadError' => 'Could not load the mini orchestration settings.',
+			'settings.miniOrchestration.enable.label' => 'Enable mini orchestration',
+			'settings.miniOrchestration.enable.description' => 'Route Auto (mini) sessions through the two-role engine instead of the full orchestrator.',
+			'settings.miniOrchestration.thinker.title' => 'Thinker (non-flash)',
+			'settings.miniOrchestration.thinker.description' => 'Plans, decides, reviews and writes the final report.',
+			'settings.miniOrchestration.worker.title' => 'Worker (flash)',
+			'settings.miniOrchestration.worker.description' => 'Executes each planned step.',
+			'settings.miniOrchestration.fields.provider' => 'Provider',
+			'settings.miniOrchestration.fields.model' => 'Model',
+			'settings.miniOrchestration.fields.modelPlaceholder' => 'Model id',
+			'settings.miniOrchestration.fields.tier' => 'Tier',
+			'settings.miniOrchestration.roles.title' => 'Per-task model',
+			'settings.miniOrchestration.roles.description' => 'Which model (role) handles each task type.',
+			'settings.miniOrchestration.planner.title' => 'Planner',
+			'settings.miniOrchestration.planner.mode' => 'Mode',
+			'settings.miniOrchestration.planner.modes.auto' => 'Plan with the thinker',
+			'settings.miniOrchestration.planner.modes.off' => 'Single step',
+			'settings.miniOrchestration.planner.requireConfirmLabel' => 'Confirm the plan before running',
 			'settings.orchestration.title' => 'Orchestration',
 			'settings.orchestration.description' => 'Route chat tasks across your providers and models.',
 			'settings.orchestration.loading' => 'Loading orchestration settings…',
@@ -14937,6 +15107,8 @@ extension on Translations {
 			'settings.notifications.sound.description' => 'Play a short tone when a chat run finishes or needs tool approval.',
 			'settings.notifications.sound.enabled' => 'Enabled',
 			'settings.notifications.sound.test' => 'Test sound',
+			_ => null,
+		} ?? switch (path) {
 			'settings.notifications.events.title' => 'Event Types',
 			'settings.notifications.events.actionRequired' => 'Action required',
 			'settings.notifications.events.stop' => 'Run stopped',
@@ -14959,8 +15131,6 @@ extension on Translations {
 			'settings.appearanceSettings.codeEditor.theme.label' => 'Editor Theme',
 			'settings.appearanceSettings.codeEditor.theme.description' => 'Default theme for the code editor',
 			'settings.appearanceSettings.codeEditor.wordWrap.label' => 'Word Wrap',
-			_ => null,
-		} ?? switch (path) {
 			'settings.appearanceSettings.codeEditor.wordWrap.description' => 'Enable word wrapping by default in the editor',
 			'settings.appearanceSettings.codeEditor.showMinimap.label' => 'Show Minimap',
 			'settings.appearanceSettings.codeEditor.showMinimap.description' => 'Display a minimap for easier navigation in diff view',
@@ -15451,6 +15621,8 @@ extension on Translations {
 			'sidebar.time.minutesAgo' => ({required Object count}) => '${count} mins ago',
 			'sidebar.time.oneHourAgo' => '1 hour ago',
 			'sidebar.time.hoursAgo' => ({required Object count}) => '${count} hours ago',
+			_ => null,
+		} ?? switch (path) {
 			'sidebar.time.oneDayAgo' => '1 day ago',
 			'sidebar.time.daysAgo' => ({required Object count}) => '${count} days ago',
 			'sidebar.messages.deleteConfirm' => 'Are you sure you want to delete this?',
@@ -15473,8 +15645,6 @@ extension on Translations {
 			'sidebar.messages.updateProjectError' => 'Error updating project. Please try again.',
 			'sidebar.messages.refreshError' => 'Failed to refresh. Please try again.',
 			'sidebar.messages.restoreProjectFailed' => 'Failed to restore project. Please try again.',
-			_ => null,
-		} ?? switch (path) {
 			'sidebar.messages.restoreProjectError' => 'Error restoring project. Please try again.',
 			'sidebar.messages.restoreSessionFailed' => 'Failed to restore session. Please try again.',
 			'sidebar.messages.restoreSessionError' => 'Error restoring session. Please try again.',
@@ -15965,6 +16135,8 @@ extension on Translations {
 			'mcp.servers.addGlobalMenuDescription' => 'Add Global MCP Server writes one common stdio or HTTP server to Claude, Cursor, Codex, OpenCode, and Devin.',
 			'mcp.servers.addProviderTitle' => ({required Object provider}) => 'Add ${provider} MCP Server',
 			'mcp.servers.addProviderDescription' => ({required Object provider}) => 'Add ${provider} MCP Server only changes ${provider}.',
+			_ => null,
+		} ?? switch (path) {
 			'mcp.servers.config.cwd' => 'Cwd',
 			'mcp.servers.config.envVars' => 'Env Vars',
 			'mcp.team.title' => 'Team MCP Configs',
@@ -15987,8 +16159,6 @@ extension on Translations {
 			'mcp.form.validation.unsupportedProvider' => ({required Object provider, required Object type}) => '${provider} does not support ${type} MCP servers',
 			'notifications.deviceLabel' => 'ddagent Flutter',
 			'notifications.errors.registrationRejected' => 'Registration rejected by server',
-			_ => null,
-		} ?? switch (path) {
 			'notifications.errors.noResponse' => 'No response from the server',
 			'onboarding.gitHint' => 'Used for commits created by ddagent sessions.',
 			'onboarding.completeSetup' => 'Complete Setup',

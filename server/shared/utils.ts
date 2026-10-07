@@ -31,6 +31,7 @@ import type {
   LLMProvider,
   NormalizedMessage,
   OrchestratorMessage,
+  OrchestratorTaskType,
   ProviderCurrentActiveModel,
   ProviderModelsDefinition,
   ProviderSkillSource,
@@ -54,6 +55,27 @@ export const IS_PLATFORM = process.env.VITE_IS_PLATFORM === 'true';
  * the sessions history/delete paths, and the orchestrator module.
  */
 export const ORCHESTRATOR_PROVIDER = 'orchestrator';
+
+/**
+ * Pseudo-provider value stored on mini-orchestrator parent sessions. The mini
+ * orchestrator is a lighter sibling of the full orchestrator: same ownership of
+ * the `orchestrator_messages` transcript and the same realtime `status` frames,
+ * but it drives a two-role pipeline (a non-flash "thinker" plans, a "flash"
+ * "worker" executes) instead of the full supervised loop. Consumed by the
+ * websocket dispatch path, the sessions history/lifecycle paths, and the
+ * mini-orchestrator module.
+ */
+export const MINI_ORCHESTRATOR_PROVIDER = 'mini-orchestrator';
+
+/**
+ * True for both orchestrator pseudo-providers (full + mini). Every server-side
+ * branch that special-cases an orchestrated parent session (dispatch, history,
+ * archive/delete/restore cascade) must use this predicate instead of comparing
+ * against a single provider id, so both engines stay in lock-step.
+ */
+export function isOrchestratorProvider(provider: string | null | undefined): boolean {
+  return provider === ORCHESTRATOR_PROVIDER || provider === MINI_ORCHESTRATOR_PROVIDER;
+}
 
 /**
  * Environment for provider CLI child processes (`devin acp`, Claude Code,
@@ -773,16 +795,87 @@ export function createCompleteMessage(opts: {
  * the one rendered card in place rather than appending a new row. It is set
  * after the payload spread so a stray payload key can never clobber it.
  */
-export function createOrchestratorStatusFrame(entry: OrchestratorMessage): NormalizedMessage {
+export function createOrchestratorStatusFrame(
+  entry: OrchestratorMessage,
+  provider: string = ORCHESTRATOR_PROVIDER,
+): NormalizedMessage {
   return createNormalizedMessage({
     kind: 'status',
-    provider: ORCHESTRATOR_PROVIDER as LLMProvider,
+    provider: provider as LLMProvider,
     sessionId: entry.sessionId,
     role: 'assistant',
     context: { orchestratorKind: entry.kind, ...entry.payload, orchestratorRowId: entry.id },
     summary: entry.kind,
   });
 }
+
+// ---------------------------
+//----------------- ORCHESTRATOR TASK CLASSIFICATION ------------
+/**
+ * Slash-prefix → task type. An explicit prefix in the composer always wins over
+ * keyword heuristics.
+ */
+const ORCHESTRATOR_SLASH_TYPES: Record<string, OrchestratorTaskType> = {
+  plan: 'plan',
+  quick: 'quick',
+  ask: 'quick',
+  research: 'research',
+  docs: 'docs',
+  code: 'code',
+  test: 'test',
+  review: 'review',
+};
+
+const ORCHESTRATOR_KEYWORD_RULES: Array<[OrchestratorTaskType, RegExp]> = [
+  ['review', /\b(review|przegląd|audyt|audit|sprawdź|check)\b/i],
+  ['research', /\b(research|find out|explore|investigate|search|poszukaj|research)\b/i],
+  ['docs', /\b(document|docs|dokumentacj|readme|changelog|opisz)\b/i],
+  ['test', /\b(test|tests|coverage|napraw test|fix test)\b/i],
+  ['code-hard', /\b(refactor|rearchitect|migrat|rewrite|przepisz|przenieś|przebuduj)\b/i],
+  ['code', /\b(implement|fix|add|create|build|napraw|dodaj|zrobić|zrób|napisz|zmień)\b/i],
+];
+
+/** Task types a hint/slash prefix may resolve to (`gate` is plan/template-only). */
+const CLASSIFIABLE_TASK_TYPES: OrchestratorTaskType[] = [
+  'plan',
+  'quick',
+  'research',
+  'docs',
+  'code',
+  'code-hard',
+  'test',
+  'review',
+];
+
+/**
+ * Classifies one user message into a task type. Order of precedence: explicit
+ * `taskType` hint from the composer chip → `/type` slash prefix → keyword
+ * heuristics → `quick` (the cheapest lane is the safe default for chatter).
+ *
+ * Shared by the full orchestrator router and the mini orchestrator so both
+ * engines classify identically. `gate` is excluded on purpose: it executes the
+ * prompt as a shell command, so it may only originate from a plan/template —
+ * never from a hint that would turn raw user text into a command.
+ */
+export function classifyTaskType(
+  content: string,
+  hint?: string | null,
+): OrchestratorTaskType {
+  if (hint && hint !== 'gate' && CLASSIFIABLE_TASK_TYPES.includes(hint as OrchestratorTaskType)) {
+    return hint as OrchestratorTaskType;
+  }
+  const trimmed = content.trim();
+  const slash = trimmed.match(/^\/([a-z-]+)\s/i);
+  if (slash && ORCHESTRATOR_SLASH_TYPES[slash[1].toLowerCase()]) {
+    return ORCHESTRATOR_SLASH_TYPES[slash[1].toLowerCase()];
+  }
+  for (const [type, pattern] of ORCHESTRATOR_KEYWORD_RULES) {
+    if (pattern.test(trimmed)) return type;
+  }
+  return 'quick';
+}
+
+// ---------------------------
 
 // ---------------------------
 //----------------- CONVERSATION HISTORY PAGINATION UTILITIES ------------

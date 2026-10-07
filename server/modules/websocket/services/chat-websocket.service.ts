@@ -16,7 +16,12 @@ import type {
   AuthenticatedWebSocketRequest,
   LLMProvider,
 } from '@/shared/index.js';
-import { ORCHESTRATOR_PROVIDER, parseIncomingJsonObject, safeSocketSend } from '@/shared/index.js';
+import {
+  MINI_ORCHESTRATOR_PROVIDER,
+  isOrchestratorProvider,
+  parseIncomingJsonObject,
+  safeSocketSend,
+} from '@/shared/index.js';
 
 export { filterAttachmentsToUploadStore, filterImagesToUploadStore };
 
@@ -190,15 +195,17 @@ async function handleChatAbort(
     return;
   }
 
-  // Orchestrated sessions: the parent run is only bookkeeping; the real work
-  // lives in delegated child runs which the orchestrator executor aborts.
+  // Orchestrated sessions (full or mini): the parent run is only bookkeeping;
+  // the real work lives in delegated child runs which the engine aborts.
   const sessionRow = sessionsDb.getSessionById(sessionId);
-  if (sessionRow?.provider === ORCHESTRATOR_PROVIDER) {
+  if (isOrchestratorProvider(sessionRow?.provider)) {
     const parentRun = requestedRun;
-    const { orchestratorRuntime } = await import('@/modules/orchestrator/index.js');
     if (chatRunRegistry.getRun(sessionId) !== parentRun || parentRun.status !== 'running') return;
     chatRunRegistry.markAborted(sessionId);
-    const success = await orchestratorRuntime.abort(sessionId);
+    const success =
+      sessionRow?.provider === MINI_ORCHESTRATOR_PROVIDER
+        ? await (await import('@/modules/mini-orchestrator/index.js')).miniOrchestratorRuntime.abort(sessionId)
+        : await (await import('@/modules/orchestrator/index.js')).orchestratorRuntime.abort(sessionId);
     if (chatRunRegistry.getRun(sessionId) !== parentRun || parentRun.status !== 'running') return;
     if (!success) {
       chatRunRegistry.markAborted(sessionId, false);

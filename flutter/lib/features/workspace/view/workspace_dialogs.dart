@@ -260,7 +260,10 @@ class _BroadcastDialogState extends ConsumerState<BroadcastDialog> {
   List<Map<String, dynamic>>? _results;
   String? _error;
 
-  static bool _isOrchestrator(Session s) => (s.provider ?? s.raw['__provider']) == 'orchestrator';
+  static bool _isOrchestrator(Session s) {
+    final provider = s.provider ?? s.raw['__provider'];
+    return provider == 'orchestrator' || provider == 'mini-orchestrator';
+  }
 
   List<Session> get _selectable => [
     for (final s in widget.sessions)

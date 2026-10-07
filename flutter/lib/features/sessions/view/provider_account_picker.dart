@@ -145,6 +145,7 @@ Future<List<_ProviderGroup>> _buildGroups(
           // pickable), and a known quota label adds it for providers that only
           // have the ambient login (e.g. codex's email).
           if (p != 'orchestrator' &&
+              p != 'mini-orchestrator' &&
               ((byProvider[p] ?? const <ProviderAccount>[]).isNotEmpty ||
                   (ambientQuota(p)?.accountLabel ?? '').isNotEmpty))
             ambientChoice(p),
@@ -223,8 +224,11 @@ Widget _accountRow(BuildContext ctx, String provider, _AccountChoice choice) {
   );
 }
 
-String _providerLabel(String provider) =>
-    provider == 'orchestrator' ? 'Auto (orchestrator)' : provider;
+String _providerLabel(String provider) => switch (provider) {
+  'orchestrator' => 'Auto (orchestrator)',
+  'mini-orchestrator' => 'Auto (mini)',
+  _ => provider,
+};
 
 /// One provider in the account picker dialog. [choices] is empty when the
 /// provider has no account to name — it then renders as a single selectable row.

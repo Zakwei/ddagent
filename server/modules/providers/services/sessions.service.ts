@@ -12,7 +12,7 @@ import type {
   NormalizedMessage,
   OrchestratorMessage,
 } from '@/shared/types.js';
-import { AppError, countJsonlLines, normalizeProjectPath, ORCHESTRATOR_PROVIDER, validateWorkspacePath } from '@/shared/utils.js';
+import { AppError, countJsonlLines, isOrchestratorProvider, normalizeProjectPath, ORCHESTRATOR_PROVIDER, validateWorkspacePath } from '@/shared/utils.js';
 
 /**
  * Maps one orchestrator transcript row to the NormalizedMessage envelope the
@@ -24,13 +24,16 @@ import { AppError, countJsonlLines, normalizeProjectPath, ORCHESTRATOR_PROVIDER,
  * to render routing/plan/delegation cards. Plain user rows surface as regular
  * user text messages.
  */
-function orchestratorMessageToNormalized(message: OrchestratorMessage): NormalizedMessage {
+function orchestratorMessageToNormalized(
+  message: OrchestratorMessage,
+  provider: string = ORCHESTRATOR_PROVIDER,
+): NormalizedMessage {
   if (message.kind === 'user') {
     return {
       id: `orch-${message.id}`,
       sessionId: message.sessionId,
       timestamp: message.createdAt,
-      provider: ORCHESTRATOR_PROVIDER as LLMProvider,
+      provider: provider as LLMProvider,
       kind: 'text',
       role: 'user',
       content: typeof message.payload.content === 'string' ? message.payload.content : '',
@@ -40,7 +43,7 @@ function orchestratorMessageToNormalized(message: OrchestratorMessage): Normaliz
     id: `orch-${message.id}`,
     sessionId: message.sessionId,
     timestamp: message.createdAt,
-    provider: ORCHESTRATOR_PROVIDER as LLMProvider,
+    provider: provider as LLMProvider,
     kind: 'status',
     role: 'assistant',
     // `orchestratorRowId` mirrors the live frame (`createOrchestratorStatusFrame`)
@@ -514,15 +517,16 @@ export const sessionsService = {
       });
     }
 
-    // Orchestrated sessions own no provider transcript: their history lives
-    // in the ddagent-owned orchestrator_messages table and is mapped here to
-    // the same NormalizedMessage envelope every provider session returns.
-    if (session.provider === ORCHESTRATOR_PROVIDER) {
+    // Orchestrated sessions (full or mini) own no provider transcript: their
+    // history lives in the ddagent-owned orchestrator_messages table and is
+    // mapped here to the same NormalizedMessage envelope every provider session
+    // returns — tagged with the parent provider so the client routes it right.
+    if (isOrchestratorProvider(session.provider)) {
       const rows = orchestratorMessagesDb.list(sessionId);
       const offset = options.offset ?? 0;
       const limited = options.limit ? rows.slice(offset, offset + options.limit) : rows.slice(offset);
       return {
-        messages: limited.map(orchestratorMessageToNormalized),
+        messages: limited.map((row) => orchestratorMessageToNormalized(row, session.provider)),
         total: rows.length,
         hasMore: offset + limited.length < rows.length,
         offset,
@@ -667,7 +671,7 @@ export const sessionsService = {
     // an orchestrated session cascades onto every child it spawned, so they
     // never linger as orphaned sidebar rows.
     const childSessionIds =
-      session.provider === ORCHESTRATOR_PROVIDER
+      isOrchestratorProvider(session.provider)
         ? orchestratorMessagesDb.listChildSessionIds(sessionId)
         : [];
 
@@ -771,7 +775,7 @@ export const sessionsService = {
     }
 
     const childSessionIds =
-      session.provider === ORCHESTRATOR_PROVIDER
+      isOrchestratorProvider(session.provider)
         ? orchestratorMessagesDb.listChildSessionIds(sessionId)
         : [];
     for (const id of [sessionId, ...childSessionIds]) {

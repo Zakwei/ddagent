@@ -2406,6 +2406,50 @@ export type OrchestratorConfig = {
   };
 };
 
+// ---------------------------
+//----------------- MINI ORCHESTRATOR CONFIG ------------
+/**
+ * Role a mini-orchestrator task type is assigned to. `thinker` is the non-flash
+ * reasoning model (planning, decisions, review, report); `worker` is the flash
+ * execution model (doing the work). Assigning `roles` is how the user chooses
+ * which of the two models takes part in a given task type.
+ */
+export type MiniOrchestratorRole = 'thinker' | 'worker';
+
+/**
+ * Persisted mini-orchestrator settings, stored under the `mini-orchestrator:config`
+ * appConfigDb key (same pattern as `orchestrator:config`). The mini engine uses
+ * exactly two roles — a thinker and a worker — each an ordered candidate list so
+ * a spent quota or rate limit fails over to the next entry. `roles` maps each
+ * task type to the role (i.e. the model) that handles it.
+ */
+export type MiniOrchestratorConfig = {
+  enabled: boolean;
+  /** Non-flash reasoning model(s): planning, decisions, review, report. */
+  thinker: OrchestratorCandidate[];
+  /** Flash execution model(s): does the step work. */
+  worker: OrchestratorCandidate[];
+  /** Which role (model) handles each task type — the per-task participation knob. */
+  roles: Record<OrchestratorTaskType, MiniOrchestratorRole>;
+  planner: {
+    /** `off` skips planning and runs a single step on the task's role. */
+    mode: 'auto' | 'off';
+    /** When true the plan card waits for `POST /api/mini-orchestrator/plan/confirm`. */
+    requireConfirm: boolean;
+  };
+  execution: {
+    /** Steps executed concurrently. */
+    maxParallel: number;
+    /** Hard cap on the number of steps a plan may contain. */
+    maxSteps: number;
+    /** Per-attempt child-run timeout in ms; `0` disables. */
+    stepTimeoutMs: number;
+    /** Global run timeout in ms; `0` disables. */
+    runTimeoutMs: number;
+  };
+};
+
+// ---------------------------
 /** One routing decision recorded on a parent session transcript. */
 export type OrchestratorRoutingDecision = {
   taskType: OrchestratorTaskType;

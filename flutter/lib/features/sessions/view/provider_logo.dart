@@ -17,7 +17,7 @@ class ProviderLogo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Auto routes between providers — a neutral mark instead of a brand logo.
-    if (provider == 'orchestrator') {
+    if (provider == 'orchestrator' || provider == 'mini-orchestrator') {
       return Icon(LucideIcons.sparkles, size: size);
     }
     // The unified Shared list belongs to no single provider — same mark.

@@ -15,6 +15,7 @@ const kSkillProviderNames = <String, String>{
   'antigravity': 'Antigravity',
   'devin': 'Devin',
   'orchestrator': 'Auto',
+  'mini-orchestrator': 'Auto (mini)',
 };
 
 /// Provider ids shown in the standalone screen's selector — the Agents

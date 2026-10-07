@@ -8,6 +8,7 @@ import { chatRunRegistry } from '@/modules/websocket/services/chat-run-registry.
 import { connectedClients, WS_OPEN_STATE } from '@/modules/websocket/services/websocket-state.service.js';
 import {
   createOrchestratorStatusFrame,
+  MINI_ORCHESTRATOR_PROVIDER,
   ORCHESTRATOR_PROVIDER,
   safeSocketSend,
   getGlobalImageAssetsDir,
@@ -203,7 +204,10 @@ function delegationPreviewOf(event: NormalizedMessage): string | null {
  * Consumed by: dispatchChatCommand (child→parent delegation status sync).
  */
 function publishDelegationEntry(entry: OrchestratorMessage): void {
-  const frame = createOrchestratorStatusFrame(entry);
+  // The frame's provider must match the parent session's engine (full vs mini)
+  // so the client folds live rows into the right transcript.
+  const provider = sessionsDb.getSessionById(entry.sessionId)?.provider ?? ORCHESTRATOR_PROVIDER;
+  const frame = createOrchestratorStatusFrame(entry, provider);
   const parentRun = chatRunRegistry.getRun(entry.sessionId);
   if (parentRun) {
     parentRun.writer.send(frame);
@@ -355,6 +359,25 @@ export async function dispatchChatCommand(
     }
     const { orchestratorRuntime } = await import('@/modules/orchestrator/index.js');
     const result = await orchestratorRuntime.handleMessage({
+      sessionId,
+      content: effectiveContent,
+      options: clientOptions,
+      userId,
+      connection,
+    });
+    return result.ok ? result : { ...result, sessionId };
+  }
+
+  // Mini-orchestrated sessions: a lighter two-role engine (thinker plans, worker
+  // executes) that streams the same transcript frames. Lazy import keeps the
+  // websocket module free of a load-time dependency on the mini module.
+  if (session.provider === MINI_ORCHESTRATOR_PROVIDER) {
+    const sessionName = sessionsService.nameUntitledSession(sessionId, content);
+    if (sessionName) {
+      broadcastSessionName(sessionId, provider, sessionName, connection);
+    }
+    const { miniOrchestratorRuntime } = await import('@/modules/mini-orchestrator/index.js');
+    const result = await miniOrchestratorRuntime.handleMessage({
       sessionId,
       content: effectiveContent,
       options: clientOptions,

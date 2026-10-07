@@ -12,6 +12,7 @@ const kMcpProviderNames = <String, String>{
   'antigravity': 'Antigravity',
   'devin': 'Devin',
   'orchestrator': 'Auto',
+  'mini-orchestrator': 'Auto (mini)',
 };
 
 /// Provider ids shown in the MCP provider selector — the Agents settings
@@ -36,6 +37,7 @@ const kMcpSupportedScopes = <String, List<McpScope>>{
   'antigravity': [McpScope.user],
   'devin': [McpScope.user],
   'orchestrator': [McpScope.user],
+  'mini-orchestrator': [McpScope.user],
 };
 
 /// `MCP_SUPPORTED_TRANSPORTS`.
@@ -48,6 +50,7 @@ const kMcpSupportedTransports = <String, List<McpTransport>>{
   'antigravity': [McpTransport.stdio, McpTransport.http],
   'devin': [McpTransport.stdio, McpTransport.http, McpTransport.sse],
   'orchestrator': [McpTransport.stdio],
+  'mini-orchestrator': [McpTransport.stdio],
 };
 
 /// `MCP_GLOBAL_SUPPORTED_SCOPES` — "add to every provider" form limits.
@@ -66,6 +69,7 @@ const kMcpSupportsWorkingDirectory = <String, bool>{
   'antigravity': false,
   'devin': false,
   'orchestrator': false,
+  'mini-orchestrator': false,
 };
 
 List<McpScope> mcpSupportedScopes(String provider) =>

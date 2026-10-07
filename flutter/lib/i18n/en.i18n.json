@@ -1792,6 +1792,7 @@
       "label": "Settings",
       "agents": "Agents",
       "orchestration": "Orchestration",
+      "miniOrchestration": "Mini orchestration",
       "appearance": "Appearance",
       "workspaces": "Workspaces",
       "git": "Git",
@@ -1804,6 +1805,43 @@
       "about": "About",
       "quota": "Control Center",
       "shortcuts": "Keyboard shortcuts"
+    },
+    "miniOrchestration": {
+      "title": "Mini orchestration",
+      "description": "A two-model pipeline: a non-flash thinker plans, a flash worker executes.",
+      "loading": "Loading mini orchestration settings…",
+      "loadError": "Could not load the mini orchestration settings.",
+      "enable": {
+        "label": "Enable mini orchestration",
+        "description": "Route Auto (mini) sessions through the two-role engine instead of the full orchestrator."
+      },
+      "thinker": {
+        "title": "Thinker (non-flash)",
+        "description": "Plans, decides, reviews and writes the final report."
+      },
+      "worker": {
+        "title": "Worker (flash)",
+        "description": "Executes each planned step."
+      },
+      "fields": {
+        "provider": "Provider",
+        "model": "Model",
+        "modelPlaceholder": "Model id",
+        "tier": "Tier"
+      },
+      "roles": {
+        "title": "Per-task model",
+        "description": "Which model (role) handles each task type."
+      },
+      "planner": {
+        "title": "Planner",
+        "mode": "Mode",
+        "modes": {
+          "auto": "Plan with the thinker",
+          "off": "Single step"
+        },
+        "requireConfirmLabel": "Confirm the plan before running"
+      }
     },
     "orchestration": {
       "title": "Orchestration",

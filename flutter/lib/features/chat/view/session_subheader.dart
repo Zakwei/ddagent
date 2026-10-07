@@ -104,7 +104,7 @@ class SessionSubheader extends ConsumerWidget {
         composer?.activeModel ??
         (sessionModel != null && sessionModel.isNotEmpty ? sessionModel : null);
     String? modelLabel;
-    if (p == 'orchestrator') {
+    if (p == 'orchestrator' || p == 'mini-orchestrator') {
       modelLabel = 'orchestrated';
     } else {
       modelLabel = effectiveModel;

@@ -98,7 +98,7 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
     // Delegated sessions carry an orchestrator parent — the arrow-left button
     // rebinds this pane to it (web `backToParent`). Orchestrator roots and
     // missing parents render nothing.
-    final parentId = widget.provider == 'orchestrator'
+    final parentId = (widget.provider == 'orchestrator' || widget.provider == 'mini-orchestrator')
         ? null
         : ref.watch(orchestratorParentProvider(widget.sessionId)).value;
     final guarded = widget.action != PaneAction.idle;

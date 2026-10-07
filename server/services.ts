@@ -30,6 +30,7 @@ import { createProviderAccountsRouter } from './modules/provider-accounts/index.
 import { kanbanRoutes, kanbanReportRoutes } from './modules/kanban/index.js';
 import { quotaRoutes, quotaService } from './modules/quota/index.js';
 import { orchestratorRoutes, orchestratorRuntime } from './modules/orchestrator/index.js';
+import { miniOrchestratorRoutes } from './modules/mini-orchestrator/index.js';
 import { commandsRoutes } from './modules/commands/index.js';
 import { settingsRoutes } from './modules/settings/index.js';
 import { createSystemModule } from './modules/system/index.js';
@@ -328,6 +329,11 @@ export async function createServices(options: CreateServicesOptions = {}): Promi
     // quota service is injected here so the orchestrator module stays free of
     // the quota module's internals.
     orchestratorRuntime.setQuotaSource(() => quotaService.getSnapshot());
+
+    // Mini-orchestrator API Routes (protected): a lighter two-role engine
+    // (non-flash "thinker" plans, flash "worker" executes) alongside the full
+    // orchestrator, reusing the same transcript + streaming frames.
+    app.use('/api/mini-orchestrator', authenticateToken, miniOrchestratorRoutes);
 
     app.use('/api/system', authenticateToken, systemRoutes);
 

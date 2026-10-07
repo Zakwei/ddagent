@@ -12,6 +12,7 @@ import 'package:ddagent_app/features/chat/state/pending_permissions.dart';
 import 'package:ddagent_app/features/chat/view/transcript_view.dart';
 import 'package:ddagent_app/features/editor/view/editor_screen.dart';
 import 'package:ddagent_app/features/git/view/git_screen.dart';
+import 'package:ddagent_app/features/mini_orchestrator/state/mini_orchestrator_controller.dart';
 import 'package:ddagent_app/features/orchestrator/state/orchestrator_controller.dart';
 import 'package:ddagent_app/features/preview/view/preview_pane.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
@@ -606,9 +607,9 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
   Future<void> _createSession(SplitPane pane, String provider, {String? accountId}) async {
     final i18n = Translations.of(context);
     try {
-      if (provider == 'orchestrator') {
+      if (provider == 'orchestrator' || provider == 'mini-orchestrator') {
         // Panes carry only projectId — resolve the path from the loaded
-        // projects list (required by POST /api/orchestrator/sessions).
+        // projects list (required by the orchestrator session endpoints).
         final projects = ref.read(projectsProvider).projects;
         final path = [
           for (final p in projects)
@@ -617,7 +618,9 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
         if (path == null || path.isEmpty) {
           throw StateError('Unknown project path');
         }
-        final sessionId = await createOrchestratorSession(ref, projectPath: path);
+        final sessionId = provider == 'mini-orchestrator'
+            ? await createMiniOrchestratorSession(ref, projectPath: path)
+            : await createOrchestratorSession(ref, projectPath: path);
         if (!mounted) return;
         ref
             .read(workspaceProvider.notifier)

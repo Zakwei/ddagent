@@ -204,6 +204,7 @@ String _providerLabelOf(String? provider, [String fallback = 'Unknown']) {
     'antigravity',
     'devin',
     'orchestrator',
+    'mini-orchestrator',
   };
   return known.contains(provider) ? providerLabel(provider) : provider;
 }

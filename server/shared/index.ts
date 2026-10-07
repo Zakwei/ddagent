@@ -18,10 +18,12 @@ export { resolveClaudeCodeExecutablePath } from './claude-cli-path.js';
 export {
   OPENCODE_EDIT_TOOL_NAMES,
   ORCHESTRATOR_PROVIDER,
+  MINI_ORCHESTRATOR_PROVIDER,
   antigravityCredentialEmail,
   antigravityDir,
   antigravityTranscriptDir,
   cachedCliIdentity,
+  classifyTaskType,
   commandCodeDir,
   commandCodeProjectSlug,
   commandCodeProjectsDir,
@@ -37,6 +39,7 @@ export {
   idTokenEmail,
   isDevinContinuationPrompt,
   isDevinSummaryArtifact,
+  isOrchestratorProvider,
   isSubagentSessionTitle,
   openSqliteReadonlyDatabase,
   parseIncomingJsonObject,
@@ -69,6 +72,8 @@ export type {
 // Quota aggregation and orchestrator routing share these account, board and routing contracts.
 export type {
   KanbanCard,
+  MiniOrchestratorConfig,
+  MiniOrchestratorRole,
   OrchestratorCandidate,
   OrchestratorConfig,
   OrchestratorPlanStep,
