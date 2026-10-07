@@ -173,3 +173,6 @@ bug.md
 # matcher is case-insensitive, so the negation must follow the TODO.md /
 # Todo.md rules to win. (Files screen also has a "show gitignored" switch.)
 !todo.md
+
+# Local planning docs (kept on disk, not committed)
+docs/plans/
