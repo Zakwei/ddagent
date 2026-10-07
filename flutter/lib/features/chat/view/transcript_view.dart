@@ -1989,13 +1989,13 @@ class _PermissionBanner extends ConsumerWidget {
                   );
                   // ACP providers (command-code / Devin) answer a question with
                   // a picked option id only — typed free text cannot ride the
-                  // ACP answer, so it is sent as a normal user message instead:
-                  // it renders immediately under the question and the server
-                  // delivers it when this turn ends.
+                  // ACP answer. End the blocked turn and send the text as the
+                  // next turn instead, so the answer is applied right away
+                  // rather than after the agent finishes guessing.
                   if (provider == 'commandcode' || provider == 'devin') {
                     final freeText = extractQuestionFreeText(questions.first.input, updatedInput);
                     if (freeText.isNotEmpty) {
-                      notifier.send(freeText);
+                      notifier.answerQuestionWithText(freeText);
                     }
                   }
                 },

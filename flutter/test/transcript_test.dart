@@ -299,6 +299,29 @@ void main() {
     expect(row.toolInput['answers'], {'Which scope?': 'MVP'});
   });
 
+  test('answerQuestionWithText aborts the blocked turn, then sends the text', () async {
+    container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
+    container.listen(transcriptProvider('s1'), (_, _) {});
+    await pump();
+    ws.emitState(WsState.open);
+    // A live frame carrying the run id arms the abort — the gateway requires
+    // the current runId to cancel the turn.
+    ws.emitFrame({'kind': 'status', 'sessionId': 's1', 'runId': 'run-1', 'seq': 1});
+    await pump();
+    ws.sent.clear();
+
+    // ACP providers can only echo a picked option id, so a typed question
+    // answer is delivered by ending the turn and sending it as the next turn.
+    container
+        .read(transcriptProvider('s1').notifier)
+        .answerQuestionWithText('lista do wyboru modelu');
+
+    final types = ws.sent.map((f) => f['type']).where((t) => t != 'chat.subscribe').toList();
+    expect(types, ['chat.abort', 'chat.send']);
+    expect(ws.sent.firstWhere((f) => f['type'] == 'chat.abort')['runId'], 'run-1');
+    expect(ws.sent.last['content'], 'lista do wyboru modelu');
+  });
+
   test('activity: stream_end and error are not terminal — only complete is', () async {
     container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
     container.listen(transcriptProvider('s1'), (_, _) {});

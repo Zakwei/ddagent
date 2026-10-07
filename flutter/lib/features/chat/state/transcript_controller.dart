@@ -538,6 +538,17 @@ class TranscriptController extends Notifier<TranscriptState> {
 
   void abort() => _channel.abort(_sessionId);
 
+  /// ACP providers (command-code / Devin) can only echo a picked option id, so
+  /// a typed question answer cannot ride the ACP reply. End the blocked turn
+  /// and send the text as the next turn, so the answer is applied right away
+  /// instead of after the agent finishes guessing.
+  void answerQuestionWithText(String text) {
+    final value = text.trim();
+    if (value.isEmpty) return;
+    abort();
+    send(value);
+  }
+
   void permissionResponse(
     String requestId, {
     required bool allow,
