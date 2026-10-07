@@ -46,7 +46,9 @@ android {
         create("release") {
             keyAlias = keystoreProperties["keyAlias"] as String?
             keyPassword = keystoreProperties["keyPassword"] as String?
-            storeFile = (keystoreProperties["storeFile"] as String?)?.let { rootProject.file(it) }
+            // Resolve against the app module: CI writes the keystore to
+            // android/app/ (the location .gitignore expects), not android/.
+            storeFile = (keystoreProperties["storeFile"] as String?)?.let { project.file(it) }
             storePassword = keystoreProperties["storePassword"] as String?
         }
     }
