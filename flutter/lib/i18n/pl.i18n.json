@@ -2140,6 +2140,14 @@
         "success": "CLI {{agent}} zainstalowane",
         "failed": "Instalacja nie powiodła się — sprawdź dane wyjściowe terminala"
       },
+      "update": {
+        "title": "Aktualizuj CLI",
+        "description": "Zainstaluj najnowszą wersję CLI {{agent}} na hoście serwera.",
+        "button": "Aktualizuj",
+        "updating": "Aktualizowanie…",
+        "success": "CLI {{agent}} zaktualizowane",
+        "failed": "Aktualizacja nie powiodła się — sprawdź wynik w terminalu"
+      },
       "account": {
         "claude": {
           "description": "Asystent AI Anthropic Claude"
@@ -2185,6 +2193,7 @@
       "accounts": {
         "title": "Nazwane konta",
         "description": "Dodatkowe zestawy poświadczeń. Sesja przypięta do konta uruchamia CLI z izolowanym katalogiem konfiguracji. Zaloguj się, uruchamiając raz CLI providera z pokazanymi zmiennymi.",
+        "sharedCli": "Wszystkie konta korzystają z jednej instalacji CLI — aktualizuj ją w karcie połączenia powyżej.",
         "loading": "Ładowanie kont…",
         "default": "Domyślne",
         "usage": "{{tokens}} tokenów",

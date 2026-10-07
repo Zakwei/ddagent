@@ -4660,6 +4660,7 @@ class Translations$settings$agents$en {
 	// Translations
 	late final Translations$settings$agents$authStatus$en authStatus = Translations$settings$agents$authStatus$en.internal(_root);
 	late final Translations$settings$agents$install$en install = Translations$settings$agents$install$en.internal(_root);
+	late final Translations$settings$agents$update$en update = Translations$settings$agents$update$en.internal(_root);
 	late final Translations$settings$agents$account$en account = Translations$settings$agents$account$en.internal(_root);
 
 	/// en: 'Connection Status'
@@ -11592,6 +11593,33 @@ class Translations$settings$agents$install$en {
 	String get failed => 'Installation failed — check the terminal output';
 }
 
+// Path: settings.agents.update
+class Translations$settings$agents$update$en {
+	Translations$settings$agents$update$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Update CLI'
+	String get title => 'Update CLI';
+
+	/// en: 'Install the newest {{agent}} CLI release on the server host.'
+	String description({required Object agent}) => 'Install the newest ${agent} CLI release on the server host.';
+
+	/// en: 'Update'
+	String get button => 'Update';
+
+	/// en: 'Updating…'
+	String get updating => 'Updating…';
+
+	/// en: '{{agent}} CLI updated'
+	String success({required Object agent}) => '${agent} CLI updated';
+
+	/// en: 'Update failed — check the terminal output'
+	String get failed => 'Update failed — check the terminal output';
+}
+
 // Path: settings.agents.account
 class Translations$settings$agents$account$en {
 	Translations$settings$agents$account$en.internal(this._root);
@@ -11678,6 +11706,9 @@ class Translations$settings$agents$accounts$en {
 
 	/// en: 'Additional credential sets. A session pinned to an account launches the CLI with its isolated config directory. Log in by running the provider CLI once with the shown env vars.'
 	String get description => 'Additional credential sets. A session pinned to an account launches the CLI with its isolated config directory. Log in by running the provider CLI once with the shown env vars.';
+
+	/// en: 'All accounts share one CLI installation — update it in the connection card above.'
+	String get sharedCli => 'All accounts share one CLI installation — update it in the connection card above.';
 
 	/// en: 'Loading accounts…'
 	String get loading => 'Loading accounts…';
@@ -15293,6 +15324,12 @@ extension on Translations {
 			'settings.agents.install.docs' => 'Documentation',
 			'settings.agents.install.success' => ({required Object agent}) => '${agent} CLI installed',
 			'settings.agents.install.failed' => 'Installation failed — check the terminal output',
+			'settings.agents.update.title' => 'Update CLI',
+			'settings.agents.update.description' => ({required Object agent}) => 'Install the newest ${agent} CLI release on the server host.',
+			'settings.agents.update.button' => 'Update',
+			'settings.agents.update.updating' => 'Updating…',
+			'settings.agents.update.success' => ({required Object agent}) => '${agent} CLI updated',
+			'settings.agents.update.failed' => 'Update failed — check the terminal output',
 			'settings.agents.account.claude.description' => 'Anthropic Claude AI assistant',
 			'settings.agents.account.cursor.description' => 'Cursor AI-powered code editor',
 			'settings.agents.account.codex.description' => 'OpenAI Codex AI assistant',
@@ -15317,6 +15354,7 @@ extension on Translations {
 			'settings.agents.error' => ({required Object error}) => 'Error: ${error}',
 			'settings.agents.accounts.title' => 'Named accounts',
 			'settings.agents.accounts.description' => 'Additional credential sets. A session pinned to an account launches the CLI with its isolated config directory. Log in by running the provider CLI once with the shown env vars.',
+			'settings.agents.accounts.sharedCli' => 'All accounts share one CLI installation — update it in the connection card above.',
 			'settings.agents.accounts.loading' => 'Loading accounts…',
 			'settings.agents.accounts.kDefault' => 'Default',
 			'settings.agents.accounts.usage' => ({required Object tokens}) => '${tokens} tokens',
@@ -15651,6 +15689,8 @@ extension on Translations {
 			'sidebar.workspace.title' => 'Change session workspace',
 			'sidebar.workspace.description' => 'The agent runs its next turns in this directory. Existing session history is kept.',
 			'sidebar.workspace.pathLabel' => 'Workspace path',
+			_ => null,
+		} ?? switch (path) {
 			'sidebar.workspace.pathRequired' => 'Workspace path is required.',
 			'sidebar.workspace.submit' => 'Change workspace',
 			'sidebar.workspace.saving' => 'Changing…',
@@ -15658,8 +15698,6 @@ extension on Translations {
 			'sidebar.branding.openSource' => 'Open Source',
 			'sidebar.status.active' => 'Active',
 			'sidebar.status.inactive' => 'Inactive',
-			_ => null,
-		} ?? switch (path) {
 			'sidebar.status.thinking' => 'Thinking...',
 			'sidebar.status.error' => 'Error',
 			'sidebar.status.aborted' => 'Aborted',
@@ -16165,6 +16203,8 @@ extension on Translations {
 			'kanban.time.daysAgo' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: '1 day ago', other: '${count} days ago', ), 
 			'mcp.install.title' => 'Install ddagent MCP server',
 			'mcp.install.description' => 'Lets the selected agents use the ddagent knowledge base and tools over MCP.',
+			_ => null,
+		} ?? switch (path) {
 			'mcp.install.cardDescription' => 'Give your agents the knowledge base and ddagent tools over MCP — pick agents or install for all.',
 			'mcp.install.installSelected' => 'Install selected',
 			'mcp.install.installForAll' => 'Install for all',
@@ -16172,8 +16212,6 @@ extension on Translations {
 			'mcp.install.failed' => ({required Object error}) => 'Install failed: ${error}',
 			'mcp.install.installedCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: 'Installed on ${count} agent.', other: 'Installed on ${count} agents.', ), 
 			'mcp.install.partialFailure' => ({required Object count, required Object failed}) => 'Installed on ${count}; failed: ${failed}',
-			_ => null,
-		} ?? switch (path) {
 			'mcp.install.errorFallback' => 'error',
 			'mcp.servers.loading' => 'Loading MCP servers...',
 			'mcp.servers.refreshingScopes' => 'Refreshing project scopes...',

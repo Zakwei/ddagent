@@ -2519,6 +2519,7 @@ class Translations$settings$agents$ru extends Translations$settings$agents$en {
 	// Translations
 	@override late final Translations$settings$agents$authStatus$ru authStatus = Translations$settings$agents$authStatus$ru._(_root);
 	@override late final Translations$settings$agents$install$ru install = Translations$settings$agents$install$ru._(_root);
+	@override late final Translations$settings$agents$update$ru update = Translations$settings$agents$update$ru._(_root);
 	@override late final Translations$settings$agents$account$ru account = Translations$settings$agents$account$ru._(_root);
 	@override String get connectionStatus => 'Статус подключения';
 	@override late final Translations$settings$agents$login$ru login = Translations$settings$agents$login$ru._(_root);
@@ -6015,6 +6016,21 @@ class Translations$settings$agents$install$ru extends Translations$settings$agen
 	@override String get failed => 'Установка не удалась — проверьте вывод терминала';
 }
 
+// Path: settings.agents.update
+class Translations$settings$agents$update$ru extends Translations$settings$agents$update$en {
+	Translations$settings$agents$update$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Обновить CLI';
+	@override String description({required Object agent}) => 'Установить последнюю версию CLI ${agent} на хосте сервера.';
+	@override String get button => 'Обновить';
+	@override String get updating => 'Обновление…';
+	@override String success({required Object agent}) => 'CLI ${agent} обновлён';
+	@override String get failed => 'Не удалось обновить — проверьте вывод терминала';
+}
+
 // Path: settings.agents.account
 class Translations$settings$agents$account$ru extends Translations$settings$agents$account$en {
 	Translations$settings$agents$account$ru._(TranslationsRu root) : this._root = root, super.internal(root);
@@ -8653,6 +8669,12 @@ extension on TranslationsRu {
 			'settings.agents.install.docs' => 'Документация',
 			'settings.agents.install.success' => ({required Object agent}) => 'CLI ${agent} установлен',
 			'settings.agents.install.failed' => 'Установка не удалась — проверьте вывод терминала',
+			'settings.agents.update.title' => 'Обновить CLI',
+			'settings.agents.update.description' => ({required Object agent}) => 'Установить последнюю версию CLI ${agent} на хосте сервера.',
+			'settings.agents.update.button' => 'Обновить',
+			'settings.agents.update.updating' => 'Обновление…',
+			'settings.agents.update.success' => ({required Object agent}) => 'CLI ${agent} обновлён',
+			'settings.agents.update.failed' => 'Не удалось обновить — проверьте вывод терминала',
 			'settings.agents.account.claude.description' => 'AI-ассистент Anthropic Claude',
 			'settings.agents.account.cursor.description' => 'Редактор кода с AI Cursor',
 			'settings.agents.account.codex.description' => 'AI-ассистент OpenAI Codex',
@@ -8686,14 +8708,14 @@ extension on TranslationsRu {
 			'settings.permissions.allowedTools.empty' => 'Разрешенные инструменты не настроены',
 			'settings.permissions.blockedTools.title' => 'Заблокированные инструменты',
 			'settings.permissions.blockedTools.description' => 'Инструменты, которые автоматически блокируются без запроса разрешения',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.blockedTools.placeholder' => 'например, "Bash(rm:*)"',
 			'settings.permissions.blockedTools.empty' => 'Заблокированные инструменты не настроены',
 			'settings.permissions.allowedCommands.title' => 'Разрешенные команды оболочки',
 			'settings.permissions.allowedCommands.description' => 'Команды оболочки, которые автоматически разрешены без запроса',
 			'settings.permissions.allowedCommands.placeholder' => 'например, "Shell(ls)" или "Shell(git status)"',
 			'settings.permissions.allowedCommands.quickAdd' => 'Быстро добавить общие команды:',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.allowedCommands.empty' => 'Разрешенные команды не настроены',
 			'settings.permissions.blockedCommands.title' => 'Заблокированные команды оболочки',
 			'settings.permissions.blockedCommands.description' => 'Команды оболочки, которые автоматически блокируются',
@@ -9200,14 +9222,14 @@ extension on TranslationsRu {
 			'tasks.createTask.submit' => 'Добавить задачу',
 			'tasks.createTask.submitting' => 'Добавление...',
 			'tasks.createTask.title' => 'Добавить задачу',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.createTask.titleLabel' => 'Название',
 			'tasks.createTask.titlePlaceholder' => 'Что нужно сделать?',
 			'tasks.list.completedReopen' => 'Выполнена (нажмите, чтобы переоткрыть)',
 			'tasks.list.inProgressComplete' => 'Выполняется (нажмите, чтобы завершить)',
 			'tasks.list.markCompleted' => 'Отметить как выполненную',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => 'Переключить статус задачи ${id}',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.list.markDone' => 'Отметить как выполненную',
 			'tasks.list.reopen' => 'Возобновить',
 			'tasks.nextTask.allComplete' => 'Все задачи выполнены',
@@ -9714,6 +9736,8 @@ extension on TranslationsRu {
 			'workspace.searchTranscript' => 'Поиск по транскрипту',
 			'workspace.sendTo' => ({required Object count}) => 'Отправить в ${count}',
 			'workspace.accountWithLabel' => ({required Object label}) => 'По умолчанию · ${label}',
+			_ => null,
+		} ?? switch (path) {
 			'workspace.finishRunBeforeChangingWorkspace' => 'Завершите запуск перед сменой рабочей области',
 			'workspace.restored' => 'Рабочая область восстановлена',
 			'workspace.maximizePane' => 'Развернуть панель',

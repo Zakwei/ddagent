@@ -2006,6 +2006,14 @@
         "success": "{{agent}} CLI kuruldu",
         "failed": "Kurulum başarısız — terminal çıktısını kontrol edin"
       },
+      "update": {
+        "title": "CLI'yi güncelle",
+        "description": "Sunucu makinesine en son {{agent}} CLI sürümünü kurar.",
+        "button": "Güncelle",
+        "updating": "Güncelleniyor…",
+        "success": "{{agent}} CLI güncellendi",
+        "failed": "Güncelleme başarısız — terminal çıktısını kontrol edin"
+      },
       "account": {
         "claude": {
           "description": "Anthropic Claude AI asistanı"

@@ -2006,6 +2006,14 @@
         "success": "{{agent}} CLI 已安裝",
         "failed": "安裝失敗 — 請檢查終端機輸出"
       },
+      "update": {
+        "title": "更新 CLI",
+        "description": "在伺服器主機上安裝最新版本的 {{agent}} CLI。",
+        "button": "更新",
+        "updating": "正在更新…",
+        "success": "{{agent}} CLI 已更新",
+        "failed": "更新失敗 — 請查看終端機輸出"
+      },
       "account": {
         "claude": {
           "description": "Anthropic Claude AI 助手"

@@ -2006,6 +2006,14 @@
         "success": "CLI {{agent}} установлен",
         "failed": "Установка не удалась — проверьте вывод терминала"
       },
+      "update": {
+        "title": "Обновить CLI",
+        "description": "Установить последнюю версию CLI {{agent}} на хосте сервера.",
+        "button": "Обновить",
+        "updating": "Обновление…",
+        "success": "CLI {{agent}} обновлён",
+        "failed": "Не удалось обновить — проверьте вывод терминала"
+      },
       "account": {
         "claude": {
           "description": "AI-ассистент Anthropic Claude"

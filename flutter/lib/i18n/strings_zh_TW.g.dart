@@ -2519,6 +2519,7 @@ class Translations$settings$agents$zh_TW extends Translations$settings$agents$en
 	// Translations
 	@override late final Translations$settings$agents$authStatus$zh_TW authStatus = Translations$settings$agents$authStatus$zh_TW.internal(_root);
 	@override late final Translations$settings$agents$install$zh_TW install = Translations$settings$agents$install$zh_TW.internal(_root);
+	@override late final Translations$settings$agents$update$zh_TW update = Translations$settings$agents$update$zh_TW.internal(_root);
 	@override late final Translations$settings$agents$account$zh_TW account = Translations$settings$agents$account$zh_TW.internal(_root);
 	@override String get connectionStatus => '連線狀態';
 	@override late final Translations$settings$agents$login$zh_TW login = Translations$settings$agents$login$zh_TW.internal(_root);
@@ -6009,6 +6010,21 @@ class Translations$settings$agents$install$zh_TW extends Translations$settings$a
 	@override String get failed => '安裝失敗 — 請檢查終端機輸出';
 }
 
+// Path: settings.agents.update
+class Translations$settings$agents$update$zh_TW extends Translations$settings$agents$update$en {
+	Translations$settings$agents$update$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '更新 CLI';
+	@override String description({required Object agent}) => '在伺服器主機上安裝最新版本的 ${agent} CLI。';
+	@override String get button => '更新';
+	@override String get updating => '正在更新…';
+	@override String success({required Object agent}) => '${agent} CLI 已更新';
+	@override String get failed => '更新失敗 — 請查看終端機輸出';
+}
+
 // Path: settings.agents.account
 class Translations$settings$agents$account$zh_TW extends Translations$settings$agents$account$en {
 	Translations$settings$agents$account$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
@@ -8647,6 +8663,12 @@ extension on TranslationsZhTw {
 			'settings.agents.install.docs' => '文件',
 			'settings.agents.install.success' => ({required Object agent}) => '${agent} CLI 已安裝',
 			'settings.agents.install.failed' => '安裝失敗 — 請檢查終端機輸出',
+			'settings.agents.update.title' => '更新 CLI',
+			'settings.agents.update.description' => ({required Object agent}) => '在伺服器主機上安裝最新版本的 ${agent} CLI。',
+			'settings.agents.update.button' => '更新',
+			'settings.agents.update.updating' => '正在更新…',
+			'settings.agents.update.success' => ({required Object agent}) => '${agent} CLI 已更新',
+			'settings.agents.update.failed' => '更新失敗 — 請查看終端機輸出',
 			'settings.agents.account.claude.description' => 'Anthropic Claude AI 助手',
 			'settings.agents.account.cursor.description' => 'Cursor AI 驅動的程式碼編輯器',
 			'settings.agents.account.codex.description' => 'OpenAI Codex AI 助手',
@@ -8680,14 +8702,14 @@ extension on TranslationsZhTw {
 			'settings.permissions.allowedTools.empty' => '未設定允許的工具',
 			'settings.permissions.blockedTools.title' => '停用的工具',
 			'settings.permissions.blockedTools.description' => '無需權限提示即可自動停用的工具',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.blockedTools.placeholder' => '例如："Bash(rm:*)"',
 			'settings.permissions.blockedTools.empty' => '未設定停用的工具',
 			'settings.permissions.allowedCommands.title' => '允許的 Shell 指令',
 			'settings.permissions.allowedCommands.description' => '無需權限提示即可自動執行的 Shell 指令',
 			'settings.permissions.allowedCommands.placeholder' => '例如："Shell(ls)" 或 "Shell(git status)"',
 			'settings.permissions.allowedCommands.quickAdd' => '快速新增常用指令：',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.allowedCommands.empty' => '未設定允許的指令',
 			'settings.permissions.blockedCommands.title' => '封鎖的 Shell 指令',
 			'settings.permissions.blockedCommands.description' => '自動封鎖的 Shell 指令',
@@ -9194,14 +9216,14 @@ extension on TranslationsZhTw {
 			'tasks.createTask.submit' => '新增任務',
 			'tasks.createTask.submitting' => '正在新增...',
 			'tasks.createTask.title' => '新增任務',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.createTask.titleLabel' => '標題',
 			'tasks.createTask.titlePlaceholder' => '需要做什麼？',
 			'tasks.list.completedReopen' => '已完成（點擊重新開啟）',
 			'tasks.list.inProgressComplete' => '進行中（點擊完成）',
 			'tasks.list.markCompleted' => '標記為已完成',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => '切換任務 ${id} 的狀態',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.list.markDone' => '標記為完成',
 			'tasks.list.reopen' => '重新開啟',
 			'tasks.nextTask.allComplete' => '所有任務已完成',
@@ -9708,6 +9730,8 @@ extension on TranslationsZhTw {
 			'workspace.searchTranscript' => '搜尋記錄',
 			'workspace.sendTo' => ({required Object count}) => '傳送至 ${count}',
 			'workspace.accountWithLabel' => ({required Object label}) => '預設 · ${label}',
+			_ => null,
+		} ?? switch (path) {
 			'workspace.finishRunBeforeChangingWorkspace' => '變更工作區前請先完成執行',
 			'workspace.restored' => '工作區已還原',
 			'workspace.maximizePane' => '最大化窗格',

@@ -2006,6 +2006,14 @@
         "success": "CLI {{agent}} installée",
         "failed": "Échec de l'installation — vérifiez la sortie du terminal"
       },
+      "update": {
+        "title": "Mettre à jour le CLI",
+        "description": "Installe la dernière version du CLI {{agent}} sur l'hôte du serveur.",
+        "button": "Mettre à jour",
+        "updating": "Mise à jour…",
+        "success": "CLI {{agent}} mis à jour",
+        "failed": "Échec de la mise à jour — consultez la sortie du terminal"
+      },
       "account": {
         "claude": {
           "description": "Assistant IA Claude d'Anthropic"

@@ -288,6 +288,54 @@ void main() {
     expect(find.text(installT.docs), findsOneWidget);
     expect(find.text(t.settings.agents.accounts.title), findsNothing);
     expect(find.text(t.settings.agents.login.button), findsNothing);
+    // Nothing to update while the CLI is missing — the install card owns that.
+    expect(find.text(t.settings.agents.update.title), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('every installed agent offers a CLI update button', (tester) async {
+    tester.view.physicalSize = const Size(1600, 1200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    LocaleSettings.setLocaleSync(AppLocale.pl);
+    addTearDown(() => LocaleSettings.setLocaleSync(AppLocale.en));
+
+    final backend = _Backend();
+    // Signed out on purpose: an outdated CLI must be updatable regardless of
+    // auth state, so the row sits outside the login-gated block.
+    backend.auth = (_) async => {'installed': true, 'authenticated': false};
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [dioProvider.overrideWithValue(backend.dio)],
+        child: TranslationProvider(
+          child: MaterialApp(
+            theme: AppTheme.light(),
+            home: const Scaffold(body: AgentsSection()),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final updateT = t.settings.agents.update;
+    for (final agent in AgentsSection.agents) {
+      final name = _names[agent]!;
+      await tester.tap(find.text(name).first);
+      await tester.pumpAndSettle();
+
+      expect(find.text(updateT.title), findsOneWidget, reason: agent);
+      expect(find.text(updateT.description(agent: name)), findsOneWidget, reason: agent);
+      expect(find.widgetWithText(AppButton, updateT.button), findsOneWidget, reason: agent);
+      // npm-packaged CLIs must pin @latest, otherwise an installed older
+      // version satisfies the range and the update is a no-op.
+      final command = providerUpdateCommand(agent);
+      if (command.startsWith('npm install')) {
+        expect(command, endsWith('@latest'), reason: agent);
+      } else {
+        expect(command, providerInstallCommand(agent), reason: agent);
+      }
+    }
     expect(tester.takeException(), isNull);
   });
 

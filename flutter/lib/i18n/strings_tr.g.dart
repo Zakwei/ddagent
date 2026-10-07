@@ -2519,6 +2519,7 @@ class Translations$settings$agents$tr extends Translations$settings$agents$en {
 	// Translations
 	@override late final Translations$settings$agents$authStatus$tr authStatus = Translations$settings$agents$authStatus$tr._(_root);
 	@override late final Translations$settings$agents$install$tr install = Translations$settings$agents$install$tr._(_root);
+	@override late final Translations$settings$agents$update$tr update = Translations$settings$agents$update$tr._(_root);
 	@override late final Translations$settings$agents$account$tr account = Translations$settings$agents$account$tr._(_root);
 	@override String get connectionStatus => 'Bağlantı Durumu';
 	@override late final Translations$settings$agents$login$tr login = Translations$settings$agents$login$tr._(_root);
@@ -6009,6 +6010,21 @@ class Translations$settings$agents$install$tr extends Translations$settings$agen
 	@override String get failed => 'Kurulum başarısız — terminal çıktısını kontrol edin';
 }
 
+// Path: settings.agents.update
+class Translations$settings$agents$update$tr extends Translations$settings$agents$update$en {
+	Translations$settings$agents$update$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'CLI\'yi güncelle';
+	@override String description({required Object agent}) => 'Sunucu makinesine en son ${agent} CLI sürümünü kurar.';
+	@override String get button => 'Güncelle';
+	@override String get updating => 'Güncelleniyor…';
+	@override String success({required Object agent}) => '${agent} CLI güncellendi';
+	@override String get failed => 'Güncelleme başarısız — terminal çıktısını kontrol edin';
+}
+
 // Path: settings.agents.account
 class Translations$settings$agents$account$tr extends Translations$settings$agents$account$en {
 	Translations$settings$agents$account$tr._(TranslationsTr root) : this._root = root, super.internal(root);
@@ -8647,6 +8663,12 @@ extension on TranslationsTr {
 			'settings.agents.install.docs' => 'Belgeler',
 			'settings.agents.install.success' => ({required Object agent}) => '${agent} CLI kuruldu',
 			'settings.agents.install.failed' => 'Kurulum başarısız — terminal çıktısını kontrol edin',
+			'settings.agents.update.title' => 'CLI\'yi güncelle',
+			'settings.agents.update.description' => ({required Object agent}) => 'Sunucu makinesine en son ${agent} CLI sürümünü kurar.',
+			'settings.agents.update.button' => 'Güncelle',
+			'settings.agents.update.updating' => 'Güncelleniyor…',
+			'settings.agents.update.success' => ({required Object agent}) => '${agent} CLI güncellendi',
+			'settings.agents.update.failed' => 'Güncelleme başarısız — terminal çıktısını kontrol edin',
 			'settings.agents.account.claude.description' => 'Anthropic Claude AI asistanı',
 			'settings.agents.account.cursor.description' => 'Cursor AI destekli kod editörü',
 			'settings.agents.account.codex.description' => 'OpenAI Codex AI asistanı',
@@ -8680,14 +8702,14 @@ extension on TranslationsTr {
 			'settings.permissions.allowedTools.empty' => 'İzin verilen araç yapılandırılmamış',
 			'settings.permissions.blockedTools.title' => 'Engellenen Araçlar',
 			'settings.permissions.blockedTools.description' => 'İzin istemeden otomatik olarak engellenen araçlar',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.blockedTools.placeholder' => 'ör. "Bash(rm:*)"',
 			'settings.permissions.blockedTools.empty' => 'Engellenen araç yapılandırılmamış',
 			'settings.permissions.allowedCommands.title' => 'İzin Verilen Shell Komutları',
 			'settings.permissions.allowedCommands.description' => 'İzin istemeden otomatik olarak izin verilen shell komutları',
 			'settings.permissions.allowedCommands.placeholder' => 'ör. "Shell(ls)" veya "Shell(git status)"',
 			'settings.permissions.allowedCommands.quickAdd' => 'Yaygın komutları hızlı ekle:',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.allowedCommands.empty' => 'İzin verilen komut yapılandırılmamış',
 			'settings.permissions.blockedCommands.title' => 'Engellenen Shell Komutları',
 			'settings.permissions.blockedCommands.description' => 'Otomatik olarak engellenen shell komutları',
@@ -9194,14 +9216,14 @@ extension on TranslationsTr {
 			'tasks.createTask.submit' => 'Görev Ekle',
 			'tasks.createTask.submitting' => 'Ekleniyor...',
 			'tasks.createTask.title' => 'Görev Ekle',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.createTask.titleLabel' => 'Başlık',
 			'tasks.createTask.titlePlaceholder' => 'Ne yapılması gerekiyor?',
 			'tasks.list.completedReopen' => 'Tamamlandı (yeniden açmak için tıklayın)',
 			'tasks.list.inProgressComplete' => 'Devam ediyor (tamamlamak için tıklayın)',
 			'tasks.list.markCompleted' => 'Tamamlandı olarak işaretle',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => 'Görev ${id} durumunu değiştir',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.list.markDone' => 'Tamamlandı olarak işaretle',
 			'tasks.list.reopen' => 'Yeniden aç',
 			'tasks.nextTask.allComplete' => 'Tüm görevler tamamlandı',
@@ -9708,6 +9730,8 @@ extension on TranslationsTr {
 			'workspace.searchTranscript' => 'Transkriptte ara',
 			'workspace.sendTo' => ({required Object count}) => '${count} oturuma gönder',
 			'workspace.accountWithLabel' => ({required Object label}) => 'Varsayılan · ${label}',
+			_ => null,
+		} ?? switch (path) {
 			'workspace.finishRunBeforeChangingWorkspace' => 'Çalışma alanını değiştirmeden önce çalıştırmayı bitir',
 			'workspace.restored' => 'Çalışma alanı geri yüklendi',
 			'workspace.maximizePane' => 'Bölmeyi büyüt',

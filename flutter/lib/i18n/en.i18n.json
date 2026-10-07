@@ -2258,6 +2258,14 @@
         "success": "{{agent}} CLI installed",
         "failed": "Installation failed — check the terminal output"
       },
+      "update": {
+        "title": "Update CLI",
+        "description": "Install the newest {{agent}} CLI release on the server host.",
+        "button": "Update",
+        "updating": "Updating…",
+        "success": "{{agent}} CLI updated",
+        "failed": "Update failed — check the terminal output"
+      },
       "account": {
         "claude": {
           "description": "Anthropic Claude AI assistant"
@@ -2303,6 +2311,7 @@
       "accounts": {
         "title": "Named accounts",
         "description": "Additional credential sets. A session pinned to an account launches the CLI with its isolated config directory. Log in by running the provider CLI once with the shown env vars.",
+        "sharedCli": "All accounts share one CLI installation — update it in the connection card above.",
         "loading": "Loading accounts…",
         "default": "Default",
         "usage": "{{tokens}} tokens",

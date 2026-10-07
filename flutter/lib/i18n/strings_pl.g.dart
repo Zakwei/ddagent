@@ -2588,6 +2588,7 @@ class Translations$settings$agents$pl extends Translations$settings$agents$en {
 	// Translations
 	@override late final Translations$settings$agents$authStatus$pl authStatus = Translations$settings$agents$authStatus$pl._(_root);
 	@override late final Translations$settings$agents$install$pl install = Translations$settings$agents$install$pl._(_root);
+	@override late final Translations$settings$agents$update$pl update = Translations$settings$agents$update$pl._(_root);
 	@override late final Translations$settings$agents$account$pl account = Translations$settings$agents$account$pl._(_root);
 	@override String get connectionStatus => 'Stan połączenia';
 	@override late final Translations$settings$agents$login$pl login = Translations$settings$agents$login$pl._(_root);
@@ -6322,6 +6323,21 @@ class Translations$settings$agents$install$pl extends Translations$settings$agen
 	@override String get failed => 'Instalacja nie powiodła się — sprawdź dane wyjściowe terminala';
 }
 
+// Path: settings.agents.update
+class Translations$settings$agents$update$pl extends Translations$settings$agents$update$en {
+	Translations$settings$agents$update$pl._(TranslationsPl root) : this._root = root, super.internal(root);
+
+	final TranslationsPl _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Aktualizuj CLI';
+	@override String description({required Object agent}) => 'Zainstaluj najnowszą wersję CLI ${agent} na hoście serwera.';
+	@override String get button => 'Aktualizuj';
+	@override String get updating => 'Aktualizowanie…';
+	@override String success({required Object agent}) => 'CLI ${agent} zaktualizowane';
+	@override String get failed => 'Aktualizacja nie powiodła się — sprawdź wynik w terminalu';
+}
+
 // Path: settings.agents.account
 class Translations$settings$agents$account$pl extends Translations$settings$agents$account$en {
 	Translations$settings$agents$account$pl._(TranslationsPl root) : this._root = root, super.internal(root);
@@ -6378,6 +6394,7 @@ class Translations$settings$agents$accounts$pl extends Translations$settings$age
 	// Translations
 	@override String get title => 'Nazwane konta';
 	@override String get description => 'Dodatkowe zestawy poświadczeń. Sesja przypięta do konta uruchamia CLI z izolowanym katalogiem konfiguracji. Zaloguj się, uruchamiając raz CLI providera z pokazanymi zmiennymi.';
+	@override String get sharedCli => 'Wszystkie konta korzystają z jednej instalacji CLI — aktualizuj ją w karcie połączenia powyżej.';
 	@override String get loading => 'Ładowanie kont…';
 	@override String get kDefault => 'Domyślne';
 	@override String usage({required Object tokens}) => '${tokens} tokenów';
@@ -9177,6 +9194,12 @@ extension on TranslationsPl {
 			'settings.agents.install.docs' => 'Dokumentacja',
 			'settings.agents.install.success' => ({required Object agent}) => 'CLI ${agent} zainstalowane',
 			'settings.agents.install.failed' => 'Instalacja nie powiodła się — sprawdź dane wyjściowe terminala',
+			'settings.agents.update.title' => 'Aktualizuj CLI',
+			'settings.agents.update.description' => ({required Object agent}) => 'Zainstaluj najnowszą wersję CLI ${agent} na hoście serwera.',
+			'settings.agents.update.button' => 'Aktualizuj',
+			'settings.agents.update.updating' => 'Aktualizowanie…',
+			'settings.agents.update.success' => ({required Object agent}) => 'CLI ${agent} zaktualizowane',
+			'settings.agents.update.failed' => 'Aktualizacja nie powiodła się — sprawdź wynik w terminalu',
 			'settings.agents.account.claude.description' => 'Asystent AI Anthropic Claude',
 			'settings.agents.account.cursor.description' => 'Edytor kodu Cursor napędzany AI',
 			'settings.agents.account.codex.description' => 'Asystent AI OpenAI Codex',
@@ -9201,6 +9224,7 @@ extension on TranslationsPl {
 			'settings.agents.error' => ({required Object error}) => 'Błąd: ${error}',
 			'settings.agents.accounts.title' => 'Nazwane konta',
 			'settings.agents.accounts.description' => 'Dodatkowe zestawy poświadczeń. Sesja przypięta do konta uruchamia CLI z izolowanym katalogiem konfiguracji. Zaloguj się, uruchamiając raz CLI providera z pokazanymi zmiennymi.',
+			'settings.agents.accounts.sharedCli' => 'Wszystkie konta korzystają z jednej instalacji CLI — aktualizuj ją w karcie połączenia powyżej.',
 			'settings.agents.accounts.loading' => 'Ładowanie kont…',
 			'settings.agents.accounts.kDefault' => 'Domyślne',
 			'settings.agents.accounts.usage' => ({required Object tokens}) => '${tokens} tokenów',
@@ -9614,6 +9638,8 @@ extension on TranslationsPl {
 			'sidebar.deleteConfirmation.deleteSession' => 'Usuń sesję',
 			'sidebar.deleteConfirmation.confirmDelete' => 'Co chcesz zrobić z:',
 			'sidebar.deleteConfirmation.removeFromSidebar' => 'Usuń tylko z panelu bocznego',
+			_ => null,
+		} ?? switch (path) {
 			'sidebar.deleteConfirmation.deleteAllData' => 'Usuń trwale wszystkie dane',
 			'sidebar.deleteConfirmation.allConversationsDeleted' => 'Projekt zostanie usunięty z panelu bocznego. Twoje pliki, pamięci i dane sesji zostaną zachowane.',
 			'sidebar.deleteConfirmation.cannotUndo' => 'Możesz później dodać projekt ponownie.',
@@ -9621,8 +9647,6 @@ extension on TranslationsPl {
 			'sidebar.deleteConfirmation.archiveSession' => 'Archiwizuj sesję',
 			'sidebar.deleteConfirmation.archiveSessionNotice' => 'Archiwizacja ukryje sesję na liście aktywnych, zachowując jej historię.',
 			'sidebar.deleteConfirmation.archivedSessionNotice' => 'Ta sesja jest już zarchiwizowana. Możesz ją pozostawić ukrytą lub usunąć trwale.',
-			_ => null,
-		} ?? switch (path) {
 			'sidebar.deleteConfirmation.deleteSessionNotice' => 'To trwale usunie sesję wraz z transkryptem. Tej operacji nie można cofnąć.',
 			'sidebar.deleteConfirmation.deleteSessionPermanently' => 'Usuń trwale',
 			'sidebar.deleteConfirmation.sessionCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('pl'))(count, one: 'Ten projekt zawiera ${count} rozmowę.', other: 'Ten projekt zawiera ${count} rozmów.', ), 
@@ -10128,6 +10152,8 @@ extension on TranslationsPl {
 			'worktrees.scripts' => 'Skrypty',
 			'worktrees.scriptsSaved' => 'Zapisano konfigurację skryptów',
 			'worktrees.serverLabel' => 'Serwer: ',
+			_ => null,
+		} ?? switch (path) {
 			'worktrees.setupHint' => 'Polecenie setup (np. npm install)',
 			'worktrees.setupLabel' => 'Setup: ',
 			'worktrees.squashDescription' => 'Połącz wszystkie commity w jeden commit',
@@ -10135,8 +10161,6 @@ extension on TranslationsPl {
 			'quota.agents.statusCount' => ({required Object status, required Object count}) => '${status} (${count})',
 			'quota.chart.hide' => 'Ukryj',
 			'quota.chart.noData' => 'Za mało danych, aby pokazać trend.',
-			_ => null,
-		} ?? switch (path) {
 			'quota.chart.pointReadout' => ({required Object date, required Object tokens, required Object cost}) => '${date} · ${tokens} tokenów · ${cost}',
 			'quota.chart.show' => 'Pokaż',
 			'quota.config.accountRouting' => 'Routing kont',

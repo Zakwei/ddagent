@@ -2519,6 +2519,7 @@ class Translations$settings$agents$ko extends Translations$settings$agents$en {
 	// Translations
 	@override late final Translations$settings$agents$authStatus$ko authStatus = Translations$settings$agents$authStatus$ko._(_root);
 	@override late final Translations$settings$agents$install$ko install = Translations$settings$agents$install$ko._(_root);
+	@override late final Translations$settings$agents$update$ko update = Translations$settings$agents$update$ko._(_root);
 	@override late final Translations$settings$agents$account$ko account = Translations$settings$agents$account$ko._(_root);
 	@override String get connectionStatus => '연결 상태';
 	@override late final Translations$settings$agents$login$ko login = Translations$settings$agents$login$ko._(_root);
@@ -6009,6 +6010,21 @@ class Translations$settings$agents$install$ko extends Translations$settings$agen
 	@override String get failed => '설치 실패 — 터미널 출력을 확인하세요';
 }
 
+// Path: settings.agents.update
+class Translations$settings$agents$update$ko extends Translations$settings$agents$update$en {
+	Translations$settings$agents$update$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'CLI 업데이트';
+	@override String description({required Object agent}) => '서버 호스트에 최신 ${agent} CLI 버전을 설치합니다.';
+	@override String get button => '업데이트';
+	@override String get updating => '업데이트 중…';
+	@override String success({required Object agent}) => '${agent} CLI를 업데이트했습니다';
+	@override String get failed => '업데이트 실패 — 터미널 출력을 확인하세요';
+}
+
 // Path: settings.agents.account
 class Translations$settings$agents$account$ko extends Translations$settings$agents$account$en {
 	Translations$settings$agents$account$ko._(TranslationsKo root) : this._root = root, super.internal(root);
@@ -8647,6 +8663,12 @@ extension on TranslationsKo {
 			'settings.agents.install.docs' => '문서',
 			'settings.agents.install.success' => ({required Object agent}) => '${agent} CLI 설치됨',
 			'settings.agents.install.failed' => '설치 실패 — 터미널 출력을 확인하세요',
+			'settings.agents.update.title' => 'CLI 업데이트',
+			'settings.agents.update.description' => ({required Object agent}) => '서버 호스트에 최신 ${agent} CLI 버전을 설치합니다.',
+			'settings.agents.update.button' => '업데이트',
+			'settings.agents.update.updating' => '업데이트 중…',
+			'settings.agents.update.success' => ({required Object agent}) => '${agent} CLI를 업데이트했습니다',
+			'settings.agents.update.failed' => '업데이트 실패 — 터미널 출력을 확인하세요',
 			'settings.agents.account.claude.description' => 'Anthropic Claude AI 어시스턴트',
 			'settings.agents.account.cursor.description' => 'Cursor AI 기반 코드 에디터',
 			'settings.agents.account.codex.description' => 'OpenAI Codex AI 어시스턴트',
@@ -8680,14 +8702,14 @@ extension on TranslationsKo {
 			'settings.permissions.allowedTools.empty' => '설정된 허용 도구 없음',
 			'settings.permissions.blockedTools.title' => '차단된 도구',
 			'settings.permissions.blockedTools.description' => '권한 확인 없이 자동으로 차단되는 도구',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.blockedTools.placeholder' => '예: "Bash(rm:*)"',
 			'settings.permissions.blockedTools.empty' => '설정된 차단 도구 없음',
 			'settings.permissions.allowedCommands.title' => '허용된 Shell 명령어',
 			'settings.permissions.allowedCommands.description' => '권한 확인 없이 자동으로 허용되는 Shell 명령어',
 			'settings.permissions.allowedCommands.placeholder' => '예: "Shell(ls)" 또는 "Shell(git status)"',
 			'settings.permissions.allowedCommands.quickAdd' => '자주 쓰는 명령어 빠른 추가:',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.allowedCommands.empty' => '설정된 허용 명령어 없음',
 			'settings.permissions.blockedCommands.title' => '차단된 Shell 명령어',
 			'settings.permissions.blockedCommands.description' => '자동으로 차단되는 Shell 명령어',
@@ -9194,14 +9216,14 @@ extension on TranslationsKo {
 			'tasks.createTask.submit' => '작업 추가',
 			'tasks.createTask.submitting' => '추가 중...',
 			'tasks.createTask.title' => '작업 추가',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.createTask.titleLabel' => '제목',
 			'tasks.createTask.titlePlaceholder' => '무엇을 해야 하나요?',
 			'tasks.list.completedReopen' => '완료됨 (클릭하여 다시 열기)',
 			'tasks.list.inProgressComplete' => '진행 중 (클릭하여 완료)',
 			'tasks.list.markCompleted' => '완료로 표시',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => '작업 ${id} 상태 전환',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.list.markDone' => '완료로 표시',
 			'tasks.list.reopen' => '다시 열기',
 			'tasks.nextTask.allComplete' => '모든 작업 완료',
@@ -9708,6 +9730,8 @@ extension on TranslationsKo {
 			'workspace.searchTranscript' => '트랜스크립트 검색',
 			'workspace.sendTo' => ({required Object count}) => '${count}개에 전송',
 			'workspace.accountWithLabel' => ({required Object label}) => '기본 · ${label}',
+			_ => null,
+		} ?? switch (path) {
 			'workspace.finishRunBeforeChangingWorkspace' => '작업 영역을 변경하기 전에 실행을 완료하세요',
 			'workspace.restored' => '작업 영역이 복원되었습니다',
 			'workspace.maximizePane' => '창 최대화',

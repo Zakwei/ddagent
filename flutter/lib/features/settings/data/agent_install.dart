@@ -16,6 +16,23 @@ String providerInstallCommand(String provider) => switch (provider) {
   _ => 'npm install -g $provider',
 };
 
+/// Per-provider CLI update commands, run through the same terminal dialog as
+/// [providerInstallCommand]. The npm-packaged CLIs re-install pinned to
+/// `@latest`; the script-installed ones have no separate updater — their
+/// install script replaces the binary in place, so it doubles as the update.
+///
+/// The CLI itself is a single host-wide installation (the server resolves it
+/// from PATH), shared by every named provider account — so updating is a
+/// provider-level action, never a per-account one.
+String providerUpdateCommand(String provider) => switch (provider) {
+  'claude' => 'npm install -g @anthropic-ai/claude-code@latest',
+  'codex' => 'npm install -g @openai/codex@latest',
+  'opencode' => 'npm install -g opencode-ai@latest',
+  'commandcode' => 'npm install -g command-code@latest',
+  'cursor' || 'antigravity' || 'devin' => providerInstallCommand(provider),
+  _ => 'npm install -g $provider@latest',
+};
+
 /// Official installation docs for a provider CLI. Null when no stable docs
 /// URL is known; the install card then hides its documentation link.
 String? providerInstallDocsUrl(String provider) => switch (provider) {

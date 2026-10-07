@@ -2519,6 +2519,7 @@ class Translations$settings$agents$ja extends Translations$settings$agents$en {
 	// Translations
 	@override late final Translations$settings$agents$authStatus$ja authStatus = Translations$settings$agents$authStatus$ja._(_root);
 	@override late final Translations$settings$agents$install$ja install = Translations$settings$agents$install$ja._(_root);
+	@override late final Translations$settings$agents$update$ja update = Translations$settings$agents$update$ja._(_root);
 	@override late final Translations$settings$agents$account$ja account = Translations$settings$agents$account$ja._(_root);
 	@override String get connectionStatus => '接続状態';
 	@override late final Translations$settings$agents$login$ja login = Translations$settings$agents$login$ja._(_root);
@@ -6009,6 +6010,21 @@ class Translations$settings$agents$install$ja extends Translations$settings$agen
 	@override String get failed => 'インストールに失敗しました — ターミナルの出力を確認してください';
 }
 
+// Path: settings.agents.update
+class Translations$settings$agents$update$ja extends Translations$settings$agents$update$en {
+	Translations$settings$agents$update$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'CLI を更新';
+	@override String description({required Object agent}) => '${agent} CLI の最新バージョンをサーバーホストにインストールします。';
+	@override String get button => '更新';
+	@override String get updating => '更新中…';
+	@override String success({required Object agent}) => '${agent} CLI を更新しました';
+	@override String get failed => '更新に失敗しました — ターミナルの出力を確認してください';
+}
+
 // Path: settings.agents.account
 class Translations$settings$agents$account$ja extends Translations$settings$agents$account$en {
 	Translations$settings$agents$account$ja._(TranslationsJa root) : this._root = root, super.internal(root);
@@ -8647,6 +8663,12 @@ extension on TranslationsJa {
 			'settings.agents.install.docs' => 'ドキュメント',
 			'settings.agents.install.success' => ({required Object agent}) => '${agent} CLI をインストールしました',
 			'settings.agents.install.failed' => 'インストールに失敗しました — ターミナルの出力を確認してください',
+			'settings.agents.update.title' => 'CLI を更新',
+			'settings.agents.update.description' => ({required Object agent}) => '${agent} CLI の最新バージョンをサーバーホストにインストールします。',
+			'settings.agents.update.button' => '更新',
+			'settings.agents.update.updating' => '更新中…',
+			'settings.agents.update.success' => ({required Object agent}) => '${agent} CLI を更新しました',
+			'settings.agents.update.failed' => '更新に失敗しました — ターミナルの出力を確認してください',
 			'settings.agents.account.claude.description' => 'Anthropic Claude AIアシスタント',
 			'settings.agents.account.cursor.description' => 'Cursor AI搭載コードエディタ',
 			'settings.agents.account.codex.description' => 'OpenAI Codex AIアシスタント',
@@ -8680,14 +8702,14 @@ extension on TranslationsJa {
 			'settings.permissions.allowedTools.empty' => '許可されたツールはありません',
 			'settings.permissions.blockedTools.title' => 'ブロックされたツール',
 			'settings.permissions.blockedTools.description' => '権限の確認なしに自動的にブロックされるツール',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.blockedTools.placeholder' => '例: "Bash(rm:*)"',
 			'settings.permissions.blockedTools.empty' => 'ブロックされたツールはありません',
 			'settings.permissions.allowedCommands.title' => '許可されたシェルコマンド',
 			'settings.permissions.allowedCommands.description' => '権限の確認なしに自動的に許可されるシェルコマンド',
 			'settings.permissions.allowedCommands.placeholder' => '例: "Shell(ls)" または "Shell(git status)"',
 			'settings.permissions.allowedCommands.quickAdd' => 'よく使うコマンドを追加:',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.allowedCommands.empty' => '許可されたコマンドはありません',
 			'settings.permissions.blockedCommands.title' => 'ブロックされたシェルコマンド',
 			'settings.permissions.blockedCommands.description' => '自動的にブロックされるシェルコマンド',
@@ -9194,14 +9216,14 @@ extension on TranslationsJa {
 			'tasks.createTask.submit' => 'タスクを追加',
 			'tasks.createTask.submitting' => '追加中...',
 			'tasks.createTask.title' => 'タスクを追加',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.createTask.titleLabel' => 'タイトル',
 			'tasks.createTask.titlePlaceholder' => '何をすべきですか？',
 			'tasks.list.completedReopen' => '完了（クリックで再開）',
 			'tasks.list.inProgressComplete' => '進行中（クリックで完了）',
 			'tasks.list.markCompleted' => '完了としてマーク',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => 'タスク ${id} のステータスを切り替え',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.list.markDone' => '完了にする',
 			'tasks.list.reopen' => '再開',
 			'tasks.nextTask.allComplete' => 'すべてのタスクが完了',
@@ -9708,6 +9730,8 @@ extension on TranslationsJa {
 			'workspace.searchTranscript' => 'トランスクリプトを検索',
 			'workspace.sendTo' => ({required Object count}) => '${count} 件に送信',
 			'workspace.accountWithLabel' => ({required Object label}) => 'デフォルト · ${label}',
+			_ => null,
+		} ?? switch (path) {
 			'workspace.finishRunBeforeChangingWorkspace' => 'ワークスペースを変更する前に実行を終了してください',
 			'workspace.restored' => 'ワークスペースを復元しました',
 			'workspace.maximizePane' => 'ペインを最大化',

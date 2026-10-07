@@ -2519,6 +2519,7 @@ class Translations$settings$agents$zh_CN extends Translations$settings$agents$en
 	// Translations
 	@override late final Translations$settings$agents$authStatus$zh_CN authStatus = Translations$settings$agents$authStatus$zh_CN.internal(_root);
 	@override late final Translations$settings$agents$install$zh_CN install = Translations$settings$agents$install$zh_CN.internal(_root);
+	@override late final Translations$settings$agents$update$zh_CN update = Translations$settings$agents$update$zh_CN.internal(_root);
 	@override late final Translations$settings$agents$account$zh_CN account = Translations$settings$agents$account$zh_CN.internal(_root);
 	@override String get connectionStatus => '连接状态';
 	@override late final Translations$settings$agents$login$zh_CN login = Translations$settings$agents$login$zh_CN.internal(_root);
@@ -6009,6 +6010,21 @@ class Translations$settings$agents$install$zh_CN extends Translations$settings$a
 	@override String get failed => '安装失败 — 请检查终端输出';
 }
 
+// Path: settings.agents.update
+class Translations$settings$agents$update$zh_CN extends Translations$settings$agents$update$en {
+	Translations$settings$agents$update$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '更新 CLI';
+	@override String description({required Object agent}) => '在服务器主机上安装最新版本的 ${agent} CLI。';
+	@override String get button => '更新';
+	@override String get updating => '正在更新…';
+	@override String success({required Object agent}) => '${agent} CLI 已更新';
+	@override String get failed => '更新失败 — 请查看终端输出';
+}
+
 // Path: settings.agents.account
 class Translations$settings$agents$account$zh_CN extends Translations$settings$agents$account$en {
 	Translations$settings$agents$account$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
@@ -8647,6 +8663,12 @@ extension on TranslationsZhCn {
 			'settings.agents.install.docs' => '文档',
 			'settings.agents.install.success' => ({required Object agent}) => '${agent} CLI 已安装',
 			'settings.agents.install.failed' => '安装失败 — 请检查终端输出',
+			'settings.agents.update.title' => '更新 CLI',
+			'settings.agents.update.description' => ({required Object agent}) => '在服务器主机上安装最新版本的 ${agent} CLI。',
+			'settings.agents.update.button' => '更新',
+			'settings.agents.update.updating' => '正在更新…',
+			'settings.agents.update.success' => ({required Object agent}) => '${agent} CLI 已更新',
+			'settings.agents.update.failed' => '更新失败 — 请查看终端输出',
 			'settings.agents.account.claude.description' => 'Anthropic Claude AI 助手',
 			'settings.agents.account.cursor.description' => 'Cursor AI 驱动的代码编辑器',
 			'settings.agents.account.codex.description' => 'OpenAI Codex AI 助手',
@@ -8680,14 +8702,14 @@ extension on TranslationsZhCn {
 			'settings.permissions.allowedTools.empty' => '未配置允许的工具',
 			'settings.permissions.blockedTools.title' => '禁用的工具',
 			'settings.permissions.blockedTools.description' => '无需权限提示即可自动禁用的工具',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.blockedTools.placeholder' => '例如："Bash(rm:*)"',
 			'settings.permissions.blockedTools.empty' => '未配置禁用的工具',
 			'settings.permissions.allowedCommands.title' => '允许的 Shell 命令',
 			'settings.permissions.allowedCommands.description' => '无需权限提示即可自动执行的 Shell 命令',
 			'settings.permissions.allowedCommands.placeholder' => '例如："Shell(ls)" 或 "Shell(git status)"',
 			'settings.permissions.allowedCommands.quickAdd' => '快速添加常用命令：',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.allowedCommands.empty' => '未配置允许的命令',
 			'settings.permissions.blockedCommands.title' => '阻止的 Shell 命令',
 			'settings.permissions.blockedCommands.description' => '自动阻止的 Shell 命令',
@@ -9194,14 +9216,14 @@ extension on TranslationsZhCn {
 			'tasks.createTask.submit' => '添加任务',
 			'tasks.createTask.submitting' => '正在添加...',
 			'tasks.createTask.title' => '添加任务',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.createTask.titleLabel' => '标题',
 			'tasks.createTask.titlePlaceholder' => '需要做什么？',
 			'tasks.list.completedReopen' => '已完成（点击重新打开）',
 			'tasks.list.inProgressComplete' => '进行中（点击完成）',
 			'tasks.list.markCompleted' => '标记为已完成',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => '切换任务 ${id} 的状态',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.list.markDone' => '标记为已完成',
 			'tasks.list.reopen' => '重新打开',
 			'tasks.nextTask.allComplete' => '所有任务已完成',
@@ -9708,6 +9730,8 @@ extension on TranslationsZhCn {
 			'workspace.searchTranscript' => '搜索记录',
 			'workspace.sendTo' => ({required Object count}) => '发送到 ${count}',
 			'workspace.accountWithLabel' => ({required Object label}) => '默认 · ${label}',
+			_ => null,
+		} ?? switch (path) {
 			'workspace.finishRunBeforeChangingWorkspace' => '请先结束运行再更改工作区',
 			'workspace.restored' => '工作区已恢复',
 			'workspace.maximizePane' => '最大化窗格',

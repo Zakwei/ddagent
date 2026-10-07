@@ -2006,6 +2006,14 @@
         "success": "{{agent}} CLI をインストールしました",
         "failed": "インストールに失敗しました — ターミナルの出力を確認してください"
       },
+      "update": {
+        "title": "CLI を更新",
+        "description": "{{agent}} CLI の最新バージョンをサーバーホストにインストールします。",
+        "button": "更新",
+        "updating": "更新中…",
+        "success": "{{agent}} CLI を更新しました",
+        "failed": "更新に失敗しました — ターミナルの出力を確認してください"
+      },
       "account": {
         "claude": {
           "description": "Anthropic Claude AIアシスタント"

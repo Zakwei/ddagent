@@ -431,6 +431,45 @@ class _AccountContent extends ConsumerWidget {
                   ],
                 ),
 
+                // CLI update. Shown whenever the CLI is installed (this card
+                // replaces the install card) and independent of auth state —
+                // an outdated CLI breaks sessions even while signed in.
+                Divider(height: AppSpacing.xl, color: c.border),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            t.settings.agents.update.title,
+                            style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            t.settings.agents.update.description(agent: name),
+                            style: tt.bodySmall?.copyWith(color: c.mutedForeground),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    AppButton(
+                      variant: AppButtonVariant.outline,
+                      size: AppButtonSize.sm,
+                      onPressed: () => _openUpdate(context, ref),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(LucideIcons.refreshCw, size: 14),
+                          const SizedBox(width: AppSpacing.xs),
+                          Text(t.settings.agents.update.button),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+
                 // Stored-credential logout. Kept outside the api_key-gated login
                 // row so env-injected logins can still clear any saved store.
                 if (authenticated && status?.canLogout == true) ...[
@@ -561,6 +600,32 @@ class _AccountContent extends ConsumerWidget {
     );
   }
 
+  /// Runs the provider's CLI update command in the terminal dialog, then
+  /// re-checks auth status — an update can relocate the binary or invalidate
+  /// the credential store, so the status card must not keep the stale answer.
+  void _openUpdate(BuildContext context, WidgetRef ref) {
+    final t = Translations.of(context).settings.agents.update;
+    final name = AgentsSection._names[agent] ?? agent;
+    unawaited(
+      ProviderLoginDialog.show(
+        context: context,
+        provider: agent,
+        projectPath: _projectPath(ref),
+        customCommand: providerUpdateCommand(agent),
+        title: '${t.button} · $name',
+        onComplete: (exitCode) {
+          ref.invalidate(providerAuthStatusProvider(agent));
+          if (!context.mounted) return;
+          AppToast.show(
+            context,
+            exitCode == 0 ? t.success(agent: name) : t.failed,
+            isError: exitCode != 0,
+          );
+        },
+      ),
+    );
+  }
+
   /// Confirms and performs provider logout: the server clears the stored
   /// credentials, then the shared auth status refreshes (mirrors login flow).
   Future<void> _confirmLogout(BuildContext context, WidgetRef ref) async {
@@ -600,6 +665,7 @@ class _AccountContent extends ConsumerWidget {
     }
   }
 }
+
 class _AgentNotInstalledCard extends ConsumerWidget {
   const _AgentNotInstalledCard({required this.agent});
 
@@ -860,6 +926,10 @@ class _ProviderAccountsCardState extends ConsumerState<_ProviderAccountsCard> {
           Text(accountsT.title, style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.w500)),
           const SizedBox(height: 2),
           Text(accountsT.description, style: tt.bodySmall?.copyWith(color: c.mutedForeground)),
+          const SizedBox(height: 2),
+          // Accounts only swap the CLI's config directory — the binary itself
+          // is one host-wide install, so there is no per-account update action.
+          Text(accountsT.sharedCli, style: tt.labelSmall?.copyWith(color: c.mutedForeground)),
 
           if (state.error != null) ...[
             const SizedBox(height: AppSpacing.sm),

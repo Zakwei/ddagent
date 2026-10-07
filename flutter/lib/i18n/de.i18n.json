@@ -2006,6 +2006,14 @@
         "success": "{{agent}}-CLI installiert",
         "failed": "Installation fehlgeschlagen — prüfe die Terminal-Ausgabe"
       },
+      "update": {
+        "title": "CLI aktualisieren",
+        "description": "Installiert die neueste {{agent}}-CLI-Version auf dem Server-Host.",
+        "button": "Aktualisieren",
+        "updating": "Wird aktualisiert…",
+        "success": "{{agent}} CLI aktualisiert",
+        "failed": "Aktualisierung fehlgeschlagen — siehe Terminalausgabe"
+      },
       "account": {
         "claude": {
           "description": "Anthropic Claude KI-Assistent"

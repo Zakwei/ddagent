@@ -2006,6 +2006,14 @@
         "success": "{{agent}} CLI 설치됨",
         "failed": "설치 실패 — 터미널 출력을 확인하세요"
       },
+      "update": {
+        "title": "CLI 업데이트",
+        "description": "서버 호스트에 최신 {{agent}} CLI 버전을 설치합니다.",
+        "button": "업데이트",
+        "updating": "업데이트 중…",
+        "success": "{{agent}} CLI를 업데이트했습니다",
+        "failed": "업데이트 실패 — 터미널 출력을 확인하세요"
+      },
       "account": {
         "claude": {
           "description": "Anthropic Claude AI 어시스턴트"

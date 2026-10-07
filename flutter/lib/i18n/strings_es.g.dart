@@ -2519,6 +2519,7 @@ class Translations$settings$agents$es extends Translations$settings$agents$en {
 	// Translations
 	@override late final Translations$settings$agents$authStatus$es authStatus = Translations$settings$agents$authStatus$es._(_root);
 	@override late final Translations$settings$agents$install$es install = Translations$settings$agents$install$es._(_root);
+	@override late final Translations$settings$agents$update$es update = Translations$settings$agents$update$es._(_root);
 	@override late final Translations$settings$agents$account$es account = Translations$settings$agents$account$es._(_root);
 	@override String get connectionStatus => 'Estado de la conexión';
 	@override late final Translations$settings$agents$login$es login = Translations$settings$agents$login$es._(_root);
@@ -6009,6 +6010,21 @@ class Translations$settings$agents$install$es extends Translations$settings$agen
 	@override String get failed => 'La instalación falló — revisa la salida de la terminal';
 }
 
+// Path: settings.agents.update
+class Translations$settings$agents$update$es extends Translations$settings$agents$update$en {
+	Translations$settings$agents$update$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Actualizar CLI';
+	@override String description({required Object agent}) => 'Instala la versión más reciente del CLI de ${agent} en el host del servidor.';
+	@override String get button => 'Actualizar';
+	@override String get updating => 'Actualizando…';
+	@override String success({required Object agent}) => 'CLI de ${agent} actualizado';
+	@override String get failed => 'La actualización falló — revisa la salida del terminal';
+}
+
 // Path: settings.agents.account
 class Translations$settings$agents$account$es extends Translations$settings$agents$account$en {
 	Translations$settings$agents$account$es._(TranslationsEs root) : this._root = root, super.internal(root);
@@ -8647,6 +8663,12 @@ extension on TranslationsEs {
 			'settings.agents.install.docs' => 'Documentación',
 			'settings.agents.install.success' => ({required Object agent}) => 'CLI de ${agent} instalada',
 			'settings.agents.install.failed' => 'La instalación falló — revisa la salida de la terminal',
+			'settings.agents.update.title' => 'Actualizar CLI',
+			'settings.agents.update.description' => ({required Object agent}) => 'Instala la versión más reciente del CLI de ${agent} en el host del servidor.',
+			'settings.agents.update.button' => 'Actualizar',
+			'settings.agents.update.updating' => 'Actualizando…',
+			'settings.agents.update.success' => ({required Object agent}) => 'CLI de ${agent} actualizado',
+			'settings.agents.update.failed' => 'La actualización falló — revisa la salida del terminal',
 			'settings.agents.account.claude.description' => 'Asistente de IA Claude de Anthropic',
 			'settings.agents.account.cursor.description' => 'Editor de código con IA Cursor',
 			'settings.agents.account.codex.description' => 'Asistente de IA Codex de OpenAI',
@@ -8680,14 +8702,14 @@ extension on TranslationsEs {
 			'settings.permissions.allowedTools.empty' => 'No hay herramientas permitidas configuradas',
 			'settings.permissions.blockedTools.title' => 'Herramientas bloqueadas',
 			'settings.permissions.blockedTools.description' => 'Herramientas que se bloquean automáticamente sin pedir permiso',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.blockedTools.placeholder' => 'p. ej., "Bash(rm:*)"',
 			'settings.permissions.blockedTools.empty' => 'No hay herramientas bloqueadas configuradas',
 			'settings.permissions.allowedCommands.title' => 'Comandos de shell permitidos',
 			'settings.permissions.allowedCommands.description' => 'Comandos de shell que se permiten automáticamente sin preguntar',
 			'settings.permissions.allowedCommands.placeholder' => 'p. ej., "Shell(ls)" o "Shell(git status)"',
 			'settings.permissions.allowedCommands.quickAdd' => 'Añadir rápido comandos comunes:',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.allowedCommands.empty' => 'No hay comandos permitidos configurados',
 			'settings.permissions.blockedCommands.title' => 'Comandos de shell bloqueados',
 			'settings.permissions.blockedCommands.description' => 'Comandos de shell que se bloquean automáticamente',
@@ -9194,14 +9216,14 @@ extension on TranslationsEs {
 			'tasks.createTask.submit' => 'Añadir tarea',
 			'tasks.createTask.submitting' => 'Añadiendo...',
 			'tasks.createTask.title' => 'Añadir tarea',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.createTask.titleLabel' => 'Título',
 			'tasks.createTask.titlePlaceholder' => '¿Qué hay que hacer?',
 			'tasks.list.completedReopen' => 'Completada (clic para reabrir)',
 			'tasks.list.inProgressComplete' => 'En curso (clic para completar)',
 			'tasks.list.markCompleted' => 'Marcar como completada',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => 'Alternar estado de la tarea ${id}',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.list.markDone' => 'Marcar como completada',
 			'tasks.list.reopen' => 'Reabrir',
 			'tasks.nextTask.allComplete' => 'Todas las tareas completadas',
@@ -9708,6 +9730,8 @@ extension on TranslationsEs {
 			'workspace.searchTranscript' => 'Buscar en la transcripción',
 			'workspace.sendTo' => ({required Object count}) => 'Enviar a ${count}',
 			'workspace.accountWithLabel' => ({required Object label}) => 'Predeterminado · ${label}',
+			_ => null,
+		} ?? switch (path) {
 			'workspace.finishRunBeforeChangingWorkspace' => 'Finaliza la ejecución antes de cambiar de espacio de trabajo',
 			'workspace.restored' => 'Espacio de trabajo restaurado',
 			'workspace.maximizePane' => 'Maximizar panel',
