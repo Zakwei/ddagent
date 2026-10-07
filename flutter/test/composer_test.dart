@@ -156,6 +156,22 @@ void main() {
     expect(s.effortValues('claude'), ['low', 'high']);
   });
 
+  test('reasoning falls back to the provider set when the model has no effort', () {
+    // Every agent exposes a Reasoning section like Command Code: when the
+    // active model carries no `effort` descriptor, the provider's own set is
+    // served instead of hiding the section.
+    const state = ComposerState(
+      models: [
+        {'id': 'x', 'label': 'X'},
+      ],
+      activeModel: 'x',
+    );
+    expect(state.effortValues('cursor'), ['off', 'high', 'max']);
+    expect(state.effortValues('devin'), ['low', 'medium', 'high', 'xhigh', 'max']);
+    expect(state.effortValues('unknown-agent'), ['off', 'high', 'max']);
+    expect(state.effortOptions('cursor').map((e) => e.value), ['off', 'high', 'max']);
+  });
+
   test('send builds options (model/effort/permission/account) and clears draft', () async {
     container = make();
     container.listen(composerProvider(arg), (_, _) {});

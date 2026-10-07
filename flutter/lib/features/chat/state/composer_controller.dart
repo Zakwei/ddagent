@@ -72,27 +72,40 @@ class ComposerState {
   final bool autoContinue;
   final String? sendError;
 
+  /// Provider-wide reasoning levels. The active model's own descriptor wins;
+  /// when it carries no `effort` (or the catalog has not hydrated yet) these
+  /// keep the composer's Reasoning section present for every agent, matching
+  /// Command Code — the picker renders the same sections regardless of agent.
+  static const _providerEffortValues = <String, List<String>>{
+    'claude': ['low', 'medium', 'high', 'xhigh', 'max'],
+    'codex': ['low', 'medium', 'high', 'xhigh', 'max', 'ultra'],
+    'cursor': ['off', 'high', 'max'],
+    'opencode': ['none', 'low', 'medium', 'high', 'xhigh', 'max'],
+    'commandcode': ['off', 'high', 'max'],
+    // The agy CLI accepts low|medium|high|max.
+    'antigravity': ['low', 'medium', 'high', 'max'],
+    'devin': ['low', 'medium', 'high', 'xhigh', 'max'],
+  };
+
+  /// Shared last resort — Command Code's own tiers — so an unknown provider
+  /// still shows a Reasoning section instead of hiding it.
+  static const _defaultEffortValues = ['off', 'high', 'max'];
+
+  static List<String> _fallbackEffortValues(String provider) =>
+      _providerEffortValues[provider] ?? _defaultEffortValues;
+
   /// Effort levels offered by the active model's descriptor (web parity:
-  /// `ProviderModelOption.effort.values`); an unknown model falls back to the
-  /// provider superset from `FALLBACK_PROVIDER_EFFORT_VALUES` while the
-  /// catalog hydrates.
+  /// `ProviderModelOption.effort.values`), else the provider superset.
   List<String> effortValues(String provider) {
     for (final m in models) {
       if ((m['id'] ?? m['value']) == activeModel) {
         final vals = (m['effort'] as Map?)?['values'] as List?;
-        return [for (final v in vals ?? const []) (v is Map ? v['value'] : v).toString()];
+        final values = [for (final v in vals ?? const []) (v is Map ? v['value'] : v).toString()];
+        if (values.isNotEmpty) return values;
+        break;
       }
     }
-    return const {
-          'claude': ['low', 'medium', 'high', 'xhigh', 'max'],
-          'codex': ['low', 'medium', 'high', 'xhigh', 'max', 'ultra'],
-          'opencode': ['none', 'low', 'medium', 'high', 'xhigh', 'max'],
-          'commandcode': ['off', 'high', 'max'],
-          // The agy CLI accepts low|medium|high|max.
-          'antigravity': ['low', 'medium', 'high', 'max'],
-          'devin': ['low', 'medium', 'high', 'xhigh', 'max'],
-        }[provider] ??
-        const [];
+    return _fallbackEffortValues(provider);
   }
 
   /// Like [effortValues] but keeps each descriptor's `description` — the web
@@ -100,16 +113,18 @@ class ComposerState {
   List<({String value, String? description})> effortOptions(String provider) {
     for (final m in models) {
       if ((m['id'] ?? m['value']) == activeModel) {
-        final vals = (m['effort'] as Map?)?['values'] as List?;
-        return [
-          for (final v in vals ?? const [])
+        final vals = (m['effort'] as Map?)?['values'] as List? ?? const [];
+        final options = [
+          for (final v in vals)
             v is Map
                 ? (value: '${v['value']}', description: v['description']?.toString())
                 : (value: '$v', description: null),
         ];
+        if (options.isNotEmpty) return options;
+        break;
       }
     }
-    return [for (final v in effortValues(provider)) (value: v, description: null)];
+    return [for (final v in _fallbackEffortValues(provider)) (value: v, description: null)];
   }
 
   ComposerState copyWith({
