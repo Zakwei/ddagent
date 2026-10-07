@@ -1797,15 +1797,13 @@ export function setOpenCodePermissionMode(sessionId: string, mode: string): void
 
   const run = activeRuns.get(sessionId);
   for (const [requestId, pending] of [...pendingPermissions]) {
-    if (pending.appSessionId !== sessionId || !pending.baseUrl) {
+    // Questions are user input, not tool permissions: bypass must not
+    // answer them for the user (same rule as on arrival), so they stay open.
+    if (pending.appSessionId !== sessionId || !pending.baseUrl || pending.kind === 'question') {
       continue;
     }
     pendingPermissions.delete(requestId);
-    if (pending.kind === 'question') {
-      void replyQuestion(pending.baseUrl, pending.directory, pending.requestId, (pending.questions ?? []).map(() => []));
-    } else {
-      void replyPermission(pending.baseUrl, pending.directory, pending.providerSessionId, pending.permissionID, 'once');
-    }
+    void replyPermission(pending.baseUrl, pending.directory, pending.providerSessionId, pending.permissionID, 'once');
     run?.writer.send(createNormalizedMessage({
       kind: 'permission_cancelled',
       requestId,

@@ -614,3 +614,28 @@ for (const [name, createProcess, permissions, nativeKey, queryFn, runtimeExport,
     }
   });
 }
+
+test('OpenCode: switching to bypass approves pending permissions but leaves questions open', async () => {
+  const requests: string[] = [];
+  const fakeFetch = async (url: string) => {
+    requests.push(new URL(url).pathname);
+    return new Response('true', { status: 200, headers: { 'content-type': 'application/json' } });
+  };
+  const runtime = await loadRuntime('opencode', 'pendingPermissions', { fetch: fakeFetch });
+  const pending = runtime.lifecycleHooks.pendingPermissions;
+  pending.set('perm-1', {
+    kind: 'permission', appSessionId: 'app', baseUrl: 'http://127.0.0.1:1', directory: '/tmp',
+    providerSessionId: 'ses_1', permissionID: 'per_1',
+  });
+  pending.set('question-1', {
+    kind: 'question', appSessionId: 'app', baseUrl: 'http://127.0.0.1:1', directory: '/tmp',
+    providerSessionId: 'ses_1', requestId: 'que_1', questions: [{ question: 'Which scope?' }],
+  });
+
+  runtime.setOpenCodePermissionMode('app', 'bypassPermissions');
+  await new Promise((resolve) => setImmediate(resolve));
+
+  assert.equal(pending.has('perm-1'), false);
+  assert.equal(pending.has('question-1'), true);
+  assert.ok(requests.every((pathname) => !pathname.includes('/question/')), requests.join(', '));
+});
