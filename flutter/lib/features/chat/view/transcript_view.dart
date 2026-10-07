@@ -143,7 +143,9 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     // bottom edge, so "everything visible" already means aligned. Without
     // this the correction loop jumps every frame forever.
     final topVisible = positions.any(
-      (p) => p.index == 0 && p.itemLeadingEdge >= -_scrollTolerance / _viewportHeight,
+      (p) =>
+          p.index == 0 &&
+          p.itemLeadingEdge >= -_scrollTolerance / _viewportHeight,
     );
     if (topVisible) return true;
     return positions.any(
@@ -156,7 +158,10 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
   void _onPositionsChanged() {
     if (!mounted) return;
     final visible = _positions.itemPositions.value.where(
-      (p) => p.index < _rowCount && p.itemTrailingEdge > 0 && p.itemLeadingEdge < 1,
+      (p) =>
+          p.index < _rowCount &&
+          p.itemTrailingEdge > 0 &&
+          p.itemLeadingEdge < 1,
     );
     if (visible.isNotEmpty) {
       final first = visible.reduce((a, b) => a.index < b.index ? a : b);
@@ -197,8 +202,10 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     // Updates from a drag (including its ballistic continuation) or wheel
     // carry user intent. jumpTo/layout corrections never set this flag.
     if (_userScrollingDown &&
-        ((notification is ScrollUpdateNotification && (notification.scrollDelta ?? 0) > 0) ||
-            (notification is OverscrollNotification && notification.overscroll > 0)) &&
+        ((notification is ScrollUpdateNotification &&
+                (notification.scrollDelta ?? 0) > 0) ||
+            (notification is OverscrollNotification &&
+                notification.overscroll > 0)) &&
         notification.metrics.extentAfter <= _scrollTolerance) {
       _setFollowing(true);
     }
@@ -223,7 +230,11 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
   }
 
   void _scheduleFollow() {
-    if (!mounted || !_following || _pointerDown || _searchActive || _followScheduled) {
+    if (!mounted ||
+        !_following ||
+        _pointerDown ||
+        _searchActive ||
+        _followScheduled) {
       return;
     }
     _followScheduled = true;
@@ -255,7 +266,10 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
   }
 
   void _scrollToIndex(int index) {
-    if (!mounted || !_itemScroll.isAttached || index < 0 || index >= _rowCount) {
+    if (!mounted ||
+        !_itemScroll.isAttached ||
+        index < 0 ||
+        index >= _rowCount) {
       return;
     }
     _userScrollingDown = false;
@@ -324,13 +338,16 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     _composerHoverFocus.requestFocus();
   }
 
-  void _loadOlder() =>
-      unawaited(ref.read(transcriptProvider(widget.sessionId).notifier).loadOlder());
+  void _loadOlder() => unawaited(
+    ref.read(transcriptProvider(widget.sessionId).notifier).loadOlder(),
+  );
 
   /// Web `loadAllMessages` — pull every remaining page in one go. The generic
   /// row-key anchor in build() keeps the viewport on the same row across the
   /// prepends this triggers.
-  void _loadAll() => unawaited(ref.read(transcriptProvider(widget.sessionId).notifier).loadAll());
+  void _loadAll() => unawaited(
+    ref.read(transcriptProvider(widget.sessionId).notifier).loadAll(),
+  );
 
   void _openChangedFile(String path) {
     if (widget.projectId == null) return;
@@ -352,12 +369,15 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
     final tools = ref.watch(transcriptToolsProvider(widget.sessionId));
-    final controller = ref.read(transcriptToolsProvider(widget.sessionId).notifier);
+    final controller = ref.read(
+      transcriptToolsProvider(widget.sessionId).notifier,
+    );
     final files = tools.reviewFiles;
     return Focus(
       autofocus: true,
       onKeyEvent: (node, event) {
-        if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
+        if (event is KeyDownEvent &&
+            event.logicalKey == LogicalKeyboardKey.escape) {
           controller.closeReview();
           return KeyEventResult.handled;
         }
@@ -381,9 +401,16 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
             child: Column(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
-                    border: Border(bottom: BorderSide(color: c.border.withValues(alpha: 0.6))),
+                    border: Border(
+                      bottom: BorderSide(
+                        color: c.border.withValues(alpha: 0.6),
+                      ),
+                    ),
                   ),
                   child: Row(
                     spacing: 8,
@@ -404,7 +431,11 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                               height: 14,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
-                          : _toolIcon(context, LucideIcons.refreshCw, controller.loadReviewFiles),
+                          : _toolIcon(
+                              context,
+                              LucideIcons.refreshCw,
+                              controller.loadReviewFiles,
+                            ),
                       _toolIcon(context, LucideIcons.x, controller.closeReview),
                     ],
                   ),
@@ -429,10 +460,17 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
           mainAxisSize: MainAxisSize.min,
           spacing: 8,
           children: [
-            const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2)),
+            const SizedBox(
+              width: 14,
+              height: 14,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
             Text(
               i18n.settings.changelog.loading,
-              style: t.labelSmall?.copyWith(fontSize: 12, color: c.mutedForeground),
+              style: t.labelSmall?.copyWith(
+                fontSize: 12,
+                color: c.mutedForeground,
+              ),
             ),
           ],
         ),
@@ -448,7 +486,10 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     }
     if (files.isEmpty) {
       return Center(
-        child: SessionListEmptyState(icon: LucideIcons.fileDiff, label: i18n.chat.changes.empty),
+        child: SessionListEmptyState(
+          icon: LucideIcons.fileDiff,
+          label: i18n.chat.changes.empty,
+        ),
       );
     }
     return Opacity(
@@ -498,7 +539,10 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                       dirname,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: t.labelSmall?.copyWith(fontSize: 10, color: c.mutedForeground),
+                      style: t.labelSmall?.copyWith(
+                        fontSize: 10,
+                        color: c.mutedForeground,
+                      ),
                     ),
                 ],
               ),
@@ -506,16 +550,25 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
             if (f['subagent'] == true)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
-                decoration: BoxDecoration(color: c.muted, borderRadius: AppRadii.borderSm),
+                decoration: BoxDecoration(
+                  color: c.muted,
+                  borderRadius: AppRadii.borderSm,
+                ),
                 child: Text(
                   'subagent',
-                  style: t.labelSmall?.copyWith(fontSize: 9, color: c.mutedForeground),
+                  style: t.labelSmall?.copyWith(
+                    fontSize: 9,
+                    color: c.mutedForeground,
+                  ),
                 ),
               ),
             if (edits > 1)
               Text(
                 'x$edits',
-                style: t.labelSmall?.copyWith(fontSize: 10, color: c.mutedForeground),
+                style: t.labelSmall?.copyWith(
+                  fontSize: 10,
+                  color: c.mutedForeground,
+                ),
               ),
           ],
         ),
@@ -529,7 +582,10 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
   }
 
   /// `.chat-messages-pane` content — the virtualized transcript column.
-  Widget _messagesList(GroupedTranscript grouped, List<SessionMessage> messages) {
+  Widget _messagesList(
+    GroupedTranscript grouped,
+    List<SessionMessage> messages,
+  ) {
     final sessionId = widget.sessionId;
     // Pane width, not window width — MediaQuery measures the whole window, so
     // in split panes the padding outgrew the tile and collapsed the column
@@ -538,7 +594,9 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
       builder: (context, constraints) {
         _viewportHeight = constraints.maxHeight;
         _scheduleFollow();
-        final anchor = !_following && _viewportHeight > 0 ? _visibleAnchor : null;
+        final anchor = !_following && _viewportHeight > 0
+            ? _visibleAnchor
+            : null;
         return NotificationListener<ScrollMetricsNotification>(
           onNotification: _onMetricsNotification,
           child: NotificationListener<ScrollNotification>(
@@ -553,12 +611,13 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
             // preventDefaults the handled keydown.)
             child: Actions(
               actions: {
-                CopySelectionTextIntent: CallbackAction<CopySelectionTextIntent>(
-                  onInvoke: (_) {
-                    unawaited(copyText(_transcriptSelection));
-                    return null;
-                  },
-                ),
+                CopySelectionTextIntent:
+                    CallbackAction<CopySelectionTextIntent>(
+                      onInvoke: (_) {
+                        unawaited(copyText(_transcriptSelection));
+                        return null;
+                      },
+                    ),
               },
               child: SelectionArea(
                 onSelectionChanged: (content) {
@@ -573,7 +632,10 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                   initialAlignment: anchor != null
                       ? 1 - anchor.$2 / _viewportHeight
                       : (_viewportHeight > 0
-                            ? (1 - _tailHeight / _viewportHeight).clamp(0.0, 1.0)
+                            ? (1 - _tailHeight / _viewportHeight).clamp(
+                                0.0,
+                                1.0,
+                              )
                             : 0),
                   // `.chat-messages-pane .mx-auto { max-width: 900px }` — the transcript
                   // keeps a reading column instead of stretching edge to edge on wide
@@ -587,7 +649,9 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                   semanticChildCount: grouped.rows.length,
                   itemBuilder: (context, i) {
                     if (i == grouped.rows.length) {
-                      return SizedBox(height: _tailHeight.clamp(0.0, _viewportHeight));
+                      return SizedBox(
+                        height: _tailHeight.clamp(0.0, _viewportHeight),
+                      );
                     }
                     final row = grouped.rows[i];
                     if (row is ToolGroup) {
@@ -624,7 +688,11 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     );
   }
 
-  Widget _toolIcon(BuildContext context, IconData icon, VoidCallback? onPressed) {
+  Widget _toolIcon(
+    BuildContext context,
+    IconData icon,
+    VoidCallback? onPressed,
+  ) {
     final m = paneHeaderMetrics(context);
     return IconButton(
       onPressed: onPressed,
@@ -661,7 +729,9 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     // instead of guessing; only a hard failure falls back to the default.
     final provider =
         _resolvedProvider ??
-        ((details?.provider?.isNotEmpty ?? false) ? details!.provider! : null) ??
+        ((details?.provider?.isNotEmpty ?? false)
+            ? details!.provider!
+            : null) ??
         messages.lastOrNull?.provider ??
         // A draft (`/chat/new`) with no session row yet falls back to the
         // provider the user picked in the new-chat dialog.
@@ -676,31 +746,40 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     final grouped = groupToolRuns(messages);
     // The header owns the search/review state; wire match jumps back to this
     // virtualized list so "next match" scrolls the transcript.
-    final toolsController = ref.read(transcriptToolsProvider(sessionId).notifier);
+    final toolsController = ref.read(
+      transcriptToolsProvider(sessionId).notifier,
+    );
     if (_toolsController != toolsController) _clearToolsCallback();
     _toolsController = toolsController;
     toolsController.onScrollToIndex = _scrollToIndex;
     // Search navigation temporarily owns the viewport without clearing the
     // user's persistent follow preference. Closing search resumes following.
-    _searchActive = ref.watch(transcriptToolsProvider(sessionId).select((s) => s.searchActive));
+    _searchActive = ref.watch(
+      transcriptToolsProvider(sessionId).select((s) => s.searchActive),
+    );
     _rowCount = grouped.rows.length;
     final hasMore = ref.watch(
       sessionMessageStoreProvider.select((s) => s[sessionId]?.hasMore ?? false),
     );
-    final total = ref.watch(sessionMessageStoreProvider.select((s) => s[sessionId]?.total ?? 0));
+    final total = ref.watch(
+      sessionMessageStoreProvider.select((s) => s[sessionId]?.total ?? 0),
+    );
 
     // T17.3 — provider assigned a real session id; swap the route so
     // subsequent deep-links/reloads land on the canonical session.
-    ref.listen(transcriptProvider(widget.sessionId).select((s) => s.replacedWith), (_, next) {
-      if (next == null || !mounted) return;
-      final query = Uri(
-        queryParameters: {
-          if (widget.projectId != null) 'projectId': widget.projectId!,
-          if (widget.projectPath != null) 'projectPath': widget.projectPath!,
-        },
-      ).query;
-      context.replace('/chat/$next${query.isEmpty ? '' : '?$query'}');
-    });
+    ref.listen(
+      transcriptProvider(widget.sessionId).select((s) => s.replacedWith),
+      (_, next) {
+        if (next == null || !mounted) return;
+        final query = Uri(
+          queryParameters: {
+            if (widget.projectId != null) 'projectId': widget.projectId!,
+            if (widget.projectPath != null) 'projectPath': widget.projectPath!,
+          },
+        ).query;
+        context.replace('/chat/$next${query.isEmpty ? '' : '?$query'}');
+      },
+    );
 
     _lastRows = grouped.rows;
 
@@ -714,7 +793,8 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     if (anchor != null && _rowCount > 0) {
       final (idx, dy, key) = anchor;
       final moved =
-          idx >= grouped.rows.length || (key != null && _rowKey(grouped.rows[idx]) != key);
+          idx >= grouped.rows.length ||
+          (key != null && _rowKey(grouped.rows[idx]) != key);
       if (moved) {
         var target = key != null ? _indexOfRowKey(grouped.rows, key) : -1;
         if (target < 0) target = idx.clamp(0, _rowCount - 1);
@@ -727,7 +807,10 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
               _viewportHeight > 0 &&
               target < _rowCount) {
             _userScrollingDown = false;
-            _itemScroll.jumpTo(index: target, alignment: 1 - dy / _viewportHeight);
+            _itemScroll.jumpTo(
+              index: target,
+              alignment: 1 - dy / _viewportHeight,
+            );
           }
         });
       }
@@ -777,14 +860,20 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                             children: [
                               TextButton.icon(
                                 icon: const Icon(Icons.history, size: 16),
-                                label: Text(i18n.chat.session.messages.loadOlder),
+                                label: Text(
+                                  i18n.chat.session.messages.loadOlder,
+                                ),
                                 onPressed: _loadOlder,
                               ),
                               // Web LoadAllMessagesOverlay — one-shot load of
                               // every remaining page, with the total count.
                               TextButton.icon(
                                 icon: const Icon(Icons.unfold_more, size: 16),
-                                label: Text(i18n.chat.session.messages.loadAllCount(count: total)),
+                                label: Text(
+                                  i18n.chat.session.messages.loadAllCount(
+                                    count: total,
+                                  ),
+                                ),
                                 onPressed: _loadAll,
                               ),
                             ],
@@ -794,7 +883,9 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                   TextButton(
                     onPressed: _loadOlder,
                     child: Text(
-                      i18n.chat.session.messages.retryLoadOlder(error: state.olderError ?? ''),
+                      i18n.chat.session.messages.retryLoadOlder(
+                        error: state.olderError ?? '',
+                      ),
                     ),
                   ),
                 Expanded(
@@ -806,7 +897,8 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                         Positioned.fill(
                           child:
                               ref.watch(
-                                transcriptToolsProvider(sessionId).select((s) => s.reviewOpen),
+                                transcriptToolsProvider(sessionId)
+                                    .select((s) => s.reviewOpen),
                               )
                               ? _reviewPanel(context)
                               : state.loading && messages.isEmpty
@@ -905,20 +997,29 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
   Widget _standaloneHeader(String provider, String? projectPath) {
     final c = context.appColors;
     final details = ref.watch(sessionDetailsProvider(widget.sessionId)).value;
-    final projectName = projectPath?.split('/').where((s) => s.isNotEmpty).lastOrNull;
+    final projectName = projectPath
+        ?.split('/')
+        .where((s) => s.isNotEmpty)
+        .lastOrNull;
     return Container(
-      constraints: BoxConstraints(minHeight: paneHeaderMetrics(context).barHeight),
+      constraints: BoxConstraints(
+        minHeight: paneHeaderMetrics(context).barHeight,
+      ),
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
       decoration: BoxDecoration(
         color: c.muted.withValues(alpha: 0.3),
-        border: Border(bottom: BorderSide(color: c.border.withValues(alpha: 0.5))),
+        border: Border(
+          bottom: BorderSide(color: c.border.withValues(alpha: 0.5)),
+        ),
       ),
       child: PaneSessionHeader(
         sessionId: widget.sessionId,
         title: details?.displayTitle ?? 'Session',
         projectName: projectName,
         provider: provider,
-        action: details?.isRunning == true ? PaneAction.processing : PaneAction.idle,
+        action: details?.isRunning == true
+            ? PaneAction.processing
+            : PaneAction.idle,
         onChangeSession: () => context.go('/sessions'),
         // "Open full session" on an orchestrator card lands here with no back
         // stack — navigate to the parent orchestration session instead.
@@ -927,7 +1028,9 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
             if (widget.projectId != null) 'projectId': widget.projectId!,
             if (widget.projectPath != null) 'projectPath': widget.projectPath!,
           };
-          context.go(Uri(path: '/chat/$targetId', queryParameters: params).toString());
+          context.go(
+            Uri(path: '/chat/$targetId', queryParameters: params).toString(),
+          );
         },
         // Parity with the web menu (SessionActionsMenu) — available on the
         // standalone route too, disabled mid-run / while awaiting permission.
@@ -942,7 +1045,9 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
   /// SessionWorkspaceDialog parity — rebind the session to another path.
   Future<void> _standaloneChangeWorkspace() async {
     final i18n = Translations.of(context);
-    final running = ref.read(sessionDetailsProvider(widget.sessionId)).value?.isRunning == true;
+    final running =
+        ref.read(sessionDetailsProvider(widget.sessionId)).value?.isRunning ==
+        true;
     if (running) {
       AppToast.error(context, i18n.chat.session.finishRunBeforeWorkspaceChange);
       return;
@@ -952,7 +1057,11 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
       context: context,
       builder: (ctx) => AppDialog(
         title: i18n.sidebar.workspace.submit,
-        content: AppInput(controller: field, autofocus: true, hint: '/path/to/project'),
+        content: AppInput(
+          controller: field,
+          autofocus: true,
+          hint: '/path/to/project',
+        ),
         actions: [
           AppButton(
             variant: AppButtonVariant.ghost,
@@ -1012,7 +1121,10 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
       AppToast.error(context, err);
       return;
     }
-    AppToast.show(context, hard ? i18n.sessions.toasts.deleted : i18n.sessions.toasts.archived);
+    AppToast.show(
+      context,
+      hard ? i18n.sessions.toasts.deleted : i18n.sessions.toasts.archived,
+    );
     context.go('/sessions');
   }
 }
@@ -1079,14 +1191,19 @@ class MessageTile extends ConsumerWidget {
           cs,
           icon: Icons.compress,
           title: i18n.chat.message.compactedSummary,
-          child: AppMarkdown(data: message.content ?? message.summary ?? '', selectable: false),
+          child: AppMarkdown(
+            data: message.content ?? message.summary ?? '',
+            selectable: false,
+          ),
         ),
       );
     }
 
     switch (message.kind) {
       case 'text':
-        return message.role == 'user' ? _userBubble(context, ref) : _assistantText(context);
+        return message.role == 'user'
+            ? _userBubble(context, ref)
+            : _assistantText(context);
       case 'stream_delta':
         return _assistantText(context, live: true);
       case 'thinking' || 'thought_delta':
@@ -1098,13 +1215,19 @@ class MessageTile extends ConsumerWidget {
         }
         return _wrap(
           _ReasoningRow(
-            label: message.kind == 'thought_delta' ? 'Thinking...' : 'Thought for a few seconds',
+            label: message.kind == 'thought_delta'
+                ? 'Thinking...'
+                : 'Thought for a few seconds',
             content: message.content ?? '',
           ),
         );
       case 'tool_use':
         return _wrap(
-          ToolUseTile(message: message, childrenMap: childrenMap, onFileOpen: onFileOpen),
+          ToolUseTile(
+            message: message,
+            childrenMap: childrenMap,
+            onFileOpen: onFileOpen,
+          ),
         );
       case 'tool_result':
         // The web transcript folds a tool's output into its own row —
@@ -1114,18 +1237,27 @@ class MessageTile extends ConsumerWidget {
       case 'status':
         final orchKind = message.context?['orchestratorKind']?.toString();
         // Empty status rows carry no text — the old transcript skips them.
-        if (orchKind == null && (message.status ?? message.content ?? '').isEmpty) {
+        if (orchKind == null &&
+            (message.status ?? message.content ?? '').isEmpty) {
           return const SizedBox.shrink();
         }
         if (orchKind != null) {
           return _wrap(
-            OrchestratorCard(message: message, sessionId: sessionId, projectId: projectId),
+            OrchestratorCard(
+              message: message,
+              sessionId: sessionId,
+              projectId: projectId,
+            ),
           );
         }
         return _wrap(
           Row(
             children: [
-              Icon(_orchestratorIcons[orchKind] ?? Icons.info_outline, size: 14, color: cs.outline),
+              Icon(
+                _orchestratorIcons[orchKind] ?? Icons.info_outline,
+                size: 14,
+                color: cs.outline,
+              ),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
@@ -1151,9 +1283,9 @@ class MessageTile extends ConsumerWidget {
               children: [
                 Text(message.content ?? message.text ?? ''),
                 TextButton(
-                  onPressed: () =>
-                      ScaffoldMessenger.of(context)
-                          .showSnackBar(SnackBar(content: Text(i18n.chat.message.resendHint))),
+                  onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(i18n.chat.message.resendHint)),
+                  ),
                   child: Text(i18n.chat.session.messages.retry),
                 ),
               ],
@@ -1169,7 +1301,9 @@ class MessageTile extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: Text(
                   'Run complete',
-                  style: theme.textTheme.labelSmall?.copyWith(color: cs.outline),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: cs.outline,
+                  ),
                 ),
               ),
               Expanded(child: Divider(color: cs.outlineVariant)),
@@ -1198,7 +1332,11 @@ class MessageTile extends ConsumerWidget {
                       for (final o in options)
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 2),
-                          child: Text(o is Map ? '${o['number'] ?? ''}. ${o['text'] ?? o}' : '$o'),
+                          child: Text(
+                            o is Map
+                                ? '${o['number'] ?? ''}. ${o['text'] ?? o}'
+                                : '$o',
+                          ),
                         ),
                     ],
                   )
@@ -1245,7 +1383,10 @@ class MessageTile extends ConsumerWidget {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
     final time = clockTime(message.timestamp);
-    final muted = t.labelSmall?.copyWith(color: c.mutedForeground, fontSize: 12);
+    final muted = t.labelSmall?.copyWith(
+      color: c.mutedForeground,
+      fontSize: 12,
+    );
     return _wrap(
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1267,9 +1408,15 @@ class MessageTile extends ConsumerWidget {
                 Text('▣', style: t.labelSmall?.copyWith(color: c.primary)),
                 Text(
                   providerLabel(message.provider),
-                  style: t.labelSmall?.copyWith(color: c.foreground, fontSize: 12),
+                  style: t.labelSmall?.copyWith(
+                    color: c.foreground,
+                    fontSize: 12,
+                  ),
                 ),
-                if (time.isNotEmpty) ...[Text('·', style: muted), Text(time, style: muted)],
+                if (time.isNotEmpty) ...[
+                  Text('·', style: muted),
+                  Text(time, style: muted),
+                ],
               ],
             ),
           ),
@@ -1312,7 +1459,8 @@ class MessageTile extends ConsumerWidget {
                     _UserBubbleAction(
                       icon: Icons.copy_outlined,
                       tooltip: i18n.chat.codeBlock.copy,
-                      onTap: () => unawaited(copyTextWithFeedback(context, content)),
+                      onTap: () =>
+                          unawaited(copyTextWithFeedback(context, content)),
                     ),
                     if (projectId != null)
                       _UserBubbleAction(
@@ -1333,7 +1481,11 @@ class MessageTile extends ConsumerWidget {
 
   /// `MessageTaskMasterControl` — the message becomes a medium-priority
   /// task: code fences stripped, title ≤ 80 chars.
-  Future<void> _saveAsTask(BuildContext context, WidgetRef ref, String content) async {
+  Future<void> _saveAsTask(
+    BuildContext context,
+    WidgetRef ref,
+    String content,
+  ) async {
     final i18n = Translations.of(context);
     final pid = projectId;
     if (pid == null) return;
@@ -1369,7 +1521,8 @@ class MessageTile extends ConsumerWidget {
     final cs = Theme.of(context).colorScheme;
     final i18n = Translations.of(context);
     final requestId = message.requestId;
-    final toolName = (message.context?['toolName'] ?? message.toolName)?.toString() ?? '';
+    final toolName =
+        (message.context?['toolName'] ?? message.toolName)?.toString() ?? '';
     final input = message.toolInput is Map
         ? Map<String, dynamic>.from(message.toolInput as Map)
         : message.context?['input'] is Map
@@ -1382,8 +1535,12 @@ class MessageTile extends ConsumerWidget {
     // Only live requests are answerable — restored/expired asks render as
     // read-only recaps so a dead ask never looks like it can be picked.
     final isPending =
-        requestId != null && ref.watch(pendingPermissionsProvider).containsKey(requestId);
+        requestId != null &&
+        ref.watch(pendingPermissionsProvider).containsKey(requestId);
     final rememberEntry = message.context?['rememberEntry']?.toString();
+    // Only Claude runs the edited input; ACP agents and OpenCode accept a bare
+    // allow/deny, so "Edit & Allow" there would approve the original call.
+    final canEditInput = message.provider == 'claude';
     // Pending questions are answered in the sticky _PermissionBanner above
     // the composer — rendering the panel inline too duplicated the ask on
     // screen. Once decided, this card reappears as the read-only recap.
@@ -1419,7 +1576,8 @@ class MessageTile extends ConsumerWidget {
               minimum: 'member',
               fallback: Text(
                 'Viewers cannot approve',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(color: cs.outline),
+                style: Theme.of(context).textTheme.bodySmall
+                    ?.copyWith(color: cs.outline),
               ),
               child: requestId == null || !isPending
                   ? _decisionRecap(cs, input, isAskUser)
@@ -1440,17 +1598,20 @@ class MessageTile extends ConsumerWidget {
                         ),
                         if (rememberEntry != null)
                           FilledButton.tonal(
-                            onPressed: () => decide(allow: true, remember: rememberEntry),
+                            onPressed: () =>
+                                decide(allow: true, remember: rememberEntry),
                             child: Text(i18n.chat.permissions.always),
                           ),
-                        TextButton(
-                          onPressed: () => _editInputDialog(context, input).then((v) {
-                            if (v != null) {
-                              decide(allow: true, updatedInput: v);
-                            }
-                          }),
-                          child: Text(i18n.chat.permissions.editAndAllow),
-                        ),
+                        if (canEditInput)
+                          TextButton(
+                            onPressed: () =>
+                                _editInputDialog(context, input).then((v) {
+                                  if (v != null) {
+                                    decide(allow: true, updatedInput: v);
+                                  }
+                                }),
+                            child: Text(i18n.chat.permissions.editAndAllow),
+                          ),
                         TextButton(
                           onPressed: () => decide(allow: false),
                           child: Text(i18n.chat.permissions.deny),
@@ -1467,9 +1628,17 @@ class MessageTile extends ConsumerWidget {
   /// Read-only state for a permission/question card whose request is no
   /// longer pending: the picked answers if we have them, otherwise an
   /// "expired" note — a dead ask must never render as tappable.
-  Widget _decisionRecap(ColorScheme cs, Map<String, dynamic> input, bool isAskUser) {
-    final questions = input['questions'] is List ? input['questions'] as List : const <dynamic>[];
-    final answers = input['answers'] is Map ? input['answers'] as Map : const <dynamic, dynamic>{};
+  Widget _decisionRecap(
+    ColorScheme cs,
+    Map<String, dynamic> input,
+    bool isAskUser,
+  ) {
+    final questions = input['questions'] is List
+        ? input['questions'] as List
+        : const <dynamic>[];
+    final answers = input['answers'] is Map
+        ? input['answers'] as Map
+        : const <dynamic, dynamic>{};
     final resolved = input['resolved'] == true;
     final muted = TextStyle(fontSize: 12, color: cs.outline);
     return Column(
@@ -1483,8 +1652,13 @@ class MessageTile extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    q['header']?.toString() ?? q['question']?.toString() ?? 'Question',
-                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                    q['header']?.toString() ??
+                        q['question']?.toString() ??
+                        'Question',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                    ),
                   ),
                   if (q['header'] != null && q['question'] != null)
                     Text(q['question'].toString(), style: muted),
@@ -1517,9 +1691,14 @@ class MessageTile extends ConsumerWidget {
     );
   }
 
-  Future<Map<String, dynamic>?> _editInputDialog(BuildContext context, Map<String, dynamic> input) {
+  Future<Map<String, dynamic>?> _editInputDialog(
+    BuildContext context,
+    Map<String, dynamic> input,
+  ) {
     final i18n = Translations.of(context);
-    final ctrl = TextEditingController(text: const JsonEncoder.withIndent('  ').convert(input));
+    final ctrl = TextEditingController(
+      text: const JsonEncoder.withIndent('  ').convert(input),
+    );
     return showDialog<Map<String, dynamic>>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -1542,10 +1721,14 @@ class MessageTile extends ConsumerWidget {
             onPressed: () {
               try {
                 final v = jsonDecode(ctrl.text);
-                Navigator.pop(ctx, v is Map ? Map<String, dynamic>.from(v) : input);
+                Navigator.pop(
+                  ctx,
+                  v is Map ? Map<String, dynamic>.from(v) : input,
+                );
               } on Object {
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text(i18n.chat.permissions.invalidJson)));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(i18n.chat.permissions.invalidJson)),
+                );
               }
             },
             child: Text(i18n.chat.permissions.allowWithChanges),
@@ -1576,7 +1759,10 @@ class MessageTile extends ConsumerWidget {
           children: [
             Icon(icon, size: 16),
             const SizedBox(width: 6),
-            Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+            Text(
+              title,
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+            ),
           ],
         ),
         const SizedBox(height: 6),
@@ -1632,20 +1818,27 @@ class _MessageActionsState extends ConsumerState<MessageActions> {
                       icon: Icon(
                         isSpeaking ? Icons.stop : Icons.volume_up_outlined,
                         size: 14,
-                        color: isSpeaking ? Theme.of(context).colorScheme.primary : null,
+                        color: isSpeaking
+                            ? Theme.of(context).colorScheme.primary
+                            : null,
                       ),
                       tooltip: isSpeaking
                           ? i18n.chat.voice.stopSpeaking
                           : i18n.chat.voice.speakMessage,
                       padding: EdgeInsets.zero,
                       iconSize: 14,
-                      constraints: const BoxConstraints(minWidth: 20, minHeight: 20),
+                      constraints: const BoxConstraints(
+                        minWidth: 20,
+                        minHeight: 20,
+                      ),
                       onPressed: () {
                         if (isSpeaking) {
                           ref.read(ttsControllerProvider.notifier).stop();
                         } else {
                           unawaited(
-                            ref.read(ttsControllerProvider.notifier).speak(message.id, textToSpeak),
+                            ref
+                                .read(ttsControllerProvider.notifier)
+                                .speak(message.id, textToSpeak),
                           );
                         }
                       },
@@ -1656,7 +1849,10 @@ class _MessageActionsState extends ConsumerState<MessageActions> {
                     iconSize: 14,
                     onSelected: (v) async {
                       if (v == 'copy') {
-                        await copyTextWithFeedback(context, message.content ?? message.text ?? '');
+                        await copyTextWithFeedback(
+                          context,
+                          message.content ?? message.text ?? '',
+                        );
                       } else if (v == 'raw' && context.mounted) {
                         await showDialog<void>(
                           context: context,
@@ -1676,7 +1872,10 @@ class _MessageActionsState extends ConsumerState<MessageActions> {
                                   'toolInput': message.toolInput,
                                   'context': message.context,
                                 }),
-                                style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+                                style: const TextStyle(
+                                  fontFamily: 'monospace',
+                                  fontSize: 12,
+                                ),
                               ),
                             ),
                             actions: [
@@ -1690,8 +1889,14 @@ class _MessageActionsState extends ConsumerState<MessageActions> {
                       }
                     },
                     itemBuilder: (context) => [
-                      PopupMenuItem(value: 'copy', child: Text(i18n.chat.codeBlock.copy)),
-                      PopupMenuItem(value: 'raw', child: Text(i18n.chat.message.rawView)),
+                      PopupMenuItem(
+                        value: 'copy',
+                        child: Text(i18n.chat.codeBlock.copy),
+                      ),
+                      PopupMenuItem(
+                        value: 'raw',
+                        child: Text(i18n.chat.message.rawView),
+                      ),
                     ],
                   ),
                 ],
@@ -1760,13 +1965,15 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
   IconData get _icon {
     final name = _name.toLowerCase();
     final mime = widget.file['mimeType']?.toString() ?? '';
-    if (mime.startsWith('text/') || RegExp(r'\.(md|txt|pdf|docx?)$').hasMatch(name)) {
+    if (mime.startsWith('text/') ||
+        RegExp(r'\.(md|txt|pdf|docx?)$').hasMatch(name)) {
       return LucideIcons.fileText;
     }
     if (RegExp(r'\.(zip|rar|7z|tar|gz)$').hasMatch(name)) {
       return LucideIcons.fileArchive;
     }
-    if (RegExp(r'\.(js|jsx|ts|tsx|py|rb|go|rs|java|c|cpp|css|html|json|ya?ml)$').hasMatch(name)) {
+    if (RegExp(r'\.(js|jsx|ts|tsx|py|rb|go|rs|java|c|cpp|css|html|json|ya?ml)$')
+        .hasMatch(name)) {
       return LucideIcons.fileCode;
     }
     return LucideIcons.file;
@@ -1793,13 +2000,17 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
       // older sessions keep attachments inside the project directory.
       Uint8List? bytes;
       try {
-        bytes = await ref.read(miscRepositoryProvider).downloadAssetFile(storedName);
+        bytes = await ref
+            .read(miscRepositoryProvider)
+            .downloadAssetFile(storedName);
       } on Object {
         bytes = null;
       }
       final projectId = widget.projectId;
       if (bytes == null && projectId != null) {
-        bytes = await ref.read(fileTreeRepositoryProvider).readFileBlob(projectId, _path);
+        bytes = await ref
+            .read(fileTreeRepositoryProvider)
+            .readFileBlob(projectId, _path);
       }
       if (bytes == null) {
         if (mounted) setState(() => _failed = true);
@@ -1811,7 +2022,10 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
         mime: widget.file['mimeType']?.toString() ?? 'application/octet-stream',
       );
       if (!mounted) return;
-      AppToast.show(context, saved == null ? '$_name downloaded' : 'Saved $saved');
+      AppToast.show(
+        context,
+        saved == null ? '$_name downloaded' : 'Saved $saved',
+      );
     } on Object {
       if (mounted) setState(() => _failed = true);
     } finally {
@@ -1858,13 +2072,19 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
                       _name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: t.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
+                      style: t.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      _failed ? 'Download failed — click to retry' : (_size ?? 'File attachment'),
+                      _failed
+                          ? 'Download failed — click to retry'
+                          : (_size ?? 'File attachment'),
                       style: t.labelSmall?.copyWith(
-                        color: _failed ? Theme.of(context).colorScheme.error : c.mutedForeground,
+                        color: _failed
+                            ? Theme.of(context).colorScheme.error
+                            : c.mutedForeground,
                       ),
                     ),
                   ],
@@ -1873,9 +2093,16 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
               _downloading
                   ? SizedBox.square(
                       dimension: 16,
-                      child: CircularProgressIndicator(strokeWidth: 1.5, color: c.mutedForeground),
+                      child: CircularProgressIndicator(
+                        strokeWidth: 1.5,
+                        color: c.mutedForeground,
+                      ),
                     )
-                  : Icon(LucideIcons.download, size: 16, color: c.mutedForeground),
+                  : Icon(
+                      LucideIcons.download,
+                      size: 16,
+                      color: c.mutedForeground,
+                    ),
             ],
           ),
         ),
@@ -1925,7 +2152,11 @@ class _ImageThumb extends StatelessWidget {
 /// (PermissionRequestsBanner.tsx parity): one row per unanswered request with
 /// Allow / Allow all / Reject, so approvals can't be scrolled past.
 class _PermissionBanner extends ConsumerWidget {
-  const _PermissionBanner({required this.sessionId, this.projectId, this.provider});
+  const _PermissionBanner({
+    required this.sessionId,
+    this.projectId,
+    this.provider,
+  });
 
   final String sessionId;
   final String? projectId;
@@ -1941,11 +2172,17 @@ class _PermissionBanner extends ConsumerWidget {
 
     void decide(PendingPermission p, {required bool allow}) => ref
         .read(transcriptProvider(sessionId).notifier)
-        .decidePermission(p.requestId, allow: allow, rememberEntry: allow ? p.rememberEntry : null);
+        .decidePermission(
+          p.requestId,
+          allow: allow,
+          rememberEntry: allow ? p.rememberEntry : null,
+        );
 
     bool isQuestion(PendingPermission p) {
       final n = p.toolName.toLowerCase().replaceAll(' ', '_');
-      return n == 'askuserquestion' || n == 'ask_user_question' || p.input['questions'] is List;
+      return n == 'askuserquestion' ||
+          n == 'ask_user_question' ||
+          p.input['questions'] is List;
     }
 
     final questions = [
@@ -1960,7 +2197,10 @@ class _PermissionBanner extends ConsumerWidget {
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.fromLTRB(8, 4, 8, 0),
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
       decoration: BoxDecoration(
         color: c.card,
         border: Border.all(color: const Color(0xFFF59E0B)),
@@ -1981,7 +2221,9 @@ class _PermissionBanner extends ConsumerWidget {
                 requestId: questions.first.requestId,
                 input: questions.first.input,
                 onDecision: (allow, updatedInput) {
-                  final notifier = ref.read(transcriptProvider(sessionId).notifier);
+                  final notifier = ref.read(
+                    transcriptProvider(sessionId).notifier,
+                  );
                   notifier.decidePermission(
                     questions.first.requestId,
                     allow: allow,
@@ -1993,7 +2235,10 @@ class _PermissionBanner extends ConsumerWidget {
                   // next turn instead, so the answer is applied right away
                   // rather than after the agent finishes guessing.
                   if (provider == 'commandcode' || provider == 'devin') {
-                    final freeText = extractQuestionFreeText(questions.first.input, updatedInput);
+                    final freeText = extractQuestionFreeText(
+                      questions.first.input,
+                      updatedInput,
+                    );
                     if (freeText.isNotEmpty) {
                       notifier.answerQuestionWithText(freeText);
                     }
@@ -2014,7 +2259,11 @@ class _PermissionBanner extends ConsumerWidget {
               padding: const EdgeInsets.only(bottom: AppSpacing.xs),
               child: Row(
                 children: [
-                  const Icon(LucideIcons.lock, size: 14, color: Color(0xFFF59E0B)),
+                  const Icon(
+                    LucideIcons.lock,
+                    size: 14,
+                    color: Color(0xFFF59E0B),
+                  ),
                   const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Text(
@@ -2052,7 +2301,9 @@ class _PermissionBanner extends ConsumerWidget {
                     decide(p, allow: true);
                   }
                 },
-                child: Text(i18n.chat.permissions.allowAll(count: permissions.length)),
+                child: Text(
+                  i18n.chat.permissions.allowAll(count: permissions.length),
+                ),
               ),
             ),
         ],
@@ -2074,7 +2325,11 @@ double _readingColumnPadding(double width) {
 /// 14px ghost action inside the user bubble footer (MessageCopyControl /
 /// MessageTaskMasterControl parity).
 class _UserBubbleAction extends StatelessWidget {
-  const _UserBubbleAction({required this.icon, required this.tooltip, required this.onTap});
+  const _UserBubbleAction({
+    required this.icon,
+    required this.tooltip,
+    required this.onTap,
+  });
 
   final IconData icon;
   final String tooltip;

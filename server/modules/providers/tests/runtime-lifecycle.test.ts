@@ -115,6 +115,24 @@ for (const [name, map, nativeId, runtimeName] of [
     assert.equal(pending[0].toolName, 'AskUserQuestion');
     assert.equal(runtime[runtimeName!].permissions.listPending('other').length, 0);
   });
+
+  test(`${name}: denying without a reject option cancels instead of picking an allow option`, async () => {
+    const runtime = await loadRuntime(name!, map!);
+    const written: string[] = [];
+    const state = { child: { stdin: { writable: true, destroyed: false, write: (line: string) => written.push(line) } } };
+    runtime.lifecycleHooks[map!].set('req-deny', {
+      appSessionId: 'app',
+      [nativeId!]: 'native',
+      acpId: 7,
+      params: { toolCall: { title: 'rm -rf build' }, options: [{ optionId: 'allow', kind: 'allow_once', name: 'Allow' }] },
+      state,
+    });
+
+    runtime[runtimeName!].permissions.resolve('req-deny', { allow: false });
+
+    assert.equal(written.length, 1);
+    assert.deepEqual(JSON.parse(written[0]).result, { outcome: { outcome: 'cancelled' } });
+  });
 }
 
 for (const [name, spawn, abort, map] of [

@@ -586,8 +586,7 @@ function resolveCommandCodePermission(requestId: any, decision: any) {
         selected = options.find((o: any) => o.kind === 'deny')
             ?? options.find((o: any) => o.kind === 'reject')
             ?? options.find((o: any) => o.kind === 'reject_once')
-            ?? options.find((o: any) => o.kind === 'reject_always')
-            ?? options[0];
+            ?? options.find((o: any) => o.kind === 'reject_always');
     } else if (decision.rememberEntry) {
         selected = options.find((o: any) => o.kind === 'allow_always')
             ?? options.find((o: any) => o.kind === 'allow')
@@ -600,12 +599,18 @@ function resolveCommandCodePermission(requestId: any, decision: any) {
             ?? options[0];
     }
 
-    if (!selected) return;
+    // A denial with no reject-type option on offer is answered as cancelled
+    // — falling back to options[0] would usually pick `allow_once`.
+    if (!selected && decision?.allow) return;
 
     const response: any = {
         jsonrpc: '2.0',
         id: pending.acpId,
-        result: { outcome: { outcome: 'selected', optionId: selected.optionId } },
+        result: {
+            outcome: selected
+                ? { outcome: 'selected', optionId: selected.optionId }
+                : { outcome: 'cancelled' },
+        },
     };
 
     if (state.child?.stdin?.writable && !state.child.stdin!.destroyed) {
