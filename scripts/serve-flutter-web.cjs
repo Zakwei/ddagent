@@ -7,7 +7,7 @@ const Database = require('better-sqlite3');
 
 const app = express();
 const PORT = process.env.FLUTTER_WEB_PORT || 8085;
-const BACKEND_PORT = 10087;
+const BACKEND_PORT = Number(process.env.FLUTTER_BACKEND_PORT || 10087);
 const WEB_DIR = path.join(__dirname, '..', 'flutter', 'build', 'web');
 
 // gzip the Flutter payload: main.dart.js is ~6.9MB and canvaskit.wasm ~7.3MB
