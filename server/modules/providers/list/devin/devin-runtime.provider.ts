@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { createInterface } from 'node:readline';
 import fs, { promises as fsAsync } from 'node:fs';
 import path from 'node:path';
@@ -1521,7 +1522,12 @@ function createDevinProcess(sessionId: any, workingDir: any, model: any, ws: any
             }
 
             if (method === 'session/request_permission') {
-                const requestId = String(msg.id);
+                // msg.id is the agent's own JSON-RPC counter — every ACP
+                // child numbers from the same start, so it is not unique
+                // across sessions. Pending asks live in one module-wide map
+                // and the client keys cards by requestId; the JSON-RPC id
+                // is kept as acpId for the reply.
+                const requestId = `devin-perm-${randomUUID()}`;
                 const acpOptions = Array.isArray(params.options) ? params.options : [];
                 devinPendingPermissions.set(requestId, {
                     acpId: msg.id,
