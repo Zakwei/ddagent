@@ -270,6 +270,23 @@ type EventStreamState = {
 // route through `providerToApp`.
 const activeRuns = new Map<string, ActiveRun>();
 const providerToApp = new Map<string, string>();
+// Child provider session (spawned by the `task` subagent tool) -> its parent
+// provider session, learned from `session.created`/`session.updated`. Only
+// asks route through it: a child's other events (its own `session.idle`,
+// text) must never drive the parent's run.
+const childToParent = new Map<string, string>();
+
+// App session that owns an ask raised in `providerSessionId` — the session
+// itself, or the nearest ancestor of a subagent child session.
+function resolveAskAppSessionId(providerSessionId: string): string | null {
+  let current: string | undefined = providerSessionId;
+  for (let depth = 0; current && depth < 8; depth += 1) {
+    const appSessionId = providerToApp.get(current);
+    if (appSessionId) return appSessionId;
+    current = childToParent.get(current);
+  }
+  return null;
+}
 const eventStreams = new Map<string, EventStreamState>();
 const pendingPermissions = new Map<string, PendingPermission>();
 // Latest UI permission mode per app session — read by the permission watcher
@@ -573,7 +590,7 @@ function handlePermissionAsked(baseUrl: string, props: AnyRecord): void {
     return;
   }
 
-  const appSessionId = providerToApp.get(providerSessionId) ?? null;
+  const appSessionId = resolveAskAppSessionId(providerSessionId);
   const run = appSessionId ? activeRuns.get(appSessionId) : undefined;
   const mode = modeForSession(appSessionId);
   const { autoApprove } = resolveOpenCodePermissionBehavior(mode);
@@ -646,7 +663,7 @@ function handleQuestionAsked(baseUrl: string, props: AnyRecord): void {
     return;
   }
 
-  const appSessionId = providerToApp.get(providerSessionId) ?? null;
+  const appSessionId = resolveAskAppSessionId(providerSessionId);
   const run = appSessionId ? activeRuns.get(appSessionId) : undefined;
   const questions = (Array.isArray(props.questions) ? props.questions : []).map(mapQuestion);
 
@@ -815,6 +832,13 @@ function dispatchServerEvent(baseUrl: string, event: AnyRecord): void {
     const data = (event.data ?? props.data ?? props) as AnyRecord;
     handleQuestionSettled({ requestID: data.requestID ?? data.id });
     return;
+  }
+
+  if (type === 'session.created' || type === 'session.updated') {
+    const info = readObjectRecord(props.info);
+    const childId = readOptionalString(info?.id);
+    const parentId = readOptionalString(info?.parentID);
+    if (childId && parentId) childToParent.set(childId, parentId);
   }
 
   const providerSessionId = String(props.sessionID ?? '');
@@ -1531,6 +1555,9 @@ function cleanupRun(run: ActiveRun): void {
   }
   if (run.providerSessionId && providerToApp.get(run.providerSessionId) === run.appSessionId) {
     providerToApp.delete(run.providerSessionId);
+  }
+  for (const [childId, parentId] of childToParent) {
+    if (parentId === run.providerSessionId) childToParent.delete(childId);
   }
   // The live mode map is keyed per session; the next run re-seeds it from
   // the send's options, so the entry must not linger between runs.

@@ -639,3 +639,33 @@ test('OpenCode: switching to bypass approves pending permissions but leaves ques
   assert.equal(pending.has('question-1'), true);
   assert.ok(requests.every((pathname) => !pathname.includes('/question/')), requests.join(', '));
 });
+
+test('OpenCode: a subagent child session ask reaches the parent run instead of being rejected', async () => {
+  const requests: string[] = [];
+  const fakeFetch = async (url: string) => {
+    requests.push(new URL(url).pathname);
+    return new Response('true', { status: 200, headers: { 'content-type': 'application/json' } });
+  };
+  const runtime = await loadRuntime('opencode', 'dispatchServerEvent, activeRuns, providerToApp, pendingPermissions', { fetch: fakeFetch });
+  const { dispatchServerEvent, activeRuns, providerToApp, pendingPermissions } = runtime.lifecycleHooks;
+  const sent: any[] = [];
+  activeRuns.set('app', {
+    appSessionId: 'app', providerSessionId: 'ses_parent', baseUrl: 'http://127.0.0.1:1', directory: '/tmp',
+    writer: { send: (message: any) => sent.push(message) },
+  });
+  providerToApp.set('ses_parent', 'app');
+
+  dispatchServerEvent('http://127.0.0.1:1', {
+    type: 'session.created',
+    properties: { sessionID: 'ses_child', info: { id: 'ses_child', parentID: 'ses_parent' } },
+  });
+  dispatchServerEvent('http://127.0.0.1:1', {
+    type: 'permission.asked',
+    properties: { id: 'per_1', sessionID: 'ses_child', permission: 'bash', patterns: ['ls'] },
+  });
+  await new Promise((resolve) => setImmediate(resolve));
+
+  assert.ok(requests.every((pathname) => !pathname.endsWith('/permissions/per_1')), requests.join(', '));
+  assert.equal(sent.filter((message) => message.kind === 'permission_request').length, 1);
+  assert.equal(pendingPermissions.size, 1);
+});
