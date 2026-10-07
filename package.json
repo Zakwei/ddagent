@@ -1,6 +1,6 @@
 {
   "name": "@ddagent-ai/ddagent",
-  "version": "0.8.10",
+  "version": "0.8.11",
   "productName": "ddagent",
   "description": "Self-hosted interface (web, desktop & mobile) for AI coding agents (Claude Code, Codex, Cursor CLI, OpenCode, Devin)",
   "type": "module",
