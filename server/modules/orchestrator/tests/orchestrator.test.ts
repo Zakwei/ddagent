@@ -15,7 +15,6 @@ import {
 } from '@/modules/orchestrator/services/orchestrator-router.service.js';
 import {
   buildPlannerPrompt,
-  classifyStepError,
   createOrchestratorExecutor,
   extractPriorSessionContext,
   hasIssuesVerdict,
@@ -30,6 +29,7 @@ import type {
   OrchestratorPlanStep,
   QuotaAccount,
 } from '@/shared/index.js';
+import { classifyStepError } from '@/shared/utils.js';
 
 /** Minimal websocket stand-in collecting JSON frames for assertions. */
 class FakeConnection {

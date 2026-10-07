@@ -1,4 +1,4 @@
-import { orchestratorMessagesDb, sessionsDb } from '@/modules/database/index.js';
+import { orchestratorMessagesDb, providerAccountsDb, sessionsDb } from '@/modules/database/index.js';
 import { createMiniOrchestratorRouter } from '@/modules/mini-orchestrator/mini-orchestrator.routes.js';
 import { createMiniOrchestratorConfigService } from '@/modules/mini-orchestrator/services/mini-orchestrator-config.service.js';
 import { createMiniOrchestratorExecutor } from '@/modules/mini-orchestrator/services/mini-orchestrator.service.js';
@@ -46,6 +46,15 @@ const delegation = createOrchestratorDelegationService({
 const executor = createMiniOrchestratorExecutor({
   getConfig: () => configService.get(),
   delegation,
+  // Automatic multi-account: every account of the step's provider is a failover
+  // target — the default login first, or the ambient environment first when no
+  // account is marked default — so a spent quota rolls to the next account.
+  listProviderAccounts: (provider) => {
+    const accounts = providerAccountsDb.list(provider);
+    if (accounts.length === 0) return [];
+    const defaultId = accounts.find((account) => account.isDefault)?.id ?? null;
+    return [defaultId, ...accounts.filter((account) => account.id !== defaultId).map((account) => account.id)];
+  },
   publish: publishEntry,
   resolveSessionCwd: (sessionId) => sessionsDb.getSessionById(sessionId)?.project_path ?? null,
 });

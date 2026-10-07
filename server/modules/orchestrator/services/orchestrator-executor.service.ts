@@ -28,7 +28,7 @@ import type {
   OrchestratorTaskType,
   RealtimeClientConnection,
 } from '@/shared/types.js';
-import { execCliFile } from '@/shared/utils.js';
+import { classifyStepError, execCliFile } from '@/shared/utils.js';
 
 export type OrchestrateInput = {
   sessionId: string;
@@ -95,22 +95,6 @@ export function resolveLanguageName(options: AnyRecord): string | null {
   const raw = typeof options.language === 'string' ? options.language.trim() : '';
   if (!raw) return null;
   return LANGUAGE_NAMES[raw] ?? LANGUAGE_NAMES[raw.split('-')[0]] ?? null;
-}
-
-/**
- * Maps a child-run error string onto its failure class — drives the
- * per-class same-lane retry budget and the lane cooldown breaker.
- * Consumed by executor + tests. Order matters: a "rate-limited, quota
- * resets in 144h" message is rate_limit even though it says quota, and a
- * 403 about billing is auth, not quota.
- */
-export function classifyStepError(error: string | null | undefined): OrchestratorFailureClass {
-  const text = error ?? '';
-  if (/rate.?limit|429|too many|throttl|resource.?exhausted/i.test(text)) return 'rate_limit';
-  if (/401|403|unauthori[sz]ed|forbidden|invalid (api.?key|token|credentials?)|token (invalid|expired)|missing access token|permission denied|not logged in/i.test(text)) return 'auth';
-  if (/quota|insufficient (balance|credits?)|billing|payment required|plan (exhausted|limit)|exceeded (the |your )?(quota|usage|monthly limit)/i.test(text)) return 'quota';
-  if (/timed? ?out|deadline exceeded|etimedout/i.test(text)) return 'timeout';
-  return 'transient';
 }
 
 /**

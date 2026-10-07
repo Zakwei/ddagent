@@ -30,6 +30,7 @@ import type {
   AppErrorOptions,
   LLMProvider,
   NormalizedMessage,
+  OrchestratorFailureClass,
   OrchestratorMessage,
   OrchestratorTaskType,
   ProviderCurrentActiveModel,
@@ -873,6 +874,24 @@ export function classifyTaskType(
     if (pattern.test(trimmed)) return type;
   }
   return 'quick';
+}
+
+/**
+ * Maps a child-run error string onto its failure class. Order matters: a
+ * "rate-limited, quota resets in 144h" message is rate_limit even though it
+ * says quota, and a 403 about billing is auth, not quota.
+ *
+ * Shared by the full orchestrator (per-class same-lane retry budget + lane
+ * cooldown breaker) and the mini orchestrator (account failover: quota/auth/
+ * rate-limit failures move to the next account before the next candidate).
+ */
+export function classifyStepError(error: string | null | undefined): OrchestratorFailureClass {
+  const text = error ?? '';
+  if (/rate.?limit|429|too many|throttl|resource.?exhausted/i.test(text)) return 'rate_limit';
+  if (/401|403|unauthori[sz]ed|forbidden|invalid (api.?key|token|credentials?)|token (invalid|expired)|missing access token|permission denied|not logged in/i.test(text)) return 'auth';
+  if (/quota|insufficient (balance|credits?)|billing|payment required|plan (exhausted|limit)|exceeded (the |your )?(quota|usage|monthly limit)/i.test(text)) return 'quota';
+  if (/timed? ?out|deadline exceeded|etimedout/i.test(text)) return 'timeout';
+  return 'transient';
 }
 
 // ---------------------------

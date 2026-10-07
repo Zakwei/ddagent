@@ -1,8 +1,9 @@
 import { orchestratorMessagesDb, sessionsDb } from '@/modules/database/index.js';
 import type { OrchestratorDelegationService } from '@/modules/orchestrator/index.js';
-import { classifyTaskType } from '@/shared/utils.js';
+import { classifyStepError, classifyTaskType } from '@/shared/utils.js';
 import type {
   AnyRecord,
+  LLMProvider,
   MiniOrchestratorConfig,
   MiniOrchestratorRole,
   OrchestratorCandidate,
@@ -168,6 +169,14 @@ function buildPlannerPrompt(content: string, maxSteps: number): string {
 export function createMiniOrchestratorExecutor(deps: {
   getConfig(): MiniOrchestratorConfig;
   delegation: OrchestratorDelegationService;
+  /**
+   * Ordered accounts to try for a provider: the default account first, or
+   * `null` (the ambient/default environment) first when no account is marked
+   * default. Consumed to fail a role's model over across all of the provider's
+   * accounts when no explicit account is configured (the default, since
+   * Settings has no account picker for the mini orchestrator).
+   */
+  listProviderAccounts?(provider: LLMProvider): Array<string | null>;
   /** Streams each appended parent-transcript row to live viewers. */
   publish?(entry: OrchestratorMessage): void;
   /** Reads the parent session's project path. */
@@ -209,6 +218,27 @@ export function createMiniOrchestratorExecutor(deps: {
   const candidatesFor = (config: MiniOrchestratorConfig, role: MiniOrchestratorRole): OrchestratorCandidate[] =>
     role === 'thinker' ? config.thinker : config.worker;
 
+  /**
+   * Ordered accounts to try for a candidate. An explicit `accountId` +
+   * `fallbackAccountIds` wins; otherwise — the default, with no account picker
+   * in Settings — every account of the candidate's provider is tried, default
+   * account first, so a spent quota rolls over to the next login automatically.
+   * `[null]` means the provider's ambient/default environment.
+   */
+  const accountsFor = (candidate: OrchestratorCandidate): Array<string | null> => {
+    if (candidate.accountId || candidate.fallbackAccountIds.length > 0) {
+      return [candidate.accountId, ...candidate.fallbackAccountIds];
+    }
+    const ids = deps.listProviderAccounts?.(candidate.provider) ?? [];
+    return ids.length > 0 ? ids : [null];
+  };
+
+  /** Failure classes that are account-specific: the next account gets the attempt. */
+  const isAccountFailure = (error: string | null): boolean => {
+    const cls = classifyStepError(error);
+    return cls === 'quota' || cls === 'auth' || cls === 'rate_limit';
+  };
+
   const resolveCwd = (sessionId: string, options: AnyRecord): string => {
     if (typeof options.cwd === 'string' && options.cwd) return options.cwd;
     return deps.resolveSessionCwd?.(sessionId) ?? sessionsDb.getSessionById(sessionId)?.project_path ?? '';
@@ -218,6 +248,7 @@ export function createMiniOrchestratorExecutor(deps: {
   async function callLane(input: {
     parentSessionId: string;
     candidate: OrchestratorCandidate;
+    accountId: string | null;
     cwd: string;
     command: string;
     permissionMode: string;
@@ -231,7 +262,7 @@ export function createMiniOrchestratorExecutor(deps: {
       provider: input.candidate.provider,
       model: input.candidate.model,
       effort: input.candidate.effort,
-      accountId: input.candidate.accountId,
+      accountId: input.accountId,
       cwd: input.cwd,
       command: input.command,
       permissionMode: input.permissionMode,
@@ -289,19 +320,29 @@ export function createMiniOrchestratorExecutor(deps: {
         rejected: config.thinker.slice(0, index).map((c) => c.id),
         alternatives: config.thinker.slice(index + 1).map((c) => c.id),
       });
-      const outcome = await callLane({
-        parentSessionId: input.sessionId,
-        candidate,
-        cwd,
-        command: prompt,
-        permissionMode,
-        timeoutMs: config.execution.stepTimeoutMs,
-        hidden: true,
-        delegationRowId: null,
-      });
-      if (!outcome.ok) continue;
-      const steps = parsePlanJson(outcome.finalText, config.execution.maxSteps, taskType);
-      if (steps.length) return { steps, source: 'thinker' };
+      const accounts = accountsFor(candidate);
+      for (let accountIndex = 0; accountIndex < accounts.length; accountIndex += 1) {
+        const outcome = await callLane({
+          parentSessionId: input.sessionId,
+          candidate,
+          accountId: accounts[accountIndex] ?? null,
+          cwd,
+          command: prompt,
+          permissionMode,
+          timeoutMs: config.execution.stepTimeoutMs,
+          hidden: true,
+          delegationRowId: null,
+        });
+        if (outcome.ok) {
+          const steps = parsePlanJson(outcome.finalText, config.execution.maxSteps, taskType);
+          if (steps.length) return { steps, source: 'thinker' };
+          break; // empty/unparseable plan — try the next thinker candidate
+        }
+        if (outcome.aborted || abortedParents.has(input.sessionId)) break;
+        // Account-specific failure rolls to the candidate's next account; any
+        // other failure moves on to the next thinker candidate.
+        if (!isAccountFailure(outcome.error) || accountIndex + 1 >= accounts.length) break;
+      }
     }
     return { steps: single(), source: 'fallback' };
   }
@@ -346,6 +387,7 @@ export function createMiniOrchestratorExecutor(deps: {
         rejected: candidates.slice(0, index).map((c) => c.id),
         alternatives: candidates.slice(index + 1).map((c) => c.id),
       });
+      const accounts = accountsFor(candidate);
       const row = append(sessionId, 'delegation', {
         stepId: step.id,
         taskType: step.type,
@@ -355,30 +397,50 @@ export function createMiniOrchestratorExecutor(deps: {
         provider: candidate.provider,
         model: candidate.model,
         effort: candidate.effort,
-        accountId: candidate.accountId,
+        accountId: accounts[0] ?? null,
         tier: candidate.tier,
         status: 'queued',
       });
 
-      const outcome = await callLane({
-        parentSessionId: sessionId,
-        candidate,
-        cwd,
-        command,
-        permissionMode,
-        timeoutMs: config.execution.stepTimeoutMs,
-        hidden: false,
-        delegationRowId: row.id,
-      });
+      for (let accountIndex = 0; accountIndex < accounts.length; accountIndex += 1) {
+        const accountId = accounts[accountIndex] ?? null;
+        if (accountIndex > 0) {
+          // Same lane, next account: reset the row so the UI shows the retry.
+          patch(row.id, { status: 'queued', accountId, error: null, errorClass: null });
+        }
+        const outcome = await callLane({
+          parentSessionId: sessionId,
+          candidate,
+          accountId,
+          cwd,
+          command,
+          permissionMode,
+          timeoutMs: config.execution.stepTimeoutMs,
+          hidden: false,
+          delegationRowId: row.id,
+        });
 
-      if (outcome.ok) {
-        return { stepId: step.id, title: step.title, status: 'done', error: null, finalText: outcome.finalText };
+        if (outcome.ok) {
+          return { stepId: step.id, title: step.title, status: 'done', error: null, finalText: outcome.finalText };
+        }
+        if (outcome.aborted || abortedParents.has(sessionId)) {
+          return { stepId: step.id, title: step.title, status: 'aborted', error: outcome.error, finalText: '' };
+        }
+        lastError = outcome.error;
+        // A spent quota / lost auth / exhausted rate limit is account-specific,
+        // so the candidate's next account gets the attempt on the same lane
+        // before the candidate itself is abandoned.
+        const failOverAccount = isAccountFailure(outcome.error) && accountIndex + 1 < accounts.length;
+        patch(row.id, {
+          status: 'failed',
+          error: outcome.error,
+          candidateId: candidate.id,
+          accountId,
+          errorClass: classifyStepError(outcome.error),
+          ...(failOverAccount ? { failoverToAccountId: accounts[accountIndex + 1] ?? null } : {}),
+        });
+        if (!failOverAccount) break;
       }
-      if (outcome.aborted || abortedParents.has(sessionId)) {
-        return { stepId: step.id, title: step.title, status: 'aborted', error: outcome.error, finalText: '' };
-      }
-      lastError = outcome.error;
-      patch(row.id, { status: 'failed', error: outcome.error, candidateId: candidate.id });
     }
     return { stepId: step.id, title: step.title, status: 'failed', error: lastError, finalText: '' };
   }
