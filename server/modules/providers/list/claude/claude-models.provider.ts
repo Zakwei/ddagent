@@ -1,4 +1,8 @@
 import { readFile } from 'node:fs/promises';
+import os from 'node:os';
+
+import { query } from '@anthropic-ai/claude-agent-sdk';
+import type { ModelInfo, SDKUserMessage } from '@anthropic-ai/claude-agent-sdk';
 
 import { sessionsDb } from '@/modules/database/index.js';
 import type { IProviderModels } from '@/shared/interfaces.js';
@@ -7,8 +11,22 @@ import type {
   ProviderModelOption,
   ProviderModelsDefinition,
 } from '@/shared/types.js';
-import { buildDefaultProviderCurrentActiveModel } from '@/shared/utils.js';
+import {
+  buildDefaultProviderCurrentActiveModel,
+  createRefreshingCache,
+  PROVIDER_MODEL_CACHE_TTL_MS,
+  providerChildEnv,
+} from '@/shared/utils.js';
+import { resolveClaudeCodeExecutablePath } from '@/shared/index.js';
 
+/**
+ * Static fallback catalog served until the live CLI catalog loads, and whenever
+ * it cannot be reached (CLI missing, logged out, probe timed out) — the same
+ * fallback role `COMMAND_CODE_PREDEFINED_MODELS` plays for Command Code.
+ *
+ * Also consumed by the Claude runtime provider to validate reasoning-effort
+ * values when no live catalog is available yet.
+ */
 export const CLAUDE_PREDEFINED_MODELS: ProviderModelsDefinition = {
   OPTIONS: [
     {
@@ -139,14 +157,6 @@ export const CLAUDE_PREDEFINED_MODELS: ProviderModelsDefinition = {
   DEFAULT: 'default',
 };
 
-export const findClaudeModelOption = (model: string | undefined | null): ProviderModelOption | null => {
-  const normalizedModel = typeof model === 'string' ? model.trim() : '';
-  if (!normalizedModel) {
-    return null;
-  }
-
-  return CLAUDE_PREDEFINED_MODELS.OPTIONS.find((option) => option.value === normalizedModel) ?? null;
-};
 type ClaudeInitEvent = {
   sessionId?: string;
   session_id?: string;
@@ -256,25 +266,145 @@ const readClaudeSessionModelFromJsonl = async (
   return null;
 };
 
+const CLAUDE_MODEL_LIST_TIMEOUT_MS = 20_000;
+
+/**
+ * Catalog id Claude Code uses for "whatever this account should run by
+ * default". It is a real selectable option, so it also makes the best
+ * `DEFAULT` when the CLI reports it.
+ */
+const CLAUDE_DEFAULT_MODEL_VALUE = 'default';
+
+/** Effort level the picker pre-selects when a model exposes several. */
+const CLAUDE_PREFERRED_EFFORT = 'high';
+
+const toClaudeModelOption = (model: ModelInfo): ProviderModelOption => {
+  const effortLevels = model.supportsEffort ? model.supportedEffortLevels ?? [] : [];
+  const option: ProviderModelOption = {
+    value: model.value,
+    label: model.displayName?.trim() || model.value,
+  };
+
+  const description = model.description?.trim();
+  if (description) {
+    option.description = description;
+  }
+
+  if (effortLevels.length > 0) {
+    option.effort = {
+      default: effortLevels.includes(CLAUDE_PREFERRED_EFFORT)
+        ? CLAUDE_PREFERRED_EFFORT
+        : effortLevels[effortLevels.length - 1],
+      values: effortLevels.map((value) => ({ value })),
+    };
+  }
+
+  return option;
+};
+
+/**
+ * Converts the CLI's `initialize` model list into the catalog shape the model
+ * picker consumes. Exported for the Claude models tests, which assert the
+ * mapping without spawning the CLI.
+ */
+export const buildClaudeModelsDefinition = (
+  models: ModelInfo[],
+): ProviderModelsDefinition | null => {
+  const options = models
+    .filter((model) => typeof model?.value === 'string' && model.value.trim().length > 0)
+    .map(toClaudeModelOption);
+
+  if (options.length === 0) {
+    return null;
+  }
+
+  const hasDefaultOption = options.some((option) => option.value === CLAUDE_DEFAULT_MODEL_VALUE);
+  return {
+    OPTIONS: options,
+    DEFAULT: hasDefaultOption ? CLAUDE_DEFAULT_MODEL_VALUE : options[0].value,
+  };
+};
+
+/**
+ * Loads the live Claude catalog from the CLI.
+ *
+ * The SDK answers `supportedModels()` straight from the control-protocol
+ * `initialize` response, so the probe runs in streaming-input mode and never
+ * yields a message: the CLI hands over the catalog without starting a turn,
+ * which is why this no longer writes a stray session transcript the way the
+ * old `prompt: 'Get supported models'` call did. `cwd` points at the temp dir
+ * so nothing is attributed to whichever workspace triggered the refresh.
+ */
+const loadClaudeModels = async (): Promise<ProviderModelsDefinition> => {
+  const abortController = new AbortController();
+  let releaseInput = (): void => {};
+  const inputClosed = new Promise<void>((resolve) => {
+    releaseInput = resolve;
+  });
+
+  async function* idleInput(): AsyncGenerator<SDKUserMessage> {
+    await inputClosed;
+  }
+
+  const queryInstance = query({
+    prompt: idleInput(),
+    options: {
+      cwd: os.tmpdir(),
+      env: providerChildEnv(),
+      pathToClaudeCodeExecutable: resolveClaudeCodeExecutablePath(process.env.CLAUDE_CLI_PATH),
+      abortController,
+    },
+  });
+
+  let timeoutHandle: NodeJS.Timeout | undefined;
+  try {
+    const models = await Promise.race([
+      queryInstance.supportedModels(),
+      new Promise<never>((_resolve, reject) => {
+        timeoutHandle = setTimeout(
+          () => reject(new Error('Claude CLI did not report its model list in time.')),
+          CLAUDE_MODEL_LIST_TIMEOUT_MS,
+        );
+      }),
+    ]);
+
+    const definition = buildClaudeModelsDefinition(models);
+    if (!definition) {
+      throw new Error('Claude CLI returned an empty model list.');
+    }
+    return definition;
+  } finally {
+    if (timeoutHandle) {
+      clearTimeout(timeoutHandle);
+    }
+    releaseInput();
+    abortController.abort();
+    try {
+      queryInstance.close();
+    } catch {
+      // The CLI may already be gone when the probe failed; nothing to tear down.
+    }
+  }
+};
+
 export class ClaudeProviderModels implements IProviderModels {
-  async getSupportedModels(): Promise<ProviderModelsDefinition> {
-    // claude creates a new jsonl file as a separate session for this request.
-    // As a result, it lists the workspace where this is invoked when it shouldn't.
-    //
-    // Disabled for now:
-    // const queryInstance = query({
-    //   prompt: 'Get supported models',
-    //   options: buildClaudeQueryOptions(),
-    // });
-    // const supportedModels = await queryInstance.supportedModels();
-    // queryInstance.close();
-    // return buildClaudeModelsDefinition(supportedModels);
-    return CLAUDE_PREDEFINED_MODELS;
+  private readonly catalogCache = createRefreshingCache(
+    loadClaudeModels,
+    PROVIDER_MODEL_CACHE_TTL_MS,
+    CLAUDE_PREDEFINED_MODELS,
+  );
+
+  async getSupportedModels(forceRefresh?: boolean): Promise<ProviderModelsDefinition> {
+    return this.catalogCache.get(forceRefresh);
   }
 
   async getCurrentActiveModel(sessionId?: string): Promise<ProviderCurrentActiveModel> {
+    const fallback = (): ProviderCurrentActiveModel => buildDefaultProviderCurrentActiveModel(
+      this.catalogCache.peek() ?? CLAUDE_PREDEFINED_MODELS,
+    );
+
     if (!sessionId?.trim()) {
-      return buildDefaultProviderCurrentActiveModel(await this.getSupportedModels());
+      return fallback();
     }
 
     try {
@@ -289,6 +419,6 @@ export class ClaudeProviderModels implements IProviderModels {
       // Fall through to the provider default when the session-backed lookup fails.
     }
 
-    return buildDefaultProviderCurrentActiveModel(await this.getSupportedModels());
+    return fallback();
   }
 }
