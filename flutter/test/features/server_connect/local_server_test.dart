@@ -48,6 +48,22 @@ void main() {
     });
   });
 
+  group('isPreservedBundleFile', () {
+    test('keeps user env config across a bundle swap', () {
+      expect(isPreservedBundleFile('.env'), isTrue);
+      expect(isPreservedBundleFile('.env.local'), isTrue);
+      expect(isPreservedBundleFile('.env.production'), isTrue);
+    });
+
+    test('ignores release-owned files and lookalikes', () {
+      expect(isPreservedBundleFile('start.sh'), isFalse);
+      expect(isPreservedBundleFile('.installed.json'), isFalse);
+      expect(isPreservedBundleFile('.envrc'), isFalse);
+      expect(isPreservedBundleFile('env'), isFalse);
+      expect(isPreservedBundleFile('dist-server'), isFalse);
+    });
+  });
+
   test('serverAssetUrl matches the release workflow naming', () {
     expect(
       serverAssetUrl('0.8.0', 'linux-x64'),

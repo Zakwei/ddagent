@@ -60,6 +60,16 @@ String serverAssetUrl(String serverVersion, String suffix) =>
     'https://github.com/Zakwei/ddagent/releases/download/'
     'v$serverVersion/ddagent-server-$serverVersion-$suffix.tar.gz';
 
+/// Bundle-root files the release tarball never ships but the local server reads
+/// as user configuration (`start.sh` even invites "Optional .env file here").
+/// A bundle update replaces the whole directory, so these are snapshotted
+/// before the swap and restored after — otherwise every update resets the
+/// user's settings to defaults.
+final RegExp preservedBundleFilePattern = RegExp(r'^\.env(\.[^/]+)?$');
+
+/// Whether [name] is a user-owned bundle file that must survive an update.
+bool isPreservedBundleFile(String name) => preservedBundleFilePattern.hasMatch(name);
+
 /// Manages an on-device ddagent server: downloads the published release
 /// tarball, finds (or downloads) a Node 22.x runtime, and spawns/stops the
 /// process. Runtime-only state — the only persistence is the extracted bundle
@@ -434,6 +444,10 @@ class LocalServerService {
     final bundle = await _bundle;
     final staging = Directory('${root.path}/server.tmp');
     final backup = Directory('${root.path}/server.old');
+    // The release tarball is code-only, so the swap would drop the user's
+    // config. Snapshot the user-owned files before any rename and write them
+    // back once the new bundle is in place.
+    final userFiles = await _snapshotUserFiles(bundle);
     // Finish an install interrupted mid-swap: staging holds the complete new
     // bundle while the live dir is missing or half-deleted.
     await _deleteDirQuietly(backup);
@@ -443,6 +457,7 @@ class LocalServerService {
       if (await bundle.exists()) await bundle.rename(backup.path);
       await staging.rename(bundle.path);
       await _deleteDirQuietly(backup);
+      await _restoreUserFiles(bundle, userFiles);
     }
     await _deleteDirQuietly(staging);
     final installed = await installedVersion;
@@ -505,6 +520,7 @@ class LocalServerService {
       if (await bundle.exists()) await bundle.rename(backup.path);
       await staging.rename(bundle.path);
       await _deleteDirQuietly(backup);
+      await _restoreUserFiles(bundle, userFiles);
       _emit(
         LocalServerStatus(stage: LocalServerStage.installing, progress: 1, version: serverVersion),
       );
@@ -642,6 +658,37 @@ class LocalServerService {
       buffer
         ..clear()
         ..write(text.substring(text.length - _stderrTailBytes));
+    }
+  }
+
+  /// Reads the user-owned files at the bundle root before a swap so they can be
+  /// written back into the freshly extracted bundle.
+  Future<Map<String, List<int>>> _snapshotUserFiles(Directory bundle) async {
+    final snapshot = <String, List<int>>{};
+    try {
+      if (!await bundle.exists()) return snapshot;
+      await for (final entity in bundle.list(followLinks: false)) {
+        if (entity is! File) continue;
+        final name = entity.uri.pathSegments.last;
+        if (!isPreservedBundleFile(name)) continue;
+        snapshot[name] = await entity.readAsBytes();
+      }
+    } on Object {
+      // Best-effort: an unreadable config must not abort the update.
+    }
+    return snapshot;
+  }
+
+  /// Restores the files captured by [_snapshotUserFiles] into the new bundle.
+  Future<void> _restoreUserFiles(Directory bundle, Map<String, List<int>> snapshot) async {
+    if (snapshot.isEmpty) return;
+    try {
+      await bundle.create(recursive: true);
+      for (final entry in snapshot.entries) {
+        await File('${bundle.path}/${entry.key}').writeAsBytes(entry.value, flush: true);
+      }
+    } on Object {
+      // Best-effort: never fail an otherwise successful update on a config restore.
     }
   }
 
