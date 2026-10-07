@@ -1,5 +1,4 @@
 import fs from 'node:fs';
-import fsp from 'node:fs/promises';
 import path from 'node:path';
 import readline from 'node:readline';
 
@@ -35,6 +34,17 @@ type ClaudeHistoryMessagesResult =
     offset?: number;
     limit?: number | null;
   };
+
+// Tool result content is a string or a list of content blocks (Agent and MCP
+// results). Text blocks are joined so the card shows the answer, not raw JSON;
+// anything else (images, unknown shapes) stays serialized.
+function claudeToolResultText(content: unknown): string {
+  if (typeof content === 'string') return content;
+  if (Array.isArray(content) && content.every((block) => block?.type === 'text')) {
+    return content.map((block) => String(block.text ?? '')).join('\n');
+  }
+  return JSON.stringify(content);
+}
 
 async function parseAgentTools(filePath: string): Promise<AnyRecord[]> {
   const tools: AnyRecord[] = [];
@@ -118,8 +128,6 @@ async function getSessionMessages(
     }
 
     const projectDir = path.dirname(jsonLPath);
-    const files = await fsp.readdir(projectDir);
-    const agentFiles = files.filter((file) => file.endsWith('.jsonl') && file.startsWith('agent-'));
 
     const messages: AnyRecord[] = [];
     const agentToolsCache = new Map<string, AnyRecord[]>();
@@ -155,11 +163,17 @@ async function getSessionMessages(
 
     for (const agentId of agentIds) {
       const agentFileName = `agent-${agentId}.jsonl`;
-      if (!agentFiles.includes(agentFileName)) {
+      // Current Claude Code writes `<session>/subagents/agent-<id>.jsonl`;
+      // older builds put `agent-<id>.jsonl` next to the session file.
+      const candidates = [
+        path.join(projectDir, providerSessionId, 'subagents', agentFileName),
+        path.join(projectDir, agentFileName),
+      ];
+      const agentFilePath = candidates.find((candidate) => fs.existsSync(candidate));
+      if (!agentFilePath) {
         continue;
       }
 
-      const agentFilePath = path.join(projectDir, agentFileName);
       const tools = await parseAgentTools(agentFilePath);
       agentToolsCache.set(agentId, tools);
     }
@@ -400,7 +414,7 @@ export class ClaudeSessionsProvider implements IProviderSessions {
               provider: PROVIDER,
               kind: 'tool_result',
               toolId: part.tool_use_id,
-              content: typeof part.content === 'string' ? part.content : JSON.stringify(part.content),
+              content: claudeToolResultText(part.content),
               isError: Boolean(part.is_error),
               subagentTools: raw.subagentTools,
               toolUseResult: raw.toolUseResult,
@@ -713,15 +727,40 @@ export class ClaudeSessionsProvider implements IProviderSessions {
         }
 
         msg.toolResult = {
-          content: typeof toolResult.content === 'string'
-            ? toolResult.content
-            : JSON.stringify(toolResult.content),
+          content: claudeToolResultText(toolResult.content),
           isError: toolResult.isError,
           toolUseResult: toolResult.toolUseResult,
         };
         msg.subagentTools = toolResult.subagentTools;
       }
     }
+
+    // The client nests rows whose parentToolUseId names a tool call under
+    // that call's subagent card — the same shape the live stream produces —
+    // so a reload shows what the subagent did, not just its final answer.
+    const withSubagentRows: NormalizedMessage[] = [];
+    for (const msg of normalized) {
+      withSubagentRows.push(msg);
+      if (msg.kind !== 'tool_use' || !msg.toolId || !Array.isArray(msg.subagentTools)) {
+        continue;
+      }
+      for (const tool of msg.subagentTools as AnyRecord[]) {
+        if (!tool?.toolId) continue;
+        withSubagentRows.push(createNormalizedMessage({
+          id: `${msg.toolId}:${tool.toolId}`,
+          sessionId,
+          timestamp: tool.timestamp || msg.timestamp,
+          provider: PROVIDER,
+          kind: 'tool_use',
+          toolName: tool.toolName,
+          toolInput: tool.toolInput,
+          toolId: tool.toolId,
+          parentToolUseId: msg.toolId,
+          ...(tool.toolResult ? { toolResult: tool.toolResult } : {}),
+        }));
+      }
+    }
+    normalized.splice(0, normalized.length, ...withSubagentRows);
 
     let total = 0;
     for (const msg of normalized) {
