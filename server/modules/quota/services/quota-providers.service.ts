@@ -81,12 +81,15 @@ function window(
   };
 }
 
-/** Normalizes a set of windows into a live-quality account shell. */
+/**
+ * Normalizes a set of windows into a live-quality account shell. The login
+ * email doubles as the ambient label; provider_accounts rows rename the label.
+ */
 function account(
   provider: string,
   providerLabel: string,
   plan: string,
-  accountLabel: string,
+  email: string,
   windows: QuotaWindow[],
 ): QuotaAccount {
   return {
@@ -95,7 +98,8 @@ function account(
     provider,
     providerLabel,
     plan,
-    accountLabel,
+    accountLabel: email,
+    accountEmail: email,
     status: windows.length > 0 ? 'active' : 'error',
     quality: 'live',
     lastSyncedAt: new Date().toISOString(),
@@ -173,9 +177,23 @@ async function fetchClaude(dependencies: QuotaProviderDependencies): Promise<Quo
     windows.push(window(label, 'weekly', limit.percent, readOptionalString(limit.resets_at) ?? null));
   }
   const plan = readOptionalString(oauth?.subscriptionType);
-  // Same field the auth provider reads for the ambient account label.
-  const label = readOptionalString(auth.email) ?? readOptionalString(auth.user) ?? '';
-  return account('claude', 'Claude Code', plan ? `Claude ${plan}` : 'Claude', label, windows);
+  // The CLI keeps the logged-in identity in `.claude.json` (inside
+  // CLAUDE_CONFIG_DIR when set, else the home directory), not in the credentials.
+  // A half-written config must not fail the quota sync, only drop the email.
+  let config: Record<string, unknown> = {};
+  try {
+    config = readAuth(
+      dependencies,
+      dependencies.env.CLAUDE_CONFIG_DIR
+        ? `${dependencies.env.CLAUDE_CONFIG_DIR}/.claude.json`
+        : `${dependencies.homeDirectory}/.claude.json`,
+    );
+  } catch {
+    config = {};
+  }
+  const email = readOptionalString(readObjectRecord(config.oauthAccount)?.emailAddress)
+    ?? readOptionalString(auth.email) ?? readOptionalString(auth.user) ?? '';
+  return account('claude', 'Claude Code', plan ? `Claude ${plan}` : 'Claude', email, windows);
 }
 
 /** Reads Codex's ChatGPT-backed subscription limits, without sending API keys to ChatGPT. */
@@ -330,19 +348,23 @@ async function fetchDevin(dependencies: QuotaProviderDependencies): Promise<Quot
     throw new Error('missing windsurf_api_key in credentials.toml');
   }
 
-  const body = Buffer.concat([fieldString(1, key), fieldVarint(2, 1)]);
-  const response = await dependencies.request(
-    'https://windsurf.com/_backend/exa.seat_management_pb.SeatManagementService/GetPlanStatus',
-    {
+  const headers = {
+    'Content-Type': 'application/proto',
+    'x-auth-token': key,
+    'x-devin-session-token': key,
+  };
+  const seatService = 'https://windsurf.com/_backend/exa.seat_management_pb.SeatManagementService';
+  const [response, userResponse] = await Promise.all([
+    dependencies.request(`${seatService}/GetPlanStatus`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/proto',
-        'x-auth-token': key,
-        'x-devin-session-token': key,
-      },
-      body,
-    },
-  );
+      headers,
+      body: Buffer.concat([fieldString(1, key), fieldVarint(2, 1)]),
+    }),
+    // Identity is cosmetic: a failed lookup only leaves the email blank.
+    dependencies
+      .request(`${seatService}/GetCurrentUser`, { method: 'POST', headers, body: fieldString(1, key) })
+      .catch(() => null),
+  ]);
   if (response.status < 200 || response.status >= 300) {
     throw new Error(`HTTP ${response.status}: ${response.text.slice(0, 160)}`);
   }
@@ -366,7 +388,11 @@ async function fetchDevin(dependencies: QuotaProviderDependencies): Promise<Quot
     toWindow('Weekly', 'weekly', varintField(status, 15), varintField(status, 18)),
   ].filter((entry): entry is QuotaWindow => entry !== null);
 
-  return account('devin', 'Devin', `Devin ${plan}`, '', windows);
+  // GetCurrentUser: user sub-message at field 1, email at its field 3.
+  const email = userResponse && userResponse.status >= 200 && userResponse.status < 300
+    ? stringField(subMessage(walkProto(userResponse.buffer), 1), 3) ?? ''
+    : '';
+  return account('devin', 'Devin', `Devin ${plan}`, email.includes('@') ? email : '', windows);
 }
 
 // ---------- OpenCode ----------
@@ -721,10 +747,13 @@ async function fetchCommandCode(dependencies: QuotaProviderDependencies): Promis
     throw new Error('missing CommandCode API key');
   }
   const headers = { Authorization: `Bearer ${key}`, 'x-api-key': key };
-  const [creditsResponse, subscriptionsResponse] = await Promise.all([
+  const [creditsResponse, subscriptionsResponse, whoamiResponse] = await Promise.all([
     dependencies.request('https://api.commandcode.ai/alpha/billing/credits', { headers }),
     dependencies
       .request('https://api.commandcode.ai/alpha/billing/subscriptions', { headers })
+      .catch(() => null),
+    dependencies
+      .request('https://api.commandcode.ai/alpha/whoami', { headers })
       .catch(() => null),
   ]);
   if (creditsResponse.status < 200 || creditsResponse.status >= 300) {
@@ -767,8 +796,19 @@ async function fetchCommandCode(dependencies: QuotaProviderDependencies): Promis
     );
   }
 
+  // whoami answers `{ user: { email } }`; identity is cosmetic, so bad JSON only blanks it.
+  let email = '';
+  if (whoamiResponse && whoamiResponse.status >= 200 && whoamiResponse.status < 300) {
+    try {
+      const whoami = readObjectRecord(JSON.parse(whoamiResponse.text));
+      email = readOptionalString(readObjectRecord(whoami?.user)?.email) ?? '';
+    } catch {
+      email = '';
+    }
+  }
+
   const planLabel = COMMANDCODE_PLAN_LABELS[planId] ?? planId;
-  return account('commandcode', 'CommandCode', `CommandCode ${planLabel}`.trim(), '', windows);
+  return account('commandcode', 'CommandCode', `CommandCode ${planLabel}`.trim(), email, windows);
 }
 
 /** Canonical English fallback label for a window kind. */
@@ -875,11 +915,12 @@ export function createQuotaProviders(
             return { ...loaded, id: row.id, accountId: row.id, accountLabel: row.label };
           } catch (error) {
             const message = error instanceof Error ? error.message : String(error);
-            const shell = account(adapter.provider, adapter.providerLabel, adapter.providerLabel, row.label, []);
+            const shell = account(adapter.provider, adapter.providerLabel, adapter.providerLabel, '', []);
             return {
               ...shell,
               id: row.id,
               accountId: row.id,
+              accountLabel: row.label,
               status: 'error' as const,
               quality: 'error' as const,
               syncError: message,

@@ -62,6 +62,7 @@ class QuotaAccount {
     this.providerLabel = '',
     this.plan = '',
     this.accountLabel = '',
+    this.accountEmail = '',
     this.status = 'unknown',
     this.quality = 'unknown',
     this.lastSyncedAt,
@@ -75,6 +76,7 @@ class QuotaAccount {
   final String providerLabel;
   final String plan;
   final String accountLabel;
+  final String accountEmail; // login email of the credentials; '' when unknown
   final String status; // active | inactive | error
   final String quality; // live | cached | estimate | unknown | error
   final String? lastSyncedAt;
@@ -88,6 +90,7 @@ class QuotaAccount {
     providerLabel: _str(j['providerLabel']),
     plan: _str(j['plan']),
     accountLabel: _str(j['accountLabel']),
+    accountEmail: _str(j['accountEmail']),
     status: _str(j['status']).isEmpty ? 'unknown' : _str(j['status']),
     quality: _str(j['quality']).isEmpty ? 'unknown' : _str(j['quality']),
     lastSyncedAt: _strOrNull(j['lastSyncedAt']),

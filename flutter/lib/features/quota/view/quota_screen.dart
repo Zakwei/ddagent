@@ -624,6 +624,12 @@ class _AccountLimitRow extends StatelessWidget {
                         text: ' · ${account.accountLabel}',
                         style: TextStyle(color: c.mutedForeground),
                       ),
+                    if (account.accountEmail.isNotEmpty &&
+                        account.accountEmail != account.accountLabel)
+                      TextSpan(
+                        text: ' · ${account.accountEmail}',
+                        style: TextStyle(color: c.mutedForeground),
+                      ),
                   ],
                 ),
                 style: t.bodySmall,

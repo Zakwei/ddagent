@@ -71,6 +71,15 @@ class _AccountQuotaCardState extends ConsumerState<AccountQuotaCard> {
                           overflow: TextOverflow.ellipsis,
                           style: t.bodySmall?.copyWith(color: c.mutedForeground),
                         ),
+                      // A renamed provider_accounts row still shows which login it uses.
+                      if (account.accountEmail.isNotEmpty &&
+                          account.accountEmail != account.accountLabel)
+                        Text(
+                          account.accountEmail,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: t.bodySmall?.copyWith(color: c.mutedForeground),
+                        ),
                     ],
                   ),
                 ),

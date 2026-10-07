@@ -89,6 +89,7 @@ const quotaAccount = (
   providerLabel: provider,
   plan: 'Pro',
   accountLabel: '',
+  accountEmail: '',
   status,
   quality: 'live',
   lastSyncedAt: null,

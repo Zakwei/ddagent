@@ -153,6 +153,19 @@ test('Devin keeps a fully used window whose remaining field proto3 omits', async
   );
 });
 
+test('Devin reads the login email from GetCurrentUser', async () => {
+  const status = encLenField(1, Buffer.concat([encVarintField(14, 60), encVarintField(17, 1_790_928_000)]));
+  const user = encLenField(1, encLenField(3, Buffer.from('devin@example.com')));
+  const providers = buildProviders(
+    { '/home/test/.local/share/devin/credentials.toml': 'windsurf_api_key = "k"' },
+    (url) => ({ status: 200, buffer: url.endsWith('/GetCurrentUser') ? user : status, text: '' }),
+  );
+
+  const devin = (await providers.loadAll()).find((account) => account.provider === 'devin')!;
+  assert.equal(devin.accountEmail, 'devin@example.com');
+  assert.equal(devin.windows.length, 1);
+});
+
 test('Devin drops a window only when both remaining and reset are absent', async () => {
   const status = Buffer.concat([encVarintField(14, 60), encVarintField(17, 1_790_928_000)]);
   const providers = buildProviders(
@@ -178,6 +191,9 @@ test('CommandCode derives the monthly window from the plan cap', async () => {
       if (url.includes('subscriptions')) {
         return httpResponse(200, JSON.stringify({ data: { planId: 'individual-pro' } }));
       }
+      if (url.endsWith('/whoami')) {
+        return httpResponse(200, JSON.stringify({ success: true, user: { email: 'cc@example.com' } }));
+      }
       return httpResponse(
         200,
         JSON.stringify({
@@ -192,6 +208,7 @@ test('CommandCode derives the monthly window from the plan cap', async () => {
   const commandcode = accounts.find((account) => account.provider === 'commandcode')!;
 
   assert.equal(commandcode.plan, 'CommandCode Pro');
+  assert.equal(commandcode.accountEmail, 'cc@example.com');
   const monthly = commandcode.windows.find((window) => window.kind === 'monthly')!;
   assert.equal(monthly.percent, 75);
   const session = commandcode.windows.find((window) => window.kind === 'session')!;
@@ -365,7 +382,10 @@ test('a provider_accounts row loads under its own env overrides as a separate ac
       env: { ...process.env, HOME: '/home/test' },
       readTextFile: (filePath) =>
         filePath === '/acc/home/.gemini/antigravity-cli/antigravity-oauth-token'
-          ? JSON.stringify({ token: { access_token: 'acc-token', expiry: '2099-01-01T00:00:00Z' } })
+          ? JSON.stringify({
+              token: { access_token: 'acc-token', expiry: '2099-01-01T00:00:00Z' },
+              id_token: `h.${Buffer.from(JSON.stringify({ email: 'work@example.com' })).toString('base64url')}.s`,
+            })
           : null,
       request: async (url) => {
         if (url.endsWith(':loadCodeAssist')) {
@@ -390,6 +410,8 @@ test('a provider_accounts row loads under its own env overrides as a separate ac
   const named = accounts.find((entry) => entry.id === 'acc-1')!;
   assert.equal(named.accountId, 'acc-1');
   assert.equal(named.accountLabel, 'Work Gmail');
+  // The row's nickname wins the label; the detected login stays visible as email.
+  assert.equal(named.accountEmail, 'work@example.com');
   assert.equal(named.provider, 'gemini');
   assert.equal(named.status, 'active');
   const ambient = accounts.find((entry) => entry.id === 'gemini')!;
@@ -443,11 +465,11 @@ test('Claude maps session, weekly and model-specific windows without inventing n
   const providers = createQuotaProviders({
     homeDirectory: '/home/test',
     env: { ...process.env, HOME: '/home/test' },
-    readTextFile: (path) => path.endsWith('/.claude/.credentials.json')
-      ? JSON.stringify({
-          email: 'claude@example.com',
-          claudeAiOauth: { accessToken: 'native-token', subscriptionType: 'max' },
-        }) : null,
+    readTextFile: (path) => path === '/home/test/.claude.json'
+      ? JSON.stringify({ oauthAccount: { emailAddress: 'claude@example.com' } })
+      : path.endsWith('/.claude/.credentials.json')
+        ? JSON.stringify({ claudeAiOauth: { accessToken: 'native-token', subscriptionType: 'max' } })
+        : null,
     request: async (url, options) => {
       assert.equal(url, 'https://api.anthropic.com/api/oauth/usage');
       assert.equal(options?.headers?.['anthropic-beta'], 'oauth-2025-04-20');
@@ -470,6 +492,7 @@ test('Claude maps session, weekly and model-specific windows without inventing n
   assert.equal(claude.plan, 'Claude max');
   assert.equal(claude.status, 'active');
   assert.equal(claude.accountLabel, 'claude@example.com');
+  assert.equal(claude.accountEmail, 'claude@example.com');
   // Scoped `limits` add new families (Fable) without duplicating seven_day_* ones.
   assert.deepEqual(claude.windows.map((w) => [w.label, w.kind, w.percent]),
     [['5h', 'session', 0], ['Weekly', 'weekly', 75], ['Sonnet · Weekly', 'weekly', 100],

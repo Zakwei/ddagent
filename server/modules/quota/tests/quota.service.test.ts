@@ -28,6 +28,7 @@ function makeAccount(patch: Partial<QuotaAccount> = {}): QuotaAccount {
     providerLabel: 'OpenCode',
     plan: 'OpenCode Go',
     accountLabel: '',
+    accountEmail: '',
     status: 'active',
     quality: 'live',
     lastSyncedAt: null,

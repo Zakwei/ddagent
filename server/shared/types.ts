@@ -2043,6 +2043,13 @@ export type QuotaAccount = {
   plan: string;
   /** Optional account nickname so two accounts of one provider can be told apart. */
   accountLabel: string;
+  /**
+   * Login email of the credentials this reading used, as reported by the
+   * provider's own auth store or identity endpoint. Empty when the provider
+   * exposes no identity (API-key-only stores) or the sync failed before it was
+   * known. Independent of `accountLabel`, which a provider_accounts row may rename.
+   */
+  accountEmail: string;
   /** `active` when the last sync worked, `inactive` when the provider reports no plan, `error` when the sync failed. */
   status: 'active' | 'inactive' | 'error';
   /** Trustworthiness of the numbers in this account. */
