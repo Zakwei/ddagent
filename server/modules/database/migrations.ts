@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+
 import { Database } from 'better-sqlite3';
 
 import {
@@ -646,6 +648,70 @@ const hideLegacyTechnicalSessions = (db: Database): void => {
   }
 };
 
+// Opening words of the internal prompts the orchestrator lanes and the session
+// titler send; a session whose first user turn starts with one is technical.
+const TECHNICAL_PROMPT_PREFIXES = [
+  'you name chat sessions',
+  'you are the supervisor',
+  'are the supervisor of',
+  'you write the final',
+  'you are a task',
+];
+
+const readFirstDevinUserTurn = (jsonlPath: string): string | null => {
+  let fd: number | null = null;
+  try {
+    fd = fs.openSync(jsonlPath, 'r');
+    const buffer = Buffer.alloc(16 * 1024);
+    const bytes = fs.readSync(fd, buffer, 0, buffer.length, 0);
+    const firstLine = buffer.toString('utf8', 0, bytes).split('\n', 1)[0];
+    const entry = JSON.parse(firstLine);
+    return entry?.role === 'user' && typeof entry.content === 'string' ? entry.content : null;
+  } catch {
+    return null;
+  } finally {
+    if (fd !== null) fs.closeSync(fd);
+  }
+};
+
+/**
+ * Re-hides technical Devin sessions whose subagent marker was lost: Devin's
+ * ACP `session_info_update` used to overwrite custom_name with its own
+ * generated title, so titler/orchestrator rows reappeared in the sidebar under
+ * a plausible name. The name no longer reveals them, so the first user turn of
+ * the ddagent-owned transcript is checked instead. Idempotent: marked rows are
+ * skipped, so re-running on every boot only reads unmarked Devin transcripts.
+ */
+const hideRenamedDevinTechnicalSessions = (db: Database): void => {
+  if (!tableExists(db, 'sessions')) {
+    return;
+  }
+
+  const rows = db
+    .prepare(
+      `SELECT session_id, custom_name, jsonl_path FROM sessions
+       WHERE provider = 'devin'
+         AND isArchived = 0
+         AND jsonl_path IS NOT NULL
+         AND (custom_name IS NULL OR custom_name NOT LIKE '%(subagent)%')`
+    )
+    .all() as { session_id: string; custom_name: string | null; jsonl_path: string }[];
+  const hide = db.prepare('UPDATE sessions SET custom_name = ? WHERE session_id = ?');
+
+  let hidden = 0;
+  for (const row of rows) {
+    const firstTurn = readFirstDevinUserTurn(row.jsonl_path)?.trimStart().toLowerCase();
+    if (firstTurn && TECHNICAL_PROMPT_PREFIXES.some((prefix) => firstTurn.startsWith(prefix))) {
+      hide.run(`${row.custom_name ?? 'Devin session'}${SUBAGENT_SESSION_MARKER}`, row.session_id);
+      hidden += 1;
+    }
+  }
+
+  if (hidden > 0) {
+    console.log(`Running migration: Hiding ${hidden} renamed Devin technical session(s)`);
+  }
+};
+
 export const runMigrations = (db: Database) => {
   try {
     const usersTableInfo = db.prepare('PRAGMA table_info(users)').all() as { name: string }[];
@@ -717,6 +783,7 @@ export const runMigrations = (db: Database) => {
     addSessionSharedContextColumn(db);
     ensureProjectsForSessionPaths(db);
     hideLegacyTechnicalSessions(db);
+    hideRenamedDevinTechnicalSessions(db);
 
     db.exec('CREATE INDEX IF NOT EXISTS idx_session_ids_lookup ON sessions(session_id)');
     db.exec('CREATE INDEX IF NOT EXISTS idx_sessions_provider_session_id ON sessions(provider_session_id)');

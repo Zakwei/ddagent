@@ -1,6 +1,11 @@
 import { getConnection } from '@/modules/database/connection.js';
 import { projectsDb } from '@/modules/database/repositories/projects.db.js';
-import { normalizeProjectPath, SUBAGENT_SESSION_SQL_FILTER } from '@/shared/utils.js';
+import {
+  isSubagentSessionTitle,
+  normalizeProjectPath,
+  SUBAGENT_SESSION_MARKER,
+  SUBAGENT_SESSION_SQL_FILTER,
+} from '@/shared/utils.js';
 
 type SessionRow = {
   session_id: string;
@@ -298,6 +303,13 @@ export const sessionsDb = {
 
   updateSessionCustomName(sessionId: string, customName: string): void {
     const db = getConnection();
+    // A hidden technical session (titler, orchestrator lane, delegated child)
+    // stays hidden when renamed: ACP providers push their own generated title
+    // (`session_info_update`), which would otherwise drop the marker and
+    // surface the row in the sidebar.
+    if (!isSubagentSessionTitle(customName) && isSubagentSessionTitle(sessionsDb.getSessionById(sessionId)?.custom_name)) {
+      customName = `${customName}${SUBAGENT_SESSION_MARKER}`;
+    }
     db.prepare(
       `UPDATE sessions
        SET custom_name = ?

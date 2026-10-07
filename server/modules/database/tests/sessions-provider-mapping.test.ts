@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdtemp, rm } from 'node:fs/promises';
+import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
@@ -187,4 +187,47 @@ test('migrations hide legacy technical sessions and leave real sessions alone', 
     assert.ok(sessionsDb.getSessionById('tech-title')?.custom_name?.endsWith(' (subagent)'));
     assert.ok(!sessionsDb.getSessionById('tech-title')?.custom_name?.includes('(subagent) (subagent)'));
   });
+});
+
+test('a provider rename keeps a hidden technical session hidden', async () => {
+  await withIsolatedDatabase(() => {
+    sessionsDb.createAppSession('tech-title', 'devin', '/workspace/demo', 'Session title (subagent)');
+    sessionsDb.createAppSession('real-session', 'devin', '/workspace/demo', 'Fix the login bug');
+
+    // Devin's ACP session_info_update pushes its own generated title.
+    sessionsDb.updateSessionCustomName('tech-title', 'Naprawa wartości kontekstu');
+    sessionsDb.updateSessionCustomName('real-session', 'Login bug fix');
+
+    assert.equal(sessionsDb.getSessionById('tech-title')?.custom_name, 'Naprawa wartości kontekstu (subagent)');
+    assert.equal(sessionsDb.getSessionById('real-session')?.custom_name, 'Login bug fix');
+  });
+});
+
+test('migrations re-hide Devin technical sessions renamed by the provider', async () => {
+  const transcriptDir = await mkdtemp(path.join(tmpdir(), 'ddagent-devin-transcripts-'));
+  try {
+    const writeTranscript = async (name: string, firstUserTurn: string) => {
+      const jsonlPath = path.join(transcriptDir, `${name}.jsonl`);
+      await writeFile(jsonlPath, `${JSON.stringify({ kind: 'text', role: 'user', content: firstUserTurn })}\n`);
+      return jsonlPath;
+    };
+    const titlerPath = await writeTranscript('titler', "You name chat sessions. Given the user's first message, reply with ONLY a short title");
+    const realPath = await writeTranscript('real', 'Fix the login bug');
+
+    await withIsolatedDatabase(() => {
+      // Lost its marker to a Devin-generated title before the rename fix.
+      sessionsDb.createSession('tech-renamed', 'devin', '/workspace/demo', 'Naprawa kontekstu', undefined, undefined, titlerPath);
+      sessionsDb.createSession('real-devin', 'devin', '/workspace/demo', 'Login bug fix', undefined, undefined, realPath);
+      sessionsDb.createSession('missing-file', 'devin', '/workspace/demo', 'Gone', undefined, undefined, path.join(transcriptDir, 'nope.jsonl'));
+
+      runMigrations(getConnection());
+      runMigrations(getConnection());
+
+      assert.equal(sessionsDb.getSessionById('tech-renamed')?.custom_name, 'Naprawa kontekstu (subagent)');
+      assert.equal(sessionsDb.getSessionById('real-devin')?.custom_name, 'Login bug fix');
+      assert.equal(sessionsDb.getSessionById('missing-file')?.custom_name, 'Gone');
+    });
+  } finally {
+    await rm(transcriptDir, { recursive: true, force: true });
+  }
 });
