@@ -56,6 +56,8 @@ const _fileTools = {
   'read_file',
   'write_file',
   'edit_file',
+  'multiedit',
+  'multi_edit',
   'create_file',
   'rename_file',
   'move_file',
@@ -66,6 +68,7 @@ const _bashTools = {
   'bash',
   'execute_command',
   'run_command',
+  'shell_command',
   'shell',
   'terminal',
 };
@@ -104,6 +107,45 @@ final _knownTools = <String>{
   'webfetch',
 };
 
+/// Tool input as a map. Some providers (Codex history) persist the input as a
+/// JSON string; decode it so renderers can read its fields. Anything else that
+/// is not a map is kept under `input`.
+Map<String, dynamic> toolInputMap(Object? raw) {
+  if (raw is Map) return Map<String, dynamic>.from(raw);
+  if (raw is String) {
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is Map) return Map<String, dynamic>.from(decoded);
+    } on FormatException {
+      // Not JSON — fall through to the wrapped form.
+    }
+  }
+  return raw != null ? {'input': raw} : <String, dynamic>{};
+}
+
+/// Diff text for string-replacement edits — Claude `Edit`/`MultiEdit`,
+/// Devin and Command Code `edit_file` (`old_string`/`new_string`, or an
+/// `edits` list of them). Null when the input has no such fields.
+String? editInputDiff(Map<String, dynamic> input) {
+  String hunk(Map<dynamic, dynamic> edit) {
+    final oldText = edit['old_string']?.toString() ?? '';
+    final newText = edit['new_string']?.toString() ?? '';
+    return [
+      if (oldText.isNotEmpty) ...oldText.split('\n').map((line) => '-$line'),
+      if (newText.isNotEmpty) ...newText.split('\n').map((line) => '+$line'),
+    ].join('\n');
+  }
+
+  if (input.containsKey('old_string') || input.containsKey('new_string')) {
+    return hunk(input);
+  }
+  final edits = input['edits'];
+  if (edits is List && edits.isNotEmpty && edits.every((edit) => edit is Map)) {
+    return edits.map((edit) => hunk(edit as Map)).join('\n\n');
+  }
+  return null;
+}
+
 /// Web `resolveToolName` — provider titles carry the action in their leading
 /// verb ("Edit file", "Wrote ./src/a.ts"); fold those onto the canonical tool
 /// so the right renderer (file card vs one-line row) is picked. Names the
@@ -125,11 +167,18 @@ String resolveToolName(String? toolName) {
 /// opencode InlineTool glyphs — `OC_TOOL_ICONS` from `OneLineDisplay.tsx`.
 /// Rendered as a 2ch accent-colored character in `.oc-tool-icon`.
 String ocToolGlyph(String toolName) => switch (_norm(toolName)) {
-  'bash' || 'execute_command' || 'run_command' || 'shell' || 'terminal' => r'$',
+  'bash' ||
+  'execute_command' ||
+  'run_command' ||
+  'shell' ||
+  'shell_command' ||
+  'terminal' => r'$',
   'glob' || 'grep' || 'search_files' => '✱',
   'read_file' || 'read' || 'askuserquestion' || 'ask_user_question' => '→',
   'write_file' ||
   'edit_file' ||
+  'multiedit' ||
+  'multi_edit' ||
   'create_file' ||
   'apply_patch' ||
   'applypatch' ||
@@ -323,26 +372,25 @@ String ocToolLabel(String? toolName) => switch (_norm(toolName)) {
   'execute_command' ||
   'run_command' ||
   'shell' ||
+  'shell_command' ||
   'terminal' => 'Bash',
   'read_file' || 'read' => 'Read',
   'write_file' || 'create_file' || 'update_file' => 'Write',
-  'edit_file' => 'Edit',
+  'edit_file' || 'multiedit' || 'multi_edit' => 'Edit',
   'apply_patch' || 'applypatch' => 'Apply Patch',
   'glob' => 'Glob',
   'grep' || 'search_files' => 'Grep',
   'list_files' => 'List',
   'web_search' || 'websearch' => 'Web Search',
   'webfetch' || 'web_fetch' => 'Web Fetch',
-  'task' || 'delegate' || 'subagent' || 'spawn_agent' => 'Task',
+  'task' || 'agent' || 'delegate' || 'subagent' || 'spawn_agent' => 'Task',
   _ => (toolName ?? 'Tools').trim(),
 };
 
 /// `getToolInputPreview` (ToolGroupContainer.tsx) — one-line input preview for
 /// the group header (command / path / pattern, in that order).
 String toolGroupPreview(SessionMessage m) {
-  final input = m.toolInput is Map
-      ? Map<String, dynamic>.from(m.toolInput as Map)
-      : <String, dynamic>{};
+  final input = toolInputMap(m.toolInput);
   final cmd = input['command'] ?? input['cmd'] ?? input['script'];
   if (cmd != null) {
     return cmd.toString().replaceAll(RegExp(r'\s+'), ' ').trim();
@@ -462,6 +510,8 @@ bool _isThinking(String kind) => kind == 'thinking' || kind == 'thought_delta';
 /// Edits are the highest-signal rows for review — web UNGROUPABLE_TOOL_NAMES.
 const _ungroupableTools = {
   'edit_file',
+  'multiedit',
+  'multi_edit',
   'write_file',
   'create_file',
   'update_file',
@@ -507,11 +557,7 @@ class ToolUseTile extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final name = message.toolName ?? 'tool';
     final n = resolveToolName(name);
-    final input = message.toolInput is Map
-        ? Map<String, dynamic>.from(message.toolInput as Map)
-        : message.toolInput != null
-        ? {'input': message.toolInput}
-        : <String, dynamic>{};
+    final input = toolInputMap(message.toolInput);
 
     switch (toolDisplayMode(name)) {
       case ToolDisplay.hidden:
@@ -695,7 +741,10 @@ class ToolUseTile extends StatelessWidget {
     Map<String, dynamic> input,
   ) {
     final path = input['path'] ?? input['file_path'] ?? input['filePath'] ?? '';
-    final diff = input['diff']?.toString() ?? input['edits']?.toString();
+    final diff =
+        editInputDiff(input) ??
+        input['diff']?.toString() ??
+        input['edits']?.toString();
     final content =
         input['content']?.toString() ?? input['new_content']?.toString();
     return _ToolRow(
@@ -720,7 +769,7 @@ class ToolUseTile extends StatelessWidget {
   String _verb(String n) => switch (n) {
     'read_file' => 'read',
     'write_file' || 'create_file' || 'update_file' => 'write',
-    'edit_file' => 'edit',
+    'edit_file' || 'multiedit' || 'multi_edit' => 'edit',
     'delete_file' => 'delete',
     'rename_file' || 'move_file' => 'move',
     _ => n,

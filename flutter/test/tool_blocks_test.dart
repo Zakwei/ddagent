@@ -244,6 +244,47 @@ void main() {
       expect(find.text('Running'), findsNothing);
     });
 
+    test('toolInputMap decodes JSON-string inputs and wraps other values', () {
+      expect(toolInputMap('{"command":"ls"}'), {'command': 'ls'});
+      expect(toolInputMap('plain text'), {'input': 'plain text'});
+      expect(toolInputMap({'path': 'a'}), {'path': 'a'});
+      expect(toolInputMap(null), isEmpty);
+    });
+
+    test('editInputDiff renders old_string/new_string and edits lists', () {
+      expect(
+        editInputDiff({'old_string': 'a\nb', 'new_string': 'c'}),
+        '-a\n-b\n+c',
+      );
+      expect(
+        editInputDiff({
+          'edits': [
+            {'old_string': 'x', 'new_string': 'y'},
+            {'old_string': '', 'new_string': 'z'},
+          ],
+        }),
+        '-x\n+y\n\n+z',
+      );
+      expect(editInputDiff({'content': 'whole file'}), isNull);
+    });
+
+    testWidgets('Command Code shell_command renders as a bash row', (
+      tester,
+    ) async {
+      final msg = _m(
+        's1',
+        'tool_use',
+        toolName: 'shell_command',
+        toolInput: {'command': 'git status', 'description': 'status'},
+        toolResult: {'content': 'clean'},
+      );
+      await tester.pumpWidget(
+        app(ToolUseTile(message: msg, childrenMap: const {})),
+      );
+      expect(find.text(r'$'), findsOneWidget);
+      expect(find.text('git status'), findsOneWidget);
+    });
+
     testWidgets(
       'Claude `Agent` call renders as a subagent with its children and result',
       (tester) async {
