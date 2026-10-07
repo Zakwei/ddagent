@@ -13,6 +13,7 @@ import {
   SCHEDULES_TABLE_SCHEMA_SQL,
   SCHEDULE_RUNS_TABLE_SCHEMA_SQL,
   SESSIONS_TABLE_SCHEMA_SQL,
+  USER_FAVORITE_MODELS_TABLE_SCHEMA_SQL,
   USER_NOTIFICATION_PREFERENCES_TABLE_SCHEMA_SQL,
   VAPID_KEYS_TABLE_SCHEMA_SQL,
 } from '@/modules/database/schema.js';
@@ -674,6 +675,12 @@ export const runMigrations = (db: Database) => {
     db.exec(`
       CREATE INDEX IF NOT EXISTS idx_provider_models_provider_order
       ON provider_models(provider, sort_order, id)
+    `);
+
+    db.exec(USER_FAVORITE_MODELS_TABLE_SCHEMA_SQL);
+    db.exec(`
+      CREATE INDEX IF NOT EXISTS idx_user_favorite_models_user_provider
+      ON user_favorite_models(user_id, provider, sort_order, id)
     `);
 
     db.exec(QUEUED_MESSAGES_TABLE_SCHEMA_SQL);

@@ -269,6 +269,8 @@ class ComposerController extends Notifier<ComposerState> {
     // Web preloads the mention pools on mount so '@' opens instantly —
     // off the critical path (its own effect, not part of the init wait).
     unawaited(_ensureMentionPools());
+    // Favorites are server-backed; load them off the critical path too.
+    unawaited(_syncFavorites());
     // Web loads each piece in its own effect — resolve them independently so
     // one failing endpoint can't blank the model label, catalog or accounts.
     // The stored `<provider>-model` rides along as `requestedModel` so an
@@ -632,11 +634,46 @@ class ComposerController extends Notifier<ComposerState> {
     unawaited(_prefs.put('chat-auto-continue-tasks', next));
   }
 
+  /// Loads favorites from the server so they survive app updates, reinstalls
+  /// and device changes. A legacy Hive set is migrated once — only when the
+  /// user has none on the server — and then dropped so it cannot be re-imported.
+  Future<void> _syncFavorites() async {
+    final repo = ref.read(sessionsRepositoryProvider);
+    final legacy = _loadStringSet(_favoritesKey);
+    try {
+      final server = await repo.favoriteModels(_arg.provider);
+      if (!ref.mounted) return;
+      if (server.isEmpty && legacy.isNotEmpty) {
+        final migrated = await repo.saveFavoriteModels(_arg.provider, legacy.toList());
+        if (!ref.mounted) return;
+        state = state.copyWith(favorites: migrated.toSet());
+      } else {
+        state = state.copyWith(favorites: server.toSet());
+      }
+      if (Hive.isBoxOpen('settings')) {
+        unawaited(Hive.box<dynamic>('settings').delete(_favoritesKey));
+      }
+    } on Object {
+      // Offline / not signed in: keep the favorites already shown from Hive.
+    }
+  }
+
   void toggleFavorite(String modelId) {
-    final next = {...state.favorites};
+    final previous = state.favorites;
+    final next = {...previous};
     next.contains(modelId) ? next.remove(modelId) : next.add(modelId);
     state = state.copyWith(favorites: next);
-    unawaited(_prefs.put(_favoritesKey, jsonEncode(next.toList())));
+    unawaited(_persistFavorites(next, previous));
+  }
+
+  /// Persists the whole set server-side; a failed write rolls the optimistic
+  /// toggle back so the star never lies about what the server holds.
+  Future<void> _persistFavorites(Set<String> next, Set<String> previous) async {
+    try {
+      await ref.read(sessionsRepositoryProvider).saveFavoriteModels(_arg.provider, next.toList());
+    } on Object {
+      if (ref.mounted) state = state.copyWith(favorites: previous);
+    }
   }
 
   void pinFile(String path) {

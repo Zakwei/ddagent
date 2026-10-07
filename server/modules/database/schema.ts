@@ -223,6 +223,27 @@ CREATE TABLE IF NOT EXISTS provider_models (
 `;
 
 /**
+ * Per-user starred model ids used by the Providers module.
+ *
+ * Favorites are scoped to a user and provider so a signed-in user's starred
+ * models survive app updates/reinstalls and sync across devices. `model_id` is
+ * the provider catalog option's `value` (a predefined or custom model id), not
+ * its human label. The parent `users` row cascades on delete.
+ */
+export const USER_FAVORITE_MODELS_TABLE_SCHEMA_SQL = `
+CREATE TABLE IF NOT EXISTS user_favorite_models (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    provider TEXT NOT NULL CHECK (provider IN ('claude', 'cursor', 'codex', 'opencode', 'devin', 'commandcode', 'antigravity')),
+    model_id TEXT NOT NULL,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, provider, model_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+`;
+
+/**
  * Persistent kanban cards for the Kanban module.
  *
  * One row is one unit of agent work shown as a board card. `status` is the
@@ -557,6 +578,10 @@ ${APP_CONFIG_TABLE_SCHEMA_SQL}
 ${PROVIDER_MODELS_TABLE_SCHEMA_SQL}
 CREATE INDEX IF NOT EXISTS idx_provider_models_provider_order
 ON provider_models(provider, sort_order, id);
+
+${USER_FAVORITE_MODELS_TABLE_SCHEMA_SQL}
+CREATE INDEX IF NOT EXISTS idx_user_favorite_models_user_provider
+ON user_favorite_models(user_id, provider, sort_order, id);
 
 ${KANBAN_CARDS_TABLE_SCHEMA_SQL}
 CREATE INDEX IF NOT EXISTS idx_kanban_cards_project_status

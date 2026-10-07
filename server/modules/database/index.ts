@@ -10,6 +10,8 @@ export { notificationPreferencesDb } from '@/modules/database/repositories/notif
 export { providerAccountsDb } from '@/modules/database/repositories/provider-accounts.db.js';
 export type { ProviderAccount } from '@/modules/database/repositories/provider-accounts.db.js';
 export { providerModelsDb } from '@/modules/database/repositories/provider-models.js';
+// favoriteModelsDb: used by Providers to persist each user's starred model ids across devices.
+export { favoriteModelsDb } from '@/modules/database/repositories/favorite-models.js';
 // kanbanCardsDb: used by the Kanban module to persist agent work cards.
 export { kanbanCardsDb } from '@/modules/database/repositories/kanban-cards.db.js';
 // quotaSnapshotsDb: used by the Quota module to persist window history for sparklines and trend alerts.

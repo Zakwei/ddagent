@@ -17,6 +17,9 @@ export {
 // providerModelsService: used by Commands to list models and resolve the active session model.
 export { providerModelsService } from './services/provider-models.service.js';
 
+// favoriteModelsService: used by the provider routes to persist each user's starred model ids.
+export { favoriteModelsService } from './services/favorite-models.service.js';
+
 export { initializeSessionsWatcher } from './services/sessions-watcher.service.js';
 export { closeSessionsWatcher } from './services/sessions-watcher.service.js';
 

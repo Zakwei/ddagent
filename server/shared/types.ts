@@ -117,6 +117,21 @@ export type CustomProviderModelRecord = {
 };
 
 /**
+ * One persisted per-user starred model row.
+ *
+ * Providers uses this shape at the database boundary for the per-user favorites
+ * store. `modelId` is the catalog option's `value` (predefined or custom), never
+ * the display label; `sortOrder` preserves the order the user starred them in.
+ */
+export type FavoriteModelRecord = {
+  id: number;
+  userId: number;
+  provider: LLMProvider;
+  modelId: string;
+  sortOrder: number;
+};
+
+/**
  * User-editable values accepted when creating or changing a custom model.
  *
  * `id` must be the exact provider-facing model identifier and cannot contain

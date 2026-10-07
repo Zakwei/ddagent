@@ -1,6 +1,7 @@
 import express, { type Request, type Response } from 'express';
 
 import { changedFilesService } from '@/modules/providers/services/changed-files.service.js';
+import { favoriteModelsService } from '@/modules/providers/services/favorite-models.service.js';
 import { providerAuthService } from '@/modules/providers/services/provider-auth.service.js';
 import { providerCapabilitiesService } from '@/modules/providers/services/provider-capabilities.service.js';
 import { providerMcpService } from '@/modules/providers/services/mcp.service.js';
@@ -23,6 +24,20 @@ import type {
 import { AppError, asyncHandler, createApiSuccessResponse } from '@/shared/utils.js';
 
 const router = express.Router();
+
+type AuthenticatedRequest = Request & { user?: { id?: number | string } };
+
+const readUserId = (req: Request): number => {
+  const id = Number((req as AuthenticatedRequest).user?.id);
+  if (!Number.isInteger(id) || id < 1) {
+    throw new AppError('Authentication required.', {
+      code: 'UNAUTHENTICATED',
+      statusCode: 401,
+    });
+  }
+
+  return id;
+};
 
 const readPathParam = (value: unknown, name: string): string => {
   if (typeof value === 'string') {
@@ -583,6 +598,53 @@ const parseCustomProviderModelPayload = (payload: unknown): CustomProviderModelI
   return { model, id };
 };
 
+const parseFavoriteModelIds = (payload: unknown): string[] => {
+  if (!payload || typeof payload !== 'object') {
+    throw new AppError('Request body must be an object.', {
+      code: 'INVALID_REQUEST_BODY',
+      statusCode: 400,
+    });
+  }
+
+  const raw = (payload as Record<string, unknown>).modelIds;
+  if (!Array.isArray(raw)) {
+    throw new AppError('modelIds must be an array.', {
+      code: 'INVALID_MODEL_IDS',
+      statusCode: 400,
+    });
+  }
+  if (raw.length > 200) {
+    throw new AppError('At most 200 favorite models are allowed.', {
+      code: 'TOO_MANY_FAVORITE_MODELS',
+      statusCode: 400,
+    });
+  }
+
+  const modelIds: string[] = [];
+  const seen = new Set<string>();
+  for (const entry of raw) {
+    if (typeof entry !== 'string') {
+      throw new AppError('Each model id must be a string.', {
+        code: 'INVALID_MODEL_IDS',
+        statusCode: 400,
+      });
+    }
+    const modelId = entry.trim();
+    if (modelId.length === 0 || modelId.length > 200 || /\s/.test(modelId)) {
+      throw new AppError('Each model id must be 1-200 characters and cannot contain whitespace.', {
+        code: 'INVALID_MODEL_IDS',
+        statusCode: 400,
+      });
+    }
+    if (!seen.has(modelId)) {
+      seen.add(modelId);
+      modelIds.push(modelId);
+    }
+  }
+
+  return modelIds;
+};
+
 router.get(
   '/:provider/auth/status',
   asyncHandler(async (req: Request, res: Response) => {
@@ -641,6 +703,30 @@ router.delete(
     const recordId = parseModelRecordId(req.params.recordId);
     const result = await providerModelsService.deleteCustomModel(provider, recordId);
     res.json(createApiSuccessResponse({ provider, ...result }));
+  }),
+);
+
+/**
+ * Per-user starred model ids for one provider. Favorites live on the server so
+ * they survive app updates, reinstalls and device changes; the client sends the
+ * full set on save, so a toggle is one idempotent replace.
+ */
+router.get(
+  '/:provider/favorite-models',
+  asyncHandler(async (req: Request, res: Response) => {
+    const provider = parseProvider(req.params.provider);
+    const modelIds = favoriteModelsService.listFavoriteModels(readUserId(req), provider);
+    res.json(createApiSuccessResponse({ provider, modelIds }));
+  }),
+);
+
+router.put(
+  '/:provider/favorite-models',
+  asyncHandler(async (req: Request, res: Response) => {
+    const provider = parseProvider(req.params.provider);
+    const modelIds = parseFavoriteModelIds(req.body);
+    const saved = favoriteModelsService.replaceFavoriteModels(readUserId(req), provider, modelIds);
+    res.json(createApiSuccessResponse({ provider, modelIds: saved }));
   }),
 );
 

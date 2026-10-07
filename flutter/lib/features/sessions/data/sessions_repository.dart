@@ -231,6 +231,22 @@ class SessionsRepository {
     (d) => d as Map<String, dynamic>,
   );
 
+  /// Per-user starred model ids for a provider. Favorites are server-backed so
+  /// they survive app updates, reinstalls and device changes instead of living
+  /// only in local storage.
+  Future<List<String>> favoriteModels(String provider) => apiCall(
+    () => _dio.get<dynamic>('/api/providers/$provider/favorite-models'),
+    (d) => [for (final id in (d as Map<String, dynamic>)['modelIds'] as List? ?? const []) '$id'],
+  );
+
+  /// Replaces the whole favorite set for a provider — one idempotent write per
+  /// toggle, so a stale add/remove pair cannot race on the server.
+  Future<List<String>> saveFavoriteModels(String provider, List<String> modelIds) => apiCall(
+    () =>
+        _dio.put<dynamic>('/api/providers/$provider/favorite-models', data: {'modelIds': modelIds}),
+    (d) => [for (final id in (d as Map<String, dynamic>)['modelIds'] as List? ?? const []) '$id'],
+  );
+
   /// `requestedModel` is the client's effective default — the server folds it
   /// into the resolution so an un-pinned session reports it back (as
   /// `source: 'session'`) instead of the catalog `DEFAULT`.
