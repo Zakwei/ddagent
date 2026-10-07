@@ -6,6 +6,8 @@ import 'package:ddagent_app/core/widgets/app_spinner.dart';
 import 'package:ddagent_app/features/mini_orchestrator/data/mini_orchestrator_config.dart';
 import 'package:ddagent_app/features/mini_orchestrator/state/mini_orchestrator_config_controller.dart';
 import 'package:ddagent_app/features/orchestrator/data/orchestrator_config.dart';
+import 'package:ddagent_app/features/orchestrator/state/model_catalog_provider.dart';
+import 'package:ddagent_app/features/orchestrator/view/model_select.dart';
 import 'package:ddagent_app/features/settings/view/sections/settings_section_layout.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
@@ -44,6 +46,8 @@ class MiniOrchestrationSection extends ConsumerWidget {
     final ctrl = ref.read(miniOrchestratorConfigProvider.notifier);
     final mi = t.settings.miniOrchestration;
     final orch = t.settings.orchestration;
+    final catalog =
+        ref.watch(modelCatalogProvider).asData?.value ?? const <String, List<OrchModelOption>>{};
 
     if (state.loading) {
       return Center(
@@ -84,6 +88,13 @@ class MiniOrchestrationSection extends ConsumerWidget {
       );
     }
 
+    final thinker = draft.thinker.isNotEmpty
+        ? draft.thinker.first
+        : const OrchCandidate(id: 'thinker', provider: 'devin', model: '');
+    final worker = draft.worker.isNotEmpty
+        ? draft.worker.first
+        : const OrchCandidate(id: 'worker', provider: 'devin', model: '');
+
     return Column(
       children: [
         Expanded(
@@ -112,18 +123,16 @@ class MiniOrchestrationSection extends ConsumerWidget {
               _RoleEditor(
                 title: mi.thinker.title,
                 description: mi.thinker.description,
-                candidate: draft.thinker.isNotEmpty
-                    ? draft.thinker.first
-                    : const OrchCandidate(id: 'thinker', provider: 'devin', model: ''),
+                candidate: thinker,
+                modelOptions: catalog[thinker.provider] ?? const [],
                 onChanged: (cand) => ctrl.update((d) => d.copyWith(thinker: [cand])),
               ),
               const SizedBox(height: AppSpacing.lg),
               _RoleEditor(
                 title: mi.worker.title,
                 description: mi.worker.description,
-                candidate: draft.worker.isNotEmpty
-                    ? draft.worker.first
-                    : const OrchCandidate(id: 'worker', provider: 'devin', model: ''),
+                candidate: worker,
+                modelOptions: catalog[worker.provider] ?? const [],
                 onChanged: (cand) => ctrl.update((d) => d.copyWith(worker: [cand])),
               ),
               const SizedBox(height: AppSpacing.xl),
@@ -144,39 +153,20 @@ class MiniOrchestrationSection extends ConsumerWidget {
 }
 
 /// One role's provider + model + tier editor.
-class _RoleEditor extends StatefulWidget {
+class _RoleEditor extends StatelessWidget {
   const _RoleEditor({
     required this.title,
     required this.description,
     required this.candidate,
+    required this.modelOptions,
     required this.onChanged,
   });
 
   final String title;
   final String description;
   final OrchCandidate candidate;
+  final List<OrchModelOption> modelOptions;
   final ValueChanged<OrchCandidate> onChanged;
-
-  @override
-  State<_RoleEditor> createState() => _RoleEditorState();
-}
-
-class _RoleEditorState extends State<_RoleEditor> {
-  late final TextEditingController _model = TextEditingController(text: widget.candidate.model);
-
-  @override
-  void didUpdateWidget(covariant _RoleEditor oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.candidate.model != _model.text) {
-      _model.text = widget.candidate.model;
-    }
-  }
-
-  @override
-  void dispose() {
-    _model.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -184,10 +174,10 @@ class _RoleEditorState extends State<_RoleEditor> {
     final mi = t.settings.miniOrchestration;
     final c = context.appColors;
     final tt = Theme.of(context).textTheme;
-    final cand = widget.candidate;
+    final cand = candidate;
     return SettingsSectionBlock(
-      title: widget.title,
-      description: widget.description,
+      title: title,
+      description: description,
       children: [
         _Card(
           children: [
@@ -203,20 +193,17 @@ class _RoleEditorState extends State<_RoleEditor> {
                 ],
                 onChanged: (provider) {
                   if (provider == null) return;
-                  widget.onChanged(cand.copyWith(provider: provider));
+                  onChanged(cand.copyWith(provider: provider, model: ''));
                 },
               ),
             ),
             SettingsRow(
               label: mi.fields.model,
-              child: TextField(
-                controller: _model,
-                decoration: InputDecoration(
-                  isDense: true,
-                  hintText: mi.fields.modelPlaceholder,
-                  border: const OutlineInputBorder(),
-                ),
-                onChanged: (value) => widget.onChanged(cand.copyWith(model: value.trim())),
+              child: ModelSelect(
+                value: cand.model,
+                options: modelOptions,
+                hint: mi.fields.modelPlaceholder,
+                onChanged: (model) => onChanged(cand.copyWith(model: model)),
               ),
             ),
             SettingsRow(
@@ -231,7 +218,7 @@ class _RoleEditorState extends State<_RoleEditor> {
                 ],
                 onChanged: (tier) {
                   if (tier == null) return;
-                  widget.onChanged(cand.copyWith(tier: tier));
+                  onChanged(cand.copyWith(tier: tier));
                 },
               ),
             ),

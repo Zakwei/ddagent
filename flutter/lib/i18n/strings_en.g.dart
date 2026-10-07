@@ -10624,8 +10624,8 @@ class Translations$settings$miniOrchestration$fields$en {
 	/// en: 'Model'
 	String get model => 'Model';
 
-	/// en: 'Model id'
-	String get modelPlaceholder => 'Model id';
+	/// en: 'Select a model'
+	String get modelPlaceholder => 'Select a model';
 
 	/// en: 'Tier'
 	String get tier => 'Tier';
@@ -14969,7 +14969,7 @@ extension on Translations {
 			'settings.miniOrchestration.worker.description' => 'Executes each planned step.',
 			'settings.miniOrchestration.fields.provider' => 'Provider',
 			'settings.miniOrchestration.fields.model' => 'Model',
-			'settings.miniOrchestration.fields.modelPlaceholder' => 'Model id',
+			'settings.miniOrchestration.fields.modelPlaceholder' => 'Select a model',
 			'settings.miniOrchestration.fields.tier' => 'Tier',
 			'settings.miniOrchestration.roles.title' => 'Per-task model',
 			'settings.miniOrchestration.roles.description' => 'Which model (role) handles each task type.',

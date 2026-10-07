@@ -1828,7 +1828,7 @@
       "fields": {
         "provider": "Provider",
         "model": "Model",
-        "modelPlaceholder": "Model id",
+        "modelPlaceholder": "Select a model",
         "tier": "Tier"
       },
       "roles": {

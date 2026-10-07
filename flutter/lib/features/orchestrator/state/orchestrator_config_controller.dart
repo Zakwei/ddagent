@@ -5,7 +5,6 @@ import 'package:ddagent_app/core/network/api_error.dart';
 import 'package:ddagent_app/core/network/api_providers.dart';
 import 'package:ddagent_app/features/orchestrator/data/orchestrator_config.dart';
 import 'package:ddagent_app/features/orchestrator/data/orchestrator_repository.dart';
-import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// State for Settings → Orchestration — port of `useOrchestratorConfig.ts`:
@@ -20,7 +19,6 @@ class OrchestratorConfigState {
     this.saving = false,
     this.error,
     this.savedNotice = false,
-    this.modelCatalog = const {},
   });
 
   /// Edited copy shown in the UI — null until the first load lands.
@@ -33,9 +31,6 @@ class OrchestratorConfigState {
   final bool saving;
   final String? error;
   final bool savedNotice;
-
-  /// provider → selectable models (`/api/providers/{p}/models` OPTIONS).
-  final Map<String, List<OrchModelOption>> modelCatalog;
 
   /// Web parity: `JSON.stringify(config) !== JSON.stringify(savedConfig)`.
   bool get dirty {
@@ -53,7 +48,6 @@ class OrchestratorConfigState {
     bool? saving,
     String? Function()? error,
     bool? savedNotice,
-    Map<String, List<OrchModelOption>>? modelCatalog,
   }) => OrchestratorConfigState(
     draft: draft != null ? draft() : this.draft,
     saved: saved != null ? saved() : this.saved,
@@ -62,7 +56,6 @@ class OrchestratorConfigState {
     saving: saving ?? this.saving,
     error: error != null ? error() : this.error,
     savedNotice: savedNotice ?? this.savedNotice,
-    modelCatalog: modelCatalog ?? this.modelCatalog,
   );
 }
 
@@ -72,7 +65,6 @@ class OrchestratorConfigController extends Notifier<OrchestratorConfigState> {
   @override
   OrchestratorConfigState build() {
     unawaited(Future.microtask(load));
-    unawaited(Future.microtask(_loadModelCatalog));
     return const OrchestratorConfigState();
   }
 
@@ -97,24 +89,6 @@ class OrchestratorConfigController extends Notifier<OrchestratorConfigState> {
         state = state.copyWith(loading: false, loadFailed: true);
       }
     }
-  }
-
-  /// Model catalogs are best-effort: a provider that fails to answer just
-  /// gets a free-text fallback in the row instead of blocking the section.
-  Future<void> _loadModelCatalog() async {
-    final repo = ref.read(sessionsRepositoryProvider);
-    final entries = await Future.wait(
-      orchProviders.keys.map((provider) async {
-        try {
-          final res = await repo.models(provider);
-          return MapEntry(provider, [for (final m in res.options) OrchModelOption.fromJson(m)]);
-        } on Object {
-          return MapEntry(provider, const <OrchModelOption>[]);
-        }
-      }),
-    );
-    if (!ref.mounted) return;
-    state = state.copyWith(modelCatalog: Map.fromEntries(entries));
   }
 
   /// Applies [recipe] to the draft — the only mutation path, mirroring the
