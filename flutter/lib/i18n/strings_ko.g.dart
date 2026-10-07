@@ -2170,6 +2170,8 @@ class Translations$common$update$ko extends Translations$common$update$en {
 	@override String get manualRestart => '업데이트가 적용되었지만 서버가 자동으로 재시작되지 않았습니다 — 마무리하려면 수동으로 재시작하세요.';
 	@override String get failed => '업데이트 실패.';
 	@override String get failedTitle => '업데이트 실패';
+	@override String appConfirm({required Object version}) => '이 기기에 ddagent v${version}을(를) 설치할까요? 처음에는 Android가 ddagent의 앱 설치를 허용할지 물습니다.';
+	@override String get appPermission => 'ddagent에 \'알 수 없는 앱 설치\'를 허용한 뒤 업데이트를 다시 누르세요.';
 }
 
 // Path: settings.changelog
@@ -8272,6 +8274,8 @@ extension on TranslationsKo {
 			'common.update.manualRestart' => '업데이트가 적용되었지만 서버가 자동으로 재시작되지 않았습니다 — 마무리하려면 수동으로 재시작하세요.',
 			'common.update.failed' => '업데이트 실패.',
 			'common.update.failedTitle' => '업데이트 실패',
+			'common.update.appConfirm' => ({required Object version}) => '이 기기에 ddagent v${version}을(를) 설치할까요? 처음에는 Android가 ddagent의 앱 설치를 허용할지 물습니다.',
+			'common.update.appPermission' => 'ddagent에 \'알 수 없는 앱 설치\'를 허용한 뒤 업데이트를 다시 누르세요.',
 			'settings.title' => '설정',
 			'settings.changelog.title' => '변경 로그',
 			'settings.changelog.loading' => '로딩 중…',
@@ -8665,10 +8669,10 @@ extension on TranslationsKo {
 			'settings.permissions.blockedCommands.empty' => '설정된 차단 명령어 없음',
 			'settings.permissions.toolExamples.title' => '도구 패턴 예시:',
 			'settings.permissions.toolExamples.bashGitLog' => '- 모든 git log 명령어 허용',
-			'settings.permissions.toolExamples.bashGitDiff' => '- 모든 git diff 명령어 허용',
-			'settings.permissions.toolExamples.write' => '- 모든 Write 도구 사용 허용',
 			_ => null,
 		} ?? switch (path) {
+			'settings.permissions.toolExamples.bashGitDiff' => '- 모든 git diff 명령어 허용',
+			'settings.permissions.toolExamples.write' => '- 모든 Write 도구 사용 허용',
 			'settings.permissions.toolExamples.bashRm' => '- 모든 rm 명령어 차단 (위험)',
 			'settings.permissions.shellExamples.title' => 'Shell 명령어 예시:',
 			'settings.permissions.shellExamples.ls' => '- ls 명령어 허용',
@@ -9179,10 +9183,10 @@ extension on TranslationsKo {
 			'tasks.nextTask.feature2' => '- PRD 기반 작업 생성으로 프로젝트 빠른 시작.',
 			'tasks.nextTask.feature3' => '- 일상 작업을 위한 칸반 및 목록 보기.',
 			'tasks.nextTask.hideDetails' => '세부 정보 숨기기',
-			'tasks.nextTask.initialize' => '초기화',
-			'tasks.nextTask.noPending' => '대기 중인 작업 없음',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.nextTask.initialize' => '초기화',
+			'tasks.nextTask.noPending' => '대기 중인 작업 없음',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI가 구성되지 않았습니다',
 			'tasks.nextTask.review' => '검토',
 			'tasks.nextTask.startTask' => '작업 시작',

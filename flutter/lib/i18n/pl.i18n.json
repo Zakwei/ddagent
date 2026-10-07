@@ -1622,7 +1622,9 @@
       "done": "Zaktualizowano do v{{version}}. Przeładuj aplikację, aby wczytać nowy pakiet.",
       "manualRestart": "Aktualizacja została zastosowana, ale serwer nie uruchomił się ponownie sam — uruchom go ręcznie, aby dokończyć.",
       "failed": "Aktualizacja nie powiodła się.",
-      "failedTitle": "Aktualizacja nie powiodła się"
+      "failedTitle": "Aktualizacja nie powiodła się",
+      "appConfirm": "Zainstalować ddagent v{{version}} na tym urządzeniu? Android za pierwszym razem zapyta o zgodę na instalowanie aplikacji z ddagent.",
+      "appPermission": "Zezwól ddagent na „Instalowanie nieznanych aplikacji”, a potem dotknij ponownie Aktualizuj."
     }
   },
   "settings": {

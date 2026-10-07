@@ -1491,7 +1491,9 @@
       "done": "Auf v{{version}} aktualisiert. Lade die App neu, um das neue Bundle zu übernehmen.",
       "manualRestart": "Das Update wurde angewendet, aber der Server hat nicht von selbst neu gestartet — starte ihn manuell neu, um abzuschließen.",
       "failed": "Update fehlgeschlagen.",
-      "failedTitle": "Update fehlgeschlagen"
+      "failedTitle": "Update fehlgeschlagen",
+      "appConfirm": "ddagent v{{version}} auf diesem Gerät installieren? Android fragt beim ersten Mal, ob Installationen aus ddagent erlaubt sind.",
+      "appPermission": "Erlaube ddagent „Unbekannte Apps installieren“ und tippe dann erneut auf Aktualisieren."
     }
   },
   "settings": {

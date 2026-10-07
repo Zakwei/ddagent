@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Paths the in-app updater exposes through FileProvider. The downloaded
+     release APK lands in <cache>/updates before it is handed to the system
+     package installer. -->
+<paths>
+    <cache-path name="updates" path="updates/" />
+</paths>

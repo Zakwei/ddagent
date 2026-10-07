@@ -12,10 +12,14 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Port of `UpdateBadge.tsx` — an emerald rail button (or drawer row) shown
-/// only when GitHub has a newer release than the running server. Clicking it
-/// offers to run `POST /api/system/update`; under systemd the server exits and
-/// the watchdog brings it back, so the dialog polls `/health` for the new
-/// version.
+/// when GitHub has a newer release. Two independent cases feed it:
+///
+/// * the connected server is behind — the dialog runs
+///   `POST /api/system/update` and polls `/health` for the new version
+///   (under systemd the server exits and the watchdog brings it back);
+/// * this app is behind on Android — the dialog downloads the release APK and
+///   hands it to the system installer, which is the only way a sideloaded
+///   build can replace itself.
 class UpdateBadge extends ConsumerWidget {
   const UpdateBadge({super.key, this.variant = UpdateBadgeVariant.icon});
 
@@ -29,7 +33,11 @@ class UpdateBadge extends ConsumerWidget {
     final profiles = ref.watch(serverProfilesProvider);
     final active = profiles.profiles.where((p) => p.url == profiles.activeUrl).firstOrNull;
     if (active?.isLocal ?? false) return const SizedBox.shrink();
-    if (!ref.watch(updateAvailableProvider)) return const SizedBox.shrink();
+    // The server falling behind applies everywhere; an app update only exists
+    // where the client can install its own APK (Android).
+    if (!ref.watch(updateAvailableProvider) && !ref.watch(appUpdateAvailableProvider)) {
+      return const SizedBox.shrink();
+    }
     final t = Translations.of(context);
     final version = normalizeVersion(ref.watch(latestReleaseProvider).value!.tagName);
     final label = t.common.update.available(version: version);
@@ -126,7 +134,7 @@ class UpdateDialog extends ConsumerStatefulWidget {
   ConsumerState<UpdateDialog> createState() => _UpdateDialogState();
 }
 
-enum _Status { confirm, updating, restarting, done, manualRestart, failed }
+enum _Status { confirm, updating, restarting, done, manualRestart, failed, permission }
 
 class _UpdateDialogState extends ConsumerState<UpdateDialog> {
   static const _pollInterval = Duration(seconds: 2);
@@ -134,6 +142,7 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
 
   _Status _status = _Status.confirm;
   String _error = '';
+  double _progress = 0;
   Timer? _poller;
 
   @override
@@ -143,6 +152,12 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
   }
 
   Future<void> _runUpdate() async {
+    // Android can install a newer APK of this app itself; every other case is
+    // the connected server updating itself.
+    final asset = ref.read(appUpdateAssetProvider);
+    if (asset != null && ref.read(appUpdateAvailableProvider)) {
+      return _runAppUpdate(asset);
+    }
     final repo = ref.read(systemRepositoryProvider);
     setState(() {
       _status = _Status.updating;
@@ -162,6 +177,47 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
     if (!mounted) return;
     setState(() => _status = _Status.restarting);
     _pollForVersion(repo);
+  }
+
+  /// Downloads the release APK and hands it to the Android installer. Android
+  /// refuses to install for an app lacking the "install unknown apps" grant, so
+  /// that case routes the user to the system setting instead of failing.
+  Future<void> _runAppUpdate(ReleaseAsset asset) async {
+    final installer = ref.read(appUpdateInstallerProvider);
+    final t = Translations.of(context);
+    setState(() {
+      _status = _Status.updating;
+      _error = '';
+      _progress = 0;
+    });
+    try {
+      if (!await installer.canInstallPackages()) {
+        await installer.openInstallPermissionSettings();
+        if (mounted) {
+          setState(() {
+            _status = _Status.permission;
+            _error = t.common.update.appPermission;
+          });
+        }
+        return;
+      }
+      await installer.downloadAndInstall(
+        asset,
+        onProgress: (progress) {
+          if (mounted) setState(() => _progress = progress);
+        },
+      );
+    } on Exception catch (e) {
+      if (mounted) {
+        setState(() {
+          _status = _Status.failed;
+          _error = e.toString();
+        });
+      }
+      return;
+    }
+    // The system installer now owns the screen; nothing left to show here.
+    if (mounted) Navigator.of(context).pop();
   }
 
   /// `/health` poll until the restarted process reports the new version —
@@ -201,12 +257,19 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
     final busy = _status == _Status.updating || _status == _Status.restarting;
 
     final body = switch (_status) {
-      _Status.confirm => t.common.update.confirm(version: version),
-      _Status.updating => t.common.update.downloading,
+      _Status.confirm =>
+        ref.watch(appUpdateAvailableProvider)
+            ? t.common.update.appConfirm(version: version)
+            : t.common.update.confirm(version: version),
+      _Status.updating =>
+        _progress > 0
+            ? '${t.common.update.downloading} ${(_progress * 100).round()}%'
+            : t.common.update.downloading,
       _Status.restarting => t.common.update.restarting,
       _Status.done => t.common.update.done(version: version),
       _Status.manualRestart => t.common.update.manualRestart,
       _Status.failed => _error.isNotEmpty ? _error : t.common.update.failed,
+      _Status.permission => _error.isNotEmpty ? _error : t.common.update.failed,
     };
 
     return AlertDialog(
@@ -252,6 +315,7 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
           children: [
             if (_status == _Status.confirm ||
                 _status == _Status.failed ||
+                _status == _Status.permission ||
                 _status == _Status.manualRestart ||
                 _status == _Status.done)
               AppButton(
@@ -263,7 +327,7 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
               const SizedBox(width: 12),
               AppButton(onPressed: _runUpdate, child: Text(t.common.buttons.update)),
             ],
-            if (_status == _Status.failed) ...[
+            if (_status == _Status.failed || _status == _Status.permission) ...[
               const SizedBox(width: 12),
               AppButton(onPressed: _runUpdate, child: Text(t.chat.session.messages.retry)),
             ],

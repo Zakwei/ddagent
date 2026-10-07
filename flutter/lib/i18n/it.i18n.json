@@ -1491,7 +1491,9 @@
       "done": "Aggiornato alla v{{version}}. Ricarica l'app per applicare il nuovo bundle.",
       "manualRestart": "L'aggiornamento è stato applicato, ma il server non si è riavviato da solo — riavvialo manualmente per completare.",
       "failed": "Aggiornamento non riuscito.",
-      "failedTitle": "Aggiornamento non riuscito"
+      "failedTitle": "Aggiornamento non riuscito",
+      "appConfirm": "Installare ddagent v{{version}} su questo dispositivo? Android chiederà il permesso di installare app da ddagent la prima volta.",
+      "appPermission": "Consenti «Installa app sconosciute» per ddagent, poi tocca di nuovo Aggiorna."
     }
   },
   "settings": {

@@ -1491,7 +1491,9 @@
       "done": "已更新到 v{{version}}。重新加载应用以载入新的应用包。",
       "manualRestart": "更新已应用，但服务器未自动重启 — 请手动重启以完成。",
       "failed": "更新失败。",
-      "failedTitle": "更新失败"
+      "failedTitle": "更新失败",
+      "appConfirm": "要在此设备上安装 ddagent v{{version}} 吗？首次安装时 Android 会请求允许从 ddagent 安装应用。",
+      "appPermission": "请为 ddagent 允许“安装未知应用”，然后再次点击更新。"
     }
   },
   "settings": {

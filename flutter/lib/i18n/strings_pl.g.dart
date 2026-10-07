@@ -2236,6 +2236,8 @@ class Translations$common$update$pl extends Translations$common$update$en {
 	@override String get manualRestart => 'Aktualizacja została zastosowana, ale serwer nie uruchomił się ponownie sam — uruchom go ręcznie, aby dokończyć.';
 	@override String get failed => 'Aktualizacja nie powiodła się.';
 	@override String get failedTitle => 'Aktualizacja nie powiodła się';
+	@override String appConfirm({required Object version}) => 'Zainstalować ddagent v${version} na tym urządzeniu? Android za pierwszym razem zapyta o zgodę na instalowanie aplikacji z ddagent.';
+	@override String get appPermission => 'Zezwól ddagent na „Instalowanie nieznanych aplikacji”, a potem dotknij ponownie Aktualizuj.';
 }
 
 // Path: settings.changelog
@@ -8795,6 +8797,8 @@ extension on TranslationsPl {
 			'common.update.manualRestart' => 'Aktualizacja została zastosowana, ale serwer nie uruchomił się ponownie sam — uruchom go ręcznie, aby dokończyć.',
 			'common.update.failed' => 'Aktualizacja nie powiodła się.',
 			'common.update.failedTitle' => 'Aktualizacja nie powiodła się',
+			'common.update.appConfirm' => ({required Object version}) => 'Zainstalować ddagent v${version} na tym urządzeniu? Android za pierwszym razem zapyta o zgodę na instalowanie aplikacji z ddagent.',
+			'common.update.appPermission' => 'Zezwól ddagent na „Instalowanie nieznanych aplikacji”, a potem dotknij ponownie Aktualizuj.',
 			'settings.title' => 'Ustawienia',
 			'settings.changelog.title' => 'Dziennik zmian',
 			'settings.changelog.loading' => 'Ładowanie…',
@@ -9084,10 +9088,10 @@ extension on TranslationsPl {
 			'settings.git.email.help' => 'Twój e-mail do commitów Git',
 			'settings.git.email.placeholder' => 'john@example.com',
 			'settings.git.actions.save' => 'Zapisz konfigurację',
-			'settings.git.actions.saving' => 'Zapisywanie...',
-			'settings.git.status.success' => 'Zapisano pomyślnie',
 			_ => null,
 		} ?? switch (path) {
+			'settings.git.actions.saving' => 'Zapisywanie...',
+			'settings.git.status.success' => 'Zapisano pomyślnie',
 			'settings.git.status.error' => 'Nie udało się zapisać',
 			'settings.apiKeys.title' => 'Klucze API',
 			'settings.apiKeys.description' => 'Generuj klucze API, aby uzyskiwać dostęp do zewnętrznego API z innych aplikacji.',
@@ -9598,10 +9602,10 @@ extension on TranslationsPl {
 			'sidebar.zones.recent' => 'Ostatnio używane',
 			'sidebar.zones.today' => 'Dzisiaj',
 			'sidebar.zones.yesterday' => 'Wczoraj',
-			'sidebar.zones.thisWeek' => 'W tym tygodniu',
-			'sidebar.zones.showMore' => ({required Object count}) => 'Pokaż jeszcze ${count}',
 			_ => null,
 		} ?? switch (path) {
+			'sidebar.zones.thisWeek' => 'W tym tygodniu',
+			'sidebar.zones.showMore' => ({required Object count}) => 'Pokaż jeszcze ${count}',
 			'sidebar.zones.showLess' => 'Pokaż mniej',
 			'sidebar.tabs.board' => 'Tablica agentów',
 			'sidebar.tabs.files' => 'Pliki',
@@ -10112,10 +10116,10 @@ extension on TranslationsPl {
 			'quota.section.config' => 'Konfiguracja',
 			'scheduler.checking' => 'Sprawdzanie…',
 			'scheduler.cronHint' => 'Cron (min godz dzień mies dzień-tyg) — np. 0 9 * * *',
-			'scheduler.deleteMessage' => ({required Object id}) => 'Spowoduje to usunięcie zadania cyklicznego ${id}. Istniejące sesje zostaną zachowane.',
-			'scheduler.deleteTitle' => 'Usunąć harmonogram?',
 			_ => null,
 		} ?? switch (path) {
+			'scheduler.deleteMessage' => ({required Object id}) => 'Spowoduje to usunięcie zadania cyklicznego ${id}. Istniejące sesje zostaną zachowane.',
+			'scheduler.deleteTitle' => 'Usunąć harmonogram?',
 			'scheduler.editTitle' => 'Edytuj harmonogram',
 			'scheduler.newLabel' => 'Nowy',
 			'scheduler.nextIn' => ({required Object time}) => 'następne za ${time}',

@@ -1659,7 +1659,9 @@
       "done": "Updated to v{{version}}. Reload the app to pick up the new bundle.",
       "manualRestart": "The update was applied but the server did not restart on its own — restart it manually to finish.",
       "failed": "Update failed.",
-      "failedTitle": "Update failed"
+      "failedTitle": "Update failed",
+      "appConfirm": "Install ddagent v{{version}} on this device? Android will ask you to allow installs from ddagent the first time.",
+      "appPermission": "Allow “Install unknown apps” for ddagent, then tap Update again."
     }
   },
   "settings": {

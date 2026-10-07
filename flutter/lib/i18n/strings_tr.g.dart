@@ -2170,6 +2170,8 @@ class Translations$common$update$tr extends Translations$common$update$en {
 	@override String get manualRestart => 'Güncelleme uygulandı ancak sunucu kendiliğinden yeniden başlamadı — tamamlamak için elle yeniden başlat.';
 	@override String get failed => 'Güncelleme başarısız oldu.';
 	@override String get failedTitle => 'Güncelleme başarısız';
+	@override String appConfirm({required Object version}) => 'ddagent v${version} bu cihaza kurulsun mu? Android ilk seferde ddagent\'tan yüklemeye izin vermenizi ister.';
+	@override String get appPermission => 'ddagent için “Bilinmeyen uygulamaları yükle” iznini verin, sonra tekrar Güncelle\'ye dokunun.';
 }
 
 // Path: settings.changelog
@@ -8272,6 +8274,8 @@ extension on TranslationsTr {
 			'common.update.manualRestart' => 'Güncelleme uygulandı ancak sunucu kendiliğinden yeniden başlamadı — tamamlamak için elle yeniden başlat.',
 			'common.update.failed' => 'Güncelleme başarısız oldu.',
 			'common.update.failedTitle' => 'Güncelleme başarısız',
+			'common.update.appConfirm' => ({required Object version}) => 'ddagent v${version} bu cihaza kurulsun mu? Android ilk seferde ddagent\'tan yüklemeye izin vermenizi ister.',
+			'common.update.appPermission' => 'ddagent için “Bilinmeyen uygulamaları yükle” iznini verin, sonra tekrar Güncelle\'ye dokunun.',
 			'settings.title' => 'Ayarlar',
 			'settings.changelog.title' => 'Değişiklik günlüğü',
 			'settings.changelog.loading' => 'Yükleniyor…',
@@ -8665,10 +8669,10 @@ extension on TranslationsTr {
 			'settings.permissions.blockedCommands.empty' => 'Engellenen komut yapılandırılmamış',
 			'settings.permissions.toolExamples.title' => 'Araç Desen Örnekleri:',
 			'settings.permissions.toolExamples.bashGitLog' => '- Tüm git log komutlarına izin ver',
-			'settings.permissions.toolExamples.bashGitDiff' => '- Tüm git diff komutlarına izin ver',
-			'settings.permissions.toolExamples.write' => '- Tüm Write aracı kullanımına izin ver',
 			_ => null,
 		} ?? switch (path) {
+			'settings.permissions.toolExamples.bashGitDiff' => '- Tüm git diff komutlarına izin ver',
+			'settings.permissions.toolExamples.write' => '- Tüm Write aracı kullanımına izin ver',
 			'settings.permissions.toolExamples.bashRm' => '- Tüm rm komutlarını engelle (tehlikeli)',
 			'settings.permissions.shellExamples.title' => 'Shell Komut Örnekleri:',
 			'settings.permissions.shellExamples.ls' => '- ls komutuna izin ver',
@@ -9179,10 +9183,10 @@ extension on TranslationsTr {
 			'tasks.nextTask.feature2' => '- Daha hızlı proje başlangıcı için PRD tabanlı görev oluşturma.',
 			'tasks.nextTask.feature3' => '- Günlük işler için kanban ve liste görünümleri.',
 			'tasks.nextTask.hideDetails' => 'Ayrıntıları gizle',
-			'tasks.nextTask.initialize' => 'Başlat',
-			'tasks.nextTask.noPending' => 'Bekleyen görev yok',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.nextTask.initialize' => 'Başlat',
+			'tasks.nextTask.noPending' => 'Bekleyen görev yok',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI yapılandırılmamış',
 			'tasks.nextTask.review' => 'İncele',
 			'tasks.nextTask.startTask' => 'Görevi Başlat',

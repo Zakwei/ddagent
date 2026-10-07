@@ -1491,7 +1491,9 @@
       "done": "Actualizado a la v{{version}}. Recarga la app para cargar el nuevo paquete.",
       "manualRestart": "La actualización se aplicó, pero el servidor no se reinició solo — reinícialo manualmente para terminar.",
       "failed": "La actualización falló.",
-      "failedTitle": "La actualización falló"
+      "failedTitle": "La actualización falló",
+      "appConfirm": "¿Instalar ddagent v{{version}} en este dispositivo? Android te pedirá permiso para instalar apps desde ddagent la primera vez.",
+      "appPermission": "Permite «Instalar apps desconocidas» para ddagent y vuelve a pulsar Actualizar."
     }
   },
   "settings": {

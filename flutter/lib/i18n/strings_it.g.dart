@@ -2170,6 +2170,8 @@ class Translations$common$update$it extends Translations$common$update$en {
 	@override String get manualRestart => 'L\'aggiornamento è stato applicato, ma il server non si è riavviato da solo — riavvialo manualmente per completare.';
 	@override String get failed => 'Aggiornamento non riuscito.';
 	@override String get failedTitle => 'Aggiornamento non riuscito';
+	@override String appConfirm({required Object version}) => 'Installare ddagent v${version} su questo dispositivo? Android chiederà il permesso di installare app da ddagent la prima volta.';
+	@override String get appPermission => 'Consenti «Installa app sconosciute» per ddagent, poi tocca di nuovo Aggiorna.';
 }
 
 // Path: settings.changelog
@@ -8272,6 +8274,8 @@ extension on TranslationsIt {
 			'common.update.manualRestart' => 'L\'aggiornamento è stato applicato, ma il server non si è riavviato da solo — riavvialo manualmente per completare.',
 			'common.update.failed' => 'Aggiornamento non riuscito.',
 			'common.update.failedTitle' => 'Aggiornamento non riuscito',
+			'common.update.appConfirm' => ({required Object version}) => 'Installare ddagent v${version} su questo dispositivo? Android chiederà il permesso di installare app da ddagent la prima volta.',
+			'common.update.appPermission' => 'Consenti «Installa app sconosciute» per ddagent, poi tocca di nuovo Aggiorna.',
 			'settings.title' => 'Impostazioni',
 			'settings.changelog.title' => 'Registro delle modifiche',
 			'settings.changelog.loading' => 'Caricamento…',
@@ -8665,10 +8669,10 @@ extension on TranslationsIt {
 			'settings.permissions.blockedCommands.empty' => 'Nessun comando bloccato configurato',
 			'settings.permissions.toolExamples.title' => 'Esempi pattern strumenti:',
 			'settings.permissions.toolExamples.bashGitLog' => '- Consenti tutti i comandi git log',
-			'settings.permissions.toolExamples.bashGitDiff' => '- Consenti tutti i comandi git diff',
-			'settings.permissions.toolExamples.write' => '- Consenti tutti gli utilizzi dello strumento Write',
 			_ => null,
 		} ?? switch (path) {
+			'settings.permissions.toolExamples.bashGitDiff' => '- Consenti tutti i comandi git diff',
+			'settings.permissions.toolExamples.write' => '- Consenti tutti gli utilizzi dello strumento Write',
 			'settings.permissions.toolExamples.bashRm' => '- Blocca tutti i comandi rm (pericoloso)',
 			'settings.permissions.shellExamples.title' => 'Esempi comandi shell:',
 			'settings.permissions.shellExamples.ls' => '- Consenti comando ls',
@@ -9179,10 +9183,10 @@ extension on TranslationsIt {
 			'tasks.nextTask.feature2' => '- Generazione attività da PRD per un avvio più rapido.',
 			'tasks.nextTask.feature3' => '- Viste kanban e lista per il lavoro quotidiano.',
 			'tasks.nextTask.hideDetails' => 'Nascondi dettagli',
-			'tasks.nextTask.initialize' => 'Inizializza',
-			'tasks.nextTask.noPending' => 'Nessuna attività in sospeso',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.nextTask.initialize' => 'Inizializza',
+			'tasks.nextTask.noPending' => 'Nessuna attività in sospeso',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI non è configurato',
 			'tasks.nextTask.review' => 'Revisiona',
 			'tasks.nextTask.startTask' => 'Avvia attività',

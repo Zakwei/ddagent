@@ -15,9 +15,20 @@ abstract class Release with _$Release {
     String? body,
     String? publishedAt,
     String? htmlUrl,
+    @Default(<ReleaseAsset>[]) List<ReleaseAsset> assets,
   }) = _Release;
 
   factory Release.fromJson(Map<String, dynamic> json) => _$ReleaseFromJson(json);
+}
+
+/// One downloadable file attached to a release. The Android client looks for
+/// the `.apk` asset to install a newer build of itself.
+@freezed
+abstract class ReleaseAsset with _$ReleaseAsset {
+  const factory ReleaseAsset({required String name, required String downloadUrl, int? size}) =
+      _ReleaseAsset;
+
+  factory ReleaseAsset.fromJson(Map<String, dynamic> json) => _$ReleaseAssetFromJson(json);
 }
 
 /// /api/system — releases feed, self-update, restart.

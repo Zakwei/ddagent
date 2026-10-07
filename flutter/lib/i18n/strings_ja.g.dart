@@ -2170,6 +2170,8 @@ class Translations$common$update$ja extends Translations$common$update$en {
 	@override String get manualRestart => '更新は適用されましたが、サーバーは自動で再起動しませんでした — 手動で再起動して完了してください。';
 	@override String get failed => '更新に失敗しました。';
 	@override String get failedTitle => '更新に失敗しました';
+	@override String appConfirm({required Object version}) => 'この端末に ddagent v${version} をインストールしますか？ 初回は Android が ddagent からのインストール許可を求めます。';
+	@override String get appPermission => 'ddagent に「提供元不明のアプリ」のインストールを許可してから、もう一度「更新」をタップしてください。';
 }
 
 // Path: settings.changelog
@@ -8272,6 +8274,8 @@ extension on TranslationsJa {
 			'common.update.manualRestart' => '更新は適用されましたが、サーバーは自動で再起動しませんでした — 手動で再起動して完了してください。',
 			'common.update.failed' => '更新に失敗しました。',
 			'common.update.failedTitle' => '更新に失敗しました',
+			'common.update.appConfirm' => ({required Object version}) => 'この端末に ddagent v${version} をインストールしますか？ 初回は Android が ddagent からのインストール許可を求めます。',
+			'common.update.appPermission' => 'ddagent に「提供元不明のアプリ」のインストールを許可してから、もう一度「更新」をタップしてください。',
 			'settings.title' => '設定',
 			'settings.changelog.title' => '変更履歴',
 			'settings.changelog.loading' => '読み込み中…',
@@ -8665,10 +8669,10 @@ extension on TranslationsJa {
 			'settings.permissions.blockedCommands.empty' => 'ブロックされたコマンドはありません',
 			'settings.permissions.toolExamples.title' => 'ツールパターンの例:',
 			'settings.permissions.toolExamples.bashGitLog' => '- すべてのgit logコマンドを許可',
-			'settings.permissions.toolExamples.bashGitDiff' => '- すべてのgit diffコマンドを許可',
-			'settings.permissions.toolExamples.write' => '- すべてのWriteツールの使用を許可',
 			_ => null,
 		} ?? switch (path) {
+			'settings.permissions.toolExamples.bashGitDiff' => '- すべてのgit diffコマンドを許可',
+			'settings.permissions.toolExamples.write' => '- すべてのWriteツールの使用を許可',
 			'settings.permissions.toolExamples.bashRm' => '- すべてのrmコマンドをブロック（危険）',
 			'settings.permissions.shellExamples.title' => 'シェルコマンドの例:',
 			'settings.permissions.shellExamples.ls' => '- lsコマンドを許可',
@@ -9179,10 +9183,10 @@ extension on TranslationsJa {
 			'tasks.nextTask.feature2' => '- PRD駆動のタスク生成でプロジェクトを迅速に開始。',
 			'tasks.nextTask.feature3' => '- 日常作業向けのカンバンとリストビュー。',
 			'tasks.nextTask.hideDetails' => '詳細を隠す',
-			'tasks.nextTask.initialize' => '初期化',
-			'tasks.nextTask.noPending' => '保留中のタスクはありません',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.nextTask.initialize' => '初期化',
+			'tasks.nextTask.noPending' => '保留中のタスクはありません',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI が設定されていません',
 			'tasks.nextTask.review' => '確認',
 			'tasks.nextTask.startTask' => 'タスクを開始',

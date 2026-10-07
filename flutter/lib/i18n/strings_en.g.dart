@@ -4020,6 +4020,12 @@ class Translations$common$update$en {
 
 	/// en: 'Update failed'
 	String get failedTitle => 'Update failed';
+
+	/// en: 'Install ddagent v{{version}} on this device? Android will ask you to allow installs from ddagent the first time.'
+	String appConfirm({required Object version}) => 'Install ddagent v${version} on this device? Android will ask you to allow installs from ddagent the first time.';
+
+	/// en: 'Allow “Install unknown apps” for ddagent, then tap Update again.'
+	String get appPermission => 'Allow “Install unknown apps” for ddagent, then tap Update again.';
 }
 
 // Path: settings.changelog
@@ -14684,6 +14690,8 @@ extension on Translations {
 			'common.update.manualRestart' => 'The update was applied but the server did not restart on its own — restart it manually to finish.',
 			'common.update.failed' => 'Update failed.',
 			'common.update.failedTitle' => 'Update failed',
+			'common.update.appConfirm' => ({required Object version}) => 'Install ddagent v${version} on this device? Android will ask you to allow installs from ddagent the first time.',
+			'common.update.appPermission' => 'Allow “Install unknown apps” for ddagent, then tap Update again.',
 			'settings.title' => 'Settings',
 			'settings.changelog.title' => 'Changelog',
 			'settings.changelog.loading' => 'Loading…',
@@ -14951,10 +14959,10 @@ extension on Translations {
 			'settings.appearanceSettings.codeEditor.theme.label' => 'Editor Theme',
 			'settings.appearanceSettings.codeEditor.theme.description' => 'Default theme for the code editor',
 			'settings.appearanceSettings.codeEditor.wordWrap.label' => 'Word Wrap',
-			'settings.appearanceSettings.codeEditor.wordWrap.description' => 'Enable word wrapping by default in the editor',
-			'settings.appearanceSettings.codeEditor.showMinimap.label' => 'Show Minimap',
 			_ => null,
 		} ?? switch (path) {
+			'settings.appearanceSettings.codeEditor.wordWrap.description' => 'Enable word wrapping by default in the editor',
+			'settings.appearanceSettings.codeEditor.showMinimap.label' => 'Show Minimap',
 			'settings.appearanceSettings.codeEditor.showMinimap.description' => 'Display a minimap for easier navigation in diff view',
 			'settings.appearanceSettings.codeEditor.lineNumbers.label' => 'Show Line Numbers',
 			'settings.appearanceSettings.codeEditor.lineNumbers.description' => 'Display line numbers in the editor',
@@ -15465,10 +15473,10 @@ extension on Translations {
 			'sidebar.messages.updateProjectError' => 'Error updating project. Please try again.',
 			'sidebar.messages.refreshError' => 'Failed to refresh. Please try again.',
 			'sidebar.messages.restoreProjectFailed' => 'Failed to restore project. Please try again.',
-			'sidebar.messages.restoreProjectError' => 'Error restoring project. Please try again.',
-			'sidebar.messages.restoreSessionFailed' => 'Failed to restore session. Please try again.',
 			_ => null,
 		} ?? switch (path) {
+			'sidebar.messages.restoreProjectError' => 'Error restoring project. Please try again.',
+			'sidebar.messages.restoreSessionFailed' => 'Failed to restore session. Please try again.',
 			'sidebar.messages.restoreSessionError' => 'Error restoring session. Please try again.',
 			'sidebar.messages.bulkDeleteSessionsFailed' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: 'Failed to delete ${count} session. Please try again.', other: 'Failed to delete ${count} sessions. Please try again.', ), 
 			'sidebar.version.updateAvailable' => 'Update available',
@@ -15979,10 +15987,10 @@ extension on Translations {
 			'mcp.form.validation.unsupportedProvider' => ({required Object provider, required Object type}) => '${provider} does not support ${type} MCP servers',
 			'notifications.deviceLabel' => 'ddagent Flutter',
 			'notifications.errors.registrationRejected' => 'Registration rejected by server',
-			'notifications.errors.noResponse' => 'No response from the server',
-			'onboarding.gitHint' => 'Used for commits created by ddagent sessions.',
 			_ => null,
 		} ?? switch (path) {
+			'notifications.errors.noResponse' => 'No response from the server',
+			'onboarding.gitHint' => 'Used for commits created by ddagent sessions.',
 			'onboarding.completeSetup' => 'Complete Setup',
 			'onboarding.errors.nameAndEmailRequired' => 'Both git name and email are required.',
 			'onboarding.errors.invalidEmail' => 'Please enter a valid email address.',

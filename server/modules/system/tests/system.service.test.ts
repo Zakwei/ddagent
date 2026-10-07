@@ -230,6 +230,15 @@ test('latest release attaches the stored GitHub token and normalizes fields', as
       body: 'notes',
       html_url: 'https://example.test/release',
       published_at: '2026-01-01T00:00:00Z',
+      assets: [
+        {
+          name: 'ddagent-flutter-android-v0.5.1.apk',
+          browser_download_url: 'https://example.test/android.apk',
+          size: 1234,
+        },
+        // Dropped: no download URL.
+        { name: 'ddagent-server-linux.tar.gz' },
+      ],
     }), { status: 200 });
   };
   try {
@@ -241,6 +250,11 @@ test('latest release attaches the stored GitHub token and normalizes fields', as
 
     assert.equal(release?.tagName, 'v0.5.1');
     assert.equal(release?.htmlUrl, 'https://example.test/release');
+    assert.deepEqual(release?.assets, [{
+      name: 'ddagent-flutter-android-v0.5.1.apk',
+      downloadUrl: 'https://example.test/android.apk',
+      size: 1234,
+    }]);
     const headers = requests[0].init?.headers as Record<string, string>;
     assert.equal(headers.Authorization, 'Bearer secret-token');
   } finally {

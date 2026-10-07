@@ -1491,7 +1491,9 @@
       "done": "v{{version}} sürümüne güncellendi. Yeni paketi almak için uygulamayı yeniden yükle.",
       "manualRestart": "Güncelleme uygulandı ancak sunucu kendiliğinden yeniden başlamadı — tamamlamak için elle yeniden başlat.",
       "failed": "Güncelleme başarısız oldu.",
-      "failedTitle": "Güncelleme başarısız"
+      "failedTitle": "Güncelleme başarısız",
+      "appConfirm": "ddagent v{{version}} bu cihaza kurulsun mu? Android ilk seferde ddagent'tan yüklemeye izin vermenizi ister.",
+      "appPermission": "ddagent için “Bilinmeyen uygulamaları yükle” iznini verin, sonra tekrar Güncelle'ye dokunun."
     }
   },
   "settings": {

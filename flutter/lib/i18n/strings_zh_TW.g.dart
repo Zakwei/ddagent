@@ -2170,6 +2170,8 @@ class Translations$common$update$zh_TW extends Translations$common$update$en {
 	@override String get manualRestart => '更新已套用，但伺服器未自行重新啟動 — 請手動重新啟動以完成。';
 	@override String get failed => '更新失敗。';
 	@override String get failedTitle => '更新失敗';
+	@override String appConfirm({required Object version}) => '要在此裝置上安裝 ddagent v${version} 嗎？首次安裝時 Android 會要求允許從 ddagent 安裝應用程式。';
+	@override String get appPermission => '請為 ddagent 允許「安裝未知應用程式」，然後再次點選更新。';
 }
 
 // Path: settings.changelog
@@ -8272,6 +8274,8 @@ extension on TranslationsZhTw {
 			'common.update.manualRestart' => '更新已套用，但伺服器未自行重新啟動 — 請手動重新啟動以完成。',
 			'common.update.failed' => '更新失敗。',
 			'common.update.failedTitle' => '更新失敗',
+			'common.update.appConfirm' => ({required Object version}) => '要在此裝置上安裝 ddagent v${version} 嗎？首次安裝時 Android 會要求允許從 ddagent 安裝應用程式。',
+			'common.update.appPermission' => '請為 ddagent 允許「安裝未知應用程式」，然後再次點選更新。',
 			'settings.title' => '設定',
 			'settings.changelog.title' => '更新日誌',
 			'settings.changelog.loading' => '載入中…',
@@ -8665,10 +8669,10 @@ extension on TranslationsZhTw {
 			'settings.permissions.blockedCommands.empty' => '未設定封鎖的指令',
 			'settings.permissions.toolExamples.title' => '工具模式範例：',
 			'settings.permissions.toolExamples.bashGitLog' => '- 允許所有 git log 指令',
-			'settings.permissions.toolExamples.bashGitDiff' => '- 允許所有 git diff 指令',
-			'settings.permissions.toolExamples.write' => '- 允許所有 Write 工具使用',
 			_ => null,
 		} ?? switch (path) {
+			'settings.permissions.toolExamples.bashGitDiff' => '- 允許所有 git diff 指令',
+			'settings.permissions.toolExamples.write' => '- 允許所有 Write 工具使用',
 			'settings.permissions.toolExamples.bashRm' => '- 封鎖所有 rm 指令（危險）',
 			'settings.permissions.shellExamples.title' => 'Shell 指令範例：',
 			'settings.permissions.shellExamples.ls' => '- 允許 ls 指令',
@@ -9179,10 +9183,10 @@ extension on TranslationsZhTw {
 			'tasks.nextTask.feature2' => '- PRD 驅動的任務產生，快速啟動專案。',
 			'tasks.nextTask.feature3' => '- 看板和清單檢視，適合日常工作。',
 			'tasks.nextTask.hideDetails' => '隱藏詳情',
-			'tasks.nextTask.initialize' => '初始化',
-			'tasks.nextTask.noPending' => '沒有待處理任務',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.nextTask.initialize' => '初始化',
+			'tasks.nextTask.noPending' => '沒有待處理任務',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI 未設定',
 			'tasks.nextTask.review' => '審查',
 			'tasks.nextTask.startTask' => '開始任務',

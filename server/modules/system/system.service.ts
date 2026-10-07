@@ -174,7 +174,43 @@ type GitHubReleasePayload = {
   body?: string;
   html_url?: string;
   published_at?: string;
+  assets?: GitHubReleaseAssetPayload[];
 };
+
+/** One release asset as returned by the GitHub releases API. */
+type GitHubReleaseAssetPayload = {
+  name?: string;
+  browser_download_url?: string;
+  size?: number;
+};
+
+/**
+ * Release asset exposed to clients. The Android client matches `name` against
+ * its build flavor to find the APK it can install; `downloadUrl` is the direct
+ * GitHub asset URL.
+ */
+type GitHubReleaseAsset = {
+  name: string;
+  downloadUrl: string;
+  size: number | null;
+};
+
+/** Normalizes the assets array, dropping entries without a name or URL. */
+function toReleaseAssets(assets: GitHubReleaseAssetPayload[] | undefined): GitHubReleaseAsset[] {
+  if (!Array.isArray(assets)) {
+    return [];
+  }
+  const mapped: GitHubReleaseAsset[] = [];
+  for (const asset of assets) {
+    const name = typeof asset?.name === 'string' ? asset.name : '';
+    const downloadUrl = typeof asset?.browser_download_url === 'string' ? asset.browser_download_url : '';
+    if (!name || !downloadUrl) {
+      continue;
+    }
+    mapped.push({ name, downloadUrl, size: typeof asset.size === 'number' ? asset.size : null });
+  }
+  return mapped;
+}
 
 /**
  * Authenticated GitHub releases API call for the update channel repo. Returns
@@ -215,5 +251,6 @@ function toRelease(dependencies: SystemUpdateDependencies, data: unknown) {
     body: release.body || '',
     htmlUrl: release.html_url || `https://github.com/${repo}/releases/latest`,
     publishedAt: release.published_at,
+    assets: toReleaseAssets(release.assets),
   };
 }

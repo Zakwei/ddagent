@@ -1491,7 +1491,9 @@
       "done": "Mis à jour vers v{{version}}. Rechargez l'application pour charger le nouveau bundle.",
       "manualRestart": "La mise à jour a été appliquée mais le serveur ne s'est pas redémarré tout seul — redémarrez-le manuellement pour terminer.",
       "failed": "Échec de la mise à jour.",
-      "failedTitle": "Échec de la mise à jour"
+      "failedTitle": "Échec de la mise à jour",
+      "appConfirm": "Installer ddagent v{{version}} sur cet appareil ? Android demandera l'autorisation d'installer des applications depuis ddagent la première fois.",
+      "appPermission": "Autorisez « Installer des applications inconnues » pour ddagent, puis appuyez à nouveau sur Mettre à jour."
     }
   },
   "settings": {

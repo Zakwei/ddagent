@@ -2170,6 +2170,8 @@ class Translations$common$update$ru extends Translations$common$update$en {
 	@override String get manualRestart => 'Обновление применено, но сервер не перезапустился сам — перезапустите его вручную, чтобы завершить.';
 	@override String get failed => 'Обновление не удалось.';
 	@override String get failedTitle => 'Не удалось обновить';
+	@override String appConfirm({required Object version}) => 'Установить ddagent v${version} на это устройство? При первом запуске Android запросит разрешение на установку приложений из ddagent.';
+	@override String get appPermission => 'Разрешите ddagent «Установка неизвестных приложений», затем снова нажмите «Обновить».';
 }
 
 // Path: settings.changelog
@@ -8278,6 +8280,8 @@ extension on TranslationsRu {
 			'common.update.manualRestart' => 'Обновление применено, но сервер не перезапустился сам — перезапустите его вручную, чтобы завершить.',
 			'common.update.failed' => 'Обновление не удалось.',
 			'common.update.failedTitle' => 'Не удалось обновить',
+			'common.update.appConfirm' => ({required Object version}) => 'Установить ddagent v${version} на это устройство? При первом запуске Android запросит разрешение на установку приложений из ddagent.',
+			'common.update.appPermission' => 'Разрешите ddagent «Установка неизвестных приложений», затем снова нажмите «Обновить».',
 			'settings.title' => 'Настройки',
 			'settings.changelog.title' => 'Журнал изменений',
 			'settings.changelog.loading' => 'Загрузка…',
@@ -8671,10 +8675,10 @@ extension on TranslationsRu {
 			'settings.permissions.blockedCommands.empty' => 'Заблокированные команды не настроены',
 			'settings.permissions.toolExamples.title' => 'Примеры шаблонов инструментов:',
 			'settings.permissions.toolExamples.bashGitLog' => '- Разрешить все команды git log',
-			'settings.permissions.toolExamples.bashGitDiff' => '- Разрешить все команды git diff',
-			'settings.permissions.toolExamples.write' => '- Разрешить все использование инструмента Write',
 			_ => null,
 		} ?? switch (path) {
+			'settings.permissions.toolExamples.bashGitDiff' => '- Разрешить все команды git diff',
+			'settings.permissions.toolExamples.write' => '- Разрешить все использование инструмента Write',
 			'settings.permissions.toolExamples.bashRm' => '- Заблокировать все команды rm (опасно)',
 			'settings.permissions.shellExamples.title' => 'Примеры команд оболочки:',
 			'settings.permissions.shellExamples.ls' => '- Разрешить команду ls',
@@ -9185,10 +9189,10 @@ extension on TranslationsRu {
 			'tasks.nextTask.feature2' => '- Генерация задач из PRD для быстрого старта проекта.',
 			'tasks.nextTask.feature3' => '- Kanban и список для повседневной работы.',
 			'tasks.nextTask.hideDetails' => 'Скрыть детали',
-			'tasks.nextTask.initialize' => 'Инициализировать',
-			'tasks.nextTask.noPending' => 'Нет ожидающих задач',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.nextTask.initialize' => 'Инициализировать',
+			'tasks.nextTask.noPending' => 'Нет ожидающих задач',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI не настроен',
 			'tasks.nextTask.review' => 'Проверить',
 			'tasks.nextTask.startTask' => 'Начать задачу',
