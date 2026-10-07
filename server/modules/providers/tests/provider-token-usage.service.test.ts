@@ -6,7 +6,11 @@ import test from 'node:test';
 
 import Database from 'better-sqlite3';
 
-import { createProviderTokenUsageService } from '@/modules/providers/services/provider-token-usage.service.js';
+import {
+  createProviderTokenUsageService,
+  rememberClaudeContextWindow,
+  resolveClaudeContextWindow,
+} from '@/modules/providers/services/provider-token-usage.service.js';
 import { AppError } from '@/shared/utils.js';
 
 function createSessionRow(overrides: Record<string, unknown> = {}) {
@@ -62,6 +66,53 @@ test('token usage lookup requires only the app-facing session id for Claude', as
       cacheTokens: 25,
       breakdown: { input: 100, output: 30, cacheRead: 20, cacheCreation: 5 },
     });
+  } finally {
+    await rm(tempDirectory, { recursive: true, force: true });
+  }
+});
+
+test('Claude token usage sizes the context with the window the SDK reported', async () => {
+  const tempDirectory = await mkdtemp(path.join(tmpdir(), 'provider-token-usage-claude-window-'));
+  const sessionFilePath = path.join(tempDirectory, 'provider-session.jsonl');
+
+  try {
+    await writeFile(sessionFilePath, [
+      JSON.stringify({
+        type: 'assistant',
+        message: { model: 'claude-test-window', usage: { input_tokens: 10, output_tokens: 5 } },
+      }),
+      // A subagent step must not replace the main agent's context reading.
+      JSON.stringify({
+        type: 'assistant',
+        isSidechain: true,
+        message: { model: 'claude-test-window', usage: { input_tokens: 999, output_tokens: 1 } },
+      }),
+    ].join('\n'));
+
+    const service = createProviderTokenUsageService({
+      getSessionById: () => createSessionRow({
+        jsonl_path: sessionFilePath,
+        provider_session_id: 'window-session',
+      }),
+      getClaudeContextWindow: () => undefined,
+    });
+
+    // Nothing learned yet: the standard window, not the old 160k guess.
+    const beforeRun = await service.getSessionTokenUsage('app-session');
+    assert.equal(beforeRun.used, 15);
+    assert.equal(beforeRun.total, 200_000);
+
+    // The runtime records `result.modelUsage`; the helper Haiku entry is ignored.
+    rememberClaudeContextWindow('window-session', 'claude-test-window', {
+      'claude-haiku-helper': { inputTokens: 50_000, contextWindow: 200_000 },
+      'claude-test-window[1m]': { inputTokens: 10, contextWindow: 1_000_000 },
+    });
+    assert.equal((await service.getSessionTokenUsage('app-session')).total, 1_000_000);
+
+    // Another session on the same model reuses the learned window.
+    assert.equal(resolveClaudeContextWindow('other-session', 'claude-test-window', undefined), 1_000_000);
+    // An explicit override only applies while nothing was learned.
+    assert.equal(resolveClaudeContextWindow('unknown', 'claude-unknown', '123456'), 123_456);
   } finally {
     await rm(tempDirectory, { recursive: true, force: true });
   }

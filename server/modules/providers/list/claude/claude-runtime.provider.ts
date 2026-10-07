@@ -35,6 +35,10 @@ import {
   readObjectRecord,
 } from '@/shared/index.js';
 import { CLAUDE_PREDEFINED_MODELS } from '@/modules/providers/list/claude/claude-models.provider.js';
+import {
+  rememberClaudeContextWindow,
+  resolveClaudeContextWindow,
+} from '@/modules/providers/services/provider-token-usage.service.js';
 import { orchestratorMessagesDb } from '@/modules/database/index.js';
 import {
   createNotificationEvent,
@@ -433,65 +437,26 @@ function readNumber(value: any) {
 }
 
 /**
- * Extracts token usage from SDK messages.
- * Prefers per-step `message.usage` (Claude message payload), then falls back
- * to result-level usage/modelUsage for compatibility across SDK versions.
- * @param {Object} sdkMessage - SDK stream message
- * @returns {Object|null} Token budget object or null
+ * Builds a `token_budget` snapshot from one API step's `message.usage`. Only
+ * per-step usage measures the context: `result.usage`/`modelUsage` sum every
+ * step of the turn and would overshoot the window on tool-heavy turns.
  */
-function extractTokenBudget(sdkMessage: any) {
-  if (!sdkMessage || typeof sdkMessage !== 'object') {
-    return null;
-  }
-
-  const messageUsage = sdkMessage.message?.usage || sdkMessage.usage;
-  if (messageUsage && typeof messageUsage === 'object') {
-    const directInputTokens = readNumber(messageUsage.input_tokens ?? messageUsage.inputTokens);
-    const cacheCreationTokens = readNumber(messageUsage.cache_creation_input_tokens ?? messageUsage.cacheCreationInputTokens ?? messageUsage.cacheCreationTokens);
-    const cacheReadTokens = readNumber(messageUsage.cache_read_input_tokens ?? messageUsage.cacheReadInputTokens ?? messageUsage.cacheReadTokens);
-    const cacheTokens = cacheCreationTokens + cacheReadTokens;
-    const inputTokens = directInputTokens + cacheTokens;
-    const outputTokens = readNumber(messageUsage.output_tokens ?? messageUsage.outputTokens);
-    const totalUsed = inputTokens + outputTokens;
-    const contextWindow = parseInt(process.env.CONTEXT_WINDOW ?? '', 10) || 160000;
-
-    return {
-      used: totalUsed,
-      total: contextWindow,
-      inputTokens,
-      outputTokens,
-      cacheReadTokens,
-      cacheCreationTokens,
-      cacheTokens,
-      breakdown: {
-        input: inputTokens,
-        output: outputTokens,
-      },
-    };
-  }
-
-  if (!sdkMessage.modelUsage || typeof sdkMessage.modelUsage !== 'object') {
-    return null;
-  }
-
-  // Fallback for older SDK messages with only modelUsage
-  const modelKey = Object.keys(sdkMessage.modelUsage)[0];
-  const modelData = sdkMessage.modelUsage[modelKey];
-
-  if (!modelData || typeof modelData !== 'object') {
-    return null;
-  }
-
-  const inputTokens = readNumber(modelData.cumulativeInputTokens ?? modelData.inputTokens);
-  const outputTokens = readNumber(modelData.cumulativeOutputTokens ?? modelData.outputTokens);
-  const totalUsed = inputTokens + outputTokens;
-  const contextWindow = parseInt(process.env.CONTEXT_WINDOW ?? '', 10) || 160000;
+function buildTokenBudget(messageUsage: AnyRecord, contextWindow: number) {
+  const directInputTokens = readNumber(messageUsage.input_tokens ?? messageUsage.inputTokens);
+  const cacheCreationTokens = readNumber(messageUsage.cache_creation_input_tokens ?? messageUsage.cacheCreationInputTokens ?? messageUsage.cacheCreationTokens);
+  const cacheReadTokens = readNumber(messageUsage.cache_read_input_tokens ?? messageUsage.cacheReadInputTokens ?? messageUsage.cacheReadTokens);
+  const cacheTokens = cacheCreationTokens + cacheReadTokens;
+  const inputTokens = directInputTokens + cacheTokens;
+  const outputTokens = readNumber(messageUsage.output_tokens ?? messageUsage.outputTokens);
 
   return {
-    used: totalUsed,
+    used: inputTokens + outputTokens,
     total: contextWindow,
     inputTokens,
     outputTokens,
+    cacheReadTokens,
+    cacheCreationTokens,
+    cacheTokens,
     breakdown: {
       input: inputTokens,
       output: outputTokens,
@@ -687,6 +652,10 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
   // True while the process is being held open for background work, so a later
   // `result` can be recognised as that work reporting back.
   let heldForBackgroundWork = false;
+  // Latest main-agent API step usage/model: the context gauge's source, re-sent
+  // on `result` once the SDK has reported the model's real context window.
+  let lastStepUsage: AnyRecord | null = null;
+  let lastStepModel: string | null = null;
 
   // A new turn supersedes any earlier one still holding this session's process
   // open, so held runs cannot stack up across a conversation.
@@ -925,9 +894,20 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
         ws.send(msg);
       }
 
-      // Extract and send token budget updates from assistant/result usage payloads
-      const tokenBudgetData = extractTokenBudget(message);
-      if (tokenBudgetData) {
+      // Token budget: per-step usage of the main agent (subagent steps carry
+      // `parent_tool_use_id` and have their own context), sized against the
+      // window the SDK reports in `result.modelUsage`.
+      let budgetUsage: AnyRecord | null = null;
+      if (message.type === 'assistant' && !message.parent_tool_use_id && message.message?.usage) {
+        lastStepUsage = message.message.usage;
+        lastStepModel = message.message.model || lastStepModel;
+        budgetUsage = lastStepUsage;
+      } else if (message.type === 'result') {
+        rememberClaudeContextWindow(capturedSessionId, lastStepModel, message.modelUsage);
+        budgetUsage = lastStepUsage;
+      }
+      if (budgetUsage) {
+        const tokenBudgetData = buildTokenBudget(budgetUsage, resolveClaudeContextWindow(capturedSessionId, lastStepModel));
         ws.send(createNormalizedMessage({ kind: 'status', text: 'token_budget', tokenBudget: tokenBudgetData, sessionId: capturedSessionId || sessionId || null, provider: 'claude' }));
       }
 

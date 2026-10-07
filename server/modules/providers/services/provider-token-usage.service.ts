@@ -77,6 +77,73 @@ const defaultDependencies: ProviderTokenUsageServiceDependencies = {
   getClaudeContextWindow: () => process.env.CONTEXT_WINDOW,
 };
 
+/**
+ * Fallback Claude context window when neither the SDK nor `CONTEXT_WINDOW`
+ * supplied one — the standard window of every current Claude model.
+ */
+const DEFAULT_CLAUDE_CONTEXT_WINDOW = 200_000;
+
+/**
+ * Real context windows reported by the Claude SDK (`result.modelUsage[*]
+ * .contextWindow`). Transcripts never record the window, so the REST snapshot
+ * reuses what a live run learned: first for the exact session, then for the
+ * model (covers a reload after the run that taught it, until the next restart).
+ */
+const learnedClaudeContextWindows = {
+  bySession: new Map<string, number>(),
+  byModel: new Map<string, number>(),
+};
+
+/** `claude-opus-5-5[1m]` and `claude-opus-5-5` share one window key. */
+function normalizeClaudeModelKey(model: string): string {
+  return model.replace(/\[[^\]]*\]$/, '').trim().toLowerCase();
+}
+
+/**
+ * Used by the Claude runtime (same module) on every SDK `result`: records the
+ * context window from `modelUsage` so live frames and REST snapshots show the
+ * real value. `modelUsage` also lists helper models (e.g. Haiku for titles), so
+ * the entry matching the turn's main model wins, else the busiest one.
+ */
+export function rememberClaudeContextWindow(
+  providerSessionId: string | null | undefined,
+  model: string | null | undefined,
+  modelUsage: unknown,
+): void {
+  if (!modelUsage || typeof modelUsage !== 'object') return;
+  const entries = Object.entries(modelUsage as Record<string, AnyRecord | null>);
+  if (entries.length === 0) return;
+
+  const modelKey = model ? normalizeClaudeModelKey(model) : null;
+  const promptTokens = (usage: AnyRecord | null) => readUsageNumber(usage?.inputTokens)
+    + readUsageNumber(usage?.cacheReadInputTokens)
+    + readUsageNumber(usage?.cacheCreationInputTokens);
+  const [matchedModel, matchedUsage] = entries.find(([key]) => normalizeClaudeModelKey(key) === modelKey)
+    ?? entries.reduce((best, entry) => (promptTokens(entry[1]) > promptTokens(best[1]) ? entry : best));
+
+  const contextWindow = readUsageNumber(matchedUsage?.contextWindow);
+  if (contextWindow <= 0) return;
+  if (providerSessionId) learnedClaudeContextWindows.bySession.set(providerSessionId, contextWindow);
+  learnedClaudeContextWindows.byModel.set(normalizeClaudeModelKey(model || matchedModel), contextWindow);
+}
+
+/**
+ * Used by the Claude runtime (same module) and the REST snapshot below to pick
+ * the context window: SDK-learned value for the session, then for the model,
+ * then the `CONTEXT_WINDOW` override, then {@link DEFAULT_CLAUDE_CONTEXT_WINDOW}.
+ */
+export function resolveClaudeContextWindow(
+  providerSessionId: string | null | undefined,
+  model: string | null | undefined,
+  configuredContextWindow: string | undefined = process.env.CONTEXT_WINDOW,
+): number {
+  const learned = (providerSessionId && learnedClaudeContextWindows.bySession.get(providerSessionId))
+    || (model && learnedClaudeContextWindows.byModel.get(normalizeClaudeModelKey(model)));
+  if (learned) return learned;
+  const configured = Number.parseInt(configuredContextWindow ?? '', 10);
+  return Number.isFinite(configured) && configured > 0 ? configured : DEFAULT_CLAUDE_CONTEXT_WINDOW;
+}
+
 function readUsageNumber(value: unknown): number {
   const parsedValue = Number(value);
   return Number.isFinite(parsedValue) ? parsedValue : 0;
@@ -238,20 +305,28 @@ function readCommandCodeTokenUsage(fileContent: string): TokenUsageResult {
   };
 }
 
-function readClaudeTokenUsage(fileContent: string, configuredContextWindow: string | undefined): TokenUsageResult {
+function readClaudeTokenUsage(
+  fileContent: string,
+  providerSessionId: string,
+  configuredContextWindow: string | undefined,
+): TokenUsageResult {
   let inputTokens = 0;
   let outputTokens = 0;
   let cacheReadTokens = 0;
   let cacheCreationTokens = 0;
+  let model: string | null = null;
   const lines = fileContent.trim().split('\n');
 
   for (let index = lines.length - 1; index >= 0; index -= 1) {
     try {
       const entry = JSON.parse(lines[index]) as AnyRecord;
-      const usage = entry.type === 'assistant' ? entry.message?.usage : null;
+      // Sidechain rows are subagent turns; their usage is not this session's context.
+      const usage = entry.type === 'assistant' && !entry.isSidechain ? entry.message?.usage : null;
       if (!usage) {
         continue;
       }
+
+      model = typeof entry.message?.model === 'string' ? entry.message.model : null;
 
       const directInputTokens = readUsageNumber(usage.input_tokens ?? usage.inputTokens);
       cacheReadTokens = readUsageNumber(
@@ -273,8 +348,7 @@ function readClaudeTokenUsage(fileContent: string, configuredContextWindow: stri
     }
   }
 
-  const parsedContextWindow = Number.parseInt(configuredContextWindow ?? '', 10);
-  const contextWindow = Number.isFinite(parsedContextWindow) ? parsedContextWindow : 160_000;
+  const contextWindow = resolveClaudeContextWindow(providerSessionId, model, configuredContextWindow);
   const cacheTokens = cacheReadTokens + cacheCreationTokens;
 
   return {
@@ -610,7 +684,7 @@ export function createProviderTokenUsageService(
       return readTokenUsageTail(
         dependencies,
         sessionFilePath,
-        (content) => readClaudeTokenUsage(content, dependencies.getClaudeContextWindow()),
+        (content) => readClaudeTokenUsage(content, providerSessionId, dependencies.getClaudeContextWindow()),
         hasTokenUsage,
       );
     },
