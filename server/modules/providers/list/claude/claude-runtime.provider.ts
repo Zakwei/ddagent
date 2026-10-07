@@ -32,6 +32,7 @@ import {
   createCompleteMessage,
   createNormalizedMessage,
   providerChildEnv,
+  readObjectRecord,
 } from '@/shared/index.js';
 import { CLAUDE_PREDEFINED_MODELS } from '@/modules/providers/list/claude/claude-models.provider.js';
 import { orchestratorMessagesDb } from '@/modules/database/index.js';
@@ -172,6 +173,9 @@ export function resolveToolApproval(requestId: any, decision: any) {
   resolver(decision);
   // The ask was answered on one client — every other viewer still shows the
   // prompt, so drop it session-wide, not just on the answering device.
+  // Carry the picked answers so those other windows render the answer instead
+  // of falling back to "Skipped".
+  const answers = readObjectRecord(readObjectRecord(decision?.updatedInput)?.answers);
   const writer = sessionId ? activeSessions.get(sessionId)?.writer : null;
   writer?.send?.(createNormalizedMessage({
     kind: 'permission_cancelled',
@@ -179,6 +183,7 @@ export function resolveToolApproval(requestId: any, decision: any) {
     reason: 'resolved',
     sessionId,
     provider: 'claude',
+    ...(answers ? { answers } : {}),
   }));
 }
 

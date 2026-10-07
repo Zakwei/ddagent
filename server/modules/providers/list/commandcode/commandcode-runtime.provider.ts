@@ -542,12 +542,16 @@ function resolveCommandCodePermission(requestId: any, decision: any) {
 
     // The ask was answered on one client — every other viewer still shows
     // the prompt, so drop it session-wide, not just on the answering device.
+    // Carry the picked answers so those other windows render the answer
+    // instead of falling back to "Skipped".
+    const answers = readObjectRecord(readObjectRecord(decision?.updatedInput)?.answers);
     pending.state?.currentWriter?.send?.(createNormalizedMessage({
         kind: 'permission_cancelled',
         requestId: String(requestId),
         reason: 'resolved',
         sessionId: pending.commandCodeSessionId,
         provider: 'commandcode',
+        ...(answers ? { answers } : {}),
     }));
 
     const { params, state } = pending;
@@ -1270,6 +1274,9 @@ function createCommandCodeProcess(sessionId: any, workingDir: any, model: any, w
                 state.completeSent = true;
             } catch (error: any) {
                 state.busy = false;
+                // The turn is dead (ACP error or inactivity timeout): cancel its
+                // asks so a paired question the user still sees cannot outlive it.
+                clearCommandCodePendingForState(state);
                 // Close the open live rows so a partial streamed answer is
                 // finalized instead of dangling.
                 finalizeLiveMessages(state);
@@ -1673,6 +1680,10 @@ export async function queryCommandCode(command: string, options: AnyRecord = {},
             if (stalled) {
                 try { await state.sendNotification('session/cancel', { sessionId: state.commandCodeSessionId }); } catch {}
                 state.terminated = true;
+                // The old process is gone; cancel its asks so they don't linger
+                // in the map (listPending would resurface a dead, unanswerable
+                // prompt on the next subscribe).
+                clearCommandCodePendingForState(state);
                 rejectQueuedPrompts(state, 'Command Code run stalled and was restarted');
                 try { state.child.kill(); } catch {}
                 activeCommandCodeProcesses.delete(key);

@@ -393,3 +393,180 @@ for (const [name, createProcess, map, abort, nativeKey] of [
     }
   });
 }
+
+// ---------------------------------------------------------------------------
+// Interactive ask (AskUserQuestion) lifecycle for the ACP providers: the ask
+// must reach the client, a delegated child must never be shown, and a turn
+// that dies (error/timeout/stall) must cancel its pending asks so listPending
+// cannot resurface a dead, unanswerable prompt.
+// ---------------------------------------------------------------------------
+
+const flush = () => new Promise<void>((resolve) => setImmediate(resolve));
+
+const questionParams = {
+  toolCall: {
+    title: 'Zakres: Pick a scope?',
+    rawInput: { question: 'Pick a scope?', options: ['MVP', 'Full clone'] },
+  },
+  options: [
+    { optionId: 'option_0', name: 'MVP: small' },
+    { optionId: 'option_1', name: 'Full clone: everything' },
+  ],
+};
+
+/** Loads a provider with a scripted ACP child; captures responses + prompts. */
+async function loadAcpProvider(name: string, hooks: string, delegated = false) {
+  const children: any[] = [];
+  const responses: any[] = [];
+  const prompts: Array<{ id: number }> = [];
+  function fakeSpawn() {
+    const child = Object.assign(new EventEmitter(), {
+      stdin: new PassThrough(), stdout: new PassThrough(), stderr: new PassThrough(), kill: () => true,
+    });
+    children.push(child);
+    child.stdin.on('data', (chunk: Buffer) => {
+      for (const line of chunk.toString().split('\n')) {
+        if (!line.trim()) continue;
+        let msg: any;
+        try { msg = JSON.parse(line); } catch { continue; }
+        if (msg.method === 'session/prompt') { prompts.push({ id: msg.id }); continue; }
+        if (msg.method) {
+          setImmediate(() => child.stdout.write(`${JSON.stringify({ id: msg.id, result: msg.method === 'initialize' ? { agentCapabilities: {} } : { sessionId: 'native-session' } })}\n`));
+          continue;
+        }
+        responses.push(msg);
+      }
+    });
+    return child;
+  }
+  const runtime = await loadRuntime(name, hooks, {
+    'cross-spawn': fakeSpawn,
+    '../../../database/index.js': {
+      sessionsDb: { createSession() {}, assignProviderSessionId() {} },
+      orchestratorMessagesDb: { findDelegationByChildSessionId: () => delegated },
+    },
+    [`./${name}-sessions.provider.js`]: {
+      [name === 'devin' ? 'DevinSessionsProvider' : 'CommandCodeSessionsProvider']: class {
+        async fetchHistory() { return { messages: [] }; }
+      },
+    },
+  });
+  return { runtime, children, responses, prompts };
+}
+
+for (const [name, createProcess, permissions, nativeKey, queryFn, runtimeExport, map] of [
+  ['devin', 'createDevinProcess', 'devinPendingPermissions', 'devinSessionId', 'queryDevin', 'devinRuntime', 'activeDevinProcesses'],
+  ['commandcode', 'createCommandCodeProcess', 'commandCodePendingPermissions', 'commandCodeSessionId', 'queryCommandCode', 'commandCodeRuntime', 'activeCommandCodeProcesses'],
+]) {
+  test(`${name}: a question ask reaches the client and answers by option id`, async () => {
+    const directory = await mkdtemp(path.join(tmpdir(), 'acp-question-'));
+    const { runtime, children, responses } = await loadAcpProvider(name!, `${createProcess}`);
+    const frames: Array<Record<string, any>> = [];
+    const writer = { frames, send(message: Record<string, any>) { frames.push(message); }, setSessionId() {} };
+    try {
+      const state = await runtime.lifecycleHooks[createProcess!]('app', directory, null, writer, {}, 'native-session');
+      state.child.stdout.write(`${JSON.stringify({ jsonrpc: '2.0', id: 99, method: 'session/request_permission', params: questionParams })}\n`);
+      await flush();
+
+      const ask = frames.find((frame) => frame.kind === 'permission_request');
+      assert.ok(ask, 'the ask must reach the client');
+      assert.equal(ask.toolName, 'AskUserQuestion');
+      assert.equal(ask.input.questions[0].question, 'Pick a scope?');
+      assert.equal(ask.input.questions[0].header, 'Zakres');
+
+      runtime[runtimeExport!].permissions.resolve(String(ask.requestId), {
+        allow: true,
+        updatedInput: { answers: { 'Pick a scope?': 'Full clone' } },
+      });
+      assert.ok(
+        responses.some((response) => response.id === 99 && response.result?.outcome?.optionId === 'option_1'),
+        'the picked label must map back to the ACP optionId',
+      );
+      const cancelled = frames.find((frame) => frame.kind === 'permission_cancelled');
+      assert.deepEqual(cancelled?.answers, { 'Pick a scope?': 'Full clone' }, 'other windows must receive the answer');
+    } finally {
+      for (const child of children) child.stdout.end();
+      await rm(directory, { recursive: true, force: true });
+    }
+  });
+
+  test(`${name}: a delegated child's question is auto-cancelled, never shown`, async () => {
+    const directory = await mkdtemp(path.join(tmpdir(), 'acp-question-'));
+    const { runtime, children, responses } = await loadAcpProvider(name!, `${createProcess}`, true);
+    const frames: Array<Record<string, any>> = [];
+    const writer = { frames, send(message: Record<string, any>) { frames.push(message); }, setSessionId() {} };
+    try {
+      const state = await runtime.lifecycleHooks[createProcess!]('app', directory, null, writer, {}, 'native-session');
+      state.child.stdout.write(`${JSON.stringify({ jsonrpc: '2.0', id: 100, method: 'session/request_permission', params: questionParams })}\n`);
+      await flush();
+
+      assert.equal(frames.some((frame) => frame.kind === 'permission_request'), false, 'headless child has no panel');
+      assert.ok(
+        responses.some((response) => response.id === 100 && response.result?.outcome?.outcome === 'cancelled'),
+        'the ask must be answered cancelled for a delegated child',
+      );
+    } finally {
+      for (const child of children) child.stdout.end();
+      await rm(directory, { recursive: true, force: true });
+    }
+  });
+
+  test(`${name}: a dead turn cancels its pending asks`, async () => {
+    const directory = await mkdtemp(path.join(tmpdir(), 'acp-question-'));
+    const { runtime, children, prompts } = await loadAcpProvider(name!, `${createProcess}, ${permissions}`);
+    const frames: Array<Record<string, any>> = [];
+    const writer = { frames, send(message: Record<string, any>) { frames.push(message); }, setSessionId() {} };
+    try {
+      const state = await runtime.lifecycleHooks[createProcess!]('app', directory, null, writer, {}, 'native-session');
+      state.currentWriter = writer;
+      runtime.lifecycleHooks[permissions!].set('req-1', {
+        state, appSessionId: 'app', [nativeKey!]: 'native-session', params: questionParams, acpId: 7,
+      });
+
+      const pending = state.prompt('hi', {}, writer);
+      await flush();
+      assert.equal(prompts.length, 1);
+      // Fail the turn (rate limit / inactivity timeout / ACP error).
+      state.child.stdout.write(`${JSON.stringify({ jsonrpc: '2.0', id: prompts[0]!.id, error: { message: 'boom' } })}\n`);
+      await pending;
+
+      assert.equal(runtime.lifecycleHooks[permissions!].has('req-1'), false, 'the dead turn must drop its ask');
+      assert.ok(frames.some((frame) => frame.kind === 'permission_cancelled' && frame.requestId === 'req-1'));
+    } finally {
+      for (const child of children) child.stdout.end();
+      await rm(directory, { recursive: true, force: true });
+    }
+  });
+
+  test(`${name}: a stalled run cancels its pending asks before restarting`, async () => {
+    const directory = await mkdtemp(path.join(tmpdir(), 'acp-question-'));
+    const { runtime, children } = await loadAcpProvider(name!, `${createProcess}, ${map}, ${permissions}, ${queryFn}`);
+    const frames: Array<Record<string, any>> = [];
+    const writer = { frames, send(message: Record<string, any>) { frames.push(message); }, setSessionId() {} };
+    try {
+      const stalled: any = {
+        terminated: false, busy: true, lastActivityAt: 0, workingDir: directory,
+        appSessionId: 'app', [nativeKey!]: 'native-session', currentWriter: writer,
+        child: { stdin: new PassThrough(), kill: () => true }, sendNotification: async () => {}, queue: [],
+      };
+      runtime.lifecycleHooks[map!].set('app', stalled);
+      runtime.lifecycleHooks[permissions!].set('req-1', {
+        state: stalled, appSessionId: 'app', [nativeKey!]: 'native-session', params: questionParams, acpId: 9,
+      });
+      const context = {
+        isProviderInstalled: async () => true,
+        resolveResumeModel: async () => ({ model: null }),
+        resolveProviderSessionId: async () => 'native-session',
+      };
+      // Do not await: the restart then waits on an unanswered session/prompt.
+      void runtime[queryFn!]('hi', { sessionId: 'app', cwd: directory }, writer, context).catch(() => {});
+      await flush();
+
+      assert.equal(runtime.lifecycleHooks[permissions!].has('req-1'), false, 'the killed run must drop its ask');
+      assert.ok(frames.some((frame) => frame.kind === 'permission_cancelled' && frame.requestId === 'req-1'));
+    } finally {
+      for (const child of children) child.stdout.end();
+      await rm(directory, { recursive: true, force: true });
+    }
+  });
+}

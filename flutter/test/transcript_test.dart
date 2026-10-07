@@ -250,6 +250,55 @@ void main() {
     expect(container.read(pendingPermissionsProvider).containsKey('q1'), isFalse);
   });
 
+  test('permission_cancelled carries the picked answers to a non-answering window', () async {
+    container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
+    container.listen(transcriptProvider('s1'), (_, _) {});
+    await pump();
+
+    ws.emitFrame({
+      'kind': 'permission_request',
+      'sessionId': 's1',
+      'requestId': 'q1',
+      'toolName': 'AskUserQuestion',
+      'input': {
+        'questions': [
+          {
+            'question': 'Which scope?',
+            'options': [
+              {'label': 'MVP'},
+            ],
+          },
+        ],
+      },
+    });
+    for (
+      var i = 0;
+      i < 15 && !container.read(sessionMessagesProvider('s1')).any((m) => m.requestId == 'q1');
+      i++
+    ) {
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+    }
+    expect(container.read(pendingPermissionsProvider).containsKey('q1'), isTrue);
+
+    // Picked in another window — the resolve broadcast must carry the answer so
+    // this window renders it instead of falling back to "Skipped".
+    ws.emitFrame({
+      'kind': 'permission_cancelled',
+      'sessionId': 's1',
+      'requestId': 'q1',
+      'reason': 'resolved',
+      'answers': {'Which scope?': 'MVP'},
+    });
+    await pump();
+
+    expect(container.read(pendingPermissionsProvider).containsKey('q1'), isFalse);
+    final row = container
+        .read(sessionMessagesProvider('s1'))
+        .firstWhere((m) => m.requestId == 'q1');
+    expect(row.toolInput['resolved'], isTrue);
+    expect(row.toolInput['answers'], {'Which scope?': 'MVP'});
+  });
+
   test('activity: stream_end and error are not terminal — only complete is', () async {
     container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
     container.listen(transcriptProvider('s1'), (_, _) {});

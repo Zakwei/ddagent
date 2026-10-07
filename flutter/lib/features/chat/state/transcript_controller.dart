@@ -716,6 +716,11 @@ class TranscriptController extends Notifier<TranscriptState> {
       case 'permission_cancelled':
         final requestId = raw['requestId']?.toString();
         ref.read(pendingPermissionsProvider.notifier).remove(requestId);
+        // A 'resolved' cancel carries the picked answers, so a window that did
+        // not answer still shows them instead of falling back to "Skipped".
+        final cancelledAnswers = raw['answers'] is Map
+            ? Map<String, dynamic>.from(raw['answers'] as Map)
+            : const <String, dynamic>{};
         // Resolved elsewhere (another client, auto-approval, dead process) —
         // stamp the card so it stops offering a decision that no longer exists.
         if (requestId != null) {
@@ -727,6 +732,7 @@ class TranscriptController extends Notifier<TranscriptState> {
                   ? Map<String, dynamic>.from(m.toolInput as Map)
                   : <String, dynamic>{};
               input['resolved'] = true;
+              if (cancelledAnswers.isNotEmpty) input['answers'] = cancelledAnswers;
               return m.copyWith(toolInput: input);
             },
           );

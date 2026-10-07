@@ -532,12 +532,16 @@ function resolveDevinPermission(requestId: any, decision: any) {
 
     // The ask was answered on one client — every other viewer still shows
     // the prompt, so drop it session-wide, not just on the answering device.
+    // Carry the picked answers so those other windows render the answer
+    // instead of falling back to "Skipped".
+    const answers = readObjectRecord(readObjectRecord(decision?.updatedInput)?.answers);
     pending.state?.currentWriter?.send?.(createNormalizedMessage({
         kind: 'permission_cancelled',
         requestId: String(requestId),
         reason: 'resolved',
         sessionId: pending.devinSessionId,
         provider: 'devin',
+        ...(answers ? { answers } : {}),
     }));
 
     const { params, state } = pending;
@@ -1280,6 +1284,9 @@ function createDevinProcess(sessionId: any, workingDir: any, model: any, ws: any
                 state.completeSent = true;
             } catch (error: any) {
                 state.busy = false;
+                // The turn is dead (ACP error or inactivity timeout): cancel its
+                // asks so a paired question the user still sees cannot outlive it.
+                clearDevinPendingForState(state);
                 // Close the open live rows and persist whatever streamed
                 // before the failure — same treatment as the cancelled path,
                 // otherwise the partial answer vanishes on a history reload.
@@ -1742,6 +1749,10 @@ export async function queryDevin(command: string, options: AnyRecord = {}, ws: P
                 // Zawieszony run (np. współbieżne prompty): zabij i wystartuj świeży.
                 try { await state.sendNotification('session/cancel', { sessionId: state.devinSessionId }); } catch {}
                 state.terminated = true;
+                // The old process is gone; cancel its asks so they don't linger
+                // in the map (listPending would resurface a dead, unanswerable
+                // prompt on the next subscribe).
+                clearDevinPendingForState(state);
                 rejectQueuedPrompts(state, 'Devin run stalled and was restarted');
                 try { state.child.kill(); } catch {}
                 activeDevinProcesses.delete(key);
