@@ -645,6 +645,23 @@ async function getCodexSessionMessages(
   }
 }
 
+// Live Codex tool items arrive only once, at `item.completed`, as a single
+// tool_use row with no separate tool_result. The client treats a tool_use
+// without `toolResult` as still running, so the outcome rides on the row.
+function codexLiveToolResult(content: unknown, isError: boolean) {
+  return { content: typeof content === 'string' ? content : '', isError };
+}
+
+// MCP results carry ACP-style content blocks; keep their text.
+function codexMcpResultText(result: unknown): string {
+  const blocks = readObjectRecord(result)?.content;
+  if (!Array.isArray(blocks)) return '';
+  return blocks
+    .map((block: AnyRecord) => (typeof block?.text === 'string' ? block.text : ''))
+    .filter(Boolean)
+    .join('\n');
+}
+
 export class CodexSessionsProvider implements IProviderSessions {
   /**
    * Normalizes a persisted Codex JSONL entry.
@@ -803,6 +820,10 @@ export class CodexSessionsProvider implements IProviderSessions {
             output: raw.output,
             exitCode: raw.exitCode,
             status: raw.status,
+            toolResult: codexLiveToolResult(
+              raw.output,
+              raw.status === 'failed' || (typeof raw.exitCode === 'number' && raw.exitCode !== 0),
+            ),
           })];
         case 'file_change':
           return [createNormalizedMessage({
@@ -815,6 +836,12 @@ export class CodexSessionsProvider implements IProviderSessions {
             toolInput: raw.changes,
             toolId: baseId,
             status: raw.status,
+            toolResult: codexLiveToolResult(
+              (Array.isArray(raw.changes) ? raw.changes : [])
+                .map((change: AnyRecord) => `${change?.kind ?? 'update'} ${change?.path ?? ''}`.trim())
+                .join('\n'),
+              raw.status === 'failed',
+            ),
           })];
         case 'mcp_tool_call':
           return [createNormalizedMessage({
@@ -830,6 +857,10 @@ export class CodexSessionsProvider implements IProviderSessions {
             result: raw.result,
             error: raw.error,
             status: raw.status,
+            toolResult: codexLiveToolResult(
+              raw.error?.message ?? raw.error ?? codexMcpResultText(raw.result),
+              raw.status === 'failed' || Boolean(raw.error),
+            ),
           })];
         case 'web_search':
           return [createNormalizedMessage({
@@ -841,6 +872,7 @@ export class CodexSessionsProvider implements IProviderSessions {
             toolName: 'WebSearch',
             toolInput: { query: raw.query },
             toolId: baseId,
+            toolResult: codexLiveToolResult('', false),
           })];
         case 'todo_list':
           return [createNormalizedMessage({

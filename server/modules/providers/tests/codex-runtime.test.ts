@@ -166,6 +166,8 @@ test('codex runtime relays live item snapshots and closes them at completion', a
     assert.equal(authoritativeText?.role, 'assistant');
     assert.equal(sent.find((message) => message.kind === 'thinking')?.content, 'Thinking harder');
     assert.equal(sent.find((message) => message.kind === 'tool_use')?.toolName, 'Bash');
+    // The completed command carries its outcome, so the card stops spinning.
+    assert.deepEqual(sent.find((message) => message.kind === 'tool_use')?.toolResult, { content: 'hi\n', isError: false });
 
     // Live frames are control events, never transcript rows: exactly one
     // authoritative text and one authoritative thinking message are emitted,
@@ -292,4 +294,31 @@ test('codex: installed SDK types carry cumulative full-text item snapshots', asy
   assert.match(types, /type AgentMessageItem = \{[\s\S]*?text: string;/);
   assert.match(types, /type ReasoningItem = \{[\s\S]*?text: string;/);
   assert.match(types, /type ItemUpdatedEvent = \{[\s\S]*?item: ThreadItem;/);
+});
+
+test('live Codex tool items carry their outcome as toolResult', () => {
+  const provider = new CodexSessionsProvider();
+  const [failedCommand] = provider.normalizeMessage(
+    { type: 'item', itemType: 'command_execution', command: 'false', output: 'boom', exitCode: 1, status: 'failed' },
+    'app',
+  );
+  assert.deepEqual(failedCommand.toolResult, { content: 'boom', isError: true });
+
+  const [mcp] = provider.normalizeMessage(
+    { type: 'item', itemType: 'mcp_tool_call', tool: 'get_task', result: { content: [{ type: 'text', text: 'task 7' }] }, status: 'completed' },
+    'app',
+  );
+  assert.deepEqual(mcp.toolResult, { content: 'task 7', isError: false });
+
+  const [mcpError] = provider.normalizeMessage(
+    { type: 'item', itemType: 'mcp_tool_call', tool: 'get_task', error: { message: 'not found' }, status: 'failed' },
+    'app',
+  );
+  assert.deepEqual(mcpError.toolResult, { content: 'not found', isError: true });
+
+  const [fileChange] = provider.normalizeMessage(
+    { type: 'item', itemType: 'file_change', changes: [{ kind: 'update', path: 'a.ts' }], status: 'completed' },
+    'app',
+  );
+  assert.deepEqual(fileChange.toolResult, { content: 'update a.ts', isError: false });
 });
