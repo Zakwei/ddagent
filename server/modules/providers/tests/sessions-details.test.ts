@@ -63,6 +63,16 @@ test('getSessionDetailsById falls back to the provider-native id and returns the
   });
 });
 
+test('getSessionDetailsById exposes the provider account the session runs under', async () => {
+  await withIsolatedDatabase(() => {
+    const pinned = sessionsDb.createAppSession('app-session-acct', 'claude', '/home/user/acct', undefined, 'acct-2');
+    const ambient = sessionsDb.createAppSession('app-session-default', 'claude', '/home/user/acct');
+
+    assert.equal(sessionsService.getSessionDetailsById(pinned).accountId, 'acct-2');
+    assert.equal(sessionsService.getSessionDetailsById(ambient).accountId, null);
+  });
+});
+
 test('getSessionDetailsById throws SESSION_NOT_FOUND for unknown ids', async () => {
   await withIsolatedDatabase(() => {
     assert.throws(

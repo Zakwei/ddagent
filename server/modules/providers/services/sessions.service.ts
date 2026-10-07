@@ -106,6 +106,8 @@ type SessionDetails = {
   model: string | null;
   /** Approval mode pinned to the session; `null` until the app records one. */
   permissionMode: string | null;
+  /** Provider account (multi-account login) the session runs under; `null` = default login. */
+  accountId: string | null;
   project: {
     projectId: string;
     path: string;
@@ -596,6 +598,7 @@ export const sessionsService = {
       isArchived: Boolean(session.isArchived),
       model: session.model ?? null,
       permissionMode: session.permission_mode ?? null,
+      accountId: session.account_id ?? null,
       project: project && projectPath
         ? {
             projectId: project.project_id,

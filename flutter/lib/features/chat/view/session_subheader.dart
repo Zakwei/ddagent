@@ -5,7 +5,8 @@ import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_nav_menu.dart';
 import 'package:ddagent_app/features/chat/state/composer_controller.dart';
 import 'package:ddagent_app/features/chat/view/chat_utilities.dart';
-import 'package:ddagent_app/features/quota/data/quota_models.dart' hide UsageSummary;
+import 'package:ddagent_app/features/quota/data/quota_models.dart'
+    hide UsageSummary;
 import 'package:ddagent_app/features/quota/data/quota_repository.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
 import 'package:ddagent_app/features/sessions/view/provider_logo.dart';
@@ -89,17 +90,21 @@ class SessionSubheader extends ConsumerWidget {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
     final fontSize = compact ? 11.0 : 12.0;
-    final muted = t.bodySmall?.copyWith(color: c.mutedForeground, fontSize: fontSize);
+    final muted = t.bodySmall?.copyWith(
+      color: c.mutedForeground,
+      fontSize: fontSize,
+    );
 
     // `ocModelLabel` parity — 'orchestrated' for Auto, else the catalog
     // label behind the active model id. The session row's `model` seeds the
     // label immediately, like the web's `selectedSession.model` (the
     // composer's resolved pick replaces it once its init lands).
-    final sessionModel = ref
-        .watch(sessionDetailsProvider(sessionId))
-        .value
-        ?.raw['model']
-        ?.toString();
+    final sessionRaw = ref.watch(sessionDetailsProvider(sessionId)).value?.raw;
+    final sessionModel = sessionRaw?['model']?.toString();
+    // Multi-account: the login this session runs under — the composer's draft
+    // pick first (new chats), then the session row's pinned account.
+    final accountId =
+        composer?.accountId ?? sessionRaw?['accountId']?.toString();
     final effectiveModel =
         composer?.activeModel ??
         (sessionModel != null && sessionModel.isNotEmpty ? sessionModel : null);
@@ -159,7 +164,10 @@ class SessionSubheader extends ConsumerWidget {
                             providerLabel(p),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: muted?.copyWith(color: c.primary, fontWeight: FontWeight.w700),
+                            style: muted?.copyWith(
+                              color: c.primary,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
                         if (!compact) Text('·', style: muted),
@@ -195,8 +203,13 @@ class SessionSubheader extends ConsumerWidget {
                         mainAxisSize: MainAxisSize.min,
                         spacing: spacing,
                         children: [
-                          if (usage != null) _ContextGauge(usage: usage, compact: compact),
-                          QuotaBadge(provider: p, model: effectiveModel),
+                          if (usage != null)
+                            _ContextGauge(usage: usage, compact: compact),
+                          QuotaBadge(
+                            provider: p,
+                            model: effectiveModel,
+                            accountId: accountId,
+                          ),
                         ],
                       ),
                     ),
@@ -258,10 +271,16 @@ class _ContextGauge extends StatelessWidget {
           const SizedBox(width: 6),
           Text(
             '$pct%',
-            style: tabular?.copyWith(color: c.foreground, fontWeight: FontWeight.w600),
+            style: tabular?.copyWith(
+              color: c.foreground,
+              fontWeight: FontWeight.w600,
+            ),
           ),
           const SizedBox(width: 6),
-          Text(formatTokenCount(usage.total), style: tabular?.copyWith(color: c.mutedForeground)),
+          Text(
+            formatTokenCount(usage.total),
+            style: tabular?.copyWith(color: c.mutedForeground),
+          ),
         ],
       ),
     );
@@ -285,7 +304,8 @@ String? sectionForModel(String? model) {
   return null;
 }
 
-/// `windowMatchesModel` — the devin section's model-group filter.
+/// `windowMatchesModel` — model-group filter: devin's Gemini / Claude-and-GPT
+/// pools and Claude Code's per-family weekly caps (`Sonnet · Weekly`, ...).
 bool windowMatchesModel(String windowKey, String? model) {
   if (model == null) return true;
   final m = model.toLowerCase();
@@ -293,7 +313,27 @@ bool windowMatchesModel(String windowKey, String? model) {
   final isClaudeOrGpt = m.contains('claude') || m.contains('gpt');
   if (windowKey.startsWith('Gemini Models')) return isGeminiModel;
   if (windowKey.startsWith('Claude and GPT')) return isClaudeOrGpt;
+  if (windowKey.startsWith('Sonnet ·')) return m.contains('sonnet');
+  if (windowKey.startsWith('Opus ·')) return m.contains('opus');
   return true;
+}
+
+/// The /api/quota account backing [sectionKey]. A session pinned to a
+/// provider account ([accountId], multi-account) reads that login's sweep;
+/// otherwise the ambient login (`id == provider`). A pinned id from another
+/// section (e.g. a model routed elsewhere) falls back to the ambient one.
+QuotaAccount? quotaAccountFor(
+  List<QuotaAccount> accounts,
+  String sectionKey,
+  String? accountId,
+) {
+  final section = accounts.where((a) => a.provider == sectionKey).toList();
+  if (accountId != null && accountId.isNotEmpty) {
+    final pinned = accounts.where((a) => a.id == accountId).firstOrNull;
+    if (pinned != null && pinned.provider == sectionKey) return pinned;
+  }
+  return section.where((a) => a.id == sectionKey).firstOrNull ??
+      section.firstOrNull;
 }
 
 String _percentText(double p) => p.toStringAsFixed(p % 1 == 0 ? 0 : 1);
@@ -302,15 +342,24 @@ String _percentText(double p) => p.toStringAsFixed(p % 1 == 0 ? 0 : 1);
 const quotaPeriodKinds = ['session', 'daily', 'weekly', 'monthly'];
 
 /// Short label per kind (5h/D/W/M) — parity with the web PERIOD_LETTER.
-const quotaPeriodLetter = {'session': '5h', 'daily': 'D', 'weekly': 'W', 'monthly': 'M'};
+const quotaPeriodLetter = {
+  'session': '5h',
+  'daily': 'D',
+  'weekly': 'W',
+  'monthly': 'M',
+};
 
 /// `(kind, percent, resetsAt)` for every present period window, in
 /// [quotaPeriodKinds] order — parity with the web `sectionPeriodWindows`.
 /// Windows with an unrecognised kind are skipped; zero-percent windows kept.
-List<(String, double, String?)> quotaPeriodSegments(QuotaAccount? account, String? model) => [
+List<(String, double, String?)> quotaPeriodSegments(
+  QuotaAccount? account,
+  String? model,
+) => [
   for (final kind in quotaPeriodKinds)
     for (final w in account?.windows ?? const <QuotaWindow>[])
-      if (w.kind == kind && windowMatchesModel(w.label, model)) (kind, w.percent, w.resetsAt),
+      if (w.kind == kind && windowMatchesModel(w.label, model))
+        (kind, w.percent, w.resetsAt),
 ];
 
 /// Full length of each period window — used to measure remaining clock time.
@@ -356,10 +405,13 @@ String? _resetLabel(String? iso) {
 }
 
 class QuotaBadge extends ConsumerWidget {
-  const QuotaBadge({super.key, this.provider, this.model});
+  const QuotaBadge({super.key, this.provider, this.model, this.accountId});
 
   final String? provider;
   final String? model;
+
+  /// Provider account the session is pinned to; `null` = ambient login.
+  final String? accountId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -367,12 +419,13 @@ class QuotaBadge extends ConsumerWidget {
     if (snap == null) return const SizedBox.shrink();
 
     // Section exclusively for the selected model; fallback by provider only
-    // ('devin'/'claude' → devin, bare 'opencode' → opencode). No section =
+    // ('claude' → claude, bare 'opencode' → opencode). No section =
     // no badge — never show % from another subscription.
     final sectionKey =
         sectionForModel(model) ??
         switch (provider) {
-          'devin' || 'claude' => 'devin',
+          'devin' => 'devin',
+          'claude' => 'claude',
           'opencode' => 'opencode',
           'commandcode' => 'commandcode',
           'antigravity' => 'gemini',
@@ -381,7 +434,7 @@ class QuotaBadge extends ConsumerWidget {
         };
     if (sectionKey == null) return const SizedBox.shrink();
 
-    final account = snap.accounts.where((a) => a.provider == sectionKey).firstOrNull;
+    final account = quotaAccountFor(snap.accounts, sectionKey, accountId);
     final lines = <String>[];
     if (account != null && account.status != 'active') {
       lines.add('${account.plan}: ${account.syncError ?? 'no subscription'}');
@@ -399,8 +452,12 @@ class QuotaBadge extends ConsumerWidget {
     }
 
     final percent = worst?.percent;
-    final watch = snap.overview.watchThreshold > 0 ? snap.overview.watchThreshold : 75.0;
-    final danger = snap.overview.dangerThreshold > 0 ? snap.overview.dangerThreshold : 90.0;
+    final watch = snap.overview.watchThreshold > 0
+        ? snap.overview.watchThreshold
+        : 75.0;
+    final danger = snap.overview.dangerThreshold > 0
+        ? snap.overview.dangerThreshold
+        : 90.0;
 
     final c = context.appColors;
     const amber = Color(0xFFF59E0B);
@@ -412,21 +469,29 @@ class QuotaBadge extends ConsumerWidget {
         : p >= watch
         ? 'warn'
         : 'ok';
-    (Color, Color, Color) colorsForTone(String tone, {bool muted = false}) => switch (tone) {
-      'warn' => (amber.withValues(alpha: 0.5), amber.withValues(alpha: 0.1), amber),
-      'critical' => (
-        c.destructive.withValues(alpha: 0.5),
-        c.destructive.withValues(alpha: 0.1),
-        c.destructive,
-      ),
-      _ => (
-        c.border.withValues(alpha: 0.7),
-        c.background.withValues(alpha: 0.7),
-        muted ? c.mutedForeground : c.foreground,
-      ),
-    };
+    (Color, Color, Color) colorsForTone(String tone, {bool muted = false}) =>
+        switch (tone) {
+          'warn' => (
+            amber.withValues(alpha: 0.5),
+            amber.withValues(alpha: 0.1),
+            amber,
+          ),
+          'critical' => (
+            c.destructive.withValues(alpha: 0.5),
+            c.destructive.withValues(alpha: 0.1),
+            c.destructive,
+          ),
+          _ => (
+            c.border.withValues(alpha: 0.7),
+            c.background.withValues(alpha: 0.7),
+            muted ? c.mutedForeground : c.foreground,
+          ),
+        };
 
-    final (border, bg, textColor) = colorsForTone(usageTone(percent), muted: percent == null);
+    final (border, bg, textColor) = colorsForTone(
+      usageTone(percent),
+      muted: percent == null,
+    );
     final iconColor = percent == null ? c.mutedForeground : c.primary;
 
     // Present period windows in session/daily/weekly/monthly order — all shown
@@ -478,13 +543,18 @@ class QuotaBadge extends ConsumerWidget {
                           resetsAt,
                           DateTime.now().millisecondsSinceEpoch,
                         );
-                        final seg = colorsForTone(quotaToneFor(segPercent, remaining));
+                        final seg = colorsForTone(
+                          quotaToneFor(segPercent, remaining),
+                        );
                         return Tooltip(
                           message: remaining == null
                               ? '${_percentText(segPercent)}%'
                               : '${remaining.round()}% of the window left before reset',
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 4,
+                              vertical: 1,
+                            ),
                             decoration: BoxDecoration(
                               color: seg.$2,
                               border: Border.all(color: seg.$1),
@@ -492,12 +562,15 @@ class QuotaBadge extends ConsumerWidget {
                             ),
                             child: Text(
                               '${_percentText(segPercent)}%${quotaPeriodLetter[kind] ?? kind}',
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w500,
-                                color: seg.$3,
-                                fontFeatures: const [FontFeature.tabularFigures()],
-                              ),
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w500,
+                                    color: seg.$3,
+                                    fontFeatures: const [
+                                      FontFeature.tabularFigures(),
+                                    ],
+                                  ),
                             ),
                           ),
                         );
