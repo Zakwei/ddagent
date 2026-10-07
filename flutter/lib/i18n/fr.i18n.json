@@ -2059,79 +2059,6 @@
     },
     "permissions": {
       "title": "Paramètres de permission",
-      "skipPermissions": {
-        "label": "Ignorer les invites de permission (à utiliser avec précaution)",
-        "claudeDescription": "Équivalent au flag --dangerously-skip-permissions",
-        "cursorDescription": "Équivalent au flag -f dans le CLI Cursor"
-      },
-      "allowedTools": {
-        "title": "Outils autorisés",
-        "description": "Outils automatiquement autorisés sans demande de permission",
-        "placeholder": "ex. : \"Bash(git log:*)\" ou \"Write\"",
-        "quickAdd": "Ajout rapide d'outils courants :",
-        "empty": "Aucun outil autorisé configuré"
-      },
-      "blockedTools": {
-        "title": "Outils bloqués",
-        "description": "Outils automatiquement bloqués sans demande de permission",
-        "placeholder": "ex. : \"Bash(rm:*)\"",
-        "empty": "Aucun outil bloqué configuré"
-      },
-      "allowedCommands": {
-        "title": "Commandes shell autorisées",
-        "description": "Commandes shell automatiquement autorisées sans demande",
-        "placeholder": "ex. : \"Shell(ls)\" ou \"Shell(git status)\"",
-        "quickAdd": "Ajout rapide de commandes courantes :",
-        "empty": "Aucune commande autorisée configurée"
-      },
-      "blockedCommands": {
-        "title": "Commandes shell bloquées",
-        "description": "Commandes shell automatiquement bloquées",
-        "placeholder": "ex. : \"Shell(rm -rf)\" ou \"Shell(sudo)\"",
-        "empty": "Aucune commande bloquée configurée"
-      },
-      "toolExamples": {
-        "title": "Exemples de motifs d'outils :",
-        "bashGitLog": "- Autoriser toutes les commandes git log",
-        "bashGitDiff": "- Autoriser toutes les commandes git diff",
-        "write": "- Autoriser toutes les utilisations de l'outil Write",
-        "bashRm": "- Bloquer toutes les commandes rm (dangereux)"
-      },
-      "shellExamples": {
-        "title": "Exemples de commandes shell :",
-        "ls": "- Autoriser la commande ls",
-        "gitStatus": "- Autoriser git status",
-        "npmInstall": "- Autoriser npm install",
-        "rmRf": "- Bloquer la suppression récursive"
-      },
-      "codex": {
-        "permissionMode": "Mode de permission",
-        "description": "Contrôle comment Codex gère les modifications de fichiers et l'exécution des commandes",
-        "modes": {
-          "default": {
-            "title": "Par défaut",
-            "description": "Seules les commandes de confiance (ls, cat, grep, git status, etc.) s'exécutent automatiquement. Les autres sont ignorées. Peut écrire dans l'espace de travail."
-          },
-          "acceptEdits": {
-            "title": "Accepter les modifications",
-            "description": "Toutes les commandes s'exécutent automatiquement dans l'espace de travail. Mode entièrement automatique avec exécution sandboxée."
-          },
-          "bypassPermissions": {
-            "title": "Contourner les permissions",
-            "description": "Accès système complet sans restrictions. Toutes les commandes s'exécutent automatiquement avec accès disque et réseau complet. À utiliser avec précaution."
-          }
-        },
-        "technicalDetails": "Détails techniques",
-        "technicalInfo": {
-          "default": "sandboxMode=workspace-write, approvalPolicy=untrusted. Commandes de confiance : cat, cd, grep, head, ls, pwd, tail, git status/log/diff/show, find (sans -exec), etc.",
-          "acceptEdits": "sandboxMode=workspace-write, approvalPolicy=never. Toutes les commandes s'exécutent automatiquement dans le répertoire du projet.",
-          "bypassPermissions": "sandboxMode=danger-full-access, approvalPolicy=never. Accès système complet, à utiliser uniquement dans des environnements de confiance.",
-          "overrideNote": "Vous pouvez remplacer ce mode par session via le bouton de mode dans l'interface de chat."
-        }
-      },
-      "actions": {
-        "add": "Ajouter"
-      },
       "permissionMode": {
         "title": "Mode de permission",
         "description": "Mode de permission par défaut pour les nouvelles sessions {{provider}}. Vous pouvez toujours le remplacer pour une session individuelle.",
@@ -2139,6 +2066,10 @@
           "default": {
             "title": "Par défaut",
             "description": "Les actions nécessitant une permission vous sont présentées pour approbation dans la discussion."
+          },
+          "auto": {
+            "title": "Mode automatique",
+            "description": "Un classifieur de modèle décide pour chaque appel d'outil d'approuver ou refuser. Mode mains libres, mais plus sûr que le contournement — des refus peuvent toujours se produire."
           },
           "acceptEdits": {
             "title": "Accepter les modifications",

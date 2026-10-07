@@ -2207,76 +2207,6 @@
     },
     "permissions": {
       "title": "Ustawienia uprawnień",
-      "skipPermissions": {
-        "label": "Pomiń monity o uprawnienia (używaj ostrożnie)",
-        "claudeDescription": "Odpowiednik flagi --dangerously-skip-permissions",
-        "cursorDescription": "Odpowiednik flagi -f w Cursor CLI"
-      },
-      "allowedTools": {
-        "title": "Dozwolone narzędzia",
-        "description": "Narzędzia automatycznie dozwolone bez pytania o uprawnienia",
-        "placeholder": "np. \"Bash(git log:*)\" lub \"Write\"",
-        "quickAdd": "Szybko dodaj popularne narzędzia:",
-        "empty": "Brak skonfigurowanych dozwolonych narzędzi"
-      },
-      "blockedTools": {
-        "title": "Zablokowane narzędzia",
-        "description": "Narzędzia automatycznie blokowane bez pytania o uprawnienia",
-        "placeholder": "np. \"Bash(rm:*)\"",
-        "empty": "Brak skonfigurowanych zablokowanych narzędzi"
-      },
-      "allowedCommands": {
-        "title": "Dozwolone polecenia powłoki",
-        "description": "Polecenia powłoki automatycznie dozwolone bez pytania",
-        "placeholder": "np. \"Shell(ls)\" lub \"Shell(git status)\"",
-        "quickAdd": "Szybko dodaj popularne polecenia:",
-        "empty": "Brak skonfigurowanych dozwolonych poleceń"
-      },
-      "blockedCommands": {
-        "title": "Zablokowane polecenia powłoki",
-        "description": "Polecenia powłoki automatycznie blokowane",
-        "placeholder": "np. \"Shell(rm -rf)\" lub \"Shell(sudo)\"",
-        "empty": "Brak skonfigurowanych zablokowanych poleceń"
-      },
-      "toolExamples": {
-        "title": "Przykłady wzorców narzędzi:",
-        "bashGitLog": "- Zezwól na wszystkie polecenia git log",
-        "bashGitDiff": "- Zezwól na wszystkie polecenia git diff",
-        "write": "- Zezwól na każde użycie narzędzia Write",
-        "bashRm": "- Blokuj wszystkie polecenia rm (niebezpieczne)"
-      },
-      "shellExamples": {
-        "title": "Przykłady poleceń powłoki:",
-        "ls": "- Zezwól na polecenie ls",
-        "gitStatus": "- Zezwól na git status",
-        "npmInstall": "- Zezwól na npm install",
-        "rmRf": "- Blokuj rekurencyjne usuwanie"
-      },
-      "codex": {
-        "permissionMode": "Tryb uprawnień",
-        "description": "Kontroluje, jak Codex obsługuje modyfikacje plików i wykonywanie poleceń",
-        "modes": {
-          "default": {
-            "title": "Domyślny",
-            "description": "Tylko zaufane polecenia (ls, cat, grep, git status itd.) są uruchamiane automatycznie. Inne polecenia są pomijane. Możliwy zapis w obszarze roboczym."
-          },
-          "acceptEdits": {
-            "title": "Akceptuj zmiany",
-            "description": "Wszystkie polecenia są uruchamiane automatycznie w obszarze roboczym. Pełny tryb automatyczny z wykonywaniem w piaskownicy."
-          },
-          "bypassPermissions": {
-            "title": "Omijaj uprawnienia",
-            "description": "Pełny dostęp do systemu bez ograniczeń. Wszystkie polecenia są uruchamiane automatycznie z pełnym dostępem do dysku i sieci. Używaj ostrożnie."
-          }
-        },
-        "technicalDetails": "Szczegóły techniczne",
-        "technicalInfo": {
-          "default": "sandboxMode=workspace-write, approvalPolicy=untrusted. Zaufane polecenia: cat, cd, grep, head, ls, pwd, tail, git status/log/diff/show, find (bez -exec) itd.",
-          "acceptEdits": "sandboxMode=workspace-write, approvalPolicy=never. Wszystkie polecenia są wykonywane automatycznie w katalogu projektu.",
-          "bypassPermissions": "sandboxMode=danger-full-access, approvalPolicy=never. Pełny dostęp do systemu, używaj tylko w zaufanych środowiskach.",
-          "overrideNote": "Możesz to zmienić dla pojedynczej sesji przyciskiem trybu w interfejsie czatu."
-        }
-      },
       "permissionMode": {
         "title": "Tryb uprawnień",
         "description": "Domyślny tryb uprawnień dla nowych sesji {{provider}}. Możesz go nadal zmienić dla pojedynczej sesji przyciskiem trybu w oknie czatu.",
@@ -2284,6 +2214,10 @@
           "default": {
             "title": "Domyślny",
             "description": "Akcje wymagające uprawnień są wyświetlane do zatwierdzenia w czacie."
+          },
+          "auto": {
+            "title": "Tryb automatyczny",
+            "description": "Klasyfikator modelu decyduje przy każdym wywołaniu narzędzia, czy je zatwierdzić, czy odrzucić. Tryb bezobsługowy, ale bezpieczniejszy niż omijanie uprawnień — odrzucenia nadal występują."
           },
           "acceptEdits": {
             "title": "Akceptuj zmiany",
@@ -2298,9 +2232,6 @@
             "description": "Tryb planowania: agent analizuje i planuje bez wykonywania poleceń."
           }
         }
-      },
-      "actions": {
-        "add": "Dodaj"
       }
     },
     "mcpServers": {

@@ -2535,15 +2535,6 @@ class Translations$settings$permissions$ru extends Translations$settings$permiss
 
 	// Translations
 	@override String get title => 'Настройки разрешений';
-	@override late final Translations$settings$permissions$skipPermissions$ru skipPermissions = Translations$settings$permissions$skipPermissions$ru._(_root);
-	@override late final Translations$settings$permissions$allowedTools$ru allowedTools = Translations$settings$permissions$allowedTools$ru._(_root);
-	@override late final Translations$settings$permissions$blockedTools$ru blockedTools = Translations$settings$permissions$blockedTools$ru._(_root);
-	@override late final Translations$settings$permissions$allowedCommands$ru allowedCommands = Translations$settings$permissions$allowedCommands$ru._(_root);
-	@override late final Translations$settings$permissions$blockedCommands$ru blockedCommands = Translations$settings$permissions$blockedCommands$ru._(_root);
-	@override late final Translations$settings$permissions$toolExamples$ru toolExamples = Translations$settings$permissions$toolExamples$ru._(_root);
-	@override late final Translations$settings$permissions$shellExamples$ru shellExamples = Translations$settings$permissions$shellExamples$ru._(_root);
-	@override late final Translations$settings$permissions$codex$ru codex = Translations$settings$permissions$codex$ru._(_root);
-	@override late final Translations$settings$permissions$actions$ru actions = Translations$settings$permissions$actions$ru._(_root);
 	@override late final Translations$settings$permissions$permissionMode$ru permissionMode = Translations$settings$permissions$permissionMode$ru._(_root);
 }
 
@@ -6078,124 +6069,6 @@ class Translations$settings$agents$logout$ru extends Translations$settings$agent
 	@override String get failed => 'Не удалось выйти';
 }
 
-// Path: settings.permissions.skipPermissions
-class Translations$settings$permissions$skipPermissions$ru extends Translations$settings$permissions$skipPermissions$en {
-	Translations$settings$permissions$skipPermissions$ru._(TranslationsRu root) : this._root = root, super.internal(root);
-
-	final TranslationsRu _root; // ignore: unused_field
-
-	// Translations
-	@override String get label => 'Пропускать запросы разрешений (используйте с осторожностью)';
-	@override String get claudeDescription => 'Эквивалентно флагу --dangerously-skip-permissions';
-	@override String get cursorDescription => 'Эквивалентно флагу -f в Cursor CLI';
-}
-
-// Path: settings.permissions.allowedTools
-class Translations$settings$permissions$allowedTools$ru extends Translations$settings$permissions$allowedTools$en {
-	Translations$settings$permissions$allowedTools$ru._(TranslationsRu root) : this._root = root, super.internal(root);
-
-	final TranslationsRu _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Разрешенные инструменты';
-	@override String get description => 'Инструменты, которые автоматически разрешены без запроса разрешения';
-	@override String get placeholder => 'например, "Bash(git log:*)" или "Write"';
-	@override String get quickAdd => 'Быстро добавить общие инструменты:';
-	@override String get empty => 'Разрешенные инструменты не настроены';
-}
-
-// Path: settings.permissions.blockedTools
-class Translations$settings$permissions$blockedTools$ru extends Translations$settings$permissions$blockedTools$en {
-	Translations$settings$permissions$blockedTools$ru._(TranslationsRu root) : this._root = root, super.internal(root);
-
-	final TranslationsRu _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Заблокированные инструменты';
-	@override String get description => 'Инструменты, которые автоматически блокируются без запроса разрешения';
-	@override String get placeholder => 'например, "Bash(rm:*)"';
-	@override String get empty => 'Заблокированные инструменты не настроены';
-}
-
-// Path: settings.permissions.allowedCommands
-class Translations$settings$permissions$allowedCommands$ru extends Translations$settings$permissions$allowedCommands$en {
-	Translations$settings$permissions$allowedCommands$ru._(TranslationsRu root) : this._root = root, super.internal(root);
-
-	final TranslationsRu _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Разрешенные команды оболочки';
-	@override String get description => 'Команды оболочки, которые автоматически разрешены без запроса';
-	@override String get placeholder => 'например, "Shell(ls)" или "Shell(git status)"';
-	@override String get quickAdd => 'Быстро добавить общие команды:';
-	@override String get empty => 'Разрешенные команды не настроены';
-}
-
-// Path: settings.permissions.blockedCommands
-class Translations$settings$permissions$blockedCommands$ru extends Translations$settings$permissions$blockedCommands$en {
-	Translations$settings$permissions$blockedCommands$ru._(TranslationsRu root) : this._root = root, super.internal(root);
-
-	final TranslationsRu _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Заблокированные команды оболочки';
-	@override String get description => 'Команды оболочки, которые автоматически блокируются';
-	@override String get placeholder => 'например, "Shell(rm -rf)" или "Shell(sudo)"';
-	@override String get empty => 'Заблокированные команды не настроены';
-}
-
-// Path: settings.permissions.toolExamples
-class Translations$settings$permissions$toolExamples$ru extends Translations$settings$permissions$toolExamples$en {
-	Translations$settings$permissions$toolExamples$ru._(TranslationsRu root) : this._root = root, super.internal(root);
-
-	final TranslationsRu _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Примеры шаблонов инструментов:';
-	@override String get bashGitLog => '- Разрешить все команды git log';
-	@override String get bashGitDiff => '- Разрешить все команды git diff';
-	@override String get write => '- Разрешить все использование инструмента Write';
-	@override String get bashRm => '- Заблокировать все команды rm (опасно)';
-}
-
-// Path: settings.permissions.shellExamples
-class Translations$settings$permissions$shellExamples$ru extends Translations$settings$permissions$shellExamples$en {
-	Translations$settings$permissions$shellExamples$ru._(TranslationsRu root) : this._root = root, super.internal(root);
-
-	final TranslationsRu _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Примеры команд оболочки:';
-	@override String get ls => '- Разрешить команду ls';
-	@override String get gitStatus => '- Разрешить git status';
-	@override String get npmInstall => '- Разрешить npm install';
-	@override String get rmRf => '- Заблокировать рекурсивное удаление';
-}
-
-// Path: settings.permissions.codex
-class Translations$settings$permissions$codex$ru extends Translations$settings$permissions$codex$en {
-	Translations$settings$permissions$codex$ru._(TranslationsRu root) : this._root = root, super.internal(root);
-
-	final TranslationsRu _root; // ignore: unused_field
-
-	// Translations
-	@override String get permissionMode => 'Режим разрешений';
-	@override String get description => 'Управляет тем, как Codex обрабатывает изменения файлов и выполнение команд';
-	@override late final Translations$settings$permissions$codex$modes$ru modes = Translations$settings$permissions$codex$modes$ru._(_root);
-	@override String get technicalDetails => 'Технические детали';
-	@override late final Translations$settings$permissions$codex$technicalInfo$ru technicalInfo = Translations$settings$permissions$codex$technicalInfo$ru._(_root);
-}
-
-// Path: settings.permissions.actions
-class Translations$settings$permissions$actions$ru extends Translations$settings$permissions$actions$en {
-	Translations$settings$permissions$actions$ru._(TranslationsRu root) : this._root = root, super.internal(root);
-
-	final TranslationsRu _root; // ignore: unused_field
-
-	// Translations
-	@override String get add => 'Добавить';
-}
-
 // Path: settings.permissions.permissionMode
 class Translations$settings$permissions$permissionMode$ru extends Translations$settings$permissions$permissionMode$en {
 	Translations$settings$permissions$permissionMode$ru._(TranslationsRu root) : this._root = root, super.internal(root);
@@ -6918,31 +6791,6 @@ class Translations$settings$agents$account$devin$ru extends Translations$setting
 	@override String get description => 'CLI-ассистент Devin';
 }
 
-// Path: settings.permissions.codex.modes
-class Translations$settings$permissions$codex$modes$ru extends Translations$settings$permissions$codex$modes$en {
-	Translations$settings$permissions$codex$modes$ru._(TranslationsRu root) : this._root = root, super.internal(root);
-
-	final TranslationsRu _root; // ignore: unused_field
-
-	// Translations
-	@override late final Translations$settings$permissions$codex$modes$kDefault$ru kDefault = Translations$settings$permissions$codex$modes$kDefault$ru._(_root);
-	@override late final Translations$settings$permissions$codex$modes$acceptEdits$ru acceptEdits = Translations$settings$permissions$codex$modes$acceptEdits$ru._(_root);
-	@override late final Translations$settings$permissions$codex$modes$bypassPermissions$ru bypassPermissions = Translations$settings$permissions$codex$modes$bypassPermissions$ru._(_root);
-}
-
-// Path: settings.permissions.codex.technicalInfo
-class Translations$settings$permissions$codex$technicalInfo$ru extends Translations$settings$permissions$codex$technicalInfo$en {
-	Translations$settings$permissions$codex$technicalInfo$ru._(TranslationsRu root) : this._root = root, super.internal(root);
-
-	final TranslationsRu _root; // ignore: unused_field
-
-	// Translations
-	@override String get kDefault => 'sandboxMode=workspace-write, approvalPolicy=untrusted. Доверенные команды: cat, cd, grep, head, ls, pwd, tail, git status/log/diff/show, find (без -exec) и т.д.';
-	@override String get acceptEdits => 'sandboxMode=workspace-write, approvalPolicy=never. Все команды автоматически выполняются в каталоге проекта.';
-	@override String get bypassPermissions => 'sandboxMode=danger-full-access, approvalPolicy=never. Полный системный доступ, используйте только в доверенных средах.';
-	@override String get overrideNote => 'Вы можете переопределить это для каждого сеанса, используя кнопку режима в интерфейсе чата.';
-}
-
 // Path: settings.permissions.permissionMode.modes
 class Translations$settings$permissions$permissionMode$modes$ru extends Translations$settings$permissions$permissionMode$modes$en {
 	Translations$settings$permissions$permissionMode$modes$ru._(TranslationsRu root) : this._root = root, super.internal(root);
@@ -6951,6 +6799,7 @@ class Translations$settings$permissions$permissionMode$modes$ru extends Translat
 
 	// Translations
 	@override late final Translations$settings$permissions$permissionMode$modes$kDefault$ru kDefault = Translations$settings$permissions$permissionMode$modes$kDefault$ru._(_root);
+	@override late final Translations$settings$permissions$permissionMode$modes$auto$ru auto = Translations$settings$permissions$permissionMode$modes$auto$ru._(_root);
 	@override late final Translations$settings$permissions$permissionMode$modes$acceptEdits$ru acceptEdits = Translations$settings$permissions$permissionMode$modes$acceptEdits$ru._(_root);
 	@override late final Translations$settings$permissions$permissionMode$modes$bypassPermissions$ru bypassPermissions = Translations$settings$permissions$permissionMode$modes$bypassPermissions$ru._(_root);
 	@override late final Translations$settings$permissions$permissionMode$modes$plan$ru plan = Translations$settings$permissions$permissionMode$modes$plan$ru._(_root);
@@ -7083,39 +6932,6 @@ class Translations$common$notifications$codes$agent$notification$ru extends Tran
 	@override String get title => 'Уведомление агента';
 }
 
-// Path: settings.permissions.codex.modes.kDefault
-class Translations$settings$permissions$codex$modes$kDefault$ru extends Translations$settings$permissions$codex$modes$kDefault$en {
-	Translations$settings$permissions$codex$modes$kDefault$ru._(TranslationsRu root) : this._root = root, super.internal(root);
-
-	final TranslationsRu _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'По умолчанию';
-	@override String get description => 'Только доверенные команды (ls, cat, grep, git status и т.д.) выполняются автоматически. Другие команды пропускаются. Может записывать в рабочее пространство.';
-}
-
-// Path: settings.permissions.codex.modes.acceptEdits
-class Translations$settings$permissions$codex$modes$acceptEdits$ru extends Translations$settings$permissions$codex$modes$acceptEdits$en {
-	Translations$settings$permissions$codex$modes$acceptEdits$ru._(TranslationsRu root) : this._root = root, super.internal(root);
-
-	final TranslationsRu _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Принимать правки';
-	@override String get description => 'Все команды выполняются автоматически в рабочем пространстве. Полный автоматический режим с изолированным выполнением.';
-}
-
-// Path: settings.permissions.codex.modes.bypassPermissions
-class Translations$settings$permissions$codex$modes$bypassPermissions$ru extends Translations$settings$permissions$codex$modes$bypassPermissions$en {
-	Translations$settings$permissions$codex$modes$bypassPermissions$ru._(TranslationsRu root) : this._root = root, super.internal(root);
-
-	final TranslationsRu _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Обход разрешений';
-	@override String get description => 'Полный системный доступ без ограничений. Все команды выполняются автоматически с полным доступом к диску и сети. Используйте с осторожностью.';
-}
-
 // Path: settings.permissions.permissionMode.modes.kDefault
 class Translations$settings$permissions$permissionMode$modes$kDefault$ru extends Translations$settings$permissions$permissionMode$modes$kDefault$en {
 	Translations$settings$permissions$permissionMode$modes$kDefault$ru._(TranslationsRu root) : this._root = root, super.internal(root);
@@ -7125,6 +6941,17 @@ class Translations$settings$permissions$permissionMode$modes$kDefault$ru extends
 	// Translations
 	@override String get title => 'По умолчанию';
 	@override String get description => 'Действия, требующие разрешения, показываются вам для одобрения в чате.';
+}
+
+// Path: settings.permissions.permissionMode.modes.auto
+class Translations$settings$permissions$permissionMode$modes$auto$ru extends Translations$settings$permissions$permissionMode$modes$auto$en {
+	Translations$settings$permissions$permissionMode$modes$auto$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Авторежим';
+	@override String get description => 'Классификатор модели решает для каждого вызова инструмента, одобрить или отклонить. Высокая автономность.';
 }
 
 // Path: settings.permissions.permissionMode.modes.acceptEdits
@@ -8698,61 +8525,18 @@ extension on TranslationsRu {
 			'settings.agents.logout.failed' => 'Не удалось выйти',
 			'settings.agents.error' => ({required Object error}) => 'Ошибка: ${error}',
 			'settings.permissions.title' => 'Настройки разрешений',
-			'settings.permissions.skipPermissions.label' => 'Пропускать запросы разрешений (используйте с осторожностью)',
-			'settings.permissions.skipPermissions.claudeDescription' => 'Эквивалентно флагу --dangerously-skip-permissions',
-			'settings.permissions.skipPermissions.cursorDescription' => 'Эквивалентно флагу -f в Cursor CLI',
-			'settings.permissions.allowedTools.title' => 'Разрешенные инструменты',
-			'settings.permissions.allowedTools.description' => 'Инструменты, которые автоматически разрешены без запроса разрешения',
-			'settings.permissions.allowedTools.placeholder' => 'например, "Bash(git log:*)" или "Write"',
-			'settings.permissions.allowedTools.quickAdd' => 'Быстро добавить общие инструменты:',
-			'settings.permissions.allowedTools.empty' => 'Разрешенные инструменты не настроены',
-			'settings.permissions.blockedTools.title' => 'Заблокированные инструменты',
-			'settings.permissions.blockedTools.description' => 'Инструменты, которые автоматически блокируются без запроса разрешения',
-			_ => null,
-		} ?? switch (path) {
-			'settings.permissions.blockedTools.placeholder' => 'например, "Bash(rm:*)"',
-			'settings.permissions.blockedTools.empty' => 'Заблокированные инструменты не настроены',
-			'settings.permissions.allowedCommands.title' => 'Разрешенные команды оболочки',
-			'settings.permissions.allowedCommands.description' => 'Команды оболочки, которые автоматически разрешены без запроса',
-			'settings.permissions.allowedCommands.placeholder' => 'например, "Shell(ls)" или "Shell(git status)"',
-			'settings.permissions.allowedCommands.quickAdd' => 'Быстро добавить общие команды:',
-			'settings.permissions.allowedCommands.empty' => 'Разрешенные команды не настроены',
-			'settings.permissions.blockedCommands.title' => 'Заблокированные команды оболочки',
-			'settings.permissions.blockedCommands.description' => 'Команды оболочки, которые автоматически блокируются',
-			'settings.permissions.blockedCommands.placeholder' => 'например, "Shell(rm -rf)" или "Shell(sudo)"',
-			'settings.permissions.blockedCommands.empty' => 'Заблокированные команды не настроены',
-			'settings.permissions.toolExamples.title' => 'Примеры шаблонов инструментов:',
-			'settings.permissions.toolExamples.bashGitLog' => '- Разрешить все команды git log',
-			'settings.permissions.toolExamples.bashGitDiff' => '- Разрешить все команды git diff',
-			'settings.permissions.toolExamples.write' => '- Разрешить все использование инструмента Write',
-			'settings.permissions.toolExamples.bashRm' => '- Заблокировать все команды rm (опасно)',
-			'settings.permissions.shellExamples.title' => 'Примеры команд оболочки:',
-			'settings.permissions.shellExamples.ls' => '- Разрешить команду ls',
-			'settings.permissions.shellExamples.gitStatus' => '- Разрешить git status',
-			'settings.permissions.shellExamples.npmInstall' => '- Разрешить npm install',
-			'settings.permissions.shellExamples.rmRf' => '- Заблокировать рекурсивное удаление',
-			'settings.permissions.codex.permissionMode' => 'Режим разрешений',
-			'settings.permissions.codex.description' => 'Управляет тем, как Codex обрабатывает изменения файлов и выполнение команд',
-			'settings.permissions.codex.modes.kDefault.title' => 'По умолчанию',
-			'settings.permissions.codex.modes.kDefault.description' => 'Только доверенные команды (ls, cat, grep, git status и т.д.) выполняются автоматически. Другие команды пропускаются. Может записывать в рабочее пространство.',
-			'settings.permissions.codex.modes.acceptEdits.title' => 'Принимать правки',
-			'settings.permissions.codex.modes.acceptEdits.description' => 'Все команды выполняются автоматически в рабочем пространстве. Полный автоматический режим с изолированным выполнением.',
-			'settings.permissions.codex.modes.bypassPermissions.title' => 'Обход разрешений',
-			'settings.permissions.codex.modes.bypassPermissions.description' => 'Полный системный доступ без ограничений. Все команды выполняются автоматически с полным доступом к диску и сети. Используйте с осторожностью.',
-			'settings.permissions.codex.technicalDetails' => 'Технические детали',
-			'settings.permissions.codex.technicalInfo.kDefault' => 'sandboxMode=workspace-write, approvalPolicy=untrusted. Доверенные команды: cat, cd, grep, head, ls, pwd, tail, git status/log/diff/show, find (без -exec) и т.д.',
-			'settings.permissions.codex.technicalInfo.acceptEdits' => 'sandboxMode=workspace-write, approvalPolicy=never. Все команды автоматически выполняются в каталоге проекта.',
-			'settings.permissions.codex.technicalInfo.bypassPermissions' => 'sandboxMode=danger-full-access, approvalPolicy=never. Полный системный доступ, используйте только в доверенных средах.',
-			'settings.permissions.codex.technicalInfo.overrideNote' => 'Вы можете переопределить это для каждого сеанса, используя кнопку режима в интерфейсе чата.',
-			'settings.permissions.actions.add' => 'Добавить',
 			'settings.permissions.permissionMode.title' => 'Режим разрешений',
 			'settings.permissions.permissionMode.description' => ({required Object provider}) => 'Режим разрешений по умолчанию для новых сессий ${provider}. Его всё ещё можно переопределить для отдельной сессии.',
 			'settings.permissions.permissionMode.modes.kDefault.title' => 'По умолчанию',
 			'settings.permissions.permissionMode.modes.kDefault.description' => 'Действия, требующие разрешения, показываются вам для одобрения в чате.',
+			'settings.permissions.permissionMode.modes.auto.title' => 'Авторежим',
+			'settings.permissions.permissionMode.modes.auto.description' => 'Классификатор модели решает для каждого вызова инструмента, одобрить или отклонить. Высокая автономность.',
 			'settings.permissions.permissionMode.modes.acceptEdits.title' => 'Принимать правки',
 			'settings.permissions.permissionMode.modes.acceptEdits.description' => 'Правки файлов одобряются автоматически; другие действия по-прежнему запрашивают одобрение.',
 			'settings.permissions.permissionMode.modes.bypassPermissions.title' => 'Обход разрешений',
 			'settings.permissions.permissionMode.modes.bypassPermissions.description' => 'Каждое действие одобряется автоматически — полный доступ без запросов. Используйте с осторожностью.',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.plan.title' => 'План',
 			'settings.permissions.permissionMode.modes.plan.description' => 'Режим планирования: агент исследует и планирует, не выполняя команд.',
 			'settings.mcpServers.title' => 'MCP серверы',
@@ -9222,8 +9006,6 @@ extension on TranslationsRu {
 			'tasks.createTask.submit' => 'Добавить задачу',
 			'tasks.createTask.submitting' => 'Добавление...',
 			'tasks.createTask.title' => 'Добавить задачу',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.createTask.titleLabel' => 'Название',
 			'tasks.createTask.titlePlaceholder' => 'Что нужно сделать?',
 			'tasks.list.completedReopen' => 'Выполнена (нажмите, чтобы переоткрыть)',
@@ -9267,6 +9049,8 @@ extension on TranslationsRu {
 			'tasks.taskDetail.statusFailed' => 'Не удалось обновить статус задачи',
 			'tasks.taskDetail.taskId' => ({required Object id}) => 'Задача ${id}',
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'Задача ${id}: ${title}',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.testStrategy' => 'Стратегия тестирования',
 			'tasks.taskDetail.titleRequired' => 'Название обязательно',
 			'tasks.taskDetail.updateFailed' => 'Не удалось обновить задачу',
@@ -9736,8 +9520,6 @@ extension on TranslationsRu {
 			'workspace.searchTranscript' => 'Поиск по транскрипту',
 			'workspace.sendTo' => ({required Object count}) => 'Отправить в ${count}',
 			'workspace.accountWithLabel' => ({required Object label}) => 'По умолчанию · ${label}',
-			_ => null,
-		} ?? switch (path) {
 			'workspace.finishRunBeforeChangingWorkspace' => 'Завершите запуск перед сменой рабочей области',
 			'workspace.restored' => 'Рабочая область восстановлена',
 			'workspace.maximizePane' => 'Развернуть панель',

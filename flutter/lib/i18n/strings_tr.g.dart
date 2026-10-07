@@ -2535,15 +2535,6 @@ class Translations$settings$permissions$tr extends Translations$settings$permiss
 
 	// Translations
 	@override String get title => 'İzin Ayarları';
-	@override late final Translations$settings$permissions$skipPermissions$tr skipPermissions = Translations$settings$permissions$skipPermissions$tr._(_root);
-	@override late final Translations$settings$permissions$allowedTools$tr allowedTools = Translations$settings$permissions$allowedTools$tr._(_root);
-	@override late final Translations$settings$permissions$blockedTools$tr blockedTools = Translations$settings$permissions$blockedTools$tr._(_root);
-	@override late final Translations$settings$permissions$allowedCommands$tr allowedCommands = Translations$settings$permissions$allowedCommands$tr._(_root);
-	@override late final Translations$settings$permissions$blockedCommands$tr blockedCommands = Translations$settings$permissions$blockedCommands$tr._(_root);
-	@override late final Translations$settings$permissions$toolExamples$tr toolExamples = Translations$settings$permissions$toolExamples$tr._(_root);
-	@override late final Translations$settings$permissions$shellExamples$tr shellExamples = Translations$settings$permissions$shellExamples$tr._(_root);
-	@override late final Translations$settings$permissions$codex$tr codex = Translations$settings$permissions$codex$tr._(_root);
-	@override late final Translations$settings$permissions$actions$tr actions = Translations$settings$permissions$actions$tr._(_root);
 	@override late final Translations$settings$permissions$permissionMode$tr permissionMode = Translations$settings$permissions$permissionMode$tr._(_root);
 }
 
@@ -6072,124 +6063,6 @@ class Translations$settings$agents$logout$tr extends Translations$settings$agent
 	@override String get failed => 'Çıkış yapılamadı';
 }
 
-// Path: settings.permissions.skipPermissions
-class Translations$settings$permissions$skipPermissions$tr extends Translations$settings$permissions$skipPermissions$en {
-	Translations$settings$permissions$skipPermissions$tr._(TranslationsTr root) : this._root = root, super.internal(root);
-
-	final TranslationsTr _root; // ignore: unused_field
-
-	// Translations
-	@override String get label => 'İzin istemlerini atla (dikkatli kullan)';
-	@override String get claudeDescription => '--dangerously-skip-permissions bayrağının eşdeğeri';
-	@override String get cursorDescription => 'Cursor CLI\'daki -f bayrağının eşdeğeri';
-}
-
-// Path: settings.permissions.allowedTools
-class Translations$settings$permissions$allowedTools$tr extends Translations$settings$permissions$allowedTools$en {
-	Translations$settings$permissions$allowedTools$tr._(TranslationsTr root) : this._root = root, super.internal(root);
-
-	final TranslationsTr _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'İzin Verilen Araçlar';
-	@override String get description => 'İzin istemeden otomatik olarak izin verilen araçlar';
-	@override String get placeholder => 'ör. "Bash(git log:*)" veya "Write"';
-	@override String get quickAdd => 'Yaygın araçları hızlı ekle:';
-	@override String get empty => 'İzin verilen araç yapılandırılmamış';
-}
-
-// Path: settings.permissions.blockedTools
-class Translations$settings$permissions$blockedTools$tr extends Translations$settings$permissions$blockedTools$en {
-	Translations$settings$permissions$blockedTools$tr._(TranslationsTr root) : this._root = root, super.internal(root);
-
-	final TranslationsTr _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Engellenen Araçlar';
-	@override String get description => 'İzin istemeden otomatik olarak engellenen araçlar';
-	@override String get placeholder => 'ör. "Bash(rm:*)"';
-	@override String get empty => 'Engellenen araç yapılandırılmamış';
-}
-
-// Path: settings.permissions.allowedCommands
-class Translations$settings$permissions$allowedCommands$tr extends Translations$settings$permissions$allowedCommands$en {
-	Translations$settings$permissions$allowedCommands$tr._(TranslationsTr root) : this._root = root, super.internal(root);
-
-	final TranslationsTr _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'İzin Verilen Shell Komutları';
-	@override String get description => 'İzin istemeden otomatik olarak izin verilen shell komutları';
-	@override String get placeholder => 'ör. "Shell(ls)" veya "Shell(git status)"';
-	@override String get quickAdd => 'Yaygın komutları hızlı ekle:';
-	@override String get empty => 'İzin verilen komut yapılandırılmamış';
-}
-
-// Path: settings.permissions.blockedCommands
-class Translations$settings$permissions$blockedCommands$tr extends Translations$settings$permissions$blockedCommands$en {
-	Translations$settings$permissions$blockedCommands$tr._(TranslationsTr root) : this._root = root, super.internal(root);
-
-	final TranslationsTr _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Engellenen Shell Komutları';
-	@override String get description => 'Otomatik olarak engellenen shell komutları';
-	@override String get placeholder => 'ör. "Shell(rm -rf)" veya "Shell(sudo)"';
-	@override String get empty => 'Engellenen komut yapılandırılmamış';
-}
-
-// Path: settings.permissions.toolExamples
-class Translations$settings$permissions$toolExamples$tr extends Translations$settings$permissions$toolExamples$en {
-	Translations$settings$permissions$toolExamples$tr._(TranslationsTr root) : this._root = root, super.internal(root);
-
-	final TranslationsTr _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Araç Desen Örnekleri:';
-	@override String get bashGitLog => '- Tüm git log komutlarına izin ver';
-	@override String get bashGitDiff => '- Tüm git diff komutlarına izin ver';
-	@override String get write => '- Tüm Write aracı kullanımına izin ver';
-	@override String get bashRm => '- Tüm rm komutlarını engelle (tehlikeli)';
-}
-
-// Path: settings.permissions.shellExamples
-class Translations$settings$permissions$shellExamples$tr extends Translations$settings$permissions$shellExamples$en {
-	Translations$settings$permissions$shellExamples$tr._(TranslationsTr root) : this._root = root, super.internal(root);
-
-	final TranslationsTr _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Shell Komut Örnekleri:';
-	@override String get ls => '- ls komutuna izin ver';
-	@override String get gitStatus => '- git status\'a izin ver';
-	@override String get npmInstall => '- npm install\'a izin ver';
-	@override String get rmRf => '- Özyinelemeli silmeyi engelle';
-}
-
-// Path: settings.permissions.codex
-class Translations$settings$permissions$codex$tr extends Translations$settings$permissions$codex$en {
-	Translations$settings$permissions$codex$tr._(TranslationsTr root) : this._root = root, super.internal(root);
-
-	final TranslationsTr _root; // ignore: unused_field
-
-	// Translations
-	@override String get permissionMode => 'İzin Modu';
-	@override String get description => 'Codex\'in dosya değişiklikleri ve komut çalıştırmayı nasıl ele aldığını kontrol eder';
-	@override late final Translations$settings$permissions$codex$modes$tr modes = Translations$settings$permissions$codex$modes$tr._(_root);
-	@override String get technicalDetails => 'Teknik ayrıntılar';
-	@override late final Translations$settings$permissions$codex$technicalInfo$tr technicalInfo = Translations$settings$permissions$codex$technicalInfo$tr._(_root);
-}
-
-// Path: settings.permissions.actions
-class Translations$settings$permissions$actions$tr extends Translations$settings$permissions$actions$en {
-	Translations$settings$permissions$actions$tr._(TranslationsTr root) : this._root = root, super.internal(root);
-
-	final TranslationsTr _root; // ignore: unused_field
-
-	// Translations
-	@override String get add => 'Ekle';
-}
-
 // Path: settings.permissions.permissionMode
 class Translations$settings$permissions$permissionMode$tr extends Translations$settings$permissions$permissionMode$en {
 	Translations$settings$permissions$permissionMode$tr._(TranslationsTr root) : this._root = root, super.internal(root);
@@ -6912,31 +6785,6 @@ class Translations$settings$agents$account$devin$tr extends Translations$setting
 	@override String get description => 'Devin CLI asistanı';
 }
 
-// Path: settings.permissions.codex.modes
-class Translations$settings$permissions$codex$modes$tr extends Translations$settings$permissions$codex$modes$en {
-	Translations$settings$permissions$codex$modes$tr._(TranslationsTr root) : this._root = root, super.internal(root);
-
-	final TranslationsTr _root; // ignore: unused_field
-
-	// Translations
-	@override late final Translations$settings$permissions$codex$modes$kDefault$tr kDefault = Translations$settings$permissions$codex$modes$kDefault$tr._(_root);
-	@override late final Translations$settings$permissions$codex$modes$acceptEdits$tr acceptEdits = Translations$settings$permissions$codex$modes$acceptEdits$tr._(_root);
-	@override late final Translations$settings$permissions$codex$modes$bypassPermissions$tr bypassPermissions = Translations$settings$permissions$codex$modes$bypassPermissions$tr._(_root);
-}
-
-// Path: settings.permissions.codex.technicalInfo
-class Translations$settings$permissions$codex$technicalInfo$tr extends Translations$settings$permissions$codex$technicalInfo$en {
-	Translations$settings$permissions$codex$technicalInfo$tr._(TranslationsTr root) : this._root = root, super.internal(root);
-
-	final TranslationsTr _root; // ignore: unused_field
-
-	// Translations
-	@override String get kDefault => 'sandboxMode=workspace-write, approvalPolicy=untrusted. Güvenilir komutlar: cat, cd, grep, head, ls, pwd, tail, git status/log/diff/show, find (-exec olmadan), vb.';
-	@override String get acceptEdits => 'sandboxMode=workspace-write, approvalPolicy=never. Tüm komutlar proje dizini içinde otomatik çalışır.';
-	@override String get bypassPermissions => 'sandboxMode=danger-full-access, approvalPolicy=never. Tam sistem erişimi, yalnızca güvenilir ortamlarda kullan.';
-	@override String get overrideNote => 'Sohbet arayüzündeki mod düğmesini kullanarak bunu oturum başına geçersiz kılabilirsin.';
-}
-
 // Path: settings.permissions.permissionMode.modes
 class Translations$settings$permissions$permissionMode$modes$tr extends Translations$settings$permissions$permissionMode$modes$en {
 	Translations$settings$permissions$permissionMode$modes$tr._(TranslationsTr root) : this._root = root, super.internal(root);
@@ -6945,6 +6793,7 @@ class Translations$settings$permissions$permissionMode$modes$tr extends Translat
 
 	// Translations
 	@override late final Translations$settings$permissions$permissionMode$modes$kDefault$tr kDefault = Translations$settings$permissions$permissionMode$modes$kDefault$tr._(_root);
+	@override late final Translations$settings$permissions$permissionMode$modes$auto$tr auto = Translations$settings$permissions$permissionMode$modes$auto$tr._(_root);
 	@override late final Translations$settings$permissions$permissionMode$modes$acceptEdits$tr acceptEdits = Translations$settings$permissions$permissionMode$modes$acceptEdits$tr._(_root);
 	@override late final Translations$settings$permissions$permissionMode$modes$bypassPermissions$tr bypassPermissions = Translations$settings$permissions$permissionMode$modes$bypassPermissions$tr._(_root);
 	@override late final Translations$settings$permissions$permissionMode$modes$plan$tr plan = Translations$settings$permissions$permissionMode$modes$plan$tr._(_root);
@@ -7077,39 +6926,6 @@ class Translations$common$notifications$codes$agent$notification$tr extends Tran
 	@override String get title => 'Ajan Bildirimi';
 }
 
-// Path: settings.permissions.codex.modes.kDefault
-class Translations$settings$permissions$codex$modes$kDefault$tr extends Translations$settings$permissions$codex$modes$kDefault$en {
-	Translations$settings$permissions$codex$modes$kDefault$tr._(TranslationsTr root) : this._root = root, super.internal(root);
-
-	final TranslationsTr _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Varsayılan';
-	@override String get description => 'Sadece güvenilir komutlar (ls, cat, grep, git status, vb.) otomatik çalışır. Diğer komutlar atlanır. Çalışma alanına yazabilir.';
-}
-
-// Path: settings.permissions.codex.modes.acceptEdits
-class Translations$settings$permissions$codex$modes$acceptEdits$tr extends Translations$settings$permissions$codex$modes$acceptEdits$en {
-	Translations$settings$permissions$codex$modes$acceptEdits$tr._(TranslationsTr root) : this._root = root, super.internal(root);
-
-	final TranslationsTr _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Düzenlemeleri Kabul Et';
-	@override String get description => 'Tüm komutlar çalışma alanı içinde otomatik çalışır. Sandbox\'lu çalıştırma ile tam otomatik mod.';
-}
-
-// Path: settings.permissions.codex.modes.bypassPermissions
-class Translations$settings$permissions$codex$modes$bypassPermissions$tr extends Translations$settings$permissions$codex$modes$bypassPermissions$en {
-	Translations$settings$permissions$codex$modes$bypassPermissions$tr._(TranslationsTr root) : this._root = root, super.internal(root);
-
-	final TranslationsTr _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'İzinleri Atla';
-	@override String get description => 'Kısıtlama olmadan tam sistem erişimi. Tüm komutlar tam disk ve ağ erişimiyle otomatik çalışır. Dikkatli kullan.';
-}
-
 // Path: settings.permissions.permissionMode.modes.kDefault
 class Translations$settings$permissions$permissionMode$modes$kDefault$tr extends Translations$settings$permissions$permissionMode$modes$kDefault$en {
 	Translations$settings$permissions$permissionMode$modes$kDefault$tr._(TranslationsTr root) : this._root = root, super.internal(root);
@@ -7119,6 +6935,17 @@ class Translations$settings$permissions$permissionMode$modes$kDefault$tr extends
 	// Translations
 	@override String get title => 'Varsayılan';
 	@override String get description => 'İzin gerektiren eylemler onayın için sohbette gösterilir.';
+}
+
+// Path: settings.permissions.permissionMode.modes.auto
+class Translations$settings$permissions$permissionMode$modes$auto$tr extends Translations$settings$permissions$permissionMode$modes$auto$en {
+	Translations$settings$permissions$permissionMode$modes$auto$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Otomatik Mod';
+	@override String get description => 'Bir model sınıflandırıcı, her araç çağrısında onay veya ret kararı verir. Yüksek özerklik.';
 }
 
 // Path: settings.permissions.permissionMode.modes.acceptEdits
@@ -8692,61 +8519,18 @@ extension on TranslationsTr {
 			'settings.agents.logout.failed' => 'Çıkış yapılamadı',
 			'settings.agents.error' => ({required Object error}) => 'Hata: ${error}',
 			'settings.permissions.title' => 'İzin Ayarları',
-			'settings.permissions.skipPermissions.label' => 'İzin istemlerini atla (dikkatli kullan)',
-			'settings.permissions.skipPermissions.claudeDescription' => '--dangerously-skip-permissions bayrağının eşdeğeri',
-			'settings.permissions.skipPermissions.cursorDescription' => 'Cursor CLI\'daki -f bayrağının eşdeğeri',
-			'settings.permissions.allowedTools.title' => 'İzin Verilen Araçlar',
-			'settings.permissions.allowedTools.description' => 'İzin istemeden otomatik olarak izin verilen araçlar',
-			'settings.permissions.allowedTools.placeholder' => 'ör. "Bash(git log:*)" veya "Write"',
-			'settings.permissions.allowedTools.quickAdd' => 'Yaygın araçları hızlı ekle:',
-			'settings.permissions.allowedTools.empty' => 'İzin verilen araç yapılandırılmamış',
-			'settings.permissions.blockedTools.title' => 'Engellenen Araçlar',
-			'settings.permissions.blockedTools.description' => 'İzin istemeden otomatik olarak engellenen araçlar',
-			_ => null,
-		} ?? switch (path) {
-			'settings.permissions.blockedTools.placeholder' => 'ör. "Bash(rm:*)"',
-			'settings.permissions.blockedTools.empty' => 'Engellenen araç yapılandırılmamış',
-			'settings.permissions.allowedCommands.title' => 'İzin Verilen Shell Komutları',
-			'settings.permissions.allowedCommands.description' => 'İzin istemeden otomatik olarak izin verilen shell komutları',
-			'settings.permissions.allowedCommands.placeholder' => 'ör. "Shell(ls)" veya "Shell(git status)"',
-			'settings.permissions.allowedCommands.quickAdd' => 'Yaygın komutları hızlı ekle:',
-			'settings.permissions.allowedCommands.empty' => 'İzin verilen komut yapılandırılmamış',
-			'settings.permissions.blockedCommands.title' => 'Engellenen Shell Komutları',
-			'settings.permissions.blockedCommands.description' => 'Otomatik olarak engellenen shell komutları',
-			'settings.permissions.blockedCommands.placeholder' => 'ör. "Shell(rm -rf)" veya "Shell(sudo)"',
-			'settings.permissions.blockedCommands.empty' => 'Engellenen komut yapılandırılmamış',
-			'settings.permissions.toolExamples.title' => 'Araç Desen Örnekleri:',
-			'settings.permissions.toolExamples.bashGitLog' => '- Tüm git log komutlarına izin ver',
-			'settings.permissions.toolExamples.bashGitDiff' => '- Tüm git diff komutlarına izin ver',
-			'settings.permissions.toolExamples.write' => '- Tüm Write aracı kullanımına izin ver',
-			'settings.permissions.toolExamples.bashRm' => '- Tüm rm komutlarını engelle (tehlikeli)',
-			'settings.permissions.shellExamples.title' => 'Shell Komut Örnekleri:',
-			'settings.permissions.shellExamples.ls' => '- ls komutuna izin ver',
-			'settings.permissions.shellExamples.gitStatus' => '- git status\'a izin ver',
-			'settings.permissions.shellExamples.npmInstall' => '- npm install\'a izin ver',
-			'settings.permissions.shellExamples.rmRf' => '- Özyinelemeli silmeyi engelle',
-			'settings.permissions.codex.permissionMode' => 'İzin Modu',
-			'settings.permissions.codex.description' => 'Codex\'in dosya değişiklikleri ve komut çalıştırmayı nasıl ele aldığını kontrol eder',
-			'settings.permissions.codex.modes.kDefault.title' => 'Varsayılan',
-			'settings.permissions.codex.modes.kDefault.description' => 'Sadece güvenilir komutlar (ls, cat, grep, git status, vb.) otomatik çalışır. Diğer komutlar atlanır. Çalışma alanına yazabilir.',
-			'settings.permissions.codex.modes.acceptEdits.title' => 'Düzenlemeleri Kabul Et',
-			'settings.permissions.codex.modes.acceptEdits.description' => 'Tüm komutlar çalışma alanı içinde otomatik çalışır. Sandbox\'lu çalıştırma ile tam otomatik mod.',
-			'settings.permissions.codex.modes.bypassPermissions.title' => 'İzinleri Atla',
-			'settings.permissions.codex.modes.bypassPermissions.description' => 'Kısıtlama olmadan tam sistem erişimi. Tüm komutlar tam disk ve ağ erişimiyle otomatik çalışır. Dikkatli kullan.',
-			'settings.permissions.codex.technicalDetails' => 'Teknik ayrıntılar',
-			'settings.permissions.codex.technicalInfo.kDefault' => 'sandboxMode=workspace-write, approvalPolicy=untrusted. Güvenilir komutlar: cat, cd, grep, head, ls, pwd, tail, git status/log/diff/show, find (-exec olmadan), vb.',
-			'settings.permissions.codex.technicalInfo.acceptEdits' => 'sandboxMode=workspace-write, approvalPolicy=never. Tüm komutlar proje dizini içinde otomatik çalışır.',
-			'settings.permissions.codex.technicalInfo.bypassPermissions' => 'sandboxMode=danger-full-access, approvalPolicy=never. Tam sistem erişimi, yalnızca güvenilir ortamlarda kullan.',
-			'settings.permissions.codex.technicalInfo.overrideNote' => 'Sohbet arayüzündeki mod düğmesini kullanarak bunu oturum başına geçersiz kılabilirsin.',
-			'settings.permissions.actions.add' => 'Ekle',
 			'settings.permissions.permissionMode.title' => 'İzin Modu',
 			'settings.permissions.permissionMode.description' => ({required Object provider}) => 'Yeni ${provider} oturumları için varsayılan izin modu. Tek bir oturum için yine de geçersiz kılabilirsin.',
 			'settings.permissions.permissionMode.modes.kDefault.title' => 'Varsayılan',
 			'settings.permissions.permissionMode.modes.kDefault.description' => 'İzin gerektiren eylemler onayın için sohbette gösterilir.',
+			'settings.permissions.permissionMode.modes.auto.title' => 'Otomatik Mod',
+			'settings.permissions.permissionMode.modes.auto.description' => 'Bir model sınıflandırıcı, her araç çağrısında onay veya ret kararı verir. Yüksek özerklik.',
 			'settings.permissions.permissionMode.modes.acceptEdits.title' => 'Düzenlemeleri Kabul Et',
 			'settings.permissions.permissionMode.modes.acceptEdits.description' => 'Dosya düzenlemeleri otomatik onaylanır; diğer eylemler yine onayını ister.',
 			'settings.permissions.permissionMode.modes.bypassPermissions.title' => 'İzinleri Atla',
 			'settings.permissions.permissionMode.modes.bypassPermissions.description' => 'Her eylem otomatik onaylanır — sorusuz tam erişim. Dikkatli kullan.',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.plan.title' => 'Plan',
 			'settings.permissions.permissionMode.modes.plan.description' => 'Planlama modu: agent komut çalıştırmadan keşfeder ve planlar.',
 			'settings.mcpServers.title' => 'MCP Sunucuları',
@@ -9216,8 +9000,6 @@ extension on TranslationsTr {
 			'tasks.createTask.submit' => 'Görev Ekle',
 			'tasks.createTask.submitting' => 'Ekleniyor...',
 			'tasks.createTask.title' => 'Görev Ekle',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.createTask.titleLabel' => 'Başlık',
 			'tasks.createTask.titlePlaceholder' => 'Ne yapılması gerekiyor?',
 			'tasks.list.completedReopen' => 'Tamamlandı (yeniden açmak için tıklayın)',
@@ -9261,6 +9043,8 @@ extension on TranslationsTr {
 			'tasks.taskDetail.statusFailed' => 'Görev durumu güncellenemedi',
 			'tasks.taskDetail.taskId' => ({required Object id}) => 'Görev ${id}',
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'Görev ${id}: ${title}',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.testStrategy' => 'Test Stratejisi',
 			'tasks.taskDetail.titleRequired' => 'Başlık gerekli',
 			'tasks.taskDetail.updateFailed' => 'Görev güncellenemedi',
@@ -9730,8 +9514,6 @@ extension on TranslationsTr {
 			'workspace.searchTranscript' => 'Transkriptte ara',
 			'workspace.sendTo' => ({required Object count}) => '${count} oturuma gönder',
 			'workspace.accountWithLabel' => ({required Object label}) => 'Varsayılan · ${label}',
-			_ => null,
-		} ?? switch (path) {
 			'workspace.finishRunBeforeChangingWorkspace' => 'Çalışma alanını değiştirmeden önce çalıştırmayı bitir',
 			'workspace.restored' => 'Çalışma alanı geri yüklendi',
 			'workspace.maximizePane' => 'Bölmeyi büyüt',

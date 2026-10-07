@@ -50,6 +50,7 @@ export async function spawnCursor(command: string, options: AnyRecord = {}, ws: 
       cwd,
       toolsSettings,
       skipPermissions,
+      permissionMode,
       model,
       sessionSummary,
       images,
@@ -108,9 +109,14 @@ export async function spawnCursor(command: string, options: AnyRecord = {}, ws: 
       baseArgs.push('--output-format', 'stream-json');
     }
 
-    // Add skip permissions flag if enabled
-    if (skipPermissions || settings.skipPermissions) {
+    // Map ddagent permission modes onto cursor-agent flags: bypass forces
+    // every command (`-f`), plan starts the read-only `--mode plan`; default
+    // and acceptEdits keep print mode's own behaviour (edits allowed, shell
+    // commands gated by the CLI's allowlist).
+    if (skipPermissions || settings.skipPermissions || permissionMode === 'bypassPermissions') {
       baseArgs.push('-f');
+    } else if (permissionMode === 'plan') {
+      baseArgs.push('--mode', 'plan');
     }
 
     // Use cwd (actual project directory) instead of projectPath

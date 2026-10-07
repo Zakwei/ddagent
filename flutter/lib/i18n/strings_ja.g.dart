@@ -2535,15 +2535,6 @@ class Translations$settings$permissions$ja extends Translations$settings$permiss
 
 	// Translations
 	@override String get title => '権限設定';
-	@override late final Translations$settings$permissions$skipPermissions$ja skipPermissions = Translations$settings$permissions$skipPermissions$ja._(_root);
-	@override late final Translations$settings$permissions$allowedTools$ja allowedTools = Translations$settings$permissions$allowedTools$ja._(_root);
-	@override late final Translations$settings$permissions$blockedTools$ja blockedTools = Translations$settings$permissions$blockedTools$ja._(_root);
-	@override late final Translations$settings$permissions$allowedCommands$ja allowedCommands = Translations$settings$permissions$allowedCommands$ja._(_root);
-	@override late final Translations$settings$permissions$blockedCommands$ja blockedCommands = Translations$settings$permissions$blockedCommands$ja._(_root);
-	@override late final Translations$settings$permissions$toolExamples$ja toolExamples = Translations$settings$permissions$toolExamples$ja._(_root);
-	@override late final Translations$settings$permissions$shellExamples$ja shellExamples = Translations$settings$permissions$shellExamples$ja._(_root);
-	@override late final Translations$settings$permissions$codex$ja codex = Translations$settings$permissions$codex$ja._(_root);
-	@override late final Translations$settings$permissions$actions$ja actions = Translations$settings$permissions$actions$ja._(_root);
 	@override late final Translations$settings$permissions$permissionMode$ja permissionMode = Translations$settings$permissions$permissionMode$ja._(_root);
 }
 
@@ -6072,124 +6063,6 @@ class Translations$settings$agents$logout$ja extends Translations$settings$agent
 	@override String get failed => 'ログアウトに失敗しました';
 }
 
-// Path: settings.permissions.skipPermissions
-class Translations$settings$permissions$skipPermissions$ja extends Translations$settings$permissions$skipPermissions$en {
-	Translations$settings$permissions$skipPermissions$ja._(TranslationsJa root) : this._root = root, super.internal(root);
-
-	final TranslationsJa _root; // ignore: unused_field
-
-	// Translations
-	@override String get label => '権限プロンプトをスキップ（注意して使用）';
-	@override String get claudeDescription => '--dangerously-skip-permissions フラグに相当';
-	@override String get cursorDescription => 'Cursor CLIの -f フラグに相当';
-}
-
-// Path: settings.permissions.allowedTools
-class Translations$settings$permissions$allowedTools$ja extends Translations$settings$permissions$allowedTools$en {
-	Translations$settings$permissions$allowedTools$ja._(TranslationsJa root) : this._root = root, super.internal(root);
-
-	final TranslationsJa _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => '許可されたツール';
-	@override String get description => '権限の確認なしに自動的に許可されるツール';
-	@override String get placeholder => '例: "Bash(git log:*)" または "Write"';
-	@override String get quickAdd => 'よく使うツールを追加:';
-	@override String get empty => '許可されたツールはありません';
-}
-
-// Path: settings.permissions.blockedTools
-class Translations$settings$permissions$blockedTools$ja extends Translations$settings$permissions$blockedTools$en {
-	Translations$settings$permissions$blockedTools$ja._(TranslationsJa root) : this._root = root, super.internal(root);
-
-	final TranslationsJa _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'ブロックされたツール';
-	@override String get description => '権限の確認なしに自動的にブロックされるツール';
-	@override String get placeholder => '例: "Bash(rm:*)"';
-	@override String get empty => 'ブロックされたツールはありません';
-}
-
-// Path: settings.permissions.allowedCommands
-class Translations$settings$permissions$allowedCommands$ja extends Translations$settings$permissions$allowedCommands$en {
-	Translations$settings$permissions$allowedCommands$ja._(TranslationsJa root) : this._root = root, super.internal(root);
-
-	final TranslationsJa _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => '許可されたシェルコマンド';
-	@override String get description => '権限の確認なしに自動的に許可されるシェルコマンド';
-	@override String get placeholder => '例: "Shell(ls)" または "Shell(git status)"';
-	@override String get quickAdd => 'よく使うコマンドを追加:';
-	@override String get empty => '許可されたコマンドはありません';
-}
-
-// Path: settings.permissions.blockedCommands
-class Translations$settings$permissions$blockedCommands$ja extends Translations$settings$permissions$blockedCommands$en {
-	Translations$settings$permissions$blockedCommands$ja._(TranslationsJa root) : this._root = root, super.internal(root);
-
-	final TranslationsJa _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'ブロックされたシェルコマンド';
-	@override String get description => '自動的にブロックされるシェルコマンド';
-	@override String get placeholder => '例: "Shell(rm -rf)" または "Shell(sudo)"';
-	@override String get empty => 'ブロックされたコマンドはありません';
-}
-
-// Path: settings.permissions.toolExamples
-class Translations$settings$permissions$toolExamples$ja extends Translations$settings$permissions$toolExamples$en {
-	Translations$settings$permissions$toolExamples$ja._(TranslationsJa root) : this._root = root, super.internal(root);
-
-	final TranslationsJa _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'ツールパターンの例:';
-	@override String get bashGitLog => '- すべてのgit logコマンドを許可';
-	@override String get bashGitDiff => '- すべてのgit diffコマンドを許可';
-	@override String get write => '- すべてのWriteツールの使用を許可';
-	@override String get bashRm => '- すべてのrmコマンドをブロック（危険）';
-}
-
-// Path: settings.permissions.shellExamples
-class Translations$settings$permissions$shellExamples$ja extends Translations$settings$permissions$shellExamples$en {
-	Translations$settings$permissions$shellExamples$ja._(TranslationsJa root) : this._root = root, super.internal(root);
-
-	final TranslationsJa _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'シェルコマンドの例:';
-	@override String get ls => '- lsコマンドを許可';
-	@override String get gitStatus => '- git statusを許可';
-	@override String get npmInstall => '- npm installを許可';
-	@override String get rmRf => '- 再帰的削除をブロック';
-}
-
-// Path: settings.permissions.codex
-class Translations$settings$permissions$codex$ja extends Translations$settings$permissions$codex$en {
-	Translations$settings$permissions$codex$ja._(TranslationsJa root) : this._root = root, super.internal(root);
-
-	final TranslationsJa _root; // ignore: unused_field
-
-	// Translations
-	@override String get permissionMode => '権限モード';
-	@override String get description => 'Codexがファイルの変更やコマンドの実行を処理する方法を制御します';
-	@override late final Translations$settings$permissions$codex$modes$ja modes = Translations$settings$permissions$codex$modes$ja._(_root);
-	@override String get technicalDetails => '技術的な詳細';
-	@override late final Translations$settings$permissions$codex$technicalInfo$ja technicalInfo = Translations$settings$permissions$codex$technicalInfo$ja._(_root);
-}
-
-// Path: settings.permissions.actions
-class Translations$settings$permissions$actions$ja extends Translations$settings$permissions$actions$en {
-	Translations$settings$permissions$actions$ja._(TranslationsJa root) : this._root = root, super.internal(root);
-
-	final TranslationsJa _root; // ignore: unused_field
-
-	// Translations
-	@override String get add => '追加';
-}
-
 // Path: settings.permissions.permissionMode
 class Translations$settings$permissions$permissionMode$ja extends Translations$settings$permissions$permissionMode$en {
 	Translations$settings$permissions$permissionMode$ja._(TranslationsJa root) : this._root = root, super.internal(root);
@@ -6912,31 +6785,6 @@ class Translations$settings$agents$account$devin$ja extends Translations$setting
 	@override String get description => 'Devin CLI アシスタント';
 }
 
-// Path: settings.permissions.codex.modes
-class Translations$settings$permissions$codex$modes$ja extends Translations$settings$permissions$codex$modes$en {
-	Translations$settings$permissions$codex$modes$ja._(TranslationsJa root) : this._root = root, super.internal(root);
-
-	final TranslationsJa _root; // ignore: unused_field
-
-	// Translations
-	@override late final Translations$settings$permissions$codex$modes$kDefault$ja kDefault = Translations$settings$permissions$codex$modes$kDefault$ja._(_root);
-	@override late final Translations$settings$permissions$codex$modes$acceptEdits$ja acceptEdits = Translations$settings$permissions$codex$modes$acceptEdits$ja._(_root);
-	@override late final Translations$settings$permissions$codex$modes$bypassPermissions$ja bypassPermissions = Translations$settings$permissions$codex$modes$bypassPermissions$ja._(_root);
-}
-
-// Path: settings.permissions.codex.technicalInfo
-class Translations$settings$permissions$codex$technicalInfo$ja extends Translations$settings$permissions$codex$technicalInfo$en {
-	Translations$settings$permissions$codex$technicalInfo$ja._(TranslationsJa root) : this._root = root, super.internal(root);
-
-	final TranslationsJa _root; // ignore: unused_field
-
-	// Translations
-	@override String get kDefault => 'sandboxMode=workspace-write, approvalPolicy=untrusted。信頼されたコマンド: cat, cd, grep, head, ls, pwd, tail, git status/log/diff/show, find（-execなし）など。';
-	@override String get acceptEdits => 'sandboxMode=workspace-write, approvalPolicy=never。すべてのコマンドがプロジェクトディレクトリ内で自動実行。';
-	@override String get bypassPermissions => 'sandboxMode=danger-full-access, approvalPolicy=never。完全なシステムアクセス。信頼された環境でのみ使用してください。';
-	@override String get overrideNote => 'チャットインターフェースのモードボタンを使用してセッションごとに上書きできます。';
-}
-
 // Path: settings.permissions.permissionMode.modes
 class Translations$settings$permissions$permissionMode$modes$ja extends Translations$settings$permissions$permissionMode$modes$en {
 	Translations$settings$permissions$permissionMode$modes$ja._(TranslationsJa root) : this._root = root, super.internal(root);
@@ -6945,6 +6793,7 @@ class Translations$settings$permissions$permissionMode$modes$ja extends Translat
 
 	// Translations
 	@override late final Translations$settings$permissions$permissionMode$modes$kDefault$ja kDefault = Translations$settings$permissions$permissionMode$modes$kDefault$ja._(_root);
+	@override late final Translations$settings$permissions$permissionMode$modes$auto$ja auto = Translations$settings$permissions$permissionMode$modes$auto$ja._(_root);
 	@override late final Translations$settings$permissions$permissionMode$modes$acceptEdits$ja acceptEdits = Translations$settings$permissions$permissionMode$modes$acceptEdits$ja._(_root);
 	@override late final Translations$settings$permissions$permissionMode$modes$bypassPermissions$ja bypassPermissions = Translations$settings$permissions$permissionMode$modes$bypassPermissions$ja._(_root);
 	@override late final Translations$settings$permissions$permissionMode$modes$plan$ja plan = Translations$settings$permissions$permissionMode$modes$plan$ja._(_root);
@@ -7077,39 +6926,6 @@ class Translations$common$notifications$codes$agent$notification$ja extends Tran
 	@override String get title => 'エージェント通知';
 }
 
-// Path: settings.permissions.codex.modes.kDefault
-class Translations$settings$permissions$codex$modes$kDefault$ja extends Translations$settings$permissions$codex$modes$kDefault$en {
-	Translations$settings$permissions$codex$modes$kDefault$ja._(TranslationsJa root) : this._root = root, super.internal(root);
-
-	final TranslationsJa _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'デフォルト';
-	@override String get description => '信頼されたコマンド（ls、cat、grep、git statusなど）のみ自動実行。その他のコマンドはスキップ。ワークスペースへの書き込みは可能。';
-}
-
-// Path: settings.permissions.codex.modes.acceptEdits
-class Translations$settings$permissions$codex$modes$acceptEdits$ja extends Translations$settings$permissions$codex$modes$acceptEdits$en {
-	Translations$settings$permissions$codex$modes$acceptEdits$ja._(TranslationsJa root) : this._root = root, super.internal(root);
-
-	final TranslationsJa _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => '編集を許可';
-	@override String get description => 'ワークスペース内ですべてのコマンドを自動実行。サンドボックス環境での完全自動モード。';
-}
-
-// Path: settings.permissions.codex.modes.bypassPermissions
-class Translations$settings$permissions$codex$modes$bypassPermissions$ja extends Translations$settings$permissions$codex$modes$bypassPermissions$en {
-	Translations$settings$permissions$codex$modes$bypassPermissions$ja._(TranslationsJa root) : this._root = root, super.internal(root);
-
-	final TranslationsJa _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => '権限をバイパス';
-	@override String get description => '制限なしの完全なシステムアクセス。すべてのコマンドがディスクとネットワークへの完全なアクセスで自動実行されます。注意して使用してください。';
-}
-
 // Path: settings.permissions.permissionMode.modes.kDefault
 class Translations$settings$permissions$permissionMode$modes$kDefault$ja extends Translations$settings$permissions$permissionMode$modes$kDefault$en {
 	Translations$settings$permissions$permissionMode$modes$kDefault$ja._(TranslationsJa root) : this._root = root, super.internal(root);
@@ -7119,6 +6935,17 @@ class Translations$settings$permissions$permissionMode$modes$kDefault$ja extends
 	// Translations
 	@override String get title => 'デフォルト';
 	@override String get description => '権限が必要なアクションはチャットで承認のために表示されます。';
+}
+
+// Path: settings.permissions.permissionMode.modes.auto
+class Translations$settings$permissions$permissionMode$modes$auto$ja extends Translations$settings$permissions$permissionMode$modes$auto$en {
+	Translations$settings$permissions$permissionMode$modes$auto$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '自動モード';
+	@override String get description => 'モデル分類器がツール呼び出しごとに承認または拒否を決定します。高い自律性。';
 }
 
 // Path: settings.permissions.permissionMode.modes.acceptEdits
@@ -8692,61 +8519,18 @@ extension on TranslationsJa {
 			'settings.agents.logout.failed' => 'ログアウトに失敗しました',
 			'settings.agents.error' => ({required Object error}) => 'エラー: ${error}',
 			'settings.permissions.title' => '権限設定',
-			'settings.permissions.skipPermissions.label' => '権限プロンプトをスキップ（注意して使用）',
-			'settings.permissions.skipPermissions.claudeDescription' => '--dangerously-skip-permissions フラグに相当',
-			'settings.permissions.skipPermissions.cursorDescription' => 'Cursor CLIの -f フラグに相当',
-			'settings.permissions.allowedTools.title' => '許可されたツール',
-			'settings.permissions.allowedTools.description' => '権限の確認なしに自動的に許可されるツール',
-			'settings.permissions.allowedTools.placeholder' => '例: "Bash(git log:*)" または "Write"',
-			'settings.permissions.allowedTools.quickAdd' => 'よく使うツールを追加:',
-			'settings.permissions.allowedTools.empty' => '許可されたツールはありません',
-			'settings.permissions.blockedTools.title' => 'ブロックされたツール',
-			'settings.permissions.blockedTools.description' => '権限の確認なしに自動的にブロックされるツール',
-			_ => null,
-		} ?? switch (path) {
-			'settings.permissions.blockedTools.placeholder' => '例: "Bash(rm:*)"',
-			'settings.permissions.blockedTools.empty' => 'ブロックされたツールはありません',
-			'settings.permissions.allowedCommands.title' => '許可されたシェルコマンド',
-			'settings.permissions.allowedCommands.description' => '権限の確認なしに自動的に許可されるシェルコマンド',
-			'settings.permissions.allowedCommands.placeholder' => '例: "Shell(ls)" または "Shell(git status)"',
-			'settings.permissions.allowedCommands.quickAdd' => 'よく使うコマンドを追加:',
-			'settings.permissions.allowedCommands.empty' => '許可されたコマンドはありません',
-			'settings.permissions.blockedCommands.title' => 'ブロックされたシェルコマンド',
-			'settings.permissions.blockedCommands.description' => '自動的にブロックされるシェルコマンド',
-			'settings.permissions.blockedCommands.placeholder' => '例: "Shell(rm -rf)" または "Shell(sudo)"',
-			'settings.permissions.blockedCommands.empty' => 'ブロックされたコマンドはありません',
-			'settings.permissions.toolExamples.title' => 'ツールパターンの例:',
-			'settings.permissions.toolExamples.bashGitLog' => '- すべてのgit logコマンドを許可',
-			'settings.permissions.toolExamples.bashGitDiff' => '- すべてのgit diffコマンドを許可',
-			'settings.permissions.toolExamples.write' => '- すべてのWriteツールの使用を許可',
-			'settings.permissions.toolExamples.bashRm' => '- すべてのrmコマンドをブロック（危険）',
-			'settings.permissions.shellExamples.title' => 'シェルコマンドの例:',
-			'settings.permissions.shellExamples.ls' => '- lsコマンドを許可',
-			'settings.permissions.shellExamples.gitStatus' => '- git statusを許可',
-			'settings.permissions.shellExamples.npmInstall' => '- npm installを許可',
-			'settings.permissions.shellExamples.rmRf' => '- 再帰的削除をブロック',
-			'settings.permissions.codex.permissionMode' => '権限モード',
-			'settings.permissions.codex.description' => 'Codexがファイルの変更やコマンドの実行を処理する方法を制御します',
-			'settings.permissions.codex.modes.kDefault.title' => 'デフォルト',
-			'settings.permissions.codex.modes.kDefault.description' => '信頼されたコマンド（ls、cat、grep、git statusなど）のみ自動実行。その他のコマンドはスキップ。ワークスペースへの書き込みは可能。',
-			'settings.permissions.codex.modes.acceptEdits.title' => '編集を許可',
-			'settings.permissions.codex.modes.acceptEdits.description' => 'ワークスペース内ですべてのコマンドを自動実行。サンドボックス環境での完全自動モード。',
-			'settings.permissions.codex.modes.bypassPermissions.title' => '権限をバイパス',
-			'settings.permissions.codex.modes.bypassPermissions.description' => '制限なしの完全なシステムアクセス。すべてのコマンドがディスクとネットワークへの完全なアクセスで自動実行されます。注意して使用してください。',
-			'settings.permissions.codex.technicalDetails' => '技術的な詳細',
-			'settings.permissions.codex.technicalInfo.kDefault' => 'sandboxMode=workspace-write, approvalPolicy=untrusted。信頼されたコマンド: cat, cd, grep, head, ls, pwd, tail, git status/log/diff/show, find（-execなし）など。',
-			'settings.permissions.codex.technicalInfo.acceptEdits' => 'sandboxMode=workspace-write, approvalPolicy=never。すべてのコマンドがプロジェクトディレクトリ内で自動実行。',
-			'settings.permissions.codex.technicalInfo.bypassPermissions' => 'sandboxMode=danger-full-access, approvalPolicy=never。完全なシステムアクセス。信頼された環境でのみ使用してください。',
-			'settings.permissions.codex.technicalInfo.overrideNote' => 'チャットインターフェースのモードボタンを使用してセッションごとに上書きできます。',
-			'settings.permissions.actions.add' => '追加',
 			'settings.permissions.permissionMode.title' => '権限モード',
 			'settings.permissions.permissionMode.description' => ({required Object provider}) => '新しい ${provider} セッションのデフォルト権限モード。個別のセッションで上書きできます。',
 			'settings.permissions.permissionMode.modes.kDefault.title' => 'デフォルト',
 			'settings.permissions.permissionMode.modes.kDefault.description' => '権限が必要なアクションはチャットで承認のために表示されます。',
+			'settings.permissions.permissionMode.modes.auto.title' => '自動モード',
+			'settings.permissions.permissionMode.modes.auto.description' => 'モデル分類器がツール呼び出しごとに承認または拒否を決定します。高い自律性。',
 			'settings.permissions.permissionMode.modes.acceptEdits.title' => '編集を許可',
 			'settings.permissions.permissionMode.modes.acceptEdits.description' => 'ファイル編集は自動承認されます。他のアクションは引き続き承認を求めます。',
 			'settings.permissions.permissionMode.modes.bypassPermissions.title' => '権限をバイパス',
 			'settings.permissions.permissionMode.modes.bypassPermissions.description' => 'すべてのアクションが自動承認されます — プロンプトなしの完全アクセス。注意して使用してください。',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.plan.title' => 'プラン',
 			'settings.permissions.permissionMode.modes.plan.description' => 'プランモード: エージェントはコマンドを実行せずに探索と計画を行います。',
 			'settings.mcpServers.title' => 'MCPサーバー',
@@ -9216,8 +9000,6 @@ extension on TranslationsJa {
 			'tasks.createTask.submit' => 'タスクを追加',
 			'tasks.createTask.submitting' => '追加中...',
 			'tasks.createTask.title' => 'タスクを追加',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.createTask.titleLabel' => 'タイトル',
 			'tasks.createTask.titlePlaceholder' => '何をすべきですか？',
 			'tasks.list.completedReopen' => '完了（クリックで再開）',
@@ -9261,6 +9043,8 @@ extension on TranslationsJa {
 			'tasks.taskDetail.statusFailed' => 'タスクステータスの更新に失敗しました',
 			'tasks.taskDetail.taskId' => ({required Object id}) => 'タスク ${id}',
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'タスク ${id}: ${title}',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.testStrategy' => 'テスト戦略',
 			'tasks.taskDetail.titleRequired' => 'タイトルは必須です',
 			'tasks.taskDetail.updateFailed' => 'タスクの更新に失敗しました',
@@ -9730,8 +9514,6 @@ extension on TranslationsJa {
 			'workspace.searchTranscript' => 'トランスクリプトを検索',
 			'workspace.sendTo' => ({required Object count}) => '${count} 件に送信',
 			'workspace.accountWithLabel' => ({required Object label}) => 'デフォルト · ${label}',
-			_ => null,
-		} ?? switch (path) {
 			'workspace.finishRunBeforeChangingWorkspace' => 'ワークスペースを変更する前に実行を終了してください',
 			'workspace.restored' => 'ワークスペースを復元しました',
 			'workspace.maximizePane' => 'ペインを最大化',

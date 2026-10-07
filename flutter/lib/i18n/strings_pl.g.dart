@@ -2605,16 +2605,7 @@ class Translations$settings$permissions$pl extends Translations$settings$permiss
 
 	// Translations
 	@override String get title => 'Ustawienia uprawnień';
-	@override late final Translations$settings$permissions$skipPermissions$pl skipPermissions = Translations$settings$permissions$skipPermissions$pl._(_root);
-	@override late final Translations$settings$permissions$allowedTools$pl allowedTools = Translations$settings$permissions$allowedTools$pl._(_root);
-	@override late final Translations$settings$permissions$blockedTools$pl blockedTools = Translations$settings$permissions$blockedTools$pl._(_root);
-	@override late final Translations$settings$permissions$allowedCommands$pl allowedCommands = Translations$settings$permissions$allowedCommands$pl._(_root);
-	@override late final Translations$settings$permissions$blockedCommands$pl blockedCommands = Translations$settings$permissions$blockedCommands$pl._(_root);
-	@override late final Translations$settings$permissions$toolExamples$pl toolExamples = Translations$settings$permissions$toolExamples$pl._(_root);
-	@override late final Translations$settings$permissions$shellExamples$pl shellExamples = Translations$settings$permissions$shellExamples$pl._(_root);
-	@override late final Translations$settings$permissions$codex$pl codex = Translations$settings$permissions$codex$pl._(_root);
 	@override late final Translations$settings$permissions$permissionMode$pl permissionMode = Translations$settings$permissions$permissionMode$pl._(_root);
-	@override late final Translations$settings$permissions$actions$pl actions = Translations$settings$permissions$actions$pl._(_root);
 }
 
 // Path: settings.mcpServers
@@ -6406,114 +6397,6 @@ class Translations$settings$agents$accounts$pl extends Translations$settings$age
 	@override String get add => 'Dodaj konto';
 }
 
-// Path: settings.permissions.skipPermissions
-class Translations$settings$permissions$skipPermissions$pl extends Translations$settings$permissions$skipPermissions$en {
-	Translations$settings$permissions$skipPermissions$pl._(TranslationsPl root) : this._root = root, super.internal(root);
-
-	final TranslationsPl _root; // ignore: unused_field
-
-	// Translations
-	@override String get label => 'Pomiń monity o uprawnienia (używaj ostrożnie)';
-	@override String get claudeDescription => 'Odpowiednik flagi --dangerously-skip-permissions';
-	@override String get cursorDescription => 'Odpowiednik flagi -f w Cursor CLI';
-}
-
-// Path: settings.permissions.allowedTools
-class Translations$settings$permissions$allowedTools$pl extends Translations$settings$permissions$allowedTools$en {
-	Translations$settings$permissions$allowedTools$pl._(TranslationsPl root) : this._root = root, super.internal(root);
-
-	final TranslationsPl _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Dozwolone narzędzia';
-	@override String get description => 'Narzędzia automatycznie dozwolone bez pytania o uprawnienia';
-	@override String get placeholder => 'np. "Bash(git log:*)" lub "Write"';
-	@override String get quickAdd => 'Szybko dodaj popularne narzędzia:';
-	@override String get empty => 'Brak skonfigurowanych dozwolonych narzędzi';
-}
-
-// Path: settings.permissions.blockedTools
-class Translations$settings$permissions$blockedTools$pl extends Translations$settings$permissions$blockedTools$en {
-	Translations$settings$permissions$blockedTools$pl._(TranslationsPl root) : this._root = root, super.internal(root);
-
-	final TranslationsPl _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Zablokowane narzędzia';
-	@override String get description => 'Narzędzia automatycznie blokowane bez pytania o uprawnienia';
-	@override String get placeholder => 'np. "Bash(rm:*)"';
-	@override String get empty => 'Brak skonfigurowanych zablokowanych narzędzi';
-}
-
-// Path: settings.permissions.allowedCommands
-class Translations$settings$permissions$allowedCommands$pl extends Translations$settings$permissions$allowedCommands$en {
-	Translations$settings$permissions$allowedCommands$pl._(TranslationsPl root) : this._root = root, super.internal(root);
-
-	final TranslationsPl _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Dozwolone polecenia powłoki';
-	@override String get description => 'Polecenia powłoki automatycznie dozwolone bez pytania';
-	@override String get placeholder => 'np. "Shell(ls)" lub "Shell(git status)"';
-	@override String get quickAdd => 'Szybko dodaj popularne polecenia:';
-	@override String get empty => 'Brak skonfigurowanych dozwolonych poleceń';
-}
-
-// Path: settings.permissions.blockedCommands
-class Translations$settings$permissions$blockedCommands$pl extends Translations$settings$permissions$blockedCommands$en {
-	Translations$settings$permissions$blockedCommands$pl._(TranslationsPl root) : this._root = root, super.internal(root);
-
-	final TranslationsPl _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Zablokowane polecenia powłoki';
-	@override String get description => 'Polecenia powłoki automatycznie blokowane';
-	@override String get placeholder => 'np. "Shell(rm -rf)" lub "Shell(sudo)"';
-	@override String get empty => 'Brak skonfigurowanych zablokowanych poleceń';
-}
-
-// Path: settings.permissions.toolExamples
-class Translations$settings$permissions$toolExamples$pl extends Translations$settings$permissions$toolExamples$en {
-	Translations$settings$permissions$toolExamples$pl._(TranslationsPl root) : this._root = root, super.internal(root);
-
-	final TranslationsPl _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Przykłady wzorców narzędzi:';
-	@override String get bashGitLog => '- Zezwól na wszystkie polecenia git log';
-	@override String get bashGitDiff => '- Zezwól na wszystkie polecenia git diff';
-	@override String get write => '- Zezwól na każde użycie narzędzia Write';
-	@override String get bashRm => '- Blokuj wszystkie polecenia rm (niebezpieczne)';
-}
-
-// Path: settings.permissions.shellExamples
-class Translations$settings$permissions$shellExamples$pl extends Translations$settings$permissions$shellExamples$en {
-	Translations$settings$permissions$shellExamples$pl._(TranslationsPl root) : this._root = root, super.internal(root);
-
-	final TranslationsPl _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Przykłady poleceń powłoki:';
-	@override String get ls => '- Zezwól na polecenie ls';
-	@override String get gitStatus => '- Zezwól na git status';
-	@override String get npmInstall => '- Zezwól na npm install';
-	@override String get rmRf => '- Blokuj rekurencyjne usuwanie';
-}
-
-// Path: settings.permissions.codex
-class Translations$settings$permissions$codex$pl extends Translations$settings$permissions$codex$en {
-	Translations$settings$permissions$codex$pl._(TranslationsPl root) : this._root = root, super.internal(root);
-
-	final TranslationsPl _root; // ignore: unused_field
-
-	// Translations
-	@override String get permissionMode => 'Tryb uprawnień';
-	@override String get description => 'Kontroluje, jak Codex obsługuje modyfikacje plików i wykonywanie poleceń';
-	@override late final Translations$settings$permissions$codex$modes$pl modes = Translations$settings$permissions$codex$modes$pl._(_root);
-	@override String get technicalDetails => 'Szczegóły techniczne';
-	@override late final Translations$settings$permissions$codex$technicalInfo$pl technicalInfo = Translations$settings$permissions$codex$technicalInfo$pl._(_root);
-}
-
 // Path: settings.permissions.permissionMode
 class Translations$settings$permissions$permissionMode$pl extends Translations$settings$permissions$permissionMode$en {
 	Translations$settings$permissions$permissionMode$pl._(TranslationsPl root) : this._root = root, super.internal(root);
@@ -6524,16 +6407,6 @@ class Translations$settings$permissions$permissionMode$pl extends Translations$s
 	@override String get title => 'Tryb uprawnień';
 	@override String description({required Object provider}) => 'Domyślny tryb uprawnień dla nowych sesji ${provider}. Możesz go nadal zmienić dla pojedynczej sesji przyciskiem trybu w oknie czatu.';
 	@override late final Translations$settings$permissions$permissionMode$modes$pl modes = Translations$settings$permissions$permissionMode$modes$pl._(_root);
-}
-
-// Path: settings.permissions.actions
-class Translations$settings$permissions$actions$pl extends Translations$settings$permissions$actions$en {
-	Translations$settings$permissions$actions$pl._(TranslationsPl root) : this._root = root, super.internal(root);
-
-	final TranslationsPl _root; // ignore: unused_field
-
-	// Translations
-	@override String get add => 'Dodaj';
 }
 
 // Path: settings.mcpServers.description
@@ -7334,31 +7207,6 @@ class Translations$settings$agents$account$devin$pl extends Translations$setting
 	@override String get description => 'Asystent CLI Devin';
 }
 
-// Path: settings.permissions.codex.modes
-class Translations$settings$permissions$codex$modes$pl extends Translations$settings$permissions$codex$modes$en {
-	Translations$settings$permissions$codex$modes$pl._(TranslationsPl root) : this._root = root, super.internal(root);
-
-	final TranslationsPl _root; // ignore: unused_field
-
-	// Translations
-	@override late final Translations$settings$permissions$codex$modes$kDefault$pl kDefault = Translations$settings$permissions$codex$modes$kDefault$pl._(_root);
-	@override late final Translations$settings$permissions$codex$modes$acceptEdits$pl acceptEdits = Translations$settings$permissions$codex$modes$acceptEdits$pl._(_root);
-	@override late final Translations$settings$permissions$codex$modes$bypassPermissions$pl bypassPermissions = Translations$settings$permissions$codex$modes$bypassPermissions$pl._(_root);
-}
-
-// Path: settings.permissions.codex.technicalInfo
-class Translations$settings$permissions$codex$technicalInfo$pl extends Translations$settings$permissions$codex$technicalInfo$en {
-	Translations$settings$permissions$codex$technicalInfo$pl._(TranslationsPl root) : this._root = root, super.internal(root);
-
-	final TranslationsPl _root; // ignore: unused_field
-
-	// Translations
-	@override String get kDefault => 'sandboxMode=workspace-write, approvalPolicy=untrusted. Zaufane polecenia: cat, cd, grep, head, ls, pwd, tail, git status/log/diff/show, find (bez -exec) itd.';
-	@override String get acceptEdits => 'sandboxMode=workspace-write, approvalPolicy=never. Wszystkie polecenia są wykonywane automatycznie w katalogu projektu.';
-	@override String get bypassPermissions => 'sandboxMode=danger-full-access, approvalPolicy=never. Pełny dostęp do systemu, używaj tylko w zaufanych środowiskach.';
-	@override String get overrideNote => 'Możesz to zmienić dla pojedynczej sesji przyciskiem trybu w interfejsie czatu.';
-}
-
 // Path: settings.permissions.permissionMode.modes
 class Translations$settings$permissions$permissionMode$modes$pl extends Translations$settings$permissions$permissionMode$modes$en {
 	Translations$settings$permissions$permissionMode$modes$pl._(TranslationsPl root) : this._root = root, super.internal(root);
@@ -7367,6 +7215,7 @@ class Translations$settings$permissions$permissionMode$modes$pl extends Translat
 
 	// Translations
 	@override late final Translations$settings$permissions$permissionMode$modes$kDefault$pl kDefault = Translations$settings$permissions$permissionMode$modes$kDefault$pl._(_root);
+	@override late final Translations$settings$permissions$permissionMode$modes$auto$pl auto = Translations$settings$permissions$permissionMode$modes$auto$pl._(_root);
 	@override late final Translations$settings$permissions$permissionMode$modes$acceptEdits$pl acceptEdits = Translations$settings$permissions$permissionMode$modes$acceptEdits$pl._(_root);
 	@override late final Translations$settings$permissions$permissionMode$modes$bypassPermissions$pl bypassPermissions = Translations$settings$permissions$permissionMode$modes$bypassPermissions$pl._(_root);
 	@override late final Translations$settings$permissions$permissionMode$modes$plan$pl plan = Translations$settings$permissions$permissionMode$modes$plan$pl._(_root);
@@ -7499,39 +7348,6 @@ class Translations$common$notifications$codes$agent$notification$pl extends Tran
 	@override String get title => 'Powiadomienie agenta';
 }
 
-// Path: settings.permissions.codex.modes.kDefault
-class Translations$settings$permissions$codex$modes$kDefault$pl extends Translations$settings$permissions$codex$modes$kDefault$en {
-	Translations$settings$permissions$codex$modes$kDefault$pl._(TranslationsPl root) : this._root = root, super.internal(root);
-
-	final TranslationsPl _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Domyślny';
-	@override String get description => 'Tylko zaufane polecenia (ls, cat, grep, git status itd.) są uruchamiane automatycznie. Inne polecenia są pomijane. Możliwy zapis w obszarze roboczym.';
-}
-
-// Path: settings.permissions.codex.modes.acceptEdits
-class Translations$settings$permissions$codex$modes$acceptEdits$pl extends Translations$settings$permissions$codex$modes$acceptEdits$en {
-	Translations$settings$permissions$codex$modes$acceptEdits$pl._(TranslationsPl root) : this._root = root, super.internal(root);
-
-	final TranslationsPl _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Akceptuj zmiany';
-	@override String get description => 'Wszystkie polecenia są uruchamiane automatycznie w obszarze roboczym. Pełny tryb automatyczny z wykonywaniem w piaskownicy.';
-}
-
-// Path: settings.permissions.codex.modes.bypassPermissions
-class Translations$settings$permissions$codex$modes$bypassPermissions$pl extends Translations$settings$permissions$codex$modes$bypassPermissions$en {
-	Translations$settings$permissions$codex$modes$bypassPermissions$pl._(TranslationsPl root) : this._root = root, super.internal(root);
-
-	final TranslationsPl _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Omijaj uprawnienia';
-	@override String get description => 'Pełny dostęp do systemu bez ograniczeń. Wszystkie polecenia są uruchamiane automatycznie z pełnym dostępem do dysku i sieci. Używaj ostrożnie.';
-}
-
 // Path: settings.permissions.permissionMode.modes.kDefault
 class Translations$settings$permissions$permissionMode$modes$kDefault$pl extends Translations$settings$permissions$permissionMode$modes$kDefault$en {
 	Translations$settings$permissions$permissionMode$modes$kDefault$pl._(TranslationsPl root) : this._root = root, super.internal(root);
@@ -7541,6 +7357,17 @@ class Translations$settings$permissions$permissionMode$modes$kDefault$pl extends
 	// Translations
 	@override String get title => 'Domyślny';
 	@override String get description => 'Akcje wymagające uprawnień są wyświetlane do zatwierdzenia w czacie.';
+}
+
+// Path: settings.permissions.permissionMode.modes.auto
+class Translations$settings$permissions$permissionMode$modes$auto$pl extends Translations$settings$permissions$permissionMode$modes$auto$en {
+	Translations$settings$permissions$permissionMode$modes$auto$pl._(TranslationsPl root) : this._root = root, super.internal(root);
+
+	final TranslationsPl _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Tryb automatyczny';
+	@override String get description => 'Klasyfikator modelu decyduje przy każdym wywołaniu narzędzia, czy je zatwierdzić, czy odrzucić. Tryb bezobsługowy, ale bezpieczniejszy niż omijanie uprawnień — odrzucenia nadal występują.';
 }
 
 // Path: settings.permissions.permissionMode.modes.acceptEdits
@@ -9235,61 +9062,18 @@ extension on TranslationsPl {
 			'settings.agents.accounts.newLabel' => 'Nazwa konta (np. Praca)',
 			'settings.agents.accounts.add' => 'Dodaj konto',
 			'settings.permissions.title' => 'Ustawienia uprawnień',
-			'settings.permissions.skipPermissions.label' => 'Pomiń monity o uprawnienia (używaj ostrożnie)',
-			'settings.permissions.skipPermissions.claudeDescription' => 'Odpowiednik flagi --dangerously-skip-permissions',
-			'settings.permissions.skipPermissions.cursorDescription' => 'Odpowiednik flagi -f w Cursor CLI',
-			'settings.permissions.allowedTools.title' => 'Dozwolone narzędzia',
-			'settings.permissions.allowedTools.description' => 'Narzędzia automatycznie dozwolone bez pytania o uprawnienia',
-			'settings.permissions.allowedTools.placeholder' => 'np. "Bash(git log:*)" lub "Write"',
-			'settings.permissions.allowedTools.quickAdd' => 'Szybko dodaj popularne narzędzia:',
-			'settings.permissions.allowedTools.empty' => 'Brak skonfigurowanych dozwolonych narzędzi',
-			'settings.permissions.blockedTools.title' => 'Zablokowane narzędzia',
-			'settings.permissions.blockedTools.description' => 'Narzędzia automatycznie blokowane bez pytania o uprawnienia',
-			'settings.permissions.blockedTools.placeholder' => 'np. "Bash(rm:*)"',
-			'settings.permissions.blockedTools.empty' => 'Brak skonfigurowanych zablokowanych narzędzi',
-			'settings.permissions.allowedCommands.title' => 'Dozwolone polecenia powłoki',
-			'settings.permissions.allowedCommands.description' => 'Polecenia powłoki automatycznie dozwolone bez pytania',
-			'settings.permissions.allowedCommands.placeholder' => 'np. "Shell(ls)" lub "Shell(git status)"',
-			'settings.permissions.allowedCommands.quickAdd' => 'Szybko dodaj popularne polecenia:',
-			'settings.permissions.allowedCommands.empty' => 'Brak skonfigurowanych dozwolonych poleceń',
-			'settings.permissions.blockedCommands.title' => 'Zablokowane polecenia powłoki',
-			'settings.permissions.blockedCommands.description' => 'Polecenia powłoki automatycznie blokowane',
-			'settings.permissions.blockedCommands.placeholder' => 'np. "Shell(rm -rf)" lub "Shell(sudo)"',
-			'settings.permissions.blockedCommands.empty' => 'Brak skonfigurowanych zablokowanych poleceń',
-			'settings.permissions.toolExamples.title' => 'Przykłady wzorców narzędzi:',
-			'settings.permissions.toolExamples.bashGitLog' => '- Zezwól na wszystkie polecenia git log',
-			'settings.permissions.toolExamples.bashGitDiff' => '- Zezwól na wszystkie polecenia git diff',
-			'settings.permissions.toolExamples.write' => '- Zezwól na każde użycie narzędzia Write',
-			'settings.permissions.toolExamples.bashRm' => '- Blokuj wszystkie polecenia rm (niebezpieczne)',
-			'settings.permissions.shellExamples.title' => 'Przykłady poleceń powłoki:',
-			'settings.permissions.shellExamples.ls' => '- Zezwól na polecenie ls',
-			'settings.permissions.shellExamples.gitStatus' => '- Zezwól na git status',
-			'settings.permissions.shellExamples.npmInstall' => '- Zezwól na npm install',
-			'settings.permissions.shellExamples.rmRf' => '- Blokuj rekurencyjne usuwanie',
-			'settings.permissions.codex.permissionMode' => 'Tryb uprawnień',
-			'settings.permissions.codex.description' => 'Kontroluje, jak Codex obsługuje modyfikacje plików i wykonywanie poleceń',
-			'settings.permissions.codex.modes.kDefault.title' => 'Domyślny',
-			'settings.permissions.codex.modes.kDefault.description' => 'Tylko zaufane polecenia (ls, cat, grep, git status itd.) są uruchamiane automatycznie. Inne polecenia są pomijane. Możliwy zapis w obszarze roboczym.',
-			'settings.permissions.codex.modes.acceptEdits.title' => 'Akceptuj zmiany',
-			'settings.permissions.codex.modes.acceptEdits.description' => 'Wszystkie polecenia są uruchamiane automatycznie w obszarze roboczym. Pełny tryb automatyczny z wykonywaniem w piaskownicy.',
-			'settings.permissions.codex.modes.bypassPermissions.title' => 'Omijaj uprawnienia',
-			'settings.permissions.codex.modes.bypassPermissions.description' => 'Pełny dostęp do systemu bez ograniczeń. Wszystkie polecenia są uruchamiane automatycznie z pełnym dostępem do dysku i sieci. Używaj ostrożnie.',
-			'settings.permissions.codex.technicalDetails' => 'Szczegóły techniczne',
-			'settings.permissions.codex.technicalInfo.kDefault' => 'sandboxMode=workspace-write, approvalPolicy=untrusted. Zaufane polecenia: cat, cd, grep, head, ls, pwd, tail, git status/log/diff/show, find (bez -exec) itd.',
-			'settings.permissions.codex.technicalInfo.acceptEdits' => 'sandboxMode=workspace-write, approvalPolicy=never. Wszystkie polecenia są wykonywane automatycznie w katalogu projektu.',
-			'settings.permissions.codex.technicalInfo.bypassPermissions' => 'sandboxMode=danger-full-access, approvalPolicy=never. Pełny dostęp do systemu, używaj tylko w zaufanych środowiskach.',
-			'settings.permissions.codex.technicalInfo.overrideNote' => 'Możesz to zmienić dla pojedynczej sesji przyciskiem trybu w interfejsie czatu.',
 			'settings.permissions.permissionMode.title' => 'Tryb uprawnień',
 			'settings.permissions.permissionMode.description' => ({required Object provider}) => 'Domyślny tryb uprawnień dla nowych sesji ${provider}. Możesz go nadal zmienić dla pojedynczej sesji przyciskiem trybu w oknie czatu.',
 			'settings.permissions.permissionMode.modes.kDefault.title' => 'Domyślny',
 			'settings.permissions.permissionMode.modes.kDefault.description' => 'Akcje wymagające uprawnień są wyświetlane do zatwierdzenia w czacie.',
+			'settings.permissions.permissionMode.modes.auto.title' => 'Tryb automatyczny',
+			'settings.permissions.permissionMode.modes.auto.description' => 'Klasyfikator modelu decyduje przy każdym wywołaniu narzędzia, czy je zatwierdzić, czy odrzucić. Tryb bezobsługowy, ale bezpieczniejszy niż omijanie uprawnień — odrzucenia nadal występują.',
 			'settings.permissions.permissionMode.modes.acceptEdits.title' => 'Akceptuj zmiany',
 			'settings.permissions.permissionMode.modes.acceptEdits.description' => 'Zmiany plików są zatwierdzane automatycznie; pozostałe akcje nadal wymagają Twojej zgody.',
 			'settings.permissions.permissionMode.modes.bypassPermissions.title' => 'Omijaj uprawnienia',
 			'settings.permissions.permissionMode.modes.bypassPermissions.description' => 'Wszystkie akcje są zatwierdzane automatycznie — pełny dostęp bez pytań. Używaj ostrożnie.',
 			'settings.permissions.permissionMode.modes.plan.title' => 'Plan',
 			'settings.permissions.permissionMode.modes.plan.description' => 'Tryb planowania: agent analizuje i planuje bez wykonywania poleceń.',
-			'settings.permissions.actions.add' => 'Dodaj',
 			'settings.mcpServers.title' => 'Serwery MCP',
 			'settings.mcpServers.description.claude' => 'Serwery Model Context Protocol zapewniają Claude dodatkowe narzędzia i źródła danych',
 			'settings.mcpServers.description.cursor' => 'Serwery Model Context Protocol zapewniają Cursor dodatkowe narzędzia i źródła danych',
@@ -9638,8 +9422,6 @@ extension on TranslationsPl {
 			'sidebar.deleteConfirmation.deleteSession' => 'Usuń sesję',
 			'sidebar.deleteConfirmation.confirmDelete' => 'Co chcesz zrobić z:',
 			'sidebar.deleteConfirmation.removeFromSidebar' => 'Usuń tylko z panelu bocznego',
-			_ => null,
-		} ?? switch (path) {
 			'sidebar.deleteConfirmation.deleteAllData' => 'Usuń trwale wszystkie dane',
 			'sidebar.deleteConfirmation.allConversationsDeleted' => 'Projekt zostanie usunięty z panelu bocznego. Twoje pliki, pamięci i dane sesji zostaną zachowane.',
 			'sidebar.deleteConfirmation.cannotUndo' => 'Możesz później dodać projekt ponownie.',
@@ -9683,6 +9465,8 @@ extension on TranslationsPl {
 			'tasks.gettingStarted.steps.generateTasks.title' => 'Generuj zadania z PRD',
 			'tasks.gettingStarted.steps.generateTasks.description' => 'Gdy masz już PRD, poproś asystenta AI o jego przetworzenie, a TaskMaster automatycznie podzieli je na łatwe w realizacji zadania ze szczegółami implementacji.',
 			'tasks.gettingStarted.steps.analyzeTasks.title' => 'Analizuj i rozwijaj zadania',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.gettingStarted.steps.analyzeTasks.description' => 'Poproś asystenta AI o analizę złożoności zadań i rozwinięcie ich w szczegółowe podzadania, aby ułatwić implementację.',
 			'tasks.gettingStarted.steps.startBuilding.title' => 'Zacznij budować',
 			'tasks.gettingStarted.steps.startBuilding.description' => 'Poproś asystenta AI o rozpoczęcie pracy nad zadaniami, aktualizowanie ich statusu i dodawanie nowych zadań w miarę rozwoju projektu.',
@@ -10152,8 +9936,6 @@ extension on TranslationsPl {
 			'worktrees.scripts' => 'Skrypty',
 			'worktrees.scriptsSaved' => 'Zapisano konfigurację skryptów',
 			'worktrees.serverLabel' => 'Serwer: ',
-			_ => null,
-		} ?? switch (path) {
 			'worktrees.setupHint' => 'Polecenie setup (np. npm install)',
 			'worktrees.setupLabel' => 'Setup: ',
 			'worktrees.squashDescription' => 'Połącz wszystkie commity w jeden commit',
@@ -10197,6 +9979,8 @@ extension on TranslationsPl {
 			'serverConnect.local.installing' => 'Instalowanie…',
 			'serverConnect.local.running' => ({required Object url}) => 'Działa pod adresem ${url}',
 			'serverConnect.local.installed' => ({required Object version}) => 'Zainstalowany (v${version})',
+			_ => null,
+		} ?? switch (path) {
 			'serverConnect.local.connect' => 'Użyj tego serwera',
 			'serverConnect.local.error' => ({required Object error}) => 'Błąd serwera lokalnego: ${error}',
 			'serverConnect.local.or' => 'lub połącz się ze zdalnym serwerem',

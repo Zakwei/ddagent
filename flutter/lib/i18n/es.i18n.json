@@ -2059,79 +2059,6 @@
     },
     "permissions": {
       "title": "Ajustes de permisos",
-      "skipPermissions": {
-        "label": "Omitir avisos de permisos (usar con precaución)",
-        "claudeDescription": "Equivalente al flag --dangerously-skip-permissions",
-        "cursorDescription": "Equivalente al flag -f en la CLI de Cursor"
-      },
-      "allowedTools": {
-        "title": "Herramientas permitidas",
-        "description": "Herramientas que se permiten automáticamente sin pedir permiso",
-        "placeholder": "p. ej., \"Bash(git log:*)\" o \"Write\"",
-        "quickAdd": "Añadir rápido herramientas comunes:",
-        "empty": "No hay herramientas permitidas configuradas"
-      },
-      "blockedTools": {
-        "title": "Herramientas bloqueadas",
-        "description": "Herramientas que se bloquean automáticamente sin pedir permiso",
-        "placeholder": "p. ej., \"Bash(rm:*)\"",
-        "empty": "No hay herramientas bloqueadas configuradas"
-      },
-      "allowedCommands": {
-        "title": "Comandos de shell permitidos",
-        "description": "Comandos de shell que se permiten automáticamente sin preguntar",
-        "placeholder": "p. ej., \"Shell(ls)\" o \"Shell(git status)\"",
-        "quickAdd": "Añadir rápido comandos comunes:",
-        "empty": "No hay comandos permitidos configurados"
-      },
-      "blockedCommands": {
-        "title": "Comandos de shell bloqueados",
-        "description": "Comandos de shell que se bloquean automáticamente",
-        "placeholder": "p. ej., \"Shell(rm -rf)\" o \"Shell(sudo)\"",
-        "empty": "No hay comandos bloqueados configurados"
-      },
-      "toolExamples": {
-        "title": "Ejemplos de patrones de herramientas:",
-        "bashGitLog": "- Permitir todos los comandos git log",
-        "bashGitDiff": "- Permitir todos los comandos git diff",
-        "write": "- Permitir todo uso de la herramienta Write",
-        "bashRm": "- Bloquear todos los comandos rm (peligroso)"
-      },
-      "shellExamples": {
-        "title": "Ejemplos de comandos de shell:",
-        "ls": "- Permitir el comando ls",
-        "gitStatus": "- Permitir git status",
-        "npmInstall": "- Permitir npm install",
-        "rmRf": "- Bloquear el borrado recursivo"
-      },
-      "codex": {
-        "permissionMode": "Modo de permisos",
-        "description": "Controla cómo Codex gestiona las modificaciones de archivos y la ejecución de comandos",
-        "modes": {
-          "default": {
-            "title": "Por defecto",
-            "description": "Solo los comandos de confianza (ls, cat, grep, git status, etc.) se ejecutan automáticamente. Los demás comandos se omiten. Puede escribir en el espacio de trabajo."
-          },
-          "acceptEdits": {
-            "title": "Aceptar ediciones",
-            "description": "Todos los comandos se ejecutan automáticamente dentro del espacio de trabajo. Modo automático completo con ejecución en sandbox."
-          },
-          "bypassPermissions": {
-            "title": "Omitir permisos",
-            "description": "Acceso completo al sistema sin restricciones. Todos los comandos se ejecutan automáticamente con acceso total a disco y red. Úsalo con precaución."
-          }
-        },
-        "technicalDetails": "Detalles técnicos",
-        "technicalInfo": {
-          "default": "sandboxMode=workspace-write, approvalPolicy=untrusted. Comandos de confianza: cat, cd, grep, head, ls, pwd, tail, git status/log/diff/show, find (sin -exec), etc.",
-          "acceptEdits": "sandboxMode=workspace-write, approvalPolicy=never. Todos los comandos se autoejecutan dentro del directorio del proyecto.",
-          "bypassPermissions": "sandboxMode=danger-full-access, approvalPolicy=never. Acceso completo al sistema; úsalo solo en entornos de confianza.",
-          "overrideNote": "Puedes cambiar esto por sesión con el botón de modo en la interfaz del chat."
-        }
-      },
-      "actions": {
-        "add": "Añadir"
-      },
       "permissionMode": {
         "title": "Modo de permisos",
         "description": "Modo de permiso predeterminado para nuevas sesiones de {{provider}}. Aún puedes anularlo para una sesión individual.",
@@ -2139,6 +2066,10 @@
           "default": {
             "title": "Por defecto",
             "description": "Las acciones que necesitan permiso se te muestran para aprobación en el chat."
+          },
+          "auto": {
+            "title": "Modo automático",
+            "description": "Un clasificador del modelo decide en cada llamada si aprobar o denegar. Sin intervención, pero más seguro que Omitir — las denegaciones siguen ocurriendo."
           },
           "acceptEdits": {
             "title": "Aceptar ediciones",

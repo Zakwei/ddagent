@@ -2535,15 +2535,6 @@ class Translations$settings$permissions$it extends Translations$settings$permiss
 
 	// Translations
 	@override String get title => 'Impostazioni permessi';
-	@override late final Translations$settings$permissions$skipPermissions$it skipPermissions = Translations$settings$permissions$skipPermissions$it._(_root);
-	@override late final Translations$settings$permissions$allowedTools$it allowedTools = Translations$settings$permissions$allowedTools$it._(_root);
-	@override late final Translations$settings$permissions$blockedTools$it blockedTools = Translations$settings$permissions$blockedTools$it._(_root);
-	@override late final Translations$settings$permissions$allowedCommands$it allowedCommands = Translations$settings$permissions$allowedCommands$it._(_root);
-	@override late final Translations$settings$permissions$blockedCommands$it blockedCommands = Translations$settings$permissions$blockedCommands$it._(_root);
-	@override late final Translations$settings$permissions$toolExamples$it toolExamples = Translations$settings$permissions$toolExamples$it._(_root);
-	@override late final Translations$settings$permissions$shellExamples$it shellExamples = Translations$settings$permissions$shellExamples$it._(_root);
-	@override late final Translations$settings$permissions$codex$it codex = Translations$settings$permissions$codex$it._(_root);
-	@override late final Translations$settings$permissions$actions$it actions = Translations$settings$permissions$actions$it._(_root);
 	@override late final Translations$settings$permissions$permissionMode$it permissionMode = Translations$settings$permissions$permissionMode$it._(_root);
 }
 
@@ -6072,124 +6063,6 @@ class Translations$settings$agents$logout$it extends Translations$settings$agent
 	@override String get failed => 'Disconnessione non riuscita';
 }
 
-// Path: settings.permissions.skipPermissions
-class Translations$settings$permissions$skipPermissions$it extends Translations$settings$permissions$skipPermissions$en {
-	Translations$settings$permissions$skipPermissions$it._(TranslationsIt root) : this._root = root, super.internal(root);
-
-	final TranslationsIt _root; // ignore: unused_field
-
-	// Translations
-	@override String get label => 'Salta richieste di permesso (usa con cautela)';
-	@override String get claudeDescription => 'Equivalente al flag --dangerously-skip-permissions';
-	@override String get cursorDescription => 'Equivalente al flag -f in Cursor CLI';
-}
-
-// Path: settings.permissions.allowedTools
-class Translations$settings$permissions$allowedTools$it extends Translations$settings$permissions$allowedTools$en {
-	Translations$settings$permissions$allowedTools$it._(TranslationsIt root) : this._root = root, super.internal(root);
-
-	final TranslationsIt _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Strumenti consentiti';
-	@override String get description => 'Strumenti automaticamente consentiti senza richiedere permesso';
-	@override String get placeholder => 'es. "Bash(git log:*)" o "Write"';
-	@override String get quickAdd => 'Aggiunta rapida strumenti comuni:';
-	@override String get empty => 'Nessuno strumento consentito configurato';
-}
-
-// Path: settings.permissions.blockedTools
-class Translations$settings$permissions$blockedTools$it extends Translations$settings$permissions$blockedTools$en {
-	Translations$settings$permissions$blockedTools$it._(TranslationsIt root) : this._root = root, super.internal(root);
-
-	final TranslationsIt _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Strumenti bloccati';
-	@override String get description => 'Strumenti automaticamente bloccati senza richiedere permesso';
-	@override String get placeholder => 'es. "Bash(rm:*)"';
-	@override String get empty => 'Nessuno strumento bloccato configurato';
-}
-
-// Path: settings.permissions.allowedCommands
-class Translations$settings$permissions$allowedCommands$it extends Translations$settings$permissions$allowedCommands$en {
-	Translations$settings$permissions$allowedCommands$it._(TranslationsIt root) : this._root = root, super.internal(root);
-
-	final TranslationsIt _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Comandi shell consentiti';
-	@override String get description => 'Comandi shell automaticamente consentiti senza richiedere permesso';
-	@override String get placeholder => 'es. "Shell(ls)" o "Shell(git status)"';
-	@override String get quickAdd => 'Aggiunta rapida comandi comuni:';
-	@override String get empty => 'Nessun comando consentito configurato';
-}
-
-// Path: settings.permissions.blockedCommands
-class Translations$settings$permissions$blockedCommands$it extends Translations$settings$permissions$blockedCommands$en {
-	Translations$settings$permissions$blockedCommands$it._(TranslationsIt root) : this._root = root, super.internal(root);
-
-	final TranslationsIt _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Comandi shell bloccati';
-	@override String get description => 'Comandi shell automaticamente bloccati';
-	@override String get placeholder => 'es. "Shell(rm -rf)" o "Shell(sudo)"';
-	@override String get empty => 'Nessun comando bloccato configurato';
-}
-
-// Path: settings.permissions.toolExamples
-class Translations$settings$permissions$toolExamples$it extends Translations$settings$permissions$toolExamples$en {
-	Translations$settings$permissions$toolExamples$it._(TranslationsIt root) : this._root = root, super.internal(root);
-
-	final TranslationsIt _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Esempi pattern strumenti:';
-	@override String get bashGitLog => '- Consenti tutti i comandi git log';
-	@override String get bashGitDiff => '- Consenti tutti i comandi git diff';
-	@override String get write => '- Consenti tutti gli utilizzi dello strumento Write';
-	@override String get bashRm => '- Blocca tutti i comandi rm (pericoloso)';
-}
-
-// Path: settings.permissions.shellExamples
-class Translations$settings$permissions$shellExamples$it extends Translations$settings$permissions$shellExamples$en {
-	Translations$settings$permissions$shellExamples$it._(TranslationsIt root) : this._root = root, super.internal(root);
-
-	final TranslationsIt _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Esempi comandi shell:';
-	@override String get ls => '- Consenti comando ls';
-	@override String get gitStatus => '- Consenti git status';
-	@override String get npmInstall => '- Consenti npm install';
-	@override String get rmRf => '- Blocca eliminazione ricorsiva';
-}
-
-// Path: settings.permissions.codex
-class Translations$settings$permissions$codex$it extends Translations$settings$permissions$codex$en {
-	Translations$settings$permissions$codex$it._(TranslationsIt root) : this._root = root, super.internal(root);
-
-	final TranslationsIt _root; // ignore: unused_field
-
-	// Translations
-	@override String get permissionMode => 'Modalità permessi';
-	@override String get description => 'Controlla come Codex gestisce le modifiche ai file e l\'esecuzione dei comandi';
-	@override late final Translations$settings$permissions$codex$modes$it modes = Translations$settings$permissions$codex$modes$it._(_root);
-	@override String get technicalDetails => 'Dettagli tecnici';
-	@override late final Translations$settings$permissions$codex$technicalInfo$it technicalInfo = Translations$settings$permissions$codex$technicalInfo$it._(_root);
-}
-
-// Path: settings.permissions.actions
-class Translations$settings$permissions$actions$it extends Translations$settings$permissions$actions$en {
-	Translations$settings$permissions$actions$it._(TranslationsIt root) : this._root = root, super.internal(root);
-
-	final TranslationsIt _root; // ignore: unused_field
-
-	// Translations
-	@override String get add => 'Aggiungi';
-}
-
 // Path: settings.permissions.permissionMode
 class Translations$settings$permissions$permissionMode$it extends Translations$settings$permissions$permissionMode$en {
 	Translations$settings$permissions$permissionMode$it._(TranslationsIt root) : this._root = root, super.internal(root);
@@ -6912,31 +6785,6 @@ class Translations$settings$agents$account$devin$it extends Translations$setting
 	@override String get description => 'Assistente CLI Devin';
 }
 
-// Path: settings.permissions.codex.modes
-class Translations$settings$permissions$codex$modes$it extends Translations$settings$permissions$codex$modes$en {
-	Translations$settings$permissions$codex$modes$it._(TranslationsIt root) : this._root = root, super.internal(root);
-
-	final TranslationsIt _root; // ignore: unused_field
-
-	// Translations
-	@override late final Translations$settings$permissions$codex$modes$kDefault$it kDefault = Translations$settings$permissions$codex$modes$kDefault$it._(_root);
-	@override late final Translations$settings$permissions$codex$modes$acceptEdits$it acceptEdits = Translations$settings$permissions$codex$modes$acceptEdits$it._(_root);
-	@override late final Translations$settings$permissions$codex$modes$bypassPermissions$it bypassPermissions = Translations$settings$permissions$codex$modes$bypassPermissions$it._(_root);
-}
-
-// Path: settings.permissions.codex.technicalInfo
-class Translations$settings$permissions$codex$technicalInfo$it extends Translations$settings$permissions$codex$technicalInfo$en {
-	Translations$settings$permissions$codex$technicalInfo$it._(TranslationsIt root) : this._root = root, super.internal(root);
-
-	final TranslationsIt _root; // ignore: unused_field
-
-	// Translations
-	@override String get kDefault => 'sandboxMode=workspace-write, approvalPolicy=untrusted. Comandi attendibili: cat, cd, grep, head, ls, pwd, tail, git status/log/diff/show, find (senza -exec), ecc.';
-	@override String get acceptEdits => 'sandboxMode=workspace-write, approvalPolicy=never. Tutti i comandi vengono auto-eseguiti nella directory del progetto.';
-	@override String get bypassPermissions => 'sandboxMode=danger-full-access, approvalPolicy=never. Accesso completo al sistema, usa solo in ambienti attendibili.';
-	@override String get overrideNote => 'Puoi sovrascrivere questa impostazione per sessione usando il pulsante modalità nell\'interfaccia chat.';
-}
-
 // Path: settings.permissions.permissionMode.modes
 class Translations$settings$permissions$permissionMode$modes$it extends Translations$settings$permissions$permissionMode$modes$en {
 	Translations$settings$permissions$permissionMode$modes$it._(TranslationsIt root) : this._root = root, super.internal(root);
@@ -6945,6 +6793,7 @@ class Translations$settings$permissions$permissionMode$modes$it extends Translat
 
 	// Translations
 	@override late final Translations$settings$permissions$permissionMode$modes$kDefault$it kDefault = Translations$settings$permissions$permissionMode$modes$kDefault$it._(_root);
+	@override late final Translations$settings$permissions$permissionMode$modes$auto$it auto = Translations$settings$permissions$permissionMode$modes$auto$it._(_root);
 	@override late final Translations$settings$permissions$permissionMode$modes$acceptEdits$it acceptEdits = Translations$settings$permissions$permissionMode$modes$acceptEdits$it._(_root);
 	@override late final Translations$settings$permissions$permissionMode$modes$bypassPermissions$it bypassPermissions = Translations$settings$permissions$permissionMode$modes$bypassPermissions$it._(_root);
 	@override late final Translations$settings$permissions$permissionMode$modes$plan$it plan = Translations$settings$permissions$permissionMode$modes$plan$it._(_root);
@@ -7077,39 +6926,6 @@ class Translations$common$notifications$codes$agent$notification$it extends Tran
 	@override String get title => 'Notifica agente';
 }
 
-// Path: settings.permissions.codex.modes.kDefault
-class Translations$settings$permissions$codex$modes$kDefault$it extends Translations$settings$permissions$codex$modes$kDefault$en {
-	Translations$settings$permissions$codex$modes$kDefault$it._(TranslationsIt root) : this._root = root, super.internal(root);
-
-	final TranslationsIt _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Predefinito';
-	@override String get description => 'Solo i comandi attendibili (ls, cat, grep, git status, ecc.) vengono eseguiti automaticamente. Gli altri comandi vengono saltati. Può scrivere nell\'area di lavoro.';
-}
-
-// Path: settings.permissions.codex.modes.acceptEdits
-class Translations$settings$permissions$codex$modes$acceptEdits$it extends Translations$settings$permissions$codex$modes$acceptEdits$en {
-	Translations$settings$permissions$codex$modes$acceptEdits$it._(TranslationsIt root) : this._root = root, super.internal(root);
-
-	final TranslationsIt _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Accetta modifiche';
-	@override String get description => 'Tutti i comandi vengono eseguiti automaticamente nell\'area di lavoro. Modalità completamente automatica con esecuzione sandboxed.';
-}
-
-// Path: settings.permissions.codex.modes.bypassPermissions
-class Translations$settings$permissions$codex$modes$bypassPermissions$it extends Translations$settings$permissions$codex$modes$bypassPermissions$en {
-	Translations$settings$permissions$codex$modes$bypassPermissions$it._(TranslationsIt root) : this._root = root, super.internal(root);
-
-	final TranslationsIt _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Ignora permessi';
-	@override String get description => 'Accesso completo al sistema senza restrizioni. Tutti i comandi vengono eseguiti automaticamente con accesso completo a disco e rete. Usa con cautela.';
-}
-
 // Path: settings.permissions.permissionMode.modes.kDefault
 class Translations$settings$permissions$permissionMode$modes$kDefault$it extends Translations$settings$permissions$permissionMode$modes$kDefault$en {
 	Translations$settings$permissions$permissionMode$modes$kDefault$it._(TranslationsIt root) : this._root = root, super.internal(root);
@@ -7119,6 +6935,17 @@ class Translations$settings$permissions$permissionMode$modes$kDefault$it extends
 	// Translations
 	@override String get title => 'Predefinito';
 	@override String get description => 'Le azioni che richiedono un permesso ti vengono mostrate per approvazione nella chat.';
+}
+
+// Path: settings.permissions.permissionMode.modes.auto
+class Translations$settings$permissions$permissionMode$modes$auto$it extends Translations$settings$permissions$permissionMode$modes$auto$en {
+	Translations$settings$permissions$permissionMode$modes$auto$it._(TranslationsIt root) : this._root = root, super.internal(root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Modalità automatica';
+	@override String get description => 'Un classificatore di modello decide per ogni chiamata se approvare o negare. Alta autonomia.';
 }
 
 // Path: settings.permissions.permissionMode.modes.acceptEdits
@@ -8692,61 +8519,18 @@ extension on TranslationsIt {
 			'settings.agents.logout.failed' => 'Disconnessione non riuscita',
 			'settings.agents.error' => ({required Object error}) => 'Errore: ${error}',
 			'settings.permissions.title' => 'Impostazioni permessi',
-			'settings.permissions.skipPermissions.label' => 'Salta richieste di permesso (usa con cautela)',
-			'settings.permissions.skipPermissions.claudeDescription' => 'Equivalente al flag --dangerously-skip-permissions',
-			'settings.permissions.skipPermissions.cursorDescription' => 'Equivalente al flag -f in Cursor CLI',
-			'settings.permissions.allowedTools.title' => 'Strumenti consentiti',
-			'settings.permissions.allowedTools.description' => 'Strumenti automaticamente consentiti senza richiedere permesso',
-			'settings.permissions.allowedTools.placeholder' => 'es. "Bash(git log:*)" o "Write"',
-			'settings.permissions.allowedTools.quickAdd' => 'Aggiunta rapida strumenti comuni:',
-			'settings.permissions.allowedTools.empty' => 'Nessuno strumento consentito configurato',
-			'settings.permissions.blockedTools.title' => 'Strumenti bloccati',
-			'settings.permissions.blockedTools.description' => 'Strumenti automaticamente bloccati senza richiedere permesso',
-			_ => null,
-		} ?? switch (path) {
-			'settings.permissions.blockedTools.placeholder' => 'es. "Bash(rm:*)"',
-			'settings.permissions.blockedTools.empty' => 'Nessuno strumento bloccato configurato',
-			'settings.permissions.allowedCommands.title' => 'Comandi shell consentiti',
-			'settings.permissions.allowedCommands.description' => 'Comandi shell automaticamente consentiti senza richiedere permesso',
-			'settings.permissions.allowedCommands.placeholder' => 'es. "Shell(ls)" o "Shell(git status)"',
-			'settings.permissions.allowedCommands.quickAdd' => 'Aggiunta rapida comandi comuni:',
-			'settings.permissions.allowedCommands.empty' => 'Nessun comando consentito configurato',
-			'settings.permissions.blockedCommands.title' => 'Comandi shell bloccati',
-			'settings.permissions.blockedCommands.description' => 'Comandi shell automaticamente bloccati',
-			'settings.permissions.blockedCommands.placeholder' => 'es. "Shell(rm -rf)" o "Shell(sudo)"',
-			'settings.permissions.blockedCommands.empty' => 'Nessun comando bloccato configurato',
-			'settings.permissions.toolExamples.title' => 'Esempi pattern strumenti:',
-			'settings.permissions.toolExamples.bashGitLog' => '- Consenti tutti i comandi git log',
-			'settings.permissions.toolExamples.bashGitDiff' => '- Consenti tutti i comandi git diff',
-			'settings.permissions.toolExamples.write' => '- Consenti tutti gli utilizzi dello strumento Write',
-			'settings.permissions.toolExamples.bashRm' => '- Blocca tutti i comandi rm (pericoloso)',
-			'settings.permissions.shellExamples.title' => 'Esempi comandi shell:',
-			'settings.permissions.shellExamples.ls' => '- Consenti comando ls',
-			'settings.permissions.shellExamples.gitStatus' => '- Consenti git status',
-			'settings.permissions.shellExamples.npmInstall' => '- Consenti npm install',
-			'settings.permissions.shellExamples.rmRf' => '- Blocca eliminazione ricorsiva',
-			'settings.permissions.codex.permissionMode' => 'Modalità permessi',
-			'settings.permissions.codex.description' => 'Controlla come Codex gestisce le modifiche ai file e l\'esecuzione dei comandi',
-			'settings.permissions.codex.modes.kDefault.title' => 'Predefinito',
-			'settings.permissions.codex.modes.kDefault.description' => 'Solo i comandi attendibili (ls, cat, grep, git status, ecc.) vengono eseguiti automaticamente. Gli altri comandi vengono saltati. Può scrivere nell\'area di lavoro.',
-			'settings.permissions.codex.modes.acceptEdits.title' => 'Accetta modifiche',
-			'settings.permissions.codex.modes.acceptEdits.description' => 'Tutti i comandi vengono eseguiti automaticamente nell\'area di lavoro. Modalità completamente automatica con esecuzione sandboxed.',
-			'settings.permissions.codex.modes.bypassPermissions.title' => 'Ignora permessi',
-			'settings.permissions.codex.modes.bypassPermissions.description' => 'Accesso completo al sistema senza restrizioni. Tutti i comandi vengono eseguiti automaticamente con accesso completo a disco e rete. Usa con cautela.',
-			'settings.permissions.codex.technicalDetails' => 'Dettagli tecnici',
-			'settings.permissions.codex.technicalInfo.kDefault' => 'sandboxMode=workspace-write, approvalPolicy=untrusted. Comandi attendibili: cat, cd, grep, head, ls, pwd, tail, git status/log/diff/show, find (senza -exec), ecc.',
-			'settings.permissions.codex.technicalInfo.acceptEdits' => 'sandboxMode=workspace-write, approvalPolicy=never. Tutti i comandi vengono auto-eseguiti nella directory del progetto.',
-			'settings.permissions.codex.technicalInfo.bypassPermissions' => 'sandboxMode=danger-full-access, approvalPolicy=never. Accesso completo al sistema, usa solo in ambienti attendibili.',
-			'settings.permissions.codex.technicalInfo.overrideNote' => 'Puoi sovrascrivere questa impostazione per sessione usando il pulsante modalità nell\'interfaccia chat.',
-			'settings.permissions.actions.add' => 'Aggiungi',
 			'settings.permissions.permissionMode.title' => 'Modalità permessi',
 			'settings.permissions.permissionMode.description' => ({required Object provider}) => 'Modalità di permesso predefinita per le nuove sessioni ${provider}. Puoi comunque sovrascriverla per una singola sessione.',
 			'settings.permissions.permissionMode.modes.kDefault.title' => 'Predefinito',
 			'settings.permissions.permissionMode.modes.kDefault.description' => 'Le azioni che richiedono un permesso ti vengono mostrate per approvazione nella chat.',
+			'settings.permissions.permissionMode.modes.auto.title' => 'Modalità automatica',
+			'settings.permissions.permissionMode.modes.auto.description' => 'Un classificatore di modello decide per ogni chiamata se approvare o negare. Alta autonomia.',
 			'settings.permissions.permissionMode.modes.acceptEdits.title' => 'Accetta modifiche',
 			'settings.permissions.permissionMode.modes.acceptEdits.description' => 'Le modifiche ai file sono approvate automaticamente; le altre azioni chiedono ancora la tua approvazione.',
 			'settings.permissions.permissionMode.modes.bypassPermissions.title' => 'Ignora permessi',
 			'settings.permissions.permissionMode.modes.bypassPermissions.description' => 'Ogni azione è approvata automaticamente — accesso completo senza richieste. Usa con cautela.',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.plan.title' => 'Piano',
 			'settings.permissions.permissionMode.modes.plan.description' => 'Modalità pianificazione: l’agente esplora e pianifica senza eseguire comandi.',
 			'settings.mcpServers.title' => 'Server MCP',
@@ -9216,8 +9000,6 @@ extension on TranslationsIt {
 			'tasks.createTask.submit' => 'Aggiungi attività',
 			'tasks.createTask.submitting' => 'Aggiunta...',
 			'tasks.createTask.title' => 'Aggiungi attività',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.createTask.titleLabel' => 'Titolo',
 			'tasks.createTask.titlePlaceholder' => 'Cosa va fatto?',
 			'tasks.list.completedReopen' => 'Completata (clicca per riaprire)',
@@ -9261,6 +9043,8 @@ extension on TranslationsIt {
 			'tasks.taskDetail.statusFailed' => 'Impossibile aggiornare lo stato dell’attività',
 			'tasks.taskDetail.taskId' => ({required Object id}) => 'Attività ${id}',
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'Attività ${id}: ${title}',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.testStrategy' => 'Strategia di test',
 			'tasks.taskDetail.titleRequired' => 'Il titolo è obbligatorio',
 			'tasks.taskDetail.updateFailed' => 'Impossibile aggiornare l’attività',
@@ -9730,8 +9514,6 @@ extension on TranslationsIt {
 			'workspace.searchTranscript' => 'Cerca nella trascrizione',
 			'workspace.sendTo' => ({required Object count}) => 'Invia a ${count}',
 			'workspace.accountWithLabel' => ({required Object label}) => 'Predefinito · ${label}',
-			_ => null,
-		} ?? switch (path) {
 			'workspace.finishRunBeforeChangingWorkspace' => 'Termina l\'esecuzione prima di cambiare spazio di lavoro',
 			'workspace.restored' => 'Spazio di lavoro ripristinato',
 			'workspace.maximizePane' => 'Ingrandisci riquadro',

@@ -2535,15 +2535,6 @@ class Translations$settings$permissions$ko extends Translations$settings$permiss
 
 	// Translations
 	@override String get title => '권한 설정';
-	@override late final Translations$settings$permissions$skipPermissions$ko skipPermissions = Translations$settings$permissions$skipPermissions$ko._(_root);
-	@override late final Translations$settings$permissions$allowedTools$ko allowedTools = Translations$settings$permissions$allowedTools$ko._(_root);
-	@override late final Translations$settings$permissions$blockedTools$ko blockedTools = Translations$settings$permissions$blockedTools$ko._(_root);
-	@override late final Translations$settings$permissions$allowedCommands$ko allowedCommands = Translations$settings$permissions$allowedCommands$ko._(_root);
-	@override late final Translations$settings$permissions$blockedCommands$ko blockedCommands = Translations$settings$permissions$blockedCommands$ko._(_root);
-	@override late final Translations$settings$permissions$toolExamples$ko toolExamples = Translations$settings$permissions$toolExamples$ko._(_root);
-	@override late final Translations$settings$permissions$shellExamples$ko shellExamples = Translations$settings$permissions$shellExamples$ko._(_root);
-	@override late final Translations$settings$permissions$codex$ko codex = Translations$settings$permissions$codex$ko._(_root);
-	@override late final Translations$settings$permissions$actions$ko actions = Translations$settings$permissions$actions$ko._(_root);
 	@override late final Translations$settings$permissions$permissionMode$ko permissionMode = Translations$settings$permissions$permissionMode$ko._(_root);
 }
 
@@ -6072,124 +6063,6 @@ class Translations$settings$agents$logout$ko extends Translations$settings$agent
 	@override String get failed => '로그아웃 실패';
 }
 
-// Path: settings.permissions.skipPermissions
-class Translations$settings$permissions$skipPermissions$ko extends Translations$settings$permissions$skipPermissions$en {
-	Translations$settings$permissions$skipPermissions$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get label => '권한 확인 건너뛰기 (주의해서 사용)';
-	@override String get claudeDescription => '--dangerously-skip-permissions 플래그와 동일';
-	@override String get cursorDescription => 'Cursor CLI의 -f 플래그와 동일';
-}
-
-// Path: settings.permissions.allowedTools
-class Translations$settings$permissions$allowedTools$ko extends Translations$settings$permissions$allowedTools$en {
-	Translations$settings$permissions$allowedTools$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => '허용된 도구';
-	@override String get description => '권한 확인 없이 자동으로 허용되는 도구';
-	@override String get placeholder => '예: "Bash(git log:*)" 또는 "Write"';
-	@override String get quickAdd => '자주 쓰는 도구 빠른 추가:';
-	@override String get empty => '설정된 허용 도구 없음';
-}
-
-// Path: settings.permissions.blockedTools
-class Translations$settings$permissions$blockedTools$ko extends Translations$settings$permissions$blockedTools$en {
-	Translations$settings$permissions$blockedTools$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => '차단된 도구';
-	@override String get description => '권한 확인 없이 자동으로 차단되는 도구';
-	@override String get placeholder => '예: "Bash(rm:*)"';
-	@override String get empty => '설정된 차단 도구 없음';
-}
-
-// Path: settings.permissions.allowedCommands
-class Translations$settings$permissions$allowedCommands$ko extends Translations$settings$permissions$allowedCommands$en {
-	Translations$settings$permissions$allowedCommands$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => '허용된 Shell 명령어';
-	@override String get description => '권한 확인 없이 자동으로 허용되는 Shell 명령어';
-	@override String get placeholder => '예: "Shell(ls)" 또는 "Shell(git status)"';
-	@override String get quickAdd => '자주 쓰는 명령어 빠른 추가:';
-	@override String get empty => '설정된 허용 명령어 없음';
-}
-
-// Path: settings.permissions.blockedCommands
-class Translations$settings$permissions$blockedCommands$ko extends Translations$settings$permissions$blockedCommands$en {
-	Translations$settings$permissions$blockedCommands$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => '차단된 Shell 명령어';
-	@override String get description => '자동으로 차단되는 Shell 명령어';
-	@override String get placeholder => '예: "Shell(rm -rf)" 또는 "Shell(sudo)"';
-	@override String get empty => '설정된 차단 명령어 없음';
-}
-
-// Path: settings.permissions.toolExamples
-class Translations$settings$permissions$toolExamples$ko extends Translations$settings$permissions$toolExamples$en {
-	Translations$settings$permissions$toolExamples$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => '도구 패턴 예시:';
-	@override String get bashGitLog => '- 모든 git log 명령어 허용';
-	@override String get bashGitDiff => '- 모든 git diff 명령어 허용';
-	@override String get write => '- 모든 Write 도구 사용 허용';
-	@override String get bashRm => '- 모든 rm 명령어 차단 (위험)';
-}
-
-// Path: settings.permissions.shellExamples
-class Translations$settings$permissions$shellExamples$ko extends Translations$settings$permissions$shellExamples$en {
-	Translations$settings$permissions$shellExamples$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Shell 명령어 예시:';
-	@override String get ls => '- ls 명령어 허용';
-	@override String get gitStatus => '- git status 허용';
-	@override String get npmInstall => '- npm install 허용';
-	@override String get rmRf => '- 재귀 삭제 차단';
-}
-
-// Path: settings.permissions.codex
-class Translations$settings$permissions$codex$ko extends Translations$settings$permissions$codex$en {
-	Translations$settings$permissions$codex$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get permissionMode => '권한 모드';
-	@override String get description => 'Codex가 파일 수정 및 명령어 실행을 처리하는 방식을 제어합니다';
-	@override late final Translations$settings$permissions$codex$modes$ko modes = Translations$settings$permissions$codex$modes$ko._(_root);
-	@override String get technicalDetails => '기술 상세';
-	@override late final Translations$settings$permissions$codex$technicalInfo$ko technicalInfo = Translations$settings$permissions$codex$technicalInfo$ko._(_root);
-}
-
-// Path: settings.permissions.actions
-class Translations$settings$permissions$actions$ko extends Translations$settings$permissions$actions$en {
-	Translations$settings$permissions$actions$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get add => '추가';
-}
-
 // Path: settings.permissions.permissionMode
 class Translations$settings$permissions$permissionMode$ko extends Translations$settings$permissions$permissionMode$en {
 	Translations$settings$permissions$permissionMode$ko._(TranslationsKo root) : this._root = root, super.internal(root);
@@ -6912,31 +6785,6 @@ class Translations$settings$agents$account$devin$ko extends Translations$setting
 	@override String get description => 'Devin CLI 어시스턴트';
 }
 
-// Path: settings.permissions.codex.modes
-class Translations$settings$permissions$codex$modes$ko extends Translations$settings$permissions$codex$modes$en {
-	Translations$settings$permissions$codex$modes$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override late final Translations$settings$permissions$codex$modes$kDefault$ko kDefault = Translations$settings$permissions$codex$modes$kDefault$ko._(_root);
-	@override late final Translations$settings$permissions$codex$modes$acceptEdits$ko acceptEdits = Translations$settings$permissions$codex$modes$acceptEdits$ko._(_root);
-	@override late final Translations$settings$permissions$codex$modes$bypassPermissions$ko bypassPermissions = Translations$settings$permissions$codex$modes$bypassPermissions$ko._(_root);
-}
-
-// Path: settings.permissions.codex.technicalInfo
-class Translations$settings$permissions$codex$technicalInfo$ko extends Translations$settings$permissions$codex$technicalInfo$en {
-	Translations$settings$permissions$codex$technicalInfo$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get kDefault => 'sandboxMode=workspace-write, approvalPolicy=untrusted. 신뢰할 수 있는 명령어: cat, cd, grep, head, ls, pwd, tail, git status/log/diff/show, find(-exec 제외) 등.';
-	@override String get acceptEdits => 'sandboxMode=workspace-write, approvalPolicy=never. 프로젝트 디렉토리 내에서 모든 명령어 자동 실행.';
-	@override String get bypassPermissions => 'sandboxMode=danger-full-access, approvalPolicy=never. 전체 시스템 접근, 신뢰할 수 있는 환경에서만 사용하세요.';
-	@override String get overrideNote => '채팅 인터페이스의 모드 버튼을 사용하여 세션별로 재정의할 수 있습니다.';
-}
-
 // Path: settings.permissions.permissionMode.modes
 class Translations$settings$permissions$permissionMode$modes$ko extends Translations$settings$permissions$permissionMode$modes$en {
 	Translations$settings$permissions$permissionMode$modes$ko._(TranslationsKo root) : this._root = root, super.internal(root);
@@ -6945,6 +6793,7 @@ class Translations$settings$permissions$permissionMode$modes$ko extends Translat
 
 	// Translations
 	@override late final Translations$settings$permissions$permissionMode$modes$kDefault$ko kDefault = Translations$settings$permissions$permissionMode$modes$kDefault$ko._(_root);
+	@override late final Translations$settings$permissions$permissionMode$modes$auto$ko auto = Translations$settings$permissions$permissionMode$modes$auto$ko._(_root);
 	@override late final Translations$settings$permissions$permissionMode$modes$acceptEdits$ko acceptEdits = Translations$settings$permissions$permissionMode$modes$acceptEdits$ko._(_root);
 	@override late final Translations$settings$permissions$permissionMode$modes$bypassPermissions$ko bypassPermissions = Translations$settings$permissions$permissionMode$modes$bypassPermissions$ko._(_root);
 	@override late final Translations$settings$permissions$permissionMode$modes$plan$ko plan = Translations$settings$permissions$permissionMode$modes$plan$ko._(_root);
@@ -7077,39 +6926,6 @@ class Translations$common$notifications$codes$agent$notification$ko extends Tran
 	@override String get title => '에이전트 알림';
 }
 
-// Path: settings.permissions.codex.modes.kDefault
-class Translations$settings$permissions$codex$modes$kDefault$ko extends Translations$settings$permissions$codex$modes$kDefault$en {
-	Translations$settings$permissions$codex$modes$kDefault$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => '기본';
-	@override String get description => '신뢰할 수 있는 명령어(ls, cat, grep, git status 등)만 자동 실행됩니다. 다른 명령어는 건너뜁니다. 워크스페이스에 쓰기 가능.';
-}
-
-// Path: settings.permissions.codex.modes.acceptEdits
-class Translations$settings$permissions$codex$modes$acceptEdits$ko extends Translations$settings$permissions$codex$modes$acceptEdits$en {
-	Translations$settings$permissions$codex$modes$acceptEdits$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => '편집 허용';
-	@override String get description => '워크스페이스 내에서 모든 명령어가 자동 실행됩니다. 샌드박스 내 완전 자동 모드.';
-}
-
-// Path: settings.permissions.codex.modes.bypassPermissions
-class Translations$settings$permissions$codex$modes$bypassPermissions$ko extends Translations$settings$permissions$codex$modes$bypassPermissions$en {
-	Translations$settings$permissions$codex$modes$bypassPermissions$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => '권한 우회';
-	@override String get description => '제한 없는 전체 시스템 접근. 모든 명령어가 전체 디스크 및 네트워크 접근 권한으로 자동 실행됩니다. 주의해서 사용하세요.';
-}
-
 // Path: settings.permissions.permissionMode.modes.kDefault
 class Translations$settings$permissions$permissionMode$modes$kDefault$ko extends Translations$settings$permissions$permissionMode$modes$kDefault$en {
 	Translations$settings$permissions$permissionMode$modes$kDefault$ko._(TranslationsKo root) : this._root = root, super.internal(root);
@@ -7119,6 +6935,17 @@ class Translations$settings$permissions$permissionMode$modes$kDefault$ko extends
 	// Translations
 	@override String get title => '기본';
 	@override String get description => '권한이 필요한 작업은 채팅에서 승인을 위해 표시됩니다.';
+}
+
+// Path: settings.permissions.permissionMode.modes.auto
+class Translations$settings$permissions$permissionMode$modes$auto$ko extends Translations$settings$permissions$permissionMode$modes$auto$en {
+	Translations$settings$permissions$permissionMode$modes$auto$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '자동 모드';
+	@override String get description => '모델 분류기가 도구 호출마다 승인 또는 거부를 결정합니다. 높은 자율성.';
 }
 
 // Path: settings.permissions.permissionMode.modes.acceptEdits
@@ -8692,61 +8519,18 @@ extension on TranslationsKo {
 			'settings.agents.logout.failed' => '로그아웃 실패',
 			'settings.agents.error' => ({required Object error}) => '오류: ${error}',
 			'settings.permissions.title' => '권한 설정',
-			'settings.permissions.skipPermissions.label' => '권한 확인 건너뛰기 (주의해서 사용)',
-			'settings.permissions.skipPermissions.claudeDescription' => '--dangerously-skip-permissions 플래그와 동일',
-			'settings.permissions.skipPermissions.cursorDescription' => 'Cursor CLI의 -f 플래그와 동일',
-			'settings.permissions.allowedTools.title' => '허용된 도구',
-			'settings.permissions.allowedTools.description' => '권한 확인 없이 자동으로 허용되는 도구',
-			'settings.permissions.allowedTools.placeholder' => '예: "Bash(git log:*)" 또는 "Write"',
-			'settings.permissions.allowedTools.quickAdd' => '자주 쓰는 도구 빠른 추가:',
-			'settings.permissions.allowedTools.empty' => '설정된 허용 도구 없음',
-			'settings.permissions.blockedTools.title' => '차단된 도구',
-			'settings.permissions.blockedTools.description' => '권한 확인 없이 자동으로 차단되는 도구',
-			_ => null,
-		} ?? switch (path) {
-			'settings.permissions.blockedTools.placeholder' => '예: "Bash(rm:*)"',
-			'settings.permissions.blockedTools.empty' => '설정된 차단 도구 없음',
-			'settings.permissions.allowedCommands.title' => '허용된 Shell 명령어',
-			'settings.permissions.allowedCommands.description' => '권한 확인 없이 자동으로 허용되는 Shell 명령어',
-			'settings.permissions.allowedCommands.placeholder' => '예: "Shell(ls)" 또는 "Shell(git status)"',
-			'settings.permissions.allowedCommands.quickAdd' => '자주 쓰는 명령어 빠른 추가:',
-			'settings.permissions.allowedCommands.empty' => '설정된 허용 명령어 없음',
-			'settings.permissions.blockedCommands.title' => '차단된 Shell 명령어',
-			'settings.permissions.blockedCommands.description' => '자동으로 차단되는 Shell 명령어',
-			'settings.permissions.blockedCommands.placeholder' => '예: "Shell(rm -rf)" 또는 "Shell(sudo)"',
-			'settings.permissions.blockedCommands.empty' => '설정된 차단 명령어 없음',
-			'settings.permissions.toolExamples.title' => '도구 패턴 예시:',
-			'settings.permissions.toolExamples.bashGitLog' => '- 모든 git log 명령어 허용',
-			'settings.permissions.toolExamples.bashGitDiff' => '- 모든 git diff 명령어 허용',
-			'settings.permissions.toolExamples.write' => '- 모든 Write 도구 사용 허용',
-			'settings.permissions.toolExamples.bashRm' => '- 모든 rm 명령어 차단 (위험)',
-			'settings.permissions.shellExamples.title' => 'Shell 명령어 예시:',
-			'settings.permissions.shellExamples.ls' => '- ls 명령어 허용',
-			'settings.permissions.shellExamples.gitStatus' => '- git status 허용',
-			'settings.permissions.shellExamples.npmInstall' => '- npm install 허용',
-			'settings.permissions.shellExamples.rmRf' => '- 재귀 삭제 차단',
-			'settings.permissions.codex.permissionMode' => '권한 모드',
-			'settings.permissions.codex.description' => 'Codex가 파일 수정 및 명령어 실행을 처리하는 방식을 제어합니다',
-			'settings.permissions.codex.modes.kDefault.title' => '기본',
-			'settings.permissions.codex.modes.kDefault.description' => '신뢰할 수 있는 명령어(ls, cat, grep, git status 등)만 자동 실행됩니다. 다른 명령어는 건너뜁니다. 워크스페이스에 쓰기 가능.',
-			'settings.permissions.codex.modes.acceptEdits.title' => '편집 허용',
-			'settings.permissions.codex.modes.acceptEdits.description' => '워크스페이스 내에서 모든 명령어가 자동 실행됩니다. 샌드박스 내 완전 자동 모드.',
-			'settings.permissions.codex.modes.bypassPermissions.title' => '권한 우회',
-			'settings.permissions.codex.modes.bypassPermissions.description' => '제한 없는 전체 시스템 접근. 모든 명령어가 전체 디스크 및 네트워크 접근 권한으로 자동 실행됩니다. 주의해서 사용하세요.',
-			'settings.permissions.codex.technicalDetails' => '기술 상세',
-			'settings.permissions.codex.technicalInfo.kDefault' => 'sandboxMode=workspace-write, approvalPolicy=untrusted. 신뢰할 수 있는 명령어: cat, cd, grep, head, ls, pwd, tail, git status/log/diff/show, find(-exec 제외) 등.',
-			'settings.permissions.codex.technicalInfo.acceptEdits' => 'sandboxMode=workspace-write, approvalPolicy=never. 프로젝트 디렉토리 내에서 모든 명령어 자동 실행.',
-			'settings.permissions.codex.technicalInfo.bypassPermissions' => 'sandboxMode=danger-full-access, approvalPolicy=never. 전체 시스템 접근, 신뢰할 수 있는 환경에서만 사용하세요.',
-			'settings.permissions.codex.technicalInfo.overrideNote' => '채팅 인터페이스의 모드 버튼을 사용하여 세션별로 재정의할 수 있습니다.',
-			'settings.permissions.actions.add' => '추가',
 			'settings.permissions.permissionMode.title' => '권한 모드',
 			'settings.permissions.permissionMode.description' => ({required Object provider}) => '새 ${provider} 세션의 기본 권한 모드. 개별 세션에서 재정의할 수 있습니다.',
 			'settings.permissions.permissionMode.modes.kDefault.title' => '기본',
 			'settings.permissions.permissionMode.modes.kDefault.description' => '권한이 필요한 작업은 채팅에서 승인을 위해 표시됩니다.',
+			'settings.permissions.permissionMode.modes.auto.title' => '자동 모드',
+			'settings.permissions.permissionMode.modes.auto.description' => '모델 분류기가 도구 호출마다 승인 또는 거부를 결정합니다. 높은 자율성.',
 			'settings.permissions.permissionMode.modes.acceptEdits.title' => '편집 허용',
 			'settings.permissions.permissionMode.modes.acceptEdits.description' => '파일 편집은 자동 승인됩니다. 다른 작업은 계속 승인을 요청합니다.',
 			'settings.permissions.permissionMode.modes.bypassPermissions.title' => '권한 우회',
 			'settings.permissions.permissionMode.modes.bypassPermissions.description' => '모든 작업이 자동 승인됩니다 — 확인 없는 전체 접근. 주의해서 사용하세요.',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.plan.title' => '계획',
 			'settings.permissions.permissionMode.modes.plan.description' => '계획 모드: 에이전트가 명령을 실행하지 않고 탐색하고 계획합니다.',
 			'settings.mcpServers.title' => 'MCP 서버',
@@ -9216,8 +9000,6 @@ extension on TranslationsKo {
 			'tasks.createTask.submit' => '작업 추가',
 			'tasks.createTask.submitting' => '추가 중...',
 			'tasks.createTask.title' => '작업 추가',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.createTask.titleLabel' => '제목',
 			'tasks.createTask.titlePlaceholder' => '무엇을 해야 하나요?',
 			'tasks.list.completedReopen' => '완료됨 (클릭하여 다시 열기)',
@@ -9261,6 +9043,8 @@ extension on TranslationsKo {
 			'tasks.taskDetail.statusFailed' => '작업 상태 업데이트 실패',
 			'tasks.taskDetail.taskId' => ({required Object id}) => '작업 ${id}',
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => '작업 ${id}: ${title}',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.testStrategy' => '테스트 전략',
 			'tasks.taskDetail.titleRequired' => '제목은 필수입니다',
 			'tasks.taskDetail.updateFailed' => '작업 업데이트 실패',
@@ -9730,8 +9514,6 @@ extension on TranslationsKo {
 			'workspace.searchTranscript' => '트랜스크립트 검색',
 			'workspace.sendTo' => ({required Object count}) => '${count}개에 전송',
 			'workspace.accountWithLabel' => ({required Object label}) => '기본 · ${label}',
-			_ => null,
-		} ?? switch (path) {
 			'workspace.finishRunBeforeChangingWorkspace' => '작업 영역을 변경하기 전에 실행을 완료하세요',
 			'workspace.restored' => '작업 영역이 복원되었습니다',
 			'workspace.maximizePane' => '창 최대화',

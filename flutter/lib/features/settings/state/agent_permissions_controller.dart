@@ -4,51 +4,22 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-/// Per-provider permission presets — port of the web `localStorage` blobs
-/// written by `useSettingsController.saveSettings()`:
-/// `claude-settings` (allowedTools/disallowedTools/skipPermissions),
-/// `cursor-tools-settings` (allowedCommands/disallowedCommands/skipPermissions)
-/// and `<provider>-settings.permissionMode` for codex/opencode/commandcode/antigravity/devin.
-/// The Hive `settings` box stores the decoded JSON under the same key and
-/// field names so the semantics stay identical to the web client.
+/// Per-provider permission presets — the default permission mode new sessions
+/// of each agent start in. The Hive `settings` box stores a JSON map under
+/// `claude-settings`, `cursor-tools-settings` or `<provider>-settings` (the
+/// original web `localStorage` keys) with a `permissionMode` field.
 class AgentPermissions {
-  const AgentPermissions({
-    this.skipPermissions = false,
-    this.allowed = const [],
-    this.disallowed = const [],
-    this.permissionMode = 'default',
-  });
+  const AgentPermissions({this.permissionMode = 'default'});
 
-  /// claude/cursor only — skip every permission prompt (`--dangerously-skip`
-  /// / `-f` equivalents).
-  final bool skipPermissions;
-
-  /// `allowedTools` (claude) / `allowedCommands` (cursor).
-  final List<String> allowed;
-
-  /// `disallowedTools` (claude) / `disallowedCommands` (cursor).
-  final List<String> disallowed;
-
-  /// codex/opencode/commandcode/antigravity/devin — `default|acceptEdits|bypassPermissions|plan`.
+  /// One of the provider's [agentPermissionModes].
   final String permissionMode;
-
-  AgentPermissions copyWith({
-    bool? skipPermissions,
-    List<String>? allowed,
-    List<String>? disallowed,
-    String? permissionMode,
-  }) => AgentPermissions(
-    skipPermissions: skipPermissions ?? this.skipPermissions,
-    allowed: allowed ?? this.allowed,
-    disallowed: disallowed ?? this.disallowed,
-    permissionMode: permissionMode ?? this.permissionMode,
-  );
 }
 
-/// Modes each provider's settings page offers — port of
-/// `FALLBACK_PERMISSION_MODES` (src/components/chat/constants/permissionModes.ts)
-/// restricted to what the settings UI renders.
+/// Modes each provider's settings page offers — mirrors the backend
+/// `provider-capabilities.service.ts` `permissionModes` table.
 const agentPermissionModes = <String, List<String>>{
+  'claude': ['default', 'auto', 'acceptEdits', 'bypassPermissions', 'plan'],
+  'cursor': ['default', 'acceptEdits', 'bypassPermissions', 'plan'],
   'codex': ['default', 'acceptEdits', 'bypassPermissions'],
   'opencode': ['default', 'acceptEdits', 'bypassPermissions', 'plan'],
   'commandcode': ['default', 'acceptEdits', 'bypassPermissions', 'plan'],
@@ -69,20 +40,6 @@ class AgentPermissionsController extends Notifier<AgentPermissions> {
     'cursor' => 'cursor-tools-settings',
     _ => '$provider-settings',
   };
-
-  static bool _supportsLists(String provider) => provider == 'claude' || provider == 'cursor';
-
-  /// `allowedTools` vs `allowedCommands` — cursor stores shell commands.
-  static String _allowedKey(String provider) =>
-      provider == 'cursor' ? 'allowedCommands' : 'allowedTools';
-
-  static String _disallowedKey(String provider) =>
-      provider == 'cursor' ? 'disallowedCommands' : 'disallowedTools';
-
-  static List<String> _stringList(Object? value) => [
-    for (final e in (value as List?) ?? const [])
-      if ('$e'.trim().isNotEmpty) '$e',
-  ];
 
   /// Tolerant parse — mirrors `toCodexPermissionMode`/`toProviderPermissionMode`
   /// (unknown modes fall back to `default`).
@@ -105,49 +62,27 @@ class AgentPermissionsController extends Notifier<AgentPermissions> {
       }
     }
     if (decoded is! Map<Object?, Object?>) return const AgentPermissions();
-    final map = decoded;
+    // Legacy claude/cursor blobs carried a skip-permissions toggle next to an
+    // always-`default` mode — treat it as bypass until a mode is picked
+    // (saving a mode drops the legacy field).
+    final legacyBypass =
+        decoded['skipPermissions'] == true && (decoded['permissionMode'] ?? 'default') == 'default';
     return AgentPermissions(
-      skipPermissions: map['skipPermissions'] == true,
-      allowed: _supportsLists(_provider) ? _stringList(map[_allowedKey(_provider)]) : const [],
-      disallowed: _supportsLists(_provider)
-          ? _stringList(map[_disallowedKey(_provider)])
-          : const [],
-      permissionMode: _parseMode(_provider, map['permissionMode']),
+      permissionMode: legacyBypass
+          ? _parseMode(_provider, 'bypassPermissions')
+          : _parseMode(_provider, decoded['permissionMode']),
     );
   }
 
-  void _save() {
-    if (!Hive.isBoxOpen(_boxName)) return;
-    final json = <String, dynamic>{
-      'permissionMode': state.permissionMode,
-      'skipPermissions': state.skipPermissions,
-      if (_supportsLists(_provider)) ...{
-        _allowedKey(_provider): state.allowed,
-        _disallowedKey(_provider): state.disallowed,
-      },
-      'lastUpdated': DateTime.now().toIso8601String(),
-    };
-    unawaited(Hive.box<dynamic>(_boxName).put(_storageKey(_provider), json));
-  }
-
-  void setSkipPermissions(bool value) {
-    state = state.copyWith(skipPermissions: value);
-    _save();
-  }
-
-  void setAllowed(List<String> value) {
-    state = state.copyWith(allowed: value);
-    _save();
-  }
-
-  void setDisallowed(List<String> value) {
-    state = state.copyWith(disallowed: value);
-    _save();
-  }
-
   void setPermissionMode(String mode) {
-    state = state.copyWith(permissionMode: _parseMode(_provider, mode));
-    _save();
+    state = AgentPermissions(permissionMode: _parseMode(_provider, mode));
+    if (!Hive.isBoxOpen(_boxName)) return;
+    unawaited(
+      Hive.box<dynamic>(_boxName).put(_storageKey(_provider), <String, dynamic>{
+        'permissionMode': state.permissionMode,
+        'lastUpdated': DateTime.now().toIso8601String(),
+      }),
+    );
   }
 }
 

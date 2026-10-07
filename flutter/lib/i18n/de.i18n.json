@@ -2059,79 +2059,6 @@
     },
     "permissions": {
       "title": "Berechtigungseinstellungen",
-      "skipPermissions": {
-        "label": "Berechtigungsaufforderungen überspringen (mit Vorsicht verwenden)",
-        "claudeDescription": "Entspricht dem Flag --dangerously-skip-permissions",
-        "cursorDescription": "Entspricht dem Flag -f in der Cursor CLI"
-      },
-      "allowedTools": {
-        "title": "Erlaubte Werkzeuge",
-        "description": "Werkzeuge, die automatisch ohne Berechtigungsaufforderung erlaubt werden",
-        "placeholder": "z. B. \"Bash(git log:*)\" oder \"Write\"",
-        "quickAdd": "Häufige Werkzeuge schnell hinzufügen:",
-        "empty": "Keine erlaubten Werkzeuge konfiguriert"
-      },
-      "blockedTools": {
-        "title": "Gesperrte Werkzeuge",
-        "description": "Werkzeuge, die automatisch ohne Berechtigungsaufforderung gesperrt werden",
-        "placeholder": "z. B. \"Bash(rm:*)\"",
-        "empty": "Keine gesperrten Werkzeuge konfiguriert"
-      },
-      "allowedCommands": {
-        "title": "Erlaubte Shell-Befehle",
-        "description": "Shell-Befehle, die automatisch ohne Aufforderung erlaubt werden",
-        "placeholder": "z. B. \"Shell(ls)\" oder \"Shell(git status)\"",
-        "quickAdd": "Häufige Befehle schnell hinzufügen:",
-        "empty": "Keine erlaubten Befehle konfiguriert"
-      },
-      "blockedCommands": {
-        "title": "Gesperrte Shell-Befehle",
-        "description": "Shell-Befehle, die automatisch gesperrt werden",
-        "placeholder": "z. B. \"Shell(rm -rf)\" oder \"Shell(sudo)\"",
-        "empty": "Keine gesperrten Befehle konfiguriert"
-      },
-      "toolExamples": {
-        "title": "Werkzeugmuster-Beispiele:",
-        "bashGitLog": "- Alle git log-Befehle erlauben",
-        "bashGitDiff": "- Alle git diff-Befehle erlauben",
-        "write": "- Alle Write-Werkzeugnutzungen erlauben",
-        "bashRm": "- Alle rm-Befehle sperren (gefährlich)"
-      },
-      "shellExamples": {
-        "title": "Shell-Befehl-Beispiele:",
-        "ls": "- ls-Befehl erlauben",
-        "gitStatus": "- git status erlauben",
-        "npmInstall": "- npm install erlauben",
-        "rmRf": "- Rekursives Löschen sperren"
-      },
-      "codex": {
-        "permissionMode": "Berechtigungsmodus",
-        "description": "Steuert, wie Codex Dateiänderungen und Befehlsausführung handhabt",
-        "modes": {
-          "default": {
-            "title": "Standard",
-            "description": "Nur vertrauenswürdige Befehle (ls, cat, grep, git status usw.) werden automatisch ausgeführt. Andere Befehle werden übersprungen. Kann in den Arbeitsbereich schreiben."
-          },
-          "acceptEdits": {
-            "title": "Bearbeitungen akzeptieren",
-            "description": "Alle Befehle werden automatisch innerhalb des Arbeitsbereichs ausgeführt. Vollautomatischer Modus mit isolierter Ausführung."
-          },
-          "bypassPermissions": {
-            "title": "Berechtigungen umgehen",
-            "description": "Vollständiger Systemzugriff ohne Einschränkungen. Alle Befehle werden automatisch mit vollem Festplatten- und Netzwerkzugriff ausgeführt. Mit Vorsicht verwenden."
-          }
-        },
-        "technicalDetails": "Technische Details",
-        "technicalInfo": {
-          "default": "sandboxMode=workspace-write, approvalPolicy=untrusted. Vertrauenswürdige Befehle: cat, cd, grep, head, ls, pwd, tail, git status/log/diff/show, find (ohne -exec) usw.",
-          "acceptEdits": "sandboxMode=workspace-write, approvalPolicy=never. Alle Befehle werden automatisch innerhalb des Projektverzeichnisses ausgeführt.",
-          "bypassPermissions": "sandboxMode=danger-full-access, approvalPolicy=never. Vollständiger Systemzugriff, nur in vertrauenswürdigen Umgebungen verwenden.",
-          "overrideNote": "Du kannst dies pro Sitzung über die Modusschaltfläche in der Chat-Oberfläche überschreiben."
-        }
-      },
-      "actions": {
-        "add": "Hinzufügen"
-      },
       "permissionMode": {
         "title": "Berechtigungsmodus",
         "description": "Standard-Berechtigungsmodus für neue {{provider}}-Sitzungen. Du kannst ihn für eine einzelne Sitzung noch überschreiben.",
@@ -2139,6 +2066,10 @@
           "default": {
             "title": "Standard",
             "description": "Aktionen, die eine Berechtigung benötigen, werden dir im Chat zur Genehmigung gezeigt."
+          },
+          "auto": {
+            "title": "Auto-Modus",
+            "description": "Ein Modell-Klassifizierer entscheidet pro Tool-Aufruf, ob genehmigt oder abgelehnt wird. Hohe Autonomie."
           },
           "acceptEdits": {
             "title": "Bearbeitungen akzeptieren",

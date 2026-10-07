@@ -2535,15 +2535,6 @@ class Translations$settings$permissions$zh_TW extends Translations$settings$perm
 
 	// Translations
 	@override String get title => '權限設定';
-	@override late final Translations$settings$permissions$skipPermissions$zh_TW skipPermissions = Translations$settings$permissions$skipPermissions$zh_TW.internal(_root);
-	@override late final Translations$settings$permissions$allowedTools$zh_TW allowedTools = Translations$settings$permissions$allowedTools$zh_TW.internal(_root);
-	@override late final Translations$settings$permissions$blockedTools$zh_TW blockedTools = Translations$settings$permissions$blockedTools$zh_TW.internal(_root);
-	@override late final Translations$settings$permissions$allowedCommands$zh_TW allowedCommands = Translations$settings$permissions$allowedCommands$zh_TW.internal(_root);
-	@override late final Translations$settings$permissions$blockedCommands$zh_TW blockedCommands = Translations$settings$permissions$blockedCommands$zh_TW.internal(_root);
-	@override late final Translations$settings$permissions$toolExamples$zh_TW toolExamples = Translations$settings$permissions$toolExamples$zh_TW.internal(_root);
-	@override late final Translations$settings$permissions$shellExamples$zh_TW shellExamples = Translations$settings$permissions$shellExamples$zh_TW.internal(_root);
-	@override late final Translations$settings$permissions$codex$zh_TW codex = Translations$settings$permissions$codex$zh_TW.internal(_root);
-	@override late final Translations$settings$permissions$actions$zh_TW actions = Translations$settings$permissions$actions$zh_TW.internal(_root);
 	@override late final Translations$settings$permissions$permissionMode$zh_TW permissionMode = Translations$settings$permissions$permissionMode$zh_TW.internal(_root);
 }
 
@@ -6072,124 +6063,6 @@ class Translations$settings$agents$logout$zh_TW extends Translations$settings$ag
 	@override String get failed => '登出失敗';
 }
 
-// Path: settings.permissions.skipPermissions
-class Translations$settings$permissions$skipPermissions$zh_TW extends Translations$settings$permissions$skipPermissions$en {
-	Translations$settings$permissions$skipPermissions$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
-
-	final TranslationsZhTw _root; // ignore: unused_field
-
-	// Translations
-	@override String get label => '略過權限提示（請謹慎使用）';
-	@override String get claudeDescription => '等同於 --dangerously-skip-permissions 旗標';
-	@override String get cursorDescription => '等同於 Cursor CLI 中的 -f 旗標';
-}
-
-// Path: settings.permissions.allowedTools
-class Translations$settings$permissions$allowedTools$zh_TW extends Translations$settings$permissions$allowedTools$en {
-	Translations$settings$permissions$allowedTools$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
-
-	final TranslationsZhTw _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => '允許的工具';
-	@override String get description => '無需權限提示即可自動使用的工具';
-	@override String get placeholder => '例如："Bash(git log:*)" 或 "Write"';
-	@override String get quickAdd => '快速新增常用工具：';
-	@override String get empty => '未設定允許的工具';
-}
-
-// Path: settings.permissions.blockedTools
-class Translations$settings$permissions$blockedTools$zh_TW extends Translations$settings$permissions$blockedTools$en {
-	Translations$settings$permissions$blockedTools$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
-
-	final TranslationsZhTw _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => '停用的工具';
-	@override String get description => '無需權限提示即可自動停用的工具';
-	@override String get placeholder => '例如："Bash(rm:*)"';
-	@override String get empty => '未設定停用的工具';
-}
-
-// Path: settings.permissions.allowedCommands
-class Translations$settings$permissions$allowedCommands$zh_TW extends Translations$settings$permissions$allowedCommands$en {
-	Translations$settings$permissions$allowedCommands$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
-
-	final TranslationsZhTw _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => '允許的 Shell 指令';
-	@override String get description => '無需權限提示即可自動執行的 Shell 指令';
-	@override String get placeholder => '例如："Shell(ls)" 或 "Shell(git status)"';
-	@override String get quickAdd => '快速新增常用指令：';
-	@override String get empty => '未設定允許的指令';
-}
-
-// Path: settings.permissions.blockedCommands
-class Translations$settings$permissions$blockedCommands$zh_TW extends Translations$settings$permissions$blockedCommands$en {
-	Translations$settings$permissions$blockedCommands$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
-
-	final TranslationsZhTw _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => '封鎖的 Shell 指令';
-	@override String get description => '自動封鎖的 Shell 指令';
-	@override String get placeholder => '例如："Shell(rm -rf)" 或 "Shell(sudo)"';
-	@override String get empty => '未設定封鎖的指令';
-}
-
-// Path: settings.permissions.toolExamples
-class Translations$settings$permissions$toolExamples$zh_TW extends Translations$settings$permissions$toolExamples$en {
-	Translations$settings$permissions$toolExamples$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
-
-	final TranslationsZhTw _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => '工具模式範例：';
-	@override String get bashGitLog => '- 允許所有 git log 指令';
-	@override String get bashGitDiff => '- 允許所有 git diff 指令';
-	@override String get write => '- 允許所有 Write 工具使用';
-	@override String get bashRm => '- 封鎖所有 rm 指令（危險）';
-}
-
-// Path: settings.permissions.shellExamples
-class Translations$settings$permissions$shellExamples$zh_TW extends Translations$settings$permissions$shellExamples$en {
-	Translations$settings$permissions$shellExamples$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
-
-	final TranslationsZhTw _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Shell 指令範例：';
-	@override String get ls => '- 允許 ls 指令';
-	@override String get gitStatus => '- 允許 git status';
-	@override String get npmInstall => '- 允許 npm install';
-	@override String get rmRf => '- 封鎖遞迴刪除';
-}
-
-// Path: settings.permissions.codex
-class Translations$settings$permissions$codex$zh_TW extends Translations$settings$permissions$codex$en {
-	Translations$settings$permissions$codex$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
-
-	final TranslationsZhTw _root; // ignore: unused_field
-
-	// Translations
-	@override String get permissionMode => '權限模式';
-	@override String get description => '控制 Codex 如何處理檔案修改和指令執行';
-	@override late final Translations$settings$permissions$codex$modes$zh_TW modes = Translations$settings$permissions$codex$modes$zh_TW.internal(_root);
-	@override String get technicalDetails => '技術詳情';
-	@override late final Translations$settings$permissions$codex$technicalInfo$zh_TW technicalInfo = Translations$settings$permissions$codex$technicalInfo$zh_TW.internal(_root);
-}
-
-// Path: settings.permissions.actions
-class Translations$settings$permissions$actions$zh_TW extends Translations$settings$permissions$actions$en {
-	Translations$settings$permissions$actions$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
-
-	final TranslationsZhTw _root; // ignore: unused_field
-
-	// Translations
-	@override String get add => '新增';
-}
-
 // Path: settings.permissions.permissionMode
 class Translations$settings$permissions$permissionMode$zh_TW extends Translations$settings$permissions$permissionMode$en {
 	Translations$settings$permissions$permissionMode$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
@@ -6912,31 +6785,6 @@ class Translations$settings$agents$account$devin$zh_TW extends Translations$sett
 	@override String get description => 'Devin CLI 助手';
 }
 
-// Path: settings.permissions.codex.modes
-class Translations$settings$permissions$codex$modes$zh_TW extends Translations$settings$permissions$codex$modes$en {
-	Translations$settings$permissions$codex$modes$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
-
-	final TranslationsZhTw _root; // ignore: unused_field
-
-	// Translations
-	@override late final Translations$settings$permissions$codex$modes$kDefault$zh_TW kDefault = Translations$settings$permissions$codex$modes$kDefault$zh_TW.internal(_root);
-	@override late final Translations$settings$permissions$codex$modes$acceptEdits$zh_TW acceptEdits = Translations$settings$permissions$codex$modes$acceptEdits$zh_TW.internal(_root);
-	@override late final Translations$settings$permissions$codex$modes$bypassPermissions$zh_TW bypassPermissions = Translations$settings$permissions$codex$modes$bypassPermissions$zh_TW.internal(_root);
-}
-
-// Path: settings.permissions.codex.technicalInfo
-class Translations$settings$permissions$codex$technicalInfo$zh_TW extends Translations$settings$permissions$codex$technicalInfo$en {
-	Translations$settings$permissions$codex$technicalInfo$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
-
-	final TranslationsZhTw _root; // ignore: unused_field
-
-	// Translations
-	@override String get kDefault => 'sandboxMode=workspace-write, approvalPolicy=untrusted。受信任的指令：cat、cd、grep、head、ls、pwd、tail、git status/log/diff/show、find（不帶 -exec）等。';
-	@override String get acceptEdits => 'sandboxMode=workspace-write, approvalPolicy=never。所有指令在專案目錄內自動執行。';
-	@override String get bypassPermissions => 'sandboxMode=danger-full-access, approvalPolicy=never。完全系統存取權限，僅在可信環境中使用。';
-	@override String get overrideNote => '您可以使用聊天介面中的模式按鈕按工作階段覆蓋此設定。';
-}
-
 // Path: settings.permissions.permissionMode.modes
 class Translations$settings$permissions$permissionMode$modes$zh_TW extends Translations$settings$permissions$permissionMode$modes$en {
 	Translations$settings$permissions$permissionMode$modes$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
@@ -6945,6 +6793,7 @@ class Translations$settings$permissions$permissionMode$modes$zh_TW extends Trans
 
 	// Translations
 	@override late final Translations$settings$permissions$permissionMode$modes$kDefault$zh_TW kDefault = Translations$settings$permissions$permissionMode$modes$kDefault$zh_TW.internal(_root);
+	@override late final Translations$settings$permissions$permissionMode$modes$auto$zh_TW auto = Translations$settings$permissions$permissionMode$modes$auto$zh_TW.internal(_root);
 	@override late final Translations$settings$permissions$permissionMode$modes$acceptEdits$zh_TW acceptEdits = Translations$settings$permissions$permissionMode$modes$acceptEdits$zh_TW.internal(_root);
 	@override late final Translations$settings$permissions$permissionMode$modes$bypassPermissions$zh_TW bypassPermissions = Translations$settings$permissions$permissionMode$modes$bypassPermissions$zh_TW.internal(_root);
 	@override late final Translations$settings$permissions$permissionMode$modes$plan$zh_TW plan = Translations$settings$permissions$permissionMode$modes$plan$zh_TW.internal(_root);
@@ -7077,39 +6926,6 @@ class Translations$common$notifications$codes$agent$notification$zh_TW extends T
 	@override String get title => 'Agent 通知';
 }
 
-// Path: settings.permissions.codex.modes.kDefault
-class Translations$settings$permissions$codex$modes$kDefault$zh_TW extends Translations$settings$permissions$codex$modes$kDefault$en {
-	Translations$settings$permissions$codex$modes$kDefault$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
-
-	final TranslationsZhTw _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => '預設';
-	@override String get description => '只有受信任的指令（ls、cat、grep、git status 等）會自動執行。其他指令將被略過。可以寫入工作區。';
-}
-
-// Path: settings.permissions.codex.modes.acceptEdits
-class Translations$settings$permissions$codex$modes$acceptEdits$zh_TW extends Translations$settings$permissions$codex$modes$acceptEdits$en {
-	Translations$settings$permissions$codex$modes$acceptEdits$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
-
-	final TranslationsZhTw _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => '接受編輯';
-	@override String get description => '所有指令在工作區內自動執行。具有沙箱執行的全自動模式。';
-}
-
-// Path: settings.permissions.codex.modes.bypassPermissions
-class Translations$settings$permissions$codex$modes$bypassPermissions$zh_TW extends Translations$settings$permissions$codex$modes$bypassPermissions$en {
-	Translations$settings$permissions$codex$modes$bypassPermissions$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
-
-	final TranslationsZhTw _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => '略過權限';
-	@override String get description => '完全系統存取，無任何限制。所有指令自動執行，具有完整的磁碟和網路存取權限。請謹慎使用。';
-}
-
 // Path: settings.permissions.permissionMode.modes.kDefault
 class Translations$settings$permissions$permissionMode$modes$kDefault$zh_TW extends Translations$settings$permissions$permissionMode$modes$kDefault$en {
 	Translations$settings$permissions$permissionMode$modes$kDefault$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
@@ -7119,6 +6935,17 @@ class Translations$settings$permissions$permissionMode$modes$kDefault$zh_TW exte
 	// Translations
 	@override String get title => '預設';
 	@override String get description => '需要權限的操作會在聊天中顯示供你核准。';
+}
+
+// Path: settings.permissions.permissionMode.modes.auto
+class Translations$settings$permissions$permissionMode$modes$auto$zh_TW extends Translations$settings$permissions$permissionMode$modes$auto$en {
+	Translations$settings$permissions$permissionMode$modes$auto$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '自動模式';
+	@override String get description => '由模型分類器針對每次工具呼叫決定核准或拒絕。免手動操作，但比 Bypass 安全——仍可能發生拒絕。';
 }
 
 // Path: settings.permissions.permissionMode.modes.acceptEdits
@@ -8692,61 +8519,18 @@ extension on TranslationsZhTw {
 			'settings.agents.logout.failed' => '登出失敗',
 			'settings.agents.error' => ({required Object error}) => '錯誤：${error}',
 			'settings.permissions.title' => '權限設定',
-			'settings.permissions.skipPermissions.label' => '略過權限提示（請謹慎使用）',
-			'settings.permissions.skipPermissions.claudeDescription' => '等同於 --dangerously-skip-permissions 旗標',
-			'settings.permissions.skipPermissions.cursorDescription' => '等同於 Cursor CLI 中的 -f 旗標',
-			'settings.permissions.allowedTools.title' => '允許的工具',
-			'settings.permissions.allowedTools.description' => '無需權限提示即可自動使用的工具',
-			'settings.permissions.allowedTools.placeholder' => '例如："Bash(git log:*)" 或 "Write"',
-			'settings.permissions.allowedTools.quickAdd' => '快速新增常用工具：',
-			'settings.permissions.allowedTools.empty' => '未設定允許的工具',
-			'settings.permissions.blockedTools.title' => '停用的工具',
-			'settings.permissions.blockedTools.description' => '無需權限提示即可自動停用的工具',
-			_ => null,
-		} ?? switch (path) {
-			'settings.permissions.blockedTools.placeholder' => '例如："Bash(rm:*)"',
-			'settings.permissions.blockedTools.empty' => '未設定停用的工具',
-			'settings.permissions.allowedCommands.title' => '允許的 Shell 指令',
-			'settings.permissions.allowedCommands.description' => '無需權限提示即可自動執行的 Shell 指令',
-			'settings.permissions.allowedCommands.placeholder' => '例如："Shell(ls)" 或 "Shell(git status)"',
-			'settings.permissions.allowedCommands.quickAdd' => '快速新增常用指令：',
-			'settings.permissions.allowedCommands.empty' => '未設定允許的指令',
-			'settings.permissions.blockedCommands.title' => '封鎖的 Shell 指令',
-			'settings.permissions.blockedCommands.description' => '自動封鎖的 Shell 指令',
-			'settings.permissions.blockedCommands.placeholder' => '例如："Shell(rm -rf)" 或 "Shell(sudo)"',
-			'settings.permissions.blockedCommands.empty' => '未設定封鎖的指令',
-			'settings.permissions.toolExamples.title' => '工具模式範例：',
-			'settings.permissions.toolExamples.bashGitLog' => '- 允許所有 git log 指令',
-			'settings.permissions.toolExamples.bashGitDiff' => '- 允許所有 git diff 指令',
-			'settings.permissions.toolExamples.write' => '- 允許所有 Write 工具使用',
-			'settings.permissions.toolExamples.bashRm' => '- 封鎖所有 rm 指令（危險）',
-			'settings.permissions.shellExamples.title' => 'Shell 指令範例：',
-			'settings.permissions.shellExamples.ls' => '- 允許 ls 指令',
-			'settings.permissions.shellExamples.gitStatus' => '- 允許 git status',
-			'settings.permissions.shellExamples.npmInstall' => '- 允許 npm install',
-			'settings.permissions.shellExamples.rmRf' => '- 封鎖遞迴刪除',
-			'settings.permissions.codex.permissionMode' => '權限模式',
-			'settings.permissions.codex.description' => '控制 Codex 如何處理檔案修改和指令執行',
-			'settings.permissions.codex.modes.kDefault.title' => '預設',
-			'settings.permissions.codex.modes.kDefault.description' => '只有受信任的指令（ls、cat、grep、git status 等）會自動執行。其他指令將被略過。可以寫入工作區。',
-			'settings.permissions.codex.modes.acceptEdits.title' => '接受編輯',
-			'settings.permissions.codex.modes.acceptEdits.description' => '所有指令在工作區內自動執行。具有沙箱執行的全自動模式。',
-			'settings.permissions.codex.modes.bypassPermissions.title' => '略過權限',
-			'settings.permissions.codex.modes.bypassPermissions.description' => '完全系統存取，無任何限制。所有指令自動執行，具有完整的磁碟和網路存取權限。請謹慎使用。',
-			'settings.permissions.codex.technicalDetails' => '技術詳情',
-			'settings.permissions.codex.technicalInfo.kDefault' => 'sandboxMode=workspace-write, approvalPolicy=untrusted。受信任的指令：cat、cd、grep、head、ls、pwd、tail、git status/log/diff/show、find（不帶 -exec）等。',
-			'settings.permissions.codex.technicalInfo.acceptEdits' => 'sandboxMode=workspace-write, approvalPolicy=never。所有指令在專案目錄內自動執行。',
-			'settings.permissions.codex.technicalInfo.bypassPermissions' => 'sandboxMode=danger-full-access, approvalPolicy=never。完全系統存取權限，僅在可信環境中使用。',
-			'settings.permissions.codex.technicalInfo.overrideNote' => '您可以使用聊天介面中的模式按鈕按工作階段覆蓋此設定。',
-			'settings.permissions.actions.add' => '新增',
 			'settings.permissions.permissionMode.title' => '權限模式',
 			'settings.permissions.permissionMode.description' => ({required Object provider}) => '新 ${provider} 工作階段的預設權限模式。你仍可為單一工作階段覆寫。',
 			'settings.permissions.permissionMode.modes.kDefault.title' => '預設',
 			'settings.permissions.permissionMode.modes.kDefault.description' => '需要權限的操作會在聊天中顯示供你核准。',
+			'settings.permissions.permissionMode.modes.auto.title' => '自動模式',
+			'settings.permissions.permissionMode.modes.auto.description' => '由模型分類器針對每次工具呼叫決定核准或拒絕。免手動操作，但比 Bypass 安全——仍可能發生拒絕。',
 			'settings.permissions.permissionMode.modes.acceptEdits.title' => '接受編輯',
 			'settings.permissions.permissionMode.modes.acceptEdits.description' => '檔案編輯自動核准；其他操作仍會請求你的核准。',
 			'settings.permissions.permissionMode.modes.bypassPermissions.title' => '略過權限',
 			'settings.permissions.permissionMode.modes.bypassPermissions.description' => '每個操作都自動核准 — 無提示完整存取。請謹慎使用。',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.plan.title' => '計畫',
 			'settings.permissions.permissionMode.modes.plan.description' => '計畫模式：代理只探索與規劃，不執行命令。',
 			'settings.mcpServers.title' => 'MCP 伺服器',
@@ -9216,8 +9000,6 @@ extension on TranslationsZhTw {
 			'tasks.createTask.submit' => '新增任務',
 			'tasks.createTask.submitting' => '正在新增...',
 			'tasks.createTask.title' => '新增任務',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.createTask.titleLabel' => '標題',
 			'tasks.createTask.titlePlaceholder' => '需要做什麼？',
 			'tasks.list.completedReopen' => '已完成（點擊重新開啟）',
@@ -9261,6 +9043,8 @@ extension on TranslationsZhTw {
 			'tasks.taskDetail.statusFailed' => '更新任務狀態失敗',
 			'tasks.taskDetail.taskId' => ({required Object id}) => '任務 ${id}',
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => '任務 ${id}：${title}',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.testStrategy' => '測試策略',
 			'tasks.taskDetail.titleRequired' => '標題為必填項',
 			'tasks.taskDetail.updateFailed' => '更新任務失敗',
@@ -9730,8 +9514,6 @@ extension on TranslationsZhTw {
 			'workspace.searchTranscript' => '搜尋記錄',
 			'workspace.sendTo' => ({required Object count}) => '傳送至 ${count}',
 			'workspace.accountWithLabel' => ({required Object label}) => '預設 · ${label}',
-			_ => null,
-		} ?? switch (path) {
 			'workspace.finishRunBeforeChangingWorkspace' => '變更工作區前請先完成執行',
 			'workspace.restored' => '工作區已還原',
 			'workspace.maximizePane' => '最大化窗格',

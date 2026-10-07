@@ -2059,79 +2059,6 @@
     },
     "permissions": {
       "title": "Impostazioni permessi",
-      "skipPermissions": {
-        "label": "Salta richieste di permesso (usa con cautela)",
-        "claudeDescription": "Equivalente al flag --dangerously-skip-permissions",
-        "cursorDescription": "Equivalente al flag -f in Cursor CLI"
-      },
-      "allowedTools": {
-        "title": "Strumenti consentiti",
-        "description": "Strumenti automaticamente consentiti senza richiedere permesso",
-        "placeholder": "es. \"Bash(git log:*)\" o \"Write\"",
-        "quickAdd": "Aggiunta rapida strumenti comuni:",
-        "empty": "Nessuno strumento consentito configurato"
-      },
-      "blockedTools": {
-        "title": "Strumenti bloccati",
-        "description": "Strumenti automaticamente bloccati senza richiedere permesso",
-        "placeholder": "es. \"Bash(rm:*)\"",
-        "empty": "Nessuno strumento bloccato configurato"
-      },
-      "allowedCommands": {
-        "title": "Comandi shell consentiti",
-        "description": "Comandi shell automaticamente consentiti senza richiedere permesso",
-        "placeholder": "es. \"Shell(ls)\" o \"Shell(git status)\"",
-        "quickAdd": "Aggiunta rapida comandi comuni:",
-        "empty": "Nessun comando consentito configurato"
-      },
-      "blockedCommands": {
-        "title": "Comandi shell bloccati",
-        "description": "Comandi shell automaticamente bloccati",
-        "placeholder": "es. \"Shell(rm -rf)\" o \"Shell(sudo)\"",
-        "empty": "Nessun comando bloccato configurato"
-      },
-      "toolExamples": {
-        "title": "Esempi pattern strumenti:",
-        "bashGitLog": "- Consenti tutti i comandi git log",
-        "bashGitDiff": "- Consenti tutti i comandi git diff",
-        "write": "- Consenti tutti gli utilizzi dello strumento Write",
-        "bashRm": "- Blocca tutti i comandi rm (pericoloso)"
-      },
-      "shellExamples": {
-        "title": "Esempi comandi shell:",
-        "ls": "- Consenti comando ls",
-        "gitStatus": "- Consenti git status",
-        "npmInstall": "- Consenti npm install",
-        "rmRf": "- Blocca eliminazione ricorsiva"
-      },
-      "codex": {
-        "permissionMode": "Modalità permessi",
-        "description": "Controlla come Codex gestisce le modifiche ai file e l'esecuzione dei comandi",
-        "modes": {
-          "default": {
-            "title": "Predefinito",
-            "description": "Solo i comandi attendibili (ls, cat, grep, git status, ecc.) vengono eseguiti automaticamente. Gli altri comandi vengono saltati. Può scrivere nell'area di lavoro."
-          },
-          "acceptEdits": {
-            "title": "Accetta modifiche",
-            "description": "Tutti i comandi vengono eseguiti automaticamente nell'area di lavoro. Modalità completamente automatica con esecuzione sandboxed."
-          },
-          "bypassPermissions": {
-            "title": "Ignora permessi",
-            "description": "Accesso completo al sistema senza restrizioni. Tutti i comandi vengono eseguiti automaticamente con accesso completo a disco e rete. Usa con cautela."
-          }
-        },
-        "technicalDetails": "Dettagli tecnici",
-        "technicalInfo": {
-          "default": "sandboxMode=workspace-write, approvalPolicy=untrusted. Comandi attendibili: cat, cd, grep, head, ls, pwd, tail, git status/log/diff/show, find (senza -exec), ecc.",
-          "acceptEdits": "sandboxMode=workspace-write, approvalPolicy=never. Tutti i comandi vengono auto-eseguiti nella directory del progetto.",
-          "bypassPermissions": "sandboxMode=danger-full-access, approvalPolicy=never. Accesso completo al sistema, usa solo in ambienti attendibili.",
-          "overrideNote": "Puoi sovrascrivere questa impostazione per sessione usando il pulsante modalità nell'interfaccia chat."
-        }
-      },
-      "actions": {
-        "add": "Aggiungi"
-      },
       "permissionMode": {
         "title": "Modalità permessi",
         "description": "Modalità di permesso predefinita per le nuove sessioni {{provider}}. Puoi comunque sovrascriverla per una singola sessione.",
@@ -2139,6 +2066,10 @@
           "default": {
             "title": "Predefinito",
             "description": "Le azioni che richiedono un permesso ti vengono mostrate per approvazione nella chat."
+          },
+          "auto": {
+            "title": "Modalità automatica",
+            "description": "Un classificatore di modello decide per ogni chiamata se approvare o negare. Alta autonomia."
           },
           "acceptEdits": {
             "title": "Accetta modifiche",

@@ -2325,76 +2325,6 @@
     },
     "permissions": {
       "title": "Permission Settings",
-      "skipPermissions": {
-        "label": "Skip permission prompts (use with caution)",
-        "claudeDescription": "Equivalent to --dangerously-skip-permissions flag",
-        "cursorDescription": "Equivalent to -f flag in Cursor CLI"
-      },
-      "allowedTools": {
-        "title": "Allowed Tools",
-        "description": "Tools that are automatically allowed without prompting for permission",
-        "placeholder": "e.g., \"Bash(git log:*)\" or \"Write\"",
-        "quickAdd": "Quick add common tools:",
-        "empty": "No allowed tools configured"
-      },
-      "blockedTools": {
-        "title": "Blocked Tools",
-        "description": "Tools that are automatically blocked without prompting for permission",
-        "placeholder": "e.g., \"Bash(rm:*)\"",
-        "empty": "No blocked tools configured"
-      },
-      "allowedCommands": {
-        "title": "Allowed Shell Commands",
-        "description": "Shell commands that are automatically allowed without prompting",
-        "placeholder": "e.g., \"Shell(ls)\" or \"Shell(git status)\"",
-        "quickAdd": "Quick add common commands:",
-        "empty": "No allowed commands configured"
-      },
-      "blockedCommands": {
-        "title": "Blocked Shell Commands",
-        "description": "Shell commands that are automatically blocked",
-        "placeholder": "e.g., \"Shell(rm -rf)\" or \"Shell(sudo)\"",
-        "empty": "No blocked commands configured"
-      },
-      "toolExamples": {
-        "title": "Tool Pattern Examples:",
-        "bashGitLog": "- Allow all git log commands",
-        "bashGitDiff": "- Allow all git diff commands",
-        "write": "- Allow all Write tool usage",
-        "bashRm": "- Block all rm commands (dangerous)"
-      },
-      "shellExamples": {
-        "title": "Shell Command Examples:",
-        "ls": "- Allow ls command",
-        "gitStatus": "- Allow git status",
-        "npmInstall": "- Allow npm install",
-        "rmRf": "- Block recursive delete"
-      },
-      "codex": {
-        "permissionMode": "Permission Mode",
-        "description": "Controls how Codex handles file modifications and command execution",
-        "modes": {
-          "default": {
-            "title": "Default",
-            "description": "Only trusted commands (ls, cat, grep, git status, etc.) run automatically. Other commands are skipped. Can write to workspace."
-          },
-          "acceptEdits": {
-            "title": "Accept Edits",
-            "description": "All commands run automatically within the workspace. Full auto mode with sandboxed execution."
-          },
-          "bypassPermissions": {
-            "title": "Bypass Permissions",
-            "description": "Full system access with no restrictions. All commands run automatically with full disk and network access. Use with caution."
-          }
-        },
-        "technicalDetails": "Technical details",
-        "technicalInfo": {
-          "default": "sandboxMode=workspace-write, approvalPolicy=untrusted. Trusted commands: cat, cd, grep, head, ls, pwd, tail, git status/log/diff/show, find (without -exec), etc.",
-          "acceptEdits": "sandboxMode=workspace-write, approvalPolicy=never. All commands auto-execute within project directory.",
-          "bypassPermissions": "sandboxMode=danger-full-access, approvalPolicy=never. Full system access, use only in trusted environments.",
-          "overrideNote": "You can override this per-session using the mode button in the chat interface."
-        }
-      },
       "permissionMode": {
         "title": "Permission Mode",
         "description": "Default permission mode for new {{provider}} sessions. You can still override it for a single session with the mode button in the chat composer.",
@@ -2402,6 +2332,10 @@
           "default": {
             "title": "Default",
             "description": "Actions that need permission are shown to you for approval in the chat."
+          },
+          "auto": {
+            "title": "Auto Mode",
+            "description": "A model classifier decides per tool call whether to approve or deny. Hands-off, but safer than Bypass — denials still happen."
           },
           "acceptEdits": {
             "title": "Accept Edits",
@@ -2416,9 +2350,6 @@
             "description": "Planning mode: the agent explores and plans without executing commands."
           }
         }
-      },
-      "actions": {
-        "add": "Add"
       }
     },
     "mcpServers": {

@@ -4686,16 +4686,7 @@ class Translations$settings$permissions$en {
 	/// en: 'Permission Settings'
 	String get title => 'Permission Settings';
 
-	late final Translations$settings$permissions$skipPermissions$en skipPermissions = Translations$settings$permissions$skipPermissions$en.internal(_root);
-	late final Translations$settings$permissions$allowedTools$en allowedTools = Translations$settings$permissions$allowedTools$en.internal(_root);
-	late final Translations$settings$permissions$blockedTools$en blockedTools = Translations$settings$permissions$blockedTools$en.internal(_root);
-	late final Translations$settings$permissions$allowedCommands$en allowedCommands = Translations$settings$permissions$allowedCommands$en.internal(_root);
-	late final Translations$settings$permissions$blockedCommands$en blockedCommands = Translations$settings$permissions$blockedCommands$en.internal(_root);
-	late final Translations$settings$permissions$toolExamples$en toolExamples = Translations$settings$permissions$toolExamples$en.internal(_root);
-	late final Translations$settings$permissions$shellExamples$en shellExamples = Translations$settings$permissions$shellExamples$en.internal(_root);
-	late final Translations$settings$permissions$codex$en codex = Translations$settings$permissions$codex$en.internal(_root);
 	late final Translations$settings$permissions$permissionMode$en permissionMode = Translations$settings$permissions$permissionMode$en.internal(_root);
-	late final Translations$settings$permissions$actions$en actions = Translations$settings$permissions$actions$en.internal(_root);
 }
 
 // Path: settings.mcpServers
@@ -11738,184 +11729,6 @@ class Translations$settings$agents$accounts$en {
 	String get add => 'Add account';
 }
 
-// Path: settings.permissions.skipPermissions
-class Translations$settings$permissions$skipPermissions$en {
-	Translations$settings$permissions$skipPermissions$en.internal(this._root);
-
-	final Translations _root; // ignore: unused_field
-
-	// Translations
-
-	/// en: 'Skip permission prompts (use with caution)'
-	String get label => 'Skip permission prompts (use with caution)';
-
-	/// en: 'Equivalent to --dangerously-skip-permissions flag'
-	String get claudeDescription => 'Equivalent to --dangerously-skip-permissions flag';
-
-	/// en: 'Equivalent to -f flag in Cursor CLI'
-	String get cursorDescription => 'Equivalent to -f flag in Cursor CLI';
-}
-
-// Path: settings.permissions.allowedTools
-class Translations$settings$permissions$allowedTools$en {
-	Translations$settings$permissions$allowedTools$en.internal(this._root);
-
-	final Translations _root; // ignore: unused_field
-
-	// Translations
-
-	/// en: 'Allowed Tools'
-	String get title => 'Allowed Tools';
-
-	/// en: 'Tools that are automatically allowed without prompting for permission'
-	String get description => 'Tools that are automatically allowed without prompting for permission';
-
-	/// en: 'e.g., "Bash(git log:*)" or "Write"'
-	String get placeholder => 'e.g., "Bash(git log:*)" or "Write"';
-
-	/// en: 'Quick add common tools:'
-	String get quickAdd => 'Quick add common tools:';
-
-	/// en: 'No allowed tools configured'
-	String get empty => 'No allowed tools configured';
-}
-
-// Path: settings.permissions.blockedTools
-class Translations$settings$permissions$blockedTools$en {
-	Translations$settings$permissions$blockedTools$en.internal(this._root);
-
-	final Translations _root; // ignore: unused_field
-
-	// Translations
-
-	/// en: 'Blocked Tools'
-	String get title => 'Blocked Tools';
-
-	/// en: 'Tools that are automatically blocked without prompting for permission'
-	String get description => 'Tools that are automatically blocked without prompting for permission';
-
-	/// en: 'e.g., "Bash(rm:*)"'
-	String get placeholder => 'e.g., "Bash(rm:*)"';
-
-	/// en: 'No blocked tools configured'
-	String get empty => 'No blocked tools configured';
-}
-
-// Path: settings.permissions.allowedCommands
-class Translations$settings$permissions$allowedCommands$en {
-	Translations$settings$permissions$allowedCommands$en.internal(this._root);
-
-	final Translations _root; // ignore: unused_field
-
-	// Translations
-
-	/// en: 'Allowed Shell Commands'
-	String get title => 'Allowed Shell Commands';
-
-	/// en: 'Shell commands that are automatically allowed without prompting'
-	String get description => 'Shell commands that are automatically allowed without prompting';
-
-	/// en: 'e.g., "Shell(ls)" or "Shell(git status)"'
-	String get placeholder => 'e.g., "Shell(ls)" or "Shell(git status)"';
-
-	/// en: 'Quick add common commands:'
-	String get quickAdd => 'Quick add common commands:';
-
-	/// en: 'No allowed commands configured'
-	String get empty => 'No allowed commands configured';
-}
-
-// Path: settings.permissions.blockedCommands
-class Translations$settings$permissions$blockedCommands$en {
-	Translations$settings$permissions$blockedCommands$en.internal(this._root);
-
-	final Translations _root; // ignore: unused_field
-
-	// Translations
-
-	/// en: 'Blocked Shell Commands'
-	String get title => 'Blocked Shell Commands';
-
-	/// en: 'Shell commands that are automatically blocked'
-	String get description => 'Shell commands that are automatically blocked';
-
-	/// en: 'e.g., "Shell(rm -rf)" or "Shell(sudo)"'
-	String get placeholder => 'e.g., "Shell(rm -rf)" or "Shell(sudo)"';
-
-	/// en: 'No blocked commands configured'
-	String get empty => 'No blocked commands configured';
-}
-
-// Path: settings.permissions.toolExamples
-class Translations$settings$permissions$toolExamples$en {
-	Translations$settings$permissions$toolExamples$en.internal(this._root);
-
-	final Translations _root; // ignore: unused_field
-
-	// Translations
-
-	/// en: 'Tool Pattern Examples:'
-	String get title => 'Tool Pattern Examples:';
-
-	/// en: '- Allow all git log commands'
-	String get bashGitLog => '- Allow all git log commands';
-
-	/// en: '- Allow all git diff commands'
-	String get bashGitDiff => '- Allow all git diff commands';
-
-	/// en: '- Allow all Write tool usage'
-	String get write => '- Allow all Write tool usage';
-
-	/// en: '- Block all rm commands (dangerous)'
-	String get bashRm => '- Block all rm commands (dangerous)';
-}
-
-// Path: settings.permissions.shellExamples
-class Translations$settings$permissions$shellExamples$en {
-	Translations$settings$permissions$shellExamples$en.internal(this._root);
-
-	final Translations _root; // ignore: unused_field
-
-	// Translations
-
-	/// en: 'Shell Command Examples:'
-	String get title => 'Shell Command Examples:';
-
-	/// en: '- Allow ls command'
-	String get ls => '- Allow ls command';
-
-	/// en: '- Allow git status'
-	String get gitStatus => '- Allow git status';
-
-	/// en: '- Allow npm install'
-	String get npmInstall => '- Allow npm install';
-
-	/// en: '- Block recursive delete'
-	String get rmRf => '- Block recursive delete';
-}
-
-// Path: settings.permissions.codex
-class Translations$settings$permissions$codex$en {
-	Translations$settings$permissions$codex$en.internal(this._root);
-
-	final Translations _root; // ignore: unused_field
-
-	// Translations
-
-	/// en: 'Permission Mode'
-	String get permissionMode => 'Permission Mode';
-
-	/// en: 'Controls how Codex handles file modifications and command execution'
-	String get description => 'Controls how Codex handles file modifications and command execution';
-
-	late final Translations$settings$permissions$codex$modes$en modes = Translations$settings$permissions$codex$modes$en.internal(_root);
-
-	/// en: 'Technical details'
-	String get technicalDetails => 'Technical details';
-
-	late final Translations$settings$permissions$codex$technicalInfo$en technicalInfo = Translations$settings$permissions$codex$technicalInfo$en.internal(_root);
-}
-
 // Path: settings.permissions.permissionMode
 class Translations$settings$permissions$permissionMode$en {
 	Translations$settings$permissions$permissionMode$en.internal(this._root);
@@ -11931,18 +11744,6 @@ class Translations$settings$permissions$permissionMode$en {
 	String description({required Object provider}) => 'Default permission mode for new ${provider} sessions. You can still override it for a single session with the mode button in the chat composer.';
 
 	late final Translations$settings$permissions$permissionMode$modes$en modes = Translations$settings$permissions$permissionMode$modes$en.internal(_root);
-}
-
-// Path: settings.permissions.actions
-class Translations$settings$permissions$actions$en {
-	Translations$settings$permissions$actions$en.internal(this._root);
-
-	final Translations _root; // ignore: unused_field
-
-	// Translations
-
-	/// en: 'Add'
-	String get add => 'Add';
 }
 
 // Path: settings.mcpServers.description
@@ -13293,39 +13094,6 @@ class Translations$settings$agents$account$devin$en {
 	String get description => 'Devin CLI assistant';
 }
 
-// Path: settings.permissions.codex.modes
-class Translations$settings$permissions$codex$modes$en {
-	Translations$settings$permissions$codex$modes$en.internal(this._root);
-
-	final Translations _root; // ignore: unused_field
-
-	// Translations
-	late final Translations$settings$permissions$codex$modes$kDefault$en kDefault = Translations$settings$permissions$codex$modes$kDefault$en.internal(_root);
-	late final Translations$settings$permissions$codex$modes$acceptEdits$en acceptEdits = Translations$settings$permissions$codex$modes$acceptEdits$en.internal(_root);
-	late final Translations$settings$permissions$codex$modes$bypassPermissions$en bypassPermissions = Translations$settings$permissions$codex$modes$bypassPermissions$en.internal(_root);
-}
-
-// Path: settings.permissions.codex.technicalInfo
-class Translations$settings$permissions$codex$technicalInfo$en {
-	Translations$settings$permissions$codex$technicalInfo$en.internal(this._root);
-
-	final Translations _root; // ignore: unused_field
-
-	// Translations
-
-	/// en: 'sandboxMode=workspace-write, approvalPolicy=untrusted. Trusted commands: cat, cd, grep, head, ls, pwd, tail, git status/log/diff/show, find (without -exec), etc.'
-	String get kDefault => 'sandboxMode=workspace-write, approvalPolicy=untrusted. Trusted commands: cat, cd, grep, head, ls, pwd, tail, git status/log/diff/show, find (without -exec), etc.';
-
-	/// en: 'sandboxMode=workspace-write, approvalPolicy=never. All commands auto-execute within project directory.'
-	String get acceptEdits => 'sandboxMode=workspace-write, approvalPolicy=never. All commands auto-execute within project directory.';
-
-	/// en: 'sandboxMode=danger-full-access, approvalPolicy=never. Full system access, use only in trusted environments.'
-	String get bypassPermissions => 'sandboxMode=danger-full-access, approvalPolicy=never. Full system access, use only in trusted environments.';
-
-	/// en: 'You can override this per-session using the mode button in the chat interface.'
-	String get overrideNote => 'You can override this per-session using the mode button in the chat interface.';
-}
-
 // Path: settings.permissions.permissionMode.modes
 class Translations$settings$permissions$permissionMode$modes$en {
 	Translations$settings$permissions$permissionMode$modes$en.internal(this._root);
@@ -13334,6 +13102,7 @@ class Translations$settings$permissions$permissionMode$modes$en {
 
 	// Translations
 	late final Translations$settings$permissions$permissionMode$modes$kDefault$en kDefault = Translations$settings$permissions$permissionMode$modes$kDefault$en.internal(_root);
+	late final Translations$settings$permissions$permissionMode$modes$auto$en auto = Translations$settings$permissions$permissionMode$modes$auto$en.internal(_root);
 	late final Translations$settings$permissions$permissionMode$modes$acceptEdits$en acceptEdits = Translations$settings$permissions$permissionMode$modes$acceptEdits$en.internal(_root);
 	late final Translations$settings$permissions$permissionMode$modes$bypassPermissions$en bypassPermissions = Translations$settings$permissions$permissionMode$modes$bypassPermissions$en.internal(_root);
 	late final Translations$settings$permissions$permissionMode$modes$plan$en plan = Translations$settings$permissions$permissionMode$modes$plan$en.internal(_root);
@@ -13522,51 +13291,6 @@ class Translations$common$notifications$codes$agent$notification$en {
 	String get title => 'Agent Notification';
 }
 
-// Path: settings.permissions.codex.modes.kDefault
-class Translations$settings$permissions$codex$modes$kDefault$en {
-	Translations$settings$permissions$codex$modes$kDefault$en.internal(this._root);
-
-	final Translations _root; // ignore: unused_field
-
-	// Translations
-
-	/// en: 'Default'
-	String get title => 'Default';
-
-	/// en: 'Only trusted commands (ls, cat, grep, git status, etc.) run automatically. Other commands are skipped. Can write to workspace.'
-	String get description => 'Only trusted commands (ls, cat, grep, git status, etc.) run automatically. Other commands are skipped. Can write to workspace.';
-}
-
-// Path: settings.permissions.codex.modes.acceptEdits
-class Translations$settings$permissions$codex$modes$acceptEdits$en {
-	Translations$settings$permissions$codex$modes$acceptEdits$en.internal(this._root);
-
-	final Translations _root; // ignore: unused_field
-
-	// Translations
-
-	/// en: 'Accept Edits'
-	String get title => 'Accept Edits';
-
-	/// en: 'All commands run automatically within the workspace. Full auto mode with sandboxed execution.'
-	String get description => 'All commands run automatically within the workspace. Full auto mode with sandboxed execution.';
-}
-
-// Path: settings.permissions.codex.modes.bypassPermissions
-class Translations$settings$permissions$codex$modes$bypassPermissions$en {
-	Translations$settings$permissions$codex$modes$bypassPermissions$en.internal(this._root);
-
-	final Translations _root; // ignore: unused_field
-
-	// Translations
-
-	/// en: 'Bypass Permissions'
-	String get title => 'Bypass Permissions';
-
-	/// en: 'Full system access with no restrictions. All commands run automatically with full disk and network access. Use with caution.'
-	String get description => 'Full system access with no restrictions. All commands run automatically with full disk and network access. Use with caution.';
-}
-
 // Path: settings.permissions.permissionMode.modes.kDefault
 class Translations$settings$permissions$permissionMode$modes$kDefault$en {
 	Translations$settings$permissions$permissionMode$modes$kDefault$en.internal(this._root);
@@ -13580,6 +13304,21 @@ class Translations$settings$permissions$permissionMode$modes$kDefault$en {
 
 	/// en: 'Actions that need permission are shown to you for approval in the chat.'
 	String get description => 'Actions that need permission are shown to you for approval in the chat.';
+}
+
+// Path: settings.permissions.permissionMode.modes.auto
+class Translations$settings$permissions$permissionMode$modes$auto$en {
+	Translations$settings$permissions$permissionMode$modes$auto$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Auto Mode'
+	String get title => 'Auto Mode';
+
+	/// en: 'A model classifier decides per tool call whether to approve or deny. Hands-off, but safer than Bypass — denials still happen.'
+	String get description => 'A model classifier decides per tool call whether to approve or deny. Hands-off, but safer than Bypass — denials still happen.';
 }
 
 // Path: settings.permissions.permissionMode.modes.acceptEdits
@@ -15365,61 +15104,18 @@ extension on Translations {
 			'settings.agents.accounts.newLabel' => 'Account label (e.g. Work)',
 			'settings.agents.accounts.add' => 'Add account',
 			'settings.permissions.title' => 'Permission Settings',
-			'settings.permissions.skipPermissions.label' => 'Skip permission prompts (use with caution)',
-			'settings.permissions.skipPermissions.claudeDescription' => 'Equivalent to --dangerously-skip-permissions flag',
-			'settings.permissions.skipPermissions.cursorDescription' => 'Equivalent to -f flag in Cursor CLI',
-			'settings.permissions.allowedTools.title' => 'Allowed Tools',
-			'settings.permissions.allowedTools.description' => 'Tools that are automatically allowed without prompting for permission',
-			'settings.permissions.allowedTools.placeholder' => 'e.g., "Bash(git log:*)" or "Write"',
-			'settings.permissions.allowedTools.quickAdd' => 'Quick add common tools:',
-			'settings.permissions.allowedTools.empty' => 'No allowed tools configured',
-			'settings.permissions.blockedTools.title' => 'Blocked Tools',
-			'settings.permissions.blockedTools.description' => 'Tools that are automatically blocked without prompting for permission',
-			'settings.permissions.blockedTools.placeholder' => 'e.g., "Bash(rm:*)"',
-			'settings.permissions.blockedTools.empty' => 'No blocked tools configured',
-			'settings.permissions.allowedCommands.title' => 'Allowed Shell Commands',
-			'settings.permissions.allowedCommands.description' => 'Shell commands that are automatically allowed without prompting',
-			'settings.permissions.allowedCommands.placeholder' => 'e.g., "Shell(ls)" or "Shell(git status)"',
-			'settings.permissions.allowedCommands.quickAdd' => 'Quick add common commands:',
-			'settings.permissions.allowedCommands.empty' => 'No allowed commands configured',
-			'settings.permissions.blockedCommands.title' => 'Blocked Shell Commands',
-			'settings.permissions.blockedCommands.description' => 'Shell commands that are automatically blocked',
-			'settings.permissions.blockedCommands.placeholder' => 'e.g., "Shell(rm -rf)" or "Shell(sudo)"',
-			'settings.permissions.blockedCommands.empty' => 'No blocked commands configured',
-			'settings.permissions.toolExamples.title' => 'Tool Pattern Examples:',
-			'settings.permissions.toolExamples.bashGitLog' => '- Allow all git log commands',
-			'settings.permissions.toolExamples.bashGitDiff' => '- Allow all git diff commands',
-			'settings.permissions.toolExamples.write' => '- Allow all Write tool usage',
-			'settings.permissions.toolExamples.bashRm' => '- Block all rm commands (dangerous)',
-			'settings.permissions.shellExamples.title' => 'Shell Command Examples:',
-			'settings.permissions.shellExamples.ls' => '- Allow ls command',
-			'settings.permissions.shellExamples.gitStatus' => '- Allow git status',
-			'settings.permissions.shellExamples.npmInstall' => '- Allow npm install',
-			'settings.permissions.shellExamples.rmRf' => '- Block recursive delete',
-			'settings.permissions.codex.permissionMode' => 'Permission Mode',
-			'settings.permissions.codex.description' => 'Controls how Codex handles file modifications and command execution',
-			'settings.permissions.codex.modes.kDefault.title' => 'Default',
-			'settings.permissions.codex.modes.kDefault.description' => 'Only trusted commands (ls, cat, grep, git status, etc.) run automatically. Other commands are skipped. Can write to workspace.',
-			'settings.permissions.codex.modes.acceptEdits.title' => 'Accept Edits',
-			'settings.permissions.codex.modes.acceptEdits.description' => 'All commands run automatically within the workspace. Full auto mode with sandboxed execution.',
-			'settings.permissions.codex.modes.bypassPermissions.title' => 'Bypass Permissions',
-			'settings.permissions.codex.modes.bypassPermissions.description' => 'Full system access with no restrictions. All commands run automatically with full disk and network access. Use with caution.',
-			'settings.permissions.codex.technicalDetails' => 'Technical details',
-			'settings.permissions.codex.technicalInfo.kDefault' => 'sandboxMode=workspace-write, approvalPolicy=untrusted. Trusted commands: cat, cd, grep, head, ls, pwd, tail, git status/log/diff/show, find (without -exec), etc.',
-			'settings.permissions.codex.technicalInfo.acceptEdits' => 'sandboxMode=workspace-write, approvalPolicy=never. All commands auto-execute within project directory.',
-			'settings.permissions.codex.technicalInfo.bypassPermissions' => 'sandboxMode=danger-full-access, approvalPolicy=never. Full system access, use only in trusted environments.',
-			'settings.permissions.codex.technicalInfo.overrideNote' => 'You can override this per-session using the mode button in the chat interface.',
 			'settings.permissions.permissionMode.title' => 'Permission Mode',
 			'settings.permissions.permissionMode.description' => ({required Object provider}) => 'Default permission mode for new ${provider} sessions. You can still override it for a single session with the mode button in the chat composer.',
 			'settings.permissions.permissionMode.modes.kDefault.title' => 'Default',
 			'settings.permissions.permissionMode.modes.kDefault.description' => 'Actions that need permission are shown to you for approval in the chat.',
+			'settings.permissions.permissionMode.modes.auto.title' => 'Auto Mode',
+			'settings.permissions.permissionMode.modes.auto.description' => 'A model classifier decides per tool call whether to approve or deny. Hands-off, but safer than Bypass — denials still happen.',
 			'settings.permissions.permissionMode.modes.acceptEdits.title' => 'Accept Edits',
 			'settings.permissions.permissionMode.modes.acceptEdits.description' => 'File edits are approved automatically; other actions still ask for your approval.',
 			'settings.permissions.permissionMode.modes.bypassPermissions.title' => 'Bypass Permissions',
 			'settings.permissions.permissionMode.modes.bypassPermissions.description' => 'Every action is approved automatically — full access without prompts. Use with caution.',
 			'settings.permissions.permissionMode.modes.plan.title' => 'Plan',
 			'settings.permissions.permissionMode.modes.plan.description' => 'Planning mode: the agent explores and plans without executing commands.',
-			'settings.permissions.actions.add' => 'Add',
 			'settings.mcpServers.title' => 'MCP Servers',
 			'settings.mcpServers.description.claude' => 'Model Context Protocol servers provide additional tools and data sources to Claude',
 			'settings.mcpServers.description.cursor' => 'Model Context Protocol servers provide additional tools and data sources to Cursor',
@@ -15689,8 +15385,6 @@ extension on Translations {
 			'sidebar.workspace.title' => 'Change session workspace',
 			'sidebar.workspace.description' => 'The agent runs its next turns in this directory. Existing session history is kept.',
 			'sidebar.workspace.pathLabel' => 'Workspace path',
-			_ => null,
-		} ?? switch (path) {
 			'sidebar.workspace.pathRequired' => 'Workspace path is required.',
 			'sidebar.workspace.submit' => 'Change workspace',
 			'sidebar.workspace.saving' => 'Changing…',
@@ -15734,6 +15428,8 @@ extension on Translations {
 			'sidebar.messages.restoreSessionError' => 'Error restoring session. Please try again.',
 			'sidebar.messages.bulkDeleteSessionsFailed' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: 'Failed to delete ${count} session. Please try again.', other: 'Failed to delete ${count} sessions. Please try again.', ), 
 			'sidebar.version.updateAvailable' => 'Update available',
+			_ => null,
+		} ?? switch (path) {
 			'sidebar.version.restartRequired' => 'Update installed — restart the server to apply',
 			'sidebar.version.updateNow' => 'Update now',
 			'sidebar.version.updateConfirm' => ({required Object version}) => 'Update ddagent to v${version}? The latest code will be pulled, rebuilt, and the server will restart — active sessions are interrupted.',
@@ -16203,8 +15899,6 @@ extension on Translations {
 			'kanban.time.daysAgo' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: '1 day ago', other: '${count} days ago', ), 
 			'mcp.install.title' => 'Install ddagent MCP server',
 			'mcp.install.description' => 'Lets the selected agents use the ddagent knowledge base and tools over MCP.',
-			_ => null,
-		} ?? switch (path) {
 			'mcp.install.cardDescription' => 'Give your agents the knowledge base and ddagent tools over MCP — pick agents or install for all.',
 			'mcp.install.installSelected' => 'Install selected',
 			'mcp.install.installForAll' => 'Install for all',
@@ -16248,6 +15942,8 @@ extension on Translations {
 			'onboarding.completeSetup' => 'Complete Setup',
 			'onboarding.errors.nameAndEmailRequired' => 'Both git name and email are required.',
 			'onboarding.errors.invalidEmail' => 'Please enter a valid email address.',
+			_ => null,
+		} ?? switch (path) {
 			'onboarding.agents.title' => 'Connect Your AI Agents',
 			'onboarding.agents.description' => 'Login to one or more AI coding assistants. All are optional.',
 			'onboarding.agents.laterHint' => 'You can configure these later in Settings.',

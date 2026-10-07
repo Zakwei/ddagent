@@ -151,6 +151,32 @@ for (const [name, spawn, abort, map] of [
   }
 }
 
+for (const [permissionMode, expected, unexpected] of [
+  ['bypassPermissions', ['-f'], ['--mode']],
+  ['plan', ['--mode', 'plan'], ['-f']],
+  ['acceptEdits', [], ['-f', '--mode']],
+] as const) {
+  test(`cursor: permissionMode ${permissionMode} maps onto cursor-agent flags`, async () => {
+    let spawnedArgs: string[] = [];
+    const child = Object.assign(new EventEmitter(), {
+      stdin: new PassThrough(), stdout: new PassThrough(), stderr: new PassThrough(), kill: () => true,
+    });
+    const fakeSpawn = (_cmd: string, args: string[]) => {
+      spawnedArgs = args;
+      return child;
+    };
+    const runtime = await loadRuntime('cursor', 'activeCursorProcesses', { 'cross-spawn': fakeSpawn });
+    const context = { resolveProviderSessionId: () => null, resolveResumeModel: async () => undefined, isProviderInstalled: async () => true, normalizeMessage: () => [] };
+    const run = runtime.spawnCursor('hello', { sessionId: 'app', cwd: '/tmp', permissionMode }, { send() {} }, context);
+    await new Promise((resolve) => setImmediate(resolve));
+    child.emit('close', 0);
+    await run;
+    const joined = spawnedArgs.join(' ');
+    if (expected.length) assert.ok(joined.includes(expected.join(' ')), joined);
+    for (const flag of unexpected) assert.ok(!spawnedArgs.includes(flag), joined);
+  });
+}
+
 test('OpenCode: old cleanup preserves replacement mapping, mode and permissions', async () => {
   const runtime = await loadRuntime('opencode', 'cleanupRun, activeRuns, providerToApp, sessionModes, pendingPermissions');
   const hooks = runtime.lifecycleHooks;
