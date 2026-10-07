@@ -1,5 +1,6 @@
 import 'package:ddagent_app/core/theme/app_theme.dart';
 import 'package:ddagent_app/features/chat/view/tool_blocks.dart';
+import 'package:ddagent_app/features/sessions/data/session_message.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -219,5 +220,54 @@ void main() {
       }),
       '',
     );
+  });
+
+  testWidgets('an ask_user_question tool row shows every option and description', (t) async {
+    // File-synced CLI sessions deliver the ask as a plain tool_use row (no
+    // permission_request / banner), so the row itself must render the options.
+    final message = SessionMessage.fromJson({
+      'id': 'm1',
+      'sessionId': 's1',
+      'timestamp': '2026-01-01T00:00:00.000Z',
+      'provider': 'commandcode',
+      'kind': 'tool_use',
+      'toolName': 'ask_user_question',
+      'toolId': 't1',
+      'toolInput': {
+        'questions': [
+          {
+            'header': 'Scope',
+            'question': 'Pick a scope?',
+            'options': [
+              {'label': 'MVP', 'description': 'small'},
+              {'label': 'Full clone', 'description': 'everything'},
+            ],
+          },
+          {
+            'header': 'Extras',
+            'question': 'Anything else? (pick several)',
+            'multiSelect': true,
+            'options': [
+              {'label': 'Tests'},
+              {'label': 'Docs'},
+            ],
+          },
+        ],
+      },
+      'toolResult': {'content': ''},
+    });
+
+    await t.pumpWidget(
+      _wrap(ToolUseTile(message: message, childrenMap: const <String, List<SessionMessage>>{})),
+    );
+
+    expect(find.text('Pick a scope?'), findsOneWidget);
+    expect(find.text('MVP'), findsOneWidget);
+    expect(find.text('small'), findsOneWidget);
+    expect(find.text('Full clone'), findsOneWidget);
+    expect(find.text('everything'), findsOneWidget);
+    expect(find.text('Anything else? (pick several)'), findsOneWidget);
+    expect(find.text('Tests'), findsOneWidget);
+    expect(find.text('Docs'), findsOneWidget);
   });
 }

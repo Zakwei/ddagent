@@ -701,36 +701,119 @@ class ToolUseTile extends StatelessWidget {
     );
   }
 
+  /// Read-only recap of an `ask_user_question` tool row. File-synced CLI
+  /// sessions (Command Code) carry the ask as a plain `tool_use` row rather
+  /// than a live `permission_request`, so there is no banner to answer it —
+  /// this renders the header, the question and every offered option (label +
+  /// description), with the picked answer highlighted when the transcript
+  /// carries one. The interactive panel lives in the chat pane's
+  /// `_PermissionBanner` for the ACP live path.
   Widget _qaContent(BuildContext context, ColorScheme cs, Map<String, dynamic> input) {
     final questions = input['questions'] is List ? input['questions'] as List : const <dynamic>[];
-    final answers = input['answers'] is Map ? input['answers'] as Map : const <dynamic, dynamic>{};
+    if (questions.isEmpty) return const SizedBox.shrink();
+    final answers = input['answers'] is Map
+        ? Map<String, dynamic>.from(input['answers'] as Map)
+        : const <String, dynamic>{};
+    final t = Translations.of(context);
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: cs.tertiaryContainer,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: cs.outlineVariant),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.help_outline, size: 16),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  t.chat.permissionRequest.question,
+                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                ),
+              ),
+            ],
+          ),
+          for (final q in questions)
+            if (q is Map) ...[
+              const SizedBox(height: 8),
+              _qaQuestion(cs, Map<String, dynamic>.from(q), answers),
+            ],
+        ],
+      ),
+    );
+  }
+
+  /// One question inside [_qaContent] — header, text and its option rows.
+  Widget _qaQuestion(ColorScheme cs, Map<String, dynamic> q, Map<String, dynamic> answers) {
+    final header = q['header']?.toString();
+    final question = q['question']?.toString();
+    final multi = q['multiSelect'] == true;
+    final rawOptions = q['options'] is List ? q['options'] as List : const <dynamic>[];
+    final answer = question != null ? answers[question] : null;
+    final picked = <String>{};
+    if (answer is String) {
+      picked.addAll(answer.split(', ').map((part) => part.trim()));
+    } else if (answer is List) {
+      picked.addAll(answer.map((value) => '$value'));
+    }
+    final options = [
+      for (final o in rawOptions)
+        if (o is Map)
+          (label: '${o['label'] ?? o['text'] ?? ''}', description: o['description']?.toString())
+        else
+          (label: '$o', description: null),
+    ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        for (final q in questions)
-          if (q is Map)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 6),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    q['header']?.toString() ?? q['question']?.toString() ?? 'Question',
-                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+        if (header?.trim().isNotEmpty ?? false)
+          Text(header!, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+        if (question?.trim().isNotEmpty ?? false)
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Text(question!, style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant)),
+          ),
+        for (final o in options)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 1),
+                  child: Icon(
+                    picked.contains(o.label)
+                        ? (multi ? Icons.check_box : Icons.radio_button_checked)
+                        : (multi ? Icons.check_box_outline_blank : Icons.radio_button_off),
+                    size: 16,
+                    color: picked.contains(o.label) ? cs.primary : cs.outline,
                   ),
-                  if (q['question'] != null)
-                    Text(
-                      q['question'].toString(),
-                      style: TextStyle(fontSize: 12, color: cs.outline),
-                    ),
-                  if (answers[q['question']] != null)
-                    Text(
-                      '→ ${answers[q['question']]}',
-                      style: TextStyle(fontSize: 12, color: cs.primary),
-                    ),
-                ],
-              ),
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(o.label, style: const TextStyle(fontSize: 13)),
+                      if (o.description?.trim().isNotEmpty ?? false)
+                        Text(o.description!, style: TextStyle(fontSize: 11, color: cs.outline)),
+                    ],
+                  ),
+                ),
+              ],
             ),
+          ),
+        if (answer != null && picked.isEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text('→ $answer', style: TextStyle(fontSize: 12, color: cs.primary)),
+          ),
       ],
     );
   }
