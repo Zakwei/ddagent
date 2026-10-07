@@ -11,145 +11,97 @@
 -->
 <!-- lang:en -->
 ### What's new
-- Android: the app now updates itself. When a newer release exists, the update banner downloads the APK and hands it to the Android installer — tap Update and confirm the install.
-- Android builds are signed with a permanent release key from now on, so each version installs over the previous one without reinstalling.
+- Mini orchestration: a lighter sibling of the orchestrator with exactly two model roles — a thinker that plans, decides and reviews, and a worker that executes — plus a per-task-type role map. Configure it in Settings → Mini orchestration.
+- Desktop self-update (Linux/Windows): the app now downloads the matching update in the background and installs it when you quit — a silent installer on Windows, or a signed package / portable unpack on Linux. The Update badge and Settings → App updates offer a "quit and install" action.
 
 ### Bug fixes
-- The update banner on a phone no longer updates only the connected server: it compares the app's own version and installs the new APK.
-- Server: release info now lists the downloadable files, so the app can pick the right asset.
-- Android: the release build resolves the signing keystore correctly — the wrong path made properly signed releases impossible.
-
-### One-time step
-- Builds up to v0.8.8 were signed with a temporary key, so Android refuses to install v0.8.9 over them. Uninstall the app once, install v0.8.9, and in-app updates work from then on.
+- Interactive asks from devin/commandcode/claude stay answerable across windows: prompts from a dead or restarted turn are no longer resurfaced, and another window now shows the answer you picked instead of "Skipped".
+- Local server updates no longer wipe your settings: the bundle's `.env*` files (custom DATABASE_PATH, ports, integrations) are kept and restored into the new server.
 <!-- lang:pl -->
 ### Nowości
-- Android: aplikacja aktualizuje się teraz sama. Gdy pojawi się nowsze wydanie, banner aktualizacji pobiera APK i przekazuje go instalatorowi Androida — dotknij Aktualizuj i potwierdź instalację.
-- Wydania na Androida są od teraz podpisywane stałym kluczem, więc każda wersja instaluje się na poprzednią bez przeinstalowywania.
+- Mini orkiestracja: lżejszy odpowiednik orkiestratora z dokładnie dwiema rolami modeli — myśliciel planuje, decyduje i recenzuje, a wykonawca realizuje zadania — oraz mapą ról dla typów zadań. Skonfigurujesz ją w Ustawienia → Mini orkiestracja.
+- Samoaktualizacja na pulpicie (Linux/Windows): aplikacja pobiera teraz pasującą aktualizację w tle i instaluje ją przy zamykaniu — cichy instalator w Windows albo podpisany pakiet / rozpakowanie wersji przenośnej w Linux. Plakietka Aktualizacja i Ustawienia → Aktualizacje aplikacji oferują akcję „zamknij i zainstaluj".
 
 ### Poprawki błędów
-- Banner aktualizacji na telefonie nie aktualizuje już tylko podłączonego serwera: porównuje wersję samej aplikacji i instaluje nowy APK.
-- Serwer: informacje o wydaniu zawierają teraz listę plików do pobrania, więc aplikacja wybiera właściwy artefakt.
-- Android: build wydania poprawnie odnajduje keystore — błędna ścieżka uniemożliwiała podpisane wydania.
-
-### Jednorazowy krok
-- Wersje do v0.8.8 włącznie były podpisane tymczasowym kluczem, więc Android nie zainstaluje na nie v0.8.9. Odinstaluj aplikację raz, zainstaluj v0.8.9 — od tego momentu aktualizacje w aplikacji działają.
+- Interaktywne pytania z devin/commandcode/claude pozostają odpowiadalne w wielu oknach: pytania z martwej lub zrestartowanej tury nie wracają, a inne okno pokazuje wybraną odpowiedź zamiast „Pominięto".
+- Aktualizacje lokalnego serwera nie kasują już ustawień: pliki `.env*` z pakietu (własny DATABASE_PATH, porty, integracje) są zachowywane i przywracane w nowym serwerze.
 <!-- lang:de -->
 ### Neu
-- Android: Die App aktualisiert sich jetzt selbst. Gibt es eine neuere Version, lädt das Update-Banner die APK herunter und übergibt sie an den Android-Installer — auf Aktualisieren tippen und die Installation bestätigen.
-- Android-Builds werden ab jetzt mit einem festen Release-Schlüssel signiert, sodass jede Version über die vorherige installiert wird — ohne Neuinstallation.
+- Mini-Orchestrierung: ein leichteres Gegenstück zum Orchestrator mit genau zwei Modellrollen — ein Denker, der plant, entscheidet und prüft, und ein Worker, der ausführt — plus einer Rollenzuordnung pro Aufgabentyp. Konfiguration unter Einstellungen → Mini-Orchestrierung.
+- Desktop-Selbstupdate (Linux/Windows): Die App lädt das passende Update jetzt im Hintergrund und installiert es beim Beenden — stiller Installer unter Windows bzw. signiertes Paket / portables Entpacken unter Linux. Update-Badge und Einstellungen → App-Updates bieten „Beenden und installieren“.
 
 ### Fehlerbehebungen
-- Das Update-Banner auf dem Telefon aktualisiert nicht mehr nur den verbundenen Server: Es vergleicht die eigene App-Version und installiert die neue APK.
-- Server: Die Release-Informationen listen nun die herunterladbaren Dateien auf, damit die App das richtige Artefakt findet.
-- Android: Der Release-Build findet den Signatur-Keystore korrekt — der falsche Pfad machte signierte Releases unmöglich.
-
-### Einmaliger Schritt
-- Builds bis v0.8.8 waren mit einem temporären Schlüssel signiert, daher verweigert Android die Installation von v0.8.9 darüber. Deinstalliere die App einmal, installiere v0.8.9 — danach funktionieren In-App-Updates.
+- Interaktive Nachfragen von devin/commandcode/claude bleiben über Fenster hinweg beantwortbar: Nachfragen aus einem toten oder neu gestarteten Durchlauf tauchen nicht mehr auf, und ein anderes Fenster zeigt die gewählte Antwort statt „Übersprungen“.
+- Updates des lokalen Servers löschen keine Einstellungen mehr: Die `.env*`-Dateien des Bundles (eigener DATABASE_PATH, Ports, Integrationen) bleiben erhalten und werden in den neuen Server zurückgespielt.
 <!-- lang:es -->
 ### Novedades
-- Android: la app ahora se actualiza sola. Cuando hay una versión más nueva, el aviso de actualización descarga el APK y lo entrega al instalador de Android — pulsa Actualizar y confirma la instalación.
-- Las compilaciones de Android se firman a partir de ahora con una clave permanente, así cada versión se instala sobre la anterior sin reinstalar.
+- Mini-orquestación: una versión ligera del orquestador con exactamente dos roles de modelo — un pensador que planifica, decide y revisa, y un trabajador que ejecuta — más un mapa de roles por tipo de tarea. Configúrala en Ajustes → Mini orquestación.
+- Autoactualización de escritorio (Linux/Windows): la app ahora descarga la actualización correspondiente en segundo plano y la instala al salir — instalador silencioso en Windows o paquete firmado / descompresión portátil en Linux. El distintivo de actualización y Ajustes → Actualizaciones de la app ofrecen «salir e instalar».
 
 ### Correcciones de errores
-- El aviso de actualización en el teléfono ya no actualiza solo el servidor conectado: compara la versión de la propia app e instala el nuevo APK.
-- Servidor: la información del lanzamiento ahora lista los archivos descargables, así la app elige el artefacto correcto.
-- Android: la compilación de lanzamiento resuelve bien el keystore de firma — la ruta incorrecta impedía las versiones firmadas.
-
-### Paso único
-- Las versiones hasta v0.8.8 se firmaron con una clave temporal, así que Android no instala v0.8.9 sobre ellas. Desinstala la app una vez, instala v0.8.9 y desde entonces las actualizaciones en la app funcionan.
+- Las preguntas interactivas de devin/commandcode/claude siguen siendo respondibles entre ventanas: las preguntas de un turno muerto o reiniciado ya no reaparecen, y otra ventana muestra la respuesta elegida en lugar de "Omitido".
+- Las actualizaciones del servidor local ya no borran tus ajustes: los archivos `.env*` del paquete (DATABASE_PATH personalizado, puertos, integraciones) se conservan y restauran en el nuevo servidor.
 <!-- lang:fr -->
 ### Nouveautés
-- Android : l'application se met désormais à jour toute seule. Quand une version plus récente existe, la bannière de mise à jour télécharge l'APK et le remet à l'installeur Android — appuyez sur Mettre à jour et confirmez l'installation.
-- Les builds Android sont désormais signés avec une clé de release permanente, donc chaque version s'installe par-dessus la précédente sans réinstallation.
+- Mini-orchestration : un pendant plus léger de l'orchestrateur avec exactement deux rôles de modèle — un penseur qui planifie, décide et vérifie, et un exécutant qui réalise — plus une table de rôles par type de tâche. Configurez-la dans Paramètres → Mini-orchestration.
+- Mise à jour automatique sur ordinateur (Linux/Windows) : l'application télécharge désormais la mise à jour correspondante en arrière-plan et l'installe à la fermeture — installateur silencieux sous Windows, ou paquet signé / décompression portable sous Linux. Le badge de mise à jour et Paramètres → Mises à jour de l'application proposent « quitter et installer ».
 
 ### Corrections de bugs
-- La bannière de mise à jour sur téléphone ne met plus à jour uniquement le serveur connecté : elle compare la version de l'application elle-même et installe le nouvel APK.
-- Serveur : les informations de version listent maintenant les fichiers téléchargeables, pour que l'application choisisse le bon artefact.
-- Android : le build de release trouve correctement le keystore de signature — le mauvais chemin rendait toute release signée impossible.
-
-### Étape unique
-- Les versions jusqu'à v0.8.8 étaient signées avec une clé temporaire, donc Android refuse d'installer v0.8.9 par-dessus. Désinstallez l'application une fois, installez v0.8.9, et les mises à jour dans l'application fonctionneront ensuite.
+- Les demandes interactives de devin/commandcode/claude restent disponibles entre fenêtres : les demandes d'un tour mort ou redémarré ne réapparaissent plus, et une autre fenêtre affiche la réponse choisie au lieu de « Ignoré ».
+- Les mises à jour du serveur local n'effacent plus vos réglages : les fichiers `.env*` du paquet (DATABASE_PATH personnalisé, ports, intégrations) sont conservés et restaurés dans le nouveau serveur.
 <!-- lang:it -->
 ### Novità
-- Android: l'app ora si aggiorna da sola. Quando esce una versione più recente, il banner di aggiornamento scarica l'APK e lo passa all'installer di Android — tocca Aggiorna e conferma l'installazione.
-- Le build Android sono d'ora in poi firmate con una chiave di release permanente, così ogni versione si installa sopra la precedente senza reinstallare.
+- Mini orchestrazione: una versione più leggera dell'orchestratore con esattamente due ruoli di modello — un pensatore che pianifica, decide e rivede, e un esecutore che realizza — più una mappa dei ruoli per tipo di attività. La configuri in Impostazioni → Mini orchestrazione.
+- Aggiornamento automatico su desktop (Linux/Windows): l'app ora scarica in background l'aggiornamento corrispondente e lo installa all'uscita — installer silenzioso su Windows, oppure pacchetto firmato / scompattamento della versione portabile su Linux. Il badge Aggiornamento e Impostazioni → Aggiornamenti app offrono l'azione "esci e installa".
 
 ### Correzioni di bug
-- Il banner di aggiornamento sul telefono non aggiorna più solo il server collegato: confronta la versione dell'app stessa e installa il nuovo APK.
-- Server: le informazioni sulla release ora elencano i file scaricabili, così l'app sceglie l'artefatto giusto.
-- Android: la build di release trova correttamente il keystore di firma — il percorso sbagliato rendeva impossibili le release firmate.
-
-### Passo una tantum
-- Le versioni fino alla v0.8.8 erano firmate con una chiave temporanea, quindi Android rifiuta di installare la v0.8.9 sopra di esse. Disinstalla l'app una volta, installa la v0.8.9 e da quel momento gli aggiornamenti in-app funzionano.
+- Le domande interattive di devin/commandcode/claude restano gestibili tra finestre: le domande di un turno morto o riavviato non riemergono più e un'altra finestra mostra la risposta scelta invece di "Saltato".
+- Gli aggiornamenti del server locale non cancellano più le impostazioni: i file `.env*` del bundle (DATABASE_PATH personalizzato, porte, integrazioni) vengono conservati e ripristinati nel nuovo server.
 <!-- lang:ja -->
 ### 新機能
-- Android: アプリが自分で更新できるようになりました。新しいリリースがあると、更新バナーが APK をダウンロードして Android のインストーラーに渡します — 「更新」を押してインストールを確認してください。
-- Android ビルドは今後、恒久的なリリースキーで署名されます。以降のバージョンは再インストールなしで上書き更新できます。
+- ミニオーケストレーション: オーケストレーターの軽量版で、モデルの役割はちょうど 2 つ — 計画・判断・レビューを担う「シンカー」と実行を担う「ワーカー」— に加え、タスク種別ごとの役割マップ。設定 → ミニオーケストレーションで構成できます。
+- デスクトップの自動更新（Linux/Windows）: アプリが該当する更新をバックグラウンドでダウンロードし、終了時にインストールします — Windows ではサイレントインストーラー、Linux では署名済みパッケージ／ポータブル版の展開。「更新」バッジと設定 → アプリの更新に「終了してインストール」を用意しました。
 
 ### バグ修正
-- スマホの更新バナーが接続中のサーバーだけを更新することはなくなりました: アプリ自身のバージョンを比較し、新しい APK をインストールします。
-- サーバー: リリース情報にダウンロード可能なファイルの一覧が含まれ、アプリが適切な成果物を選べます。
-- Android: リリースビルドが署名用キーストアを正しく解決するようになりました — 誤ったパスが署名済みリリースを不可能にしていました。
-
-### 一度だけの手順
-- v0.8.8 以前のビルドは一時的なキーで署名されているため、Android は v0.8.9 を上書きできません。一度アプリをアンインストールして v0.8.9 をインストールしてください。以降はアプリ内更新が機能します。
+- devin/commandcode/claude の対話的な確認がウィンドウをまたいで回答可能になりました: 停止・再起動したターンの確認が再表示されなくなり、別ウィンドウでも「スキップ」ではなく選んだ回答が表示されます。
+- ローカルサーバーの更新で設定が消えなくなりました: バンドルの `.env*` ファイル（独自の DATABASE_PATH、ポート、連携）を保持し、新しいサーバーへ復元します。
 <!-- lang:ko -->
 ### 새로운 기능
-- Android: 이제 앱이 스스로 업데이트합니다. 새 릴리스가 있으면 업데이트 배너가 APK를 내려받아 Android 설치 프로그램에 넘깁니다 — 업데이트를 누르고 설치를 확인하세요.
-- Android 빌드는 이제 영구 릴리스 키로 서명되므로, 이후 버전은 재설치 없이 이전 버전 위에 설치됩니다.
+- 미니 오케스트레이션: 오케스트레이터의 경량 버전으로, 모델 역할이 정확히 두 개입니다 — 계획·판단·검토를 맡는 싱커와 실행을 맡는 워커 — 에 더해 작업 유형별 역할 매핑. 설정 → 미니 오케스트레이션에서 구성합니다.
+- 데스크톱 자동 업데이트(Linux/Windows): 앱이 이제 알맞은 업데이트를 백그라운드에서 내려받아 종료할 때 설치합니다 — Windows에서는 무음 설치 프로그램, Linux에서는 서명된 패키지/포터블 압축 해제. 업데이트 배지와 설정 → 앱 업데이트에서 "종료 후 설치"를 제공합니다.
 
 ### 버그 수정
-- 휴대폰의 업데이트 배너가 더 이상 연결된 서버만 업데이트하지 않습니다: 앱 자체의 버전을 비교해 새 APK를 설치합니다.
-- 서버: 릴리스 정보에 내려받을 수 있는 파일 목록이 포함되어 앱이 올바른 파일을 찾습니다.
-- Android: 릴리스 빌드가 서명 키스토어를 올바르게 찾습니다 — 잘못된 경로 때문에 서명된 릴리스가 불가능했습니다.
-
-### 일회성 단계
-- v0.8.8까지의 빌드는 임시 키로 서명되어 Android가 v0.8.9를 덮어 설치할 수 없습니다. 앱을 한 번 삭제하고 v0.8.9를 설치하세요. 이후부터는 앱 내 업데이트가 동작합니다.
+- devin/commandcode/claude의 대화형 질문이 창을 넘어 응답 가능해졌습니다: 종료되거나 재시작된 턴의 질문이 다시 나타나지 않고, 다른 창에서도 "건너뜀" 대신 선택한 답변이 표시됩니다.
+- 로컬 서버 업데이트가 더 이상 설정을 지우지 않습니다: 번들의 `.env*` 파일(사용자 지정 DATABASE_PATH, 포트, 연동)을 보존해 새 서버에 복원합니다.
 <!-- lang:ru -->
 ### Новое
-- Android: приложение теперь обновляет себя само. Когда выходит новая версия, баннер обновления скачивает APK и передаёт его установщику Android — нажмите «Обновить» и подтвердите установку.
-- Сборки Android теперь подписываются постоянным ключом, поэтому каждая версия ставится поверх предыдущей без переустановки.
+- Мини-оркестрация: облегчённый вариант оркестратора ровно с двумя ролями моделей — мыслитель планирует, решает и проверяет, а исполнитель выполняет — плюс карта ролей по типам задач. Настраивается в разделе «Настройки → Мини-оркестрация».
+- Самообновление на компьютере (Linux/Windows): приложение теперь скачивает нужное обновление в фоне и устанавливает его при выходе — тихий установщик в Windows либо подписанный пакет / распаковка портативной версии в Linux. Значок обновления и «Настройки → Обновления приложения» предлагают действие «выйти и установить».
 
 ### Исправления ошибок
-- Баннер обновления на телефоне больше не обновляет только подключённый сервер: он сравнивает версию самого приложения и устанавливает новый APK.
-- Сервер: информация о релизе теперь содержит список файлов для загрузки, поэтому приложение выбирает нужный артефакт.
-- Android: релизная сборка корректно находит keystore для подписи — неверный путь делал подписанные релизы невозможными.
-
-### Однократный шаг
-- Версии до v0.8.8 включительно подписаны временным ключом, поэтому Android не установит v0.8.9 поверх них. Удалите приложение один раз, установите v0.8.9 — дальше обновления из приложения работают.
+- Интерактивные запросы devin/commandcode/claude остаются доступными в разных окнах: запросы из завершённого или перезапущенного хода больше не всплывают, а в другом окне показывается выбранный ответ вместо «Пропущено».
+- Обновления локального сервера больше не стирают настройки: файлы `.env*` из пакета (свой DATABASE_PATH, порты, интеграции) сохраняются и восстанавливаются в новом сервере.
 <!-- lang:tr -->
 ### Yenilikler
-- Android: uygulama artık kendini güncelliyor. Yeni bir sürüm çıktığında güncelleme şeridi APK'yı indirip Android yükleyicisine verir — Güncelle'ye dokunun ve kurulumu onaylayın.
-- Android derlemeleri artık kalıcı bir sürüm anahtarıyla imzalanıyor; böylece her sürüm yeniden kurulum olmadan öncekinin üzerine kurulur.
+- Mini orkestrasyon: orkestratörün daha hafif bir sürümü; tam olarak iki model rolü var — planlayan, karar veren ve gözden geçiren bir düşünen ile uygulayan bir çalışan — ayrıca görev türüne göre rol eşlemesi. Ayarlar → Mini orkestrasyon'dan yapılandırılır.
+- Masaüstünde otomatik güncelleme (Linux/Windows): uygulama artık uygun güncellemeyi arka planda indirip çıkışta kuruyor — Windows'ta sessiz kurulum, Linux'ta imzalı paket / taşınabilir sürümü açma. Güncelleme rozeti ve Ayarlar → Uygulama güncellemeleri "çık ve kur" eylemini sunar.
 
 ### Hata düzeltmeleri
-- Telefondaki güncelleme şeridi artık yalnızca bağlı sunucuyu güncellemiyor: uygulamanın kendi sürümünü karşılaştırıp yeni APK'yı kuruyor.
-- Sunucu: sürüm bilgisi artık indirilebilir dosyaları listeliyor, böylece uygulama doğru dosyayı buluyor.
-- Android: sürüm derlemesi imzalama anahtar deposunu doğru buluyor — yanlış yol imzalı sürümleri imkânsız kılıyordu.
-
-### Tek seferlik adım
-- v0.8.8'e kadarki derlemeler geçici bir anahtarla imzalandığı için Android v0.8.9'u üzerlerine kurmaz. Uygulamayı bir kez kaldırın, v0.8.9'u kurun; sonrasında uygulama içi güncellemeler çalışır.
+- devin/commandcode/claude etkileşimli soruları pencereler arasında yanıtlanabilir kalıyor: ölmüş ya da yeniden başlatılmış bir turun soruları artık geri gelmiyor ve başka bir pencere "Atlandı" yerine seçtiğiniz yanıtı gösteriyor.
+- Yerel sunucu güncellemeleri artık ayarlarınızı silmiyor: paketin `.env*` dosyaları (özel DATABASE_PATH, portlar, entegrasyonlar) korunup yeni sunucuya geri yükleniyor.
 <!-- lang:zh-CN -->
 ### 新功能
-- Android：应用现在可以自我更新。有新版本时，更新横幅会下载 APK 并交给 Android 安装程序 — 点“更新”并确认安装。
-- Android 构建从今以后使用固定的发布密钥签名，因此每个版本都能直接覆盖安装上一个版本，无需重装。
+- 迷你编排：编排器的轻量版本，模型角色恰好两个——负责规划、决策和审查的思考者，以及负责执行的执行者——另有按任务类型的角色映射。可在 设置 → 迷你编排 中配置。
+- 桌面自动更新（Linux/Windows）：应用现在会在后台下载对应的更新，并在退出时安装——Windows 使用静默安装程序，Linux 使用签名软件包/便携版解压。更新徽标与 设置 → 应用更新 提供“退出并安装”操作。
 
 ### 错误修复
-- 手机上的更新横幅不再只更新已连接的服务器：它会比较应用自身的版本并安装新的 APK。
-- 服务器：版本信息现在会列出可下载的文件，应用能选到正确的产物。
-- Android：发布构建现在能正确解析签名密钥库 — 错误的路径此前让签名发布无法实现。
-
-### 一次性步骤
-- v0.8.8 及更早的构建使用临时密钥签名，因此 Android 不允许在其上安装 v0.8.9。请先卸载应用一次，再安装 v0.8.9，之后应用内更新即可正常工作。
+- devin/commandcode/claude 的交互式提问现在可跨窗口回答：已结束或重启轮次的提问不再重新出现，其他窗口也会显示你所选的回答，而不是“已跳过”。
+- 本地服务器更新不再清空你的设置：安装包根目录的 `.env*` 文件（自定义 DATABASE_PATH、端口、集成）会被保留并恢复到新的服务器中。
 <!-- lang:zh-TW -->
 ### 新功能
-- Android：應用程式現在會自我更新。有新版本時，更新橫幅會下載 APK 並交給 Android 安裝程式 — 點「更新」並確認安裝。
-- Android 組建從現在起使用固定的發行金鑰簽署，因此每個版本都能直接覆蓋安裝上一版，無需重新安裝。
+- 迷你編排：編排器的輕量版本，模型角色恰好兩個——負責規劃、決策與審查的思考者，以及負責執行的執行者——另有依任務類型的角色對應。可在 設定 → 迷你編排 中設定。
+- 桌面自動更新（Linux/Windows）：應用程式現在會在背景下載對應的更新，並在結束時安裝——Windows 使用無聲安裝程式，Linux 使用簽章套件／可攜版解壓。更新徽章與 設定 → 應用程式更新 提供「結束並安裝」動作。
 
 ### 錯誤修復
-- 手機上的更新橫幅不再只更新已連接的伺服器：它會比較應用程式本身的版本並安裝新的 APK。
-- 伺服器：發行資訊現在會列出可下載的檔案，應用程式能選到正確的產物。
-- Android：發行組建現在能正確解析簽署金鑰庫 — 錯誤的路徑先前讓簽署發行無法實現。
-
-### 一次性步驟
-- v0.8.8 及更早的組建使用臨時金鑰簽署，因此 Android 不允許在其上安裝 v0.8.9。請先解除安裝應用程式一次，再安裝 v0.8.9，之後應用程式內更新即可正常運作。
+- devin/commandcode/claude 的互動提問現在可跨視窗回答：已結束或重新啟動回合的提問不再重新出現，其他視窗也會顯示你選擇的回答，而不是「已略過」。
+- 本機伺服器更新不再清空你的設定：套件根目錄的 `.env*` 檔案（自訂 DATABASE_PATH、連接埠、整合）會被保留並還原到新的伺服器。
