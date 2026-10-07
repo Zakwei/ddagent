@@ -1,6 +1,8 @@
 import 'package:ddagent_app/core/theme/app_theme.dart';
 import 'package:ddagent_app/features/settings/view/sections/about_section.dart';
 import 'package:ddagent_app/features/settings/view/settings_screen.dart';
+import 'package:ddagent_app/features/system/data/system_repository.dart';
+import 'package:ddagent_app/features/system/state/system_providers.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -77,6 +79,42 @@ void main() {
     // rail's lazy list can keep the last item out of the built window.
     expect(find.byType(AboutSection), findsOneWidget);
     expect(Hive.box<dynamic>('settings').get('lastSettingsSection'), 'about');
+  });
+
+  testWidgets('restart button opens the confirmation dialog', (tester) async {
+    tester.view.physicalSize = const Size(1200, 2600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    // Stub the About page's network providers so the changelog spinner does not
+    // animate forever (pumpAndSettle would never complete).
+    await tester.pumpWidget(
+      TranslationProvider(
+        child: ProviderScope(
+          overrides: [
+            releasesProvider.overrideWith((ref) async => <Release>[]),
+            serverHealthProvider.overrideWith((ref) async => {'status': 'ok', 'version': '0.0.0'}),
+          ],
+          child: MaterialApp(
+            theme: AppTheme.light(),
+            home: const MediaQuery(
+              data: MediaQueryData(size: Size(1200, 2600)),
+              child: SettingsScreen(section: 'about'),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final restart = find.text('Restart');
+    expect(restart, findsWidgets);
+    await tester.tap(restart.first);
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Restart the ddagent server? Active sessions will be interrupted.'),
+      findsOneWidget,
+    );
   });
 
   testWidgets('compact width switches the rail to pills', (tester) async {

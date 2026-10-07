@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:ddagent_app/core/config/env.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
+import 'package:ddagent_app/core/utils/app_reload.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/core/widgets/app_markdown.dart';
@@ -723,6 +724,10 @@ class _RestartBlockState extends ConsumerState<_RestartBlock> {
     }
     if (!mounted) return;
     if (back) {
+      // Reload the web tab so the client re-bootstraps against the new process
+      // (the copy promises it, and the web original reloaded here). Desktop and
+      // mobile have no page to reload, so refresh the health state instead.
+      if (reloadClient()) return;
       ref.invalidate(serverHealthProvider);
       unawaited(_showResultDialog(_RestartStatus.back, null));
     } else {
