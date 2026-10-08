@@ -47,6 +47,10 @@ test('claude history: subagent tool calls from <session>/subagents nest under th
   ]));
   await writeFile(path.join(projectDir, sessionId, 'subagents', 'agent-abc.jsonl'), jsonl([
     {
+      uuid: 'u1', timestamp: '2026-10-07T10:00:01Z',
+      message: { role: 'assistant', content: [{ type: 'thinking', thinking: 'look around' }, { type: 'text', text: 'Listing files.' }] },
+    },
+    {
       timestamp: '2026-10-07T10:00:02Z',
       message: { role: 'assistant', content: [{ type: 'tool_use', id: 'toolu_child', name: 'Bash', input: { command: 'ls' } }] },
     },
@@ -73,6 +77,11 @@ test('claude history: subagent tool calls from <session>/subagents nest under th
     assert.equal((child?.toolResult as { content?: string })?.content, 'a.ts');
     // The child row follows its parent so a page never orphans it.
     assert.ok(messages.indexOf(child!) > messages.indexOf(agent!));
+    // The subagent's own text and thinking survive a reload, in order.
+    const nested = messages.filter((message) => message.parentToolUseId === 'toolu_agent');
+    assert.deepEqual(nested.map((message) => [message.kind, message.content ?? message.toolName]), [
+      ['thinking', 'look around'], ['text', 'Listing files.'], ['tool_use', 'Bash'],
+    ]);
     // The background Agent's card carries its notification's outcome.
     const background = messages.find((message) => message.kind === 'tool_use' && message.toolId === 'toolu_bg');
     assert.deepEqual(

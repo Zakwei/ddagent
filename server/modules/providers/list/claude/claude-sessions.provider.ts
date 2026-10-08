@@ -14,6 +14,7 @@ type ClaudeToolResult = {
   content: unknown;
   isError: boolean;
   subagentTools?: unknown;
+  subagentSteps?: AnyRecord[];
   toolUseResult?: unknown;
 };
 
@@ -84,8 +85,11 @@ function readClaudeUserText(content: unknown): string {
     .join('\n');
 }
 
-async function parseAgentTools(filePath: string): Promise<AnyRecord[]> {
+// A subagent transcript: its tool calls (the client's `subagentTools`) and,
+// in order, every step — those calls plus its text and thinking — for reload.
+async function parseAgentTools(filePath: string): Promise<{ tools: AnyRecord[]; steps: AnyRecord[] }> {
   const tools: AnyRecord[] = [];
+  const steps: AnyRecord[] = [];
 
   try {
     const fileStream = fs.createReadStream(filePath);
@@ -103,16 +107,25 @@ async function parseAgentTools(filePath: string): Promise<AnyRecord[]> {
         const entry = JSON.parse(line) as AnyRecord;
 
         if (entry.message?.role === 'assistant' && Array.isArray(entry.message?.content)) {
-          for (const part of entry.message.content as AnyRecord[]) {
+          (entry.message.content as AnyRecord[]).forEach((part, index) => {
             if (part.type === 'tool_use') {
-              tools.push({
+              const tool = {
                 toolId: part.id,
                 toolName: part.name,
                 toolInput: part.input,
                 timestamp: entry.timestamp,
+              };
+              tools.push(tool);
+              steps.push(tool);
+            } else if ((part.type === 'text' && part.text) || (part.type === 'thinking' && part.thinking)) {
+              steps.push({
+                id: `${entry.uuid || entry.timestamp}_${index}`,
+                kind: part.type,
+                content: part.type === 'text' ? part.text : part.thinking,
+                timestamp: entry.timestamp,
               });
             }
-          }
+          });
         }
 
         if (entry.message?.role === 'user' && Array.isArray(entry.message?.content)) {
@@ -141,7 +154,7 @@ async function parseAgentTools(filePath: string): Promise<AnyRecord[]> {
     console.warn(`Error parsing agent file ${filePath}:`, message);
   }
 
-  return tools;
+  return { tools, steps };
 }
 
 async function getSessionMessages(
@@ -162,7 +175,7 @@ async function getSessionMessages(
     const projectDir = path.dirname(jsonLPath);
 
     const messages: AnyRecord[] = [];
-    const agentToolsCache = new Map<string, AnyRecord[]>();
+    const agentToolsCache = new Map<string, { tools: AnyRecord[]; steps: AnyRecord[] }>();
 
     const fileStream = fs.createReadStream(jsonLPath);
     const rl = readline.createInterface({
@@ -206,8 +219,7 @@ async function getSessionMessages(
         continue;
       }
 
-      const tools = await parseAgentTools(agentFilePath);
-      agentToolsCache.set(agentId, tools);
+      agentToolsCache.set(agentId, await parseAgentTools(agentFilePath));
     }
 
     for (const message of messages) {
@@ -216,9 +228,12 @@ async function getSessionMessages(
         continue;
       }
 
-      const agentTools = agentToolsCache.get(String(agentId));
-      if (agentTools && agentTools.length > 0) {
-        message.subagentTools = agentTools;
+      const agent = agentToolsCache.get(String(agentId));
+      if (agent && agent.tools.length > 0) {
+        message.subagentTools = agent.tools;
+      }
+      if (agent && agent.steps.length > 0) {
+        message.subagentSteps = agent.steps;
       }
     }
 
@@ -776,6 +791,7 @@ export class ClaudeSessionsProvider implements IProviderSessions {
               content: part.content,
               isError: Boolean(part.is_error),
               subagentTools: raw.subagentTools,
+              subagentSteps: raw.subagentSteps,
               toolUseResult: raw.toolUseResult,
             });
           }
@@ -810,10 +826,26 @@ export class ClaudeSessionsProvider implements IProviderSessions {
     const withSubagentRows: NormalizedMessage[] = [];
     for (const msg of normalized) {
       withSubagentRows.push(msg);
-      if (msg.kind !== 'tool_use' || !msg.toolId || !Array.isArray(msg.subagentTools)) {
+      if (msg.kind !== 'tool_use' || !msg.toolId) {
         continue;
       }
-      for (const tool of msg.subagentTools as AnyRecord[]) {
+      // Steps keep the subagent's text and thinking between its tool calls.
+      const steps = toolResultMap.get(msg.toolId)?.subagentSteps ?? msg.subagentTools;
+      if (!Array.isArray(steps)) continue;
+      for (const tool of steps as AnyRecord[]) {
+        if (tool?.kind === 'text' || tool?.kind === 'thinking') {
+          withSubagentRows.push(createNormalizedMessage({
+            id: `${msg.toolId}:${tool.id}`,
+            sessionId,
+            timestamp: tool.timestamp || msg.timestamp,
+            provider: PROVIDER,
+            kind: tool.kind,
+            ...(tool.kind === 'text' ? { role: 'assistant' as const } : {}),
+            content: tool.content,
+            parentToolUseId: msg.toolId,
+          }));
+          continue;
+        }
         if (!tool?.toolId) continue;
         withSubagentRows.push(createNormalizedMessage({
           id: `${msg.toolId}:${tool.toolId}`,
