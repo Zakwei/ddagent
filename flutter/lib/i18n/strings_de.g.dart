@@ -1061,6 +1061,10 @@ class Translations$chat$claudeStatus$de extends Translations$chat$claudeStatus$e
 	@override late final Translations$chat$claudeStatus$controls$de controls = Translations$chat$claudeStatus$controls$de._(_root);
 	@override late final Translations$chat$claudeStatus$providers$de providers = Translations$chat$claudeStatus$providers$de._(_root);
 	@override String get stop => 'Stoppen';
+	@override String backgroundTasks({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(count,
+		one: '${count} Hintergrundaufgabe läuft',
+		other: '${count} Hintergrundaufgaben laufen',
+	);
 }
 
 // Path: chat.projectSelection
@@ -7234,6 +7238,7 @@ extension on TranslationsDe {
 			'chat.claudeStatus.controls.pressEscToStop' => 'Jederzeit Esc drücken, um zu stoppen',
 			'chat.claudeStatus.providers.assistant' => 'Assistent',
 			'chat.claudeStatus.stop' => 'Stoppen',
+			'chat.claudeStatus.backgroundTasks' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(count, one: '${count} Hintergrundaufgabe läuft', other: '${count} Hintergrundaufgaben laufen', ), 
 			'chat.projectSelection.startChatWithProvider' => ({required Object provider}) => 'Wähl ein Projekt, um mit ${provider} zu chatten',
 			'chat.tasks.nextTaskPrompt' => 'Nächste Aufgabe starten',
 			'chat.voice.autoRead' => 'Antworten vorlesen',
@@ -7500,9 +7505,9 @@ extension on TranslationsDe {
 			'common.mainContent.chooseProject' => 'Projekt auswählen',
 			'common.mainContent.selectProjectDescription' => 'Wähl ein Projekt aus der Seitenleiste, um mit Claude zu programmieren. Jedes Projekt enthält deine Chat-Sitzungen und den Dateiverlauf.',
 			'common.mainContent.tip' => 'Tipp',
-			'common.mainContent.createProjectMobile' => 'Tipp oben auf die Menüschaltfläche, um auf Projekte zuzugreifen',
 			_ => null,
 		} ?? switch (path) {
+			'common.mainContent.createProjectMobile' => 'Tipp oben auf die Menüschaltfläche, um auf Projekte zuzugreifen',
 			'common.mainContent.createProjectDesktop' => 'Erstell ein neues Projekt, indem du auf das Ordnersymbol in der Seitenleiste klickst',
 			'common.mainContent.newSession' => 'Neue Sitzung',
 			'common.mainContent.untitledSession' => 'Unbenannte Sitzung',
@@ -8014,9 +8019,9 @@ extension on TranslationsDe {
 			'common.gitPanel.mergeWorktree.cleanupLabel' => 'Nach dem Merge aufräumen',
 			'common.gitPanel.mergeWorktree.commitCount' => ({required Object count}) => '${count} Commit(s)',
 			'common.gitPanel.mergeWorktree.merge' => 'Mergen',
-			'common.gitPanel.mergeWorktree.mergeMessage' => ({required Object branch}) => 'Branch \'${branch}\' mergen',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.mergeWorktree.mergeMessage' => ({required Object branch}) => 'Branch \'${branch}\' mergen',
 			'common.gitPanel.mergeWorktree.messageLabel' => 'Commit-Nachricht',
 			'common.gitPanel.mergeWorktree.squashDesc' => ({required Object commits, required Object branch}) => 'Alle ${commits} zu einem einzigen Commit auf ${branch} zusammenfassen',
 			'common.gitPanel.mergeWorktree.squashLabel' => 'Commits squashen',
@@ -8528,9 +8533,9 @@ extension on TranslationsDe {
 			'settings.permissions.permissionMode.modes.acceptEdits.title' => 'Bearbeitungen akzeptieren',
 			'settings.permissions.permissionMode.modes.acceptEdits.description' => 'Dateibearbeitungen werden automatisch genehmigt; andere Aktionen fragen weiterhin nach deiner Zustimmung.',
 			'settings.permissions.permissionMode.modes.bypassPermissions.title' => 'Berechtigungen umgehen',
-			'settings.permissions.permissionMode.modes.bypassPermissions.description' => 'Jede Aktion wird automatisch genehmigt — voller Zugriff ohne Nachfragen. Mit Vorsicht verwenden.',
 			_ => null,
 		} ?? switch (path) {
+			'settings.permissions.permissionMode.modes.bypassPermissions.description' => 'Jede Aktion wird automatisch genehmigt — voller Zugriff ohne Nachfragen. Mit Vorsicht verwenden.',
 			'settings.permissions.permissionMode.modes.plan.title' => 'Plan',
 			'settings.permissions.permissionMode.modes.plan.description' => 'Planungsmodus: Der Agent erkundet und plant, ohne Befehle auszuführen.',
 			'settings.mcpServers.title' => 'MCP-Server',
@@ -9042,9 +9047,9 @@ extension on TranslationsDe {
 			'tasks.taskDetail.status' => 'Status',
 			'tasks.taskDetail.statusFailed' => 'Aufgabenstatus konnte nicht aktualisiert werden',
 			'tasks.taskDetail.taskId' => ({required Object id}) => 'Aufgabe ${id}',
-			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'Aufgabe ${id}: ${title}',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'Aufgabe ${id}: ${title}',
 			'tasks.taskDetail.testStrategy' => 'Teststrategie',
 			'tasks.taskDetail.titleRequired' => 'Titel ist erforderlich',
 			'tasks.taskDetail.updateFailed' => 'Aufgabe konnte nicht aktualisiert werden',

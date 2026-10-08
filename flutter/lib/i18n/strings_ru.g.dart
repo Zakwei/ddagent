@@ -1061,6 +1061,12 @@ class Translations$chat$claudeStatus$ru extends Translations$chat$claudeStatus$e
 	@override late final Translations$chat$claudeStatus$controls$ru controls = Translations$chat$claudeStatus$controls$ru._(_root);
 	@override late final Translations$chat$claudeStatus$providers$ru providers = Translations$chat$claudeStatus$providers$ru._(_root);
 	@override String get stop => 'Остановить';
+	@override String backgroundTasks({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(count,
+		one: 'Выполняется ${count} фоновая задача',
+		few: 'Выполняются ${count} фоновые задачи',
+		many: 'Выполняется ${count} фоновых задач',
+		other: 'Выполняется ${count} фоновой задачи',
+	);
 }
 
 // Path: chat.projectSelection
@@ -7240,6 +7246,7 @@ extension on TranslationsRu {
 			'chat.claudeStatus.controls.pressEscToStop' => 'Нажмите Esc в любое время для остановки',
 			'chat.claudeStatus.providers.assistant' => 'Ассистент',
 			'chat.claudeStatus.stop' => 'Остановить',
+			'chat.claudeStatus.backgroundTasks' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(count, one: 'Выполняется ${count} фоновая задача', few: 'Выполняются ${count} фоновые задачи', many: 'Выполняется ${count} фоновых задач', other: 'Выполняется ${count} фоновой задачи', ), 
 			'chat.projectSelection.startChatWithProvider' => ({required Object provider}) => 'Выберите проект для начала чата с ${provider}',
 			'chat.tasks.nextTaskPrompt' => 'Начать следующую задачу',
 			'chat.voice.autoRead' => 'Читать ответы вслух',
@@ -7506,9 +7513,9 @@ extension on TranslationsRu {
 			'common.mainContent.chooseProject' => 'Выберите проект',
 			'common.mainContent.selectProjectDescription' => 'Выберите проект на боковой панели, чтобы начать работу с Claude. Каждый проект содержит ваши сеансы чата и историю файлов.',
 			'common.mainContent.tip' => 'Совет',
-			'common.mainContent.createProjectMobile' => 'Нажмите кнопку меню выше для доступа к проектам',
 			_ => null,
 		} ?? switch (path) {
+			'common.mainContent.createProjectMobile' => 'Нажмите кнопку меню выше для доступа к проектам',
 			'common.mainContent.createProjectDesktop' => 'Создайте новый проект, нажав на значок папки на боковой панели',
 			'common.mainContent.newSession' => 'Новый сеанс',
 			'common.mainContent.untitledSession' => 'Безымянный сеанс',
@@ -8020,9 +8027,9 @@ extension on TranslationsRu {
 			'common.gitPanel.mergeWorktree.cleanupLabel' => 'Очистить после слияния',
 			'common.gitPanel.mergeWorktree.commitCount' => ({required Object count}) => '${count} коммит(ов)',
 			'common.gitPanel.mergeWorktree.merge' => 'Слить',
-			'common.gitPanel.mergeWorktree.mergeMessage' => ({required Object branch}) => 'Слить ветку \'${branch}\'',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.mergeWorktree.mergeMessage' => ({required Object branch}) => 'Слить ветку \'${branch}\'',
 			'common.gitPanel.mergeWorktree.messageLabel' => 'Сообщение коммита',
 			'common.gitPanel.mergeWorktree.squashDesc' => ({required Object commits, required Object branch}) => 'Объединить все ${commits} в один коммит в ${branch}',
 			'common.gitPanel.mergeWorktree.squashLabel' => 'Сжать коммиты (squash)',
@@ -8534,9 +8541,9 @@ extension on TranslationsRu {
 			'settings.permissions.permissionMode.modes.acceptEdits.title' => 'Принимать правки',
 			'settings.permissions.permissionMode.modes.acceptEdits.description' => 'Правки файлов одобряются автоматически; другие действия по-прежнему запрашивают одобрение.',
 			'settings.permissions.permissionMode.modes.bypassPermissions.title' => 'Обход разрешений',
-			'settings.permissions.permissionMode.modes.bypassPermissions.description' => 'Каждое действие одобряется автоматически — полный доступ без запросов. Используйте с осторожностью.',
 			_ => null,
 		} ?? switch (path) {
+			'settings.permissions.permissionMode.modes.bypassPermissions.description' => 'Каждое действие одобряется автоматически — полный доступ без запросов. Используйте с осторожностью.',
 			'settings.permissions.permissionMode.modes.plan.title' => 'План',
 			'settings.permissions.permissionMode.modes.plan.description' => 'Режим планирования: агент исследует и планирует, не выполняя команд.',
 			'settings.mcpServers.title' => 'MCP серверы',
@@ -9048,9 +9055,9 @@ extension on TranslationsRu {
 			'tasks.taskDetail.status' => 'Статус',
 			'tasks.taskDetail.statusFailed' => 'Не удалось обновить статус задачи',
 			'tasks.taskDetail.taskId' => ({required Object id}) => 'Задача ${id}',
-			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'Задача ${id}: ${title}',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'Задача ${id}: ${title}',
 			'tasks.taskDetail.testStrategy' => 'Стратегия тестирования',
 			'tasks.taskDetail.titleRequired' => 'Название обязательно',
 			'tasks.taskDetail.updateFailed' => 'Не удалось обновить задачу',

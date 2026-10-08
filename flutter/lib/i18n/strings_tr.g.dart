@@ -1061,6 +1061,9 @@ class Translations$chat$claudeStatus$tr extends Translations$chat$claudeStatus$e
 	@override late final Translations$chat$claudeStatus$controls$tr controls = Translations$chat$claudeStatus$controls$tr._(_root);
 	@override late final Translations$chat$claudeStatus$providers$tr providers = Translations$chat$claudeStatus$providers$tr._(_root);
 	@override String get stop => 'Durdur';
+	@override String backgroundTasks({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('tr'))(count,
+		other: '${count} arka plan görevi çalışıyor',
+	);
 }
 
 // Path: chat.projectSelection
@@ -7234,6 +7237,7 @@ extension on TranslationsTr {
 			'chat.claudeStatus.controls.pressEscToStop' => 'Durdurmak için istediğin zaman Esc\'ye bas',
 			'chat.claudeStatus.providers.assistant' => 'Asistan',
 			'chat.claudeStatus.stop' => 'Durdur',
+			'chat.claudeStatus.backgroundTasks' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('tr'))(count, other: '${count} arka plan görevi çalışıyor', ), 
 			'chat.projectSelection.startChatWithProvider' => ({required Object provider}) => '${provider} ile sohbet etmeye başlamak için bir proje seç',
 			'chat.tasks.nextTaskPrompt' => 'Sonraki görevi başlat',
 			'chat.voice.autoRead' => 'Yanıtları sesli oku',
@@ -7500,9 +7504,9 @@ extension on TranslationsTr {
 			'common.mainContent.chooseProject' => 'Projeni Seç',
 			'common.mainContent.selectProjectDescription' => 'Claude ile kodlamaya başlamak için kenar çubuğundan bir proje seç. Her proje kendi sohbet oturumlarını ve dosya geçmişini içerir.',
 			'common.mainContent.tip' => 'İpucu',
-			'common.mainContent.createProjectMobile' => 'Projelere erişmek için yukarıdaki menü düğmesine dokun',
 			_ => null,
 		} ?? switch (path) {
+			'common.mainContent.createProjectMobile' => 'Projelere erişmek için yukarıdaki menü düğmesine dokun',
 			'common.mainContent.createProjectDesktop' => 'Kenar çubuğundaki klasör simgesine tıklayarak yeni bir proje oluştur',
 			'common.mainContent.newSession' => 'Yeni Oturum',
 			'common.mainContent.untitledSession' => 'Adsız Oturum',
@@ -8014,9 +8018,9 @@ extension on TranslationsTr {
 			'common.gitPanel.mergeWorktree.cleanupLabel' => 'Birleştirmeden sonra temizle',
 			'common.gitPanel.mergeWorktree.commitCount' => ({required Object count}) => '${count} commit',
 			'common.gitPanel.mergeWorktree.merge' => 'Birleştir',
-			'common.gitPanel.mergeWorktree.mergeMessage' => ({required Object branch}) => '\'${branch}\' dalını birleştir',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.mergeWorktree.mergeMessage' => ({required Object branch}) => '\'${branch}\' dalını birleştir',
 			'common.gitPanel.mergeWorktree.messageLabel' => 'Commit mesajı',
 			'common.gitPanel.mergeWorktree.squashDesc' => ({required Object commits, required Object branch}) => '${commits} commitin tümünü ${branch} üzerinde tek committe birleştir',
 			'common.gitPanel.mergeWorktree.squashLabel' => 'Commitleri sıkıştır (squash)',
@@ -8528,9 +8532,9 @@ extension on TranslationsTr {
 			'settings.permissions.permissionMode.modes.acceptEdits.title' => 'Düzenlemeleri Kabul Et',
 			'settings.permissions.permissionMode.modes.acceptEdits.description' => 'Dosya düzenlemeleri otomatik onaylanır; diğer eylemler yine onayını ister.',
 			'settings.permissions.permissionMode.modes.bypassPermissions.title' => 'İzinleri Atla',
-			'settings.permissions.permissionMode.modes.bypassPermissions.description' => 'Her eylem otomatik onaylanır — sorusuz tam erişim. Dikkatli kullan.',
 			_ => null,
 		} ?? switch (path) {
+			'settings.permissions.permissionMode.modes.bypassPermissions.description' => 'Her eylem otomatik onaylanır — sorusuz tam erişim. Dikkatli kullan.',
 			'settings.permissions.permissionMode.modes.plan.title' => 'Plan',
 			'settings.permissions.permissionMode.modes.plan.description' => 'Planlama modu: agent komut çalıştırmadan keşfeder ve planlar.',
 			'settings.mcpServers.title' => 'MCP Sunucuları',
@@ -9042,9 +9046,9 @@ extension on TranslationsTr {
 			'tasks.taskDetail.status' => 'Durum',
 			'tasks.taskDetail.statusFailed' => 'Görev durumu güncellenemedi',
 			'tasks.taskDetail.taskId' => ({required Object id}) => 'Görev ${id}',
-			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'Görev ${id}: ${title}',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'Görev ${id}: ${title}',
 			'tasks.taskDetail.testStrategy' => 'Test Stratejisi',
 			'tasks.taskDetail.titleRequired' => 'Başlık gerekli',
 			'tasks.taskDetail.updateFailed' => 'Görev güncellenemedi',

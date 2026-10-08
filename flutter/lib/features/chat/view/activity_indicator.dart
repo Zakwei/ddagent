@@ -17,6 +17,10 @@ const _frameInterval = Duration(milliseconds: 80);
 /// stop affordance. Port of `ActivityIndicator.tsx`; rendered only while the
 /// viewed session is in the processing map, and only when no permission prompt
 /// is waiting (a blocking question takes precedence).
+///
+/// Background tasks that outlive the turn (subagents, background shells) get
+/// their own pill: alongside the running one, or on its own between turns so
+/// the session never looks idle while work is still going on.
 class ActivityIndicator extends ConsumerStatefulWidget {
   const ActivityIndicator({required this.sessionId, super.key});
 
@@ -37,6 +41,7 @@ class _ActivityIndicatorState extends ConsumerState<ActivityIndicator> {
   /// (web `EXIT_ANIMATION_MS = 220`).
   SessionActivity? _rendered;
   bool _hasPendingPermissions = false;
+  int _backgroundTasks = 0;
 
   @override
   void initState() {
@@ -53,7 +58,7 @@ class _ActivityIndicatorState extends ConsumerState<ActivityIndicator> {
     });
   }
 
-  bool get _visible => _rendered != null && !_hasPendingPermissions;
+  bool get _visible => (_rendered != null || _backgroundTasks > 0) && !_hasPendingPermissions;
 
   void _tickElapsed() {
     final startedAt = _rendered?.startedAt;
@@ -79,6 +84,7 @@ class _ActivityIndicatorState extends ConsumerState<ActivityIndicator> {
     _hasPendingPermissions = ref.watch(
       sessionPendingPermissionsProvider(widget.sessionId).select((list) => list.isNotEmpty),
     );
+    _backgroundTasks = ref.watch(backgroundTasksProvider.select((m) => m[widget.sessionId] ?? 0));
 
     if (activity != null && activity != _rendered) {
       _rendered = activity;
@@ -93,10 +99,41 @@ class _ActivityIndicatorState extends ConsumerState<ActivityIndicator> {
     }
 
     final shown = _rendered;
-    if (shown == null || _hasPendingPermissions) return const SizedBox.shrink();
+    if (_hasPendingPermissions) return const SizedBox.shrink();
 
     final t = Translations.of(context);
     final cs = t.chat.claudeStatus;
+    final backgroundPill = _backgroundTasks > 0
+        ? _Pill(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (shown == null) ...[
+                  Text(
+                    _spinnerFrames[_frame],
+                    style: TextStyle(color: context.appColors.mutedForeground, height: 1),
+                  ),
+                  const SizedBox(width: 8),
+                ],
+                Flexible(
+                  child: Text(
+                    cs.backgroundTasks(count: _backgroundTasks),
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: context.appColors.mutedForeground),
+                  ),
+                ),
+              ],
+            ),
+          )
+        : null;
+    if (shown == null) {
+      return backgroundPill == null
+          ? const SizedBox.shrink()
+          : Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [Flexible(child: backgroundPill)],
+            );
+    }
     final actionWords = [
       cs.actions.thinking,
       cs.actions.processing,
@@ -152,6 +189,7 @@ class _ActivityIndicatorState extends ConsumerState<ActivityIndicator> {
               ),
             ),
             const SizedBox(width: 8),
+            if (backgroundPill != null) ...[backgroundPill, const SizedBox(width: 8)],
             if (shown.canInterrupt)
               _Pill(
                 onTap: () => ref.read(chatChannelProvider).abort(widget.sessionId),

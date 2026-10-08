@@ -1130,6 +1130,12 @@ class Translations$chat$claudeStatus$pl extends Translations$chat$claudeStatus$e
 	@override late final Translations$chat$claudeStatus$state$pl state = Translations$chat$claudeStatus$state$pl._(_root);
 	@override late final Translations$chat$claudeStatus$elapsed$pl elapsed = Translations$chat$claudeStatus$elapsed$pl._(_root);
 	@override String get stop => 'Zatrzymaj';
+	@override String backgroundTasks({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('pl'))(count,
+		one: '${count} zadanie w tle w toku',
+		few: '${count} zadania w tle w toku',
+		many: '${count} zadań w tle w toku',
+		other: '${count} zadania w tle w toku',
+	);
 	@override late final Translations$chat$claudeStatus$controls$pl controls = Translations$chat$claudeStatus$controls$pl._(_root);
 	@override late final Translations$chat$claudeStatus$providers$pl providers = Translations$chat$claudeStatus$providers$pl._(_root);
 }
@@ -7738,6 +7744,7 @@ extension on TranslationsPl {
 			'chat.claudeStatus.elapsed.label' => ({required Object time}) => 'Upłynęło ${time}',
 			'chat.claudeStatus.elapsed.startingNow' => 'Zaczynam teraz',
 			'chat.claudeStatus.stop' => 'Zatrzymaj',
+			'chat.claudeStatus.backgroundTasks' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('pl'))(count, one: '${count} zadanie w tle w toku', few: '${count} zadania w tle w toku', many: '${count} zadań w tle w toku', other: '${count} zadania w tle w toku', ), 
 			'chat.claudeStatus.controls.stopGeneration' => 'Zatrzymaj generowanie',
 			'chat.claudeStatus.controls.pressEscToStop' => 'W dowolnym momencie naciśnij Esc, aby zatrzymać',
 			'chat.claudeStatus.providers.assistant' => 'Asystent',
@@ -7922,9 +7929,9 @@ extension on TranslationsPl {
 			'codeEditor.toasts.someSavesFailed' => 'Nie udało się zapisać niektórych plików',
 			'codeEditor.toasts.savedTo' => ({required Object path}) => 'Zapisano w ${path}',
 			'codeEditor.toasts.mergeApplied' => 'Scalanie zastosowane — zapisz, aby zachować zmiany',
-			'common.buttons.save' => 'Zapisz',
 			_ => null,
 		} ?? switch (path) {
+			'common.buttons.save' => 'Zapisz',
 			'common.buttons.cancel' => 'Anuluj',
 			'common.buttons.delete' => 'Usuń',
 			'common.buttons.create' => 'Utwórz',
@@ -8436,9 +8443,9 @@ extension on TranslationsPl {
 			'common.gitPanel.branches.forceDelete' => 'Wymuś usunięcie',
 			'common.gitPanel.branches.forceDeleteDesc' => 'Trwale usuwa gałąź, nawet jeśli zawiera commity niescalone gdzie indziej.',
 			'common.gitPanel.branches.forceDeleteLabel' => 'Wymuś usunięcie tej niescalonej gałęzi',
-			'common.gitPanel.branches.local' => 'Lokalne',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.branches.local' => 'Lokalne',
 			'common.gitPanel.branches.kNew' => 'Nowa gałąź',
 			'common.gitPanel.branches.noMatch' => 'Żadna gałąź nie pasuje do wyszukiwania',
 			'common.gitPanel.branches.none' => 'Nie znaleziono gałęzi',
@@ -8950,9 +8957,9 @@ extension on TranslationsPl {
 			'settings.git.name.help' => 'Twoja nazwa do commitów Git',
 			'settings.git.name.placeholder' => 'John Doe',
 			'settings.git.email.label' => 'E-mail Git',
-			'settings.git.email.help' => 'Twój e-mail do commitów Git',
 			_ => null,
 		} ?? switch (path) {
+			'settings.git.email.help' => 'Twój e-mail do commitów Git',
 			'settings.git.email.placeholder' => 'john@example.com',
 			'settings.git.actions.save' => 'Zapisz konfigurację',
 			'settings.git.actions.saving' => 'Zapisywanie...',
@@ -9464,9 +9471,9 @@ extension on TranslationsPl {
 			'tasks.gettingStarted.steps.createPRD.existingPRDs' => 'Istniejące PRD:',
 			'tasks.gettingStarted.steps.generateTasks.title' => 'Generuj zadania z PRD',
 			'tasks.gettingStarted.steps.generateTasks.description' => 'Gdy masz już PRD, poproś asystenta AI o jego przetworzenie, a TaskMaster automatycznie podzieli je na łatwe w realizacji zadania ze szczegółami implementacji.',
-			'tasks.gettingStarted.steps.analyzeTasks.title' => 'Analizuj i rozwijaj zadania',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.gettingStarted.steps.analyzeTasks.title' => 'Analizuj i rozwijaj zadania',
 			'tasks.gettingStarted.steps.analyzeTasks.description' => 'Poproś asystenta AI o analizę złożoności zadań i rozwinięcie ich w szczegółowe podzadania, aby ułatwić implementację.',
 			'tasks.gettingStarted.steps.startBuilding.title' => 'Zacznij budować',
 			'tasks.gettingStarted.steps.startBuilding.description' => 'Poproś asystenta AI o rozpoczęcie pracy nad zadaniami, aktualizowanie ich statusu i dodawanie nowych zadań w miarę rozwoju projektu.',
@@ -9978,9 +9985,9 @@ extension on TranslationsPl {
 			'serverConnect.local.downloading' => ({required Object percent}) => 'Pobieranie serwera… ${percent}%',
 			'serverConnect.local.installing' => 'Instalowanie…',
 			'serverConnect.local.running' => ({required Object url}) => 'Działa pod adresem ${url}',
-			'serverConnect.local.installed' => ({required Object version}) => 'Zainstalowany (v${version})',
 			_ => null,
 		} ?? switch (path) {
+			'serverConnect.local.installed' => ({required Object version}) => 'Zainstalowany (v${version})',
 			'serverConnect.local.connect' => 'Użyj tego serwera',
 			'serverConnect.local.error' => ({required Object error}) => 'Błąd serwera lokalnego: ${error}',
 			'serverConnect.local.or' => 'lub połącz się ze zdalnym serwerem',

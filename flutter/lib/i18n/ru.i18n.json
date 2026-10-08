@@ -331,7 +331,13 @@
       "providers": {
         "assistant": "Ассистент"
       },
-      "stop": "Остановить"
+      "stop": "Остановить",
+      "backgroundTasks(param=count)": {
+        "one": "Выполняется {{count}} фоновая задача",
+        "few": "Выполняются {{count}} фоновые задачи",
+        "many": "Выполняется {{count}} фоновых задач",
+        "other": "Выполняется {{count}} фоновой задачи"
+      }
     },
     "projectSelection": {
       "startChatWithProvider": "Выберите проект для начала чата с {{provider}}"

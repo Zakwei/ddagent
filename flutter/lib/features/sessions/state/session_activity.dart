@@ -89,3 +89,22 @@ final sessionActivityProvider =
     NotifierProvider<SessionActivityController, Map<String, SessionActivity>>(
       SessionActivityController.new,
     );
+
+/// Background tasks (subagents, background shells, workflows) still running
+/// per session, from the server's `background_tasks` frames. They can outlive
+/// the turn that started them, so this is independent of [SessionActivity]:
+/// a session can be idle (no turn running) and still have work going on.
+class BackgroundTasksController extends Notifier<Map<String, int>> {
+  @override
+  Map<String, int> build() => {};
+
+  void setCount(String? sessionId, int count) {
+    if (sessionId == null) return;
+    if ((state[sessionId] ?? 0) == count) return;
+    state = count > 0 ? {...state, sessionId: count} : ({...state}..remove(sessionId));
+  }
+}
+
+final backgroundTasksProvider = NotifierProvider<BackgroundTasksController, Map<String, int>>(
+  BackgroundTasksController.new,
+);

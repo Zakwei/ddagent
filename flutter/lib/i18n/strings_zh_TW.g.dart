@@ -1061,6 +1061,9 @@ class Translations$chat$claudeStatus$zh_TW extends Translations$chat$claudeStatu
 	@override late final Translations$chat$claudeStatus$controls$zh_TW controls = Translations$chat$claudeStatus$controls$zh_TW.internal(_root);
 	@override late final Translations$chat$claudeStatus$providers$zh_TW providers = Translations$chat$claudeStatus$providers$zh_TW.internal(_root);
 	@override String get stop => '停止';
+	@override String backgroundTasks({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
+		other: '${count} 個背景工作正在執行',
+	);
 }
 
 // Path: chat.projectSelection
@@ -7234,6 +7237,7 @@ extension on TranslationsZhTw {
 			'chat.claudeStatus.controls.pressEscToStop' => '隨時按 Esc 即可停止',
 			'chat.claudeStatus.providers.assistant' => '助理',
 			'chat.claudeStatus.stop' => '停止',
+			'chat.claudeStatus.backgroundTasks' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, other: '${count} 個背景工作正在執行', ), 
 			'chat.projectSelection.startChatWithProvider' => ({required Object provider}) => '選擇一個專案以開始與 ${provider} 聊天',
 			'chat.tasks.nextTaskPrompt' => '開始下一個任務',
 			'chat.voice.autoRead' => '朗讀回覆',
@@ -7500,9 +7504,9 @@ extension on TranslationsZhTw {
 			'common.mainContent.chooseProject' => '選擇您的專案',
 			'common.mainContent.selectProjectDescription' => '從側邊欄選擇一個專案以開始使用 Claude 進行程式開發。每個專案包含您的聊天紀錄和檔案歷史。',
 			'common.mainContent.tip' => '提示',
-			'common.mainContent.createProjectMobile' => '點擊上方的選單按鈕以存取專案',
 			_ => null,
 		} ?? switch (path) {
+			'common.mainContent.createProjectMobile' => '點擊上方的選單按鈕以存取專案',
 			'common.mainContent.createProjectDesktop' => '點擊側邊欄中的資料夾圖示以建立新專案',
 			'common.mainContent.newSession' => '新工作階段',
 			'common.mainContent.untitledSession' => '未命名工作階段',
@@ -8014,9 +8018,9 @@ extension on TranslationsZhTw {
 			'common.gitPanel.mergeWorktree.cleanupLabel' => '合併後清理',
 			'common.gitPanel.mergeWorktree.commitCount' => ({required Object count}) => '${count} 個提交',
 			'common.gitPanel.mergeWorktree.merge' => '合併',
-			'common.gitPanel.mergeWorktree.mergeMessage' => ({required Object branch}) => '合併分支 \'${branch}\'',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.mergeWorktree.mergeMessage' => ({required Object branch}) => '合併分支 \'${branch}\'',
 			'common.gitPanel.mergeWorktree.messageLabel' => '提交訊息',
 			'common.gitPanel.mergeWorktree.squashDesc' => ({required Object commits, required Object branch}) => '將全部 ${commits} 個提交合併為 ${branch} 上的單一提交',
 			'common.gitPanel.mergeWorktree.squashLabel' => '壓縮提交（squash）',
@@ -8528,9 +8532,9 @@ extension on TranslationsZhTw {
 			'settings.permissions.permissionMode.modes.acceptEdits.title' => '接受編輯',
 			'settings.permissions.permissionMode.modes.acceptEdits.description' => '檔案編輯自動核准；其他操作仍會請求你的核准。',
 			'settings.permissions.permissionMode.modes.bypassPermissions.title' => '略過權限',
-			'settings.permissions.permissionMode.modes.bypassPermissions.description' => '每個操作都自動核准 — 無提示完整存取。請謹慎使用。',
 			_ => null,
 		} ?? switch (path) {
+			'settings.permissions.permissionMode.modes.bypassPermissions.description' => '每個操作都自動核准 — 無提示完整存取。請謹慎使用。',
 			'settings.permissions.permissionMode.modes.plan.title' => '計畫',
 			'settings.permissions.permissionMode.modes.plan.description' => '計畫模式：代理只探索與規劃，不執行命令。',
 			'settings.mcpServers.title' => 'MCP 伺服器',
@@ -9042,9 +9046,9 @@ extension on TranslationsZhTw {
 			'tasks.taskDetail.status' => '狀態',
 			'tasks.taskDetail.statusFailed' => '更新任務狀態失敗',
 			'tasks.taskDetail.taskId' => ({required Object id}) => '任務 ${id}',
-			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => '任務 ${id}：${title}',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => '任務 ${id}：${title}',
 			'tasks.taskDetail.testStrategy' => '測試策略',
 			'tasks.taskDetail.titleRequired' => '標題為必填項',
 			'tasks.taskDetail.updateFailed' => '更新任務失敗',

@@ -465,6 +465,10 @@
         "startingNow": "Starting now"
       },
       "stop": "Stop",
+      "backgroundTasks(param=count)": {
+        "one": "{{count}} background task running",
+        "other": "{{count}} background tasks running"
+      },
       "controls": {
         "stopGeneration": "Stop Generation",
         "pressEscToStop": "Press Esc anytime to stop"

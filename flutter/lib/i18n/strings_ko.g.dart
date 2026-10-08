@@ -1059,6 +1059,9 @@ class Translations$chat$claudeStatus$ko extends Translations$chat$claudeStatus$e
 	@override late final Translations$chat$claudeStatus$state$ko state = Translations$chat$claudeStatus$state$ko._(_root);
 	@override late final Translations$chat$claudeStatus$elapsed$ko elapsed = Translations$chat$claudeStatus$elapsed$ko._(_root);
 	@override String get stop => '중지';
+	@override String backgroundTasks({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
+		other: '백그라운드 작업 ${count}개 실행 중',
+	);
 	@override late final Translations$chat$claudeStatus$controls$ko controls = Translations$chat$claudeStatus$controls$ko._(_root);
 	@override late final Translations$chat$claudeStatus$providers$ko providers = Translations$chat$claudeStatus$providers$ko._(_root);
 }
@@ -7231,6 +7234,7 @@ extension on TranslationsKo {
 			'chat.claudeStatus.elapsed.label' => ({required Object time}) => '${time} 경과',
 			'chat.claudeStatus.elapsed.startingNow' => '지금 시작',
 			'chat.claudeStatus.stop' => '중지',
+			'chat.claudeStatus.backgroundTasks' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, other: '백그라운드 작업 ${count}개 실행 중', ), 
 			'chat.claudeStatus.controls.stopGeneration' => '생성 중지',
 			'chat.claudeStatus.controls.pressEscToStop' => 'Esc를 눌러 언제든 중지',
 			'chat.claudeStatus.providers.assistant' => '어시스턴트',
@@ -7500,9 +7504,9 @@ extension on TranslationsKo {
 			'common.mainContent.chooseProject' => '프로젝트 선택',
 			'common.mainContent.selectProjectDescription' => '사이드바에서 프로젝트를 선택하여 Claude와 코딩을 시작하세요. 각 프로젝트에는 채팅 세션과 파일 히스토리가 포함됩니다.',
 			'common.mainContent.tip' => '팁',
-			'common.mainContent.createProjectMobile' => '위의 메뉴 버튼을 눌러 프로젝트에 접근하세요',
 			_ => null,
 		} ?? switch (path) {
+			'common.mainContent.createProjectMobile' => '위의 메뉴 버튼을 눌러 프로젝트에 접근하세요',
 			'common.mainContent.createProjectDesktop' => '사이드바의 폴더 아이콘을 클릭하여 새 프로젝트를 생성하세요',
 			'common.mainContent.newSession' => '새 세션',
 			'common.mainContent.untitledSession' => '제목 없는 세션',
@@ -8014,9 +8018,9 @@ extension on TranslationsKo {
 			'common.gitPanel.mergeWorktree.cleanupLabel' => '병합 후 정리',
 			'common.gitPanel.mergeWorktree.commitCount' => ({required Object count}) => '${count}개 커밋',
 			'common.gitPanel.mergeWorktree.merge' => '병합',
-			'common.gitPanel.mergeWorktree.mergeMessage' => ({required Object branch}) => '\'${branch}\' 브랜치 병합',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.mergeWorktree.mergeMessage' => ({required Object branch}) => '\'${branch}\' 브랜치 병합',
 			'common.gitPanel.mergeWorktree.messageLabel' => '커밋 메시지',
 			'common.gitPanel.mergeWorktree.squashDesc' => ({required Object commits, required Object branch}) => '${commits}개를 ${branch}의 단일 커밋으로 결합',
 			'common.gitPanel.mergeWorktree.squashLabel' => '커밋 스쿼시',
@@ -8528,9 +8532,9 @@ extension on TranslationsKo {
 			'settings.permissions.permissionMode.modes.acceptEdits.title' => '편집 허용',
 			'settings.permissions.permissionMode.modes.acceptEdits.description' => '파일 편집은 자동 승인됩니다. 다른 작업은 계속 승인을 요청합니다.',
 			'settings.permissions.permissionMode.modes.bypassPermissions.title' => '권한 우회',
-			'settings.permissions.permissionMode.modes.bypassPermissions.description' => '모든 작업이 자동 승인됩니다 — 확인 없는 전체 접근. 주의해서 사용하세요.',
 			_ => null,
 		} ?? switch (path) {
+			'settings.permissions.permissionMode.modes.bypassPermissions.description' => '모든 작업이 자동 승인됩니다 — 확인 없는 전체 접근. 주의해서 사용하세요.',
 			'settings.permissions.permissionMode.modes.plan.title' => '계획',
 			'settings.permissions.permissionMode.modes.plan.description' => '계획 모드: 에이전트가 명령을 실행하지 않고 탐색하고 계획합니다.',
 			'settings.mcpServers.title' => 'MCP 서버',
@@ -9042,9 +9046,9 @@ extension on TranslationsKo {
 			'tasks.taskDetail.status' => '상태',
 			'tasks.taskDetail.statusFailed' => '작업 상태 업데이트 실패',
 			'tasks.taskDetail.taskId' => ({required Object id}) => '작업 ${id}',
-			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => '작업 ${id}: ${title}',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => '작업 ${id}: ${title}',
 			'tasks.taskDetail.testStrategy' => '테스트 전략',
 			'tasks.taskDetail.titleRequired' => '제목은 필수입니다',
 			'tasks.taskDetail.updateFailed' => '작업 업데이트 실패',

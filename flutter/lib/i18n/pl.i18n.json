@@ -437,6 +437,12 @@
         "startingNow": "Zaczynam teraz"
       },
       "stop": "Zatrzymaj",
+      "backgroundTasks(param=count)": {
+        "one": "{{count}} zadanie w tle w toku",
+        "few": "{{count}} zadania w tle w toku",
+        "many": "{{count}} zadań w tle w toku",
+        "other": "{{count}} zadania w tle w toku"
+      },
       "controls": {
         "stopGeneration": "Zatrzymaj generowanie",
         "pressEscToStop": "W dowolnym momencie naciśnij Esc, aby zatrzymać"

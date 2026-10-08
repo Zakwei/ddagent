@@ -1061,6 +1061,9 @@ class Translations$chat$claudeStatus$ja extends Translations$chat$claudeStatus$e
 	@override late final Translations$chat$claudeStatus$controls$ja controls = Translations$chat$claudeStatus$controls$ja._(_root);
 	@override late final Translations$chat$claudeStatus$providers$ja providers = Translations$chat$claudeStatus$providers$ja._(_root);
 	@override String get stop => '停止';
+	@override String backgroundTasks({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ja'))(count,
+		other: 'バックグラウンドタスク ${count} 件を実行中',
+	);
 }
 
 // Path: chat.voice
@@ -7234,6 +7237,7 @@ extension on TranslationsJa {
 			'chat.claudeStatus.controls.pressEscToStop' => 'Escキーでいつでも停止',
 			'chat.claudeStatus.providers.assistant' => 'アシスタント',
 			'chat.claudeStatus.stop' => '停止',
+			'chat.claudeStatus.backgroundTasks' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ja'))(count, other: 'バックグラウンドタスク ${count} 件を実行中', ), 
 			'chat.voice.autoRead' => '返信を読み上げる',
 			'chat.voice.autoReadOn' => '返信の読み上げ: オン',
 			'chat.voice.autoReadOff' => '返信の読み上げ: オフ',
@@ -7500,9 +7504,9 @@ extension on TranslationsJa {
 			'common.mainContent.chooseProject' => 'プロジェクトを選択',
 			'common.mainContent.selectProjectDescription' => 'サイドバーからプロジェクトを選択して、Claudeとコーディングを始めましょう。各プロジェクトにはチャットセッションとファイル履歴が含まれています。',
 			'common.mainContent.tip' => 'ヒント',
-			'common.mainContent.createProjectMobile' => '上部のメニューボタンからプロジェクトにアクセスできます',
 			_ => null,
 		} ?? switch (path) {
+			'common.mainContent.createProjectMobile' => '上部のメニューボタンからプロジェクトにアクセスできます',
 			'common.mainContent.createProjectDesktop' => 'サイドバーのフォルダアイコンをクリックして新しいプロジェクトを作成できます',
 			'common.mainContent.newSession' => '新しいセッション',
 			'common.mainContent.untitledSession' => '無題のセッション',
@@ -8014,9 +8018,9 @@ extension on TranslationsJa {
 			'common.gitPanel.mergeWorktree.cleanupLabel' => 'マージ後にクリーンアップ',
 			'common.gitPanel.mergeWorktree.commitCount' => ({required Object count}) => '${count} コミット',
 			'common.gitPanel.mergeWorktree.merge' => 'マージ',
-			'common.gitPanel.mergeWorktree.mergeMessage' => ({required Object branch}) => 'ブランチ \'${branch}\' をマージ',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.mergeWorktree.mergeMessage' => ({required Object branch}) => 'ブランチ \'${branch}\' をマージ',
 			'common.gitPanel.mergeWorktree.messageLabel' => 'コミットメッセージ',
 			'common.gitPanel.mergeWorktree.squashDesc' => ({required Object commits, required Object branch}) => '${commits} 件すべてを ${branch} 上の1つのコミットにまとめる',
 			'common.gitPanel.mergeWorktree.squashLabel' => 'コミットをスカッシュ',
@@ -8528,9 +8532,9 @@ extension on TranslationsJa {
 			'settings.permissions.permissionMode.modes.acceptEdits.title' => '編集を許可',
 			'settings.permissions.permissionMode.modes.acceptEdits.description' => 'ファイル編集は自動承認されます。他のアクションは引き続き承認を求めます。',
 			'settings.permissions.permissionMode.modes.bypassPermissions.title' => '権限をバイパス',
-			'settings.permissions.permissionMode.modes.bypassPermissions.description' => 'すべてのアクションが自動承認されます — プロンプトなしの完全アクセス。注意して使用してください。',
 			_ => null,
 		} ?? switch (path) {
+			'settings.permissions.permissionMode.modes.bypassPermissions.description' => 'すべてのアクションが自動承認されます — プロンプトなしの完全アクセス。注意して使用してください。',
 			'settings.permissions.permissionMode.modes.plan.title' => 'プラン',
 			'settings.permissions.permissionMode.modes.plan.description' => 'プランモード: エージェントはコマンドを実行せずに探索と計画を行います。',
 			'settings.mcpServers.title' => 'MCPサーバー',
@@ -9042,9 +9046,9 @@ extension on TranslationsJa {
 			'tasks.taskDetail.status' => 'ステータス',
 			'tasks.taskDetail.statusFailed' => 'タスクステータスの更新に失敗しました',
 			'tasks.taskDetail.taskId' => ({required Object id}) => 'タスク ${id}',
-			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'タスク ${id}: ${title}',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'タスク ${id}: ${title}',
 			'tasks.taskDetail.testStrategy' => 'テスト戦略',
 			'tasks.taskDetail.titleRequired' => 'タイトルは必須です',
 			'tasks.taskDetail.updateFailed' => 'タスクの更新に失敗しました',

@@ -325,6 +325,9 @@
         "startingNow": "지금 시작"
       },
       "stop": "중지",
+      "backgroundTasks(param=count)": {
+        "other": "백그라운드 작업 {{count}}개 실행 중"
+      },
       "controls": {
         "stopGeneration": "생성 중지",
         "pressEscToStop": "Esc를 눌러 언제든 중지"

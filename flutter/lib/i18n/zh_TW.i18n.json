@@ -331,7 +331,10 @@
       "providers": {
         "assistant": "助理"
       },
-      "stop": "停止"
+      "stop": "停止",
+      "backgroundTasks(param=count)": {
+        "other": "{{count}} 個背景工作正在執行"
+      }
     },
     "projectSelection": {
       "startChatWithProvider": "選擇一個專案以開始與 {{provider}} 聊天"

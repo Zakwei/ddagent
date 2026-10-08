@@ -1077,6 +1077,10 @@ class Translations$chat$claudeStatus$es extends Translations$chat$claudeStatus$e
 	@override late final Translations$chat$claudeStatus$state$es state = Translations$chat$claudeStatus$state$es._(_root);
 	@override late final Translations$chat$claudeStatus$elapsed$es elapsed = Translations$chat$claudeStatus$elapsed$es._(_root);
 	@override String get stop => 'Detener';
+	@override String backgroundTasks({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count,
+		one: '${count} tarea en segundo plano en curso',
+		other: '${count} tareas en segundo plano en curso',
+	);
 	@override late final Translations$chat$claudeStatus$controls$es controls = Translations$chat$claudeStatus$controls$es._(_root);
 	@override late final Translations$chat$claudeStatus$providers$es providers = Translations$chat$claudeStatus$providers$es._(_root);
 }
@@ -7240,6 +7244,7 @@ extension on TranslationsEs {
 			'chat.claudeStatus.elapsed.label' => ({required Object time}) => '${time} transcurridos',
 			'chat.claudeStatus.elapsed.startingNow' => 'Empezando ahora',
 			'chat.claudeStatus.stop' => 'Detener',
+			'chat.claudeStatus.backgroundTasks' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: '${count} tarea en segundo plano en curso', other: '${count} tareas en segundo plano en curso', ), 
 			'chat.claudeStatus.controls.stopGeneration' => 'Detener generación',
 			'chat.claudeStatus.controls.pressEscToStop' => 'Pulsa Esc en cualquier momento para detener',
 			'chat.claudeStatus.providers.assistant' => 'Asistente',
@@ -7500,9 +7505,9 @@ extension on TranslationsEs {
 			'common.mainContent.chooseProject' => 'Elige tu proyecto',
 			'common.mainContent.selectProjectDescription' => 'Selecciona un proyecto en la barra lateral para empezar a programar con Claude. Cada proyecto contiene tus sesiones de chat e historial de archivos.',
 			'common.mainContent.tip' => 'Consejo',
-			'common.mainContent.createProjectMobile' => 'Toca el botón de menú de arriba para acceder a los proyectos',
 			_ => null,
 		} ?? switch (path) {
+			'common.mainContent.createProjectMobile' => 'Toca el botón de menú de arriba para acceder a los proyectos',
 			'common.mainContent.createProjectDesktop' => 'Crea un proyecto nuevo haciendo clic en el icono de carpeta de la barra lateral',
 			'common.mainContent.newSession' => 'Nueva sesión',
 			'common.mainContent.untitledSession' => 'Sesión sin título',
@@ -8014,9 +8019,9 @@ extension on TranslationsEs {
 			'common.gitPanel.mergeWorktree.cleanupLabel' => 'Limpiar tras la fusión',
 			'common.gitPanel.mergeWorktree.commitCount' => ({required Object count}) => '${count} commit(s)',
 			'common.gitPanel.mergeWorktree.merge' => 'Fusionar',
-			'common.gitPanel.mergeWorktree.mergeMessage' => ({required Object branch}) => 'Fusionar la rama \'${branch}\'',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.mergeWorktree.mergeMessage' => ({required Object branch}) => 'Fusionar la rama \'${branch}\'',
 			'common.gitPanel.mergeWorktree.messageLabel' => 'Mensaje de commit',
 			'common.gitPanel.mergeWorktree.squashDesc' => ({required Object commits, required Object branch}) => 'Combinar los ${commits} en un solo commit en ${branch}',
 			'common.gitPanel.mergeWorktree.squashLabel' => 'Compactar commits',
@@ -8528,9 +8533,9 @@ extension on TranslationsEs {
 			'settings.permissions.permissionMode.modes.acceptEdits.title' => 'Aceptar ediciones',
 			'settings.permissions.permissionMode.modes.acceptEdits.description' => 'Las ediciones de archivos se aprueban automáticamente; otras acciones siguen pidiendo tu aprobación.',
 			'settings.permissions.permissionMode.modes.bypassPermissions.title' => 'Omitir permisos',
-			'settings.permissions.permissionMode.modes.bypassPermissions.description' => 'Cada acción se aprueba automáticamente — acceso total sin avisos. Úsalo con precaución.',
 			_ => null,
 		} ?? switch (path) {
+			'settings.permissions.permissionMode.modes.bypassPermissions.description' => 'Cada acción se aprueba automáticamente — acceso total sin avisos. Úsalo con precaución.',
 			'settings.permissions.permissionMode.modes.plan.title' => 'Plan',
 			'settings.permissions.permissionMode.modes.plan.description' => 'Modo planificación: el agente explora y planifica sin ejecutar comandos.',
 			'settings.mcpServers.title' => 'Servidores MCP',
@@ -9042,9 +9047,9 @@ extension on TranslationsEs {
 			'tasks.taskDetail.status' => 'Estado',
 			'tasks.taskDetail.statusFailed' => 'No se pudo actualizar el estado de la tarea',
 			'tasks.taskDetail.taskId' => ({required Object id}) => 'Tarea ${id}',
-			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'Tarea ${id}: ${title}',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'Tarea ${id}: ${title}',
 			'tasks.taskDetail.testStrategy' => 'Estrategia de pruebas',
 			'tasks.taskDetail.titleRequired' => 'El título es obligatorio',
 			'tasks.taskDetail.updateFailed' => 'No se pudo actualizar la tarea',

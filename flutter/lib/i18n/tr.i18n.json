@@ -331,7 +331,10 @@
       "providers": {
         "assistant": "Asistan"
       },
-      "stop": "Durdur"
+      "stop": "Durdur",
+      "backgroundTasks(param=count)": {
+        "other": "{{count}} arka plan görevi çalışıyor"
+      }
     },
     "projectSelection": {
       "startChatWithProvider": "{{provider}} ile sohbet etmeye başlamak için bir proje seç"

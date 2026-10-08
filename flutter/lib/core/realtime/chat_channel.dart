@@ -135,6 +135,9 @@ class ChatChannel {
   /// after 5 min, so entries older than that can never recur — prune on read.
   final _retiredRuns = <String, Map<String, DateTime>>{};
   static const _retiredRunRetention = Duration(minutes: 6);
+
+  /// Kinds a completed run may still publish (server `LATE_ASK_KINDS`).
+  static const _lateKinds = {'permission_request', 'permission_cancelled', 'background_tasks'};
   final _awaitingRun = <String>{};
   final _pendingAborts = <String>{};
   final _sendGeneration = <String, int>{};
@@ -322,7 +325,15 @@ class ChatChannel {
 
     if (sid != null && !event.isBroadcast) {
       final runId = event.runId;
-      if (runId != null && _isRetired(sid, runId)) return;
+      // A finished run is sealed, except for what its still-living process
+      // reports afterwards: asks from background work and the running-task
+      // count (the server's late kinds). Only from the latest run — an older
+      // one's late frames would land on top of a newer turn.
+      if (runId != null &&
+          _isRetired(sid, runId) &&
+          !(_lateKinds.contains(event.kind) && runId == cursor(sid).runId)) {
+        return;
+      }
       if (event.kind == 'protocol_error') _awaitingRun.remove(sid);
       if (!event.isGateway) {
         final current = cursor(sid);

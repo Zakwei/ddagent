@@ -336,6 +336,10 @@
         "startingNow": "Empezando ahora"
       },
       "stop": "Detener",
+      "backgroundTasks(param=count)": {
+        "one": "{{count}} tarea en segundo plano en curso",
+        "other": "{{count}} tareas en segundo plano en curso"
+      },
       "controls": {
         "stopGeneration": "Detener generación",
         "pressEscToStop": "Pulsa Esc en cualquier momento para detener"

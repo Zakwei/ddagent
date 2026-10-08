@@ -209,6 +209,11 @@ class TranscriptController extends Notifier<TranscriptState> {
   /// with `complete` alone: `stream_end` is a message boundary providers emit
   /// mid-run (every tool call, every continuation round) and `error` rows are
   /// informational, so neither settles the run here (web parity).
+  /// Run whose `complete` this pane has seen. Its process may still ask for
+  /// permission afterwards (background work); such a late ask must not flip
+  /// the pane back to running, since no second `complete` will follow.
+  String? _completedRunId;
+
   void _markRunRunning() {
     _activity.markProcessing(_sessionId);
     // Both writes notify listeners — skip the redundant churn on frames that
@@ -682,6 +687,14 @@ class TranscriptController extends Notifier<TranscriptState> {
     // Remaining gateway/broadcast frames (presence, kanban…) are not
     // transcript rows — web `useChatMessages` only converts message kinds.
     if (e.isGateway || e.isBroadcast) return;
+    // Work outliving the turn (Claude subagents, background shells) — reported
+    // after the turn's `complete` too, so it must not touch run/row state.
+    if (e.kind == 'background_tasks') {
+      ref
+          .read(backgroundTasksProvider.notifier)
+          .setCount(_sessionId, (raw['count'] as num?)?.toInt() ?? 0);
+      return;
+    }
     final provider = raw['provider']?.toString() ?? '';
     if (e.runId != null && e.runId != _runId) {
       _buffer.closeLiveRows(_sessionId, provider);
@@ -707,6 +720,7 @@ class TranscriptController extends Notifier<TranscriptState> {
         _buffer.closeLiveRows(_sessionId, provider);
         return;
       case 'complete':
+        _completedRunId = e.runId;
         _buffer.closeLiveRows(_sessionId, provider);
         _expirePendingPermissions();
         _settleRun();
@@ -733,7 +747,7 @@ class TranscriptController extends Notifier<TranscriptState> {
         _markRunRunning();
         break;
       case 'permission_request':
-        _markRunRunning();
+        if (e.runId == null || e.runId != _completedRunId) _markRunRunning();
         final requestId = raw['requestId']?.toString();
         if (requestId != null) {
           ref

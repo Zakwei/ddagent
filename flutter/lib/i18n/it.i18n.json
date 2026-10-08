@@ -331,7 +331,11 @@
       "providers": {
         "assistant": "Assistente"
       },
-      "stop": "Ferma"
+      "stop": "Ferma",
+      "backgroundTasks(param=count)": {
+        "one": "{{count}} attività in background in corso",
+        "other": "{{count}} attività in background in corso"
+      }
     },
     "projectSelection": {
       "startChatWithProvider": "Seleziona un progetto per iniziare a chattare con {{provider}}"

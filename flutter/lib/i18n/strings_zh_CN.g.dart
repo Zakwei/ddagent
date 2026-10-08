@@ -1059,6 +1059,9 @@ class Translations$chat$claudeStatus$zh_CN extends Translations$chat$claudeStatu
 	@override late final Translations$chat$claudeStatus$state$zh_CN state = Translations$chat$claudeStatus$state$zh_CN.internal(_root);
 	@override late final Translations$chat$claudeStatus$elapsed$zh_CN elapsed = Translations$chat$claudeStatus$elapsed$zh_CN.internal(_root);
 	@override String get stop => '停止';
+	@override String backgroundTasks({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
+		other: '${count} 个后台任务正在运行',
+	);
 	@override late final Translations$chat$claudeStatus$controls$zh_CN controls = Translations$chat$claudeStatus$controls$zh_CN.internal(_root);
 	@override late final Translations$chat$claudeStatus$providers$zh_CN providers = Translations$chat$claudeStatus$providers$zh_CN.internal(_root);
 }
@@ -7231,6 +7234,7 @@ extension on TranslationsZhCn {
 			'chat.claudeStatus.elapsed.label' => ({required Object time}) => '已用 ${time}',
 			'chat.claudeStatus.elapsed.startingNow' => '刚刚开始',
 			'chat.claudeStatus.stop' => '停止',
+			'chat.claudeStatus.backgroundTasks' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, other: '${count} 个后台任务正在运行', ), 
 			'chat.claudeStatus.controls.stopGeneration' => '停止生成',
 			'chat.claudeStatus.controls.pressEscToStop' => '随时按 Esc 停止',
 			'chat.claudeStatus.providers.assistant' => '助手',
@@ -7500,9 +7504,9 @@ extension on TranslationsZhCn {
 			'common.mainContent.chooseProject' => '选择您的项目',
 			'common.mainContent.selectProjectDescription' => '从侧边栏选择一个项目以开始使用 Claude 进行编程。每个项目包含您的聊天会话和文件历史。',
 			'common.mainContent.tip' => '提示',
-			'common.mainContent.createProjectMobile' => '点击上方的菜单按钮以访问项目',
 			_ => null,
 		} ?? switch (path) {
+			'common.mainContent.createProjectMobile' => '点击上方的菜单按钮以访问项目',
 			'common.mainContent.createProjectDesktop' => '点击侧边栏中的文件夹图标以创建新项目',
 			'common.mainContent.newSession' => '新会话',
 			'common.mainContent.untitledSession' => '未命名会话',
@@ -8014,9 +8018,9 @@ extension on TranslationsZhCn {
 			'common.gitPanel.mergeWorktree.cleanupLabel' => '合并后清理',
 			'common.gitPanel.mergeWorktree.commitCount' => ({required Object count}) => '${count} 个提交',
 			'common.gitPanel.mergeWorktree.merge' => '合并',
-			'common.gitPanel.mergeWorktree.mergeMessage' => ({required Object branch}) => '合并分支 \'${branch}\'',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.mergeWorktree.mergeMessage' => ({required Object branch}) => '合并分支 \'${branch}\'',
 			'common.gitPanel.mergeWorktree.messageLabel' => '提交消息',
 			'common.gitPanel.mergeWorktree.squashDesc' => ({required Object commits, required Object branch}) => '将全部 ${commits} 个提交合并为 ${branch} 上的单个提交',
 			'common.gitPanel.mergeWorktree.squashLabel' => '压缩提交（squash）',
@@ -8528,9 +8532,9 @@ extension on TranslationsZhCn {
 			'settings.permissions.permissionMode.modes.acceptEdits.title' => '接受编辑',
 			'settings.permissions.permissionMode.modes.acceptEdits.description' => '文件编辑自动批准；其他操作仍会请求你的批准。',
 			'settings.permissions.permissionMode.modes.bypassPermissions.title' => '绕过权限',
-			'settings.permissions.permissionMode.modes.bypassPermissions.description' => '每个操作都自动批准 — 无提示完全访问。请谨慎使用。',
 			_ => null,
 		} ?? switch (path) {
+			'settings.permissions.permissionMode.modes.bypassPermissions.description' => '每个操作都自动批准 — 无提示完全访问。请谨慎使用。',
 			'settings.permissions.permissionMode.modes.plan.title' => '计划',
 			'settings.permissions.permissionMode.modes.plan.description' => '计划模式：代理只探索和规划，不执行命令。',
 			'settings.mcpServers.title' => 'MCP 服务器',
@@ -9042,9 +9046,9 @@ extension on TranslationsZhCn {
 			'tasks.taskDetail.status' => '状态',
 			'tasks.taskDetail.statusFailed' => '更新任务状态失败',
 			'tasks.taskDetail.taskId' => ({required Object id}) => '任务 ${id}',
-			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => '任务 ${id}：${title}',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => '任务 ${id}：${title}',
 			'tasks.taskDetail.testStrategy' => '测试策略',
 			'tasks.taskDetail.titleRequired' => '标题为必填项',
 			'tasks.taskDetail.updateFailed' => '更新任务失败',

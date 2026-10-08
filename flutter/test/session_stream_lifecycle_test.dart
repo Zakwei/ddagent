@@ -399,4 +399,38 @@ void main() {
     await expectIdleUi(tester);
     await cleanup(tester);
   });
+
+  testWidgets('background tasks keep a pill up after the turn completes, without a running turn', (
+    tester,
+  ) async {
+    await mount(tester);
+    controller().send('launch agents');
+    await frame(tester, 'r1', 1, 'stream_delta', 'Launching');
+    await frame(tester, 'r1', 2, 'complete');
+    ws.emitFrame({
+      'sessionId': 's1',
+      'runId': 'r1',
+      'seq': 3,
+      'kind': 'background_tasks',
+      'provider': 'claude',
+      'count': 2,
+    });
+    await tester.pump();
+    expectRunning(false);
+    expect(find.text('2 background tasks running'), findsOneWidget);
+    // Idle composer: the user can keep talking while the agents work.
+    expect(find.byIcon(Icons.send), findsOneWidget);
+
+    ws.emitFrame({
+      'sessionId': 's1',
+      'runId': 'r1',
+      'seq': 4,
+      'kind': 'background_tasks',
+      'provider': 'claude',
+      'count': 0,
+    });
+    await tester.pump();
+    expect(find.textContaining('background task'), findsNothing);
+    expect(answers(), ['Launching']);
+  });
 }

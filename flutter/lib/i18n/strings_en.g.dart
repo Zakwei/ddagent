@@ -1845,6 +1845,12 @@ class Translations$chat$claudeStatus$en {
 	/// en: 'Stop'
 	String get stop => 'Stop';
 
+	/// en: '(one) {{{count}} background task running} (other) {{{count}} background tasks running}'
+	String backgroundTasks({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count,
+		one: '${count} background task running',
+		other: '${count} background tasks running',
+	);
+
 	late final Translations$chat$claudeStatus$controls$en controls = Translations$chat$claudeStatus$controls$en.internal(_root);
 	late final Translations$chat$claudeStatus$providers$en providers = Translations$chat$claudeStatus$providers$en.internal(_root);
 }
@@ -13716,6 +13722,7 @@ extension on Translations {
 			'chat.claudeStatus.elapsed.label' => ({required Object time}) => '${time} elapsed',
 			'chat.claudeStatus.elapsed.startingNow' => 'Starting now',
 			'chat.claudeStatus.stop' => 'Stop',
+			'chat.claudeStatus.backgroundTasks' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: '${count} background task running', other: '${count} background tasks running', ), 
 			'chat.claudeStatus.controls.stopGeneration' => 'Stop Generation',
 			'chat.claudeStatus.controls.pressEscToStop' => 'Press Esc anytime to stop',
 			'chat.claudeStatus.providers.assistant' => 'Assistant',
@@ -13885,9 +13892,9 @@ extension on Translations {
 			'codeEditor.hexDump.more' => ({required Object size}) => '… ${size} more',
 			'codeEditor.settings.minimap' => 'Minimap',
 			'codeEditor.settings.tabSize' => ({required Object size}) => 'Tab size: ${size}',
-			'codeEditor.settings.fontSizeDecrease' => ({required Object size}) => 'Font size −  (now ${size})',
 			_ => null,
 		} ?? switch (path) {
+			'codeEditor.settings.fontSizeDecrease' => ({required Object size}) => 'Font size −  (now ${size})',
 			'codeEditor.settings.fontSizeIncrease' => 'Font size +',
 			'codeEditor.diff.noChanges' => 'No changes',
 			'codeEditor.diff.hunk' => ({required Object number}) => 'Hunk ${number}',
@@ -14399,9 +14406,9 @@ extension on Translations {
 			'common.commandPalette.title' => 'Command palette',
 			'common.gitPanel.ahead' => ({required Object count}) => '${count} ahead',
 			'common.gitPanel.aheadLabel' => 'ahead',
-			'common.gitPanel.aiSuggest' => 'AI suggest',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.aiSuggest' => 'AI suggest',
 			'common.gitPanel.aiSuggestTitle' => 'Generate a commit message with AI',
 			'common.gitPanel.all' => 'All',
 			'common.gitPanel.allStaged' => 'All changes staged',
@@ -14913,9 +14920,9 @@ extension on Translations {
 			'settings.notifications.desktop.enabled' => 'Notifications are enabled for this desktop app',
 			'settings.notifications.desktop.unsupported' => 'Desktop notifications are not supported on this system.',
 			'settings.notifications.sound.title' => 'Sound',
-			'settings.notifications.sound.description' => 'Play a short tone when a chat run finishes or needs tool approval.',
 			_ => null,
 		} ?? switch (path) {
+			'settings.notifications.sound.description' => 'Play a short tone when a chat run finishes or needs tool approval.',
 			'settings.notifications.sound.enabled' => 'Enabled',
 			'settings.notifications.sound.test' => 'Test sound',
 			'settings.notifications.events.title' => 'Event Types',
@@ -15427,9 +15434,9 @@ extension on Translations {
 			'sidebar.messages.restoreSessionFailed' => 'Failed to restore session. Please try again.',
 			'sidebar.messages.restoreSessionError' => 'Error restoring session. Please try again.',
 			'sidebar.messages.bulkDeleteSessionsFailed' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: 'Failed to delete ${count} session. Please try again.', other: 'Failed to delete ${count} sessions. Please try again.', ), 
-			'sidebar.version.updateAvailable' => 'Update available',
 			_ => null,
 		} ?? switch (path) {
+			'sidebar.version.updateAvailable' => 'Update available',
 			'sidebar.version.restartRequired' => 'Update installed — restart the server to apply',
 			'sidebar.version.updateNow' => 'Update now',
 			'sidebar.version.updateConfirm' => ({required Object version}) => 'Update ddagent to v${version}? The latest code will be pulled, rebuilt, and the server will restart — active sessions are interrupted.',
@@ -15941,9 +15948,9 @@ extension on Translations {
 			'onboarding.gitHint' => 'Used for commits created by ddagent sessions.',
 			'onboarding.completeSetup' => 'Complete Setup',
 			'onboarding.errors.nameAndEmailRequired' => 'Both git name and email are required.',
-			'onboarding.errors.invalidEmail' => 'Please enter a valid email address.',
 			_ => null,
 		} ?? switch (path) {
+			'onboarding.errors.invalidEmail' => 'Please enter a valid email address.',
 			'onboarding.agents.title' => 'Connect Your AI Agents',
 			'onboarding.agents.description' => 'Login to one or more AI coding assistants. All are optional.',
 			'onboarding.agents.laterHint' => 'You can configure these later in Settings.',

@@ -331,7 +331,10 @@
       "providers": {
         "assistant": "アシスタント"
       },
-      "stop": "停止"
+      "stop": "停止",
+      "backgroundTasks(param=count)": {
+        "other": "バックグラウンドタスク {{count}} 件を実行中"
+      }
     },
     "voice": {
       "autoRead": "返信を読み上げる",
