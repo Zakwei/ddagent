@@ -29,9 +29,7 @@ Map<String, dynamic> _input() => {
 };
 
 void main() {
-  testWidgets('autoSubmit tap fires onDecision with the picked label', (
-    t,
-  ) async {
+  testWidgets('autoSubmit tap fires onDecision with the picked label', (t) async {
     (bool, Map<String, dynamic>)? got;
     await t.pumpWidget(
       _wrap(
@@ -52,9 +50,7 @@ void main() {
     expect(got!.$2['answers'], {'Pick a scope?': 'MVP'});
   });
 
-  testWidgets('non-autoSubmit tap only selects; Submit sends answers', (
-    t,
-  ) async {
+  testWidgets('non-autoSubmit tap only selects; Submit sends answers', (t) async {
     (bool, Map<String, dynamic>)? got;
     await t.pumpWidget(
       _wrap(
@@ -110,9 +106,7 @@ void main() {
     expect(find.textContaining('do the thing'), findsNothing);
   });
 
-  testWidgets('a model "Other"-like option reveals the free-text field', (
-    t,
-  ) async {
+  testWidgets('a model "Other"-like option reveals the free-text field', (t) async {
     (bool, Map<String, dynamic>)? got;
     await t.pumpWidget(
       _wrap(
@@ -125,10 +119,7 @@ void main() {
                 'header': 'Colour',
                 'options': [
                   {'label': 'Usage vs time'},
-                  {
-                    'label': 'Inne (wpiszę)',
-                    'description': 'opisz własną regułę',
-                  },
+                  {'label': 'Inne (wpiszę)', 'description': 'opisz własną regułę'},
                 ],
               },
             ],
@@ -151,40 +142,37 @@ void main() {
     expect(got!.$2['answers'], {'Which rule?': 'Inne (wpiszę), my own rule'});
   });
 
-  test(
-    'extractQuestionFreeText keeps only text that is not an option label',
-    () {
-      final input = {
-        'questions': [
-          {
-            'question': 'Which rule?',
-            'options': [
-              {'label': 'Usage vs time'},
-              {'label': 'Inne (wpiszę)'},
-            ],
-          },
-        ],
-      };
-      expect(
-        extractQuestionFreeText(input, {
-          'answers': {'Which rule?': 'Inne (wpiszę), my own rule'},
-        }),
-        'my own rule',
-      );
-      expect(
-        extractQuestionFreeText(input, {
-          'answers': {'Which rule?': 'Usage vs time'},
-        }),
-        '',
-      );
-      expect(
-        extractQuestionFreeText(input, {
-          'answers': {'Which rule?': 'just my own text'},
-        }),
-        'just my own text',
-      );
-    },
-  );
+  test('extractQuestionFreeText keeps only text that is not an option label', () {
+    final input = {
+      'questions': [
+        {
+          'question': 'Which rule?',
+          'options': [
+            {'label': 'Usage vs time'},
+            {'label': 'Inne (wpiszę)'},
+          ],
+        },
+      ],
+    };
+    expect(
+      extractQuestionFreeText(input, {
+        'answers': {'Which rule?': 'Inne (wpiszę), my own rule'},
+      }),
+      'my own rule',
+    );
+    expect(
+      extractQuestionFreeText(input, {
+        'answers': {'Which rule?': 'Usage vs time'},
+      }),
+      '',
+    );
+    expect(
+      extractQuestionFreeText(input, {
+        'answers': {'Which rule?': 'just my own text'},
+      }),
+      'just my own text',
+    );
+  });
 
   test('extractQuestionFreeText relays a multi-select pick in full', () {
     final input = {
@@ -239,10 +227,7 @@ void main() {
     // it would emit "Yes\nauto-accept edits" as a phantom follow-up message.
     expect(
       extractQuestionFreeText(input, {
-        'answers': {
-          'Plan ready for review. Begin implementation?':
-              'Yes, auto-accept edits',
-        },
+        'answers': {'Plan ready for review. Begin implementation?': 'Yes, auto-accept edits'},
       }),
       '',
     );
@@ -274,60 +259,52 @@ void main() {
     );
   });
 
-  testWidgets(
-    'an ask_user_question tool row shows every option and description',
-    (t) async {
-      // File-synced CLI sessions deliver the ask as a plain tool_use row (no
-      // permission_request / banner), so the row itself must render the options.
-      final message = SessionMessage.fromJson({
-        'id': 'm1',
-        'sessionId': 's1',
-        'timestamp': '2026-01-01T00:00:00.000Z',
-        'provider': 'commandcode',
-        'kind': 'tool_use',
-        'toolName': 'ask_user_question',
-        'toolId': 't1',
-        'toolInput': {
-          'questions': [
-            {
-              'header': 'Scope',
-              'question': 'Pick a scope?',
-              'options': [
-                {'label': 'MVP', 'description': 'small'},
-                {'label': 'Full clone', 'description': 'everything'},
-              ],
-            },
-            {
-              'header': 'Extras',
-              'question': 'Anything else? (pick several)',
-              'multiSelect': true,
-              'options': [
-                {'label': 'Tests'},
-                {'label': 'Docs'},
-              ],
-            },
-          ],
-        },
-        'toolResult': {'content': ''},
-      });
+  testWidgets('an ask_user_question tool row shows every option and description', (t) async {
+    // File-synced CLI sessions deliver the ask as a plain tool_use row (no
+    // permission_request / banner), so the row itself must render the options.
+    final message = SessionMessage.fromJson({
+      'id': 'm1',
+      'sessionId': 's1',
+      'timestamp': '2026-01-01T00:00:00.000Z',
+      'provider': 'commandcode',
+      'kind': 'tool_use',
+      'toolName': 'ask_user_question',
+      'toolId': 't1',
+      'toolInput': {
+        'questions': [
+          {
+            'header': 'Scope',
+            'question': 'Pick a scope?',
+            'options': [
+              {'label': 'MVP', 'description': 'small'},
+              {'label': 'Full clone', 'description': 'everything'},
+            ],
+          },
+          {
+            'header': 'Extras',
+            'question': 'Anything else? (pick several)',
+            'multiSelect': true,
+            'options': [
+              {'label': 'Tests'},
+              {'label': 'Docs'},
+            ],
+          },
+        ],
+      },
+      'toolResult': {'content': ''},
+    });
 
-      await t.pumpWidget(
-        _wrap(
-          ToolUseTile(
-            message: message,
-            childrenMap: const <String, List<SessionMessage>>{},
-          ),
-        ),
-      );
+    await t.pumpWidget(
+      _wrap(ToolUseTile(message: message, childrenMap: const <String, List<SessionMessage>>{})),
+    );
 
-      expect(find.text('Pick a scope?'), findsOneWidget);
-      expect(find.text('MVP'), findsOneWidget);
-      expect(find.text('small'), findsOneWidget);
-      expect(find.text('Full clone'), findsOneWidget);
-      expect(find.text('everything'), findsOneWidget);
-      expect(find.text('Anything else? (pick several)'), findsOneWidget);
-      expect(find.text('Tests'), findsOneWidget);
-      expect(find.text('Docs'), findsOneWidget);
-    },
-  );
+    expect(find.text('Pick a scope?'), findsOneWidget);
+    expect(find.text('MVP'), findsOneWidget);
+    expect(find.text('small'), findsOneWidget);
+    expect(find.text('Full clone'), findsOneWidget);
+    expect(find.text('everything'), findsOneWidget);
+    expect(find.text('Anything else? (pick several)'), findsOneWidget);
+    expect(find.text('Tests'), findsOneWidget);
+    expect(find.text('Docs'), findsOneWidget);
+  });
 }
