@@ -6,8 +6,8 @@ import test from 'node:test';
 
 import { CommandCodeMcpProvider } from '@/modules/providers/list/commandcode/commandcode-mcp.provider.js';
 import { parseCommandCodeModelList } from '@/modules/providers/list/commandcode/commandcode-models.provider.js';
-import { isEditPermissionRequest, questionAnswerOptionId, resolveCommandCodePlanReviewContent } from '@/modules/providers/list/commandcode/commandcode-runtime.provider.js';
-import { CommandCodeSessionsProvider, readCommandCodeTranscript } from '@/modules/providers/list/commandcode/commandcode-sessions.provider.js';
+import { commandCodeToolNameFromAcp, isEditPermissionRequest, questionAnswerOptionId, resolveCommandCodePlanReviewContent } from '@/modules/providers/list/commandcode/commandcode-runtime.provider.js';
+import { COMMAND_CODE_CONTINUATION_PROMPT, CommandCodeSessionsProvider, readCommandCodeTranscript } from '@/modules/providers/list/commandcode/commandcode-sessions.provider.js';
 import {
   commandCodeProjectSlug,
   isCommandCodeTranscriptFileName,
@@ -337,4 +337,31 @@ test('acceptEdits auto-approves only ACP edit kinds, never shell titles that men
   assert.equal(isEditPermissionRequest({ toolCall: { kind: 'execute', title: 'Shell: rm -rf ./profile' } }), false);
   assert.equal(isEditPermissionRequest({ toolCall: { kind: 'execute', title: 'kubectl apply -f file.yaml' } }), false);
   assert.equal(isEditPermissionRequest({ toolCall: { title: 'Write file' } }), false);
+});
+
+test('live ACP tool titles map onto the raw tool names history uses', () => {
+  assert.equal(commandCodeToolNameFromAcp('Edit: src/a.ts', { file_path: 'src/a.ts' }), 'edit_file');
+  assert.equal(commandCodeToolNameFromAcp('Shell: npm test', { command: 'npm test' }), 'shell_command');
+  assert.equal(commandCodeToolNameFromAcp('Read: *.ts', { include: '*.ts' }), 'read_multiple_files');
+  assert.equal(commandCodeToolNameFromAcp('Search: acp', { query: 'acp' }), 'web_search');
+  assert.equal(commandCodeToolNameFromAcp('Search: acp', { pattern: 'acp' }), 'grep');
+  assert.equal(commandCodeToolNameFromAcp('Updating todos', {}), 'todo_write');
+  assert.equal(commandCodeToolNameFromAcp('enter_plan_mode', {}), 'enter_plan_mode');
+  assert.equal(commandCodeToolNameFromAcp(undefined, {}), 'Tool');
+});
+
+test('Command Code history hides injected continuation prompts and marks notices', () => {
+  const provider = new CommandCodeSessionsProvider();
+  const userRow = (text: string) => provider.normalizeMessage({
+    type: 'message', id: 'u1', timestamp: '2026-10-07T10:00:00Z',
+    message: { role: 'user', content: [{ type: 'text', text }] },
+  }, 'app');
+
+  assert.deepEqual(userRow(COMMAND_CODE_CONTINUATION_PROMPT), []);
+  assert.deepEqual(userRow('There are 3 unfinished Task Master task(s). Use mcp_call_tool ...'), []);
+  assert.equal(userRow('real question').length, 1);
+
+  const [notice] = provider.normalizeMessage({ type: 'custom_message', id: 'c1', content: 'hook output' }, 'app');
+  assert.equal(notice?.kind, 'status');
+  assert.equal(notice?.notice, true);
 });

@@ -20,6 +20,21 @@ import {
 
 const PROVIDER = 'commandcode' as const;
 
+// Consumed by commandcode-runtime: the prompt it injects after a non-end_turn stop.
+export const COMMAND_CODE_CONTINUATION_PROMPT = 'Please continue and provide a final response.';
+
+/**
+ * True for the prompts the runtime injects as user turns (stop-reason
+ * continuation and Task Master auto-continue). The CLI persists them like typed
+ * messages, so history drops them instead of showing fake user bubbles.
+ * Consumed by commandcode-runtime and this file's history normalizer.
+ */
+export function isCommandCodeContinuationPrompt(text: unknown): boolean {
+  if (typeof text !== 'string') return false;
+  return text === COMMAND_CODE_CONTINUATION_PROMPT
+    || (text.startsWith('There are ') && text.includes('unfinished Task Master task'));
+}
+
 /**
  * Command Code persists one v3 JSONL transcript per session under
  * `~/.commandcode/projects/<slug>/<session-id>.jsonl`. The first line is a
@@ -195,7 +210,7 @@ function normalizeMessageEntry(
 
     const text = extractTextContent(content);
     const images = extractUserImages(content);
-    if (!text.trim() && !images) {
+    if ((!text.trim() && !images) || isCommandCodeContinuationPrompt(text)) {
       return;
     }
     normalized.push(createNormalizedMessage({
@@ -338,6 +353,7 @@ export class CommandCodeSessionsProvider implements IProviderSessions {
           provider: PROVIDER,
           kind: 'status',
           text: content,
+          notice: true,
         }));
         return;
       }
@@ -353,6 +369,7 @@ export class CommandCodeSessionsProvider implements IProviderSessions {
           provider: PROVIDER,
           kind: 'status',
           text: summary,
+          notice: true,
         }));
         return;
       }

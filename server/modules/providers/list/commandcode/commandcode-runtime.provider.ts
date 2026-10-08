@@ -58,7 +58,11 @@ import {
 
 import { orchestratorMessagesDb, sessionsDb } from "../../../database/index.js";
 
-import { CommandCodeSessionsProvider } from './commandcode-sessions.provider.js';
+import {
+    COMMAND_CODE_CONTINUATION_PROMPT,
+    CommandCodeSessionsProvider,
+    isCommandCodeContinuationPrompt,
+} from './commandcode-sessions.provider.js';
 
 const activeCommandCodeProcesses = new Map<any, any>();
 const commandCodePendingPermissions = new Map<any, any>();
@@ -137,7 +141,6 @@ const DEFAULT_CONTROL_TIMEOUT_MS = 120000;
 const PROMPT_INACTIVITY_TIMEOUT_MS = 21600000; // 6 hours
 const STALL_THRESHOLD_MS = 60000; // no events for 60 s = run treated as stalled
 
-const CONTINUATION_PROMPT = 'Please continue and provide a final response.';
 const MAX_CONTINUATION_ROUNDS = 2;
 const TASKMASTER_TASKS_JSON = '.taskmaster/tasks/tasks.json';
 const MAX_TASKMASTER_CONINUATION_ROUNDS = 200;
@@ -186,12 +189,6 @@ function extractThoughtContent(update: any) {
     return extractTextContent(update?.content);
 }
 
-/** True for the internal continuation prompts we inject as user turns. */
-function isCommandCodeContinuationPrompt(text: any) {
-    if (typeof text !== 'string') return false;
-    return text === CONTINUATION_PROMPT || (text.startsWith('There are ') && text.includes('unfinished Task Master task'));
-}
-
 /**
  * One normalized user turn broadcast to the client (the CLI itself persists
  * the real user entry into its v3 transcript on `session/prompt`).
@@ -217,6 +214,18 @@ function sendStreamEnd(writer: any, state: any) {
     state.streamEnded = true;
     writer.send(createNormalizedMessage({
         kind: 'stream_end',
+        sessionId: state.commandCodeSessionId,
+        provider: 'commandcode',
+        timestamp: new Date().toISOString(),
+    }));
+}
+
+/** C1 notice: a persistent informational line in the transcript. */
+function sendNotice(writer: any, state: any, text: string) {
+    writer?.send(createNormalizedMessage({
+        kind: 'status',
+        text,
+        notice: true,
         sessionId: state.commandCodeSessionId,
         provider: 'commandcode',
         timestamp: new Date().toISOString(),
@@ -481,6 +490,12 @@ export function questionAnswerOptionId(params: any, updatedInput: any) {
     return null;
 }
 
+/** True when a question answer carries any non-empty text (picked or typed). */
+function hasQuestionAnswerText(updatedInput: any) {
+    const answers = readObjectRecord(readObjectRecord(updatedInput)?.answers) ?? {};
+    return Object.values(answers).some((value: any) => (Array.isArray(value) ? value.join('') : String(value ?? '')).trim() !== '');
+}
+
 /**
  * The CLI's `resolvePlanContent` size cap (`ag`/`uk` in cli.mjs) — plan files
  * above it are ignored rather than truncated.
@@ -605,13 +620,23 @@ function resolveCommandCodePermission(requestId: any, decision: any) {
         if (state.child?.stdin?.writable && !state.child.stdin!.destroyed) {
             state.child.stdin!.write(JSON.stringify(response) + '\n');
         }
+        // Typed text (or a multi-pick) cannot ride the ACP answer: end the
+        // turn but keep the child alive, so the client sends the text as the
+        // next prompt without a respawn.
+        if (!selectedOptionId && decision?.allow && hasQuestionAnswerText(decision?.updatedInput)) {
+            state.questionRedirected = true;
+            void state.sendNotification?.('session/cancel', { sessionId: state.commandCodeSessionId }).catch(() => {});
+        }
         return;
     }
 
     let selected;
 
     if (!decision?.allow) {
-        selected = options.find((o: any) => o.kind === 'deny')
+        state.permissionRejected = true;
+        // "Always deny" arrives as a deny carrying rememberEntry.
+        selected = (decision?.rememberEntry ? options.find((o: any) => o.kind === 'reject_always') : undefined)
+            ?? options.find((o: any) => o.kind === 'deny')
             ?? options.find((o: any) => o.kind === 'reject')
             ?? options.find((o: any) => o.kind === 'reject_once')
             ?? options.find((o: any) => o.kind === 'reject_always');
@@ -627,10 +652,8 @@ function resolveCommandCodePermission(requestId: any, decision: any) {
             ?? options[0];
     }
 
-    // A denial with no reject-type option on offer is answered as cancelled
-    // — falling back to options[0] would usually pick `allow_once`.
-    if (!selected && decision?.allow) return;
-
+    // Nothing selectable (a denial with no reject option, or no options at
+    // all) is answered as cancelled so the agent never waits forever.
     const response: any = {
         jsonrpc: '2.0',
         id: pending.acpId,
@@ -644,6 +667,20 @@ function resolveCommandCodePermission(requestId: any, decision: any) {
     if (state.child?.stdin?.writable && !state.child.stdin!.destroyed) {
         state.child.stdin!.write(JSON.stringify(response) + '\n');
     }
+}
+
+/**
+ * The tool input shown on a permission card: ACP `toolCall.rawInput` plus the
+ * call's `kind`/`locations`, so the client can show what is being approved.
+ */
+function permissionRequestInput(params: any) {
+    const toolCall = readObjectRecord(params?.toolCall);
+    const rawInput = readObjectRecord(toolCall?.rawInput) ?? readObjectRecord(params?.rawInput) ?? {};
+    return {
+        ...rawInput,
+        ...(toolCall?.kind ? { kind: toolCall.kind } : {}),
+        ...(Array.isArray(toolCall?.locations) && toolCall.locations.length > 0 ? { locations: toolCall.locations } : {}),
+    };
 }
 
 function clearCommandCodePendingForState(state: any) {
@@ -677,7 +714,7 @@ function listCommandCodePendingPermissions(sessionId: any) {
                     : readOptionalString(toolCall?.title) ?? readOptionalString(pending.params?.title) ?? 'Tool',
                 input: questionAsk
                     ? { questions: [attachPlanReviewContent(pending.state, questionAsk)] }
-                    : readObjectRecord(toolCall?.rawInput) ?? pending.params?.rawInput ?? {},
+                    : permissionRequestInput(pending.params),
                 context: {
                     options: Array.isArray(pending.params.options) ? pending.params.options : [],
                     ...acpRememberContext(Array.isArray(pending.params.options) ? pending.params.options : []),
@@ -990,6 +1027,65 @@ export function isEditPermissionRequest(params: any) {
     return kind === 'edit' || kind === 'delete' || kind === 'move';
 }
 
+/**
+ * Title labels of the CLI's `toolTitleFor` ("Edit: src/a.ts" → "Edit"),
+ * mapped back onto the raw tool names its v3 transcript stores. Ambiguous
+ * labels are told apart by their rawInput key.
+ */
+const COMMAND_CODE_TOOL_TITLE_LABELS: Record<string, string> = {
+    Shell: 'shell_command',
+    Monitor: 'monitor_command',
+    Read: 'read_file',
+    List: 'read_directory',
+    Edit: 'edit_file',
+    Write: 'write_file',
+    Search: 'grep',
+    Glob: 'glob',
+    'Updating todos': 'todo_write',
+    Kill: 'kill_shell',
+    Fetch: 'web_fetch',
+    Diagnostics: 'get_diagnostics',
+    Command: 'run_command',
+    Agent: 'task',
+};
+
+/**
+ * Live ACP tool_call titles are display strings; history replays the raw
+ * tool name. Returning the raw name keeps live and reloaded rows on the same
+ * renderer (diff card for edit_file, etc.). Titles the CLI leaves unmapped are
+ * already the raw name (`enter_plan_mode`, MCP tools). Exported for tests.
+ */
+export function commandCodeToolNameFromAcp(title: any, rawInput: any) {
+    const text = readOptionalString(title);
+    if (!text) return 'Tool';
+    const separator = text.indexOf(': ');
+    const label = separator === -1 ? text : text.slice(0, separator);
+    const name = COMMAND_CODE_TOOL_TITLE_LABELS[label];
+    if (!name) return text;
+    const input = readObjectRecord(rawInput) ?? {};
+    if (name === 'read_file' && input.include !== undefined) return 'read_multiple_files';
+    if (name === 'grep' && input.query !== undefined) return 'web_search';
+    return name;
+}
+
+/** DDAgent permission mode for an ACP mode id the agent switched to itself. */
+const COMMAND_CODE_ACP_MODE_TO_DDAGENT: Record<string, string> = {
+    default: 'default',
+    'auto-accept': 'acceptEdits',
+    bypass: 'bypassPermissions',
+    plan: 'plan',
+};
+
+/**
+ * Bounded tail of the child's stderr, appended to crash/close errors so a
+ * failing CLI says why instead of only "process closed".
+ */
+const STDERR_TAIL_MAX_CHARS = 4000;
+function withStderrTail(message: string, state: any) {
+    const tail = String(state?.stderrTail ?? '').trim();
+    return tail ? `${message}\n${tail.slice(-1000)}` : message;
+}
+
 // Reads the active model out of an ACP config-option payload (the
 // `configOptions` array on a session/new, session/load or
 // session/set_config_option result, or on a config_option_update update).
@@ -1141,6 +1237,15 @@ function createCommandCodeProcess(sessionId: any, workingDir: any, model: any, w
             permissionMode,
             appliedAcpMode: null,
             lastFinalAssistantId: null,
+            stderrTail: '',
+            // session/load replays the whole conversation as session/update
+            // before it answers; those frames must not reach the live run.
+            loadingSession: false,
+            toolsRan: false,
+            permissionRejected: false,
+            questionRedirected: false,
+            // Tool calls still running — a quiet long tool is not a stall.
+            openToolCalls: new Set(),
             // The CLI resolves the plan to review as the newest plans/*.md
             // since session start — this process's spawn time mirrors it.
             processStartedAt: Date.now(),
@@ -1153,6 +1258,10 @@ function createCommandCodeProcess(sessionId: any, workingDir: any, model: any, w
                     : path.join(commandCodeDir(), 'plans');
             })(),
         };
+
+        child.stderr?.on('data', (chunk: any) => {
+            state.stderrTail = (state.stderrTail + String(chunk)).slice(-STDERR_TAIL_MAX_CHARS);
+        });
 
         const sendCompact = (msg: any) => {
             if (!child.stdin!.writable || child.stdin!.destroyed) return;
@@ -1237,6 +1346,10 @@ function createCommandCodeProcess(sessionId: any, workingDir: any, model: any, w
             state.finalAssistantStreamSent = false;
             state.completeSent = false;
             state.continuationRound = 0;
+            state.toolsRan = false;
+            state.permissionRejected = false;
+            state.questionRedirected = false;
+            state.openToolCalls = new Set();
             state.promptStartedAt = Date.now();
             const promptText = Array.isArray(command) ? command.join('\n') : String(command);
             const autoContinue = options?.autoContinueTasks === true;
@@ -1251,7 +1364,7 @@ function createCommandCodeProcess(sessionId: any, workingDir: any, model: any, w
                 while (true) {
                     if (round > 0) {
                         unfinished = getTaskMasterUnfinishedCount(state.workingDir);
-                        const continuationText = autoContinue && unfinished > 0 ? buildTaskMasterContinuationPrompt(state.workingDir, unfinished) : CONTINUATION_PROMPT;
+                        const continuationText = autoContinue && unfinished > 0 ? buildTaskMasterContinuationPrompt(state.workingDir, unfinished) : COMMAND_CODE_CONTINUATION_PROMPT;
                         // Continuation prompts are internal next user turns —
                         // they must not appear in the UI transcript as typed
                         // messages.
@@ -1270,7 +1383,14 @@ function createCommandCodeProcess(sessionId: any, workingDir: any, model: any, w
                     unfinished = getTaskMasterUnfinishedCount(state.workingDir);
                     const tokenHigh = state.tokenBudget?.total > 0 && (state.tokenBudget.used / state.tokenBudget.total) > TASKMASTER_TOKEN_BUDGET_THRESHOLD;
                     const maxRounds = autoContinue && unfinished > 0 ? Math.min(unfinished + 5, MAX_TASKMASTER_CONINUATION_ROUNDS) : MAX_CONTINUATION_ROUNDS;
-                    const shouldContinue = (stopReason !== 'end_turn' && round < maxRounds) || (stopReason === 'end_turn' && autoContinue && unfinished > 0 && round < maxRounds && !tokenHigh);
+                    // A refusal is final — re-prompting would only push the
+                    // model to retry what it declined.
+                    const shouldContinue = (stopReason !== 'end_turn' && stopReason !== 'refusal' && round < maxRounds) || (stopReason === 'end_turn' && autoContinue && unfinished > 0 && round < maxRounds && !tokenHigh);
+                    if (stopReason !== 'end_turn') {
+                        sendNotice(writer, state, shouldContinue
+                            ? `Command Code stopped early (${stopReason}); asking it to continue (${round}/${maxRounds}).`
+                            : `Command Code stopped: ${stopReason}.`);
+                    }
                     if (!shouldContinue) break;
                     // Another round follows: close this round's live rows so
                     // the next one starts a fresh row.
@@ -1284,15 +1404,27 @@ function createCommandCodeProcess(sessionId: any, workingDir: any, model: any, w
                         provider: 'commandcode',
                         sessionId: state.commandCodeSessionId,
                         exitCode: 0,
-                        aborted: true,
+                        // A turn ended for a typed question answer is not a
+                        // user Stop — the answer follows as the next prompt.
+                        aborted: !state.questionRedirected,
                     }));
                     state.completeSent = true;
                     return;
                 }
                 state.busy = false;
-                const finalOptions: any = { maxRetries: 120, retryDelayMs: 500, scanLimit: null };
+                // The streamed text is authoritative: a turn that streamed,
+                // ran tools or hit a rejected permission (the CLI reports
+                // permission_denied as end_turn) gets only a short transcript
+                // reconcile; only a turn with nothing at all waits longer.
+                const producedOutput = Boolean(state.assistantBuffer.trim())
+                    || state.streamedAssistantContents.size > 0
+                    || state.toolsRan
+                    || state.permissionRejected;
+                const finalOptions: any = producedOutput
+                    ? { maxRetries: 4, retryDelayMs: 250, scanLimit: null }
+                    : { maxRetries: 20, retryDelayMs: 500, scanLimit: null };
                 if (state.terminated) throw new Error('Command Code session terminated');
-                const finalFound = await sendFinalAssistantMessage(writer, state, finalOptions);
+                const finalFound = await sendFinalAssistantMessage(writer, state, finalOptions) || producedOutput;
                 if (state.terminated) throw new Error('Command Code session terminated');
                 finalizeLiveMessages(state);
                 sendStreamEnd(writer, state);
@@ -1305,7 +1437,7 @@ function createCommandCodeProcess(sessionId: any, workingDir: any, model: any, w
                 } else {
                     const finalError = createNormalizedMessage({
                         kind: 'error',
-                        content: `Command Code did not produce a final assistant response in the transcript before the timeout (stopReason: ${stopReason}).`,
+                        content: `Command Code ended the turn without any response (stopReason: ${stopReason}).`,
                         sessionId: state.commandCodeSessionId,
                         provider: 'commandcode',
                     });
@@ -1362,10 +1494,17 @@ function createCommandCodeProcess(sessionId: any, workingDir: any, model: any, w
         };
 
         const handleNotification = (msg: any) => {
-            // The process can drain buffered stdout after Stop or completion.
-            // Do not mutate transcript buffers or publish those old updates.
-            if (state.terminated || state.completeSent) return;
             const method = msg.method;
+            // The process can drain buffered stdout after Stop or completion.
+            // Do not mutate transcript buffers or publish those old updates —
+            // but a late permission request still gets an answer, or the
+            // agent would wait on it forever.
+            if (state.terminated || state.completeSent || (state.loadingSession && method === 'session/update')) {
+                if (method === 'session/request_permission' && msg.id !== undefined) {
+                    sendCompact({ jsonrpc: '2.0', id: msg.id, result: { outcome: { outcome: 'cancelled' } } });
+                }
+                return;
+            }
             const params = readObjectRecord(msg.params) ?? {};
             const sessionIdFromMsg = readOptionalString(params.sessionId) ?? state.commandCodeSessionId;
             const update = readObjectRecord(params.update);
@@ -1410,9 +1549,14 @@ function createCommandCodeProcess(sessionId: any, workingDir: any, model: any, w
                     // close its live row before the tool rows so the order is
                     // preserved.
                     finalizeLiveMessages(state);
-                    const toolName = readOptionalString(update.title) ?? 'Tool';
-                    const toolId = readOptionalString(update.toolCallId) ?? `commandcode_tool_${nextRequestId()}`;
                     const toolInput = update.rawInput ?? {};
+                    const toolName = commandCodeToolNameFromAcp(update.title, toolInput);
+                    const toolId = readOptionalString(update.toolCallId) ?? `commandcode_tool_${nextRequestId()}`;
+                    state.toolsRan = true;
+                    state.openToolCalls.add(toolId);
+                    // todo_write already renders as the todo list; its
+                    // companion `plan` update must not add a second one.
+                    state.planCoveredByToolCall = toolName === 'todo_write';
                     state.currentWriter?.send(createNormalizedMessage({
                         id: toolId,
                         kind: 'tool_use',
@@ -1432,6 +1576,7 @@ function createCommandCodeProcess(sessionId: any, workingDir: any, model: any, w
                     // An empty in-progress update carries nothing yet; as a
                     // tool_result it would flip the card to Completed.
                     const terminal = update.status === 'completed' || update.status === 'failed';
+                    if (terminal) state.openToolCalls.delete(toolId);
                     if (!terminal && !contentBlocks.trim() && !state.toolResultSnapshots?.has(toolId)) return;
                     // Every snapshot shares one id, so emit the folded state
                     // of the call rather than this (often empty) update.
@@ -1454,6 +1599,46 @@ function createCommandCodeProcess(sessionId: any, workingDir: any, model: any, w
                 }
                 else if (sessionUpdate === 'session_info_update' && update.title !== undefined && update.title !== null) {
                     sessionsDb.updateSessionCustomName(state.appSessionId, String(update.title));
+                }
+                else if (sessionUpdate === 'plan' && Array.isArray(update.entries)) {
+                    if (state.planCoveredByToolCall) {
+                        state.planCoveredByToolCall = false;
+                        return;
+                    }
+                    const toolId = `commandcode_plan_${nextRequestId()}`;
+                    state.currentWriter?.send(createNormalizedMessage({
+                        id: toolId,
+                        kind: 'tool_use',
+                        toolName: 'TodoWrite',
+                        toolId,
+                        toolInput: {
+                            todos: update.entries.map((entry: any) => ({
+                                content: String(entry?.content ?? ''),
+                                status: readOptionalString(entry?.status) ?? 'pending',
+                            })),
+                        },
+                        sessionId: state.commandCodeSessionId,
+                        provider: 'commandcode',
+                        timestamp: new Date().toISOString(),
+                    }));
+                }
+                else if (sessionUpdate === 'current_mode_update') {
+                    // After "Exit Plan" the CLI leaves plan mode itself; a stale
+                    // 'plan' here would skip the next set_mode('plan') as
+                    // already applied. Only the exit is tracked — a plan mode
+                    // the agent entered on its own must not be undone by the
+                    // next prompt re-sending the composer's mode.
+                    const modeId = readOptionalString(update.currentModeId);
+                    if (modeId && modeId !== 'plan' && state.appliedAcpMode === 'plan') {
+                        state.appliedAcpMode = modeId;
+                        const nextMode = COMMAND_CODE_ACP_MODE_TO_DDAGENT[modeId] ?? 'default';
+                        state.permissionMode = nextMode;
+                        try {
+                            sessionsDb.setSessionPermissionMode(state.appSessionId, nextMode);
+                        } catch (error: any) {
+                            console.warn('[CommandCode] Failed to persist the permission mode after plan exit:', error instanceof Error ? error.message : error);
+                        }
+                    }
                 }
                 else if (sessionUpdate === 'config_option_update') {
                     // Keep the tracked model in step with what the ACP session
@@ -1520,7 +1705,7 @@ function createCommandCodeProcess(sessionId: any, workingDir: any, model: any, w
                     kind: 'permission_request',
                     requestId,
                     toolName: readOptionalString(toolCall?.title) ?? readOptionalString(params.title) ?? 'Tool',
-                    input: readObjectRecord(toolCall?.rawInput) ?? params.rawInput ?? {},
+                    input: permissionRequestInput(params),
                     context: { options: acpOptions, ...acpRememberContext(acpOptions) },
                     sessionId: state.commandCodeSessionId,
                     provider: 'commandcode',
@@ -1535,6 +1720,7 @@ function createCommandCodeProcess(sessionId: any, workingDir: any, model: any, w
 
         rl.on('line', (line: any) => {
             if (!line.trim()) return;
+            state.lastActivityAt = Date.now();
             let msg;
             try {
                 msg = JSON.parse(line);
@@ -1557,7 +1743,7 @@ function createCommandCodeProcess(sessionId: any, workingDir: any, model: any, w
             state.completeSent = true;
             const streamError = createNormalizedMessage({
                 kind: 'error',
-                content: error instanceof Error ? error.message : String(error),
+                content: withStderrTail(error instanceof Error ? error.message : String(error), state),
                 sessionId: state.commandCodeSessionId || sessionId,
                 provider: 'commandcode',
             });
@@ -1585,8 +1771,11 @@ function createCommandCodeProcess(sessionId: any, workingDir: any, model: any, w
             state.childExited = true;
             state.childExitCode = code;
             state.terminated = true;
-            rejectQueuedPrompts(state, 'Command Code ACP process closed');
-            state.rejectPendingRequests('Command Code ACP process closed');
+            const closeReason = alreadySettled
+                ? 'Command Code ACP process closed'
+                : withStderrTail(`Command Code ACP process closed (exit code ${code ?? 'unknown'})`, state);
+            rejectQueuedPrompts(state, closeReason);
+            state.rejectPendingRequests(closeReason);
             if (alreadySettled) return;
             if (activeCommandCodeProcesses.get(sessionId) === state) {
                 activeCommandCodeProcesses.delete(sessionId);
@@ -1611,8 +1800,12 @@ function createCommandCodeProcess(sessionId: any, workingDir: any, model: any, w
             let sessionResult;
             let didLoad = false;
             if (resumeSessionId) {
+                // session/resume reattaches without replaying history; older
+                // CLIs only have session/load, whose replay is suppressed.
+                const canResume = Boolean(readObjectRecord(readObjectRecord(state.agentCapabilities.sessionCapabilities)?.resume));
+                state.loadingSession = !canResume;
                 try {
-                    sessionResult = await state.sendRequest('session/load', {
+                    sessionResult = await state.sendRequest(canResume ? 'session/resume' : 'session/load', {
                         sessionId: resumeSessionId,
                         cwd: workingDir,
                         mcpServers,
@@ -1622,6 +1815,8 @@ function createCommandCodeProcess(sessionId: any, workingDir: any, model: any, w
                     }
                 } catch (error: any) {
                     throw new Error(`Command Code could not resume session "${resumeSessionId}": ${error instanceof Error ? error.message : String(error)}`);
+                } finally {
+                    state.loadingSession = false;
                 }
                 if (!sessionResult) {
                     throw new Error('Command Code resume returned no session; refusing to lose conversation context');
@@ -1737,8 +1932,12 @@ export async function queryCommandCode(command: string, options: AnyRecord = {},
             activeCommandCodeProcesses.set(key, state);
         } else if (state.busy) {
             // Prompt in flight — tell apart a healthy run from a deadlock.
+            // Waiting on the user or on a long tool is not a stall.
             const lastActivity = state.lastActivityAt || state.promptStartedAt || 0;
-            const stalled = Date.now() - lastActivity > STALL_THRESHOLD_MS;
+            const waitingOnUser = [...commandCodePendingPermissions.values()].some((pending: any) => pending.state === state);
+            const stalled = !waitingOnUser
+                && !(state.openToolCalls?.size > 0)
+                && Date.now() - lastActivity > STALL_THRESHOLD_MS;
             if (stalled) {
                 try { await state.sendNotification('session/cancel', { sessionId: state.commandCodeSessionId }); } catch {}
                 state.terminated = true;
@@ -1859,6 +2058,16 @@ function setPermissionMode(sessionId: any, mode: any) {
     if (!state || state.terminated) return;
     state.permissionMode = mode;
     void applyPermissionModeToCommandCodeSession(state, mode);
+    // Like OpenCode: switching to bypass (or acceptEdits, for edits) answers
+    // the asks already waiting, so the toggle applies mid-response. Questions
+    // are user input and stay open.
+    const acpMode = mapDdagentPermissionModeToCommandCode(mode);
+    if (acpMode !== 'bypass' && acpMode !== 'auto-accept') return;
+    for (const [requestId, pending] of [...commandCodePendingPermissions]) {
+        if (pending.state !== state || readQuestionAsk(pending.params)) continue;
+        if (acpMode === 'auto-accept' && !isEditPermissionRequest(pending.params)) continue;
+        resolveCommandCodePermission(requestId, { allow: true });
+    }
 }
 
 // Consumed by the provider registry for run, Stop and permission controls.
