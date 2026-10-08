@@ -249,18 +249,17 @@ function readCodexTokenUsage(fileContent: string): TokenUsageResult {
         continue;
       }
 
-      if (tokenInfo.total_token_usage) {
-        const reportedInput = readUsageNumber(tokenInfo.total_token_usage.input_tokens);
-        cacheReadTokens = readUsageNumber(
-          tokenInfo.total_token_usage.cached_input_tokens
-            ?? tokenInfo.total_token_usage.cache_read_input_tokens,
-        );
+      // `total_token_usage` is the whole thread's running sum and can exceed the
+      // window; the last request's usage is what currently fills the context.
+      const usage = tokenInfo.last_token_usage ?? tokenInfo.total_token_usage;
+      if (usage) {
+        const reportedInput = readUsageNumber(usage.input_tokens);
+        cacheReadTokens = readUsageNumber(usage.cached_input_tokens ?? usage.cache_read_input_tokens);
         // Codex folds cached input into `input_tokens`; report the direct
         // (uncached) portion so cache reads are not counted as fresh input.
         inputTokens = Math.max(0, reportedInput - cacheReadTokens);
-        outputTokens = readUsageNumber(tokenInfo.total_token_usage.output_tokens);
-        totalTokens = readUsageNumber(tokenInfo.total_token_usage.total_tokens)
-          || inputTokens + cacheReadTokens + outputTokens;
+        outputTokens = readUsageNumber(usage.output_tokens);
+        totalTokens = readUsageNumber(usage.total_tokens) || inputTokens + cacheReadTokens + outputTokens;
       }
       contextWindow = readUsageNumber(tokenInfo.model_context_window) || contextWindow;
       break;
