@@ -9,6 +9,7 @@ import 'package:ddagent_app/core/widgets/app_nav_menu.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/features/browser/view/web_browser_pane.dart';
 import 'package:ddagent_app/features/chat/state/pending_permissions.dart';
+import 'package:ddagent_app/features/chat/state/transcript_controller.dart';
 import 'package:ddagent_app/features/chat/view/transcript_view.dart';
 import 'package:ddagent_app/features/editor/view/editor_screen.dart';
 import 'package:ddagent_app/features/git/view/git_screen.dart';
@@ -114,6 +115,16 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
     ref.watch(activityPollerProvider);
     final processingIds = ref.watch(sessionActivityProvider).keys.toSet();
     final pendingIds = ref.watch(pendingPermissionSessionsProvider);
+
+    // Compact mounts only the active pane — keep every chat pane's transcript
+    // subscribed so a background ask (question / permission) still lands in
+    // pendingPermissions and turns its tab amber, even after a reload.
+    for (final p in ws.panes) {
+      final id = p.sessionId;
+      if (p.kind == PaneKind.chat && id != null) {
+        ref.listen(transcriptProvider(id).select((s) => s.loading), (_, _) {});
+      }
+    }
 
     // processing → idle on a background pane flags its tab as finished.
     ref.listen(sessionActivityProvider, (prev, next) {
