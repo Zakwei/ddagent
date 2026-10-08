@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -11,21 +12,41 @@ import 'package:hive_flutter/hive_flutter.dart';
 class AgentPermissions {
   const AgentPermissions({this.permissionMode = 'default'});
 
-  /// One of the provider's [agentPermissionModes].
+  /// One of the provider's [providerPermissionModesProvider] modes.
   final String permissionMode;
 }
 
-/// Modes each provider's settings page offers — mirrors the backend
-/// `provider-capabilities.service.ts` `permissionModes` table.
+/// Offline fallback for [providerPermissionModesProvider] — a snapshot of the
+/// backend `provider-capabilities.service.ts` `permissionModes` table.
 const agentPermissionModes = <String, List<String>>{
   'claude': ['default', 'auto', 'acceptEdits', 'bypassPermissions', 'plan'],
-  'cursor': ['default', 'acceptEdits', 'bypassPermissions', 'plan'],
+  'cursor': ['default', 'bypassPermissions', 'plan'],
   'codex': ['default', 'acceptEdits', 'bypassPermissions'],
   'opencode': ['default', 'acceptEdits', 'bypassPermissions', 'plan'],
   'commandcode': ['default', 'acceptEdits', 'bypassPermissions', 'plan'],
   'antigravity': ['default', 'acceptEdits', 'bypassPermissions', 'plan'],
-  'devin': ['default', 'acceptEdits', 'bypassPermissions'],
+  'devin': ['default', 'auto', 'acceptEdits', 'bypassPermissions'],
 };
+
+/// Modes a provider's settings page offers — the server's capability matrix
+/// (`GET /api/providers/:provider/capabilities`), else the snapshot above.
+final providerPermissionModesProvider = FutureProvider.family<List<String>, String>((
+  ref,
+  provider,
+) async {
+  try {
+    final caps = await ref.read(sessionsRepositoryProvider).capabilities(provider);
+    final modes = [for (final m in caps['permissionModes'] as List? ?? const []) '$m'];
+    if (modes.isNotEmpty) return modes;
+  } on Object {
+    // Offline / older server — fall back to the snapshot.
+  }
+  return agentPermissionModes[provider] ?? const ['default'];
+});
+
+/// Every mode any provider knows — stored picks are validated against this,
+/// since the per-provider list now comes from the server.
+const _knownModes = {'default', 'auto', 'acceptEdits', 'bypassPermissions', 'plan'};
 
 class AgentPermissionsController extends Notifier<AgentPermissions> {
   AgentPermissionsController(this._provider);
@@ -44,9 +65,8 @@ class AgentPermissionsController extends Notifier<AgentPermissions> {
   /// Tolerant parse — mirrors `toCodexPermissionMode`/`toProviderPermissionMode`
   /// (unknown modes fall back to `default`).
   static String _parseMode(String provider, Object? value) {
-    final modes = agentPermissionModes[provider] ?? const ['default'];
     final v = value?.toString() ?? 'default';
-    return modes.contains(v) ? v : 'default';
+    return _knownModes.contains(v) ? v : 'default';
   }
 
   @override

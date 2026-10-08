@@ -1323,7 +1323,10 @@ class _ModePermissions extends ConsumerWidget {
         ),
         const SizedBox(height: AppSpacing.md),
 
-        for (final mode in agentPermissionModes[provider] ?? const ['default'])
+        for (final mode
+            in ref.watch(providerPermissionModesProvider(provider)).value ??
+                agentPermissionModes[provider] ??
+                const ['default'])
           Builder(
             builder: (context) {
               final (title, desc, tone, warn) = modeData(mode);
