@@ -2073,6 +2073,18 @@ function resolveOpenCodePermission(requestId: string, decision: ProviderPermissi
   const response = decision.allow
     ? (decision.rememberEntry ? 'always' : 'once')
     : 'reject';
+  const feedback = !decision.allow && typeof decision.message === 'string' ? decision.message.trim() : '';
+  if (feedback) {
+    // A bare reject halts the agent; with a message OpenCode feeds it back and keeps going.
+    void apiRequest(pending.baseUrl, `/permission/${pending.permissionID}/reply`, {
+      method: 'POST',
+      query: { directory: pending.directory },
+      body: { reply: 'reject', message: feedback },
+    })
+      .then(({ status }) => status >= 400 ? replyPermission(pending.baseUrl, pending.directory, pending.providerSessionId, pending.permissionID, 'reject') : undefined)
+      .catch(() => replyPermission(pending.baseUrl, pending.directory, pending.providerSessionId, pending.permissionID, 'reject'));
+    return;
+  }
   void replyPermission(pending.baseUrl, pending.directory, pending.providerSessionId, pending.permissionID, response);
 }
 

@@ -685,6 +685,26 @@ test('OpenCode: switching to bypass approves pending permissions but leaves ques
   assert.ok(requests.every((pathname) => !pathname.includes('/question/')), requests.join(', '));
 });
 
+test('OpenCode: a deny with feedback uses the reply endpoint so the agent keeps going', async () => {
+  const requests: Array<{ path: string; body: any }> = [];
+  const fakeFetch = async (url: string, init: any = {}) => {
+    requests.push({ path: new URL(url).pathname, body: init.body ? JSON.parse(init.body) : null });
+    return new Response('true', { status: 200, headers: { 'content-type': 'application/json' } });
+  };
+  const runtime = await loadRuntime('opencode', 'pendingPermissions', { fetch: fakeFetch });
+  const pending = runtime.lifecycleHooks.pendingPermissions;
+  const ask = { kind: 'permission', baseUrl: 'http://127.0.0.1:1', directory: '/tmp', providerSessionId: 'ses_1' };
+  pending.set('perm-1', { ...ask, permissionID: 'per_1' });
+  pending.set('perm-2', { ...ask, permissionID: 'per_2' });
+
+  runtime.opencodeRuntime.permissions.resolve('perm-1', { allow: false, message: 'Use mkdir -p instead' });
+  runtime.opencodeRuntime.permissions.resolve('perm-2', { allow: false });
+  await new Promise((resolve) => setImmediate(resolve));
+
+  assert.deepEqual(requests.find((r) => r.path === '/permission/per_1/reply')?.body, { reply: 'reject', message: 'Use mkdir -p instead' });
+  assert.deepEqual(requests.find((r) => r.path === '/session/ses_1/permissions/per_2')?.body, { response: 'reject' });
+});
+
 test('OpenCode: a subagent child session ask reaches the parent run instead of being rejected', async () => {
   const requests: string[] = [];
   const fakeFetch = async (url: string) => {
