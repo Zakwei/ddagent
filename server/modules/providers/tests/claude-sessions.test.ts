@@ -219,3 +219,15 @@ test('claude: transcript rows never normalize into live stream frames', () => {
 
   assert.deepEqual(kinds, ['text']);
 });
+
+test('claude: a live SDK tool result keeps its tool_use_result payload', () => {
+  const provider = new ClaudeSessionsProvider();
+  const messages = provider.normalizeMessage({
+    type: 'user',
+    uuid: 'u-live',
+    tool_use_result: { filenames: ['a.ts'] },
+    message: { role: 'user', content: [{ type: 'tool_result', tool_use_id: 'toolu_1', content: 'Found 1 file' }] },
+  }, 'app');
+  const result = messages.find((message) => message.kind === 'tool_result');
+  assert.deepEqual(result?.toolUseResult, { filenames: ['a.ts'] });
+});

@@ -305,6 +305,7 @@ List<SessionMessage> attachToolResults(List<SessionMessage> messages) {
                 'content': res.content ?? res.text ?? '',
                 'isError': res.isError,
                 if (res.exitCode != null) 'exitCode': res.exitCode,
+                'toolUseResult': ?res.toolUseResult,
               },
             ),
     );

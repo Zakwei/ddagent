@@ -417,7 +417,9 @@ export class ClaudeSessionsProvider implements IProviderSessions {
               content: claudeToolResultText(part.content),
               isError: Boolean(part.is_error),
               subagentTools: raw.subagentTools,
-              toolUseResult: raw.toolUseResult,
+              // Transcript rows say `toolUseResult`; live SDK messages
+              // carry the same payload as `tool_use_result`.
+              toolUseResult: raw.toolUseResult ?? raw.tool_use_result,
             }));
           } else if (part.type === 'text') {
             const text = part.text || '';

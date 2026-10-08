@@ -34,6 +34,7 @@ class SessionMessage {
     this.status,
     this.summary,
     this.exitCode,
+    this.toolUseResult,
     this.actualSessionId,
     this.parentToolUseId,
     this.isFinal = false,
@@ -80,6 +81,11 @@ class SessionMessage {
   final String? status;
   final String? summary;
   final int? exitCode;
+
+  /// Structured result payload of a `tool_result` row (Claude Grep/Glob
+  /// `filenames`, Agent ids) — folded into the tool card by
+  /// `attachToolResults`.
+  final Object? toolUseResult;
   final String? actualSessionId;
   final String? parentToolUseId;
   final bool isFinal;
@@ -135,6 +141,7 @@ class SessionMessage {
     status: status,
     summary: summary ?? this.summary,
     exitCode: exitCode,
+    toolUseResult: toolUseResult,
     actualSessionId: actualSessionId,
     parentToolUseId: parentToolUseId,
     isFinal: isFinal,
@@ -185,6 +192,7 @@ class SessionMessage {
     status: j['status']?.toString(),
     summary: j['summary']?.toString(),
     exitCode: _int(j['exitCode']),
+    toolUseResult: j['toolUseResult'],
     actualSessionId: j['actualSessionId']?.toString(),
     parentToolUseId: j['parentToolUseId']?.toString(),
     isFinal: j['isFinal'] == true,

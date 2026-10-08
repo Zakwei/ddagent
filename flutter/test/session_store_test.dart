@@ -27,6 +27,26 @@ SessionMessage _m(
 
 void main() {
   group('merge/dedupe', () {
+    test('a live tool_result carries its structured toolUseResult onto the card', () {
+      final use = _m('u1', kind: 'tool_use', toolId: 't1', content: '');
+      final result = SessionMessage.fromJson({
+        'id': 't1_res',
+        'sessionId': 's1',
+        'timestamp': '2026-01-01T00:00:59Z',
+        'provider': 'claude',
+        'kind': 'tool_result',
+        'toolId': 't1',
+        'content': 'Found 2 files',
+        'toolUseResult': {
+          'filenames': ['a.ts', 'b.ts'],
+        },
+      });
+      final card = computeMerged(const [], [use, result]).firstWhere((m) => m.id == 'u1');
+      expect(card.toolResult?['toolUseResult'], {
+        'filenames': ['a.ts', 'b.ts'],
+      });
+    });
+
     test('optimistic local_ echo dropped once server turn persists', () {
       final local = _m('local_1', role: 'user', content: 'hi', ts: '2026-01-01T00:00:00Z');
       final server = _m('srv_1', role: 'user', content: 'hi', ts: '2026-01-01T00:00:02Z');
