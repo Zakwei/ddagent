@@ -268,9 +268,23 @@ export class AntigravitySessionsProvider implements IProviderSessions {
         return;
       }
       // 'session' headers and metadata rows carry metadata only —
-      // token usage reads them directly, no chat row.
-      default:
+      // token usage reads them directly, no chat row. Persisted runtime
+      // notices (C1 `status` + `notice: true`) replay as-is.
+      default: {
+        const text = readOptionalString(entry.text);
+        if (entry.kind === 'status' && entry.notice === true && text) {
+          normalized.push(createNormalizedMessage({
+            id: baseId,
+            sessionId,
+            timestamp: ts,
+            provider: PROVIDER,
+            kind: 'status',
+            text,
+            notice: true,
+          }));
+        }
         return;
+      }
     }
   }
 

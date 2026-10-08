@@ -29,6 +29,22 @@ const spawnFunction = crossSpawn;
 
 const activeProcesses = new Map<any, any>(); // Track active agy processes by session ID
 
+// Working dirs with a fresh-chat launch whose conversation id (`init`) has not
+// arrived yet. The synchronizer must not guess which pending app row a new
+// summary row belongs to while one of these is open — the runtime binds it.
+const pendingLaunchDirs = new Map<string, number>();
+
+// Consumed by the antigravity session synchronizer (same module) to skip
+// pending-row binding while a runtime launch in that project is unbound.
+export function hasPendingAntigravityLaunch(projectPath: string): boolean {
+  return (pendingLaunchDirs.get(path.resolve(projectPath)) ?? 0) > 0;
+}
+
+// Grace period between SIGTERM and SIGKILL on Stop.
+const ABORT_KILL_GRACE_MS = 5000;
+// Kept stderr tail: shown on failure, dropped on success.
+const STDERR_TAIL_CHARS = 4000;
+
 /**
  * Antigravity (`agy`) runs headless per turn: `agy --print "<prompt>"
  * --output-format stream-json` emits NDJSON `init` / `step_update` / `result`
@@ -103,6 +119,35 @@ function toolFilePath(toolName: any, parameters: any) {
     }
   }
   return null;
+}
+
+/**
+ * Reads a finished tool step: agy puts the output in `tool_info.output` and,
+ * for `state:"ERROR"`, the failure in `tool_info.error.message`.
+ */
+function readToolOutcome(update: any): { content: string; isError: boolean } {
+  const info = update?.tool_info || {};
+  const isError = update?.state === 'ERROR' || Boolean(info.error);
+  const raw = isError ? (info.error?.message ?? info.error ?? info.output) : info.output;
+  if (raw == null) {
+    return { content: '', isError };
+  }
+  return { content: typeof raw === 'string' ? raw : JSON.stringify(raw), isError };
+}
+
+/**
+ * Print mode cannot prompt, so tools needing approval are auto-denied and
+ * listed in `result.denied_actions`. Returns a user-facing notice or null.
+ */
+function deniedActionsNotice(deniedActions: any): string | null {
+  if (!Array.isArray(deniedActions) || deniedActions.length === 0) {
+    return null;
+  }
+  const names = [...new Set(deniedActions
+    .map((entry: any) => readOptionalString(entry?.display_name) || readOptionalString(entry?.action))
+    .filter(Boolean))];
+  return `Antigravity denied ${names.join(', ') || 'a tool'} — default mode cannot ask for approval in headless runs. `
+    + 'Switch to Accept Edits or Bypass Permissions to allow it.';
 }
 
 // Consumed by provider runtime services and lifecycle tests.
@@ -189,6 +234,15 @@ export async function spawnAntigravity(command: string, options: AnyRecord = {},
 
     const executable = resolveAntigravityExecutable() || 'agy';
 
+    // Checked before the mirror write, which would otherwise mkdir the
+    // missing directory and run agy in an empty folder.
+    if (!fs.existsSync(workingDir)) {
+      const message = `Working directory does not exist: ${workingDir}`;
+      ws.send(createNormalizedMessage({ kind: 'error', content: message, sessionId: sessionId || null, provider: 'antigravity' }));
+      ws.send(createCompleteMessage({ provider: 'antigravity', sessionId: sessionId || null, exitCode: 1 }));
+      throw new Error(message);
+    }
+
     // Mirror transcript — named after the provider conversation id once the
     // `init` event reports it, keyed under the app session id meanwhile.
     let jsonlPath = path.join(
@@ -252,44 +306,104 @@ export async function spawnAntigravity(command: string, options: AnyRecord = {},
     };
 
     // The user turn is written once, up-front — agy echoes it back as a
-    // user_input step that the renderer ignores.
+    // user_input step that the renderer ignores. The launch model rides on it
+    // so getCurrentActiveModel can restore it even for tool-only turns.
     const userEntry: any = {
       type: 'message',
       id: generateMessageId('antigravity'),
       timestamp: new Date().toISOString(),
+      ...(resolvedModel ? { model: resolvedModel } : {}),
       message: { role: 'user', content: [{ type: 'text', text: promptWithAttachments }] },
     };
     appendTranscript(jsonlPath, userEntry);
+    const echoImages = normalizeAttachmentDescriptors(images);
+    const echoFiles = normalizeAttachmentDescriptors(files);
     const userEcho = createNormalizedMessage({
       kind: 'text',
       role: 'user',
       content: command || '',
+      images: echoImages.length > 0 ? echoImages : undefined,
+      files: echoFiles.length > 0 ? echoFiles : undefined,
       sessionId: capturedSessionId || sessionId || null,
       provider: 'antigravity',
     });
     ws.send(userEcho);
 
+    // Fresh chats stay "pending" for the synchronizer until `init` binds them.
+    const pendingDirKey = path.resolve(workingDir);
+    let pendingLaunchOpen = !providerSessionId;
+    if (pendingLaunchOpen) {
+      pendingLaunchDirs.set(pendingDirKey, (pendingLaunchDirs.get(pendingDirKey) ?? 0) + 1);
+    }
+    const closePendingLaunch = () => {
+      if (!pendingLaunchOpen) {
+        return;
+      }
+      pendingLaunchOpen = false;
+      const next = (pendingLaunchDirs.get(pendingDirKey) ?? 1) - 1;
+      if (next > 0) {
+        pendingLaunchDirs.set(pendingDirKey, next);
+      } else {
+        pendingLaunchDirs.delete(pendingDirKey);
+      }
+    };
+
     let stdoutLineBuffer = '';
+    let stderrTail = '';
     // Per assistant-response accumulator: `agent_response` steps stream
     // text_delta chunks on ACTIVE rows and the final chunk on DONE.
     const openAssistantSteps = new Map<any, any>(); // step_index → accumulated text
+    const openThinkingSteps = new Map<any, string>(); // step_index → accumulated thinking
     const openToolSteps = new Map<any, any>(); // step_index → { id, name, input }
+
+    // A stopped process keeps writing until it exits; nothing it emits after
+    // Stop belongs in the mirror.
+    const mirror = (record: any) => {
+      if (!agyProcess.aborted) {
+        appendTranscript(jsonlPath, record);
+      }
+    };
 
     const appendAssistantMessage = (stepIndex: any, usage: any) => {
       const text = openAssistantSteps.get(stepIndex);
-      if (text == null) {
+      const thinking = openThinkingSteps.get(stepIndex);
+      openAssistantSteps.delete(stepIndex);
+      openThinkingSteps.delete(stepIndex);
+      const content: any[] = [];
+      if (thinking) {
+        content.push({ type: 'thinking', thinking });
+      }
+      if (text) {
+        content.push({ type: 'text', text });
+      }
+      if (!content.length) {
         return;
       }
-      openAssistantSteps.delete(stepIndex);
-      const entry: any = {
+      mirror({
         type: 'message',
         id: generateMessageId('antigravity'),
         timestamp: new Date().toISOString(),
         ...(resolvedModel ? { model: resolvedModel } : {}),
         ...(usage ? { usage } : {}),
-        message: { role: 'assistant', content: [{ type: 'text', text }] },
-      };
-      appendTranscript(jsonlPath, entry);
+        message: { role: 'assistant', content },
+      });
+    };
+
+    // Persists text/thinking of steps that never reached DONE (Stop, crash).
+    const flushOpenAssistantSteps = () => {
+      const indexes = new Set([...openAssistantSteps.keys(), ...openThinkingSteps.keys()]);
+      for (const stepIndex of indexes) {
+        appendAssistantMessage(stepIndex, null);
+      }
+    };
+
+    const sendError = (content: string) => {
+      ws.send(createNormalizedMessage({
+        kind: 'error',
+        content,
+        sessionId: capturedSessionId || sessionId || null,
+        provider: 'antigravity',
+      }));
     };
 
     const emitComplete = (exitCode: any) => {
@@ -330,6 +444,7 @@ export async function spawnAntigravity(command: string, options: AnyRecord = {},
         const conversationId = event.conversation_id;
         if (conversationId) {
           capturedSessionId = conversationId;
+          closePendingLaunch();
           finalizeTranscriptPath();
 
           if (!sessionId && processKey !== capturedSessionId) {
@@ -379,6 +494,20 @@ export async function spawnAntigravity(command: string, options: AnyRecord = {},
         const ts = new Date().toISOString();
 
         if (stepType === 'agent_response') {
+          // shortcut: thinking field names come from the agy binary's json tags
+          // (no live sample yet — quota); verify against a thinking model run.
+          const thinkingDelta = typeof update.thinking_delta === 'string'
+            ? update.thinking_delta
+            : (typeof update.thinking === 'string' ? update.thinking : '');
+          if (thinkingDelta) {
+            openThinkingSteps.set(stepIndex, (openThinkingSteps.get(stepIndex) || '') + thinkingDelta);
+            ws.send(createNormalizedMessage({
+              kind: 'thought_delta',
+              content: thinkingDelta,
+              sessionId: capturedSessionId || sessionId || null,
+              provider: 'antigravity',
+            }));
+          }
           const delta = typeof update.text_delta === 'string' ? update.text_delta : '';
           if (update.state === 'ACTIVE' && delta) {
             openAssistantSteps.set(stepIndex, (openAssistantSteps.get(stepIndex) || '') + delta);
@@ -401,6 +530,12 @@ export async function spawnAntigravity(command: string, options: AnyRecord = {},
                 sessionId: capturedSessionId || sessionId || null,
                 provider: 'antigravity',
               }));
+              // Closes the client's live buffer so the next step starts fresh.
+              ws.send(createNormalizedMessage({
+                kind: 'stream_end',
+                sessionId: capturedSessionId || sessionId || null,
+                provider: 'antigravity',
+              }));
             }
             const usage = normalizeUsage(update.usage);
             if (usage) {
@@ -414,7 +549,7 @@ export async function spawnAntigravity(command: string, options: AnyRecord = {},
                 timestamp: ts,
               });
               ws.send(budgetMessage);
-              appendTranscript(jsonlPath, budgetMessage);
+              mirror(budgetMessage);
             }
             appendAssistantMessage(stepIndex, normalizeUsage(update.usage));
           }
@@ -436,7 +571,7 @@ export async function spawnAntigravity(command: string, options: AnyRecord = {},
               provider: 'antigravity',
             }));
             // Mirror transcript records tool_use inside an assistant message.
-            appendTranscript(jsonlPath, {
+            mirror({
               type: 'message',
               id: generateMessageId('antigravity'),
               timestamp: ts,
@@ -451,25 +586,24 @@ export async function spawnAntigravity(command: string, options: AnyRecord = {},
                 provider: 'antigravity',
               }));
             }
-          } else if (update.state === 'DONE') {
+          } else if (update.state === 'DONE' || update.state === 'ERROR') {
             const open = openToolSteps.get(stepIndex);
             openToolSteps.delete(stepIndex);
             const toolId = open?.id || `agy-tool-${stepIndex}`;
-            const resultContent = update.tool_info?.result != null
-              ? (typeof update.tool_info.result === 'string' ? update.tool_info.result : JSON.stringify(update.tool_info.result))
-              : '';
+            const { content: resultContent, isError } = readToolOutcome(update);
             ws.send(createNormalizedMessage({
               kind: 'tool_result',
               toolId,
               content: resultContent,
+              isError,
               sessionId: capturedSessionId || sessionId || null,
               provider: 'antigravity',
             }));
-            appendTranscript(jsonlPath, {
+            mirror({
               type: 'message',
               id: generateMessageId('antigravity'),
               timestamp: ts,
-              message: { role: 'user', content: [{ type: 'tool_result', tool_use_id: toolId, content: resultContent }] },
+              message: { role: 'user', content: [{ type: 'tool_result', tool_use_id: toolId, content: resultContent, is_error: isError }] },
             });
           }
           return;
@@ -482,20 +616,27 @@ export async function spawnAntigravity(command: string, options: AnyRecord = {},
       if (type === 'result') {
         const result = event.result || {};
         const status = typeof result.status === 'string' ? result.status : '';
-        if (status === 'ERROR' || (status && status !== 'SUCCESS')) {
-          const content = readOptionalString(result.error) || readOptionalString(result.response) || `Antigravity run ended with status ${status}`;
-          ws.send(createNormalizedMessage({
-            kind: 'error',
-            content,
+        const deniedNotice = deniedActionsNotice(result.denied_actions);
+        if (deniedNotice) {
+          const notice = createNormalizedMessage({
+            kind: 'status',
+            text: deniedNotice,
+            notice: true,
             sessionId: capturedSessionId || sessionId || null,
             provider: 'antigravity',
-          }));
+          });
+          ws.send(notice);
+          mirror(notice);
+        }
+        if (status === 'ERROR' || (status && status !== 'SUCCESS')) {
+          const content = readOptionalString(result.error) || readOptionalString(result.response) || `Antigravity run ended with status ${status}`;
+          sendError(content);
           emitComplete(1);
           return;
         }
         const usage = normalizeUsage(result.usage);
         if (usage) {
-          appendTranscript(jsonlPath, createNormalizedMessage({
+          mirror(createNormalizedMessage({
             kind: 'status',
             text: 'token_budget',
             tokenBudget: { inputTokens: usage.inputTokens, outputTokens: usage.outputTokens, cacheReadTokens: usage.cacheReadTokens, used: usage.totalTokens, total: 0 },
@@ -509,7 +650,7 @@ export async function spawnAntigravity(command: string, options: AnyRecord = {},
       }
     };
 
-    const agyProcess: import("node:child_process").ChildProcess & { aborted?: boolean } = spawnFunction(executable, baseArgs, {
+    const agyProcess: import("node:child_process").ChildProcess & { aborted?: boolean; flushPartial?: () => void } = spawnFunction(executable, baseArgs, {
       cwd: workingDir,
       stdio: ['ignore', 'pipe', 'pipe'],
       // options.env carries multi-account overrides (e.g. an isolated HOME)
@@ -518,9 +659,14 @@ export async function spawnAntigravity(command: string, options: AnyRecord = {},
     });
 
     activeProcesses.set(processKey, agyProcess);
+    // Called by abortAntigravitySession before it flags the process aborted.
+    agyProcess.flushPartial = flushOpenAssistantSteps;
 
-    agyProcess.stdout!.on('data', (data: any) => {
-      stdoutLineBuffer += data.toString();
+    agyProcess.stdout!.setEncoding('utf8');
+    agyProcess.stderr!.setEncoding('utf8');
+
+    agyProcess.stdout!.on('data', (data: string) => {
+      stdoutLineBuffer += data;
       const completeLines = stdoutLineBuffer.split(/\r?\n/);
       stdoutLineBuffer = completeLines.pop() || '';
       for (const line of completeLines) {
@@ -528,19 +674,20 @@ export async function spawnAntigravity(command: string, options: AnyRecord = {},
       }
     });
 
-    // Diagnostics (auth prompts, permission notices) go to stderr.
-    agyProcess.stderr!.on('data', (data: any) => {
-      const stderrText = data.toString();
-      console.error('Antigravity CLI stderr:', stderrText);
-      ws.send(createNormalizedMessage({
-        kind: 'error',
-        content: stderrText,
-        sessionId: capturedSessionId || sessionId || null,
-        provider: 'antigravity',
-      }));
+    // Diagnostics (auth prompts, permission notices) go to stderr. Buffered:
+    // the tail is attached to a failure, a successful run only logs it.
+    agyProcess.stderr!.on('data', (data: string) => {
+      console.error('Antigravity CLI stderr:', data);
+      stderrTail = (stderrTail + data).slice(-STDERR_TAIL_CHARS);
     });
 
+    let spawnFailed = false;
     agyProcess.on('close', (code: any) => {
+      closePendingLaunch();
+      // The 'error' handler already reported a spawn failure and completed.
+      if (spawnFailed) {
+        return;
+      }
       const finalSessionId = sessionId || capturedSessionId || processKey;
       if (activeProcesses.get(finalSessionId) === agyProcess) {
           activeProcesses.delete(finalSessionId);
@@ -557,7 +704,15 @@ export async function spawnAntigravity(command: string, options: AnyRecord = {},
         stdoutLineBuffer = '';
       }
 
+      if (!agyProcess.aborted) {
+        flushOpenAssistantSteps();
+      }
+
       if (!completeSent && !agyProcess.aborted) {
+        if (code !== 0) {
+          const tail = stderrTail.trim();
+          sendError(`Antigravity CLI exited with code ${code}${tail ? `:\n${tail}` : ''}`);
+        }
         emitComplete(code);
       }
 
@@ -577,11 +732,15 @@ export async function spawnAntigravity(command: string, options: AnyRecord = {},
       }
     });
 
-    agyProcess.on('error', async (error: any) => {
-        if (agyProcess.aborted) {
-          settleOnce(() => resolve());
-          return;
-        }
+    // Node emits 'error' before 'close' on a spawn failure, so everything here
+    // stays synchronous: the error must reach the client before `complete`.
+    agyProcess.on('error', (error: any) => {
+      closePendingLaunch();
+      if (agyProcess.aborted) {
+        settleOnce(() => resolve());
+        return;
+      }
+      spawnFailed = true;
       console.error('Antigravity CLI process error:', error);
       const finalSessionId = sessionId || capturedSessionId || processKey;
       if (activeProcesses.get(finalSessionId) === agyProcess) {
@@ -591,17 +750,10 @@ export async function spawnAntigravity(command: string, options: AnyRecord = {},
           activeProcesses.delete(processKey);
         }
 
-      const installed = await context.isProviderInstalled();
-      const errorContent = !installed
+      // cwd was verified before spawn, so ENOENT here means the binary.
+      sendError(error?.code === 'ENOENT'
         ? 'Antigravity CLI is not installed. Install it per https://antigravity.google/docs/cli/install/'
-        : error.message;
-
-      ws.send(createNormalizedMessage({
-        kind: 'error',
-        content: errorContent,
-        sessionId: capturedSessionId || sessionId || null,
-        provider: 'antigravity',
-      }));
+        : error.message);
       emitComplete(1);
       notifyTerminalState({ error });
 
@@ -617,6 +769,8 @@ export function abortAntigravitySession(sessionId: any) {
   const process = activeProcesses.get(sessionId);
   if (process) {
     console.log(`Aborting Antigravity session: ${sessionId}`);
+    // Keep the partial answer before the abort flag stops mirror writes.
+    process.flushPartial?.();
     // The abort handler sends the terminal complete (aborted: true); flag the
     // process so its close handler does not emit a second one.
     process.aborted = true;
@@ -630,6 +784,13 @@ export function abortAntigravitySession(sessionId: any) {
       console.warn('Failed to cancel CLI process:', error);
       return false;
     }
+    // agy can ignore SIGTERM mid-tool; escalate if it is still alive.
+    const killTimer = setTimeout(() => {
+      if (process.exitCode === null && process.signalCode === null) {
+        process.kill('SIGKILL');
+      }
+    }, ABORT_KILL_GRACE_MS);
+    killTimer.unref?.();
     if (activeProcesses.get(sessionId) === process) {
       activeProcesses.delete(sessionId);
     }

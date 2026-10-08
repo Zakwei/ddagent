@@ -11,7 +11,6 @@ import {
   execCliFile,
   PROVIDER_MODEL_CACHE_TTL_MS,
   readFileTail,
-  readObjectRecord,
   readOptionalString,
   resolveAntigravityExecutable,
 } from '@/shared/utils.js';
@@ -153,8 +152,8 @@ const loadAntigravityModels = async (
 
 /**
  * Reads the last model recorded in a session's mirror transcript — the
- * runtime stamps `type:"session"` headers and assistant `message` rows with
- * the model id it launched with. Newest entry wins scanning from the tail.
+ * runtime stamps user/assistant `message` rows with the model id it launched
+ * with. Newest entry wins scanning from the tail.
  */
 async function readTranscriptModel(transcriptPath: string): Promise<string | undefined> {
   const tail = await readFileTail(transcriptPath, 512 * 1024);
@@ -166,13 +165,9 @@ async function readTranscriptModel(transcriptPath: string): Promise<string | und
     } catch {
       continue;
     }
-    if (entry?.type === 'message' && readObjectRecord(entry.message)?.role === 'assistant') {
-      const model = readOptionalString(entry.model);
-      if (model) {
-        return model;
-      }
-    }
-    if (entry?.type === 'session') {
+    // The runtime stamps the launch model on each turn's user row and on
+    // assistant rows; legacy `type:"session"` headers are still honored.
+    if (entry?.type === 'message' || entry?.type === 'session') {
       const model = readOptionalString(entry.model);
       if (model) {
         return model;
