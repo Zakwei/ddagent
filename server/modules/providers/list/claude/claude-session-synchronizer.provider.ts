@@ -39,7 +39,11 @@ export class ClaudeSessionSynchronizer implements IProviderSessionSynchronizer {
    */
   private isSubagentTranscript(filePath: string): boolean {
     const pathParts = path.normalize(filePath).split(path.sep);
-    return pathParts.includes('subagents') || pathParts.includes('tool-results');
+    // Older Claude Code wrote subagents as `agent-<id>.jsonl` right next to
+    // the parent session file — same parent `sessionId`, same corruption.
+    return pathParts.includes('subagents')
+      || pathParts.includes('tool-results')
+      || /^agent-[\w-]+\.jsonl$/.test(path.basename(filePath));
   }
 
   /**
