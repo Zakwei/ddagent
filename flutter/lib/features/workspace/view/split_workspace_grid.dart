@@ -32,7 +32,8 @@ bool hoverFocusBlockedByField() {
 /// Split-pane grid (port of SplitWorkspaceGrid.tsx):
 /// - `getSplitLayout` column/row math + last-row-partial spanning via flex,
 /// - compact (<600pt): tab strip + only the active pane mounted; tabs whose
-///   agent finished in the background turn green until opened,
+///   agent finished in the background turn green until opened, tabs waiting
+///   on the user turn amber,
 /// - maximized pane: hidden panes stay mounted (Offstage) so chats/terminals
 ///   keep state,
 /// - per-pane header with drag handle (Draggable + DragTarget reorder),
@@ -51,6 +52,7 @@ class SplitWorkspaceGrid extends StatefulWidget {
     this.maximizedPaneId,
     this.onToggleMaximizePane,
     this.finishedPaneIds = const {},
+    this.actionPaneIds = const {},
   });
 
   final List<SplitPane> panes;
@@ -67,6 +69,10 @@ class SplitWorkspaceGrid extends StatefulWidget {
   /// Panes whose agent finished while they were in the background — their
   /// compact tab turns green until opened.
   final Set<String> finishedPaneIds;
+
+  /// Panes waiting on the user (question / permission) — their compact tab
+  /// turns amber; this wins over [finishedPaneIds].
+  final Set<String> actionPaneIds;
 
   @override
   State<SplitWorkspaceGrid> createState() => _SplitWorkspaceGridState();
@@ -138,12 +144,15 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
     final c = context.appColors;
     final t = Theme.of(context);
     final m = topBarMetrics(context);
-    final finished = !selected && widget.finishedPaneIds.contains(pane.id);
-    final fg = finished
-        ? _finishedColor
-        : selected
-        ? c.foreground
-        : c.mutedForeground;
+    // A pending question outranks "finished" — it blocks the agent.
+    final (accent, accentIcon) = selected
+        ? (null, null)
+        : widget.actionPaneIds.contains(pane.id)
+        ? (_actionColor, Icons.warning_amber_rounded)
+        : widget.finishedPaneIds.contains(pane.id)
+        ? (_finishedColor, Icons.check_circle)
+        : (null, null);
+    final fg = accent ?? (selected ? c.foreground : c.mutedForeground);
     return InkWell(
       borderRadius: AppRadii.borderMd,
       onTap: () => widget.onActivatePane?.call(pane.id),
@@ -151,20 +160,14 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
         // Border is always 1px so a tab turning green doesn't shift the strip.
         padding: EdgeInsets.symmetric(horizontal: 9, vertical: (m.hit - m.icon) / 2 - 1),
         decoration: BoxDecoration(
-          color: finished
-              ? _finishedColor.withValues(alpha: 0.15)
-              : selected
-              ? c.background
-              : Colors.transparent,
-          border: Border.all(
-            color: finished ? _finishedColor.withValues(alpha: 0.6) : Colors.transparent,
-          ),
+          color: accent?.withValues(alpha: 0.15) ?? (selected ? c.background : Colors.transparent),
+          border: Border.all(color: accent?.withValues(alpha: 0.6) ?? Colors.transparent),
           borderRadius: AppRadii.borderMd,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(finished ? Icons.check_circle : paneKindIcon(pane.kind), size: m.icon, color: fg),
+            Icon(accentIcon ?? paneKindIcon(pane.kind), size: m.icon, color: fg),
             const SizedBox(width: 6),
             ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 140),
@@ -174,7 +177,7 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
                 overflow: TextOverflow.ellipsis,
                 style: t.textTheme.labelSmall?.copyWith(
                   color: fg,
-                  fontWeight: selected || finished ? FontWeight.w600 : FontWeight.w400,
+                  fontWeight: selected || accent != null ? FontWeight.w600 : FontWeight.w400,
                 ),
               ),
             ),
@@ -186,6 +189,9 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
 
   /// Emerald — same hue as the session-list "running" dot.
   static const _finishedColor = Color(0xFF10B981);
+
+  /// Amber — same as the pane header's pending-question triangle.
+  static const _actionColor = Color(0xFFF59E0B);
 
   /// Desktop grid: rows of equal height; a partial last row stretches to the
   /// full width (finer unit grid — see SplitWorkspaceGrid.tsx).

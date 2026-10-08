@@ -125,4 +125,34 @@ void main() {
     await tester.pumpWidget(grid('pane-1'));
     expect(find.byIcon(Icons.check_circle), findsNothing);
   });
+
+  testWidgets('compact tab waiting on the user turns amber over green', (tester) async {
+    tester.view.physicalSize = const Size(400, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      TranslationProvider(
+        child: MaterialApp(
+          theme: AppTheme.light(),
+          home: Scaffold(
+            body: SplitWorkspaceGrid(
+              panes: const [
+                SplitPane(id: 'pane-0', kind: PaneKind.chat),
+                SplitPane(id: 'pane-1', kind: PaneKind.chat),
+              ],
+              activePaneId: 'pane-0',
+              finishedPaneIds: const {'pane-1'},
+              actionPaneIds: const {'pane-1'},
+              paneTitle: (pane) => pane.id,
+              onClosePane: (_) {},
+              onReorderPanes: (_, _) {},
+              renderPane: (_, _) => const SizedBox.expand(),
+            ),
+          ),
+        ),
+      ),
+    );
+    expect(find.byIcon(Icons.warning_amber_rounded), findsOneWidget);
+    expect(find.byIcon(Icons.check_circle), findsNothing);
+  });
 }

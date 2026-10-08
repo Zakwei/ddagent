@@ -208,6 +208,10 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
               maximizedPaneId: ws.maximizedPaneId,
               onToggleMaximizePane: ctrl.toggleMaximize,
               finishedPaneIds: _finishedPaneIds,
+              actionPaneIds: {
+                for (final p in ws.panes)
+                  if (display(p).action == PaneAction.question) p.id,
+              },
               paneTitle: (p) => display(p).title,
               renderPaneHeaderContent: (p, actions) =>
                   _headerContent(p, display(p), sessions, projects, actions),
