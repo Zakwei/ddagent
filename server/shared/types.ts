@@ -300,6 +300,23 @@ export type NormalizedMessage = {
   };
   isError?: boolean;
   text?: string;
+  /**
+   * On `status` events only: `true` marks a persistent informational line
+   * (shown as a transcript row and kept across history reloads); without it a
+   * `status` is an ephemeral activity label that the next status replaces.
+   * Notices may still arrive after the run's `complete`.
+   */
+  notice?: boolean;
+  /**
+   * On `complete` events only: the provider process/turn exit code. 0 means
+   * success; any other value is a failure. Aborted runs always report 0.
+   */
+  exitCode?: number;
+  /**
+   * On `complete` events only: `true` when the run ended because the user
+   * stopped it (chat.abort), not because the turn finished or failed.
+   */
+  aborted?: boolean;
   tokens?: number;
   canInterrupt?: boolean;
   requestId?: string;
