@@ -1802,6 +1802,53 @@ export async function spawnOpenCode(
   return done;
 }
 
+/**
+ * Posts a user message into the session's running turn. OpenCode appends a
+ * prompt sent to a busy session to the conversation and its agent loop picks
+ * it up at the next step, so the live run streams the rest and still settles
+ * on the single `session.idle` at the end. Only a turn that is visibly busy
+ * qualifies — before that, or once it settled, the message goes out as the
+ * next turn instead.
+ */
+// Consumed by the provider registry (runtime.steer) for the queue's "send now".
+export async function steerOpenCodeSession(sessionId: string, content: string, options: AnyRecord): Promise<boolean> {
+  const run = activeRuns.get(sessionId);
+  if (
+    !run
+    || !run.sawBusy
+    || run.aborted
+    || run.completeSent
+    || run.recovering
+    || !run.baseUrl
+    || !run.providerSessionId
+    || !run.promptBody
+  ) {
+    return false;
+  }
+
+  const text = appendFilesInputTag(appendImagesInputTag(content.trim(), options.images), options.files);
+  // Same agent/model/variant as the turn it joins — only the text differs.
+  const { status } = await apiRequest(run.baseUrl, `/session/${run.providerSessionId}/prompt_async`, {
+    method: 'POST',
+    query: { directory: run.directory },
+    body: { ...run.promptBody, parts: [{ type: 'text', text }] },
+  });
+  if (status >= 400) {
+    return false;
+  }
+  // OpenCode's own echo of a user part is filtered from the live stream (the
+  // client normally shows its optimistic bubble); a queued message has none.
+  closeLivePart(run, run.providerSessionId);
+  run.writer.send(createNormalizedMessage({
+    kind: 'text',
+    role: 'user',
+    content: content.trim(),
+    sessionId: run.providerSessionId,
+    provider: PROVIDER,
+  }));
+  return true;
+}
+
 // Consumed by provider runtime services and lifecycle tests.
 export async function abortOpenCodeSession(sessionId: string): Promise<boolean> {
   const run = activeRuns.get(sessionId);
@@ -1936,6 +1983,7 @@ export const opencodeRuntime: IProviderRuntime & {
 } = {
   run: spawnOpenCode,
   abort: abortOpenCodeSession,
+  steer: steerOpenCodeSession,
   setPermissionMode: setOpenCodePermissionMode,
   permissions: {
     resolve: resolveOpenCodePermission,

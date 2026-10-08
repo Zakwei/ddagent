@@ -211,6 +211,114 @@ test('sendNow promotes a queued message without interrupting the active run', as
   assert.deepEqual(dispatched, ['second', 'first']);
 });
 
+test('sendNow steers a message into the live turn when the provider accepts it', async () => {
+  const repository = createMemoryRepository();
+  const runs = createRunRegistry(true);
+  const dispatched: string[] = [];
+  const steered: string[] = [];
+  const broadcasts: QueuedMessage[][] = [];
+
+  const service = createQueuedMessagesService({
+    repository,
+    runs,
+    dispatch: async (input): Promise<QueuedDispatchResult> => {
+      dispatched.push(input.content);
+      return { ok: true };
+    },
+    steer: async (input) => {
+      steered.push(input.content);
+      return true;
+    },
+    broadcast: (payload) => broadcasts.push(payload.messages),
+  });
+
+  const first = service.enqueue({ sessionId: SESSION, content: 'first' });
+  const second = service.enqueue({ sessionId: SESSION, content: 'second' });
+
+  const returned = await service.sendNow(second.id);
+  assert.deepEqual(steered, ['second']);
+  assert.equal(returned.status, 'sent');
+  // The steered row left the queue; the other one still waits for the turn.
+  assert.deepEqual(broadcasts.at(-1)?.map((row) => row.id), [first.id]);
+
+  runs.emitCompleted(SESSION);
+  await sleep(0);
+  // Never sent twice: only the untouched row drains as the next turn.
+  assert.deepEqual(dispatched, ['first']);
+});
+
+test('sendNow falls back to promoting when the live turn refuses the message', async () => {
+  const repository = createMemoryRepository();
+  const runs = createRunRegistry(true);
+  const dispatched: string[] = [];
+
+  const service = createQueuedMessagesService({
+    repository,
+    runs,
+    dispatch: async (input): Promise<QueuedDispatchResult> => {
+      dispatched.push(input.content);
+      return { ok: true };
+    },
+    steer: async () => false,
+  });
+
+  service.enqueue({ sessionId: SESSION, content: 'first' });
+  const second = service.enqueue({ sessionId: SESSION, content: 'second' });
+
+  const returned = await service.sendNow(second.id);
+  assert.equal(returned.status, 'queued');
+  assert.deepEqual(dispatched, []);
+
+  runs.emitCompleted(SESSION);
+  await sleep(0);
+  assert.deepEqual(dispatched, ['second', 'first']);
+});
+
+test('a steer that throws keeps the message queued', async () => {
+  const repository = createMemoryRepository();
+  const runs = createRunRegistry(true);
+
+  const service = createQueuedMessagesService({
+    repository,
+    runs,
+    dispatch: async (): Promise<QueuedDispatchResult> => ({ ok: true }),
+    steer: async () => {
+      throw new Error('provider went away');
+    },
+  });
+
+  const message = service.enqueue({ sessionId: SESSION, content: 'hello' });
+  const returned = await service.sendNow(message.id);
+  assert.equal(returned.status, 'queued');
+});
+
+test('a completion during a refused steer still drains the message', async () => {
+  const repository = createMemoryRepository();
+  const runs = createRunRegistry(true);
+  const dispatched: string[] = [];
+
+  const service = createQueuedMessagesService({
+    repository,
+    runs,
+    dispatch: async (input): Promise<QueuedDispatchResult> => {
+      dispatched.push(input.content);
+      return { ok: true };
+    },
+    // The turn ends while the provider is deciding — its completion drain
+    // finds the row claimed and skips it.
+    steer: async () => {
+      runs.emitCompleted(SESSION);
+      return false;
+    },
+  });
+
+  const message = service.enqueue({ sessionId: SESSION, content: 'late' });
+  await service.sendNow(message.id);
+  await sleep(0);
+  assert.deepEqual(dispatched, ['late']);
+  assert.equal(repository.getById(message.id)?.status, 'sent');
+});
+
 test('a failed dispatch marks the row failed rather than dropping it', async () => {
   const repository = createMemoryRepository();
   const runs = createRunRegistry(false);

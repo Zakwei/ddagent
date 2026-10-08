@@ -45,6 +45,16 @@ export interface IProviderRuntime {
    * message; runtimes without it simply apply the mode at run start.
    */
   setPermissionMode?(sessionId: string, mode: string): void;
+  /**
+   * Optional mid-turn steering: hands a user message to the turn that is
+   * running right now, without interrupting it — the agent picks it up at its
+   * next step boundary. Consumed by provider-runtime.service for the queue's
+   * "send now". Resolves `true` only when the live turn accepted the message
+   * (the runtime then also streams it as a user row); `false` means the caller
+   * must deliver it some other way (as the next turn). Runtimes whose
+   * transport cannot inject into a running turn (ACP, Codex exec) omit it.
+   */
+  steer?(sessionId: string, content: string, options: AnyRecord): Promise<boolean>;
 }
 
 /**

@@ -257,6 +257,27 @@ test('claude: a background-task notification becomes a card, not a raw XML user 
   }
 });
 
+test('claude: a message sent mid-turn renders as the user turn it is', () => {
+  const provider = new ClaudeSessionsProvider();
+  // How the CLI persists a user message that arrived while a turn was running.
+  const messages = provider.normalizeMessage({
+    type: 'attachment',
+    uuid: 'q1',
+    timestamp: '2026-10-08T16:33:36.086Z',
+    attachment: {
+      type: 'queued_command',
+      prompt: [{ type: 'text', text: 'Also cover the edge case' }],
+      source_uuid: 'src-1',
+      commandMode: 'prompt',
+    },
+  }, 'app');
+  assert.equal(messages.length, 1);
+  assert.equal(messages[0].kind, 'text');
+  assert.equal(messages[0].role, 'user');
+  assert.equal(messages[0].content, 'Also cover the edge case');
+  assert.equal(messages[0].timestamp, '2026-10-08T16:33:36.086Z');
+});
+
 test('claude: the async Agent launch placeholder is not shown as the subagent answer', () => {
   const provider = new ClaudeSessionsProvider();
   const [result] = provider.normalizeMessage({

@@ -391,8 +391,9 @@ export function mapCliOptionsToSDK(options: any = {}): any {
  * @param {Object} writer - WebSocket writer for reconnect support
  * @param {Function} releaseInput - Closes the held stdin stream so the CLI can exit
  * @param {Function} injectTurn - Feeds a new user turn into this live process
+ * @param {Function} steerTurn - Feeds a user message into the turn running now
  */
-function addSession(sessionId: any, queryInstance: any, writer: any = null, releaseInput: any = null, injectTurn: any = null) {
+function addSession(sessionId: any, queryInstance: any, writer: any = null, releaseInput: any = null, injectTurn: any = null, steerTurn: any = null) {
   const existing = activeSessions.get(sessionId);
   // A different live instance under the same key means an earlier run was
   // superseded without being stopped (e.g. an abort that raced run setup and
@@ -421,7 +422,8 @@ function addSession(sessionId: any, queryInstance: any, writer: any = null, rele
     writer,
     // Re-registered mid-run once the provider session id lands; keep the closer.
     releaseInput: releaseInput || carried?.releaseInput || null,
-    injectTurn: injectTurn || carried?.injectTurn || null
+    injectTurn: injectTurn || carried?.injectTurn || null,
+    steerTurn: steerTurn || carried?.steerTurn || null
   });
 }
 
@@ -785,6 +787,10 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
   type TurnInjection = { uuid: string; writer: ProviderRuntimeWriter; settle: (accepted: boolean) => void };
   let pendingInjection = null as TurnInjection | null;
   let activeInjection = null as TurnInjection | null;
+  // Uuids of user messages steered into a running turn that the CLI has not
+  // replayed yet. While any is outstanding at `result`, the CLI will run it as
+  // a turn of its own, so stdin must stay open for it.
+  const unreplayedSteers = new Set<string>();
   // Latest main-agent API step usage/model: the context gauge's source, re-sent
   // on `result` once the SDK has reported the model's real context window.
   let lastStepUsage: AnyRecord | null = null;
@@ -1120,6 +1126,21 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
       });
     };
 
+    // Called by steerClaudeSDKSession: pushes a user message onto the live
+    // stdin while a turn runs. The CLI folds it into that turn at its next
+    // step (or, if the turn is already wrapping up, runs it right after).
+    const steerTurn = (messages: any[]): boolean => {
+      if (!turnActive
+        || supersededInstances.has(queryInstance)
+        || abortedInstances.has(queryInstance)) {
+        return false;
+      }
+      const uuid = crypto.randomUUID();
+      if (!pushPrompt(messages.map((message) => ({ ...message, uuid })))) return false;
+      unreplayedSteers.add(uuid);
+      return true;
+    };
+
     // Points the run's output at the writer of the turn that is starting, so
     // its events reach the chat run the client is watching for that turn.
     const beginTurn = (writer: ProviderRuntimeWriter | null) => {
@@ -1136,7 +1157,7 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
 
     // Track the query instance for abort capability
     if (sessionKey()) {
-      addSession(sessionKey(), queryInstance, ws, releasePromptStream, injectTurn);
+      addSession(sessionKey(), queryInstance, ws, releasePromptStream, injectTurn, steerTurn);
     }
     // A fresh process has no background tasks yet. Saying so clears a count
     // a previous process left behind on the client (its own final 0 can be
@@ -1161,7 +1182,7 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
       if (message.session_id && !capturedSessionId) {
 
         capturedSessionId = message.session_id;
-        addSession(sessionKey(), queryInstance, ws, releasePromptStream, injectTurn);
+        addSession(sessionKey(), queryInstance, ws, releasePromptStream, injectTurn, steerTurn);
 
         // Set session ID on writer
         if (ws.setSessionId && typeof ws.setSessionId === 'function') {
@@ -1186,6 +1207,17 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
           pendingInjection = null;
           turnIsFollowUp = false;
           beginTurn(activeInjection.writer);
+        } else if (unreplayedSteers.delete(message.uuid)) {
+          // A steered message has no client-side bubble yet (it came out of
+          // the queue): stream it as a user row where the agent picked it up.
+          // Echoed after the turn ended, it opens a run of its own.
+          if (!turnActive) {
+            turnIsFollowUp = false;
+            beginTurn(typeof options.openFollowUpRun === 'function' ? options.openFollowUpRun() : null);
+          }
+          for (const msg of context.normalizeMessage(message, capturedSessionId || sessionId || null)) {
+            ws.send(msg);
+          }
         }
         continue;
       }
@@ -1285,10 +1317,11 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
           backgroundWorkPending = false;
           heldForBackgroundWork = true;
           scheduleRelease();
-        } else if (taskSettledThisTurn) {
-          // A task finished while this turn ran: the CLI still has to report
-          // it in a follow-up turn. Keep stdin open for it; that turn's own
-          // `result` closes it once nothing is left.
+        } else if (taskSettledThisTurn || unreplayedSteers.size > 0) {
+          // A task finished while this turn ran, or a steered message arrived
+          // too late to join it: the CLI still has to run a follow-up turn.
+          // Keep stdin open for it; that turn's own `result` closes it once
+          // nothing is left.
           heldForBackgroundWork = true;
           scheduleRelease(FOLLOW_UP_GRACE_MS);
         } else {
@@ -1411,6 +1444,21 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
 }
 
 /**
+ * Feeds a user message into the session's running turn (mid-turn steering).
+ * Resolves false when no turn is live in this server's process for the
+ * session, so the caller delivers the message as the next turn instead.
+ */
+// Consumed by the provider registry (runtime.steer) for the queue's "send now".
+export async function steerClaudeSDKSession(sessionId: string, content: string, options: AnyRecord) {
+  const session = getSession(sessionId);
+  if (!session?.steerTurn || session.status !== 'active') {
+    return false;
+  }
+  const messages = await buildPromptMessages(content, options.images, options.files, options.cwd);
+  return Boolean(session.steerTurn(messages));
+}
+
+/**
  * Aborts an active SDK session
  * @param {string} sessionId - Session identifier
  * @returns {boolean} True if session was aborted, false if not found
@@ -1518,6 +1566,7 @@ export function reconnectSessionWriter(sessionId: any, newRawWs: any) {
 export const claudeRuntime: IProviderRuntime = {
   run: queryClaudeSDK,
   abort: abortClaudeSDKSession,
+  steer: steerClaudeSDKSession,
   permissions: {
     resolve: resolveToolApproval,
     listPending: getPendingApprovalsForSession,

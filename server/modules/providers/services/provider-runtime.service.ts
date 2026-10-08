@@ -91,6 +91,31 @@ export function createProviderRuntimeService(
       return Boolean(await dependencies.resolveProvider(providerName).runtime.abort(sessionId));
     },
 
+    /**
+     * Hands a message to the session's running turn. `false` when the
+     * provider cannot steer (no `steer` hook) or its live turn refused it.
+     */
+    async steer(
+      providerName: LLMProvider,
+      sessionId: string,
+      content: string,
+      options: AnyRecord,
+    ): Promise<boolean> {
+      let runtime;
+      try {
+        runtime = dependencies.resolveProvider(providerName).runtime;
+      } catch {
+        return false;
+      }
+      if (!runtime.steer) return false;
+      try {
+        return await runtime.steer(sessionId, content, options);
+      } catch (error) {
+        console.warn(`[Steer] ${providerName} refused a mid-turn message:`, error);
+        return false;
+      }
+    },
+
     setSessionPermissionMode(providerName: LLMProvider, sessionId: string, mode: string): void {
       try {
         dependencies.resolveProvider(providerName).runtime.setPermissionMode?.(sessionId, mode);

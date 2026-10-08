@@ -43,6 +43,7 @@ export type ProviderRuntimeGateway = {
   ): Promise<unknown>;
   abort(provider: LLMProvider, sessionId: string): Promise<boolean>;
   setSessionPermissionMode?(provider: LLMProvider, sessionId: string, mode: string): void;
+  steer?(provider: LLMProvider, sessionId: string, content: string, options: AnyRecord): Promise<boolean>;
   resolveToolApproval(requestId: string, payload: ProviderPermissionDecision): void;
   getPendingApprovalsForSession(sessionId: string): unknown[];
 };
@@ -591,4 +592,42 @@ export async function dispatchChatCommand(
       });
     }
   }
+}
+
+/**
+ * Hands a message to the session's running turn instead of queueing it behind
+ * that turn (mid-turn steering). Used by the queued-messages module for
+ * "send now" while a run is live.
+ *
+ * Returns `true` only when the provider's live turn accepted the message; any
+ * other state (no live run, archived session, orchestrated session, a provider
+ * that cannot steer) yields `false` and the caller falls back to delivering it
+ * as the next turn. Attachments pass the same upload-store trust boundary as
+ * `dispatchChatCommand`.
+ */
+export async function steerChatCommand(
+  runtime: ProviderRuntimeGateway,
+  input: { sessionId: string; content: string; options: AnyRecord },
+): Promise<boolean> {
+  const { sessionId, content } = input;
+  if (!runtime.steer) return false;
+
+  const run = chatRunRegistry.getRun(sessionId);
+  if (!run || run.status !== 'running' || run.aborted) return false;
+
+  const session = sessionsDb.getSessionById(sessionId);
+  if (!session || session.isArchived) return false;
+
+  const attachments = filterAttachmentsToUploadStore([
+    ...normalizeAttachmentDescriptors(input.options.images),
+    ...normalizeAttachmentDescriptors(input.options.files),
+    ...normalizeAttachmentDescriptors(input.options.attachments),
+  ]).filter((descriptor, index, all) => all.findIndex((candidate) => candidate.path === descriptor.path) === index);
+  if (!content.trim() && attachments.length === 0) return false;
+
+  return runtime.steer(run.provider, sessionId, content, {
+    images: attachments.filter(isImageAttachmentDescriptor),
+    files: attachments.filter((descriptor) => !isImageAttachmentDescriptor(descriptor)),
+    cwd: session.project_path ?? undefined,
+  });
 }

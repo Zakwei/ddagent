@@ -2,7 +2,13 @@ import { queuedMessagesDb } from '@/modules/database/index.js';
 import { createInboxRouter, createQueuedMessagesRouter } from '@/modules/queued-messages/queued-messages.routes.js';
 import { createQueuedMessagesService } from '@/modules/queued-messages/queued-messages.service.js';
 import { providerRuntimeService } from '@/modules/providers/index.js';
-import { chatRunRegistry, connectedClients, dispatchChatCommand, WS_OPEN_STATE } from '@/modules/websocket/index.js';
+import {
+  chatRunRegistry,
+  connectedClients,
+  dispatchChatCommand,
+  steerChatCommand,
+  WS_OPEN_STATE,
+} from '@/modules/websocket/index.js';
 import type { QueuedMessage } from '@/shared/types.js';
 import { safeSocketSend } from '@/shared/utils.js';
 
@@ -41,6 +47,9 @@ export const queuedMessagesService = createQueuedMessagesService({
     });
     return result.ok ? { ok: true } : { ok: false, error: result.error };
   },
+  // "Send now" during a live turn: providers that read input mid-turn take it
+  // right away; the rest fall back to the next turn.
+  steer: (input) => steerChatCommand(providerRuntimeService, input),
   // The run's writer wraps the live socket — hand the socket itself, not
   // the writer (it has no readyState and would be a dead delivery target).
   findConnection: (sessionId) => chatRunRegistry.getRun(sessionId)?.writer.ws ?? null,

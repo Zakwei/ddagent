@@ -51,8 +51,9 @@ class QueueRepository {
     ],
   );
 
-  /// Moves one queued message to the front of its session's queue so it is
-  /// the next turn sent — it never interrupts the turn already running.
+  /// Delivers one queued message without interrupting the running turn: the
+  /// server hands it to that turn when the agent can take input mid-turn
+  /// (Claude, OpenCode), otherwise moves it to the front as the next turn.
   Future<void> sendNow(String id) =>
       apiCall(() => _dio.post<dynamic>('/api/queue/$id/send-now'), (_) {});
 

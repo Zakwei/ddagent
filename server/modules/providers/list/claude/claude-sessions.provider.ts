@@ -443,6 +443,17 @@ export class ClaudeSessionsProvider implements IProviderSessions {
         }));
         return messages;
       }
+      // A user message sent while a turn was running (queue "send now") is
+      // persisted the same way, with commandMode `prompt` — render it as the
+      // user turn it is, attachments included.
+      if (queuedPrompt && raw.attachment.commandMode === 'prompt') {
+        return this.normalizeMessage({
+          ...raw,
+          type: 'user',
+          attachment: undefined,
+          message: { role: 'user', content: raw.attachment.prompt },
+        }, sessionId);
+      }
     }
 
     if (raw.message?.role === 'user' && raw.message?.content && raw.isMeta !== true) {

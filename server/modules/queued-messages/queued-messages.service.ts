@@ -42,6 +42,13 @@ type QueuedMessagesServiceDeps = {
     connection: unknown;
   }) => Promise<QueuedDispatchResult>;
   /**
+   * Hands a message to the session's running turn without interrupting it.
+   * Resolves `false` when the provider cannot take it mid-turn, in which case
+   * `sendNow` falls back to promoting it as the next turn. Optional so tests
+   * (and providers without steering) keep the promote-only behaviour.
+   */
+  steer?: (input: { sessionId: string; content: string; options: AnyRecord }) => Promise<boolean>;
+  /**
    * Live connection for the session, when a browser has it open. A queued
    * message still sends without one, so an absent connection is normal.
    */
@@ -75,10 +82,11 @@ const BACKGROUND_CONNECTION = {
  * and closed tabs. Two triggers drain a session's queue: a run completing
  * (via the registry listener) and a fresh enqueue while the session is idle.
  *
- * `sendNow` promotes one message to the front of its session's queue so it is
- * the next turn dispatched. It never interrupts the turn that is already
- * running — sending a queued message must not stop the session's in-flight
- * work; the current turn's completion drains the promoted message first.
+ * `sendNow` never interrupts the turn that is already running — sending a
+ * queued message must not stop the session's in-flight work. While a turn is
+ * live it first offers the message to that turn (steering, for providers that
+ * can take input mid-turn); otherwise it promotes the message to the front of
+ * the queue and the current turn's completion drains it first.
  */
 export function createQueuedMessagesService(deps: QueuedMessagesServiceDeps): QueuedMessagesService {
   /** Sessions with a dispatch in progress, so completion callbacks do not re-enter. */
@@ -154,6 +162,38 @@ export function createQueuedMessagesService(deps: QueuedMessagesServiceDeps): Qu
       }
     } finally {
       draining.delete(sessionId);
+    }
+  }
+
+  /**
+   * Offers a queued row to the session's running turn. Claims the row first
+   * (`sending`) so a completion drain racing the provider call cannot dispatch
+   * it a second time; a refused steer puts it back in the queue untouched.
+   */
+  async function steerIntoLiveTurn(id: number, sessionId: string): Promise<void> {
+    const row = deps.repository.getById(id);
+    if (!deps.steer || !row || row.status !== 'queued' || !deps.repository.markSending(id)) {
+      return;
+    }
+    dispatching.add(id);
+    let steered = false;
+    try {
+      steered = await deps.steer({ sessionId, content: row.content, options: row.options });
+    } catch (error) {
+      console.warn('[Queue] Mid-turn send failed, keeping the message queued:', error);
+    } finally {
+      dispatching.delete(id);
+    }
+    if (steered) {
+      deps.repository.markSent(id);
+    } else {
+      deps.repository.requeue(id);
+    }
+    broadcastQueue(sessionId);
+    // The turn may have ended while the provider call was in flight; its
+    // completion drain skipped this claimed row, so pick it up now.
+    if (!steered) {
+      void drainSession(sessionId);
     }
   }
 
@@ -285,18 +325,22 @@ export function createQueuedMessagesService(deps: QueuedMessagesServiceDeps): Qu
         deps.repository.requeue(id);
       }
 
-      // Promote-only while a turn is live: sending a queued message must NOT
-      // abort the session's in-flight work. The running turn's completion
-      // drains the queue, so the promoted message goes out next. When the
-      // session is idle, dispatch it right away.
+      // A live turn first gets the message mid-turn (steering) — the agent
+      // reads it at its next step instead of after the whole turn. Providers
+      // that cannot take it keep the promoted row: the running turn's
+      // completion drains the queue, so it goes out next. Either way the
+      // in-flight work is never aborted.
       //
-      // Fire-and-forget: `dispatchNext` resolves only when the whole provider
-      // turn ends (often minutes), so awaiting it would hold the HTTP response
-      // past the client's receive timeout — the caller would see "send now"
-      // hang and never refresh its queue. The dispatch still marks the row
-      // `sending` synchronously and broadcasts the new queue before it awaits
-      // the provider, which is what updates every connected client.
-      if (!deps.runs.isProcessing(sessionId)) {
+      // When the session is idle, dispatch right away. Fire-and-forget:
+      // `dispatchNext` resolves only when the whole provider turn ends (often
+      // minutes), so awaiting it would hold the HTTP response past the
+      // client's receive timeout — the caller would see "send now" hang and
+      // never refresh its queue. The dispatch still marks the row `sending`
+      // synchronously and broadcasts the new queue before it awaits the
+      // provider, which is what updates every connected client.
+      if (deps.runs.isProcessing(sessionId)) {
+        await steerIntoLiveTurn(id, sessionId);
+      } else {
         void dispatchNext(sessionId);
       }
 
