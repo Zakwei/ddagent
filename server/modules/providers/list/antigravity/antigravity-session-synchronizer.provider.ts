@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import type { Database as DatabaseType } from 'better-sqlite3';
 
 import { sessionsDb } from '@/modules/database/index.js';
+import { hasPendingAntigravityLaunch } from '@/modules/providers/list/antigravity/antigravity-runtime.provider.js';
 import type { IProviderSessionSynchronizer } from '@/shared/interfaces.js';
 import {
   antigravityConversationsDir,
@@ -109,18 +110,31 @@ export class AntigravitySessionSynchronizer implements IProviderSessionSynchroni
       return null;
     }
 
-    const pendingAppSession = sessionsDb.getSessionByProviderSessionId(row.conversation_id)
-      ?? sessionsDb.getSessionById(row.conversation_id)
-      ?? sessionsDb.findLatestPendingAppSession(this.provider, projectPath);
-    if (pendingAppSession && !pendingAppSession.provider_session_id) {
-      // The watcher can index the summary row before the runtime reports its
-      // conversation id back; bind it to the fresh app row so the sidebar does
-      // not get a duplicate provider-id entry for the same session.
-      sessionsDb.assignProviderSessionId(pendingAppSession.session_id, row.conversation_id);
+    // Hidden technical conversations must never claim a pending app row.
+    if (isSubagentSessionTitle(readOptionalString(row.title) ?? readOptionalString(row.preview))) {
+      return null;
     }
 
-    const existingSession = sessionsDb.getSessionByProviderSessionId(row.conversation_id)
+    let existingSession = sessionsDb.getSessionByProviderSessionId(row.conversation_id)
       ?? sessionsDb.getSessionById(row.conversation_id);
+    if (!existingSession && hasPendingAntigravityLaunch(projectPath)) {
+      // A DDAgent launch in this project has not reported its conversation id
+      // yet. Guessing the newest pending row can bind the wrong chat (two new
+      // chats at once) and the runtime would then delete it as a duplicate;
+      // skip — the runtime binds on `init` and the next scan indexes the rest.
+      return null;
+    }
+    if (!existingSession) {
+      const pendingAppSession = sessionsDb.findLatestPendingAppSession(this.provider, projectPath);
+      if (pendingAppSession) {
+        // The watcher can index the summary row after the runtime exited
+        // without reporting its id; bind it to the fresh app row so the
+        // sidebar does not get a duplicate provider-id entry.
+        sessionsDb.assignProviderSessionId(pendingAppSession.session_id, row.conversation_id);
+        existingSession = sessionsDb.getSessionById(pendingAppSession.session_id);
+      }
+    }
+
     const existingName = existingSession?.custom_name;
     const title = existingName && existingName !== FALLBACK_TITLE
       ? existingName
