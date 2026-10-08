@@ -27,6 +27,25 @@ SessionMessage _m(
 
 void main() {
   group('merge/dedupe', () {
+    test('history supersedes live Codex tool rows it already covers', () {
+      SessionMessage codexTool(String id, String toolId, String ts) => SessionMessage.fromJson({
+        'id': id,
+        'sessionId': 's1',
+        'timestamp': ts,
+        'provider': 'codex',
+        'kind': 'tool_use',
+        'toolId': toolId,
+        'toolName': 'Bash',
+      });
+      final persisted = codexTool('h1', 'call_abc', '2026-01-01T00:00:05Z');
+      final liveCovered = codexTool('live1', 'item_1', '2026-01-01T00:00:03Z');
+      final liveNewer = codexTool('live2', 'item_2', '2026-01-01T00:00:09Z');
+
+      final ids = computeMerged([persisted], [liveCovered, liveNewer]).map((m) => m.id).toList();
+
+      expect(ids, ['h1', 'live2']);
+    });
+
     test('a live tool_result carries its structured toolUseResult onto the card', () {
       final use = _m('u1', kind: 'tool_use', toolId: 't1', content: '');
       final result = SessionMessage.fromJson({

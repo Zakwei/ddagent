@@ -351,6 +351,14 @@ List<SessionMessage> computeMerged(List<SessionMessage> server, List<SessionMess
 
   final serverIds = {for (final m in server) m.id};
   final echoes = _echoIndex(server);
+  // Live Codex tool rows (SDK `item_N` ids, `command_execution` shape) share
+  // neither id nor content with the rollout's `call_…` rows, so they can't be
+  // matched one-to-one. Once persisted history reaches past one, it is
+  // superseded — keeping it would show every call twice after a refresh.
+  final latestServerTime = server.fold<int>(0, (latest, m) {
+    final t = _time(m) ?? 0;
+    return t > latest ? t : latest;
+  });
 
   // A live frame for a row the server already persisted folds into that row:
   // the persisted position/id stays, the payload comes from the newest frame
@@ -384,6 +392,11 @@ List<SessionMessage> computeMerged(List<SessionMessage> server, List<SessionMess
       }
     }
     if (m.kind == 'tool_use' && m.toolId != null && echoes.toolUseIds.contains(m.toolId)) {
+      return false;
+    }
+    if (m.provider == 'codex' &&
+        m.kind == 'tool_use' &&
+        (_time(m) ?? latestServerTime + 1) <= latestServerTime) {
       return false;
     }
     final fp = _orchestratorFingerprint(m);
