@@ -425,3 +425,13 @@ test('codex runtime sends a fatal stream error once, before a failed complete', 
     await rm(cwd, { recursive: true, force: true });
   }
 });
+
+test('readableCodexError shows the message inside a raw API error body', async () => {
+  const { readableCodexError } = await import('@/modules/providers/list/codex/codex-runtime.provider.js');
+  assert.equal(
+    readableCodexError('{"type":"error","status":400,"error":{"type":"invalid_request_error","message":"Model not supported"}}'),
+    'Model not supported',
+  );
+  assert.equal(readableCodexError('plain failure'), 'plain failure');
+  assert.equal(readableCodexError('{not json'), '{not json');
+});

@@ -73,6 +73,18 @@ function extractCodexTokenBudget(event: any, context: { used: number; total: num
   };
 }
 
+// API failures arrive as the raw response body
+// (`{"type":"error","status":400,"error":{"message":...}}`); show its message.
+export function readableCodexError(message: any) {
+  if (typeof message !== 'string' || !message.trimStart().startsWith('{')) return message;
+  try {
+    const body = JSON.parse(message);
+    return body?.error?.message ?? body?.message ?? message;
+  } catch {
+    return message;
+  }
+}
+
 // codex exec cannot ask for approval, so under `on-request` an escalation
 // outside the sandbox is refused; the refusal only shows in the item.
 function isCodexApprovalRefusal(item: any) {
@@ -197,7 +209,7 @@ function transformCodexEvent(event: any) {
     case 'turn.failed':
       return {
         type: 'turn_failed',
-        error: event.error
+        error: event.error ? { ...event.error, message: readableCodexError(event.error.message) } : event.error
       };
 
     case 'thread.started':
@@ -209,7 +221,7 @@ function transformCodexEvent(event: any) {
     case 'error':
       return {
         type: 'error',
-        message: event.message
+        message: readableCodexError(event.message)
       };
 
     default:
