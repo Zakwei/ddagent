@@ -183,6 +183,9 @@ export async function spawnCursor(command: string, options: AnyRecord = {}, ws: 
     let openLiveKind: 'text' | 'thinking' | null = null;
     // Tail of stderr; shown only when the run fails.
     let stderrTail = '';
+    // Text of the failure `error` already sent; the rejection reuses it so the
+    // dispatcher's late-error dedupe does not show the failure twice.
+    let reportedError: string | null = null;
 
     // Build Cursor CLI command
     const baseArgs: any = [];
@@ -418,9 +421,10 @@ export async function spawnCursor(command: string, options: AnyRecord = {}, ws: 
                 if (!resultSucceeded) {
                   const reason = [response.result, response.error?.message ?? response.error, response.message]
                     .find((value) => typeof value === 'string' && value.trim());
+                  reportedError = withStderrTail(reason || `cursor-agent run failed (${response.subtype || 'error'})`);
                   ws.send(createNormalizedMessage({
                     kind: 'error',
-                    content: withStderrTail(reason || `cursor-agent run failed (${response.subtype || 'error'})`),
+                    content: reportedError,
                     sessionId: liveSessionId(),
                     provider: 'cursor',
                   }));
@@ -480,8 +484,14 @@ export async function spawnCursor(command: string, options: AnyRecord = {}, ws: 
         stderrTail = (stderrTail + stderrText).slice(-CURSOR_STDERR_TAIL_CHARS);
       });
 
+      // Node emits 'close' after a spawn 'error'; that handler reports it.
+      let spawnFailed = false;
+
       // Handle process completion
       cursorProcess.on('close', async (code: any) => {
+        if (spawnFailed) {
+          return;
+        }
         // The process map is keyed by the app session id when one was given,
         // otherwise by the captured provider id (or the timestamp fallback).
         const finalSessionId = sessionId || capturedSessionId || processKey;
@@ -519,9 +529,10 @@ export async function spawnCursor(command: string, options: AnyRecord = {}, ws: 
         if (!completeSent && !cursorProcess.aborted) {
           completeSent = true;
           if (!succeeded) {
+            reportedError = withStderrTail(`cursor-agent exited with code ${code}`);
             ws.send(createNormalizedMessage({
               kind: 'error',
-              content: withStderrTail(`cursor-agent exited with code ${code}`),
+              content: reportedError,
               sessionId: liveSessionId(),
               provider: 'cursor',
             }));
@@ -547,7 +558,7 @@ export async function spawnCursor(command: string, options: AnyRecord = {}, ws: 
         } else {
           console.error('Cursor CLI failed:', withStderrTail(`exit code ${code}`));
           notifyTerminalState({ code: code ?? 1 });
-          settleOnce(() => reject(new Error(`Cursor CLI exited with code ${code}`)));
+          settleOnce(() => reject(new Error(reportedError ?? `Cursor CLI exited with code ${code}`)));
         }
       });
 
@@ -557,6 +568,7 @@ export async function spawnCursor(command: string, options: AnyRecord = {}, ws: 
           settleOnce(() => resolve());
           return;
         }
+        spawnFailed = true;
         console.error('Cursor CLI process error:', error);
 
         // Clean up process reference on error

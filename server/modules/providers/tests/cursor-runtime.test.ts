@@ -61,8 +61,9 @@ async function runCursor(lines: unknown[], { stderr = '', code = 0 } = {}) {
   for (const line of lines) child.stdout.emit('data', Buffer.from(`${JSON.stringify(line)}\n`));
   child.exitCode = code;
   child.emit('close', code);
-  const outcome = await run.then(() => 'resolved', () => 'rejected');
-  return { sent, signals, outcome };
+  let rejection: string | undefined;
+  const outcome = await run.then(() => 'resolved', (error: Error) => { rejection = error.message; return 'rejected'; });
+  return { sent, signals, outcome, rejection };
 }
 
 const text = (value: string) => ({ type: 'assistant', message: { content: [{ type: 'text', text: value }] } });
@@ -87,18 +88,21 @@ test('cursor: text segments close at tool calls and the result; thinking streams
 });
 
 test('cursor: a failed result reports its text and the stderr tail before complete', async () => {
-  const { sent, outcome } = await runCursor(
+  const { sent, outcome, rejection } = await runCursor(
     [{ type: 'result', subtype: 'error', is_error: true, result: 'Model unavailable' }],
     { stderr: 'boom details', code: 1 },
   );
   assert.equal(outcome, 'rejected');
+  // Same text as the sent error, so the dispatcher's late error dedupes.
+  assert.equal(rejection, 'Model unavailable\nboom details');
   assert.deepEqual(sent.map((msg) => msg.kind), ['error', 'complete']);
   assert.equal(sent[0].content, 'Model unavailable\nboom details');
   assert.equal(sent[1].exitCode, 1);
 });
 
 test('cursor: a silent non-zero exit sends an error before complete', async () => {
-  const { sent } = await runCursor([], { code: 3 });
+  const { sent, rejection } = await runCursor([], { code: 3 });
+  assert.equal(rejection, 'cursor-agent exited with code 3');
   assert.deepEqual(sent.map((msg) => msg.kind), ['error', 'complete']);
   assert.equal(sent[0].content, 'cursor-agent exited with code 3');
   assert.equal(sent[1].exitCode, 3);
@@ -118,4 +122,20 @@ test('cursor: abort escalates SIGTERM to SIGKILL when the process ignores it', a
   assert.deepEqual(signals, ['SIGTERM', 'SIGKILL']);
   child.emit('close', null);
   await run;
+});
+
+test('cursor: a spawn failure sends one error, then one complete', async () => {
+  const { child } = fakeChild();
+  const runtime = await loadCursorRuntime(() => child);
+  const sent: any[] = [];
+  const context = { resolveProviderSessionId: () => null, resolveResumeModel: async () => undefined, isProviderInstalled: async () => false, normalizeMessage: () => [] };
+  const run = runtime.spawnCursor('hello', { sessionId: 'enoent-app', cwd: '/tmp' }, { send: (msg: unknown) => sent.push(msg) }, context);
+  run.catch(() => {});
+  await new Promise((resolve) => setImmediate(resolve));
+  // Node emits 'close' right after a spawn 'error'.
+  child.emit('error', Object.assign(new Error('spawn cursor-agent ENOENT'), { code: 'ENOENT' }));
+  child.emit('close', -2);
+  await run.then(() => {}, () => {});
+  assert.deepEqual(sent.map((msg) => msg.kind), ['error', 'complete']);
+  assert.match(sent[0].content, /not installed/);
 });
