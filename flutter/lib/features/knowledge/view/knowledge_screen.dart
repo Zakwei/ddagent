@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
+import 'package:ddagent_app/core/widgets/app_nav_menu.dart';
 import 'package:ddagent_app/features/knowledge/data/knowledge_models.dart';
 import 'package:ddagent_app/features/knowledge/data/knowledge_repository.dart';
 import 'package:ddagent_app/features/knowledge/state/knowledge_controller.dart';
@@ -606,6 +608,9 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
       length: 6,
       child: Scaffold(
         appBar: AppBar(
+          // Own Scaffold without a drawer, so the AppBar can't find the shell's
+          // hamburger by itself — on compact this was a dead end.
+          leading: context.breakpoint.isCompact ? const AppNavMenuButton() : null,
           title: Text(t.knowledge.title),
           actions: [
             DropdownButton<String?>(
