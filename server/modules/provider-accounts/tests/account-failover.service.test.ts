@@ -72,7 +72,7 @@ function setup(options: {
     },
     now: () => NOW,
   });
-  if (options.enabled) service.updateSettings({ autoSwitchOnLimit: true });
+  if (options.enabled) service.updateSettings('claude', { autoSwitchOnLimit: true });
   return { service, moves, carried, refreshes: () => refreshes };
 }
 
@@ -84,11 +84,24 @@ const turn = (accountId: string | null, providerSessionId: string | null = null,
   model,
 });
 
-test('auto-switch is off by default and persists when enabled', () => {
+test('auto-switch is off by default and is stored per agent', () => {
   const { service } = setup({});
-  assert.deepEqual(service.getSettings(), { autoSwitchOnLimit: false });
-  service.updateSettings({ autoSwitchOnLimit: true });
-  assert.deepEqual(service.getSettings(), { autoSwitchOnLimit: true });
+  assert.deepEqual(service.getSettings('claude'), { autoSwitchOnLimit: false });
+  service.updateSettings('claude', { autoSwitchOnLimit: true });
+  service.updateSettings('codex', { autoSwitchOnLimit: false });
+  assert.deepEqual(service.getSettings('claude'), { autoSwitchOnLimit: true });
+  assert.deepEqual(service.getSettings('codex'), { autoSwitchOnLimit: false });
+  assert.deepEqual(service.getSettings('devin'), { autoSwitchOnLimit: false });
+});
+
+test("another agent's setting does not enable switching", async () => {
+  const { service, moves } = setup({
+    accounts: [account('a', 'claude'), account('b', 'claude')],
+    quota: [quotaEntry('claude', 'a', [window('5h', 100)]), quotaEntry('claude', 'b', [window('5h', 10)])],
+  });
+  service.updateSettings('codex', { autoSwitchOnLimit: true });
+  assert.equal(await service.prepareTurnAccount(turn('a')), null);
+  assert.deepEqual(moves, []);
 });
 
 test('disabled setting never moves an exhausted session', async () => {

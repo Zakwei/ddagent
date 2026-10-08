@@ -192,19 +192,28 @@ final providerAccountsProvider = NotifierProvider.autoDispose
       ProviderAccountsController.new,
     );
 
-/// Limit auto-switch preference (`/api/provider-accounts/settings`): when a
-/// session's account runs out of its usage limit, the server moves it to
-/// another account of the SAME agent that still has headroom — even over a
-/// manual pick. One server-wide flag, off by default.
+/// Limit auto-switch preference of one agent
+/// (`/api/provider-accounts/settings?provider=`): when a session's account runs
+/// out of its usage limit, the server moves it to another account of the SAME
+/// agent that still has headroom — even over a manual pick. Each agent opts in
+/// separately; off by default.
 class AccountAutoSwitchController extends AsyncNotifier<bool> {
+  AccountAutoSwitchController(this._provider);
+
+  final String _provider;
+
   static bool _parse(dynamic data) {
     final settings = data is Map ? data['settings'] : null;
     return settings is Map && settings['autoSwitchOnLimit'] == true;
   }
 
   @override
-  Future<bool> build() =>
-      apiCall(() => ref.read(dioProvider).get<dynamic>('/api/provider-accounts/settings'), _parse);
+  Future<bool> build() => apiCall(
+    () => ref
+        .read(dioProvider)
+        .get<dynamic>('/api/provider-accounts/settings', queryParameters: {'provider': _provider}),
+    _parse,
+  );
 
   /// Optimistic toggle; reverts and returns the error message when saving fails.
   Future<String?> setEnabled(bool value) async {
@@ -214,7 +223,10 @@ class AccountAutoSwitchController extends AsyncNotifier<bool> {
       final saved = await apiCall(
         () => ref
             .read(dioProvider)
-            .put<dynamic>('/api/provider-accounts/settings', data: {'autoSwitchOnLimit': value}),
+            .put<dynamic>(
+              '/api/provider-accounts/settings',
+              data: {'provider': _provider, 'autoSwitchOnLimit': value},
+            ),
         _parse,
       );
       if (ref.mounted) state = AsyncData(saved);
@@ -226,7 +238,6 @@ class AccountAutoSwitchController extends AsyncNotifier<bool> {
   }
 }
 
-final accountAutoSwitchProvider =
-    AsyncNotifierProvider.autoDispose<AccountAutoSwitchController, bool>(
-      AccountAutoSwitchController.new,
-    );
+/// Keyed by provider id.
+final accountAutoSwitchProvider = AsyncNotifierProvider.autoDispose
+    .family<AccountAutoSwitchController, bool, String>(AccountAutoSwitchController.new);

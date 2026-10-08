@@ -537,7 +537,7 @@ export async function dispatchChatCommand(
   // even over the user's manual pick. Never switches agents. Awaited only
   // when enabled, so the default path still starts the runtime in the same
   // tick as the run it registered.
-  const preTurnSwitch = accountFailoverService.getSettings().autoSwitchOnLimit
+  const preTurnSwitch = accountFailoverService.getSettings(provider).autoSwitchOnLimit
     ? await accountFailoverService.prepareTurnAccount(failoverSession()).catch((error: unknown) => {
       console.error('[Chat] Account auto-switch check failed', { sessionId, error });
       return null;

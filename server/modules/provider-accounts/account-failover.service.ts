@@ -5,7 +5,7 @@ import path from 'node:path';
 import { appConfigDb, providerAccountsDb, sessionsDb, type ProviderAccount } from '@/modules/database/index.js';
 import type { LLMProvider, QuotaAccount, QuotaWindow } from '@/shared/types.js';
 
-/** app_config key holding the auto-switch preference. */
+/** app_config key holding the per-provider auto-switch preference (`{ providers: { claude: true } }`). */
 const FAILOVER_SETTINGS_KEY = 'provider_accounts.failover';
 
 /** How long a limit hit with no parseable reset time keeps an account out of rotation. */
@@ -36,6 +36,9 @@ type AccountFailoverSettings = {
   /** Move a session to another account of the same provider when its account hits a limit. */
   autoSwitchOnLimit: boolean;
 };
+
+/** Stored shape: each agent opts in separately; absent means off. */
+type StoredFailoverSettings = { providers?: Record<string, boolean> };
 
 /** A limit reading pulled from one runtime event. */
 type UsageLimitHit = {
@@ -221,7 +224,7 @@ export function carryOverConversationOnDisk(input: CarryOverInput): boolean {
  * sweep and against limit errors seen at runtime, and an exhausted account is
  * swapped for another account OF THE SAME PROVIDER with headroom — never for
  * a different agent. The user's manual pick is overridden only while it is
- * exhausted, and only when the user enabled the setting.
+ * exhausted, and only when the user enabled the setting for that agent.
  */
 export function createAccountFailoverService(dependencies: AccountFailoverDependencies) {
   /** `${provider}:${accountId}` → epoch ms until which a runtime limit hit benches the account. */
@@ -237,14 +240,19 @@ export function createAccountFailoverService(dependencies: AccountFailoverDepend
     return false;
   }
 
-  function getSettings(): AccountFailoverSettings {
+  function readStored(): Record<string, boolean> {
     try {
       const raw = dependencies.store.get(FAILOVER_SETTINGS_KEY);
-      const parsed = raw ? (JSON.parse(raw) as Partial<AccountFailoverSettings>) : {};
-      return { autoSwitchOnLimit: parsed.autoSwitchOnLimit === true };
+      const parsed = raw ? (JSON.parse(raw) as StoredFailoverSettings) : {};
+      return parsed.providers && typeof parsed.providers === 'object' ? parsed.providers : {};
     } catch {
-      return { autoSwitchOnLimit: false };
+      return {};
     }
+  }
+
+  /** One agent's preference — each agent's accounts opt in on their own. */
+  function getSettings(provider: LLMProvider): AccountFailoverSettings {
+    return { autoSwitchOnLimit: readStored()[provider] === true };
   }
 
   /**
@@ -343,13 +351,14 @@ export function createAccountFailoverService(dependencies: AccountFailoverDepend
   return {
     getSettings,
 
-    updateSettings(patch: Partial<AccountFailoverSettings>): AccountFailoverSettings {
-      const next: AccountFailoverSettings = {
-        ...getSettings(),
-        ...(typeof patch.autoSwitchOnLimit === 'boolean' ? { autoSwitchOnLimit: patch.autoSwitchOnLimit } : {}),
-      };
-      dependencies.store.set(FAILOVER_SETTINGS_KEY, JSON.stringify(next));
-      return next;
+    updateSettings(provider: LLMProvider, patch: Partial<AccountFailoverSettings>): AccountFailoverSettings {
+      if (typeof patch.autoSwitchOnLimit === 'boolean') {
+        const stored: StoredFailoverSettings = {
+          providers: { ...readStored(), [provider]: patch.autoSwitchOnLimit },
+        };
+        dependencies.store.set(FAILOVER_SETTINGS_KEY, JSON.stringify(stored));
+      }
+      return getSettings(provider);
     },
 
     /**
@@ -380,7 +389,7 @@ export function createAccountFailoverService(dependencies: AccountFailoverDepend
      * with headroom, or the conversation cannot move).
      */
     async prepareTurnAccount(input: SessionTurnInput): Promise<AccountSwitch | null> {
-      if (!getSettings().autoSwitchOnLimit) return null;
+      if (!getSettings(input.provider).autoSwitchOnLimit) return null;
       const model = input.model ?? '';
       const quota = await dependencies.readQuotaAccounts();
       const exhausted = isMarkedLimited(input.provider, input.accountId)
@@ -402,7 +411,7 @@ export function createAccountFailoverService(dependencies: AccountFailoverDepend
         : now + (hit.transient ? RATE_LIMIT_COOLDOWN_MS : USAGE_LIMIT_COOLDOWN_MS);
       limitedUntil.set(limitKey(input.provider, input.accountId), until);
       dependencies.refreshQuota();
-      if (!getSettings().autoSwitchOnLimit) return null;
+      if (!getSettings(input.provider).autoSwitchOnLimit) return null;
       const quota = await dependencies.readQuotaAccounts();
       const target = pickTarget(input.provider, input.accountId, input.model ?? '', quota);
       return target ? switchSession(input, target, quota) : null;

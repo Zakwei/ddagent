@@ -814,11 +814,12 @@ class _AgentNotInstalledCard extends ConsumerWidget {
 }
 
 /// ProviderAccountsSection — named accounts CRUD + per-account usage probe.
-/// Opt-in limit failover: a session whose account hit its usage limit moves
-/// to another account of the same agent. The flag is server-wide, so every
-/// agent's account card shows the same switch.
+/// Opt-in limit failover for one agent: a session whose account hit its usage
+/// limit moves to another account of the same agent.
 class _AccountAutoSwitchRow extends ConsumerWidget {
-  const _AccountAutoSwitchRow();
+  const _AccountAutoSwitchRow({required this.agent});
+
+  final String agent;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -826,7 +827,7 @@ class _AccountAutoSwitchRow extends ConsumerWidget {
     final c = context.appColors;
     final tt = Theme.of(context).textTheme;
     final autoSwitchT = t.settings.agents.accounts.autoSwitch;
-    final enabled = ref.watch(accountAutoSwitchProvider);
+    final enabled = ref.watch(accountAutoSwitchProvider(agent));
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -854,7 +855,7 @@ class _AccountAutoSwitchRow extends ConsumerWidget {
                 ? null
                 : (value) async {
                     final error = await ref
-                        .read(accountAutoSwitchProvider.notifier)
+                        .read(accountAutoSwitchProvider(agent).notifier)
                         .setEnabled(value);
                     if (error != null && context.mounted) {
                       AppToast.show(context, error, isError: true);
@@ -981,7 +982,7 @@ class _ProviderAccountsCardState extends ConsumerState<_ProviderAccountsCard> {
           // is one host-wide install, so there is no per-account update action.
           Text(accountsT.sharedCli, style: tt.labelSmall?.copyWith(color: c.mutedForeground)),
           const SizedBox(height: AppSpacing.md),
-          const _AccountAutoSwitchRow(),
+          _AccountAutoSwitchRow(agent: widget.agent),
 
           if (state.error != null) ...[
             const SizedBox(height: AppSpacing.sm),

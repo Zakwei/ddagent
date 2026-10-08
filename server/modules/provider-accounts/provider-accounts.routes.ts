@@ -45,12 +45,13 @@ export function createProviderAccountsRouter() {
     }),
   );
 
-  // Limit auto-switch preference (off by default — not everyone wants a
-  // manually picked account overridden).
+  // Limit auto-switch preference, per agent (off by default — not everyone
+  // wants a manually picked account overridden).
   router.get(
     '/settings',
-    asyncHandler(async (_req: Request, res: Response) => {
-      res.json(createApiSuccessResponse({ settings: accountFailoverService.getSettings() }));
+    asyncHandler(async (req: Request, res: Response) => {
+      const provider = parseProvider(req.query.provider);
+      res.json(createApiSuccessResponse({ settings: accountFailoverService.getSettings(provider) }));
     }),
   );
 
@@ -64,7 +65,7 @@ export function createProviderAccountsRouter() {
           statusCode: 400,
         });
       }
-      const settings = accountFailoverService.updateSettings({
+      const settings = accountFailoverService.updateSettings(parseProvider(body.provider), {
         autoSwitchOnLimit: body.autoSwitchOnLimit as boolean | undefined,
       });
       res.json(createApiSuccessResponse({ settings }));
