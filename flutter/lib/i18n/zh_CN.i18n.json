@@ -236,6 +236,8 @@
       "alwaysDeny": "始终拒绝",
       "denyFeedbackTitle": "拒绝计划",
       "denyFeedbackHint": "需要智能体修改什么？（可选）",
+      "denyReasonTitle": "拒绝此操作",
+      "denyReasonHint": "告诉代理原因或应改做什么（可选）",
       "modeAppliesNextMessage": "新的权限模式将从下一条消息开始生效。"
     },
     "todo": {

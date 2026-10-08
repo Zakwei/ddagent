@@ -1000,6 +1000,8 @@ class Translations$chat$permissions$ko extends Translations$chat$permissions$en 
 	@override String get alwaysDeny => '항상 거부';
 	@override String get denyFeedbackTitle => '계획 거부';
 	@override String get denyFeedbackHint => '에이전트가 무엇을 바꿔야 하나요? (선택 사항)';
+	@override String get denyReasonTitle => '이 작업 거부';
+	@override String get denyReasonHint => '이유나 대신 할 일을 에이전트에게 알려 주세요 (선택)';
 	@override String get modeAppliesNextMessage => '새 권한 모드는 다음 메시지부터 적용됩니다.';
 }
 
@@ -8634,6 +8636,8 @@ extension on TranslationsKo {
 			'chat.permissions.alwaysDeny' => '항상 거부',
 			'chat.permissions.denyFeedbackTitle' => '계획 거부',
 			'chat.permissions.denyFeedbackHint' => '에이전트가 무엇을 바꿔야 하나요? (선택 사항)',
+			'chat.permissions.denyReasonTitle' => '이 작업 거부',
+			'chat.permissions.denyReasonHint' => '이유나 대신 할 일을 에이전트에게 알려 주세요 (선택)',
 			'chat.permissions.modeAppliesNextMessage' => '새 권한 모드는 다음 메시지부터 적용됩니다.',
 			'chat.todo.updated' => 'Todo 리스트가 업데이트되었습니다',
 			'chat.todo.current' => '현재 Todo 리스트',
@@ -8977,10 +8981,10 @@ extension on TranslationsKo {
 			'chat.modelLibrary.addedNotice' => ({required Object name}) => '${name}을(를) 추가했습니다.',
 			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '${name}을(를) 삭제했습니다.',
 			'chat.modelLibrary.saving' => '저장 중…',
-			'chat.modelLibrary.saveChanges' => '변경 사항 저장',
-			'chat.modelLibrary.deleteConfirm' => '모든 선택기에서 이 모델을 삭제할까요?',
 			_ => null,
 		} ?? switch (path) {
+			'chat.modelLibrary.saveChanges' => '변경 사항 저장',
+			'chat.modelLibrary.deleteConfirm' => '모든 선택기에서 이 모델을 삭제할까요?',
 			'chat.modelLibrary.customBadge' => '사용자 지정',
 			'chat.changes.failedToLoad' => '변경사항을 불러오지 못했습니다',
 			'chat.changes.empty' => '파일 변경 없음',
@@ -9491,10 +9495,10 @@ extension on TranslationsKo {
 			'common.projectWizard.step2.nonePublic' => '없음 (공개)',
 			'common.projectWizard.step2.selectToken' => '토큰 선택',
 			'common.projectWizard.step2.selectTokenPlaceholder' => '-- 토큰 선택 --',
-			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-			'common.projectWizard.step2.tokenHelp' => '이 토큰은 이 작업에만 사용됩니다',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+			'common.projectWizard.step2.tokenHelp' => '이 토큰은 이 작업에만 사용됩니다',
 			'common.projectWizard.step2.publicRepoInfo' => '공개 저장소는 인증이 필요하지 않습니다. 공개 저장소를 clone하는 경우 토큰을 생략할 수 있습니다.',
 			'common.projectWizard.step2.noTokensHelp' => '저장된 토큰이 없습니다. 설정 → API Keys에서 토큰을 추가하면 재사용이 편리합니다.',
 			'common.projectWizard.step2.optionalTokenPublic' => 'GitHub 토큰 (공개 저장소는 선택사항)',
@@ -10005,10 +10009,10 @@ extension on TranslationsKo {
 			'settings.mcp.scope.user' => '사용자',
 			'settings.mcp.scope.project' => '프로젝트',
 			'settings.appearance.title' => '외관',
-			'settings.appearance.theme' => '테마',
-			'settings.appearance.codeEditor' => '코드 에디터',
 			_ => null,
 		} ?? switch (path) {
+			'settings.appearance.theme' => '테마',
+			'settings.appearance.codeEditor' => '코드 에디터',
 			'settings.appearance.editorTheme' => '에디터 테마',
 			'settings.appearance.wordWrap' => '자동 줄바꿈',
 			'settings.appearance.showMinimap' => '미니맵 표시',
@@ -10519,10 +10523,10 @@ extension on TranslationsKo {
 			'settings.workspaces.title' => '작업 영역',
 			'settings.workspaces.pathRequired' => '경로는 필수입니다',
 			'settings.stt.title' => '음성 입력 (음성 인식)',
-			'settings.stt.description' => 'Whisper 호환 /audio/transcriptions 엔드포인트 (OpenAI, whisper.cpp, faster-whisper, Speaches). 입력창의 마이크 버튼을 활성화합니다.',
-			'settings.stt.configured' => '구성됨',
 			_ => null,
 		} ?? switch (path) {
+			'settings.stt.description' => 'Whisper 호환 /audio/transcriptions 엔드포인트 (OpenAI, whisper.cpp, faster-whisper, Speaches). 입력창의 마이크 버튼을 활성화합니다.',
+			'settings.stt.configured' => '구성됨',
 			'settings.stt.endpoint' => '엔드포인트 URL (예: https://api.openai.com/v1)',
 			'settings.stt.apiKey' => 'API 키',
 			'settings.stt.model' => '모델 (기본값: whisper-1)',
@@ -11033,10 +11037,10 @@ extension on TranslationsKo {
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => '작업 ${id}: ${title}',
 			'tasks.taskDetail.testStrategy' => '테스트 전략',
 			'tasks.taskDetail.titleRequired' => '제목은 필수입니다',
-			'tasks.taskDetail.updateFailed' => '작업 업데이트 실패',
-			'tasks.taskDetail.notFound' => '작업을 찾을 수 없습니다',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.updateFailed' => '작업 업데이트 실패',
+			'tasks.taskDetail.notFound' => '작업을 찾을 수 없습니다',
 			'tasks.taskDetail.subtasks' => '하위 작업',
 			'tasks.taskDetail.deleteConfirmMessage' => ({required Object id}) => '작업 #${id}이(가) 제거됩니다. 되돌릴 수 없습니다.',
 			'tasks.taskDetail.idCopied' => '작업 ID 복사됨',
@@ -11547,10 +11551,10 @@ extension on TranslationsKo {
 			'terminal.overlay.processExited' => '프로세스가 종료되었습니다 — 연결하면 다시 시작합니다',
 			'terminal.overlay.processExitedWithCode' => ({required Object code}) => '프로세스가 종료되었습니다(코드 ${code}) — 연결하면 다시 시작합니다',
 			'terminal.overlay.resumeSession' => ({required Object title}) => '세션 ${title} 재개',
-			'terminal.overlay.startSession' => ({required Object path}) => '${path}에서 새 세션 시작',
-			'voice.preview' => '미리보기',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.overlay.startSession' => ({required Object path}) => '${path}에서 새 세션 시작',
+			'voice.preview' => '미리보기',
 			'voice.settingsSaved' => '음성 입력 설정이 저장되었습니다',
 			'voice.saveFailed' => 'STT 설정 저장 실패',
 			'voice.apiKeySaved' => 'API 키 (저장됨, 교체하려면 입력)',

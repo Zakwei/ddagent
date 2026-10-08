@@ -1000,6 +1000,8 @@ class Translations$chat$permissions$zh_TW extends Translations$chat$permissions$
 	@override String get alwaysDeny => '一律拒絕';
 	@override String get denyFeedbackTitle => '拒絕計畫';
 	@override String get denyFeedbackHint => '需要代理修改什麼？（選填）';
+	@override String get denyReasonTitle => '拒絕此操作';
+	@override String get denyReasonHint => '告訴代理原因或應改做什麼（選填）';
 	@override String get modeAppliesNextMessage => '新的權限模式將從下一則訊息開始生效。';
 }
 
@@ -8634,6 +8636,8 @@ extension on TranslationsZhTw {
 			'chat.permissions.alwaysDeny' => '一律拒絕',
 			'chat.permissions.denyFeedbackTitle' => '拒絕計畫',
 			'chat.permissions.denyFeedbackHint' => '需要代理修改什麼？（選填）',
+			'chat.permissions.denyReasonTitle' => '拒絕此操作',
+			'chat.permissions.denyReasonHint' => '告訴代理原因或應改做什麼（選填）',
 			'chat.permissions.modeAppliesNextMessage' => '新的權限模式將從下一則訊息開始生效。',
 			'chat.todo.updated' => '待辦清單已成功更新',
 			'chat.todo.current' => '目前待辦清單',
@@ -8977,10 +8981,10 @@ extension on TranslationsZhTw {
 			'chat.modelLibrary.addedNotice' => ({required Object name}) => '已新增 ${name}。',
 			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '已刪除 ${name}。',
 			'chat.modelLibrary.saving' => '正在儲存…',
-			'chat.modelLibrary.saveChanges' => '儲存變更',
-			'chat.modelLibrary.deleteConfirm' => '要從所有選擇器中刪除此模型嗎？',
 			_ => null,
 		} ?? switch (path) {
+			'chat.modelLibrary.saveChanges' => '儲存變更',
+			'chat.modelLibrary.deleteConfirm' => '要從所有選擇器中刪除此模型嗎？',
 			'chat.modelLibrary.customBadge' => '自訂',
 			'chat.changes.failedToLoad' => '載入變更失敗',
 			'chat.changes.empty' => '沒有檔案變更',
@@ -9491,10 +9495,10 @@ extension on TranslationsZhTw {
 			'common.projectWizard.step2.nonePublic' => '無（公開）',
 			'common.projectWizard.step2.selectToken' => '選取權杖',
 			'common.projectWizard.step2.selectTokenPlaceholder' => '-- 選取權杖 --',
-			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-			'common.projectWizard.step2.tokenHelp' => '此權杖僅用於此操作',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+			'common.projectWizard.step2.tokenHelp' => '此權杖僅用於此操作',
 			'common.projectWizard.step2.publicRepoInfo' => '公開儲存庫不需要身分驗證。如果複製公開儲存庫，可以略過提供權杖。',
 			'common.projectWizard.step2.noTokensHelp' => '沒有可用的已儲存權杖。您可以在 設定 → API 金鑰 中新增權杖以便重複使用。',
 			'common.projectWizard.step2.optionalTokenPublic' => 'GitHub 權杖（公開儲存庫可選）',
@@ -10005,10 +10009,10 @@ extension on TranslationsZhTw {
 			'settings.mcp.scope.user' => '使用者',
 			'settings.mcp.scope.project' => '專案',
 			'settings.appearance.title' => '外觀',
-			'settings.appearance.theme' => '佈景主題',
-			'settings.appearance.codeEditor' => '程式碼編輯器',
 			_ => null,
 		} ?? switch (path) {
+			'settings.appearance.theme' => '佈景主題',
+			'settings.appearance.codeEditor' => '程式碼編輯器',
 			'settings.appearance.editorTheme' => '編輯器佈景主題',
 			'settings.appearance.wordWrap' => '自動換行',
 			'settings.appearance.showMinimap' => '顯示縮圖',
@@ -10519,10 +10523,10 @@ extension on TranslationsZhTw {
 			'settings.workspaces.title' => '工作區',
 			'settings.workspaces.pathRequired' => '路徑為必填項。',
 			'settings.stt.title' => '語音輸入（語音轉文字）',
-			'settings.stt.description' => '相容 Whisper 的 /audio/transcriptions 端點（OpenAI、whisper.cpp、faster-whisper、Speaches）。啟用後，輸入區會出現麥克風按鈕。',
-			'settings.stt.configured' => '已設定',
 			_ => null,
 		} ?? switch (path) {
+			'settings.stt.description' => '相容 Whisper 的 /audio/transcriptions 端點（OpenAI、whisper.cpp、faster-whisper、Speaches）。啟用後，輸入區會出現麥克風按鈕。',
+			'settings.stt.configured' => '已設定',
 			'settings.stt.endpoint' => '端點 URL（例如 https://api.openai.com/v1）',
 			'settings.stt.apiKey' => 'API 金鑰',
 			'settings.stt.model' => '模型（預設：whisper-1）',
@@ -11033,10 +11037,10 @@ extension on TranslationsZhTw {
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => '任務 ${id}：${title}',
 			'tasks.taskDetail.testStrategy' => '測試策略',
 			'tasks.taskDetail.titleRequired' => '標題為必填項',
-			'tasks.taskDetail.updateFailed' => '更新任務失敗',
-			'tasks.taskDetail.notFound' => '找不到任務',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.updateFailed' => '更新任務失敗',
+			'tasks.taskDetail.notFound' => '找不到任務',
 			'tasks.taskDetail.subtasks' => '子任務',
 			'tasks.taskDetail.deleteConfirmMessage' => ({required Object id}) => '任務 #${id} 將被移除。此操作無法復原。',
 			'tasks.taskDetail.idCopied' => '已複製任務 ID',
@@ -11547,10 +11551,10 @@ extension on TranslationsZhTw {
 			'terminal.overlay.processExited' => '程序已結束 — 連線以重新啟動',
 			'terminal.overlay.processExitedWithCode' => ({required Object code}) => '程序已結束（代碼 ${code}）— 連線以重新啟動',
 			'terminal.overlay.resumeSession' => ({required Object title}) => '繼續工作階段 ${title}',
-			'terminal.overlay.startSession' => ({required Object path}) => '在 ${path} 中開始新的工作階段',
-			'voice.preview' => '預覽',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.overlay.startSession' => ({required Object path}) => '在 ${path} 中開始新的工作階段',
+			'voice.preview' => '預覽',
 			'voice.settingsSaved' => '語音輸入設定已儲存',
 			'voice.saveFailed' => '儲存 STT 設定失敗',
 			'voice.apiKeySaved' => 'API 金鑰（已儲存，輸入以取代）',

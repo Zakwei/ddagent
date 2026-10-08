@@ -236,6 +236,8 @@
       "alwaysDeny": "Toujours refuser",
       "denyFeedbackTitle": "Refuser le plan",
       "denyFeedbackHint": "Que doit changer l’agent ? (facultatif)",
+      "denyReasonTitle": "Refuser cette action",
+      "denyReasonHint": "Dites à l'agent pourquoi ou quoi faire à la place (facultatif)",
       "modeAppliesNextMessage": "Le nouveau mode d’autorisation s’applique à partir du prochain message."
     },
     "todo": {

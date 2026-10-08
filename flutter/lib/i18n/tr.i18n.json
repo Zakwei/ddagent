@@ -236,6 +236,8 @@
       "alwaysDeny": "Her zaman reddet",
       "denyFeedbackTitle": "Planı reddet",
       "denyFeedbackHint": "Ajan neyi değiştirmeli? (isteğe bağlı)",
+      "denyReasonTitle": "Bu işlemi reddet",
+      "denyReasonHint": "Ajana nedenini ya da bunun yerine ne yapması gerektiğini yazın (isteğe bağlı)",
       "modeAppliesNextMessage": "Yeni izin modu bir sonraki mesajdan itibaren geçerli olur."
     },
     "todo": {

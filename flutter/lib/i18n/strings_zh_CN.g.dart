@@ -1000,6 +1000,8 @@ class Translations$chat$permissions$zh_CN extends Translations$chat$permissions$
 	@override String get alwaysDeny => '始终拒绝';
 	@override String get denyFeedbackTitle => '拒绝计划';
 	@override String get denyFeedbackHint => '需要智能体修改什么？（可选）';
+	@override String get denyReasonTitle => '拒绝此操作';
+	@override String get denyReasonHint => '告诉代理原因或应改做什么（可选）';
 	@override String get modeAppliesNextMessage => '新的权限模式将从下一条消息开始生效。';
 }
 
@@ -8634,6 +8636,8 @@ extension on TranslationsZhCn {
 			'chat.permissions.alwaysDeny' => '始终拒绝',
 			'chat.permissions.denyFeedbackTitle' => '拒绝计划',
 			'chat.permissions.denyFeedbackHint' => '需要智能体修改什么？（可选）',
+			'chat.permissions.denyReasonTitle' => '拒绝此操作',
+			'chat.permissions.denyReasonHint' => '告诉代理原因或应改做什么（可选）',
 			'chat.permissions.modeAppliesNextMessage' => '新的权限模式将从下一条消息开始生效。',
 			'chat.todo.updated' => '待办列表已成功更新',
 			'chat.todo.current' => '当前待办列表',
@@ -8977,10 +8981,10 @@ extension on TranslationsZhCn {
 			'chat.modelLibrary.addedNotice' => ({required Object name}) => '已添加 ${name}。',
 			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '已删除 ${name}。',
 			'chat.modelLibrary.saving' => '正在保存…',
-			'chat.modelLibrary.saveChanges' => '保存更改',
-			'chat.modelLibrary.deleteConfirm' => '要从所有选择器中删除此模型吗？',
 			_ => null,
 		} ?? switch (path) {
+			'chat.modelLibrary.saveChanges' => '保存更改',
+			'chat.modelLibrary.deleteConfirm' => '要从所有选择器中删除此模型吗？',
 			'chat.modelLibrary.customBadge' => '自定义',
 			'chat.changes.failedToLoad' => '加载更改失败',
 			'chat.changes.empty' => '没有文件更改',
@@ -9491,10 +9495,10 @@ extension on TranslationsZhCn {
 			'common.projectWizard.step2.nonePublic' => '无（公共）',
 			'common.projectWizard.step2.selectToken' => '选择令牌',
 			'common.projectWizard.step2.selectTokenPlaceholder' => '-- 选择令牌 --',
-			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-			'common.projectWizard.step2.tokenHelp' => '此令牌仅用于此操作',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+			'common.projectWizard.step2.tokenHelp' => '此令牌仅用于此操作',
 			'common.projectWizard.step2.publicRepoInfo' => '公共仓库不需要身份验证。如果克隆公共仓库，可以跳过提供令牌。',
 			'common.projectWizard.step2.noTokensHelp' => '没有可用的已保存令牌。您可以在 设置 → API 密钥 中添加令牌以便重复使用。',
 			'common.projectWizard.step2.optionalTokenPublic' => 'GitHub 令牌（公共仓库可选）',
@@ -10005,10 +10009,10 @@ extension on TranslationsZhCn {
 			'settings.mcp.scope.user' => '用户',
 			'settings.mcp.scope.project' => '项目',
 			'settings.appearance.title' => '外观',
-			'settings.appearance.theme' => '主题',
-			'settings.appearance.codeEditor' => '代码编辑器',
 			_ => null,
 		} ?? switch (path) {
+			'settings.appearance.theme' => '主题',
+			'settings.appearance.codeEditor' => '代码编辑器',
 			'settings.appearance.editorTheme' => '编辑器主题',
 			'settings.appearance.wordWrap' => '自动换行',
 			'settings.appearance.showMinimap' => '显示缩略图',
@@ -10519,10 +10523,10 @@ extension on TranslationsZhCn {
 			'settings.workspaces.title' => '工作区',
 			'settings.workspaces.pathRequired' => '路径为必填项',
 			'settings.stt.title' => '语音输入（语音转文字）',
-			'settings.stt.description' => '兼容 Whisper 的 /audio/transcriptions 端点（OpenAI、whisper.cpp、faster-whisper、Speaches）。启用后输入框中会显示麦克风按钮。',
-			'settings.stt.configured' => '已配置',
 			_ => null,
 		} ?? switch (path) {
+			'settings.stt.description' => '兼容 Whisper 的 /audio/transcriptions 端点（OpenAI、whisper.cpp、faster-whisper、Speaches）。启用后输入框中会显示麦克风按钮。',
+			'settings.stt.configured' => '已配置',
 			'settings.stt.endpoint' => '端点 URL（例如 https://api.openai.com/v1）',
 			'settings.stt.apiKey' => 'API 密钥',
 			'settings.stt.model' => '模型（默认：whisper-1）',
@@ -11033,10 +11037,10 @@ extension on TranslationsZhCn {
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => '任务 ${id}：${title}',
 			'tasks.taskDetail.testStrategy' => '测试策略',
 			'tasks.taskDetail.titleRequired' => '标题为必填项',
-			'tasks.taskDetail.updateFailed' => '更新任务失败',
-			'tasks.taskDetail.notFound' => '未找到任务',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.updateFailed' => '更新任务失败',
+			'tasks.taskDetail.notFound' => '未找到任务',
 			'tasks.taskDetail.subtasks' => '子任务',
 			'tasks.taskDetail.deleteConfirmMessage' => ({required Object id}) => '任务 #${id} 将被移除。此操作无法撤销。',
 			'tasks.taskDetail.idCopied' => '任务 ID 已复制',
@@ -11547,10 +11551,10 @@ extension on TranslationsZhCn {
 			'terminal.overlay.processExited' => '进程已退出 — 连接以重新启动',
 			'terminal.overlay.processExitedWithCode' => ({required Object code}) => '进程已退出（代码 ${code}）— 连接以重新启动',
 			'terminal.overlay.resumeSession' => ({required Object title}) => '恢复会话 ${title}',
-			'terminal.overlay.startSession' => ({required Object path}) => '在 ${path} 中开始新会话',
-			'voice.preview' => '预览',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.overlay.startSession' => ({required Object path}) => '在 ${path} 中开始新会话',
+			'voice.preview' => '预览',
 			'voice.settingsSaved' => '语音输入设置已保存',
 			'voice.saveFailed' => '保存 STT 配置失败',
 			'voice.apiKeySaved' => 'API 密钥（已保存，输入以替换）',

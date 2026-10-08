@@ -236,6 +236,8 @@
       "alwaysDeny": "常に拒否",
       "denyFeedbackTitle": "プランを却下",
       "denyFeedbackHint": "エージェントに何を変更してほしいですか？（任意）",
+      "denyReasonTitle": "この操作を拒否",
+      "denyReasonHint": "理由や代わりにしてほしいことをエージェントに伝えてください（任意）",
       "modeAppliesNextMessage": "新しい権限モードは次のメッセージから適用されます。"
     },
     "todo": {

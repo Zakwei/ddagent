@@ -1003,6 +1003,8 @@ class Translations$chat$permissions$pl extends Translations$chat$permissions$en 
 	@override String get alwaysDeny => 'Zawsze odmawiaj';
 	@override String get denyFeedbackTitle => 'Odrzuć plan';
 	@override String get denyFeedbackHint => 'Co agent powinien zmienić? (opcjonalnie)';
+	@override String get denyReasonTitle => 'Odmów tej akcji';
+	@override String get denyReasonHint => 'Napisz agentowi dlaczego albo co ma zrobić zamiast tego (opcjonalnie)';
 	@override String get modeAppliesNextMessage => 'Nowy tryb uprawnień zacznie obowiązywać od następnej wiadomości.';
 }
 
@@ -8685,6 +8687,8 @@ extension on TranslationsPl {
 			'chat.permissions.alwaysDeny' => 'Zawsze odmawiaj',
 			'chat.permissions.denyFeedbackTitle' => 'Odrzuć plan',
 			'chat.permissions.denyFeedbackHint' => 'Co agent powinien zmienić? (opcjonalnie)',
+			'chat.permissions.denyReasonTitle' => 'Odmów tej akcji',
+			'chat.permissions.denyReasonHint' => 'Napisz agentowi dlaczego albo co ma zrobić zamiast tego (opcjonalnie)',
 			'chat.permissions.modeAppliesNextMessage' => 'Nowy tryb uprawnień zacznie obowiązywać od następnej wiadomości.',
 			'chat.todo.updated' => 'Lista zadań została pomyślnie zaktualizowana',
 			'chat.todo.current' => 'Aktualna lista zadań',
@@ -9028,10 +9032,10 @@ extension on TranslationsPl {
 			'chat.modelLibrary.addedNotice' => ({required Object name}) => 'Dodano ${name}.',
 			'chat.modelLibrary.deletedNotice' => ({required Object name}) => 'Usunięto ${name}.',
 			'chat.modelLibrary.saving' => 'Zapisywanie…',
-			'chat.modelLibrary.saveChanges' => 'Zapisz zmiany',
-			'chat.modelLibrary.deleteConfirm' => 'Usunąć ten model ze wszystkich selektorów?',
 			_ => null,
 		} ?? switch (path) {
+			'chat.modelLibrary.saveChanges' => 'Zapisz zmiany',
+			'chat.modelLibrary.deleteConfirm' => 'Usunąć ten model ze wszystkich selektorów?',
 			'chat.modelLibrary.customBadge' => 'Własny',
 			'chat.changes.failedToLoad' => 'Nie udało się wczytać zmian',
 			'chat.changes.empty' => 'Brak zmian w plikach',
@@ -9542,10 +9546,10 @@ extension on TranslationsPl {
 			'common.projectWizard.step2.nonePublic' => 'Brak (publiczne)',
 			'common.projectWizard.step2.selectToken' => 'Wybierz token',
 			'common.projectWizard.step2.selectTokenPlaceholder' => '-- Wybierz token --',
-			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-			'common.projectWizard.step2.tokenHelp' => 'Ten token zostanie użyty tylko do tej operacji',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+			'common.projectWizard.step2.tokenHelp' => 'Ten token zostanie użyty tylko do tej operacji',
 			'common.projectWizard.step2.publicRepoInfo' => 'Repozytoria publiczne nie wymagają uwierzytelniania. Możesz pominąć podawanie tokenu, jeśli klonujesz publiczne repozytorium.',
 			'common.projectWizard.step2.noTokensHelp' => 'Brak zapisanych tokenów. Możesz dodać tokeny w Ustawienia → Klucze API, aby łatwiej używać ich ponownie.',
 			'common.projectWizard.step2.optionalTokenPublic' => 'Token GitHub (opcjonalny dla repozytoriów publicznych)',
@@ -10056,10 +10060,10 @@ extension on TranslationsPl {
 			'settings.mcp.scope.user' => 'Użytkownik',
 			'settings.mcp.scope.project' => 'Projekt',
 			'settings.appearance.title' => 'Wygląd',
-			'settings.appearance.theme' => 'Motyw',
-			'settings.appearance.codeEditor' => 'Edytor kodu',
 			_ => null,
 		} ?? switch (path) {
+			'settings.appearance.theme' => 'Motyw',
+			'settings.appearance.codeEditor' => 'Edytor kodu',
 			'settings.appearance.editorTheme' => 'Motyw edytora',
 			'settings.appearance.wordWrap' => 'Zawijanie wierszy',
 			'settings.appearance.showMinimap' => 'Pokaż minimapę',
@@ -10570,10 +10574,10 @@ extension on TranslationsPl {
 			'settings.workspaces.title' => 'Obszary robocze',
 			'settings.workspaces.pathRequired' => 'Ścieżka jest wymagana',
 			'settings.stt.title' => 'Wprowadzanie głosowe (speech-to-text)',
-			'settings.stt.description' => 'Endpoint zgodny z Whisper /audio/transcriptions (OpenAI, whisper.cpp, faster-whisper, Speaches). Włącza przycisk mikrofonu w polu wiadomości.',
-			'settings.stt.configured' => 'skonfigurowano',
 			_ => null,
 		} ?? switch (path) {
+			'settings.stt.description' => 'Endpoint zgodny z Whisper /audio/transcriptions (OpenAI, whisper.cpp, faster-whisper, Speaches). Włącza przycisk mikrofonu w polu wiadomości.',
+			'settings.stt.configured' => 'skonfigurowano',
 			'settings.stt.endpoint' => 'URL endpointu (np. https://api.openai.com/v1)',
 			'settings.stt.apiKey' => 'Klucz API',
 			'settings.stt.model' => 'Model (domyślnie: whisper-1)',
@@ -11084,10 +11088,10 @@ extension on TranslationsPl {
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'Zadanie ${id}: ${title}',
 			'tasks.taskDetail.testStrategy' => 'Strategia testowania',
 			'tasks.taskDetail.titleRequired' => 'Tytuł jest wymagany',
-			'tasks.taskDetail.updateFailed' => 'Nie udało się zaktualizować zadania',
-			'tasks.taskDetail.notFound' => 'Nie znaleziono zadania',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.updateFailed' => 'Nie udało się zaktualizować zadania',
+			'tasks.taskDetail.notFound' => 'Nie znaleziono zadania',
 			'tasks.taskDetail.subtasks' => 'Podzadania',
 			'tasks.taskDetail.deleteConfirmMessage' => ({required Object id}) => 'Zadanie #${id} zostanie usunięte. Tej operacji nie można cofnąć.',
 			'tasks.taskDetail.idCopied' => 'Skopiowano ID zadania',
@@ -11598,10 +11602,10 @@ extension on TranslationsPl {
 			'terminal.overlay.processExited' => 'Proces zakończył działanie — połącz się, aby uruchomić go ponownie',
 			'terminal.overlay.processExitedWithCode' => ({required Object code}) => 'Proces zakończył działanie (kod ${code}) — połącz się, aby uruchomić go ponownie',
 			'terminal.overlay.resumeSession' => ({required Object title}) => 'Wznów sesję ${title}',
-			'terminal.overlay.startSession' => ({required Object path}) => 'Rozpocznij nową sesję w ${path}',
-			'voice.preview' => 'Podgląd',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.overlay.startSession' => ({required Object path}) => 'Rozpocznij nową sesję w ${path}',
+			'voice.preview' => 'Podgląd',
 			'voice.settingsSaved' => 'Zapisano ustawienia wprowadzania głosowego',
 			'voice.saveFailed' => 'Nie udało się zapisać konfiguracji STT',
 			'voice.apiKeySaved' => 'Klucz API (zapisany, wpisz nowy, aby zastąpić)',

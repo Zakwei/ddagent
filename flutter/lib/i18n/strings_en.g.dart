@@ -1578,6 +1578,12 @@ class Translations$chat$permissions$en {
 	/// en: 'What should the agent change? (optional)'
 	String get denyFeedbackHint => 'What should the agent change? (optional)';
 
+	/// en: 'Deny this action'
+	String get denyReasonTitle => 'Deny this action';
+
+	/// en: 'Tell the agent why or what to do instead (optional)'
+	String get denyReasonHint => 'Tell the agent why or what to do instead (optional)';
+
 	/// en: 'The new permission mode applies from the next message.'
 	String get modeAppliesNextMessage => 'The new permission mode applies from the next message.';
 }
@@ -15072,6 +15078,8 @@ extension on Translations {
 			'chat.permissions.alwaysDeny' => 'Always deny',
 			'chat.permissions.denyFeedbackTitle' => 'Deny the plan',
 			'chat.permissions.denyFeedbackHint' => 'What should the agent change? (optional)',
+			'chat.permissions.denyReasonTitle' => 'Deny this action',
+			'chat.permissions.denyReasonHint' => 'Tell the agent why or what to do instead (optional)',
 			'chat.permissions.modeAppliesNextMessage' => 'The new permission mode applies from the next message.',
 			'chat.todo.updated' => 'Todo list has been updated successfully',
 			'chat.todo.current' => 'Current Todo List',
@@ -15415,10 +15423,10 @@ extension on Translations {
 			'chat.modelLibrary.addedNotice' => ({required Object name}) => '${name} was added.',
 			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '${name} was deleted.',
 			'chat.modelLibrary.saving' => 'Saving…',
-			'chat.modelLibrary.saveChanges' => 'Save changes',
-			'chat.modelLibrary.deleteConfirm' => 'Delete this model from all pickers?',
 			_ => null,
 		} ?? switch (path) {
+			'chat.modelLibrary.saveChanges' => 'Save changes',
+			'chat.modelLibrary.deleteConfirm' => 'Delete this model from all pickers?',
 			'chat.modelLibrary.customBadge' => 'Custom',
 			'chat.changes.failedToLoad' => 'Failed to load changes',
 			'chat.changes.empty' => 'No file changes',
@@ -15929,10 +15937,10 @@ extension on Translations {
 			'common.projectWizard.step2.nonePublic' => 'None (Public)',
 			'common.projectWizard.step2.selectToken' => 'Select Token',
 			'common.projectWizard.step2.selectTokenPlaceholder' => '-- Select a token --',
-			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-			'common.projectWizard.step2.tokenHelp' => 'This token will be used only for this operation',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+			'common.projectWizard.step2.tokenHelp' => 'This token will be used only for this operation',
 			'common.projectWizard.step2.publicRepoInfo' => 'Public repositories don\'t require authentication. You can skip providing a token if cloning a public repo.',
 			'common.projectWizard.step2.noTokensHelp' => 'No stored tokens available. You can add tokens in Settings → API Keys for easier reuse.',
 			'common.projectWizard.step2.optionalTokenPublic' => 'GitHub Token (Optional for Public Repos)',
@@ -16443,10 +16451,10 @@ extension on Translations {
 			'settings.mcp.scope.user' => 'User',
 			'settings.mcp.scope.project' => 'Project',
 			'settings.appearance.title' => 'Appearance',
-			'settings.appearance.theme' => 'Theme',
-			'settings.appearance.codeEditor' => 'Code Editor',
 			_ => null,
 		} ?? switch (path) {
+			'settings.appearance.theme' => 'Theme',
+			'settings.appearance.codeEditor' => 'Code Editor',
 			'settings.appearance.editorTheme' => 'Editor Theme',
 			'settings.appearance.wordWrap' => 'Word Wrap',
 			'settings.appearance.showMinimap' => 'Show Minimap',
@@ -16957,10 +16965,10 @@ extension on Translations {
 			'settings.workspaces.title' => 'Workspaces',
 			'settings.workspaces.pathRequired' => 'Path is required',
 			'settings.stt.title' => 'Voice input (speech-to-text)',
-			'settings.stt.description' => 'Whisper-compatible /audio/transcriptions endpoint (OpenAI, whisper.cpp, faster-whisper, Speaches). Enables the mic button in the composer.',
-			'settings.stt.configured' => 'configured',
 			_ => null,
 		} ?? switch (path) {
+			'settings.stt.description' => 'Whisper-compatible /audio/transcriptions endpoint (OpenAI, whisper.cpp, faster-whisper, Speaches). Enables the mic button in the composer.',
+			'settings.stt.configured' => 'configured',
 			'settings.stt.endpoint' => 'Endpoint URL (e.g. https://api.openai.com/v1)',
 			'settings.stt.apiKey' => 'API key',
 			'settings.stt.model' => 'Model (default: whisper-1)',
@@ -17471,10 +17479,10 @@ extension on Translations {
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'Task ${id}: ${title}',
 			'tasks.taskDetail.testStrategy' => 'Test Strategy',
 			'tasks.taskDetail.titleRequired' => 'Title is required',
-			'tasks.taskDetail.updateFailed' => 'Failed to update task',
-			'tasks.taskDetail.notFound' => 'Task not found',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.updateFailed' => 'Failed to update task',
+			'tasks.taskDetail.notFound' => 'Task not found',
 			'tasks.taskDetail.subtasks' => 'Subtasks',
 			'tasks.taskDetail.deleteConfirmMessage' => ({required Object id}) => 'Task #${id} will be removed. This cannot be undone.',
 			'tasks.taskDetail.idCopied' => 'Task ID copied',
@@ -17985,10 +17993,10 @@ extension on Translations {
 			'terminal.overlay.processExited' => 'Process exited — connect to start it again',
 			'terminal.overlay.processExitedWithCode' => ({required Object code}) => 'Process exited (code ${code}) — connect to start it again',
 			'terminal.overlay.resumeSession' => ({required Object title}) => 'Resume session ${title}',
-			'terminal.overlay.startSession' => ({required Object path}) => 'Start a new session in ${path}',
-			'voice.preview' => 'Preview',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.overlay.startSession' => ({required Object path}) => 'Start a new session in ${path}',
+			'voice.preview' => 'Preview',
 			'voice.settingsSaved' => 'Voice input settings saved',
 			'voice.saveFailed' => 'Failed to save STT configuration',
 			'voice.apiKeySaved' => 'API Key (saved, enter to replace)',

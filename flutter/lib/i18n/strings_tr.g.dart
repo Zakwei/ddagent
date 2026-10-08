@@ -1001,6 +1001,8 @@ class Translations$chat$permissions$tr extends Translations$chat$permissions$en 
 	@override String get alwaysDeny => 'Her zaman reddet';
 	@override String get denyFeedbackTitle => 'Planı reddet';
 	@override String get denyFeedbackHint => 'Ajan neyi değiştirmeli? (isteğe bağlı)';
+	@override String get denyReasonTitle => 'Bu işlemi reddet';
+	@override String get denyReasonHint => 'Ajana nedenini ya da bunun yerine ne yapması gerektiğini yazın (isteğe bağlı)';
 	@override String get modeAppliesNextMessage => 'Yeni izin modu bir sonraki mesajdan itibaren geçerli olur.';
 }
 
@@ -8640,6 +8642,8 @@ extension on TranslationsTr {
 			'chat.permissions.alwaysDeny' => 'Her zaman reddet',
 			'chat.permissions.denyFeedbackTitle' => 'Planı reddet',
 			'chat.permissions.denyFeedbackHint' => 'Ajan neyi değiştirmeli? (isteğe bağlı)',
+			'chat.permissions.denyReasonTitle' => 'Bu işlemi reddet',
+			'chat.permissions.denyReasonHint' => 'Ajana nedenini ya da bunun yerine ne yapması gerektiğini yazın (isteğe bağlı)',
 			'chat.permissions.modeAppliesNextMessage' => 'Yeni izin modu bir sonraki mesajdan itibaren geçerli olur.',
 			'chat.todo.updated' => 'Yapılacaklar listesi başarıyla güncellendi',
 			'chat.todo.current' => 'Mevcut Yapılacaklar Listesi',
@@ -8983,10 +8987,10 @@ extension on TranslationsTr {
 			'chat.modelLibrary.addedNotice' => ({required Object name}) => '${name} eklendi.',
 			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '${name} silindi.',
 			'chat.modelLibrary.saving' => 'Kaydediliyor…',
-			'chat.modelLibrary.saveChanges' => 'Değişiklikleri kaydet',
-			'chat.modelLibrary.deleteConfirm' => 'Bu model tüm seçicilerden silinsin mi?',
 			_ => null,
 		} ?? switch (path) {
+			'chat.modelLibrary.saveChanges' => 'Değişiklikleri kaydet',
+			'chat.modelLibrary.deleteConfirm' => 'Bu model tüm seçicilerden silinsin mi?',
 			'chat.modelLibrary.customBadge' => 'Özel',
 			'chat.changes.failedToLoad' => 'Değişiklikler yüklenemedi',
 			'chat.changes.empty' => 'Dosya değişikliği yok',
@@ -9497,10 +9501,10 @@ extension on TranslationsTr {
 			'common.projectWizard.step2.nonePublic' => 'Yok (Genel)',
 			'common.projectWizard.step2.selectToken' => 'Token Seç',
 			'common.projectWizard.step2.selectTokenPlaceholder' => '-- Bir token seç --',
-			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-			'common.projectWizard.step2.tokenHelp' => 'Bu token sadece bu işlem için kullanılacak',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+			'common.projectWizard.step2.tokenHelp' => 'Bu token sadece bu işlem için kullanılacak',
 			'common.projectWizard.step2.publicRepoInfo' => 'Genel depolar kimlik doğrulama gerektirmez. Genel bir depo klonluyorsan token girmeyi atlayabilirsin.',
 			'common.projectWizard.step2.noTokensHelp' => 'Kayıtlı token yok. Kolay tekrar kullanım için Ayarlar → API Anahtarları bölümünden token ekleyebilirsin.',
 			'common.projectWizard.step2.optionalTokenPublic' => 'GitHub Token (Genel Depolar için İsteğe Bağlı)',
@@ -10011,10 +10015,10 @@ extension on TranslationsTr {
 			'settings.mcp.scope.user' => 'Kullanıcı',
 			'settings.mcp.scope.project' => 'Proje',
 			'settings.appearance.title' => 'Görünüm',
-			'settings.appearance.theme' => 'Tema',
-			'settings.appearance.codeEditor' => 'Kod Editörü',
 			_ => null,
 		} ?? switch (path) {
+			'settings.appearance.theme' => 'Tema',
+			'settings.appearance.codeEditor' => 'Kod Editörü',
 			'settings.appearance.editorTheme' => 'Editör Teması',
 			'settings.appearance.wordWrap' => 'Kelime Kaydırma',
 			'settings.appearance.showMinimap' => 'Minimap\'i Göster',
@@ -10525,10 +10529,10 @@ extension on TranslationsTr {
 			'settings.workspaces.title' => 'Çalışma alanları',
 			'settings.workspaces.pathRequired' => 'Yol gerekli',
 			'settings.stt.title' => 'Sesli giriş (konuşmadan metne)',
-			'settings.stt.description' => 'Whisper uyumlu /audio/transcriptions uç noktası (OpenAI, whisper.cpp, faster-whisper, Speaches). Yazma alanındaki mikrofon düğmesini etkinleştirir.',
-			'settings.stt.configured' => 'yapılandırıldı',
 			_ => null,
 		} ?? switch (path) {
+			'settings.stt.description' => 'Whisper uyumlu /audio/transcriptions uç noktası (OpenAI, whisper.cpp, faster-whisper, Speaches). Yazma alanındaki mikrofon düğmesini etkinleştirir.',
+			'settings.stt.configured' => 'yapılandırıldı',
 			'settings.stt.endpoint' => 'Uç nokta URL\'si (örn. https://api.openai.com/v1)',
 			'settings.stt.apiKey' => 'API anahtarı',
 			'settings.stt.model' => 'Model (varsayılan: whisper-1)',
@@ -11039,10 +11043,10 @@ extension on TranslationsTr {
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'Görev ${id}: ${title}',
 			'tasks.taskDetail.testStrategy' => 'Test Stratejisi',
 			'tasks.taskDetail.titleRequired' => 'Başlık gerekli',
-			'tasks.taskDetail.updateFailed' => 'Görev güncellenemedi',
-			'tasks.taskDetail.notFound' => 'Görev bulunamadı',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.updateFailed' => 'Görev güncellenemedi',
+			'tasks.taskDetail.notFound' => 'Görev bulunamadı',
 			'tasks.taskDetail.subtasks' => 'Alt görevler',
 			'tasks.taskDetail.deleteConfirmMessage' => ({required Object id}) => '#${id} görevi kaldırılacak. Bu işlem geri alınamaz.',
 			'tasks.taskDetail.idCopied' => 'Görev ID kopyalandı',
@@ -11553,10 +11557,10 @@ extension on TranslationsTr {
 			'terminal.overlay.processExited' => 'İşlem sonlandı — yeniden başlatmak için bağlanın',
 			'terminal.overlay.processExitedWithCode' => ({required Object code}) => 'İşlem sonlandı (kod ${code}) — yeniden başlatmak için bağlanın',
 			'terminal.overlay.resumeSession' => ({required Object title}) => '${title} oturumunu sürdür',
-			'terminal.overlay.startSession' => ({required Object path}) => '${path} içinde yeni bir oturum başlat',
-			'voice.preview' => 'Önizle',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.overlay.startSession' => ({required Object path}) => '${path} içinde yeni bir oturum başlat',
+			'voice.preview' => 'Önizle',
 			'voice.settingsSaved' => 'Sesli giriş ayarları kaydedildi',
 			'voice.saveFailed' => 'STT yapılandırması kaydedilemedi',
 			'voice.apiKeySaved' => 'API Anahtarı (kayıtlı, değiştirmek için girin)',

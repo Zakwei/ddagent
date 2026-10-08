@@ -236,6 +236,8 @@
       "alwaysDeny": "一律拒絕",
       "denyFeedbackTitle": "拒絕計畫",
       "denyFeedbackHint": "需要代理修改什麼？（選填）",
+      "denyReasonTitle": "拒絕此操作",
+      "denyReasonHint": "告訴代理原因或應改做什麼（選填）",
       "modeAppliesNextMessage": "新的權限模式將從下一則訊息開始生效。"
     },
     "todo": {

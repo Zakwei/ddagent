@@ -236,6 +236,8 @@
       "alwaysDeny": "Always deny",
       "denyFeedbackTitle": "Deny the plan",
       "denyFeedbackHint": "What should the agent change? (optional)",
+      "denyReasonTitle": "Deny this action",
+      "denyReasonHint": "Tell the agent why or what to do instead (optional)",
       "modeAppliesNextMessage": "The new permission mode applies from the next message."
     },
     "todo": {

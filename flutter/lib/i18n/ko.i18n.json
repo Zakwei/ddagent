@@ -236,6 +236,8 @@
       "alwaysDeny": "항상 거부",
       "denyFeedbackTitle": "계획 거부",
       "denyFeedbackHint": "에이전트가 무엇을 바꿔야 하나요? (선택 사항)",
+      "denyReasonTitle": "이 작업 거부",
+      "denyReasonHint": "이유나 대신 할 일을 에이전트에게 알려 주세요 (선택)",
       "modeAppliesNextMessage": "새 권한 모드는 다음 메시지부터 적용됩니다."
     },
     "todo": {

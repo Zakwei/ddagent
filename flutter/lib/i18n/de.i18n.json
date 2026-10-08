@@ -236,6 +236,8 @@
       "alwaysDeny": "Immer ablehnen",
       "denyFeedbackTitle": "Plan ablehnen",
       "denyFeedbackHint": "Was soll der Agent ändern? (optional)",
+      "denyReasonTitle": "Aktion ablehnen",
+      "denyReasonHint": "Sag dem Agenten, warum oder was er stattdessen tun soll (optional)",
       "modeAppliesNextMessage": "Der neue Berechtigungsmodus gilt ab der nächsten Nachricht."
     },
     "todo": {

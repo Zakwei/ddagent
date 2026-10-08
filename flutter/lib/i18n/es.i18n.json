@@ -236,6 +236,8 @@
       "alwaysDeny": "Denegar siempre",
       "denyFeedbackTitle": "Rechazar el plan",
       "denyFeedbackHint": "¿Qué debería cambiar el agente? (opcional)",
+      "denyReasonTitle": "Rechazar esta acción",
+      "denyReasonHint": "Dile al agente por qué o qué hacer en su lugar (opcional)",
       "modeAppliesNextMessage": "El nuevo modo de permisos se aplica a partir del siguiente mensaje."
     },
     "todo": {

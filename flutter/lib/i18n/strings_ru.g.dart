@@ -1003,6 +1003,8 @@ class Translations$chat$permissions$ru extends Translations$chat$permissions$en 
 	@override String get alwaysDeny => 'Всегда запрещать';
 	@override String get denyFeedbackTitle => 'Отклонить план';
 	@override String get denyFeedbackHint => 'Что агенту изменить? (необязательно)';
+	@override String get denyReasonTitle => 'Отклонить действие';
+	@override String get denyReasonHint => 'Объясните агенту причину или что сделать вместо этого (необязательно)';
 	@override String get modeAppliesNextMessage => 'Новый режим разрешений применится со следующего сообщения.';
 }
 
@@ -8683,6 +8685,8 @@ extension on TranslationsRu {
 			'chat.permissions.alwaysDeny' => 'Всегда запрещать',
 			'chat.permissions.denyFeedbackTitle' => 'Отклонить план',
 			'chat.permissions.denyFeedbackHint' => 'Что агенту изменить? (необязательно)',
+			'chat.permissions.denyReasonTitle' => 'Отклонить действие',
+			'chat.permissions.denyReasonHint' => 'Объясните агенту причину или что сделать вместо этого (необязательно)',
 			'chat.permissions.modeAppliesNextMessage' => 'Новый режим разрешений применится со следующего сообщения.',
 			'chat.todo.updated' => 'Список задач успешно обновлен',
 			'chat.todo.current' => 'Текущий список задач',
@@ -9026,10 +9030,10 @@ extension on TranslationsRu {
 			'chat.modelLibrary.addedNotice' => ({required Object name}) => '${name} добавлена.',
 			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '${name} удалена.',
 			'chat.modelLibrary.saving' => 'Сохранение…',
-			'chat.modelLibrary.saveChanges' => 'Сохранить изменения',
-			'chat.modelLibrary.deleteConfirm' => 'Удалить эту модель из всех списков выбора?',
 			_ => null,
 		} ?? switch (path) {
+			'chat.modelLibrary.saveChanges' => 'Сохранить изменения',
+			'chat.modelLibrary.deleteConfirm' => 'Удалить эту модель из всех списков выбора?',
 			'chat.modelLibrary.customBadge' => 'Свой',
 			'chat.changes.failedToLoad' => 'Не удалось загрузить изменения',
 			'chat.changes.empty' => 'Нет изменений файлов',
@@ -9540,10 +9544,10 @@ extension on TranslationsRu {
 			'common.projectWizard.step2.nonePublic' => 'Нет (публичный)',
 			'common.projectWizard.step2.selectToken' => 'Выбрать токен',
 			'common.projectWizard.step2.selectTokenPlaceholder' => '-- Выберите токен --',
-			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-			'common.projectWizard.step2.tokenHelp' => 'Этот токен будет использован только для этой операции',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+			'common.projectWizard.step2.tokenHelp' => 'Этот токен будет использован только для этой операции',
 			'common.projectWizard.step2.publicRepoInfo' => 'Публичные репозитории не требуют аутентификации. Вы можете пропустить токен при клонировании публичного репозитория.',
 			'common.projectWizard.step2.noTokensHelp' => 'Нет доступных сохраненных токенов. Вы можете добавить токены в Настройки → API ключи для удобного повторного использования.',
 			'common.projectWizard.step2.optionalTokenPublic' => 'Токен GitHub (необязательно для публичных репозиториев)',
@@ -10054,10 +10058,10 @@ extension on TranslationsRu {
 			'settings.mcp.scope.user' => 'Пользователь',
 			'settings.mcp.scope.project' => 'Проект',
 			'settings.appearance.title' => 'Внешний вид',
-			'settings.appearance.theme' => 'Тема',
-			'settings.appearance.codeEditor' => 'Редактор кода',
 			_ => null,
 		} ?? switch (path) {
+			'settings.appearance.theme' => 'Тема',
+			'settings.appearance.codeEditor' => 'Редактор кода',
 			'settings.appearance.editorTheme' => 'Тема редактора',
 			'settings.appearance.wordWrap' => 'Перенос слов',
 			'settings.appearance.showMinimap' => 'Показать миникарту',
@@ -10568,10 +10572,10 @@ extension on TranslationsRu {
 			'settings.workspaces.title' => 'Рабочие области',
 			'settings.workspaces.pathRequired' => 'Требуется путь',
 			'settings.stt.title' => 'Голосовой ввод (распознавание речи)',
-			'settings.stt.description' => 'Whisper-совместимая конечная точка /audio/transcriptions (OpenAI, whisper.cpp, faster-whisper, Speaches). Включает кнопку микрофона в поле ввода.',
-			'settings.stt.configured' => 'настроено',
 			_ => null,
 		} ?? switch (path) {
+			'settings.stt.description' => 'Whisper-совместимая конечная точка /audio/transcriptions (OpenAI, whisper.cpp, faster-whisper, Speaches). Включает кнопку микрофона в поле ввода.',
+			'settings.stt.configured' => 'настроено',
 			'settings.stt.endpoint' => 'URL конечной точки (например, https://api.openai.com/v1)',
 			'settings.stt.apiKey' => 'Ключ API',
 			'settings.stt.model' => 'Модель (по умолчанию: whisper-1)',
@@ -11082,10 +11086,10 @@ extension on TranslationsRu {
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'Задача ${id}: ${title}',
 			'tasks.taskDetail.testStrategy' => 'Стратегия тестирования',
 			'tasks.taskDetail.titleRequired' => 'Название обязательно',
-			'tasks.taskDetail.updateFailed' => 'Не удалось обновить задачу',
-			'tasks.taskDetail.notFound' => 'Задача не найдена',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.updateFailed' => 'Не удалось обновить задачу',
+			'tasks.taskDetail.notFound' => 'Задача не найдена',
 			'tasks.taskDetail.subtasks' => 'Подзадачи',
 			'tasks.taskDetail.deleteConfirmMessage' => ({required Object id}) => 'Задача #${id} будет удалена. Действие необратимо.',
 			'tasks.taskDetail.idCopied' => 'ID задачи скопирован',
@@ -11596,10 +11600,10 @@ extension on TranslationsRu {
 			'terminal.overlay.processExited' => 'Процесс завершён — подключитесь, чтобы запустить его снова',
 			'terminal.overlay.processExitedWithCode' => ({required Object code}) => 'Процесс завершён (код ${code}) — подключитесь, чтобы запустить его снова',
 			'terminal.overlay.resumeSession' => ({required Object title}) => 'Возобновить сеанс ${title}',
-			'terminal.overlay.startSession' => ({required Object path}) => 'Начать новый сеанс в ${path}',
-			'voice.preview' => 'Предпросмотр',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.overlay.startSession' => ({required Object path}) => 'Начать новый сеанс в ${path}',
+			'voice.preview' => 'Предпросмотр',
 			'voice.settingsSaved' => 'Настройки голосового ввода сохранены',
 			'voice.saveFailed' => 'Не удалось сохранить конфигурацию STT',
 			'voice.apiKeySaved' => 'API-ключ (сохранён, введите, чтобы заменить)',

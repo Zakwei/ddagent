@@ -1510,8 +1510,10 @@ class MessageTile extends ConsumerWidget {
                           ),
                         TextButton(
                           onPressed: () async {
-                            if (!isPlanExit) return decide(allow: false);
-                            final feedback = await _askDenyFeedback(context);
+                            if (!_denyTakesReason(message.provider, toolName)) {
+                              return decide(allow: false);
+                            }
+                            final feedback = await _askDenyFeedback(context, plan: isPlanExit);
                             if (feedback != null) {
                               decide(allow: false, feedback: feedback.isEmpty ? null : feedback);
                             }
@@ -2039,8 +2041,8 @@ class _PermissionBanner extends ConsumerWidget {
         );
 
     Future<void> reject(PendingPermission p) async {
-      if (!_isPlanExit(p.toolName)) return decide(p, allow: false);
-      final feedback = await _askDenyFeedback(context);
+      if (!_denyTakesReason(provider, p.toolName)) return decide(p, allow: false);
+      final feedback = await _askDenyFeedback(context, plan: _isPlanExit(p.toolName));
       if (feedback != null) {
         decide(p, allow: false, feedback: feedback.isEmpty ? null : feedback);
       }
@@ -2281,15 +2283,22 @@ class _ReasoningRowState extends State<_ReasoningRow> {
 bool _isPlanExit(String toolName) =>
     toolName.toLowerCase().replaceAll(RegExp('[ _]'), '') == 'exitplanmode';
 
-/// Deny-with-feedback for a plan (ExitPlanMode): null when cancelled, else
-/// the (possibly empty) text sent to the agent as the denial `message`.
-Future<String?> _askDenyFeedback(BuildContext context) async {
+/// Providers whose deny carries a `message` to the agent (Claude's deny
+/// reason, OpenCode's reject feedback); ACP rejects have no text channel.
+bool _denyTakesReason(String? provider, String toolName) =>
+    _isPlanExit(toolName) || provider == 'claude' || provider == 'opencode';
+
+/// Deny-with-feedback: null when cancelled, else the (possibly empty) text
+/// sent to the agent as the denial `message`.
+Future<String?> _askDenyFeedback(BuildContext context, {bool plan = true}) async {
   final i18n = Translations.of(context);
   final ctrl = TextEditingController();
   final ok = await showDialog<bool>(
     context: context,
     builder: (ctx) => AlertDialog(
-      title: Text(i18n.chat.permissions.denyFeedbackTitle),
+      title: Text(
+        plan ? i18n.chat.permissions.denyFeedbackTitle : i18n.chat.permissions.denyReasonTitle,
+      ),
       content: SizedBox(
         width: 480,
         child: TextField(
@@ -2298,7 +2307,9 @@ Future<String?> _askDenyFeedback(BuildContext context) async {
           minLines: 2,
           maxLines: 6,
           decoration: InputDecoration(
-            hintText: i18n.chat.permissions.denyFeedbackHint,
+            hintText: plan
+                ? i18n.chat.permissions.denyFeedbackHint
+                : i18n.chat.permissions.denyReasonHint,
             border: const OutlineInputBorder(),
           ),
         ),

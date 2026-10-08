@@ -244,6 +244,8 @@
       "alwaysDeny": "Zawsze odmawiaj",
       "denyFeedbackTitle": "Odrzuć plan",
       "denyFeedbackHint": "Co agent powinien zmienić? (opcjonalnie)",
+      "denyReasonTitle": "Odmów tej akcji",
+      "denyReasonHint": "Napisz agentowi dlaczego albo co ma zrobić zamiast tego (opcjonalnie)",
       "modeAppliesNextMessage": "Nowy tryb uprawnień zacznie obowiązywać od następnej wiadomości."
     },
     "todo": {

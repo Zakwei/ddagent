@@ -236,6 +236,8 @@
       "alwaysDeny": "Nega sempre",
       "denyFeedbackTitle": "Rifiuta il piano",
       "denyFeedbackHint": "Cosa dovrebbe cambiare l’agente? (facoltativo)",
+      "denyReasonTitle": "Rifiuta questa azione",
+      "denyReasonHint": "Spiega all'agente perché o cosa fare invece (facoltativo)",
       "modeAppliesNextMessage": "La nuova modalità di autorizzazione si applica dal prossimo messaggio."
     },
     "todo": {
