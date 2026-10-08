@@ -31,7 +31,8 @@ bool hoverFocusBlockedByField() {
 
 /// Split-pane grid (port of SplitWorkspaceGrid.tsx):
 /// - `getSplitLayout` column/row math + last-row-partial spanning via flex,
-/// - compact (<600pt): tab strip + only the active pane mounted,
+/// - compact (<600pt): tab strip + only the active pane mounted; tabs whose
+///   agent finished in the background turn green until opened,
 /// - maximized pane: hidden panes stay mounted (Offstage) so chats/terminals
 ///   keep state,
 /// - per-pane header with drag handle (Draggable + DragTarget reorder),
@@ -49,6 +50,7 @@ class SplitWorkspaceGrid extends StatefulWidget {
     this.paneTitle,
     this.maximizedPaneId,
     this.onToggleMaximizePane,
+    this.finishedPaneIds = const {},
   });
 
   final List<SplitPane> panes;
@@ -61,6 +63,10 @@ class SplitWorkspaceGrid extends StatefulWidget {
   final String Function(SplitPane pane)? paneTitle;
   final String? maximizedPaneId;
   final ValueChanged<String>? onToggleMaximizePane;
+
+  /// Panes whose agent finished while they were in the background — their
+  /// compact tab turns green until opened.
+  final Set<String> finishedPaneIds;
 
   @override
   State<SplitWorkspaceGrid> createState() => _SplitWorkspaceGridState();
@@ -132,23 +138,33 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
     final c = context.appColors;
     final t = Theme.of(context);
     final m = topBarMetrics(context);
+    final finished = !selected && widget.finishedPaneIds.contains(pane.id);
+    final fg = finished
+        ? _finishedColor
+        : selected
+        ? c.foreground
+        : c.mutedForeground;
     return InkWell(
       borderRadius: AppRadii.borderMd,
       onTap: () => widget.onActivatePane?.call(pane.id),
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 10, vertical: (m.hit - m.icon) / 2),
+        // Border is always 1px so a tab turning green doesn't shift the strip.
+        padding: EdgeInsets.symmetric(horizontal: 9, vertical: (m.hit - m.icon) / 2 - 1),
         decoration: BoxDecoration(
-          color: selected ? c.background : Colors.transparent,
+          color: finished
+              ? _finishedColor.withValues(alpha: 0.15)
+              : selected
+              ? c.background
+              : Colors.transparent,
+          border: Border.all(
+            color: finished ? _finishedColor.withValues(alpha: 0.6) : Colors.transparent,
+          ),
           borderRadius: AppRadii.borderMd,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              paneKindIcon(pane.kind),
-              size: m.icon,
-              color: selected ? c.foreground : c.mutedForeground,
-            ),
+            Icon(finished ? Icons.check_circle : paneKindIcon(pane.kind), size: m.icon, color: fg),
             const SizedBox(width: 6),
             ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 140),
@@ -157,8 +173,8 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: t.textTheme.labelSmall?.copyWith(
-                  color: selected ? c.foreground : c.mutedForeground,
-                  fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                  color: fg,
+                  fontWeight: selected || finished ? FontWeight.w600 : FontWeight.w400,
                 ),
               ),
             ),
@@ -167,6 +183,9 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
       ),
     );
   }
+
+  /// Emerald — same hue as the session-list "running" dot.
+  static const _finishedColor = Color(0xFF10B981);
 
   /// Desktop grid: rows of equal height; a partial last row stretches to the
   /// full width (finer unit grid — see SplitWorkspaceGrid.tsx).

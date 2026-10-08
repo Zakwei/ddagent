@@ -50,6 +50,9 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
   bool _overviewOpen = false;
   bool _broadcastOpen = false;
 
+  /// Panes whose session stopped processing while another pane was active.
+  final _finishedPaneIds = <String>{};
+
   @override
   void initState() {
     super.initState();
@@ -111,6 +114,27 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
     ref.watch(activityPollerProvider);
     final processingIds = ref.watch(sessionActivityProvider).keys.toSet();
     final pendingIds = ref.watch(pendingPermissionSessionsProvider);
+
+    // processing → idle on a background pane flags its tab as finished.
+    ref.listen(sessionActivityProvider, (prev, next) {
+      final stopped = {
+        for (final id in prev?.keys ?? const <String>[])
+          if (!next.containsKey(id)) id,
+      };
+      if (stopped.isEmpty) return;
+      final current = ref.read(workspaceProvider);
+      final hits = [
+        for (final p in current.panes)
+          if (p.id != current.activePaneId && stopped.contains(p.sessionId)) p.id,
+      ];
+      if (hits.isNotEmpty) setState(() => _finishedPaneIds.addAll(hits));
+    });
+    // Opening the pane (or the agent starting again) clears the flag.
+    _finishedPaneIds.removeWhere((id) {
+      if (id == ws.activePaneId) return true;
+      final pane = ws.panes.where((p) => p.id == id).firstOrNull;
+      return pane == null || processingIds.contains(pane.sessionId);
+    });
 
     // An empty workspace renders nothing, which makes "new session"
     // unreachable — seed one chat pane in picker state so the session list
@@ -183,6 +207,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
               onReorderPanes: ctrl.reorderPanes,
               maximizedPaneId: ws.maximizedPaneId,
               onToggleMaximizePane: ctrl.toggleMaximize,
+              finishedPaneIds: _finishedPaneIds,
               paneTitle: (p) => display(p).title,
               renderPaneHeaderContent: (p, actions) =>
                   _headerContent(p, display(p), sessions, projects, actions),
