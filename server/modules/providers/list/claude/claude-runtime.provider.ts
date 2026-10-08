@@ -60,7 +60,14 @@ const abortedInstances = new WeakSet();
 // entry, the abort flag, and all client-facing events belong to the new run.
 const supersededInstances = new WeakSet();
 
-const TOOL_APPROVAL_TIMEOUT_MS = parseInt(process.env.CLAUDE_TOOL_APPROVAL_TIMEOUT_MS ?? '', 10) || 55000;
+// Runs that have not registered their query yet (model lookup, MCP config,
+// prompt build). An abort landing in that window is parked here and honoured
+// right before the CLI would be spawned.
+const startingRuns = new Set<string>();
+const pendingAborts = new Set<string>();
+
+// Not an SDK limit (the CLI waits on can_use_tool indefinitely, as the interactive asks show): long enough for a user to answer a prompt already on screen.
+const TOOL_APPROVAL_TIMEOUT_MS = parseInt(process.env.CLAUDE_TOOL_APPROVAL_TIMEOUT_MS ?? '', 10) || 30 * 60 * 1000;
 
 // How long background work is allowed to keep running after a turn ends. This drives
 // two halves of the same behaviour:
@@ -89,6 +96,9 @@ const BG_WAIT_CEILING_MS = 30 * 60 * 1000;
 const FOLLOW_UP_GRACE_MS = 60 * 1000;
 
 const TOOLS_REQUIRING_INTERACTION = new Set(['AskUserQuestion', 'ExitPlanMode']);
+
+// Tools that write files: their "Always" rule only covers the project directory.
+const FILE_EDIT_TOOLS = new Set(['Edit', 'Write', 'MultiEdit', 'NotebookEdit']);
 
 /**
  * Delegated (orchestrator-spawned) child sessions have no one watching their
@@ -229,6 +239,17 @@ function matchesToolPermission(entry: any, toolName: any, input: any) {
     return true;
   }
 
+  // `Edit(//abs/dir/**)` — Claude Code's absolute-path rule, as built by
+  // scopeRememberedRule: only paths inside that directory match.
+  const scopedMatch = entry.match(/^(\w+)\(\/(\/.*)\/\*\*\)$/);
+  if (scopedMatch && scopedMatch[1] === toolName && FILE_EDIT_TOOLS.has(toolName)) {
+    const target = input?.file_path ?? input?.notebook_path;
+    if (typeof target !== 'string' || !target) return false;
+    const dir = scopedMatch[2];
+    const resolved = path.resolve(dir, target);
+    return resolved === dir || resolved.startsWith(`${dir}${path.sep}`);
+  }
+
   const bashMatch = entry.match(/^Bash\((.+):\*\)$/);
   if (toolName === 'Bash' && bashMatch) {
     const allowedPrefix = bashMatch[1];
@@ -279,6 +300,117 @@ export function claudeRememberEntry(toolName: any, input: any): string | null {
 }
 
 /**
+ * The rule an "Always" answer actually stores. The client's entry is accepted
+ * only when it is the one the server offered for that ask, and file-editing
+ * tools are narrowed to the project directory so "Always allow Edit" never
+ * covers files outside it.
+ */
+// Exported for tests.
+export function scopeRememberedRule(offered: string | null, requested: unknown, toolName: string, cwd: unknown): string | null {
+  if (!offered || requested !== offered) return null;
+  if (!FILE_EDIT_TOOLS.has(toolName)) return offered;
+  return typeof cwd === 'string' && cwd ? `${toolName}(/${path.resolve(cwd)}/**)` : null;
+}
+
+/**
+ * Splits the app's permission mode into what the CLI runs with and whether
+ * bypass is emulated in canUseTool. Interactive bypass stays OUT of the SDK
+ * so canUseTool keeps gating interactive tools (AskUserQuestion/ExitPlanMode)
+ * — in real bypass the SDK resolves approval at the permission-mode step and
+ * never calls it, so the model would act on a generated answer. Headless
+ * delegated children keep real bypass: nobody watches their transcript.
+ */
+function resolvePermissionModeState(permissionMode: any, skipPermissions: any, delegated: any) {
+  const bypassRequested = permissionMode === 'bypassPermissions' || (skipPermissions && permissionMode !== 'plan');
+  const interactiveBypass = Boolean(bypassRequested && !delegated);
+  const sdkMode: string = interactiveBypass ? 'default' : (permissionMode || 'default');
+  return { sdkMode, interactiveBypass };
+}
+
+const ASSISTANT_ERROR_TEXT: Record<string, string> = {
+  authentication_failed: 'Claude authentication failed — log in again.',
+  oauth_org_not_allowed: 'This Claude account\'s organization is not allowed.',
+  billing_error: 'Claude billing error — check the account\'s plan or credits.',
+  rate_limit: 'Claude usage limit reached.',
+  overloaded: 'Claude API is overloaded.',
+  invalid_request: 'Claude rejected the request as invalid.',
+  model_not_found: 'The selected Claude model was not found.',
+  server_error: 'Claude API server error.',
+  max_output_tokens: 'The response hit the output token limit.',
+};
+
+const RESULT_SUBTYPE_TEXT: Record<string, string> = {
+  error_max_turns: 'Stopped: reached the maximum number of turns.',
+  error_max_budget_usd: 'Stopped: reached the maximum budget.',
+  error_during_execution: 'Claude failed while running.',
+  error_max_structured_output_retries: 'Stopped: could not produce valid structured output.',
+};
+
+/**
+ * Readable error for a failed turn `result` (`is_error` or a non-success
+ * subtype), or null when the turn succeeded. `assistantError` is the `error`
+ * code of the turn's last assistant message, which names the API failure.
+ */
+// Exported for tests.
+export function describeClaudeResultFailure(result: AnyRecord, assistantError: string | null): string | null {
+  if (result?.is_error !== true && (!result?.subtype || result.subtype === 'success')) return null;
+  const errors = Array.isArray(result.errors) ? result.errors.filter((e: unknown) => typeof e === 'string' && e) : [];
+  const detail = errors.join('; ') || (typeof result.result === 'string' ? result.result.trim() : '');
+  const denials = Array.isArray(result.permission_denials)
+    ? [...new Set(result.permission_denials.map((d: AnyRecord) => d?.tool_name).filter(Boolean))]
+    : [];
+  return [
+    (assistantError && ASSISTANT_ERROR_TEXT[assistantError]) || '',
+    detail || RESULT_SUBTYPE_TEXT[result.subtype] || 'Claude run failed.',
+    denials.length ? `Denied tools: ${denials.join(', ')}.` : '',
+  ].filter(Boolean).join(' ');
+}
+
+function formatDuration(ms: number) {
+  const minutes = Math.max(1, Math.round(ms / 60000));
+  return minutes >= 60 ? `${Math.floor(minutes / 60)}h ${minutes % 60}m` : `${minutes}m`;
+}
+
+/**
+ * The user-facing line for an SDK message that is worth a status row:
+ * `notice: true` lines persist in the transcript (C1), the rest are ephemeral
+ * activity labels. Null for every other message.
+ */
+// Exported for tests.
+export function claudeStatusLine(message: AnyRecord): { text: string; notice: boolean } | null {
+  if (message?.type === 'rate_limit_event') {
+    const info = message.rate_limit_info || {};
+    if (info.status !== 'rejected' && info.status !== 'allowed_warning') return null;
+    const kind = info.rateLimitType ? ` (${String(info.rateLimitType).replace(/_/g, ' ')})` : '';
+    const resets = Number(info.resetsAt) > 0 ? `, resets in ${formatDuration(Number(info.resetsAt) * 1000 - Date.now())}` : '';
+    return info.status === 'rejected'
+      ? { text: `Claude usage limit reached${kind}${resets}.`, notice: true }
+      : { text: `Approaching the Claude usage limit${kind}${resets}.`, notice: true };
+  }
+  if (message?.type === 'result' && !describeClaudeResultFailure(message, null)) {
+    if (message.stop_reason === 'refusal') return { text: 'Claude declined to continue (refusal).', notice: true };
+    if (message.stop_reason === 'max_tokens') return { text: 'The response was cut off at the output token limit.', notice: true };
+    return null;
+  }
+  if (message?.type !== 'system') return null;
+  switch (message.subtype) {
+    case 'api_retry': {
+      const status = message.error_status ? ` ${message.error_status}` : '';
+      const delay = Math.round(Number(message.retry_delay_ms) / 1000);
+      return { text: `API error (${message.error || 'unknown'}${status}), retrying in ${delay}s — attempt ${message.attempt}/${message.max_retries}.`, notice: true };
+    }
+    case 'status':
+      if (message.compact_result === 'failed') return { text: `Compaction failed: ${message.compact_error || 'unknown error'}.`, notice: true };
+      if (message.compact_result === 'success') return { text: 'Conversation compacted.', notice: true };
+      return message.status === 'compacting' ? { text: 'Compacting conversation…', notice: false } : null;
+    case 'permission_denied':
+      return { text: `${message.tool_name || 'Tool'} denied: ${message.decision_reason || message.message || 'not permitted'}.`, notice: true };
+    default:
+      return null;
+  }
+}
+
+/**
  * Maps the provider-agnostic run options onto SDK query options.
  *
  * Exported for the runtime provider tests, which assert the streaming-related
@@ -315,21 +447,17 @@ export function mapCliOptionsToSDK(options: any = {}): any {
     skipPermissions: false
   };
 
-  // Interactive bypass stays OUT of the SDK so canUseTool keeps gating
-  // interactive tools (AskUserQuestion/ExitPlanMode) — in real bypass the SDK
-  // resolves approval at the permission-mode step and never calls it, so the
-  // model would act on a generated answer. Headless delegated children keep
-  // real bypass: nobody watches their transcript to answer a question.
-  const bypassRequested =
-    permissionMode === 'bypassPermissions'
-    || (settings.skipPermissions && permissionMode !== 'plan');
-  const interactiveBypass = bypassRequested && !options.delegated;
+  const { sdkMode, interactiveBypass } = resolvePermissionModeState(permissionMode, settings.skipPermissions, options.delegated);
   if (interactiveBypass) {
     sdkOptions.interactiveBypass = true;
   }
 
-  if (permissionMode && permissionMode !== 'default' && !interactiveBypass) {
-    sdkOptions.permissionMode = permissionMode;
+  if (sdkMode !== 'default') {
+    sdkOptions.permissionMode = sdkMode;
+  }
+  // The SDK requires this opt-in for a real bypass (headless delegated children).
+  if (sdkMode === 'bypassPermissions') {
+    sdkOptions.allowDangerouslySkipPermissions = true;
   }
 
   let allowedTools: any = [...(settings.allowedTools || [])];
@@ -392,8 +520,9 @@ export function mapCliOptionsToSDK(options: any = {}): any {
  * @param {Function} releaseInput - Closes the held stdin stream so the CLI can exit
  * @param {Function} injectTurn - Feeds a new user turn into this live process
  * @param {Function} steerTurn - Feeds a user message into the turn running now
+ * @param {Function} applyPermissionMode - Switches the live process's permission mode
  */
-function addSession(sessionId: any, queryInstance: any, writer: any = null, releaseInput: any = null, injectTurn: any = null, steerTurn: any = null) {
+function addSession(sessionId: any, queryInstance: any, writer: any = null, releaseInput: any = null, injectTurn: any = null, steerTurn: any = null, applyPermissionMode: any = null) {
   const existing = activeSessions.get(sessionId);
   // A different live instance under the same key means an earlier run was
   // superseded without being stopped (e.g. an abort that raced run setup and
@@ -423,7 +552,8 @@ function addSession(sessionId: any, queryInstance: any, writer: any = null, rele
     // Re-registered mid-run once the provider session id lands; keep the closer.
     releaseInput: releaseInput || carried?.releaseInput || null,
     injectTurn: injectTurn || carried?.injectTurn || null,
-    steerTurn: steerTurn || carried?.steerTurn || null
+    steerTurn: steerTurn || carried?.steerTurn || null,
+    applyPermissionMode: applyPermissionMode || carried?.applyPermissionMode || null
   });
 }
 
@@ -706,8 +836,8 @@ async function loadMcpConfig(cwd: any) {
     }
 
     // Add/override with project-specific MCP servers
-    if (claudeConfig.claudeProjects && cwd) {
-      const projectConfig = claudeConfig.claudeProjects[cwd];
+    if (claudeConfig.projects && cwd) {
+      const projectConfig = claudeConfig.projects[cwd];
       if (projectConfig && projectConfig.mcpServers && typeof projectConfig.mcpServers === 'object') {
         mcpServers = { ...mcpServers, ...projectConfig.mcpServers };
         // Project MCP servers merged
@@ -855,6 +985,11 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
   let queryInstance: any = null;
   // Whether the user stopped this run (the abort flag itself is consumed on wind-down).
   let stoppedByUser = false;
+  // Key an early abort is parked under until the query is registered.
+  const startKey = sessionKey();
+  if (startKey) startingRuns.add(startKey);
+  // `error` code of the latest main-agent assistant message (auth, rate limit…).
+  let lastAssistantError: string | null = null;
 
   try {
     const resolvedModel = await context.resolveResumeModel(sessionId, options.model);
@@ -865,15 +1000,17 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
       console.warn('[Claude SDK] Unable to load provider models for effort validation:', error);
     }
 
+    const delegated = isDelegatedChildSession(sessionId);
     const sdkOptions = mapCliOptionsToSDK({
       ...options,
-      delegated: isDelegatedChildSession(sessionId),
+      delegated,
       providerSessionId,
       model: resolvedModel || options.model,
       effortModels,
     });
-    // Re-apply this session's "Always" rules to the new turn.
-    for (const entry of sessionRememberedTools.get(sessionId) ?? []) {
+    // Re-apply this session's "Always" rules to the new turn (same key they
+    // were stored under, so legacy provider-id callers keep them too).
+    for (const entry of sessionRememberedTools.get(sessionKey()) ?? []) {
       if (!sdkOptions.allowedTools.includes(entry)) sdkOptions.allowedTools.push(entry);
     }
 
@@ -893,11 +1030,12 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
     const promptMessages = await buildPromptMessages(command, options.images, options.files, options.cwd);
 
     // Everything the CLI was spawned with, minus what may differ between turns
-    // of one conversation without needing a new process: the resume id and the
-    // allow-list (merged into the live run instead). Two runs with the same
-    // signature can share a process.
-    const { resume: _resume, allowedTools: _allowedTools, ...spawnShape } = sdkOptions;
-    const runSignature = JSON.stringify({ ...spawnShape, interactiveBypass });
+    // of one conversation without needing a new process: the resume id, the
+    // allow-list (merged into the live run instead) and the permission mode
+    // (switched live via setPermissionMode). Two runs with the same signature
+    // can share a process.
+    const { resume: _resume, allowedTools: _allowedTools, permissionMode: _permissionMode, ...spawnShape } = sdkOptions;
+    const runSignature = JSON.stringify(spawnShape);
 
     // A process still held open for this session's background work (running
     // subagents, shells, watchers) takes the new turn on its stdin — spawning
@@ -911,8 +1049,14 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
         writer: ws,
         signature: runSignature,
         allowedTools: sdkOptions.allowedTools,
+        permissionMode: options.permissionMode,
       });
       if (accepted) return;
+    }
+    // Stopped while the run was still being set up: never spawn the CLI.
+    if (startKey && pendingAborts.delete(startKey)) {
+      stoppedByUser = true;
+      return;
     }
     // Otherwise this turn supersedes any earlier one still holding the
     // session's process open, so held runs cannot stack up.
@@ -952,7 +1096,33 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
     // resolves approval at the permission-mode step and skips this callback —
     // interactive tools won't reach the UI there; the classifier/bypass
     // auto-approves them and the model acts on a generated answer.
-    const bypassActive = interactiveBypass || sdkOptions.permissionMode === 'bypassPermissions';
+    let bypassActive = interactiveBypass || sdkOptions.permissionMode === 'bypassPermissions';
+    // The mode the CLI process is in right now (kept in sync with its status events).
+    let liveSdkMode: string = sdkOptions.permissionMode || 'default';
+    // Applies a permission-mode change to the running process instead of
+    // respawning it; bypass stays emulated in canUseTool as at spawn.
+    const applyPermissionMode = (mode: any) => {
+      const next = resolvePermissionModeState(mode, options.toolsSettings?.skipPermissions, delegated);
+      bypassActive = next.interactiveBypass || next.sdkMode === 'bypassPermissions';
+      if (next.sdkMode === liveSdkMode || typeof queryInstance?.setPermissionMode !== 'function') return;
+      liveSdkMode = next.sdkMode;
+      Promise.resolve(queryInstance.setPermissionMode(next.sdkMode)).catch((error: any) => {
+        console.warn('[claude] Failed to switch the live permission mode:', error?.message || error);
+      });
+    };
+
+    // A full elicitation form is out of scope: decline, but tell the user.
+    sdkOptions.onElicitation = async (request: AnyRecord) => {
+      ws.send(createNormalizedMessage({
+        kind: 'status',
+        text: `MCP server "${request?.serverName || 'unknown'}" asked for input${request?.message ? ` ("${request.message}")` : ''} — declined, not supported here.`,
+        notice: true,
+        sessionId: capturedSessionId || sessionId || null,
+        provider: 'claude',
+      }));
+      return { action: 'decline' };
+    };
+
     sdkOptions.canUseTool = async (toolName: any, input: any, context: any) => {
       const requiresInteraction = TOOLS_REQUIRING_INTERACTION.has(toolName);
 
@@ -1049,24 +1219,38 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
       }
 
       if (decision.allow) {
-        if (decision.rememberEntry && typeof decision.rememberEntry === 'string') {
-          if (!sdkOptions.allowedTools.includes(decision.rememberEntry)) {
-            sdkOptions.allowedTools.push(decision.rememberEntry);
+        const rule = scopeRememberedRule(rememberEntry, decision.rememberEntry, toolName, options.cwd);
+        if (rule) {
+          if (!sdkOptions.allowedTools.includes(rule)) {
+            sdkOptions.allowedTools.push(rule);
           }
-          const rememberKey = sessionId || capturedSessionId;
+          const rememberKey = sessionKey();
           if (rememberKey) {
             const remembered = sessionRememberedTools.get(rememberKey) ?? new Set<string>();
-            remembered.add(decision.rememberEntry);
+            remembered.add(rule);
             sessionRememberedTools.set(rememberKey, remembered);
           }
           if (Array.isArray(sdkOptions.disallowedTools)) {
-            sdkOptions.disallowedTools = sdkOptions.disallowedTools.filter((entry: any) => entry !== decision.rememberEntry);
+            sdkOptions.disallowedTools = sdkOptions.disallowedTools.filter((entry: any) => entry !== rule);
+          }
+        }
+        // An approved plan takes the CLI out of plan mode; record that so the
+        // next turn is not respawned with --permission-mode plan.
+        if (toolName === 'ExitPlanMode' && liveSdkMode === 'plan') {
+          liveSdkMode = 'default';
+          if (sessionId) {
+            try {
+              sessionsDb.setSessionPermissionMode(String(sessionId), 'default');
+            } catch (error: any) {
+              console.warn('[claude] Failed to persist the post-plan permission mode:', error?.message || error);
+            }
           }
         }
         return { behavior: 'allow', updatedInput: decision.updatedInput ?? input };
       }
 
-      return { behavior: 'deny', message: decision.message ?? 'User denied tool use' };
+      // The user's feedback (e.g. on a rejected plan) is what the model reads.
+      return { behavior: 'deny', message: decision.message || 'User denied tool use' };
     };
 
     let heldPrompt = createHeldPromptStream(promptMessages);
@@ -1101,6 +1285,7 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
       writer: ProviderRuntimeWriter;
       signature: string;
       allowedTools: string[];
+      permissionMode?: string;
     }): Promise<boolean> => {
       const unavailable = !heldForBackgroundWork
         || pendingInjection !== null
@@ -1113,6 +1298,8 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
       const uuid = crypto.randomUUID();
       return new Promise<boolean>((resolve) => {
         pendingInjection = { uuid, writer: request.writer, settle: resolve };
+        // The turn's mode reaches the CLI before its prompt (same stdin, in order).
+        applyPermissionMode(request.permissionMode);
         if (!pushPrompt(request.messages.map((message) => ({ ...message, uuid })))) {
           pendingInjection = null;
           resolve(false);
@@ -1157,8 +1344,10 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
 
     // Track the query instance for abort capability
     if (sessionKey()) {
-      addSession(sessionKey(), queryInstance, ws, releasePromptStream, injectTurn, steerTurn);
+      addSession(sessionKey(), queryInstance, ws, releasePromptStream, injectTurn, steerTurn, applyPermissionMode);
     }
+    // From here an abort finds the registered query directly.
+    if (startKey) startingRuns.delete(startKey);
     // A fresh process has no background tasks yet. Saying so clears a count
     // a previous process left behind on the client (its own final 0 can be
     // dropped once a newer run owns the session).
@@ -1182,7 +1371,7 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
       if (message.session_id && !capturedSessionId) {
 
         capturedSessionId = message.session_id;
-        addSession(sessionKey(), queryInstance, ws, releasePromptStream, injectTurn, steerTurn);
+        addSession(sessionKey(), queryInstance, ws, releasePromptStream, injectTurn, steerTurn, applyPermissionMode);
 
         // Set session ID on writer
         if (ws.setSessionId && typeof ws.setSessionId === 'function') {
@@ -1247,6 +1436,24 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
         ws.send(msg);
       }
 
+      const statusLine = claudeStatusLine(message);
+      if (statusLine) {
+        ws.send(createNormalizedMessage({
+          kind: 'status',
+          text: statusLine.text,
+          ...(statusLine.notice ? { notice: true } : {}),
+          sessionId: sid,
+          provider: 'claude',
+        }));
+      }
+      // The CLI reports its own mode switches (e.g. leaving plan mode).
+      if (message.type === 'system' && typeof message.permissionMode === 'string') {
+        liveSdkMode = message.permissionMode;
+      }
+      if (message.type === 'assistant' && !message.parent_tool_use_id) {
+        lastAssistantError = typeof message.error === 'string' ? message.error : null;
+      }
+
       // Token budget: per-step usage of the main agent (subagent steps carry
       // `parent_tool_use_id` and have their own context), sized against the
       // window the CLI reported.
@@ -1279,10 +1486,24 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
         const followUp = turnIsFollowUp;
         turnIsFollowUp = false;
         const abortPending = sessionKey() ? abortedInstances.has(queryInstance) : false;
+        const failure = describeClaudeResultFailure(message, lastAssistantError);
+        lastAssistantError = null;
         if (!turnCompleteSent && !abortPending) {
           turnCompleteSent = true;
-          ws.send(createCompleteMessage({ provider: 'claude', sessionId: capturedSessionId || sessionId || null, exitCode: 0 }));
-          if (followUp) {
+          // C3: the error goes out before `complete`, which seals the run.
+          if (failure) {
+            ws.send(createNormalizedMessage({ kind: 'error', content: failure, sessionId: capturedSessionId || sessionId || null, provider: 'claude' }));
+          }
+          ws.send(createCompleteMessage({ provider: 'claude', sessionId: capturedSessionId || sessionId || null, exitCode: failure ? 1 : 0 }));
+          if (failure) {
+            notifyRunFailed({
+              userId: ws?.userId || null,
+              provider: 'claude',
+              sessionId: sessionId || capturedSessionId || null,
+              sessionName: sessionSummary,
+              error: failure
+            });
+          } else if (followUp) {
             notifyBackgroundWorkCompleted({
               userId: ws?.userId || null,
               provider: 'claude',
@@ -1417,6 +1638,10 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
       error
     });
   } finally {
+    if (startKey) {
+      startingRuns.delete(startKey);
+      pendingAborts.delete(startKey);
+    }
     // Always close stdin — otherwise an aborted or failed run leaves the CLI
     // process (and its MCP servers) alive until the server exits.
     if (idleReleaseTimer) {
@@ -1468,6 +1693,11 @@ export async function abortClaudeSDKSession(sessionId: any) {
   const session = getSession(sessionId);
 
   if (!session) {
+    // The run is still being set up: it checks this right before spawning.
+    if (startingRuns.has(sessionId)) {
+      pendingAborts.add(sessionId);
+      return true;
+    }
     console.log(`Session ${sessionId} not found`);
     return false;
   }
@@ -1562,11 +1792,20 @@ export function reconnectSessionWriter(sessionId: any, newRawWs: any) {
   return true;
 }
 
+/**
+ * Switches a running session's permission mode in place (no respawn). A
+ * session without a live process picks the mode up from its next run.
+ */
+function setClaudeSDKSessionPermissionMode(sessionId: string, mode: string) {
+  getSession(sessionId)?.applyPermissionMode?.(mode);
+}
+
 // Consumed by the provider registry for run, Stop and permission controls.
 export const claudeRuntime: IProviderRuntime = {
   run: queryClaudeSDK,
   abort: abortClaudeSDKSession,
   steer: steerClaudeSDKSession,
+  setPermissionMode: setClaudeSDKSessionPermissionMode,
   permissions: {
     resolve: resolveToolApproval,
     listPending: getPendingApprovalsForSession,
