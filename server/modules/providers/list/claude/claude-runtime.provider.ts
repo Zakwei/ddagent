@@ -236,10 +236,38 @@ function matchesToolPermission(entry: any, toolName: any, input: any) {
       return false;
     }
 
-    return command.startsWith(allowedPrefix);
+    // A prefix rule approves one command, never a chain riding on it
+    // (`git status && rm -rf ~`), and `git status:*` must not match
+    // `git statusx`.
+    if (/[;&|`\n]|\$\(/.test(command)) {
+      return false;
+    }
+    return command === allowedPrefix || command.startsWith(`${allowedPrefix} `);
   }
 
   return false;
+}
+
+// Rules approved with "Always", per app session. The client sends no
+// persistent allowedTools, so without this an "Always" lasted one turn.
+const sessionRememberedTools = new Map<string, Set<string>>();
+
+/**
+ * The rule an "Always" answer adds for one permission ask: Bash gets a
+ * command-prefix rule (`Bash(git status:*)` — the command plus its
+ * subcommand when there is one), every other tool its bare name. Interactive
+ * tools and commands that cannot be expressed as a safe prefix get none, so
+ * the client offers no "Always" button for them.
+ */
+// Exported for tests: the rule offered to the client.
+export function claudeRememberEntry(toolName: any, input: any): string | null {
+  if (!toolName || TOOLS_REQUIRING_INTERACTION.has(toolName)) return null;
+  if (toolName !== 'Bash') return String(toolName);
+  const command = typeof input?.command === 'string' ? input.command.trim() : '';
+  if (!command || /[;&|`\n]|\$\(/.test(command)) return null;
+  const words = command.split(/\s+/);
+  const prefix = words.length > 1 && /^[a-z][\w:.-]*$/i.test(words[1]) ? `${words[0]} ${words[1]}` : words[0];
+  return /^[\w./:@+-]+( [\w:.-]+)?$/.test(prefix) ? `Bash(${prefix}:*)` : null;
 }
 
 /**
@@ -697,6 +725,10 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
       model: resolvedModel || options.model,
       effortModels,
     });
+    // Re-apply this session's "Always" rules to the new turn.
+    for (const entry of sessionRememberedTools.get(sessionId) ?? []) {
+      if (!sdkOptions.allowedTools.includes(entry)) sdkOptions.allowedTools.push(entry);
+    }
 
     // Local bypass flag for interactive runs — never an SDK option, so strip
     // it before query() sees the bag.
@@ -765,7 +797,16 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
       }
 
       const requestId = createRequestId();
-      ws.send(createNormalizedMessage({ kind: 'permission_request', requestId, toolName, input, sessionId: capturedSessionId || sessionId || null, provider: 'claude' }));
+      const rememberEntry = claudeRememberEntry(toolName, input);
+      ws.send(createNormalizedMessage({
+        kind: 'permission_request',
+        requestId,
+        toolName,
+        input,
+        ...(rememberEntry ? { context: { rememberEntry } } : {}),
+        sessionId: capturedSessionId || sessionId || null,
+        provider: 'claude',
+      }));
       emitNotification((createNotificationEvent as (input: any) => any)({
         provider: 'claude',
         sessionId: sessionId || capturedSessionId || null,
@@ -801,6 +842,7 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
           _sessionId: sessionId || capturedSessionId || null,
           _toolName: toolName,
           _input: input,
+          _context: rememberEntry ? { rememberEntry } : undefined,
           _receivedAt: new Date(),
         },
         onCancel: (reason: any) => {
@@ -819,6 +861,12 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
         if (decision.rememberEntry && typeof decision.rememberEntry === 'string') {
           if (!sdkOptions.allowedTools.includes(decision.rememberEntry)) {
             sdkOptions.allowedTools.push(decision.rememberEntry);
+          }
+          const rememberKey = sessionId || capturedSessionId;
+          if (rememberKey) {
+            const remembered = sessionRememberedTools.get(rememberKey) ?? new Set<string>();
+            remembered.add(decision.rememberEntry);
+            sessionRememberedTools.set(rememberKey, remembered);
           }
           if (Array.isArray(sdkOptions.disallowedTools)) {
             sdkOptions.disallowedTools = sdkOptions.disallowedTools.filter((entry: any) => entry !== decision.rememberEntry);

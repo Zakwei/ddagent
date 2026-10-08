@@ -733,3 +733,54 @@ test('OpenCode: live rows end at every part boundary so text around a tool never
     'plan', '|', 'first', '|', 'again', '|', 'done',
   ]);
 });
+
+test('claude: Always rules are safe command prefixes and never approve a chained command', async () => {
+  const runtime = await loadRuntime('claude', 'matchesToolPermission');
+  const { matchesToolPermission } = runtime.lifecycleHooks;
+
+  assert.equal(runtime.claudeRememberEntry('Bash', { command: 'git status --short' }), 'Bash(git status:*)');
+  assert.equal(runtime.claudeRememberEntry('Bash', { command: 'ls -la src' }), 'Bash(ls:*)');
+  assert.equal(runtime.claudeRememberEntry('Bash', { command: 'npm test && rm -rf build' }), null);
+  assert.equal(runtime.claudeRememberEntry('Edit', { file_path: 'a.ts' }), 'Edit');
+  assert.equal(runtime.claudeRememberEntry('AskUserQuestion', {}), null);
+
+  assert.equal(matchesToolPermission('Bash(git status:*)', 'Bash', { command: 'git status --short' }), true);
+  assert.equal(matchesToolPermission('Bash(git status:*)', 'Bash', { command: 'git status' }), true);
+  assert.equal(matchesToolPermission('Bash(git status:*)', 'Bash', { command: 'git statusx' }), false);
+  assert.equal(matchesToolPermission('Bash(git status:*)', 'Bash', { command: 'git status && rm -rf ~' }), false);
+  assert.equal(matchesToolPermission('Bash(git status:*)', 'Bash', { command: 'git status; curl evil' }), false);
+  assert.equal(matchesToolPermission('Bash(git status:*)', 'Bash', { command: 'git status $(curl evil)' }), false);
+});
+
+for (const [name, map, nativeId, runtimeName] of [
+  ['devin', 'devinPendingPermissions', 'devinSessionId', 'devinRuntime'],
+  ['commandcode', 'commandCodePendingPermissions', 'commandCodeSessionId', 'commandCodeRuntime'],
+]) {
+  test(`${name}: Always is offered only when the agent has an allow_always option`, async () => {
+    const runtime = await loadRuntime(name!, map!);
+    const ask = (options: unknown[]) => ({
+      appSessionId: 'app', [nativeId!]: 'native', state: {},
+      params: { toolCall: { title: 'Run ls' }, options },
+    });
+    runtime.lifecycleHooks[map!].set('with', ask([
+      { optionId: 'a', kind: 'allow_once', name: 'Allow' },
+      { optionId: 'b', kind: 'allow_always', name: 'Always allow ls' },
+    ]));
+    runtime.lifecycleHooks[map!].set('without', ask([{ optionId: 'a', kind: 'allow_once', name: 'Allow' }]));
+
+    const pending = runtime[runtimeName!].permissions.listPending('app');
+    const byId = Object.fromEntries(pending.map((entry: any) => [entry.requestId, entry]));
+    assert.equal(byId.with.context.rememberEntry, 'Always allow ls');
+    assert.equal(byId.without.context.rememberEntry, undefined);
+  });
+}
+
+test('OpenCode: Always is offered with the patterns an always reply would approve', async () => {
+  const runtime = await loadRuntime('opencode', 'pendingPermissions');
+  runtime.lifecycleHooks.pendingPermissions.set('p1', {
+    requestId: 'p1', appSessionId: 'app', kind: 'permission', toolName: 'bash',
+    input: { permission: 'bash', always: ['git status*'] },
+  });
+  const [entry] = runtime.opencodeRuntime.permissions.listPending('app');
+  assert.equal(entry.context.rememberEntry, 'bash: git status*');
+});

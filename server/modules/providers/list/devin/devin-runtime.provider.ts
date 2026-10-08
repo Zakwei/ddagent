@@ -448,6 +448,17 @@ export async function sendFinalAssistantMessage(writer: any, state: any, options
     return true;
 }
 
+
+/**
+ * "Always" is offered only when the agent itself has an `allow_always`
+ * option; its label rides along as the rule shown to the user. Resolving
+ * with a truthy rememberEntry then selects that option.
+ */
+function acpRememberContext(options: any[]) {
+    const always = options.find((option: any) => option?.kind === 'allow_always');
+    return always ? { rememberEntry: readOptionalString(always.name) ?? 'Always allow' } : {};
+}
+
 /**
  * Extracts an `ask_user_question` ask out of ACP `session/request_permission`
  * params. The CLI forwards one ACP request per question: `toolCall.rawInput`
@@ -653,7 +664,10 @@ function listDevinPendingPermissions(sessionId: any) {
                 input: questionAsk
                     ? { questions: [questionAsk] }
                     : readObjectRecord(toolCall?.rawInput) ?? pending.params?.rawInput ?? {},
-                context: { options: Array.isArray(pending.params.options) ? pending.params.options : [] },
+                context: {
+                    options: Array.isArray(pending.params.options) ? pending.params.options : [],
+                    ...acpRememberContext(Array.isArray(pending.params.options) ? pending.params.options : []),
+                },
                 // The client filters pending asks by the app session id, so the
                 // ack must carry that id — not the provider-native one (which
                 // never leaves the backend). See chat-websocket.service.ts.
@@ -1588,7 +1602,7 @@ function createDevinProcess(sessionId: any, workingDir: any, model: any, ws: any
                     requestId,
                     toolName: readOptionalString(toolCall?.title) ?? readOptionalString(params.title) ?? 'Tool',
                     input: readObjectRecord(toolCall?.rawInput) ?? params.rawInput ?? {},
-                    context: { options: acpOptions },
+                    context: { options: acpOptions, ...acpRememberContext(acpOptions) },
                     sessionId: state.devinSessionId,
                     provider: 'devin',
                 }));

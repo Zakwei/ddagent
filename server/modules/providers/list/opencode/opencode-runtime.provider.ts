@@ -584,9 +584,21 @@ function forwardPermissionRequest(
     requestId,
     toolName,
     input,
+    ...openCodeRememberContext(input),
     sessionId: providerSessionId,
     provider: PROVIDER,
   }));
+}
+
+// OpenCode lists the patterns an "always" reply approves for the session;
+// "Always" is offered only when there are some.
+function openCodeRememberContext(input: AnyRecord) {
+  const patterns = Array.isArray(input.always)
+    ? input.always.filter((pattern: unknown) => typeof pattern === 'string' && pattern)
+    : [];
+  return patterns.length
+    ? { context: { rememberEntry: `${String(input.permission ?? 'tool')}: ${patterns.join(', ')}` } }
+    : {};
 }
 
 function handlePermissionAsked(baseUrl: string, props: AnyRecord): void {
@@ -1912,6 +1924,7 @@ function listOpenCodePendingPermissions(sessionId: string): unknown[] {
       requestId: entry.requestId,
       toolName: entry.toolName,
       input: entry.input,
+      ...(entry.kind === 'permission' ? openCodeRememberContext(entry.input as AnyRecord) : {}),
       sessionId,
     });
   }

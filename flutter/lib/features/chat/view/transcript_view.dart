@@ -1442,9 +1442,12 @@ class MessageTile extends ConsumerWidget {
                           child: Text(i18n.chat.permissions.allow),
                         ),
                         if (rememberEntry != null)
-                          FilledButton.tonal(
-                            onPressed: () => decide(allow: true, remember: rememberEntry),
-                            child: Text(i18n.chat.permissions.always),
+                          Tooltip(
+                            message: i18n.chat.permissions.addTo(entry: rememberEntry),
+                            child: FilledButton.tonal(
+                              onPressed: () => decide(allow: true, remember: rememberEntry),
+                              child: Text(i18n.chat.permissions.always),
+                            ),
                           ),
                         if (canEditInput)
                           TextButton(
@@ -1949,9 +1952,15 @@ class _PermissionBanner extends ConsumerWidget {
     final t = Theme.of(context).textTheme;
     final i18n = Translations.of(context);
 
-    void decide(PendingPermission p, {required bool allow}) => ref
+    // Only "Always" remembers the rule — a plain Allow (or Allow all) must
+    // approve this one call and nothing more.
+    void decide(PendingPermission p, {required bool allow, bool remember = false}) => ref
         .read(transcriptProvider(sessionId).notifier)
-        .decidePermission(p.requestId, allow: allow, rememberEntry: allow ? p.rememberEntry : null);
+        .decidePermission(
+          p.requestId,
+          allow: allow,
+          rememberEntry: allow && remember ? p.rememberEntry : null,
+        );
 
     bool isQuestion(PendingPermission p) {
       final n = p.toolName.toLowerCase().replaceAll(' ', '_');
@@ -2039,9 +2048,12 @@ class _PermissionBanner extends ConsumerWidget {
                     child: Text(i18n.chat.permissions.allow),
                   ),
                   if (p.rememberEntry != null)
-                    TextButton(
-                      onPressed: () => decide(p, allow: true),
-                      child: Text(i18n.chat.permissions.always),
+                    Tooltip(
+                      message: i18n.chat.permissions.addTo(entry: p.rememberEntry!),
+                      child: TextButton(
+                        onPressed: () => decide(p, allow: true, remember: true),
+                        child: Text(i18n.chat.permissions.always),
+                      ),
                     ),
                   TextButton(
                     onPressed: () => decide(p, allow: false),
