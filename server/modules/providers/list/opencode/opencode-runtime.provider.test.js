@@ -136,8 +136,9 @@ function createFakeServe() {
       const abort = url.pathname.match(/^\/session\/([^/]+)\/abort$/);
       if (req.method === 'POST' && abort) {
         state.aborts.push(abort[1]);
+        state.onAbort?.(abort[1]);
         res.statusCode = 204;
-        res.end();
+        setTimeout(() => res.end(), state.abortDelayMs ?? 0);
         return;
       }
       if (req.method === 'POST' && url.pathname === '/instance/dispose') {
@@ -1056,6 +1057,39 @@ test('a provider retry that stops advancing aborts the wedged turn instead of ha
     assert.deepEqual(state.aborts, [sid]);
     assert.equal(writer.messages.some((m) => m.kind === 'error' && /retry stalled/.test(m.content)), true);
     assert.equal(writer.messages.some((m) => m.kind === 'complete' && m.exitCode === 1), true);
+  });
+});
+
+test('a retry-stall abort whose own idle arrives first still fails the run', async () => {
+  await withFakeServe(async ({ state, tempRoot, baseUrl }) => {
+    process.env.OPENCODE_RETRY_STALL_MS = '150';
+    const writer = makeWriter();
+    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-rs2' }, writer, makeContext());
+
+    await waitFor(() => state.promptBodies.length === 1);
+    const sid = 'ses_fake_1';
+    state.emit({
+      type: 'session.status',
+      properties: { sessionID: sid, status: { type: 'retry', attempt: 1, message: 'Timed out' } },
+    });
+    state.sessionStatuses = { [sid]: { type: 'retry', attempt: 1 } };
+    // OpenCode publishes the aborted message and the idle before the abort
+    // POST returns.
+    state.onAbort = () => {
+      state.emit({
+        type: 'message.updated',
+        properties: { sessionID: sid, info: { role: 'assistant', error: { name: 'MessageAbortedError', data: {} } } },
+      });
+      state.emit(idleEvent(sid));
+    };
+    state.abortDelayMs = 100;
+    await waitFor(() => writer.messages.some((m) => m.text?.includes('retry 1')));
+    const rejected = assert.rejects(run, /retry stalled/);
+    await new Promise((resolve) => setTimeout(resolve, 250));
+    await reconcileActiveRuns(baseUrl);
+    await rejected;
+    const completes = writer.messages.filter((m) => m.kind === 'complete');
+    assert.deepEqual(completes.map((m) => m.exitCode), [1]);
   });
 });
 

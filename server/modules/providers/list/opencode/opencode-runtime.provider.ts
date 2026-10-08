@@ -844,7 +844,9 @@ function questionAnswersToApi(questions: ForwardedQuestion[], answers: unknown):
 }
 
 function finishRun(run: ActiveRun): void {
-  if (run.completeSent) {
+  // A retry-stall abort's trailing idle must not settle the run as a success;
+  // trackRetryStatus fails it once the abort POST returns.
+  if (run.completeSent || run.retryStallAborted) {
     return;
   }
   if (run.aborted) {
@@ -1140,7 +1142,7 @@ function dispatchServerEvent(baseUrl: string, event: AnyRecord): void {
     // Same stale-event guard: an error predating our prompt belongs to the
     // previous turn — and an error during poison recovery belongs to the
     // killed turn, not the retried one.
-    if (run.promptPosted && !run.recovering) {
+    if (run.promptPosted && !run.recovering && !run.retryStallAborted) {
       failRun(run, new Error(extractOpenCodeErrorMessage(props.error) ?? 'OpenCode session error'));
     }
   }
