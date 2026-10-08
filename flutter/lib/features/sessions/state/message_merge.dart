@@ -71,7 +71,10 @@ final _injectedPrefixPatterns = [
   ),
 ];
 
-String _stripInjectedPrefix(String text) {
+/// The user's own text of a turn, without the server's first-turn injections.
+String stripInjectedPrefix(String text) => _stripInjected(text);
+
+String _stripInjected(String text) {
   var t = text;
   for (final pattern in _injectedPrefixPatterns) {
     t = t.replaceFirst(pattern, '');
@@ -82,7 +85,7 @@ String _stripInjectedPrefix(String text) {
 _Fingerprint? _fingerprint(SessionMessage m, {bool stripInjectedPrefix = false}) {
   if (!m.isUserText) return null;
   var text = (m.content ?? '').trim();
-  if (stripInjectedPrefix) text = _stripInjectedPrefix(text);
+  if (stripInjectedPrefix) text = _stripInjected(text);
   final images = m.images?.length ?? 0;
   final files = m.files?.length ?? 0;
   if (text.isEmpty && images == 0 && files == 0) return null;

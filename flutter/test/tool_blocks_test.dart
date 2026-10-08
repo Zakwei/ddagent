@@ -357,6 +357,34 @@ void main() {
       ),
     );
 
+    testWidgets('reloaded AskUserQuestion marks the answer kept on toolUseResult', (tester) async {
+      final question = {
+        'question': 'Red or blue?',
+        'options': [
+          {'label': 'Red'},
+          {'label': 'Blue'},
+        ],
+      };
+      final msg = _m(
+        'q1',
+        'tool_use',
+        toolName: 'AskUserQuestion',
+        toolInput: {
+          'questions': [question],
+        },
+        toolResult: {
+          'content': 'answered',
+          'toolUseResult': {
+            'questions': [question],
+            'answers': {'Red or blue?': 'Blue'},
+          },
+        },
+      );
+      await tester.pumpWidget(app(ToolUseTile(message: msg, childrenMap: const {})));
+      expect(find.byIcon(Icons.radio_button_checked), findsOneWidget);
+      expect(find.byIcon(Icons.radio_button_off), findsOneWidget);
+    });
+
     testWidgets('todo_write expands into the TodoListContent rows', (tester) async {
       final msg = _m(
         'tw',

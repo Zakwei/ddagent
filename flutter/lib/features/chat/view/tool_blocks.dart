@@ -804,8 +804,12 @@ class ToolUseTile extends StatelessWidget {
   Widget _qaContent(BuildContext context, ColorScheme cs, Map<String, dynamic> input) {
     final questions = input['questions'] is List ? input['questions'] as List : const <dynamic>[];
     if (questions.isEmpty) return const SizedBox.shrink();
-    final answers = input['answers'] is Map
-        ? Map<String, dynamic>.from(input['answers'] as Map)
+    // Live asks stamp `answers` on the input; reloaded Claude rows carry them
+    // only on the tool result's `toolUseResult`.
+    final tur = message.toolResult?['toolUseResult'];
+    final rawAnswers = input['answers'] ?? (tur is Map ? tur['answers'] : null);
+    final answers = rawAnswers is Map
+        ? Map<String, dynamic>.from(rawAnswers)
         : const <String, dynamic>{};
     final t = Translations.of(context);
     return Container(

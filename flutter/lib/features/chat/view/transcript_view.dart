@@ -29,6 +29,7 @@ import 'package:ddagent_app/features/orchestrator/view/orchestrator_cards.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/sessions/state/activity_poller.dart';
+import 'package:ddagent_app/features/sessions/state/message_merge.dart' show stripInjectedPrefix;
 import 'package:ddagent_app/features/sessions/state/session_store.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
 import 'package:ddagent_app/features/sessions/view/session_list_row.dart';
@@ -1312,7 +1313,8 @@ class MessageTile extends ConsumerWidget {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
     final i18n = Translations.of(context);
-    final content = message.content ?? '';
+    // Reloaded first turns carry the server's injected rules; show only what was typed.
+    final content = stripInjectedPrefix(message.content ?? '');
     final time = clockTime(message.timestamp);
     final muted = t.labelSmall?.copyWith(color: c.mutedForeground);
     return _wrap(
