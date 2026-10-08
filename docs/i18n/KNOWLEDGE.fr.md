@@ -35,6 +35,11 @@ Il y a trois couches, et il est utile de savoir laquelle est laquelle :
   Claude Code lit `CLAUDE.md`, Codex/Cursor lisent `AGENTS.md`, Cursor lit
   `.cursorrules`, et plusieurs lisent `skills/` et `.agents/skills/`. C’est le travail du
   CLI, pas le choix du modèle — ddagent ne le désactive pas.
+- **Le préfixe de premier tour de ddagent** — au premier message d’une session,
+  ddagent ajoute en tête le `.ddagent/shared-context.md` du projet et un bloc
+  `<unified-rules>` (l’`AGENTS.md` du workspace, `~/.agents/AGENTS.md` et une courte
+  note d’hygiène ; définissez `DDAGENT_UNIFIED_RULES=0` pour le supprimer). Cette
+  couche repose sur des fichiers et est distincte de la base de connaissances.
 - **Récupération via MCP (à la demande)** — dès que vous installez le serveur MCP de
   ddagent dans un agent, sa liste d’outils inclut `knowledge_get_context`,
   `knowledge_search` et compagnie. Comme chez Contexta, rien n’est injecté
@@ -109,11 +114,12 @@ Les outils acceptent soit un `projectId`, soit un `projectPath` que ddagent conn
 
 ### Installer le serveur dans vos agents
 
-Vous n’avez pas à modifier les configurations des fournisseurs à la main. Utilisez **Settings → MCP →
-Install ddagent MCP server** (également proposé comme étape de l’onboarding) et choisissez les
-agents — ou installez pour tous. Cela écrit une entrée HTTP MCP `ddagent` (portée
-utilisateur) pointant vers `<server>/mcp` avec un jeton bearer `ddagent-mcp` réutilisable
-(une réinstallation révoque le précédent). Une fois installé, les outils de cet agent
+Vous n’avez pas à modifier les configurations des fournisseurs à la main. Utilisez **Settings → Agents →
+(agent) → MCP → Install ddagent MCP server** (également proposé comme étape de
+l’onboarding) et choisissez les agents — ou installez pour tous. Cela écrit une entrée
+HTTP MCP `ddagent` (portée utilisateur) pointant vers `<server>/mcp` avec un jeton
+bearer `ddagent-mcp` réutilisable, de portée `write` (une réinstallation révoque le
+précédent). Une fois installé, les outils de cet agent
 incluent le groupe `knowledge_*` aux côtés de `create_task`, `send_message`, etc.
 
 Comment un agent sait-il *quand* utiliser MCP ? Il ne devine pas — dites-le-lui. Gardez une
@@ -130,8 +136,9 @@ intention :
 
 - `AGENTS.md`, `CLAUDE.md`, `MUSE.md`, `GEMINI.md`, `CODEX.md`, `.cursorrules`,
   `.muserules` et le markdown/`.mdc` sous `.cursor/rules` deviennent des **règles**
-  (critical + enabled, afin d’atteindre le contexte de l’agent ; l’`AGENTS.md` du
-  workspace est `high` pour éviter la double injection avec unified-rules),
+  (critical + enabled, afin que `knowledge_get_context` les renvoie toujours ;
+  l’`AGENTS.md` du workspace est importé en `high` car le préfixe `<unified-rules>`
+  du premier tour le fournit déjà),
 - les fichiers `SKILL.md` sous `skills` / `.agents/skills` deviennent des **skills**
   (nom/description depuis le frontmatter),
 - tout autre markdown analysé devient une **mémoire de référence**.
@@ -157,13 +164,16 @@ Le graphe dessine vos liens explicites ainsi que les hubs implicites — chaque 
    réanalysez après de gros changements de ses fichiers d’instructions.
 2. **Promouvez délibérément** : seules les règles réellement contraignantes devraient être
    `critical` (elles sont toujours servies par le constructeur de contexte). Utilisez
-   l’étoile sur une ligne et surveillez le compteur de contexte critique.
+   l’étoile sur une ligne et surveillez le compteur de contexte de règles.
 3. **Gardez le reste en `high`/`normal`** — toujours interrogeable et disponible via MCP
    uniquement lorsqu’une requête correspond, donc elles ne coûtent rien quand elles sont hors sujet.
 4. **Informations personnelles** pour les préférences inter-projets (fuseau horaire, éditeur, nommage).
 5. **Reliez les mémoires liées** pour que les voisins à 1 saut suivent.
 6. **Installez MCP** pour les agents qui doivent interroger la base et persister
-   les apprentissages ; donnez la portée `read` à la plupart, `write` là où vous faites confiance à l’agent.
+   les apprentissages. L’installation en un clic utilise un jeton `write` ; pour un
+   agent en lecture seule, créez un jeton `read` dans les jetons du serveur MCP de
+   ddagent et configurez cet agent à la main (voir
+   [ddagent comme serveur MCP](../mcp-server.md#manual-client-config)).
 
 ## Migration
 
@@ -195,14 +205,14 @@ Montée sur `/api/knowledge` derrière l’authentification :
 ```
 GET    /memories            ?projectId=&includeGlobal=&priority=&tag=&memoryType=&limit=&offset=
 POST   /memories            PATCH /memories/:id   DELETE /memories/:id
-GET    /rules               ?projectId=&includeGlobal=&priority=&enabledOnly=
+GET    /rules               ?projectId=&includeGlobal=&priority=&enabledOnly=&limit=&offset=
 POST   /rules               PATCH /rules/:id       DELETE /rules/:id
-GET    /skills              ?category=
+GET    /skills              ?category=&limit=&offset=
 POST   /skills              PATCH /skills/:id      DELETE /skills/:id
 GET    /personal            POST /personal         PATCH/DELETE /personal/:id
 GET    /search              ?q=&type=&projectId=&limit=
 GET    /graph               ?projectId=&types=&limit=
-GET    /context             ?projectId=            (taille du contexte critique + budget)
+GET    /context             ?projectId=            (aperçu du contexte de règles : taille + budget)
 GET    /tags                DELETE /tags/:id
 GET    /connections         POST /connections      DELETE /connections/:id
 GET    /history             ?entityType=&entityId=&limit=
@@ -219,5 +229,5 @@ POST   /import-all          { dryRun?, dedupe?, promoteRules? }
 
 ## Voir aussi
 
-- [ddagent comme serveur MCP](mcp-server.md) — le catalogue d’outils et la configuration du jeton
-- [Collaboration d’équipe](teams.md) · [Approbations à distance](remote-approvals.md)
+- [ddagent comme serveur MCP](../mcp-server.md) — le catalogue d’outils et la configuration du jeton
+- [Collaboration d’équipe](../teams.md) · [Approbations à distance](../remote-approvals.md)

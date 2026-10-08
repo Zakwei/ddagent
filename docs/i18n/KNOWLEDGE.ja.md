@@ -35,6 +35,11 @@ SQLite データベース（`auth.db`）に FTS5 全文インデックスを伴�
   `CLAUDE.md` を読み、Codex/Cursor は `AGENTS.md` を読み、Cursor は `.cursorrules` を読み、
   いくつかは `skills/` と `.agents/skills/` を読みます。これは CLI の仕事であり、
   モデルの選択ではありません — ddagent はそれを止めません。
+- **ddagent の初回ターンのプレフィックス** — セッションの最初のメッセージで、ddagent は
+  プロジェクトの `.ddagent/shared-context.md` と `<unified-rules>` ブロック
+  （ワークスペースの `AGENTS.md`、`~/.agents/AGENTS.md`、短い衛生上の注意）を先頭に
+  付加します。`DDAGENT_UNIFIED_RULES=0` を設定すると省略できます。これはファイルベースで、
+  ナレッジベースとは別物です。
 - **MCP による取得（オンデマンド）** — エージェントに ddagent の MCP サーバーを
   インストールすると、そのツール一覧に `knowledge_get_context`、`knowledge_search`
   などが含まれます。Contexta に倣い、自動的に注入されるものは何もありません。
@@ -101,10 +106,10 @@ ddagent の MCP サーバー（`POST /mcp`）はナレッジベースを任意�
 
 ### エージェントへのサーバーインストール
 
-プロバイダー設定を手で編集する必要はありません。**Settings → MCP →
-Install ddagent MCP server**（オンボーディングの手順としても提示されます）を使い、
+プロバイダー設定を手で編集する必要はありません。**Settings → Agents →
+（エージェント） → MCP → Install ddagent MCP server**（オンボーディングの手順としても提示されます）を使い、
 エージェントを選びます — すべてにインストールすることもできます。`<server>/mcp` を指す
-`ddagent` HTTP MCP エントリ（ユーザースコープ）を、再利用可能な `ddagent-mcp` bearer トークンとともに
+`ddagent` HTTP MCP エントリ（ユーザースコープ）を、再利用可能な `write` スコープの `ddagent-mcp` bearer トークンとともに
 書き込みます（再インストールすると以前のものは失効します）。インストール後、そのエージェントのツールには
 `knowledge_*` グループが `create_task`、`send_message` などと並んで含まれます。
 
@@ -121,8 +126,9 @@ Install ddagent MCP server**（オンボーディングの手順としても提�
 
 - `AGENTS.md`、`CLAUDE.md`、`MUSE.md`、`GEMINI.md`、`CODEX.md`、`.cursorrules`、
   `.muserules`、および `.cursor/rules` 配下の markdown/`.mdc` は**ルール**になります
-  （critical + enabled で、エージェントコンテキストに届きます。ワークスペースの `AGENTS.md`
-  は unified-rules との二重注入を避けるため `high` です）。
+  （critical + enabled なので、`knowledge_get_context` が常に返します。ワークスペースの
+  `AGENTS.md` は、初回ターンの `<unified-rules>` プレフィックスがすでに届けているため
+  `high` としてインポートされます）。
 - `skills` / `.agents/skills` 配下の `SKILL.md` ファイルは**スキル**になります
   （frontmatter から名前/説明を取得）。
 - それ以外のスキャンされた markdown は**参照メモリ**になります。
@@ -147,13 +153,15 @@ Graph タブは pan/zoom、ノードのドラッグ、エンティティタイ�
    指示ファイルに大きな変更があったら再スキャンします。
 2. **意図的に昇格**します。真に拘束力のあるルールだけを `critical` にします
    （コンテキストビルダーによって常に提供されます）。行の星を使って、
-   クリティカルコンテキストメーターを監視します。
+   ルールコンテキストメーターを監視します。
 3. **残りは `high`/`normal` に保ちます** — 依然として検索可能で MCP 経由で利用でき、
    クエリが一致したときだけなので、無関係なときはコストがかかりません。
 4. プロジェクト横断の設定（タイムゾーン、エディタ、命名）には**個人情報**を使います。
 5. **関連するメモリをリンク**して、1 ホップ隣接を一緒に運びます。
 6. ナレッジベースを検索し学びを永続化すべきエージェントには **MCP をインストール**します。
-   ほとんどには `read` スコープを、信頼するエージェントには `write` を与えます。
+   ワンクリックインストールは `write` トークンを使います。読み取り専用のエージェントには、
+   ddagent MCP サーバーのトークンで `read` トークンを作成し、そのエージェントを手動で
+   設定してください（[MCP サーバーとしての ddagent](../mcp-server.md#manual-client-config) を参照）。
 
 ## マイグレーション
 
@@ -185,14 +193,14 @@ Knowledge → メニュー → **Migrate existing rules** は **dry-run** レポ
 ```
 GET    /memories            ?projectId=&includeGlobal=&priority=&tag=&memoryType=&limit=&offset=
 POST   /memories            PATCH /memories/:id   DELETE /memories/:id
-GET    /rules               ?projectId=&includeGlobal=&priority=&enabledOnly=
+GET    /rules               ?projectId=&includeGlobal=&priority=&enabledOnly=&limit=&offset=
 POST   /rules               PATCH /rules/:id       DELETE /rules/:id
-GET    /skills              ?category=
+GET    /skills              ?category=&limit=&offset=
 POST   /skills              PATCH /skills/:id      DELETE /skills/:id
 GET    /personal            POST /personal         PATCH/DELETE /personal/:id
 GET    /search              ?q=&type=&projectId=&limit=
 GET    /graph               ?projectId=&types=&limit=
-GET    /context             ?projectId=            (クリティカルコンテキストのサイズ + 予算)
+GET    /context             ?projectId=            (ルールコンテキストのプレビュー: サイズ + 予算)
 GET    /tags                DELETE /tags/:id
 GET    /connections         POST /connections      DELETE /connections/:id
 GET    /history             ?entityType=&entityId=&limit=
@@ -209,5 +217,5 @@ POST   /import-all          { dryRun?, dedupe?, promoteRules? }
 
 ## 関連
 
-- [MCP サーバーとしての ddagent](mcp-server.md) — ツールカタログとトークン設定
-- [チームコラボレーション](teams.md) · [リモート承認](remote-approvals.md)
+- [MCP サーバーとしての ddagent](../mcp-server.md) — ツールカタログとトークン設定
+- [チームコラボレーション](../teams.md) · [リモート承認](../remote-approvals.md)

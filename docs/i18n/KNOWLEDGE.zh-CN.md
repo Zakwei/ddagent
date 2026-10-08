@@ -34,6 +34,10 @@ ddagent 为你的智能体提供一个**本地优先的知识库**：记忆、�
   读取 `CLAUDE.md`，Codex/Cursor 读取 `AGENTS.md`，Cursor 读取 `.cursorrules`，
   还有一些读取 `skills/` 和 `.agents/skills/`。这是 CLI 的职责，而非
   模型的选择——ddagent 不会关闭它。
+- **ddagent 的首轮前缀** — 在会话的第一条消息中，ddagent 会在前面加上项目的
+  `.ddagent/shared-context.md` 和一个 `<unified-rules>` 块（工作区 `AGENTS.md`、
+  `~/.agents/AGENTS.md` 以及一条简短的规范提示；设置 `DDAGENT_UNIFIED_RULES=0`
+  可去掉它）。这基于文件，与知识库相互独立。
 - **MCP 检索（按需）** — 一旦你把 ddagent 的 MCP 服务器安装到某个智能体，它的
   工具列表就会包含 `knowledge_get_context`、`knowledge_search` 之类。遵循
   Contexta，不会有任何东西被自动注入：智能体用查询调用上下文构建器，取回
@@ -95,10 +99,10 @@ ddagent 的 MCP 服务器（`POST /mcp`）把知识库暴露给任何 MCP 客户
 
 ### 把服务器安装到你的智能体
 
-你不必手动编辑提供商配置。使用 **Settings → MCP →
-Install ddagent MCP server**（在引导流程中也会作为一步提供）并选择
+你不必手动编辑提供商配置。使用 **Settings → Agents →
+（智能体） → MCP → Install ddagent MCP server**（在引导流程中也会作为一步提供）并选择
 智能体——或为所有智能体安装。它会写入一个 `ddagent` HTTP MCP 条目（用户
-范围），指向 `<server>/mcp`，并带一个可复用的 `ddagent-mcp` bearer token
+范围），指向 `<server>/mcp`，并带一个可复用、具有 `write` 范围的 `ddagent-mcp` bearer token
 （重新安装会吊销上一个）。安装后，该智能体的工具
 会包含 `knowledge_*` 组，以及 `create_task`、`send_message` 等。
 
@@ -114,8 +118,8 @@ Install ddagent MCP server**（在引导流程中也会作为一步提供）并�
 
 - `AGENTS.md`、`CLAUDE.md`、`MUSE.md`、`GEMINI.md`、`CODEX.md`、`.cursorrules`、
   `.muserules` 以及 `.cursor/rules` 下的 markdown/`.mdc` 成为**规则**
-  （critical + enabled，因此会进入智能体上下文；工作区 `AGENTS.md`
-  为 `high`，以避免与 unified-rules 重复注入），
+  （critical + enabled，因此 `knowledge_get_context` 总会返回它们；工作区
+  `AGENTS.md` 以 `high` 导入，因为首轮的 `<unified-rules>` 前缀已经提供了它），
 - `skills` / `.agents/skills` 下的 `SKILL.md` 文件成为**技能**
   （名称/描述来自 frontmatter），
 - 扫描到的任何其他 markdown 成为**参考记忆**。
@@ -139,13 +143,15 @@ Graph 标签页是一个力导向关系视图，带平移/缩放、节点
 1. 对每个活跃项目**扫描**一次（Knowledge → 选择项目 → scan）；
    在其指令文件发生大改动后重新扫描。
 2. **有意识地提升**：只有真正有约束力的规则才应该是 `critical`
-   （总是由上下文构建器提供）。使用行上的星标，并留意关键上下文计量表。
+   （总是由上下文构建器提供）。使用行上的星标，并留意规则上下文计量表。
 3. **其余保持 `high`/`normal`**——仍然可搜索、可通过 MCP 使用，
    只在查询匹配时才可用，因此在无关时不会产生任何成本。
 4. 用**个人信息**存跨项目偏好（时区、编辑器、命名）。
 5. **链接相关记忆**，让 1 跳邻居一起带上。
-6. 对应当搜索知识库并持久化所学内容的智能体**安装 MCP**；
-   给大多数 `read` 范围，在信任的智能体上给 `write`。
+6. 对应当搜索知识库并持久化所学内容的智能体**安装 MCP**。
+   一键安装使用 `write` token；对于只读智能体，请在 ddagent MCP 服务器 token 中
+   创建一个 `read` token，并手动配置该智能体（参见
+   [作为 MCP 服务器的 ddagent](../mcp-server.md#manual-client-config)）。
 
 ## 迁移
 
@@ -176,14 +182,14 @@ Knowledge → 菜单 → **Migrate existing rules** 会运行一份 **dry-run** 
 ```
 GET    /memories            ?projectId=&includeGlobal=&priority=&tag=&memoryType=&limit=&offset=
 POST   /memories            PATCH /memories/:id   DELETE /memories/:id
-GET    /rules               ?projectId=&includeGlobal=&priority=&enabledOnly=
+GET    /rules               ?projectId=&includeGlobal=&priority=&enabledOnly=&limit=&offset=
 POST   /rules               PATCH /rules/:id       DELETE /rules/:id
-GET    /skills              ?category=
+GET    /skills              ?category=&limit=&offset=
 POST   /skills              PATCH /skills/:id      DELETE /skills/:id
 GET    /personal            POST /personal         PATCH/DELETE /personal/:id
 GET    /search              ?q=&type=&projectId=&limit=
 GET    /graph               ?projectId=&types=&limit=
-GET    /context             ?projectId=            （关键上下文大小 + 预算）
+GET    /context             ?projectId=            （规则上下文预览：大小 + 预算）
 GET    /tags                DELETE /tags/:id
 GET    /connections         POST /connections      DELETE /connections/:id
 GET    /history             ?entityType=&entityId=&limit=
@@ -200,5 +206,5 @@ POST   /import-all          { dryRun?, dedupe?, promoteRules? }
 
 ## 相关
 
-- [作为 MCP 服务器的 ddagent](mcp-server.md) — 工具目录和 token 设置
-- [团队协作](teams.md) · [远程审批](remote-approvals.md)
+- [作为 MCP 服务器的 ddagent](../mcp-server.md) — 工具目录和 token 设置
+- [团队协作](../teams.md) · [远程审批](../remote-approvals.md)

@@ -35,6 +35,11 @@ SQLite 데이터베이스(`auth.db`)에 FTS5 전체 텍스트 인덱스와 함�
   `CLAUDE.md`를, Codex/Cursor는 `AGENTS.md`를, Cursor는 `.cursorrules`를 읽고,
   몇몇은 `skills/`와 `.agents/skills/`를 읽습니다. 이것은 CLI의 일이지
   모델의 선택이 아닙니다 — ddagent는 이를 끄지 않습니다.
+- **ddagent의 첫 턴 접두사** — 세션의 첫 메시지에서 ddagent는 프로젝트의
+  `.ddagent/shared-context.md`와 `<unified-rules>` 블록(워크스페이스 `AGENTS.md`,
+  `~/.agents/AGENTS.md`, 짧은 위생 안내)을 앞에 붙입니다. 이를 빼려면
+  `DDAGENT_UNIFIED_RULES=0`을 설정하세요. 이것은 파일 기반이며 지식 베이스와는
+  별개입니다.
 - **MCP 검색(온디맨드)** — 에이전트에 ddagent의 MCP 서버를 설치하면 도구 목록에
   `knowledge_get_context`, `knowledge_search` 등이 포함됩니다. Contexta를 따라,
   자동으로 주입되는 것은 없습니다: 에이전트가 쿼리를 가지고 컨텍스트 빌더를
@@ -99,10 +104,10 @@ ddagent의 MCP 서버(`POST /mcp`)는 지식 베이스를 모든 MCP 클라이�
 
 ### 에이전트에 서버 설치
 
-제공자 설정을 직접 편집할 필요가 없습니다. **Settings → MCP →
-Install ddagent MCP server**(온보딩 단계로도 제공됨)를 사용하고
+제공자 설정을 직접 편집할 필요가 없습니다. **Settings → Agents →
+(에이전트) → MCP → Install ddagent MCP server**(온보딩 단계로도 제공됨)를 사용하고
 에이전트를 선택하세요 — 또는 모두에 설치하세요. `<server>/mcp`를 가리키는
-`ddagent` HTTP MCP 항목(사용자 범위)을 재사용 가능한 `ddagent-mcp` 베어러 토큰과 함께
+`ddagent` HTTP MCP 항목(사용자 범위)을 재사용 가능한 `write` 범위의 `ddagent-mcp` 베어러 토큰과 함께
 기록합니다(재설치하면 이전 토큰은 폐기됩니다). 설치 후 해당 에이전트의 도구에는
 `create_task`, `send_message` 등과 함께 `knowledge_*` 그룹이 포함됩니다.
 
@@ -119,8 +124,9 @@ Install ddagent MCP server**(온보딩 단계로도 제공됨)를 사용하고
 
 - `AGENTS.md`, `CLAUDE.md`, `MUSE.md`, `GEMINI.md`, `CODEX.md`, `.cursorrules`,
   `.muserules` 및 `.cursor/rules` 아래의 markdown/`.mdc`는 **규칙**이 됩니다
-  (critical + enabled라서 에이전트 컨텍스트에 도달합니다; 워크스페이스 `AGENTS.md`는
-  unified-rules와의 이중 주입을 피하기 위해 `high`입니다),
+  (critical + enabled라서 `knowledge_get_context`가 항상 반환합니다; 워크스페이스
+  `AGENTS.md`는 첫 턴 `<unified-rules>` 접두사가 이미 전달하므로 `high`로
+  가져옵니다),
 - `skills` / `.agents/skills` 아래의 `SKILL.md` 파일은 **스킬**이 됩니다
   (frontmatter의 이름/설명),
 - 그 밖에 스캔된 markdown은 **참조 메모리**가 됩니다.
@@ -145,13 +151,15 @@ Graph 탭은 팬/줌, 노드 드래그, 엔티티 유형 필터, 이웃 하이�
    지침 파일에 큰 변경이 있으면 다시 스캔하세요.
 2. **의도적으로 승격**하세요: 정말 구속력 있는 규칙만 `critical`이어야 합니다
    (컨텍스트 빌더에 의해 항상 제공됩니다). 행의 별을 사용하고
-   크리티컬 컨텍스트 미터를 지켜보세요.
+   규칙 컨텍스트 미터를 지켜보세요.
 3. **나머지는 `high`/`normal`로 유지**하세요 — 여전히 검색 가능하고 MCP로 사용할 수 있으며
    쿼리가 일치할 때만이므로 관련이 없을 때는 비용이 들지 않습니다.
 4. 프로젝트 간 선호(시간대, 편집기, 명명)에는 **개인 정보**를 사용하세요.
 5. **관련 메모리를 연결**하여 1홉 이웃이 함께 따라오게 하세요.
-6. 지식 베이스를 검색하고 배운 것을 영속화해야 하는 에이전트에 **MCP를 설치**하세요;
-   대부분에는 `read` 범위를, 신뢰하는 에이전트에는 `write`를 주세요.
+6. 지식 베이스를 검색하고 배운 것을 영속화해야 하는 에이전트에 **MCP를 설치**하세요.
+   원클릭 설치는 `write` 토큰을 사용합니다. 읽기 전용 에이전트라면 ddagent MCP 서버
+   토큰에서 `read` 토큰을 만들고 해당 에이전트를 직접 설정하세요
+   ([MCP 서버로서의 ddagent](../mcp-server.md#manual-client-config) 참고).
 
 ## 마이그레이션
 
@@ -183,14 +191,14 @@ Knowledge → 메뉴 → **Migrate existing rules**는 **dry-run** 보고서를 
 ```
 GET    /memories            ?projectId=&includeGlobal=&priority=&tag=&memoryType=&limit=&offset=
 POST   /memories            PATCH /memories/:id   DELETE /memories/:id
-GET    /rules               ?projectId=&includeGlobal=&priority=&enabledOnly=
+GET    /rules               ?projectId=&includeGlobal=&priority=&enabledOnly=&limit=&offset=
 POST   /rules               PATCH /rules/:id       DELETE /rules/:id
-GET    /skills              ?category=
+GET    /skills              ?category=&limit=&offset=
 POST   /skills              PATCH /skills/:id      DELETE /skills/:id
 GET    /personal            POST /personal         PATCH/DELETE /personal/:id
 GET    /search              ?q=&type=&projectId=&limit=
 GET    /graph               ?projectId=&types=&limit=
-GET    /context             ?projectId=            (크리티컬 컨텍스트 크기 + 예산)
+GET    /context             ?projectId=            (규칙 컨텍스트 미리보기: 크기 + 예산)
 GET    /tags                DELETE /tags/:id
 GET    /connections         POST /connections      DELETE /connections/:id
 GET    /history             ?entityType=&entityId=&limit=
@@ -207,5 +215,5 @@ POST   /import-all          { dryRun?, dedupe?, promoteRules? }
 
 ## 관련 항목
 
-- [MCP 서버로서의 ddagent](mcp-server.md) — 도구 카탈로그와 토큰 설정
-- [팀 협업](teams.md) · [원격 승인](remote-approvals.md)
+- [MCP 서버로서의 ddagent](../mcp-server.md) — 도구 카탈로그와 토큰 설정
+- [팀 협업](../teams.md) · [원격 승인](../remote-approvals.md)

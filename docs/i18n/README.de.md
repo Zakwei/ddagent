@@ -2,13 +2,13 @@
   <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/logo.svg" alt="ddagent" width="72" height="72">
   <h1>ddagent</h1>
   <p><strong>Eine UI für alle deine AI-Coding-Agenten.</strong><br>
-  Selbst gehostetes Interface (Web, Desktop &amp; Mobile) für Claude Code, Codex, Cursor CLI, OpenCode und Devin — Sessions, Dateien, Git, Terminals und Tasks an einem Ort.</p>
+  Selbst gehosteter Server und Flutter-Client (Web, Linux, Windows &amp; Android) für Claude Code, Codex, Cursor CLI, OpenCode, Devin, Command Code und Antigravity — Sessions, Dateien, Git, Terminals und Tasks an einem Ort.</p>
 
   <p>
     <img src="https://img.shields.io/github/v/release/Zakwei/ddagent?label=Version&amp;color=0066FF" alt="Version">
     <img src="https://img.shields.io/badge/license-AGPL--3.0-blue" alt="Lizenz: AGPL-3.0">
     <img src="https://img.shields.io/badge/node-%E2%89%A522-339933" alt="node >= 22">
-    <img src="https://img.shields.io/badge/self--hosted-yes-success" alt="self-hosted">
+    <img src="https://img.shields.io/badge/self--hosted-yes-success" alt="selbst gehostet">
   </p>
 
   <p>
@@ -34,92 +34,136 @@
 </div>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/desktop-main.png" alt="ddagent Chat-Ansicht" width="78%">&nbsp;
-  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/mobile-chat.png" alt="ddagent Mobile-Ansicht" width="20%">
+  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/desktop-main.png" alt="ddagent-Chatansicht" width="78%">&nbsp;
+  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/mobile-chat.png" alt="ddagent-Mobilansicht" width="20%">
 </p>
+
+<table>
+  <tr>
+    <td width="33%"><img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/sessions.png" alt="Letzte Sessions aus Claude Code und Codex"></td>
+    <td width="33%"><img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/kanban-board.png" alt="Kanban-Board, das Agenten-Läufe steuert"></td>
+    <td width="33%"><img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/git-panel.png" alt="Git-Panel mit Hunk-Staging"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Sessions aller Agenten in einer Liste</sub></td>
+    <td align="center"><sub>Kanban-Board — Karten starten Agenten-Läufe</sub></td>
+    <td align="center"><sub>Git-Panel — Diff, Hunks stagen, Commit</sub></td>
+  </tr>
+</table>
 
 ---
 
 ## Was ist ddagent?
 
-ddagent läuft auf deinem eigenen Rechner oder VPS und liefert dir eine ausgefeilte UI (Flutter: Web, Desktop und Mobile) über den Coding-Agenten, die du bereits nutzt. Es erkennt ihre Sessions direkt von der Festplatte — deine `~/.claude`-, Codex- und Devin-Historie erscheint sofort, nichts wird dupliziert oder an Dritte synchronisiert.
+ddagent läuft auf deinem eigenen Rechner oder VPS und legt eine durchdachte UI über die Coding-Agenten, die du bereits nutzt. Der Server liest die Sessions jedes Agenten direkt aus dessen eigenem Verlauf auf der Festplatte (`~/.claude`, `~/.codex`, `~/.cursor`, OpenCode, Devin, …), sodass bestehende Unterhaltungen ohne jeglichen Import erscheinen. Lokal werden nur Session-Metadaten indexiert; nichts wird an Dritte gesendet.
 
-Öffne es in jedem Browser in deinem Netzwerk oder auf dem Handy. Deine Maschine, deine Agenten, deine Daten.
+Verbinde dich über den Flutter-Client auf deinem Desktop, Smartphone oder im Browser. Dein Rechner, deine Agenten, deine Daten.
 
 ## Funktionen
 
-- **Multi-Agent-Sessions** — Claude-Code-, Codex-, Cursor-CLI-, OpenCode- und Devin-Sessions parallel starten und fortsetzen, mit Live-Streaming über WebSocket
-- **Geteilte Panes** — Chat-, Terminal-, Browser- und Datei-Panes in einem Workspace
-- **Datei-Explorer & Editor** — Workspace durchsuchen und Code im integrierten Editor bearbeiten
-- **Git-Panel** — Stage, Commit, Diff und Branch-Wechsel, ohne die UI zu verlassen
-- **Integrierte Shell** — vollständiges Terminal pro Workspace plus ein eigenständiger Shell-Tab
-- **Task-Board** — Kanban-Ansicht auf Basis von TaskMaster; PRDs in ausführbare Tasks verwandeln
-- **MCP-Verwaltung** — MCP-Server hinzufügen, bearbeiten und agentenübergreifend synchronisieren
-- **Wissensbasis** — ein lokaler, durchsuchbarer Speicher für jeden Agenten: Regeln, Skills, Memories und persönliche Infos, über MCP auf Abruf abgerufen (Contexta-Modell) ([Doku](KNOWLEDGE.de.md))
-- **Skills-Browser** — Agent-Skills direkt in der UI verwalten
-- **Quota & Nutzung** — Token-Verbrauch und Abo-Limits pro Agent auf einen Blick
-- **Browser-use** — agentengesteuerte Browser-Sessions für Recherche und Tests
-- **Worktrees** — isolierte Git-Worktrees pro Task erstellen, mit Setup-/Run-Skripten pro Worktree und authentifizierter Live-Dev-Server-Vorschau
-- **Remote-Freigaben** — Tool-Berechtigungen per Telegram, Discord oder der mobilen App genehmigen
-- **Spracheingabe** — Prompts über einen Whisper-kompatiblen STT-Endpunkt diktieren
-- **Agent-Broadcast & gemeinsamer Speicher** — alle Agenten gleichzeitig anschreiben und projektbezogene Notizen pflegen, die alle lesen
-- **Multi-Account-Wechsel** — benannte Konten pro Provider mit Env-Overrides pro Session
-- **Scheduler** — cron-gesteuerte Agent-Läufe, mit Keep-Awake auf Web/Desktop
-- **Teamzusammenarbeit** — Rollen (Owner/Member/Viewer), Einladungslinks, Zuweisungen, Kommentare, Presence und Activity-Feed auf dem Board ([Doku](https://github.com/Zakwei/ddagent/blob/main/docs/teams.md))
-- **MCP-Server** — externe MCP-Clients (Claude Desktop, OpenClaw) Tasks erstellen und Sessions anschreiben lassen ([Doku](https://github.com/Zakwei/ddagent/blob/main/docs/mcp-server.md))
-- **Benachrichtigungen & TTS** — gepingt (oder vorgelesen) werden, wenn eine Session dich braucht
-- **Docker-Sandboxes** — Agenten in microVM-isolierten Umgebungen ausführen ([Doku](https://github.com/Zakwei/ddagent/blob/main/docker/README.md))
-- **Flutter-Client** — eine Codebasis für Web, Desktop und Mobile; **12 Sprachen**, Dark- & Light-Theme
+- **Multi-Agent-Sessions** — Sessions aus sieben Agenten-CLIs nebeneinander starten und fortsetzen, mit Live-Streaming über WebSocket
+- **Auto-Orchestrator** — „Auto“-Sessions leiten jede Aufgabe an einen passenden Agenten und ein passendes Modell weiter, berücksichtigen dabei das verbleibende Abo-Kontingent und delegieren Arbeit an Child-Sessions
+- **Geteilter Arbeitsbereich** — bis zu sechs Panels (Chat, Terminal, Browser, Vorschau, Editor, Git, Notizen) in einem Fenster
+- **Datei-Explorer & Editor** — den Workspace durchsuchen und Code im integrierten Editor bearbeiten
+- **Git-Panel** — Dateien oder einzelne Hunks stagen, committen (mit KI-generierten Nachrichten), Diffs ansehen, Branches wechseln, Pull/Push und Checkpoints wiederherstellen, ohne die UI zu verlassen
+- **Integriertes Terminal** — eine vollwertige Shell pro Workspace
+- **Kanban-Board** — eine Karte verschieben, um einen Agenten-Lauf darauf zu starten (optional in einem eigenen Worktree); der Agent meldet sich, sobald er fertig ist
+- **TaskMaster** — PRDs in Tasks verwandeln und auf einem Task-Board verfolgen
+- **Nachrichten-Queue** — Nachrichten, die gesendet werden, während ein Agent beschäftigt ist, landen serverseitig in einer Warteschlange und überstehen Neuladen und Gerätewechsel
+- **MCP-Verwaltung** — MCP-Server agentenübergreifend hinzufügen, bearbeiten und synchronisieren
+- **Wissensdatenbank** — ein lokales, durchsuchbares Gedächtnis für alle Agenten: Regeln, Skills, Erinnerungen und persönliche Infos, bei Bedarf über MCP abgerufen ([Doku](KNOWLEDGE.de.md))
+- **Skills & Regeln** — Agenten-Skills und gemeinsame Regeln an einem Ort verwalten
+- **Kontingent & Nutzung** — Token-Verbrauch und Abo-Limits pro Agent auf einen Blick
+- **Browser-use** — agentengesteuerte Browser-Sessions für Recherche und Tests, mit einem Live-Browser-Panel
+- **Worktrees** — isolierte Git-Worktrees pro Task anlegen, mit Setup-/Run-Skripten pro Worktree und einer authentifizierten Live-Vorschau des Dev-Servers
+- **Remote-Freigaben** — Tool-Berechtigungen über Telegram, Discord oder die Android-App freigeben ([Doku](https://github.com/Zakwei/ddagent/blob/main/docs/remote-approvals.md))
+- **Spracheingabe** — Prompts über einen Whisper-kompatiblen Speech-to-Text-Endpunkt diktieren
+- **Agenten-Broadcast & gemeinsames Gedächtnis** — allen Agenten gleichzeitig eine Nachricht senden und projektbezogene Notizen pflegen, die alle lesen
+- **Multi-Account-Wechsel** — benannte Accounts pro Provider mit Env-Overrides pro Session
+- **Scheduler** — cron-gesteuerte, unbeaufsichtigte Agenten-Läufe, optional mit Wachhalten des Geräts, solange Läufe aktiv sind
+- **Team-Zusammenarbeit** — Rollen (owner/member/viewer), Einladungslinks, Zuständige, Kommentare, Präsenz und ein Aktivitätsfeed auf dem Board ([Doku](https://github.com/Zakwei/ddagent/blob/main/docs/teams.md))
+- **MCP-Server** — externe MCP-Clients (Claude Desktop, OpenClaw) können Sessions auflisten, Tasks anlegen und Sessions Nachrichten senden ([Doku](https://github.com/Zakwei/ddagent/blob/main/docs/mcp-server.md))
+- **Benachrichtigungen & TTS** — Push-, Telegram- und Discord-Benachrichtigungen, wenn eine Session dich braucht, plus optionales Vorlesen der Antworten
+- **Befehlspalette** — `Ctrl/Cmd+Shift+K`, um Sessions und Nachrichten zu durchsuchen, zu jeder Seite zu springen oder Schnellaktionen auszuführen
+- **Docker-Sandboxes** — Agenten in microVM-isolierten Docker Sandboxes ausführen ([Doku](https://github.com/Zakwei/ddagent/blob/main/docker/README.md))
+- **Flutter-Client** — eine Codebasis für Web, Linux, Windows und Android; **12 Sprachen**, dunkles und helles Theme
 
 ## Unterstützte Agenten
 
 | Agent | Anbindung |
 |---|---|
-| **Claude Code** | Erkennt `~/.claude`-Sessions automatisch; MCP- & Settings-Sync mit dem nativen CLI |
-| **Codex** | Lokale CLI-Sessions und Transkripte |
-| **Cursor CLI** | Lokale CLI-Sessions |
-| **OpenCode** | Lokale Sessions und Skill-Speicherorte |
-| **Devin** | CLI-/ACP-Sessions via lokalem Sync |
+| **Claude Code** | Claude Agent SDK; erkennt `~/.claude`-Sessions automatisch; MCP- und Einstellungs-Sync mit der nativen CLI |
+| **Codex** | Codex SDK; lokale Sessions und Transkripte aus `~/.codex` |
+| **Cursor CLI** | `cursor-agent` mit Streaming-JSON-Ausgabe; lokale Chats aus `~/.cursor` |
+| **OpenCode** | `opencode serve`; lokale Sessions aus der OpenCode-Datenbank |
+| **Devin** | `devin acp` (Agent Client Protocol); lokale Transkripte |
+| **Command Code** | `command-code acp` (Agent Client Protocol); Transkripte aus `~/.commandcode` |
+| **Antigravity** | `agy`-CLI im Headless-Modus; Unterhaltungen indexiert aus `~/.gemini/antigravity-cli` |
 
-Du bringst deine eigenen Abos mit — ddagent liefert die Umgebung, nicht die KI.
+Die Agenten-CLIs müssen auf dem Server-Rechner installiert und angemeldet sein. Deine Abos bringst du selbst mit — ddagent stellt die Umgebung bereit, nicht die KI.
 
 ## Installation
 
-Benötigt **Node.js 22+** auf der Maschine, die den Server ausführt. Der Server stellt die REST/WS-API bereit, mit der sich der Flutter-Client (Web, Desktop, Mobile) remote verbindet.
+ddagent besteht aus zwei Teilen: dem **Server**, der neben deinen Agenten läuft und eine REST/WebSocket-API bereitstellt, und dem **Client**, der sich mit ihm verbindet. Der Server benötigt **Node.js 22+** (die vorgefertigten Tarballs benötigen Node.js 22.x, da ihre nativen Module dagegen gebaut sind).
 
-### Selbst gehosteter Server — Installer-Skript
+### Server — Installer-Skript
 
 ```bash
 curl -fsSL https://github.com/Zakwei/ddagent/releases/latest/download/install.sh | bash
 ```
 
-Klont den neuesten Release-Tag nach `~/.ddagent/app`, baut das Backend und hinterlässt einen `start.sh`-Launcher. Optionen: `--version vX.Y.Z` · `--dir <path>` · `--port <port>` · `--systemd` (installiert und aktiviert eine User-Systemd-Unit). Mit `--version` erneut ausführen, um vor Ort zu aktualisieren.
+Benötigt `git`, Node.js 22+ und `npm`. Das Skript klont ein Release-Tag nach `~/.ddagent/app`, installiert die Abhängigkeiten, baut das Backend und erzeugt einen `start.sh`-Launcher. Optionen übergibst du nach `bash -s --`:
 
-Danach:
+| Option | Beschreibung |
+|---|---|
+| `--version vX.Y.Z` | Bestimmtes Release installieren (Standard: neuestes) |
+| `--dir <path>` | Installationsverzeichnis (Standard: `~/.ddagent/app`) |
+| `--systemd` | Einen systemd-User-Service namens `ddagent` installieren und aktivieren |
+| `--port <port>` | Port für den systemd-Service (Standard: `3001`) |
 
 ```bash
-~/.ddagent/app/start.sh        # → http://localhost:3001
+curl -fsSL https://github.com/Zakwei/ddagent/releases/latest/download/install.sh | bash -s -- --systemd --port 3001
 ```
 
-### Selbst gehosteter Server — vorgefertigter Tarball
+Zum Aktualisieren führst du das Skript erneut mit `--version vX.Y.Z` aus; es aktualisiert den Checkout an Ort und Stelle. Danach startest du den Server:
 
-Kein Build-Schritt — `ddagent-server-<version>-<os>-<arch>.tar.gz` von [Releases](https://github.com/Zakwei/ddagent/releases) herunterladen, entpacken, starten:
+```bash
+~/.ddagent/app/start.sh        # API on http://<host>:3001 (set SERVER_PORT to change)
+```
+
+### Server — vorgefertigter Tarball
+
+Kein Build-Schritt: Lade `ddagent-server-<version>-<os>-<arch>.tar.gz` (`linux-x64`, `mac-arm64` oder `win-x64`) unter [Releases](https://github.com/Zakwei/ddagent/releases) herunter, entpacke es und starte den Launcher:
 
 ```bash
 mkdir ddagent && tar xzf ddagent-server-*-linux-x64.tar.gz -C ddagent
-./ddagent/start.sh           # start.bat on Windows
+./ddagent/start.sh             # start.bat on Windows
 ```
 
-### Flutter-Client (Web · Desktop · Mobile)
+Zu jedem Tarball gibt es eine `.sha256`-Prüfsumme. Einstellungen kommen in eine optionale `.env`-Datei neben `start.sh`.
 
-Der Client ist eine Flutter-App (`flutter/`) — eine Codebasis für Web, Desktop (Linux/Windows) und Mobile. Aus dem Quellcode bauen:
+### Client
+
+Lade einen vorgefertigten Client unter [Releases](https://github.com/Zakwei/ddagent/releases) herunter:
+
+| Plattform | Datei |
+|---|---|
+| Windows x64 | `ddagent-flutter-windows-x64-<tag>-setup.exe` (Installer) oder `.zip` (portabel) |
+| Linux x64 | `ddagent-flutter-linux-x64-<tag>.deb` oder `.tar.gz` |
+| Android | `ddagent-flutter-android-<tag>.apk` |
+| Web | `ddagent-flutter-web-<tag>.zip` |
+
+Gib beim ersten Start die URL deines Servers ein (zum Beispiel `http://my-vps:3001`) und lege das erste Konto an. Unter Windows und Linux x64 kann der Desktop-Client auch einen lokalen Server für dich herunterladen und ausführen („Dieses Gerät“ auf dem Verbindungsbildschirm).
+
+Der Web-Build hat keinen Login-Bildschirm und ruft die API auf seinem eigenen Origin auf. Er muss daher hinter einem Reverse Proxy ausgeliefert werden, der vor einem Server im Single-User-Plattformmodus steht (`VITE_IS_PLATFORM=true`, was die Authentifizierung deaktiviert). In einem Quellcode-Checkout liefert `node scripts/serve-flutter-web.cjs` `flutter/build/web` auf Port 8085 aus und leitet API und WebSockets an den Server auf `FLUTTER_BACKEND_PORT` weiter (Standard `10087`). Stelle dieses Setup nur in einem vertrauenswürdigen Netzwerk bereit.
+
+Um den Client selbst zu bauen:
 
 ```bash
 cd flutter
-flutter build web        # → build/web (serve with scripts/serve-flutter-web.cjs)
+flutter pub get
+flutter build linux --release      # or: windows, apk, web
 ```
-
-Der Client verbindet sich mit einer selbst gehosteten Server-URL.
 
 ### Aus dem Quellcode
 
@@ -127,7 +171,7 @@ Der Client verbindet sich mit einer selbst gehosteten Server-URL.
 git clone https://github.com/Zakwei/ddagent.git
 cd ddagent
 npm install
-npm run dev        # backend dev mode (tsx) with HMR
+npm run build && node dist-server/server/index.js   # API on http://localhost:3001
 ```
 
 ### Docker-Sandbox (experimentell)
@@ -136,51 +180,76 @@ npm run dev        # backend dev mode (tsx) with HMR
 ddagent sandbox ~/my-project
 ```
 
-Führt den Agenten in einer hypervisor-isolierten Sandbox aus. Siehe [docker/README.md](https://github.com/Zakwei/ddagent/blob/main/docker/README.md).
+Führt ddagent und einen Agenten (Claude Code oder Codex) in einer microVM-isolierten Docker Sandbox aus. Benötigt die `sbx`-CLI — siehe [docker/README.md](https://github.com/Zakwei/ddagent/blob/main/docker/README.md).
 
 ## CLI
 
-In einem Source- oder `install.sh`-Checkout bedeutet `ddagent` unten `node dist-server/server/modules/cli/cli.js` (hat einen Shebang, also funktioniert auch `./dist-server/server/modules/cli/cli.js`).
+In einem Quellcode- oder `install.sh`-Checkout steht `ddagent` im Folgenden für `node dist-server/server/modules/cli/cli.js` (die Datei hat einen Shebang, daher funktioniert auch `./dist-server/server/modules/cli/cli.js`).
 
 | Befehl | Beschreibung |
 |---|---|
-| `ddagent` | Server starten |
-| `ddagent start` | Server starten |
-| `ddagent status` | Konfig- und Datenpfade anzeigen |
+| `ddagent` / `ddagent start` | Server starten (Standardbefehl) |
+| `ddagent status` | Version sowie Speicherorte von Konfigurationsdatei, Datenbank und Claude-Projekten anzeigen |
+| `ddagent sandbox <workspace>` | Docker-Sandbox anlegen und starten; `ddagent sandbox help` listet `ls`, `start`, `stop`, `rm`, `logs` |
+| `ddagent browser-use-mcp` | Den browser-use-MCP-Server über stdio ausführen |
 | `ddagent version` | Version ausgeben |
 | `ddagent help` | Hilfe anzeigen |
 
+| Option | Beschreibung |
+|---|---|
+| `-p, --port <port>` | Server-Port (überschreibt `SERVER_PORT`) |
+| `--database-path <path>` | Eigener Speicherort der Datenbank (überschreibt `DATABASE_PATH`) |
+
 ## Konfiguration
 
-Alle Einstellungen liegen in einer einzigen Env-Datei — `ddagent status` zeigt, wo deine gelesen wird.
+Der Server liest eine optionale `.env`-Datei aus seinem Installationsverzeichnis (neben `start.sh`); echte Umgebungsvariablen haben Vorrang. Mit `ddagent status` siehst du, welche Datei verwendet wird.
 
 | Variable | Standard | Beschreibung |
 |---|---|---|
-| `SERVER_PORT` | `3001` | API- + WebSocket-Port |
-| `HOST` | `0.0.0.0` | Bind-Adresse (`127.0.0.1` für nur localhost) |
-| `DATABASE_PATH` | auto | Speicherort der Auth-Datenbank |
-| `CONTEXT_WINDOW` | `160000` | Max. Tokens pro Session |
-| `CLAUDE_CLI_PATH` | `claude` | Eigener Pfad zur Claude-CLI-Binary |
+| `SERVER_PORT` | `3001` | Port für API + WebSocket (`PORT` wird als Legacy-Alias akzeptiert) |
+| `HOST` | `0.0.0.0` | Bind-Adresse (`127.0.0.1` nur für localhost) |
+| `DATABASE_PATH` | `~/.ddagent/auth.db` | SQLite-Datenbank (Benutzer, Einstellungen, Tokens) |
+| `WORKSPACES_ROOT` | Home-Verzeichnis | Projekte müssen innerhalb dieses Verzeichnisses liegen |
+| `JWT_SECRET` | automatisch generiert | Secret zum Signieren von Login-Tokens (pro Installation generiert und gespeichert) |
+| `API_KEY` | nicht gesetzt | Wenn gesetzt, müssen API-Anfragen ihn im Header `x-api-key` mitsenden |
+| `CLAUDE_CLI_PATH` | `claude` | Eigenes Claude-Code-CLI-Binary |
+| `CONTEXT_WINDOW` | `200000` | Fallback für das Claude-Kontextfenster, verwendet, bis das SDK das tatsächliche Fenster des Modells meldet |
+| `STT_ENDPOINT_URL` / `STT_API_KEY` / `STT_MODEL` | `https://api.openai.com/v1` / nicht gesetzt / `whisper-1` | Speech-to-Text für die Spracheingabe (auch in den Einstellungen konfigurierbar) |
+| `VITE_IS_PLATFORM` | `false` | Single-User-Plattformmodus: überspringt die Authentifizierung (vom Web-Client benötigt) |
 
-Vollständige Liste siehe [`.env.example`](https://github.com/Zakwei/ddagent/blob/main/.env.example).
+Mehr dazu in [`.env.example`](https://github.com/Zakwei/ddagent/blob/main/.env.example).
 
 ## Entwicklung
 
 ```bash
-npm run dev            # backend dev mode (tsx)
-npm run build          # server production build
-npm test               # backend tests
-npm run typecheck      # TypeScript check
+npm install
+npm run dev               # start the backend from source (tsx, no reload)
+npm run server:dev-watch  # same, restarting on file changes
+npm run build             # compile the server to dist-server/
+npm test                  # backend tests
+npm run typecheck         # TypeScript check
+npm run lint              # ESLint
 ```
 
-Der Backend-Code folgt der in `server/modules/` beschriebenen Modularchitektur — siehe `server/modules/providers/README.md` für Provider-Internals.
+Client (Flutter 3.47.5 stable):
+
+```bash
+cd flutter
+flutter pub get
+flutter run -d linux --dart-define=DEFAULT_SERVER_URL=http://localhost:3001
+dart format --line-length 100 lib test
+flutter analyze
+flutter test
+```
+
+Der Backend-Code folgt der Modularchitektur in `server/modules/`; Details zu den Provider-Interna findest du in [`server/modules/providers/README.md`](https://github.com/Zakwei/ddagent/blob/main/server/modules/providers/README.md).
 
 ## Mitwirken
 
-Bugfixes sind willkommen — siehe [CONTRIBUTING.md](https://github.com/Zakwei/ddagent/blob/main/CONTRIBUTING.md).
+Bugfixes sind willkommen — siehe [CONTRIBUTING.md](https://github.com/Zakwei/ddagent/blob/main/CONTRIBUTING.md). Um eine Sicherheitslücke zu melden, siehe [SECURITY.md](https://github.com/Zakwei/ddagent/blob/main/SECURITY.md).
 
 ---
 
 <div align="center">
-  <sub>Gebaut für die Claude-Code-, Cursor-, Codex-, OpenCode- und Devin-Community.</sub>
+  <sub>Entwickelt für die Community von Claude Code, Codex, Cursor, OpenCode, Devin, Command Code und Antigravity.</sub>
 </div>

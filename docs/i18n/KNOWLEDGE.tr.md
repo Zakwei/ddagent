@@ -35,6 +35,11 @@ dosyaları okuyanlar da MCP konuşanlar da.
   `CLAUDE.md` okur, Codex/Cursor `AGENTS.md` okur, Cursor `.cursorrules` okur,
   birkaçı da `skills/` ve `.agents/skills/` okur. Bu CLI'ın işidir, modelin
   seçimi değil — ddagent bunu kapatmaz.
+- **ddagent'ın ilk tur ön eki** — bir oturumun ilk mesajında ddagent, projenin
+  `.ddagent/shared-context.md` dosyasını ve bir `<unified-rules>` bloğunu
+  (çalışma alanı `AGENTS.md`'si, `~/.agents/AGENTS.md` ve kısa bir hijyen notu)
+  başa ekler; bunu kaldırmak için `DDAGENT_UNIFIED_RULES=0` ayarlayın. Bu dosya
+  tabanlıdır ve bilgi tabanından ayrıdır.
 - **MCP ile alma (isteğe bağlı)** — ddagent'ın MCP sunucusunu bir ajana
   kurduğunuzda, araç listesi `knowledge_get_context`, `knowledge_search` ve
   benzerlerini içerir. Contexta'yı izleyerek, hiçbir şey otomatik olarak enjekte
@@ -104,10 +109,10 @@ Araçlar `projectId` ya da ddagent'ın zaten bildiği bir `projectPath` kabul ed
 
 ### Sunucuyu ajanlarınıza kurma
 
-Sağlayıcı yapılandırmalarını elle düzenlemek zorunda değilsiniz. **Settings → MCP →
-Install ddagent MCP server** kullanın (onboarding'de bir adım olarak da sunulur) ve
-ajanları seçin — ya da hepsine kurun. Yeniden kullanılabilir bir `ddagent-mcp` bearer
-token'ı ile `<server>/mcp` adresini işaret eden bir `ddagent` HTTP MCP girdisi (kullanıcı
+Sağlayıcı yapılandırmalarını elle düzenlemek zorunda değilsiniz. **Settings → Agents →
+(ajan) → MCP → Install ddagent MCP server** kullanın (onboarding'de bir adım olarak da sunulur) ve
+ajanları seçin — ya da hepsine kurun. Yeniden kullanılabilir, `write` kapsamlı bir
+`ddagent-mcp` bearer token'ı ile `<server>/mcp` adresini işaret eden bir `ddagent` HTTP MCP girdisi (kullanıcı
 kapsamı) yazar (yeniden kurmak öncekini iptal eder). Kurulduktan sonra, o ajanın araçları
 `create_task`, `send_message` vb. yanında `knowledge_*` grubunu içerir.
 
@@ -124,8 +129,9 @@ sınıflandırarak içe aktarır:
 
 - `AGENTS.md`, `CLAUDE.md`, `MUSE.md`, `GEMINI.md`, `CODEX.md`, `.cursorrules`,
   `.muserules` ve `.cursor/rules` altındaki markdown/`.mdc` **kural** olur
-  (critical + enabled, böylece ajan bağlamına ulaşırlar; çalışma alanı `AGENTS.md`'si
-  unified-rules ile çift enjeksiyondan kaçınmak için `high`'dır),
+  (critical + enabled, böylece `knowledge_get_context` onları her zaman döndürür;
+  çalışma alanı `AGENTS.md`'si `high` olarak içe aktarılır, çünkü ilk tur
+  `<unified-rules>` ön eki onu zaten iletir),
 - `skills` / `.agents/skills` altındaki `SKILL.md` dosyaları **beceri** olur
   (ad/açıklama frontmatter'dan),
 - taranan diğer markdown'lar **referans anı** olur.
@@ -150,13 +156,15 @@ Grafik, açık bağlantılarınız ile örtük merkezleri çizer — proje kapsa
    talimat dosyalarında büyük değişikliklerden sonra yeniden tarayın.
 2. **Bilinçli olarak yükseltin**: yalnızca gerçekten bağlayıcı kurallar `critical`
    olmalıdır (bağlam oluşturucu tarafından her zaman sunulurlar). Bir satırdaki
-   yıldızı kullanın ve kritik bağlam ölçerini izleyin.
+   yıldızı kullanın ve kural bağlamı ölçerini izleyin.
 3. **Gerisini `high`/`normal` tutun** — yine aranabilir ve MCP üzerinden kullanılabilir,
    yalnızca bir sorgu eşleştiğinde, dolayısıyla ilgisiz olduklarında hiçbir maliyeti yoktur.
 4. Projeler arası tercihler (saat dilimi, düzenleyici, adlandırma) için **kişisel bilgi**.
 5. **İlgili anıları bağlayın** ki 1 atlamalı komşular birlikte gelsin.
-6. Bilgi tabanını araması ve öğrendiklerini kalıcılaştırması gereken ajanlar için **MCP kurun**;
-   çoğuna `read` kapsamı, ajanа güvendiğiniz yere `write` verin.
+6. Bilgi tabanını araması ve öğrendiklerini kalıcılaştırması gereken ajanlar için **MCP kurun**.
+   Tek tıkla kurulum bir `write` token'ı kullanır; salt okunur bir ajan için ddagent MCP
+   sunucusu token'ları altında bir `read` token'ı oluşturun ve o ajanı elle yapılandırın
+   (bkz. [MCP sunucusu olarak ddagent](../mcp-server.md#manual-client-config)).
 
 ## Geçiş
 
@@ -188,14 +196,14 @@ Kimlik doğrulamanın arkasında `/api/knowledge` altında bağlanır:
 ```
 GET    /memories            ?projectId=&includeGlobal=&priority=&tag=&memoryType=&limit=&offset=
 POST   /memories            PATCH /memories/:id   DELETE /memories/:id
-GET    /rules               ?projectId=&includeGlobal=&priority=&enabledOnly=
+GET    /rules               ?projectId=&includeGlobal=&priority=&enabledOnly=&limit=&offset=
 POST   /rules               PATCH /rules/:id       DELETE /rules/:id
-GET    /skills              ?category=
+GET    /skills              ?category=&limit=&offset=
 POST   /skills              PATCH /skills/:id      DELETE /skills/:id
 GET    /personal            POST /personal         PATCH/DELETE /personal/:id
 GET    /search              ?q=&type=&projectId=&limit=
 GET    /graph               ?projectId=&types=&limit=
-GET    /context             ?projectId=            (kritik bağlam boyutu + bütçe)
+GET    /context             ?projectId=            (kural bağlamı önizlemesi: boyut + bütçe)
 GET    /tags                DELETE /tags/:id
 GET    /connections         POST /connections      DELETE /connections/:id
 GET    /history             ?entityType=&entityId=&limit=
@@ -212,5 +220,5 @@ eklemek proje satırlarını artı genel satırları döndürür.
 
 ## İlgili
 
-- [MCP sunucusu olarak ddagent](mcp-server.md) — araç kataloğu ve token kurulumu
-- [Ekip iş birliği](teams.md) · [Uzaktan onaylar](remote-approvals.md)
+- [MCP sunucusu olarak ddagent](../mcp-server.md) — araç kataloğu ve token kurulumu
+- [Ekip iş birliği](../teams.md) · [Uzaktan onaylar](../remote-approvals.md)

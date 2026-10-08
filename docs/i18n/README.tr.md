@@ -2,7 +2,7 @@
   <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/logo.svg" alt="ddagent" width="72" height="72">
   <h1>ddagent</h1>
   <p><strong>Tüm AI kodlama ajanlarınız için tek bir arayüz.</strong><br>
-  Claude Code, Codex, Cursor CLI, OpenCode ve Devin için self-hosted arayüz (web, masaüstü ve mobil) — oturumlar, dosyalar, git, terminaller ve görevler tek bir yerde.</p>
+  Claude Code, Codex, Cursor CLI, OpenCode, Devin, Command Code ve Antigravity için self-hosted sunucu ve Flutter istemcisi (web, Linux, Windows ve Android) — oturumlar, dosyalar, git, terminaller ve görevler tek bir yerde.</p>
 
   <p>
     <img src="https://img.shields.io/github/v/release/Zakwei/ddagent?label=sürüm&amp;color=0066FF" alt="sürüm">
@@ -38,88 +38,132 @@
   <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/mobile-chat.png" alt="ddagent mobil görünümü" width="20%">
 </p>
 
+<table>
+  <tr>
+    <td width="33%"><img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/sessions.png" alt="Claude Code ve Codex'in son oturumları"></td>
+    <td width="33%"><img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/kanban-board.png" alt="Ajan çalıştırmalarını yöneten Kanban panosu"></td>
+    <td width="33%"><img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/git-panel.png" alt="Parça bazında stage desteği sunan Git paneli"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Tüm ajanların oturumları tek listede</sub></td>
+    <td align="center"><sub>Kanban panosu — kartlar ajan çalıştırmalarını başlatır</sub></td>
+    <td align="center"><sub>Git paneli — diff, parçaları stage etme, commit</sub></td>
+  </tr>
+</table>
+
 ---
 
 ## ddagent nedir?
 
-ddagent kendi makinenizde veya VPS'inizde çalışır ve halihazırda kullandığınız kodlama ajanlarının üzerine cilalanmış bir arayüz (Flutter: web, masaüstü ve mobil) sunar. Oturumlarını doğrudan diskten keşfeder — `~/.claude`, Codex ve Devin geçmişiniz anında görünür; hiçbir şey kopyalanmaz veya üçüncü taraflarla senkronize edilmez.
+ddagent kendi makinenizde veya VPS'inizde çalışır ve hâlihazırda kullandığınız kodlama ajanlarını tek, özenle tasarlanmış bir arayüzde bir araya getirir. Sunucu, her ajanın oturumlarını doğrudan o ajanın diskteki kendi geçmişinden (`~/.claude`, `~/.codex`, `~/.cursor`, OpenCode, Devin, …) okur; böylece mevcut konuşmalarınız hiçbir şey içe aktarmadan görünür. Yerel olarak yalnızca oturum meta verileri dizinlenir; hiçbir veri üçüncü taraflara gönderilmez.
 
-Ağınızdaki herhangi bir tarayıcıdan veya telefonunuzdan açın. Sizin makineniz, sizin ajanlarınız, sizin verileriniz.
+Masaüstünüzden, telefonunuzdan veya tarayıcınızdan Flutter istemcisiyle bağlanın. Makine sizin, ajanlar sizin, veriler sizin.
 
 ## Özellikler
 
-- **Çoklu ajan oturumları** — Claude Code, Codex, Cursor CLI, OpenCode ve Devin oturumlarını yan yana çalıştırın ve sürdürün, WebSocket üzerinden canlı akışla
-- **Bölünmüş paneller** — tek çalışma alanında sohbet, terminal, tarayıcı ve dosya panelleri
-- **Dosya gezgini ve editör** — çalışma alanına göz atın ve kodu yerleşik editörde düzenleyin
-- **Git paneli** — arayüzden ayrılmadan stage, commit, diff yapın ve dal değiştirin
-- **Entegre kabuk** — çalışma alanı başına tam terminal, artı bağımsız bir kabuk sekmesi
-- **Görev panosu** — TaskMaster destekli kanban görünümü; PRD'leri çalıştırılabilir görevlere dönüştürün
-- **MCP yönetimi** — ajanlar arasında MCP sunucuları ekleyin, düzenleyin ve senkronize edin
-- **Bilgi tabanı** — her ajan için tek, yerel ve aranabilir bir bellek: kurallar, beceriler, anılar ve kişisel bilgiler, MCP üzerinden isteğe bağlı olarak alınır (Contexta modeli) ([dokümanlar](KNOWLEDGE.tr.md))
-- **Yetenek tarayıcısı** — ajan yeteneklerini arayüzden yönetin
-- **Kota ve kullanım** — ajan başına token kullanımı ve abonelik limitleri, bir bakışta
-- **Browser-use** — araştırma ve test için ajan kontrollü tarayıcı oturumları
-- **Worktree'ler** — görev başına izole git worktree'leri oluşturun; worktree başına kurulum/çalıştırma betikleri ve kimlik doğrulamalı canlı geliştirme sunucusu önizlemesi ile
-- **Uzak onaylar** — Telegram, Discord veya mobil uygulamadan araç izinlerini onaylayın
-- **Sesli giriş** — Whisper uyumlu bir STT uç noktası ile prompt dikte edin
-- **Ajan yayını ve paylaşılan bellek** — tüm ajanlara aynı anda mesaj gönderin ve hepsinin okuduğu proje bazlı notlar tutun
-- **Çoklu hesap geçişi** — sağlayıcı başına adlandırılmış hesaplar ve oturum bazlı env geçersiz kılmaları
-- **Zamanlayıcı** — cron tabanlı ajan çalıştırmaları, web/masaüstünde keep-awake ile
-- **Takım işbirliği** — roller (owner/member/viewer), davet bağlantıları, atananlar, yorumlar, presence ve panoda bir aktivite akışı ([dokümanlar](https://github.com/Zakwei/ddagent/blob/main/docs/teams.md))
-- **MCP sunucusu** — harici MCP istemcilerinin (Claude Desktop, OpenClaw) görev oluşturmasına ve oturumlara mesaj göndermesine izin verin ([dokümanlar](https://github.com/Zakwei/ddagent/blob/main/docs/mcp-server.md))
-- **Bildirimler ve TTS** — bir oturum size ihtiyaç duyduğunda ping alın (veya sesli okutun)
-- **Docker sandbox'ları** — ajanları microVM izoleli ortamlarda çalıştırın ([dokümanlar](https://github.com/Zakwei/ddagent/blob/main/docker/README.md))
-- **Flutter istemcisi** — web, masaüstü ve mobil için tek kod tabanı; **12 dil**, koyu ve açık temalar
+- **Çoklu ajan oturumları** — yedi ajan CLI'ının oturumlarını yan yana çalıştırın ve sürdürün; WebSocket üzerinden canlı akış
+- **Otomatik orkestratör** — "Auto" oturumları, kalan abonelik kotasını da hesaba katarak her görevi uygun bir ajana ve modele yönlendirir ve işi alt oturumlara devreder
+- **Bölünmüş çalışma alanı** — tek pencerede altı panele kadar (sohbet, terminal, tarayıcı, önizleme, düzenleyici, git, notlar)
+- **Dosya gezgini ve düzenleyici** — çalışma alanında gezinin ve kodu yerleşik düzenleyicide düzenleyin
+- **Git paneli** — arayüzden çıkmadan dosyaları veya tek tek parçaları stage edin, commit atın (AI ile oluşturulan mesajlarla), diff görüntüleyin, dal değiştirin, pull/push yapın ve kontrol noktalarını geri yükleyin
+- **Entegre terminal** — her çalışma alanı için tam bir kabuk
+- **Kanban panosu** — bir kartı taşıyarak onun üzerinde bir ajan çalıştırması başlatın (isteğe bağlı olarak kendi worktree'sinde); ajan işi bitince geri bildirim verir
+- **TaskMaster** — PRD'leri görevlere dönüştürün ve bir görev panosunda takip edin
+- **Mesaj kuyruğu** — ajan meşgulken gönderilen mesajlar sunucuda kuyruğa alınır; sayfa yenilemelerinden ve cihaz değişikliklerinden etkilenmez
+- **MCP yönetimi** — MCP sunucularını ajanlar arasında ekleyin, düzenleyin ve senkronize edin
+- **Bilgi tabanı** — tüm ajanlar için tek, yerel ve aranabilir bir hafıza: kurallar, beceriler, anılar ve kişisel bilgiler, MCP üzerinden ihtiyaç anında getirilir ([belgeler](KNOWLEDGE.tr.md))
+- **Beceriler ve kurallar** — ajan becerilerini ve ortak kuralları tek bir yerden yönetin
+- **Kota ve kullanım** — ajan başına token kullanımı ve abonelik limitleri bir bakışta
+- **Browser-use** — araştırma ve test için ajan tarafından yönetilen tarayıcı oturumları, canlı tarayıcı paneliyle birlikte
+- **Worktree'ler** — her görev için yalıtılmış git worktree'leri oluşturun; worktree başına kurulum/çalıştırma betikleri ve kimlik doğrulamalı canlı dev-server önizlemesiyle
+- **Uzaktan onay** — araç izinlerini Telegram, Discord veya Android uygulamasından onaylayın ([belgeler](https://github.com/Zakwei/ddagent/blob/main/docs/remote-approvals.md))
+- **Sesli giriş** — istemlerinizi Whisper uyumlu bir konuşmadan metne uç noktası aracılığıyla dikte edin
+- **Ajanlara toplu mesaj ve ortak hafıza** — tüm ajanlara aynı anda mesaj gönderin ve hepsinin okuduğu proje notları tutun
+- **Çoklu hesap geçişi** — sağlayıcı başına adlandırılmış hesaplar ve oturum bazında ortam değişkeni geçersiz kılma
+- **Zamanlayıcı** — cron ile tetiklenen, gözetimsiz ajan çalıştırmaları; çalıştırmalar sürerken cihazı uyanık tutma seçeneğiyle
+- **Ekip çalışması** — roller (owner/member/viewer), davet bağlantıları, atananlar, yorumlar, çevrimiçi durumu ve panoda etkinlik akışı ([belgeler](https://github.com/Zakwei/ddagent/blob/main/docs/teams.md))
+- **MCP sunucusu** — harici MCP istemcilerinin (Claude Desktop, OpenClaw) oturumları listelemesine, görev oluşturmasına ve oturumlara mesaj göndermesine olanak tanır ([belgeler](https://github.com/Zakwei/ddagent/blob/main/docs/mcp-server.md))
+- **Bildirimler ve TTS** — bir oturum size ihtiyaç duyduğunda push, Telegram ve Discord bildirimleri; ayrıca isteğe bağlı sesli yanıt okuma
+- **Komut paleti** — oturumlarda ve mesajlarda arama yapmak, herhangi bir sayfaya geçmek veya hızlı eylemler çalıştırmak için `Ctrl/Cmd+Shift+K`
+- **Docker sandbox'ları** — ajanları microVM ile yalıtılmış Docker Sandboxes içinde çalıştırın ([belgeler](https://github.com/Zakwei/ddagent/blob/main/docker/README.md))
+- **Flutter istemcisi** — web, Linux, Windows ve Android için tek kod tabanı; **12 dil**, koyu ve açık tema
 
 ## Desteklenen ajanlar
 
-| Ajan | Nasıl bağlanır |
+| Ajan | Bağlantı şekli |
 |---|---|
-| **Claude Code** | `~/.claude` oturumlarını otomatik keşfeder; MCP ve ayarları yerel CLI ile senkronize eder |
-| **Codex** | Yerel CLI oturumları ve transkriptler |
-| **Cursor CLI** | Yerel CLI oturumları |
-| **OpenCode** | Yerel oturumlar ve yetenek konumları |
-| **Devin** | Yerel senkronizasyon yoluyla CLI/ACP oturumları |
+| **Claude Code** | Claude Agent SDK; `~/.claude` oturumlarını otomatik bulur; MCP ve ayarlar yerel CLI ile senkronize edilir |
+| **Codex** | Codex SDK; `~/.codex` içindeki yerel oturumlar ve dökümler |
+| **Cursor CLI** | Akışlı JSON çıktısıyla `cursor-agent`; `~/.cursor` içindeki yerel sohbetler |
+| **OpenCode** | `opencode serve`; OpenCode veritabanındaki yerel oturumlar |
+| **Devin** | `devin acp` (Agent Client Protocol); yerel dökümler |
+| **Command Code** | `command-code acp` (Agent Client Protocol); `~/.commandcode` içindeki dökümler |
+| **Antigravity** | Headless modda `agy` CLI; konuşmalar `~/.gemini/antigravity-cli` dizininden dizinlenir |
 
-Kendi aboneliklerinizi getirirsiniz — ddagent ortamı sağlar, AI'ı değil.
+Ajan CLI'larının sunucu makinesinde kurulu ve oturum açılmış olması gerekir. Abonelikler size aittir — ddagent yapay zekâyı değil, ortamı sağlar.
 
 ## Kurulum
 
-Sunucuyu çalıştıran makinede **Node.js 22+** gerekir. Sunucu, Flutter istemcisinin (web, masaüstü, mobil) uzaktan bağlandığı REST/WS API'sini sunar.
+ddagent iki bölümden oluşur: ajanlarınızla aynı makinede çalışan ve bir REST/WebSocket API'si sunan **sunucu** ve ona bağlanan **istemci**. Sunucu **Node.js 22+** gerektirir (hazır tarball'lar ise Node.js 22.x gerektirir, çünkü içlerindeki yerel modüller bu sürüme göre derlenmiştir).
 
-### Self-hosted sunucu — kurulum betiği
+### Sunucu — kurulum betiği
 
 ```bash
 curl -fsSL https://github.com/Zakwei/ddagent/releases/latest/download/install.sh | bash
 ```
 
-En son sürüm etiketini `~/.ddagent/app` içine klonlar, backend'i derler ve bir `start.sh` başlatıcısı bırakır. Seçenekler: `--version vX.Y.Z` · `--dir <path>` · `--port <port>` · `--systemd` (kullanıcı systemd birimini kurar ve etkinleştirir). `--version` ile yeniden çalıştırarak yerinde güncelleyin.
+`git`, Node.js 22+ ve `npm` gerektirir. Betik bir sürüm etiketini `~/.ddagent/app` dizinine klonlar, bağımlılıkları kurar, backend'i derler ve bir `start.sh` başlatıcısı oluşturur. Seçenekleri `bash -s --` sonrasında verin:
 
-Ardından:
+| Seçenek | Açıklama |
+|---|---|
+| `--version vX.Y.Z` | Belirli bir sürümü kur (varsayılan: en son sürüm) |
+| `--dir <path>` | Kurulum dizini (varsayılan: `~/.ddagent/app`) |
+| `--systemd` | `ddagent` adlı bir systemd kullanıcı servisi kur ve etkinleştir |
+| `--port <port>` | systemd servisinin portu (varsayılan: `3001`) |
 
 ```bash
-~/.ddagent/app/start.sh        # → http://localhost:3001
+curl -fsSL https://github.com/Zakwei/ddagent/releases/latest/download/install.sh | bash -s -- --systemd --port 3001
 ```
 
-### Self-hosted sunucu — hazır tarball
+Güncellemek için betiği `--version vX.Y.Z` ile yeniden çalıştırın; mevcut kopyayı yerinde günceller. Ardından sunucuyu başlatın:
 
-Derleme adımı yok — [Releases](https://github.com/Zakwei/ddagent/releases) sayfasından `ddagent-server-<version>-<os>-<arch>.tar.gz` dosyasını indirin, açın ve çalıştırın:
+```bash
+~/.ddagent/app/start.sh        # API on http://<host>:3001 (set SERVER_PORT to change)
+```
+
+### Sunucu — hazır tarball
+
+Derleme gerekmez: [Releases](https://github.com/Zakwei/ddagent/releases) sayfasından `ddagent-server-<version>-<os>-<arch>.tar.gz` dosyasını (`linux-x64`, `mac-arm64` veya `win-x64`) indirin, arşivi açın ve başlatıcıyı çalıştırın:
 
 ```bash
 mkdir ddagent && tar xzf ddagent-server-*-linux-x64.tar.gz -C ddagent
-./ddagent/start.sh           # start.bat on Windows
+./ddagent/start.sh             # start.bat on Windows
 ```
 
-### Flutter istemcisi (web · masaüstü · mobil)
+Her tarball bir `.sha256` sağlama toplamıyla birlikte gelir. Ayarlar, `start.sh` dosyasının yanındaki isteğe bağlı bir `.env` dosyasına yazılır.
 
-İstemci bir Flutter uygulamasıdır (`flutter/`) — web, masaüstü (Linux/Windows) ve mobil için tek kod tabanı. Kaynaktan derleyin:
+### İstemci
+
+[Releases](https://github.com/Zakwei/ddagent/releases) sayfasından hazır bir istemci indirin:
+
+| Platform | Dosya |
+|---|---|
+| Windows x64 | `ddagent-flutter-windows-x64-<tag>-setup.exe` (yükleyici) veya `.zip` (taşınabilir) |
+| Linux x64 | `ddagent-flutter-linux-x64-<tag>.deb` veya `.tar.gz` |
+| Android | `ddagent-flutter-android-<tag>.apk` |
+| Web | `ddagent-flutter-web-<tag>.zip` |
+
+İlk açılışta sunucu URL'nizi girin (örneğin `http://my-vps:3001`) ve ilk hesabı oluşturun. Windows ve Linux x64'te masaüstü istemcisi sizin için yerel bir sunucuyu indirip çalıştırabilir de (bağlantı ekranındaki "Bu cihaz" seçeneği).
+
+Web derlemesinde giriş ekranı yoktur ve API'yi kendi origin'i üzerinden çağırır; bu nedenle tek kullanıcılı platform modunda (`VITE_IS_PLATFORM=true`, kimlik doğrulamayı devre dışı bırakır) çalışan bir sunucunun önündeki bir ters proxy arkasından sunulmalıdır. Kaynak kod kopyasında `node scripts/serve-flutter-web.cjs`, `flutter/build/web` dizinini 8085 portunda sunar ve API ile WebSocket bağlantılarını `FLUTTER_BACKEND_PORT` (varsayılan `10087`) portundaki sunucuya yönlendirir. Bu kurulumu yalnızca güvenilir bir ağda erişime açın.
+
+İstemciyi kendiniz derlemek için:
 
 ```bash
 cd flutter
-flutter build web        # → build/web (serve with scripts/serve-flutter-web.cjs)
+flutter pub get
+flutter build linux --release      # or: windows, apk, web
 ```
-
-İstemci self-hosted bir sunucu URL'sine bağlanır.
 
 ### Kaynaktan
 
@@ -127,7 +171,7 @@ flutter build web        # → build/web (serve with scripts/serve-flutter-web.c
 git clone https://github.com/Zakwei/ddagent.git
 cd ddagent
 npm install
-npm run dev        # backend dev mode (tsx) with HMR
+npm run build && node dist-server/server/index.js   # API on http://localhost:3001
 ```
 
 ### Docker sandbox (deneysel)
@@ -136,51 +180,76 @@ npm run dev        # backend dev mode (tsx) with HMR
 ddagent sandbox ~/my-project
 ```
 
-Ajanı hipervizör izoleli bir sandbox'ta çalıştırır. Bkz. [docker/README.md](https://github.com/Zakwei/ddagent/blob/main/docker/README.md).
+ddagent'ı ve bir ajanı (Claude Code veya Codex) microVM ile yalıtılmış bir Docker Sandbox içinde çalıştırır. `sbx` CLI gerektirir — bkz. [docker/README.md](https://github.com/Zakwei/ddagent/blob/main/docker/README.md).
 
 ## CLI
 
-Kaynak veya `install.sh` kurulumunda, aşağıdaki `ddagent` `node dist-server/server/modules/cli/cli.js` anlamına gelir (shebang'i vardır, yani `./dist-server/server/modules/cli/cli.js` da çalışır).
+Kaynak kod veya `install.sh` kopyasında, aşağıdaki `ddagent` ifadesi `node dist-server/server/modules/cli/cli.js` anlamına gelir (dosyada shebang bulunduğundan `./dist-server/server/modules/cli/cli.js` da çalışır).
 
 | Komut | Açıklama |
 |---|---|
-| `ddagent` | Sunucuyu başlat |
-| `ddagent start` | Sunucuyu başlat |
-| `ddagent status` | Yapılandırma ve veri konumlarını göster |
+| `ddagent` / `ddagent start` | Sunucuyu başlat (varsayılan komut) |
+| `ddagent status` | Sürümü ve yapılandırma dosyası, veritabanı ile Claude projelerinin konumlarını göster |
+| `ddagent sandbox <workspace>` | Bir Docker sandbox oluştur ve başlat; `ddagent sandbox help` şu alt komutları listeler: `ls`, `start`, `stop`, `rm`, `logs` |
+| `ddagent browser-use-mcp` | browser-use MCP sunucusunu stdio üzerinden çalıştır |
 | `ddagent version` | Sürümü yazdır |
 | `ddagent help` | Yardımı göster |
 
+| Seçenek | Açıklama |
+|---|---|
+| `-p, --port <port>` | Sunucu portu (`SERVER_PORT` değerini geçersiz kılar) |
+| `--database-path <path>` | Özel veritabanı konumu (`DATABASE_PATH` değerini geçersiz kılar) |
+
 ## Yapılandırma
 
-Tüm ayarlar tek bir env dosyasında bulunur — sizinkinin nereden okunduğunu görmek için `ddagent status` çalıştırın.
+Sunucu, kurulum dizinindeki (`start.sh` dosyasının yanındaki) isteğe bağlı `.env` dosyasını okur; gerçek ortam değişkenleri önceliklidir. Hangi dosyanın kullanıldığını görmek için `ddagent status` komutunu çalıştırın.
 
 | Değişken | Varsayılan | Açıklama |
 |---|---|---|
-| `SERVER_PORT` | `3001` | API + WebSocket portu |
-| `HOST` | `0.0.0.0` | Bağlanma adresi (yalnızca localhost için `127.0.0.1`) |
-| `DATABASE_PATH` | auto | Kimlik doğrulama veritabanı konumu |
-| `CONTEXT_WINDOW` | `160000` | Oturum başına maksimum token |
-| `CLAUDE_CLI_PATH` | `claude` | Özel Claude CLI ikili dosya yolu |
+| `SERVER_PORT` | `3001` | API + WebSocket portu (`PORT` eski bir takma ad olarak kabul edilir) |
+| `HOST` | `0.0.0.0` | Bağlanılacak adres (yalnızca localhost için `127.0.0.1`) |
+| `DATABASE_PATH` | `~/.ddagent/auth.db` | SQLite veritabanı (kullanıcılar, ayarlar, token'lar) |
+| `WORKSPACES_ROOT` | ev dizini | Projeler bu dizinin içinde bulunmalıdır |
+| `JWT_SECRET` | otomatik oluşturulur | Giriş token'larını imzalamak için kullanılan gizli anahtar (her kurulum için oluşturulup saklanır) |
+| `API_KEY` | tanımsız | Tanımlanırsa API istekleri bu anahtarı `x-api-key` başlığında göndermelidir |
+| `CLAUDE_CLI_PATH` | `claude` | Özel Claude Code CLI ikili dosyası |
+| `CONTEXT_WINDOW` | `200000` | Claude bağlam penceresi için yedek değer; SDK modelin gerçek pencere boyutunu bildirene kadar kullanılır |
+| `STT_ENDPOINT_URL` / `STT_API_KEY` / `STT_MODEL` | `https://api.openai.com/v1` / tanımsız / `whisper-1` | Sesli giriş için konuşmadan metne dönüştürme (Ayarlar'dan da yapılandırılabilir) |
+| `VITE_IS_PLATFORM` | `false` | Tek kullanıcılı platform modu: kimlik doğrulamayı atlar (web istemcisi için gereklidir) |
 
-Tam liste için bkz. [`.env.example`](https://github.com/Zakwei/ddagent/blob/main/.env.example).
+Daha fazlası için [`.env.example`](https://github.com/Zakwei/ddagent/blob/main/.env.example) dosyasına bakın.
 
 ## Geliştirme
 
 ```bash
-npm run dev            # backend dev mode (tsx)
-npm run build          # server production build
-npm test               # backend tests
-npm run typecheck      # TypeScript check
+npm install
+npm run dev               # start the backend from source (tsx, no reload)
+npm run server:dev-watch  # same, restarting on file changes
+npm run build             # compile the server to dist-server/
+npm test                  # backend tests
+npm run typecheck         # TypeScript check
+npm run lint              # ESLint
 ```
 
-Backend kodu `server/modules/` içinde açıklanan modül mimarisini izler — sağlayıcı iç işleyişi için bkz. [`server/modules/providers/README.md`](https://github.com/Zakwei/ddagent/blob/main/server/modules/providers/README.md).
+İstemci (Flutter 3.47.5 stable):
+
+```bash
+cd flutter
+flutter pub get
+flutter run -d linux --dart-define=DEFAULT_SERVER_URL=http://localhost:3001
+dart format --line-length 100 lib test
+flutter analyze
+flutter test
+```
+
+Backend kodu `server/modules/` altındaki modül mimarisini izler; sağlayıcıların iç yapısı için bkz. [`server/modules/providers/README.md`](https://github.com/Zakwei/ddagent/blob/main/server/modules/providers/README.md).
 
 ## Katkıda Bulunma
 
-Hata düzeltmeleri memnuniyetle karşılanır — bkz. [CONTRIBUTING.md](https://github.com/Zakwei/ddagent/blob/main/CONTRIBUTING.md).
+Hata düzeltmelerine her zaman açığız — bkz. [CONTRIBUTING.md](https://github.com/Zakwei/ddagent/blob/main/CONTRIBUTING.md). Bir güvenlik açığı bildirmek için bkz. [SECURITY.md](https://github.com/Zakwei/ddagent/blob/main/SECURITY.md).
 
 ---
 
 <div align="center">
-  <sub>Claude Code, Cursor, Codex, OpenCode ve Devin topluluğu için geliştirildi.</sub>
+  <sub>Claude Code, Codex, Cursor, OpenCode, Devin, Command Code ve Antigravity topluluğu için geliştirildi.</sub>
 </div>

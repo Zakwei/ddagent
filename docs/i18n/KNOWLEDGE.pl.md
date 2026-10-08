@@ -35,6 +35,11 @@ Są trzy warstwy i warto wiedzieć, która jest która:
   Code czyta `CLAUDE.md`, Codex/Cursor czytają `AGENTS.md`, Cursor czyta `.cursorrules`,
   a kilka czyta `skills/` i `.agents/skills/`. To zadanie CLI, nie
   wybór modelu — ddagent tego nie wyłącza.
+- **Prefiks pierwszej tury ddagent** — przy pierwszej wiadomości sesji ddagent
+  dokleja na początku projektowy `.ddagent/shared-context.md` oraz blok
+  `<unified-rules>` (workspace’owy `AGENTS.md`, `~/.agents/AGENTS.md` i krótką
+  notkę o higienie; ustaw `DDAGENT_UNIFIED_RULES=0`, aby go pominąć). Ta warstwa
+  opiera się na plikach i jest niezależna od bazy wiedzy.
 - **Pobieranie przez MCP (na żądanie)** — gdy zainstalujesz serwer MCP ddagent w
   agencie, jego lista narzędzi zawiera `knowledge_get_context`, `knowledge_search`
   i podobne. Zgodnie z Contexta nic nie jest wstrzykiwane automatycznie: agent
@@ -107,11 +112,12 @@ Narzędzia przyjmują `projectId` albo `projectPath`, który ddagent już zna.
 
 ### Instalowanie serwera w Twoich agentach
 
-Nie musisz ręcznie edytować konfiguracji providerów. Użyj **Settings → MCP →
-Install ddagent MCP server** (oferowane też jako krok w onboardingu) i wybierz
-agentów — albo zainstaluj dla wszystkich. Zapisuje wpis HTTP MCP `ddagent` (zakres
-użytkownika) wskazujący na `<server>/mcp` z wielokrotnego użytku tokenem bearer
-`ddagent-mcp` (ponowna instalacja unieważnia poprzedni). Po instalacji narzędzia tego
+Nie musisz ręcznie edytować konfiguracji providerów. Użyj **Settings → Agents →
+(agent) → MCP → Install ddagent MCP server** (oferowane też jako krok w
+onboardingu) i wybierz agentów — albo zainstaluj dla wszystkich. Zapisuje wpis
+HTTP MCP `ddagent` (zakres użytkownika) wskazujący na `<server>/mcp` z wielokrotnego
+użytku tokenem bearer `ddagent-mcp` o zakresie `write` (ponowna instalacja
+unieważnia poprzedni). Po instalacji narzędzia tego
 agenta zawierają grupę `knowledge_*` obok `create_task`, `send_message` itd.
 
 Skąd agent wie, *kiedy* użyć MCP? Nie zgaduje — powiedz mu. Trzymaj regułę
@@ -127,8 +133,9 @@ intencji:
 
 - `AGENTS.md`, `CLAUDE.md`, `MUSE.md`, `GEMINI.md`, `CODEX.md`, `.cursorrules`,
   `.muserules` oraz markdown/`.mdc` pod `.cursor/rules` stają się **regułami**
-  (critical + enabled, więc trafiają do kontekstu agenta; workspace’owy `AGENTS.md`
-  jest `high`, aby uniknąć podwójnego wstrzykiwania z unified-rules),
+  (critical + enabled, więc `knowledge_get_context` zawsze je zwraca; workspace’owy
+  `AGENTS.md` jest importowany jako `high`, bo prefiks pierwszej tury
+  `<unified-rules>` już go dostarcza),
 - pliki `SKILL.md` pod `skills` / `.agents/skills` stają się **skillami**
   (nazwa/opis z frontmatter),
 - każdy inny zeskanowany markdown staje się **wspomnieniem referencyjnym**.
@@ -153,13 +160,15 @@ Graf rysuje Twoje jawne połączenia oraz niejawne huby — każda encja w zasi�
    ponów skanowanie po dużych zmianach w jego plikach instrukcyjnych.
 2. **Awansuj świadomie**: tylko naprawdę wiążące reguły powinny być `critical`
    (są zawsze dostarczane przez konstruktor kontekstu). Użyj gwiazdki w wierszu
-   i obserwuj miernik kontekstu krytycznego.
+   i obserwuj miernik kontekstu reguł.
 3. **Resztę trzymaj jako `high`/`normal`** — nadal przeszukiwalne i dostępne przez MCP
    tylko wtedy, gdy zapytanie pasuje, więc nie kosztują nic, gdy są nieistotne.
 4. **Informacje osobiste** dla preferencji między projektami (strefa czasowa, edytor, nazewnictwo).
 5. **Łącz powiązane wspomnienia**, żeby sąsiedzi 1 skoku jechali razem.
 6. **Zainstaluj MCP** dla agentów, które powinny przeszukiwać bazę i utrwalać
-   naukę; daj zakres `read` większości, `write` tam, gdzie ufasz agentowi.
+   naukę. Instalacja jednym kliknięciem używa tokenu `write`; dla agenta tylko do
+   odczytu utwórz token `read` w sekcji tokenów serwera MCP ddagent i skonfiguruj
+   tego agenta ręcznie (zobacz [ddagent jako serwer MCP](../mcp-server.md#manual-client-config)).
 
 ## Migracja
 
@@ -191,14 +200,14 @@ Zamontowane pod `/api/knowledge` za uwierzytelnianiem:
 ```
 GET    /memories            ?projectId=&includeGlobal=&priority=&tag=&memoryType=&limit=&offset=
 POST   /memories            PATCH /memories/:id   DELETE /memories/:id
-GET    /rules               ?projectId=&includeGlobal=&priority=&enabledOnly=
+GET    /rules               ?projectId=&includeGlobal=&priority=&enabledOnly=&limit=&offset=
 POST   /rules               PATCH /rules/:id       DELETE /rules/:id
-GET    /skills              ?category=
+GET    /skills              ?category=&limit=&offset=
 POST   /skills              PATCH /skills/:id      DELETE /skills/:id
 GET    /personal            POST /personal         PATCH/DELETE /personal/:id
 GET    /search              ?q=&type=&projectId=&limit=
 GET    /graph               ?projectId=&types=&limit=
-GET    /context             ?projectId=            (rozmiar kontekstu krytycznego + budżet)
+GET    /context             ?projectId=            (podgląd kontekstu reguł: rozmiar + budżet)
 GET    /tags                DELETE /tags/:id
 GET    /connections         POST /connections      DELETE /connections/:id
 GET    /history             ?entityType=&entityId=&limit=
@@ -215,5 +224,5 @@ do id projektu zwraca wiersze projektu plus globalne.
 
 ## Powiązane
 
-- [ddagent jako serwer MCP](mcp-server.md) — katalog narzędzi i konfiguracja tokenu
-- [Współpraca zespołowa](teams.md) · [Zdalne zatwierdzanie](remote-approvals.md)
+- [ddagent jako serwer MCP](../mcp-server.md) — katalog narzędzi i konfiguracja tokenu
+- [Współpraca zespołowa](../teams.md) · [Zdalne zatwierdzanie](../remote-approvals.md)

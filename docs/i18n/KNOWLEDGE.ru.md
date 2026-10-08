@@ -35,6 +35,11 @@ FTS5, управляется с экрана **Knowledge** в клиенте и 
   читает `CLAUDE.md`, Codex/Cursor читают `AGENTS.md`, Cursor читает `.cursorrules`,
   а некоторые читают `skills/` и `.agents/skills/`. Это работа CLI, а не
   выбор модели — ddagent это не отключает.
+- **Префикс первого хода ddagent** — к первому сообщению сессии ddagent добавляет
+  в начало файл проекта `.ddagent/shared-context.md` и блок `<unified-rules>`
+  (`AGENTS.md` рабочего пространства, `~/.agents/AGENTS.md` и короткую памятку о гигиене;
+  чтобы убрать его, задайте `DDAGENT_UNIFIED_RULES=0`). Это механизм на основе
+  файлов, отдельный от базы знаний.
 - **Получение через MCP (по запросу)** — как только вы установите MCP-сервер ddagent
   в агента, его список инструментов будет включать `knowledge_get_context`,
   `knowledge_search` и компанию. Следуя Contexta, ничего не внедряется
@@ -105,12 +110,12 @@ MCP-сервер ddagent (`POST /mcp`) открывает базу знаний 
 
 ### Установка сервера в ваших агентах
 
-Вам не нужно редактировать конфигурации провайдеров вручную. Используйте **Settings → MCP →
-Install ddagent MCP server** (также предлагается как шаг онбординга) и выберите
+Вам не нужно редактировать конфигурации провайдеров вручную. Используйте **Settings → Agents →
+(агент) → MCP → Install ddagent MCP server** (также предлагается как шаг онбординга) и выберите
 агентов — или установите для всех. Он записывает HTTP MCP-запись `ddagent` (область
 пользователя), указывающую на `<server>/mcp`, с переиспользуемым bearer-токеном
-`ddagent-mcp` (переустановка отзывает предыдущий). После установки инструменты этого
-агента включают группу `knowledge_*` рядом с `create_task`, `send_message` и т. д.
+`ddagent-mcp` с областью `write` (переустановка отзывает предыдущий). После
+установки инструменты этого агента включают группу `knowledge_*` рядом с `create_task`, `send_message` и т. д.
 
 Откуда агент знает, *когда* использовать MCP? Он не угадывает — скажите ему. Держите
 правило `critical`, например: *«Прежде чем отвечать на вопросы об этом проекте, вызови
@@ -126,8 +131,9 @@ Install ddagent MCP server** (также предлагается как шаг 
 
 - `AGENTS.md`, `CLAUDE.md`, `MUSE.md`, `GEMINI.md`, `CODEX.md`, `.cursorrules`,
   `.muserules` и markdown/`.mdc` под `.cursor/rules` становятся **правилами**
-  (critical + enabled, поэтому они доходят до контекста агента; рабочее `AGENTS.md`
-  — `high`, чтобы избежать двойной инъекции с unified-rules),
+  (critical + enabled, поэтому `knowledge_get_context` всегда их возвращает;
+  `AGENTS.md` рабочего пространства импортируется как `high`, потому что его уже
+  доставляет префикс первого хода `<unified-rules>`),
 - файлы `SKILL.md` под `skills` / `.agents/skills` становятся **навыками**
   (имя/описание из frontmatter),
 - любой другой просканированный markdown становится **справочным воспоминанием**.
@@ -152,13 +158,15 @@ Rules, Skills, Personal и Graph, фильтр области проекта, м
    повторяйте сканирование после больших изменений в его инструкционных файлах.
 2. **Повышайте осознанно**: только действительно обязывающие правила должны быть `critical`
    (они всегда подаются построителем контекста). Используйте звезду в строке и
-   следите за измерителем критического контекста.
+   следите за измерителем контекста правил.
 3. **Остальное держите как `high`/`normal`** — всё ещё доступно для поиска и через MCP
    только когда запрос совпадает, поэтому они ничего не стоят, когда нерелевантны.
 4. **Личная информация** для предпочтений между проектами (часовой пояс, редактор, именование).
 5. **Связывайте родственные воспоминания**, чтобы соседи на 1 шаг ехали вместе.
 6. **Установите MCP** для агентов, которым следует искать в базе и фиксировать
-   знания; дайте область `read` большинству, `write` — там, где доверяете агенту.
+   знания. Установка в один клик использует токен `write`; для агента только для
+   чтения создайте токен `read` в разделе токенов MCP-сервера ddagent и настройте
+   этого агента вручную (см. [ddagent как MCP-сервер](../mcp-server.md#manual-client-config)).
 
 ## Миграция
 
@@ -190,14 +198,14 @@ Knowledge → меню → **Migrate existing rules** запускает отч�
 ```
 GET    /memories            ?projectId=&includeGlobal=&priority=&tag=&memoryType=&limit=&offset=
 POST   /memories            PATCH /memories/:id   DELETE /memories/:id
-GET    /rules               ?projectId=&includeGlobal=&priority=&enabledOnly=
+GET    /rules               ?projectId=&includeGlobal=&priority=&enabledOnly=&limit=&offset=
 POST   /rules               PATCH /rules/:id       DELETE /rules/:id
-GET    /skills              ?category=
+GET    /skills              ?category=&limit=&offset=
 POST   /skills              PATCH /skills/:id      DELETE /skills/:id
 GET    /personal            POST /personal         PATCH/DELETE /personal/:id
 GET    /search              ?q=&type=&projectId=&limit=
 GET    /graph               ?projectId=&types=&limit=
-GET    /context             ?projectId=            (размер критического контекста + бюджет)
+GET    /context             ?projectId=            (предпросмотр контекста правил: размер + бюджет)
 GET    /tags                DELETE /tags/:id
 GET    /connections         POST /connections      DELETE /connections/:id
 GET    /history             ?entityType=&entityId=&limit=
@@ -214,5 +222,5 @@ POST   /import-all          { dryRun?, dedupe?, promoteRules? }
 
 ## Смотрите также
 
-- [ddagent как MCP-сервер](mcp-server.md) — каталог инструментов и настройка токена
-- [Командная работа](teams.md) · [Удалённые одобрения](remote-approvals.md)
+- [ddagent как MCP-сервер](../mcp-server.md) — каталог инструментов и настройка токена
+- [Командная работа](../teams.md) · [Удалённые одобрения](../remote-approvals.md)

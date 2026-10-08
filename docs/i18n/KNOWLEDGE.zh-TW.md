@@ -34,6 +34,10 @@ ddagent 為你的代理提供一個**本地優先的知識庫**：記憶、規�
   讀取 `CLAUDE.md`，Codex/Cursor 讀取 `AGENTS.md`，Cursor 讀取 `.cursorrules`，
   還有一些讀取 `skills/` 和 `.agents/skills/`。這是 CLI 的職責，而非
   模型的選擇——ddagent 不會關閉它。
+- **ddagent 的首輪前綴** — 在對話的第一則訊息中，ddagent 會在前面加上專案的
+  `.ddagent/shared-context.md` 和一個 `<unified-rules>` 區塊（工作區 `AGENTS.md`、
+  `~/.agents/AGENTS.md` 以及一則簡短的規範提示；設定 `DDAGENT_UNIFIED_RULES=0`
+  可去掉它）。這以檔案為基礎，與知識庫彼此獨立。
 - **MCP 檢索（隨需）** — 一旦你把 ddagent 的 MCP 伺服器安裝到某個代理，它的
   工具清單就會包含 `knowledge_get_context`、`knowledge_search` 之類。遵循
   Contexta，不會有任何東西被自動注入：代理用查詢呼叫上下文建構器，取回
@@ -95,10 +99,10 @@ ddagent 的 MCP 伺服器（`POST /mcp`）把知識庫暴露給任何 MCP 用戶
 
 ### 把伺服器安裝到你的代理
 
-你不必手動編輯供應商設定。使用 **Settings → MCP →
-Install ddagent MCP server**（在引導流程中也會作為一步提供）並選擇
+你不必手動編輯供應商設定。使用 **Settings → Agents →
+（代理） → MCP → Install ddagent MCP server**（在引導流程中也會作為一步提供）並選擇
 代理——或為所有代理安裝。它會寫入一個 `ddagent` HTTP MCP 項目（使用者
-範圍），指向 `<server>/mcp`，並帶一個可重複使用的 `ddagent-mcp` bearer token
+範圍），指向 `<server>/mcp`，並帶一個可重複使用、具有 `write` 範圍的 `ddagent-mcp` bearer token
 （重新安裝會撤銷上一個）。安裝後，該代理的工具
 會包含 `knowledge_*` 群組，以及 `create_task`、`send_message` 等。
 
@@ -114,8 +118,8 @@ Install ddagent MCP server**（在引導流程中也會作為一步提供）並�
 
 - `AGENTS.md`、`CLAUDE.md`、`MUSE.md`、`GEMINI.md`、`CODEX.md`、`.cursorrules`、
   `.muserules` 以及 `.cursor/rules` 下的 markdown/`.mdc` 成為**規則**
-  （critical + enabled，因此會進入代理上下文；工作區 `AGENTS.md`
-  為 `high`，以避免與 unified-rules 重複注入），
+  （critical + enabled，因此 `knowledge_get_context` 總會回傳它們；工作區
+  `AGENTS.md` 以 `high` 匯入，因為首輪的 `<unified-rules>` 前綴已經提供了它），
 - `skills` / `.agents/skills` 下的 `SKILL.md` 檔案成為**技能**
   （名稱/描述來自 frontmatter），
 - 掃描到的任何其他 markdown 成為**參考記憶**。
@@ -139,13 +143,15 @@ Graph 分頁是一個力導向關係檢視，帶平移/縮放、節點
 1. 對每個使用中的專案**掃描**一次（Knowledge → 選擇專案 → scan）；
    在其指令檔案發生大改動後重新掃描。
 2. **有意識地提升**：只有真正有約束力的規則才應該是 `critical`
-   （總是會由上下文建構器提供）。使用列上的星號，並留意關鍵上下文計量表。
+   （總是會由上下文建構器提供）。使用列上的星號，並留意規則上下文計量表。
 3. **其餘保持 `high`/`normal`**——仍然可搜尋、可透過 MCP 使用，
    只在查詢匹配時才可用，因此在無關時不會產生任何成本。
 4. 用**個人資訊**存跨專案偏好（時區、編輯器、命名）。
 5. **連結相關記憶**，讓 1 跳鄰居一起帶上。
-6. 對應當搜尋知識庫並持久化所學內容的代理**安裝 MCP**；
-   給大多數 `read` 範圍，在信任的代理上給 `write`。
+6. 對應當搜尋知識庫並持久化所學內容的代理**安裝 MCP**。
+   一鍵安裝使用 `write` token；對於唯讀代理，請在 ddagent MCP 伺服器 token 中
+   建立一個 `read` token，並手動設定該代理（參見
+   [作為 MCP 伺服器的 ddagent](../mcp-server.md#manual-client-config)）。
 
 ## 遷移
 
@@ -176,14 +182,14 @@ Knowledge → 選單 → **Migrate existing rules** 會執行一份 **dry-run** 
 ```
 GET    /memories            ?projectId=&includeGlobal=&priority=&tag=&memoryType=&limit=&offset=
 POST   /memories            PATCH /memories/:id   DELETE /memories/:id
-GET    /rules               ?projectId=&includeGlobal=&priority=&enabledOnly=
+GET    /rules               ?projectId=&includeGlobal=&priority=&enabledOnly=&limit=&offset=
 POST   /rules               PATCH /rules/:id       DELETE /rules/:id
-GET    /skills              ?category=
+GET    /skills              ?category=&limit=&offset=
 POST   /skills              PATCH /skills/:id      DELETE /skills/:id
 GET    /personal            POST /personal         PATCH/DELETE /personal/:id
 GET    /search              ?q=&type=&projectId=&limit=
 GET    /graph               ?projectId=&types=&limit=
-GET    /context             ?projectId=            （關鍵上下文大小 + 預算）
+GET    /context             ?projectId=            （規則上下文預覽：大小 + 預算）
 GET    /tags                DELETE /tags/:id
 GET    /connections         POST /connections      DELETE /connections/:id
 GET    /history             ?entityType=&entityId=&limit=
@@ -200,5 +206,5 @@ POST   /import-all          { dryRun?, dedupe?, promoteRules? }
 
 ## 相關
 
-- [作為 MCP 伺服器的 ddagent](mcp-server.md) — 工具目錄和 token 設定
-- [團隊協作](teams.md) · [遠端核准](remote-approvals.md)
+- [作為 MCP 伺服器的 ddagent](../mcp-server.md) — 工具目錄和 token 設定
+- [團隊協作](../teams.md) · [遠端核准](../remote-approvals.md)
