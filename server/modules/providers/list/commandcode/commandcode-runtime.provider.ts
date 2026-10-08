@@ -1553,7 +1553,7 @@ function createCommandCodeProcess(sessionId: any, workingDir: any, model: any, w
                     const toolName = commandCodeToolNameFromAcp(update.title, toolInput);
                     const toolId = readOptionalString(update.toolCallId) ?? `commandcode_tool_${nextRequestId()}`;
                     state.toolsRan = true;
-                    state.openToolCalls.add(toolId);
+                    if (update.status === 'in_progress') state.openToolCalls.add(toolId);
                     // todo_write already renders as the todo list; its
                     // companion `plan` update must not add a second one.
                     state.planCoveredByToolCall = toolName === 'todo_write';
@@ -1576,7 +1576,10 @@ function createCommandCodeProcess(sessionId: any, workingDir: any, model: any, w
                     // An empty in-progress update carries nothing yet; as a
                     // tool_result it would flip the card to Completed.
                     const terminal = update.status === 'completed' || update.status === 'failed';
+                    // Only a started tool excuses silence: a queued call that
+                    // never starts is the deadlock the stall check must catch.
                     if (terminal) state.openToolCalls.delete(toolId);
+                    else if (update.status === 'in_progress') state.openToolCalls.add(toolId);
                     if (!terminal && !contentBlocks.trim() && !state.toolResultSnapshots?.has(toolId)) return;
                     // Every snapshot shares one id, so emit the folded state
                     // of the call rather than this (often empty) update.

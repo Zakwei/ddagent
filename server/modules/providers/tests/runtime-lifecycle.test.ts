@@ -617,6 +617,49 @@ for (const [name, createProcess, permissions, nativeKey, queryFn, runtimeExport,
   });
 }
 
+// Only a tool the agent reports running excuses silence; a queued (pending)
+// tool_call that never starts is exactly the deadlock the stall check exists for.
+for (const [label, updates, expectStalled] of [
+  ['a queued tool that never starts is still caught as stalled', [{ sessionUpdate: 'tool_call', toolCallId: 't1', title: 'Shell: ls', kind: 'execute', status: 'pending' }], true],
+  ['a running tool is not a stall', [
+    { sessionUpdate: 'tool_call', toolCallId: 't1', title: 'Shell: ls', kind: 'execute', status: 'pending' },
+    { sessionUpdate: 'tool_call_update', toolCallId: 't1', status: 'in_progress' },
+  ], false],
+] as const) {
+  test(`commandcode: ${label}`, async () => {
+    const directory = await mkdtemp(path.join(tmpdir(), 'acp-stall-'));
+    const { runtime, children } = await loadAcpProvider('commandcode', 'createCommandCodeProcess, activeCommandCodeProcesses, queryCommandCode');
+    const frames: Array<Record<string, any>> = [];
+    const writer = { frames, send(message: Record<string, any>) { frames.push(message); }, setSessionId() {} };
+    try {
+      const { createCommandCodeProcess, activeCommandCodeProcesses, queryCommandCode } = runtime.lifecycleHooks;
+      const state = await createCommandCodeProcess('app', directory, null, writer, {}, 'native-session');
+      activeCommandCodeProcesses.set('app', state);
+      void state.prompt('hi', {}, writer).catch(() => {});
+      for (let i = 0; i < 5; i += 1) await flush();
+      for (const update of updates) {
+        state.child.stdout.write(`${JSON.stringify({ jsonrpc: '2.0', method: 'session/update', params: { sessionId: 'native-session', update } })}\n`);
+      }
+      await flush();
+      state.lastActivityAt = 1;
+      const context = {
+        isProviderInstalled: async () => true,
+        resolveResumeModel: async () => ({ model: null }),
+        resolveProviderSessionId: async () => 'native-session',
+      };
+      void queryCommandCode('next', { sessionId: 'app', cwd: directory }, writer, context).catch(() => {});
+      for (let i = 0; i < 5; i += 1) await flush();
+      assert.equal(state.terminated, expectStalled);
+    } finally {
+      // Let a stall restart finish spawning, then close every child so the
+      // in-flight session/prompt timeout timers are cleared.
+      for (let i = 0; i < 10; i += 1) await flush();
+      for (const child of children) { child.stdout.end(); child.emit('close', 0); }
+      await rm(directory, { recursive: true, force: true });
+    }
+  });
+}
+
 test('OpenCode: switching to bypass approves pending permissions but leaves questions open', async () => {
   const requests: string[] = [];
   const fakeFetch = async (url: string) => {
