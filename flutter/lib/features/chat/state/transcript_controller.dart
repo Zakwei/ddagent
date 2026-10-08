@@ -621,8 +621,9 @@ class TranscriptController extends Notifier<TranscriptState> {
       );
       return;
     }
-    // REST contract: {decision: 'allow'|'deny'|'always'} — 'always' carries the
-    // remember semantics; updatedInput/message are WS-only fields.
+    // REST contract: {decision: 'allow'|'deny'|'always'} plus the same
+    // optional fields the WS frame carries — without them a question answered
+    // while the socket reconnects reached the agent with no answers.
     final decision = !allow
         ? 'deny'
         : rememberEntry != null
@@ -630,6 +631,9 @@ class TranscriptController extends Notifier<TranscriptState> {
         : 'allow';
     await ref.read(notificationsRepositoryProvider).respondToApproval(requestId, {
       'decision': decision,
+      if (updatedInput is Map) 'updatedInput': updatedInput,
+      'message': ?message,
+      if (rememberEntry is String) 'rememberEntry': rememberEntry,
     });
   }
 

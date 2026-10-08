@@ -59,7 +59,11 @@ export function registerApprovalContext(
  */
 export async function resolveRemoteApproval(
   requestId: string,
-  action: RemoteApprovalAction
+  action: RemoteApprovalAction,
+  // Optional payload a full client (the app over REST while its websocket
+  // reconnects) attaches — the same fields a `chat.permission-response`
+  // frame carries. Messenger buttons send none.
+  details: { updatedInput?: Record<string, unknown>; message?: string; rememberEntry?: string } = {}
 ): Promise<RemoteApprovalResult> {
   if (typeof requestId !== 'string' || requestId.length === 0 || requestId.length > 128) {
     return { ok: false, reason: 'invalid' };
@@ -77,9 +81,12 @@ export async function resolveRemoteApproval(
   const runtime = await resolveRuntime();
   runtime.resolveToolApproval(requestId, {
     allow: action !== 'deny',
-    // 'always' stores the bare tool name; claude-runtime's
-    // matchesToolPermission treats a bare name as matching every invocation.
-    rememberEntry: action === 'always' ? context?.toolName ?? undefined : undefined,
+    // 'always' prefers the client's exact entry; messenger buttons have none
+    // and fall back to the bare tool name, which claude-runtime's
+    // matchesToolPermission treats as matching every invocation.
+    rememberEntry: action === 'always' ? details.rememberEntry ?? context?.toolName ?? undefined : undefined,
+    ...(details.updatedInput ? { updatedInput: details.updatedInput } : {}),
+    ...(details.message ? { message: details.message } : {}),
   });
 
   recentDecisions.set(requestId, Date.now());

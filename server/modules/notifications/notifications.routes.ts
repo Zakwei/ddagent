@@ -17,6 +17,7 @@ import {
   getDetectedTelegramChats,
   restartTelegramPoller,
 } from '@/modules/notifications/services/telegram-poller.service.js';
+import { readObjectRecord } from '@/shared/utils.js';
 
 const router = express.Router();
 
@@ -228,7 +229,17 @@ router.post('/approvals/:requestId', requireRole('member'), async (req, res) => 
   try {
     const requestId = readText(req.params.requestId);
     const decision = readText(req.body?.decision);
-    const result = await resolveRemoteApproval(requestId, decision as 'allow' | 'deny' | 'always');
+    // Question answers (updatedInput.answers), a deny message and an exact
+    // "always" entry ride along so an answer sent while the websocket is down
+    // is not reduced to a bare allow/deny.
+    const updatedInput = readObjectRecord(req.body?.updatedInput) ?? undefined;
+    const message = readText(req.body?.message) || undefined;
+    const rememberEntry = readText(req.body?.rememberEntry) || undefined;
+    const result = await resolveRemoteApproval(requestId, decision as 'allow' | 'deny' | 'always', {
+      updatedInput,
+      message,
+      rememberEntry,
+    });
     if (!result.ok) {
       return res.status(409).json({ success: false, reason: result.reason });
     }

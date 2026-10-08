@@ -20,6 +20,7 @@ import {
   registerApprovalContext,
   resolveRemoteApproval,
 } from '@/modules/notifications/services/remote-approval.service.js';
+import { providerRuntimeService } from '@/modules/providers/index.js';
 
 type FetchCall = { url: string; body: Record<string, unknown> };
 
@@ -153,4 +154,25 @@ test('isEndpointEnabledForAnyUser honours the enabled flag', async () => {
     notificationChannelEndpointsDb.setEndpointEnabled(userId, 'telegram', '42', false);
     assert.equal(notificationChannelEndpointsDb.isEndpointEnabledForAnyUser('telegram', '42'), false);
   });
+});
+
+test('resolveRemoteApproval forwards question answers, a deny message and an exact always entry', async (t) => {
+  const decisions: unknown[] = [];
+  const original = providerRuntimeService.resolveToolApproval;
+  providerRuntimeService.resolveToolApproval = ((_requestId: string, decision: unknown) => {
+    decisions.push(decision);
+  }) as typeof original;
+  t.after(() => { providerRuntimeService.resolveToolApproval = original; });
+
+  registerApprovalContext('req-q', { toolName: 'AskUserQuestion', sessionId: 's1' });
+  await resolveRemoteApproval('req-q', 'allow', { updatedInput: { answers: { 'Which?': 'A' } } });
+  await resolveRemoteApproval('req-d', 'deny', { message: 'use the staging db' });
+  registerApprovalContext('req-a', { toolName: 'Bash', sessionId: 's1' });
+  await resolveRemoteApproval('req-a', 'always', { rememberEntry: 'Bash(git status:*)' });
+
+  assert.deepEqual(decisions, [
+    { allow: true, rememberEntry: undefined, updatedInput: { answers: { 'Which?': 'A' } } },
+    { allow: false, rememberEntry: undefined, message: 'use the staging db' },
+    { allow: true, rememberEntry: 'Bash(git status:*)' },
+  ]);
 });
