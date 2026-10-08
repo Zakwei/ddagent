@@ -31,7 +31,7 @@ class McpTokensState {
   );
 }
 
-/// `/api/mcp/tokens` CRUD — bearer tokens for ddagent's own MCP endpoint
+/// `/api/mcp/tokens` CRUD — bearer tokens for DDAgent's own MCP endpoint
 /// (`POST /mcp`), used by external tools like Claude Desktop or OpenClaw.
 class McpTokensController extends Notifier<McpTokensState> {
   McpRepository get _repo => ref.read(mcpRepositoryProvider);

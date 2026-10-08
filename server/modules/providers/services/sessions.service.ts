@@ -429,7 +429,7 @@ export const sessionsService = {
    * chat, navigates to the returned id immediately, and the id never changes
    * for the lifetime of the conversation. The provider-native id is mapped to
    * this row later, when the provider runtime announces it mid-run. Its title
-   * comes directly from the first visible ddagent message, normalized by
+   * comes directly from the first visible DDAgent message, normalized by
    * `buildDdagentSessionName` into a short uppercase title before any
    * provider-owned storage exists.
    */
@@ -520,7 +520,7 @@ export const sessionsService = {
     }
 
     // Orchestrated sessions (full or mini) own no provider transcript: their
-    // history lives in the ddagent-owned orchestrator_messages table and is
+    // history lives in the DDAgent-owned orchestrator_messages table and is
     // mapped here to the same NormalizedMessage envelope every provider session
     // returns — tagged with the parent provider so the client routes it right.
     if (isOrchestratorProvider(session.provider)) {

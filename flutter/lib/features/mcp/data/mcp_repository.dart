@@ -10,7 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 ///   `workspacePath` params)
 /// - `DELETE /api/providers/{provider}/mcp/servers/{name}`
 /// - `POST /api/providers/mcp/servers/global`
-/// - `GET/POST/DELETE /api/mcp/tokens[/{id}]` (ddagent's own MCP endpoint)
+/// - `GET/POST/DELETE /api/mcp/tokens[/{id}]` (DDAgent's own MCP endpoint)
 class McpRepository {
   const McpRepository(this._dio);
 
@@ -68,7 +68,7 @@ class McpRepository {
     ],
   );
 
-  // --- ddagent MCP endpoint tokens (`/api/mcp/tokens`) ---
+  // --- DDAgent MCP endpoint tokens (`/api/mcp/tokens`) ---
 
   Future<List<McpToken>> tokens() => apiCall(
     () => _dio.get<dynamic>('/api/mcp/tokens'),
@@ -87,7 +87,7 @@ class McpRepository {
   Future<void> revokeToken(String id) =>
       apiCall(() => _dio.delete<dynamic>('/api/mcp/tokens/${Uri.encodeComponent(id)}'), (_) {});
 
-  /// `POST /api/mcp/install` — installs the ddagent MCP server (pointing at
+  /// `POST /api/mcp/install` — installs the DDAgent MCP server (pointing at
   /// `/mcp` with a bearer token) into provider CLIs. Empty/omitted [providers]
   /// installs on every provider; returns the per-provider outcomes.
   Future<List<GlobalMcpResult>> installDdagent({List<String>? providers, String scope = 'write'}) =>

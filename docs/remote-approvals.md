@@ -18,7 +18,7 @@ approvals**.
 ## Discord
 
 Paste a channel webhook URL (`https://discord.com/api/webhooks/…`) into the
-Discord card, save it and enable the channel. ddagent posts notifications there
+Discord card, save it and enable the channel. DDAgent posts notifications there
 (approval requests and the other enabled event types). Discord is
 notification-only: a webhook cannot receive button callbacks, so approvals still
 have to be answered in Telegram or the client.

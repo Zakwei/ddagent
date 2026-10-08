@@ -473,7 +473,7 @@ export function hasAssistantInJsonl(sourceMessages) {
 }
 
 /**
- * Exported for the provider test suite: reads the ddagent JSONL transcript and
+ * Exported for the provider test suite: reads the DDAgent JSONL transcript and
  * collapses the incremental tool-result snapshots the Devin runtime appends.
  */
 export function loadDdagentJsonlHistory(jsonlPath, limit = null, offset = 0) {
@@ -520,7 +520,7 @@ export function loadDdagentJsonlHistory(jsonlPath, limit = null, offset = 0) {
         messages.chainLength = messages.length;
         return messages;
     } catch (error) {
-        console.warn(`[DevinProvider] Could not read ddagent JSONL ${jsonlPath}:`, error instanceof Error ? error.message : error);
+        console.warn(`[DevinProvider] Could not read DDAgent JSONL ${jsonlPath}:`, error instanceof Error ? error.message : error);
         return [];
     }
 }
@@ -584,7 +584,7 @@ export class DevinSessionsProvider {
         const session = sessionsDb.getSessionById(sessionId);
         const providerSessionId = options.providerSessionId ?? session?.provider_session_id ?? sessionId;
 
-        // Prefer the ddagent JSONL transcript once it contains at least one
+        // Prefer the DDAgent JSONL transcript once it contains at least one
         // assistant answer. Before that point (or for legacy sessions whose
         // JSONL only holds tool/status rows), Devin's SQLite graph is the more
         // complete source of truth, even though it is branched and contains

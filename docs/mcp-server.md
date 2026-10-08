@@ -1,7 +1,7 @@
-# ddagent as an MCP server
+# DDAgent as an MCP server
 
 External MCP clients (Claude Code, Claude Desktop, OpenClaw, any JSON-RPC MCP
-client) can drive ddagent: list sessions, create kanban tasks, enqueue messages,
+client) can drive DDAgent: list sessions, create kanban tasks, enqueue messages,
 create worktrees, and read or write the [knowledge base](KNOWLEDGE.md).
 
 ## Endpoint
@@ -19,7 +19,7 @@ clients only ever hold `mcp_*` tokens.
 ## Tokens
 
 Create tokens in the client under **Settings → Agents → (any agent) → MCP →
-ddagent MCP server tokens**. The plaintext token is shown exactly once — store it
+DDAgent MCP server tokens**. The plaintext token is shown exactly once — store it
 in the client config. Only its SHA-256 hash is kept on the server. Scopes:
 
 - `read` — read-only tools: `list_sessions`, `get_status`, `knowledge_search`,
@@ -45,7 +45,7 @@ The same list is available over REST (session-authenticated):
 ## Install into your agents
 
 Rather than writing each provider's config by hand, install the server from
-**Settings → Agents → (agent) → MCP → Install ddagent MCP server** (pick agents,
+**Settings → Agents → (agent) → MCP → Install DDAgent MCP server** (pick agents,
 or install for all; also offered during onboarding). It calls:
 
 ```

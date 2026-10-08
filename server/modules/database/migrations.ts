@@ -693,7 +693,7 @@ const readFirstDevinUserTurn = (jsonlPath: string): string | null => {
  * ACP `session_info_update` used to overwrite custom_name with its own
  * generated title, so titler/orchestrator rows reappeared in the sidebar under
  * a plausible name. The name no longer reveals them, so the first user turn of
- * the ddagent-owned transcript is checked instead. Idempotent: marked rows are
+ * the DDAgent-owned transcript is checked instead. Idempotent: marked rows are
  * skipped, so re-running on every boot only reads unmarked Devin transcripts.
  */
 const hideRenamedDevinTechnicalSessions = (db: Database): void => {

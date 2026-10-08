@@ -463,7 +463,7 @@ export function createKnowledgeRouter() {
   );
 
   // One global action: project migration (scan + optional dedupe/promote) and
-  // agent-skill import in a single call. Reads agents' files, writes only ddagent DB.
+  // agent-skill import in a single call. Reads agents' files, writes only DDAgent DB.
   router.post(
     '/import-all',
     asyncHandler(async (req: Request, res: Response) => {

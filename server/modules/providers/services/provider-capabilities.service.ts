@@ -62,7 +62,7 @@ const PROVIDER_CAPABILITIES: Record<LLMProvider, ProviderCapabilities> = {
     // NDJSON, spawn-per-turn): acceptEdits→--mode accept-edits, plan→--mode
     // plan, bypassPermissions→--dangerously-skip-permissions. Print mode has
     // no interactive permission channel, so default soft-denies tool prompts
-    // inside the CLI and ddagent never sees a request_permission round-trip.
+    // inside the CLI and DDAgent never sees a request_permission round-trip.
     permissionModes: ['default', 'acceptEdits', 'bypassPermissions', 'plan'],
     defaultPermissionMode: 'default',
     supportsImages: true,

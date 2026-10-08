@@ -3,7 +3,7 @@
     "sessionExpired": "Tu sesión ha caducado. Inicia sesión de nuevo.",
     "login": {
       "title": "Bienvenido de nuevo",
-      "description": "Inicia sesión en tu cuenta autoalojada de ddagent",
+      "description": "Inicia sesión en tu cuenta autoalojada de DDAgent",
       "username": "Usuario",
       "password": "Contraseña",
       "submit": "Iniciar sesión",
@@ -699,7 +699,7 @@
       "openInEditor": "Abrir en el editor"
     },
     "mainContent": {
-      "loading": "Cargando ddagent",
+      "loading": "Cargando DDAgent",
       "settingUpWorkspace": "Preparando tu espacio de trabajo...",
       "chooseProject": "Elige tu proyecto",
       "selectProjectDescription": "Selecciona un proyecto en la barra lateral para empezar a programar con Claude. Cada proyecto contiene tus sesiones de chat e historial de archivos.",
@@ -1498,8 +1498,8 @@
       "manualRestart": "La actualización se aplicó, pero el servidor no se reinició solo — reinícialo manualmente para terminar.",
       "failed": "La actualización falló.",
       "failedTitle": "La actualización falló",
-      "appConfirm": "¿Instalar ddagent v{{version}} en este dispositivo? Android te pedirá permiso para instalar apps desde ddagent la primera vez.",
-      "appPermission": "Permite «Instalar apps desconocidas» para ddagent y vuelve a pulsar Actualizar.",
+      "appConfirm": "¿Instalar DDAgent v{{version}} en este dispositivo? Android te pedirá permiso para instalar apps desde DDAgent la primera vez.",
+      "appPermission": "Permite «Instalar apps desconocidas» para DDAgent y vuelve a pulsar Actualizar.",
       "chooseTitle": "Actualizaciones disponibles",
       "targetApp": "Esta app",
       "targetWeb": "Interfaz web",
@@ -1528,9 +1528,9 @@
     },
     "server": {
       "title": "Servidor",
-      "description": "Reinicia el proceso de ddagent — útil tras una actualización o si algo se bloquea.",
+      "description": "Reinicia el proceso de DDAgent — útil tras una actualización o si algo se bloquea.",
       "restart": "Reiniciar",
-      "restartConfirm": "¿Reiniciar el servidor ddagent? Las sesiones activas se interrumpirán.",
+      "restartConfirm": "¿Reiniciar el servidor DDAgent? Las sesiones activas se interrumpirán.",
       "restarting": "Reiniciando… la página se recargará cuando el servidor vuelva.",
       "restartFailed": "El reinicio falló",
       "unsupported": "El reinicio solo está disponible cuando el servidor se ejecuta bajo el gestor de servicios.",
@@ -1548,8 +1548,8 @@
       "check": "Buscar actualizaciones",
       "checking": "Buscando…",
       "upToDate": "Tienes la última versión (v{{version}}).",
-      "available": "Actualización v{{version}} encontrada — descargando en segundo plano; se instalará al cerrar ddagent.",
-      "downloaded": "Actualización v{{version}} descargada — cierra y reinicia ddagent para instalarla.",
+      "available": "Actualización v{{version}} encontrada — descargando en segundo plano; se instalará al cerrar DDAgent.",
+      "downloaded": "Actualización v{{version}} descargada — cierra y reinicia DDAgent para instalarla.",
       "unavailable": "La búsqueda de actualizaciones solo está disponible en builds de escritorio empaquetados.",
       "error": "Error al buscar actualizaciones: {{message}}",
       "errorGeneric": "Error al buscar actualizaciones.",
@@ -1792,10 +1792,10 @@
         "loading": "Actualizando...",
         "unsupported": "Las notificaciones push no son compatibles con este navegador.",
         "denied": "Las notificaciones push están bloqueadas. Permítelas en los ajustes de tu navegador.",
-        "iosHint": "En iPhone/iPad, las notificaciones solo funcionan tras añadir ddagent a la pantalla de inicio (Compartir → Añadir a pantalla de inicio) y activarlas desde la app instalada.",
+        "iosHint": "En iPhone/iPad, las notificaciones solo funcionan tras añadir DDAgent a la pantalla de inicio (Compartir → Añadir a pantalla de inicio) y activarlas desde la app instalada.",
         "test": "Enviar notificación de prueba",
         "testNoSubscription": "Ningún dispositivo está suscrito. Toca «Activar» en el teléfono primero.",
-        "testSuccess": "Enviado a {{count}} dispositivo(s). Si no aparece nada en el teléfono, añade ddagent a la pantalla de inicio (iOS lo requiere).",
+        "testSuccess": "Enviado a {{count}} dispositivo(s). Si no aparece nada en el teléfono, añade DDAgent a la pantalla de inicio (iOS lo requiere).",
         "testNotDelivered": "Ningún dispositivo estaba disponible. Asegúrate de que la app esté en ejecución y las notificaciones activadas."
       },
       "device": {
@@ -2152,7 +2152,7 @@
       },
       "managed": {
         "badge": "Gestionado",
-        "hint": "Gestionado por ddagent."
+        "hint": "Gestionado por DDAgent."
       },
       "help": {
         "title": "Acerca de MCP en Codex",
@@ -2238,10 +2238,10 @@
     "workspaces": {
       "cancel": "Cancelar",
       "create": "Añadir espacio de trabajo",
-      "deleteConfirm": "¿Quitar este espacio de trabajo de ddagent? Sus archivos permanecen en el disco.",
+      "deleteConfirm": "¿Quitar este espacio de trabajo de DDAgent? Sus archivos permanecen en el disco.",
       "deleteFailed": "No se pudo quitar el espacio de trabajo.",
       "deleteTitle": "Quitar espacio de trabajo",
-      "description": "Los espacios de trabajo son directorios donde ddagent puede chatear, ejecutar código y navegar.",
+      "description": "Los espacios de trabajo son directorios donde DDAgent puede chatear, ejecutar código y navegar.",
       "remove": "Quitar espacio de trabajo",
       "title": "Espacios de trabajo",
       "pathRequired": "La ruta es obligatoria"
@@ -2254,8 +2254,8 @@
         "syncSettings": "Sincronizar ajustes",
         "teamManagement": "Gestión de equipo"
       },
-      "proFeatures": "Funciones de ddagent Pro",
-      "tryHosted": "Prueba ddagent Hosted",
+      "proFeatures": "Funciones de DDAgent Pro",
+      "tryHosted": "Prueba DDAgent Hosted",
       "versionInfo": "Información de versión",
       "client": "Aplicación",
       "server": "Servidor",
@@ -2287,7 +2287,7 @@
       "runClaudeCli": "Ejecuta Claude CLI en el directorio de un proyecto para empezar"
     },
     "app": {
-      "title": "ddagent",
+      "title": "DDAgent",
       "subtitle": "Interfaz de asistente de programación con IA"
     },
     "sessions": {
@@ -2409,7 +2409,7 @@
       "updateAvailable": "Actualización disponible",
       "restartRequired": "Actualización instalada — reinicia el servidor para aplicarla",
       "updateNow": "Actualizar ahora",
-      "updateConfirm": "¿Actualizar ddagent a v{{version}}? Se descargará y compilará el código más reciente y el servidor se reiniciará — las sesiones activas se interrumpirán.",
+      "updateConfirm": "¿Actualizar DDAgent a v{{version}}? Se descargará y compilará el código más reciente y el servidor se reiniciará — las sesiones activas se interrumpirán.",
       "updating": "Actualizando… puede tardar unos minutos",
       "restarting": "Actualización instalada — reiniciando…",
       "updateFailed": "La actualización falló",
@@ -2925,11 +2925,11 @@
     "importAll": {
       "action": "Importar todo",
       "mergeDuplicates": "Fusionar entradas duplicadas",
-      "mergeDuplicatesHint": "Combina las filas duplicadas en ddagent (no los archivos)",
+      "mergeDuplicatesHint": "Combina las filas duplicadas en DDAgent (no los archivos)",
       "projectsScanned": "Proyectos examinados: {{count}}",
       "rulesSummary": "Reglas: {{total}} · grupos duplicados: {{duplicates}}",
       "skillsFound": "Skills de agentes encontradas: {{found}} (nuevas: {{newSkills}})",
-      "title": "Importar todo a ddagent"
+      "title": "Importar todo a DDAgent"
     },
     "importSkills": {
       "found": "Se encontraron {{count}} skills en tus agentes.",
@@ -3061,8 +3061,8 @@
     },
     "install": {
       "button": "Instalar",
-      "cardDescription": "Da a tus agentes la base de conocimiento y las herramientas de ddagent mediante MCP: elige agentes o instala para todos.",
-      "description": "Permite que los agentes seleccionados usen la base de conocimiento y las herramientas de ddagent mediante MCP.",
+      "cardDescription": "Da a tus agentes la base de conocimiento y las herramientas de DDAgent mediante MCP: elige agentes o instala para todos.",
+      "description": "Permite que los agentes seleccionados usen la base de conocimiento y las herramientas de DDAgent mediante MCP.",
       "errorFallback": "error",
       "failed": "La instalación falló: {{error}}",
       "installForAll": "Instalar para todos",
@@ -3072,7 +3072,7 @@
         "other": "Instalado en {{count}} agentes."
       },
       "partialFailure": "Instalado en {{count}}; falló: {{failed}}",
-      "title": "Instalar el servidor MCP de ddagent"
+      "title": "Instalar el servidor MCP de DDAgent"
     },
     "servers": {
       "addGlobalDescription": "Añade este servidor MCP a todos los proveedores: Claude, Cursor, Codex, OpenCode y Devin. Solo se admiten los transportes stdio y HTTP porque la misma configuración debe funcionar en todos los proveedores.",
@@ -3089,7 +3089,7 @@
       "refreshingScopes": "Actualizando ámbitos de proyecto…"
     },
     "team": {
-      "cta": "Disponible con ddagent Pro",
+      "cta": "Disponible con DDAgent Pro",
       "description": "Comparte configuraciones de servidores MCP con tu equipo. Todos se mantienen sincronizados automáticamente.",
       "title": "Configuraciones MCP del equipo"
     },
@@ -3207,7 +3207,7 @@
     "worktree": "worktree"
   },
   "notifications": {
-    "deviceLabel": "ddagent Flutter",
+    "deviceLabel": "DDAgent Flutter",
     "errors": {
       "noResponse": "Sin respuesta del servidor",
       "registrationRejected": "El servidor rechazó el registro"
@@ -3221,7 +3221,7 @@
     "enterUrl": "Introduce una URL de servidor",
     "local": {
       "title": "Este dispositivo",
-      "subtitle": "Ejecuta el servidor ddagent en esta máquina",
+      "subtitle": "Ejecuta el servidor DDAgent en esta máquina",
       "install": "Instalar servidor local",
       "start": "Iniciar servidor local",
       "stop": "Detener",
@@ -3234,7 +3234,7 @@
       "error": "Error del servidor local: {{error}}",
       "or": "o conecta un servidor remoto"
     },
-    "subtitle": "Conéctate a tu servidor de ddagent"
+    "subtitle": "Conéctate a tu servidor de DDAgent"
   },
   "voice": {
     "apiKeySaved": "Clave API (guardada; escribe para reemplazar)",
@@ -3410,9 +3410,9 @@
       "invalidEmail": "Introduce una dirección de correo electrónico válida.",
       "nameAndEmailRequired": "Se requieren tanto el nombre como el correo de git."
     },
-    "gitHint": "Se usa para los commits creados por sesiones de ddagent.",
+    "gitHint": "Se usa para los commits creados por sesiones de DDAgent.",
     "mcp": {
-      "description": "Instala el servidor MCP de ddagent para que tus agentes puedan usar la base de conocimiento y las herramientas de ddagent. Elige agentes o instala para todos.",
+      "description": "Instala el servidor MCP de DDAgent para que tus agentes puedan usar la base de conocimiento y las herramientas de DDAgent. Elige agentes o instala para todos.",
       "installForAll": "Instalar para todos",
       "installSelected": "Instalar seleccionados",
       "installedOn(param=count)": {
@@ -3421,7 +3421,7 @@
       },
       "installedWithFailures": "Instalado en {{installedCount}}; falló: {{failed}}",
       "laterHint": "Opcional: también puedes instalarlo más tarde en Ajustes → MCP.",
-      "title": "Conecta los agentes con ddagent"
+      "title": "Conecta los agentes con DDAgent"
     }
   },
   "fileTree": {

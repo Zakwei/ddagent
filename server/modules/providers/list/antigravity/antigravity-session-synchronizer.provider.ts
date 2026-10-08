@@ -133,7 +133,7 @@ export class AntigravitySessionSynchronizer implements IProviderSessionSynchroni
     const timestamps = parseSummaryTime(row.last_modified_time)
       ?? parseSummaryTime(row.last_user_input_time);
 
-    // The mirror transcript only exists for sessions a ddagent runtime ran.
+    // The mirror transcript only exists for sessions a DDAgent runtime ran.
     const mirrorPath = path.join(
       antigravityTranscriptDir(projectPath),
       `${row.conversation_id}.jsonl`,

@@ -400,7 +400,7 @@ class _LinksBlock extends StatelessWidget {
             textLink(_discordUrl, LucideIcons.messageSquare, 'Discord'),
             textLink(_coffeeUrl, LucideIcons.coffee, t.buyMeACoffee),
             textLink(_docsUrl, LucideIcons.externalLink, 'Docs'),
-            textLink(_githubRepoUrl, LucideIcons.externalLink, 'ddagent'),
+            textLink(_githubRepoUrl, LucideIcons.externalLink, 'DDAgent'),
           ],
         ),
         if (!Env.embedded) ...[

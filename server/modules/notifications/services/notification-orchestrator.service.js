@@ -168,7 +168,7 @@ function buildNotificationPayload(event) {
   const message = CODE_MAP[normalizedEvent.code] || 'You have a new notification';
 
   return {
-    title: sessionName || 'ddagent',
+    title: sessionName || 'DDAgent',
     body: `${providerLabel}: ${message}`,
     data: {
       sessionId: normalizedEvent.sessionId || null,
@@ -246,7 +246,7 @@ function sendTestPush(userId) {
     provider: 'system',
     kind: 'info',
     code: 'agent.notification',
-    meta: { message: 'Test notification from ddagent' },
+    meta: { message: 'Test notification from DDAgent' },
     createdAt: new Date().toISOString()
   });
   return deliverWebPush(userId, payload);

@@ -21,10 +21,10 @@ import 'package:go_router/go_router.dart';
 
 final _emailPattern = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
 
-/// Three-step onboarding — port of Onboarding.tsx plus a ddagent-MCP step:
+/// Three-step onboarding — port of Onboarding.tsx plus a DDAgent-MCP step:
 /// step 0: git identity (GET/POST /user/git-config, auto-populated),
 /// step 1: agent connections,
-/// step 2: install the ddagent MCP server into agents → POST /user/complete-onboarding.
+/// step 2: install the DDAgent MCP server into agents → POST /user/complete-onboarding.
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
 
@@ -216,7 +216,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 }
 
-/// Step 2 — install the ddagent MCP server into the chosen agents (or all).
+/// Step 2 — install the DDAgent MCP server into the chosen agents (or all).
 class _McpInstallStep extends ConsumerStatefulWidget {
   const _McpInstallStep();
 

@@ -1,6 +1,6 @@
 # Lista zmian
 
-Wszystkie istotne zmiany w ddagent są dokumentowane w tym miejscu.
+Wszystkie istotne zmiany w DDAgent są dokumentowane w tym miejscu.
 
 Format opiera się na [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 a projekt stosuje [Semantic Versioning](https://semver.org/).
@@ -169,7 +169,7 @@ Pierwsze publiczne wydanie open-source — **AGPL-3.0-only**.
 
 ## [0.5.0] - 2026-09-21
 
-Pierwsze samodzielne wydanie **ddagent** — self-hosted interfejs webowy i mobilny dla agentów AI do kodowania.
+Pierwsze samodzielne wydanie **DDAgent** — self-hosted interfejs webowy i mobilny dla agentów AI do kodowania.
 
 ### Najważniejsze funkcje
 

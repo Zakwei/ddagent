@@ -69,7 +69,7 @@ export interface IProvider {
 /**
  * Model catalog contract for one provider.
  *
- * Implementations supply ddagent's curated predefined models and can inspect
+ * Implementations supply DDAgent's curated predefined models and can inspect
  * provider-native session state. The Providers service merges these immutable
  * source-controlled definitions with user-created SQLite rows at read time.
  */

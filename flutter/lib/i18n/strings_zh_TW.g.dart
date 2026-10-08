@@ -444,7 +444,7 @@ class Translations$notifications$zh_TW extends Translations$notifications$en {
 	final TranslationsZhTw _root; // ignore: unused_field
 
 	// Translations
-	@override String get deviceLabel => 'ddagent Flutter';
+	@override String get deviceLabel => 'DDAgent Flutter';
 	@override late final Translations$notifications$errors$zh_TW errors = Translations$notifications$errors$zh_TW.internal(_root);
 }
 
@@ -461,7 +461,7 @@ class Translations$serverConnect$zh_TW extends Translations$serverConnect$en {
 	@override String connectionFailed({required Object error}) => '連線失敗（${error}）';
 	@override String get enterUrl => '輸入伺服器 URL';
 	@override late final Translations$serverConnect$local$zh_TW local = Translations$serverConnect$local$zh_TW.internal(_root);
-	@override String get subtitle => '連線到你的 ddagent 伺服器';
+	@override String get subtitle => '連線到你的 DDAgent 伺服器';
 }
 
 // Path: voice
@@ -631,7 +631,7 @@ class Translations$onboarding$zh_TW extends Translations$onboarding$en {
 	@override late final Translations$onboarding$agents$zh_TW agents = Translations$onboarding$agents$zh_TW.internal(_root);
 	@override String get completeSetup => '完成設定';
 	@override late final Translations$onboarding$errors$zh_TW errors = Translations$onboarding$errors$zh_TW.internal(_root);
-	@override String get gitHint => '用於 ddagent 工作階段建立的提交。';
+	@override String get gitHint => '用於 DDAgent 工作階段建立的提交。';
 	@override late final Translations$onboarding$mcp$zh_TW mcp = Translations$onboarding$mcp$zh_TW.internal(_root);
 }
 
@@ -694,7 +694,7 @@ class Translations$auth$login$zh_TW extends Translations$auth$login$en {
 
 	// Translations
 	@override String get title => '歡迎回來';
-	@override String get description => '登入您的 ddagent 帳戶';
+	@override String get description => '登入您的 DDAgent 帳戶';
 	@override String get username => '使用者名稱';
 	@override String get password => '密碼';
 	@override String get submit => '登入';
@@ -1729,7 +1729,7 @@ class Translations$common$mainContent$zh_TW extends Translations$common$mainCont
 	final TranslationsZhTw _root; // ignore: unused_field
 
 	// Translations
-	@override String get loading => '正在載入 ddagent';
+	@override String get loading => '正在載入 DDAgent';
 	@override String get settingUpWorkspace => '正在設定您的工作區...';
 	@override String get chooseProject => '選擇您的專案';
 	@override String get selectProjectDescription => '從側邊欄選擇一個專案以開始使用 Claude 進行程式開發。每個專案包含您的聊天紀錄和檔案歷史。';
@@ -2163,8 +2163,8 @@ class Translations$common$update$zh_TW extends Translations$common$update$en {
 	@override String get manualRestart => '更新已套用，但伺服器未自行重新啟動 — 請手動重新啟動以完成。';
 	@override String get failed => '更新失敗。';
 	@override String get failedTitle => '更新失敗';
-	@override String appConfirm({required Object version}) => '要在此裝置上安裝 ddagent v${version} 嗎？首次安裝時 Android 會要求允許從 ddagent 安裝應用程式。';
-	@override String get appPermission => '請為 ddagent 允許「安裝未知應用程式」，然後再次點選更新。';
+	@override String appConfirm({required Object version}) => '要在此裝置上安裝 DDAgent v${version} 嗎？首次安裝時 Android 會要求允許從 DDAgent 安裝應用程式。';
+	@override String get appPermission => '請為 DDAgent 允許「安裝未知應用程式」，然後再次點選更新。';
 	@override String get chooseTitle => '有可用的更新';
 	@override String get targetApp => '此應用程式';
 	@override String get targetWeb => 'Web 介面';
@@ -2204,9 +2204,9 @@ class Translations$settings$server$zh_TW extends Translations$settings$server$en
 
 	// Translations
 	@override String get title => '伺服器';
-	@override String get description => '重新啟動 ddagent 處理程序 — 適用於套用更新或從卡住狀態復原。';
+	@override String get description => '重新啟動 DDAgent 處理程序 — 適用於套用更新或從卡住狀態復原。';
 	@override String get restart => '重新啟動';
-	@override String get restartConfirm => '確定要重新啟動 ddagent 伺服器?進行中的工作階段將被中斷。';
+	@override String get restartConfirm => '確定要重新啟動 DDAgent 伺服器?進行中的工作階段將被中斷。';
 	@override String get restarting => '正在重新啟動… 伺服器恢復後頁面將自動重新整理。';
 	@override String get restartFailed => '重新啟動失敗';
 	@override String get unsupported => '僅當伺服器在服務管理員下執行時才可重新啟動。';
@@ -2231,8 +2231,8 @@ class Translations$settings$updates$zh_TW extends Translations$settings$updates$
 	@override String get check => '檢查更新';
 	@override String get checking => '正在檢查…';
 	@override String upToDate({required Object version}) => '已是最新版本（v${version}）。';
-	@override String available({required Object version}) => '發現更新 v${version} — 正在背景下載；退出 ddagent 時自動安裝。';
-	@override String downloaded({required Object version}) => '更新 v${version} 已下載 — 退出並重新啟動 ddagent 即可安裝。';
+	@override String available({required Object version}) => '發現更新 v${version} — 正在背景下載；退出 DDAgent 時自動安裝。';
+	@override String downloaded({required Object version}) => '更新 v${version} 已下載 — 退出並重新啟動 DDAgent 即可安裝。';
 	@override String get unavailable => '更新檢查僅在打包的桌面版本中可用。';
 	@override String error({required Object message}) => '更新檢查失敗：${message}';
 	@override String get errorGeneric => '更新檢查失敗。';
@@ -2625,10 +2625,10 @@ class Translations$settings$workspaces$zh_TW extends Translations$settings$works
 	// Translations
 	@override String get cancel => '取消';
 	@override String get create => '新增工作區';
-	@override String get deleteConfirm => '從 ddagent 移除此工作區？檔案將保留在磁碟上。';
+	@override String get deleteConfirm => '從 DDAgent 移除此工作區？檔案將保留在磁碟上。';
 	@override String get deleteFailed => '移除工作區失敗。';
 	@override String get deleteTitle => '移除工作區';
-	@override String get description => '工作區是 ddagent 可以聊天、執行程式碼和瀏覽的目錄。';
+	@override String get description => '工作區是 DDAgent 可以聊天、執行程式碼和瀏覽的目錄。';
 	@override String get remove => '移除工作區';
 	@override String get title => '工作區';
 	@override String get pathRequired => '路徑為必填項。';
@@ -2645,8 +2645,8 @@ class Translations$settings$about$zh_TW extends Translations$settings$about$en {
 	@override String get buyMeACoffee => '請我喝杯咖啡';
 	@override String get learnMore => '深入了解';
 	@override late final Translations$settings$about$pro$zh_TW pro = Translations$settings$about$pro$zh_TW.internal(_root);
-	@override String get proFeatures => 'ddagent Pro 功能';
-	@override String get tryHosted => '試用 ddagent Hosted';
+	@override String get proFeatures => 'DDAgent Pro 功能';
+	@override String get tryHosted => '試用 DDAgent Hosted';
 	@override String get versionInfo => '版本資訊';
 	@override String get client => '應用程式';
 	@override String get server => '伺服器';
@@ -2690,7 +2690,7 @@ class Translations$sidebar$app$zh_TW extends Translations$sidebar$app$en {
 	final TranslationsZhTw _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'ddagent';
+	@override String get title => 'DDAgent';
 	@override String get subtitle => 'AI 程式開發助手';
 }
 
@@ -2875,7 +2875,7 @@ class Translations$sidebar$version$zh_TW extends Translations$sidebar$version$en
 	@override String get updateAvailable => '有可用更新';
 	@override String get restartRequired => '已安裝更新 — 請重新啟動伺服器以套用';
 	@override String get updateNow => '立即更新';
-	@override String updateConfirm({required Object version}) => '將 ddagent 更新到 v${version}？將擷取最新程式碼並重新建置，隨後伺服器會重新啟動 — 進行中的工作階段會被中斷。';
+	@override String updateConfirm({required Object version}) => '將 DDAgent 更新到 v${version}？將擷取最新程式碼並重新建置，隨後伺服器會重新啟動 — 進行中的工作階段會被中斷。';
 	@override String get updating => '正在更新… 可能需要幾分鐘';
 	@override String get restarting => '更新已安裝 — 正在重新啟動…';
 	@override String get updateFailed => '更新失敗';
@@ -3625,11 +3625,11 @@ class Translations$knowledge$importAll$zh_TW extends Translations$knowledge$impo
 	// Translations
 	@override String get action => '匯入全部';
 	@override String get mergeDuplicates => '合併重複項目';
-	@override String get mergeDuplicatesHint => '在 ddagent 中合併重複的資料列（非檔案）';
+	@override String get mergeDuplicatesHint => '在 DDAgent 中合併重複的資料列（非檔案）';
 	@override String projectsScanned({required Object count}) => '已掃描專案：${count}';
 	@override String rulesSummary({required Object total, required Object duplicates}) => '規則：${total} · 重複群組：${duplicates}';
 	@override String skillsFound({required Object found, required Object newSkills}) => '找到代理技能：${found}（新增：${newSkills}）';
-	@override String get title => '將所有內容匯入 ddagent';
+	@override String get title => '將所有內容匯入 DDAgent';
 }
 
 // Path: knowledge.importSkills
@@ -3813,8 +3813,8 @@ class Translations$mcp$install$zh_TW extends Translations$mcp$install$en {
 
 	// Translations
 	@override String get button => '安裝';
-	@override String get cardDescription => '透過 MCP 為你的代理提供知識庫與 ddagent 工具 — 選擇代理，或為全部安裝。';
-	@override String get description => '讓所選代理透過 MCP 使用 ddagent 知識庫與工具。';
+	@override String get cardDescription => '透過 MCP 為你的代理提供知識庫與 DDAgent 工具 — 選擇代理，或為全部安裝。';
+	@override String get description => '讓所選代理透過 MCP 使用 DDAgent 知識庫與工具。';
 	@override String get errorFallback => '錯誤';
 	@override String failed({required Object error}) => '安裝失敗：${error}';
 	@override String get installForAll => '為全部安裝';
@@ -3824,7 +3824,7 @@ class Translations$mcp$install$zh_TW extends Translations$mcp$install$en {
 		other: '已安裝於 ${count} 個代理。',
 	);
 	@override String partialFailure({required Object count, required Object failed}) => '已安裝於 ${count} 個；失敗：${failed}';
-	@override String get title => '安裝 ddagent MCP 伺服器';
+	@override String get title => '安裝 DDAgent MCP 伺服器';
 }
 
 // Path: mcp.servers
@@ -3852,7 +3852,7 @@ class Translations$mcp$team$zh_TW extends Translations$mcp$team$en {
 	final TranslationsZhTw _root; // ignore: unused_field
 
 	// Translations
-	@override String get cta => 'ddagent Pro 提供';
+	@override String get cta => 'DDAgent Pro 提供';
 	@override String get description => '在團隊中分享 MCP 伺服器設定。所有人都會自動保持同步。';
 	@override String get title => '團隊 MCP 設定';
 }
@@ -4030,7 +4030,7 @@ class Translations$serverConnect$local$zh_TW extends Translations$serverConnect$
 
 	// Translations
 	@override String get title => '此裝置';
-	@override String get subtitle => '在此電腦上執行 ddagent 伺服器';
+	@override String get subtitle => '在此電腦上執行 DDAgent 伺服器';
 	@override String get install => '安裝本機伺服器';
 	@override String get start => '啟動本機伺服器';
 	@override String get stop => '停止';
@@ -4224,7 +4224,7 @@ class Translations$onboarding$mcp$zh_TW extends Translations$onboarding$mcp$en {
 	final TranslationsZhTw _root; // ignore: unused_field
 
 	// Translations
-	@override String get description => '安裝 ddagent MCP 伺服器，讓你的代理可以使用知識庫與 ddagent 工具。選擇代理，或為全部安裝。';
+	@override String get description => '安裝 DDAgent MCP 伺服器，讓你的代理可以使用知識庫與 DDAgent 工具。選擇代理，或為全部安裝。';
 	@override String get installForAll => '為全部安裝';
 	@override String get installSelected => '安裝所選項目';
 	@override String installedOn({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
@@ -4233,7 +4233,7 @@ class Translations$onboarding$mcp$zh_TW extends Translations$onboarding$mcp$en {
 	);
 	@override String installedWithFailures({required Object installedCount, required Object failed}) => '已安裝於 ${installedCount} 個；失敗：${failed}';
 	@override String get laterHint => '選填 — 你也可以稍後在設定 → MCP 中安裝。';
-	@override String get title => '將代理連接到 ddagent';
+	@override String get title => '將代理連接到 DDAgent';
 }
 
 // Path: fileTree.search
@@ -5628,10 +5628,10 @@ class Translations$settings$notifications$webPush$zh_TW extends Translations$set
 	@override String get loading => '更新中...';
 	@override String get unsupported => '此瀏覽器不支援推播通知。';
 	@override String get denied => '推播通知已被封鎖，請在瀏覽器設定中允許。';
-	@override String get iosHint => '在 iPhone/iPad 上，只有將 ddagent 加入主畫面（分享 → 加入主畫面）並在安裝的 App 中啟用通知後，通知才有效。';
+	@override String get iosHint => '在 iPhone/iPad 上，只有將 DDAgent 加入主畫面（分享 → 加入主畫面）並在安裝的 App 中啟用通知後，通知才有效。';
 	@override String get test => '傳送測試通知';
 	@override String get testNoSubscription => '沒有已訂閱的裝置。請先在手機上點擊「啟用」。';
-	@override String testSuccess({required Object count}) => '已傳送到 ${count} 台裝置。如果手機上沒有顯示，請將 ddagent 加入主畫面（iOS 要求）。';
+	@override String testSuccess({required Object count}) => '已傳送到 ${count} 台裝置。如果手機上沒有顯示，請將 DDAgent 加入主畫面（iOS 要求）。';
 	@override String get testNotDelivered => '沒有可連線的裝置。請確認應用程式正在執行且通知已開啟。';
 }
 
@@ -6175,7 +6175,7 @@ class Translations$settings$mcpServers$managed$zh_TW extends Translations$settin
 
 	// Translations
 	@override String get badge => '受管理';
-	@override String get hint => '由 ddagent 管理。';
+	@override String get hint => '由 DDAgent 管理。';
 }
 
 // Path: settings.mcpServers.deleteConfirm
@@ -7009,7 +7009,7 @@ extension on TranslationsZhTw {
 		return switch (path) {
 			'auth.sessionExpired' => '工作階段已過期，請重新登入。',
 			'auth.login.title' => '歡迎回來',
-			'auth.login.description' => '登入您的 ddagent 帳戶',
+			'auth.login.description' => '登入您的 DDAgent 帳戶',
 			'auth.login.username' => '使用者名稱',
 			'auth.login.password' => '密碼',
 			'auth.login.submit' => '登入',
@@ -7516,7 +7516,7 @@ extension on TranslationsZhTw {
 			'common.fileOperations.move' => '移動',
 			'common.fileOperations.copyPath' => '複製路徑',
 			'common.fileOperations.openInEditor' => '在編輯器中開啟',
-			'common.mainContent.loading' => '正在載入 ddagent',
+			'common.mainContent.loading' => '正在載入 DDAgent',
 			'common.mainContent.settingUpWorkspace' => '正在設定您的工作區...',
 			'common.mainContent.chooseProject' => '選擇您的專案',
 			_ => null,
@@ -8155,8 +8155,8 @@ extension on TranslationsZhTw {
 			'common.update.manualRestart' => '更新已套用，但伺服器未自行重新啟動 — 請手動重新啟動以完成。',
 			'common.update.failed' => '更新失敗。',
 			'common.update.failedTitle' => '更新失敗',
-			'common.update.appConfirm' => ({required Object version}) => '要在此裝置上安裝 ddagent v${version} 嗎？首次安裝時 Android 會要求允許從 ddagent 安裝應用程式。',
-			'common.update.appPermission' => '請為 ddagent 允許「安裝未知應用程式」，然後再次點選更新。',
+			'common.update.appConfirm' => ({required Object version}) => '要在此裝置上安裝 DDAgent v${version} 嗎？首次安裝時 Android 會要求允許從 DDAgent 安裝應用程式。',
+			'common.update.appPermission' => '請為 DDAgent 允許「安裝未知應用程式」，然後再次點選更新。',
 			'common.update.chooseTitle' => '有可用的更新',
 			'common.update.targetApp' => '此應用程式',
 			'common.update.targetWeb' => 'Web 介面',
@@ -8179,9 +8179,9 @@ extension on TranslationsZhTw {
 			'settings.changelog.current' => '目前',
 			'settings.changelog.kNew' => '新',
 			'settings.server.title' => '伺服器',
-			'settings.server.description' => '重新啟動 ddagent 處理程序 — 適用於套用更新或從卡住狀態復原。',
+			'settings.server.description' => '重新啟動 DDAgent 處理程序 — 適用於套用更新或從卡住狀態復原。',
 			'settings.server.restart' => '重新啟動',
-			'settings.server.restartConfirm' => '確定要重新啟動 ddagent 伺服器?進行中的工作階段將被中斷。',
+			'settings.server.restartConfirm' => '確定要重新啟動 DDAgent 伺服器?進行中的工作階段將被中斷。',
 			'settings.server.restarting' => '正在重新啟動… 伺服器恢復後頁面將自動重新整理。',
 			'settings.server.restartFailed' => '重新啟動失敗',
 			'settings.server.unsupported' => '僅當伺服器在服務管理員下執行時才可重新啟動。',
@@ -8197,8 +8197,8 @@ extension on TranslationsZhTw {
 			'settings.updates.check' => '檢查更新',
 			'settings.updates.checking' => '正在檢查…',
 			'settings.updates.upToDate' => ({required Object version}) => '已是最新版本（v${version}）。',
-			'settings.updates.available' => ({required Object version}) => '發現更新 v${version} — 正在背景下載；退出 ddagent 時自動安裝。',
-			'settings.updates.downloaded' => ({required Object version}) => '更新 v${version} 已下載 — 退出並重新啟動 ddagent 即可安裝。',
+			'settings.updates.available' => ({required Object version}) => '發現更新 v${version} — 正在背景下載；退出 DDAgent 時自動安裝。',
+			'settings.updates.downloaded' => ({required Object version}) => '更新 v${version} 已下載 — 退出並重新啟動 DDAgent 即可安裝。',
 			'settings.updates.unavailable' => '更新檢查僅在打包的桌面版本中可用。',
 			'settings.updates.error' => ({required Object message}) => '更新檢查失敗：${message}',
 			'settings.updates.errorGeneric' => '更新檢查失敗。',
@@ -8384,10 +8384,10 @@ extension on TranslationsZhTw {
 			'settings.notifications.webPush.loading' => '更新中...',
 			'settings.notifications.webPush.unsupported' => '此瀏覽器不支援推播通知。',
 			'settings.notifications.webPush.denied' => '推播通知已被封鎖，請在瀏覽器設定中允許。',
-			'settings.notifications.webPush.iosHint' => '在 iPhone/iPad 上，只有將 ddagent 加入主畫面（分享 → 加入主畫面）並在安裝的 App 中啟用通知後，通知才有效。',
+			'settings.notifications.webPush.iosHint' => '在 iPhone/iPad 上，只有將 DDAgent 加入主畫面（分享 → 加入主畫面）並在安裝的 App 中啟用通知後，通知才有效。',
 			'settings.notifications.webPush.test' => '傳送測試通知',
 			'settings.notifications.webPush.testNoSubscription' => '沒有已訂閱的裝置。請先在手機上點擊「啟用」。',
-			'settings.notifications.webPush.testSuccess' => ({required Object count}) => '已傳送到 ${count} 台裝置。如果手機上沒有顯示，請將 ddagent 加入主畫面（iOS 要求）。',
+			'settings.notifications.webPush.testSuccess' => ({required Object count}) => '已傳送到 ${count} 台裝置。如果手機上沒有顯示，請將 DDAgent 加入主畫面（iOS 要求）。',
 			'settings.notifications.webPush.testNotDelivered' => '沒有可連線的裝置。請確認應用程式正在執行且通知已開啟。',
 			'settings.notifications.device.title' => '通知此裝置',
 			'settings.notifications.device.enabled' => '此裝置的通知已啟用',
@@ -8604,7 +8604,7 @@ extension on TranslationsZhTw {
 			'settings.mcpServers.help.title' => '關於 Codex MCP',
 			'settings.mcpServers.help.description' => 'Codex 支援基於 stdio 的 MCP 伺服器。您可以新增伺服器，透過額外的工具和資源來擴充 Codex 的功能。',
 			'settings.mcpServers.managed.badge' => '受管理',
-			'settings.mcpServers.managed.hint' => '由 ddagent 管理。',
+			'settings.mcpServers.managed.hint' => '由 DDAgent 管理。',
 			'settings.mcpServers.deleteConfirm.description' => ({required Object serverName}) => '「${serverName}」將從提供者設定中移除。',
 			'settings.mcpServers.deleteConfirm.title' => '刪除 MCP 伺服器？',
 			'settings.quota.settings.tab' => 'Control Center',
@@ -8667,10 +8667,10 @@ extension on TranslationsZhTw {
 			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => '取消',
 			'settings.workspaces.create' => '新增工作區',
-			'settings.workspaces.deleteConfirm' => '從 ddagent 移除此工作區？檔案將保留在磁碟上。',
+			'settings.workspaces.deleteConfirm' => '從 DDAgent 移除此工作區？檔案將保留在磁碟上。',
 			'settings.workspaces.deleteFailed' => '移除工作區失敗。',
 			'settings.workspaces.deleteTitle' => '移除工作區',
-			'settings.workspaces.description' => '工作區是 ddagent 可以聊天、執行程式碼和瀏覽的目錄。',
+			'settings.workspaces.description' => '工作區是 DDAgent 可以聊天、執行程式碼和瀏覽的目錄。',
 			'settings.workspaces.remove' => '移除工作區',
 			'settings.workspaces.title' => '工作區',
 			'settings.workspaces.pathRequired' => '路徑為必填項。',
@@ -8679,8 +8679,8 @@ extension on TranslationsZhTw {
 			'settings.about.learnMore' => '深入了解',
 			'settings.about.pro.syncSettings' => '同步設定',
 			'settings.about.pro.teamManagement' => '團隊管理',
-			'settings.about.proFeatures' => 'ddagent Pro 功能',
-			'settings.about.tryHosted' => '試用 ddagent Hosted',
+			'settings.about.proFeatures' => 'DDAgent Pro 功能',
+			'settings.about.tryHosted' => '試用 DDAgent Hosted',
 			'settings.about.versionInfo' => '版本資訊',
 			'settings.about.client' => '應用程式',
 			'settings.about.server' => '伺服器',
@@ -8706,7 +8706,7 @@ extension on TranslationsZhTw {
 			'sidebar.projects.noMatchingProjects' => '找不到符合的專案',
 			'sidebar.projects.tryDifferentSearch' => '嘗試調整您的搜尋詞',
 			'sidebar.projects.runClaudeCli' => '在專案目錄中執行 Claude CLI 以開始使用',
-			'sidebar.app.title' => 'ddagent',
+			'sidebar.app.title' => 'DDAgent',
 			'sidebar.app.subtitle' => 'AI 程式開發助手',
 			'sidebar.sessions.title' => '工作階段',
 			'sidebar.sessions.newSession' => '新增工作階段',
@@ -8804,7 +8804,7 @@ extension on TranslationsZhTw {
 			'sidebar.version.updateAvailable' => '有可用更新',
 			'sidebar.version.restartRequired' => '已安裝更新 — 請重新啟動伺服器以套用',
 			'sidebar.version.updateNow' => '立即更新',
-			'sidebar.version.updateConfirm' => ({required Object version}) => '將 ddagent 更新到 v${version}？將擷取最新程式碼並重新建置，隨後伺服器會重新啟動 — 進行中的工作階段會被中斷。',
+			'sidebar.version.updateConfirm' => ({required Object version}) => '將 DDAgent 更新到 v${version}？將擷取最新程式碼並重新建置，隨後伺服器會重新啟動 — 進行中的工作階段會被中斷。',
 			'sidebar.version.updating' => '正在更新… 可能需要幾分鐘',
 			'sidebar.version.restarting' => '更新已安裝 — 正在重新啟動…',
 			'sidebar.version.updateFailed' => '更新失敗',
@@ -9183,11 +9183,11 @@ extension on TranslationsZhTw {
 			'knowledge.graph.truncated' => '已截斷',
 			'knowledge.importAll.action' => '匯入全部',
 			'knowledge.importAll.mergeDuplicates' => '合併重複項目',
-			'knowledge.importAll.mergeDuplicatesHint' => '在 ddagent 中合併重複的資料列（非檔案）',
+			'knowledge.importAll.mergeDuplicatesHint' => '在 DDAgent 中合併重複的資料列（非檔案）',
 			'knowledge.importAll.projectsScanned' => ({required Object count}) => '已掃描專案：${count}',
 			'knowledge.importAll.rulesSummary' => ({required Object total, required Object duplicates}) => '規則：${total} · 重複群組：${duplicates}',
 			'knowledge.importAll.skillsFound' => ({required Object found, required Object newSkills}) => '找到代理技能：${found}（新增：${newSkills}）',
-			'knowledge.importAll.title' => '將所有內容匯入 ddagent',
+			'knowledge.importAll.title' => '將所有內容匯入 DDAgent',
 			'knowledge.importSkills.found' => ({required Object count}) => '在你的代理中找到 ${count} 個技能。',
 			'knowledge.importSkills.summary' => ({required Object imported, required Object skipped}) => '新增：${imported} · 略過：${skipped}',
 			'knowledge.importSkills.title' => '匯入代理技能',
@@ -9276,15 +9276,15 @@ extension on TranslationsZhTw {
 			'mcp.form.validation.unsupportedGlobal' => ({required Object type}) => '新增 MCP 伺服器在所有提供者中僅支援 stdio 和 http，不支援 ${type}。',
 			'mcp.form.validation.unsupportedProvider' => ({required Object provider, required Object type}) => '${provider} 不支援 ${type} MCP 伺服器',
 			'mcp.install.button' => '安裝',
-			'mcp.install.cardDescription' => '透過 MCP 為你的代理提供知識庫與 ddagent 工具 — 選擇代理，或為全部安裝。',
-			'mcp.install.description' => '讓所選代理透過 MCP 使用 ddagent 知識庫與工具。',
+			'mcp.install.cardDescription' => '透過 MCP 為你的代理提供知識庫與 DDAgent 工具 — 選擇代理，或為全部安裝。',
+			'mcp.install.description' => '讓所選代理透過 MCP 使用 DDAgent 知識庫與工具。',
 			'mcp.install.errorFallback' => '錯誤',
 			'mcp.install.failed' => ({required Object error}) => '安裝失敗：${error}',
 			'mcp.install.installForAll' => '為全部安裝',
 			'mcp.install.installSelected' => '安裝所選項目',
 			'mcp.install.installedCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '已安裝於 ${count} 個代理。', other: '已安裝於 ${count} 個代理。', ), 
 			'mcp.install.partialFailure' => ({required Object count, required Object failed}) => '已安裝於 ${count} 個；失敗：${failed}',
-			'mcp.install.title' => '安裝 ddagent MCP 伺服器',
+			'mcp.install.title' => '安裝 DDAgent MCP 伺服器',
 			'mcp.servers.addGlobalDescription' => '將此 MCP 伺服器新增至所有提供者：Claude、Cursor、Codex、OpenCode 和 Devin。由於相同設定必須在所有提供者中運作，因此僅支援 stdio 與 HTTP 傳輸。',
 			'mcp.servers.addGlobalMenuDescription' => '新增全域 MCP 伺服器會將一個通用 stdio 或 HTTP 伺服器寫入 Claude、Cursor、Codex、OpenCode 和 Devin。',
 			'mcp.servers.addGlobalTitle' => '新增全域 MCP 伺服器',
@@ -9295,7 +9295,7 @@ extension on TranslationsZhTw {
 			'mcp.servers.descriptionGeneric' => ({required Object provider}) => 'Model Context Protocol 伺服器為 ${provider} 提供額外的工具和資料來源',
 			'mcp.servers.loading' => '正在載入 MCP 伺服器...',
 			'mcp.servers.refreshingScopes' => '正在重新整理專案範圍...',
-			'mcp.team.cta' => 'ddagent Pro 提供',
+			'mcp.team.cta' => 'DDAgent Pro 提供',
 			'mcp.team.description' => '在團隊中分享 MCP 伺服器設定。所有人都會自動保持同步。',
 			'mcp.team.title' => '團隊 MCP 設定',
 			'mcp.tokens.scopeWrite' => '寫入',
@@ -9376,7 +9376,7 @@ extension on TranslationsZhTw {
 			'scheduler.runs' => '執行次數',
 			'scheduler.session' => ({required Object id}) => '工作階段 ${id}',
 			'scheduler.worktree' => 'worktree',
-			'notifications.deviceLabel' => 'ddagent Flutter',
+			'notifications.deviceLabel' => 'DDAgent Flutter',
 			'notifications.errors.noResponse' => '伺服器沒有回應',
 			'notifications.errors.registrationRejected' => '伺服器拒絕註冊',
 			'serverConnect.connect' => '連線',
@@ -9385,7 +9385,7 @@ extension on TranslationsZhTw {
 			'serverConnect.connectionFailed' => ({required Object error}) => '連線失敗（${error}）',
 			'serverConnect.enterUrl' => '輸入伺服器 URL',
 			'serverConnect.local.title' => '此裝置',
-			'serverConnect.local.subtitle' => '在此電腦上執行 ddagent 伺服器',
+			'serverConnect.local.subtitle' => '在此電腦上執行 DDAgent 伺服器',
 			'serverConnect.local.install' => '安裝本機伺服器',
 			'serverConnect.local.start' => '啟動本機伺服器',
 			'serverConnect.local.stop' => '停止',
@@ -9397,7 +9397,7 @@ extension on TranslationsZhTw {
 			'serverConnect.local.connect' => '使用此伺服器',
 			'serverConnect.local.error' => ({required Object error}) => '本機伺服器錯誤：${error}',
 			'serverConnect.local.or' => '或連線到遠端伺服器',
-			'serverConnect.subtitle' => '連線到你的 ddagent 伺服器',
+			'serverConnect.subtitle' => '連線到你的 DDAgent 伺服器',
 			'voice.apiKeySaved' => 'API 金鑰（已儲存，輸入以取代）',
 			'voice.preview' => '預覽',
 			'voice.saveFailed' => '儲存 STT 設定失敗',
@@ -9517,14 +9517,14 @@ extension on TranslationsZhTw {
 			'onboarding.completeSetup' => '完成設定',
 			'onboarding.errors.invalidEmail' => '請輸入有效的電子郵件地址。',
 			'onboarding.errors.nameAndEmailRequired' => 'git 名稱與電子郵件皆為必填。',
-			'onboarding.gitHint' => '用於 ddagent 工作階段建立的提交。',
-			'onboarding.mcp.description' => '安裝 ddagent MCP 伺服器，讓你的代理可以使用知識庫與 ddagent 工具。選擇代理，或為全部安裝。',
+			'onboarding.gitHint' => '用於 DDAgent 工作階段建立的提交。',
+			'onboarding.mcp.description' => '安裝 DDAgent MCP 伺服器，讓你的代理可以使用知識庫與 DDAgent 工具。選擇代理，或為全部安裝。',
 			'onboarding.mcp.installForAll' => '為全部安裝',
 			'onboarding.mcp.installSelected' => '安裝所選項目',
 			'onboarding.mcp.installedOn' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '已安裝於 ${count} 個代理。', other: '已安裝於 ${count} 個代理。', ), 
 			'onboarding.mcp.installedWithFailures' => ({required Object installedCount, required Object failed}) => '已安裝於 ${installedCount} 個；失敗：${failed}',
 			'onboarding.mcp.laterHint' => '選填 — 你也可以稍後在設定 → MCP 中安裝。',
-			'onboarding.mcp.title' => '將代理連接到 ddagent',
+			'onboarding.mcp.title' => '將代理連接到 DDAgent',
 			'fileTree.browseServerFilesystem' => '瀏覽伺服器檔案系統',
 			'fileTree.chooseFolder' => '選擇資料夾',
 			'fileTree.copyContents' => '複製內容',

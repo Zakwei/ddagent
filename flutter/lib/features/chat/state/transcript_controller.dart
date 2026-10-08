@@ -331,7 +331,7 @@ class TranscriptController extends Notifier<TranscriptState> {
   /// fired on `complete`. Replaces the cached rows wholesale when the latest
   /// page is the authoritative transcript (`!hasMore`) or nothing is cached;
   /// otherwise stitches by overlap, bridging backward when ids regenerated
-  /// or the provider switched sources mid-turn (Devin DB ↔ ddagent JSONL).
+  /// or the provider switched sources mid-turn (Devin DB ↔ DDAgent JSONL).
   /// Either way the persisted copy of the just-finished turn lands, which is
   /// what lets `removeOptimisticUserEchoes` reclaim any orphan `local_*` row.
   Future<void> _refreshLatest() => _withHistoryLock(() async {

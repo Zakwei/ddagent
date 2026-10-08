@@ -30,7 +30,7 @@ the fixed release.
 
 ## Scope
 
-ddagent is a self-hosted server that runs AI coding agents with real system
+DDAgent is a self-hosted server that runs AI coding agents with real system
 access — it can spawn shells, edit files and run git commands on the machine it
 is installed on. Treat the server as privileged:
 

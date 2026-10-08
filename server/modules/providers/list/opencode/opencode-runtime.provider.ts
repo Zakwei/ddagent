@@ -1514,7 +1514,7 @@ async function createProviderSession(
   const { status, data } = await apiRequest(baseUrl, '/session', {
     method: 'POST',
     query: { directory },
-    body: { title: title || 'ddagent session' },
+    body: { title: title || 'DDAgent session' },
   });
   const id = (data as AnyRecord | null)?.id;
   if (status >= 400 || typeof id !== 'string' || !id) {

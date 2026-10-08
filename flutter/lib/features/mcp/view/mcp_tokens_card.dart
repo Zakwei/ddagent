@@ -11,9 +11,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-/// `McpServerTokens.tsx` — bearer tokens for ddagent's own MCP endpoint
+/// `McpServerTokens.tsx` — bearer tokens for DDAgent's own MCP endpoint
 /// (`POST /mcp`), how external tools like Claude Desktop or OpenClaw call the
-/// ddagent tools. Plaintext shows exactly once, right after creation.
+/// DDAgent tools. Plaintext shows exactly once, right after creation.
 class McpTokensCard extends ConsumerStatefulWidget {
   const McpTokensCard({super.key});
 

@@ -13,7 +13,7 @@ import {
   sanitizeLeafDirectoryName,
 } from '@/shared/utils.js';
 
-/** Curated Cursor catalog shipped as immutable ddagent defaults. */
+/** Curated Cursor catalog shipped as immutable DDAgent defaults. */
 export const CURSOR_PREDEFINED_MODELS: ProviderModelsDefinition = {
   OPTIONS: [
     { value: 'auto', label: 'Auto', description: 'Let Cursor choose the model.' },

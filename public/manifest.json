@@ -1,7 +1,7 @@
 {
-  "name": "ddagent UI",
-  "short_name": "ddagent UI",
-  "description": "ddagent UI web application",
+  "name": "DDAgent UI",
+  "short_name": "DDAgent UI",
+  "description": "DDAgent UI web application",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

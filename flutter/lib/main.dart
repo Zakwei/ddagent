@@ -46,7 +46,7 @@ final rootMessengerKey = GlobalKey<ScaffoldMessengerState>();
 Future<void> presentDesktopNotification(DesktopNotification event) async {
   final title = event.title?.trim();
   final body = event.body?.trim() ?? '';
-  final resolvedTitle = (title == null || title.isEmpty) ? 'ddagent' : title;
+  final resolvedTitle = (title == null || title.isEmpty) ? 'DDAgent' : title;
   if (await showDesktopNotification(title: resolvedTitle, body: body)) return;
   final context = rootMessengerKey.currentContext;
   if (context != null && context.mounted) {

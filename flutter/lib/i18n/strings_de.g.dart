@@ -444,7 +444,7 @@ class Translations$notifications$de extends Translations$notifications$en {
 	final TranslationsDe _root; // ignore: unused_field
 
 	// Translations
-	@override String get deviceLabel => 'ddagent Flutter';
+	@override String get deviceLabel => 'DDAgent Flutter';
 	@override late final Translations$notifications$errors$de errors = Translations$notifications$errors$de._(_root);
 }
 
@@ -461,7 +461,7 @@ class Translations$serverConnect$de extends Translations$serverConnect$en {
 	@override String connectionFailed({required Object error}) => 'Verbindung fehlgeschlagen (${error})';
 	@override String get enterUrl => 'Server-URL eingeben';
 	@override late final Translations$serverConnect$local$de local = Translations$serverConnect$local$de._(_root);
-	@override String get subtitle => 'Mit deinem ddagent-Server verbinden';
+	@override String get subtitle => 'Mit deinem DDAgent-Server verbinden';
 }
 
 // Path: voice
@@ -631,7 +631,7 @@ class Translations$onboarding$de extends Translations$onboarding$en {
 	@override late final Translations$onboarding$agents$de agents = Translations$onboarding$agents$de._(_root);
 	@override String get completeSetup => 'Einrichtung abschließen';
 	@override late final Translations$onboarding$errors$de errors = Translations$onboarding$errors$de._(_root);
-	@override String get gitHint => 'Wird für Commits verwendet, die von ddagent-Sitzungen erstellt werden.';
+	@override String get gitHint => 'Wird für Commits verwendet, die von DDAgent-Sitzungen erstellt werden.';
 	@override late final Translations$onboarding$mcp$de mcp = Translations$onboarding$mcp$de._(_root);
 }
 
@@ -694,7 +694,7 @@ class Translations$auth$login$de extends Translations$auth$login$en {
 
 	// Translations
 	@override String get title => 'Willkommen zurück';
-	@override String get description => 'Meld dich bei deinem ddagent-Konto an';
+	@override String get description => 'Meld dich bei deinem DDAgent-Konto an';
 	@override String get username => 'Benutzername';
 	@override String get password => 'Passwort';
 	@override String get submit => 'Anmelden';
@@ -1730,7 +1730,7 @@ class Translations$common$mainContent$de extends Translations$common$mainContent
 	final TranslationsDe _root; // ignore: unused_field
 
 	// Translations
-	@override String get loading => 'ddagent wird geladen';
+	@override String get loading => 'DDAgent wird geladen';
 	@override String get settingUpWorkspace => 'Arbeitsbereich wird eingerichtet...';
 	@override String get chooseProject => 'Projekt auswählen';
 	@override String get selectProjectDescription => 'Wähl ein Projekt aus der Seitenleiste, um mit Claude zu programmieren. Jedes Projekt enthält deine Chat-Sitzungen und den Dateiverlauf.';
@@ -2164,8 +2164,8 @@ class Translations$common$update$de extends Translations$common$update$en {
 	@override String get manualRestart => 'Das Update wurde angewendet, aber der Server hat nicht von selbst neu gestartet — starte ihn manuell neu, um abzuschließen.';
 	@override String get failed => 'Update fehlgeschlagen.';
 	@override String get failedTitle => 'Update fehlgeschlagen';
-	@override String appConfirm({required Object version}) => 'ddagent v${version} auf diesem Gerät installieren? Android fragt beim ersten Mal, ob Installationen aus ddagent erlaubt sind.';
-	@override String get appPermission => 'Erlaube ddagent „Unbekannte Apps installieren“ und tippe dann erneut auf Aktualisieren.';
+	@override String appConfirm({required Object version}) => 'DDAgent v${version} auf diesem Gerät installieren? Android fragt beim ersten Mal, ob Installationen aus DDAgent erlaubt sind.';
+	@override String get appPermission => 'Erlaube DDAgent „Unbekannte Apps installieren“ und tippe dann erneut auf Aktualisieren.';
 	@override String get chooseTitle => 'Updates verfügbar';
 	@override String get targetApp => 'Diese App';
 	@override String get targetWeb => 'Weboberfläche';
@@ -2205,9 +2205,9 @@ class Translations$settings$server$de extends Translations$settings$server$en {
 
 	// Translations
 	@override String get title => 'Server';
-	@override String get description => 'Startet den ddagent-Prozess neu — nützlich nach Updates oder wenn etwas hängt.';
+	@override String get description => 'Startet den DDAgent-Prozess neu — nützlich nach Updates oder wenn etwas hängt.';
 	@override String get restart => 'Neu starten';
-	@override String get restartConfirm => 'ddagent-Server neu starten? Aktive Sitzungen werden unterbrochen.';
+	@override String get restartConfirm => 'DDAgent-Server neu starten? Aktive Sitzungen werden unterbrochen.';
 	@override String get restarting => 'Neustart läuft… die Seite lädt neu, sobald der Server zurück ist.';
 	@override String get restartFailed => 'Neustart fehlgeschlagen';
 	@override String get unsupported => 'Neustart ist nur verfügbar, wenn der Server unter dem Dienst-Manager läuft.';
@@ -2232,8 +2232,8 @@ class Translations$settings$updates$de extends Translations$settings$updates$en 
 	@override String get check => 'Nach Updates suchen';
 	@override String get checking => 'Suche läuft…';
 	@override String upToDate({required Object version}) => 'Du hast die neueste Version (v${version}).';
-	@override String available({required Object version}) => 'Update v${version} gefunden — Download im Hintergrund; Installation beim Beenden von ddagent.';
-	@override String downloaded({required Object version}) => 'Update v${version} heruntergeladen — ddagent beenden und neu starten, um es zu installieren.';
+	@override String available({required Object version}) => 'Update v${version} gefunden — Download im Hintergrund; Installation beim Beenden von DDAgent.';
+	@override String downloaded({required Object version}) => 'Update v${version} heruntergeladen — DDAgent beenden und neu starten, um es zu installieren.';
 	@override String get unavailable => 'Die Update-Prüfung ist nur in paketierten Desktop-Builds verfügbar.';
 	@override String error({required Object message}) => 'Update-Prüfung fehlgeschlagen: ${message}';
 	@override String get errorGeneric => 'Update-Prüfung fehlgeschlagen.';
@@ -2626,10 +2626,10 @@ class Translations$settings$workspaces$de extends Translations$settings$workspac
 	// Translations
 	@override String get cancel => 'Abbrechen';
 	@override String get create => 'Workspace hinzufügen';
-	@override String get deleteConfirm => 'Diesen Workspace aus ddagent entfernen? Seine Dateien bleiben auf der Festplatte.';
+	@override String get deleteConfirm => 'Diesen Workspace aus DDAgent entfernen? Seine Dateien bleiben auf der Festplatte.';
 	@override String get deleteFailed => 'Workspace konnte nicht entfernt werden.';
 	@override String get deleteTitle => 'Workspace entfernen';
-	@override String get description => 'Workspaces sind Verzeichnisse, in denen ddagent chatten, Code ausführen und browsen kann.';
+	@override String get description => 'Workspaces sind Verzeichnisse, in denen DDAgent chatten, Code ausführen und browsen kann.';
 	@override String get remove => 'Workspace entfernen';
 	@override String get title => 'Arbeitsbereiche';
 	@override String get pathRequired => 'Pfad ist erforderlich';
@@ -2646,8 +2646,8 @@ class Translations$settings$about$de extends Translations$settings$about$en {
 	@override String get buyMeACoffee => 'Buy Me a Coffee';
 	@override String get learnMore => 'Mehr erfahren';
 	@override late final Translations$settings$about$pro$de pro = Translations$settings$about$pro$de._(_root);
-	@override String get proFeatures => 'ddagent Pro-Funktionen';
-	@override String get tryHosted => 'ddagent Hosted testen';
+	@override String get proFeatures => 'DDAgent Pro-Funktionen';
+	@override String get tryHosted => 'DDAgent Hosted testen';
 	@override String get versionInfo => 'Versionsinfo';
 	@override String get client => 'App';
 	@override String get server => 'Server';
@@ -2691,7 +2691,7 @@ class Translations$sidebar$app$de extends Translations$sidebar$app$en {
 	final TranslationsDe _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'ddagent';
+	@override String get title => 'DDAgent';
 	@override String get subtitle => 'KI-Programmierassistent-Oberfläche';
 }
 
@@ -2876,7 +2876,7 @@ class Translations$sidebar$version$de extends Translations$sidebar$version$en {
 	@override String get updateAvailable => 'Update verfügbar';
 	@override String get restartRequired => 'Update installiert – zum Anwenden Server neu starten';
 	@override String get updateNow => 'Jetzt aktualisieren';
-	@override String updateConfirm({required Object version}) => 'ddagent auf v${version} aktualisieren? Der neueste Code wird geholt und gebaut, der Server startet neu — aktive Sitzungen werden unterbrochen.';
+	@override String updateConfirm({required Object version}) => 'DDAgent auf v${version} aktualisieren? Der neueste Code wird geholt und gebaut, der Server startet neu — aktive Sitzungen werden unterbrochen.';
 	@override String get updating => 'Aktualisierung läuft… kann ein paar Minuten dauern';
 	@override String get restarting => 'Update installiert — Neustart…';
 	@override String get updateFailed => 'Update fehlgeschlagen';
@@ -3626,11 +3626,11 @@ class Translations$knowledge$importAll$de extends Translations$knowledge$importA
 	// Translations
 	@override String get action => 'Alles importieren';
 	@override String get mergeDuplicates => 'Doppelte Einträge zusammenführen';
-	@override String get mergeDuplicatesHint => 'Führt doppelte Zeilen in ddagent zusammen (keine Dateien)';
+	@override String get mergeDuplicatesHint => 'Führt doppelte Zeilen in DDAgent zusammen (keine Dateien)';
 	@override String projectsScanned({required Object count}) => 'Gescannte Projekte: ${count}';
 	@override String rulesSummary({required Object total, required Object duplicates}) => 'Regeln: ${total} · doppelte Gruppen: ${duplicates}';
 	@override String skillsFound({required Object found, required Object newSkills}) => 'Agent-Skills gefunden: ${found} (neu: ${newSkills})';
-	@override String get title => 'Alles in ddagent importieren';
+	@override String get title => 'Alles in DDAgent importieren';
 }
 
 // Path: knowledge.importSkills
@@ -3814,8 +3814,8 @@ class Translations$mcp$install$de extends Translations$mcp$install$en {
 
 	// Translations
 	@override String get button => 'Installieren';
-	@override String get cardDescription => 'Gib deinen Agenten die Wissensdatenbank und die ddagent-Werkzeuge über MCP — wähle Agenten aus oder installiere für alle.';
-	@override String get description => 'Ermöglicht den ausgewählten Agenten die Nutzung der ddagent-Wissensdatenbank und -Werkzeuge über MCP.';
+	@override String get cardDescription => 'Gib deinen Agenten die Wissensdatenbank und die DDAgent-Werkzeuge über MCP — wähle Agenten aus oder installiere für alle.';
+	@override String get description => 'Ermöglicht den ausgewählten Agenten die Nutzung der DDAgent-Wissensdatenbank und -Werkzeuge über MCP.';
 	@override String get errorFallback => 'Fehler';
 	@override String failed({required Object error}) => 'Installation fehlgeschlagen: ${error}';
 	@override String get installForAll => 'Für alle installieren';
@@ -3825,7 +3825,7 @@ class Translations$mcp$install$de extends Translations$mcp$install$en {
 		other: 'Auf ${count} Agenten installiert.',
 	);
 	@override String partialFailure({required Object count, required Object failed}) => 'Auf ${count} installiert; fehlgeschlagen: ${failed}';
-	@override String get title => 'ddagent MCP-Server installieren';
+	@override String get title => 'DDAgent MCP-Server installieren';
 }
 
 // Path: mcp.servers
@@ -3853,7 +3853,7 @@ class Translations$mcp$team$de extends Translations$mcp$team$en {
 	final TranslationsDe _root; // ignore: unused_field
 
 	// Translations
-	@override String get cta => 'Verfügbar mit ddagent Pro';
+	@override String get cta => 'Verfügbar mit DDAgent Pro';
 	@override String get description => 'Teile MCP-Server-Konfigurationen mit deinem Team. Alle bleiben automatisch synchron.';
 	@override String get title => 'Team-MCP-Konfigurationen';
 }
@@ -4031,7 +4031,7 @@ class Translations$serverConnect$local$de extends Translations$serverConnect$loc
 
 	// Translations
 	@override String get title => 'Dieses Gerät';
-	@override String get subtitle => 'ddagent-Server auf diesem Rechner ausführen';
+	@override String get subtitle => 'DDAgent-Server auf diesem Rechner ausführen';
 	@override String get install => 'Lokalen Server installieren';
 	@override String get start => 'Lokalen Server starten';
 	@override String get stop => 'Stoppen';
@@ -4225,7 +4225,7 @@ class Translations$onboarding$mcp$de extends Translations$onboarding$mcp$en {
 	final TranslationsDe _root; // ignore: unused_field
 
 	// Translations
-	@override String get description => 'Installiere den ddagent MCP-Server, damit deine Agenten die Wissensdatenbank und die ddagent-Werkzeuge nutzen können. Wähle Agenten aus oder installiere für alle.';
+	@override String get description => 'Installiere den DDAgent MCP-Server, damit deine Agenten die Wissensdatenbank und die DDAgent-Werkzeuge nutzen können. Wähle Agenten aus oder installiere für alle.';
 	@override String get installForAll => 'Für alle installieren';
 	@override String get installSelected => 'Ausgewählte installieren';
 	@override String installedOn({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(count,
@@ -4234,7 +4234,7 @@ class Translations$onboarding$mcp$de extends Translations$onboarding$mcp$en {
 	);
 	@override String installedWithFailures({required Object installedCount, required Object failed}) => 'Auf ${installedCount} installiert; fehlgeschlagen: ${failed}';
 	@override String get laterHint => 'Optional — du kannst dies auch später unter Einstellungen → MCP installieren.';
-	@override String get title => 'Agenten mit ddagent verbinden';
+	@override String get title => 'Agenten mit DDAgent verbinden';
 }
 
 // Path: fileTree.search
@@ -5629,10 +5629,10 @@ class Translations$settings$notifications$webPush$de extends Translations$settin
 	@override String get loading => 'Wird aktualisiert...';
 	@override String get unsupported => 'Push-Benachrichtigungen werden in diesem Browser nicht unterstützt.';
 	@override String get denied => 'Push-Benachrichtigungen sind blockiert. Bitte erlaube sie in den Browsereinstellungen.';
-	@override String get iosHint => 'Auf iPhone/iPad funktionieren Benachrichtigungen erst, nachdem ddagent zum Home-Bildschirm hinzugefügt wurde (Teilen → Zum Home-Bildschirm) und sie in der installierten App aktiviert wurden.';
+	@override String get iosHint => 'Auf iPhone/iPad funktionieren Benachrichtigungen erst, nachdem DDAgent zum Home-Bildschirm hinzugefügt wurde (Teilen → Zum Home-Bildschirm) und sie in der installierten App aktiviert wurden.';
 	@override String get test => 'Test-Benachrichtigung senden';
 	@override String get testNoSubscription => 'Kein Gerät ist angemeldet. Tippe zuerst auf dem Telefon auf „Aktivieren“.';
-	@override String testSuccess({required Object count}) => 'An ${count} Gerät(e) gesendet. Falls nichts auf dem Telefon erscheint, füge ddagent zum Home-Bildschirm hinzu (iOS erfordert dies).';
+	@override String testSuccess({required Object count}) => 'An ${count} Gerät(e) gesendet. Falls nichts auf dem Telefon erscheint, füge DDAgent zum Home-Bildschirm hinzu (iOS erfordert dies).';
 	@override String get testNotDelivered => 'Kein Gerät war erreichbar. Stelle sicher, dass die App läuft und Benachrichtigungen aktiviert sind.';
 }
 
@@ -6176,7 +6176,7 @@ class Translations$settings$mcpServers$managed$de extends Translations$settings$
 
 	// Translations
 	@override String get badge => 'Verwaltet';
-	@override String get hint => 'Verwaltet von ddagent.';
+	@override String get hint => 'Verwaltet von DDAgent.';
 }
 
 // Path: settings.mcpServers.deleteConfirm
@@ -7010,7 +7010,7 @@ extension on TranslationsDe {
 		return switch (path) {
 			'auth.sessionExpired' => 'Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.',
 			'auth.login.title' => 'Willkommen zurück',
-			'auth.login.description' => 'Meld dich bei deinem ddagent-Konto an',
+			'auth.login.description' => 'Meld dich bei deinem DDAgent-Konto an',
 			'auth.login.username' => 'Benutzername',
 			'auth.login.password' => 'Passwort',
 			'auth.login.submit' => 'Anmelden',
@@ -7517,7 +7517,7 @@ extension on TranslationsDe {
 			'common.fileOperations.move' => 'Verschieben',
 			'common.fileOperations.copyPath' => 'Pfad kopieren',
 			'common.fileOperations.openInEditor' => 'Im Editor öffnen',
-			'common.mainContent.loading' => 'ddagent wird geladen',
+			'common.mainContent.loading' => 'DDAgent wird geladen',
 			'common.mainContent.settingUpWorkspace' => 'Arbeitsbereich wird eingerichtet...',
 			'common.mainContent.chooseProject' => 'Projekt auswählen',
 			_ => null,
@@ -8156,8 +8156,8 @@ extension on TranslationsDe {
 			'common.update.manualRestart' => 'Das Update wurde angewendet, aber der Server hat nicht von selbst neu gestartet — starte ihn manuell neu, um abzuschließen.',
 			'common.update.failed' => 'Update fehlgeschlagen.',
 			'common.update.failedTitle' => 'Update fehlgeschlagen',
-			'common.update.appConfirm' => ({required Object version}) => 'ddagent v${version} auf diesem Gerät installieren? Android fragt beim ersten Mal, ob Installationen aus ddagent erlaubt sind.',
-			'common.update.appPermission' => 'Erlaube ddagent „Unbekannte Apps installieren“ und tippe dann erneut auf Aktualisieren.',
+			'common.update.appConfirm' => ({required Object version}) => 'DDAgent v${version} auf diesem Gerät installieren? Android fragt beim ersten Mal, ob Installationen aus DDAgent erlaubt sind.',
+			'common.update.appPermission' => 'Erlaube DDAgent „Unbekannte Apps installieren“ und tippe dann erneut auf Aktualisieren.',
 			'common.update.chooseTitle' => 'Updates verfügbar',
 			'common.update.targetApp' => 'Diese App',
 			'common.update.targetWeb' => 'Weboberfläche',
@@ -8180,9 +8180,9 @@ extension on TranslationsDe {
 			'settings.changelog.current' => 'aktuell',
 			'settings.changelog.kNew' => 'neu',
 			'settings.server.title' => 'Server',
-			'settings.server.description' => 'Startet den ddagent-Prozess neu — nützlich nach Updates oder wenn etwas hängt.',
+			'settings.server.description' => 'Startet den DDAgent-Prozess neu — nützlich nach Updates oder wenn etwas hängt.',
 			'settings.server.restart' => 'Neu starten',
-			'settings.server.restartConfirm' => 'ddagent-Server neu starten? Aktive Sitzungen werden unterbrochen.',
+			'settings.server.restartConfirm' => 'DDAgent-Server neu starten? Aktive Sitzungen werden unterbrochen.',
 			'settings.server.restarting' => 'Neustart läuft… die Seite lädt neu, sobald der Server zurück ist.',
 			'settings.server.restartFailed' => 'Neustart fehlgeschlagen',
 			'settings.server.unsupported' => 'Neustart ist nur verfügbar, wenn der Server unter dem Dienst-Manager läuft.',
@@ -8198,8 +8198,8 @@ extension on TranslationsDe {
 			'settings.updates.check' => 'Nach Updates suchen',
 			'settings.updates.checking' => 'Suche läuft…',
 			'settings.updates.upToDate' => ({required Object version}) => 'Du hast die neueste Version (v${version}).',
-			'settings.updates.available' => ({required Object version}) => 'Update v${version} gefunden — Download im Hintergrund; Installation beim Beenden von ddagent.',
-			'settings.updates.downloaded' => ({required Object version}) => 'Update v${version} heruntergeladen — ddagent beenden und neu starten, um es zu installieren.',
+			'settings.updates.available' => ({required Object version}) => 'Update v${version} gefunden — Download im Hintergrund; Installation beim Beenden von DDAgent.',
+			'settings.updates.downloaded' => ({required Object version}) => 'Update v${version} heruntergeladen — DDAgent beenden und neu starten, um es zu installieren.',
 			'settings.updates.unavailable' => 'Die Update-Prüfung ist nur in paketierten Desktop-Builds verfügbar.',
 			'settings.updates.error' => ({required Object message}) => 'Update-Prüfung fehlgeschlagen: ${message}',
 			'settings.updates.errorGeneric' => 'Update-Prüfung fehlgeschlagen.',
@@ -8385,10 +8385,10 @@ extension on TranslationsDe {
 			'settings.notifications.webPush.loading' => 'Wird aktualisiert...',
 			'settings.notifications.webPush.unsupported' => 'Push-Benachrichtigungen werden in diesem Browser nicht unterstützt.',
 			'settings.notifications.webPush.denied' => 'Push-Benachrichtigungen sind blockiert. Bitte erlaube sie in den Browsereinstellungen.',
-			'settings.notifications.webPush.iosHint' => 'Auf iPhone/iPad funktionieren Benachrichtigungen erst, nachdem ddagent zum Home-Bildschirm hinzugefügt wurde (Teilen → Zum Home-Bildschirm) und sie in der installierten App aktiviert wurden.',
+			'settings.notifications.webPush.iosHint' => 'Auf iPhone/iPad funktionieren Benachrichtigungen erst, nachdem DDAgent zum Home-Bildschirm hinzugefügt wurde (Teilen → Zum Home-Bildschirm) und sie in der installierten App aktiviert wurden.',
 			'settings.notifications.webPush.test' => 'Test-Benachrichtigung senden',
 			'settings.notifications.webPush.testNoSubscription' => 'Kein Gerät ist angemeldet. Tippe zuerst auf dem Telefon auf „Aktivieren“.',
-			'settings.notifications.webPush.testSuccess' => ({required Object count}) => 'An ${count} Gerät(e) gesendet. Falls nichts auf dem Telefon erscheint, füge ddagent zum Home-Bildschirm hinzu (iOS erfordert dies).',
+			'settings.notifications.webPush.testSuccess' => ({required Object count}) => 'An ${count} Gerät(e) gesendet. Falls nichts auf dem Telefon erscheint, füge DDAgent zum Home-Bildschirm hinzu (iOS erfordert dies).',
 			'settings.notifications.webPush.testNotDelivered' => 'Kein Gerät war erreichbar. Stelle sicher, dass die App läuft und Benachrichtigungen aktiviert sind.',
 			'settings.notifications.device.title' => 'Dieses Gerät benachrichtigen',
 			'settings.notifications.device.enabled' => 'Benachrichtigungen sind für dieses Gerät aktiviert',
@@ -8605,7 +8605,7 @@ extension on TranslationsDe {
 			'settings.mcpServers.help.title' => 'Über Codex MCP',
 			'settings.mcpServers.help.description' => 'Codex unterstützt stdio-basierte MCP-Server. Du kannst Server hinzufügen, die die Fähigkeiten von Codex mit zusätzlichen Werkzeugen und Ressourcen erweitern.',
 			'settings.mcpServers.managed.badge' => 'Verwaltet',
-			'settings.mcpServers.managed.hint' => 'Verwaltet von ddagent.',
+			'settings.mcpServers.managed.hint' => 'Verwaltet von DDAgent.',
 			'settings.mcpServers.deleteConfirm.description' => ({required Object serverName}) => '„${serverName}“ wird aus der Anbieterkonfiguration entfernt.',
 			'settings.mcpServers.deleteConfirm.title' => 'MCP-Server löschen?',
 			'settings.quota.settings.tab' => 'Control Center',
@@ -8668,10 +8668,10 @@ extension on TranslationsDe {
 			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => 'Abbrechen',
 			'settings.workspaces.create' => 'Workspace hinzufügen',
-			'settings.workspaces.deleteConfirm' => 'Diesen Workspace aus ddagent entfernen? Seine Dateien bleiben auf der Festplatte.',
+			'settings.workspaces.deleteConfirm' => 'Diesen Workspace aus DDAgent entfernen? Seine Dateien bleiben auf der Festplatte.',
 			'settings.workspaces.deleteFailed' => 'Workspace konnte nicht entfernt werden.',
 			'settings.workspaces.deleteTitle' => 'Workspace entfernen',
-			'settings.workspaces.description' => 'Workspaces sind Verzeichnisse, in denen ddagent chatten, Code ausführen und browsen kann.',
+			'settings.workspaces.description' => 'Workspaces sind Verzeichnisse, in denen DDAgent chatten, Code ausführen und browsen kann.',
 			'settings.workspaces.remove' => 'Workspace entfernen',
 			'settings.workspaces.title' => 'Arbeitsbereiche',
 			'settings.workspaces.pathRequired' => 'Pfad ist erforderlich',
@@ -8680,8 +8680,8 @@ extension on TranslationsDe {
 			'settings.about.learnMore' => 'Mehr erfahren',
 			'settings.about.pro.syncSettings' => 'Einstellungen synchronisieren',
 			'settings.about.pro.teamManagement' => 'Teamverwaltung',
-			'settings.about.proFeatures' => 'ddagent Pro-Funktionen',
-			'settings.about.tryHosted' => 'ddagent Hosted testen',
+			'settings.about.proFeatures' => 'DDAgent Pro-Funktionen',
+			'settings.about.tryHosted' => 'DDAgent Hosted testen',
 			'settings.about.versionInfo' => 'Versionsinfo',
 			'settings.about.client' => 'App',
 			'settings.about.server' => 'Server',
@@ -8707,7 +8707,7 @@ extension on TranslationsDe {
 			'sidebar.projects.noMatchingProjects' => 'Keine passenden Projekte',
 			'sidebar.projects.tryDifferentSearch' => 'Versuch, den Suchbegriff anzupassen',
 			'sidebar.projects.runClaudeCli' => 'Führ Claude CLI in einem Projektverzeichnis aus, um zu beginnen',
-			'sidebar.app.title' => 'ddagent',
+			'sidebar.app.title' => 'DDAgent',
 			'sidebar.app.subtitle' => 'KI-Programmierassistent-Oberfläche',
 			'sidebar.sessions.title' => 'Sitzungen',
 			'sidebar.sessions.newSession' => 'Neue Sitzung',
@@ -8805,7 +8805,7 @@ extension on TranslationsDe {
 			'sidebar.version.updateAvailable' => 'Update verfügbar',
 			'sidebar.version.restartRequired' => 'Update installiert – zum Anwenden Server neu starten',
 			'sidebar.version.updateNow' => 'Jetzt aktualisieren',
-			'sidebar.version.updateConfirm' => ({required Object version}) => 'ddagent auf v${version} aktualisieren? Der neueste Code wird geholt und gebaut, der Server startet neu — aktive Sitzungen werden unterbrochen.',
+			'sidebar.version.updateConfirm' => ({required Object version}) => 'DDAgent auf v${version} aktualisieren? Der neueste Code wird geholt und gebaut, der Server startet neu — aktive Sitzungen werden unterbrochen.',
 			'sidebar.version.updating' => 'Aktualisierung läuft… kann ein paar Minuten dauern',
 			'sidebar.version.restarting' => 'Update installiert — Neustart…',
 			'sidebar.version.updateFailed' => 'Update fehlgeschlagen',
@@ -9184,11 +9184,11 @@ extension on TranslationsDe {
 			'knowledge.graph.truncated' => 'gekürzt',
 			'knowledge.importAll.action' => 'Alles importieren',
 			'knowledge.importAll.mergeDuplicates' => 'Doppelte Einträge zusammenführen',
-			'knowledge.importAll.mergeDuplicatesHint' => 'Führt doppelte Zeilen in ddagent zusammen (keine Dateien)',
+			'knowledge.importAll.mergeDuplicatesHint' => 'Führt doppelte Zeilen in DDAgent zusammen (keine Dateien)',
 			'knowledge.importAll.projectsScanned' => ({required Object count}) => 'Gescannte Projekte: ${count}',
 			'knowledge.importAll.rulesSummary' => ({required Object total, required Object duplicates}) => 'Regeln: ${total} · doppelte Gruppen: ${duplicates}',
 			'knowledge.importAll.skillsFound' => ({required Object found, required Object newSkills}) => 'Agent-Skills gefunden: ${found} (neu: ${newSkills})',
-			'knowledge.importAll.title' => 'Alles in ddagent importieren',
+			'knowledge.importAll.title' => 'Alles in DDAgent importieren',
 			'knowledge.importSkills.found' => ({required Object count}) => '${count} Skill(s) bei deinen Agenten gefunden.',
 			'knowledge.importSkills.summary' => ({required Object imported, required Object skipped}) => 'Neu: ${imported} · übersprungen: ${skipped}',
 			'knowledge.importSkills.title' => 'Agent-Skills importieren',
@@ -9277,15 +9277,15 @@ extension on TranslationsDe {
 			'mcp.form.validation.unsupportedGlobal' => ({required Object type}) => '„MCP-Server hinzufügen“ unterstützt bei allen Anbietern nur stdio und http, nicht ${type}.',
 			'mcp.form.validation.unsupportedProvider' => ({required Object provider, required Object type}) => '${provider} unterstützt keine ${type}-MCP-Server',
 			'mcp.install.button' => 'Installieren',
-			'mcp.install.cardDescription' => 'Gib deinen Agenten die Wissensdatenbank und die ddagent-Werkzeuge über MCP — wähle Agenten aus oder installiere für alle.',
-			'mcp.install.description' => 'Ermöglicht den ausgewählten Agenten die Nutzung der ddagent-Wissensdatenbank und -Werkzeuge über MCP.',
+			'mcp.install.cardDescription' => 'Gib deinen Agenten die Wissensdatenbank und die DDAgent-Werkzeuge über MCP — wähle Agenten aus oder installiere für alle.',
+			'mcp.install.description' => 'Ermöglicht den ausgewählten Agenten die Nutzung der DDAgent-Wissensdatenbank und -Werkzeuge über MCP.',
 			'mcp.install.errorFallback' => 'Fehler',
 			'mcp.install.failed' => ({required Object error}) => 'Installation fehlgeschlagen: ${error}',
 			'mcp.install.installForAll' => 'Für alle installieren',
 			'mcp.install.installSelected' => 'Ausgewählte installieren',
 			'mcp.install.installedCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(count, one: 'Auf ${count} Agenten installiert.', other: 'Auf ${count} Agenten installiert.', ), 
 			'mcp.install.partialFailure' => ({required Object count, required Object failed}) => 'Auf ${count} installiert; fehlgeschlagen: ${failed}',
-			'mcp.install.title' => 'ddagent MCP-Server installieren',
+			'mcp.install.title' => 'DDAgent MCP-Server installieren',
 			'mcp.servers.addGlobalDescription' => 'Fügt diesen MCP-Server zu jedem Anbieter hinzu: Claude, Cursor, Codex, OpenCode und Devin. Nur stdio- und HTTP-Transporte werden unterstützt, da dieselbe Konfiguration bei allen Anbietern funktionieren muss.',
 			'mcp.servers.addGlobalMenuDescription' => '„Globalen MCP-Server hinzufügen“ schreibt einen gemeinsamen stdio- oder HTTP-Server in Claude, Cursor, Codex, OpenCode und Devin.',
 			'mcp.servers.addGlobalTitle' => 'Globalen MCP-Server hinzufügen',
@@ -9296,7 +9296,7 @@ extension on TranslationsDe {
 			'mcp.servers.descriptionGeneric' => ({required Object provider}) => 'Model Context Protocol-Server stellen ${provider} zusätzliche Werkzeuge und Datenquellen bereit',
 			'mcp.servers.loading' => 'MCP-Server werden geladen...',
 			'mcp.servers.refreshingScopes' => 'Projekt-Geltungsbereiche werden aktualisiert...',
-			'mcp.team.cta' => 'Verfügbar mit ddagent Pro',
+			'mcp.team.cta' => 'Verfügbar mit DDAgent Pro',
 			'mcp.team.description' => 'Teile MCP-Server-Konfigurationen mit deinem Team. Alle bleiben automatisch synchron.',
 			'mcp.team.title' => 'Team-MCP-Konfigurationen',
 			'mcp.tokens.scopeWrite' => 'Schreiben',
@@ -9377,7 +9377,7 @@ extension on TranslationsDe {
 			'scheduler.runs' => 'Läufe',
 			'scheduler.session' => ({required Object id}) => 'Sitzung ${id}',
 			'scheduler.worktree' => 'Worktree',
-			'notifications.deviceLabel' => 'ddagent Flutter',
+			'notifications.deviceLabel' => 'DDAgent Flutter',
 			'notifications.errors.noResponse' => 'Keine Antwort vom Server',
 			'notifications.errors.registrationRejected' => 'Registrierung vom Server abgelehnt',
 			'serverConnect.connect' => 'Verbinden',
@@ -9386,7 +9386,7 @@ extension on TranslationsDe {
 			'serverConnect.connectionFailed' => ({required Object error}) => 'Verbindung fehlgeschlagen (${error})',
 			'serverConnect.enterUrl' => 'Server-URL eingeben',
 			'serverConnect.local.title' => 'Dieses Gerät',
-			'serverConnect.local.subtitle' => 'ddagent-Server auf diesem Rechner ausführen',
+			'serverConnect.local.subtitle' => 'DDAgent-Server auf diesem Rechner ausführen',
 			'serverConnect.local.install' => 'Lokalen Server installieren',
 			'serverConnect.local.start' => 'Lokalen Server starten',
 			'serverConnect.local.stop' => 'Stoppen',
@@ -9398,7 +9398,7 @@ extension on TranslationsDe {
 			'serverConnect.local.connect' => 'Diesen Server verwenden',
 			'serverConnect.local.error' => ({required Object error}) => 'Fehler des lokalen Servers: ${error}',
 			'serverConnect.local.or' => 'oder mit einem Remote-Server verbinden',
-			'serverConnect.subtitle' => 'Mit deinem ddagent-Server verbinden',
+			'serverConnect.subtitle' => 'Mit deinem DDAgent-Server verbinden',
 			'voice.apiKeySaved' => 'API-Schlüssel (gespeichert, zum Ersetzen eingeben)',
 			'voice.preview' => 'Vorschau',
 			'voice.saveFailed' => 'STT-Konfiguration konnte nicht gespeichert werden',
@@ -9518,14 +9518,14 @@ extension on TranslationsDe {
 			'onboarding.completeSetup' => 'Einrichtung abschließen',
 			'onboarding.errors.invalidEmail' => 'Bitte gib eine gültige E-Mail-Adresse ein.',
 			'onboarding.errors.nameAndEmailRequired' => 'Git-Name und E-Mail sind beide erforderlich.',
-			'onboarding.gitHint' => 'Wird für Commits verwendet, die von ddagent-Sitzungen erstellt werden.',
-			'onboarding.mcp.description' => 'Installiere den ddagent MCP-Server, damit deine Agenten die Wissensdatenbank und die ddagent-Werkzeuge nutzen können. Wähle Agenten aus oder installiere für alle.',
+			'onboarding.gitHint' => 'Wird für Commits verwendet, die von DDAgent-Sitzungen erstellt werden.',
+			'onboarding.mcp.description' => 'Installiere den DDAgent MCP-Server, damit deine Agenten die Wissensdatenbank und die DDAgent-Werkzeuge nutzen können. Wähle Agenten aus oder installiere für alle.',
 			'onboarding.mcp.installForAll' => 'Für alle installieren',
 			'onboarding.mcp.installSelected' => 'Ausgewählte installieren',
 			'onboarding.mcp.installedOn' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(count, one: 'Auf ${count} Agenten installiert.', other: 'Auf ${count} Agenten installiert.', ), 
 			'onboarding.mcp.installedWithFailures' => ({required Object installedCount, required Object failed}) => 'Auf ${installedCount} installiert; fehlgeschlagen: ${failed}',
 			'onboarding.mcp.laterHint' => 'Optional — du kannst dies auch später unter Einstellungen → MCP installieren.',
-			'onboarding.mcp.title' => 'Agenten mit ddagent verbinden',
+			'onboarding.mcp.title' => 'Agenten mit DDAgent verbinden',
 			'fileTree.browseServerFilesystem' => 'Server-Dateisystem durchsuchen',
 			'fileTree.chooseFolder' => 'Ordner wählen',
 			'fileTree.copyContents' => 'Inhalt kopieren',

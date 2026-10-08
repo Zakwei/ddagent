@@ -1,6 +1,6 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/logo.svg" alt="ddagent" width="72" height="72">
-  <h1>ddagent</h1>
+  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/logo.svg" alt="DDAgent" width="72" height="72">
+  <h1>DDAgent</h1>
   <p><strong>모든 AI 코딩 에이전트를 위한 하나의 UI.</strong><br>
   Claude Code, Codex, Cursor CLI, OpenCode, Devin, Command Code, Antigravity를 위한 셀프호스팅 서버와 Flutter 클라이언트(웹, Linux, Windows 및 Android) — 세션, 파일, git, 터미널, 작업을 한곳에서.</p>
 
@@ -34,8 +34,8 @@
 </div>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/desktop-main.png" alt="ddagent 채팅 화면" width="78%">&nbsp;
-  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/mobile-chat.png" alt="ddagent 모바일 화면" width="20%">
+  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/desktop-main.png" alt="DDAgent 채팅 화면" width="78%">&nbsp;
+  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/mobile-chat.png" alt="DDAgent 모바일 화면" width="20%">
 </p>
 
 <table>
@@ -53,9 +53,9 @@
 
 ---
 
-## ddagent란?
+## DDAgent란?
 
-ddagent는 사용자의 머신이나 VPS에서 실행되며, 이미 사용 중인 코딩 에이전트 위에 세련된 UI 하나를 얹어 줍니다. 서버는 각 에이전트의 세션을 디스크에 저장된 자체 기록(`~/.claude`, `~/.codex`, `~/.cursor`, OpenCode, Devin, …)에서 직접 읽어 오므로, 따로 가져오기 작업을 하지 않아도 기존 대화가 그대로 표시됩니다. 로컬에는 세션 메타데이터만 인덱싱되며, 제3자에게 전송되는 데이터는 없습니다.
+DDAgent는 사용자의 머신이나 VPS에서 실행되며, 이미 사용 중인 코딩 에이전트 위에 세련된 UI 하나를 얹어 줍니다. 서버는 각 에이전트의 세션을 디스크에 저장된 자체 기록(`~/.claude`, `~/.codex`, `~/.cursor`, OpenCode, Devin, …)에서 직접 읽어 오므로, 따로 가져오기 작업을 하지 않아도 기존 대화가 그대로 표시됩니다. 로컬에는 세션 메타데이터만 인덱싱되며, 제3자에게 전송되는 데이터는 없습니다.
 
 데스크톱, 휴대폰 또는 브라우저의 Flutter 클라이언트로 접속하세요. 당신의 머신, 당신의 에이전트, 당신의 데이터.
 
@@ -100,11 +100,11 @@ ddagent는 사용자의 머신이나 VPS에서 실행되며, 이미 사용 중�
 | **Command Code** | `command-code acp`(Agent Client Protocol); `~/.commandcode`의 트랜스크립트 |
 | **Antigravity** | 헤드리스 모드의 `agy` CLI; `~/.gemini/antigravity-cli`에서 인덱싱한 대화 |
 
-에이전트 CLI는 서버 머신에 설치되어 있고 로그인된 상태여야 합니다. 구독은 직접 준비하세요 — ddagent는 AI가 아닌 환경을 제공합니다.
+에이전트 CLI는 서버 머신에 설치되어 있고 로그인된 상태여야 합니다. 구독은 직접 준비하세요 — DDAgent는 AI가 아닌 환경을 제공합니다.
 
 ## 설치
 
-ddagent는 두 부분으로 구성됩니다. 에이전트와 같은 머신에서 실행되며 REST/WebSocket API를 제공하는 **서버**, 그리고 서버에 연결하는 **클라이언트**입니다. 서버에는 **Node.js 22+**가 필요합니다(사전 빌드 tarball은 네이티브 모듈이 Node.js 22.x 기준으로 빌드되므로 Node.js 22.x가 필요합니다).
+DDAgent는 두 부분으로 구성됩니다. 에이전트와 같은 머신에서 실행되며 REST/WebSocket API를 제공하는 **서버**, 그리고 서버에 연결하는 **클라이언트**입니다. 서버에는 **Node.js 22+**가 필요합니다(사전 빌드 tarball은 네이티브 모듈이 Node.js 22.x 기준으로 빌드되므로 Node.js 22.x가 필요합니다).
 
 ### 서버 — 설치 스크립트
 
@@ -192,7 +192,7 @@ npm run build && node dist-server/server/index.js   # API on http://localhost:30
 ddagent sandbox ~/my-project
 ```
 
-ddagent와 에이전트(Claude Code 또는 Codex)를 microVM으로 격리된 Docker Sandbox 안에서 실행합니다. `sbx` CLI가 필요합니다 — [docker/README.md](https://github.com/Zakwei/ddagent/blob/main/docker/README.md)를 참조하세요.
+DDAgent와 에이전트(Claude Code 또는 Codex)를 microVM으로 격리된 Docker Sandbox 안에서 실행합니다. `sbx` CLI가 필요합니다 — [docker/README.md](https://github.com/Zakwei/ddagent/blob/main/docker/README.md)를 참조하세요.
 
 ## CLI
 

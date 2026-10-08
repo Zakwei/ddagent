@@ -49,7 +49,7 @@ type CheckpointDependencies = {
 /** `git for-each-ref` field separator that cannot appear in a ref name. */
 const REF_FIELD_SEPARATOR = '\u001f';
 
-/** Namespace under which ddagent stores its non-branch checkpoint refs. */
+/** Namespace under which DDAgent stores its non-branch checkpoint refs. */
 const CHECKPOINT_REF_PREFIX = 'refs/ddagent/checkpoints/';
 
 const DEFAULT_CHECKPOINT_LABEL = 'Manual checkpoint';

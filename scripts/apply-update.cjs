@@ -4,7 +4,7 @@
 // server/modules/system/system.service.ts.
 //
 // The bundled start.sh / start.bat run this before every server start, while
-// no ddagent process holds the install's files open (Windows cannot replace
+// no DDAgent process holds the install's files open (Windows cannot replace
 // loaded native modules). It moves each top-level entry of `.update/next` over
 // the install — keeping the launchers (they are executing right now) and the
 // user's `.env` — and parks what it replaced in `.update-previous`.

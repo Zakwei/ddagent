@@ -1,6 +1,6 @@
 # Registro delle modifiche
 
-Tutte le modifiche rilevanti a ddagent sono documentate qui.
+Tutte le modifiche rilevanti a DDAgent sono documentate qui.
 
 Il formato segue [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 e questo progetto aderisce al [Semantic Versioning](https://semver.org/).
@@ -169,7 +169,7 @@ Prima versione pubblica open source — **AGPL-3.0-only**.
 
 ## [0.5.0] - 2026-09-21
 
-Prima release standalone di **ddagent** — un'interfaccia web e mobile self-hosted per agenti di codifica AI.
+Prima release standalone di **DDAgent** — un'interfaccia web e mobile self-hosted per agenti di codifica AI.
 
 ### In evidenza
 

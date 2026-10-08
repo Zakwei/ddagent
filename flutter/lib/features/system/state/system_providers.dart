@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// `GET /health` — `{status, version, installMode}` of the connected server.
 /// "Current version" in the About tab is the *server's* running version (the
 /// web client bakes package.json into its bundle; this app talks to a remote
-/// ddagent whose version is what matters).
+/// DDAgent whose version is what matters).
 final serverHealthProvider = FutureProvider.autoDispose<Map<String, dynamic>>(
   (ref) => ref.watch(systemRepositoryProvider).health(),
 );

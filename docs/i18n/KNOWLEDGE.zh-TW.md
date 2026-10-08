@@ -15,8 +15,8 @@
   <strong>繁體中文</strong>
 </p>
 
-ddagent 為你的代理提供一個**本地優先的知識庫**：記憶、規則、技能和個人資訊，
-外加標籤和關係。它存在於與 ddagent 其餘部分相同的 SQLite 資料庫（`auth.db`）中，
+DDAgent 為你的代理提供一個**本地優先的知識庫**：記憶、規則、技能和個人資訊，
+外加標籤和關係。它存在於與 DDAgent 其餘部分相同的 SQLite 資料庫（`auth.db`）中，
 背後是 FTS5 全文索引，可從用戶端的 **Knowledge** 介面管理，並可由你的代理
 透過 MCP 讀寫。它鬆散地受到
 [Contexta](https://github.com/XFABISIEK/Contexta) 的啟發。
@@ -33,19 +33,19 @@ ddagent 為你的代理提供一個**本地優先的知識庫**：記憶、規�
 - **CLI 原生檔案** — 每個工具各自讀取自己的設定：Claude Code
   讀取 `CLAUDE.md`，Codex/Cursor 讀取 `AGENTS.md`，Cursor 讀取 `.cursorrules`，
   還有一些讀取 `skills/` 和 `.agents/skills/`。這是 CLI 的職責，而非
-  模型的選擇——ddagent 不會關閉它。
-- **ddagent 的首輪前綴** — 在對話的第一則訊息中，ddagent 會在前面加上專案的
+  模型的選擇——DDAgent 不會關閉它。
+- **DDAgent 的首輪前綴** — 在對話的第一則訊息中，DDAgent 會在前面加上專案的
   `.ddagent/shared-context.md` 和一個 `<unified-rules>` 區塊（工作區 `AGENTS.md`、
   `~/.agents/AGENTS.md` 以及一則簡短的規範提示；設定 `DDAGENT_UNIFIED_RULES=0`
   可去掉它）。這以檔案為基礎，與知識庫彼此獨立。
-- **MCP 檢索（隨需）** — 一旦你把 ddagent 的 MCP 伺服器安裝到某個代理，它的
+- **MCP 檢索（隨需）** — 一旦你把 DDAgent 的 MCP 伺服器安裝到某個代理，它的
   工具清單就會包含 `knowledge_get_context`、`knowledge_search` 之類。遵循
   Contexta，不會有任何東西被自動注入：代理用查詢呼叫上下文建構器，取回
   `critical` 規則以及所有匹配的內容。模型會根據工具描述以及你在知識庫中保存的
   指令規則，決定何時呼叫它。
 
 所以「一個位置」意味著**一個整理知識的位置**——它不會（也無法）阻止 CLI
-讀取自己的原生檔案。ddagent 完全不會把知識庫自動注入對話。
+讀取自己的原生檔案。DDAgent 完全不會把知識庫自動注入對話。
 
 ## 實體
 
@@ -83,7 +83,7 @@ ContextBuilder 的忠實移植）。給定專案和查詢，它會按順序回�
 
 ## MCP 工具（隨需）
 
-ddagent 的 MCP 伺服器（`POST /mcp`）把知識庫暴露給任何 MCP 用戶端。
+DDAgent 的 MCP 伺服器（`POST /mcp`）把知識庫暴露給任何 MCP 用戶端。
 讀取工具使用 `read` 範圍的 token；寫入工具需要 `write`。寫入
 工具執行與 UI 相同的驗證並記錄歷史。
 
@@ -95,12 +95,12 @@ ddagent 的 MCP 伺服器（`POST /mcp`）把知識庫暴露給任何 MCP 用戶
 `knowledge_delete_memory`，以及 `rule`、`skill` 和 `personal` 的同樣三件套；
 外加 `knowledge_link` / `knowledge_unlink`。
 
-工具接受 `projectId`，或 ddagent 已經知道的 `projectPath`。
+工具接受 `projectId`，或 DDAgent 已經知道的 `projectPath`。
 
 ### 把伺服器安裝到你的代理
 
 你不必手動編輯供應商設定。使用 **Settings → Agents →
-（代理） → MCP → Install ddagent MCP server**（在引導流程中也會作為一步提供）並選擇
+（代理） → MCP → Install DDAgent MCP server**（在引導流程中也會作為一步提供）並選擇
 代理——或為所有代理安裝。它會寫入一個 `ddagent` HTTP MCP 項目（使用者
 範圍），指向 `<server>/mcp`，並帶一個可重複使用、具有 `write` 範圍的 `ddagent-mcp` bearer token
 （重新安裝會撤銷上一個）。安裝後，該代理的工具
@@ -149,9 +149,9 @@ Graph 分頁是一個力導向關係檢視，帶平移/縮放、節點
 4. 用**個人資訊**存跨專案偏好（時區、編輯器、命名）。
 5. **連結相關記憶**，讓 1 跳鄰居一起帶上。
 6. 對應當搜尋知識庫並持久化所學內容的代理**安裝 MCP**。
-   一鍵安裝使用 `write` token；對於唯讀代理，請在 ddagent MCP 伺服器 token 中
+   一鍵安裝使用 `write` token；對於唯讀代理，請在 DDAgent MCP 伺服器 token 中
    建立一個 `read` token，並手動設定該代理（參見
-   [作為 MCP 伺服器的 ddagent](../mcp-server.md#manual-client-config)）。
+   [作為 MCP 伺服器的 DDAgent](../mcp-server.md#manual-client-config)）。
 
 ## 遷移
 
@@ -161,13 +161,13 @@ Knowledge → 選單 → **Migrate existing rules** 會執行一份 **dry-run** 
 （把它們合併為一個全域列）和/或 **Make all rules critical**。在你確認之前
 不會寫入任何內容——破壞性操作都是明確的。
 
-**Dashboard** 還有一個單獨的 **把所有內容匯入 ddagent** 按鈕：它用一個動作執行專案掃描和代理技能匯入，並帶有相同的 dry-run 預覽以及可選的重複合併 / 提升開關。它只讀取你的代理的檔案並寫入 ddagent 自己的資料庫——不會觸碰任何 CLI 檔案或設定（唯一會寫入代理設定的動作是單獨的 "Install ddagent MCP server"）。
+**Dashboard** 還有一個單獨的 **把所有內容匯入 DDAgent** 按鈕：它用一個動作執行專案掃描和代理技能匯入，並帶有相同的 dry-run 預覽以及可選的重複合併 / 提升開關。它只讀取你的代理的檔案並寫入 DDAgent 自己的資料庫——不會觸碰任何 CLI 檔案或設定（唯一會寫入代理設定的動作是單獨的 "Install DDAgent MCP server"）。
 
 同一個選單裡還有**匯入代理技能**：它會列出你的代理已經自帶或已安裝的全域/預設技能（使用者 / 系統 / 外掛範圍），並把缺少的技能作為技能匯入知識庫。它會先進行 dry-run，而且是冪等的——已存在的名稱會被略過。專案範圍的技能則由專案掃描匯入。
 
 ## 須知
 
-- 一切都**本地**於這個 ddagent 實例；沒有雲端，沒有同步。
+- 一切都**本地**於這個 DDAgent 實例；沒有雲端，沒有同步。
 - 知識庫**不會自動注入**——代理透過 MCP 隨需檢索（Contexta 模型）。
   沒有安裝 MCP 伺服器的代理不會從中獲得任何內容。
 - 掃描到的技能可透過 MCP（`knowledge_get_context` / `knowledge_search`）到達，
@@ -206,5 +206,5 @@ POST   /import-all          { dryRun?, dedupe?, promoteRules? }
 
 ## 相關
 
-- [作為 MCP 伺服器的 ddagent](../mcp-server.md) — 工具目錄和 token 設定
+- [作為 MCP 伺服器的 DDAgent](../mcp-server.md) — 工具目錄和 token 設定
 - [團隊協作](../teams.md) · [遠端核准](../remote-approvals.md)

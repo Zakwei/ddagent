@@ -639,7 +639,7 @@ class _EmptyState extends StatelessWidget {
   }
 }
 
-/// `TeamMcpFeatureCard` — ddagent Pro upsell shown under the claude tab.
+/// `TeamMcpFeatureCard` — DDAgent Pro upsell shown under the claude tab.
 class _TeamMcpCard extends StatelessWidget {
   const _TeamMcpCard();
 

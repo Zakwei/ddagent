@@ -1,6 +1,6 @@
 # 변경 로그
 
-ddagent의 모든 주요 변경 사항은 여기에 기록됩니다.
+DDAgent의 모든 주요 변경 사항은 여기에 기록됩니다.
 
 형식은 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)를 따르며,
 이 프로젝트는 [Semantic Versioning](https://semver.org/)을 준수합니다.
@@ -169,7 +169,7 @@ ddagent의 모든 주요 변경 사항은 여기에 기록됩니다.
 
 ## [0.5.0] - 2026-09-21
 
-**ddagent**의 첫 독립형 릴리스 — AI 코딩 에이전트를 위한 셀프 호스팅 웹 & 모바일 UI.
+**DDAgent**의 첫 독립형 릴리스 — AI 코딩 에이전트를 위한 셀프 호스팅 웹 & 모바일 UI.
 
 ### 주요 기능
 

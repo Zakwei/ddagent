@@ -5,7 +5,7 @@ import { AppError } from '@/shared/utils.js';
 
 export const providerMcpService = {
   /**
-   * Provider ids currently registered. Used by the ddagent-MCP installer
+   * Provider ids currently registered. Used by the DDAgent MCP installer
    * (mcp-server module) to offer "all providers" and validate a chosen subset.
    */
   listProviderIds(): LLMProvider[] {

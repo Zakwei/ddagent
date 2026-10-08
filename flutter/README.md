@@ -1,7 +1,7 @@
-# ddagent — Flutter client
+# DDAgent — Flutter client
 
-The ddagent client: one Flutter codebase for **web, Linux and Windows desktop, and
-Android**. It connects to a self-hosted ddagent server (REST + WebSocket API). macOS
+The DDAgent client: one Flutter codebase for **web, Linux and Windows desktop, and
+Android**. It connects to a self-hosted DDAgent server (REST + WebSocket API). macOS
 and iOS are not built yet (there is no `macos/` or `ios/` target).
 
 ## Requirements
@@ -11,7 +11,7 @@ and iOS are not built yet (there is no `macos/` or `ios/` target).
 - Android: Android SDK and Java 17 (Gradle).
 - Web: Chrome for `flutter run -d chrome`.
 - Linux desktop: `clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libsecret-1-dev`.
-- A running ddagent server (`npm run dev` from the repo root, default port `3001`).
+- A running DDAgent server (`npm run dev` from the repo root, default port `3001`).
 
 ## Setup
 
@@ -38,7 +38,7 @@ Build-time configuration comes from `--dart-define` flags (see
 | Flag | Values | Default |
 |---|---|---|
 | `ENV` | `dev`, `prod` | `dev` |
-| `DEFAULT_SERVER_URL` | ddagent server URL | empty → the app asks for a server on first launch |
+| `DEFAULT_SERVER_URL` | DDAgent server URL | empty → the app asks for a server on first launch |
 | `API_KEY` | value sent as `x-api-key` when the server's API-key gate is on | empty (gate off) |
 | `EMBEDDED` | `true` for a build served by the server itself (no login flow); web builds always count as embedded | `false` |
 

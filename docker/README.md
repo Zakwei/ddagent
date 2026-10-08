@@ -1,9 +1,9 @@
 <!-- Docker Hub short description (100 chars max): -->
-<!-- Sandbox templates running Claude Code or Codex with the ddagent server for remote control -->
+<!-- Sandbox templates running Claude Code or Codex with the DDAgent server for remote control -->
 
-# Sandboxed coding agents with ddagent
+# Sandboxed coding agents with DDAgent
 
-[Docker Sandbox](https://docs.docker.com/ai/sandboxes/) templates that add the [ddagent](https://github.com/Zakwei/ddagent) server on top of Claude Code and Codex. Connect the ddagent Flutter client (web, Linux/Windows desktop or Android) to the sandbox and drive the agent from any device.
+[Docker Sandbox](https://docs.docker.com/ai/sandboxes/) templates that add the [DDAgent](https://github.com/Zakwei/ddagent) server on top of Claude Code and Codex. Connect the DDAgent Flutter client (web, Linux/Windows desktop or Android) to the sandbox and drive the agent from any device.
 
 ## Get started
 
@@ -28,13 +28,13 @@ sbx secret set -g anthropic
 
 ### 3. Launch Claude Code
 
-> Run the `ddagent` CLI below as `node dist-server/server/modules/cli/cli.js` inside a ddagent install (`~/.ddagent/app`) or a source checkout — see the [main README](https://github.com/Zakwei/ddagent#install).
+> Run the `ddagent` CLI below as `node dist-server/server/modules/cli/cli.js` inside a DDAgent install (`~/.ddagent/app`) or a source checkout — see the [main README](https://github.com/Zakwei/ddagent#install).
 
 ```bash
 ddagent sandbox ~/my-project
 ```
 
-The server is published on **http://localhost:3001** (use `--port <port>` to pick another host port). It serves the REST/WebSocket API only — point the ddagent Flutter client at that URL and create the owner account on first connect.
+The server is published on **http://localhost:3001** (use `--port <port>` to pick another host port). It serves the REST/WebSocket API only — point the DDAgent Flutter client at that URL and create the owner account on first connect.
 
 ### Using a different agent
 
@@ -69,7 +69,7 @@ The same `ddagent` CLI manages sandboxes:
 
 ```bash
 ddagent sandbox ls
-ddagent sandbox start my-project    # Restart and re-launch the ddagent server
+ddagent sandbox start my-project    # Restart and re-launch the DDAgent server
 ddagent sandbox logs my-project     # View server logs
 ```
 
@@ -100,7 +100,7 @@ Or inside a running sandbox:
 sbx exec my-project bash -c 'echo "export CONTEXT_WINDOW=200000" >> /etc/sandbox-persistent.sh'
 ```
 
-Restart ddagent for changes to take effect:
+Restart DDAgent for changes to take effect:
 
 ```bash
 sbx exec my-project bash -c 'pkill -f "server/index.js"'
@@ -120,7 +120,7 @@ Inside the sandbox the server always listens on port `3001` (the launch commands
 For branch mode, multiple workspaces, memory limits, or the terminal agent experience, use `sbx` with the template:
 
 ```bash
-# Terminal agent + ddagent server
+# Terminal agent + DDAgent server
 sbx run --template docker.io/ddagentai/sandbox:claude-code claude ~/my-project --name my-project
 sbx ports my-project --publish 3001:3001
 
@@ -134,7 +134,7 @@ sbx run --template docker.io/ddagentai/sandbox:claude-code claude ~/project ~/sh
 sbx run --template docker.io/ddagentai/sandbox:claude-code claude ~/my-project -- "Fix the auth bug"
 ```
 
-ddagent auto-starts via `.bashrc` when using `sbx run`.
+DDAgent auto-starts via `.bashrc` when using `sbx run`.
 
 Full options in the [Docker Sandboxes usage guide](https://docs.docker.com/ai/sandboxes/usage/).
 
@@ -147,7 +147,7 @@ sbx policy allow network localhost:11434
 # Inside the sandbox: curl http://host.docker.internal:11434
 ```
 
-The ddagent server itself doesn't need a policy — reach it via `sbx ports`.
+The DDAgent server itself doesn't need a policy — reach it via `sbx ports`.
 
 ## Links
 

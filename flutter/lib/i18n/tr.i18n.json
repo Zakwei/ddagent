@@ -3,7 +3,7 @@
     "sessionExpired": "Oturumunuzun süresi doldu. Lütfen tekrar giriş yapın.",
     "login": {
       "title": "Tekrar Hoş Geldin",
-      "description": "Kendi ddagent hesabına giriş yap",
+      "description": "Kendi DDAgent hesabına giriş yap",
       "username": "Kullanıcı Adı",
       "password": "Şifre",
       "submit": "Giriş Yap",
@@ -698,7 +698,7 @@
       "openInEditor": "Editörde Aç"
     },
     "mainContent": {
-      "loading": "ddagent Yükleniyor",
+      "loading": "DDAgent Yükleniyor",
       "settingUpWorkspace": "Çalışma alanın hazırlanıyor...",
       "chooseProject": "Projeni Seç",
       "selectProjectDescription": "Claude ile kodlamaya başlamak için kenar çubuğundan bir proje seç. Her proje kendi sohbet oturumlarını ve dosya geçmişini içerir.",
@@ -1497,8 +1497,8 @@
       "manualRestart": "Güncelleme uygulandı ancak sunucu kendiliğinden yeniden başlamadı — tamamlamak için elle yeniden başlat.",
       "failed": "Güncelleme başarısız oldu.",
       "failedTitle": "Güncelleme başarısız",
-      "appConfirm": "ddagent v{{version}} bu cihaza kurulsun mu? Android ilk seferde ddagent'tan yüklemeye izin vermenizi ister.",
-      "appPermission": "ddagent için “Bilinmeyen uygulamaları yükle” iznini verin, sonra tekrar Güncelle'ye dokunun.",
+      "appConfirm": "DDAgent v{{version}} bu cihaza kurulsun mu? Android ilk seferde DDAgent'tan yüklemeye izin vermenizi ister.",
+      "appPermission": "DDAgent için “Bilinmeyen uygulamaları yükle” iznini verin, sonra tekrar Güncelle'ye dokunun.",
       "chooseTitle": "Güncellemeler var",
       "targetApp": "Bu uygulama",
       "targetWeb": "Web arayüzü",
@@ -1527,9 +1527,9 @@
     },
     "server": {
       "title": "Sunucu",
-      "description": "ddagent sürecini yeniden başlatır — güncelleme sonrası veya takılma durumunda kullanışlıdır.",
+      "description": "DDAgent sürecini yeniden başlatır — güncelleme sonrası veya takılma durumunda kullanışlıdır.",
       "restart": "Yeniden başlat",
-      "restartConfirm": "ddagent sunucusu yeniden başlatılsın mı? Aktif oturumlar kesintiye uğrayacak.",
+      "restartConfirm": "DDAgent sunucusu yeniden başlatılsın mı? Aktif oturumlar kesintiye uğrayacak.",
       "restarting": "Yeniden başlatılıyor… sunucu döndüğünde sayfa yenilenecek.",
       "restartFailed": "Yeniden başlatma başarısız",
       "unsupported": "Yeniden başlatma yalnızca sunucu servis yöneticisi altında çalışırken kullanılabilir.",
@@ -1547,8 +1547,8 @@
       "check": "Güncellemeleri denetle",
       "checking": "Denetleniyor…",
       "upToDate": "En güncel sürümü kullanıyorsunuz (v{{version}}).",
-      "available": "v{{version}} güncellemesi bulundu — arka planda indiriliyor; ddagent kapanırken kurulacak.",
-      "downloaded": "v{{version}} güncellemesi indirildi — kurmak için ddagent'ı kapatıp yeniden başlatın.",
+      "available": "v{{version}} güncellemesi bulundu — arka planda indiriliyor; DDAgent kapanırken kurulacak.",
+      "downloaded": "v{{version}} güncellemesi indirildi — kurmak için DDAgent'ı kapatıp yeniden başlatın.",
       "unavailable": "Güncelleme denetimi yalnızca paketlenmiş masaüstü sürümlerinde kullanılabilir.",
       "error": "Güncelleme denetimi başarısız: {{message}}",
       "errorGeneric": "Güncelleme denetimi başarısız.",
@@ -1791,10 +1791,10 @@
         "loading": "Güncelleniyor...",
         "unsupported": "Bu tarayıcıda push bildirimleri desteklenmiyor.",
         "denied": "Push bildirimleri engellendi. Lütfen tarayıcı ayarlarından izin ver.",
-        "iosHint": "iPhone/iPad’de bildirimler yalnızca ddagent ana ekrana eklendikten sonra (Paylaş → Ana Ekrana Ekle) ve kurulu uygulamada etkinleştirildikten sonra çalışır.",
+        "iosHint": "iPhone/iPad’de bildirimler yalnızca DDAgent ana ekrana eklendikten sonra (Paylaş → Ana Ekrana Ekle) ve kurulu uygulamada etkinleştirildikten sonra çalışır.",
         "test": "Test bildirimi gönder",
         "testNoSubscription": "Abone cihaz yok. Önce telefonda “Etkinleştir”e dokunun.",
-        "testSuccess": "{{count}} cihaza gönderildi. Telefonda bir şey görünmezse ddagent’ı ana ekrana ekleyin (iOS bunu gerektirir).",
+        "testSuccess": "{{count}} cihaza gönderildi. Telefonda bir şey görünmezse DDAgent’ı ana ekrana ekleyin (iOS bunu gerektirir).",
         "testNotDelivered": "Erişilebilir cihaz yoktu. Uygulamanın çalıştığından ve bildirimlerin etkin olduğundan emin olun."
       },
       "device": {
@@ -2155,7 +2155,7 @@
       },
       "managed": {
         "badge": "Yönetilen",
-        "hint": "ddagent tarafından yönetiliyor."
+        "hint": "DDAgent tarafından yönetiliyor."
       },
       "deleteConfirm": {
         "description": "“{{serverName}}” sağlayıcı yapılandırmasından kaldırılacak.",
@@ -2237,10 +2237,10 @@
     "workspaces": {
       "cancel": "İptal",
       "create": "Çalışma alanı ekle",
-      "deleteConfirm": "Bu çalışma alanı ddagent’tan kaldırılsın mı? Dosyaları diskte kalır.",
+      "deleteConfirm": "Bu çalışma alanı DDAgent’tan kaldırılsın mı? Dosyaları diskte kalır.",
       "deleteFailed": "Çalışma alanı kaldırılamadı.",
       "deleteTitle": "Çalışma alanını kaldır",
-      "description": "Çalışma alanları, ddagent’ın sohbet edebildiği, kod çalıştırabildiği ve gezinebildiği dizinlerdir.",
+      "description": "Çalışma alanları, DDAgent’ın sohbet edebildiği, kod çalıştırabildiği ve gezinebildiği dizinlerdir.",
       "remove": "Çalışma alanını kaldır",
       "title": "Çalışma alanları",
       "pathRequired": "Yol gerekli"
@@ -2253,8 +2253,8 @@
         "syncSettings": "Ayarları Senkronize Et",
         "teamManagement": "Takım Yönetimi"
       },
-      "proFeatures": "ddagent Pro Özellikleri",
-      "tryHosted": "ddagent Hosted'ı deneyin",
+      "proFeatures": "DDAgent Pro Özellikleri",
+      "tryHosted": "DDAgent Hosted'ı deneyin",
       "versionInfo": "Sürüm bilgisi",
       "client": "Uygulama",
       "server": "Sunucu",
@@ -2286,7 +2286,7 @@
       "runClaudeCli": "Başlamak için bir proje dizininde Claude CLI çalıştır"
     },
     "app": {
-      "title": "ddagent",
+      "title": "DDAgent",
       "subtitle": "AI kodlama asistanı arayüzü"
     },
     "sessions": {
@@ -2408,7 +2408,7 @@
       "updateAvailable": "Güncelleme mevcut",
       "restartRequired": "Güncelleme yüklendi — uygulamak için sunucuyu yeniden başlatın",
       "updateNow": "Şimdi güncelle",
-      "updateConfirm": "ddagent v{{version}} sürümüne güncellensin mi? En yeni kod çekilip derlenecek ve sunucu yeniden başlatılacak — etkin oturumlar kesintiye uğrar.",
+      "updateConfirm": "DDAgent v{{version}} sürümüne güncellensin mi? En yeni kod çekilip derlenecek ve sunucu yeniden başlatılacak — etkin oturumlar kesintiye uğrar.",
       "updating": "Güncelleniyor… birkaç dakika sürebilir",
       "restarting": "Güncelleme yüklendi — yeniden başlatılıyor…",
       "updateFailed": "Güncelleme başarısız",
@@ -2924,11 +2924,11 @@
     "importAll": {
       "action": "Her şeyi içe aktar",
       "mergeDuplicates": "Yinelenen kayıtları birleştir",
-      "mergeDuplicatesHint": "ddagent içindeki yinelenen satırları birleştirir (dosyaları değil)",
+      "mergeDuplicatesHint": "DDAgent içindeki yinelenen satırları birleştirir (dosyaları değil)",
       "projectsScanned": "Taranan projeler: {{count}}",
       "rulesSummary": "Kurallar: {{total}} · yinelenen gruplar: {{duplicates}}",
       "skillsFound": "Bulunan agent becerileri: {{found}} (yeni: {{newSkills}})",
-      "title": "Her şeyi ddagent'a aktar"
+      "title": "Her şeyi DDAgent'a aktar"
     },
     "importSkills": {
       "found": "Agentlarınızda {{count}} beceri bulundu.",
@@ -3060,8 +3060,8 @@
     },
     "install": {
       "button": "Kur",
-      "cardDescription": "Agentlarınıza MCP üzerinden bilgi tabanını ve ddagent araçlarını verin — agentları seçin veya tümü için kurun.",
-      "description": "Seçili agentların MCP üzerinden ddagent bilgi tabanını ve araçlarını kullanmasını sağlar.",
+      "cardDescription": "Agentlarınıza MCP üzerinden bilgi tabanını ve DDAgent araçlarını verin — agentları seçin veya tümü için kurun.",
+      "description": "Seçili agentların MCP üzerinden DDAgent bilgi tabanını ve araçlarını kullanmasını sağlar.",
       "errorFallback": "hata",
       "failed": "Kurulum başarısız: {{error}}",
       "installForAll": "Tümü için kur",
@@ -3071,7 +3071,7 @@
         "other": "{{count}} agenta kuruldu."
       },
       "partialFailure": "{{count}} agenta kuruldu; başarısız: {{failed}}",
-      "title": "ddagent MCP sunucusunu kur"
+      "title": "DDAgent MCP sunucusunu kur"
     },
     "servers": {
       "addGlobalDescription": "Bu MCP sunucusunu tüm sağlayıcılara ekler: Claude, Cursor, Codex, OpenCode ve Devin. Aynı yapılandırmanın tüm sağlayıcılarda çalışması gerektiğinden yalnızca stdio ve HTTP taşımaları desteklenir.",
@@ -3088,7 +3088,7 @@
       "refreshingScopes": "Proje kapsamları yenileniyor..."
     },
     "team": {
-      "cta": "ddagent Pro ile kullanılabilir",
+      "cta": "DDAgent Pro ile kullanılabilir",
       "description": "MCP sunucu yapılandırmalarını takımınızla paylaşın. Herkes otomatik olarak senkron kalır.",
       "title": "Takım MCP Yapılandırmaları"
     },
@@ -3206,7 +3206,7 @@
     "worktree": "worktree"
   },
   "notifications": {
-    "deviceLabel": "ddagent Flutter",
+    "deviceLabel": "DDAgent Flutter",
     "errors": {
       "noResponse": "Sunucudan yanıt yok",
       "registrationRejected": "Kayıt sunucu tarafından reddedildi"
@@ -3220,7 +3220,7 @@
     "enterUrl": "Bir sunucu URL'si girin",
     "local": {
       "title": "Bu cihaz",
-      "subtitle": "ddagent sunucusunu bu makinede çalıştırın",
+      "subtitle": "DDAgent sunucusunu bu makinede çalıştırın",
       "install": "Yerel sunucuyu kur",
       "start": "Yerel sunucuyu başlat",
       "stop": "Durdur",
@@ -3233,7 +3233,7 @@
       "error": "Yerel sunucu hatası: {{error}}",
       "or": "veya uzak bir sunucuya bağlanın"
     },
-    "subtitle": "ddagent sunucunuza bağlanın"
+    "subtitle": "DDAgent sunucunuza bağlanın"
   },
   "voice": {
     "apiKeySaved": "API Anahtarı (kayıtlı, değiştirmek için girin)",
@@ -3409,9 +3409,9 @@
       "invalidEmail": "Lütfen geçerli bir e-posta adresi girin.",
       "nameAndEmailRequired": "Hem git adı hem de e-posta gerekli."
     },
-    "gitHint": "ddagent oturumlarının oluşturduğu commit'ler için kullanılır.",
+    "gitHint": "DDAgent oturumlarının oluşturduğu commit'ler için kullanılır.",
     "mcp": {
-      "description": "Agentlarınızın bilgi tabanını ve ddagent araçlarını kullanabilmesi için ddagent MCP sunucusunu kurun. Agentları seçin veya tümü için kurun.",
+      "description": "Agentlarınızın bilgi tabanını ve DDAgent araçlarını kullanabilmesi için DDAgent MCP sunucusunu kurun. Agentları seçin veya tümü için kurun.",
       "installForAll": "Tümü için kur",
       "installSelected": "Seçilenler için kur",
       "installedOn(param=count)": {
@@ -3420,7 +3420,7 @@
       },
       "installedWithFailures": "{{installedCount}} agenta kuruldu; başarısız: {{failed}}",
       "laterHint": "İsteğe bağlı — bunu daha sonra Ayarlar → MCP bölümünden de kurabilirsiniz.",
-      "title": "Agentları ddagent'a bağlayın"
+      "title": "Agentları DDAgent'a bağlayın"
     }
   },
   "fileTree": {

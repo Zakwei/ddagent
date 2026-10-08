@@ -1,6 +1,6 @@
-# Contributing to ddagent
+# Contributing to DDAgent
 
-Thanks for your interest in contributing to ddagent! Please read this guide before you start.
+Thanks for your interest in contributing to DDAgent! Please read this guide before you start.
 
 ## Before You Start
 

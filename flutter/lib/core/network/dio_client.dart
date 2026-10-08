@@ -2,7 +2,7 @@ import 'package:ddagent_app/core/config/env.dart';
 import 'package:ddagent_app/core/network/auth_token_store.dart';
 import 'package:dio/dio.dart';
 
-/// Dio configured for the ddagent API:
+/// Dio configured for the DDAgent API:
 /// - baseUrl from the server profile (`--dart-define=DEFAULT_SERVER_URL`)
 /// - `Authorization: Bearer <jwt>` + optional `x-api-key` gate header
 /// - captures `X-Refreshed-Token` response header into the token store

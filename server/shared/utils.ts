@@ -50,7 +50,7 @@ export const IS_PLATFORM = process.env.VITE_IS_PLATFORM === 'true';
 
 /**
  * Pseudo-provider value stored on orchestrated parent sessions. A parent has
- * no provider runtime of its own: its transcript lives in the ddagent-owned
+ * no provider runtime of its own: its transcript lives in the DDAgent-owned
  * `orchestrator_messages` table and every user message is delegated to child
  * sessions running on real providers. Consumed by the websocket dispatch path,
  * the sessions history/delete paths, and the orchestrator module.
@@ -334,7 +334,7 @@ export function antigravitySummariesDbPath(): string {
 /**
  * Directory where the antigravity runtime mirrors readable transcripts.
  * Antigravity persists conversation steps as protobuf rows inside SQLite, so
- * the runtime appends a ddagent JSONL mirror per session (same contract as
+ * the runtime appends a DDAgent JSONL mirror per session (same contract as
  * `.ddagent/devin/`); `<session-id>.jsonl` under the workspace.
  */
 export function antigravityTranscriptDir(workspacePath: string): string {

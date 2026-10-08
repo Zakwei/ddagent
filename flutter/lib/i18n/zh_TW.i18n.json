@@ -3,7 +3,7 @@
     "sessionExpired": "工作階段已過期，請重新登入。",
     "login": {
       "title": "歡迎回來",
-      "description": "登入您的 ddagent 帳戶",
+      "description": "登入您的 DDAgent 帳戶",
       "username": "使用者名稱",
       "password": "密碼",
       "submit": "登入",
@@ -698,7 +698,7 @@
       "openInEditor": "在編輯器中開啟"
     },
     "mainContent": {
-      "loading": "正在載入 ddagent",
+      "loading": "正在載入 DDAgent",
       "settingUpWorkspace": "正在設定您的工作區...",
       "chooseProject": "選擇您的專案",
       "selectProjectDescription": "從側邊欄選擇一個專案以開始使用 Claude 進行程式開發。每個專案包含您的聊天紀錄和檔案歷史。",
@@ -1497,8 +1497,8 @@
       "manualRestart": "更新已套用，但伺服器未自行重新啟動 — 請手動重新啟動以完成。",
       "failed": "更新失敗。",
       "failedTitle": "更新失敗",
-      "appConfirm": "要在此裝置上安裝 ddagent v{{version}} 嗎？首次安裝時 Android 會要求允許從 ddagent 安裝應用程式。",
-      "appPermission": "請為 ddagent 允許「安裝未知應用程式」，然後再次點選更新。",
+      "appConfirm": "要在此裝置上安裝 DDAgent v{{version}} 嗎？首次安裝時 Android 會要求允許從 DDAgent 安裝應用程式。",
+      "appPermission": "請為 DDAgent 允許「安裝未知應用程式」，然後再次點選更新。",
       "chooseTitle": "有可用的更新",
       "targetApp": "此應用程式",
       "targetWeb": "Web 介面",
@@ -1527,9 +1527,9 @@
     },
     "server": {
       "title": "伺服器",
-      "description": "重新啟動 ddagent 處理程序 — 適用於套用更新或從卡住狀態復原。",
+      "description": "重新啟動 DDAgent 處理程序 — 適用於套用更新或從卡住狀態復原。",
       "restart": "重新啟動",
-      "restartConfirm": "確定要重新啟動 ddagent 伺服器?進行中的工作階段將被中斷。",
+      "restartConfirm": "確定要重新啟動 DDAgent 伺服器?進行中的工作階段將被中斷。",
       "restarting": "正在重新啟動… 伺服器恢復後頁面將自動重新整理。",
       "restartFailed": "重新啟動失敗",
       "unsupported": "僅當伺服器在服務管理員下執行時才可重新啟動。",
@@ -1547,8 +1547,8 @@
       "check": "檢查更新",
       "checking": "正在檢查…",
       "upToDate": "已是最新版本（v{{version}}）。",
-      "available": "發現更新 v{{version}} — 正在背景下載；退出 ddagent 時自動安裝。",
-      "downloaded": "更新 v{{version}} 已下載 — 退出並重新啟動 ddagent 即可安裝。",
+      "available": "發現更新 v{{version}} — 正在背景下載；退出 DDAgent 時自動安裝。",
+      "downloaded": "更新 v{{version}} 已下載 — 退出並重新啟動 DDAgent 即可安裝。",
       "unavailable": "更新檢查僅在打包的桌面版本中可用。",
       "error": "更新檢查失敗：{{message}}",
       "errorGeneric": "更新檢查失敗。",
@@ -1791,10 +1791,10 @@
         "loading": "更新中...",
         "unsupported": "此瀏覽器不支援推播通知。",
         "denied": "推播通知已被封鎖，請在瀏覽器設定中允許。",
-        "iosHint": "在 iPhone/iPad 上，只有將 ddagent 加入主畫面（分享 → 加入主畫面）並在安裝的 App 中啟用通知後，通知才有效。",
+        "iosHint": "在 iPhone/iPad 上，只有將 DDAgent 加入主畫面（分享 → 加入主畫面）並在安裝的 App 中啟用通知後，通知才有效。",
         "test": "傳送測試通知",
         "testNoSubscription": "沒有已訂閱的裝置。請先在手機上點擊「啟用」。",
-        "testSuccess": "已傳送到 {{count}} 台裝置。如果手機上沒有顯示，請將 ddagent 加入主畫面（iOS 要求）。",
+        "testSuccess": "已傳送到 {{count}} 台裝置。如果手機上沒有顯示，請將 DDAgent 加入主畫面（iOS 要求）。",
         "testNotDelivered": "沒有可連線的裝置。請確認應用程式正在執行且通知已開啟。"
       },
       "device": {
@@ -2155,7 +2155,7 @@
       },
       "managed": {
         "badge": "受管理",
-        "hint": "由 ddagent 管理。"
+        "hint": "由 DDAgent 管理。"
       },
       "deleteConfirm": {
         "description": "「{{serverName}}」將從提供者設定中移除。",
@@ -2237,10 +2237,10 @@
     "workspaces": {
       "cancel": "取消",
       "create": "新增工作區",
-      "deleteConfirm": "從 ddagent 移除此工作區？檔案將保留在磁碟上。",
+      "deleteConfirm": "從 DDAgent 移除此工作區？檔案將保留在磁碟上。",
       "deleteFailed": "移除工作區失敗。",
       "deleteTitle": "移除工作區",
-      "description": "工作區是 ddagent 可以聊天、執行程式碼和瀏覽的目錄。",
+      "description": "工作區是 DDAgent 可以聊天、執行程式碼和瀏覽的目錄。",
       "remove": "移除工作區",
       "title": "工作區",
       "pathRequired": "路徑為必填項。"
@@ -2253,8 +2253,8 @@
         "syncSettings": "同步設定",
         "teamManagement": "團隊管理"
       },
-      "proFeatures": "ddagent Pro 功能",
-      "tryHosted": "試用 ddagent Hosted",
+      "proFeatures": "DDAgent Pro 功能",
+      "tryHosted": "試用 DDAgent Hosted",
       "versionInfo": "版本資訊",
       "client": "應用程式",
       "server": "伺服器",
@@ -2286,7 +2286,7 @@
       "runClaudeCli": "在專案目錄中執行 Claude CLI 以開始使用"
     },
     "app": {
-      "title": "ddagent",
+      "title": "DDAgent",
       "subtitle": "AI 程式開發助手"
     },
     "sessions": {
@@ -2408,7 +2408,7 @@
       "updateAvailable": "有可用更新",
       "restartRequired": "已安裝更新 — 請重新啟動伺服器以套用",
       "updateNow": "立即更新",
-      "updateConfirm": "將 ddagent 更新到 v{{version}}？將擷取最新程式碼並重新建置，隨後伺服器會重新啟動 — 進行中的工作階段會被中斷。",
+      "updateConfirm": "將 DDAgent 更新到 v{{version}}？將擷取最新程式碼並重新建置，隨後伺服器會重新啟動 — 進行中的工作階段會被中斷。",
       "updating": "正在更新… 可能需要幾分鐘",
       "restarting": "更新已安裝 — 正在重新啟動…",
       "updateFailed": "更新失敗",
@@ -2924,11 +2924,11 @@
     "importAll": {
       "action": "匯入全部",
       "mergeDuplicates": "合併重複項目",
-      "mergeDuplicatesHint": "在 ddagent 中合併重複的資料列（非檔案）",
+      "mergeDuplicatesHint": "在 DDAgent 中合併重複的資料列（非檔案）",
       "projectsScanned": "已掃描專案：{{count}}",
       "rulesSummary": "規則：{{total}} · 重複群組：{{duplicates}}",
       "skillsFound": "找到代理技能：{{found}}（新增：{{newSkills}}）",
-      "title": "將所有內容匯入 ddagent"
+      "title": "將所有內容匯入 DDAgent"
     },
     "importSkills": {
       "found": "在你的代理中找到 {{count}} 個技能。",
@@ -3060,8 +3060,8 @@
     },
     "install": {
       "button": "安裝",
-      "cardDescription": "透過 MCP 為你的代理提供知識庫與 ddagent 工具 — 選擇代理，或為全部安裝。",
-      "description": "讓所選代理透過 MCP 使用 ddagent 知識庫與工具。",
+      "cardDescription": "透過 MCP 為你的代理提供知識庫與 DDAgent 工具 — 選擇代理，或為全部安裝。",
+      "description": "讓所選代理透過 MCP 使用 DDAgent 知識庫與工具。",
       "errorFallback": "錯誤",
       "failed": "安裝失敗：{{error}}",
       "installForAll": "為全部安裝",
@@ -3071,7 +3071,7 @@
         "other": "已安裝於 {{count}} 個代理。"
       },
       "partialFailure": "已安裝於 {{count}} 個；失敗：{{failed}}",
-      "title": "安裝 ddagent MCP 伺服器"
+      "title": "安裝 DDAgent MCP 伺服器"
     },
     "servers": {
       "addGlobalDescription": "將此 MCP 伺服器新增至所有提供者：Claude、Cursor、Codex、OpenCode 和 Devin。由於相同設定必須在所有提供者中運作，因此僅支援 stdio 與 HTTP 傳輸。",
@@ -3088,7 +3088,7 @@
       "refreshingScopes": "正在重新整理專案範圍..."
     },
     "team": {
-      "cta": "ddagent Pro 提供",
+      "cta": "DDAgent Pro 提供",
       "description": "在團隊中分享 MCP 伺服器設定。所有人都會自動保持同步。",
       "title": "團隊 MCP 設定"
     },
@@ -3206,7 +3206,7 @@
     "worktree": "worktree"
   },
   "notifications": {
-    "deviceLabel": "ddagent Flutter",
+    "deviceLabel": "DDAgent Flutter",
     "errors": {
       "noResponse": "伺服器沒有回應",
       "registrationRejected": "伺服器拒絕註冊"
@@ -3220,7 +3220,7 @@
     "enterUrl": "輸入伺服器 URL",
     "local": {
       "title": "此裝置",
-      "subtitle": "在此電腦上執行 ddagent 伺服器",
+      "subtitle": "在此電腦上執行 DDAgent 伺服器",
       "install": "安裝本機伺服器",
       "start": "啟動本機伺服器",
       "stop": "停止",
@@ -3233,7 +3233,7 @@
       "error": "本機伺服器錯誤：{{error}}",
       "or": "或連線到遠端伺服器"
     },
-    "subtitle": "連線到你的 ddagent 伺服器"
+    "subtitle": "連線到你的 DDAgent 伺服器"
   },
   "voice": {
     "apiKeySaved": "API 金鑰（已儲存，輸入以取代）",
@@ -3409,9 +3409,9 @@
       "invalidEmail": "請輸入有效的電子郵件地址。",
       "nameAndEmailRequired": "git 名稱與電子郵件皆為必填。"
     },
-    "gitHint": "用於 ddagent 工作階段建立的提交。",
+    "gitHint": "用於 DDAgent 工作階段建立的提交。",
     "mcp": {
-      "description": "安裝 ddagent MCP 伺服器，讓你的代理可以使用知識庫與 ddagent 工具。選擇代理，或為全部安裝。",
+      "description": "安裝 DDAgent MCP 伺服器，讓你的代理可以使用知識庫與 DDAgent 工具。選擇代理，或為全部安裝。",
       "installForAll": "為全部安裝",
       "installSelected": "安裝所選項目",
       "installedOn(param=count)": {
@@ -3420,7 +3420,7 @@
       },
       "installedWithFailures": "已安裝於 {{installedCount}} 個；失敗：{{failed}}",
       "laterHint": "選填 — 你也可以稍後在設定 → MCP 中安裝。",
-      "title": "將代理連接到 ddagent"
+      "title": "將代理連接到 DDAgent"
     }
   },
   "fileTree": {

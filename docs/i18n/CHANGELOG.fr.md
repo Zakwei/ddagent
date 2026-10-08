@@ -1,6 +1,6 @@
 # Journal des modifications
 
-Toutes les modifications notables de ddagent sont documentées ici.
+Toutes les modifications notables de DDAgent sont documentées ici.
 
 Le format suit [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 et ce projet adhère au [Semantic Versioning](https://semver.org/).
@@ -169,7 +169,7 @@ Première version publique open source — **AGPL-3.0-only**.
 
 ## [0.5.0] - 2026-09-21
 
-Première version autonome de **ddagent** — une interface web et mobile auto-hébergée pour les agents de codage IA.
+Première version autonome de **DDAgent** — une interface web et mobile auto-hébergée pour les agents de codage IA.
 
 ### Points forts
 

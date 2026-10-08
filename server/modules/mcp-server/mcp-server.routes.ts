@@ -144,7 +144,7 @@ mcpTokensRouter.delete(
 );
 
 /**
- * Installs the ddagent MCP server into provider CLIs (all or a chosen subset).
+ * Installs the DDAgent MCP server into provider CLIs (all or a chosen subset).
  * Body: `{ providers?: string[], url?: string, scope?: 'read'|'write',
  * serverName?: string }`. Writes a `ddagent` user-scope HTTP MCP entry pointing
  * at `/mcp` with a reusable bearer token, so agents can call the knowledge tools.

@@ -15,8 +15,8 @@
   <a href="KNOWLEDGE.zh-TW.md">繁體中文</a>
 </p>
 
-ddagent, ajanlarınız için **yerel öncelikli bir bilgi tabanı** sunar: anılar, kurallar,
-beceriler ve kişisel bilgiler, artı etiketler ve ilişkiler. ddagent'ın geri kalanıyla
+DDAgent, ajanlarınız için **yerel öncelikli bir bilgi tabanı** sunar: anılar, kurallar,
+beceriler ve kişisel bilgiler, artı etiketler ve ilişkiler. DDAgent'ın geri kalanıyla
 aynı SQLite veritabanında (`auth.db`) bir FTS5 tam metin indeksinin arkasında yaşar,
 istemcideki **Knowledge** ekranından yönetilir ve ajanlarınız tarafından MCP üzerinden
 okunup yazılabilir. Gevşek biçimde
@@ -34,13 +34,13 @@ dosyaları okuyanlar da MCP konuşanlar da.
 - **CLI'ye özgü dosyalar** — her araç kendi yapılandırmasını kendi okur: Claude Code
   `CLAUDE.md` okur, Codex/Cursor `AGENTS.md` okur, Cursor `.cursorrules` okur,
   birkaçı da `skills/` ve `.agents/skills/` okur. Bu CLI'ın işidir, modelin
-  seçimi değil — ddagent bunu kapatmaz.
-- **ddagent'ın ilk tur ön eki** — bir oturumun ilk mesajında ddagent, projenin
+  seçimi değil — DDAgent bunu kapatmaz.
+- **DDAgent'ın ilk tur ön eki** — bir oturumun ilk mesajında DDAgent, projenin
   `.ddagent/shared-context.md` dosyasını ve bir `<unified-rules>` bloğunu
   (çalışma alanı `AGENTS.md`'si, `~/.agents/AGENTS.md` ve kısa bir hijyen notu)
   başa ekler; bunu kaldırmak için `DDAGENT_UNIFIED_RULES=0` ayarlayın. Bu dosya
   tabanlıdır ve bilgi tabanından ayrıdır.
-- **MCP ile alma (isteğe bağlı)** — ddagent'ın MCP sunucusunu bir ajana
+- **MCP ile alma (isteğe bağlı)** — DDAgent'ın MCP sunucusunu bir ajana
   kurduğunuzda, araç listesi `knowledge_get_context`, `knowledge_search` ve
   benzerlerini içerir. Contexta'yı izleyerek, hiçbir şey otomatik olarak enjekte
   edilmez: ajan bağlam oluşturucuyu bir sorguyla çağırır ve `critical` kurallar ile
@@ -49,7 +49,7 @@ dosyaları okuyanlar da MCP konuşanlar da.
 
 Yani "tek yer", **bilgiyi düzenlemek için tek yer** anlamına gelir
 — bir CLI'ın kendi yerel dosyalarını okumasını durdurmaz (durdurması da mümkün değildir).
-ddagent bilgi tabanını oturumlara otomatik olarak enjekte etmez.
+DDAgent bilgi tabanını oturumlara otomatik olarak enjekte etmez.
 
 ## Varlıklar
 
@@ -93,7 +93,7 @@ hatalarını ve yarı eşanlamlıları yakalayan bulanık bir **trigram** geçi�
 
 ## MCP araçları (isteğe bağlı)
 
-ddagent'ın MCP sunucusu (`POST /mcp`) bilgi tabanını her MCP istemcisine açar.
+DDAgent'ın MCP sunucusu (`POST /mcp`) bilgi tabanını her MCP istemcisine açar.
 Okuma araçları `read` kapsamlı bir token ile çalışır; yazma araçları `write` gerektirir. Yazma
 araçları, arayüzle aynı doğrulamayı çalıştırır ve geçmiş kaydeder.
 
@@ -105,12 +105,12 @@ Yazma: `knowledge_add_memory`, `knowledge_update_memory`,
 `knowledge_delete_memory`, ve `rule`, `skill` ile `personal` için aynı üçlü;
 artı `knowledge_link` / `knowledge_unlink`.
 
-Araçlar `projectId` ya da ddagent'ın zaten bildiği bir `projectPath` kabul eder.
+Araçlar `projectId` ya da DDAgent'ın zaten bildiği bir `projectPath` kabul eder.
 
 ### Sunucuyu ajanlarınıza kurma
 
 Sağlayıcı yapılandırmalarını elle düzenlemek zorunda değilsiniz. **Settings → Agents →
-(ajan) → MCP → Install ddagent MCP server** kullanın (onboarding'de bir adım olarak da sunulur) ve
+(ajan) → MCP → Install DDAgent MCP server** kullanın (onboarding'de bir adım olarak da sunulur) ve
 ajanları seçin — ya da hepsine kurun. Yeniden kullanılabilir, `write` kapsamlı bir
 `ddagent-mcp` bearer token'ı ile `<server>/mcp` adresini işaret eden bir `ddagent` HTTP MCP girdisi (kullanıcı
 kapsamı) yazar (yeniden kurmak öncekini iptal eder). Kurulduktan sonra, o ajanın araçları
@@ -162,9 +162,9 @@ Grafik, açık bağlantılarınız ile örtük merkezleri çizer — proje kapsa
 4. Projeler arası tercihler (saat dilimi, düzenleyici, adlandırma) için **kişisel bilgi**.
 5. **İlgili anıları bağlayın** ki 1 atlamalı komşular birlikte gelsin.
 6. Bilgi tabanını araması ve öğrendiklerini kalıcılaştırması gereken ajanlar için **MCP kurun**.
-   Tek tıkla kurulum bir `write` token'ı kullanır; salt okunur bir ajan için ddagent MCP
+   Tek tıkla kurulum bir `write` token'ı kullanır; salt okunur bir ajan için DDAgent MCP
    sunucusu token'ları altında bir `read` token'ı oluşturun ve o ajanı elle yapılandırın
-   (bkz. [MCP sunucusu olarak ddagent](../mcp-server.md#manual-client-config)).
+   (bkz. [MCP sunucusu olarak DDAgent](../mcp-server.md#manual-client-config)).
 
 ## Geçiş
 
@@ -174,13 +174,13 @@ başlık + içerik) bulur ve kural sayılarını gösterir. Oradan **Merge dupli
 (tek bir genel satırda birleştirir) ve/veya **Make all rules critical** yapabilirsiniz. Siz
 onaylayana kadar hiçbir şey yazılmaz — yıkıcı eylemler açıktır.
 
-**Dashboard**'da ayrıca tek bir **her şeyi ddagent'a içe aktar** düğmesi vardır: proje taramasını ve ajan becerisi içe aktarımını tek bir eylemde çalıştırır; aynı dry-run önizlemesi ve isteğe bağlı yinelenen birleştirme / yükseltme anahtarlarıyla birlikte. Yalnızca ajanlarınızın dosyalarını okur ve ddagent'ın kendi veritabanına yazar — hiçbir CLI dosyası ya da yapılandırması değiştirilmez (bir ajanın yapılandırmasına yazan tek eylem, ayrı "Install ddagent MCP server"dır).
+**Dashboard**'da ayrıca tek bir **her şeyi DDAgent'a içe aktar** düğmesi vardır: proje taramasını ve ajan becerisi içe aktarımını tek bir eylemde çalıştırır; aynı dry-run önizlemesi ve isteğe bağlı yinelenen birleştirme / yükseltme anahtarlarıyla birlikte. Yalnızca ajanlarınızın dosyalarını okur ve DDAgent'ın kendi veritabanına yazar — hiçbir CLI dosyası ya da yapılandırması değiştirilmez (bir ajanın yapılandırmasına yazan tek eylem, ayrı "Install DDAgent MCP server"dır).
 
 Aynı menüde **Ajan becerilerini içe aktar** vardır: ajanlarınızın zaten sunduğu veya kurduğu genel/varsayılan becerileri (kullanıcı / sistem / eklenti kapsamları) listeler ve eksik olanları beceri olarak bilgi tabanına içe aktarır. Önce bir dry-run'dır ve idempotenttir — zaten var olan bir ad atlanır. Projeye kapsanmış beceriler ise bunun yerine proje taraması tarafından içe aktarılır.
 
 ## Bilinmesi iyi olanlar
 
-- Her şey bu ddagent örneğine **yereldir**; bulut yok, senkronizasyon yok.
+- Her şey bu DDAgent örneğine **yereldir**; bulut yok, senkronizasyon yok.
 - Bilgi tabanı **otomatik olarak enjekte edilmez** — ajanlar onu MCP üzerinden
   isteğe bağlı olarak alır (Contexta modeli). MCP sunucusu kurulu olmayan ajanlar
   ondan hiçbir şey almaz.
@@ -220,5 +220,5 @@ eklemek proje satırlarını artı genel satırları döndürür.
 
 ## İlgili
 
-- [MCP sunucusu olarak ddagent](../mcp-server.md) — araç kataloğu ve token kurulumu
+- [MCP sunucusu olarak DDAgent](../mcp-server.md) — araç kataloğu ve token kurulumu
 - [Ekip iş birliği](../teams.md) · [Uzaktan onaylar](../remote-approvals.md)

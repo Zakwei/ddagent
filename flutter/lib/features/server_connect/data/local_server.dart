@@ -70,7 +70,7 @@ final RegExp preservedBundleFilePattern = RegExp(r'^\.env(\.[^/]+)?$');
 /// Whether [name] is a user-owned bundle file that must survive an update.
 bool isPreservedBundleFile(String name) => preservedBundleFilePattern.hasMatch(name);
 
-/// Manages an on-device ddagent server: downloads the published release
+/// Manages an on-device DDAgent server: downloads the published release
 /// tarball, finds (or downloads) a Node 22.x runtime, and spawns/stops the
 /// process. Runtime-only state — the only persistence is the extracted bundle
 /// on disk. Supported targets: Windows x64, Linux x64/arm64.
@@ -181,7 +181,7 @@ class LocalServerService {
     }
   }
 
-  /// GET /api/auth/status on a short-timeout bare client — 200 means a ddagent
+  /// GET /api/auth/status on a short-timeout bare client — 200 means a DDAgent
   /// server (ours or foreign) is answering on [localUrl].
   Future<bool> _probeAlive() async {
     try {
@@ -193,7 +193,7 @@ class LocalServerService {
   }
 
   /// Version the currently-answering server reports via `GET /health` — null
-  /// when nothing (or something that isn't ddagent) is listening.
+  /// when nothing (or something that isn't DDAgent) is listening.
   Future<String?> _runningVersion() async {
     try {
       final res = await _probe.get<dynamic>('$localUrl/health');
@@ -538,7 +538,7 @@ class LocalServerService {
     }
   }
 
-  /// Adopt-or-spawn: when a ddagent already answers on [localUrl] (e.g. an
+  /// Adopt-or-spawn: when a DDAgent already answers on [localUrl] (e.g. an
   /// orphan from a previous app run, or the systemd service on this box) it is
   /// reused as-is and [stop] will leave it alone. Otherwise we spawn
   /// `node dist-server/server/index.js` from the installed bundle and poll the

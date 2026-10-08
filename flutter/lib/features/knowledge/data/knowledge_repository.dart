@@ -312,7 +312,7 @@ class KnowledgeRepository {
       );
 
   /// `POST /api/knowledge/import-all` — one-shot import of everything into
-  /// ddagent (project migration + agent skills). Dry run by default; [dedupe]
+  /// DDAgent (project migration + agent skills). Dry run by default; [dedupe]
   /// and [promoteRules] only take effect when [dryRun] is false.
   Future<Map<String, dynamic>> importEverything({
     bool dryRun = true,

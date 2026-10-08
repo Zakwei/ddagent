@@ -1,6 +1,6 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/logo.svg" alt="ddagent" width="72" height="72">
-  <h1>ddagent</h1>
+  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/logo.svg" alt="DDAgent" width="72" height="72">
+  <h1>DDAgent</h1>
   <p><strong>Un'unica UI per tutti i tuoi agenti di coding AI.</strong><br>
   Server self-hosted e client Flutter (web, Linux, Windows &amp; Android) per Claude Code, Codex, Cursor CLI, OpenCode, Devin, Command Code e Antigravity — sessioni, file, git, terminali e task in un unico posto.</p>
 
@@ -34,8 +34,8 @@
 </div>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/desktop-main.png" alt="vista chat di ddagent" width="78%">&nbsp;
-  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/mobile-chat.png" alt="vista mobile di ddagent" width="20%">
+  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/desktop-main.png" alt="vista chat di DDAgent" width="78%">&nbsp;
+  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/mobile-chat.png" alt="vista mobile di DDAgent" width="20%">
 </p>
 
 <table>
@@ -53,9 +53,9 @@
 
 ---
 
-## Cos'è ddagent?
+## Cos'è DDAgent?
 
-ddagent gira sulla tua macchina o sul tuo VPS e offre un'unica UI curata sopra gli agenti di coding che già usi. Il server legge le sessioni di ogni agente direttamente dalla sua cronologia su disco (`~/.claude`, `~/.codex`, `~/.cursor`, OpenCode, Devin, …), quindi le conversazioni esistenti compaiono senza dover importare nulla. Solo i metadati delle sessioni vengono indicizzati in locale; nulla viene inviato a terze parti.
+DDAgent gira sulla tua macchina o sul tuo VPS e offre un'unica UI curata sopra gli agenti di coding che già usi. Il server legge le sessioni di ogni agente direttamente dalla sua cronologia su disco (`~/.claude`, `~/.codex`, `~/.cursor`, OpenCode, Devin, …), quindi le conversazioni esistenti compaiono senza dover importare nulla. Solo i metadati delle sessioni vengono indicizzati in locale; nulla viene inviato a terze parti.
 
 Collegati dal client Flutter su desktop, telefono o browser. La tua macchina, i tuoi agenti, i tuoi dati.
 
@@ -100,11 +100,11 @@ Collegati dal client Flutter su desktop, telefono o browser. La tua macchina, i 
 | **Command Code** | `command-code acp` (Agent Client Protocol); trascrizioni da `~/.commandcode` |
 | **Antigravity** | CLI `agy` in modalità headless; conversazioni indicizzate da `~/.gemini/antigravity-cli` |
 
-Le CLI degli agenti devono essere installate e autenticate sulla macchina server. Gli abbonamenti sono i tuoi — ddagent fornisce l'ambiente, non l'AI.
+Le CLI degli agenti devono essere installate e autenticate sulla macchina server. Gli abbonamenti sono i tuoi — DDAgent fornisce l'ambiente, non l'AI.
 
 ## Installazione
 
-ddagent è composto da due parti: il **server**, che gira accanto ai tuoi agenti ed espone un'API REST/WebSocket, e il **client**, che vi si collega. Il server richiede **Node.js 22+** (i tarball precompilati richiedono Node.js 22.x, perché i loro moduli nativi sono compilati per questa versione).
+DDAgent è composto da due parti: il **server**, che gira accanto ai tuoi agenti ed espone un'API REST/WebSocket, e il **client**, che vi si collega. Il server richiede **Node.js 22+** (i tarball precompilati richiedono Node.js 22.x, perché i loro moduli nativi sono compilati per questa versione).
 
 ### Server — script di installazione
 
@@ -192,7 +192,7 @@ npm run build && node dist-server/server/index.js   # API on http://localhost:30
 ddagent sandbox ~/my-project
 ```
 
-Esegue ddagent e un agente (Claude Code o Codex) all'interno di una Docker Sandbox isolata tramite microVM. Richiede la CLI `sbx` — vedi [docker/README.md](https://github.com/Zakwei/ddagent/blob/main/docker/README.md).
+Esegue DDAgent e un agente (Claude Code o Codex) all'interno di una Docker Sandbox isolata tramite microVM. Richiede la CLI `sbx` — vedi [docker/README.md](https://github.com/Zakwei/ddagent/blob/main/docker/README.md).
 
 ## CLI
 

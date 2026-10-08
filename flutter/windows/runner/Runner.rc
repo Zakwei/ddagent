@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "ai.devin" "\0"
-            VALUE "FileDescription", "ddagent_app" "\0"
+            VALUE "FileDescription", "DDAgent" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "ddagent_app" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 ai.devin. All rights reserved." "\0"
             VALUE "OriginalFilename", "ddagent_app.exe" "\0"
-            VALUE "ProductName", "ddagent_app" "\0"
+            VALUE "ProductName", "DDAgent" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

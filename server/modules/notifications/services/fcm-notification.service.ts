@@ -50,7 +50,7 @@ async function getAdminApp(): Promise<import('firebase-admin/app').App | null> {
 }
 
 function toFcmMessage(payload: Record<string, any>) {
-  const title = payload?.title ?? 'ddagent';
+  const title = payload?.title ?? 'DDAgent';
   const body = payload?.body ?? payload?.message ?? '';
   const data: Record<string, string> = {};
   // FCM data values must be strings; sessionId drives ddagent://chat/<id> taps.

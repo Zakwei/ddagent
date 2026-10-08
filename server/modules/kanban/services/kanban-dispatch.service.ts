@@ -44,7 +44,7 @@ export function buildKickoffPrompt(input: {
     `-d '{"token":"${token}","cardId":"${card.cardId}","status":"${status}","message":"${message}"}'`;
 
   return [
-    `You are working on a kanban task automatically dispatched by ddagent.`,
+    `You are working on a kanban task automatically dispatched by DDAgent.`,
     ``,
     `Task: ${card.title}`,
     card.description ? `Details:\n${card.description}` : '',

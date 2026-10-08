@@ -272,7 +272,7 @@ function finalizeLiveMessages(state: any) {
 }
 /**
  * Persists the assistant message that just ended (narration before a tool call,
- * or the answer of an intermediate continuation round) to the ddagent JSONL
+ * or the answer of an intermediate continuation round) to the DDAgent JSONL
  * transcript.
  *
  * The JSONL is what the client reloads as history, so without this the text the
@@ -295,7 +295,7 @@ function persistLiveAssistantMessage(state: any) {
     }));
 }
 /**
- * Persists the reasoning that just ended to the ddagent JSONL transcript so
+ * Persists the reasoning that just ended to the DDAgent JSONL transcript so
  * the thinking blocks survive a history reload exactly as they streamed.
  */
 function persistLiveThoughtMessage(state: any) {
@@ -311,7 +311,7 @@ function persistLiveThoughtMessage(state: any) {
     }));
 }
 /**
- * Persists a run-level error to the ddagent JSONL transcript next to its live
+ * Persists a run-level error to the DDAgent JSONL transcript next to its live
  * broadcast, so the message survives a history reload instead of living only
  * in the websocket replay buffer (which is evicted). Failures before the ACP
  * session exists have no `jsonlPath` and stay live-only.
@@ -334,7 +334,7 @@ async function fetchLatestAssistantMessage(state: any, options: any = {}) {
         }
         try {
             const sessionsProvider = new DevinSessionsProvider();
-            // Read from the Devin DB, not the lagging ddagent JSONL, and find
+            // Read from the Devin DB, not the lagging DDAgent JSONL, and find
             // the most recent assistant message that actually comes after the
             // last real user turn. This prevents replaying a stale final from a
             // previous turn when the current turn only produced tool calls or

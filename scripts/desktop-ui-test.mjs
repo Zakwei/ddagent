@@ -1,4 +1,4 @@
-// UI test via CDP for ddagent desktop on remote Windows host.
+// UI test via CDP for DDAgent desktop on remote Windows host.
 // Usage: node scripts/desktop-ui-test.mjs <phase>
 import { chromium } from 'playwright';
 import fs from 'node:fs';

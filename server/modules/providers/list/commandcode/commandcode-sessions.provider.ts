@@ -143,7 +143,7 @@ function extractToolResultContent(content: unknown): string {
 }
 
 /**
- * Normalizes one v3 transcript `message` entry into ddagent messages. A single
+ * Normalizes one v3 transcript `message` entry into DDAgent messages. A single
  * entry can expand into several normalized rows (text + thinking + tool_use +
  * tool_result all live in the same `content` array).
  */

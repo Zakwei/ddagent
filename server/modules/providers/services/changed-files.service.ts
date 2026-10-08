@@ -256,7 +256,7 @@ export function collectDevinDbChangedFiles(db: DatabaseType, sessionId: string):
 }
 
 /**
- * Collects file edits from the ddagent JSONL transcript the Devin runtime
+ * Collects file edits from the DDAgent JSONL transcript the Devin runtime
  * appends while a session runs. `tool_use` rows carry an ACP title ("Edit file",
  * "Wrote ./src/a.ts") plus the raw input; a row counts as an edit when the title
  * resolves to an edit verb or the input carries an `old_string`/`oldString`

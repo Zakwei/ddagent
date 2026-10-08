@@ -444,7 +444,7 @@ class Translations$notifications$ja extends Translations$notifications$en {
 	final TranslationsJa _root; // ignore: unused_field
 
 	// Translations
-	@override String get deviceLabel => 'ddagent Flutter';
+	@override String get deviceLabel => 'DDAgent Flutter';
 	@override late final Translations$notifications$errors$ja errors = Translations$notifications$errors$ja._(_root);
 }
 
@@ -461,7 +461,7 @@ class Translations$serverConnect$ja extends Translations$serverConnect$en {
 	@override String connectionFailed({required Object error}) => '接続に失敗しました (${error})';
 	@override String get enterUrl => 'サーバーのURLを入力';
 	@override late final Translations$serverConnect$local$ja local = Translations$serverConnect$local$ja._(_root);
-	@override String get subtitle => 'ddagent サーバーに接続';
+	@override String get subtitle => 'DDAgent サーバーに接続';
 }
 
 // Path: voice
@@ -631,7 +631,7 @@ class Translations$onboarding$ja extends Translations$onboarding$en {
 	@override late final Translations$onboarding$agents$ja agents = Translations$onboarding$agents$ja._(_root);
 	@override String get completeSetup => 'セットアップを完了';
 	@override late final Translations$onboarding$errors$ja errors = Translations$onboarding$errors$ja._(_root);
-	@override String get gitHint => 'ddagent セッションで作成されるコミットに使用されます。';
+	@override String get gitHint => 'DDAgent セッションで作成されるコミットに使用されます。';
 	@override late final Translations$onboarding$mcp$ja mcp = Translations$onboarding$mcp$ja._(_root);
 }
 
@@ -694,7 +694,7 @@ class Translations$auth$login$ja extends Translations$auth$login$en {
 
 	// Translations
 	@override String get title => 'おかえりなさい';
-	@override String get description => 'ddagentアカウントにサインイン';
+	@override String get description => 'DDAgentアカウントにサインイン';
 	@override String get username => 'ユーザー名';
 	@override String get password => 'パスワード';
 	@override String get submit => 'サインイン';
@@ -1729,7 +1729,7 @@ class Translations$common$mainContent$ja extends Translations$common$mainContent
 	final TranslationsJa _root; // ignore: unused_field
 
 	// Translations
-	@override String get loading => 'ddagent を読み込んでいます';
+	@override String get loading => 'DDAgent を読み込んでいます';
 	@override String get settingUpWorkspace => 'ワークスペースを準備しています...';
 	@override String get chooseProject => 'プロジェクトを選択';
 	@override String get selectProjectDescription => 'サイドバーからプロジェクトを選択して、Claudeとコーディングを始めましょう。各プロジェクトにはチャットセッションとファイル履歴が含まれています。';
@@ -2163,8 +2163,8 @@ class Translations$common$update$ja extends Translations$common$update$en {
 	@override String get manualRestart => '更新は適用されましたが、サーバーは自動で再起動しませんでした — 手動で再起動して完了してください。';
 	@override String get failed => '更新に失敗しました。';
 	@override String get failedTitle => '更新に失敗しました';
-	@override String appConfirm({required Object version}) => 'この端末に ddagent v${version} をインストールしますか？ 初回は Android が ddagent からのインストール許可を求めます。';
-	@override String get appPermission => 'ddagent に「提供元不明のアプリ」のインストールを許可してから、もう一度「更新」をタップしてください。';
+	@override String appConfirm({required Object version}) => 'この端末に DDAgent v${version} をインストールしますか？ 初回は Android が DDAgent からのインストール許可を求めます。';
+	@override String get appPermission => 'DDAgent に「提供元不明のアプリ」のインストールを許可してから、もう一度「更新」をタップしてください。';
 	@override String get chooseTitle => 'アップデートがあります';
 	@override String get targetApp => 'このアプリ';
 	@override String get targetWeb => 'Web インターフェイス';
@@ -2204,9 +2204,9 @@ class Translations$settings$server$ja extends Translations$settings$server$en {
 
 	// Translations
 	@override String get title => 'サーバー';
-	@override String get description => 'ddagent プロセスを再起動します — 更新後や応答しない状態からの回復に便利です。';
+	@override String get description => 'DDAgent プロセスを再起動します — 更新後や応答しない状態からの回復に便利です。';
 	@override String get restart => '再起動';
-	@override String get restartConfirm => 'ddagent サーバーを再起動しますか?アクティブなセッションは中断されます。';
+	@override String get restartConfirm => 'DDAgent サーバーを再起動しますか?アクティブなセッションは中断されます。';
 	@override String get restarting => '再起動中… サーバーが戻り次第、ページを再読み込みします。';
 	@override String get restartFailed => '再起動に失敗しました';
 	@override String get unsupported => '再起動は、サーバーがサービスマネージャー管理下で動作している場合のみ利用できます。';
@@ -2231,8 +2231,8 @@ class Translations$settings$updates$ja extends Translations$settings$updates$en 
 	@override String get check => '更新を確認';
 	@override String get checking => '確認中…';
 	@override String upToDate({required Object version}) => '最新バージョンです（v${version}）。';
-	@override String available({required Object version}) => '更新 v${version} が見つかりました — バックグラウンドでダウンロード中。ddagent 終了時にインストールされます。';
-	@override String downloaded({required Object version}) => '更新 v${version} をダウンロードしました — ddagent を終了して再起動するとインストールされます。';
+	@override String available({required Object version}) => '更新 v${version} が見つかりました — バックグラウンドでダウンロード中。DDAgent 終了時にインストールされます。';
+	@override String downloaded({required Object version}) => '更新 v${version} をダウンロードしました — DDAgent を終了して再起動するとインストールされます。';
 	@override String get unavailable => '更新チェックはパッケージ済みデスクトップビルドでのみ利用できます。';
 	@override String error({required Object message}) => '更新チェックに失敗しました: ${message}';
 	@override String get errorGeneric => '更新チェックに失敗しました。';
@@ -2625,10 +2625,10 @@ class Translations$settings$workspaces$ja extends Translations$settings$workspac
 	// Translations
 	@override String get cancel => 'キャンセル';
 	@override String get create => 'ワークスペースを追加';
-	@override String get deleteConfirm => 'このワークスペースを ddagent から削除しますか？ファイルはディスクに残ります。';
+	@override String get deleteConfirm => 'このワークスペースを DDAgent から削除しますか？ファイルはディスクに残ります。';
 	@override String get deleteFailed => 'ワークスペースの削除に失敗しました。';
 	@override String get deleteTitle => 'ワークスペースを削除';
-	@override String get description => 'ワークスペースは、ddagent がチャット・コード実行・ブラウジングできるディレクトリです。';
+	@override String get description => 'ワークスペースは、DDAgent がチャット・コード実行・ブラウジングできるディレクトリです。';
 	@override String get remove => 'ワークスペースを削除';
 	@override String get title => 'ワークスペース';
 	@override String get pathRequired => 'パスは必須です';
@@ -2645,8 +2645,8 @@ class Translations$settings$about$ja extends Translations$settings$about$en {
 	@override String get buyMeACoffee => 'Buy Me a Coffee';
 	@override String get learnMore => '詳細を見る';
 	@override late final Translations$settings$about$pro$ja pro = Translations$settings$about$pro$ja._(_root);
-	@override String get proFeatures => 'ddagent Pro の機能';
-	@override String get tryHosted => 'ddagent Hosted を試す';
+	@override String get proFeatures => 'DDAgent Pro の機能';
+	@override String get tryHosted => 'DDAgent Hosted を試す';
 	@override String get versionInfo => 'バージョン情報';
 	@override String get client => 'アプリ';
 	@override String get server => 'サーバー';
@@ -2690,7 +2690,7 @@ class Translations$sidebar$app$ja extends Translations$sidebar$app$en {
 	final TranslationsJa _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'ddagent';
+	@override String get title => 'DDAgent';
 	@override String get subtitle => 'AIコーディングアシスタント';
 }
 
@@ -2875,7 +2875,7 @@ class Translations$sidebar$version$ja extends Translations$sidebar$version$en {
 	@override String get updateAvailable => 'アップデートあり';
 	@override String get restartRequired => '更新が適用されていません。サーバーを再起動してください';
 	@override String get updateNow => '今すぐ更新';
-	@override String updateConfirm({required Object version}) => 'ddagent を v${version} に更新しますか？最新コードの取得とビルド後、サーバーが再起動します — 実行中のセッションは中断されます。';
+	@override String updateConfirm({required Object version}) => 'DDAgent を v${version} に更新しますか？最新コードの取得とビルド後、サーバーが再起動します — 実行中のセッションは中断されます。';
 	@override String get updating => '更新中… 数分かかることがあります';
 	@override String get restarting => '更新をインストールしました — 再起動中…';
 	@override String get updateFailed => '更新に失敗しました';
@@ -3625,11 +3625,11 @@ class Translations$knowledge$importAll$ja extends Translations$knowledge$importA
 	// Translations
 	@override String get action => 'すべてをインポート';
 	@override String get mergeDuplicates => '重複エントリを統合';
-	@override String get mergeDuplicatesHint => 'ddagent 内の重複行を統合します（ファイルではありません）';
+	@override String get mergeDuplicatesHint => 'DDAgent 内の重複行を統合します（ファイルではありません）';
 	@override String projectsScanned({required Object count}) => 'スキャンしたプロジェクト: ${count}';
 	@override String rulesSummary({required Object total, required Object duplicates}) => 'ルール: ${total} · 重複グループ: ${duplicates}';
 	@override String skillsFound({required Object found, required Object newSkills}) => '見つかったエージェントスキル: ${found} (新規: ${newSkills})';
-	@override String get title => 'すべてを ddagent にインポート';
+	@override String get title => 'すべてを DDAgent にインポート';
 }
 
 // Path: knowledge.importSkills
@@ -3813,8 +3813,8 @@ class Translations$mcp$install$ja extends Translations$mcp$install$en {
 
 	// Translations
 	@override String get button => 'インストール';
-	@override String get cardDescription => 'MCP経由でエージェントにナレッジベースとddagentツールを提供します — エージェントを選択するか、すべてにインストールしてください。';
-	@override String get description => '選択したエージェントがMCP経由でddagentのナレッジベースとツールを使用できるようにします。';
+	@override String get cardDescription => 'MCP経由でエージェントにナレッジベースとDDAgentツールを提供します — エージェントを選択するか、すべてにインストールしてください。';
+	@override String get description => '選択したエージェントがMCP経由でDDAgentのナレッジベースとツールを使用できるようにします。';
 	@override String get errorFallback => 'エラー';
 	@override String failed({required Object error}) => 'インストールに失敗しました: ${error}';
 	@override String get installForAll => 'すべてにインストール';
@@ -3824,7 +3824,7 @@ class Translations$mcp$install$ja extends Translations$mcp$install$en {
 		other: '${count} 個のエージェントにインストールしました。',
 	);
 	@override String partialFailure({required Object count, required Object failed}) => '${count} 個にインストールしました。失敗: ${failed}';
-	@override String get title => 'ddagent MCPサーバーをインストール';
+	@override String get title => 'DDAgent MCPサーバーをインストール';
 }
 
 // Path: mcp.servers
@@ -3852,7 +3852,7 @@ class Translations$mcp$team$ja extends Translations$mcp$team$en {
 	final TranslationsJa _root; // ignore: unused_field
 
 	// Translations
-	@override String get cta => 'ddagent Pro で利用できます';
+	@override String get cta => 'DDAgent Pro で利用できます';
 	@override String get description => 'MCPサーバー設定をチーム全体で共有します。全員が自動的に同期されます。';
 	@override String get title => 'チームMCP設定';
 }
@@ -4030,7 +4030,7 @@ class Translations$serverConnect$local$ja extends Translations$serverConnect$loc
 
 	// Translations
 	@override String get title => 'このデバイス';
-	@override String get subtitle => 'このマシンでddagentサーバーを実行します';
+	@override String get subtitle => 'このマシンでDDAgentサーバーを実行します';
 	@override String get install => 'ローカルサーバーをインストール';
 	@override String get start => 'ローカルサーバーを起動';
 	@override String get stop => '停止';
@@ -4224,7 +4224,7 @@ class Translations$onboarding$mcp$ja extends Translations$onboarding$mcp$en {
 	final TranslationsJa _root; // ignore: unused_field
 
 	// Translations
-	@override String get description => 'ddagent MCPサーバーをインストールすると、エージェントがナレッジベースとddagentツールを使用できるようになります。エージェントを選択するか、すべてにインストールしてください。';
+	@override String get description => 'DDAgent MCPサーバーをインストールすると、エージェントがナレッジベースとDDAgentツールを使用できるようになります。エージェントを選択するか、すべてにインストールしてください。';
 	@override String get installForAll => 'すべてにインストール';
 	@override String get installSelected => '選択項目にインストール';
 	@override String installedOn({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ja'))(count,
@@ -4233,7 +4233,7 @@ class Translations$onboarding$mcp$ja extends Translations$onboarding$mcp$en {
 	);
 	@override String installedWithFailures({required Object installedCount, required Object failed}) => '${installedCount} 個にインストールしました。失敗: ${failed}';
 	@override String get laterHint => '任意 — 後で設定 → MCP からインストールすることもできます。';
-	@override String get title => 'エージェントを ddagent に接続';
+	@override String get title => 'エージェントを DDAgent に接続';
 }
 
 // Path: fileTree.search
@@ -5628,10 +5628,10 @@ class Translations$settings$notifications$webPush$ja extends Translations$settin
 	@override String get loading => '更新中...';
 	@override String get unsupported => 'このブラウザではプッシュ通知がサポートされていません。';
 	@override String get denied => 'プッシュ通知がブロックされています。ブラウザの設定で許可してください。';
-	@override String get iosHint => 'iPhone/iPad では、ddagent をホーム画面に追加し（共有 → ホーム画面に追加）、そのインストール済みアプリで通知を有効にした後でのみ通知が機能します。';
+	@override String get iosHint => 'iPhone/iPad では、DDAgent をホーム画面に追加し（共有 → ホーム画面に追加）、そのインストール済みアプリで通知を有効にした後でのみ通知が機能します。';
 	@override String get test => 'テスト通知を送信';
 	@override String get testNoSubscription => '登録済みデバイスがありません。先にスマホで「有効にする」をタップしてください。';
-	@override String testSuccess({required Object count}) => '${count} 台のデバイスに送信しました。スマホに表示されない場合は ddagent をホーム画面に追加してください（iOS の要件）。';
+	@override String testSuccess({required Object count}) => '${count} 台のデバイスに送信しました。スマホに表示されない場合は DDAgent をホーム画面に追加してください（iOS の要件）。';
 	@override String get testNotDelivered => '到達可能なデバイスがありませんでした。アプリが実行中で、通知が有効になっていることを確認してください。';
 }
 
@@ -6175,7 +6175,7 @@ class Translations$settings$mcpServers$managed$ja extends Translations$settings$
 
 	// Translations
 	@override String get badge => '管理対象';
-	@override String get hint => 'ddagent により管理。';
+	@override String get hint => 'DDAgent により管理。';
 }
 
 // Path: settings.mcpServers.deleteConfirm
@@ -7009,7 +7009,7 @@ extension on TranslationsJa {
 		return switch (path) {
 			'auth.sessionExpired' => 'セッションの有効期限が切れました。再度ログインしてください。',
 			'auth.login.title' => 'おかえりなさい',
-			'auth.login.description' => 'ddagentアカウントにサインイン',
+			'auth.login.description' => 'DDAgentアカウントにサインイン',
 			'auth.login.username' => 'ユーザー名',
 			'auth.login.password' => 'パスワード',
 			'auth.login.submit' => 'サインイン',
@@ -7516,7 +7516,7 @@ extension on TranslationsJa {
 			'common.fileOperations.move' => '移動',
 			'common.fileOperations.copyPath' => 'パスをコピー',
 			'common.fileOperations.openInEditor' => 'エディタで開く',
-			'common.mainContent.loading' => 'ddagent を読み込んでいます',
+			'common.mainContent.loading' => 'DDAgent を読み込んでいます',
 			'common.mainContent.settingUpWorkspace' => 'ワークスペースを準備しています...',
 			'common.mainContent.chooseProject' => 'プロジェクトを選択',
 			_ => null,
@@ -8155,8 +8155,8 @@ extension on TranslationsJa {
 			'common.update.manualRestart' => '更新は適用されましたが、サーバーは自動で再起動しませんでした — 手動で再起動して完了してください。',
 			'common.update.failed' => '更新に失敗しました。',
 			'common.update.failedTitle' => '更新に失敗しました',
-			'common.update.appConfirm' => ({required Object version}) => 'この端末に ddagent v${version} をインストールしますか？ 初回は Android が ddagent からのインストール許可を求めます。',
-			'common.update.appPermission' => 'ddagent に「提供元不明のアプリ」のインストールを許可してから、もう一度「更新」をタップしてください。',
+			'common.update.appConfirm' => ({required Object version}) => 'この端末に DDAgent v${version} をインストールしますか？ 初回は Android が DDAgent からのインストール許可を求めます。',
+			'common.update.appPermission' => 'DDAgent に「提供元不明のアプリ」のインストールを許可してから、もう一度「更新」をタップしてください。',
 			'common.update.chooseTitle' => 'アップデートがあります',
 			'common.update.targetApp' => 'このアプリ',
 			'common.update.targetWeb' => 'Web インターフェイス',
@@ -8179,9 +8179,9 @@ extension on TranslationsJa {
 			'settings.changelog.current' => '現在',
 			'settings.changelog.kNew' => '新規',
 			'settings.server.title' => 'サーバー',
-			'settings.server.description' => 'ddagent プロセスを再起動します — 更新後や応答しない状態からの回復に便利です。',
+			'settings.server.description' => 'DDAgent プロセスを再起動します — 更新後や応答しない状態からの回復に便利です。',
 			'settings.server.restart' => '再起動',
-			'settings.server.restartConfirm' => 'ddagent サーバーを再起動しますか?アクティブなセッションは中断されます。',
+			'settings.server.restartConfirm' => 'DDAgent サーバーを再起動しますか?アクティブなセッションは中断されます。',
 			'settings.server.restarting' => '再起動中… サーバーが戻り次第、ページを再読み込みします。',
 			'settings.server.restartFailed' => '再起動に失敗しました',
 			'settings.server.unsupported' => '再起動は、サーバーがサービスマネージャー管理下で動作している場合のみ利用できます。',
@@ -8197,8 +8197,8 @@ extension on TranslationsJa {
 			'settings.updates.check' => '更新を確認',
 			'settings.updates.checking' => '確認中…',
 			'settings.updates.upToDate' => ({required Object version}) => '最新バージョンです（v${version}）。',
-			'settings.updates.available' => ({required Object version}) => '更新 v${version} が見つかりました — バックグラウンドでダウンロード中。ddagent 終了時にインストールされます。',
-			'settings.updates.downloaded' => ({required Object version}) => '更新 v${version} をダウンロードしました — ddagent を終了して再起動するとインストールされます。',
+			'settings.updates.available' => ({required Object version}) => '更新 v${version} が見つかりました — バックグラウンドでダウンロード中。DDAgent 終了時にインストールされます。',
+			'settings.updates.downloaded' => ({required Object version}) => '更新 v${version} をダウンロードしました — DDAgent を終了して再起動するとインストールされます。',
 			'settings.updates.unavailable' => '更新チェックはパッケージ済みデスクトップビルドでのみ利用できます。',
 			'settings.updates.error' => ({required Object message}) => '更新チェックに失敗しました: ${message}',
 			'settings.updates.errorGeneric' => '更新チェックに失敗しました。',
@@ -8384,10 +8384,10 @@ extension on TranslationsJa {
 			'settings.notifications.webPush.loading' => '更新中...',
 			'settings.notifications.webPush.unsupported' => 'このブラウザではプッシュ通知がサポートされていません。',
 			'settings.notifications.webPush.denied' => 'プッシュ通知がブロックされています。ブラウザの設定で許可してください。',
-			'settings.notifications.webPush.iosHint' => 'iPhone/iPad では、ddagent をホーム画面に追加し（共有 → ホーム画面に追加）、そのインストール済みアプリで通知を有効にした後でのみ通知が機能します。',
+			'settings.notifications.webPush.iosHint' => 'iPhone/iPad では、DDAgent をホーム画面に追加し（共有 → ホーム画面に追加）、そのインストール済みアプリで通知を有効にした後でのみ通知が機能します。',
 			'settings.notifications.webPush.test' => 'テスト通知を送信',
 			'settings.notifications.webPush.testNoSubscription' => '登録済みデバイスがありません。先にスマホで「有効にする」をタップしてください。',
-			'settings.notifications.webPush.testSuccess' => ({required Object count}) => '${count} 台のデバイスに送信しました。スマホに表示されない場合は ddagent をホーム画面に追加してください（iOS の要件）。',
+			'settings.notifications.webPush.testSuccess' => ({required Object count}) => '${count} 台のデバイスに送信しました。スマホに表示されない場合は DDAgent をホーム画面に追加してください（iOS の要件）。',
 			'settings.notifications.webPush.testNotDelivered' => '到達可能なデバイスがありませんでした。アプリが実行中で、通知が有効になっていることを確認してください。',
 			'settings.notifications.device.title' => 'このデバイスに通知',
 			'settings.notifications.device.enabled' => 'このデバイスの通知が有効になっています',
@@ -8604,7 +8604,7 @@ extension on TranslationsJa {
 			'settings.mcpServers.help.title' => 'Codex MCPについて',
 			'settings.mcpServers.help.description' => 'Codexはstdioベースのツールサーバーをサポートしています。追加のツールやリソースでCodexの機能を拡張するサーバーを追加できます。',
 			'settings.mcpServers.managed.badge' => '管理対象',
-			'settings.mcpServers.managed.hint' => 'ddagent により管理。',
+			'settings.mcpServers.managed.hint' => 'DDAgent により管理。',
 			'settings.mcpServers.deleteConfirm.description' => ({required Object serverName}) => '「${serverName}」はプロバイダー設定から削除されます。',
 			'settings.mcpServers.deleteConfirm.title' => 'MCP サーバーを削除しますか？',
 			'settings.quota.settings.tab' => 'Control Center',
@@ -8667,10 +8667,10 @@ extension on TranslationsJa {
 			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => 'キャンセル',
 			'settings.workspaces.create' => 'ワークスペースを追加',
-			'settings.workspaces.deleteConfirm' => 'このワークスペースを ddagent から削除しますか？ファイルはディスクに残ります。',
+			'settings.workspaces.deleteConfirm' => 'このワークスペースを DDAgent から削除しますか？ファイルはディスクに残ります。',
 			'settings.workspaces.deleteFailed' => 'ワークスペースの削除に失敗しました。',
 			'settings.workspaces.deleteTitle' => 'ワークスペースを削除',
-			'settings.workspaces.description' => 'ワークスペースは、ddagent がチャット・コード実行・ブラウジングできるディレクトリです。',
+			'settings.workspaces.description' => 'ワークスペースは、DDAgent がチャット・コード実行・ブラウジングできるディレクトリです。',
 			'settings.workspaces.remove' => 'ワークスペースを削除',
 			'settings.workspaces.title' => 'ワークスペース',
 			'settings.workspaces.pathRequired' => 'パスは必須です',
@@ -8679,8 +8679,8 @@ extension on TranslationsJa {
 			'settings.about.learnMore' => '詳細を見る',
 			'settings.about.pro.syncSettings' => '設定を同期',
 			'settings.about.pro.teamManagement' => 'チーム管理',
-			'settings.about.proFeatures' => 'ddagent Pro の機能',
-			'settings.about.tryHosted' => 'ddagent Hosted を試す',
+			'settings.about.proFeatures' => 'DDAgent Pro の機能',
+			'settings.about.tryHosted' => 'DDAgent Hosted を試す',
 			'settings.about.versionInfo' => 'バージョン情報',
 			'settings.about.client' => 'アプリ',
 			'settings.about.server' => 'サーバー',
@@ -8706,7 +8706,7 @@ extension on TranslationsJa {
 			'sidebar.projects.noMatchingProjects' => '一致するプロジェクトがありません',
 			'sidebar.projects.tryDifferentSearch' => '検索語を変えてお試しください',
 			'sidebar.projects.runClaudeCli' => 'プロジェクトディレクトリでClaude CLIを実行して始めましょう',
-			'sidebar.app.title' => 'ddagent',
+			'sidebar.app.title' => 'DDAgent',
 			'sidebar.app.subtitle' => 'AIコーディングアシスタント',
 			'sidebar.sessions.title' => 'セッション',
 			'sidebar.sessions.newSession' => '新しいセッション',
@@ -8804,7 +8804,7 @@ extension on TranslationsJa {
 			'sidebar.version.updateAvailable' => 'アップデートあり',
 			'sidebar.version.restartRequired' => '更新が適用されていません。サーバーを再起動してください',
 			'sidebar.version.updateNow' => '今すぐ更新',
-			'sidebar.version.updateConfirm' => ({required Object version}) => 'ddagent を v${version} に更新しますか？最新コードの取得とビルド後、サーバーが再起動します — 実行中のセッションは中断されます。',
+			'sidebar.version.updateConfirm' => ({required Object version}) => 'DDAgent を v${version} に更新しますか？最新コードの取得とビルド後、サーバーが再起動します — 実行中のセッションは中断されます。',
 			'sidebar.version.updating' => '更新中… 数分かかることがあります',
 			'sidebar.version.restarting' => '更新をインストールしました — 再起動中…',
 			'sidebar.version.updateFailed' => '更新に失敗しました',
@@ -9183,11 +9183,11 @@ extension on TranslationsJa {
 			'knowledge.graph.truncated' => '省略',
 			'knowledge.importAll.action' => 'すべてをインポート',
 			'knowledge.importAll.mergeDuplicates' => '重複エントリを統合',
-			'knowledge.importAll.mergeDuplicatesHint' => 'ddagent 内の重複行を統合します（ファイルではありません）',
+			'knowledge.importAll.mergeDuplicatesHint' => 'DDAgent 内の重複行を統合します（ファイルではありません）',
 			'knowledge.importAll.projectsScanned' => ({required Object count}) => 'スキャンしたプロジェクト: ${count}',
 			'knowledge.importAll.rulesSummary' => ({required Object total, required Object duplicates}) => 'ルール: ${total} · 重複グループ: ${duplicates}',
 			'knowledge.importAll.skillsFound' => ({required Object found, required Object newSkills}) => '見つかったエージェントスキル: ${found} (新規: ${newSkills})',
-			'knowledge.importAll.title' => 'すべてを ddagent にインポート',
+			'knowledge.importAll.title' => 'すべてを DDAgent にインポート',
 			'knowledge.importSkills.found' => ({required Object count}) => 'エージェント全体で ${count} 件のスキルが見つかりました。',
 			'knowledge.importSkills.summary' => ({required Object imported, required Object skipped}) => '新規: ${imported} · スキップ: ${skipped}',
 			'knowledge.importSkills.title' => 'エージェントスキルをインポート',
@@ -9276,15 +9276,15 @@ extension on TranslationsJa {
 			'mcp.form.validation.unsupportedGlobal' => ({required Object type}) => 'MCPサーバーの追加は、すべてのプロバイダーで stdio と http のみをサポートし、${type} はサポートしません。',
 			'mcp.form.validation.unsupportedProvider' => ({required Object provider, required Object type}) => '${provider} は ${type} MCPサーバーをサポートしていません',
 			'mcp.install.button' => 'インストール',
-			'mcp.install.cardDescription' => 'MCP経由でエージェントにナレッジベースとddagentツールを提供します — エージェントを選択するか、すべてにインストールしてください。',
-			'mcp.install.description' => '選択したエージェントがMCP経由でddagentのナレッジベースとツールを使用できるようにします。',
+			'mcp.install.cardDescription' => 'MCP経由でエージェントにナレッジベースとDDAgentツールを提供します — エージェントを選択するか、すべてにインストールしてください。',
+			'mcp.install.description' => '選択したエージェントがMCP経由でDDAgentのナレッジベースとツールを使用できるようにします。',
 			'mcp.install.errorFallback' => 'エラー',
 			'mcp.install.failed' => ({required Object error}) => 'インストールに失敗しました: ${error}',
 			'mcp.install.installForAll' => 'すべてにインストール',
 			'mcp.install.installSelected' => '選択項目にインストール',
 			'mcp.install.installedCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ja'))(count, one: '${count} 個のエージェントにインストールしました。', other: '${count} 個のエージェントにインストールしました。', ), 
 			'mcp.install.partialFailure' => ({required Object count, required Object failed}) => '${count} 個にインストールしました。失敗: ${failed}',
-			'mcp.install.title' => 'ddagent MCPサーバーをインストール',
+			'mcp.install.title' => 'DDAgent MCPサーバーをインストール',
 			'mcp.servers.addGlobalDescription' => 'このMCPサーバーをすべてのプロバイダー（Claude、Cursor、Codex、OpenCode、Devin）に追加します。同じ設定をすべてのプロバイダーで機能させる必要があるため、stdio と HTTP トランスポートのみがサポートされます。',
 			'mcp.servers.addGlobalMenuDescription' => 'グローバルMCPサーバーの追加は、共通の stdio または HTTP サーバーを Claude、Cursor、Codex、OpenCode、Devin に書き込みます。',
 			'mcp.servers.addGlobalTitle' => 'グローバルMCPサーバーを追加',
@@ -9295,7 +9295,7 @@ extension on TranslationsJa {
 			'mcp.servers.descriptionGeneric' => ({required Object provider}) => 'Model Context Protocolサーバーは ${provider} に追加のツールとデータソースを提供します',
 			'mcp.servers.loading' => 'MCPサーバーを読み込み中...',
 			'mcp.servers.refreshingScopes' => 'プロジェクトスコープを更新中...',
-			'mcp.team.cta' => 'ddagent Pro で利用できます',
+			'mcp.team.cta' => 'DDAgent Pro で利用できます',
 			'mcp.team.description' => 'MCPサーバー設定をチーム全体で共有します。全員が自動的に同期されます。',
 			'mcp.team.title' => 'チームMCP設定',
 			'mcp.tokens.scopeWrite' => '書き込み',
@@ -9376,7 +9376,7 @@ extension on TranslationsJa {
 			'scheduler.runs' => '実行回数',
 			'scheduler.session' => ({required Object id}) => 'セッション ${id}',
 			'scheduler.worktree' => 'worktree',
-			'notifications.deviceLabel' => 'ddagent Flutter',
+			'notifications.deviceLabel' => 'DDAgent Flutter',
 			'notifications.errors.noResponse' => 'サーバーから応答がありません',
 			'notifications.errors.registrationRejected' => 'サーバーに登録を拒否されました',
 			'serverConnect.connect' => '接続',
@@ -9385,7 +9385,7 @@ extension on TranslationsJa {
 			'serverConnect.connectionFailed' => ({required Object error}) => '接続に失敗しました (${error})',
 			'serverConnect.enterUrl' => 'サーバーのURLを入力',
 			'serverConnect.local.title' => 'このデバイス',
-			'serverConnect.local.subtitle' => 'このマシンでddagentサーバーを実行します',
+			'serverConnect.local.subtitle' => 'このマシンでDDAgentサーバーを実行します',
 			'serverConnect.local.install' => 'ローカルサーバーをインストール',
 			'serverConnect.local.start' => 'ローカルサーバーを起動',
 			'serverConnect.local.stop' => '停止',
@@ -9397,7 +9397,7 @@ extension on TranslationsJa {
 			'serverConnect.local.connect' => 'このサーバーを使用',
 			'serverConnect.local.error' => ({required Object error}) => 'ローカルサーバーエラー: ${error}',
 			'serverConnect.local.or' => 'またはリモートサーバーに接続',
-			'serverConnect.subtitle' => 'ddagent サーバーに接続',
+			'serverConnect.subtitle' => 'DDAgent サーバーに接続',
 			'voice.apiKeySaved' => 'APIキー（保存済み、変更するには入力）',
 			'voice.preview' => 'プレビュー',
 			'voice.saveFailed' => 'STT設定の保存に失敗しました',
@@ -9517,14 +9517,14 @@ extension on TranslationsJa {
 			'onboarding.completeSetup' => 'セットアップを完了',
 			'onboarding.errors.invalidEmail' => '有効なメールアドレスを入力してください。',
 			'onboarding.errors.nameAndEmailRequired' => 'git の名前とメールアドレスの両方が必要です。',
-			'onboarding.gitHint' => 'ddagent セッションで作成されるコミットに使用されます。',
-			'onboarding.mcp.description' => 'ddagent MCPサーバーをインストールすると、エージェントがナレッジベースとddagentツールを使用できるようになります。エージェントを選択するか、すべてにインストールしてください。',
+			'onboarding.gitHint' => 'DDAgent セッションで作成されるコミットに使用されます。',
+			'onboarding.mcp.description' => 'DDAgent MCPサーバーをインストールすると、エージェントがナレッジベースとDDAgentツールを使用できるようになります。エージェントを選択するか、すべてにインストールしてください。',
 			'onboarding.mcp.installForAll' => 'すべてにインストール',
 			'onboarding.mcp.installSelected' => '選択項目にインストール',
 			'onboarding.mcp.installedOn' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ja'))(count, one: '${count} 個のエージェントにインストールしました。', other: '${count} 個のエージェントにインストールしました。', ), 
 			'onboarding.mcp.installedWithFailures' => ({required Object installedCount, required Object failed}) => '${installedCount} 個にインストールしました。失敗: ${failed}',
 			'onboarding.mcp.laterHint' => '任意 — 後で設定 → MCP からインストールすることもできます。',
-			'onboarding.mcp.title' => 'エージェントを ddagent に接続',
+			'onboarding.mcp.title' => 'エージェントを DDAgent に接続',
 			'fileTree.browseServerFilesystem' => 'サーバーのファイルシステムを参照',
 			'fileTree.chooseFolder' => 'フォルダを選択',
 			'fileTree.copyContents' => '内容をコピー',

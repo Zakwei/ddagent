@@ -1,6 +1,6 @@
 <div align="center">
-  <img src="public/logo.svg" alt="ddagent" width="72" height="72">
-  <h1>ddagent</h1>
+  <img src="public/logo.svg" alt="DDAgent" width="72" height="72">
+  <h1>DDAgent</h1>
   <p><strong>One UI for all your AI coding agents.</strong><br>
   Self-hosted server and Flutter client (web, Linux, Windows &amp; Android) for Claude Code, Codex, Cursor CLI, OpenCode, Devin, Command Code and Antigravity — sessions, files, git, terminals and tasks in a single place.</p>
 
@@ -34,8 +34,8 @@
 </div>
 
 <p align="center">
-  <img src="public/screenshots/desktop-main.png" alt="ddagent chat view" width="78%">&nbsp;
-  <img src="public/screenshots/mobile-chat.png" alt="ddagent mobile view" width="20%">
+  <img src="public/screenshots/desktop-main.png" alt="DDAgent chat view" width="78%">&nbsp;
+  <img src="public/screenshots/mobile-chat.png" alt="DDAgent mobile view" width="20%">
 </p>
 
 <table>
@@ -53,9 +53,9 @@
 
 ---
 
-## What is ddagent?
+## What is DDAgent?
 
-ddagent runs on your own machine or VPS and puts one polished UI on top of the coding agents you already use. The server reads each agent's sessions straight from its own on-disk history (`~/.claude`, `~/.codex`, `~/.cursor`, OpenCode, Devin, …), so existing conversations show up without importing anything. Only session metadata is indexed locally; nothing is sent to a third party.
+DDAgent runs on your own machine or VPS and puts one polished UI on top of the coding agents you already use. The server reads each agent's sessions straight from its own on-disk history (`~/.claude`, `~/.codex`, `~/.cursor`, OpenCode, Devin, …), so existing conversations show up without importing anything. Only session metadata is indexed locally; nothing is sent to a third party.
 
 Connect from the Flutter client on your desktop, phone or browser. Your machine, your agents, your data.
 
@@ -100,11 +100,11 @@ Connect from the Flutter client on your desktop, phone or browser. Your machine,
 | **Command Code** | `command-code acp` (Agent Client Protocol); transcripts from `~/.commandcode` |
 | **Antigravity** | `agy` CLI in headless mode; conversations indexed from `~/.gemini/antigravity-cli` |
 
-The agent CLIs must be installed and signed in on the server machine. You bring your own subscriptions — ddagent provides the environment, not the AI.
+The agent CLIs must be installed and signed in on the server machine. You bring your own subscriptions — DDAgent provides the environment, not the AI.
 
 ## Install
 
-ddagent has two parts: the **server**, which runs next to your agents and exposes a REST/WebSocket API, and the **client**, which connects to it. The server needs **Node.js 22+** (the prebuilt tarballs need Node.js 22.x, because their native modules are built against it).
+DDAgent has two parts: the **server**, which runs next to your agents and exposes a REST/WebSocket API, and the **client**, which connects to it. The server needs **Node.js 22+** (the prebuilt tarballs need Node.js 22.x, because their native modules are built against it).
 
 ### Server — installer script
 
@@ -192,7 +192,7 @@ npm run build && node dist-server/server/index.js   # API on http://localhost:30
 ddagent sandbox ~/my-project
 ```
 
-Runs ddagent and an agent (Claude Code or Codex) inside a microVM-isolated Docker Sandbox. Requires the `sbx` CLI — see [docker/README.md](docker/README.md).
+Runs DDAgent and an agent (Claude Code or Codex) inside a microVM-isolated Docker Sandbox. Requires the `sbx` CLI — see [docker/README.md](docker/README.md).
 
 ## CLI
 

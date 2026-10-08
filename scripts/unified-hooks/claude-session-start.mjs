@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Unified SessionStart hook for Claude Code (`node <this-script>`).
 //
-// Managed by the ddagent unified module (`POST /api/unified/context/install-
+// Managed by the DDAgent unified module (`POST /api/unified/context/install-
 // claude-hook`); do not edit the installed settings.json entry by hand, edit
 // this file. Runs at session start with the session context on stdin.
 //
@@ -80,7 +80,7 @@ try {
   process.stdout.write(JSON.stringify({
     additionalContext: [
       '<unified-context-prune>',
-      'Stale transcript below was pruned by ddagent: repeated identical errors collapsed, superseded tool results dropped.',
+      'Stale transcript below was pruned by DDAgent: repeated identical errors collapsed, superseded tool results dropped.',
       'Do not paste these outputs back into the conversation; summarize briefly and re-read from disk when needed.',
       summary,
       '</unified-context-prune>',

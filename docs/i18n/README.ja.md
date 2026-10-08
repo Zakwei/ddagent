@@ -1,6 +1,6 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/logo.svg" alt="ddagent" width="72" height="72">
-  <h1>ddagent</h1>
+  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/logo.svg" alt="DDAgent" width="72" height="72">
+  <h1>DDAgent</h1>
   <p><strong>すべての AI コーディングエージェントをひとつの UI で。</strong><br>
   Claude Code、Codex、Cursor CLI、OpenCode、Devin、Command Code、Antigravity のためのセルフホスト型サーバーと Flutter クライアント（Web、Linux、Windows &amp; Android）— セッション、ファイル、git、ターミナル、タスクをひとつの場所に。</p>
 
@@ -34,8 +34,8 @@
 </div>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/desktop-main.png" alt="ddagent チャット画面" width="78%">&nbsp;
-  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/mobile-chat.png" alt="ddagent モバイル画面" width="20%">
+  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/desktop-main.png" alt="DDAgent チャット画面" width="78%">&nbsp;
+  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/mobile-chat.png" alt="DDAgent モバイル画面" width="20%">
 </p>
 
 <table>
@@ -53,9 +53,9 @@
 
 ---
 
-## ddagent とは？
+## DDAgent とは？
 
-ddagent はあなた自身のマシンや VPS 上で動作し、すでに使っているコーディングエージェントの上に洗練されたひとつの UI を提供します。サーバーは各エージェントのセッションを、それぞれのディスク上の履歴（`~/.claude`、`~/.codex`、`~/.cursor`、OpenCode、Devin など）から直接読み込むため、既存の会話は何もインポートせずにそのまま表示されます。ローカルにインデックスされるのはセッションのメタデータだけで、第三者には何も送信されません。
+DDAgent はあなた自身のマシンや VPS 上で動作し、すでに使っているコーディングエージェントの上に洗練されたひとつの UI を提供します。サーバーは各エージェントのセッションを、それぞれのディスク上の履歴（`~/.claude`、`~/.codex`、`~/.cursor`、OpenCode、Devin など）から直接読み込むため、既存の会話は何もインポートせずにそのまま表示されます。ローカルにインデックスされるのはセッションのメタデータだけで、第三者には何も送信されません。
 
 デスクトップ、スマートフォン、ブラウザの Flutter クライアントから接続できます。あなたのマシン、あなたのエージェント、あなたのデータ。
 
@@ -100,11 +100,11 @@ ddagent はあなた自身のマシンや VPS 上で動作し、すでに使っ�
 | **Command Code** | `command-code acp`（Agent Client Protocol）。`~/.commandcode` のトランスクリプト |
 | **Antigravity** | ヘッドレスモードの `agy` CLI。`~/.gemini/antigravity-cli` からインデックスした会話 |
 
-エージェントの CLI は、サーバーマシンにインストールしてサインインしておく必要があります。サブスクリプションはご自身のものを使います — ddagent が提供するのは環境であり、AI ではありません。
+エージェントの CLI は、サーバーマシンにインストールしてサインインしておく必要があります。サブスクリプションはご自身のものを使います — DDAgent が提供するのは環境であり、AI ではありません。
 
 ## インストール
 
-ddagent は 2 つの部分で構成されます。エージェントと同じマシンで動作し REST/WebSocket API を公開する**サーバー**と、そこに接続する**クライアント**です。サーバーには **Node.js 22+** が必要です（ビルド済み tarball はネイティブモジュールが Node.js 22.x 向けにビルドされているため、Node.js 22.x が必要です）。
+DDAgent は 2 つの部分で構成されます。エージェントと同じマシンで動作し REST/WebSocket API を公開する**サーバー**と、そこに接続する**クライアント**です。サーバーには **Node.js 22+** が必要です（ビルド済み tarball はネイティブモジュールが Node.js 22.x 向けにビルドされているため、Node.js 22.x が必要です）。
 
 ### サーバー — インストーラースクリプト
 
@@ -192,7 +192,7 @@ npm run build && node dist-server/server/index.js   # API on http://localhost:30
 ddagent sandbox ~/my-project
 ```
 
-microVM で分離された Docker Sandbox 内で ddagent とエージェント（Claude Code または Codex）を実行します。`sbx` CLI が必要です — [docker/README.md](https://github.com/Zakwei/ddagent/blob/main/docker/README.md) を参照してください。
+microVM で分離された Docker Sandbox 内で DDAgent とエージェント（Claude Code または Codex）を実行します。`sbx` CLI が必要です — [docker/README.md](https://github.com/Zakwei/ddagent/blob/main/docker/README.md) を参照してください。
 
 ## CLI
 

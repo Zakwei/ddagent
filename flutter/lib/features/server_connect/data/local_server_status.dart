@@ -1,4 +1,4 @@
-/// Lifecycle of the self-hosted ddagent server running on this device.
+/// Lifecycle of the self-hosted DDAgent server running on this device.
 ///
 /// dart:io-free — shared between the real (io) service implementation and
 /// the web/mobile stub so widgets can import the status types on every

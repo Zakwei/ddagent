@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# ddagent self-hosted server installer.
+# DDAgent self-hosted server installer.
 #
 # Clones a release tag of this repository, installs dependencies, builds the
 # backend, and leaves a runnable server:
 #
 #   <dir>/start.sh                      (node dist-server/server/index.js)
 #
-# The server serves the REST/WS API that the ddagent client connects to remotely.
+# The server serves the REST/WS API that the DDAgent client connects to remotely.
 #
 # Usage:
 #   ./install.sh [--version vX.Y.Z] [--dir <path>] [--systemd] [--port <port>]
@@ -53,7 +53,7 @@ if [ "$VERSION" = "latest" ]; then
   VERSION="$(git ls-remote --tags --sort=-v:refname "$REPO_URL" 'v*' | grep -v '\^{}' | head -n1 | sed 's|.*refs/tags/||')"
   [ -n "$VERSION" ] || { echo "error: could not resolve latest release tag" >&2; exit 1; }
 fi
-echo ">> Installing ddagent server $VERSION into $INSTALL_DIR"
+echo ">> Installing DDAgent server $VERSION into $INSTALL_DIR"
 
 if [ -d "$INSTALL_DIR/.git" ]; then
   git -C "$INSTALL_DIR" fetch --depth 1 origin "refs/tags/$VERSION:refs/tags/$VERSION" 2>/dev/null \
@@ -93,7 +93,7 @@ if [ "$USE_SYSTEMD" = "1" ]; then
   mkdir -p "$UNIT_DIR"
   cat > "$UNIT_DIR/ddagent.service" <<EOF
 [Unit]
-Description=ddagent server
+Description=DDAgent server
 After=network-online.target
 
 [Service]
@@ -113,7 +113,7 @@ fi
 
 cat <<EOF
 
-ddagent server $VERSION installed in $INSTALL_DIR
+DDAgent server $VERSION installed in $INSTALL_DIR
 
   Start:      $INSTALL_DIR/start.sh
   Port:       SERVER_PORT=$SERVER_PORT $INSTALL_DIR/start.sh

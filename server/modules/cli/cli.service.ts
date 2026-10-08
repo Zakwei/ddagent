@@ -84,7 +84,7 @@ function showStatus(dependencies: CliServiceDependencies): void {
   const claudeProjectsPath = path.join(dependencies.homeDirectory, '.claude', 'projects');
   const environmentFilePath = path.join(dependencies.applicationRoot, '.env');
 
-  output.log(`\n${terminalTextStyles.bright('ddagent UI - Status')}\n`);
+  output.log(`\n${terminalTextStyles.bright('DDAgent UI - Status')}\n`);
   output.log(terminalTextStyles.dim('═'.repeat(60)));
   output.log(`\n${terminalTextStyles.info('[INFO]')} Version: ${terminalTextStyles.bright(dependencies.packageMetadata.version)}`);
   output.log(`\n${terminalTextStyles.info('[INFO]')} Installation Directory:`);
@@ -127,7 +127,7 @@ function showStatus(dependencies: CliServiceDependencies): void {
 function showHelp(dependencies: CliServiceDependencies): void {
   dependencies.output.log(`
 ╔═══════════════════════════════════════════════════════════════╗
-║              ddagent - Command Line Tool               ║
+║              DDAgent - Command Line Tool               ║
 ╚═══════════════════════════════════════════════════════════════╝
 
 Usage:
@@ -135,7 +135,7 @@ Usage:
   ddagent [command] [options]
 
 Commands:
-  start            Start the ddagent server (default)
+  start            Start the DDAgent server (default)
   sandbox          Manage Docker sandbox environments
   browser-use-mcp  Run Browser MCP stdio server
   status           Show configuration and data locations
@@ -208,7 +208,7 @@ export function createCliService(dependencies: CliServiceDependencies): CliAppli
     try {
       dependencies.output.log(`${terminalTextStyles.info('[INFO]')} Updating ${dependencies.packageMetadata.version}...`);
       dependencies.updateGlobalPackage();
-      dependencies.output.log(`${terminalTextStyles.ok('[OK]')} Update complete! Restart ddagent to use the new version.`);
+      dependencies.output.log(`${terminalTextStyles.ok('[OK]')} Update complete! Restart DDAgent to use the new version.`);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       dependencies.output.error(`${terminalTextStyles.error('[ERROR]')} Update failed: ${message}`);

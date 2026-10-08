@@ -21,14 +21,14 @@ const PROVIDER = 'antigravity' as const;
 /**
  * Antigravity persists conversation steps as protobuf blobs inside
  * per-conversation SQLite stores (`~/.gemini/antigravity-cli/conversations`),
- * which ddagent cannot decode directly. The antigravity runtime therefore
+ * which DDAgent cannot decode directly. The antigravity runtime therefore
  * mirrors every streamed turn into `<workspace>/.ddagent/antigravity/
  * <conversation-id>.jsonl` in Command Code's v3 transcript shape — a
  * `type:"session"` header plus `type:"message"` entries whose `content`
  * blocks hold `text`/`thinking`/`tool_use`/`tool_result` — and this provider
  * reads that mirror. Sessions created natively in `agy` show their title and
  * workspace through the synchronizer but expose an empty history until they
- * are resumed through ddagent (which starts mirroring from that turn on).
+ * are resumed through DDAgent (which starts mirroring from that turn on).
  */
 
 /** Resolves the on-disk mirror transcript for one provider-native session id. */
@@ -99,7 +99,7 @@ function extractToolResultContent(content: unknown): string {
 }
 
 /**
- * Normalizes one mirror-transcript `message` entry into ddagent messages. A
+ * Normalizes one mirror-transcript `message` entry into DDAgent messages. A
  * single entry can expand into several normalized rows (text + thinking +
  * tool_use + tool_result all live in the same `content` array).
  */

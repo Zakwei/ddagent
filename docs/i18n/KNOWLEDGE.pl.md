@@ -15,9 +15,9 @@
   <a href="KNOWLEDGE.zh-TW.md">繁體中文</a>
 </p>
 
-ddagent dostarcza **lokalną bazę wiedzy** dla Twoich agentów: wspomnienia, reguły,
+DDAgent dostarcza **lokalną bazę wiedzy** dla Twoich agentów: wspomnienia, reguły,
 skille i informacje osobiste, a także tagi i relacje. Mieszka w tej samej bazie
-SQLite co reszta ddagent (`auth.db`), za indeksem pełnotekstowym FTS5, jest
+SQLite co reszta DDAgent (`auth.db`), za indeksem pełnotekstowym FTS5, jest
 zarządzana z ekranu **Knowledge** w kliencie i może być odczytywana oraz zapisywana
 przez Twoich agentów przez MCP. Jest luźno inspirowana
 [Contexta](https://github.com/XFABISIEK/Contexta).
@@ -34,13 +34,13 @@ Są trzy warstwy i warto wiedzieć, która jest która:
 - **Pliki natywne CLI** — każde narzędzie czyta własną konfigurację po swojemu: Claude
   Code czyta `CLAUDE.md`, Codex/Cursor czytają `AGENTS.md`, Cursor czyta `.cursorrules`,
   a kilka czyta `skills/` i `.agents/skills/`. To zadanie CLI, nie
-  wybór modelu — ddagent tego nie wyłącza.
-- **Prefiks pierwszej tury ddagent** — przy pierwszej wiadomości sesji ddagent
+  wybór modelu — DDAgent tego nie wyłącza.
+- **Prefiks pierwszej tury DDAgent** — przy pierwszej wiadomości sesji DDAgent
   dokleja na początku projektowy `.ddagent/shared-context.md` oraz blok
   `<unified-rules>` (workspace’owy `AGENTS.md`, `~/.agents/AGENTS.md` i krótką
   notkę o higienie; ustaw `DDAGENT_UNIFIED_RULES=0`, aby go pominąć). Ta warstwa
   opiera się na plikach i jest niezależna od bazy wiedzy.
-- **Pobieranie przez MCP (na żądanie)** — gdy zainstalujesz serwer MCP ddagent w
+- **Pobieranie przez MCP (na żądanie)** — gdy zainstalujesz serwer MCP DDAgent w
   agencie, jego lista narzędzi zawiera `knowledge_get_context`, `knowledge_search`
   i podobne. Zgodnie z Contexta nic nie jest wstrzykiwane automatycznie: agent
   wywołuje konstruktor kontekstu z zapytaniem i dostaje z powrotem reguły
@@ -50,7 +50,7 @@ Są trzy warstwy i warto wiedzieć, która jest która:
 
 Czyli „jedno miejsce” oznacza **jedno miejsce do kuratorowania wiedzy**
 — nie zatrzymuje (i nie może zatrzymać) CLI czytającego własne natywne pliki.
-ddagent w ogóle nie wstrzykuje bazy wiedzy automatycznie do sesji.
+DDAgent w ogóle nie wstrzykuje bazy wiedzy automatycznie do sesji.
 
 ## Encje
 
@@ -96,7 +96,7 @@ rerank według `bm25 + priority + recency`.
 
 ## Narzędzia MCP (na żądanie)
 
-Serwer MCP ddagent (`POST /mcp`) udostępnia bazę wiedzy każdemu klientowi MCP.
+Serwer MCP DDAgent (`POST /mcp`) udostępnia bazę wiedzy każdemu klientowi MCP.
 Narzędzia czytające działają z tokenem o zakresie `read`; narzędzia zapisujące wymagają `write`.
 Narzędzia zapisujące uruchamiają tę samą walidację co UI i zapisują historię.
 
@@ -108,12 +108,12 @@ Zapis: `knowledge_add_memory`, `knowledge_update_memory`,
 `knowledge_delete_memory`, oraz to samo trio dla `rule`, `skill` i `personal`;
 plus `knowledge_link` / `knowledge_unlink`.
 
-Narzędzia przyjmują `projectId` albo `projectPath`, który ddagent już zna.
+Narzędzia przyjmują `projectId` albo `projectPath`, który DDAgent już zna.
 
 ### Instalowanie serwera w Twoich agentach
 
 Nie musisz ręcznie edytować konfiguracji providerów. Użyj **Settings → Agents →
-(agent) → MCP → Install ddagent MCP server** (oferowane też jako krok w
+(agent) → MCP → Install DDAgent MCP server** (oferowane też jako krok w
 onboardingu) i wybierz agentów — albo zainstaluj dla wszystkich. Zapisuje wpis
 HTTP MCP `ddagent` (zakres użytkownika) wskazujący na `<server>/mcp` z wielokrotnego
 użytku tokenem bearer `ddagent-mcp` o zakresie `write` (ponowna instalacja
@@ -167,8 +167,8 @@ Graf rysuje Twoje jawne połączenia oraz niejawne huby — każda encja w zasi�
 5. **Łącz powiązane wspomnienia**, żeby sąsiedzi 1 skoku jechali razem.
 6. **Zainstaluj MCP** dla agentów, które powinny przeszukiwać bazę i utrwalać
    naukę. Instalacja jednym kliknięciem używa tokenu `write`; dla agenta tylko do
-   odczytu utwórz token `read` w sekcji tokenów serwera MCP ddagent i skonfiguruj
-   tego agenta ręcznie (zobacz [ddagent jako serwer MCP](../mcp-server.md#manual-client-config)).
+   odczytu utwórz token `read` w sekcji tokenów serwera MCP DDAgent i skonfiguruj
+   tego agenta ręcznie (zobacz [DDAgent jako serwer MCP](../mcp-server.md#manual-client-config)).
 
 ## Migracja
 
@@ -178,13 +178,13 @@ znormalizowany tytuł + treść) i pokazuje liczby reguł. Stamtąd możesz **Me
 (scala je w jeden globalny wiersz) i/lub **Make all rules critical**. Nic nie
 jest zapisywane, dopóki nie potwierdzisz — destrukcyjne akcje są jawne.
 
-**Dashboard** ma również pojedynczy przycisk **Importuj wszystko do ddagent**: uruchamia skanowanie projektu i import skilli agentów w jednej akcji, z tym samym podglądem dry-run i opcjonalnymi przełącznikami scalania duplikatów / promowania. Odczytuje wyłącznie pliki Twoich agentów i zapisuje do własnej bazy danych ddagent — żaden plik ani konfiguracja CLI nie są dotykane (jedyną akcją, która zapisuje w konfiguracji agenta, jest osobne "Install ddagent MCP server").
+**Dashboard** ma również pojedynczy przycisk **Importuj wszystko do DDAgent**: uruchamia skanowanie projektu i import skilli agentów w jednej akcji, z tym samym podglądem dry-run i opcjonalnymi przełącznikami scalania duplikatów / promowania. Odczytuje wyłącznie pliki Twoich agentów i zapisuje do własnej bazy danych DDAgent — żaden plik ani konfiguracja CLI nie są dotykane (jedyną akcją, która zapisuje w konfiguracji agenta, jest osobne "Install DDAgent MCP server").
 
 To samo menu ma **Importuj skille agentów**: wyświetla globalne/domyślne skille, które Twoi agenci już dostarczają lub mają zainstalowane (zakres użytkownika / systemu / wtyczki) i importuje brakujące do bazy wiedzy jako skille. Najpierw jest to dry-run i jest idempotentne — nazwa, która już istnieje, jest pomijana. Skille o zasięgu projektu są natomiast importowane przez skanowanie projektu.
 
 ## Warto wiedzieć
 
-- Wszystko jest **lokalne** dla tej instancji ddagent; brak chmury, brak synchronizacji.
+- Wszystko jest **lokalne** dla tej instancji DDAgent; brak chmury, brak synchronizacji.
 - Baza wiedzy **nie jest wstrzykiwana automatycznie** — agenci pobierają ją przez
   MCP na żądanie (model Contexta). Agenci bez zainstalowanego serwera MCP nie
   dostają z niej nic.
@@ -224,5 +224,5 @@ do id projektu zwraca wiersze projektu plus globalne.
 
 ## Powiązane
 
-- [ddagent jako serwer MCP](../mcp-server.md) — katalog narzędzi i konfiguracja tokenu
+- [DDAgent jako serwer MCP](../mcp-server.md) — katalog narzędzi i konfiguracja tokenu
 - [Współpraca zespołowa](../teams.md) · [Zdalne zatwierdzanie](../remote-approvals.md)

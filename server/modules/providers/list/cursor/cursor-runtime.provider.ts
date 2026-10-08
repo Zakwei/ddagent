@@ -174,7 +174,7 @@ export async function spawnCursor(command: string, options: AnyRecord = {}, ws: 
       baseArgs.push('--output-format', 'stream-json');
     }
 
-    // Map ddagent permission modes onto cursor-agent flags: bypass forces
+    // Map DDAgent permission modes onto cursor-agent flags: bypass forces
     // every command (`-f`), plan starts the read-only `--mode plan`; default
     // and acceptEdits keep print mode's own behaviour (edits allowed, shell
     // commands gated by the CLI's allowlist).

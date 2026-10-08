@@ -20,7 +20,7 @@ class AppUpdateInstaller {
   AppUpdateInstaller({Dio? dio}) : _dio = dio ?? Dio();
 
   /// A plain Dio on purpose — the GitHub asset URL is public and must never
-  /// carry the ddagent server's auth headers.
+  /// carry the DDAgent server's auth headers.
   final Dio _dio;
 
   static const _channel = MethodChannel('ddagent/app_update');

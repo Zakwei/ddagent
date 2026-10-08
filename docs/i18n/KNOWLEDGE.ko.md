@@ -15,8 +15,8 @@
   <a href="KNOWLEDGE.zh-TW.md">繁體中文</a>
 </p>
 
-ddagent는 에이전트를 위한 **로컬 우선 지식 베이스**를 제공합니다: 메모리, 규칙,
-스킬, 개인 정보, 그리고 태그와 관계입니다. ddagent의 나머지와 같은
+DDAgent는 에이전트를 위한 **로컬 우선 지식 베이스**를 제공합니다: 메모리, 규칙,
+스킬, 개인 정보, 그리고 태그와 관계입니다. DDAgent의 나머지와 같은
 SQLite 데이터베이스(`auth.db`)에 FTS5 전체 텍스트 인덱스와 함께 존재하며,
 클라이언트의 **Knowledge** 화면에서 관리되고, 에이전트가 MCP를 통해 읽고
 쓸 수 있습니다. [Contexta](https://github.com/XFABISIEK/Contexta)에서
@@ -34,13 +34,13 @@ SQLite 데이터베이스(`auth.db`)에 FTS5 전체 텍스트 인덱스와 함�
 - **CLI 네이티브 파일** — 각 도구는 자체 설정을 스스로 읽습니다: Claude Code는
   `CLAUDE.md`를, Codex/Cursor는 `AGENTS.md`를, Cursor는 `.cursorrules`를 읽고,
   몇몇은 `skills/`와 `.agents/skills/`를 읽습니다. 이것은 CLI의 일이지
-  모델의 선택이 아닙니다 — ddagent는 이를 끄지 않습니다.
-- **ddagent의 첫 턴 접두사** — 세션의 첫 메시지에서 ddagent는 프로젝트의
+  모델의 선택이 아닙니다 — DDAgent는 이를 끄지 않습니다.
+- **DDAgent의 첫 턴 접두사** — 세션의 첫 메시지에서 DDAgent는 프로젝트의
   `.ddagent/shared-context.md`와 `<unified-rules>` 블록(워크스페이스 `AGENTS.md`,
   `~/.agents/AGENTS.md`, 짧은 위생 안내)을 앞에 붙입니다. 이를 빼려면
   `DDAGENT_UNIFIED_RULES=0`을 설정하세요. 이것은 파일 기반이며 지식 베이스와는
   별개입니다.
-- **MCP 검색(온디맨드)** — 에이전트에 ddagent의 MCP 서버를 설치하면 도구 목록에
+- **MCP 검색(온디맨드)** — 에이전트에 DDAgent의 MCP 서버를 설치하면 도구 목록에
   `knowledge_get_context`, `knowledge_search` 등이 포함됩니다. Contexta를 따라,
   자동으로 주입되는 것은 없습니다: 에이전트가 쿼리를 가지고 컨텍스트 빌더를
   호출하면 `critical` 규칙과 일치하는 내용을 돌려받습니다. 모델은 도구 설명과
@@ -48,7 +48,7 @@ SQLite 데이터베이스(`auth.db`)에 FTS5 전체 텍스트 인덱스와 함�
 
 따라서 "한 곳"이란 **지식을 관리하는 한 곳**을 의미합니다
 — CLI가 자체 네이티브 파일을 읽는 것을 막지 않으며(막을 수도 없습니다).
-ddagent는 지식 베이스를 세션에 자동 주입하지 않습니다.
+DDAgent는 지식 베이스를 세션에 자동 주입하지 않습니다.
 
 ## 엔티티
 
@@ -88,7 +88,7 @@ Markdown 블록으로 렌더링됩니다; 더 이상 들어가지 않는 항목�
 
 ## MCP 도구 (온디맨드)
 
-ddagent의 MCP 서버(`POST /mcp`)는 지식 베이스를 모든 MCP 클라이언트에 노출합니다.
+DDAgent의 MCP 서버(`POST /mcp`)는 지식 베이스를 모든 MCP 클라이언트에 노출합니다.
 읽기 도구는 `read` 범위 토큰으로 작동하고, 쓰기 도구는 `write`가 필요합니다. 쓰기
 도구는 UI와 동일한 검증을 실행하고 기록을 남깁니다.
 
@@ -100,12 +100,12 @@ ddagent의 MCP 서버(`POST /mcp`)는 지식 베이스를 모든 MCP 클라이�
 `knowledge_delete_memory`, 그리고 `rule`, `skill`, `personal`에 대한 동일한 3종 세트;
 추가로 `knowledge_link` / `knowledge_unlink`.
 
-도구는 `projectId` 또는 ddagent가 이미 아는 `projectPath`를 받습니다.
+도구는 `projectId` 또는 DDAgent가 이미 아는 `projectPath`를 받습니다.
 
 ### 에이전트에 서버 설치
 
 제공자 설정을 직접 편집할 필요가 없습니다. **Settings → Agents →
-(에이전트) → MCP → Install ddagent MCP server**(온보딩 단계로도 제공됨)를 사용하고
+(에이전트) → MCP → Install DDAgent MCP server**(온보딩 단계로도 제공됨)를 사용하고
 에이전트를 선택하세요 — 또는 모두에 설치하세요. `<server>/mcp`를 가리키는
 `ddagent` HTTP MCP 항목(사용자 범위)을 재사용 가능한 `write` 범위의 `ddagent-mcp` 베어러 토큰과 함께
 기록합니다(재설치하면 이전 토큰은 폐기됩니다). 설치 후 해당 에이전트의 도구에는
@@ -157,9 +157,9 @@ Graph 탭은 팬/줌, 노드 드래그, 엔티티 유형 필터, 이웃 하이�
 4. 프로젝트 간 선호(시간대, 편집기, 명명)에는 **개인 정보**를 사용하세요.
 5. **관련 메모리를 연결**하여 1홉 이웃이 함께 따라오게 하세요.
 6. 지식 베이스를 검색하고 배운 것을 영속화해야 하는 에이전트에 **MCP를 설치**하세요.
-   원클릭 설치는 `write` 토큰을 사용합니다. 읽기 전용 에이전트라면 ddagent MCP 서버
+   원클릭 설치는 `write` 토큰을 사용합니다. 읽기 전용 에이전트라면 DDAgent MCP 서버
    토큰에서 `read` 토큰을 만들고 해당 에이전트를 직접 설정하세요
-   ([MCP 서버로서의 ddagent](../mcp-server.md#manual-client-config) 참고).
+   ([MCP 서버로서의 DDAgent](../mcp-server.md#manual-client-config) 참고).
 
 ## 마이그레이션
 
@@ -169,13 +169,13 @@ Knowledge → 메뉴 → **Migrate existing rules**는 **dry-run** 보고서를 
 (하나의 전역 행으로 병합) 및/또는 **Make all rules critical**을 실행할 수 있습니다. 확인하기
 전에는 아무것도 기록되지 않습니다 — 파괴적 작업은 명시적입니다.
 
-**Dashboard**에는 **모든 것을 ddagent로 가져오기** 버튼도 하나 있습니다. 프로젝트 스캔과 에이전트 스킬 가져오기를 한 번의 작업으로 실행하며, 동일한 dry-run 미리보기와 선택적 중복 병합 / 승격 토글을 제공합니다. 에이전트의 파일을 읽기만 하고 ddagent 자체 데이터베이스에 기록합니다 — CLI 파일이나 설정은 전혀 건드리지 않습니다(에이전트 설정에 기록하는 유일한 작업은 별도의 "Install ddagent MCP server"입니다).
+**Dashboard**에는 **모든 것을 DDAgent로 가져오기** 버튼도 하나 있습니다. 프로젝트 스캔과 에이전트 스킬 가져오기를 한 번의 작업으로 실행하며, 동일한 dry-run 미리보기와 선택적 중복 병합 / 승격 토글을 제공합니다. 에이전트의 파일을 읽기만 하고 DDAgent 자체 데이터베이스에 기록합니다 — CLI 파일이나 설정은 전혀 건드리지 않습니다(에이전트 설정에 기록하는 유일한 작업은 별도의 "Install DDAgent MCP server"입니다).
 
 같은 메뉴에 **에이전트 스킬 가져오기**가 있습니다: 에이전트가 이미 함께 제공하거나 설치한 전역/기본 스킬(사용자 / 시스템 / 플러그인 범위)을 나열하고, 없는 스킬을 지식 베이스에 스킬로 가져옵니다. 먼저 dry-run이며 멱등합니다 — 이미 존재하는 이름은 건너뜁니다. 프로젝트 범위 스킬은 대신 프로젝트 스캔에서 가져옵니다.
 
 ## 알아 두면 좋은 것
 
-- 모든 것은 이 ddagent 인스턴스에 **로컬**입니다; 클라우드도, 동기화도 없습니다.
+- 모든 것은 이 DDAgent 인스턴스에 **로컬**입니다; 클라우드도, 동기화도 없습니다.
 - 지식 베이스는 **자동 주입되지 않습니다** — 에이전트가 MCP를 통해 온디맨드로
   가져옵니다(Contexta 모델). MCP 서버를 설치하지 않은 에이전트는 아무것도 받지
   못합니다.
@@ -215,5 +215,5 @@ POST   /import-all          { dryRun?, dedupe?, promoteRules? }
 
 ## 관련 항목
 
-- [MCP 서버로서의 ddagent](../mcp-server.md) — 도구 카탈로그와 토큰 설정
+- [MCP 서버로서의 DDAgent](../mcp-server.md) — 도구 카탈로그와 토큰 설정
 - [팀 협업](../teams.md) · [원격 승인](../remote-approvals.md)

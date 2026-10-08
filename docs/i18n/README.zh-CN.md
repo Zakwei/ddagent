@@ -1,6 +1,6 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/logo.svg" alt="ddagent" width="72" height="72">
-  <h1>ddagent</h1>
+  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/logo.svg" alt="DDAgent" width="72" height="72">
+  <h1>DDAgent</h1>
   <p><strong>一个 UI，管理你所有的 AI 编程智能体。</strong><br>
   为 Claude Code、Codex、Cursor CLI、OpenCode、Devin、Command Code 和 Antigravity 打造的自托管服务器与 Flutter 客户端（网页、Linux、Windows 与 Android）—— 会话、文件、git、终端和任务，尽在一处。</p>
 
@@ -34,8 +34,8 @@
 </div>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/desktop-main.png" alt="ddagent 聊天视图" width="78%">&nbsp;
-  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/mobile-chat.png" alt="ddagent 移动端视图" width="20%">
+  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/desktop-main.png" alt="DDAgent 聊天视图" width="78%">&nbsp;
+  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/mobile-chat.png" alt="DDAgent 移动端视图" width="20%">
 </p>
 
 <table>
@@ -53,9 +53,9 @@
 
 ---
 
-## ddagent 是什么？
+## DDAgent 是什么？
 
-ddagent 运行在你自己的机器或 VPS 上，为你已在使用的编程智能体提供一个精致统一的 UI。服务器直接从各智能体自己的磁盘历史记录（`~/.claude`、`~/.codex`、`~/.cursor`、OpenCode、Devin 等）读取会话，因此已有的对话无需任何导入即可显示。只有会话元数据会在本地建立索引，不会向任何第三方发送数据。
+DDAgent 运行在你自己的机器或 VPS 上，为你已在使用的编程智能体提供一个精致统一的 UI。服务器直接从各智能体自己的磁盘历史记录（`~/.claude`、`~/.codex`、`~/.cursor`、OpenCode、Devin 等）读取会话，因此已有的对话无需任何导入即可显示。只有会话元数据会在本地建立索引，不会向任何第三方发送数据。
 
 在桌面、手机或浏览器上通过 Flutter 客户端连接即可。你的机器，你的智能体，你的数据。
 
@@ -100,11 +100,11 @@ ddagent 运行在你自己的机器或 VPS 上，为你已在使用的编程智�
 | **Command Code** | `command-code acp`（Agent Client Protocol）；来自 `~/.commandcode` 的转录 |
 | **Antigravity** | 无头模式下的 `agy` CLI；从 `~/.gemini/antigravity-cli` 索引的对话 |
 
-各智能体 CLI 必须已在服务器所在机器上安装并登录。你需要自备订阅 —— ddagent 提供的是环境，而非 AI 本身。
+各智能体 CLI 必须已在服务器所在机器上安装并登录。你需要自备订阅 —— DDAgent 提供的是环境，而非 AI 本身。
 
 ## 安装
 
-ddagent 由两部分组成：**服务器**，与你的智能体运行在同一台机器上，提供 REST/WebSocket API；以及连接到服务器的**客户端**。服务器需要 **Node.js 22+**（预构建 tarball 需要 Node.js 22.x，因为其中的原生模块是针对该版本构建的）。
+DDAgent 由两部分组成：**服务器**，与你的智能体运行在同一台机器上，提供 REST/WebSocket API；以及连接到服务器的**客户端**。服务器需要 **Node.js 22+**（预构建 tarball 需要 Node.js 22.x，因为其中的原生模块是针对该版本构建的）。
 
 ### 服务器 —— 安装脚本
 
@@ -192,7 +192,7 @@ npm run build && node dist-server/server/index.js   # API on http://localhost:30
 ddagent sandbox ~/my-project
 ```
 
-在 microVM 隔离的 Docker Sandbox 中运行 ddagent 和一个智能体（Claude Code 或 Codex）。需要 `sbx` CLI —— 参见 [docker/README.md](https://github.com/Zakwei/ddagent/blob/main/docker/README.md)。
+在 microVM 隔离的 Docker Sandbox 中运行 DDAgent 和一个智能体（Claude Code 或 Codex）。需要 `sbx` CLI —— 参见 [docker/README.md](https://github.com/Zakwei/ddagent/blob/main/docker/README.md)。
 
 ## CLI
 

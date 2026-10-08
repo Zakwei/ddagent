@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-/// "Install ddagent MCP server" card — lets the user install ddagent's MCP
+/// "Install DDAgent MCP server" card — lets the user install DDAgent's MCP
 /// endpoint (pointing at `/mcp` with a bearer token) into one, several or all
 /// agent CLIs, so their tools gain the `knowledge_*` group.
 ///

@@ -15,9 +15,9 @@
   <a href="i18n/KNOWLEDGE.zh-TW.md">繁體中文</a>
 </p>
 
-ddagent ships a **local-first knowledge base** for your agents: memories, rules,
+DDAgent ships a **local-first knowledge base** for your agents: memories, rules,
 skills and personal information, plus tags and relations. It lives in the same
-SQLite database as the rest of ddagent (`auth.db`) behind an FTS5 full-text
+SQLite database as the rest of DDAgent (`auth.db`) behind an FTS5 full-text
 index, is managed from the **Knowledge** screen in the client, and is readable
 and writable by your agents over MCP. It is loosely inspired by
 [Contexta](https://github.com/XFABISIEK/Contexta).
@@ -34,13 +34,13 @@ There are three layers, and it helps to know which is which:
 - **CLI-native files** — each tool reads its own config on its own: Claude Code
   reads `CLAUDE.md`, Codex/Cursor read `AGENTS.md`, Cursor reads `.cursorrules`,
   and several read `skills/` and `.agents/skills/`. This is the CLI's job, not
-  the model's choice — ddagent does not turn it off.
-- **ddagent's first-turn prefix** — on a session's first message ddagent
+  the model's choice — DDAgent does not turn it off.
+- **DDAgent's first-turn prefix** — on a session's first message DDAgent
   prepends the project's `.ddagent/shared-context.md` and a `<unified-rules>`
   block (the workspace `AGENTS.md`, `~/.agents/AGENTS.md` and a short hygiene
   note; set `DDAGENT_UNIFIED_RULES=0` to drop it). This is file-based and
   separate from the knowledge base.
-- **MCP retrieval (on demand)** — once you install ddagent's MCP server into an
+- **MCP retrieval (on demand)** — once you install DDAgent's MCP server into an
   agent, its tool list includes `knowledge_get_context`, `knowledge_search` and
   friends. Following Contexta, nothing is injected automatically: the agent
   calls the context builder with a query and gets back the critical rules plus
@@ -48,7 +48,7 @@ There are three layers, and it helps to know which is which:
   descriptions and by any instruction rules you keep in the knowledge base.
 
 So "one place" means **one place to curate the knowledge** — it does not (and
-cannot) stop a CLI from reading its own native files. ddagent does not
+cannot) stop a CLI from reading its own native files. DDAgent does not
 auto-inject the knowledge base into sessions at all.
 
 ## Entities
@@ -93,7 +93,7 @@ typos and near-synonyms, then a rerank by `bm25 + priority + recency`.
 
 ## MCP tools (on demand)
 
-ddagent's MCP server (`POST /mcp`) exposes the knowledge base to any MCP client.
+DDAgent's MCP server (`POST /mcp`) exposes the knowledge base to any MCP client.
 Read tools work with a `read`-scoped token; write tools require `write`. Write
 tools run the same validation as the UI and record history.
 
@@ -105,12 +105,12 @@ Write: `knowledge_add_memory`, `knowledge_update_memory`,
 `knowledge_delete_memory`, and the same trio for `rule`, `skill` and `personal`;
 plus `knowledge_link` / `knowledge_unlink`.
 
-Tools accept either `projectId` or a `projectPath` ddagent already knows.
+Tools accept either `projectId` or a `projectPath` DDAgent already knows.
 
 ### Installing the server into your agents
 
 You do not have to edit provider configs by hand. Use **Settings → Agents →
-(agent) → MCP → Install ddagent MCP server** (also offered as a step in
+(agent) → MCP → Install DDAgent MCP server** (also offered as a step in
 onboarding) and pick the agents — or install for all. It writes a `ddagent` HTTP
 MCP entry (user scope) pointing at `<server>/mcp` with a reusable, write-scoped
 `ddagent-mcp` bearer token (reinstalling revokes the previous one). Once
@@ -167,8 +167,8 @@ structure.
 5. **Link related memories** so 1-hop neighbours ride along.
 6. **Install MCP** for the agents that should search the base and persist
    learnings. The one-click install uses a `write` token; for a read-only agent,
-   create a `read` token under ddagent MCP server tokens and configure that agent
-   by hand (see [ddagent as an MCP server](mcp-server.md#manual-client-config)).
+   create a `read` token under DDAgent MCP server tokens and configure that agent
+   by hand (see [DDAgent as an MCP server](mcp-server.md#manual-client-config)).
 
 ## Migration
 
@@ -178,12 +178,12 @@ title + content), and shows rule counts. From there you can **Merge duplicates**
 (collapses them into one global row) and/or **Make all rules critical**. Nothing
 is written until you confirm — destructive actions are explicit.
 
-The **Dashboard** also has a single **Import everything into ddagent** button:
+The **Dashboard** also has a single **Import everything into DDAgent** button:
 it runs the project scan and the agent-skill import in one action, with the same
 dry-run preview and optional duplicate-merge / promote toggles. It only reads
-your agents' files and writes to ddagent's own database — no CLI file or config
+your agents' files and writes to DDAgent's own database — no CLI file or config
 is touched (the only action that writes to an agent's config is the separate
-"Install ddagent MCP server").
+"Install DDAgent MCP server").
 
 The same menu has **Import agent skills**: it lists the global/default skills
 your agents already ship or have installed (user / system / plugin scopes) and
@@ -193,7 +193,7 @@ skills are imported by the project scan instead.
 
 ## Good to know
 
-- Everything is **local** to this ddagent instance; no cloud, no sync.
+- Everything is **local** to this DDAgent instance; no cloud, no sync.
 - The knowledge base is **not auto-injected** — agents retrieve it over MCP on
   demand (Contexta model). Agents without the MCP server installed get nothing
   from it.
@@ -233,5 +233,5 @@ to a project id returns the project plus global rows.
 
 ## Related
 
-- [ddagent as an MCP server](mcp-server.md) — the tool catalog and token setup
+- [DDAgent as an MCP server](mcp-server.md) — the tool catalog and token setup
 - [Team collaboration](teams.md) · [Remote approvals](remote-approvals.md)

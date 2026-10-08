@@ -1,6 +1,6 @@
 # 更新日志
 
-ddagent 的所有重要变更都记录在此。
+DDAgent 的所有重要变更都记录在此。
 
 格式遵循 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)，
 本项目遵循 [Semantic Versioning](https://semver.org/)。
@@ -169,7 +169,7 @@ ddagent 的所有重要变更都记录在此。
 
 ## [0.5.0] - 2026-09-21
 
-**ddagent** 的首个独立版本 — 面向 AI 编码代理的自托管 Web 和移动 UI。
+**DDAgent** 的首个独立版本 — 面向 AI 编码代理的自托管 Web 和移动 UI。
 
 ### 亮点
 

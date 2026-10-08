@@ -3,7 +3,7 @@
     "sessionExpired": "Votre session a expiré. Veuillez vous reconnecter.",
     "login": {
       "title": "Bon retour",
-      "description": "Connectez-vous à votre compte ddagent auto-hébergé",
+      "description": "Connectez-vous à votre compte DDAgent auto-hébergé",
       "username": "Nom d'utilisateur",
       "password": "Mot de passe",
       "submit": "Se connecter",
@@ -699,7 +699,7 @@
       "openInEditor": "Ouvrir dans l'éditeur"
     },
     "mainContent": {
-      "loading": "Chargement de ddagent",
+      "loading": "Chargement de DDAgent",
       "settingUpWorkspace": "Préparation de votre espace de travail...",
       "chooseProject": "Choisissez votre projet",
       "selectProjectDescription": "Sélectionnez un projet dans la barre latérale pour commencer à coder avec Claude. Chaque projet contient vos sessions de chat et l'historique des fichiers.",
@@ -1498,8 +1498,8 @@
       "manualRestart": "La mise à jour a été appliquée mais le serveur ne s'est pas redémarré tout seul — redémarrez-le manuellement pour terminer.",
       "failed": "Échec de la mise à jour.",
       "failedTitle": "Échec de la mise à jour",
-      "appConfirm": "Installer ddagent v{{version}} sur cet appareil ? Android demandera l'autorisation d'installer des applications depuis ddagent la première fois.",
-      "appPermission": "Autorisez « Installer des applications inconnues » pour ddagent, puis appuyez à nouveau sur Mettre à jour.",
+      "appConfirm": "Installer DDAgent v{{version}} sur cet appareil ? Android demandera l'autorisation d'installer des applications depuis DDAgent la première fois.",
+      "appPermission": "Autorisez « Installer des applications inconnues » pour DDAgent, puis appuyez à nouveau sur Mettre à jour.",
       "chooseTitle": "Mises à jour disponibles",
       "targetApp": "Cette application",
       "targetWeb": "Interface web",
@@ -1528,9 +1528,9 @@
     },
     "server": {
       "title": "Serveur",
-      "description": "Redémarre le processus ddagent — utile après une mise à jour ou en cas de blocage.",
+      "description": "Redémarre le processus DDAgent — utile après une mise à jour ou en cas de blocage.",
       "restart": "Redémarrer",
-      "restartConfirm": "Redémarrer le serveur ddagent ? Les sessions actives seront interrompues.",
+      "restartConfirm": "Redémarrer le serveur DDAgent ? Les sessions actives seront interrompues.",
       "restarting": "Redémarrage… la page se rechargera quand le serveur sera de retour.",
       "restartFailed": "Le redémarrage a échoué",
       "unsupported": "Le redémarrage n'est disponible que lorsque le serveur tourne sous le gestionnaire de services.",
@@ -1548,8 +1548,8 @@
       "check": "Rechercher des mises à jour",
       "checking": "Recherche…",
       "upToDate": "Vous avez la dernière version (v{{version}}).",
-      "available": "Mise à jour v{{version}} trouvée — téléchargement en arrière-plan ; elle s'installera à la fermeture de ddagent.",
-      "downloaded": "Mise à jour v{{version}} téléchargée — quittez et relancez ddagent pour l'installer.",
+      "available": "Mise à jour v{{version}} trouvée — téléchargement en arrière-plan ; elle s'installera à la fermeture de DDAgent.",
+      "downloaded": "Mise à jour v{{version}} téléchargée — quittez et relancez DDAgent pour l'installer.",
       "unavailable": "La recherche de mises à jour n'est disponible que dans les builds de bureau empaquetées.",
       "error": "Échec de la recherche de mises à jour : {{message}}",
       "errorGeneric": "Échec de la recherche de mises à jour.",
@@ -1792,10 +1792,10 @@
         "loading": "Mise à jour...",
         "unsupported": "Les notifications push ne sont pas prises en charge dans ce navigateur.",
         "denied": "Les notifications push sont bloquées. Veuillez les autoriser dans les paramètres de votre navigateur.",
-        "iosHint": "Sur iPhone/iPad, les notifications ne fonctionnent qu’après avoir ajouté ddagent à l’écran d’accueil (Partager → Ajouter à l’écran d’accueil) et les avoir activées depuis l’app installée.",
+        "iosHint": "Sur iPhone/iPad, les notifications ne fonctionnent qu’après avoir ajouté DDAgent à l’écran d’accueil (Partager → Ajouter à l’écran d’accueil) et les avoir activées depuis l’app installée.",
         "test": "Envoyer une notification de test",
         "testNoSubscription": "Aucun appareil n’est abonné. Touchez d’abord « Activer » sur le téléphone.",
-        "testSuccess": "Envoyé à {{count}} appareil(s). Si rien n’apparaît sur le téléphone, ajoutez ddagent à l’écran d’accueil (requis par iOS).",
+        "testSuccess": "Envoyé à {{count}} appareil(s). Si rien n’apparaît sur le téléphone, ajoutez DDAgent à l’écran d’accueil (requis par iOS).",
         "testNotDelivered": "Aucun appareil n'était joignable. Vérifiez que l'application est en cours d'exécution et que les notifications sont activées."
       },
       "device": {
@@ -2156,7 +2156,7 @@
       },
       "managed": {
         "badge": "Géré",
-        "hint": "Géré par ddagent."
+        "hint": "Géré par DDAgent."
       },
       "deleteConfirm": {
         "description": "« {{serverName}} » sera supprimé de la configuration du fournisseur.",
@@ -2238,10 +2238,10 @@
     "workspaces": {
       "cancel": "Annuler",
       "create": "Ajouter un espace de travail",
-      "deleteConfirm": "Retirer cet espace de travail de ddagent ? Ses fichiers restent sur le disque.",
+      "deleteConfirm": "Retirer cet espace de travail de DDAgent ? Ses fichiers restent sur le disque.",
       "deleteFailed": "Échec de la suppression de l’espace de travail.",
       "deleteTitle": "Retirer l’espace de travail",
-      "description": "Les espaces de travail sont des répertoires dans lesquels ddagent peut discuter, exécuter du code et naviguer.",
+      "description": "Les espaces de travail sont des répertoires dans lesquels DDAgent peut discuter, exécuter du code et naviguer.",
       "remove": "Retirer l’espace de travail",
       "title": "Espaces de travail",
       "pathRequired": "Le chemin est requis"
@@ -2254,8 +2254,8 @@
         "syncSettings": "Synchroniser les paramètres",
         "teamManagement": "Gestion d’équipe"
       },
-      "proFeatures": "Fonctionnalités de ddagent Pro",
-      "tryHosted": "Essayer ddagent Hosted",
+      "proFeatures": "Fonctionnalités de DDAgent Pro",
+      "tryHosted": "Essayer DDAgent Hosted",
       "versionInfo": "Informations de version",
       "client": "Application",
       "server": "Serveur",
@@ -2287,7 +2287,7 @@
       "runClaudeCli": "Exécutez le CLI Claude dans un répertoire de projet pour commencer"
     },
     "app": {
-      "title": "ddagent",
+      "title": "DDAgent",
       "subtitle": "Interface d'assistant de codage IA"
     },
     "sessions": {
@@ -2409,7 +2409,7 @@
       "updateAvailable": "Mise à jour disponible",
       "restartRequired": "Mise à jour installée — redémarrez le serveur pour l'appliquer",
       "updateNow": "Mettre à jour",
-      "updateConfirm": "Mettre à jour ddagent vers v{{version}} ? Le dernier code sera récupéré et compilé, puis le serveur redémarrera — les sessions actives seront interrompues.",
+      "updateConfirm": "Mettre à jour DDAgent vers v{{version}} ? Le dernier code sera récupéré et compilé, puis le serveur redémarrera — les sessions actives seront interrompues.",
       "updating": "Mise à jour… cela peut prendre quelques minutes",
       "restarting": "Mise à jour installée — redémarrage…",
       "updateFailed": "Échec de la mise à jour",
@@ -2925,11 +2925,11 @@
     "importAll": {
       "action": "Tout importer",
       "mergeDuplicates": "Fusionner les entrées en double",
-      "mergeDuplicatesHint": "Regroupe les lignes en double dans ddagent (pas les fichiers)",
+      "mergeDuplicatesHint": "Regroupe les lignes en double dans DDAgent (pas les fichiers)",
       "projectsScanned": "Projets analysés : {{count}}",
       "rulesSummary": "Règles : {{total}} · groupes de doublons : {{duplicates}}",
       "skillsFound": "Compétences d’agent trouvées : {{found}} (nouvelles : {{newSkills}})",
-      "title": "Tout importer dans ddagent"
+      "title": "Tout importer dans DDAgent"
     },
     "importSkills": {
       "found": "{{count}} compétence(s) trouvée(s) dans vos agents.",
@@ -3061,8 +3061,8 @@
     },
     "install": {
       "button": "Installer",
-      "cardDescription": "Donnez à vos agents la base de connaissances et les outils ddagent via MCP — choisissez des agents ou installez pour tous.",
-      "description": "Permet aux agents sélectionnés d’utiliser la base de connaissances et les outils ddagent via MCP.",
+      "cardDescription": "Donnez à vos agents la base de connaissances et les outils DDAgent via MCP — choisissez des agents ou installez pour tous.",
+      "description": "Permet aux agents sélectionnés d’utiliser la base de connaissances et les outils DDAgent via MCP.",
       "errorFallback": "erreur",
       "failed": "Échec de l’installation : {{error}}",
       "installForAll": "Installer pour tous",
@@ -3072,7 +3072,7 @@
         "other": "Installé sur {{count}} agents."
       },
       "partialFailure": "Installé sur {{count}} ; échec : {{failed}}",
-      "title": "Installer le serveur MCP ddagent"
+      "title": "Installer le serveur MCP DDAgent"
     },
     "servers": {
       "addGlobalDescription": "Ajoute ce serveur MCP à tous les fournisseurs : Claude, Cursor, Codex, OpenCode et Devin. Seuls les transports stdio et HTTP sont pris en charge, car la même configuration doit fonctionner pour tous les fournisseurs.",
@@ -3089,7 +3089,7 @@
       "refreshingScopes": "Actualisation des portées du projet..."
     },
     "team": {
-      "cta": "Disponible avec ddagent Pro",
+      "cta": "Disponible avec DDAgent Pro",
       "description": "Partagez les configurations de serveurs MCP avec votre équipe. Tout le monde reste synchronisé automatiquement.",
       "title": "Configurations MCP d’équipe"
     },
@@ -3207,7 +3207,7 @@
     "worktree": "worktree"
   },
   "notifications": {
-    "deviceLabel": "ddagent Flutter",
+    "deviceLabel": "DDAgent Flutter",
     "errors": {
       "noResponse": "Aucune réponse du serveur",
       "registrationRejected": "Inscription refusée par le serveur"
@@ -3221,7 +3221,7 @@
     "enterUrl": "Saisir une URL de serveur",
     "local": {
       "title": "Cet appareil",
-      "subtitle": "Exécuter le serveur ddagent sur cette machine",
+      "subtitle": "Exécuter le serveur DDAgent sur cette machine",
       "install": "Installer le serveur local",
       "start": "Démarrer le serveur local",
       "stop": "Arrêter",
@@ -3234,7 +3234,7 @@
       "error": "Erreur du serveur local : {{error}}",
       "or": "ou connectez-vous à un serveur distant"
     },
-    "subtitle": "Connectez-vous à votre serveur ddagent"
+    "subtitle": "Connectez-vous à votre serveur DDAgent"
   },
   "voice": {
     "apiKeySaved": "Clé API (enregistrée, saisissez pour remplacer)",
@@ -3410,9 +3410,9 @@
       "invalidEmail": "Veuillez saisir une adresse e-mail valide.",
       "nameAndEmailRequired": "Le nom et l’e-mail git sont tous deux requis."
     },
-    "gitHint": "Utilisé pour les commits créés par les sessions ddagent.",
+    "gitHint": "Utilisé pour les commits créés par les sessions DDAgent.",
     "mcp": {
-      "description": "Installez le serveur MCP ddagent pour que vos agents puissent utiliser la base de connaissances et les outils ddagent. Choisissez des agents ou installez pour tous.",
+      "description": "Installez le serveur MCP DDAgent pour que vos agents puissent utiliser la base de connaissances et les outils DDAgent. Choisissez des agents ou installez pour tous.",
       "installForAll": "Installer pour tous",
       "installSelected": "Installer la sélection",
       "installedOn(param=count)": {
@@ -3421,7 +3421,7 @@
       },
       "installedWithFailures": "Installé sur {{installedCount}} ; échec : {{failed}}",
       "laterHint": "Optionnel — vous pouvez aussi l’installer plus tard dans Paramètres → MCP.",
-      "title": "Connecter les agents à ddagent"
+      "title": "Connecter les agents à DDAgent"
     }
   },
   "fileTree": {

@@ -1,6 +1,6 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/logo.svg" alt="ddagent" width="72" height="72">
-  <h1>ddagent</h1>
+  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/logo.svg" alt="DDAgent" width="72" height="72">
+  <h1>DDAgent</h1>
   <p><strong>Jeden interfejs dla wszystkich Twoich agentów AI do kodowania.</strong><br>
   Serwer self-hosted i klient Flutter (web, Linux, Windows i Android) dla Claude Code, Codex, Cursor CLI, OpenCode, Devin, Command Code i Antigravity — sesje, pliki, git, terminale i zadania w jednym miejscu.</p>
 
@@ -34,8 +34,8 @@
 </div>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/desktop-main.png" alt="widok czatu ddagent" width="78%">&nbsp;
-  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/mobile-chat.png" alt="widok mobilny ddagent" width="20%">
+  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/desktop-main.png" alt="widok czatu DDAgent" width="78%">&nbsp;
+  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/mobile-chat.png" alt="widok mobilny DDAgent" width="20%">
 </p>
 
 <table>
@@ -53,9 +53,9 @@
 
 ---
 
-## Czym jest ddagent?
+## Czym jest DDAgent?
 
-ddagent działa na Twojej własnej maszynie lub VPS-ie i daje jeden dopracowany interfejs dla agentów do kodowania, których już używasz. Serwer odczytuje sesje każdego agenta bezpośrednio z jego własnej historii na dysku (`~/.claude`, `~/.codex`, `~/.cursor`, OpenCode, Devin, …), więc istniejące rozmowy pojawiają się bez żadnego importu. Lokalnie indeksowane są wyłącznie metadane sesji; nic nie trafia do podmiotów trzecich.
+DDAgent działa na Twojej własnej maszynie lub VPS-ie i daje jeden dopracowany interfejs dla agentów do kodowania, których już używasz. Serwer odczytuje sesje każdego agenta bezpośrednio z jego własnej historii na dysku (`~/.claude`, `~/.codex`, `~/.cursor`, OpenCode, Devin, …), więc istniejące rozmowy pojawiają się bez żadnego importu. Lokalnie indeksowane są wyłącznie metadane sesji; nic nie trafia do podmiotów trzecich.
 
 Łącz się z klienta Flutter na komputerze, telefonie lub w przeglądarce. Twoja maszyna, Twoi agenci, Twoje dane.
 
@@ -100,11 +100,11 @@ ddagent działa na Twojej własnej maszynie lub VPS-ie i daje jeden dopracowany 
 | **Command Code** | `command-code acp` (Agent Client Protocol); transkrypty z `~/.commandcode` |
 | **Antigravity** | CLI `agy` w trybie headless; rozmowy indeksowane z `~/.gemini/antigravity-cli` |
 
-CLI agentów muszą być zainstalowane i zalogowane na maszynie serwera. Przynosisz własne subskrypcje — ddagent dostarcza środowisko, nie AI.
+CLI agentów muszą być zainstalowane i zalogowane na maszynie serwera. Przynosisz własne subskrypcje — DDAgent dostarcza środowisko, nie AI.
 
 ## Instalacja
 
-ddagent składa się z dwóch części: **serwera**, który działa obok Twoich agentów i udostępnia API REST/WebSocket, oraz **klienta**, który się z nim łączy. Serwer wymaga **Node.js 22+** (gotowe tarballe wymagają Node.js 22.x, ponieważ ich natywne moduły są pod niego budowane).
+DDAgent składa się z dwóch części: **serwera**, który działa obok Twoich agentów i udostępnia API REST/WebSocket, oraz **klienta**, który się z nim łączy. Serwer wymaga **Node.js 22+** (gotowe tarballe wymagają Node.js 22.x, ponieważ ich natywne moduły są pod niego budowane).
 
 ### Serwer — skrypt instalacyjny
 
@@ -192,7 +192,7 @@ npm run build && node dist-server/server/index.js   # API on http://localhost:30
 ddagent sandbox ~/my-project
 ```
 
-Uruchamia ddagent i agenta (Claude Code lub Codex) w Docker Sandbox izolowanym przez microVM. Wymaga CLI `sbx` — zobacz [docker/README.md](https://github.com/Zakwei/ddagent/blob/main/docker/README.md).
+Uruchamia DDAgent i agenta (Claude Code lub Codex) w Docker Sandbox izolowanym przez microVM. Wymaga CLI `sbx` — zobacz [docker/README.md](https://github.com/Zakwei/ddagent/blob/main/docker/README.md).
 
 ## CLI
 

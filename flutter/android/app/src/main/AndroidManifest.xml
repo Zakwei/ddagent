@@ -11,7 +11,7 @@
          the user must be able to grant "install unknown apps" for this app. -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
     <application
-        android:label="ddagent"
+        android:label="DDAgent"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true"

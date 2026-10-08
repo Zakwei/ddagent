@@ -82,7 +82,7 @@ export function createTaskmasterRouter(dependencies: TaskmasterRouterDependencie
             // required. Report the native engine as always installed and ready.
             const installationStatus = {
                 isInstalled: true,
-                installPath: 'ddagent (native)',
+                installPath: 'DDAgent (native)',
                 version: 'native',
                 reason: null
             };

@@ -172,7 +172,7 @@ export async function spawnAntigravity(command: string, options: AnyRecord = {},
       baseArgs.push('--effort', effort);
     }
 
-    // Map ddagent permission modes onto agy flags. `--mode` accepts
+    // Map DDAgent permission modes onto agy flags. `--mode` accepts
     // accept-edits|plan; bypass needs the dedicated flag; default print mode
     // soft-denies permission prompts (there is no interactive reviewer).
     const bypass = skipPermissions || settings.skipPermissions || permissionMode === 'bypassPermissions';

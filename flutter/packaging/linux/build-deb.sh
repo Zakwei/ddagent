@@ -23,7 +23,7 @@ cp "$ROOT/flutter/web/icons/Icon-512.png" "$STAGE/usr/share/icons/hicolor/512x51
 
 cat > "$STAGE/usr/share/applications/ddagent.desktop" <<'EOF'
 [Desktop Entry]
-Name=ddagent
+Name=DDAgent
 Comment=Self-hosted interface for AI coding agents
 Exec=/usr/bin/ddagent
 Icon=ddagent
@@ -38,10 +38,10 @@ Version: ${VERSION#v}
 Section: devel
 Priority: optional
 Architecture: amd64
-Maintainer: ddagent <https://github.com/Zakwei/ddagent>
+Maintainer: DDAgent <https://github.com/Zakwei/ddagent>
 Depends: libgtk-3-0t64 | libgtk-3-0, libsecret-1-0, liblzma5
 Description: Self-hosted interface for AI coding agents
- Flutter desktop client for ddagent — connect to a ddagent server and drive
+ Flutter desktop client for DDAgent — connect to a DDAgent server and drive
  Claude Code, Codex, Cursor CLI, OpenCode, Devin and other agents.
 EOF
 

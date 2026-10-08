@@ -1,6 +1,6 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/logo.svg" alt="ddagent" width="72" height="72">
-  <h1>ddagent</h1>
+  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/logo.svg" alt="DDAgent" width="72" height="72">
+  <h1>DDAgent</h1>
   <p><strong>Tüm AI kodlama ajanlarınız için tek bir arayüz.</strong><br>
   Claude Code, Codex, Cursor CLI, OpenCode, Devin, Command Code ve Antigravity için self-hosted sunucu ve Flutter istemcisi (web, Linux, Windows ve Android) — oturumlar, dosyalar, git, terminaller ve görevler tek bir yerde.</p>
 
@@ -34,8 +34,8 @@
 </div>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/desktop-main.png" alt="ddagent sohbet görünümü" width="78%">&nbsp;
-  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/mobile-chat.png" alt="ddagent mobil görünümü" width="20%">
+  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/desktop-main.png" alt="DDAgent sohbet görünümü" width="78%">&nbsp;
+  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/mobile-chat.png" alt="DDAgent mobil görünümü" width="20%">
 </p>
 
 <table>
@@ -53,9 +53,9 @@
 
 ---
 
-## ddagent nedir?
+## DDAgent nedir?
 
-ddagent kendi makinenizde veya VPS'inizde çalışır ve hâlihazırda kullandığınız kodlama ajanlarını tek, özenle tasarlanmış bir arayüzde bir araya getirir. Sunucu, her ajanın oturumlarını doğrudan o ajanın diskteki kendi geçmişinden (`~/.claude`, `~/.codex`, `~/.cursor`, OpenCode, Devin, …) okur; böylece mevcut konuşmalarınız hiçbir şey içe aktarmadan görünür. Yerel olarak yalnızca oturum meta verileri dizinlenir; hiçbir veri üçüncü taraflara gönderilmez.
+DDAgent kendi makinenizde veya VPS'inizde çalışır ve hâlihazırda kullandığınız kodlama ajanlarını tek, özenle tasarlanmış bir arayüzde bir araya getirir. Sunucu, her ajanın oturumlarını doğrudan o ajanın diskteki kendi geçmişinden (`~/.claude`, `~/.codex`, `~/.cursor`, OpenCode, Devin, …) okur; böylece mevcut konuşmalarınız hiçbir şey içe aktarmadan görünür. Yerel olarak yalnızca oturum meta verileri dizinlenir; hiçbir veri üçüncü taraflara gönderilmez.
 
 Masaüstünüzden, telefonunuzdan veya tarayıcınızdan Flutter istemcisiyle bağlanın. Makine sizin, ajanlar sizin, veriler sizin.
 
@@ -100,11 +100,11 @@ Masaüstünüzden, telefonunuzdan veya tarayıcınızdan Flutter istemcisiyle ba
 | **Command Code** | `command-code acp` (Agent Client Protocol); `~/.commandcode` içindeki dökümler |
 | **Antigravity** | Headless modda `agy` CLI; konuşmalar `~/.gemini/antigravity-cli` dizininden dizinlenir |
 
-Ajan CLI'larının sunucu makinesinde kurulu ve oturum açılmış olması gerekir. Abonelikler size aittir — ddagent yapay zekâyı değil, ortamı sağlar.
+Ajan CLI'larının sunucu makinesinde kurulu ve oturum açılmış olması gerekir. Abonelikler size aittir — DDAgent yapay zekâyı değil, ortamı sağlar.
 
 ## Kurulum
 
-ddagent iki bölümden oluşur: ajanlarınızla aynı makinede çalışan ve bir REST/WebSocket API'si sunan **sunucu** ve ona bağlanan **istemci**. Sunucu **Node.js 22+** gerektirir (hazır tarball'lar ise Node.js 22.x gerektirir, çünkü içlerindeki yerel modüller bu sürüme göre derlenmiştir).
+DDAgent iki bölümden oluşur: ajanlarınızla aynı makinede çalışan ve bir REST/WebSocket API'si sunan **sunucu** ve ona bağlanan **istemci**. Sunucu **Node.js 22+** gerektirir (hazır tarball'lar ise Node.js 22.x gerektirir, çünkü içlerindeki yerel modüller bu sürüme göre derlenmiştir).
 
 ### Sunucu — kurulum betiği
 
@@ -192,7 +192,7 @@ npm run build && node dist-server/server/index.js   # API on http://localhost:30
 ddagent sandbox ~/my-project
 ```
 
-ddagent'ı ve bir ajanı (Claude Code veya Codex) microVM ile yalıtılmış bir Docker Sandbox içinde çalıştırır. `sbx` CLI gerektirir — bkz. [docker/README.md](https://github.com/Zakwei/ddagent/blob/main/docker/README.md).
+DDAgent'ı ve bir ajanı (Claude Code veya Codex) microVM ile yalıtılmış bir Docker Sandbox içinde çalıştırır. `sbx` CLI gerektirir — bkz. [docker/README.md](https://github.com/Zakwei/ddagent/blob/main/docker/README.md).
 
 ## CLI
 

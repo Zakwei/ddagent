@@ -19,7 +19,7 @@ import {
 const OPENCODE_MODEL_LIST_TIMEOUT_MS = 30_000;
 
 /**
- * Curated OpenCode catalog shipped as immutable ddagent defaults.
+ * Curated OpenCode catalog shipped as immutable DDAgent defaults.
  *
  * OpenCode routes by `<providerID>/<modelID>`, so this list mirrors the
  * providers `opencode models --verbose` reports: the OpenCode Zen gateway plus

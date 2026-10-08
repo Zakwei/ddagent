@@ -1,6 +1,6 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/logo.svg" alt="ddagent" width="72" height="72">
-  <h1>ddagent</h1>
+  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/logo.svg" alt="DDAgent" width="72" height="72">
+  <h1>DDAgent</h1>
   <p><strong>Une seule UI pour tous vos agents de codage IA.</strong><br>
   Serveur auto-hébergé et client Flutter (web, Linux, Windows &amp; Android) pour Claude Code, Codex, Cursor CLI, OpenCode, Devin, Command Code et Antigravity — sessions, fichiers, git, terminaux et tâches au même endroit.</p>
 
@@ -34,8 +34,8 @@
 </div>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/desktop-main.png" alt="vue de chat ddagent" width="78%">&nbsp;
-  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/mobile-chat.png" alt="vue mobile ddagent" width="20%">
+  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/desktop-main.png" alt="vue de chat DDAgent" width="78%">&nbsp;
+  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/screenshots/mobile-chat.png" alt="vue mobile DDAgent" width="20%">
 </p>
 
 <table>
@@ -53,9 +53,9 @@
 
 ---
 
-## Qu'est-ce que ddagent ?
+## Qu'est-ce que DDAgent ?
 
-ddagent tourne sur votre propre machine ou VPS et place une UI soignée au-dessus des agents de codage que vous utilisez déjà. Le serveur lit les sessions de chaque agent directement depuis son propre historique sur disque (`~/.claude`, `~/.codex`, `~/.cursor`, OpenCode, Devin, …) : vos conversations existantes apparaissent sans rien importer. Seules les métadonnées des sessions sont indexées localement ; rien n'est envoyé à un tiers.
+DDAgent tourne sur votre propre machine ou VPS et place une UI soignée au-dessus des agents de codage que vous utilisez déjà. Le serveur lit les sessions de chaque agent directement depuis son propre historique sur disque (`~/.claude`, `~/.codex`, `~/.cursor`, OpenCode, Devin, …) : vos conversations existantes apparaissent sans rien importer. Seules les métadonnées des sessions sont indexées localement ; rien n'est envoyé à un tiers.
 
 Connectez-vous depuis le client Flutter sur votre ordinateur, votre téléphone ou votre navigateur. Votre machine, vos agents, vos données.
 
@@ -100,11 +100,11 @@ Connectez-vous depuis le client Flutter sur votre ordinateur, votre téléphone 
 | **Command Code** | `command-code acp` (Agent Client Protocol) ; transcriptions depuis `~/.commandcode` |
 | **Antigravity** | CLI `agy` en mode headless ; conversations indexées depuis `~/.gemini/antigravity-cli` |
 
-Les CLI des agents doivent être installés et connectés sur la machine serveur. Vous apportez vos propres abonnements — ddagent fournit l'environnement, pas l'IA.
+Les CLI des agents doivent être installés et connectés sur la machine serveur. Vous apportez vos propres abonnements — DDAgent fournit l'environnement, pas l'IA.
 
 ## Installation
 
-ddagent se compose de deux parties : le **serveur**, qui tourne à côté de vos agents et expose une API REST/WebSocket, et le **client**, qui s'y connecte. Le serveur nécessite **Node.js 22+** (les tarballs précompilés exigent Node.js 22.x, car leurs modules natifs sont compilés pour cette version).
+DDAgent se compose de deux parties : le **serveur**, qui tourne à côté de vos agents et expose une API REST/WebSocket, et le **client**, qui s'y connecte. Le serveur nécessite **Node.js 22+** (les tarballs précompilés exigent Node.js 22.x, car leurs modules natifs sont compilés pour cette version).
 
 ### Serveur — script d'installation
 
@@ -192,7 +192,7 @@ npm run build && node dist-server/server/index.js   # API on http://localhost:30
 ddagent sandbox ~/my-project
 ```
 
-Exécute ddagent et un agent (Claude Code ou Codex) dans une Docker Sandbox isolée par microVM. Nécessite le CLI `sbx` — voir [docker/README.md](https://github.com/Zakwei/ddagent/blob/main/docker/README.md).
+Exécute DDAgent et un agent (Claude Code ou Codex) dans une Docker Sandbox isolée par microVM. Nécessite le CLI `sbx` — voir [docker/README.md](https://github.com/Zakwei/ddagent/blob/main/docker/README.md).
 
 ## CLI
 

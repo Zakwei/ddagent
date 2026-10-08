@@ -6,7 +6,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 
 enum WsState { connecting, open, reconnecting, closed }
 
-/// Reconnecting JSON WebSocket client for the ddagent gateway paths
+/// Reconnecting JSON WebSocket client for the DDAgent gateway paths
 /// (`/ws`, `/shell`, `/browser-view`, `/desktop-notifications`).
 ///
 /// The server pings each socket on an interval and drops sockets that miss a

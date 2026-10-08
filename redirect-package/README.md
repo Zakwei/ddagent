@@ -1,6 +1,6 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/logo.svg" alt="ddagent" width="72" height="72">
-  <h1>ddagent</h1>
+  <img src="https://raw.githubusercontent.com/Zakwei/ddagent/main/public/logo.svg" alt="DDAgent" width="72" height="72">
+  <h1>DDAgent</h1>
   <p><strong>One UI for all your AI coding agents.</strong><br>
   Self-hosted server plus a Flutter client (web, desktop &amp; Android) for Claude Code, Codex, Cursor CLI, OpenCode, Devin, Command Code and Antigravity.</p>
 </div>

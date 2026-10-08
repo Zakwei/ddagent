@@ -99,7 +99,7 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
   }
 
   /// One global action: import everything (project migration + agent skills).
-  /// Reads the agents' files, writes only ddagent's database.
+  /// Reads the agents' files, writes only DDAgent's database.
   Future<void> _openImportAll() async {
     if (_importing) return;
     final t = Translations.of(context);
@@ -815,7 +815,7 @@ class _ContextBudgetCard extends StatelessWidget {
   }
 }
 
-/// Prominent one-click "import everything into ddagent" entry point.
+/// Prominent one-click "import everything into DDAgent" entry point.
 class _ImportAllCard extends StatelessWidget {
   const _ImportAllCard({required this.onPressed, required this.busy});
 

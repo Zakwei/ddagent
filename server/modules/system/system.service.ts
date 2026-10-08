@@ -436,7 +436,7 @@ async function updateBundle(dependencies: SystemUpdateDependencies, userId: numb
       throw new Error(`Could not unpack ${assetName}: ${extract.errorOutput || extract.output}`);
     }
     if (!fs.existsSync(path.join(nextDirectory, 'dist-server', 'server', 'index.js'))) {
-      throw new Error(`${assetName} does not contain a ddagent server.`);
+      throw new Error(`${assetName} does not contain a DDAgent server.`);
     }
     assertSameNodeAbi(nextDirectory, version, dependencies.nodeModulesVersion ?? process.versions.modules);
     fs.rmSync(archive, { force: true });

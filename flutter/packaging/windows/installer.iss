@@ -1,4 +1,4 @@
-; ddagent Windows installer — built by .github/workflows/flutter-release.yml
+; DDAgent Windows installer — built by .github/workflows/flutter-release.yml
 ;   ISCC.exe /DAppVersion=0.8.0 /DVerTag=v0.8.0 packaging\windows\installer.iss
 #ifndef AppVersion
   #define AppVersion "0.0.0"
@@ -8,9 +8,11 @@
 #endif
 
 [Setup]
-AppName=ddagent
+; AppId pinned to the pre-rebrand value so upgrades keep the same uninstall entry.
+AppId=ddagent
+AppName=DDAgent
 AppVersion={#AppVersion}
-AppPublisher=ddagent
+AppPublisher=DDAgent
 AppPublisherURL=https://github.com/Zakwei/ddagent
 DefaultDirName={autopf}\ddagent
 DefaultGroupName=ddagent
@@ -31,8 +33,8 @@ Name: "desktopicon"; Description: "Create a &desktop icon"; GroupDescription: "A
 Source: "..\..\build\windows\x64\runner\Release\*"; DestDir: "{app}"; Flags: recursesubdirs ignoreversion
 
 [Icons]
-Name: "{autoprograms}\ddagent"; Filename: "{app}\ddagent_app.exe"
-Name: "{autodesktop}\ddagent"; Filename: "{app}\ddagent_app.exe"; Tasks: desktopicon
+Name: "{autoprograms}\DDAgent"; Filename: "{app}\ddagent_app.exe"
+Name: "{autodesktop}\DDAgent"; Filename: "{app}\ddagent_app.exe"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\ddagent_app.exe"; Description: "Launch ddagent"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\ddagent_app.exe"; Description: "Launch DDAgent"; Flags: nowait postinstall skipifsilent

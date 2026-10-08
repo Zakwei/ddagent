@@ -1,4 +1,4 @@
-// Service Worker for ddagent PWA
+// Service Worker for DDAgent PWA
 // Cache only manifest (needed for PWA install). HTML and JS are never pre-cached
 // so a rebuild + refresh always picks up the latest assets.
 const CACHE_NAME = 'claude-ui-v2';
@@ -96,7 +96,7 @@ self.addEventListener('push', event => {
   try {
     payload = event.data.json();
   } catch {
-    payload = { title: 'ddagent', body: event.data.text() };
+    payload = { title: 'DDAgent', body: event.data.text() };
   }
 
   const options = {
@@ -109,7 +109,7 @@ self.addEventListener('push', event => {
   };
 
   event.waitUntil(
-    self.registration.showNotification(payload.title || 'ddagent', options)
+    self.registration.showNotification(payload.title || 'DDAgent', options)
   );
 });
 

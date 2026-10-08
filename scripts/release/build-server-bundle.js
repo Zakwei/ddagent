@@ -93,7 +93,7 @@ async function writeStandaloneLaunchers(stageDir) {
     startShPath,
     [
       '#!/bin/sh',
-      '# Self-hosted ddagent server — serves the API/WS that the ddagent client',
+      '# Self-hosted DDAgent server — serves the API/WS that the DDAgent client',
       '# connects to. Node.js 22+ required.',
       '# Env: SERVER_PORT (default 3001), HOST (default 0.0.0.0). Optional .env file here.',
       '{',
@@ -123,7 +123,7 @@ async function writeStandaloneLaunchers(stageDir) {
     path.join(stageDir, 'start.bat'),
     [
       '@echo off',
-      'rem Self-hosted ddagent server. Node.js 22+ required. Env: SERVER_PORT, HOST.',
+      'rem Self-hosted DDAgent server. Node.js 22+ required. Env: SERVER_PORT, HOST.',
       'rem Restarts on exit code 75 (restart/update from the UI), applying a staged update first.',
       'setlocal',
       'cd /d "%~dp0"',

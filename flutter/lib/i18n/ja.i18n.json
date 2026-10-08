@@ -3,7 +3,7 @@
     "sessionExpired": "セッションの有効期限が切れました。再度ログインしてください。",
     "login": {
       "title": "おかえりなさい",
-      "description": "ddagentアカウントにサインイン",
+      "description": "DDAgentアカウントにサインイン",
       "username": "ユーザー名",
       "password": "パスワード",
       "submit": "サインイン",
@@ -698,7 +698,7 @@
       "openInEditor": "エディタで開く"
     },
     "mainContent": {
-      "loading": "ddagent を読み込んでいます",
+      "loading": "DDAgent を読み込んでいます",
       "settingUpWorkspace": "ワークスペースを準備しています...",
       "chooseProject": "プロジェクトを選択",
       "selectProjectDescription": "サイドバーからプロジェクトを選択して、Claudeとコーディングを始めましょう。各プロジェクトにはチャットセッションとファイル履歴が含まれています。",
@@ -1497,8 +1497,8 @@
       "manualRestart": "更新は適用されましたが、サーバーは自動で再起動しませんでした — 手動で再起動して完了してください。",
       "failed": "更新に失敗しました。",
       "failedTitle": "更新に失敗しました",
-      "appConfirm": "この端末に ddagent v{{version}} をインストールしますか？ 初回は Android が ddagent からのインストール許可を求めます。",
-      "appPermission": "ddagent に「提供元不明のアプリ」のインストールを許可してから、もう一度「更新」をタップしてください。",
+      "appConfirm": "この端末に DDAgent v{{version}} をインストールしますか？ 初回は Android が DDAgent からのインストール許可を求めます。",
+      "appPermission": "DDAgent に「提供元不明のアプリ」のインストールを許可してから、もう一度「更新」をタップしてください。",
       "chooseTitle": "アップデートがあります",
       "targetApp": "このアプリ",
       "targetWeb": "Web インターフェイス",
@@ -1527,9 +1527,9 @@
     },
     "server": {
       "title": "サーバー",
-      "description": "ddagent プロセスを再起動します — 更新後や応答しない状態からの回復に便利です。",
+      "description": "DDAgent プロセスを再起動します — 更新後や応答しない状態からの回復に便利です。",
       "restart": "再起動",
-      "restartConfirm": "ddagent サーバーを再起動しますか?アクティブなセッションは中断されます。",
+      "restartConfirm": "DDAgent サーバーを再起動しますか?アクティブなセッションは中断されます。",
       "restarting": "再起動中… サーバーが戻り次第、ページを再読み込みします。",
       "restartFailed": "再起動に失敗しました",
       "unsupported": "再起動は、サーバーがサービスマネージャー管理下で動作している場合のみ利用できます。",
@@ -1547,8 +1547,8 @@
       "check": "更新を確認",
       "checking": "確認中…",
       "upToDate": "最新バージョンです（v{{version}}）。",
-      "available": "更新 v{{version}} が見つかりました — バックグラウンドでダウンロード中。ddagent 終了時にインストールされます。",
-      "downloaded": "更新 v{{version}} をダウンロードしました — ddagent を終了して再起動するとインストールされます。",
+      "available": "更新 v{{version}} が見つかりました — バックグラウンドでダウンロード中。DDAgent 終了時にインストールされます。",
+      "downloaded": "更新 v{{version}} をダウンロードしました — DDAgent を終了して再起動するとインストールされます。",
       "unavailable": "更新チェックはパッケージ済みデスクトップビルドでのみ利用できます。",
       "error": "更新チェックに失敗しました: {{message}}",
       "errorGeneric": "更新チェックに失敗しました。",
@@ -1791,10 +1791,10 @@
         "loading": "更新中...",
         "unsupported": "このブラウザではプッシュ通知がサポートされていません。",
         "denied": "プッシュ通知がブロックされています。ブラウザの設定で許可してください。",
-        "iosHint": "iPhone/iPad では、ddagent をホーム画面に追加し（共有 → ホーム画面に追加）、そのインストール済みアプリで通知を有効にした後でのみ通知が機能します。",
+        "iosHint": "iPhone/iPad では、DDAgent をホーム画面に追加し（共有 → ホーム画面に追加）、そのインストール済みアプリで通知を有効にした後でのみ通知が機能します。",
         "test": "テスト通知を送信",
         "testNoSubscription": "登録済みデバイスがありません。先にスマホで「有効にする」をタップしてください。",
-        "testSuccess": "{{count}} 台のデバイスに送信しました。スマホに表示されない場合は ddagent をホーム画面に追加してください（iOS の要件）。",
+        "testSuccess": "{{count}} 台のデバイスに送信しました。スマホに表示されない場合は DDAgent をホーム画面に追加してください（iOS の要件）。",
         "testNotDelivered": "到達可能なデバイスがありませんでした。アプリが実行中で、通知が有効になっていることを確認してください。"
       },
       "device": {
@@ -2155,7 +2155,7 @@
       },
       "managed": {
         "badge": "管理対象",
-        "hint": "ddagent により管理。"
+        "hint": "DDAgent により管理。"
       },
       "deleteConfirm": {
         "description": "「{{serverName}}」はプロバイダー設定から削除されます。",
@@ -2237,10 +2237,10 @@
     "workspaces": {
       "cancel": "キャンセル",
       "create": "ワークスペースを追加",
-      "deleteConfirm": "このワークスペースを ddagent から削除しますか？ファイルはディスクに残ります。",
+      "deleteConfirm": "このワークスペースを DDAgent から削除しますか？ファイルはディスクに残ります。",
       "deleteFailed": "ワークスペースの削除に失敗しました。",
       "deleteTitle": "ワークスペースを削除",
-      "description": "ワークスペースは、ddagent がチャット・コード実行・ブラウジングできるディレクトリです。",
+      "description": "ワークスペースは、DDAgent がチャット・コード実行・ブラウジングできるディレクトリです。",
       "remove": "ワークスペースを削除",
       "title": "ワークスペース",
       "pathRequired": "パスは必須です"
@@ -2253,8 +2253,8 @@
         "syncSettings": "設定を同期",
         "teamManagement": "チーム管理"
       },
-      "proFeatures": "ddagent Pro の機能",
-      "tryHosted": "ddagent Hosted を試す",
+      "proFeatures": "DDAgent Pro の機能",
+      "tryHosted": "DDAgent Hosted を試す",
       "versionInfo": "バージョン情報",
       "client": "アプリ",
       "server": "サーバー",
@@ -2286,7 +2286,7 @@
       "runClaudeCli": "プロジェクトディレクトリでClaude CLIを実行して始めましょう"
     },
     "app": {
-      "title": "ddagent",
+      "title": "DDAgent",
       "subtitle": "AIコーディングアシスタント"
     },
     "sessions": {
@@ -2408,7 +2408,7 @@
       "updateAvailable": "アップデートあり",
       "restartRequired": "更新が適用されていません。サーバーを再起動してください",
       "updateNow": "今すぐ更新",
-      "updateConfirm": "ddagent を v{{version}} に更新しますか？最新コードの取得とビルド後、サーバーが再起動します — 実行中のセッションは中断されます。",
+      "updateConfirm": "DDAgent を v{{version}} に更新しますか？最新コードの取得とビルド後、サーバーが再起動します — 実行中のセッションは中断されます。",
       "updating": "更新中… 数分かかることがあります",
       "restarting": "更新をインストールしました — 再起動中…",
       "updateFailed": "更新に失敗しました",
@@ -2924,11 +2924,11 @@
     "importAll": {
       "action": "すべてをインポート",
       "mergeDuplicates": "重複エントリを統合",
-      "mergeDuplicatesHint": "ddagent 内の重複行を統合します（ファイルではありません）",
+      "mergeDuplicatesHint": "DDAgent 内の重複行を統合します（ファイルではありません）",
       "projectsScanned": "スキャンしたプロジェクト: {{count}}",
       "rulesSummary": "ルール: {{total}} · 重複グループ: {{duplicates}}",
       "skillsFound": "見つかったエージェントスキル: {{found}} (新規: {{newSkills}})",
-      "title": "すべてを ddagent にインポート"
+      "title": "すべてを DDAgent にインポート"
     },
     "importSkills": {
       "found": "エージェント全体で {{count}} 件のスキルが見つかりました。",
@@ -3060,8 +3060,8 @@
     },
     "install": {
       "button": "インストール",
-      "cardDescription": "MCP経由でエージェントにナレッジベースとddagentツールを提供します — エージェントを選択するか、すべてにインストールしてください。",
-      "description": "選択したエージェントがMCP経由でddagentのナレッジベースとツールを使用できるようにします。",
+      "cardDescription": "MCP経由でエージェントにナレッジベースとDDAgentツールを提供します — エージェントを選択するか、すべてにインストールしてください。",
+      "description": "選択したエージェントがMCP経由でDDAgentのナレッジベースとツールを使用できるようにします。",
       "errorFallback": "エラー",
       "failed": "インストールに失敗しました: {{error}}",
       "installForAll": "すべてにインストール",
@@ -3071,7 +3071,7 @@
         "other": "{{count}} 個のエージェントにインストールしました。"
       },
       "partialFailure": "{{count}} 個にインストールしました。失敗: {{failed}}",
-      "title": "ddagent MCPサーバーをインストール"
+      "title": "DDAgent MCPサーバーをインストール"
     },
     "servers": {
       "addGlobalDescription": "このMCPサーバーをすべてのプロバイダー（Claude、Cursor、Codex、OpenCode、Devin）に追加します。同じ設定をすべてのプロバイダーで機能させる必要があるため、stdio と HTTP トランスポートのみがサポートされます。",
@@ -3088,7 +3088,7 @@
       "refreshingScopes": "プロジェクトスコープを更新中..."
     },
     "team": {
-      "cta": "ddagent Pro で利用できます",
+      "cta": "DDAgent Pro で利用できます",
       "description": "MCPサーバー設定をチーム全体で共有します。全員が自動的に同期されます。",
       "title": "チームMCP設定"
     },
@@ -3206,7 +3206,7 @@
     "worktree": "worktree"
   },
   "notifications": {
-    "deviceLabel": "ddagent Flutter",
+    "deviceLabel": "DDAgent Flutter",
     "errors": {
       "noResponse": "サーバーから応答がありません",
       "registrationRejected": "サーバーに登録を拒否されました"
@@ -3220,7 +3220,7 @@
     "enterUrl": "サーバーのURLを入力",
     "local": {
       "title": "このデバイス",
-      "subtitle": "このマシンでddagentサーバーを実行します",
+      "subtitle": "このマシンでDDAgentサーバーを実行します",
       "install": "ローカルサーバーをインストール",
       "start": "ローカルサーバーを起動",
       "stop": "停止",
@@ -3233,7 +3233,7 @@
       "error": "ローカルサーバーエラー: {{error}}",
       "or": "またはリモートサーバーに接続"
     },
-    "subtitle": "ddagent サーバーに接続"
+    "subtitle": "DDAgent サーバーに接続"
   },
   "voice": {
     "apiKeySaved": "APIキー（保存済み、変更するには入力）",
@@ -3409,9 +3409,9 @@
       "invalidEmail": "有効なメールアドレスを入力してください。",
       "nameAndEmailRequired": "git の名前とメールアドレスの両方が必要です。"
     },
-    "gitHint": "ddagent セッションで作成されるコミットに使用されます。",
+    "gitHint": "DDAgent セッションで作成されるコミットに使用されます。",
     "mcp": {
-      "description": "ddagent MCPサーバーをインストールすると、エージェントがナレッジベースとddagentツールを使用できるようになります。エージェントを選択するか、すべてにインストールしてください。",
+      "description": "DDAgent MCPサーバーをインストールすると、エージェントがナレッジベースとDDAgentツールを使用できるようになります。エージェントを選択するか、すべてにインストールしてください。",
       "installForAll": "すべてにインストール",
       "installSelected": "選択項目にインストール",
       "installedOn(param=count)": {
@@ -3420,7 +3420,7 @@
       },
       "installedWithFailures": "{{installedCount}} 個にインストールしました。失敗: {{failed}}",
       "laterHint": "任意 — 後で設定 → MCP からインストールすることもできます。",
-      "title": "エージェントを ddagent に接続"
+      "title": "エージェントを DDAgent に接続"
     }
   },
   "fileTree": {

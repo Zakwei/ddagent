@@ -81,7 +81,7 @@ export type ProviderModelOption = {
   tier?: 'free' | 'paid';
   /** Stable SQLite row id used only by model-management actions. */
   recordId?: number;
-  /** True for user-created rows; false for immutable ddagent defaults. */
+  /** True for user-created rows; false for immutable DDAgent defaults. */
   isCustom?: boolean;
   effort?: {
     default?: string;
@@ -774,7 +774,7 @@ export type WorktreePorcelainEntry = {
  *
  * Extends the porcelain entry with everything the Worktrees panel renders:
  * dirty-file count, ahead/behind relative to the base branch (the branch
- * checked out in the main worktree), last-commit metadata, and the ddagent
+ * checked out in the main worktree), last-commit metadata, and the DDAgent
  * project row linked to the worktree directory (if one was registered).
  */
 export type WorktreeDescriptor = {
@@ -853,7 +853,7 @@ export type CreateAndOpenWorktreeResult = CreateWorktreeResult & {
 };
 
 /**
- * Input accepted when registering an existing worktree as a ddagent project.
+ * Input accepted when registering an existing worktree as a DDAgent project.
  *
  * The service verifies that `worktreePath` belongs to the repository containing
  * `projectPath` before it creates or restores any project record.
@@ -864,7 +864,7 @@ export type OpenWorktreeInput = {
 };
 
 /**
- * Project view returned after a worktree is opened in ddagent.
+ * Project view returned after a worktree is opened in DDAgent.
  *
  * This deliberately mirrors the project-selection payload used by the Projects
  * module so the frontend can switch to the worktree without another lookup.

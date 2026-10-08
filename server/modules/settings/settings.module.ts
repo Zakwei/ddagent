@@ -60,7 +60,7 @@ const settingsService = createSettingsService({
         provider: 'system',
         kind: 'info',
         code: 'agent.notification',
-        meta: { message: 'Test notification from ddagent' },
+        meta: { message: 'Test notification from DDAgent' },
         createdAt: new Date().toISOString(),
       }),
     ),

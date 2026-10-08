@@ -24,7 +24,7 @@ type DevinSessionIndexRow = {
   last_activity_at: number | string | null;
 };
 
-/** One Devin session normalized for the ddagent `sessions` table. */
+/** One Devin session normalized for the DDAgent `sessions` table. */
 type ImportedDevinSession = {
   id: string;
   workingDirectory: string;
@@ -135,7 +135,7 @@ export class DevinSessionSynchronizer implements IProviderSessionSynchronizer {
 
   /**
    * Reads every visible session from the Devin CLI database, normalized for
-   * the ddagent `sessions` table. Hidden rows and subagent-only sessions are
+   * the DDAgent `sessions` table. Hidden rows and subagent-only sessions are
    * dropped here.
    */
   private queryAllSessions(): ImportedDevinSession[] {

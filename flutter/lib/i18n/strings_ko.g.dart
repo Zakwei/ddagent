@@ -444,7 +444,7 @@ class Translations$notifications$ko extends Translations$notifications$en {
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get deviceLabel => 'ddagent Flutter';
+	@override String get deviceLabel => 'DDAgent Flutter';
 	@override late final Translations$notifications$errors$ko errors = Translations$notifications$errors$ko._(_root);
 }
 
@@ -461,7 +461,7 @@ class Translations$serverConnect$ko extends Translations$serverConnect$en {
 	@override String connectionFailed({required Object error}) => '연결 실패 (${error})';
 	@override String get enterUrl => '서버 URL을 입력하세요';
 	@override late final Translations$serverConnect$local$ko local = Translations$serverConnect$local$ko._(_root);
-	@override String get subtitle => 'ddagent 서버에 연결하세요';
+	@override String get subtitle => 'DDAgent 서버에 연결하세요';
 }
 
 // Path: voice
@@ -631,7 +631,7 @@ class Translations$onboarding$ko extends Translations$onboarding$en {
 	@override late final Translations$onboarding$agents$ko agents = Translations$onboarding$agents$ko._(_root);
 	@override String get completeSetup => '설정 완료';
 	@override late final Translations$onboarding$errors$ko errors = Translations$onboarding$errors$ko._(_root);
-	@override String get gitHint => 'ddagent 세션이 생성한 커밋에 사용됩니다.';
+	@override String get gitHint => 'DDAgent 세션이 생성한 커밋에 사용됩니다.';
 	@override late final Translations$onboarding$mcp$ko mcp = Translations$onboarding$mcp$ko._(_root);
 }
 
@@ -694,7 +694,7 @@ class Translations$auth$login$ko extends Translations$auth$login$en {
 
 	// Translations
 	@override String get title => '다시 오신 것을 환영합니다';
-	@override String get description => 'ddagent 계정에 로그인하세요';
+	@override String get description => 'DDAgent 계정에 로그인하세요';
 	@override String get username => '사용자명';
 	@override String get password => '비밀번호';
 	@override String get submit => '로그인';
@@ -1729,7 +1729,7 @@ class Translations$common$mainContent$ko extends Translations$common$mainContent
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get loading => 'ddagent 로딩 중';
+	@override String get loading => 'DDAgent 로딩 중';
 	@override String get settingUpWorkspace => '워크스페이스 설정 중...';
 	@override String get chooseProject => '프로젝트 선택';
 	@override String get selectProjectDescription => '사이드바에서 프로젝트를 선택하여 Claude와 코딩을 시작하세요. 각 프로젝트에는 채팅 세션과 파일 히스토리가 포함됩니다.';
@@ -2163,8 +2163,8 @@ class Translations$common$update$ko extends Translations$common$update$en {
 	@override String get manualRestart => '업데이트가 적용되었지만 서버가 자동으로 재시작되지 않았습니다 — 마무리하려면 수동으로 재시작하세요.';
 	@override String get failed => '업데이트 실패.';
 	@override String get failedTitle => '업데이트 실패';
-	@override String appConfirm({required Object version}) => '이 기기에 ddagent v${version}을(를) 설치할까요? 처음에는 Android가 ddagent의 앱 설치를 허용할지 물습니다.';
-	@override String get appPermission => 'ddagent에 \'알 수 없는 앱 설치\'를 허용한 뒤 업데이트를 다시 누르세요.';
+	@override String appConfirm({required Object version}) => '이 기기에 DDAgent v${version}을(를) 설치할까요? 처음에는 Android가 DDAgent의 앱 설치를 허용할지 물습니다.';
+	@override String get appPermission => 'DDAgent에 \'알 수 없는 앱 설치\'를 허용한 뒤 업데이트를 다시 누르세요.';
 	@override String get chooseTitle => '업데이트 가능';
 	@override String get targetApp => '이 앱';
 	@override String get targetWeb => '웹 인터페이스';
@@ -2204,9 +2204,9 @@ class Translations$settings$server$ko extends Translations$settings$server$en {
 
 	// Translations
 	@override String get title => '서버';
-	@override String get description => 'ddagent 프로세스를 재시작합니다 — 업데이트 적용이나 멈춤 상태 복구에 유용합니다.';
+	@override String get description => 'DDAgent 프로세스를 재시작합니다 — 업데이트 적용이나 멈춤 상태 복구에 유용합니다.';
 	@override String get restart => '재시작';
-	@override String get restartConfirm => 'ddagent 서버를 재시작할까요? 활성 세션이 중단됩니다.';
+	@override String get restartConfirm => 'DDAgent 서버를 재시작할까요? 활성 세션이 중단됩니다.';
 	@override String get restarting => '재시작 중… 서버가 돌아오면 페이지가 새로고침됩니다.';
 	@override String get restartFailed => '재시작 실패';
 	@override String get unsupported => '서버가 서비스 매니저로 실행 중일 때만 재시작할 수 있습니다.';
@@ -2231,8 +2231,8 @@ class Translations$settings$updates$ko extends Translations$settings$updates$en 
 	@override String get check => '업데이트 확인';
 	@override String get checking => '확인 중…';
 	@override String upToDate({required Object version}) => '최신 버전입니다 (v${version}).';
-	@override String available({required Object version}) => '업데이트 v${version} 발견 — 백그라운드에서 다운로드 중; ddagent 종료 시 설치됩니다.';
-	@override String downloaded({required Object version}) => '업데이트 v${version} 다운로드 완료 — ddagent를 종료 후 다시 실행하면 설치됩니다.';
+	@override String available({required Object version}) => '업데이트 v${version} 발견 — 백그라운드에서 다운로드 중; DDAgent 종료 시 설치됩니다.';
+	@override String downloaded({required Object version}) => '업데이트 v${version} 다운로드 완료 — DDAgent를 종료 후 다시 실행하면 설치됩니다.';
 	@override String get unavailable => '업데이트 확인은 패키지된 데스크톱 빌드에서만 사용할 수 있습니다.';
 	@override String error({required Object message}) => '업데이트 확인 실패: ${message}';
 	@override String get errorGeneric => '업데이트 확인에 실패했습니다.';
@@ -2625,10 +2625,10 @@ class Translations$settings$workspaces$ko extends Translations$settings$workspac
 	// Translations
 	@override String get cancel => '취소';
 	@override String get create => '작업 영역 추가';
-	@override String get deleteConfirm => '이 작업 영역을 ddagent에서 제거하시겠습니까? 파일은 디스크에 남습니다.';
+	@override String get deleteConfirm => '이 작업 영역을 DDAgent에서 제거하시겠습니까? 파일은 디스크에 남습니다.';
 	@override String get deleteFailed => '작업 영역 제거에 실패했습니다.';
 	@override String get deleteTitle => '작업 영역 제거';
-	@override String get description => '작업 영역은 ddagent가 채팅하고, 코드를 실행하고, 탐색할 수 있는 디렉터리입니다.';
+	@override String get description => '작업 영역은 DDAgent가 채팅하고, 코드를 실행하고, 탐색할 수 있는 디렉터리입니다.';
 	@override String get remove => '작업 영역 제거';
 	@override String get title => '작업 영역';
 	@override String get pathRequired => '경로는 필수입니다';
@@ -2645,8 +2645,8 @@ class Translations$settings$about$ko extends Translations$settings$about$en {
 	@override String get buyMeACoffee => '커피 한 잔 사주기';
 	@override String get learnMore => '더 알아보기';
 	@override late final Translations$settings$about$pro$ko pro = Translations$settings$about$pro$ko._(_root);
-	@override String get proFeatures => 'ddagent Pro 기능';
-	@override String get tryHosted => 'ddagent Hosted 사용해보기';
+	@override String get proFeatures => 'DDAgent Pro 기능';
+	@override String get tryHosted => 'DDAgent Hosted 사용해보기';
 	@override String get versionInfo => '버전 정보';
 	@override String get client => '앱';
 	@override String get server => '서버';
@@ -2690,7 +2690,7 @@ class Translations$sidebar$app$ko extends Translations$sidebar$app$en {
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'ddagent';
+	@override String get title => 'DDAgent';
 	@override String get subtitle => 'AI 코딩 어시스턴트 UI';
 }
 
@@ -2875,7 +2875,7 @@ class Translations$sidebar$version$ko extends Translations$sidebar$version$en {
 	@override String get updateAvailable => '업데이트 가능';
 	@override String get restartRequired => '업데이트가 설치됨 — 적용하려면 서버를 재시작하세요';
 	@override String get updateNow => '지금 업데이트';
-	@override String updateConfirm({required Object version}) => 'ddagent를 v${version}(으)로 업데이트할까요? 최신 코드를 받아 빌드한 뒤 서버가 재시작됩니다 — 활성 세션은 중단됩니다.';
+	@override String updateConfirm({required Object version}) => 'DDAgent를 v${version}(으)로 업데이트할까요? 최신 코드를 받아 빌드한 뒤 서버가 재시작됩니다 — 활성 세션은 중단됩니다.';
 	@override String get updating => '업데이트 중… 몇 분 걸릴 수 있습니다';
 	@override String get restarting => '업데이트 설치됨 — 재시작 중…';
 	@override String get updateFailed => '업데이트 실패';
@@ -3625,11 +3625,11 @@ class Translations$knowledge$importAll$ko extends Translations$knowledge$importA
 	// Translations
 	@override String get action => '모두 가져오기';
 	@override String get mergeDuplicates => '중복 항목 병합';
-	@override String get mergeDuplicatesHint => 'ddagent 내 중복 행을 병합합니다 (파일 아님)';
+	@override String get mergeDuplicatesHint => 'DDAgent 내 중복 행을 병합합니다 (파일 아님)';
 	@override String projectsScanned({required Object count}) => '검사한 프로젝트: ${count}';
 	@override String rulesSummary({required Object total, required Object duplicates}) => '규칙: ${total} · 중복 그룹: ${duplicates}';
 	@override String skillsFound({required Object found, required Object newSkills}) => '발견한 에이전트 스킬: ${found} (신규: ${newSkills})';
-	@override String get title => 'ddagent로 모두 가져오기';
+	@override String get title => 'DDAgent로 모두 가져오기';
 }
 
 // Path: knowledge.importSkills
@@ -3813,8 +3813,8 @@ class Translations$mcp$install$ko extends Translations$mcp$install$en {
 
 	// Translations
 	@override String get button => '설치';
-	@override String get cardDescription => 'MCP를 통해 에이전트에게 지식 베이스와 ddagent 도구를 제공하세요 — 에이전트를 선택하거나 전체에 설치하세요.';
-	@override String get description => '선택한 에이전트가 MCP를 통해 ddagent 지식 베이스와 도구를 사용할 수 있게 합니다.';
+	@override String get cardDescription => 'MCP를 통해 에이전트에게 지식 베이스와 DDAgent 도구를 제공하세요 — 에이전트를 선택하거나 전체에 설치하세요.';
+	@override String get description => '선택한 에이전트가 MCP를 통해 DDAgent 지식 베이스와 도구를 사용할 수 있게 합니다.';
 	@override String get errorFallback => '오류';
 	@override String failed({required Object error}) => '설치 실패: ${error}';
 	@override String get installForAll => '전체에 설치';
@@ -3824,7 +3824,7 @@ class Translations$mcp$install$ko extends Translations$mcp$install$en {
 		other: '에이전트 ${count}개에 설치했습니다.',
 	);
 	@override String partialFailure({required Object count, required Object failed}) => '${count}개에 설치됨, 실패: ${failed}';
-	@override String get title => 'ddagent MCP 서버 설치';
+	@override String get title => 'DDAgent MCP 서버 설치';
 }
 
 // Path: mcp.servers
@@ -3852,7 +3852,7 @@ class Translations$mcp$team$ko extends Translations$mcp$team$en {
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get cta => 'ddagent Pro에서 사용 가능';
+	@override String get cta => 'DDAgent Pro에서 사용 가능';
 	@override String get description => '팀 전체에서 MCP 서버 설정을 공유하세요. 모든 사람이 자동으로 동기화됩니다.';
 	@override String get title => '팀 MCP 설정';
 }
@@ -4030,7 +4030,7 @@ class Translations$serverConnect$local$ko extends Translations$serverConnect$loc
 
 	// Translations
 	@override String get title => '이 기기';
-	@override String get subtitle => '이 컴퓨터에서 ddagent 서버를 실행합니다';
+	@override String get subtitle => '이 컴퓨터에서 DDAgent 서버를 실행합니다';
 	@override String get install => '로컬 서버 설치';
 	@override String get start => '로컬 서버 시작';
 	@override String get stop => '중지';
@@ -4224,7 +4224,7 @@ class Translations$onboarding$mcp$ko extends Translations$onboarding$mcp$en {
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get description => '에이전트가 지식 베이스와 ddagent 도구를 사용할 수 있도록 ddagent MCP 서버를 설치하세요. 에이전트를 선택하거나 전체에 설치하세요.';
+	@override String get description => '에이전트가 지식 베이스와 DDAgent 도구를 사용할 수 있도록 DDAgent MCP 서버를 설치하세요. 에이전트를 선택하거나 전체에 설치하세요.';
 	@override String get installForAll => '전체에 설치';
 	@override String get installSelected => '선택 항목에 설치';
 	@override String installedOn({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
@@ -4233,7 +4233,7 @@ class Translations$onboarding$mcp$ko extends Translations$onboarding$mcp$en {
 	);
 	@override String installedWithFailures({required Object installedCount, required Object failed}) => '${installedCount}개에 설치됨, 실패: ${failed}';
 	@override String get laterHint => '선택사항 — 나중에 설정 → MCP에서 설치할 수도 있습니다.';
-	@override String get title => '에이전트를 ddagent에 연결';
+	@override String get title => '에이전트를 DDAgent에 연결';
 }
 
 // Path: fileTree.search
@@ -5628,10 +5628,10 @@ class Translations$settings$notifications$webPush$ko extends Translations$settin
 	@override String get loading => '업데이트 중...';
 	@override String get unsupported => '이 브라우저에서는 푸시 알림이 지원되지 않습니다.';
 	@override String get denied => '푸시 알림이 차단되었습니다. 브라우저 설정에서 허용해 주세요.';
-	@override String get iosHint => 'iPhone/iPad에서는 ddagent를 홈 화면에 추가하고(공유 → 홈 화면에 추가) 설치된 앱에서 알림을 활성화해야만 알림이 작동합니다.';
+	@override String get iosHint => 'iPhone/iPad에서는 DDAgent를 홈 화면에 추가하고(공유 → 홈 화면에 추가) 설치된 앱에서 알림을 활성화해야만 알림이 작동합니다.';
 	@override String get test => '테스트 알림 보내기';
 	@override String get testNoSubscription => '구독 중인 기기가 없습니다. 먼저 휴대폰에서 "활성화"를 누르세요.';
-	@override String testSuccess({required Object count}) => '${count}개 기기에 전송했습니다. 휴대폰에 아무것도 표시되지 않으면 ddagent를 홈 화면에 추가하세요(iOS 요구 사항).';
+	@override String testSuccess({required Object count}) => '${count}개 기기에 전송했습니다. 휴대폰에 아무것도 표시되지 않으면 DDAgent를 홈 화면에 추가하세요(iOS 요구 사항).';
 	@override String get testNotDelivered => '연결 가능한 기기가 없습니다. 앱이 실행 중이고 알림이 활성화되어 있는지 확인하세요.';
 }
 
@@ -6164,7 +6164,7 @@ class Translations$settings$mcpServers$managed$ko extends Translations$settings$
 
 	// Translations
 	@override String get badge => '관리됨';
-	@override String get hint => 'ddagent가 관리합니다.';
+	@override String get hint => 'DDAgent가 관리합니다.';
 }
 
 // Path: settings.mcpServers.help
@@ -7009,7 +7009,7 @@ extension on TranslationsKo {
 		return switch (path) {
 			'auth.sessionExpired' => '세션이 만료되었습니다. 다시 로그인하세요.',
 			'auth.login.title' => '다시 오신 것을 환영합니다',
-			'auth.login.description' => 'ddagent 계정에 로그인하세요',
+			'auth.login.description' => 'DDAgent 계정에 로그인하세요',
 			'auth.login.username' => '사용자명',
 			'auth.login.password' => '비밀번호',
 			'auth.login.submit' => '로그인',
@@ -7516,7 +7516,7 @@ extension on TranslationsKo {
 			'common.fileOperations.move' => '이동',
 			'common.fileOperations.copyPath' => '경로 복사',
 			'common.fileOperations.openInEditor' => '에디터에서 열기',
-			'common.mainContent.loading' => 'ddagent 로딩 중',
+			'common.mainContent.loading' => 'DDAgent 로딩 중',
 			'common.mainContent.settingUpWorkspace' => '워크스페이스 설정 중...',
 			'common.mainContent.chooseProject' => '프로젝트 선택',
 			_ => null,
@@ -8155,8 +8155,8 @@ extension on TranslationsKo {
 			'common.update.manualRestart' => '업데이트가 적용되었지만 서버가 자동으로 재시작되지 않았습니다 — 마무리하려면 수동으로 재시작하세요.',
 			'common.update.failed' => '업데이트 실패.',
 			'common.update.failedTitle' => '업데이트 실패',
-			'common.update.appConfirm' => ({required Object version}) => '이 기기에 ddagent v${version}을(를) 설치할까요? 처음에는 Android가 ddagent의 앱 설치를 허용할지 물습니다.',
-			'common.update.appPermission' => 'ddagent에 \'알 수 없는 앱 설치\'를 허용한 뒤 업데이트를 다시 누르세요.',
+			'common.update.appConfirm' => ({required Object version}) => '이 기기에 DDAgent v${version}을(를) 설치할까요? 처음에는 Android가 DDAgent의 앱 설치를 허용할지 물습니다.',
+			'common.update.appPermission' => 'DDAgent에 \'알 수 없는 앱 설치\'를 허용한 뒤 업데이트를 다시 누르세요.',
 			'common.update.chooseTitle' => '업데이트 가능',
 			'common.update.targetApp' => '이 앱',
 			'common.update.targetWeb' => '웹 인터페이스',
@@ -8179,9 +8179,9 @@ extension on TranslationsKo {
 			'settings.changelog.current' => '현재',
 			'settings.changelog.kNew' => '신규',
 			'settings.server.title' => '서버',
-			'settings.server.description' => 'ddagent 프로세스를 재시작합니다 — 업데이트 적용이나 멈춤 상태 복구에 유용합니다.',
+			'settings.server.description' => 'DDAgent 프로세스를 재시작합니다 — 업데이트 적용이나 멈춤 상태 복구에 유용합니다.',
 			'settings.server.restart' => '재시작',
-			'settings.server.restartConfirm' => 'ddagent 서버를 재시작할까요? 활성 세션이 중단됩니다.',
+			'settings.server.restartConfirm' => 'DDAgent 서버를 재시작할까요? 활성 세션이 중단됩니다.',
 			'settings.server.restarting' => '재시작 중… 서버가 돌아오면 페이지가 새로고침됩니다.',
 			'settings.server.restartFailed' => '재시작 실패',
 			'settings.server.unsupported' => '서버가 서비스 매니저로 실행 중일 때만 재시작할 수 있습니다.',
@@ -8197,8 +8197,8 @@ extension on TranslationsKo {
 			'settings.updates.check' => '업데이트 확인',
 			'settings.updates.checking' => '확인 중…',
 			'settings.updates.upToDate' => ({required Object version}) => '최신 버전입니다 (v${version}).',
-			'settings.updates.available' => ({required Object version}) => '업데이트 v${version} 발견 — 백그라운드에서 다운로드 중; ddagent 종료 시 설치됩니다.',
-			'settings.updates.downloaded' => ({required Object version}) => '업데이트 v${version} 다운로드 완료 — ddagent를 종료 후 다시 실행하면 설치됩니다.',
+			'settings.updates.available' => ({required Object version}) => '업데이트 v${version} 발견 — 백그라운드에서 다운로드 중; DDAgent 종료 시 설치됩니다.',
+			'settings.updates.downloaded' => ({required Object version}) => '업데이트 v${version} 다운로드 완료 — DDAgent를 종료 후 다시 실행하면 설치됩니다.',
 			'settings.updates.unavailable' => '업데이트 확인은 패키지된 데스크톱 빌드에서만 사용할 수 있습니다.',
 			'settings.updates.error' => ({required Object message}) => '업데이트 확인 실패: ${message}',
 			'settings.updates.errorGeneric' => '업데이트 확인에 실패했습니다.',
@@ -8384,10 +8384,10 @@ extension on TranslationsKo {
 			'settings.notifications.webPush.loading' => '업데이트 중...',
 			'settings.notifications.webPush.unsupported' => '이 브라우저에서는 푸시 알림이 지원되지 않습니다.',
 			'settings.notifications.webPush.denied' => '푸시 알림이 차단되었습니다. 브라우저 설정에서 허용해 주세요.',
-			'settings.notifications.webPush.iosHint' => 'iPhone/iPad에서는 ddagent를 홈 화면에 추가하고(공유 → 홈 화면에 추가) 설치된 앱에서 알림을 활성화해야만 알림이 작동합니다.',
+			'settings.notifications.webPush.iosHint' => 'iPhone/iPad에서는 DDAgent를 홈 화면에 추가하고(공유 → 홈 화면에 추가) 설치된 앱에서 알림을 활성화해야만 알림이 작동합니다.',
 			'settings.notifications.webPush.test' => '테스트 알림 보내기',
 			'settings.notifications.webPush.testNoSubscription' => '구독 중인 기기가 없습니다. 먼저 휴대폰에서 "활성화"를 누르세요.',
-			'settings.notifications.webPush.testSuccess' => ({required Object count}) => '${count}개 기기에 전송했습니다. 휴대폰에 아무것도 표시되지 않으면 ddagent를 홈 화면에 추가하세요(iOS 요구 사항).',
+			'settings.notifications.webPush.testSuccess' => ({required Object count}) => '${count}개 기기에 전송했습니다. 휴대폰에 아무것도 표시되지 않으면 DDAgent를 홈 화면에 추가하세요(iOS 요구 사항).',
 			'settings.notifications.webPush.testNotDelivered' => '연결 가능한 기기가 없습니다. 앱이 실행 중이고 알림이 활성화되어 있는지 확인하세요.',
 			'settings.notifications.device.title' => '이 기기에 알림',
 			'settings.notifications.device.enabled' => '이 기기의 알림이 활성화되어 있습니다',
@@ -8602,7 +8602,7 @@ extension on TranslationsKo {
 			'settings.mcpServers.actions.edit' => '서버 편집',
 			'settings.mcpServers.actions.delete' => '서버 삭제',
 			'settings.mcpServers.managed.badge' => '관리됨',
-			'settings.mcpServers.managed.hint' => 'ddagent가 관리합니다.',
+			'settings.mcpServers.managed.hint' => 'DDAgent가 관리합니다.',
 			'settings.mcpServers.help.title' => 'Codex MCP 정보',
 			'settings.mcpServers.help.description' => 'Codex는 stdio 기반 MCP 서버를 지원합니다. 추가 도구와 리소스로 Codex의 기능을 확장하는 서버를 추가할 수 있습니다.',
 			'settings.mcpServers.deleteConfirm.description' => ({required Object serverName}) => '"${serverName}"이(가) 제공자 구성에서 제거됩니다.',
@@ -8667,10 +8667,10 @@ extension on TranslationsKo {
 			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => '취소',
 			'settings.workspaces.create' => '작업 영역 추가',
-			'settings.workspaces.deleteConfirm' => '이 작업 영역을 ddagent에서 제거하시겠습니까? 파일은 디스크에 남습니다.',
+			'settings.workspaces.deleteConfirm' => '이 작업 영역을 DDAgent에서 제거하시겠습니까? 파일은 디스크에 남습니다.',
 			'settings.workspaces.deleteFailed' => '작업 영역 제거에 실패했습니다.',
 			'settings.workspaces.deleteTitle' => '작업 영역 제거',
-			'settings.workspaces.description' => '작업 영역은 ddagent가 채팅하고, 코드를 실행하고, 탐색할 수 있는 디렉터리입니다.',
+			'settings.workspaces.description' => '작업 영역은 DDAgent가 채팅하고, 코드를 실행하고, 탐색할 수 있는 디렉터리입니다.',
 			'settings.workspaces.remove' => '작업 영역 제거',
 			'settings.workspaces.title' => '작업 영역',
 			'settings.workspaces.pathRequired' => '경로는 필수입니다',
@@ -8679,8 +8679,8 @@ extension on TranslationsKo {
 			'settings.about.learnMore' => '더 알아보기',
 			'settings.about.pro.syncSettings' => '설정 동기화',
 			'settings.about.pro.teamManagement' => '팀 관리',
-			'settings.about.proFeatures' => 'ddagent Pro 기능',
-			'settings.about.tryHosted' => 'ddagent Hosted 사용해보기',
+			'settings.about.proFeatures' => 'DDAgent Pro 기능',
+			'settings.about.tryHosted' => 'DDAgent Hosted 사용해보기',
 			'settings.about.versionInfo' => '버전 정보',
 			'settings.about.client' => '앱',
 			'settings.about.server' => '서버',
@@ -8706,7 +8706,7 @@ extension on TranslationsKo {
 			'sidebar.projects.noMatchingProjects' => '일치하는 프로젝트 없음',
 			'sidebar.projects.tryDifferentSearch' => '검색어를 변경해보세요',
 			'sidebar.projects.runClaudeCli' => '프로젝트 디렉토리에서 Claude CLI를 실행하여 시작하세요',
-			'sidebar.app.title' => 'ddagent',
+			'sidebar.app.title' => 'DDAgent',
 			'sidebar.app.subtitle' => 'AI 코딩 어시스턴트 UI',
 			'sidebar.sessions.title' => '세션',
 			'sidebar.sessions.newSession' => '새 세션',
@@ -8804,7 +8804,7 @@ extension on TranslationsKo {
 			'sidebar.version.updateAvailable' => '업데이트 가능',
 			'sidebar.version.restartRequired' => '업데이트가 설치됨 — 적용하려면 서버를 재시작하세요',
 			'sidebar.version.updateNow' => '지금 업데이트',
-			'sidebar.version.updateConfirm' => ({required Object version}) => 'ddagent를 v${version}(으)로 업데이트할까요? 최신 코드를 받아 빌드한 뒤 서버가 재시작됩니다 — 활성 세션은 중단됩니다.',
+			'sidebar.version.updateConfirm' => ({required Object version}) => 'DDAgent를 v${version}(으)로 업데이트할까요? 최신 코드를 받아 빌드한 뒤 서버가 재시작됩니다 — 활성 세션은 중단됩니다.',
 			'sidebar.version.updating' => '업데이트 중… 몇 분 걸릴 수 있습니다',
 			'sidebar.version.restarting' => '업데이트 설치됨 — 재시작 중…',
 			'sidebar.version.updateFailed' => '업데이트 실패',
@@ -9183,11 +9183,11 @@ extension on TranslationsKo {
 			'knowledge.graph.truncated' => '잘림',
 			'knowledge.importAll.action' => '모두 가져오기',
 			'knowledge.importAll.mergeDuplicates' => '중복 항목 병합',
-			'knowledge.importAll.mergeDuplicatesHint' => 'ddagent 내 중복 행을 병합합니다 (파일 아님)',
+			'knowledge.importAll.mergeDuplicatesHint' => 'DDAgent 내 중복 행을 병합합니다 (파일 아님)',
 			'knowledge.importAll.projectsScanned' => ({required Object count}) => '검사한 프로젝트: ${count}',
 			'knowledge.importAll.rulesSummary' => ({required Object total, required Object duplicates}) => '규칙: ${total} · 중복 그룹: ${duplicates}',
 			'knowledge.importAll.skillsFound' => ({required Object found, required Object newSkills}) => '발견한 에이전트 스킬: ${found} (신규: ${newSkills})',
-			'knowledge.importAll.title' => 'ddagent로 모두 가져오기',
+			'knowledge.importAll.title' => 'DDAgent로 모두 가져오기',
 			'knowledge.importSkills.found' => ({required Object count}) => '에이전트 전체에서 스킬 ${count}개를 찾았습니다.',
 			'knowledge.importSkills.summary' => ({required Object imported, required Object skipped}) => '신규: ${imported} · 건너뜀: ${skipped}',
 			'knowledge.importSkills.title' => '에이전트 스킬 가져오기',
@@ -9276,15 +9276,15 @@ extension on TranslationsKo {
 			'mcp.form.validation.unsupportedGlobal' => ({required Object type}) => 'MCP 서버 추가는 모든 제공자에서 stdio와 http만 지원하며 ${type}은(는) 지원하지 않습니다.',
 			'mcp.form.validation.unsupportedProvider' => ({required Object provider, required Object type}) => '${provider}는 ${type} MCP 서버를 지원하지 않습니다',
 			'mcp.install.button' => '설치',
-			'mcp.install.cardDescription' => 'MCP를 통해 에이전트에게 지식 베이스와 ddagent 도구를 제공하세요 — 에이전트를 선택하거나 전체에 설치하세요.',
-			'mcp.install.description' => '선택한 에이전트가 MCP를 통해 ddagent 지식 베이스와 도구를 사용할 수 있게 합니다.',
+			'mcp.install.cardDescription' => 'MCP를 통해 에이전트에게 지식 베이스와 DDAgent 도구를 제공하세요 — 에이전트를 선택하거나 전체에 설치하세요.',
+			'mcp.install.description' => '선택한 에이전트가 MCP를 통해 DDAgent 지식 베이스와 도구를 사용할 수 있게 합니다.',
 			'mcp.install.errorFallback' => '오류',
 			'mcp.install.failed' => ({required Object error}) => '설치 실패: ${error}',
 			'mcp.install.installForAll' => '전체에 설치',
 			'mcp.install.installSelected' => '선택 항목에 설치',
 			'mcp.install.installedCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, one: '에이전트 ${count}개에 설치했습니다.', other: '에이전트 ${count}개에 설치했습니다.', ), 
 			'mcp.install.partialFailure' => ({required Object count, required Object failed}) => '${count}개에 설치됨, 실패: ${failed}',
-			'mcp.install.title' => 'ddagent MCP 서버 설치',
+			'mcp.install.title' => 'DDAgent MCP 서버 설치',
 			'mcp.servers.addGlobalDescription' => '이 MCP 서버를 모든 제공자(Claude, Cursor, Codex, OpenCode, Devin)에 추가합니다. 동일한 설정이 모든 제공자에서 작동해야 하므로 stdio와 HTTP 전송만 지원됩니다.',
 			'mcp.servers.addGlobalMenuDescription' => '전역 MCP 서버 추가는 하나의 공통 stdio 또는 HTTP 서버를 Claude, Cursor, Codex, OpenCode, Devin에 기록합니다.',
 			'mcp.servers.addGlobalTitle' => '전역 MCP 서버 추가',
@@ -9295,7 +9295,7 @@ extension on TranslationsKo {
 			'mcp.servers.descriptionGeneric' => ({required Object provider}) => 'Model Context Protocol 서버는 ${provider}에 추가 도구와 데이터 소스를 제공합니다',
 			'mcp.servers.loading' => 'MCP 서버 로드 중...',
 			'mcp.servers.refreshingScopes' => '프로젝트 범위 새로 고치는 중...',
-			'mcp.team.cta' => 'ddagent Pro에서 사용 가능',
+			'mcp.team.cta' => 'DDAgent Pro에서 사용 가능',
 			'mcp.team.description' => '팀 전체에서 MCP 서버 설정을 공유하세요. 모든 사람이 자동으로 동기화됩니다.',
 			'mcp.team.title' => '팀 MCP 설정',
 			'mcp.tokens.scopeWrite' => '쓰기',
@@ -9376,7 +9376,7 @@ extension on TranslationsKo {
 			'scheduler.runs' => '실행',
 			'scheduler.session' => ({required Object id}) => '세션 ${id}',
 			'scheduler.worktree' => 'worktree',
-			'notifications.deviceLabel' => 'ddagent Flutter',
+			'notifications.deviceLabel' => 'DDAgent Flutter',
 			'notifications.errors.noResponse' => '서버에서 응답이 없습니다',
 			'notifications.errors.registrationRejected' => '서버에서 등록을 거부했습니다',
 			'serverConnect.connect' => '연결',
@@ -9385,7 +9385,7 @@ extension on TranslationsKo {
 			'serverConnect.connectionFailed' => ({required Object error}) => '연결 실패 (${error})',
 			'serverConnect.enterUrl' => '서버 URL을 입력하세요',
 			'serverConnect.local.title' => '이 기기',
-			'serverConnect.local.subtitle' => '이 컴퓨터에서 ddagent 서버를 실행합니다',
+			'serverConnect.local.subtitle' => '이 컴퓨터에서 DDAgent 서버를 실행합니다',
 			'serverConnect.local.install' => '로컬 서버 설치',
 			'serverConnect.local.start' => '로컬 서버 시작',
 			'serverConnect.local.stop' => '중지',
@@ -9397,7 +9397,7 @@ extension on TranslationsKo {
 			'serverConnect.local.connect' => '이 서버 사용',
 			'serverConnect.local.error' => ({required Object error}) => '로컬 서버 오류: ${error}',
 			'serverConnect.local.or' => '또는 원격 서버에 연결',
-			'serverConnect.subtitle' => 'ddagent 서버에 연결하세요',
+			'serverConnect.subtitle' => 'DDAgent 서버에 연결하세요',
 			'voice.apiKeySaved' => 'API 키 (저장됨, 교체하려면 입력)',
 			'voice.preview' => '미리보기',
 			'voice.saveFailed' => 'STT 설정 저장 실패',
@@ -9517,14 +9517,14 @@ extension on TranslationsKo {
 			'onboarding.completeSetup' => '설정 완료',
 			'onboarding.errors.invalidEmail' => '유효한 이메일 주소를 입력해주세요.',
 			'onboarding.errors.nameAndEmailRequired' => 'git 이름과 이메일이 모두 필요합니다.',
-			'onboarding.gitHint' => 'ddagent 세션이 생성한 커밋에 사용됩니다.',
-			'onboarding.mcp.description' => '에이전트가 지식 베이스와 ddagent 도구를 사용할 수 있도록 ddagent MCP 서버를 설치하세요. 에이전트를 선택하거나 전체에 설치하세요.',
+			'onboarding.gitHint' => 'DDAgent 세션이 생성한 커밋에 사용됩니다.',
+			'onboarding.mcp.description' => '에이전트가 지식 베이스와 DDAgent 도구를 사용할 수 있도록 DDAgent MCP 서버를 설치하세요. 에이전트를 선택하거나 전체에 설치하세요.',
 			'onboarding.mcp.installForAll' => '전체에 설치',
 			'onboarding.mcp.installSelected' => '선택 항목에 설치',
 			'onboarding.mcp.installedOn' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, one: '에이전트 ${count}개에 설치했습니다.', other: '에이전트 ${count}개에 설치했습니다.', ), 
 			'onboarding.mcp.installedWithFailures' => ({required Object installedCount, required Object failed}) => '${installedCount}개에 설치됨, 실패: ${failed}',
 			'onboarding.mcp.laterHint' => '선택사항 — 나중에 설정 → MCP에서 설치할 수도 있습니다.',
-			'onboarding.mcp.title' => '에이전트를 ddagent에 연결',
+			'onboarding.mcp.title' => '에이전트를 DDAgent에 연결',
 			'fileTree.browseServerFilesystem' => '서버 파일 시스템 찾아보기',
 			'fileTree.chooseFolder' => '폴더 선택',
 			'fileTree.copyContents' => '내용 복사',

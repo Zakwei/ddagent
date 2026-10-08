@@ -147,7 +147,7 @@ export type CreateServicesResult = {
 };
 
 /**
- * Composes the ddagent backend: builds the Express application, mounts every
+ * Composes the DDAgent backend: builds the Express application, mounts every
  * module and route, initializes the database schema and web push, and returns
  * the websocket dependency object. Never binds a port, registers signal
  * handlers, or exits the process — that stays with the caller.

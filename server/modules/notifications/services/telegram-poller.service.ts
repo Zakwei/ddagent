@@ -91,7 +91,7 @@ async function handleCallbackQuery(token: string, query: NonNullable<TelegramUpd
     return;
   }
   if (!chatId || !isChatWhitelisted(chatId)) {
-    await answer('This chat is not paired with ddagent');
+    await answer('This chat is not paired with DDAgent');
     return;
   }
 

@@ -104,7 +104,7 @@ class McpServer {
   final String? projectName;
   final String? projectDisplayName;
 
-  /// Servers prefixed `ddagent-` are written/removed by ddagent feature
+  /// Servers prefixed `ddagent-` are written/removed by DDAgent feature
   /// toggles (e.g. the Browser tab) — shown read-only so users don't edit
   /// them out of sync with the feature.
   bool get isManaged => name.startsWith('ddagent-');
@@ -167,7 +167,7 @@ class McpServer {
       : const {};
 }
 
-/// Bearer token for ddagent's own MCP endpoint (`POST /mcp`) —
+/// Bearer token for DDAgent's own MCP endpoint (`POST /mcp`) —
 /// `McpServerTokens.tsx` row shape.
 class McpToken {
   const McpToken({

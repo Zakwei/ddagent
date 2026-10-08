@@ -118,7 +118,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(
-      find.text('Restart the ddagent server? Active sessions will be interrupted.'),
+      find.text('Restart the DDAgent server? Active sessions will be interrupted.'),
       findsOneWidget,
     );
   });
@@ -262,7 +262,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(
         find.textContaining(
-          android ? 'Install ddagent v9.9.9 on this device?' : 'Update to v9.9.9?',
+          android ? 'Install DDAgent v9.9.9 on this device?' : 'Update to v9.9.9?',
         ),
         findsOneWidget,
       );

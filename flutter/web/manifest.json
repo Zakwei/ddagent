@@ -1,6 +1,6 @@
 {
-    "name": "ddagent_app",
-    "short_name": "ddagent_app",
+    "name": "DDAgent",
+    "short_name": "DDAgent",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

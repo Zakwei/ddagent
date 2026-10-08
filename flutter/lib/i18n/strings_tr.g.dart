@@ -444,7 +444,7 @@ class Translations$notifications$tr extends Translations$notifications$en {
 	final TranslationsTr _root; // ignore: unused_field
 
 	// Translations
-	@override String get deviceLabel => 'ddagent Flutter';
+	@override String get deviceLabel => 'DDAgent Flutter';
 	@override late final Translations$notifications$errors$tr errors = Translations$notifications$errors$tr._(_root);
 }
 
@@ -461,7 +461,7 @@ class Translations$serverConnect$tr extends Translations$serverConnect$en {
 	@override String connectionFailed({required Object error}) => 'Bağlantı başarısız (${error})';
 	@override String get enterUrl => 'Bir sunucu URL\'si girin';
 	@override late final Translations$serverConnect$local$tr local = Translations$serverConnect$local$tr._(_root);
-	@override String get subtitle => 'ddagent sunucunuza bağlanın';
+	@override String get subtitle => 'DDAgent sunucunuza bağlanın';
 }
 
 // Path: voice
@@ -631,7 +631,7 @@ class Translations$onboarding$tr extends Translations$onboarding$en {
 	@override late final Translations$onboarding$agents$tr agents = Translations$onboarding$agents$tr._(_root);
 	@override String get completeSetup => 'Kurulumu Tamamla';
 	@override late final Translations$onboarding$errors$tr errors = Translations$onboarding$errors$tr._(_root);
-	@override String get gitHint => 'ddagent oturumlarının oluşturduğu commit\'ler için kullanılır.';
+	@override String get gitHint => 'DDAgent oturumlarının oluşturduğu commit\'ler için kullanılır.';
 	@override late final Translations$onboarding$mcp$tr mcp = Translations$onboarding$mcp$tr._(_root);
 }
 
@@ -694,7 +694,7 @@ class Translations$auth$login$tr extends Translations$auth$login$en {
 
 	// Translations
 	@override String get title => 'Tekrar Hoş Geldin';
-	@override String get description => 'Kendi ddagent hesabına giriş yap';
+	@override String get description => 'Kendi DDAgent hesabına giriş yap';
 	@override String get username => 'Kullanıcı Adı';
 	@override String get password => 'Şifre';
 	@override String get submit => 'Giriş Yap';
@@ -1729,7 +1729,7 @@ class Translations$common$mainContent$tr extends Translations$common$mainContent
 	final TranslationsTr _root; // ignore: unused_field
 
 	// Translations
-	@override String get loading => 'ddagent Yükleniyor';
+	@override String get loading => 'DDAgent Yükleniyor';
 	@override String get settingUpWorkspace => 'Çalışma alanın hazırlanıyor...';
 	@override String get chooseProject => 'Projeni Seç';
 	@override String get selectProjectDescription => 'Claude ile kodlamaya başlamak için kenar çubuğundan bir proje seç. Her proje kendi sohbet oturumlarını ve dosya geçmişini içerir.';
@@ -2163,8 +2163,8 @@ class Translations$common$update$tr extends Translations$common$update$en {
 	@override String get manualRestart => 'Güncelleme uygulandı ancak sunucu kendiliğinden yeniden başlamadı — tamamlamak için elle yeniden başlat.';
 	@override String get failed => 'Güncelleme başarısız oldu.';
 	@override String get failedTitle => 'Güncelleme başarısız';
-	@override String appConfirm({required Object version}) => 'ddagent v${version} bu cihaza kurulsun mu? Android ilk seferde ddagent\'tan yüklemeye izin vermenizi ister.';
-	@override String get appPermission => 'ddagent için “Bilinmeyen uygulamaları yükle” iznini verin, sonra tekrar Güncelle\'ye dokunun.';
+	@override String appConfirm({required Object version}) => 'DDAgent v${version} bu cihaza kurulsun mu? Android ilk seferde DDAgent\'tan yüklemeye izin vermenizi ister.';
+	@override String get appPermission => 'DDAgent için “Bilinmeyen uygulamaları yükle” iznini verin, sonra tekrar Güncelle\'ye dokunun.';
 	@override String get chooseTitle => 'Güncellemeler var';
 	@override String get targetApp => 'Bu uygulama';
 	@override String get targetWeb => 'Web arayüzü';
@@ -2204,9 +2204,9 @@ class Translations$settings$server$tr extends Translations$settings$server$en {
 
 	// Translations
 	@override String get title => 'Sunucu';
-	@override String get description => 'ddagent sürecini yeniden başlatır — güncelleme sonrası veya takılma durumunda kullanışlıdır.';
+	@override String get description => 'DDAgent sürecini yeniden başlatır — güncelleme sonrası veya takılma durumunda kullanışlıdır.';
 	@override String get restart => 'Yeniden başlat';
-	@override String get restartConfirm => 'ddagent sunucusu yeniden başlatılsın mı? Aktif oturumlar kesintiye uğrayacak.';
+	@override String get restartConfirm => 'DDAgent sunucusu yeniden başlatılsın mı? Aktif oturumlar kesintiye uğrayacak.';
 	@override String get restarting => 'Yeniden başlatılıyor… sunucu döndüğünde sayfa yenilenecek.';
 	@override String get restartFailed => 'Yeniden başlatma başarısız';
 	@override String get unsupported => 'Yeniden başlatma yalnızca sunucu servis yöneticisi altında çalışırken kullanılabilir.';
@@ -2231,8 +2231,8 @@ class Translations$settings$updates$tr extends Translations$settings$updates$en 
 	@override String get check => 'Güncellemeleri denetle';
 	@override String get checking => 'Denetleniyor…';
 	@override String upToDate({required Object version}) => 'En güncel sürümü kullanıyorsunuz (v${version}).';
-	@override String available({required Object version}) => 'v${version} güncellemesi bulundu — arka planda indiriliyor; ddagent kapanırken kurulacak.';
-	@override String downloaded({required Object version}) => 'v${version} güncellemesi indirildi — kurmak için ddagent\'ı kapatıp yeniden başlatın.';
+	@override String available({required Object version}) => 'v${version} güncellemesi bulundu — arka planda indiriliyor; DDAgent kapanırken kurulacak.';
+	@override String downloaded({required Object version}) => 'v${version} güncellemesi indirildi — kurmak için DDAgent\'ı kapatıp yeniden başlatın.';
 	@override String get unavailable => 'Güncelleme denetimi yalnızca paketlenmiş masaüstü sürümlerinde kullanılabilir.';
 	@override String error({required Object message}) => 'Güncelleme denetimi başarısız: ${message}';
 	@override String get errorGeneric => 'Güncelleme denetimi başarısız.';
@@ -2625,10 +2625,10 @@ class Translations$settings$workspaces$tr extends Translations$settings$workspac
 	// Translations
 	@override String get cancel => 'İptal';
 	@override String get create => 'Çalışma alanı ekle';
-	@override String get deleteConfirm => 'Bu çalışma alanı ddagent’tan kaldırılsın mı? Dosyaları diskte kalır.';
+	@override String get deleteConfirm => 'Bu çalışma alanı DDAgent’tan kaldırılsın mı? Dosyaları diskte kalır.';
 	@override String get deleteFailed => 'Çalışma alanı kaldırılamadı.';
 	@override String get deleteTitle => 'Çalışma alanını kaldır';
-	@override String get description => 'Çalışma alanları, ddagent’ın sohbet edebildiği, kod çalıştırabildiği ve gezinebildiği dizinlerdir.';
+	@override String get description => 'Çalışma alanları, DDAgent’ın sohbet edebildiği, kod çalıştırabildiği ve gezinebildiği dizinlerdir.';
 	@override String get remove => 'Çalışma alanını kaldır';
 	@override String get title => 'Çalışma alanları';
 	@override String get pathRequired => 'Yol gerekli';
@@ -2645,8 +2645,8 @@ class Translations$settings$about$tr extends Translations$settings$about$en {
 	@override String get buyMeACoffee => 'Bana kahve ısmarla';
 	@override String get learnMore => 'Daha fazla bilgi';
 	@override late final Translations$settings$about$pro$tr pro = Translations$settings$about$pro$tr._(_root);
-	@override String get proFeatures => 'ddagent Pro Özellikleri';
-	@override String get tryHosted => 'ddagent Hosted\'ı deneyin';
+	@override String get proFeatures => 'DDAgent Pro Özellikleri';
+	@override String get tryHosted => 'DDAgent Hosted\'ı deneyin';
 	@override String get versionInfo => 'Sürüm bilgisi';
 	@override String get client => 'Uygulama';
 	@override String get server => 'Sunucu';
@@ -2690,7 +2690,7 @@ class Translations$sidebar$app$tr extends Translations$sidebar$app$en {
 	final TranslationsTr _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'ddagent';
+	@override String get title => 'DDAgent';
 	@override String get subtitle => 'AI kodlama asistanı arayüzü';
 }
 
@@ -2875,7 +2875,7 @@ class Translations$sidebar$version$tr extends Translations$sidebar$version$en {
 	@override String get updateAvailable => 'Güncelleme mevcut';
 	@override String get restartRequired => 'Güncelleme yüklendi — uygulamak için sunucuyu yeniden başlatın';
 	@override String get updateNow => 'Şimdi güncelle';
-	@override String updateConfirm({required Object version}) => 'ddagent v${version} sürümüne güncellensin mi? En yeni kod çekilip derlenecek ve sunucu yeniden başlatılacak — etkin oturumlar kesintiye uğrar.';
+	@override String updateConfirm({required Object version}) => 'DDAgent v${version} sürümüne güncellensin mi? En yeni kod çekilip derlenecek ve sunucu yeniden başlatılacak — etkin oturumlar kesintiye uğrar.';
 	@override String get updating => 'Güncelleniyor… birkaç dakika sürebilir';
 	@override String get restarting => 'Güncelleme yüklendi — yeniden başlatılıyor…';
 	@override String get updateFailed => 'Güncelleme başarısız';
@@ -3625,11 +3625,11 @@ class Translations$knowledge$importAll$tr extends Translations$knowledge$importA
 	// Translations
 	@override String get action => 'Her şeyi içe aktar';
 	@override String get mergeDuplicates => 'Yinelenen kayıtları birleştir';
-	@override String get mergeDuplicatesHint => 'ddagent içindeki yinelenen satırları birleştirir (dosyaları değil)';
+	@override String get mergeDuplicatesHint => 'DDAgent içindeki yinelenen satırları birleştirir (dosyaları değil)';
 	@override String projectsScanned({required Object count}) => 'Taranan projeler: ${count}';
 	@override String rulesSummary({required Object total, required Object duplicates}) => 'Kurallar: ${total} · yinelenen gruplar: ${duplicates}';
 	@override String skillsFound({required Object found, required Object newSkills}) => 'Bulunan agent becerileri: ${found} (yeni: ${newSkills})';
-	@override String get title => 'Her şeyi ddagent\'a aktar';
+	@override String get title => 'Her şeyi DDAgent\'a aktar';
 }
 
 // Path: knowledge.importSkills
@@ -3813,8 +3813,8 @@ class Translations$mcp$install$tr extends Translations$mcp$install$en {
 
 	// Translations
 	@override String get button => 'Kur';
-	@override String get cardDescription => 'Agentlarınıza MCP üzerinden bilgi tabanını ve ddagent araçlarını verin — agentları seçin veya tümü için kurun.';
-	@override String get description => 'Seçili agentların MCP üzerinden ddagent bilgi tabanını ve araçlarını kullanmasını sağlar.';
+	@override String get cardDescription => 'Agentlarınıza MCP üzerinden bilgi tabanını ve DDAgent araçlarını verin — agentları seçin veya tümü için kurun.';
+	@override String get description => 'Seçili agentların MCP üzerinden DDAgent bilgi tabanını ve araçlarını kullanmasını sağlar.';
 	@override String get errorFallback => 'hata';
 	@override String failed({required Object error}) => 'Kurulum başarısız: ${error}';
 	@override String get installForAll => 'Tümü için kur';
@@ -3824,7 +3824,7 @@ class Translations$mcp$install$tr extends Translations$mcp$install$en {
 		other: '${count} agenta kuruldu.',
 	);
 	@override String partialFailure({required Object count, required Object failed}) => '${count} agenta kuruldu; başarısız: ${failed}';
-	@override String get title => 'ddagent MCP sunucusunu kur';
+	@override String get title => 'DDAgent MCP sunucusunu kur';
 }
 
 // Path: mcp.servers
@@ -3852,7 +3852,7 @@ class Translations$mcp$team$tr extends Translations$mcp$team$en {
 	final TranslationsTr _root; // ignore: unused_field
 
 	// Translations
-	@override String get cta => 'ddagent Pro ile kullanılabilir';
+	@override String get cta => 'DDAgent Pro ile kullanılabilir';
 	@override String get description => 'MCP sunucu yapılandırmalarını takımınızla paylaşın. Herkes otomatik olarak senkron kalır.';
 	@override String get title => 'Takım MCP Yapılandırmaları';
 }
@@ -4030,7 +4030,7 @@ class Translations$serverConnect$local$tr extends Translations$serverConnect$loc
 
 	// Translations
 	@override String get title => 'Bu cihaz';
-	@override String get subtitle => 'ddagent sunucusunu bu makinede çalıştırın';
+	@override String get subtitle => 'DDAgent sunucusunu bu makinede çalıştırın';
 	@override String get install => 'Yerel sunucuyu kur';
 	@override String get start => 'Yerel sunucuyu başlat';
 	@override String get stop => 'Durdur';
@@ -4224,7 +4224,7 @@ class Translations$onboarding$mcp$tr extends Translations$onboarding$mcp$en {
 	final TranslationsTr _root; // ignore: unused_field
 
 	// Translations
-	@override String get description => 'Agentlarınızın bilgi tabanını ve ddagent araçlarını kullanabilmesi için ddagent MCP sunucusunu kurun. Agentları seçin veya tümü için kurun.';
+	@override String get description => 'Agentlarınızın bilgi tabanını ve DDAgent araçlarını kullanabilmesi için DDAgent MCP sunucusunu kurun. Agentları seçin veya tümü için kurun.';
 	@override String get installForAll => 'Tümü için kur';
 	@override String get installSelected => 'Seçilenler için kur';
 	@override String installedOn({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('tr'))(count,
@@ -4233,7 +4233,7 @@ class Translations$onboarding$mcp$tr extends Translations$onboarding$mcp$en {
 	);
 	@override String installedWithFailures({required Object installedCount, required Object failed}) => '${installedCount} agenta kuruldu; başarısız: ${failed}';
 	@override String get laterHint => 'İsteğe bağlı — bunu daha sonra Ayarlar → MCP bölümünden de kurabilirsiniz.';
-	@override String get title => 'Agentları ddagent\'a bağlayın';
+	@override String get title => 'Agentları DDAgent\'a bağlayın';
 }
 
 // Path: fileTree.search
@@ -5628,10 +5628,10 @@ class Translations$settings$notifications$webPush$tr extends Translations$settin
 	@override String get loading => 'Güncelleniyor...';
 	@override String get unsupported => 'Bu tarayıcıda push bildirimleri desteklenmiyor.';
 	@override String get denied => 'Push bildirimleri engellendi. Lütfen tarayıcı ayarlarından izin ver.';
-	@override String get iosHint => 'iPhone/iPad’de bildirimler yalnızca ddagent ana ekrana eklendikten sonra (Paylaş → Ana Ekrana Ekle) ve kurulu uygulamada etkinleştirildikten sonra çalışır.';
+	@override String get iosHint => 'iPhone/iPad’de bildirimler yalnızca DDAgent ana ekrana eklendikten sonra (Paylaş → Ana Ekrana Ekle) ve kurulu uygulamada etkinleştirildikten sonra çalışır.';
 	@override String get test => 'Test bildirimi gönder';
 	@override String get testNoSubscription => 'Abone cihaz yok. Önce telefonda “Etkinleştir”e dokunun.';
-	@override String testSuccess({required Object count}) => '${count} cihaza gönderildi. Telefonda bir şey görünmezse ddagent’ı ana ekrana ekleyin (iOS bunu gerektirir).';
+	@override String testSuccess({required Object count}) => '${count} cihaza gönderildi. Telefonda bir şey görünmezse DDAgent’ı ana ekrana ekleyin (iOS bunu gerektirir).';
 	@override String get testNotDelivered => 'Erişilebilir cihaz yoktu. Uygulamanın çalıştığından ve bildirimlerin etkin olduğundan emin olun.';
 }
 
@@ -6175,7 +6175,7 @@ class Translations$settings$mcpServers$managed$tr extends Translations$settings$
 
 	// Translations
 	@override String get badge => 'Yönetilen';
-	@override String get hint => 'ddagent tarafından yönetiliyor.';
+	@override String get hint => 'DDAgent tarafından yönetiliyor.';
 }
 
 // Path: settings.mcpServers.deleteConfirm
@@ -7009,7 +7009,7 @@ extension on TranslationsTr {
 		return switch (path) {
 			'auth.sessionExpired' => 'Oturumunuzun süresi doldu. Lütfen tekrar giriş yapın.',
 			'auth.login.title' => 'Tekrar Hoş Geldin',
-			'auth.login.description' => 'Kendi ddagent hesabına giriş yap',
+			'auth.login.description' => 'Kendi DDAgent hesabına giriş yap',
 			'auth.login.username' => 'Kullanıcı Adı',
 			'auth.login.password' => 'Şifre',
 			'auth.login.submit' => 'Giriş Yap',
@@ -7516,7 +7516,7 @@ extension on TranslationsTr {
 			'common.fileOperations.move' => 'Taşı',
 			'common.fileOperations.copyPath' => 'Yolu Kopyala',
 			'common.fileOperations.openInEditor' => 'Editörde Aç',
-			'common.mainContent.loading' => 'ddagent Yükleniyor',
+			'common.mainContent.loading' => 'DDAgent Yükleniyor',
 			'common.mainContent.settingUpWorkspace' => 'Çalışma alanın hazırlanıyor...',
 			'common.mainContent.chooseProject' => 'Projeni Seç',
 			_ => null,
@@ -8155,8 +8155,8 @@ extension on TranslationsTr {
 			'common.update.manualRestart' => 'Güncelleme uygulandı ancak sunucu kendiliğinden yeniden başlamadı — tamamlamak için elle yeniden başlat.',
 			'common.update.failed' => 'Güncelleme başarısız oldu.',
 			'common.update.failedTitle' => 'Güncelleme başarısız',
-			'common.update.appConfirm' => ({required Object version}) => 'ddagent v${version} bu cihaza kurulsun mu? Android ilk seferde ddagent\'tan yüklemeye izin vermenizi ister.',
-			'common.update.appPermission' => 'ddagent için “Bilinmeyen uygulamaları yükle” iznini verin, sonra tekrar Güncelle\'ye dokunun.',
+			'common.update.appConfirm' => ({required Object version}) => 'DDAgent v${version} bu cihaza kurulsun mu? Android ilk seferde DDAgent\'tan yüklemeye izin vermenizi ister.',
+			'common.update.appPermission' => 'DDAgent için “Bilinmeyen uygulamaları yükle” iznini verin, sonra tekrar Güncelle\'ye dokunun.',
 			'common.update.chooseTitle' => 'Güncellemeler var',
 			'common.update.targetApp' => 'Bu uygulama',
 			'common.update.targetWeb' => 'Web arayüzü',
@@ -8179,9 +8179,9 @@ extension on TranslationsTr {
 			'settings.changelog.current' => 'mevcut',
 			'settings.changelog.kNew' => 'yeni',
 			'settings.server.title' => 'Sunucu',
-			'settings.server.description' => 'ddagent sürecini yeniden başlatır — güncelleme sonrası veya takılma durumunda kullanışlıdır.',
+			'settings.server.description' => 'DDAgent sürecini yeniden başlatır — güncelleme sonrası veya takılma durumunda kullanışlıdır.',
 			'settings.server.restart' => 'Yeniden başlat',
-			'settings.server.restartConfirm' => 'ddagent sunucusu yeniden başlatılsın mı? Aktif oturumlar kesintiye uğrayacak.',
+			'settings.server.restartConfirm' => 'DDAgent sunucusu yeniden başlatılsın mı? Aktif oturumlar kesintiye uğrayacak.',
 			'settings.server.restarting' => 'Yeniden başlatılıyor… sunucu döndüğünde sayfa yenilenecek.',
 			'settings.server.restartFailed' => 'Yeniden başlatma başarısız',
 			'settings.server.unsupported' => 'Yeniden başlatma yalnızca sunucu servis yöneticisi altında çalışırken kullanılabilir.',
@@ -8197,8 +8197,8 @@ extension on TranslationsTr {
 			'settings.updates.check' => 'Güncellemeleri denetle',
 			'settings.updates.checking' => 'Denetleniyor…',
 			'settings.updates.upToDate' => ({required Object version}) => 'En güncel sürümü kullanıyorsunuz (v${version}).',
-			'settings.updates.available' => ({required Object version}) => 'v${version} güncellemesi bulundu — arka planda indiriliyor; ddagent kapanırken kurulacak.',
-			'settings.updates.downloaded' => ({required Object version}) => 'v${version} güncellemesi indirildi — kurmak için ddagent\'ı kapatıp yeniden başlatın.',
+			'settings.updates.available' => ({required Object version}) => 'v${version} güncellemesi bulundu — arka planda indiriliyor; DDAgent kapanırken kurulacak.',
+			'settings.updates.downloaded' => ({required Object version}) => 'v${version} güncellemesi indirildi — kurmak için DDAgent\'ı kapatıp yeniden başlatın.',
 			'settings.updates.unavailable' => 'Güncelleme denetimi yalnızca paketlenmiş masaüstü sürümlerinde kullanılabilir.',
 			'settings.updates.error' => ({required Object message}) => 'Güncelleme denetimi başarısız: ${message}',
 			'settings.updates.errorGeneric' => 'Güncelleme denetimi başarısız.',
@@ -8384,10 +8384,10 @@ extension on TranslationsTr {
 			'settings.notifications.webPush.loading' => 'Güncelleniyor...',
 			'settings.notifications.webPush.unsupported' => 'Bu tarayıcıda push bildirimleri desteklenmiyor.',
 			'settings.notifications.webPush.denied' => 'Push bildirimleri engellendi. Lütfen tarayıcı ayarlarından izin ver.',
-			'settings.notifications.webPush.iosHint' => 'iPhone/iPad’de bildirimler yalnızca ddagent ana ekrana eklendikten sonra (Paylaş → Ana Ekrana Ekle) ve kurulu uygulamada etkinleştirildikten sonra çalışır.',
+			'settings.notifications.webPush.iosHint' => 'iPhone/iPad’de bildirimler yalnızca DDAgent ana ekrana eklendikten sonra (Paylaş → Ana Ekrana Ekle) ve kurulu uygulamada etkinleştirildikten sonra çalışır.',
 			'settings.notifications.webPush.test' => 'Test bildirimi gönder',
 			'settings.notifications.webPush.testNoSubscription' => 'Abone cihaz yok. Önce telefonda “Etkinleştir”e dokunun.',
-			'settings.notifications.webPush.testSuccess' => ({required Object count}) => '${count} cihaza gönderildi. Telefonda bir şey görünmezse ddagent’ı ana ekrana ekleyin (iOS bunu gerektirir).',
+			'settings.notifications.webPush.testSuccess' => ({required Object count}) => '${count} cihaza gönderildi. Telefonda bir şey görünmezse DDAgent’ı ana ekrana ekleyin (iOS bunu gerektirir).',
 			'settings.notifications.webPush.testNotDelivered' => 'Erişilebilir cihaz yoktu. Uygulamanın çalıştığından ve bildirimlerin etkin olduğundan emin olun.',
 			'settings.notifications.device.title' => 'Bu cihazı bilgilendir',
 			'settings.notifications.device.enabled' => 'Bu cihaz için bildirimler etkin',
@@ -8604,7 +8604,7 @@ extension on TranslationsTr {
 			'settings.mcpServers.help.title' => 'Codex MCP Hakkında',
 			'settings.mcpServers.help.description' => 'Codex stdio tabanlı MCP sunucularını destekler. Codex\'in yeteneklerini ek araçlar ve kaynaklarla genişleten sunucular ekleyebilirsin.',
 			'settings.mcpServers.managed.badge' => 'Yönetilen',
-			'settings.mcpServers.managed.hint' => 'ddagent tarafından yönetiliyor.',
+			'settings.mcpServers.managed.hint' => 'DDAgent tarafından yönetiliyor.',
 			'settings.mcpServers.deleteConfirm.description' => ({required Object serverName}) => '“${serverName}” sağlayıcı yapılandırmasından kaldırılacak.',
 			'settings.mcpServers.deleteConfirm.title' => 'MCP sunucusu silinsin mi?',
 			'settings.quota.settings.tab' => 'Control Center',
@@ -8667,10 +8667,10 @@ extension on TranslationsTr {
 			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => 'İptal',
 			'settings.workspaces.create' => 'Çalışma alanı ekle',
-			'settings.workspaces.deleteConfirm' => 'Bu çalışma alanı ddagent’tan kaldırılsın mı? Dosyaları diskte kalır.',
+			'settings.workspaces.deleteConfirm' => 'Bu çalışma alanı DDAgent’tan kaldırılsın mı? Dosyaları diskte kalır.',
 			'settings.workspaces.deleteFailed' => 'Çalışma alanı kaldırılamadı.',
 			'settings.workspaces.deleteTitle' => 'Çalışma alanını kaldır',
-			'settings.workspaces.description' => 'Çalışma alanları, ddagent’ın sohbet edebildiği, kod çalıştırabildiği ve gezinebildiği dizinlerdir.',
+			'settings.workspaces.description' => 'Çalışma alanları, DDAgent’ın sohbet edebildiği, kod çalıştırabildiği ve gezinebildiği dizinlerdir.',
 			'settings.workspaces.remove' => 'Çalışma alanını kaldır',
 			'settings.workspaces.title' => 'Çalışma alanları',
 			'settings.workspaces.pathRequired' => 'Yol gerekli',
@@ -8679,8 +8679,8 @@ extension on TranslationsTr {
 			'settings.about.learnMore' => 'Daha fazla bilgi',
 			'settings.about.pro.syncSettings' => 'Ayarları Senkronize Et',
 			'settings.about.pro.teamManagement' => 'Takım Yönetimi',
-			'settings.about.proFeatures' => 'ddagent Pro Özellikleri',
-			'settings.about.tryHosted' => 'ddagent Hosted\'ı deneyin',
+			'settings.about.proFeatures' => 'DDAgent Pro Özellikleri',
+			'settings.about.tryHosted' => 'DDAgent Hosted\'ı deneyin',
 			'settings.about.versionInfo' => 'Sürüm bilgisi',
 			'settings.about.client' => 'Uygulama',
 			'settings.about.server' => 'Sunucu',
@@ -8706,7 +8706,7 @@ extension on TranslationsTr {
 			'sidebar.projects.noMatchingProjects' => 'Eşleşen proje yok',
 			'sidebar.projects.tryDifferentSearch' => 'Arama terimini değiştirmeyi dene',
 			'sidebar.projects.runClaudeCli' => 'Başlamak için bir proje dizininde Claude CLI çalıştır',
-			'sidebar.app.title' => 'ddagent',
+			'sidebar.app.title' => 'DDAgent',
 			'sidebar.app.subtitle' => 'AI kodlama asistanı arayüzü',
 			'sidebar.sessions.title' => 'Oturumlar',
 			'sidebar.sessions.newSession' => 'Yeni Oturum',
@@ -8804,7 +8804,7 @@ extension on TranslationsTr {
 			'sidebar.version.updateAvailable' => 'Güncelleme mevcut',
 			'sidebar.version.restartRequired' => 'Güncelleme yüklendi — uygulamak için sunucuyu yeniden başlatın',
 			'sidebar.version.updateNow' => 'Şimdi güncelle',
-			'sidebar.version.updateConfirm' => ({required Object version}) => 'ddagent v${version} sürümüne güncellensin mi? En yeni kod çekilip derlenecek ve sunucu yeniden başlatılacak — etkin oturumlar kesintiye uğrar.',
+			'sidebar.version.updateConfirm' => ({required Object version}) => 'DDAgent v${version} sürümüne güncellensin mi? En yeni kod çekilip derlenecek ve sunucu yeniden başlatılacak — etkin oturumlar kesintiye uğrar.',
 			'sidebar.version.updating' => 'Güncelleniyor… birkaç dakika sürebilir',
 			'sidebar.version.restarting' => 'Güncelleme yüklendi — yeniden başlatılıyor…',
 			'sidebar.version.updateFailed' => 'Güncelleme başarısız',
@@ -9183,11 +9183,11 @@ extension on TranslationsTr {
 			'knowledge.graph.truncated' => 'kısaltıldı',
 			'knowledge.importAll.action' => 'Her şeyi içe aktar',
 			'knowledge.importAll.mergeDuplicates' => 'Yinelenen kayıtları birleştir',
-			'knowledge.importAll.mergeDuplicatesHint' => 'ddagent içindeki yinelenen satırları birleştirir (dosyaları değil)',
+			'knowledge.importAll.mergeDuplicatesHint' => 'DDAgent içindeki yinelenen satırları birleştirir (dosyaları değil)',
 			'knowledge.importAll.projectsScanned' => ({required Object count}) => 'Taranan projeler: ${count}',
 			'knowledge.importAll.rulesSummary' => ({required Object total, required Object duplicates}) => 'Kurallar: ${total} · yinelenen gruplar: ${duplicates}',
 			'knowledge.importAll.skillsFound' => ({required Object found, required Object newSkills}) => 'Bulunan agent becerileri: ${found} (yeni: ${newSkills})',
-			'knowledge.importAll.title' => 'Her şeyi ddagent\'a aktar',
+			'knowledge.importAll.title' => 'Her şeyi DDAgent\'a aktar',
 			'knowledge.importSkills.found' => ({required Object count}) => 'Agentlarınızda ${count} beceri bulundu.',
 			'knowledge.importSkills.summary' => ({required Object imported, required Object skipped}) => 'Yeni: ${imported} · atlanan: ${skipped}',
 			'knowledge.importSkills.title' => 'Agent becerilerini içe aktar',
@@ -9276,15 +9276,15 @@ extension on TranslationsTr {
 			'mcp.form.validation.unsupportedGlobal' => ({required Object type}) => 'MCP Sunucusu Ekle, tüm sağlayıcılarda yalnızca stdio ve http destekler; ${type} desteklemez.',
 			'mcp.form.validation.unsupportedProvider' => ({required Object provider, required Object type}) => '${provider}, ${type} MCP sunucularını desteklemiyor',
 			'mcp.install.button' => 'Kur',
-			'mcp.install.cardDescription' => 'Agentlarınıza MCP üzerinden bilgi tabanını ve ddagent araçlarını verin — agentları seçin veya tümü için kurun.',
-			'mcp.install.description' => 'Seçili agentların MCP üzerinden ddagent bilgi tabanını ve araçlarını kullanmasını sağlar.',
+			'mcp.install.cardDescription' => 'Agentlarınıza MCP üzerinden bilgi tabanını ve DDAgent araçlarını verin — agentları seçin veya tümü için kurun.',
+			'mcp.install.description' => 'Seçili agentların MCP üzerinden DDAgent bilgi tabanını ve araçlarını kullanmasını sağlar.',
 			'mcp.install.errorFallback' => 'hata',
 			'mcp.install.failed' => ({required Object error}) => 'Kurulum başarısız: ${error}',
 			'mcp.install.installForAll' => 'Tümü için kur',
 			'mcp.install.installSelected' => 'Seçilenler için kur',
 			'mcp.install.installedCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('tr'))(count, one: '${count} agenta kuruldu.', other: '${count} agenta kuruldu.', ), 
 			'mcp.install.partialFailure' => ({required Object count, required Object failed}) => '${count} agenta kuruldu; başarısız: ${failed}',
-			'mcp.install.title' => 'ddagent MCP sunucusunu kur',
+			'mcp.install.title' => 'DDAgent MCP sunucusunu kur',
 			'mcp.servers.addGlobalDescription' => 'Bu MCP sunucusunu tüm sağlayıcılara ekler: Claude, Cursor, Codex, OpenCode ve Devin. Aynı yapılandırmanın tüm sağlayıcılarda çalışması gerektiğinden yalnızca stdio ve HTTP taşımaları desteklenir.',
 			'mcp.servers.addGlobalMenuDescription' => 'Genel MCP Sunucusu Ekle, Claude, Cursor, Codex, OpenCode ve Devin için ortak bir stdio veya HTTP sunucusu yazar.',
 			'mcp.servers.addGlobalTitle' => 'Genel MCP Sunucusu Ekle',
@@ -9295,7 +9295,7 @@ extension on TranslationsTr {
 			'mcp.servers.descriptionGeneric' => ({required Object provider}) => 'Model Context Protocol sunucuları ${provider} için ek araçlar ve veri kaynakları sağlar',
 			'mcp.servers.loading' => 'MCP sunucuları yükleniyor...',
 			'mcp.servers.refreshingScopes' => 'Proje kapsamları yenileniyor...',
-			'mcp.team.cta' => 'ddagent Pro ile kullanılabilir',
+			'mcp.team.cta' => 'DDAgent Pro ile kullanılabilir',
 			'mcp.team.description' => 'MCP sunucu yapılandırmalarını takımınızla paylaşın. Herkes otomatik olarak senkron kalır.',
 			'mcp.team.title' => 'Takım MCP Yapılandırmaları',
 			'mcp.tokens.scopeWrite' => 'Yazma',
@@ -9376,7 +9376,7 @@ extension on TranslationsTr {
 			'scheduler.runs' => 'Çalıştırmalar',
 			'scheduler.session' => ({required Object id}) => 'oturum ${id}',
 			'scheduler.worktree' => 'worktree',
-			'notifications.deviceLabel' => 'ddagent Flutter',
+			'notifications.deviceLabel' => 'DDAgent Flutter',
 			'notifications.errors.noResponse' => 'Sunucudan yanıt yok',
 			'notifications.errors.registrationRejected' => 'Kayıt sunucu tarafından reddedildi',
 			'serverConnect.connect' => 'Bağlan',
@@ -9385,7 +9385,7 @@ extension on TranslationsTr {
 			'serverConnect.connectionFailed' => ({required Object error}) => 'Bağlantı başarısız (${error})',
 			'serverConnect.enterUrl' => 'Bir sunucu URL\'si girin',
 			'serverConnect.local.title' => 'Bu cihaz',
-			'serverConnect.local.subtitle' => 'ddagent sunucusunu bu makinede çalıştırın',
+			'serverConnect.local.subtitle' => 'DDAgent sunucusunu bu makinede çalıştırın',
 			'serverConnect.local.install' => 'Yerel sunucuyu kur',
 			'serverConnect.local.start' => 'Yerel sunucuyu başlat',
 			'serverConnect.local.stop' => 'Durdur',
@@ -9397,7 +9397,7 @@ extension on TranslationsTr {
 			'serverConnect.local.connect' => 'Bu sunucuyu kullan',
 			'serverConnect.local.error' => ({required Object error}) => 'Yerel sunucu hatası: ${error}',
 			'serverConnect.local.or' => 'veya uzak bir sunucuya bağlanın',
-			'serverConnect.subtitle' => 'ddagent sunucunuza bağlanın',
+			'serverConnect.subtitle' => 'DDAgent sunucunuza bağlanın',
 			'voice.apiKeySaved' => 'API Anahtarı (kayıtlı, değiştirmek için girin)',
 			'voice.preview' => 'Önizle',
 			'voice.saveFailed' => 'STT yapılandırması kaydedilemedi',
@@ -9517,14 +9517,14 @@ extension on TranslationsTr {
 			'onboarding.completeSetup' => 'Kurulumu Tamamla',
 			'onboarding.errors.invalidEmail' => 'Lütfen geçerli bir e-posta adresi girin.',
 			'onboarding.errors.nameAndEmailRequired' => 'Hem git adı hem de e-posta gerekli.',
-			'onboarding.gitHint' => 'ddagent oturumlarının oluşturduğu commit\'ler için kullanılır.',
-			'onboarding.mcp.description' => 'Agentlarınızın bilgi tabanını ve ddagent araçlarını kullanabilmesi için ddagent MCP sunucusunu kurun. Agentları seçin veya tümü için kurun.',
+			'onboarding.gitHint' => 'DDAgent oturumlarının oluşturduğu commit\'ler için kullanılır.',
+			'onboarding.mcp.description' => 'Agentlarınızın bilgi tabanını ve DDAgent araçlarını kullanabilmesi için DDAgent MCP sunucusunu kurun. Agentları seçin veya tümü için kurun.',
 			'onboarding.mcp.installForAll' => 'Tümü için kur',
 			'onboarding.mcp.installSelected' => 'Seçilenler için kur',
 			'onboarding.mcp.installedOn' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('tr'))(count, one: '${count} agenta kuruldu.', other: '${count} agenta kuruldu.', ), 
 			'onboarding.mcp.installedWithFailures' => ({required Object installedCount, required Object failed}) => '${installedCount} agenta kuruldu; başarısız: ${failed}',
 			'onboarding.mcp.laterHint' => 'İsteğe bağlı — bunu daha sonra Ayarlar → MCP bölümünden de kurabilirsiniz.',
-			'onboarding.mcp.title' => 'Agentları ddagent\'a bağlayın',
+			'onboarding.mcp.title' => 'Agentları DDAgent\'a bağlayın',
 			'fileTree.browseServerFilesystem' => 'Sunucu dosya sistemine göz at',
 			'fileTree.chooseFolder' => 'Klasör seç',
 			'fileTree.copyContents' => 'İçeriği kopyala',

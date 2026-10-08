@@ -1,4 +1,4 @@
-# Strict analysis config for the ddagent Flutter rebuild.
+# Strict analysis config for the DDAgent Flutter rebuild.
 # Formatting is enforced in CI via `dart format --set-exit-if-changed` (line length 100).
 include: package:flutter_lints/flutter.yaml
 

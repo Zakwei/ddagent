@@ -9,7 +9,7 @@ import type { AnyRecord, LLMProvider } from '@/shared/types.js';
 import { AppError, readObjectRecord } from '@/shared/utils.js';
 
 /**
- * MCP tool catalog: thin adapters over existing ddagent services.
+ * MCP tool catalog: thin adapters over existing DDAgent services.
  *
  * Each definition carries the minimum token `scope` required to call it —
  * `read` tools (list_sessions, get_status) work for every token, `write`
@@ -28,7 +28,7 @@ const STRING = { type: 'string' } as const;
 const MCP_TOOL_DEFINITIONS: McpToolDefinition[] = [
   {
     name: 'list_sessions',
-    description: 'List recent ddagent chat sessions across all projects.',
+    description: 'List recent DDAgent chat sessions across all projects.',
     scope: 'read',
     inputSchema: {
       type: 'object',
@@ -39,7 +39,7 @@ const MCP_TOOL_DEFINITIONS: McpToolDefinition[] = [
   },
   {
     name: 'get_status',
-    description: 'Return ddagent runtime status: running agent sessions and project count.',
+    description: 'Return DDAgent runtime status: running agent sessions and project count.',
     scope: 'read',
     inputSchema: { type: 'object', properties: {} },
   },
@@ -52,7 +52,7 @@ const MCP_TOOL_DEFINITIONS: McpToolDefinition[] = [
       type: 'object',
       properties: {
         projectId: STRING,
-        projectPath: { type: 'string', description: 'Alternative to projectId: an absolute project path already known to ddagent.' },
+        projectPath: { type: 'string', description: 'Alternative to projectId: an absolute project path already known to DDAgent.' },
         prompt: { type: 'string', description: 'Full task description the agent will work on.' },
         title: { type: 'string', description: 'Card title; defaults to the first prompt line.' },
         provider: STRING,
@@ -64,7 +64,7 @@ const MCP_TOOL_DEFINITIONS: McpToolDefinition[] = [
   },
   {
     name: 'send_message',
-    description: 'Enqueue a message into a ddagent session (delivered when the session is idle).',
+    description: 'Enqueue a message into a DDAgent session (delivered when the session is idle).',
     scope: 'write',
     inputSchema: {
       type: 'object',
@@ -370,7 +370,7 @@ function readOptionalNumber(value: unknown): number | undefined {
  *
  * `undefined` means "no scope filter" (return everything), a string scopes to
  * that project id, and `null` is returned when a supplied projectPath is not a
- * project ddagent knows about. Accepting projectPath keeps the tools usable for
+ * project DDAgent knows about. Accepting projectPath keeps the tools usable for
  * callers that only know the workspace directory.
  */
 function resolveKnowledgeProjectId(input: AnyRecord): string | null | undefined {

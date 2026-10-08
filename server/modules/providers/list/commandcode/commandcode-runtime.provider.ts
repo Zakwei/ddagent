@@ -7,7 +7,7 @@
  * message per line — mirroring the Devin ACP adapter. Unlike Devin, the CLI
  * already persists the canonical v3 transcript at
  * `~/.commandcode/projects/<slug>/<session-id>.jsonl` (slug =
- * `commandCodeProjectSlug(cwd)`), so this adapter keeps NO ddagent-owned
+ * `commandCodeProjectSlug(cwd)`), so this adapter keeps NO DDAgent-owned
  * mirror: live rows stream over the websocket and history reconciles against
  * the CLI transcript via `CommandCodeSessionsProvider.fetchHistory`.
  *
@@ -921,7 +921,7 @@ async function buildPromptBlocks(promptText: any, options: any, workingDir: any,
 }
 
 /**
- * Maps a ddagent permission mode onto Command Code's ACP mode ids
+ * Maps a DDAgent permission mode onto Command Code's ACP mode ids
  * (`default`, `plan`, `auto-accept`, `dont-ask`, `bypass`; the CLI's
  * `--permission-mode` also accepts `accept-edits`/`yolo` aliases).
  */
@@ -1651,7 +1651,7 @@ function createCommandCodeProcess(sessionId: any, workingDir: any, model: any, w
             state.commandCodeSessionId = commandCodeSessionId;
             // The CLI writes the canonical v3 transcript itself; registering
             // its path on the session row lets fetchHistory and the watcher
-            // find it without a ddagent-owned mirror.
+            // find it without a DDAgent-owned mirror.
             state.transcriptPath = path.join(
                 commandCodeProjectsDir(),
                 commandCodeProjectSlug(workingDir),

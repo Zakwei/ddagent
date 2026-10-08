@@ -15,8 +15,8 @@
   <a href="KNOWLEDGE.zh-TW.md">繁體中文</a>
 </p>
 
-ddagent 为你的智能体提供一个**本地优先的知识库**：记忆、规则、技能和个人信息，
-外加标签和关系。它存在于与 ddagent 其余部分相同的 SQLite 数据库（`auth.db`）中，
+DDAgent 为你的智能体提供一个**本地优先的知识库**：记忆、规则、技能和个人信息，
+外加标签和关系。它存在于与 DDAgent 其余部分相同的 SQLite 数据库（`auth.db`）中，
 背后是 FTS5 全文索引，可从客户端的 **Knowledge** 界面管理，并可由你的智能体
 通过 MCP 读写。它松散地受到
 [Contexta](https://github.com/XFABISIEK/Contexta) 的启发。
@@ -33,19 +33,19 @@ ddagent 为你的智能体提供一个**本地优先的知识库**：记忆、�
 - **CLI 原生文件** — 每个工具各自读取自己的配置：Claude Code
   读取 `CLAUDE.md`，Codex/Cursor 读取 `AGENTS.md`，Cursor 读取 `.cursorrules`，
   还有一些读取 `skills/` 和 `.agents/skills/`。这是 CLI 的职责，而非
-  模型的选择——ddagent 不会关闭它。
-- **ddagent 的首轮前缀** — 在会话的第一条消息中，ddagent 会在前面加上项目的
+  模型的选择——DDAgent 不会关闭它。
+- **DDAgent 的首轮前缀** — 在会话的第一条消息中，DDAgent 会在前面加上项目的
   `.ddagent/shared-context.md` 和一个 `<unified-rules>` 块（工作区 `AGENTS.md`、
   `~/.agents/AGENTS.md` 以及一条简短的规范提示；设置 `DDAGENT_UNIFIED_RULES=0`
   可去掉它）。这基于文件，与知识库相互独立。
-- **MCP 检索（按需）** — 一旦你把 ddagent 的 MCP 服务器安装到某个智能体，它的
+- **MCP 检索（按需）** — 一旦你把 DDAgent 的 MCP 服务器安装到某个智能体，它的
   工具列表就会包含 `knowledge_get_context`、`knowledge_search` 之类。遵循
   Contexta，不会有任何东西被自动注入：智能体用查询调用上下文构建器，取回
   `critical` 规则以及所有匹配的内容。模型会根据工具描述以及你在知识库中保存的
   指令规则，决定何时调用它。
 
 所以“一个位置”意味着**一个整理知识的位置**——它不会（也无法）阻止 CLI
-读取自己的原生文件。ddagent 完全不会把知识库自动注入会话。
+读取自己的原生文件。DDAgent 完全不会把知识库自动注入会话。
 
 ## 实体
 
@@ -83,7 +83,7 @@ ContextBuilder 的忠实移植）。给定项目和查询，它会按顺序返�
 
 ## MCP 工具（按需）
 
-ddagent 的 MCP 服务器（`POST /mcp`）把知识库暴露给任何 MCP 客户端。
+DDAgent 的 MCP 服务器（`POST /mcp`）把知识库暴露给任何 MCP 客户端。
 读取工具使用 `read` 范围的 token；写入工具需要 `write`。写入
 工具执行与 UI 相同的校验并记录历史。
 
@@ -95,12 +95,12 @@ ddagent 的 MCP 服务器（`POST /mcp`）把知识库暴露给任何 MCP 客户
 `knowledge_delete_memory`，以及 `rule`、`skill` 和 `personal` 的同样三件套；
 外加 `knowledge_link` / `knowledge_unlink`。
 
-工具接受 `projectId`，或 ddagent 已经知道的 `projectPath`。
+工具接受 `projectId`，或 DDAgent 已经知道的 `projectPath`。
 
 ### 把服务器安装到你的智能体
 
 你不必手动编辑提供商配置。使用 **Settings → Agents →
-（智能体） → MCP → Install ddagent MCP server**（在引导流程中也会作为一步提供）并选择
+（智能体） → MCP → Install DDAgent MCP server**（在引导流程中也会作为一步提供）并选择
 智能体——或为所有智能体安装。它会写入一个 `ddagent` HTTP MCP 条目（用户
 范围），指向 `<server>/mcp`，并带一个可复用、具有 `write` 范围的 `ddagent-mcp` bearer token
 （重新安装会吊销上一个）。安装后，该智能体的工具
@@ -149,9 +149,9 @@ Graph 标签页是一个力导向关系视图，带平移/缩放、节点
 4. 用**个人信息**存跨项目偏好（时区、编辑器、命名）。
 5. **链接相关记忆**，让 1 跳邻居一起带上。
 6. 对应当搜索知识库并持久化所学内容的智能体**安装 MCP**。
-   一键安装使用 `write` token；对于只读智能体，请在 ddagent MCP 服务器 token 中
+   一键安装使用 `write` token；对于只读智能体，请在 DDAgent MCP 服务器 token 中
    创建一个 `read` token，并手动配置该智能体（参见
-   [作为 MCP 服务器的 ddagent](../mcp-server.md#manual-client-config)）。
+   [作为 MCP 服务器的 DDAgent](../mcp-server.md#manual-client-config)）。
 
 ## 迁移
 
@@ -161,13 +161,13 @@ Knowledge → 菜单 → **Migrate existing rules** 会运行一份 **dry-run** 
 （把它们合并为一个全局行）和/或 **Make all rules critical**。在你确认之前
 不会写入任何内容——破坏性操作都是显式的。
 
-**Dashboard** 还有一个单独的 **把所有内容导入 ddagent** 按钮：它用一个操作运行项目扫描和智能体技能导入，并带有相同的 dry-run 预览以及可选的重复合并 / 提升开关。它只读取你的智能体的文件并写入 ddagent 自己的数据库——不会触碰任何 CLI 文件或配置（唯一会写入智能体配置的操作是单独的 "Install ddagent MCP server"）。
+**Dashboard** 还有一个单独的 **把所有内容导入 DDAgent** 按钮：它用一个操作运行项目扫描和智能体技能导入，并带有相同的 dry-run 预览以及可选的重复合并 / 提升开关。它只读取你的智能体的文件并写入 DDAgent 自己的数据库——不会触碰任何 CLI 文件或配置（唯一会写入智能体配置的操作是单独的 "Install DDAgent MCP server"）。
 
 同一个菜单里还有**导入智能体技能**：它会列出你的智能体已经自带或已安装的全局/默认技能（用户 / 系统 / 插件范围），并把缺失的技能作为技能导入知识库。它先进行 dry-run，而且是幂等的——已存在的名称会被跳过。项目范围的技能则由项目扫描导入。
 
 ## 须知
 
-- 一切都**本地**于这个 ddagent 实例；没有云，没有同步。
+- 一切都**本地**于这个 DDAgent 实例；没有云，没有同步。
 - 知识库**不会自动注入**——智能体通过 MCP 按需检索（Contexta 模型）。
   没有安装 MCP 服务器的智能体不会从中获得任何内容。
 - 扫描到的技能可通过 MCP（`knowledge_get_context` / `knowledge_search`）到达，
@@ -206,5 +206,5 @@ POST   /import-all          { dryRun?, dedupe?, promoteRules? }
 
 ## 相关
 
-- [作为 MCP 服务器的 ddagent](../mcp-server.md) — 工具目录和 token 设置
+- [作为 MCP 服务器的 DDAgent](../mcp-server.md) — 工具目录和 token 设置
 - [团队协作](../teams.md) · [远程审批](../remote-approvals.md)

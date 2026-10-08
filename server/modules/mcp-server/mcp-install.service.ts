@@ -6,7 +6,7 @@ import type { LLMProvider } from '@/shared/types.js';
 import { AppError } from '@/shared/utils.js';
 
 /**
- * Installs ddagent's own MCP endpoint into provider CLIs.
+ * Installs DDAgent's own MCP endpoint into provider CLIs.
  *
  * Consumers: the MCP token router (`POST /api/mcp/install`), driven from the
  * client's MCP screen and the onboarding flow. For each selected provider it
@@ -35,7 +35,7 @@ export type DdagentMcpInstallResult = {
 };
 
 /**
- * Installs (or refreshes) the ddagent MCP server on the chosen providers.
+ * Installs (or refreshes) the DDAgent MCP server on the chosen providers.
  *
  * `providers` omitted/empty = every registered provider. `url` defaults to the
  * local server; callers on a remote client should pass the reachable base URL.

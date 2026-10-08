@@ -123,7 +123,7 @@ final serverProfilesProvider = NotifierProvider<ServerProfilesController, Server
   ServerProfilesController.new,
 );
 
-/// GET /api/auth/status on a bare client — verifies the URL is a ddagent
+/// GET /api/auth/status on a bare client — verifies the URL is a DDAgent
 /// server without touching the authed Dio instance (port of testConnection).
 Future<({bool ok, String? error})> probeServer(String raw) async {
   final base = normalizeServerUrl(raw);

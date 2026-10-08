@@ -1,6 +1,6 @@
 # Değişiklik günlüğü
 
-ddagent'e yapılan tüm önemli değişiklikler burada belgelenir.
+DDAgent'e yapılan tüm önemli değişiklikler burada belgelenir.
 
 Biçim [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) standardını izler
 ve bu proje [Semantic Versioning](https://semver.org/) kurallarına uyar.
@@ -169,7 +169,7 @@ ve bu proje [Semantic Versioning](https://semver.org/) kurallarına uyar.
 
 ## [0.5.0] - 2026-09-21
 
-**ddagent**'in ilk bağımsız sürümü — AI kodlama ajanları için kendi barındırdığınız web ve mobil UI.
+**DDAgent**'in ilk bağımsız sürümü — AI kodlama ajanları için kendi barındırdığınız web ve mobil UI.
 
 ### Öne çıkanlar
 

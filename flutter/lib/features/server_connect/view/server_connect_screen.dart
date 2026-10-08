@@ -193,7 +193,7 @@ class _ServerConnectScreenState extends ConsumerState<ServerConnectScreen> {
   }
 }
 
-/// "This device" option — downloads/spawns the ddagent server locally and
+/// "This device" option — downloads/spawns the DDAgent server locally and
 /// connects to it over loopback. Rendered only on Linux/Windows desktop.
 class _LocalServerCard extends ConsumerWidget {
   const _LocalServerCard({required this.onConnect});

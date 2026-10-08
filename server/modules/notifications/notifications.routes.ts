@@ -183,7 +183,7 @@ router.post('/channels/:channel/test', async (req, res) => {
   try {
     const channel = readText(req.params.channel);
     const userId = readUserId(req);
-    const payload = { title: 'ddagent', body: 'Test notification from ddagent' };
+    const payload = { title: 'DDAgent', body: 'Test notification from DDAgent' };
     const event = { code: 'agent.notification', meta: {} };
 
     if (channel === 'telegram') {
