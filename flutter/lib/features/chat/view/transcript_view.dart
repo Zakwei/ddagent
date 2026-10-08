@@ -6,6 +6,7 @@ import 'package:ddagent_app/core/theme/app_theme.dart';
 import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/utils/clipboard.dart';
+import 'package:ddagent_app/core/utils/path_utils.dart';
 import 'package:ddagent_app/core/utils/selection_copy.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
@@ -895,7 +896,8 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
   Widget _standaloneHeader(String provider, String? projectPath) {
     final c = context.appColors;
     final details = ref.watch(sessionDetailsProvider(widget.sessionId)).value;
-    final projectName = projectPath?.split('/').where((s) => s.isNotEmpty).lastOrNull;
+    final baseName = pathBasename(projectPath ?? '');
+    final projectName = baseName.isEmpty ? null : baseName;
     return Container(
       constraints: BoxConstraints(minHeight: paneHeaderMetrics(context).barHeight),
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),

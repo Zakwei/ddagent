@@ -4,8 +4,14 @@
 /// the installer output on the host that runs the server. `claude`, `codex`,
 /// `opencode` and `commandcode` install via npm — the server itself is a Node
 /// process, so npm is always present — while the remaining CLIs ship a native
-/// install script.
-String providerInstallCommand(String provider) => switch (provider) {
+/// install script. [windows] is the *server's* OS (from `GET /health`
+/// `platform`) — the command runs on the server host, which may not be this
+/// client's machine; on Windows the native installers are their official
+/// PowerShell one-liners (the server runs terminals in PowerShell).
+String providerInstallCommand(String provider, {bool windows = false}) => switch (provider) {
+  'cursor' when windows => "irm 'https://cursor.com/install?win32=true' | iex",
+  'antigravity' when windows => 'irm https://antigravity.google/cli/install.ps1 | iex',
+  'devin' when windows => 'irm https://static.devin.ai/cli/setup.ps1 | iex',
   'claude' => 'npm install -g @anthropic-ai/claude-code',
   'cursor' => 'curl https://cursor.com/install -fsS | bash',
   'codex' => 'npm install -g @openai/codex',
@@ -24,12 +30,12 @@ String providerInstallCommand(String provider) => switch (provider) {
 /// The CLI itself is a single host-wide installation (the server resolves it
 /// from PATH), shared by every named provider account — so updating is a
 /// provider-level action, never a per-account one.
-String providerUpdateCommand(String provider) => switch (provider) {
+String providerUpdateCommand(String provider, {bool windows = false}) => switch (provider) {
   'claude' => 'npm install -g @anthropic-ai/claude-code@latest',
   'codex' => 'npm install -g @openai/codex@latest',
   'opencode' => 'npm install -g opencode-ai@latest',
   'commandcode' => 'npm install -g command-code@latest',
-  'cursor' || 'antigravity' || 'devin' => providerInstallCommand(provider),
+  'cursor' || 'antigravity' || 'devin' => providerInstallCommand(provider, windows: windows),
   _ => 'npm install -g $provider@latest',
 };
 

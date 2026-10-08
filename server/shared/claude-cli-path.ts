@@ -2,6 +2,8 @@ import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
+import { providerChildEnv } from '@/shared/utils.js';
+
 const DEFAULT_CLAUDE_COMMAND = 'claude';
 const CLAUDE_SCRIPT_EXTENSIONS = new Set(['.cjs', '.js', '.jsx', '.mjs', '.ts', '.tsx']);
 const CLAUDE_WRAPPER_SEGMENTS = ['node_modules', '@anthropic-ai', 'claude-code', 'bin', 'claude.exe'] as const;
@@ -92,6 +94,7 @@ function resolveWindowsClaudeExecutablePath(
   try {
     const stdout = deps.execFileSync('where.exe', [configuredPath], {
       encoding: 'utf8',
+      env: providerChildEnv(),
       stdio: ['ignore', 'pipe', 'ignore'],
       windowsHide: true,
     });

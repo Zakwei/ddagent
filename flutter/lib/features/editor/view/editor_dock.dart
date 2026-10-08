@@ -1,4 +1,5 @@
 import 'package:ddagent_app/core/theme/tokens.dart';
+import 'package:ddagent_app/core/utils/path_utils.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_node.dart';
 import 'package:ddagent_app/features/file_tree/state/file_tree_controller.dart';
 import 'package:ddagent_app/features/git/data/git_repository.dart';
@@ -158,7 +159,7 @@ class _ChangedRow extends StatelessWidget {
             const SizedBox(width: 6),
             Expanded(
               child: Text(
-                path.split('/').last,
+                pathBasename(path),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.bodySmall,

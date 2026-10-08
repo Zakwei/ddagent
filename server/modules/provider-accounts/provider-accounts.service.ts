@@ -5,9 +5,8 @@ import path from 'node:path';
 import { providerAccountsDb, sessionsDb, type ProviderAccount } from '@/modules/database/index.js';
 import { providerTokenUsageService } from '@/modules/providers/index.js';
 import type { LLMProvider } from '@/shared/types.js';
-import { AppError } from '@/shared/utils.js';
+import { AppError, ENV_KEY_PATTERN } from '@/shared/utils.js';
 
-const ENV_KEY_PATTERN = /^[A-Za-z_][A-Za-z0-9_]*$/;
 const MAX_ENV_KEYS = 50;
 const MAX_ENV_VALUE_LENGTH = 4096;
 const LABEL_MAX_LENGTH = 80;

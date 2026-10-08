@@ -17,7 +17,7 @@ import type {
   WorktreeScriptSpawner,
   WorktreeServices,
 } from '@/shared/types.js';
-import { AppError } from '@/shared/utils.js';
+import { AppError, powerShellArgs, providerChildEnv } from '@/shared/utils.js';
 import {
   resolveWorktreeScripts,
   saveWorktreeScriptsConfig,
@@ -95,13 +95,14 @@ const resolveWorktreeScriptConfig = (repositoryRoot: string) =>
 const spawnWorktreeScript: WorktreeScriptSpawner = (script, cwd) => {
   const isWindows = os.platform() === 'win32';
   const shell = isWindows ? 'powershell.exe' : process.env.SHELL || 'bash';
-  const shellArgs = isWindows ? ['-Command', script] : ['-c', script];
+  const shellArgs = isWindows ? powerShellArgs(script) : ['-c', script];
   return pty.spawn(shell, shellArgs, {
     name: 'xterm-256color',
     cols: 120,
     rows: 30,
     cwd,
-    env: { ...process.env },
+    // Puts the running node.exe dir on PATH on Windows (portable bundle).
+    env: providerChildEnv(),
   });
 };
 

@@ -104,14 +104,9 @@ export async function generateDisplayName(projectName: string, actualProjectDir:
     // Fall back to path-based naming if package.json doesn't exist or can't be read.
   }
 
-  // If it starts with /, it's an absolute path.
-  if (projectPath.startsWith('/')) {
-    const parts = projectPath.split('/').filter(Boolean);
-    // Return only the last folder name.
-    return parts[parts.length - 1] || projectPath;
-  }
-
-  return projectPath;
+  // win32.basename splits on both '/' and '\\', so POSIX and Windows paths both
+  // shorten to the last folder name; roots like '/' or 'C:\\' keep the full path.
+  return path.win32.basename(projectPath) || projectPath;
 }
 
 function normalizeSessionPagination(options: SessionPaginationOptions = {}): { limit: number; offset: number } {

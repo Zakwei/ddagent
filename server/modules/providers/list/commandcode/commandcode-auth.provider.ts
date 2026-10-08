@@ -8,6 +8,7 @@ import {
   cachedCliIdentity,
   commandCodeDir,
   execCliFile,
+  providerChildEnv,
   readCliField,
   readJsonConfig,
   readObjectRecord,
@@ -37,6 +38,7 @@ export class CommandCodeProviderAuth implements IProviderAuth {
       const { stdout } = await execCliFile(executable, ['--version'], {
         encoding: 'utf8',
         timeout: COMMAND_CODE_VERSION_TIMEOUT_MS,
+        env: providerChildEnv(),
       });
       return readOptionalString(stdout.trim()) ?? null;
     } catch {

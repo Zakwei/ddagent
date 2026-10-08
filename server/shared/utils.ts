@@ -102,20 +102,62 @@ export function isOrchestratorProvider(provider: string | null | undefined): boo
  * it with only the user-local dir — `spawn devin ENOENT` for every bare
  * command. The existing key's casing must therefore be reused. `baseEnv`
  * exists so tests can exercise that path with a fake Windows-style env.
+ *
+ * On Windows (`platform`, injectable for tests) `%APPDATA%\npm`,
+ * `%LOCALAPPDATA%\pnpm` and the running Node's directory are appended too:
+ * global CLI shims (`claude.cmd`, `codex.cmd`, ...) live there, and a
+ * service-launched server often lacks them on PATH. Also consumed by the
+ * provider auth `--version` install probes and the Claude `where.exe` lookup.
  */
 export function providerChildEnv(
   overrides: Record<string, string> = {},
   baseEnv: NodeJS.ProcessEnv = process.env,
+  platform: NodeJS.Platform = process.platform,
 ): NodeJS.ProcessEnv {
   const env: NodeJS.ProcessEnv = { ...baseEnv };
-  const userLocalBin = path.join(os.homedir(), '.local', 'bin');
+  const isWindows = platform === 'win32';
+  const pathApi = isWindows ? path.win32 : path;
+  const extraDirs = [pathApi.join(os.homedir(), '.local', 'bin')];
+  if (isWindows) {
+    // npm/pnpm global shims and the running node.exe sit outside a service PATH.
+    if (env.APPDATA) extraDirs.push(pathApi.join(env.APPDATA, 'npm'));
+    if (env.LOCALAPPDATA) extraDirs.push(pathApi.join(env.LOCALAPPDATA, 'pnpm'));
+    extraDirs.push(pathApi.dirname(process.execPath));
+  }
   const pathKey = Object.keys(env).find((key) => key.toUpperCase() === 'PATH') ?? 'PATH';
-  const pathEntries = (env[pathKey] ?? '').split(path.delimiter).filter(Boolean);
-  if (!pathEntries.includes(userLocalBin)) {
-    env[pathKey] = [...pathEntries, userLocalBin].join(path.delimiter);
+  const pathEntries = (env[pathKey] ?? '').split(pathApi.delimiter).filter(Boolean);
+  const normalize = (entry: string) => (isWindows ? entry.toLowerCase() : entry);
+  const present = new Set(pathEntries.map(normalize));
+  const missingDirs = extraDirs.filter((dir) => !present.has(normalize(dir)));
+  if (missingDirs.length > 0) {
+    env[pathKey] = [...pathEntries, ...missingDirs].join(pathApi.delimiter);
   }
   env.TASK_MASTER_TOOLS ??= 'standard';
   return { ...env, ...overrides };
+}
+
+/**
+ * Valid environment variable name (POSIX portable: letter/underscore first,
+ * then letters, digits, underscores). Used by the Provider Accounts service to
+ * validate account `envOverrides` and by the websocket shell service to filter
+ * the per-account `env` a login terminal's init message carries — both feed
+ * the keys straight into a child process environment.
+ */
+export const ENV_KEY_PATTERN = /^[A-Za-z_][A-Za-z0-9_]*$/;
+
+/**
+ * PowerShell arguments for Windows terminals. `-ExecutionPolicy Bypass` is
+ * required because npm installs `.ps1` shims (`claude.ps1`) that the default
+ * Restricted policy refuses to run. With a command it runs non-interactively
+ * (`-NoProfile -Command`); without one it starts an interactive session that
+ * still loads the user's profile. Used by the websocket shell PTY and the
+ * worktree script spawner.
+ */
+export function powerShellArgs(command?: string): string[] {
+  if (!command) {
+    return ['-NoLogo', '-ExecutionPolicy', 'Bypass'];
+  }
+  return ['-NoLogo', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', command];
 }
 
 // ---------------------------
@@ -249,8 +291,8 @@ let resolvedCommandCodeExecutable: string | null | undefined;
  * appends the PATHEXT variants), then `commandcode`. `COMMAND_CODE_CLI_PATH`
  * overrides detection entirely (mirrors `CLAUDE_CLI_PATH`); on Windows the
  * well-known global-bin dirs above are probed after the PATH misses. Returns
- * `null` when none answers `--version`. The result is cached for the process
- * lifetime; pass a `spawnSync` override in tests.
+ * `null` when none answers `--version`. A found executable is cached for the
+ * process lifetime; pass a `spawnSync` override in tests.
  */
 export function resolveCommandCodeExecutable(
   spawnSync?: (command: string, args: string[]) => { error?: unknown; status?: number | null },
@@ -268,7 +310,7 @@ export function resolveCommandCodeExecutable(
   }
 
   const run = spawnSync ?? ((command: string, args: string[]) =>
-    crossSpawn.sync(command, args, { stdio: 'ignore', timeout: 10_000 }));
+    crossSpawn.sync(command, args, { stdio: 'ignore', timeout: 10_000, env: providerChildEnv() }));
 
   const candidates: string[] = [...COMMAND_CODE_EXECUTABLE_CANDIDATES];
   if (process.platform === 'win32') {
@@ -288,7 +330,8 @@ export function resolveCommandCodeExecutable(
     }
   }
 
-  if (spawnSync === undefined) {
+  // A miss is not cached, so an in-app install is picked up on the next lookup.
+  if (spawnSync === undefined && resolved !== null) {
     resolvedCommandCodeExecutable = resolved;
   }
   return resolved;
@@ -365,8 +408,8 @@ let resolvedAntigravityExecutable: string | null | undefined;
  * `COMMAND_CODE_CLI_PATH`); on Windows the well-known npm/pnpm/bun global-bin
  * dirs are probed after the PATH misses — npm installs `agy.cmd` under the
  * user profile, which a sanitized service PATH never inherits. Returns `null`
- * when no candidate answers `--version`. The result is cached for the process
- * lifetime; pass a `spawnSync` override in tests.
+ * when no candidate answers `--version`. A found executable is cached for the
+ * process lifetime; pass a `spawnSync` override in tests.
  */
 export function resolveAntigravityExecutable(
   spawnSync?: (command: string, args: string[]) => { error?: unknown; status?: number | null },
@@ -384,7 +427,7 @@ export function resolveAntigravityExecutable(
   }
 
   const run = spawnSync ?? ((command: string, args: string[]) =>
-    crossSpawn.sync(command, args, { stdio: 'ignore', timeout: 10_000 }));
+    crossSpawn.sync(command, args, { stdio: 'ignore', timeout: 10_000, env: providerChildEnv() }));
 
   const candidates: string[] = [...ANTIGRAVITY_EXECUTABLE_CANDIDATES];
   if (process.platform === 'win32') {
@@ -404,7 +447,8 @@ export function resolveAntigravityExecutable(
     }
   }
 
-  if (spawnSync === undefined) {
+  // A miss is not cached, so an in-app install is picked up on the next lookup.
+  if (spawnSync === undefined && resolved !== null) {
     resolvedAntigravityExecutable = resolved;
   }
   return resolved;
@@ -556,6 +600,7 @@ function shouldUseWindowsPathNormalization(inputPath: string): boolean {
  * - trim whitespace
  * - strip Windows long-path prefixes (`\\?\` and `\\?\UNC\`)
  * - normalize path separators and dot segments
+ * - uppercase Windows drive letters
  * - trim trailing separators except for filesystem roots
  */
 export function normalizeProjectPath(inputPath: string): string {
@@ -570,8 +615,9 @@ export function normalizeProjectPath(inputPath: string): string {
 
   const withoutLongPrefix = stripWindowsLongPathPrefix(trimmed);
   const useWindowsPathRules = shouldUseWindowsPathNormalization(withoutLongPrefix);
+  // Drive letters are case-insensitive on Windows, so `c:\proj` and `C:\proj` share one key.
   const normalized = useWindowsPathRules
-    ? path.win32.normalize(withoutLongPrefix)
+    ? path.win32.normalize(withoutLongPrefix).replace(/^[a-z](?=:)/, (drive) => drive.toUpperCase())
     : path.posix.normalize(withoutLongPrefix);
 
   if (!normalized) {

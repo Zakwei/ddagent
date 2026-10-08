@@ -1,5 +1,6 @@
 import spawn from 'cross-spawn';
 
+import { execCliFile, providerChildEnv } from '@/shared/index.js';
 import type { IProviderAuth, ProviderAuthStatus } from '@/shared/index.js';
 
 type CursorLoginStatus = {
@@ -16,8 +17,13 @@ export class CursorProviderAuth implements IProviderAuth {
    */
   private checkInstalled(): boolean {
     try {
-      spawn.sync('cursor-agent', ['--version'], { stdio: 'ignore', timeout: 5000 });
-      return true;
+      // cross-spawn reports ENOENT via `result.error` instead of throwing.
+      const result = spawn.sync('cursor-agent', ['--version'], {
+        stdio: 'ignore',
+        timeout: 5000,
+        env: providerChildEnv(),
+      });
+      return !result.error && result.status === 0;
     } catch {
       return false;
     }
@@ -53,6 +59,15 @@ export class CursorProviderAuth implements IProviderAuth {
   }
 
   /**
+   * Signs the cursor-agent CLI out (`cursor-agent logout`), which clears its
+   * stored login. Consumed by the settings "Log out" action via
+   * IProviderAuth.logout.
+   */
+  async logout(): Promise<void> {
+    await execCliFile('cursor-agent', ['logout'], { encoding: 'utf8', timeout: 15_000, env: providerChildEnv() });
+  }
+
+  /**
    * Runs cursor-agent status and parses the login marker from stdout.
    */
   private checkCursorLogin(): Promise<CursorLoginStatus> {
@@ -74,7 +89,7 @@ export class CursorProviderAuth implements IProviderAuth {
       }, 5000);
 
       try {
-        childProcess = spawn('cursor-agent', ['status']);
+        childProcess = spawn('cursor-agent', ['status'], { env: providerChildEnv() });
       } catch {
         clearTimeout(timeout);
         processCompleted = true;

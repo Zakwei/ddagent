@@ -5,7 +5,7 @@ import path from 'node:path';
 import spawn from 'cross-spawn';
 
 import type { IProviderAuth, ProviderAuthStatus } from '@/shared/index.js';
-import { idTokenEmail, readObjectRecord, readOptionalString } from '@/shared/index.js';
+import { idTokenEmail, providerChildEnv, readObjectRecord, readOptionalString } from '@/shared/index.js';
 
 type CodexCredentialsStatus = {
   authenticated: boolean;
@@ -21,8 +21,9 @@ export class CodexProviderAuth implements IProviderAuth {
    */
   private checkInstalled(): boolean {
     try {
-      spawn.sync('codex', ['--version'], { stdio: 'ignore', timeout: 5000 });
-      return true;
+      // cross-spawn reports ENOENT via `result.error` instead of throwing.
+      const result = spawn.sync('codex', ['--version'], { stdio: 'ignore', timeout: 5000, env: providerChildEnv() });
+      return !result.error && result.status === 0;
     } catch {
       return false;
     }

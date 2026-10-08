@@ -1,4 +1,4 @@
-import { readFile } from 'node:fs/promises';
+import { readFile, rm } from 'node:fs/promises';
 import path from 'node:path';
 
 import spawn from 'cross-spawn';
@@ -7,6 +7,7 @@ import {
   cachedCliIdentity,
   devinConfigDir,
   devinDataDir,
+  providerChildEnv,
   readCliField,
   readObjectRecord,
   readOptionalString,
@@ -30,7 +31,7 @@ export class DevinProviderAuth implements IProviderAuth {
    */
   private checkInstalled(): boolean {
     try {
-      const result = spawn.sync('devin', ['--version'], { stdio: 'ignore', timeout: 5000 });
+      const result = spawn.sync('devin', ['--version'], { stdio: 'ignore', timeout: 5000, env: providerChildEnv() });
       return !result.error && result.status === 0;
     } catch {
       return false;
@@ -84,6 +85,15 @@ export class DevinProviderAuth implements IProviderAuth {
       }
       return readCliField(result.stdout, 'Email') ?? readCliField(result.stdout, 'Name');
     });
+  }
+
+  /**
+   * Removes Devin's `credentials.toml` so the next status check reports
+   * unauthenticated. Keys injected through the environment cannot be cleared
+   * here. Consumed by the settings "Log out" action via IProviderAuth.logout.
+   */
+  async logout(): Promise<void> {
+    await rm(path.join(devinDataDir(), 'credentials.toml'), { force: true });
   }
 
   /**

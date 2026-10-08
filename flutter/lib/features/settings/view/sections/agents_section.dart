@@ -18,6 +18,7 @@ import 'package:ddagent_app/features/settings/data/agent_install.dart';
 import 'package:ddagent_app/features/settings/state/agent_permissions_controller.dart';
 import 'package:ddagent_app/features/settings/state/provider_auth_controller.dart';
 import 'package:ddagent_app/features/skills/view/skills_screen.dart';
+import 'package:ddagent_app/features/system/state/system_providers.dart';
 import 'package:ddagent_app/features/terminal/view/provider_login_dialog.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
@@ -306,6 +307,11 @@ class _AgentPill extends ConsumerWidget {
 
 /// AccountContent — provider header + tinted connection-status card +
 /// login button + the named-accounts manager.
+/// Whether the connected server — not this possibly-remote client — runs
+/// Windows; install/update commands execute on the server host.
+bool _serverIsWindows(WidgetRef ref) =>
+    ref.watch(serverHealthProvider).value?['platform'] == 'win32';
+
 class _AccountContent extends ConsumerWidget {
   const _AccountContent({required this.agent});
 
@@ -340,6 +346,7 @@ class _AccountContent extends ConsumerWidget {
     final statusAsync = ref.watch(providerAuthStatusProvider(agent));
     final status = statusAsync.value;
     final name = AgentsSection._names[agent] ?? agent;
+    final serverWindows = _serverIsWindows(ref);
 
     final loading = statusAsync.isLoading;
     final authenticated = status?.authenticated ?? false;
@@ -455,7 +462,7 @@ class _AccountContent extends ConsumerWidget {
                     AppButton(
                       variant: AppButtonVariant.outline,
                       size: AppButtonSize.sm,
-                      onPressed: () => _openUpdate(context, ref),
+                      onPressed: () => _openUpdate(context, ref, windows: serverWindows),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -601,7 +608,7 @@ class _AccountContent extends ConsumerWidget {
   /// Runs the provider's CLI update command in the terminal dialog, then
   /// re-checks auth status — an update can relocate the binary or invalidate
   /// the credential store, so the status card must not keep the stale answer.
-  void _openUpdate(BuildContext context, WidgetRef ref) {
+  void _openUpdate(BuildContext context, WidgetRef ref, {required bool windows}) {
     final t = Translations.of(context).settings.agents.update;
     final name = AgentsSection._names[agent] ?? agent;
     unawaited(
@@ -609,7 +616,7 @@ class _AccountContent extends ConsumerWidget {
         context: context,
         provider: agent,
         projectPath: _projectPath(ref),
-        customCommand: providerUpdateCommand(agent),
+        customCommand: providerUpdateCommand(agent, windows: windows),
         title: '${t.button} · $name',
         onComplete: (exitCode) {
           ref.invalidate(providerAuthStatusProvider(agent));
@@ -678,7 +685,7 @@ class _AgentNotInstalledCard extends ConsumerWidget {
     return (first.fullPath?.isNotEmpty ?? false) ? first.fullPath! : first.path;
   }
 
-  void _install(BuildContext context, WidgetRef ref) {
+  void _install(BuildContext context, WidgetRef ref, String command) {
     final t = Translations.of(context).settings.agents.install;
     final name = AgentsSection._names[agent] ?? agent;
     unawaited(
@@ -686,7 +693,7 @@ class _AgentNotInstalledCard extends ConsumerWidget {
         context: context,
         provider: agent,
         projectPath: _projectPath(ref),
-        customCommand: providerInstallCommand(agent),
+        customCommand: command,
         title: '${t.button} · $name',
         onComplete: (exitCode) {
           ref.invalidate(providerAuthStatusProvider(agent));
@@ -708,7 +715,7 @@ class _AgentNotInstalledCard extends ConsumerWidget {
     final tt = Theme.of(context).textTheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final name = AgentsSection._names[agent] ?? agent;
-    final command = providerInstallCommand(agent);
+    final command = providerInstallCommand(agent, windows: _serverIsWindows(ref));
     final docsUrl = providerInstallDocsUrl(agent);
 
     return Container(
@@ -779,7 +786,7 @@ class _AgentNotInstalledCard extends ConsumerWidget {
             children: [
               AppButton(
                 size: AppButtonSize.sm,
-                onPressed: () => _install(context, ref),
+                onPressed: () => _install(context, ref, command),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -921,16 +928,13 @@ class _ProviderAccountsCardState extends ConsumerState<_ProviderAccountsCard> {
   /// so e.g. an Antigravity account signs into its isolated HOME (~/.gemini).
   void _openAccountLogin(ProviderAccountEntry account) {
     final t = Translations.of(context);
-    final env = account.envOverrides.entries
-        .map((e) => "${e.key}='${e.value.replaceAll("'", r"'\''")}'")
-        .join(' ');
     unawaited(
       ProviderLoginDialog.show(
         context: context,
         provider: widget.agent,
         projectPath: _projectPath(),
-        customCommand:
-            '${env.isEmpty ? '' : 'env $env '}${ProviderLoginDialog.loginCommandFor(widget.agent)}',
+        customCommand: ProviderLoginDialog.loginCommandFor(widget.agent),
+        env: account.envOverrides,
         onComplete: (exitCode) {
           ref.invalidate(providerAuthStatusProvider(widget.agent));
           if (!context.mounted) return;

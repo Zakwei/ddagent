@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:ddagent_app/core/realtime/chat_channel.dart';
 import 'package:ddagent_app/core/realtime/realtime_providers.dart';
+import 'package:ddagent_app/core/utils/path_utils.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/sessions/state/session_activity.dart';
@@ -33,7 +34,7 @@ String? _toolStatusText(Object? toolName, Object? toolInput) {
   final cmd = (input['command'] ?? input['shell'] ?? '').toString();
   final url = (input['url'] ?? '').toString();
   final query = (input['query'] ?? '').toString();
-  String base(String p) => p.split('/').last;
+  const base = pathBasename;
 
   switch (name.toLowerCase()) {
     case 'task' || 'run_subagent' || 'agent':

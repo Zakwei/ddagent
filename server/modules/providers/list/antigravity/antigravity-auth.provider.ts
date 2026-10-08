@@ -6,6 +6,7 @@ import {
   antigravityCredentialEmail,
   antigravityDir,
   execCliFile,
+  providerChildEnv,
   readObjectRecord,
   readOptionalString,
   resolveAntigravityExecutable,
@@ -32,6 +33,7 @@ export class AntigravityProviderAuth implements IProviderAuth {
       const { stdout } = await execCliFile(executable, ['--version'], {
         encoding: 'utf8',
         timeout: ANTIGRAVITY_VERSION_TIMEOUT_MS,
+        env: providerChildEnv(),
       });
       const trimmed = stdout.trim();
       return trimmed.length > 0 ? trimmed.split(/\r?\n/, 1)[0] : null;

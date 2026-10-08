@@ -5,7 +5,13 @@ import path from 'node:path';
 import pty, { type IPty } from 'node-pty';
 import { WebSocket, type RawData } from 'ws';
 
-import { parseIncomingJsonObject } from '@/shared/utils.js';
+import {
+  ENV_KEY_PATTERN,
+  parseIncomingJsonObject,
+  powerShellArgs,
+  providerChildEnv,
+  readStringRecord,
+} from '@/shared/utils.js';
 
 type ShellIncomingMessage = {
   type?: string;
@@ -19,6 +25,8 @@ type ShellIncomingMessage = {
   initialCommand?: string;
   isPlainShell?: boolean;
   forceRestart?: boolean;
+  /** Extra env vars for the PTY (e.g. a provider account's config dir). */
+  env?: Record<string, string>;
 };
 
 type PtySessionEntry = {
@@ -211,8 +219,9 @@ function buildShellCommand(
 
   if (isPlainShell) {
     // An empty command would spawn `bash -c ""` and exit instantly; a bare
-    // terminal pane needs the user's interactive shell instead.
-    return initialCommand || (os.platform() === 'win32' ? 'powershell.exe' : process.env.SHELL || 'bash');
+    // terminal pane needs the user's interactive shell instead. On Windows the
+    // empty command makes the launcher start PowerShell interactively.
+    return initialCommand || (os.platform() === 'win32' ? '' : process.env.SHELL || 'bash');
   }
 
   if (provider === 'cursor') {
@@ -269,6 +278,16 @@ function buildShellCommand(
     return `claude --resume "${resumeSessionId}" || claude`;
   }
   return command;
+}
+
+/**
+ * Reads the init message's extra env, keeping only string values under valid
+ * variable names — the keys land verbatim in the PTY environment.
+ */
+function readShellEnv(value: unknown): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(readStringRecord(value) ?? {}).filter(([key]) => ENV_KEY_PATTERN.test(key))
+  );
 }
 
 function readEnvValue(env: NodeJS.ProcessEnv, key: string): string | undefined {
@@ -436,7 +455,7 @@ export function handleShellConnection(
         const resumeSessionId = resolveResumeSessionId(data, dependencies);
         const shell = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
         const shellArgs =
-          os.platform() === 'win32' ? ['-Command', shellCommand] : ['-c', shellCommand];
+          os.platform() === 'win32' ? powerShellArgs(shellCommand) : ['-c', shellCommand];
         const termCols = readNumber(data.cols, 80);
         const termRows = readNumber(data.rows, 24);
         const prioritizedPath = prioritizeUserNpmGlobalBin(process.env);
@@ -446,13 +465,16 @@ export function handleShellConnection(
           cols: termCols,
           rows: termRows,
           cwd: resolvedProjectPath,
-          env: {
-            ...process.env,
-            [prioritizedPath.key]: prioritizedPath.value,
-            TERM: 'xterm-256color',
-            COLORTERM: 'truecolor',
-            FORCE_COLOR: '3',
-          },
+          env: providerChildEnv(
+            {
+              ...readShellEnv(data.env),
+              TERM: 'xterm-256color',
+              COLORTERM: 'truecolor',
+              FORCE_COLOR: '3',
+            },
+            // providerChildEnv also puts the running node.exe dir on a Windows PATH.
+            { ...process.env, [prioritizedPath.key]: prioritizedPath.value }
+          ),
         });
 
         // Captured for the lifecycle handlers below: `shellProcess` is

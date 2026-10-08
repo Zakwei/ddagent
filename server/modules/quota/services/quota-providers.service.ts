@@ -111,9 +111,14 @@ function account(
 
 // ---------- Native subscription agents ----------
 
-/** HOME of the credential store; an env override beats the injected home dir. */
+/**
+ * HOME of the credential store; an env override beats the injected home dir.
+ * Windows CLIs resolve ~ from USERPROFILE (what account presets redirect),
+ * while HOME there may be a Git Bash/MSYS value pointing elsewhere.
+ */
 function credHome(dependencies: QuotaProviderDependencies): string {
-  return dependencies.env.HOME || dependencies.homeDirectory;
+  const homeOverride = process.platform === 'win32' ? dependencies.env.USERPROFILE : dependencies.env.HOME;
+  return homeOverride || dependencies.homeDirectory;
 }
 
 /** Reads only the owning CLI's credential store; never borrows another agent's login. */
@@ -340,9 +345,11 @@ function readTomlValue(text: string | null, key: string): string | null {
 
 /** Reads the Devin/Windsurf plan status through its protobuf endpoint. */
 async function fetchDevin(dependencies: QuotaProviderDependencies): Promise<QuotaAccount> {
-  const credentials = dependencies.readTextFile(
-    `${dependencies.env.XDG_DATA_HOME || `${dependencies.homeDirectory}/.local/share`}/devin/credentials.toml`,
-  );
+  // Same layout as devinDataDir(), but through the injected env so account APPDATA overrides apply.
+  const dataDir = process.platform === 'win32'
+    ? `${dependencies.env.APPDATA || `${dependencies.homeDirectory}/AppData/Roaming`}/devin`
+    : `${dependencies.env.XDG_DATA_HOME || `${dependencies.homeDirectory}/.local/share`}/devin`;
+  const credentials = dependencies.readTextFile(`${dataDir}/credentials.toml`);
   const key = readTomlValue(credentials, 'windsurf_api_key');
   if (!key) {
     throw new Error('missing windsurf_api_key in credentials.toml');

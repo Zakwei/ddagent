@@ -1,3 +1,4 @@
+import 'package:ddagent_app/core/utils/path_utils.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_node.dart';
 
 /// How the editor should present a file. Mirrors the React editor's
@@ -98,7 +99,7 @@ bool editorKindNeedsContent(EditorFileKind kind) =>
 /// `highlight` package language id for syntax highlighting, or null when the
 /// extension is unknown (plain text, no highlighting attempt).
 String? editorLanguage(String path) {
-  final name = path.split('/').last.toLowerCase();
+  final name = pathBasename(path).toLowerCase();
   // Extensionless well-known names first.
   const byName = {
     'dockerfile': 'dockerfile',

@@ -396,6 +396,29 @@ void main() {
       expect(active?.title, 'Login: opencode');
       expect(active?.initialCommand, 'opencode auth login');
     });
+
+    test('one-shot init sends env and forceRestart only on the first send', () async {
+      final container = ProviderContainer(
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
+      );
+      addTearDown(container.dispose);
+
+      container
+          .read(terminalControllerProvider.notifier)
+          .runOneShotCommand(
+            projectPath: '/test/proj',
+            command: 'claude setup-token',
+            env: {'CLAUDE_CONFIG_DIR': '/tmp/acct'},
+          );
+      await Future<void>.delayed(Duration.zero);
+
+      final inits = fakeWs.sent.where((f) => f['type'] == 'init').toList();
+      expect(inits.first['env'], {'CLAUDE_CONFIG_DIR': '/tmp/acct'});
+      expect(inits.first['forceRestart'], isTrue);
+      // The reconnect re-send must reattach, not kill the login it started.
+      expect(inits.last['forceRestart'], isFalse);
+      expect(inits.last['env'], {'CLAUDE_CONFIG_DIR': '/tmp/acct'});
+    });
   });
 
   group('Terminal widget tests', () {

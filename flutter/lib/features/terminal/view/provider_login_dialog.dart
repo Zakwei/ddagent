@@ -13,6 +13,7 @@ class ProviderLoginDialog extends ConsumerStatefulWidget {
     required this.projectPath,
     this.customCommand,
     this.title,
+    this.env,
     this.onComplete,
   });
 
@@ -23,10 +24,14 @@ class ProviderLoginDialog extends ConsumerStatefulWidget {
   /// Header/tab title override — the install flow reuses this dialog to run a
   /// provider's install command, so "… Login" would be wrong there.
   final String? title;
+
+  /// Extra env for the server PTY — a per-account login's config-dir
+  /// overrides (Settings → Agents → accounts). Sent apart from the command so
+  /// it works in PowerShell too, not only in `env`-capable POSIX shells.
+  final Map<String, String>? env;
   final void Function(int exitCode)? onComplete;
 
-  /// The provider's login shell command — exposed so per-account logins can
-  /// wrap it in `env KEY=VALUE …` overrides (Settings → Agents → accounts).
+  /// The provider's login shell command (Settings → Agents → accounts).
   static String loginCommandFor(String provider) => providerLoginCommand(provider);
 
   static Future<void> show({
@@ -35,6 +40,7 @@ class ProviderLoginDialog extends ConsumerStatefulWidget {
     required String projectPath,
     String? customCommand,
     String? title,
+    Map<String, String>? env,
     void Function(int exitCode)? onComplete,
   }) {
     return showDialog(
@@ -45,6 +51,7 @@ class ProviderLoginDialog extends ConsumerStatefulWidget {
         projectPath: projectPath,
         customCommand: customCommand,
         title: title,
+        env: env,
         onComplete: onComplete,
       ),
     );
@@ -112,6 +119,7 @@ class _ProviderLoginDialogState extends ConsumerState<ProviderLoginDialog> {
           projectPath: widget.projectPath,
           command: cmd,
           title: _getTitle(_selectedProvider),
+          env: widget.env,
           onComplete: (exitCode) {
             if (mounted) {
               setState(() {});

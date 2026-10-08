@@ -4,7 +4,12 @@ import path from 'node:path';
 
 import spawn from 'cross-spawn';
 
-import { resolveClaudeCodeExecutablePath, readObjectRecord, readOptionalString } from '@/shared/index.js';
+import {
+  providerChildEnv,
+  resolveClaudeCodeExecutablePath,
+  readObjectRecord,
+  readOptionalString,
+} from '@/shared/index.js';
 import type { IProviderAuth, ProviderAuthStatus } from '@/shared/index.js';
 
 type ClaudeCredentialsStatus = {
@@ -33,8 +38,9 @@ export class ClaudeProviderAuth implements IProviderAuth {
   private checkInstalled(): boolean {
     const cliPath = resolveClaudeCodeExecutablePath(process.env.CLAUDE_CLI_PATH);
     try {
-      spawn.sync(cliPath, ['--version'], { stdio: 'ignore', timeout: 5000 });
-      return true;
+      // cross-spawn reports ENOENT via `result.error` instead of throwing.
+      const result = spawn.sync(cliPath, ['--version'], { stdio: 'ignore', timeout: 5000, env: providerChildEnv() });
+      return !result.error && result.status === 0;
     } catch {
       return false;
     }

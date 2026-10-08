@@ -266,6 +266,9 @@ export async function createServices(options: CreateServicesOptions = {}): Promi
             timestamp: new Date().toISOString(),
             installMode,
             version: runningVersion,
+            // The client may be remote, so it reads the server OS from here to
+            // pick install commands (PowerShell on win32) instead of its own.
+            platform: process.platform,
             // When this process started — changes on every restart, so a client
             // waiting out a restart can tell the new process from the old one.
             startedAt: PROCESS_STARTED_AT

@@ -39,6 +39,7 @@ class TerminalTab {
     this.initialCommand,
     this.isPlainShell = true,
     this.isCommandMode = false,
+    this.env,
     this.onComplete,
     required this.terminal,
     required this.channel,
@@ -56,6 +57,9 @@ class TerminalTab {
   final String? initialCommand;
   final bool isPlainShell;
   final bool isCommandMode;
+
+  /// Extra PTY env sent with `init` (per-account login config dirs).
+  final Map<String, String>? env;
   final void Function(int exitCode)? onComplete;
   final Terminal terminal;
   final ShellChannel channel;
@@ -94,6 +98,7 @@ class TerminalTab {
       initialCommand: initialCommand,
       isPlainShell: isPlainShell,
       isCommandMode: isCommandMode,
+      env: env,
       onComplete: onComplete,
       terminal: terminal,
       channel: channel,
@@ -163,6 +168,7 @@ class TerminalController extends Notifier<TerminalState> {
     String? initialCommand,
     bool isPlainShell = true,
     bool isCommandMode = false,
+    Map<String, String>? env,
     void Function(int exitCode)? onComplete,
     int? cols,
     int? rows,
@@ -190,6 +196,7 @@ class TerminalController extends Notifier<TerminalState> {
       initialCommand: initialCommand,
       isPlainShell: isPlainShell,
       isCommandMode: isCommandMode,
+      env: env,
       onComplete: onComplete,
       terminal: terminal,
       channel: channel,
@@ -228,7 +235,11 @@ class TerminalController extends Notifier<TerminalState> {
       hasSession: sessionId != null,
       initialCommand: initialCommand,
       isPlainShell: isPlainShell,
-      forceRestart: false,
+      // A one-shot command (install/update/login) is a fresh run: the server
+      // keys PTYs by a short command prefix, so reattaching could land on a
+      // stale run of a different command or account.
+      forceRestart: isCommandMode,
+      env: env,
       cols: cols ?? 80,
       rows: rows ?? 24,
     );
@@ -511,6 +522,7 @@ class TerminalController extends Notifier<TerminalState> {
       initialCommand: tab.initialCommand,
       isPlainShell: tab.isPlainShell,
       forceRestart: true,
+      env: tab.env,
       cols: 80,
       rows: 24,
     );
@@ -536,6 +548,7 @@ class TerminalController extends Notifier<TerminalState> {
     required String projectPath,
     required String command,
     String? title,
+    Map<String, String>? env,
     void Function(int exitCode)? onComplete,
   }) {
     return createTab(
@@ -544,6 +557,7 @@ class TerminalController extends Notifier<TerminalState> {
       initialCommand: command,
       isPlainShell: true,
       isCommandMode: true,
+      env: env,
       onComplete: onComplete,
     );
   }

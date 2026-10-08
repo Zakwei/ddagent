@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
+import 'package:ddagent_app/core/utils/path_utils.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/core/widgets/auth_image.dart';
@@ -1543,7 +1544,7 @@ class _PinnedFilesBar extends ConsumerWidget {
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 160),
                     child: Text(
-                      f.split('/').last,
+                      pathBasename(f),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.bodySmall

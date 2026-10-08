@@ -4,6 +4,7 @@ import 'package:cross_file/cross_file.dart';
 import 'package:ddagent_app/core/network/api_error.dart';
 import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
+import 'package:ddagent_app/core/utils/path_utils.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_context_menu.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
@@ -65,17 +66,6 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
   };
 }
 
-String _basename(String path) {
-  final trimmed = path.endsWith('/') ? path.substring(0, path.length - 1) : path;
-  final i = trimmed.lastIndexOf('/');
-  return i < 0 ? trimmed : trimmed.substring(i + 1);
-}
-
-String _dirname(String path) {
-  final i = path.lastIndexOf('/');
-  return i <= 0 ? '/' : path.substring(0, i);
-}
-
 // file-tree/constants/constants.ts parity.
 const _kMaxUploadCount = 20;
 const _kMaxUploadBytes = 200 * 1024 * 1024;
@@ -111,7 +101,7 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
     _search.text = ui.query;
     if (ui.openPath != null && ui.openProjectId == ref.read(fileTreeProvider).projectId) {
       _openNode = FileTreeNode(
-        name: _basename(ui.openPath!),
+        name: pathBasename(ui.openPath!),
         path: ui.openPath!,
         isDirectory: false,
       );
@@ -188,12 +178,13 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
 
   /// Reveal a content-search hit: expand ancestors, open the file.
   void _openMatch(FileSearchMatch match) {
-    final node = FileTreeNode(name: _basename(match.path), path: match.path, isDirectory: false);
+    final node = FileTreeNode(name: pathBasename(match.path), path: match.path, isDirectory: false);
     final ancestors = <String>[];
-    var dir = _dirname(match.path);
-    while (dir.isNotEmpty && dir != '/') {
+    var dir = pathDirname(match.path);
+    // Stops at '', '/' or '\\' (POSIX / Windows / UNC roots).
+    while (dir.length > 1) {
       ancestors.add(dir);
-      dir = _dirname(dir);
+      dir = pathDirname(dir);
     }
     ref.read(fileTreeProvider.notifier).expandDirectories(ancestors);
     _open(node);

@@ -304,3 +304,35 @@ test('shell output strips OSC-8 sequences split around a wrapped auth URL', () =
 
   pty.emitExit();
 });
+
+test('init env reaches the PTY environment, dropping invalid names and non-string values', () => {
+  const pty = createFakePty();
+  let spawnedEnv: Record<string, string | undefined> = {};
+  const socket = createFakeSocket();
+  handleShellConnection(socket as never, {
+    resolveProviderSessionId: () => null,
+    spawnPty: ((_file: string, _args: string[], options: { env: Record<string, string> }) => {
+      spawnedEnv = options.env;
+      return pty;
+    }) as never,
+  });
+
+  socket.emit(
+    'message',
+    JSON.stringify({
+      type: 'init',
+      projectPath: process.cwd(),
+      sessionId: `env-${Date.now()}`,
+      provider: 'plain-shell',
+      isPlainShell: true,
+      initialCommand: 'claude setup-token',
+      env: { CLAUDE_CONFIG_DIR: '/tmp/acct', 'BAD;KEY': 'x', NUM: 1 },
+    })
+  );
+
+  assert.equal(spawnedEnv.CLAUDE_CONFIG_DIR, '/tmp/acct');
+  assert.equal(spawnedEnv['BAD;KEY'], undefined);
+  assert.equal(spawnedEnv.NUM, undefined);
+  assert.equal(spawnedEnv.TERM, 'xterm-256color');
+  pty.emitExit();
+});

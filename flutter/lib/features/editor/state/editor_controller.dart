@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:ddagent_app/core/network/api_error.dart';
+import 'package:ddagent_app/core/utils/path_utils.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_repository.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
@@ -33,7 +34,7 @@ class EditorTab {
   bool get isDirty => content != savedContent;
 
   /// File name for the tab label.
-  String get name => path.split('/').last;
+  String get name => pathBasename(path);
 
   EditorTab copyWith({
     String? content,

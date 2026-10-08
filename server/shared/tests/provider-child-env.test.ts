@@ -3,7 +3,12 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { devinConfigDir, devinDataDir, providerChildEnv } from '@/shared/utils.js';
+import {
+  devinConfigDir,
+  devinDataDir,
+  powerShellArgs,
+  providerChildEnv,
+} from '@/shared/utils.js';
 
 test('providerChildEnv appends the user-local bin to PATH', () => {
   const env = providerChildEnv({}, { PATH: '/usr/bin' });
@@ -34,6 +39,13 @@ test('providerChildEnv keeps explicit overrides and defaults TASK_MASTER_TOOLS',
   assert.equal(env.TASK_MASTER_TOOLS, 'standard');
 });
 
+test('powerShellArgs bypasses the execution policy and runs interactively without a command', () => {
+  assert.deepEqual(powerShellArgs('claude'), [
+    '-NoLogo', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', 'claude',
+  ]);
+  assert.deepEqual(powerShellArgs(''), ['-NoLogo', '-ExecutionPolicy', 'Bypass']);
+});
+
 if (process.platform === 'win32') {
   test('devin dirs point into %APPDATA%\\devin on Windows', () => {
     const roaming = process.env.APPDATA ?? path.join(os.homedir(), 'AppData', 'Roaming');
@@ -46,3 +58,22 @@ if (process.platform === 'win32') {
     assert.equal(devinConfigDir(), path.join(os.homedir(), '.config', 'devin'));
   });
 }
+
+test('providerChildEnv appends npm/pnpm global bins and the node dir on Windows', () => {
+  const env = providerChildEnv(
+    {},
+    { Path: 'C:\\Windows', APPDATA: 'C:\\Users\\u\\AppData\\Roaming', LOCALAPPDATA: 'C:\\Users\\u\\AppData\\Local' },
+    'win32',
+  );
+  const entries = env.Path?.split(';') ?? [];
+  assert.equal(entries[0], 'C:\\Windows');
+  assert.ok(entries.includes('C:\\Users\\u\\AppData\\Roaming\\npm'));
+  assert.ok(entries.includes('C:\\Users\\u\\AppData\\Local\\pnpm'));
+  assert.ok(entries.includes(path.win32.dirname(process.execPath)));
+});
+
+test('providerChildEnv skips Windows dirs already on PATH regardless of case', () => {
+  const env = providerChildEnv({}, { Path: 'c:\\users\\u\\appdata\\roaming\\NPM', APPDATA: 'C:\\Users\\u\\AppData\\Roaming' }, 'win32');
+  const npmEntries = (env.Path?.split(';') ?? []).filter((entry) => entry.toLowerCase().endsWith('\\npm'));
+  assert.equal(npmEntries.length, 1);
+});

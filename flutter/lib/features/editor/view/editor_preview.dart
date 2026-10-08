@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:ddagent_app/core/theme/tokens.dart';
+import 'package:ddagent_app/core/utils/path_utils.dart';
 import 'package:ddagent_app/core/widgets/app_markdown.dart';
 import 'package:ddagent_app/core/widgets/auth_image.dart';
 import 'package:ddagent_app/features/editor/data/editor_file_kind.dart';
@@ -100,7 +101,7 @@ class _BinaryCard extends ConsumerWidget {
               const SizedBox(height: AppSpacing.sm),
               Text(title, style: Theme.of(context).textTheme.titleSmall),
               Text(
-                path.split('/').last +
+                pathBasename(path) +
                     (snap.hasData ? ' · ${formatFileSize(snap.data!.length)}' : ''),
                 style: Theme.of(context).textTheme.bodySmall
                     ?.copyWith(color: colors.mutedForeground),

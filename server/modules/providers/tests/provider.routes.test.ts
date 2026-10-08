@@ -315,6 +315,12 @@ test('auth logout route clears credentials, exposes canLogout, and rejects unsup
   t.mock.method(logoutAuth, 'logout', async () => {
     logoutCalls += 1;
   });
+  // Every provider implements logout now; shadow cursor's to exercise the unsupported path.
+  const cursorAuth = cursor.auth as { logout?: () => Promise<void> };
+  cursorAuth.logout = undefined;
+  t.after(() => {
+    delete cursorAuth.logout;
+  });
 
   await withProviderServer(async (baseUrl) => {
     const claudeStatus = await fetch(`${baseUrl}/api/providers/claude/auth/status`);

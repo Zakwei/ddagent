@@ -339,6 +339,15 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  test('a Windows server gets PowerShell installers for the script-installed CLIs', () {
+    for (final agent in ['cursor', 'antigravity', 'devin']) {
+      final command = providerInstallCommand(agent, windows: true);
+      expect(command, endsWith('| iex'), reason: agent);
+      expect(providerUpdateCommand(agent, windows: true), command, reason: agent);
+    }
+    expect(providerInstallCommand('claude', windows: true), providerInstallCommand('claude'));
+  });
+
   testWidgets('logout confirms, calls the server, and refreshes the status', (tester) async {
     tester.view.physicalSize = const Size(1600, 1200);
     tester.view.devicePixelRatio = 1;

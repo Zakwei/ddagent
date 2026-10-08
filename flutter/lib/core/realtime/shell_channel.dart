@@ -49,6 +49,7 @@ class ShellChannel {
     String? initialCommand,
     bool isPlainShell = false,
     bool forceRestart = false,
+    Map<String, String>? env,
     int? cols,
     int? rows,
   }) {
@@ -61,10 +62,18 @@ class ShellChannel {
       'initialCommand': ?initialCommand,
       'isPlainShell': isPlainShell,
       'forceRestart': forceRestart,
+      'env': ?env,
       'cols': ?cols,
       'rows': ?rows,
     };
-    if (_ws.state == WsState.open) _ws.send(_initFrame!);
+    if (_ws.state == WsState.open) _sendInit();
+  }
+
+  /// `forceRestart` applies to the first send only — a reconnect re-sends the
+  /// frame to reattach, and must not kill the PTY it just restarted.
+  void _sendInit() {
+    _ws.send(_initFrame!);
+    _initFrame = {..._initFrame!, 'forceRestart': false};
   }
 
   /// Binds frames + auto re-init on reconnect. Call once.
@@ -72,7 +81,7 @@ class ShellChannel {
     _sub ??= _ws.frames.listen((raw) => _framesOut.add(ShellFrame(raw: raw)));
     _statesSub = _ws.states.listen((s) {
       if (s == WsState.open && _initFrame != null) {
-        _ws.send(_initFrame!);
+        _sendInit();
       }
     });
   }

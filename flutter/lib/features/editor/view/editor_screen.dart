@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:ddagent_app/core/theme/tokens.dart';
+import 'package:ddagent_app/core/utils/path_utils.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/features/editor/data/editor_file_kind.dart';
@@ -202,7 +203,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     );
   }
 
-  static String _fileName(String path) => path.contains('/') ? path.split('/').last : path;
+  static String _fileName(String path) => pathBasename(path);
 
   /// web handleDownload — saves the current buffer (unsaved edits included).
   Future<void> _downloadTab(EditorTab tab) async {
