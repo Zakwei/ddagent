@@ -89,20 +89,6 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
         .openPane(PaneKind.chat, projectId: _defaultProjectId, picker: true);
   }
 
-  /// "Sessions" toolbar action: retarget the focused chat pane to picker
-  /// state rather than stacking a fresh tile.
-  void _browseSessions() {
-    final ws = ref.read(workspaceProvider);
-    final ctrl = ref.read(workspaceProvider.notifier);
-    for (final p in ws.panes) {
-      if (p.id == ws.activePaneId && p.kind == PaneKind.chat) {
-        ctrl.updatePane(p.id, picker: true);
-        return;
-      }
-    }
-    ctrl.openPane(PaneKind.chat, projectId: _defaultProjectId, picker: true);
-  }
-
   void _add(PaneKind kind) {
     ref.read(workspaceProvider.notifier).openPane(kind, projectId: _defaultProjectId);
   }
@@ -286,7 +272,6 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
     final buttons = <Widget>[
       const AppNavMenuButton(),
       btn(LucideIcons.messageSquarePlus, 'Add chat pane', canAdd ? _addChat : null),
-      btn(LucideIcons.history, 'Open session list', _browseSessions),
       btn(
         LucideIcons.globe,
         'Add browser pane',
