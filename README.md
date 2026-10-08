@@ -2,7 +2,7 @@
   <img src="public/logo.svg" alt="ddagent" width="72" height="72">
   <h1>ddagent</h1>
   <p><strong>One UI for all your AI coding agents.</strong><br>
-  Self-hosted interface (web, desktop &amp; mobile) for Claude Code, Codex, Cursor CLI, OpenCode and Devin — sessions, files, git, terminals and tasks in a single place.</p>
+  Self-hosted server and Flutter client (web, Linux, Windows &amp; Android) for Claude Code, Codex, Cursor CLI, OpenCode, Devin, Command Code and Antigravity — sessions, files, git, terminals and tasks in a single place.</p>
 
   <p>
     <img src="https://img.shields.io/github/v/release/Zakwei/ddagent?label=version&amp;color=0066FF" alt="version">
@@ -38,88 +38,132 @@
   <img src="public/screenshots/mobile-chat.png" alt="ddagent mobile view" width="20%">
 </p>
 
+<table>
+  <tr>
+    <td width="33%"><img src="public/screenshots/sessions.png" alt="Recent sessions from Claude Code and Codex"></td>
+    <td width="33%"><img src="public/screenshots/kanban-board.png" alt="Kanban board driving agent runs"></td>
+    <td width="33%"><img src="public/screenshots/git-panel.png" alt="Git panel with hunk staging"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Sessions from every agent in one list</sub></td>
+    <td align="center"><sub>Kanban board — cards start agent runs</sub></td>
+    <td align="center"><sub>Git panel — diff, stage hunks, commit</sub></td>
+  </tr>
+</table>
+
 ---
 
 ## What is ddagent?
 
-ddagent runs on your own machine or VPS and gives you a polished UI (Flutter: web, desktop and mobile) on top of the coding agents you already use. It discovers their sessions directly from disk — your `~/.claude`, Codex and Devin history shows up instantly, nothing is duplicated or synced to a third party.
+ddagent runs on your own machine or VPS and puts one polished UI on top of the coding agents you already use. The server reads each agent's sessions straight from its own on-disk history (`~/.claude`, `~/.codex`, `~/.cursor`, OpenCode, Devin, …), so existing conversations show up without importing anything. Only session metadata is indexed locally; nothing is sent to a third party.
 
-Open it from any browser on your network, or from your phone. Your machine, your agents, your data.
+Connect from the Flutter client on your desktop, phone or browser. Your machine, your agents, your data.
 
 ## Features
 
-- **Multi-agent sessions** — run and resume Claude Code, Codex, Cursor CLI, OpenCode and Devin sessions side by side, with live streaming over WebSocket
-- **Split panes** — chat, terminal, browser and file panes in one workspace
+- **Multi-agent sessions** — run and resume sessions from seven agent CLIs side by side, with live streaming over WebSocket
+- **Auto orchestrator** — "Auto" sessions route each task to a suitable agent and model, taking remaining subscription quota into account, and delegate work to child sessions
+- **Split workspace** — up to six panes (chat, terminal, browser, preview, editor, git, notes) in one window
 - **File explorer & editor** — browse the workspace and edit code in the built-in editor
-- **Git panel** — stage, commit, diff and switch branches without leaving the UI
-- **Integrated shell** — full terminal per workspace, plus a standalone shell tab
-- **Task board** — kanban view powered by TaskMaster; turn PRDs into executable tasks
+- **Git panel** — stage files or individual hunks, commit (with AI-generated messages), diff, branch, pull/push and restore checkpoints without leaving the UI
+- **Integrated terminal** — a full shell per workspace
+- **Kanban board** — move a card to start an agent run on it (optionally in its own worktree); the agent reports back when it is done
+- **TaskMaster** — turn PRDs into tasks and track them on a task board
+- **Message queue** — messages sent while an agent is busy are queued on the server and survive refreshes and device switches
 - **MCP management** — add, edit and sync MCP servers across agents
-- **Knowledge base** — one local, searchable memory for every agent: rules, skills, memories and personal info, retrieved on demand over MCP (Contexta model) ([docs](docs/KNOWLEDGE.md))
-- **Skills browser** — manage agent skills from the UI
+- **Knowledge base** — one local, searchable memory for every agent: rules, skills, memories and personal info, retrieved on demand over MCP ([docs](docs/KNOWLEDGE.md))
+- **Skills & rules** — manage agent skills and shared rules from one place
 - **Quota & usage** — token usage and subscription limits per agent, at a glance
-- **Browser-use** — agent-driven browser sessions for research and testing
+- **Browser-use** — agent-driven browser sessions for research and testing, with a live browser pane
 - **Worktrees** — spin up isolated git worktrees per task, with per-worktree setup/run scripts and an authenticated live dev-server preview
-- **Remote approvals** — approve tool permissions from Telegram, Discord, or the mobile app
-- **Voice input** — dictate prompts via a Whisper-compatible STT endpoint
+- **Remote approvals** — approve tool permissions from Telegram, Discord or the Android app ([docs](docs/remote-approvals.md))
+- **Voice input** — dictate prompts through a Whisper-compatible speech-to-text endpoint
 - **Agent broadcast & shared memory** — message every agent at once and keep per-project notes they all read
 - **Multi-account switching** — named accounts per provider with per-session env overrides
-- **Scheduler** — cron-driven agent runs, with keep-awake on web/desktop
+- **Scheduler** — cron-driven, unattended agent runs, with an option to keep the device awake while runs are active
 - **Team collaboration** — roles (owner/member/viewer), invite links, assignees, comments, presence and an activity feed on the board ([docs](docs/teams.md))
-- **MCP server** — let external MCP clients (Claude Desktop, OpenClaw) create tasks and message sessions ([docs](docs/mcp-server.md))
-- **Notifications & TTS** — get pinged (or read aloud) when a session needs you
-- **Docker sandboxes** — run agents in microVM-isolated environments ([docs](docker/README.md))
-- **Flutter client** — one codebase for web, desktop and mobile; **12 languages**, dark & light themes
+- **MCP server** — let external MCP clients (Claude Desktop, OpenClaw) list sessions, create tasks and message sessions ([docs](docs/mcp-server.md))
+- **Notifications & TTS** — push, Telegram and Discord notifications when a session needs you, plus optional read-aloud replies
+- **Command palette** — `Ctrl/Cmd+Shift+K` to search sessions and messages, jump to any page or run quick actions
+- **Docker sandboxes** — run agents in microVM-isolated Docker Sandboxes ([docs](docker/README.md))
+- **Flutter client** — one codebase for web, Linux, Windows and Android; **12 languages**, dark and light themes
 
 ## Supported agents
 
 | Agent | How it connects |
 |---|---|
-| **Claude Code** | Auto-discovers `~/.claude` sessions; MCP & settings sync with the native CLI |
-| **Codex** | Local CLI sessions and transcripts |
-| **Cursor CLI** | Local CLI sessions |
-| **OpenCode** | Local sessions and skill locations |
-| **Devin** | CLI/ACP sessions via local sync |
+| **Claude Code** | Claude Agent SDK; auto-discovers `~/.claude` sessions; MCP and settings sync with the native CLI |
+| **Codex** | Codex SDK; local sessions and transcripts from `~/.codex` |
+| **Cursor CLI** | `cursor-agent` with streaming JSON output; local chats from `~/.cursor` |
+| **OpenCode** | `opencode serve`; local sessions from the OpenCode database |
+| **Devin** | `devin acp` (Agent Client Protocol); local transcripts |
+| **Command Code** | `command-code acp` (Agent Client Protocol); transcripts from `~/.commandcode` |
+| **Antigravity** | `agy` CLI in headless mode; conversations indexed from `~/.gemini/antigravity-cli` |
 
-You bring your own subscriptions — ddagent provides the environment, not the AI.
+The agent CLIs must be installed and signed in on the server machine. You bring your own subscriptions — ddagent provides the environment, not the AI.
 
 ## Install
 
-Requires **Node.js 22+** on the machine that runs the server. The server serves the REST/WS API that the Flutter client (web, desktop, mobile) connects to remotely.
+ddagent has two parts: the **server**, which runs next to your agents and exposes a REST/WebSocket API, and the **client**, which connects to it. The server needs **Node.js 22+** (the prebuilt tarballs need Node.js 22.x, because their native modules are built against it).
 
-### Self-hosted server — installer script
+### Server — installer script
 
 ```bash
 curl -fsSL https://github.com/Zakwei/ddagent/releases/latest/download/install.sh | bash
 ```
 
-Clones the latest release tag into `~/.ddagent/app`, builds the backend, and leaves a `start.sh` launcher. Options: `--version vX.Y.Z` · `--dir <path>` · `--port <port>` · `--systemd` (installs and enables a user systemd unit). Re-run with `--version` to update in place.
+Requires `git`, Node.js 22+ and `npm`. The script clones a release tag into `~/.ddagent/app`, installs dependencies, builds the backend and writes a `start.sh` launcher. Pass options after `bash -s --`:
 
-Then:
+| Option | Description |
+|---|---|
+| `--version vX.Y.Z` | Install a specific release (default: latest) |
+| `--dir <path>` | Install directory (default: `~/.ddagent/app`) |
+| `--systemd` | Install and enable a systemd user service named `ddagent` |
+| `--port <port>` | Port for the systemd service (default: `3001`) |
 
 ```bash
-~/.ddagent/app/start.sh        # → http://localhost:3001
+curl -fsSL https://github.com/Zakwei/ddagent/releases/latest/download/install.sh | bash -s -- --systemd --port 3001
 ```
 
-### Self-hosted server — prebuilt tarball
+To update, re-run the script with `--version vX.Y.Z`; it updates the checkout in place. Then start the server:
 
-No build step — download `ddagent-server-<version>-<os>-<arch>.tar.gz` from [Releases](https://github.com/Zakwei/ddagent/releases), unpack, run:
+```bash
+~/.ddagent/app/start.sh        # API on http://<host>:3001 (set SERVER_PORT to change)
+```
+
+### Server — prebuilt tarball
+
+No build step: download `ddagent-server-<version>-<os>-<arch>.tar.gz` (`linux-x64`, `mac-arm64` or `win-x64`) from [Releases](https://github.com/Zakwei/ddagent/releases), unpack it and run the launcher:
 
 ```bash
 mkdir ddagent && tar xzf ddagent-server-*-linux-x64.tar.gz -C ddagent
-./ddagent/start.sh           # start.bat on Windows
+./ddagent/start.sh             # start.bat on Windows
 ```
 
-### Flutter client (web · desktop · mobile)
+Each tarball comes with a `.sha256` checksum. Settings go in an optional `.env` file next to `start.sh`.
 
-The client is a Flutter app (`flutter/`) — one codebase for web, desktop (Linux/Windows) and mobile. Build from source:
+### Client
+
+Download a prebuilt client from [Releases](https://github.com/Zakwei/ddagent/releases):
+
+| Platform | Asset |
+|---|---|
+| Windows x64 | `ddagent-flutter-windows-x64-<tag>-setup.exe` (installer) or `.zip` (portable) |
+| Linux x64 | `ddagent-flutter-linux-x64-<tag>.deb` or `.tar.gz` |
+| Android | `ddagent-flutter-android-<tag>.apk` |
+| Web | `ddagent-flutter-web-<tag>.zip` |
+
+On first launch, enter your server URL (for example `http://my-vps:3001`) and create the first account. On Windows and Linux x64, the desktop client can also download and run a local server for you ("This device" on the connect screen).
+
+The web build has no login screen and calls the API on its own origin, so it must be served behind a reverse proxy in front of a server running in single-user platform mode (`VITE_IS_PLATFORM=true`, which disables authentication). In a source checkout, `node scripts/serve-flutter-web.cjs` serves `flutter/build/web` on port 8085 and proxies the API and WebSockets to the server on `FLUTTER_BACKEND_PORT` (default `10087`). Only expose this setup on a trusted network.
+
+To build the client yourself:
 
 ```bash
 cd flutter
-flutter build web        # → build/web (serve with scripts/serve-flutter-web.cjs)
+flutter pub get
+flutter build linux --release      # or: windows, apk, web
 ```
-
-The client connects to a self-hosted server URL.
 
 ### From source
 
@@ -127,7 +171,7 @@ The client connects to a self-hosted server URL.
 git clone https://github.com/Zakwei/ddagent.git
 cd ddagent
 npm install
-npm run dev        # backend dev mode (tsx) with HMR
+npm run build && node dist-server/server/index.js   # API on http://localhost:3001
 ```
 
 ### Docker sandbox (experimental)
@@ -136,7 +180,7 @@ npm run dev        # backend dev mode (tsx) with HMR
 ddagent sandbox ~/my-project
 ```
 
-Runs the agent in a hypervisor-isolated sandbox. See [docker/README.md](docker/README.md).
+Runs ddagent and an agent (Claude Code or Codex) inside a microVM-isolated Docker Sandbox. Requires the `sbx` CLI — see [docker/README.md](docker/README.md).
 
 ## CLI
 
@@ -144,43 +188,68 @@ In a source or `install.sh` checkout, `ddagent` below means `node dist-server/se
 
 | Command | Description |
 |---|---|
-| `ddagent` | Start the server |
-| `ddagent start` | Start the server |
-| `ddagent status` | Show config and data locations |
-| `ddagent version` | Print version |
+| `ddagent` / `ddagent start` | Start the server (default command) |
+| `ddagent status` | Show version, config file, database and Claude projects locations |
+| `ddagent sandbox <workspace>` | Create and start a Docker sandbox; `ddagent sandbox help` lists `ls`, `start`, `stop`, `rm`, `logs` |
+| `ddagent browser-use-mcp` | Run the browser-use MCP server over stdio |
+| `ddagent version` | Print the version |
 | `ddagent help` | Show help |
+
+| Option | Description |
+|---|---|
+| `-p, --port <port>` | Server port (overrides `SERVER_PORT`) |
+| `--database-path <path>` | Custom database location (overrides `DATABASE_PATH`) |
 
 ## Configuration
 
-All settings live in a single env file — run `ddagent status` to see where yours is read from.
+The server reads an optional `.env` file from its install directory (next to `start.sh`); real environment variables take precedence. Run `ddagent status` to see which file is used.
 
 | Variable | Default | Description |
 |---|---|---|
-| `SERVER_PORT` | `3001` | API + WebSocket port |
+| `SERVER_PORT` | `3001` | API + WebSocket port (`PORT` is accepted as a legacy alias) |
 | `HOST` | `0.0.0.0` | Bind address (`127.0.0.1` for localhost only) |
-| `DATABASE_PATH` | auto | Auth database location |
-| `CONTEXT_WINDOW` | `160000` | Max tokens per session |
-| `CLAUDE_CLI_PATH` | `claude` | Custom Claude CLI binary path |
+| `DATABASE_PATH` | `~/.ddagent/auth.db` | SQLite database (users, settings, tokens) |
+| `WORKSPACES_ROOT` | home directory | Projects must live inside this directory |
+| `JWT_SECRET` | auto-generated | Secret for signing login tokens (generated and stored per installation) |
+| `API_KEY` | unset | When set, API requests must send it in the `x-api-key` header |
+| `CLAUDE_CLI_PATH` | `claude` | Custom Claude Code CLI binary |
+| `CONTEXT_WINDOW` | `200000` | Claude context window fallback, used until the SDK reports the model's real window |
+| `STT_ENDPOINT_URL` / `STT_API_KEY` / `STT_MODEL` | `https://api.openai.com/v1` / unset / `whisper-1` | Speech-to-text for voice input (also configurable in Settings) |
+| `VITE_IS_PLATFORM` | `false` | Single-user platform mode: skips authentication (required by the web client) |
 
-See [`.env.example`](.env.example) for the full list.
+See [`.env.example`](.env.example) for more.
 
 ## Development
 
 ```bash
-npm run dev            # dev mode (backend with tsx hot reload)
-npm run build          # server production build
-npm test               # backend tests
-npm run typecheck      # TypeScript check
+npm install
+npm run dev               # start the backend from source (tsx, no reload)
+npm run server:dev-watch  # same, restarting on file changes
+npm run build             # compile the server to dist-server/
+npm test                  # backend tests
+npm run typecheck         # TypeScript check
+npm run lint              # ESLint
 ```
 
-Backend code follows the module architecture described in `server/modules/` — see `server/modules/providers/README.md` for provider internals.
+Client (Flutter 3.47.5 stable):
+
+```bash
+cd flutter
+flutter pub get
+flutter run -d linux --dart-define=DEFAULT_SERVER_URL=http://localhost:3001
+dart format --line-length 100 lib test
+flutter analyze
+flutter test
+```
+
+Backend code follows the module architecture in `server/modules/`; see [`server/modules/providers/README.md`](server/modules/providers/README.md) for provider internals.
 
 ## Contributing
 
-Bug fixes are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
+Bug fixes are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md). To report a vulnerability, see [SECURITY.md](SECURITY.md).
 
 ---
 
 <div align="center">
-  <sub>Built for the Claude Code, Cursor, Codex, OpenCode and Devin community.</sub>
+  <sub>Built for the Claude Code, Codex, Cursor, OpenCode, Devin, Command Code and Antigravity community.</sub>
 </div>

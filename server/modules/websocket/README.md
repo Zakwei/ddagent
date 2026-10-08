@@ -4,23 +4,29 @@ This module owns the server-side WebSocket gateway used by:
 
 1. Chat streaming (`/ws`)
 2. Interactive terminal sessions (`/shell`)
-3. In-app browser view frames (`/browser-view`)
-4. Desktop notifications (`/desktop-notifications`)
+3. In-app browser view frames (`/browser-view`) — handler lives in `modules/browser-view`
+4. Desktop notifications (`/desktop-notifications`) — handler lives in `modules/notifications`
 
 It is intentionally structured as **small services** plus a **barrel export** in `index.ts`.
+Every accepted socket gets a 30 s ping/pong heartbeat (`attachWebSocketHeartbeat`); a
+socket that misses a pong is terminated so its client can reconnect.
 
 ## Public API
 
 `server/modules/websocket/index.ts` exports:
 
-1. `createWebSocketServer(server, dependencies)`  
+1. `createWebSocketServer(server, dependencies)` and the `WebSocketServerDependencies` type  
 Creates and wires the shared `ws` server.
 2. `connectedClients` and `WS_OPEN_STATE`  
 Shared chat client registry and open-state constant used by other modules.
+3. `chatRunRegistry`  
+Live run state (seq numbering, replay buffer, completion) shared with server-side senders.
+4. `dispatchChatCommand` and the `ProviderRuntimeGateway` type  
+The provider-run dispatcher used by both the chat socket and the persisted message queue.
 
 ## Why Dependency Injection Is Used
 
-The module receives runtime-specific functions from `server/index.ts` instead of importing legacy runtime files directly.
+The module receives runtime-specific functions from the composition root (`server/services.ts`, attached to the HTTP server in `server/index.ts`) instead of importing runtime files directly.
 
 Benefits:
 
@@ -34,12 +40,14 @@ Benefits:
 |---|---|
 | `services/websocket-server.service.ts` | Creates `WebSocketServer`, binds `verifyClient`, routes connection by pathname |
 | `services/websocket-auth.service.ts` | Authenticates upgrade requests and attaches `request.user` |
-| `services/chat-websocket.service.ts` | Handles the `/ws` chat protocol (`chat.send` / `chat.abort` / `chat.subscribe` / `chat.permission-response`) |
+| `services/chat-websocket.service.ts` | Handles the `/ws` chat protocol (see [Chat Message Dispatch](#chat-message-dispatch)) |
+| `services/chat-dispatch.service.ts` | `dispatchChatCommand`: resolves the session row, applies first-turn context (shared context + unified rules), starts the run; shared by the socket and the message queue |
 | `services/chat-run-registry.service.ts` | Tracks live provider runs per app session id: seq numbering, event replay buffer, provider-id mapping, completion state |
 | `services/chat-session-writer.service.ts` | Gateway writer handed to provider runtimes: remaps provider session ids to app ids, swallows `session_created`, assigns `seq` |
 | `services/shell-websocket.service.ts` | Handles `/shell` PTY lifecycle, reconnect buffering, auth URL detection |
-| `services/websocket-writer.service.ts` | Adapts raw WebSocket to writer interface (`send`, `setSessionId`, `getSessionId`) for non-chat writer consumers |
+| `services/websocket-writer.service.ts` | Legacy raw-WebSocket writer adapter (`send`, `setSessionId`, `getSessionId`, `updateWebSocket`); chat runs use `ChatSessionWriter` |
 | `services/websocket-state.service.ts` | Holds shared chat client set and open-state constant |
+| `services/workspace-sync.service.ts` | Per-user workspace (pane layout) state: `workspace.get` / `workspace.update`, broadcast as `workspace_state` to the user's other sockets |
 
 ## High-Level Architecture
 
@@ -50,13 +58,15 @@ flowchart LR
   B --> D{Pathname}
   D -->|/ws| E[handleChatConnection]
   D -->|/shell| F[handleShellConnection]
+  D -->|/desktop-notifications| G[handleDesktopNotificationsConnection]
+  D -->|/browser-view| L[handleBrowserViewConnection]
   D -->|other| H[close()]
 
   E --> I[connectedClients Set]
   E --> J[chatRunRegistry + ChatSessionWriter]
   F --> K[ptySessionsMap]
 
-  I --> M[projects.service loading_progress]
+  I --> M[projects-with-sessions-fetch loading_progress]
   I --> N[sessions-watcher.service session_upserted]
 ```
 
@@ -91,6 +101,8 @@ sequenceDiagram
       Router->>Chat: handleChatConnection(ws, request, deps.chat)
     else pathname == /shell
       Router->>Shell: handleShellConnection(ws, deps.shell)
+    else /desktop-notifications or /browser-view
+      Router->>Router: delegate to notifications / browser-view module
     else unknown
       Router->>Router: ws.close()
     end
@@ -101,14 +113,14 @@ sequenceDiagram
 
 When a chat socket connects:
 
-1. Add socket to `connectedClients`.
+1. Add socket to `connectedClients` and register it with workspace sync for the authenticated user.
 2. Parse each incoming message with `parseIncomingJsonObject`.
-3. Dispatch by `data.type` (four message types, none provider-specific).
-4. On close, remove socket from `connectedClients`.
+3. Dispatch by `data.type` (none of the message types is provider-specific).
+4. On close, remove the socket from `connectedClients`, workspace sync, the run registry and presence.
 
 ### Session identity model
 
-The frontend only ever knows the **app session id** (allocated by
+The client only ever knows the **app session id** (allocated by
 `POST /api/providers/sessions` or discovered via the session index). The
 provider-native id (JSONL file name, CLI resume id) stays inside the backend:
 
@@ -124,19 +136,25 @@ flowchart TD
   B -->|invalid| C[send kind:protocol_error]
   B -->|ok| D{data.type}
 
-  D -->|chat.send| E[resolve session row -> startRun -> providerRuntimeService.run]
-  D -->|chat.abort| F[providerRuntimeService.abort + synthetic complete]
+  D -->|chat.send| E[dispatchChatCommand: resolve session row -> startRun -> runtime.run]
+  D -->|chat.abort| F[check runId -> runtime.abort -> synthetic complete]
   D -->|chat.subscribe| G[chat_subscribed ack + attach socket + replay events seq > lastSeq]
-  D -->|chat.permission-response| H[providerRuntimeService.resolveToolApproval]
+  D -->|chat.permission-response| H[member role -> resolve tool approval]
+  D -->|chat.set-permission-mode| J[member role -> persist + apply session permission mode]
+  D -->|presence| K[collab presence -> presence-roster broadcast]
+  D -->|workspace.get / workspace.update| L[workspace sync -> workspace_state]
   D -->|other| I[send kind:protocol_error]
 ```
 
 ### Chat Notes
 
-1. **Unified envelope**: every server-to-client frame carries a `kind` — either a provider `NormalizedMessage` kind or a gateway kind (`chat_subscribed`, `session_upserted`, `loading_progress`, `protocol_error`). There is no second `type`-based protocol.
+1. **Unified envelope**: chat frames carry a `kind` — either a provider `NormalizedMessage` kind or a gateway kind (`chat_subscribed`, `session_upserted`, `loading_progress`, `workspace_state`, `protocol_error`). The one exception is the collab `presence-roster` frame, which uses `type`.
 2. **Unified terminal lifecycle**: every provider run ends with exactly one `complete` message built by `createCompleteMessage()` (`server/shared/utils.ts`): `{ kind: "complete", sessionId, actualSessionId, exitCode, success, aborted }`. The chat handler emits a synthetic `complete` for runs that crash or get aborted, and the run registry drops duplicate completes.
-3. **Per-run event log**: every live event gets a monotonically increasing `seq`. `chat.subscribe { sessions: [{ sessionId, lastSeq }] }` re-attaches the live stream to the requesting socket (any provider, not just Claude) and replays events with `seq > lastSeq`. If the buffer no longer covers `lastSeq`, the client refreshes over REST.
-4. `chat_subscribed` includes `isProcessing` (replaces `check-session-status`) and `pendingPermissions` (replaces `get-pending-permissions`).
+3. **Per-run event log**: every live event gets a monotonically increasing `seq`. `chat.subscribe { sessions: [{ sessionId, lastSeq, runId? }] }` re-attaches the live stream to the requesting socket (any provider) and, for a run that is still processing, replays events with `seq > lastSeq`. Completed runs are not replayed — their history comes from REST. If the buffer no longer covers `lastSeq`, the client refreshes over REST.
+4. `chat_subscribed` includes `isProcessing`, `runId`, `lastSeq`, `startedAt` and `pendingPermissions`.
+5. **Run-scoped Stop**: `chat.abort { sessionId, runId }` must name the current run; a missing or stale id is rejected (`RUN_ID_REQUIRED` / `STALE_RUN`) before the runtime is called, and the abort result is applied only to the run captured before the await. A refused abort is reported as `ABORT_FAILED` and the run keeps going.
+6. **Role gates**: `chat.permission-response` and `chat.set-permission-mode` require the `member` role (`FORBIDDEN_ROLE` otherwise).
+7. A `chat.send` that races a live run (`RUN_IN_PROGRESS`) is parked in the server-side message queue instead of being dropped.
 
 ## `/shell` Terminal Flow
 
@@ -177,7 +195,7 @@ stateDiagram-v2
 1. `init`:
 Reads `projectPath`, `sessionId`, `provider`, `hasSession`, `initialCommand`, `isPlainShell`.
 2. Login reset:
-For login-like commands, existing keyed PTY session is killed and recreated.
+For login-like commands (or `forceRestart`), the existing keyed PTY session is killed and recreated.
 3. Validation:
 Path must exist and be a directory; `sessionId` must match safe pattern.
 4. Command build:
@@ -187,24 +205,25 @@ Stores up to 5000 chunks for replay on reconnect.
 6. URL detection:
 Strips ANSI, accumulates text buffer, extracts URLs, emits `auth_url` once per normalized URL, supports `autoOpen`.
 7. Close behavior:
-Socket disconnect does not instantly kill PTY; session is kept alive and terminated on timeout.
+Socket disconnect does not instantly kill the PTY; the session is kept alive for 30 minutes and then terminated.
 
 ## Shared Client Registry and Broadcasts
 
 Only chat sockets (`/ws`) are tracked in `connectedClients`.
 
-That shared set is consumed by:
+That shared set is consumed by, among others:
 
 1. `modules/projects/services/projects-with-sessions-fetch.service.ts`
 Broadcasts `kind: loading_progress` while project snapshots are being built.
 2. `modules/providers/services/sessions-watcher.service.ts`
 Broadcasts per-session `kind: session_upserted` deltas when provider session artifacts change (no full project snapshots).
+3. The kanban, queued-messages, orchestrator and mini-orchestrator modules, for their own realtime updates.
 
 This design centralizes cross-module realtime fanout without requiring route-local references to WebSocket internals.
 
 ## Writer Adapter (`WebSocketWriter`)
 
-`WebSocketWriter` normalizes chat transport behavior to match existing writer-style interfaces used elsewhere.
+`WebSocketWriter` adapts a raw socket to the writer interface the provider runtimes expect. Chat runs no longer use it directly: `ChatSessionWriter` exposes the same surface (including `isWebSocketWriter`) so runtimes need no changes.
 
 Methods:
 
@@ -219,7 +238,7 @@ Allows active session stream redirection on reconnect.
 
 Errors:
 
-1. Chat handler catches and emits `{ kind: "protocol_error", code, error }`.
+1. Chat handler catches and emits `{ kind: "protocol_error", code, error }` (unknown message types use `UNKNOWN_MESSAGE_TYPE`).
 2. Shell handler catches and writes terminal-visible error output.
 3. Unknown websocket paths are closed immediately.
 
@@ -230,5 +249,5 @@ To add a new websocket route:
 1. Add a new handler service under `services/`.
 2. Extend `WebSocketServerDependencies` in `websocket-server.service.ts` if needed.
 3. Add a new pathname branch in the router.
-4. Wire dependency injection from `server/index.ts`.
+4. Wire dependency injection from `server/services.ts`, or delegate to a handler exported by the owning module (as `/browser-view` and `/desktop-notifications` do).
 5. Keep `index.ts` as barrel-only export surface.

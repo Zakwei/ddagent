@@ -1,71 +1,97 @@
-# ddagent — Flutter app
+# ddagent — Flutter client
 
-Natywny klient ddagent (Electron → Flutter) — jedno źródło dla web, desktopu i Androida.
-Decyzje architektoniczne i plan zadań prowadzimy wewnętrznie (poza publicznym repozytorium).
+The ddagent client: one Flutter codebase for **web, Linux and Windows desktop, and
+Android**. It connects to a self-hosted ddagent server (REST + WebSocket API). macOS
+and iOS are not built yet (there is no `macos/` or `ios/` target).
 
-Platformy: **Android, Windows, Web, Linux** (iOS/macOS opcjonalnie — T39).
+## Requirements
 
-## Środowisko
-
-- **Flutter 3.47.5 stable** (Dart 3.13.4) — wersja przypięta też w CI (`flutter-ci.yml`).
-- Android SDK 36+, Java 17 (Gradle), Chrome (web), dla Linux: `clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev`.
-- Pełna lista komponentów i gotchas hosta dev: `.taskmaster/docs/flutter-env.md`.
-
-### Gotchas tego hosta (z flutter-env.md)
-
-1. **`LD_LIBRARY_PATH` konflikt** — sesyjne env (Playwright/browser-use) zasłania systemowy libfontconfig → link error przy `flutter build linux`. Używaj `env -u LD_LIBRARY_PATH flutter ...` (w `.bashrc` jest alias).
-2. **Brak `/dev/kvm`** — emulator Androida nie działa; testuj na fizycznym urządzeniu albo w CI.
+- **Flutter 3.47.5 stable** (Dart 3.13.4) — the same version is pinned in CI
+  (`.github/workflows/flutter-ci.yml`, `flutter-release.yml`).
+- Android: Android SDK and Java 17 (Gradle).
+- Web: Chrome for `flutter run -d chrome`.
+- Linux desktop: `clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libsecret-1-dev`.
+- A running ddagent server (`npm run dev` from the repo root, default port `3001`).
 
 ## Setup
 
 ```bash
 cd flutter
 flutter pub get
-# codegen (freezed/json_serializable) — gdy pojawią się modele:
-dart run build_runner build --delete-conflicting-outputs
 ```
 
-## Uruchamianie
-
-Konfiguracja build-time przez `--dart-define` (nic nie jest hardkodowane w kodzie):
-
-| Flag | Wartości | Domyślne |
-|---|---|---|
-| `ENV` | `dev`, `prod` | `dev` |
-| `DEFAULT_SERVER_URL` | URL serwera ddagent | puste → picker przy starcie |
+Generated code is committed. Regenerate it when you change its sources:
 
 ```bash
-# dev
-flutter run -d linux   --dart-define=ENV=dev --dart-define=DEFAULT_SERVER_URL=http://localhost:10087
-flutter run -d chrome  --dart-define=ENV=dev --dart-define=DEFAULT_SERVER_URL=http://localhost:10087
-flutter run -d <android-device> --dart-define=ENV=dev --dart-define=DEFAULT_SERVER_URL=http://<host>:10087
+# freezed / json_serializable models (*.freezed.dart, *.g.dart)
+dart run build_runner build --delete-conflicting-outputs
 
-# prod build
-flutter build apk     --release --dart-define=ENV=prod
-flutter build windows --release --dart-define=ENV=prod
+# translations: edit lib/i18n/<locale>.i18n.json, then regenerate lib/i18n/strings*.g.dart
+dart run slang
+```
+
+## Running
+
+Build-time configuration comes from `--dart-define` flags (see
+`lib/core/config/env.dart`); nothing is hardcoded:
+
+| Flag | Values | Default |
+|---|---|---|
+| `ENV` | `dev`, `prod` | `dev` |
+| `DEFAULT_SERVER_URL` | ddagent server URL | empty → the app asks for a server on first launch |
+| `API_KEY` | value sent as `x-api-key` when the server's API-key gate is on | empty (gate off) |
+| `EMBEDDED` | `true` for a build served by the server itself (no login flow); web builds always count as embedded | `false` |
+
+```bash
+# development
+flutter run -d linux  --dart-define=DEFAULT_SERVER_URL=http://localhost:3001
+flutter run -d chrome --dart-define=DEFAULT_SERVER_URL=http://localhost:3001
+flutter run -d <android-device> --dart-define=DEFAULT_SERVER_URL=http://<host>:3001
+
+# release builds
 flutter build web     --release --dart-define=ENV=prod
 flutter build linux   --release --dart-define=ENV=prod
+flutter build windows --release --dart-define=ENV=prod
+flutter build apk     --release --dart-define=ENV=prod
 ```
+
+The server does not serve the web UI. Serve `build/web` with
+`scripts/serve-flutter-web.cjs` (port `8085` by default; it proxies `/api` and the
+WebSocket upgrades to the backend on `FLUTTER_BACKEND_PORT`, default `10087` — set it
+to your server's port) or any static file server.
+
+Release packaging used by `flutter-release.yml`: `packaging/linux/build-deb.sh`
+(`.deb` from the Linux bundle) and `packaging/windows/installer.iss` (Inno Setup
+installer).
 
 ## Layout (feature-first)
 
 ```
 lib/
-  core/            # config (env), network, wspólne utils
+  core/            # config (env), network, realtime (WebSocket channels), router, theme, widgets
   features/
-    <domain>/
-      data/        # modele (freezed), repozytoria, źródła (dio/WS)
-      state/       # providery Riverpod
-      ui/          # ekrany i widgety
+    <feature>/
+      data/        # models (freezed), repositories, API/WS sources
+      state/       # Riverpod providers/controllers
+      view/        # screens and widgets
+  i18n/            # slang translations (*.i18n.json) and generated strings*.g.dart
 ```
 
 ## Checks
 
 ```bash
-dart format --line-length 100 lib test
-flutter analyze   # strict: strict-casts/inference/raw-types
+dart format --line-length 100 lib test   # CI fails on any diff (--set-exit-if-changed)
+flutter analyze                          # strict: strict-casts / strict-inference / strict-raw-types
 flutter test
 ```
 
-CI (`.github/workflows/flutter-ci.yml`): PR → format + analyze + test;
-push na `main` → build matrix: apk-debug, web, linux, windows.
+CI (`.github/workflows/flutter-ci.yml`): pull requests run format, analyze and
+test; pushes to `main` also build the debug matrix (Android APK, web, Linux,
+Windows).
+
+## Troubleshooting
+
+- **`flutter build linux` fails with a libfontconfig link error** — a session
+  `LD_LIBRARY_PATH` (for example from a Playwright/browser tooling environment) can
+  shadow the system libraries. Run `env -u LD_LIBRARY_PATH flutter build linux`.
+- **No `/dev/kvm`** — the Android emulator cannot run; use a physical device or CI.

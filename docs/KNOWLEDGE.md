@@ -35,6 +35,11 @@ There are three layers, and it helps to know which is which:
   reads `CLAUDE.md`, Codex/Cursor read `AGENTS.md`, Cursor reads `.cursorrules`,
   and several read `skills/` and `.agents/skills/`. This is the CLI's job, not
   the model's choice — ddagent does not turn it off.
+- **ddagent's first-turn prefix** — on a session's first message ddagent
+  prepends the project's `.ddagent/shared-context.md` and a `<unified-rules>`
+  block (the workspace `AGENTS.md`, `~/.agents/AGENTS.md` and a short hygiene
+  note; set `DDAGENT_UNIFIED_RULES=0` to drop it). This is file-based and
+  separate from the knowledge base.
 - **MCP retrieval (on demand)** — once you install ddagent's MCP server into an
   agent, its tool list includes `knowledge_get_context`, `knowledge_search` and
   friends. Following Contexta, nothing is injected automatically: the agent
@@ -104,12 +109,13 @@ Tools accept either `projectId` or a `projectPath` ddagent already knows.
 
 ### Installing the server into your agents
 
-You do not have to edit provider configs by hand. Use **Settings → MCP →
-Install ddagent MCP server** (also offered as a step in onboarding) and pick the
-agents — or install for all. It writes a `ddagent` HTTP MCP entry (user scope)
-pointing at `<server>/mcp` with a reusable `ddagent-mcp` bearer token
-(reinstalling revokes the previous one). Once installed, that agent's tools
-include the `knowledge_*` group alongside `create_task`, `send_message`, etc.
+You do not have to edit provider configs by hand. Use **Settings → Agents →
+(agent) → MCP → Install ddagent MCP server** (also offered as a step in
+onboarding) and pick the agents — or install for all. It writes a `ddagent` HTTP
+MCP entry (user scope) pointing at `<server>/mcp` with a reusable, write-scoped
+`ddagent-mcp` bearer token (reinstalling revokes the previous one). Once
+installed, that agent's tools include the `knowledge_*` group alongside
+`create_task`, `send_message`, etc.
 
 How does an agent know *when* to use MCP? It does not guess — tell it. Keep a
 `critical` rule such as: *"Before answering questions about this project, call
@@ -125,8 +131,9 @@ intent:
 
 - `AGENTS.md`, `CLAUDE.md`, `MUSE.md`, `GEMINI.md`, `CODEX.md`, `.cursorrules`,
   `.muserules` and markdown/`.mdc` under `.cursor/rules` become **rules**
-  (critical + enabled, so they reach the agent context; the workspace `AGENTS.md`
-  is `high` to avoid double injection with unified-rules),
+  (critical + enabled, so `knowledge_get_context` always returns them; the
+  workspace `AGENTS.md` is imported as `high` because the first-turn
+  `<unified-rules>` prefix already delivers it),
 - `SKILL.md` files under `skills` / `.agents/skills` become **skills**
   (name/description from frontmatter),
 - any other scanned markdown becomes a **reference memory**.
@@ -153,13 +160,15 @@ structure.
    re-scan after big changes to its instruction files.
 2. **Promote deliberately**: only truly binding rules should be `critical`
    (they are always served by the context builder). Use the star on a row, and
-   watch the critical-context meter.
+   watch the rules-context meter.
 3. **Keep the rest `high`/`normal`** — still searchable and available over MCP
    only when a query matches, so they cost nothing when irrelevant.
 4. **Personal info** for cross-project preferences (timezone, editor, naming).
 5. **Link related memories** so 1-hop neighbours ride along.
 6. **Install MCP** for the agents that should search the base and persist
-   learnings; give `read` scope to most, `write` where you trust the agent.
+   learnings. The one-click install uses a `write` token; for a read-only agent,
+   create a `read` token under ddagent MCP server tokens and configure that agent
+   by hand (see [ddagent as an MCP server](mcp-server.md#manual-client-config)).
 
 ## Migration
 
@@ -200,14 +209,14 @@ Mounted at `/api/knowledge` behind authentication:
 ```
 GET    /memories            ?projectId=&includeGlobal=&priority=&tag=&memoryType=&limit=&offset=
 POST   /memories            PATCH /memories/:id   DELETE /memories/:id
-GET    /rules               ?projectId=&includeGlobal=&priority=&enabledOnly=
+GET    /rules               ?projectId=&includeGlobal=&priority=&enabledOnly=&limit=&offset=
 POST   /rules               PATCH /rules/:id       DELETE /rules/:id
-GET    /skills              ?category=
+GET    /skills              ?category=&limit=&offset=
 POST   /skills              PATCH /skills/:id      DELETE /skills/:id
 GET    /personal            POST /personal         PATCH/DELETE /personal/:id
 GET    /search              ?q=&type=&projectId=&limit=
 GET    /graph               ?projectId=&types=&limit=
-GET    /context             ?projectId=            (critical-context size + budget)
+GET    /context             ?projectId=            (rules-context preview: size + budget)
 GET    /tags                DELETE /tags/:id
 GET    /connections         POST /connections      DELETE /connections/:id
 GET    /history             ?entityType=&entityId=&limit=

@@ -49,8 +49,9 @@ Current provider ids in this repo are:
 - `devin`
 - `opencode`
 
-Those ids are mirrored in backend unions and frontend provider constants. If
-adding a new provider, update every place that hardcodes this list.
+Those ids are mirrored in backend unions and in the Flutter client's provider
+constants. If adding a new provider, update every place that hardcodes this list
+(`grep -rn "'commandcode'" server flutter/lib` finds most of them).
 
 ## Current File Layout
 
@@ -59,7 +60,7 @@ Each provider lives under its own folder in `server/modules/providers/list/`:
 ```text
 server/modules/providers/list/<provider>/
   <provider>.provider.ts
-  <provider>-runtime.provider.js
+  <provider>-runtime.provider.ts
   <provider>-auth.provider.ts
   <provider>-models.provider.ts
   <provider>-mcp.provider.ts
@@ -69,6 +70,9 @@ server/modules/providers/list/<provider>/
 ```
 
 The existing provider folders are `antigravity`, `claude`, `codex`, `commandcode`, `cursor`, `devin`, and `opencode`.
+Devin still has some plain-JavaScript facets (`devin.provider.js`, `devin-mcp.provider.js`,
+`devin-sessions.provider.js`, `devin-skills.provider.js`); new providers should be TypeScript.
+OpenCode additionally has `opencode-server.manager.ts` for its local HTTP server.
 
 Each provider wrapper owns its SDK/CLI runtime alongside its auth, model, and
 session facets. Runtime adapters receive registry-backed model and session
@@ -99,24 +103,20 @@ import the service from `server/modules/providers/index.ts`.
 1. Add the provider id everywhere it is part of the contract.
 
 - Update `server/shared/types.ts` `LLMProvider`.
-- Update `src/types/app.ts` `LLMProvider` if the frontend should know about it.
-- Update `server/modules/providers/provider.routes.ts`.
-- Update `server/modules/agent/agent.routes.ts` if the provider is launchable from the agent runtime.
-- Update `server/index.ts` if the provider needs runtime boot or shutdown wiring.
+- Update `parseProvider` in `server/modules/providers/provider.routes.ts`.
+- Update `server/modules/agent/agent.routes.ts` if the provider is launchable from the agent API.
+- Update `server/services.ts` (the composition root) if the provider needs runtime boot or shutdown wiring.
 - Update the `PROVIDER_ORDER` list in `public/api-docs.html` if the provider should appear in the public API docs.
-- Update `src/components/chat/hooks/useChatProviderState.ts` and
-  `src/components/chat/view/subcomponents/ProviderSelectionEmptyState.tsx` if
-  the provider should be selectable in chat.
-- Update `src/components/provider-auth/view/ProviderLoginModal.tsx` if the
-  provider has a login/setup flow.
+- Update the Flutter client if the provider should be visible there (see step 9).
 
 2. Create the wrapper class.
 
 - Add `server/modules/providers/list/<provider>/<provider>.provider.ts`.
-- Add `server/modules/providers/list/<provider>/<provider>-runtime.provider.js`
+- Add `server/modules/providers/list/<provider>/<provider>-runtime.provider.ts`
   when the provider supports live SDK/CLI execution.
 - Extend `AbstractProvider`.
-- Expose readonly `auth`, `mcp`, `skills`, `sessions`, and `sessionSynchronizer`.
+- Expose `runtime` (as a lazy getter — see the template below), plus readonly
+  `models`, `auth`, `mcp`, `skills`, `sessions`, and `sessionSynchronizer`.
 - Call `super('<provider>')`.
 
 3. Implement auth.
@@ -142,11 +142,11 @@ Current MCP formats in this repo are:
 
 | Provider | User / Project Storage | Supported Scopes | Supported Transports |
 | --- | --- | --- | --- |
-| Claude | `.mcp.json` in user / local / project locations | `user`, `local`, `project` | `stdio`, `http`, `sse` |
-| Codex | `.codex/config.toml` | `user`, `project` | `stdio`, `http` |
+| Claude | `~/.claude.json` (user, and per-project `local` entries), `<workspace>/.mcp.json` (project) | `user`, `local`, `project` | `stdio`, `http`, `sse` |
+| Codex | `~/.codex/config.toml`, `<workspace>/.codex/config.toml` | `user`, `project` | `stdio`, `http` |
 | Cursor | `.cursor/mcp.json` | `user`, `project` | `stdio`, `http` |
 | OpenCode | `~/.config/opencode/opencode.json` or `<workspace>/opencode.json` (`.jsonc` is read when present) | `user`, `project` | `stdio`, `http` |
-| Devin | `~/.config/devin/mcp_config.json`, `<workspace>/.devin/mcp_config.json` (+ `.local` variant) | `user`, `local`, `project` | `stdio`, `sse`, `ws` |
+| Devin | `~/.config/devin/mcp_config.json`, `<workspace>/.devin/mcp_config.json` (+ `.local` variant) | `user`, `local`, `project` | `stdio`, `http`, `sse`, `ws` |
 | Command Code | `~/.commandcode/mcp.json`, `<workspace>/.mcp.json`, `~/.commandcode/projects/<slug>/mcp.json` | `user`, `local`, `project` | `stdio`, `http` |
 | Antigravity | `~/.gemini/config/mcp_config.json` | `user` | `stdio`, `http` (key is `serverUrl`) |
 
@@ -166,7 +166,7 @@ Current skill discovery roots are:
 | Provider | User Roots | Project / Repo Roots | Prefix | Notes |
 | --- | --- | --- | --- | --- |
 | Claude | `~/.claude/skills` | `<workspace>/.claude/skills` | `/` | Also discovers Claude plugin skills from enabled plugin installs. Command skills live under `commands/`; markdown skills live under `skills/` and are scanned recursively. |
-| Codex | `~/.agents/skills`, `~/.codex/skills/.system`, `/etc/codex/skills` | `<workspace>/.agents/skills`, `path.dirname(workspacePath)/.agents/skills`, topmost git root `.agents/skills` | `$` | Overlapping roots are deduplicated before scanning. |
+| Codex | `~/.agents/skills`, `~/.codex/skills`, `~/.codex/skills/.system`, `/etc/codex/skills` | `<workspace>/.agents/skills`, `path.dirname(workspacePath)/.agents/skills`, topmost git root `.agents/skills` | `$` | Overlapping roots are deduplicated before scanning. |
 | Cursor | `~/.cursor/skills` | `<workspace>/.cursor/skills`, `<workspace>/.agents/skills` | `/` | Uses slash-style commands. |
 | OpenCode | `~/.config/opencode/skills`, `~/.claude/skills`, `~/.agents/skills` | Cwd-to-topmost-git-root `.opencode/skills`, `.claude/skills`, and `.agents/skills` | `/` | Reuses OpenCode, Claude, and Agents skill locations. Overlapping roots are deduplicated before scanning. |
 | Devin | `~/.local/share/devin/skills`, `~/.config/devin/skills`, `~/.agents/skills` | `<workspace>/.devin/skills` | `/` | Recursive scan; plugin-cache skills are inferred as a separate scope. |
@@ -182,6 +182,7 @@ Command forms currently used by the providers are:
 - OpenCode skills: `/skill-name`
 - Devin skills: `/skill-name`
 - Command Code skills: `/skill-name`
+- Antigravity skills: `/skill-name`
 
 6. Implement sessions.
 
@@ -219,32 +220,37 @@ Current session sync roots are:
 | Codex | `~/.codex/sessions/**/*.jsonl` | Uses `~/.codex/session_index.jsonl` for title lookup and the last `task_complete` message for a fallback title. |
 | Cursor | `~/.cursor/projects/**/*.jsonl` | Uses sibling `worker.log` to recover `workspacePath`, then derives the session title from the first user prompt. |
 | OpenCode | `~/.local/share/opencode/opencode.db` | Reads active sessions/messages/parts from OpenCode's shared SQLite database and stores `jsonl_path` as `null` so deleting one app session cannot remove the shared DB. |
-| Devin | `~/.local/share/devin/cli/sessions.db` | Reads sessions from Devin CLI's SQLite database and falls back to `devin list` output for live titles. |
+| Devin | `~/.local/share/devin/cli/sessions.db` | Reads sessions (id, working directory, title, timestamps) from Devin CLI's SQLite database. The watcher also picks up the `<repo>/.ddagent/devin/<id>.jsonl` transcript mirrors and resolves their metadata from that database; subagent sessions are skipped. |
 | Command Code | `~/.commandcode/projects/<slug>/<session-id>.jsonl` | v3 append-only transcripts with a `type:"session"` header row (`id` + `cwd`); `.meta.json` sidecars carry titles. Only primary `*.jsonl` files are indexed — `.meta.json`/`.checkpoints.jsonl`/`.v2.bak` sidecars are skipped. |
 | Antigravity | `~/.gemini/antigravity-cli/conversations/<id>.db` + `conversation_summaries.db` | Conversations are protobuf rows inside SQLite — the synchronizer indexes `conversation_summaries` (id, title, `workspace_uris`, timestamps) and the runtime mirrors each turn into `<workspace>/.ddagent/antigravity/<id>.jsonl` for readable history. |
 
 8. Register the provider.
 
 - Add the new provider class to `server/modules/providers/provider.registry.ts`.
-- Update `server/modules/providers/provider.routes.ts` provider parsing.
+- Update `parseProvider` in `server/modules/providers/provider.routes.ts`.
 - If the provider introduces a new service or lifecycle hook, export it from the module entrypoint that consumes providers.
 
 9. Wire runtime and UI surfaces outside the providers module when needed.
 
 If the provider can run live chat sessions, update the runtime entrypoints too:
 
-- `server/modules/providers/list/<provider>/<provider>-runtime.provider.js`
+- `server/modules/providers/list/<provider>/<provider>-runtime.provider.ts`
 - `server/modules/providers/list/<provider>/<provider>.provider.ts`
 - `server/modules/agent/agent.routes.ts`
-- `server/index.ts`
+- `server/services.ts`
 
-If the provider is visible in the UI, update:
+If the provider is visible in the Flutter client, update (under `flutter/lib/features/`):
 
-- provider model fallback files under `server/modules/providers/list/<provider>/`
-- `src/components/chat/hooks/useChatProviderState.ts`
-- `src/components/chat/view/subcomponents/ProviderSelectionEmptyState.tsx`
-- `src/components/provider-auth/view/ProviderLoginModal.tsx`
-- `src/components/mcp/constants.ts`
+- `settings/view/sections/agents_section.dart` — `AgentsSection.agents`, display names, auth-dot colors, account description
+- `sessions/view/provider_logo.dart` — provider logo
+- `mcp/data/mcp_constants.dart` — `kMcpProviders`, supported scopes/transports
+- `skills/data/skills_constants.dart` — `kSkillProviders`, managed skill dirs
+- `terminal/view/provider_login_dialog.dart` — login/setup flow
+- `settings/data/agent_install.dart` — install/update commands
+- `chat/view/model_library_panel.dart` and `chat/state/composer_controller.dart` — model library and effort levels
+- `lib/i18n/en.i18n.json` (and the other locales) for any new strings
+
+Then run the Flutter checks from `flutter/README.md`.
 
 ## Minimal Wrapper Template
 
@@ -268,7 +274,13 @@ import type {
 } from '@/shared/interfaces.js';
 
 export class <Provider>Provider extends AbstractProvider {
-  readonly runtime: IProviderRuntime = <provider>Runtime;
+  // Lazy getter: runtime -> notifications -> remote-approval -> providers is a
+  // live import cycle, so reading the runtime binding during field init can hit
+  // the TDZ. Every existing provider uses this pattern.
+  private _runtime: IProviderRuntime | null = null;
+  get runtime(): IProviderRuntime {
+    return (this._runtime ??= <provider>Runtime);
+  }
   readonly models: IProviderModels = new <Provider>ProviderModels();
   readonly auth: IProviderAuth = new <Provider>ProviderAuth();
   readonly mcp: IProviderMcp = new <Provider>McpProvider();
@@ -333,8 +345,8 @@ Add a new provider "<provider>" using the current provider module architecture.
 
 Requirements:
 1) Create:
-    - server/modules/providers/list/<provider>/<provider>.provider.ts
-    - server/modules/providers/list/<provider>/<provider>-runtime.provider.js
+   - server/modules/providers/list/<provider>/<provider>.provider.ts
+   - server/modules/providers/list/<provider>/<provider>-runtime.provider.ts
    - server/modules/providers/list/<provider>/<provider>-auth.provider.ts
    - server/modules/providers/list/<provider>/<provider>-models.provider.ts
    - server/modules/providers/list/<provider>/<provider>-mcp.provider.ts
@@ -342,10 +354,10 @@ Requirements:
    - server/modules/providers/list/<provider>/<provider>-sessions.provider.ts
    - server/modules/providers/list/<provider>/<provider>-session-synchronizer.provider.ts
 2) Register in:
-    - server/modules/providers/provider.registry.ts
-    - server/modules/providers/provider.routes.ts
+   - server/modules/providers/provider.registry.ts
+   - server/modules/providers/provider.routes.ts (parseProvider)
    - server/shared/types.ts LLMProvider
-   - src/types/app.ts LLMProvider
+   - the Flutter provider lists (see "Wire runtime and UI surfaces")
 3) Mirror the nearest existing provider implementation for file naming, style,
    and error handling.
 4) Implement skills support with SkillsProvider and the current skill roots.
@@ -354,7 +366,8 @@ Requirements:
 7) Keep `sessions` and `sessionSynchronizer` separate.
 8) Run:
    - npx eslint <touched files>
-   - npx tsc --noEmit -p server/tsconfig.json
+   - npm run typecheck
+   - npm test
 ```
 
 ## Validation
@@ -362,8 +375,9 @@ Requirements:
 After adding or changing a provider, run the relevant checks:
 
 ```bash
-npx eslint server/modules/providers/**/*.ts server/shared/types.ts server/shared/interfaces.ts
-npx tsc --noEmit -p server/tsconfig.json
+npx eslint server/modules/providers server/shared/types.ts server/shared/interfaces.ts
+npm run typecheck   # tsc --noEmit -p server/tsconfig.json
+npm test            # all server tests
 ```
 
 Useful tests in this repo:
@@ -371,6 +385,8 @@ Useful tests in this repo:
 - `server/modules/providers/tests/mcp.test.ts`
 - `server/modules/providers/tests/skills.test.ts`
 - `server/modules/providers/tests/opencode-sessions.test.ts`
+- `server/modules/providers/tests/provider-auth-identity.test.ts`
+- `server/modules/providers/tests/runtime-lifecycle.test.ts`
 
 If you touch sessions or session synchronization, add or update focused tests
 alongside the implementation.
@@ -380,8 +396,7 @@ alongside the implementation.
 - Adding provider files but forgetting `provider.registry.ts` or
   `provider.routes.ts`.
 - Adding a live runtime without exposing it from the provider wrapper.
-- Updating backend provider ids but not `src/types/app.ts` or the frontend
-  provider constants.
+- Updating backend provider ids but not the Flutter provider constants.
 - Omitting `runtime`, `skills`, or `sessionSynchronizer` from the wrapper.
 - Returning duplicate normalized message ids for split content.
 - Treating `limit === 0` as unbounded history.
@@ -391,7 +406,7 @@ alongside the implementation.
   user/project skill folders.
 - Assuming one provider's MCP config file format works for the others.
 
-### Ambient login identity for Flutter
+## Ambient login identity for Flutter
 
 `GET /api/providers/:provider/auth/status` returns
 `{ success: true, data: { installed, provider, authenticated, email, method, canLogout, error? } }`

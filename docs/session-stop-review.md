@@ -1,57 +1,61 @@
-# Przegląd Stop → kolejna wiadomość (2026-10-02)
+# Review: Stop → next message (2026-10-02)
 
-Przegląd statyczny siedmiu runtime’ów, bramy WebSocket i klienta Flutter.
-Testy używają atrap; nie zatrzymywano rzeczywistych sesji ani usług.
+A static review of the seven provider runtimes, the WebSocket gateway and the
+Flutter client. Tests use fakes; no real sessions or services were stopped.
 
-## Poprawiona obsługa wspólna
+## Fixed shared handling
 
-`chat-websocket.service.ts`: odpowiedź na asynchroniczne zatrzymanie była
-stosowana do sesji, zamiast do konkretnej tury. Poprzednia tura może zakończyć
-się podczas oczekiwania na abort, a kolejna wystartować z kolejki lub od użytkownika.
-Sukces abort kończył wtedy kolejną turę, a odmowa resetowała jej flagę abort.
-Teraz wynik jest stosowany tylko do przechwyconej tury. Analogiczną ochronę
-zakończenia zastosowano dla rodzica orchestratora.
+`chat-websocket.service.ts`: the result of an asynchronous abort was applied to
+the session instead of to the specific run (turn). The previous run can finish
+while the abort is still pending, and the next one can start from the queue or
+from the user. A successful abort then completed the next run, and a refused
+abort reset that run's abort flag. The result is now applied only to the run
+captured before the abort. The same completion guard was added for the
+orchestrator parent run.
 
-Dodano 14 przypadków regresyjnych: sukces i odmowa opóźnionego abort dla każdego
-providera. Testy sprawdzają, że nowa tura nadal działa i nie dostaje błędnego
-complete/protocol_error.
+Added 14 regression cases: a delayed abort that succeeds and one that is refused,
+for each provider. The tests check that the new run keeps running and does not
+receive a stray `complete` or `protocol_error`.
 
-## Ryzyka zidentyfikowane przed naprawą
+## Risks identified before the fix
 
-| Agent | Wznowienie | Ustalenia wymagające dalszych poprawek |
+| Agent | Resume mechanism | Findings that needed further fixes |
 | --- | --- | --- |
-| Claude | SDK `resume` z identyfikatorem providera | Zwykły cleanup pętli sprawdza własność instancji, ale `abortClaudeSDKSession` po `await interrupt()` usuwa wpis po ID bez tego sprawdzenia. Przy zakończeniu i wznowieniu w tym oknie może usunąć nową instancję. |
-| Codex | SDK `resumeThread` | `finally` w `queryCodex` zmienia status wpisu pobranego po ID sesji. Starsza zatrzymana tura może oznaczyć nowszą jako completed; również odczyty statusu abort są związane z ID zamiast własną instancją. |
-| Cursor | CLI `--resume` | Callbacki close/error bezwarunkowo usuwają wpis po ID. Opóźnione wyjście zatrzymanego procesu może usunąć uchwyt nowego procesu, przez co następny Stop nie zadziała. Retry workspace trust jest sprawdzany przed flagą aborted. |
-| Antigravity | CLI `--conversation` | Callbacki close/error bezwarunkowo usuwają wpis po ID; analogiczne ryzyko utraty uchwytu nowego procesu jak w Cursor. |
-| OpenCode | Istniejąca sesja HTTP | Abort ustawia aborted, ignoruje błąd HTTP i zwraca true. Interfejs może pokazać zatrzymanie, chociaż serwer nadal generuje. Cleanup chroni activeRuns, ale usuwa mapping, tryb i permissions po ID sesji bez pełnej ochrony własności. |
-| Devin | ACP `session/load` | Nieudane load przechodzi na session/new, co może utracić kontekst providera mimo historii widocznej w aplikacji. Abort po błędzie wysyłania cancel nadal zwraca true; blok catch może pominąć cleanup. |
-| Command Code | ACP `session/load` | Ten sam fallback load → new i ignorowanie wyjątku podczas abort co w Devin. |
+| Claude | SDK `resume` with the provider session id | The normal loop cleanup checks instance ownership, but `abortClaudeSDKSession` deletes the entry by id after `await interrupt()` without that check. If a run finishes and is resumed inside that window, it can delete the new instance. |
+| Codex | SDK `resumeThread` | The `finally` block in `queryCodex` updates the status of the entry looked up by session id. An older, stopped run can mark a newer one as completed; abort-status reads are also keyed by id instead of the owning instance. |
+| Cursor | CLI `--resume` | The close/error callbacks unconditionally delete the entry by id. A delayed exit of the stopped process can delete the new process's handle, so the next Stop does nothing. The workspace-trust retry is checked before the aborted flag. |
+| Antigravity | CLI `--conversation` | The close/error callbacks unconditionally delete the entry by id; same risk of losing the new process's handle as Cursor. |
+| OpenCode | Existing HTTP session | Abort sets `aborted`, ignores the HTTP error and returns `true`, so the UI can show the run as stopped while the server keeps generating. Cleanup protects `activeRuns` but removes the mapping, mode and permissions by session id without full ownership checks. |
+| Devin | ACP `session/load` | A failed load falls back to `session/new`, which can lose the provider context even though the app still shows the history. Abort still returns `true` after a failed cancel send; the `catch` block can skip cleanup. |
+| Command Code | ACP `session/load` | Same load → new fallback and ignored abort exception as Devin. |
 
-Klient Flutter wysyła `chat.abort` bez runId. Zakończenie jest skorelowane przez
-bramę z przechwyconą turą, ale opóźnione samo żądanie Stop nadal może trafić do
-nowszej tury. Osobne zabezpieczenie protokołu wymaga przesyłania i walidacji runId.
+The Flutter client sent `chat.abort` without a `runId`. The gateway correlated
+completion with the captured run, but a delayed Stop request itself could still
+hit a newer run. A separate protocol safeguard needed the `runId` to be sent and
+validated.
 
-Wniosek: wspólny wyścig odpowiedzi na Stop naprawiono; nie ma podstaw, by uznać
-wszystkie runtime’y za bezpieczne przy natychmiastowym wznowieniu. Powyższe
-ryzyka wynikają z kodu i wymagają osobnych testów cyklu życia runtime’ów.
+Conclusion at that point: the shared Stop-result race was fixed, but there was
+no basis to treat every runtime as safe for an immediate resume. The risks above
+come from reading the code and needed dedicated runtime lifecycle tests.
 
-## Naprawa pozostałych ryzyk (2026-10-02)
+## Fixing the remaining risks (2026-10-02)
 
-Wszystkie powyższe ustalenia zostały zaadresowane:
+All findings above have been addressed:
 
-- Claude i Codex wiążą abort, status i cleanup z konkretną instancją tury.
-- Cursor i Antigravity usuwają uchwyty tylko wtedy, gdy nadal należą do
-  kończącego się procesu. Zatrzymany Cursor nie ponawia workspace trust.
-- OpenCode chroni mapping, tryb i permissions przed cleanupem starej tury;
-  błąd HTTP lub odpowiedź `false` na abort pozostawia turę aktywną i zwraca odmowę.
-- Devin i Command Code zgłaszają błąd wznowienia zamiast tworzyć nową rozmowę.
-  Nieudany cancel zwraca odmowę i zachowuje uchwyt do ponownego Stop;
-  błąd zabijania procesu nie pomija cleanupu po zaakceptowanym cancel.
-- Flutter przesyła `runId` przy Stop, a brama odrzuca brakujący lub nieaktualny
-  identyfikator przed wywołaniem runtime’u. Abort orchestratora również chroni
-  własność tury i obsługuje odmowę anulowania.
+- Claude and Codex tie abort, status and cleanup to the specific run instance.
+- Cursor and Antigravity delete handles only while they still belong to the
+  exiting process. A stopped Cursor run no longer retries workspace trust.
+- OpenCode protects the mapping, mode and permissions from an old run's cleanup;
+  an HTTP error or a `false` abort response keeps the run active and reports a
+  refusal.
+- Devin and Command Code report a resume error instead of starting a new
+  conversation. A failed cancel reports a refusal and keeps the handle so Stop
+  can be retried; a process-kill error no longer skips cleanup after an accepted
+  cancel.
+- Flutter sends `runId` with Stop, and the gateway rejects a missing
+  (`RUN_ID_REQUIRED`) or stale (`STALE_RUN`) id before calling the runtime. The
+  orchestrator abort also guards run ownership and handles a refused cancel.
 
-Testy cyklu życia runtime’ów i bramy używają atrap transportów i procesów.
-Nie stanowią sprawdzenia integracyjnego rzeczywistych SDK ani usług ACP.
-Nie restartowano usług ani nie zatrzymywano rzeczywistych sesji.
+The runtime and gateway lifecycle tests use fake transports and processes. They
+are not an integration check of the real SDKs or ACP services. No services were
+restarted and no real sessions were stopped.
