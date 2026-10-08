@@ -131,6 +131,9 @@ CREATE TABLE IF NOT EXISTS sessions (
     -- Stamped once the project's .ddagent/shared-context.md was prepended to
     -- this session's first outbound message (NULL = not injected yet).
     shared_context_injected_at DATETIME,
+    -- Context window the provider CLI last reported for this session (NULL =
+    -- not reported yet); transcripts never record it.
+    context_window INTEGER,
     PRIMARY KEY (session_id),
     FOREIGN KEY (project_path) REFERENCES projects(project_path)
     ON DELETE SET NULL

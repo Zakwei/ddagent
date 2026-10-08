@@ -29,6 +29,8 @@ type SessionRow = {
   shared_context_injected_at?: string | null;
   /** provider_accounts.id this session runs under; NULL = provider default env. */
   account_id?: string | null;
+  /** Context window the provider CLI last reported; NULL until a run reports one. */
+  context_window?: number | null;
 };
 
 type RecentSessionsPage = {
@@ -37,7 +39,7 @@ type RecentSessionsPage = {
 };
 
 const SESSION_ROW_COLUMNS =
-  'session_id, provider, provider_session_id, project_path, jsonl_path, custom_name, model, effort, permission_mode, isArchived, created_at, updated_at, last_viewed_at, shared_context_injected_at, account_id';
+  'session_id, provider, provider_session_id, project_path, jsonl_path, custom_name, model, effort, permission_mode, isArchived, created_at, updated_at, last_viewed_at, shared_context_injected_at, account_id, context_window';
 
 const SQLITE_UTC_TIMESTAMP_REGEX = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
 
@@ -268,6 +270,22 @@ export const sessionsDb = {
        SET model = ?
        WHERE session_id = ?`
     ).run(model, sessionId);
+  },
+
+  /**
+   * Records the context window the provider CLI reported for one session.
+   *
+   * Written by the Claude runtime whenever a run learns the window, so the
+   * REST token-usage snapshot shows the real size after a server restart
+   * instead of the 200k fallback. Unchanged values skip the write.
+   */
+  setSessionContextWindow(sessionId: string, contextWindow: number): void {
+    const db = getConnection();
+    db.prepare(
+      `UPDATE sessions
+       SET context_window = ?
+       WHERE session_id = ? AND context_window IS NOT ?`
+    ).run(contextWindow, sessionId, contextWindow);
   },
 
   /**

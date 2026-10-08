@@ -549,6 +549,20 @@ const addSessionSharedContextColumn = (db: Database): void => {
 };
 
 /**
+ * Adds the `context_window` column: the window the provider CLI last reported
+ * for the session, so the context gauge survives a server restart.
+ *
+ * Existing rows stay NULL — transcripts never record the window, so readers
+ * fall back to what a live run learns.
+ */
+const addSessionContextWindowColumn = (db: Database): void => {
+  const sessionsTableInfo = getTableInfo(db, 'sessions');
+  const columnNames = sessionsTableInfo.map((column) => column.name);
+
+  addColumnToTableIfNotExists(db, 'sessions', columnNames, 'context_window', 'INTEGER');
+};
+
+/**
  * SQLite CHECK constraints can't be altered in place, so when the
  * provider_models allow-list predates newer provider ids ('devin',
  * 'commandcode', 'antigravity') the table is rebuilt with the current schema. Rows are copied
@@ -781,6 +795,7 @@ export const runMigrations = (db: Database) => {
     addSessionPermissionModeColumn(db);
     addSessionLastViewedAtColumn(db);
     addSessionSharedContextColumn(db);
+    addSessionContextWindowColumn(db);
     ensureProjectsForSessionPaths(db);
     hideLegacyTechnicalSessions(db);
     hideRenamedDevinTechnicalSessions(db);
