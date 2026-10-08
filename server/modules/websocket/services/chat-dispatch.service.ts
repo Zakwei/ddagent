@@ -169,6 +169,25 @@ async function defaultSessionTitleGenerator(input: {
 
 let sessionTitleGenerator: SessionTitleGenerator = defaultSessionTitleGenerator;
 
+const languageNames = new Intl.DisplayNames(['en'], { type: 'language' });
+
+/**
+ * Prefixes every outbound turn with the client's UI language, so agents keep
+ * answering in it even when the rules or tool output around them are in
+ * another language. The client strips the tag from the user bubble.
+ */
+function withAppLanguage(content: string, language: unknown): string {
+  if (typeof language !== 'string' || !language.trim()) return content;
+  let name: string | undefined;
+  try {
+    name = languageNames.of(language.trim());
+  } catch {
+    return content; // Not a valid BCP 47 tag.
+  }
+  if (!name) return content;
+  return `<app-language>Always reply in ${name} (the user's app language) unless the user explicitly asks for another language.</app-language>\n\n${content}`;
+}
+
 /**
  * Test seam: replaces the background titler so unit tests never spawn a real
  * provider run. Pass null to restore the production orchestrator-backed one.
@@ -355,12 +374,12 @@ export async function dispatchChatCommand(
   // every runtime (the prepend IS the fallback for providers without a
   // dedicated system-context channel). Entering history once keeps both in
   // context for the whole session without per-turn token burn.
-  let effectiveContent = content;
+  let effectiveContent = withAppLanguage(content, clientOptions.language);
   if (session.project_path && !session.shared_context_injected_at) {
     try {
       const prefix = await buildSharedContextPrefix(session.project_path);
       if (prefix) {
-        effectiveContent = prefix + content;
+        effectiveContent = prefix + effectiveContent;
       }
       // Unified rules (workspace AGENTS.md + hygiene block) ride the same
       // first-turn gate. DDAGENT_UNIFIED_RULES=0 opts out; injection never

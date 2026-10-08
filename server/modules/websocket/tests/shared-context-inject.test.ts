@@ -112,3 +112,24 @@ test('no shared-context file leaves the message untouched', async () => {
   });
   delete process.env.DDAGENT_UNIFIED_RULES;
 });
+
+test('every message asks for replies in the app language', async () => {
+  process.env.DDAGENT_UNIFIED_RULES = '0';
+  await withIsolatedDatabase(async (dir) => {
+    sessionsDb.createAppSession('sess-lang', 'devin', path.join(dir, 'repo'));
+    const { runtime, sent } = capturingRuntime();
+
+    for (const content of ['pierwsza', 'druga']) {
+      await dispatchChatCommand(runtime, {
+        sessionId: 'sess-lang',
+        content,
+        options: { language: 'pl' },
+        userId: null,
+        connection: new FakeConnection() as never,
+      });
+    }
+    assert.match(sent[0], /^<app-language>[^<]*Polish[^<]*<\/app-language>\n\npierwsza$/);
+    assert.match(sent[1], /^<app-language>[^<]*Polish[^<]*<\/app-language>\n\ndruga$/);
+  });
+  delete process.env.DDAGENT_UNIFIED_RULES;
+});

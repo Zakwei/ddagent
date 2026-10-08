@@ -58,9 +58,10 @@ bool samePersistedRow(SessionMessage a, SessionMessage b) {
 
 typedef _Fingerprint = ({String text, int imageCount, int fileCount});
 
-/// First-turn injections the server prepends to the outbound prompt
-/// (`chat-dispatch` effectiveContent): `<unified-rules>…</unified-rules>` and
-/// an optional shared-context block. The persisted/echoed user turn carries
+/// Injections the server prepends to the outbound prompt (`chat-dispatch`
+/// effectiveContent), in this order: first-turn `<unified-rules>…</unified-rules>`
+/// and an optional shared-context block, then the per-turn `<app-language>` tag.
+/// The persisted/echoed user turn carries
 /// them, the local optimistic echo holds only the typed text — fingerprints
 /// used to claim that echo must compare user text alone, otherwise the orphan
 /// grabs the next same-text candidate and leaves a permanent duplicate.
@@ -69,6 +70,7 @@ final _injectedPrefixPatterns = [
   RegExp(
     r'^The following shared context is maintained by the ddagent workspace[\s\S]*?\n\n---\n\n',
   ),
+  RegExp(r'^<app-language>[\s\S]*?</app-language>\s*'),
 ];
 
 /// The user's own text of a turn, without the server's first-turn injections.
