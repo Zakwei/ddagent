@@ -425,9 +425,12 @@ export async function createBrowserViewSession(options: {
 
       // Printable text without shortcut modifiers is inserted directly, which
       // keeps non-ASCII input (e.g. Polish) working without a full keymap.
+      // Control characters (Enter's "\r") must go through a real keyDown so the
+      // page sees a keypress and forms submit.
       const isPrintable = !isKeyUp
         && typeof input.text === 'string'
         && input.text.length === 1
+        && input.text >= ' '
         && !(modifiers & (CDP_MODIFIER_CTRL | CDP_MODIFIER_META | CDP_MODIFIER_ALT));
       if (isPrintable) {
         await sendInput(cdp, 'Input.insertText', { text: input.text });

@@ -114,7 +114,14 @@ export function handleBrowserViewConnection(
       sendJson(ws, { type: 'ready', sessionId: session.id });
 
       if (message.url) {
-        await session.navigate(message.url);
+        // The page is up: an unreachable or invalid restore URL is a per-action
+        // failure like any later navigate, not a reason to drop the session.
+        await session.navigate(message.url).catch((error: unknown) => {
+          sendJson(ws, {
+            type: 'error',
+            error: error instanceof Error ? error.message : 'Navigation failed.',
+          });
+        });
       }
     } catch (error) {
       sendJson(ws, {
