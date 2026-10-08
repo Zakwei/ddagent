@@ -1260,7 +1260,13 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
       }
 
       // The user's feedback (e.g. on a rejected plan) is what the model reads.
-      return { behavior: 'deny', message: decision.message || 'User denied tool use' };
+      // A bare reason reads like tool output, which the model distrusts; attribute it to the user.
+      return {
+        behavior: 'deny',
+        message: decision.message
+          ? `The user doesn't want to proceed with this tool use. The tool use was rejected. The user said:\n${decision.message}`
+          : 'User denied tool use',
+      };
     };
 
     let heldPrompt = createHeldPromptStream(promptMessages);
