@@ -97,6 +97,15 @@ Map<String, dynamic> toolInputMap(Object? raw) {
   return raw != null ? {'input': raw} : <String, dynamic>{};
 }
 
+/// Caps an expanded tool input preview (a whole file passed to Write, a large
+/// JSON payload) so one card can't lay out thousands of lines; the file itself
+/// stays one click away and copy uses the full input.
+String capToolPreviewLines(String text, {int maxLines = 200}) {
+  final lines = text.split('\n');
+  if (lines.length <= maxLines) return text;
+  return '${lines.take(maxLines).join('\n')}\n… ${lines.length - maxLines} more lines';
+}
+
 /// Diff text for string-replacement edits — Claude `Edit`/`MultiEdit`,
 /// Devin and Command Code `edit_file` (`old_string`/`new_string`, or an
 /// `edits` list of them). Null when the input has no such fields.
@@ -666,7 +675,10 @@ class ToolUseTile extends StatelessWidget {
       openPath: '$path',
       onFileOpen: onFileOpen,
       extras: [
-        AppMarkdown(data: '```diff\n${diff ?? content ?? _json(input)}\n```', selectable: false),
+        AppMarkdown(
+          data: '```diff\n${capToolPreviewLines(diff ?? content ?? _json(input))}\n```',
+          selectable: false,
+        ),
       ],
       output: _resultText(),
       block: true,
@@ -876,7 +888,12 @@ class ToolUseTile extends StatelessWidget {
         glyph: ocToolGlyph(name),
         label: name,
         copyText: _json(input),
-        extras: [Text(_json(input), style: const TextStyle(fontSize: 12, fontFamily: 'monospace'))],
+        extras: [
+          Text(
+            capToolPreviewLines(_json(input)),
+            style: const TextStyle(fontSize: 12, fontFamily: 'monospace'),
+          ),
+        ],
         output: _resultText(),
       );
 

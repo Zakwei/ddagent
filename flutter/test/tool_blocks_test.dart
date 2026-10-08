@@ -228,6 +228,11 @@ void main() {
       expect(toolInputMap(null), isEmpty);
     });
 
+    test('capToolPreviewLines keeps short text and caps long text', () {
+      expect(capToolPreviewLines('a\nb', maxLines: 3), 'a\nb');
+      expect(capToolPreviewLines('1\n2\n3\n4\n5', maxLines: 2), '1\n2\n… 3 more lines');
+    });
+
     test('editInputDiff renders old_string/new_string and edits lists', () {
       expect(editInputDiff({'old_string': 'a\nb', 'new_string': 'c'}), '-a\n-b\n+c');
       expect(
