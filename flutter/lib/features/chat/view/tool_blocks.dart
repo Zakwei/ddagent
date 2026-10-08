@@ -1292,6 +1292,10 @@ bool _isFreeTextOption(String label) {
 /// themselves contain ", " (e.g. "Yes, auto-accept edits"), so the whole value
 /// is checked before splitting; this mirrors the server's
 /// `questionAnswerOptionId`.
+///
+/// ACP answers with a single option id, so a multi-select pick of several
+/// labels is cancelled server-side; the full selection is relayed here as
+/// `question: label, label` so none of it is lost.
 String extractQuestionFreeText(dynamic input, dynamic updatedInput) {
   final questions = input is Map ? input['questions'] : null;
   final answers = updatedInput is Map ? updatedInput['answers'] : null;
@@ -1308,14 +1312,25 @@ String extractQuestionFreeText(dynamic input, dynamic updatedInput) {
     final values = raw is String
         ? [raw]
         : (raw is List ? raw.map((e) => '$e').toList() : const <String>[]);
+    final picked = <String>[];
+    final free = <String>[];
     for (final value in values) {
       final text = value.trim();
-      if (text.isEmpty || labels.contains(text)) continue;
+      if (text.isEmpty) continue;
+      if (labels.contains(text)) {
+        picked.add(text);
+        continue;
+      }
       for (final part in text.split(', ')) {
         final t = part.trim();
-        if (t.isNotEmpty && !labels.contains(t)) parts.add(t);
+        if (t.isEmpty) continue;
+        (labels.contains(t) ? picked : free).add(t);
       }
     }
+    if (picked.length > 1) {
+      parts.add('${q['question'] ?? 'q$i'}: ${picked.join(', ')}');
+    }
+    parts.addAll(free);
   }
   return parts.join('\n');
 }

@@ -303,3 +303,19 @@ test('resolveCommandCodePlanReviewContent returns null without a qualifying plan
     await fs.rm(tempRoot, { recursive: true, force: true });
   }
 });
+
+test('questionAnswerOptionId cancels a multi-select pick instead of keeping only the first label', () => {
+  const question = 'Which areas?';
+  const params = {
+    toolCall: { title: question, rawInput: { question, options: ['API', 'UI', 'Docs'], multiple: true } },
+    options: [
+      { optionId: 'option_0', name: 'API' },
+      { optionId: 'option_1', name: 'UI' },
+      { optionId: 'option_2', name: 'Docs' },
+    ],
+  };
+
+  assert.equal(questionAnswerOptionId(params, { answers: { [question]: 'API, Docs' } }), null);
+  assert.equal(questionAnswerOptionId(params, { answers: { [question]: ['API', 'UI'] } }), null);
+  assert.equal(questionAnswerOptionId(params, { answers: { [question]: 'UI' } }), 'option_1');
+});

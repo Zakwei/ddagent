@@ -455,6 +455,11 @@ export function questionAnswerOptionId(params: any, updatedInput: any) {
             }
         }
     }
+    // ACP answers with exactly one optionId. Picking just one of several
+    // selections would silently drop the rest, so a multi-pick is cancelled
+    // and the client relays the full selection as the next message.
+    const pickedLabels = ask.options.filter((option: any) => picked.has(option.label));
+    if (pickedLabels.length > 1) return null;
     const acpOptions = Array.isArray(params?.options) ? params.options : [];
     for (let i = 0; i < ask.options.length; i += 1) {
         if (picked.has(ask.options[i].label)) {
