@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
@@ -876,38 +877,47 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                     // left so the submit button always lands on the row's
                     // right inner edge regardless of pane width.
                     Expanded(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        spacing: 4,
-                        children: [
-                          // `.oc-submit-hint` — keyboard hints never render
-                          // on compact (touch) or dense (two-row split)
-                          // layouts; Flexible so a narrow pane shrinks it
-                          // instead of pushing the submit button out.
-                          if (!compact && !widget.dense)
-                            Flexible(
-                              child: _SubmitHint(
-                                text: canQueueDraft
-                                    ? state.queue.isNotEmpty
-                                          ? t.chat.input.hintText.updateQueued
-                                          : t.chat.input.hintText.queue
-                                    : sendByCtrlEnter
-                                    ? t.chat.input.hintText.ctrlEnter
-                                    : t.chat.input.hintText.enter,
-                                faded: hasDraft && !canQueueDraft,
+                      child: LayoutBuilder(
+                        builder: (context, box) {
+                          final showHint = !compact && !widget.dense;
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            spacing: 4,
+                            children: [
+                              // `.oc-submit-hint` — keyboard hints never render
+                              // on compact (touch) or dense (two-row split)
+                              // layouts; Flexible so it only takes what the
+                              // option bar leaves and ellipsizes first.
+                              if (showHint)
+                                Flexible(
+                                  child: _SubmitHint(
+                                    text: canQueueDraft
+                                        ? state.queue.isNotEmpty
+                                              ? t.chat.input.hintText.updateQueued
+                                              : t.chat.input.hintText.queue
+                                        : sendByCtrlEnter
+                                        ? t.chat.input.hintText.ctrlEnter
+                                        : t.chat.input.hintText.enter,
+                                    faded: hasDraft && !canQueueDraft,
+                                  ),
+                                ),
+                              // The option bar (model / permission) keeps its
+                              // natural width and only scrolls once it alone
+                              // outgrows the row — a Wrap here pushed the
+                              // trailing icon buttons onto a second row.
+                              ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxWidth: math.max(0, box.maxWidth - (showHint ? 4 : 0)),
+                                ),
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  reverse: true,
+                                  child: optionBar,
+                                ),
                               ),
-                            ),
-                          Flexible(
-                            // Single line — a Wrap here pushed the trailing
-                            // icon buttons onto a second row under the
-                            // composer.
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              reverse: true,
-                              child: optionBar,
-                            ),
-                          ),
-                        ],
+                            ],
+                          );
+                        },
                       ),
                     ),
                     _SendButton(
