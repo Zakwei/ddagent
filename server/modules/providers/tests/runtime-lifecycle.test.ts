@@ -908,3 +908,29 @@ test('claude: a message the live process cannot take starts a new one', async ()
   sdk.processes[1].end();
   proc.end();
 });
+
+test('claude: a task that finishes mid-turn keeps stdin open for the turn that reports it', async () => {
+  const { runtime, sdk, context } = await loadClaudeWithFakeSdk();
+  const followUp = recordingWriter();
+  const options = { sessionId: 'app', cwd: '/tmp', openFollowUpRun: () => followUp };
+  const first = recordingWriter();
+  const run = runtime.queryClaudeSDK('run a slow command', options, first, context);
+  await until(() => sdk.processes[0]?.prompts.length === 1);
+  const proc = sdk.processes[0];
+
+  // A command moved to the background and finished before the turn ended.
+  proc.emit({ type: 'system', subtype: 'task_started', task_id: 'b1' });
+  proc.emit({ type: 'system', subtype: 'task_notification', task_id: 'b1', status: 'completed' });
+  proc.emit({ type: 'result' });
+  await until(() => first.kinds().includes('complete'));
+  await new Promise((resolve) => setTimeout(resolve, 20));
+  assert.equal(proc.inputClosed, false, 'the queued report turn still needs the permission channel');
+
+  // The CLI's report turn — afterwards nothing is left, so stdin closes.
+  proc.emit({ type: 'assistant', message: { content: [{ type: 'text', text: 'it finished' }] } });
+  proc.emit({ type: 'result' });
+  await until(() => proc.inputClosed);
+  assert.ok(followUp.kinds().includes('complete'));
+  proc.end();
+  await run;
+});

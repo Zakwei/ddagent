@@ -80,6 +80,13 @@ const TOOL_APPROVAL_TIMEOUT_MS = parseInt(process.env.CLAUDE_TOOL_APPROVAL_TIMEO
 // forever. The timer resets on every message, so it measures silence, not total time.
 const BG_WAIT_CEILING_MS = 30 * 60 * 1000;
 
+// How long stdin stays open after a turn during which a background task
+// settled. The CLI reports that task in a follow-up turn it queues behind the
+// current one; closing stdin at the current turn's `result` would cut that
+// turn's permission channel ("Stream closed"). The follow-up turn's messages
+// re-arm the hold, and its own `result` decides again.
+const FOLLOW_UP_GRACE_MS = 60 * 1000;
+
 const TOOLS_REQUIRING_INTERACTION = new Set(['AskUserQuestion', 'ExitPlanMode']);
 
 /**
@@ -753,6 +760,8 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
   const outstandingTasks = new Set<string>();
   // Last task count sent to the client, so it only hears about changes.
   let reportedTaskCount = 0;
+  // A task settled since the last `result` — its report is still to come.
+  let taskSettledThisTurn = false;
   // False between a turn's `result` and the next turn's first message.
   let turnActive = true;
   // True while the current turn was started by the CLI itself (a background
@@ -770,7 +779,7 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
   let lastStepModel: string | null = null;
 
   // Arms (or re-arms) the idle countdown that eventually closes stdin.
-  const scheduleRelease = () => {
+  const scheduleRelease = (delayMs = BG_WAIT_CEILING_MS) => {
     if (idleReleaseTimer) {
       clearTimeout(idleReleaseTimer);
       idleReleaseTimer = null;
@@ -778,7 +787,7 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
     idleReleaseTimer = setTimeout(() => {
       idleReleaseTimer = null;
       releasePromptStream();
-    }, BG_WAIT_CEILING_MS);
+    }, delayMs);
     // Never let the hold keep the server process alive on its own.
     idleReleaseTimer.unref?.();
   };
@@ -1156,7 +1165,13 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
       if (startsBackgroundWork(message)) {
         backgroundWorkPending = true;
       }
+      const runningBefore = outstandingTasks.size;
       trackBackgroundTask(outstandingTasks, message);
+      // Only mid-turn: a task settling between turns is already reported by
+      // the follow-up turn that is about to start.
+      if (outstandingTasks.size < runningBefore && turnActive) {
+        taskSettledThisTurn = true;
+      }
       if (outstandingTasks.size !== reportedTaskCount) {
         reportedTaskCount = outstandingTasks.size;
         ws.send(createNormalizedMessage({ kind: 'background_tasks', count: reportedTaskCount, sessionId: capturedSessionId || sessionId || null, provider: 'claude' }));
@@ -1206,12 +1221,19 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
           backgroundWorkPending = false;
           heldForBackgroundWork = true;
           scheduleRelease();
+        } else if (taskSettledThisTurn) {
+          // A task finished while this turn ran: the CLI still has to report
+          // it in a follow-up turn. Keep stdin open for it; that turn's own
+          // `result` closes it once nothing is left.
+          heldForBackgroundWork = true;
+          scheduleRelease(FOLLOW_UP_GRACE_MS);
         } else {
           // Either nothing was backgrounded, or the background work just
           // reported in — let the CLI exit now, as it always has.
           heldForBackgroundWork = false;
           releasePromptStream();
         }
+        taskSettledThisTurn = false;
         // The injected turn is over — its caller can return like a normal run.
         if (activeInjection) {
           activeInjection.settle(true);
