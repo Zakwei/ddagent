@@ -401,6 +401,13 @@ export async function sendFinalAssistantMessage(writer: any, state: any, options
     // the same row this fetch would add: sending or appending it again would
     // duplicate it in the transcript and in the UI.
     if (state.persistedAssistantContents.has(finalMsg.content.trim())) {
+        // The fetch found an earlier, already persisted segment while text
+        // streamed after it (the Devin DB had not caught up yet). That newer
+        // text is the turn's real answer — persist it instead of dropping it.
+        if (streamedText.trim() && streamedText.trim() !== finalMsg.content.trim()) {
+            state.assistantBuffer = streamedText;
+            persistLiveAssistantMessage(state);
+        }
         state.lastFinalAssistantId = finalMsg.id;
         state.finalAssistantStreamSent = true;
         return true;

@@ -264,6 +264,12 @@ function sendThoughtDelta(state: any, text: any) {
  * appended to the previous message.
  */
 function finalizeLiveMessages(state: any) {
+    // The segment that just ended is complete on the client; remember it so
+    // the end-of-turn fetch never re-sends it, and start the next one empty.
+    if (state.assistantBuffer?.trim()) {
+        (state.streamedAssistantContents ??= new Set()).add(state.assistantBuffer.trim());
+    }
+    state.assistantBuffer = '';
     if (!state.liveStreamOpen && !state.liveThoughtOpen) return;
     state.liveStreamOpen = false;
     state.liveThoughtOpen = false;
@@ -347,9 +353,14 @@ export async function sendFinalAssistantMessage(writer: any, state: any, options
     if (finalMsg.id === state.lastFinalAssistantId) return false;
     const streamedText = state.assistantBuffer;
     state.assistantBuffer = '';
-    // The content that streamed into the live row is the same answer this
-    // fetch found: marking sent without re-sending avoids a duplicated row.
-    if (streamedText.trim() === finalMsg.content.trim()) {
+    // The answer already reached the client — as the open live row, or as a
+    // segment closed at a tool boundary. Re-sending would duplicate it; a
+    // lagging transcript that returns an earlier segment must not overwrite
+    // the newer live row either.
+    if (
+        streamedText.trim() === finalMsg.content.trim()
+        || state.streamedAssistantContents?.has(finalMsg.content.trim())
+    ) {
         state.lastFinalAssistantId = finalMsg.id;
         state.finalAssistantStreamSent = true;
         return true;
@@ -1208,6 +1219,7 @@ function createCommandCodeProcess(sessionId: any, workingDir: any, model: any, w
             }
             await applyPermissionModeToCommandCodeSession(state, state.permissionMode);
             state.assistantBuffer = '';
+            state.streamedAssistantContents = new Set();
             state.thoughtBuffer = '';
             state.liveStreamOpen = false;
             state.liveThoughtOpen = false;

@@ -1,4 +1,7 @@
 import assert from 'node:assert/strict';
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import test from 'node:test';
 
 import {
@@ -211,4 +214,28 @@ test('sendFinalAssistantMessage does not replay a pre-anchor stale final via the
 
   assert.equal(ok, false);
   assert.equal(sent.length, 0);
+});
+
+test('sendFinalAssistantMessage persists the streamed answer when the Devin DB still returns an earlier segment', async (t) => {
+  // Narration A streamed and was persisted at a tool boundary; answer B then
+  // streamed, but the DB has only written A so far.
+  stubHistory(t, [
+    { id: 'u1', kind: 'text', role: 'user', content: 'run it' },
+    { id: 'a1', kind: 'text', role: 'assistant', content: 'Checking the files.', timestamp: new Date().toISOString() },
+  ]);
+  const dir = mkdtempSync(path.join(os.tmpdir(), 'devin-final-'));
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const jsonlPath = path.join(dir, 'turn.jsonl');
+  const state = emptyTurnState({
+    jsonlPath,
+    assistantBuffer: 'All fixed.',
+    liveStreamOpen: true,
+    persistedAssistantContents: new Set(['Checking the files.']),
+  });
+
+  const ok = await sendFinalAssistantMessage({ send() {} }, state, { maxRetries: 0, retryDelayMs: 1 });
+
+  assert.equal(ok, true);
+  const rows = readFileSync(jsonlPath, 'utf8').trim().split('\n').map((line) => JSON.parse(line));
+  assert.deepEqual(rows.map((row) => [row.kind, row.role, row.content]), [['text', 'assistant', 'All fixed.']]);
 });

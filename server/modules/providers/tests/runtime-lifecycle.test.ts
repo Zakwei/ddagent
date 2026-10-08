@@ -8,6 +8,8 @@ import { PassThrough } from 'node:stream';
 
 import ts from 'typescript';
 
+import { CommandCodeSessionsProvider } from '../list/commandcode/commandcode-sessions.provider.js';
+
 /** Evaluate an isolated runtime with fake transports; production maps stay private. */
 async function loadRuntime(name: string, hooks: string, overrides: Record<string, unknown> = {}) {
   const url = new URL(`../list/${name}/${name}-runtime.provider.ts`, import.meta.url);
@@ -668,4 +670,36 @@ test('OpenCode: a subagent child session ask reaches the parent run instead of b
   assert.ok(requests.every((pathname) => !pathname.endsWith('/permissions/per_1')), requests.join(', '));
   assert.equal(sent.filter((message) => message.kind === 'permission_request').length, 1);
   assert.equal(pendingPermissions.size, 1);
+});
+
+test('commandcode: an answer closed at a tool boundary is not re-sent at the end of the turn', async (t) => {
+  const runtime = await loadRuntime('commandcode', 'finalizeLiveMessages');
+  const original = CommandCodeSessionsProvider.prototype.fetchHistory;
+  CommandCodeSessionsProvider.prototype.fetchHistory = async () => ({
+    messages: [
+      { id: 'u1', kind: 'text', role: 'user', content: 'fix it' },
+      { id: 'a2', kind: 'text', role: 'assistant', content: 'Fixed the bug.' },
+    ],
+  }) as any;
+  t.after(() => { CommandCodeSessionsProvider.prototype.fetchHistory = original; });
+
+  const sent: any[] = [];
+  const writer = { send: (message: any) => sent.push(message) };
+  const state: any = {
+    appSessionId: 'app', commandCodeSessionId: 'cc', terminated: false, promptStartedAt: Date.now(),
+    lastFinalAssistantId: null, assistantBuffer: '', streamedAssistantContents: new Set(), currentWriter: writer,
+    liveStreamOpen: true, liveThoughtOpen: false,
+  };
+  // Narration, a tool call, the answer, then a trailing tool call.
+  state.assistantBuffer = 'Looking.';
+  runtime.lifecycleHooks.finalizeLiveMessages(state);
+  state.assistantBuffer = 'Fixed the bug.';
+  state.liveStreamOpen = true;
+  runtime.lifecycleHooks.finalizeLiveMessages(state);
+  sent.length = 0;
+
+  const ok = await runtime.sendFinalAssistantMessage(writer, state, { maxRetries: 0, retryDelayMs: 1 });
+
+  assert.equal(ok, true);
+  assert.deepEqual(sent, []);
 });
