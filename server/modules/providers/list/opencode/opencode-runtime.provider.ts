@@ -187,6 +187,12 @@ type ActiveRun = {
    */
   streamedParts: Set<string>;
   /**
+   * Part whose deltas currently feed the client's open live row. Deltas of
+   * another part, or any non-text part (tool, step), end that row first so
+   * text before and after a tool call never merge into one message.
+   */
+  livePartId: string | null;
+  /**
    * messageIDs that already emitted an edit/write tool card. OpenCode mirrors
    * every such edit with an auto-generated `patch` part in the same message;
    * the live `message.part.updated` for that patch is skipped so the UI shows
@@ -804,6 +810,13 @@ function failRun(run: ActiveRun, error: Error): void {
   run.reject(error);
 }
 
+// Ends the client's open live row (message and reasoning) at a part boundary.
+function closeLivePart(run: ActiveRun, sessionId: string): void {
+  if (!run.livePartId) return;
+  run.livePartId = null;
+  run.writer.send(createNormalizedMessage({ kind: 'stream_end', sessionId, provider: PROVIDER }));
+}
+
 function dispatchServerEvent(baseUrl: string, event: AnyRecord): void {
   const props = (event.properties ?? {}) as AnyRecord;
   const type = String(event.type ?? '');
@@ -902,6 +915,9 @@ function dispatchServerEvent(baseUrl: string, event: AnyRecord): void {
     if (partId && partType) {
       run.partTypes.set(partId, partType);
     }
+    if (partType && partType !== 'text' && partType !== 'reasoning') {
+      closeLivePart(run, run.providerSessionId ?? providerSessionId);
+    }
     // OpenCode mirrors every edit/write tool with an auto-generated `patch`
     // part in the same message (same diff) — the CLI shows one card, so drop
     // the patch echo once the edit tool was seen. The edit tool carries the
@@ -952,6 +968,10 @@ function dispatchServerEvent(baseUrl: string, event: AnyRecord): void {
     }
     if (partId) {
       run.streamedParts.add(partId);
+      if (run.livePartId !== partId) {
+        closeLivePart(run, run.providerSessionId ?? providerSessionId);
+        run.livePartId = partId;
+      }
     }
     run.writer.send(createNormalizedMessage({
       kind: partType === 'reasoning' ? 'thought_delta' : 'stream_delta',
@@ -1638,6 +1658,7 @@ export async function spawnOpenCode(
       sawBusy: false,
       partTypes: new Map(),
       streamedParts: new Set(),
+      livePartId: null,
       editedMessageIds: new Set(),
       envOverrides,
       resolve,

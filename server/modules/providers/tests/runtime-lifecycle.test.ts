@@ -703,3 +703,33 @@ test('commandcode: an answer closed at a tool boundary is not re-sent at the end
   assert.equal(ok, true);
   assert.deepEqual(sent, []);
 });
+
+test('OpenCode: live rows end at every part boundary so text around a tool never merges', async () => {
+  const runtime = await loadRuntime('opencode', 'dispatchServerEvent, activeRuns, providerToApp');
+  const { dispatchServerEvent, activeRuns, providerToApp } = runtime.lifecycleHooks;
+  const sent: any[] = [];
+  activeRuns.set('app', {
+    appSessionId: 'app', providerSessionId: 'ses_1', baseUrl: 'http://127.0.0.1:1', directory: '/tmp',
+    writer: { send: (message: any) => sent.push(message) },
+    context: { normalizeMessage: () => [] },
+    partTypes: new Map(), streamedParts: new Set(), editedMessageIds: new Set(), livePartId: null,
+  });
+  providerToApp.set('ses_1', 'app');
+  const updated = (id: string, type: string) => dispatchServerEvent('http://x', {
+    type: 'message.part.updated', properties: { sessionID: 'ses_1', part: { id, type, messageID: 'm1' } },
+  });
+  const delta = (partID: string, text: string) => dispatchServerEvent('http://x', {
+    type: 'message.part.delta', properties: { sessionID: 'ses_1', partID, field: 'text', delta: text },
+  });
+
+  // The order a real `opencode serve` run produced.
+  updated('r1', 'reasoning'); delta('r1', 'plan');
+  updated('t1', 'text'); delta('t1', 'first');
+  updated('tool1', 'tool');
+  updated('r2', 'reasoning'); delta('r2', 'again');
+  updated('t2', 'text'); delta('t2', 'done');
+
+  assert.deepEqual(sent.map((message) => message.kind === 'stream_end' ? '|' : message.content), [
+    'plan', '|', 'first', '|', 'again', '|', 'done',
+  ]);
+});
