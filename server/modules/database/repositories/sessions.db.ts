@@ -319,6 +319,20 @@ export const sessionsDb = {
     ).run(permissionMode, sessionId);
   },
 
+  /**
+   * Re-pins the provider_accounts row one session runs under. Only the
+   * account auto-switch (limit failover) moves a session between accounts;
+   * `null` means the provider's ambient login.
+   */
+  setSessionAccount(sessionId: string, accountId: string | null): void {
+    const db = getConnection();
+    db.prepare(
+      `UPDATE sessions
+       SET account_id = ?
+       WHERE session_id = ?`
+    ).run(accountId, sessionId);
+  },
+
   updateSessionCustomName(sessionId: string, customName: string): void {
     const db = getConnection();
     // A hidden technical session (titler, orchestrator lane, delegated child)

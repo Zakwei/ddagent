@@ -1,5 +1,6 @@
 import express, { type Request, type Response } from 'express';
 
+import { accountFailoverService } from '@/modules/provider-accounts/account-failover.service.js';
 import { providerAccountsService } from '@/modules/provider-accounts/provider-accounts.service.js';
 import type { LLMProvider } from '@/shared/types.js';
 import { AppError, asyncHandler, createApiSuccessResponse } from '@/shared/utils.js';
@@ -41,6 +42,32 @@ export function createProviderAccountsRouter() {
     asyncHandler(async (req: Request, res: Response) => {
       const provider = req.query.provider ? parseProvider(req.query.provider) : undefined;
       res.json(createApiSuccessResponse({ accounts: providerAccountsService.list(provider) }));
+    }),
+  );
+
+  // Limit auto-switch preference (off by default — not everyone wants a
+  // manually picked account overridden).
+  router.get(
+    '/settings',
+    asyncHandler(async (_req: Request, res: Response) => {
+      res.json(createApiSuccessResponse({ settings: accountFailoverService.getSettings() }));
+    }),
+  );
+
+  router.put(
+    '/settings',
+    asyncHandler(async (req: Request, res: Response) => {
+      const body = (req.body ?? {}) as Record<string, unknown>;
+      if (body.autoSwitchOnLimit !== undefined && typeof body.autoSwitchOnLimit !== 'boolean') {
+        throw new AppError('autoSwitchOnLimit must be a boolean.', {
+          code: 'INVALID_SETTINGS',
+          statusCode: 400,
+        });
+      }
+      const settings = accountFailoverService.updateSettings({
+        autoSwitchOnLimit: body.autoSwitchOnLimit as boolean | undefined,
+      });
+      res.json(createApiSuccessResponse({ settings }));
     }),
   );
 

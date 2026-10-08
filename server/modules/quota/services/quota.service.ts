@@ -225,6 +225,16 @@ export function createQuotaService(dependencies: QuotaServiceDependencies) {
 
   return {
     /**
+     * Last provider sweep without triggering a read, or null before the first
+     * one lands. Used by the account auto-switch, which runs before every chat
+     * turn and must never stall a send on live provider HTTP; the background
+     * sync keeps this at most one interval old.
+     */
+    peekAccounts(): QuotaAccount[] | null {
+      return cache ? cache.accounts : null;
+    },
+
+    /**
      * Returns the current quota snapshot.
      *
      * Serves the cached sweep when it is still fresh, otherwise reads every

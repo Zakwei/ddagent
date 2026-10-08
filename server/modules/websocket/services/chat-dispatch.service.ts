@@ -1,12 +1,14 @@
 import path from 'node:path';
 
 import { orchestratorMessagesDb, providerAccountsDb, sessionsDb } from '@/modules/database/index.js';
+import { accountFailoverService } from '@/modules/provider-accounts/index.js';
 import { buildDdagentSessionName, isAutoDerivedSessionName, providerModelsService, sessionsService } from '@/modules/providers/index.js';
 import { buildSharedContextPrefix } from '@/modules/shared-context/index.js';
 import { applyUnifiedPrefix } from '@/modules/unified/index.js';
 import { chatRunRegistry } from '@/modules/websocket/services/chat-run-registry.service.js';
 import { connectedClients, WS_OPEN_STATE } from '@/modules/websocket/services/websocket-state.service.js';
 import {
+  createNormalizedMessage,
   createOrchestratorStatusFrame,
   MINI_ORCHESTRATOR_PROVIDER,
   ORCHESTRATOR_PROVIDER,
@@ -116,6 +118,36 @@ function broadcastSessionName(
   recipients.forEach((client) => {
     if (client.readyState === WS_OPEN_STATE) safeSocketSend(client, frame);
   });
+}
+
+/**
+ * Tells every client a session now runs under another provider account; the
+ * session lists reload on `session_upserted`, so headers pick up the new
+ * account badge.
+ */
+function broadcastSessionAccount(
+  sessionId: string,
+  provider: LLMProvider,
+  accountId: string | null,
+  connection: RealtimeClientConnection,
+): void {
+  const frame = JSON.stringify({
+    kind: 'session_upserted',
+    sessionId,
+    provider,
+    session: { id: sessionId, accountId },
+  });
+  const recipients = new Set([...connectedClients, connection]);
+  recipients.forEach((client) => {
+    if (client.readyState === WS_OPEN_STATE) safeSocketSend(client, frame);
+  });
+}
+
+/** One-line status shown while the switched turn starts. */
+function describeAccountSwitch(change: { fromLabel: string; toLabel: string }): string {
+  const from = change.fromLabel || 'default login';
+  const to = change.toLabel || 'default login';
+  return `Usage limit reached on "${from}" — switched to account "${to}"`;
 }
 
 /** Test seam: the background title generator contract. */
@@ -490,10 +522,39 @@ export async function dispatchChatCommand(
   // (e.g. CLAUDE_CONFIG_DIR) that each runtime merges into its child env via
   // providerChildEnv. A deleted account leaves account_id dangling — the
   // session then runs on the provider's ambient environment.
-  const accountEnv =
-    typeof session.account_id === 'string' && session.account_id
-      ? providerAccountsDb.get(session.account_id)?.envOverrides ?? null
-      : null;
+  let accountId = typeof session.account_id === 'string' && session.account_id ? session.account_id : null;
+  const failoverSession = () => ({
+    sessionId,
+    provider,
+    accountId,
+    providerSessionId: session.provider_session_id ?? null,
+    model: session.model ?? (typeof clientOptions.model === 'string' ? clientOptions.model : null),
+  });
+
+  // Limit auto-switch (opt-in setting): when the session's account is out of
+  // quota — per the last quota sweep or a limit error seen earlier — the turn
+  // moves to another account of the SAME provider that still has headroom,
+  // even over the user's manual pick. Never switches agents. Awaited only
+  // when enabled, so the default path still starts the runtime in the same
+  // tick as the run it registered.
+  const preTurnSwitch = accountFailoverService.getSettings().autoSwitchOnLimit
+    ? await accountFailoverService.prepareTurnAccount(failoverSession()).catch((error: unknown) => {
+      console.error('[Chat] Account auto-switch check failed', { sessionId, error });
+      return null;
+    })
+    : null;
+  if (preTurnSwitch) {
+    accountId = preTurnSwitch.toAccountId;
+    run.writer.send(createNormalizedMessage({
+      kind: 'status',
+      text: describeAccountSwitch(preTurnSwitch),
+      sessionId,
+      provider,
+    }));
+    broadcastSessionAccount(sessionId, provider, accountId, connection);
+  }
+
+  const accountEnv = accountId ? providerAccountsDb.get(accountId)?.envOverrides ?? null : null;
 
   const runtimeOptions: AnyRecord = {
     ...clientOptions,
@@ -559,6 +620,19 @@ export async function dispatchChatCommand(
     };
   }
 
+  // Watches the turn for a usage/rate-limit hit (an error, or Claude's limit
+  // banner reply). The account is benched once the turn ends, and with
+  // auto-switch on the session moves so the next message runs elsewhere.
+  let limitHit: ReturnType<typeof accountFailoverService.detectLimit> = null;
+  const sendBeforeLimitWatch = run.writer.send.bind(run.writer) as (data: unknown) => void;
+  run.writer.send = (data: unknown) => {
+    sendBeforeLimitWatch(data);
+    const event = (data ?? {}) as NormalizedMessage;
+    if (limitHit || event.role === 'user') return;
+    const text = (event.content ?? (event as Record<string, unknown>).text ?? '') as unknown;
+    limitHit = accountFailoverService.detectLimit(event.kind, typeof text === 'string' ? text : '');
+  };
+
   let runError: string | null = null;
   try {
     await runtime.run(provider, effectiveContent, runtimeOptions, run.writer);
@@ -581,6 +655,13 @@ export async function dispatchChatCommand(
     // a queued message can start the session's next run before this promise
     // settles, and the session-keyed completeRun would kill that new run.
     chatRunRegistry.completeRunIfCurrent(run, { exitCode: 1 });
+    if (limitHit) {
+      void accountFailoverService.reportLimitHit(failoverSession(), limitHit)
+        .then((limitSwitch) => {
+          if (limitSwitch) broadcastSessionAccount(sessionId, provider, limitSwitch.toAccountId, connection);
+        })
+        .catch((error: unknown) => console.error('[Chat] Account auto-switch after limit failed', { sessionId, error }));
+    }
     // A superseded child must not overwrite the newer turn’s running preview.
     if (delegation && chatRunRegistry.getRun(sessionId) === run) {
       const { rowId, parentSessionId } = delegation;

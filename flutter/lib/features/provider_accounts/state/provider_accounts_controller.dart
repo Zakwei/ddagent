@@ -191,3 +191,42 @@ final providerAccountsProvider = NotifierProvider.autoDispose
     .family<ProviderAccountsController, ProviderAccountsState, String>(
       ProviderAccountsController.new,
     );
+
+/// Limit auto-switch preference (`/api/provider-accounts/settings`): when a
+/// session's account runs out of its usage limit, the server moves it to
+/// another account of the SAME agent that still has headroom — even over a
+/// manual pick. One server-wide flag, off by default.
+class AccountAutoSwitchController extends AsyncNotifier<bool> {
+  static bool _parse(dynamic data) {
+    final settings = data is Map ? data['settings'] : null;
+    return settings is Map && settings['autoSwitchOnLimit'] == true;
+  }
+
+  @override
+  Future<bool> build() =>
+      apiCall(() => ref.read(dioProvider).get<dynamic>('/api/provider-accounts/settings'), _parse);
+
+  /// Optimistic toggle; reverts and returns the error message when saving fails.
+  Future<String?> setEnabled(bool value) async {
+    final previous = state.value ?? false;
+    state = AsyncData(value);
+    try {
+      final saved = await apiCall(
+        () => ref
+            .read(dioProvider)
+            .put<dynamic>('/api/provider-accounts/settings', data: {'autoSwitchOnLimit': value}),
+        _parse,
+      );
+      if (ref.mounted) state = AsyncData(saved);
+      return null;
+    } on AppError catch (e) {
+      if (ref.mounted) state = AsyncData(previous);
+      return e.message;
+    }
+  }
+}
+
+final accountAutoSwitchProvider =
+    AsyncNotifierProvider.autoDispose<AccountAutoSwitchController, bool>(
+      AccountAutoSwitchController.new,
+    );
