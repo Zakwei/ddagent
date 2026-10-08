@@ -11,169 +11,193 @@
 -->
 <!-- lang:en -->
 ### What's new
-- Settings → About → Updates has its own button for each part: **Update app** (Android, Windows, Linux), **Update web interface** (web) and **Update server** — each with its installed and latest version.
-- The server can update itself however it was installed: installer script, git checkout or release tarball. Tarballs are checked against their checksum, installed on restart and rolled back automatically if the new version fails to start.
-- `start.sh` / `start.bat` now restart the server after an update or a restart from the app, without systemd.
-- A web interface hosted by the server is updated together with it, or on its own.
-- The desktop app's local server ("This device") can be updated on demand.
+- When you deny a tool request from Claude or OpenCode, you can add a reason, and the agent carries on using your feedback.
+- "Send now" puts a queued message into the turn that is already running (for agents that support it; elsewhere the button is greyed out).
+- Hitting a usage limit can switch to another account of the same agent automatically. You turn this on per agent.
+- Devin now offers its own plan mode.
+- On mobile, a tab turns amber when it is waiting for you and green when its chat has finished in the background.
+- The remaining untranslated parts of the interface are now available in all 12 languages.
 
 ### Bug fixes
-- The update message no longer tells you to tap an Update button that wasn't there.
-- With both the app and the server out of date, the server update was unreachable; the update badge now lets you pick.
-
-### Before you update
-- Servers on 0.8.12 or older installed with the installer script or a tarball must be updated to 0.8.13 once by hand (re-run `install.sh --version v0.8.13`, or unpack the new tarball over the old one); after that, updates work from the app. Release tarballs need Node.js 22.
+- Agents now reply in the app's language on every turn, not only the first.
+- Errors, notices and run outcomes from Claude, Codex, OpenCode, Devin, Cursor, Antigravity and Command Code are shown once, readably, and are kept in the history.
+- Permission modes now apply right away and show only the modes each agent really supports.
+- Desktop notifications work on Linux, Windows and the web.
+- Agent installation, login, the terminal and file paths now work when the server runs on Windows.
+- Open panes stay in sync across devices, and the built-in browser no longer leaks Chromium sessions.
 <!-- lang:pl -->
 ### Nowości
-- Ustawienia → O aplikacji → Aktualizacje ma osobny przycisk dla każdej części: **Aktualizuj aplikację** (Android, Windows, Linux), **Aktualizuj interfejs web** (web) i **Aktualizuj serwer** — każdy z zainstalowaną i najnowszą wersją.
-- Serwer aktualizuje się sam bez względu na sposób instalacji: skrypt instalacyjny, checkout gita albo tarball wydania. Tarballe są sprawdzane sumą kontrolną, instalowane przy restarcie i automatycznie wycofywane, jeśli nowa wersja nie wystartuje.
-- `start.sh` / `start.bat` same restartują serwer po aktualizacji lub restarcie z aplikacji, bez systemd.
-- Interfejs web hostowany przez serwer aktualizuje się razem z nim albo osobno.
-- Lokalny serwer aplikacji desktop („To urządzenie”) można zaktualizować na żądanie.
+- Odrzucając prośbę o narzędzie od Claude lub OpenCode, możesz podać powód — agent kontynuuje, biorąc go pod uwagę.
+- „Wyślij teraz” wstawia wiadomość z kolejki do trwającej tury (u agentów, które to obsługują; u pozostałych przycisk jest wyszarzony).
+- Po osiągnięciu limitu użycia aplikacja może automatycznie przełączyć się na inne konto tego samego agenta — włączane osobno dla każdego agenta.
+- Devin ma własny tryb planowania.
+- Na telefonie karta świeci na bursztynowo, gdy czeka na Ciebie, i na zielono, gdy czat w tle się zakończył.
+- Pozostałe nieprzetłumaczone teksty interfejsu są teraz dostępne we wszystkich 12 językach.
 
-### Poprawki błędów
-- Komunikat o aktualizacji nie każe już klikać przycisku Aktualizuj, którego nie było.
-- Gdy nieaktualne były i aplikacja, i serwer, aktualizacja serwera była niedostępna; ikonka aktualizacji pozwala teraz wybrać.
-
-### Przed aktualizacją
-- Serwery w wersji 0.8.12 lub starszej zainstalowane skryptem instalacyjnym albo z tarballa trzeba raz zaktualizować do 0.8.13 ręcznie (ponownie uruchom `install.sh --version v0.8.13` albo rozpakuj nowy tarball na stary); potem aktualizacje działają z aplikacji. Tarballe wydań wymagają Node.js 22.
+### Poprawki
+- Agenci odpowiadają w języku aplikacji w każdej turze, nie tylko w pierwszej.
+- Błędy, komunikaty i wyniki uruchomień Claude, Codex, OpenCode, Devin, Cursor, Antigravity i Command Code są pokazywane raz, czytelnie, i zostają w historii.
+- Tryby uprawnień działają od razu i pokazują tylko tryby, które dany agent naprawdę obsługuje.
+- Powiadomienia systemowe działają na Linuksie, Windowsie i w wersji web.
+- Instalacja agentów, logowanie, terminal i ścieżki działają, gdy serwer stoi na Windowsie.
+- Otwarte panele są zsynchronizowane między urządzeniami, a wbudowana przeglądarka nie zostawia już sesji Chromium.
 <!-- lang:de -->
 ### Neu
-- Einstellungen → Info → Updates hat für jeden Teil einen eigenen Button: **App aktualisieren** (Android, Windows, Linux), **Weboberfläche aktualisieren** (Web) und **Server aktualisieren** — jeweils mit installierter und neuester Version.
-- Der Server aktualisiert sich selbst, egal wie er installiert wurde: Installationsskript, Git-Checkout oder Release-Tarball. Tarballs werden per Prüfsumme geprüft, beim Neustart installiert und automatisch zurückgerollt, wenn die neue Version nicht startet.
-- `start.sh` / `start.bat` starten den Server nach einem Update oder Neustart aus der App selbst neu, ohne systemd.
-- Eine vom Server gehostete Weboberfläche wird mit ihm oder einzeln aktualisiert.
-- Der lokale Server der Desktop-App („Dieses Gerät“) lässt sich bei Bedarf aktualisieren.
+- Wenn du eine Tool-Anfrage von Claude oder OpenCode ablehnst, kannst du einen Grund angeben – der Agent macht mit deinem Feedback weiter.
+- „Jetzt senden“ fügt eine Nachricht aus der Warteschlange in den laufenden Durchgang ein (bei Agenten, die das unterstützen; sonst ist die Schaltfläche ausgegraut).
+- Bei Erreichen eines Nutzungslimits kann automatisch zu einem anderen Konto desselben Agenten gewechselt werden – pro Agent einstellbar.
+- Devin bietet jetzt seinen eigenen Planmodus.
+- Auf dem Handy wird ein Tab gelb, wenn er auf dich wartet, und grün, wenn sein Chat im Hintergrund fertig ist.
+- Die restlichen unübersetzten Texte der Oberfläche gibt es jetzt in allen 12 Sprachen.
 
 ### Fehlerbehebungen
-- Die Update-Meldung verweist nicht mehr auf einen Aktualisieren-Button, den es nicht gab.
-- Waren App und Server veraltet, war das Server-Update nicht erreichbar; die Update-Anzeige lässt jetzt wählen.
-
-### Vor dem Update
-- Server mit 0.8.12 oder älter, die per Installationsskript oder Tarball installiert wurden, müssen einmal von Hand auf 0.8.13 gebracht werden (`install.sh --version v0.8.13` erneut ausführen oder den neuen Tarball über den alten entpacken); danach funktionieren Updates aus der App. Release-Tarballs benötigen Node.js 22.
+- Agenten antworten jetzt in jedem Durchgang in der Sprache der App, nicht nur im ersten.
+- Fehler, Hinweise und Ergebnisse von Claude, Codex, OpenCode, Devin, Cursor, Antigravity und Command Code werden einmal, lesbar angezeigt und bleiben im Verlauf.
+- Berechtigungsmodi greifen sofort und zeigen nur die Modi, die der jeweilige Agent wirklich unterstützt.
+- Desktop-Benachrichtigungen funktionieren unter Linux, Windows und im Web.
+- Agenten-Installation, Anmeldung, Terminal und Dateipfade funktionieren, wenn der Server unter Windows läuft.
+- Offene Bereiche bleiben geräteübergreifend synchron, und der integrierte Browser hinterlässt keine Chromium-Sitzungen mehr.
 <!-- lang:es -->
 ### Novedades
-- Ajustes → Acerca de → Actualizaciones tiene un botón para cada parte: **Actualizar app** (Android, Windows, Linux), **Actualizar interfaz web** (web) y **Actualizar servidor**, cada uno con su versión instalada y la más reciente.
-- El servidor se actualiza solo, sin importar cómo se instaló: script de instalación, checkout de git o tarball de la versión. Los tarballs se verifican con su suma de comprobación, se instalan al reiniciar y se revierten automáticamente si la versión nueva no arranca.
-- `start.sh` / `start.bat` reinician el servidor tras una actualización o un reinicio desde la app, sin systemd.
-- Una interfaz web alojada por el servidor se actualiza junto con él o por separado.
-- El servidor local de la app de escritorio («Este dispositivo») se puede actualizar cuando quieras.
+- Al rechazar una solicitud de herramienta de Claude u OpenCode puedes añadir un motivo, y el agente continúa teniendo en cuenta tu comentario.
+- «Enviar ahora» inserta un mensaje de la cola en el turno en curso (en los agentes que lo admiten; en los demás el botón aparece desactivado).
+- Al alcanzar un límite de uso, la app puede cambiar automáticamente a otra cuenta del mismo agente. Se activa por agente.
+- Devin ofrece ahora su propio modo de planificación.
+- En el móvil, una pestaña se vuelve ámbar cuando te espera y verde cuando su chat ha terminado en segundo plano.
+- Los textos de la interfaz que faltaban por traducir ya están en los 12 idiomas.
 
 ### Correcciones
-- El aviso de actualización ya no pide pulsar un botón Actualizar que no existía.
-- Si la app y el servidor estaban desactualizados, la actualización del servidor no estaba disponible; el indicador de actualización ahora permite elegir.
-
-### Antes de actualizar
-- Los servidores con 0.8.12 o anterior instalados con el script de instalación o un tarball deben actualizarse a 0.8.13 una vez a mano (vuelve a ejecutar `install.sh --version v0.8.13` o descomprime el nuevo tarball sobre el antiguo); después, las actualizaciones funcionan desde la app. Los tarballs de las versiones requieren Node.js 22.
+- Los agentes responden en el idioma de la app en cada turno, no solo en el primero.
+- Los errores, avisos y resultados de Claude, Codex, OpenCode, Devin, Cursor, Antigravity y Command Code se muestran una sola vez, de forma legible, y se guardan en el historial.
+- Los modos de permisos se aplican al instante y solo muestran los que cada agente admite de verdad.
+- Las notificaciones de escritorio funcionan en Linux, Windows y la web.
+- La instalación de agentes, el inicio de sesión, la terminal y las rutas funcionan cuando el servidor corre en Windows.
+- Los paneles abiertos se mantienen sincronizados entre dispositivos y el navegador integrado ya no deja sesiones de Chromium abiertas.
 <!-- lang:fr -->
 ### Nouveautés
-- Paramètres → À propos → Mises à jour propose un bouton pour chaque partie : **Mettre à jour l'application** (Android, Windows, Linux), **Mettre à jour l'interface web** (web) et **Mettre à jour le serveur**, chacun avec sa version installée et la plus récente.
-- Le serveur se met à jour lui-même, quelle que soit son installation : script d'installation, checkout git ou archive de la version. Les archives sont vérifiées par somme de contrôle, installées au redémarrage et annulées automatiquement si la nouvelle version ne démarre pas.
-- `start.sh` / `start.bat` redémarrent le serveur après une mise à jour ou un redémarrage depuis l'application, sans systemd.
-- Une interface web hébergée par le serveur est mise à jour avec lui ou séparément.
-- Le serveur local de l'application de bureau (« Cet appareil ») peut être mis à jour à la demande.
+- Quand vous refusez une demande d'outil de Claude ou d'OpenCode, vous pouvez indiquer une raison : l'agent continue en tenant compte de votre retour.
+- « Envoyer maintenant » insère un message de la file d'attente dans le tour en cours (pour les agents qui le prennent en charge ; sinon le bouton est grisé).
+- Quand une limite d'utilisation est atteinte, l'app peut passer automatiquement à un autre compte du même agent. Activable agent par agent.
+- Devin propose désormais son propre mode plan.
+- Sur mobile, un onglet passe à l'ambre quand il vous attend et au vert quand son chat est terminé en arrière-plan.
+- Les derniers textes non traduits de l'interface sont disponibles dans les 12 langues.
 
 ### Corrections
-- Le message de mise à jour ne demande plus de cliquer sur un bouton Mettre à jour inexistant.
-- Quand l'application et le serveur étaient tous deux en retard, la mise à jour du serveur était inaccessible ; l'indicateur de mise à jour permet maintenant de choisir.
-
-### Avant la mise à jour
-- Les serveurs en 0.8.12 ou plus ancien installés avec le script d'installation ou une archive doivent être mis à jour une fois à la main vers 0.8.13 (relancez `install.sh --version v0.8.13` ou décompressez la nouvelle archive par-dessus l'ancienne) ; ensuite, les mises à jour se font depuis l'application. Les archives des versions nécessitent Node.js 22.
+- Les agents répondent dans la langue de l'app à chaque tour, pas seulement au premier.
+- Les erreurs, notifications et résultats de Claude, Codex, OpenCode, Devin, Cursor, Antigravity et Command Code s'affichent une seule fois, lisiblement, et restent dans l'historique.
+- Les modes d'autorisation s'appliquent immédiatement et n'affichent que ceux que chaque agent prend vraiment en charge.
+- Les notifications de bureau fonctionnent sous Linux, Windows et sur le web.
+- L'installation des agents, la connexion, le terminal et les chemins fonctionnent quand le serveur tourne sous Windows.
+- Les panneaux ouverts restent synchronisés entre appareils, et le navigateur intégré ne laisse plus de sessions Chromium ouvertes.
 <!-- lang:it -->
 ### Novità
-- Impostazioni → Informazioni → Aggiornamenti ha un pulsante per ogni parte: **Aggiorna app** (Android, Windows, Linux), **Aggiorna interfaccia web** (web) e **Aggiorna server**, ognuno con la versione installata e l'ultima.
-- Il server si aggiorna da solo, comunque sia stato installato: script di installazione, checkout git o tarball della release. I tarball vengono verificati con il checksum, installati al riavvio e annullati automaticamente se la nuova versione non parte.
-- `start.sh` / `start.bat` riavviano il server dopo un aggiornamento o un riavvio dall'app, senza systemd.
-- Un'interfaccia web ospitata dal server si aggiorna insieme a lui o da sola.
-- Il server locale dell'app desktop («Questo dispositivo») si può aggiornare su richiesta.
+- Quando rifiuti una richiesta di strumento di Claude o OpenCode puoi aggiungere un motivo: l'agente prosegue tenendo conto del tuo feedback.
+- «Invia ora» inserisce un messaggio in coda nel turno in corso (per gli agenti che lo supportano; altrimenti il pulsante è disattivato).
+- Al raggiungimento di un limite di utilizzo l'app può passare automaticamente a un altro account dello stesso agente. Si attiva per singolo agente.
+- Devin offre ora la propria modalità piano.
+- Su mobile una scheda diventa ambra quando ti aspetta e verde quando la sua chat è terminata in background.
+- I testi dell'interfaccia ancora non tradotti sono ora disponibili in tutte le 12 lingue.
 
 ### Correzioni
-- Il messaggio di aggiornamento non chiede più di premere un pulsante Aggiorna che non c'era.
-- Con app e server entrambi non aggiornati, l'aggiornamento del server non era raggiungibile; l'indicatore di aggiornamento ora permette di scegliere.
-
-### Prima di aggiornare
-- I server con 0.8.12 o precedente installati con lo script di installazione o un tarball vanno portati a 0.8.13 una volta a mano (riesegui `install.sh --version v0.8.13` o estrai il nuovo tarball sopra il vecchio); dopo, gli aggiornamenti funzionano dall'app. I tarball delle release richiedono Node.js 22.
+- Gli agenti rispondono nella lingua dell'app a ogni turno, non solo al primo.
+- Errori, avvisi ed esiti di Claude, Codex, OpenCode, Devin, Cursor, Antigravity e Command Code vengono mostrati una sola volta, in modo leggibile, e restano nella cronologia.
+- Le modalità di autorizzazione si applicano subito e mostrano solo quelle che ogni agente supporta davvero.
+- Le notifiche desktop funzionano su Linux, Windows e web.
+- Installazione degli agenti, accesso, terminale e percorsi funzionano quando il server gira su Windows.
+- I pannelli aperti restano sincronizzati tra i dispositivi e il browser integrato non lascia più sessioni Chromium aperte.
 <!-- lang:ja -->
 ### 新機能
-- 設定 → 概要 → 更新 に、部分ごとのボタンが付きました：**アプリを更新**（Android、Windows、Linux）、**Web インターフェイスを更新**（Web）、**サーバーを更新**。それぞれインストール済みと最新のバージョンを表示します。
-- サーバーはインストール方法（インストールスクリプト、git チェックアウト、リリースの tarball）にかかわらず自分で更新できます。tarball はチェックサムで検証され、再起動時にインストールされ、新しいバージョンが起動しない場合は自動的に元に戻ります。
-- `start.sh` / `start.bat` は、アップデートやアプリからの再起動の後、systemd なしでサーバーを再起動します。
-- サーバーがホストする Web インターフェイスは、サーバーと一緒に、または単独で更新されます。
-- デスクトップアプリのローカルサーバー（「このデバイス」）を必要なときに更新できます。
+- Claude または OpenCode のツール要求を拒否するときに理由を添えられるようになり、エージェントはそのフィードバックを踏まえて作業を続けます。
+- 「今すぐ送信」で、キューのメッセージを実行中のターンに差し込めます（対応エージェントのみ。非対応の場合はボタンがグレー表示になります）。
+- 使用上限に達したとき、同じエージェントの別アカウントへ自動で切り替えられます。エージェントごとに設定できます。
+- Devin 独自のプランモードが使えるようになりました。
+- モバイルでは、入力待ちのタブがアンバー、バックグラウンドのチャットが完了したタブが緑で表示されます。
+- 未翻訳だった UI の文言が 12 言語すべてで表示されるようになりました。
 
 ### バグ修正
-- アップデートの案内が、存在しない「更新」ボタンを押すよう求めなくなりました。
-- アプリとサーバーの両方が古い場合にサーバーを更新できませんでしたが、アップデートバッジから選べるようになりました。
-
-### アップデートの前に
-- インストールスクリプトまたは tarball で導入した 0.8.12 以前のサーバーは、一度だけ手動で 0.8.13 に更新してください（`install.sh --version v0.8.13` を再実行するか、新しい tarball を古いものの上に展開）。その後はアプリから更新できます。リリースの tarball には Node.js 22 が必要です。
+- エージェントが最初のターンだけでなく、毎ターンアプリの言語で返答するようになりました。
+- Claude、Codex、OpenCode、Devin、Cursor、Antigravity、Command Code のエラー・通知・実行結果が一度だけ読みやすく表示され、履歴にも残ります。
+- 権限モードがすぐに反映され、各エージェントが実際に対応しているモードだけが表示されます。
+- Linux、Windows、Web でデスクトップ通知が動作します。
+- サーバーが Windows 上で動いている場合も、エージェントのインストール、ログイン、ターミナル、パスが正しく動作します。
+- 開いているペインがデバイス間で同期され、内蔵ブラウザーが Chromium セッションを残さなくなりました。
 <!-- lang:ko -->
-### 새 기능
-- 설정 → 정보 → 업데이트에 부분별 버튼이 생겼습니다: **앱 업데이트**(Android, Windows, Linux), **웹 인터페이스 업데이트**(웹), **서버 업데이트**. 각각 설치된 버전과 최신 버전을 보여 줍니다.
-- 서버는 설치 방식(설치 스크립트, git 체크아웃, 릴리스 tarball)과 관계없이 스스로 업데이트됩니다. tarball은 체크섬으로 검증되고, 재시작할 때 설치되며, 새 버전이 시작되지 않으면 자동으로 되돌립니다.
-- `start.sh` / `start.bat`가 업데이트나 앱에서의 재시작 후 systemd 없이 서버를 다시 시작합니다.
-- 서버가 호스팅하는 웹 인터페이스는 서버와 함께 또는 따로 업데이트됩니다.
-- 데스크톱 앱의 로컬 서버('이 기기')를 원할 때 업데이트할 수 있습니다.
+### 새로운 기능
+- Claude 또는 OpenCode의 도구 요청을 거부할 때 이유를 적을 수 있으며, 에이전트는 그 피드백을 반영해 작업을 이어갑니다.
+- '지금 보내기'로 대기열의 메시지를 진행 중인 턴에 넣을 수 있습니다(지원하는 에이전트만, 그 외에는 버튼이 비활성화됩니다).
+- 사용 한도에 도달하면 같은 에이전트의 다른 계정으로 자동 전환할 수 있습니다. 에이전트별로 설정합니다.
+- Devin 자체의 계획 모드를 사용할 수 있습니다.
+- 모바일에서 입력을 기다리는 탭은 호박색, 백그라운드 채팅이 끝난 탭은 초록색으로 표시됩니다.
+- 번역되지 않았던 나머지 UI 문구가 12개 언어 모두로 제공됩니다.
 
 ### 버그 수정
-- 업데이트 안내가 더 이상 존재하지 않는 업데이트 버튼을 누르라고 하지 않습니다.
-- 앱과 서버가 모두 오래되었을 때 서버 업데이트에 접근할 수 없었는데, 이제 업데이트 배지에서 선택할 수 있습니다.
-
-### 업데이트 전에
-- 설치 스크립트나 tarball로 설치한 0.8.12 이하 서버는 한 번만 직접 0.8.13으로 업데이트해야 합니다(`install.sh --version v0.8.13`을 다시 실행하거나 새 tarball을 기존 위치에 덮어서 풀기). 그 뒤로는 앱에서 업데이트됩니다. 릴리스 tarball에는 Node.js 22가 필요합니다.
+- 에이전트가 첫 턴뿐 아니라 매 턴 앱 언어로 답합니다.
+- Claude, Codex, OpenCode, Devin, Cursor, Antigravity, Command Code의 오류·알림·실행 결과가 한 번만 읽기 쉽게 표시되고 기록에 남습니다.
+- 권한 모드가 즉시 적용되며 각 에이전트가 실제로 지원하는 모드만 표시됩니다.
+- Linux, Windows, 웹에서 데스크톱 알림이 동작합니다.
+- 서버가 Windows에서 실행될 때도 에이전트 설치, 로그인, 터미널, 경로가 정상 동작합니다.
+- 열린 창이 기기 간에 동기화되고, 내장 브라우저가 더 이상 Chromium 세션을 남기지 않습니다.
 <!-- lang:ru -->
 ### Что нового
-- Настройки → О программе → Обновления у каждой части своя кнопка: **Обновить приложение** (Android, Windows, Linux), **Обновить веб-интерфейс** (веб) и **Обновить сервер** — с установленной и последней версией.
-- Сервер обновляется сам независимо от способа установки: скрипт установки, git-checkout или архив релиза. Архивы проверяются по контрольной сумме, устанавливаются при перезапуске и автоматически откатываются, если новая версия не запускается.
-- `start.sh` / `start.bat` сами перезапускают сервер после обновления или перезапуска из приложения, без systemd.
-- Веб-интерфейс, который размещает сервер, обновляется вместе с ним или отдельно.
-- Локальный сервер десктопного приложения («Это устройство») можно обновить по запросу.
+- Отклоняя запрос инструмента от Claude или OpenCode, можно указать причину — агент продолжит работу с учётом вашего ответа.
+- «Отправить сейчас» вставляет сообщение из очереди в текущий ход (у агентов с поддержкой этой функции; у остальных кнопка неактивна).
+- При достижении лимита использования приложение может автоматически переключиться на другой аккаунт того же агента. Включается отдельно для каждого агента.
+- У Devin появился собственный режим планирования.
+- На телефоне вкладка становится янтарной, когда ждёт вас, и зелёной, когда её чат завершился в фоне.
+- Оставшиеся непереведённые тексты интерфейса теперь доступны на всех 12 языках.
 
 ### Исправления
-- Сообщение об обновлении больше не предлагает нажать несуществующую кнопку «Обновить».
-- Когда устарели и приложение, и сервер, обновить сервер было нельзя; теперь значок обновления позволяет выбрать.
-
-### Перед обновлением
-- Серверы версии 0.8.12 и старше, установленные скриптом или из архива, нужно один раз обновить до 0.8.13 вручную (повторно запустите `install.sh --version v0.8.13` или распакуйте новый архив поверх старого); после этого обновления работают из приложения. Архивам релизов нужен Node.js 22.
+- Агенты отвечают на языке приложения в каждом ходе, а не только в первом.
+- Ошибки, уведомления и результаты запусков Claude, Codex, OpenCode, Devin, Cursor, Antigravity и Command Code показываются один раз, понятно, и сохраняются в истории.
+- Режимы разрешений применяются сразу и показывают только те, что агент действительно поддерживает.
+- Системные уведомления работают в Linux, Windows и веб-версии.
+- Установка агентов, вход, терминал и пути работают, когда сервер запущен в Windows.
+- Открытые панели синхронизируются между устройствами, а встроенный браузер больше не оставляет сессии Chromium.
 <!-- lang:tr -->
 ### Yenilikler
-- Ayarlar → Hakkında → Güncellemeler bölümünde her parça için ayrı düğme var: **Uygulamayı güncelle** (Android, Windows, Linux), **Web arayüzünü güncelle** (web) ve **Sunucuyu güncelle** — her biri kurulu ve en son sürümüyle.
-- Sunucu nasıl kurulduğundan bağımsız olarak kendini günceller: kurulum betiği, git checkout veya sürüm arşivi. Arşivler sağlama toplamıyla doğrulanır, yeniden başlatmada kurulur ve yeni sürüm başlamazsa otomatik olarak geri alınır.
-- `start.sh` / `start.bat` bir güncellemeden veya uygulamadan yeniden başlatmadan sonra sunucuyu systemd olmadan yeniden başlatır.
-- Sunucunun barındırdığı web arayüzü onunla birlikte ya da tek başına güncellenir.
-- Masaüstü uygulamasının yerel sunucusu ("Bu cihaz") istendiğinde güncellenebilir.
+- Claude veya OpenCode'un araç isteğini reddederken bir neden ekleyebilirsiniz; ajan geri bildiriminizi dikkate alarak devam eder.
+- "Şimdi gönder", kuyruktaki mesajı devam eden tura ekler (destekleyen ajanlarda; diğerlerinde düğme soluk görünür).
+- Kullanım sınırına ulaşıldığında uygulama aynı ajanın başka bir hesabına otomatik geçebilir. Her ajan için ayrı açılır.
+- Devin artık kendi plan modunu sunuyor.
+- Mobilde sizi bekleyen sekme kehribar, arka planda sohbeti biten sekme yeşil olur.
+- Arayüzün çevrilmemiş kalan metinleri artık 12 dilin tamamında mevcut.
 
 ### Hata düzeltmeleri
-- Güncelleme mesajı artık olmayan bir Güncelle düğmesine basmanızı istemiyor.
-- Hem uygulama hem sunucu eskiyken sunucu güncellemesine ulaşılamıyordu; güncelleme rozeti artık seçim sunuyor.
-
-### Güncellemeden önce
-- Kurulum betiği veya arşivle kurulmuş 0.8.12 ve öncesi sunucular bir kez elle 0.8.13'e güncellenmeli (`install.sh --version v0.8.13` komutunu yeniden çalıştırın veya yeni arşivi eskisinin üzerine açın); sonrasında güncellemeler uygulamadan çalışır. Sürüm arşivleri Node.js 22 gerektirir.
+- Ajanlar yalnızca ilk turda değil, her turda uygulamanın dilinde yanıt verir.
+- Claude, Codex, OpenCode, Devin, Cursor, Antigravity ve Command Code'un hataları, bildirimleri ve çalışma sonuçları bir kez, okunaklı şekilde gösterilir ve geçmişte kalır.
+- İzin modları hemen uygulanır ve yalnızca her ajanın gerçekten desteklediği modlar gösterilir.
+- Masaüstü bildirimleri Linux, Windows ve web'de çalışır.
+- Sunucu Windows'ta çalışırken ajan kurulumu, giriş, terminal ve dosya yolları düzgün çalışır.
+- Açık paneller cihazlar arasında senkron kalır; yerleşik tarayıcı artık Chromium oturumu bırakmaz.
 <!-- lang:zh-CN -->
 ### 新功能
-- 设置 → 关于 → 更新 为每个部分提供单独的按钮：**更新应用**（Android、Windows、Linux）、**更新 Web 界面**（Web）和 **更新服务器**，并显示各自已安装和最新的版本。
-- 无论服务器以何种方式安装（安装脚本、git 检出或发布的 tarball），都能自行更新。tarball 会用校验和验证，在重启时安装，新版本无法启动时会自动回滚。
-- `start.sh` / `start.bat` 会在更新或从应用重启后自行重启服务器，无需 systemd。
-- 服务器托管的 Web 界面会随服务器一起更新，也可以单独更新。
-- 桌面应用的本地服务器（“此设备”）可以随时手动更新。
+- 拒绝 Claude 或 OpenCode 的工具请求时可以填写原因，智能体会根据你的反馈继续工作。
+- “立即发送”可将队列中的消息插入正在进行的轮次（仅限支持的智能体，其他智能体的按钮显示为灰色）。
+- 达到用量上限时，可自动切换到同一智能体的另一个账号，按智能体单独开启。
+- Devin 现在提供自己的计划模式。
+- 在手机上，等待你操作的标签显示为琥珀色，后台对话已完成的标签显示为绿色。
+- 界面中剩余未翻译的文字现已支持全部 12 种语言。
 
 ### 问题修复
-- 更新提示不再要求点击并不存在的“更新”按钮。
-- 应用和服务器都过期时无法更新服务器；现在更新标记可以让你选择。
-
-### 更新之前
-- 通过安装脚本或 tarball 安装的 0.8.12 及更早版本的服务器，需要手动更新到 0.8.13 一次（重新运行 `install.sh --version v0.8.13`，或将新的 tarball 解压覆盖旧文件）；之后即可在应用中更新。发布的 tarball 需要 Node.js 22。
+- 智能体在每一轮都使用应用语言回复，而不仅是第一轮。
+- Claude、Codex、OpenCode、Devin、Cursor、Antigravity 和 Command Code 的错误、通知和运行结果只显示一次、清晰易读，并保留在历史记录中。
+- 权限模式立即生效，且只显示各智能体真正支持的模式。
+- 桌面通知可在 Linux、Windows 和网页版上使用。
+- 服务器运行在 Windows 上时，智能体安装、登录、终端和路径均可正常工作。
+- 打开的面板在设备间保持同步，内置浏览器不再残留 Chromium 会话。
 <!-- lang:zh-TW -->
 ### 新功能
-- 設定 → 關於 → 更新 為每個部分提供個別的按鈕：**更新應用程式**（Android、Windows、Linux）、**更新 Web 介面**（Web）和 **更新伺服器**，並顯示各自已安裝與最新的版本。
-- 不論伺服器以何種方式安裝（安裝指令碼、git 簽出或發行版 tarball），都能自行更新。tarball 會以檢查碼驗證、在重新啟動時安裝，新版本無法啟動時會自動還原。
-- `start.sh` / `start.bat` 會在更新或從應用程式重新啟動後自行重新啟動伺服器，不需要 systemd。
-- 伺服器託管的 Web 介面會隨伺服器一起更新，也可以單獨更新。
-- 桌面應用程式的本機伺服器（「此裝置」）可以隨時手動更新。
+- 拒絕 Claude 或 OpenCode 的工具請求時可以填寫原因，代理會根據你的回饋繼續工作。
+- 「立即傳送」可將佇列中的訊息插入進行中的回合（僅限支援的代理，其他代理的按鈕會呈灰色）。
+- 達到用量上限時，可自動切換到同一代理的另一個帳號，依代理個別開啟。
+- Devin 現在提供自己的計畫模式。
+- 在手機上，等待你操作的分頁會顯示為琥珀色，背景對話已完成的分頁會顯示為綠色。
+- 介面中剩餘未翻譯的文字現已支援全部 12 種語言。
 
-### 錯誤修正
-- 更新提示不再要求點選並不存在的「更新」按鈕。
-- 應用程式與伺服器都過期時無法更新伺服器；現在更新標記可以讓你選擇。
-
-### 更新之前
-- 以安裝指令碼或 tarball 安裝的 0.8.12 及更早版本伺服器，需要手動更新到 0.8.13 一次（重新執行 `install.sh --version v0.8.13`，或將新的 tarball 解壓縮覆蓋舊檔案）；之後即可從應用程式更新。發行版 tarball 需要 Node.js 22。
+### 問題修正
+- 代理在每一回合都使用應用程式語言回覆，而不只是第一回合。
+- Claude、Codex、OpenCode、Devin、Cursor、Antigravity 和 Command Code 的錯誤、通知和執行結果只顯示一次、清楚易讀，並保留在歷史記錄中。
+- 權限模式立即生效，且只顯示各代理真正支援的模式。
+- 桌面通知可在 Linux、Windows 和網頁版上使用。
+- 伺服器在 Windows 上執行時，代理安裝、登入、終端機和路徑皆可正常運作。
+- 開啟的窗格在裝置間保持同步，內建瀏覽器不再殘留 Chromium 工作階段。
