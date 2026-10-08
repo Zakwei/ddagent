@@ -121,6 +121,26 @@ test('claude: a stop that arrives before the query exists is honoured', async ()
   assert.equal(await runtime.abortClaudeSDKSession('app-early'), false, 'no stale pending abort');
 });
 
+test('claude: a stop during setup next to a held process spawns no new CLI', async () => {
+  let release!: () => void;
+  const gate = new Promise<void>((resolve) => { release = resolve; });
+  let calls = 0;
+  const { runtime, sdk, context } = await setup(async () => { calls += 1; if (calls > 1) await gate; return undefined; });
+  const first = writer();
+  const held = runtime.queryClaudeSDK('start', { sessionId: 'app-held', cwd: '/tmp' }, first, context);
+  await until(() => sdk.processes[0]?.prompts.length === 1);
+  sdk.processes[0].emit({ type: 'system', subtype: 'task_started', task_id: 't1' });
+  sdk.processes[0].emit({ type: 'result', subtype: 'success', is_error: false });
+  await until(() => first.events.some((event) => event.kind === 'complete'));
+
+  const next = runtime.queryClaudeSDK('next', { sessionId: 'app-held', cwd: '/tmp' }, writer(), context);
+  await until(() => calls === 2);
+  assert.equal(await runtime.abortClaudeSDKSession('app-held'), true);
+  release();
+  await Promise.all([held, next]);
+  assert.equal(sdk.processes.length, 1, 'the stopped turn never spawns a CLI');
+});
+
 test('claude: permission mode changes apply live and do not respawn a held process', async () => {
   const { runtime, sdk, context, storedModes } = await setup();
   const options = { sessionId: 'app-mode', cwd: '/tmp', permissionMode: 'plan' };

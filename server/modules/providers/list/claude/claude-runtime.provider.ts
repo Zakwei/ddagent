@@ -1638,7 +1638,9 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
       error
     });
   } finally {
-    if (startKey) {
+    // A spawned run cleared its own entries on registration; by now they may
+    // belong to the session's next turn, which is still being set up.
+    if (startKey && !queryInstance) {
       startingRuns.delete(startKey);
       pendingAborts.delete(startKey);
     }
@@ -1723,6 +1725,9 @@ export async function abortClaudeSDKSession(sessionId: any) {
     if (getSession(sessionId) === session) {
       removeSession(sessionId);
     }
+    // A turn still being set up next to a held process would otherwise spawn
+    // a fresh CLI after this Stop: park the abort for it as well.
+    if (startingRuns.has(sessionId)) pendingAborts.add(sessionId);
 
     return true;
   } catch (error: any) {
