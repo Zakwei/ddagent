@@ -1854,6 +1854,9 @@ export async function spawnOpenCode(
         }
 
         const { providerID, modelID } = splitModelRef(resolvedModel);
+        if (modelID && !providerID) {
+          throw new Error(`OpenCode model "${resolvedModel}" is not a provider/model id (e.g. opencode/big-pickle).`);
+        }
 
         if (run.aborted || run.completeSent) {
           // The run settled while the session was being set up — posting the
@@ -1883,7 +1886,7 @@ export async function spawnOpenCode(
         );
 
         if (status >= 400) {
-          throw new Error(`OpenCode prompt failed (HTTP ${status}): ${JSON.stringify(data)}`);
+          throw new Error(`OpenCode prompt failed (HTTP ${status}): ${extractOpenCodeErrorMessage(data) ?? JSON.stringify(data)}`);
         }
 
         if (run.aborted) {
