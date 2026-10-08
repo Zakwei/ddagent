@@ -1065,6 +1065,8 @@ class Translations$chat$claudeStatus$it extends Translations$chat$claudeStatus$e
 		one: '${count} attività in background in corso',
 		other: '${count} attività in background in corso',
 	);
+	@override String get backgroundTasksTitle => 'In esecuzione in background';
+	@override String get backgroundTaskUnnamed => 'Attività senza nome';
 }
 
 // Path: chat.projectSelection
@@ -7264,6 +7266,8 @@ extension on TranslationsIt {
 			'chat.claudeStatus.providers.assistant' => 'Assistente',
 			'chat.claudeStatus.stop' => 'Ferma',
 			'chat.claudeStatus.backgroundTasks' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('it'))(count, one: '${count} attività in background in corso', other: '${count} attività in background in corso', ), 
+			'chat.claudeStatus.backgroundTasksTitle' => 'In esecuzione in background',
+			'chat.claudeStatus.backgroundTaskUnnamed' => 'Attività senza nome',
 			'chat.projectSelection.startChatWithProvider' => ({required Object provider}) => 'Seleziona un progetto per iniziare a chattare con ${provider}',
 			'chat.tasks.nextTaskPrompt' => 'Inizia l\'attività successiva',
 			'chat.voice.autoRead' => 'Leggi le risposte ad alta voce',
@@ -7528,10 +7532,10 @@ extension on TranslationsIt {
 			'common.mainContent.loading' => 'Caricamento ddagent',
 			'common.mainContent.settingUpWorkspace' => 'Preparazione dell\'area di lavoro...',
 			'common.mainContent.chooseProject' => 'Scegli il tuo progetto',
-			'common.mainContent.selectProjectDescription' => 'Seleziona un progetto dalla barra laterale per iniziare a programmare con Claude. Ogni progetto contiene le tue sessioni di chat e la cronologia dei file.',
-			'common.mainContent.tip' => 'Suggerimento',
 			_ => null,
 		} ?? switch (path) {
+			'common.mainContent.selectProjectDescription' => 'Seleziona un progetto dalla barra laterale per iniziare a programmare con Claude. Ogni progetto contiene le tue sessioni di chat e la cronologia dei file.',
+			'common.mainContent.tip' => 'Suggerimento',
 			'common.mainContent.createProjectMobile' => 'Tocca il pulsante menu in alto per accedere ai progetti',
 			'common.mainContent.createProjectDesktop' => 'Crea un nuovo progetto cliccando l\'icona cartella nella barra laterale',
 			'common.mainContent.newSession' => 'Nuova sessione',
@@ -8042,10 +8046,10 @@ extension on TranslationsIt {
 			'common.gitPanel.history.removed' => 'Rimosse',
 			'common.gitPanel.mergeWorktree.cleanupDesc' => 'Rimuovi il worktree ed elimina il suo branch una volta fuso',
 			'common.gitPanel.mergeWorktree.cleanupLabel' => 'Pulisci dopo il merge',
-			'common.gitPanel.mergeWorktree.commitCount' => ({required Object count}) => '${count} commit',
-			'common.gitPanel.mergeWorktree.merge' => 'Fondi',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.mergeWorktree.commitCount' => ({required Object count}) => '${count} commit',
+			'common.gitPanel.mergeWorktree.merge' => 'Fondi',
 			'common.gitPanel.mergeWorktree.mergeMessage' => ({required Object branch}) => 'Fondi il branch \'${branch}\'',
 			'common.gitPanel.mergeWorktree.messageLabel' => 'Messaggio di commit',
 			'common.gitPanel.mergeWorktree.squashDesc' => ({required Object commits, required Object branch}) => 'Combina tutti i ${commits} in un singolo commit su ${branch}',
@@ -8556,10 +8560,10 @@ extension on TranslationsIt {
 			'settings.agents.account.codex.description' => 'Assistente AI OpenAI Codex',
 			'settings.agents.account.opencode.description' => 'Assistente CLI OpenCode',
 			'settings.agents.account.commandcode.description' => 'Assistente CLI Command Code',
-			'settings.agents.account.antigravity.description' => 'Assistente CLI Antigravity',
-			'settings.agents.account.devin.description' => 'Assistente CLI Devin',
 			_ => null,
 		} ?? switch (path) {
+			'settings.agents.account.antigravity.description' => 'Assistente CLI Antigravity',
+			'settings.agents.account.devin.description' => 'Assistente CLI Devin',
 			'settings.agents.connectionStatus' => 'Stato connessione',
 			'settings.agents.login.title' => 'Accedi',
 			'settings.agents.login.reAuthenticate' => 'Ri-autenticati',
@@ -9070,10 +9074,10 @@ extension on TranslationsIt {
 			'tasks.nextTask.hideDetails' => 'Nascondi dettagli',
 			'tasks.nextTask.initialize' => 'Inizializza',
 			'tasks.nextTask.noPending' => 'Nessuna attività in sospeso',
-			'tasks.nextTask.notConfigured' => 'TaskMaster AI non è configurato',
-			'tasks.nextTask.review' => 'Revisiona',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.nextTask.notConfigured' => 'TaskMaster AI non è configurato',
+			'tasks.nextTask.review' => 'Revisiona',
 			'tasks.nextTask.startTask' => 'Avvia attività',
 			'tasks.nextTask.taskId' => ({required Object id}) => 'Attività ${id}',
 			'tasks.nextTask.viewAll' => 'Vedi tutte le attività',

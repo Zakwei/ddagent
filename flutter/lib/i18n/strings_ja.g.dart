@@ -1064,6 +1064,8 @@ class Translations$chat$claudeStatus$ja extends Translations$chat$claudeStatus$e
 	@override String backgroundTasks({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ja'))(count,
 		other: 'バックグラウンドタスク ${count} 件を実行中',
 	);
+	@override String get backgroundTasksTitle => 'バックグラウンドで実行中';
+	@override String get backgroundTaskUnnamed => '名前のないタスク';
 }
 
 // Path: chat.voice
@@ -7263,6 +7265,8 @@ extension on TranslationsJa {
 			'chat.claudeStatus.providers.assistant' => 'アシスタント',
 			'chat.claudeStatus.stop' => '停止',
 			'chat.claudeStatus.backgroundTasks' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ja'))(count, other: 'バックグラウンドタスク ${count} 件を実行中', ), 
+			'chat.claudeStatus.backgroundTasksTitle' => 'バックグラウンドで実行中',
+			'chat.claudeStatus.backgroundTaskUnnamed' => '名前のないタスク',
 			'chat.voice.autoRead' => '返信を読み上げる',
 			'chat.voice.autoReadOn' => '返信の読み上げ: オン',
 			'chat.voice.autoReadOff' => '返信の読み上げ: オフ',
@@ -7527,10 +7531,10 @@ extension on TranslationsJa {
 			'common.mainContent.loading' => 'ddagent を読み込んでいます',
 			'common.mainContent.settingUpWorkspace' => 'ワークスペースを準備しています...',
 			'common.mainContent.chooseProject' => 'プロジェクトを選択',
-			'common.mainContent.selectProjectDescription' => 'サイドバーからプロジェクトを選択して、Claudeとコーディングを始めましょう。各プロジェクトにはチャットセッションとファイル履歴が含まれています。',
-			'common.mainContent.tip' => 'ヒント',
 			_ => null,
 		} ?? switch (path) {
+			'common.mainContent.selectProjectDescription' => 'サイドバーからプロジェクトを選択して、Claudeとコーディングを始めましょう。各プロジェクトにはチャットセッションとファイル履歴が含まれています。',
+			'common.mainContent.tip' => 'ヒント',
 			'common.mainContent.createProjectMobile' => '上部のメニューボタンからプロジェクトにアクセスできます',
 			'common.mainContent.createProjectDesktop' => 'サイドバーのフォルダアイコンをクリックして新しいプロジェクトを作成できます',
 			'common.mainContent.newSession' => '新しいセッション',
@@ -8041,10 +8045,10 @@ extension on TranslationsJa {
 			'common.gitPanel.history.removed' => '削除',
 			'common.gitPanel.mergeWorktree.cleanupDesc' => 'マージ後に worktree を削除し、そのブランチを削除する',
 			'common.gitPanel.mergeWorktree.cleanupLabel' => 'マージ後にクリーンアップ',
-			'common.gitPanel.mergeWorktree.commitCount' => ({required Object count}) => '${count} コミット',
-			'common.gitPanel.mergeWorktree.merge' => 'マージ',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.mergeWorktree.commitCount' => ({required Object count}) => '${count} コミット',
+			'common.gitPanel.mergeWorktree.merge' => 'マージ',
 			'common.gitPanel.mergeWorktree.mergeMessage' => ({required Object branch}) => 'ブランチ \'${branch}\' をマージ',
 			'common.gitPanel.mergeWorktree.messageLabel' => 'コミットメッセージ',
 			'common.gitPanel.mergeWorktree.squashDesc' => ({required Object commits, required Object branch}) => '${commits} 件すべてを ${branch} 上の1つのコミットにまとめる',
@@ -8555,10 +8559,10 @@ extension on TranslationsJa {
 			'settings.agents.account.codex.description' => 'OpenAI Codex AIアシスタント',
 			'settings.agents.account.opencode.description' => 'OpenCode CLI アシスタント',
 			'settings.agents.account.commandcode.description' => 'Command Code CLI アシスタント',
-			'settings.agents.account.antigravity.description' => 'Antigravity CLI アシスタント',
-			'settings.agents.account.devin.description' => 'Devin CLI アシスタント',
 			_ => null,
 		} ?? switch (path) {
+			'settings.agents.account.antigravity.description' => 'Antigravity CLI アシスタント',
+			'settings.agents.account.devin.description' => 'Devin CLI アシスタント',
 			'settings.agents.connectionStatus' => '接続状態',
 			'settings.agents.login.title' => 'ログイン',
 			'settings.agents.login.reAuthenticate' => '再認証',
@@ -9069,10 +9073,10 @@ extension on TranslationsJa {
 			'tasks.nextTask.hideDetails' => '詳細を隠す',
 			'tasks.nextTask.initialize' => '初期化',
 			'tasks.nextTask.noPending' => '保留中のタスクはありません',
-			'tasks.nextTask.notConfigured' => 'TaskMaster AI が設定されていません',
-			'tasks.nextTask.review' => '確認',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.nextTask.notConfigured' => 'TaskMaster AI が設定されていません',
+			'tasks.nextTask.review' => '確認',
 			'tasks.nextTask.startTask' => 'タスクを開始',
 			'tasks.nextTask.taskId' => ({required Object id}) => 'タスク ${id}',
 			'tasks.nextTask.viewAll' => 'すべてのタスクを表示',

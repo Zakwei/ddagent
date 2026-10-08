@@ -1067,6 +1067,8 @@ class Translations$chat$claudeStatus$ru extends Translations$chat$claudeStatus$e
 		many: 'Выполняется ${count} фоновых задач',
 		other: 'Выполняется ${count} фоновой задачи',
 	);
+	@override String get backgroundTasksTitle => 'Выполняется в фоне';
+	@override String get backgroundTaskUnnamed => 'Задача без названия';
 }
 
 // Path: chat.projectSelection
@@ -7272,6 +7274,8 @@ extension on TranslationsRu {
 			'chat.claudeStatus.providers.assistant' => 'Ассистент',
 			'chat.claudeStatus.stop' => 'Остановить',
 			'chat.claudeStatus.backgroundTasks' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(count, one: 'Выполняется ${count} фоновая задача', few: 'Выполняются ${count} фоновые задачи', many: 'Выполняется ${count} фоновых задач', other: 'Выполняется ${count} фоновой задачи', ), 
+			'chat.claudeStatus.backgroundTasksTitle' => 'Выполняется в фоне',
+			'chat.claudeStatus.backgroundTaskUnnamed' => 'Задача без названия',
 			'chat.projectSelection.startChatWithProvider' => ({required Object provider}) => 'Выберите проект для начала чата с ${provider}',
 			'chat.tasks.nextTaskPrompt' => 'Начать следующую задачу',
 			'chat.voice.autoRead' => 'Читать ответы вслух',
@@ -7536,10 +7540,10 @@ extension on TranslationsRu {
 			'common.mainContent.loading' => 'Загрузка ddagent',
 			'common.mainContent.settingUpWorkspace' => 'Настройка рабочего пространства...',
 			'common.mainContent.chooseProject' => 'Выберите проект',
-			'common.mainContent.selectProjectDescription' => 'Выберите проект на боковой панели, чтобы начать работу с Claude. Каждый проект содержит ваши сеансы чата и историю файлов.',
-			'common.mainContent.tip' => 'Совет',
 			_ => null,
 		} ?? switch (path) {
+			'common.mainContent.selectProjectDescription' => 'Выберите проект на боковой панели, чтобы начать работу с Claude. Каждый проект содержит ваши сеансы чата и историю файлов.',
+			'common.mainContent.tip' => 'Совет',
 			'common.mainContent.createProjectMobile' => 'Нажмите кнопку меню выше для доступа к проектам',
 			'common.mainContent.createProjectDesktop' => 'Создайте новый проект, нажав на значок папки на боковой панели',
 			'common.mainContent.newSession' => 'Новый сеанс',
@@ -8050,10 +8054,10 @@ extension on TranslationsRu {
 			'common.gitPanel.history.removed' => 'Удалено',
 			'common.gitPanel.mergeWorktree.cleanupDesc' => 'Удалить worktree и его ветку после слияния',
 			'common.gitPanel.mergeWorktree.cleanupLabel' => 'Очистить после слияния',
-			'common.gitPanel.mergeWorktree.commitCount' => ({required Object count}) => '${count} коммит(ов)',
-			'common.gitPanel.mergeWorktree.merge' => 'Слить',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.mergeWorktree.commitCount' => ({required Object count}) => '${count} коммит(ов)',
+			'common.gitPanel.mergeWorktree.merge' => 'Слить',
 			'common.gitPanel.mergeWorktree.mergeMessage' => ({required Object branch}) => 'Слить ветку \'${branch}\'',
 			'common.gitPanel.mergeWorktree.messageLabel' => 'Сообщение коммита',
 			'common.gitPanel.mergeWorktree.squashDesc' => ({required Object commits, required Object branch}) => 'Объединить все ${commits} в один коммит в ${branch}',
@@ -8564,10 +8568,10 @@ extension on TranslationsRu {
 			'settings.agents.account.codex.description' => 'AI-ассистент OpenAI Codex',
 			'settings.agents.account.opencode.description' => 'CLI-ассистент OpenCode',
 			'settings.agents.account.commandcode.description' => 'CLI-ассистент Command Code',
-			'settings.agents.account.antigravity.description' => 'CLI-ассистент Antigravity',
-			'settings.agents.account.devin.description' => 'CLI-ассистент Devin',
 			_ => null,
 		} ?? switch (path) {
+			'settings.agents.account.antigravity.description' => 'CLI-ассистент Antigravity',
+			'settings.agents.account.devin.description' => 'CLI-ассистент Devin',
 			'settings.agents.connectionStatus' => 'Статус подключения',
 			'settings.agents.login.title' => 'Вход',
 			'settings.agents.login.reAuthenticate' => 'Повторная аутентификация',
@@ -9078,10 +9082,10 @@ extension on TranslationsRu {
 			'tasks.nextTask.hideDetails' => 'Скрыть детали',
 			'tasks.nextTask.initialize' => 'Инициализировать',
 			'tasks.nextTask.noPending' => 'Нет ожидающих задач',
-			'tasks.nextTask.notConfigured' => 'TaskMaster AI не настроен',
-			'tasks.nextTask.review' => 'Проверить',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.nextTask.notConfigured' => 'TaskMaster AI не настроен',
+			'tasks.nextTask.review' => 'Проверить',
 			'tasks.nextTask.startTask' => 'Начать задачу',
 			'tasks.nextTask.taskId' => ({required Object id}) => 'Задача ${id}',
 			'tasks.nextTask.viewAll' => 'Все задачи',

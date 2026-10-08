@@ -690,9 +690,15 @@ class TranscriptController extends Notifier<TranscriptState> {
     // Work outliving the turn (Claude subagents, background shells) — reported
     // after the turn's `complete` too, so it must not touch run/row state.
     if (e.kind == 'background_tasks') {
+      final tasks = raw['tasks'] is List
+          ? [
+              for (final task in raw['tasks'] as List)
+                if (task is Map) BackgroundTask.fromJson(Map<String, dynamic>.from(task)),
+            ]
+          : const <BackgroundTask>[];
       ref
           .read(backgroundTasksProvider.notifier)
-          .setCount(_sessionId, (raw['count'] as num?)?.toInt() ?? 0);
+          .set(_sessionId, (raw['count'] as num?)?.toInt() ?? tasks.length, tasks);
       return;
     }
     final provider = raw['provider']?.toString() ?? '';

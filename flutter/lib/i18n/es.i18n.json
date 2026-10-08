@@ -346,7 +346,9 @@
       },
       "providers": {
         "assistant": "Asistente"
-      }
+      },
+      "backgroundTasksTitle": "En segundo plano",
+      "backgroundTaskUnnamed": "Tarea sin nombre"
     },
     "projectSelection": {
       "startChatWithProvider": "Selecciona un proyecto para empezar a chatear con {{provider}}"

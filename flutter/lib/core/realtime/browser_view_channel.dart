@@ -73,6 +73,28 @@ class BrowserViewChannel {
   Future<void> connect() => _ws.connect();
   Future<void> close() => _ws.close();
 
+  int _views = 0;
+
+  /// A view mounts: always start from a fresh socket. Reusing a live one would
+  /// leave the server-side page bound to the old view (`start` is ignored once
+  /// a session exists, so the new view never sees `ready`), and calling
+  /// [connect] on an open client orphans the previous socket — and with it a
+  /// whole Chromium process the server only frees on socket close.
+  Future<void> attach() async {
+    _views++;
+    await _ws.close();
+    await _ws.connect();
+  }
+
+  /// A view unmounts: once none is left, close the socket so the server tears
+  /// the Chromium session down instead of streaming frames to nobody. A pane
+  /// moving within the tree attaches its new state before the old one
+  /// detaches, so the count never touches zero in that case.
+  void detach() {
+    if (_views > 0) _views--;
+    if (_views == 0) unawaited(_ws.close());
+  }
+
   Future<void> dispose() async {
     await _sub?.cancel();
     await _framesOut.close();

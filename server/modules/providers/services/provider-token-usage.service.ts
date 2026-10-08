@@ -84,10 +84,11 @@ const defaultDependencies: ProviderTokenUsageServiceDependencies = {
 const DEFAULT_CLAUDE_CONTEXT_WINDOW = 200_000;
 
 /**
- * Real context windows reported by the Claude SDK (`result.modelUsage[*]
- * .contextWindow`). Transcripts never record the window, so the REST snapshot
- * reuses what a live run learned: first for the exact session, then for the
- * model (covers a reload after the run that taught it, until the next restart).
+ * Real context windows reported by the Claude CLI (`getContextUsage()` at
+ * process start, `result.modelUsage[*].contextWindow` per turn). Transcripts
+ * never record the window, so the REST snapshot reuses what a live run learned:
+ * first for the exact session, then the value persisted on the session row,
+ * then for the model (until the next restart).
  */
 const learnedClaudeContextWindows = {
   bySession: new Map<string, number>(),
@@ -100,19 +101,35 @@ function normalizeClaudeModelKey(model: string): string {
 }
 
 /**
+ * Used by the Claude runtime (same module) when the CLI reports the window up
+ * front (`getContextUsage()`), and by {@link rememberClaudeContextWindow}:
+ * records one window for the session and the model.
+ */
+export function recordClaudeContextWindow(
+  providerSessionId: string | null | undefined,
+  model: string | null | undefined,
+  contextWindow: number,
+): void {
+  if (!(contextWindow > 0)) return;
+  if (providerSessionId) learnedClaudeContextWindows.bySession.set(providerSessionId, contextWindow);
+  if (model) learnedClaudeContextWindows.byModel.set(normalizeClaudeModelKey(model), contextWindow);
+}
+
+/**
  * Used by the Claude runtime (same module) on every SDK `result`: records the
  * context window from `modelUsage` so live frames and REST snapshots show the
  * real value. `modelUsage` also lists helper models (e.g. Haiku for titles), so
  * the entry matching the turn's main model wins, else the busiest one.
+ * Returns the recorded window, or 0 when `modelUsage` carried none.
  */
 export function rememberClaudeContextWindow(
   providerSessionId: string | null | undefined,
   model: string | null | undefined,
   modelUsage: unknown,
-): void {
-  if (!modelUsage || typeof modelUsage !== 'object') return;
+): number {
+  if (!modelUsage || typeof modelUsage !== 'object') return 0;
   const entries = Object.entries(modelUsage as Record<string, AnyRecord | null>);
-  if (entries.length === 0) return;
+  if (entries.length === 0) return 0;
 
   const modelKey = model ? normalizeClaudeModelKey(model) : null;
   const promptTokens = (usage: AnyRecord | null) => readUsageNumber(usage?.inputTokens)
@@ -122,22 +139,25 @@ export function rememberClaudeContextWindow(
     ?? entries.reduce((best, entry) => (promptTokens(entry[1]) > promptTokens(best[1]) ? entry : best));
 
   const contextWindow = readUsageNumber(matchedUsage?.contextWindow);
-  if (contextWindow <= 0) return;
-  if (providerSessionId) learnedClaudeContextWindows.bySession.set(providerSessionId, contextWindow);
-  learnedClaudeContextWindows.byModel.set(normalizeClaudeModelKey(model || matchedModel), contextWindow);
+  if (contextWindow <= 0) return 0;
+  recordClaudeContextWindow(providerSessionId, model || matchedModel, contextWindow);
+  return contextWindow;
 }
 
 /**
  * Used by the Claude runtime (same module) and the REST snapshot below to pick
- * the context window: SDK-learned value for the session, then for the model,
- * then the `CONTEXT_WINDOW` override, then {@link DEFAULT_CLAUDE_CONTEXT_WINDOW}.
+ * the context window: SDK-learned value for the session, then the window
+ * persisted on the session row, then the one learned for the model, then the
+ * `CONTEXT_WINDOW` override, then {@link DEFAULT_CLAUDE_CONTEXT_WINDOW}.
  */
 export function resolveClaudeContextWindow(
   providerSessionId: string | null | undefined,
   model: string | null | undefined,
   configuredContextWindow: string | undefined = process.env.CONTEXT_WINDOW,
+  storedContextWindow: number | null | undefined = null,
 ): number {
   const learned = (providerSessionId && learnedClaudeContextWindows.bySession.get(providerSessionId))
+    || (storedContextWindow && storedContextWindow > 0 ? storedContextWindow : 0)
     || (model && learnedClaudeContextWindows.byModel.get(normalizeClaudeModelKey(model)));
   if (learned) return learned;
   const configured = Number.parseInt(configuredContextWindow ?? '', 10);
@@ -309,6 +329,7 @@ function readClaudeTokenUsage(
   fileContent: string,
   providerSessionId: string,
   configuredContextWindow: string | undefined,
+  storedContextWindow: number | null | undefined,
 ): TokenUsageResult {
   let inputTokens = 0;
   let outputTokens = 0;
@@ -348,7 +369,12 @@ function readClaudeTokenUsage(
     }
   }
 
-  const contextWindow = resolveClaudeContextWindow(providerSessionId, model, configuredContextWindow);
+  const contextWindow = resolveClaudeContextWindow(
+    providerSessionId,
+    model,
+    configuredContextWindow,
+    storedContextWindow,
+  );
   const cacheTokens = cacheReadTokens + cacheCreationTokens;
 
   return {
@@ -684,7 +710,12 @@ export function createProviderTokenUsageService(
       return readTokenUsageTail(
         dependencies,
         sessionFilePath,
-        (content) => readClaudeTokenUsage(content, providerSessionId, dependencies.getClaudeContextWindow()),
+        (content) => readClaudeTokenUsage(
+          content,
+          providerSessionId,
+          dependencies.getClaudeContextWindow(),
+          session.context_window,
+        ),
         hasTokenUsage,
       );
     },

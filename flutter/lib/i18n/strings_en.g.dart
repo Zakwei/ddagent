@@ -1853,6 +1853,12 @@ class Translations$chat$claudeStatus$en {
 
 	late final Translations$chat$claudeStatus$controls$en controls = Translations$chat$claudeStatus$controls$en.internal(_root);
 	late final Translations$chat$claudeStatus$providers$en providers = Translations$chat$claudeStatus$providers$en.internal(_root);
+
+	/// en: 'Running in the background'
+	String get backgroundTasksTitle => 'Running in the background';
+
+	/// en: 'Unnamed task'
+	String get backgroundTaskUnnamed => 'Unnamed task';
 }
 
 // Path: chat.projectSelection
@@ -13804,6 +13810,8 @@ extension on Translations {
 			'chat.claudeStatus.controls.stopGeneration' => 'Stop Generation',
 			'chat.claudeStatus.controls.pressEscToStop' => 'Press Esc anytime to stop',
 			'chat.claudeStatus.providers.assistant' => 'Assistant',
+			'chat.claudeStatus.backgroundTasksTitle' => 'Running in the background',
+			'chat.claudeStatus.backgroundTaskUnnamed' => 'Unnamed task',
 			'chat.projectSelection.startChatWithProvider' => ({required Object provider}) => 'Select a project to start chatting with ${provider}',
 			'chat.tasks.nextTaskPrompt' => 'Start the next task',
 			'chat.splitSession.toggle' => 'Split Session',
@@ -13968,10 +13976,10 @@ extension on Translations {
 			'codeEditor.mediaFile.subtitle' => 'Audio/video preview is not supported yet',
 			'codeEditor.failedToLoad' => 'Failed to load file',
 			'codeEditor.hexDump.more' => ({required Object size}) => '… ${size} more',
-			'codeEditor.settings.minimap' => 'Minimap',
-			'codeEditor.settings.tabSize' => ({required Object size}) => 'Tab size: ${size}',
 			_ => null,
 		} ?? switch (path) {
+			'codeEditor.settings.minimap' => 'Minimap',
+			'codeEditor.settings.tabSize' => ({required Object size}) => 'Tab size: ${size}',
 			'codeEditor.settings.fontSizeDecrease' => ({required Object size}) => 'Font size −  (now ${size})',
 			'codeEditor.settings.fontSizeIncrease' => 'Font size +',
 			'codeEditor.diff.noChanges' => 'No changes',
@@ -14482,10 +14490,10 @@ extension on Translations {
 			'common.commandPalette.placeholder' => 'Type to search anything…',
 			'common.commandPalette.searchPagePlaceholder' => ({required Object page}) => 'Search ${page}…',
 			'common.commandPalette.title' => 'Command palette',
-			'common.gitPanel.ahead' => ({required Object count}) => '${count} ahead',
-			'common.gitPanel.aheadLabel' => 'ahead',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.ahead' => ({required Object count}) => '${count} ahead',
+			'common.gitPanel.aheadLabel' => 'ahead',
 			'common.gitPanel.aiSuggest' => 'AI suggest',
 			'common.gitPanel.aiSuggestTitle' => 'Generate a commit message with AI',
 			'common.gitPanel.all' => 'All',
@@ -14996,10 +15004,10 @@ extension on Translations {
 			'settings.orchestration.execution.retryClasses.timeout' => 'Timeout',
 			'settings.orchestration.execution.retryClasses.transient' => 'Transient',
 			'settings.orchestration.save.unsaved' => 'Unsaved changes',
-			'settings.orchestration.save.save' => 'Save',
-			'settings.orchestration.save.saving' => 'Saving…',
 			_ => null,
 		} ?? switch (path) {
+			'settings.orchestration.save.save' => 'Save',
+			'settings.orchestration.save.saving' => 'Saving…',
 			'settings.orchestration.save.saved' => 'Saved',
 			'settings.orchestration.save.discard' => 'Discard',
 			'settings.orchestration.save.error' => 'Save failed',
@@ -15510,10 +15518,10 @@ extension on Translations {
 			'sidebar.time.justNow' => 'Just now',
 			'sidebar.time.oneMinuteAgo' => '1 min ago',
 			'sidebar.time.minutesAgo' => ({required Object count}) => '${count} mins ago',
-			'sidebar.time.oneHourAgo' => '1 hour ago',
-			'sidebar.time.hoursAgo' => ({required Object count}) => '${count} hours ago',
 			_ => null,
 		} ?? switch (path) {
+			'sidebar.time.oneHourAgo' => '1 hour ago',
+			'sidebar.time.hoursAgo' => ({required Object count}) => '${count} hours ago',
 			'sidebar.time.oneDayAgo' => '1 day ago',
 			'sidebar.time.daysAgo' => ({required Object count}) => '${count} days ago',
 			'sidebar.messages.deleteConfirm' => 'Are you sure you want to delete this?',
@@ -16024,10 +16032,10 @@ extension on Translations {
 			'mcp.servers.addGlobalTitle' => 'Add Global MCP Server',
 			'mcp.servers.addGlobalDescription' => 'Adds this MCP server to every provider: Claude, Cursor, Codex, OpenCode, and Devin. Only stdio and HTTP transports are supported because the same config must work across all providers.',
 			'mcp.servers.addGlobalMenuDescription' => 'Add Global MCP Server writes one common stdio or HTTP server to Claude, Cursor, Codex, OpenCode, and Devin.',
-			'mcp.servers.addProviderTitle' => ({required Object provider}) => 'Add ${provider} MCP Server',
-			'mcp.servers.addProviderDescription' => ({required Object provider}) => 'Add ${provider} MCP Server only changes ${provider}.',
 			_ => null,
 		} ?? switch (path) {
+			'mcp.servers.addProviderTitle' => ({required Object provider}) => 'Add ${provider} MCP Server',
+			'mcp.servers.addProviderDescription' => ({required Object provider}) => 'Add ${provider} MCP Server only changes ${provider}.',
 			'mcp.servers.config.cwd' => 'Cwd',
 			'mcp.servers.config.envVars' => 'Env Vars',
 			'mcp.team.title' => 'Team MCP Configs',

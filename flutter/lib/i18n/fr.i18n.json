@@ -335,7 +335,9 @@
       "backgroundTasks(param=count)": {
         "one": "{{count}} tâche en arrière-plan en cours",
         "other": "{{count}} tâches en arrière-plan en cours"
-      }
+      },
+      "backgroundTasksTitle": "En arrière-plan",
+      "backgroundTaskUnnamed": "Tâche sans nom"
     },
     "projectSelection": {
       "startChatWithProvider": "Sélectionnez un projet pour commencer à chatter avec {{provider}}"

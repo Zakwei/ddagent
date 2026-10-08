@@ -7,6 +7,7 @@ import 'package:ddagent_app/features/sessions/state/session_activity.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// opencode TUI spinner frames, advanced every 80 ms (web `ActivityIndicator`).
 const _spinnerFrames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
@@ -42,6 +43,7 @@ class _ActivityIndicatorState extends ConsumerState<ActivityIndicator> {
   SessionActivity? _rendered;
   bool _hasPendingPermissions = false;
   int _backgroundTasks = 0;
+  List<BackgroundTask> _backgroundTaskList = const [];
 
   @override
   void initState() {
@@ -76,6 +78,48 @@ class _ActivityIndicatorState extends ConsumerState<ActivityIndicator> {
     super.dispose();
   }
 
+  /// What is running in the background — the agent's own task descriptions.
+  Future<void> _showBackgroundTasks(BuildContext context) {
+    final cs = Translations.of(context).chat.claudeStatus;
+    final tasks = _backgroundTaskList;
+    return showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(cs.backgroundTasksTitle),
+        content: SizedBox(
+          width: 420,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(cs.backgroundTasks(count: _backgroundTasks)),
+              const SizedBox(height: 8),
+              for (final task in tasks)
+                ListTile(
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  leading: Icon(switch (task.type) {
+                    'local_agent' || 'remote_agent' => LucideIcons.bot,
+                    'local_bash' => LucideIcons.squareTerminal,
+                    _ => LucideIcons.layers,
+                  }, size: 16),
+                  title: Text(
+                    task.description.isEmpty ? cs.backgroundTaskUnnamed : task.description,
+                  ),
+                ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(Translations.of(dialogContext).chat.common.close),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final activity = ref.watch(sessionActivityProvider.select((m) => m[widget.sessionId]));
@@ -84,7 +128,9 @@ class _ActivityIndicatorState extends ConsumerState<ActivityIndicator> {
     _hasPendingPermissions = ref.watch(
       sessionPendingPermissionsProvider(widget.sessionId).select((list) => list.isNotEmpty),
     );
-    _backgroundTasks = ref.watch(backgroundTasksProvider.select((m) => m[widget.sessionId] ?? 0));
+    final background = ref.watch(backgroundTasksProvider.select((m) => m[widget.sessionId]));
+    _backgroundTasks = background?.count ?? 0;
+    _backgroundTaskList = background?.tasks ?? const [];
 
     if (activity != null && activity != _rendered) {
       _rendered = activity;
@@ -105,6 +151,7 @@ class _ActivityIndicatorState extends ConsumerState<ActivityIndicator> {
     final cs = t.chat.claudeStatus;
     final backgroundPill = _backgroundTasks > 0
         ? _Pill(
+            onTap: () => unawaited(_showBackgroundTasks(context)),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [

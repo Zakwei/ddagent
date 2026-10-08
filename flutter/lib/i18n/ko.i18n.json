@@ -334,7 +334,9 @@
       },
       "providers": {
         "assistant": "어시스턴트"
-      }
+      },
+      "backgroundTasksTitle": "백그라운드에서 실행 중",
+      "backgroundTaskUnnamed": "이름 없는 작업"
     },
     "projectSelection": {
       "startChatWithProvider": "{{provider}}와 채팅을 시작하려면 프로젝트를 선택하세요"

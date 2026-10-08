@@ -334,7 +334,9 @@
       "stop": "停止",
       "backgroundTasks(param=count)": {
         "other": "バックグラウンドタスク {{count}} 件を実行中"
-      }
+      },
+      "backgroundTasksTitle": "バックグラウンドで実行中",
+      "backgroundTaskUnnamed": "名前のないタスク"
     },
     "voice": {
       "autoRead": "返信を読み上げる",

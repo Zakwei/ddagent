@@ -449,7 +449,9 @@
       },
       "providers": {
         "assistant": "Asystent"
-      }
+      },
+      "backgroundTasksTitle": "Działa w tle",
+      "backgroundTaskUnnamed": "Zadanie bez nazwy"
     },
     "projectSelection": {
       "startChatWithProvider": "Wybierz projekt, aby rozpocząć rozmowę z {{provider}}"

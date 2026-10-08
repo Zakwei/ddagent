@@ -334,7 +334,9 @@
       "stop": "停止",
       "backgroundTasks(param=count)": {
         "other": "{{count}} 個背景工作正在執行"
-      }
+      },
+      "backgroundTasksTitle": "正在背景執行",
+      "backgroundTaskUnnamed": "未命名的工作"
     },
     "projectSelection": {
       "startChatWithProvider": "選擇一個專案以開始與 {{provider}} 聊天"

@@ -414,10 +414,23 @@ void main() {
       'kind': 'background_tasks',
       'provider': 'claude',
       'count': 2,
+      'tasks': [
+        {'id': 't1', 'description': 'Run checkout tests', 'type': 'local_bash'},
+        {'id': 't2', 'description': 'Review the payment module', 'type': 'local_agent'},
+      ],
     });
     await tester.pump();
     expectRunning(false);
     expect(find.text('2 background tasks running'), findsOneWidget);
+    // Tapping the pill says what is running.
+    await tester.tap(find.text('2 background tasks running'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('Run checkout tests'), findsOneWidget);
+    expect(find.text('Review the payment module'), findsOneWidget);
+    await tester.tap(find.text('Close'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
     // Idle composer: the user can keep talking while the agents work.
     expect(find.byIcon(Icons.send), findsOneWidget);
 

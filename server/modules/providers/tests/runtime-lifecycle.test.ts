@@ -873,7 +873,9 @@ test('claude: a message sent while a background agent runs joins the live proces
   proc.emit({ type: 'assistant', message: { content: [{ type: 'text', text: 'pong' }] } });
   proc.emit({ type: 'result' });
   await secondRun;
-  assert.deepEqual(second.kinds().filter((kind) => kind !== 'status'), ['text', 'complete']);
+  // The injected turn's run opens with the live task list (t1 still running).
+  assert.deepEqual(second.kinds().filter((kind) => kind !== 'status'), ['background_tasks', 'text', 'complete']);
+  assert.deepEqual(second.events[0].tasks.map((task: { id: string }) => task.id), ['t1']);
   assert.equal(first.kinds().filter((kind) => kind === 'complete').length, 1);
 
   // t1 reports back in a turn the CLI starts on its own — it gets its own run.
@@ -884,9 +886,9 @@ test('claude: a message sent while a background agent runs joins the live proces
   proc.end();
   await firstRun;
   assert.equal(opened, 1);
-  assert.deepEqual(followUp.kinds().filter((kind) => kind !== 'status'), ['text', 'complete']);
+  assert.deepEqual(followUp.kinds().filter((kind) => kind !== 'status'), ['background_tasks', 'text', 'complete']);
   // The count dropped before that turn began, so the latest run heard it.
-  assert.deepEqual(second.events.filter((event) => event.kind === 'background_tasks').map((event) => event.count), [0]);
+  assert.deepEqual(second.events.filter((event) => event.kind === 'background_tasks').map((event) => event.count), [1, 0]);
 });
 
 test('claude: a message the live process cannot take starts a new one', async () => {
@@ -933,4 +935,59 @@ test('claude: a task that finishes mid-turn keeps stdin open for the turn that r
   assert.ok(followUp.kinds().includes('complete'));
   proc.end();
   await run;
+});
+
+test('claude: a new process clears a task count an earlier process left on the client', async () => {
+  const { runtime, sdk, context } = await loadClaudeWithFakeSdk();
+  const writer = recordingWriter();
+  void runtime.queryClaudeSDK('hello', { sessionId: 'app', cwd: '/tmp' }, writer, context);
+  await until(() => sdk.processes[0]?.prompts.length === 1);
+  assert.deepEqual(writer.events[0], {
+    ...writer.events[0],
+    kind: 'background_tasks',
+    count: 0,
+    tasks: [],
+  });
+  sdk.processes[0].end();
+});
+
+test('claude: the context gauge uses the window the CLI reports at spawn, not the 200k fallback', async () => {
+  const sdk = fakeClaudeSdk();
+  const contextUsage = deferred<{ model: string; rawMaxTokens: number; maxTokens: number }>();
+  const stored: Array<[string, number]> = [];
+  const runtime = await loadRuntime('claude', 'activeSessions', {
+    '@anthropic-ai/claude-agent-sdk': {
+      query: (args: any) => Object.assign(sdk.query(args), { getContextUsage: () => contextUsage.promise }),
+    },
+    '@/modules/database/index.js': {
+      orchestratorMessagesDb: { findDelegationByChildSessionId: () => null },
+      sessionsDb: { setSessionContextWindow: (id: string, window: number) => stored.push([id, window]) },
+    },
+  });
+  const context = {
+    resolveProviderSessionId: () => 'native-window',
+    resolveResumeModel: async () => undefined,
+    getProviderModels: async () => ({ OPTIONS: [], DEFAULT: 'default' }),
+    isProviderInstalled: async () => true,
+    normalizeMessage: () => [],
+  };
+  const writer = recordingWriter();
+  const run = runtime.queryClaudeSDK('hi', { sessionId: 'app-window', cwd: '/tmp' }, writer, context);
+  await until(() => sdk.processes[0]?.prompts.length === 1);
+  const proc = sdk.processes[0];
+  const budgets = () => writer.events.filter((event) => event.text === 'token_budget').map((event) => event.tokenBudget.total);
+
+  proc.emit({ type: 'assistant', message: { model: 'claude-spawn-window', usage: { input_tokens: 10, output_tokens: 5 } } });
+  await until(() => budgets().length === 1);
+  contextUsage.resolve({ model: 'claude-spawn-window[1m]', rawMaxTokens: 1_000_000, maxTokens: 1_000_000 });
+  // The reported window re-sizes the gauge mid-turn and is stored for restarts.
+  await until(() => budgets().length === 2);
+  assert.equal(budgets()[1], 1_000_000);
+  assert.deepEqual(stored, [['app-window', 1_000_000]]);
+
+  proc.emit({ type: 'assistant', message: { model: 'claude-spawn-window', usage: { input_tokens: 20, output_tokens: 5 } } });
+  proc.emit({ type: 'result' });
+  proc.end();
+  await run;
+  assert.deepEqual(budgets().slice(2), [1_000_000, 1_000_000]);
 });

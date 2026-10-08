@@ -13,7 +13,9 @@ import 'package:ddagent_app/features/browser_use/data/browser_use_repository.dar
 import 'package:ddagent_app/features/browser_use/state/browser_use_controller.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -87,8 +89,13 @@ class _FakeWs extends WsClient {
   @override
   Future<void> connect() async => _statesCtl.add(WsState.open);
 
+  int closes = 0;
+
   @override
-  Future<void> close() async => _statesCtl.add(WsState.closed);
+  Future<void> close() async {
+    closes++;
+    _statesCtl.add(WsState.closed);
+  }
 
   void emit(Map<String, dynamic> raw) => _framesCtl.add(raw);
 }
@@ -496,6 +503,80 @@ void main() {
 
       expect(find.text('Remote browser process exited unexpectedly'), findsOneWidget);
       expect(find.text('Retry'), findsOneWidget);
+    });
+
+    testWidgets('błąd po ready (np. nieosiągalny URL) nie zrywa sesji', (tester) async {
+      await tester.pumpWidget(buildApp());
+      await tester.pumpAndSettle();
+      await tester.emitAndPump(ws, {'type': 'ready', 'sessionId': 'sess-100'});
+      ws.closes = 0;
+
+      await tester.emitAndPump(ws, {'type': 'error', 'error': 'net::ERR_NAME_NOT_RESOLVED'});
+      await tester.pumpAndSettle();
+
+      expect(find.text('net::ERR_NAME_NOT_RESOLVED'), findsOneWidget);
+      expect(find.text('Retry'), findsNothing);
+      expect(find.text('Connecting to browser…'), findsNothing);
+      expect(ws.closes, 0);
+    });
+
+    testWidgets('klawiatura wysyła wpisany znak, Enter z \\r i kody VK', (tester) async {
+      await tester.pumpWidget(buildApp());
+      await tester.pumpAndSettle();
+      await tester.emitAndPump(ws, {'type': 'ready', 'sessionId': 'sess-100'});
+      await tester.emitAndPump(ws, {
+        'type': 'frame',
+        'data': base64Encode(_testFramePng),
+        'width': 800,
+        'height': 600,
+      });
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(Image));
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyA);
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+
+      final downs = ws.sent.where((m) => m['type'] == 'key' && m['event'] == 'down').toList();
+      expect(downs[0], containsPair('text', 'a'));
+      expect(downs[0], containsPair('keyCode', 65));
+      expect(downs[0], containsPair('code', 'KeyA'));
+      expect(downs[1], containsPair('key', 'Enter'));
+      expect(downs[1], containsPair('text', '\r'));
+      expect(downs[1], containsPair('keyCode', 13));
+      expect(downs[2], containsPair('key', 'ArrowLeft'));
+      expect(downs[2], containsPair('keyCode', 37));
+      expect(downs[2].containsKey('text'), isFalse);
+    });
+
+    testWidgets('prawy przycisk jest zwalniany jako right, a odmontowanie zamyka socket', (
+      tester,
+    ) async {
+      await tester.pumpWidget(buildApp());
+      await tester.pumpAndSettle();
+      await tester.emitAndPump(ws, {'type': 'ready', 'sessionId': 'sess-100'});
+      await tester.emitAndPump(ws, {
+        'type': 'frame',
+        'data': base64Encode(_testFramePng),
+        'width': 800,
+        'height': 600,
+      });
+      await tester.pumpAndSettle();
+
+      final gesture = await tester.startGesture(
+        tester.getCenter(find.byType(Image)),
+        kind: PointerDeviceKind.mouse,
+        buttons: kSecondaryMouseButton,
+      );
+      await gesture.up();
+      await tester.pumpAndSettle();
+      final up = ws.sent.lastWhere((m) => m['type'] == 'mouse' && m['event'] == 'up');
+      expect(up['button'], 'right');
+
+      ws.closes = 0;
+      await tester.pumpWidget(const SizedBox());
+      expect(ws.closes, 1);
     });
   });
 

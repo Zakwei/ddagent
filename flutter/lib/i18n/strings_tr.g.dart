@@ -1064,6 +1064,8 @@ class Translations$chat$claudeStatus$tr extends Translations$chat$claudeStatus$e
 	@override String backgroundTasks({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('tr'))(count,
 		other: '${count} arka plan görevi çalışıyor',
 	);
+	@override String get backgroundTasksTitle => 'Arka planda çalışıyor';
+	@override String get backgroundTaskUnnamed => 'Adsız görev';
 }
 
 // Path: chat.projectSelection
@@ -7263,6 +7265,8 @@ extension on TranslationsTr {
 			'chat.claudeStatus.providers.assistant' => 'Asistan',
 			'chat.claudeStatus.stop' => 'Durdur',
 			'chat.claudeStatus.backgroundTasks' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('tr'))(count, other: '${count} arka plan görevi çalışıyor', ), 
+			'chat.claudeStatus.backgroundTasksTitle' => 'Arka planda çalışıyor',
+			'chat.claudeStatus.backgroundTaskUnnamed' => 'Adsız görev',
 			'chat.projectSelection.startChatWithProvider' => ({required Object provider}) => '${provider} ile sohbet etmeye başlamak için bir proje seç',
 			'chat.tasks.nextTaskPrompt' => 'Sonraki görevi başlat',
 			'chat.voice.autoRead' => 'Yanıtları sesli oku',
@@ -7527,10 +7531,10 @@ extension on TranslationsTr {
 			'common.mainContent.loading' => 'ddagent Yükleniyor',
 			'common.mainContent.settingUpWorkspace' => 'Çalışma alanın hazırlanıyor...',
 			'common.mainContent.chooseProject' => 'Projeni Seç',
-			'common.mainContent.selectProjectDescription' => 'Claude ile kodlamaya başlamak için kenar çubuğundan bir proje seç. Her proje kendi sohbet oturumlarını ve dosya geçmişini içerir.',
-			'common.mainContent.tip' => 'İpucu',
 			_ => null,
 		} ?? switch (path) {
+			'common.mainContent.selectProjectDescription' => 'Claude ile kodlamaya başlamak için kenar çubuğundan bir proje seç. Her proje kendi sohbet oturumlarını ve dosya geçmişini içerir.',
+			'common.mainContent.tip' => 'İpucu',
 			'common.mainContent.createProjectMobile' => 'Projelere erişmek için yukarıdaki menü düğmesine dokun',
 			'common.mainContent.createProjectDesktop' => 'Kenar çubuğundaki klasör simgesine tıklayarak yeni bir proje oluştur',
 			'common.mainContent.newSession' => 'Yeni Oturum',
@@ -8041,10 +8045,10 @@ extension on TranslationsTr {
 			'common.gitPanel.history.removed' => 'Kaldırılan',
 			'common.gitPanel.mergeWorktree.cleanupDesc' => 'Birleştirildikten sonra worktree’yi kaldır ve dalını sil',
 			'common.gitPanel.mergeWorktree.cleanupLabel' => 'Birleştirmeden sonra temizle',
-			'common.gitPanel.mergeWorktree.commitCount' => ({required Object count}) => '${count} commit',
-			'common.gitPanel.mergeWorktree.merge' => 'Birleştir',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.mergeWorktree.commitCount' => ({required Object count}) => '${count} commit',
+			'common.gitPanel.mergeWorktree.merge' => 'Birleştir',
 			'common.gitPanel.mergeWorktree.mergeMessage' => ({required Object branch}) => '\'${branch}\' dalını birleştir',
 			'common.gitPanel.mergeWorktree.messageLabel' => 'Commit mesajı',
 			'common.gitPanel.mergeWorktree.squashDesc' => ({required Object commits, required Object branch}) => '${commits} commitin tümünü ${branch} üzerinde tek committe birleştir',
@@ -8555,10 +8559,10 @@ extension on TranslationsTr {
 			'settings.agents.account.codex.description' => 'OpenAI Codex AI asistanı',
 			'settings.agents.account.opencode.description' => 'OpenCode CLI asistanı',
 			'settings.agents.account.commandcode.description' => 'Command Code CLI asistanı',
-			'settings.agents.account.antigravity.description' => 'Antigravity CLI asistanı',
-			'settings.agents.account.devin.description' => 'Devin CLI asistanı',
 			_ => null,
 		} ?? switch (path) {
+			'settings.agents.account.antigravity.description' => 'Antigravity CLI asistanı',
+			'settings.agents.account.devin.description' => 'Devin CLI asistanı',
 			'settings.agents.connectionStatus' => 'Bağlantı Durumu',
 			'settings.agents.login.title' => 'Giriş Yap',
 			'settings.agents.login.reAuthenticate' => 'Yeniden Kimlik Doğrula',
@@ -9069,10 +9073,10 @@ extension on TranslationsTr {
 			'tasks.nextTask.hideDetails' => 'Ayrıntıları gizle',
 			'tasks.nextTask.initialize' => 'Başlat',
 			'tasks.nextTask.noPending' => 'Bekleyen görev yok',
-			'tasks.nextTask.notConfigured' => 'TaskMaster AI yapılandırılmamış',
-			'tasks.nextTask.review' => 'İncele',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.nextTask.notConfigured' => 'TaskMaster AI yapılandırılmamış',
+			'tasks.nextTask.review' => 'İncele',
 			'tasks.nextTask.startTask' => 'Görevi Başlat',
 			'tasks.nextTask.taskId' => ({required Object id}) => 'Görev ${id}',
 			'tasks.nextTask.viewAll' => 'Tüm görevleri görüntüle',

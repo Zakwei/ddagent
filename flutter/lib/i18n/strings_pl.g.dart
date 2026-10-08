@@ -1138,6 +1138,8 @@ class Translations$chat$claudeStatus$pl extends Translations$chat$claudeStatus$e
 	);
 	@override late final Translations$chat$claudeStatus$controls$pl controls = Translations$chat$claudeStatus$controls$pl._(_root);
 	@override late final Translations$chat$claudeStatus$providers$pl providers = Translations$chat$claudeStatus$providers$pl._(_root);
+	@override String get backgroundTasksTitle => 'Działa w tle';
+	@override String get backgroundTaskUnnamed => 'Zadanie bez nazwy';
 }
 
 // Path: chat.projectSelection
@@ -7774,6 +7776,8 @@ extension on TranslationsPl {
 			'chat.claudeStatus.controls.stopGeneration' => 'Zatrzymaj generowanie',
 			'chat.claudeStatus.controls.pressEscToStop' => 'W dowolnym momencie naciśnij Esc, aby zatrzymać',
 			'chat.claudeStatus.providers.assistant' => 'Asystent',
+			'chat.claudeStatus.backgroundTasksTitle' => 'Działa w tle',
+			'chat.claudeStatus.backgroundTaskUnnamed' => 'Zadanie bez nazwy',
 			'chat.projectSelection.startChatWithProvider' => ({required Object provider}) => 'Wybierz projekt, aby rozpocząć rozmowę z ${provider}',
 			'chat.tasks.nextTaskPrompt' => 'Rozpocznij następne zadanie',
 			'chat.splitSession.toggle' => 'Podziel widok sesji',
@@ -7953,10 +7957,10 @@ extension on TranslationsPl {
 			'codeEditor.toasts.saveFailed' => 'Zapis nie powiódł się',
 			'codeEditor.toasts.allSaved' => 'Zapisano wszystko',
 			'codeEditor.toasts.someSavesFailed' => 'Nie udało się zapisać niektórych plików',
-			'codeEditor.toasts.savedTo' => ({required Object path}) => 'Zapisano w ${path}',
-			'codeEditor.toasts.mergeApplied' => 'Scalanie zastosowane — zapisz, aby zachować zmiany',
 			_ => null,
 		} ?? switch (path) {
+			'codeEditor.toasts.savedTo' => ({required Object path}) => 'Zapisano w ${path}',
+			'codeEditor.toasts.mergeApplied' => 'Scalanie zastosowane — zapisz, aby zachować zmiany',
 			'common.buttons.save' => 'Zapisz',
 			'common.buttons.cancel' => 'Anuluj',
 			'common.buttons.delete' => 'Usuń',
@@ -8467,10 +8471,10 @@ extension on TranslationsPl {
 			'common.gitPanel.branches.deleteTitle' => ({required Object branch}) => 'Usuń ${branch}',
 			'common.gitPanel.branches.emptyDesc' => 'Utwórz gałąź, aby rozpocząć pracę równoległą.',
 			'common.gitPanel.branches.forceDelete' => 'Wymuś usunięcie',
-			'common.gitPanel.branches.forceDeleteDesc' => 'Trwale usuwa gałąź, nawet jeśli zawiera commity niescalone gdzie indziej.',
-			'common.gitPanel.branches.forceDeleteLabel' => 'Wymuś usunięcie tej niescalonej gałęzi',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.branches.forceDeleteDesc' => 'Trwale usuwa gałąź, nawet jeśli zawiera commity niescalone gdzie indziej.',
+			'common.gitPanel.branches.forceDeleteLabel' => 'Wymuś usunięcie tej niescalonej gałęzi',
 			'common.gitPanel.branches.local' => 'Lokalne',
 			'common.gitPanel.branches.kNew' => 'Nowa gałąź',
 			'common.gitPanel.branches.noMatch' => 'Żadna gałąź nie pasuje do wyszukiwania',
@@ -8981,10 +8985,10 @@ extension on TranslationsPl {
 			'settings.mcpForm.fields.arguments' => 'Argumenty (po jednym w wierszu)',
 			'settings.mcpForm.fields.jsonConfig' => 'Konfiguracja JSON',
 			'settings.mcpForm.fields.url' => 'URL',
-			'settings.mcpForm.fields.envVars' => 'Zmienne środowiskowe (KLUCZ=wartość, po jednej w wierszu)',
-			'settings.mcpForm.fields.headers' => 'Nagłówki (KLUCZ=wartość, po jednym w wierszu)',
 			_ => null,
 		} ?? switch (path) {
+			'settings.mcpForm.fields.envVars' => 'Zmienne środowiskowe (KLUCZ=wartość, po jednej w wierszu)',
+			'settings.mcpForm.fields.headers' => 'Nagłówki (KLUCZ=wartość, po jednym w wierszu)',
 			'settings.mcpForm.fields.selectProject' => 'Wybierz projekt...',
 			'settings.mcpForm.placeholders.serverName' => 'my-server',
 			'settings.mcpForm.validation.missingType' => 'Brak wymaganego pola: type',
@@ -9495,10 +9499,10 @@ extension on TranslationsPl {
 			'sidebar.deleteConfirmation.archiveSelectedSessions' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('pl'))(count, one: 'Archiwizuj sesję', few: 'Archiwizuj ${count} sesje', many: 'Archiwizuj ${count} sesji', other: 'Archiwizuj ${count} sesji', ), 
 			'sidebar.zones.activeNow' => 'Aktywne teraz',
 			'sidebar.zones.recent' => 'Ostatnio używane',
-			'sidebar.zones.today' => 'Dzisiaj',
-			'sidebar.zones.yesterday' => 'Wczoraj',
 			_ => null,
 		} ?? switch (path) {
+			'sidebar.zones.today' => 'Dzisiaj',
+			'sidebar.zones.yesterday' => 'Wczoraj',
 			'sidebar.zones.thisWeek' => 'W tym tygodniu',
 			'sidebar.zones.showMore' => ({required Object count}) => 'Pokaż jeszcze ${count}',
 			'sidebar.zones.showLess' => 'Pokaż mniej',
@@ -10009,10 +10013,10 @@ extension on TranslationsPl {
 			'quota.config.save' => 'Zapisz konfigurację',
 			'quota.overview.tokensAndCost' => 'Tokeny i koszt',
 			'quota.section.config' => 'Konfiguracja',
-			'scheduler.checking' => 'Sprawdzanie…',
-			'scheduler.cronHint' => 'Cron (min godz dzień mies dzień-tyg) — np. 0 9 * * *',
 			_ => null,
 		} ?? switch (path) {
+			'scheduler.checking' => 'Sprawdzanie…',
+			'scheduler.cronHint' => 'Cron (min godz dzień mies dzień-tyg) — np. 0 9 * * *',
 			'scheduler.deleteMessage' => ({required Object id}) => 'Spowoduje to usunięcie zadania cyklicznego ${id}. Istniejące sesje zostaną zachowane.',
 			'scheduler.deleteTitle' => 'Usunąć harmonogram?',
 			'scheduler.editTitle' => 'Edytuj harmonogram',

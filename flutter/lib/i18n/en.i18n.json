@@ -475,7 +475,9 @@
       },
       "providers": {
         "assistant": "Assistant"
-      }
+      },
+      "backgroundTasksTitle": "Running in the background",
+      "backgroundTaskUnnamed": "Unnamed task"
     },
     "projectSelection": {
       "startChatWithProvider": "Select a project to start chatting with {{provider}}"

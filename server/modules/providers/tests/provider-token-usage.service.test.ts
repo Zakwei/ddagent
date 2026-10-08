@@ -8,6 +8,7 @@ import Database from 'better-sqlite3';
 
 import {
   createProviderTokenUsageService,
+  recordClaudeContextWindow,
   rememberClaudeContextWindow,
   resolveClaudeContextWindow,
 } from '@/modules/providers/services/provider-token-usage.service.js';
@@ -113,6 +114,35 @@ test('Claude token usage sizes the context with the window the SDK reported', as
     assert.equal(resolveClaudeContextWindow('other-session', 'claude-test-window', undefined), 1_000_000);
     // An explicit override only applies while nothing was learned.
     assert.equal(resolveClaudeContextWindow('unknown', 'claude-unknown', '123456'), 123_456);
+  } finally {
+    await rm(tempDirectory, { recursive: true, force: true });
+  }
+});
+
+test('Claude token usage reuses the window persisted on the session row after a restart', async () => {
+  const tempDirectory = await mkdtemp(path.join(tmpdir(), 'provider-token-usage-stored-window-'));
+  const sessionFilePath = path.join(tempDirectory, 'provider-session.jsonl');
+
+  try {
+    await writeFile(sessionFilePath, JSON.stringify({
+      type: 'assistant',
+      message: { model: 'claude-never-run', usage: { input_tokens: 10, output_tokens: 5 } },
+    }));
+
+    // Nothing learned in memory (fresh process), but a past run stored 1M.
+    const service = createProviderTokenUsageService({
+      getSessionById: () => createSessionRow({
+        jsonl_path: sessionFilePath,
+        provider_session_id: 'stored-window-session',
+        context_window: 1_000_000,
+      }),
+      getClaudeContextWindow: () => undefined,
+    });
+    assert.equal((await service.getSessionTokenUsage('app-session')).total, 1_000_000);
+
+    // A window the CLI reports live wins over the stored one.
+    recordClaudeContextWindow('stored-window-session', 'claude-never-run', 200_000);
+    assert.equal((await service.getSessionTokenUsage('app-session')).total, 200_000);
   } finally {
     await rm(tempDirectory, { recursive: true, force: true });
   }

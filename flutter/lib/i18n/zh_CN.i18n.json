@@ -334,7 +334,9 @@
       },
       "providers": {
         "assistant": "助手"
-      }
+      },
+      "backgroundTasksTitle": "正在后台运行",
+      "backgroundTaskUnnamed": "未命名任务"
     },
     "projectSelection": {
       "startChatWithProvider": "选择一个项目以开始与 {{provider}} 聊天"

@@ -1083,6 +1083,8 @@ class Translations$chat$claudeStatus$es extends Translations$chat$claudeStatus$e
 	);
 	@override late final Translations$chat$claudeStatus$controls$es controls = Translations$chat$claudeStatus$controls$es._(_root);
 	@override late final Translations$chat$claudeStatus$providers$es providers = Translations$chat$claudeStatus$providers$es._(_root);
+	@override String get backgroundTasksTitle => 'En segundo plano';
+	@override String get backgroundTaskUnnamed => 'Tarea sin nombre';
 }
 
 // Path: chat.projectSelection
@@ -7273,6 +7275,8 @@ extension on TranslationsEs {
 			'chat.claudeStatus.controls.stopGeneration' => 'Detener generación',
 			'chat.claudeStatus.controls.pressEscToStop' => 'Pulsa Esc en cualquier momento para detener',
 			'chat.claudeStatus.providers.assistant' => 'Asistente',
+			'chat.claudeStatus.backgroundTasksTitle' => 'En segundo plano',
+			'chat.claudeStatus.backgroundTaskUnnamed' => 'Tarea sin nombre',
 			'chat.projectSelection.startChatWithProvider' => ({required Object provider}) => 'Selecciona un proyecto para empezar a chatear con ${provider}',
 			'chat.tasks.nextTaskPrompt' => 'Empezar la siguiente tarea',
 			'chat.voice.autoRead' => 'Leer respuestas en voz alta',
@@ -7528,10 +7532,10 @@ extension on TranslationsEs {
 			'common.mainContent.loading' => 'Cargando ddagent',
 			'common.mainContent.settingUpWorkspace' => 'Preparando tu espacio de trabajo...',
 			'common.mainContent.chooseProject' => 'Elige tu proyecto',
-			'common.mainContent.selectProjectDescription' => 'Selecciona un proyecto en la barra lateral para empezar a programar con Claude. Cada proyecto contiene tus sesiones de chat e historial de archivos.',
-			'common.mainContent.tip' => 'Consejo',
 			_ => null,
 		} ?? switch (path) {
+			'common.mainContent.selectProjectDescription' => 'Selecciona un proyecto en la barra lateral para empezar a programar con Claude. Cada proyecto contiene tus sesiones de chat e historial de archivos.',
+			'common.mainContent.tip' => 'Consejo',
 			'common.mainContent.createProjectMobile' => 'Toca el botón de menú de arriba para acceder a los proyectos',
 			'common.mainContent.createProjectDesktop' => 'Crea un proyecto nuevo haciendo clic en el icono de carpeta de la barra lateral',
 			'common.mainContent.newSession' => 'Nueva sesión',
@@ -8042,10 +8046,10 @@ extension on TranslationsEs {
 			'common.gitPanel.history.removed' => 'Eliminadas',
 			'common.gitPanel.mergeWorktree.cleanupDesc' => 'Eliminar el worktree y borrar su rama una vez fusionada',
 			'common.gitPanel.mergeWorktree.cleanupLabel' => 'Limpiar tras la fusión',
-			'common.gitPanel.mergeWorktree.commitCount' => ({required Object count}) => '${count} commit(s)',
-			'common.gitPanel.mergeWorktree.merge' => 'Fusionar',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.mergeWorktree.commitCount' => ({required Object count}) => '${count} commit(s)',
+			'common.gitPanel.mergeWorktree.merge' => 'Fusionar',
 			'common.gitPanel.mergeWorktree.mergeMessage' => ({required Object branch}) => 'Fusionar la rama \'${branch}\'',
 			'common.gitPanel.mergeWorktree.messageLabel' => 'Mensaje de commit',
 			'common.gitPanel.mergeWorktree.squashDesc' => ({required Object commits, required Object branch}) => 'Combinar los ${commits} en un solo commit en ${branch}',
@@ -8556,10 +8560,10 @@ extension on TranslationsEs {
 			'settings.agents.account.codex.description' => 'Asistente de IA Codex de OpenAI',
 			'settings.agents.account.opencode.description' => 'Asistente CLI OpenCode',
 			'settings.agents.account.commandcode.description' => 'Asistente CLI Command Code',
-			'settings.agents.account.antigravity.description' => 'Asistente CLI Antigravity',
-			'settings.agents.account.devin.description' => 'Asistente CLI Devin',
 			_ => null,
 		} ?? switch (path) {
+			'settings.agents.account.antigravity.description' => 'Asistente CLI Antigravity',
+			'settings.agents.account.devin.description' => 'Asistente CLI Devin',
 			'settings.agents.connectionStatus' => 'Estado de la conexión',
 			'settings.agents.login.title' => 'Iniciar sesión',
 			'settings.agents.login.reAuthenticate' => 'Volver a autenticar',
@@ -9070,10 +9074,10 @@ extension on TranslationsEs {
 			'tasks.nextTask.hideDetails' => 'Ocultar detalles',
 			'tasks.nextTask.initialize' => 'Inicializar',
 			'tasks.nextTask.noPending' => 'No hay tareas pendientes',
-			'tasks.nextTask.notConfigured' => 'TaskMaster AI no está configurado',
-			'tasks.nextTask.review' => 'Revisar',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.nextTask.notConfigured' => 'TaskMaster AI no está configurado',
+			'tasks.nextTask.review' => 'Revisar',
 			'tasks.nextTask.startTask' => 'Iniciar tarea',
 			'tasks.nextTask.taskId' => ({required Object id}) => 'Tarea ${id}',
 			'tasks.nextTask.viewAll' => 'Ver todas las tareas',

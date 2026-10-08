@@ -334,7 +334,9 @@
       "stop": "Durdur",
       "backgroundTasks(param=count)": {
         "other": "{{count}} arka plan görevi çalışıyor"
-      }
+      },
+      "backgroundTasksTitle": "Arka planda çalışıyor",
+      "backgroundTaskUnnamed": "Adsız görev"
     },
     "projectSelection": {
       "startChatWithProvider": "{{provider}} ile sohbet etmeye başlamak için bir proje seç"

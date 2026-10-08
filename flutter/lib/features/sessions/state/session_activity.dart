@@ -90,21 +90,45 @@ final sessionActivityProvider =
       SessionActivityController.new,
     );
 
+/// One task running in the background, as the server describes it — the
+/// agent's own description ("Run the checkout tests") and its kind
+/// (`local_bash`, `local_agent`, …; null when unknown).
+class BackgroundTask {
+  const BackgroundTask({required this.id, required this.description, this.type});
+
+  factory BackgroundTask.fromJson(Map<String, dynamic> json) => BackgroundTask(
+    id: json['id']?.toString() ?? '',
+    description: json['description']?.toString() ?? '',
+    type: json['type']?.toString(),
+  );
+
+  final String id;
+  final String description;
+  final String? type;
+}
+
 /// Background tasks (subagents, background shells, workflows) still running
 /// per session, from the server's `background_tasks` frames. They can outlive
 /// the turn that started them, so this is independent of [SessionActivity]:
 /// a session can be idle (no turn running) and still have work going on.
-class BackgroundTasksController extends Notifier<Map<String, int>> {
+/// Servers before 0.8.14 send only a count, so [tasks] can be shorter than it.
+class BackgroundTasksController
+    extends Notifier<Map<String, ({int count, List<BackgroundTask> tasks})>> {
   @override
-  Map<String, int> build() => {};
+  Map<String, ({int count, List<BackgroundTask> tasks})> build() => {};
 
-  void setCount(String? sessionId, int count) {
+  void set(String? sessionId, int count, List<BackgroundTask> tasks) {
     if (sessionId == null) return;
-    if ((state[sessionId] ?? 0) == count) return;
-    state = count > 0 ? {...state, sessionId: count} : ({...state}..remove(sessionId));
+    if (count <= 0) {
+      if (state.containsKey(sessionId)) state = {...state}..remove(sessionId);
+      return;
+    }
+    state = {...state, sessionId: (count: count, tasks: tasks)};
   }
 }
 
-final backgroundTasksProvider = NotifierProvider<BackgroundTasksController, Map<String, int>>(
-  BackgroundTasksController.new,
-);
+final backgroundTasksProvider =
+    NotifierProvider<
+      BackgroundTasksController,
+      Map<String, ({int count, List<BackgroundTask> tasks})>
+    >(BackgroundTasksController.new);

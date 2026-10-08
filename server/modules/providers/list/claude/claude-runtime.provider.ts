@@ -36,10 +36,11 @@ import {
 } from '@/shared/index.js';
 import { CLAUDE_PREDEFINED_MODELS } from '@/modules/providers/list/claude/claude-models.provider.js';
 import {
+  recordClaudeContextWindow,
   rememberClaudeContextWindow,
   resolveClaudeContextWindow,
 } from '@/modules/providers/services/provider-token-usage.service.js';
-import { orchestratorMessagesDb } from '@/modules/database/index.js';
+import { orchestratorMessagesDb, sessionsDb } from '@/modules/database/index.js';
 import {
   createNotificationEvent,
   notifyBackgroundWorkCompleted,
@@ -534,6 +535,13 @@ function startsBackgroundWork(sdkMessage: any) {
 const TERMINAL_TASK_STATUSES = new Set(['completed', 'failed', 'stopped', 'killed']);
 
 /**
+ * One running background task as the client lists it — the CLI's own
+ * description ("Run the checkout tests") and kind (`local_bash`,
+ * `local_agent`, …). Consumed by queryClaudeSDK and the runtime tests.
+ */
+export type BackgroundTask = { id: string; description: string; type: string | null };
+
+/**
  * Keeps `outstanding` in sync with the SDK's task lifecycle events.
  *
  * The CLI reports every subagent, background shell and workflow it starts via
@@ -546,17 +554,21 @@ const TERMINAL_TASK_STATUSES = new Set(['completed', 'failed', 'stopped', 'kille
  *
  * Consumed by queryClaudeSDK (hold decision) and the runtime tests.
  *
- * @param {Set<string>} outstanding - Task ids still running; mutated in place
+ * @param {Map<string, BackgroundTask>} outstanding - Running tasks by id; mutated in place
  * @param {Object} sdkMessage - SDK stream message
  */
-export function trackBackgroundTask(outstanding: Set<string>, sdkMessage: any): void {
+export function trackBackgroundTask(outstanding: Map<string, BackgroundTask>, sdkMessage: any): void {
   if (sdkMessage?.type !== 'system' || typeof sdkMessage.task_id !== 'string') {
     return;
   }
   switch (sdkMessage.subtype) {
     case 'task_started':
       if (!sdkMessage.skip_transcript) {
-        outstanding.add(sdkMessage.task_id);
+        outstanding.set(sdkMessage.task_id, {
+          id: sdkMessage.task_id,
+          description: typeof sdkMessage.description === 'string' ? sdkMessage.description : '',
+          type: typeof sdkMessage.task_type === 'string' ? sdkMessage.task_type : null,
+        });
       }
       break;
     case 'task_notification':
@@ -757,7 +769,7 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
   let heldForBackgroundWork = false;
   // Tasks (subagents, background shells, workflows) the CLI reported as started
   // and not yet settled — they can outlive several turns.
-  const outstandingTasks = new Set<string>();
+  const outstandingTasks = new Map<string, BackgroundTask>();
   // Last task count sent to the client, so it only hears about changes.
   let reportedTaskCount = 0;
   // A task settled since the last `result` — its report is still to come.
@@ -777,6 +789,46 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
   // on `result` once the SDK has reported the model's real context window.
   let lastStepUsage: AnyRecord | null = null;
   let lastStepModel: string | null = null;
+  // Context window this CLI process reported (`getContextUsage()` right after
+  // spawn, then every `result.modelUsage`); 0 until it does. Without it the
+  // first turn of a session — or any turn after a server restart — would be
+  // sized against the 200k fallback until its `result` arrived.
+  let reportedContextWindow = 0;
+
+  // Sends the context gauge for the latest main-agent step, if there is one.
+  const sendTokenBudget = () => {
+    if (!lastStepUsage) return;
+    const contextWindow = reportedContextWindow || resolveClaudeContextWindow(capturedSessionId, lastStepModel);
+    const tokenBudget = buildTokenBudget(lastStepUsage, contextWindow);
+    ws.send(createNormalizedMessage({ kind: 'status', text: 'token_budget', tokenBudget, sessionId: capturedSessionId || sessionId || null, provider: 'claude' }));
+  };
+
+  // Keeps a reported window for this run, REST snapshots, and the session row
+  // (so the gauge still shows it after a server restart).
+  const adoptContextWindow = (contextWindow: number, model: string | null) => {
+    if (!(contextWindow > 0)) return;
+    reportedContextWindow = contextWindow;
+    recordClaudeContextWindow(capturedSessionId, model, contextWindow);
+    if (!sessionId) return;
+    try {
+      sessionsDb.setSessionContextWindow(String(sessionId), contextWindow);
+    } catch (error: any) {
+      console.warn('[claude] Failed to persist the context window:', error?.message || error);
+    }
+  };
+
+  // Sends the running background tasks (count plus what each one is) to the
+  // writer of the current turn.
+  const reportBackgroundTasks = () => {
+    reportedTaskCount = outstandingTasks.size;
+    ws.send(createNormalizedMessage({
+      kind: 'background_tasks',
+      count: reportedTaskCount,
+      tasks: [...outstandingTasks.values()],
+      sessionId: capturedSessionId || sessionId || null,
+      provider: 'claude',
+    }));
+  };
 
   // Arms (or re-arms) the idle countdown that eventually closes stdin.
   const scheduleRelease = (delayMs = BG_WAIT_CEILING_MS) => {
@@ -1077,11 +1129,29 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
       turnCompleteSent = false;
       const entry = sessionKey() ? getSession(sessionKey()) : undefined;
       if (entry?.instance === queryInstance) entry.writer = writer;
+      // The new turn's run starts with the live task list, so the client never
+      // keeps a count from a run it no longer listens to.
+      reportBackgroundTasks();
     };
 
     // Track the query instance for abort capability
     if (sessionKey()) {
       addSession(sessionKey(), queryInstance, ws, releasePromptStream, injectTurn);
+    }
+    // A fresh process has no background tasks yet. Saying so clears a count
+    // a previous process left behind on the client (its own final 0 can be
+    // dropped once a newer run owns the session).
+    reportBackgroundTasks();
+
+    // The CLI knows the model's window as soon as it starts; ask instead of
+    // waiting for the turn's `result`. Never blocks the stream.
+    if (typeof queryInstance.getContextUsage === 'function') {
+      queryInstance.getContextUsage().then((usage: AnyRecord) => {
+        adoptContextWindow(readNumber(usage?.rawMaxTokens || usage?.maxTokens), usage?.model || null);
+        if (turnActive) sendTokenBudget();
+      }).catch(() => {
+        // The process may already be gone; `result.modelUsage` still reports it.
+      });
     }
 
     // Process streaming messages
@@ -1147,19 +1217,14 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
 
       // Token budget: per-step usage of the main agent (subagent steps carry
       // `parent_tool_use_id` and have their own context), sized against the
-      // window the SDK reports in `result.modelUsage`.
-      let budgetUsage: AnyRecord | null = null;
+      // window the CLI reported.
       if (message.type === 'assistant' && !message.parent_tool_use_id && message.message?.usage) {
         lastStepUsage = message.message.usage;
         lastStepModel = message.message.model || lastStepModel;
-        budgetUsage = lastStepUsage;
+        sendTokenBudget();
       } else if (message.type === 'result') {
-        rememberClaudeContextWindow(capturedSessionId, lastStepModel, message.modelUsage);
-        budgetUsage = lastStepUsage;
-      }
-      if (budgetUsage) {
-        const tokenBudgetData = buildTokenBudget(budgetUsage, resolveClaudeContextWindow(capturedSessionId, lastStepModel));
-        ws.send(createNormalizedMessage({ kind: 'status', text: 'token_budget', tokenBudget: tokenBudgetData, sessionId: capturedSessionId || sessionId || null, provider: 'claude' }));
+        adoptContextWindow(rememberClaudeContextWindow(capturedSessionId, lastStepModel, message.modelUsage), lastStepModel);
+        sendTokenBudget();
       }
 
       if (startsBackgroundWork(message)) {
@@ -1173,8 +1238,7 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
         taskSettledThisTurn = true;
       }
       if (outstandingTasks.size !== reportedTaskCount) {
-        reportedTaskCount = outstandingTasks.size;
-        ws.send(createNormalizedMessage({ kind: 'background_tasks', count: reportedTaskCount, sessionId: capturedSessionId || sessionId || null, provider: 'claude' }));
+        reportBackgroundTasks();
       }
 
       if (message.type === 'result') {
@@ -1340,8 +1404,8 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
       activeInjection = null;
     }
     if (reportedTaskCount > 0) {
-      reportedTaskCount = 0;
-      ws.send(createNormalizedMessage({ kind: 'background_tasks', count: 0, sessionId: capturedSessionId || sessionId || null, provider: 'claude' }));
+      outstandingTasks.clear();
+      reportBackgroundTasks();
     }
   }
 }

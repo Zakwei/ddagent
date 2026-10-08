@@ -1064,6 +1064,8 @@ class Translations$chat$claudeStatus$zh_TW extends Translations$chat$claudeStatu
 	@override String backgroundTasks({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
 		other: '${count} 個背景工作正在執行',
 	);
+	@override String get backgroundTasksTitle => '正在背景執行';
+	@override String get backgroundTaskUnnamed => '未命名的工作';
 }
 
 // Path: chat.projectSelection
@@ -7263,6 +7265,8 @@ extension on TranslationsZhTw {
 			'chat.claudeStatus.providers.assistant' => '助理',
 			'chat.claudeStatus.stop' => '停止',
 			'chat.claudeStatus.backgroundTasks' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, other: '${count} 個背景工作正在執行', ), 
+			'chat.claudeStatus.backgroundTasksTitle' => '正在背景執行',
+			'chat.claudeStatus.backgroundTaskUnnamed' => '未命名的工作',
 			'chat.projectSelection.startChatWithProvider' => ({required Object provider}) => '選擇一個專案以開始與 ${provider} 聊天',
 			'chat.tasks.nextTaskPrompt' => '開始下一個任務',
 			'chat.voice.autoRead' => '朗讀回覆',
@@ -7527,10 +7531,10 @@ extension on TranslationsZhTw {
 			'common.mainContent.loading' => '正在載入 ddagent',
 			'common.mainContent.settingUpWorkspace' => '正在設定您的工作區...',
 			'common.mainContent.chooseProject' => '選擇您的專案',
-			'common.mainContent.selectProjectDescription' => '從側邊欄選擇一個專案以開始使用 Claude 進行程式開發。每個專案包含您的聊天紀錄和檔案歷史。',
-			'common.mainContent.tip' => '提示',
 			_ => null,
 		} ?? switch (path) {
+			'common.mainContent.selectProjectDescription' => '從側邊欄選擇一個專案以開始使用 Claude 進行程式開發。每個專案包含您的聊天紀錄和檔案歷史。',
+			'common.mainContent.tip' => '提示',
 			'common.mainContent.createProjectMobile' => '點擊上方的選單按鈕以存取專案',
 			'common.mainContent.createProjectDesktop' => '點擊側邊欄中的資料夾圖示以建立新專案',
 			'common.mainContent.newSession' => '新工作階段',
@@ -8041,10 +8045,10 @@ extension on TranslationsZhTw {
 			'common.gitPanel.history.removed' => '已移除',
 			'common.gitPanel.mergeWorktree.cleanupDesc' => '合併後移除 worktree 並刪除其分支',
 			'common.gitPanel.mergeWorktree.cleanupLabel' => '合併後清理',
-			'common.gitPanel.mergeWorktree.commitCount' => ({required Object count}) => '${count} 個提交',
-			'common.gitPanel.mergeWorktree.merge' => '合併',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.mergeWorktree.commitCount' => ({required Object count}) => '${count} 個提交',
+			'common.gitPanel.mergeWorktree.merge' => '合併',
 			'common.gitPanel.mergeWorktree.mergeMessage' => ({required Object branch}) => '合併分支 \'${branch}\'',
 			'common.gitPanel.mergeWorktree.messageLabel' => '提交訊息',
 			'common.gitPanel.mergeWorktree.squashDesc' => ({required Object commits, required Object branch}) => '將全部 ${commits} 個提交合併為 ${branch} 上的單一提交',
@@ -8555,10 +8559,10 @@ extension on TranslationsZhTw {
 			'settings.agents.account.codex.description' => 'OpenAI Codex AI 助手',
 			'settings.agents.account.opencode.description' => 'OpenCode CLI 助手',
 			'settings.agents.account.commandcode.description' => 'Command Code CLI 助手',
-			'settings.agents.account.antigravity.description' => 'Antigravity CLI 助手',
-			'settings.agents.account.devin.description' => 'Devin CLI 助手',
 			_ => null,
 		} ?? switch (path) {
+			'settings.agents.account.antigravity.description' => 'Antigravity CLI 助手',
+			'settings.agents.account.devin.description' => 'Devin CLI 助手',
 			'settings.agents.connectionStatus' => '連線狀態',
 			'settings.agents.login.title' => '登入',
 			'settings.agents.login.reAuthenticate' => '重新驗證',
@@ -9069,10 +9073,10 @@ extension on TranslationsZhTw {
 			'tasks.nextTask.hideDetails' => '隱藏詳情',
 			'tasks.nextTask.initialize' => '初始化',
 			'tasks.nextTask.noPending' => '沒有待處理任務',
-			'tasks.nextTask.notConfigured' => 'TaskMaster AI 未設定',
-			'tasks.nextTask.review' => '審查',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.nextTask.notConfigured' => 'TaskMaster AI 未設定',
+			'tasks.nextTask.review' => '審查',
 			'tasks.nextTask.startTask' => '開始任務',
 			'tasks.nextTask.taskId' => ({required Object id}) => '任務 ${id}',
 			'tasks.nextTask.viewAll' => '檢視所有任務',
