@@ -983,20 +983,11 @@ function buildTaskMasterContinuationPrompt(workingDir: any, unfinished: any) {
     return `There are ${unfinished} unfinished Task Master task(s). Use mcp_call_tool with server_name "task-master-ai" and projectRoot "${workingDir}": call the next_task tool, implement the returned task, then call set_task_status to mark it done. Keep going until all tasks are done or the token budget is exhausted.`;
 }
 
-function isEditPermissionRequest(params: any) {
-    const toolCall = readObjectRecord(params?.toolCall);
-    const title = String(toolCall?.title ?? params?.title ?? '').toLowerCase();
-    const rawInput = readObjectRecord(toolCall?.rawInput) ?? params?.rawInput ?? {};
-    const toolName = String(rawInput?.tool ?? rawInput?.tool_name ?? '').toLowerCase();
-    const hasPath = rawInput && (rawInput.path !== undefined || rawInput.paths !== undefined || rawInput.file_path !== undefined);
-    const editKeywords: any = ['edit', 'write', 'apply', 'replace', 'create', 'modify', 'save', 'patch', 'file'];
-    if (editKeywords.some((kw: any) => title.includes(kw)) || editKeywords.some((kw: any) => toolName.includes(kw))) {
-        return true;
-    }
-    if (hasPath && !title.includes('exec') && !title.includes('bash') && !title.includes('shell') && !title.includes('run')) {
-        return true;
-    }
-    return false;
+// acceptEdits trusts only the ACP tool kind: titles are free text ("Shell: rm file.txt"),
+// so a missing or other kind falls through to a real permission prompt.
+export function isEditPermissionRequest(params: any) {
+    const kind = readObjectRecord(params?.toolCall)?.kind;
+    return kind === 'edit' || kind === 'delete' || kind === 'move';
 }
 
 // Reads the active model out of an ACP config-option payload (the

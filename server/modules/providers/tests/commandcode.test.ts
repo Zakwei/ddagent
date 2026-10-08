@@ -6,7 +6,7 @@ import test from 'node:test';
 
 import { CommandCodeMcpProvider } from '@/modules/providers/list/commandcode/commandcode-mcp.provider.js';
 import { parseCommandCodeModelList } from '@/modules/providers/list/commandcode/commandcode-models.provider.js';
-import { questionAnswerOptionId, resolveCommandCodePlanReviewContent } from '@/modules/providers/list/commandcode/commandcode-runtime.provider.js';
+import { isEditPermissionRequest, questionAnswerOptionId, resolveCommandCodePlanReviewContent } from '@/modules/providers/list/commandcode/commandcode-runtime.provider.js';
 import { CommandCodeSessionsProvider, readCommandCodeTranscript } from '@/modules/providers/list/commandcode/commandcode-sessions.provider.js';
 import {
   commandCodeProjectSlug,
@@ -330,4 +330,11 @@ test('Command Code history flags a tool result that reports a non-zero exit code
   assert.equal(resultFor('Exit code: 2\n\nnpm ERR!')?.isError, true);
   assert.equal(resultFor('Exit code: 0\n\nok')?.isError, false);
   assert.equal(resultFor('total 12\n-rw-r--r-- a.ts')?.isError, false);
+});
+
+test('acceptEdits auto-approves only ACP edit kinds, never shell titles that mention files', () => {
+  assert.equal(isEditPermissionRequest({ toolCall: { kind: 'edit', title: 'Edit: a.ts' } }), true);
+  assert.equal(isEditPermissionRequest({ toolCall: { kind: 'execute', title: 'Shell: rm -rf ./profile' } }), false);
+  assert.equal(isEditPermissionRequest({ toolCall: { kind: 'execute', title: 'kubectl apply -f file.yaml' } }), false);
+  assert.equal(isEditPermissionRequest({ toolCall: { title: 'Write file' } }), false);
 });

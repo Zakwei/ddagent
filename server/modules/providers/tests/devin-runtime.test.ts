@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { questionAnswerOptionId } from '@/modules/providers/list/devin/devin-runtime.provider.js';
+import { isEditPermissionRequest, questionAnswerOptionId } from '@/modules/providers/list/devin/devin-runtime.provider.js';
 
 /**
  * Devin answers an AskUserQuestion over the ACP permission protocol, which can
@@ -34,4 +34,11 @@ test('Devin maps a picked label containing ", " back onto its optionId', () => {
 test('Devin refuses free text and empty answers', () => {
   assert.equal(questionAnswerOptionId(params, { answers: { 'Zakres resetu': 'custom text' } }), null);
   assert.equal(questionAnswerOptionId(params, { answers: {} }), null);
+});
+
+test('acceptEdits auto-approves only ACP edit kinds, never shell titles that mention files', () => {
+  assert.equal(isEditPermissionRequest({ toolCall: { kind: 'edit', title: 'Edit: a.ts' } }), true);
+  assert.equal(isEditPermissionRequest({ toolCall: { kind: 'execute', title: 'Shell: rm -rf ./profile' } }), false);
+  assert.equal(isEditPermissionRequest({ toolCall: { kind: 'execute', title: 'kubectl apply -f file.yaml' } }), false);
+  assert.equal(isEditPermissionRequest({ toolCall: { title: 'Write file' } }), false);
 });
