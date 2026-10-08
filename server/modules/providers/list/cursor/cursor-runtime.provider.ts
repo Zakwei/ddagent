@@ -37,6 +37,71 @@ function isWorkspaceTrustPrompt(text: any = '') {
   return WORKSPACE_TRUST_PATTERNS.some((pattern: any) => pattern.test(text));
 }
 
+// cursor-agent `stream-json` names each tool by a `<kind>ToolCall` key
+// (`shellToolCall`, `readToolCall`, ...); MCP/other tools use `function`.
+const CURSOR_TOOL_NAMES: Record<string, string> = {
+  shellToolCall: 'Bash',
+  readToolCall: 'Read',
+  editToolCall: 'Edit',
+  writeToolCall: 'Write',
+  deleteToolCall: 'Delete',
+  grepToolCall: 'Grep',
+  globToolCall: 'Glob',
+  lsToolCall: 'List',
+  todoToolCall: 'TodoWrite',
+  updateTodosToolCall: 'TodoWrite',
+};
+
+function readCursorToolResultText(result: AnyRecord | undefined): { content: string; isError: boolean } {
+  const error = result?.error ?? result?.failure;
+  if (error) {
+    const message = typeof error === 'string' ? error : (error.message ?? error.errorMessage ?? error.stderr);
+    return { content: typeof message === 'string' ? message : JSON.stringify(error), isError: true };
+  }
+  const success = result?.success ?? result;
+  if (!success || typeof success !== 'object') return { content: typeof success === 'string' ? success : '', isError: false };
+  const output = [success.content, success.stdout, success.stderr, success.output]
+    .filter((part) => typeof part === 'string' && part.length > 0)
+    .join('\n');
+  const exitCode = typeof success.exitCode === 'number' ? success.exitCode : 0;
+  return { content: output || JSON.stringify(success), isError: exitCode !== 0 };
+}
+
+/**
+ * Maps one cursor-agent `tool_call` event (`subtype` started/completed) onto
+ * the normalized tool_use / tool_result rows. The call id is the same
+ * `toolCallId` history uses, so live rows dedupe against the reloaded ones.
+ */
+// Exported for tests: live tool-call mapping.
+export function buildCursorToolCallMessages(event: AnyRecord, sessionId: string | null) {
+  const toolId = typeof event?.call_id === 'string' ? event.call_id : null;
+  const toolCall = event?.tool_call && typeof event.tool_call === 'object' ? event.tool_call as AnyRecord : null;
+  if (!toolId || !toolCall) return [];
+  const kind = Object.keys(toolCall)[0];
+  if (!kind) return [];
+  const call = (toolCall[kind] ?? {}) as AnyRecord;
+  const toolName = kind === 'function'
+    ? String(call.name ?? 'Tool')
+    : CURSOR_TOOL_NAMES[kind] ?? kind.replace(/ToolCall$/, '');
+  let toolInput: unknown = call.args;
+  if (kind === 'function' && typeof call.arguments === 'string') {
+    try { toolInput = JSON.parse(call.arguments); } catch { toolInput = call.arguments; }
+  }
+
+  if (event.subtype === 'started') {
+    return [createNormalizedMessage({
+      id: toolId, kind: 'tool_use', toolId, toolName, toolInput: toolInput ?? {}, sessionId, provider: 'cursor',
+    })];
+  }
+  if (event.subtype === 'completed') {
+    const { content, isError } = readCursorToolResultText(call.result);
+    return [createNormalizedMessage({
+      id: `${toolId}__result`, kind: 'tool_result', toolId, content, isError, sessionId, provider: 'cursor',
+    })];
+  }
+  return [];
+}
+
 // Consumed by provider runtime services and lifecycle tests.
 export async function spawnCursor(command: string, options: AnyRecord = {}, ws: ProviderRuntimeWriter, context: AnyRecord) {
   return new Promise((resolve: any, reject: any) => {
@@ -247,6 +312,15 @@ export async function spawnCursor(command: string, options: AnyRecord = {}, ws: 
                 for (const msg of normalized) ws.send(msg);
               }
               break;
+
+            case 'tool_call': {
+              // Tool calls stream as their own events; without this case they
+              // only appeared after a history reload.
+              for (const msg of buildCursorToolCallMessages(response, capturedSessionId || sessionId || null)) {
+                ws.send(msg);
+              }
+              break;
+            }
 
             case 'result': {
               // Session complete — terminal lifecycle event for this run
