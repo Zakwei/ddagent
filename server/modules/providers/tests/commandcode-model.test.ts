@@ -38,3 +38,15 @@ test('applyModelToCommandCodeSession passes ids through when the ACP list is unk
 
   assert.deepEqual(calls.map((call) => call.params.value), ['moonshotai/kimi-k3']);
 });
+
+test('applyModelToCommandCodeSession tells the user when the model is not offered', async () => {
+  const sent: any[] = [];
+  const { state, calls } = fakeCommandCodeState({ currentWriter: { send: (message: any) => sent.push(message) } });
+
+  await applyModelToCommandCodeSession(state, 'nonexistent-model-xyz');
+
+  assert.equal(calls.length, 0);
+  assert.equal(state.model, 'deepseek/deepseek-v4-flash');
+  assert.equal(sent[0]?.notice, true);
+  assert.match(sent[0]?.text, /nonexistent-model-xyz; still using deepseek\/deepseek-v4-flash/);
+});

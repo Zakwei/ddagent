@@ -1120,7 +1120,13 @@ export async function applyModelToCommandCodeSession(state: any, model: any) {
     // only accepts its canonical spelling (`zai-org/glm-5.3` vs
     // `zai-org/GLM-5.3`) and rejects the rest as "Unknown model".
     const requested = String(model).toLowerCase();
-    model = (state.modelOptions ?? []).find((value: string) => value.toLowerCase() === requested) ?? model;
+    const canonical = (state.modelOptions ?? []).find((value: string) => value.toLowerCase() === requested);
+    // The CLI keeps its current model on an unknown id without failing the call.
+    if (!canonical && state.modelOptions?.length) {
+        notifyCommandCodeModelNotApplied(state, model);
+        return;
+    }
+    model = canonical ?? model;
     if (state.model === model) return;
     let applied: any = null;
     try {
@@ -1140,10 +1146,25 @@ export async function applyModelToCommandCodeSession(state: any, model: any) {
             });
         } catch (innerError: any) {
             console.warn('[CommandCode] Failed to apply the selected model to the session:', innerError instanceof Error ? innerError.message : innerError);
+            notifyCommandCodeModelNotApplied(state, model);
             return;
         }
     }
-    state.model = readModelConfigValue(applied) ?? model;
+    const active = readModelConfigValue(applied);
+    if (active && String(active).toLowerCase() !== String(model).toLowerCase()) {
+        notifyCommandCodeModelNotApplied(state, model, active);
+    }
+    state.model = active ?? model;
+}
+
+function notifyCommandCodeModelNotApplied(state: any, model: any, active: any = state.model) {
+    state.currentWriter?.send(createNormalizedMessage({
+        kind: 'status',
+        text: `Could not switch model to ${model}${active ? `; still using ${active}` : ''}.`,
+        notice: true,
+        sessionId: state.commandCodeSessionId,
+        provider: 'commandcode',
+    }));
 }
 
 /**
