@@ -13,6 +13,9 @@
  * - getActiveCodexSessions() - List all active sessions
  */
 
+import os from 'node:os';
+import path from 'node:path';
+
 import { Codex } from '@openai/codex-sdk';
 
 import type {
@@ -30,6 +33,8 @@ import {
 } from '@/shared/index.js';
 import { notifyRunFailed, notifyRunStopped } from '@/modules/notifications/index.js';
 
+import { readCodexRolloutContextUsage } from './codex-sessions.provider.js';
+
 const activeCodexSessions = new Map<any, any>();
 
 function readUsageNumber(value: any) {
@@ -37,27 +42,43 @@ function readUsageNumber(value: any) {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
-function extractCodexTokenBudget(event: any) {
-  const info = event?.info || event?.payload?.info || event?.usage?.info;
-  const usage = info?.total_token_usage || event?.usage?.total_token_usage || event?.usage;
-  if (!usage || typeof usage !== 'object') {
+/**
+ * Builds the live token budget for a finished turn. `turn.completed.usage` is
+ * the thread-wide token sum (it grows past the context window), so it only
+ * feeds the input/output counters; `used`/`total` come from the rollout's last
+ * request (`context`), falling back to the catalog's window when the rollout
+ * cannot be read yet. Returns null when there is no context reading at all.
+ */
+function extractCodexTokenBudget(event: any, context: { used: number; total: number } | null, catalogWindow: number) {
+  if (!context) {
     return null;
   }
-
-  const inputTokens = readUsageNumber(usage.input_tokens);
+  const usage = event?.usage && typeof event.usage === 'object' ? event.usage : {};
+  const cacheReadTokens = readUsageNumber(usage.cached_input_tokens);
+  // Codex folds cached input into input_tokens; split it out like history.
+  const inputTokens = Math.max(0, readUsageNumber(usage.input_tokens) - cacheReadTokens);
   const outputTokens = readUsageNumber(usage.output_tokens);
-  const used = readUsageNumber(usage.total_tokens) || inputTokens + outputTokens;
 
   return {
-    used,
-    total: readUsageNumber(info?.model_context_window || event?.usage?.model_context_window) || 200000,
+    used: context.used,
+    total: context.total || catalogWindow || 200000,
     inputTokens,
     outputTokens,
+    cacheReadTokens,
     breakdown: {
       input: inputTokens,
       output: outputTokens,
+      cacheRead: cacheReadTokens,
     },
   };
+}
+
+// codex exec cannot ask for approval, so under `untrusted` a command outside
+// the trusted list is refused; the refusal only shows in the item.
+function isCodexApprovalRefusal(item: any) {
+  return item?.type === 'command_execution'
+    && (item.status === 'declined'
+      || /rejected by user|declined by user|approval settings/i.test(String(item.aggregated_output ?? '')));
 }
 
 /**
@@ -151,10 +172,7 @@ function transformCodexEvent(event: any) {
           return {
             type: 'item',
             itemType: 'error',
-            message: {
-              role: 'error',
-              content: item.message
-            }
+            text: item.message
           };
 
         default:
@@ -382,6 +400,16 @@ export async function queryCodex(command: string, options: AnyRecord = {}, ws: P
   let capturedSessionId = providerSessionId;
   let sessionCreatedSent = false;
   let terminalFailure: any = null;
+  // Text of the last `error` frame sent, to drop the turn.failed repeat.
+  let lastErrorText: string | undefined;
+  let approvalNoticeSent = false;
+  // Tool items whose card was already sent at item.started.
+  const startedToolIds = new Set<string>();
+  // todo_list item id -> last items snapshot sent.
+  const todoSnapshots = new Map<string, string>();
+  let todoRevision = 0;
+  const codexHome = options.env?.CODEX_HOME || process.env.CODEX_HOME || path.join(os.homedir(), '.codex');
+  const catalogWindow = Number(selectedModel?.context) || 0;
   // Live rows relayed to the client for message/reasoning item snapshots.
   const liveStream = createCodexLiveStream();
   const abortController = new AbortController();
@@ -472,18 +500,60 @@ export async function queryCodex(command: string, options: AnyRecord = {}, ws: P
 
       const eventSessionId = capturedSessionId || sessionId || null;
 
+      const item = event.item;
+      const isItemEvent = event.type === 'item.started' || event.type === 'item.updated' || event.type === 'item.completed';
+
+      // Todo lists stream as snapshots; each changed one becomes its own
+      // TodoWrite card (the client shows the latest list).
+      if (isItemEvent && item?.type === 'todo_list') {
+        const snapshot = JSON.stringify(item.items ?? []);
+        if (todoSnapshots.get(item.id) !== snapshot) {
+          todoSnapshots.set(item.id, snapshot);
+          const transformedTodo: any = transformCodexEvent(event);
+          transformedTodo.itemId = `${item.id}:${++todoRevision}`;
+          for (const msg of context.normalizeMessage(transformedTodo, eventSessionId)) {
+            sendMessage(ws, msg);
+          }
+        }
+        continue;
+      }
+
       if (event.type === 'item.started' || event.type === 'item.updated') {
-        // Message/reasoning snapshots feed the client's live rows; every other
-        // item type keeps its completion-only behavior.
-        for (const msg of buildCodexLiveSnapshotMessages(event.item, liveStream, eventSessionId)) {
+        // Message/reasoning snapshots feed the client's live rows.
+        for (const msg of buildCodexLiveSnapshotMessages(item, liveStream, eventSessionId)) {
           sendMessage(ws, msg);
+        }
+        // Long-running tools show their card while they run; the result is
+        // attached at item.completed under the same toolId.
+        if (
+          event.type === 'item.started'
+          && (item?.type === 'command_execution' || item?.type === 'mcp_tool_call')
+          && item.id
+        ) {
+          startedToolIds.add(item.id);
+          const transformedStart: any = transformCodexEvent(event);
+          transformedStart.itemId = item.id;
+          transformedStart.status = 'in_progress';
+          for (const msg of context.normalizeMessage(transformedStart, eventSessionId)) {
+            sendMessage(ws, msg);
+          }
         }
         continue;
       }
 
       if (event.type === 'item.completed') {
-        for (const msg of buildCodexLiveCompletionMessages(event.item, liveStream, eventSessionId)) {
+        for (const msg of buildCodexLiveCompletionMessages(item, liveStream, eventSessionId)) {
           sendMessage(ws, msg);
+        }
+        if (permissionMode === 'default' && !approvalNoticeSent && isCodexApprovalRefusal(item)) {
+          approvalNoticeSent = true;
+          sendMessage(ws, createNormalizedMessage({
+            kind: 'status',
+            notice: true,
+            text: 'A command was blocked by the sandbox/approval policy: Codex cannot ask for approval in this mode. Switch to Accept Edits or Bypass Permissions to let it run commands.',
+            sessionId: eventSessionId,
+            provider: 'codex',
+          }));
         }
       } else if (event.type === 'turn.completed' || event.type === 'turn.failed') {
         // The turn is over: finalize any row an unfinished item left open
@@ -493,16 +563,39 @@ export async function queryCodex(command: string, options: AnyRecord = {}, ws: P
         }
       }
 
-      const transformed = transformCodexEvent(event);
+      const transformed: any = transformCodexEvent(event);
+      if (item?.id) {
+        transformed.itemId = item.id;
+      }
 
       // Normalize the transformed event into NormalizedMessage(s) via adapter
-      const normalizedMsgs = context.normalizeMessage(transformed, eventSessionId);
-      for (const msg of normalizedMsgs) {
+      for (const msg of context.normalizeMessage(transformed, eventSessionId)) {
+        if (msg.kind === 'tool_use' && startedToolIds.has(msg.toolId)) {
+          // The card was sent at item.started; attach only its outcome.
+          sendMessage(ws, createNormalizedMessage({
+            kind: 'tool_result',
+            toolId: msg.toolId,
+            content: msg.toolResult?.content ?? '',
+            isError: Boolean(msg.toolResult?.isError),
+            exitCode: msg.exitCode,
+            sessionId: eventSessionId,
+            provider: 'codex',
+          }));
+          continue;
+        }
+        if (msg.kind === 'error') {
+          // A top-level `error` is usually followed by `turn.failed` with
+          // the same text; show it once.
+          if (msg.content === lastErrorText) {
+            continue;
+          }
+          lastErrorText = msg.content;
+        }
         sendMessage(ws, msg);
       }
 
-      if (event.type === 'turn.failed' && !terminalFailure) {
-        terminalFailure = event.error || new Error('Turn failed');
+      if ((event.type === 'turn.failed' || event.type === 'error') && !terminalFailure) {
+        terminalFailure = event.error || new Error(event.message || 'Turn failed');
         // Notifications are app-facing, so they carry the app session id.
         notifyRunFailed({
           userId: ws?.userId || null,
@@ -515,7 +608,11 @@ export async function queryCodex(command: string, options: AnyRecord = {}, ws: P
 
       // Extract and send token usage if available (normalized to match Claude format)
       if (event.type === 'turn.completed') {
-        const tokenBudget = extractCodexTokenBudget(event);
+        const threadId = capturedSessionId || thread.id;
+        const rolloutContext = threadId
+          ? await readCodexRolloutContextUsage(sessionId || null, threadId, codexHome)
+          : null;
+        const tokenBudget = extractCodexTokenBudget(event, rolloutContext, catalogWindow);
         if (tokenBudget) {
           sendMessage(ws, createNormalizedMessage({ kind: 'status', text: 'token_budget', tokenBudget, sessionId: capturedSessionId || sessionId || null, provider: 'codex' }));
         }
@@ -566,13 +663,16 @@ export async function queryCodex(command: string, options: AnyRecord = {}, ws: P
     if (!wasAborted) {
       console.error('[Codex] Error:', error);
 
-      // Check if Codex SDK is available for a clearer error message
-      const installed = await context.isProviderInstalled();
-      const errorContent = !installed
-        ? 'Codex CLI is not configured. Please set up authentication first.'
-        : error.message;
-
-      sendMessage(ws, createNormalizedMessage({ kind: 'error', content: errorContent, sessionId: capturedSessionId || sessionId || null, provider: 'codex' }));
+      // A turn that already reported its failure exits non-zero too; that
+      // exit adds nothing the user has not seen.
+      if (!terminalFailure) {
+        const message = String(error?.message || error || 'Codex failed');
+        const binaryMissing = error?.code === 'ENOENT' || /ENOENT/.test(message) || !(await context.isProviderInstalled());
+        const errorContent = binaryMissing
+          ? `${message}\nThe Codex CLI was not found. Install it (npm install -g @openai/codex) and sign in.`
+          : message;
+        sendMessage(ws, createNormalizedMessage({ kind: 'error', content: errorContent, sessionId: capturedSessionId || sessionId || null, provider: 'codex' }));
+      }
       sendMessage(ws, createCompleteMessage({
         provider: 'codex',
         sessionId: capturedSessionId || sessionId || null,

@@ -109,9 +109,18 @@ const INTERNAL_CONTENT_PREFIXES = [
  * Codex includes extra internal metadata tags that should not surface as
  * user-facing searchable conversation content.
  */
+// Context Codex injects as `role: user` response items (AGENTS.md, skills,
+// environment) — never typed by the user.
 const CODEX_INTERNAL_CONTENT_PREFIXES = [
   '<environment_context>',
   '<cwd>',
+  '<user_instructions>',
+  '<INSTRUCTIONS>',
+  '<permissions instructions>',
+  '<skill>',
+  '<unified-rules>',
+  '<turn_aborted>',
+  '# AGENTS.md instructions',
 ] as const;
 
 function normalizeComparablePath(inputPath: string): string {
@@ -1053,6 +1062,15 @@ async function parseCodexSessionMatches(
 
       if (entry.type === 'event_msg' && isVisibleCodexUserMessage(entry.payload as AnyRecord)) {
         text = String(entry.payload.message);
+        role = 'user';
+      } else if (
+        // codex-cli 0.160 records prompts as item_completed UserMessage items;
+        // the role=user response_item copy is deduped by fingerprint below.
+        entry.type === 'event_msg'
+        && entry.payload?.type === 'item_completed'
+        && entry.payload.item?.type === 'UserMessage'
+      ) {
+        text = extractCodexText(entry.payload.item.content);
         role = 'user';
       } else if (
         entry.type === 'event_msg'

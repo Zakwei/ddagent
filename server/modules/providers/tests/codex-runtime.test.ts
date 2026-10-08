@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdtemp, readFile, readdir, rm } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
@@ -99,7 +99,8 @@ test('codex runtime relays live item snapshots and closes them at completion', a
         { type: 'item.updated', item: { id: 'rs-1', type: 'reasoning', text: 'Think' } },
         { type: 'item.updated', item: { id: 'rs-1', type: 'reasoning', text: 'Thinking harder' } },
         { type: 'item.completed', item: { id: 'rs-1', type: 'reasoning', text: 'Thinking harder' } },
-        // Tool items keep their completion-only handling: no live frames.
+        // A started command shows its card at once; the outcome follows as a
+        // tool_result under the same toolId.
         {
           type: 'item.started',
           item: {
@@ -146,8 +147,7 @@ test('codex runtime relays live item snapshots and closes them at completion', a
       'stream_end',
       'thinking',
       'tool_use',
-      'complete',
-      'status',
+      'tool_result',
       'complete',
     ]);
 
@@ -166,8 +166,14 @@ test('codex runtime relays live item snapshots and closes them at completion', a
     assert.equal(authoritativeText?.role, 'assistant');
     assert.equal(sent.find((message) => message.kind === 'thinking')?.content, 'Thinking harder');
     assert.equal(sent.find((message) => message.kind === 'tool_use')?.toolName, 'Bash');
-    // The completed command carries its outcome, so the card stops spinning.
-    assert.deepEqual(sent.find((message) => message.kind === 'tool_use')?.toolResult, { content: 'hi\n', isError: false });
+    // The started card has no outcome yet; the result pairs with it by toolId.
+    const startedCard = sent.find((message) => message.kind === 'tool_use');
+    assert.equal(startedCard?.toolResult, undefined);
+    assert.equal(startedCard?.toolId, 'cmd-1');
+    const result = sent.find((message) => message.kind === 'tool_result');
+    assert.equal(result?.toolId, 'cmd-1');
+    assert.equal(result?.content, 'hi\n');
+    assert.equal(result?.isError, false);
 
     // Live frames are control events, never transcript rows: exactly one
     // authoritative text and one authoritative thinking message are emitted,
@@ -212,8 +218,6 @@ test('codex runtime keeps completion-only frames when no live snapshots arrive',
       'text',
       'tool_use',
       'complete',
-      'status',
-      'complete',
     ]);
     assert.equal(sent[0].content, 'Final answer');
   } finally {
@@ -236,8 +240,6 @@ test('codex runtime closes a live row left open when the turn ends', async () =>
     assert.deepEqual(sent.map((message) => message.kind), [
       'stream_replace',
       'stream_end',
-      'complete',
-      'status',
       'complete',
     ]);
     assert.equal(sent[0].content, 'Partial answer');
@@ -272,8 +274,6 @@ test('codex runtime skips reasoning snapshots that are not safe to reduce to a s
       'thought_delta',
       'stream_end',
       'thinking',
-      'complete',
-      'status',
       'complete',
     ]);
   } finally {
@@ -333,4 +333,95 @@ test('Codex history flags tool outputs with a non-zero exit code as errors', () 
   assert.equal(result('Script completed\nOutput:\n{"exit_code":0,"output":"ok"}').isError, false);
   assert.equal(result('Process exited with code 1\nOutput:\nboom').isError, true);
   assert.equal(result('plain output').isError, false);
+});
+
+test('codex runtime surfaces errors, notices, todos and the context budget with one complete', async () => {
+  const cwd = await mkdtemp(path.join(os.tmpdir(), 'codex-runtime-lifecycle-'));
+  const previousCodexHome = process.env.CODEX_HOME;
+  process.env.CODEX_HOME = cwd;
+  try {
+    // The live usage is thread-wide; the gauge reads the rollout's last request.
+    const now = new Date();
+    const dayDir = path.join(
+      cwd, 'sessions', String(now.getFullYear()),
+      String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0'),
+    );
+    await mkdir(dayDir, { recursive: true });
+    await writeFile(
+      path.join(dayDir, 'rollout-2026-10-08T10-00-00-provider-thread-1.jsonl'),
+      `${JSON.stringify({
+        type: 'event_msg',
+        payload: {
+          type: 'token_count',
+          info: {
+            total_token_usage: { input_tokens: 400000, output_tokens: 3000, total_tokens: 403000 },
+            last_token_usage: { input_tokens: 51000, output_tokens: 200, total_tokens: 51200 },
+            model_context_window: 258400,
+          },
+        },
+      })}\n`,
+    );
+
+    const sent = await runCodexWithEvents(
+      [
+        { type: 'turn.started' },
+        { type: 'item.started', item: { id: 'todo-1', type: 'todo_list', items: [{ text: 'Read', completed: false }] } },
+        { type: 'item.updated', item: { id: 'todo-1', type: 'todo_list', items: [{ text: 'Read', completed: true }] } },
+        { type: 'item.completed', item: { id: 'todo-1', type: 'todo_list', items: [{ text: 'Read', completed: true }] } },
+        { type: 'item.completed', item: { id: 'err-1', type: 'error', message: 'Reconnecting... 1/5' } },
+        { type: 'item.completed', item: { id: 'rs-1', type: 'reasoning', text: '   ' } },
+        {
+          type: 'item.completed',
+          item: { id: 'cmd-1', type: 'command_execution', command: 'rm x', aggregated_output: 'exec command rejected by user', status: 'failed' },
+        },
+        { type: 'turn.completed', usage: { input_tokens: 400000, cached_input_tokens: 300000, output_tokens: 3000 } },
+      ],
+      { cwd, sessionId: 'app-codex-lifecycle-1' },
+    );
+
+    const kinds = sent.map((message) => message.kind);
+    assert.equal(kinds.filter((kind) => kind === 'complete').length, 1);
+    assert.equal(kinds.at(-1), 'complete');
+    assert.equal(sent.at(-1)?.exitCode, 0);
+    assert.ok(!kinds.includes('error'), 'non-fatal item errors are notices');
+    assert.ok(!kinds.includes('thinking'), 'blank reasoning is skipped');
+
+    const todos = sent.filter((message) => message.toolName === 'TodoWrite');
+    assert.equal(todos.length, 2);
+    assert.deepEqual((todos[1].toolInput as any).todos, [{ content: 'Read', status: 'completed' }]);
+    assert.ok(todos.every((message) => message.toolResult));
+
+    const notices = sent.filter((message) => message.kind === 'status' && message.notice === true);
+    assert.equal(notices[0].text, 'Reconnecting... 1/5');
+    assert.match(String(notices[1].text), /approval policy/);
+
+    const budget = sent.find((message) => message.text === 'token_budget')?.tokenBudget as AnyRecord;
+    assert.equal(budget.used, 51200);
+    assert.equal(budget.total, 258400);
+    assert.equal(budget.cacheReadTokens, 300000);
+  } finally {
+    if (previousCodexHome === undefined) delete process.env.CODEX_HOME;
+    else process.env.CODEX_HOME = previousCodexHome;
+    await rm(cwd, { recursive: true, force: true });
+  }
+});
+
+test('codex runtime sends a fatal stream error once, before a failed complete', async () => {
+  const cwd = await mkdtemp(path.join(os.tmpdir(), 'codex-runtime-error-'));
+  try {
+    const sent = await runCodexWithEvents(
+      [
+        { type: 'turn.started' },
+        { type: 'error', message: 'stream disconnected' },
+        { type: 'turn.failed', error: { message: 'stream disconnected' } },
+      ],
+      { cwd, sessionId: 'app-codex-error-1' },
+    );
+
+    assert.deepEqual(sent.map((message) => message.kind), ['error', 'complete']);
+    assert.equal(sent[0].content, 'stream disconnected');
+    assert.equal(sent[1].exitCode, 1);
+  } finally {
+    await rm(cwd, { recursive: true, force: true });
+  }
 });

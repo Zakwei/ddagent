@@ -180,9 +180,26 @@ test('Codex history preserves wrapped exec tool calls and results', { concurrenc
         expectedToolName: 'Bash',
         expectedToolInput: JSON.stringify({ command: 'echo current' }),
       },
-      { callId: 'apply-patch-1', input: 'await tools.apply_patch("*** Begin Patch\\n*** End Patch");' },
-      { callId: 'web-run-1', input: 'await tools.web__run({ search_query: [{ q: "Codex" }] });' },
-      { callId: 'update-plan-1', input: 'await tools.update_plan({ plan: [] });' },
+      { callId: 'apply-patch-empty-1', input: 'await tools.apply_patch("*** Begin Patch\\n*** End Patch");' },
+      {
+        callId: 'apply-patch-1',
+        input: 'text(await tools.apply_patch("*** Begin Patch\\n*** Update File: /w/a.ts\\n@@\\n-x\\n+y\\n*** Add File: /w/b.ts\\n+z\\n*** End Patch"));',
+        expectedToolName: 'FileChanges',
+        expectedToolInput: [{ path: '/w/a.ts', kind: 'update' }, { path: '/w/b.ts', kind: 'add' }],
+      },
+      {
+        callId: 'web-run-1',
+        input: 'await tools.web__run({ search_query: [{ q: "Codex" }] });',
+        expectedToolName: 'WebSearch',
+        expectedToolInput: { query: 'Codex' },
+      },
+      { callId: 'update-plan-empty-1', input: 'await tools.update_plan({ plan: [] });' },
+      {
+        callId: 'update-plan-1',
+        input: 'await tools.update_plan({ plan: [{ step: "Read", status: "completed" }, { step: "Fix", status: "in_progress" }] });',
+        expectedToolName: 'TodoWrite',
+        expectedToolInput: { todos: [{ content: 'Read', status: 'completed' }, { content: 'Fix', status: 'in_progress' }] },
+      },
       { callId: 'unknown-1', input: 'await tools.unknown_wrapper({ value: true });' },
     ];
     const transcriptLines = [
@@ -219,10 +236,73 @@ test('Codex history preserves wrapped exec tool calls and results', { concurrenc
         const toolUse = toolUsesById.get(call.callId);
         assert.ok(toolUse);
         assert.equal(toolUse.toolName, call.expectedToolName || 'exec');
-        assert.equal(toolUse.toolInput, call.expectedToolInput || call.input);
+        assert.deepEqual(toolUse.toolInput, call.expectedToolInput || call.input);
         assert.equal(toolUse.toolResult?.content, `result:${call.callId}`);
         assert.equal(toolResultsById.get(call.callId)?.content, `result:${call.callId}`);
       }
+    });
+  } finally {
+    restoreHomeDir();
+    await rm(tempRoot, { recursive: true, force: true });
+  }
+});
+
+test('Codex 0.160 history rebuilds user prompts, questions and turn failures', { concurrency: false }, async () => {
+  const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'codex-160-history-'));
+  const workspacePath = path.join(tempRoot, 'workspace');
+  await mkdir(workspacePath, { recursive: true });
+  const restoreHomeDir = patchHomeDir(tempRoot);
+
+  try {
+    const providerSessionId = 'codex-160-1';
+    const transcriptPath = await writeCodexTranscript(tempRoot, providerSessionId, workspacePath);
+    const at = (second: number) => `2026-10-04T15:54:${String(second).padStart(2, '0')}.000Z`;
+    const userItem = (text: string) => ({ type: 'response_item', payload: { type: 'message', role: 'user', content: [{ type: 'input_text', text }] } });
+    const lines = [
+      { type: 'session_meta', payload: { id: providerSessionId, cwd: workspacePath } },
+      // 0.160 writes injected context and the prompt as role=user response
+      // items, and the prompt alone as an item_completed UserMessage.
+      { timestamp: at(1), ...userItem('# AGENTS.md instructions for /w\n<INSTRUCTIONS>rules</INSTRUCTIONS>') },
+      { timestamp: at(2), ...userItem('Fix the bug') },
+      {
+        timestamp: at(2),
+        type: 'event_msg',
+        payload: { type: 'item_completed', item: { type: 'UserMessage', id: 'u1', content: [{ type: 'text', text: 'Fix the bug' }] } },
+      },
+      {
+        timestamp: at(3),
+        type: 'response_item',
+        payload: {
+          type: 'function_call',
+          name: 'request_user_input_async',
+          call_id: 'ask-1',
+          arguments: JSON.stringify({ questions: [{ title: 'Which file?' }] }),
+        },
+      },
+      { timestamp: at(4), type: 'response_item', payload: { type: 'function_call_output', call_id: 'ask-1', output: '{"accepted":true}' } },
+      {
+        timestamp: at(5),
+        type: 'event_msg',
+        payload: { type: 'task_complete', last_agent_message: null, error: { message: 'You have hit your usage limit.' } },
+      },
+    ];
+    await writeFile(transcriptPath, `${lines.map((line) => JSON.stringify(line)).join('\n')}\n`, 'utf8');
+
+    await withIsolatedDatabase(async () => {
+      sessionsDb.createAppSession('app-160-1', 'codex', workspacePath);
+      sessionsDb.assignProviderSessionId('app-160-1', providerSessionId);
+      await new CodexSessionSynchronizer().synchronize();
+
+      const history = await new CodexSessionsProvider().fetchHistory('app-160-1');
+      const users = history.messages.filter((message) => message.kind === 'text' && message.role === 'user');
+      assert.deepEqual(users.map((message) => message.content), ['Fix the bug']);
+
+      const ask = history.messages.find((message) => message.toolId === 'ask-1');
+      assert.equal(ask?.toolName, 'AskUserQuestion');
+      assert.deepEqual((ask?.toolInput as any).questions[0].question, 'Which file?');
+
+      const error = history.messages.find((message) => message.kind === 'error');
+      assert.equal(error?.content, 'You have hit your usage limit.');
     });
   } finally {
     restoreHomeDir();

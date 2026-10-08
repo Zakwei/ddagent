@@ -1,4 +1,5 @@
 import fsSync from 'node:fs';
+import path from 'node:path';
 import readline from 'node:readline';
 
 import { sessionsDb } from '@/modules/database/index.js';
@@ -30,6 +31,113 @@ function isVisibleCodexUserMessage(payload: AnyRecord | null | undefined): boole
   }
 
   return typeof payload.message === 'string' && payload.message.trim().length > 0;
+}
+
+// Context Codex injects as `role: user` response items (AGENTS.md, skills,
+// environment) — never typed by the user.
+const CODEX_INJECTED_USER_PREFIXES = [
+  '<environment_context>',
+  '<cwd>',
+  '<user_instructions>',
+  '<INSTRUCTIONS>',
+  '<permissions instructions>',
+  '<skill>',
+  '<unified-rules>',
+  '<turn_aborted>',
+  '# AGENTS.md instructions',
+];
+
+function isInjectedCodexUserText(text: string): boolean {
+  const normalized = text.trimStart();
+  return CODEX_INJECTED_USER_PREFIXES.some((prefix) => normalized.startsWith(prefix));
+}
+
+/**
+ * Reads one user prompt from a rollout line. codex-cli <= 0.146 writes
+ * `event_msg/user_message`; 0.160 writes `event_msg/item_completed` with a
+ * `UserMessage` item. Both are the clean "typed by the user" channel
+ * (`primary`). `response_item/message role=user` repeats each prompt next to
+ * injected context, so it is only a `fallback` for rollouts with neither.
+ *
+ * Exported for tests.
+ */
+export function readCodexUserPrompt(
+  entry: AnyRecord,
+): { source: 'primary' | 'fallback'; text: string; images?: Array<{ path?: string; data?: string }> } | null {
+  const payload = readObjectRecord(entry.payload);
+  if (!payload) {
+    return null;
+  }
+
+  if (entry.type === 'event_msg' && isVisibleCodexUserMessage(payload)) {
+    return { source: 'primary', text: payload.message, images: extractCodexUserImages(payload) };
+  }
+
+  if (entry.type === 'event_msg' && payload.type === 'item_completed' && payload.item?.type === 'UserMessage') {
+    const parts: AnyRecord[] = Array.isArray(payload.item.content) ? payload.item.content : [];
+    const text = extractCodexTextContent(parts);
+    const images = extractCodexUserImages({
+      local_images: parts.filter((part) => part?.type === 'local_image').map((part) => part.path),
+      images: parts.filter((part) => part?.type === 'image').map((part) => part.image_url ?? part.url),
+    });
+    if ((!text.trim() && !images) || isInjectedCodexUserText(text)) {
+      return null;
+    }
+    return { source: 'primary', text, images };
+  }
+
+  if (entry.type === 'response_item' && payload.type === 'message' && payload.role === 'user') {
+    const text = extractCodexTextContent(payload.content);
+    if (!text.trim() || isInjectedCodexUserText(text)) {
+      return null;
+    }
+    return { source: 'fallback', text };
+  }
+
+  return null;
+}
+
+/**
+ * Maps Codex plan/todo items onto the client's `TodoWrite` todo shape.
+ * Accepts the live SDK `todo_list` items (`{text, completed}`) and the
+ * rollout `update_plan` steps (`{step, status}`).
+ *
+ * Exported for the Codex runtime (live todo snapshots) and tests.
+ */
+export function toCodexTodos(items: unknown): Array<{ content: string; status: string }> {
+  if (!Array.isArray(items)) {
+    return [];
+  }
+  return items.map((item: AnyRecord) => {
+    const status = item?.status === 'completed' || item?.status === 'in_progress'
+      ? item.status
+      : item?.completed === true ? 'completed' : 'pending';
+    return { content: String(item?.text ?? item?.step ?? item?.content ?? ''), status };
+  });
+}
+
+// Every string literal assigned to `key:` inside an exec script.
+function extractCodexScriptStrings(source: string, key: string): string[] {
+  const pattern = new RegExp(
+    `\\b${key}\\s*:\\s*("(?:\\\\.|[^"\\\\])*"|'(?:\\\\.|[^'\\\\])*'|\`(?:\\\\.|[^\`\\\\])*\`)`,
+    'g',
+  );
+  return [...source.matchAll(pattern)].map((match) => decodeJavaScriptStringLiteral(match[1]));
+}
+
+// `tools.apply_patch("*** Begin Patch ...")` → the same `[{path, kind}]`
+// list live `file_change` items carry.
+function extractCodexPatchChanges(source: string): Array<{ path: string; kind: string }> {
+  const changes: Array<{ path: string; kind: string }> = [];
+  const patchPattern = /tools\.apply_patch\s*\(\s*("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`)/g;
+  const kinds: Record<string, string> = { Add: 'add', Update: 'update', Delete: 'delete' };
+  for (const patch of source.matchAll(patchPattern)) {
+    const text = decodeJavaScriptStringLiteral(patch[1]);
+    for (const file of text.matchAll(/^\*\*\* (Add|Update|Delete) File: (.+)$/gm)) {
+      changes.push({ path: file[2].trim(), kind: kinds[file[1]] });
+    }
+  }
+  return changes;
 }
 
 /**
@@ -171,7 +279,7 @@ function extractNestedCodexCommands(source: string): string[] {
  * the nested tool name. Recover the useful UI-level operation so history does
  * not degrade into rows labelled only "exec / Parameters".
  */
-function translateCodexExecInput(input: unknown): { toolName: string; toolInput: string } | null {
+function translateCodexExecInput(input: unknown): { toolName: string; toolInput: unknown } | null {
   const source = typeof input === 'string' ? input : String(input || '');
   if (/\btools\.(?:shell_command|exec_command)\s*\(/.test(source)) {
     const commands = extractNestedCodexCommands(source);
@@ -181,6 +289,31 @@ function translateCodexExecInput(input: unknown): { toolName: string; toolInput:
         toolInput: JSON.stringify({ command: commands.join('\n') }),
       };
     }
+  }
+
+  if (/\btools\.apply_patch\s*\(/.test(source)) {
+    const changes = extractCodexPatchChanges(source);
+    if (changes.length > 0) {
+      return { toolName: 'FileChanges', toolInput: changes };
+    }
+  }
+
+  if (/\btools\.update_plan\s*\(/.test(source)) {
+    // shortcut: pairs step/status literals by order; a computed plan stays raw.
+    const steps = extractCodexScriptStrings(source, 'step');
+    const statuses = extractCodexScriptStrings(source, 'status');
+    if (steps.length > 0) {
+      return {
+        toolName: 'TodoWrite',
+        toolInput: { todos: toCodexTodos(steps.map((step, index) => ({ step, status: statuses[index] }))) },
+      };
+    }
+  }
+
+  if (/\btools\.web__run\s*\(/.test(source)) {
+    const queries = extractCodexScriptStrings(source, 'q');
+    const targets = queries.length > 0 ? queries : extractCodexScriptStrings(source, 'ref_id');
+    return { toolName: 'WebSearch', toolInput: { query: targets.join(' | ') } };
   }
 
   return null;
@@ -237,6 +370,89 @@ function readTokenCount(value: unknown): number {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
 }
 
+const ROLLOUT_TAIL_BYTES = 512 * 1024;
+
+// Rollouts live in `<CODEX_HOME>/sessions/YYYY/MM/DD/rollout-<ts>-<threadId>.jsonl`
+// (local date). An indexed session row knows its path; a brand-new thread is
+// found under today's or yesterday's folder.
+async function findCodexRolloutPath(appSessionId: string | null, threadId: string, codexHome: string) {
+  let indexed: string | null | undefined = null;
+  try {
+    indexed = appSessionId ? sessionsDb.getSessionById(appSessionId)?.jsonl_path : null;
+  } catch {
+    // No session index (e.g. a standalone run); fall back to the date folders.
+  }
+  if (indexed) {
+    return indexed;
+  }
+  for (const daysAgo of [0, 1]) {
+    const day = new Date(Date.now() - daysAgo * 86_400_000);
+    const directory = path.join(
+      codexHome,
+      'sessions',
+      String(day.getFullYear()),
+      String(day.getMonth() + 1).padStart(2, '0'),
+      String(day.getDate()).padStart(2, '0'),
+    );
+    const names = await fsSync.promises.readdir(directory).catch(() => [] as string[]);
+    const match = names.find((name) => name.endsWith(`-${threadId}.jsonl`));
+    if (match) {
+      return path.join(directory, match);
+    }
+  }
+  return null;
+}
+
+/**
+ * Reads the context size of the latest model request (`last_token_usage`)
+ * and the model's effective window from the tail of a Codex rollout. The
+ * live SDK `turn.completed` usage is the session-wide sum, so it cannot
+ * drive the context gauge.
+ *
+ * Consumed by the Codex runtime for its live `token_budget` frame.
+ */
+export async function readCodexRolloutContextUsage(
+  appSessionId: string | null,
+  threadId: string,
+  codexHome: string,
+): Promise<{ used: number; total: number } | null> {
+  try {
+    const rolloutPath = await findCodexRolloutPath(appSessionId, threadId, codexHome);
+    if (!rolloutPath) {
+      return null;
+    }
+    const handle = await fsSync.promises.open(rolloutPath, 'r');
+    let tail: string;
+    try {
+      const { size } = await handle.stat();
+      const length = Math.min(size, ROLLOUT_TAIL_BYTES);
+      const buffer = Buffer.alloc(length);
+      await handle.read(buffer, 0, length, size - length);
+      tail = buffer.toString('utf8');
+    } finally {
+      await handle.close();
+    }
+    const lines = tail.split('\n');
+    for (let index = lines.length - 1; index >= 0; index -= 1) {
+      if (!lines[index].includes('"token_count"')) {
+        continue;
+      }
+      try {
+        const info = (JSON.parse(lines[index]) as AnyRecord).payload?.info;
+        const used = readTokenCount(info?.last_token_usage?.total_tokens);
+        if (used > 0) {
+          return { used, total: readTokenCount(info.model_context_window) };
+        }
+      } catch {
+        // The first tail line is usually cut mid-record.
+      }
+    }
+  } catch {
+    // A missing or unreadable rollout just means no context reading.
+  }
+  return null;
+}
+
 async function getCodexSessionMessages(
   sessionId: string,
   limit: number | null = null,
@@ -260,6 +476,8 @@ async function getCodexSessionMessages(
     const completedExecCalls = new Set<string>();
     const subagentsByCallId = new Map<string, CodexSubagentRecord>();
     const subagentsByPath = new Map<string, CodexSubagentRecord>();
+    const fallbackUserMessages: AnyRecord[] = [];
+    let sawPrimaryUserMessage = false;
     const fileStream = fsSync.createReadStream(sessionFilePath);
     const rl = readline.createInterface({
       input: fileStream,
@@ -287,7 +505,10 @@ async function getCodexSessionMessages(
             // full input rate.
             const inputTokens = Math.max(0, reportedInput - cacheReadTokens);
             tokenUsage = {
-              used: readTokenCount(usage.total_tokens)
+              // total_token_usage is the session-wide sum; the context the
+              // gauge shows is the last request (`last_token_usage`).
+              used: readTokenCount(info.last_token_usage?.total_tokens)
+                || readTokenCount(usage.total_tokens)
                 || inputTokens + cacheReadTokens + outputTokens,
               total: info.model_context_window || 200000,
               inputTokens,
@@ -316,16 +537,26 @@ async function getCodexSessionMessages(
           }
         }
 
-        if (entry.type === 'event_msg' && isVisibleCodexUserMessage(entry.payload as AnyRecord)) {
-          messages.push({
+        const userPrompt = readCodexUserPrompt(entry);
+        if (userPrompt) {
+          const userMessage = {
             type: 'user',
             timestamp: entry.timestamp,
-            message: {
-              role: 'user',
-              content: entry.payload.message,
-            },
-            images: extractCodexUserImages(entry.payload as AnyRecord),
-          });
+            message: { role: 'user', content: userPrompt.text },
+            images: userPrompt.images,
+          };
+          (userPrompt.source === 'primary' ? messages : fallbackUserMessages).push(userMessage);
+          sawPrimaryUserMessage ||= userPrompt.source === 'primary';
+        }
+
+        // Turn failures (usage limits, API errors) land on task_complete;
+        // older rollouts persist a standalone `error` event.
+        const failure = entry.type === 'event_msg'
+          ? readNonEmptyString(entry.payload?.type === 'task_complete' ? entry.payload.error?.message : undefined)
+            ?? readNonEmptyString(entry.payload?.type === 'error' ? entry.payload.message : undefined)
+          : undefined;
+        if (failure) {
+          messages.push({ type: 'error', timestamp: entry.timestamp, content: failure });
         }
 
         if (
@@ -466,6 +697,34 @@ async function getCodexSessionMessages(
             try {
               const args = JSON.parse(entry.payload.arguments) as AnyRecord;
               toolInput = JSON.stringify({ command: args.command });
+            } catch {
+              // Keep original arguments when parsing fails.
+            }
+          }
+
+          // Plan updates render as the client's todo list, like live todo_list items.
+          if (toolName === 'update_plan') {
+            try {
+              const args = JSON.parse(String(entry.payload.arguments || '{}')) as AnyRecord;
+              toolName = 'TodoWrite';
+              toolInput = { todos: toCodexTodos(args.plan) };
+            } catch {
+              // Keep original arguments when parsing fails.
+            }
+          }
+
+          if (toolName === 'request_user_input' || toolName === 'request_user_input_async') {
+            try {
+              const args = JSON.parse(String(entry.payload.arguments || '{}')) as AnyRecord;
+              const questions: AnyRecord[] = Array.isArray(args.questions) ? args.questions : [];
+              toolName = 'AskUserQuestion';
+              toolInput = {
+                questions: questions.map((question) => ({
+                  header: question?.header,
+                  question: question?.question ?? question?.title ?? '',
+                  options: question?.options,
+                })),
+              };
             } catch {
               // Keep original arguments when parsing fails.
             }
@@ -612,6 +871,10 @@ async function getCodexSessionMessages(
       } catch {
         // Skip malformed lines.
       }
+    }
+
+    if (!sawPrimaryUserMessage) {
+      messages.push(...fallbackUserMessages);
     }
 
     messages.sort(
@@ -766,6 +1029,17 @@ export class CodexSessionsProvider implements IProviderSessions {
       })];
     }
 
+    if (raw.type === 'error') {
+      return [createNormalizedMessage({
+        id: baseId,
+        sessionId,
+        timestamp: ts,
+        provider: PROVIDER,
+        kind: 'error',
+        content: raw.content,
+      })];
+    }
+
     if (raw.type === 'tool_result') {
       return [createNormalizedMessage({
         id: baseId,
@@ -811,13 +1085,16 @@ export class CodexSessionsProvider implements IProviderSessions {
             content: raw.message?.content || '',
           })];
         case 'reasoning':
+          if (!String(raw.message?.content ?? '').trim()) {
+            return [];
+          }
           return [createNormalizedMessage({
             id: baseId,
             sessionId,
             timestamp: ts,
             provider: PROVIDER,
             kind: 'thinking',
-            content: raw.message?.content || '',
+            content: raw.message.content,
           })];
         case 'command_execution':
           return [createNormalizedMessage({
@@ -828,13 +1105,15 @@ export class CodexSessionsProvider implements IProviderSessions {
             kind: 'tool_use',
             toolName: 'Bash',
             toolInput: { command: raw.command },
-            toolId: baseId,
+            toolId: raw.itemId || baseId,
             output: raw.output,
             exitCode: raw.exitCode,
             status: raw.status,
-            toolResult: codexLiveToolResult(
+            // A started command has no outcome yet; the runtime sends it later
+            // as a tool_result under the same toolId.
+            toolResult: raw.status === 'in_progress' ? undefined : codexLiveToolResult(
               raw.output,
-              raw.status === 'failed' || (typeof raw.exitCode === 'number' && raw.exitCode !== 0),
+              raw.status !== 'completed' || (typeof raw.exitCode === 'number' && raw.exitCode !== 0),
             ),
           })];
         case 'file_change':
@@ -846,7 +1125,7 @@ export class CodexSessionsProvider implements IProviderSessions {
             kind: 'tool_use',
             toolName: 'FileChanges',
             toolInput: raw.changes,
-            toolId: baseId,
+            toolId: raw.itemId || baseId,
             status: raw.status,
             toolResult: codexLiveToolResult(
               (Array.isArray(raw.changes) ? raw.changes : [])
@@ -864,12 +1143,12 @@ export class CodexSessionsProvider implements IProviderSessions {
             kind: 'tool_use',
             toolName: raw.tool || 'MCP',
             toolInput: raw.arguments,
-            toolId: baseId,
+            toolId: raw.itemId || baseId,
             server: raw.server,
             result: raw.result,
             error: raw.error,
             status: raw.status,
-            toolResult: codexLiveToolResult(
+            toolResult: raw.status === 'in_progress' ? undefined : codexLiveToolResult(
               raw.error?.message ?? raw.error ?? codexMcpResultText(raw.result),
               raw.status === 'failed' || Boolean(raw.error),
             ),
@@ -883,7 +1162,7 @@ export class CodexSessionsProvider implements IProviderSessions {
             kind: 'tool_use',
             toolName: 'WebSearch',
             toolInput: { query: raw.query },
-            toolId: baseId,
+            toolId: raw.itemId || baseId,
             toolResult: codexLiveToolResult('', false),
           })];
         case 'todo_list':
@@ -893,18 +1172,22 @@ export class CodexSessionsProvider implements IProviderSessions {
             timestamp: ts,
             provider: PROVIDER,
             kind: 'tool_use',
-            toolName: 'TodoList',
-            toolInput: { items: raw.items },
-            toolId: baseId,
+            toolName: 'TodoWrite',
+            toolInput: { todos: toCodexTodos(raw.items) },
+            toolId: raw.itemId || baseId,
+            toolResult: codexLiveToolResult('', false),
           })];
         case 'error':
+          // ErrorItem is Codex's non-fatal error (e.g. a stream retry); the
+          // fatal ones arrive as the top-level `error` / `turn.failed` events.
           return [createNormalizedMessage({
             id: baseId,
             sessionId,
             timestamp: ts,
             provider: PROVIDER,
-            kind: 'error',
-            content: raw.message?.content || 'Unknown error',
+            kind: 'status',
+            text: raw.text || 'Unknown error',
+            notice: true,
           })];
         default:
           return [createNormalizedMessage({
@@ -920,13 +1203,16 @@ export class CodexSessionsProvider implements IProviderSessions {
       }
     }
 
-    if (raw.type === 'turn_complete') {
+    // `turn_complete` maps to nothing: the runtime sends the run's single
+    // terminal `complete` after the token budget.
+    if (raw.type === 'error') {
       return [createNormalizedMessage({
         id: baseId,
         sessionId,
         timestamp: ts,
         provider: PROVIDER,
-        kind: 'complete',
+        kind: 'error',
+        content: raw.message || 'Codex error',
       })];
     }
     if (raw.type === 'turn_failed') {

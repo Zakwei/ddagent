@@ -137,6 +137,11 @@ export function parseCodexDebugModels(stdout: string): ProviderModelsDefinition 
       value: slug,
       label: readOptionalString(model.display_name) ?? slug,
       description: readOptionalString(model.description),
+      // Codex reports the usable window (`model_context_window` in rollouts)
+      // as context_window scaled by effective_context_window_percent.
+      context: typeof model.context_window === 'number'
+        ? Math.round(model.context_window * (Number(model.effective_context_window_percent) || 100) / 100)
+        : undefined,
       effort: effortOf(values.includes(defaultEffort) ? defaultEffort : values[0], values),
       priority: typeof model.priority === 'number' ? model.priority : Number.MAX_SAFE_INTEGER,
     });
