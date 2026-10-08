@@ -50,6 +50,9 @@ type ChatRun = {
  */
 const COMPLETED_RUN_RETENTION_MS = 5 * 60 * 1000;
 
+// Event kinds a completed run may still publish (see decorateAndRecordEvent).
+const LATE_ASK_KINDS = new Set<string>(['permission_request', 'permission_cancelled']);
+
 /**
  * Upper bound on buffered events per run so a very long tool-heavy run cannot
  * grow memory unbounded. When exceeded, the oldest events are dropped —
@@ -168,7 +171,13 @@ function evictRunLater({ appSessionId, id }: ChatRun): void {
 function decorateAndRecordEvent(run: ChatRun, message: NormalizedMessage): NormalizedMessage | null {
   // A terminal event seals the entire stream, including late text, tools and
   // errors. Old writers must never affect a replacement run or its viewers.
-  if (runs.get(run.appSessionId) !== run || run.status !== 'running') {
+  // Asks are the exception: Claude keeps a finished turn's process alive for
+  // background work, whose follow-up turn can still ask for permission — a
+  // dropped ask silently auto-denies (or, for a question, hangs). They pass
+  // while no newer run owns the session, even after this one was evicted.
+  const current = runs.get(run.appSessionId);
+  const lateAsk = LATE_ASK_KINDS.has(message.kind) && (current === undefined || current === run);
+  if (!lateAsk && (current !== run || run.status !== 'running')) {
     return null;
   }
 

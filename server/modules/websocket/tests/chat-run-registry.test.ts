@@ -487,3 +487,28 @@ test('completion is delivered and buffered before listeners start another run', 
     }
   });
 });
+
+test('a finished run still publishes asks, but nothing else and never over a newer run', async () => {
+  await withIsolatedDatabase(() => {
+    sessionsDb.createAppSession('app-run-ask', 'claude', '/workspace/demo');
+    const connection = new FakeConnection();
+    const start = () => chatRunRegistry.startRun({
+      appSessionId: 'app-run-ask', provider: 'claude', providerSessionId: null, connection, userId: null,
+    });
+    const held = start();
+    assert.ok(held);
+    held.writer.send({ kind: 'complete', provider: 'claude', sessionId: 'native', exitCode: 0 });
+
+    // Claude's background follow-up turn, after the turn reported complete.
+    held.writer.send({ kind: 'text', provider: 'claude', sessionId: 'native', content: 'late text' });
+    held.writer.send({ kind: 'permission_request', provider: 'claude', sessionId: 'native', requestId: 'r1', toolName: 'Bash' });
+    assert.deepEqual(connection.frames.map((frame) => frame.kind), ['complete', 'permission_request']);
+    assert.equal(connection.frames[1]?.sessionId, 'app-run-ask');
+
+    // Once the user starts a new run, the old process's asks are stale.
+    const next = start();
+    assert.ok(next);
+    held.writer.send({ kind: 'permission_request', provider: 'claude', sessionId: 'native', requestId: 'r2', toolName: 'Bash' });
+    assert.equal(connection.frames.filter((frame) => frame.kind === 'permission_request').length, 1);
+  });
+});
