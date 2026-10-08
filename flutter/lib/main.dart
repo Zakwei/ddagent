@@ -39,8 +39,8 @@ Future<void> main() async {
 }
 
 /// Surfaces an inbound device notification: an OS/browser notification when the
-/// platform supports it, otherwise an in-app toast (web permission denied, or
-/// native builds without a notification plugin).
+/// platform supports it, otherwise an in-app toast (permission denied, or no OS
+/// notification service — e.g. a Linux session without a D-Bus notifier).
 Future<void> presentDesktopNotification(DesktopNotification event) async {
   final title = event.title?.trim();
   final body = event.body?.trim() ?? '';

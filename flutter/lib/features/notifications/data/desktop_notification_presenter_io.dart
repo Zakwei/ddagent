@@ -3,14 +3,18 @@ import 'dart:io' show Platform;
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-/// Native notification surface for Android, iOS and macOS via
-/// `flutter_local_notifications`. Linux/Windows builds have no wired surface
-/// here, so both calls return false and the caller falls back to an in-app
-/// toast.
+/// Native notification surface for Android, iOS, macOS, Linux (freedesktop
+/// D-Bus) and Windows (toast) via `flutter_local_notifications`. When a call
+/// fails the caller falls back to an in-app toast.
 final FlutterLocalNotificationsPlugin _plugin = FlutterLocalNotificationsPlugin();
 bool _initialized = false;
 
-bool get _hasNativeSurface => Platform.isAndroid || Platform.isIOS || Platform.isMacOS;
+bool get _hasNativeSurface =>
+    Platform.isAndroid ||
+    Platform.isIOS ||
+    Platform.isMacOS ||
+    Platform.isLinux ||
+    Platform.isWindows;
 
 Future<void> _ensureInitialized() async {
   if (_initialized) return;
@@ -27,6 +31,14 @@ Future<void> _ensureInitialized() async {
       requestBadgePermission: false,
       requestSoundPermission: false,
     ),
+    linux: LinuxInitializationSettings(defaultActionName: 'Open'),
+    // Unpackaged (Inno Setup) build: the plugin registers this AUMID/GUID
+    // itself. Keep both stable — changing them orphans the toast registration.
+    windows: WindowsInitializationSettings(
+      appName: 'DDAgent',
+      appUserModelId: 'DDNet.DDAgent',
+      guid: '6f1c2a3e-8b4d-4e7a-9c55-2d0f3b8a7e41',
+    ),
   );
   await _plugin.initialize(settings: settings);
   _initialized = true;
@@ -34,6 +46,7 @@ Future<void> _ensureInitialized() async {
 
 /// Requests the OS notification permission — Android 13+ `POST_NOTIFICATIONS`
 /// or the alert permission on iOS/macOS. Must be called from a user gesture.
+/// Linux/Windows have no runtime permission — initializing is enough.
 Future<bool> requestPermissionImpl() async {
   if (!_hasNativeSurface) return false;
   try {
@@ -44,6 +57,7 @@ Future<bool> requestPermissionImpl() async {
               ?.requestNotificationsPermission() ??
           false;
     }
+    if (Platform.isLinux || Platform.isWindows) return true;
     if (Platform.isIOS) {
       return await _plugin
               .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
