@@ -1030,7 +1030,11 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
     // Every turn uses streaming input so stdin stays open past the turn's
     // `result`. The message list is reusable, but each query attempt needs its
     // own stream because an async generator cannot be replayed once consumed.
-    const promptMessages = await buildPromptMessages(command, options.images, options.files, options.cwd);
+    // Our prompt's uuid until the CLI replays it — a `result` before that is a
+    // turn the CLI ran on its own (see the replay handling below).
+    let ownPromptUuid: string | null = crypto.randomUUID();
+    const promptMessages = (await buildPromptMessages(command, options.images, options.files, options.cwd))
+      .map((message) => ({ ...message, uuid: ownPromptUuid }));
 
     // Everything the CLI was spawned with, minus what may differ between turns
     // of one conversation without needing a new process: the resume id, the
@@ -1398,7 +1402,9 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
       // of an injected turn hands the output over to that turn's writer; no
       // echo is forwarded — the client already shows what the user sent.
       if (message.type === 'user' && message.isReplay) {
-        if (pendingInjection && message.uuid === pendingInjection.uuid) {
+        if (message.uuid === ownPromptUuid) {
+          ownPromptUuid = null;
+        } else if (pendingInjection && message.uuid === pendingInjection.uuid) {
           activeInjection = pendingInjection;
           pendingInjection = null;
           turnIsFollowUp = false;
@@ -1415,6 +1421,13 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
             ws.send(msg);
           }
         }
+        continue;
+      }
+
+      // A resumed CLI reports tasks its previous process left behind (killed by
+      // a server restart) in an empty turn, `result` included, before it reads
+      // our prompt. Ending our turn there would close stdin under the real one.
+      if (message.type === 'result' && ownPromptUuid && message.num_turns === 0) {
         continue;
       }
 

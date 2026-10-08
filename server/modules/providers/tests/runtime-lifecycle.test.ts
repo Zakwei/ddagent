@@ -980,6 +980,30 @@ test('claude: a task that finishes mid-turn keeps stdin open for the turn that r
   await run;
 });
 
+test('claude: the empty result a resumed CLI emits for orphaned tasks does not end the turn', async () => {
+  const { runtime, sdk, context } = await loadClaudeWithFakeSdk();
+  const first = recordingWriter();
+  const run = runtime.queryClaudeSDK('check it', { sessionId: 'app', cwd: '/tmp' }, first, context);
+  await until(() => sdk.processes[0]?.prompts.length === 1);
+  const proc = sdk.processes[0];
+
+  // Real CLI order after a restart killed its tasks: the orphan report and an
+  // empty `result` come before the CLI even replays our prompt.
+  proc.emit({ type: 'system', subtype: 'task_notification', task_id: 'gone', status: 'stopped' });
+  proc.emit({ type: 'result', subtype: 'success', num_turns: 0 });
+  await new Promise((resolve) => setTimeout(resolve, 20));
+  assert.equal(proc.inputClosed, false, 'the real turn still needs the permission channel');
+  assert.ok(!first.kinds().includes('complete'));
+
+  proc.emit({ type: 'user', isReplay: true, uuid: proc.prompts[0].uuid, message: { role: 'user', content: 'check it' } });
+  proc.emit({ type: 'assistant', message: { content: [{ type: 'text', text: 'checked' }] } });
+  proc.emit({ type: 'result', subtype: 'success', num_turns: 1 });
+  await until(() => proc.inputClosed);
+  assert.deepEqual(first.kinds().filter((kind) => kind !== 'status' && kind !== 'background_tasks'), ['text', 'complete']);
+  proc.end();
+  await run;
+});
+
 test('claude: a new process clears a task count an earlier process left on the client', async () => {
   const { runtime, sdk, context } = await loadClaudeWithFakeSdk();
   const writer = recordingWriter();
