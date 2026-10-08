@@ -164,17 +164,14 @@ void main() {
     expect(windowMatchesModel('Gemini Models 5h', null), isTrue);
   });
 
-  test(
-    'windowMatchesModel keeps only the matching Claude family weekly cap',
-    () {
-      expect(windowMatchesModel('Sonnet · Weekly', 'sonnet'), isTrue);
-      expect(windowMatchesModel('Sonnet · Weekly', 'opus[1m]'), isFalse);
-      expect(windowMatchesModel('Opus · Weekly', 'claude-opus-4-1'), isTrue);
-      expect(windowMatchesModel('Opus · Weekly', 'sonnet'), isFalse);
-      expect(windowMatchesModel('Fable · Weekly', 'claude-fable-5-1'), isTrue);
-      expect(windowMatchesModel('Fable · Weekly', 'opus'), isFalse);
-    },
-  );
+  test('windowMatchesModel keeps only the matching Claude family weekly cap', () {
+    expect(windowMatchesModel('Sonnet · Weekly', 'sonnet'), isTrue);
+    expect(windowMatchesModel('Sonnet · Weekly', 'opus[1m]'), isFalse);
+    expect(windowMatchesModel('Opus · Weekly', 'claude-opus-4-1'), isTrue);
+    expect(windowMatchesModel('Opus · Weekly', 'sonnet'), isFalse);
+    expect(windowMatchesModel('Fable · Weekly', 'claude-fable-5-1'), isTrue);
+    expect(windowMatchesModel('Fable · Weekly', 'opus'), isFalse);
+  });
 
   test('quotaAccountFor picks the pinned login, else the ambient one', () {
     const accounts = [
@@ -193,25 +190,22 @@ void main() {
     expect(quotaAccountFor(accounts.sublist(2), 'claude', null)?.id, 'acct-2');
   });
 
-  test(
-    'quotaPeriodSegments keeps all present kinds in order, including 0%',
-    () {
-      const account = QuotaAccount(
-        id: 'commandcode',
-        windows: [
-          QuotaWindow(label: '5h', kind: 'session', percent: 0),
-          QuotaWindow(label: 'Weekly', kind: 'weekly', percent: 17),
-          QuotaWindow(label: 'Monthly', kind: 'monthly', percent: 35),
-        ],
-      );
-      expect(quotaPeriodSegments(account, 'commandcode/x'), [
-        ('session', 0.0, null, '5h'),
-        ('weekly', 17.0, null, 'W'),
-        ('monthly', 35.0, null, 'M'),
-      ]);
-      expect(quotaPeriodSegments(null, 'devin'), isEmpty);
-    },
-  );
+  test('quotaPeriodSegments keeps all present kinds in order, including 0%', () {
+    const account = QuotaAccount(
+      id: 'commandcode',
+      windows: [
+        QuotaWindow(label: '5h', kind: 'session', percent: 0),
+        QuotaWindow(label: 'Weekly', kind: 'weekly', percent: 17),
+        QuotaWindow(label: 'Monthly', kind: 'monthly', percent: 35),
+      ],
+    );
+    expect(quotaPeriodSegments(account, 'commandcode/x'), [
+      ('session', 0.0, null, '5h'),
+      ('weekly', 17.0, null, 'W'),
+      ('monthly', 35.0, null, 'M'),
+    ]);
+    expect(quotaPeriodSegments(null, 'devin'), isEmpty);
+  });
 
   test('quotaPeriodSegments marks Claude model-scoped weekly caps apart', () {
     const account = QuotaAccount(
@@ -228,26 +222,16 @@ void main() {
       ('weekly', 20.0, null, 'W'),
       ('weekly', 3.0, null, 'FW'),
     ]);
-    expect(quotaPeriodSegments(account, 'opus').map((s) => s.$4), [
-      '5h',
-      'W',
-      'OW',
-    ]);
+    expect(quotaPeriodSegments(account, 'opus').map((s) => s.$4), ['5h', 'W', 'OW']);
   });
 
   test('quotaTimeRemainingPercent measures the clock until reset', () {
     final now = DateTime.utc(2026, 9, 30).millisecondsSinceEpoch;
     // Weekly (7 d): reset za 3.5 d → zostało 50% czasu okna.
-    expect(
-      quotaTimeRemainingPercent('weekly', '2026-10-03T12:00:00Z', now),
-      50,
-    );
+    expect(quotaTimeRemainingPercent('weekly', '2026-10-03T12:00:00Z', now), 50);
     // Tuż przed resetem → 0%; świeżo po resecie → 100%.
     expect(quotaTimeRemainingPercent('daily', '2026-09-30T00:00:00Z', now), 0);
-    expect(
-      quotaTimeRemainingPercent('daily', '2026-10-01T00:00:00Z', now),
-      100,
-    );
+    expect(quotaTimeRemainingPercent('daily', '2026-10-01T00:00:00Z', now), 100);
     expect(quotaTimeRemainingPercent('weekly', null, now), isNull);
     expect(quotaTimeRemainingPercent('weekly', 'not-a-date', now), isNull);
   });
@@ -269,9 +253,7 @@ void main() {
     expect(quotaToneFor(5, null), 'ok');
   });
 
-  testWidgets('desktop subheader shows logo label, model, path, ctx, quota', (
-    tester,
-  ) async {
+  testWidgets('desktop subheader shows logo label, model, path, ctx, quota', (tester) async {
     await tester.pumpWidget(
       _app(
         const SessionSubheader(
@@ -326,9 +308,7 @@ void main() {
     Rect stripRowRect() => tester.getRect(
       find.ancestor(
         of: find.byType(QuotaBadge),
-        matching: find.byWidgetPredicate(
-          (w) => w is Row && w.mainAxisSize == MainAxisSize.max,
-        ),
+        matching: find.byWidgetPredicate((w) => w is Row && w.mainAxisSize == MainAxisSize.max),
       ),
     );
 
@@ -337,9 +317,7 @@ void main() {
     Rect stripContainerRect() => tester.getRect(
       find.ancestor(
         of: find.byType(QuotaBadge),
-        matching: find.byWidgetPredicate(
-          (w) => w is Container && w.margin != null,
-        ),
+        matching: find.byWidgetPredicate((w) => w is Container && w.margin != null),
       ),
     );
 
@@ -384,10 +362,7 @@ void main() {
       // ways: against the content Row and independently against the
       // decorated Container (right - margin - 1px border - padding).
       expect(badge.right, moreOrLessEquals(row.right, epsilon: 0.6));
-      expect(
-        badge.right,
-        moreOrLessEquals(strip.right - margin - 1 - padding, epsilon: 0.6),
-      );
+      expect(badge.right, moreOrLessEquals(strip.right - margin - 1 - padding, epsilon: 0.6));
       // Never paints past the strip's right edge.
       expect(badge.right, lessThanOrEqualTo(strip.right + 0.5));
 
@@ -408,10 +383,7 @@ void main() {
         }
       }
       for (final e in find.text('42%').evaluate()) {
-        expect(
-          tester.getRect(find.byWidget(e.widget)).right,
-          lessThanOrEqualTo(badge.left + 0.5),
-        );
+        expect(tester.getRect(find.byWidget(e.widget)).right, lessThanOrEqualTo(badge.left + 0.5));
       }
     }
 
@@ -427,12 +399,7 @@ void main() {
     // Narrow compact, short neighbours, single-pill badge.
     await pumpCase(width: 360);
     // Medium width: long path + long model against the wide badge.
-    await pumpCase(
-      width: 700,
-      quota: wideQuota,
-      sessions: longModelSessions,
-      path: longPath,
-    );
+    await pumpCase(width: 700, quota: wideQuota, sessions: longModelSessions, path: longPath);
     // Medium width, short neighbours.
     await pumpCase(width: 700);
     // Wider than the strip's `maxWidth: 900` cap: strip stays ≤900 and the
