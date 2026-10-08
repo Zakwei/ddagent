@@ -1509,14 +1509,20 @@ class MessageTile extends ConsumerWidget {
                 ],
               ),
             ),
-        Text(
-          resolved
-              ? isAskUser
-                    ? (answers.isNotEmpty ? 'Answered' : 'Skipped')
-                    : 'Decided'
-              : 'Request expired — the agent is no longer waiting for it',
-          style: muted,
-        ),
+        Text(switch (input['cancelReason']?.toString()) {
+          'timeout' => 'Timed out — denied automatically',
+          'cancelled' => 'Cancelled — the turn was stopped',
+          'auto-approved' => 'Approved automatically',
+          'expired' ||
+          'process-exited' ||
+          'run-settled' => 'Request expired — the agent is no longer waiting for it',
+          _ =>
+            resolved
+                ? isAskUser
+                      ? (answers.isNotEmpty ? 'Answered' : 'Skipped')
+                      : 'Decided'
+                : 'Request expired — the agent is no longer waiting for it',
+        }, style: muted),
       ],
     );
   }

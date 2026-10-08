@@ -250,6 +250,53 @@ void main() {
     expect(container.read(pendingPermissionsProvider).containsKey('q1'), isFalse);
   });
 
+  test('a timed-out ask records its reason and complete expires leftover asks', () async {
+    container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
+    container.listen(transcriptProvider('s1'), (_, _) {});
+    await pump();
+
+    for (final id in ['p1', 'p2']) {
+      ws.emitFrame({
+        'kind': 'permission_request',
+        'sessionId': 's1',
+        'requestId': id,
+        'toolName': 'Bash',
+        'input': {'command': 'ls'},
+      });
+    }
+    bool rowsArrived() =>
+        container
+            .read(sessionMessagesProvider('s1'))
+            .where((m) => m.kind == 'permission_request')
+            .length ==
+        2;
+    for (var i = 0; i < 15 && !rowsArrived(); i++) {
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+    }
+    expect(container.read(pendingPermissionsProvider).keys, containsAll(['p1', 'p2']));
+
+    // Claude's 55 s approval timeout auto-denies — the card must say so.
+    ws.emitFrame({
+      'kind': 'permission_cancelled',
+      'sessionId': 's1',
+      'requestId': 'p1',
+      'reason': 'timeout',
+    });
+    await pump();
+    Map<String, dynamic> rowInput(String id) => Map<String, dynamic>.from(
+      container.read(sessionMessagesProvider('s1')).firstWhere((m) => m.requestId == id).toolInput
+          as Map,
+    );
+    expect(rowInput('p1')['cancelReason'], 'timeout');
+
+    // Stop/run end: the server drops frames after `complete`, so the client
+    // must retire the ask itself instead of leaving an answerable card.
+    ws.emitFrame({'kind': 'complete', 'sessionId': 's1', 'exitCode': 1});
+    await pump();
+    expect(container.read(pendingPermissionsProvider).containsKey('p2'), isFalse);
+    expect(rowInput('p2')['cancelReason'], 'expired');
+  });
+
   test('permission_cancelled carries the picked answers to a non-answering window', () async {
     container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
     container.listen(transcriptProvider('s1'), (_, _) {});

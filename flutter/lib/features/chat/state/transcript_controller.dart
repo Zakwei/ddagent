@@ -164,6 +164,30 @@ class TranscriptController extends Notifier<TranscriptState> {
     }
   }
 
+  /// A finished run can no longer receive an answer, and the server drops
+  /// every frame after `complete` — so an ask cancelled by Stop or the run's
+  /// end would otherwise keep its live card forever.
+  void _expirePendingPermissions() {
+    final open = {
+      for (final p in ref.read(pendingPermissionsProvider).values)
+        if (p.sessionId == _sessionId) p.requestId,
+    };
+    if (open.isEmpty) return;
+    _store.patchRealtime(
+      _sessionId,
+      (m) => m.kind == 'permission_request' && open.contains(m.requestId),
+      (m) {
+        final input = m.toolInput is Map
+            ? Map<String, dynamic>.from(m.toolInput as Map)
+            : <String, dynamic>{};
+        input['resolved'] = true;
+        input['cancelReason'] = 'expired';
+        return m.copyWith(toolInput: input);
+      },
+    );
+    ref.read(pendingPermissionsProvider.notifier).removeForSession(_sessionId);
+  }
+
   void _settleRun([String status = 'done']) {
     _buffer.closeLiveRows(_sessionId, '');
     _store.setStatus(_sessionId, status);
@@ -680,6 +704,7 @@ class TranscriptController extends Notifier<TranscriptState> {
         return;
       case 'complete':
         _buffer.closeLiveRows(_sessionId, provider);
+        _expirePendingPermissions();
         _settleRun();
         _maybeAutoRead(raw);
         // Web `requestLatestMessages`: once the turn is persisted, pull the
@@ -744,6 +769,10 @@ class TranscriptController extends Notifier<TranscriptState> {
                   : <String, dynamic>{};
               input['resolved'] = true;
               if (cancelledAnswers.isNotEmpty) input['answers'] = cancelledAnswers;
+              // Why it closed when nobody answered it here (timeout, stop,
+              // auto-approval) — the recap must not claim it was "Decided".
+              final reason = raw['reason']?.toString();
+              if (reason != null && reason != 'resolved') input['cancelReason'] = reason;
               return m.copyWith(toolInput: input);
             },
           );
