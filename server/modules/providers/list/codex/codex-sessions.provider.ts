@@ -1,4 +1,5 @@
 import fsSync from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import readline from 'node:readline';
 
@@ -462,7 +463,14 @@ async function getCodexSessionMessages(
   offset = 0,
 ): Promise<CodexHistoryResult> {
   try {
-    const sessionFilePath = sessionsDb.getSessionById(sessionId)?.jsonl_path;
+    const row = sessionsDb.getSessionById(sessionId);
+    // A fresh thread is read (e.g. by another device on `complete`) before the
+    // synchronizer records its path.
+    // shortcut: only the default CODEX_HOME is searched; isolated-account threads wait for the synchronizer.
+    const sessionFilePath = row?.jsonl_path
+      ?? (row?.provider_session_id
+        ? await findCodexRolloutPath(null, row.provider_session_id, process.env.CODEX_HOME || path.join(os.homedir(), '.codex'))
+        : null);
 
     if (!sessionFilePath) {
       console.warn(`Codex session file not found for session ${sessionId}`);
