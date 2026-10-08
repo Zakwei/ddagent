@@ -6,6 +6,7 @@ import {
   applyPermissionModeToDevinSession,
   isEditPermissionRequest,
   questionAnswerOptionId,
+  withKnownDevinToolCall,
 } from '@/modules/providers/list/devin/devin-runtime.provider.js';
 
 /**
@@ -112,4 +113,15 @@ test('ACP tool content renders diffs and falls back to rawOutput', () => {
   assert.equal(acpToolContentText({ content: [{ type: 'terminal', terminalId: 't1' }], rawOutput: { output: 'ls out' } }), 'ls out');
   assert.equal(acpToolContentText({ rawOutput: 'plain' }), 'plain');
   assert.equal(acpToolContentText({}), '');
+});
+
+test('Devin asks that carry only a toolCallId borrow title, kind and input from the tool_call', () => {
+  const state = { knownToolCalls: new Map([['t1', { title: 'Ran touch', kind: 'execute', rawInput: { command: 'touch x' } }]]) };
+  const merged = withKnownDevinToolCall(state, { toolCall: { toolCallId: 't1' }, options: [] });
+  assert.equal(merged.toolCall.title, 'Ran touch');
+  assert.equal(merged.toolCall.kind, 'execute');
+  assert.deepEqual(merged.toolCall.rawInput, { command: 'touch x' });
+  assert.equal(isEditPermissionRequest(merged), false);
+  const own = withKnownDevinToolCall(state, { toolCall: { toolCallId: 't1', title: 'Own title' } });
+  assert.equal(own.toolCall.title, 'Own title');
 });

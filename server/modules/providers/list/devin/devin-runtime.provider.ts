@@ -634,6 +634,29 @@ function isDelegatedChildSession(appSessionId: any) {
  * The tool input a permission card shows (C4): ACP `toolCall.rawInput` plus
  * the call's `kind` and `locations`, which say what the agent wants to touch.
  */
+const DEVIN_TOOL_CALL_FIELDS = ['title', 'kind', 'rawInput', 'locations'];
+
+function rememberDevinToolCall(state: any, update: any) {
+    const toolCallId = readOptionalString(update?.toolCallId);
+    if (!toolCallId) return;
+    const known = (state.knownToolCalls ??= new Map()).get(toolCallId) ?? {};
+    for (const field of DEVIN_TOOL_CALL_FIELDS) {
+        if (update[field] !== undefined && update[field] !== null) known[field] = update[field];
+    }
+    state.knownToolCalls.set(toolCallId, known);
+}
+
+export function withKnownDevinToolCall(state: any, params: any) {
+    const toolCall = readObjectRecord(params?.toolCall);
+    const known = toolCall?.toolCallId ? state.knownToolCalls?.get(toolCall.toolCallId) : undefined;
+    if (!known) return params;
+    const merged: AnyRecord = { ...toolCall };
+    for (const field of DEVIN_TOOL_CALL_FIELDS) {
+        if (merged[field] === undefined || merged[field] === null) merged[field] = known[field];
+    }
+    return { ...params, toolCall: merged };
+}
+
 function permissionRequestInput(params: any) {
     const toolCall = readObjectRecord(params?.toolCall);
     const rawInput = readObjectRecord(toolCall?.rawInput) ?? readObjectRecord(params?.rawInput) ?? {};
@@ -1606,7 +1629,7 @@ function createDevinProcess(sessionId: any, workingDir: any, model: any, ws: any
             // Do not mutate transcript buffers or publish those old updates.
             if (state.terminated || state.completeSent) return;
             const method = msg.method;
-            const params = readObjectRecord(msg.params) ?? {};
+            let params = readObjectRecord(msg.params) ?? {};
             const sessionIdFromMsg = readOptionalString(params.sessionId) ?? state.devinSessionId;
             const update = readObjectRecord(params.update);
 
@@ -1745,6 +1768,7 @@ function createDevinProcess(sessionId: any, workingDir: any, model: any, ws: any
                     const toolName = readOptionalString(update.title) ?? 'Tool';
                     const toolId = readOptionalString(update.toolCallId) ?? `devin_tool_${nextRequestId()}`;
                     const toolInput = withDiffInput(update.rawInput ?? {}, update);
+                    rememberDevinToolCall(state, update);
                     state.turnToolCount = (state.turnToolCount ?? 0) + 1;
                     if (update.status !== 'completed' && update.status !== 'failed') state.openToolCalls.add(toolId);
                     const toolUseMessage = createNormalizedMessage({
@@ -1761,6 +1785,7 @@ function createDevinProcess(sessionId: any, workingDir: any, model: any, ws: any
                     state.currentWriter?.send(toolUseMessage);
                 }
                 else if (sessionUpdate === 'tool_call_update') {
+                    rememberDevinToolCall(state, update);
                     const contentBlocks = acpToolContentText(update);
                     const toolId = readOptionalString(update.toolCallId) ?? `devin_tool_${nextRequestId()}`;
                     // An empty in-progress update carries nothing yet; as a
@@ -1802,6 +1827,9 @@ function createDevinProcess(sessionId: any, workingDir: any, model: any, ws: any
                 // and the client keys cards by requestId; the JSON-RPC id
                 // is kept as acpId for the reply.
                 const requestId = `devin-perm-${randomUUID()}`;
+                // Devin's ask often carries only the toolCallId; the title, kind and
+                // input arrived earlier on the tool_call itself.
+                params = withKnownDevinToolCall(state, params);
                 const acpOptions = Array.isArray(params.options) ? params.options : [];
                 devinPendingPermissions.set(requestId, {
                     acpId: msg.id,
