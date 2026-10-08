@@ -110,9 +110,11 @@ class DeviceNotificationsController extends Notifier<DeviceNotificationsState> {
   Future<String?> enable() async {
     if (state.busy) return null;
     state = DeviceNotificationsState(enabled: state.enabled, busy: true, loading: false);
+    // `1 << 30`, not `1 << 32`: dart2js shifts are 32-bit, so `1 << 32` is 0
+    // on web and `nextInt(0)` threw before registration ever ran.
     final deviceId =
         _deviceId ??
-        'flutter-${DateTime.now().microsecondsSinceEpoch}-${Random().nextInt(1 << 32)}';
+        'flutter-${DateTime.now().microsecondsSinceEpoch}-${Random().nextInt(1 << 30)}';
     final channel = ref.read(desktopNotificationsChannelProvider);
     try {
       await channel.connect();
