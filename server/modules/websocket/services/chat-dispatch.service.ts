@@ -505,6 +505,17 @@ export async function dispatchChatCommand(
     sessionId,
     cwd: clientOptions.cwd ?? session.project_path ?? undefined,
     projectPath: session.project_path ?? clientOptions.projectPath,
+    // A provider process that outlives this turn (Claude, holding on for
+    // background work) can start further turns on its own — a task reporting
+    // back. Each gets a chat run of its own so clients show it working and
+    // stream it; null while another run owns the session.
+    openFollowUpRun: () => chatRunRegistry.startRun({
+      appSessionId: sessionId,
+      provider,
+      providerSessionId: run.providerSessionId ?? session.provider_session_id,
+      connection,
+      userId,
+    })?.writer ?? null,
   };
 
   // Child→parent delegation status sync: if this session was spawned by an

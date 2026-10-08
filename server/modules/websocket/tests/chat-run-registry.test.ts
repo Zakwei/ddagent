@@ -502,7 +502,8 @@ test('a finished run still publishes asks, but nothing else and never over a new
     // Claude's background follow-up turn, after the turn reported complete.
     held.writer.send({ kind: 'text', provider: 'claude', sessionId: 'native', content: 'late text' });
     held.writer.send({ kind: 'permission_request', provider: 'claude', sessionId: 'native', requestId: 'r1', toolName: 'Bash' });
-    assert.deepEqual(connection.frames.map((frame) => frame.kind), ['complete', 'permission_request']);
+    held.writer.send({ kind: 'background_tasks', provider: 'claude', sessionId: 'native', count: 2 });
+    assert.deepEqual(connection.frames.map((frame) => frame.kind), ['complete', 'permission_request', 'background_tasks']);
     assert.equal(connection.frames[1]?.sessionId, 'app-run-ask');
 
     // Once the user starts a new run, the old process's asks are stale.

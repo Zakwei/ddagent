@@ -784,3 +784,127 @@ test('OpenCode: Always is offered with the patterns an always reply would approv
   const [entry] = runtime.opencodeRuntime.permissions.listPending('app');
   assert.equal(entry.context.rememberEntry, 'bash: git status*');
 });
+
+// ---------------------------------------------------------------------------
+// Claude: one CLI process per session while background work runs.
+
+/** Fake `query()` that records each spawned process and lets the test drive its output. */
+function fakeClaudeSdk() {
+  const processes: any[] = [];
+  const query = ({ prompt, options }: { prompt: AsyncIterable<any>; options: any }) => {
+    const outbox: any[] = [];
+    let wake: (() => void) | null = null;
+    let ended = false;
+    const proc = {
+      options,
+      prompts: [] as any[],
+      inputClosed: false,
+      emit(message: any) { outbox.push({ session_id: 'native', ...message }); wake?.(); },
+      end() { ended = true; wake?.(); },
+    };
+    void (async () => {
+      for await (const message of prompt) proc.prompts.push(message);
+      proc.inputClosed = true;
+    })();
+    processes.push(proc);
+    const stream = (async function* () {
+      while (true) {
+        while (outbox.length) yield outbox.shift();
+        if (ended) return;
+        await new Promise<void>((resolve) => { wake = resolve; });
+      }
+    })();
+    return Object.assign(stream, { interrupt: async () => proc.end(), setPermissionMode: async () => {} });
+  };
+  return { query, processes };
+}
+
+async function until(condition: () => boolean) {
+  // Time-bounded: the run does real async I/O (MCP config read) before spawning.
+  const deadline = Date.now() + 5000;
+  while (!condition() && Date.now() < deadline) {
+    await new Promise((resolve) => setTimeout(resolve, 2));
+  }
+  assert.ok(condition(), 'condition not reached');
+}
+
+function recordingWriter() {
+  const events: any[] = [];
+  return { events, userId: null, send(message: any) { events.push(message); }, kinds: () => events.map((event) => event.kind) };
+}
+
+async function loadClaudeWithFakeSdk() {
+  const sdk = fakeClaudeSdk();
+  const runtime = await loadRuntime('claude', 'activeSessions', {
+    '@anthropic-ai/claude-agent-sdk': { query: sdk.query },
+  });
+  const context = {
+    resolveProviderSessionId: () => 'native',
+    resolveResumeModel: async () => undefined,
+    getProviderModels: async () => ({ OPTIONS: [], DEFAULT: 'default' }),
+    isProviderInstalled: async () => true,
+    normalizeMessage: (message: any) => (message.type === 'assistant' ? [{ kind: 'text', content: 'reply' }] : []),
+  };
+  return { runtime, sdk, context };
+}
+
+test('claude: a message sent while a background agent runs joins the live process', async () => {
+  const { runtime, sdk, context } = await loadClaudeWithFakeSdk();
+  const followUp = recordingWriter();
+  let opened = 0;
+  const options = { sessionId: 'app', cwd: '/tmp', openFollowUpRun: () => { opened += 1; return followUp; } };
+  const first = recordingWriter();
+  const firstRun = runtime.queryClaudeSDK('launch an agent', options, first, context);
+  await until(() => sdk.processes[0]?.prompts.length === 1);
+  const proc = sdk.processes[0];
+  proc.emit({ type: 'system', subtype: 'task_started', task_id: 't1' });
+  proc.emit({ type: 'result' });
+  await until(() => first.kinds().includes('complete'));
+  assert.ok(first.events.some((event) => event.kind === 'background_tasks' && event.count === 1));
+
+  // The user writes again while t1 is still running.
+  const second = recordingWriter();
+  const secondRun = runtime.queryClaudeSDK('and another thing', options, second, context);
+  await until(() => proc.prompts.length === 2);
+  assert.equal(sdk.processes.length, 1, 'no replacement process is spawned');
+  assert.equal(proc.inputClosed, false, 'the running agent keeps its permission channel');
+
+  proc.emit({ type: 'user', isReplay: true, uuid: proc.prompts[1].uuid, message: { role: 'user', content: 'and another thing' } });
+  proc.emit({ type: 'assistant', message: { content: [{ type: 'text', text: 'pong' }] } });
+  proc.emit({ type: 'result' });
+  await secondRun;
+  assert.deepEqual(second.kinds().filter((kind) => kind !== 'status'), ['text', 'complete']);
+  assert.equal(first.kinds().filter((kind) => kind === 'complete').length, 1);
+
+  // t1 reports back in a turn the CLI starts on its own — it gets its own run.
+  proc.emit({ type: 'system', subtype: 'task_notification', task_id: 't1', status: 'completed' });
+  proc.emit({ type: 'assistant', message: { content: [{ type: 'text', text: 'agent finished' }] } });
+  proc.emit({ type: 'result' });
+  await until(() => proc.inputClosed);
+  proc.end();
+  await firstRun;
+  assert.equal(opened, 1);
+  assert.deepEqual(followUp.kinds().filter((kind) => kind !== 'status'), ['text', 'complete']);
+  // The count dropped before that turn began, so the latest run heard it.
+  assert.deepEqual(second.events.filter((event) => event.kind === 'background_tasks').map((event) => event.count), [0]);
+});
+
+test('claude: a message the live process cannot take starts a new one', async () => {
+  const { runtime, sdk, context } = await loadClaudeWithFakeSdk();
+  const first = recordingWriter();
+  void runtime.queryClaudeSDK('launch an agent', { sessionId: 'app', cwd: '/tmp' }, first, context);
+  await until(() => sdk.processes[0]?.prompts.length === 1);
+  const proc = sdk.processes[0];
+  proc.emit({ type: 'system', subtype: 'task_started', task_id: 't1' });
+  proc.emit({ type: 'result' });
+  await until(() => first.kinds().includes('complete'));
+
+  // A different working directory can't be applied to a running CLI.
+  const second = recordingWriter();
+  void runtime.queryClaudeSDK('elsewhere', { sessionId: 'app', cwd: '/var/tmp' }, second, context);
+  await until(() => sdk.processes.length === 2);
+  assert.equal(proc.prompts.length, 1);
+  await until(() => proc.inputClosed);
+  sdk.processes[1].end();
+  proc.end();
+});

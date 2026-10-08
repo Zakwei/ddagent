@@ -50,8 +50,9 @@ type ChatRun = {
  */
 const COMPLETED_RUN_RETENTION_MS = 5 * 60 * 1000;
 
-// Event kinds a completed run may still publish (see decorateAndRecordEvent).
-const LATE_ASK_KINDS = new Set<string>(['permission_request', 'permission_cancelled']);
+// Event kinds a completed run may still publish (see decorateAndRecordEvent):
+// asks from work outliving the turn, and the count of that work.
+const LATE_ASK_KINDS = new Set<string>(['permission_request', 'permission_cancelled', 'background_tasks']);
 
 /**
  * Upper bound on buffered events per run so a very long tool-heavy run cannot
@@ -174,7 +175,8 @@ function decorateAndRecordEvent(run: ChatRun, message: NormalizedMessage): Norma
   // Asks are the exception: Claude keeps a finished turn's process alive for
   // background work, whose follow-up turn can still ask for permission — a
   // dropped ask silently auto-denies (or, for a question, hangs). They pass
-  // while no newer run owns the session, even after this one was evicted.
+  // while no newer run owns the session, even after this one was evicted, as
+  // does the running-task count that work reports between turns.
   const current = runs.get(run.appSessionId);
   const lateAsk = LATE_ASK_KINDS.has(message.kind) && (current === undefined || current === run);
   if (!lateAsk && (current !== run || run.status !== 'running')) {

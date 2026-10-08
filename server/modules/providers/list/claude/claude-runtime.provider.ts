@@ -382,8 +382,9 @@ export function mapCliOptionsToSDK(options: any = {}): any {
  * @param {Object} queryInstance - SDK query instance
  * @param {Object} writer - WebSocket writer for reconnect support
  * @param {Function} releaseInput - Closes the held stdin stream so the CLI can exit
+ * @param {Function} injectTurn - Feeds a new user turn into this live process
  */
-function addSession(sessionId: any, queryInstance: any, writer: any = null, releaseInput: any = null) {
+function addSession(sessionId: any, queryInstance: any, writer: any = null, releaseInput: any = null, injectTurn: any = null) {
   const existing = activeSessions.get(sessionId);
   // A different live instance under the same key means an earlier run was
   // superseded without being stopped (e.g. an abort that raced run setup and
@@ -411,7 +412,8 @@ function addSession(sessionId: any, queryInstance: any, writer: any = null, rele
     status: 'active',
     writer,
     // Re-registered mid-run once the provider session id lands; keep the closer.
-    releaseInput: releaseInput || carried?.releaseInput || null
+    releaseInput: releaseInput || carried?.releaseInput || null,
+    injectTurn: injectTurn || carried?.injectTurn || null
   });
 }
 
@@ -604,22 +606,45 @@ async function buildPromptMessages(command: any, images: any, files: any, cwd: a
  * of the run and kills anything still going in the background, so the iterable
  * has to stay pending until we actually want the process gone.
  *
+ * `push` feeds a later user turn into the same live process (see injectTurn in
+ * queryClaudeSDK); it returns false once the stream has been released.
+ *
  * @param {Array<Object>} messages - SDKUserMessage records to send
- * @returns {{ stream: AsyncIterable, release: () => void }} Stream plus its closer
+ * @returns {{ stream: AsyncIterable, release: () => void, push: (messages: Array<Object>) => boolean }}
  */
 function createHeldPromptStream(messages: any) {
-  let release!: () => void;
-  const held = new Promise<void>((resolve) => { release = resolve; });
+  const queue: any[] = [...messages];
+  let released = false;
+  let wake: (() => void) | null = null;
+  const wakeUp = () => {
+    const resolve = wake;
+    wake = null;
+    resolve?.();
+  };
 
   const stream = (async function* () {
-    for (const message of messages) {
-      yield message;
+    while (true) {
+      while (queue.length > 0) {
+        yield queue.shift();
+      }
+      // Keeps stdin open — the CLI stays alive until release() is called.
+      if (released) return;
+      await new Promise<void>((resolve) => { wake = resolve; });
     }
-    // Keeps stdin open — the CLI stays alive until release() is called.
-    await held;
   })();
 
-  return { stream, release };
+  const release = () => {
+    released = true;
+    wakeUp();
+  };
+  const push = (more: any[]) => {
+    if (released) return false;
+    queue.push(...more);
+    wakeUp();
+    return true;
+  };
+
+  return { stream, release, push };
 }
 
 /**
@@ -711,6 +736,8 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
   // Closes the held stdin stream so the CLI can wind down. Replaced once the
   // stream exists; the finally block calls it no matter how the run ends.
   let releasePromptStream = () => {};
+  // Feeds another user turn into the held stream; replaced alongside the closer.
+  let pushPrompt = (_messages: any[]) => false;
   let idleReleaseTimer: any = null;
   // The client is told the turn is over as soon as `result` lands, even though
   // the process lingers, so the UI never waits out the idle hold.
@@ -724,16 +751,23 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
   // Tasks (subagents, background shells, workflows) the CLI reported as started
   // and not yet settled — they can outlive several turns.
   const outstandingTasks = new Set<string>();
+  // Last task count sent to the client, so it only hears about changes.
+  let reportedTaskCount = 0;
+  // False between a turn's `result` and the next turn's first message.
+  let turnActive = true;
+  // True while the current turn was started by the CLI itself (a background
+  // task reporting back, a scheduled wake-up) rather than by a user message.
+  let turnIsFollowUp = false;
+  // A user turn fed into this process by a later queryClaudeSDK call: it waits
+  // in `pending` until the CLI replays its uuid, then becomes `active` until its
+  // `result`. `settle` resolves the injecting call (false = run it elsewhere).
+  type TurnInjection = { uuid: string; writer: ProviderRuntimeWriter; settle: (accepted: boolean) => void };
+  let pendingInjection = null as TurnInjection | null;
+  let activeInjection = null as TurnInjection | null;
   // Latest main-agent API step usage/model: the context gauge's source, re-sent
   // on `result` once the SDK has reported the model's real context window.
   let lastStepUsage: AnyRecord | null = null;
   let lastStepModel: string | null = null;
-
-  // A new turn supersedes any earlier one still holding this session's process
-  // open, so held runs cannot stack up across a conversation.
-  if (sessionKey()) {
-    getSession(sessionKey())?.releaseInput?.();
-  }
 
   // Arms (or re-arms) the idle countdown that eventually closes stdin.
   const scheduleRelease = () => {
@@ -752,6 +786,8 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
   // Hoisted above the try so the catch's cleanup can tell whether this run
   // still owns the activeSessions entry (or was superseded by a newer run).
   let queryInstance: any = null;
+  // Whether the user stopped this run (the abort flag itself is consumed on wind-down).
+  let stoppedByUser = false;
 
   try {
     const resolvedModel = await context.resolveResumeModel(sessionId, options.model);
@@ -788,6 +824,39 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
     // `result`. The message list is reusable, but each query attempt needs its
     // own stream because an async generator cannot be replayed once consumed.
     const promptMessages = await buildPromptMessages(command, options.images, options.files, options.cwd);
+
+    // Everything the CLI was spawned with, minus what may differ between turns
+    // of one conversation without needing a new process: the resume id and the
+    // allow-list (merged into the live run instead). Two runs with the same
+    // signature can share a process.
+    const { resume: _resume, allowedTools: _allowedTools, ...spawnShape } = sdkOptions;
+    const runSignature = JSON.stringify({ ...spawnShape, interactiveBypass });
+
+    // A process still held open for this session's background work (running
+    // subagents, shells, watchers) takes the new turn on its stdin — spawning
+    // a replacement would close that stdin and with it the only channel those
+    // tasks have for permission asks. Falls back to a fresh process when the
+    // held one can't take it (different model, mode, cwd, MCP config…).
+    const heldSession = sessionKey() ? getSession(sessionKey()) : undefined;
+    if (heldSession?.injectTurn) {
+      const accepted = await heldSession.injectTurn({
+        messages: promptMessages,
+        writer: ws,
+        signature: runSignature,
+        allowedTools: sdkOptions.allowedTools,
+      });
+      if (accepted) return;
+    }
+    // Otherwise this turn supersedes any earlier one still holding the
+    // session's process open, so held runs cannot stack up.
+    if (sessionKey()) {
+      getSession(sessionKey())?.releaseInput?.();
+    }
+
+    // Echo each user message back once the CLI starts processing it — the
+    // echo's uuid tells an injected turn's output apart from whatever the
+    // process was doing before.
+    sdkOptions.extraArgs = { ...(sdkOptions.extraArgs || {}), 'replay-user-messages': null };
 
     sdkOptions.hooks = {
       Notification: [{
@@ -935,6 +1004,7 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
 
     let heldPrompt = createHeldPromptStream(promptMessages);
     releasePromptStream = heldPrompt.release;
+    pushPrompt = heldPrompt.push;
     try {
       queryInstance = query({
         prompt: heldPrompt.stream,
@@ -949,15 +1019,60 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
       heldPrompt.release();
       heldPrompt = createHeldPromptStream(promptMessages);
       releasePromptStream = heldPrompt.release;
+      pushPrompt = heldPrompt.push;
       queryInstance = query({
         prompt: heldPrompt.stream,
         options: sdkOptions
       });
     }
 
+    // Called by a later queryClaudeSDK for this session (see heldSession
+    // above). Resolves true once the injected turn has finished here, false
+    // when this process can't take it and the caller must spawn its own.
+    const injectTurn = (request: {
+      messages: any[];
+      writer: ProviderRuntimeWriter;
+      signature: string;
+      allowedTools: string[];
+    }): Promise<boolean> => {
+      const unavailable = !heldForBackgroundWork
+        || pendingInjection !== null
+        || activeInjection !== null
+        || request.signature !== runSignature
+        || supersededInstances.has(queryInstance)
+        || abortedInstances.has(queryInstance);
+      if (unavailable) return Promise.resolve(false);
+
+      const uuid = crypto.randomUUID();
+      return new Promise<boolean>((resolve) => {
+        pendingInjection = { uuid, writer: request.writer, settle: resolve };
+        if (!pushPrompt(request.messages.map((message) => ({ ...message, uuid })))) {
+          pendingInjection = null;
+          resolve(false);
+          return;
+        }
+        // "Always" rules granted since this process started apply here too.
+        for (const entry of request.allowedTools) {
+          if (!sdkOptions.allowedTools.includes(entry)) sdkOptions.allowedTools.push(entry);
+        }
+        if (idleReleaseTimer) scheduleRelease();
+      });
+    };
+
+    // Points the run's output at the writer of the turn that is starting, so
+    // its events reach the chat run the client is watching for that turn.
+    const beginTurn = (writer: ProviderRuntimeWriter | null) => {
+      turnActive = true;
+      if (!writer) return;
+      ws = writer;
+      turnCompleteSent = false;
+      const entry = sessionKey() ? getSession(sessionKey()) : undefined;
+      if (entry?.instance === queryInstance) entry.writer = writer;
+    };
+
     // Track the query instance for abort capability
     if (sessionKey()) {
-      addSession(sessionKey(), queryInstance, ws, releasePromptStream);
+      addSession(sessionKey(), queryInstance, ws, releasePromptStream, injectTurn);
     }
 
     // Process streaming messages
@@ -967,7 +1082,7 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
       if (message.session_id && !capturedSessionId) {
 
         capturedSessionId = message.session_id;
-        addSession(sessionKey(), queryInstance, ws, releasePromptStream);
+        addSession(sessionKey(), queryInstance, ws, releasePromptStream, injectTurn);
 
         // Set session ID on writer
         if (ws.setSessionId && typeof ws.setSessionId === 'function') {
@@ -981,6 +1096,30 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
         }
       } else {
         // session_id already captured
+      }
+
+      // The CLI echoes each user message as it starts processing it. The echo
+      // of an injected turn hands the output over to that turn's writer; no
+      // echo is forwarded — the client already shows what the user sent.
+      if (message.type === 'user' && message.isReplay) {
+        if (pendingInjection && message.uuid === pendingInjection.uuid) {
+          activeInjection = pendingInjection;
+          pendingInjection = null;
+          turnIsFollowUp = false;
+          beginTurn(activeInjection.writer);
+        }
+        continue;
+      }
+
+      // Output with no turn in progress is a turn the CLI started on its own:
+      // a background task reporting back or a scheduled wake-up. Give it a
+      // chat run of its own so the client shows it working and streams it —
+      // the previous turn's run is already sealed. Without one (a newer run
+      // owns the session) its output is dropped as before.
+      if (!turnActive && !message.parent_tool_use_id
+        && (message.type === 'assistant' || message.type === 'stream_event')) {
+        turnIsFollowUp = true;
+        beginTurn(typeof options.openFollowUpRun === 'function' ? options.openFollowUpRun() : null);
       }
 
       // Transform and normalize message via adapter
@@ -1018,21 +1157,37 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
         backgroundWorkPending = true;
       }
       trackBackgroundTask(outstandingTasks, message);
+      if (outstandingTasks.size !== reportedTaskCount) {
+        reportedTaskCount = outstandingTasks.size;
+        ws.send(createNormalizedMessage({ kind: 'background_tasks', count: reportedTaskCount, sessionId: capturedSessionId || sessionId || null, provider: 'claude' }));
+      }
 
       if (message.type === 'result') {
         // The turn is done as far as the client is concerned.
+        turnActive = false;
+        const followUp = turnIsFollowUp;
+        turnIsFollowUp = false;
         const abortPending = sessionKey() ? abortedInstances.has(queryInstance) : false;
         if (!turnCompleteSent && !abortPending) {
           turnCompleteSent = true;
           ws.send(createCompleteMessage({ provider: 'claude', sessionId: capturedSessionId || sessionId || null, exitCode: 0 }));
-          notifyRunStopped({
-            userId: ws?.userId || null,
-            provider: 'claude',
-            sessionId: sessionId || capturedSessionId || null,
-            sessionName: sessionSummary,
-            stopReason: 'completed'
-          });
-        } else if (heldForBackgroundWork && !abortPending) {
+          if (followUp) {
+            notifyBackgroundWorkCompleted({
+              userId: ws?.userId || null,
+              provider: 'claude',
+              sessionId: sessionId || capturedSessionId || null,
+              sessionName: sessionSummary
+            });
+          } else {
+            notifyRunStopped({
+              userId: ws?.userId || null,
+              provider: 'claude',
+              sessionId: sessionId || capturedSessionId || null,
+              sessionName: sessionSummary,
+              stopReason: 'completed'
+            });
+          }
+        } else if (followUp && !abortPending) {
           // A result after the turn already reported complete means the work we
           // held the process open for has finished and pushed a follow-up turn.
           notifyBackgroundWorkCompleted({
@@ -1057,6 +1212,11 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
           heldForBackgroundWork = false;
           releasePromptStream();
         }
+        // The injected turn is over — its caller can return like a normal run.
+        if (activeInjection) {
+          activeInjection.settle(true);
+          activeInjection = null;
+        }
       } else if (idleReleaseTimer) {
         // Background activity after the turn — push the countdown back out.
         scheduleRelease();
@@ -1078,6 +1238,7 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
     // terminal `complete` (aborted: true) was already sent by abort-session, and
     // for runs that already reported completion when their `result` arrived.
     const wasAborted = !superseded && sessionKey() ? abortedInstances.delete(queryInstance) : false;
+    stoppedByUser = wasAborted;
     if (!turnCompleteSent && !superseded) {
       turnCompleteSent = true;
       if (!wasAborted) {
@@ -1109,6 +1270,7 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
     }
 
     const wasAborted = sessionKey() ? abortedInstances.delete(queryInstance) : false;
+    stoppedByUser = wasAborted;
     if (wasAborted) {
       // The abort already produced the terminal complete; a generator throw
       // caused by interrupt() is expected noise, not a user-facing error.
@@ -1143,6 +1305,22 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
       idleReleaseTimer = null;
     }
     releasePromptStream();
+    // The process is gone: an injected turn the CLI never started goes back to
+    // its caller to run in a fresh process — unless the user stopped it, in
+    // which case it must not come back to life. A started one already got its
+    // terminal events from this run.
+    if (pendingInjection) {
+      pendingInjection.settle(stoppedByUser || Boolean(queryInstance && abortedInstances.has(queryInstance)));
+      pendingInjection = null;
+    }
+    if (activeInjection) {
+      activeInjection.settle(true);
+      activeInjection = null;
+    }
+    if (reportedTaskCount > 0) {
+      reportedTaskCount = 0;
+      ws.send(createNormalizedMessage({ kind: 'background_tasks', count: 0, sessionId: capturedSessionId || sessionId || null, provider: 'claude' }));
+    }
   }
 }
 

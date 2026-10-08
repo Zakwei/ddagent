@@ -212,7 +212,13 @@ export type MessageKind =
   | 'permission_cancelled'
   | 'session_created'
   | 'interactive_prompt'
-  | 'task_notification';
+  | 'task_notification'
+  /**
+   * Number of tasks (subagents, background shells, workflows) still running
+   * for the session in `count`. Sent whenever it changes — including between
+   * turns, after the turn's `complete` — and 0 when the provider process ends.
+   */
+  | 'background_tasks';
 
 /**
  * Event kinds added by the chat gateway layer on top of provider message kinds.
