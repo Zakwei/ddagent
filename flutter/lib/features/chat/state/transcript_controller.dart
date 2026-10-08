@@ -897,10 +897,10 @@ class TranscriptController extends Notifier<TranscriptState> {
   void _restoreRejectedDecisions(String? requestId) {
     final now = DateTime.now().millisecondsSinceEpoch;
     _recentDecisions.removeWhere((_, d) => now - d.at > _decisionRejectWindowMs);
-    final ids = requestId != null
-        ? [if (_recentDecisions.containsKey(requestId)) requestId]
-        : _recentDecisions.keys.toList();
-    for (final id in ids) {
+    // The server echoes the rejected permission's requestId; a FORBIDDEN_ROLE
+    // without one answered some other frame and must not undo accepted answers.
+    if (requestId == null) return;
+    for (final id in [if (_recentDecisions.containsKey(requestId)) requestId]) {
       final pending = _recentDecisions.remove(id)?.pending;
       if (pending != null) ref.read(pendingPermissionsProvider.notifier).add(pending);
       _store.patchRealtime(_sessionId, (m) => m.kind == 'permission_request' && m.requestId == id, (
