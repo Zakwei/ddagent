@@ -157,13 +157,35 @@ test('antigravity MCP provider round-trips stdio/http servers in the user config
     const config = await readJson(path.join(tempRoot, '.gemini', 'config', 'mcp_config.json'));
     const servers = config.mcpServers as Record<string, any>;
     assert.equal(servers.echo.command, 'npx');
-    assert.equal(servers.echo.disabled, false);
+    assert.equal(servers.echo.disabled, undefined);
     assert.equal(servers.remote.serverUrl, 'https://example.com/mcp');
     assert.equal(servers.remote.headers.Authorization, 'Bearer T');
 
     const scoped = await provider.listServers({ workspacePath });
     assert.ok(scoped.user.some((s) => s.name === 'echo'));
     assert.ok(scoped.user.some((s) => s.name === 'remote' && s.url === 'https://example.com/mcp'));
+
+    // Editing keeps the CLI-side `disabled` flag and unknown keys, and drops
+    // stale transport keys when the transport changes.
+    const configPath = path.join(tempRoot, '.gemini', 'config', 'mcp_config.json');
+    servers.echo.disabled = true;
+    servers.echo.timeout = 30;
+    await fs.writeFile(configPath, JSON.stringify(config));
+    await provider.upsertServer({
+      name: 'echo',
+      scope: 'user',
+      transport: 'http',
+      url: 'https://example.com/echo',
+      workspacePath,
+    });
+    const edited = (await readJson(configPath)).mcpServers as Record<string, any>;
+    assert.deepEqual(edited.echo, { disabled: true, timeout: 30, serverUrl: 'https://example.com/echo' });
+    assert.equal(edited.remote.serverUrl, 'https://example.com/mcp');
+
+    // A malformed file is never overwritten.
+    await fs.writeFile(configPath, '{ broken');
+    await assert.rejects(provider.removeServer({ name: 'remote', scope: 'user', workspacePath }));
+    assert.equal(await fs.readFile(configPath, 'utf8'), '{ broken');
 
     // project/local scopes are not supported by `agy mcp` — reject them.
     await assert.rejects(

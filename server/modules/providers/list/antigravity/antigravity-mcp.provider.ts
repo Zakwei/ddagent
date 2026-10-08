@@ -15,6 +15,10 @@ import {
 
 const ANTIGRAVITY_MCP_PATH = () => path.join(antigravityConfigDir(), 'mcp_config.json');
 
+// Keys rebuilt from the edit form; everything else on an existing entry
+// (`disabled`, timeouts, CLI-only flags) survives an edit.
+const TRANSPORT_KEYS = new Set(['command', 'args', 'env', 'serverUrl', 'url', 'httpUrl', 'headers', 'type', 'transport']);
+
 /**
  * Antigravity stores MCP servers as `{mcpServers: {name: config}}` JSON at
  * `~/.gemini/config/mcp_config.json` — a single user-global scope (the CLI's
@@ -22,8 +26,8 @@ const ANTIGRAVITY_MCP_PATH = () => path.join(antigravityConfigDir(), 'mcp_config
  * servers carry `command` + `args` + `env`; `http` servers carry `serverUrl`
  * + `headers` (SSE is not offered by this CLI). `agy mcp enable|disable`
  * flips a `disabled` flag on the entry; `ProviderMcpServer` has no enabled
- * field, so disabled entries normalize identically and the CLI-side flag is
- * preserved untouched on write.
+ * field, so disabled entries normalize identically and the CLI-side flag (plus
+ * any other key DDAgent does not model) is preserved untouched on write.
  */
 export class AntigravityMcpProvider extends McpProvider {
   constructor() {
@@ -41,8 +45,17 @@ export class AntigravityMcpProvider extends McpProvider {
     servers: Record<string, unknown>,
   ): Promise<void> {
     const filePath = ANTIGRAVITY_MCP_PATH();
-    const config: Record<string, unknown> = await readJsonConfig(filePath).catch(() => ({}));
-    config.mcpServers = servers;
+    // No catch: a malformed file must fail the write instead of being replaced
+    // by `{}` and losing the user's config.
+    const config: Record<string, unknown> = await readJsonConfig(filePath);
+    const existing = readObjectRecord(config.mcpServers) ?? {};
+    const merged: Record<string, unknown> = {};
+    for (const [name, next] of Object.entries(servers)) {
+      const previous = readObjectRecord(existing[name]) ?? {};
+      const kept = Object.fromEntries(Object.entries(previous).filter(([key]) => !TRANSPORT_KEYS.has(key)));
+      merged[name] = { ...kept, ...(readObjectRecord(next) ?? {}) };
+    }
+    config.mcpServers = merged;
     await writeJsonConfig(filePath, config);
   }
 
@@ -58,7 +71,6 @@ export class AntigravityMcpProvider extends McpProvider {
       return {
         command: input.command,
         args: input.args ?? [],
-        disabled: false,
         ...(input.env ? { env: input.env } : {}),
       };
     }
@@ -72,7 +84,6 @@ export class AntigravityMcpProvider extends McpProvider {
 
     return {
       serverUrl: input.url,
-      disabled: false,
       ...(input.headers ? { headers: input.headers } : {}),
     };
   }
