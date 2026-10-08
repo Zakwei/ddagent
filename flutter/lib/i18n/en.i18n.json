@@ -1697,6 +1697,7 @@
       "title": "App updates",
       "description": "Check GitHub for a newer desktop build. New versions download automatically and install when you quit.",
       "descriptionMobile": "Check GitHub for a newer build of this app. Updates are installed by your device's system installer.",
+      "descriptionServer": "Check GitHub for a newer ddagent release. The connected server can update itself — active sessions are interrupted while it restarts.",
       "check": "Check for updates",
       "checking": "Checking…",
       "upToDate": "You are on the latest version (v{{version}}).",

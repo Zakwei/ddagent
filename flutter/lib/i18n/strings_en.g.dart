@@ -4127,6 +4127,9 @@ class Translations$settings$updates$en {
 	/// en: 'Check GitHub for a newer build of this app. Updates are installed by your device's system installer.'
 	String get descriptionMobile => 'Check GitHub for a newer build of this app. Updates are installed by your device\'s system installer.';
 
+	/// en: 'Check GitHub for a newer ddagent release. The connected server can update itself — active sessions are interrupted while it restarts.'
+	String get descriptionServer => 'Check GitHub for a newer ddagent release. The connected server can update itself — active sessions are interrupted while it restarts.';
+
 	/// en: 'Check for updates'
 	String get check => 'Check for updates';
 
@@ -14695,6 +14698,7 @@ extension on Translations {
 			'settings.updates.title' => 'App updates',
 			'settings.updates.description' => 'Check GitHub for a newer desktop build. New versions download automatically and install when you quit.',
 			'settings.updates.descriptionMobile' => 'Check GitHub for a newer build of this app. Updates are installed by your device\'s system installer.',
+			'settings.updates.descriptionServer' => 'Check GitHub for a newer ddagent release. The connected server can update itself — active sessions are interrupted while it restarts.',
 			'settings.updates.check' => 'Check for updates',
 			'settings.updates.checking' => 'Checking…',
 			'settings.updates.upToDate' => ({required Object version}) => 'You are on the latest version (v${version}).',
@@ -14937,9 +14941,9 @@ extension on Translations {
 			'settings.notifications.webPush.testSuccess' => ({required Object count}) => 'Sent to ${count} device(s). If nothing appeared on the phone, add ddagent to the home screen (iOS requires this).',
 			'settings.notifications.webPush.testNotDelivered' => 'No device was reachable. Make sure the app is running and notifications are enabled.',
 			'settings.notifications.device.title' => 'Notify this device',
-			'settings.notifications.device.enabled' => 'Notifications are enabled for this device',
 			_ => null,
 		} ?? switch (path) {
+			'settings.notifications.device.enabled' => 'Notifications are enabled for this device',
 			'settings.notifications.desktop.title' => 'Notify this desktop app',
 			'settings.notifications.desktop.enable' => 'Enable notifications',
 			'settings.notifications.desktop.disable' => 'Disable notifications',
@@ -15451,9 +15455,9 @@ extension on Translations {
 			'sidebar.messages.deleteProjectError' => 'Error removing project. Please try again.',
 			'sidebar.messages.createProjectFailed' => 'Failed to create project. Please try again.',
 			'sidebar.messages.createProjectError' => 'Error creating project. Please try again.',
-			'sidebar.messages.updateProjectError' => 'Error updating project. Please try again.',
 			_ => null,
 		} ?? switch (path) {
+			'sidebar.messages.updateProjectError' => 'Error updating project. Please try again.',
 			'sidebar.messages.refreshError' => 'Failed to refresh. Please try again.',
 			'sidebar.messages.restoreProjectFailed' => 'Failed to restore project. Please try again.',
 			'sidebar.messages.restoreProjectError' => 'Error restoring project. Please try again.',
@@ -15965,9 +15969,9 @@ extension on Translations {
 			'mcp.form.fields.envVarNames' => 'Environment Variable Names',
 			'mcp.form.fields.bearerTokenEnvVar' => 'Bearer Token Environment Variable',
 			'mcp.form.validation.unsupportedGlobal' => ({required Object type}) => 'Add MCP Server supports only stdio and http across all providers, not ${type}.',
-			'mcp.form.validation.unsupportedProvider' => ({required Object provider, required Object type}) => '${provider} does not support ${type} MCP servers',
 			_ => null,
 		} ?? switch (path) {
+			'mcp.form.validation.unsupportedProvider' => ({required Object provider, required Object type}) => '${provider} does not support ${type} MCP servers',
 			'notifications.deviceLabel' => 'ddagent Flutter',
 			'notifications.errors.registrationRejected' => 'Registration rejected by server',
 			'notifications.errors.noResponse' => 'No response from the server',

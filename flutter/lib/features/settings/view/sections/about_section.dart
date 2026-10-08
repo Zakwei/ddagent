@@ -6,6 +6,7 @@ import 'package:ddagent_app/core/utils/app_reload.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/core/widgets/app_markdown.dart';
+import 'package:ddagent_app/core/widgets/update_badge.dart' show UpdateDialog;
 import 'package:ddagent_app/features/server_connect/data/server_profiles.dart';
 import 'package:ddagent_app/features/settings/state/locale_controller.dart';
 import 'package:ddagent_app/features/settings/view/sections/general_section.dart';
@@ -13,7 +14,14 @@ import 'package:ddagent_app/features/system/data/app_update_channel.dart';
 import 'package:ddagent_app/features/system/data/system_repository.dart';
 import 'package:ddagent_app/features/system/state/system_providers.dart';
 import 'package:ddagent_app/features/system/state/update_controller.dart'
-    show DesktopUpdateStage, appUpdateChannelProvider, appVersionProvider, desktopUpdateProvider;
+    show
+        DesktopUpdateStage,
+        appUpdateAvailableProvider,
+        appUpdateChannelProvider,
+        appVersionProvider,
+        desktopUpdateProvider,
+        normalizeVersion,
+        updateAvailableProvider;
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -616,6 +624,16 @@ class _UpdateCheckBlockState extends ConsumerState<_UpdateCheckBlock> {
     final tt = Theme.of(context).textTheme;
 
     final channel = ref.watch(appUpdateChannelProvider);
+    final latestRelease = normalizeVersion(ref.watch(latestReleaseProvider).value?.tagName ?? '');
+    // Server self-update: a remote server behind the latest release. A local
+    // server ("This device") updates with the app, never over the API.
+    final profiles = ref.watch(serverProfilesProvider);
+    final activeIsLocal =
+        profiles.profiles.where((p) => p.url == profiles.activeUrl).firstOrNull?.isLocal ?? false;
+    final serverBehind = !activeIsLocal && ref.watch(updateAvailableProvider);
+    // Something the Update dialog can act on: install this app's newer build
+    // (Android, desktop), or update the connected server.
+    final canUpdate = ref.watch(appUpdateAvailableProvider) || serverBehind;
 
     String? result;
     var good = false;
@@ -662,15 +680,20 @@ class _UpdateCheckBlockState extends ConsumerState<_UpdateCheckBlock> {
         good = true;
       }
     } else {
-      switch (_status) {
+      // A newer release than the connected server — known from the shared
+      // providers without pressing Check (the rail badge uses the same ones).
+      final behind = serverBehind && _status != _CheckStatus.checking;
+      final status = behind ? _CheckStatus.updateAvailable : _status;
+      final detail = behind ? latestRelease : _detail;
+      switch (status) {
         case _CheckStatus.upToDate:
-          result = t.updates.upToDate(version: _detail);
+          result = t.updates.upToDate(version: detail);
           good = true;
         case _CheckStatus.updateAvailable:
-          result = t.apiKeys.version.updateAvailable(version: _detail);
+          result = t.apiKeys.version.updateAvailable(version: detail);
           good = true;
         case _CheckStatus.error:
-          result = _detail.isEmpty ? t.updates.errorGeneric : t.updates.error(message: _detail);
+          result = detail.isEmpty ? t.updates.errorGeneric : t.updates.error(message: detail);
         case _CheckStatus.idle || _CheckStatus.checking:
           result = null;
       }
@@ -694,15 +717,31 @@ class _UpdateCheckBlockState extends ConsumerState<_UpdateCheckBlock> {
                     ],
                   ),
                   const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    channel == AppUpdateChannel.android
-                        ? t.updates.descriptionMobile
-                        : t.updates.description,
-                    style: tt.labelSmall?.copyWith(color: c.mutedForeground),
-                  ),
+                  Text(switch (channel) {
+                    AppUpdateChannel.android => t.updates.descriptionMobile,
+                    // Web and other builds that can't install themselves —
+                    // what's left to update is the connected server.
+                    AppUpdateChannel.unsupported => t.updates.descriptionServer,
+                    _ => t.updates.description,
+                  }, style: tt.labelSmall?.copyWith(color: c.mutedForeground)),
                 ],
               ),
             ),
+            if (canUpdate)
+              AppButton(
+                size: AppButtonSize.sm,
+                onPressed: () => unawaited(
+                  showDialog<void>(context: context, builder: (_) => const UpdateDialog()),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  spacing: AppSpacing.xs,
+                  children: [
+                    const Icon(LucideIcons.circleArrowUp, size: 12),
+                    Text(Translations.of(context).common.buttons.update),
+                  ],
+                ),
+              ),
             AppButton(
               variant: AppButtonVariant.outline,
               size: AppButtonSize.sm,

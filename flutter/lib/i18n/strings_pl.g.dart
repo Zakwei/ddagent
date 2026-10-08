@@ -2293,6 +2293,7 @@ class Translations$settings$updates$pl extends Translations$settings$updates$en 
 	@override String get title => 'Aktualizacje aplikacji';
 	@override String get description => 'Sprawdź GitHub w poszukiwaniu nowszej wersji desktopowej. Nowe wersje pobierają się automatycznie i instalują przy zamknięciu.';
 	@override String get descriptionMobile => 'Sprawdź GitHub w poszukiwaniu nowszej wersji tej aplikacji. Aktualizację instaluje instalator systemowy urządzenia.';
+	@override String get descriptionServer => 'Sprawdza na GitHubie, czy jest nowsze wydanie ddagent. Podłączony serwer może zaktualizować się sam — trwające sesje zostaną przerwane na czas restartu.';
 	@override String get check => 'Sprawdź aktualizacje';
 	@override String get checking => 'Sprawdzanie…';
 	@override String upToDate({required Object version}) => 'Masz najnowszą wersję (v${version}).';
@@ -8698,6 +8699,7 @@ extension on TranslationsPl {
 			'settings.updates.title' => 'Aktualizacje aplikacji',
 			'settings.updates.description' => 'Sprawdź GitHub w poszukiwaniu nowszej wersji desktopowej. Nowe wersje pobierają się automatycznie i instalują przy zamknięciu.',
 			'settings.updates.descriptionMobile' => 'Sprawdź GitHub w poszukiwaniu nowszej wersji tej aplikacji. Aktualizację instaluje instalator systemowy urządzenia.',
+			'settings.updates.descriptionServer' => 'Sprawdza na GitHubie, czy jest nowsze wydanie ddagent. Podłączony serwer może zaktualizować się sam — trwające sesje zostaną przerwane na czas restartu.',
 			'settings.updates.check' => 'Sprawdź aktualizacje',
 			'settings.updates.checking' => 'Sprawdzanie…',
 			'settings.updates.upToDate' => ({required Object version}) => 'Masz najnowszą wersję (v${version}).',
@@ -8962,9 +8964,9 @@ extension on TranslationsPl {
 			'settings.saveStatus.error' => 'Nie udało się zapisać ustawień',
 			'settings.saveStatus.saving' => 'Zapisywanie...',
 			'settings.footerActions.save' => 'Zapisz ustawienia',
-			'settings.footerActions.cancel' => 'Anuluj',
 			_ => null,
 		} ?? switch (path) {
+			'settings.footerActions.cancel' => 'Anuluj',
 			'settings.git.title' => 'Konfiguracja Git',
 			'settings.git.description' => 'Skonfiguruj swoją tożsamość Git do commitów. Te ustawienia zostaną zastosowane globalnie przez git config --global',
 			'settings.git.name.label' => 'Nazwa Git',
@@ -9476,9 +9478,9 @@ extension on TranslationsPl {
 			'tasks.notConfigured.initializeButton' => 'Zainicjuj TaskMaster AI',
 			'tasks.notConfigured.writePrdFirst' => 'Najpierw napisz PRD',
 			'tasks.gettingStarted.title' => 'Pierwsze kroki z TaskMaster',
-			'tasks.gettingStarted.subtitle' => 'TaskMaster został zainicjowany! Oto co zrobić dalej:',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.gettingStarted.subtitle' => 'TaskMaster został zainicjowany! Oto co zrobić dalej:',
 			'tasks.gettingStarted.steps.createPRD.title' => 'Utwórz dokument wymagań produktu (PRD)',
 			'tasks.gettingStarted.steps.createPRD.description' => 'Omów swój pomysł na projekt i utwórz PRD opisujące, co chcesz zbudować.',
 			'tasks.gettingStarted.steps.createPRD.addButton' => 'Dodaj PRD',
@@ -9990,9 +9992,9 @@ extension on TranslationsPl {
 			'serverConnect.enterUrl' => 'Wpisz adres URL serwera',
 			'serverConnect.local.title' => 'To urządzenie',
 			'serverConnect.local.subtitle' => 'Uruchom serwer ddagent na tym komputerze',
-			'serverConnect.local.install' => 'Zainstaluj serwer lokalny',
 			_ => null,
 		} ?? switch (path) {
+			'serverConnect.local.install' => 'Zainstaluj serwer lokalny',
 			'serverConnect.local.start' => 'Uruchom serwer lokalny',
 			'serverConnect.local.stop' => 'Zatrzymaj',
 			'serverConnect.local.starting' => 'Uruchamianie serwera lokalnego…',

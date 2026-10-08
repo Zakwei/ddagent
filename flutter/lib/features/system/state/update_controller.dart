@@ -3,9 +3,15 @@ import 'dart:async';
 import 'package:ddagent_app/features/system/data/app_update_channel.dart';
 import 'package:ddagent_app/features/system/data/app_update_installer.dart';
 import 'package:ddagent_app/features/system/data/system_repository.dart';
+import 'package:ddagent_app/features/system/state/system_providers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+
+// The update checks share the Settings → About providers, so the rail badge and
+// the About page always agree on the latest release and the server version.
+export 'package:ddagent_app/features/system/state/system_providers.dart'
+    show latestReleaseProvider, serverHealthProvider;
 
 /// Numeric dot-version compare — port of `compareVersions` in
 /// `useVersionCheck.ts`. Positive if [a] > [b].
@@ -22,17 +28,6 @@ int compareVersions(String a, String b) {
 
 /// Strip the `v` prefix a GitHub tag carries (`v1.2.3` → `1.2.3`).
 String normalizeVersion(String v) => v.startsWith('v') || v.startsWith('V') ? v.substring(1) : v;
-
-/// `GET /health` — running server version probe (also used after update).
-final serverHealthProvider = FutureProvider.autoDispose<Map<String, dynamic>>(
-  (ref) =>
-      ref.watch(systemRepositoryProvider).health().catchError((_) => const <String, dynamic>{}),
-);
-
-/// `GET /api/system/latest-release` — newest GitHub release (null on failure).
-final latestReleaseProvider = FutureProvider.autoDispose<Release?>(
-  (ref) => ref.watch(systemRepositoryProvider).latestRelease().catchError((_) => null),
-);
 
 /// Whether the server is behind the latest GitHub release — the web client's
 /// `useVersionCheck` (latest tag vs the version /health reports).

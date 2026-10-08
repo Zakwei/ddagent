@@ -1,4 +1,5 @@
 import 'package:ddagent_app/core/theme/app_theme.dart';
+import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/features/settings/view/sections/about_section.dart';
 import 'package:ddagent_app/features/settings/view/settings_screen.dart';
 import 'package:ddagent_app/features/system/data/app_update_channel.dart';
@@ -211,6 +212,62 @@ void main() {
     );
     expect(find.textContaining('system installer'), findsOneWidget);
   });
+
+  for (final android in [false, true]) {
+    testWidgets('a newer release offers an Update button (${android ? 'Android' : 'web'})', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(1200, 2600);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(
+        TranslationProvider(
+          child: ProviderScope(
+            overrides: [
+              releasesProvider.overrideWith((ref) async => <Release>[]),
+              serverHealthProvider.overrideWith(
+                (ref) async => {'status': 'ok', 'version': android ? '9.9.9' : '0.0.1'},
+              ),
+              latestReleaseProvider.overrideWith(
+                (ref) async => const Release(
+                  tagName: 'v9.9.9',
+                  assets: [
+                    ReleaseAsset(
+                      name: 'ddagent-flutter-android-v9.9.9.apk',
+                      downloadUrl: 'https://example.com/app.apk',
+                    ),
+                  ],
+                ),
+              ),
+              appUpdateChannelProvider.overrideWithValue(
+                android ? AppUpdateChannel.android : AppUpdateChannel.unsupported,
+              ),
+              appVersionProvider.overrideWith((ref) async => '1.0.0'),
+            ],
+            child: MaterialApp(
+              theme: AppTheme.light(),
+              home: const MediaQuery(
+                data: MediaQueryData(size: Size(1200, 2600)),
+                child: SettingsScreen(section: 'about'),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final update = find.widgetWithText(AppButton, 'Update');
+      expect(update, findsOneWidget);
+      await tester.tap(update);
+      await tester.pumpAndSettle();
+      expect(
+        find.textContaining(
+          android ? 'Install ddagent v9.9.9 on this device?' : 'Update to v9.9.9?',
+        ),
+        findsOneWidget,
+      );
+    });
+  }
 }
 
 /// Health answers with the old process, fails while it is down, then reports a
