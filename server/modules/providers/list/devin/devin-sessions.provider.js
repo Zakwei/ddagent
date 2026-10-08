@@ -559,6 +559,31 @@ export function graftJsonlUserIdentity(dbMessages, jsonlMessages) {
     }
 }
 
+const isUserText = (m) => m.kind === 'text' && m.role === 'user';
+const isAssistantText = (m) => m.kind === 'text' && m.role === 'assistant' && typeof m.content === 'string' && m.content.trim();
+
+/**
+ * Exported for tests: fills the final answer of the JSONL's last turn from the
+ * Devin DB when the JSONL has none (e.g. an aborted turn). The JSONL stays the
+ * history — it keeps the live tool names, errors and thinking the DB lacks —
+ * and only the DB's last assistant text after the same user prompt is added.
+ */
+export function appendMissingDbFinal(jsonlMessages, dbMessages) {
+    const lastJsonlUser = [...jsonlMessages].reverse().find(isUserText);
+    let lastDbUserIndex = -1;
+    for (let i = 0; i < dbMessages.length; i += 1) {
+        if (isUserText(dbMessages[i])) lastDbUserIndex = i;
+    }
+    if (!lastJsonlUser || lastDbUserIndex === -1) return;
+    const jsonlPrompt = (lastJsonlUser.content || '').trim();
+    // The DB copy may carry an appended attachment tag after the prompt.
+    if (!(dbMessages[lastDbUserIndex].content || '').trim().startsWith(jsonlPrompt)) return;
+    const final = dbMessages.slice(lastDbUserIndex + 1).filter(isAssistantText).at(-1);
+    if (!final || jsonlMessages.some((m) => isAssistantText(m) && m.content.trim() === final.content.trim())) return;
+    jsonlMessages.push(final);
+    jsonlMessages.chainLength = jsonlMessages.length;
+}
+
 export class DevinSessionsProvider {
     /**
      * Normalizes a persisted Devin JSONL record into the shared message shape.
@@ -598,6 +623,11 @@ export class DevinSessionsProvider {
             const jsonlPath = getSessionJsonlPath(session, providerSessionId);
             jsonlMessages = loadDdagentJsonlHistory(jsonlPath, limit, offset);
             if (jsonlMessages.length > 0 && hasAssistantInJsonl(jsonlMessages)) {
+                sourceMessages = jsonlMessages;
+            } else if (jsonlMessages.some(isUserText)) {
+                // A turn without an answer (abort, crash): keep the JSONL and
+                // only borrow the missing final from the Devin DB.
+                appendMissingDbFinal(jsonlMessages, loadDevinDbHistory(providerSessionId));
                 sourceMessages = jsonlMessages;
             }
         }

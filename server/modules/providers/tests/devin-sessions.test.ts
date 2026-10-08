@@ -4,7 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { filterDevinChainNodes, graftJsonlUserIdentity, loadDdagentJsonlHistory } from '@/modules/providers/list/devin/devin-sessions.provider.js';
+import { appendMissingDbFinal, filterDevinChainNodes, graftJsonlUserIdentity, loadDdagentJsonlHistory } from '@/modules/providers/list/devin/devin-sessions.provider.js';
 
 /** Writes one ddagent JSONL transcript into a temp directory and removes it afterwards. */
 async function withTranscript(
@@ -156,4 +156,28 @@ test('graftJsonlUserIdentity leaves DB-only user rows and id-less echoes alone',
   graftJsonlUserIdentity(dbMessages, []);
   graftJsonlUserIdentity([], jsonlMessages);
   assert.equal(dbMessages[1].id, 'text_siema', 'empty inputs are a no-op');
+});
+
+test('appendMissingDbFinal keeps the JSONL turn and only adds the DB final', () => {
+  const jsonl: any[] = [
+    { id: 'u1', kind: 'text', role: 'user', content: 'fix it' },
+    { id: 'tool-1', kind: 'tool_use', toolName: 'Edit a.ts' },
+    { id: 'err', kind: 'error', content: 'earlier error' },
+  ];
+  // hasAssistantInJsonl would already accept the error row; drop it to model an abort.
+  jsonl.pop();
+  appendMissingDbFinal(jsonl, [
+    { kind: 'text', role: 'user', content: 'fix it' },
+    { kind: 'tool_use', toolName: 'edit_file' },
+    { id: 'a1', kind: 'text', role: 'assistant', content: 'Done.' },
+  ]);
+  assert.deepEqual(jsonl.map((m) => m.id), ['u1', 'tool-1', 'a1']);
+
+  // A DB that has not reached this prompt adds nothing (no stale final).
+  const stale: any[] = [{ id: 'u2', kind: 'text', role: 'user', content: 'next' }];
+  appendMissingDbFinal(stale, [
+    { kind: 'text', role: 'user', content: 'fix it' },
+    { id: 'a1', kind: 'text', role: 'assistant', content: 'Done.' },
+  ]);
+  assert.deepEqual(stale.map((m) => m.id), ['u2']);
 });
