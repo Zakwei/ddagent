@@ -149,7 +149,9 @@ test('applyModelToDevinSession skips a thought_level the new model does not offe
 });
 
 test('applyModelToDevinSession keeps the turn alive when the switch fails', async () => {
+  const sent = [];
   const { state } = fakeDevinState({
+    currentWriter: { send: (message) => sent.push(message) },
     async sendRequest() {
       throw new Error('ACP error');
     },
@@ -157,6 +159,10 @@ test('applyModelToDevinSession keeps the turn alive when the switch fails', asyn
 
   await applyModelToDevinSession(state, 'deepseek-v4-1-flash-max');
   assert.equal(state.model, 'swe-2-high');
+  // The failure is visible to the user as a persistent notice.
+  assert.equal(sent.length, 1);
+  assert.equal(sent[0].notice, true);
+  assert.match(sent[0].text, /Could not switch model to deepseek-v4-1-flash-max; still using swe-2-high/);
 });
 
 test('applyModelToDevinSession ignores an empty model', async () => {
