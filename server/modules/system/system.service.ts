@@ -135,7 +135,8 @@ export function createSystemUpdateService(dependencies: SystemUpdateDependencies
         workingDirectory,
         dependencies.environment,
         (output: string) => dependencies.logInfo('Update output:', output),
-        (errorOutput: string) => dependencies.logError('Update error:', errorOutput),
+        // npm writes plain warnings to stderr; the exit code decides failure.
+        (errorOutput: string) => dependencies.logInfo('Update log:', errorOutput),
       ] as const;
 
       try {
@@ -430,7 +431,7 @@ async function updateBundle(dependencies: SystemUpdateDependencies, userId: numb
       updateDirectory,
       dependencies.environment,
       (output) => dependencies.logInfo('Update output:', output),
-      (errorOutput) => dependencies.logError('Update error:', errorOutput),
+      (errorOutput) => dependencies.logInfo('Update log:', errorOutput),
     );
     if (extract.exitCode !== 0) {
       throw new Error(`Could not unpack ${assetName}: ${extract.errorOutput || extract.output}`);
