@@ -397,7 +397,11 @@ export async function spawnAntigravity(command: string, options: AnyRecord = {},
       }
     };
 
+    // The rejection reuses the reported text: the dispatcher re-sends a
+    // rejection as a late error and dedupes it only on identical text.
+    let reportedError: string | null = null;
     const sendError = (content: string) => {
+      reportedError = content;
       ws.send(createNormalizedMessage({
         kind: 'error',
         content,
@@ -728,7 +732,7 @@ export async function spawnAntigravity(command: string, options: AnyRecord = {},
         settleOnce(() => resolve());
       } else {
         notifyTerminalState({ code });
-        settleOnce(() => reject(new Error(`Antigravity CLI exited with code ${code}`)));
+        settleOnce(() => reject(new Error(reportedError ?? `Antigravity CLI exited with code ${code}`)));
       }
     });
 
@@ -757,7 +761,7 @@ export async function spawnAntigravity(command: string, options: AnyRecord = {},
       emitComplete(1);
       notifyTerminalState({ error });
 
-      settleOnce(() => reject(error));
+      settleOnce(() => reject(new Error(reportedError ?? error.message)));
     });
     }
     main().catch(reject);

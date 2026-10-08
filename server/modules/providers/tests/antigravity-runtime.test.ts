@@ -98,7 +98,8 @@ test('antigravity runtime reports spawn failure before complete', async () => {
     await tick();
     children[0].emit('error', Object.assign(new Error('spawn agy ENOENT'), { code: 'ENOENT' }));
     children[0].emit('close', -2);
-    await assert.rejects(run);
+    // Same text as the error row, so the dispatcher's late copy is deduped.
+    await assert.rejects(run, /not installed/);
     assert.deepEqual(sent.slice(1).map((m) => m.kind), ['error', 'complete']);
     assert.match(sent[1].content, /not installed/);
     assert.equal(runtime.hasPendingAntigravityLaunch(cwd), false);
@@ -124,7 +125,7 @@ test('antigravity runtime buffers stderr and surfaces it with a silent non-zero 
     await tick();
     assert.equal(sent.filter((m) => m.kind === 'error').length, 0);
     children[0].emit('close', 3);
-    await assert.rejects(run);
+    await assert.rejects(run, (error: Error) => error.message === 'Antigravity CLI exited with code 3:\nauth expired');
     const errors = sent.filter((m) => m.kind === 'error');
     assert.equal(errors.length, 1);
     assert.match(errors[0].content, /code 3:\nauth expired/);
