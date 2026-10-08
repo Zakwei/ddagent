@@ -584,7 +584,7 @@ for (const [name, createProcess, permissions, nativeKey, queryFn, runtimeExport,
     }
   });
 
-  test(`${name}: a stalled run cancels its pending asks before restarting`, async () => {
+  test(`${name}: a run waiting on a pending ask is never killed as stalled`, async () => {
     const directory = await mkdtemp(path.join(tmpdir(), 'acp-question-'));
     const { runtime, children } = await loadAcpProvider(name!, `${createProcess}, ${map}, ${permissions}, ${queryFn}`);
     const frames: Array<Record<string, any>> = [];
@@ -608,8 +608,8 @@ for (const [name, createProcess, permissions, nativeKey, queryFn, runtimeExport,
       void runtime[queryFn!]('hi', { sessionId: 'app', cwd: directory }, writer, context).catch(() => {});
       await flush();
 
-      assert.equal(runtime.lifecycleHooks[permissions!].has('req-1'), false, 'the killed run must drop its ask');
-      assert.ok(frames.some((frame) => frame.kind === 'permission_cancelled' && frame.requestId === 'req-1'));
+      assert.equal(runtime.lifecycleHooks[permissions!].has('req-1'), true, 'a run waiting on the user is not stalled');
+      assert.ok(!frames.some((frame) => frame.kind === 'permission_cancelled' && frame.requestId === 'req-1'));
     } finally {
       for (const child of children) child.stdout.end();
       await rm(directory, { recursive: true, force: true });
