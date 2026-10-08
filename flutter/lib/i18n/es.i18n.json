@@ -184,7 +184,8 @@
         "edit": "Editar mensaje en cola",
         "delete": "Eliminar mensaje en cola",
         "failed": "Falló el envío",
-        "sendNow": "Enviar ahora"
+        "sendNow": "Enviar ahora",
+        "sendNowAfterTurn": "Este agente no acepta mensajes durante un turno: se enviará cuando termine el actual"
       },
       "attachFilesDesc": "Subir fotos, archivos o documentos",
       "takePhoto": "Tomar foto",

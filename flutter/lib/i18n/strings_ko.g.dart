@@ -4354,6 +4354,7 @@ class Translations$chat$input$queue$ko extends Translations$chat$input$queue$en 
 	@override String get delete => '대기 중인 메시지 삭제';
 	@override String get failed => '전송 실패';
 	@override String get sendNow => '지금 보내기';
+	@override String get sendNowAfterTurn => '이 에이전트는 턴 진행 중에 메시지를 받을 수 없습니다. 현재 턴이 끝난 후 전송됩니다';
 }
 
 // Path: chat.input.offlineQueue
@@ -7142,6 +7143,7 @@ extension on TranslationsKo {
 			'chat.input.queue.delete' => '대기 중인 메시지 삭제',
 			'chat.input.queue.failed' => '전송 실패',
 			'chat.input.queue.sendNow' => '지금 보내기',
+			'chat.input.queue.sendNowAfterTurn' => '이 에이전트는 턴 진행 중에 메시지를 받을 수 없습니다. 현재 턴이 끝난 후 전송됩니다',
 			'chat.input.attachFilesDesc' => '사진, 파일 또는 문서 업로드',
 			'chat.input.takePhoto' => '사진 촬영',
 			'chat.input.takePhotoDesc' => '카메라로 사진 촬영',
@@ -7518,9 +7520,9 @@ extension on TranslationsKo {
 			'common.fileOperations.openInEditor' => '에디터에서 열기',
 			'common.mainContent.loading' => 'DDAgent 로딩 중',
 			'common.mainContent.settingUpWorkspace' => '워크스페이스 설정 중...',
-			'common.mainContent.chooseProject' => '프로젝트 선택',
 			_ => null,
 		} ?? switch (path) {
+			'common.mainContent.chooseProject' => '프로젝트 선택',
 			'common.mainContent.selectProjectDescription' => '사이드바에서 프로젝트를 선택하여 Claude와 코딩을 시작하세요. 각 프로젝트에는 채팅 세션과 파일 히스토리가 포함됩니다.',
 			'common.mainContent.tip' => '팁',
 			'common.mainContent.createProjectMobile' => '위의 메뉴 버튼을 눌러 프로젝트에 접근하세요',
@@ -8032,9 +8034,9 @@ extension on TranslationsKo {
 			'common.gitPanel.history.files' => '파일',
 			'common.gitPanel.history.removed' => '제거됨',
 			'common.gitPanel.mergeWorktree.cleanupDesc' => '병합 후 worktree를 제거하고 브랜치 삭제',
-			'common.gitPanel.mergeWorktree.cleanupLabel' => '병합 후 정리',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.mergeWorktree.cleanupLabel' => '병합 후 정리',
 			'common.gitPanel.mergeWorktree.commitCount' => ({required Object count}) => '${count}개 커밋',
 			'common.gitPanel.mergeWorktree.merge' => '병합',
 			'common.gitPanel.mergeWorktree.mergeMessage' => ({required Object branch}) => '\'${branch}\' 브랜치 병합',
@@ -8546,9 +8548,9 @@ extension on TranslationsKo {
 			'settings.agents.account.cursor.description' => 'Cursor AI 기반 코드 에디터',
 			'settings.agents.account.codex.description' => 'OpenAI Codex AI 어시스턴트',
 			'settings.agents.account.opencode.description' => 'OpenCode CLI 어시스턴트',
-			'settings.agents.account.commandcode.description' => 'Command Code CLI 어시스턴트',
 			_ => null,
 		} ?? switch (path) {
+			'settings.agents.account.commandcode.description' => 'Command Code CLI 어시스턴트',
 			'settings.agents.account.antigravity.description' => 'Antigravity CLI 어시스턴트',
 			'settings.agents.account.devin.description' => 'Devin CLI 어시스턴트',
 			'settings.agents.connectionStatus' => '연결 상태',
@@ -9060,9 +9062,9 @@ extension on TranslationsKo {
 			'tasks.nextTask.feature3' => '- 일상 작업을 위한 칸반 및 목록 보기.',
 			'tasks.nextTask.hideDetails' => '세부 정보 숨기기',
 			'tasks.nextTask.initialize' => '초기화',
-			'tasks.nextTask.noPending' => '대기 중인 작업 없음',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.nextTask.noPending' => '대기 중인 작업 없음',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI가 구성되지 않았습니다',
 			'tasks.nextTask.review' => '검토',
 			'tasks.nextTask.startTask' => '작업 시작',

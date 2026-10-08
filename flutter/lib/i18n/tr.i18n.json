@@ -192,7 +192,8 @@
         "edit": "Sıradaki mesajı düzenle",
         "delete": "Sıradaki mesajı sil",
         "failed": "Gönderilemedi",
-        "sendNow": "Şimdi gönder"
+        "sendNow": "Şimdi gönder",
+        "sendNowAfterTurn": "Bu ajan tur sırasında mesaj kabul etmiyor — mevcut tur bittikten sonra gönderilecek"
       },
       "autoContinueTasks": "Otomatik devam",
       "autoContinueTasksTooltip": "Devin'in bir sonraki Task Master görevine otomatik geçmesi için etkinleştir",

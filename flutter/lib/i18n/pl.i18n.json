@@ -278,7 +278,8 @@
         "edit": "Edytuj wiadomość w kolejce",
         "delete": "Usuń wiadomość z kolejki",
         "failed": "Nie udało się wysłać",
-        "sendNow": "Wyślij teraz"
+        "sendNow": "Wyślij teraz",
+        "sendNowAfterTurn": "Ten agent nie przyjmuje wiadomości w trakcie tury — zostanie wysłana po bieżącej turze"
       },
       "autoContinueTasks": "Auto-kontynuacja",
       "autoContinueTasksTooltip": "Włącz, by Devin automatycznie przechodził do kolejnych zadań Task Mastera",

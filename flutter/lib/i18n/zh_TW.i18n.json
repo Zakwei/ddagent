@@ -192,7 +192,8 @@
         "edit": "編輯佇列中的訊息",
         "delete": "刪除佇列中的訊息",
         "failed": "傳送失敗",
-        "sendNow": "立即傳送"
+        "sendNow": "立即傳送",
+        "sendNowAfterTurn": "此代理無法在回合進行中接收訊息——將在目前回合結束後傳送"
       },
       "autoContinueTasks": "自動繼續",
       "autoContinueTasksTooltip": "啟用後讓 Devin 自動繼續下一個 Task Master 任務",

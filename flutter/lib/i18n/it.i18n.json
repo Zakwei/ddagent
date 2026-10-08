@@ -192,7 +192,8 @@
         "edit": "Modifica messaggio in coda",
         "delete": "Elimina messaggio in coda",
         "failed": "Invio non riuscito",
-        "sendNow": "Invia ora"
+        "sendNow": "Invia ora",
+        "sendNowAfterTurn": "Questo agente non accetta messaggi durante un turno: verrà inviato al termine di quello attuale"
       },
       "autoContinueTasks": "Continuazione automatica",
       "autoContinueTasksTooltip": "Attiva per lasciare che Devin passi automaticamente all’attività Task Master successiva",

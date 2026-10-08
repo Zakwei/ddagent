@@ -4354,6 +4354,7 @@ class Translations$chat$input$queue$ja extends Translations$chat$input$queue$en 
 	@override String get delete => 'キュー済みメッセージを削除';
 	@override String get failed => '送信に失敗しました';
 	@override String get sendNow => '今すぐ送信';
+	@override String get sendNowAfterTurn => 'このエージェントはターン中にメッセージを受け付けません。現在のターンの終了後に送信されます';
 }
 
 // Path: chat.input.offlineQueue
@@ -7150,6 +7151,7 @@ extension on TranslationsJa {
 			'chat.input.queue.delete' => 'キュー済みメッセージを削除',
 			'chat.input.queue.failed' => '送信に失敗しました',
 			'chat.input.queue.sendNow' => '今すぐ送信',
+			'chat.input.queue.sendNowAfterTurn' => 'このエージェントはターン中にメッセージを受け付けません。現在のターンの終了後に送信されます',
 			'chat.input.autoContinueTasks' => '自動続行',
 			'chat.input.autoContinueTasksTooltip' => '有効にすると Devin が次の Task Master タスクへ自動的に進みます',
 			'chat.input.offlineQueue.clear' => 'キャンセルしてオフラインキューをクリア',
@@ -7518,9 +7520,9 @@ extension on TranslationsJa {
 			'common.fileOperations.openInEditor' => 'エディタで開く',
 			'common.mainContent.loading' => 'DDAgent を読み込んでいます',
 			'common.mainContent.settingUpWorkspace' => 'ワークスペースを準備しています...',
-			'common.mainContent.chooseProject' => 'プロジェクトを選択',
 			_ => null,
 		} ?? switch (path) {
+			'common.mainContent.chooseProject' => 'プロジェクトを選択',
 			'common.mainContent.selectProjectDescription' => 'サイドバーからプロジェクトを選択して、Claudeとコーディングを始めましょう。各プロジェクトにはチャットセッションとファイル履歴が含まれています。',
 			'common.mainContent.tip' => 'ヒント',
 			'common.mainContent.createProjectMobile' => '上部のメニューボタンからプロジェクトにアクセスできます',
@@ -8032,9 +8034,9 @@ extension on TranslationsJa {
 			'common.gitPanel.history.files' => 'ファイル',
 			'common.gitPanel.history.removed' => '削除',
 			'common.gitPanel.mergeWorktree.cleanupDesc' => 'マージ後に worktree を削除し、そのブランチを削除する',
-			'common.gitPanel.mergeWorktree.cleanupLabel' => 'マージ後にクリーンアップ',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.mergeWorktree.cleanupLabel' => 'マージ後にクリーンアップ',
 			'common.gitPanel.mergeWorktree.commitCount' => ({required Object count}) => '${count} コミット',
 			'common.gitPanel.mergeWorktree.merge' => 'マージ',
 			'common.gitPanel.mergeWorktree.mergeMessage' => ({required Object branch}) => 'ブランチ \'${branch}\' をマージ',
@@ -8546,9 +8548,9 @@ extension on TranslationsJa {
 			'settings.agents.account.cursor.description' => 'Cursor AI搭載コードエディタ',
 			'settings.agents.account.codex.description' => 'OpenAI Codex AIアシスタント',
 			'settings.agents.account.opencode.description' => 'OpenCode CLI アシスタント',
-			'settings.agents.account.commandcode.description' => 'Command Code CLI アシスタント',
 			_ => null,
 		} ?? switch (path) {
+			'settings.agents.account.commandcode.description' => 'Command Code CLI アシスタント',
 			'settings.agents.account.antigravity.description' => 'Antigravity CLI アシスタント',
 			'settings.agents.account.devin.description' => 'Devin CLI アシスタント',
 			'settings.agents.connectionStatus' => '接続状態',
@@ -9060,9 +9062,9 @@ extension on TranslationsJa {
 			'tasks.nextTask.feature3' => '- 日常作業向けのカンバンとリストビュー。',
 			'tasks.nextTask.hideDetails' => '詳細を隠す',
 			'tasks.nextTask.initialize' => '初期化',
-			'tasks.nextTask.noPending' => '保留中のタスクはありません',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.nextTask.noPending' => '保留中のタスクはありません',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI が設定されていません',
 			'tasks.nextTask.review' => '確認',
 			'tasks.nextTask.startTask' => 'タスクを開始',

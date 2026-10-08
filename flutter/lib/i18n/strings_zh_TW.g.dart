@@ -4354,6 +4354,7 @@ class Translations$chat$input$queue$zh_TW extends Translations$chat$input$queue$
 	@override String get delete => '刪除佇列中的訊息';
 	@override String get failed => '傳送失敗';
 	@override String get sendNow => '立即傳送';
+	@override String get sendNowAfterTurn => '此代理無法在回合進行中接收訊息——將在目前回合結束後傳送';
 }
 
 // Path: chat.input.offlineQueue
@@ -7150,6 +7151,7 @@ extension on TranslationsZhTw {
 			'chat.input.queue.delete' => '刪除佇列中的訊息',
 			'chat.input.queue.failed' => '傳送失敗',
 			'chat.input.queue.sendNow' => '立即傳送',
+			'chat.input.queue.sendNowAfterTurn' => '此代理無法在回合進行中接收訊息——將在目前回合結束後傳送',
 			'chat.input.autoContinueTasks' => '自動繼續',
 			'chat.input.autoContinueTasksTooltip' => '啟用後讓 Devin 自動繼續下一個 Task Master 任務',
 			'chat.input.offlineQueue.clear' => '取消並清空離線佇列',
@@ -7518,9 +7520,9 @@ extension on TranslationsZhTw {
 			'common.fileOperations.openInEditor' => '在編輯器中開啟',
 			'common.mainContent.loading' => '正在載入 DDAgent',
 			'common.mainContent.settingUpWorkspace' => '正在設定您的工作區...',
-			'common.mainContent.chooseProject' => '選擇您的專案',
 			_ => null,
 		} ?? switch (path) {
+			'common.mainContent.chooseProject' => '選擇您的專案',
 			'common.mainContent.selectProjectDescription' => '從側邊欄選擇一個專案以開始使用 Claude 進行程式開發。每個專案包含您的聊天紀錄和檔案歷史。',
 			'common.mainContent.tip' => '提示',
 			'common.mainContent.createProjectMobile' => '點擊上方的選單按鈕以存取專案',
@@ -8032,9 +8034,9 @@ extension on TranslationsZhTw {
 			'common.gitPanel.history.files' => '檔案',
 			'common.gitPanel.history.removed' => '已移除',
 			'common.gitPanel.mergeWorktree.cleanupDesc' => '合併後移除 worktree 並刪除其分支',
-			'common.gitPanel.mergeWorktree.cleanupLabel' => '合併後清理',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.mergeWorktree.cleanupLabel' => '合併後清理',
 			'common.gitPanel.mergeWorktree.commitCount' => ({required Object count}) => '${count} 個提交',
 			'common.gitPanel.mergeWorktree.merge' => '合併',
 			'common.gitPanel.mergeWorktree.mergeMessage' => ({required Object branch}) => '合併分支 \'${branch}\'',
@@ -8546,9 +8548,9 @@ extension on TranslationsZhTw {
 			'settings.agents.account.cursor.description' => 'Cursor AI 驅動的程式碼編輯器',
 			'settings.agents.account.codex.description' => 'OpenAI Codex AI 助手',
 			'settings.agents.account.opencode.description' => 'OpenCode CLI 助手',
-			'settings.agents.account.commandcode.description' => 'Command Code CLI 助手',
 			_ => null,
 		} ?? switch (path) {
+			'settings.agents.account.commandcode.description' => 'Command Code CLI 助手',
 			'settings.agents.account.antigravity.description' => 'Antigravity CLI 助手',
 			'settings.agents.account.devin.description' => 'Devin CLI 助手',
 			'settings.agents.connectionStatus' => '連線狀態',
@@ -9060,9 +9062,9 @@ extension on TranslationsZhTw {
 			'tasks.nextTask.feature3' => '- 看板和清單檢視，適合日常工作。',
 			'tasks.nextTask.hideDetails' => '隱藏詳情',
 			'tasks.nextTask.initialize' => '初始化',
-			'tasks.nextTask.noPending' => '沒有待處理任務',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.nextTask.noPending' => '沒有待處理任務',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI 未設定',
 			'tasks.nextTask.review' => '審查',
 			'tasks.nextTask.startTask' => '開始任務',

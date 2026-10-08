@@ -4645,6 +4645,7 @@ class Translations$chat$input$queue$pl extends Translations$chat$input$queue$en 
 	@override String get delete => 'Usuń wiadomość z kolejki';
 	@override String get failed => 'Nie udało się wysłać';
 	@override String get sendNow => 'Wyślij teraz';
+	@override String get sendNowAfterTurn => 'Ten agent nie przyjmuje wiadomości w trakcie tury — zostanie wysłana po bieżącej turze';
 }
 
 // Path: chat.input.offlineQueue
@@ -7637,6 +7638,7 @@ extension on TranslationsPl {
 			'chat.input.queue.delete' => 'Usuń wiadomość z kolejki',
 			'chat.input.queue.failed' => 'Nie udało się wysłać',
 			'chat.input.queue.sendNow' => 'Wyślij teraz',
+			'chat.input.queue.sendNowAfterTurn' => 'Ten agent nie przyjmuje wiadomości w trakcie tury — zostanie wysłana po bieżącej turze',
 			'chat.input.autoContinueTasks' => 'Auto-kontynuacja',
 			'chat.input.autoContinueTasksTooltip' => 'Włącz, by Devin automatycznie przechodził do kolejnych zadań Task Mastera',
 			'chat.input.offlineQueue.clear' => 'Anuluj i wyczyść kolejkę offline',
@@ -7944,9 +7946,9 @@ extension on TranslationsPl {
 			'codeEditor.toasts.savedFile' => ({required Object name}) => 'Zapisano ${name}',
 			'codeEditor.toasts.saveFailed' => 'Zapis nie powiódł się',
 			'codeEditor.toasts.allSaved' => 'Zapisano wszystko',
-			'codeEditor.toasts.someSavesFailed' => 'Nie udało się zapisać niektórych plików',
 			_ => null,
 		} ?? switch (path) {
+			'codeEditor.toasts.someSavesFailed' => 'Nie udało się zapisać niektórych plików',
 			'codeEditor.toasts.savedTo' => ({required Object path}) => 'Zapisano w ${path}',
 			'codeEditor.toasts.mergeApplied' => 'Scalanie zastosowane — zapisz, aby zachować zmiany',
 			'common.buttons.save' => 'Zapisz',
@@ -8458,9 +8460,9 @@ extension on TranslationsPl {
 			'common.gitPanel.branches.current' => 'bieżąca',
 			'common.gitPanel.branches.deleteTitle' => ({required Object branch}) => 'Usuń ${branch}',
 			'common.gitPanel.branches.emptyDesc' => 'Utwórz gałąź, aby rozpocząć pracę równoległą.',
-			'common.gitPanel.branches.forceDelete' => 'Wymuś usunięcie',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.branches.forceDelete' => 'Wymuś usunięcie',
 			'common.gitPanel.branches.forceDeleteDesc' => 'Trwale usuwa gałąź, nawet jeśli zawiera commity niescalone gdzie indziej.',
 			'common.gitPanel.branches.forceDeleteLabel' => 'Wymuś usunięcie tej niescalonej gałęzi',
 			'common.gitPanel.branches.local' => 'Lokalne',
@@ -8972,9 +8974,9 @@ extension on TranslationsPl {
 			'settings.mcpForm.fields.command' => 'Polecenie',
 			'settings.mcpForm.fields.arguments' => 'Argumenty (po jednym w wierszu)',
 			'settings.mcpForm.fields.jsonConfig' => 'Konfiguracja JSON',
-			'settings.mcpForm.fields.url' => 'URL',
 			_ => null,
 		} ?? switch (path) {
+			'settings.mcpForm.fields.url' => 'URL',
 			'settings.mcpForm.fields.envVars' => 'Zmienne środowiskowe (KLUCZ=wartość, po jednej w wierszu)',
 			'settings.mcpForm.fields.headers' => 'Nagłówki (KLUCZ=wartość, po jednym w wierszu)',
 			'settings.mcpForm.fields.selectProject' => 'Wybierz projekt...',
@@ -9486,9 +9488,9 @@ extension on TranslationsPl {
 			'sidebar.deleteConfirmation.bulkDeleteSessionsTitle' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('pl'))(count, one: 'Zarządzaj zaznaczoną sesją', few: 'Zarządzaj ${count} zaznaczonymi sesjami', many: 'Zarządzaj ${count} zaznaczonymi sesjami', other: 'Zarządzaj ${count} zaznaczonymi sesjami', ), 
 			'sidebar.deleteConfirmation.archiveSelectedSessions' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('pl'))(count, one: 'Archiwizuj sesję', few: 'Archiwizuj ${count} sesje', many: 'Archiwizuj ${count} sesji', other: 'Archiwizuj ${count} sesji', ), 
 			'sidebar.zones.activeNow' => 'Aktywne teraz',
-			'sidebar.zones.recent' => 'Ostatnio używane',
 			_ => null,
 		} ?? switch (path) {
+			'sidebar.zones.recent' => 'Ostatnio używane',
 			'sidebar.zones.today' => 'Dzisiaj',
 			'sidebar.zones.yesterday' => 'Wczoraj',
 			'sidebar.zones.thisWeek' => 'W tym tygodniu',
@@ -10000,9 +10002,9 @@ extension on TranslationsPl {
 			'quota.config.pollerTitle' => 'Odpytywanie i alerty',
 			'quota.config.save' => 'Zapisz konfigurację',
 			'quota.overview.tokensAndCost' => 'Tokeny i koszt',
-			'quota.section.config' => 'Konfiguracja',
 			_ => null,
 		} ?? switch (path) {
+			'quota.section.config' => 'Konfiguracja',
 			'scheduler.checking' => 'Sprawdzanie…',
 			'scheduler.cronHint' => 'Cron (min godz dzień mies dzień-tyg) — np. 0 9 * * *',
 			'scheduler.deleteMessage' => ({required Object id}) => 'Spowoduje to usunięcie zadania cyklicznego ${id}. Istniejące sesje zostaną zachowane.',

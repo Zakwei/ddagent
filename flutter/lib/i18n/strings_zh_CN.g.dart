@@ -4354,6 +4354,7 @@ class Translations$chat$input$queue$zh_CN extends Translations$chat$input$queue$
 	@override String get delete => '删除排队消息';
 	@override String get failed => '发送失败';
 	@override String get sendNow => '立即发送';
+	@override String get sendNowAfterTurn => '该智能体无法在回合进行中接收消息——将在当前回合结束后发送';
 }
 
 // Path: chat.input.offlineQueue
@@ -7142,6 +7143,7 @@ extension on TranslationsZhCn {
 			'chat.input.queue.delete' => '删除排队消息',
 			'chat.input.queue.failed' => '发送失败',
 			'chat.input.queue.sendNow' => '立即发送',
+			'chat.input.queue.sendNowAfterTurn' => '该智能体无法在回合进行中接收消息——将在当前回合结束后发送',
 			'chat.input.attachFilesDesc' => '上传照片、文件或文档',
 			'chat.input.takePhoto' => '拍摄照片',
 			'chat.input.takePhotoDesc' => '使用相机拍摄照片',
@@ -7518,9 +7520,9 @@ extension on TranslationsZhCn {
 			'common.fileOperations.openInEditor' => '在编辑器中打开',
 			'common.mainContent.loading' => '正在加载 DDAgent',
 			'common.mainContent.settingUpWorkspace' => '正在设置您的工作空间...',
-			'common.mainContent.chooseProject' => '选择您的项目',
 			_ => null,
 		} ?? switch (path) {
+			'common.mainContent.chooseProject' => '选择您的项目',
 			'common.mainContent.selectProjectDescription' => '从侧边栏选择一个项目以开始使用 Claude 进行编程。每个项目包含您的聊天会话和文件历史。',
 			'common.mainContent.tip' => '提示',
 			'common.mainContent.createProjectMobile' => '点击上方的菜单按钮以访问项目',
@@ -8032,9 +8034,9 @@ extension on TranslationsZhCn {
 			'common.gitPanel.history.files' => '文件',
 			'common.gitPanel.history.removed' => '已移除',
 			'common.gitPanel.mergeWorktree.cleanupDesc' => '合并后移除 worktree 并删除其分支',
-			'common.gitPanel.mergeWorktree.cleanupLabel' => '合并后清理',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.mergeWorktree.cleanupLabel' => '合并后清理',
 			'common.gitPanel.mergeWorktree.commitCount' => ({required Object count}) => '${count} 个提交',
 			'common.gitPanel.mergeWorktree.merge' => '合并',
 			'common.gitPanel.mergeWorktree.mergeMessage' => ({required Object branch}) => '合并分支 \'${branch}\'',
@@ -8546,9 +8548,9 @@ extension on TranslationsZhCn {
 			'settings.agents.account.cursor.description' => 'Cursor AI 驱动的代码编辑器',
 			'settings.agents.account.codex.description' => 'OpenAI Codex AI 助手',
 			'settings.agents.account.opencode.description' => 'OpenCode CLI 助手',
-			'settings.agents.account.commandcode.description' => 'Command Code CLI 助手',
 			_ => null,
 		} ?? switch (path) {
+			'settings.agents.account.commandcode.description' => 'Command Code CLI 助手',
 			'settings.agents.account.antigravity.description' => 'Antigravity CLI 助手',
 			'settings.agents.account.devin.description' => 'Devin CLI 助手',
 			'settings.agents.connectionStatus' => '连接状态',
@@ -9060,9 +9062,9 @@ extension on TranslationsZhCn {
 			'tasks.nextTask.feature3' => '- 看板和列表视图，适合日常工作。',
 			'tasks.nextTask.hideDetails' => '隐藏详情',
 			'tasks.nextTask.initialize' => '初始化',
-			'tasks.nextTask.noPending' => '没有待处理任务',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.nextTask.noPending' => '没有待处理任务',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI 未配置',
 			'tasks.nextTask.review' => '审查',
 			'tasks.nextTask.startTask' => '开始任务',

@@ -184,7 +184,8 @@
         "edit": "대기 중인 메시지 편집",
         "delete": "대기 중인 메시지 삭제",
         "failed": "전송 실패",
-        "sendNow": "지금 보내기"
+        "sendNow": "지금 보내기",
+        "sendNowAfterTurn": "이 에이전트는 턴 진행 중에 메시지를 받을 수 없습니다. 현재 턴이 끝난 후 전송됩니다"
       },
       "attachFilesDesc": "사진, 파일 또는 문서 업로드",
       "takePhoto": "사진 촬영",

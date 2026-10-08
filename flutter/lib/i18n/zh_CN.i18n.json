@@ -184,7 +184,8 @@
         "edit": "编辑排队消息",
         "delete": "删除排队消息",
         "failed": "发送失败",
-        "sendNow": "立即发送"
+        "sendNow": "立即发送",
+        "sendNowAfterTurn": "该智能体无法在回合进行中接收消息——将在当前回合结束后发送"
       },
       "attachFilesDesc": "上传照片、文件或文档",
       "takePhoto": "拍摄照片",

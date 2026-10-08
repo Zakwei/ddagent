@@ -683,7 +683,7 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
               ref.read(transcriptProvider(widget.sessionId).notifier).clearOfflineQueue(),
             ),
           ),
-        if (state.queue.isNotEmpty) _QueueCard(arg: _arg, queue: state.queue),
+        if (state.queue.isNotEmpty) _QueueCard(arg: _arg, queue: state.queue, running: running),
         // `.chat-activity-tab` — spinner + rotating label + elapsed + Stop,
         // pinned above the prompt box while the session is processing
         // (web `ActivityIndicator`, rendered from ChatComposer).
@@ -1556,16 +1556,23 @@ class _PinnedFilesBar extends ConsumerWidget {
 
 /// `QueuedMessageCard` list — one row per server-queued message: status
 /// label, content preview, attachment count, send-now / edit / delete.
+/// Providers whose server runtime implements mid-turn steering
+/// (`IProviderRuntime.steer`): "Send now" hands the message to the running
+/// turn. Every other agent can only take it after the turn ends.
+const _kSteersMidTurn = {'claude', 'opencode'};
+
 class _QueueCard extends ConsumerWidget {
-  const _QueueCard({required this.arg, required this.queue});
+  const _QueueCard({required this.arg, required this.queue, required this.running});
 
   final ComposerArg arg;
   final List<Map<String, dynamic>> queue;
+  final bool running;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = Translations.of(context);
     final c = context.appColors;
+    final steers = _kSteersMidTurn.contains(arg.provider);
     return Card(
       margin: const EdgeInsets.only(bottom: 6),
       child: Column(
@@ -1624,14 +1631,24 @@ class _QueueCard extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  _action(
-                    Icons.send,
-                    tooltip: t.chat.input.queue.sendNow,
-                    // 'sending' disables send-now (web `isSending`).
-                    onPressed: m['status'] == 'sending'
-                        ? null
-                        : () => ref.read(composerProvider(arg).notifier).sendNow('${m['id']}'),
-                  ),
+                  // Greyed out while a turn runs for agents that cannot take a
+                  // message mid-turn — it would only go next, which the queue
+                  // already does. A failed row stays clickable: that is retry.
+                  if (running && !steers && m['status'] != 'failed')
+                    _action(
+                      Icons.send,
+                      tooltip: t.chat.input.queue.sendNowAfterTurn,
+                      onPressed: null,
+                    )
+                  else
+                    _action(
+                      Icons.send,
+                      tooltip: t.chat.input.queue.sendNow,
+                      // 'sending' disables send-now (web `isSending`).
+                      onPressed: m['status'] == 'sending'
+                          ? null
+                          : () => ref.read(composerProvider(arg).notifier).sendNow('${m['id']}'),
+                    ),
                   _action(
                     Icons.edit_outlined,
                     tooltip: t.chat.input.queue.edit,

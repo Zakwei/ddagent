@@ -4355,6 +4355,7 @@ class Translations$chat$input$queue$it extends Translations$chat$input$queue$en 
 	@override String get delete => 'Elimina messaggio in coda';
 	@override String get failed => 'Invio non riuscito';
 	@override String get sendNow => 'Invia ora';
+	@override String get sendNowAfterTurn => 'Questo agente non accetta messaggi durante un turno: verrà inviato al termine di quello attuale';
 }
 
 // Path: chat.input.offlineQueue
@@ -7151,6 +7152,7 @@ extension on TranslationsIt {
 			'chat.input.queue.delete' => 'Elimina messaggio in coda',
 			'chat.input.queue.failed' => 'Invio non riuscito',
 			'chat.input.queue.sendNow' => 'Invia ora',
+			'chat.input.queue.sendNowAfterTurn' => 'Questo agente non accetta messaggi durante un turno: verrà inviato al termine di quello attuale',
 			'chat.input.autoContinueTasks' => 'Continuazione automatica',
 			'chat.input.autoContinueTasksTooltip' => 'Attiva per lasciare che Devin passi automaticamente all’attività Task Master successiva',
 			'chat.input.offlineQueue.clear' => 'Annulla e svuota la coda offline',
@@ -7519,9 +7521,9 @@ extension on TranslationsIt {
 			'common.fileOperations.openInEditor' => 'Apri nell\'editor',
 			'common.mainContent.loading' => 'Caricamento DDAgent',
 			'common.mainContent.settingUpWorkspace' => 'Preparazione dell\'area di lavoro...',
-			'common.mainContent.chooseProject' => 'Scegli il tuo progetto',
 			_ => null,
 		} ?? switch (path) {
+			'common.mainContent.chooseProject' => 'Scegli il tuo progetto',
 			'common.mainContent.selectProjectDescription' => 'Seleziona un progetto dalla barra laterale per iniziare a programmare con Claude. Ogni progetto contiene le tue sessioni di chat e la cronologia dei file.',
 			'common.mainContent.tip' => 'Suggerimento',
 			'common.mainContent.createProjectMobile' => 'Tocca il pulsante menu in alto per accedere ai progetti',
@@ -8033,9 +8035,9 @@ extension on TranslationsIt {
 			'common.gitPanel.history.files' => 'File',
 			'common.gitPanel.history.removed' => 'Rimosse',
 			'common.gitPanel.mergeWorktree.cleanupDesc' => 'Rimuovi il worktree ed elimina il suo branch una volta fuso',
-			'common.gitPanel.mergeWorktree.cleanupLabel' => 'Pulisci dopo il merge',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.mergeWorktree.cleanupLabel' => 'Pulisci dopo il merge',
 			'common.gitPanel.mergeWorktree.commitCount' => ({required Object count}) => '${count} commit',
 			'common.gitPanel.mergeWorktree.merge' => 'Fondi',
 			'common.gitPanel.mergeWorktree.mergeMessage' => ({required Object branch}) => 'Fondi il branch \'${branch}\'',
@@ -8547,9 +8549,9 @@ extension on TranslationsIt {
 			'settings.agents.account.cursor.description' => 'Editor di codice potenziato da AI Cursor',
 			'settings.agents.account.codex.description' => 'Assistente AI OpenAI Codex',
 			'settings.agents.account.opencode.description' => 'Assistente CLI OpenCode',
-			'settings.agents.account.commandcode.description' => 'Assistente CLI Command Code',
 			_ => null,
 		} ?? switch (path) {
+			'settings.agents.account.commandcode.description' => 'Assistente CLI Command Code',
 			'settings.agents.account.antigravity.description' => 'Assistente CLI Antigravity',
 			'settings.agents.account.devin.description' => 'Assistente CLI Devin',
 			'settings.agents.connectionStatus' => 'Stato connessione',
@@ -9061,9 +9063,9 @@ extension on TranslationsIt {
 			'tasks.nextTask.feature3' => '- Viste kanban e lista per il lavoro quotidiano.',
 			'tasks.nextTask.hideDetails' => 'Nascondi dettagli',
 			'tasks.nextTask.initialize' => 'Inizializza',
-			'tasks.nextTask.noPending' => 'Nessuna attività in sospeso',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.nextTask.noPending' => 'Nessuna attività in sospeso',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI non è configurato',
 			'tasks.nextTask.review' => 'Revisiona',
 			'tasks.nextTask.startTask' => 'Avvia attività',

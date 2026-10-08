@@ -4354,6 +4354,7 @@ class Translations$chat$input$queue$tr extends Translations$chat$input$queue$en 
 	@override String get delete => 'Sıradaki mesajı sil';
 	@override String get failed => 'Gönderilemedi';
 	@override String get sendNow => 'Şimdi gönder';
+	@override String get sendNowAfterTurn => 'Bu ajan tur sırasında mesaj kabul etmiyor — mevcut tur bittikten sonra gönderilecek';
 }
 
 // Path: chat.input.offlineQueue
@@ -7150,6 +7151,7 @@ extension on TranslationsTr {
 			'chat.input.queue.delete' => 'Sıradaki mesajı sil',
 			'chat.input.queue.failed' => 'Gönderilemedi',
 			'chat.input.queue.sendNow' => 'Şimdi gönder',
+			'chat.input.queue.sendNowAfterTurn' => 'Bu ajan tur sırasında mesaj kabul etmiyor — mevcut tur bittikten sonra gönderilecek',
 			'chat.input.autoContinueTasks' => 'Otomatik devam',
 			'chat.input.autoContinueTasksTooltip' => 'Devin\'in bir sonraki Task Master görevine otomatik geçmesi için etkinleştir',
 			'chat.input.offlineQueue.clear' => 'Çevrimdışı kuyruğu iptal et ve temizle',
@@ -7518,9 +7520,9 @@ extension on TranslationsTr {
 			'common.fileOperations.openInEditor' => 'Editörde Aç',
 			'common.mainContent.loading' => 'DDAgent Yükleniyor',
 			'common.mainContent.settingUpWorkspace' => 'Çalışma alanın hazırlanıyor...',
-			'common.mainContent.chooseProject' => 'Projeni Seç',
 			_ => null,
 		} ?? switch (path) {
+			'common.mainContent.chooseProject' => 'Projeni Seç',
 			'common.mainContent.selectProjectDescription' => 'Claude ile kodlamaya başlamak için kenar çubuğundan bir proje seç. Her proje kendi sohbet oturumlarını ve dosya geçmişini içerir.',
 			'common.mainContent.tip' => 'İpucu',
 			'common.mainContent.createProjectMobile' => 'Projelere erişmek için yukarıdaki menü düğmesine dokun',
@@ -8032,9 +8034,9 @@ extension on TranslationsTr {
 			'common.gitPanel.history.files' => 'Dosyalar',
 			'common.gitPanel.history.removed' => 'Kaldırılan',
 			'common.gitPanel.mergeWorktree.cleanupDesc' => 'Birleştirildikten sonra worktree’yi kaldır ve dalını sil',
-			'common.gitPanel.mergeWorktree.cleanupLabel' => 'Birleştirmeden sonra temizle',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.mergeWorktree.cleanupLabel' => 'Birleştirmeden sonra temizle',
 			'common.gitPanel.mergeWorktree.commitCount' => ({required Object count}) => '${count} commit',
 			'common.gitPanel.mergeWorktree.merge' => 'Birleştir',
 			'common.gitPanel.mergeWorktree.mergeMessage' => ({required Object branch}) => '\'${branch}\' dalını birleştir',
@@ -8546,9 +8548,9 @@ extension on TranslationsTr {
 			'settings.agents.account.cursor.description' => 'Cursor AI destekli kod editörü',
 			'settings.agents.account.codex.description' => 'OpenAI Codex AI asistanı',
 			'settings.agents.account.opencode.description' => 'OpenCode CLI asistanı',
-			'settings.agents.account.commandcode.description' => 'Command Code CLI asistanı',
 			_ => null,
 		} ?? switch (path) {
+			'settings.agents.account.commandcode.description' => 'Command Code CLI asistanı',
 			'settings.agents.account.antigravity.description' => 'Antigravity CLI asistanı',
 			'settings.agents.account.devin.description' => 'Devin CLI asistanı',
 			'settings.agents.connectionStatus' => 'Bağlantı Durumu',
@@ -9060,9 +9062,9 @@ extension on TranslationsTr {
 			'tasks.nextTask.feature3' => '- Günlük işler için kanban ve liste görünümleri.',
 			'tasks.nextTask.hideDetails' => 'Ayrıntıları gizle',
 			'tasks.nextTask.initialize' => 'Başlat',
-			'tasks.nextTask.noPending' => 'Bekleyen görev yok',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.nextTask.noPending' => 'Bekleyen görev yok',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI yapılandırılmamış',
 			'tasks.nextTask.review' => 'İncele',
 			'tasks.nextTask.startTask' => 'Görevi Başlat',

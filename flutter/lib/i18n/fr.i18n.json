@@ -192,7 +192,8 @@
         "edit": "Modifier le message en file",
         "delete": "Supprimer le message en file",
         "failed": "Échec de l’envoi",
-        "sendNow": "Envoyer maintenant"
+        "sendNow": "Envoyer maintenant",
+        "sendNowAfterTurn": "Cet agent n'accepte pas de messages en cours de tour — il sera envoyé à la fin du tour actuel"
       },
       "autoContinueTasks": "Continuité auto",
       "autoContinueTasksTooltip": "Activer pour laisser Devin passer automatiquement à la tâche Task Master suivante",

@@ -8478,6 +8478,9 @@ class Translations$chat$input$queue$en {
 
 	/// en: 'Send now'
 	String get sendNow => 'Send now';
+
+	/// en: 'This agent can't take messages mid-turn — it will be sent after the current turn'
+	String get sendNowAfterTurn => 'This agent can\'t take messages mid-turn — it will be sent after the current turn';
 }
 
 // Path: chat.input.offlineQueue
@@ -13639,6 +13642,7 @@ extension on Translations {
 			'chat.input.queue.delete' => 'Delete queued message',
 			'chat.input.queue.failed' => 'Failed to send',
 			'chat.input.queue.sendNow' => 'Send now',
+			'chat.input.queue.sendNowAfterTurn' => 'This agent can\'t take messages mid-turn — it will be sent after the current turn',
 			'chat.input.autoContinueTasks' => 'Auto-continue',
 			'chat.input.autoContinueTasksTooltip' => 'Enable to let Devin automatically continue to the next Task Master task',
 			'chat.input.offlineQueue.clear' => 'Cancel and clear offline queue',
@@ -13931,9 +13935,9 @@ extension on Translations {
 			'codeEditor.mediaFile.title' => 'Media file',
 			'codeEditor.mediaFile.subtitle' => 'Audio/video preview is not supported yet',
 			'codeEditor.failedToLoad' => 'Failed to load file',
-			'codeEditor.hexDump.more' => ({required Object size}) => '… ${size} more',
 			_ => null,
 		} ?? switch (path) {
+			'codeEditor.hexDump.more' => ({required Object size}) => '… ${size} more',
 			'codeEditor.settings.minimap' => 'Minimap',
 			'codeEditor.settings.tabSize' => ({required Object size}) => 'Tab size: ${size}',
 			'codeEditor.settings.fontSizeDecrease' => ({required Object size}) => 'Font size −  (now ${size})',
@@ -14445,9 +14449,9 @@ extension on Translations {
 			'common.commandPalette.pages.sessions' => 'Sessions',
 			'common.commandPalette.placeholder' => 'Type to search anything…',
 			'common.commandPalette.searchPagePlaceholder' => ({required Object page}) => 'Search ${page}…',
-			'common.commandPalette.title' => 'Command palette',
 			_ => null,
 		} ?? switch (path) {
+			'common.commandPalette.title' => 'Command palette',
 			'common.gitPanel.ahead' => ({required Object count}) => '${count} ahead',
 			'common.gitPanel.aheadLabel' => 'ahead',
 			'common.gitPanel.aiSuggest' => 'AI suggest',
@@ -14959,9 +14963,9 @@ extension on Translations {
 			'settings.orchestration.save.saved' => 'Saved',
 			'settings.orchestration.save.discard' => 'Discard',
 			'settings.orchestration.save.error' => 'Save failed',
-			'settings.orchestration.save.emptyPool' => 'Add at least one candidate before saving.',
 			_ => null,
 		} ?? switch (path) {
+			'settings.orchestration.save.emptyPool' => 'Add at least one candidate before saving.',
 			'settings.notifications.title' => 'Notifications',
 			'settings.notifications.description' => 'Control which notification events you receive.',
 			'settings.notifications.webPush.title' => 'Notify this browser',
@@ -15473,9 +15477,9 @@ extension on Translations {
 			'sidebar.time.oneDayAgo' => '1 day ago',
 			'sidebar.time.daysAgo' => ({required Object count}) => '${count} days ago',
 			'sidebar.messages.deleteConfirm' => 'Are you sure you want to delete this?',
-			'sidebar.messages.renameSuccess' => 'Renamed successfully',
 			_ => null,
 		} ?? switch (path) {
+			'sidebar.messages.renameSuccess' => 'Renamed successfully',
 			'sidebar.messages.deleteSuccess' => 'Deleted successfully',
 			'sidebar.messages.errorOccurred' => 'An error occurred',
 			'sidebar.messages.deleteSessionConfirm' => 'Are you sure you want to delete this session? This action cannot be undone.',
@@ -15987,9 +15991,9 @@ extension on Translations {
 			'mcp.servers.config.cwd' => 'Cwd',
 			'mcp.servers.config.envVars' => 'Env Vars',
 			'mcp.team.title' => 'Team MCP Configs',
-			'mcp.team.description' => 'Share MCP server configurations across your team. Everyone stays in sync automatically.',
 			_ => null,
 		} ?? switch (path) {
+			'mcp.team.description' => 'Share MCP server configurations across your team. Everyone stays in sync automatically.',
 			'mcp.team.cta' => 'Available with DDAgent Pro',
 			'mcp.tokens.scopeWrite' => 'Write',
 			'mcp.form.submitTo' => ({required Object provider}) => 'Add Server to ${provider}',

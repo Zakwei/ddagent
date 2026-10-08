@@ -306,7 +306,8 @@
         "edit": "Edit queued message",
         "delete": "Delete queued message",
         "failed": "Failed to send",
-        "sendNow": "Send now"
+        "sendNow": "Send now",
+        "sendNowAfterTurn": "This agent can't take messages mid-turn — it will be sent after the current turn"
       },
       "autoContinueTasks": "Auto-continue",
       "autoContinueTasksTooltip": "Enable to let Devin automatically continue to the next Task Master task",

@@ -21,11 +21,11 @@ import 'package:hive_flutter/hive_flutter.dart';
 class _FakeWs extends WsClient {
   _FakeWs() : super(urlBuilder: () async => Uri.parse('ws://t'));
 
-  final _frames = StreamController<Map<String, dynamic>>.broadcast();
+  final inbound = StreamController<Map<String, dynamic>>.broadcast();
   final _states = StreamController<WsState>.broadcast();
 
   @override
-  Stream<Map<String, dynamic>> get frames => _frames.stream;
+  Stream<Map<String, dynamic>> get frames => inbound.stream;
   @override
   Stream<WsState> get states => _states.stream;
   @override
@@ -83,20 +83,20 @@ Dio _fakeDio() {
   return dio;
 }
 
-Widget _app() => TranslationProvider(
+Widget _app({_FakeWs? ws, String provider = 'claude'}) => TranslationProvider(
   child: ProviderScope(
     overrides: [
       dioProvider.overrideWithValue(_fakeDio()),
-      chatChannelProvider.overrideWithValue(ChatChannel(_FakeWs())..start()),
+      chatChannelProvider.overrideWithValue(ChatChannel(ws ?? _FakeWs())..start()),
     ],
     child: MaterialApp(
       theme: AppTheme.ocChat(),
-      home: const MediaQuery(
-        data: MediaQueryData(size: Size(1000, 800)),
+      home: MediaQuery(
+        data: const MediaQueryData(size: Size(1000, 800)),
         child: Scaffold(
           body: Align(
             alignment: Alignment.bottomCenter,
-            child: ChatComposer(sessionId: 's1', projectId: 'p1'),
+            child: ChatComposer(sessionId: 's1', projectId: 'p1', provider: provider),
           ),
         ),
       ),
@@ -181,6 +181,37 @@ void main() {
     );
     expect(sendBtn.onPressed, isNotNull);
   });
+
+  for (final (provider, steers) in [('claude', true), ('opencode', true), ('devin', false)]) {
+    testWidgets(
+      'running $provider session: send-now ${steers ? 'stays enabled' : 'is greyed out'}',
+      (tester) async {
+        _serverQueue.add({
+          'id': 11,
+          'content': 'mid-turn note',
+          'status': 'queued',
+          'options': const <String, dynamic>{},
+        });
+        final ws = _FakeWs();
+        await tester.pumpWidget(_app(ws: ws, provider: provider));
+        await tester.pump(const Duration(milliseconds: 300));
+        await tester.pump(const Duration(milliseconds: 300));
+
+        // A `status` frame flips the session to running.
+        ws.inbound.add({'kind': 'status', 'sessionId': 's1'});
+        await tester.pump();
+        await tester.pump();
+
+        final tooltip = steers
+            ? 'Send now'
+            : "This agent can't take messages mid-turn — it will be sent after the current turn";
+        final sendBtn = tester.widget<IconButton>(
+          find.ancestor(of: find.byTooltip(tooltip), matching: find.byType(IconButton)),
+        );
+        expect(sendBtn.onPressed == null, !steers);
+      },
+    );
+  }
 
   testWidgets('offline queue card shows count and Cancel clears storage', (tester) async {
     await _realZone(tester, () async {

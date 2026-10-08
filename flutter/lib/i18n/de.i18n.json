@@ -192,7 +192,8 @@
         "edit": "Eingereihte Nachricht bearbeiten",
         "delete": "Eingereihte Nachricht löschen",
         "failed": "Senden fehlgeschlagen",
-        "sendNow": "Jetzt senden"
+        "sendNow": "Jetzt senden",
+        "sendNowAfterTurn": "Dieser Agent nimmt während eines Durchlaufs keine Nachrichten an — sie wird danach gesendet"
       },
       "autoContinueTasks": "Auto-Fortsetzen",
       "autoContinueTasksTooltip": "Aktivieren, damit Devin automatisch mit der nächsten Task-Master-Aufgabe fortfährt",

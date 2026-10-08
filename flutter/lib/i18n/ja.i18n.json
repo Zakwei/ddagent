@@ -192,7 +192,8 @@
         "edit": "キュー済みメッセージを編集",
         "delete": "キュー済みメッセージを削除",
         "failed": "送信に失敗しました",
-        "sendNow": "今すぐ送信"
+        "sendNow": "今すぐ送信",
+        "sendNowAfterTurn": "このエージェントはターン中にメッセージを受け付けません。現在のターンの終了後に送信されます"
       },
       "autoContinueTasks": "自動続行",
       "autoContinueTasksTooltip": "有効にすると Devin が次の Task Master タスクへ自動的に進みます",

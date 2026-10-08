@@ -4363,6 +4363,7 @@ class Translations$chat$input$queue$ru extends Translations$chat$input$queue$en 
 	@override String get delete => 'Удалить сообщение из очереди';
 	@override String get failed => 'Не удалось отправить';
 	@override String get sendNow => 'Отправить сейчас';
+	@override String get sendNowAfterTurn => 'Этот агент не принимает сообщения во время хода — оно будет отправлено после текущего хода';
 }
 
 // Path: chat.input.offlineQueue
@@ -7159,6 +7160,7 @@ extension on TranslationsRu {
 			'chat.input.queue.delete' => 'Удалить сообщение из очереди',
 			'chat.input.queue.failed' => 'Не удалось отправить',
 			'chat.input.queue.sendNow' => 'Отправить сейчас',
+			'chat.input.queue.sendNowAfterTurn' => 'Этот агент не принимает сообщения во время хода — оно будет отправлено после текущего хода',
 			'chat.input.autoContinueTasks' => 'Автопродолжение',
 			'chat.input.autoContinueTasksTooltip' => 'Включите, чтобы Devin автоматически переходил к следующей задаче Task Master',
 			'chat.input.offlineQueue.clear' => 'Отменить и очистить офлайн-очередь',
@@ -7527,9 +7529,9 @@ extension on TranslationsRu {
 			'common.fileOperations.openInEditor' => 'Открыть в редакторе',
 			'common.mainContent.loading' => 'Загрузка DDAgent',
 			'common.mainContent.settingUpWorkspace' => 'Настройка рабочего пространства...',
-			'common.mainContent.chooseProject' => 'Выберите проект',
 			_ => null,
 		} ?? switch (path) {
+			'common.mainContent.chooseProject' => 'Выберите проект',
 			'common.mainContent.selectProjectDescription' => 'Выберите проект на боковой панели, чтобы начать работу с Claude. Каждый проект содержит ваши сеансы чата и историю файлов.',
 			'common.mainContent.tip' => 'Совет',
 			'common.mainContent.createProjectMobile' => 'Нажмите кнопку меню выше для доступа к проектам',
@@ -8041,9 +8043,9 @@ extension on TranslationsRu {
 			'common.gitPanel.history.files' => 'Файлы',
 			'common.gitPanel.history.removed' => 'Удалено',
 			'common.gitPanel.mergeWorktree.cleanupDesc' => 'Удалить worktree и его ветку после слияния',
-			'common.gitPanel.mergeWorktree.cleanupLabel' => 'Очистить после слияния',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.mergeWorktree.cleanupLabel' => 'Очистить после слияния',
 			'common.gitPanel.mergeWorktree.commitCount' => ({required Object count}) => '${count} коммит(ов)',
 			'common.gitPanel.mergeWorktree.merge' => 'Слить',
 			'common.gitPanel.mergeWorktree.mergeMessage' => ({required Object branch}) => 'Слить ветку \'${branch}\'',
@@ -8555,9 +8557,9 @@ extension on TranslationsRu {
 			'settings.agents.account.cursor.description' => 'Редактор кода с AI Cursor',
 			'settings.agents.account.codex.description' => 'AI-ассистент OpenAI Codex',
 			'settings.agents.account.opencode.description' => 'CLI-ассистент OpenCode',
-			'settings.agents.account.commandcode.description' => 'CLI-ассистент Command Code',
 			_ => null,
 		} ?? switch (path) {
+			'settings.agents.account.commandcode.description' => 'CLI-ассистент Command Code',
 			'settings.agents.account.antigravity.description' => 'CLI-ассистент Antigravity',
 			'settings.agents.account.devin.description' => 'CLI-ассистент Devin',
 			'settings.agents.connectionStatus' => 'Статус подключения',
@@ -9069,9 +9071,9 @@ extension on TranslationsRu {
 			'tasks.nextTask.feature3' => '- Kanban и список для повседневной работы.',
 			'tasks.nextTask.hideDetails' => 'Скрыть детали',
 			'tasks.nextTask.initialize' => 'Инициализировать',
-			'tasks.nextTask.noPending' => 'Нет ожидающих задач',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.nextTask.noPending' => 'Нет ожидающих задач',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI не настроен',
 			'tasks.nextTask.review' => 'Проверить',
 			'tasks.nextTask.startTask' => 'Начать задачу',
