@@ -73,8 +73,8 @@ function extractCodexTokenBudget(event: any, context: { used: number; total: num
   };
 }
 
-// codex exec cannot ask for approval, so under `untrusted` a command outside
-// the trusted list is refused; the refusal only shows in the item.
+// codex exec cannot ask for approval, so under `on-request` an escalation
+// outside the sandbox is refused; the refusal only shows in the item.
 function isCodexApprovalRefusal(item: any) {
   return item?.type === 'command_execution'
     && (item.status === 'declined'
@@ -353,7 +353,8 @@ function mapPermissionModeToCodexOptions(permissionMode: any) {
     default:
       return {
         sandboxMode: 'workspace-write',
-        approvalPolicy: 'untrusted'
+        // codex-cli 0.161 rejects `untrusted`; exec mode declines escalation requests.
+        approvalPolicy: 'on-request'
       };
   }
 }

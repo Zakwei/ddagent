@@ -118,7 +118,6 @@ const CODEX_INTERNAL_CONTENT_PREFIXES = [
   '<INSTRUCTIONS>',
   '<permissions instructions>',
   '<skill>',
-  '<unified-rules>',
   '<turn_aborted>',
   '# AGENTS.md instructions',
 ] as const;
@@ -240,9 +239,13 @@ function isInternalContent(content: string): boolean {
   return INTERNAL_CONTENT_PREFIXES.some((prefix) => content.startsWith(prefix));
 }
 
+const UNIFIED_RULES_BLOCK = /^\s*<unified-rules>[\s\S]*?<\/unified-rules>\s*/;
+
 function isInternalCodexContent(content: string): boolean {
-  const normalized = content.trimStart();
-  return CODEX_INTERNAL_CONTENT_PREFIXES.some((prefix) => normalized.startsWith(prefix));
+  // The first prompt carries DDAgent's <unified-rules> prefix; only a prompt
+  // that is nothing but that block is injected context.
+  const normalized = content.replace(UNIFIED_RULES_BLOCK, '').trimStart();
+  return !normalized || CODEX_INTERNAL_CONTENT_PREFIXES.some((prefix) => normalized.startsWith(prefix));
 }
 
 function escapeRegex(value: string): string {

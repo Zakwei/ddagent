@@ -42,14 +42,17 @@ const CODEX_INJECTED_USER_PREFIXES = [
   '<INSTRUCTIONS>',
   '<permissions instructions>',
   '<skill>',
-  '<unified-rules>',
   '<turn_aborted>',
   '# AGENTS.md instructions',
 ];
 
+const UNIFIED_RULES_BLOCK = /^\s*<unified-rules>[\s\S]*?<\/unified-rules>\s*/;
+
 function isInjectedCodexUserText(text: string): boolean {
-  const normalized = text.trimStart();
-  return CODEX_INJECTED_USER_PREFIXES.some((prefix) => normalized.startsWith(prefix));
+  // The first prompt carries DDAgent's <unified-rules> prefix; only a prompt
+  // that is nothing but that block is injected context.
+  const normalized = text.replace(UNIFIED_RULES_BLOCK, '').trimStart();
+  return !normalized || CODEX_INJECTED_USER_PREFIXES.some((prefix) => normalized.startsWith(prefix));
 }
 
 /**

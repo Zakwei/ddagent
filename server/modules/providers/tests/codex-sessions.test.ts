@@ -267,7 +267,8 @@ test('Codex 0.160 history rebuilds user prompts, questions and turn failures', {
       {
         timestamp: at(2),
         type: 'event_msg',
-        payload: { type: 'item_completed', item: { type: 'UserMessage', id: 'u1', content: [{ type: 'text', text: 'Fix the bug' }] } },
+        // The first prompt carries DDAgent's <unified-rules> prefix; the client strips it.
+        payload: { type: 'item_completed', item: { type: 'UserMessage', id: 'u1', content: [{ type: 'text', text: '<unified-rules>\nrules\n</unified-rules>\n\nFix the bug' }] } },
       },
       {
         timestamp: at(3),
@@ -295,7 +296,7 @@ test('Codex 0.160 history rebuilds user prompts, questions and turn failures', {
 
       const history = await new CodexSessionsProvider().fetchHistory('app-160-1');
       const users = history.messages.filter((message) => message.kind === 'text' && message.role === 'user');
-      assert.deepEqual(users.map((message) => message.content), ['Fix the bug']);
+      assert.deepEqual(users.map((message) => String(message.content).replace(/^<unified-rules>[\s\S]*?<\/unified-rules>\s*/, '')), ['Fix the bug']);
 
       const ask = history.messages.find((message) => message.toolId === 'ask-1');
       assert.equal(ask?.toolName, 'AskUserQuestion');
