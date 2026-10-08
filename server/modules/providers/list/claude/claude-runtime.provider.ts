@@ -893,6 +893,9 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
   // The client is told the turn is over as soon as `result` lands, even though
   // the process lingers, so the UI never waits out the idle hold.
   let turnCompleteSent = false;
+  // The SDK may also throw on the CLI's non-zero exit after a failed `result`;
+  // that throw repeats a failure the client already saw.
+  let turnFailureReported = false;
   // Set when a turn starts background work, cleared when the next `result`
   // arrives — only turns with work still outstanding hold their process open.
   let backgroundWorkPending = false;
@@ -1105,8 +1108,11 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
       const next = resolvePermissionModeState(mode, options.toolsSettings?.skipPermissions, delegated);
       bypassActive = next.interactiveBypass || next.sdkMode === 'bypassPermissions';
       if (next.sdkMode === liveSdkMode || typeof queryInstance?.setPermissionMode !== 'function') return;
+      const previous = liveSdkMode;
       liveSdkMode = next.sdkMode;
       Promise.resolve(queryInstance.setPermissionMode(next.sdkMode)).catch((error: any) => {
+        // A rejected switch leaves the CLI where it was, so a later switch back is not skipped.
+        if (liveSdkMode === next.sdkMode) liveSdkMode = previous;
         console.warn('[claude] Failed to switch the live permission mode:', error?.message || error);
       });
     };
@@ -1335,6 +1341,7 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
       if (!writer) return;
       ws = writer;
       turnCompleteSent = false;
+      turnFailureReported = false;
       const entry = sessionKey() ? getSession(sessionKey()) : undefined;
       if (entry?.instance === queryInstance) entry.writer = writer;
       // The new turn's run starts with the live task list, so the client never
@@ -1492,6 +1499,7 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
           turnCompleteSent = true;
           // C3: the error goes out before `complete`, which seals the run.
           if (failure) {
+            turnFailureReported = true;
             ws.send(createNormalizedMessage({ kind: 'error', content: failure, sessionId: capturedSessionId || sessionId || null, provider: 'claude' }));
           }
           ws.send(createCompleteMessage({ provider: 'claude', sessionId: capturedSessionId || sessionId || null, exitCode: failure ? 1 : 0 }));
@@ -1614,6 +1622,10 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
     if (wasAborted) {
       // The abort already produced the terminal complete; a generator throw
       // caused by interrupt() is expected noise, not a user-facing error.
+      return;
+    }
+
+    if (turnCompleteSent && turnFailureReported) {
       return;
     }
 
