@@ -522,6 +522,47 @@ function startsBackgroundWork(sdkMessage: any) {
   });
 }
 
+const TERMINAL_TASK_STATUSES = new Set(['completed', 'failed', 'stopped', 'killed']);
+
+/**
+ * Keeps `outstanding` in sync with the SDK's task lifecycle events.
+ *
+ * The CLI reports every subagent, background shell and workflow it starts via
+ * `task_started` and settles it with `task_notification` / a terminal
+ * `task_updated`. stdin is the CLI's only channel back to us — permission asks
+ * from those tasks travel over it — so it must stay open while any of them is
+ * still running, not just while the latest turn launched something.
+ * Ambient housekeeping tasks (`skip_transcript`) are ignored so they can't hold
+ * the process open on their own.
+ *
+ * Consumed by queryClaudeSDK (hold decision) and the runtime tests.
+ *
+ * @param {Set<string>} outstanding - Task ids still running; mutated in place
+ * @param {Object} sdkMessage - SDK stream message
+ */
+export function trackBackgroundTask(outstanding: Set<string>, sdkMessage: any): void {
+  if (sdkMessage?.type !== 'system' || typeof sdkMessage.task_id !== 'string') {
+    return;
+  }
+  switch (sdkMessage.subtype) {
+    case 'task_started':
+      if (!sdkMessage.skip_transcript) {
+        outstanding.add(sdkMessage.task_id);
+      }
+      break;
+    case 'task_notification':
+      outstanding.delete(sdkMessage.task_id);
+      break;
+    case 'task_updated':
+      if (TERMINAL_TASK_STATUSES.has(sdkMessage.patch?.status)) {
+        outstanding.delete(sdkMessage.task_id);
+      }
+      break;
+    default:
+      break;
+  }
+}
+
 /**
  * Builds the SDK user messages for one turn.
  *
@@ -680,6 +721,9 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
   // True while the process is being held open for background work, so a later
   // `result` can be recognised as that work reporting back.
   let heldForBackgroundWork = false;
+  // Tasks (subagents, background shells, workflows) the CLI reported as started
+  // and not yet settled — they can outlive several turns.
+  const outstandingTasks = new Set<string>();
   // Latest main-agent API step usage/model: the context gauge's source, re-sent
   // on `result` once the SDK has reported the model's real context window.
   let lastStepUsage: AnyRecord | null = null;
@@ -973,6 +1017,7 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
       if (startsBackgroundWork(message)) {
         backgroundWorkPending = true;
       }
+      trackBackgroundTask(outstandingTasks, message);
 
       if (message.type === 'result') {
         // The turn is done as far as the client is concerned.
@@ -997,10 +1042,12 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
             sessionName: sessionSummary
           });
         }
-        if (backgroundWorkPending) {
-          // Work started during this turn is still running. Hold the process
-          // open so it can finish and report back in a follow-up turn; the
-          // ceiling is only a backstop for work that never reports.
+        if (backgroundWorkPending || outstandingTasks.size > 0) {
+          // Work started during this turn — or an earlier one, e.g. a second
+          // subagent still running when the first reports back — is still
+          // going. Hold the process open so it can finish, ask for permissions
+          // and report back in a follow-up turn; the ceiling is only a backstop
+          // for work that never reports.
           backgroundWorkPending = false;
           heldForBackgroundWork = true;
           scheduleRelease();
