@@ -24,6 +24,26 @@ IconData taskStatusIcon(String status) => switch (status) {
   _ => Icons.radio_button_unchecked,
 };
 
+/// Localized display name for a task status wire value (unknown → as-is).
+String taskStatusLabel(String status, Translations i18n) => switch (status) {
+  'pending' => i18n.tasks.statuses.pending,
+  'in-progress' => i18n.tasks.statuses.inProgress,
+  'review' => i18n.tasks.statuses.review,
+  'done' => i18n.tasks.statuses.done,
+  'blocked' => i18n.tasks.statuses.blocked,
+  'deferred' => i18n.tasks.statuses.deferred,
+  'cancelled' => i18n.tasks.statuses.cancelled,
+  _ => status,
+};
+
+/// Localized display name for a task priority wire value (unknown → as-is).
+String taskPriorityLabel(String priority, Translations i18n) => switch (priority) {
+  'high' => i18n.tasks.priorities.high,
+  'medium' => i18n.tasks.priorities.medium,
+  'low' => i18n.tasks.priorities.low,
+  _ => priority,
+};
+
 Color taskPriorityColor(String priority, AppColors c) => switch (priority) {
   'high' => c.destructive,
   'medium' => const Color(0xFFF59E0B),
@@ -107,9 +127,17 @@ class TaskmasterTaskTile extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 6),
-                        _badge(task.priority, taskPriorityColor(task.priority, c), t),
+                        _badge(
+                          taskPriorityLabel(task.priority, i18n),
+                          taskPriorityColor(task.priority, c),
+                          t,
+                        ),
                         const SizedBox(width: 4),
-                        _badge(task.status, taskStatusColor(task.status, c), t),
+                        _badge(
+                          taskStatusLabel(task.status, i18n),
+                          taskStatusColor(task.status, c),
+                          t,
+                        ),
                       ],
                     ),
                     const SizedBox(height: 3),
@@ -133,7 +161,7 @@ class TaskmasterTaskTile extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(top: 2),
                         child: Text(
-                          'Depends on: ${task.dependencies.join(', ')}',
+                          i18n.tasks.card.dependsOnList(tasks: task.dependencies.join(', ')),
                           style: t.labelSmall?.copyWith(
                             color: const Color(0xFFF59E0B),
                             fontSize: 10,

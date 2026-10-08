@@ -548,9 +548,7 @@ String _taskTypeLabel(Translations t, String type) {
     'code-hard' => types.codeHard,
     'test' => types.test,
     'review' => types.review,
-    // No i18n key for the report lane yet (added server-side with the
-    // supervised loop) — English literal per project convention.
-    'report' => 'Report',
+    'report' => types.report,
     _ => type,
   };
 }

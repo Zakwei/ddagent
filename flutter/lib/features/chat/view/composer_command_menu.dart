@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
 import 'package:ddagent_app/core/theme/tokens.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -176,13 +177,14 @@ String slashCommandKey(Map<String, dynamic> c) =>
 bool isSkillCommand(Map<String, dynamic> c) =>
     c['type'] == 'skill' || (c['metadata'] as Map?)?['type'] == 'skill';
 
-const _namespaceLabels = {
-  'frequent': 'Frequently Used',
-  'builtin': 'Built-in Commands',
-  'skill': 'Skills',
-  'project': 'Project Commands',
-  'user': 'User Commands',
-  'other': 'Other Commands',
+String? _namespaceLabel(Translations t, String ns) => switch (ns) {
+  'frequent' => t.chat.commandMenu.namespaces.frequent,
+  'builtin' => t.chat.commandMenu.namespaces.builtin,
+  'skill' => t.chat.commandMenu.namespaces.skill,
+  'project' => t.chat.commandMenu.namespaces.project,
+  'user' => t.chat.commandMenu.namespaces.user,
+  'other' => t.chat.commandMenu.namespaces.other,
+  _ => null,
 };
 
 IconData _namespaceIcon(String ns) => switch (ns) {
@@ -274,13 +276,14 @@ class SlashCommandList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
+    final t = Translations.of(context);
     if (commands.isEmpty) {
       // `.command-menu-empty` — centered muted label, padding 20.
       return Padding(
         padding: const EdgeInsets.all(20),
         child: Center(
           child: Text(
-            'No commands available',
+            t.chat.commandMenu.empty,
             style: TextStyle(fontSize: 14, color: c.mutedForeground),
           ),
         ),
@@ -337,7 +340,7 @@ class SlashCommandList extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      (_namespaceLabels[ns] ?? ns).toUpperCase(),
+                      (_namespaceLabel(t, ns) ?? ns).toUpperCase(),
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w600,
@@ -606,6 +609,13 @@ class _MentionRow extends StatelessWidget {
       _ => (LucideIcons.fileText, c.mutedForeground),
     };
     final subtitle = item['subtitle'] ?? '';
+    final mention = Translations.of(context).chat.mentionMenu.kinds;
+    final kindLabel = switch (kind) {
+      'file' => mention.file,
+      'session' => mention.session,
+      'task' => mention.task,
+      _ => kind,
+    };
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -675,7 +685,7 @@ class _MentionRow extends StatelessWidget {
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
-                  kind.toUpperCase(),
+                  kindLabel.toUpperCase(),
                   style: TextStyle(
                     fontSize: 10,
                     height: 1,

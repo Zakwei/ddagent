@@ -105,6 +105,7 @@ class _ChangedSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.appColors;
     final t = Theme.of(context);
+    final i18n = Translations.of(context);
     final total = _groups.fold<int>(0, (sum, g) => sum + _paths(g.$1).length);
     if (total == 0) return const SizedBox.shrink();
     return Column(
@@ -116,7 +117,7 @@ class _ChangedSection extends ConsumerWidget {
             children: [
               Expanded(
                 child: Text(
-                  'Changed files',
+                  i18n.common.gitPanel.history.changedFiles,
                   style: t.textTheme.labelSmall?.copyWith(color: c.mutedForeground),
                 ),
               ),

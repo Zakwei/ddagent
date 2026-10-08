@@ -1,4 +1,5 @@
 import 'package:ddagent_app/features/server_connect/data/local_server_status.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Web/mobile stub — no dart:io, no process spawning. Every lifecycle call
@@ -11,7 +12,7 @@ class LocalServerController extends Notifier<LocalServerStatus> {
   Future<void> refresh() async {}
 
   Future<String> installAndStart() =>
-      throw UnsupportedError('Local server is not supported on this platform.');
+      throw UnsupportedError(t.serverConnect.local.errors.unsupportedPlatform);
 
   Future<String?> ensureRunning() async => null;
 

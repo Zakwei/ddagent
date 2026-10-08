@@ -372,7 +372,7 @@ class _NewApiKeyCardState extends State<_NewApiKeyCard> {
               ),
               const SizedBox(width: AppSpacing.sm),
               Tooltip(
-                message: _copied ? 'Copied' : 'Copy',
+                message: _copied ? t.chat.codeBlock.copied : t.common.buttons.copy,
                 child: AppButton(
                   variant: AppButtonVariant.outline,
                   size: AppButtonSize.sm,

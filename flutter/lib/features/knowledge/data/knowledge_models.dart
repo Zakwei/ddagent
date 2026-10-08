@@ -3,6 +3,8 @@
 /// `fromJson` factories (same style as `mcp_models.dart`, no codegen).
 library;
 
+import 'package:ddagent_app/i18n/strings.g.dart';
+
 /// Priority of a memory or rule — drives ordering/badges in the UI.
 enum KnowledgePriority {
   critical('critical'),
@@ -23,12 +25,12 @@ enum KnowledgePriority {
     _ => KnowledgePriority.normal,
   };
 
-  /// Display label — `critical → Critical`.
+  /// Localized display label (`critical → Critical` in English).
   String get label => switch (this) {
-    KnowledgePriority.critical => 'Critical',
-    KnowledgePriority.high => 'High',
-    KnowledgePriority.normal => 'Normal',
-    KnowledgePriority.low => 'Low',
+    KnowledgePriority.critical => t.knowledge.priorities.critical,
+    KnowledgePriority.high => t.knowledge.priorities.high,
+    KnowledgePriority.normal => t.knowledge.priorities.normal,
+    KnowledgePriority.low => t.knowledge.priorities.low,
   };
 }
 
@@ -51,12 +53,12 @@ enum KnowledgeEntityType {
     _ => KnowledgeEntityType.memory,
   };
 
-  /// Display label — `personal → Personal`.
+  /// Localized display label (`personal → Personal` in English).
   String get label => switch (this) {
-    KnowledgeEntityType.memory => 'Memory',
-    KnowledgeEntityType.rule => 'Rule',
-    KnowledgeEntityType.skill => 'Skill',
-    KnowledgeEntityType.personal => 'Personal',
+    KnowledgeEntityType.memory => t.knowledge.entityTypes.memory,
+    KnowledgeEntityType.rule => t.knowledge.entityTypes.rule,
+    KnowledgeEntityType.skill => t.knowledge.entityTypes.skill,
+    KnowledgeEntityType.personal => t.knowledge.entityTypes.personal,
   };
 }
 

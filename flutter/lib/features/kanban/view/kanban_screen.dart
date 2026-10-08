@@ -1969,7 +1969,7 @@ class _CardDetailsDialog extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                t.kanban.details.status(status: card.status ?? ''),
+                t.kanban.details.status(status: _BoardCardState._columnTitle(t, card.status ?? '')),
                 style: TextStyle(color: c.mutedForeground, fontSize: 13),
               ),
               const SizedBox(height: AppSpacing.md),

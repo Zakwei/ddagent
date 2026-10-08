@@ -279,9 +279,8 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
       final confirmed = await AppDialog.confirm(
         context,
         title: t.chat.commands.runConfirmTitle,
-        message:
-            'This command contains bash commands that will be executed. Do you want to proceed?',
-        confirmLabel: 'Proceed',
+        message: t.chat.commands.bashConfirmMessage,
+        confirmLabel: t.chat.commands.proceed,
       );
       if (!mounted) return;
       if (!confirmed) {
@@ -1044,7 +1043,11 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                   spacing: 6,
                   children: [
                     Flexible(child: Text(t.chat.tokenUsage.title)),
-                    _SheetBadge(label: usage.unsupported ? 'N/A' : '${usage.used.round()} tokens'),
+                    _SheetBadge(
+                      label: usage.unsupported
+                          ? t.chat.tokenUsage.notAvailable
+                          : t.chat.tokenUsage.tokensBadge(count: usage.used.round()),
+                    ),
                   ],
                 ),
                 subtitle: Text(t.chat.tokenUsage.desc),
@@ -1437,7 +1440,7 @@ class _OptionBar extends ConsumerWidget {
             value: state.accountId,
             items: [null, for (final a in state.accounts) a.id],
             displayFor: (v) => v == null
-                ? 'Auto'
+                ? t.chat.composer.accountAutoShort
                 : state.accounts.where((a) => a.id == v).map((a) => a.label ?? a.id).firstOrNull ??
                       v,
             onChanged: (v) => ref.read(composerProvider(arg).notifier).selectAccount(v),
@@ -1465,6 +1468,7 @@ class _MiniDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
+    final auto = Translations.of(context).chat.composer.accountAutoShort;
     final textStyle = Theme.of(context).textTheme.bodySmall
         ?.copyWith(fontSize: 11.5, color: c.mutedForeground);
     // `.oc-pill` — subtle border, 3px radius, h-7.
@@ -1480,20 +1484,17 @@ class _MiniDropdown extends StatelessWidget {
           value: items.contains(value) ? value : null,
           isDense: true,
           style: textStyle,
-          hint: Text('$label: ${displayFor?.call(value) ?? value ?? 'auto'}', style: textStyle),
+          hint: Text('$label: ${displayFor?.call(value) ?? value ?? auto}', style: textStyle),
           selectedItemBuilder: (_) => [
             for (final it in items)
               Align(
                 alignment: Alignment.centerLeft,
-                child: Text('$label: ${displayFor?.call(it) ?? it ?? 'auto'}', style: textStyle),
+                child: Text('$label: ${displayFor?.call(it) ?? it ?? auto}', style: textStyle),
               ),
           ],
           items: [
             for (final it in items)
-              DropdownMenuItem<String>(
-                value: it,
-                child: Text(displayFor?.call(it) ?? it ?? 'auto'),
-              ),
+              DropdownMenuItem<String>(value: it, child: Text(displayFor?.call(it) ?? it ?? auto)),
           ],
           onChanged: onChanged,
         ),
@@ -1623,9 +1624,7 @@ class _QueueCard extends ConsumerWidget {
                         ),
                         if (_attachmentCount(m) > 0)
                           Text(
-                            _attachmentCount(m) == 1
-                                ? '1 file attached'
-                                : '${_attachmentCount(m)} files attached',
+                            t.chat.input.queue.filesAttached(count: _attachmentCount(m)),
                             style: TextStyle(fontSize: 11, color: c.mutedForeground),
                           ),
                       ],

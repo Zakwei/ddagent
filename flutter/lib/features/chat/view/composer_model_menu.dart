@@ -97,9 +97,25 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
     return null;
   }
 
-  String _effortLabel() {
-    final effort = _state.effort ?? _defaultEffort;
-    return effort == _defaultEffort ? 'Default' : _cap(effort);
+  String _effortLabel() => _effortName(_state.effort ?? _defaultEffort);
+
+  /// Display name for a reasoning level — known levels are localized, any
+  /// other wire value falls back to its capitalized form.
+  String _effortName(String effort) {
+    final l = Translations.of(context).chat.composer;
+    return switch (effort) {
+      _defaultEffort => l.effortDefault,
+      'off' => l.effortLevels.off,
+      'none' => l.effortLevels.none,
+      'minimal' => l.effortLevels.minimal,
+      'low' => l.effortLevels.low,
+      'medium' => l.effortLevels.medium,
+      'high' => l.effortLevels.high,
+      'xhigh' => l.effortLevels.xhigh,
+      'max' => l.effortLevels.max,
+      'ultra' => l.effortLevels.ultra,
+      _ => _cap(effort),
+    };
   }
 
   static String _cap(String s) => s.isEmpty ? s : '${s[0].toUpperCase()}${s.substring(1)}';
@@ -225,7 +241,7 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
 
     final active = _activeOption(_state);
     final label = hasModel
-        ? (active != null ? _label(active) : (_state.activeModel ?? 'Model'))
+        ? (active != null ? _label(active) : (_state.activeModel ?? t.chat.composer.model))
         : _effortLabel();
     final selectedFree = active != null && _tierOf(active) == 'free';
     final showEffort = hasModel && hasEffort && (_state.effort ?? _defaultEffort) != _defaultEffort;
@@ -306,14 +322,15 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
         if (!state.favorites.contains(_id(m))) m,
     ];
     final effort = state.effort ?? _defaultEffort;
+    final t = Translations.of(ctx);
 
     return [
       if (hasEffort) ...[
-        _heading(c, 'Reasoning'),
+        _heading(c, t.chat.composer.reasoning),
         for (final e in efforts)
           _item(
             c,
-            label: e.value == _defaultEffort ? 'Default' : _cap(e.value),
+            label: _effortName(e.value),
             description: e.description,
             selected: effort == e.value,
             onTap: () {
@@ -325,7 +342,7 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
       if (hasModel) ...[
         if (hasEffort) _separator(c),
         if (favoriteOptions.isNotEmpty) ...[
-          _heading(c, 'Favorites'),
+          _heading(c, t.chat.composer.favorites),
           for (final m in favoriteOptions) _modelRow(ctx, ref, state, c, m),
         ],
         // The collapsible row shows the active model's label, muted.
@@ -333,7 +350,7 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
           c,
           label: _activeOption(state) != null
               ? _label(_activeOption(state)!)
-              : (state.activeModel ?? 'Model'),
+              : (state.activeModel ?? t.chat.composer.model),
           muted: true,
           trailing: Icon(
             _modelSectionOpen ? LucideIcons.chevronDown : LucideIcons.chevronRight,
@@ -353,12 +370,12 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
         if (_modelSectionOpen) ...[
           Padding(padding: const EdgeInsets.fromLTRB(10, 4, 10, 6), child: _pillBar(c)),
           Padding(padding: const EdgeInsets.fromLTRB(10, 0, 10, 6), child: _searchField(c)),
-          _heading(c, 'Model'),
+          _heading(c, t.chat.composer.model),
           if (options.isEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               child: Text(
-                'No models found.',
+                t.chat.providerSelection.noModelsFound,
                 style: TextStyle(fontSize: 14, height: 20 / 14, color: c.mutedForeground),
               ),
             ),
@@ -380,11 +397,14 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
     final selected = id == state.activeModel;
     final free = _tierOf(m) == 'free';
     final contextText = _contextText(m);
+    final contextLabel = contextText == null
+        ? null
+        : Translations.of(ctx).chat.composer.contextWindow(size: contextText);
     final description = free
-        ? (contextText != null ? '$contextText context' : null)
+        ? contextLabel
         : [
             m['description']?.toString(),
-            if (contextText != null) '$contextText context',
+            ?contextLabel,
           ].whereType<String>().where((s) => s.isNotEmpty).join(' · ');
     return _item(
       c,
@@ -450,6 +470,7 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
 
   /// `PillBar`/`Pill` — All/Free/Paid segmented filter.
   Widget _pillBar(AppColors c) {
+    final ps = Translations.of(context).chat.providerSelection;
     Widget pill(String tier, String label) {
       final active = _tier == tier;
       return GestureDetector(
@@ -491,7 +512,7 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           spacing: 2,
-          children: [pill('all', 'All'), pill('free', 'Free'), pill('paid', 'Paid')],
+          children: [pill('all', ps.all), pill('free', ps.free), pill('paid', ps.paid)],
         ),
       ),
     );
@@ -858,9 +879,9 @@ class _FreeBadge extends StatelessWidget {
         border: Border.all(color: _emerald.withValues(alpha: 0.3)),
         borderRadius: BorderRadius.circular(999),
       ),
-      child: const Text(
-        'Free',
-        style: TextStyle(
+      child: Text(
+        Translations.of(context).chat.providerSelection.free,
+        style: const TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.w500,
           color: Color(0xFF047857), // emerald-700, theme-independent

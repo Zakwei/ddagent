@@ -1,6 +1,8 @@
 /// Domain models for /api/schedules — mirrors schedules.db.ts + routes.
 library;
 
+import 'package:ddagent_app/i18n/strings.g.dart';
+
 String _str(Object? v) => v?.toString() ?? '';
 String? _strOrNull(Object? v) => v?.toString();
 
@@ -130,18 +132,18 @@ const _dowNames = {'sun': 0, 'mon': 1, 'tue': 2, 'wed': 3, 'thu': 4, 'fri': 5, '
 /// remains authoritative (it rejects with `CRON_INVALID`).
 String? validateCron(String expr) {
   final fields = expr.trim().split(RegExp(r'\s+'));
-  if (fields.length != 5) return 'Expected 5 fields, got ${fields.length}';
+  if (fields.length != 5) return t.scheduler.cronErrors.fieldCount(got: fields.length);
   const ranges = [(0, 59), (0, 23), (1, 31), (1, 12), (0, 7)];
   const names = [null, null, null, _monthNames, _dowNames];
   for (var i = 0; i < 5; i++) {
     final err = _checkField(fields[i], ranges[i].$1, ranges[i].$2, names[i]);
-    if (err != null) return 'Field ${i + 1}: $err';
+    if (err != null) return t.scheduler.cronErrors.fieldError(index: i + 1, error: err);
   }
   return null;
 }
 
 String? _checkField(String f, int lo, int hi, Map<String, int>? names) {
-  if (f.isEmpty) return 'empty';
+  if (f.isEmpty) return t.scheduler.cronErrors.empty;
   int? value(String v) {
     if (v == '*') return null;
     final n = names?[v.toLowerCase()] ?? int.tryParse(v);
@@ -154,13 +156,13 @@ String? _checkField(String f, int lo, int hi, Map<String, int>? names) {
     // part = base[/step]; base = '*' | value | value-value
     final slash = part.split('/');
     if (slash.length > 2 || (slash.length == 2 && (int.tryParse(slash[1]) ?? 0) < 1)) {
-      return 'invalid "$part"';
+      return t.scheduler.cronErrors.invalidPart(part: part);
     }
     final base = slash[0];
-    if (base.isEmpty) return 'invalid "$part"';
+    if (base.isEmpty) return t.scheduler.cronErrors.invalidPart(part: part);
     for (final v in base.split('-')) {
-      if (v.isEmpty) return 'invalid "$part"';
-      if (value(v) == -1) return 'invalid value "$v"';
+      if (v.isEmpty) return t.scheduler.cronErrors.invalidPart(part: part);
+      if (value(v) == -1) return t.scheduler.cronErrors.invalidValue(value: v);
     }
   }
   return null;

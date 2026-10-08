@@ -64,7 +64,7 @@ class AboutSection extends ConsumerWidget {
         const _ChangelogBlock(),
         Divider(height: AppSpacing.xl * 2, color: context.appColors.border),
         Text(
-          '© 2026 ddagent — all rights reserved',
+          Translations.of(context).settings.about.copyright,
           style: Theme.of(context).textTheme.labelSmall
               ?.copyWith(color: context.appColors.mutedForeground.withValues(alpha: 0.6)),
         ),
@@ -247,7 +247,7 @@ class _BrandHeader extends ConsumerWidget {
                 children: [
                   Flexible(
                     child: Text(
-                      'ddagent',
+                      'DDAgent',
                       overflow: TextOverflow.ellipsis,
                       style: tt.titleMedium?.copyWith(fontWeight: FontWeight.w600),
                     ),
@@ -307,7 +307,7 @@ class _BrandHeader extends ConsumerWidget {
               ),
               const SizedBox(height: 2),
               Text(
-                'Open-source AI coding assistant interface',
+                t.settings.about.tagline,
                 overflow: TextOverflow.ellipsis,
                 style: tt.bodySmall?.copyWith(color: c.mutedForeground),
               ),
@@ -319,7 +319,7 @@ class _BrandHeader extends ConsumerWidget {
   }
 }
 
-/// Star/coffee buttons, the link row, and the OSS-only "ddagent Hosted" CTA +
+/// Star/coffee buttons, the link row, and the OSS-only "DDAgent Hosted" CTA +
 /// Pro placeholder cards (all gated on `!Env.embedded` — `!IS_PLATFORM`
 /// parity).
 class _LinksBlock extends StatelessWidget {
@@ -382,7 +382,11 @@ class _LinksBlock extends StatelessWidget {
           spacing: AppSpacing.sm,
           runSpacing: AppSpacing.sm,
           children: [
-            linkButton(_githubRepoUrl, LucideIcons.star, 'Star on GitHub'),
+            linkButton(
+              _githubRepoUrl,
+              LucideIcons.star,
+              Translations.of(context).sidebar.actions.starOnGithub,
+            ),
             linkButton(
               _coffeeUrl,
               LucideIcons.coffee,
@@ -399,7 +403,7 @@ class _LinksBlock extends StatelessWidget {
             textLink(_githubRepoUrl, LucideIcons.gitBranch, 'GitHub'),
             textLink(_discordUrl, LucideIcons.messageSquare, 'Discord'),
             textLink(_coffeeUrl, LucideIcons.coffee, t.buyMeACoffee),
-            textLink(_docsUrl, LucideIcons.externalLink, 'Docs'),
+            textLink(_docsUrl, LucideIcons.externalLink, t.docs),
             textLink(_githubRepoUrl, LucideIcons.externalLink, 'DDAgent'),
           ],
         ),
@@ -418,11 +422,7 @@ class _LinksBlock extends StatelessWidget {
               children: [
                 Text(t.tryHosted, style: tt.titleSmall),
                 const SizedBox(height: AppSpacing.xs),
-                Text(
-                  'Team collaboration, shared MCP configs, settings sync '
-                  'across environments, and managed infrastructure.',
-                  style: tt.labelSmall?.copyWith(color: c.mutedForeground),
-                ),
+                Text(t.hostedDescription, style: tt.labelSmall?.copyWith(color: c.mutedForeground)),
                 const SizedBox(height: AppSpacing.sm),
                 InkWell(
                   onTap: () => _openUrl(_githubRepoUrl),
@@ -444,17 +444,13 @@ class _LinksBlock extends StatelessWidget {
           _ProCard(
             icon: LucideIcons.cloud,
             title: t.pro.syncSettings,
-            description:
-                'Keep your preferences, MCP configs, and theme in sync '
-                'across all your environments.',
+            description: t.pro.syncSettingsDescription,
           ),
           const SizedBox(height: AppSpacing.sm),
           _ProCard(
             icon: LucideIcons.users,
             title: t.pro.teamManagement,
-            description:
-                'Multiple users, role-based access, and shared projects '
-                'for your team.',
+            description: t.pro.teamManagementDescription,
           ),
         ],
       ],
@@ -520,7 +516,7 @@ class _ProCard extends StatelessWidget {
                     children: [
                       Flexible(
                         child: Text(
-                          'Available with ddagent Pro',
+                          Translations.of(context).mcp.team.cta,
                           style: tt.labelSmall?.copyWith(color: c.primary),
                         ),
                       ),

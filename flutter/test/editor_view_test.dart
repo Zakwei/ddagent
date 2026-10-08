@@ -209,10 +209,10 @@ void main() {
     testWidgets('markdown file toggles to rendered preview', (tester) async {
       files.files['p1:/r.md'] = '# Title';
       await _pumpScreen(tester, files, git, file: '/r.md');
-      await tester.tap(find.byTooltip('Preview'));
+      await tester.tap(find.byTooltip('Preview markdown'));
       await tester.pumpAndSettle();
       expect(find.byType(AppMarkdown), findsOneWidget);
-      await tester.tap(find.byTooltip('Edit'));
+      await tester.tap(find.byTooltip('Edit markdown'));
       await tester.pumpAndSettle();
       expect(find.byType(CodeEditor), findsOneWidget);
     });
@@ -287,7 +287,7 @@ void main() {
         'staged': <String>[],
       };
       await _pumpScreen(tester, files, git);
-      expect(find.text('Changed files'), findsOneWidget);
+      expect(find.text('Changed Files'), findsOneWidget);
       expect(find.text('1'), findsWidgets); // change counter
       await tester.tap(find.text('changed.dart'));
       await tester.pumpAndSettle();

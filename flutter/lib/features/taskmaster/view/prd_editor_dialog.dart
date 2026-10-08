@@ -61,9 +61,9 @@ class _PrdEditorDialogState extends ConsumerState<PrdEditorDialog> {
     final i18n = Translations.of(context);
     final name = _name.text.trim();
     final invalid = name.isEmpty
-        ? 'Please provide a filename for the PRD.'
+        ? i18n.tasks.taskmaster.prd.fileNameRequired
         : _content.text.trim().isEmpty
-        ? 'Please add content before saving.'
+        ? i18n.tasks.taskmaster.prd.contentRequired
         : null;
     if (invalid != null) {
       setState(() => _error = invalid);
@@ -77,7 +77,7 @@ class _PrdEditorDialogState extends ConsumerState<PrdEditorDialog> {
         context,
         title: i18n.tasks.prd.fileExistsTitle,
         message: i18n.tasks.prd.fileExistsMessage(name: name),
-        confirmLabel: 'Overwrite',
+        confirmLabel: i18n.tasks.taskmaster.prd.overwrite,
       );
       if (!ok || !mounted) return false;
     }
@@ -191,9 +191,7 @@ class _PrdEditorDialogState extends ConsumerState<PrdEditorDialog> {
                       maxLines: null,
                       enabled: !busy,
                       style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
-                      decoration: const InputDecoration(
-                        hintText: '# Product Requirements Document…',
-                      ),
+                      decoration: InputDecoration(hintText: i18n.tasks.taskmaster.prd.contentHint),
                       onChanged: ctrl.setPrdContent,
                     ),
             ),

@@ -33,6 +33,14 @@ String _formatRelativeTime(String? value) {
   return '${hours ~/ 24}${rel.daysAgo}';
 }
 
+/// Localized label for a session status wire value; unknown values pass through.
+String _statusLabel(String status) => switch (status) {
+  'ready' => t.browserUse.sessionStatus.ready,
+  'stopped' => t.browserUse.sessionStatus.stopped,
+  'unavailable' => t.browserUse.sessionStatus.unavailable,
+  _ => status,
+};
+
 String _formatAction(String? action) =>
     action == null ? t.common.browserUse.waiting : action.replaceAll('_', ' ');
 
@@ -443,7 +451,7 @@ class _SessionSurface extends StatelessWidget {
               spacing: AppSpacing.sm,
               children: [
                 _Badge(
-                  label: s?.status ?? t.common.browserUse.emptyStatus,
+                  label: s == null ? t.common.browserUse.emptyStatus : _statusLabel(s.status),
                   highlighted: s?.isRunning == true,
                 ),
                 Expanded(
@@ -749,7 +757,7 @@ class _SessionsAside extends StatelessWidget {
                   const SizedBox(height: AppSpacing.sm),
                   _MetaRow(
                     label: t.common.browserUse.status,
-                    value: s?.status ?? t.common.browserUse.none,
+                    value: s == null ? t.common.browserUse.none : _statusLabel(s.status),
                   ),
                   _MetaRow(
                     label: t.common.browserUse.lastAction,
@@ -875,7 +883,7 @@ class _SessionListItem extends StatelessWidget {
                     ),
                   ),
                 ),
-                _Badge(label: session.status),
+                _Badge(label: _statusLabel(session.status)),
               ],
             ),
             Padding(

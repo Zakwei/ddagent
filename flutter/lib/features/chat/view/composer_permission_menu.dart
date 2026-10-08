@@ -47,32 +47,26 @@ class _ComposerPermissionMenuState extends State<ComposerPermissionMenu> {
   // open while toggling — the check appears in place).
   final _menuTick = ValueNotifier<int>(0);
 
-  // `permissionModes.modes.*` (en) — the codex keys are the translated
-  // fallback in the web; Flutter ships the English strings.
-  static const _labels = {
-    'default': 'Default Mode',
-    'auto': 'Auto Mode',
-    'acceptEdits': 'Accept Edits',
-    'bypassPermissions': 'Bypass Permissions',
-    'plan': 'Plan Mode',
+  /// Known permission modes — the trigger stays neutral for anything else.
+  static const _knownModes = {'default', 'auto', 'acceptEdits', 'bypassPermissions', 'plan'};
+
+  // `permissionModes.modes.*` — localized via the `chat.codex` keys.
+  static String? _label(Translations t, String mode) => switch (mode) {
+    'default' => t.chat.codex.modes.kDefault,
+    'auto' => t.chat.codex.modes.auto,
+    'acceptEdits' => t.chat.codex.modes.acceptEdits,
+    'bypassPermissions' => t.chat.codex.modes.bypassPermissions,
+    'plan' => t.chat.codex.modes.plan,
+    _ => null,
   };
 
-  static const _descriptions = {
-    'default':
-        'Only trusted commands (ls, cat, grep, git status, etc.) run '
-        'automatically. Other commands are skipped. Can write to '
-        'workspace.',
-    'auto':
-        'A model classifier decides per tool call whether to approve '
-        'or deny. Hands-off, but safer than Bypass — denials still happen.',
-    'acceptEdits':
-        'All commands run automatically within the workspace. '
-        'Full auto mode with sandboxed execution.',
-    'bypassPermissions':
-        'Full system access with no restrictions. All '
-        'commands run automatically with full disk and network access. '
-        'Use with caution.',
-    'plan': 'Planning mode - no commands are executed',
+  static String? _description(Translations t, String mode) => switch (mode) {
+    'default' => t.chat.codex.descriptions.kDefault,
+    'auto' => t.chat.codex.descriptions.auto,
+    'acceptEdits' => t.chat.codex.descriptions.acceptEdits,
+    'bypassPermissions' => t.chat.codex.descriptions.bypassPermissions,
+    'plan' => t.chat.codex.descriptions.plan,
+    _ => null,
   };
 
   /// MODE_APPEARANCE from ComposerPermissionMenu.tsx (icon + item text tone).
@@ -158,16 +152,13 @@ class _ComposerPermissionMenuState extends State<ComposerPermissionMenu> {
       children: [
         ComposerMenuHeading(
           colors: c,
-          child: Text(
-            'How should ${widget.providerLabel} actions be '
-            'approved?',
-          ),
+          child: Text(t.chat.composer.permissionHeading(provider: widget.providerLabel)),
         ),
         for (final m in widget.modes)
           ComposerMenuItem(
             colors: c,
-            label: _labels[m] ?? m,
-            description: _descriptions[m],
+            label: _label(t, m) ?? m,
+            description: _description(t, m),
             labelColor: _appearance(m, c, isDark).$2,
             icon: Icon(_appearance(m, c, isDark).$1, size: 14, color: _appearance(m, c, isDark).$2),
             selected: m == widget.mode,
@@ -182,9 +173,7 @@ class _ComposerPermissionMenuState extends State<ComposerPermissionMenu> {
           ComposerMenuItem(
             colors: c,
             label: t.chat.input.autoContinueTasks,
-            description:
-                'Enable to let Devin automatically continue to the '
-                'next Task Master task',
+            description: t.chat.input.autoContinueTasksTooltip,
             icon: Icon(LucideIcons.listChecks, size: 14, color: c.popoverForeground),
             selected: widget.autoContinue,
             compact: widget.compact,
@@ -205,7 +194,7 @@ class _ComposerPermissionMenuState extends State<ComposerPermissionMenu> {
     final (icon, tone) = _appearance(widget.mode, c, isDark);
     // The default mode's trigger is neutral (border-border/60 bg-muted/50);
     // colored modes tint border+fill with their tone instead.
-    final neutral = widget.mode == 'default' || !_labels.containsKey(widget.mode);
+    final neutral = widget.mode == 'default' || !_knownModes.contains(widget.mode);
     final size = widget.compact ? 44.0 : 32.0;
     return Tooltip(
       // Web title parity — localized; the Tab shortcut is web-only so the

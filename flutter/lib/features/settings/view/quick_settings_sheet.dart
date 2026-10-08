@@ -39,7 +39,7 @@ class QuickSettingsDialog extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      'Quick settings',
+                      t.settings.quickSettings.title,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -98,7 +98,7 @@ class QuickSettingsDialog extends ConsumerWidget {
                   Padding(
                     padding: const EdgeInsets.only(left: 12, top: 4),
                     child: Text(
-                      'When off, Enter sends and Shift+Enter inserts a newline.',
+                      t.settings.quickSettings.enterSendsHint,
                       style: TextStyle(fontSize: 12, color: c.mutedForeground),
                     ),
                   ),

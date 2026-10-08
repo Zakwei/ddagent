@@ -422,7 +422,9 @@ class _Toolbar extends StatelessWidget {
           ),
           if (kind == EditorFileKind.markdown)
             IconButton(
-              tooltip: previewOn ? 'Edit' : 'Preview',
+              tooltip: previewOn
+                  ? t.codeEditor.actions.editMarkdown
+                  : t.codeEditor.actions.previewMarkdown,
               visualDensity: VisualDensity.compact,
               icon: Icon(previewOn ? Icons.edit_outlined : Icons.visibility_outlined, size: 18),
               onPressed: onTogglePreview,
@@ -537,8 +539,9 @@ class _Footer extends StatelessWidget {
   Widget build(BuildContext context) {
     if (tab == null) return const SizedBox.shrink();
     final colors = context.appColors;
+    final t = Translations.of(context);
     final lines = '\n'.allMatches(tab!.content).length + 1;
-    final lang = editorLanguage(tab!.path) ?? 'plain text';
+    final lang = editorLanguage(tab!.path) ?? t.codeEditor.footer.plainText;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 3),
@@ -546,7 +549,8 @@ class _Footer extends StatelessWidget {
         border: Border(top: BorderSide(color: colors.border)),
       ),
       child: Text(
-        '$lang · $lines lines${tab!.isDirty ? ' · modified' : ''}',
+        '$lang · ${t.codeEditor.footer.lineCount(count: lines)}'
+        '${tab!.isDirty ? ' · ${t.codeEditor.footer.modified}' : ''}',
         style: Theme.of(context).textTheme.labelSmall?.copyWith(color: colors.mutedForeground),
       ),
     );
@@ -568,7 +572,7 @@ class _EmptyState extends StatelessWidget {
           const SizedBox(height: AppSpacing.sm),
           Text(t.codeEditor.emptyState.title, style: Theme.of(context).textTheme.titleSmall),
           Text(
-            'Open files from the Files tab',
+            t.codeEditor.emptyState.hint,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(color: colors.mutedForeground),
           ),
         ],

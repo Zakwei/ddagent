@@ -354,6 +354,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     final tools = ref.watch(transcriptToolsProvider(widget.sessionId));
     final controller = ref.read(transcriptToolsProvider(widget.sessionId).notifier);
     final files = tools.reviewFiles;
+    final review = Translations.of(context).chat.review;
     return Focus(
       autofocus: true,
       onKeyEvent: (node, event) {
@@ -389,8 +390,9 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                     spacing: 8,
                     children: [
                       Text(
-                        'Changed files'
-                        '${!tools.reviewLoading && files.isNotEmpty ? ' (${files.length})' : ''}',
+                        !tools.reviewLoading && files.isNotEmpty
+                            ? review.changedFilesCount(count: files.length)
+                            : review.changedFiles,
                         style: t.labelSmall?.copyWith(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
@@ -508,7 +510,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 decoration: BoxDecoration(color: c.muted, borderRadius: AppRadii.borderSm),
                 child: Text(
-                  'subagent',
+                  Translations.of(context).chat.review.subagent,
                   style: t.labelSmall?.copyWith(fontSize: 9, color: c.mutedForeground),
                 ),
               ),
@@ -915,7 +917,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
       ),
       child: PaneSessionHeader(
         sessionId: widget.sessionId,
-        title: details?.displayTitle ?? 'Session',
+        title: details?.displayTitle ?? Translations.of(context).chat.session.fallbackTitle,
         projectName: projectName,
         provider: provider,
         action: details?.isRunning == true ? PaneAction.processing : PaneAction.idle,
@@ -999,7 +1001,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
         context,
         title: i18n.common.browserUse.deleteSession,
         message: i18n.chat.session.deleteConfirm,
-        confirmLabel: 'Delete',
+        confirmLabel: i18n.common.buttons.delete,
       );
       if (!ok) return;
     }
@@ -1098,7 +1100,9 @@ class MessageTile extends ConsumerWidget {
         }
         return _wrap(
           _ReasoningRow(
-            label: message.kind == 'thought_delta' ? 'Thinking...' : 'Thought for a few seconds',
+            label: message.kind == 'thought_delta'
+                ? i18n.chat.thinking.title
+                : i18n.chat.thinking.thoughtFewSeconds,
             content: message.content ?? '',
           ),
         );
@@ -1168,7 +1172,7 @@ class MessageTile extends ConsumerWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: Text(
-                  'Run complete',
+                  i18n.chat.message.runComplete,
                   style: theme.textTheme.labelSmall?.copyWith(color: cs.outline),
                 ),
               ),
@@ -1190,7 +1194,7 @@ class MessageTile extends ConsumerWidget {
           _card(
             cs,
             icon: Icons.help_outline,
-            title: message.content ?? 'Question',
+            title: message.content ?? i18n.chat.permissionRequest.question,
             child: options is List
                 ? Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1343,7 +1347,7 @@ class MessageTile extends ConsumerWidget {
         .replaceAll(RegExp(r'\n+'), ' ')
         .trim();
     final title = plain.isEmpty
-        ? 'Task from chat'
+        ? i18n.chat.taskMaster.defaultTaskTitle
         : plain.length <= 80
         ? plain
         : '${plain.substring(0, 77).trim()}...';
@@ -1419,7 +1423,10 @@ class MessageTile extends ConsumerWidget {
             if (message.context?['agentId'] != null)
               Padding(
                 padding: const EdgeInsets.only(bottom: 4),
-                child: Text('Subagent', style: TextStyle(fontSize: 11, color: cs.outline)),
+                child: Text(
+                  i18n.chat.permissionRequest.subagent,
+                  style: TextStyle(fontSize: 11, color: cs.outline),
+                ),
               ),
             if (!isAskUser) Text(message.content ?? message.text ?? ''),
             if (!isAskUser) const SizedBox(height: 8),
@@ -1427,11 +1434,11 @@ class MessageTile extends ConsumerWidget {
             RequireRole(
               minimum: 'member',
               fallback: Text(
-                'Viewers cannot approve',
+                i18n.chat.permissionRequest.viewersCannotApprove,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(color: cs.outline),
               ),
               child: requestId == null || !isPending
-                  ? _decisionRecap(cs, input, isAskUser)
+                  ? _decisionRecap(i18n, cs, input, isAskUser)
                   : isAskUser
                   ? AskUserQuestionPanel(
                       requestId: requestId,
@@ -1480,7 +1487,13 @@ class MessageTile extends ConsumerWidget {
   /// Read-only state for a permission/question card whose request is no
   /// longer pending: the picked answers if we have them, otherwise an
   /// "expired" note — a dead ask must never render as tappable.
-  Widget _decisionRecap(ColorScheme cs, Map<String, dynamic> input, bool isAskUser) {
+  Widget _decisionRecap(
+    Translations i18n,
+    ColorScheme cs,
+    Map<String, dynamic> input,
+    bool isAskUser,
+  ) {
+    final recap = i18n.chat.permissionRequest.recap;
     final questions = input['questions'] is List ? input['questions'] as List : const <dynamic>[];
     final answers = input['answers'] is Map ? input['answers'] as Map : const <dynamic, dynamic>{};
     final resolved = input['resolved'] == true;
@@ -1496,7 +1509,9 @@ class MessageTile extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    q['header']?.toString() ?? q['question']?.toString() ?? 'Question',
+                    q['header']?.toString() ??
+                        q['question']?.toString() ??
+                        i18n.chat.permissionRequest.question,
                     style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
                   ),
                   if (q['header'] != null && q['question'] != null)
@@ -1519,18 +1534,16 @@ class MessageTile extends ConsumerWidget {
               ),
             ),
         Text(switch (input['cancelReason']?.toString()) {
-          'timeout' => 'Timed out — denied automatically',
-          'cancelled' => 'Cancelled — the turn was stopped',
-          'auto-approved' => 'Approved automatically',
-          'expired' ||
-          'process-exited' ||
-          'run-settled' => 'Request expired — the agent is no longer waiting for it',
+          'timeout' => recap.timedOut,
+          'cancelled' => recap.cancelled,
+          'auto-approved' => recap.autoApproved,
+          'expired' || 'process-exited' || 'run-settled' => recap.expired,
           _ =>
             resolved
                 ? isAskUser
-                      ? (answers.isNotEmpty ? 'Answered' : 'Skipped')
-                      : 'Decided'
-                : 'Request expired — the agent is no longer waiting for it',
+                      ? (answers.isNotEmpty ? recap.answered : recap.skipped)
+                      : recap.decided
+                : recap.expired,
         }, style: muted),
       ],
     );
@@ -1773,7 +1786,7 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
     final name = widget.file['name']?.toString();
     if (name != null && name.isNotEmpty) return name;
     final base = _path.split(RegExp(r'[\\/]')).last;
-    return base.isEmpty ? 'Attached file' : base;
+    return base.isEmpty ? Translations.of(context).chat.attachments.attachedFile : base;
   }
 
   IconData get _icon {
@@ -1830,7 +1843,13 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
         mime: widget.file['mimeType']?.toString() ?? 'application/octet-stream',
       );
       if (!mounted) return;
-      AppToast.show(context, saved == null ? '$_name downloaded' : 'Saved $saved');
+      final i18n = Translations.of(context);
+      AppToast.show(
+        context,
+        saved == null
+            ? i18n.chat.attachments.downloaded(name: _name)
+            : i18n.chat.export.savedTo(path: saved),
+      );
     } on Object {
       if (mounted) setState(() => _failed = true);
     } finally {
@@ -1881,7 +1900,9 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      _failed ? 'Download failed — click to retry' : (_size ?? 'File attachment'),
+                      _failed
+                          ? i18n.chat.attachments.downloadFailedRetry
+                          : (_size ?? i18n.chat.attachments.fileAttachment),
                       style: t.labelSmall?.copyWith(
                         color: _failed ? Theme.of(context).colorScheme.error : c.mutedForeground,
                       ),
@@ -2030,7 +2051,7 @@ class _PermissionBanner extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.xs),
               child: Text(
-                '${questions.length - 1} more question${questions.length > 2 ? 's' : ''} waiting',
+                i18n.chat.permissionRequest.moreQuestions(count: questions.length - 1),
                 style: t.bodySmall?.copyWith(color: c.mutedForeground),
               ),
             ),
@@ -2044,8 +2065,8 @@ class _PermissionBanner extends ConsumerWidget {
                   Expanded(
                     child: Text(
                       p.context?['agentId'] != null
-                          ? 'Subagent: ${p.toolName} needs approval'
-                          : '${p.toolName} needs approval',
+                          ? i18n.chat.permissionRequest.subagentNeedsApproval(tool: p.toolName)
+                          : i18n.chat.permissionRequest.needsApproval(tool: p.toolName),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: t.bodySmall?.copyWith(color: c.foreground),

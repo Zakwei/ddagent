@@ -596,7 +596,7 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
                           p == 'orchestrator'
                               ? t.sessions.autoOrchestrator
                               : p == 'mini-orchestrator'
-                              ? 'Auto (mini)'
+                              ? t.sessions.autoMini
                               : p,
                         ),
                         onTap: () => Navigator.of(ctx).pop(p),

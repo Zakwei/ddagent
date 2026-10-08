@@ -18,6 +18,15 @@ String _initials(String name) {
   return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
 }
 
+/// Localized label for a presence `viewing.kind` (session/card/board);
+/// unknown kinds fall back to the raw wire value.
+String _viewingLabel(Translations t, String kind) => switch (kind) {
+  'session' => t.collab.viewing.session,
+  'card' => t.collab.viewing.card,
+  'board' => t.collab.viewing.board,
+  _ => kind,
+};
+
 /// Stacked initials of everyone present on the shared surface — port of
 /// `PresenceAvatars`. Hover shows the username and what they are viewing.
 class PresenceAvatars extends StatelessWidget {
@@ -41,7 +50,7 @@ class PresenceAvatars extends StatelessWidget {
               child: Tooltip(
                 message:
                     '${roster[i].username}'
-                    '${roster[i].viewing == null ? '' : ' · ${roster[i].viewing!.kind}'}',
+                    '${roster[i].viewing == null ? '' : ' · ${_viewingLabel(t, roster[i].viewing!.kind)}'}',
                 child: CircleAvatar(
                   radius: 12,
                   backgroundColor: onSurface,

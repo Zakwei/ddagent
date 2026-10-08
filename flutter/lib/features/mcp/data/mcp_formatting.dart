@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:ddagent_app/features/mcp/data/mcp_constants.dart';
 import 'package:ddagent_app/features/mcp/data/mcp_models.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 
 /// MCP form/payload helpers — port of `src/components/mcp/utils/mcpFormatting.ts`.
 
@@ -96,7 +97,7 @@ void _assertSupportedTransport(
   if (supported.contains(transport)) return;
   throw McpPayloadException(
     unsupportedTransportMessage?.call(transport) ??
-        '$provider does not support ${transport.wire} MCP servers',
+        t.mcp.form.validation.unsupportedProvider(provider: provider, type: transport.wire),
   );
 }
 
@@ -137,12 +138,12 @@ Map<String, dynamic> buildMcpPayload({
   if (importMode == McpImportMode.json) {
     final parsed = jsonDecode(jsonInput);
     if (parsed is! Map) {
-      throw const McpPayloadException('JSON configuration must be an object');
+      throw McpPayloadException(t.mcp.form.validation.jsonMustBeObject);
     }
     final transportInput = _readString(parsed['transport']) ?? _readString(parsed['type']);
     final parsedTransport = McpTransport.parse(transportInput);
     if (parsedTransport == null) {
-      throw const McpPayloadException('Missing required field: type');
+      throw McpPayloadException(t.settings.mcpForm.validation.missingType);
     }
     _assertSupportedTransport(
       provider,
@@ -151,11 +152,13 @@ Map<String, dynamic> buildMcpPayload({
       unsupportedTransportMessage,
     );
     if (parsedTransport == McpTransport.stdio && _readString(parsed['command']) == null) {
-      throw const McpPayloadException('stdio type requires a command field');
+      throw McpPayloadException(t.settings.mcpForm.validation.stdioRequiresCommand);
     }
     if ((parsedTransport == McpTransport.http || parsedTransport == McpTransport.sse) &&
         _readString(parsed['url']) == null) {
-      throw McpPayloadException('${parsedTransport.wire} type requires a url field');
+      throw McpPayloadException(
+        t.settings.mcpForm.validation.httpRequiresUrl(type: parsedTransport.wire),
+      );
     }
     // `undefined` fields in the web payload are dropped by JSON.stringify —
     // removeWhere mirrors that (`args`/`env`/`headers` default to {} / [] and

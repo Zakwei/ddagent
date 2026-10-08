@@ -1,5 +1,6 @@
 import 'dart:io' show Platform;
 
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 /// Native notification surface for Android, iOS and macOS via
@@ -65,16 +66,16 @@ Future<bool> showImpl({required String title, required String body}) async {
   if (!_hasNativeSurface) return false;
   try {
     await _ensureInitialized();
-    const details = NotificationDetails(
+    final details = NotificationDetails(
       android: AndroidNotificationDetails(
         'ddagent_alerts',
-        'ddagent alerts',
-        channelDescription: 'Agent run, approval and error notifications',
+        t.notifications.androidChannel.name,
+        channelDescription: t.notifications.androidChannel.description,
         importance: Importance.high,
         priority: Priority.high,
       ),
-      iOS: DarwinNotificationDetails(),
-      macOS: DarwinNotificationDetails(),
+      iOS: const DarwinNotificationDetails(),
+      macOS: const DarwinNotificationDetails(),
     );
     // A per-notification id keeps alerts stacked instead of replacing one another.
     final id = DateTime.now().microsecondsSinceEpoch.remainder(1 << 31);

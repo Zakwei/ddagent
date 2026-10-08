@@ -47,25 +47,28 @@ class TranslationsZhCn extends Translations with BaseTranslations<AppLocale, Tra
 	@override late final Translations$sidebar$zh_CN sidebar = Translations$sidebar$zh_CN.internal(_root);
 	@override late final Translations$tasks$zh_CN tasks = Translations$tasks$zh_CN.internal(_root);
 	@override late final Translations$knowledge$zh_CN knowledge = Translations$knowledge$zh_CN.internal(_root);
-	@override late final Translations$skills$zh_CN skills = Translations$skills$zh_CN.internal(_root);
-	@override late final Translations$mcp$zh_CN mcp = Translations$mcp$zh_CN.internal(_root);
-	@override late final Translations$terminal$zh_CN terminal = Translations$terminal$zh_CN.internal(_root);
-	@override late final Translations$worktrees$zh_CN worktrees = Translations$worktrees$zh_CN.internal(_root);
-	@override late final Translations$quota$zh_CN quota = Translations$quota$zh_CN.internal(_root);
-	@override late final Translations$scheduler$zh_CN scheduler = Translations$scheduler$zh_CN.internal(_root);
-	@override late final Translations$notifications$zh_CN notifications = Translations$notifications$zh_CN.internal(_root);
-	@override late final Translations$serverConnect$zh_CN serverConnect = Translations$serverConnect$zh_CN.internal(_root);
-	@override late final Translations$voice$zh_CN voice = Translations$voice$zh_CN.internal(_root);
-	@override late final Translations$sharedContext$zh_CN sharedContext = Translations$sharedContext$zh_CN.internal(_root);
-	@override late final Translations$collab$zh_CN collab = Translations$collab$zh_CN.internal(_root);
 	@override late final Translations$browser$zh_CN browser = Translations$browser$zh_CN.internal(_root);
-	@override late final Translations$projects$zh_CN projects = Translations$projects$zh_CN.internal(_root);
-	@override late final Translations$sessions$zh_CN sessions = Translations$sessions$zh_CN.internal(_root);
+	@override late final Translations$collab$zh_CN collab = Translations$collab$zh_CN.internal(_root);
+	@override late final Translations$fileTree$zh_CN fileTree = Translations$fileTree$zh_CN.internal(_root);
 	@override late final Translations$git$zh_CN git = Translations$git$zh_CN.internal(_root);
 	@override late final Translations$kanban$zh_CN kanban = Translations$kanban$zh_CN.internal(_root);
+	@override late final Translations$mcp$zh_CN mcp = Translations$mcp$zh_CN.internal(_root);
+	@override late final Translations$notifications$zh_CN notifications = Translations$notifications$zh_CN.internal(_root);
 	@override late final Translations$onboarding$zh_CN onboarding = Translations$onboarding$zh_CN.internal(_root);
-	@override late final Translations$fileTree$zh_CN fileTree = Translations$fileTree$zh_CN.internal(_root);
+	@override late final Translations$projects$zh_CN projects = Translations$projects$zh_CN.internal(_root);
+	@override late final Translations$quota$zh_CN quota = Translations$quota$zh_CN.internal(_root);
+	@override late final Translations$scheduler$zh_CN scheduler = Translations$scheduler$zh_CN.internal(_root);
+	@override late final Translations$serverConnect$zh_CN serverConnect = Translations$serverConnect$zh_CN.internal(_root);
+	@override late final Translations$sessions$zh_CN sessions = Translations$sessions$zh_CN.internal(_root);
+	@override late final Translations$sharedContext$zh_CN sharedContext = Translations$sharedContext$zh_CN.internal(_root);
+	@override late final Translations$skills$zh_CN skills = Translations$skills$zh_CN.internal(_root);
+	@override late final Translations$terminal$zh_CN terminal = Translations$terminal$zh_CN.internal(_root);
+	@override late final Translations$voice$zh_CN voice = Translations$voice$zh_CN.internal(_root);
 	@override late final Translations$workspace$zh_CN workspace = Translations$workspace$zh_CN.internal(_root);
+	@override late final Translations$worktrees$zh_CN worktrees = Translations$worktrees$zh_CN.internal(_root);
+	@override late final Translations$browserUse$zh_CN browserUse = Translations$browserUse$zh_CN.internal(_root);
+	@override late final Translations$orchestrator$zh_CN orchestrator = Translations$orchestrator$zh_CN.internal(_root);
+	@override late final Translations$miniOrchestrator$zh_CN miniOrchestrator = Translations$miniOrchestrator$zh_CN.internal(_root);
 }
 
 // Path: auth
@@ -91,6 +94,7 @@ class Translations$chat$zh_CN extends Translations$chat$en {
 	@override late final Translations$chat$codeBlock$zh_CN codeBlock = Translations$chat$codeBlock$zh_CN.internal(_root);
 	@override late final Translations$chat$copyMessage$zh_CN copyMessage = Translations$chat$copyMessage$zh_CN.internal(_root);
 	@override late final Translations$chat$messageTypes$zh_CN messageTypes = Translations$chat$messageTypes$zh_CN.internal(_root);
+	@override late final Translations$chat$orchestrator$zh_CN orchestrator = Translations$chat$orchestrator$zh_CN.internal(_root);
 	@override late final Translations$chat$tools$zh_CN tools = Translations$chat$tools$zh_CN.internal(_root);
 	@override late final Translations$chat$search$zh_CN search = Translations$chat$search$zh_CN.internal(_root);
 	@override late final Translations$chat$fileOperations$zh_CN fileOperations = Translations$chat$fileOperations$zh_CN.internal(_root);
@@ -102,15 +106,15 @@ class Translations$chat$zh_CN extends Translations$chat$en {
 	@override late final Translations$chat$plan$zh_CN plan = Translations$chat$plan$zh_CN.internal(_root);
 	@override late final Translations$chat$usageLimit$zh_CN usageLimit = Translations$chat$usageLimit$zh_CN.internal(_root);
 	@override late final Translations$chat$codex$zh_CN codex = Translations$chat$codex$zh_CN.internal(_root);
+	@override late final Translations$chat$voice$zh_CN voice = Translations$chat$voice$zh_CN.internal(_root);
 	@override late final Translations$chat$input$zh_CN input = Translations$chat$input$zh_CN.internal(_root);
+	@override late final Translations$chat$composer$zh_CN composer = Translations$chat$composer$zh_CN.internal(_root);
 	@override late final Translations$chat$providerSelection$zh_CN providerSelection = Translations$chat$providerSelection$zh_CN.internal(_root);
 	@override late final Translations$chat$session$zh_CN session = Translations$chat$session$zh_CN.internal(_root);
 	@override late final Translations$chat$shell$zh_CN shell = Translations$chat$shell$zh_CN.internal(_root);
 	@override late final Translations$chat$claudeStatus$zh_CN claudeStatus = Translations$chat$claudeStatus$zh_CN.internal(_root);
 	@override late final Translations$chat$projectSelection$zh_CN projectSelection = Translations$chat$projectSelection$zh_CN.internal(_root);
 	@override late final Translations$chat$tasks$zh_CN tasks = Translations$chat$tasks$zh_CN.internal(_root);
-	@override late final Translations$chat$voice$zh_CN voice = Translations$chat$voice$zh_CN.internal(_root);
-	@override late final Translations$chat$composer$zh_CN composer = Translations$chat$composer$zh_CN.internal(_root);
 	@override late final Translations$chat$splitSession$zh_CN splitSession = Translations$chat$splitSession$zh_CN.internal(_root);
 	@override late final Translations$chat$sessionPicker$zh_CN sessionPicker = Translations$chat$sessionPicker$zh_CN.internal(_root);
 	@override late final Translations$chat$splitWorkspace$zh_CN splitWorkspace = Translations$chat$splitWorkspace$zh_CN.internal(_root);
@@ -123,16 +127,24 @@ class Translations$chat$zh_CN extends Translations$chat$en {
 	@override late final Translations$chat$tokenUsage$zh_CN tokenUsage = Translations$chat$tokenUsage$zh_CN.internal(_root);
 	@override late final Translations$chat$tool$zh_CN tool = Translations$chat$tool$zh_CN.internal(_root);
 	@override late final Translations$chat$quotaBadge$zh_CN quotaBadge = Translations$chat$quotaBadge$zh_CN.internal(_root);
-	@override late final Translations$chat$paneHeader$zh_CN paneHeader = Translations$chat$paneHeader$zh_CN.internal(_root);
 	@override late final Translations$chat$broadcast$zh_CN broadcast = Translations$chat$broadcast$zh_CN.internal(_root);
-	@override late final Translations$chat$changes$zh_CN changes = Translations$chat$changes$zh_CN.internal(_root);
+	@override late final Translations$chat$paneHeader$zh_CN paneHeader = Translations$chat$paneHeader$zh_CN.internal(_root);
+	@override late final Translations$chat$export$zh_CN export = Translations$chat$export$zh_CN.internal(_root);
 	@override late final Translations$chat$commandResult$zh_CN commandResult = Translations$chat$commandResult$zh_CN.internal(_root);
 	@override late final Translations$chat$commands$zh_CN commands = Translations$chat$commands$zh_CN.internal(_root);
-	@override late final Translations$chat$export$zh_CN export = Translations$chat$export$zh_CN.internal(_root);
-	@override late final Translations$chat$message$zh_CN message = Translations$chat$message$zh_CN.internal(_root);
-	@override late final Translations$chat$modelLibrary$zh_CN modelLibrary = Translations$chat$modelLibrary$zh_CN.internal(_root);
 	@override late final Translations$chat$pinFile$zh_CN pinFile = Translations$chat$pinFile$zh_CN.internal(_root);
+	@override late final Translations$chat$modelLibrary$zh_CN modelLibrary = Translations$chat$modelLibrary$zh_CN.internal(_root);
+	@override late final Translations$chat$changes$zh_CN changes = Translations$chat$changes$zh_CN.internal(_root);
+	@override late final Translations$chat$message$zh_CN message = Translations$chat$message$zh_CN.internal(_root);
 	@override late final Translations$chat$permissionRequest$zh_CN permissionRequest = Translations$chat$permissionRequest$zh_CN.internal(_root);
+	@override late final Translations$chat$commandDialog$zh_CN commandDialog = Translations$chat$commandDialog$zh_CN.internal(_root);
+	@override late final Translations$chat$utilities$zh_CN utilities = Translations$chat$utilities$zh_CN.internal(_root);
+	@override late final Translations$chat$toolBlocks$zh_CN toolBlocks = Translations$chat$toolBlocks$zh_CN.internal(_root);
+	@override late final Translations$chat$commandMenu$zh_CN commandMenu = Translations$chat$commandMenu$zh_CN.internal(_root);
+	@override late final Translations$chat$mentionMenu$zh_CN mentionMenu = Translations$chat$mentionMenu$zh_CN.internal(_root);
+	@override late final Translations$chat$subheader$zh_CN subheader = Translations$chat$subheader$zh_CN.internal(_root);
+	@override late final Translations$chat$transcript$zh_CN transcript = Translations$chat$transcript$zh_CN.internal(_root);
+	@override late final Translations$chat$review$zh_CN review = Translations$chat$review$zh_CN.internal(_root);
 }
 
 // Path: codeEditor
@@ -149,14 +161,14 @@ class Translations$codeEditor$zh_CN extends Translations$codeEditor$en {
 	@override late final Translations$codeEditor$footer$zh_CN footer = Translations$codeEditor$footer$zh_CN.internal(_root);
 	@override late final Translations$codeEditor$binaryFile$zh_CN binaryFile = Translations$codeEditor$binaryFile$zh_CN.internal(_root);
 	@override late final Translations$codeEditor$filePreview$zh_CN filePreview = Translations$codeEditor$filePreview$zh_CN.internal(_root);
-	@override late final Translations$codeEditor$diff$zh_CN diff = Translations$codeEditor$diff$zh_CN.internal(_root);
+	@override String unsavedChanges({required Object name}) => '${name} 中有未保存的更改';
 	@override String get discardUnsavedChanges => '放弃未保存的更改？';
-	@override late final Translations$codeEditor$emptyState$zh_CN emptyState = Translations$codeEditor$emptyState$zh_CN.internal(_root);
+	@override late final Translations$codeEditor$mediaFile$zh_CN mediaFile = Translations$codeEditor$mediaFile$zh_CN.internal(_root);
 	@override String get failedToLoad => '加载文件失败';
 	@override late final Translations$codeEditor$hexDump$zh_CN hexDump = Translations$codeEditor$hexDump$zh_CN.internal(_root);
-	@override late final Translations$codeEditor$mediaFile$zh_CN mediaFile = Translations$codeEditor$mediaFile$zh_CN.internal(_root);
 	@override late final Translations$codeEditor$settings$zh_CN settings = Translations$codeEditor$settings$zh_CN.internal(_root);
-	@override String unsavedChanges({required Object name}) => '${name} 中有未保存的更改';
+	@override late final Translations$codeEditor$diff$zh_CN diff = Translations$codeEditor$diff$zh_CN.internal(_root);
+	@override late final Translations$codeEditor$emptyState$zh_CN emptyState = Translations$codeEditor$emptyState$zh_CN.internal(_root);
 	@override late final Translations$codeEditor$toasts$zh_CN toasts = Translations$codeEditor$toasts$zh_CN.internal(_root);
 }
 
@@ -169,6 +181,7 @@ class Translations$common$zh_CN extends Translations$common$en {
 	// Translations
 	@override late final Translations$common$buttons$zh_CN buttons = Translations$common$buttons$zh_CN.internal(_root);
 	@override late final Translations$common$tabs$zh_CN tabs = Translations$common$tabs$zh_CN.internal(_root);
+	@override late final Translations$common$quota$zh_CN quota = Translations$common$quota$zh_CN.internal(_root);
 	@override late final Translations$common$status$zh_CN status = Translations$common$status$zh_CN.internal(_root);
 	@override late final Translations$common$messages$zh_CN messages = Translations$common$messages$zh_CN.internal(_root);
 	@override late final Translations$common$navigation$zh_CN navigation = Translations$common$navigation$zh_CN.internal(_root);
@@ -180,7 +193,6 @@ class Translations$common$zh_CN extends Translations$common$en {
 	@override late final Translations$common$projectWizard$zh_CN projectWizard = Translations$common$projectWizard$zh_CN.internal(_root);
 	@override late final Translations$common$notifications$zh_CN notifications = Translations$common$notifications$zh_CN.internal(_root);
 	@override late final Translations$common$versionUpdate$zh_CN versionUpdate = Translations$common$versionUpdate$zh_CN.internal(_root);
-	@override late final Translations$common$quota$zh_CN quota = Translations$common$quota$zh_CN.internal(_root);
 	@override late final Translations$common$actions$zh_CN actions = Translations$common$actions$zh_CN.internal(_root);
 	@override late final Translations$common$browserPane$zh_CN browserPane = Translations$common$browserPane$zh_CN.internal(_root);
 	@override late final Translations$common$browserUse$zh_CN browserUse = Translations$common$browserUse$zh_CN.internal(_root);
@@ -188,8 +200,11 @@ class Translations$common$zh_CN extends Translations$common$en {
 	@override late final Translations$common$gitPanel$zh_CN gitPanel = Translations$common$gitPanel$zh_CN.internal(_root);
 	@override late final Translations$common$sessions$zh_CN sessions = Translations$common$sessions$zh_CN.internal(_root);
 	@override late final Translations$common$projects$zh_CN projects = Translations$common$projects$zh_CN.internal(_root);
+	@override late final Translations$common$sharedNotes$zh_CN sharedNotes = Translations$common$sharedNotes$zh_CN.internal(_root);
 	@override late final Translations$common$codeBlock$zh_CN codeBlock = Translations$common$codeBlock$zh_CN.internal(_root);
 	@override late final Translations$common$update$zh_CN update = Translations$common$update$zh_CN.internal(_root);
+	@override late final Translations$common$appShell$zh_CN appShell = Translations$common$appShell$zh_CN.internal(_root);
+	@override late final Translations$common$errors$zh_CN errors = Translations$common$errors$zh_CN.internal(_root);
 }
 
 // Path: settings
@@ -211,6 +226,7 @@ class Translations$settings$zh_CN extends Translations$settings$en {
 	@override late final Translations$settings$quickSettings$zh_CN quickSettings = Translations$settings$quickSettings$zh_CN.internal(_root);
 	@override late final Translations$settings$terminalShortcuts$zh_CN terminalShortcuts = Translations$settings$terminalShortcuts$zh_CN.internal(_root);
 	@override late final Translations$settings$mainTabs$zh_CN mainTabs = Translations$settings$mainTabs$zh_CN.internal(_root);
+	@override late final Translations$settings$miniOrchestration$zh_CN miniOrchestration = Translations$settings$miniOrchestration$zh_CN.internal(_root);
 	@override late final Translations$settings$orchestration$zh_CN orchestration = Translations$settings$orchestration$zh_CN.internal(_root);
 	@override late final Translations$settings$notifications$zh_CN notifications = Translations$settings$notifications$zh_CN.internal(_root);
 	@override late final Translations$settings$appearanceSettings$zh_CN appearanceSettings = Translations$settings$appearanceSettings$zh_CN.internal(_root);
@@ -226,7 +242,11 @@ class Translations$settings$zh_CN extends Translations$settings$en {
 	@override late final Translations$settings$quota$zh_CN quota = Translations$settings$quota$zh_CN.internal(_root);
 	@override late final Translations$settings$browser$zh_CN browser = Translations$settings$browser$zh_CN.internal(_root);
 	@override late final Translations$settings$workspaces$zh_CN workspaces = Translations$settings$workspaces$zh_CN.internal(_root);
+	@override late final Translations$settings$stt$zh_CN stt = Translations$settings$stt$zh_CN.internal(_root);
+	@override late final Translations$settings$schedules$zh_CN schedules = Translations$settings$schedules$zh_CN.internal(_root);
+	@override late final Translations$settings$mcpTokens$zh_CN mcpTokens = Translations$settings$mcpTokens$zh_CN.internal(_root);
 	@override late final Translations$settings$about$zh_CN about = Translations$settings$about$zh_CN.internal(_root);
+	@override late final Translations$settings$shortcuts$zh_CN shortcuts = Translations$settings$shortcuts$zh_CN.internal(_root);
 }
 
 // Path: sidebar
@@ -238,21 +258,21 @@ class Translations$sidebar$zh_CN extends Translations$sidebar$en {
 	// Translations
 	@override late final Translations$sidebar$projects$zh_CN projects = Translations$sidebar$projects$zh_CN.internal(_root);
 	@override late final Translations$sidebar$app$zh_CN app = Translations$sidebar$app$zh_CN.internal(_root);
+	@override late final Translations$sidebar$panel$zh_CN panel = Translations$sidebar$panel$zh_CN.internal(_root);
 	@override late final Translations$sidebar$sessions$zh_CN sessions = Translations$sidebar$sessions$zh_CN.internal(_root);
 	@override late final Translations$sidebar$tooltips$zh_CN tooltips = Translations$sidebar$tooltips$zh_CN.internal(_root);
 	@override late final Translations$sidebar$navigation$zh_CN navigation = Translations$sidebar$navigation$zh_CN.internal(_root);
 	@override late final Translations$sidebar$actions$zh_CN actions = Translations$sidebar$actions$zh_CN.internal(_root);
+	@override late final Translations$sidebar$workspace$zh_CN workspace = Translations$sidebar$workspace$zh_CN.internal(_root);
 	@override late final Translations$sidebar$branding$zh_CN branding = Translations$sidebar$branding$zh_CN.internal(_root);
 	@override late final Translations$sidebar$status$zh_CN status = Translations$sidebar$status$zh_CN.internal(_root);
 	@override late final Translations$sidebar$time$zh_CN time = Translations$sidebar$time$zh_CN.internal(_root);
 	@override late final Translations$sidebar$messages$zh_CN messages = Translations$sidebar$messages$zh_CN.internal(_root);
 	@override late final Translations$sidebar$version$zh_CN version = Translations$sidebar$version$zh_CN.internal(_root);
 	@override late final Translations$sidebar$search$zh_CN search = Translations$sidebar$search$zh_CN.internal(_root);
+	@override late final Translations$sidebar$recent$zh_CN recent = Translations$sidebar$recent$zh_CN.internal(_root);
 	@override late final Translations$sidebar$deleteConfirmation$zh_CN deleteConfirmation = Translations$sidebar$deleteConfirmation$zh_CN.internal(_root);
 	@override late final Translations$sidebar$zones$zh_CN zones = Translations$sidebar$zones$zh_CN.internal(_root);
-	@override late final Translations$sidebar$panel$zh_CN panel = Translations$sidebar$panel$zh_CN.internal(_root);
-	@override late final Translations$sidebar$workspace$zh_CN workspace = Translations$sidebar$workspace$zh_CN.internal(_root);
-	@override late final Translations$sidebar$recent$zh_CN recent = Translations$sidebar$recent$zh_CN.internal(_root);
 	@override late final Translations$sidebar$tabs$zh_CN tabs = Translations$sidebar$tabs$zh_CN.internal(_root);
 }
 
@@ -284,6 +304,7 @@ class Translations$tasks$zh_CN extends Translations$tasks$en {
 	@override late final Translations$tasks$nextTask$zh_CN nextTask = Translations$tasks$nextTask$zh_CN.internal(_root);
 	@override late final Translations$tasks$taskDetail$zh_CN taskDetail = Translations$tasks$taskDetail$zh_CN.internal(_root);
 	@override late final Translations$tasks$toasts$zh_CN toasts = Translations$tasks$toasts$zh_CN.internal(_root);
+	@override late final Translations$tasks$taskmaster$zh_CN taskmaster = Translations$tasks$taskmaster$zh_CN.internal(_root);
 }
 
 // Path: knowledge
@@ -306,201 +327,15 @@ class Translations$knowledge$zh_CN extends Translations$knowledge$en {
 	@override late final Translations$knowledge$search$zh_CN search = Translations$knowledge$search$zh_CN.internal(_root);
 	@override late final Translations$knowledge$links$zh_CN links = Translations$knowledge$links$zh_CN.internal(_root);
 	@override late final Translations$knowledge$tags$zh_CN tags = Translations$knowledge$tags$zh_CN.internal(_root);
-	@override late final Translations$knowledge$contextBudget$zh_CN contextBudget = Translations$knowledge$contextBudget$zh_CN.internal(_root);
-	@override late final Translations$knowledge$critical$zh_CN critical = Translations$knowledge$critical$zh_CN.internal(_root);
-	@override late final Translations$knowledge$errors$zh_CN errors = Translations$knowledge$errors$zh_CN.internal(_root);
 	@override late final Translations$knowledge$graph$zh_CN graph = Translations$knowledge$graph$zh_CN.internal(_root);
 	@override late final Translations$knowledge$importAll$zh_CN importAll = Translations$knowledge$importAll$zh_CN.internal(_root);
-	@override late final Translations$knowledge$importSkills$zh_CN importSkills = Translations$knowledge$importSkills$zh_CN.internal(_root);
-	@override late final Translations$knowledge$linkOptions$zh_CN linkOptions = Translations$knowledge$linkOptions$zh_CN.internal(_root);
 	@override late final Translations$knowledge$migrate$zh_CN migrate = Translations$knowledge$migrate$zh_CN.internal(_root);
-}
-
-// Path: skills
-class Translations$skills$zh_CN extends Translations$skills$en {
-	Translations$skills$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override late final Translations$skills$addDialog$zh_CN addDialog = Translations$skills$addDialog$zh_CN.internal(_root);
-	@override String deleteSkill({required Object name}) => '删除 ${name}';
-	@override late final Translations$skills$empty$zh_CN empty = Translations$skills$empty$zh_CN.internal(_root);
-	@override late final Translations$skills$errors$zh_CN errors = Translations$skills$errors$zh_CN.internal(_root);
-	@override late final Translations$skills$moveDialog$zh_CN moveDialog = Translations$skills$moveDialog$zh_CN.internal(_root);
-	@override String moveSkill({required Object name}) => '移动 ${name}';
-	@override String get projectLabel => '项目';
-	@override late final Translations$skills$scopes$zh_CN scopes = Translations$skills$scopes$zh_CN.internal(_root);
-	@override late final Translations$skills$screen$zh_CN screen = Translations$skills$screen$zh_CN.internal(_root);
-}
-
-// Path: mcp
-class Translations$mcp$zh_CN extends Translations$mcp$en {
-	Translations$mcp$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override late final Translations$mcp$form$zh_CN form = Translations$mcp$form$zh_CN.internal(_root);
-	@override late final Translations$mcp$install$zh_CN install = Translations$mcp$install$zh_CN.internal(_root);
-	@override late final Translations$mcp$servers$zh_CN servers = Translations$mcp$servers$zh_CN.internal(_root);
-	@override late final Translations$mcp$team$zh_CN team = Translations$mcp$team$zh_CN.internal(_root);
-	@override late final Translations$mcp$tokens$zh_CN tokens = Translations$mcp$tokens$zh_CN.internal(_root);
-}
-
-// Path: terminal
-class Translations$terminal$zh_CN extends Translations$terminal$en {
-	Translations$terminal$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override late final Translations$terminal$actions$zh_CN actions = Translations$terminal$actions$zh_CN.internal(_root);
-	@override late final Translations$terminal$authUrl$zh_CN authUrl = Translations$terminal$authUrl$zh_CN.internal(_root);
-	@override late final Translations$terminal$errors$zh_CN errors = Translations$terminal$errors$zh_CN.internal(_root);
-	@override late final Translations$terminal$fileLink$zh_CN fileLink = Translations$terminal$fileLink$zh_CN.internal(_root);
-	@override late final Translations$terminal$paste$zh_CN paste = Translations$terminal$paste$zh_CN.internal(_root);
-	@override late final Translations$terminal$shortcuts$zh_CN shortcuts = Translations$terminal$shortcuts$zh_CN.internal(_root);
-	@override late final Translations$terminal$tabs$zh_CN tabs = Translations$terminal$tabs$zh_CN.internal(_root);
-}
-
-// Path: worktrees
-class Translations$worktrees$zh_CN extends Translations$worktrees$en {
-	Translations$worktrees$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get branchHint => '新分支名称（例如 feature/login）';
-	@override String branchingOff({required Object branch}) => '从 ${branch} 创建分支';
-	@override String get cleanupDescription => '合并后移除 worktree 并删除分支';
-	@override String get created => 'Worktree 已创建';
-	@override String get deleteBranchLabel => '同时删除分支';
-	@override String dirtyWarning({required Object count}) => '警告：此 worktree 有 ${count} 个未提交的更改将会丢失。';
-	@override String get emptyDescription => '创建 worktree 以隔离功能开发或代理运行。';
-	@override String get emptyTitle => '未找到 worktree';
-	@override String get forceRemoveLabel => '强制移除（放弃更改）';
-	@override String headDetachedAt({required Object sha}) => 'HEAD 分离于 ${sha}';
-	@override String get mainBadge => 'main';
-	@override String mergeDescription({required Object branch}) => '将更改合并到 ${branch}。';
-	@override String mergeTitle({required Object branch}) => '合并 ${branch}';
-	@override String merged({required Object branch}) => 'Worktree 已合并到 ${branch}';
-	@override String opened({required Object branch}) => '已打开 worktree：${branch}';
-	@override String get portHint => '运行端口（可选，例如 3000）';
-	@override String get removeDescription => '这将删除 worktree 文件夹。关联的项目将被归档。';
-	@override String removeTitle({required Object branch}) => '移除 worktree ${branch}？';
-	@override String get removed => 'Worktree 已移除';
-	@override String get runButton => '运行';
-	@override String get runHint => '运行命令（例如 npm run dev）';
-	@override String get runRunning => '运行中';
-	@override String runRunningWithPort({required Object port}) => '运行中 :${port}';
-	@override String get scripts => '脚本';
-	@override String get scriptsSaved => '脚本配置已保存';
-	@override String get serverLabel => '服务器： ';
-	@override String get setupHint => '初始化命令（例如 npm install）';
-	@override String get setupLabel => '初始化： ';
-	@override String get squashDescription => '将所有提交合并为单个提交';
-	@override String get stopButton => '停止';
-}
-
-// Path: quota
-class Translations$quota$zh_CN extends Translations$quota$en {
-	Translations$quota$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override late final Translations$quota$agents$zh_CN agents = Translations$quota$agents$zh_CN.internal(_root);
-	@override late final Translations$quota$chart$zh_CN chart = Translations$quota$chart$zh_CN.internal(_root);
-	@override late final Translations$quota$config$zh_CN config = Translations$quota$config$zh_CN.internal(_root);
-	@override late final Translations$quota$overview$zh_CN overview = Translations$quota$overview$zh_CN.internal(_root);
-	@override late final Translations$quota$section$zh_CN section = Translations$quota$section$zh_CN.internal(_root);
-}
-
-// Path: scheduler
-class Translations$scheduler$zh_CN extends Translations$scheduler$en {
-	Translations$scheduler$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get checking => '检查中…';
-	@override String get cronHint => 'Cron（分 时 日 月 周）— 例如 0 9 * * *';
-	@override String deleteMessage({required Object id}) => '这将移除重复任务 ${id}。现有会话会保留。';
-	@override String get deleteTitle => '删除定时任务？';
-	@override String get editTitle => '编辑定时任务';
-	@override String get newLabel => '新建';
-	@override String nextIn({required Object time}) => '${time} 后';
-	@override String get promptHint => '给代理的提示词';
-	@override String get runs => '运行次数';
-	@override String session({required Object id}) => '会话 ${id}';
-	@override String get worktree => 'worktree';
-}
-
-// Path: notifications
-class Translations$notifications$zh_CN extends Translations$notifications$en {
-	Translations$notifications$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get deviceLabel => 'DDAgent Flutter';
-	@override late final Translations$notifications$errors$zh_CN errors = Translations$notifications$errors$zh_CN.internal(_root);
-}
-
-// Path: serverConnect
-class Translations$serverConnect$zh_CN extends Translations$serverConnect$en {
-	Translations$serverConnect$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get connect => '连接';
-	@override String get connecting => '正在连接…';
-	@override String get changeServer => '更换服务器';
-	@override String connectionFailed({required Object error}) => '连接失败（${error}）';
-	@override String get enterUrl => '输入服务器 URL';
-	@override late final Translations$serverConnect$local$zh_CN local = Translations$serverConnect$local$zh_CN.internal(_root);
-	@override String get subtitle => '连接到你的 DDAgent 服务器';
-}
-
-// Path: voice
-class Translations$voice$zh_CN extends Translations$voice$en {
-	Translations$voice$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get apiKeySaved => 'API 密钥（已保存，输入以替换）';
-	@override String get preview => '预览';
-	@override String get saveFailed => '保存 STT 配置失败';
-	@override String get settingsSaved => '语音输入设置已保存';
-}
-
-// Path: sharedContext
-class Translations$sharedContext$zh_CN extends Translations$sharedContext$en {
-	Translations$sharedContext$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => '共享笔记';
-}
-
-// Path: collab
-class Translations$collab$zh_CN extends Translations$collab$en {
-	Translations$collab$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get copyToken => '复制令牌';
-	@override String get createInvite => '创建邀请';
-	@override String get invite => '邀请';
-	@override String get inviteTeammate => '邀请队友';
-	@override late final Translations$collab$roles$zh_CN roles = Translations$collab$roles$zh_CN.internal(_root);
-	@override String get shareTokenHint => '分享此邀请令牌 — 它仅显示一次，并在 72 小时后过期：';
-	@override String get team => '团队';
+	@override late final Translations$knowledge$importSkills$zh_CN importSkills = Translations$knowledge$importSkills$zh_CN.internal(_root);
+	@override late final Translations$knowledge$critical$zh_CN critical = Translations$knowledge$critical$zh_CN.internal(_root);
+	@override late final Translations$knowledge$contextBudget$zh_CN contextBudget = Translations$knowledge$contextBudget$zh_CN.internal(_root);
+	@override late final Translations$knowledge$linkOptions$zh_CN linkOptions = Translations$knowledge$linkOptions$zh_CN.internal(_root);
+	@override late final Translations$knowledge$errors$zh_CN errors = Translations$knowledge$errors$zh_CN.internal(_root);
+	@override late final Translations$knowledge$entityTypes$zh_CN entityTypes = Translations$knowledge$entityTypes$zh_CN.internal(_root);
 }
 
 // Path: browser
@@ -515,66 +350,54 @@ class Translations$browser$zh_CN extends Translations$browser$en {
 	@override String get web => 'Web';
 }
 
-// Path: projects
-class Translations$projects$zh_CN extends Translations$projects$en {
-	Translations$projects$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+// Path: collab
+class Translations$collab$zh_CN extends Translations$collab$en {
+	Translations$collab$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get archive => '归档';
-	@override String archivedSection({required Object count}) => '已归档（${count}）';
-	@override String get clone => '克隆';
-	@override String get cloneFailed => '克隆失败';
-	@override String get cloneFinished => '克隆完成。正在刷新项目列表…';
-	@override String get cloneRepository => '克隆仓库';
-	@override String get deletePermanently => '永久删除';
-	@override String deleteProjectMessage({required Object name}) => '永久移除“${name}”，包括所有会话和已存储的历史记录（清空 JSONL）。此操作无法撤销。';
-	@override String get deleteProjectTitle => '删除项目？';
-	@override String get destinationPath => '目标路径';
-	@override String get destinationPathRequired => '目标路径为必填项';
-	@override String get displayNameOptional => '显示名称（可选）';
-	@override String get failedToLoadTokens => '加载 GitHub 令牌失败';
-	@override String get githubTokenOptional => 'GitHub 令牌（可选）';
-	@override String get newer => '较新';
-	@override String get older => '较早';
-	@override String get projectArchived => '项目已归档';
-	@override String get projectDeleted => '项目已删除';
-	@override String get projectRenamed => '项目已重命名';
-	@override String get projectRestored => '项目已恢复';
-	@override String get repoUrlPlaceholder => 'https://github.com/org/repo.git';
-	@override String get repositoryCloned => '仓库已克隆';
-	@override String get repositoryUrlRequired => '仓库 URL 为必填项';
-	@override String get restore => '恢复';
-	@override String sessionCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
-		one: '${count} 个会话',
-		other: '${count} 个会话',
-	);
-	@override String get unknown => '未知';
-	@override String usingStoredToken({required Object name}) => '使用已保存的令牌：${name}';
+	@override String get team => '团队';
+	@override String get invite => '邀请';
+	@override String get inviteTeammate => '邀请队友';
+	@override String get shareTokenHint => '分享此邀请令牌 — 它仅显示一次，并在 72 小时后过期：';
+	@override String get createInvite => '创建邀请';
+	@override String get copyToken => '复制令牌';
+	@override late final Translations$collab$roles$zh_CN roles = Translations$collab$roles$zh_CN.internal(_root);
+	@override late final Translations$collab$viewing$zh_CN viewing = Translations$collab$viewing$zh_CN.internal(_root);
 }
 
-// Path: sessions
-class Translations$sessions$zh_CN extends Translations$sessions$en {
-	Translations$sessions$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+// Path: fileTree
+class Translations$fileTree$zh_CN extends Translations$fileTree$en {
+	Translations$fileTree$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override late final Translations$sessions$activity$zh_CN activity = Translations$sessions$activity$zh_CN.internal(_root);
-	@override late final Translations$sessions$age$zh_CN age = Translations$sessions$age$zh_CN.internal(_root);
-	@override String get archive => '归档';
-	@override String get archivedSessions => '已归档的会话';
-	@override String get autoOrchestrator => '自动（编排器）';
-	@override String get compareWith => '与之比较…';
-	@override String createFailed({required Object error}) => '创建会话失败：${error}';
-	@override String deleteSessionMessage({required Object name}) => '移除“${name}”及其记录。此操作无法撤销。';
-	@override String get newSessionProvider => '新会话 — 提供商';
-	@override String get noRecentSessions => '没有最近的会话';
-	@override String get noSessions => '没有会话';
-	@override String get projectPath => '项目路径';
-	@override String get rename => '重命名';
-	@override late final Translations$sessions$toasts$zh_CN toasts = Translations$sessions$toasts$zh_CN.internal(_root);
+	@override String get uploadTo => '上传到';
+	@override String get uploadHere => '上传到此处';
+	@override String get browseServerFilesystem => '浏览服务器文件系统';
+	@override String get noFiles => '没有文件';
+	@override String get copyContents => '复制内容';
+	@override String get chooseFolder => '选择文件夹';
+	@override late final Translations$fileTree$search$zh_CN search = Translations$fileTree$search$zh_CN.internal(_root);
+	@override late final Translations$fileTree$titles$zh_CN titles = Translations$fileTree$titles$zh_CN.internal(_root);
+	@override String uploadedCount({required Object count}) => '已上传 ${count} 个文件';
+	@override String get newName => '新名称';
+	@override String notRegisteredProject({required Object path}) => '不是已注册的项目：${path}';
+	@override String get showGitignoredFiles => '显示被 gitignore 忽略的文件';
+	@override String get hideGitignoredFiles => '隐藏被 gitignore 忽略的文件';
+	@override String get downloadUnsupportedOnWeb => '网页端不支持下载';
+	@override String get saveToPath => '保存到路径';
+	@override String savedTo({required Object path}) => '已保存到 ${path}';
+	@override late final Translations$fileTree$relative$zh_CN relative = Translations$fileTree$relative$zh_CN.internal(_root);
+	@override String get projectRoot => '（项目根目录）';
+	@override String uploadLimitCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
+		other: '一次最多可上传 ${count} 个文件。',
+	);
+	@override String fileTooLarge({required Object name}) => '${name} 超过 200MB。';
+	@override String deleteFolderConfirm({required Object path}) => '删除文件夹“${path}”？此操作无法撤销。';
+	@override String deleteFileConfirm({required Object path}) => '删除文件“${path}”？此操作无法撤销。';
 }
 
 // Path: git
@@ -584,25 +407,26 @@ class Translations$git$zh_CN extends Translations$git$en {
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get aiButton => '✦ AI';
 	@override late final Translations$git$checkpoints$zh_CN checkpoints = Translations$git$checkpoints$zh_CN.internal(_root);
-	@override String get commitCreated => '提交已创建';
-	@override String get commitMessage => '提交消息';
-	@override String get deleteFile => '删除文件';
-	@override String get hunkStage => '+ 区块';
-	@override String get hunkUnstage => '− 区块';
-	@override String get largeDiff => '大型差异预览：为保证标签页响应流畅，渲染已受限。';
-	@override String loadDiffFailed({required Object error}) => '加载差异失败：${error}';
-	@override String get noBranch => '无分支';
-	@override String get noDiff => '没有可用的差异';
-	@override String get selectProject => '选择项目';
-	@override String get splitDiff => '并排差异';
-	@override String get stageHunk => '暂存区块';
 	@override String get stagedChanges => '已暂存的更改';
 	@override String get statusStaged => '已暂存';
 	@override String get switchBranch => '切换分支';
 	@override String get unifiedDiff => '统一差异';
+	@override String get splitDiff => '并排差异';
+	@override String get noDiff => '没有可用的差异';
+	@override String get largeDiff => '大型差异预览：为保证标签页响应流畅，渲染已受限。';
+	@override String loadDiffFailed({required Object error}) => '加载差异失败：${error}';
+	@override String get hunkStage => '+ 区块';
+	@override String get hunkUnstage => '− 区块';
+	@override String get stageHunk => '暂存区块';
 	@override String get unstageHunk => '取消暂存区块';
+	@override String get deleteFile => '删除文件';
+	@override String get commitMessage => '提交消息';
+	@override String get aiButton => '✦ AI';
+	@override String get commitCreated => '提交已创建';
+	@override String get noBranch => '无分支';
+	@override String get selectProject => '选择项目';
+	@override late final Translations$git$branchSections$zh_CN branchSections = Translations$git$branchSections$zh_CN.internal(_root);
 }
 
 // Path: kanban
@@ -614,11 +438,37 @@ class Translations$kanban$zh_CN extends Translations$kanban$en {
 	// Translations
 	@override late final Translations$kanban$card$zh_CN card = Translations$kanban$card$zh_CN.internal(_root);
 	@override late final Translations$kanban$comments$zh_CN comments = Translations$kanban$comments$zh_CN.internal(_root);
-	@override late final Translations$kanban$details$zh_CN details = Translations$kanban$details$zh_CN.internal(_root);
 	@override late final Translations$kanban$dialog$zh_CN dialog = Translations$kanban$dialog$zh_CN.internal(_root);
+	@override late final Translations$kanban$details$zh_CN details = Translations$kanban$details$zh_CN.internal(_root);
 	@override late final Translations$kanban$empty$zh_CN empty = Translations$kanban$empty$zh_CN.internal(_root);
 	@override String get saveFailed => '保存卡片失败';
 	@override late final Translations$kanban$time$zh_CN time = Translations$kanban$time$zh_CN.internal(_root);
+}
+
+// Path: mcp
+class Translations$mcp$zh_CN extends Translations$mcp$en {
+	Translations$mcp$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$mcp$install$zh_CN install = Translations$mcp$install$zh_CN.internal(_root);
+	@override late final Translations$mcp$servers$zh_CN servers = Translations$mcp$servers$zh_CN.internal(_root);
+	@override late final Translations$mcp$team$zh_CN team = Translations$mcp$team$zh_CN.internal(_root);
+	@override late final Translations$mcp$tokens$zh_CN tokens = Translations$mcp$tokens$zh_CN.internal(_root);
+	@override late final Translations$mcp$form$zh_CN form = Translations$mcp$form$zh_CN.internal(_root);
+}
+
+// Path: notifications
+class Translations$notifications$zh_CN extends Translations$notifications$en {
+	Translations$notifications$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get deviceLabel => 'DDAgent Flutter';
+	@override late final Translations$notifications$errors$zh_CN errors = Translations$notifications$errors$zh_CN.internal(_root);
+	@override late final Translations$notifications$androidChannel$zh_CN androidChannel = Translations$notifications$androidChannel$zh_CN.internal(_root);
 }
 
 // Path: onboarding
@@ -628,36 +478,191 @@ class Translations$onboarding$zh_CN extends Translations$onboarding$en {
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override late final Translations$onboarding$agents$zh_CN agents = Translations$onboarding$agents$zh_CN.internal(_root);
+	@override String get gitHint => '用于 DDAgent 会话创建的提交。';
 	@override String get completeSetup => '完成设置';
 	@override late final Translations$onboarding$errors$zh_CN errors = Translations$onboarding$errors$zh_CN.internal(_root);
-	@override String get gitHint => '用于 DDAgent 会话创建的提交。';
+	@override late final Translations$onboarding$agents$zh_CN agents = Translations$onboarding$agents$zh_CN.internal(_root);
 	@override late final Translations$onboarding$mcp$zh_CN mcp = Translations$onboarding$mcp$zh_CN.internal(_root);
 }
 
-// Path: fileTree
-class Translations$fileTree$zh_CN extends Translations$fileTree$en {
-	Translations$fileTree$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+// Path: projects
+class Translations$projects$zh_CN extends Translations$projects$en {
+	Translations$projects$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get browseServerFilesystem => '浏览服务器文件系统';
-	@override String get chooseFolder => '选择文件夹';
-	@override String get copyContents => '复制内容';
-	@override String get noFiles => '没有文件';
-	@override late final Translations$fileTree$search$zh_CN search = Translations$fileTree$search$zh_CN.internal(_root);
-	@override late final Translations$fileTree$titles$zh_CN titles = Translations$fileTree$titles$zh_CN.internal(_root);
-	@override String get uploadHere => '上传到此处';
-	@override String get uploadTo => '上传到';
-	@override String uploadedCount({required Object count}) => '已上传 ${count} 个文件';
-	@override String get newName => '新名称';
-	@override String notRegisteredProject({required Object path}) => '不是已注册的项目：${path}';
-	@override String get showGitignoredFiles => '显示被 gitignore 忽略的文件';
-	@override String get hideGitignoredFiles => '隐藏被 gitignore 忽略的文件';
-	@override String get downloadUnsupportedOnWeb => '网页端不支持下载';
-	@override String get saveToPath => '保存到路径';
-	@override String savedTo({required Object path}) => '已保存到 ${path}';
+	@override String get cloneRepository => '克隆仓库';
+	@override String get repositoryCloned => '仓库已克隆';
+	@override String get clone => '克隆';
+	@override String get cloneFinished => '克隆完成。正在刷新项目列表…';
+	@override String get cloneFailed => '克隆失败';
+	@override String get repoUrlPlaceholder => 'https://github.com/org/repo.git';
+	@override String get destinationPath => '目标路径';
+	@override String get destinationPathRequired => '目标路径为必填项';
+	@override String get repositoryUrlRequired => '仓库 URL 为必填项';
+	@override String get githubTokenOptional => 'GitHub 令牌（可选）';
+	@override String get archive => '归档';
+	@override String get restore => '恢复';
+	@override String get deletePermanently => '永久删除';
+	@override String get deleteProjectTitle => '删除项目？';
+	@override String deleteProjectMessage({required Object name}) => '永久移除“${name}”，包括所有会话和已存储的历史记录（清空 JSONL）。此操作无法撤销。';
+	@override String archivedSection({required Object count}) => '已归档（${count}）';
+	@override String sessionCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
+		one: '${count} 个会话',
+		other: '${count} 个会话',
+	);
+	@override String get newer => '较新';
+	@override String get older => '较早';
+	@override String get projectArchived => '项目已归档';
+	@override String get projectRestored => '项目已恢复';
+	@override String get projectRenamed => '项目已重命名';
+	@override String get projectDeleted => '项目已删除';
+	@override String get failedToLoadTokens => '加载 GitHub 令牌失败';
+	@override String get displayNameOptional => '显示名称（可选）';
+	@override String usingStoredToken({required Object name}) => '使用已保存的令牌：${name}';
+	@override String get unknown => '未知';
+	@override String get project => '项目';
+}
+
+// Path: quota
+class Translations$quota$zh_CN extends Translations$quota$en {
+	Translations$quota$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$quota$section$zh_CN section = Translations$quota$section$zh_CN.internal(_root);
+	@override late final Translations$quota$overview$zh_CN overview = Translations$quota$overview$zh_CN.internal(_root);
+	@override late final Translations$quota$agents$zh_CN agents = Translations$quota$agents$zh_CN.internal(_root);
+	@override late final Translations$quota$config$zh_CN config = Translations$quota$config$zh_CN.internal(_root);
+	@override late final Translations$quota$chart$zh_CN chart = Translations$quota$chart$zh_CN.internal(_root);
+	@override late final Translations$quota$duration$zh_CN duration = Translations$quota$duration$zh_CN.internal(_root);
+}
+
+// Path: scheduler
+class Translations$scheduler$zh_CN extends Translations$scheduler$en {
+	Translations$scheduler$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get newLabel => '新建';
+	@override String get runs => '运行次数';
+	@override String get editTitle => '编辑定时任务';
+	@override String get deleteTitle => '删除定时任务？';
+	@override String deleteMessage({required Object id}) => '这将移除重复任务 ${id}。现有会话会保留。';
+	@override String get checking => '检查中…';
+	@override String nextIn({required Object time}) => '${time} 后';
+	@override String get worktree => 'worktree';
+	@override String session({required Object id}) => '会话 ${id}';
+	@override String get cronHint => 'Cron（分 时 日 月 周）— 例如 0 9 * * *';
+	@override String get promptHint => '给代理的提示词';
+	@override late final Translations$scheduler$runStatus$zh_CN runStatus = Translations$scheduler$runStatus$zh_CN.internal(_root);
+	@override late final Translations$scheduler$cronErrors$zh_CN cronErrors = Translations$scheduler$cronErrors$zh_CN.internal(_root);
+}
+
+// Path: serverConnect
+class Translations$serverConnect$zh_CN extends Translations$serverConnect$en {
+	Translations$serverConnect$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get subtitle => '连接到你的 DDAgent 服务器';
+	@override String get enterUrl => '输入服务器 URL';
+	@override String connectionFailed({required Object error}) => '连接失败（${error}）';
+	@override String get connect => '连接';
+	@override String get connecting => '正在连接…';
+	@override String get changeServer => '更换服务器';
+	@override late final Translations$serverConnect$local$zh_CN local = Translations$serverConnect$local$zh_CN.internal(_root);
+	@override String httpStatus({required Object code}) => 'HTTP ${code}';
+	@override String get networkError => '网络错误';
+}
+
+// Path: sessions
+class Translations$sessions$zh_CN extends Translations$sessions$en {
+	Translations$sessions$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get noSessions => '没有会话';
+	@override String get noRecentSessions => '没有最近的会话';
+	@override String get archivedSessions => '已归档的会话';
+	@override String get rename => '重命名';
+	@override String get archive => '归档';
+	@override String get compareWith => '与之比较…';
+	@override String get projectPath => '项目路径';
+	@override String get newSessionProvider => '新会话 — 提供商';
+	@override String get autoOrchestrator => '自动（编排器）';
+	@override String createFailed({required Object error}) => '创建会话失败：${error}';
+	@override String deleteSessionMessage({required Object name}) => '移除“${name}”及其记录。此操作无法撤销。';
+	@override late final Translations$sessions$toasts$zh_CN toasts = Translations$sessions$toasts$zh_CN.internal(_root);
+	@override late final Translations$sessions$age$zh_CN age = Translations$sessions$age$zh_CN.internal(_root);
+	@override late final Translations$sessions$activity$zh_CN activity = Translations$sessions$activity$zh_CN.internal(_root);
+	@override String get autoMini => '自动（迷你）';
+}
+
+// Path: sharedContext
+class Translations$sharedContext$zh_CN extends Translations$sharedContext$en {
+	Translations$sharedContext$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '共享笔记';
+}
+
+// Path: skills
+class Translations$skills$zh_CN extends Translations$skills$en {
+	Translations$skills$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String moveSkill({required Object name}) => '移动 ${name}';
+	@override String deleteSkill({required Object name}) => '删除 ${name}';
+	@override String get projectLabel => '项目';
+	@override late final Translations$skills$addDialog$zh_CN addDialog = Translations$skills$addDialog$zh_CN.internal(_root);
+	@override late final Translations$skills$moveDialog$zh_CN moveDialog = Translations$skills$moveDialog$zh_CN.internal(_root);
+	@override late final Translations$skills$screen$zh_CN screen = Translations$skills$screen$zh_CN.internal(_root);
+	@override late final Translations$skills$empty$zh_CN empty = Translations$skills$empty$zh_CN.internal(_root);
+	@override late final Translations$skills$scopes$zh_CN scopes = Translations$skills$scopes$zh_CN.internal(_root);
+	@override late final Translations$skills$errors$zh_CN errors = Translations$skills$errors$zh_CN.internal(_root);
+	@override String get providerShared => '共享';
+}
+
+// Path: terminal
+class Translations$terminal$zh_CN extends Translations$terminal$en {
+	Translations$terminal$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$terminal$tabs$zh_CN tabs = Translations$terminal$tabs$zh_CN.internal(_root);
+	@override late final Translations$terminal$actions$zh_CN actions = Translations$terminal$actions$zh_CN.internal(_root);
+	@override late final Translations$terminal$authUrl$zh_CN authUrl = Translations$terminal$authUrl$zh_CN.internal(_root);
+	@override late final Translations$terminal$fileLink$zh_CN fileLink = Translations$terminal$fileLink$zh_CN.internal(_root);
+	@override late final Translations$terminal$shortcuts$zh_CN shortcuts = Translations$terminal$shortcuts$zh_CN.internal(_root);
+	@override late final Translations$terminal$paste$zh_CN paste = Translations$terminal$paste$zh_CN.internal(_root);
+	@override late final Translations$terminal$errors$zh_CN errors = Translations$terminal$errors$zh_CN.internal(_root);
+	@override late final Translations$terminal$loginDialog$zh_CN loginDialog = Translations$terminal$loginDialog$zh_CN.internal(_root);
+	@override late final Translations$terminal$empty$zh_CN empty = Translations$terminal$empty$zh_CN.internal(_root);
+	@override late final Translations$terminal$overlay$zh_CN overlay = Translations$terminal$overlay$zh_CN.internal(_root);
+}
+
+// Path: voice
+class Translations$voice$zh_CN extends Translations$voice$en {
+	Translations$voice$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get preview => '预览';
+	@override String get settingsSaved => '语音输入设置已保存';
+	@override String get saveFailed => '保存 STT 配置失败';
+	@override String get apiKeySaved => 'API 密钥（已保存，输入以替换）';
 }
 
 // Path: workspace
@@ -667,23 +672,108 @@ class Translations$workspace$zh_CN extends Translations$workspace$en {
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get archivedWorkspaceName => '已归档';
-	@override String get closePane => '关闭窗格';
-	@override String get closeSearch => '关闭搜索';
-	@override String get deleteSessionNotice => '移除会话及其记录。此操作无法撤销。';
 	@override String get exportChat => '导出聊天';
-	@override String get jumpToSession => '跳转到会话…';
-	@override String get newChatProvider => '新聊天 — 提供商';
-	@override String get nextMatch => '下一个匹配项';
-	@override String get previousMatch => '上一个匹配项';
 	@override String get searchTranscript => '搜索记录';
+	@override String get previousMatch => '上一个匹配项';
+	@override String get nextMatch => '下一个匹配项';
+	@override String get closeSearch => '关闭搜索';
+	@override String get newChatProvider => '新聊天 — 提供商';
+	@override String get closePane => '关闭窗格';
+	@override String get jumpToSession => '跳转到会话…';
+	@override String get archivedWorkspaceName => '已归档';
 	@override String sendTo({required Object count}) => '发送到 ${count}';
+	@override String get deleteSessionNotice => '移除会话及其记录。此操作无法撤销。';
 	@override String accountWithLabel({required Object label}) => '默认 · ${label}';
 	@override String get finishRunBeforeChangingWorkspace => '请先结束运行再更改工作区';
 	@override String get restored => '工作区已恢复';
 	@override String get maximizePane => '最大化窗格';
 	@override String get restorePanes => '恢复窗格';
 	@override String get reviewChangedFiles => '查看更改的文件';
+	@override late final Translations$workspace$paneTitle$zh_CN paneTitle = Translations$workspace$paneTitle$zh_CN.internal(_root);
+	@override String get addEditorPane => '添加编辑器窗格';
+	@override String get addGitPane => '添加 Git 窗格';
+	@override String get unknownProjectPath => '未知的项目路径';
+	@override String get autoMini => '自动 (mini)';
+	@override String get exportAs => '导出为：';
+	@override String get exportMarkdown => 'Markdown (.md)';
+	@override String get exportHtml => '网页 (.html)';
+	@override String get exportPdf => 'PDF（打印到文件）';
+	@override String matchPosition({required Object current, required Object total}) => '${current} / ${total}';
+	@override String get launcherDescription => '为此窗格选择一个工作区，或新建一个。';
+	@override String get createWorkspace => '创建工作区';
+}
+
+// Path: worktrees
+class Translations$worktrees$zh_CN extends Translations$worktrees$en {
+	Translations$worktrees$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get scripts => '脚本';
+	@override String get emptyTitle => '未找到 worktree';
+	@override String get emptyDescription => '创建 worktree 以隔离功能开发或代理运行。';
+	@override String opened({required Object branch}) => '已打开 worktree：${branch}';
+	@override String get created => 'Worktree 已创建';
+	@override String get removed => 'Worktree 已移除';
+	@override String merged({required Object branch}) => 'Worktree 已合并到 ${branch}';
+	@override String get scriptsSaved => '脚本配置已保存';
+	@override String get setupLabel => '初始化： ';
+	@override String get serverLabel => '服务器： ';
+	@override String get runRunning => '运行中';
+	@override String runRunningWithPort({required Object port}) => '运行中 :${port}';
+	@override String get runButton => '运行';
+	@override String get stopButton => '停止';
+	@override String get mainBadge => 'main';
+	@override String headDetachedAt({required Object sha}) => 'HEAD 分离于 ${sha}';
+	@override String get branchHint => '新分支名称（例如 feature/login）';
+	@override String branchingOff({required Object branch}) => '从 ${branch} 创建分支';
+	@override String mergeTitle({required Object branch}) => '合并 ${branch}';
+	@override String mergeDescription({required Object branch}) => '将更改合并到 ${branch}。';
+	@override String get squashDescription => '将所有提交合并为单个提交';
+	@override String get cleanupDescription => '合并后移除 worktree 并删除分支';
+	@override String removeTitle({required Object branch}) => '移除 worktree ${branch}？';
+	@override String get removeDescription => '这将删除 worktree 文件夹。关联的项目将被归档。';
+	@override String dirtyWarning({required Object count}) => '警告：此 worktree 有 ${count} 个未提交的更改将会丢失。';
+	@override String get forceRemoveLabel => '强制移除（放弃更改）';
+	@override String get deleteBranchLabel => '同时删除分支';
+	@override String get setupHint => '初始化命令（例如 npm install）';
+	@override String get runHint => '运行命令（例如 npm run dev）';
+	@override String get portHint => '运行端口（可选，例如 3000）';
+	@override String get unknownSha => '未知';
+	@override String get baseBranchFallback => '基础分支';
+	@override late final Translations$worktrees$runtimeStatus$zh_CN runtimeStatus = Translations$worktrees$runtimeStatus$zh_CN.internal(_root);
+}
+
+// Path: browserUse
+class Translations$browserUse$zh_CN extends Translations$browserUse$en {
+	Translations$browserUse$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$browserUse$sessionStatus$zh_CN sessionStatus = Translations$browserUse$sessionStatus$zh_CN.internal(_root);
+}
+
+// Path: orchestrator
+class Translations$orchestrator$zh_CN extends Translations$orchestrator$en {
+	Translations$orchestrator$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String stepFallback({required Object n}) => '步骤 ${n}';
+}
+
+// Path: miniOrchestrator
+class Translations$miniOrchestrator$zh_CN extends Translations$miniOrchestrator$en {
+	Translations$miniOrchestrator$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$miniOrchestrator$taskTypes$zh_CN taskTypes = Translations$miniOrchestrator$taskTypes$zh_CN.internal(_root);
+	@override late final Translations$miniOrchestrator$roles$zh_CN roles = Translations$miniOrchestrator$roles$zh_CN.internal(_root);
 }
 
 // Path: auth.login
@@ -775,6 +865,24 @@ class Translations$chat$messageTypes$zh_CN extends Translations$chat$messageType
 	@override String get codex => 'Codex';
 	@override String get opencode => 'OpenCode';
 	@override String get devin => 'Devin';
+	@override String get orchestrator => '自动';
+}
+
+// Path: chat.orchestrator
+class Translations$chat$orchestrator$zh_CN extends Translations$chat$orchestrator$en {
+	Translations$chat$orchestrator$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$chat$orchestrator$routing$zh_CN routing = Translations$chat$orchestrator$routing$zh_CN.internal(_root);
+	@override late final Translations$chat$orchestrator$plan$zh_CN plan = Translations$chat$orchestrator$plan$zh_CN.internal(_root);
+	@override late final Translations$chat$orchestrator$decision$zh_CN decision = Translations$chat$orchestrator$decision$zh_CN.internal(_root);
+	@override late final Translations$chat$orchestrator$delegation$zh_CN delegation = Translations$chat$orchestrator$delegation$zh_CN.internal(_root);
+	@override late final Translations$chat$orchestrator$summary$zh_CN summary = Translations$chat$orchestrator$summary$zh_CN.internal(_root);
+	@override String get backToParent => '返回编排';
+	@override late final Translations$chat$orchestrator$taskmaster$zh_CN taskmaster = Translations$chat$orchestrator$taskmaster$zh_CN.internal(_root);
+	@override late final Translations$chat$orchestrator$gate$zh_CN gate = Translations$chat$orchestrator$gate$zh_CN.internal(_root);
 }
 
 // Path: chat.tools
@@ -854,6 +962,7 @@ class Translations$chat$thinking$zh_CN extends Translations$chat$thinking$en {
 	// Translations
 	@override String get title => '思考中...';
 	@override String get emoji => '💭 思考中...';
+	@override String get thoughtFewSeconds => '思考了几秒钟';
 }
 
 // Path: chat.json
@@ -880,14 +989,14 @@ class Translations$chat$permissions$zh_CN extends Translations$chat$permissions$
 	@override String get error => '无法更新权限。请重试。';
 	@override String get openSettings => '打开设置';
 	@override String get allow => '允许';
-	@override String allowAll({required Object count}) => '全部允许（${count}）';
-	@override String get allowWithChanges => '按修改允许';
 	@override String get always => '始终';
-	@override String get deny => '拒绝';
 	@override String get editAndAllow => '编辑并允许';
+	@override String get deny => '拒绝';
+	@override String get reject => '驳回';
+	@override String allowAll({required Object count}) => '全部允许（${count}）';
 	@override String get editInput => '编辑输入';
 	@override String get invalidJson => '无效的 JSON';
-	@override String get reject => '驳回';
+	@override String get allowWithChanges => '按修改允许';
 }
 
 // Path: chat.todo
@@ -935,6 +1044,23 @@ class Translations$chat$codex$zh_CN extends Translations$chat$codex$en {
 	@override String get technicalDetails => '技术细节';
 }
 
+// Path: chat.voice
+class Translations$chat$voice$zh_CN extends Translations$chat$voice$en {
+	Translations$chat$voice$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get autoRead => '朗读回复';
+	@override String get autoReadOn => '朗读回复：开';
+	@override String get autoReadOff => '朗读回复：关';
+	@override String get autoReadVoice => '朗读声音';
+	@override String get autoReadVoiceAuto => '自动声音';
+	@override String get autoReadPreview => '回复将以此声音朗读。';
+	@override String get speakMessage => '朗读';
+	@override String get stopSpeaking => '停止朗读';
+}
+
 // Path: chat.input
 class Translations$chat$input$zh_CN extends Translations$chat$input$en {
 	Translations$chat$input$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
@@ -946,6 +1072,12 @@ class Translations$chat$input$zh_CN extends Translations$chat$input$en {
 	@override String get placeholderDefault => '输入您的消息...';
 	@override String get disabled => '输入已禁用';
 	@override String get attachFiles => '附加文件';
+	@override String get attachFilesDesc => '上传照片、文件或文档';
+	@override String get takePhoto => '拍摄照片';
+	@override String get takePhotoDesc => '使用相机拍摄照片';
+	@override String get moreTools => '更多工具';
+	@override String get commandsDesc => '浏览快捷键和命令';
+	@override String get clearInputDesc => '丢弃当前文本';
 	@override String get attachImages => '附加图片';
 	@override String get send => '发送';
 	@override String get stop => '停止';
@@ -954,19 +1086,45 @@ class Translations$chat$input$zh_CN extends Translations$chat$input$en {
 	@override String get showAllCommands => '显示所有命令';
 	@override String get clearInput => '清空输入';
 	@override String get scrollToBottom => '滚动到底部';
-	@override late final Translations$chat$input$queue$zh_CN queue = Translations$chat$input$queue$zh_CN.internal(_root);
-	@override String get attachFilesDesc => '上传照片、文件或文档';
-	@override String get takePhoto => '拍摄照片';
-	@override String get takePhotoDesc => '使用相机拍摄照片';
-	@override String get moreTools => '更多工具';
-	@override String get commandsDesc => '浏览快捷键和命令';
-	@override String get clearInputDesc => '丢弃当前文本';
 	@override String get newMessage => '新消息';
 	@override String get newMessages => '新消息';
+	@override late final Translations$chat$input$queue$zh_CN queue = Translations$chat$input$queue$zh_CN.internal(_root);
 	@override String get autoContinueTasks => '自动继续';
 	@override String get autoContinueTasksTooltip => '启用后让 Devin 自动继续下一个 Task Master 任务';
 	@override late final Translations$chat$input$offlineQueue$zh_CN offlineQueue = Translations$chat$input$offlineQueue$zh_CN.internal(_root);
+	@override String get voice => '语音输入';
+	@override String get voiceStart => '语音输入消息';
+	@override String get voiceStop => '停止听写';
+	@override String get pinFile => '将文件固定到上下文';
+	@override String get voiceSettings => '语音设置（STT）';
 	@override String cameraUnavailable({required Object error}) => '相机不可用：${error}';
+}
+
+// Path: chat.composer
+class Translations$chat$composer$zh_CN extends Translations$chat$composer$en {
+	Translations$chat$composer$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get toolsAndActions => '工具与操作';
+	@override String get toolsAndActionsDesc => '聊天输入框的工具和控件';
+	@override String get reasoning => '推理';
+	@override String get model => '模型';
+	@override String get effortDefault => '默认';
+	@override String get loadingModels => '正在加载模型…';
+	@override String get modelMenu => '选择模型和推理强度';
+	@override String permissionHeading({required Object provider}) => '应如何批准 ${provider} 的操作？';
+	@override String get favorites => '收藏';
+	@override String get account => '账号';
+	@override String get accountMenu => '选择账号';
+	@override String get accountDefault => '默认账号';
+	@override String get accountAuto => '自动（默认）';
+	@override String get accountIsDefault => '默认';
+	@override late final Translations$chat$composer$effortLevels$zh_CN effortLevels = Translations$chat$composer$effortLevels$zh_CN.internal(_root);
+	@override String contextWindow({required Object size}) => '${size} 上下文';
+	@override String get accountAutoShort => '自动';
+	@override String get uploadNoRecords => '上传未返回任何记录';
 }
 
 // Path: chat.providerSelection
@@ -979,15 +1137,19 @@ class Translations$chat$providerSelection$zh_CN extends Translations$chat$provid
 	@override String get title => '选择您的 AI 助手';
 	@override String get description => '选择一个供应商以开始新对话';
 	@override String get selectModel => '选择模型';
-	@override late final Translations$chat$providerSelection$providerInfo$zh_CN providerInfo = Translations$chat$providerSelection$providerInfo$zh_CN.internal(_root);
-	@override late final Translations$chat$providerSelection$readyPrompt$zh_CN readyPrompt = Translations$chat$providerSelection$readyPrompt$zh_CN.internal(_root);
-	@override String pressToSearch({required Object shortcut}) => '按 <kbd>${shortcut}</kbd> 搜索会话、文件和提交';
 	@override String get workspace => '工作区';
 	@override String get noWorkspace => '无';
 	@override String get clickToChangeWorkspace => '点击更改工作区';
 	@override String get chooseWorkspace => '选择工作区';
 	@override String get searchWorkspaces => '搜索工作区...';
 	@override String get noWorkspacesFound => '未找到工作区。';
+	@override late final Translations$chat$providerSelection$providerInfo$zh_CN providerInfo = Translations$chat$providerSelection$providerInfo$zh_CN.internal(_root);
+	@override late final Translations$chat$providerSelection$readyPrompt$zh_CN readyPrompt = Translations$chat$providerSelection$readyPrompt$zh_CN.internal(_root);
+	@override String get autoGroup => '自动';
+	@override String get autoLabel => '自动（编排）';
+	@override String get autoDescription => '将每个步骤路由到最佳可用的提供者和模型';
+	@override String get orchestrated => '编排';
+	@override String pressToSearch({required Object shortcut}) => '按 <kbd>${shortcut}</kbd> 搜索会话、文件和提交';
 	@override String get all => '全部';
 	@override String get free => '免费';
 	@override String get noModelsFound => '未找到模型。';
@@ -1015,6 +1177,7 @@ class Translations$chat$session$zh_CN extends Translations$chat$session$en {
 	@override late final Translations$chat$session$messages$zh_CN messages = Translations$chat$session$messages$zh_CN.internal(_root);
 	@override String get deleteConfirm => '移除会话及其记录。此操作无法撤销。';
 	@override String get finishRunBeforeWorkspaceChange => '请先结束运行再更改工作区';
+	@override String get fallbackTitle => '会话';
 }
 
 // Path: chat.shell
@@ -1048,6 +1211,7 @@ class Translations$chat$claudeStatus$zh_CN extends Translations$chat$claudeStatu
 	@override late final Translations$chat$claudeStatus$elapsed$zh_CN elapsed = Translations$chat$claudeStatus$elapsed$zh_CN.internal(_root);
 	@override String get stop => '停止';
 	@override String backgroundTasks({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
+		one: '${count} 个后台任务正在运行',
 		other: '${count} 个后台任务正在运行',
 	);
 	@override late final Translations$chat$claudeStatus$controls$zh_CN controls = Translations$chat$claudeStatus$controls$zh_CN.internal(_root);
@@ -1074,41 +1238,6 @@ class Translations$chat$tasks$zh_CN extends Translations$chat$tasks$en {
 
 	// Translations
 	@override String get nextTaskPrompt => '开始下一个任务';
-}
-
-// Path: chat.voice
-class Translations$chat$voice$zh_CN extends Translations$chat$voice$en {
-	Translations$chat$voice$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get autoRead => '朗读回复';
-	@override String get autoReadOn => '朗读回复：开';
-	@override String get autoReadOff => '朗读回复：关';
-	@override String get autoReadVoice => '朗读声音';
-	@override String get autoReadVoiceAuto => '自动声音';
-	@override String get autoReadPreview => '回复将以此声音朗读。';
-	@override String get speakMessage => '朗读';
-	@override String get stopSpeaking => '停止朗读';
-}
-
-// Path: chat.composer
-class Translations$chat$composer$zh_CN extends Translations$chat$composer$en {
-	Translations$chat$composer$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get toolsAndActions => '工具与操作';
-	@override String get toolsAndActionsDesc => '聊天输入框的工具和控件';
-	@override String get reasoning => '推理';
-	@override String get model => '模型';
-	@override String get effortDefault => '默认';
-	@override String get loadingModels => '正在加载模型…';
-	@override String get modelMenu => '选择模型和推理强度';
-	@override String permissionHeading({required Object provider}) => '应如何批准 ${provider} 的操作？';
-	@override String get favorites => '收藏';
 }
 
 // Path: chat.splitSession
@@ -1157,6 +1286,7 @@ class Translations$chat$sessionPicker$zh_CN extends Translations$chat$sessionPic
 	@override String get deleteFailed => '删除会话失败。请重试。';
 	@override String get running => '会话正在运行';
 	@override String get unread => '未读 — 已完成并有新输出';
+	@override String get account => '账号';
 }
 
 // Path: chat.splitWorkspace
@@ -1169,9 +1299,12 @@ class Translations$chat$splitWorkspace$zh_CN extends Translations$chat$splitWork
 	@override String get addChat => '添加聊天窗格';
 	@override String get addBrowser => '添加浏览器窗格';
 	@override String get addTerminal => '添加终端窗格';
+	@override String get addPreview => '添加预览窗格';
 	@override String get overview => '显示所有窗格';
 	@override String get exitFocusMode => '退出专注模式 (Ctrl+Shift+F)';
 	@override String get focusMode => '专注模式 (Ctrl+Shift+F)';
+	@override String get broadcast => '广播到会话';
+	@override String get addNotes => '添加共享笔记窗格';
 	@override String get browseSessions => '打开会话列表';
 }
 
@@ -1199,9 +1332,9 @@ class Translations$chat$askUserQuestion$zh_CN extends Translations$chat$askUserQ
 
 	// Translations
 	@override String needsInput({required Object provider}) => '${provider} 需要你的输入';
-	@override String get answerHint => '输入你的答案…';
-	@override String get other => '其他…';
 	@override String get skip => '跳过';
+	@override String get other => '其他…';
+	@override String get answerHint => '输入你的答案…';
 }
 
 // Path: chat.attachments
@@ -1214,6 +1347,8 @@ class Translations$chat$attachments$zh_CN extends Translations$chat$attachments$
 	@override String get downloadFailedRetry => '下载失败 — 点击重试';
 	@override String get fileAttachment => '文件附件';
 	@override String download({required Object name}) => '下载 ${name}';
+	@override String get attachedFile => '附件';
+	@override String downloaded({required Object name}) => '已下载 ${name}';
 }
 
 // Path: chat.checkpoint
@@ -1226,6 +1361,9 @@ class Translations$chat$checkpoint$zh_CN extends Translations$chat$checkpoint$en
 	@override String get creating => '正在创建快照…';
 	@override String get revertChanges => '将文件还原到上一个检查点';
 	@override String get undo => '撤销检查点';
+	@override String get undoAiRun => '撤销 AI 运行';
+	@override String get undoing => '正在撤销…';
+	@override String get undone => '已撤销';
 	@override String get beforeAiTurn => 'AI 回合之前';
 }
 
@@ -1252,6 +1390,7 @@ class Translations$chat$taskMaster$zh_CN extends Translations$chat$taskMaster$en
 	@override String get taskShort => '任务';
 	@override String get addToTask => '添加到 TaskMaster';
 	@override String get added => '已添加到 TaskMaster';
+	@override String get defaultTaskTitle => '来自聊天的任务';
 }
 
 // Path: chat.tokenUsage
@@ -1263,6 +1402,10 @@ class Translations$chat$tokenUsage$zh_CN extends Translations$chat$tokenUsage$en
 	// Translations
 	@override String get desc => '查看会话令牌消耗';
 	@override String get title => '令牌用量';
+	@override String get notAvailable => '不适用';
+	@override String tokensBadge({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
+		other: '${count} 个 token',
+	);
 }
 
 // Path: chat.tool
@@ -1284,6 +1427,29 @@ class Translations$chat$quotaBadge$zh_CN extends Translations$chat$quotaBadge$en
 	// Translations
 	@override String get ariaLabel => '订阅额度限制';
 	@override String get noData => '此模型暂无订阅数据';
+	@override String get noSubscription => '无订阅';
+	@override String windowLineReset({required Object label, required Object percent, required Object time}) => '${label}：${percent}% · 重置于 ${time}';
+	@override String windowRemaining({required Object percent}) => '距离重置还剩 ${percent}% 的时间窗口';
+}
+
+// Path: chat.broadcast
+class Translations$chat$broadcast$zh_CN extends Translations$chat$broadcast$en {
+	Translations$chat$broadcast$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '广播到会话';
+	@override String get noSessions => '没有可用的会话';
+	@override String get placeholder => '要发送给每个选中会话的消息…';
+	@override String partial({required Object count}) => '${count} 个会话拒绝了该消息';
+	@override String sent({required Object count}) => '已为 ${count} 个会话加入队列';
+	@override String get selectAll => '全选';
+	@override String get selectOrchestrators => '选择编排器';
+	@override String get orchestratorsOnly => '仅编排器';
+	@override String get noOrchestrators => '没有可用的编排器会话';
+	@override String get sending => '正在发送…';
+	@override String send({required Object count}) => '发送到 ${count} 个会话';
 }
 
 // Path: chat.paneHeader
@@ -1297,27 +1463,17 @@ class Translations$chat$paneHeader$zh_CN extends Translations$chat$paneHeader$en
 	@override String get switchSession => '切换会话';
 }
 
-// Path: chat.broadcast
-class Translations$chat$broadcast$zh_CN extends Translations$chat$broadcast$en {
-	Translations$chat$broadcast$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+// Path: chat.export
+class Translations$chat$export$zh_CN extends Translations$chat$export$en {
+	Translations$chat$export$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get selectOrchestrators => '选择编排器';
-	@override String get orchestratorsOnly => '仅编排器';
-	@override String get noOrchestrators => '没有可用的编排器会话';
-}
-
-// Path: chat.changes
-class Translations$chat$changes$zh_CN extends Translations$chat$changes$en {
-	Translations$chat$changes$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get empty => '没有文件更改';
-	@override String get failedToLoad => '加载更改失败';
+	@override String sessionTitle({required Object id}) => '会话 ${id}';
+	@override String get pdfFailed => 'PDF 导出失败';
+	@override String get transcriptDownloaded => '会话记录已下载';
+	@override String savedTo({required Object path}) => '已保存 ${path}';
 }
 
 // Path: chat.commandResult
@@ -1341,19 +1497,69 @@ class Translations$chat$commands$zh_CN extends Translations$chat$commands$en {
 	// Translations
 	@override String get runConfirmTitle => '运行命令？';
 	@override String get executionCancelled => '命令执行已取消';
+	@override String get bashConfirmMessage => '此命令包含将被执行的 bash 命令。要继续吗？';
+	@override String get proceed => '继续';
 }
 
-// Path: chat.export
-class Translations$chat$export$zh_CN extends Translations$chat$export$en {
-	Translations$chat$export$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+// Path: chat.pinFile
+class Translations$chat$pinFile$zh_CN extends Translations$chat$pinFile$en {
+	Translations$chat$pinFile$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String sessionTitle({required Object id}) => '会话 ${id}';
-	@override String get pdfFailed => 'PDF 导出失败';
-	@override String get transcriptDownloaded => '会话记录已下载';
-	@override String savedTo({required Object path}) => '已保存 ${path}';
+	@override String get title => '固定文件';
+	@override String get pathHint => 'path/to/file.ext';
+	@override String get action => '固定';
+}
+
+// Path: chat.modelLibrary
+class Translations$chat$modelLibrary$zh_CN extends Translations$chat$modelLibrary$en {
+	Translations$chat$modelLibrary$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String editTooltip({required Object name}) => '编辑 ${name}';
+	@override String deleteTooltip({required Object name}) => '删除 ${name}';
+	@override String get enterNameAndId => '请输入模型名称和模型 ID。';
+	@override String get idNoSpaces => '模型 ID 不能包含空格。';
+	@override String get setAsDefault => '设为默认';
+	@override String get defaultModel => '默认模型';
+	@override String get title => '模型库';
+	@override String get subtitle => '添加提供方支持的模型 ID。内置模型保持锁定。圆圈标记默认模型。';
+	@override String get yourModels => '你的模型';
+	@override String get yourModelsHint => '可编辑，存储在 auth.db 中';
+	@override String get emptyTitle => '还没有自定义模型';
+	@override String get emptyHint => '通过表单添加后，它会出现在所有模型选择器中。';
+	@override String get builtInModels => '内置模型';
+	@override String get builtInModelsHint => '由 DDAgent 维护，只读';
+	@override String get editTitle => '编辑自定义模型';
+	@override String get addTitle => '添加自定义模型';
+	@override String idSentAsWritten({required Object provider}) => 'ID 会按原样发送给 ${provider}。';
+	@override String get nameLabel => '模型名称';
+	@override String get nameHint => '例如 GPT-5.5 Pro';
+	@override String get idLabel => '模型 ID';
+	@override String get idHint => '例如 gpt-5.5-pro';
+	@override String get idHelp => '请使用提供方 CLI 接受的准确标识符。ID 不能包含空格。';
+	@override String updatedNotice({required Object name}) => '已更新 ${name}。';
+	@override String addedNotice({required Object name}) => '已添加 ${name}。';
+	@override String deletedNotice({required Object name}) => '已删除 ${name}。';
+	@override String get saving => '正在保存…';
+	@override String get saveChanges => '保存更改';
+	@override String get deleteConfirm => '要从所有选择器中删除此模型吗？';
+	@override String get customBadge => '自定义';
+}
+
+// Path: chat.changes
+class Translations$chat$changes$zh_CN extends Translations$chat$changes$en {
+	Translations$chat$changes$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get failedToLoad => '加载更改失败';
+	@override String get empty => '没有文件更改';
 }
 
 // Path: chat.message
@@ -1364,35 +1570,9 @@ class Translations$chat$message$zh_CN extends Translations$chat$message$en {
 
 	// Translations
 	@override String get compactedSummary => '压缩摘要';
-	@override String get rawView => '原始视图';
 	@override String get resendHint => '从输入框重新发送';
-}
-
-// Path: chat.modelLibrary
-class Translations$chat$modelLibrary$zh_CN extends Translations$chat$modelLibrary$en {
-	Translations$chat$modelLibrary$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String deleteTooltip({required Object name}) => '删除 ${name}';
-	@override String editTooltip({required Object name}) => '编辑 ${name}';
-	@override String get enterNameAndId => '请输入模型名称和模型 ID。';
-	@override String get idNoSpaces => '模型 ID 不能包含空格。';
-	@override String get setAsDefault => '设为默认';
-	@override String get defaultModel => '默认模型';
-}
-
-// Path: chat.pinFile
-class Translations$chat$pinFile$zh_CN extends Translations$chat$pinFile$en {
-	Translations$chat$pinFile$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get action => '固定';
-	@override String get pathHint => 'path/to/file.ext';
-	@override String get title => '固定文件';
+	@override String get rawView => '原始视图';
+	@override String get runComplete => '运行完成';
 }
 
 // Path: chat.permissionRequest
@@ -1404,6 +1584,150 @@ class Translations$chat$permissionRequest$zh_CN extends Translations$chat$permis
 	// Translations
 	@override String title({required Object tool}) => '权限请求 · ${tool}';
 	@override String get question => '问题';
+	@override String get subagent => '子代理';
+	@override String get viewersCannotApprove => '查看者无法批准';
+	@override late final Translations$chat$permissionRequest$recap$zh_CN recap = Translations$chat$permissionRequest$recap$zh_CN.internal(_root);
+	@override String needsApproval({required Object tool}) => '${tool} 需要批准';
+	@override String subagentNeedsApproval({required Object tool}) => '子代理：${tool} 需要批准';
+	@override String moreQuestions({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
+		other: '还有 ${count} 个问题在等待',
+	);
+}
+
+// Path: chat.commandDialog
+class Translations$chat$commandDialog$zh_CN extends Translations$chat$commandDialog$en {
+	Translations$chat$commandDialog$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$chat$commandDialog$help$zh_CN help = Translations$chat$commandDialog$help$zh_CN.internal(_root);
+	@override late final Translations$chat$commandDialog$models$zh_CN models = Translations$chat$commandDialog$models$zh_CN.internal(_root);
+	@override late final Translations$chat$commandDialog$cost$zh_CN cost = Translations$chat$commandDialog$cost$zh_CN.internal(_root);
+	@override late final Translations$chat$commandDialog$status$zh_CN status = Translations$chat$commandDialog$status$zh_CN.internal(_root);
+	@override String get defaultEyebrow => '命令';
+	@override String get defaultTitle => '命令结果';
+	@override String get escHint => '按 Esc 关闭窗口。';
+	@override String get unknown => '未知';
+	@override String get noDescription => '暂无描述。';
+	@override String get noCommandsMatch => '没有与该筛选条件匹配的命令。';
+	@override late final Translations$chat$commandDialog$syntax$zh_CN syntax = Translations$chat$commandDialog$syntax$zh_CN.internal(_root);
+	@override String get commandFinished => '命令已完成。';
+}
+
+// Path: chat.utilities
+class Translations$chat$utilities$zh_CN extends Translations$chat$utilities$en {
+	Translations$chat$utilities$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get tokenUsageUnavailable => 'Token 用量不可用';
+	@override late final Translations$chat$utilities$tooltip$zh_CN tooltip = Translations$chat$utilities$tooltip$zh_CN.internal(_root);
+	@override String get used => '已用';
+	@override String get cacheWrite => '缓存写入';
+	@override String get contextLabel => '上下文';
+	@override String get usageUnsupported => '不支持用量统计';
+	@override String get chatTranscript => '聊天记录';
+	@override String get you => '你：';
+	@override String get providerAutoMini => '自动 (mini)';
+}
+
+// Path: chat.toolBlocks
+class Translations$chat$toolBlocks$zh_CN extends Translations$chat$toolBlocks$en {
+	Translations$chat$toolBlocks$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String moreLines({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
+		other: '… 还有 ${count} 行',
+	);
+	@override late final Translations$chat$toolBlocks$status$zh_CN status = Translations$chat$toolBlocks$status$zh_CN.internal(_root);
+	@override String get showLess => '收起';
+	@override String get showMore => '显示更多';
+	@override String showMoreLines({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
+		other: '再显示 ${count} 行',
+	);
+	@override String get tools => '工具';
+	@override String get planReview => '计划审阅';
+	@override String get planUpdate => '计划更新';
+	@override String get todoListUpdated => '待办列表已更新';
+	@override String get creatingTask => '正在创建任务';
+	@override String get updatingTask => '正在更新';
+	@override String get fetchingTask => '正在获取';
+	@override String get listingTasks => '正在列出任务';
+	@override String get search => '搜索';
+	@override late final Translations$chat$toolBlocks$verbs$zh_CN verbs = Translations$chat$toolBlocks$verbs$zh_CN.internal(_root);
+	@override String get subagent => '子代理';
+	@override String toolCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
+		other: '${count} 个工具',
+	);
+	@override String get result => '结果';
+	@override String plusMore({required Object count}) => '+${count} 个';
+	@override String get plan => '计划';
+	@override String questionProgress({required Object current, required Object total}) => '问题 ${current}/${total}';
+	@override String lineCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
+		other: '${count} 行',
+	);
+	@override String todoListItems({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
+		other: '待办列表（${count} 项）',
+	);
+	@override String tasksCompleted({required Object done, required Object total}) => '已完成 ${done}/${total}';
+}
+
+// Path: chat.commandMenu
+class Translations$chat$commandMenu$zh_CN extends Translations$chat$commandMenu$en {
+	Translations$chat$commandMenu$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get empty => '没有可用的命令';
+	@override late final Translations$chat$commandMenu$namespaces$zh_CN namespaces = Translations$chat$commandMenu$namespaces$zh_CN.internal(_root);
+}
+
+// Path: chat.mentionMenu
+class Translations$chat$mentionMenu$zh_CN extends Translations$chat$mentionMenu$en {
+	Translations$chat$mentionMenu$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$chat$mentionMenu$kinds$zh_CN kinds = Translations$chat$mentionMenu$kinds$zh_CN.internal(_root);
+	@override String taskTitle({required Object id}) => '任务 ${id}';
+}
+
+// Path: chat.subheader
+class Translations$chat$subheader$zh_CN extends Translations$chat$subheader$en {
+	Translations$chat$subheader$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String contextTooltip({required Object used, required Object total, required Object percent}) => '上下文：${used} / ${total} 个 token · 已用 ${percent}%';
+}
+
+// Path: chat.transcript
+class Translations$chat$transcript$zh_CN extends Translations$chat$transcript$en {
+	Translations$chat$transcript$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get requestFailed => '请求失败';
+}
+
+// Path: chat.review
+class Translations$chat$review$zh_CN extends Translations$chat$review$en {
+	Translations$chat$review$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get changedFiles => '已更改的文件';
+	@override String changedFilesCount({required Object count}) => '已更改的文件（${count}）';
+	@override String get subagent => '子代理';
 }
 
 // Path: codeEditor.toolbar
@@ -1421,10 +1745,10 @@ class Translations$codeEditor$toolbar$zh_CN extends Translations$codeEditor$tool
 	@override String get settings => '编辑器设置';
 	@override String get collapse => '折叠编辑器';
 	@override String get expand => '展开编辑器到全宽';
+	@override String get toggleDock => '切换文件停靠栏';
 	@override String get diffMerge => '差异 / 合并';
 	@override String get previewInBrowser => '在浏览器中预览';
 	@override String get reload => '从磁盘重新加载';
-	@override String get toggleDock => '切换文件停靠栏';
 }
 
 // Path: codeEditor.header
@@ -1472,6 +1796,11 @@ class Translations$codeEditor$footer$zh_CN extends Translations$codeEditor$foote
 	@override String get lines => '行数：';
 	@override String get characters => '字符数：';
 	@override String get shortcuts => '按 Ctrl+S 保存 • Esc 关闭';
+	@override String get plainText => '纯文本';
+	@override String lineCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
+		other: '${count} 行',
+	);
+	@override String get modified => '已修改';
 }
 
 // Path: codeEditor.binaryFile
@@ -1498,30 +1827,15 @@ class Translations$codeEditor$filePreview$zh_CN extends Translations$codeEditor$
 	@override String get openInNewTab => '在新标签页中打开';
 }
 
-// Path: codeEditor.diff
-class Translations$codeEditor$diff$zh_CN extends Translations$codeEditor$diff$en {
-	Translations$codeEditor$diff$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+// Path: codeEditor.mediaFile
+class Translations$codeEditor$mediaFile$zh_CN extends Translations$codeEditor$mediaFile$en {
+	Translations$codeEditor$mediaFile$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get applyMerge => '应用合并';
-	@override String get base => '基准';
-	@override String get close => '关闭差异';
-	@override String get current => '当前';
-	@override String hunk({required Object number}) => '区块 ${number}';
-	@override String get noChanges => '没有更改';
-	@override String get deletedOnDisk => '已在磁盘上删除';
-}
-
-// Path: codeEditor.emptyState
-class Translations$codeEditor$emptyState$zh_CN extends Translations$codeEditor$emptyState$en {
-	Translations$codeEditor$emptyState$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => '没有打开的文件';
+	@override String get title => '媒体文件';
+	@override String get subtitle => '暂不支持音频/视频预览';
 }
 
 // Path: codeEditor.hexDump
@@ -1534,17 +1848,6 @@ class Translations$codeEditor$hexDump$zh_CN extends Translations$codeEditor$hexD
 	@override String more({required Object size}) => '… 还有 ${size}';
 }
 
-// Path: codeEditor.mediaFile
-class Translations$codeEditor$mediaFile$zh_CN extends Translations$codeEditor$mediaFile$en {
-	Translations$codeEditor$mediaFile$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get subtitle => '暂不支持音频/视频预览';
-	@override String get title => '媒体文件';
-}
-
 // Path: codeEditor.settings
 class Translations$codeEditor$settings$zh_CN extends Translations$codeEditor$settings$en {
 	Translations$codeEditor$settings$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
@@ -1552,10 +1855,45 @@ class Translations$codeEditor$settings$zh_CN extends Translations$codeEditor$set
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String fontSizeDecrease({required Object size}) => '字体大小 −  （当前 ${size}）';
-	@override String get fontSizeIncrease => '字体大小 +';
 	@override String get minimap => '缩略图';
 	@override String tabSize({required Object size}) => 'Tab 大小：${size}';
+	@override String fontSizeDecrease({required Object size}) => '字体大小 −  （当前 ${size}）';
+	@override String get fontSizeIncrease => '字体大小 +';
+}
+
+// Path: codeEditor.diff
+class Translations$codeEditor$diff$zh_CN extends Translations$codeEditor$diff$en {
+	Translations$codeEditor$diff$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get noChanges => '没有更改';
+	@override String hunk({required Object number}) => '区块 ${number}';
+	@override String get close => '关闭差异';
+	@override String get base => '基准';
+	@override String get current => '当前';
+	@override String get applyMerge => '应用合并';
+	@override String get deletedOnDisk => '已在磁盘上删除';
+	@override String get untrackedWillBeDeleted => '此未跟踪文件将被删除。';
+	@override String restoreConfirm({required Object name}) => '将 ${name} 恢复到已提交的状态？';
+	@override String get headVsWorkingCopy => 'HEAD 与工作副本';
+	@override String get savedVsBuffer => '上次保存与缓冲区（无 git）';
+	@override String unchangedLines({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
+		other: '${count} 行未更改',
+	);
+	@override String get revertToSaved => '恢复为已保存版本';
+}
+
+// Path: codeEditor.emptyState
+class Translations$codeEditor$emptyState$zh_CN extends Translations$codeEditor$emptyState$en {
+	Translations$codeEditor$emptyState$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '没有打开的文件';
+	@override String get hint => '从“文件”标签页打开文件';
 }
 
 // Path: codeEditor.toasts
@@ -1596,8 +1934,8 @@ class Translations$common$buttons$zh_CN extends Translations$common$buttons$en {
 	@override String get download => '下载';
 	@override String get upload => '上传';
 	@override String get browse => '浏览';
-	@override String get openDiagram => '打开图表';
 	@override String get update => '更新';
+	@override String get openDiagram => '打开图表';
 }
 
 // Path: common.tabs
@@ -1612,10 +1950,53 @@ class Translations$common$tabs$zh_CN extends Translations$common$tabs$en {
 	@override String get files => '文件';
 	@override String get git => '源代码管理';
 	@override String get tasks => '任务';
+	@override String get board => '看板';
 	@override String get browser => '浏览器';
 	@override String get computer => '计算机';
-	@override String get board => '看板';
 	@override String get usage => 'AI Control';
+}
+
+// Path: common.quota
+class Translations$common$quota$zh_CN extends Translations$common$quota$en {
+	Translations$common$quota$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get controlCenter => 'AI 控制中心';
+	@override late final Translations$common$quota$section$zh_CN section = Translations$common$quota$section$zh_CN.internal(_root);
+	@override late final Translations$common$quota$filter$zh_CN filter = Translations$common$quota$filter$zh_CN.internal(_root);
+	@override late final Translations$common$quota$period$zh_CN period = Translations$common$quota$period$zh_CN.internal(_root);
+	@override late final Translations$common$quota$group$zh_CN group = Translations$common$quota$group$zh_CN.internal(_root);
+	@override late final Translations$common$quota$metric$zh_CN metric = Translations$common$quota$metric$zh_CN.internal(_root);
+	@override late final Translations$common$quota$cost$zh_CN cost = Translations$common$quota$cost$zh_CN.internal(_root);
+	@override late final Translations$common$quota$cost3$zh_CN cost3 = Translations$common$quota$cost3$zh_CN.internal(_root);
+	@override late final Translations$common$quota$overview$zh_CN overview = Translations$common$quota$overview$zh_CN.internal(_root);
+	@override late final Translations$common$quota$usage$zh_CN usage = Translations$common$quota$usage$zh_CN.internal(_root);
+	@override late final Translations$common$quota$agents$zh_CN agents = Translations$common$quota$agents$zh_CN.internal(_root);
+	@override late final Translations$common$quota$agentStatus$zh_CN agentStatus = Translations$common$quota$agentStatus$zh_CN.internal(_root);
+	@override late final Translations$common$quota$alert$zh_CN alert = Translations$common$quota$alert$zh_CN.internal(_root);
+	@override String get backToChat => '返回聊天';
+	@override String get syncNow => '立即同步';
+	@override String generatedAt({required Object value}) => '更新于 ${value}';
+	@override String get loading => '正在加载账户额度…';
+	@override String remaining({required Object value}) => '剩余 ${value}%';
+	@override String resetsIn({required Object value}) => '${value} 后重置';
+	@override String projected({required Object value}) => '按当前速度，此额度将在 ${value} 后耗尽';
+	@override String syncedAgo({required Object value}) => '${value} 前已同步';
+	@override String get refreshAccount => '刷新账户';
+	@override String get syncFailed => '同步失败';
+	@override String get history => '历史';
+	@override String historyPoints({required Object value}) => '已记录 ${value} 条读数';
+	@override String get historyEmpty => '尚无历史记录';
+	@override String get noAgents => '未分配代理';
+	@override String get noSubscription => '无订阅';
+	@override String get noSubscriptionHint => '提供商未报告此账户有有效套餐。';
+	@override late final Translations$common$quota$quality$zh_CN quality = Translations$common$quota$quality$zh_CN.internal(_root);
+	@override late final Translations$common$quota$kpi$zh_CN kpi = Translations$common$quota$kpi$zh_CN.internal(_root);
+	@override late final Translations$common$quota$empty$zh_CN empty = Translations$common$quota$empty$zh_CN.internal(_root);
+	@override late final Translations$common$quota$settings$zh_CN settings = Translations$common$quota$settings$zh_CN.internal(_root);
+	@override late final Translations$common$quota$range$zh_CN range = Translations$common$quota$range$zh_CN.internal(_root);
 }
 
 // Path: common.status
@@ -1667,6 +2048,7 @@ class Translations$common$navigation$zh_CN extends Translations$common$navigatio
 	@override String get next => '下一步';
 	@override String get previous => '上一步';
 	@override String get logout => '退出登录';
+	@override String get backToChat => '返回聊天';
 }
 
 // Path: common.common
@@ -1762,6 +2144,9 @@ class Translations$common$fileTree$zh_CN extends Translations$common$fileTree$en
 	@override String get compactView => '紧凑视图';
 	@override String get detailedView => '详细视图';
 	@override String get searchPlaceholder => '搜索文件和文件夹...';
+	@override String get searchContentPlaceholder => '在文件中搜索...';
+	@override String get searchInFiles => '在文件中搜索';
+	@override String get searchByName => '按名称搜索';
 	@override String get clearSearch => '清除搜索';
 	@override String get name => '名称';
 	@override String get size => '大小';
@@ -1769,8 +2154,13 @@ class Translations$common$fileTree$zh_CN extends Translations$common$fileTree$en
 	@override String get permissions => '权限';
 	@override String get noFilesFound => '未找到文件';
 	@override String get checkProjectPath => '检查项目路径是否可访问';
+	@override String get loadFailed => '无法加载文件';
 	@override String get noMatchesFound => '未找到匹配项';
+	@override String get noSearchResults => '未找到匹配项';
 	@override String get tryDifferentSearch => '尝试不同的搜索词或清除搜索';
+	@override String get searchError => '搜索失败';
+	@override String get searching => '正在搜索...';
+	@override String resultsTruncated({required Object count}) => '显示前 ${count} 条结果';
 	@override String get justNow => '刚刚';
 	@override String minAgo({required Object count}) => '${count} 分钟前';
 	@override String hoursAgo({required Object count}) => '${count} 小时前';
@@ -1780,14 +2170,6 @@ class Translations$common$fileTree$zh_CN extends Translations$common$fileTree$en
 	@override String get refresh => '刷新';
 	@override String get collapseAll => '全部折叠';
 	@override late final Translations$common$fileTree$context$zh_CN context = Translations$common$fileTree$context$zh_CN.internal(_root);
-	@override String get searchContentPlaceholder => '在文件中搜索...';
-	@override String get searchInFiles => '在文件中搜索';
-	@override String get searchByName => '按名称搜索';
-	@override String get loadFailed => '无法加载文件';
-	@override String get noSearchResults => '未找到匹配项';
-	@override String get searchError => '搜索失败';
-	@override String get searching => '正在搜索...';
-	@override String resultsTruncated({required Object count}) => '显示前 ${count} 条结果';
 	@override String get allWorkspaces => '所有工作区';
 	@override late final Translations$common$fileTree$delete$zh_CN delete = Translations$common$fileTree$delete$zh_CN.internal(_root);
 	@override String get dropToUpload => '拖放文件以上传';
@@ -1856,49 +2238,6 @@ class Translations$common$versionUpdate$zh_CN extends Translations$common$versio
 	@override String get updateFailed => '更新失败';
 	@override late final Translations$common$versionUpdate$buttons$zh_CN buttons = Translations$common$versionUpdate$buttons$zh_CN.internal(_root);
 	@override late final Translations$common$versionUpdate$ariaLabels$zh_CN ariaLabels = Translations$common$versionUpdate$ariaLabels$zh_CN.internal(_root);
-}
-
-// Path: common.quota
-class Translations$common$quota$zh_CN extends Translations$common$quota$en {
-	Translations$common$quota$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get controlCenter => 'AI Control Center';
-	@override late final Translations$common$quota$section$zh_CN section = Translations$common$quota$section$zh_CN.internal(_root);
-	@override late final Translations$common$quota$filter$zh_CN filter = Translations$common$quota$filter$zh_CN.internal(_root);
-	@override late final Translations$common$quota$period$zh_CN period = Translations$common$quota$period$zh_CN.internal(_root);
-	@override late final Translations$common$quota$group$zh_CN group = Translations$common$quota$group$zh_CN.internal(_root);
-	@override late final Translations$common$quota$metric$zh_CN metric = Translations$common$quota$metric$zh_CN.internal(_root);
-	@override late final Translations$common$quota$cost$zh_CN cost = Translations$common$quota$cost$zh_CN.internal(_root);
-	@override late final Translations$common$quota$cost3$zh_CN cost3 = Translations$common$quota$cost3$zh_CN.internal(_root);
-	@override late final Translations$common$quota$overview$zh_CN overview = Translations$common$quota$overview$zh_CN.internal(_root);
-	@override late final Translations$common$quota$usage$zh_CN usage = Translations$common$quota$usage$zh_CN.internal(_root);
-	@override late final Translations$common$quota$agents$zh_CN agents = Translations$common$quota$agents$zh_CN.internal(_root);
-	@override late final Translations$common$quota$agentStatus$zh_CN agentStatus = Translations$common$quota$agentStatus$zh_CN.internal(_root);
-	@override late final Translations$common$quota$alert$zh_CN alert = Translations$common$quota$alert$zh_CN.internal(_root);
-	@override String get backToChat => '返回聊天';
-	@override String get syncNow => '立即同步';
-	@override String generatedAt({required Object value}) => '更新于 ${value}';
-	@override String get loading => '正在加载账户额度…';
-	@override String remaining({required Object value}) => '剩余 ${value}%';
-	@override String resetsIn({required Object value}) => '${value} 后重置';
-	@override String projected({required Object value}) => '按当前速度，此额度将在 ${value} 后耗尽';
-	@override String syncedAgo({required Object value}) => '${value} 前已同步';
-	@override String get refreshAccount => '刷新账户';
-	@override String get syncFailed => '同步失败';
-	@override String get history => '历史';
-	@override String historyPoints({required Object value}) => '已记录 ${value} 条读数';
-	@override String get historyEmpty => '尚无历史记录';
-	@override String get noAgents => '未分配代理';
-	@override String get noSubscription => '无订阅';
-	@override String get noSubscriptionHint => '提供商未报告此账户有有效套餐。';
-	@override late final Translations$common$quota$quality$zh_CN quality = Translations$common$quota$quality$zh_CN.internal(_root);
-	@override late final Translations$common$quota$kpi$zh_CN kpi = Translations$common$quota$kpi$zh_CN.internal(_root);
-	@override late final Translations$common$quota$empty$zh_CN empty = Translations$common$quota$empty$zh_CN.internal(_root);
-	@override late final Translations$common$quota$settings$zh_CN settings = Translations$common$quota$settings$zh_CN.internal(_root);
-	@override late final Translations$common$quota$range$zh_CN range = Translations$common$quota$range$zh_CN.internal(_root);
 }
 
 // Path: common.actions
@@ -2115,6 +2454,8 @@ class Translations$common$gitPanel$zh_CN extends Translations$common$gitPanel$en
 	@override late final Translations$common$gitPanel$worktrees$zh_CN worktrees = Translations$common$gitPanel$worktrees$zh_CN.internal(_root);
 	@override String get wrap => '换行';
 	@override late final Translations$common$gitPanel$tabs$zh_CN tabs = Translations$common$gitPanel$tabs$zh_CN.internal(_root);
+	@override String get save => '保存';
+	@override late final Translations$common$gitPanel$worktreeScripts$zh_CN worktreeScripts = Translations$common$gitPanel$worktreeScripts$zh_CN.internal(_root);
 }
 
 // Path: common.sessions
@@ -2135,6 +2476,20 @@ class Translations$common$projects$zh_CN extends Translations$common$projects$en
 
 	// Translations
 	@override String get newSession => '新会话';
+}
+
+// Path: common.sharedNotes
+class Translations$common$sharedNotes$zh_CN extends Translations$common$sharedNotes$en {
+	Translations$common$sharedNotes$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get subtitle => '共享记忆 — 注入到此项目的每个会话中';
+	@override String get save => '保存';
+	@override String get saving => '正在保存…';
+	@override String get noProject => '选择一个工作区以编辑其共享上下文';
+	@override String get placeholder => '# 共享上下文\n每个智能体都应了解的约定、决策和要点…';
 }
 
 // Path: common.codeBlock
@@ -2180,6 +2535,26 @@ class Translations$common$update$zh_CN extends Translations$common$update$en {
 	@override String staged({required Object version}) => '已下载更新 v${version} — 请重启服务器以完成安装。';
 	@override String get upToDate => '服务器已是最新版本。';
 	@override String webHostFailed({required Object message}) => '服务器已更新，但其 Web 界面未更新：${message}';
+}
+
+// Path: common.appShell
+class Translations$common$appShell$zh_CN extends Translations$common$appShell$en {
+	Translations$common$appShell$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String panelActive({required Object count}) => '面板 · ${count} 个运行中';
+}
+
+// Path: common.errors
+class Translations$common$errors$zh_CN extends Translations$common$errors$en {
+	Translations$common$errors$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get forbidden => '访问被拒绝';
 }
 
 // Path: settings.changelog
@@ -2228,10 +2603,13 @@ class Translations$settings$updates$zh_CN extends Translations$settings$updates$
 	// Translations
 	@override String get title => '更新';
 	@override String get description => '在 GitHub 上检查更新的桌面版本。新版本会自动下载并在退出时安装。';
+	@override String get descriptionMobile => '在 GitHub 上检查此应用的新版本。更新由设备的系统安装程序安装。';
+	@override String get descriptionServer => '在 GitHub 上检查新的 DDAgent 版本。已连接的服务器可以自行更新 — 重启期间活动会话将被中断。';
 	@override String get check => '检查更新';
 	@override String get checking => '正在检查…';
 	@override String upToDate({required Object version}) => '已是最新版本（v${version}）。';
 	@override String available({required Object version}) => '发现更新 v${version} — 正在后台下载；退出 DDAgent 时自动安装。';
+	@override String appAvailable({required Object version}) => '应用更新 v${version} 可用 — 点击“更新”即可在此设备上安装。';
 	@override String downloaded({required Object version}) => '更新 v${version} 已下载 — 退出并重新启动 DDAgent 即可安装。';
 	@override String get unavailable => '更新检查仅在打包的桌面版本中可用。';
 	@override String error({required Object message}) => '更新检查失败：${message}';
@@ -2340,6 +2718,7 @@ class Translations$settings$quickSettings$zh_CN extends Translations$settings$qu
 	@override String get sendByCtrlEnterDescription => '启用后，按 Ctrl+Enter 发送消息，而不是仅按 Enter。这对于使用输入法的用户可以避免意外发送。';
 	@override late final Translations$settings$quickSettings$dragHandle$zh_CN dragHandle = Translations$settings$quickSettings$dragHandle$zh_CN.internal(_root);
 	@override String get sendWithCtrlEnter => '使用 Ctrl+Enter 发送';
+	@override String get enterSendsHint => '关闭时，按 Enter 发送，按 Shift+Enter 换行。';
 }
 
 // Path: settings.terminalShortcuts
@@ -2358,8 +2737,8 @@ class Translations$settings$terminalShortcuts$zh_CN extends Translations$setting
 	@override String get arrowUp => '上箭头';
 	@override String get arrowDown => '下箭头';
 	@override String get scrollDown => '滚动到底部';
-	@override late final Translations$settings$terminalShortcuts$handle$zh_CN handle = Translations$settings$terminalShortcuts$handle$zh_CN.internal(_root);
 	@override String get killTitle => '终止正在运行的进程 (Ctrl+C)';
+	@override late final Translations$settings$terminalShortcuts$handle$zh_CN handle = Translations$settings$terminalShortcuts$handle$zh_CN.internal(_root);
 	@override String get paste => '粘贴';
 }
 
@@ -2373,7 +2752,9 @@ class Translations$settings$mainTabs$zh_CN extends Translations$settings$mainTab
 	@override String get label => '设置';
 	@override String get agents => '智能体';
 	@override String get orchestration => '编排';
+	@override String get miniOrchestration => '迷你编排';
 	@override String get appearance => '外观';
+	@override String get workspaces => '工作区';
 	@override String get git => 'Git';
 	@override String get apiTokens => 'API 和令牌';
 	@override String get models => '模型';
@@ -2382,8 +2763,27 @@ class Translations$settings$mainTabs$zh_CN extends Translations$settings$mainTab
 	@override String get tools => '工具';
 	@override String get notifications => '通知';
 	@override String get about => '关于';
-	@override String get workspaces => '工作区';
-	@override String get quota => 'Control Center';
+	@override String get quota => '控制中心';
+	@override String get shortcuts => '键盘快捷键';
+}
+
+// Path: settings.miniOrchestration
+class Translations$settings$miniOrchestration$zh_CN extends Translations$settings$miniOrchestration$en {
+	Translations$settings$miniOrchestration$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '迷你编排';
+	@override String get description => '双模型流水线：非 flash 的思考者负责规划，flash 执行者负责执行。';
+	@override String get loading => '正在加载迷你编排设置…';
+	@override String get loadError => '无法加载迷你编排设置。';
+	@override late final Translations$settings$miniOrchestration$enable$zh_CN enable = Translations$settings$miniOrchestration$enable$zh_CN.internal(_root);
+	@override late final Translations$settings$miniOrchestration$thinker$zh_CN thinker = Translations$settings$miniOrchestration$thinker$zh_CN.internal(_root);
+	@override late final Translations$settings$miniOrchestration$worker$zh_CN worker = Translations$settings$miniOrchestration$worker$zh_CN.internal(_root);
+	@override late final Translations$settings$miniOrchestration$fields$zh_CN fields = Translations$settings$miniOrchestration$fields$zh_CN.internal(_root);
+	@override late final Translations$settings$miniOrchestration$roles$zh_CN roles = Translations$settings$miniOrchestration$roles$zh_CN.internal(_root);
+	@override late final Translations$settings$miniOrchestration$planner$zh_CN planner = Translations$settings$miniOrchestration$planner$zh_CN.internal(_root);
 }
 
 // Path: settings.orchestration
@@ -2394,9 +2794,9 @@ class Translations$settings$orchestration$zh_CN extends Translations$settings$or
 
 	// Translations
 	@override String get title => 'Orchestration';
-	@override String get description => 'Route chat tasks across your providers and models.';
-	@override String get loading => 'Loading orchestration settings…';
-	@override String get loadError => 'Could not load the orchestration settings.';
+	@override String get description => '在您的提供者和模型之间路由聊天任务。';
+	@override String get loading => '正在加载编排设置…';
+	@override String get loadError => '无法加载编排设置。';
 	@override String get retry => 'Retry';
 	@override late final Translations$settings$orchestration$enable$zh_CN enable = Translations$settings$orchestration$enable$zh_CN.internal(_root);
 	@override late final Translations$settings$orchestration$pool$zh_CN pool = Translations$settings$orchestration$pool$zh_CN.internal(_root);
@@ -2421,6 +2821,7 @@ class Translations$settings$notifications$zh_CN extends Translations$settings$no
 	@override late final Translations$settings$notifications$desktop$zh_CN desktop = Translations$settings$notifications$desktop$zh_CN.internal(_root);
 	@override late final Translations$settings$notifications$sound$zh_CN sound = Translations$settings$notifications$sound$zh_CN.internal(_root);
 	@override late final Translations$settings$notifications$events$zh_CN events = Translations$settings$notifications$events$zh_CN.internal(_root);
+	@override late final Translations$settings$notifications$messaging$zh_CN messaging = Translations$settings$notifications$messaging$zh_CN.internal(_root);
 	@override late final Translations$settings$notifications$channels$zh_CN channels = Translations$settings$notifications$channels$zh_CN.internal(_root);
 	@override String get unpair => '取消配对';
 }
@@ -2543,6 +2944,7 @@ class Translations$settings$agents$zh_CN extends Translations$settings$agents$en
 	@override late final Translations$settings$agents$login$zh_CN login = Translations$settings$agents$login$zh_CN.internal(_root);
 	@override late final Translations$settings$agents$logout$zh_CN logout = Translations$settings$agents$logout$zh_CN.internal(_root);
 	@override String error({required Object error}) => '错误：${error}';
+	@override late final Translations$settings$agents$accounts$zh_CN accounts = Translations$settings$agents$accounts$zh_CN.internal(_root);
 }
 
 // Path: settings.permissions
@@ -2634,6 +3036,72 @@ class Translations$settings$workspaces$zh_CN extends Translations$settings$works
 	@override String get pathRequired => '路径为必填项';
 }
 
+// Path: settings.stt
+class Translations$settings$stt$zh_CN extends Translations$settings$stt$en {
+	Translations$settings$stt$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '语音输入（语音转文字）';
+	@override String get description => '兼容 Whisper 的 /audio/transcriptions 端点（OpenAI、whisper.cpp、faster-whisper、Speaches）。启用后输入框中会显示麦克风按钮。';
+	@override String get configured => '已配置';
+	@override String get endpoint => '端点 URL（例如 https://api.openai.com/v1）';
+	@override String get apiKey => 'API 密钥';
+	@override String get model => '模型（默认：whisper-1）';
+	@override String get save => '保存';
+}
+
+// Path: settings.schedules
+class Translations$settings$schedules$zh_CN extends Translations$settings$schedules$en {
+	Translations$settings$schedules$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '定时任务';
+	@override String get description => '按 cron 时间表定期运行智能体。运行将在无人值守的情况下进行，并跳过权限确认。';
+	@override String get preventSleep => '智能体运行时阻止休眠';
+	@override String get preventSleepHint => '桌面端会保持屏幕常亮；在浏览器中使用屏幕唤醒锁。';
+	@override String get kNew => '新建定时任务';
+	@override String get loading => '正在加载…';
+	@override String get empty => '暂无定时任务。';
+	@override String get project => '项目';
+	@override String get provider => '提供者';
+	@override String get cron => 'Cron（分 时 日 月 星期）';
+	@override String nextRun({required Object time}) => '下次运行：${time}';
+	@override String get cronInvalid => '此表达式没有即将到来的运行';
+	@override String get prompt => '提示词';
+	@override String get useWorktree => '在新的 worktree 中运行';
+	@override String get catchUp => '补跑错过的运行';
+	@override String failures({required Object count}) => '${count} 次失败';
+	@override String get disabled => '已禁用';
+	@override String get history => '历史';
+	@override String get runNow => '立即运行';
+	@override String get delete => '删除';
+	@override String get noRuns => '暂无运行记录。';
+	@override String get next => '下次';
+	@override String get create => '创建';
+	@override String get toggleSchedule => '启用定时任务';
+}
+
+// Path: settings.mcpTokens
+class Translations$settings$mcpTokens$zh_CN extends Translations$settings$mcpTokens$en {
+	Translations$settings$mcpTokens$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'DDAgent MCP 服务器令牌';
+	@override String get description => '外部工具（Claude Desktop、OpenClaw）通过 POST /mcp 并携带其中一个 Bearer 令牌来调用 DDAgent 工具。';
+	@override String get dismiss => '关闭';
+	@override String get labelPlaceholder => '令牌标签（例如 Claude Desktop）';
+	@override String get create => '创建';
+	@override String get empty => '暂无 MCP 令牌。';
+	@override String lastUsed({required Object time}) => '使用于 ${time}';
+	@override String get neverUsed => '从未使用';
+}
+
 // Path: settings.about
 class Translations$settings$about$zh_CN extends Translations$settings$about$en {
 	Translations$settings$about$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
@@ -2643,10 +3111,10 @@ class Translations$settings$about$zh_CN extends Translations$settings$about$en {
 	// Translations
 	@override String get supportTitle => '支持本项目';
 	@override String get buyMeACoffee => '请我喝杯咖啡';
-	@override String get learnMore => '了解更多';
-	@override late final Translations$settings$about$pro$zh_CN pro = Translations$settings$about$pro$zh_CN.internal(_root);
-	@override String get proFeatures => 'DDAgent Pro 功能';
 	@override String get tryHosted => '试用 DDAgent Hosted';
+	@override String get learnMore => '了解更多';
+	@override String get proFeatures => 'DDAgent Pro 功能';
+	@override late final Translations$settings$about$pro$zh_CN pro = Translations$settings$about$pro$zh_CN.internal(_root);
 	@override String get versionInfo => '版本信息';
 	@override String get client => '应用';
 	@override String get server => '服务器';
@@ -2654,6 +3122,58 @@ class Translations$settings$about$zh_CN extends Translations$settings$about$en {
 	@override String get platformDesktop => '桌面端';
 	@override String get platformWeb => '网页';
 	@override String get unknown => '未知';
+	@override String get copyright => '© 2026 DDAgent — 保留所有权利';
+	@override String get tagline => '开源 AI 编程助手界面';
+	@override String get docs => '文档';
+	@override String get hostedDescription => '团队协作、共享 MCP 配置、跨环境设置同步以及托管基础设施。';
+}
+
+// Path: settings.shortcuts
+class Translations$settings$shortcuts$zh_CN extends Translations$settings$shortcuts$en {
+	Translations$settings$shortcuts$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => 'DDAgent 中的所有键盘快捷键，按平台分列。';
+	@override String get action => '操作';
+	@override String get winLinux => 'Windows / Linux';
+	@override String get mac => 'macOS';
+	@override String get navigation => '导航';
+	@override String get navWorkspace => '转到工作区';
+	@override String get navTasks => '转到任务 / Git';
+	@override String get navGit => '转到 Git';
+	@override String get navFocus => '切换专注模式（侧边栏）';
+	@override String get navSwitcher => '快速切换会话';
+	@override String get navPalette => '命令面板';
+	@override String get navSettings => '打开设置';
+	@override String get navClose => '关闭对话框 / 恢复分屏窗格';
+	@override String get composer => '输入框';
+	@override String get compSend => '发送消息';
+	@override String get compNewline => '换行';
+	@override String get compNav => '浏览建议';
+	@override String get compAccept => '接受建议';
+	@override String get compCloseSuggest => '关闭建议';
+	@override String get transcript => '对话记录';
+	@override String get trCopy => '复制选中文本';
+	@override String get trClose => '关闭搜索 / 审查面板';
+	@override String get terminal => '终端';
+	@override String get termCopy => '复制选中内容';
+	@override String get termInterrupt => '中断进程（无选中内容时）';
+	@override String get termPaste => '粘贴';
+	@override String get termSelectAll => '全选';
+	@override String get editor => '编辑器';
+	@override String get edSave => '保存文件';
+	@override String get edSaveAll => '保存所有文件';
+	@override String get edClose => '关闭标签页';
+	@override String get edNextTab => '下一个标签页';
+	@override String get edPrevTab => '上一个标签页';
+	@override String get edIndent => '增加 / 减少缩进';
+	@override String get palette => '命令面板';
+	@override String get palNav => '浏览项目';
+	@override String get palRun => '运行 / 打开';
+	@override String get palBack => '返回（搜索为空时）';
+	@override String get palClose => '关闭';
 }
 
 // Path: sidebar.projects
@@ -2692,6 +3212,19 @@ class Translations$sidebar$app$zh_CN extends Translations$sidebar$app$en {
 	// Translations
 	@override String get title => 'DDAgent';
 	@override String get subtitle => 'AI 编程助手';
+}
+
+// Path: sidebar.panel
+class Translations$sidebar$panel$zh_CN extends Translations$sidebar$panel$en {
+	Translations$sidebar$panel$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get open => '面板';
+	@override String get newChat => '新聊天';
+	@override String get navigation => '导航';
+	@override String get sessions => '会话';
 }
 
 // Path: sidebar.sessions
@@ -2788,6 +3321,22 @@ class Translations$sidebar$actions$zh_CN extends Translations$sidebar$actions$en
 	@override String get buyMeACoffee => '请我喝杯咖啡';
 }
 
+// Path: sidebar.workspace
+class Translations$sidebar$workspace$zh_CN extends Translations$sidebar$workspace$en {
+	Translations$sidebar$workspace$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '更改会话工作区';
+	@override String get description => '代理将在此目录中执行后续回合。现有会话历史将被保留。';
+	@override String get pathLabel => '工作区路径';
+	@override String get pathRequired => '工作区路径为必填项。';
+	@override String get submit => '更改工作区';
+	@override String get saving => '正在更改…';
+	@override String get changeAction => '更改工作区';
+}
+
 // Path: sidebar.branding
 class Translations$sidebar$branding$zh_CN extends Translations$sidebar$branding$en {
 	Translations$sidebar$branding$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
@@ -2847,6 +3396,8 @@ class Translations$sidebar$messages$zh_CN extends Translations$sidebar$messages$
 	@override String get deleteSessionError => '删除会话时出错，请重试。';
 	@override String get renameSessionFailed => '重命名会话失败，请重试。';
 	@override String get renameSessionError => '重命名会话时出错，请重试。';
+	@override String get changeWorkspaceFailed => '更改工作区失败。请重试。';
+	@override String get changeWorkspaceError => '更改工作区时出错。请重试。';
 	@override String get deleteProjectFailed => '移除项目失败，请重试。';
 	@override String get deleteProjectError => '移除项目时出错，请重试。';
 	@override String get createProjectFailed => '创建项目失败，请重试。';
@@ -2857,8 +3408,6 @@ class Translations$sidebar$messages$zh_CN extends Translations$sidebar$messages$
 	@override String get restoreProjectError => '恢复项目时出错，请重试。';
 	@override String get restoreSessionFailed => '恢复会话失败，请重试。';
 	@override String get restoreSessionError => '恢复会话时出错，请重试。';
-	@override String get changeWorkspaceFailed => '更改工作区失败。请重试。';
-	@override String get changeWorkspaceError => '更改工作区时出错。请重试。';
 	@override String bulkDeleteSessionsFailed({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
 		one: '删除 ${count} 个会话失败。请重试。',
 		other: '删除 ${count} 个会话失败。请重试。',
@@ -2916,6 +3465,21 @@ class Translations$sidebar$search$zh_CN extends Translations$sidebar$search$en {
 	);
 }
 
+// Path: sidebar.recent
+class Translations$sidebar$recent$zh_CN extends Translations$sidebar$recent$en {
+	Translations$sidebar$recent$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '最近对话';
+	@override String get emptyTitle => '暂无对话';
+	@override String get emptyDescription => '你最近更新的对话将显示在这里。';
+	@override String get loadFailed => '无法加载最近对话';
+	@override String get loadMore => '加载更早的对话';
+	@override String get loadingMore => '加载中...';
+}
+
 // Path: sidebar.deleteConfirmation
 class Translations$sidebar$deleteConfirmation$zh_CN extends Translations$sidebar$deleteConfirmation$en {
 	Translations$sidebar$deleteConfirmation$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
@@ -2964,50 +3528,6 @@ class Translations$sidebar$zones$zh_CN extends Translations$sidebar$zones$en {
 	@override String get thisWeek => '本周';
 	@override String showMore({required Object count}) => '再显示 ${count} 个';
 	@override String get showLess => '收起';
-}
-
-// Path: sidebar.panel
-class Translations$sidebar$panel$zh_CN extends Translations$sidebar$panel$en {
-	Translations$sidebar$panel$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get open => '面板';
-	@override String get newChat => '新聊天';
-	@override String get navigation => '导航';
-	@override String get sessions => '会话';
-}
-
-// Path: sidebar.workspace
-class Translations$sidebar$workspace$zh_CN extends Translations$sidebar$workspace$en {
-	Translations$sidebar$workspace$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => '更改会话工作区';
-	@override String get description => '代理将在此目录中执行后续回合。现有会话历史将被保留。';
-	@override String get pathLabel => '工作区路径';
-	@override String get pathRequired => '工作区路径为必填项。';
-	@override String get submit => '更改工作区';
-	@override String get saving => '正在更改…';
-	@override String get changeAction => '更改工作区';
-}
-
-// Path: sidebar.recent
-class Translations$sidebar$recent$zh_CN extends Translations$sidebar$recent$en {
-	Translations$sidebar$recent$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => '最近对话';
-	@override String get emptyTitle => '暂无对话';
-	@override String get emptyDescription => '你最近更新的对话将显示在这里。';
-	@override String get loadFailed => '无法加载最近对话';
-	@override String get loadMore => '加载更早的对话';
-	@override String get loadingMore => '加载中...';
 }
 
 // Path: sidebar.tabs
@@ -3191,11 +3711,11 @@ class Translations$tasks$prd$zh_CN extends Translations$tasks$prd$en {
 	// Translations
 	@override String modified({required Object date}) => '修改时间：${date}';
 	@override String editorTitle({required Object name}) => 'PRD — ${name}';
-	@override String fileExistsMessage({required Object name}) => '名为“${name}”的 PRD 已存在。要覆盖它吗？';
-	@override String get fileExistsTitle => '文件已存在';
 	@override String get newFile => '新文件';
-	@override String get parse => '解析 PRD';
 	@override String get template => '模板';
+	@override String get parse => '解析 PRD';
+	@override String get fileExistsTitle => '文件已存在';
+	@override String fileExistsMessage({required Object name}) => '名为“${name}”的 PRD 已存在。要覆盖它吗？';
 	@override String get fileNameHint => '文件名（例如 prd.txt）';
 	@override String get saved => 'PRD 已保存';
 	@override String get tasksGenerated => '已从 PRD 生成任务';
@@ -3262,6 +3782,10 @@ class Translations$tasks$board$zh_CN extends Translations$tasks$board$en {
 	@override late final Translations$tasks$board$agent$zh_CN agent = Translations$tasks$board$agent$zh_CN.internal(_root);
 	@override late final Translations$tasks$board$deleteConfirm$zh_CN deleteConfirm = Translations$tasks$board$deleteConfirm$zh_CN.internal(_root);
 	@override String get project => '项目';
+	@override late final Translations$tasks$board$assignee$zh_CN assignee = Translations$tasks$board$assignee$zh_CN.internal(_root);
+	@override late final Translations$tasks$board$presence$zh_CN presence = Translations$tasks$board$presence$zh_CN.internal(_root);
+	@override late final Translations$tasks$board$activity$zh_CN activity = Translations$tasks$board$activity$zh_CN.internal(_root);
+	@override late final Translations$tasks$board$comments$zh_CN comments = Translations$tasks$board$comments$zh_CN.internal(_root);
 }
 
 // Path: tasks.card
@@ -3375,9 +3899,9 @@ class Translations$tasks$taskDetail$zh_CN extends Translations$tasks$taskDetail$
 	@override String get testStrategy => '测试策略';
 	@override String get titleRequired => '标题为必填项';
 	@override String get updateFailed => '更新任务失败';
-	@override String deleteConfirmMessage({required Object id}) => '任务 #${id} 将被移除。此操作无法撤销。';
 	@override String get notFound => '未找到任务';
 	@override String get subtasks => '子任务';
+	@override String deleteConfirmMessage({required Object id}) => '任务 #${id} 将被移除。此操作无法撤销。';
 	@override String get idCopied => '任务 ID 已复制';
 }
 
@@ -3389,6 +3913,22 @@ class Translations$tasks$toasts$zh_CN extends Translations$tasks$toasts$en {
 
 	// Translations
 	@override String statusInProgress({required Object id}) => '任务 ${id} 已设为进行中';
+}
+
+// Path: tasks.taskmaster
+class Translations$tasks$taskmaster$zh_CN extends Translations$tasks$taskmaster$en {
+	Translations$tasks$taskmaster$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get noProjectHint => '请先添加项目，然后为其创建任务。';
+	@override late final Translations$tasks$taskmaster$sort$zh_CN sort = Translations$tasks$taskmaster$sort$zh_CN.internal(_root);
+	@override String installedVersion({required Object version}) => '已安装：${version}';
+	@override String get initFailed => '初始化 TaskMaster 失败';
+	@override late final Translations$tasks$taskmaster$prd$zh_CN prd = Translations$tasks$taskmaster$prd$zh_CN.internal(_root);
+	@override late final Translations$tasks$taskmaster$detail$zh_CN detail = Translations$tasks$taskmaster$detail$zh_CN.internal(_root);
+	@override String get untitledTask => '无标题任务';
 }
 
 // Path: knowledge.tabs
@@ -3573,39 +4113,6 @@ class Translations$knowledge$tags$zh_CN extends Translations$knowledge$tags$en {
 	@override String get none => '还没有标签。';
 }
 
-// Path: knowledge.contextBudget
-class Translations$knowledge$contextBudget$zh_CN extends Translations$knowledge$contextBudget$en {
-	Translations$knowledge$contextBudget$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String tokens({required Object tokens, required Object budget}) => '~${tokens} / ${budget} 令牌';
-}
-
-// Path: knowledge.critical
-class Translations$knowledge$critical$zh_CN extends Translations$knowledge$critical$en {
-	Translations$knowledge$critical$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get make => '标记为严重';
-	@override String get makeAll => '将所有规则设为严重';
-	@override String get makeAllHint => '将它们加入注入的上下文预算';
-}
-
-// Path: knowledge.errors
-class Translations$knowledge$errors$zh_CN extends Translations$knowledge$errors$en {
-	Translations$knowledge$errors$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String importFailed({required Object error}) => '导入失败：${error}';
-	@override String migrationFailed({required Object error}) => '迁移失败：${error}';
-}
-
 // Path: knowledge.graph
 class Translations$knowledge$graph$zh_CN extends Translations$knowledge$graph$en {
 	Translations$knowledge$graph$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
@@ -3623,13 +4130,35 @@ class Translations$knowledge$importAll$zh_CN extends Translations$knowledge$impo
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get action => '导入全部';
+	@override String get title => '将全部内容导入 DDAgent';
+	@override String projectsScanned({required Object count}) => '已扫描项目：${count}';
+	@override String skillsFound({required Object found, required Object newSkills}) => '发现的代理技能：${found}（新增：${newSkills}）';
+	@override String rulesSummary({required Object total, required Object duplicates}) => '规则：${total} · 重复组：${duplicates}';
 	@override String get mergeDuplicates => '合并重复条目';
 	@override String get mergeDuplicatesHint => '合并 DDAgent 中的重复行（不涉及文件）';
-	@override String projectsScanned({required Object count}) => '已扫描项目：${count}';
-	@override String rulesSummary({required Object total, required Object duplicates}) => '规则：${total} · 重复组：${duplicates}';
-	@override String skillsFound({required Object found, required Object newSkills}) => '发现的代理技能：${found}（新增：${newSkills}）';
-	@override String get title => '将全部内容导入 DDAgent';
+	@override String get action => '导入全部';
+	@override String get readOnlyNotice => '对你的代理只读：此操作只导入到 DDAgent 自己的数据库，不会修改或删除任何 CLI 文件或配置。以下选项只会更改 DDAgent 数据。';
+	@override String get dryRunNote => '试运行——尚未写入任何内容。';
+	@override String get importedNote => '已导入。';
+	@override String result({required Object rules, required Object newSkills, required Object removed, required Object promoted}) => '已导入——规则：${rules}，新技能：${newSkills}，已移除：${removed}，已提升：${promoted}';
+	@override String get description => '扫描所有项目，并将代理的技能导入知识库。对代理只读——不会更改 CLI 中的任何内容。';
+}
+
+// Path: knowledge.migrate
+class Translations$knowledge$migrate$zh_CN extends Translations$knowledge$migrate$en {
+	Translations$knowledge$migrate$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '迁移现有规则';
+	@override String scanned({required Object count}) => '已扫描 ${count} 个项目。';
+	@override String rulesSummary({required Object total, required Object critical}) => '规则：共 ${total} 条，${critical} 条严重。';
+	@override String duplicates({required Object count}) => '跨项目的重复组：${count}';
+	@override String removedPromoted({required Object removed, required Object promoted}) => '已移除：${removed}，已提升：${promoted}';
+	@override String get mergeDuplicates => '合并重复项';
+	@override String get dryRunNote => '试运行——尚未进行任何更改。';
+	@override String get applied => '已应用。';
 }
 
 // Path: knowledge.importSkills
@@ -3639,9 +4168,35 @@ class Translations$knowledge$importSkills$zh_CN extends Translations$knowledge$i
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
+	@override String get title => '导入代理技能';
 	@override String found({required Object count}) => '在你的代理中找到 ${count} 个技能。';
 	@override String summary({required Object imported, required Object skipped}) => '新增：${imported} · 已跳过：${skipped}';
-	@override String get title => '导入代理技能';
+	@override String get dryRunHint => '将代理自带的全局/默认技能（用户、系统、插件）导入为知识技能。试运行——尚未导入任何内容。';
+	@override String get importedNote => '已导入知识库。';
+}
+
+// Path: knowledge.critical
+class Translations$knowledge$critical$zh_CN extends Translations$knowledge$critical$en {
+	Translations$knowledge$critical$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get make => '标记为严重';
+	@override String get makeAll => '将所有规则设为严重';
+	@override String get makeAllHint => '将它们加入注入的上下文预算';
+}
+
+// Path: knowledge.contextBudget
+class Translations$knowledge$contextBudget$zh_CN extends Translations$knowledge$contextBudget$en {
+	Translations$knowledge$contextBudget$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String tokens({required Object tokens, required Object budget}) => '~${tokens} / ${budget} 令牌';
+	@override String get title => '规则上下文（始终提供）';
+	@override String get selectProject => '选择一个项目以查看其关键上下文的大小。';
 }
 
 // Path: knowledge.linkOptions
@@ -3652,157 +4207,197 @@ class Translations$knowledge$linkOptions$zh_CN extends Translations$knowledge$li
 
 	// Translations
 	@override String memory({required Object title}) => '记忆：${title}';
-	@override String personal({required Object title}) => '个人信息：${title}';
 	@override String rule({required Object title}) => '规则：${title}';
 	@override String skill({required Object name}) => '技能：${name}';
+	@override String personal({required Object title}) => '个人信息：${title}';
 }
 
-// Path: knowledge.migrate
-class Translations$knowledge$migrate$zh_CN extends Translations$knowledge$migrate$en {
-	Translations$knowledge$migrate$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+// Path: knowledge.errors
+class Translations$knowledge$errors$zh_CN extends Translations$knowledge$errors$en {
+	Translations$knowledge$errors$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String duplicates({required Object count}) => '跨项目的重复组：${count}';
-	@override String get mergeDuplicates => '合并重复项';
-	@override String removedPromoted({required Object removed, required Object promoted}) => '已移除：${removed}，已提升：${promoted}';
-	@override String rulesSummary({required Object total, required Object critical}) => '规则：共 ${total} 条，${critical} 条严重。';
-	@override String scanned({required Object count}) => '已扫描 ${count} 个项目。';
-	@override String get title => '迁移现有规则';
+	@override String importFailed({required Object error}) => '导入失败：${error}';
+	@override String migrationFailed({required Object error}) => '迁移失败：${error}';
 }
 
-// Path: skills.addDialog
-class Translations$skills$addDialog$zh_CN extends Translations$skills$addDialog$en {
-	Translations$skills$addDialog$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+// Path: knowledge.entityTypes
+class Translations$knowledge$entityTypes$zh_CN extends Translations$knowledge$entityTypes$en {
+	Translations$knowledge$entityTypes$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get chooseFileTitle => '选择 SKILL.md';
-	@override String get chooseFiles => '选择文件';
-	@override String get chooseFolder => '选择文件夹';
-	@override String get chooseFolderTitle => '选择技能文件夹';
-	@override String folderFilesMeta({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
-		one: '${count} 个文件 · ${size}',
-		other: '${count} 个文件 · ${size}',
-	);
-	@override String get folderUploadsNote => '文件夹上传会保留所选文件夹名称；单独文件使用 `SKILL.md` 中的 `name`。';
-	@override String get hideInstallLocation => '隐藏安装位置';
-	@override String get installSkill => '安装技能';
-	@override String installSkills({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
-		one: '安装 ${count} 个技能',
-		other: '安装 ${count} 个技能',
-	);
-	@override String markdownFileMeta({required Object size}) => 'Markdown 文件 · ${size}';
-	@override String get pickHint => '文件夹可包含脚本、参考资料和资源。';
-	@override String get pickTitle => '选择技能文件夹或 SKILL.md';
-	@override String get readyToInstall => '可以安装';
-	@override String removeQueued({required Object name}) => '移除 ${name}';
-	@override String title({required Object provider}) => '添加 ${provider} 技能';
-	@override String get uploadHint => '上传 SKILL.md 文件或完整的技能文件夹。';
-	@override String get whereWillThisInstall => '将安装到何处？';
-}
-
-// Path: skills.empty
-class Translations$skills$empty$zh_CN extends Translations$skills$empty$en {
-	Translations$skills$empty$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get noGlobalSkills => '尚未发现全局技能';
-	@override String get noGlobalSkillsDescription => '在上方添加全局技能，使其可用于所有项目。';
-	@override String get noMatchingSkills => '没有匹配的技能';
-	@override String get noMatchingSkillsDescription => '请尝试其他命令、名称、范围、项目或来源路径。';
-	@override String get noProjects => '没有可用的项目';
-	@override String get noProjectsDescription => '添加项目或工作区以浏览其技能。';
-	@override String get noSkillsInProject => '此项目中没有技能';
-	@override String get noSkillsInProjectDescription => '在所选项目中创建 .claude/skills、.cursor/skills 或 .agents/skills 文件夹。';
-}
-
-// Path: skills.errors
-class Translations$skills$errors$zh_CN extends Translations$skills$errors$en {
-	Translations$skills$errors$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get addMarkdownFirst => '请先添加一个或多个 Markdown 文件。';
-	@override String couldNotReadSkillFile({required Object name}) => '无法从 ${name} 读取 SKILL.md。';
-	@override String get dropMarkdownOrFolder => '拖入一个或多个 Markdown 文件，或包含 SKILL.md 的文件夹。';
-	@override String folderFileLimit({required Object count}) => '一个技能文件夹最多可包含 ${count} 个文件。';
-	@override String get folderReadFailed => '读取技能文件夹失败';
-	@override String get folderSizeLimit => '所选技能文件夹的总大小必须小于 30 MB。';
-	@override String get importFailed => '导入技能失败';
-	@override String get missingSkillFile => '所选文件夹不包含 SKILL.md 文件。';
-}
-
-// Path: skills.moveDialog
-class Translations$skills$moveDialog$zh_CN extends Translations$skills$moveDialog$en {
-	Translations$skills$moveDialog$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get moveToGlobal => '移动到全局';
-	@override String get moveToProject => '移动到项目';
-	@override String get toGlobalHint => '将此技能移入全局技能目录，以便所有项目都能使用。';
-	@override String get toProjectHint => '选择应拥有此技能的项目。它将从提供商的全局技能目录中移出。';
-}
-
-// Path: skills.scopes
-class Translations$skills$scopes$zh_CN extends Translations$skills$scopes$en {
-	Translations$skills$scopes$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get admin => '管理员';
-	@override String get plugin => '插件';
+	@override String get memory => '记忆';
+	@override String get rule => '规则';
+	@override String get skill => '技能';
+	@override String get personal => '个人';
 	@override String get project => '项目';
-	@override String get repo => '仓库';
-	@override String get system => '系统';
-	@override String get user => '用户';
+	@override String get tag => '标签';
 }
 
-// Path: skills.screen
-class Translations$skills$screen$zh_CN extends Translations$skills$screen$en {
-	Translations$skills$screen$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+// Path: collab.roles
+class Translations$collab$roles$zh_CN extends Translations$collab$roles$en {
+	Translations$collab$roles$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get addSkill => '添加技能';
-	@override String get clearSearch => '清除技能搜索';
-	@override String deleteDescription({required Object directory, required Object provider}) => '这会将 ${directory} 目录从 ${provider} 的托管技能目录中移除。此操作无法撤销。';
-	@override String deleteTitle({required Object name}) => '删除 ${name}？';
-	@override String loadingSkills({required Object provider}) => '正在加载 ${provider} 技能…';
-	@override String manageDescription({required Object provider}) => '管理来自本地文件、完整文件夹和项目级位置的 ${provider} 技能。';
-	@override String get noDescription => '技能的 front matter 中未提供描述。';
-	@override String pluginBadge({required Object name}) => '插件：${name}';
-	@override String projectBadge({required Object name}) => '项目：${name}';
-	@override String get savedSuccessfully => '技能保存成功。';
-	@override String get scanningProjectSkills => '正在扫描项目技能...';
-	@override String get searchHint => '搜索技能...';
-	@override String skillsCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
-		one: '${count} 个技能',
-		other: '${count} 个技能',
+	@override String get member => '成员';
+	@override String get viewer => '查看者';
+}
+
+// Path: collab.viewing
+class Translations$collab$viewing$zh_CN extends Translations$collab$viewing$en {
+	Translations$collab$viewing$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get session => '会话';
+	@override String get card => '卡片';
+	@override String get board => '看板';
+}
+
+// Path: fileTree.search
+class Translations$fileTree$search$zh_CN extends Translations$fileTree$search$en {
+	Translations$fileTree$search$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get hint => '筛选名称 / 按 Enter 搜索内容';
+	@override String get prompt => '输入查询并按 Enter';
+	@override String get noMatches => '没有匹配项';
+	@override String get resultsTruncated => '结果已截断';
+}
+
+// Path: fileTree.titles
+class Translations$fileTree$titles$zh_CN extends Translations$fileTree$titles$en {
+	Translations$fileTree$titles$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String rename({required Object name}) => '重命名 ${name}';
+	@override String delete({required Object name}) => '删除 ${name}';
+	@override String download({required Object name}) => '下载 ${name}';
+}
+
+// Path: fileTree.relative
+class Translations$fileTree$relative$zh_CN extends Translations$fileTree$relative$en {
+	Translations$fileTree$relative$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get now => '刚刚';
+	@override String minutes({required Object n}) => '${n} 分钟';
+	@override String hours({required Object n}) => '${n} 小时';
+	@override String days({required Object n}) => '${n} 天';
+}
+
+// Path: git.checkpoints
+class Translations$git$checkpoints$zh_CN extends Translations$git$checkpoints$en {
+	Translations$git$checkpoints$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '检查点';
+	@override String get restoreTitle => '恢复检查点';
+	@override String get restoreMessage => '将工作树重置到此检查点？当前更改将被替换。';
+	@override String get restored => '检查点已恢复';
+	@override String get labelHint => '检查点标签（可选）';
+	@override String get empty => '还没有检查点';
+	@override String get create => '新建';
+}
+
+// Path: git.branchSections
+class Translations$git$branchSections$zh_CN extends Translations$git$branchSections$en {
+	Translations$git$branchSections$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get local => '本地';
+	@override String get remote => '远程';
+}
+
+// Path: kanban.card
+class Translations$kanban$card$zh_CN extends Translations$kanban$card$en {
+	Translations$kanban$card$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get untitled => '未命名';
+}
+
+// Path: kanban.comments
+class Translations$kanban$comments$zh_CN extends Translations$kanban$comments$en {
+	Translations$kanban$comments$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get empty => '还没有评论';
+	@override String get add => '添加评论';
+}
+
+// Path: kanban.dialog
+class Translations$kanban$dialog$zh_CN extends Translations$kanban$dialog$en {
+	Translations$kanban$dialog$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get saving => '保存中…';
+}
+
+// Path: kanban.details
+class Translations$kanban$details$zh_CN extends Translations$kanban$details$en {
+	Translations$kanban$details$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '卡片详情';
+	@override String status({required Object status}) => '状态：${status}';
+}
+
+// Path: kanban.empty
+class Translations$kanban$empty$zh_CN extends Translations$kanban$empty$en {
+	Translations$kanban$empty$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get noProject => '未选择项目';
+}
+
+// Path: kanban.time
+class Translations$kanban$time$zh_CN extends Translations$kanban$time$en {
+	Translations$kanban$time$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get now => '刚刚';
+	@override String minutesAgo({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
+		one: '1 分钟前',
+		other: '${count} 分钟前',
 	);
-	@override String get sourceLabel => '来源';
-}
-
-// Path: mcp.form
-class Translations$mcp$form$zh_CN extends Translations$mcp$form$en {
-	Translations$mcp$form$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override late final Translations$mcp$form$fields$zh_CN fields = Translations$mcp$form$fields$zh_CN.internal(_root);
-	@override late final Translations$mcp$form$scope$zh_CN scope = Translations$mcp$form$scope$zh_CN.internal(_root);
-	@override String submitTo({required Object provider}) => '将服务器添加到 ${provider}';
-	@override late final Translations$mcp$form$validation$zh_CN validation = Translations$mcp$form$validation$zh_CN.internal(_root);
+	@override String hoursAgo({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
+		one: '1 小时前',
+		other: '${count} 小时前',
+	);
+	@override String daysAgo({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
+		one: '1 天前',
+		other: '${count} 天前',
+	);
 }
 
 // Path: mcp.install
@@ -3812,19 +4407,19 @@ class Translations$mcp$install$zh_CN extends Translations$mcp$install$en {
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get button => '安装';
-	@override String get cardDescription => '通过 MCP 让你的代理使用知识库和 DDAgent 工具 — 选择代理，或为全部安装。';
+	@override String get title => '安装 DDAgent MCP 服务器';
 	@override String get description => '让所选代理通过 MCP 使用 DDAgent 知识库和工具。';
-	@override String get errorFallback => '错误';
-	@override String failed({required Object error}) => '安装失败：${error}';
-	@override String get installForAll => '为全部安装';
+	@override String get cardDescription => '通过 MCP 让你的代理使用知识库和 DDAgent 工具 — 选择代理，或为全部安装。';
 	@override String get installSelected => '安装到所选';
+	@override String get installForAll => '为全部安装';
+	@override String get button => '安装';
+	@override String failed({required Object error}) => '安装失败：${error}';
 	@override String installedCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
 		one: '已安装到 ${count} 个代理。',
 		other: '已安装到 ${count} 个代理。',
 	);
 	@override String partialFailure({required Object count, required Object failed}) => '已安装到 ${count}；失败：${failed}';
-	@override String get title => '安装 DDAgent MCP 服务器';
+	@override String get errorFallback => '错误';
 }
 
 // Path: mcp.servers
@@ -3834,15 +4429,19 @@ class Translations$mcp$servers$zh_CN extends Translations$mcp$servers$en {
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get addGlobalDescription => '将此 MCP 服务器添加到所有提供商：Claude、Cursor、Codex、OpenCode 和 Devin。仅支持 stdio 和 HTTP 传输，因为同一份配置必须在所有提供商中都能使用。';
-	@override String get addGlobalMenuDescription => '添加全局 MCP 服务器会将一个通用的 stdio 或 HTTP 服务器写入 Claude、Cursor、Codex、OpenCode 和 Devin。';
-	@override String get addGlobalTitle => '添加全局 MCP 服务器';
-	@override String addProviderDescription({required Object provider}) => '添加 ${provider} MCP 服务器只会更改 ${provider}。';
-	@override String addProviderTitle({required Object provider}) => '添加 ${provider} MCP 服务器';
-	@override late final Translations$mcp$servers$config$zh_CN config = Translations$mcp$servers$config$zh_CN.internal(_root);
-	@override String descriptionGeneric({required Object provider}) => 'Model Context Protocol 服务器为 ${provider} 提供额外的工具和数据源';
 	@override String get loading => '正在加载 MCP 服务器...';
 	@override String get refreshingScopes => '正在刷新项目范围...';
+	@override String descriptionGeneric({required Object provider}) => 'Model Context Protocol 服务器为 ${provider} 提供额外的工具和数据源';
+	@override String get addGlobalTitle => '添加全局 MCP 服务器';
+	@override String get addGlobalDescription => '将此 MCP 服务器添加到所有提供商：Claude、Cursor、Codex、OpenCode 和 Devin。仅支持 stdio 和 HTTP 传输，因为同一份配置必须在所有提供商中都能使用。';
+	@override String get addGlobalMenuDescription => '添加全局 MCP 服务器会将一个通用的 stdio 或 HTTP 服务器写入 Claude、Cursor、Codex、OpenCode 和 Devin。';
+	@override String addProviderTitle({required Object provider}) => '添加 ${provider} MCP 服务器';
+	@override String addProviderDescription({required Object provider}) => '添加 ${provider} MCP 服务器只会更改 ${provider}。';
+	@override late final Translations$mcp$servers$config$zh_CN config = Translations$mcp$servers$config$zh_CN.internal(_root);
+	@override String get selectProjectRequired => '请为项目范围的 MCP 服务器选择一个项目';
+	@override String get globalScopeUnsupported => '为所有提供商添加 MCP 服务器时仅支持用户或项目范围。';
+	@override String globalAddFailed({required Object details}) => '无法将 MCP 服务器添加到所有提供商。${details}';
+	@override String get scopeProject => '项目';
 }
 
 // Path: mcp.team
@@ -3852,9 +4451,9 @@ class Translations$mcp$team$zh_CN extends Translations$mcp$team$en {
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get cta => 'DDAgent Pro 版可用';
-	@override String get description => '在团队中共享 MCP 服务器配置。所有人自动保持同步。';
 	@override String get title => '团队 MCP 配置';
+	@override String get description => '在团队中共享 MCP 服务器配置。所有人自动保持同步。';
+	@override String get cta => 'DDAgent Pro 版可用';
 }
 
 // Path: mcp.tokens
@@ -3865,140 +4464,84 @@ class Translations$mcp$tokens$zh_CN extends Translations$mcp$tokens$en {
 
 	// Translations
 	@override String get scopeWrite => '写入';
+	@override String get scopeRead => '读取';
 }
 
-// Path: terminal.actions
-class Translations$terminal$actions$zh_CN extends Translations$terminal$actions$en {
-	Translations$terminal$actions$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+// Path: mcp.form
+class Translations$mcp$form$zh_CN extends Translations$mcp$form$en {
+	Translations$mcp$form$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get clearOutput => '清空输出';
-	@override String get connect => '连接';
-	@override String get newShell => '新建 Shell';
-	@override String get newTab => '新建终端标签页';
-	@override String get providerLogin => '提供商登录';
-	@override String get restartSession => '重启会话';
+	@override String submitTo({required Object provider}) => '将服务器添加到 ${provider}';
+	@override late final Translations$mcp$form$scope$zh_CN scope = Translations$mcp$form$scope$zh_CN.internal(_root);
+	@override late final Translations$mcp$form$fields$zh_CN fields = Translations$mcp$form$fields$zh_CN.internal(_root);
+	@override late final Translations$mcp$form$validation$zh_CN validation = Translations$mcp$form$validation$zh_CN.internal(_root);
 }
 
-// Path: terminal.authUrl
-class Translations$terminal$authUrl$zh_CN extends Translations$terminal$authUrl$en {
-	Translations$terminal$authUrl$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+// Path: notifications.errors
+class Translations$notifications$errors$zh_CN extends Translations$notifications$errors$en {
+	Translations$notifications$errors$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get openInBrowser => '在浏览器中打开';
+	@override String get registrationRejected => '注册被服务器拒绝';
+	@override String get noResponse => '服务器无响应';
 }
 
-// Path: terminal.errors
-class Translations$terminal$errors$zh_CN extends Translations$terminal$errors$en {
-	Translations$terminal$errors$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+// Path: notifications.androidChannel
+class Translations$notifications$androidChannel$zh_CN extends Translations$notifications$androidChannel$en {
+	Translations$notifications$androidChannel$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String couldNotOpenLink({required Object url}) => '无法打开链接：${url}';
+	@override String get name => 'DDAgent 提醒';
+	@override String get description => '智能体运行、审批和错误通知';
 }
 
-// Path: terminal.fileLink
-class Translations$terminal$fileLink$zh_CN extends Translations$terminal$fileLink$en {
-	Translations$terminal$fileLink$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+// Path: onboarding.errors
+class Translations$onboarding$errors$zh_CN extends Translations$onboarding$errors$en {
+	Translations$onboarding$errors$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String detected({required Object path}) => '检测到文件：${path}';
+	@override String get nameAndEmailRequired => 'git 名称和邮箱均为必填项。';
+	@override String get invalidEmail => '请输入有效的邮箱地址。';
 }
 
-// Path: terminal.paste
-class Translations$terminal$paste$zh_CN extends Translations$terminal$paste$en {
-	Translations$terminal$paste$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+// Path: onboarding.agents
+class Translations$onboarding$agents$zh_CN extends Translations$onboarding$agents$en {
+	Translations$onboarding$agents$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get hint => 'Ctrl+V / 右键 → 粘贴';
-	@override String get title => '粘贴到终端';
+	@override String get title => '连接你的 AI 代理';
+	@override String get description => '登录一个或多个 AI 编程助手。全部为可选。';
+	@override String get laterHint => '你可以稍后在设置中配置。';
 }
 
-// Path: terminal.shortcuts
-class Translations$terminal$shortcuts$zh_CN extends Translations$terminal$shortcuts$en {
-	Translations$terminal$shortcuts$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+// Path: onboarding.mcp
+class Translations$onboarding$mcp$zh_CN extends Translations$onboarding$mcp$en {
+	Translations$onboarding$mcp$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get eof => 'EOF';
-	@override String get hide => '隐藏快捷键栏';
-	@override String get interrupt => '中断 (SIGINT)';
-	@override String get suspend => '挂起 (SIGTSTP)';
-	@override String get showTooltip => '显示快捷键';
-	@override String get hideTooltip => '隐藏快捷键';
-}
-
-// Path: terminal.tabs
-class Translations$terminal$tabs$zh_CN extends Translations$terminal$tabs$en {
-	Translations$terminal$tabs$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get antigravityCli => 'Antigravity CLI';
-	@override String get claudeCli => 'Claude CLI';
-	@override String get commandCodeCli => 'Command Code CLI';
-	@override String get cursorCli => 'Cursor CLI';
-	@override String get devinCli => 'Devin CLI';
-	@override String loginTitle({required Object provider}) => '登录：${provider}';
-	@override String get opencodeCli => 'OpenCode CLI';
-	@override String get plainShell => '普通 Shell';
-	@override String shellName({required Object index}) => 'Shell ${index}';
-}
-
-// Path: quota.agents
-class Translations$quota$agents$zh_CN extends Translations$quota$agents$en {
-	Translations$quota$agents$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String statusCount({required Object status, required Object count}) => '${status}（${count}）';
-}
-
-// Path: quota.chart
-class Translations$quota$chart$zh_CN extends Translations$quota$chart$en {
-	Translations$quota$chart$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get hide => '隐藏';
-	@override String get noData => '数据不足，无法显示趋势。';
-	@override String pointReadout({required Object date, required Object tokens, required Object cost}) => '${date} · ${tokens} 令牌 · ${cost}';
-	@override String get show => '显示';
-}
-
-// Path: quota.config
-class Translations$quota$config$zh_CN extends Translations$quota$config$en {
-	Translations$quota$config$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get accountRouting => '账户路由';
-	@override String get pollerTitle => '轮询与提醒';
-	@override String get save => '保存配置';
-}
-
-// Path: quota.overview
-class Translations$quota$overview$zh_CN extends Translations$quota$overview$en {
-	Translations$quota$overview$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get tokensAndCost => '令牌与成本';
+	@override String get title => '将代理连接到 DDAgent';
+	@override String get description => '安装 DDAgent MCP 服务器，让你的代理可以使用知识库和 DDAgent 工具。选择代理，或为全部安装。';
+	@override String get installSelected => '安装到所选';
+	@override String get installForAll => '为全部安装';
+	@override String get laterHint => '可选 — 你也可以稍后在设置 → MCP 中安装。';
+	@override String installedOn({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
+		one: '已安装到 ${count} 个代理。',
+		other: '已安装到 ${count} 个代理。',
+	);
+	@override String installedWithFailures({required Object installedCount, required Object failed}) => '已安装到 ${installedCount}；失败：${failed}';
 }
 
 // Path: quota.section
@@ -4011,15 +4554,89 @@ class Translations$quota$section$zh_CN extends Translations$quota$section$en {
 	@override String get config => '配置';
 }
 
-// Path: notifications.errors
-class Translations$notifications$errors$zh_CN extends Translations$notifications$errors$en {
-	Translations$notifications$errors$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+// Path: quota.overview
+class Translations$quota$overview$zh_CN extends Translations$quota$overview$en {
+	Translations$quota$overview$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get noResponse => '服务器无响应';
-	@override String get registrationRejected => '注册被服务器拒绝';
+	@override String get tokensAndCost => '令牌与成本';
+}
+
+// Path: quota.agents
+class Translations$quota$agents$zh_CN extends Translations$quota$agents$en {
+	Translations$quota$agents$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String statusCount({required Object status, required Object count}) => '${status}（${count}）';
+}
+
+// Path: quota.config
+class Translations$quota$config$zh_CN extends Translations$quota$config$en {
+	Translations$quota$config$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get pollerTitle => '轮询与提醒';
+	@override String get accountRouting => '账户路由';
+	@override String get save => '保存配置';
+}
+
+// Path: quota.chart
+class Translations$quota$chart$zh_CN extends Translations$quota$chart$en {
+	Translations$quota$chart$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get show => '显示';
+	@override String get hide => '隐藏';
+	@override String get noData => '数据不足，无法显示趋势。';
+	@override String pointReadout({required Object date, required Object tokens, required Object cost}) => '${date} · ${tokens} 令牌 · ${cost}';
+}
+
+// Path: quota.duration
+class Translations$quota$duration$zh_CN extends Translations$quota$duration$en {
+	Translations$quota$duration$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String minutes({required Object minutes}) => '${minutes} 分钟';
+	@override String hoursMinutes({required Object hours, required Object minutes}) => '${hours} 小时 ${minutes} 分钟';
+	@override String daysHours({required Object days, required Object hours}) => '${days} 天 ${hours} 小时';
+	@override String get now => '刚刚';
+}
+
+// Path: scheduler.runStatus
+class Translations$scheduler$runStatus$zh_CN extends Translations$scheduler$runStatus$en {
+	Translations$scheduler$runStatus$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get fired => '已触发';
+	@override String get skipped => '已跳过';
+	@override String get failed => '失败';
+	@override String get completed => '已完成';
+}
+
+// Path: scheduler.cronErrors
+class Translations$scheduler$cronErrors$zh_CN extends Translations$scheduler$cronErrors$en {
+	Translations$scheduler$cronErrors$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String fieldCount({required Object got}) => '需要 5 个字段，实际为 ${got} 个';
+	@override String fieldError({required Object index, required Object error}) => '字段 ${index}：${error}';
+	@override String get empty => '为空';
+	@override String invalidPart({required Object part}) => '无效的“${part}”';
+	@override String invalidValue({required Object value}) => '无效值“${value}”';
 }
 
 // Path: serverConnect.local
@@ -4042,50 +4659,7 @@ class Translations$serverConnect$local$zh_CN extends Translations$serverConnect$
 	@override String get connect => '使用此服务器';
 	@override String error({required Object error}) => '本地服务器错误：${error}';
 	@override String get or => '或连接到远程服务器';
-}
-
-// Path: collab.roles
-class Translations$collab$roles$zh_CN extends Translations$collab$roles$en {
-	Translations$collab$roles$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get member => '成员';
-	@override String get viewer => '查看者';
-}
-
-// Path: sessions.activity
-class Translations$sessions$activity$zh_CN extends Translations$sessions$activity$en {
-	Translations$sessions$activity$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get committingChanges => '正在提交更改';
-	@override String editingFile({required Object file}) => '正在编辑 ${file}';
-	@override String get editingFileGeneric => '正在编辑文件';
-	@override String fetchingUrl({required Object url}) => '正在获取 ${url}';
-	@override String get pushingBranch => '正在推送分支';
-	@override String readingFile({required Object file}) => '正在读取 ${file}';
-	@override String runningCommand({required Object command}) => '正在运行 `${command}`';
-	@override String get runningShellCommand => '正在运行 Shell 命令';
-	@override String runningTool({required Object name}) => '正在运行 ${name}';
-	@override String searching({required Object query}) => '正在搜索“${query}”';
-	@override String get subagentRunning => '子代理运行中';
-}
-
-// Path: sessions.age
-class Translations$sessions$age$zh_CN extends Translations$sessions$age$en {
-	Translations$sessions$age$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String days({required Object days}) => '${days}天';
-	@override String hours({required Object hours}) => '${hours}小时';
-	@override String get lessThanMinute => '<1分钟';
-	@override String minutes({required Object count}) => '${count}分钟';
+	@override late final Translations$serverConnect$local$errors$zh_CN errors = Translations$serverConnect$local$errors$zh_CN.internal(_root);
 }
 
 // Path: sessions.toasts
@@ -4096,169 +4670,356 @@ class Translations$sessions$toasts$zh_CN extends Translations$sessions$toasts$en
 
 	// Translations
 	@override String get archived => '会话已归档';
-	@override String get deleted => '会话已删除';
-	@override String get pinned => '会话已固定';
-	@override String get renamed => '会话已重命名';
 	@override String get restored => '会话已恢复';
+	@override String get deleted => '会话已删除';
+	@override String get renamed => '会话已重命名';
+	@override String get pinned => '会话已固定';
 	@override String get unpinned => '会话已取消固定';
 	@override String get workspaceChanged => '工作区已更改';
 }
 
-// Path: git.checkpoints
-class Translations$git$checkpoints$zh_CN extends Translations$git$checkpoints$en {
-	Translations$git$checkpoints$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+// Path: sessions.age
+class Translations$sessions$age$zh_CN extends Translations$sessions$age$en {
+	Translations$sessions$age$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get create => '新建';
-	@override String get empty => '还没有检查点';
-	@override String get labelHint => '检查点标签（可选）';
-	@override String get restoreMessage => '将工作树重置到此检查点？当前更改将被替换。';
-	@override String get restoreTitle => '恢复检查点';
-	@override String get restored => '检查点已恢复';
-	@override String get title => '检查点';
+	@override String get lessThanMinute => '<1分钟';
+	@override String minutes({required Object count}) => '${count}分钟';
+	@override String hours({required Object hours}) => '${hours}小时';
+	@override String days({required Object days}) => '${days}天';
 }
 
-// Path: kanban.card
-class Translations$kanban$card$zh_CN extends Translations$kanban$card$en {
-	Translations$kanban$card$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+// Path: sessions.activity
+class Translations$sessions$activity$zh_CN extends Translations$sessions$activity$en {
+	Translations$sessions$activity$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get untitled => '未命名';
+	@override String get subagentRunning => '子代理运行中';
+	@override String readingFile({required Object file}) => '正在读取 ${file}';
+	@override String runningTool({required Object name}) => '正在运行 ${name}';
+	@override String editingFile({required Object file}) => '正在编辑 ${file}';
+	@override String get editingFileGeneric => '正在编辑文件';
+	@override String get runningShellCommand => '正在运行 Shell 命令';
+	@override String runningCommand({required Object command}) => '正在运行 `${command}`';
+	@override String get committingChanges => '正在提交更改';
+	@override String get pushingBranch => '正在推送分支';
+	@override String fetchingUrl({required Object url}) => '正在获取 ${url}';
+	@override String searching({required Object query}) => '正在搜索“${query}”';
 }
 
-// Path: kanban.comments
-class Translations$kanban$comments$zh_CN extends Translations$kanban$comments$en {
-	Translations$kanban$comments$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+// Path: skills.addDialog
+class Translations$skills$addDialog$zh_CN extends Translations$skills$addDialog$en {
+	Translations$skills$addDialog$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get add => '添加评论';
-	@override String get empty => '还没有评论';
-}
-
-// Path: kanban.details
-class Translations$kanban$details$zh_CN extends Translations$kanban$details$en {
-	Translations$kanban$details$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String status({required Object status}) => '状态：${status}';
-	@override String get title => '卡片详情';
-}
-
-// Path: kanban.dialog
-class Translations$kanban$dialog$zh_CN extends Translations$kanban$dialog$en {
-	Translations$kanban$dialog$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get saving => '保存中…';
-}
-
-// Path: kanban.empty
-class Translations$kanban$empty$zh_CN extends Translations$kanban$empty$en {
-	Translations$kanban$empty$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get noProject => '未选择项目';
-}
-
-// Path: kanban.time
-class Translations$kanban$time$zh_CN extends Translations$kanban$time$en {
-	Translations$kanban$time$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String daysAgo({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
-		one: '1 天前',
-		other: '${count} 天前',
+	@override String title({required Object provider}) => '添加 ${provider} 技能';
+	@override String get chooseFileTitle => '选择 SKILL.md';
+	@override String get chooseFolderTitle => '选择技能文件夹';
+	@override String get uploadHint => '上传 SKILL.md 文件或完整的技能文件夹。';
+	@override String get pickTitle => '选择技能文件夹或 SKILL.md';
+	@override String get pickHint => '文件夹可包含脚本、参考资料和资源。';
+	@override String get chooseFiles => '选择文件';
+	@override String get chooseFolder => '选择文件夹';
+	@override String get readyToInstall => '可以安装';
+	@override String markdownFileMeta({required Object size}) => 'Markdown 文件 · ${size}';
+	@override String folderFilesMeta({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
+		one: '${count} 个文件 · ${size}',
+		other: '${count} 个文件 · ${size}',
 	);
-	@override String hoursAgo({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
-		one: '1 小时前',
-		other: '${count} 小时前',
+	@override String removeQueued({required Object name}) => '移除 ${name}';
+	@override String get whereWillThisInstall => '将安装到何处？';
+	@override String get hideInstallLocation => '隐藏安装位置';
+	@override String get folderUploadsNote => '文件夹上传会保留所选文件夹名称；单独文件使用 `SKILL.md` 中的 `name`。';
+	@override String get installSkill => '安装技能';
+	@override String installSkills({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
+		one: '安装 ${count} 个技能',
+		other: '安装 ${count} 个技能',
 	);
-	@override String minutesAgo({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
-		one: '1 分钟前',
-		other: '${count} 分钟前',
+}
+
+// Path: skills.moveDialog
+class Translations$skills$moveDialog$zh_CN extends Translations$skills$moveDialog$en {
+	Translations$skills$moveDialog$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get toProjectHint => '选择应拥有此技能的项目。它将从提供商的全局技能目录中移出。';
+	@override String get toGlobalHint => '将此技能移入全局技能目录，以便所有项目都能使用。';
+	@override String get moveToProject => '移动到项目';
+	@override String get moveToGlobal => '移动到全局';
+}
+
+// Path: skills.screen
+class Translations$skills$screen$zh_CN extends Translations$skills$screen$en {
+	Translations$skills$screen$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String manageDescription({required Object provider}) => '管理来自本地文件、完整文件夹和项目级位置的 ${provider} 技能。';
+	@override String get searchHint => '搜索技能...';
+	@override String get clearSearch => '清除技能搜索';
+	@override String get addSkill => '添加技能';
+	@override String get scanningProjectSkills => '正在扫描项目技能...';
+	@override String get savedSuccessfully => '技能保存成功。';
+	@override String loadingSkills({required Object provider}) => '正在加载 ${provider} 技能…';
+	@override String skillsCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
+		one: '${count} 个技能',
+		other: '${count} 个技能',
 	);
-	@override String get now => '刚刚';
+	@override String deleteTitle({required Object name}) => '删除 ${name}？';
+	@override String deleteDescription({required Object directory, required Object provider}) => '这会将 ${directory} 目录从 ${provider} 的托管技能目录中移除。此操作无法撤销。';
+	@override String get noDescription => '技能的 front matter 中未提供描述。';
+	@override String pluginBadge({required Object name}) => '插件：${name}';
+	@override String projectBadge({required Object name}) => '项目：${name}';
+	@override String get sourceLabel => '来源';
 }
 
-// Path: onboarding.agents
-class Translations$onboarding$agents$zh_CN extends Translations$onboarding$agents$en {
-	Translations$onboarding$agents$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+// Path: skills.empty
+class Translations$skills$empty$zh_CN extends Translations$skills$empty$en {
+	Translations$skills$empty$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get description => '登录一个或多个 AI 编程助手。全部为可选。';
-	@override String get laterHint => '你可以稍后在设置中配置。';
-	@override String get title => '连接你的 AI 代理';
+	@override String get noProjects => '没有可用的项目';
+	@override String get noProjectsDescription => '添加项目或工作区以浏览其技能。';
+	@override String get noSkillsInProject => '此项目中没有技能';
+	@override String get noSkillsInProjectDescription => '在所选项目中创建 .claude/skills、.cursor/skills 或 .agents/skills 文件夹。';
+	@override String get noGlobalSkills => '尚未发现全局技能';
+	@override String get noGlobalSkillsDescription => '在上方添加全局技能，使其可用于所有项目。';
+	@override String get noMatchingSkills => '没有匹配的技能';
+	@override String get noMatchingSkillsDescription => '请尝试其他命令、名称、范围、项目或来源路径。';
 }
 
-// Path: onboarding.errors
-class Translations$onboarding$errors$zh_CN extends Translations$onboarding$errors$en {
-	Translations$onboarding$errors$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+// Path: skills.scopes
+class Translations$skills$scopes$zh_CN extends Translations$skills$scopes$en {
+	Translations$skills$scopes$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get invalidEmail => '请输入有效的邮箱地址。';
-	@override String get nameAndEmailRequired => 'git 名称和邮箱均为必填项。';
+	@override String get user => '用户';
+	@override String get plugin => '插件';
+	@override String get repo => '仓库';
+	@override String get project => '项目';
+	@override String get admin => '管理员';
+	@override String get system => '系统';
 }
 
-// Path: onboarding.mcp
-class Translations$onboarding$mcp$zh_CN extends Translations$onboarding$mcp$en {
-	Translations$onboarding$mcp$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+// Path: skills.errors
+class Translations$skills$errors$zh_CN extends Translations$skills$errors$en {
+	Translations$skills$errors$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get description => '安装 DDAgent MCP 服务器，让你的代理可以使用知识库和 DDAgent 工具。选择代理，或为全部安装。';
-	@override String get installForAll => '为全部安装';
-	@override String get installSelected => '安装到所选';
-	@override String installedOn({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
-		one: '已安装到 ${count} 个代理。',
-		other: '已安装到 ${count} 个代理。',
-	);
-	@override String installedWithFailures({required Object installedCount, required Object failed}) => '已安装到 ${installedCount}；失败：${failed}';
-	@override String get laterHint => '可选 — 你也可以稍后在设置 → MCP 中安装。';
-	@override String get title => '将代理连接到 DDAgent';
+	@override String get dropMarkdownOrFolder => '拖入一个或多个 Markdown 文件，或包含 SKILL.md 的文件夹。';
+	@override String get addMarkdownFirst => '请先添加一个或多个 Markdown 文件。';
+	@override String get importFailed => '导入技能失败';
+	@override String get folderReadFailed => '读取技能文件夹失败';
+	@override String folderFileLimit({required Object count}) => '一个技能文件夹最多可包含 ${count} 个文件。';
+	@override String get folderSizeLimit => '所选技能文件夹的总大小必须小于 30 MB。';
+	@override String get missingSkillFile => '所选文件夹不包含 SKILL.md 文件。';
+	@override String couldNotReadSkillFile({required Object name}) => '无法从 ${name} 读取 SKILL.md。';
 }
 
-// Path: fileTree.search
-class Translations$fileTree$search$zh_CN extends Translations$fileTree$search$en {
-	Translations$fileTree$search$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+// Path: terminal.tabs
+class Translations$terminal$tabs$zh_CN extends Translations$terminal$tabs$en {
+	Translations$terminal$tabs$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get hint => '筛选名称 / 按 Enter 搜索内容';
-	@override String get noMatches => '没有匹配项';
-	@override String get prompt => '输入查询并按 Enter';
-	@override String get resultsTruncated => '结果已截断';
+	@override String shellName({required Object index}) => '终端 ${index}';
+	@override String get plainShell => '普通 Shell';
+	@override String get claudeCli => 'Claude CLI';
+	@override String get opencodeCli => 'OpenCode CLI';
+	@override String get commandCodeCli => 'Command Code CLI';
+	@override String get antigravityCli => 'Antigravity CLI';
+	@override String get cursorCli => 'Cursor CLI';
+	@override String get devinCli => 'Devin CLI';
+	@override String loginTitle({required Object provider}) => '登录：${provider}';
+	@override String runTitle({required Object command}) => '运行：${command}';
 }
 
-// Path: fileTree.titles
-class Translations$fileTree$titles$zh_CN extends Translations$fileTree$titles$en {
-	Translations$fileTree$titles$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+// Path: terminal.actions
+class Translations$terminal$actions$zh_CN extends Translations$terminal$actions$en {
+	Translations$terminal$actions$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String delete({required Object name}) => '删除 ${name}';
-	@override String download({required Object name}) => '下载 ${name}';
-	@override String rename({required Object name}) => '重命名 ${name}';
+	@override String get newTab => '新建终端标签页';
+	@override String get providerLogin => '提供商登录';
+	@override String get restartSession => '重启会话';
+	@override String get clearOutput => '清空输出';
+	@override String get newShell => '新建 Shell';
+	@override String get connect => '连接';
+}
+
+// Path: terminal.authUrl
+class Translations$terminal$authUrl$zh_CN extends Translations$terminal$authUrl$en {
+	Translations$terminal$authUrl$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get openInBrowser => '在浏览器中打开';
+	@override String linkLabel({required Object url}) => '认证链接：${url}';
+}
+
+// Path: terminal.fileLink
+class Translations$terminal$fileLink$zh_CN extends Translations$terminal$fileLink$en {
+	Translations$terminal$fileLink$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String detected({required Object path}) => '检测到文件：${path}';
+}
+
+// Path: terminal.shortcuts
+class Translations$terminal$shortcuts$zh_CN extends Translations$terminal$shortcuts$en {
+	Translations$terminal$shortcuts$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get interrupt => '中断 (SIGINT)';
+	@override String get eof => 'EOF';
+	@override String get suspend => '挂起 (SIGTSTP)';
+	@override String get hide => '隐藏快捷键栏';
+	@override String get showTooltip => '显示快捷键';
+	@override String get hideTooltip => '隐藏快捷键';
+}
+
+// Path: terminal.paste
+class Translations$terminal$paste$zh_CN extends Translations$terminal$paste$en {
+	Translations$terminal$paste$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '粘贴到终端';
+	@override String get hint => 'Ctrl+V / 右键 → 粘贴';
+}
+
+// Path: terminal.errors
+class Translations$terminal$errors$zh_CN extends Translations$terminal$errors$en {
+	Translations$terminal$errors$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String couldNotOpenLink({required Object url}) => '无法打开链接：${url}';
+	@override String frameError({required Object message}) => '[错误] ${message}';
+	@override String connectionError({required Object message}) => '[连接错误] ${message}';
+}
+
+// Path: terminal.loginDialog
+class Translations$terminal$loginDialog$zh_CN extends Translations$terminal$loginDialog$en {
+	Translations$terminal$loginDialog$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String title({required Object provider}) => '${provider} CLI 登录';
+	@override String exited({required Object code}) => '已退出（${code}）';
+	@override String get authLinkDetected => '检测到认证链接';
+}
+
+// Path: terminal.empty
+class Translations$terminal$empty$zh_CN extends Translations$terminal$empty$en {
+	Translations$terminal$empty$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '没有活动终端';
+	@override String get description => '新建标签页以开始';
+}
+
+// Path: terminal.overlay
+class Translations$terminal$overlay$zh_CN extends Translations$terminal$overlay$en {
+	Translations$terminal$overlay$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get processExited => '进程已退出 — 连接以重新启动';
+	@override String processExitedWithCode({required Object code}) => '进程已退出（代码 ${code}）— 连接以重新启动';
+	@override String resumeSession({required Object title}) => '恢复会话 ${title}';
+	@override String startSession({required Object path}) => '在 ${path} 中开始新会话';
+}
+
+// Path: workspace.paneTitle
+class Translations$workspace$paneTitle$zh_CN extends Translations$workspace$paneTitle$en {
+	Translations$workspace$paneTitle$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get chat => '聊天';
+	@override String get browser => '浏览器';
+	@override String get terminal => '终端';
+	@override String get notes => '共享笔记';
+	@override String get editor => '编辑器';
+	@override String get git => 'Git';
+}
+
+// Path: worktrees.runtimeStatus
+class Translations$worktrees$runtimeStatus$zh_CN extends Translations$worktrees$runtimeStatus$en {
+	Translations$worktrees$runtimeStatus$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get idle => '空闲';
+	@override String get running => '运行中';
+	@override String get done => '已完成';
+	@override String get failed => '失败';
+	@override String get exited => '已退出';
+}
+
+// Path: browserUse.sessionStatus
+class Translations$browserUse$sessionStatus$zh_CN extends Translations$browserUse$sessionStatus$en {
+	Translations$browserUse$sessionStatus$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get ready => '就绪';
+	@override String get stopped => '已停止';
+	@override String get unavailable => '不可用';
+}
+
+// Path: miniOrchestrator.taskTypes
+class Translations$miniOrchestrator$taskTypes$zh_CN extends Translations$miniOrchestrator$taskTypes$en {
+	Translations$miniOrchestrator$taskTypes$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get gate => '关卡';
+}
+
+// Path: miniOrchestrator.roles
+class Translations$miniOrchestrator$roles$zh_CN extends Translations$miniOrchestrator$roles$en {
+	Translations$miniOrchestrator$roles$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get thinker => '思考者';
+	@override String get worker => '执行者';
 }
 
 // Path: auth.login.errors
@@ -4296,6 +5057,131 @@ class Translations$auth$register$errors$zh_CN extends Translations$auth$register
 	@override String get weakPassword => '密码强度太弱';
 	@override String get usernameTooShort => '用户名至少需要 3 个字符';
 	@override String get passwordTooShort => '密码至少需要 6 个字符';
+}
+
+// Path: chat.orchestrator.routing
+class Translations$chat$orchestrator$routing$zh_CN extends Translations$chat$orchestrator$routing$en {
+	Translations$chat$orchestrator$routing$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '路由';
+	@override String alternatives({required Object list}) => '备选：${list}';
+	@override String first({required Object label, required Object task}) => '${label} — ${task} 的首选候选';
+	@override String skipped({required Object label, required Object list}) => '${label} — 已跳过之前的候选（${list}）';
+}
+
+// Path: chat.orchestrator.plan
+class Translations$chat$orchestrator$plan$zh_CN extends Translations$chat$orchestrator$plan$en {
+	Translations$chat$orchestrator$plan$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '计划';
+	@override String get disabled => '已禁用';
+	@override String get awaitingConfirm => '正在等待确认计划。';
+	@override String get run => '运行计划';
+	@override String get toggleStep => '启用步骤';
+	@override String get confirmFailed => '启动失败，请重试。';
+	@override String get fallback => '规划器不可用 — 回退为单步执行';
+	@override String get templateSource => '来自流水线模板';
+	@override String get offSource => '规划器已关闭';
+	@override String stepCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
+		one: '${count} 个步骤',
+		other: '${count} 个步骤',
+	);
+	@override String get supervisedSource => '监督循环';
+}
+
+// Path: chat.orchestrator.decision
+class Translations$chat$orchestrator$decision$zh_CN extends Translations$chat$orchestrator$decision$en {
+	Translations$chat$orchestrator$decision$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '监督者决策';
+	@override String iteration({required Object n}) => '第 ${n} 轮';
+	@override String get rationaleLabel => '原因';
+	@override String get awaitingConfirm => '运行这些步骤前正在等待您的批准。';
+	@override String get proposedSteps => '建议的步骤';
+	@override late final Translations$chat$orchestrator$decision$action$zh_CN action = Translations$chat$orchestrator$decision$action$zh_CN.internal(_root);
+	@override late final Translations$chat$orchestrator$decision$outcome$zh_CN outcome = Translations$chat$orchestrator$decision$outcome$zh_CN.internal(_root);
+}
+
+// Path: chat.orchestrator.delegation
+class Translations$chat$orchestrator$delegation$zh_CN extends Translations$chat$orchestrator$delegation$en {
+	Translations$chat$orchestrator$delegation$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '委派的步骤';
+	@override String get openSession => '打开完整会话';
+	@override String attempt({required Object n}) => '第 ${n} 次尝试';
+	@override String get retryStep => '重试 / 修复';
+	@override String get continueStep => '继续 / 修复';
+	@override String get continueFailed => '失败，请重试。';
+	@override late final Translations$chat$orchestrator$delegation$status$zh_CN status = Translations$chat$orchestrator$delegation$status$zh_CN.internal(_root);
+	@override String attempts({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
+		one: '${count} 次尝试',
+		other: '${count} 次尝试',
+	);
+	@override String candidates({required Object list}) => '候选：${list}';
+	@override String candidateCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
+		one: '${count} 个候选',
+		other: '${count} 个候选',
+	);
+}
+
+// Path: chat.orchestrator.summary
+class Translations$chat$orchestrator$summary$zh_CN extends Translations$chat$orchestrator$summary$en {
+	Translations$chat$orchestrator$summary$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '总结';
+	@override String progress({required Object done, required Object total}) => '已完成步骤：${done}/${total}';
+	@override String get aborted => '已中止';
+	@override String get timedOut => '已超时';
+	@override String get capped => '已达迭代上限';
+	@override String failed({required Object list}) => '失败的步骤：${list}';
+	@override String get kContinue => '继续';
+	@override String get continueWork => '继续工作';
+	@override String get resumeFailed => '恢复失败，请重试。';
+	@override String get runNextTask => '运行下一个任务';
+	@override String get endAllTasks => '结束所有任务';
+	@override String get tasksRunning => '正在处理任务…';
+	@override String get cancelTasks => '取消';
+}
+
+// Path: chat.orchestrator.taskmaster
+class Translations$chat$orchestrator$taskmaster$zh_CN extends Translations$chat$orchestrator$taskmaster$en {
+	Translations$chat$orchestrator$taskmaster$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '任务队列';
+	@override String remaining({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
+		one: '剩余 ${count} 个',
+		other: '剩余 ${count} 个',
+	);
+	@override late final Translations$chat$orchestrator$taskmaster$status$zh_CN status = Translations$chat$orchestrator$taskmaster$status$zh_CN.internal(_root);
+}
+
+// Path: chat.orchestrator.gate
+class Translations$chat$orchestrator$gate$zh_CN extends Translations$chat$orchestrator$gate$en {
+	Translations$chat$orchestrator$gate$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get timedOut => '已超时';
+	@override String exit({required Object code}) => '退出码 ${code}';
 }
 
 // Path: chat.codex.modes
@@ -4355,6 +5241,9 @@ class Translations$chat$input$queue$zh_CN extends Translations$chat$input$queue$
 	@override String get failed => '发送失败';
 	@override String get sendNow => '立即发送';
 	@override String get sendNowAfterTurn => '该智能体无法在回合进行中接收消息——将在当前回合结束后发送';
+	@override String filesAttached({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count,
+		other: '已附加 ${count} 个文件',
+	);
 }
 
 // Path: chat.input.offlineQueue
@@ -4368,6 +5257,24 @@ class Translations$chat$input$offlineQueue$zh_CN extends Translations$chat$input
 	@override String get clearBtn => '取消';
 	@override String multiple({required Object count}) => '${count} 条消息在离线队列中 — 重新连接后将自动发送';
 	@override String get single => '1 条消息在离线队列中 — 重新连接后将自动发送';
+}
+
+// Path: chat.composer.effortLevels
+class Translations$chat$composer$effortLevels$zh_CN extends Translations$chat$composer$effortLevels$en {
+	Translations$chat$composer$effortLevels$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get off => '关闭';
+	@override String get none => '无';
+	@override String get minimal => '最低';
+	@override String get low => '低';
+	@override String get medium => '中';
+	@override String get high => '高';
+	@override String get xhigh => '极高';
+	@override String get max => '最大';
+	@override String get ultra => '超高';
 }
 
 // Path: chat.providerSelection.providerInfo
@@ -4396,6 +5303,7 @@ class Translations$chat$providerSelection$readyPrompt$zh_CN extends Translations
 	@override String opencode({required Object model}) => '准备好使用带有 ${model} 的 OpenCode。请在下方开始输入您的消息。';
 	@override String get kDefault => '请在上方选择一个提供者以开始';
 	@override String devin({required Object model}) => 'Devin ${model} 已就绪';
+	@override String get orchestrator => '自动模式已就绪 — 路由器会为每个步骤选择最佳模型';
 }
 
 // Path: chat.session.kContinue
@@ -4432,15 +5340,15 @@ class Translations$chat$session$messages$zh_CN extends Translations$chat$session
 	@override String get scrollToLoad => '向上滚动以加载更多';
 	@override String showingLast({required Object count, required Object total}) => '显示最近 ${count} 条消息（共 ${total} 条）';
 	@override String get loadEarlier => '加载更早的消息';
+	@override String get loadOlderFailed => '加载较早消息失败。';
+	@override String get retry => '重试';
 	@override String get loadAll => '加载全部消息';
 	@override String get loadingAll => '正在加载全部消息...';
 	@override String get allLoaded => '全部消息已加载';
 	@override String get perfWarning => '已加载全部消息 - 滚动可能变慢。点击「滚动到底部」恢复性能。';
-	@override String get loadOlderFailed => '加载较早消息失败。';
-	@override String get retry => '重试';
 	@override String get noSearchMatches => '没有消息匹配搜索。';
-	@override String loadAllCount({required Object count}) => '加载全部（${count}）';
 	@override String get loadOlder => '加载更早的消息';
+	@override String loadAllCount({required Object count}) => '加载全部（${count}）';
 	@override String retryLoadOlder({required Object error}) => '重试加载更早的消息 — ${error}';
 }
 
@@ -4478,8 +5386,6 @@ class Translations$chat$shell$actions$zh_CN extends Translations$chat$shell$acti
 	@override String get disconnectTitle => '断开 Shell 连接';
 	@override String get restart => '重启';
 	@override String get restartTitle => '重启 Shell（请先断开连接）';
-	@override String get connect => '在 Shell 中继续';
-	@override String get connectTitle => '连接到 Shell';
 	@override String get kill => '终止 (SIGINT)';
 	@override String get killTitle => '终止正在运行的进程 (Ctrl+C)';
 	@override String get copyOutput => '复制输出';
@@ -4487,6 +5393,8 @@ class Translations$chat$shell$actions$zh_CN extends Translations$chat$shell$acti
 	@override String get copied => '已复制！';
 	@override String get zoomInTitle => '放大';
 	@override String get zoomOutTitle => '缩小';
+	@override String get connect => '在 Shell 中继续';
+	@override String get connectTitle => '连接到 Shell';
 }
 
 // Path: chat.claudeStatus.actions
@@ -4523,7 +5431,7 @@ class Translations$chat$claudeStatus$elapsed$zh_CN extends Translations$chat$cla
 
 	// Translations
 	@override String seconds({required Object count}) => '${count}秒';
-	@override String minutesSeconds({required Object minutes, required Object seconds}) => '${minutes}m ${seconds}s';
+	@override String minutesSeconds({required Object minutes, required Object seconds}) => '${minutes} 分 ${seconds} 秒';
 	@override String label({required Object time}) => '已用 ${time}';
 	@override String get startingNow => '刚刚开始';
 }
@@ -4556,222 +5464,180 @@ class Translations$chat$commandResult$fallback$zh_CN extends Translations$chat$c
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get config => '打开设置和配置。';
-	@override String get cost => '查看当前会话的令牌用量。';
-	@override String get help => '显示命令文档和语法。';
-	@override String get memory => '打开项目的 CLAUDE.md 记忆文件。';
 	@override String get models => '浏览当前提供商的可用模型。';
+	@override String get cost => '查看当前会话的令牌用量。';
 	@override String get status => '查看运行时、版本、提供商和环境状态。';
+	@override String get memory => '打开项目的 CLAUDE.md 记忆文件。';
+	@override String get config => '打开设置和配置。';
+	@override String get help => '显示命令文档和语法。';
 }
 
-// Path: common.fileTree.context
-class Translations$common$fileTree$context$zh_CN extends Translations$common$fileTree$context$en {
-	Translations$common$fileTree$context$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+// Path: chat.permissionRequest.recap
+class Translations$chat$permissionRequest$recap$zh_CN extends Translations$chat$permissionRequest$recap$en {
+	Translations$chat$permissionRequest$recap$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get rename => '重命名';
+	@override String get timedOut => '已超时 — 已自动拒绝';
+	@override String get cancelled => '已取消 — 本轮已停止';
+	@override String get autoApproved => '已自动批准';
+	@override String get expired => '请求已过期 — 代理不再等待';
+	@override String get answered => '已回答';
+	@override String get skipped => '已跳过';
+	@override String get decided => '已决定';
+}
+
+// Path: chat.commandDialog.help
+class Translations$chat$commandDialog$help$zh_CN extends Translations$chat$commandDialog$help$en {
+	Translations$chat$commandDialog$help$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get eyebrow => '命令中心';
+	@override String get title => '帮助与快捷方式';
+	@override String get subtitle => '搜索内置命令、语法模式和命令用法。';
+}
+
+// Path: chat.commandDialog.models
+class Translations$chat$commandDialog$models$zh_CN extends Translations$chat$commandDialog$models$en {
+	Translations$chat$commandDialog$models$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get eyebrow => '模型选择';
+	@override String get title => '选择模型';
+	@override String get subtitle => '选择此提供商要使用的模型。';
+	@override String modelSetTo({required Object model}) => '模型已设置为 ${model}。';
+	@override String get activeModel => '当前模型';
+	@override String get noModelsMatch => '没有与该筛选条件匹配的模型。';
+	@override String get choiceSavedForSession => '你的选择会保存到此会话，并成为新聊天的默认设置。';
+	@override String get choiceDefault => '你的选择将成为新聊天的默认模型。';
+	@override String get custom => '自定义';
+	@override String get currentSelection => '当前选择';
+}
+
+// Path: chat.commandDialog.cost
+class Translations$chat$commandDialog$cost$zh_CN extends Translations$chat$commandDialog$cost$en {
+	Translations$chat$commandDialog$cost$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get eyebrow => '会话遥测';
+	@override String get title => 'Token 用量';
+	@override String get subtitle => '此会话的输入、输出和总 token 数。';
+	@override String get totalTokensUsed => '已用 token 总数';
+	@override String get inputTokens => '输入 token';
+	@override String get cacheReadTokens => '缓存读取 token';
+	@override String get cacheWriteTokens => '缓存写入 token';
+	@override String get outputTokens => '输出 token';
+	@override String get breakdown => '明细';
+	@override String get unavailable => '不可用';
+	@override String get contextWindow => '上下文窗口';
+	@override String get estimatedCost => '预估费用';
+}
+
+// Path: chat.commandDialog.status
+class Translations$chat$commandDialog$status$zh_CN extends Translations$chat$commandDialog$status$en {
+	Translations$chat$commandDialog$status$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get eyebrow => '运行时健康状况';
+	@override String get title => '系统状态';
+	@override String get subtitle => '版本、提供商、运行时和环境详情。';
+	@override String get package => '软件包';
+	@override String get uptime => '运行时间';
+	@override String get platform => '平台';
+	@override String get memory => '内存';
+	@override String memoryRss({required Object mb}) => '${mb} MB RSS';
+	@override String get runtimeOnline => '运行时在线';
+	@override String processResponding({required Object pid}) => '进程 #${pid} 正在响应。';
+	@override String get processStatusResponding => '进程正在响应。';
+	@override String get healthy => '正常';
+}
+
+// Path: chat.commandDialog.syntax
+class Translations$chat$commandDialog$syntax$zh_CN extends Translations$chat$commandDialog$syntax$en {
+	Translations$chat$commandDialog$syntax$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '语法';
+	@override String arguments({required Object arguments, required Object first, required Object second}) => '${arguments} 传递所有参数；${first}、${second} 为位置参数。';
+	@override String file({required Object token}) => '${token} 会包含文件内容。';
+	@override String bash({required Object token}) => '${token} 运行 bash。';
+}
+
+// Path: chat.utilities.tooltip
+class Translations$chat$utilities$tooltip$zh_CN extends Translations$chat$utilities$tooltip$en {
+	Translations$chat$utilities$tooltip$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String tokensUsed({required Object tokens}) => '已用 ${tokens} token';
+	@override String contextOf({required Object percent, required Object total}) => '上下文 ${percent}% / ${total}';
+	@override String input({required Object value}) => '输入 ${value}';
+	@override String cache({required Object read, required Object write}) => '缓存读取 ${read} · 写入 ${write}';
+	@override String output({required Object value}) => '输出 ${value}';
+}
+
+// Path: chat.toolBlocks.status
+class Translations$chat$toolBlocks$status$zh_CN extends Translations$chat$toolBlocks$status$en {
+	Translations$chat$toolBlocks$status$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get running => '运行中';
+	@override String get denied => '已拒绝';
+}
+
+// Path: chat.toolBlocks.verbs
+class Translations$chat$toolBlocks$verbs$zh_CN extends Translations$chat$toolBlocks$verbs$en {
+	Translations$chat$toolBlocks$verbs$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get read => '读取';
+	@override String get write => '写入';
+	@override String get edit => '编辑';
 	@override String get delete => '删除';
-	@override String get copyPath => '复制路径';
-	@override String get download => '下载';
-	@override String get newFile => '新建文件';
-	@override String get newFolder => '新建文件夹';
-	@override String get upload => '上传文件';
-	@override String get refresh => '刷新';
-	@override String get menuLabel => '文件上下文菜单';
-	@override String get loading => '加载中...';
+	@override String get move => '移动';
 }
 
-// Path: common.fileTree.delete
-class Translations$common$fileTree$delete$zh_CN extends Translations$common$fileTree$delete$en {
-	Translations$common$fileTree$delete$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+// Path: chat.commandMenu.namespaces
+class Translations$chat$commandMenu$namespaces$zh_CN extends Translations$chat$commandMenu$namespaces$en {
+	Translations$chat$commandMenu$namespaces$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get confirm => '删除';
-	@override String get fileWarning => '此文件将被永久删除。';
-	@override String get folderWarning => '此文件夹及其所有内容将被永久删除。';
-	@override String title({required Object type}) => '删除${type}';
+	@override String get frequent => '常用';
+	@override String get builtin => '内置命令';
+	@override String get skill => '技能';
+	@override String get project => '项目命令';
+	@override String get user => '用户命令';
+	@override String get other => '其他命令';
 }
 
-// Path: common.fileTree.toast
-class Translations$common$fileTree$toast$zh_CN extends Translations$common$fileTree$toast$en {
-	Translations$common$fileTree$toast$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+// Path: chat.mentionMenu.kinds
+class Translations$chat$mentionMenu$kinds$zh_CN extends Translations$chat$mentionMenu$kinds$en {
+	Translations$chat$mentionMenu$kinds$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get copyFailed => '复制路径失败';
-	@override String get fileCreated => '文件创建成功';
-	@override String get fileDeleted => '文件已删除';
-	@override String get folderCreated => '文件夹创建成功';
-	@override String get folderDeleted => '文件夹已删除';
-	@override String get folderDownloaded => '文件夹已下载为 ZIP';
-	@override String get pathCopied => '路径已复制到剪贴板';
-	@override String get renamed => '重命名成功';
-}
-
-// Path: common.fileTree.validation
-class Translations$common$fileTree$validation$zh_CN extends Translations$common$fileTree$validation$en {
-	Translations$common$fileTree$validation$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get dotsOnly => '文件名不能只包含点';
-	@override String get emptyName => '文件名不能为空';
-	@override String get invalidChars => '文件名包含无效字符';
-	@override String get reserved => '文件名是保留名称';
-}
-
-// Path: common.projectWizard.steps
-class Translations$common$projectWizard$steps$zh_CN extends Translations$common$projectWizard$steps$en {
-	Translations$common$projectWizard$steps$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get type => '类型';
-	@override String get configure => '配置';
-	@override String get confirm => '确认';
-}
-
-// Path: common.projectWizard.step1
-class Translations$common$projectWizard$step1$zh_CN extends Translations$common$projectWizard$step1$en {
-	Translations$common$projectWizard$step1$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get question => '您已经有工作区，还是想创建一个新的工作区？';
-	@override late final Translations$common$projectWizard$step1$existing$zh_CN existing = Translations$common$projectWizard$step1$existing$zh_CN.internal(_root);
-	@override late final Translations$common$projectWizard$step1$kNew$zh_CN kNew = Translations$common$projectWizard$step1$kNew$zh_CN.internal(_root);
-}
-
-// Path: common.projectWizard.step2
-class Translations$common$projectWizard$step2$zh_CN extends Translations$common$projectWizard$step2$en {
-	Translations$common$projectWizard$step2$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get existingPath => '工作区路径';
-	@override String get newPath => '工作区路径';
-	@override String get existingPlaceholder => '/path/to/existing/workspace';
-	@override String get newPlaceholder => '/path/to/new/workspace';
-	@override String get existingHelp => '您现有工作区目录的完整路径';
-	@override String get newHelp => '工作区目录的完整路径';
-	@override String get githubUrl => 'GitHub URL（可选）';
-	@override String get githubPlaceholder => 'https://github.com/username/repository';
-	@override String get githubHelp => '可选：提供 GitHub URL 以克隆仓库';
-	@override String get githubAuth => 'GitHub 身份验证（可选）';
-	@override String get githubAuthHelp => '仅私有仓库需要。公共仓库无需身份验证即可克隆。';
-	@override String get loadingTokens => '正在加载已保存的令牌...';
-	@override String get storedToken => '已保存的令牌';
-	@override String get newToken => '新令牌';
-	@override String get nonePublic => '无（公共）';
-	@override String get selectToken => '选择令牌';
-	@override String get selectTokenPlaceholder => '-- 选择令牌 --';
-	@override String get tokenPlaceholder => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
-	@override String get tokenHelp => '此令牌仅用于此操作';
-	@override String get publicRepoInfo => '公共仓库不需要身份验证。如果克隆公共仓库，可以跳过提供令牌。';
-	@override String get noTokensHelp => '没有可用的已保存令牌。您可以在 设置 → API 密钥 中添加令牌以便重复使用。';
-	@override String get optionalTokenPublic => 'GitHub 令牌（公共仓库可选）';
-	@override String get tokenPublicPlaceholder => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx（公共仓库可留空）';
-}
-
-// Path: common.projectWizard.step3
-class Translations$common$projectWizard$step3$zh_CN extends Translations$common$projectWizard$step3$en {
-	Translations$common$projectWizard$step3$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get reviewConfig => '查看您的配置';
-	@override String get existingWorkspace => '现有工作区';
-	@override String get newWorkspace => '新建工作区';
-	@override String get path => '路径：';
-	@override String get cloneFrom => '克隆自：';
-	@override String get authentication => '身份验证：';
-	@override String get usingStoredToken => '使用已保存的令牌：';
-	@override String get usingProvidedToken => '使用提供的令牌';
-	@override String get noAuthentication => '无身份验证';
-	@override String get sshKey => 'SSH 密钥';
-	@override String get existingInfo => '工作区将被添加到您的项目列表中，并可用于 Claude/Cursor 会话。';
-	@override String get newWithClone => '仓库将从此文件夹克隆。';
-	@override String get newEmpty => '工作区将被添加到您的项目列表中，并可用于 Claude/Cursor 会话。';
-	@override String get cloningRepository => '正在克隆仓库...';
-}
-
-// Path: common.projectWizard.buttons
-class Translations$common$projectWizard$buttons$zh_CN extends Translations$common$projectWizard$buttons$en {
-	Translations$common$projectWizard$buttons$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get cancel => '取消';
-	@override String get back => '返回';
-	@override String get next => '下一步';
-	@override String get createProject => '创建项目';
-	@override String get creating => '创建中...';
-	@override String get cloning => '正在克隆...';
-}
-
-// Path: common.projectWizard.errors
-class Translations$common$projectWizard$errors$zh_CN extends Translations$common$projectWizard$errors$en {
-	Translations$common$projectWizard$errors$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get selectType => '请选择您已有现有工作区还是想创建新工作区';
-	@override String get providePath => '请提供工作区路径';
-	@override String get failedToCreate => '创建工作区失败';
-	@override String get failedToCreateFolder => '创建文件夹失败';
-}
-
-// Path: common.notifications.codes
-class Translations$common$notifications$codes$zh_CN extends Translations$common$notifications$codes$en {
-	Translations$common$notifications$codes$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override late final Translations$common$notifications$codes$generic$zh_CN generic = Translations$common$notifications$codes$generic$zh_CN.internal(_root);
-	@override late final Translations$common$notifications$codes$permission$zh_CN permission = Translations$common$notifications$codes$permission$zh_CN.internal(_root);
-	@override late final Translations$common$notifications$codes$run$zh_CN run = Translations$common$notifications$codes$run$zh_CN.internal(_root);
-	@override late final Translations$common$notifications$codes$agent$zh_CN agent = Translations$common$notifications$codes$agent$zh_CN.internal(_root);
-}
-
-// Path: common.versionUpdate.buttons
-class Translations$common$versionUpdate$buttons$zh_CN extends Translations$common$versionUpdate$buttons$en {
-	Translations$common$versionUpdate$buttons$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get close => '关闭';
-	@override String get later => '稍后';
-	@override String get copyCommand => '复制命令';
-	@override String get updateNow => '立即更新';
-	@override String get updating => '更新中...';
-}
-
-// Path: common.versionUpdate.ariaLabels
-class Translations$common$versionUpdate$ariaLabels$zh_CN extends Translations$common$versionUpdate$ariaLabels$en {
-	Translations$common$versionUpdate$ariaLabels$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get closeModal => '关闭版本升级模态框';
-	@override String get showSidebar => '显示侧边栏';
-	@override String get settings => '设置';
-	@override String get updateAvailable => '有可用更新';
-	@override String get closeSidebar => '关闭侧边栏';
+	@override String get file => '文件';
+	@override String get session => '会话';
+	@override String get task => '任务';
 }
 
 // Path: common.quota.section
@@ -5020,6 +5886,216 @@ class Translations$common$quota$range$zh_CN extends Translations$common$quota$ra
 	@override String get k7d => '7d';
 	@override String get k30d => '30d';
 	@override String get all => '全部';
+}
+
+// Path: common.fileTree.context
+class Translations$common$fileTree$context$zh_CN extends Translations$common$fileTree$context$en {
+	Translations$common$fileTree$context$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get rename => '重命名';
+	@override String get delete => '删除';
+	@override String get copyPath => '复制路径';
+	@override String get download => '下载';
+	@override String get newFile => '新建文件';
+	@override String get newFolder => '新建文件夹';
+	@override String get upload => '上传文件';
+	@override String get refresh => '刷新';
+	@override String get menuLabel => '文件上下文菜单';
+	@override String get loading => '加载中...';
+}
+
+// Path: common.fileTree.delete
+class Translations$common$fileTree$delete$zh_CN extends Translations$common$fileTree$delete$en {
+	Translations$common$fileTree$delete$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get confirm => '删除';
+	@override String get fileWarning => '此文件将被永久删除。';
+	@override String get folderWarning => '此文件夹及其所有内容将被永久删除。';
+	@override String title({required Object type}) => '删除${type}';
+}
+
+// Path: common.fileTree.toast
+class Translations$common$fileTree$toast$zh_CN extends Translations$common$fileTree$toast$en {
+	Translations$common$fileTree$toast$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get copyFailed => '复制路径失败';
+	@override String get fileCreated => '文件创建成功';
+	@override String get fileDeleted => '文件已删除';
+	@override String get folderCreated => '文件夹创建成功';
+	@override String get folderDeleted => '文件夹已删除';
+	@override String get folderDownloaded => '文件夹已下载为 ZIP';
+	@override String get pathCopied => '路径已复制到剪贴板';
+	@override String get renamed => '重命名成功';
+}
+
+// Path: common.fileTree.validation
+class Translations$common$fileTree$validation$zh_CN extends Translations$common$fileTree$validation$en {
+	Translations$common$fileTree$validation$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get dotsOnly => '文件名不能只包含点';
+	@override String get emptyName => '文件名不能为空';
+	@override String get invalidChars => '文件名包含无效字符';
+	@override String get reserved => '文件名是保留名称';
+}
+
+// Path: common.projectWizard.steps
+class Translations$common$projectWizard$steps$zh_CN extends Translations$common$projectWizard$steps$en {
+	Translations$common$projectWizard$steps$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get type => '类型';
+	@override String get configure => '配置';
+	@override String get confirm => '确认';
+}
+
+// Path: common.projectWizard.step1
+class Translations$common$projectWizard$step1$zh_CN extends Translations$common$projectWizard$step1$en {
+	Translations$common$projectWizard$step1$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get question => '您已经有工作区，还是想创建一个新的工作区？';
+	@override late final Translations$common$projectWizard$step1$existing$zh_CN existing = Translations$common$projectWizard$step1$existing$zh_CN.internal(_root);
+	@override late final Translations$common$projectWizard$step1$kNew$zh_CN kNew = Translations$common$projectWizard$step1$kNew$zh_CN.internal(_root);
+}
+
+// Path: common.projectWizard.step2
+class Translations$common$projectWizard$step2$zh_CN extends Translations$common$projectWizard$step2$en {
+	Translations$common$projectWizard$step2$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get existingPath => '工作区路径';
+	@override String get newPath => '工作区路径';
+	@override String get existingPlaceholder => '/path/to/existing/workspace';
+	@override String get newPlaceholder => '/path/to/new/workspace';
+	@override String get existingHelp => '您现有工作区目录的完整路径';
+	@override String get newHelp => '工作区目录的完整路径';
+	@override String get githubUrl => 'GitHub URL（可选）';
+	@override String get githubPlaceholder => 'https://github.com/username/repository';
+	@override String get githubHelp => '可选：提供 GitHub URL 以克隆仓库';
+	@override String get githubAuth => 'GitHub 身份验证（可选）';
+	@override String get githubAuthHelp => '仅私有仓库需要。公共仓库无需身份验证即可克隆。';
+	@override String get loadingTokens => '正在加载已保存的令牌...';
+	@override String get storedToken => '已保存的令牌';
+	@override String get newToken => '新令牌';
+	@override String get nonePublic => '无（公共）';
+	@override String get selectToken => '选择令牌';
+	@override String get selectTokenPlaceholder => '-- 选择令牌 --';
+	@override String get tokenPlaceholder => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
+	@override String get tokenHelp => '此令牌仅用于此操作';
+	@override String get publicRepoInfo => '公共仓库不需要身份验证。如果克隆公共仓库，可以跳过提供令牌。';
+	@override String get noTokensHelp => '没有可用的已保存令牌。您可以在 设置 → API 密钥 中添加令牌以便重复使用。';
+	@override String get optionalTokenPublic => 'GitHub 令牌（公共仓库可选）';
+	@override String get tokenPublicPlaceholder => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx（公共仓库可留空）';
+}
+
+// Path: common.projectWizard.step3
+class Translations$common$projectWizard$step3$zh_CN extends Translations$common$projectWizard$step3$en {
+	Translations$common$projectWizard$step3$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get reviewConfig => '查看您的配置';
+	@override String get existingWorkspace => '现有工作区';
+	@override String get newWorkspace => '新建工作区';
+	@override String get path => '路径：';
+	@override String get cloneFrom => '克隆自：';
+	@override String get authentication => '身份验证：';
+	@override String get usingStoredToken => '使用已保存的令牌：';
+	@override String get usingProvidedToken => '使用提供的令牌';
+	@override String get noAuthentication => '无身份验证';
+	@override String get sshKey => 'SSH 密钥';
+	@override String get existingInfo => '工作区将被添加到您的项目列表中，并可用于 Claude/Cursor 会话。';
+	@override String get newWithClone => '仓库将从此文件夹克隆。';
+	@override String get newEmpty => '工作区将被添加到您的项目列表中，并可用于 Claude/Cursor 会话。';
+	@override String get cloningRepository => '正在克隆仓库...';
+}
+
+// Path: common.projectWizard.buttons
+class Translations$common$projectWizard$buttons$zh_CN extends Translations$common$projectWizard$buttons$en {
+	Translations$common$projectWizard$buttons$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get cancel => '取消';
+	@override String get back => '返回';
+	@override String get next => '下一步';
+	@override String get createProject => '创建项目';
+	@override String get creating => '创建中...';
+	@override String get cloning => '正在克隆...';
+}
+
+// Path: common.projectWizard.errors
+class Translations$common$projectWizard$errors$zh_CN extends Translations$common$projectWizard$errors$en {
+	Translations$common$projectWizard$errors$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get selectType => '请选择您已有现有工作区还是想创建新工作区';
+	@override String get providePath => '请提供工作区路径';
+	@override String get failedToCreate => '创建工作区失败';
+	@override String get failedToCreateFolder => '创建文件夹失败';
+}
+
+// Path: common.notifications.codes
+class Translations$common$notifications$codes$zh_CN extends Translations$common$notifications$codes$en {
+	Translations$common$notifications$codes$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$common$notifications$codes$generic$zh_CN generic = Translations$common$notifications$codes$generic$zh_CN.internal(_root);
+	@override late final Translations$common$notifications$codes$permission$zh_CN permission = Translations$common$notifications$codes$permission$zh_CN.internal(_root);
+	@override late final Translations$common$notifications$codes$run$zh_CN run = Translations$common$notifications$codes$run$zh_CN.internal(_root);
+	@override late final Translations$common$notifications$codes$agent$zh_CN agent = Translations$common$notifications$codes$agent$zh_CN.internal(_root);
+}
+
+// Path: common.versionUpdate.buttons
+class Translations$common$versionUpdate$buttons$zh_CN extends Translations$common$versionUpdate$buttons$en {
+	Translations$common$versionUpdate$buttons$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => '关闭';
+	@override String get later => '稍后';
+	@override String get copyCommand => '复制命令';
+	@override String get updateNow => '立即更新';
+	@override String get updating => '更新中...';
+}
+
+// Path: common.versionUpdate.ariaLabels
+class Translations$common$versionUpdate$ariaLabels$zh_CN extends Translations$common$versionUpdate$ariaLabels$en {
+	Translations$common$versionUpdate$ariaLabels$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get closeModal => '关闭版本升级模态框';
+	@override String get showSidebar => '显示侧边栏';
+	@override String get settings => '设置';
+	@override String get updateAvailable => '有可用更新';
+	@override String get closeSidebar => '关闭侧边栏';
 }
 
 // Path: common.browserUse.empty
@@ -5444,6 +6520,31 @@ class Translations$common$gitPanel$tabs$zh_CN extends Translations$common$gitPan
 	@override String get worktrees => '工作树';
 }
 
+// Path: common.gitPanel.worktreeScripts
+class Translations$common$gitPanel$worktreeScripts$zh_CN extends Translations$common$gitPanel$worktreeScripts$en {
+	Translations$common$gitPanel$worktreeScripts$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Worktree 脚本';
+	@override String get setup => '初始化脚本（创建/打开后运行）';
+	@override String get run => '启动开发服务器';
+	@override String get stop => '停止开发服务器';
+	@override String get runScript => '运行脚本（开发服务器，按需启动）';
+	@override String get runPort => '预览端口（可选 — 留空时自动检测）';
+	@override String get invalidPort => '端口必须介于 1 到 65535 之间';
+	@override String get sourceProject => '已保存为项目覆盖配置';
+	@override String get sourceFile => '来自 .ddagent/worktree.json — 保存将创建项目覆盖配置';
+	@override String get sourceNone => '尚未配置任何内容';
+	@override String get saving => '正在保存…';
+	@override String get setupRunning => '正在初始化';
+	@override String get setupFailed => '初始化失败';
+	@override String get running => '运行中';
+	@override String get openPreview => '打开预览';
+	@override String runExited({required Object code}) => '运行已退出（${code}）';
+}
+
 // Path: settings.mcp.scope
 class Translations$settings$mcp$scope$zh_CN extends Translations$settings$mcp$scope$en {
 	Translations$settings$mcp$scope$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
@@ -5463,9 +6564,9 @@ class Translations$settings$appearance$themeModes$zh_CN extends Translations$set
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get dark => '深色';
-	@override String get light => '浅色';
 	@override String get system => '跟随系统';
+	@override String get light => '浅色';
+	@override String get dark => '深色';
 }
 
 // Path: settings.quickSettings.sections
@@ -5505,6 +6606,76 @@ class Translations$settings$terminalShortcuts$handle$zh_CN extends Translations$
 	@override String get openPanel => '打开快捷键面板';
 }
 
+// Path: settings.miniOrchestration.enable
+class Translations$settings$miniOrchestration$enable$zh_CN extends Translations$settings$miniOrchestration$enable$en {
+	Translations$settings$miniOrchestration$enable$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get label => '启用迷你编排';
+	@override String get description => '将自动（迷你）会话交由双角色引擎处理，而不是完整的编排器。';
+}
+
+// Path: settings.miniOrchestration.thinker
+class Translations$settings$miniOrchestration$thinker$zh_CN extends Translations$settings$miniOrchestration$thinker$en {
+	Translations$settings$miniOrchestration$thinker$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '思考者（非 flash）';
+	@override String get description => '负责规划、决策、审查并撰写最终报告。';
+}
+
+// Path: settings.miniOrchestration.worker
+class Translations$settings$miniOrchestration$worker$zh_CN extends Translations$settings$miniOrchestration$worker$en {
+	Translations$settings$miniOrchestration$worker$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '执行者（flash）';
+	@override String get description => '执行每个计划步骤。';
+}
+
+// Path: settings.miniOrchestration.fields
+class Translations$settings$miniOrchestration$fields$zh_CN extends Translations$settings$miniOrchestration$fields$en {
+	Translations$settings$miniOrchestration$fields$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get provider => '提供者';
+	@override String get model => '模型';
+	@override String get modelPlaceholder => '选择模型';
+	@override String get tier => '档位';
+}
+
+// Path: settings.miniOrchestration.roles
+class Translations$settings$miniOrchestration$roles$zh_CN extends Translations$settings$miniOrchestration$roles$en {
+	Translations$settings$miniOrchestration$roles$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '按任务分配模型';
+	@override String get description => '每种任务类型由哪个模型（角色）处理。';
+}
+
+// Path: settings.miniOrchestration.planner
+class Translations$settings$miniOrchestration$planner$zh_CN extends Translations$settings$miniOrchestration$planner$en {
+	Translations$settings$miniOrchestration$planner$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '规划器';
+	@override String get mode => '模式';
+	@override late final Translations$settings$miniOrchestration$planner$modes$zh_CN modes = Translations$settings$miniOrchestration$planner$modes$zh_CN.internal(_root);
+	@override String get requireConfirmLabel => '运行前确认计划';
+}
+
 // Path: settings.orchestration.enable
 class Translations$settings$orchestration$enable$zh_CN extends Translations$settings$orchestration$enable$en {
 	Translations$settings$orchestration$enable$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
@@ -5512,8 +6683,8 @@ class Translations$settings$orchestration$enable$zh_CN extends Translations$sett
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get label => 'Enable orchestration';
-	@override String get description => 'Let the orchestrator pick a model per step instead of running everything on one provider.';
+	@override String get label => '启用编排';
+	@override String get description => '让编排器为每个步骤选择模型，而不是全部在同一个提供者上运行。';
 }
 
 // Path: settings.orchestration.pool
@@ -5523,10 +6694,10 @@ class Translations$settings$orchestration$pool$zh_CN extends Translations$settin
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'Candidate pool';
-	@override String get description => 'Models the router can pick from, each pinned to a cost tier.';
-	@override String get add => 'Add candidate';
-	@override String get empty => 'No candidates yet — add one to start routing.';
+	@override String get title => '候选池';
+	@override String get description => '路由器可选择的模型，每个都绑定到一个成本档位。';
+	@override String get add => '添加候选';
+	@override String get empty => '暂无候选 — 添加一个即可开始路由。';
 	@override late final Translations$settings$orchestration$pool$fields$zh_CN fields = Translations$settings$orchestration$pool$fields$zh_CN.internal(_root);
 }
 
@@ -5550,12 +6721,12 @@ class Translations$settings$orchestration$rules$zh_CN extends Translations$setti
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'Routing rules';
-	@override String get description => 'Ordered candidates per task type — the first available one wins.';
-	@override String get addCandidate => 'Add candidate…';
-	@override String get empty => 'No candidates — nothing to route this task type to.';
+	@override String get title => '路由规则';
+	@override String get description => '按任务类型排序的候选 — 第一个可用的候选胜出。';
+	@override String get addCandidate => '添加候选…';
+	@override String get empty => '没有候选 — 此任务类型无处可路由。';
 	@override String get missing => '(removed)';
-	@override String get remove => 'Remove candidate';
+	@override String get remove => '移除候选';
 	@override late final Translations$settings$orchestration$rules$taskTypes$zh_CN taskTypes = Translations$settings$orchestration$rules$taskTypes$zh_CN.internal(_root);
 }
 
@@ -5567,16 +6738,20 @@ class Translations$settings$orchestration$planner$zh_CN extends Translations$set
 
 	// Translations
 	@override String get title => 'Planner';
-	@override String get description => 'How a request is split into routed steps.';
-	@override String get modeLabel => 'Planning mode';
+	@override String get description => '请求如何被拆分为可路由的步骤。';
+	@override String get modeLabel => '规划模式';
 	@override late final Translations$settings$orchestration$planner$modes$zh_CN modes = Translations$settings$orchestration$planner$modes$zh_CN.internal(_root);
 	@override late final Translations$settings$orchestration$planner$modeHints$zh_CN modeHints = Translations$settings$orchestration$planner$modeHints$zh_CN.internal(_root);
-	@override String get candidateLabel => 'Planner model';
-	@override String get candidateDescription => 'Pool candidate used for plan generation and classification calls.';
-	@override String get candidatePlaceholder => 'Select a pool candidate';
+	@override String get candidateLabel => '规划模型';
+	@override String get candidateDescription => '用于生成计划和分类调用的候选池模型。';
+	@override String get candidatePlaceholder => '选择一个候选池模型';
 	@override late final Translations$settings$orchestration$planner$templates$zh_CN templates = Translations$settings$orchestration$planner$templates$zh_CN.internal(_root);
-	@override String get requireConfirm => 'Confirm plan before running';
-	@override String get requireConfirmDescription => 'Pause after planning so you can edit or disable steps on the plan card.';
+	@override String get requireConfirm => '运行前确认计划';
+	@override String get requireConfirmDescription => '规划完成后暂停，以便您在计划卡片上编辑或禁用步骤。';
+	@override String get checkpointLabel => '自主程度';
+	@override late final Translations$settings$orchestration$planner$checkpointModes$zh_CN checkpointModes = Translations$settings$orchestration$planner$checkpointModes$zh_CN.internal(_root);
+	@override late final Translations$settings$orchestration$planner$checkpointHints$zh_CN checkpointHints = Translations$settings$orchestration$planner$checkpointHints$zh_CN.internal(_root);
+	@override String get checkpointIntervalLabel => '检查点之间的步骤数（1–50）';
 }
 
 // Path: settings.orchestration.execution
@@ -5586,17 +6761,30 @@ class Translations$settings$orchestration$execution$zh_CN extends Translations$s
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'Execution limits';
-	@override String get description => 'Guardrails for parallel runs and fix loops.';
-	@override String get maxParallel => 'Max parallel steps';
-	@override String get maxParallelDescription => 'How many subtasks may run at once (1–8).';
-	@override String get maxFixLoops => 'Max fix loops';
-	@override String get maxFixLoopsDescription => 'Retries when a step fails verification (0–5).';
-	@override String get onNoCandidate => 'When no candidate is available';
-	@override String get onNoCandidateDescription => 'Ask before falling back, or skip the step.';
+	@override String get title => '执行限制';
+	@override String get description => '并行运行和修复循环的保护措施。';
+	@override String get maxParallel => '最大并行步骤数';
+	@override String get maxParallelDescription => '可同时运行的子任务数量（1–8）。';
+	@override String get maxFixLoops => '最大修复循环次数';
+	@override String get maxFixLoopsDescription => '步骤验证失败时的重试次数（0–5）。';
+	@override String get onNoCandidate => '没有可用候选时';
+	@override String get onNoCandidateDescription => '回退前先询问，或跳过该步骤。';
 	@override late final Translations$settings$orchestration$execution$onNoCandidateOptions$zh_CN onNoCandidateOptions = Translations$settings$orchestration$execution$onNoCandidateOptions$zh_CN.internal(_root);
-	@override String get useWorktree => 'Isolated worktree';
-	@override String get useWorktreeDescription => 'Run all delegated steps in one shared git worktree instead of the project directory.';
+	@override String get useWorktree => '隔离的 worktree';
+	@override String get useWorktreeDescription => '在一个共享的 git worktree 中运行所有委派步骤，而不是在项目目录中。';
+	@override String get maxSupervisorIterations => '最大监督者迭代次数';
+	@override String get maxSupervisorIterationsDescription => '自动模式下监督者决策轮次的上限（1–100）；达到上限时运行将以部分报告结束。';
+	@override String get maxAttempts => '每步最大尝试次数';
+	@override String get maxAttemptsDescription => '单个步骤在所有通道和重试中的总尝试预算（1–50）。';
+	@override String get stepTimeoutMs => '步骤超时（毫秒）';
+	@override String get stepTimeoutMsDescription => '每次尝试的子运行超时（毫秒）；0 表示禁用。';
+	@override String get runTimeoutMs => '运行超时（毫秒）';
+	@override String get runTimeoutMsDescription => '整个计划运行的全局超时（毫秒）；0 表示禁用。';
+	@override String get retryBackoffBaseMs => '重试退避基数（毫秒）';
+	@override String get retryBackoffBaseMsDescription => '同一通道重试之间指数退避的基数（全抖动）。';
+	@override String get retryBudgetTitle => '按失败类别的重试预算';
+	@override String get retryBudgetDescription => '故障转移/冷却前在同一通道的重试次数（0–5）。';
+	@override late final Translations$settings$orchestration$execution$retryClasses$zh_CN retryClasses = Translations$settings$orchestration$execution$retryClasses$zh_CN.internal(_root);
 }
 
 // Path: settings.orchestration.save
@@ -5606,13 +6794,13 @@ class Translations$settings$orchestration$save$zh_CN extends Translations$settin
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get unsaved => 'Unsaved changes';
+	@override String get unsaved => '有未保存的更改';
 	@override String get save => 'Save';
 	@override String get saving => 'Saving…';
 	@override String get saved => 'Saved';
 	@override String get discard => 'Discard';
 	@override String get error => 'Save failed';
-	@override String get emptyPool => 'Add at least one candidate before saving.';
+	@override String get emptyPool => '保存前请至少添加一个候选。';
 }
 
 // Path: settings.notifications.webPush
@@ -5687,6 +6875,24 @@ class Translations$settings$notifications$events$zh_CN extends Translations$sett
 	@override String get error => '运行失败';
 }
 
+// Path: settings.notifications.messaging
+class Translations$settings$notifications$messaging$zh_CN extends Translations$settings$notifications$messaging$en {
+	Translations$settings$notifications$messaging$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '即时通讯审批';
+	@override String get description => '通过 Telegram 批准或拒绝智能体的权限请求，并在 Discord 上接收运行通知。';
+	@override String get enabled => '已启用';
+	@override String get save => '保存';
+	@override String get test => '测试';
+	@override String get pair => '配对';
+	@override String get telegramToken => '来自 @BotFather 的机器人令牌（123456:ABC…）';
+	@override String get telegramHint => '向您的机器人发送任意消息，然后在下方配对该聊天。';
+	@override String get discordWebhook => 'https://discord.com/api/webhooks/…';
+}
+
 // Path: settings.notifications.channels
 class Translations$settings$notifications$channels$zh_CN extends Translations$settings$notifications$channels$en {
 	Translations$settings$notifications$channels$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
@@ -5694,8 +6900,8 @@ class Translations$settings$notifications$channels$zh_CN extends Translations$se
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get discord => 'Discord';
 	@override String get telegram => 'Telegram';
+	@override String get discord => 'Discord';
 }
 
 // Path: settings.appearanceSettings.darkMode
@@ -6082,6 +7288,28 @@ class Translations$settings$agents$logout$zh_CN extends Translations$settings$ag
 	@override String get failed => '退出登录失败';
 }
 
+// Path: settings.agents.accounts
+class Translations$settings$agents$accounts$zh_CN extends Translations$settings$agents$accounts$en {
+	Translations$settings$agents$accounts$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '命名账号';
+	@override String get description => '额外的凭据集。固定到某个账号的会话会使用该账号独立的配置目录启动 CLI。使用下方显示的环境变量运行一次提供者 CLI 即可登录。';
+	@override String get sharedCli => '所有账号共用同一个 CLI 安装 — 请在上方的连接卡片中更新。';
+	@override String get loading => '正在加载账号…';
+	@override String get kDefault => '默认';
+	@override String usage({required Object tokens}) => '${tokens} 个令牌';
+	@override String get usageButton => '用量';
+	@override String get showUsage => '显示令牌用量';
+	@override String get makeDefault => '设为默认';
+	@override String get remove => '移除账号';
+	@override String get newLabel => '账号标签（例如：工作）';
+	@override String get add => '添加账号';
+	@override late final Translations$settings$agents$accounts$autoSwitch$zh_CN autoSwitch = Translations$settings$agents$accounts$autoSwitch$zh_CN.internal(_root);
+}
+
 // Path: settings.permissions.permissionMode
 class Translations$settings$permissions$permissionMode$zh_CN extends Translations$settings$permissions$permissionMode$en {
 	Translations$settings$permissions$permissionMode$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
@@ -6197,8 +7425,8 @@ class Translations$settings$quota$settings$zh_CN extends Translations$settings$q
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get tab => 'Control Center';
-	@override String get title => 'Control Center';
+	@override String get tab => '控制中心';
+	@override String get title => '控制中心';
 	@override String get description => '提醒阈值、路由策略以及轮询额度的账户。';
 	@override String get saved => '已保存';
 	@override String get alertsSection => '提醒';
@@ -6271,6 +7499,8 @@ class Translations$settings$about$pro$zh_CN extends Translations$settings$about$
 	// Translations
 	@override String get syncSettings => '同步设置';
 	@override String get teamManagement => '团队管理';
+	@override String get syncSettingsDescription => '在所有环境中同步你的偏好设置、MCP 配置和主题。';
+	@override String get teamManagementDescription => '多用户、基于角色的访问控制以及团队共享项目。';
 }
 
 // Path: tasks.notConfigured.features
@@ -6376,6 +7606,8 @@ class Translations$tasks$board$card$zh_CN extends Translations$tasks$board$card$
 	@override String get delete => '删除';
 	@override String get openSession => '打开会话';
 	@override String get pullRequest => '拉取请求';
+	@override String get edit => '编辑';
+	@override String get moveTo => '移动到';
 }
 
 // Path: tasks.board.dialog
@@ -6423,40 +7655,84 @@ class Translations$tasks$board$deleteConfirm$zh_CN extends Translations$tasks$bo
 	@override String get title => '删除卡片？';
 }
 
-// Path: mcp.form.fields
-class Translations$mcp$form$fields$zh_CN extends Translations$mcp$form$fields$en {
-	Translations$mcp$form$fields$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+// Path: tasks.board.assignee
+class Translations$tasks$board$assignee$zh_CN extends Translations$tasks$board$assignee$en {
+	Translations$tasks$board$assignee$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get bearerTokenEnvVar => 'Bearer 令牌环境变量';
-	@override String get envVarNames => '环境变量名称';
-	@override String get workingDirectory => '工作目录';
+	@override String get label => '负责人';
+	@override String get all => '所有负责人';
+	@override String get unassigned => '未分配';
 }
 
-// Path: mcp.form.scope
-class Translations$mcp$form$scope$zh_CN extends Translations$mcp$form$scope$en {
-	Translations$mcp$form$scope$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+// Path: tasks.board.presence
+class Translations$tasks$board$presence$zh_CN extends Translations$tasks$board$presence$en {
+	Translations$tasks$board$presence$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get claudeLocal => 'Claude 本地';
-	@override late final Translations$mcp$form$scope$description$zh_CN description = Translations$mcp$form$scope$description$zh_CN.internal(_root);
-	@override String get projectAllProviders => '项目（所有提供商）';
-	@override String get userAllProviders => '用户（所有提供商）';
+	@override String online({required Object count}) => '${count} 人在线';
 }
 
-// Path: mcp.form.validation
-class Translations$mcp$form$validation$zh_CN extends Translations$mcp$form$validation$en {
-	Translations$mcp$form$validation$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+// Path: tasks.board.activity
+class Translations$tasks$board$activity$zh_CN extends Translations$tasks$board$activity$en {
+	Translations$tasks$board$activity$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String unsupportedGlobal({required Object type}) => '添加 MCP 服务器在所有提供商中仅支持 stdio 和 http，不支持 ${type}。';
-	@override String unsupportedProvider({required Object provider, required Object type}) => '${provider} 不支持 ${type} MCP 服务器';
+	@override String get title => '动态';
+	@override String get empty => '暂无动态';
+}
+
+// Path: tasks.board.comments
+class Translations$tasks$board$comments$zh_CN extends Translations$tasks$board$comments$en {
+	Translations$tasks$board$comments$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get label => '评论';
+	@override String get placeholder => '写评论…';
+	@override String get send => '发送';
+	@override String get unknownAuthor => '某人';
+}
+
+// Path: tasks.taskmaster.sort
+class Translations$tasks$taskmaster$sort$zh_CN extends Translations$tasks$taskmaster$sort$en {
+	Translations$tasks$taskmaster$sort$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get statusAz => '状态 (A-Z)';
+	@override String get statusZa => '状态 (Z-A)';
+}
+
+// Path: tasks.taskmaster.prd
+class Translations$tasks$taskmaster$prd$zh_CN extends Translations$tasks$taskmaster$prd$en {
+	Translations$tasks$taskmaster$prd$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get fileNameRequired => '请为 PRD 提供文件名。';
+	@override String get contentRequired => '保存前请先添加内容。';
+	@override String get overwrite => '覆盖';
+	@override String get contentHint => '# 产品需求文档…';
+}
+
+// Path: tasks.taskmaster.detail
+class Translations$tasks$taskmaster$detail$zh_CN extends Translations$tasks$taskmaster$detail$en {
+	Translations$tasks$taskmaster$detail$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get dependenciesLabel => '依赖项（以逗号分隔的 ID）';
 }
 
 // Path: mcp.servers.config
@@ -6468,6 +7744,133 @@ class Translations$mcp$servers$config$zh_CN extends Translations$mcp$servers$con
 	// Translations
 	@override String get cwd => '工作目录';
 	@override String get envVars => '环境变量';
+}
+
+// Path: mcp.form.scope
+class Translations$mcp$form$scope$zh_CN extends Translations$mcp$form$scope$en {
+	Translations$mcp$form$scope$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get userAllProviders => '用户（所有提供商）';
+	@override String get claudeLocal => 'Claude 本地';
+	@override String get projectAllProviders => '项目（所有提供商）';
+	@override late final Translations$mcp$form$scope$description$zh_CN description = Translations$mcp$form$scope$description$zh_CN.internal(_root);
+}
+
+// Path: mcp.form.fields
+class Translations$mcp$form$fields$zh_CN extends Translations$mcp$form$fields$en {
+	Translations$mcp$form$fields$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get workingDirectory => '工作目录';
+	@override String get envVarNames => '环境变量名称';
+	@override String get bearerTokenEnvVar => 'Bearer 令牌环境变量';
+}
+
+// Path: mcp.form.validation
+class Translations$mcp$form$validation$zh_CN extends Translations$mcp$form$validation$en {
+	Translations$mcp$form$validation$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String unsupportedGlobal({required Object type}) => '添加 MCP 服务器在所有提供商中仅支持 stdio 和 http，不支持 ${type}。';
+	@override String unsupportedProvider({required Object provider, required Object type}) => '${provider} 不支持 ${type} MCP 服务器';
+	@override String get jsonMustBeObject => 'JSON 配置必须是一个对象';
+}
+
+// Path: serverConnect.local.errors
+class Translations$serverConnect$local$errors$zh_CN extends Translations$serverConnect$local$errors$en {
+	Translations$serverConnect$local$errors$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get releaseTagUnresolved => '无法获取最新的 DDAgent 发布标签。';
+	@override String get unsupportedPlatform => '此平台不支持本地服务器。';
+	@override String unsupportedPlatformDetail({required Object platform}) => '此平台不支持本地服务器（${platform}）。';
+	@override String nodeExtractionFailed({required Object path}) => 'Node.js 解压后未生成 ${path}';
+	@override String downloadFailed({required Object error}) => '服务器下载失败：${error}';
+	@override String installFailed({required Object error}) => '服务器安装失败：${error}';
+	@override String get bundleNotInstalled => '服务器包未安装。';
+	@override String spawnFailed({required Object error}) => '无法启动本地服务器：${error}';
+	@override String portInUse({required Object port}) => '端口 ${port} 已被其他应用占用。';
+	@override String get exitedDuringStartup => '本地服务器在启动过程中退出。';
+	@override String exitedDuringStartupWithOutput({required Object output}) => '本地服务器在启动过程中退出：${output}';
+	@override String get startTimeout => '等待本地服务器启动超时。';
+	@override String tarFailed({required Object command, required Object code, required Object output}) => '${command} 失败（退出码 ${code}）：${output}';
+}
+
+// Path: chat.orchestrator.decision.action
+class Translations$chat$orchestrator$decision$action$zh_CN extends Translations$chat$orchestrator$decision$action$en {
+	Translations$chat$orchestrator$decision$action$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get kContinue => '正在委派';
+	@override String get done => '已完成';
+	@override String get invalid => '无决策';
+}
+
+// Path: chat.orchestrator.decision.outcome
+class Translations$chat$orchestrator$decision$outcome$zh_CN extends Translations$chat$orchestrator$decision$outcome$en {
+	Translations$chat$orchestrator$decision$outcome$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get success => '成功';
+	@override String get partial => '部分完成';
+	@override String get failed => '失败';
+}
+
+// Path: chat.orchestrator.delegation.status
+class Translations$chat$orchestrator$delegation$status$zh_CN extends Translations$chat$orchestrator$delegation$status$en {
+	Translations$chat$orchestrator$delegation$status$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get queued => '排队中';
+	@override String get running => '运行中';
+	@override String get done => '已完成';
+	@override String get failed => '失败';
+	@override String get aborted => '已中止';
+	@override String get skipped => '已跳过';
+	@override String get awaitingDecision => '等待决策';
+}
+
+// Path: chat.orchestrator.taskmaster.status
+class Translations$chat$orchestrator$taskmaster$status$zh_CN extends Translations$chat$orchestrator$taskmaster$status$en {
+	Translations$chat$orchestrator$taskmaster$status$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get started => '运行中';
+	@override String get done => '已完成';
+	@override String get complete => '全部完成';
+	@override String get failed => '失败';
+	@override String get paused => '已暂停';
+	@override String get blocked => '已阻塞';
+	@override String get aborted => '已中止';
+}
+
+// Path: common.quota.settings.routing
+class Translations$common$quota$settings$routing$zh_CN extends Translations$common$quota$settings$routing$en {
+	Translations$common$quota$settings$routing$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get manual => '手动 — 仅建议';
+	@override String get ask => '切换账户前询问';
+	@override String get autoLowRisk => '低风险任务自动切换';
 }
 
 // Path: common.projectWizard.step1.existing
@@ -6533,16 +7936,15 @@ class Translations$common$notifications$codes$agent$zh_CN extends Translations$c
 	@override late final Translations$common$notifications$codes$agent$notification$zh_CN notification = Translations$common$notifications$codes$agent$notification$zh_CN.internal(_root);
 }
 
-// Path: common.quota.settings.routing
-class Translations$common$quota$settings$routing$zh_CN extends Translations$common$quota$settings$routing$en {
-	Translations$common$quota$settings$routing$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+// Path: settings.miniOrchestration.planner.modes
+class Translations$settings$miniOrchestration$planner$modes$zh_CN extends Translations$settings$miniOrchestration$planner$modes$en {
+	Translations$settings$miniOrchestration$planner$modes$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get manual => '手动 — 仅建议';
-	@override String get ask => '切换账户前询问';
-	@override String get autoLowRisk => '低风险任务自动切换';
+	@override String get auto => '由思考者规划';
+	@override String get off => '单步';
 }
 
 // Path: settings.orchestration.pool.fields
@@ -6553,19 +7955,19 @@ class Translations$settings$orchestration$pool$fields$zh_CN extends Translations
 
 	// Translations
 	@override String get label => 'Label';
-	@override String get labelPlaceholder => 'e.g. SWE-2 Medium';
+	@override String get labelPlaceholder => '例如 SWE-2 Medium';
 	@override String get provider => 'Provider';
 	@override String get model => 'Model';
-	@override String get modelPlaceholder => 'Select a model';
+	@override String get modelPlaceholder => '选择模型';
 	@override String get effort => 'Effort';
-	@override String get effortDefault => 'Provider default';
+	@override String get effortDefault => '提供者默认值';
 	@override String get effortPlaceholder => 'default';
 	@override String get account => 'Account';
-	@override String get accountDefault => 'Provider default';
+	@override String get accountDefault => '提供者默认值';
 	@override String get redundantAccounts => '冗余账户';
 	@override String get redundantAccountsNone => '此提供商没有其他账户';
 	@override String get tier => 'Cost tier';
-	@override String get remove => 'Remove candidate';
+	@override String get remove => '移除候选';
 	@override String get moveUp => 'Move up';
 	@override String get moveDown => 'Move down';
 }
@@ -6578,13 +7980,14 @@ class Translations$settings$orchestration$rules$taskTypes$zh_CN extends Translat
 
 	// Translations
 	@override String get plan => 'Planning';
-	@override String get quick => 'Quick answers';
+	@override String get quick => '快速回答';
 	@override String get research => 'Research';
 	@override String get docs => 'Documentation';
 	@override String get code => 'Coding';
-	@override String get codeHard => 'Complex coding';
+	@override String get codeHard => '复杂编码';
 	@override String get test => 'Testing';
 	@override String get review => 'Review';
+	@override String get report => '报告';
 }
 
 // Path: settings.orchestration.planner.modes
@@ -6606,9 +8009,9 @@ class Translations$settings$orchestration$planner$modeHints$zh_CN extends Transl
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get auto => 'The planner model decomposes each request into typed steps.';
-	@override String get template => 'Requests run through a fixed pipeline you pick below.';
-	@override String get off => 'No planning — the whole request is routed as a single step.';
+	@override String get auto => '规划模型会将每个请求分解为带类型的步骤。';
+	@override String get template => '请求将按您在下方选择的固定流水线运行。';
+	@override String get off => '不进行规划 — 整个请求作为单个步骤路由。';
 }
 
 // Path: settings.orchestration.planner.templates
@@ -6618,14 +8021,38 @@ class Translations$settings$orchestration$planner$templates$zh_CN extends Transl
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'Pipeline templates';
+	@override String get title => '流水线模板';
 	@override String get add => 'Add template';
-	@override String get namePlaceholder => 'Template name';
+	@override String get namePlaceholder => '模板名称';
 	@override String get addStep => 'Add step…';
-	@override String get remove => 'Remove template';
+	@override String get remove => '移除模板';
 	@override String get removeStep => 'Remove step';
-	@override String get empty => 'No templates yet.';
-	@override String get emptySteps => 'No steps yet — add one below.';
+	@override String get empty => '暂无模板。';
+	@override String get emptySteps => '暂无步骤 — 请在下方添加。';
+}
+
+// Path: settings.orchestration.planner.checkpointModes
+class Translations$settings$orchestration$planner$checkpointModes$zh_CN extends Translations$settings$orchestration$planner$checkpointModes$en {
+	Translations$settings$orchestration$planner$checkpointModes$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get off => '完全自主';
+	@override String get perStep => '每一步';
+	@override String get everyN => '每 N 步';
+}
+
+// Path: settings.orchestration.planner.checkpointHints
+class Translations$settings$orchestration$planner$checkpointHints$zh_CN extends Translations$settings$orchestration$planner$checkpointHints$en {
+	Translations$settings$orchestration$planner$checkpointHints$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get off => '监督者的决策无需询问即执行（自动模式）。';
+	@override String get perStep => '在每批建议的步骤执行前请求批准。';
+	@override String get everyN => '每完成 N 个步骤后请求批准。';
 }
 
 // Path: settings.orchestration.execution.onNoCandidateOptions
@@ -6637,6 +8064,20 @@ class Translations$settings$orchestration$execution$onNoCandidateOptions$zh_CN e
 	// Translations
 	@override String get ask => 'Ask';
 	@override String get skip => 'Skip step';
+}
+
+// Path: settings.orchestration.execution.retryClasses
+class Translations$settings$orchestration$execution$retryClasses$zh_CN extends Translations$settings$orchestration$execution$retryClasses$en {
+	Translations$settings$orchestration$execution$retryClasses$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get rateLimit => '速率限制';
+	@override String get quota => '配额';
+	@override String get auth => '认证';
+	@override String get timeout => '超时';
+	@override String get transient => '临时错误';
 }
 
 // Path: settings.appearanceSettings.codeEditor.theme
@@ -6804,6 +8245,17 @@ class Translations$settings$agents$account$devin$zh_CN extends Translations$sett
 	@override String get description => 'Devin CLI 助手';
 }
 
+// Path: settings.agents.accounts.autoSwitch
+class Translations$settings$agents$accounts$autoSwitch$zh_CN extends Translations$settings$agents$accounts$autoSwitch$en {
+	Translations$settings$agents$accounts$autoSwitch$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get label => '达到用量上限时自动切换账号';
+	@override String get description => '当某个账号达到用量上限时，会话会切换到同一智能体下仍有额度的另一个账号——即使你手动选择了已耗尽的账号。绝不会切换到其他智能体。Claude 和 Codex 会保留对话；其他智能体仅在新对话中切换。';
+}
+
 // Path: settings.permissions.permissionMode.modes
 class Translations$settings$permissions$permissionMode$modes$zh_CN extends Translations$settings$permissions$permissionMode$modes$en {
 	Translations$settings$permissions$permissionMode$modes$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
@@ -6886,11 +8338,11 @@ class Translations$mcp$form$scope$description$zh_CN extends Translations$mcp$for
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get local => '存储在所选项目的 Claude 用户设置中';
-	@override String get project => '存储在所选项目工作区中';
-	@override String get projectGlobal => '写入所选项目工作区，适用于所有提供商';
-	@override String get user => '在您机器的所有项目中可用';
 	@override String get userGlobal => '写入每个提供商的用户配置，并在本机的所有项目中可用';
+	@override String get user => '在您机器的所有项目中可用';
+	@override String get local => '存储在所选项目的 Claude 用户设置中';
+	@override String get projectGlobal => '写入所选项目工作区，适用于所有提供商';
+	@override String get project => '存储在所选项目工作区中';
 }
 
 // Path: common.notifications.codes.generic.info
@@ -7053,6 +8505,74 @@ extension on TranslationsZhCn {
 			'chat.messageTypes.codex' => 'Codex',
 			'chat.messageTypes.opencode' => 'OpenCode',
 			'chat.messageTypes.devin' => 'Devin',
+			'chat.messageTypes.orchestrator' => '自动',
+			'chat.orchestrator.routing.title' => '路由',
+			'chat.orchestrator.routing.alternatives' => ({required Object list}) => '备选：${list}',
+			'chat.orchestrator.routing.first' => ({required Object label, required Object task}) => '${label} — ${task} 的首选候选',
+			'chat.orchestrator.routing.skipped' => ({required Object label, required Object list}) => '${label} — 已跳过之前的候选（${list}）',
+			'chat.orchestrator.plan.title' => '计划',
+			'chat.orchestrator.plan.disabled' => '已禁用',
+			'chat.orchestrator.plan.awaitingConfirm' => '正在等待确认计划。',
+			'chat.orchestrator.plan.run' => '运行计划',
+			'chat.orchestrator.plan.toggleStep' => '启用步骤',
+			'chat.orchestrator.plan.confirmFailed' => '启动失败，请重试。',
+			'chat.orchestrator.plan.fallback' => '规划器不可用 — 回退为单步执行',
+			'chat.orchestrator.plan.templateSource' => '来自流水线模板',
+			'chat.orchestrator.plan.offSource' => '规划器已关闭',
+			'chat.orchestrator.plan.stepCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '${count} 个步骤', other: '${count} 个步骤', ), 
+			'chat.orchestrator.plan.supervisedSource' => '监督循环',
+			'chat.orchestrator.decision.title' => '监督者决策',
+			'chat.orchestrator.decision.iteration' => ({required Object n}) => '第 ${n} 轮',
+			'chat.orchestrator.decision.rationaleLabel' => '原因',
+			'chat.orchestrator.decision.awaitingConfirm' => '运行这些步骤前正在等待您的批准。',
+			'chat.orchestrator.decision.proposedSteps' => '建议的步骤',
+			'chat.orchestrator.decision.action.kContinue' => '正在委派',
+			'chat.orchestrator.decision.action.done' => '已完成',
+			'chat.orchestrator.decision.action.invalid' => '无决策',
+			'chat.orchestrator.decision.outcome.success' => '成功',
+			'chat.orchestrator.decision.outcome.partial' => '部分完成',
+			'chat.orchestrator.decision.outcome.failed' => '失败',
+			'chat.orchestrator.delegation.title' => '委派的步骤',
+			'chat.orchestrator.delegation.openSession' => '打开完整会话',
+			'chat.orchestrator.delegation.attempt' => ({required Object n}) => '第 ${n} 次尝试',
+			'chat.orchestrator.delegation.retryStep' => '重试 / 修复',
+			'chat.orchestrator.delegation.continueStep' => '继续 / 修复',
+			'chat.orchestrator.delegation.continueFailed' => '失败，请重试。',
+			'chat.orchestrator.delegation.status.queued' => '排队中',
+			'chat.orchestrator.delegation.status.running' => '运行中',
+			'chat.orchestrator.delegation.status.done' => '已完成',
+			'chat.orchestrator.delegation.status.failed' => '失败',
+			'chat.orchestrator.delegation.status.aborted' => '已中止',
+			'chat.orchestrator.delegation.status.skipped' => '已跳过',
+			'chat.orchestrator.delegation.status.awaitingDecision' => '等待决策',
+			'chat.orchestrator.delegation.attempts' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '${count} 次尝试', other: '${count} 次尝试', ), 
+			'chat.orchestrator.delegation.candidates' => ({required Object list}) => '候选：${list}',
+			'chat.orchestrator.delegation.candidateCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '${count} 个候选', other: '${count} 个候选', ), 
+			'chat.orchestrator.summary.title' => '总结',
+			'chat.orchestrator.summary.progress' => ({required Object done, required Object total}) => '已完成步骤：${done}/${total}',
+			'chat.orchestrator.summary.aborted' => '已中止',
+			'chat.orchestrator.summary.timedOut' => '已超时',
+			'chat.orchestrator.summary.capped' => '已达迭代上限',
+			'chat.orchestrator.summary.failed' => ({required Object list}) => '失败的步骤：${list}',
+			'chat.orchestrator.summary.kContinue' => '继续',
+			'chat.orchestrator.summary.continueWork' => '继续工作',
+			'chat.orchestrator.summary.resumeFailed' => '恢复失败，请重试。',
+			'chat.orchestrator.summary.runNextTask' => '运行下一个任务',
+			'chat.orchestrator.summary.endAllTasks' => '结束所有任务',
+			'chat.orchestrator.summary.tasksRunning' => '正在处理任务…',
+			'chat.orchestrator.summary.cancelTasks' => '取消',
+			'chat.orchestrator.backToParent' => '返回编排',
+			'chat.orchestrator.taskmaster.title' => '任务队列',
+			'chat.orchestrator.taskmaster.remaining' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '剩余 ${count} 个', other: '剩余 ${count} 个', ), 
+			'chat.orchestrator.taskmaster.status.started' => '运行中',
+			'chat.orchestrator.taskmaster.status.done' => '已完成',
+			'chat.orchestrator.taskmaster.status.complete' => '全部完成',
+			'chat.orchestrator.taskmaster.status.failed' => '失败',
+			'chat.orchestrator.taskmaster.status.paused' => '已暂停',
+			'chat.orchestrator.taskmaster.status.blocked' => '已阻塞',
+			'chat.orchestrator.taskmaster.status.aborted' => '已中止',
+			'chat.orchestrator.gate.timedOut' => '已超时',
+			'chat.orchestrator.gate.exit' => ({required Object code}) => '退出码 ${code}',
 			'chat.tools.settings' => '工具设置',
 			'chat.tools.error' => '工具错误',
 			'chat.tools.result' => '工具结果',
@@ -7087,6 +8607,7 @@ extension on TranslationsZhCn {
 			'chat.interactive.instructionDetail' => '在 CLI 中，您可以使用方向键或输入数字来交互式地选择此选项。',
 			'chat.thinking.title' => '思考中...',
 			'chat.thinking.emoji' => '💭 思考中...',
+			'chat.thinking.thoughtFewSeconds' => '思考了几秒钟',
 			'chat.json.response' => 'JSON 响应',
 			'chat.permissions.grant' => ({required Object tool}) => '授予 ${tool} 权限',
 			'chat.permissions.added' => '权限已添加',
@@ -7095,14 +8616,14 @@ extension on TranslationsZhCn {
 			'chat.permissions.error' => '无法更新权限。请重试。',
 			'chat.permissions.openSettings' => '打开设置',
 			'chat.permissions.allow' => '允许',
-			'chat.permissions.allowAll' => ({required Object count}) => '全部允许（${count}）',
-			'chat.permissions.allowWithChanges' => '按修改允许',
 			'chat.permissions.always' => '始终',
-			'chat.permissions.deny' => '拒绝',
 			'chat.permissions.editAndAllow' => '编辑并允许',
+			'chat.permissions.deny' => '拒绝',
+			'chat.permissions.reject' => '驳回',
+			'chat.permissions.allowAll' => ({required Object count}) => '全部允许（${count}）',
 			'chat.permissions.editInput' => '编辑输入',
 			'chat.permissions.invalidJson' => '无效的 JSON',
-			'chat.permissions.reject' => '驳回',
+			'chat.permissions.allowWithChanges' => '按修改允许',
 			'chat.todo.updated' => '待办列表已成功更新',
 			'chat.todo.current' => '当前待办列表',
 			'chat.plan.viewPlan' => '📋 查看实施计划',
@@ -7120,10 +8641,24 @@ extension on TranslationsZhCn {
 			'chat.codex.descriptions.bypassPermissions' => '完全的系统访问，无限制。所有命令自动运行，具有完整的磁盘和网络访问权限。请谨慎使用。',
 			'chat.codex.descriptions.plan' => '计划模式 - 不执行任何命令',
 			'chat.codex.technicalDetails' => '技术细节',
+			'chat.voice.autoRead' => '朗读回复',
+			'chat.voice.autoReadOn' => '朗读回复：开',
+			'chat.voice.autoReadOff' => '朗读回复：关',
+			'chat.voice.autoReadVoice' => '朗读声音',
+			'chat.voice.autoReadVoiceAuto' => '自动声音',
+			'chat.voice.autoReadPreview' => '回复将以此声音朗读。',
+			'chat.voice.speakMessage' => '朗读',
+			'chat.voice.stopSpeaking' => '停止朗读',
 			'chat.input.placeholder' => ({required Object provider}) => '输入 / 调用命令，@ 选择文件，或向 ${provider} 提问...',
 			'chat.input.placeholderDefault' => '输入您的消息...',
 			'chat.input.disabled' => '输入已禁用',
 			'chat.input.attachFiles' => '附加文件',
+			'chat.input.attachFilesDesc' => '上传照片、文件或文档',
+			'chat.input.takePhoto' => '拍摄照片',
+			'chat.input.takePhotoDesc' => '使用相机拍摄照片',
+			'chat.input.moreTools' => '更多工具',
+			'chat.input.commandsDesc' => '浏览快捷键和命令',
+			'chat.input.clearInputDesc' => '丢弃当前文本',
 			'chat.input.attachImages' => '附加图片',
 			'chat.input.send' => '发送',
 			'chat.input.stop' => '停止',
@@ -7135,6 +8670,8 @@ extension on TranslationsZhCn {
 			'chat.input.showAllCommands' => '显示所有命令',
 			'chat.input.clearInput' => '清空输入',
 			'chat.input.scrollToBottom' => '滚动到底部',
+			'chat.input.newMessage' => '新消息',
+			'chat.input.newMessages' => '新消息',
 			'chat.input.queue.sendNext' => '排队发送下一条消息',
 			'chat.input.queue.update' => '更新排队消息',
 			'chat.input.queue.label' => '已排队',
@@ -7144,24 +8681,54 @@ extension on TranslationsZhCn {
 			'chat.input.queue.failed' => '发送失败',
 			'chat.input.queue.sendNow' => '立即发送',
 			'chat.input.queue.sendNowAfterTurn' => '该智能体无法在回合进行中接收消息——将在当前回合结束后发送',
-			'chat.input.attachFilesDesc' => '上传照片、文件或文档',
-			'chat.input.takePhoto' => '拍摄照片',
-			'chat.input.takePhotoDesc' => '使用相机拍摄照片',
-			'chat.input.moreTools' => '更多工具',
-			'chat.input.commandsDesc' => '浏览快捷键和命令',
-			'chat.input.clearInputDesc' => '丢弃当前文本',
-			'chat.input.newMessage' => '新消息',
-			'chat.input.newMessages' => '新消息',
+			'chat.input.queue.filesAttached' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, other: '已附加 ${count} 个文件', ), 
 			'chat.input.autoContinueTasks' => '自动继续',
 			'chat.input.autoContinueTasksTooltip' => '启用后让 Devin 自动继续下一个 Task Master 任务',
 			'chat.input.offlineQueue.clear' => '取消并清空离线队列',
 			'chat.input.offlineQueue.clearBtn' => '取消',
 			'chat.input.offlineQueue.multiple' => ({required Object count}) => '${count} 条消息在离线队列中 — 重新连接后将自动发送',
 			'chat.input.offlineQueue.single' => '1 条消息在离线队列中 — 重新连接后将自动发送',
+			'chat.input.voice' => '语音输入',
+			'chat.input.voiceStart' => '语音输入消息',
+			'chat.input.voiceStop' => '停止听写',
+			'chat.input.pinFile' => '将文件固定到上下文',
+			'chat.input.voiceSettings' => '语音设置（STT）',
 			'chat.input.cameraUnavailable' => ({required Object error}) => '相机不可用：${error}',
+			'chat.composer.toolsAndActions' => '工具与操作',
+			'chat.composer.toolsAndActionsDesc' => '聊天输入框的工具和控件',
+			'chat.composer.reasoning' => '推理',
+			'chat.composer.model' => '模型',
+			'chat.composer.effortDefault' => '默认',
+			'chat.composer.loadingModels' => '正在加载模型…',
+			'chat.composer.modelMenu' => '选择模型和推理强度',
+			'chat.composer.permissionHeading' => ({required Object provider}) => '应如何批准 ${provider} 的操作？',
+			'chat.composer.favorites' => '收藏',
+			'chat.composer.account' => '账号',
+			'chat.composer.accountMenu' => '选择账号',
+			'chat.composer.accountDefault' => '默认账号',
+			'chat.composer.accountAuto' => '自动（默认）',
+			'chat.composer.accountIsDefault' => '默认',
+			'chat.composer.effortLevels.off' => '关闭',
+			'chat.composer.effortLevels.none' => '无',
+			'chat.composer.effortLevels.minimal' => '最低',
+			'chat.composer.effortLevels.low' => '低',
+			'chat.composer.effortLevels.medium' => '中',
+			'chat.composer.effortLevels.high' => '高',
+			'chat.composer.effortLevels.xhigh' => '极高',
+			'chat.composer.effortLevels.max' => '最大',
+			'chat.composer.effortLevels.ultra' => '超高',
+			'chat.composer.contextWindow' => ({required Object size}) => '${size} 上下文',
+			'chat.composer.accountAutoShort' => '自动',
+			'chat.composer.uploadNoRecords' => '上传未返回任何记录',
 			'chat.providerSelection.title' => '选择您的 AI 助手',
 			'chat.providerSelection.description' => '选择一个供应商以开始新对话',
 			'chat.providerSelection.selectModel' => '选择模型',
+			'chat.providerSelection.workspace' => '工作区',
+			'chat.providerSelection.noWorkspace' => '无',
+			'chat.providerSelection.clickToChangeWorkspace' => '点击更改工作区',
+			'chat.providerSelection.chooseWorkspace' => '选择工作区',
+			'chat.providerSelection.searchWorkspaces' => '搜索工作区...',
+			'chat.providerSelection.noWorkspacesFound' => '未找到工作区。',
 			'chat.providerSelection.providerInfo.anthropic' => '由 Anthropic 提供',
 			'chat.providerSelection.providerInfo.openai' => '由 OpenAI 提供',
 			'chat.providerSelection.providerInfo.cursorEditor' => 'AI 代码编辑器',
@@ -7172,13 +8739,12 @@ extension on TranslationsZhCn {
 			'chat.providerSelection.readyPrompt.opencode' => ({required Object model}) => '准备好使用带有 ${model} 的 OpenCode。请在下方开始输入您的消息。',
 			'chat.providerSelection.readyPrompt.kDefault' => '请在上方选择一个提供者以开始',
 			'chat.providerSelection.readyPrompt.devin' => ({required Object model}) => 'Devin ${model} 已就绪',
+			'chat.providerSelection.readyPrompt.orchestrator' => '自动模式已就绪 — 路由器会为每个步骤选择最佳模型',
+			'chat.providerSelection.autoGroup' => '自动',
+			'chat.providerSelection.autoLabel' => '自动（编排）',
+			'chat.providerSelection.autoDescription' => '将每个步骤路由到最佳可用的提供者和模型',
+			'chat.providerSelection.orchestrated' => '编排',
 			'chat.providerSelection.pressToSearch' => ({required Object shortcut}) => '按 <kbd>${shortcut}</kbd> 搜索会话、文件和提交',
-			'chat.providerSelection.workspace' => '工作区',
-			'chat.providerSelection.noWorkspace' => '无',
-			'chat.providerSelection.clickToChangeWorkspace' => '点击更改工作区',
-			'chat.providerSelection.chooseWorkspace' => '选择工作区',
-			'chat.providerSelection.searchWorkspaces' => '搜索工作区...',
-			'chat.providerSelection.noWorkspacesFound' => '未找到工作区。',
 			'chat.providerSelection.all' => '全部',
 			'chat.providerSelection.free' => '免费',
 			'chat.providerSelection.noModelsFound' => '未找到模型。',
@@ -7201,18 +8767,19 @@ extension on TranslationsZhCn {
 			'chat.session.messages.scrollToLoad' => '向上滚动以加载更多',
 			'chat.session.messages.showingLast' => ({required Object count, required Object total}) => '显示最近 ${count} 条消息（共 ${total} 条）',
 			'chat.session.messages.loadEarlier' => '加载更早的消息',
+			'chat.session.messages.loadOlderFailed' => '加载较早消息失败。',
+			'chat.session.messages.retry' => '重试',
 			'chat.session.messages.loadAll' => '加载全部消息',
 			'chat.session.messages.loadingAll' => '正在加载全部消息...',
 			'chat.session.messages.allLoaded' => '全部消息已加载',
 			'chat.session.messages.perfWarning' => '已加载全部消息 - 滚动可能变慢。点击「滚动到底部」恢复性能。',
-			'chat.session.messages.loadOlderFailed' => '加载较早消息失败。',
-			'chat.session.messages.retry' => '重试',
 			'chat.session.messages.noSearchMatches' => '没有消息匹配搜索。',
-			'chat.session.messages.loadAllCount' => ({required Object count}) => '加载全部（${count}）',
 			'chat.session.messages.loadOlder' => '加载更早的消息',
+			'chat.session.messages.loadAllCount' => ({required Object count}) => '加载全部（${count}）',
 			'chat.session.messages.retryLoadOlder' => ({required Object error}) => '重试加载更早的消息 — ${error}',
 			'chat.session.deleteConfirm' => '移除会话及其记录。此操作无法撤销。',
 			'chat.session.finishRunBeforeWorkspaceChange' => '请先结束运行再更改工作区',
+			'chat.session.fallbackTitle' => '会话',
 			'chat.shell.selectProject.title' => '选择项目',
 			'chat.shell.selectProject.description' => '选择一个项目以在该目录中打开交互式 Shell',
 			'chat.shell.status.newSession' => '新会话',
@@ -7222,8 +8789,6 @@ extension on TranslationsZhCn {
 			'chat.shell.actions.disconnectTitle' => '断开 Shell 连接',
 			'chat.shell.actions.restart' => '重启',
 			'chat.shell.actions.restartTitle' => '重启 Shell（请先断开连接）',
-			'chat.shell.actions.connect' => '在 Shell 中继续',
-			'chat.shell.actions.connectTitle' => '连接到 Shell',
 			'chat.shell.actions.kill' => '终止 (SIGINT)',
 			'chat.shell.actions.killTitle' => '终止正在运行的进程 (Ctrl+C)',
 			'chat.shell.actions.copyOutput' => '复制输出',
@@ -7231,6 +8796,8 @@ extension on TranslationsZhCn {
 			'chat.shell.actions.copied' => '已复制！',
 			'chat.shell.actions.zoomInTitle' => '放大',
 			'chat.shell.actions.zoomOutTitle' => '缩小',
+			'chat.shell.actions.connect' => '在 Shell 中继续',
+			'chat.shell.actions.connectTitle' => '连接到 Shell',
 			'chat.shell.loading' => '正在加载终端...',
 			'chat.shell.connecting' => '正在连接到 Shell...',
 			'chat.shell.startSession' => '启动新的 Claude 会话',
@@ -7247,11 +8814,11 @@ extension on TranslationsZhCn {
 			'chat.claudeStatus.state.live' => '实时',
 			'chat.claudeStatus.state.paused' => '已暂停',
 			'chat.claudeStatus.elapsed.seconds' => ({required Object count}) => '${count}秒',
-			'chat.claudeStatus.elapsed.minutesSeconds' => ({required Object minutes, required Object seconds}) => '${minutes}m ${seconds}s',
+			'chat.claudeStatus.elapsed.minutesSeconds' => ({required Object minutes, required Object seconds}) => '${minutes} 分 ${seconds} 秒',
 			'chat.claudeStatus.elapsed.label' => ({required Object time}) => '已用 ${time}',
 			'chat.claudeStatus.elapsed.startingNow' => '刚刚开始',
 			'chat.claudeStatus.stop' => '停止',
-			'chat.claudeStatus.backgroundTasks' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, other: '${count} 个后台任务正在运行', ), 
+			'chat.claudeStatus.backgroundTasks' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '${count} 个后台任务正在运行', other: '${count} 个后台任务正在运行', ), 
 			'chat.claudeStatus.controls.stopGeneration' => '停止生成',
 			'chat.claudeStatus.controls.pressEscToStop' => '随时按 Esc 停止',
 			'chat.claudeStatus.providers.assistant' => '助手',
@@ -7259,23 +8826,6 @@ extension on TranslationsZhCn {
 			'chat.claudeStatus.backgroundTaskUnnamed' => '未命名任务',
 			'chat.projectSelection.startChatWithProvider' => ({required Object provider}) => '选择一个项目以开始与 ${provider} 聊天',
 			'chat.tasks.nextTaskPrompt' => '开始下一个任务',
-			'chat.voice.autoRead' => '朗读回复',
-			'chat.voice.autoReadOn' => '朗读回复：开',
-			'chat.voice.autoReadOff' => '朗读回复：关',
-			'chat.voice.autoReadVoice' => '朗读声音',
-			'chat.voice.autoReadVoiceAuto' => '自动声音',
-			'chat.voice.autoReadPreview' => '回复将以此声音朗读。',
-			'chat.voice.speakMessage' => '朗读',
-			'chat.voice.stopSpeaking' => '停止朗读',
-			'chat.composer.toolsAndActions' => '工具与操作',
-			'chat.composer.toolsAndActionsDesc' => '聊天输入框的工具和控件',
-			'chat.composer.reasoning' => '推理',
-			'chat.composer.model' => '模型',
-			'chat.composer.effortDefault' => '默认',
-			'chat.composer.loadingModels' => '正在加载模型…',
-			'chat.composer.modelMenu' => '选择模型和推理强度',
-			'chat.composer.permissionHeading' => ({required Object provider}) => '应如何批准 ${provider} 的操作？',
-			'chat.composer.favorites' => '收藏',
 			'chat.splitSession.toggle' => '分屏会话',
 			'chat.splitSession.close' => '关闭分屏会话',
 			'chat.splitSession.selectSession' => '选择要比较的会话',
@@ -7306,12 +8856,16 @@ extension on TranslationsZhCn {
 			'chat.sessionPicker.deleteFailed' => '删除会话失败。请重试。',
 			'chat.sessionPicker.running' => '会话正在运行',
 			'chat.sessionPicker.unread' => '未读 — 已完成并有新输出',
+			'chat.sessionPicker.account' => '账号',
 			'chat.splitWorkspace.addChat' => '添加聊天窗格',
 			'chat.splitWorkspace.addBrowser' => '添加浏览器窗格',
 			'chat.splitWorkspace.addTerminal' => '添加终端窗格',
+			'chat.splitWorkspace.addPreview' => '添加预览窗格',
 			'chat.splitWorkspace.overview' => '显示所有窗格',
 			'chat.splitWorkspace.exitFocusMode' => '退出专注模式 (Ctrl+Shift+F)',
 			'chat.splitWorkspace.focusMode' => '专注模式 (Ctrl+Shift+F)',
+			'chat.splitWorkspace.broadcast' => '广播到会话',
+			'chat.splitWorkspace.addNotes' => '添加共享笔记窗格',
 			'chat.splitWorkspace.browseSessions' => '打开会话列表',
 			'chat.splitOverview.title' => '分屏窗格概览',
 			'chat.splitOverview.count' => ({required Object count}) => '${count} 个窗格',
@@ -7321,15 +8875,20 @@ extension on TranslationsZhCn {
 			'chat.splitOverview.idle' => '空闲',
 			'chat.splitOverview.active' => '活跃',
 			'chat.askUserQuestion.needsInput' => ({required Object provider}) => '${provider} 需要你的输入',
-			'chat.askUserQuestion.answerHint' => '输入你的答案…',
-			'chat.askUserQuestion.other' => '其他…',
 			'chat.askUserQuestion.skip' => '跳过',
+			'chat.askUserQuestion.other' => '其他…',
+			'chat.askUserQuestion.answerHint' => '输入你的答案…',
 			'chat.attachments.downloadFailedRetry' => '下载失败 — 点击重试',
 			'chat.attachments.fileAttachment' => '文件附件',
 			'chat.attachments.download' => ({required Object name}) => '下载 ${name}',
+			'chat.attachments.attachedFile' => '附件',
+			'chat.attachments.downloaded' => ({required Object name}) => '已下载 ${name}',
 			'chat.checkpoint.creating' => '正在创建快照…',
 			'chat.checkpoint.revertChanges' => '将文件还原到上一个检查点',
 			'chat.checkpoint.undo' => '撤销检查点',
+			'chat.checkpoint.undoAiRun' => '撤销 AI 运行',
+			'chat.checkpoint.undoing' => '正在撤销…',
+			'chat.checkpoint.undone' => '已撤销',
 			'chat.checkpoint.beforeAiTurn' => 'AI 回合之前',
 			'chat.common.close' => '关闭',
 			'chat.taskMaster.saveToTask' => '任务',
@@ -7338,46 +8897,206 @@ extension on TranslationsZhCn {
 			'chat.taskMaster.taskShort' => '任务',
 			'chat.taskMaster.addToTask' => '添加到 TaskMaster',
 			'chat.taskMaster.added' => '已添加到 TaskMaster',
+			'chat.taskMaster.defaultTaskTitle' => '来自聊天的任务',
 			'chat.tokenUsage.desc' => '查看会话令牌消耗',
 			'chat.tokenUsage.title' => '令牌用量',
+			'chat.tokenUsage.notAvailable' => '不适用',
+			'chat.tokenUsage.tokensBadge' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, other: '${count} 个 token', ), 
 			'chat.tool.emptyResult' => '（暂无输出 — 工具返回了空结果）',
 			'chat.quotaBadge.ariaLabel' => '订阅额度限制',
 			'chat.quotaBadge.noData' => '此模型暂无订阅数据',
-			'chat.paneHeader.processing' => '处理中…',
-			'chat.paneHeader.switchSession' => '切换会话',
+			'chat.quotaBadge.noSubscription' => '无订阅',
+			'chat.quotaBadge.windowLineReset' => ({required Object label, required Object percent, required Object time}) => '${label}：${percent}% · 重置于 ${time}',
+			'chat.quotaBadge.windowRemaining' => ({required Object percent}) => '距离重置还剩 ${percent}% 的时间窗口',
+			'chat.broadcast.title' => '广播到会话',
+			'chat.broadcast.noSessions' => '没有可用的会话',
+			'chat.broadcast.placeholder' => '要发送给每个选中会话的消息…',
+			'chat.broadcast.partial' => ({required Object count}) => '${count} 个会话拒绝了该消息',
+			'chat.broadcast.sent' => ({required Object count}) => '已为 ${count} 个会话加入队列',
+			'chat.broadcast.selectAll' => '全选',
 			'chat.broadcast.selectOrchestrators' => '选择编排器',
 			'chat.broadcast.orchestratorsOnly' => '仅编排器',
 			'chat.broadcast.noOrchestrators' => '没有可用的编排器会话',
-			'chat.changes.empty' => '没有文件更改',
-			'chat.changes.failedToLoad' => '加载更改失败',
-			'chat.commandResult.fallback.config' => '打开设置和配置。',
-			'chat.commandResult.fallback.cost' => '查看当前会话的令牌用量。',
-			'chat.commandResult.fallback.help' => '显示命令文档和语法。',
-			'chat.commandResult.fallback.memory' => '打开项目的 CLAUDE.md 记忆文件。',
-			'chat.commandResult.fallback.models' => '浏览当前提供商的可用模型。',
-			'chat.commandResult.fallback.status' => '查看运行时、版本、提供商和环境状态。',
-			'chat.commandResult.filterCommands' => '筛选命令...',
-			'chat.commandResult.searchModels' => ({required Object provider}) => '搜索 ${provider} 模型...',
-			'chat.commands.runConfirmTitle' => '运行命令？',
-			'chat.commands.executionCancelled' => '命令执行已取消',
+			'chat.broadcast.sending' => '正在发送…',
+			'chat.broadcast.send' => ({required Object count}) => '发送到 ${count} 个会话',
+			'chat.paneHeader.processing' => '处理中…',
+			'chat.paneHeader.switchSession' => '切换会话',
 			'chat.export.sessionTitle' => ({required Object id}) => '会话 ${id}',
 			'chat.export.pdfFailed' => 'PDF 导出失败',
 			'chat.export.transcriptDownloaded' => '会话记录已下载',
 			'chat.export.savedTo' => ({required Object path}) => '已保存 ${path}',
-			'chat.message.compactedSummary' => '压缩摘要',
-			'chat.message.rawView' => '原始视图',
-			'chat.message.resendHint' => '从输入框重新发送',
-			'chat.modelLibrary.deleteTooltip' => ({required Object name}) => '删除 ${name}',
+			'chat.commandResult.fallback.models' => '浏览当前提供商的可用模型。',
+			'chat.commandResult.fallback.cost' => '查看当前会话的令牌用量。',
+			'chat.commandResult.fallback.status' => '查看运行时、版本、提供商和环境状态。',
+			'chat.commandResult.fallback.memory' => '打开项目的 CLAUDE.md 记忆文件。',
+			'chat.commandResult.fallback.config' => '打开设置和配置。',
+			'chat.commandResult.fallback.help' => '显示命令文档和语法。',
+			'chat.commandResult.filterCommands' => '筛选命令...',
+			'chat.commandResult.searchModels' => ({required Object provider}) => '搜索 ${provider} 模型...',
+			'chat.commands.runConfirmTitle' => '运行命令？',
+			'chat.commands.executionCancelled' => '命令执行已取消',
+			'chat.commands.bashConfirmMessage' => '此命令包含将被执行的 bash 命令。要继续吗？',
+			'chat.commands.proceed' => '继续',
+			'chat.pinFile.title' => '固定文件',
+			'chat.pinFile.pathHint' => 'path/to/file.ext',
+			'chat.pinFile.action' => '固定',
 			'chat.modelLibrary.editTooltip' => ({required Object name}) => '编辑 ${name}',
+			'chat.modelLibrary.deleteTooltip' => ({required Object name}) => '删除 ${name}',
 			'chat.modelLibrary.enterNameAndId' => '请输入模型名称和模型 ID。',
 			'chat.modelLibrary.idNoSpaces' => '模型 ID 不能包含空格。',
 			'chat.modelLibrary.setAsDefault' => '设为默认',
 			'chat.modelLibrary.defaultModel' => '默认模型',
-			'chat.pinFile.action' => '固定',
-			'chat.pinFile.pathHint' => 'path/to/file.ext',
-			'chat.pinFile.title' => '固定文件',
+			'chat.modelLibrary.title' => '模型库',
+			'chat.modelLibrary.subtitle' => '添加提供方支持的模型 ID。内置模型保持锁定。圆圈标记默认模型。',
+			'chat.modelLibrary.yourModels' => '你的模型',
+			'chat.modelLibrary.yourModelsHint' => '可编辑，存储在 auth.db 中',
+			'chat.modelLibrary.emptyTitle' => '还没有自定义模型',
+			'chat.modelLibrary.emptyHint' => '通过表单添加后，它会出现在所有模型选择器中。',
+			'chat.modelLibrary.builtInModels' => '内置模型',
+			'chat.modelLibrary.builtInModelsHint' => '由 DDAgent 维护，只读',
+			'chat.modelLibrary.editTitle' => '编辑自定义模型',
+			'chat.modelLibrary.addTitle' => '添加自定义模型',
+			'chat.modelLibrary.idSentAsWritten' => ({required Object provider}) => 'ID 会按原样发送给 ${provider}。',
+			'chat.modelLibrary.nameLabel' => '模型名称',
+			'chat.modelLibrary.nameHint' => '例如 GPT-5.5 Pro',
+			'chat.modelLibrary.idLabel' => '模型 ID',
+			'chat.modelLibrary.idHint' => '例如 gpt-5.5-pro',
+			'chat.modelLibrary.idHelp' => '请使用提供方 CLI 接受的准确标识符。ID 不能包含空格。',
+			'chat.modelLibrary.updatedNotice' => ({required Object name}) => '已更新 ${name}。',
+			'chat.modelLibrary.addedNotice' => ({required Object name}) => '已添加 ${name}。',
+			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '已删除 ${name}。',
+			'chat.modelLibrary.saving' => '正在保存…',
+			'chat.modelLibrary.saveChanges' => '保存更改',
+			'chat.modelLibrary.deleteConfirm' => '要从所有选择器中删除此模型吗？',
+			'chat.modelLibrary.customBadge' => '自定义',
+			'chat.changes.failedToLoad' => '加载更改失败',
+			'chat.changes.empty' => '没有文件更改',
+			'chat.message.compactedSummary' => '压缩摘要',
+			_ => null,
+		} ?? switch (path) {
+			'chat.message.resendHint' => '从输入框重新发送',
+			'chat.message.rawView' => '原始视图',
+			'chat.message.runComplete' => '运行完成',
 			'chat.permissionRequest.title' => ({required Object tool}) => '权限请求 · ${tool}',
 			'chat.permissionRequest.question' => '问题',
+			'chat.permissionRequest.subagent' => '子代理',
+			'chat.permissionRequest.viewersCannotApprove' => '查看者无法批准',
+			'chat.permissionRequest.recap.timedOut' => '已超时 — 已自动拒绝',
+			'chat.permissionRequest.recap.cancelled' => '已取消 — 本轮已停止',
+			'chat.permissionRequest.recap.autoApproved' => '已自动批准',
+			'chat.permissionRequest.recap.expired' => '请求已过期 — 代理不再等待',
+			'chat.permissionRequest.recap.answered' => '已回答',
+			'chat.permissionRequest.recap.skipped' => '已跳过',
+			'chat.permissionRequest.recap.decided' => '已决定',
+			'chat.permissionRequest.needsApproval' => ({required Object tool}) => '${tool} 需要批准',
+			'chat.permissionRequest.subagentNeedsApproval' => ({required Object tool}) => '子代理：${tool} 需要批准',
+			'chat.permissionRequest.moreQuestions' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, other: '还有 ${count} 个问题在等待', ), 
+			'chat.commandDialog.help.eyebrow' => '命令中心',
+			'chat.commandDialog.help.title' => '帮助与快捷方式',
+			'chat.commandDialog.help.subtitle' => '搜索内置命令、语法模式和命令用法。',
+			'chat.commandDialog.models.eyebrow' => '模型选择',
+			'chat.commandDialog.models.title' => '选择模型',
+			'chat.commandDialog.models.subtitle' => '选择此提供商要使用的模型。',
+			'chat.commandDialog.models.modelSetTo' => ({required Object model}) => '模型已设置为 ${model}。',
+			'chat.commandDialog.models.activeModel' => '当前模型',
+			'chat.commandDialog.models.noModelsMatch' => '没有与该筛选条件匹配的模型。',
+			'chat.commandDialog.models.choiceSavedForSession' => '你的选择会保存到此会话，并成为新聊天的默认设置。',
+			'chat.commandDialog.models.choiceDefault' => '你的选择将成为新聊天的默认模型。',
+			'chat.commandDialog.models.custom' => '自定义',
+			'chat.commandDialog.models.currentSelection' => '当前选择',
+			'chat.commandDialog.cost.eyebrow' => '会话遥测',
+			'chat.commandDialog.cost.title' => 'Token 用量',
+			'chat.commandDialog.cost.subtitle' => '此会话的输入、输出和总 token 数。',
+			'chat.commandDialog.cost.totalTokensUsed' => '已用 token 总数',
+			'chat.commandDialog.cost.inputTokens' => '输入 token',
+			'chat.commandDialog.cost.cacheReadTokens' => '缓存读取 token',
+			'chat.commandDialog.cost.cacheWriteTokens' => '缓存写入 token',
+			'chat.commandDialog.cost.outputTokens' => '输出 token',
+			'chat.commandDialog.cost.breakdown' => '明细',
+			'chat.commandDialog.cost.unavailable' => '不可用',
+			'chat.commandDialog.cost.contextWindow' => '上下文窗口',
+			'chat.commandDialog.cost.estimatedCost' => '预估费用',
+			'chat.commandDialog.status.eyebrow' => '运行时健康状况',
+			'chat.commandDialog.status.title' => '系统状态',
+			'chat.commandDialog.status.subtitle' => '版本、提供商、运行时和环境详情。',
+			'chat.commandDialog.status.package' => '软件包',
+			'chat.commandDialog.status.uptime' => '运行时间',
+			'chat.commandDialog.status.platform' => '平台',
+			'chat.commandDialog.status.memory' => '内存',
+			'chat.commandDialog.status.memoryRss' => ({required Object mb}) => '${mb} MB RSS',
+			'chat.commandDialog.status.runtimeOnline' => '运行时在线',
+			'chat.commandDialog.status.processResponding' => ({required Object pid}) => '进程 #${pid} 正在响应。',
+			'chat.commandDialog.status.processStatusResponding' => '进程正在响应。',
+			'chat.commandDialog.status.healthy' => '正常',
+			'chat.commandDialog.defaultEyebrow' => '命令',
+			'chat.commandDialog.defaultTitle' => '命令结果',
+			'chat.commandDialog.escHint' => '按 Esc 关闭窗口。',
+			'chat.commandDialog.unknown' => '未知',
+			'chat.commandDialog.noDescription' => '暂无描述。',
+			'chat.commandDialog.noCommandsMatch' => '没有与该筛选条件匹配的命令。',
+			'chat.commandDialog.syntax.title' => '语法',
+			'chat.commandDialog.syntax.arguments' => ({required Object arguments, required Object first, required Object second}) => '${arguments} 传递所有参数；${first}、${second} 为位置参数。',
+			'chat.commandDialog.syntax.file' => ({required Object token}) => '${token} 会包含文件内容。',
+			'chat.commandDialog.syntax.bash' => ({required Object token}) => '${token} 运行 bash。',
+			'chat.commandDialog.commandFinished' => '命令已完成。',
+			'chat.utilities.tokenUsageUnavailable' => 'Token 用量不可用',
+			'chat.utilities.tooltip.tokensUsed' => ({required Object tokens}) => '已用 ${tokens} token',
+			'chat.utilities.tooltip.contextOf' => ({required Object percent, required Object total}) => '上下文 ${percent}% / ${total}',
+			'chat.utilities.tooltip.input' => ({required Object value}) => '输入 ${value}',
+			'chat.utilities.tooltip.cache' => ({required Object read, required Object write}) => '缓存读取 ${read} · 写入 ${write}',
+			'chat.utilities.tooltip.output' => ({required Object value}) => '输出 ${value}',
+			'chat.utilities.used' => '已用',
+			'chat.utilities.cacheWrite' => '缓存写入',
+			'chat.utilities.contextLabel' => '上下文',
+			'chat.utilities.usageUnsupported' => '不支持用量统计',
+			'chat.utilities.chatTranscript' => '聊天记录',
+			'chat.utilities.you' => '你：',
+			'chat.utilities.providerAutoMini' => '自动 (mini)',
+			'chat.toolBlocks.moreLines' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, other: '… 还有 ${count} 行', ), 
+			'chat.toolBlocks.status.running' => '运行中',
+			'chat.toolBlocks.status.denied' => '已拒绝',
+			'chat.toolBlocks.showLess' => '收起',
+			'chat.toolBlocks.showMore' => '显示更多',
+			'chat.toolBlocks.showMoreLines' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, other: '再显示 ${count} 行', ), 
+			'chat.toolBlocks.tools' => '工具',
+			'chat.toolBlocks.planReview' => '计划审阅',
+			'chat.toolBlocks.planUpdate' => '计划更新',
+			'chat.toolBlocks.todoListUpdated' => '待办列表已更新',
+			'chat.toolBlocks.creatingTask' => '正在创建任务',
+			'chat.toolBlocks.updatingTask' => '正在更新',
+			'chat.toolBlocks.fetchingTask' => '正在获取',
+			'chat.toolBlocks.listingTasks' => '正在列出任务',
+			'chat.toolBlocks.search' => '搜索',
+			'chat.toolBlocks.verbs.read' => '读取',
+			'chat.toolBlocks.verbs.write' => '写入',
+			'chat.toolBlocks.verbs.edit' => '编辑',
+			'chat.toolBlocks.verbs.delete' => '删除',
+			'chat.toolBlocks.verbs.move' => '移动',
+			'chat.toolBlocks.subagent' => '子代理',
+			'chat.toolBlocks.toolCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, other: '${count} 个工具', ), 
+			'chat.toolBlocks.result' => '结果',
+			'chat.toolBlocks.plusMore' => ({required Object count}) => '+${count} 个',
+			'chat.toolBlocks.plan' => '计划',
+			'chat.toolBlocks.questionProgress' => ({required Object current, required Object total}) => '问题 ${current}/${total}',
+			'chat.toolBlocks.lineCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, other: '${count} 行', ), 
+			'chat.toolBlocks.todoListItems' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, other: '待办列表（${count} 项）', ), 
+			'chat.toolBlocks.tasksCompleted' => ({required Object done, required Object total}) => '已完成 ${done}/${total}',
+			'chat.commandMenu.empty' => '没有可用的命令',
+			'chat.commandMenu.namespaces.frequent' => '常用',
+			'chat.commandMenu.namespaces.builtin' => '内置命令',
+			'chat.commandMenu.namespaces.skill' => '技能',
+			'chat.commandMenu.namespaces.project' => '项目命令',
+			'chat.commandMenu.namespaces.user' => '用户命令',
+			'chat.commandMenu.namespaces.other' => '其他命令',
+			'chat.mentionMenu.kinds.file' => '文件',
+			'chat.mentionMenu.kinds.session' => '会话',
+			'chat.mentionMenu.kinds.task' => '任务',
+			'chat.mentionMenu.taskTitle' => ({required Object id}) => '任务 ${id}',
+			'chat.subheader.contextTooltip' => ({required Object used, required Object total, required Object percent}) => '上下文：${used} / ${total} 个 token · 已用 ${percent}%',
+			'chat.transcript.requestFailed' => '请求失败',
+			'chat.review.changedFiles' => '已更改的文件',
+			'chat.review.changedFilesCount' => ({required Object count}) => '已更改的文件（${count}）',
+			'chat.review.subagent' => '子代理',
 			'codeEditor.toolbar.changes' => '个更改',
 			'codeEditor.toolbar.previousChange' => '上一个更改',
 			'codeEditor.toolbar.nextChange' => '下一个更改',
@@ -7386,10 +9105,10 @@ extension on TranslationsZhCn {
 			'codeEditor.toolbar.settings' => '编辑器设置',
 			'codeEditor.toolbar.collapse' => '折叠编辑器',
 			'codeEditor.toolbar.expand' => '展开编辑器到全宽',
+			'codeEditor.toolbar.toggleDock' => '切换文件停靠栏',
 			'codeEditor.toolbar.diffMerge' => '差异 / 合并',
 			'codeEditor.toolbar.previewInBrowser' => '在浏览器中预览',
 			'codeEditor.toolbar.reload' => '从磁盘重新加载',
-			'codeEditor.toolbar.toggleDock' => '切换文件停靠栏',
 			'codeEditor.loading' => ({required Object fileName}) => '正在加载 ${fileName}...',
 			'codeEditor.header.showingChanges' => '显示更改',
 			'codeEditor.actions.copyPath' => '复制文件路径',
@@ -7411,30 +9130,40 @@ extension on TranslationsZhCn {
 			'codeEditor.footer.lines' => '行数：',
 			'codeEditor.footer.characters' => '字符数：',
 			'codeEditor.footer.shortcuts' => '按 Ctrl+S 保存 • Esc 关闭',
+			'codeEditor.footer.plainText' => '纯文本',
+			'codeEditor.footer.lineCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, other: '${count} 行', ), 
+			'codeEditor.footer.modified' => '已修改',
 			'codeEditor.binaryFile.title' => '二进制文件',
 			'codeEditor.binaryFile.message' => ({required Object fileName}) => '文件 "${fileName}" 无法在文本编辑器中显示，因为它是二进制文件。',
 			'codeEditor.binaryFile.cannotDisplayAsText' => '无法以文本形式显示',
 			'codeEditor.filePreview.loading' => '正在加载预览...',
 			'codeEditor.filePreview.error' => '无法显示此文件。',
 			'codeEditor.filePreview.openInNewTab' => '在新标签页中打开',
-			'codeEditor.diff.applyMerge' => '应用合并',
-			'codeEditor.diff.base' => '基准',
-			'codeEditor.diff.close' => '关闭差异',
-			'codeEditor.diff.current' => '当前',
-			'codeEditor.diff.hunk' => ({required Object number}) => '区块 ${number}',
-			'codeEditor.diff.noChanges' => '没有更改',
-			'codeEditor.diff.deletedOnDisk' => '已在磁盘上删除',
+			'codeEditor.unsavedChanges' => ({required Object name}) => '${name} 中有未保存的更改',
 			'codeEditor.discardUnsavedChanges' => '放弃未保存的更改？',
-			'codeEditor.emptyState.title' => '没有打开的文件',
+			'codeEditor.mediaFile.title' => '媒体文件',
+			'codeEditor.mediaFile.subtitle' => '暂不支持音频/视频预览',
 			'codeEditor.failedToLoad' => '加载文件失败',
 			'codeEditor.hexDump.more' => ({required Object size}) => '… 还有 ${size}',
-			'codeEditor.mediaFile.subtitle' => '暂不支持音频/视频预览',
-			'codeEditor.mediaFile.title' => '媒体文件',
-			'codeEditor.settings.fontSizeDecrease' => ({required Object size}) => '字体大小 −  （当前 ${size}）',
-			'codeEditor.settings.fontSizeIncrease' => '字体大小 +',
 			'codeEditor.settings.minimap' => '缩略图',
 			'codeEditor.settings.tabSize' => ({required Object size}) => 'Tab 大小：${size}',
-			'codeEditor.unsavedChanges' => ({required Object name}) => '${name} 中有未保存的更改',
+			'codeEditor.settings.fontSizeDecrease' => ({required Object size}) => '字体大小 −  （当前 ${size}）',
+			'codeEditor.settings.fontSizeIncrease' => '字体大小 +',
+			'codeEditor.diff.noChanges' => '没有更改',
+			'codeEditor.diff.hunk' => ({required Object number}) => '区块 ${number}',
+			'codeEditor.diff.close' => '关闭差异',
+			'codeEditor.diff.base' => '基准',
+			'codeEditor.diff.current' => '当前',
+			'codeEditor.diff.applyMerge' => '应用合并',
+			'codeEditor.diff.deletedOnDisk' => '已在磁盘上删除',
+			'codeEditor.diff.untrackedWillBeDeleted' => '此未跟踪文件将被删除。',
+			'codeEditor.diff.restoreConfirm' => ({required Object name}) => '将 ${name} 恢复到已提交的状态？',
+			'codeEditor.diff.headVsWorkingCopy' => 'HEAD 与工作副本',
+			'codeEditor.diff.savedVsBuffer' => '上次保存与缓冲区（无 git）',
+			'codeEditor.diff.unchangedLines' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, other: '${count} 行未更改', ), 
+			'codeEditor.diff.revertToSaved' => '恢复为已保存版本',
+			'codeEditor.emptyState.title' => '没有打开的文件',
+			'codeEditor.emptyState.hint' => '从“文件”标签页打开文件',
 			'codeEditor.toasts.savedFile' => ({required Object name}) => '已保存 ${name}',
 			'codeEditor.toasts.saveFailed' => '保存失败',
 			'codeEditor.toasts.allSaved' => '全部已保存',
@@ -7457,246 +9186,18 @@ extension on TranslationsZhCn {
 			'common.buttons.download' => '下载',
 			'common.buttons.upload' => '上传',
 			'common.buttons.browse' => '浏览',
-			'common.buttons.openDiagram' => '打开图表',
 			'common.buttons.update' => '更新',
+			'common.buttons.openDiagram' => '打开图表',
 			'common.tabs.chat' => '聊天',
 			'common.tabs.shell' => '终端',
 			'common.tabs.files' => '文件',
 			'common.tabs.git' => '源代码管理',
 			'common.tabs.tasks' => '任务',
+			'common.tabs.board' => '看板',
 			'common.tabs.browser' => '浏览器',
 			'common.tabs.computer' => '计算机',
-			'common.tabs.board' => '看板',
 			'common.tabs.usage' => 'AI Control',
-			'common.status.loading' => '加载中...',
-			'common.status.success' => '成功',
-			'common.status.error' => '错误',
-			'common.status.failed' => '失败',
-			'common.status.pending' => '待处理',
-			'common.status.completed' => '已完成',
-			'common.status.inProgress' => '进行中',
-			'common.messages.savedSuccessfully' => '保存成功',
-			'common.messages.deletedSuccessfully' => '删除成功',
-			'common.messages.updatedSuccessfully' => '更新成功',
-			'common.messages.operationFailed' => '操作失败',
-			'common.messages.networkError' => '网络错误，请检查您的连接。',
-			'common.messages.unauthorized' => '未授权，请登录。',
-			'common.messages.notFound' => '未找到',
-			'common.messages.invalidInput' => '输入无效',
-			'common.messages.requiredField' => '此字段为必填项',
-			'common.messages.unknownError' => '发生未知错误',
-			'common.messages.renameSessionFailed' => '重命名会话失败。请重试。',
-			'common.navigation.settings' => '设置',
-			'common.navigation.home' => '首页',
-			'common.navigation.back' => '返回',
-			'common.navigation.next' => '下一步',
-			'common.navigation.previous' => '上一步',
-			'common.navigation.logout' => '退出登录',
-			'common.common.language' => '语言',
-			'common.common.theme' => '主题',
-			'common.common.darkMode' => '深色模式',
-			'common.common.lightMode' => '浅色模式',
-			'common.common.name' => '名称',
-			'common.common.description' => '描述',
-			'common.common.enabled' => '已启用',
-			'common.common.disabled' => '已禁用',
-			'common.common.optional' => '可选',
-			'common.common.version' => '版本',
-			'common.common.select' => '选择',
-			'common.common.selectAll' => '全选',
-			'common.common.deselectAll' => '取消全选',
-			'common.common.done' => '完成',
-			'common.common.failed' => '失败',
-			'common.time.justNow' => '刚刚',
-			'common.time.minutesAgo' => ({required Object count}) => '${count} 分钟前',
-			'common.time.hoursAgo' => ({required Object count}) => '${count} 小时前',
-			'common.time.daysAgo' => ({required Object count}) => '${count} 天前',
-			'common.time.yesterday' => '昨天',
-			'common.fileOperations.newFile' => '新建文件',
-			'common.fileOperations.newFolder' => '新建文件夹',
-			'common.fileOperations.rename' => '重命名',
-			'common.fileOperations.move' => '移动',
-			'common.fileOperations.copyPath' => '复制路径',
-			'common.fileOperations.openInEditor' => '在编辑器中打开',
-			'common.mainContent.loading' => '正在加载 DDAgent',
-			'common.mainContent.settingUpWorkspace' => '正在设置您的工作空间...',
-			_ => null,
-		} ?? switch (path) {
-			'common.mainContent.chooseProject' => '选择您的项目',
-			'common.mainContent.selectProjectDescription' => '从侧边栏选择一个项目以开始使用 Claude 进行编程。每个项目包含您的聊天会话和文件历史。',
-			'common.mainContent.tip' => '提示',
-			'common.mainContent.createProjectMobile' => '点击上方的菜单按钮以访问项目',
-			'common.mainContent.createProjectDesktop' => '点击侧边栏中的文件夹图标以创建新项目',
-			'common.mainContent.newSession' => '新会话',
-			'common.mainContent.untitledSession' => '未命名会话',
-			'common.mainContent.projectFiles' => '项目文件',
-			'common.mainContent.focusMode' => '专注模式 (Ctrl+Shift+F)',
-			'common.mainContent.exitFocusMode' => '退出专注模式 (Ctrl+Shift+F)',
-			'common.mainContent.splitSession' => '分屏会话',
-			'common.mainContent.closeSplitSession' => '关闭分屏会话',
-			'common.mainContent.chooseWorkspace' => '选择工作区',
-			'common.mainContent.chooseWorkspaceDescription' => '为此聊天选择一个工作区，或在设置中创建新工作区。',
-			'common.mainContent.createWorkspace' => '在设置中创建工作区',
-			'common.mainContent.recentProjects' => '最近项目',
-			'common.fileTree.loading' => '正在加载文件...',
-			'common.fileTree.files' => '文件',
-			'common.fileTree.simpleView' => '简单视图',
-			'common.fileTree.compactView' => '紧凑视图',
-			'common.fileTree.detailedView' => '详细视图',
-			'common.fileTree.searchPlaceholder' => '搜索文件和文件夹...',
-			'common.fileTree.clearSearch' => '清除搜索',
-			'common.fileTree.name' => '名称',
-			'common.fileTree.size' => '大小',
-			'common.fileTree.modified' => '修改时间',
-			'common.fileTree.permissions' => '权限',
-			'common.fileTree.noFilesFound' => '未找到文件',
-			'common.fileTree.checkProjectPath' => '检查项目路径是否可访问',
-			'common.fileTree.noMatchesFound' => '未找到匹配项',
-			'common.fileTree.tryDifferentSearch' => '尝试不同的搜索词或清除搜索',
-			'common.fileTree.justNow' => '刚刚',
-			'common.fileTree.minAgo' => ({required Object count}) => '${count} 分钟前',
-			'common.fileTree.hoursAgo' => ({required Object count}) => '${count} 小时前',
-			'common.fileTree.daysAgo' => ({required Object count}) => '${count} 天前',
-			'common.fileTree.newFile' => '新建文件 (Cmd+N)',
-			'common.fileTree.newFolder' => '新建文件夹 (Cmd+Shift+N)',
-			'common.fileTree.refresh' => '刷新',
-			'common.fileTree.collapseAll' => '全部折叠',
-			'common.fileTree.context.rename' => '重命名',
-			'common.fileTree.context.delete' => '删除',
-			'common.fileTree.context.copyPath' => '复制路径',
-			'common.fileTree.context.download' => '下载',
-			'common.fileTree.context.newFile' => '新建文件',
-			'common.fileTree.context.newFolder' => '新建文件夹',
-			'common.fileTree.context.upload' => '上传文件',
-			'common.fileTree.context.refresh' => '刷新',
-			'common.fileTree.context.menuLabel' => '文件上下文菜单',
-			'common.fileTree.context.loading' => '加载中...',
-			'common.fileTree.searchContentPlaceholder' => '在文件中搜索...',
-			'common.fileTree.searchInFiles' => '在文件中搜索',
-			'common.fileTree.searchByName' => '按名称搜索',
-			'common.fileTree.loadFailed' => '无法加载文件',
-			'common.fileTree.noSearchResults' => '未找到匹配项',
-			'common.fileTree.searchError' => '搜索失败',
-			'common.fileTree.searching' => '正在搜索...',
-			'common.fileTree.resultsTruncated' => ({required Object count}) => '显示前 ${count} 条结果',
-			'common.fileTree.allWorkspaces' => '所有工作区',
-			'common.fileTree.delete.confirm' => '删除',
-			'common.fileTree.delete.fileWarning' => '此文件将被永久删除。',
-			'common.fileTree.delete.folderWarning' => '此文件夹及其所有内容将被永久删除。',
-			'common.fileTree.delete.title' => ({required Object type}) => '删除${type}',
-			'common.fileTree.dropToUpload' => '拖放文件以上传',
-			'common.fileTree.dropToUploadTo' => ({required Object folder}) => '拖放文件以上传到“${folder}”',
-			'common.fileTree.noProject' => '请先添加项目',
-			'common.fileTree.noRecentFiles' => '最近 7 天没有文件变更',
-			'common.fileTree.showAllFiles' => '显示所有文件',
-			'common.fileTree.showAllFilesHint' => '关闭最近筛选器以查看全部。',
-			'common.fileTree.showRecentOnly' => '显示最近 7 天变更的文件',
-			'common.fileTree.toast.copyFailed' => '复制路径失败',
-			'common.fileTree.toast.fileCreated' => '文件创建成功',
-			'common.fileTree.toast.fileDeleted' => '文件已删除',
-			'common.fileTree.toast.folderCreated' => '文件夹创建成功',
-			'common.fileTree.toast.folderDeleted' => '文件夹已删除',
-			'common.fileTree.toast.folderDownloaded' => '文件夹已下载为 ZIP',
-			'common.fileTree.toast.pathCopied' => '路径已复制到剪贴板',
-			'common.fileTree.toast.renamed' => '重命名成功',
-			'common.fileTree.uploadComplete' => '上传完成',
-			'common.fileTree.uploadFailed' => '上传失败',
-			'common.fileTree.uploadFiles' => ({required Object size}) => '上传文件（每个最大 ${size}）',
-			'common.fileTree.uploadToFolder' => ({required Object folder}) => '上传文件到“${folder}”',
-			'common.fileTree.uploadedCount' => ({required Object total, required Object label, required Object uploaded}) => '已上传 ${total} ${label} 中的 ${uploaded} 个',
-			'common.fileTree.uploadingFiles' => '正在上传文件',
-			'common.fileTree.validation.dotsOnly' => '文件名不能只包含点',
-			'common.fileTree.validation.emptyName' => '文件名不能为空',
-			'common.fileTree.validation.invalidChars' => '文件名包含无效字符',
-			'common.fileTree.validation.reserved' => '文件名是保留名称',
-			'common.projectWizard.title' => '创建新项目',
-			'common.projectWizard.steps.type' => '类型',
-			'common.projectWizard.steps.configure' => '配置',
-			'common.projectWizard.steps.confirm' => '确认',
-			'common.projectWizard.step1.question' => '您已经有工作区，还是想创建一个新的工作区？',
-			'common.projectWizard.step1.existing.title' => '现有工作区',
-			'common.projectWizard.step1.existing.description' => '我的服务器上已经有工作区，只需要将其添加到项目列表中',
-			'common.projectWizard.step1.kNew.title' => '新建工作区',
-			'common.projectWizard.step1.kNew.description' => '创建一个新工作区，可选择从 GitHub 仓库克隆',
-			'common.projectWizard.step2.existingPath' => '工作区路径',
-			'common.projectWizard.step2.newPath' => '工作区路径',
-			'common.projectWizard.step2.existingPlaceholder' => '/path/to/existing/workspace',
-			'common.projectWizard.step2.newPlaceholder' => '/path/to/new/workspace',
-			'common.projectWizard.step2.existingHelp' => '您现有工作区目录的完整路径',
-			'common.projectWizard.step2.newHelp' => '工作区目录的完整路径',
-			'common.projectWizard.step2.githubUrl' => 'GitHub URL（可选）',
-			'common.projectWizard.step2.githubPlaceholder' => 'https://github.com/username/repository',
-			'common.projectWizard.step2.githubHelp' => '可选：提供 GitHub URL 以克隆仓库',
-			'common.projectWizard.step2.githubAuth' => 'GitHub 身份验证（可选）',
-			'common.projectWizard.step2.githubAuthHelp' => '仅私有仓库需要。公共仓库无需身份验证即可克隆。',
-			'common.projectWizard.step2.loadingTokens' => '正在加载已保存的令牌...',
-			'common.projectWizard.step2.storedToken' => '已保存的令牌',
-			'common.projectWizard.step2.newToken' => '新令牌',
-			'common.projectWizard.step2.nonePublic' => '无（公共）',
-			'common.projectWizard.step2.selectToken' => '选择令牌',
-			'common.projectWizard.step2.selectTokenPlaceholder' => '-- 选择令牌 --',
-			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-			'common.projectWizard.step2.tokenHelp' => '此令牌仅用于此操作',
-			'common.projectWizard.step2.publicRepoInfo' => '公共仓库不需要身份验证。如果克隆公共仓库，可以跳过提供令牌。',
-			'common.projectWizard.step2.noTokensHelp' => '没有可用的已保存令牌。您可以在 设置 → API 密钥 中添加令牌以便重复使用。',
-			'common.projectWizard.step2.optionalTokenPublic' => 'GitHub 令牌（公共仓库可选）',
-			'common.projectWizard.step2.tokenPublicPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx（公共仓库可留空）',
-			'common.projectWizard.step3.reviewConfig' => '查看您的配置',
-			'common.projectWizard.step3.existingWorkspace' => '现有工作区',
-			'common.projectWizard.step3.newWorkspace' => '新建工作区',
-			'common.projectWizard.step3.path' => '路径：',
-			'common.projectWizard.step3.cloneFrom' => '克隆自：',
-			'common.projectWizard.step3.authentication' => '身份验证：',
-			'common.projectWizard.step3.usingStoredToken' => '使用已保存的令牌：',
-			'common.projectWizard.step3.usingProvidedToken' => '使用提供的令牌',
-			'common.projectWizard.step3.noAuthentication' => '无身份验证',
-			'common.projectWizard.step3.sshKey' => 'SSH 密钥',
-			'common.projectWizard.step3.existingInfo' => '工作区将被添加到您的项目列表中，并可用于 Claude/Cursor 会话。',
-			'common.projectWizard.step3.newWithClone' => '仓库将从此文件夹克隆。',
-			'common.projectWizard.step3.newEmpty' => '工作区将被添加到您的项目列表中，并可用于 Claude/Cursor 会话。',
-			'common.projectWizard.step3.cloningRepository' => '正在克隆仓库...',
-			'common.projectWizard.buttons.cancel' => '取消',
-			'common.projectWizard.buttons.back' => '返回',
-			'common.projectWizard.buttons.next' => '下一步',
-			'common.projectWizard.buttons.createProject' => '创建项目',
-			'common.projectWizard.buttons.creating' => '创建中...',
-			'common.projectWizard.buttons.cloning' => '正在克隆...',
-			'common.projectWizard.errors.selectType' => '请选择您已有现有工作区还是想创建新工作区',
-			'common.projectWizard.errors.providePath' => '请提供工作区路径',
-			'common.projectWizard.errors.failedToCreate' => '创建工作区失败',
-			'common.projectWizard.errors.failedToCreateFolder' => '创建文件夹失败',
-			'common.notifications.genericTool' => '工具',
-			'common.notifications.codes.generic.info.title' => '通知',
-			'common.notifications.codes.permission.required.title' => '需要处理',
-			'common.notifications.codes.permission.required.body' => ({required Object toolName}) => '${toolName} 正在等待你的决策。',
-			'common.notifications.codes.run.stopped.title' => '运行已停止',
-			'common.notifications.codes.run.stopped.body' => ({required Object reason}) => '原因：${reason}',
-			'common.notifications.codes.run.failed.title' => '运行失败',
-			'common.notifications.codes.agent.notification.title' => 'Agent 通知',
-			'common.versionUpdate.title' => '有可用更新',
-			'common.versionUpdate.newVersionReady' => '新版本已准备就绪',
-			'common.versionUpdate.currentVersion' => '当前版本',
-			'common.versionUpdate.latestVersion' => '最新版本',
-			'common.versionUpdate.whatsNew' => '新内容：',
-			'common.versionUpdate.viewFullRelease' => '查看完整发布',
-			'common.versionUpdate.updateProgress' => '更新进度：',
-			'common.versionUpdate.manualUpgrade' => '手动升级：',
-			'common.versionUpdate.npmUpgradeCommand' => 'npm install -g @ddagent-ai/ddagent@latest',
-			'common.versionUpdate.manualUpgradeHint' => '或点击\'立即更新\'以自动运行更新。',
-			'common.versionUpdate.updateCompleted' => '更新成功完成！',
-			'common.versionUpdate.restartServer' => '请重启服务器以应用更改。',
-			'common.versionUpdate.updateFailed' => '更新失败',
-			'common.versionUpdate.buttons.close' => '关闭',
-			'common.versionUpdate.buttons.later' => '稍后',
-			'common.versionUpdate.buttons.copyCommand' => '复制命令',
-			'common.versionUpdate.buttons.updateNow' => '立即更新',
-			'common.versionUpdate.buttons.updating' => '更新中...',
-			'common.versionUpdate.ariaLabels.closeModal' => '关闭版本升级模态框',
-			'common.versionUpdate.ariaLabels.showSidebar' => '显示侧边栏',
-			'common.versionUpdate.ariaLabels.settings' => '设置',
-			'common.versionUpdate.ariaLabels.updateAvailable' => '有可用更新',
-			'common.versionUpdate.ariaLabels.closeSidebar' => '关闭侧边栏',
-			'common.quota.controlCenter' => 'AI Control Center',
+			'common.quota.controlCenter' => 'AI 控制中心',
 			'common.quota.section.overview' => '概览',
 			'common.quota.section.quotas' => '额度',
 			'common.quota.section.usage' => '用量',
@@ -7810,6 +9311,235 @@ extension on TranslationsZhCn {
 			'common.quota.range.k7d' => '7d',
 			'common.quota.range.k30d' => '30d',
 			'common.quota.range.all' => '全部',
+			'common.status.loading' => '加载中...',
+			'common.status.success' => '成功',
+			'common.status.error' => '错误',
+			'common.status.failed' => '失败',
+			'common.status.pending' => '待处理',
+			'common.status.completed' => '已完成',
+			'common.status.inProgress' => '进行中',
+			'common.messages.savedSuccessfully' => '保存成功',
+			'common.messages.deletedSuccessfully' => '删除成功',
+			'common.messages.updatedSuccessfully' => '更新成功',
+			'common.messages.operationFailed' => '操作失败',
+			'common.messages.networkError' => '网络错误，请检查您的连接。',
+			'common.messages.unauthorized' => '未授权，请登录。',
+			'common.messages.notFound' => '未找到',
+			'common.messages.invalidInput' => '输入无效',
+			'common.messages.requiredField' => '此字段为必填项',
+			'common.messages.unknownError' => '发生未知错误',
+			'common.messages.renameSessionFailed' => '重命名会话失败。请重试。',
+			'common.navigation.settings' => '设置',
+			'common.navigation.home' => '首页',
+			'common.navigation.back' => '返回',
+			'common.navigation.next' => '下一步',
+			'common.navigation.previous' => '上一步',
+			'common.navigation.logout' => '退出登录',
+			'common.navigation.backToChat' => '返回聊天',
+			'common.common.language' => '语言',
+			'common.common.theme' => '主题',
+			'common.common.darkMode' => '深色模式',
+			'common.common.lightMode' => '浅色模式',
+			'common.common.name' => '名称',
+			'common.common.description' => '描述',
+			'common.common.enabled' => '已启用',
+			'common.common.disabled' => '已禁用',
+			'common.common.optional' => '可选',
+			'common.common.version' => '版本',
+			'common.common.select' => '选择',
+			'common.common.selectAll' => '全选',
+			'common.common.deselectAll' => '取消全选',
+			'common.common.done' => '完成',
+			'common.common.failed' => '失败',
+			'common.time.justNow' => '刚刚',
+			'common.time.minutesAgo' => ({required Object count}) => '${count} 分钟前',
+			'common.time.hoursAgo' => ({required Object count}) => '${count} 小时前',
+			'common.time.daysAgo' => ({required Object count}) => '${count} 天前',
+			'common.time.yesterday' => '昨天',
+			'common.fileOperations.newFile' => '新建文件',
+			'common.fileOperations.newFolder' => '新建文件夹',
+			'common.fileOperations.rename' => '重命名',
+			'common.fileOperations.move' => '移动',
+			'common.fileOperations.copyPath' => '复制路径',
+			'common.fileOperations.openInEditor' => '在编辑器中打开',
+			'common.mainContent.loading' => '正在加载 DDAgent',
+			'common.mainContent.settingUpWorkspace' => '正在设置您的工作空间...',
+			'common.mainContent.chooseProject' => '选择您的项目',
+			'common.mainContent.selectProjectDescription' => '从侧边栏选择一个项目以开始使用 Claude 进行编程。每个项目包含您的聊天会话和文件历史。',
+			'common.mainContent.tip' => '提示',
+			'common.mainContent.createProjectMobile' => '点击上方的菜单按钮以访问项目',
+			'common.mainContent.createProjectDesktop' => '点击侧边栏中的文件夹图标以创建新项目',
+			'common.mainContent.newSession' => '新会话',
+			'common.mainContent.untitledSession' => '未命名会话',
+			'common.mainContent.projectFiles' => '项目文件',
+			'common.mainContent.focusMode' => '专注模式 (Ctrl+Shift+F)',
+			'common.mainContent.exitFocusMode' => '退出专注模式 (Ctrl+Shift+F)',
+			'common.mainContent.splitSession' => '分屏会话',
+			'common.mainContent.closeSplitSession' => '关闭分屏会话',
+			'common.mainContent.chooseWorkspace' => '选择工作区',
+			'common.mainContent.chooseWorkspaceDescription' => '为此聊天选择一个工作区，或在设置中创建新工作区。',
+			'common.mainContent.createWorkspace' => '在设置中创建工作区',
+			'common.mainContent.recentProjects' => '最近项目',
+			'common.fileTree.loading' => '正在加载文件...',
+			'common.fileTree.files' => '文件',
+			'common.fileTree.simpleView' => '简单视图',
+			'common.fileTree.compactView' => '紧凑视图',
+			'common.fileTree.detailedView' => '详细视图',
+			'common.fileTree.searchPlaceholder' => '搜索文件和文件夹...',
+			'common.fileTree.searchContentPlaceholder' => '在文件中搜索...',
+			'common.fileTree.searchInFiles' => '在文件中搜索',
+			'common.fileTree.searchByName' => '按名称搜索',
+			'common.fileTree.clearSearch' => '清除搜索',
+			'common.fileTree.name' => '名称',
+			'common.fileTree.size' => '大小',
+			'common.fileTree.modified' => '修改时间',
+			'common.fileTree.permissions' => '权限',
+			'common.fileTree.noFilesFound' => '未找到文件',
+			'common.fileTree.checkProjectPath' => '检查项目路径是否可访问',
+			'common.fileTree.loadFailed' => '无法加载文件',
+			'common.fileTree.noMatchesFound' => '未找到匹配项',
+			'common.fileTree.noSearchResults' => '未找到匹配项',
+			'common.fileTree.tryDifferentSearch' => '尝试不同的搜索词或清除搜索',
+			'common.fileTree.searchError' => '搜索失败',
+			'common.fileTree.searching' => '正在搜索...',
+			'common.fileTree.resultsTruncated' => ({required Object count}) => '显示前 ${count} 条结果',
+			'common.fileTree.justNow' => '刚刚',
+			'common.fileTree.minAgo' => ({required Object count}) => '${count} 分钟前',
+			'common.fileTree.hoursAgo' => ({required Object count}) => '${count} 小时前',
+			'common.fileTree.daysAgo' => ({required Object count}) => '${count} 天前',
+			'common.fileTree.newFile' => '新建文件 (Cmd+N)',
+			'common.fileTree.newFolder' => '新建文件夹 (Cmd+Shift+N)',
+			'common.fileTree.refresh' => '刷新',
+			'common.fileTree.collapseAll' => '全部折叠',
+			'common.fileTree.context.rename' => '重命名',
+			'common.fileTree.context.delete' => '删除',
+			'common.fileTree.context.copyPath' => '复制路径',
+			'common.fileTree.context.download' => '下载',
+			'common.fileTree.context.newFile' => '新建文件',
+			'common.fileTree.context.newFolder' => '新建文件夹',
+			'common.fileTree.context.upload' => '上传文件',
+			'common.fileTree.context.refresh' => '刷新',
+			'common.fileTree.context.menuLabel' => '文件上下文菜单',
+			'common.fileTree.context.loading' => '加载中...',
+			'common.fileTree.allWorkspaces' => '所有工作区',
+			'common.fileTree.delete.confirm' => '删除',
+			'common.fileTree.delete.fileWarning' => '此文件将被永久删除。',
+			'common.fileTree.delete.folderWarning' => '此文件夹及其所有内容将被永久删除。',
+			'common.fileTree.delete.title' => ({required Object type}) => '删除${type}',
+			'common.fileTree.dropToUpload' => '拖放文件以上传',
+			'common.fileTree.dropToUploadTo' => ({required Object folder}) => '拖放文件以上传到“${folder}”',
+			'common.fileTree.noProject' => '请先添加项目',
+			'common.fileTree.noRecentFiles' => '最近 7 天没有文件变更',
+			'common.fileTree.showAllFiles' => '显示所有文件',
+			'common.fileTree.showAllFilesHint' => '关闭最近筛选器以查看全部。',
+			'common.fileTree.showRecentOnly' => '显示最近 7 天变更的文件',
+			'common.fileTree.toast.copyFailed' => '复制路径失败',
+			'common.fileTree.toast.fileCreated' => '文件创建成功',
+			'common.fileTree.toast.fileDeleted' => '文件已删除',
+			'common.fileTree.toast.folderCreated' => '文件夹创建成功',
+			'common.fileTree.toast.folderDeleted' => '文件夹已删除',
+			'common.fileTree.toast.folderDownloaded' => '文件夹已下载为 ZIP',
+			'common.fileTree.toast.pathCopied' => '路径已复制到剪贴板',
+			'common.fileTree.toast.renamed' => '重命名成功',
+			'common.fileTree.uploadComplete' => '上传完成',
+			'common.fileTree.uploadFailed' => '上传失败',
+			'common.fileTree.uploadFiles' => ({required Object size}) => '上传文件（每个最大 ${size}）',
+			'common.fileTree.uploadToFolder' => ({required Object folder}) => '上传文件到“${folder}”',
+			'common.fileTree.uploadedCount' => ({required Object total, required Object label, required Object uploaded}) => '已上传 ${total} ${label} 中的 ${uploaded} 个',
+			'common.fileTree.uploadingFiles' => '正在上传文件',
+			'common.fileTree.validation.dotsOnly' => '文件名不能只包含点',
+			'common.fileTree.validation.emptyName' => '文件名不能为空',
+			'common.fileTree.validation.invalidChars' => '文件名包含无效字符',
+			'common.fileTree.validation.reserved' => '文件名是保留名称',
+			'common.projectWizard.title' => '创建新项目',
+			'common.projectWizard.steps.type' => '类型',
+			'common.projectWizard.steps.configure' => '配置',
+			'common.projectWizard.steps.confirm' => '确认',
+			'common.projectWizard.step1.question' => '您已经有工作区，还是想创建一个新的工作区？',
+			'common.projectWizard.step1.existing.title' => '现有工作区',
+			'common.projectWizard.step1.existing.description' => '我的服务器上已经有工作区，只需要将其添加到项目列表中',
+			'common.projectWizard.step1.kNew.title' => '新建工作区',
+			'common.projectWizard.step1.kNew.description' => '创建一个新工作区，可选择从 GitHub 仓库克隆',
+			'common.projectWizard.step2.existingPath' => '工作区路径',
+			'common.projectWizard.step2.newPath' => '工作区路径',
+			'common.projectWizard.step2.existingPlaceholder' => '/path/to/existing/workspace',
+			'common.projectWizard.step2.newPlaceholder' => '/path/to/new/workspace',
+			'common.projectWizard.step2.existingHelp' => '您现有工作区目录的完整路径',
+			'common.projectWizard.step2.newHelp' => '工作区目录的完整路径',
+			'common.projectWizard.step2.githubUrl' => 'GitHub URL（可选）',
+			'common.projectWizard.step2.githubPlaceholder' => 'https://github.com/username/repository',
+			'common.projectWizard.step2.githubHelp' => '可选：提供 GitHub URL 以克隆仓库',
+			'common.projectWizard.step2.githubAuth' => 'GitHub 身份验证（可选）',
+			'common.projectWizard.step2.githubAuthHelp' => '仅私有仓库需要。公共仓库无需身份验证即可克隆。',
+			'common.projectWizard.step2.loadingTokens' => '正在加载已保存的令牌...',
+			'common.projectWizard.step2.storedToken' => '已保存的令牌',
+			'common.projectWizard.step2.newToken' => '新令牌',
+			'common.projectWizard.step2.nonePublic' => '无（公共）',
+			'common.projectWizard.step2.selectToken' => '选择令牌',
+			'common.projectWizard.step2.selectTokenPlaceholder' => '-- 选择令牌 --',
+			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+			'common.projectWizard.step2.tokenHelp' => '此令牌仅用于此操作',
+			'common.projectWizard.step2.publicRepoInfo' => '公共仓库不需要身份验证。如果克隆公共仓库，可以跳过提供令牌。',
+			'common.projectWizard.step2.noTokensHelp' => '没有可用的已保存令牌。您可以在 设置 → API 密钥 中添加令牌以便重复使用。',
+			'common.projectWizard.step2.optionalTokenPublic' => 'GitHub 令牌（公共仓库可选）',
+			'common.projectWizard.step2.tokenPublicPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx（公共仓库可留空）',
+			'common.projectWizard.step3.reviewConfig' => '查看您的配置',
+			'common.projectWizard.step3.existingWorkspace' => '现有工作区',
+			'common.projectWizard.step3.newWorkspace' => '新建工作区',
+			_ => null,
+		} ?? switch (path) {
+			'common.projectWizard.step3.path' => '路径：',
+			'common.projectWizard.step3.cloneFrom' => '克隆自：',
+			'common.projectWizard.step3.authentication' => '身份验证：',
+			'common.projectWizard.step3.usingStoredToken' => '使用已保存的令牌：',
+			'common.projectWizard.step3.usingProvidedToken' => '使用提供的令牌',
+			'common.projectWizard.step3.noAuthentication' => '无身份验证',
+			'common.projectWizard.step3.sshKey' => 'SSH 密钥',
+			'common.projectWizard.step3.existingInfo' => '工作区将被添加到您的项目列表中，并可用于 Claude/Cursor 会话。',
+			'common.projectWizard.step3.newWithClone' => '仓库将从此文件夹克隆。',
+			'common.projectWizard.step3.newEmpty' => '工作区将被添加到您的项目列表中，并可用于 Claude/Cursor 会话。',
+			'common.projectWizard.step3.cloningRepository' => '正在克隆仓库...',
+			'common.projectWizard.buttons.cancel' => '取消',
+			'common.projectWizard.buttons.back' => '返回',
+			'common.projectWizard.buttons.next' => '下一步',
+			'common.projectWizard.buttons.createProject' => '创建项目',
+			'common.projectWizard.buttons.creating' => '创建中...',
+			'common.projectWizard.buttons.cloning' => '正在克隆...',
+			'common.projectWizard.errors.selectType' => '请选择您已有现有工作区还是想创建新工作区',
+			'common.projectWizard.errors.providePath' => '请提供工作区路径',
+			'common.projectWizard.errors.failedToCreate' => '创建工作区失败',
+			'common.projectWizard.errors.failedToCreateFolder' => '创建文件夹失败',
+			'common.notifications.genericTool' => '工具',
+			'common.notifications.codes.generic.info.title' => '通知',
+			'common.notifications.codes.permission.required.title' => '需要处理',
+			'common.notifications.codes.permission.required.body' => ({required Object toolName}) => '${toolName} 正在等待你的决策。',
+			'common.notifications.codes.run.stopped.title' => '运行已停止',
+			'common.notifications.codes.run.stopped.body' => ({required Object reason}) => '原因：${reason}',
+			'common.notifications.codes.run.failed.title' => '运行失败',
+			'common.notifications.codes.agent.notification.title' => 'Agent 通知',
+			'common.versionUpdate.title' => '有可用更新',
+			'common.versionUpdate.newVersionReady' => '新版本已准备就绪',
+			'common.versionUpdate.currentVersion' => '当前版本',
+			'common.versionUpdate.latestVersion' => '最新版本',
+			'common.versionUpdate.whatsNew' => '新内容：',
+			'common.versionUpdate.viewFullRelease' => '查看完整发布',
+			'common.versionUpdate.updateProgress' => '更新进度：',
+			'common.versionUpdate.manualUpgrade' => '手动升级：',
+			'common.versionUpdate.npmUpgradeCommand' => 'npm install -g @ddagent-ai/ddagent@latest',
+			'common.versionUpdate.manualUpgradeHint' => '或点击\'立即更新\'以自动运行更新。',
+			'common.versionUpdate.updateCompleted' => '更新成功完成！',
+			'common.versionUpdate.restartServer' => '请重启服务器以应用更改。',
+			'common.versionUpdate.updateFailed' => '更新失败',
+			'common.versionUpdate.buttons.close' => '关闭',
+			'common.versionUpdate.buttons.later' => '稍后',
+			'common.versionUpdate.buttons.copyCommand' => '复制命令',
+			'common.versionUpdate.buttons.updateNow' => '立即更新',
+			'common.versionUpdate.buttons.updating' => '更新中...',
+			'common.versionUpdate.ariaLabels.closeModal' => '关闭版本升级模态框',
+			'common.versionUpdate.ariaLabels.showSidebar' => '显示侧边栏',
+			'common.versionUpdate.ariaLabels.settings' => '设置',
+			'common.versionUpdate.ariaLabels.updateAvailable' => '有可用更新',
+			'common.versionUpdate.ariaLabels.closeSidebar' => '关闭侧边栏',
 			'common.actions.cancel' => '取消',
 			'common.actions.retry' => '重试',
 			'common.actions.save' => '保存',
@@ -8034,8 +9764,6 @@ extension on TranslationsZhCn {
 			'common.gitPanel.history.files' => '文件',
 			'common.gitPanel.history.removed' => '已移除',
 			'common.gitPanel.mergeWorktree.cleanupDesc' => '合并后移除 worktree 并删除其分支',
-			_ => null,
-		} ?? switch (path) {
 			'common.gitPanel.mergeWorktree.cleanupLabel' => '合并后清理',
 			'common.gitPanel.mergeWorktree.commitCount' => ({required Object count}) => '${count} 个提交',
 			'common.gitPanel.mergeWorktree.merge' => '合并',
@@ -8145,8 +9873,30 @@ extension on TranslationsZhCn {
 			'common.gitPanel.tabs.history' => '提交',
 			'common.gitPanel.tabs.branches' => '分支',
 			'common.gitPanel.tabs.worktrees' => '工作树',
+			'common.gitPanel.save' => '保存',
+			'common.gitPanel.worktreeScripts.title' => 'Worktree 脚本',
+			'common.gitPanel.worktreeScripts.setup' => '初始化脚本（创建/打开后运行）',
+			'common.gitPanel.worktreeScripts.run' => '启动开发服务器',
+			'common.gitPanel.worktreeScripts.stop' => '停止开发服务器',
+			'common.gitPanel.worktreeScripts.runScript' => '运行脚本（开发服务器，按需启动）',
+			'common.gitPanel.worktreeScripts.runPort' => '预览端口（可选 — 留空时自动检测）',
+			'common.gitPanel.worktreeScripts.invalidPort' => '端口必须介于 1 到 65535 之间',
+			'common.gitPanel.worktreeScripts.sourceProject' => '已保存为项目覆盖配置',
+			'common.gitPanel.worktreeScripts.sourceFile' => '来自 .ddagent/worktree.json — 保存将创建项目覆盖配置',
+			'common.gitPanel.worktreeScripts.sourceNone' => '尚未配置任何内容',
+			'common.gitPanel.worktreeScripts.saving' => '正在保存…',
+			'common.gitPanel.worktreeScripts.setupRunning' => '正在初始化',
+			'common.gitPanel.worktreeScripts.setupFailed' => '初始化失败',
+			'common.gitPanel.worktreeScripts.running' => '运行中',
+			'common.gitPanel.worktreeScripts.openPreview' => '打开预览',
+			'common.gitPanel.worktreeScripts.runExited' => ({required Object code}) => '运行已退出（${code}）',
 			'common.sessions.renameSession' => '重命名会话',
 			'common.projects.newSession' => '新会话',
+			'common.sharedNotes.subtitle' => '共享记忆 — 注入到此项目的每个会话中',
+			'common.sharedNotes.save' => '保存',
+			'common.sharedNotes.saving' => '正在保存…',
+			'common.sharedNotes.noProject' => '选择一个工作区以编辑其共享上下文',
+			'common.sharedNotes.placeholder' => '# 共享上下文\n每个智能体都应了解的约定、决策和要点…',
 			'common.codeBlock.wrapLines' => '自动换行',
 			'common.codeBlock.noWrap' => '不换行',
 			'common.update.available' => ({required Object version}) => '有可用更新 · v${version}',
@@ -8174,6 +9924,8 @@ extension on TranslationsZhCn {
 			'common.update.staged' => ({required Object version}) => '已下载更新 v${version} — 请重启服务器以完成安装。',
 			'common.update.upToDate' => '服务器已是最新版本。',
 			'common.update.webHostFailed' => ({required Object message}) => '服务器已更新，但其 Web 界面未更新：${message}',
+			'common.appShell.panelActive' => ({required Object count}) => '面板 · ${count} 个运行中',
+			'common.errors.forbidden' => '访问被拒绝',
 			'settings.title' => '设置',
 			'settings.changelog.title' => '更新日志',
 			'settings.changelog.loading' => '加载中…',
@@ -8196,10 +9948,13 @@ extension on TranslationsZhCn {
 			'settings.server.restartTimeout' => ({required Object seconds}) => '服务器在 ${seconds} 秒内未恢复。请检查服务日志（/tmp/ddagent.log）或手动重启。',
 			'settings.updates.title' => '更新',
 			'settings.updates.description' => '在 GitHub 上检查更新的桌面版本。新版本会自动下载并在退出时安装。',
+			'settings.updates.descriptionMobile' => '在 GitHub 上检查此应用的新版本。更新由设备的系统安装程序安装。',
+			'settings.updates.descriptionServer' => '在 GitHub 上检查新的 DDAgent 版本。已连接的服务器可以自行更新 — 重启期间活动会话将被中断。',
 			'settings.updates.check' => '检查更新',
 			'settings.updates.checking' => '正在检查…',
 			'settings.updates.upToDate' => ({required Object version}) => '已是最新版本（v${version}）。',
 			'settings.updates.available' => ({required Object version}) => '发现更新 v${version} — 正在后台下载；退出 DDAgent 时自动安装。',
+			'settings.updates.appAvailable' => ({required Object version}) => '应用更新 v${version} 可用 — 点击“更新”即可在此设备上安装。',
 			'settings.updates.downloaded' => ({required Object version}) => '更新 v${version} 已下载 — 退出并重新启动 DDAgent 即可安装。',
 			'settings.updates.unavailable' => '更新检查仅在打包的桌面版本中可用。',
 			'settings.updates.error' => ({required Object message}) => '更新检查失败：${message}',
@@ -8243,9 +9998,11 @@ extension on TranslationsZhCn {
 			'settings.appearance.showMinimap' => '显示缩略图',
 			'settings.appearance.lineNumbers' => '行号',
 			'settings.appearance.fontSize' => '字体大小',
-			'settings.appearance.themeModes.dark' => '深色',
-			'settings.appearance.themeModes.light' => '浅色',
 			'settings.appearance.themeModes.system' => '跟随系统',
+			'settings.appearance.themeModes.light' => '浅色',
+			_ => null,
+		} ?? switch (path) {
+			'settings.appearance.themeModes.dark' => '深色',
 			'settings.actions.saveChanges' => '保存更改',
 			'settings.actions.resetToDefaults' => '重置为默认值',
 			'settings.actions.cancelChanges' => '取消更改',
@@ -8264,6 +10021,7 @@ extension on TranslationsZhCn {
 			'settings.quickSettings.dragHandle.draggingStatus' => '正在拖拽...',
 			'settings.quickSettings.dragHandle.toggleAndMove' => '点击切换，拖拽移动',
 			'settings.quickSettings.sendWithCtrlEnter' => '使用 Ctrl+Enter 发送',
+			'settings.quickSettings.enterSendsHint' => '关闭时，按 Enter 发送，按 Shift+Enter 换行。',
 			'settings.terminalShortcuts.title' => '终端快捷键',
 			'settings.terminalShortcuts.sectionKeys' => '按键',
 			'settings.terminalShortcuts.sectionNavigation' => '导航',
@@ -8273,14 +10031,16 @@ extension on TranslationsZhCn {
 			'settings.terminalShortcuts.arrowUp' => '上箭头',
 			'settings.terminalShortcuts.arrowDown' => '下箭头',
 			'settings.terminalShortcuts.scrollDown' => '滚动到底部',
+			'settings.terminalShortcuts.killTitle' => '终止正在运行的进程 (Ctrl+C)',
 			'settings.terminalShortcuts.handle.closePanel' => '关闭快捷键面板',
 			'settings.terminalShortcuts.handle.openPanel' => '打开快捷键面板',
-			'settings.terminalShortcuts.killTitle' => '终止正在运行的进程 (Ctrl+C)',
 			'settings.terminalShortcuts.paste' => '粘贴',
 			'settings.mainTabs.label' => '设置',
 			'settings.mainTabs.agents' => '智能体',
 			'settings.mainTabs.orchestration' => '编排',
+			'settings.mainTabs.miniOrchestration' => '迷你编排',
 			'settings.mainTabs.appearance' => '外观',
+			'settings.mainTabs.workspaces' => '工作区',
 			'settings.mainTabs.git' => 'Git',
 			'settings.mainTabs.apiTokens' => 'API 和令牌',
 			'settings.mainTabs.models' => '模型',
@@ -8289,94 +10049,141 @@ extension on TranslationsZhCn {
 			'settings.mainTabs.tools' => '工具',
 			'settings.mainTabs.notifications' => '通知',
 			'settings.mainTabs.about' => '关于',
-			'settings.mainTabs.workspaces' => '工作区',
-			'settings.mainTabs.quota' => 'Control Center',
+			'settings.mainTabs.quota' => '控制中心',
+			'settings.mainTabs.shortcuts' => '键盘快捷键',
+			'settings.miniOrchestration.title' => '迷你编排',
+			'settings.miniOrchestration.description' => '双模型流水线：非 flash 的思考者负责规划，flash 执行者负责执行。',
+			'settings.miniOrchestration.loading' => '正在加载迷你编排设置…',
+			'settings.miniOrchestration.loadError' => '无法加载迷你编排设置。',
+			'settings.miniOrchestration.enable.label' => '启用迷你编排',
+			'settings.miniOrchestration.enable.description' => '将自动（迷你）会话交由双角色引擎处理，而不是完整的编排器。',
+			'settings.miniOrchestration.thinker.title' => '思考者（非 flash）',
+			'settings.miniOrchestration.thinker.description' => '负责规划、决策、审查并撰写最终报告。',
+			'settings.miniOrchestration.worker.title' => '执行者（flash）',
+			'settings.miniOrchestration.worker.description' => '执行每个计划步骤。',
+			'settings.miniOrchestration.fields.provider' => '提供者',
+			'settings.miniOrchestration.fields.model' => '模型',
+			'settings.miniOrchestration.fields.modelPlaceholder' => '选择模型',
+			'settings.miniOrchestration.fields.tier' => '档位',
+			'settings.miniOrchestration.roles.title' => '按任务分配模型',
+			'settings.miniOrchestration.roles.description' => '每种任务类型由哪个模型（角色）处理。',
+			'settings.miniOrchestration.planner.title' => '规划器',
+			'settings.miniOrchestration.planner.mode' => '模式',
+			'settings.miniOrchestration.planner.modes.auto' => '由思考者规划',
+			'settings.miniOrchestration.planner.modes.off' => '单步',
+			'settings.miniOrchestration.planner.requireConfirmLabel' => '运行前确认计划',
 			'settings.orchestration.title' => 'Orchestration',
-			'settings.orchestration.description' => 'Route chat tasks across your providers and models.',
-			'settings.orchestration.loading' => 'Loading orchestration settings…',
-			'settings.orchestration.loadError' => 'Could not load the orchestration settings.',
+			'settings.orchestration.description' => '在您的提供者和模型之间路由聊天任务。',
+			'settings.orchestration.loading' => '正在加载编排设置…',
+			'settings.orchestration.loadError' => '无法加载编排设置。',
 			'settings.orchestration.retry' => 'Retry',
-			'settings.orchestration.enable.label' => 'Enable orchestration',
-			'settings.orchestration.enable.description' => 'Let the orchestrator pick a model per step instead of running everything on one provider.',
-			'settings.orchestration.pool.title' => 'Candidate pool',
-			'settings.orchestration.pool.description' => 'Models the router can pick from, each pinned to a cost tier.',
-			'settings.orchestration.pool.add' => 'Add candidate',
-			'settings.orchestration.pool.empty' => 'No candidates yet — add one to start routing.',
+			'settings.orchestration.enable.label' => '启用编排',
+			'settings.orchestration.enable.description' => '让编排器为每个步骤选择模型，而不是全部在同一个提供者上运行。',
+			'settings.orchestration.pool.title' => '候选池',
+			'settings.orchestration.pool.description' => '路由器可选择的模型，每个都绑定到一个成本档位。',
+			'settings.orchestration.pool.add' => '添加候选',
+			'settings.orchestration.pool.empty' => '暂无候选 — 添加一个即可开始路由。',
 			'settings.orchestration.pool.fields.label' => 'Label',
-			'settings.orchestration.pool.fields.labelPlaceholder' => 'e.g. SWE-2 Medium',
+			'settings.orchestration.pool.fields.labelPlaceholder' => '例如 SWE-2 Medium',
 			'settings.orchestration.pool.fields.provider' => 'Provider',
 			'settings.orchestration.pool.fields.model' => 'Model',
-			'settings.orchestration.pool.fields.modelPlaceholder' => 'Select a model',
+			'settings.orchestration.pool.fields.modelPlaceholder' => '选择模型',
 			'settings.orchestration.pool.fields.effort' => 'Effort',
-			'settings.orchestration.pool.fields.effortDefault' => 'Provider default',
+			'settings.orchestration.pool.fields.effortDefault' => '提供者默认值',
 			'settings.orchestration.pool.fields.effortPlaceholder' => 'default',
 			'settings.orchestration.pool.fields.account' => 'Account',
-			'settings.orchestration.pool.fields.accountDefault' => 'Provider default',
+			'settings.orchestration.pool.fields.accountDefault' => '提供者默认值',
 			'settings.orchestration.pool.fields.redundantAccounts' => '冗余账户',
 			'settings.orchestration.pool.fields.redundantAccountsNone' => '此提供商没有其他账户',
 			'settings.orchestration.pool.fields.tier' => 'Cost tier',
-			'settings.orchestration.pool.fields.remove' => 'Remove candidate',
+			'settings.orchestration.pool.fields.remove' => '移除候选',
 			'settings.orchestration.pool.fields.moveUp' => 'Move up',
 			'settings.orchestration.pool.fields.moveDown' => 'Move down',
 			'settings.orchestration.tiers.free' => 'Free',
 			'settings.orchestration.tiers.cheap' => 'Cheap',
 			'settings.orchestration.tiers.mid' => 'Mid',
 			'settings.orchestration.tiers.premium' => 'Premium',
-			'settings.orchestration.rules.title' => 'Routing rules',
-			'settings.orchestration.rules.description' => 'Ordered candidates per task type — the first available one wins.',
-			'settings.orchestration.rules.addCandidate' => 'Add candidate…',
-			'settings.orchestration.rules.empty' => 'No candidates — nothing to route this task type to.',
+			'settings.orchestration.rules.title' => '路由规则',
+			'settings.orchestration.rules.description' => '按任务类型排序的候选 — 第一个可用的候选胜出。',
+			'settings.orchestration.rules.addCandidate' => '添加候选…',
+			'settings.orchestration.rules.empty' => '没有候选 — 此任务类型无处可路由。',
 			'settings.orchestration.rules.missing' => '(removed)',
-			'settings.orchestration.rules.remove' => 'Remove candidate',
+			'settings.orchestration.rules.remove' => '移除候选',
 			'settings.orchestration.rules.taskTypes.plan' => 'Planning',
-			'settings.orchestration.rules.taskTypes.quick' => 'Quick answers',
+			'settings.orchestration.rules.taskTypes.quick' => '快速回答',
 			'settings.orchestration.rules.taskTypes.research' => 'Research',
 			'settings.orchestration.rules.taskTypes.docs' => 'Documentation',
 			'settings.orchestration.rules.taskTypes.code' => 'Coding',
-			'settings.orchestration.rules.taskTypes.codeHard' => 'Complex coding',
+			'settings.orchestration.rules.taskTypes.codeHard' => '复杂编码',
 			'settings.orchestration.rules.taskTypes.test' => 'Testing',
 			'settings.orchestration.rules.taskTypes.review' => 'Review',
+			'settings.orchestration.rules.taskTypes.report' => '报告',
 			'settings.orchestration.planner.title' => 'Planner',
-			'settings.orchestration.planner.description' => 'How a request is split into routed steps.',
-			'settings.orchestration.planner.modeLabel' => 'Planning mode',
+			'settings.orchestration.planner.description' => '请求如何被拆分为可路由的步骤。',
+			'settings.orchestration.planner.modeLabel' => '规划模式',
 			'settings.orchestration.planner.modes.auto' => 'Auto (LLM)',
 			'settings.orchestration.planner.modes.template' => 'Templates',
 			'settings.orchestration.planner.modes.off' => 'Off',
-			'settings.orchestration.planner.modeHints.auto' => 'The planner model decomposes each request into typed steps.',
-			'settings.orchestration.planner.modeHints.template' => 'Requests run through a fixed pipeline you pick below.',
-			'settings.orchestration.planner.modeHints.off' => 'No planning — the whole request is routed as a single step.',
-			'settings.orchestration.planner.candidateLabel' => 'Planner model',
-			'settings.orchestration.planner.candidateDescription' => 'Pool candidate used for plan generation and classification calls.',
-			'settings.orchestration.planner.candidatePlaceholder' => 'Select a pool candidate',
-			'settings.orchestration.planner.templates.title' => 'Pipeline templates',
+			'settings.orchestration.planner.modeHints.auto' => '规划模型会将每个请求分解为带类型的步骤。',
+			'settings.orchestration.planner.modeHints.template' => '请求将按您在下方选择的固定流水线运行。',
+			'settings.orchestration.planner.modeHints.off' => '不进行规划 — 整个请求作为单个步骤路由。',
+			'settings.orchestration.planner.candidateLabel' => '规划模型',
+			'settings.orchestration.planner.candidateDescription' => '用于生成计划和分类调用的候选池模型。',
+			'settings.orchestration.planner.candidatePlaceholder' => '选择一个候选池模型',
+			'settings.orchestration.planner.templates.title' => '流水线模板',
 			'settings.orchestration.planner.templates.add' => 'Add template',
-			'settings.orchestration.planner.templates.namePlaceholder' => 'Template name',
+			'settings.orchestration.planner.templates.namePlaceholder' => '模板名称',
 			'settings.orchestration.planner.templates.addStep' => 'Add step…',
-			'settings.orchestration.planner.templates.remove' => 'Remove template',
+			'settings.orchestration.planner.templates.remove' => '移除模板',
 			'settings.orchestration.planner.templates.removeStep' => 'Remove step',
-			'settings.orchestration.planner.templates.empty' => 'No templates yet.',
-			'settings.orchestration.planner.templates.emptySteps' => 'No steps yet — add one below.',
-			'settings.orchestration.planner.requireConfirm' => 'Confirm plan before running',
-			'settings.orchestration.planner.requireConfirmDescription' => 'Pause after planning so you can edit or disable steps on the plan card.',
-			'settings.orchestration.execution.title' => 'Execution limits',
-			'settings.orchestration.execution.description' => 'Guardrails for parallel runs and fix loops.',
-			'settings.orchestration.execution.maxParallel' => 'Max parallel steps',
-			'settings.orchestration.execution.maxParallelDescription' => 'How many subtasks may run at once (1–8).',
-			'settings.orchestration.execution.maxFixLoops' => 'Max fix loops',
-			'settings.orchestration.execution.maxFixLoopsDescription' => 'Retries when a step fails verification (0–5).',
-			'settings.orchestration.execution.onNoCandidate' => 'When no candidate is available',
-			'settings.orchestration.execution.onNoCandidateDescription' => 'Ask before falling back, or skip the step.',
+			'settings.orchestration.planner.templates.empty' => '暂无模板。',
+			'settings.orchestration.planner.templates.emptySteps' => '暂无步骤 — 请在下方添加。',
+			'settings.orchestration.planner.requireConfirm' => '运行前确认计划',
+			'settings.orchestration.planner.requireConfirmDescription' => '规划完成后暂停，以便您在计划卡片上编辑或禁用步骤。',
+			'settings.orchestration.planner.checkpointLabel' => '自主程度',
+			'settings.orchestration.planner.checkpointModes.off' => '完全自主',
+			'settings.orchestration.planner.checkpointModes.perStep' => '每一步',
+			'settings.orchestration.planner.checkpointModes.everyN' => '每 N 步',
+			'settings.orchestration.planner.checkpointHints.off' => '监督者的决策无需询问即执行（自动模式）。',
+			'settings.orchestration.planner.checkpointHints.perStep' => '在每批建议的步骤执行前请求批准。',
+			'settings.orchestration.planner.checkpointHints.everyN' => '每完成 N 个步骤后请求批准。',
+			'settings.orchestration.planner.checkpointIntervalLabel' => '检查点之间的步骤数（1–50）',
+			'settings.orchestration.execution.title' => '执行限制',
+			'settings.orchestration.execution.description' => '并行运行和修复循环的保护措施。',
+			'settings.orchestration.execution.maxParallel' => '最大并行步骤数',
+			'settings.orchestration.execution.maxParallelDescription' => '可同时运行的子任务数量（1–8）。',
+			'settings.orchestration.execution.maxFixLoops' => '最大修复循环次数',
+			'settings.orchestration.execution.maxFixLoopsDescription' => '步骤验证失败时的重试次数（0–5）。',
+			'settings.orchestration.execution.onNoCandidate' => '没有可用候选时',
+			'settings.orchestration.execution.onNoCandidateDescription' => '回退前先询问，或跳过该步骤。',
 			'settings.orchestration.execution.onNoCandidateOptions.ask' => 'Ask',
 			'settings.orchestration.execution.onNoCandidateOptions.skip' => 'Skip step',
-			'settings.orchestration.execution.useWorktree' => 'Isolated worktree',
-			'settings.orchestration.execution.useWorktreeDescription' => 'Run all delegated steps in one shared git worktree instead of the project directory.',
-			'settings.orchestration.save.unsaved' => 'Unsaved changes',
+			'settings.orchestration.execution.useWorktree' => '隔离的 worktree',
+			'settings.orchestration.execution.useWorktreeDescription' => '在一个共享的 git worktree 中运行所有委派步骤，而不是在项目目录中。',
+			'settings.orchestration.execution.maxSupervisorIterations' => '最大监督者迭代次数',
+			'settings.orchestration.execution.maxSupervisorIterationsDescription' => '自动模式下监督者决策轮次的上限（1–100）；达到上限时运行将以部分报告结束。',
+			'settings.orchestration.execution.maxAttempts' => '每步最大尝试次数',
+			'settings.orchestration.execution.maxAttemptsDescription' => '单个步骤在所有通道和重试中的总尝试预算（1–50）。',
+			'settings.orchestration.execution.stepTimeoutMs' => '步骤超时（毫秒）',
+			'settings.orchestration.execution.stepTimeoutMsDescription' => '每次尝试的子运行超时（毫秒）；0 表示禁用。',
+			'settings.orchestration.execution.runTimeoutMs' => '运行超时（毫秒）',
+			'settings.orchestration.execution.runTimeoutMsDescription' => '整个计划运行的全局超时（毫秒）；0 表示禁用。',
+			'settings.orchestration.execution.retryBackoffBaseMs' => '重试退避基数（毫秒）',
+			'settings.orchestration.execution.retryBackoffBaseMsDescription' => '同一通道重试之间指数退避的基数（全抖动）。',
+			'settings.orchestration.execution.retryBudgetTitle' => '按失败类别的重试预算',
+			'settings.orchestration.execution.retryBudgetDescription' => '故障转移/冷却前在同一通道的重试次数（0–5）。',
+			'settings.orchestration.execution.retryClasses.rateLimit' => '速率限制',
+			'settings.orchestration.execution.retryClasses.quota' => '配额',
+			'settings.orchestration.execution.retryClasses.auth' => '认证',
+			'settings.orchestration.execution.retryClasses.timeout' => '超时',
+			'settings.orchestration.execution.retryClasses.transient' => '临时错误',
+			'settings.orchestration.save.unsaved' => '有未保存的更改',
 			'settings.orchestration.save.save' => 'Save',
 			'settings.orchestration.save.saving' => 'Saving…',
 			'settings.orchestration.save.saved' => 'Saved',
 			'settings.orchestration.save.discard' => 'Discard',
 			'settings.orchestration.save.error' => 'Save failed',
-			'settings.orchestration.save.emptyPool' => 'Add at least one candidate before saving.',
+			'settings.orchestration.save.emptyPool' => '保存前请至少添加一个候选。',
 			'settings.notifications.title' => '通知',
 			'settings.notifications.description' => '控制你希望接收的通知事件。',
 			'settings.notifications.webPush.title' => '通知此浏览器',
@@ -8406,8 +10213,17 @@ extension on TranslationsZhCn {
 			'settings.notifications.events.actionRequired' => '需要处理',
 			'settings.notifications.events.stop' => '运行已停止',
 			'settings.notifications.events.error' => '运行失败',
-			'settings.notifications.channels.discord' => 'Discord',
+			'settings.notifications.messaging.title' => '即时通讯审批',
+			'settings.notifications.messaging.description' => '通过 Telegram 批准或拒绝智能体的权限请求，并在 Discord 上接收运行通知。',
+			'settings.notifications.messaging.enabled' => '已启用',
+			'settings.notifications.messaging.save' => '保存',
+			'settings.notifications.messaging.test' => '测试',
+			'settings.notifications.messaging.pair' => '配对',
+			'settings.notifications.messaging.telegramToken' => '来自 @BotFather 的机器人令牌（123456:ABC…）',
+			'settings.notifications.messaging.telegramHint' => '向您的机器人发送任意消息，然后在下方配对该聊天。',
+			'settings.notifications.messaging.discordWebhook' => 'https://discord.com/api/webhooks/…',
 			'settings.notifications.channels.telegram' => 'Telegram',
+			'settings.notifications.channels.discord' => 'Discord',
 			'settings.notifications.unpair' => '取消配对',
 			'settings.appearanceSettings.darkMode.label' => '深色模式',
 			'settings.appearanceSettings.darkMode.description' => '切换浅色和深色主题',
@@ -8548,8 +10364,6 @@ extension on TranslationsZhCn {
 			'settings.agents.account.cursor.description' => 'Cursor AI 驱动的代码编辑器',
 			'settings.agents.account.codex.description' => 'OpenAI Codex AI 助手',
 			'settings.agents.account.opencode.description' => 'OpenCode CLI 助手',
-			_ => null,
-		} ?? switch (path) {
 			'settings.agents.account.commandcode.description' => 'Command Code CLI 助手',
 			'settings.agents.account.antigravity.description' => 'Antigravity CLI 助手',
 			'settings.agents.account.devin.description' => 'Devin CLI 助手',
@@ -8568,6 +10382,20 @@ extension on TranslationsZhCn {
 			'settings.agents.logout.success' => '已退出登录',
 			'settings.agents.logout.failed' => '退出登录失败',
 			'settings.agents.error' => ({required Object error}) => '错误：${error}',
+			'settings.agents.accounts.title' => '命名账号',
+			'settings.agents.accounts.description' => '额外的凭据集。固定到某个账号的会话会使用该账号独立的配置目录启动 CLI。使用下方显示的环境变量运行一次提供者 CLI 即可登录。',
+			'settings.agents.accounts.sharedCli' => '所有账号共用同一个 CLI 安装 — 请在上方的连接卡片中更新。',
+			'settings.agents.accounts.loading' => '正在加载账号…',
+			'settings.agents.accounts.kDefault' => '默认',
+			'settings.agents.accounts.usage' => ({required Object tokens}) => '${tokens} 个令牌',
+			'settings.agents.accounts.usageButton' => '用量',
+			'settings.agents.accounts.showUsage' => '显示令牌用量',
+			'settings.agents.accounts.makeDefault' => '设为默认',
+			'settings.agents.accounts.remove' => '移除账号',
+			'settings.agents.accounts.newLabel' => '账号标签（例如：工作）',
+			'settings.agents.accounts.add' => '添加账号',
+			'settings.agents.accounts.autoSwitch.label' => '达到用量上限时自动切换账号',
+			'settings.agents.accounts.autoSwitch.description' => '当某个账号达到用量上限时，会话会切换到同一智能体下仍有额度的另一个账号——即使你手动选择了已耗尽的账号。绝不会切换到其他智能体。Claude 和 Codex 会保留对话；其他智能体仅在新对话中切换。',
 			'settings.permissions.title' => '权限设置',
 			'settings.permissions.permissionMode.title' => '权限模式',
 			'settings.permissions.permissionMode.description' => ({required Object provider}) => '新 ${provider} 会话的默认权限模式。你仍可为单个会话覆盖。',
@@ -8609,8 +10437,8 @@ extension on TranslationsZhCn {
 			'settings.mcpServers.help.description' => 'Codex 支持基于 stdio 的 MCP 服务器。您可以添加服务器，通过额外的工具和资源来扩展 Codex 的功能。',
 			'settings.mcpServers.deleteConfirm.description' => ({required Object serverName}) => '“${serverName}”将从提供商配置中移除。',
 			'settings.mcpServers.deleteConfirm.title' => '删除 MCP 服务器？',
-			'settings.quota.settings.tab' => 'Control Center',
-			'settings.quota.settings.title' => 'Control Center',
+			'settings.quota.settings.tab' => '控制中心',
+			'settings.quota.settings.title' => '控制中心',
 			'settings.quota.settings.description' => '提醒阈值、路由策略以及轮询额度的账户。',
 			'settings.quota.settings.saved' => '已保存',
 			'settings.quota.settings.alertsSection' => '提醒',
@@ -8676,13 +10504,56 @@ extension on TranslationsZhCn {
 			'settings.workspaces.remove' => '移除工作区',
 			'settings.workspaces.title' => '工作区',
 			'settings.workspaces.pathRequired' => '路径为必填项',
+			'settings.stt.title' => '语音输入（语音转文字）',
+			'settings.stt.description' => '兼容 Whisper 的 /audio/transcriptions 端点（OpenAI、whisper.cpp、faster-whisper、Speaches）。启用后输入框中会显示麦克风按钮。',
+			'settings.stt.configured' => '已配置',
+			'settings.stt.endpoint' => '端点 URL（例如 https://api.openai.com/v1）',
+			'settings.stt.apiKey' => 'API 密钥',
+			'settings.stt.model' => '模型（默认：whisper-1）',
+			'settings.stt.save' => '保存',
+			'settings.schedules.title' => '定时任务',
+			'settings.schedules.description' => '按 cron 时间表定期运行智能体。运行将在无人值守的情况下进行，并跳过权限确认。',
+			'settings.schedules.preventSleep' => '智能体运行时阻止休眠',
+			_ => null,
+		} ?? switch (path) {
+			'settings.schedules.preventSleepHint' => '桌面端会保持屏幕常亮；在浏览器中使用屏幕唤醒锁。',
+			'settings.schedules.kNew' => '新建定时任务',
+			'settings.schedules.loading' => '正在加载…',
+			'settings.schedules.empty' => '暂无定时任务。',
+			'settings.schedules.project' => '项目',
+			'settings.schedules.provider' => '提供者',
+			'settings.schedules.cron' => 'Cron（分 时 日 月 星期）',
+			'settings.schedules.nextRun' => ({required Object time}) => '下次运行：${time}',
+			'settings.schedules.cronInvalid' => '此表达式没有即将到来的运行',
+			'settings.schedules.prompt' => '提示词',
+			'settings.schedules.useWorktree' => '在新的 worktree 中运行',
+			'settings.schedules.catchUp' => '补跑错过的运行',
+			'settings.schedules.failures' => ({required Object count}) => '${count} 次失败',
+			'settings.schedules.disabled' => '已禁用',
+			'settings.schedules.history' => '历史',
+			'settings.schedules.runNow' => '立即运行',
+			'settings.schedules.delete' => '删除',
+			'settings.schedules.noRuns' => '暂无运行记录。',
+			'settings.schedules.next' => '下次',
+			'settings.schedules.create' => '创建',
+			'settings.schedules.toggleSchedule' => '启用定时任务',
+			'settings.mcpTokens.title' => 'DDAgent MCP 服务器令牌',
+			'settings.mcpTokens.description' => '外部工具（Claude Desktop、OpenClaw）通过 POST /mcp 并携带其中一个 Bearer 令牌来调用 DDAgent 工具。',
+			'settings.mcpTokens.dismiss' => '关闭',
+			'settings.mcpTokens.labelPlaceholder' => '令牌标签（例如 Claude Desktop）',
+			'settings.mcpTokens.create' => '创建',
+			'settings.mcpTokens.empty' => '暂无 MCP 令牌。',
+			'settings.mcpTokens.lastUsed' => ({required Object time}) => '使用于 ${time}',
+			'settings.mcpTokens.neverUsed' => '从未使用',
 			'settings.about.supportTitle' => '支持本项目',
 			'settings.about.buyMeACoffee' => '请我喝杯咖啡',
+			'settings.about.tryHosted' => '试用 DDAgent Hosted',
 			'settings.about.learnMore' => '了解更多',
+			'settings.about.proFeatures' => 'DDAgent Pro 功能',
 			'settings.about.pro.syncSettings' => '同步设置',
 			'settings.about.pro.teamManagement' => '团队管理',
-			'settings.about.proFeatures' => 'DDAgent Pro 功能',
-			'settings.about.tryHosted' => '试用 DDAgent Hosted',
+			'settings.about.pro.syncSettingsDescription' => '在所有环境中同步你的偏好设置、MCP 配置和主题。',
+			'settings.about.pro.teamManagementDescription' => '多用户、基于角色的访问控制以及团队共享项目。',
 			'settings.about.versionInfo' => '版本信息',
 			'settings.about.client' => '应用',
 			'settings.about.server' => '服务器',
@@ -8690,6 +10561,49 @@ extension on TranslationsZhCn {
 			'settings.about.platformDesktop' => '桌面端',
 			'settings.about.platformWeb' => '网页',
 			'settings.about.unknown' => '未知',
+			'settings.about.copyright' => '© 2026 DDAgent — 保留所有权利',
+			'settings.about.tagline' => '开源 AI 编程助手界面',
+			'settings.about.docs' => '文档',
+			'settings.about.hostedDescription' => '团队协作、共享 MCP 配置、跨环境设置同步以及托管基础设施。',
+			'settings.shortcuts.description' => 'DDAgent 中的所有键盘快捷键，按平台分列。',
+			'settings.shortcuts.action' => '操作',
+			'settings.shortcuts.winLinux' => 'Windows / Linux',
+			'settings.shortcuts.mac' => 'macOS',
+			'settings.shortcuts.navigation' => '导航',
+			'settings.shortcuts.navWorkspace' => '转到工作区',
+			'settings.shortcuts.navTasks' => '转到任务 / Git',
+			'settings.shortcuts.navGit' => '转到 Git',
+			'settings.shortcuts.navFocus' => '切换专注模式（侧边栏）',
+			'settings.shortcuts.navSwitcher' => '快速切换会话',
+			'settings.shortcuts.navPalette' => '命令面板',
+			'settings.shortcuts.navSettings' => '打开设置',
+			'settings.shortcuts.navClose' => '关闭对话框 / 恢复分屏窗格',
+			'settings.shortcuts.composer' => '输入框',
+			'settings.shortcuts.compSend' => '发送消息',
+			'settings.shortcuts.compNewline' => '换行',
+			'settings.shortcuts.compNav' => '浏览建议',
+			'settings.shortcuts.compAccept' => '接受建议',
+			'settings.shortcuts.compCloseSuggest' => '关闭建议',
+			'settings.shortcuts.transcript' => '对话记录',
+			'settings.shortcuts.trCopy' => '复制选中文本',
+			'settings.shortcuts.trClose' => '关闭搜索 / 审查面板',
+			'settings.shortcuts.terminal' => '终端',
+			'settings.shortcuts.termCopy' => '复制选中内容',
+			'settings.shortcuts.termInterrupt' => '中断进程（无选中内容时）',
+			'settings.shortcuts.termPaste' => '粘贴',
+			'settings.shortcuts.termSelectAll' => '全选',
+			'settings.shortcuts.editor' => '编辑器',
+			'settings.shortcuts.edSave' => '保存文件',
+			'settings.shortcuts.edSaveAll' => '保存所有文件',
+			'settings.shortcuts.edClose' => '关闭标签页',
+			'settings.shortcuts.edNextTab' => '下一个标签页',
+			'settings.shortcuts.edPrevTab' => '上一个标签页',
+			'settings.shortcuts.edIndent' => '增加 / 减少缩进',
+			'settings.shortcuts.palette' => '命令面板',
+			'settings.shortcuts.palNav' => '浏览项目',
+			'settings.shortcuts.palRun' => '运行 / 打开',
+			'settings.shortcuts.palBack' => '返回（搜索为空时）',
+			'settings.shortcuts.palClose' => '关闭',
 			'sidebar.projects.title' => '项目',
 			'sidebar.projects.newProject' => '新建项目',
 			'sidebar.projects.deleteProject' => '移除项目',
@@ -8710,6 +10624,10 @@ extension on TranslationsZhCn {
 			'sidebar.projects.runClaudeCli' => '在项目目录中运行 Claude CLI 以开始使用',
 			'sidebar.app.title' => 'DDAgent',
 			'sidebar.app.subtitle' => 'AI 编程助手',
+			'sidebar.panel.open' => '面板',
+			'sidebar.panel.newChat' => '新聊天',
+			'sidebar.panel.navigation' => '导航',
+			'sidebar.panel.sessions' => '会话',
 			'sidebar.sessions.title' => '会话',
 			'sidebar.sessions.newSession' => '新建会话',
 			'sidebar.sessions.deleteSession' => '删除会话',
@@ -8765,6 +10683,13 @@ extension on TranslationsZhCn {
 			'sidebar.actions.reportIssue' => '报告问题',
 			'sidebar.actions.starOnGithub' => '在GitHub上加星',
 			'sidebar.actions.buyMeACoffee' => '请我喝杯咖啡',
+			'sidebar.workspace.title' => '更改会话工作区',
+			'sidebar.workspace.description' => '代理将在此目录中执行后续回合。现有会话历史将被保留。',
+			'sidebar.workspace.pathLabel' => '工作区路径',
+			'sidebar.workspace.pathRequired' => '工作区路径为必填项。',
+			'sidebar.workspace.submit' => '更改工作区',
+			'sidebar.workspace.saving' => '正在更改…',
+			'sidebar.workspace.changeAction' => '更改工作区',
 			'sidebar.branding.openSource' => '开源',
 			'sidebar.status.active' => '活动',
 			'sidebar.status.inactive' => '非活动',
@@ -8790,6 +10715,8 @@ extension on TranslationsZhCn {
 			'sidebar.messages.deleteSessionError' => '删除会话时出错，请重试。',
 			'sidebar.messages.renameSessionFailed' => '重命名会话失败，请重试。',
 			'sidebar.messages.renameSessionError' => '重命名会话时出错，请重试。',
+			'sidebar.messages.changeWorkspaceFailed' => '更改工作区失败。请重试。',
+			'sidebar.messages.changeWorkspaceError' => '更改工作区时出错。请重试。',
 			'sidebar.messages.deleteProjectFailed' => '移除项目失败，请重试。',
 			'sidebar.messages.deleteProjectError' => '移除项目时出错，请重试。',
 			'sidebar.messages.createProjectFailed' => '创建项目失败，请重试。',
@@ -8800,8 +10727,6 @@ extension on TranslationsZhCn {
 			'sidebar.messages.restoreProjectError' => '恢复项目时出错，请重试。',
 			'sidebar.messages.restoreSessionFailed' => '恢复会话失败，请重试。',
 			'sidebar.messages.restoreSessionError' => '恢复会话时出错，请重试。',
-			'sidebar.messages.changeWorkspaceFailed' => '更改工作区失败。请重试。',
-			'sidebar.messages.changeWorkspaceError' => '更改工作区时出错。请重试。',
 			'sidebar.messages.bulkDeleteSessionsFailed' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '删除 ${count} 个会话失败。请重试。', other: '删除 ${count} 个会话失败。请重试。', ), 
 			'sidebar.version.updateAvailable' => '有可用更新',
 			'sidebar.version.restartRequired' => '已安装更新 — 请重启服务器以生效',
@@ -8830,6 +10755,12 @@ extension on TranslationsZhCn {
 			'sidebar.search.runningPlaceholder' => '搜索运行中的会话...',
 			'sidebar.search.matches' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '${count} 个匹配', other: '${count} 个匹配', ), 
 			'sidebar.search.projectsScanned' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '${count} 个项目已扫描', other: '${count} 个项目已扫描', ), 
+			'sidebar.recent.title' => '最近对话',
+			'sidebar.recent.emptyTitle' => '暂无对话',
+			'sidebar.recent.emptyDescription' => '你最近更新的对话将显示在这里。',
+			'sidebar.recent.loadFailed' => '无法加载最近对话',
+			'sidebar.recent.loadMore' => '加载更早的对话',
+			'sidebar.recent.loadingMore' => '加载中...',
 			'sidebar.deleteConfirmation.deleteProject' => '移除项目',
 			'sidebar.deleteConfirmation.deleteSession' => '删除会话',
 			'sidebar.deleteConfirmation.confirmDelete' => '您想如何处理',
@@ -8853,23 +10784,6 @@ extension on TranslationsZhCn {
 			'sidebar.zones.thisWeek' => '本周',
 			'sidebar.zones.showMore' => ({required Object count}) => '再显示 ${count} 个',
 			'sidebar.zones.showLess' => '收起',
-			'sidebar.panel.open' => '面板',
-			'sidebar.panel.newChat' => '新聊天',
-			'sidebar.panel.navigation' => '导航',
-			'sidebar.panel.sessions' => '会话',
-			'sidebar.workspace.title' => '更改会话工作区',
-			'sidebar.workspace.description' => '代理将在此目录中执行后续回合。现有会话历史将被保留。',
-			'sidebar.workspace.pathLabel' => '工作区路径',
-			'sidebar.workspace.pathRequired' => '工作区路径为必填项。',
-			'sidebar.workspace.submit' => '更改工作区',
-			'sidebar.workspace.saving' => '正在更改…',
-			'sidebar.workspace.changeAction' => '更改工作区',
-			'sidebar.recent.title' => '最近对话',
-			'sidebar.recent.emptyTitle' => '暂无对话',
-			'sidebar.recent.emptyDescription' => '你最近更新的对话将显示在这里。',
-			'sidebar.recent.loadFailed' => '无法加载最近对话',
-			'sidebar.recent.loadMore' => '加载更早的对话',
-			'sidebar.recent.loadingMore' => '加载中...',
 			'sidebar.tabs.board' => '代理面板',
 			'sidebar.tabs.files' => '文件',
 			'sidebar.tabs.git' => '源代码管理',
@@ -8966,11 +10880,11 @@ extension on TranslationsZhCn {
 			'tasks.buttons.prdsAvailable' => ({required Object count}) => '${count} 个 PRD 可用',
 			'tasks.prd.modified' => ({required Object date}) => '修改时间：${date}',
 			'tasks.prd.editorTitle' => ({required Object name}) => 'PRD — ${name}',
-			'tasks.prd.fileExistsMessage' => ({required Object name}) => '名为“${name}”的 PRD 已存在。要覆盖它吗？',
-			'tasks.prd.fileExistsTitle' => '文件已存在',
 			'tasks.prd.newFile' => '新文件',
-			'tasks.prd.parse' => '解析 PRD',
 			'tasks.prd.template' => '模板',
+			'tasks.prd.parse' => '解析 PRD',
+			'tasks.prd.fileExistsTitle' => '文件已存在',
+			'tasks.prd.fileExistsMessage' => ({required Object name}) => '名为“${name}”的 PRD 已存在。要覆盖它吗？',
 			'tasks.prd.fileNameHint' => '文件名（例如 prd.txt）',
 			'tasks.prd.saved' => 'PRD 已保存',
 			'tasks.prd.tasksGenerated' => '已从 PRD 生成任务',
@@ -9004,6 +10918,8 @@ extension on TranslationsZhCn {
 			'tasks.board.card.delete' => '删除',
 			'tasks.board.card.openSession' => '打开会话',
 			'tasks.board.card.pullRequest' => '拉取请求',
+			'tasks.board.card.edit' => '编辑',
+			'tasks.board.card.moveTo' => '移动到',
 			'tasks.board.dialog.createTitle' => '新卡片',
 			'tasks.board.dialog.editTitle' => '编辑卡片',
 			'tasks.board.dialog.titleLabel' => '标题',
@@ -9026,6 +10942,16 @@ extension on TranslationsZhCn {
 			'tasks.board.deleteConfirm.description' => ({required Object cardTitle}) => '“${cardTitle}”将被永久删除。',
 			'tasks.board.deleteConfirm.title' => '删除卡片？',
 			'tasks.board.project' => '项目',
+			'tasks.board.assignee.label' => '负责人',
+			'tasks.board.assignee.all' => '所有负责人',
+			'tasks.board.assignee.unassigned' => '未分配',
+			'tasks.board.presence.online' => ({required Object count}) => '${count} 人在线',
+			'tasks.board.activity.title' => '动态',
+			'tasks.board.activity.empty' => '暂无动态',
+			'tasks.board.comments.label' => '评论',
+			'tasks.board.comments.placeholder' => '写评论…',
+			'tasks.board.comments.send' => '发送',
+			'tasks.board.comments.unknownAuthor' => '某人',
 			'tasks.card.dependsOnList' => ({required Object tasks}) => '依赖于：${tasks}',
 			'tasks.card.dependsOnTooltip' => ({required Object id}) => '任务 ${id}',
 			'tasks.card.highPriority' => '高优先级',
@@ -9062,8 +10988,6 @@ extension on TranslationsZhCn {
 			'tasks.nextTask.feature3' => '- 看板和列表视图，适合日常工作。',
 			'tasks.nextTask.hideDetails' => '隐藏详情',
 			'tasks.nextTask.initialize' => '初始化',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.nextTask.noPending' => '没有待处理任务',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI 未配置',
 			'tasks.nextTask.review' => '审查',
@@ -9096,11 +11020,24 @@ extension on TranslationsZhCn {
 			'tasks.taskDetail.testStrategy' => '测试策略',
 			'tasks.taskDetail.titleRequired' => '标题为必填项',
 			'tasks.taskDetail.updateFailed' => '更新任务失败',
-			'tasks.taskDetail.deleteConfirmMessage' => ({required Object id}) => '任务 #${id} 将被移除。此操作无法撤销。',
 			'tasks.taskDetail.notFound' => '未找到任务',
 			'tasks.taskDetail.subtasks' => '子任务',
+			'tasks.taskDetail.deleteConfirmMessage' => ({required Object id}) => '任务 #${id} 将被移除。此操作无法撤销。',
 			'tasks.taskDetail.idCopied' => '任务 ID 已复制',
 			'tasks.toasts.statusInProgress' => ({required Object id}) => '任务 ${id} 已设为进行中',
+			'tasks.taskmaster.noProjectHint' => '请先添加项目，然后为其创建任务。',
+			'tasks.taskmaster.sort.statusAz' => '状态 (A-Z)',
+			'tasks.taskmaster.sort.statusZa' => '状态 (Z-A)',
+			_ => null,
+		} ?? switch (path) {
+			'tasks.taskmaster.installedVersion' => ({required Object version}) => '已安装：${version}',
+			'tasks.taskmaster.initFailed' => '初始化 TaskMaster 失败',
+			'tasks.taskmaster.prd.fileNameRequired' => '请为 PRD 提供文件名。',
+			'tasks.taskmaster.prd.contentRequired' => '保存前请先添加内容。',
+			'tasks.taskmaster.prd.overwrite' => '覆盖',
+			'tasks.taskmaster.prd.contentHint' => '# 产品需求文档…',
+			'tasks.taskmaster.detail.dependenciesLabel' => '依赖项（以逗号分隔的 ID）',
+			'tasks.taskmaster.untitledTask' => '无标题任务',
 			'knowledge.title' => '知识',
 			'knowledge.tabs.dashboard' => '面板',
 			'knowledge.tabs.memories' => '记忆',
@@ -9176,216 +11113,264 @@ extension on TranslationsZhCn {
 			'knowledge.tags.all' => '所有标签',
 			'knowledge.tags.manage' => '管理标签',
 			'knowledge.tags.none' => '还没有标签。',
-			'knowledge.contextBudget.tokens' => ({required Object tokens, required Object budget}) => '~${tokens} / ${budget} 令牌',
+			'knowledge.graph.truncated' => '已截断',
+			'knowledge.importAll.title' => '将全部内容导入 DDAgent',
+			'knowledge.importAll.projectsScanned' => ({required Object count}) => '已扫描项目：${count}',
+			'knowledge.importAll.skillsFound' => ({required Object found, required Object newSkills}) => '发现的代理技能：${found}（新增：${newSkills}）',
+			'knowledge.importAll.rulesSummary' => ({required Object total, required Object duplicates}) => '规则：${total} · 重复组：${duplicates}',
+			'knowledge.importAll.mergeDuplicates' => '合并重复条目',
+			'knowledge.importAll.mergeDuplicatesHint' => '合并 DDAgent 中的重复行（不涉及文件）',
+			'knowledge.importAll.action' => '导入全部',
+			'knowledge.importAll.readOnlyNotice' => '对你的代理只读：此操作只导入到 DDAgent 自己的数据库，不会修改或删除任何 CLI 文件或配置。以下选项只会更改 DDAgent 数据。',
+			'knowledge.importAll.dryRunNote' => '试运行——尚未写入任何内容。',
+			'knowledge.importAll.importedNote' => '已导入。',
+			'knowledge.importAll.result' => ({required Object rules, required Object newSkills, required Object removed, required Object promoted}) => '已导入——规则：${rules}，新技能：${newSkills}，已移除：${removed}，已提升：${promoted}',
+			'knowledge.importAll.description' => '扫描所有项目，并将代理的技能导入知识库。对代理只读——不会更改 CLI 中的任何内容。',
+			'knowledge.migrate.title' => '迁移现有规则',
+			'knowledge.migrate.scanned' => ({required Object count}) => '已扫描 ${count} 个项目。',
+			'knowledge.migrate.rulesSummary' => ({required Object total, required Object critical}) => '规则：共 ${total} 条，${critical} 条严重。',
+			'knowledge.migrate.duplicates' => ({required Object count}) => '跨项目的重复组：${count}',
+			'knowledge.migrate.removedPromoted' => ({required Object removed, required Object promoted}) => '已移除：${removed}，已提升：${promoted}',
+			'knowledge.migrate.mergeDuplicates' => '合并重复项',
+			'knowledge.migrate.dryRunNote' => '试运行——尚未进行任何更改。',
+			'knowledge.migrate.applied' => '已应用。',
+			'knowledge.importSkills.title' => '导入代理技能',
+			'knowledge.importSkills.found' => ({required Object count}) => '在你的代理中找到 ${count} 个技能。',
+			'knowledge.importSkills.summary' => ({required Object imported, required Object skipped}) => '新增：${imported} · 已跳过：${skipped}',
+			'knowledge.importSkills.dryRunHint' => '将代理自带的全局/默认技能（用户、系统、插件）导入为知识技能。试运行——尚未导入任何内容。',
+			'knowledge.importSkills.importedNote' => '已导入知识库。',
 			'knowledge.critical.make' => '标记为严重',
 			'knowledge.critical.makeAll' => '将所有规则设为严重',
 			'knowledge.critical.makeAllHint' => '将它们加入注入的上下文预算',
-			'knowledge.errors.importFailed' => ({required Object error}) => '导入失败：${error}',
-			'knowledge.errors.migrationFailed' => ({required Object error}) => '迁移失败：${error}',
-			'knowledge.graph.truncated' => '已截断',
-			'knowledge.importAll.action' => '导入全部',
-			'knowledge.importAll.mergeDuplicates' => '合并重复条目',
-			'knowledge.importAll.mergeDuplicatesHint' => '合并 DDAgent 中的重复行（不涉及文件）',
-			'knowledge.importAll.projectsScanned' => ({required Object count}) => '已扫描项目：${count}',
-			'knowledge.importAll.rulesSummary' => ({required Object total, required Object duplicates}) => '规则：${total} · 重复组：${duplicates}',
-			'knowledge.importAll.skillsFound' => ({required Object found, required Object newSkills}) => '发现的代理技能：${found}（新增：${newSkills}）',
-			'knowledge.importAll.title' => '将全部内容导入 DDAgent',
-			'knowledge.importSkills.found' => ({required Object count}) => '在你的代理中找到 ${count} 个技能。',
-			'knowledge.importSkills.summary' => ({required Object imported, required Object skipped}) => '新增：${imported} · 已跳过：${skipped}',
-			'knowledge.importSkills.title' => '导入代理技能',
+			'knowledge.contextBudget.tokens' => ({required Object tokens, required Object budget}) => '~${tokens} / ${budget} 令牌',
+			'knowledge.contextBudget.title' => '规则上下文（始终提供）',
+			'knowledge.contextBudget.selectProject' => '选择一个项目以查看其关键上下文的大小。',
 			'knowledge.linkOptions.memory' => ({required Object title}) => '记忆：${title}',
-			'knowledge.linkOptions.personal' => ({required Object title}) => '个人信息：${title}',
 			'knowledge.linkOptions.rule' => ({required Object title}) => '规则：${title}',
 			'knowledge.linkOptions.skill' => ({required Object name}) => '技能：${name}',
-			'knowledge.migrate.duplicates' => ({required Object count}) => '跨项目的重复组：${count}',
-			'knowledge.migrate.mergeDuplicates' => '合并重复项',
-			'knowledge.migrate.removedPromoted' => ({required Object removed, required Object promoted}) => '已移除：${removed}，已提升：${promoted}',
-			'knowledge.migrate.rulesSummary' => ({required Object total, required Object critical}) => '规则：共 ${total} 条，${critical} 条严重。',
-			'knowledge.migrate.scanned' => ({required Object count}) => '已扫描 ${count} 个项目。',
-			'knowledge.migrate.title' => '迁移现有规则',
-			'skills.addDialog.chooseFileTitle' => '选择 SKILL.md',
-			'skills.addDialog.chooseFiles' => '选择文件',
-			'skills.addDialog.chooseFolder' => '选择文件夹',
-			'skills.addDialog.chooseFolderTitle' => '选择技能文件夹',
-			'skills.addDialog.folderFilesMeta' => ({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '${count} 个文件 · ${size}', other: '${count} 个文件 · ${size}', ), 
-			'skills.addDialog.folderUploadsNote' => '文件夹上传会保留所选文件夹名称；单独文件使用 `SKILL.md` 中的 `name`。',
-			'skills.addDialog.hideInstallLocation' => '隐藏安装位置',
-			'skills.addDialog.installSkill' => '安装技能',
-			'skills.addDialog.installSkills' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '安装 ${count} 个技能', other: '安装 ${count} 个技能', ), 
-			'skills.addDialog.markdownFileMeta' => ({required Object size}) => 'Markdown 文件 · ${size}',
-			'skills.addDialog.pickHint' => '文件夹可包含脚本、参考资料和资源。',
-			'skills.addDialog.pickTitle' => '选择技能文件夹或 SKILL.md',
-			'skills.addDialog.readyToInstall' => '可以安装',
-			'skills.addDialog.removeQueued' => ({required Object name}) => '移除 ${name}',
-			'skills.addDialog.title' => ({required Object provider}) => '添加 ${provider} 技能',
-			'skills.addDialog.uploadHint' => '上传 SKILL.md 文件或完整的技能文件夹。',
-			'skills.addDialog.whereWillThisInstall' => '将安装到何处？',
-			'skills.deleteSkill' => ({required Object name}) => '删除 ${name}',
-			'skills.empty.noGlobalSkills' => '尚未发现全局技能',
-			'skills.empty.noGlobalSkillsDescription' => '在上方添加全局技能，使其可用于所有项目。',
-			'skills.empty.noMatchingSkills' => '没有匹配的技能',
-			'skills.empty.noMatchingSkillsDescription' => '请尝试其他命令、名称、范围、项目或来源路径。',
-			'skills.empty.noProjects' => '没有可用的项目',
-			'skills.empty.noProjectsDescription' => '添加项目或工作区以浏览其技能。',
-			'skills.empty.noSkillsInProject' => '此项目中没有技能',
-			'skills.empty.noSkillsInProjectDescription' => '在所选项目中创建 .claude/skills、.cursor/skills 或 .agents/skills 文件夹。',
-			'skills.errors.addMarkdownFirst' => '请先添加一个或多个 Markdown 文件。',
-			'skills.errors.couldNotReadSkillFile' => ({required Object name}) => '无法从 ${name} 读取 SKILL.md。',
-			'skills.errors.dropMarkdownOrFolder' => '拖入一个或多个 Markdown 文件，或包含 SKILL.md 的文件夹。',
-			'skills.errors.folderFileLimit' => ({required Object count}) => '一个技能文件夹最多可包含 ${count} 个文件。',
-			'skills.errors.folderReadFailed' => '读取技能文件夹失败',
-			'skills.errors.folderSizeLimit' => '所选技能文件夹的总大小必须小于 30 MB。',
-			'skills.errors.importFailed' => '导入技能失败',
-			'skills.errors.missingSkillFile' => '所选文件夹不包含 SKILL.md 文件。',
-			'skills.moveDialog.moveToGlobal' => '移动到全局',
-			'skills.moveDialog.moveToProject' => '移动到项目',
-			'skills.moveDialog.toGlobalHint' => '将此技能移入全局技能目录，以便所有项目都能使用。',
-			'skills.moveDialog.toProjectHint' => '选择应拥有此技能的项目。它将从提供商的全局技能目录中移出。',
-			'skills.moveSkill' => ({required Object name}) => '移动 ${name}',
-			'skills.projectLabel' => '项目',
-			'skills.scopes.admin' => '管理员',
-			'skills.scopes.plugin' => '插件',
-			'skills.scopes.project' => '项目',
-			'skills.scopes.repo' => '仓库',
-			'skills.scopes.system' => '系统',
-			'skills.scopes.user' => '用户',
-			'skills.screen.addSkill' => '添加技能',
-			'skills.screen.clearSearch' => '清除技能搜索',
-			'skills.screen.deleteDescription' => ({required Object directory, required Object provider}) => '这会将 ${directory} 目录从 ${provider} 的托管技能目录中移除。此操作无法撤销。',
-			'skills.screen.deleteTitle' => ({required Object name}) => '删除 ${name}？',
-			'skills.screen.loadingSkills' => ({required Object provider}) => '正在加载 ${provider} 技能…',
-			'skills.screen.manageDescription' => ({required Object provider}) => '管理来自本地文件、完整文件夹和项目级位置的 ${provider} 技能。',
-			'skills.screen.noDescription' => '技能的 front matter 中未提供描述。',
-			'skills.screen.pluginBadge' => ({required Object name}) => '插件：${name}',
-			'skills.screen.projectBadge' => ({required Object name}) => '项目：${name}',
-			'skills.screen.savedSuccessfully' => '技能保存成功。',
-			'skills.screen.scanningProjectSkills' => '正在扫描项目技能...',
-			'skills.screen.searchHint' => '搜索技能...',
-			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '${count} 个技能', other: '${count} 个技能', ), 
-			'skills.screen.sourceLabel' => '来源',
-			'mcp.form.fields.bearerTokenEnvVar' => 'Bearer 令牌环境变量',
-			'mcp.form.fields.envVarNames' => '环境变量名称',
-			'mcp.form.fields.workingDirectory' => '工作目录',
-			'mcp.form.scope.claudeLocal' => 'Claude 本地',
-			'mcp.form.scope.description.local' => '存储在所选项目的 Claude 用户设置中',
-			'mcp.form.scope.description.project' => '存储在所选项目工作区中',
-			'mcp.form.scope.description.projectGlobal' => '写入所选项目工作区，适用于所有提供商',
-			'mcp.form.scope.description.user' => '在您机器的所有项目中可用',
-			'mcp.form.scope.description.userGlobal' => '写入每个提供商的用户配置，并在本机的所有项目中可用',
-			'mcp.form.scope.projectAllProviders' => '项目（所有提供商）',
-			'mcp.form.scope.userAllProviders' => '用户（所有提供商）',
-			'mcp.form.submitTo' => ({required Object provider}) => '将服务器添加到 ${provider}',
-			'mcp.form.validation.unsupportedGlobal' => ({required Object type}) => '添加 MCP 服务器在所有提供商中仅支持 stdio 和 http，不支持 ${type}。',
-			'mcp.form.validation.unsupportedProvider' => ({required Object provider, required Object type}) => '${provider} 不支持 ${type} MCP 服务器',
-			'mcp.install.button' => '安装',
-			'mcp.install.cardDescription' => '通过 MCP 让你的代理使用知识库和 DDAgent 工具 — 选择代理，或为全部安装。',
+			'knowledge.linkOptions.personal' => ({required Object title}) => '个人信息：${title}',
+			'knowledge.errors.importFailed' => ({required Object error}) => '导入失败：${error}',
+			'knowledge.errors.migrationFailed' => ({required Object error}) => '迁移失败：${error}',
+			'knowledge.entityTypes.memory' => '记忆',
+			'knowledge.entityTypes.rule' => '规则',
+			'knowledge.entityTypes.skill' => '技能',
+			'knowledge.entityTypes.personal' => '个人',
+			'knowledge.entityTypes.project' => '项目',
+			'knowledge.entityTypes.tag' => '标签',
+			'browser.dialogTitle' => '代理浏览器',
+			'browser.viewError' => '浏览器视图错误',
+			'browser.web' => 'Web',
+			'collab.team' => '团队',
+			'collab.invite' => '邀请',
+			'collab.inviteTeammate' => '邀请队友',
+			'collab.shareTokenHint' => '分享此邀请令牌 — 它仅显示一次，并在 72 小时后过期：',
+			'collab.createInvite' => '创建邀请',
+			'collab.copyToken' => '复制令牌',
+			'collab.roles.member' => '成员',
+			'collab.roles.viewer' => '查看者',
+			'collab.viewing.session' => '会话',
+			'collab.viewing.card' => '卡片',
+			'collab.viewing.board' => '看板',
+			'fileTree.uploadTo' => '上传到',
+			'fileTree.uploadHere' => '上传到此处',
+			'fileTree.browseServerFilesystem' => '浏览服务器文件系统',
+			'fileTree.noFiles' => '没有文件',
+			'fileTree.copyContents' => '复制内容',
+			'fileTree.chooseFolder' => '选择文件夹',
+			'fileTree.search.hint' => '筛选名称 / 按 Enter 搜索内容',
+			'fileTree.search.prompt' => '输入查询并按 Enter',
+			'fileTree.search.noMatches' => '没有匹配项',
+			'fileTree.search.resultsTruncated' => '结果已截断',
+			'fileTree.titles.rename' => ({required Object name}) => '重命名 ${name}',
+			'fileTree.titles.delete' => ({required Object name}) => '删除 ${name}',
+			'fileTree.titles.download' => ({required Object name}) => '下载 ${name}',
+			'fileTree.uploadedCount' => ({required Object count}) => '已上传 ${count} 个文件',
+			'fileTree.newName' => '新名称',
+			'fileTree.notRegisteredProject' => ({required Object path}) => '不是已注册的项目：${path}',
+			'fileTree.showGitignoredFiles' => '显示被 gitignore 忽略的文件',
+			'fileTree.hideGitignoredFiles' => '隐藏被 gitignore 忽略的文件',
+			'fileTree.downloadUnsupportedOnWeb' => '网页端不支持下载',
+			'fileTree.saveToPath' => '保存到路径',
+			'fileTree.savedTo' => ({required Object path}) => '已保存到 ${path}',
+			'fileTree.relative.now' => '刚刚',
+			'fileTree.relative.minutes' => ({required Object n}) => '${n} 分钟',
+			'fileTree.relative.hours' => ({required Object n}) => '${n} 小时',
+			'fileTree.relative.days' => ({required Object n}) => '${n} 天',
+			'fileTree.projectRoot' => '（项目根目录）',
+			'fileTree.uploadLimitCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, other: '一次最多可上传 ${count} 个文件。', ), 
+			'fileTree.fileTooLarge' => ({required Object name}) => '${name} 超过 200MB。',
+			'fileTree.deleteFolderConfirm' => ({required Object path}) => '删除文件夹“${path}”？此操作无法撤销。',
+			'fileTree.deleteFileConfirm' => ({required Object path}) => '删除文件“${path}”？此操作无法撤销。',
+			'git.checkpoints.title' => '检查点',
+			'git.checkpoints.restoreTitle' => '恢复检查点',
+			'git.checkpoints.restoreMessage' => '将工作树重置到此检查点？当前更改将被替换。',
+			'git.checkpoints.restored' => '检查点已恢复',
+			'git.checkpoints.labelHint' => '检查点标签（可选）',
+			'git.checkpoints.empty' => '还没有检查点',
+			'git.checkpoints.create' => '新建',
+			'git.stagedChanges' => '已暂存的更改',
+			'git.statusStaged' => '已暂存',
+			'git.switchBranch' => '切换分支',
+			'git.unifiedDiff' => '统一差异',
+			'git.splitDiff' => '并排差异',
+			'git.noDiff' => '没有可用的差异',
+			'git.largeDiff' => '大型差异预览：为保证标签页响应流畅，渲染已受限。',
+			'git.loadDiffFailed' => ({required Object error}) => '加载差异失败：${error}',
+			'git.hunkStage' => '+ 区块',
+			'git.hunkUnstage' => '− 区块',
+			'git.stageHunk' => '暂存区块',
+			'git.unstageHunk' => '取消暂存区块',
+			'git.deleteFile' => '删除文件',
+			'git.commitMessage' => '提交消息',
+			'git.aiButton' => '✦ AI',
+			'git.commitCreated' => '提交已创建',
+			'git.noBranch' => '无分支',
+			'git.selectProject' => '选择项目',
+			'git.branchSections.local' => '本地',
+			'git.branchSections.remote' => '远程',
+			'kanban.card.untitled' => '未命名',
+			'kanban.comments.empty' => '还没有评论',
+			'kanban.comments.add' => '添加评论',
+			'kanban.dialog.saving' => '保存中…',
+			'kanban.details.title' => '卡片详情',
+			'kanban.details.status' => ({required Object status}) => '状态：${status}',
+			'kanban.empty.noProject' => '未选择项目',
+			'kanban.saveFailed' => '保存卡片失败',
+			'kanban.time.now' => '刚刚',
+			'kanban.time.minutesAgo' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '1 分钟前', other: '${count} 分钟前', ), 
+			'kanban.time.hoursAgo' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '1 小时前', other: '${count} 小时前', ), 
+			'kanban.time.daysAgo' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '1 天前', other: '${count} 天前', ), 
+			'mcp.install.title' => '安装 DDAgent MCP 服务器',
 			'mcp.install.description' => '让所选代理通过 MCP 使用 DDAgent 知识库和工具。',
-			'mcp.install.errorFallback' => '错误',
-			'mcp.install.failed' => ({required Object error}) => '安装失败：${error}',
-			'mcp.install.installForAll' => '为全部安装',
+			'mcp.install.cardDescription' => '通过 MCP 让你的代理使用知识库和 DDAgent 工具 — 选择代理，或为全部安装。',
 			'mcp.install.installSelected' => '安装到所选',
+			'mcp.install.installForAll' => '为全部安装',
+			'mcp.install.button' => '安装',
+			'mcp.install.failed' => ({required Object error}) => '安装失败：${error}',
 			'mcp.install.installedCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '已安装到 ${count} 个代理。', other: '已安装到 ${count} 个代理。', ), 
 			'mcp.install.partialFailure' => ({required Object count, required Object failed}) => '已安装到 ${count}；失败：${failed}',
-			'mcp.install.title' => '安装 DDAgent MCP 服务器',
-			'mcp.servers.addGlobalDescription' => '将此 MCP 服务器添加到所有提供商：Claude、Cursor、Codex、OpenCode 和 Devin。仅支持 stdio 和 HTTP 传输，因为同一份配置必须在所有提供商中都能使用。',
-			'mcp.servers.addGlobalMenuDescription' => '添加全局 MCP 服务器会将一个通用的 stdio 或 HTTP 服务器写入 Claude、Cursor、Codex、OpenCode 和 Devin。',
-			'mcp.servers.addGlobalTitle' => '添加全局 MCP 服务器',
-			'mcp.servers.addProviderDescription' => ({required Object provider}) => '添加 ${provider} MCP 服务器只会更改 ${provider}。',
-			'mcp.servers.addProviderTitle' => ({required Object provider}) => '添加 ${provider} MCP 服务器',
-			'mcp.servers.config.cwd' => '工作目录',
-			'mcp.servers.config.envVars' => '环境变量',
-			'mcp.servers.descriptionGeneric' => ({required Object provider}) => 'Model Context Protocol 服务器为 ${provider} 提供额外的工具和数据源',
+			'mcp.install.errorFallback' => '错误',
 			'mcp.servers.loading' => '正在加载 MCP 服务器...',
 			'mcp.servers.refreshingScopes' => '正在刷新项目范围...',
-			'mcp.team.cta' => 'DDAgent Pro 版可用',
-			'mcp.team.description' => '在团队中共享 MCP 服务器配置。所有人自动保持同步。',
+			'mcp.servers.descriptionGeneric' => ({required Object provider}) => 'Model Context Protocol 服务器为 ${provider} 提供额外的工具和数据源',
+			'mcp.servers.addGlobalTitle' => '添加全局 MCP 服务器',
+			'mcp.servers.addGlobalDescription' => '将此 MCP 服务器添加到所有提供商：Claude、Cursor、Codex、OpenCode 和 Devin。仅支持 stdio 和 HTTP 传输，因为同一份配置必须在所有提供商中都能使用。',
+			'mcp.servers.addGlobalMenuDescription' => '添加全局 MCP 服务器会将一个通用的 stdio 或 HTTP 服务器写入 Claude、Cursor、Codex、OpenCode 和 Devin。',
+			'mcp.servers.addProviderTitle' => ({required Object provider}) => '添加 ${provider} MCP 服务器',
+			'mcp.servers.addProviderDescription' => ({required Object provider}) => '添加 ${provider} MCP 服务器只会更改 ${provider}。',
+			'mcp.servers.config.cwd' => '工作目录',
+			'mcp.servers.config.envVars' => '环境变量',
+			'mcp.servers.selectProjectRequired' => '请为项目范围的 MCP 服务器选择一个项目',
+			'mcp.servers.globalScopeUnsupported' => '为所有提供商添加 MCP 服务器时仅支持用户或项目范围。',
+			'mcp.servers.globalAddFailed' => ({required Object details}) => '无法将 MCP 服务器添加到所有提供商。${details}',
+			'mcp.servers.scopeProject' => '项目',
 			'mcp.team.title' => '团队 MCP 配置',
+			'mcp.team.description' => '在团队中共享 MCP 服务器配置。所有人自动保持同步。',
+			'mcp.team.cta' => 'DDAgent Pro 版可用',
 			'mcp.tokens.scopeWrite' => '写入',
-			'terminal.actions.clearOutput' => '清空输出',
-			'terminal.actions.connect' => '连接',
-			'terminal.actions.newShell' => '新建 Shell',
-			'terminal.actions.newTab' => '新建终端标签页',
-			'terminal.actions.providerLogin' => '提供商登录',
-			'terminal.actions.restartSession' => '重启会话',
-			'terminal.authUrl.openInBrowser' => '在浏览器中打开',
-			'terminal.errors.couldNotOpenLink' => ({required Object url}) => '无法打开链接：${url}',
-			'terminal.fileLink.detected' => ({required Object path}) => '检测到文件：${path}',
-			'terminal.paste.hint' => 'Ctrl+V / 右键 → 粘贴',
-			'terminal.paste.title' => '粘贴到终端',
-			'terminal.shortcuts.eof' => 'EOF',
-			'terminal.shortcuts.hide' => '隐藏快捷键栏',
-			'terminal.shortcuts.interrupt' => '中断 (SIGINT)',
-			'terminal.shortcuts.suspend' => '挂起 (SIGTSTP)',
-			'terminal.shortcuts.showTooltip' => '显示快捷键',
-			'terminal.shortcuts.hideTooltip' => '隐藏快捷键',
-			'terminal.tabs.antigravityCli' => 'Antigravity CLI',
-			'terminal.tabs.claudeCli' => 'Claude CLI',
-			'terminal.tabs.commandCodeCli' => 'Command Code CLI',
-			'terminal.tabs.cursorCli' => 'Cursor CLI',
-			'terminal.tabs.devinCli' => 'Devin CLI',
-			'terminal.tabs.loginTitle' => ({required Object provider}) => '登录：${provider}',
-			'terminal.tabs.opencodeCli' => 'OpenCode CLI',
-			'terminal.tabs.plainShell' => '普通 Shell',
-			'terminal.tabs.shellName' => ({required Object index}) => 'Shell ${index}',
-			'worktrees.branchHint' => '新分支名称（例如 feature/login）',
-			'worktrees.branchingOff' => ({required Object branch}) => '从 ${branch} 创建分支',
-			'worktrees.cleanupDescription' => '合并后移除 worktree 并删除分支',
-			'worktrees.created' => 'Worktree 已创建',
-			'worktrees.deleteBranchLabel' => '同时删除分支',
-			'worktrees.dirtyWarning' => ({required Object count}) => '警告：此 worktree 有 ${count} 个未提交的更改将会丢失。',
-			'worktrees.emptyDescription' => '创建 worktree 以隔离功能开发或代理运行。',
-			'worktrees.emptyTitle' => '未找到 worktree',
-			'worktrees.forceRemoveLabel' => '强制移除（放弃更改）',
-			'worktrees.headDetachedAt' => ({required Object sha}) => 'HEAD 分离于 ${sha}',
-			'worktrees.mainBadge' => 'main',
-			'worktrees.mergeDescription' => ({required Object branch}) => '将更改合并到 ${branch}。',
-			'worktrees.mergeTitle' => ({required Object branch}) => '合并 ${branch}',
-			'worktrees.merged' => ({required Object branch}) => 'Worktree 已合并到 ${branch}',
-			'worktrees.opened' => ({required Object branch}) => '已打开 worktree：${branch}',
-			'worktrees.portHint' => '运行端口（可选，例如 3000）',
-			'worktrees.removeDescription' => '这将删除 worktree 文件夹。关联的项目将被归档。',
-			'worktrees.removeTitle' => ({required Object branch}) => '移除 worktree ${branch}？',
-			'worktrees.removed' => 'Worktree 已移除',
-			'worktrees.runButton' => '运行',
-			'worktrees.runHint' => '运行命令（例如 npm run dev）',
-			'worktrees.runRunning' => '运行中',
-			'worktrees.runRunningWithPort' => ({required Object port}) => '运行中 :${port}',
-			'worktrees.scripts' => '脚本',
-			'worktrees.scriptsSaved' => '脚本配置已保存',
-			'worktrees.serverLabel' => '服务器： ',
-			'worktrees.setupHint' => '初始化命令（例如 npm install）',
-			'worktrees.setupLabel' => '初始化： ',
-			'worktrees.squashDescription' => '将所有提交合并为单个提交',
-			'worktrees.stopButton' => '停止',
+			'mcp.tokens.scopeRead' => '读取',
+			'mcp.form.submitTo' => ({required Object provider}) => '将服务器添加到 ${provider}',
+			'mcp.form.scope.userAllProviders' => '用户（所有提供商）',
+			'mcp.form.scope.claudeLocal' => 'Claude 本地',
+			'mcp.form.scope.projectAllProviders' => '项目（所有提供商）',
+			'mcp.form.scope.description.userGlobal' => '写入每个提供商的用户配置，并在本机的所有项目中可用',
+			'mcp.form.scope.description.user' => '在您机器的所有项目中可用',
+			'mcp.form.scope.description.local' => '存储在所选项目的 Claude 用户设置中',
+			'mcp.form.scope.description.projectGlobal' => '写入所选项目工作区，适用于所有提供商',
+			'mcp.form.scope.description.project' => '存储在所选项目工作区中',
+			'mcp.form.fields.workingDirectory' => '工作目录',
+			'mcp.form.fields.envVarNames' => '环境变量名称',
+			'mcp.form.fields.bearerTokenEnvVar' => 'Bearer 令牌环境变量',
+			'mcp.form.validation.unsupportedGlobal' => ({required Object type}) => '添加 MCP 服务器在所有提供商中仅支持 stdio 和 http，不支持 ${type}。',
+			'mcp.form.validation.unsupportedProvider' => ({required Object provider, required Object type}) => '${provider} 不支持 ${type} MCP 服务器',
+			'mcp.form.validation.jsonMustBeObject' => 'JSON 配置必须是一个对象',
+			'notifications.deviceLabel' => 'DDAgent Flutter',
+			'notifications.errors.registrationRejected' => '注册被服务器拒绝',
+			'notifications.errors.noResponse' => '服务器无响应',
+			'notifications.androidChannel.name' => 'DDAgent 提醒',
+			'notifications.androidChannel.description' => '智能体运行、审批和错误通知',
+			'onboarding.gitHint' => '用于 DDAgent 会话创建的提交。',
+			'onboarding.completeSetup' => '完成设置',
+			'onboarding.errors.nameAndEmailRequired' => 'git 名称和邮箱均为必填项。',
+			'onboarding.errors.invalidEmail' => '请输入有效的邮箱地址。',
+			'onboarding.agents.title' => '连接你的 AI 代理',
+			'onboarding.agents.description' => '登录一个或多个 AI 编程助手。全部为可选。',
+			'onboarding.agents.laterHint' => '你可以稍后在设置中配置。',
+			'onboarding.mcp.title' => '将代理连接到 DDAgent',
+			'onboarding.mcp.description' => '安装 DDAgent MCP 服务器，让你的代理可以使用知识库和 DDAgent 工具。选择代理，或为全部安装。',
+			'onboarding.mcp.installSelected' => '安装到所选',
+			'onboarding.mcp.installForAll' => '为全部安装',
+			'onboarding.mcp.laterHint' => '可选 — 你也可以稍后在设置 → MCP 中安装。',
+			'onboarding.mcp.installedOn' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '已安装到 ${count} 个代理。', other: '已安装到 ${count} 个代理。', ), 
+			'onboarding.mcp.installedWithFailures' => ({required Object installedCount, required Object failed}) => '已安装到 ${installedCount}；失败：${failed}',
+			'projects.cloneRepository' => '克隆仓库',
+			'projects.repositoryCloned' => '仓库已克隆',
+			'projects.clone' => '克隆',
+			'projects.cloneFinished' => '克隆完成。正在刷新项目列表…',
+			'projects.cloneFailed' => '克隆失败',
+			'projects.repoUrlPlaceholder' => 'https://github.com/org/repo.git',
+			'projects.destinationPath' => '目标路径',
+			'projects.destinationPathRequired' => '目标路径为必填项',
+			'projects.repositoryUrlRequired' => '仓库 URL 为必填项',
+			'projects.githubTokenOptional' => 'GitHub 令牌（可选）',
+			'projects.archive' => '归档',
+			'projects.restore' => '恢复',
+			'projects.deletePermanently' => '永久删除',
+			'projects.deleteProjectTitle' => '删除项目？',
+			'projects.deleteProjectMessage' => ({required Object name}) => '永久移除“${name}”，包括所有会话和已存储的历史记录（清空 JSONL）。此操作无法撤销。',
+			'projects.archivedSection' => ({required Object count}) => '已归档（${count}）',
+			'projects.sessionCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '${count} 个会话', other: '${count} 个会话', ), 
+			'projects.newer' => '较新',
+			'projects.older' => '较早',
+			'projects.projectArchived' => '项目已归档',
+			'projects.projectRestored' => '项目已恢复',
+			'projects.projectRenamed' => '项目已重命名',
+			'projects.projectDeleted' => '项目已删除',
+			'projects.failedToLoadTokens' => '加载 GitHub 令牌失败',
+			'projects.displayNameOptional' => '显示名称（可选）',
+			'projects.usingStoredToken' => ({required Object name}) => '使用已保存的令牌：${name}',
+			'projects.unknown' => '未知',
+			'projects.project' => '项目',
+			'quota.section.config' => '配置',
+			'quota.overview.tokensAndCost' => '令牌与成本',
 			'quota.agents.statusCount' => ({required Object status, required Object count}) => '${status}（${count}）',
+			'quota.config.pollerTitle' => '轮询与提醒',
+			'quota.config.accountRouting' => '账户路由',
+			'quota.config.save' => '保存配置',
+			'quota.chart.show' => '显示',
 			'quota.chart.hide' => '隐藏',
 			'quota.chart.noData' => '数据不足，无法显示趋势。',
 			'quota.chart.pointReadout' => ({required Object date, required Object tokens, required Object cost}) => '${date} · ${tokens} 令牌 · ${cost}',
-			'quota.chart.show' => '显示',
-			'quota.config.accountRouting' => '账户路由',
-			'quota.config.pollerTitle' => '轮询与提醒',
-			'quota.config.save' => '保存配置',
-			'quota.overview.tokensAndCost' => '令牌与成本',
-			'quota.section.config' => '配置',
-			'scheduler.checking' => '检查中…',
-			'scheduler.cronHint' => 'Cron（分 时 日 月 周）— 例如 0 9 * * *',
-			'scheduler.deleteMessage' => ({required Object id}) => '这将移除重复任务 ${id}。现有会话会保留。',
-			'scheduler.deleteTitle' => '删除定时任务？',
-			'scheduler.editTitle' => '编辑定时任务',
+			'quota.duration.minutes' => ({required Object minutes}) => '${minutes} 分钟',
+			'quota.duration.hoursMinutes' => ({required Object hours, required Object minutes}) => '${hours} 小时 ${minutes} 分钟',
+			'quota.duration.daysHours' => ({required Object days, required Object hours}) => '${days} 天 ${hours} 小时',
+			'quota.duration.now' => '刚刚',
 			'scheduler.newLabel' => '新建',
-			'scheduler.nextIn' => ({required Object time}) => '${time} 后',
-			'scheduler.promptHint' => '给代理的提示词',
 			'scheduler.runs' => '运行次数',
-			'scheduler.session' => ({required Object id}) => '会话 ${id}',
+			'scheduler.editTitle' => '编辑定时任务',
+			'scheduler.deleteTitle' => '删除定时任务？',
+			'scheduler.deleteMessage' => ({required Object id}) => '这将移除重复任务 ${id}。现有会话会保留。',
+			'scheduler.checking' => '检查中…',
+			'scheduler.nextIn' => ({required Object time}) => '${time} 后',
 			'scheduler.worktree' => 'worktree',
-			'notifications.deviceLabel' => 'DDAgent Flutter',
-			'notifications.errors.noResponse' => '服务器无响应',
-			'notifications.errors.registrationRejected' => '注册被服务器拒绝',
+			'scheduler.session' => ({required Object id}) => '会话 ${id}',
+			'scheduler.cronHint' => 'Cron（分 时 日 月 周）— 例如 0 9 * * *',
+			'scheduler.promptHint' => '给代理的提示词',
+			'scheduler.runStatus.fired' => '已触发',
+			'scheduler.runStatus.skipped' => '已跳过',
+			'scheduler.runStatus.failed' => '失败',
+			'scheduler.runStatus.completed' => '已完成',
+			'scheduler.cronErrors.fieldCount' => ({required Object got}) => '需要 5 个字段，实际为 ${got} 个',
+			'scheduler.cronErrors.fieldError' => ({required Object index, required Object error}) => '字段 ${index}：${error}',
+			'scheduler.cronErrors.empty' => '为空',
+			'scheduler.cronErrors.invalidPart' => ({required Object part}) => '无效的“${part}”',
+			'scheduler.cronErrors.invalidValue' => ({required Object value}) => '无效值“${value}”',
+			'serverConnect.subtitle' => '连接到你的 DDAgent 服务器',
+			'serverConnect.enterUrl' => '输入服务器 URL',
+			'serverConnect.connectionFailed' => ({required Object error}) => '连接失败（${error}）',
 			'serverConnect.connect' => '连接',
 			'serverConnect.connecting' => '正在连接…',
 			'serverConnect.changeServer' => '更换服务器',
-			'serverConnect.connectionFailed' => ({required Object error}) => '连接失败（${error}）',
-			'serverConnect.enterUrl' => '输入服务器 URL',
 			'serverConnect.local.title' => '本设备',
 			'serverConnect.local.subtitle' => '在此计算机上运行 DDAgent 服务器',
 			'serverConnect.local.install' => '安装本地服务器',
@@ -9399,172 +11384,240 @@ extension on TranslationsZhCn {
 			'serverConnect.local.connect' => '使用此服务器',
 			'serverConnect.local.error' => ({required Object error}) => '本地服务器错误：${error}',
 			'serverConnect.local.or' => '或连接到远程服务器',
-			'serverConnect.subtitle' => '连接到你的 DDAgent 服务器',
-			'voice.apiKeySaved' => 'API 密钥（已保存，输入以替换）',
-			'voice.preview' => '预览',
-			'voice.saveFailed' => '保存 STT 配置失败',
-			'voice.settingsSaved' => '语音输入设置已保存',
-			'sharedContext.title' => '共享笔记',
-			'collab.copyToken' => '复制令牌',
-			'collab.createInvite' => '创建邀请',
-			'collab.invite' => '邀请',
-			'collab.inviteTeammate' => '邀请队友',
-			'collab.roles.member' => '成员',
-			'collab.roles.viewer' => '查看者',
-			'collab.shareTokenHint' => '分享此邀请令牌 — 它仅显示一次，并在 72 小时后过期：',
-			'collab.team' => '团队',
-			'browser.dialogTitle' => '代理浏览器',
-			'browser.viewError' => '浏览器视图错误',
-			'browser.web' => 'Web',
-			'projects.archive' => '归档',
-			'projects.archivedSection' => ({required Object count}) => '已归档（${count}）',
-			'projects.clone' => '克隆',
-			'projects.cloneFailed' => '克隆失败',
-			'projects.cloneFinished' => '克隆完成。正在刷新项目列表…',
-			'projects.cloneRepository' => '克隆仓库',
-			'projects.deletePermanently' => '永久删除',
-			'projects.deleteProjectMessage' => ({required Object name}) => '永久移除“${name}”，包括所有会话和已存储的历史记录（清空 JSONL）。此操作无法撤销。',
-			'projects.deleteProjectTitle' => '删除项目？',
-			'projects.destinationPath' => '目标路径',
-			'projects.destinationPathRequired' => '目标路径为必填项',
-			'projects.displayNameOptional' => '显示名称（可选）',
-			'projects.failedToLoadTokens' => '加载 GitHub 令牌失败',
-			'projects.githubTokenOptional' => 'GitHub 令牌（可选）',
-			'projects.newer' => '较新',
-			'projects.older' => '较早',
-			'projects.projectArchived' => '项目已归档',
-			'projects.projectDeleted' => '项目已删除',
-			'projects.projectRenamed' => '项目已重命名',
-			'projects.projectRestored' => '项目已恢复',
-			'projects.repoUrlPlaceholder' => 'https://github.com/org/repo.git',
-			'projects.repositoryCloned' => '仓库已克隆',
-			'projects.repositoryUrlRequired' => '仓库 URL 为必填项',
-			'projects.restore' => '恢复',
-			'projects.sessionCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '${count} 个会话', other: '${count} 个会话', ), 
-			'projects.unknown' => '未知',
-			'projects.usingStoredToken' => ({required Object name}) => '使用已保存的令牌：${name}',
-			'sessions.activity.committingChanges' => '正在提交更改',
-			'sessions.activity.editingFile' => ({required Object file}) => '正在编辑 ${file}',
-			'sessions.activity.editingFileGeneric' => '正在编辑文件',
-			'sessions.activity.fetchingUrl' => ({required Object url}) => '正在获取 ${url}',
-			'sessions.activity.pushingBranch' => '正在推送分支',
-			'sessions.activity.readingFile' => ({required Object file}) => '正在读取 ${file}',
-			'sessions.activity.runningCommand' => ({required Object command}) => '正在运行 `${command}`',
-			'sessions.activity.runningShellCommand' => '正在运行 Shell 命令',
-			'sessions.activity.runningTool' => ({required Object name}) => '正在运行 ${name}',
-			'sessions.activity.searching' => ({required Object query}) => '正在搜索“${query}”',
-			'sessions.activity.subagentRunning' => '子代理运行中',
-			'sessions.age.days' => ({required Object days}) => '${days}天',
-			'sessions.age.hours' => ({required Object hours}) => '${hours}小时',
-			'sessions.age.lessThanMinute' => '<1分钟',
-			'sessions.age.minutes' => ({required Object count}) => '${count}分钟',
-			'sessions.archive' => '归档',
+			'serverConnect.local.errors.releaseTagUnresolved' => '无法获取最新的 DDAgent 发布标签。',
+			'serverConnect.local.errors.unsupportedPlatform' => '此平台不支持本地服务器。',
+			'serverConnect.local.errors.unsupportedPlatformDetail' => ({required Object platform}) => '此平台不支持本地服务器（${platform}）。',
+			'serverConnect.local.errors.nodeExtractionFailed' => ({required Object path}) => 'Node.js 解压后未生成 ${path}',
+			'serverConnect.local.errors.downloadFailed' => ({required Object error}) => '服务器下载失败：${error}',
+			'serverConnect.local.errors.installFailed' => ({required Object error}) => '服务器安装失败：${error}',
+			'serverConnect.local.errors.bundleNotInstalled' => '服务器包未安装。',
+			'serverConnect.local.errors.spawnFailed' => ({required Object error}) => '无法启动本地服务器：${error}',
+			'serverConnect.local.errors.portInUse' => ({required Object port}) => '端口 ${port} 已被其他应用占用。',
+			'serverConnect.local.errors.exitedDuringStartup' => '本地服务器在启动过程中退出。',
+			'serverConnect.local.errors.exitedDuringStartupWithOutput' => ({required Object output}) => '本地服务器在启动过程中退出：${output}',
+			'serverConnect.local.errors.startTimeout' => '等待本地服务器启动超时。',
+			'serverConnect.local.errors.tarFailed' => ({required Object command, required Object code, required Object output}) => '${command} 失败（退出码 ${code}）：${output}',
+			'serverConnect.httpStatus' => ({required Object code}) => 'HTTP ${code}',
+			'serverConnect.networkError' => '网络错误',
+			'sessions.noSessions' => '没有会话',
+			'sessions.noRecentSessions' => '没有最近的会话',
 			'sessions.archivedSessions' => '已归档的会话',
-			'sessions.autoOrchestrator' => '自动（编排器）',
+			'sessions.rename' => '重命名',
+			'sessions.archive' => '归档',
 			'sessions.compareWith' => '与之比较…',
+			'sessions.projectPath' => '项目路径',
+			'sessions.newSessionProvider' => '新会话 — 提供商',
+			'sessions.autoOrchestrator' => '自动（编排器）',
 			'sessions.createFailed' => ({required Object error}) => '创建会话失败：${error}',
 			'sessions.deleteSessionMessage' => ({required Object name}) => '移除“${name}”及其记录。此操作无法撤销。',
-			'sessions.newSessionProvider' => '新会话 — 提供商',
-			'sessions.noRecentSessions' => '没有最近的会话',
-			'sessions.noSessions' => '没有会话',
-			'sessions.projectPath' => '项目路径',
-			'sessions.rename' => '重命名',
 			'sessions.toasts.archived' => '会话已归档',
-			'sessions.toasts.deleted' => '会话已删除',
-			'sessions.toasts.pinned' => '会话已固定',
-			'sessions.toasts.renamed' => '会话已重命名',
 			'sessions.toasts.restored' => '会话已恢复',
+			'sessions.toasts.deleted' => '会话已删除',
+			'sessions.toasts.renamed' => '会话已重命名',
+			'sessions.toasts.pinned' => '会话已固定',
 			'sessions.toasts.unpinned' => '会话已取消固定',
 			'sessions.toasts.workspaceChanged' => '工作区已更改',
-			'git.aiButton' => '✦ AI',
-			'git.checkpoints.create' => '新建',
-			'git.checkpoints.empty' => '还没有检查点',
-			'git.checkpoints.labelHint' => '检查点标签（可选）',
-			'git.checkpoints.restoreMessage' => '将工作树重置到此检查点？当前更改将被替换。',
-			'git.checkpoints.restoreTitle' => '恢复检查点',
-			'git.checkpoints.restored' => '检查点已恢复',
-			'git.checkpoints.title' => '检查点',
-			'git.commitCreated' => '提交已创建',
-			'git.commitMessage' => '提交消息',
-			'git.deleteFile' => '删除文件',
-			'git.hunkStage' => '+ 区块',
-			'git.hunkUnstage' => '− 区块',
-			'git.largeDiff' => '大型差异预览：为保证标签页响应流畅，渲染已受限。',
-			'git.loadDiffFailed' => ({required Object error}) => '加载差异失败：${error}',
-			'git.noBranch' => '无分支',
-			'git.noDiff' => '没有可用的差异',
-			'git.selectProject' => '选择项目',
-			'git.splitDiff' => '并排差异',
-			'git.stageHunk' => '暂存区块',
-			'git.stagedChanges' => '已暂存的更改',
-			'git.statusStaged' => '已暂存',
-			'git.switchBranch' => '切换分支',
-			'git.unifiedDiff' => '统一差异',
-			'git.unstageHunk' => '取消暂存区块',
-			'kanban.card.untitled' => '未命名',
-			'kanban.comments.add' => '添加评论',
-			'kanban.comments.empty' => '还没有评论',
-			'kanban.details.status' => ({required Object status}) => '状态：${status}',
-			'kanban.details.title' => '卡片详情',
-			'kanban.dialog.saving' => '保存中…',
-			'kanban.empty.noProject' => '未选择项目',
-			'kanban.saveFailed' => '保存卡片失败',
-			'kanban.time.daysAgo' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '1 天前', other: '${count} 天前', ), 
-			'kanban.time.hoursAgo' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '1 小时前', other: '${count} 小时前', ), 
-			'kanban.time.minutesAgo' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '1 分钟前', other: '${count} 分钟前', ), 
-			'kanban.time.now' => '刚刚',
-			'onboarding.agents.description' => '登录一个或多个 AI 编程助手。全部为可选。',
-			'onboarding.agents.laterHint' => '你可以稍后在设置中配置。',
-			'onboarding.agents.title' => '连接你的 AI 代理',
-			'onboarding.completeSetup' => '完成设置',
-			'onboarding.errors.invalidEmail' => '请输入有效的邮箱地址。',
-			'onboarding.errors.nameAndEmailRequired' => 'git 名称和邮箱均为必填项。',
-			'onboarding.gitHint' => '用于 DDAgent 会话创建的提交。',
-			'onboarding.mcp.description' => '安装 DDAgent MCP 服务器，让你的代理可以使用知识库和 DDAgent 工具。选择代理，或为全部安装。',
-			'onboarding.mcp.installForAll' => '为全部安装',
-			'onboarding.mcp.installSelected' => '安装到所选',
-			'onboarding.mcp.installedOn' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '已安装到 ${count} 个代理。', other: '已安装到 ${count} 个代理。', ), 
-			'onboarding.mcp.installedWithFailures' => ({required Object installedCount, required Object failed}) => '已安装到 ${installedCount}；失败：${failed}',
-			'onboarding.mcp.laterHint' => '可选 — 你也可以稍后在设置 → MCP 中安装。',
-			'onboarding.mcp.title' => '将代理连接到 DDAgent',
-			'fileTree.browseServerFilesystem' => '浏览服务器文件系统',
-			'fileTree.chooseFolder' => '选择文件夹',
-			'fileTree.copyContents' => '复制内容',
-			'fileTree.noFiles' => '没有文件',
-			'fileTree.search.hint' => '筛选名称 / 按 Enter 搜索内容',
-			'fileTree.search.noMatches' => '没有匹配项',
-			'fileTree.search.prompt' => '输入查询并按 Enter',
-			'fileTree.search.resultsTruncated' => '结果已截断',
-			'fileTree.titles.delete' => ({required Object name}) => '删除 ${name}',
-			'fileTree.titles.download' => ({required Object name}) => '下载 ${name}',
-			'fileTree.titles.rename' => ({required Object name}) => '重命名 ${name}',
-			'fileTree.uploadHere' => '上传到此处',
-			'fileTree.uploadTo' => '上传到',
-			'fileTree.uploadedCount' => ({required Object count}) => '已上传 ${count} 个文件',
-			'fileTree.newName' => '新名称',
-			'fileTree.notRegisteredProject' => ({required Object path}) => '不是已注册的项目：${path}',
-			'fileTree.showGitignoredFiles' => '显示被 gitignore 忽略的文件',
-			'fileTree.hideGitignoredFiles' => '隐藏被 gitignore 忽略的文件',
-			'fileTree.downloadUnsupportedOnWeb' => '网页端不支持下载',
-			'fileTree.saveToPath' => '保存到路径',
-			'fileTree.savedTo' => ({required Object path}) => '已保存到 ${path}',
-			'workspace.archivedWorkspaceName' => '已归档',
-			'workspace.closePane' => '关闭窗格',
-			'workspace.closeSearch' => '关闭搜索',
-			'workspace.deleteSessionNotice' => '移除会话及其记录。此操作无法撤销。',
+			'sessions.age.lessThanMinute' => '<1分钟',
+			'sessions.age.minutes' => ({required Object count}) => '${count}分钟',
+			'sessions.age.hours' => ({required Object hours}) => '${hours}小时',
+			'sessions.age.days' => ({required Object days}) => '${days}天',
+			'sessions.activity.subagentRunning' => '子代理运行中',
+			'sessions.activity.readingFile' => ({required Object file}) => '正在读取 ${file}',
+			'sessions.activity.runningTool' => ({required Object name}) => '正在运行 ${name}',
+			'sessions.activity.editingFile' => ({required Object file}) => '正在编辑 ${file}',
+			'sessions.activity.editingFileGeneric' => '正在编辑文件',
+			'sessions.activity.runningShellCommand' => '正在运行 Shell 命令',
+			'sessions.activity.runningCommand' => ({required Object command}) => '正在运行 `${command}`',
+			'sessions.activity.committingChanges' => '正在提交更改',
+			'sessions.activity.pushingBranch' => '正在推送分支',
+			'sessions.activity.fetchingUrl' => ({required Object url}) => '正在获取 ${url}',
+			'sessions.activity.searching' => ({required Object query}) => '正在搜索“${query}”',
+			'sessions.autoMini' => '自动（迷你）',
+			'sharedContext.title' => '共享笔记',
+			'skills.moveSkill' => ({required Object name}) => '移动 ${name}',
+			'skills.deleteSkill' => ({required Object name}) => '删除 ${name}',
+			'skills.projectLabel' => '项目',
+			'skills.addDialog.title' => ({required Object provider}) => '添加 ${provider} 技能',
+			'skills.addDialog.chooseFileTitle' => '选择 SKILL.md',
+			'skills.addDialog.chooseFolderTitle' => '选择技能文件夹',
+			'skills.addDialog.uploadHint' => '上传 SKILL.md 文件或完整的技能文件夹。',
+			'skills.addDialog.pickTitle' => '选择技能文件夹或 SKILL.md',
+			'skills.addDialog.pickHint' => '文件夹可包含脚本、参考资料和资源。',
+			'skills.addDialog.chooseFiles' => '选择文件',
+			'skills.addDialog.chooseFolder' => '选择文件夹',
+			'skills.addDialog.readyToInstall' => '可以安装',
+			'skills.addDialog.markdownFileMeta' => ({required Object size}) => 'Markdown 文件 · ${size}',
+			'skills.addDialog.folderFilesMeta' => ({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '${count} 个文件 · ${size}', other: '${count} 个文件 · ${size}', ), 
+			'skills.addDialog.removeQueued' => ({required Object name}) => '移除 ${name}',
+			'skills.addDialog.whereWillThisInstall' => '将安装到何处？',
+			'skills.addDialog.hideInstallLocation' => '隐藏安装位置',
+			'skills.addDialog.folderUploadsNote' => '文件夹上传会保留所选文件夹名称；单独文件使用 `SKILL.md` 中的 `name`。',
+			'skills.addDialog.installSkill' => '安装技能',
+			'skills.addDialog.installSkills' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '安装 ${count} 个技能', other: '安装 ${count} 个技能', ), 
+			'skills.moveDialog.toProjectHint' => '选择应拥有此技能的项目。它将从提供商的全局技能目录中移出。',
+			'skills.moveDialog.toGlobalHint' => '将此技能移入全局技能目录，以便所有项目都能使用。',
+			'skills.moveDialog.moveToProject' => '移动到项目',
+			'skills.moveDialog.moveToGlobal' => '移动到全局',
+			'skills.screen.manageDescription' => ({required Object provider}) => '管理来自本地文件、完整文件夹和项目级位置的 ${provider} 技能。',
+			'skills.screen.searchHint' => '搜索技能...',
+			'skills.screen.clearSearch' => '清除技能搜索',
+			'skills.screen.addSkill' => '添加技能',
+			'skills.screen.scanningProjectSkills' => '正在扫描项目技能...',
+			'skills.screen.savedSuccessfully' => '技能保存成功。',
+			'skills.screen.loadingSkills' => ({required Object provider}) => '正在加载 ${provider} 技能…',
+			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '${count} 个技能', other: '${count} 个技能', ), 
+			'skills.screen.deleteTitle' => ({required Object name}) => '删除 ${name}？',
+			'skills.screen.deleteDescription' => ({required Object directory, required Object provider}) => '这会将 ${directory} 目录从 ${provider} 的托管技能目录中移除。此操作无法撤销。',
+			'skills.screen.noDescription' => '技能的 front matter 中未提供描述。',
+			'skills.screen.pluginBadge' => ({required Object name}) => '插件：${name}',
+			'skills.screen.projectBadge' => ({required Object name}) => '项目：${name}',
+			'skills.screen.sourceLabel' => '来源',
+			'skills.empty.noProjects' => '没有可用的项目',
+			'skills.empty.noProjectsDescription' => '添加项目或工作区以浏览其技能。',
+			'skills.empty.noSkillsInProject' => '此项目中没有技能',
+			'skills.empty.noSkillsInProjectDescription' => '在所选项目中创建 .claude/skills、.cursor/skills 或 .agents/skills 文件夹。',
+			'skills.empty.noGlobalSkills' => '尚未发现全局技能',
+			'skills.empty.noGlobalSkillsDescription' => '在上方添加全局技能，使其可用于所有项目。',
+			'skills.empty.noMatchingSkills' => '没有匹配的技能',
+			'skills.empty.noMatchingSkillsDescription' => '请尝试其他命令、名称、范围、项目或来源路径。',
+			'skills.scopes.user' => '用户',
+			'skills.scopes.plugin' => '插件',
+			'skills.scopes.repo' => '仓库',
+			'skills.scopes.project' => '项目',
+			'skills.scopes.admin' => '管理员',
+			'skills.scopes.system' => '系统',
+			'skills.errors.dropMarkdownOrFolder' => '拖入一个或多个 Markdown 文件，或包含 SKILL.md 的文件夹。',
+			'skills.errors.addMarkdownFirst' => '请先添加一个或多个 Markdown 文件。',
+			'skills.errors.importFailed' => '导入技能失败',
+			'skills.errors.folderReadFailed' => '读取技能文件夹失败',
+			'skills.errors.folderFileLimit' => ({required Object count}) => '一个技能文件夹最多可包含 ${count} 个文件。',
+			'skills.errors.folderSizeLimit' => '所选技能文件夹的总大小必须小于 30 MB。',
+			'skills.errors.missingSkillFile' => '所选文件夹不包含 SKILL.md 文件。',
+			'skills.errors.couldNotReadSkillFile' => ({required Object name}) => '无法从 ${name} 读取 SKILL.md。',
+			'skills.providerShared' => '共享',
+			'terminal.tabs.shellName' => ({required Object index}) => '终端 ${index}',
+			'terminal.tabs.plainShell' => '普通 Shell',
+			'terminal.tabs.claudeCli' => 'Claude CLI',
+			'terminal.tabs.opencodeCli' => 'OpenCode CLI',
+			'terminal.tabs.commandCodeCli' => 'Command Code CLI',
+			'terminal.tabs.antigravityCli' => 'Antigravity CLI',
+			'terminal.tabs.cursorCli' => 'Cursor CLI',
+			'terminal.tabs.devinCli' => 'Devin CLI',
+			'terminal.tabs.loginTitle' => ({required Object provider}) => '登录：${provider}',
+			'terminal.tabs.runTitle' => ({required Object command}) => '运行：${command}',
+			'terminal.actions.newTab' => '新建终端标签页',
+			'terminal.actions.providerLogin' => '提供商登录',
+			'terminal.actions.restartSession' => '重启会话',
+			'terminal.actions.clearOutput' => '清空输出',
+			'terminal.actions.newShell' => '新建 Shell',
+			'terminal.actions.connect' => '连接',
+			'terminal.authUrl.openInBrowser' => '在浏览器中打开',
+			'terminal.authUrl.linkLabel' => ({required Object url}) => '认证链接：${url}',
+			'terminal.fileLink.detected' => ({required Object path}) => '检测到文件：${path}',
+			'terminal.shortcuts.interrupt' => '中断 (SIGINT)',
+			'terminal.shortcuts.eof' => 'EOF',
+			'terminal.shortcuts.suspend' => '挂起 (SIGTSTP)',
+			'terminal.shortcuts.hide' => '隐藏快捷键栏',
+			'terminal.shortcuts.showTooltip' => '显示快捷键',
+			'terminal.shortcuts.hideTooltip' => '隐藏快捷键',
+			'terminal.paste.title' => '粘贴到终端',
+			'terminal.paste.hint' => 'Ctrl+V / 右键 → 粘贴',
+			'terminal.errors.couldNotOpenLink' => ({required Object url}) => '无法打开链接：${url}',
+			'terminal.errors.frameError' => ({required Object message}) => '[错误] ${message}',
+			'terminal.errors.connectionError' => ({required Object message}) => '[连接错误] ${message}',
+			'terminal.loginDialog.title' => ({required Object provider}) => '${provider} CLI 登录',
+			'terminal.loginDialog.exited' => ({required Object code}) => '已退出（${code}）',
+			'terminal.loginDialog.authLinkDetected' => '检测到认证链接',
+			'terminal.empty.title' => '没有活动终端',
+			'terminal.empty.description' => '新建标签页以开始',
+			'terminal.overlay.processExited' => '进程已退出 — 连接以重新启动',
+			'terminal.overlay.processExitedWithCode' => ({required Object code}) => '进程已退出（代码 ${code}）— 连接以重新启动',
+			'terminal.overlay.resumeSession' => ({required Object title}) => '恢复会话 ${title}',
+			'terminal.overlay.startSession' => ({required Object path}) => '在 ${path} 中开始新会话',
+			'voice.preview' => '预览',
+			'voice.settingsSaved' => '语音输入设置已保存',
+			'voice.saveFailed' => '保存 STT 配置失败',
+			'voice.apiKeySaved' => 'API 密钥（已保存，输入以替换）',
 			'workspace.exportChat' => '导出聊天',
-			'workspace.jumpToSession' => '跳转到会话…',
-			'workspace.newChatProvider' => '新聊天 — 提供商',
-			'workspace.nextMatch' => '下一个匹配项',
-			'workspace.previousMatch' => '上一个匹配项',
 			'workspace.searchTranscript' => '搜索记录',
+			'workspace.previousMatch' => '上一个匹配项',
+			'workspace.nextMatch' => '下一个匹配项',
+			_ => null,
+		} ?? switch (path) {
+			'workspace.closeSearch' => '关闭搜索',
+			'workspace.newChatProvider' => '新聊天 — 提供商',
+			'workspace.closePane' => '关闭窗格',
+			'workspace.jumpToSession' => '跳转到会话…',
+			'workspace.archivedWorkspaceName' => '已归档',
 			'workspace.sendTo' => ({required Object count}) => '发送到 ${count}',
+			'workspace.deleteSessionNotice' => '移除会话及其记录。此操作无法撤销。',
 			'workspace.accountWithLabel' => ({required Object label}) => '默认 · ${label}',
 			'workspace.finishRunBeforeChangingWorkspace' => '请先结束运行再更改工作区',
 			'workspace.restored' => '工作区已恢复',
 			'workspace.maximizePane' => '最大化窗格',
 			'workspace.restorePanes' => '恢复窗格',
 			'workspace.reviewChangedFiles' => '查看更改的文件',
+			'workspace.paneTitle.chat' => '聊天',
+			'workspace.paneTitle.browser' => '浏览器',
+			'workspace.paneTitle.terminal' => '终端',
+			'workspace.paneTitle.notes' => '共享笔记',
+			'workspace.paneTitle.editor' => '编辑器',
+			'workspace.paneTitle.git' => 'Git',
+			'workspace.addEditorPane' => '添加编辑器窗格',
+			'workspace.addGitPane' => '添加 Git 窗格',
+			'workspace.unknownProjectPath' => '未知的项目路径',
+			'workspace.autoMini' => '自动 (mini)',
+			'workspace.exportAs' => '导出为：',
+			'workspace.exportMarkdown' => 'Markdown (.md)',
+			'workspace.exportHtml' => '网页 (.html)',
+			'workspace.exportPdf' => 'PDF（打印到文件）',
+			'workspace.matchPosition' => ({required Object current, required Object total}) => '${current} / ${total}',
+			'workspace.launcherDescription' => '为此窗格选择一个工作区，或新建一个。',
+			'workspace.createWorkspace' => '创建工作区',
+			'worktrees.scripts' => '脚本',
+			'worktrees.emptyTitle' => '未找到 worktree',
+			'worktrees.emptyDescription' => '创建 worktree 以隔离功能开发或代理运行。',
+			'worktrees.opened' => ({required Object branch}) => '已打开 worktree：${branch}',
+			'worktrees.created' => 'Worktree 已创建',
+			'worktrees.removed' => 'Worktree 已移除',
+			'worktrees.merged' => ({required Object branch}) => 'Worktree 已合并到 ${branch}',
+			'worktrees.scriptsSaved' => '脚本配置已保存',
+			'worktrees.setupLabel' => '初始化： ',
+			'worktrees.serverLabel' => '服务器： ',
+			'worktrees.runRunning' => '运行中',
+			'worktrees.runRunningWithPort' => ({required Object port}) => '运行中 :${port}',
+			'worktrees.runButton' => '运行',
+			'worktrees.stopButton' => '停止',
+			'worktrees.mainBadge' => 'main',
+			'worktrees.headDetachedAt' => ({required Object sha}) => 'HEAD 分离于 ${sha}',
+			'worktrees.branchHint' => '新分支名称（例如 feature/login）',
+			'worktrees.branchingOff' => ({required Object branch}) => '从 ${branch} 创建分支',
+			'worktrees.mergeTitle' => ({required Object branch}) => '合并 ${branch}',
+			'worktrees.mergeDescription' => ({required Object branch}) => '将更改合并到 ${branch}。',
+			'worktrees.squashDescription' => '将所有提交合并为单个提交',
+			'worktrees.cleanupDescription' => '合并后移除 worktree 并删除分支',
+			'worktrees.removeTitle' => ({required Object branch}) => '移除 worktree ${branch}？',
+			'worktrees.removeDescription' => '这将删除 worktree 文件夹。关联的项目将被归档。',
+			'worktrees.dirtyWarning' => ({required Object count}) => '警告：此 worktree 有 ${count} 个未提交的更改将会丢失。',
+			'worktrees.forceRemoveLabel' => '强制移除（放弃更改）',
+			'worktrees.deleteBranchLabel' => '同时删除分支',
+			'worktrees.setupHint' => '初始化命令（例如 npm install）',
+			'worktrees.runHint' => '运行命令（例如 npm run dev）',
+			'worktrees.portHint' => '运行端口（可选，例如 3000）',
+			'worktrees.unknownSha' => '未知',
+			'worktrees.baseBranchFallback' => '基础分支',
+			'worktrees.runtimeStatus.idle' => '空闲',
+			'worktrees.runtimeStatus.running' => '运行中',
+			'worktrees.runtimeStatus.done' => '已完成',
+			'worktrees.runtimeStatus.failed' => '失败',
+			'worktrees.runtimeStatus.exited' => '已退出',
+			'browserUse.sessionStatus.ready' => '就绪',
+			'browserUse.sessionStatus.stopped' => '已停止',
+			'browserUse.sessionStatus.unavailable' => '不可用',
+			'orchestrator.stepFallback' => ({required Object n}) => '步骤 ${n}',
+			'miniOrchestrator.taskTypes.gate' => '关卡',
+			'miniOrchestrator.roles.thinker' => '思考者',
+			'miniOrchestrator.roles.worker' => '执行者',
 			_ => null,
 		};
 	}

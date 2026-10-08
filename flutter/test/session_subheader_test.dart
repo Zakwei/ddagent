@@ -6,6 +6,7 @@ import 'package:ddagent_app/features/queue/data/queue_repository.dart';
 import 'package:ddagent_app/features/quota/data/quota_models.dart';
 import 'package:ddagent_app/features/quota/data/quota_repository.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -120,19 +121,21 @@ Widget _app(
   double width = 900,
   QuotaRepository? quota,
   SessionsRepository? sessions,
-}) => ProviderScope(
-  overrides: [
-    sessionsRepositoryProvider.overrideWithValue(sessions ?? _FakeSessions()),
-    quotaRepositoryProvider.overrideWithValue(quota ?? _FakeQuota()),
-    providerAccountsRepositoryProvider.overrideWithValue(_FakeAccounts()),
-    queueRepositoryProvider.overrideWithValue(_FakeQueue()),
-    commandsRepositoryProvider.overrideWithValue(_FakeCommands()),
-  ],
-  child: MaterialApp(
-    theme: AppTheme.ocChat(),
-    home: MediaQuery(
-      data: MediaQueryData(size: Size(width, 800)),
-      child: Scaffold(body: child),
+}) => TranslationProvider(
+  child: ProviderScope(
+    overrides: [
+      sessionsRepositoryProvider.overrideWithValue(sessions ?? _FakeSessions()),
+      quotaRepositoryProvider.overrideWithValue(quota ?? _FakeQuota()),
+      providerAccountsRepositoryProvider.overrideWithValue(_FakeAccounts()),
+      queueRepositoryProvider.overrideWithValue(_FakeQueue()),
+      commandsRepositoryProvider.overrideWithValue(_FakeCommands()),
+    ],
+    child: MaterialApp(
+      theme: AppTheme.ocChat(),
+      home: MediaQuery(
+        data: MediaQueryData(size: Size(width, 800)),
+        child: Scaffold(body: child),
+      ),
     ),
   ),
 );

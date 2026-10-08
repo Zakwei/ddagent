@@ -613,7 +613,7 @@ void main() {
       expect(find.text('2 total'), findsOneWidget);
       expect(find.text('Test App'), findsWidgets);
       expect(find.text('Status'), findsOneWidget);
-      expect(find.text('ready'), findsWidgets);
+      expect(find.text('Ready'), findsWidgets);
       expect(find.text('Profile'), findsOneWidget);
       expect(find.text('Temporary'), findsOneWidget);
     });
@@ -638,7 +638,7 @@ void main() {
       // Wybór drugiej sesji przełącza widok
       await tester.tap(find.text('example.com').first);
       await tester.pumpAndSettle();
-      expect(find.text('stopped'), findsWidgets);
+      expect(find.text('Stopped'), findsWidgets);
     });
 
     testWidgets('pusty stan: install runtime + karty promptów', (tester) async {

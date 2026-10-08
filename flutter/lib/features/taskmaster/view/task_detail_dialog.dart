@@ -117,7 +117,11 @@ class _TaskDetailDialogState extends ConsumerState<TaskDetailDialog> {
         _error = '';
       });
     } else {
-      setState(() => _error = ref.read(taskmasterProvider).error ?? 'Failed');
+      setState(
+        () => _error =
+            ref.read(taskmasterProvider).error ??
+            Translations.of(context).tasks.taskDetail.updateFailed,
+      );
     }
   }
 
@@ -158,7 +162,7 @@ class _TaskDetailDialogState extends ConsumerState<TaskDetailDialog> {
       context,
       title: i18n.tasks.taskDetail.deleteConfirmTitle,
       message: i18n.tasks.taskDetail.deleteConfirmMessage(id: task.idText),
-      confirmLabel: 'Delete',
+      confirmLabel: i18n.common.buttons.delete,
     );
     if (!ok || !mounted) return;
     final done = await ref.read(taskmasterProvider.notifier).deleteTask(task.idText);
@@ -228,7 +232,8 @@ class _TaskDetailDialogState extends ConsumerState<TaskDetailDialog> {
                                 }
                               },
                         items: [
-                          for (final s in taskStatuses) DropdownMenuItem(value: s, child: Text(s)),
+                          for (final s in taskStatuses)
+                            DropdownMenuItem(value: s, child: Text(taskStatusLabel(s, i18n))),
                         ],
                       ),
                     ],
@@ -248,7 +253,7 @@ class _TaskDetailDialogState extends ConsumerState<TaskDetailDialog> {
             ),
             const SizedBox(height: AppSpacing.sm),
             if (_editing) ...[
-              field('Title', _title),
+              field(i18n.tasks.createTask.titleLabel, _title),
               const SizedBox(height: AppSpacing.sm),
               field(i18n.tasks.taskDetail.description, _description, lines: 3),
               const SizedBox(height: AppSpacing.sm),
@@ -256,7 +261,7 @@ class _TaskDetailDialogState extends ConsumerState<TaskDetailDialog> {
               const SizedBox(height: AppSpacing.sm),
               field(i18n.tasks.taskDetail.testStrategy, _testStrategy, lines: 2),
               const SizedBox(height: AppSpacing.sm),
-              field('Dependencies (comma-separated ids)', _deps),
+              field(i18n.tasks.taskmaster.detail.dependenciesLabel, _deps),
               const SizedBox(height: AppSpacing.sm),
               Text(
                 i18n.tasks.taskDetail.priority,
@@ -267,7 +272,10 @@ class _TaskDetailDialogState extends ConsumerState<TaskDetailDialog> {
                 isDense: true,
                 underline: const SizedBox.shrink(),
                 onChanged: (v) => v == null ? null : setState(() => _priority = v),
-                items: [for (final p in taskPriorities) DropdownMenuItem(value: p, child: Text(p))],
+                items: [
+                  for (final p in taskPriorities)
+                    DropdownMenuItem(value: p, child: Text(taskPriorityLabel(p, i18n))),
+                ],
               ),
             ] else ...[
               Text(
@@ -275,7 +283,7 @@ class _TaskDetailDialogState extends ConsumerState<TaskDetailDialog> {
                 style: t.labelSmall?.copyWith(color: c.mutedForeground),
               ),
               Text(
-                task.description.isEmpty ? 'No description provided' : task.description,
+                task.description.isEmpty ? i18n.tasks.taskDetail.noDescription : task.description,
                 style: t.bodySmall,
               ),
               if (task.details.isNotEmpty) ...[
@@ -424,7 +432,10 @@ class _CreateTaskDialogState extends ConsumerState<CreateTaskDialog> {
                 isDense: true,
                 underline: const SizedBox.shrink(),
                 onChanged: (v) => v == null ? null : setState(() => _priority = v),
-                items: [for (final p in taskPriorities) DropdownMenuItem(value: p, child: Text(p))],
+                items: [
+                  for (final p in taskPriorities)
+                    DropdownMenuItem(value: p, child: Text(taskPriorityLabel(p, i18n))),
+                ],
               ),
             ),
           ],

@@ -81,7 +81,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
           .read(terminalControllerProvider.notifier)
           .createTab(
             title: widget.sessionId != null
-                ? 'Session ${widget.sessionId}'
+                ? t.chat.export.sessionTitle(id: widget.sessionId!)
                 : t.terminal.tabs.shellName(index: 1),
             projectPath: path,
             sessionId: widget.sessionId,
@@ -504,7 +504,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'Auth link: $authUrl',
+              t.terminal.authUrl.linkLabel(url: authUrl),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -540,12 +540,12 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
           Icon(Icons.terminal, size: 48, color: colors.mutedForeground),
           const SizedBox(height: 12),
           Text(
-            'No Active Terminal',
+            t.terminal.empty.title,
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: colors.foreground),
           ),
           const SizedBox(height: 8),
           Text(
-            'Create a new tab to begin',
+            t.terminal.empty.description,
             style: TextStyle(fontSize: 13, color: colors.mutedForeground),
           ),
           const SizedBox(height: 16),
@@ -584,11 +584,13 @@ class _ConnectionOverlay extends StatelessWidget {
     final connecting = tab.status == TerminalTabStatus.connecting;
     final description = switch (tab.status) {
       TerminalTabStatus.exited =>
-        'Process exited${tab.exitCode != null ? ' (code ${tab.exitCode})' : ''} — connect to start it again',
+        tab.exitCode != null
+            ? t.terminal.overlay.processExitedWithCode(code: tab.exitCode!)
+            : t.terminal.overlay.processExited,
       _ =>
         tab.sessionId != null
-            ? 'Resume session ${tab.title}'
-            : 'Start a new session in ${tab.projectPath}',
+            ? t.terminal.overlay.resumeSession(title: tab.title)
+            : t.terminal.overlay.startSession(path: tab.projectPath),
     };
     return Container(
       color: const Color(0xE6030713), // gray-950/90
@@ -597,20 +599,20 @@ class _ConnectionOverlay extends StatelessWidget {
             ? Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Row(
+                  Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      SizedBox.square(
+                      const SizedBox.square(
                         dimension: 16,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
                           color: Color(0xFFFDE047), // yellow-300
                         ),
                       ),
-                      SizedBox(width: 12),
+                      const SizedBox(width: 12),
                       Text(
-                        'Connecting…',
-                        style: TextStyle(
+                        t.serverConnect.connecting,
+                        style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w500,
                           color: Color(0xFFFDE047),

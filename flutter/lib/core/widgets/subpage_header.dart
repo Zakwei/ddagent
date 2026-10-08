@@ -2,6 +2,7 @@ import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_interactive.dart';
 import 'package:ddagent_app/core/widgets/app_nav_menu.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -15,7 +16,7 @@ class SubpageHeader extends StatelessWidget {
     super.key,
     this.title,
     this.icon,
-    this.backLabel = 'Back to chat',
+    this.backLabel,
     this.backRoute = '/workspace',
     this.showBack = true,
     this.children = const [],
@@ -24,7 +25,9 @@ class SubpageHeader extends StatelessWidget {
 
   final String? title;
   final IconData? icon;
-  final String backLabel;
+
+  /// Back-button label; defaults to the localized "Back to chat".
+  final String? backLabel;
 
   /// Route for the back button — `/workspace` is the new app's chat home
   /// (old app navigates to `/`).
@@ -70,7 +73,10 @@ class SubpageHeader extends StatelessWidget {
                     // Web `hidden sm:inline` — compact widths keep only the
                     // arrow so the header cannot overflow.
                     if (!context.breakpoint.isCompact)
-                      Text(backLabel, style: t.textTheme.bodyMedium),
+                      Text(
+                        backLabel ?? Translations.of(context).common.navigation.backToChat,
+                        style: t.textTheme.bodyMedium,
+                      ),
                   ],
                 ),
               ),

@@ -14,6 +14,7 @@ import 'package:ddagent_app/features/sessions/state/session_activity.dart';
 import 'package:ddagent_app/features/sessions/state/session_store.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
 import 'package:ddagent_app/features/voice/state/tts_controller.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// History page size for the initial load — matches the web client's
@@ -677,7 +678,7 @@ class TranscriptController extends Notifier<TranscriptState> {
             'id': 'protocol_error_${DateTime.now().millisecondsSinceEpoch}',
             'sessionId': _sessionId,
             'kind': 'error',
-            'content': raw['error']?.toString() ?? 'Request failed',
+            'content': raw['error']?.toString() ?? t.chat.transcript.requestFailed,
             'timestamp': DateTime.now().toIso8601String(),
           }),
         );

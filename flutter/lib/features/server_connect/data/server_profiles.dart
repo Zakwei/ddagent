@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:ddagent_app/core/config/env.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -127,7 +128,7 @@ final serverProfilesProvider = NotifierProvider<ServerProfilesController, Server
 /// server without touching the authed Dio instance (port of testConnection).
 Future<({bool ok, String? error})> probeServer(String raw) async {
   final base = normalizeServerUrl(raw);
-  if (base.isEmpty) return (ok: false, error: 'empty-url');
+  if (base.isEmpty) return (ok: false, error: t.serverConnect.enterUrl);
   try {
     final res = await Dio(
       BaseOptions(
@@ -137,9 +138,9 @@ Future<({bool ok, String? error})> probeServer(String raw) async {
     ).get<dynamic>('$base/api/auth/status');
     return res.statusCode == 200
         ? (ok: true, error: null)
-        : (ok: false, error: 'http-${res.statusCode}');
+        : (ok: false, error: t.serverConnect.httpStatus(code: res.statusCode ?? 0));
   } on DioException catch (e) {
-    return (ok: false, error: e.message ?? 'network-error');
+    return (ok: false, error: e.message ?? t.serverConnect.networkError);
   } on Object catch (e) {
     // Malformed URL / parse failures never surface as DioException — treat
     // them as a failed probe instead of letting the throw escape the caller.

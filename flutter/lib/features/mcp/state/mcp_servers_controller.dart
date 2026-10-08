@@ -7,6 +7,7 @@ import 'package:ddagent_app/features/mcp/data/mcp_models.dart';
 import 'package:ddagent_app/features/mcp/data/mcp_repository.dart';
 import 'package:ddagent_app/features/projects/data/projects_repository.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Server list state — port of the `useMcpServers` return value (minus the
@@ -197,7 +198,7 @@ class McpServersController extends Notifier<McpServersState> {
   Future<String?> submit(Map<String, dynamic> payload, {McpServer? editing}) async {
     if (payload['scope'] != McpScope.user.wire &&
         ((payload['workspacePath'] as String?) ?? '').isEmpty) {
-      return 'Select a project for project-scoped MCP servers';
+      return t.mcp.servers.selectProjectRequired;
     }
     try {
       await _repo.upsert(provider, payload);
@@ -217,12 +218,11 @@ class McpServersController extends Notifier<McpServersState> {
   /// `formatGlobalAddFailures`).
   Future<String?> submitGlobal(Map<String, dynamic> payload) async {
     if (payload['scope'] == McpScope.local.wire) {
-      return 'Add MCP Server supports only user or project scope across '
-          'all providers.';
+      return t.mcp.servers.globalScopeUnsupported;
     }
     if (payload['scope'] != McpScope.user.wire &&
         ((payload['workspacePath'] as String?) ?? '').isEmpty) {
-      return 'Select a project for project-scoped MCP servers';
+      return t.mcp.servers.selectProjectRequired;
     }
     try {
       final results = await _repo.saveGlobal(payload);
@@ -233,8 +233,15 @@ class McpServersController extends Notifier<McpServersState> {
           if (!r.created) r,
       ];
       if (failures.isEmpty) return null;
-      return 'Failed to add MCP server to all providers. '
-          '${failures.map((f) => '${mcpProviderName(f.provider)}: ${f.error ?? 'Unknown error'}').join('; ')}';
+      return t.mcp.servers.globalAddFailed(
+        details: failures
+            .map(
+              (f) =>
+                  '${mcpProviderName(f.provider)}: '
+                  '${f.error ?? t.common.messages.unknownError}',
+            )
+            .join('; '),
+      );
     } on AppError catch (e) {
       return e.message;
     }

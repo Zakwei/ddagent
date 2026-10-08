@@ -300,6 +300,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
     final c = context.appColors;
     final m = topBarMetrics(context);
     final compact = context.breakpoint.isCompact;
+    final i18n = Translations.of(context);
     Widget btn(IconData icon, String tip, VoidCallback? onPressed) => IconButton(
       tooltip: tip,
       onPressed: onPressed,
@@ -310,10 +311,14 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
     );
     final buttons = <Widget>[
       const AppNavMenuButton(),
-      btn(LucideIcons.messageSquarePlus, 'Add chat pane', canAdd ? _addChat : null),
+      btn(
+        LucideIcons.messageSquarePlus,
+        i18n.chat.splitWorkspace.addChat,
+        canAdd ? _addChat : null,
+      ),
       btn(
         LucideIcons.globe,
-        'Add browser pane',
+        i18n.chat.splitWorkspace.addBrowser,
         // One remote Chromium stream per workspace — the server ignores a
         // second `start` on the shared /browser-view socket, so a second
         // pane would only fight over the same page.
@@ -321,22 +326,34 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
             ? () => _add(PaneKind.browser)
             : null,
       ),
-      btn(LucideIcons.terminal, 'Add terminal pane', canAdd ? () => _add(PaneKind.terminal) : null),
+      btn(
+        LucideIcons.terminal,
+        i18n.chat.splitWorkspace.addTerminal,
+        canAdd ? () => _add(PaneKind.terminal) : null,
+      ),
       btn(
         // React uses NotebookPen for the shared-notes pane button.
         LucideIcons.notebookPen,
-        'Add shared-notes pane',
+        i18n.chat.splitWorkspace.addNotes,
         canAdd ? () => _add(PaneKind.notes) : null,
       ),
-      btn(LucideIcons.code, 'Add editor pane', canAdd ? () => _add(PaneKind.editor) : null),
-      btn(LucideIcons.gitBranch, 'Add git pane', canAdd ? () => _add(PaneKind.git) : null),
-      btn(LucideIcons.megaphone, 'Broadcast to sessions', _openBroadcast),
+      btn(
+        LucideIcons.code,
+        i18n.workspace.addEditorPane,
+        canAdd ? () => _add(PaneKind.editor) : null,
+      ),
+      btn(
+        LucideIcons.gitBranch,
+        i18n.workspace.addGitPane,
+        canAdd ? () => _add(PaneKind.git) : null,
+      ),
+      btn(LucideIcons.megaphone, i18n.chat.splitWorkspace.broadcast, _openBroadcast),
       // Compact overflows the 40px targets, so the row scrolls instead of
       // clamping; the Spacer only makes sense on the non-scrolling row.
       if (!compact) const Spacer(),
       btn(
         LucideIcons.layoutGrid,
-        'Show all panes',
+        i18n.chat.splitWorkspace.overview,
         () => _openOverview(overviewPanes, onSelectPane),
       ),
       // Focus mode — web hides this on `sm:` (desktop-only); it toggles
@@ -346,7 +363,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
           ref.watch(uiPreferencesProvider).sidebarVisible
               ? LucideIcons.maximize2
               : LucideIcons.minimize2,
-          'Focus Mode (Ctrl+Shift+F)',
+          i18n.chat.splitWorkspace.focusMode,
           () => ref.read(uiPreferencesProvider.notifier).toggleSidebar(),
         ),
     ];
@@ -471,7 +488,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
       context,
       title: i18n.sidebar.deleteConfirmation.archiveSession,
       message: i18n.sidebar.deleteConfirmation.archiveSessionNotice,
-      confirmLabel: 'Archive session',
+      confirmLabel: i18n.sidebar.deleteConfirmation.archiveSession,
     );
     if (!ok) return;
     final err = await ref.read(sessionsProvider(_scope).notifier).archive(id);
@@ -489,7 +506,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
       context,
       title: i18n.common.browserUse.deleteSession,
       message: i18n.workspace.deleteSessionNotice,
-      confirmLabel: 'Delete',
+      confirmLabel: i18n.common.buttons.delete,
     );
     if (!ok) return;
     final err = await ref.read(sessionsProvider(_scope).notifier).hardDelete(id);
@@ -617,7 +634,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
             if (p.projectId == pane.projectId) p.path,
         ].firstOrNull;
         if (path == null || path.isEmpty) {
-          throw StateError('Unknown project path');
+          throw StateError(i18n.workspace.unknownProjectPath);
         }
         final sessionId = provider == 'mini-orchestrator'
             ? await createMiniOrchestratorSession(ref, projectPath: path)
@@ -637,7 +654,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
           if (p.projectId == pane.projectId) p.fullPath ?? p.path,
       ].firstOrNull;
       if (projectPath == null || projectPath.isEmpty) {
-        throw StateError('Unknown project path');
+        throw StateError(i18n.workspace.unknownProjectPath);
       }
       final s = await ref.read(sessionsRepositoryProvider).createSession({
         'provider': provider,
@@ -649,7 +666,8 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
           .read(workspaceProvider.notifier)
           .updatePane(pane.id, sessionId: () => s.sessionId, picker: false);
     } on Object catch (e) {
-      if (mounted) AppToast.error(context, i18n.sessions.createFailed(error: '$e'));
+      final error = e is StateError ? e.message : '$e';
+      if (mounted) AppToast.error(context, i18n.sessions.createFailed(error: error));
     }
   }
 }

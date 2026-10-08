@@ -259,7 +259,7 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
               ListTile(
                 dense: true,
                 leading: const Icon(Icons.folder_outlined, size: 18),
-                title: Text(d.isEmpty ? '(project root)' : d),
+                title: Text(d.isEmpty ? t.fileTree.projectRoot : d),
                 onTap: () => AppDialog.pop(context, d),
               ),
           ],
@@ -291,19 +291,16 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
     if (dropped.isEmpty) {
       return;
     }
+    final t = Translations.of(context);
     if (dropped.length > _kMaxUploadCount) {
-      AppToast.show(
-        context,
-        'You can upload up to $_kMaxUploadCount files at once.',
-        isError: true,
-      );
+      AppToast.show(context, t.fileTree.uploadLimitCount(count: _kMaxUploadCount), isError: true);
       return;
     }
     final files = <({String name, List<int> bytes})>[];
     for (final f in dropped) {
       if (await f.length() > _kMaxUploadBytes) {
         if (mounted) {
-          AppToast.show(context, '${f.name} is larger than 200MB.', isError: true);
+          AppToast.show(context, t.fileTree.fileTooLarge(name: f.name), isError: true);
         }
         return;
       }
@@ -333,8 +330,10 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
     final nameController = TextEditingController();
     final name = await AppDialog.show<String>(
       context,
-      title: type == 'directory' ? 'New folder' : 'New file',
-      content: AppInput(controller: nameController, hint: 'Name', autofocus: true),
+      title: type == 'directory'
+          ? t.common.fileOperations.newFolder
+          : t.chat.fileOperations.newFile,
+      content: AppInput(controller: nameController, hint: t.common.common.name, autofocus: true),
       actions: [
         AppButton(
           variant: AppButtonVariant.ghost,
@@ -399,10 +398,10 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
     final ok = await AppDialog.confirm(
       context,
       title: t.fileTree.titles.delete(name: node.name),
-      message:
-          'Delete ${node.isDirectory ? 'folder' : 'file'} "${node.path}"? '
-          'This cannot be undone.',
-      confirmLabel: 'Delete',
+      message: node.isDirectory
+          ? t.fileTree.deleteFolderConfirm(path: node.path)
+          : t.fileTree.deleteFileConfirm(path: node.path),
+      confirmLabel: t.common.buttons.delete,
     );
     if (!ok || !mounted) {
       return;
@@ -700,6 +699,7 @@ class _DropOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final t = Translations.of(context);
     return Positioned.fill(
       child: IgnorePointer(
         child: ColoredBox(
@@ -721,7 +721,7 @@ class _DropOverlay extends StatelessWidget {
                   Icon(LucideIcons.upload, size: 18, color: colors.primary),
                   const SizedBox(width: 8),
                   Text(
-                    'Drop files to upload',
+                    t.common.fileTree.dropToUpload,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -889,9 +889,13 @@ class _TreeToolbar extends StatelessWidget {
                 color: c.border,
               ),
               for (final (mode, icon, tip) in [
-                (FileTreeViewMode.simple, LucideIcons.list, 'Simple view'),
-                (FileTreeViewMode.compact, LucideIcons.eye, 'Compact view'),
-                (FileTreeViewMode.detailed, LucideIcons.tableProperties, 'Detailed view'),
+                (FileTreeViewMode.simple, LucideIcons.list, i18n.common.fileTree.simpleView),
+                (FileTreeViewMode.compact, LucideIcons.eye, i18n.common.fileTree.compactView),
+                (
+                  FileTreeViewMode.detailed,
+                  LucideIcons.tableProperties,
+                  i18n.common.fileTree.detailedView,
+                ),
               ])
                 _IconBtn(
                   tooltip: tip,
@@ -901,8 +905,8 @@ class _TreeToolbar extends StatelessWidget {
                 ),
               _IconBtn(
                 tooltip: recentOnly
-                    ? 'Show all files (recent only is on)'
-                    : 'Recent only (last 7 days)',
+                    ? i18n.common.fileTree.showAllFiles
+                    : i18n.common.fileTree.showRecentOnly,
                 icon: LucideIcons.calendarClock,
                 active: recentOnly,
                 onTap: onToggleRecentOnly,

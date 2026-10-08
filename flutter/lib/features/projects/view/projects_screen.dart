@@ -250,11 +250,11 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
           AppButton(
             variant: AppButtonVariant.ghost,
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(i18n.chat.orchestrator.summary.cancelTasks),
+            child: Text(i18n.common.buttons.cancel),
           ),
           AppButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(i18n.codeEditor.actions.save),
+            child: Text(i18n.common.buttons.save),
           ),
         ],
       ),
@@ -1323,7 +1323,7 @@ class _CloneDialogState extends ConsumerState<_CloneDialog> {
             _cancel?.cancel();
             Navigator.of(context).pop();
           },
-          child: Text(_done ? i18n.chat.common.close : i18n.chat.orchestrator.summary.cancelTasks),
+          child: Text(_done ? i18n.chat.common.close : i18n.common.buttons.cancel),
         ),
         if (!_done) AppButton(onPressed: _clone, loading: _busy, child: Text(i18n.projects.clone)),
       ],

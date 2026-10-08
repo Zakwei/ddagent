@@ -97,8 +97,8 @@ class _EditorDiffViewState extends ConsumerState<EditorDiffView> {
         title: Text(t.common.gitPanel.discardChanges),
         content: Text(
           base.isUntracked
-              ? 'This untracked file will be deleted.'
-              : 'Restore ${widget.tab.name} to its committed state?',
+              ? t.codeEditor.diff.untrackedWillBeDeleted
+              : t.codeEditor.diff.restoreConfirm(name: widget.tab.name),
         ),
         actions: [
           TextButton(
@@ -108,7 +108,7 @@ class _EditorDiffViewState extends ConsumerState<EditorDiffView> {
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: context.appColors.destructive),
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(base.isUntracked ? 'Delete' : 'Discard'),
+            child: Text(base.isUntracked ? t.common.buttons.delete : t.common.gitPanel.discard),
           ),
         ],
       ),
@@ -202,7 +202,9 @@ class _DiffHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final t = Translations.of(context);
-    final label = base.fromGit ? 'HEAD vs working copy' : 'Last saved vs buffer (no git)';
+    final label = base.fromGit
+        ? t.codeEditor.diff.headVsWorkingCopy
+        : t.codeEditor.diff.savedVsBuffer;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
       decoration: BoxDecoration(
@@ -212,7 +214,7 @@ class _DiffHeader extends StatelessWidget {
         children: [
           Text(label, style: Theme.of(context).textTheme.bodySmall),
           if (base.isUntracked)
-            _Tag(text: 'untracked', color: colors.primary)
+            _Tag(text: t.common.gitPanel.status.untracked, color: colors.primary)
           else if (base.isDeleted)
             _Tag(text: t.codeEditor.diff.deletedOnDisk, color: colors.destructive),
           const Spacer(),
@@ -263,6 +265,7 @@ class _ContextRows extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const keep = 2;
+    final t = Translations.of(context);
     if (lines.length <= 8 || expanded) {
       return Column(
         children: [for (final l in lines) _DiffLine(kind: _LineKind.context, text: l)],
@@ -278,7 +281,7 @@ class _ContextRows extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 2),
             color: context.appColors.muted.withValues(alpha: 0.3),
             child: Text(
-              '⋯ ${lines.length - keep * 2} unchanged lines',
+              '⋯ ${t.codeEditor.diff.unchangedLines(count: lines.length - keep * 2)}',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.labelSmall
                   ?.copyWith(color: context.appColors.mutedForeground),
@@ -449,9 +452,9 @@ class _DiffFooter extends StatelessWidget {
             onPressed: onDiscard,
             child: Text(
               fallbackMode
-                  ? 'Revert to saved'
+                  ? t.codeEditor.diff.revertToSaved
                   : untracked
-                  ? 'Delete file'
+                  ? t.git.deleteFile
                   : t.common.gitPanel.discardChanges,
             ),
           ),

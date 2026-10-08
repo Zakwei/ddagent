@@ -183,16 +183,17 @@ class TokenUsageChip extends ConsumerWidget {
     final usage = ref.watch(tokenUsageProvider(sessionId)).value;
     if (usage == null) return const SizedBox.shrink();
     final cs = Theme.of(context).colorScheme;
+    final u = Translations.of(context).chat.utilities;
     final pct = usage.contextPercent;
     final title = usage.unsupported
-        ? (usage.message ?? 'Token usage not available')
+        ? (usage.message ?? u.tokenUsageUnavailable)
         : [
-            '${usage.used.round()} tokens used',
-            if (pct != null) 'context $pct% of ${usage.total.round()}',
-            'input ${usage.input.round()}',
+            u.tooltip.tokensUsed(tokens: usage.used.round()),
+            if (pct != null) u.tooltip.contextOf(percent: pct, total: usage.total.round()),
+            u.tooltip.input(value: usage.input.round()),
             if (usage.cacheRead + usage.cacheCreation > 0)
-              'cache read ${usage.cacheRead.round()} · write ${usage.cacheCreation.round()}',
-            'output ${usage.output.round()}',
+              u.tooltip.cache(read: usage.cacheRead.round(), write: usage.cacheCreation.round()),
+            u.tooltip.output(value: usage.output.round()),
           ].join(' · ');
     return Tooltip(
       message: title,
@@ -249,12 +250,13 @@ class TokenUsageChip extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             for (final (label, value) in <(String, String)>[
-              ('Used', u.used.round().toString()),
-              ('Input', u.input.round().toString()),
-              ('Output', u.output.round().toString()),
-              ('Cache read', u.cacheRead.round().toString()),
-              ('Cache write', u.cacheCreation.round().toString()),
-              if (u.total > 0) ('Context', '${u.used.round()} / ${u.total.round()}'),
+              (t.chat.utilities.used, u.used.round().toString()),
+              (t.common.quota.metric.input, u.input.round().toString()),
+              (t.common.quota.metric.output, u.output.round().toString()),
+              (t.common.quota.metric.cache, u.cacheRead.round().toString()),
+              (t.chat.utilities.cacheWrite, u.cacheCreation.round().toString()),
+              if (u.total > 0)
+                (t.chat.utilities.contextLabel, '${u.used.round()} / ${u.total.round()}'),
             ])
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 2),
@@ -297,11 +299,11 @@ String _rowText(SessionMessage m) {
 }
 
 String transcriptToMarkdown(List<SessionMessage> messages, {String? title}) {
-  final b = StringBuffer('# ${title ?? 'Chat transcript'}\n\n');
+  final b = StringBuffer('# ${title ?? t.chat.utilities.chatTranscript}\n\n');
   for (final m in messages) {
     final text = _rowText(m).trim();
     if (text.isEmpty) continue;
-    final speaker = m.role == 'user' ? '**You:** ' : '';
+    final speaker = m.role == 'user' ? '**${t.chat.utilities.you}** ' : '';
     b.writeln('$speaker$text\n');
   }
   return b.toString();
@@ -310,13 +312,14 @@ String transcriptToMarkdown(List<SessionMessage> messages, {String? title}) {
 String _esc(String s) => s.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 
 String transcriptToHtml(List<SessionMessage> messages, {String? title}) {
+  final heading = _esc(title ?? t.chat.utilities.chatTranscript);
   final b = StringBuffer(
-    '<!doctype html><meta charset="utf-8"><title>${_esc(title ?? 'Chat transcript')}</title>'
+    '<!doctype html><meta charset="utf-8"><title>$heading</title>'
     '<style>body{font-family:sans-serif;max-width:800px;margin:auto;padding:16px}'
     '.user{background:#eef;border-radius:8px;padding:8px;margin:8px 0}'
     'pre{background:#f5f5f5;padding:8px;overflow-x:auto}</style>',
   );
-  b.write('<h1>${_esc(title ?? 'Chat transcript')}</h1>');
+  b.write('<h1>$heading</h1>');
   for (final m in messages) {
     final text = _rowText(m).trim();
     if (text.isEmpty) continue;
@@ -423,12 +426,12 @@ class SessionCompareDialog extends ConsumerWidget {
                 ),
                 const SizedBox(height: 8),
                 for (final (k, v) in <(String, String)>[
-                  ('Model', u.model ?? '—'),
-                  ('Used', u.used == null ? '—' : formatTokenCount(u.used!)),
-                  ('Input', u.input?.round().toString() ?? '—'),
-                  ('Output', u.output?.round().toString() ?? '—'),
-                  ('Cost', formatCostUsd(u.costUsd)),
-                  if (u.unsupported) ('', 'usage unsupported'),
+                  (t.common.commandPalette.compare.model, u.model ?? '—'),
+                  (t.chat.utilities.used, u.used == null ? '—' : formatTokenCount(u.used!)),
+                  (t.common.quota.metric.input, u.input?.round().toString() ?? '—'),
+                  (t.common.quota.metric.output, u.output?.round().toString() ?? '—'),
+                  (t.common.quota.metric.cost, formatCostUsd(u.costUsd)),
+                  if (u.unsupported) ('', t.chat.utilities.usageUnsupported),
                 ])
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 2),
@@ -458,8 +461,8 @@ String providerLabel(String provider) => switch (provider) {
   'commandcode' => 'Command Code',
   'antigravity' => 'Antigravity',
   'devin' => 'Devin',
-  'orchestrator' => 'Auto',
-  'mini-orchestrator' => 'Auto (mini)',
+  'orchestrator' => t.chat.messageTypes.orchestrator,
+  'mini-orchestrator' => t.chat.utilities.providerAutoMini,
   _ => 'Claude',
 };
 

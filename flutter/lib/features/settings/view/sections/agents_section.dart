@@ -316,10 +316,8 @@ class _AccountContent extends ConsumerWidget {
     'cursor' => t.settings.agents.account.cursor.description,
     'codex' => t.settings.agents.account.codex.description,
     'opencode' => t.settings.agents.account.opencode.description,
-    // Generated slang accessors lack `commandcode`/`antigravity` until i18n
-    // regen — the English literals mirror `agents.account.*.description`.
-    'commandcode' => 'Command Code CLI assistant',
-    'antigravity' => 'Antigravity CLI assistant',
+    'commandcode' => t.settings.agents.account.commandcode.description,
+    'antigravity' => t.settings.agents.account.antigravity.description,
     'devin' => t.settings.agents.account.devin.description,
     _ => '',
   };
@@ -816,6 +814,58 @@ class _AgentNotInstalledCard extends ConsumerWidget {
 }
 
 /// ProviderAccountsSection — named accounts CRUD + per-account usage probe.
+/// Opt-in limit failover: a session whose account hit its usage limit moves
+/// to another account of the same agent. The flag is server-wide, so every
+/// agent's account card shows the same switch.
+class _AccountAutoSwitchRow extends ConsumerWidget {
+  const _AccountAutoSwitchRow();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = Translations.of(context);
+    final c = context.appColors;
+    final tt = Theme.of(context).textTheme;
+    final autoSwitchT = t.settings.agents.accounts.autoSwitch;
+    final enabled = ref.watch(accountAutoSwitchProvider);
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(autoSwitchT.label, style: tt.bodySmall?.copyWith(fontWeight: FontWeight.w500)),
+              const SizedBox(height: 2),
+              Text(
+                autoSwitchT.description,
+                style: tt.labelSmall?.copyWith(color: c.mutedForeground),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: AppSpacing.md),
+        if (enabled.isLoading && !enabled.hasValue)
+          const AppSpinner(size: 16)
+        else
+          Switch(
+            value: enabled.value ?? false,
+            onChanged: enabled.hasError && !enabled.hasValue
+                ? null
+                : (value) async {
+                    final error = await ref
+                        .read(accountAutoSwitchProvider.notifier)
+                        .setEnabled(value);
+                    if (error != null && context.mounted) {
+                      AppToast.show(context, error, isError: true);
+                    }
+                  },
+          ),
+      ],
+    );
+  }
+}
+
 class _ProviderAccountsCard extends ConsumerStatefulWidget {
   const _ProviderAccountsCard({required this.agent});
 
@@ -930,6 +980,8 @@ class _ProviderAccountsCardState extends ConsumerState<_ProviderAccountsCard> {
           // Accounts only swap the CLI's config directory — the binary itself
           // is one host-wide install, so there is no per-account update action.
           Text(accountsT.sharedCli, style: tt.labelSmall?.copyWith(color: c.mutedForeground)),
+          const SizedBox(height: AppSpacing.md),
+          const _AccountAutoSwitchRow(),
 
           if (state.error != null) ...[
             const SizedBox(height: AppSpacing.sm),

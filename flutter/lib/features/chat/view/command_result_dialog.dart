@@ -43,39 +43,23 @@ class CommandResultDialog extends StatelessWidget {
   final ComposerArg arg;
 
   /// Web `modalMeta` — (icon, eyebrow, title, subtitle) per payload kind.
-  static const _meta = <String, (IconData, String, String, String)>{
-    'help': (
-      LucideIcons.circleHelp,
-      'Command center',
-      'Help & Shortcuts',
-      'Search built-ins, syntax patterns, and command usage.',
-    ),
-    'models': (
-      LucideIcons.cpu,
-      'Model selection',
-      'Choose a Model',
-      'Pick the model this provider should use.',
-    ),
-    'cost': (
-      LucideIcons.coins,
-      'Session telemetry',
-      'Token Usage',
-      'Input, output, and total token counts for this session.',
-    ),
-    'status': (
-      LucideIcons.activity,
-      'Runtime health',
-      'System Status',
-      'Version, provider, runtime, and environment details.',
-    ),
-  };
+  static (IconData, String, String, String)? _metaFor(Translations t, String action) {
+    final d = t.chat.commandDialog;
+    return switch (action) {
+      'help' => (LucideIcons.circleHelp, d.help.eyebrow, d.help.title, d.help.subtitle),
+      'models' => (LucideIcons.cpu, d.models.eyebrow, d.models.title, d.models.subtitle),
+      'cost' => (LucideIcons.coins, d.cost.eyebrow, d.cost.title, d.cost.subtitle),
+      'status' => (LucideIcons.activity, d.status.eyebrow, d.status.title, d.status.subtitle),
+      _ => null,
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
     final t = Translations.of(context);
     final action = result.action ?? '';
-    final meta = _meta[action];
+    final meta = _metaFor(t, action);
     final height = MediaQuery.sizeOf(context).height;
     return Dialog(
       backgroundColor: c.popover,
@@ -109,7 +93,7 @@ class CommandResultDialog extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          (meta?.$2 ?? 'Command').toUpperCase(),
+                          (meta?.$2 ?? t.chat.commandDialog.defaultEyebrow).toUpperCase(),
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.w600,
@@ -118,7 +102,7 @@ class CommandResultDialog extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          meta?.$3 ?? 'Command Result',
+                          meta?.$3 ?? t.chat.commandDialog.defaultTitle,
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -169,7 +153,7 @@ class CommandResultDialog extends StatelessWidget {
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
-                      'Esc closes the modal.',
+                      t.chat.commandDialog.escHint,
                       style: TextStyle(fontSize: 11, color: c.mutedForeground),
                     ),
                   ),
@@ -193,8 +177,8 @@ class CommandResultDialog extends StatelessWidget {
 
 /// `providerLabel` plus the web's `getProviderLabel` fallback: an unknown
 /// provider id renders as written instead of collapsing to Claude.
-String _providerLabelOf(String? provider, [String fallback = 'Unknown']) {
-  if (provider == null || provider.isEmpty) return fallback;
+String _providerLabelOf(String? provider, [String? fallback]) {
+  if (provider == null || provider.isEmpty) return fallback ?? t.chat.commandDialog.unknown;
   const known = {
     'claude',
     'cursor',
@@ -405,7 +389,7 @@ class _HelpContentState extends State<_HelpContent> {
                               padding: const EdgeInsets.only(top: 8),
                               child: Text(
                                 cmd.description.isEmpty
-                                    ? 'No description available.'
+                                    ? t.chat.commandDialog.noDescription
                                     : cmd.description,
                                 style: TextStyle(
                                   fontSize: 12,
@@ -429,7 +413,7 @@ class _HelpContentState extends State<_HelpContent> {
                   ),
                   child: Center(
                     child: Text(
-                      'No commands match that filter.',
+                      t.chat.commandDialog.noCommandsMatch,
                       style: TextStyle(fontSize: 13, color: c.mutedForeground),
                     ),
                   ),
@@ -452,7 +436,7 @@ class _HelpContentState extends State<_HelpContent> {
                       children: [
                         Icon(LucideIcons.squareTerminal, size: 14, color: c.primary),
                         Text(
-                          'Syntax',
+                          t.chat.commandDialog.syntax.title,
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
@@ -462,11 +446,15 @@ class _HelpContentState extends State<_HelpContent> {
                       ],
                     ),
                     const SizedBox(height: 8),
-                    for (final line in const [
+                    for (final line in [
                       '/command arg1 arg2',
-                      '\$ARGUMENTS passes all args; \$1, \$2 positional.',
-                      '@file includes file contents.',
-                      '!command runs bash.',
+                      t.chat.commandDialog.syntax.arguments(
+                        arguments: '\$ARGUMENTS',
+                        first: '\$1',
+                        second: '\$2',
+                      ),
+                      t.chat.commandDialog.syntax.file(token: '@file'),
+                      t.chat.commandDialog.syntax.bash(token: '!command'),
                     ])
                       Text(
                         line,
@@ -528,10 +516,11 @@ class _ModelsContentState extends ConsumerState<_ModelsContent> {
   }
 
   Future<void> _select(String id) async {
+    final t = Translations.of(context);
     setState(() => _selecting = id);
     try {
       await ref.read(composerProvider(widget.arg).notifier).selectModel(id);
-      if (mounted) setState(() => _notice = 'Model set to $id.');
+      if (mounted) setState(() => _notice = t.chat.commandDialog.models.modelSetTo(model: id));
     } on Object catch (e) {
       if (mounted) setState(() => _notice = '$e');
     } finally {
@@ -549,7 +538,7 @@ class _ModelsContentState extends ConsumerState<_ModelsContent> {
         : const <String, dynamic>{};
     final provider = '${current['provider'] ?? widget.arg.provider}';
     final pLabel = '${current['providerLabel'] ?? _providerLabelOf(provider)}';
-    final currentModel = state.activeModel ?? '${current['model'] ?? 'Unknown'}';
+    final currentModel = state.activeModel ?? '${current['model'] ?? t.chat.commandDialog.unknown}';
     final options = _options(state);
     final q = _query.trim().toLowerCase();
     final searched = q.isEmpty
@@ -585,7 +574,7 @@ class _ModelsContentState extends ConsumerState<_ModelsContent> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        'ACTIVE MODEL · ${pLabel.toUpperCase()}',
+                        '${t.chat.commandDialog.models.activeModel.toUpperCase()} · ${pLabel.toUpperCase()}',
                         style: TextStyle(
                           fontSize: 9,
                           fontWeight: FontWeight.w600,
@@ -639,7 +628,7 @@ class _ModelsContentState extends ConsumerState<_ModelsContent> {
           child: shown.isEmpty
               ? Center(
                   child: Text(
-                    'No models match that filter.',
+                    t.chat.commandDialog.models.noModelsMatch,
                     style: TextStyle(fontSize: 13, color: c.mutedForeground),
                   ),
                 )
@@ -656,8 +645,8 @@ class _ModelsContentState extends ConsumerState<_ModelsContent> {
             child: Text(
               _notice ??
                   (widget.arg.sessionId?.isNotEmpty ?? false
-                      ? 'Your choice is saved for this session and becomes the default for new chats.'
-                      : 'Your choice becomes the default model for new chats.'),
+                      ? t.chat.commandDialog.models.choiceSavedForSession
+                      : t.chat.commandDialog.models.choiceDefault),
               style: TextStyle(
                 fontSize: 11,
                 height: 16 / 11,
@@ -671,6 +660,7 @@ class _ModelsContentState extends ConsumerState<_ModelsContent> {
   }
 
   Widget _modelTile(AppColors c, ComposerState state, Map<String, dynamic> m) {
+    final t = Translations.of(context);
     final id = _id(m);
     final label = _label(m);
     final isCurrent = id == state.activeModel;
@@ -715,10 +705,13 @@ class _ModelsContentState extends ConsumerState<_ModelsContent> {
                       ),
                     ),
                     if (isFree) ...[
-                      const _Chip('Free', color: Color(0xFF10B981)),
+                      _Chip(t.chat.providerSelection.free, color: const Color(0xFF10B981)),
                       const SizedBox(width: 6),
                     ],
-                    if (isCustom) ...[const _Chip('Custom'), const SizedBox(width: 6)],
+                    if (isCustom) ...[
+                      _Chip(t.chat.commandDialog.models.custom),
+                      const SizedBox(width: 6),
+                    ],
                     if (busy)
                       SizedBox.square(
                         dimension: 14,
@@ -749,7 +742,7 @@ class _ModelsContentState extends ConsumerState<_ModelsContent> {
                   Padding(
                     padding: const EdgeInsets.only(top: 6),
                     child: Text(
-                      'CURRENT SELECTION',
+                      t.chat.commandDialog.models.currentSelection.toUpperCase(),
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w600,
@@ -777,6 +770,7 @@ class _TierPills extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
+    final i18n = Translations.of(context).chat.providerSelection;
     Widget pill(String t, String label) {
       final active = tier == t;
       return GestureDetector(
@@ -811,7 +805,7 @@ class _TierPills extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           spacing: 2,
-          children: [pill('all', 'All'), pill('free', 'Free'), pill('paid', 'Paid')],
+          children: [pill('all', i18n.all), pill('free', i18n.free), pill('paid', i18n.paid)],
         ),
       ),
     );
@@ -828,6 +822,8 @@ class _CostContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
+    final t = Translations.of(context);
+    final d = t.chat.commandDialog;
     final usage = data['tokenUsage'] is Map ? data['tokenUsage'] as Map : const <String, dynamic>{};
     final breakdown = data['tokenBreakdown'] is Map ? data['tokenBreakdown'] as Map : null;
     final used = _numOf(usage['used']);
@@ -849,17 +845,20 @@ class _CostContent extends StatelessWidget {
     final unsupported = data['unsupported'] == true;
 
     final rows = <(String, String)>[
-      ('Total tokens used', _fmtNum(used)),
+      (d.cost.totalTokensUsed, _fmtNum(used)),
       if (hasBreakdown) ...[
-        ('Input tokens', _fmtNum(_numOf(breakdown?['input']))),
-        if (cacheRead > 0) ('Cache read tokens', _fmtNum(cacheRead)),
-        if (cacheCreation > 0) ('Cache write tokens', _fmtNum(cacheCreation)),
-        ('Output tokens', _fmtNum(_numOf(breakdown?['output']))),
+        (d.cost.inputTokens, _fmtNum(_numOf(breakdown?['input']))),
+        if (cacheRead > 0) (d.cost.cacheReadTokens, _fmtNum(cacheRead)),
+        if (cacheCreation > 0) (d.cost.cacheWriteTokens, _fmtNum(cacheCreation)),
+        (d.cost.outputTokens, _fmtNum(_numOf(breakdown?['output']))),
       ] else
-        ('Breakdown', 'Unavailable'),
-      if (total > 0) ('Context window', _fmtNum(total)),
+        (d.cost.breakdown, d.cost.unavailable),
+      if (total > 0) (d.cost.contextWindow, _fmtNum(total)),
       if (estimated != null)
-        (reportedCost > 0 ? 'Cost' : 'Estimated cost', formatCostUsd(estimated)),
+        (
+          reportedCost > 0 ? t.common.quota.metric.cost : d.cost.estimatedCost,
+          formatCostUsd(estimated),
+        ),
     ];
 
     return ListView(
@@ -925,8 +924,16 @@ class _CostContent extends StatelessWidget {
           child: Row(
             children: [
               for (final (label, value, mono) in [
-                ('PROVIDER', _providerLabelOf(data['provider']?.toString()), false),
-                ('MODEL', '${data['model'] ?? 'Unknown'}', true),
+                (
+                  t.common.commandPalette.compare.provider.toUpperCase(),
+                  _providerLabelOf(data['provider']?.toString(), d.unknown),
+                  false,
+                ),
+                (
+                  t.common.commandPalette.compare.model.toUpperCase(),
+                  '${data['model'] ?? d.unknown}',
+                  true,
+                ),
               ])
                 Expanded(
                   child: Column(
@@ -972,20 +979,31 @@ class _StatusContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
+    final t = Translations.of(context);
+    final d = t.chat.commandDialog;
+    final unknown = d.unknown;
     const emerald = Color(0xFF10B981);
     final memory = data['memoryUsage'] is Map
         ? data['memoryUsage'] as Map
         : const <String, dynamic>{};
     final rssMb = memory['rssMb'];
     final rows = <(String, String, IconData)>[
-      ('Package', '${data['packageName'] ?? 'ddagent'}', LucideIcons.package),
-      ('Version', '${data['version'] ?? 'Unknown'}', LucideIcons.badgeCheck),
-      ('Uptime', '${data['uptime'] ?? 'Unknown'}', LucideIcons.timer),
-      ('Provider', _providerLabelOf(data['provider']?.toString()), LucideIcons.server),
-      ('Model', '${data['model'] ?? 'Unknown'}', LucideIcons.cpu),
-      ('Node.js', '${data['nodeVersion'] ?? 'Unknown'}', LucideIcons.squareTerminal),
-      ('Platform', '${data['platform'] ?? 'Unknown'}', LucideIcons.activity),
-      ('Memory', rssMb is num ? '${rssMb.round()} MB RSS' : 'Unknown', LucideIcons.gauge),
+      (d.status.package, '${data['packageName'] ?? 'ddagent'}', LucideIcons.package),
+      (t.common.common.version, '${data['version'] ?? unknown}', LucideIcons.badgeCheck),
+      (d.status.uptime, '${data['uptime'] ?? unknown}', LucideIcons.timer),
+      (
+        t.common.commandPalette.compare.provider,
+        _providerLabelOf(data['provider']?.toString(), unknown),
+        LucideIcons.server,
+      ),
+      (t.common.commandPalette.compare.model, '${data['model'] ?? unknown}', LucideIcons.cpu),
+      ('Node.js', '${data['nodeVersion'] ?? unknown}', LucideIcons.squareTerminal),
+      (d.status.platform, '${data['platform'] ?? unknown}', LucideIcons.activity),
+      (
+        d.status.memory,
+        rssMb is num ? d.status.memoryRss(mb: rssMb.round()) : unknown,
+        LucideIcons.gauge,
+      ),
     ];
 
     return ListView(
@@ -1013,7 +1031,7 @@ class _StatusContent extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'Runtime online',
+                      d.status.runtimeOnline,
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -1021,13 +1039,15 @@ class _StatusContent extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'Process ${data['pid'] != null ? '#${data['pid']}' : 'status'} is responding.',
+                      data['pid'] != null
+                          ? d.status.processResponding(pid: '${data['pid']}')
+                          : d.status.processStatusResponding,
                       style: TextStyle(fontSize: 11, color: c.mutedForeground),
                     ),
                   ],
                 ),
               ),
-              const _Chip('Healthy', color: emerald),
+              _Chip(d.status.healthy, color: emerald),
             ],
           ),
         ),
@@ -1102,7 +1122,7 @@ class _FallbackContent extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Text(
-        '${data['message'] ?? 'Command finished.'}',
+        '${data['message'] ?? Translations.of(context).chat.commandDialog.commandFinished}',
         style: TextStyle(fontSize: 13, color: c.foreground),
       ),
     );

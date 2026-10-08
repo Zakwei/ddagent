@@ -146,6 +146,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
   // ─── Body ────────────────────────────────────────────────────────────
 
   Widget _body(TaskmasterState state, ProjectsState projectsState, String? pid) {
+    final i18n = Translations.of(context);
     final c = context.appColors;
     if (pid == null) {
       return Center(
@@ -166,7 +167,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'No project selected',
+                    i18n.kanban.empty.noProject,
                     style: TextStyle(
                       color: c.foreground,
                       fontSize: 16,
@@ -175,7 +176,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Add a project first, then create tasks for it.',
+                    i18n.tasks.taskmaster.noProjectHint,
                     style: TextStyle(color: c.mutedForeground, fontSize: 14),
                   ),
                 ],
@@ -289,6 +290,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
 
   /// `flex rounded-lg bg-gray-100 p-1` segmented icon group.
   Widget _viewToggle(bool dark) {
+    final i18n = Translations.of(context);
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
@@ -298,9 +300,9 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _modeButton(LucideIcons.layoutGrid, 'kanban', 'Kanban view', dark),
-          _modeButton(LucideIcons.list, 'list', 'List view', dark),
-          _modeButton(LucideIcons.grid, 'grid', 'Grid view', dark),
+          _modeButton(LucideIcons.layoutGrid, 'kanban', i18n.tasks.views.kanban, dark),
+          _modeButton(LucideIcons.list, 'list', i18n.tasks.views.list, dark),
+          _modeButton(LucideIcons.grid, 'grid', i18n.tasks.views.grid, dark),
         ],
       ),
     );
@@ -336,6 +338,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
 
   /// `Filters` outline button — blue tint while the panel is open.
   Widget _filtersButton(bool dark) {
+    final i18n = Translations.of(context);
     final open = _filtersOpen;
     return InkWell(
       onTap: () => setState(() => _filtersOpen = !open),
@@ -366,7 +369,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
             ),
             const SizedBox(width: 8),
             Text(
-              'Filters',
+              i18n.tasks.filters.button,
               style: TextStyle(
                 fontSize: 14,
                 color: open
@@ -418,6 +421,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
   /// `bg-purple-600` PRD button — flat "Add PRD" without files, a dropdown
   /// ("PRDs" + count badge) once `.taskmaster/docs` has documents.
   Widget _prdButton(TaskmasterState state, bool dark) {
+    final i18n = Translations.of(context);
     final prds = state.prdFiles;
     Widget trigger(String label, {int? count}) => Container(
       height: 36,
@@ -460,11 +464,11 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
       return InkWell(
         onTap: state.busy || _pid == null ? null : () => unawaited(PrdEditorDialog.show(context)),
         borderRadius: AppRadii.borderLg,
-        child: trigger('Add PRD'),
+        child: trigger(i18n.tasks.buttons.addPRD),
       );
     }
     return PopupMenuButton<String>(
-      tooltip: '${prds.length} PRD(s) available',
+      tooltip: i18n.tasks.buttons.prdsAvailable(count: prds.length),
       position: PopupMenuPosition.under,
       offset: const Offset(0, 8),
       onSelected: (name) {
@@ -478,13 +482,13 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
         PopupMenuItem<String>(
           value: '__new',
           height: 36,
-          child: const Row(
+          child: Row(
             children: [
-              Icon(LucideIcons.plus, size: 16, color: Color(0xFF7E22CE)),
-              SizedBox(width: 8),
+              const Icon(LucideIcons.plus, size: 16, color: Color(0xFF7E22CE)),
+              const SizedBox(width: 8),
               Text(
-                'Create New PRD',
-                style: TextStyle(
+                i18n.tasks.buttons.createNewPRD,
+                style: const TextStyle(
                   color: Color(0xFF7E22CE),
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -521,12 +525,13 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
             ),
           ),
       ],
-      child: trigger('PRDs', count: prds.length),
+      child: trigger(i18n.tasks.buttons.prds, count: prds.length),
     );
   }
 
   /// `bg-blue-600` primary action.
   Widget _addTaskButton(TaskmasterState state) {
+    final i18n = Translations.of(context);
     return InkWell(
       onTap: state.busy || _pid == null ? null : () => unawaited(CreateTaskDialog.show(context)),
       borderRadius: AppRadii.borderLg,
@@ -537,14 +542,18 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
           color: const Color(0xFF2563EB), // blue-600
           borderRadius: AppRadii.borderLg,
         ),
-        child: const Row(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(LucideIcons.plus, size: 16, color: Colors.white),
-            SizedBox(width: 8),
+            const Icon(LucideIcons.plus, size: 16, color: Colors.white),
+            const SizedBox(width: 8),
             Text(
-              'Add Task',
-              style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500),
+              i18n.tasks.buttons.addTask,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),
@@ -555,14 +564,15 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
   // ─── Quick sort chips — TaskQuickSortBar parity ──────────────────────
 
   Widget _sortChips(TaskmasterState state) {
+    final i18n = Translations.of(context);
     final dark = Theme.of(context).brightness == Brightness.dark;
     final ctrl = ref.read(taskmasterProvider.notifier);
     return Wrap(
       spacing: 8,
       children: [
-        _sortChip('ID', TaskSort.position, state, dark, ctrl),
-        _sortChip('Status', TaskSort.status, state, dark, ctrl),
-        _sortChip('Priority', TaskSort.priority, state, dark, ctrl),
+        _sortChip(i18n.tasks.sort.id, TaskSort.position, state, dark, ctrl),
+        _sortChip(i18n.tasks.sort.status, TaskSort.status, state, dark, ctrl),
+        _sortChip(i18n.tasks.sort.priority, TaskSort.priority, state, dark, ctrl),
       ],
     );
   }
@@ -658,23 +668,23 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
             runSpacing: 12,
             children: [
               _filterField(
-                'Status',
-                'All Statuses',
+                i18n.tasks.filters.status,
+                i18n.tasks.filters.allStatuses,
                 state.statusFilter,
                 statusOptions,
                 ctrl.setStatusFilter,
                 dark,
               ),
               _filterField(
-                'Priority',
-                'All Priorities',
+                i18n.tasks.filters.priority,
+                i18n.tasks.filters.allPriorities,
                 state.priorityFilter,
                 priorityOptions,
                 ctrl.setPriorityFilter,
                 dark,
               ),
               _filterField(
-                'Sort By',
+                i18n.tasks.filters.sortBy,
                 null,
                 '${_sortKey(state.sort)}-${state.sortOrder.name}',
                 const [
@@ -699,14 +709,14 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
                 },
                 dark,
                 labels: {
-                  'id-asc': 'ID (Ascending)',
-                  'id-desc': 'ID (Descending)',
+                  'id-asc': i18n.tasks.sort.idAsc,
+                  'id-desc': i18n.tasks.sort.idDesc,
                   'title-asc': i18n.tasks.sort.titleAsc,
                   'title-desc': i18n.tasks.sort.titleDesc,
-                  'status-asc': 'Status (A-Z)',
-                  'status-desc': 'Status (Z-A)',
-                  'priority-asc': 'Priority (High First)',
-                  'priority-desc': 'Priority (Low First)',
+                  'status-asc': i18n.tasks.taskmaster.sort.statusAz,
+                  'status-desc': i18n.tasks.taskmaster.sort.statusZa,
+                  'priority-asc': i18n.tasks.sort.priorityAsc,
+                  'priority-desc': i18n.tasks.sort.priorityDesc,
                 },
               ),
             ],
@@ -715,8 +725,10 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
           Row(
             children: [
               Text(
-                'Showing ${state.filteredTasks.length} of '
-                '${state.tasks.length} tasks',
+                i18n.tasks.filters.showing(
+                  filtered: state.filteredTasks.length,
+                  total: state.tasks.length,
+                ),
                 style: TextStyle(
                   color: dark ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563),
                   fontSize: 14,
@@ -730,9 +742,9 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
                   ctrl.setSearchQuery('');
                   _searchCtrl.clear();
                 },
-                child: const Text(
-                  'Clear Filters',
-                  style: TextStyle(
+                child: Text(
+                  i18n.tasks.filters.clearFilters,
+                  style: const TextStyle(
                     color: Color(0xFF2563EB),
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
@@ -822,7 +834,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'No tasks match your filters',
+              i18n.tasks.noMatchingTasks.title,
               style: TextStyle(
                 color: dark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
                 fontSize: 18,
@@ -831,7 +843,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Try adjusting your search or filter criteria.',
+              i18n.tasks.noMatchingTasks.description,
               style: TextStyle(
                 color: dark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
                 fontSize: 14,
@@ -1026,7 +1038,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        'Task ${task.idText}',
+                        i18n.tasks.nextTask.taskId(id: task.idText),
                         style: TextStyle(
                           color: dark ? const Color(0xFF94A3B8) : const Color(0xFF475569),
                           fontSize: 12,
@@ -1062,14 +1074,14 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
                 color: const Color(0xFF2563EB),
                 borderRadius: AppRadii.borderMd,
               ),
-              child: const Row(
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(LucideIcons.play, size: 12, color: Colors.white),
-                  SizedBox(width: 4),
+                  const Icon(LucideIcons.play, size: 12, color: Colors.white),
+                  const SizedBox(width: 4),
                   Text(
-                    'Start Task',
-                    style: TextStyle(
+                    i18n.tasks.nextTask.startTask,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
@@ -1143,43 +1155,41 @@ class _HelpDialog extends StatelessWidget {
   final VoidCallback? onCreatePrd;
 
   // accent colors from TaskHelpModal.tsx (border + bg per step).
-  static const _steps = [
-    (
-      'Create a Product Requirements Document (PRD)',
-      'Discuss your project idea and create a PRD that describes what you '
-          'want to build.',
-      Color(0xFFBFDBFE),
-      Color(0xFFEFF6FF),
-    ),
-    (
-      'Generate Tasks from PRD',
-      'Once you have a PRD, ask your AI assistant to parse it and TaskMaster '
-          'will automatically break it down into manageable tasks with '
-          'implementation details.',
-      Color(0xFFA7F3D0),
-      Color(0xFFECFDF5),
-    ),
-    (
-      'Analyze & Expand Tasks',
-      'Ask your AI assistant to analyze task complexity and expand them into '
-          'detailed subtasks for easier implementation.',
-      Color(0xFFFDE68A),
-      Color(0xFFFFFBEB),
-    ),
-    (
-      'Start Building',
-      'Ask your AI assistant to begin working on tasks, update their status, '
-          'and add new tasks as your project evolves.',
-      Color(0xFFE9D5FF),
-      Color(0xFFFAF5FF),
-    ),
-  ];
+  static List<(String, String, Color, Color)> _steps(Translations i18n) {
+    final s = i18n.tasks.gettingStarted.steps;
+    return [
+      (
+        s.createPRD.title,
+        s.createPRD.description,
+        const Color(0xFFBFDBFE),
+        const Color(0xFFEFF6FF),
+      ),
+      (
+        s.generateTasks.title,
+        s.generateTasks.description,
+        const Color(0xFFA7F3D0),
+        const Color(0xFFECFDF5),
+      ),
+      (
+        s.analyzeTasks.title,
+        s.analyzeTasks.description,
+        const Color(0xFFFDE68A),
+        const Color(0xFFFFFBEB),
+      ),
+      (
+        s.startBuilding.title,
+        s.startBuilding.description,
+        const Color(0xFFE9D5FF),
+        const Color(0xFFFAF5FF),
+      ),
+    ];
+  }
 
-  static const _tips = [
-    'Use the search bar to quickly find specific tasks',
-    'Switch between Kanban, List, and Grid views using the view toggles',
-    'Use filters to focus on specific task statuses or priorities',
-    'Click on any task to view detailed information and manage subtasks',
+  static List<String> _tips(Translations i18n) => [
+    i18n.tasks.helpGuide.proTips.search,
+    i18n.tasks.helpGuide.proTips.views,
+    i18n.tasks.helpGuide.proTips.filters,
+    i18n.tasks.helpGuide.proTips.details,
   ];
 
   @override
@@ -1188,6 +1198,8 @@ class _HelpDialog extends StatelessWidget {
     final t = Theme.of(context).textTheme;
     final i18n = Translations.of(context);
     final dark = Theme.of(context).brightness == Brightness.dark;
+    final steps = _steps(i18n);
+    final tips = _tips(i18n);
     return Dialog(
       backgroundColor: c.popover,
       child: ConstrainedBox(
@@ -1216,11 +1228,11 @@ class _HelpDialog extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Getting Started with TaskMaster',
+                          i18n.tasks.helpGuide.title,
                           style: t.titleLarge?.copyWith(fontWeight: FontWeight.w600),
                         ),
                         Text(
-                          'Your guide to productive task management',
+                          i18n.tasks.helpGuide.subtitle,
                           style: t.bodySmall?.copyWith(color: c.mutedForeground),
                         ),
                       ],
@@ -1240,15 +1252,15 @@ class _HelpDialog extends StatelessWidget {
                 padding: const EdgeInsets.all(24),
                 child: Column(
                   children: [
-                    for (var i = 0; i < _steps.length; i++)
+                    for (var i = 0; i < steps.length; i++)
                       Container(
                         width: double.infinity,
                         margin: const EdgeInsets.only(bottom: 16),
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: dark ? _steps[i].$4.withValues(alpha: 0.08) : _steps[i].$4,
+                          color: dark ? steps[i].$4.withValues(alpha: 0.08) : steps[i].$4,
                           border: Border.all(
-                            color: dark ? _steps[i].$3.withValues(alpha: 0.4) : _steps[i].$3,
+                            color: dark ? steps[i].$3.withValues(alpha: 0.4) : steps[i].$3,
                           ),
                           borderRadius: AppRadii.borderLg,
                         ),
@@ -1279,12 +1291,12 @@ class _HelpDialog extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    _steps[i].$1,
+                                    steps[i].$1,
                                     style: t.titleSmall?.copyWith(fontWeight: FontWeight.w500),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    _steps[i].$2,
+                                    steps[i].$2,
                                     style: t.bodySmall?.copyWith(color: c.mutedForeground),
                                   ),
                                   if (i == 0) ...[
@@ -1318,7 +1330,7 @@ class _HelpDialog extends StatelessWidget {
                                             ),
                                             const SizedBox(width: 8),
                                             Text(
-                                              'Add PRD',
+                                              i18n.tasks.gettingStarted.steps.createPRD.addButton,
                                               style: t.bodySmall?.copyWith(
                                                 color: dark
                                                     ? const Color(0xFFD8B4FE)
@@ -1348,11 +1360,11 @@ class _HelpDialog extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '💡 Pro Tips',
+                            i18n.tasks.helpGuide.proTips.title,
                             style: t.titleSmall?.copyWith(fontWeight: FontWeight.w500),
                           ),
                           const SizedBox(height: 8),
-                          for (final tip in _tips)
+                          for (final tip in tips)
                             Padding(
                               padding: const EdgeInsets.only(bottom: 8),
                               child: Text(
@@ -1380,7 +1392,7 @@ class _HelpDialog extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '📚 Learn More',
+                            i18n.tasks.helpGuide.learnMore.title,
                             style: t.titleSmall?.copyWith(
                               fontWeight: FontWeight.w500,
                               color: dark ? const Color(0xFFDBEAFE) : const Color(0xFF1E3A8A),
@@ -1388,9 +1400,7 @@ class _HelpDialog extends StatelessWidget {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'TaskMaster AI is an advanced task management '
-                            'system built for developers. Get documentation, '
-                            'examples, and contribute to the project.',
+                            i18n.tasks.helpGuide.learnMore.description,
                             style: t.bodySmall?.copyWith(
                               color: dark ? const Color(0xFFBFDBFE) : const Color(0xFF1E40AF),
                             ),
@@ -1413,19 +1423,23 @@ class _HelpDialog extends StatelessWidget {
                                 color: const Color(0xFF2563EB),
                                 borderRadius: AppRadii.borderLg,
                               ),
-                              child: const Row(
+                              child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(
-                                    'View on GitHub',
-                                    style: TextStyle(
+                                    i18n.tasks.helpGuide.learnMore.githubButton,
+                                    style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
-                                  SizedBox(width: 8),
-                                  Icon(LucideIcons.externalLink, size: 16, color: Colors.white),
+                                  const SizedBox(width: 8),
+                                  const Icon(
+                                    LucideIcons.externalLink,
+                                    size: 16,
+                                    color: Colors.white,
+                                  ),
                                 ],
                               ),
                             ),
@@ -1455,22 +1469,19 @@ class _GettingStarted extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.appColors;
     final dark = Theme.of(context).brightness == Brightness.dark;
-    const stepTitles = [
-      '1. Create a Product Requirements Document (PRD)',
-      '2. Generate Tasks from PRD',
-      '3. Analyze & Expand Tasks',
-      '4. Start Building',
+    final i18n = Translations.of(context);
+    final gs = i18n.tasks.gettingStarted;
+    final stepTitles = [
+      '1. ${gs.steps.createPRD.title}',
+      '2. ${gs.steps.generateTasks.title}',
+      '3. ${gs.steps.analyzeTasks.title}',
+      '4. ${gs.steps.startBuilding.title}',
     ];
-    const stepDescs = [
-      'Discuss your project idea and create a PRD that describes what you '
-          'want to build.',
-      'Once you have a PRD, ask your AI assistant to parse it and TaskMaster '
-          'will automatically break it down into manageable tasks with '
-          'implementation details.',
-      'Ask your AI assistant to analyze task complexity and expand them into '
-          'detailed subtasks for easier implementation.',
-      'Ask your AI assistant to begin working on tasks, update their status, '
-          'and add new tasks as your project evolves.',
+    final stepDescs = [
+      gs.steps.createPRD.description,
+      gs.steps.generateTasks.description,
+      gs.steps.analyzeTasks.description,
+      gs.steps.startBuilding.description,
     ];
 
     return SingleChildScrollView(
@@ -1521,7 +1532,7 @@ class _GettingStarted extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Getting Started with TaskMaster',
+                              gs.title,
                               style: TextStyle(
                                 color: c.foreground,
                                 fontSize: 20,
@@ -1529,8 +1540,7 @@ class _GettingStarted extends ConsumerWidget {
                               ),
                             ),
                             Text(
-                              'TaskMaster is initialized! '
-                              'Here\'s what to do next:',
+                              gs.subtitle,
                               style: TextStyle(color: c.mutedForeground, fontSize: 14),
                             ),
                           ],
@@ -1589,7 +1599,7 @@ class _GettingStarted extends ConsumerWidget {
                                       ),
                                       const SizedBox(width: 6),
                                       Text(
-                                        'Add PRD',
+                                        gs.steps.createPRD.addButton,
                                         style: TextStyle(
                                           color: dark
                                               ? const Color(0xFFD8B4FE)
@@ -1606,7 +1616,7 @@ class _GettingStarted extends ConsumerWidget {
                                 Divider(color: c.border, height: 1),
                                 const SizedBox(height: 8),
                                 Text(
-                                  'Existing PRDs:',
+                                  gs.steps.createPRD.existingPRDs,
                                   style: TextStyle(color: c.mutedForeground, fontSize: 12),
                                 ),
                                 const SizedBox(height: 8),
@@ -1662,14 +1672,14 @@ class _GettingStarted extends ConsumerWidget {
                           color: const Color(0xFF9333EA),
                           borderRadius: AppRadii.borderLg,
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(LucideIcons.fileText, size: 16, color: Colors.white),
-                            SizedBox(width: 8),
+                            const Icon(LucideIcons.fileText, size: 16, color: Colors.white),
+                            const SizedBox(width: 8),
                             Text(
-                              'Add PRD',
-                              style: TextStyle(
+                              gs.steps.createPRD.addButton,
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
@@ -1683,11 +1693,7 @@ class _GettingStarted extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              Text(
-                '💡 Tip: Start with a PRD to get the most out of '
-                "TaskMaster's AI-powered task generation",
-                style: TextStyle(color: c.mutedForeground, fontSize: 14),
-              ),
+              Text(gs.tip, style: TextStyle(color: c.mutedForeground, fontSize: 14)),
             ],
           ),
         ),
@@ -1710,14 +1716,13 @@ class _SetupView extends ConsumerWidget {
     final c = context.appColors;
     final i18n = Translations.of(context);
     final dark = Theme.of(context).brightness == Brightness.dark;
-    const features = [
-      '- AI-Powered Task Management: Break complex projects into manageable '
-          'subtasks',
-      '- PRD Templates: Generate tasks from Product Requirements Documents',
-      '- Dependency Tracking: Understand task relationships and execution '
-          'order',
-      '- Progress Visualization: Kanban boards and detailed task analytics',
-      '- CLI Integration: Use taskmaster commands for advanced workflows',
+    final nc = i18n.tasks.notConfigured;
+    final features = [
+      '- ${nc.features.aiPowered}',
+      '- ${nc.features.prdTemplates}',
+      '- ${nc.features.dependencyTracking}',
+      '- ${nc.features.progressVisualization}',
+      '- ${nc.features.cliIntegration}',
     ];
 
     return SingleChildScrollView(
@@ -1730,15 +1735,13 @@ class _SetupView extends ConsumerWidget {
               const Icon(LucideIcons.settings, size: 48, color: Color(0xFF2563EB)),
               const SizedBox(height: 16),
               Text(
-                'TaskMaster AI is not configured',
+                nc.title,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: c.foreground, fontSize: 18, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 8),
               Text(
-                state.config?.reason ??
-                    'TaskMaster helps break down complex projects into '
-                        'manageable tasks with AI-powered assistance',
+                state.config?.reason ?? nc.description,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: c.mutedForeground, fontSize: 14),
               ),
@@ -1754,7 +1757,7 @@ class _SetupView extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '🎯 What is TaskMaster?',
+                      nc.whatIsTitle,
                       style: TextStyle(
                         color: dark ? const Color(0xFFDBEAFE) : const Color(0xFF1E3A8A),
                         fontSize: 14,
@@ -1780,7 +1783,7 @@ class _SetupView extends ConsumerWidget {
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
                   child: Text(
-                    'Installed: ${state.config!.version}',
+                    i18n.tasks.taskmaster.installedVersion(version: state.config!.version!),
                     style: TextStyle(color: c.mutedForeground, fontSize: 12),
                   ),
                 ),
@@ -1811,14 +1814,14 @@ class _SetupView extends ConsumerWidget {
                         color: const Color(0xFF2563EB),
                         borderRadius: AppRadii.borderLg,
                       ),
-                      child: const Row(
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(LucideIcons.terminal, size: 16, color: Colors.white),
-                          SizedBox(width: 8),
+                          const Icon(LucideIcons.terminal, size: 16, color: Colors.white),
+                          const SizedBox(width: 8),
                           Text(
-                            'Initialize TaskMaster AI',
-                            style: TextStyle(
+                            nc.initializeButton,
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
@@ -1900,7 +1903,9 @@ class _SetupDialogState extends ConsumerState<_SetupDialog> {
       if (ok) {
         _complete = true;
       } else {
-        _error = ref.read(taskmasterProvider).error ?? 'Failed to initialize TaskMaster';
+        _error =
+            ref.read(taskmasterProvider).error ??
+            Translations.of(context).tasks.taskmaster.initFailed;
       }
     });
     if (ok) {
@@ -1938,11 +1943,11 @@ class _SetupDialogState extends ConsumerState<_SetupDialog> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'TaskMaster Setup',
+                  i18n.tasks.setupModal.title,
                   style: t.titleMedium?.copyWith(fontWeight: FontWeight.w600),
                 ),
                 Text(
-                  'Interactive CLI for ${widget.projectName}',
+                  i18n.tasks.setupModal.subtitle(projectName: widget.projectName),
                   style: t.bodySmall?.copyWith(color: c.mutedForeground),
                 ),
               ],
@@ -1960,8 +1965,7 @@ class _SetupDialogState extends ConsumerState<_SetupDialog> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Creates a .taskmaster folder in this project. No external '
-            'tooling or API keys required — tasks are stored locally.',
+            i18n.tasks.setupModal.description,
             style: t.bodySmall?.copyWith(color: c.mutedForeground),
           ),
           if (_complete)
@@ -1977,8 +1981,7 @@ class _SetupDialogState extends ConsumerState<_SetupDialog> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'TaskMaster setup completed! '
-                      'You can now close this window.',
+                      i18n.tasks.setupModal.completed,
                       style: t.bodySmall?.copyWith(
                         color: dark ? const Color(0xFF4ADE80) : const Color(0xFF16A34A),
                       ),
@@ -1998,14 +2001,22 @@ class _SetupDialogState extends ConsumerState<_SetupDialog> {
         AppButton(
           variant: AppButtonVariant.outline,
           onPressed: _close,
-          child: Text(_complete ? 'Close & Continue' : 'Close'),
+          child: Text(
+            _complete
+                ? i18n.tasks.setupModal.closeContinueButton
+                : i18n.tasks.setupModal.closeButton,
+          ),
         ),
         if (!_complete)
           AppButton(
             variant: AppButtonVariant.primary,
             loading: _initializing,
             onPressed: _initializing ? null : () => unawaited(_initialize()),
-            child: Text(_initializing ? 'Initializing...' : 'Initialize'),
+            child: Text(
+              _initializing
+                  ? i18n.tasks.setupModal.initializing
+                  : i18n.tasks.setupModal.initializeButton,
+            ),
           ),
       ],
     );

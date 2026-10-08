@@ -541,7 +541,7 @@ void main() {
       // Zmiana statusu w dialogu
       await tester.tap(find.byType(DropdownButton<String>).last);
       await tester.pumpAndSettle();
-      await tester.tap(find.text('in-progress').last);
+      await tester.tap(find.text('In Progress').last);
       await tester.pumpAndSettle();
       expect(repo.calls, contains('update:3:in-progress'));
 

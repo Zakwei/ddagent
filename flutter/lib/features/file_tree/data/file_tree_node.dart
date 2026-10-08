@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:ddagent_app/i18n/strings.g.dart';
+
 // File-tree domain model + pure tree helpers.
 // Mirrors `FileTreeNode` in server/shared/types.ts and ports the pure parts
 // of src/components/file-tree/utils/fileTreeUtils.ts.
@@ -215,7 +217,7 @@ String formatFileSize(int bytes) {
 }
 
 /// Short relative timestamp ("now", "5m", "3h", "2d", else date) —
-/// formatRelativeTime parity without i18n plural rules.
+/// formatRelativeTime parity without i18n plural rules (labels localized).
 String formatModified(String? iso) {
   if (iso == null || iso.isEmpty) {
     return '-';
@@ -226,16 +228,16 @@ String formatModified(String? iso) {
   }
   final seconds = DateTime.now().difference(past).inSeconds;
   if (seconds < 60) {
-    return 'now';
+    return t.fileTree.relative.now;
   }
   if (seconds < 3600) {
-    return '${seconds ~/ 60}m';
+    return t.fileTree.relative.minutes(n: seconds ~/ 60);
   }
   if (seconds < 86400) {
-    return '${seconds ~/ 3600}h';
+    return t.fileTree.relative.hours(n: seconds ~/ 3600);
   }
   if (seconds < 2592000) {
-    return '${seconds ~/ 86400}d';
+    return t.fileTree.relative.days(n: seconds ~/ 86400);
   }
   return '${past.year}-${past.month.toString().padLeft(2, '0')}-'
       '${past.day.toString().padLeft(2, '0')}';

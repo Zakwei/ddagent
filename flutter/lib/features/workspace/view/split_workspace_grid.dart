@@ -172,7 +172,7 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
             ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 140),
               child: Text(
-                widget.paneTitle?.call(pane) ?? pane.kind.name,
+                widget.paneTitle?.call(pane) ?? paneKindLabel(pane.kind),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: t.textTheme.labelSmall?.copyWith(
@@ -389,7 +389,7 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
                 child:
                     // Web pane chrome: text-xs muted — 12px/16, regular weight.
                     Text(
-                      widget.paneTitle?.call(pane) ?? pane.kind.name,
+                      widget.paneTitle?.call(pane) ?? paneKindLabel(pane.kind),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(fontSize: 12, height: 16 / 12, color: c.mutedForeground),

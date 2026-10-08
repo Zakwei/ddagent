@@ -1,5 +1,6 @@
 import 'package:ddagent_app/core/network/api_error.dart';
 import 'package:ddagent_app/core/network/api_providers.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -389,7 +390,8 @@ class SessionsRepository {
 /// that aren't worth a schema bump).
 extension SessionView on Session {
   String get displayTitle =>
-      (raw['summary'] ?? raw['title'] ?? summary ?? 'Session $sessionId').toString();
+      (raw['summary'] ?? raw['title'] ?? summary ?? t.chat.export.sessionTitle(id: sessionId))
+          .toString();
 
   String? get projectId {
     final project = raw['project'];

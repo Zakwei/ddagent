@@ -52,7 +52,7 @@ class WorkspaceLauncher extends ConsumerWidget {
               Text(i18n.chat.providerSelection.chooseWorkspace, style: t.textTheme.titleMedium),
               const SizedBox(height: AppSpacing.xs),
               Text(
-                'Pick a workspace for this pane, or create a new one.',
+                i18n.workspace.launcherDescription,
                 textAlign: TextAlign.center,
                 style: t.textTheme.bodySmall?.copyWith(color: c.mutedForeground),
               ),
@@ -116,7 +116,7 @@ class WorkspaceLauncher extends ConsumerWidget {
                       Icon(Icons.add, size: 14, color: c.mutedForeground),
                       const SizedBox(width: AppSpacing.sm),
                       Text(
-                        'Create workspace',
+                        i18n.workspace.createWorkspace,
                         style: t.textTheme.bodySmall?.copyWith(color: c.mutedForeground),
                       ),
                     ],

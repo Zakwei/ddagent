@@ -337,7 +337,7 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
             height: 32,
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Text(
-              'Export as:',
+              i18n.workspace.exportAs,
               style: t.labelSmall?.copyWith(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
@@ -345,9 +345,9 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
               ),
             ),
           ),
-          _exportItem('markdown', LucideIcons.fileText, 'Markdown (.md)'),
-          _exportItem('html', LucideIcons.fileJson, 'Web Page (.html)'),
-          _exportItem('pdf', LucideIcons.fileJson, 'PDF (Print to File)'),
+          _exportItem('markdown', LucideIcons.fileText, i18n.workspace.exportMarkdown),
+          _exportItem('html', LucideIcons.fileJson, i18n.workspace.exportHtml),
+          _exportItem('pdf', LucideIcons.fileJson, i18n.workspace.exportPdf),
         ],
         child: SizedBox(
           width: m.hit,
@@ -376,7 +376,12 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
           SizedBox(
             width: 80,
             child: Text(
-              tools.matches.isEmpty ? '0 of 0' : '${tools.matchPos + 1} of ${tools.matches.length}',
+              tools.matches.isEmpty
+                  ? i18n.workspace.matchPosition(current: 0, total: 0)
+                  : i18n.workspace.matchPosition(
+                      current: tools.matchPos + 1,
+                      total: tools.matches.length,
+                    ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: t.labelSmall?.copyWith(color: c.mutedForeground, fontSize: 11),

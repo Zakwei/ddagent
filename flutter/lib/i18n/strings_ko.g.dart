@@ -47,25 +47,28 @@ class TranslationsKo extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final Translations$sidebar$ko sidebar = Translations$sidebar$ko._(_root);
 	@override late final Translations$tasks$ko tasks = Translations$tasks$ko._(_root);
 	@override late final Translations$knowledge$ko knowledge = Translations$knowledge$ko._(_root);
-	@override late final Translations$skills$ko skills = Translations$skills$ko._(_root);
-	@override late final Translations$mcp$ko mcp = Translations$mcp$ko._(_root);
-	@override late final Translations$terminal$ko terminal = Translations$terminal$ko._(_root);
-	@override late final Translations$worktrees$ko worktrees = Translations$worktrees$ko._(_root);
-	@override late final Translations$quota$ko quota = Translations$quota$ko._(_root);
-	@override late final Translations$scheduler$ko scheduler = Translations$scheduler$ko._(_root);
-	@override late final Translations$notifications$ko notifications = Translations$notifications$ko._(_root);
-	@override late final Translations$serverConnect$ko serverConnect = Translations$serverConnect$ko._(_root);
-	@override late final Translations$voice$ko voice = Translations$voice$ko._(_root);
-	@override late final Translations$sharedContext$ko sharedContext = Translations$sharedContext$ko._(_root);
-	@override late final Translations$collab$ko collab = Translations$collab$ko._(_root);
 	@override late final Translations$browser$ko browser = Translations$browser$ko._(_root);
-	@override late final Translations$projects$ko projects = Translations$projects$ko._(_root);
-	@override late final Translations$sessions$ko sessions = Translations$sessions$ko._(_root);
+	@override late final Translations$collab$ko collab = Translations$collab$ko._(_root);
+	@override late final Translations$fileTree$ko fileTree = Translations$fileTree$ko._(_root);
 	@override late final Translations$git$ko git = Translations$git$ko._(_root);
 	@override late final Translations$kanban$ko kanban = Translations$kanban$ko._(_root);
+	@override late final Translations$mcp$ko mcp = Translations$mcp$ko._(_root);
+	@override late final Translations$notifications$ko notifications = Translations$notifications$ko._(_root);
 	@override late final Translations$onboarding$ko onboarding = Translations$onboarding$ko._(_root);
-	@override late final Translations$fileTree$ko fileTree = Translations$fileTree$ko._(_root);
+	@override late final Translations$projects$ko projects = Translations$projects$ko._(_root);
+	@override late final Translations$quota$ko quota = Translations$quota$ko._(_root);
+	@override late final Translations$scheduler$ko scheduler = Translations$scheduler$ko._(_root);
+	@override late final Translations$serverConnect$ko serverConnect = Translations$serverConnect$ko._(_root);
+	@override late final Translations$sessions$ko sessions = Translations$sessions$ko._(_root);
+	@override late final Translations$sharedContext$ko sharedContext = Translations$sharedContext$ko._(_root);
+	@override late final Translations$skills$ko skills = Translations$skills$ko._(_root);
+	@override late final Translations$terminal$ko terminal = Translations$terminal$ko._(_root);
+	@override late final Translations$voice$ko voice = Translations$voice$ko._(_root);
 	@override late final Translations$workspace$ko workspace = Translations$workspace$ko._(_root);
+	@override late final Translations$worktrees$ko worktrees = Translations$worktrees$ko._(_root);
+	@override late final Translations$browserUse$ko browserUse = Translations$browserUse$ko._(_root);
+	@override late final Translations$orchestrator$ko orchestrator = Translations$orchestrator$ko._(_root);
+	@override late final Translations$miniOrchestrator$ko miniOrchestrator = Translations$miniOrchestrator$ko._(_root);
 }
 
 // Path: auth
@@ -91,6 +94,7 @@ class Translations$chat$ko extends Translations$chat$en {
 	@override late final Translations$chat$codeBlock$ko codeBlock = Translations$chat$codeBlock$ko._(_root);
 	@override late final Translations$chat$copyMessage$ko copyMessage = Translations$chat$copyMessage$ko._(_root);
 	@override late final Translations$chat$messageTypes$ko messageTypes = Translations$chat$messageTypes$ko._(_root);
+	@override late final Translations$chat$orchestrator$ko orchestrator = Translations$chat$orchestrator$ko._(_root);
 	@override late final Translations$chat$tools$ko tools = Translations$chat$tools$ko._(_root);
 	@override late final Translations$chat$search$ko search = Translations$chat$search$ko._(_root);
 	@override late final Translations$chat$fileOperations$ko fileOperations = Translations$chat$fileOperations$ko._(_root);
@@ -102,15 +106,15 @@ class Translations$chat$ko extends Translations$chat$en {
 	@override late final Translations$chat$plan$ko plan = Translations$chat$plan$ko._(_root);
 	@override late final Translations$chat$usageLimit$ko usageLimit = Translations$chat$usageLimit$ko._(_root);
 	@override late final Translations$chat$codex$ko codex = Translations$chat$codex$ko._(_root);
+	@override late final Translations$chat$voice$ko voice = Translations$chat$voice$ko._(_root);
 	@override late final Translations$chat$input$ko input = Translations$chat$input$ko._(_root);
+	@override late final Translations$chat$composer$ko composer = Translations$chat$composer$ko._(_root);
 	@override late final Translations$chat$providerSelection$ko providerSelection = Translations$chat$providerSelection$ko._(_root);
 	@override late final Translations$chat$session$ko session = Translations$chat$session$ko._(_root);
 	@override late final Translations$chat$shell$ko shell = Translations$chat$shell$ko._(_root);
 	@override late final Translations$chat$claudeStatus$ko claudeStatus = Translations$chat$claudeStatus$ko._(_root);
 	@override late final Translations$chat$projectSelection$ko projectSelection = Translations$chat$projectSelection$ko._(_root);
 	@override late final Translations$chat$tasks$ko tasks = Translations$chat$tasks$ko._(_root);
-	@override late final Translations$chat$voice$ko voice = Translations$chat$voice$ko._(_root);
-	@override late final Translations$chat$composer$ko composer = Translations$chat$composer$ko._(_root);
 	@override late final Translations$chat$splitSession$ko splitSession = Translations$chat$splitSession$ko._(_root);
 	@override late final Translations$chat$sessionPicker$ko sessionPicker = Translations$chat$sessionPicker$ko._(_root);
 	@override late final Translations$chat$splitWorkspace$ko splitWorkspace = Translations$chat$splitWorkspace$ko._(_root);
@@ -123,16 +127,24 @@ class Translations$chat$ko extends Translations$chat$en {
 	@override late final Translations$chat$tokenUsage$ko tokenUsage = Translations$chat$tokenUsage$ko._(_root);
 	@override late final Translations$chat$tool$ko tool = Translations$chat$tool$ko._(_root);
 	@override late final Translations$chat$quotaBadge$ko quotaBadge = Translations$chat$quotaBadge$ko._(_root);
-	@override late final Translations$chat$paneHeader$ko paneHeader = Translations$chat$paneHeader$ko._(_root);
 	@override late final Translations$chat$broadcast$ko broadcast = Translations$chat$broadcast$ko._(_root);
-	@override late final Translations$chat$changes$ko changes = Translations$chat$changes$ko._(_root);
+	@override late final Translations$chat$paneHeader$ko paneHeader = Translations$chat$paneHeader$ko._(_root);
+	@override late final Translations$chat$export$ko export = Translations$chat$export$ko._(_root);
 	@override late final Translations$chat$commandResult$ko commandResult = Translations$chat$commandResult$ko._(_root);
 	@override late final Translations$chat$commands$ko commands = Translations$chat$commands$ko._(_root);
-	@override late final Translations$chat$export$ko export = Translations$chat$export$ko._(_root);
-	@override late final Translations$chat$message$ko message = Translations$chat$message$ko._(_root);
-	@override late final Translations$chat$modelLibrary$ko modelLibrary = Translations$chat$modelLibrary$ko._(_root);
 	@override late final Translations$chat$pinFile$ko pinFile = Translations$chat$pinFile$ko._(_root);
+	@override late final Translations$chat$modelLibrary$ko modelLibrary = Translations$chat$modelLibrary$ko._(_root);
+	@override late final Translations$chat$changes$ko changes = Translations$chat$changes$ko._(_root);
+	@override late final Translations$chat$message$ko message = Translations$chat$message$ko._(_root);
 	@override late final Translations$chat$permissionRequest$ko permissionRequest = Translations$chat$permissionRequest$ko._(_root);
+	@override late final Translations$chat$commandDialog$ko commandDialog = Translations$chat$commandDialog$ko._(_root);
+	@override late final Translations$chat$utilities$ko utilities = Translations$chat$utilities$ko._(_root);
+	@override late final Translations$chat$toolBlocks$ko toolBlocks = Translations$chat$toolBlocks$ko._(_root);
+	@override late final Translations$chat$commandMenu$ko commandMenu = Translations$chat$commandMenu$ko._(_root);
+	@override late final Translations$chat$mentionMenu$ko mentionMenu = Translations$chat$mentionMenu$ko._(_root);
+	@override late final Translations$chat$subheader$ko subheader = Translations$chat$subheader$ko._(_root);
+	@override late final Translations$chat$transcript$ko transcript = Translations$chat$transcript$ko._(_root);
+	@override late final Translations$chat$review$ko review = Translations$chat$review$ko._(_root);
 }
 
 // Path: codeEditor
@@ -149,14 +161,14 @@ class Translations$codeEditor$ko extends Translations$codeEditor$en {
 	@override late final Translations$codeEditor$footer$ko footer = Translations$codeEditor$footer$ko._(_root);
 	@override late final Translations$codeEditor$binaryFile$ko binaryFile = Translations$codeEditor$binaryFile$ko._(_root);
 	@override late final Translations$codeEditor$filePreview$ko filePreview = Translations$codeEditor$filePreview$ko._(_root);
-	@override late final Translations$codeEditor$diff$ko diff = Translations$codeEditor$diff$ko._(_root);
+	@override String unsavedChanges({required Object name}) => '${name}에 저장하지 않은 변경 사항';
 	@override String get discardUnsavedChanges => '저장하지 않은 변경 사항을 폐기할까요?';
-	@override late final Translations$codeEditor$emptyState$ko emptyState = Translations$codeEditor$emptyState$ko._(_root);
+	@override late final Translations$codeEditor$mediaFile$ko mediaFile = Translations$codeEditor$mediaFile$ko._(_root);
 	@override String get failedToLoad => '파일을 불러오지 못했습니다';
 	@override late final Translations$codeEditor$hexDump$ko hexDump = Translations$codeEditor$hexDump$ko._(_root);
-	@override late final Translations$codeEditor$mediaFile$ko mediaFile = Translations$codeEditor$mediaFile$ko._(_root);
 	@override late final Translations$codeEditor$settings$ko settings = Translations$codeEditor$settings$ko._(_root);
-	@override String unsavedChanges({required Object name}) => '${name}에 저장하지 않은 변경 사항';
+	@override late final Translations$codeEditor$diff$ko diff = Translations$codeEditor$diff$ko._(_root);
+	@override late final Translations$codeEditor$emptyState$ko emptyState = Translations$codeEditor$emptyState$ko._(_root);
 	@override late final Translations$codeEditor$toasts$ko toasts = Translations$codeEditor$toasts$ko._(_root);
 }
 
@@ -169,6 +181,7 @@ class Translations$common$ko extends Translations$common$en {
 	// Translations
 	@override late final Translations$common$buttons$ko buttons = Translations$common$buttons$ko._(_root);
 	@override late final Translations$common$tabs$ko tabs = Translations$common$tabs$ko._(_root);
+	@override late final Translations$common$quota$ko quota = Translations$common$quota$ko._(_root);
 	@override late final Translations$common$status$ko status = Translations$common$status$ko._(_root);
 	@override late final Translations$common$messages$ko messages = Translations$common$messages$ko._(_root);
 	@override late final Translations$common$navigation$ko navigation = Translations$common$navigation$ko._(_root);
@@ -180,7 +193,6 @@ class Translations$common$ko extends Translations$common$en {
 	@override late final Translations$common$projectWizard$ko projectWizard = Translations$common$projectWizard$ko._(_root);
 	@override late final Translations$common$notifications$ko notifications = Translations$common$notifications$ko._(_root);
 	@override late final Translations$common$versionUpdate$ko versionUpdate = Translations$common$versionUpdate$ko._(_root);
-	@override late final Translations$common$quota$ko quota = Translations$common$quota$ko._(_root);
 	@override late final Translations$common$actions$ko actions = Translations$common$actions$ko._(_root);
 	@override late final Translations$common$browserPane$ko browserPane = Translations$common$browserPane$ko._(_root);
 	@override late final Translations$common$browserUse$ko browserUse = Translations$common$browserUse$ko._(_root);
@@ -188,8 +200,11 @@ class Translations$common$ko extends Translations$common$en {
 	@override late final Translations$common$gitPanel$ko gitPanel = Translations$common$gitPanel$ko._(_root);
 	@override late final Translations$common$sessions$ko sessions = Translations$common$sessions$ko._(_root);
 	@override late final Translations$common$projects$ko projects = Translations$common$projects$ko._(_root);
+	@override late final Translations$common$sharedNotes$ko sharedNotes = Translations$common$sharedNotes$ko._(_root);
 	@override late final Translations$common$codeBlock$ko codeBlock = Translations$common$codeBlock$ko._(_root);
 	@override late final Translations$common$update$ko update = Translations$common$update$ko._(_root);
+	@override late final Translations$common$appShell$ko appShell = Translations$common$appShell$ko._(_root);
+	@override late final Translations$common$errors$ko errors = Translations$common$errors$ko._(_root);
 }
 
 // Path: settings
@@ -211,6 +226,7 @@ class Translations$settings$ko extends Translations$settings$en {
 	@override late final Translations$settings$quickSettings$ko quickSettings = Translations$settings$quickSettings$ko._(_root);
 	@override late final Translations$settings$terminalShortcuts$ko terminalShortcuts = Translations$settings$terminalShortcuts$ko._(_root);
 	@override late final Translations$settings$mainTabs$ko mainTabs = Translations$settings$mainTabs$ko._(_root);
+	@override late final Translations$settings$miniOrchestration$ko miniOrchestration = Translations$settings$miniOrchestration$ko._(_root);
 	@override late final Translations$settings$orchestration$ko orchestration = Translations$settings$orchestration$ko._(_root);
 	@override late final Translations$settings$notifications$ko notifications = Translations$settings$notifications$ko._(_root);
 	@override late final Translations$settings$appearanceSettings$ko appearanceSettings = Translations$settings$appearanceSettings$ko._(_root);
@@ -226,7 +242,11 @@ class Translations$settings$ko extends Translations$settings$en {
 	@override late final Translations$settings$quota$ko quota = Translations$settings$quota$ko._(_root);
 	@override late final Translations$settings$browser$ko browser = Translations$settings$browser$ko._(_root);
 	@override late final Translations$settings$workspaces$ko workspaces = Translations$settings$workspaces$ko._(_root);
+	@override late final Translations$settings$stt$ko stt = Translations$settings$stt$ko._(_root);
+	@override late final Translations$settings$schedules$ko schedules = Translations$settings$schedules$ko._(_root);
+	@override late final Translations$settings$mcpTokens$ko mcpTokens = Translations$settings$mcpTokens$ko._(_root);
 	@override late final Translations$settings$about$ko about = Translations$settings$about$ko._(_root);
+	@override late final Translations$settings$shortcuts$ko shortcuts = Translations$settings$shortcuts$ko._(_root);
 }
 
 // Path: sidebar
@@ -238,21 +258,21 @@ class Translations$sidebar$ko extends Translations$sidebar$en {
 	// Translations
 	@override late final Translations$sidebar$projects$ko projects = Translations$sidebar$projects$ko._(_root);
 	@override late final Translations$sidebar$app$ko app = Translations$sidebar$app$ko._(_root);
+	@override late final Translations$sidebar$panel$ko panel = Translations$sidebar$panel$ko._(_root);
 	@override late final Translations$sidebar$sessions$ko sessions = Translations$sidebar$sessions$ko._(_root);
 	@override late final Translations$sidebar$tooltips$ko tooltips = Translations$sidebar$tooltips$ko._(_root);
 	@override late final Translations$sidebar$navigation$ko navigation = Translations$sidebar$navigation$ko._(_root);
 	@override late final Translations$sidebar$actions$ko actions = Translations$sidebar$actions$ko._(_root);
+	@override late final Translations$sidebar$workspace$ko workspace = Translations$sidebar$workspace$ko._(_root);
 	@override late final Translations$sidebar$branding$ko branding = Translations$sidebar$branding$ko._(_root);
 	@override late final Translations$sidebar$status$ko status = Translations$sidebar$status$ko._(_root);
 	@override late final Translations$sidebar$time$ko time = Translations$sidebar$time$ko._(_root);
 	@override late final Translations$sidebar$messages$ko messages = Translations$sidebar$messages$ko._(_root);
 	@override late final Translations$sidebar$version$ko version = Translations$sidebar$version$ko._(_root);
 	@override late final Translations$sidebar$search$ko search = Translations$sidebar$search$ko._(_root);
+	@override late final Translations$sidebar$recent$ko recent = Translations$sidebar$recent$ko._(_root);
 	@override late final Translations$sidebar$deleteConfirmation$ko deleteConfirmation = Translations$sidebar$deleteConfirmation$ko._(_root);
 	@override late final Translations$sidebar$zones$ko zones = Translations$sidebar$zones$ko._(_root);
-	@override late final Translations$sidebar$panel$ko panel = Translations$sidebar$panel$ko._(_root);
-	@override late final Translations$sidebar$workspace$ko workspace = Translations$sidebar$workspace$ko._(_root);
-	@override late final Translations$sidebar$recent$ko recent = Translations$sidebar$recent$ko._(_root);
 	@override late final Translations$sidebar$tabs$ko tabs = Translations$sidebar$tabs$ko._(_root);
 }
 
@@ -284,6 +304,7 @@ class Translations$tasks$ko extends Translations$tasks$en {
 	@override late final Translations$tasks$nextTask$ko nextTask = Translations$tasks$nextTask$ko._(_root);
 	@override late final Translations$tasks$taskDetail$ko taskDetail = Translations$tasks$taskDetail$ko._(_root);
 	@override late final Translations$tasks$toasts$ko toasts = Translations$tasks$toasts$ko._(_root);
+	@override late final Translations$tasks$taskmaster$ko taskmaster = Translations$tasks$taskmaster$ko._(_root);
 }
 
 // Path: knowledge
@@ -306,201 +327,15 @@ class Translations$knowledge$ko extends Translations$knowledge$en {
 	@override late final Translations$knowledge$search$ko search = Translations$knowledge$search$ko._(_root);
 	@override late final Translations$knowledge$links$ko links = Translations$knowledge$links$ko._(_root);
 	@override late final Translations$knowledge$tags$ko tags = Translations$knowledge$tags$ko._(_root);
-	@override late final Translations$knowledge$contextBudget$ko contextBudget = Translations$knowledge$contextBudget$ko._(_root);
-	@override late final Translations$knowledge$critical$ko critical = Translations$knowledge$critical$ko._(_root);
-	@override late final Translations$knowledge$errors$ko errors = Translations$knowledge$errors$ko._(_root);
 	@override late final Translations$knowledge$graph$ko graph = Translations$knowledge$graph$ko._(_root);
 	@override late final Translations$knowledge$importAll$ko importAll = Translations$knowledge$importAll$ko._(_root);
-	@override late final Translations$knowledge$importSkills$ko importSkills = Translations$knowledge$importSkills$ko._(_root);
-	@override late final Translations$knowledge$linkOptions$ko linkOptions = Translations$knowledge$linkOptions$ko._(_root);
 	@override late final Translations$knowledge$migrate$ko migrate = Translations$knowledge$migrate$ko._(_root);
-}
-
-// Path: skills
-class Translations$skills$ko extends Translations$skills$en {
-	Translations$skills$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override late final Translations$skills$addDialog$ko addDialog = Translations$skills$addDialog$ko._(_root);
-	@override String deleteSkill({required Object name}) => '${name} 삭제';
-	@override late final Translations$skills$empty$ko empty = Translations$skills$empty$ko._(_root);
-	@override late final Translations$skills$errors$ko errors = Translations$skills$errors$ko._(_root);
-	@override late final Translations$skills$moveDialog$ko moveDialog = Translations$skills$moveDialog$ko._(_root);
-	@override String moveSkill({required Object name}) => '${name} 이동';
-	@override String get projectLabel => '프로젝트';
-	@override late final Translations$skills$scopes$ko scopes = Translations$skills$scopes$ko._(_root);
-	@override late final Translations$skills$screen$ko screen = Translations$skills$screen$ko._(_root);
-}
-
-// Path: mcp
-class Translations$mcp$ko extends Translations$mcp$en {
-	Translations$mcp$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override late final Translations$mcp$form$ko form = Translations$mcp$form$ko._(_root);
-	@override late final Translations$mcp$install$ko install = Translations$mcp$install$ko._(_root);
-	@override late final Translations$mcp$servers$ko servers = Translations$mcp$servers$ko._(_root);
-	@override late final Translations$mcp$team$ko team = Translations$mcp$team$ko._(_root);
-	@override late final Translations$mcp$tokens$ko tokens = Translations$mcp$tokens$ko._(_root);
-}
-
-// Path: terminal
-class Translations$terminal$ko extends Translations$terminal$en {
-	Translations$terminal$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override late final Translations$terminal$actions$ko actions = Translations$terminal$actions$ko._(_root);
-	@override late final Translations$terminal$authUrl$ko authUrl = Translations$terminal$authUrl$ko._(_root);
-	@override late final Translations$terminal$errors$ko errors = Translations$terminal$errors$ko._(_root);
-	@override late final Translations$terminal$fileLink$ko fileLink = Translations$terminal$fileLink$ko._(_root);
-	@override late final Translations$terminal$paste$ko paste = Translations$terminal$paste$ko._(_root);
-	@override late final Translations$terminal$shortcuts$ko shortcuts = Translations$terminal$shortcuts$ko._(_root);
-	@override late final Translations$terminal$tabs$ko tabs = Translations$terminal$tabs$ko._(_root);
-}
-
-// Path: worktrees
-class Translations$worktrees$ko extends Translations$worktrees$en {
-	Translations$worktrees$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get branchHint => '새 브랜치 이름 (예: feature/login)';
-	@override String branchingOff({required Object branch}) => '${branch}에서 분기';
-	@override String get cleanupDescription => '병합되면 worktree를 제거하고 브랜치 삭제';
-	@override String get created => 'Worktree 생성됨';
-	@override String get deleteBranchLabel => '브랜치도 삭제';
-	@override String dirtyWarning({required Object count}) => '경고: 이 worktree에는 손실될 커밋되지 않은 변경 사항이 ${count}개 있습니다.';
-	@override String get emptyDescription => '기능 작업이나 에이전트 실행을 격리하려면 worktree를 생성하세요.';
-	@override String get emptyTitle => 'worktree를 찾을 수 없습니다';
-	@override String get forceRemoveLabel => '강제 제거 (변경 사항 폐기)';
-	@override String headDetachedAt({required Object sha}) => 'HEAD 분리됨 @ ${sha}';
-	@override String get mainBadge => 'main';
-	@override String mergeDescription({required Object branch}) => '변경 사항을 ${branch}에 병합합니다.';
-	@override String mergeTitle({required Object branch}) => '${branch} 병합';
-	@override String merged({required Object branch}) => 'worktree가 ${branch}에 병합됨';
-	@override String opened({required Object branch}) => 'worktree 열림: ${branch}';
-	@override String get portHint => '실행 포트 (선택사항, 예: 3000)';
-	@override String get removeDescription => 'worktree 폴더가 삭제됩니다. 연결된 프로젝트는 보관됩니다.';
-	@override String removeTitle({required Object branch}) => 'worktree ${branch}을(를) 제거할까요?';
-	@override String get removed => 'worktree 제거됨';
-	@override String get runButton => '실행';
-	@override String get runHint => '실행 명령어 (예: npm run dev)';
-	@override String get runRunning => '실행 중';
-	@override String runRunningWithPort({required Object port}) => '실행 중 :${port}';
-	@override String get scripts => '스크립트';
-	@override String get scriptsSaved => '스크립트 설정이 저장되었습니다';
-	@override String get serverLabel => '서버: ';
-	@override String get setupHint => '설정 명령어 (예: npm install)';
-	@override String get setupLabel => '설정: ';
-	@override String get squashDescription => '모든 커밋을 단일 커밋으로 결합';
-	@override String get stopButton => '중지';
-}
-
-// Path: quota
-class Translations$quota$ko extends Translations$quota$en {
-	Translations$quota$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override late final Translations$quota$agents$ko agents = Translations$quota$agents$ko._(_root);
-	@override late final Translations$quota$chart$ko chart = Translations$quota$chart$ko._(_root);
-	@override late final Translations$quota$config$ko config = Translations$quota$config$ko._(_root);
-	@override late final Translations$quota$overview$ko overview = Translations$quota$overview$ko._(_root);
-	@override late final Translations$quota$section$ko section = Translations$quota$section$ko._(_root);
-}
-
-// Path: scheduler
-class Translations$scheduler$ko extends Translations$scheduler$en {
-	Translations$scheduler$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get checking => '확인 중…';
-	@override String get cronHint => 'Cron (분 시 일 월 요일) — 예: 0 9 * * *';
-	@override String deleteMessage({required Object id}) => '반복 작업 ${id}을(를) 제거합니다. 기존 세션은 유지됩니다.';
-	@override String get deleteTitle => '일정을 삭제할까요?';
-	@override String get editTitle => '일정 편집';
-	@override String get newLabel => '새로 만들기';
-	@override String nextIn({required Object time}) => '${time} 후 다음';
-	@override String get promptHint => '에이전트에게 보낼 프롬프트';
-	@override String get runs => '실행';
-	@override String session({required Object id}) => '세션 ${id}';
-	@override String get worktree => 'worktree';
-}
-
-// Path: notifications
-class Translations$notifications$ko extends Translations$notifications$en {
-	Translations$notifications$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get deviceLabel => 'DDAgent Flutter';
-	@override late final Translations$notifications$errors$ko errors = Translations$notifications$errors$ko._(_root);
-}
-
-// Path: serverConnect
-class Translations$serverConnect$ko extends Translations$serverConnect$en {
-	Translations$serverConnect$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get connect => '연결';
-	@override String get connecting => '연결 중…';
-	@override String get changeServer => '서버 변경';
-	@override String connectionFailed({required Object error}) => '연결 실패 (${error})';
-	@override String get enterUrl => '서버 URL을 입력하세요';
-	@override late final Translations$serverConnect$local$ko local = Translations$serverConnect$local$ko._(_root);
-	@override String get subtitle => 'DDAgent 서버에 연결하세요';
-}
-
-// Path: voice
-class Translations$voice$ko extends Translations$voice$en {
-	Translations$voice$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get apiKeySaved => 'API 키 (저장됨, 교체하려면 입력)';
-	@override String get preview => '미리보기';
-	@override String get saveFailed => 'STT 설정 저장 실패';
-	@override String get settingsSaved => '음성 입력 설정이 저장되었습니다';
-}
-
-// Path: sharedContext
-class Translations$sharedContext$ko extends Translations$sharedContext$en {
-	Translations$sharedContext$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => '공유 노트';
-}
-
-// Path: collab
-class Translations$collab$ko extends Translations$collab$en {
-	Translations$collab$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get copyToken => '토큰 복사';
-	@override String get createInvite => '초대 만들기';
-	@override String get invite => '초대';
-	@override String get inviteTeammate => '팀원 초대';
-	@override late final Translations$collab$roles$ko roles = Translations$collab$roles$ko._(_root);
-	@override String get shareTokenHint => '이 초대 토큰을 공유하세요 — 한 번만 표시되며 72시간 후 만료됩니다:';
-	@override String get team => '팀';
+	@override late final Translations$knowledge$importSkills$ko importSkills = Translations$knowledge$importSkills$ko._(_root);
+	@override late final Translations$knowledge$critical$ko critical = Translations$knowledge$critical$ko._(_root);
+	@override late final Translations$knowledge$contextBudget$ko contextBudget = Translations$knowledge$contextBudget$ko._(_root);
+	@override late final Translations$knowledge$linkOptions$ko linkOptions = Translations$knowledge$linkOptions$ko._(_root);
+	@override late final Translations$knowledge$errors$ko errors = Translations$knowledge$errors$ko._(_root);
+	@override late final Translations$knowledge$entityTypes$ko entityTypes = Translations$knowledge$entityTypes$ko._(_root);
 }
 
 // Path: browser
@@ -515,66 +350,54 @@ class Translations$browser$ko extends Translations$browser$en {
 	@override String get web => '웹';
 }
 
-// Path: projects
-class Translations$projects$ko extends Translations$projects$en {
-	Translations$projects$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+// Path: collab
+class Translations$collab$ko extends Translations$collab$en {
+	Translations$collab$ko._(TranslationsKo root) : this._root = root, super.internal(root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get archive => '보관';
-	@override String archivedSection({required Object count}) => '보관됨 (${count})';
-	@override String get clone => 'Clone';
-	@override String get cloneFailed => 'Clone 실패';
-	@override String get cloneFinished => 'Clone 완료. 프로젝트 목록을 새로 고치는 중…';
-	@override String get cloneRepository => '저장소 Clone';
-	@override String get deletePermanently => '영구 삭제';
-	@override String deleteProjectMessage({required Object name}) => '모든 세션과 저장된 기록(JSONL 삭제)을 포함하여 "${name}"을(를) 영구적으로 제거합니다. 되돌릴 수 없습니다.';
-	@override String get deleteProjectTitle => '프로젝트를 삭제할까요?';
-	@override String get destinationPath => '대상 경로';
-	@override String get destinationPathRequired => '대상 경로는 필수입니다';
-	@override String get displayNameOptional => '표시 이름 (선택사항)';
-	@override String get failedToLoadTokens => 'GitHub 토큰을 불러오지 못했습니다';
-	@override String get githubTokenOptional => 'GitHub 토큰 (선택사항)';
-	@override String get newer => '최신순';
-	@override String get older => '오래된순';
-	@override String get projectArchived => '프로젝트가 보관되었습니다';
-	@override String get projectDeleted => '프로젝트가 삭제되었습니다';
-	@override String get projectRenamed => '프로젝트 이름이 변경되었습니다';
-	@override String get projectRestored => '프로젝트가 복원되었습니다';
-	@override String get repoUrlPlaceholder => 'https://github.com/org/repo.git';
-	@override String get repositoryCloned => '저장소 Clone 완료';
-	@override String get repositoryUrlRequired => '저장소 URL은 필수입니다';
-	@override String get restore => '복원';
-	@override String sessionCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
-		one: '세션 ${count}개',
-		other: '세션 ${count}개',
-	);
-	@override String get unknown => '알 수 없음';
-	@override String usingStoredToken({required Object name}) => '저장된 토큰 사용: ${name}';
+	@override String get team => '팀';
+	@override String get invite => '초대';
+	@override String get inviteTeammate => '팀원 초대';
+	@override String get shareTokenHint => '이 초대 토큰을 공유하세요 — 한 번만 표시되며 72시간 후 만료됩니다:';
+	@override String get createInvite => '초대 만들기';
+	@override String get copyToken => '토큰 복사';
+	@override late final Translations$collab$roles$ko roles = Translations$collab$roles$ko._(_root);
+	@override late final Translations$collab$viewing$ko viewing = Translations$collab$viewing$ko._(_root);
 }
 
-// Path: sessions
-class Translations$sessions$ko extends Translations$sessions$en {
-	Translations$sessions$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+// Path: fileTree
+class Translations$fileTree$ko extends Translations$fileTree$en {
+	Translations$fileTree$ko._(TranslationsKo root) : this._root = root, super.internal(root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override late final Translations$sessions$activity$ko activity = Translations$sessions$activity$ko._(_root);
-	@override late final Translations$sessions$age$ko age = Translations$sessions$age$ko._(_root);
-	@override String get archive => '보관';
-	@override String get archivedSessions => '보관된 세션';
-	@override String get autoOrchestrator => '자동 (오케스트레이터)';
-	@override String get compareWith => '비교 대상…';
-	@override String createFailed({required Object error}) => '세션 생성 실패: ${error}';
-	@override String deleteSessionMessage({required Object name}) => '"${name}"과(와) 트랜스크립트를 제거합니다. 되돌릴 수 없습니다.';
-	@override String get newSessionProvider => '새 세션 — 제공자';
-	@override String get noRecentSessions => '최근 세션 없음';
-	@override String get noSessions => '세션 없음';
-	@override String get projectPath => '프로젝트 경로';
-	@override String get rename => '이름 변경';
-	@override late final Translations$sessions$toasts$ko toasts = Translations$sessions$toasts$ko._(_root);
+	@override String get uploadTo => '업로드 대상';
+	@override String get uploadHere => '여기에 업로드';
+	@override String get browseServerFilesystem => '서버 파일 시스템 찾아보기';
+	@override String get noFiles => '파일 없음';
+	@override String get copyContents => '내용 복사';
+	@override String get chooseFolder => '폴더 선택';
+	@override late final Translations$fileTree$search$ko search = Translations$fileTree$search$ko._(_root);
+	@override late final Translations$fileTree$titles$ko titles = Translations$fileTree$titles$ko._(_root);
+	@override String uploadedCount({required Object count}) => '${count}개 파일 업로드됨';
+	@override String get newName => '새 이름';
+	@override String notRegisteredProject({required Object path}) => '등록되지 않은 프로젝트: ${path}';
+	@override String get showGitignoredFiles => 'Git 무시 파일 표시';
+	@override String get hideGitignoredFiles => 'Git 무시 파일 숨기기';
+	@override String get downloadUnsupportedOnWeb => '웹에서는 다운로드를 지원하지 않습니다';
+	@override String get saveToPath => '경로에 저장';
+	@override String savedTo({required Object path}) => '${path}에 저장됨';
+	@override late final Translations$fileTree$relative$ko relative = Translations$fileTree$relative$ko._(_root);
+	@override String get projectRoot => '(프로젝트 루트)';
+	@override String uploadLimitCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
+		other: '한 번에 최대 ${count}개 파일까지 업로드할 수 있습니다.',
+	);
+	@override String fileTooLarge({required Object name}) => '${name}이(가) 200MB보다 큽니다.';
+	@override String deleteFolderConfirm({required Object path}) => '"${path}" 폴더를 삭제할까요? 이 작업은 되돌릴 수 없습니다.';
+	@override String deleteFileConfirm({required Object path}) => '"${path}" 파일을 삭제할까요? 이 작업은 되돌릴 수 없습니다.';
 }
 
 // Path: git
@@ -584,25 +407,26 @@ class Translations$git$ko extends Translations$git$en {
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get aiButton => '✦ AI';
 	@override late final Translations$git$checkpoints$ko checkpoints = Translations$git$checkpoints$ko._(_root);
-	@override String get commitCreated => '커밋이 생성되었습니다';
-	@override String get commitMessage => '커밋 메시지';
-	@override String get deleteFile => '파일 삭제';
-	@override String get hunkStage => '+ 헝크';
-	@override String get hunkUnstage => '− 헝크';
-	@override String get largeDiff => '대용량 diff 미리보기: 탭 응답성을 유지하기 위해 렌더링이 제한됩니다.';
-	@override String loadDiffFailed({required Object error}) => 'diff를 불러오지 못했습니다: ${error}';
-	@override String get noBranch => '브랜치 없음';
-	@override String get noDiff => '사용 가능한 diff 없음';
-	@override String get selectProject => '프로젝트 선택';
-	@override String get splitDiff => '분할 diff';
-	@override String get stageHunk => '헝크 스테이징';
 	@override String get stagedChanges => '스테이징된 변경 사항';
 	@override String get statusStaged => '스테이징됨';
 	@override String get switchBranch => '브랜치 전환';
 	@override String get unifiedDiff => '통합 diff';
+	@override String get splitDiff => '분할 diff';
+	@override String get noDiff => '사용 가능한 diff 없음';
+	@override String get largeDiff => '대용량 diff 미리보기: 탭 응답성을 유지하기 위해 렌더링이 제한됩니다.';
+	@override String loadDiffFailed({required Object error}) => 'diff를 불러오지 못했습니다: ${error}';
+	@override String get hunkStage => '+ 헝크';
+	@override String get hunkUnstage => '− 헝크';
+	@override String get stageHunk => '헝크 스테이징';
 	@override String get unstageHunk => '헝크 스테이징 해제';
+	@override String get deleteFile => '파일 삭제';
+	@override String get commitMessage => '커밋 메시지';
+	@override String get aiButton => '✦ AI';
+	@override String get commitCreated => '커밋이 생성되었습니다';
+	@override String get noBranch => '브랜치 없음';
+	@override String get selectProject => '프로젝트 선택';
+	@override late final Translations$git$branchSections$ko branchSections = Translations$git$branchSections$ko._(_root);
 }
 
 // Path: kanban
@@ -614,11 +438,37 @@ class Translations$kanban$ko extends Translations$kanban$en {
 	// Translations
 	@override late final Translations$kanban$card$ko card = Translations$kanban$card$ko._(_root);
 	@override late final Translations$kanban$comments$ko comments = Translations$kanban$comments$ko._(_root);
-	@override late final Translations$kanban$details$ko details = Translations$kanban$details$ko._(_root);
 	@override late final Translations$kanban$dialog$ko dialog = Translations$kanban$dialog$ko._(_root);
+	@override late final Translations$kanban$details$ko details = Translations$kanban$details$ko._(_root);
 	@override late final Translations$kanban$empty$ko empty = Translations$kanban$empty$ko._(_root);
 	@override String get saveFailed => '카드를 저장하지 못했습니다';
 	@override late final Translations$kanban$time$ko time = Translations$kanban$time$ko._(_root);
+}
+
+// Path: mcp
+class Translations$mcp$ko extends Translations$mcp$en {
+	Translations$mcp$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$mcp$install$ko install = Translations$mcp$install$ko._(_root);
+	@override late final Translations$mcp$servers$ko servers = Translations$mcp$servers$ko._(_root);
+	@override late final Translations$mcp$team$ko team = Translations$mcp$team$ko._(_root);
+	@override late final Translations$mcp$tokens$ko tokens = Translations$mcp$tokens$ko._(_root);
+	@override late final Translations$mcp$form$ko form = Translations$mcp$form$ko._(_root);
+}
+
+// Path: notifications
+class Translations$notifications$ko extends Translations$notifications$en {
+	Translations$notifications$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get deviceLabel => 'DDAgent Flutter';
+	@override late final Translations$notifications$errors$ko errors = Translations$notifications$errors$ko._(_root);
+	@override late final Translations$notifications$androidChannel$ko androidChannel = Translations$notifications$androidChannel$ko._(_root);
 }
 
 // Path: onboarding
@@ -628,36 +478,191 @@ class Translations$onboarding$ko extends Translations$onboarding$en {
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override late final Translations$onboarding$agents$ko agents = Translations$onboarding$agents$ko._(_root);
+	@override String get gitHint => 'DDAgent 세션이 생성한 커밋에 사용됩니다.';
 	@override String get completeSetup => '설정 완료';
 	@override late final Translations$onboarding$errors$ko errors = Translations$onboarding$errors$ko._(_root);
-	@override String get gitHint => 'DDAgent 세션이 생성한 커밋에 사용됩니다.';
+	@override late final Translations$onboarding$agents$ko agents = Translations$onboarding$agents$ko._(_root);
 	@override late final Translations$onboarding$mcp$ko mcp = Translations$onboarding$mcp$ko._(_root);
 }
 
-// Path: fileTree
-class Translations$fileTree$ko extends Translations$fileTree$en {
-	Translations$fileTree$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+// Path: projects
+class Translations$projects$ko extends Translations$projects$en {
+	Translations$projects$ko._(TranslationsKo root) : this._root = root, super.internal(root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get browseServerFilesystem => '서버 파일 시스템 찾아보기';
-	@override String get chooseFolder => '폴더 선택';
-	@override String get copyContents => '내용 복사';
-	@override String get noFiles => '파일 없음';
-	@override late final Translations$fileTree$search$ko search = Translations$fileTree$search$ko._(_root);
-	@override late final Translations$fileTree$titles$ko titles = Translations$fileTree$titles$ko._(_root);
-	@override String get uploadHere => '여기에 업로드';
-	@override String get uploadTo => '업로드 대상';
-	@override String uploadedCount({required Object count}) => '${count}개 파일 업로드됨';
-	@override String get newName => '새 이름';
-	@override String notRegisteredProject({required Object path}) => '등록되지 않은 프로젝트: ${path}';
-	@override String get showGitignoredFiles => 'Git 무시 파일 표시';
-	@override String get hideGitignoredFiles => 'Git 무시 파일 숨기기';
-	@override String get downloadUnsupportedOnWeb => '웹에서는 다운로드를 지원하지 않습니다';
-	@override String get saveToPath => '경로에 저장';
-	@override String savedTo({required Object path}) => '${path}에 저장됨';
+	@override String get cloneRepository => '저장소 Clone';
+	@override String get repositoryCloned => '저장소 Clone 완료';
+	@override String get clone => '복제';
+	@override String get cloneFinished => 'Clone 완료. 프로젝트 목록을 새로 고치는 중…';
+	@override String get cloneFailed => 'Clone 실패';
+	@override String get repoUrlPlaceholder => 'https://github.com/org/repo.git';
+	@override String get destinationPath => '대상 경로';
+	@override String get destinationPathRequired => '대상 경로는 필수입니다';
+	@override String get repositoryUrlRequired => '저장소 URL은 필수입니다';
+	@override String get githubTokenOptional => 'GitHub 토큰 (선택사항)';
+	@override String get archive => '보관';
+	@override String get restore => '복원';
+	@override String get deletePermanently => '영구 삭제';
+	@override String get deleteProjectTitle => '프로젝트를 삭제할까요?';
+	@override String deleteProjectMessage({required Object name}) => '모든 세션과 저장된 기록(JSONL 삭제)을 포함하여 "${name}"을(를) 영구적으로 제거합니다. 되돌릴 수 없습니다.';
+	@override String archivedSection({required Object count}) => '보관됨 (${count})';
+	@override String sessionCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
+		one: '세션 ${count}개',
+		other: '세션 ${count}개',
+	);
+	@override String get newer => '최신순';
+	@override String get older => '오래된순';
+	@override String get projectArchived => '프로젝트가 보관되었습니다';
+	@override String get projectRestored => '프로젝트가 복원되었습니다';
+	@override String get projectRenamed => '프로젝트 이름이 변경되었습니다';
+	@override String get projectDeleted => '프로젝트가 삭제되었습니다';
+	@override String get failedToLoadTokens => 'GitHub 토큰을 불러오지 못했습니다';
+	@override String get displayNameOptional => '표시 이름 (선택사항)';
+	@override String usingStoredToken({required Object name}) => '저장된 토큰 사용: ${name}';
+	@override String get unknown => '알 수 없음';
+	@override String get project => '프로젝트';
+}
+
+// Path: quota
+class Translations$quota$ko extends Translations$quota$en {
+	Translations$quota$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$quota$section$ko section = Translations$quota$section$ko._(_root);
+	@override late final Translations$quota$overview$ko overview = Translations$quota$overview$ko._(_root);
+	@override late final Translations$quota$agents$ko agents = Translations$quota$agents$ko._(_root);
+	@override late final Translations$quota$config$ko config = Translations$quota$config$ko._(_root);
+	@override late final Translations$quota$chart$ko chart = Translations$quota$chart$ko._(_root);
+	@override late final Translations$quota$duration$ko duration = Translations$quota$duration$ko._(_root);
+}
+
+// Path: scheduler
+class Translations$scheduler$ko extends Translations$scheduler$en {
+	Translations$scheduler$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get newLabel => '새로 만들기';
+	@override String get runs => '실행';
+	@override String get editTitle => '일정 편집';
+	@override String get deleteTitle => '일정을 삭제할까요?';
+	@override String deleteMessage({required Object id}) => '반복 작업 ${id}을(를) 제거합니다. 기존 세션은 유지됩니다.';
+	@override String get checking => '확인 중…';
+	@override String nextIn({required Object time}) => '${time} 후 다음';
+	@override String get worktree => 'worktree';
+	@override String session({required Object id}) => '세션 ${id}';
+	@override String get cronHint => 'Cron (분 시 일 월 요일) — 예: 0 9 * * *';
+	@override String get promptHint => '에이전트에게 보낼 프롬프트';
+	@override late final Translations$scheduler$runStatus$ko runStatus = Translations$scheduler$runStatus$ko._(_root);
+	@override late final Translations$scheduler$cronErrors$ko cronErrors = Translations$scheduler$cronErrors$ko._(_root);
+}
+
+// Path: serverConnect
+class Translations$serverConnect$ko extends Translations$serverConnect$en {
+	Translations$serverConnect$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get subtitle => 'DDAgent 서버에 연결하세요';
+	@override String get enterUrl => '서버 URL을 입력하세요';
+	@override String connectionFailed({required Object error}) => '연결 실패 (${error})';
+	@override String get connect => '연결';
+	@override String get connecting => '연결 중…';
+	@override String get changeServer => '서버 변경';
+	@override late final Translations$serverConnect$local$ko local = Translations$serverConnect$local$ko._(_root);
+	@override String httpStatus({required Object code}) => 'HTTP ${code}';
+	@override String get networkError => '네트워크 오류';
+}
+
+// Path: sessions
+class Translations$sessions$ko extends Translations$sessions$en {
+	Translations$sessions$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get noSessions => '세션 없음';
+	@override String get noRecentSessions => '최근 세션 없음';
+	@override String get archivedSessions => '보관된 세션';
+	@override String get rename => '이름 변경';
+	@override String get archive => '보관';
+	@override String get compareWith => '비교 대상…';
+	@override String get projectPath => '프로젝트 경로';
+	@override String get newSessionProvider => '새 세션 — 제공자';
+	@override String get autoOrchestrator => '자동 (오케스트레이터)';
+	@override String createFailed({required Object error}) => '세션 생성 실패: ${error}';
+	@override String deleteSessionMessage({required Object name}) => '"${name}"과(와) 트랜스크립트를 제거합니다. 되돌릴 수 없습니다.';
+	@override late final Translations$sessions$toasts$ko toasts = Translations$sessions$toasts$ko._(_root);
+	@override late final Translations$sessions$age$ko age = Translations$sessions$age$ko._(_root);
+	@override late final Translations$sessions$activity$ko activity = Translations$sessions$activity$ko._(_root);
+	@override String get autoMini => '자동 (미니)';
+}
+
+// Path: sharedContext
+class Translations$sharedContext$ko extends Translations$sharedContext$en {
+	Translations$sharedContext$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '공유 노트';
+}
+
+// Path: skills
+class Translations$skills$ko extends Translations$skills$en {
+	Translations$skills$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String moveSkill({required Object name}) => '${name} 이동';
+	@override String deleteSkill({required Object name}) => '${name} 삭제';
+	@override String get projectLabel => '프로젝트';
+	@override late final Translations$skills$addDialog$ko addDialog = Translations$skills$addDialog$ko._(_root);
+	@override late final Translations$skills$moveDialog$ko moveDialog = Translations$skills$moveDialog$ko._(_root);
+	@override late final Translations$skills$screen$ko screen = Translations$skills$screen$ko._(_root);
+	@override late final Translations$skills$empty$ko empty = Translations$skills$empty$ko._(_root);
+	@override late final Translations$skills$scopes$ko scopes = Translations$skills$scopes$ko._(_root);
+	@override late final Translations$skills$errors$ko errors = Translations$skills$errors$ko._(_root);
+	@override String get providerShared => '공유';
+}
+
+// Path: terminal
+class Translations$terminal$ko extends Translations$terminal$en {
+	Translations$terminal$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$terminal$tabs$ko tabs = Translations$terminal$tabs$ko._(_root);
+	@override late final Translations$terminal$actions$ko actions = Translations$terminal$actions$ko._(_root);
+	@override late final Translations$terminal$authUrl$ko authUrl = Translations$terminal$authUrl$ko._(_root);
+	@override late final Translations$terminal$fileLink$ko fileLink = Translations$terminal$fileLink$ko._(_root);
+	@override late final Translations$terminal$shortcuts$ko shortcuts = Translations$terminal$shortcuts$ko._(_root);
+	@override late final Translations$terminal$paste$ko paste = Translations$terminal$paste$ko._(_root);
+	@override late final Translations$terminal$errors$ko errors = Translations$terminal$errors$ko._(_root);
+	@override late final Translations$terminal$loginDialog$ko loginDialog = Translations$terminal$loginDialog$ko._(_root);
+	@override late final Translations$terminal$empty$ko empty = Translations$terminal$empty$ko._(_root);
+	@override late final Translations$terminal$overlay$ko overlay = Translations$terminal$overlay$ko._(_root);
+}
+
+// Path: voice
+class Translations$voice$ko extends Translations$voice$en {
+	Translations$voice$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get preview => '미리보기';
+	@override String get settingsSaved => '음성 입력 설정이 저장되었습니다';
+	@override String get saveFailed => 'STT 설정 저장 실패';
+	@override String get apiKeySaved => 'API 키 (저장됨, 교체하려면 입력)';
 }
 
 // Path: workspace
@@ -667,23 +672,108 @@ class Translations$workspace$ko extends Translations$workspace$en {
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get archivedWorkspaceName => '보관됨';
-	@override String get closePane => '창 닫기';
-	@override String get closeSearch => '검색 닫기';
-	@override String get deleteSessionNotice => '세션과 트랜스크립트를 제거합니다. 되돌릴 수 없습니다.';
 	@override String get exportChat => '채팅 내보내기';
-	@override String get jumpToSession => '세션으로 이동…';
-	@override String get newChatProvider => '새 채팅 — 제공자';
-	@override String get nextMatch => '다음 일치';
-	@override String get previousMatch => '이전 일치';
 	@override String get searchTranscript => '트랜스크립트 검색';
+	@override String get previousMatch => '이전 일치';
+	@override String get nextMatch => '다음 일치';
+	@override String get closeSearch => '검색 닫기';
+	@override String get newChatProvider => '새 채팅 — 제공자';
+	@override String get closePane => '창 닫기';
+	@override String get jumpToSession => '세션으로 이동…';
+	@override String get archivedWorkspaceName => '보관됨';
 	@override String sendTo({required Object count}) => '${count}개에 전송';
+	@override String get deleteSessionNotice => '세션과 트랜스크립트를 제거합니다. 되돌릴 수 없습니다.';
 	@override String accountWithLabel({required Object label}) => '기본 · ${label}';
 	@override String get finishRunBeforeChangingWorkspace => '작업 영역을 변경하기 전에 실행을 완료하세요';
 	@override String get restored => '작업 영역이 복원되었습니다';
 	@override String get maximizePane => '창 최대화';
 	@override String get restorePanes => '창 복원';
 	@override String get reviewChangedFiles => '변경된 파일 검토';
+	@override late final Translations$workspace$paneTitle$ko paneTitle = Translations$workspace$paneTitle$ko._(_root);
+	@override String get addEditorPane => '편집기 창 추가';
+	@override String get addGitPane => 'Git 창 추가';
+	@override String get unknownProjectPath => '알 수 없는 프로젝트 경로';
+	@override String get autoMini => '자동 (mini)';
+	@override String get exportAs => '내보내기 형식:';
+	@override String get exportMarkdown => 'Markdown (.md)';
+	@override String get exportHtml => '웹 페이지 (.html)';
+	@override String get exportPdf => 'PDF (파일로 인쇄)';
+	@override String matchPosition({required Object current, required Object total}) => '${current} / ${total}';
+	@override String get launcherDescription => '이 창에 사용할 작업 공간을 선택하거나 새로 만드세요.';
+	@override String get createWorkspace => '작업 공간 만들기';
+}
+
+// Path: worktrees
+class Translations$worktrees$ko extends Translations$worktrees$en {
+	Translations$worktrees$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get scripts => '스크립트';
+	@override String get emptyTitle => 'worktree를 찾을 수 없습니다';
+	@override String get emptyDescription => '기능 작업이나 에이전트 실행을 격리하려면 worktree를 생성하세요.';
+	@override String opened({required Object branch}) => 'worktree 열림: ${branch}';
+	@override String get created => 'Worktree 생성됨';
+	@override String get removed => 'worktree 제거됨';
+	@override String merged({required Object branch}) => 'worktree가 ${branch}에 병합됨';
+	@override String get scriptsSaved => '스크립트 설정이 저장되었습니다';
+	@override String get setupLabel => '설정: ';
+	@override String get serverLabel => '서버: ';
+	@override String get runRunning => '실행 중';
+	@override String runRunningWithPort({required Object port}) => '실행 중 :${port}';
+	@override String get runButton => '실행';
+	@override String get stopButton => '중지';
+	@override String get mainBadge => 'main';
+	@override String headDetachedAt({required Object sha}) => 'HEAD 분리됨 @ ${sha}';
+	@override String get branchHint => '새 브랜치 이름 (예: feature/login)';
+	@override String branchingOff({required Object branch}) => '${branch}에서 분기';
+	@override String mergeTitle({required Object branch}) => '${branch} 병합';
+	@override String mergeDescription({required Object branch}) => '변경 사항을 ${branch}에 병합합니다.';
+	@override String get squashDescription => '모든 커밋을 단일 커밋으로 결합';
+	@override String get cleanupDescription => '병합되면 worktree를 제거하고 브랜치 삭제';
+	@override String removeTitle({required Object branch}) => 'worktree ${branch}을(를) 제거할까요?';
+	@override String get removeDescription => 'worktree 폴더가 삭제됩니다. 연결된 프로젝트는 보관됩니다.';
+	@override String dirtyWarning({required Object count}) => '경고: 이 worktree에는 손실될 커밋되지 않은 변경 사항이 ${count}개 있습니다.';
+	@override String get forceRemoveLabel => '강제 제거 (변경 사항 폐기)';
+	@override String get deleteBranchLabel => '브랜치도 삭제';
+	@override String get setupHint => '설정 명령어 (예: npm install)';
+	@override String get runHint => '실행 명령어 (예: npm run dev)';
+	@override String get portHint => '실행 포트 (선택사항, 예: 3000)';
+	@override String get unknownSha => '알 수 없음';
+	@override String get baseBranchFallback => '기본 브랜치';
+	@override late final Translations$worktrees$runtimeStatus$ko runtimeStatus = Translations$worktrees$runtimeStatus$ko._(_root);
+}
+
+// Path: browserUse
+class Translations$browserUse$ko extends Translations$browserUse$en {
+	Translations$browserUse$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$browserUse$sessionStatus$ko sessionStatus = Translations$browserUse$sessionStatus$ko._(_root);
+}
+
+// Path: orchestrator
+class Translations$orchestrator$ko extends Translations$orchestrator$en {
+	Translations$orchestrator$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String stepFallback({required Object n}) => '${n}단계';
+}
+
+// Path: miniOrchestrator
+class Translations$miniOrchestrator$ko extends Translations$miniOrchestrator$en {
+	Translations$miniOrchestrator$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$miniOrchestrator$taskTypes$ko taskTypes = Translations$miniOrchestrator$taskTypes$ko._(_root);
+	@override late final Translations$miniOrchestrator$roles$ko roles = Translations$miniOrchestrator$roles$ko._(_root);
 }
 
 // Path: auth.login
@@ -775,6 +865,24 @@ class Translations$chat$messageTypes$ko extends Translations$chat$messageTypes$e
 	@override String get codex => 'Codex';
 	@override String get opencode => 'OpenCode';
 	@override String get devin => 'Devin';
+	@override String get orchestrator => 'Auto';
+}
+
+// Path: chat.orchestrator
+class Translations$chat$orchestrator$ko extends Translations$chat$orchestrator$en {
+	Translations$chat$orchestrator$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$chat$orchestrator$routing$ko routing = Translations$chat$orchestrator$routing$ko._(_root);
+	@override late final Translations$chat$orchestrator$plan$ko plan = Translations$chat$orchestrator$plan$ko._(_root);
+	@override late final Translations$chat$orchestrator$decision$ko decision = Translations$chat$orchestrator$decision$ko._(_root);
+	@override late final Translations$chat$orchestrator$delegation$ko delegation = Translations$chat$orchestrator$delegation$ko._(_root);
+	@override late final Translations$chat$orchestrator$summary$ko summary = Translations$chat$orchestrator$summary$ko._(_root);
+	@override String get backToParent => '오케스트레이션으로 돌아가기';
+	@override late final Translations$chat$orchestrator$taskmaster$ko taskmaster = Translations$chat$orchestrator$taskmaster$ko._(_root);
+	@override late final Translations$chat$orchestrator$gate$ko gate = Translations$chat$orchestrator$gate$ko._(_root);
 }
 
 // Path: chat.tools
@@ -854,6 +962,7 @@ class Translations$chat$thinking$ko extends Translations$chat$thinking$en {
 	// Translations
 	@override String get title => '생각 중...';
 	@override String get emoji => '💭 생각 중...';
+	@override String get thoughtFewSeconds => '몇 초 동안 생각함';
 }
 
 // Path: chat.json
@@ -880,14 +989,14 @@ class Translations$chat$permissions$ko extends Translations$chat$permissions$en 
 	@override String get error => '권한을 업데이트할 수 없습니다. 다시 시도해주세요.';
 	@override String get openSettings => '설정 열기';
 	@override String get allow => '허용';
-	@override String allowAll({required Object count}) => '모두 허용 (${count})';
-	@override String get allowWithChanges => '변경 포함 허용';
 	@override String get always => '항상';
-	@override String get deny => '거부';
 	@override String get editAndAllow => '편집 및 허용';
+	@override String get deny => '거부';
+	@override String get reject => '거절';
+	@override String allowAll({required Object count}) => '모두 허용 (${count})';
 	@override String get editInput => '입력 편집';
 	@override String get invalidJson => '잘못된 JSON';
-	@override String get reject => '거절';
+	@override String get allowWithChanges => '변경 포함 허용';
 }
 
 // Path: chat.todo
@@ -935,6 +1044,23 @@ class Translations$chat$codex$ko extends Translations$chat$codex$en {
 	@override String get technicalDetails => '기술 상세';
 }
 
+// Path: chat.voice
+class Translations$chat$voice$ko extends Translations$chat$voice$en {
+	Translations$chat$voice$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get autoRead => '답변 소리 내어 읽기';
+	@override String get autoReadOn => '답변 읽기: 켬';
+	@override String get autoReadOff => '답변 읽기: 끔';
+	@override String get autoReadVoice => '읽기 음성';
+	@override String get autoReadVoiceAuto => '자동 음성';
+	@override String get autoReadPreview => '답변이 이렇게 들립니다.';
+	@override String get speakMessage => '소리 내어 읽기';
+	@override String get stopSpeaking => '읽기 중지';
+}
+
 // Path: chat.input
 class Translations$chat$input$ko extends Translations$chat$input$en {
 	Translations$chat$input$ko._(TranslationsKo root) : this._root = root, super.internal(root);
@@ -946,6 +1072,12 @@ class Translations$chat$input$ko extends Translations$chat$input$en {
 	@override String get placeholderDefault => '메시지를 입력하세요...';
 	@override String get disabled => '입력 비활성화';
 	@override String get attachFiles => '파일 첨부';
+	@override String get attachFilesDesc => '사진, 파일 또는 문서 업로드';
+	@override String get takePhoto => '사진 촬영';
+	@override String get takePhotoDesc => '카메라로 사진 촬영';
+	@override String get moreTools => '더 많은 도구';
+	@override String get commandsDesc => '단축키와 명령 탐색';
+	@override String get clearInputDesc => '현재 텍스트 버리기';
 	@override String get attachImages => '이미지 첨부';
 	@override String get send => '전송';
 	@override String get stop => '중지';
@@ -954,19 +1086,45 @@ class Translations$chat$input$ko extends Translations$chat$input$en {
 	@override String get showAllCommands => '모든 명령어 보기';
 	@override String get clearInput => '입력 지우기';
 	@override String get scrollToBottom => '맨 아래로 스크롤';
-	@override late final Translations$chat$input$queue$ko queue = Translations$chat$input$queue$ko._(_root);
-	@override String get attachFilesDesc => '사진, 파일 또는 문서 업로드';
-	@override String get takePhoto => '사진 촬영';
-	@override String get takePhotoDesc => '카메라로 사진 촬영';
-	@override String get moreTools => '더 많은 도구';
-	@override String get commandsDesc => '단축키와 명령 탐색';
-	@override String get clearInputDesc => '현재 텍스트 버리기';
 	@override String get newMessage => '새 메시지';
 	@override String get newMessages => '새 메시지들';
+	@override late final Translations$chat$input$queue$ko queue = Translations$chat$input$queue$ko._(_root);
 	@override String get autoContinueTasks => '자동 계속';
 	@override String get autoContinueTasksTooltip => 'Devin이 다음 Task Master 작업으로 자동 진행하도록 활성화';
 	@override late final Translations$chat$input$offlineQueue$ko offlineQueue = Translations$chat$input$offlineQueue$ko._(_root);
+	@override String get voice => '음성 입력';
+	@override String get voiceStart => '메시지 받아쓰기';
+	@override String get voiceStop => '받아쓰기 중지';
+	@override String get pinFile => '파일을 컨텍스트에 고정';
+	@override String get voiceSettings => '음성 설정 (STT)';
 	@override String cameraUnavailable({required Object error}) => '카메라를 사용할 수 없습니다: ${error}';
+}
+
+// Path: chat.composer
+class Translations$chat$composer$ko extends Translations$chat$composer$en {
+	Translations$chat$composer$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get toolsAndActions => '도구 및 작업';
+	@override String get toolsAndActionsDesc => '채팅 입력창의 도구와 컨트롤';
+	@override String get reasoning => '추론';
+	@override String get model => '모델';
+	@override String get effortDefault => '기본값';
+	@override String get loadingModels => '모델 로드 중…';
+	@override String get modelMenu => '모델 및 추론 수준 선택';
+	@override String permissionHeading({required Object provider}) => '${provider} 작업을 어떻게 승인할까요?';
+	@override String get favorites => '즐겨찾기';
+	@override String get account => '계정';
+	@override String get accountMenu => '계정 선택';
+	@override String get accountDefault => '기본 계정';
+	@override String get accountAuto => '자동 (기본값)';
+	@override String get accountIsDefault => '기본값';
+	@override late final Translations$chat$composer$effortLevels$ko effortLevels = Translations$chat$composer$effortLevels$ko._(_root);
+	@override String contextWindow({required Object size}) => '컨텍스트 ${size}';
+	@override String get accountAutoShort => '자동';
+	@override String get uploadNoRecords => '업로드 결과에 항목이 없습니다';
 }
 
 // Path: chat.providerSelection
@@ -979,15 +1137,19 @@ class Translations$chat$providerSelection$ko extends Translations$chat$providerS
 	@override String get title => 'AI 어시스턴트 선택';
 	@override String get description => '새 대화를 시작할 프로바이더를 선택하세요';
 	@override String get selectModel => '모델 선택';
-	@override late final Translations$chat$providerSelection$providerInfo$ko providerInfo = Translations$chat$providerSelection$providerInfo$ko._(_root);
-	@override late final Translations$chat$providerSelection$readyPrompt$ko readyPrompt = Translations$chat$providerSelection$readyPrompt$ko._(_root);
-	@override String pressToSearch({required Object shortcut}) => '<kbd>${shortcut}</kbd>를 눌러 세션, 파일 및 커밋을 검색하세요';
 	@override String get workspace => '작업 영역';
 	@override String get noWorkspace => '없음';
 	@override String get clickToChangeWorkspace => '클릭하여 작업 영역 변경';
 	@override String get chooseWorkspace => '작업 영역 선택';
 	@override String get searchWorkspaces => '작업 영역 검색...';
 	@override String get noWorkspacesFound => '작업 영역을 찾을 수 없습니다.';
+	@override late final Translations$chat$providerSelection$providerInfo$ko providerInfo = Translations$chat$providerSelection$providerInfo$ko._(_root);
+	@override late final Translations$chat$providerSelection$readyPrompt$ko readyPrompt = Translations$chat$providerSelection$readyPrompt$ko._(_root);
+	@override String get autoGroup => 'Auto';
+	@override String get autoLabel => 'Auto (오케스트레이션)';
+	@override String get autoDescription => '각 단계를 사용 가능한 최적의 제공자와 모델로 라우팅합니다';
+	@override String get orchestrated => '오케스트레이션';
+	@override String pressToSearch({required Object shortcut}) => '<kbd>${shortcut}</kbd>를 눌러 세션, 파일 및 커밋을 검색하세요';
 	@override String get all => '전체';
 	@override String get free => '무료';
 	@override String get noModelsFound => '모델을 찾을 수 없습니다.';
@@ -1015,6 +1177,7 @@ class Translations$chat$session$ko extends Translations$chat$session$en {
 	@override late final Translations$chat$session$messages$ko messages = Translations$chat$session$messages$ko._(_root);
 	@override String get deleteConfirm => '세션과 트랜스크립트를 제거합니다. 되돌릴 수 없습니다.';
 	@override String get finishRunBeforeWorkspaceChange => '작업 영역을 변경하기 전에 실행을 완료하세요';
+	@override String get fallbackTitle => '세션';
 }
 
 // Path: chat.shell
@@ -1048,6 +1211,7 @@ class Translations$chat$claudeStatus$ko extends Translations$chat$claudeStatus$e
 	@override late final Translations$chat$claudeStatus$elapsed$ko elapsed = Translations$chat$claudeStatus$elapsed$ko._(_root);
 	@override String get stop => '중지';
 	@override String backgroundTasks({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
+		one: '백그라운드 작업 ${count}개 실행 중',
 		other: '백그라운드 작업 ${count}개 실행 중',
 	);
 	@override late final Translations$chat$claudeStatus$controls$ko controls = Translations$chat$claudeStatus$controls$ko._(_root);
@@ -1074,41 +1238,6 @@ class Translations$chat$tasks$ko extends Translations$chat$tasks$en {
 
 	// Translations
 	@override String get nextTaskPrompt => '다음 작업 시작';
-}
-
-// Path: chat.voice
-class Translations$chat$voice$ko extends Translations$chat$voice$en {
-	Translations$chat$voice$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get autoRead => '답변 소리 내어 읽기';
-	@override String get autoReadOn => '답변 읽기: 켬';
-	@override String get autoReadOff => '답변 읽기: 끔';
-	@override String get autoReadVoice => '읽기 음성';
-	@override String get autoReadVoiceAuto => '자동 음성';
-	@override String get autoReadPreview => '답변이 이렇게 들립니다.';
-	@override String get speakMessage => '소리 내어 읽기';
-	@override String get stopSpeaking => '읽기 중지';
-}
-
-// Path: chat.composer
-class Translations$chat$composer$ko extends Translations$chat$composer$en {
-	Translations$chat$composer$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get toolsAndActions => '도구 및 작업';
-	@override String get toolsAndActionsDesc => '채팅 입력창의 도구와 컨트롤';
-	@override String get reasoning => '추론';
-	@override String get model => '모델';
-	@override String get effortDefault => '기본값';
-	@override String get loadingModels => '모델 로드 중…';
-	@override String get modelMenu => '모델 및 추론 수준 선택';
-	@override String permissionHeading({required Object provider}) => '${provider} 작업을 어떻게 승인할까요?';
-	@override String get favorites => '즐겨찾기';
 }
 
 // Path: chat.splitSession
@@ -1157,6 +1286,7 @@ class Translations$chat$sessionPicker$ko extends Translations$chat$sessionPicker
 	@override String get deleteFailed => '세션 삭제에 실패했습니다. 다시 시도하세요.';
 	@override String get running => '세션 실행 중';
 	@override String get unread => '읽지 않음 — 새 출력과 함께 완료됨';
+	@override String get account => '계정';
 }
 
 // Path: chat.splitWorkspace
@@ -1169,9 +1299,12 @@ class Translations$chat$splitWorkspace$ko extends Translations$chat$splitWorkspa
 	@override String get addChat => '채팅 창 추가';
 	@override String get addBrowser => '브라우저 창 추가';
 	@override String get addTerminal => '터미널 창 추가';
+	@override String get addPreview => '미리보기 창 추가';
 	@override String get overview => '모든 창 표시';
 	@override String get exitFocusMode => '포커스 모드 종료 (Ctrl+Shift+F)';
 	@override String get focusMode => '포커스 모드 (Ctrl+Shift+F)';
+	@override String get broadcast => '세션에 일괄 전송';
+	@override String get addNotes => '공유 메모 창 추가';
 	@override String get browseSessions => '세션 목록 열기';
 }
 
@@ -1199,9 +1332,9 @@ class Translations$chat$askUserQuestion$ko extends Translations$chat$askUserQues
 
 	// Translations
 	@override String needsInput({required Object provider}) => '${provider}이(가) 입력을 기다립니다';
-	@override String get answerHint => '답변을 입력하세요…';
-	@override String get other => '기타…';
 	@override String get skip => '건너뛰기';
+	@override String get other => '기타…';
+	@override String get answerHint => '답변을 입력하세요…';
 }
 
 // Path: chat.attachments
@@ -1214,6 +1347,8 @@ class Translations$chat$attachments$ko extends Translations$chat$attachments$en 
 	@override String get downloadFailedRetry => '다운로드 실패 — 클릭하여 다시 시도';
 	@override String get fileAttachment => '파일 첨부';
 	@override String download({required Object name}) => '${name} 다운로드';
+	@override String get attachedFile => '첨부 파일';
+	@override String downloaded({required Object name}) => '${name} 다운로드 완료';
 }
 
 // Path: chat.checkpoint
@@ -1226,6 +1361,9 @@ class Translations$chat$checkpoint$ko extends Translations$chat$checkpoint$en {
 	@override String get creating => '스냅샷 생성 중…';
 	@override String get revertChanges => '파일을 마지막 체크포인트로 되돌리기';
 	@override String get undo => '체크포인트 실행 취소';
+	@override String get undoAiRun => 'AI 실행 되돌리기';
+	@override String get undoing => '되돌리는 중…';
+	@override String get undone => '되돌림';
 	@override String get beforeAiTurn => 'AI 턴 이전';
 }
 
@@ -1252,6 +1390,7 @@ class Translations$chat$taskMaster$ko extends Translations$chat$taskMaster$en {
 	@override String get taskShort => '작업';
 	@override String get addToTask => 'TaskMaster에 추가';
 	@override String get added => 'TaskMaster에 추가됨';
+	@override String get defaultTaskTitle => '채팅에서 만든 작업';
 }
 
 // Path: chat.tokenUsage
@@ -1263,6 +1402,10 @@ class Translations$chat$tokenUsage$ko extends Translations$chat$tokenUsage$en {
 	// Translations
 	@override String get desc => '세션 토큰 사용량 보기';
 	@override String get title => '토큰 사용량';
+	@override String get notAvailable => '없음';
+	@override String tokensBadge({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
+		other: '${count} 토큰',
+	);
 }
 
 // Path: chat.tool
@@ -1284,6 +1427,29 @@ class Translations$chat$quotaBadge$ko extends Translations$chat$quotaBadge$en {
 	// Translations
 	@override String get ariaLabel => '구독 한도';
 	@override String get noData => '이 모델에 대한 구독 데이터가 없습니다';
+	@override String get noSubscription => '구독 없음';
+	@override String windowLineReset({required Object label, required Object percent, required Object time}) => '${label}: ${percent}% · 초기화 ${time}';
+	@override String windowRemaining({required Object percent}) => '초기화까지 기간의 ${percent}% 남음';
+}
+
+// Path: chat.broadcast
+class Translations$chat$broadcast$ko extends Translations$chat$broadcast$en {
+	Translations$chat$broadcast$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '세션에 일괄 전송';
+	@override String get noSessions => '사용 가능한 세션이 없습니다';
+	@override String get placeholder => '선택한 모든 세션에 보낼 메시지…';
+	@override String partial({required Object count}) => '세션 ${count}개가 메시지를 거부했습니다';
+	@override String sent({required Object count}) => '세션 ${count}개의 대기열에 추가됨';
+	@override String get selectAll => '모두 선택';
+	@override String get selectOrchestrators => '오케스트레이터 선택';
+	@override String get orchestratorsOnly => '오케스트레이터만';
+	@override String get noOrchestrators => '사용 가능한 오케스트레이터 세션이 없습니다';
+	@override String get sending => '보내는 중…';
+	@override String send({required Object count}) => '${count}개에 보내기';
 }
 
 // Path: chat.paneHeader
@@ -1297,27 +1463,17 @@ class Translations$chat$paneHeader$ko extends Translations$chat$paneHeader$en {
 	@override String get switchSession => '세션 전환';
 }
 
-// Path: chat.broadcast
-class Translations$chat$broadcast$ko extends Translations$chat$broadcast$en {
-	Translations$chat$broadcast$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+// Path: chat.export
+class Translations$chat$export$ko extends Translations$chat$export$en {
+	Translations$chat$export$ko._(TranslationsKo root) : this._root = root, super.internal(root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get selectOrchestrators => '오케스트레이터 선택';
-	@override String get orchestratorsOnly => '오케스트레이터만';
-	@override String get noOrchestrators => '사용 가능한 오케스트레이터 세션이 없습니다';
-}
-
-// Path: chat.changes
-class Translations$chat$changes$ko extends Translations$chat$changes$en {
-	Translations$chat$changes$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get empty => '파일 변경 없음';
-	@override String get failedToLoad => '변경사항을 불러오지 못했습니다';
+	@override String sessionTitle({required Object id}) => '세션 ${id}';
+	@override String get pdfFailed => 'PDF 내보내기 실패';
+	@override String get transcriptDownloaded => '트랜스크립트 다운로드됨';
+	@override String savedTo({required Object path}) => '${path}에 저장됨';
 }
 
 // Path: chat.commandResult
@@ -1341,19 +1497,69 @@ class Translations$chat$commands$ko extends Translations$chat$commands$en {
 	// Translations
 	@override String get runConfirmTitle => '명령어를 실행할까요?';
 	@override String get executionCancelled => '명령어 실행이 취소되었습니다';
+	@override String get bashConfirmMessage => '이 명령에는 실행될 bash 명령이 포함되어 있습니다. 계속할까요?';
+	@override String get proceed => '계속';
 }
 
-// Path: chat.export
-class Translations$chat$export$ko extends Translations$chat$export$en {
-	Translations$chat$export$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+// Path: chat.pinFile
+class Translations$chat$pinFile$ko extends Translations$chat$pinFile$en {
+	Translations$chat$pinFile$ko._(TranslationsKo root) : this._root = root, super.internal(root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String sessionTitle({required Object id}) => '세션 ${id}';
-	@override String get pdfFailed => 'PDF 내보내기 실패';
-	@override String get transcriptDownloaded => '트랜스크립트 다운로드됨';
-	@override String savedTo({required Object path}) => '${path}에 저장됨';
+	@override String get title => '파일 고정';
+	@override String get pathHint => 'path/to/file.ext';
+	@override String get action => '고정';
+}
+
+// Path: chat.modelLibrary
+class Translations$chat$modelLibrary$ko extends Translations$chat$modelLibrary$en {
+	Translations$chat$modelLibrary$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String editTooltip({required Object name}) => '${name} 편집';
+	@override String deleteTooltip({required Object name}) => '${name} 삭제';
+	@override String get enterNameAndId => '모델 이름과 모델 ID를 모두 입력하세요.';
+	@override String get idNoSpaces => '모델 ID에는 공백을 사용할 수 없습니다.';
+	@override String get setAsDefault => '기본으로 설정';
+	@override String get defaultModel => '기본 모델';
+	@override String get title => '모델 라이브러리';
+	@override String get subtitle => '공급자가 지원하는 모델 ID를 추가하세요. 기본 제공 모델은 잠긴 상태로 유지됩니다. 원은 기본 모델을 나타냅니다.';
+	@override String get yourModels => '내 모델';
+	@override String get yourModelsHint => '편집 가능하며 auth.db에 저장됨';
+	@override String get emptyTitle => '아직 사용자 지정 모델이 없습니다';
+	@override String get emptyHint => '양식으로 추가하면 모든 모델 선택기에 표시됩니다.';
+	@override String get builtInModels => '기본 제공 모델';
+	@override String get builtInModelsHint => 'DDAgent에서 관리하며 읽기 전용';
+	@override String get editTitle => '사용자 지정 모델 편집';
+	@override String get addTitle => '사용자 지정 모델 추가';
+	@override String idSentAsWritten({required Object provider}) => 'ID는 입력한 그대로 ${provider}에 전송됩니다.';
+	@override String get nameLabel => '모델 이름';
+	@override String get nameHint => '예: GPT-5.5 Pro';
+	@override String get idLabel => '모델 ID';
+	@override String get idHint => '예: gpt-5.5-pro';
+	@override String get idHelp => '공급자 CLI가 허용하는 정확한 식별자를 사용하세요. ID에는 공백을 넣을 수 없습니다.';
+	@override String updatedNotice({required Object name}) => '${name}을(를) 업데이트했습니다.';
+	@override String addedNotice({required Object name}) => '${name}을(를) 추가했습니다.';
+	@override String deletedNotice({required Object name}) => '${name}을(를) 삭제했습니다.';
+	@override String get saving => '저장 중…';
+	@override String get saveChanges => '변경 사항 저장';
+	@override String get deleteConfirm => '모든 선택기에서 이 모델을 삭제할까요?';
+	@override String get customBadge => '사용자 지정';
+}
+
+// Path: chat.changes
+class Translations$chat$changes$ko extends Translations$chat$changes$en {
+	Translations$chat$changes$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get failedToLoad => '변경사항을 불러오지 못했습니다';
+	@override String get empty => '파일 변경 없음';
 }
 
 // Path: chat.message
@@ -1364,35 +1570,9 @@ class Translations$chat$message$ko extends Translations$chat$message$en {
 
 	// Translations
 	@override String get compactedSummary => '압축된 요약';
-	@override String get rawView => 'Raw 보기';
 	@override String get resendHint => '입력창에서 다시 전송';
-}
-
-// Path: chat.modelLibrary
-class Translations$chat$modelLibrary$ko extends Translations$chat$modelLibrary$en {
-	Translations$chat$modelLibrary$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String deleteTooltip({required Object name}) => '${name} 삭제';
-	@override String editTooltip({required Object name}) => '${name} 편집';
-	@override String get enterNameAndId => '모델 이름과 모델 ID를 모두 입력하세요.';
-	@override String get idNoSpaces => '모델 ID에는 공백을 사용할 수 없습니다.';
-	@override String get setAsDefault => '기본으로 설정';
-	@override String get defaultModel => '기본 모델';
-}
-
-// Path: chat.pinFile
-class Translations$chat$pinFile$ko extends Translations$chat$pinFile$en {
-	Translations$chat$pinFile$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get action => '고정';
-	@override String get pathHint => 'path/to/file.ext';
-	@override String get title => '파일 고정';
+	@override String get rawView => 'Raw 보기';
+	@override String get runComplete => '실행 완료';
 }
 
 // Path: chat.permissionRequest
@@ -1404,6 +1584,150 @@ class Translations$chat$permissionRequest$ko extends Translations$chat$permissio
 	// Translations
 	@override String title({required Object tool}) => '권한 요청 · ${tool}';
 	@override String get question => '질문';
+	@override String get subagent => '하위 에이전트';
+	@override String get viewersCannotApprove => '뷰어는 승인할 수 없습니다';
+	@override late final Translations$chat$permissionRequest$recap$ko recap = Translations$chat$permissionRequest$recap$ko._(_root);
+	@override String needsApproval({required Object tool}) => '${tool} 승인이 필요합니다';
+	@override String subagentNeedsApproval({required Object tool}) => '하위 에이전트: ${tool} 승인이 필요합니다';
+	@override String moreQuestions({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
+		other: '대기 중인 질문 ${count}개 더 있음',
+	);
+}
+
+// Path: chat.commandDialog
+class Translations$chat$commandDialog$ko extends Translations$chat$commandDialog$en {
+	Translations$chat$commandDialog$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$chat$commandDialog$help$ko help = Translations$chat$commandDialog$help$ko._(_root);
+	@override late final Translations$chat$commandDialog$models$ko models = Translations$chat$commandDialog$models$ko._(_root);
+	@override late final Translations$chat$commandDialog$cost$ko cost = Translations$chat$commandDialog$cost$ko._(_root);
+	@override late final Translations$chat$commandDialog$status$ko status = Translations$chat$commandDialog$status$ko._(_root);
+	@override String get defaultEyebrow => '명령';
+	@override String get defaultTitle => '명령 결과';
+	@override String get escHint => 'Esc 키로 창을 닫습니다.';
+	@override String get unknown => '알 수 없음';
+	@override String get noDescription => '설명이 없습니다.';
+	@override String get noCommandsMatch => '이 필터와 일치하는 명령이 없습니다.';
+	@override late final Translations$chat$commandDialog$syntax$ko syntax = Translations$chat$commandDialog$syntax$ko._(_root);
+	@override String get commandFinished => '명령이 완료되었습니다.';
+}
+
+// Path: chat.utilities
+class Translations$chat$utilities$ko extends Translations$chat$utilities$en {
+	Translations$chat$utilities$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get tokenUsageUnavailable => '토큰 사용량을 사용할 수 없습니다';
+	@override late final Translations$chat$utilities$tooltip$ko tooltip = Translations$chat$utilities$tooltip$ko._(_root);
+	@override String get used => '사용됨';
+	@override String get cacheWrite => '캐시 쓰기';
+	@override String get contextLabel => '컨텍스트';
+	@override String get usageUnsupported => '사용량 미지원';
+	@override String get chatTranscript => '채팅 기록';
+	@override String get you => '나:';
+	@override String get providerAutoMini => '자동 (mini)';
+}
+
+// Path: chat.toolBlocks
+class Translations$chat$toolBlocks$ko extends Translations$chat$toolBlocks$en {
+	Translations$chat$toolBlocks$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String moreLines({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
+		other: '… ${count}줄 더 있음',
+	);
+	@override late final Translations$chat$toolBlocks$status$ko status = Translations$chat$toolBlocks$status$ko._(_root);
+	@override String get showLess => '간단히 보기';
+	@override String get showMore => '더 보기';
+	@override String showMoreLines({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
+		other: '${count}줄 더 보기',
+	);
+	@override String get tools => '도구';
+	@override String get planReview => '계획 검토';
+	@override String get planUpdate => '계획 업데이트';
+	@override String get todoListUpdated => '할 일 목록이 업데이트됨';
+	@override String get creatingTask => '작업 생성 중';
+	@override String get updatingTask => '업데이트 중';
+	@override String get fetchingTask => '가져오는 중';
+	@override String get listingTasks => '작업 목록 조회 중';
+	@override String get search => '검색';
+	@override late final Translations$chat$toolBlocks$verbs$ko verbs = Translations$chat$toolBlocks$verbs$ko._(_root);
+	@override String get subagent => '하위 에이전트';
+	@override String toolCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
+		other: '도구 ${count}개',
+	);
+	@override String get result => '결과';
+	@override String plusMore({required Object count}) => '+${count}개 더';
+	@override String get plan => '계획';
+	@override String questionProgress({required Object current, required Object total}) => '질문 ${current}/${total}';
+	@override String lineCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
+		other: '${count}줄',
+	);
+	@override String todoListItems({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
+		other: '할 일 목록 (${count}개 항목)',
+	);
+	@override String tasksCompleted({required Object done, required Object total}) => '${done}/${total} 완료';
+}
+
+// Path: chat.commandMenu
+class Translations$chat$commandMenu$ko extends Translations$chat$commandMenu$en {
+	Translations$chat$commandMenu$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get empty => '사용 가능한 명령이 없습니다';
+	@override late final Translations$chat$commandMenu$namespaces$ko namespaces = Translations$chat$commandMenu$namespaces$ko._(_root);
+}
+
+// Path: chat.mentionMenu
+class Translations$chat$mentionMenu$ko extends Translations$chat$mentionMenu$en {
+	Translations$chat$mentionMenu$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$chat$mentionMenu$kinds$ko kinds = Translations$chat$mentionMenu$kinds$ko._(_root);
+	@override String taskTitle({required Object id}) => '작업 ${id}';
+}
+
+// Path: chat.subheader
+class Translations$chat$subheader$ko extends Translations$chat$subheader$en {
+	Translations$chat$subheader$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String contextTooltip({required Object used, required Object total, required Object percent}) => '컨텍스트: ${used} / ${total} 토큰 · ${percent}% 사용';
+}
+
+// Path: chat.transcript
+class Translations$chat$transcript$ko extends Translations$chat$transcript$en {
+	Translations$chat$transcript$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get requestFailed => '요청에 실패했습니다';
+}
+
+// Path: chat.review
+class Translations$chat$review$ko extends Translations$chat$review$en {
+	Translations$chat$review$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get changedFiles => '변경된 파일';
+	@override String changedFilesCount({required Object count}) => '변경된 파일 (${count})';
+	@override String get subagent => '하위 에이전트';
 }
 
 // Path: codeEditor.toolbar
@@ -1421,10 +1745,10 @@ class Translations$codeEditor$toolbar$ko extends Translations$codeEditor$toolbar
 	@override String get settings => '에디터 설정';
 	@override String get collapse => '에디터 접기';
 	@override String get expand => '에디터 전체 너비로 펼치기';
+	@override String get toggleDock => '파일 독 전환';
 	@override String get diffMerge => 'Diff / 병합';
 	@override String get previewInBrowser => '브라우저에서 미리보기';
 	@override String get reload => '디스크에서 다시 로드';
-	@override String get toggleDock => '파일 독 전환';
 }
 
 // Path: codeEditor.header
@@ -1472,6 +1796,11 @@ class Translations$codeEditor$footer$ko extends Translations$codeEditor$footer$e
 	@override String get lines => '줄:';
 	@override String get characters => '문자:';
 	@override String get shortcuts => 'Ctrl+S로 저장 • Esc로 닫기';
+	@override String get plainText => '일반 텍스트';
+	@override String lineCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
+		other: '${count}줄',
+	);
+	@override String get modified => '수정됨';
 }
 
 // Path: codeEditor.binaryFile
@@ -1498,30 +1827,15 @@ class Translations$codeEditor$filePreview$ko extends Translations$codeEditor$fil
 	@override String get openInNewTab => '새 탭에서 열기';
 }
 
-// Path: codeEditor.diff
-class Translations$codeEditor$diff$ko extends Translations$codeEditor$diff$en {
-	Translations$codeEditor$diff$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+// Path: codeEditor.mediaFile
+class Translations$codeEditor$mediaFile$ko extends Translations$codeEditor$mediaFile$en {
+	Translations$codeEditor$mediaFile$ko._(TranslationsKo root) : this._root = root, super.internal(root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get applyMerge => '병합 적용';
-	@override String get base => '기본';
-	@override String get close => 'diff 닫기';
-	@override String get current => '현재';
-	@override String hunk({required Object number}) => '헝크 ${number}';
-	@override String get noChanges => '변경 사항 없음';
-	@override String get deletedOnDisk => '디스크에서 삭제됨';
-}
-
-// Path: codeEditor.emptyState
-class Translations$codeEditor$emptyState$ko extends Translations$codeEditor$emptyState$en {
-	Translations$codeEditor$emptyState$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => '열린 파일 없음';
+	@override String get title => '미디어 파일';
+	@override String get subtitle => '오디오/비디오 미리보기는 아직 지원되지 않습니다';
 }
 
 // Path: codeEditor.hexDump
@@ -1534,17 +1848,6 @@ class Translations$codeEditor$hexDump$ko extends Translations$codeEditor$hexDump
 	@override String more({required Object size}) => '… ${size}개 더';
 }
 
-// Path: codeEditor.mediaFile
-class Translations$codeEditor$mediaFile$ko extends Translations$codeEditor$mediaFile$en {
-	Translations$codeEditor$mediaFile$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get subtitle => '오디오/비디오 미리보기는 아직 지원되지 않습니다';
-	@override String get title => '미디어 파일';
-}
-
 // Path: codeEditor.settings
 class Translations$codeEditor$settings$ko extends Translations$codeEditor$settings$en {
 	Translations$codeEditor$settings$ko._(TranslationsKo root) : this._root = root, super.internal(root);
@@ -1552,10 +1855,45 @@ class Translations$codeEditor$settings$ko extends Translations$codeEditor$settin
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String fontSizeDecrease({required Object size}) => '글꼴 크기 −  (현재 ${size})';
-	@override String get fontSizeIncrease => '글꼴 크기 +';
 	@override String get minimap => '미니맵';
 	@override String tabSize({required Object size}) => '탭 크기: ${size}';
+	@override String fontSizeDecrease({required Object size}) => '글꼴 크기 −  (현재 ${size})';
+	@override String get fontSizeIncrease => '글꼴 크기 +';
+}
+
+// Path: codeEditor.diff
+class Translations$codeEditor$diff$ko extends Translations$codeEditor$diff$en {
+	Translations$codeEditor$diff$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get noChanges => '변경 사항 없음';
+	@override String hunk({required Object number}) => '헝크 ${number}';
+	@override String get close => 'diff 닫기';
+	@override String get base => '기본';
+	@override String get current => '현재';
+	@override String get applyMerge => '병합 적용';
+	@override String get deletedOnDisk => '디스크에서 삭제됨';
+	@override String get untrackedWillBeDeleted => '추적되지 않는 이 파일이 삭제됩니다.';
+	@override String restoreConfirm({required Object name}) => '${name}을(를) 커밋된 상태로 복원할까요?';
+	@override String get headVsWorkingCopy => 'HEAD 대 작업 사본';
+	@override String get savedVsBuffer => '마지막 저장본 대 버퍼(git 없음)';
+	@override String unchangedLines({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
+		other: '변경 없는 ${count}줄',
+	);
+	@override String get revertToSaved => '저장된 상태로 되돌리기';
+}
+
+// Path: codeEditor.emptyState
+class Translations$codeEditor$emptyState$ko extends Translations$codeEditor$emptyState$en {
+	Translations$codeEditor$emptyState$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '열린 파일 없음';
+	@override String get hint => '파일 탭에서 파일을 여세요';
 }
 
 // Path: codeEditor.toasts
@@ -1596,8 +1934,8 @@ class Translations$common$buttons$ko extends Translations$common$buttons$en {
 	@override String get download => '다운로드';
 	@override String get upload => '업로드';
 	@override String get browse => '찾아보기';
-	@override String get openDiagram => '다이어그램 열기';
 	@override String get update => '업데이트';
+	@override String get openDiagram => '다이어그램 열기';
 }
 
 // Path: common.tabs
@@ -1612,10 +1950,53 @@ class Translations$common$tabs$ko extends Translations$common$tabs$en {
 	@override String get files => '파일';
 	@override String get git => '소스 관리';
 	@override String get tasks => '작업';
+	@override String get board => '보드';
 	@override String get browser => '브라우저';
 	@override String get computer => '컴퓨터';
-	@override String get board => '보드';
-	@override String get usage => 'AI Control';
+	@override String get usage => 'AI 컨트롤';
+}
+
+// Path: common.quota
+class Translations$common$quota$ko extends Translations$common$quota$en {
+	Translations$common$quota$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get controlCenter => 'AI 컨트롤 센터';
+	@override late final Translations$common$quota$section$ko section = Translations$common$quota$section$ko._(_root);
+	@override late final Translations$common$quota$filter$ko filter = Translations$common$quota$filter$ko._(_root);
+	@override late final Translations$common$quota$period$ko period = Translations$common$quota$period$ko._(_root);
+	@override late final Translations$common$quota$group$ko group = Translations$common$quota$group$ko._(_root);
+	@override late final Translations$common$quota$metric$ko metric = Translations$common$quota$metric$ko._(_root);
+	@override late final Translations$common$quota$cost$ko cost = Translations$common$quota$cost$ko._(_root);
+	@override late final Translations$common$quota$cost3$ko cost3 = Translations$common$quota$cost3$ko._(_root);
+	@override late final Translations$common$quota$overview$ko overview = Translations$common$quota$overview$ko._(_root);
+	@override late final Translations$common$quota$usage$ko usage = Translations$common$quota$usage$ko._(_root);
+	@override late final Translations$common$quota$agents$ko agents = Translations$common$quota$agents$ko._(_root);
+	@override late final Translations$common$quota$agentStatus$ko agentStatus = Translations$common$quota$agentStatus$ko._(_root);
+	@override late final Translations$common$quota$alert$ko alert = Translations$common$quota$alert$ko._(_root);
+	@override String get backToChat => '채팅으로 돌아가기';
+	@override String get syncNow => '지금 동기화';
+	@override String generatedAt({required Object value}) => '업데이트: ${value}';
+	@override String get loading => '계정 한도 로드 중…';
+	@override String remaining({required Object value}) => '${value}% 남음';
+	@override String resetsIn({required Object value}) => '${value} 후 리셋';
+	@override String projected({required Object value}) => '현재 속도로 이 한도는 ${value} 후 소진됩니다';
+	@override String syncedAgo({required Object value}) => '${value} 전에 동기화됨';
+	@override String get refreshAccount => '계정 새로고침';
+	@override String get syncFailed => '동기화 실패';
+	@override String get history => '기록';
+	@override String historyPoints({required Object value}) => '${value}개 판독값 기록됨';
+	@override String get historyEmpty => '아직 기록된 내역 없음';
+	@override String get noAgents => '할당된 에이전트 없음';
+	@override String get noSubscription => '구독 없음';
+	@override String get noSubscriptionHint => '제공자가 이 계정에 대한 활성 플랜을 보고하지 않습니다.';
+	@override late final Translations$common$quota$quality$ko quality = Translations$common$quota$quality$ko._(_root);
+	@override late final Translations$common$quota$kpi$ko kpi = Translations$common$quota$kpi$ko._(_root);
+	@override late final Translations$common$quota$empty$ko empty = Translations$common$quota$empty$ko._(_root);
+	@override late final Translations$common$quota$settings$ko settings = Translations$common$quota$settings$ko._(_root);
+	@override late final Translations$common$quota$range$ko range = Translations$common$quota$range$ko._(_root);
 }
 
 // Path: common.status
@@ -1667,6 +2048,7 @@ class Translations$common$navigation$ko extends Translations$common$navigation$e
 	@override String get next => '다음';
 	@override String get previous => '이전';
 	@override String get logout => '로그아웃';
+	@override String get backToChat => '채팅으로 돌아가기';
 }
 
 // Path: common.common
@@ -1762,6 +2144,9 @@ class Translations$common$fileTree$ko extends Translations$common$fileTree$en {
 	@override String get compactView => '컴팩트 보기';
 	@override String get detailedView => '상세히 보기';
 	@override String get searchPlaceholder => '파일 및 폴더 검색...';
+	@override String get searchContentPlaceholder => '파일 내 검색...';
+	@override String get searchInFiles => '파일 내 검색';
+	@override String get searchByName => '이름으로 검색';
 	@override String get clearSearch => '검색 지우기';
 	@override String get name => '이름';
 	@override String get size => '크기';
@@ -1769,8 +2154,13 @@ class Translations$common$fileTree$ko extends Translations$common$fileTree$en {
 	@override String get permissions => '권한';
 	@override String get noFilesFound => '파일을 찾을 수 없음';
 	@override String get checkProjectPath => '프로젝트 경로가 접근 가능한지 확인하세요';
+	@override String get loadFailed => '파일을 불러올 수 없습니다';
 	@override String get noMatchesFound => '일치하는 항목 없음';
+	@override String get noSearchResults => '일치하는 항목 없음';
 	@override String get tryDifferentSearch => '다른 검색어를 시도하거나 검색을 지우세요';
+	@override String get searchError => '검색 실패';
+	@override String get searching => '검색 중...';
+	@override String resultsTruncated({required Object count}) => '처음 ${count}개 결과 표시';
 	@override String get justNow => '방금 전';
 	@override String minAgo({required Object count}) => '${count}분 전';
 	@override String hoursAgo({required Object count}) => '${count}시간 전';
@@ -1780,14 +2170,6 @@ class Translations$common$fileTree$ko extends Translations$common$fileTree$en {
 	@override String get refresh => '새로고침';
 	@override String get collapseAll => '모두 접기';
 	@override late final Translations$common$fileTree$context$ko context = Translations$common$fileTree$context$ko._(_root);
-	@override String get searchContentPlaceholder => '파일 내 검색...';
-	@override String get searchInFiles => '파일 내 검색';
-	@override String get searchByName => '이름으로 검색';
-	@override String get loadFailed => '파일을 불러올 수 없습니다';
-	@override String get noSearchResults => '일치하는 항목 없음';
-	@override String get searchError => '검색 실패';
-	@override String get searching => '검색 중...';
-	@override String resultsTruncated({required Object count}) => '처음 ${count}개 결과 표시';
 	@override String get allWorkspaces => '모든 작업 영역';
 	@override late final Translations$common$fileTree$delete$ko delete = Translations$common$fileTree$delete$ko._(_root);
 	@override String get dropToUpload => '파일을 놓아 업로드';
@@ -1856,49 +2238,6 @@ class Translations$common$versionUpdate$ko extends Translations$common$versionUp
 	@override String get updateFailed => '업데이트 실패';
 	@override late final Translations$common$versionUpdate$buttons$ko buttons = Translations$common$versionUpdate$buttons$ko._(_root);
 	@override late final Translations$common$versionUpdate$ariaLabels$ko ariaLabels = Translations$common$versionUpdate$ariaLabels$ko._(_root);
-}
-
-// Path: common.quota
-class Translations$common$quota$ko extends Translations$common$quota$en {
-	Translations$common$quota$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get controlCenter => 'AI Control Center';
-	@override late final Translations$common$quota$section$ko section = Translations$common$quota$section$ko._(_root);
-	@override late final Translations$common$quota$filter$ko filter = Translations$common$quota$filter$ko._(_root);
-	@override late final Translations$common$quota$period$ko period = Translations$common$quota$period$ko._(_root);
-	@override late final Translations$common$quota$group$ko group = Translations$common$quota$group$ko._(_root);
-	@override late final Translations$common$quota$metric$ko metric = Translations$common$quota$metric$ko._(_root);
-	@override late final Translations$common$quota$cost$ko cost = Translations$common$quota$cost$ko._(_root);
-	@override late final Translations$common$quota$cost3$ko cost3 = Translations$common$quota$cost3$ko._(_root);
-	@override late final Translations$common$quota$overview$ko overview = Translations$common$quota$overview$ko._(_root);
-	@override late final Translations$common$quota$usage$ko usage = Translations$common$quota$usage$ko._(_root);
-	@override late final Translations$common$quota$agents$ko agents = Translations$common$quota$agents$ko._(_root);
-	@override late final Translations$common$quota$agentStatus$ko agentStatus = Translations$common$quota$agentStatus$ko._(_root);
-	@override late final Translations$common$quota$alert$ko alert = Translations$common$quota$alert$ko._(_root);
-	@override String get backToChat => '채팅으로 돌아가기';
-	@override String get syncNow => '지금 동기화';
-	@override String generatedAt({required Object value}) => '업데이트: ${value}';
-	@override String get loading => '계정 한도 로드 중…';
-	@override String remaining({required Object value}) => '${value}% 남음';
-	@override String resetsIn({required Object value}) => '${value} 후 리셋';
-	@override String projected({required Object value}) => '현재 속도로 이 한도는 ${value} 후 소진됩니다';
-	@override String syncedAgo({required Object value}) => '${value} 전에 동기화됨';
-	@override String get refreshAccount => '계정 새로고침';
-	@override String get syncFailed => '동기화 실패';
-	@override String get history => '기록';
-	@override String historyPoints({required Object value}) => '${value}개 판독값 기록됨';
-	@override String get historyEmpty => '아직 기록된 내역 없음';
-	@override String get noAgents => '할당된 에이전트 없음';
-	@override String get noSubscription => '구독 없음';
-	@override String get noSubscriptionHint => '제공자가 이 계정에 대한 활성 플랜을 보고하지 않습니다.';
-	@override late final Translations$common$quota$quality$ko quality = Translations$common$quota$quality$ko._(_root);
-	@override late final Translations$common$quota$kpi$ko kpi = Translations$common$quota$kpi$ko._(_root);
-	@override late final Translations$common$quota$empty$ko empty = Translations$common$quota$empty$ko._(_root);
-	@override late final Translations$common$quota$settings$ko settings = Translations$common$quota$settings$ko._(_root);
-	@override late final Translations$common$quota$range$ko range = Translations$common$quota$range$ko._(_root);
 }
 
 // Path: common.actions
@@ -2115,6 +2454,8 @@ class Translations$common$gitPanel$ko extends Translations$common$gitPanel$en {
 	@override late final Translations$common$gitPanel$worktrees$ko worktrees = Translations$common$gitPanel$worktrees$ko._(_root);
 	@override String get wrap => '줄바꿈';
 	@override late final Translations$common$gitPanel$tabs$ko tabs = Translations$common$gitPanel$tabs$ko._(_root);
+	@override String get save => '저장';
+	@override late final Translations$common$gitPanel$worktreeScripts$ko worktreeScripts = Translations$common$gitPanel$worktreeScripts$ko._(_root);
 }
 
 // Path: common.sessions
@@ -2135,6 +2476,20 @@ class Translations$common$projects$ko extends Translations$common$projects$en {
 
 	// Translations
 	@override String get newSession => '새 세션';
+}
+
+// Path: common.sharedNotes
+class Translations$common$sharedNotes$ko extends Translations$common$sharedNotes$en {
+	Translations$common$sharedNotes$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get subtitle => '공유 메모리 — 이 프로젝트의 모든 세션에 주입됩니다';
+	@override String get save => '저장';
+	@override String get saving => '저장 중…';
+	@override String get noProject => '공유 컨텍스트를 편집할 작업 영역을 선택하세요';
+	@override String get placeholder => '# 공유 컨텍스트\n모든 에이전트가 알아야 할 규칙, 결정 사항, 참고 자료…';
 }
 
 // Path: common.codeBlock
@@ -2180,6 +2535,26 @@ class Translations$common$update$ko extends Translations$common$update$en {
 	@override String staged({required Object version}) => '업데이트 v${version}을(를) 다운로드했습니다 — 설치하려면 서버를 재시작하세요.';
 	@override String get upToDate => '서버가 이미 최신 릴리스입니다.';
 	@override String webHostFailed({required Object message}) => '서버는 업데이트되었지만 웹 인터페이스는 업데이트되지 않았습니다: ${message}';
+}
+
+// Path: common.appShell
+class Translations$common$appShell$ko extends Translations$common$appShell$en {
+	Translations$common$appShell$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String panelActive({required Object count}) => '패널 · ${count}개 실행 중';
+}
+
+// Path: common.errors
+class Translations$common$errors$ko extends Translations$common$errors$en {
+	Translations$common$errors$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get forbidden => '액세스가 거부되었습니다';
 }
 
 // Path: settings.changelog
@@ -2228,10 +2603,13 @@ class Translations$settings$updates$ko extends Translations$settings$updates$en 
 	// Translations
 	@override String get title => '업데이트';
 	@override String get description => 'GitHub에서 더 최신 데스크톱 빌드를 확인합니다. 새 버전은 자동으로 다운로드되어 종료 시 설치됩니다.';
+	@override String get descriptionMobile => 'GitHub에서 이 앱의 최신 빌드를 확인합니다. 업데이트는 기기의 시스템 설치 프로그램으로 설치됩니다.';
+	@override String get descriptionServer => 'GitHub에서 최신 DDAgent 릴리스를 확인합니다. 연결된 서버는 스스로 업데이트할 수 있으며, 재시작하는 동안 활성 세션이 중단됩니다.';
 	@override String get check => '업데이트 확인';
 	@override String get checking => '확인 중…';
 	@override String upToDate({required Object version}) => '최신 버전입니다 (v${version}).';
 	@override String available({required Object version}) => '업데이트 v${version} 발견 — 백그라운드에서 다운로드 중; DDAgent 종료 시 설치됩니다.';
+	@override String appAvailable({required Object version}) => '앱 업데이트 v${version} 사용 가능 — 업데이트를 탭하여 이 기기에 설치하세요.';
 	@override String downloaded({required Object version}) => '업데이트 v${version} 다운로드 완료 — DDAgent를 종료 후 다시 실행하면 설치됩니다.';
 	@override String get unavailable => '업데이트 확인은 패키지된 데스크톱 빌드에서만 사용할 수 있습니다.';
 	@override String error({required Object message}) => '업데이트 확인 실패: ${message}';
@@ -2340,6 +2718,7 @@ class Translations$settings$quickSettings$ko extends Translations$settings$quick
 	@override String get sendByCtrlEnterDescription => '활성화하면 Enter 대신 Ctrl+Enter로 메시지를 전송합니다. IME 사용자가 실수로 전송하는 것을 방지하는 데 유용합니다.';
 	@override late final Translations$settings$quickSettings$dragHandle$ko dragHandle = Translations$settings$quickSettings$dragHandle$ko._(_root);
 	@override String get sendWithCtrlEnter => 'Ctrl+Enter로 전송';
+	@override String get enterSendsHint => '끄면 Enter로 전송하고 Shift+Enter로 줄을 바꿉니다.';
 }
 
 // Path: settings.terminalShortcuts
@@ -2358,8 +2737,8 @@ class Translations$settings$terminalShortcuts$ko extends Translations$settings$t
 	@override String get arrowUp => '위쪽 화살표';
 	@override String get arrowDown => '아래쪽 화살표';
 	@override String get scrollDown => '아래로 스크롤';
-	@override late final Translations$settings$terminalShortcuts$handle$ko handle = Translations$settings$terminalShortcuts$handle$ko._(_root);
 	@override String get killTitle => '실행 중인 프로세스 종료 (Ctrl+C)';
+	@override late final Translations$settings$terminalShortcuts$handle$ko handle = Translations$settings$terminalShortcuts$handle$ko._(_root);
 	@override String get paste => '붙여넣기';
 }
 
@@ -2373,7 +2752,9 @@ class Translations$settings$mainTabs$ko extends Translations$settings$mainTabs$e
 	@override String get label => '설정';
 	@override String get agents => '에이전트';
 	@override String get orchestration => '오케스트레이션';
+	@override String get miniOrchestration => '미니 오케스트레이션';
 	@override String get appearance => '외관';
+	@override String get workspaces => '작업 영역';
 	@override String get git => 'Git';
 	@override String get apiTokens => 'API & 토큰';
 	@override String get models => '모델';
@@ -2382,8 +2763,27 @@ class Translations$settings$mainTabs$ko extends Translations$settings$mainTabs$e
 	@override String get tools => '도구';
 	@override String get notifications => '알림';
 	@override String get about => '정보';
-	@override String get workspaces => '작업 영역';
-	@override String get quota => 'Control Center';
+	@override String get quota => '컨트롤 센터';
+	@override String get shortcuts => '키보드 단축키';
+}
+
+// Path: settings.miniOrchestration
+class Translations$settings$miniOrchestration$ko extends Translations$settings$miniOrchestration$en {
+	Translations$settings$miniOrchestration$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '미니 오케스트레이션';
+	@override String get description => '두 모델 파이프라인: flash가 아닌 사고 모델이 계획하고, flash 작업자가 실행합니다.';
+	@override String get loading => '미니 오케스트레이션 설정 로드 중…';
+	@override String get loadError => '미니 오케스트레이션 설정을 불러올 수 없습니다.';
+	@override late final Translations$settings$miniOrchestration$enable$ko enable = Translations$settings$miniOrchestration$enable$ko._(_root);
+	@override late final Translations$settings$miniOrchestration$thinker$ko thinker = Translations$settings$miniOrchestration$thinker$ko._(_root);
+	@override late final Translations$settings$miniOrchestration$worker$ko worker = Translations$settings$miniOrchestration$worker$ko._(_root);
+	@override late final Translations$settings$miniOrchestration$fields$ko fields = Translations$settings$miniOrchestration$fields$ko._(_root);
+	@override late final Translations$settings$miniOrchestration$roles$ko roles = Translations$settings$miniOrchestration$roles$ko._(_root);
+	@override late final Translations$settings$miniOrchestration$planner$ko planner = Translations$settings$miniOrchestration$planner$ko._(_root);
 }
 
 // Path: settings.orchestration
@@ -2393,11 +2793,11 @@ class Translations$settings$orchestration$ko extends Translations$settings$orche
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'Orchestration';
-	@override String get description => 'Route chat tasks across your providers and models.';
-	@override String get loading => 'Loading orchestration settings…';
-	@override String get loadError => 'Could not load the orchestration settings.';
-	@override String get retry => 'Retry';
+	@override String get title => '오케스트레이션';
+	@override String get description => '채팅 작업을 제공자와 모델에 분배합니다.';
+	@override String get loading => '오케스트레이션 설정 로드 중…';
+	@override String get loadError => '오케스트레이션 설정을 불러올 수 없습니다.';
+	@override String get retry => '다시 시도';
 	@override late final Translations$settings$orchestration$enable$ko enable = Translations$settings$orchestration$enable$ko._(_root);
 	@override late final Translations$settings$orchestration$pool$ko pool = Translations$settings$orchestration$pool$ko._(_root);
 	@override late final Translations$settings$orchestration$tiers$ko tiers = Translations$settings$orchestration$tiers$ko._(_root);
@@ -2421,6 +2821,7 @@ class Translations$settings$notifications$ko extends Translations$settings$notif
 	@override late final Translations$settings$notifications$desktop$ko desktop = Translations$settings$notifications$desktop$ko._(_root);
 	@override late final Translations$settings$notifications$sound$ko sound = Translations$settings$notifications$sound$ko._(_root);
 	@override late final Translations$settings$notifications$events$ko events = Translations$settings$notifications$events$ko._(_root);
+	@override late final Translations$settings$notifications$messaging$ko messaging = Translations$settings$notifications$messaging$ko._(_root);
 	@override late final Translations$settings$notifications$channels$ko channels = Translations$settings$notifications$channels$ko._(_root);
 	@override String get unpair => '페어링 해제';
 }
@@ -2543,6 +2944,7 @@ class Translations$settings$agents$ko extends Translations$settings$agents$en {
 	@override late final Translations$settings$agents$login$ko login = Translations$settings$agents$login$ko._(_root);
 	@override late final Translations$settings$agents$logout$ko logout = Translations$settings$agents$logout$ko._(_root);
 	@override String error({required Object error}) => '오류: ${error}';
+	@override late final Translations$settings$agents$accounts$ko accounts = Translations$settings$agents$accounts$ko._(_root);
 }
 
 // Path: settings.permissions
@@ -2634,6 +3036,72 @@ class Translations$settings$workspaces$ko extends Translations$settings$workspac
 	@override String get pathRequired => '경로는 필수입니다';
 }
 
+// Path: settings.stt
+class Translations$settings$stt$ko extends Translations$settings$stt$en {
+	Translations$settings$stt$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '음성 입력 (음성 인식)';
+	@override String get description => 'Whisper 호환 /audio/transcriptions 엔드포인트 (OpenAI, whisper.cpp, faster-whisper, Speaches). 입력창의 마이크 버튼을 활성화합니다.';
+	@override String get configured => '구성됨';
+	@override String get endpoint => '엔드포인트 URL (예: https://api.openai.com/v1)';
+	@override String get apiKey => 'API 키';
+	@override String get model => '모델 (기본값: whisper-1)';
+	@override String get save => '저장';
+}
+
+// Path: settings.schedules
+class Translations$settings$schedules$ko extends Translations$settings$schedules$en {
+	Translations$settings$schedules$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '일정';
+	@override String get description => 'cron 시간표에 따른 반복 에이전트 실행입니다. 실행은 무인으로 진행되며 권한 확인을 우회합니다.';
+	@override String get preventSleep => '에이전트 실행 중 절전 방지';
+	@override String get preventSleepHint => '데스크톱에서는 화면이 켜진 상태로 유지되고, 브라우저에서는 화면 깨우기 잠금이 사용됩니다.';
+	@override String get kNew => '새 일정';
+	@override String get loading => '로드 중…';
+	@override String get empty => '아직 일정이 없습니다.';
+	@override String get project => '프로젝트';
+	@override String get provider => '제공자';
+	@override String get cron => 'Cron (분 시 일 월 요일)';
+	@override String nextRun({required Object time}) => '다음 실행: ${time}';
+	@override String get cronInvalid => '이 표현식으로는 예정된 실행이 없습니다';
+	@override String get prompt => '프롬프트';
+	@override String get useWorktree => '새 worktree에서 실행';
+	@override String get catchUp => '놓친 실행 따라잡기';
+	@override String failures({required Object count}) => '실패 ${count}회';
+	@override String get disabled => '비활성화됨';
+	@override String get history => '기록';
+	@override String get runNow => '지금 실행';
+	@override String get delete => '삭제';
+	@override String get noRuns => '아직 실행 기록이 없습니다.';
+	@override String get next => '다음';
+	@override String get create => '만들기';
+	@override String get toggleSchedule => '일정 사용';
+}
+
+// Path: settings.mcpTokens
+class Translations$settings$mcpTokens$ko extends Translations$settings$mcpTokens$en {
+	Translations$settings$mcpTokens$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'DDAgent MCP 서버 토큰';
+	@override String get description => '외부 도구(Claude Desktop, OpenClaw)는 이 bearer 토큰 중 하나로 POST /mcp를 통해 DDAgent 도구를 호출합니다.';
+	@override String get dismiss => '닫기';
+	@override String get labelPlaceholder => '토큰 레이블 (예: Claude Desktop)';
+	@override String get create => '만들기';
+	@override String get empty => '아직 MCP 토큰이 없습니다.';
+	@override String lastUsed({required Object time}) => '${time} 사용';
+	@override String get neverUsed => '사용한 적 없음';
+}
+
 // Path: settings.about
 class Translations$settings$about$ko extends Translations$settings$about$en {
 	Translations$settings$about$ko._(TranslationsKo root) : this._root = root, super.internal(root);
@@ -2643,10 +3111,10 @@ class Translations$settings$about$ko extends Translations$settings$about$en {
 	// Translations
 	@override String get supportTitle => '프로젝트 후원하기';
 	@override String get buyMeACoffee => '커피 한 잔 사주기';
-	@override String get learnMore => '더 알아보기';
-	@override late final Translations$settings$about$pro$ko pro = Translations$settings$about$pro$ko._(_root);
-	@override String get proFeatures => 'DDAgent Pro 기능';
 	@override String get tryHosted => 'DDAgent Hosted 사용해보기';
+	@override String get learnMore => '더 알아보기';
+	@override String get proFeatures => 'DDAgent Pro 기능';
+	@override late final Translations$settings$about$pro$ko pro = Translations$settings$about$pro$ko._(_root);
 	@override String get versionInfo => '버전 정보';
 	@override String get client => '앱';
 	@override String get server => '서버';
@@ -2654,6 +3122,58 @@ class Translations$settings$about$ko extends Translations$settings$about$en {
 	@override String get platformDesktop => '데스크톱';
 	@override String get platformWeb => 'Web';
 	@override String get unknown => '알 수 없음';
+	@override String get copyright => '© 2026 DDAgent — 모든 권리 보유';
+	@override String get tagline => '오픈 소스 AI 코딩 어시스턴트 인터페이스';
+	@override String get docs => '문서';
+	@override String get hostedDescription => '팀 협업, 공유 MCP 구성, 환경 간 설정 동기화, 관리형 인프라.';
+}
+
+// Path: settings.shortcuts
+class Translations$settings$shortcuts$ko extends Translations$settings$shortcuts$en {
+	Translations$settings$shortcuts$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => 'DDAgent의 모든 키보드 단축키를 플랫폼별로 정리했습니다.';
+	@override String get action => '작업';
+	@override String get winLinux => 'Windows / Linux';
+	@override String get mac => 'macOS';
+	@override String get navigation => '탐색';
+	@override String get navWorkspace => '작업 영역으로 이동';
+	@override String get navTasks => '작업 / Git으로 이동';
+	@override String get navGit => 'Git으로 이동';
+	@override String get navFocus => '집중 모드 전환 (사이드바)';
+	@override String get navSwitcher => '세션 빠른 전환';
+	@override String get navPalette => '명령 팔레트';
+	@override String get navSettings => '설정 열기';
+	@override String get navClose => '대화상자 닫기 / 분할 창 복원';
+	@override String get composer => '입력창';
+	@override String get compSend => '메시지 보내기';
+	@override String get compNewline => '줄 바꿈';
+	@override String get compNav => '제안 항목 탐색';
+	@override String get compAccept => '제안 수락';
+	@override String get compCloseSuggest => '제안 닫기';
+	@override String get transcript => '대화 기록';
+	@override String get trCopy => '선택한 텍스트 복사';
+	@override String get trClose => '검색 / 검토 패널 닫기';
+	@override String get terminal => '터미널';
+	@override String get termCopy => '선택 영역 복사';
+	@override String get termInterrupt => '프로세스 중단 (선택 없음)';
+	@override String get termPaste => '붙여넣기';
+	@override String get termSelectAll => '모두 선택';
+	@override String get editor => '편집기';
+	@override String get edSave => '파일 저장';
+	@override String get edSaveAll => '모든 파일 저장';
+	@override String get edClose => '탭 닫기';
+	@override String get edNextTab => '다음 탭';
+	@override String get edPrevTab => '이전 탭';
+	@override String get edIndent => '들여쓰기 / 내어쓰기';
+	@override String get palette => '명령 팔레트';
+	@override String get palNav => '항목 탐색';
+	@override String get palRun => '실행 / 열기';
+	@override String get palBack => '뒤로 (검색어가 비어 있을 때)';
+	@override String get palClose => '닫기';
 }
 
 // Path: sidebar.projects
@@ -2692,6 +3212,19 @@ class Translations$sidebar$app$ko extends Translations$sidebar$app$en {
 	// Translations
 	@override String get title => 'DDAgent';
 	@override String get subtitle => 'AI 코딩 어시스턴트 UI';
+}
+
+// Path: sidebar.panel
+class Translations$sidebar$panel$ko extends Translations$sidebar$panel$en {
+	Translations$sidebar$panel$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get open => '패널';
+	@override String get newChat => '새 채팅';
+	@override String get navigation => '탐색';
+	@override String get sessions => '세션';
 }
 
 // Path: sidebar.sessions
@@ -2788,6 +3321,22 @@ class Translations$sidebar$actions$ko extends Translations$sidebar$actions$en {
 	@override String get buyMeACoffee => '커피 한 잔 사주기';
 }
 
+// Path: sidebar.workspace
+class Translations$sidebar$workspace$ko extends Translations$sidebar$workspace$en {
+	Translations$sidebar$workspace$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '세션 작업 영역 변경';
+	@override String get description => '에이전트가 이 디렉터리에서 다음 턴을 실행합니다. 기존 세션 기록은 유지됩니다.';
+	@override String get pathLabel => '작업 영역 경로';
+	@override String get pathRequired => '작업 영역 경로가 필요합니다.';
+	@override String get submit => '작업 영역 변경';
+	@override String get saving => '변경 중…';
+	@override String get changeAction => '작업 영역 변경';
+}
+
 // Path: sidebar.branding
 class Translations$sidebar$branding$ko extends Translations$sidebar$branding$en {
 	Translations$sidebar$branding$ko._(TranslationsKo root) : this._root = root, super.internal(root);
@@ -2847,6 +3396,8 @@ class Translations$sidebar$messages$ko extends Translations$sidebar$messages$en 
 	@override String get deleteSessionError => '세션 삭제 오류. 다시 시도해주세요.';
 	@override String get renameSessionFailed => '세션 이름 변경 실패. 다시 시도해주세요.';
 	@override String get renameSessionError => '세션 이름 변경 오류. 다시 시도해주세요.';
+	@override String get changeWorkspaceFailed => '작업 영역 변경에 실패했습니다. 다시 시도하세요.';
+	@override String get changeWorkspaceError => '작업 영역 변경 중 오류가 발생했습니다. 다시 시도하세요.';
 	@override String get deleteProjectFailed => '프로젝트 제거 실패. 다시 시도해주세요.';
 	@override String get deleteProjectError => '프로젝트 제거 오류. 다시 시도해주세요.';
 	@override String get createProjectFailed => '프로젝트 생성 실패. 다시 시도해주세요.';
@@ -2857,8 +3408,6 @@ class Translations$sidebar$messages$ko extends Translations$sidebar$messages$en 
 	@override String get restoreProjectError => '프로젝트 복원 오류. 다시 시도해주세요.';
 	@override String get restoreSessionFailed => '세션 복원 실패. 다시 시도해주세요.';
 	@override String get restoreSessionError => '세션 복원 오류. 다시 시도해주세요.';
-	@override String get changeWorkspaceFailed => '작업 영역 변경에 실패했습니다. 다시 시도하세요.';
-	@override String get changeWorkspaceError => '작업 영역 변경 중 오류가 발생했습니다. 다시 시도하세요.';
 	@override String bulkDeleteSessionsFailed({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
 		one: '${count}개 세션을 삭제하지 못했습니다. 다시 시도하세요.',
 		other: '${count}개 세션을 삭제하지 못했습니다. 다시 시도하세요.',
@@ -2916,6 +3465,21 @@ class Translations$sidebar$search$ko extends Translations$sidebar$search$en {
 	);
 }
 
+// Path: sidebar.recent
+class Translations$sidebar$recent$ko extends Translations$sidebar$recent$en {
+	Translations$sidebar$recent$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '최근 대화';
+	@override String get emptyTitle => '아직 대화 없음';
+	@override String get emptyDescription => '가장 최근에 업데이트된 대화가 여기에 표시됩니다.';
+	@override String get loadFailed => '최근 대화를 불러올 수 없습니다';
+	@override String get loadMore => '이전 대화 불러오기';
+	@override String get loadingMore => '더 불러오는 중...';
+}
+
 // Path: sidebar.deleteConfirmation
 class Translations$sidebar$deleteConfirmation$ko extends Translations$sidebar$deleteConfirmation$en {
 	Translations$sidebar$deleteConfirmation$ko._(TranslationsKo root) : this._root = root, super.internal(root);
@@ -2964,50 +3528,6 @@ class Translations$sidebar$zones$ko extends Translations$sidebar$zones$en {
 	@override String get thisWeek => '이번 주';
 	@override String showMore({required Object count}) => '${count}개 더 보기';
 	@override String get showLess => '간단히 보기';
-}
-
-// Path: sidebar.panel
-class Translations$sidebar$panel$ko extends Translations$sidebar$panel$en {
-	Translations$sidebar$panel$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get open => '패널';
-	@override String get newChat => '새 채팅';
-	@override String get navigation => '탐색';
-	@override String get sessions => '세션';
-}
-
-// Path: sidebar.workspace
-class Translations$sidebar$workspace$ko extends Translations$sidebar$workspace$en {
-	Translations$sidebar$workspace$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => '세션 작업 영역 변경';
-	@override String get description => '에이전트가 이 디렉터리에서 다음 턴을 실행합니다. 기존 세션 기록은 유지됩니다.';
-	@override String get pathLabel => '작업 영역 경로';
-	@override String get pathRequired => '작업 영역 경로가 필요합니다.';
-	@override String get submit => '작업 영역 변경';
-	@override String get saving => '변경 중…';
-	@override String get changeAction => '작업 영역 변경';
-}
-
-// Path: sidebar.recent
-class Translations$sidebar$recent$ko extends Translations$sidebar$recent$en {
-	Translations$sidebar$recent$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => '최근 대화';
-	@override String get emptyTitle => '아직 대화 없음';
-	@override String get emptyDescription => '가장 최근에 업데이트된 대화가 여기에 표시됩니다.';
-	@override String get loadFailed => '최근 대화를 불러올 수 없습니다';
-	@override String get loadMore => '이전 대화 불러오기';
-	@override String get loadingMore => '더 불러오는 중...';
 }
 
 // Path: sidebar.tabs
@@ -3191,11 +3711,11 @@ class Translations$tasks$prd$ko extends Translations$tasks$prd$en {
 	// Translations
 	@override String modified({required Object date}) => '수정됨: ${date}';
 	@override String editorTitle({required Object name}) => 'PRD — ${name}';
-	@override String fileExistsMessage({required Object name}) => '"${name}"이라는 PRD가 이미 있습니다. 덮어쓸까요?';
-	@override String get fileExistsTitle => '파일이 이미 존재합니다';
 	@override String get newFile => '새 파일';
-	@override String get parse => 'PRD 분석';
 	@override String get template => '템플릿';
+	@override String get parse => 'PRD 분석';
+	@override String get fileExistsTitle => '파일이 이미 존재합니다';
+	@override String fileExistsMessage({required Object name}) => '"${name}"이라는 PRD가 이미 있습니다. 덮어쓸까요?';
 	@override String get fileNameHint => '파일 이름 (예: prd.txt)';
 	@override String get saved => 'PRD 저장됨';
 	@override String get tasksGenerated => 'PRD에서 작업이 생성되었습니다';
@@ -3262,6 +3782,10 @@ class Translations$tasks$board$ko extends Translations$tasks$board$en {
 	@override late final Translations$tasks$board$agent$ko agent = Translations$tasks$board$agent$ko._(_root);
 	@override late final Translations$tasks$board$deleteConfirm$ko deleteConfirm = Translations$tasks$board$deleteConfirm$ko._(_root);
 	@override String get project => '프로젝트';
+	@override late final Translations$tasks$board$assignee$ko assignee = Translations$tasks$board$assignee$ko._(_root);
+	@override late final Translations$tasks$board$presence$ko presence = Translations$tasks$board$presence$ko._(_root);
+	@override late final Translations$tasks$board$activity$ko activity = Translations$tasks$board$activity$ko._(_root);
+	@override late final Translations$tasks$board$comments$ko comments = Translations$tasks$board$comments$ko._(_root);
 }
 
 // Path: tasks.card
@@ -3375,9 +3899,9 @@ class Translations$tasks$taskDetail$ko extends Translations$tasks$taskDetail$en 
 	@override String get testStrategy => '테스트 전략';
 	@override String get titleRequired => '제목은 필수입니다';
 	@override String get updateFailed => '작업 업데이트 실패';
-	@override String deleteConfirmMessage({required Object id}) => '작업 #${id}이(가) 제거됩니다. 되돌릴 수 없습니다.';
 	@override String get notFound => '작업을 찾을 수 없습니다';
 	@override String get subtasks => '하위 작업';
+	@override String deleteConfirmMessage({required Object id}) => '작업 #${id}이(가) 제거됩니다. 되돌릴 수 없습니다.';
 	@override String get idCopied => '작업 ID 복사됨';
 }
 
@@ -3389,6 +3913,22 @@ class Translations$tasks$toasts$ko extends Translations$tasks$toasts$en {
 
 	// Translations
 	@override String statusInProgress({required Object id}) => '작업 ${id}이(가) 진행 중으로 설정되었습니다';
+}
+
+// Path: tasks.taskmaster
+class Translations$tasks$taskmaster$ko extends Translations$tasks$taskmaster$en {
+	Translations$tasks$taskmaster$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get noProjectHint => '먼저 프로젝트를 추가한 후 작업을 만드세요.';
+	@override late final Translations$tasks$taskmaster$sort$ko sort = Translations$tasks$taskmaster$sort$ko._(_root);
+	@override String installedVersion({required Object version}) => '설치됨: ${version}';
+	@override String get initFailed => 'TaskMaster를 초기화하지 못했습니다';
+	@override late final Translations$tasks$taskmaster$prd$ko prd = Translations$tasks$taskmaster$prd$ko._(_root);
+	@override late final Translations$tasks$taskmaster$detail$ko detail = Translations$tasks$taskmaster$detail$ko._(_root);
+	@override String get untitledTask => '제목 없는 작업';
 }
 
 // Path: knowledge.tabs
@@ -3573,39 +4113,6 @@ class Translations$knowledge$tags$ko extends Translations$knowledge$tags$en {
 	@override String get none => '태그가 없습니다.';
 }
 
-// Path: knowledge.contextBudget
-class Translations$knowledge$contextBudget$ko extends Translations$knowledge$contextBudget$en {
-	Translations$knowledge$contextBudget$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String tokens({required Object tokens, required Object budget}) => '~${tokens} / ${budget} 토큰';
-}
-
-// Path: knowledge.critical
-class Translations$knowledge$critical$ko extends Translations$knowledge$critical$en {
-	Translations$knowledge$critical$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get make => '치명적으로 표시';
-	@override String get makeAll => '모든 규칙을 치명적으로 표시';
-	@override String get makeAllHint => '주입되는 컨텍스트 예산에 추가합니다';
-}
-
-// Path: knowledge.errors
-class Translations$knowledge$errors$ko extends Translations$knowledge$errors$en {
-	Translations$knowledge$errors$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String importFailed({required Object error}) => '가져오기 실패: ${error}';
-	@override String migrationFailed({required Object error}) => '마이그레이션 실패: ${error}';
-}
-
 // Path: knowledge.graph
 class Translations$knowledge$graph$ko extends Translations$knowledge$graph$en {
 	Translations$knowledge$graph$ko._(TranslationsKo root) : this._root = root, super.internal(root);
@@ -3623,13 +4130,35 @@ class Translations$knowledge$importAll$ko extends Translations$knowledge$importA
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get action => '모두 가져오기';
+	@override String get title => 'DDAgent로 모두 가져오기';
+	@override String projectsScanned({required Object count}) => '검사한 프로젝트: ${count}';
+	@override String skillsFound({required Object found, required Object newSkills}) => '발견한 에이전트 스킬: ${found} (신규: ${newSkills})';
+	@override String rulesSummary({required Object total, required Object duplicates}) => '규칙: ${total} · 중복 그룹: ${duplicates}';
 	@override String get mergeDuplicates => '중복 항목 병합';
 	@override String get mergeDuplicatesHint => 'DDAgent 내 중복 행을 병합합니다 (파일 아님)';
-	@override String projectsScanned({required Object count}) => '검사한 프로젝트: ${count}';
-	@override String rulesSummary({required Object total, required Object duplicates}) => '규칙: ${total} · 중복 그룹: ${duplicates}';
-	@override String skillsFound({required Object found, required Object newSkills}) => '발견한 에이전트 스킬: ${found} (신규: ${newSkills})';
-	@override String get title => 'DDAgent로 모두 가져오기';
+	@override String get action => '모두 가져오기';
+	@override String get readOnlyNotice => '에이전트에는 읽기 전용입니다: DDAgent 자체 데이터베이스로 가져오며 CLI 파일이나 설정을 수정하거나 삭제하지 않습니다. 아래 옵션은 DDAgent 데이터만 변경합니다.';
+	@override String get dryRunNote => '시험 실행 — 아직 아무것도 기록되지 않았습니다.';
+	@override String get importedNote => '가져왔습니다.';
+	@override String result({required Object rules, required Object newSkills, required Object removed, required Object promoted}) => '가져오기 완료 — 규칙: ${rules}, 새 스킬: ${newSkills}, 제거됨: ${removed}, 승격됨: ${promoted}';
+	@override String get description => '모든 프로젝트를 스캔하고 에이전트의 스킬을 지식 베이스로 가져옵니다. 에이전트에는 읽기 전용이며 CLI에서는 아무것도 변경되지 않습니다.';
+}
+
+// Path: knowledge.migrate
+class Translations$knowledge$migrate$ko extends Translations$knowledge$migrate$en {
+	Translations$knowledge$migrate$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '기존 규칙 마이그레이션';
+	@override String scanned({required Object count}) => '프로젝트 ${count}개를 검사했습니다.';
+	@override String rulesSummary({required Object total, required Object critical}) => '규칙: 총 ${total}개, 치명적 ${critical}개.';
+	@override String duplicates({required Object count}) => '프로젝트 간 중복 그룹: ${count}';
+	@override String removedPromoted({required Object removed, required Object promoted}) => '제거: ${removed}, 승격: ${promoted}';
+	@override String get mergeDuplicates => '중복 병합';
+	@override String get dryRunNote => '시험 실행 — 아직 아무것도 변경되지 않았습니다.';
+	@override String get applied => '적용되었습니다.';
 }
 
 // Path: knowledge.importSkills
@@ -3639,9 +4168,35 @@ class Translations$knowledge$importSkills$ko extends Translations$knowledge$impo
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
+	@override String get title => '에이전트 스킬 가져오기';
 	@override String found({required Object count}) => '에이전트 전체에서 스킬 ${count}개를 찾았습니다.';
 	@override String summary({required Object imported, required Object skipped}) => '신규: ${imported} · 건너뜀: ${skipped}';
-	@override String get title => '에이전트 스킬 가져오기';
+	@override String get dryRunHint => '에이전트에 포함된 전역/기본 스킬(사용자, 시스템, 플러그인)을 지식 스킬로 가져옵니다. 시험 실행 — 아직 아무것도 가져오지 않았습니다.';
+	@override String get importedNote => '지식 베이스로 가져왔습니다.';
+}
+
+// Path: knowledge.critical
+class Translations$knowledge$critical$ko extends Translations$knowledge$critical$en {
+	Translations$knowledge$critical$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get make => '치명적으로 표시';
+	@override String get makeAll => '모든 규칙을 치명적으로 표시';
+	@override String get makeAllHint => '주입되는 컨텍스트 예산에 추가합니다';
+}
+
+// Path: knowledge.contextBudget
+class Translations$knowledge$contextBudget$ko extends Translations$knowledge$contextBudget$en {
+	Translations$knowledge$contextBudget$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String tokens({required Object tokens, required Object budget}) => '~${tokens} / ${budget} 토큰';
+	@override String get title => '규칙 컨텍스트(항상 제공)';
+	@override String get selectProject => '프로젝트를 선택하면 중요 컨텍스트 크기를 볼 수 있습니다.';
 }
 
 // Path: knowledge.linkOptions
@@ -3652,157 +4207,197 @@ class Translations$knowledge$linkOptions$ko extends Translations$knowledge$linkO
 
 	// Translations
 	@override String memory({required Object title}) => '메모리: ${title}';
-	@override String personal({required Object title}) => '개인정보: ${title}';
 	@override String rule({required Object title}) => '규칙: ${title}';
 	@override String skill({required Object name}) => '스킬: ${name}';
+	@override String personal({required Object title}) => '개인정보: ${title}';
 }
 
-// Path: knowledge.migrate
-class Translations$knowledge$migrate$ko extends Translations$knowledge$migrate$en {
-	Translations$knowledge$migrate$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+// Path: knowledge.errors
+class Translations$knowledge$errors$ko extends Translations$knowledge$errors$en {
+	Translations$knowledge$errors$ko._(TranslationsKo root) : this._root = root, super.internal(root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String duplicates({required Object count}) => '프로젝트 간 중복 그룹: ${count}';
-	@override String get mergeDuplicates => '중복 병합';
-	@override String removedPromoted({required Object removed, required Object promoted}) => '제거: ${removed}, 승격: ${promoted}';
-	@override String rulesSummary({required Object total, required Object critical}) => '규칙: 총 ${total}개, 치명적 ${critical}개.';
-	@override String scanned({required Object count}) => '프로젝트 ${count}개를 검사했습니다.';
-	@override String get title => '기존 규칙 마이그레이션';
+	@override String importFailed({required Object error}) => '가져오기 실패: ${error}';
+	@override String migrationFailed({required Object error}) => '마이그레이션 실패: ${error}';
 }
 
-// Path: skills.addDialog
-class Translations$skills$addDialog$ko extends Translations$skills$addDialog$en {
-	Translations$skills$addDialog$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+// Path: knowledge.entityTypes
+class Translations$knowledge$entityTypes$ko extends Translations$knowledge$entityTypes$en {
+	Translations$knowledge$entityTypes$ko._(TranslationsKo root) : this._root = root, super.internal(root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get chooseFileTitle => 'SKILL.md 선택';
-	@override String get chooseFiles => '파일 선택';
-	@override String get chooseFolder => '폴더 선택';
-	@override String get chooseFolderTitle => '스킬 폴더 선택';
-	@override String folderFilesMeta({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
-		one: '${count}개 파일 · ${size}',
-		other: '${count}개 파일 · ${size}',
-	);
-	@override String get folderUploadsNote => '폴더 업로드는 선택한 폴더 이름을 유지하며, 단독 파일은 `SKILL.md`의 `name`을 사용합니다.';
-	@override String get hideInstallLocation => '설치 위치 숨기기';
-	@override String get installSkill => '스킬 설치';
-	@override String installSkills({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
-		one: '스킬 ${count}개 설치',
-		other: '스킬 ${count}개 설치',
-	);
-	@override String markdownFileMeta({required Object size}) => '마크다운 파일 · ${size}';
-	@override String get pickHint => '폴더에는 스크립트, 참조 자료, 에셋을 포함할 수 있습니다.';
-	@override String get pickTitle => '스킬 폴더 또는 SKILL.md 선택';
-	@override String get readyToInstall => '설치 준비 완료';
-	@override String removeQueued({required Object name}) => '${name} 제거';
-	@override String title({required Object provider}) => '${provider} 스킬 추가';
-	@override String get uploadHint => 'SKILL.md 파일 또는 전체 스킬 폴더를 업로드하세요.';
-	@override String get whereWillThisInstall => '어디에 설치되나요?';
-}
-
-// Path: skills.empty
-class Translations$skills$empty$ko extends Translations$skills$empty$en {
-	Translations$skills$empty$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get noGlobalSkills => '아직 발견된 전역 스킬이 없습니다';
-	@override String get noGlobalSkillsDescription => '위에서 전역 스킬을 추가하면 모든 프로젝트에서 사용할 수 있습니다.';
-	@override String get noMatchingSkills => '일치하는 스킬 없음';
-	@override String get noMatchingSkillsDescription => '다른 명령어, 이름, 범위, 프로젝트 또는 소스 경로를 시도해보세요.';
-	@override String get noProjects => '사용 가능한 프로젝트 없음';
-	@override String get noProjectsDescription => '스킬을 살펴보려면 프로젝트 또는 작업 영역을 추가하세요.';
-	@override String get noSkillsInProject => '이 프로젝트에 스킬이 없습니다';
-	@override String get noSkillsInProjectDescription => '선택한 프로젝트에 .claude/skills, .cursor/skills 또는 .agents/skills 폴더를 만드세요.';
-}
-
-// Path: skills.errors
-class Translations$skills$errors$ko extends Translations$skills$errors$en {
-	Translations$skills$errors$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get addMarkdownFirst => '먼저 마크다운 파일을 하나 이상 추가하세요.';
-	@override String couldNotReadSkillFile({required Object name}) => '${name}에서 SKILL.md를 읽을 수 없습니다.';
-	@override String get dropMarkdownOrFolder => '마크다운 파일을 하나 이상 또는 SKILL.md가 포함된 폴더를 놓으세요.';
-	@override String folderFileLimit({required Object count}) => '스킬 폴더에는 최대 ${count}개 파일을 포함할 수 있습니다.';
-	@override String get folderReadFailed => '스킬 폴더를 읽지 못했습니다';
-	@override String get folderSizeLimit => '선택한 스킬 폴더의 총 용량은 30MB 미만이어야 합니다.';
-	@override String get importFailed => '스킬 가져오기 실패';
-	@override String get missingSkillFile => '선택한 폴더에 SKILL.md 파일이 없습니다.';
-}
-
-// Path: skills.moveDialog
-class Translations$skills$moveDialog$ko extends Translations$skills$moveDialog$en {
-	Translations$skills$moveDialog$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get moveToGlobal => '전역으로 이동';
-	@override String get moveToProject => '프로젝트로 이동';
-	@override String get toGlobalHint => '이 스킬을 전역 스킬 디렉터리로 이동하여 모든 프로젝트에서 사용할 수 있게 합니다.';
-	@override String get toProjectHint => '이 스킬을 소유할 프로젝트를 선택하세요. 제공자의 전역 스킬 디렉터리에서 이동됩니다.';
-}
-
-// Path: skills.scopes
-class Translations$skills$scopes$ko extends Translations$skills$scopes$en {
-	Translations$skills$scopes$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get admin => '관리자';
-	@override String get plugin => '플러그인';
+	@override String get memory => '메모리';
+	@override String get rule => '규칙';
+	@override String get skill => '스킬';
+	@override String get personal => '개인';
 	@override String get project => '프로젝트';
-	@override String get repo => '리포지토리';
-	@override String get system => '시스템';
-	@override String get user => '사용자';
+	@override String get tag => '태그';
 }
 
-// Path: skills.screen
-class Translations$skills$screen$ko extends Translations$skills$screen$en {
-	Translations$skills$screen$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+// Path: collab.roles
+class Translations$collab$roles$ko extends Translations$collab$roles$en {
+	Translations$collab$roles$ko._(TranslationsKo root) : this._root = root, super.internal(root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get addSkill => '스킬 추가';
-	@override String get clearSearch => '스킬 검색 지우기';
-	@override String deleteDescription({required Object provider, required Object directory}) => '${provider}의 관리형 스킬 디렉터리에서 ${directory} 디렉터리를 제거합니다. 되돌릴 수 없습니다.';
-	@override String deleteTitle({required Object name}) => '${name}을(를) 삭제할까요?';
-	@override String loadingSkills({required Object provider}) => '${provider} 스킬 로드 중…';
-	@override String manageDescription({required Object provider}) => '로컬 파일, 전체 폴더 및 프로젝트 인식 위치에서 ${provider} 스킬을 관리합니다.';
-	@override String get noDescription => '스킬 프런트 매터에 설명이 없습니다.';
-	@override String pluginBadge({required Object name}) => '플러그인: ${name}';
-	@override String projectBadge({required Object name}) => '프로젝트: ${name}';
-	@override String get savedSuccessfully => '스킬이 저장되었습니다.';
-	@override String get scanningProjectSkills => '프로젝트 스킬 검사 중...';
-	@override String get searchHint => '스킬 검색...';
-	@override String skillsCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
-		one: 'SKILL ${count}개',
-		other: 'SKILL ${count}개',
+	@override String get member => '멤버';
+	@override String get viewer => '뷰어';
+}
+
+// Path: collab.viewing
+class Translations$collab$viewing$ko extends Translations$collab$viewing$en {
+	Translations$collab$viewing$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get session => '세션';
+	@override String get card => '카드';
+	@override String get board => '보드';
+}
+
+// Path: fileTree.search
+class Translations$fileTree$search$ko extends Translations$fileTree$search$en {
+	Translations$fileTree$search$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get hint => '이름 필터링 / Enter로 내용 검색';
+	@override String get prompt => '검색어를 입력하고 Enter를 누르세요';
+	@override String get noMatches => '일치하는 항목 없음';
+	@override String get resultsTruncated => '결과가 잘렸습니다';
+}
+
+// Path: fileTree.titles
+class Translations$fileTree$titles$ko extends Translations$fileTree$titles$en {
+	Translations$fileTree$titles$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String rename({required Object name}) => '${name} 이름 변경';
+	@override String delete({required Object name}) => '${name} 삭제';
+	@override String download({required Object name}) => '${name} 다운로드';
+}
+
+// Path: fileTree.relative
+class Translations$fileTree$relative$ko extends Translations$fileTree$relative$en {
+	Translations$fileTree$relative$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get now => '방금';
+	@override String minutes({required Object n}) => '${n}분';
+	@override String hours({required Object n}) => '${n}시간';
+	@override String days({required Object n}) => '${n}일';
+}
+
+// Path: git.checkpoints
+class Translations$git$checkpoints$ko extends Translations$git$checkpoints$en {
+	Translations$git$checkpoints$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '체크포인트';
+	@override String get restoreTitle => '체크포인트 복원';
+	@override String get restoreMessage => '작업 트리를 이 체크포인트로 재설정할까요? 현재 변경 사항이 대체됩니다.';
+	@override String get restored => '체크포인트가 복원되었습니다';
+	@override String get labelHint => '체크포인트 레이블 (선택사항)';
+	@override String get empty => '아직 체크포인트 없음';
+	@override String get create => '새로 만들기';
+}
+
+// Path: git.branchSections
+class Translations$git$branchSections$ko extends Translations$git$branchSections$en {
+	Translations$git$branchSections$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get local => '로컬';
+	@override String get remote => '원격';
+}
+
+// Path: kanban.card
+class Translations$kanban$card$ko extends Translations$kanban$card$en {
+	Translations$kanban$card$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get untitled => '제목 없음';
+}
+
+// Path: kanban.comments
+class Translations$kanban$comments$ko extends Translations$kanban$comments$en {
+	Translations$kanban$comments$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get empty => '아직 댓글 없음';
+	@override String get add => '댓글 추가';
+}
+
+// Path: kanban.dialog
+class Translations$kanban$dialog$ko extends Translations$kanban$dialog$en {
+	Translations$kanban$dialog$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get saving => '저장 중…';
+}
+
+// Path: kanban.details
+class Translations$kanban$details$ko extends Translations$kanban$details$en {
+	Translations$kanban$details$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '카드 상세';
+	@override String status({required Object status}) => '상태: ${status}';
+}
+
+// Path: kanban.empty
+class Translations$kanban$empty$ko extends Translations$kanban$empty$en {
+	Translations$kanban$empty$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get noProject => '선택한 프로젝트 없음';
+}
+
+// Path: kanban.time
+class Translations$kanban$time$ko extends Translations$kanban$time$en {
+	Translations$kanban$time$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get now => '방금';
+	@override String minutesAgo({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
+		one: '1분 전',
+		other: '${count}분 전',
 	);
-	@override String get sourceLabel => '소스';
-}
-
-// Path: mcp.form
-class Translations$mcp$form$ko extends Translations$mcp$form$en {
-	Translations$mcp$form$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override late final Translations$mcp$form$fields$ko fields = Translations$mcp$form$fields$ko._(_root);
-	@override late final Translations$mcp$form$scope$ko scope = Translations$mcp$form$scope$ko._(_root);
-	@override String submitTo({required Object provider}) => '${provider}에 서버 추가';
-	@override late final Translations$mcp$form$validation$ko validation = Translations$mcp$form$validation$ko._(_root);
+	@override String hoursAgo({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
+		one: '1시간 전',
+		other: '${count}시간 전',
+	);
+	@override String daysAgo({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
+		one: '1일 전',
+		other: '${count}일 전',
+	);
 }
 
 // Path: mcp.install
@@ -3812,19 +4407,19 @@ class Translations$mcp$install$ko extends Translations$mcp$install$en {
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get button => '설치';
-	@override String get cardDescription => 'MCP를 통해 에이전트에게 지식 베이스와 DDAgent 도구를 제공하세요 — 에이전트를 선택하거나 전체에 설치하세요.';
+	@override String get title => 'DDAgent MCP 서버 설치';
 	@override String get description => '선택한 에이전트가 MCP를 통해 DDAgent 지식 베이스와 도구를 사용할 수 있게 합니다.';
-	@override String get errorFallback => '오류';
-	@override String failed({required Object error}) => '설치 실패: ${error}';
-	@override String get installForAll => '전체에 설치';
+	@override String get cardDescription => 'MCP를 통해 에이전트에게 지식 베이스와 DDAgent 도구를 제공하세요 — 에이전트를 선택하거나 전체에 설치하세요.';
 	@override String get installSelected => '선택 항목에 설치';
+	@override String get installForAll => '전체에 설치';
+	@override String get button => '설치';
+	@override String failed({required Object error}) => '설치 실패: ${error}';
 	@override String installedCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
 		one: '에이전트 ${count}개에 설치했습니다.',
 		other: '에이전트 ${count}개에 설치했습니다.',
 	);
 	@override String partialFailure({required Object count, required Object failed}) => '${count}개에 설치됨, 실패: ${failed}';
-	@override String get title => 'DDAgent MCP 서버 설치';
+	@override String get errorFallback => '오류';
 }
 
 // Path: mcp.servers
@@ -3834,15 +4429,19 @@ class Translations$mcp$servers$ko extends Translations$mcp$servers$en {
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get addGlobalDescription => '이 MCP 서버를 모든 제공자(Claude, Cursor, Codex, OpenCode, Devin)에 추가합니다. 동일한 설정이 모든 제공자에서 작동해야 하므로 stdio와 HTTP 전송만 지원됩니다.';
-	@override String get addGlobalMenuDescription => '전역 MCP 서버 추가는 하나의 공통 stdio 또는 HTTP 서버를 Claude, Cursor, Codex, OpenCode, Devin에 기록합니다.';
-	@override String get addGlobalTitle => '전역 MCP 서버 추가';
-	@override String addProviderDescription({required Object provider}) => '${provider} MCP 서버 추가는 ${provider}만 변경합니다.';
-	@override String addProviderTitle({required Object provider}) => '${provider} MCP 서버 추가';
-	@override late final Translations$mcp$servers$config$ko config = Translations$mcp$servers$config$ko._(_root);
-	@override String descriptionGeneric({required Object provider}) => 'Model Context Protocol 서버는 ${provider}에 추가 도구와 데이터 소스를 제공합니다';
 	@override String get loading => 'MCP 서버 로드 중...';
 	@override String get refreshingScopes => '프로젝트 범위 새로 고치는 중...';
+	@override String descriptionGeneric({required Object provider}) => 'Model Context Protocol 서버는 ${provider}에 추가 도구와 데이터 소스를 제공합니다';
+	@override String get addGlobalTitle => '전역 MCP 서버 추가';
+	@override String get addGlobalDescription => '이 MCP 서버를 모든 제공자(Claude, Cursor, Codex, OpenCode, Devin)에 추가합니다. 동일한 설정이 모든 제공자에서 작동해야 하므로 stdio와 HTTP 전송만 지원됩니다.';
+	@override String get addGlobalMenuDescription => '전역 MCP 서버 추가는 하나의 공통 stdio 또는 HTTP 서버를 Claude, Cursor, Codex, OpenCode, Devin에 기록합니다.';
+	@override String addProviderTitle({required Object provider}) => '${provider} MCP 서버 추가';
+	@override String addProviderDescription({required Object provider}) => '${provider} MCP 서버 추가는 ${provider}만 변경합니다.';
+	@override late final Translations$mcp$servers$config$ko config = Translations$mcp$servers$config$ko._(_root);
+	@override String get selectProjectRequired => '프로젝트 범위 MCP 서버에 사용할 프로젝트를 선택하세요';
+	@override String get globalScopeUnsupported => '모든 제공자에 MCP 서버를 추가할 때는 사용자 또는 프로젝트 범위만 지원됩니다.';
+	@override String globalAddFailed({required Object details}) => '모든 제공자에 MCP 서버를 추가하지 못했습니다. ${details}';
+	@override String get scopeProject => '프로젝트';
 }
 
 // Path: mcp.team
@@ -3852,9 +4451,9 @@ class Translations$mcp$team$ko extends Translations$mcp$team$en {
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get cta => 'DDAgent Pro에서 사용 가능';
-	@override String get description => '팀 전체에서 MCP 서버 설정을 공유하세요. 모든 사람이 자동으로 동기화됩니다.';
 	@override String get title => '팀 MCP 설정';
+	@override String get description => '팀 전체에서 MCP 서버 설정을 공유하세요. 모든 사람이 자동으로 동기화됩니다.';
+	@override String get cta => 'DDAgent Pro에서 사용 가능';
 }
 
 // Path: mcp.tokens
@@ -3865,140 +4464,84 @@ class Translations$mcp$tokens$ko extends Translations$mcp$tokens$en {
 
 	// Translations
 	@override String get scopeWrite => '쓰기';
+	@override String get scopeRead => '읽기';
 }
 
-// Path: terminal.actions
-class Translations$terminal$actions$ko extends Translations$terminal$actions$en {
-	Translations$terminal$actions$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+// Path: mcp.form
+class Translations$mcp$form$ko extends Translations$mcp$form$en {
+	Translations$mcp$form$ko._(TranslationsKo root) : this._root = root, super.internal(root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get clearOutput => '출력 지우기';
-	@override String get connect => '연결';
-	@override String get newShell => '새 Shell';
-	@override String get newTab => '새 터미널 탭';
-	@override String get providerLogin => '제공자 로그인';
-	@override String get restartSession => '세션 재시작';
+	@override String submitTo({required Object provider}) => '${provider}에 서버 추가';
+	@override late final Translations$mcp$form$scope$ko scope = Translations$mcp$form$scope$ko._(_root);
+	@override late final Translations$mcp$form$fields$ko fields = Translations$mcp$form$fields$ko._(_root);
+	@override late final Translations$mcp$form$validation$ko validation = Translations$mcp$form$validation$ko._(_root);
 }
 
-// Path: terminal.authUrl
-class Translations$terminal$authUrl$ko extends Translations$terminal$authUrl$en {
-	Translations$terminal$authUrl$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+// Path: notifications.errors
+class Translations$notifications$errors$ko extends Translations$notifications$errors$en {
+	Translations$notifications$errors$ko._(TranslationsKo root) : this._root = root, super.internal(root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get openInBrowser => '브라우저에서 열기';
+	@override String get registrationRejected => '서버에서 등록을 거부했습니다';
+	@override String get noResponse => '서버에서 응답이 없습니다';
 }
 
-// Path: terminal.errors
-class Translations$terminal$errors$ko extends Translations$terminal$errors$en {
-	Translations$terminal$errors$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+// Path: notifications.androidChannel
+class Translations$notifications$androidChannel$ko extends Translations$notifications$androidChannel$en {
+	Translations$notifications$androidChannel$ko._(TranslationsKo root) : this._root = root, super.internal(root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String couldNotOpenLink({required Object url}) => '링크를 열 수 없습니다: ${url}';
+	@override String get name => 'DDAgent 알림';
+	@override String get description => '에이전트 실행, 승인 및 오류 알림';
 }
 
-// Path: terminal.fileLink
-class Translations$terminal$fileLink$ko extends Translations$terminal$fileLink$en {
-	Translations$terminal$fileLink$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+// Path: onboarding.errors
+class Translations$onboarding$errors$ko extends Translations$onboarding$errors$en {
+	Translations$onboarding$errors$ko._(TranslationsKo root) : this._root = root, super.internal(root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String detected({required Object path}) => '파일 감지됨: ${path}';
+	@override String get nameAndEmailRequired => 'git 이름과 이메일이 모두 필요합니다.';
+	@override String get invalidEmail => '유효한 이메일 주소를 입력해주세요.';
 }
 
-// Path: terminal.paste
-class Translations$terminal$paste$ko extends Translations$terminal$paste$en {
-	Translations$terminal$paste$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+// Path: onboarding.agents
+class Translations$onboarding$agents$ko extends Translations$onboarding$agents$en {
+	Translations$onboarding$agents$ko._(TranslationsKo root) : this._root = root, super.internal(root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get hint => 'Ctrl+V / 마우스 오른쪽 클릭 → 붙여넣기';
-	@override String get title => '터미널에 붙여넣기';
+	@override String get title => 'AI 에이전트 연결';
+	@override String get description => '하나 이상의 AI 코딩 어시스턴트에 로그인하세요. 모두 선택사항입니다.';
+	@override String get laterHint => '나중에 설정에서 구성할 수 있습니다.';
 }
 
-// Path: terminal.shortcuts
-class Translations$terminal$shortcuts$ko extends Translations$terminal$shortcuts$en {
-	Translations$terminal$shortcuts$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+// Path: onboarding.mcp
+class Translations$onboarding$mcp$ko extends Translations$onboarding$mcp$en {
+	Translations$onboarding$mcp$ko._(TranslationsKo root) : this._root = root, super.internal(root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get eof => 'EOF';
-	@override String get hide => '단축키 표시줄 숨기기';
-	@override String get interrupt => '중단 (SIGINT)';
-	@override String get suspend => '일시 중단 (SIGTSTP)';
-	@override String get showTooltip => '단축키 표시';
-	@override String get hideTooltip => '단축키 숨기기';
-}
-
-// Path: terminal.tabs
-class Translations$terminal$tabs$ko extends Translations$terminal$tabs$en {
-	Translations$terminal$tabs$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get antigravityCli => 'Antigravity CLI';
-	@override String get claudeCli => 'Claude CLI';
-	@override String get commandCodeCli => 'Command Code CLI';
-	@override String get cursorCli => 'Cursor CLI';
-	@override String get devinCli => 'Devin CLI';
-	@override String loginTitle({required Object provider}) => '로그인: ${provider}';
-	@override String get opencodeCli => 'OpenCode CLI';
-	@override String get plainShell => '일반 Shell';
-	@override String shellName({required Object index}) => 'Shell ${index}';
-}
-
-// Path: quota.agents
-class Translations$quota$agents$ko extends Translations$quota$agents$en {
-	Translations$quota$agents$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String statusCount({required Object status, required Object count}) => '${status} (${count})';
-}
-
-// Path: quota.chart
-class Translations$quota$chart$ko extends Translations$quota$chart$en {
-	Translations$quota$chart$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get hide => '숨기기';
-	@override String get noData => '추세를 표시하기에 데이터가 부족합니다.';
-	@override String pointReadout({required Object date, required Object tokens, required Object cost}) => '${date} · ${tokens} 토큰 · ${cost}';
-	@override String get show => '표시';
-}
-
-// Path: quota.config
-class Translations$quota$config$ko extends Translations$quota$config$en {
-	Translations$quota$config$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get accountRouting => '계정 라우팅';
-	@override String get pollerTitle => '폴링 및 알림';
-	@override String get save => '설정 저장';
-}
-
-// Path: quota.overview
-class Translations$quota$overview$ko extends Translations$quota$overview$en {
-	Translations$quota$overview$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get tokensAndCost => '토큰 및 비용';
+	@override String get title => '에이전트를 DDAgent에 연결';
+	@override String get description => '에이전트가 지식 베이스와 DDAgent 도구를 사용할 수 있도록 DDAgent MCP 서버를 설치하세요. 에이전트를 선택하거나 전체에 설치하세요.';
+	@override String get installSelected => '선택 항목에 설치';
+	@override String get installForAll => '전체에 설치';
+	@override String get laterHint => '선택사항 — 나중에 설정 → MCP에서 설치할 수도 있습니다.';
+	@override String installedOn({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
+		one: '에이전트 ${count}개에 설치했습니다.',
+		other: '에이전트 ${count}개에 설치했습니다.',
+	);
+	@override String installedWithFailures({required Object installedCount, required Object failed}) => '${installedCount}개에 설치됨, 실패: ${failed}';
 }
 
 // Path: quota.section
@@ -4011,15 +4554,89 @@ class Translations$quota$section$ko extends Translations$quota$section$en {
 	@override String get config => '설정';
 }
 
-// Path: notifications.errors
-class Translations$notifications$errors$ko extends Translations$notifications$errors$en {
-	Translations$notifications$errors$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+// Path: quota.overview
+class Translations$quota$overview$ko extends Translations$quota$overview$en {
+	Translations$quota$overview$ko._(TranslationsKo root) : this._root = root, super.internal(root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get noResponse => '서버에서 응답이 없습니다';
-	@override String get registrationRejected => '서버에서 등록을 거부했습니다';
+	@override String get tokensAndCost => '토큰 및 비용';
+}
+
+// Path: quota.agents
+class Translations$quota$agents$ko extends Translations$quota$agents$en {
+	Translations$quota$agents$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String statusCount({required Object status, required Object count}) => '${status} (${count})';
+}
+
+// Path: quota.config
+class Translations$quota$config$ko extends Translations$quota$config$en {
+	Translations$quota$config$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get pollerTitle => '폴링 및 알림';
+	@override String get accountRouting => '계정 라우팅';
+	@override String get save => '설정 저장';
+}
+
+// Path: quota.chart
+class Translations$quota$chart$ko extends Translations$quota$chart$en {
+	Translations$quota$chart$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get show => '표시';
+	@override String get hide => '숨기기';
+	@override String get noData => '추세를 표시하기에 데이터가 부족합니다.';
+	@override String pointReadout({required Object date, required Object tokens, required Object cost}) => '${date} · ${tokens} 토큰 · ${cost}';
+}
+
+// Path: quota.duration
+class Translations$quota$duration$ko extends Translations$quota$duration$en {
+	Translations$quota$duration$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String minutes({required Object minutes}) => '${minutes}분';
+	@override String hoursMinutes({required Object hours, required Object minutes}) => '${hours}시간 ${minutes}분';
+	@override String daysHours({required Object days, required Object hours}) => '${days}일 ${hours}시간';
+	@override String get now => '방금';
+}
+
+// Path: scheduler.runStatus
+class Translations$scheduler$runStatus$ko extends Translations$scheduler$runStatus$en {
+	Translations$scheduler$runStatus$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get fired => '실행됨';
+	@override String get skipped => '건너뜀';
+	@override String get failed => '실패';
+	@override String get completed => '완료';
+}
+
+// Path: scheduler.cronErrors
+class Translations$scheduler$cronErrors$ko extends Translations$scheduler$cronErrors$en {
+	Translations$scheduler$cronErrors$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String fieldCount({required Object got}) => '필드 5개가 필요하지만 ${got}개입니다';
+	@override String fieldError({required Object index, required Object error}) => '필드 ${index}: ${error}';
+	@override String get empty => '비어 있음';
+	@override String invalidPart({required Object part}) => '"${part}"이(가) 잘못되었습니다';
+	@override String invalidValue({required Object value}) => '잘못된 값 "${value}"';
 }
 
 // Path: serverConnect.local
@@ -4042,50 +4659,7 @@ class Translations$serverConnect$local$ko extends Translations$serverConnect$loc
 	@override String get connect => '이 서버 사용';
 	@override String error({required Object error}) => '로컬 서버 오류: ${error}';
 	@override String get or => '또는 원격 서버에 연결';
-}
-
-// Path: collab.roles
-class Translations$collab$roles$ko extends Translations$collab$roles$en {
-	Translations$collab$roles$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get member => '멤버';
-	@override String get viewer => '뷰어';
-}
-
-// Path: sessions.activity
-class Translations$sessions$activity$ko extends Translations$sessions$activity$en {
-	Translations$sessions$activity$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get committingChanges => '변경 사항 커밋 중';
-	@override String editingFile({required Object file}) => '${file} 편집 중';
-	@override String get editingFileGeneric => '파일 편집 중';
-	@override String fetchingUrl({required Object url}) => '${url} 가져오는 중';
-	@override String get pushingBranch => '브랜치 푸시 중';
-	@override String readingFile({required Object file}) => '${file} 읽는 중';
-	@override String runningCommand({required Object command}) => '`${command}` 실행 중';
-	@override String get runningShellCommand => 'Shell 명령어 실행 중';
-	@override String runningTool({required Object name}) => '${name} 실행 중';
-	@override String searching({required Object query}) => '“${query}” 검색 중';
-	@override String get subagentRunning => '하위 에이전트 실행 중';
-}
-
-// Path: sessions.age
-class Translations$sessions$age$ko extends Translations$sessions$age$en {
-	Translations$sessions$age$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String days({required Object days}) => '${days}일';
-	@override String hours({required Object hours}) => '${hours}시간';
-	@override String get lessThanMinute => '<1분';
-	@override String minutes({required Object count}) => '${count}분';
+	@override late final Translations$serverConnect$local$errors$ko errors = Translations$serverConnect$local$errors$ko._(_root);
 }
 
 // Path: sessions.toasts
@@ -4096,169 +4670,356 @@ class Translations$sessions$toasts$ko extends Translations$sessions$toasts$en {
 
 	// Translations
 	@override String get archived => '세션이 보관되었습니다';
-	@override String get deleted => '세션이 삭제되었습니다';
-	@override String get pinned => '세션이 고정되었습니다';
-	@override String get renamed => '세션 이름이 변경되었습니다';
 	@override String get restored => '세션이 복원되었습니다';
+	@override String get deleted => '세션이 삭제되었습니다';
+	@override String get renamed => '세션 이름이 변경되었습니다';
+	@override String get pinned => '세션이 고정되었습니다';
 	@override String get unpinned => '세션 고정이 해제되었습니다';
 	@override String get workspaceChanged => '작업 영역이 변경되었습니다';
 }
 
-// Path: git.checkpoints
-class Translations$git$checkpoints$ko extends Translations$git$checkpoints$en {
-	Translations$git$checkpoints$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+// Path: sessions.age
+class Translations$sessions$age$ko extends Translations$sessions$age$en {
+	Translations$sessions$age$ko._(TranslationsKo root) : this._root = root, super.internal(root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get create => '새로 만들기';
-	@override String get empty => '아직 체크포인트 없음';
-	@override String get labelHint => '체크포인트 레이블 (선택사항)';
-	@override String get restoreMessage => '작업 트리를 이 체크포인트로 재설정할까요? 현재 변경 사항이 대체됩니다.';
-	@override String get restoreTitle => '체크포인트 복원';
-	@override String get restored => '체크포인트가 복원되었습니다';
-	@override String get title => '체크포인트';
+	@override String get lessThanMinute => '<1분';
+	@override String minutes({required Object count}) => '${count}분';
+	@override String hours({required Object hours}) => '${hours}시간';
+	@override String days({required Object days}) => '${days}일';
 }
 
-// Path: kanban.card
-class Translations$kanban$card$ko extends Translations$kanban$card$en {
-	Translations$kanban$card$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+// Path: sessions.activity
+class Translations$sessions$activity$ko extends Translations$sessions$activity$en {
+	Translations$sessions$activity$ko._(TranslationsKo root) : this._root = root, super.internal(root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get untitled => '제목 없음';
+	@override String get subagentRunning => '하위 에이전트 실행 중';
+	@override String readingFile({required Object file}) => '${file} 읽는 중';
+	@override String runningTool({required Object name}) => '${name} 실행 중';
+	@override String editingFile({required Object file}) => '${file} 편집 중';
+	@override String get editingFileGeneric => '파일 편집 중';
+	@override String get runningShellCommand => 'Shell 명령어 실행 중';
+	@override String runningCommand({required Object command}) => '`${command}` 실행 중';
+	@override String get committingChanges => '변경 사항 커밋 중';
+	@override String get pushingBranch => '브랜치 푸시 중';
+	@override String fetchingUrl({required Object url}) => '${url} 가져오는 중';
+	@override String searching({required Object query}) => '“${query}” 검색 중';
 }
 
-// Path: kanban.comments
-class Translations$kanban$comments$ko extends Translations$kanban$comments$en {
-	Translations$kanban$comments$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+// Path: skills.addDialog
+class Translations$skills$addDialog$ko extends Translations$skills$addDialog$en {
+	Translations$skills$addDialog$ko._(TranslationsKo root) : this._root = root, super.internal(root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get add => '댓글 추가';
-	@override String get empty => '아직 댓글 없음';
-}
-
-// Path: kanban.details
-class Translations$kanban$details$ko extends Translations$kanban$details$en {
-	Translations$kanban$details$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String status({required Object status}) => '상태: ${status}';
-	@override String get title => '카드 상세';
-}
-
-// Path: kanban.dialog
-class Translations$kanban$dialog$ko extends Translations$kanban$dialog$en {
-	Translations$kanban$dialog$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get saving => '저장 중…';
-}
-
-// Path: kanban.empty
-class Translations$kanban$empty$ko extends Translations$kanban$empty$en {
-	Translations$kanban$empty$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get noProject => '선택한 프로젝트 없음';
-}
-
-// Path: kanban.time
-class Translations$kanban$time$ko extends Translations$kanban$time$en {
-	Translations$kanban$time$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String daysAgo({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
-		one: '1일 전',
-		other: '${count}일 전',
+	@override String title({required Object provider}) => '${provider} 스킬 추가';
+	@override String get chooseFileTitle => 'SKILL.md 선택';
+	@override String get chooseFolderTitle => '스킬 폴더 선택';
+	@override String get uploadHint => 'SKILL.md 파일 또는 전체 스킬 폴더를 업로드하세요.';
+	@override String get pickTitle => '스킬 폴더 또는 SKILL.md 선택';
+	@override String get pickHint => '폴더에는 스크립트, 참조 자료, 에셋을 포함할 수 있습니다.';
+	@override String get chooseFiles => '파일 선택';
+	@override String get chooseFolder => '폴더 선택';
+	@override String get readyToInstall => '설치 준비 완료';
+	@override String markdownFileMeta({required Object size}) => '마크다운 파일 · ${size}';
+	@override String folderFilesMeta({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
+		one: '${count}개 파일 · ${size}',
+		other: '${count}개 파일 · ${size}',
 	);
-	@override String hoursAgo({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
-		one: '1시간 전',
-		other: '${count}시간 전',
+	@override String removeQueued({required Object name}) => '${name} 제거';
+	@override String get whereWillThisInstall => '어디에 설치되나요?';
+	@override String get hideInstallLocation => '설치 위치 숨기기';
+	@override String get folderUploadsNote => '폴더 업로드는 선택한 폴더 이름을 유지하며, 단독 파일은 `SKILL.md`의 `name`을 사용합니다.';
+	@override String get installSkill => '스킬 설치';
+	@override String installSkills({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
+		one: '스킬 ${count}개 설치',
+		other: '스킬 ${count}개 설치',
 	);
-	@override String minutesAgo({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
-		one: '1분 전',
-		other: '${count}분 전',
+}
+
+// Path: skills.moveDialog
+class Translations$skills$moveDialog$ko extends Translations$skills$moveDialog$en {
+	Translations$skills$moveDialog$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get toProjectHint => '이 스킬을 소유할 프로젝트를 선택하세요. 제공자의 전역 스킬 디렉터리에서 이동됩니다.';
+	@override String get toGlobalHint => '이 스킬을 전역 스킬 디렉터리로 이동하여 모든 프로젝트에서 사용할 수 있게 합니다.';
+	@override String get moveToProject => '프로젝트로 이동';
+	@override String get moveToGlobal => '전역으로 이동';
+}
+
+// Path: skills.screen
+class Translations$skills$screen$ko extends Translations$skills$screen$en {
+	Translations$skills$screen$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String manageDescription({required Object provider}) => '로컬 파일, 전체 폴더 및 프로젝트 인식 위치에서 ${provider} 스킬을 관리합니다.';
+	@override String get searchHint => '스킬 검색...';
+	@override String get clearSearch => '스킬 검색 지우기';
+	@override String get addSkill => '스킬 추가';
+	@override String get scanningProjectSkills => '프로젝트 스킬 검사 중...';
+	@override String get savedSuccessfully => '스킬이 저장되었습니다.';
+	@override String loadingSkills({required Object provider}) => '${provider} 스킬 로드 중…';
+	@override String skillsCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
+		one: 'SKILL ${count}개',
+		other: 'SKILL ${count}개',
 	);
-	@override String get now => '방금';
+	@override String deleteTitle({required Object name}) => '${name}을(를) 삭제할까요?';
+	@override String deleteDescription({required Object provider, required Object directory}) => '${provider}의 관리형 스킬 디렉터리에서 ${directory} 디렉터리를 제거합니다. 되돌릴 수 없습니다.';
+	@override String get noDescription => '스킬 프런트 매터에 설명이 없습니다.';
+	@override String pluginBadge({required Object name}) => '플러그인: ${name}';
+	@override String projectBadge({required Object name}) => '프로젝트: ${name}';
+	@override String get sourceLabel => '소스';
 }
 
-// Path: onboarding.agents
-class Translations$onboarding$agents$ko extends Translations$onboarding$agents$en {
-	Translations$onboarding$agents$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+// Path: skills.empty
+class Translations$skills$empty$ko extends Translations$skills$empty$en {
+	Translations$skills$empty$ko._(TranslationsKo root) : this._root = root, super.internal(root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get description => '하나 이상의 AI 코딩 어시스턴트에 로그인하세요. 모두 선택사항입니다.';
-	@override String get laterHint => '나중에 설정에서 구성할 수 있습니다.';
-	@override String get title => 'AI 에이전트 연결';
+	@override String get noProjects => '사용 가능한 프로젝트 없음';
+	@override String get noProjectsDescription => '스킬을 살펴보려면 프로젝트 또는 작업 영역을 추가하세요.';
+	@override String get noSkillsInProject => '이 프로젝트에 스킬이 없습니다';
+	@override String get noSkillsInProjectDescription => '선택한 프로젝트에 .claude/skills, .cursor/skills 또는 .agents/skills 폴더를 만드세요.';
+	@override String get noGlobalSkills => '아직 발견된 전역 스킬이 없습니다';
+	@override String get noGlobalSkillsDescription => '위에서 전역 스킬을 추가하면 모든 프로젝트에서 사용할 수 있습니다.';
+	@override String get noMatchingSkills => '일치하는 스킬 없음';
+	@override String get noMatchingSkillsDescription => '다른 명령어, 이름, 범위, 프로젝트 또는 소스 경로를 시도해보세요.';
 }
 
-// Path: onboarding.errors
-class Translations$onboarding$errors$ko extends Translations$onboarding$errors$en {
-	Translations$onboarding$errors$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+// Path: skills.scopes
+class Translations$skills$scopes$ko extends Translations$skills$scopes$en {
+	Translations$skills$scopes$ko._(TranslationsKo root) : this._root = root, super.internal(root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get invalidEmail => '유효한 이메일 주소를 입력해주세요.';
-	@override String get nameAndEmailRequired => 'git 이름과 이메일이 모두 필요합니다.';
+	@override String get user => '사용자';
+	@override String get plugin => '플러그인';
+	@override String get repo => '리포지토리';
+	@override String get project => '프로젝트';
+	@override String get admin => '관리자';
+	@override String get system => '시스템';
 }
 
-// Path: onboarding.mcp
-class Translations$onboarding$mcp$ko extends Translations$onboarding$mcp$en {
-	Translations$onboarding$mcp$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+// Path: skills.errors
+class Translations$skills$errors$ko extends Translations$skills$errors$en {
+	Translations$skills$errors$ko._(TranslationsKo root) : this._root = root, super.internal(root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get description => '에이전트가 지식 베이스와 DDAgent 도구를 사용할 수 있도록 DDAgent MCP 서버를 설치하세요. 에이전트를 선택하거나 전체에 설치하세요.';
-	@override String get installForAll => '전체에 설치';
-	@override String get installSelected => '선택 항목에 설치';
-	@override String installedOn({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
-		one: '에이전트 ${count}개에 설치했습니다.',
-		other: '에이전트 ${count}개에 설치했습니다.',
-	);
-	@override String installedWithFailures({required Object installedCount, required Object failed}) => '${installedCount}개에 설치됨, 실패: ${failed}';
-	@override String get laterHint => '선택사항 — 나중에 설정 → MCP에서 설치할 수도 있습니다.';
-	@override String get title => '에이전트를 DDAgent에 연결';
+	@override String get dropMarkdownOrFolder => '마크다운 파일을 하나 이상 또는 SKILL.md가 포함된 폴더를 놓으세요.';
+	@override String get addMarkdownFirst => '먼저 마크다운 파일을 하나 이상 추가하세요.';
+	@override String get importFailed => '스킬 가져오기 실패';
+	@override String get folderReadFailed => '스킬 폴더를 읽지 못했습니다';
+	@override String folderFileLimit({required Object count}) => '스킬 폴더에는 최대 ${count}개 파일을 포함할 수 있습니다.';
+	@override String get folderSizeLimit => '선택한 스킬 폴더의 총 용량은 30MB 미만이어야 합니다.';
+	@override String get missingSkillFile => '선택한 폴더에 SKILL.md 파일이 없습니다.';
+	@override String couldNotReadSkillFile({required Object name}) => '${name}에서 SKILL.md를 읽을 수 없습니다.';
 }
 
-// Path: fileTree.search
-class Translations$fileTree$search$ko extends Translations$fileTree$search$en {
-	Translations$fileTree$search$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+// Path: terminal.tabs
+class Translations$terminal$tabs$ko extends Translations$terminal$tabs$en {
+	Translations$terminal$tabs$ko._(TranslationsKo root) : this._root = root, super.internal(root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get hint => '이름 필터링 / Enter로 내용 검색';
-	@override String get noMatches => '일치하는 항목 없음';
-	@override String get prompt => '검색어를 입력하고 Enter를 누르세요';
-	@override String get resultsTruncated => '결과가 잘렸습니다';
+	@override String shellName({required Object index}) => '셸 ${index}';
+	@override String get plainShell => '일반 Shell';
+	@override String get claudeCli => 'Claude CLI';
+	@override String get opencodeCli => 'OpenCode CLI';
+	@override String get commandCodeCli => 'Command Code CLI';
+	@override String get antigravityCli => 'Antigravity CLI';
+	@override String get cursorCli => 'Cursor CLI';
+	@override String get devinCli => 'Devin CLI';
+	@override String loginTitle({required Object provider}) => '로그인: ${provider}';
+	@override String runTitle({required Object command}) => '실행: ${command}';
 }
 
-// Path: fileTree.titles
-class Translations$fileTree$titles$ko extends Translations$fileTree$titles$en {
-	Translations$fileTree$titles$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+// Path: terminal.actions
+class Translations$terminal$actions$ko extends Translations$terminal$actions$en {
+	Translations$terminal$actions$ko._(TranslationsKo root) : this._root = root, super.internal(root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String delete({required Object name}) => '${name} 삭제';
-	@override String download({required Object name}) => '${name} 다운로드';
-	@override String rename({required Object name}) => '${name} 이름 변경';
+	@override String get newTab => '새 터미널 탭';
+	@override String get providerLogin => '제공자 로그인';
+	@override String get restartSession => '세션 재시작';
+	@override String get clearOutput => '출력 지우기';
+	@override String get newShell => '새 Shell';
+	@override String get connect => '연결';
+}
+
+// Path: terminal.authUrl
+class Translations$terminal$authUrl$ko extends Translations$terminal$authUrl$en {
+	Translations$terminal$authUrl$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get openInBrowser => '브라우저에서 열기';
+	@override String linkLabel({required Object url}) => '인증 링크: ${url}';
+}
+
+// Path: terminal.fileLink
+class Translations$terminal$fileLink$ko extends Translations$terminal$fileLink$en {
+	Translations$terminal$fileLink$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String detected({required Object path}) => '파일 감지됨: ${path}';
+}
+
+// Path: terminal.shortcuts
+class Translations$terminal$shortcuts$ko extends Translations$terminal$shortcuts$en {
+	Translations$terminal$shortcuts$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get interrupt => '중단 (SIGINT)';
+	@override String get eof => 'EOF';
+	@override String get suspend => '일시 중단 (SIGTSTP)';
+	@override String get hide => '단축키 표시줄 숨기기';
+	@override String get showTooltip => '단축키 표시';
+	@override String get hideTooltip => '단축키 숨기기';
+}
+
+// Path: terminal.paste
+class Translations$terminal$paste$ko extends Translations$terminal$paste$en {
+	Translations$terminal$paste$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '터미널에 붙여넣기';
+	@override String get hint => 'Ctrl+V / 마우스 오른쪽 클릭 → 붙여넣기';
+}
+
+// Path: terminal.errors
+class Translations$terminal$errors$ko extends Translations$terminal$errors$en {
+	Translations$terminal$errors$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String couldNotOpenLink({required Object url}) => '링크를 열 수 없습니다: ${url}';
+	@override String frameError({required Object message}) => '[오류] ${message}';
+	@override String connectionError({required Object message}) => '[연결 오류] ${message}';
+}
+
+// Path: terminal.loginDialog
+class Translations$terminal$loginDialog$ko extends Translations$terminal$loginDialog$en {
+	Translations$terminal$loginDialog$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String title({required Object provider}) => '${provider} CLI 로그인';
+	@override String exited({required Object code}) => '종료됨 (${code})';
+	@override String get authLinkDetected => '인증 링크가 감지되었습니다';
+}
+
+// Path: terminal.empty
+class Translations$terminal$empty$ko extends Translations$terminal$empty$en {
+	Translations$terminal$empty$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '활성 터미널 없음';
+	@override String get description => '시작하려면 새 탭을 만드세요';
+}
+
+// Path: terminal.overlay
+class Translations$terminal$overlay$ko extends Translations$terminal$overlay$en {
+	Translations$terminal$overlay$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get processExited => '프로세스가 종료되었습니다 — 연결하면 다시 시작합니다';
+	@override String processExitedWithCode({required Object code}) => '프로세스가 종료되었습니다(코드 ${code}) — 연결하면 다시 시작합니다';
+	@override String resumeSession({required Object title}) => '세션 ${title} 재개';
+	@override String startSession({required Object path}) => '${path}에서 새 세션 시작';
+}
+
+// Path: workspace.paneTitle
+class Translations$workspace$paneTitle$ko extends Translations$workspace$paneTitle$en {
+	Translations$workspace$paneTitle$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get chat => '채팅';
+	@override String get browser => '브라우저';
+	@override String get terminal => '터미널';
+	@override String get notes => '공유 노트';
+	@override String get editor => '편집기';
+	@override String get git => 'Git';
+}
+
+// Path: worktrees.runtimeStatus
+class Translations$worktrees$runtimeStatus$ko extends Translations$worktrees$runtimeStatus$en {
+	Translations$worktrees$runtimeStatus$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get idle => '대기 중';
+	@override String get running => '실행 중';
+	@override String get done => '완료';
+	@override String get failed => '실패';
+	@override String get exited => '종료됨';
+}
+
+// Path: browserUse.sessionStatus
+class Translations$browserUse$sessionStatus$ko extends Translations$browserUse$sessionStatus$en {
+	Translations$browserUse$sessionStatus$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get ready => '준비됨';
+	@override String get stopped => '중지됨';
+	@override String get unavailable => '사용 불가';
+}
+
+// Path: miniOrchestrator.taskTypes
+class Translations$miniOrchestrator$taskTypes$ko extends Translations$miniOrchestrator$taskTypes$en {
+	Translations$miniOrchestrator$taskTypes$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get gate => '게이트';
+}
+
+// Path: miniOrchestrator.roles
+class Translations$miniOrchestrator$roles$ko extends Translations$miniOrchestrator$roles$en {
+	Translations$miniOrchestrator$roles$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get thinker => '사고 모델';
+	@override String get worker => '작업 모델';
 }
 
 // Path: auth.login.errors
@@ -4296,6 +5057,131 @@ class Translations$auth$register$errors$ko extends Translations$auth$register$er
 	@override String get weakPassword => '비밀번호가 너무 약합니다';
 	@override String get usernameTooShort => '사용자 이름은 3자 이상이어야 합니다';
 	@override String get passwordTooShort => '비밀번호는 6자 이상이어야 합니다';
+}
+
+// Path: chat.orchestrator.routing
+class Translations$chat$orchestrator$routing$ko extends Translations$chat$orchestrator$routing$en {
+	Translations$chat$orchestrator$routing$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '라우팅';
+	@override String alternatives({required Object list}) => '대안: ${list}';
+	@override String first({required Object label, required Object task}) => '${label} — ${task}의 첫 번째 후보';
+	@override String skipped({required Object label, required Object list}) => '${label} — 앞선 후보 건너뜀 (${list})';
+}
+
+// Path: chat.orchestrator.plan
+class Translations$chat$orchestrator$plan$ko extends Translations$chat$orchestrator$plan$en {
+	Translations$chat$orchestrator$plan$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '계획';
+	@override String get disabled => '비활성화됨';
+	@override String get awaitingConfirm => '계획 확인을 기다리는 중입니다.';
+	@override String get run => '계획 실행';
+	@override String get toggleStep => '단계 활성화';
+	@override String get confirmFailed => '시작하지 못했습니다 — 다시 시도하세요.';
+	@override String get fallback => '플래너를 사용할 수 없음 — 단일 단계로 대체';
+	@override String get templateSource => '파이프라인 템플릿에서';
+	@override String get offSource => '플래너 꺼짐';
+	@override String stepCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
+		one: '${count}단계',
+		other: '${count}단계',
+	);
+	@override String get supervisedSource => '감독 루프';
+}
+
+// Path: chat.orchestrator.decision
+class Translations$chat$orchestrator$decision$ko extends Translations$chat$orchestrator$decision$en {
+	Translations$chat$orchestrator$decision$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '감독자 결정';
+	@override String iteration({required Object n}) => '반복 ${n}';
+	@override String get rationaleLabel => '이유';
+	@override String get awaitingConfirm => '이 단계들을 실행하기 전에 승인을 기다리는 중입니다.';
+	@override String get proposedSteps => '제안된 단계';
+	@override late final Translations$chat$orchestrator$decision$action$ko action = Translations$chat$orchestrator$decision$action$ko._(_root);
+	@override late final Translations$chat$orchestrator$decision$outcome$ko outcome = Translations$chat$orchestrator$decision$outcome$ko._(_root);
+}
+
+// Path: chat.orchestrator.delegation
+class Translations$chat$orchestrator$delegation$ko extends Translations$chat$orchestrator$delegation$en {
+	Translations$chat$orchestrator$delegation$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '위임된 단계';
+	@override String get openSession => '전체 세션 열기';
+	@override String attempt({required Object n}) => '시도 ${n}';
+	@override String get retryStep => '재시도 / 수정';
+	@override String get continueStep => '계속 / 수정';
+	@override String get continueFailed => '실패했습니다 — 다시 시도하세요.';
+	@override late final Translations$chat$orchestrator$delegation$status$ko status = Translations$chat$orchestrator$delegation$status$ko._(_root);
+	@override String attempts({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
+		one: '${count}회 시도',
+		other: '${count}회 시도',
+	);
+	@override String candidates({required Object list}) => '후보: ${list}';
+	@override String candidateCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
+		one: '후보 ${count}개',
+		other: '후보 ${count}개',
+	);
+}
+
+// Path: chat.orchestrator.summary
+class Translations$chat$orchestrator$summary$ko extends Translations$chat$orchestrator$summary$en {
+	Translations$chat$orchestrator$summary$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '요약';
+	@override String progress({required Object done, required Object total}) => '완료된 단계: ${done}/${total}';
+	@override String get aborted => '중단됨';
+	@override String get timedOut => '시간 초과';
+	@override String get capped => '반복 한도 도달';
+	@override String failed({required Object list}) => '실패한 단계: ${list}';
+	@override String get kContinue => '계속';
+	@override String get continueWork => '작업 계속';
+	@override String get resumeFailed => '재개하지 못했습니다 — 다시 시도하세요.';
+	@override String get runNextTask => '다음 작업 실행';
+	@override String get endAllTasks => '모든 작업 종료';
+	@override String get tasksRunning => '작업 처리 중…';
+	@override String get cancelTasks => '취소';
+}
+
+// Path: chat.orchestrator.taskmaster
+class Translations$chat$orchestrator$taskmaster$ko extends Translations$chat$orchestrator$taskmaster$en {
+	Translations$chat$orchestrator$taskmaster$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '작업 대기열';
+	@override String remaining({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
+		one: '${count}개 남음',
+		other: '${count}개 남음',
+	);
+	@override late final Translations$chat$orchestrator$taskmaster$status$ko status = Translations$chat$orchestrator$taskmaster$status$ko._(_root);
+}
+
+// Path: chat.orchestrator.gate
+class Translations$chat$orchestrator$gate$ko extends Translations$chat$orchestrator$gate$en {
+	Translations$chat$orchestrator$gate$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get timedOut => '시간 초과';
+	@override String exit({required Object code}) => '종료 코드 ${code}';
 }
 
 // Path: chat.codex.modes
@@ -4355,6 +5241,9 @@ class Translations$chat$input$queue$ko extends Translations$chat$input$queue$en 
 	@override String get failed => '전송 실패';
 	@override String get sendNow => '지금 보내기';
 	@override String get sendNowAfterTurn => '이 에이전트는 턴 진행 중에 메시지를 받을 수 없습니다. 현재 턴이 끝난 후 전송됩니다';
+	@override String filesAttached({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count,
+		other: '파일 ${count}개 첨부됨',
+	);
 }
 
 // Path: chat.input.offlineQueue
@@ -4368,6 +5257,24 @@ class Translations$chat$input$offlineQueue$ko extends Translations$chat$input$of
 	@override String get clearBtn => '취소';
 	@override String multiple({required Object count}) => '${count}개 메시지가 오프라인 큐에 있음 — 재연결 시 자동 전송됩니다';
 	@override String get single => '1개 메시지가 오프라인 큐에 있음 — 재연결 시 자동 전송됩니다';
+}
+
+// Path: chat.composer.effortLevels
+class Translations$chat$composer$effortLevels$ko extends Translations$chat$composer$effortLevels$en {
+	Translations$chat$composer$effortLevels$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get off => '끄기';
+	@override String get none => '없음';
+	@override String get minimal => '최소';
+	@override String get low => '낮음';
+	@override String get medium => '중간';
+	@override String get high => '높음';
+	@override String get xhigh => '매우 높음';
+	@override String get max => '최대';
+	@override String get ultra => '울트라';
 }
 
 // Path: chat.providerSelection.providerInfo
@@ -4396,6 +5303,7 @@ class Translations$chat$providerSelection$readyPrompt$ko extends Translations$ch
 	@override String opencode({required Object model}) => '${model} 모델로 OpenCode를 사용할 준비가 되었습니다. 아래에 메시지를 입력하세요.';
 	@override String get kDefault => '시작하려면 위에서 제공자를 선택하세요';
 	@override String devin({required Object model}) => 'Devin ${model} 준비 완료';
+	@override String get orchestrator => 'Auto로 준비 완료 — 라우터가 단계마다 최적의 모델을 선택합니다';
 }
 
 // Path: chat.session.kContinue
@@ -4432,15 +5340,15 @@ class Translations$chat$session$messages$ko extends Translations$chat$session$me
 	@override String get scrollToLoad => '위로 스크롤하여 더 로드';
 	@override String showingLast({required Object count, required Object total}) => '마지막 ${count}개 메시지 표시 (총 ${total}개)';
 	@override String get loadEarlier => '이전 메시지 로드';
+	@override String get loadOlderFailed => '이전 메시지를 불러오지 못했습니다.';
+	@override String get retry => '다시 시도';
 	@override String get loadAll => '모든 메시지 로드';
 	@override String get loadingAll => '모든 메시지 로딩 중...';
 	@override String get allLoaded => '모든 메시지 로드 완료';
 	@override String get perfWarning => '모든 메시지가 로드됨 - 스크롤이 느려질 수 있습니다. "맨 아래로 스크롤"을 클릭하면 성능이 복구됩니다.';
-	@override String get loadOlderFailed => '이전 메시지를 불러오지 못했습니다.';
-	@override String get retry => '다시 시도';
 	@override String get noSearchMatches => '검색과 일치하는 메시지가 없습니다.';
-	@override String loadAllCount({required Object count}) => '모두 로드 (${count})';
 	@override String get loadOlder => '이전 메시지 로드';
+	@override String loadAllCount({required Object count}) => '모두 로드 (${count})';
 	@override String retryLoadOlder({required Object error}) => '이전 메시지 로드 재시도 — ${error}';
 }
 
@@ -4478,8 +5386,6 @@ class Translations$chat$shell$actions$ko extends Translations$chat$shell$actions
 	@override String get disconnectTitle => 'Shell 연결 끊기';
 	@override String get restart => '재시작';
 	@override String get restartTitle => 'Shell 재시작 (먼저 연결 끊기)';
-	@override String get connect => 'Shell에서 계속';
-	@override String get connectTitle => 'Shell에 연결';
 	@override String get kill => '종료 (SIGINT)';
 	@override String get killTitle => '실행 중인 프로세스 종료 (Ctrl+C)';
 	@override String get copyOutput => '출력 복사';
@@ -4487,6 +5393,8 @@ class Translations$chat$shell$actions$ko extends Translations$chat$shell$actions
 	@override String get copied => '복사됨!';
 	@override String get zoomInTitle => '확대';
 	@override String get zoomOutTitle => '축소';
+	@override String get connect => 'Shell에서 계속';
+	@override String get connectTitle => 'Shell에 연결';
 }
 
 // Path: chat.claudeStatus.actions
@@ -4556,222 +5464,180 @@ class Translations$chat$commandResult$fallback$ko extends Translations$chat$comm
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get config => '설정 및 구성을 엽니다.';
-	@override String get cost => '활성 세션의 토큰 사용량을 확인합니다.';
-	@override String get help => '명령어 문서와 구문을 표시합니다.';
-	@override String get memory => '프로젝트 CLAUDE.md 메모리 파일을 엽니다.';
 	@override String get models => '활성 제공자의 사용 가능한 모델을 살펴봅니다.';
+	@override String get cost => '활성 세션의 토큰 사용량을 확인합니다.';
 	@override String get status => '런타임, 버전, 제공자 및 환경 상태를 확인합니다.';
+	@override String get memory => '프로젝트 CLAUDE.md 메모리 파일을 엽니다.';
+	@override String get config => '설정 및 구성을 엽니다.';
+	@override String get help => '명령어 문서와 구문을 표시합니다.';
 }
 
-// Path: common.fileTree.context
-class Translations$common$fileTree$context$ko extends Translations$common$fileTree$context$en {
-	Translations$common$fileTree$context$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+// Path: chat.permissionRequest.recap
+class Translations$chat$permissionRequest$recap$ko extends Translations$chat$permissionRequest$recap$en {
+	Translations$chat$permissionRequest$recap$ko._(TranslationsKo root) : this._root = root, super.internal(root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get rename => '이름 변경';
+	@override String get timedOut => '시간 초과 — 자동으로 거부됨';
+	@override String get cancelled => '취소됨 — 턴이 중지됨';
+	@override String get autoApproved => '자동으로 승인됨';
+	@override String get expired => '요청 만료됨 — 에이전트가 더 이상 기다리지 않습니다';
+	@override String get answered => '답변함';
+	@override String get skipped => '건너뜀';
+	@override String get decided => '결정됨';
+}
+
+// Path: chat.commandDialog.help
+class Translations$chat$commandDialog$help$ko extends Translations$chat$commandDialog$help$en {
+	Translations$chat$commandDialog$help$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get eyebrow => '명령 센터';
+	@override String get title => '도움말 및 단축키';
+	@override String get subtitle => '기본 제공 명령, 구문 패턴, 명령 사용법을 검색합니다.';
+}
+
+// Path: chat.commandDialog.models
+class Translations$chat$commandDialog$models$ko extends Translations$chat$commandDialog$models$en {
+	Translations$chat$commandDialog$models$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get eyebrow => '모델 선택';
+	@override String get title => '모델 선택';
+	@override String get subtitle => '이 공급자가 사용할 모델을 선택하세요.';
+	@override String modelSetTo({required Object model}) => '모델이 ${model}(으)로 설정되었습니다.';
+	@override String get activeModel => '활성 모델';
+	@override String get noModelsMatch => '이 필터와 일치하는 모델이 없습니다.';
+	@override String get choiceSavedForSession => '선택한 내용은 이 세션에 저장되며 새 채팅의 기본값이 됩니다.';
+	@override String get choiceDefault => '선택한 모델이 새 채팅의 기본 모델이 됩니다.';
+	@override String get custom => '사용자 지정';
+	@override String get currentSelection => '현재 선택';
+}
+
+// Path: chat.commandDialog.cost
+class Translations$chat$commandDialog$cost$ko extends Translations$chat$commandDialog$cost$en {
+	Translations$chat$commandDialog$cost$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get eyebrow => '세션 원격 분석';
+	@override String get title => '토큰 사용량';
+	@override String get subtitle => '이 세션의 입력, 출력 및 전체 토큰 수입니다.';
+	@override String get totalTokensUsed => '사용한 총 토큰';
+	@override String get inputTokens => '입력 토큰';
+	@override String get cacheReadTokens => '캐시 읽기 토큰';
+	@override String get cacheWriteTokens => '캐시 쓰기 토큰';
+	@override String get outputTokens => '출력 토큰';
+	@override String get breakdown => '세부 내역';
+	@override String get unavailable => '사용할 수 없음';
+	@override String get contextWindow => '컨텍스트 창';
+	@override String get estimatedCost => '예상 비용';
+}
+
+// Path: chat.commandDialog.status
+class Translations$chat$commandDialog$status$ko extends Translations$chat$commandDialog$status$en {
+	Translations$chat$commandDialog$status$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get eyebrow => '런타임 상태';
+	@override String get title => '시스템 상태';
+	@override String get subtitle => '버전, 공급자, 런타임 및 환경 세부 정보입니다.';
+	@override String get package => '패키지';
+	@override String get uptime => '가동 시간';
+	@override String get platform => '플랫폼';
+	@override String get memory => '메모리';
+	@override String memoryRss({required Object mb}) => '${mb} MB RSS';
+	@override String get runtimeOnline => '런타임 온라인';
+	@override String processResponding({required Object pid}) => '프로세스 #${pid}이(가) 응답하고 있습니다.';
+	@override String get processStatusResponding => '프로세스가 응답하고 있습니다.';
+	@override String get healthy => '정상';
+}
+
+// Path: chat.commandDialog.syntax
+class Translations$chat$commandDialog$syntax$ko extends Translations$chat$commandDialog$syntax$en {
+	Translations$chat$commandDialog$syntax$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '구문';
+	@override String arguments({required Object arguments, required Object first, required Object second}) => '${arguments}는 모든 인수를 전달합니다. ${first}, ${second}는 위치 인수입니다.';
+	@override String file({required Object token}) => '${token}은(는) 파일 내용을 포함합니다.';
+	@override String bash({required Object token}) => '${token}은(는) bash를 실행합니다.';
+}
+
+// Path: chat.utilities.tooltip
+class Translations$chat$utilities$tooltip$ko extends Translations$chat$utilities$tooltip$en {
+	Translations$chat$utilities$tooltip$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String tokensUsed({required Object tokens}) => '${tokens} 토큰 사용';
+	@override String contextOf({required Object total, required Object percent}) => '컨텍스트 ${total} 중 ${percent}%';
+	@override String input({required Object value}) => '입력 ${value}';
+	@override String cache({required Object read, required Object write}) => '캐시 읽기 ${read} · 쓰기 ${write}';
+	@override String output({required Object value}) => '출력 ${value}';
+}
+
+// Path: chat.toolBlocks.status
+class Translations$chat$toolBlocks$status$ko extends Translations$chat$toolBlocks$status$en {
+	Translations$chat$toolBlocks$status$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get running => '실행 중';
+	@override String get denied => '거부됨';
+}
+
+// Path: chat.toolBlocks.verbs
+class Translations$chat$toolBlocks$verbs$ko extends Translations$chat$toolBlocks$verbs$en {
+	Translations$chat$toolBlocks$verbs$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get read => '읽기';
+	@override String get write => '쓰기';
+	@override String get edit => '편집';
 	@override String get delete => '삭제';
-	@override String get copyPath => '경로 복사';
-	@override String get download => '다운로드';
-	@override String get newFile => '새 파일';
-	@override String get newFolder => '새 폴더';
-	@override String get upload => '파일 업로드';
-	@override String get refresh => '새로 고침';
-	@override String get menuLabel => '파일 컨텍스트 메뉴';
-	@override String get loading => '로딩 중...';
+	@override String get move => '이동';
 }
 
-// Path: common.fileTree.delete
-class Translations$common$fileTree$delete$ko extends Translations$common$fileTree$delete$en {
-	Translations$common$fileTree$delete$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+// Path: chat.commandMenu.namespaces
+class Translations$chat$commandMenu$namespaces$ko extends Translations$chat$commandMenu$namespaces$en {
+	Translations$chat$commandMenu$namespaces$ko._(TranslationsKo root) : this._root = root, super.internal(root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get confirm => '삭제';
-	@override String get fileWarning => '이 파일은 영구적으로 삭제됩니다.';
-	@override String get folderWarning => '이 폴더와 모든 내용이 영구적으로 삭제됩니다.';
-	@override String title({required Object type}) => '${type} 삭제';
+	@override String get frequent => '자주 사용';
+	@override String get builtin => '기본 제공 명령';
+	@override String get skill => '스킬';
+	@override String get project => '프로젝트 명령';
+	@override String get user => '사용자 명령';
+	@override String get other => '기타 명령';
 }
 
-// Path: common.fileTree.toast
-class Translations$common$fileTree$toast$ko extends Translations$common$fileTree$toast$en {
-	Translations$common$fileTree$toast$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+// Path: chat.mentionMenu.kinds
+class Translations$chat$mentionMenu$kinds$ko extends Translations$chat$mentionMenu$kinds$en {
+	Translations$chat$mentionMenu$kinds$ko._(TranslationsKo root) : this._root = root, super.internal(root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get copyFailed => '경로 복사 실패';
-	@override String get fileCreated => '파일이 생성되었습니다';
-	@override String get fileDeleted => '파일이 삭제되었습니다';
-	@override String get folderCreated => '폴더가 생성되었습니다';
-	@override String get folderDeleted => '폴더가 삭제되었습니다';
-	@override String get folderDownloaded => '폴더가 ZIP으로 다운로드되었습니다';
-	@override String get pathCopied => '경로가 클립보드에 복사되었습니다';
-	@override String get renamed => '이름이 변경되었습니다';
-}
-
-// Path: common.fileTree.validation
-class Translations$common$fileTree$validation$ko extends Translations$common$fileTree$validation$en {
-	Translations$common$fileTree$validation$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get dotsOnly => '파일 이름은 점만으로 구성될 수 없습니다';
-	@override String get emptyName => '파일 이름은 비워 둘 수 없습니다';
-	@override String get invalidChars => '파일 이름에 잘못된 문자가 포함되어 있습니다';
-	@override String get reserved => '파일 이름이 예약어입니다';
-}
-
-// Path: common.projectWizard.steps
-class Translations$common$projectWizard$steps$ko extends Translations$common$projectWizard$steps$en {
-	Translations$common$projectWizard$steps$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get type => '유형';
-	@override String get configure => '설정';
-	@override String get confirm => '확인';
-}
-
-// Path: common.projectWizard.step1
-class Translations$common$projectWizard$step1$ko extends Translations$common$projectWizard$step1$en {
-	Translations$common$projectWizard$step1$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get question => '이미 워크스페이스가 있으신가요, 아니면 새로 생성하시겠습니까?';
-	@override late final Translations$common$projectWizard$step1$existing$ko existing = Translations$common$projectWizard$step1$existing$ko._(_root);
-	@override late final Translations$common$projectWizard$step1$kNew$ko kNew = Translations$common$projectWizard$step1$kNew$ko._(_root);
-}
-
-// Path: common.projectWizard.step2
-class Translations$common$projectWizard$step2$ko extends Translations$common$projectWizard$step2$en {
-	Translations$common$projectWizard$step2$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get existingPath => '워크스페이스 경로';
-	@override String get newPath => '워크스페이스 경로';
-	@override String get existingPlaceholder => '/path/to/existing/workspace';
-	@override String get newPlaceholder => '/path/to/new/workspace';
-	@override String get existingHelp => '기존 워크스페이스 디렉토리의 전체 경로';
-	@override String get newHelp => '워크스페이스 디렉토리의 전체 경로';
-	@override String get githubUrl => 'GitHub URL (선택사항)';
-	@override String get githubPlaceholder => 'https://github.com/username/repository';
-	@override String get githubHelp => '선택사항: 저장소를 clone하려면 GitHub URL을 입력하세요';
-	@override String get githubAuth => 'GitHub 인증 (선택사항)';
-	@override String get githubAuthHelp => '비공개 저장소에만 필요합니다. 공개 저장소는 인증 없이 clone할 수 있습니다.';
-	@override String get loadingTokens => '저장된 토큰 로딩 중...';
-	@override String get storedToken => '저장된 토큰';
-	@override String get newToken => '새 토큰';
-	@override String get nonePublic => '없음 (공개)';
-	@override String get selectToken => '토큰 선택';
-	@override String get selectTokenPlaceholder => '-- 토큰 선택 --';
-	@override String get tokenPlaceholder => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
-	@override String get tokenHelp => '이 토큰은 이 작업에만 사용됩니다';
-	@override String get publicRepoInfo => '공개 저장소는 인증이 필요하지 않습니다. 공개 저장소를 clone하는 경우 토큰을 생략할 수 있습니다.';
-	@override String get noTokensHelp => '저장된 토큰이 없습니다. 설정 → API Keys에서 토큰을 추가하면 재사용이 편리합니다.';
-	@override String get optionalTokenPublic => 'GitHub 토큰 (공개 저장소는 선택사항)';
-	@override String get tokenPublicPlaceholder => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx (공개 저장소는 비워두세요)';
-}
-
-// Path: common.projectWizard.step3
-class Translations$common$projectWizard$step3$ko extends Translations$common$projectWizard$step3$en {
-	Translations$common$projectWizard$step3$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get reviewConfig => '설정 검토';
-	@override String get existingWorkspace => '기존 워크스페이스';
-	@override String get newWorkspace => '새 워크스페이스';
-	@override String get path => '경로:';
-	@override String get cloneFrom => 'Clone 소스:';
-	@override String get authentication => '인증:';
-	@override String get usingStoredToken => '저장된 토큰 사용:';
-	@override String get usingProvidedToken => '제공된 토큰 사용';
-	@override String get noAuthentication => '인증 없음';
-	@override String get sshKey => 'SSH 키';
-	@override String get existingInfo => '워크스페이스가 프로젝트 목록에 추가되며 Claude/Cursor 세션에서 사용할 수 있습니다.';
-	@override String get newWithClone => '이 폴더에 저장소가 clone됩니다.';
-	@override String get newEmpty => '워크스페이스가 프로젝트 목록에 추가되며 Claude/Cursor 세션에서 사용할 수 있습니다.';
-	@override String get cloningRepository => '저장소 clone 중...';
-}
-
-// Path: common.projectWizard.buttons
-class Translations$common$projectWizard$buttons$ko extends Translations$common$projectWizard$buttons$en {
-	Translations$common$projectWizard$buttons$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get cancel => '취소';
-	@override String get back => '뒤로';
-	@override String get next => '다음';
-	@override String get createProject => '프로젝트 생성';
-	@override String get creating => '생성 중...';
-	@override String get cloning => 'Clone 중...';
-}
-
-// Path: common.projectWizard.errors
-class Translations$common$projectWizard$errors$ko extends Translations$common$projectWizard$errors$en {
-	Translations$common$projectWizard$errors$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get selectType => '기존 워크스페이스를 사용할지 새로 생성할지 선택해주세요';
-	@override String get providePath => '워크스페이스 경로를 입력해주세요';
-	@override String get failedToCreate => '워크스페이스 생성 실패';
-	@override String get failedToCreateFolder => '폴더 생성 실패';
-}
-
-// Path: common.notifications.codes
-class Translations$common$notifications$codes$ko extends Translations$common$notifications$codes$en {
-	Translations$common$notifications$codes$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override late final Translations$common$notifications$codes$generic$ko generic = Translations$common$notifications$codes$generic$ko._(_root);
-	@override late final Translations$common$notifications$codes$permission$ko permission = Translations$common$notifications$codes$permission$ko._(_root);
-	@override late final Translations$common$notifications$codes$run$ko run = Translations$common$notifications$codes$run$ko._(_root);
-	@override late final Translations$common$notifications$codes$agent$ko agent = Translations$common$notifications$codes$agent$ko._(_root);
-}
-
-// Path: common.versionUpdate.buttons
-class Translations$common$versionUpdate$buttons$ko extends Translations$common$versionUpdate$buttons$en {
-	Translations$common$versionUpdate$buttons$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get close => '닫기';
-	@override String get later => '나중에';
-	@override String get copyCommand => '명령어 복사';
-	@override String get updateNow => '지금 업데이트';
-	@override String get updating => '업데이트 중...';
-}
-
-// Path: common.versionUpdate.ariaLabels
-class Translations$common$versionUpdate$ariaLabels$ko extends Translations$common$versionUpdate$ariaLabels$en {
-	Translations$common$versionUpdate$ariaLabels$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get closeModal => '버전 업그레이드 모달 닫기';
-	@override String get showSidebar => '사이드바 표시';
-	@override String get settings => '설정';
-	@override String get updateAvailable => '업데이트 가능';
-	@override String get closeSidebar => '사이드바 닫기';
+	@override String get file => '파일';
+	@override String get session => '세션';
+	@override String get task => '작업';
 }
 
 // Path: common.quota.section
@@ -5020,6 +5886,216 @@ class Translations$common$quota$range$ko extends Translations$common$quota$range
 	@override String get k7d => '7d';
 	@override String get k30d => '30d';
 	@override String get all => '전체';
+}
+
+// Path: common.fileTree.context
+class Translations$common$fileTree$context$ko extends Translations$common$fileTree$context$en {
+	Translations$common$fileTree$context$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get rename => '이름 변경';
+	@override String get delete => '삭제';
+	@override String get copyPath => '경로 복사';
+	@override String get download => '다운로드';
+	@override String get newFile => '새 파일';
+	@override String get newFolder => '새 폴더';
+	@override String get upload => '파일 업로드';
+	@override String get refresh => '새로 고침';
+	@override String get menuLabel => '파일 컨텍스트 메뉴';
+	@override String get loading => '로딩 중...';
+}
+
+// Path: common.fileTree.delete
+class Translations$common$fileTree$delete$ko extends Translations$common$fileTree$delete$en {
+	Translations$common$fileTree$delete$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get confirm => '삭제';
+	@override String get fileWarning => '이 파일은 영구적으로 삭제됩니다.';
+	@override String get folderWarning => '이 폴더와 모든 내용이 영구적으로 삭제됩니다.';
+	@override String title({required Object type}) => '${type} 삭제';
+}
+
+// Path: common.fileTree.toast
+class Translations$common$fileTree$toast$ko extends Translations$common$fileTree$toast$en {
+	Translations$common$fileTree$toast$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get copyFailed => '경로 복사 실패';
+	@override String get fileCreated => '파일이 생성되었습니다';
+	@override String get fileDeleted => '파일이 삭제되었습니다';
+	@override String get folderCreated => '폴더가 생성되었습니다';
+	@override String get folderDeleted => '폴더가 삭제되었습니다';
+	@override String get folderDownloaded => '폴더가 ZIP으로 다운로드되었습니다';
+	@override String get pathCopied => '경로가 클립보드에 복사되었습니다';
+	@override String get renamed => '이름이 변경되었습니다';
+}
+
+// Path: common.fileTree.validation
+class Translations$common$fileTree$validation$ko extends Translations$common$fileTree$validation$en {
+	Translations$common$fileTree$validation$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get dotsOnly => '파일 이름은 점만으로 구성될 수 없습니다';
+	@override String get emptyName => '파일 이름은 비워 둘 수 없습니다';
+	@override String get invalidChars => '파일 이름에 잘못된 문자가 포함되어 있습니다';
+	@override String get reserved => '파일 이름이 예약어입니다';
+}
+
+// Path: common.projectWizard.steps
+class Translations$common$projectWizard$steps$ko extends Translations$common$projectWizard$steps$en {
+	Translations$common$projectWizard$steps$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get type => '유형';
+	@override String get configure => '설정';
+	@override String get confirm => '확인';
+}
+
+// Path: common.projectWizard.step1
+class Translations$common$projectWizard$step1$ko extends Translations$common$projectWizard$step1$en {
+	Translations$common$projectWizard$step1$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get question => '이미 워크스페이스가 있으신가요, 아니면 새로 생성하시겠습니까?';
+	@override late final Translations$common$projectWizard$step1$existing$ko existing = Translations$common$projectWizard$step1$existing$ko._(_root);
+	@override late final Translations$common$projectWizard$step1$kNew$ko kNew = Translations$common$projectWizard$step1$kNew$ko._(_root);
+}
+
+// Path: common.projectWizard.step2
+class Translations$common$projectWizard$step2$ko extends Translations$common$projectWizard$step2$en {
+	Translations$common$projectWizard$step2$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get existingPath => '워크스페이스 경로';
+	@override String get newPath => '워크스페이스 경로';
+	@override String get existingPlaceholder => '/path/to/existing/workspace';
+	@override String get newPlaceholder => '/path/to/new/workspace';
+	@override String get existingHelp => '기존 워크스페이스 디렉토리의 전체 경로';
+	@override String get newHelp => '워크스페이스 디렉토리의 전체 경로';
+	@override String get githubUrl => 'GitHub URL (선택사항)';
+	@override String get githubPlaceholder => 'https://github.com/username/repository';
+	@override String get githubHelp => '선택사항: 저장소를 clone하려면 GitHub URL을 입력하세요';
+	@override String get githubAuth => 'GitHub 인증 (선택사항)';
+	@override String get githubAuthHelp => '비공개 저장소에만 필요합니다. 공개 저장소는 인증 없이 clone할 수 있습니다.';
+	@override String get loadingTokens => '저장된 토큰 로딩 중...';
+	@override String get storedToken => '저장된 토큰';
+	@override String get newToken => '새 토큰';
+	@override String get nonePublic => '없음 (공개)';
+	@override String get selectToken => '토큰 선택';
+	@override String get selectTokenPlaceholder => '-- 토큰 선택 --';
+	@override String get tokenPlaceholder => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
+	@override String get tokenHelp => '이 토큰은 이 작업에만 사용됩니다';
+	@override String get publicRepoInfo => '공개 저장소는 인증이 필요하지 않습니다. 공개 저장소를 clone하는 경우 토큰을 생략할 수 있습니다.';
+	@override String get noTokensHelp => '저장된 토큰이 없습니다. 설정 → API Keys에서 토큰을 추가하면 재사용이 편리합니다.';
+	@override String get optionalTokenPublic => 'GitHub 토큰 (공개 저장소는 선택사항)';
+	@override String get tokenPublicPlaceholder => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx (공개 저장소는 비워두세요)';
+}
+
+// Path: common.projectWizard.step3
+class Translations$common$projectWizard$step3$ko extends Translations$common$projectWizard$step3$en {
+	Translations$common$projectWizard$step3$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get reviewConfig => '설정 검토';
+	@override String get existingWorkspace => '기존 워크스페이스';
+	@override String get newWorkspace => '새 워크스페이스';
+	@override String get path => '경로:';
+	@override String get cloneFrom => 'Clone 소스:';
+	@override String get authentication => '인증:';
+	@override String get usingStoredToken => '저장된 토큰 사용:';
+	@override String get usingProvidedToken => '제공된 토큰 사용';
+	@override String get noAuthentication => '인증 없음';
+	@override String get sshKey => 'SSH 키';
+	@override String get existingInfo => '워크스페이스가 프로젝트 목록에 추가되며 Claude/Cursor 세션에서 사용할 수 있습니다.';
+	@override String get newWithClone => '이 폴더에 저장소가 clone됩니다.';
+	@override String get newEmpty => '워크스페이스가 프로젝트 목록에 추가되며 Claude/Cursor 세션에서 사용할 수 있습니다.';
+	@override String get cloningRepository => '저장소 clone 중...';
+}
+
+// Path: common.projectWizard.buttons
+class Translations$common$projectWizard$buttons$ko extends Translations$common$projectWizard$buttons$en {
+	Translations$common$projectWizard$buttons$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get cancel => '취소';
+	@override String get back => '뒤로';
+	@override String get next => '다음';
+	@override String get createProject => '프로젝트 생성';
+	@override String get creating => '생성 중...';
+	@override String get cloning => 'Clone 중...';
+}
+
+// Path: common.projectWizard.errors
+class Translations$common$projectWizard$errors$ko extends Translations$common$projectWizard$errors$en {
+	Translations$common$projectWizard$errors$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get selectType => '기존 워크스페이스를 사용할지 새로 생성할지 선택해주세요';
+	@override String get providePath => '워크스페이스 경로를 입력해주세요';
+	@override String get failedToCreate => '워크스페이스 생성 실패';
+	@override String get failedToCreateFolder => '폴더 생성 실패';
+}
+
+// Path: common.notifications.codes
+class Translations$common$notifications$codes$ko extends Translations$common$notifications$codes$en {
+	Translations$common$notifications$codes$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$common$notifications$codes$generic$ko generic = Translations$common$notifications$codes$generic$ko._(_root);
+	@override late final Translations$common$notifications$codes$permission$ko permission = Translations$common$notifications$codes$permission$ko._(_root);
+	@override late final Translations$common$notifications$codes$run$ko run = Translations$common$notifications$codes$run$ko._(_root);
+	@override late final Translations$common$notifications$codes$agent$ko agent = Translations$common$notifications$codes$agent$ko._(_root);
+}
+
+// Path: common.versionUpdate.buttons
+class Translations$common$versionUpdate$buttons$ko extends Translations$common$versionUpdate$buttons$en {
+	Translations$common$versionUpdate$buttons$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => '닫기';
+	@override String get later => '나중에';
+	@override String get copyCommand => '명령어 복사';
+	@override String get updateNow => '지금 업데이트';
+	@override String get updating => '업데이트 중...';
+}
+
+// Path: common.versionUpdate.ariaLabels
+class Translations$common$versionUpdate$ariaLabels$ko extends Translations$common$versionUpdate$ariaLabels$en {
+	Translations$common$versionUpdate$ariaLabels$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get closeModal => '버전 업그레이드 모달 닫기';
+	@override String get showSidebar => '사이드바 표시';
+	@override String get settings => '설정';
+	@override String get updateAvailable => '업데이트 가능';
+	@override String get closeSidebar => '사이드바 닫기';
 }
 
 // Path: common.browserUse.empty
@@ -5444,6 +6520,31 @@ class Translations$common$gitPanel$tabs$ko extends Translations$common$gitPanel$
 	@override String get worktrees => '워크트리';
 }
 
+// Path: common.gitPanel.worktreeScripts
+class Translations$common$gitPanel$worktreeScripts$ko extends Translations$common$gitPanel$worktreeScripts$en {
+	Translations$common$gitPanel$worktreeScripts$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'worktree 스크립트';
+	@override String get setup => '설정 스크립트 (생성/열기 후 실행)';
+	@override String get run => '개발 서버 실행';
+	@override String get stop => '개발 서버 중지';
+	@override String get runScript => '실행 스크립트 (개발 서버, 필요 시)';
+	@override String get runPort => '미리보기 포트 (선택 사항 — 비워 두면 자동 감지)';
+	@override String get invalidPort => '포트는 1에서 65535 사이여야 합니다';
+	@override String get sourceProject => '프로젝트 재정의로 저장됨';
+	@override String get sourceFile => '.ddagent/worktree.json에서 가져옴 — 저장하면 프로젝트 재정의가 생성됩니다';
+	@override String get sourceNone => '아직 구성된 항목이 없습니다';
+	@override String get saving => '저장 중…';
+	@override String get setupRunning => '설정 실행 중';
+	@override String get setupFailed => '설정 실패';
+	@override String get running => '실행 중';
+	@override String get openPreview => '미리보기 열기';
+	@override String runExited({required Object code}) => '실행 종료됨 (${code})';
+}
+
 // Path: settings.mcp.scope
 class Translations$settings$mcp$scope$ko extends Translations$settings$mcp$scope$en {
 	Translations$settings$mcp$scope$ko._(TranslationsKo root) : this._root = root, super.internal(root);
@@ -5463,9 +6564,9 @@ class Translations$settings$appearance$themeModes$ko extends Translations$settin
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get dark => '다크';
-	@override String get light => '라이트';
 	@override String get system => '시스템';
+	@override String get light => '라이트';
+	@override String get dark => '다크';
 }
 
 // Path: settings.quickSettings.sections
@@ -5505,6 +6606,76 @@ class Translations$settings$terminalShortcuts$handle$ko extends Translations$set
 	@override String get openPanel => '단축키 패널 열기';
 }
 
+// Path: settings.miniOrchestration.enable
+class Translations$settings$miniOrchestration$enable$ko extends Translations$settings$miniOrchestration$enable$en {
+	Translations$settings$miniOrchestration$enable$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get label => '미니 오케스트레이션 사용';
+	@override String get description => 'Auto (mini) 세션을 전체 오케스트레이터 대신 2역할 엔진으로 라우팅합니다.';
+}
+
+// Path: settings.miniOrchestration.thinker
+class Translations$settings$miniOrchestration$thinker$ko extends Translations$settings$miniOrchestration$thinker$en {
+	Translations$settings$miniOrchestration$thinker$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '사고 모델 (non-flash)';
+	@override String get description => '계획, 결정, 검토를 수행하고 최종 보고서를 작성합니다.';
+}
+
+// Path: settings.miniOrchestration.worker
+class Translations$settings$miniOrchestration$worker$ko extends Translations$settings$miniOrchestration$worker$en {
+	Translations$settings$miniOrchestration$worker$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '작업자 (flash)';
+	@override String get description => '계획된 각 단계를 실행합니다.';
+}
+
+// Path: settings.miniOrchestration.fields
+class Translations$settings$miniOrchestration$fields$ko extends Translations$settings$miniOrchestration$fields$en {
+	Translations$settings$miniOrchestration$fields$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get provider => '제공자';
+	@override String get model => '모델';
+	@override String get modelPlaceholder => '모델 선택';
+	@override String get tier => '티어';
+}
+
+// Path: settings.miniOrchestration.roles
+class Translations$settings$miniOrchestration$roles$ko extends Translations$settings$miniOrchestration$roles$en {
+	Translations$settings$miniOrchestration$roles$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '작업별 모델';
+	@override String get description => '각 작업 유형을 어떤 모델(역할)이 처리할지 지정합니다.';
+}
+
+// Path: settings.miniOrchestration.planner
+class Translations$settings$miniOrchestration$planner$ko extends Translations$settings$miniOrchestration$planner$en {
+	Translations$settings$miniOrchestration$planner$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '플래너';
+	@override String get mode => '모드';
+	@override late final Translations$settings$miniOrchestration$planner$modes$ko modes = Translations$settings$miniOrchestration$planner$modes$ko._(_root);
+	@override String get requireConfirmLabel => '실행 전에 계획 확인';
+}
+
 // Path: settings.orchestration.enable
 class Translations$settings$orchestration$enable$ko extends Translations$settings$orchestration$enable$en {
 	Translations$settings$orchestration$enable$ko._(TranslationsKo root) : this._root = root, super.internal(root);
@@ -5512,8 +6683,8 @@ class Translations$settings$orchestration$enable$ko extends Translations$setting
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get label => 'Enable orchestration';
-	@override String get description => 'Let the orchestrator pick a model per step instead of running everything on one provider.';
+	@override String get label => '오케스트레이션 사용';
+	@override String get description => '모든 작업을 하나의 제공자에서 실행하는 대신, 오케스트레이터가 단계마다 모델을 선택합니다.';
 }
 
 // Path: settings.orchestration.pool
@@ -5523,10 +6694,10 @@ class Translations$settings$orchestration$pool$ko extends Translations$settings$
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'Candidate pool';
-	@override String get description => 'Models the router can pick from, each pinned to a cost tier.';
-	@override String get add => 'Add candidate';
-	@override String get empty => 'No candidates yet — add one to start routing.';
+	@override String get title => '후보 풀';
+	@override String get description => '라우터가 선택할 수 있는 모델이며, 각각 비용 등급에 연결됩니다.';
+	@override String get add => '후보 추가';
+	@override String get empty => '아직 후보가 없습니다 — 하나를 추가하면 라우팅이 시작됩니다.';
 	@override late final Translations$settings$orchestration$pool$fields$ko fields = Translations$settings$orchestration$pool$fields$ko._(_root);
 }
 
@@ -5537,10 +6708,10 @@ class Translations$settings$orchestration$tiers$ko extends Translations$settings
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get free => 'Free';
-	@override String get cheap => 'Cheap';
-	@override String get mid => 'Mid';
-	@override String get premium => 'Premium';
+	@override String get free => '무료';
+	@override String get cheap => '저가';
+	@override String get mid => '중간';
+	@override String get premium => '프리미엄';
 }
 
 // Path: settings.orchestration.rules
@@ -5550,12 +6721,12 @@ class Translations$settings$orchestration$rules$ko extends Translations$settings
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'Routing rules';
-	@override String get description => 'Ordered candidates per task type — the first available one wins.';
-	@override String get addCandidate => 'Add candidate…';
-	@override String get empty => 'No candidates — nothing to route this task type to.';
-	@override String get missing => '(removed)';
-	@override String get remove => 'Remove candidate';
+	@override String get title => '라우팅 규칙';
+	@override String get description => '작업 유형별로 정렬된 후보 — 처음으로 사용 가능한 후보가 선택됩니다.';
+	@override String get addCandidate => '후보 추가…';
+	@override String get empty => '후보 없음 — 이 작업 유형을 라우팅할 대상이 없습니다.';
+	@override String get missing => '(제거됨)';
+	@override String get remove => '후보 제거';
 	@override late final Translations$settings$orchestration$rules$taskTypes$ko taskTypes = Translations$settings$orchestration$rules$taskTypes$ko._(_root);
 }
 
@@ -5566,17 +6737,21 @@ class Translations$settings$orchestration$planner$ko extends Translations$settin
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'Planner';
-	@override String get description => 'How a request is split into routed steps.';
-	@override String get modeLabel => 'Planning mode';
+	@override String get title => '플래너';
+	@override String get description => '요청을 라우팅할 단계로 나누는 방식입니다.';
+	@override String get modeLabel => '계획 모드';
 	@override late final Translations$settings$orchestration$planner$modes$ko modes = Translations$settings$orchestration$planner$modes$ko._(_root);
 	@override late final Translations$settings$orchestration$planner$modeHints$ko modeHints = Translations$settings$orchestration$planner$modeHints$ko._(_root);
-	@override String get candidateLabel => 'Planner model';
-	@override String get candidateDescription => 'Pool candidate used for plan generation and classification calls.';
-	@override String get candidatePlaceholder => 'Select a pool candidate';
+	@override String get candidateLabel => '플래너 모델';
+	@override String get candidateDescription => '계획 생성과 분류 호출에 사용되는 풀 후보입니다.';
+	@override String get candidatePlaceholder => '풀 후보 선택';
 	@override late final Translations$settings$orchestration$planner$templates$ko templates = Translations$settings$orchestration$planner$templates$ko._(_root);
-	@override String get requireConfirm => 'Confirm plan before running';
-	@override String get requireConfirmDescription => 'Pause after planning so you can edit or disable steps on the plan card.';
+	@override String get requireConfirm => '실행 전에 계획 확인';
+	@override String get requireConfirmDescription => '계획 후 일시 중지하여 계획 카드에서 단계를 편집하거나 비활성화할 수 있습니다.';
+	@override String get checkpointLabel => '자율성';
+	@override late final Translations$settings$orchestration$planner$checkpointModes$ko checkpointModes = Translations$settings$orchestration$planner$checkpointModes$ko._(_root);
+	@override late final Translations$settings$orchestration$planner$checkpointHints$ko checkpointHints = Translations$settings$orchestration$planner$checkpointHints$ko._(_root);
+	@override String get checkpointIntervalLabel => '체크포인트 간 단계 수 (1–50)';
 }
 
 // Path: settings.orchestration.execution
@@ -5586,17 +6761,30 @@ class Translations$settings$orchestration$execution$ko extends Translations$sett
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'Execution limits';
-	@override String get description => 'Guardrails for parallel runs and fix loops.';
-	@override String get maxParallel => 'Max parallel steps';
-	@override String get maxParallelDescription => 'How many subtasks may run at once (1–8).';
-	@override String get maxFixLoops => 'Max fix loops';
-	@override String get maxFixLoopsDescription => 'Retries when a step fails verification (0–5).';
-	@override String get onNoCandidate => 'When no candidate is available';
-	@override String get onNoCandidateDescription => 'Ask before falling back, or skip the step.';
+	@override String get title => '실행 제한';
+	@override String get description => '병렬 실행과 수정 루프에 대한 안전장치입니다.';
+	@override String get maxParallel => '최대 병렬 단계 수';
+	@override String get maxParallelDescription => '동시에 실행할 수 있는 하위 작업 수 (1–8).';
+	@override String get maxFixLoops => '최대 수정 루프 수';
+	@override String get maxFixLoopsDescription => '단계가 검증에 실패했을 때의 재시도 횟수 (0–5).';
+	@override String get onNoCandidate => '사용 가능한 후보가 없을 때';
+	@override String get onNoCandidateDescription => '대체 수단으로 넘어가기 전에 묻거나, 단계를 건너뜁니다.';
 	@override late final Translations$settings$orchestration$execution$onNoCandidateOptions$ko onNoCandidateOptions = Translations$settings$orchestration$execution$onNoCandidateOptions$ko._(_root);
-	@override String get useWorktree => 'Isolated worktree';
-	@override String get useWorktreeDescription => 'Run all delegated steps in one shared git worktree instead of the project directory.';
+	@override String get useWorktree => '격리된 worktree';
+	@override String get useWorktreeDescription => '위임된 모든 단계를 프로젝트 디렉터리 대신 하나의 공유 git worktree에서 실행합니다.';
+	@override String get maxSupervisorIterations => '최대 감독자 반복 횟수';
+	@override String get maxSupervisorIterationsDescription => '자동 모드에서 감독자 결정 라운드의 상한 (1–100). 도달하면 부분 보고서와 함께 실행이 종료됩니다.';
+	@override String get maxAttempts => '단계당 최대 시도 횟수';
+	@override String get maxAttemptsDescription => '한 단계에 대해 레인과 재시도를 모두 합친 총 시도 횟수 (1–50).';
+	@override String get stepTimeoutMs => '단계 시간 제한 (ms)';
+	@override String get stepTimeoutMsDescription => '시도별 하위 실행 시간 제한(밀리초). 0이면 사용 안 함.';
+	@override String get runTimeoutMs => '실행 시간 제한 (ms)';
+	@override String get runTimeoutMsDescription => '전체 계획 실행 시간 제한(밀리초). 0이면 사용 안 함.';
+	@override String get retryBackoffBaseMs => '재시도 백오프 기준값 (ms)';
+	@override String get retryBackoffBaseMsDescription => '같은 레인 재시도 사이의 지수 백오프 기준값 (full jitter).';
+	@override String get retryBudgetTitle => '실패 유형별 재시도 횟수';
+	@override String get retryBudgetDescription => '페일오버/쿨다운 전 같은 레인에서의 재시도 횟수 (0–5).';
+	@override late final Translations$settings$orchestration$execution$retryClasses$ko retryClasses = Translations$settings$orchestration$execution$retryClasses$ko._(_root);
 }
 
 // Path: settings.orchestration.save
@@ -5606,13 +6794,13 @@ class Translations$settings$orchestration$save$ko extends Translations$settings$
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get unsaved => 'Unsaved changes';
-	@override String get save => 'Save';
-	@override String get saving => 'Saving…';
-	@override String get saved => 'Saved';
-	@override String get discard => 'Discard';
-	@override String get error => 'Save failed';
-	@override String get emptyPool => 'Add at least one candidate before saving.';
+	@override String get unsaved => '저장되지 않은 변경 사항';
+	@override String get save => '저장';
+	@override String get saving => '저장 중…';
+	@override String get saved => '저장됨';
+	@override String get discard => '변경 취소';
+	@override String get error => '저장 실패';
+	@override String get emptyPool => '저장하기 전에 후보를 하나 이상 추가하세요.';
 }
 
 // Path: settings.notifications.webPush
@@ -5687,6 +6875,24 @@ class Translations$settings$notifications$events$ko extends Translations$setting
 	@override String get error => '실행 실패';
 }
 
+// Path: settings.notifications.messaging
+class Translations$settings$notifications$messaging$ko extends Translations$settings$notifications$messaging$en {
+	Translations$settings$notifications$messaging$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '메신저 승인';
+	@override String get description => 'Telegram에서 에이전트 권한 요청을 승인하거나 거부하고, Discord에서 실행 알림을 받습니다.';
+	@override String get enabled => '사용';
+	@override String get save => '저장';
+	@override String get test => '테스트';
+	@override String get pair => '페어링';
+	@override String get telegramToken => '@BotFather에서 받은 봇 토큰 (123456:ABC…)';
+	@override String get telegramHint => '봇에게 아무 메시지나 보낸 다음 아래에서 채팅을 페어링하세요.';
+	@override String get discordWebhook => 'https://discord.com/api/webhooks/…';
+}
+
 // Path: settings.notifications.channels
 class Translations$settings$notifications$channels$ko extends Translations$settings$notifications$channels$en {
 	Translations$settings$notifications$channels$ko._(TranslationsKo root) : this._root = root, super.internal(root);
@@ -5694,8 +6900,8 @@ class Translations$settings$notifications$channels$ko extends Translations$setti
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get discord => 'Discord';
 	@override String get telegram => 'Telegram';
+	@override String get discord => 'Discord';
 }
 
 // Path: settings.appearanceSettings.darkMode
@@ -6082,6 +7288,28 @@ class Translations$settings$agents$logout$ko extends Translations$settings$agent
 	@override String get failed => '로그아웃 실패';
 }
 
+// Path: settings.agents.accounts
+class Translations$settings$agents$accounts$ko extends Translations$settings$agents$accounts$en {
+	Translations$settings$agents$accounts$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '이름 있는 계정';
+	@override String get description => '추가 자격 증명 세트입니다. 계정에 고정된 세션은 해당 계정의 격리된 구성 디렉터리로 CLI를 실행합니다. 표시된 환경 변수로 제공자 CLI를 한 번 실행하여 로그인하세요.';
+	@override String get sharedCli => '모든 계정은 하나의 CLI 설치를 공유합니다 — 위의 연결 카드에서 업데이트하세요.';
+	@override String get loading => '계정 로드 중…';
+	@override String get kDefault => '기본값';
+	@override String usage({required Object tokens}) => '${tokens} 토큰';
+	@override String get usageButton => '사용량';
+	@override String get showUsage => '토큰 사용량 표시';
+	@override String get makeDefault => '기본값으로 설정';
+	@override String get remove => '계정 제거';
+	@override String get newLabel => '계정 레이블 (예: 업무)';
+	@override String get add => '계정 추가';
+	@override late final Translations$settings$agents$accounts$autoSwitch$ko autoSwitch = Translations$settings$agents$accounts$autoSwitch$ko._(_root);
+}
+
 // Path: settings.permissions.permissionMode
 class Translations$settings$permissions$permissionMode$ko extends Translations$settings$permissions$permissionMode$en {
 	Translations$settings$permissions$permissionMode$ko._(TranslationsKo root) : this._root = root, super.internal(root);
@@ -6197,8 +7425,8 @@ class Translations$settings$quota$settings$ko extends Translations$settings$quot
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get tab => 'Control Center';
-	@override String get title => 'Control Center';
+	@override String get tab => '컨트롤 센터';
+	@override String get title => '컨트롤 센터';
 	@override String get description => '알림 임계값, 라우팅 정책, 쿼터를 폴링하는 계정.';
 	@override String get saved => '저장됨';
 	@override String get alertsSection => '알림';
@@ -6271,6 +7499,8 @@ class Translations$settings$about$pro$ko extends Translations$settings$about$pro
 	// Translations
 	@override String get syncSettings => '설정 동기화';
 	@override String get teamManagement => '팀 관리';
+	@override String get syncSettingsDescription => '모든 환경에서 환경설정, MCP 구성, 테마를 동기화하세요.';
+	@override String get teamManagementDescription => '여러 사용자, 역할 기반 액세스, 팀을 위한 공유 프로젝트.';
 }
 
 // Path: tasks.notConfigured.features
@@ -6376,6 +7606,8 @@ class Translations$tasks$board$card$ko extends Translations$tasks$board$card$en 
 	@override String get delete => '삭제';
 	@override String get openSession => '세션 열기';
 	@override String get pullRequest => '풀 리퀘스트';
+	@override String get edit => '편집';
+	@override String get moveTo => '이동';
 }
 
 // Path: tasks.board.dialog
@@ -6423,40 +7655,84 @@ class Translations$tasks$board$deleteConfirm$ko extends Translations$tasks$board
 	@override String get title => '카드를 삭제하시겠습니까?';
 }
 
-// Path: mcp.form.fields
-class Translations$mcp$form$fields$ko extends Translations$mcp$form$fields$en {
-	Translations$mcp$form$fields$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+// Path: tasks.board.assignee
+class Translations$tasks$board$assignee$ko extends Translations$tasks$board$assignee$en {
+	Translations$tasks$board$assignee$ko._(TranslationsKo root) : this._root = root, super.internal(root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get bearerTokenEnvVar => 'Bearer 토큰 환경 변수';
-	@override String get envVarNames => '환경 변수 이름';
-	@override String get workingDirectory => '작업 디렉터리';
+	@override String get label => '담당자';
+	@override String get all => '모든 담당자';
+	@override String get unassigned => '미지정';
 }
 
-// Path: mcp.form.scope
-class Translations$mcp$form$scope$ko extends Translations$mcp$form$scope$en {
-	Translations$mcp$form$scope$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+// Path: tasks.board.presence
+class Translations$tasks$board$presence$ko extends Translations$tasks$board$presence$en {
+	Translations$tasks$board$presence$ko._(TranslationsKo root) : this._root = root, super.internal(root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get claudeLocal => 'Claude 로컬';
-	@override late final Translations$mcp$form$scope$description$ko description = Translations$mcp$form$scope$description$ko._(_root);
-	@override String get projectAllProviders => '프로젝트 (모든 제공자)';
-	@override String get userAllProviders => '사용자 (모든 제공자)';
+	@override String online({required Object count}) => '${count}명 온라인';
 }
 
-// Path: mcp.form.validation
-class Translations$mcp$form$validation$ko extends Translations$mcp$form$validation$en {
-	Translations$mcp$form$validation$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+// Path: tasks.board.activity
+class Translations$tasks$board$activity$ko extends Translations$tasks$board$activity$en {
+	Translations$tasks$board$activity$ko._(TranslationsKo root) : this._root = root, super.internal(root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String unsupportedGlobal({required Object type}) => 'MCP 서버 추가는 모든 제공자에서 stdio와 http만 지원하며 ${type}은(는) 지원하지 않습니다.';
-	@override String unsupportedProvider({required Object provider, required Object type}) => '${provider}는 ${type} MCP 서버를 지원하지 않습니다';
+	@override String get title => '활동';
+	@override String get empty => '아직 활동이 없습니다';
+}
+
+// Path: tasks.board.comments
+class Translations$tasks$board$comments$ko extends Translations$tasks$board$comments$en {
+	Translations$tasks$board$comments$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get label => '댓글';
+	@override String get placeholder => '댓글 작성…';
+	@override String get send => '보내기';
+	@override String get unknownAuthor => '알 수 없는 사용자';
+}
+
+// Path: tasks.taskmaster.sort
+class Translations$tasks$taskmaster$sort$ko extends Translations$tasks$taskmaster$sort$en {
+	Translations$tasks$taskmaster$sort$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get statusAz => '상태 (A-Z)';
+	@override String get statusZa => '상태 (Z-A)';
+}
+
+// Path: tasks.taskmaster.prd
+class Translations$tasks$taskmaster$prd$ko extends Translations$tasks$taskmaster$prd$en {
+	Translations$tasks$taskmaster$prd$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get fileNameRequired => 'PRD 파일 이름을 입력하세요.';
+	@override String get contentRequired => '저장하기 전에 내용을 추가하세요.';
+	@override String get overwrite => '덮어쓰기';
+	@override String get contentHint => '# 제품 요구사항 문서…';
+}
+
+// Path: tasks.taskmaster.detail
+class Translations$tasks$taskmaster$detail$ko extends Translations$tasks$taskmaster$detail$en {
+	Translations$tasks$taskmaster$detail$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get dependenciesLabel => '종속성 (쉼표로 구분된 ID)';
 }
 
 // Path: mcp.servers.config
@@ -6468,6 +7744,133 @@ class Translations$mcp$servers$config$ko extends Translations$mcp$servers$config
 	// Translations
 	@override String get cwd => '작업 디렉터리';
 	@override String get envVars => '환경 변수';
+}
+
+// Path: mcp.form.scope
+class Translations$mcp$form$scope$ko extends Translations$mcp$form$scope$en {
+	Translations$mcp$form$scope$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get userAllProviders => '사용자 (모든 제공자)';
+	@override String get claudeLocal => 'Claude 로컬';
+	@override String get projectAllProviders => '프로젝트 (모든 제공자)';
+	@override late final Translations$mcp$form$scope$description$ko description = Translations$mcp$form$scope$description$ko._(_root);
+}
+
+// Path: mcp.form.fields
+class Translations$mcp$form$fields$ko extends Translations$mcp$form$fields$en {
+	Translations$mcp$form$fields$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get workingDirectory => '작업 디렉터리';
+	@override String get envVarNames => '환경 변수 이름';
+	@override String get bearerTokenEnvVar => 'Bearer 토큰 환경 변수';
+}
+
+// Path: mcp.form.validation
+class Translations$mcp$form$validation$ko extends Translations$mcp$form$validation$en {
+	Translations$mcp$form$validation$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String unsupportedGlobal({required Object type}) => 'MCP 서버 추가는 모든 제공자에서 stdio와 http만 지원하며 ${type}은(는) 지원하지 않습니다.';
+	@override String unsupportedProvider({required Object provider, required Object type}) => '${provider}는 ${type} MCP 서버를 지원하지 않습니다';
+	@override String get jsonMustBeObject => 'JSON 구성은 객체여야 합니다';
+}
+
+// Path: serverConnect.local.errors
+class Translations$serverConnect$local$errors$ko extends Translations$serverConnect$local$errors$en {
+	Translations$serverConnect$local$errors$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get releaseTagUnresolved => '최신 DDAgent 릴리스 태그를 확인할 수 없습니다.';
+	@override String get unsupportedPlatform => '이 플랫폼에서는 로컬 서버가 지원되지 않습니다.';
+	@override String unsupportedPlatformDetail({required Object platform}) => '이 플랫폼에서는 로컬 서버가 지원되지 않습니다(${platform}).';
+	@override String nodeExtractionFailed({required Object path}) => 'Node.js 압축 해제 결과 ${path}이(가) 생성되지 않았습니다';
+	@override String downloadFailed({required Object error}) => '서버 다운로드 실패: ${error}';
+	@override String installFailed({required Object error}) => '서버 설치 실패: ${error}';
+	@override String get bundleNotInstalled => '서버 번들이 설치되어 있지 않습니다.';
+	@override String spawnFailed({required Object error}) => '로컬 서버를 실행하지 못했습니다: ${error}';
+	@override String portInUse({required Object port}) => '포트 ${port}을(를) 다른 애플리케이션에서 이미 사용 중입니다.';
+	@override String get exitedDuringStartup => '로컬 서버가 시작 중에 종료되었습니다.';
+	@override String exitedDuringStartupWithOutput({required Object output}) => '로컬 서버가 시작 중에 종료되었습니다: ${output}';
+	@override String get startTimeout => '로컬 서버 시작 대기 시간이 초과되었습니다.';
+	@override String tarFailed({required Object command, required Object code, required Object output}) => '${command} 실패(종료 코드 ${code}): ${output}';
+}
+
+// Path: chat.orchestrator.decision.action
+class Translations$chat$orchestrator$decision$action$ko extends Translations$chat$orchestrator$decision$action$en {
+	Translations$chat$orchestrator$decision$action$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get kContinue => '위임 중';
+	@override String get done => '완료됨';
+	@override String get invalid => '결정 없음';
+}
+
+// Path: chat.orchestrator.decision.outcome
+class Translations$chat$orchestrator$decision$outcome$ko extends Translations$chat$orchestrator$decision$outcome$en {
+	Translations$chat$orchestrator$decision$outcome$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get success => '성공';
+	@override String get partial => '부분 성공';
+	@override String get failed => '실패';
+}
+
+// Path: chat.orchestrator.delegation.status
+class Translations$chat$orchestrator$delegation$status$ko extends Translations$chat$orchestrator$delegation$status$en {
+	Translations$chat$orchestrator$delegation$status$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get queued => '대기 중';
+	@override String get running => '실행 중';
+	@override String get done => '완료';
+	@override String get failed => '실패';
+	@override String get aborted => '중단됨';
+	@override String get skipped => '건너뜀';
+	@override String get awaitingDecision => '결정 대기 중';
+}
+
+// Path: chat.orchestrator.taskmaster.status
+class Translations$chat$orchestrator$taskmaster$status$ko extends Translations$chat$orchestrator$taskmaster$status$en {
+	Translations$chat$orchestrator$taskmaster$status$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get started => '실행 중';
+	@override String get done => '완료';
+	@override String get complete => '모두 완료';
+	@override String get failed => '실패';
+	@override String get paused => '일시 중지됨';
+	@override String get blocked => '차단됨';
+	@override String get aborted => '중단됨';
+}
+
+// Path: common.quota.settings.routing
+class Translations$common$quota$settings$routing$ko extends Translations$common$quota$settings$routing$en {
+	Translations$common$quota$settings$routing$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get manual => '수동 — 권장만 표시';
+	@override String get ask => '계정 전환 전 확인';
+	@override String get autoLowRisk => '저위험 작업 자동 전환';
 }
 
 // Path: common.projectWizard.step1.existing
@@ -6533,16 +7936,15 @@ class Translations$common$notifications$codes$agent$ko extends Translations$comm
 	@override late final Translations$common$notifications$codes$agent$notification$ko notification = Translations$common$notifications$codes$agent$notification$ko._(_root);
 }
 
-// Path: common.quota.settings.routing
-class Translations$common$quota$settings$routing$ko extends Translations$common$quota$settings$routing$en {
-	Translations$common$quota$settings$routing$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+// Path: settings.miniOrchestration.planner.modes
+class Translations$settings$miniOrchestration$planner$modes$ko extends Translations$settings$miniOrchestration$planner$modes$en {
+	Translations$settings$miniOrchestration$planner$modes$ko._(TranslationsKo root) : this._root = root, super.internal(root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get manual => '수동 — 권장만 표시';
-	@override String get ask => '계정 전환 전 확인';
-	@override String get autoLowRisk => '저위험 작업 자동 전환';
+	@override String get auto => '사고 모델로 계획';
+	@override String get off => '단일 단계';
 }
 
 // Path: settings.orchestration.pool.fields
@@ -6552,22 +7954,22 @@ class Translations$settings$orchestration$pool$fields$ko extends Translations$se
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get label => 'Label';
-	@override String get labelPlaceholder => 'e.g. SWE-2 Medium';
-	@override String get provider => 'Provider';
-	@override String get model => 'Model';
-	@override String get modelPlaceholder => 'Select a model';
-	@override String get effort => 'Effort';
-	@override String get effortDefault => 'Provider default';
-	@override String get effortPlaceholder => 'default';
-	@override String get account => 'Account';
-	@override String get accountDefault => 'Provider default';
+	@override String get label => '레이블';
+	@override String get labelPlaceholder => '예: SWE-2 Medium';
+	@override String get provider => '제공자';
+	@override String get model => '모델';
+	@override String get modelPlaceholder => '모델 선택';
+	@override String get effort => '추론 수준';
+	@override String get effortDefault => '제공자 기본값';
+	@override String get effortPlaceholder => '기본값';
+	@override String get account => '계정';
+	@override String get accountDefault => '제공자 기본값';
 	@override String get redundantAccounts => '중복 계정';
 	@override String get redundantAccountsNone => '이 공급자의 다른 계정이 없습니다';
-	@override String get tier => 'Cost tier';
-	@override String get remove => 'Remove candidate';
-	@override String get moveUp => 'Move up';
-	@override String get moveDown => 'Move down';
+	@override String get tier => '비용 등급';
+	@override String get remove => '후보 제거';
+	@override String get moveUp => '위로 이동';
+	@override String get moveDown => '아래로 이동';
 }
 
 // Path: settings.orchestration.rules.taskTypes
@@ -6577,14 +7979,15 @@ class Translations$settings$orchestration$rules$taskTypes$ko extends Translation
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get plan => 'Planning';
-	@override String get quick => 'Quick answers';
-	@override String get research => 'Research';
-	@override String get docs => 'Documentation';
-	@override String get code => 'Coding';
-	@override String get codeHard => 'Complex coding';
-	@override String get test => 'Testing';
-	@override String get review => 'Review';
+	@override String get plan => '계획';
+	@override String get quick => '빠른 답변';
+	@override String get research => '조사';
+	@override String get docs => '문서화';
+	@override String get code => '코딩';
+	@override String get codeHard => '복잡한 코딩';
+	@override String get test => '테스트';
+	@override String get review => '검토';
+	@override String get report => '보고서';
 }
 
 // Path: settings.orchestration.planner.modes
@@ -6594,9 +7997,9 @@ class Translations$settings$orchestration$planner$modes$ko extends Translations$
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get auto => 'Auto (LLM)';
-	@override String get template => 'Templates';
-	@override String get off => 'Off';
+	@override String get auto => '자동 (LLM)';
+	@override String get template => '템플릿';
+	@override String get off => '끄기';
 }
 
 // Path: settings.orchestration.planner.modeHints
@@ -6606,9 +8009,9 @@ class Translations$settings$orchestration$planner$modeHints$ko extends Translati
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get auto => 'The planner model decomposes each request into typed steps.';
-	@override String get template => 'Requests run through a fixed pipeline you pick below.';
-	@override String get off => 'No planning — the whole request is routed as a single step.';
+	@override String get auto => '플래너 모델이 각 요청을 유형이 지정된 단계로 분해합니다.';
+	@override String get template => '요청은 아래에서 선택한 고정 파이프라인으로 실행됩니다.';
+	@override String get off => '계획 없음 — 전체 요청이 하나의 단계로 라우팅됩니다.';
 }
 
 // Path: settings.orchestration.planner.templates
@@ -6618,14 +8021,38 @@ class Translations$settings$orchestration$planner$templates$ko extends Translati
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'Pipeline templates';
-	@override String get add => 'Add template';
-	@override String get namePlaceholder => 'Template name';
-	@override String get addStep => 'Add step…';
-	@override String get remove => 'Remove template';
-	@override String get removeStep => 'Remove step';
-	@override String get empty => 'No templates yet.';
-	@override String get emptySteps => 'No steps yet — add one below.';
+	@override String get title => '파이프라인 템플릿';
+	@override String get add => '템플릿 추가';
+	@override String get namePlaceholder => '템플릿 이름';
+	@override String get addStep => '단계 추가…';
+	@override String get remove => '템플릿 제거';
+	@override String get removeStep => '단계 제거';
+	@override String get empty => '아직 템플릿이 없습니다.';
+	@override String get emptySteps => '아직 단계가 없습니다 — 아래에서 추가하세요.';
+}
+
+// Path: settings.orchestration.planner.checkpointModes
+class Translations$settings$orchestration$planner$checkpointModes$ko extends Translations$settings$orchestration$planner$checkpointModes$en {
+	Translations$settings$orchestration$planner$checkpointModes$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get off => '자율';
+	@override String get perStep => '단계별';
+	@override String get everyN => 'N단계마다';
+}
+
+// Path: settings.orchestration.planner.checkpointHints
+class Translations$settings$orchestration$planner$checkpointHints$ko extends Translations$settings$orchestration$planner$checkpointHints$en {
+	Translations$settings$orchestration$planner$checkpointHints$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get off => '감독자 결정을 묻지 않고 실행합니다 (자동 모드).';
+	@override String get perStep => '제안된 단계 묶음마다 실행 전에 승인을 요청합니다.';
+	@override String get everyN => 'N개 단계가 완료될 때마다 승인을 요청합니다.';
 }
 
 // Path: settings.orchestration.execution.onNoCandidateOptions
@@ -6635,8 +8062,22 @@ class Translations$settings$orchestration$execution$onNoCandidateOptions$ko exte
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get ask => 'Ask';
-	@override String get skip => 'Skip step';
+	@override String get ask => '묻기';
+	@override String get skip => '단계 건너뛰기';
+}
+
+// Path: settings.orchestration.execution.retryClasses
+class Translations$settings$orchestration$execution$retryClasses$ko extends Translations$settings$orchestration$execution$retryClasses$en {
+	Translations$settings$orchestration$execution$retryClasses$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get rateLimit => '속도 제한';
+	@override String get quota => '할당량';
+	@override String get auth => '인증';
+	@override String get timeout => '시간 초과';
+	@override String get transient => '일시적 오류';
 }
 
 // Path: settings.appearanceSettings.codeEditor.theme
@@ -6804,6 +8245,17 @@ class Translations$settings$agents$account$devin$ko extends Translations$setting
 	@override String get description => 'Devin CLI 어시스턴트';
 }
 
+// Path: settings.agents.accounts.autoSwitch
+class Translations$settings$agents$accounts$autoSwitch$ko extends Translations$settings$agents$accounts$autoSwitch$en {
+	Translations$settings$agents$accounts$autoSwitch$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get label => '사용 한도 도달 시 계정 자동 전환';
+	@override String get description => '계정이 사용 한도에 도달하면 세션이 같은 에이전트의 한도가 남아 있는 다른 계정으로 전환됩니다. 소진된 계정을 직접 선택한 경우에도 마찬가지입니다. 다른 에이전트로는 전환하지 않습니다. Claude와 Codex는 대화를 유지하고, 다른 에이전트는 새 채팅에서만 전환됩니다.';
+}
+
 // Path: settings.permissions.permissionMode.modes
 class Translations$settings$permissions$permissionMode$modes$ko extends Translations$settings$permissions$permissionMode$modes$en {
 	Translations$settings$permissions$permissionMode$modes$ko._(TranslationsKo root) : this._root = root, super.internal(root);
@@ -6886,11 +8338,11 @@ class Translations$mcp$form$scope$description$ko extends Translations$mcp$form$s
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get local => '선택한 프로젝트의 Claude 사용자 설정에 저장됩니다';
-	@override String get project => '선택한 프로젝트 작업 영역에 저장됩니다';
-	@override String get projectGlobal => '모든 제공자의 선택한 프로젝트 작업 영역에 기록합니다';
-	@override String get user => '이 컴퓨터의 모든 프로젝트에서 사용할 수 있습니다';
 	@override String get userGlobal => '각 제공자의 사용자 설정에 기록되며 이 컴퓨터의 모든 프로젝트에서 사용할 수 있습니다';
+	@override String get user => '이 컴퓨터의 모든 프로젝트에서 사용할 수 있습니다';
+	@override String get local => '선택한 프로젝트의 Claude 사용자 설정에 저장됩니다';
+	@override String get projectGlobal => '모든 제공자의 선택한 프로젝트 작업 영역에 기록합니다';
+	@override String get project => '선택한 프로젝트 작업 영역에 저장됩니다';
 }
 
 // Path: common.notifications.codes.generic.info
@@ -7053,6 +8505,74 @@ extension on TranslationsKo {
 			'chat.messageTypes.codex' => 'Codex',
 			'chat.messageTypes.opencode' => 'OpenCode',
 			'chat.messageTypes.devin' => 'Devin',
+			'chat.messageTypes.orchestrator' => 'Auto',
+			'chat.orchestrator.routing.title' => '라우팅',
+			'chat.orchestrator.routing.alternatives' => ({required Object list}) => '대안: ${list}',
+			'chat.orchestrator.routing.first' => ({required Object label, required Object task}) => '${label} — ${task}의 첫 번째 후보',
+			'chat.orchestrator.routing.skipped' => ({required Object label, required Object list}) => '${label} — 앞선 후보 건너뜀 (${list})',
+			'chat.orchestrator.plan.title' => '계획',
+			'chat.orchestrator.plan.disabled' => '비활성화됨',
+			'chat.orchestrator.plan.awaitingConfirm' => '계획 확인을 기다리는 중입니다.',
+			'chat.orchestrator.plan.run' => '계획 실행',
+			'chat.orchestrator.plan.toggleStep' => '단계 활성화',
+			'chat.orchestrator.plan.confirmFailed' => '시작하지 못했습니다 — 다시 시도하세요.',
+			'chat.orchestrator.plan.fallback' => '플래너를 사용할 수 없음 — 단일 단계로 대체',
+			'chat.orchestrator.plan.templateSource' => '파이프라인 템플릿에서',
+			'chat.orchestrator.plan.offSource' => '플래너 꺼짐',
+			'chat.orchestrator.plan.stepCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, one: '${count}단계', other: '${count}단계', ), 
+			'chat.orchestrator.plan.supervisedSource' => '감독 루프',
+			'chat.orchestrator.decision.title' => '감독자 결정',
+			'chat.orchestrator.decision.iteration' => ({required Object n}) => '반복 ${n}',
+			'chat.orchestrator.decision.rationaleLabel' => '이유',
+			'chat.orchestrator.decision.awaitingConfirm' => '이 단계들을 실행하기 전에 승인을 기다리는 중입니다.',
+			'chat.orchestrator.decision.proposedSteps' => '제안된 단계',
+			'chat.orchestrator.decision.action.kContinue' => '위임 중',
+			'chat.orchestrator.decision.action.done' => '완료됨',
+			'chat.orchestrator.decision.action.invalid' => '결정 없음',
+			'chat.orchestrator.decision.outcome.success' => '성공',
+			'chat.orchestrator.decision.outcome.partial' => '부분 성공',
+			'chat.orchestrator.decision.outcome.failed' => '실패',
+			'chat.orchestrator.delegation.title' => '위임된 단계',
+			'chat.orchestrator.delegation.openSession' => '전체 세션 열기',
+			'chat.orchestrator.delegation.attempt' => ({required Object n}) => '시도 ${n}',
+			'chat.orchestrator.delegation.retryStep' => '재시도 / 수정',
+			'chat.orchestrator.delegation.continueStep' => '계속 / 수정',
+			'chat.orchestrator.delegation.continueFailed' => '실패했습니다 — 다시 시도하세요.',
+			'chat.orchestrator.delegation.status.queued' => '대기 중',
+			'chat.orchestrator.delegation.status.running' => '실행 중',
+			'chat.orchestrator.delegation.status.done' => '완료',
+			'chat.orchestrator.delegation.status.failed' => '실패',
+			'chat.orchestrator.delegation.status.aborted' => '중단됨',
+			'chat.orchestrator.delegation.status.skipped' => '건너뜀',
+			'chat.orchestrator.delegation.status.awaitingDecision' => '결정 대기 중',
+			'chat.orchestrator.delegation.attempts' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, one: '${count}회 시도', other: '${count}회 시도', ), 
+			'chat.orchestrator.delegation.candidates' => ({required Object list}) => '후보: ${list}',
+			'chat.orchestrator.delegation.candidateCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, one: '후보 ${count}개', other: '후보 ${count}개', ), 
+			'chat.orchestrator.summary.title' => '요약',
+			'chat.orchestrator.summary.progress' => ({required Object done, required Object total}) => '완료된 단계: ${done}/${total}',
+			'chat.orchestrator.summary.aborted' => '중단됨',
+			'chat.orchestrator.summary.timedOut' => '시간 초과',
+			'chat.orchestrator.summary.capped' => '반복 한도 도달',
+			'chat.orchestrator.summary.failed' => ({required Object list}) => '실패한 단계: ${list}',
+			'chat.orchestrator.summary.kContinue' => '계속',
+			'chat.orchestrator.summary.continueWork' => '작업 계속',
+			'chat.orchestrator.summary.resumeFailed' => '재개하지 못했습니다 — 다시 시도하세요.',
+			'chat.orchestrator.summary.runNextTask' => '다음 작업 실행',
+			'chat.orchestrator.summary.endAllTasks' => '모든 작업 종료',
+			'chat.orchestrator.summary.tasksRunning' => '작업 처리 중…',
+			'chat.orchestrator.summary.cancelTasks' => '취소',
+			'chat.orchestrator.backToParent' => '오케스트레이션으로 돌아가기',
+			'chat.orchestrator.taskmaster.title' => '작업 대기열',
+			'chat.orchestrator.taskmaster.remaining' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, one: '${count}개 남음', other: '${count}개 남음', ), 
+			'chat.orchestrator.taskmaster.status.started' => '실행 중',
+			'chat.orchestrator.taskmaster.status.done' => '완료',
+			'chat.orchestrator.taskmaster.status.complete' => '모두 완료',
+			'chat.orchestrator.taskmaster.status.failed' => '실패',
+			'chat.orchestrator.taskmaster.status.paused' => '일시 중지됨',
+			'chat.orchestrator.taskmaster.status.blocked' => '차단됨',
+			'chat.orchestrator.taskmaster.status.aborted' => '중단됨',
+			'chat.orchestrator.gate.timedOut' => '시간 초과',
+			'chat.orchestrator.gate.exit' => ({required Object code}) => '종료 코드 ${code}',
 			'chat.tools.settings' => '도구 설정',
 			'chat.tools.error' => '도구 오류',
 			'chat.tools.result' => '도구 결과',
@@ -7087,6 +8607,7 @@ extension on TranslationsKo {
 			'chat.interactive.instructionDetail' => 'CLI에서 화살표 키 또는 숫자를 입력하여 이 옵션을 대화형으로 선택합니다.',
 			'chat.thinking.title' => '생각 중...',
 			'chat.thinking.emoji' => '💭 생각 중...',
+			'chat.thinking.thoughtFewSeconds' => '몇 초 동안 생각함',
 			'chat.json.response' => 'JSON 응답',
 			'chat.permissions.grant' => ({required Object tool}) => '${tool}에 대한 권한 부여',
 			'chat.permissions.added' => '권한이 추가되었습니다',
@@ -7095,14 +8616,14 @@ extension on TranslationsKo {
 			'chat.permissions.error' => '권한을 업데이트할 수 없습니다. 다시 시도해주세요.',
 			'chat.permissions.openSettings' => '설정 열기',
 			'chat.permissions.allow' => '허용',
-			'chat.permissions.allowAll' => ({required Object count}) => '모두 허용 (${count})',
-			'chat.permissions.allowWithChanges' => '변경 포함 허용',
 			'chat.permissions.always' => '항상',
-			'chat.permissions.deny' => '거부',
 			'chat.permissions.editAndAllow' => '편집 및 허용',
+			'chat.permissions.deny' => '거부',
+			'chat.permissions.reject' => '거절',
+			'chat.permissions.allowAll' => ({required Object count}) => '모두 허용 (${count})',
 			'chat.permissions.editInput' => '입력 편집',
 			'chat.permissions.invalidJson' => '잘못된 JSON',
-			'chat.permissions.reject' => '거절',
+			'chat.permissions.allowWithChanges' => '변경 포함 허용',
 			'chat.todo.updated' => 'Todo 리스트가 업데이트되었습니다',
 			'chat.todo.current' => '현재 Todo 리스트',
 			'chat.plan.viewPlan' => '📋 구현 계획 보기',
@@ -7120,10 +8641,24 @@ extension on TranslationsKo {
 			'chat.codex.descriptions.bypassPermissions' => '제한 없는 전체 시스템 접근. 모든 명령어가 전체 디스크 및 네트워크 접근 권한으로 자동 실행됩니다. 주의해서 사용하세요.',
 			'chat.codex.descriptions.plan' => '계획 모드 - 명령어가 실행되지 않습니다',
 			'chat.codex.technicalDetails' => '기술 상세',
+			'chat.voice.autoRead' => '답변 소리 내어 읽기',
+			'chat.voice.autoReadOn' => '답변 읽기: 켬',
+			'chat.voice.autoReadOff' => '답변 읽기: 끔',
+			'chat.voice.autoReadVoice' => '읽기 음성',
+			'chat.voice.autoReadVoiceAuto' => '자동 음성',
+			'chat.voice.autoReadPreview' => '답변이 이렇게 들립니다.',
+			'chat.voice.speakMessage' => '소리 내어 읽기',
+			'chat.voice.stopSpeaking' => '읽기 중지',
 			'chat.input.placeholder' => ({required Object provider}) => '/를 입력하여 명령어, @를 입력하여 파일, 또는 ${provider}에게 무엇이든 물어보세요...',
 			'chat.input.placeholderDefault' => '메시지를 입력하세요...',
 			'chat.input.disabled' => '입력 비활성화',
 			'chat.input.attachFiles' => '파일 첨부',
+			'chat.input.attachFilesDesc' => '사진, 파일 또는 문서 업로드',
+			'chat.input.takePhoto' => '사진 촬영',
+			'chat.input.takePhotoDesc' => '카메라로 사진 촬영',
+			'chat.input.moreTools' => '더 많은 도구',
+			'chat.input.commandsDesc' => '단축키와 명령 탐색',
+			'chat.input.clearInputDesc' => '현재 텍스트 버리기',
 			'chat.input.attachImages' => '이미지 첨부',
 			'chat.input.send' => '전송',
 			'chat.input.stop' => '중지',
@@ -7135,6 +8670,8 @@ extension on TranslationsKo {
 			'chat.input.showAllCommands' => '모든 명령어 보기',
 			'chat.input.clearInput' => '입력 지우기',
 			'chat.input.scrollToBottom' => '맨 아래로 스크롤',
+			'chat.input.newMessage' => '새 메시지',
+			'chat.input.newMessages' => '새 메시지들',
 			'chat.input.queue.sendNext' => '다음 메시지 대기열에 추가',
 			'chat.input.queue.update' => '대기 중인 메시지 업데이트',
 			'chat.input.queue.label' => '대기 중',
@@ -7144,24 +8681,54 @@ extension on TranslationsKo {
 			'chat.input.queue.failed' => '전송 실패',
 			'chat.input.queue.sendNow' => '지금 보내기',
 			'chat.input.queue.sendNowAfterTurn' => '이 에이전트는 턴 진행 중에 메시지를 받을 수 없습니다. 현재 턴이 끝난 후 전송됩니다',
-			'chat.input.attachFilesDesc' => '사진, 파일 또는 문서 업로드',
-			'chat.input.takePhoto' => '사진 촬영',
-			'chat.input.takePhotoDesc' => '카메라로 사진 촬영',
-			'chat.input.moreTools' => '더 많은 도구',
-			'chat.input.commandsDesc' => '단축키와 명령 탐색',
-			'chat.input.clearInputDesc' => '현재 텍스트 버리기',
-			'chat.input.newMessage' => '새 메시지',
-			'chat.input.newMessages' => '새 메시지들',
+			'chat.input.queue.filesAttached' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, other: '파일 ${count}개 첨부됨', ), 
 			'chat.input.autoContinueTasks' => '자동 계속',
 			'chat.input.autoContinueTasksTooltip' => 'Devin이 다음 Task Master 작업으로 자동 진행하도록 활성화',
 			'chat.input.offlineQueue.clear' => '취소하고 오프라인 큐 비우기',
 			'chat.input.offlineQueue.clearBtn' => '취소',
 			'chat.input.offlineQueue.multiple' => ({required Object count}) => '${count}개 메시지가 오프라인 큐에 있음 — 재연결 시 자동 전송됩니다',
 			'chat.input.offlineQueue.single' => '1개 메시지가 오프라인 큐에 있음 — 재연결 시 자동 전송됩니다',
+			'chat.input.voice' => '음성 입력',
+			'chat.input.voiceStart' => '메시지 받아쓰기',
+			'chat.input.voiceStop' => '받아쓰기 중지',
+			'chat.input.pinFile' => '파일을 컨텍스트에 고정',
+			'chat.input.voiceSettings' => '음성 설정 (STT)',
 			'chat.input.cameraUnavailable' => ({required Object error}) => '카메라를 사용할 수 없습니다: ${error}',
+			'chat.composer.toolsAndActions' => '도구 및 작업',
+			'chat.composer.toolsAndActionsDesc' => '채팅 입력창의 도구와 컨트롤',
+			'chat.composer.reasoning' => '추론',
+			'chat.composer.model' => '모델',
+			'chat.composer.effortDefault' => '기본값',
+			'chat.composer.loadingModels' => '모델 로드 중…',
+			'chat.composer.modelMenu' => '모델 및 추론 수준 선택',
+			'chat.composer.permissionHeading' => ({required Object provider}) => '${provider} 작업을 어떻게 승인할까요?',
+			'chat.composer.favorites' => '즐겨찾기',
+			'chat.composer.account' => '계정',
+			'chat.composer.accountMenu' => '계정 선택',
+			'chat.composer.accountDefault' => '기본 계정',
+			'chat.composer.accountAuto' => '자동 (기본값)',
+			'chat.composer.accountIsDefault' => '기본값',
+			'chat.composer.effortLevels.off' => '끄기',
+			'chat.composer.effortLevels.none' => '없음',
+			'chat.composer.effortLevels.minimal' => '최소',
+			'chat.composer.effortLevels.low' => '낮음',
+			'chat.composer.effortLevels.medium' => '중간',
+			'chat.composer.effortLevels.high' => '높음',
+			'chat.composer.effortLevels.xhigh' => '매우 높음',
+			'chat.composer.effortLevels.max' => '최대',
+			'chat.composer.effortLevels.ultra' => '울트라',
+			'chat.composer.contextWindow' => ({required Object size}) => '컨텍스트 ${size}',
+			'chat.composer.accountAutoShort' => '자동',
+			'chat.composer.uploadNoRecords' => '업로드 결과에 항목이 없습니다',
 			'chat.providerSelection.title' => 'AI 어시스턴트 선택',
 			'chat.providerSelection.description' => '새 대화를 시작할 프로바이더를 선택하세요',
 			'chat.providerSelection.selectModel' => '모델 선택',
+			'chat.providerSelection.workspace' => '작업 영역',
+			'chat.providerSelection.noWorkspace' => '없음',
+			'chat.providerSelection.clickToChangeWorkspace' => '클릭하여 작업 영역 변경',
+			'chat.providerSelection.chooseWorkspace' => '작업 영역 선택',
+			'chat.providerSelection.searchWorkspaces' => '작업 영역 검색...',
+			'chat.providerSelection.noWorkspacesFound' => '작업 영역을 찾을 수 없습니다.',
 			'chat.providerSelection.providerInfo.anthropic' => 'Anthropic 제공',
 			'chat.providerSelection.providerInfo.openai' => 'OpenAI 제공',
 			'chat.providerSelection.providerInfo.cursorEditor' => 'AI 코드 에디터',
@@ -7172,13 +8739,12 @@ extension on TranslationsKo {
 			'chat.providerSelection.readyPrompt.opencode' => ({required Object model}) => '${model} 모델로 OpenCode를 사용할 준비가 되었습니다. 아래에 메시지를 입력하세요.',
 			'chat.providerSelection.readyPrompt.kDefault' => '시작하려면 위에서 제공자를 선택하세요',
 			'chat.providerSelection.readyPrompt.devin' => ({required Object model}) => 'Devin ${model} 준비 완료',
+			'chat.providerSelection.readyPrompt.orchestrator' => 'Auto로 준비 완료 — 라우터가 단계마다 최적의 모델을 선택합니다',
+			'chat.providerSelection.autoGroup' => 'Auto',
+			'chat.providerSelection.autoLabel' => 'Auto (오케스트레이션)',
+			'chat.providerSelection.autoDescription' => '각 단계를 사용 가능한 최적의 제공자와 모델로 라우팅합니다',
+			'chat.providerSelection.orchestrated' => '오케스트레이션',
 			'chat.providerSelection.pressToSearch' => ({required Object shortcut}) => '<kbd>${shortcut}</kbd>를 눌러 세션, 파일 및 커밋을 검색하세요',
-			'chat.providerSelection.workspace' => '작업 영역',
-			'chat.providerSelection.noWorkspace' => '없음',
-			'chat.providerSelection.clickToChangeWorkspace' => '클릭하여 작업 영역 변경',
-			'chat.providerSelection.chooseWorkspace' => '작업 영역 선택',
-			'chat.providerSelection.searchWorkspaces' => '작업 영역 검색...',
-			'chat.providerSelection.noWorkspacesFound' => '작업 영역을 찾을 수 없습니다.',
 			'chat.providerSelection.all' => '전체',
 			'chat.providerSelection.free' => '무료',
 			'chat.providerSelection.noModelsFound' => '모델을 찾을 수 없습니다.',
@@ -7201,18 +8767,19 @@ extension on TranslationsKo {
 			'chat.session.messages.scrollToLoad' => '위로 스크롤하여 더 로드',
 			'chat.session.messages.showingLast' => ({required Object count, required Object total}) => '마지막 ${count}개 메시지 표시 (총 ${total}개)',
 			'chat.session.messages.loadEarlier' => '이전 메시지 로드',
+			'chat.session.messages.loadOlderFailed' => '이전 메시지를 불러오지 못했습니다.',
+			'chat.session.messages.retry' => '다시 시도',
 			'chat.session.messages.loadAll' => '모든 메시지 로드',
 			'chat.session.messages.loadingAll' => '모든 메시지 로딩 중...',
 			'chat.session.messages.allLoaded' => '모든 메시지 로드 완료',
 			'chat.session.messages.perfWarning' => '모든 메시지가 로드됨 - 스크롤이 느려질 수 있습니다. "맨 아래로 스크롤"을 클릭하면 성능이 복구됩니다.',
-			'chat.session.messages.loadOlderFailed' => '이전 메시지를 불러오지 못했습니다.',
-			'chat.session.messages.retry' => '다시 시도',
 			'chat.session.messages.noSearchMatches' => '검색과 일치하는 메시지가 없습니다.',
-			'chat.session.messages.loadAllCount' => ({required Object count}) => '모두 로드 (${count})',
 			'chat.session.messages.loadOlder' => '이전 메시지 로드',
+			'chat.session.messages.loadAllCount' => ({required Object count}) => '모두 로드 (${count})',
 			'chat.session.messages.retryLoadOlder' => ({required Object error}) => '이전 메시지 로드 재시도 — ${error}',
 			'chat.session.deleteConfirm' => '세션과 트랜스크립트를 제거합니다. 되돌릴 수 없습니다.',
 			'chat.session.finishRunBeforeWorkspaceChange' => '작업 영역을 변경하기 전에 실행을 완료하세요',
+			'chat.session.fallbackTitle' => '세션',
 			'chat.shell.selectProject.title' => '프로젝트 선택',
 			'chat.shell.selectProject.description' => '해당 디렉토리에서 대화형 Shell을 열 프로젝트를 선택하세요',
 			'chat.shell.status.newSession' => '새 세션',
@@ -7222,8 +8789,6 @@ extension on TranslationsKo {
 			'chat.shell.actions.disconnectTitle' => 'Shell 연결 끊기',
 			'chat.shell.actions.restart' => '재시작',
 			'chat.shell.actions.restartTitle' => 'Shell 재시작 (먼저 연결 끊기)',
-			'chat.shell.actions.connect' => 'Shell에서 계속',
-			'chat.shell.actions.connectTitle' => 'Shell에 연결',
 			'chat.shell.actions.kill' => '종료 (SIGINT)',
 			'chat.shell.actions.killTitle' => '실행 중인 프로세스 종료 (Ctrl+C)',
 			'chat.shell.actions.copyOutput' => '출력 복사',
@@ -7231,6 +8796,8 @@ extension on TranslationsKo {
 			'chat.shell.actions.copied' => '복사됨!',
 			'chat.shell.actions.zoomInTitle' => '확대',
 			'chat.shell.actions.zoomOutTitle' => '축소',
+			'chat.shell.actions.connect' => 'Shell에서 계속',
+			'chat.shell.actions.connectTitle' => 'Shell에 연결',
 			'chat.shell.loading' => '터미널 로딩 중...',
 			'chat.shell.connecting' => 'Shell에 연결 중...',
 			'chat.shell.startSession' => '새 Claude 세션 시작',
@@ -7251,7 +8818,7 @@ extension on TranslationsKo {
 			'chat.claudeStatus.elapsed.label' => ({required Object time}) => '${time} 경과',
 			'chat.claudeStatus.elapsed.startingNow' => '지금 시작',
 			'chat.claudeStatus.stop' => '중지',
-			'chat.claudeStatus.backgroundTasks' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, other: '백그라운드 작업 ${count}개 실행 중', ), 
+			'chat.claudeStatus.backgroundTasks' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, one: '백그라운드 작업 ${count}개 실행 중', other: '백그라운드 작업 ${count}개 실행 중', ), 
 			'chat.claudeStatus.controls.stopGeneration' => '생성 중지',
 			'chat.claudeStatus.controls.pressEscToStop' => 'Esc를 눌러 언제든 중지',
 			'chat.claudeStatus.providers.assistant' => '어시스턴트',
@@ -7259,23 +8826,6 @@ extension on TranslationsKo {
 			'chat.claudeStatus.backgroundTaskUnnamed' => '이름 없는 작업',
 			'chat.projectSelection.startChatWithProvider' => ({required Object provider}) => '${provider}와 채팅을 시작하려면 프로젝트를 선택하세요',
 			'chat.tasks.nextTaskPrompt' => '다음 작업 시작',
-			'chat.voice.autoRead' => '답변 소리 내어 읽기',
-			'chat.voice.autoReadOn' => '답변 읽기: 켬',
-			'chat.voice.autoReadOff' => '답변 읽기: 끔',
-			'chat.voice.autoReadVoice' => '읽기 음성',
-			'chat.voice.autoReadVoiceAuto' => '자동 음성',
-			'chat.voice.autoReadPreview' => '답변이 이렇게 들립니다.',
-			'chat.voice.speakMessage' => '소리 내어 읽기',
-			'chat.voice.stopSpeaking' => '읽기 중지',
-			'chat.composer.toolsAndActions' => '도구 및 작업',
-			'chat.composer.toolsAndActionsDesc' => '채팅 입력창의 도구와 컨트롤',
-			'chat.composer.reasoning' => '추론',
-			'chat.composer.model' => '모델',
-			'chat.composer.effortDefault' => '기본값',
-			'chat.composer.loadingModels' => '모델 로드 중…',
-			'chat.composer.modelMenu' => '모델 및 추론 수준 선택',
-			'chat.composer.permissionHeading' => ({required Object provider}) => '${provider} 작업을 어떻게 승인할까요?',
-			'chat.composer.favorites' => '즐겨찾기',
 			'chat.splitSession.toggle' => '세션 분할',
 			'chat.splitSession.close' => '분할 세션 닫기',
 			'chat.splitSession.selectSession' => '비교할 세션 선택',
@@ -7306,12 +8856,16 @@ extension on TranslationsKo {
 			'chat.sessionPicker.deleteFailed' => '세션 삭제에 실패했습니다. 다시 시도하세요.',
 			'chat.sessionPicker.running' => '세션 실행 중',
 			'chat.sessionPicker.unread' => '읽지 않음 — 새 출력과 함께 완료됨',
+			'chat.sessionPicker.account' => '계정',
 			'chat.splitWorkspace.addChat' => '채팅 창 추가',
 			'chat.splitWorkspace.addBrowser' => '브라우저 창 추가',
 			'chat.splitWorkspace.addTerminal' => '터미널 창 추가',
+			'chat.splitWorkspace.addPreview' => '미리보기 창 추가',
 			'chat.splitWorkspace.overview' => '모든 창 표시',
 			'chat.splitWorkspace.exitFocusMode' => '포커스 모드 종료 (Ctrl+Shift+F)',
 			'chat.splitWorkspace.focusMode' => '포커스 모드 (Ctrl+Shift+F)',
+			'chat.splitWorkspace.broadcast' => '세션에 일괄 전송',
+			'chat.splitWorkspace.addNotes' => '공유 메모 창 추가',
 			'chat.splitWorkspace.browseSessions' => '세션 목록 열기',
 			'chat.splitOverview.title' => '분할 창 개요',
 			'chat.splitOverview.count' => ({required Object count}) => '${count}개 창',
@@ -7321,15 +8875,20 @@ extension on TranslationsKo {
 			'chat.splitOverview.idle' => '유휴',
 			'chat.splitOverview.active' => '활성',
 			'chat.askUserQuestion.needsInput' => ({required Object provider}) => '${provider}이(가) 입력을 기다립니다',
-			'chat.askUserQuestion.answerHint' => '답변을 입력하세요…',
-			'chat.askUserQuestion.other' => '기타…',
 			'chat.askUserQuestion.skip' => '건너뛰기',
+			'chat.askUserQuestion.other' => '기타…',
+			'chat.askUserQuestion.answerHint' => '답변을 입력하세요…',
 			'chat.attachments.downloadFailedRetry' => '다운로드 실패 — 클릭하여 다시 시도',
 			'chat.attachments.fileAttachment' => '파일 첨부',
 			'chat.attachments.download' => ({required Object name}) => '${name} 다운로드',
+			'chat.attachments.attachedFile' => '첨부 파일',
+			'chat.attachments.downloaded' => ({required Object name}) => '${name} 다운로드 완료',
 			'chat.checkpoint.creating' => '스냅샷 생성 중…',
 			'chat.checkpoint.revertChanges' => '파일을 마지막 체크포인트로 되돌리기',
 			'chat.checkpoint.undo' => '체크포인트 실행 취소',
+			'chat.checkpoint.undoAiRun' => 'AI 실행 되돌리기',
+			'chat.checkpoint.undoing' => '되돌리는 중…',
+			'chat.checkpoint.undone' => '되돌림',
 			'chat.checkpoint.beforeAiTurn' => 'AI 턴 이전',
 			'chat.common.close' => '닫기',
 			'chat.taskMaster.saveToTask' => '작업',
@@ -7338,46 +8897,206 @@ extension on TranslationsKo {
 			'chat.taskMaster.taskShort' => '작업',
 			'chat.taskMaster.addToTask' => 'TaskMaster에 추가',
 			'chat.taskMaster.added' => 'TaskMaster에 추가됨',
+			'chat.taskMaster.defaultTaskTitle' => '채팅에서 만든 작업',
 			'chat.tokenUsage.desc' => '세션 토큰 사용량 보기',
 			'chat.tokenUsage.title' => '토큰 사용량',
+			'chat.tokenUsage.notAvailable' => '없음',
+			'chat.tokenUsage.tokensBadge' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, other: '${count} 토큰', ), 
 			'chat.tool.emptyResult' => '(아직 출력 없음 — 도구가 빈 결과를 반환했습니다)',
 			'chat.quotaBadge.ariaLabel' => '구독 한도',
 			'chat.quotaBadge.noData' => '이 모델에 대한 구독 데이터가 없습니다',
-			'chat.paneHeader.processing' => '처리 중…',
-			'chat.paneHeader.switchSession' => '세션 전환',
+			'chat.quotaBadge.noSubscription' => '구독 없음',
+			'chat.quotaBadge.windowLineReset' => ({required Object label, required Object percent, required Object time}) => '${label}: ${percent}% · 초기화 ${time}',
+			'chat.quotaBadge.windowRemaining' => ({required Object percent}) => '초기화까지 기간의 ${percent}% 남음',
+			'chat.broadcast.title' => '세션에 일괄 전송',
+			'chat.broadcast.noSessions' => '사용 가능한 세션이 없습니다',
+			'chat.broadcast.placeholder' => '선택한 모든 세션에 보낼 메시지…',
+			'chat.broadcast.partial' => ({required Object count}) => '세션 ${count}개가 메시지를 거부했습니다',
+			'chat.broadcast.sent' => ({required Object count}) => '세션 ${count}개의 대기열에 추가됨',
+			'chat.broadcast.selectAll' => '모두 선택',
 			'chat.broadcast.selectOrchestrators' => '오케스트레이터 선택',
 			'chat.broadcast.orchestratorsOnly' => '오케스트레이터만',
 			'chat.broadcast.noOrchestrators' => '사용 가능한 오케스트레이터 세션이 없습니다',
-			'chat.changes.empty' => '파일 변경 없음',
-			'chat.changes.failedToLoad' => '변경사항을 불러오지 못했습니다',
-			'chat.commandResult.fallback.config' => '설정 및 구성을 엽니다.',
-			'chat.commandResult.fallback.cost' => '활성 세션의 토큰 사용량을 확인합니다.',
-			'chat.commandResult.fallback.help' => '명령어 문서와 구문을 표시합니다.',
-			'chat.commandResult.fallback.memory' => '프로젝트 CLAUDE.md 메모리 파일을 엽니다.',
-			'chat.commandResult.fallback.models' => '활성 제공자의 사용 가능한 모델을 살펴봅니다.',
-			'chat.commandResult.fallback.status' => '런타임, 버전, 제공자 및 환경 상태를 확인합니다.',
-			'chat.commandResult.filterCommands' => '명령어 필터링...',
-			'chat.commandResult.searchModels' => ({required Object provider}) => '${provider} 모델 검색...',
-			'chat.commands.runConfirmTitle' => '명령어를 실행할까요?',
-			'chat.commands.executionCancelled' => '명령어 실행이 취소되었습니다',
+			'chat.broadcast.sending' => '보내는 중…',
+			'chat.broadcast.send' => ({required Object count}) => '${count}개에 보내기',
+			'chat.paneHeader.processing' => '처리 중…',
+			'chat.paneHeader.switchSession' => '세션 전환',
 			'chat.export.sessionTitle' => ({required Object id}) => '세션 ${id}',
 			'chat.export.pdfFailed' => 'PDF 내보내기 실패',
 			'chat.export.transcriptDownloaded' => '트랜스크립트 다운로드됨',
 			'chat.export.savedTo' => ({required Object path}) => '${path}에 저장됨',
-			'chat.message.compactedSummary' => '압축된 요약',
-			'chat.message.rawView' => 'Raw 보기',
-			'chat.message.resendHint' => '입력창에서 다시 전송',
-			'chat.modelLibrary.deleteTooltip' => ({required Object name}) => '${name} 삭제',
+			'chat.commandResult.fallback.models' => '활성 제공자의 사용 가능한 모델을 살펴봅니다.',
+			'chat.commandResult.fallback.cost' => '활성 세션의 토큰 사용량을 확인합니다.',
+			'chat.commandResult.fallback.status' => '런타임, 버전, 제공자 및 환경 상태를 확인합니다.',
+			'chat.commandResult.fallback.memory' => '프로젝트 CLAUDE.md 메모리 파일을 엽니다.',
+			'chat.commandResult.fallback.config' => '설정 및 구성을 엽니다.',
+			'chat.commandResult.fallback.help' => '명령어 문서와 구문을 표시합니다.',
+			'chat.commandResult.filterCommands' => '명령어 필터링...',
+			'chat.commandResult.searchModels' => ({required Object provider}) => '${provider} 모델 검색...',
+			'chat.commands.runConfirmTitle' => '명령어를 실행할까요?',
+			'chat.commands.executionCancelled' => '명령어 실행이 취소되었습니다',
+			'chat.commands.bashConfirmMessage' => '이 명령에는 실행될 bash 명령이 포함되어 있습니다. 계속할까요?',
+			'chat.commands.proceed' => '계속',
+			'chat.pinFile.title' => '파일 고정',
+			'chat.pinFile.pathHint' => 'path/to/file.ext',
+			'chat.pinFile.action' => '고정',
 			'chat.modelLibrary.editTooltip' => ({required Object name}) => '${name} 편집',
+			'chat.modelLibrary.deleteTooltip' => ({required Object name}) => '${name} 삭제',
 			'chat.modelLibrary.enterNameAndId' => '모델 이름과 모델 ID를 모두 입력하세요.',
 			'chat.modelLibrary.idNoSpaces' => '모델 ID에는 공백을 사용할 수 없습니다.',
 			'chat.modelLibrary.setAsDefault' => '기본으로 설정',
 			'chat.modelLibrary.defaultModel' => '기본 모델',
-			'chat.pinFile.action' => '고정',
-			'chat.pinFile.pathHint' => 'path/to/file.ext',
-			'chat.pinFile.title' => '파일 고정',
+			'chat.modelLibrary.title' => '모델 라이브러리',
+			'chat.modelLibrary.subtitle' => '공급자가 지원하는 모델 ID를 추가하세요. 기본 제공 모델은 잠긴 상태로 유지됩니다. 원은 기본 모델을 나타냅니다.',
+			'chat.modelLibrary.yourModels' => '내 모델',
+			'chat.modelLibrary.yourModelsHint' => '편집 가능하며 auth.db에 저장됨',
+			'chat.modelLibrary.emptyTitle' => '아직 사용자 지정 모델이 없습니다',
+			'chat.modelLibrary.emptyHint' => '양식으로 추가하면 모든 모델 선택기에 표시됩니다.',
+			'chat.modelLibrary.builtInModels' => '기본 제공 모델',
+			'chat.modelLibrary.builtInModelsHint' => 'DDAgent에서 관리하며 읽기 전용',
+			'chat.modelLibrary.editTitle' => '사용자 지정 모델 편집',
+			'chat.modelLibrary.addTitle' => '사용자 지정 모델 추가',
+			'chat.modelLibrary.idSentAsWritten' => ({required Object provider}) => 'ID는 입력한 그대로 ${provider}에 전송됩니다.',
+			'chat.modelLibrary.nameLabel' => '모델 이름',
+			'chat.modelLibrary.nameHint' => '예: GPT-5.5 Pro',
+			'chat.modelLibrary.idLabel' => '모델 ID',
+			'chat.modelLibrary.idHint' => '예: gpt-5.5-pro',
+			'chat.modelLibrary.idHelp' => '공급자 CLI가 허용하는 정확한 식별자를 사용하세요. ID에는 공백을 넣을 수 없습니다.',
+			'chat.modelLibrary.updatedNotice' => ({required Object name}) => '${name}을(를) 업데이트했습니다.',
+			'chat.modelLibrary.addedNotice' => ({required Object name}) => '${name}을(를) 추가했습니다.',
+			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '${name}을(를) 삭제했습니다.',
+			'chat.modelLibrary.saving' => '저장 중…',
+			'chat.modelLibrary.saveChanges' => '변경 사항 저장',
+			'chat.modelLibrary.deleteConfirm' => '모든 선택기에서 이 모델을 삭제할까요?',
+			'chat.modelLibrary.customBadge' => '사용자 지정',
+			'chat.changes.failedToLoad' => '변경사항을 불러오지 못했습니다',
+			'chat.changes.empty' => '파일 변경 없음',
+			'chat.message.compactedSummary' => '압축된 요약',
+			_ => null,
+		} ?? switch (path) {
+			'chat.message.resendHint' => '입력창에서 다시 전송',
+			'chat.message.rawView' => 'Raw 보기',
+			'chat.message.runComplete' => '실행 완료',
 			'chat.permissionRequest.title' => ({required Object tool}) => '권한 요청 · ${tool}',
 			'chat.permissionRequest.question' => '질문',
+			'chat.permissionRequest.subagent' => '하위 에이전트',
+			'chat.permissionRequest.viewersCannotApprove' => '뷰어는 승인할 수 없습니다',
+			'chat.permissionRequest.recap.timedOut' => '시간 초과 — 자동으로 거부됨',
+			'chat.permissionRequest.recap.cancelled' => '취소됨 — 턴이 중지됨',
+			'chat.permissionRequest.recap.autoApproved' => '자동으로 승인됨',
+			'chat.permissionRequest.recap.expired' => '요청 만료됨 — 에이전트가 더 이상 기다리지 않습니다',
+			'chat.permissionRequest.recap.answered' => '답변함',
+			'chat.permissionRequest.recap.skipped' => '건너뜀',
+			'chat.permissionRequest.recap.decided' => '결정됨',
+			'chat.permissionRequest.needsApproval' => ({required Object tool}) => '${tool} 승인이 필요합니다',
+			'chat.permissionRequest.subagentNeedsApproval' => ({required Object tool}) => '하위 에이전트: ${tool} 승인이 필요합니다',
+			'chat.permissionRequest.moreQuestions' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, other: '대기 중인 질문 ${count}개 더 있음', ), 
+			'chat.commandDialog.help.eyebrow' => '명령 센터',
+			'chat.commandDialog.help.title' => '도움말 및 단축키',
+			'chat.commandDialog.help.subtitle' => '기본 제공 명령, 구문 패턴, 명령 사용법을 검색합니다.',
+			'chat.commandDialog.models.eyebrow' => '모델 선택',
+			'chat.commandDialog.models.title' => '모델 선택',
+			'chat.commandDialog.models.subtitle' => '이 공급자가 사용할 모델을 선택하세요.',
+			'chat.commandDialog.models.modelSetTo' => ({required Object model}) => '모델이 ${model}(으)로 설정되었습니다.',
+			'chat.commandDialog.models.activeModel' => '활성 모델',
+			'chat.commandDialog.models.noModelsMatch' => '이 필터와 일치하는 모델이 없습니다.',
+			'chat.commandDialog.models.choiceSavedForSession' => '선택한 내용은 이 세션에 저장되며 새 채팅의 기본값이 됩니다.',
+			'chat.commandDialog.models.choiceDefault' => '선택한 모델이 새 채팅의 기본 모델이 됩니다.',
+			'chat.commandDialog.models.custom' => '사용자 지정',
+			'chat.commandDialog.models.currentSelection' => '현재 선택',
+			'chat.commandDialog.cost.eyebrow' => '세션 원격 분석',
+			'chat.commandDialog.cost.title' => '토큰 사용량',
+			'chat.commandDialog.cost.subtitle' => '이 세션의 입력, 출력 및 전체 토큰 수입니다.',
+			'chat.commandDialog.cost.totalTokensUsed' => '사용한 총 토큰',
+			'chat.commandDialog.cost.inputTokens' => '입력 토큰',
+			'chat.commandDialog.cost.cacheReadTokens' => '캐시 읽기 토큰',
+			'chat.commandDialog.cost.cacheWriteTokens' => '캐시 쓰기 토큰',
+			'chat.commandDialog.cost.outputTokens' => '출력 토큰',
+			'chat.commandDialog.cost.breakdown' => '세부 내역',
+			'chat.commandDialog.cost.unavailable' => '사용할 수 없음',
+			'chat.commandDialog.cost.contextWindow' => '컨텍스트 창',
+			'chat.commandDialog.cost.estimatedCost' => '예상 비용',
+			'chat.commandDialog.status.eyebrow' => '런타임 상태',
+			'chat.commandDialog.status.title' => '시스템 상태',
+			'chat.commandDialog.status.subtitle' => '버전, 공급자, 런타임 및 환경 세부 정보입니다.',
+			'chat.commandDialog.status.package' => '패키지',
+			'chat.commandDialog.status.uptime' => '가동 시간',
+			'chat.commandDialog.status.platform' => '플랫폼',
+			'chat.commandDialog.status.memory' => '메모리',
+			'chat.commandDialog.status.memoryRss' => ({required Object mb}) => '${mb} MB RSS',
+			'chat.commandDialog.status.runtimeOnline' => '런타임 온라인',
+			'chat.commandDialog.status.processResponding' => ({required Object pid}) => '프로세스 #${pid}이(가) 응답하고 있습니다.',
+			'chat.commandDialog.status.processStatusResponding' => '프로세스가 응답하고 있습니다.',
+			'chat.commandDialog.status.healthy' => '정상',
+			'chat.commandDialog.defaultEyebrow' => '명령',
+			'chat.commandDialog.defaultTitle' => '명령 결과',
+			'chat.commandDialog.escHint' => 'Esc 키로 창을 닫습니다.',
+			'chat.commandDialog.unknown' => '알 수 없음',
+			'chat.commandDialog.noDescription' => '설명이 없습니다.',
+			'chat.commandDialog.noCommandsMatch' => '이 필터와 일치하는 명령이 없습니다.',
+			'chat.commandDialog.syntax.title' => '구문',
+			'chat.commandDialog.syntax.arguments' => ({required Object arguments, required Object first, required Object second}) => '${arguments}는 모든 인수를 전달합니다. ${first}, ${second}는 위치 인수입니다.',
+			'chat.commandDialog.syntax.file' => ({required Object token}) => '${token}은(는) 파일 내용을 포함합니다.',
+			'chat.commandDialog.syntax.bash' => ({required Object token}) => '${token}은(는) bash를 실행합니다.',
+			'chat.commandDialog.commandFinished' => '명령이 완료되었습니다.',
+			'chat.utilities.tokenUsageUnavailable' => '토큰 사용량을 사용할 수 없습니다',
+			'chat.utilities.tooltip.tokensUsed' => ({required Object tokens}) => '${tokens} 토큰 사용',
+			'chat.utilities.tooltip.contextOf' => ({required Object total, required Object percent}) => '컨텍스트 ${total} 중 ${percent}%',
+			'chat.utilities.tooltip.input' => ({required Object value}) => '입력 ${value}',
+			'chat.utilities.tooltip.cache' => ({required Object read, required Object write}) => '캐시 읽기 ${read} · 쓰기 ${write}',
+			'chat.utilities.tooltip.output' => ({required Object value}) => '출력 ${value}',
+			'chat.utilities.used' => '사용됨',
+			'chat.utilities.cacheWrite' => '캐시 쓰기',
+			'chat.utilities.contextLabel' => '컨텍스트',
+			'chat.utilities.usageUnsupported' => '사용량 미지원',
+			'chat.utilities.chatTranscript' => '채팅 기록',
+			'chat.utilities.you' => '나:',
+			'chat.utilities.providerAutoMini' => '자동 (mini)',
+			'chat.toolBlocks.moreLines' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, other: '… ${count}줄 더 있음', ), 
+			'chat.toolBlocks.status.running' => '실행 중',
+			'chat.toolBlocks.status.denied' => '거부됨',
+			'chat.toolBlocks.showLess' => '간단히 보기',
+			'chat.toolBlocks.showMore' => '더 보기',
+			'chat.toolBlocks.showMoreLines' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, other: '${count}줄 더 보기', ), 
+			'chat.toolBlocks.tools' => '도구',
+			'chat.toolBlocks.planReview' => '계획 검토',
+			'chat.toolBlocks.planUpdate' => '계획 업데이트',
+			'chat.toolBlocks.todoListUpdated' => '할 일 목록이 업데이트됨',
+			'chat.toolBlocks.creatingTask' => '작업 생성 중',
+			'chat.toolBlocks.updatingTask' => '업데이트 중',
+			'chat.toolBlocks.fetchingTask' => '가져오는 중',
+			'chat.toolBlocks.listingTasks' => '작업 목록 조회 중',
+			'chat.toolBlocks.search' => '검색',
+			'chat.toolBlocks.verbs.read' => '읽기',
+			'chat.toolBlocks.verbs.write' => '쓰기',
+			'chat.toolBlocks.verbs.edit' => '편집',
+			'chat.toolBlocks.verbs.delete' => '삭제',
+			'chat.toolBlocks.verbs.move' => '이동',
+			'chat.toolBlocks.subagent' => '하위 에이전트',
+			'chat.toolBlocks.toolCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, other: '도구 ${count}개', ), 
+			'chat.toolBlocks.result' => '결과',
+			'chat.toolBlocks.plusMore' => ({required Object count}) => '+${count}개 더',
+			'chat.toolBlocks.plan' => '계획',
+			'chat.toolBlocks.questionProgress' => ({required Object current, required Object total}) => '질문 ${current}/${total}',
+			'chat.toolBlocks.lineCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, other: '${count}줄', ), 
+			'chat.toolBlocks.todoListItems' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, other: '할 일 목록 (${count}개 항목)', ), 
+			'chat.toolBlocks.tasksCompleted' => ({required Object done, required Object total}) => '${done}/${total} 완료',
+			'chat.commandMenu.empty' => '사용 가능한 명령이 없습니다',
+			'chat.commandMenu.namespaces.frequent' => '자주 사용',
+			'chat.commandMenu.namespaces.builtin' => '기본 제공 명령',
+			'chat.commandMenu.namespaces.skill' => '스킬',
+			'chat.commandMenu.namespaces.project' => '프로젝트 명령',
+			'chat.commandMenu.namespaces.user' => '사용자 명령',
+			'chat.commandMenu.namespaces.other' => '기타 명령',
+			'chat.mentionMenu.kinds.file' => '파일',
+			'chat.mentionMenu.kinds.session' => '세션',
+			'chat.mentionMenu.kinds.task' => '작업',
+			'chat.mentionMenu.taskTitle' => ({required Object id}) => '작업 ${id}',
+			'chat.subheader.contextTooltip' => ({required Object used, required Object total, required Object percent}) => '컨텍스트: ${used} / ${total} 토큰 · ${percent}% 사용',
+			'chat.transcript.requestFailed' => '요청에 실패했습니다',
+			'chat.review.changedFiles' => '변경된 파일',
+			'chat.review.changedFilesCount' => ({required Object count}) => '변경된 파일 (${count})',
+			'chat.review.subagent' => '하위 에이전트',
 			'codeEditor.toolbar.changes' => '변경사항',
 			'codeEditor.toolbar.previousChange' => '이전 변경',
 			'codeEditor.toolbar.nextChange' => '다음 변경',
@@ -7386,10 +9105,10 @@ extension on TranslationsKo {
 			'codeEditor.toolbar.settings' => '에디터 설정',
 			'codeEditor.toolbar.collapse' => '에디터 접기',
 			'codeEditor.toolbar.expand' => '에디터 전체 너비로 펼치기',
+			'codeEditor.toolbar.toggleDock' => '파일 독 전환',
 			'codeEditor.toolbar.diffMerge' => 'Diff / 병합',
 			'codeEditor.toolbar.previewInBrowser' => '브라우저에서 미리보기',
 			'codeEditor.toolbar.reload' => '디스크에서 다시 로드',
-			'codeEditor.toolbar.toggleDock' => '파일 독 전환',
 			'codeEditor.loading' => ({required Object fileName}) => '${fileName} 로딩 중...',
 			'codeEditor.header.showingChanges' => '변경사항 표시',
 			'codeEditor.actions.copyPath' => '파일 경로 복사',
@@ -7411,30 +9130,40 @@ extension on TranslationsKo {
 			'codeEditor.footer.lines' => '줄:',
 			'codeEditor.footer.characters' => '문자:',
 			'codeEditor.footer.shortcuts' => 'Ctrl+S로 저장 • Esc로 닫기',
+			'codeEditor.footer.plainText' => '일반 텍스트',
+			'codeEditor.footer.lineCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, other: '${count}줄', ), 
+			'codeEditor.footer.modified' => '수정됨',
 			'codeEditor.binaryFile.title' => '바이너리 파일',
 			'codeEditor.binaryFile.message' => ({required Object fileName}) => '파일 "${fileName}"은(는) 바이너리 파일이므로 텍스트 편집기에서 표시할 수 없습니다.',
 			'codeEditor.binaryFile.cannotDisplayAsText' => '텍스트로 표시할 수 없습니다',
 			'codeEditor.filePreview.loading' => '미리보기 로딩 중...',
 			'codeEditor.filePreview.error' => '이 파일을 표시할 수 없습니다.',
 			'codeEditor.filePreview.openInNewTab' => '새 탭에서 열기',
-			'codeEditor.diff.applyMerge' => '병합 적용',
-			'codeEditor.diff.base' => '기본',
-			'codeEditor.diff.close' => 'diff 닫기',
-			'codeEditor.diff.current' => '현재',
-			'codeEditor.diff.hunk' => ({required Object number}) => '헝크 ${number}',
-			'codeEditor.diff.noChanges' => '변경 사항 없음',
-			'codeEditor.diff.deletedOnDisk' => '디스크에서 삭제됨',
+			'codeEditor.unsavedChanges' => ({required Object name}) => '${name}에 저장하지 않은 변경 사항',
 			'codeEditor.discardUnsavedChanges' => '저장하지 않은 변경 사항을 폐기할까요?',
-			'codeEditor.emptyState.title' => '열린 파일 없음',
+			'codeEditor.mediaFile.title' => '미디어 파일',
+			'codeEditor.mediaFile.subtitle' => '오디오/비디오 미리보기는 아직 지원되지 않습니다',
 			'codeEditor.failedToLoad' => '파일을 불러오지 못했습니다',
 			'codeEditor.hexDump.more' => ({required Object size}) => '… ${size}개 더',
-			'codeEditor.mediaFile.subtitle' => '오디오/비디오 미리보기는 아직 지원되지 않습니다',
-			'codeEditor.mediaFile.title' => '미디어 파일',
-			'codeEditor.settings.fontSizeDecrease' => ({required Object size}) => '글꼴 크기 −  (현재 ${size})',
-			'codeEditor.settings.fontSizeIncrease' => '글꼴 크기 +',
 			'codeEditor.settings.minimap' => '미니맵',
 			'codeEditor.settings.tabSize' => ({required Object size}) => '탭 크기: ${size}',
-			'codeEditor.unsavedChanges' => ({required Object name}) => '${name}에 저장하지 않은 변경 사항',
+			'codeEditor.settings.fontSizeDecrease' => ({required Object size}) => '글꼴 크기 −  (현재 ${size})',
+			'codeEditor.settings.fontSizeIncrease' => '글꼴 크기 +',
+			'codeEditor.diff.noChanges' => '변경 사항 없음',
+			'codeEditor.diff.hunk' => ({required Object number}) => '헝크 ${number}',
+			'codeEditor.diff.close' => 'diff 닫기',
+			'codeEditor.diff.base' => '기본',
+			'codeEditor.diff.current' => '현재',
+			'codeEditor.diff.applyMerge' => '병합 적용',
+			'codeEditor.diff.deletedOnDisk' => '디스크에서 삭제됨',
+			'codeEditor.diff.untrackedWillBeDeleted' => '추적되지 않는 이 파일이 삭제됩니다.',
+			'codeEditor.diff.restoreConfirm' => ({required Object name}) => '${name}을(를) 커밋된 상태로 복원할까요?',
+			'codeEditor.diff.headVsWorkingCopy' => 'HEAD 대 작업 사본',
+			'codeEditor.diff.savedVsBuffer' => '마지막 저장본 대 버퍼(git 없음)',
+			'codeEditor.diff.unchangedLines' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, other: '변경 없는 ${count}줄', ), 
+			'codeEditor.diff.revertToSaved' => '저장된 상태로 되돌리기',
+			'codeEditor.emptyState.title' => '열린 파일 없음',
+			'codeEditor.emptyState.hint' => '파일 탭에서 파일을 여세요',
 			'codeEditor.toasts.savedFile' => ({required Object name}) => '${name} 저장됨',
 			'codeEditor.toasts.saveFailed' => '저장 실패',
 			'codeEditor.toasts.allSaved' => '모두 저장됨',
@@ -7457,246 +9186,18 @@ extension on TranslationsKo {
 			'common.buttons.download' => '다운로드',
 			'common.buttons.upload' => '업로드',
 			'common.buttons.browse' => '찾아보기',
-			'common.buttons.openDiagram' => '다이어그램 열기',
 			'common.buttons.update' => '업데이트',
+			'common.buttons.openDiagram' => '다이어그램 열기',
 			'common.tabs.chat' => '채팅',
 			'common.tabs.shell' => 'Shell',
 			'common.tabs.files' => '파일',
 			'common.tabs.git' => '소스 관리',
 			'common.tabs.tasks' => '작업',
+			'common.tabs.board' => '보드',
 			'common.tabs.browser' => '브라우저',
 			'common.tabs.computer' => '컴퓨터',
-			'common.tabs.board' => '보드',
-			'common.tabs.usage' => 'AI Control',
-			'common.status.loading' => '로딩 중...',
-			'common.status.success' => '성공',
-			'common.status.error' => '오류',
-			'common.status.failed' => '실패',
-			'common.status.pending' => '대기 중',
-			'common.status.completed' => '완료',
-			'common.status.inProgress' => '진행 중',
-			'common.messages.savedSuccessfully' => '저장되었습니다',
-			'common.messages.deletedSuccessfully' => '삭제되었습니다',
-			'common.messages.updatedSuccessfully' => '업데이트되었습니다',
-			'common.messages.operationFailed' => '작업 실패',
-			'common.messages.networkError' => '네트워크 오류. 연결을 확인해주세요.',
-			'common.messages.unauthorized' => '인증되지 않았습니다. 로그인해주세요.',
-			'common.messages.notFound' => '찾을 수 없음',
-			'common.messages.invalidInput' => '잘못된 입력',
-			'common.messages.requiredField' => '필수 항목입니다',
-			'common.messages.unknownError' => '알 수 없는 오류가 발생했습니다',
-			'common.messages.renameSessionFailed' => '세션 이름 변경에 실패했습니다. 다시 시도하세요.',
-			'common.navigation.settings' => '설정',
-			'common.navigation.home' => '홈',
-			'common.navigation.back' => '뒤로',
-			'common.navigation.next' => '다음',
-			'common.navigation.previous' => '이전',
-			'common.navigation.logout' => '로그아웃',
-			'common.common.language' => '언어',
-			'common.common.theme' => '테마',
-			'common.common.darkMode' => '다크 모드',
-			'common.common.lightMode' => '라이트 모드',
-			'common.common.name' => '이름',
-			'common.common.description' => '설명',
-			'common.common.enabled' => '활성화',
-			'common.common.disabled' => '비활성화',
-			'common.common.optional' => '선택사항',
-			'common.common.version' => '버전',
-			'common.common.select' => '선택',
-			'common.common.selectAll' => '전체 선택',
-			'common.common.deselectAll' => '전체 해제',
-			'common.common.done' => '완료',
-			'common.common.failed' => '실패',
-			'common.time.justNow' => '방금 전',
-			'common.time.minutesAgo' => ({required Object count}) => '${count}분 전',
-			'common.time.hoursAgo' => ({required Object count}) => '${count}시간 전',
-			'common.time.daysAgo' => ({required Object count}) => '${count}일 전',
-			'common.time.yesterday' => '어제',
-			'common.fileOperations.newFile' => '새 파일',
-			'common.fileOperations.newFolder' => '새 폴더',
-			'common.fileOperations.rename' => '이름 변경',
-			'common.fileOperations.move' => '이동',
-			'common.fileOperations.copyPath' => '경로 복사',
-			'common.fileOperations.openInEditor' => '에디터에서 열기',
-			'common.mainContent.loading' => 'DDAgent 로딩 중',
-			'common.mainContent.settingUpWorkspace' => '워크스페이스 설정 중...',
-			_ => null,
-		} ?? switch (path) {
-			'common.mainContent.chooseProject' => '프로젝트 선택',
-			'common.mainContent.selectProjectDescription' => '사이드바에서 프로젝트를 선택하여 Claude와 코딩을 시작하세요. 각 프로젝트에는 채팅 세션과 파일 히스토리가 포함됩니다.',
-			'common.mainContent.tip' => '팁',
-			'common.mainContent.createProjectMobile' => '위의 메뉴 버튼을 눌러 프로젝트에 접근하세요',
-			'common.mainContent.createProjectDesktop' => '사이드바의 폴더 아이콘을 클릭하여 새 프로젝트를 생성하세요',
-			'common.mainContent.newSession' => '새 세션',
-			'common.mainContent.untitledSession' => '제목 없는 세션',
-			'common.mainContent.projectFiles' => '프로젝트 파일',
-			'common.mainContent.focusMode' => '포커스 모드 (Ctrl+Shift+F)',
-			'common.mainContent.exitFocusMode' => '포커스 모드 종료 (Ctrl+Shift+F)',
-			'common.mainContent.splitSession' => '세션 분할',
-			'common.mainContent.closeSplitSession' => '분할 세션 닫기',
-			'common.mainContent.chooseWorkspace' => '작업 영역 선택',
-			'common.mainContent.chooseWorkspaceDescription' => '이 채팅의 작업 영역을 선택하거나 설정에서 새로 만드세요.',
-			'common.mainContent.createWorkspace' => '설정에서 작업 영역 만들기',
-			'common.mainContent.recentProjects' => '최근 프로젝트',
-			'common.fileTree.loading' => '파일 로딩 중...',
-			'common.fileTree.files' => '파일',
-			'common.fileTree.simpleView' => '간단히 보기',
-			'common.fileTree.compactView' => '컴팩트 보기',
-			'common.fileTree.detailedView' => '상세히 보기',
-			'common.fileTree.searchPlaceholder' => '파일 및 폴더 검색...',
-			'common.fileTree.clearSearch' => '검색 지우기',
-			'common.fileTree.name' => '이름',
-			'common.fileTree.size' => '크기',
-			'common.fileTree.modified' => '수정일',
-			'common.fileTree.permissions' => '권한',
-			'common.fileTree.noFilesFound' => '파일을 찾을 수 없음',
-			'common.fileTree.checkProjectPath' => '프로젝트 경로가 접근 가능한지 확인하세요',
-			'common.fileTree.noMatchesFound' => '일치하는 항목 없음',
-			'common.fileTree.tryDifferentSearch' => '다른 검색어를 시도하거나 검색을 지우세요',
-			'common.fileTree.justNow' => '방금 전',
-			'common.fileTree.minAgo' => ({required Object count}) => '${count}분 전',
-			'common.fileTree.hoursAgo' => ({required Object count}) => '${count}시간 전',
-			'common.fileTree.daysAgo' => ({required Object count}) => '${count}일 전',
-			'common.fileTree.newFile' => '새 파일 (Cmd+N)',
-			'common.fileTree.newFolder' => '새 폴더 (Cmd+Shift+N)',
-			'common.fileTree.refresh' => '새로고침',
-			'common.fileTree.collapseAll' => '모두 접기',
-			'common.fileTree.context.rename' => '이름 변경',
-			'common.fileTree.context.delete' => '삭제',
-			'common.fileTree.context.copyPath' => '경로 복사',
-			'common.fileTree.context.download' => '다운로드',
-			'common.fileTree.context.newFile' => '새 파일',
-			'common.fileTree.context.newFolder' => '새 폴더',
-			'common.fileTree.context.upload' => '파일 업로드',
-			'common.fileTree.context.refresh' => '새로 고침',
-			'common.fileTree.context.menuLabel' => '파일 컨텍스트 메뉴',
-			'common.fileTree.context.loading' => '로딩 중...',
-			'common.fileTree.searchContentPlaceholder' => '파일 내 검색...',
-			'common.fileTree.searchInFiles' => '파일 내 검색',
-			'common.fileTree.searchByName' => '이름으로 검색',
-			'common.fileTree.loadFailed' => '파일을 불러올 수 없습니다',
-			'common.fileTree.noSearchResults' => '일치하는 항목 없음',
-			'common.fileTree.searchError' => '검색 실패',
-			'common.fileTree.searching' => '검색 중...',
-			'common.fileTree.resultsTruncated' => ({required Object count}) => '처음 ${count}개 결과 표시',
-			'common.fileTree.allWorkspaces' => '모든 작업 영역',
-			'common.fileTree.delete.confirm' => '삭제',
-			'common.fileTree.delete.fileWarning' => '이 파일은 영구적으로 삭제됩니다.',
-			'common.fileTree.delete.folderWarning' => '이 폴더와 모든 내용이 영구적으로 삭제됩니다.',
-			'common.fileTree.delete.title' => ({required Object type}) => '${type} 삭제',
-			'common.fileTree.dropToUpload' => '파일을 놓아 업로드',
-			'common.fileTree.dropToUploadTo' => ({required Object folder}) => '파일을 놓아 "${folder}"에 업로드',
-			'common.fileTree.noProject' => '먼저 프로젝트를 추가하세요',
-			'common.fileTree.noRecentFiles' => '최근 7일간 변경된 파일이 없습니다',
-			'common.fileTree.showAllFiles' => '모든 파일 표시',
-			'common.fileTree.showAllFilesHint' => '최근 필터를 끄면 모든 파일을 볼 수 있습니다.',
-			'common.fileTree.showRecentOnly' => '최근 7일간 변경된 파일 표시',
-			'common.fileTree.toast.copyFailed' => '경로 복사 실패',
-			'common.fileTree.toast.fileCreated' => '파일이 생성되었습니다',
-			'common.fileTree.toast.fileDeleted' => '파일이 삭제되었습니다',
-			'common.fileTree.toast.folderCreated' => '폴더가 생성되었습니다',
-			'common.fileTree.toast.folderDeleted' => '폴더가 삭제되었습니다',
-			'common.fileTree.toast.folderDownloaded' => '폴더가 ZIP으로 다운로드되었습니다',
-			'common.fileTree.toast.pathCopied' => '경로가 클립보드에 복사되었습니다',
-			'common.fileTree.toast.renamed' => '이름이 변경되었습니다',
-			'common.fileTree.uploadComplete' => '업로드 완료',
-			'common.fileTree.uploadFailed' => '업로드 실패',
-			'common.fileTree.uploadFiles' => ({required Object size}) => '파일 업로드 (각 최대 ${size})',
-			'common.fileTree.uploadToFolder' => ({required Object folder}) => '"${folder}"에 파일 업로드',
-			'common.fileTree.uploadedCount' => ({required Object total, required Object label, required Object uploaded}) => '${total} ${label} 중 ${uploaded}개 업로드됨',
-			'common.fileTree.uploadingFiles' => '파일 업로드 중',
-			'common.fileTree.validation.dotsOnly' => '파일 이름은 점만으로 구성될 수 없습니다',
-			'common.fileTree.validation.emptyName' => '파일 이름은 비워 둘 수 없습니다',
-			'common.fileTree.validation.invalidChars' => '파일 이름에 잘못된 문자가 포함되어 있습니다',
-			'common.fileTree.validation.reserved' => '파일 이름이 예약어입니다',
-			'common.projectWizard.title' => '새 프로젝트 생성',
-			'common.projectWizard.steps.type' => '유형',
-			'common.projectWizard.steps.configure' => '설정',
-			'common.projectWizard.steps.confirm' => '확인',
-			'common.projectWizard.step1.question' => '이미 워크스페이스가 있으신가요, 아니면 새로 생성하시겠습니까?',
-			'common.projectWizard.step1.existing.title' => '기존 워크스페이스',
-			'common.projectWizard.step1.existing.description' => '서버에 이미 워크스페이스가 있고 프로젝트 목록에 추가만 하면 됩니다',
-			'common.projectWizard.step1.kNew.title' => '새 워크스페이스',
-			'common.projectWizard.step1.kNew.description' => '새 워크스페이스를 생성하고, 선택적으로 GitHub 저장소에서 clone합니다',
-			'common.projectWizard.step2.existingPath' => '워크스페이스 경로',
-			'common.projectWizard.step2.newPath' => '워크스페이스 경로',
-			'common.projectWizard.step2.existingPlaceholder' => '/path/to/existing/workspace',
-			'common.projectWizard.step2.newPlaceholder' => '/path/to/new/workspace',
-			'common.projectWizard.step2.existingHelp' => '기존 워크스페이스 디렉토리의 전체 경로',
-			'common.projectWizard.step2.newHelp' => '워크스페이스 디렉토리의 전체 경로',
-			'common.projectWizard.step2.githubUrl' => 'GitHub URL (선택사항)',
-			'common.projectWizard.step2.githubPlaceholder' => 'https://github.com/username/repository',
-			'common.projectWizard.step2.githubHelp' => '선택사항: 저장소를 clone하려면 GitHub URL을 입력하세요',
-			'common.projectWizard.step2.githubAuth' => 'GitHub 인증 (선택사항)',
-			'common.projectWizard.step2.githubAuthHelp' => '비공개 저장소에만 필요합니다. 공개 저장소는 인증 없이 clone할 수 있습니다.',
-			'common.projectWizard.step2.loadingTokens' => '저장된 토큰 로딩 중...',
-			'common.projectWizard.step2.storedToken' => '저장된 토큰',
-			'common.projectWizard.step2.newToken' => '새 토큰',
-			'common.projectWizard.step2.nonePublic' => '없음 (공개)',
-			'common.projectWizard.step2.selectToken' => '토큰 선택',
-			'common.projectWizard.step2.selectTokenPlaceholder' => '-- 토큰 선택 --',
-			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-			'common.projectWizard.step2.tokenHelp' => '이 토큰은 이 작업에만 사용됩니다',
-			'common.projectWizard.step2.publicRepoInfo' => '공개 저장소는 인증이 필요하지 않습니다. 공개 저장소를 clone하는 경우 토큰을 생략할 수 있습니다.',
-			'common.projectWizard.step2.noTokensHelp' => '저장된 토큰이 없습니다. 설정 → API Keys에서 토큰을 추가하면 재사용이 편리합니다.',
-			'common.projectWizard.step2.optionalTokenPublic' => 'GitHub 토큰 (공개 저장소는 선택사항)',
-			'common.projectWizard.step2.tokenPublicPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx (공개 저장소는 비워두세요)',
-			'common.projectWizard.step3.reviewConfig' => '설정 검토',
-			'common.projectWizard.step3.existingWorkspace' => '기존 워크스페이스',
-			'common.projectWizard.step3.newWorkspace' => '새 워크스페이스',
-			'common.projectWizard.step3.path' => '경로:',
-			'common.projectWizard.step3.cloneFrom' => 'Clone 소스:',
-			'common.projectWizard.step3.authentication' => '인증:',
-			'common.projectWizard.step3.usingStoredToken' => '저장된 토큰 사용:',
-			'common.projectWizard.step3.usingProvidedToken' => '제공된 토큰 사용',
-			'common.projectWizard.step3.noAuthentication' => '인증 없음',
-			'common.projectWizard.step3.sshKey' => 'SSH 키',
-			'common.projectWizard.step3.existingInfo' => '워크스페이스가 프로젝트 목록에 추가되며 Claude/Cursor 세션에서 사용할 수 있습니다.',
-			'common.projectWizard.step3.newWithClone' => '이 폴더에 저장소가 clone됩니다.',
-			'common.projectWizard.step3.newEmpty' => '워크스페이스가 프로젝트 목록에 추가되며 Claude/Cursor 세션에서 사용할 수 있습니다.',
-			'common.projectWizard.step3.cloningRepository' => '저장소 clone 중...',
-			'common.projectWizard.buttons.cancel' => '취소',
-			'common.projectWizard.buttons.back' => '뒤로',
-			'common.projectWizard.buttons.next' => '다음',
-			'common.projectWizard.buttons.createProject' => '프로젝트 생성',
-			'common.projectWizard.buttons.creating' => '생성 중...',
-			'common.projectWizard.buttons.cloning' => 'Clone 중...',
-			'common.projectWizard.errors.selectType' => '기존 워크스페이스를 사용할지 새로 생성할지 선택해주세요',
-			'common.projectWizard.errors.providePath' => '워크스페이스 경로를 입력해주세요',
-			'common.projectWizard.errors.failedToCreate' => '워크스페이스 생성 실패',
-			'common.projectWizard.errors.failedToCreateFolder' => '폴더 생성 실패',
-			'common.notifications.genericTool' => '도구',
-			'common.notifications.codes.generic.info.title' => '알림',
-			'common.notifications.codes.permission.required.title' => '작업 필요',
-			'common.notifications.codes.permission.required.body' => ({required Object toolName}) => '${toolName} 에 대한 결정을 기다리고 있습니다.',
-			'common.notifications.codes.run.stopped.title' => '실행이 중지되었습니다',
-			'common.notifications.codes.run.stopped.body' => ({required Object reason}) => '사유: ${reason}',
-			'common.notifications.codes.run.failed.title' => '실행 실패',
-			'common.notifications.codes.agent.notification.title' => '에이전트 알림',
-			'common.versionUpdate.title' => '업데이트 가능',
-			'common.versionUpdate.newVersionReady' => '새 버전이 준비되었습니다',
-			'common.versionUpdate.currentVersion' => '현재 버전',
-			'common.versionUpdate.latestVersion' => '최신 버전',
-			'common.versionUpdate.whatsNew' => '새로운 기능:',
-			'common.versionUpdate.viewFullRelease' => '전체 릴리스 보기',
-			'common.versionUpdate.updateProgress' => '업데이트 진행 상황:',
-			'common.versionUpdate.manualUpgrade' => '수동 업그레이드:',
-			'common.versionUpdate.npmUpgradeCommand' => 'npm install -g @ddagent-ai/ddagent@latest',
-			'common.versionUpdate.manualUpgradeHint' => '또는 "지금 업데이트"를 클릭하여 자동으로 업데이트합니다.',
-			'common.versionUpdate.updateCompleted' => '업데이트가 완료되었습니다!',
-			'common.versionUpdate.restartServer' => '변경사항을 적용하려면 서버를 재시작하세요.',
-			'common.versionUpdate.updateFailed' => '업데이트 실패',
-			'common.versionUpdate.buttons.close' => '닫기',
-			'common.versionUpdate.buttons.later' => '나중에',
-			'common.versionUpdate.buttons.copyCommand' => '명령어 복사',
-			'common.versionUpdate.buttons.updateNow' => '지금 업데이트',
-			'common.versionUpdate.buttons.updating' => '업데이트 중...',
-			'common.versionUpdate.ariaLabels.closeModal' => '버전 업그레이드 모달 닫기',
-			'common.versionUpdate.ariaLabels.showSidebar' => '사이드바 표시',
-			'common.versionUpdate.ariaLabels.settings' => '설정',
-			'common.versionUpdate.ariaLabels.updateAvailable' => '업데이트 가능',
-			'common.versionUpdate.ariaLabels.closeSidebar' => '사이드바 닫기',
-			'common.quota.controlCenter' => 'AI Control Center',
+			'common.tabs.usage' => 'AI 컨트롤',
+			'common.quota.controlCenter' => 'AI 컨트롤 센터',
 			'common.quota.section.overview' => '개요',
 			'common.quota.section.quotas' => '쿼터',
 			'common.quota.section.usage' => '사용량',
@@ -7810,6 +9311,235 @@ extension on TranslationsKo {
 			'common.quota.range.k7d' => '7d',
 			'common.quota.range.k30d' => '30d',
 			'common.quota.range.all' => '전체',
+			'common.status.loading' => '로딩 중...',
+			'common.status.success' => '성공',
+			'common.status.error' => '오류',
+			'common.status.failed' => '실패',
+			'common.status.pending' => '대기 중',
+			'common.status.completed' => '완료',
+			'common.status.inProgress' => '진행 중',
+			'common.messages.savedSuccessfully' => '저장되었습니다',
+			'common.messages.deletedSuccessfully' => '삭제되었습니다',
+			'common.messages.updatedSuccessfully' => '업데이트되었습니다',
+			'common.messages.operationFailed' => '작업 실패',
+			'common.messages.networkError' => '네트워크 오류. 연결을 확인해주세요.',
+			'common.messages.unauthorized' => '인증되지 않았습니다. 로그인해주세요.',
+			'common.messages.notFound' => '찾을 수 없음',
+			'common.messages.invalidInput' => '잘못된 입력',
+			'common.messages.requiredField' => '필수 항목입니다',
+			'common.messages.unknownError' => '알 수 없는 오류가 발생했습니다',
+			'common.messages.renameSessionFailed' => '세션 이름 변경에 실패했습니다. 다시 시도하세요.',
+			'common.navigation.settings' => '설정',
+			'common.navigation.home' => '홈',
+			'common.navigation.back' => '뒤로',
+			'common.navigation.next' => '다음',
+			'common.navigation.previous' => '이전',
+			'common.navigation.logout' => '로그아웃',
+			'common.navigation.backToChat' => '채팅으로 돌아가기',
+			'common.common.language' => '언어',
+			'common.common.theme' => '테마',
+			'common.common.darkMode' => '다크 모드',
+			'common.common.lightMode' => '라이트 모드',
+			'common.common.name' => '이름',
+			'common.common.description' => '설명',
+			'common.common.enabled' => '활성화',
+			'common.common.disabled' => '비활성화',
+			'common.common.optional' => '선택사항',
+			'common.common.version' => '버전',
+			'common.common.select' => '선택',
+			'common.common.selectAll' => '전체 선택',
+			'common.common.deselectAll' => '전체 해제',
+			'common.common.done' => '완료',
+			'common.common.failed' => '실패',
+			'common.time.justNow' => '방금 전',
+			'common.time.minutesAgo' => ({required Object count}) => '${count}분 전',
+			'common.time.hoursAgo' => ({required Object count}) => '${count}시간 전',
+			'common.time.daysAgo' => ({required Object count}) => '${count}일 전',
+			'common.time.yesterday' => '어제',
+			'common.fileOperations.newFile' => '새 파일',
+			'common.fileOperations.newFolder' => '새 폴더',
+			'common.fileOperations.rename' => '이름 변경',
+			'common.fileOperations.move' => '이동',
+			'common.fileOperations.copyPath' => '경로 복사',
+			'common.fileOperations.openInEditor' => '에디터에서 열기',
+			'common.mainContent.loading' => 'DDAgent 로딩 중',
+			'common.mainContent.settingUpWorkspace' => '워크스페이스 설정 중...',
+			'common.mainContent.chooseProject' => '프로젝트 선택',
+			'common.mainContent.selectProjectDescription' => '사이드바에서 프로젝트를 선택하여 Claude와 코딩을 시작하세요. 각 프로젝트에는 채팅 세션과 파일 히스토리가 포함됩니다.',
+			'common.mainContent.tip' => '팁',
+			'common.mainContent.createProjectMobile' => '위의 메뉴 버튼을 눌러 프로젝트에 접근하세요',
+			'common.mainContent.createProjectDesktop' => '사이드바의 폴더 아이콘을 클릭하여 새 프로젝트를 생성하세요',
+			'common.mainContent.newSession' => '새 세션',
+			'common.mainContent.untitledSession' => '제목 없는 세션',
+			'common.mainContent.projectFiles' => '프로젝트 파일',
+			'common.mainContent.focusMode' => '포커스 모드 (Ctrl+Shift+F)',
+			'common.mainContent.exitFocusMode' => '포커스 모드 종료 (Ctrl+Shift+F)',
+			'common.mainContent.splitSession' => '세션 분할',
+			'common.mainContent.closeSplitSession' => '분할 세션 닫기',
+			'common.mainContent.chooseWorkspace' => '작업 영역 선택',
+			'common.mainContent.chooseWorkspaceDescription' => '이 채팅의 작업 영역을 선택하거나 설정에서 새로 만드세요.',
+			'common.mainContent.createWorkspace' => '설정에서 작업 영역 만들기',
+			'common.mainContent.recentProjects' => '최근 프로젝트',
+			'common.fileTree.loading' => '파일 로딩 중...',
+			'common.fileTree.files' => '파일',
+			'common.fileTree.simpleView' => '간단히 보기',
+			'common.fileTree.compactView' => '컴팩트 보기',
+			'common.fileTree.detailedView' => '상세히 보기',
+			'common.fileTree.searchPlaceholder' => '파일 및 폴더 검색...',
+			'common.fileTree.searchContentPlaceholder' => '파일 내 검색...',
+			'common.fileTree.searchInFiles' => '파일 내 검색',
+			'common.fileTree.searchByName' => '이름으로 검색',
+			'common.fileTree.clearSearch' => '검색 지우기',
+			'common.fileTree.name' => '이름',
+			'common.fileTree.size' => '크기',
+			'common.fileTree.modified' => '수정일',
+			'common.fileTree.permissions' => '권한',
+			'common.fileTree.noFilesFound' => '파일을 찾을 수 없음',
+			'common.fileTree.checkProjectPath' => '프로젝트 경로가 접근 가능한지 확인하세요',
+			'common.fileTree.loadFailed' => '파일을 불러올 수 없습니다',
+			'common.fileTree.noMatchesFound' => '일치하는 항목 없음',
+			'common.fileTree.noSearchResults' => '일치하는 항목 없음',
+			'common.fileTree.tryDifferentSearch' => '다른 검색어를 시도하거나 검색을 지우세요',
+			'common.fileTree.searchError' => '검색 실패',
+			'common.fileTree.searching' => '검색 중...',
+			'common.fileTree.resultsTruncated' => ({required Object count}) => '처음 ${count}개 결과 표시',
+			'common.fileTree.justNow' => '방금 전',
+			'common.fileTree.minAgo' => ({required Object count}) => '${count}분 전',
+			'common.fileTree.hoursAgo' => ({required Object count}) => '${count}시간 전',
+			'common.fileTree.daysAgo' => ({required Object count}) => '${count}일 전',
+			'common.fileTree.newFile' => '새 파일 (Cmd+N)',
+			'common.fileTree.newFolder' => '새 폴더 (Cmd+Shift+N)',
+			'common.fileTree.refresh' => '새로고침',
+			'common.fileTree.collapseAll' => '모두 접기',
+			'common.fileTree.context.rename' => '이름 변경',
+			'common.fileTree.context.delete' => '삭제',
+			'common.fileTree.context.copyPath' => '경로 복사',
+			'common.fileTree.context.download' => '다운로드',
+			'common.fileTree.context.newFile' => '새 파일',
+			'common.fileTree.context.newFolder' => '새 폴더',
+			'common.fileTree.context.upload' => '파일 업로드',
+			'common.fileTree.context.refresh' => '새로 고침',
+			'common.fileTree.context.menuLabel' => '파일 컨텍스트 메뉴',
+			'common.fileTree.context.loading' => '로딩 중...',
+			'common.fileTree.allWorkspaces' => '모든 작업 영역',
+			'common.fileTree.delete.confirm' => '삭제',
+			'common.fileTree.delete.fileWarning' => '이 파일은 영구적으로 삭제됩니다.',
+			'common.fileTree.delete.folderWarning' => '이 폴더와 모든 내용이 영구적으로 삭제됩니다.',
+			'common.fileTree.delete.title' => ({required Object type}) => '${type} 삭제',
+			'common.fileTree.dropToUpload' => '파일을 놓아 업로드',
+			'common.fileTree.dropToUploadTo' => ({required Object folder}) => '파일을 놓아 "${folder}"에 업로드',
+			'common.fileTree.noProject' => '먼저 프로젝트를 추가하세요',
+			'common.fileTree.noRecentFiles' => '최근 7일간 변경된 파일이 없습니다',
+			'common.fileTree.showAllFiles' => '모든 파일 표시',
+			'common.fileTree.showAllFilesHint' => '최근 필터를 끄면 모든 파일을 볼 수 있습니다.',
+			'common.fileTree.showRecentOnly' => '최근 7일간 변경된 파일 표시',
+			'common.fileTree.toast.copyFailed' => '경로 복사 실패',
+			'common.fileTree.toast.fileCreated' => '파일이 생성되었습니다',
+			'common.fileTree.toast.fileDeleted' => '파일이 삭제되었습니다',
+			'common.fileTree.toast.folderCreated' => '폴더가 생성되었습니다',
+			'common.fileTree.toast.folderDeleted' => '폴더가 삭제되었습니다',
+			'common.fileTree.toast.folderDownloaded' => '폴더가 ZIP으로 다운로드되었습니다',
+			'common.fileTree.toast.pathCopied' => '경로가 클립보드에 복사되었습니다',
+			'common.fileTree.toast.renamed' => '이름이 변경되었습니다',
+			'common.fileTree.uploadComplete' => '업로드 완료',
+			'common.fileTree.uploadFailed' => '업로드 실패',
+			'common.fileTree.uploadFiles' => ({required Object size}) => '파일 업로드 (각 최대 ${size})',
+			'common.fileTree.uploadToFolder' => ({required Object folder}) => '"${folder}"에 파일 업로드',
+			'common.fileTree.uploadedCount' => ({required Object total, required Object label, required Object uploaded}) => '${total} ${label} 중 ${uploaded}개 업로드됨',
+			'common.fileTree.uploadingFiles' => '파일 업로드 중',
+			'common.fileTree.validation.dotsOnly' => '파일 이름은 점만으로 구성될 수 없습니다',
+			'common.fileTree.validation.emptyName' => '파일 이름은 비워 둘 수 없습니다',
+			'common.fileTree.validation.invalidChars' => '파일 이름에 잘못된 문자가 포함되어 있습니다',
+			'common.fileTree.validation.reserved' => '파일 이름이 예약어입니다',
+			'common.projectWizard.title' => '새 프로젝트 생성',
+			'common.projectWizard.steps.type' => '유형',
+			'common.projectWizard.steps.configure' => '설정',
+			'common.projectWizard.steps.confirm' => '확인',
+			'common.projectWizard.step1.question' => '이미 워크스페이스가 있으신가요, 아니면 새로 생성하시겠습니까?',
+			'common.projectWizard.step1.existing.title' => '기존 워크스페이스',
+			'common.projectWizard.step1.existing.description' => '서버에 이미 워크스페이스가 있고 프로젝트 목록에 추가만 하면 됩니다',
+			'common.projectWizard.step1.kNew.title' => '새 워크스페이스',
+			'common.projectWizard.step1.kNew.description' => '새 워크스페이스를 생성하고, 선택적으로 GitHub 저장소에서 clone합니다',
+			'common.projectWizard.step2.existingPath' => '워크스페이스 경로',
+			'common.projectWizard.step2.newPath' => '워크스페이스 경로',
+			'common.projectWizard.step2.existingPlaceholder' => '/path/to/existing/workspace',
+			'common.projectWizard.step2.newPlaceholder' => '/path/to/new/workspace',
+			'common.projectWizard.step2.existingHelp' => '기존 워크스페이스 디렉토리의 전체 경로',
+			'common.projectWizard.step2.newHelp' => '워크스페이스 디렉토리의 전체 경로',
+			'common.projectWizard.step2.githubUrl' => 'GitHub URL (선택사항)',
+			'common.projectWizard.step2.githubPlaceholder' => 'https://github.com/username/repository',
+			'common.projectWizard.step2.githubHelp' => '선택사항: 저장소를 clone하려면 GitHub URL을 입력하세요',
+			'common.projectWizard.step2.githubAuth' => 'GitHub 인증 (선택사항)',
+			'common.projectWizard.step2.githubAuthHelp' => '비공개 저장소에만 필요합니다. 공개 저장소는 인증 없이 clone할 수 있습니다.',
+			'common.projectWizard.step2.loadingTokens' => '저장된 토큰 로딩 중...',
+			'common.projectWizard.step2.storedToken' => '저장된 토큰',
+			'common.projectWizard.step2.newToken' => '새 토큰',
+			'common.projectWizard.step2.nonePublic' => '없음 (공개)',
+			'common.projectWizard.step2.selectToken' => '토큰 선택',
+			'common.projectWizard.step2.selectTokenPlaceholder' => '-- 토큰 선택 --',
+			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+			'common.projectWizard.step2.tokenHelp' => '이 토큰은 이 작업에만 사용됩니다',
+			'common.projectWizard.step2.publicRepoInfo' => '공개 저장소는 인증이 필요하지 않습니다. 공개 저장소를 clone하는 경우 토큰을 생략할 수 있습니다.',
+			'common.projectWizard.step2.noTokensHelp' => '저장된 토큰이 없습니다. 설정 → API Keys에서 토큰을 추가하면 재사용이 편리합니다.',
+			'common.projectWizard.step2.optionalTokenPublic' => 'GitHub 토큰 (공개 저장소는 선택사항)',
+			'common.projectWizard.step2.tokenPublicPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx (공개 저장소는 비워두세요)',
+			'common.projectWizard.step3.reviewConfig' => '설정 검토',
+			'common.projectWizard.step3.existingWorkspace' => '기존 워크스페이스',
+			'common.projectWizard.step3.newWorkspace' => '새 워크스페이스',
+			_ => null,
+		} ?? switch (path) {
+			'common.projectWizard.step3.path' => '경로:',
+			'common.projectWizard.step3.cloneFrom' => 'Clone 소스:',
+			'common.projectWizard.step3.authentication' => '인증:',
+			'common.projectWizard.step3.usingStoredToken' => '저장된 토큰 사용:',
+			'common.projectWizard.step3.usingProvidedToken' => '제공된 토큰 사용',
+			'common.projectWizard.step3.noAuthentication' => '인증 없음',
+			'common.projectWizard.step3.sshKey' => 'SSH 키',
+			'common.projectWizard.step3.existingInfo' => '워크스페이스가 프로젝트 목록에 추가되며 Claude/Cursor 세션에서 사용할 수 있습니다.',
+			'common.projectWizard.step3.newWithClone' => '이 폴더에 저장소가 clone됩니다.',
+			'common.projectWizard.step3.newEmpty' => '워크스페이스가 프로젝트 목록에 추가되며 Claude/Cursor 세션에서 사용할 수 있습니다.',
+			'common.projectWizard.step3.cloningRepository' => '저장소 clone 중...',
+			'common.projectWizard.buttons.cancel' => '취소',
+			'common.projectWizard.buttons.back' => '뒤로',
+			'common.projectWizard.buttons.next' => '다음',
+			'common.projectWizard.buttons.createProject' => '프로젝트 생성',
+			'common.projectWizard.buttons.creating' => '생성 중...',
+			'common.projectWizard.buttons.cloning' => 'Clone 중...',
+			'common.projectWizard.errors.selectType' => '기존 워크스페이스를 사용할지 새로 생성할지 선택해주세요',
+			'common.projectWizard.errors.providePath' => '워크스페이스 경로를 입력해주세요',
+			'common.projectWizard.errors.failedToCreate' => '워크스페이스 생성 실패',
+			'common.projectWizard.errors.failedToCreateFolder' => '폴더 생성 실패',
+			'common.notifications.genericTool' => '도구',
+			'common.notifications.codes.generic.info.title' => '알림',
+			'common.notifications.codes.permission.required.title' => '작업 필요',
+			'common.notifications.codes.permission.required.body' => ({required Object toolName}) => '${toolName} 에 대한 결정을 기다리고 있습니다.',
+			'common.notifications.codes.run.stopped.title' => '실행이 중지되었습니다',
+			'common.notifications.codes.run.stopped.body' => ({required Object reason}) => '사유: ${reason}',
+			'common.notifications.codes.run.failed.title' => '실행 실패',
+			'common.notifications.codes.agent.notification.title' => '에이전트 알림',
+			'common.versionUpdate.title' => '업데이트 가능',
+			'common.versionUpdate.newVersionReady' => '새 버전이 준비되었습니다',
+			'common.versionUpdate.currentVersion' => '현재 버전',
+			'common.versionUpdate.latestVersion' => '최신 버전',
+			'common.versionUpdate.whatsNew' => '새로운 기능:',
+			'common.versionUpdate.viewFullRelease' => '전체 릴리스 보기',
+			'common.versionUpdate.updateProgress' => '업데이트 진행 상황:',
+			'common.versionUpdate.manualUpgrade' => '수동 업그레이드:',
+			'common.versionUpdate.npmUpgradeCommand' => 'npm install -g @ddagent-ai/ddagent@latest',
+			'common.versionUpdate.manualUpgradeHint' => '또는 "지금 업데이트"를 클릭하여 자동으로 업데이트합니다.',
+			'common.versionUpdate.updateCompleted' => '업데이트가 완료되었습니다!',
+			'common.versionUpdate.restartServer' => '변경사항을 적용하려면 서버를 재시작하세요.',
+			'common.versionUpdate.updateFailed' => '업데이트 실패',
+			'common.versionUpdate.buttons.close' => '닫기',
+			'common.versionUpdate.buttons.later' => '나중에',
+			'common.versionUpdate.buttons.copyCommand' => '명령어 복사',
+			'common.versionUpdate.buttons.updateNow' => '지금 업데이트',
+			'common.versionUpdate.buttons.updating' => '업데이트 중...',
+			'common.versionUpdate.ariaLabels.closeModal' => '버전 업그레이드 모달 닫기',
+			'common.versionUpdate.ariaLabels.showSidebar' => '사이드바 표시',
+			'common.versionUpdate.ariaLabels.settings' => '설정',
+			'common.versionUpdate.ariaLabels.updateAvailable' => '업데이트 가능',
+			'common.versionUpdate.ariaLabels.closeSidebar' => '사이드바 닫기',
 			'common.actions.cancel' => '취소',
 			'common.actions.retry' => '다시 시도',
 			'common.actions.save' => '저장',
@@ -8034,8 +9764,6 @@ extension on TranslationsKo {
 			'common.gitPanel.history.files' => '파일',
 			'common.gitPanel.history.removed' => '제거됨',
 			'common.gitPanel.mergeWorktree.cleanupDesc' => '병합 후 worktree를 제거하고 브랜치 삭제',
-			_ => null,
-		} ?? switch (path) {
 			'common.gitPanel.mergeWorktree.cleanupLabel' => '병합 후 정리',
 			'common.gitPanel.mergeWorktree.commitCount' => ({required Object count}) => '${count}개 커밋',
 			'common.gitPanel.mergeWorktree.merge' => '병합',
@@ -8145,8 +9873,30 @@ extension on TranslationsKo {
 			'common.gitPanel.tabs.history' => '커밋',
 			'common.gitPanel.tabs.branches' => '브랜치',
 			'common.gitPanel.tabs.worktrees' => '워크트리',
+			'common.gitPanel.save' => '저장',
+			'common.gitPanel.worktreeScripts.title' => 'worktree 스크립트',
+			'common.gitPanel.worktreeScripts.setup' => '설정 스크립트 (생성/열기 후 실행)',
+			'common.gitPanel.worktreeScripts.run' => '개발 서버 실행',
+			'common.gitPanel.worktreeScripts.stop' => '개발 서버 중지',
+			'common.gitPanel.worktreeScripts.runScript' => '실행 스크립트 (개발 서버, 필요 시)',
+			'common.gitPanel.worktreeScripts.runPort' => '미리보기 포트 (선택 사항 — 비워 두면 자동 감지)',
+			'common.gitPanel.worktreeScripts.invalidPort' => '포트는 1에서 65535 사이여야 합니다',
+			'common.gitPanel.worktreeScripts.sourceProject' => '프로젝트 재정의로 저장됨',
+			'common.gitPanel.worktreeScripts.sourceFile' => '.ddagent/worktree.json에서 가져옴 — 저장하면 프로젝트 재정의가 생성됩니다',
+			'common.gitPanel.worktreeScripts.sourceNone' => '아직 구성된 항목이 없습니다',
+			'common.gitPanel.worktreeScripts.saving' => '저장 중…',
+			'common.gitPanel.worktreeScripts.setupRunning' => '설정 실행 중',
+			'common.gitPanel.worktreeScripts.setupFailed' => '설정 실패',
+			'common.gitPanel.worktreeScripts.running' => '실행 중',
+			'common.gitPanel.worktreeScripts.openPreview' => '미리보기 열기',
+			'common.gitPanel.worktreeScripts.runExited' => ({required Object code}) => '실행 종료됨 (${code})',
 			'common.sessions.renameSession' => '세션 이름 변경',
 			'common.projects.newSession' => '새 세션',
+			'common.sharedNotes.subtitle' => '공유 메모리 — 이 프로젝트의 모든 세션에 주입됩니다',
+			'common.sharedNotes.save' => '저장',
+			'common.sharedNotes.saving' => '저장 중…',
+			'common.sharedNotes.noProject' => '공유 컨텍스트를 편집할 작업 영역을 선택하세요',
+			'common.sharedNotes.placeholder' => '# 공유 컨텍스트\n모든 에이전트가 알아야 할 규칙, 결정 사항, 참고 자료…',
 			'common.codeBlock.wrapLines' => '줄바꿈',
 			'common.codeBlock.noWrap' => '줄바꿈 안 함',
 			'common.update.available' => ({required Object version}) => '업데이트 가능 · v${version}',
@@ -8174,6 +9924,8 @@ extension on TranslationsKo {
 			'common.update.staged' => ({required Object version}) => '업데이트 v${version}을(를) 다운로드했습니다 — 설치하려면 서버를 재시작하세요.',
 			'common.update.upToDate' => '서버가 이미 최신 릴리스입니다.',
 			'common.update.webHostFailed' => ({required Object message}) => '서버는 업데이트되었지만 웹 인터페이스는 업데이트되지 않았습니다: ${message}',
+			'common.appShell.panelActive' => ({required Object count}) => '패널 · ${count}개 실행 중',
+			'common.errors.forbidden' => '액세스가 거부되었습니다',
 			'settings.title' => '설정',
 			'settings.changelog.title' => '변경 로그',
 			'settings.changelog.loading' => '로딩 중…',
@@ -8196,10 +9948,13 @@ extension on TranslationsKo {
 			'settings.server.restartTimeout' => ({required Object seconds}) => '${seconds}초 안에 서버가 돌아오지 않았습니다. 서비스 로그(/tmp/ddagent.log)를 확인하거나 직접 재시작하세요.',
 			'settings.updates.title' => '업데이트',
 			'settings.updates.description' => 'GitHub에서 더 최신 데스크톱 빌드를 확인합니다. 새 버전은 자동으로 다운로드되어 종료 시 설치됩니다.',
+			'settings.updates.descriptionMobile' => 'GitHub에서 이 앱의 최신 빌드를 확인합니다. 업데이트는 기기의 시스템 설치 프로그램으로 설치됩니다.',
+			'settings.updates.descriptionServer' => 'GitHub에서 최신 DDAgent 릴리스를 확인합니다. 연결된 서버는 스스로 업데이트할 수 있으며, 재시작하는 동안 활성 세션이 중단됩니다.',
 			'settings.updates.check' => '업데이트 확인',
 			'settings.updates.checking' => '확인 중…',
 			'settings.updates.upToDate' => ({required Object version}) => '최신 버전입니다 (v${version}).',
 			'settings.updates.available' => ({required Object version}) => '업데이트 v${version} 발견 — 백그라운드에서 다운로드 중; DDAgent 종료 시 설치됩니다.',
+			'settings.updates.appAvailable' => ({required Object version}) => '앱 업데이트 v${version} 사용 가능 — 업데이트를 탭하여 이 기기에 설치하세요.',
 			'settings.updates.downloaded' => ({required Object version}) => '업데이트 v${version} 다운로드 완료 — DDAgent를 종료 후 다시 실행하면 설치됩니다.',
 			'settings.updates.unavailable' => '업데이트 확인은 패키지된 데스크톱 빌드에서만 사용할 수 있습니다.',
 			'settings.updates.error' => ({required Object message}) => '업데이트 확인 실패: ${message}',
@@ -8243,9 +9998,11 @@ extension on TranslationsKo {
 			'settings.appearance.showMinimap' => '미니맵 표시',
 			'settings.appearance.lineNumbers' => '줄 번호',
 			'settings.appearance.fontSize' => '글꼴 크기',
-			'settings.appearance.themeModes.dark' => '다크',
-			'settings.appearance.themeModes.light' => '라이트',
 			'settings.appearance.themeModes.system' => '시스템',
+			'settings.appearance.themeModes.light' => '라이트',
+			_ => null,
+		} ?? switch (path) {
+			'settings.appearance.themeModes.dark' => '다크',
 			'settings.actions.saveChanges' => '변경사항 저장',
 			'settings.actions.resetToDefaults' => '기본값으로 초기화',
 			'settings.actions.cancelChanges' => '변경 취소',
@@ -8264,6 +10021,7 @@ extension on TranslationsKo {
 			'settings.quickSettings.dragHandle.draggingStatus' => '드래그 중...',
 			'settings.quickSettings.dragHandle.toggleAndMove' => '클릭하여 토글, 드래그하여 이동',
 			'settings.quickSettings.sendWithCtrlEnter' => 'Ctrl+Enter로 전송',
+			'settings.quickSettings.enterSendsHint' => '끄면 Enter로 전송하고 Shift+Enter로 줄을 바꿉니다.',
 			'settings.terminalShortcuts.title' => '터미널 단축키',
 			'settings.terminalShortcuts.sectionKeys' => '키',
 			'settings.terminalShortcuts.sectionNavigation' => '탐색',
@@ -8273,14 +10031,16 @@ extension on TranslationsKo {
 			'settings.terminalShortcuts.arrowUp' => '위쪽 화살표',
 			'settings.terminalShortcuts.arrowDown' => '아래쪽 화살표',
 			'settings.terminalShortcuts.scrollDown' => '아래로 스크롤',
+			'settings.terminalShortcuts.killTitle' => '실행 중인 프로세스 종료 (Ctrl+C)',
 			'settings.terminalShortcuts.handle.closePanel' => '단축키 패널 닫기',
 			'settings.terminalShortcuts.handle.openPanel' => '단축키 패널 열기',
-			'settings.terminalShortcuts.killTitle' => '실행 중인 프로세스 종료 (Ctrl+C)',
 			'settings.terminalShortcuts.paste' => '붙여넣기',
 			'settings.mainTabs.label' => '설정',
 			'settings.mainTabs.agents' => '에이전트',
 			'settings.mainTabs.orchestration' => '오케스트레이션',
+			'settings.mainTabs.miniOrchestration' => '미니 오케스트레이션',
 			'settings.mainTabs.appearance' => '외관',
+			'settings.mainTabs.workspaces' => '작업 영역',
 			'settings.mainTabs.git' => 'Git',
 			'settings.mainTabs.apiTokens' => 'API & 토큰',
 			'settings.mainTabs.models' => '모델',
@@ -8289,94 +10049,141 @@ extension on TranslationsKo {
 			'settings.mainTabs.tools' => '도구',
 			'settings.mainTabs.notifications' => '알림',
 			'settings.mainTabs.about' => '정보',
-			'settings.mainTabs.workspaces' => '작업 영역',
-			'settings.mainTabs.quota' => 'Control Center',
-			'settings.orchestration.title' => 'Orchestration',
-			'settings.orchestration.description' => 'Route chat tasks across your providers and models.',
-			'settings.orchestration.loading' => 'Loading orchestration settings…',
-			'settings.orchestration.loadError' => 'Could not load the orchestration settings.',
-			'settings.orchestration.retry' => 'Retry',
-			'settings.orchestration.enable.label' => 'Enable orchestration',
-			'settings.orchestration.enable.description' => 'Let the orchestrator pick a model per step instead of running everything on one provider.',
-			'settings.orchestration.pool.title' => 'Candidate pool',
-			'settings.orchestration.pool.description' => 'Models the router can pick from, each pinned to a cost tier.',
-			'settings.orchestration.pool.add' => 'Add candidate',
-			'settings.orchestration.pool.empty' => 'No candidates yet — add one to start routing.',
-			'settings.orchestration.pool.fields.label' => 'Label',
-			'settings.orchestration.pool.fields.labelPlaceholder' => 'e.g. SWE-2 Medium',
-			'settings.orchestration.pool.fields.provider' => 'Provider',
-			'settings.orchestration.pool.fields.model' => 'Model',
-			'settings.orchestration.pool.fields.modelPlaceholder' => 'Select a model',
-			'settings.orchestration.pool.fields.effort' => 'Effort',
-			'settings.orchestration.pool.fields.effortDefault' => 'Provider default',
-			'settings.orchestration.pool.fields.effortPlaceholder' => 'default',
-			'settings.orchestration.pool.fields.account' => 'Account',
-			'settings.orchestration.pool.fields.accountDefault' => 'Provider default',
+			'settings.mainTabs.quota' => '컨트롤 센터',
+			'settings.mainTabs.shortcuts' => '키보드 단축키',
+			'settings.miniOrchestration.title' => '미니 오케스트레이션',
+			'settings.miniOrchestration.description' => '두 모델 파이프라인: flash가 아닌 사고 모델이 계획하고, flash 작업자가 실행합니다.',
+			'settings.miniOrchestration.loading' => '미니 오케스트레이션 설정 로드 중…',
+			'settings.miniOrchestration.loadError' => '미니 오케스트레이션 설정을 불러올 수 없습니다.',
+			'settings.miniOrchestration.enable.label' => '미니 오케스트레이션 사용',
+			'settings.miniOrchestration.enable.description' => 'Auto (mini) 세션을 전체 오케스트레이터 대신 2역할 엔진으로 라우팅합니다.',
+			'settings.miniOrchestration.thinker.title' => '사고 모델 (non-flash)',
+			'settings.miniOrchestration.thinker.description' => '계획, 결정, 검토를 수행하고 최종 보고서를 작성합니다.',
+			'settings.miniOrchestration.worker.title' => '작업자 (flash)',
+			'settings.miniOrchestration.worker.description' => '계획된 각 단계를 실행합니다.',
+			'settings.miniOrchestration.fields.provider' => '제공자',
+			'settings.miniOrchestration.fields.model' => '모델',
+			'settings.miniOrchestration.fields.modelPlaceholder' => '모델 선택',
+			'settings.miniOrchestration.fields.tier' => '티어',
+			'settings.miniOrchestration.roles.title' => '작업별 모델',
+			'settings.miniOrchestration.roles.description' => '각 작업 유형을 어떤 모델(역할)이 처리할지 지정합니다.',
+			'settings.miniOrchestration.planner.title' => '플래너',
+			'settings.miniOrchestration.planner.mode' => '모드',
+			'settings.miniOrchestration.planner.modes.auto' => '사고 모델로 계획',
+			'settings.miniOrchestration.planner.modes.off' => '단일 단계',
+			'settings.miniOrchestration.planner.requireConfirmLabel' => '실행 전에 계획 확인',
+			'settings.orchestration.title' => '오케스트레이션',
+			'settings.orchestration.description' => '채팅 작업을 제공자와 모델에 분배합니다.',
+			'settings.orchestration.loading' => '오케스트레이션 설정 로드 중…',
+			'settings.orchestration.loadError' => '오케스트레이션 설정을 불러올 수 없습니다.',
+			'settings.orchestration.retry' => '다시 시도',
+			'settings.orchestration.enable.label' => '오케스트레이션 사용',
+			'settings.orchestration.enable.description' => '모든 작업을 하나의 제공자에서 실행하는 대신, 오케스트레이터가 단계마다 모델을 선택합니다.',
+			'settings.orchestration.pool.title' => '후보 풀',
+			'settings.orchestration.pool.description' => '라우터가 선택할 수 있는 모델이며, 각각 비용 등급에 연결됩니다.',
+			'settings.orchestration.pool.add' => '후보 추가',
+			'settings.orchestration.pool.empty' => '아직 후보가 없습니다 — 하나를 추가하면 라우팅이 시작됩니다.',
+			'settings.orchestration.pool.fields.label' => '레이블',
+			'settings.orchestration.pool.fields.labelPlaceholder' => '예: SWE-2 Medium',
+			'settings.orchestration.pool.fields.provider' => '제공자',
+			'settings.orchestration.pool.fields.model' => '모델',
+			'settings.orchestration.pool.fields.modelPlaceholder' => '모델 선택',
+			'settings.orchestration.pool.fields.effort' => '추론 수준',
+			'settings.orchestration.pool.fields.effortDefault' => '제공자 기본값',
+			'settings.orchestration.pool.fields.effortPlaceholder' => '기본값',
+			'settings.orchestration.pool.fields.account' => '계정',
+			'settings.orchestration.pool.fields.accountDefault' => '제공자 기본값',
 			'settings.orchestration.pool.fields.redundantAccounts' => '중복 계정',
 			'settings.orchestration.pool.fields.redundantAccountsNone' => '이 공급자의 다른 계정이 없습니다',
-			'settings.orchestration.pool.fields.tier' => 'Cost tier',
-			'settings.orchestration.pool.fields.remove' => 'Remove candidate',
-			'settings.orchestration.pool.fields.moveUp' => 'Move up',
-			'settings.orchestration.pool.fields.moveDown' => 'Move down',
-			'settings.orchestration.tiers.free' => 'Free',
-			'settings.orchestration.tiers.cheap' => 'Cheap',
-			'settings.orchestration.tiers.mid' => 'Mid',
-			'settings.orchestration.tiers.premium' => 'Premium',
-			'settings.orchestration.rules.title' => 'Routing rules',
-			'settings.orchestration.rules.description' => 'Ordered candidates per task type — the first available one wins.',
-			'settings.orchestration.rules.addCandidate' => 'Add candidate…',
-			'settings.orchestration.rules.empty' => 'No candidates — nothing to route this task type to.',
-			'settings.orchestration.rules.missing' => '(removed)',
-			'settings.orchestration.rules.remove' => 'Remove candidate',
-			'settings.orchestration.rules.taskTypes.plan' => 'Planning',
-			'settings.orchestration.rules.taskTypes.quick' => 'Quick answers',
-			'settings.orchestration.rules.taskTypes.research' => 'Research',
-			'settings.orchestration.rules.taskTypes.docs' => 'Documentation',
-			'settings.orchestration.rules.taskTypes.code' => 'Coding',
-			'settings.orchestration.rules.taskTypes.codeHard' => 'Complex coding',
-			'settings.orchestration.rules.taskTypes.test' => 'Testing',
-			'settings.orchestration.rules.taskTypes.review' => 'Review',
-			'settings.orchestration.planner.title' => 'Planner',
-			'settings.orchestration.planner.description' => 'How a request is split into routed steps.',
-			'settings.orchestration.planner.modeLabel' => 'Planning mode',
-			'settings.orchestration.planner.modes.auto' => 'Auto (LLM)',
-			'settings.orchestration.planner.modes.template' => 'Templates',
-			'settings.orchestration.planner.modes.off' => 'Off',
-			'settings.orchestration.planner.modeHints.auto' => 'The planner model decomposes each request into typed steps.',
-			'settings.orchestration.planner.modeHints.template' => 'Requests run through a fixed pipeline you pick below.',
-			'settings.orchestration.planner.modeHints.off' => 'No planning — the whole request is routed as a single step.',
-			'settings.orchestration.planner.candidateLabel' => 'Planner model',
-			'settings.orchestration.planner.candidateDescription' => 'Pool candidate used for plan generation and classification calls.',
-			'settings.orchestration.planner.candidatePlaceholder' => 'Select a pool candidate',
-			'settings.orchestration.planner.templates.title' => 'Pipeline templates',
-			'settings.orchestration.planner.templates.add' => 'Add template',
-			'settings.orchestration.planner.templates.namePlaceholder' => 'Template name',
-			'settings.orchestration.planner.templates.addStep' => 'Add step…',
-			'settings.orchestration.planner.templates.remove' => 'Remove template',
-			'settings.orchestration.planner.templates.removeStep' => 'Remove step',
-			'settings.orchestration.planner.templates.empty' => 'No templates yet.',
-			'settings.orchestration.planner.templates.emptySteps' => 'No steps yet — add one below.',
-			'settings.orchestration.planner.requireConfirm' => 'Confirm plan before running',
-			'settings.orchestration.planner.requireConfirmDescription' => 'Pause after planning so you can edit or disable steps on the plan card.',
-			'settings.orchestration.execution.title' => 'Execution limits',
-			'settings.orchestration.execution.description' => 'Guardrails for parallel runs and fix loops.',
-			'settings.orchestration.execution.maxParallel' => 'Max parallel steps',
-			'settings.orchestration.execution.maxParallelDescription' => 'How many subtasks may run at once (1–8).',
-			'settings.orchestration.execution.maxFixLoops' => 'Max fix loops',
-			'settings.orchestration.execution.maxFixLoopsDescription' => 'Retries when a step fails verification (0–5).',
-			'settings.orchestration.execution.onNoCandidate' => 'When no candidate is available',
-			'settings.orchestration.execution.onNoCandidateDescription' => 'Ask before falling back, or skip the step.',
-			'settings.orchestration.execution.onNoCandidateOptions.ask' => 'Ask',
-			'settings.orchestration.execution.onNoCandidateOptions.skip' => 'Skip step',
-			'settings.orchestration.execution.useWorktree' => 'Isolated worktree',
-			'settings.orchestration.execution.useWorktreeDescription' => 'Run all delegated steps in one shared git worktree instead of the project directory.',
-			'settings.orchestration.save.unsaved' => 'Unsaved changes',
-			'settings.orchestration.save.save' => 'Save',
-			'settings.orchestration.save.saving' => 'Saving…',
-			'settings.orchestration.save.saved' => 'Saved',
-			'settings.orchestration.save.discard' => 'Discard',
-			'settings.orchestration.save.error' => 'Save failed',
-			'settings.orchestration.save.emptyPool' => 'Add at least one candidate before saving.',
+			'settings.orchestration.pool.fields.tier' => '비용 등급',
+			'settings.orchestration.pool.fields.remove' => '후보 제거',
+			'settings.orchestration.pool.fields.moveUp' => '위로 이동',
+			'settings.orchestration.pool.fields.moveDown' => '아래로 이동',
+			'settings.orchestration.tiers.free' => '무료',
+			'settings.orchestration.tiers.cheap' => '저가',
+			'settings.orchestration.tiers.mid' => '중간',
+			'settings.orchestration.tiers.premium' => '프리미엄',
+			'settings.orchestration.rules.title' => '라우팅 규칙',
+			'settings.orchestration.rules.description' => '작업 유형별로 정렬된 후보 — 처음으로 사용 가능한 후보가 선택됩니다.',
+			'settings.orchestration.rules.addCandidate' => '후보 추가…',
+			'settings.orchestration.rules.empty' => '후보 없음 — 이 작업 유형을 라우팅할 대상이 없습니다.',
+			'settings.orchestration.rules.missing' => '(제거됨)',
+			'settings.orchestration.rules.remove' => '후보 제거',
+			'settings.orchestration.rules.taskTypes.plan' => '계획',
+			'settings.orchestration.rules.taskTypes.quick' => '빠른 답변',
+			'settings.orchestration.rules.taskTypes.research' => '조사',
+			'settings.orchestration.rules.taskTypes.docs' => '문서화',
+			'settings.orchestration.rules.taskTypes.code' => '코딩',
+			'settings.orchestration.rules.taskTypes.codeHard' => '복잡한 코딩',
+			'settings.orchestration.rules.taskTypes.test' => '테스트',
+			'settings.orchestration.rules.taskTypes.review' => '검토',
+			'settings.orchestration.rules.taskTypes.report' => '보고서',
+			'settings.orchestration.planner.title' => '플래너',
+			'settings.orchestration.planner.description' => '요청을 라우팅할 단계로 나누는 방식입니다.',
+			'settings.orchestration.planner.modeLabel' => '계획 모드',
+			'settings.orchestration.planner.modes.auto' => '자동 (LLM)',
+			'settings.orchestration.planner.modes.template' => '템플릿',
+			'settings.orchestration.planner.modes.off' => '끄기',
+			'settings.orchestration.planner.modeHints.auto' => '플래너 모델이 각 요청을 유형이 지정된 단계로 분해합니다.',
+			'settings.orchestration.planner.modeHints.template' => '요청은 아래에서 선택한 고정 파이프라인으로 실행됩니다.',
+			'settings.orchestration.planner.modeHints.off' => '계획 없음 — 전체 요청이 하나의 단계로 라우팅됩니다.',
+			'settings.orchestration.planner.candidateLabel' => '플래너 모델',
+			'settings.orchestration.planner.candidateDescription' => '계획 생성과 분류 호출에 사용되는 풀 후보입니다.',
+			'settings.orchestration.planner.candidatePlaceholder' => '풀 후보 선택',
+			'settings.orchestration.planner.templates.title' => '파이프라인 템플릿',
+			'settings.orchestration.planner.templates.add' => '템플릿 추가',
+			'settings.orchestration.planner.templates.namePlaceholder' => '템플릿 이름',
+			'settings.orchestration.planner.templates.addStep' => '단계 추가…',
+			'settings.orchestration.planner.templates.remove' => '템플릿 제거',
+			'settings.orchestration.planner.templates.removeStep' => '단계 제거',
+			'settings.orchestration.planner.templates.empty' => '아직 템플릿이 없습니다.',
+			'settings.orchestration.planner.templates.emptySteps' => '아직 단계가 없습니다 — 아래에서 추가하세요.',
+			'settings.orchestration.planner.requireConfirm' => '실행 전에 계획 확인',
+			'settings.orchestration.planner.requireConfirmDescription' => '계획 후 일시 중지하여 계획 카드에서 단계를 편집하거나 비활성화할 수 있습니다.',
+			'settings.orchestration.planner.checkpointLabel' => '자율성',
+			'settings.orchestration.planner.checkpointModes.off' => '자율',
+			'settings.orchestration.planner.checkpointModes.perStep' => '단계별',
+			'settings.orchestration.planner.checkpointModes.everyN' => 'N단계마다',
+			'settings.orchestration.planner.checkpointHints.off' => '감독자 결정을 묻지 않고 실행합니다 (자동 모드).',
+			'settings.orchestration.planner.checkpointHints.perStep' => '제안된 단계 묶음마다 실행 전에 승인을 요청합니다.',
+			'settings.orchestration.planner.checkpointHints.everyN' => 'N개 단계가 완료될 때마다 승인을 요청합니다.',
+			'settings.orchestration.planner.checkpointIntervalLabel' => '체크포인트 간 단계 수 (1–50)',
+			'settings.orchestration.execution.title' => '실행 제한',
+			'settings.orchestration.execution.description' => '병렬 실행과 수정 루프에 대한 안전장치입니다.',
+			'settings.orchestration.execution.maxParallel' => '최대 병렬 단계 수',
+			'settings.orchestration.execution.maxParallelDescription' => '동시에 실행할 수 있는 하위 작업 수 (1–8).',
+			'settings.orchestration.execution.maxFixLoops' => '최대 수정 루프 수',
+			'settings.orchestration.execution.maxFixLoopsDescription' => '단계가 검증에 실패했을 때의 재시도 횟수 (0–5).',
+			'settings.orchestration.execution.onNoCandidate' => '사용 가능한 후보가 없을 때',
+			'settings.orchestration.execution.onNoCandidateDescription' => '대체 수단으로 넘어가기 전에 묻거나, 단계를 건너뜁니다.',
+			'settings.orchestration.execution.onNoCandidateOptions.ask' => '묻기',
+			'settings.orchestration.execution.onNoCandidateOptions.skip' => '단계 건너뛰기',
+			'settings.orchestration.execution.useWorktree' => '격리된 worktree',
+			'settings.orchestration.execution.useWorktreeDescription' => '위임된 모든 단계를 프로젝트 디렉터리 대신 하나의 공유 git worktree에서 실행합니다.',
+			'settings.orchestration.execution.maxSupervisorIterations' => '최대 감독자 반복 횟수',
+			'settings.orchestration.execution.maxSupervisorIterationsDescription' => '자동 모드에서 감독자 결정 라운드의 상한 (1–100). 도달하면 부분 보고서와 함께 실행이 종료됩니다.',
+			'settings.orchestration.execution.maxAttempts' => '단계당 최대 시도 횟수',
+			'settings.orchestration.execution.maxAttemptsDescription' => '한 단계에 대해 레인과 재시도를 모두 합친 총 시도 횟수 (1–50).',
+			'settings.orchestration.execution.stepTimeoutMs' => '단계 시간 제한 (ms)',
+			'settings.orchestration.execution.stepTimeoutMsDescription' => '시도별 하위 실행 시간 제한(밀리초). 0이면 사용 안 함.',
+			'settings.orchestration.execution.runTimeoutMs' => '실행 시간 제한 (ms)',
+			'settings.orchestration.execution.runTimeoutMsDescription' => '전체 계획 실행 시간 제한(밀리초). 0이면 사용 안 함.',
+			'settings.orchestration.execution.retryBackoffBaseMs' => '재시도 백오프 기준값 (ms)',
+			'settings.orchestration.execution.retryBackoffBaseMsDescription' => '같은 레인 재시도 사이의 지수 백오프 기준값 (full jitter).',
+			'settings.orchestration.execution.retryBudgetTitle' => '실패 유형별 재시도 횟수',
+			'settings.orchestration.execution.retryBudgetDescription' => '페일오버/쿨다운 전 같은 레인에서의 재시도 횟수 (0–5).',
+			'settings.orchestration.execution.retryClasses.rateLimit' => '속도 제한',
+			'settings.orchestration.execution.retryClasses.quota' => '할당량',
+			'settings.orchestration.execution.retryClasses.auth' => '인증',
+			'settings.orchestration.execution.retryClasses.timeout' => '시간 초과',
+			'settings.orchestration.execution.retryClasses.transient' => '일시적 오류',
+			'settings.orchestration.save.unsaved' => '저장되지 않은 변경 사항',
+			'settings.orchestration.save.save' => '저장',
+			'settings.orchestration.save.saving' => '저장 중…',
+			'settings.orchestration.save.saved' => '저장됨',
+			'settings.orchestration.save.discard' => '변경 취소',
+			'settings.orchestration.save.error' => '저장 실패',
+			'settings.orchestration.save.emptyPool' => '저장하기 전에 후보를 하나 이상 추가하세요.',
 			'settings.notifications.title' => '알림',
 			'settings.notifications.description' => '수신할 알림 이벤트를 설정합니다.',
 			'settings.notifications.webPush.title' => '웹 푸시 알림',
@@ -8406,8 +10213,17 @@ extension on TranslationsKo {
 			'settings.notifications.events.actionRequired' => '작업 필요',
 			'settings.notifications.events.stop' => '실행 중지',
 			'settings.notifications.events.error' => '실행 실패',
-			'settings.notifications.channels.discord' => 'Discord',
+			'settings.notifications.messaging.title' => '메신저 승인',
+			'settings.notifications.messaging.description' => 'Telegram에서 에이전트 권한 요청을 승인하거나 거부하고, Discord에서 실행 알림을 받습니다.',
+			'settings.notifications.messaging.enabled' => '사용',
+			'settings.notifications.messaging.save' => '저장',
+			'settings.notifications.messaging.test' => '테스트',
+			'settings.notifications.messaging.pair' => '페어링',
+			'settings.notifications.messaging.telegramToken' => '@BotFather에서 받은 봇 토큰 (123456:ABC…)',
+			'settings.notifications.messaging.telegramHint' => '봇에게 아무 메시지나 보낸 다음 아래에서 채팅을 페어링하세요.',
+			'settings.notifications.messaging.discordWebhook' => 'https://discord.com/api/webhooks/…',
 			'settings.notifications.channels.telegram' => 'Telegram',
+			'settings.notifications.channels.discord' => 'Discord',
 			'settings.notifications.unpair' => '페어링 해제',
 			'settings.appearanceSettings.darkMode.label' => '다크 모드',
 			'settings.appearanceSettings.darkMode.description' => '라이트/다크 테마 전환',
@@ -8548,8 +10364,6 @@ extension on TranslationsKo {
 			'settings.agents.account.cursor.description' => 'Cursor AI 기반 코드 에디터',
 			'settings.agents.account.codex.description' => 'OpenAI Codex AI 어시스턴트',
 			'settings.agents.account.opencode.description' => 'OpenCode CLI 어시스턴트',
-			_ => null,
-		} ?? switch (path) {
 			'settings.agents.account.commandcode.description' => 'Command Code CLI 어시스턴트',
 			'settings.agents.account.antigravity.description' => 'Antigravity CLI 어시스턴트',
 			'settings.agents.account.devin.description' => 'Devin CLI 어시스턴트',
@@ -8568,6 +10382,20 @@ extension on TranslationsKo {
 			'settings.agents.logout.success' => '로그아웃되었습니다',
 			'settings.agents.logout.failed' => '로그아웃 실패',
 			'settings.agents.error' => ({required Object error}) => '오류: ${error}',
+			'settings.agents.accounts.title' => '이름 있는 계정',
+			'settings.agents.accounts.description' => '추가 자격 증명 세트입니다. 계정에 고정된 세션은 해당 계정의 격리된 구성 디렉터리로 CLI를 실행합니다. 표시된 환경 변수로 제공자 CLI를 한 번 실행하여 로그인하세요.',
+			'settings.agents.accounts.sharedCli' => '모든 계정은 하나의 CLI 설치를 공유합니다 — 위의 연결 카드에서 업데이트하세요.',
+			'settings.agents.accounts.loading' => '계정 로드 중…',
+			'settings.agents.accounts.kDefault' => '기본값',
+			'settings.agents.accounts.usage' => ({required Object tokens}) => '${tokens} 토큰',
+			'settings.agents.accounts.usageButton' => '사용량',
+			'settings.agents.accounts.showUsage' => '토큰 사용량 표시',
+			'settings.agents.accounts.makeDefault' => '기본값으로 설정',
+			'settings.agents.accounts.remove' => '계정 제거',
+			'settings.agents.accounts.newLabel' => '계정 레이블 (예: 업무)',
+			'settings.agents.accounts.add' => '계정 추가',
+			'settings.agents.accounts.autoSwitch.label' => '사용 한도 도달 시 계정 자동 전환',
+			'settings.agents.accounts.autoSwitch.description' => '계정이 사용 한도에 도달하면 세션이 같은 에이전트의 한도가 남아 있는 다른 계정으로 전환됩니다. 소진된 계정을 직접 선택한 경우에도 마찬가지입니다. 다른 에이전트로는 전환하지 않습니다. Claude와 Codex는 대화를 유지하고, 다른 에이전트는 새 채팅에서만 전환됩니다.',
 			'settings.permissions.title' => '권한 설정',
 			'settings.permissions.permissionMode.title' => '권한 모드',
 			'settings.permissions.permissionMode.description' => ({required Object provider}) => '새 ${provider} 세션의 기본 권한 모드. 개별 세션에서 재정의할 수 있습니다.',
@@ -8609,8 +10437,8 @@ extension on TranslationsKo {
 			'settings.mcpServers.help.description' => 'Codex는 stdio 기반 MCP 서버를 지원합니다. 추가 도구와 리소스로 Codex의 기능을 확장하는 서버를 추가할 수 있습니다.',
 			'settings.mcpServers.deleteConfirm.description' => ({required Object serverName}) => '"${serverName}"이(가) 제공자 구성에서 제거됩니다.',
 			'settings.mcpServers.deleteConfirm.title' => 'MCP 서버를 삭제하시겠습니까?',
-			'settings.quota.settings.tab' => 'Control Center',
-			'settings.quota.settings.title' => 'Control Center',
+			'settings.quota.settings.tab' => '컨트롤 센터',
+			'settings.quota.settings.title' => '컨트롤 센터',
 			'settings.quota.settings.description' => '알림 임계값, 라우팅 정책, 쿼터를 폴링하는 계정.',
 			'settings.quota.settings.saved' => '저장됨',
 			'settings.quota.settings.alertsSection' => '알림',
@@ -8676,13 +10504,56 @@ extension on TranslationsKo {
 			'settings.workspaces.remove' => '작업 영역 제거',
 			'settings.workspaces.title' => '작업 영역',
 			'settings.workspaces.pathRequired' => '경로는 필수입니다',
+			'settings.stt.title' => '음성 입력 (음성 인식)',
+			'settings.stt.description' => 'Whisper 호환 /audio/transcriptions 엔드포인트 (OpenAI, whisper.cpp, faster-whisper, Speaches). 입력창의 마이크 버튼을 활성화합니다.',
+			'settings.stt.configured' => '구성됨',
+			'settings.stt.endpoint' => '엔드포인트 URL (예: https://api.openai.com/v1)',
+			'settings.stt.apiKey' => 'API 키',
+			'settings.stt.model' => '모델 (기본값: whisper-1)',
+			'settings.stt.save' => '저장',
+			'settings.schedules.title' => '일정',
+			'settings.schedules.description' => 'cron 시간표에 따른 반복 에이전트 실행입니다. 실행은 무인으로 진행되며 권한 확인을 우회합니다.',
+			'settings.schedules.preventSleep' => '에이전트 실행 중 절전 방지',
+			_ => null,
+		} ?? switch (path) {
+			'settings.schedules.preventSleepHint' => '데스크톱에서는 화면이 켜진 상태로 유지되고, 브라우저에서는 화면 깨우기 잠금이 사용됩니다.',
+			'settings.schedules.kNew' => '새 일정',
+			'settings.schedules.loading' => '로드 중…',
+			'settings.schedules.empty' => '아직 일정이 없습니다.',
+			'settings.schedules.project' => '프로젝트',
+			'settings.schedules.provider' => '제공자',
+			'settings.schedules.cron' => 'Cron (분 시 일 월 요일)',
+			'settings.schedules.nextRun' => ({required Object time}) => '다음 실행: ${time}',
+			'settings.schedules.cronInvalid' => '이 표현식으로는 예정된 실행이 없습니다',
+			'settings.schedules.prompt' => '프롬프트',
+			'settings.schedules.useWorktree' => '새 worktree에서 실행',
+			'settings.schedules.catchUp' => '놓친 실행 따라잡기',
+			'settings.schedules.failures' => ({required Object count}) => '실패 ${count}회',
+			'settings.schedules.disabled' => '비활성화됨',
+			'settings.schedules.history' => '기록',
+			'settings.schedules.runNow' => '지금 실행',
+			'settings.schedules.delete' => '삭제',
+			'settings.schedules.noRuns' => '아직 실행 기록이 없습니다.',
+			'settings.schedules.next' => '다음',
+			'settings.schedules.create' => '만들기',
+			'settings.schedules.toggleSchedule' => '일정 사용',
+			'settings.mcpTokens.title' => 'DDAgent MCP 서버 토큰',
+			'settings.mcpTokens.description' => '외부 도구(Claude Desktop, OpenClaw)는 이 bearer 토큰 중 하나로 POST /mcp를 통해 DDAgent 도구를 호출합니다.',
+			'settings.mcpTokens.dismiss' => '닫기',
+			'settings.mcpTokens.labelPlaceholder' => '토큰 레이블 (예: Claude Desktop)',
+			'settings.mcpTokens.create' => '만들기',
+			'settings.mcpTokens.empty' => '아직 MCP 토큰이 없습니다.',
+			'settings.mcpTokens.lastUsed' => ({required Object time}) => '${time} 사용',
+			'settings.mcpTokens.neverUsed' => '사용한 적 없음',
 			'settings.about.supportTitle' => '프로젝트 후원하기',
 			'settings.about.buyMeACoffee' => '커피 한 잔 사주기',
+			'settings.about.tryHosted' => 'DDAgent Hosted 사용해보기',
 			'settings.about.learnMore' => '더 알아보기',
+			'settings.about.proFeatures' => 'DDAgent Pro 기능',
 			'settings.about.pro.syncSettings' => '설정 동기화',
 			'settings.about.pro.teamManagement' => '팀 관리',
-			'settings.about.proFeatures' => 'DDAgent Pro 기능',
-			'settings.about.tryHosted' => 'DDAgent Hosted 사용해보기',
+			'settings.about.pro.syncSettingsDescription' => '모든 환경에서 환경설정, MCP 구성, 테마를 동기화하세요.',
+			'settings.about.pro.teamManagementDescription' => '여러 사용자, 역할 기반 액세스, 팀을 위한 공유 프로젝트.',
 			'settings.about.versionInfo' => '버전 정보',
 			'settings.about.client' => '앱',
 			'settings.about.server' => '서버',
@@ -8690,6 +10561,49 @@ extension on TranslationsKo {
 			'settings.about.platformDesktop' => '데스크톱',
 			'settings.about.platformWeb' => 'Web',
 			'settings.about.unknown' => '알 수 없음',
+			'settings.about.copyright' => '© 2026 DDAgent — 모든 권리 보유',
+			'settings.about.tagline' => '오픈 소스 AI 코딩 어시스턴트 인터페이스',
+			'settings.about.docs' => '문서',
+			'settings.about.hostedDescription' => '팀 협업, 공유 MCP 구성, 환경 간 설정 동기화, 관리형 인프라.',
+			'settings.shortcuts.description' => 'DDAgent의 모든 키보드 단축키를 플랫폼별로 정리했습니다.',
+			'settings.shortcuts.action' => '작업',
+			'settings.shortcuts.winLinux' => 'Windows / Linux',
+			'settings.shortcuts.mac' => 'macOS',
+			'settings.shortcuts.navigation' => '탐색',
+			'settings.shortcuts.navWorkspace' => '작업 영역으로 이동',
+			'settings.shortcuts.navTasks' => '작업 / Git으로 이동',
+			'settings.shortcuts.navGit' => 'Git으로 이동',
+			'settings.shortcuts.navFocus' => '집중 모드 전환 (사이드바)',
+			'settings.shortcuts.navSwitcher' => '세션 빠른 전환',
+			'settings.shortcuts.navPalette' => '명령 팔레트',
+			'settings.shortcuts.navSettings' => '설정 열기',
+			'settings.shortcuts.navClose' => '대화상자 닫기 / 분할 창 복원',
+			'settings.shortcuts.composer' => '입력창',
+			'settings.shortcuts.compSend' => '메시지 보내기',
+			'settings.shortcuts.compNewline' => '줄 바꿈',
+			'settings.shortcuts.compNav' => '제안 항목 탐색',
+			'settings.shortcuts.compAccept' => '제안 수락',
+			'settings.shortcuts.compCloseSuggest' => '제안 닫기',
+			'settings.shortcuts.transcript' => '대화 기록',
+			'settings.shortcuts.trCopy' => '선택한 텍스트 복사',
+			'settings.shortcuts.trClose' => '검색 / 검토 패널 닫기',
+			'settings.shortcuts.terminal' => '터미널',
+			'settings.shortcuts.termCopy' => '선택 영역 복사',
+			'settings.shortcuts.termInterrupt' => '프로세스 중단 (선택 없음)',
+			'settings.shortcuts.termPaste' => '붙여넣기',
+			'settings.shortcuts.termSelectAll' => '모두 선택',
+			'settings.shortcuts.editor' => '편집기',
+			'settings.shortcuts.edSave' => '파일 저장',
+			'settings.shortcuts.edSaveAll' => '모든 파일 저장',
+			'settings.shortcuts.edClose' => '탭 닫기',
+			'settings.shortcuts.edNextTab' => '다음 탭',
+			'settings.shortcuts.edPrevTab' => '이전 탭',
+			'settings.shortcuts.edIndent' => '들여쓰기 / 내어쓰기',
+			'settings.shortcuts.palette' => '명령 팔레트',
+			'settings.shortcuts.palNav' => '항목 탐색',
+			'settings.shortcuts.palRun' => '실행 / 열기',
+			'settings.shortcuts.palBack' => '뒤로 (검색어가 비어 있을 때)',
+			'settings.shortcuts.palClose' => '닫기',
 			'sidebar.projects.title' => '프로젝트',
 			'sidebar.projects.newProject' => '새 프로젝트',
 			'sidebar.projects.deleteProject' => '프로젝트 제거',
@@ -8710,6 +10624,10 @@ extension on TranslationsKo {
 			'sidebar.projects.runClaudeCli' => '프로젝트 디렉토리에서 Claude CLI를 실행하여 시작하세요',
 			'sidebar.app.title' => 'DDAgent',
 			'sidebar.app.subtitle' => 'AI 코딩 어시스턴트 UI',
+			'sidebar.panel.open' => '패널',
+			'sidebar.panel.newChat' => '새 채팅',
+			'sidebar.panel.navigation' => '탐색',
+			'sidebar.panel.sessions' => '세션',
 			'sidebar.sessions.title' => '세션',
 			'sidebar.sessions.newSession' => '새 세션',
 			'sidebar.sessions.deleteSession' => '세션 삭제',
@@ -8765,6 +10683,13 @@ extension on TranslationsKo {
 			'sidebar.actions.reportIssue' => '문제 신고',
 			'sidebar.actions.starOnGithub' => 'GitHub에서 스타',
 			'sidebar.actions.buyMeACoffee' => '커피 한 잔 사주기',
+			'sidebar.workspace.title' => '세션 작업 영역 변경',
+			'sidebar.workspace.description' => '에이전트가 이 디렉터리에서 다음 턴을 실행합니다. 기존 세션 기록은 유지됩니다.',
+			'sidebar.workspace.pathLabel' => '작업 영역 경로',
+			'sidebar.workspace.pathRequired' => '작업 영역 경로가 필요합니다.',
+			'sidebar.workspace.submit' => '작업 영역 변경',
+			'sidebar.workspace.saving' => '변경 중…',
+			'sidebar.workspace.changeAction' => '작업 영역 변경',
 			'sidebar.branding.openSource' => '오픈 소스',
 			'sidebar.status.active' => '활성',
 			'sidebar.status.inactive' => '비활성',
@@ -8790,6 +10715,8 @@ extension on TranslationsKo {
 			'sidebar.messages.deleteSessionError' => '세션 삭제 오류. 다시 시도해주세요.',
 			'sidebar.messages.renameSessionFailed' => '세션 이름 변경 실패. 다시 시도해주세요.',
 			'sidebar.messages.renameSessionError' => '세션 이름 변경 오류. 다시 시도해주세요.',
+			'sidebar.messages.changeWorkspaceFailed' => '작업 영역 변경에 실패했습니다. 다시 시도하세요.',
+			'sidebar.messages.changeWorkspaceError' => '작업 영역 변경 중 오류가 발생했습니다. 다시 시도하세요.',
 			'sidebar.messages.deleteProjectFailed' => '프로젝트 제거 실패. 다시 시도해주세요.',
 			'sidebar.messages.deleteProjectError' => '프로젝트 제거 오류. 다시 시도해주세요.',
 			'sidebar.messages.createProjectFailed' => '프로젝트 생성 실패. 다시 시도해주세요.',
@@ -8800,8 +10727,6 @@ extension on TranslationsKo {
 			'sidebar.messages.restoreProjectError' => '프로젝트 복원 오류. 다시 시도해주세요.',
 			'sidebar.messages.restoreSessionFailed' => '세션 복원 실패. 다시 시도해주세요.',
 			'sidebar.messages.restoreSessionError' => '세션 복원 오류. 다시 시도해주세요.',
-			'sidebar.messages.changeWorkspaceFailed' => '작업 영역 변경에 실패했습니다. 다시 시도하세요.',
-			'sidebar.messages.changeWorkspaceError' => '작업 영역 변경 중 오류가 발생했습니다. 다시 시도하세요.',
 			'sidebar.messages.bulkDeleteSessionsFailed' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, one: '${count}개 세션을 삭제하지 못했습니다. 다시 시도하세요.', other: '${count}개 세션을 삭제하지 못했습니다. 다시 시도하세요.', ), 
 			'sidebar.version.updateAvailable' => '업데이트 가능',
 			'sidebar.version.restartRequired' => '업데이트가 설치됨 — 적용하려면 서버를 재시작하세요',
@@ -8830,6 +10755,12 @@ extension on TranslationsKo {
 			'sidebar.search.runningPlaceholder' => '실행 중인 세션 검색...',
 			'sidebar.search.matches' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, one: '${count}개 일치', other: '${count}개 일치', ), 
 			'sidebar.search.projectsScanned' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, one: '프로젝트 ${count}개 검색됨', other: '프로젝트 ${count}개 검색됨', ), 
+			'sidebar.recent.title' => '최근 대화',
+			'sidebar.recent.emptyTitle' => '아직 대화 없음',
+			'sidebar.recent.emptyDescription' => '가장 최근에 업데이트된 대화가 여기에 표시됩니다.',
+			'sidebar.recent.loadFailed' => '최근 대화를 불러올 수 없습니다',
+			'sidebar.recent.loadMore' => '이전 대화 불러오기',
+			'sidebar.recent.loadingMore' => '더 불러오는 중...',
 			'sidebar.deleteConfirmation.deleteProject' => '프로젝트 제거',
 			'sidebar.deleteConfirmation.deleteSession' => '세션 삭제',
 			'sidebar.deleteConfirmation.confirmDelete' => '이 프로젝트를 어떻게 하시겠습니까:',
@@ -8853,23 +10784,6 @@ extension on TranslationsKo {
 			'sidebar.zones.thisWeek' => '이번 주',
 			'sidebar.zones.showMore' => ({required Object count}) => '${count}개 더 보기',
 			'sidebar.zones.showLess' => '간단히 보기',
-			'sidebar.panel.open' => '패널',
-			'sidebar.panel.newChat' => '새 채팅',
-			'sidebar.panel.navigation' => '탐색',
-			'sidebar.panel.sessions' => '세션',
-			'sidebar.workspace.title' => '세션 작업 영역 변경',
-			'sidebar.workspace.description' => '에이전트가 이 디렉터리에서 다음 턴을 실행합니다. 기존 세션 기록은 유지됩니다.',
-			'sidebar.workspace.pathLabel' => '작업 영역 경로',
-			'sidebar.workspace.pathRequired' => '작업 영역 경로가 필요합니다.',
-			'sidebar.workspace.submit' => '작업 영역 변경',
-			'sidebar.workspace.saving' => '변경 중…',
-			'sidebar.workspace.changeAction' => '작업 영역 변경',
-			'sidebar.recent.title' => '최근 대화',
-			'sidebar.recent.emptyTitle' => '아직 대화 없음',
-			'sidebar.recent.emptyDescription' => '가장 최근에 업데이트된 대화가 여기에 표시됩니다.',
-			'sidebar.recent.loadFailed' => '최근 대화를 불러올 수 없습니다',
-			'sidebar.recent.loadMore' => '이전 대화 불러오기',
-			'sidebar.recent.loadingMore' => '더 불러오는 중...',
 			'sidebar.tabs.board' => '에이전트 보드',
 			'sidebar.tabs.files' => '파일',
 			'sidebar.tabs.git' => '소스 컨트롤',
@@ -8966,11 +10880,11 @@ extension on TranslationsKo {
 			'tasks.buttons.prdsAvailable' => ({required Object count}) => 'PRD ${count}개 사용 가능',
 			'tasks.prd.modified' => ({required Object date}) => '수정됨: ${date}',
 			'tasks.prd.editorTitle' => ({required Object name}) => 'PRD — ${name}',
-			'tasks.prd.fileExistsMessage' => ({required Object name}) => '"${name}"이라는 PRD가 이미 있습니다. 덮어쓸까요?',
-			'tasks.prd.fileExistsTitle' => '파일이 이미 존재합니다',
 			'tasks.prd.newFile' => '새 파일',
-			'tasks.prd.parse' => 'PRD 분석',
 			'tasks.prd.template' => '템플릿',
+			'tasks.prd.parse' => 'PRD 분석',
+			'tasks.prd.fileExistsTitle' => '파일이 이미 존재합니다',
+			'tasks.prd.fileExistsMessage' => ({required Object name}) => '"${name}"이라는 PRD가 이미 있습니다. 덮어쓸까요?',
 			'tasks.prd.fileNameHint' => '파일 이름 (예: prd.txt)',
 			'tasks.prd.saved' => 'PRD 저장됨',
 			'tasks.prd.tasksGenerated' => 'PRD에서 작업이 생성되었습니다',
@@ -9004,6 +10918,8 @@ extension on TranslationsKo {
 			'tasks.board.card.delete' => '삭제',
 			'tasks.board.card.openSession' => '세션 열기',
 			'tasks.board.card.pullRequest' => '풀 리퀘스트',
+			'tasks.board.card.edit' => '편집',
+			'tasks.board.card.moveTo' => '이동',
 			'tasks.board.dialog.createTitle' => '새 카드',
 			'tasks.board.dialog.editTitle' => '카드 편집',
 			'tasks.board.dialog.titleLabel' => '제목',
@@ -9026,6 +10942,16 @@ extension on TranslationsKo {
 			'tasks.board.deleteConfirm.description' => ({required Object cardTitle}) => '"${cardTitle}"이(가) 영구적으로 삭제됩니다.',
 			'tasks.board.deleteConfirm.title' => '카드를 삭제하시겠습니까?',
 			'tasks.board.project' => '프로젝트',
+			'tasks.board.assignee.label' => '담당자',
+			'tasks.board.assignee.all' => '모든 담당자',
+			'tasks.board.assignee.unassigned' => '미지정',
+			'tasks.board.presence.online' => ({required Object count}) => '${count}명 온라인',
+			'tasks.board.activity.title' => '활동',
+			'tasks.board.activity.empty' => '아직 활동이 없습니다',
+			'tasks.board.comments.label' => '댓글',
+			'tasks.board.comments.placeholder' => '댓글 작성…',
+			'tasks.board.comments.send' => '보내기',
+			'tasks.board.comments.unknownAuthor' => '알 수 없는 사용자',
 			'tasks.card.dependsOnList' => ({required Object tasks}) => '종속: ${tasks}',
 			'tasks.card.dependsOnTooltip' => ({required Object id}) => '작업 ${id}',
 			'tasks.card.highPriority' => '높은 우선순위',
@@ -9062,8 +10988,6 @@ extension on TranslationsKo {
 			'tasks.nextTask.feature3' => '- 일상 작업을 위한 칸반 및 목록 보기.',
 			'tasks.nextTask.hideDetails' => '세부 정보 숨기기',
 			'tasks.nextTask.initialize' => '초기화',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.nextTask.noPending' => '대기 중인 작업 없음',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI가 구성되지 않았습니다',
 			'tasks.nextTask.review' => '검토',
@@ -9096,11 +11020,24 @@ extension on TranslationsKo {
 			'tasks.taskDetail.testStrategy' => '테스트 전략',
 			'tasks.taskDetail.titleRequired' => '제목은 필수입니다',
 			'tasks.taskDetail.updateFailed' => '작업 업데이트 실패',
-			'tasks.taskDetail.deleteConfirmMessage' => ({required Object id}) => '작업 #${id}이(가) 제거됩니다. 되돌릴 수 없습니다.',
 			'tasks.taskDetail.notFound' => '작업을 찾을 수 없습니다',
 			'tasks.taskDetail.subtasks' => '하위 작업',
+			'tasks.taskDetail.deleteConfirmMessage' => ({required Object id}) => '작업 #${id}이(가) 제거됩니다. 되돌릴 수 없습니다.',
 			'tasks.taskDetail.idCopied' => '작업 ID 복사됨',
 			'tasks.toasts.statusInProgress' => ({required Object id}) => '작업 ${id}이(가) 진행 중으로 설정되었습니다',
+			'tasks.taskmaster.noProjectHint' => '먼저 프로젝트를 추가한 후 작업을 만드세요.',
+			'tasks.taskmaster.sort.statusAz' => '상태 (A-Z)',
+			'tasks.taskmaster.sort.statusZa' => '상태 (Z-A)',
+			_ => null,
+		} ?? switch (path) {
+			'tasks.taskmaster.installedVersion' => ({required Object version}) => '설치됨: ${version}',
+			'tasks.taskmaster.initFailed' => 'TaskMaster를 초기화하지 못했습니다',
+			'tasks.taskmaster.prd.fileNameRequired' => 'PRD 파일 이름을 입력하세요.',
+			'tasks.taskmaster.prd.contentRequired' => '저장하기 전에 내용을 추가하세요.',
+			'tasks.taskmaster.prd.overwrite' => '덮어쓰기',
+			'tasks.taskmaster.prd.contentHint' => '# 제품 요구사항 문서…',
+			'tasks.taskmaster.detail.dependenciesLabel' => '종속성 (쉼표로 구분된 ID)',
+			'tasks.taskmaster.untitledTask' => '제목 없는 작업',
 			'knowledge.title' => '지식',
 			'knowledge.tabs.dashboard' => '대시보드',
 			'knowledge.tabs.memories' => '메모리',
@@ -9176,216 +11113,264 @@ extension on TranslationsKo {
 			'knowledge.tags.all' => '모든 태그',
 			'knowledge.tags.manage' => '태그 관리',
 			'knowledge.tags.none' => '태그가 없습니다.',
-			'knowledge.contextBudget.tokens' => ({required Object tokens, required Object budget}) => '~${tokens} / ${budget} 토큰',
+			'knowledge.graph.truncated' => '잘림',
+			'knowledge.importAll.title' => 'DDAgent로 모두 가져오기',
+			'knowledge.importAll.projectsScanned' => ({required Object count}) => '검사한 프로젝트: ${count}',
+			'knowledge.importAll.skillsFound' => ({required Object found, required Object newSkills}) => '발견한 에이전트 스킬: ${found} (신규: ${newSkills})',
+			'knowledge.importAll.rulesSummary' => ({required Object total, required Object duplicates}) => '규칙: ${total} · 중복 그룹: ${duplicates}',
+			'knowledge.importAll.mergeDuplicates' => '중복 항목 병합',
+			'knowledge.importAll.mergeDuplicatesHint' => 'DDAgent 내 중복 행을 병합합니다 (파일 아님)',
+			'knowledge.importAll.action' => '모두 가져오기',
+			'knowledge.importAll.readOnlyNotice' => '에이전트에는 읽기 전용입니다: DDAgent 자체 데이터베이스로 가져오며 CLI 파일이나 설정을 수정하거나 삭제하지 않습니다. 아래 옵션은 DDAgent 데이터만 변경합니다.',
+			'knowledge.importAll.dryRunNote' => '시험 실행 — 아직 아무것도 기록되지 않았습니다.',
+			'knowledge.importAll.importedNote' => '가져왔습니다.',
+			'knowledge.importAll.result' => ({required Object rules, required Object newSkills, required Object removed, required Object promoted}) => '가져오기 완료 — 규칙: ${rules}, 새 스킬: ${newSkills}, 제거됨: ${removed}, 승격됨: ${promoted}',
+			'knowledge.importAll.description' => '모든 프로젝트를 스캔하고 에이전트의 스킬을 지식 베이스로 가져옵니다. 에이전트에는 읽기 전용이며 CLI에서는 아무것도 변경되지 않습니다.',
+			'knowledge.migrate.title' => '기존 규칙 마이그레이션',
+			'knowledge.migrate.scanned' => ({required Object count}) => '프로젝트 ${count}개를 검사했습니다.',
+			'knowledge.migrate.rulesSummary' => ({required Object total, required Object critical}) => '규칙: 총 ${total}개, 치명적 ${critical}개.',
+			'knowledge.migrate.duplicates' => ({required Object count}) => '프로젝트 간 중복 그룹: ${count}',
+			'knowledge.migrate.removedPromoted' => ({required Object removed, required Object promoted}) => '제거: ${removed}, 승격: ${promoted}',
+			'knowledge.migrate.mergeDuplicates' => '중복 병합',
+			'knowledge.migrate.dryRunNote' => '시험 실행 — 아직 아무것도 변경되지 않았습니다.',
+			'knowledge.migrate.applied' => '적용되었습니다.',
+			'knowledge.importSkills.title' => '에이전트 스킬 가져오기',
+			'knowledge.importSkills.found' => ({required Object count}) => '에이전트 전체에서 스킬 ${count}개를 찾았습니다.',
+			'knowledge.importSkills.summary' => ({required Object imported, required Object skipped}) => '신규: ${imported} · 건너뜀: ${skipped}',
+			'knowledge.importSkills.dryRunHint' => '에이전트에 포함된 전역/기본 스킬(사용자, 시스템, 플러그인)을 지식 스킬로 가져옵니다. 시험 실행 — 아직 아무것도 가져오지 않았습니다.',
+			'knowledge.importSkills.importedNote' => '지식 베이스로 가져왔습니다.',
 			'knowledge.critical.make' => '치명적으로 표시',
 			'knowledge.critical.makeAll' => '모든 규칙을 치명적으로 표시',
 			'knowledge.critical.makeAllHint' => '주입되는 컨텍스트 예산에 추가합니다',
-			'knowledge.errors.importFailed' => ({required Object error}) => '가져오기 실패: ${error}',
-			'knowledge.errors.migrationFailed' => ({required Object error}) => '마이그레이션 실패: ${error}',
-			'knowledge.graph.truncated' => '잘림',
-			'knowledge.importAll.action' => '모두 가져오기',
-			'knowledge.importAll.mergeDuplicates' => '중복 항목 병합',
-			'knowledge.importAll.mergeDuplicatesHint' => 'DDAgent 내 중복 행을 병합합니다 (파일 아님)',
-			'knowledge.importAll.projectsScanned' => ({required Object count}) => '검사한 프로젝트: ${count}',
-			'knowledge.importAll.rulesSummary' => ({required Object total, required Object duplicates}) => '규칙: ${total} · 중복 그룹: ${duplicates}',
-			'knowledge.importAll.skillsFound' => ({required Object found, required Object newSkills}) => '발견한 에이전트 스킬: ${found} (신규: ${newSkills})',
-			'knowledge.importAll.title' => 'DDAgent로 모두 가져오기',
-			'knowledge.importSkills.found' => ({required Object count}) => '에이전트 전체에서 스킬 ${count}개를 찾았습니다.',
-			'knowledge.importSkills.summary' => ({required Object imported, required Object skipped}) => '신규: ${imported} · 건너뜀: ${skipped}',
-			'knowledge.importSkills.title' => '에이전트 스킬 가져오기',
+			'knowledge.contextBudget.tokens' => ({required Object tokens, required Object budget}) => '~${tokens} / ${budget} 토큰',
+			'knowledge.contextBudget.title' => '규칙 컨텍스트(항상 제공)',
+			'knowledge.contextBudget.selectProject' => '프로젝트를 선택하면 중요 컨텍스트 크기를 볼 수 있습니다.',
 			'knowledge.linkOptions.memory' => ({required Object title}) => '메모리: ${title}',
-			'knowledge.linkOptions.personal' => ({required Object title}) => '개인정보: ${title}',
 			'knowledge.linkOptions.rule' => ({required Object title}) => '규칙: ${title}',
 			'knowledge.linkOptions.skill' => ({required Object name}) => '스킬: ${name}',
-			'knowledge.migrate.duplicates' => ({required Object count}) => '프로젝트 간 중복 그룹: ${count}',
-			'knowledge.migrate.mergeDuplicates' => '중복 병합',
-			'knowledge.migrate.removedPromoted' => ({required Object removed, required Object promoted}) => '제거: ${removed}, 승격: ${promoted}',
-			'knowledge.migrate.rulesSummary' => ({required Object total, required Object critical}) => '규칙: 총 ${total}개, 치명적 ${critical}개.',
-			'knowledge.migrate.scanned' => ({required Object count}) => '프로젝트 ${count}개를 검사했습니다.',
-			'knowledge.migrate.title' => '기존 규칙 마이그레이션',
-			'skills.addDialog.chooseFileTitle' => 'SKILL.md 선택',
-			'skills.addDialog.chooseFiles' => '파일 선택',
-			'skills.addDialog.chooseFolder' => '폴더 선택',
-			'skills.addDialog.chooseFolderTitle' => '스킬 폴더 선택',
-			'skills.addDialog.folderFilesMeta' => ({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, one: '${count}개 파일 · ${size}', other: '${count}개 파일 · ${size}', ), 
-			'skills.addDialog.folderUploadsNote' => '폴더 업로드는 선택한 폴더 이름을 유지하며, 단독 파일은 `SKILL.md`의 `name`을 사용합니다.',
-			'skills.addDialog.hideInstallLocation' => '설치 위치 숨기기',
-			'skills.addDialog.installSkill' => '스킬 설치',
-			'skills.addDialog.installSkills' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, one: '스킬 ${count}개 설치', other: '스킬 ${count}개 설치', ), 
-			'skills.addDialog.markdownFileMeta' => ({required Object size}) => '마크다운 파일 · ${size}',
-			'skills.addDialog.pickHint' => '폴더에는 스크립트, 참조 자료, 에셋을 포함할 수 있습니다.',
-			'skills.addDialog.pickTitle' => '스킬 폴더 또는 SKILL.md 선택',
-			'skills.addDialog.readyToInstall' => '설치 준비 완료',
-			'skills.addDialog.removeQueued' => ({required Object name}) => '${name} 제거',
-			'skills.addDialog.title' => ({required Object provider}) => '${provider} 스킬 추가',
-			'skills.addDialog.uploadHint' => 'SKILL.md 파일 또는 전체 스킬 폴더를 업로드하세요.',
-			'skills.addDialog.whereWillThisInstall' => '어디에 설치되나요?',
-			'skills.deleteSkill' => ({required Object name}) => '${name} 삭제',
-			'skills.empty.noGlobalSkills' => '아직 발견된 전역 스킬이 없습니다',
-			'skills.empty.noGlobalSkillsDescription' => '위에서 전역 스킬을 추가하면 모든 프로젝트에서 사용할 수 있습니다.',
-			'skills.empty.noMatchingSkills' => '일치하는 스킬 없음',
-			'skills.empty.noMatchingSkillsDescription' => '다른 명령어, 이름, 범위, 프로젝트 또는 소스 경로를 시도해보세요.',
-			'skills.empty.noProjects' => '사용 가능한 프로젝트 없음',
-			'skills.empty.noProjectsDescription' => '스킬을 살펴보려면 프로젝트 또는 작업 영역을 추가하세요.',
-			'skills.empty.noSkillsInProject' => '이 프로젝트에 스킬이 없습니다',
-			'skills.empty.noSkillsInProjectDescription' => '선택한 프로젝트에 .claude/skills, .cursor/skills 또는 .agents/skills 폴더를 만드세요.',
-			'skills.errors.addMarkdownFirst' => '먼저 마크다운 파일을 하나 이상 추가하세요.',
-			'skills.errors.couldNotReadSkillFile' => ({required Object name}) => '${name}에서 SKILL.md를 읽을 수 없습니다.',
-			'skills.errors.dropMarkdownOrFolder' => '마크다운 파일을 하나 이상 또는 SKILL.md가 포함된 폴더를 놓으세요.',
-			'skills.errors.folderFileLimit' => ({required Object count}) => '스킬 폴더에는 최대 ${count}개 파일을 포함할 수 있습니다.',
-			'skills.errors.folderReadFailed' => '스킬 폴더를 읽지 못했습니다',
-			'skills.errors.folderSizeLimit' => '선택한 스킬 폴더의 총 용량은 30MB 미만이어야 합니다.',
-			'skills.errors.importFailed' => '스킬 가져오기 실패',
-			'skills.errors.missingSkillFile' => '선택한 폴더에 SKILL.md 파일이 없습니다.',
-			'skills.moveDialog.moveToGlobal' => '전역으로 이동',
-			'skills.moveDialog.moveToProject' => '프로젝트로 이동',
-			'skills.moveDialog.toGlobalHint' => '이 스킬을 전역 스킬 디렉터리로 이동하여 모든 프로젝트에서 사용할 수 있게 합니다.',
-			'skills.moveDialog.toProjectHint' => '이 스킬을 소유할 프로젝트를 선택하세요. 제공자의 전역 스킬 디렉터리에서 이동됩니다.',
-			'skills.moveSkill' => ({required Object name}) => '${name} 이동',
-			'skills.projectLabel' => '프로젝트',
-			'skills.scopes.admin' => '관리자',
-			'skills.scopes.plugin' => '플러그인',
-			'skills.scopes.project' => '프로젝트',
-			'skills.scopes.repo' => '리포지토리',
-			'skills.scopes.system' => '시스템',
-			'skills.scopes.user' => '사용자',
-			'skills.screen.addSkill' => '스킬 추가',
-			'skills.screen.clearSearch' => '스킬 검색 지우기',
-			'skills.screen.deleteDescription' => ({required Object provider, required Object directory}) => '${provider}의 관리형 스킬 디렉터리에서 ${directory} 디렉터리를 제거합니다. 되돌릴 수 없습니다.',
-			'skills.screen.deleteTitle' => ({required Object name}) => '${name}을(를) 삭제할까요?',
-			'skills.screen.loadingSkills' => ({required Object provider}) => '${provider} 스킬 로드 중…',
-			'skills.screen.manageDescription' => ({required Object provider}) => '로컬 파일, 전체 폴더 및 프로젝트 인식 위치에서 ${provider} 스킬을 관리합니다.',
-			'skills.screen.noDescription' => '스킬 프런트 매터에 설명이 없습니다.',
-			'skills.screen.pluginBadge' => ({required Object name}) => '플러그인: ${name}',
-			'skills.screen.projectBadge' => ({required Object name}) => '프로젝트: ${name}',
-			'skills.screen.savedSuccessfully' => '스킬이 저장되었습니다.',
-			'skills.screen.scanningProjectSkills' => '프로젝트 스킬 검사 중...',
-			'skills.screen.searchHint' => '스킬 검색...',
-			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, one: 'SKILL ${count}개', other: 'SKILL ${count}개', ), 
-			'skills.screen.sourceLabel' => '소스',
-			'mcp.form.fields.bearerTokenEnvVar' => 'Bearer 토큰 환경 변수',
-			'mcp.form.fields.envVarNames' => '환경 변수 이름',
-			'mcp.form.fields.workingDirectory' => '작업 디렉터리',
-			'mcp.form.scope.claudeLocal' => 'Claude 로컬',
-			'mcp.form.scope.description.local' => '선택한 프로젝트의 Claude 사용자 설정에 저장됩니다',
-			'mcp.form.scope.description.project' => '선택한 프로젝트 작업 영역에 저장됩니다',
-			'mcp.form.scope.description.projectGlobal' => '모든 제공자의 선택한 프로젝트 작업 영역에 기록합니다',
-			'mcp.form.scope.description.user' => '이 컴퓨터의 모든 프로젝트에서 사용할 수 있습니다',
-			'mcp.form.scope.description.userGlobal' => '각 제공자의 사용자 설정에 기록되며 이 컴퓨터의 모든 프로젝트에서 사용할 수 있습니다',
-			'mcp.form.scope.projectAllProviders' => '프로젝트 (모든 제공자)',
-			'mcp.form.scope.userAllProviders' => '사용자 (모든 제공자)',
-			'mcp.form.submitTo' => ({required Object provider}) => '${provider}에 서버 추가',
-			'mcp.form.validation.unsupportedGlobal' => ({required Object type}) => 'MCP 서버 추가는 모든 제공자에서 stdio와 http만 지원하며 ${type}은(는) 지원하지 않습니다.',
-			'mcp.form.validation.unsupportedProvider' => ({required Object provider, required Object type}) => '${provider}는 ${type} MCP 서버를 지원하지 않습니다',
-			'mcp.install.button' => '설치',
-			'mcp.install.cardDescription' => 'MCP를 통해 에이전트에게 지식 베이스와 DDAgent 도구를 제공하세요 — 에이전트를 선택하거나 전체에 설치하세요.',
+			'knowledge.linkOptions.personal' => ({required Object title}) => '개인정보: ${title}',
+			'knowledge.errors.importFailed' => ({required Object error}) => '가져오기 실패: ${error}',
+			'knowledge.errors.migrationFailed' => ({required Object error}) => '마이그레이션 실패: ${error}',
+			'knowledge.entityTypes.memory' => '메모리',
+			'knowledge.entityTypes.rule' => '규칙',
+			'knowledge.entityTypes.skill' => '스킬',
+			'knowledge.entityTypes.personal' => '개인',
+			'knowledge.entityTypes.project' => '프로젝트',
+			'knowledge.entityTypes.tag' => '태그',
+			'browser.dialogTitle' => '에이전트 브라우저',
+			'browser.viewError' => '브라우저 뷰 오류',
+			'browser.web' => '웹',
+			'collab.team' => '팀',
+			'collab.invite' => '초대',
+			'collab.inviteTeammate' => '팀원 초대',
+			'collab.shareTokenHint' => '이 초대 토큰을 공유하세요 — 한 번만 표시되며 72시간 후 만료됩니다:',
+			'collab.createInvite' => '초대 만들기',
+			'collab.copyToken' => '토큰 복사',
+			'collab.roles.member' => '멤버',
+			'collab.roles.viewer' => '뷰어',
+			'collab.viewing.session' => '세션',
+			'collab.viewing.card' => '카드',
+			'collab.viewing.board' => '보드',
+			'fileTree.uploadTo' => '업로드 대상',
+			'fileTree.uploadHere' => '여기에 업로드',
+			'fileTree.browseServerFilesystem' => '서버 파일 시스템 찾아보기',
+			'fileTree.noFiles' => '파일 없음',
+			'fileTree.copyContents' => '내용 복사',
+			'fileTree.chooseFolder' => '폴더 선택',
+			'fileTree.search.hint' => '이름 필터링 / Enter로 내용 검색',
+			'fileTree.search.prompt' => '검색어를 입력하고 Enter를 누르세요',
+			'fileTree.search.noMatches' => '일치하는 항목 없음',
+			'fileTree.search.resultsTruncated' => '결과가 잘렸습니다',
+			'fileTree.titles.rename' => ({required Object name}) => '${name} 이름 변경',
+			'fileTree.titles.delete' => ({required Object name}) => '${name} 삭제',
+			'fileTree.titles.download' => ({required Object name}) => '${name} 다운로드',
+			'fileTree.uploadedCount' => ({required Object count}) => '${count}개 파일 업로드됨',
+			'fileTree.newName' => '새 이름',
+			'fileTree.notRegisteredProject' => ({required Object path}) => '등록되지 않은 프로젝트: ${path}',
+			'fileTree.showGitignoredFiles' => 'Git 무시 파일 표시',
+			'fileTree.hideGitignoredFiles' => 'Git 무시 파일 숨기기',
+			'fileTree.downloadUnsupportedOnWeb' => '웹에서는 다운로드를 지원하지 않습니다',
+			'fileTree.saveToPath' => '경로에 저장',
+			'fileTree.savedTo' => ({required Object path}) => '${path}에 저장됨',
+			'fileTree.relative.now' => '방금',
+			'fileTree.relative.minutes' => ({required Object n}) => '${n}분',
+			'fileTree.relative.hours' => ({required Object n}) => '${n}시간',
+			'fileTree.relative.days' => ({required Object n}) => '${n}일',
+			'fileTree.projectRoot' => '(프로젝트 루트)',
+			'fileTree.uploadLimitCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, other: '한 번에 최대 ${count}개 파일까지 업로드할 수 있습니다.', ), 
+			'fileTree.fileTooLarge' => ({required Object name}) => '${name}이(가) 200MB보다 큽니다.',
+			'fileTree.deleteFolderConfirm' => ({required Object path}) => '"${path}" 폴더를 삭제할까요? 이 작업은 되돌릴 수 없습니다.',
+			'fileTree.deleteFileConfirm' => ({required Object path}) => '"${path}" 파일을 삭제할까요? 이 작업은 되돌릴 수 없습니다.',
+			'git.checkpoints.title' => '체크포인트',
+			'git.checkpoints.restoreTitle' => '체크포인트 복원',
+			'git.checkpoints.restoreMessage' => '작업 트리를 이 체크포인트로 재설정할까요? 현재 변경 사항이 대체됩니다.',
+			'git.checkpoints.restored' => '체크포인트가 복원되었습니다',
+			'git.checkpoints.labelHint' => '체크포인트 레이블 (선택사항)',
+			'git.checkpoints.empty' => '아직 체크포인트 없음',
+			'git.checkpoints.create' => '새로 만들기',
+			'git.stagedChanges' => '스테이징된 변경 사항',
+			'git.statusStaged' => '스테이징됨',
+			'git.switchBranch' => '브랜치 전환',
+			'git.unifiedDiff' => '통합 diff',
+			'git.splitDiff' => '분할 diff',
+			'git.noDiff' => '사용 가능한 diff 없음',
+			'git.largeDiff' => '대용량 diff 미리보기: 탭 응답성을 유지하기 위해 렌더링이 제한됩니다.',
+			'git.loadDiffFailed' => ({required Object error}) => 'diff를 불러오지 못했습니다: ${error}',
+			'git.hunkStage' => '+ 헝크',
+			'git.hunkUnstage' => '− 헝크',
+			'git.stageHunk' => '헝크 스테이징',
+			'git.unstageHunk' => '헝크 스테이징 해제',
+			'git.deleteFile' => '파일 삭제',
+			'git.commitMessage' => '커밋 메시지',
+			'git.aiButton' => '✦ AI',
+			'git.commitCreated' => '커밋이 생성되었습니다',
+			'git.noBranch' => '브랜치 없음',
+			'git.selectProject' => '프로젝트 선택',
+			'git.branchSections.local' => '로컬',
+			'git.branchSections.remote' => '원격',
+			'kanban.card.untitled' => '제목 없음',
+			'kanban.comments.empty' => '아직 댓글 없음',
+			'kanban.comments.add' => '댓글 추가',
+			'kanban.dialog.saving' => '저장 중…',
+			'kanban.details.title' => '카드 상세',
+			'kanban.details.status' => ({required Object status}) => '상태: ${status}',
+			'kanban.empty.noProject' => '선택한 프로젝트 없음',
+			'kanban.saveFailed' => '카드를 저장하지 못했습니다',
+			'kanban.time.now' => '방금',
+			'kanban.time.minutesAgo' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, one: '1분 전', other: '${count}분 전', ), 
+			'kanban.time.hoursAgo' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, one: '1시간 전', other: '${count}시간 전', ), 
+			'kanban.time.daysAgo' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, one: '1일 전', other: '${count}일 전', ), 
+			'mcp.install.title' => 'DDAgent MCP 서버 설치',
 			'mcp.install.description' => '선택한 에이전트가 MCP를 통해 DDAgent 지식 베이스와 도구를 사용할 수 있게 합니다.',
-			'mcp.install.errorFallback' => '오류',
-			'mcp.install.failed' => ({required Object error}) => '설치 실패: ${error}',
-			'mcp.install.installForAll' => '전체에 설치',
+			'mcp.install.cardDescription' => 'MCP를 통해 에이전트에게 지식 베이스와 DDAgent 도구를 제공하세요 — 에이전트를 선택하거나 전체에 설치하세요.',
 			'mcp.install.installSelected' => '선택 항목에 설치',
+			'mcp.install.installForAll' => '전체에 설치',
+			'mcp.install.button' => '설치',
+			'mcp.install.failed' => ({required Object error}) => '설치 실패: ${error}',
 			'mcp.install.installedCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, one: '에이전트 ${count}개에 설치했습니다.', other: '에이전트 ${count}개에 설치했습니다.', ), 
 			'mcp.install.partialFailure' => ({required Object count, required Object failed}) => '${count}개에 설치됨, 실패: ${failed}',
-			'mcp.install.title' => 'DDAgent MCP 서버 설치',
-			'mcp.servers.addGlobalDescription' => '이 MCP 서버를 모든 제공자(Claude, Cursor, Codex, OpenCode, Devin)에 추가합니다. 동일한 설정이 모든 제공자에서 작동해야 하므로 stdio와 HTTP 전송만 지원됩니다.',
-			'mcp.servers.addGlobalMenuDescription' => '전역 MCP 서버 추가는 하나의 공통 stdio 또는 HTTP 서버를 Claude, Cursor, Codex, OpenCode, Devin에 기록합니다.',
-			'mcp.servers.addGlobalTitle' => '전역 MCP 서버 추가',
-			'mcp.servers.addProviderDescription' => ({required Object provider}) => '${provider} MCP 서버 추가는 ${provider}만 변경합니다.',
-			'mcp.servers.addProviderTitle' => ({required Object provider}) => '${provider} MCP 서버 추가',
-			'mcp.servers.config.cwd' => '작업 디렉터리',
-			'mcp.servers.config.envVars' => '환경 변수',
-			'mcp.servers.descriptionGeneric' => ({required Object provider}) => 'Model Context Protocol 서버는 ${provider}에 추가 도구와 데이터 소스를 제공합니다',
+			'mcp.install.errorFallback' => '오류',
 			'mcp.servers.loading' => 'MCP 서버 로드 중...',
 			'mcp.servers.refreshingScopes' => '프로젝트 범위 새로 고치는 중...',
-			'mcp.team.cta' => 'DDAgent Pro에서 사용 가능',
-			'mcp.team.description' => '팀 전체에서 MCP 서버 설정을 공유하세요. 모든 사람이 자동으로 동기화됩니다.',
+			'mcp.servers.descriptionGeneric' => ({required Object provider}) => 'Model Context Protocol 서버는 ${provider}에 추가 도구와 데이터 소스를 제공합니다',
+			'mcp.servers.addGlobalTitle' => '전역 MCP 서버 추가',
+			'mcp.servers.addGlobalDescription' => '이 MCP 서버를 모든 제공자(Claude, Cursor, Codex, OpenCode, Devin)에 추가합니다. 동일한 설정이 모든 제공자에서 작동해야 하므로 stdio와 HTTP 전송만 지원됩니다.',
+			'mcp.servers.addGlobalMenuDescription' => '전역 MCP 서버 추가는 하나의 공통 stdio 또는 HTTP 서버를 Claude, Cursor, Codex, OpenCode, Devin에 기록합니다.',
+			'mcp.servers.addProviderTitle' => ({required Object provider}) => '${provider} MCP 서버 추가',
+			'mcp.servers.addProviderDescription' => ({required Object provider}) => '${provider} MCP 서버 추가는 ${provider}만 변경합니다.',
+			'mcp.servers.config.cwd' => '작업 디렉터리',
+			'mcp.servers.config.envVars' => '환경 변수',
+			'mcp.servers.selectProjectRequired' => '프로젝트 범위 MCP 서버에 사용할 프로젝트를 선택하세요',
+			'mcp.servers.globalScopeUnsupported' => '모든 제공자에 MCP 서버를 추가할 때는 사용자 또는 프로젝트 범위만 지원됩니다.',
+			'mcp.servers.globalAddFailed' => ({required Object details}) => '모든 제공자에 MCP 서버를 추가하지 못했습니다. ${details}',
+			'mcp.servers.scopeProject' => '프로젝트',
 			'mcp.team.title' => '팀 MCP 설정',
+			'mcp.team.description' => '팀 전체에서 MCP 서버 설정을 공유하세요. 모든 사람이 자동으로 동기화됩니다.',
+			'mcp.team.cta' => 'DDAgent Pro에서 사용 가능',
 			'mcp.tokens.scopeWrite' => '쓰기',
-			'terminal.actions.clearOutput' => '출력 지우기',
-			'terminal.actions.connect' => '연결',
-			'terminal.actions.newShell' => '새 Shell',
-			'terminal.actions.newTab' => '새 터미널 탭',
-			'terminal.actions.providerLogin' => '제공자 로그인',
-			'terminal.actions.restartSession' => '세션 재시작',
-			'terminal.authUrl.openInBrowser' => '브라우저에서 열기',
-			'terminal.errors.couldNotOpenLink' => ({required Object url}) => '링크를 열 수 없습니다: ${url}',
-			'terminal.fileLink.detected' => ({required Object path}) => '파일 감지됨: ${path}',
-			'terminal.paste.hint' => 'Ctrl+V / 마우스 오른쪽 클릭 → 붙여넣기',
-			'terminal.paste.title' => '터미널에 붙여넣기',
-			'terminal.shortcuts.eof' => 'EOF',
-			'terminal.shortcuts.hide' => '단축키 표시줄 숨기기',
-			'terminal.shortcuts.interrupt' => '중단 (SIGINT)',
-			'terminal.shortcuts.suspend' => '일시 중단 (SIGTSTP)',
-			'terminal.shortcuts.showTooltip' => '단축키 표시',
-			'terminal.shortcuts.hideTooltip' => '단축키 숨기기',
-			'terminal.tabs.antigravityCli' => 'Antigravity CLI',
-			'terminal.tabs.claudeCli' => 'Claude CLI',
-			'terminal.tabs.commandCodeCli' => 'Command Code CLI',
-			'terminal.tabs.cursorCli' => 'Cursor CLI',
-			'terminal.tabs.devinCli' => 'Devin CLI',
-			'terminal.tabs.loginTitle' => ({required Object provider}) => '로그인: ${provider}',
-			'terminal.tabs.opencodeCli' => 'OpenCode CLI',
-			'terminal.tabs.plainShell' => '일반 Shell',
-			'terminal.tabs.shellName' => ({required Object index}) => 'Shell ${index}',
-			'worktrees.branchHint' => '새 브랜치 이름 (예: feature/login)',
-			'worktrees.branchingOff' => ({required Object branch}) => '${branch}에서 분기',
-			'worktrees.cleanupDescription' => '병합되면 worktree를 제거하고 브랜치 삭제',
-			'worktrees.created' => 'Worktree 생성됨',
-			'worktrees.deleteBranchLabel' => '브랜치도 삭제',
-			'worktrees.dirtyWarning' => ({required Object count}) => '경고: 이 worktree에는 손실될 커밋되지 않은 변경 사항이 ${count}개 있습니다.',
-			'worktrees.emptyDescription' => '기능 작업이나 에이전트 실행을 격리하려면 worktree를 생성하세요.',
-			'worktrees.emptyTitle' => 'worktree를 찾을 수 없습니다',
-			'worktrees.forceRemoveLabel' => '강제 제거 (변경 사항 폐기)',
-			'worktrees.headDetachedAt' => ({required Object sha}) => 'HEAD 분리됨 @ ${sha}',
-			'worktrees.mainBadge' => 'main',
-			'worktrees.mergeDescription' => ({required Object branch}) => '변경 사항을 ${branch}에 병합합니다.',
-			'worktrees.mergeTitle' => ({required Object branch}) => '${branch} 병합',
-			'worktrees.merged' => ({required Object branch}) => 'worktree가 ${branch}에 병합됨',
-			'worktrees.opened' => ({required Object branch}) => 'worktree 열림: ${branch}',
-			'worktrees.portHint' => '실행 포트 (선택사항, 예: 3000)',
-			'worktrees.removeDescription' => 'worktree 폴더가 삭제됩니다. 연결된 프로젝트는 보관됩니다.',
-			'worktrees.removeTitle' => ({required Object branch}) => 'worktree ${branch}을(를) 제거할까요?',
-			'worktrees.removed' => 'worktree 제거됨',
-			'worktrees.runButton' => '실행',
-			'worktrees.runHint' => '실행 명령어 (예: npm run dev)',
-			'worktrees.runRunning' => '실행 중',
-			'worktrees.runRunningWithPort' => ({required Object port}) => '실행 중 :${port}',
-			'worktrees.scripts' => '스크립트',
-			'worktrees.scriptsSaved' => '스크립트 설정이 저장되었습니다',
-			'worktrees.serverLabel' => '서버: ',
-			'worktrees.setupHint' => '설정 명령어 (예: npm install)',
-			'worktrees.setupLabel' => '설정: ',
-			'worktrees.squashDescription' => '모든 커밋을 단일 커밋으로 결합',
-			'worktrees.stopButton' => '중지',
+			'mcp.tokens.scopeRead' => '읽기',
+			'mcp.form.submitTo' => ({required Object provider}) => '${provider}에 서버 추가',
+			'mcp.form.scope.userAllProviders' => '사용자 (모든 제공자)',
+			'mcp.form.scope.claudeLocal' => 'Claude 로컬',
+			'mcp.form.scope.projectAllProviders' => '프로젝트 (모든 제공자)',
+			'mcp.form.scope.description.userGlobal' => '각 제공자의 사용자 설정에 기록되며 이 컴퓨터의 모든 프로젝트에서 사용할 수 있습니다',
+			'mcp.form.scope.description.user' => '이 컴퓨터의 모든 프로젝트에서 사용할 수 있습니다',
+			'mcp.form.scope.description.local' => '선택한 프로젝트의 Claude 사용자 설정에 저장됩니다',
+			'mcp.form.scope.description.projectGlobal' => '모든 제공자의 선택한 프로젝트 작업 영역에 기록합니다',
+			'mcp.form.scope.description.project' => '선택한 프로젝트 작업 영역에 저장됩니다',
+			'mcp.form.fields.workingDirectory' => '작업 디렉터리',
+			'mcp.form.fields.envVarNames' => '환경 변수 이름',
+			'mcp.form.fields.bearerTokenEnvVar' => 'Bearer 토큰 환경 변수',
+			'mcp.form.validation.unsupportedGlobal' => ({required Object type}) => 'MCP 서버 추가는 모든 제공자에서 stdio와 http만 지원하며 ${type}은(는) 지원하지 않습니다.',
+			'mcp.form.validation.unsupportedProvider' => ({required Object provider, required Object type}) => '${provider}는 ${type} MCP 서버를 지원하지 않습니다',
+			'mcp.form.validation.jsonMustBeObject' => 'JSON 구성은 객체여야 합니다',
+			'notifications.deviceLabel' => 'DDAgent Flutter',
+			'notifications.errors.registrationRejected' => '서버에서 등록을 거부했습니다',
+			'notifications.errors.noResponse' => '서버에서 응답이 없습니다',
+			'notifications.androidChannel.name' => 'DDAgent 알림',
+			'notifications.androidChannel.description' => '에이전트 실행, 승인 및 오류 알림',
+			'onboarding.gitHint' => 'DDAgent 세션이 생성한 커밋에 사용됩니다.',
+			'onboarding.completeSetup' => '설정 완료',
+			'onboarding.errors.nameAndEmailRequired' => 'git 이름과 이메일이 모두 필요합니다.',
+			'onboarding.errors.invalidEmail' => '유효한 이메일 주소를 입력해주세요.',
+			'onboarding.agents.title' => 'AI 에이전트 연결',
+			'onboarding.agents.description' => '하나 이상의 AI 코딩 어시스턴트에 로그인하세요. 모두 선택사항입니다.',
+			'onboarding.agents.laterHint' => '나중에 설정에서 구성할 수 있습니다.',
+			'onboarding.mcp.title' => '에이전트를 DDAgent에 연결',
+			'onboarding.mcp.description' => '에이전트가 지식 베이스와 DDAgent 도구를 사용할 수 있도록 DDAgent MCP 서버를 설치하세요. 에이전트를 선택하거나 전체에 설치하세요.',
+			'onboarding.mcp.installSelected' => '선택 항목에 설치',
+			'onboarding.mcp.installForAll' => '전체에 설치',
+			'onboarding.mcp.laterHint' => '선택사항 — 나중에 설정 → MCP에서 설치할 수도 있습니다.',
+			'onboarding.mcp.installedOn' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, one: '에이전트 ${count}개에 설치했습니다.', other: '에이전트 ${count}개에 설치했습니다.', ), 
+			'onboarding.mcp.installedWithFailures' => ({required Object installedCount, required Object failed}) => '${installedCount}개에 설치됨, 실패: ${failed}',
+			'projects.cloneRepository' => '저장소 Clone',
+			'projects.repositoryCloned' => '저장소 Clone 완료',
+			'projects.clone' => '복제',
+			'projects.cloneFinished' => 'Clone 완료. 프로젝트 목록을 새로 고치는 중…',
+			'projects.cloneFailed' => 'Clone 실패',
+			'projects.repoUrlPlaceholder' => 'https://github.com/org/repo.git',
+			'projects.destinationPath' => '대상 경로',
+			'projects.destinationPathRequired' => '대상 경로는 필수입니다',
+			'projects.repositoryUrlRequired' => '저장소 URL은 필수입니다',
+			'projects.githubTokenOptional' => 'GitHub 토큰 (선택사항)',
+			'projects.archive' => '보관',
+			'projects.restore' => '복원',
+			'projects.deletePermanently' => '영구 삭제',
+			'projects.deleteProjectTitle' => '프로젝트를 삭제할까요?',
+			'projects.deleteProjectMessage' => ({required Object name}) => '모든 세션과 저장된 기록(JSONL 삭제)을 포함하여 "${name}"을(를) 영구적으로 제거합니다. 되돌릴 수 없습니다.',
+			'projects.archivedSection' => ({required Object count}) => '보관됨 (${count})',
+			'projects.sessionCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, one: '세션 ${count}개', other: '세션 ${count}개', ), 
+			'projects.newer' => '최신순',
+			'projects.older' => '오래된순',
+			'projects.projectArchived' => '프로젝트가 보관되었습니다',
+			'projects.projectRestored' => '프로젝트가 복원되었습니다',
+			'projects.projectRenamed' => '프로젝트 이름이 변경되었습니다',
+			'projects.projectDeleted' => '프로젝트가 삭제되었습니다',
+			'projects.failedToLoadTokens' => 'GitHub 토큰을 불러오지 못했습니다',
+			'projects.displayNameOptional' => '표시 이름 (선택사항)',
+			'projects.usingStoredToken' => ({required Object name}) => '저장된 토큰 사용: ${name}',
+			'projects.unknown' => '알 수 없음',
+			'projects.project' => '프로젝트',
+			'quota.section.config' => '설정',
+			'quota.overview.tokensAndCost' => '토큰 및 비용',
 			'quota.agents.statusCount' => ({required Object status, required Object count}) => '${status} (${count})',
+			'quota.config.pollerTitle' => '폴링 및 알림',
+			'quota.config.accountRouting' => '계정 라우팅',
+			'quota.config.save' => '설정 저장',
+			'quota.chart.show' => '표시',
 			'quota.chart.hide' => '숨기기',
 			'quota.chart.noData' => '추세를 표시하기에 데이터가 부족합니다.',
 			'quota.chart.pointReadout' => ({required Object date, required Object tokens, required Object cost}) => '${date} · ${tokens} 토큰 · ${cost}',
-			'quota.chart.show' => '표시',
-			'quota.config.accountRouting' => '계정 라우팅',
-			'quota.config.pollerTitle' => '폴링 및 알림',
-			'quota.config.save' => '설정 저장',
-			'quota.overview.tokensAndCost' => '토큰 및 비용',
-			'quota.section.config' => '설정',
-			'scheduler.checking' => '확인 중…',
-			'scheduler.cronHint' => 'Cron (분 시 일 월 요일) — 예: 0 9 * * *',
-			'scheduler.deleteMessage' => ({required Object id}) => '반복 작업 ${id}을(를) 제거합니다. 기존 세션은 유지됩니다.',
-			'scheduler.deleteTitle' => '일정을 삭제할까요?',
-			'scheduler.editTitle' => '일정 편집',
+			'quota.duration.minutes' => ({required Object minutes}) => '${minutes}분',
+			'quota.duration.hoursMinutes' => ({required Object hours, required Object minutes}) => '${hours}시간 ${minutes}분',
+			'quota.duration.daysHours' => ({required Object days, required Object hours}) => '${days}일 ${hours}시간',
+			'quota.duration.now' => '방금',
 			'scheduler.newLabel' => '새로 만들기',
-			'scheduler.nextIn' => ({required Object time}) => '${time} 후 다음',
-			'scheduler.promptHint' => '에이전트에게 보낼 프롬프트',
 			'scheduler.runs' => '실행',
-			'scheduler.session' => ({required Object id}) => '세션 ${id}',
+			'scheduler.editTitle' => '일정 편집',
+			'scheduler.deleteTitle' => '일정을 삭제할까요?',
+			'scheduler.deleteMessage' => ({required Object id}) => '반복 작업 ${id}을(를) 제거합니다. 기존 세션은 유지됩니다.',
+			'scheduler.checking' => '확인 중…',
+			'scheduler.nextIn' => ({required Object time}) => '${time} 후 다음',
 			'scheduler.worktree' => 'worktree',
-			'notifications.deviceLabel' => 'DDAgent Flutter',
-			'notifications.errors.noResponse' => '서버에서 응답이 없습니다',
-			'notifications.errors.registrationRejected' => '서버에서 등록을 거부했습니다',
+			'scheduler.session' => ({required Object id}) => '세션 ${id}',
+			'scheduler.cronHint' => 'Cron (분 시 일 월 요일) — 예: 0 9 * * *',
+			'scheduler.promptHint' => '에이전트에게 보낼 프롬프트',
+			'scheduler.runStatus.fired' => '실행됨',
+			'scheduler.runStatus.skipped' => '건너뜀',
+			'scheduler.runStatus.failed' => '실패',
+			'scheduler.runStatus.completed' => '완료',
+			'scheduler.cronErrors.fieldCount' => ({required Object got}) => '필드 5개가 필요하지만 ${got}개입니다',
+			'scheduler.cronErrors.fieldError' => ({required Object index, required Object error}) => '필드 ${index}: ${error}',
+			'scheduler.cronErrors.empty' => '비어 있음',
+			'scheduler.cronErrors.invalidPart' => ({required Object part}) => '"${part}"이(가) 잘못되었습니다',
+			'scheduler.cronErrors.invalidValue' => ({required Object value}) => '잘못된 값 "${value}"',
+			'serverConnect.subtitle' => 'DDAgent 서버에 연결하세요',
+			'serverConnect.enterUrl' => '서버 URL을 입력하세요',
+			'serverConnect.connectionFailed' => ({required Object error}) => '연결 실패 (${error})',
 			'serverConnect.connect' => '연결',
 			'serverConnect.connecting' => '연결 중…',
 			'serverConnect.changeServer' => '서버 변경',
-			'serverConnect.connectionFailed' => ({required Object error}) => '연결 실패 (${error})',
-			'serverConnect.enterUrl' => '서버 URL을 입력하세요',
 			'serverConnect.local.title' => '이 기기',
 			'serverConnect.local.subtitle' => '이 컴퓨터에서 DDAgent 서버를 실행합니다',
 			'serverConnect.local.install' => '로컬 서버 설치',
@@ -9399,172 +11384,240 @@ extension on TranslationsKo {
 			'serverConnect.local.connect' => '이 서버 사용',
 			'serverConnect.local.error' => ({required Object error}) => '로컬 서버 오류: ${error}',
 			'serverConnect.local.or' => '또는 원격 서버에 연결',
-			'serverConnect.subtitle' => 'DDAgent 서버에 연결하세요',
-			'voice.apiKeySaved' => 'API 키 (저장됨, 교체하려면 입력)',
-			'voice.preview' => '미리보기',
-			'voice.saveFailed' => 'STT 설정 저장 실패',
-			'voice.settingsSaved' => '음성 입력 설정이 저장되었습니다',
-			'sharedContext.title' => '공유 노트',
-			'collab.copyToken' => '토큰 복사',
-			'collab.createInvite' => '초대 만들기',
-			'collab.invite' => '초대',
-			'collab.inviteTeammate' => '팀원 초대',
-			'collab.roles.member' => '멤버',
-			'collab.roles.viewer' => '뷰어',
-			'collab.shareTokenHint' => '이 초대 토큰을 공유하세요 — 한 번만 표시되며 72시간 후 만료됩니다:',
-			'collab.team' => '팀',
-			'browser.dialogTitle' => '에이전트 브라우저',
-			'browser.viewError' => '브라우저 뷰 오류',
-			'browser.web' => '웹',
-			'projects.archive' => '보관',
-			'projects.archivedSection' => ({required Object count}) => '보관됨 (${count})',
-			'projects.clone' => 'Clone',
-			'projects.cloneFailed' => 'Clone 실패',
-			'projects.cloneFinished' => 'Clone 완료. 프로젝트 목록을 새로 고치는 중…',
-			'projects.cloneRepository' => '저장소 Clone',
-			'projects.deletePermanently' => '영구 삭제',
-			'projects.deleteProjectMessage' => ({required Object name}) => '모든 세션과 저장된 기록(JSONL 삭제)을 포함하여 "${name}"을(를) 영구적으로 제거합니다. 되돌릴 수 없습니다.',
-			'projects.deleteProjectTitle' => '프로젝트를 삭제할까요?',
-			'projects.destinationPath' => '대상 경로',
-			'projects.destinationPathRequired' => '대상 경로는 필수입니다',
-			'projects.displayNameOptional' => '표시 이름 (선택사항)',
-			'projects.failedToLoadTokens' => 'GitHub 토큰을 불러오지 못했습니다',
-			'projects.githubTokenOptional' => 'GitHub 토큰 (선택사항)',
-			'projects.newer' => '최신순',
-			'projects.older' => '오래된순',
-			'projects.projectArchived' => '프로젝트가 보관되었습니다',
-			'projects.projectDeleted' => '프로젝트가 삭제되었습니다',
-			'projects.projectRenamed' => '프로젝트 이름이 변경되었습니다',
-			'projects.projectRestored' => '프로젝트가 복원되었습니다',
-			'projects.repoUrlPlaceholder' => 'https://github.com/org/repo.git',
-			'projects.repositoryCloned' => '저장소 Clone 완료',
-			'projects.repositoryUrlRequired' => '저장소 URL은 필수입니다',
-			'projects.restore' => '복원',
-			'projects.sessionCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, one: '세션 ${count}개', other: '세션 ${count}개', ), 
-			'projects.unknown' => '알 수 없음',
-			'projects.usingStoredToken' => ({required Object name}) => '저장된 토큰 사용: ${name}',
-			'sessions.activity.committingChanges' => '변경 사항 커밋 중',
-			'sessions.activity.editingFile' => ({required Object file}) => '${file} 편집 중',
-			'sessions.activity.editingFileGeneric' => '파일 편집 중',
-			'sessions.activity.fetchingUrl' => ({required Object url}) => '${url} 가져오는 중',
-			'sessions.activity.pushingBranch' => '브랜치 푸시 중',
-			'sessions.activity.readingFile' => ({required Object file}) => '${file} 읽는 중',
-			'sessions.activity.runningCommand' => ({required Object command}) => '`${command}` 실행 중',
-			'sessions.activity.runningShellCommand' => 'Shell 명령어 실행 중',
-			'sessions.activity.runningTool' => ({required Object name}) => '${name} 실행 중',
-			'sessions.activity.searching' => ({required Object query}) => '“${query}” 검색 중',
-			'sessions.activity.subagentRunning' => '하위 에이전트 실행 중',
-			'sessions.age.days' => ({required Object days}) => '${days}일',
-			'sessions.age.hours' => ({required Object hours}) => '${hours}시간',
-			'sessions.age.lessThanMinute' => '<1분',
-			'sessions.age.minutes' => ({required Object count}) => '${count}분',
-			'sessions.archive' => '보관',
+			'serverConnect.local.errors.releaseTagUnresolved' => '최신 DDAgent 릴리스 태그를 확인할 수 없습니다.',
+			'serverConnect.local.errors.unsupportedPlatform' => '이 플랫폼에서는 로컬 서버가 지원되지 않습니다.',
+			'serverConnect.local.errors.unsupportedPlatformDetail' => ({required Object platform}) => '이 플랫폼에서는 로컬 서버가 지원되지 않습니다(${platform}).',
+			'serverConnect.local.errors.nodeExtractionFailed' => ({required Object path}) => 'Node.js 압축 해제 결과 ${path}이(가) 생성되지 않았습니다',
+			'serverConnect.local.errors.downloadFailed' => ({required Object error}) => '서버 다운로드 실패: ${error}',
+			'serverConnect.local.errors.installFailed' => ({required Object error}) => '서버 설치 실패: ${error}',
+			'serverConnect.local.errors.bundleNotInstalled' => '서버 번들이 설치되어 있지 않습니다.',
+			'serverConnect.local.errors.spawnFailed' => ({required Object error}) => '로컬 서버를 실행하지 못했습니다: ${error}',
+			'serverConnect.local.errors.portInUse' => ({required Object port}) => '포트 ${port}을(를) 다른 애플리케이션에서 이미 사용 중입니다.',
+			'serverConnect.local.errors.exitedDuringStartup' => '로컬 서버가 시작 중에 종료되었습니다.',
+			'serverConnect.local.errors.exitedDuringStartupWithOutput' => ({required Object output}) => '로컬 서버가 시작 중에 종료되었습니다: ${output}',
+			'serverConnect.local.errors.startTimeout' => '로컬 서버 시작 대기 시간이 초과되었습니다.',
+			'serverConnect.local.errors.tarFailed' => ({required Object command, required Object code, required Object output}) => '${command} 실패(종료 코드 ${code}): ${output}',
+			'serverConnect.httpStatus' => ({required Object code}) => 'HTTP ${code}',
+			'serverConnect.networkError' => '네트워크 오류',
+			'sessions.noSessions' => '세션 없음',
+			'sessions.noRecentSessions' => '최근 세션 없음',
 			'sessions.archivedSessions' => '보관된 세션',
-			'sessions.autoOrchestrator' => '자동 (오케스트레이터)',
+			'sessions.rename' => '이름 변경',
+			'sessions.archive' => '보관',
 			'sessions.compareWith' => '비교 대상…',
+			'sessions.projectPath' => '프로젝트 경로',
+			'sessions.newSessionProvider' => '새 세션 — 제공자',
+			'sessions.autoOrchestrator' => '자동 (오케스트레이터)',
 			'sessions.createFailed' => ({required Object error}) => '세션 생성 실패: ${error}',
 			'sessions.deleteSessionMessage' => ({required Object name}) => '"${name}"과(와) 트랜스크립트를 제거합니다. 되돌릴 수 없습니다.',
-			'sessions.newSessionProvider' => '새 세션 — 제공자',
-			'sessions.noRecentSessions' => '최근 세션 없음',
-			'sessions.noSessions' => '세션 없음',
-			'sessions.projectPath' => '프로젝트 경로',
-			'sessions.rename' => '이름 변경',
 			'sessions.toasts.archived' => '세션이 보관되었습니다',
-			'sessions.toasts.deleted' => '세션이 삭제되었습니다',
-			'sessions.toasts.pinned' => '세션이 고정되었습니다',
-			'sessions.toasts.renamed' => '세션 이름이 변경되었습니다',
 			'sessions.toasts.restored' => '세션이 복원되었습니다',
+			'sessions.toasts.deleted' => '세션이 삭제되었습니다',
+			'sessions.toasts.renamed' => '세션 이름이 변경되었습니다',
+			'sessions.toasts.pinned' => '세션이 고정되었습니다',
 			'sessions.toasts.unpinned' => '세션 고정이 해제되었습니다',
 			'sessions.toasts.workspaceChanged' => '작업 영역이 변경되었습니다',
-			'git.aiButton' => '✦ AI',
-			'git.checkpoints.create' => '새로 만들기',
-			'git.checkpoints.empty' => '아직 체크포인트 없음',
-			'git.checkpoints.labelHint' => '체크포인트 레이블 (선택사항)',
-			'git.checkpoints.restoreMessage' => '작업 트리를 이 체크포인트로 재설정할까요? 현재 변경 사항이 대체됩니다.',
-			'git.checkpoints.restoreTitle' => '체크포인트 복원',
-			'git.checkpoints.restored' => '체크포인트가 복원되었습니다',
-			'git.checkpoints.title' => '체크포인트',
-			'git.commitCreated' => '커밋이 생성되었습니다',
-			'git.commitMessage' => '커밋 메시지',
-			'git.deleteFile' => '파일 삭제',
-			'git.hunkStage' => '+ 헝크',
-			'git.hunkUnstage' => '− 헝크',
-			'git.largeDiff' => '대용량 diff 미리보기: 탭 응답성을 유지하기 위해 렌더링이 제한됩니다.',
-			'git.loadDiffFailed' => ({required Object error}) => 'diff를 불러오지 못했습니다: ${error}',
-			'git.noBranch' => '브랜치 없음',
-			'git.noDiff' => '사용 가능한 diff 없음',
-			'git.selectProject' => '프로젝트 선택',
-			'git.splitDiff' => '분할 diff',
-			'git.stageHunk' => '헝크 스테이징',
-			'git.stagedChanges' => '스테이징된 변경 사항',
-			'git.statusStaged' => '스테이징됨',
-			'git.switchBranch' => '브랜치 전환',
-			'git.unifiedDiff' => '통합 diff',
-			'git.unstageHunk' => '헝크 스테이징 해제',
-			'kanban.card.untitled' => '제목 없음',
-			'kanban.comments.add' => '댓글 추가',
-			'kanban.comments.empty' => '아직 댓글 없음',
-			'kanban.details.status' => ({required Object status}) => '상태: ${status}',
-			'kanban.details.title' => '카드 상세',
-			'kanban.dialog.saving' => '저장 중…',
-			'kanban.empty.noProject' => '선택한 프로젝트 없음',
-			'kanban.saveFailed' => '카드를 저장하지 못했습니다',
-			'kanban.time.daysAgo' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, one: '1일 전', other: '${count}일 전', ), 
-			'kanban.time.hoursAgo' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, one: '1시간 전', other: '${count}시간 전', ), 
-			'kanban.time.minutesAgo' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, one: '1분 전', other: '${count}분 전', ), 
-			'kanban.time.now' => '방금',
-			'onboarding.agents.description' => '하나 이상의 AI 코딩 어시스턴트에 로그인하세요. 모두 선택사항입니다.',
-			'onboarding.agents.laterHint' => '나중에 설정에서 구성할 수 있습니다.',
-			'onboarding.agents.title' => 'AI 에이전트 연결',
-			'onboarding.completeSetup' => '설정 완료',
-			'onboarding.errors.invalidEmail' => '유효한 이메일 주소를 입력해주세요.',
-			'onboarding.errors.nameAndEmailRequired' => 'git 이름과 이메일이 모두 필요합니다.',
-			'onboarding.gitHint' => 'DDAgent 세션이 생성한 커밋에 사용됩니다.',
-			'onboarding.mcp.description' => '에이전트가 지식 베이스와 DDAgent 도구를 사용할 수 있도록 DDAgent MCP 서버를 설치하세요. 에이전트를 선택하거나 전체에 설치하세요.',
-			'onboarding.mcp.installForAll' => '전체에 설치',
-			'onboarding.mcp.installSelected' => '선택 항목에 설치',
-			'onboarding.mcp.installedOn' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, one: '에이전트 ${count}개에 설치했습니다.', other: '에이전트 ${count}개에 설치했습니다.', ), 
-			'onboarding.mcp.installedWithFailures' => ({required Object installedCount, required Object failed}) => '${installedCount}개에 설치됨, 실패: ${failed}',
-			'onboarding.mcp.laterHint' => '선택사항 — 나중에 설정 → MCP에서 설치할 수도 있습니다.',
-			'onboarding.mcp.title' => '에이전트를 DDAgent에 연결',
-			'fileTree.browseServerFilesystem' => '서버 파일 시스템 찾아보기',
-			'fileTree.chooseFolder' => '폴더 선택',
-			'fileTree.copyContents' => '내용 복사',
-			'fileTree.noFiles' => '파일 없음',
-			'fileTree.search.hint' => '이름 필터링 / Enter로 내용 검색',
-			'fileTree.search.noMatches' => '일치하는 항목 없음',
-			'fileTree.search.prompt' => '검색어를 입력하고 Enter를 누르세요',
-			'fileTree.search.resultsTruncated' => '결과가 잘렸습니다',
-			'fileTree.titles.delete' => ({required Object name}) => '${name} 삭제',
-			'fileTree.titles.download' => ({required Object name}) => '${name} 다운로드',
-			'fileTree.titles.rename' => ({required Object name}) => '${name} 이름 변경',
-			'fileTree.uploadHere' => '여기에 업로드',
-			'fileTree.uploadTo' => '업로드 대상',
-			'fileTree.uploadedCount' => ({required Object count}) => '${count}개 파일 업로드됨',
-			'fileTree.newName' => '새 이름',
-			'fileTree.notRegisteredProject' => ({required Object path}) => '등록되지 않은 프로젝트: ${path}',
-			'fileTree.showGitignoredFiles' => 'Git 무시 파일 표시',
-			'fileTree.hideGitignoredFiles' => 'Git 무시 파일 숨기기',
-			'fileTree.downloadUnsupportedOnWeb' => '웹에서는 다운로드를 지원하지 않습니다',
-			'fileTree.saveToPath' => '경로에 저장',
-			'fileTree.savedTo' => ({required Object path}) => '${path}에 저장됨',
-			'workspace.archivedWorkspaceName' => '보관됨',
-			'workspace.closePane' => '창 닫기',
-			'workspace.closeSearch' => '검색 닫기',
-			'workspace.deleteSessionNotice' => '세션과 트랜스크립트를 제거합니다. 되돌릴 수 없습니다.',
+			'sessions.age.lessThanMinute' => '<1분',
+			'sessions.age.minutes' => ({required Object count}) => '${count}분',
+			'sessions.age.hours' => ({required Object hours}) => '${hours}시간',
+			'sessions.age.days' => ({required Object days}) => '${days}일',
+			'sessions.activity.subagentRunning' => '하위 에이전트 실행 중',
+			'sessions.activity.readingFile' => ({required Object file}) => '${file} 읽는 중',
+			'sessions.activity.runningTool' => ({required Object name}) => '${name} 실행 중',
+			'sessions.activity.editingFile' => ({required Object file}) => '${file} 편집 중',
+			'sessions.activity.editingFileGeneric' => '파일 편집 중',
+			'sessions.activity.runningShellCommand' => 'Shell 명령어 실행 중',
+			'sessions.activity.runningCommand' => ({required Object command}) => '`${command}` 실행 중',
+			'sessions.activity.committingChanges' => '변경 사항 커밋 중',
+			'sessions.activity.pushingBranch' => '브랜치 푸시 중',
+			'sessions.activity.fetchingUrl' => ({required Object url}) => '${url} 가져오는 중',
+			'sessions.activity.searching' => ({required Object query}) => '“${query}” 검색 중',
+			'sessions.autoMini' => '자동 (미니)',
+			'sharedContext.title' => '공유 노트',
+			'skills.moveSkill' => ({required Object name}) => '${name} 이동',
+			'skills.deleteSkill' => ({required Object name}) => '${name} 삭제',
+			'skills.projectLabel' => '프로젝트',
+			'skills.addDialog.title' => ({required Object provider}) => '${provider} 스킬 추가',
+			'skills.addDialog.chooseFileTitle' => 'SKILL.md 선택',
+			'skills.addDialog.chooseFolderTitle' => '스킬 폴더 선택',
+			'skills.addDialog.uploadHint' => 'SKILL.md 파일 또는 전체 스킬 폴더를 업로드하세요.',
+			'skills.addDialog.pickTitle' => '스킬 폴더 또는 SKILL.md 선택',
+			'skills.addDialog.pickHint' => '폴더에는 스크립트, 참조 자료, 에셋을 포함할 수 있습니다.',
+			'skills.addDialog.chooseFiles' => '파일 선택',
+			'skills.addDialog.chooseFolder' => '폴더 선택',
+			'skills.addDialog.readyToInstall' => '설치 준비 완료',
+			'skills.addDialog.markdownFileMeta' => ({required Object size}) => '마크다운 파일 · ${size}',
+			'skills.addDialog.folderFilesMeta' => ({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, one: '${count}개 파일 · ${size}', other: '${count}개 파일 · ${size}', ), 
+			'skills.addDialog.removeQueued' => ({required Object name}) => '${name} 제거',
+			'skills.addDialog.whereWillThisInstall' => '어디에 설치되나요?',
+			'skills.addDialog.hideInstallLocation' => '설치 위치 숨기기',
+			'skills.addDialog.folderUploadsNote' => '폴더 업로드는 선택한 폴더 이름을 유지하며, 단독 파일은 `SKILL.md`의 `name`을 사용합니다.',
+			'skills.addDialog.installSkill' => '스킬 설치',
+			'skills.addDialog.installSkills' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, one: '스킬 ${count}개 설치', other: '스킬 ${count}개 설치', ), 
+			'skills.moveDialog.toProjectHint' => '이 스킬을 소유할 프로젝트를 선택하세요. 제공자의 전역 스킬 디렉터리에서 이동됩니다.',
+			'skills.moveDialog.toGlobalHint' => '이 스킬을 전역 스킬 디렉터리로 이동하여 모든 프로젝트에서 사용할 수 있게 합니다.',
+			'skills.moveDialog.moveToProject' => '프로젝트로 이동',
+			'skills.moveDialog.moveToGlobal' => '전역으로 이동',
+			'skills.screen.manageDescription' => ({required Object provider}) => '로컬 파일, 전체 폴더 및 프로젝트 인식 위치에서 ${provider} 스킬을 관리합니다.',
+			'skills.screen.searchHint' => '스킬 검색...',
+			'skills.screen.clearSearch' => '스킬 검색 지우기',
+			'skills.screen.addSkill' => '스킬 추가',
+			'skills.screen.scanningProjectSkills' => '프로젝트 스킬 검사 중...',
+			'skills.screen.savedSuccessfully' => '스킬이 저장되었습니다.',
+			'skills.screen.loadingSkills' => ({required Object provider}) => '${provider} 스킬 로드 중…',
+			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, one: 'SKILL ${count}개', other: 'SKILL ${count}개', ), 
+			'skills.screen.deleteTitle' => ({required Object name}) => '${name}을(를) 삭제할까요?',
+			'skills.screen.deleteDescription' => ({required Object provider, required Object directory}) => '${provider}의 관리형 스킬 디렉터리에서 ${directory} 디렉터리를 제거합니다. 되돌릴 수 없습니다.',
+			'skills.screen.noDescription' => '스킬 프런트 매터에 설명이 없습니다.',
+			'skills.screen.pluginBadge' => ({required Object name}) => '플러그인: ${name}',
+			'skills.screen.projectBadge' => ({required Object name}) => '프로젝트: ${name}',
+			'skills.screen.sourceLabel' => '소스',
+			'skills.empty.noProjects' => '사용 가능한 프로젝트 없음',
+			'skills.empty.noProjectsDescription' => '스킬을 살펴보려면 프로젝트 또는 작업 영역을 추가하세요.',
+			'skills.empty.noSkillsInProject' => '이 프로젝트에 스킬이 없습니다',
+			'skills.empty.noSkillsInProjectDescription' => '선택한 프로젝트에 .claude/skills, .cursor/skills 또는 .agents/skills 폴더를 만드세요.',
+			'skills.empty.noGlobalSkills' => '아직 발견된 전역 스킬이 없습니다',
+			'skills.empty.noGlobalSkillsDescription' => '위에서 전역 스킬을 추가하면 모든 프로젝트에서 사용할 수 있습니다.',
+			'skills.empty.noMatchingSkills' => '일치하는 스킬 없음',
+			'skills.empty.noMatchingSkillsDescription' => '다른 명령어, 이름, 범위, 프로젝트 또는 소스 경로를 시도해보세요.',
+			'skills.scopes.user' => '사용자',
+			'skills.scopes.plugin' => '플러그인',
+			'skills.scopes.repo' => '리포지토리',
+			'skills.scopes.project' => '프로젝트',
+			'skills.scopes.admin' => '관리자',
+			'skills.scopes.system' => '시스템',
+			'skills.errors.dropMarkdownOrFolder' => '마크다운 파일을 하나 이상 또는 SKILL.md가 포함된 폴더를 놓으세요.',
+			'skills.errors.addMarkdownFirst' => '먼저 마크다운 파일을 하나 이상 추가하세요.',
+			'skills.errors.importFailed' => '스킬 가져오기 실패',
+			'skills.errors.folderReadFailed' => '스킬 폴더를 읽지 못했습니다',
+			'skills.errors.folderFileLimit' => ({required Object count}) => '스킬 폴더에는 최대 ${count}개 파일을 포함할 수 있습니다.',
+			'skills.errors.folderSizeLimit' => '선택한 스킬 폴더의 총 용량은 30MB 미만이어야 합니다.',
+			'skills.errors.missingSkillFile' => '선택한 폴더에 SKILL.md 파일이 없습니다.',
+			'skills.errors.couldNotReadSkillFile' => ({required Object name}) => '${name}에서 SKILL.md를 읽을 수 없습니다.',
+			'skills.providerShared' => '공유',
+			'terminal.tabs.shellName' => ({required Object index}) => '셸 ${index}',
+			'terminal.tabs.plainShell' => '일반 Shell',
+			'terminal.tabs.claudeCli' => 'Claude CLI',
+			'terminal.tabs.opencodeCli' => 'OpenCode CLI',
+			'terminal.tabs.commandCodeCli' => 'Command Code CLI',
+			'terminal.tabs.antigravityCli' => 'Antigravity CLI',
+			'terminal.tabs.cursorCli' => 'Cursor CLI',
+			'terminal.tabs.devinCli' => 'Devin CLI',
+			'terminal.tabs.loginTitle' => ({required Object provider}) => '로그인: ${provider}',
+			'terminal.tabs.runTitle' => ({required Object command}) => '실행: ${command}',
+			'terminal.actions.newTab' => '새 터미널 탭',
+			'terminal.actions.providerLogin' => '제공자 로그인',
+			'terminal.actions.restartSession' => '세션 재시작',
+			'terminal.actions.clearOutput' => '출력 지우기',
+			'terminal.actions.newShell' => '새 Shell',
+			'terminal.actions.connect' => '연결',
+			'terminal.authUrl.openInBrowser' => '브라우저에서 열기',
+			'terminal.authUrl.linkLabel' => ({required Object url}) => '인증 링크: ${url}',
+			'terminal.fileLink.detected' => ({required Object path}) => '파일 감지됨: ${path}',
+			'terminal.shortcuts.interrupt' => '중단 (SIGINT)',
+			'terminal.shortcuts.eof' => 'EOF',
+			'terminal.shortcuts.suspend' => '일시 중단 (SIGTSTP)',
+			'terminal.shortcuts.hide' => '단축키 표시줄 숨기기',
+			'terminal.shortcuts.showTooltip' => '단축키 표시',
+			'terminal.shortcuts.hideTooltip' => '단축키 숨기기',
+			'terminal.paste.title' => '터미널에 붙여넣기',
+			'terminal.paste.hint' => 'Ctrl+V / 마우스 오른쪽 클릭 → 붙여넣기',
+			'terminal.errors.couldNotOpenLink' => ({required Object url}) => '링크를 열 수 없습니다: ${url}',
+			'terminal.errors.frameError' => ({required Object message}) => '[오류] ${message}',
+			'terminal.errors.connectionError' => ({required Object message}) => '[연결 오류] ${message}',
+			'terminal.loginDialog.title' => ({required Object provider}) => '${provider} CLI 로그인',
+			'terminal.loginDialog.exited' => ({required Object code}) => '종료됨 (${code})',
+			'terminal.loginDialog.authLinkDetected' => '인증 링크가 감지되었습니다',
+			'terminal.empty.title' => '활성 터미널 없음',
+			'terminal.empty.description' => '시작하려면 새 탭을 만드세요',
+			'terminal.overlay.processExited' => '프로세스가 종료되었습니다 — 연결하면 다시 시작합니다',
+			'terminal.overlay.processExitedWithCode' => ({required Object code}) => '프로세스가 종료되었습니다(코드 ${code}) — 연결하면 다시 시작합니다',
+			'terminal.overlay.resumeSession' => ({required Object title}) => '세션 ${title} 재개',
+			'terminal.overlay.startSession' => ({required Object path}) => '${path}에서 새 세션 시작',
+			'voice.preview' => '미리보기',
+			'voice.settingsSaved' => '음성 입력 설정이 저장되었습니다',
+			'voice.saveFailed' => 'STT 설정 저장 실패',
+			'voice.apiKeySaved' => 'API 키 (저장됨, 교체하려면 입력)',
 			'workspace.exportChat' => '채팅 내보내기',
-			'workspace.jumpToSession' => '세션으로 이동…',
-			'workspace.newChatProvider' => '새 채팅 — 제공자',
-			'workspace.nextMatch' => '다음 일치',
-			'workspace.previousMatch' => '이전 일치',
 			'workspace.searchTranscript' => '트랜스크립트 검색',
+			'workspace.previousMatch' => '이전 일치',
+			'workspace.nextMatch' => '다음 일치',
+			_ => null,
+		} ?? switch (path) {
+			'workspace.closeSearch' => '검색 닫기',
+			'workspace.newChatProvider' => '새 채팅 — 제공자',
+			'workspace.closePane' => '창 닫기',
+			'workspace.jumpToSession' => '세션으로 이동…',
+			'workspace.archivedWorkspaceName' => '보관됨',
 			'workspace.sendTo' => ({required Object count}) => '${count}개에 전송',
+			'workspace.deleteSessionNotice' => '세션과 트랜스크립트를 제거합니다. 되돌릴 수 없습니다.',
 			'workspace.accountWithLabel' => ({required Object label}) => '기본 · ${label}',
 			'workspace.finishRunBeforeChangingWorkspace' => '작업 영역을 변경하기 전에 실행을 완료하세요',
 			'workspace.restored' => '작업 영역이 복원되었습니다',
 			'workspace.maximizePane' => '창 최대화',
 			'workspace.restorePanes' => '창 복원',
 			'workspace.reviewChangedFiles' => '변경된 파일 검토',
+			'workspace.paneTitle.chat' => '채팅',
+			'workspace.paneTitle.browser' => '브라우저',
+			'workspace.paneTitle.terminal' => '터미널',
+			'workspace.paneTitle.notes' => '공유 노트',
+			'workspace.paneTitle.editor' => '편집기',
+			'workspace.paneTitle.git' => 'Git',
+			'workspace.addEditorPane' => '편집기 창 추가',
+			'workspace.addGitPane' => 'Git 창 추가',
+			'workspace.unknownProjectPath' => '알 수 없는 프로젝트 경로',
+			'workspace.autoMini' => '자동 (mini)',
+			'workspace.exportAs' => '내보내기 형식:',
+			'workspace.exportMarkdown' => 'Markdown (.md)',
+			'workspace.exportHtml' => '웹 페이지 (.html)',
+			'workspace.exportPdf' => 'PDF (파일로 인쇄)',
+			'workspace.matchPosition' => ({required Object current, required Object total}) => '${current} / ${total}',
+			'workspace.launcherDescription' => '이 창에 사용할 작업 공간을 선택하거나 새로 만드세요.',
+			'workspace.createWorkspace' => '작업 공간 만들기',
+			'worktrees.scripts' => '스크립트',
+			'worktrees.emptyTitle' => 'worktree를 찾을 수 없습니다',
+			'worktrees.emptyDescription' => '기능 작업이나 에이전트 실행을 격리하려면 worktree를 생성하세요.',
+			'worktrees.opened' => ({required Object branch}) => 'worktree 열림: ${branch}',
+			'worktrees.created' => 'Worktree 생성됨',
+			'worktrees.removed' => 'worktree 제거됨',
+			'worktrees.merged' => ({required Object branch}) => 'worktree가 ${branch}에 병합됨',
+			'worktrees.scriptsSaved' => '스크립트 설정이 저장되었습니다',
+			'worktrees.setupLabel' => '설정: ',
+			'worktrees.serverLabel' => '서버: ',
+			'worktrees.runRunning' => '실행 중',
+			'worktrees.runRunningWithPort' => ({required Object port}) => '실행 중 :${port}',
+			'worktrees.runButton' => '실행',
+			'worktrees.stopButton' => '중지',
+			'worktrees.mainBadge' => 'main',
+			'worktrees.headDetachedAt' => ({required Object sha}) => 'HEAD 분리됨 @ ${sha}',
+			'worktrees.branchHint' => '새 브랜치 이름 (예: feature/login)',
+			'worktrees.branchingOff' => ({required Object branch}) => '${branch}에서 분기',
+			'worktrees.mergeTitle' => ({required Object branch}) => '${branch} 병합',
+			'worktrees.mergeDescription' => ({required Object branch}) => '변경 사항을 ${branch}에 병합합니다.',
+			'worktrees.squashDescription' => '모든 커밋을 단일 커밋으로 결합',
+			'worktrees.cleanupDescription' => '병합되면 worktree를 제거하고 브랜치 삭제',
+			'worktrees.removeTitle' => ({required Object branch}) => 'worktree ${branch}을(를) 제거할까요?',
+			'worktrees.removeDescription' => 'worktree 폴더가 삭제됩니다. 연결된 프로젝트는 보관됩니다.',
+			'worktrees.dirtyWarning' => ({required Object count}) => '경고: 이 worktree에는 손실될 커밋되지 않은 변경 사항이 ${count}개 있습니다.',
+			'worktrees.forceRemoveLabel' => '강제 제거 (변경 사항 폐기)',
+			'worktrees.deleteBranchLabel' => '브랜치도 삭제',
+			'worktrees.setupHint' => '설정 명령어 (예: npm install)',
+			'worktrees.runHint' => '실행 명령어 (예: npm run dev)',
+			'worktrees.portHint' => '실행 포트 (선택사항, 예: 3000)',
+			'worktrees.unknownSha' => '알 수 없음',
+			'worktrees.baseBranchFallback' => '기본 브랜치',
+			'worktrees.runtimeStatus.idle' => '대기 중',
+			'worktrees.runtimeStatus.running' => '실행 중',
+			'worktrees.runtimeStatus.done' => '완료',
+			'worktrees.runtimeStatus.failed' => '실패',
+			'worktrees.runtimeStatus.exited' => '종료됨',
+			'browserUse.sessionStatus.ready' => '준비됨',
+			'browserUse.sessionStatus.stopped' => '중지됨',
+			'browserUse.sessionStatus.unavailable' => '사용 불가',
+			'orchestrator.stepFallback' => ({required Object n}) => '${n}단계',
+			'miniOrchestrator.taskTypes.gate' => '게이트',
+			'miniOrchestrator.roles.thinker' => '사고 모델',
+			'miniOrchestrator.roles.worker' => '작업 모델',
 			_ => null,
 		};
 	}

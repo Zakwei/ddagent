@@ -5,6 +5,7 @@ import 'dart:ffi';
 import 'dart:io';
 
 import 'package:ddagent_app/features/server_connect/data/local_server_status.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -161,7 +162,7 @@ class LocalServerService {
     );
     final tag = res.data?['tag_name'] as String?;
     if (tag == null || tag.isEmpty) {
-      throw StateError('Could not resolve the latest ddagent release tag.');
+      throw StateError(t.serverConnect.local.errors.releaseTagUnresolved);
     }
     return tag.replaceFirst(RegExp('^v', caseSensitive: false), '');
   }
@@ -177,7 +178,9 @@ class LocalServerService {
 
   void _requireSupported() {
     if (!isSupported) {
-      throw UnsupportedError('Local server is not supported on this platform ($_abi).');
+      throw UnsupportedError(
+        t.serverConnect.local.errors.unsupportedPlatformDetail(platform: '$_abi'),
+      );
     }
   }
 
@@ -353,7 +356,7 @@ class LocalServerService {
     // 3) Download + extract a portable LTS into nodeDir.
     await _downloadPortableNode();
     if (!await File(exe).exists()) {
-      throw StateError('Node.js extraction did not produce $exe');
+      throw StateError(t.serverConnect.local.errors.nodeExtractionFailed(path: exe));
     }
     return _nodeExe = exe;
   }
@@ -502,7 +505,7 @@ class LocalServerService {
       _emit(
         LocalServerStatus(
           stage: LocalServerStage.error,
-          message: 'Server download failed: $e',
+          message: t.serverConnect.local.errors.downloadFailed(error: '$e'),
           version: installed,
         ),
       );
@@ -528,7 +531,7 @@ class LocalServerService {
       _emit(
         LocalServerStatus(
           stage: LocalServerStage.error,
-          message: 'Server install failed: $e',
+          message: t.serverConnect.local.errors.installFailed(error: '$e'),
           version: installed,
         ),
       );
@@ -566,8 +569,8 @@ class LocalServerService {
       }
     }
     if (version == null) {
-      const message = 'Server bundle is not installed.';
-      _emit(const LocalServerStatus(stage: LocalServerStage.error, message: message));
+      final message = t.serverConnect.local.errors.bundleNotInstalled;
+      _emit(LocalServerStatus(stage: LocalServerStage.error, message: message));
       throw StateError(message);
     }
     final exe = _nodeExe ?? await ensureNode();
@@ -581,7 +584,7 @@ class LocalServerService {
         environment: {...Platform.environment, 'SERVER_PORT': '$localPort', 'HOST': '127.0.0.1'},
       );
     } on Object catch (e) {
-      final message = 'Failed to spawn the local server: $e';
+      final message = t.serverConnect.local.errors.spawnFailed(error: '$e');
       _emit(LocalServerStatus(stage: LocalServerStage.error, message: message, version: version));
       throw StateError(message);
     }
@@ -614,14 +617,16 @@ class LocalServerService {
     final stderrText = stderrTail.toString().trim();
     String message;
     if (stderrText.contains('EADDRINUSE')) {
-      message = 'Port $localPort is already in use by another application.';
+      message = t.serverConnect.local.errors.portInUse(port: localPort);
     } else if (exited) {
       final tail = stderrText.length > 300
           ? '…${stderrText.substring(stderrText.length - 300)}'
           : stderrText;
-      message = 'Local server exited during startup${tail.isEmpty ? '.' : ': $tail'}';
+      message = tail.isEmpty
+          ? t.serverConnect.local.errors.exitedDuringStartup
+          : t.serverConnect.local.errors.exitedDuringStartupWithOutput(output: tail);
     } else {
-      message = 'Timed out waiting for the local server to start.';
+      message = t.serverConnect.local.errors.startTimeout;
     }
     if (!exited) proc.kill();
     _process = null;
@@ -647,7 +652,13 @@ class LocalServerService {
     proc.stderr.transform(const Utf8Decoder(allowMalformed: true)).listen(stderr.write);
     final code = await proc.exitCode;
     if (code != 0) {
-      throw StateError('tar ${args.join(' ')} failed (exit $code): ${stderr.toString().trim()}');
+      throw StateError(
+        t.serverConnect.local.errors.tarFailed(
+          command: 'tar ${args.join(' ')}',
+          code: code,
+          output: stderr.toString().trim(),
+        ),
+      );
     }
   }
 

@@ -1,3 +1,4 @@
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
 
 /// Unified error for the API layer. HTTP only — WS/SSE errors are wrapped
@@ -60,14 +61,14 @@ AppError mapDioError(DioException e) {
     final errorCode = err is Map ? err['code']?.toString() : null;
     final status = response.statusCode ?? 0;
     if (status == 401) {
-      return AuthError(message.isEmpty ? 'Unauthorized' : message);
+      return AuthError(message.isEmpty ? t.common.messages.unauthorized : message);
     }
     if (status == 403) {
-      return ForbiddenError(message.isEmpty ? 'Forbidden' : message);
+      return ForbiddenError(message.isEmpty ? t.common.errors.forbidden : message);
     }
     return ServerError(message.isEmpty ? 'HTTP $status' : message, status, errorCode);
   }
-  return NetworkError(e.message ?? 'Network error');
+  return NetworkError(e.message ?? t.common.messages.networkError);
 }
 
 /// Convenience: unwraps a Dio call into `T` or throws an [AppError].

@@ -179,7 +179,7 @@ class TerminalController extends Notifier<TerminalState> {
             ? (initialCommand.length > 20
                   ? '${initialCommand.substring(0, 17)}...'
                   : initialCommand)
-            : (isPlainShell ? 'Shell $tabIndex' : '$provider CLI'));
+            : (isPlainShell ? t.terminal.tabs.shellName(index: tabIndex) : '$provider CLI'));
 
     final tab = TerminalTab(
       id: tabId,
@@ -273,7 +273,9 @@ class TerminalController extends Notifier<TerminalState> {
       }
       _notifyTabsChanged();
     } else if (frame.isError) {
-      tab.terminal.write('\r\n\x1b[31m[Error] ${frame.error}\x1b[0m\r\n');
+      tab.terminal.write(
+        '\r\n\x1b[31m${t.terminal.errors.frameError(message: frame.error ?? '')}\x1b[0m\r\n',
+      );
       _notifyTabsChanged();
     }
   }
@@ -282,7 +284,9 @@ class TerminalController extends Notifier<TerminalState> {
     final tabIndex = state.tabs.indexWhere((t) => t.id == tabId);
     if (tabIndex == -1) return;
     final tab = state.tabs[tabIndex];
-    tab.terminal.write('\r\n\x1b[31m[Connection Error] $errorMessage\x1b[0m\r\n');
+    tab.terminal.write(
+      '\r\n\x1b[31m${t.terminal.errors.connectionError(message: errorMessage)}\x1b[0m\r\n',
+    );
     tab.status = TerminalTabStatus.disconnected;
     _clearPrompt(tab);
     _notifyTabsChanged();
@@ -535,7 +539,7 @@ class TerminalController extends Notifier<TerminalState> {
     void Function(int exitCode)? onComplete,
   }) {
     return createTab(
-      title: title ?? 'Run: $command',
+      title: title ?? t.terminal.tabs.runTitle(command: command),
       projectPath: projectPath,
       initialCommand: command,
       isPlainShell: true,

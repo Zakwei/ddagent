@@ -705,7 +705,7 @@ class ComposerController extends Notifier<ComposerState> {
           .map((r) => r)
           .toList();
       if (records.isEmpty) {
-        state = state.copyWith(uploading: false, sendError: () => 'Upload returned no records');
+        state = state.copyWith(uploading: false, sendError: () => t.chat.composer.uploadNoRecords);
         return;
       }
       state = state.copyWith(
@@ -830,14 +830,15 @@ class ComposerController extends Notifier<ComposerState> {
         try {
           final tm = await ref.read(taskmasterRepositoryProvider).tasks(pid);
           _taskMentions = [
-            for (final t in (tm['tasks'] as List? ?? const []))
+            for (final task in (tm['tasks'] as List? ?? const []))
               // `isOpenTask` — done/cancelled tasks stay out of the picker.
-              if (t is Map && !{'done', 'cancelled'}.contains('${t['status']}'))
+              if (task is Map && !{'done', 'cancelled'}.contains('${task['status']}'))
                 {
                   'kind': 'task',
-                  'title': '${t['title'] ?? 'Task ${t['id']}'}',
-                  'subtitle': '${t['status'] ?? ''}',
-                  'value': '${t['title'] ?? 'Task ${t['id']}'}',
+                  'title': '${task['title'] ?? t.chat.mentionMenu.taskTitle(id: '${task['id']}')}',
+                  'subtitle': '${task['status'] ?? ''}',
+                  // Inserted into the prompt — stays English for the agent.
+                  'value': '${task['title'] ?? 'Task ${task['id']}'}',
                 },
           ];
         } on Object {

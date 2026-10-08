@@ -83,7 +83,8 @@ class _DevicePushCardState extends ConsumerState<_DevicePushCard> {
     try {
       final res = await ref.read(settingsRepositoryProvider).pushTest();
       if (!mounted) return;
-      final t = Translations.of(context).settings.notifications.webPush;
+      final i18n = Translations.of(context);
+      final t = i18n.settings.notifications.webPush;
       final results = res['results'] as List? ?? const [];
       // The desktop (WebSocket) channel reaches mobile/desktop apps that are
       // not Web Push subscriptions; the server reports those counts separately.
@@ -110,7 +111,8 @@ class _DevicePushCardState extends ConsumerState<_DevicePushCard> {
               ? t.testNotDelivered
               : failed
                     .map(
-                      (r) => '${r['endpointHost']}: ${r['statusCode'] ?? r['error'] ?? 'failed'}',
+                      (r) =>
+                          '${r['endpointHost']}: ${r['statusCode'] ?? r['error'] ?? i18n.common.status.failed}',
                     )
                     .join(' · ');
         } else {
@@ -670,7 +672,7 @@ class _ChatRow extends StatelessWidget {
                 size: AppButtonSize.sm,
                 loading: busy,
                 onPressed: onAction,
-                child: Text(pairLabel ?? 'Pair'),
+                child: Text(pairLabel ?? t.messaging.pair),
               ),
           ],
         ),

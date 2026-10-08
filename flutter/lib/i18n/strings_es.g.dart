@@ -47,25 +47,28 @@ class TranslationsEs extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final Translations$sidebar$es sidebar = Translations$sidebar$es._(_root);
 	@override late final Translations$tasks$es tasks = Translations$tasks$es._(_root);
 	@override late final Translations$knowledge$es knowledge = Translations$knowledge$es._(_root);
-	@override late final Translations$skills$es skills = Translations$skills$es._(_root);
-	@override late final Translations$mcp$es mcp = Translations$mcp$es._(_root);
-	@override late final Translations$terminal$es terminal = Translations$terminal$es._(_root);
-	@override late final Translations$worktrees$es worktrees = Translations$worktrees$es._(_root);
-	@override late final Translations$quota$es quota = Translations$quota$es._(_root);
-	@override late final Translations$scheduler$es scheduler = Translations$scheduler$es._(_root);
-	@override late final Translations$notifications$es notifications = Translations$notifications$es._(_root);
-	@override late final Translations$serverConnect$es serverConnect = Translations$serverConnect$es._(_root);
-	@override late final Translations$voice$es voice = Translations$voice$es._(_root);
-	@override late final Translations$sharedContext$es sharedContext = Translations$sharedContext$es._(_root);
-	@override late final Translations$collab$es collab = Translations$collab$es._(_root);
 	@override late final Translations$browser$es browser = Translations$browser$es._(_root);
-	@override late final Translations$projects$es projects = Translations$projects$es._(_root);
-	@override late final Translations$sessions$es sessions = Translations$sessions$es._(_root);
+	@override late final Translations$collab$es collab = Translations$collab$es._(_root);
+	@override late final Translations$fileTree$es fileTree = Translations$fileTree$es._(_root);
 	@override late final Translations$git$es git = Translations$git$es._(_root);
 	@override late final Translations$kanban$es kanban = Translations$kanban$es._(_root);
+	@override late final Translations$mcp$es mcp = Translations$mcp$es._(_root);
+	@override late final Translations$notifications$es notifications = Translations$notifications$es._(_root);
 	@override late final Translations$onboarding$es onboarding = Translations$onboarding$es._(_root);
-	@override late final Translations$fileTree$es fileTree = Translations$fileTree$es._(_root);
+	@override late final Translations$projects$es projects = Translations$projects$es._(_root);
+	@override late final Translations$quota$es quota = Translations$quota$es._(_root);
+	@override late final Translations$scheduler$es scheduler = Translations$scheduler$es._(_root);
+	@override late final Translations$serverConnect$es serverConnect = Translations$serverConnect$es._(_root);
+	@override late final Translations$sessions$es sessions = Translations$sessions$es._(_root);
+	@override late final Translations$sharedContext$es sharedContext = Translations$sharedContext$es._(_root);
+	@override late final Translations$skills$es skills = Translations$skills$es._(_root);
+	@override late final Translations$terminal$es terminal = Translations$terminal$es._(_root);
+	@override late final Translations$voice$es voice = Translations$voice$es._(_root);
 	@override late final Translations$workspace$es workspace = Translations$workspace$es._(_root);
+	@override late final Translations$worktrees$es worktrees = Translations$worktrees$es._(_root);
+	@override late final Translations$browserUse$es browserUse = Translations$browserUse$es._(_root);
+	@override late final Translations$orchestrator$es orchestrator = Translations$orchestrator$es._(_root);
+	@override late final Translations$miniOrchestrator$es miniOrchestrator = Translations$miniOrchestrator$es._(_root);
 }
 
 // Path: auth
@@ -91,6 +94,7 @@ class Translations$chat$es extends Translations$chat$en {
 	@override late final Translations$chat$codeBlock$es codeBlock = Translations$chat$codeBlock$es._(_root);
 	@override late final Translations$chat$copyMessage$es copyMessage = Translations$chat$copyMessage$es._(_root);
 	@override late final Translations$chat$messageTypes$es messageTypes = Translations$chat$messageTypes$es._(_root);
+	@override late final Translations$chat$orchestrator$es orchestrator = Translations$chat$orchestrator$es._(_root);
 	@override late final Translations$chat$tools$es tools = Translations$chat$tools$es._(_root);
 	@override late final Translations$chat$search$es search = Translations$chat$search$es._(_root);
 	@override late final Translations$chat$fileOperations$es fileOperations = Translations$chat$fileOperations$es._(_root);
@@ -102,6 +106,7 @@ class Translations$chat$es extends Translations$chat$en {
 	@override late final Translations$chat$plan$es plan = Translations$chat$plan$es._(_root);
 	@override late final Translations$chat$usageLimit$es usageLimit = Translations$chat$usageLimit$es._(_root);
 	@override late final Translations$chat$codex$es codex = Translations$chat$codex$es._(_root);
+	@override late final Translations$chat$voice$es voice = Translations$chat$voice$es._(_root);
 	@override late final Translations$chat$input$es input = Translations$chat$input$es._(_root);
 	@override late final Translations$chat$composer$es composer = Translations$chat$composer$es._(_root);
 	@override late final Translations$chat$providerSelection$es providerSelection = Translations$chat$providerSelection$es._(_root);
@@ -110,7 +115,6 @@ class Translations$chat$es extends Translations$chat$en {
 	@override late final Translations$chat$claudeStatus$es claudeStatus = Translations$chat$claudeStatus$es._(_root);
 	@override late final Translations$chat$projectSelection$es projectSelection = Translations$chat$projectSelection$es._(_root);
 	@override late final Translations$chat$tasks$es tasks = Translations$chat$tasks$es._(_root);
-	@override late final Translations$chat$voice$es voice = Translations$chat$voice$es._(_root);
 	@override late final Translations$chat$splitSession$es splitSession = Translations$chat$splitSession$es._(_root);
 	@override late final Translations$chat$sessionPicker$es sessionPicker = Translations$chat$sessionPicker$es._(_root);
 	@override late final Translations$chat$splitWorkspace$es splitWorkspace = Translations$chat$splitWorkspace$es._(_root);
@@ -123,16 +127,24 @@ class Translations$chat$es extends Translations$chat$en {
 	@override late final Translations$chat$tokenUsage$es tokenUsage = Translations$chat$tokenUsage$es._(_root);
 	@override late final Translations$chat$tool$es tool = Translations$chat$tool$es._(_root);
 	@override late final Translations$chat$quotaBadge$es quotaBadge = Translations$chat$quotaBadge$es._(_root);
-	@override late final Translations$chat$paneHeader$es paneHeader = Translations$chat$paneHeader$es._(_root);
 	@override late final Translations$chat$broadcast$es broadcast = Translations$chat$broadcast$es._(_root);
-	@override late final Translations$chat$changes$es changes = Translations$chat$changes$es._(_root);
+	@override late final Translations$chat$paneHeader$es paneHeader = Translations$chat$paneHeader$es._(_root);
+	@override late final Translations$chat$export$es export = Translations$chat$export$es._(_root);
 	@override late final Translations$chat$commandResult$es commandResult = Translations$chat$commandResult$es._(_root);
 	@override late final Translations$chat$commands$es commands = Translations$chat$commands$es._(_root);
-	@override late final Translations$chat$export$es export = Translations$chat$export$es._(_root);
-	@override late final Translations$chat$message$es message = Translations$chat$message$es._(_root);
-	@override late final Translations$chat$modelLibrary$es modelLibrary = Translations$chat$modelLibrary$es._(_root);
 	@override late final Translations$chat$pinFile$es pinFile = Translations$chat$pinFile$es._(_root);
+	@override late final Translations$chat$modelLibrary$es modelLibrary = Translations$chat$modelLibrary$es._(_root);
+	@override late final Translations$chat$changes$es changes = Translations$chat$changes$es._(_root);
+	@override late final Translations$chat$message$es message = Translations$chat$message$es._(_root);
 	@override late final Translations$chat$permissionRequest$es permissionRequest = Translations$chat$permissionRequest$es._(_root);
+	@override late final Translations$chat$commandDialog$es commandDialog = Translations$chat$commandDialog$es._(_root);
+	@override late final Translations$chat$utilities$es utilities = Translations$chat$utilities$es._(_root);
+	@override late final Translations$chat$toolBlocks$es toolBlocks = Translations$chat$toolBlocks$es._(_root);
+	@override late final Translations$chat$commandMenu$es commandMenu = Translations$chat$commandMenu$es._(_root);
+	@override late final Translations$chat$mentionMenu$es mentionMenu = Translations$chat$mentionMenu$es._(_root);
+	@override late final Translations$chat$subheader$es subheader = Translations$chat$subheader$es._(_root);
+	@override late final Translations$chat$transcript$es transcript = Translations$chat$transcript$es._(_root);
+	@override late final Translations$chat$review$es review = Translations$chat$review$es._(_root);
 }
 
 // Path: codeEditor
@@ -149,14 +161,14 @@ class Translations$codeEditor$es extends Translations$codeEditor$en {
 	@override late final Translations$codeEditor$footer$es footer = Translations$codeEditor$footer$es._(_root);
 	@override late final Translations$codeEditor$binaryFile$es binaryFile = Translations$codeEditor$binaryFile$es._(_root);
 	@override late final Translations$codeEditor$filePreview$es filePreview = Translations$codeEditor$filePreview$es._(_root);
-	@override late final Translations$codeEditor$diff$es diff = Translations$codeEditor$diff$es._(_root);
+	@override String unsavedChanges({required Object name}) => 'Cambios sin guardar en ${name}';
 	@override String get discardUnsavedChanges => '¿Descartar los cambios sin guardar?';
-	@override late final Translations$codeEditor$emptyState$es emptyState = Translations$codeEditor$emptyState$es._(_root);
+	@override late final Translations$codeEditor$mediaFile$es mediaFile = Translations$codeEditor$mediaFile$es._(_root);
 	@override String get failedToLoad => 'No se pudo cargar el archivo';
 	@override late final Translations$codeEditor$hexDump$es hexDump = Translations$codeEditor$hexDump$es._(_root);
-	@override late final Translations$codeEditor$mediaFile$es mediaFile = Translations$codeEditor$mediaFile$es._(_root);
 	@override late final Translations$codeEditor$settings$es settings = Translations$codeEditor$settings$es._(_root);
-	@override String unsavedChanges({required Object name}) => 'Cambios sin guardar en ${name}';
+	@override late final Translations$codeEditor$diff$es diff = Translations$codeEditor$diff$es._(_root);
+	@override late final Translations$codeEditor$emptyState$es emptyState = Translations$codeEditor$emptyState$es._(_root);
 	@override late final Translations$codeEditor$toasts$es toasts = Translations$codeEditor$toasts$es._(_root);
 }
 
@@ -169,6 +181,7 @@ class Translations$common$es extends Translations$common$en {
 	// Translations
 	@override late final Translations$common$buttons$es buttons = Translations$common$buttons$es._(_root);
 	@override late final Translations$common$tabs$es tabs = Translations$common$tabs$es._(_root);
+	@override late final Translations$common$quota$es quota = Translations$common$quota$es._(_root);
 	@override late final Translations$common$status$es status = Translations$common$status$es._(_root);
 	@override late final Translations$common$messages$es messages = Translations$common$messages$es._(_root);
 	@override late final Translations$common$navigation$es navigation = Translations$common$navigation$es._(_root);
@@ -180,7 +193,6 @@ class Translations$common$es extends Translations$common$en {
 	@override late final Translations$common$projectWizard$es projectWizard = Translations$common$projectWizard$es._(_root);
 	@override late final Translations$common$notifications$es notifications = Translations$common$notifications$es._(_root);
 	@override late final Translations$common$versionUpdate$es versionUpdate = Translations$common$versionUpdate$es._(_root);
-	@override late final Translations$common$quota$es quota = Translations$common$quota$es._(_root);
 	@override late final Translations$common$actions$es actions = Translations$common$actions$es._(_root);
 	@override late final Translations$common$browserPane$es browserPane = Translations$common$browserPane$es._(_root);
 	@override late final Translations$common$browserUse$es browserUse = Translations$common$browserUse$es._(_root);
@@ -188,8 +200,11 @@ class Translations$common$es extends Translations$common$en {
 	@override late final Translations$common$gitPanel$es gitPanel = Translations$common$gitPanel$es._(_root);
 	@override late final Translations$common$sessions$es sessions = Translations$common$sessions$es._(_root);
 	@override late final Translations$common$projects$es projects = Translations$common$projects$es._(_root);
+	@override late final Translations$common$sharedNotes$es sharedNotes = Translations$common$sharedNotes$es._(_root);
 	@override late final Translations$common$codeBlock$es codeBlock = Translations$common$codeBlock$es._(_root);
 	@override late final Translations$common$update$es update = Translations$common$update$es._(_root);
+	@override late final Translations$common$appShell$es appShell = Translations$common$appShell$es._(_root);
+	@override late final Translations$common$errors$es errors = Translations$common$errors$es._(_root);
 }
 
 // Path: settings
@@ -211,6 +226,7 @@ class Translations$settings$es extends Translations$settings$en {
 	@override late final Translations$settings$quickSettings$es quickSettings = Translations$settings$quickSettings$es._(_root);
 	@override late final Translations$settings$terminalShortcuts$es terminalShortcuts = Translations$settings$terminalShortcuts$es._(_root);
 	@override late final Translations$settings$mainTabs$es mainTabs = Translations$settings$mainTabs$es._(_root);
+	@override late final Translations$settings$miniOrchestration$es miniOrchestration = Translations$settings$miniOrchestration$es._(_root);
 	@override late final Translations$settings$orchestration$es orchestration = Translations$settings$orchestration$es._(_root);
 	@override late final Translations$settings$notifications$es notifications = Translations$settings$notifications$es._(_root);
 	@override late final Translations$settings$appearanceSettings$es appearanceSettings = Translations$settings$appearanceSettings$es._(_root);
@@ -226,7 +242,11 @@ class Translations$settings$es extends Translations$settings$en {
 	@override late final Translations$settings$quota$es quota = Translations$settings$quota$es._(_root);
 	@override late final Translations$settings$browser$es browser = Translations$settings$browser$es._(_root);
 	@override late final Translations$settings$workspaces$es workspaces = Translations$settings$workspaces$es._(_root);
+	@override late final Translations$settings$stt$es stt = Translations$settings$stt$es._(_root);
+	@override late final Translations$settings$schedules$es schedules = Translations$settings$schedules$es._(_root);
+	@override late final Translations$settings$mcpTokens$es mcpTokens = Translations$settings$mcpTokens$es._(_root);
 	@override late final Translations$settings$about$es about = Translations$settings$about$es._(_root);
+	@override late final Translations$settings$shortcuts$es shortcuts = Translations$settings$shortcuts$es._(_root);
 }
 
 // Path: sidebar
@@ -238,21 +258,21 @@ class Translations$sidebar$es extends Translations$sidebar$en {
 	// Translations
 	@override late final Translations$sidebar$projects$es projects = Translations$sidebar$projects$es._(_root);
 	@override late final Translations$sidebar$app$es app = Translations$sidebar$app$es._(_root);
+	@override late final Translations$sidebar$panel$es panel = Translations$sidebar$panel$es._(_root);
 	@override late final Translations$sidebar$sessions$es sessions = Translations$sidebar$sessions$es._(_root);
 	@override late final Translations$sidebar$tooltips$es tooltips = Translations$sidebar$tooltips$es._(_root);
 	@override late final Translations$sidebar$navigation$es navigation = Translations$sidebar$navigation$es._(_root);
 	@override late final Translations$sidebar$actions$es actions = Translations$sidebar$actions$es._(_root);
+	@override late final Translations$sidebar$workspace$es workspace = Translations$sidebar$workspace$es._(_root);
 	@override late final Translations$sidebar$branding$es branding = Translations$sidebar$branding$es._(_root);
 	@override late final Translations$sidebar$status$es status = Translations$sidebar$status$es._(_root);
 	@override late final Translations$sidebar$time$es time = Translations$sidebar$time$es._(_root);
 	@override late final Translations$sidebar$messages$es messages = Translations$sidebar$messages$es._(_root);
 	@override late final Translations$sidebar$version$es version = Translations$sidebar$version$es._(_root);
 	@override late final Translations$sidebar$search$es search = Translations$sidebar$search$es._(_root);
+	@override late final Translations$sidebar$recent$es recent = Translations$sidebar$recent$es._(_root);
 	@override late final Translations$sidebar$deleteConfirmation$es deleteConfirmation = Translations$sidebar$deleteConfirmation$es._(_root);
 	@override late final Translations$sidebar$zones$es zones = Translations$sidebar$zones$es._(_root);
-	@override late final Translations$sidebar$panel$es panel = Translations$sidebar$panel$es._(_root);
-	@override late final Translations$sidebar$workspace$es workspace = Translations$sidebar$workspace$es._(_root);
-	@override late final Translations$sidebar$recent$es recent = Translations$sidebar$recent$es._(_root);
 	@override late final Translations$sidebar$tabs$es tabs = Translations$sidebar$tabs$es._(_root);
 }
 
@@ -284,6 +304,7 @@ class Translations$tasks$es extends Translations$tasks$en {
 	@override late final Translations$tasks$nextTask$es nextTask = Translations$tasks$nextTask$es._(_root);
 	@override late final Translations$tasks$taskDetail$es taskDetail = Translations$tasks$taskDetail$es._(_root);
 	@override late final Translations$tasks$toasts$es toasts = Translations$tasks$toasts$es._(_root);
+	@override late final Translations$tasks$taskmaster$es taskmaster = Translations$tasks$taskmaster$es._(_root);
 }
 
 // Path: knowledge
@@ -306,201 +327,15 @@ class Translations$knowledge$es extends Translations$knowledge$en {
 	@override late final Translations$knowledge$search$es search = Translations$knowledge$search$es._(_root);
 	@override late final Translations$knowledge$links$es links = Translations$knowledge$links$es._(_root);
 	@override late final Translations$knowledge$tags$es tags = Translations$knowledge$tags$es._(_root);
-	@override late final Translations$knowledge$contextBudget$es contextBudget = Translations$knowledge$contextBudget$es._(_root);
-	@override late final Translations$knowledge$critical$es critical = Translations$knowledge$critical$es._(_root);
-	@override late final Translations$knowledge$errors$es errors = Translations$knowledge$errors$es._(_root);
 	@override late final Translations$knowledge$graph$es graph = Translations$knowledge$graph$es._(_root);
 	@override late final Translations$knowledge$importAll$es importAll = Translations$knowledge$importAll$es._(_root);
-	@override late final Translations$knowledge$importSkills$es importSkills = Translations$knowledge$importSkills$es._(_root);
-	@override late final Translations$knowledge$linkOptions$es linkOptions = Translations$knowledge$linkOptions$es._(_root);
 	@override late final Translations$knowledge$migrate$es migrate = Translations$knowledge$migrate$es._(_root);
-}
-
-// Path: skills
-class Translations$skills$es extends Translations$skills$en {
-	Translations$skills$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override late final Translations$skills$addDialog$es addDialog = Translations$skills$addDialog$es._(_root);
-	@override String deleteSkill({required Object name}) => 'Eliminar ${name}';
-	@override late final Translations$skills$empty$es empty = Translations$skills$empty$es._(_root);
-	@override late final Translations$skills$errors$es errors = Translations$skills$errors$es._(_root);
-	@override late final Translations$skills$moveDialog$es moveDialog = Translations$skills$moveDialog$es._(_root);
-	@override String moveSkill({required Object name}) => 'Mover ${name}';
-	@override String get projectLabel => 'Proyecto';
-	@override late final Translations$skills$scopes$es scopes = Translations$skills$scopes$es._(_root);
-	@override late final Translations$skills$screen$es screen = Translations$skills$screen$es._(_root);
-}
-
-// Path: mcp
-class Translations$mcp$es extends Translations$mcp$en {
-	Translations$mcp$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override late final Translations$mcp$form$es form = Translations$mcp$form$es._(_root);
-	@override late final Translations$mcp$install$es install = Translations$mcp$install$es._(_root);
-	@override late final Translations$mcp$servers$es servers = Translations$mcp$servers$es._(_root);
-	@override late final Translations$mcp$team$es team = Translations$mcp$team$es._(_root);
-	@override late final Translations$mcp$tokens$es tokens = Translations$mcp$tokens$es._(_root);
-}
-
-// Path: terminal
-class Translations$terminal$es extends Translations$terminal$en {
-	Translations$terminal$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override late final Translations$terminal$actions$es actions = Translations$terminal$actions$es._(_root);
-	@override late final Translations$terminal$authUrl$es authUrl = Translations$terminal$authUrl$es._(_root);
-	@override late final Translations$terminal$errors$es errors = Translations$terminal$errors$es._(_root);
-	@override late final Translations$terminal$fileLink$es fileLink = Translations$terminal$fileLink$es._(_root);
-	@override late final Translations$terminal$paste$es paste = Translations$terminal$paste$es._(_root);
-	@override late final Translations$terminal$shortcuts$es shortcuts = Translations$terminal$shortcuts$es._(_root);
-	@override late final Translations$terminal$tabs$es tabs = Translations$terminal$tabs$es._(_root);
-}
-
-// Path: worktrees
-class Translations$worktrees$es extends Translations$worktrees$en {
-	Translations$worktrees$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String get branchHint => 'Nombre de la nueva rama (p. ej. feature/login)';
-	@override String branchingOff({required Object branch}) => 'Ramificando desde ${branch}';
-	@override String get cleanupDescription => 'Eliminar el worktree y borrar la rama una vez fusionada';
-	@override String get created => 'Worktree creado';
-	@override String get deleteBranchLabel => 'Eliminar también la rama';
-	@override String dirtyWarning({required Object count}) => 'Advertencia: este worktree tiene ${count} cambios sin confirmar que se perderán.';
-	@override String get emptyDescription => 'Crea un worktree para aislar el trabajo de una funcionalidad o las ejecuciones de agentes.';
-	@override String get emptyTitle => 'No se encontraron worktrees';
-	@override String get forceRemoveLabel => 'Forzar eliminación (descartar cambios)';
-	@override String headDetachedAt({required Object sha}) => 'HEAD separado en ${sha}';
-	@override String get mainBadge => 'main';
-	@override String mergeDescription({required Object branch}) => 'Fusionar los cambios en ${branch}.';
-	@override String mergeTitle({required Object branch}) => 'Fusionar ${branch}';
-	@override String merged({required Object branch}) => 'Worktree fusionado en ${branch}';
-	@override String opened({required Object branch}) => 'Worktree abierto: ${branch}';
-	@override String get portHint => 'Puerto de ejecución (opcional, p. ej. 3000)';
-	@override String get removeDescription => 'Esto elimina la carpeta del worktree. Los proyectos vinculados se archivarán.';
-	@override String removeTitle({required Object branch}) => '¿Eliminar el worktree ${branch}?';
-	@override String get removed => 'Worktree eliminado';
-	@override String get runButton => 'Ejecutar';
-	@override String get runHint => 'Comando de ejecución (p. ej. npm run dev)';
-	@override String get runRunning => 'en ejecución';
-	@override String runRunningWithPort({required Object port}) => 'en ejecución :${port}';
-	@override String get scripts => 'Scripts';
-	@override String get scriptsSaved => 'Configuración de scripts guardada';
-	@override String get serverLabel => 'Servidor: ';
-	@override String get setupHint => 'Comando de configuración (p. ej. npm install)';
-	@override String get setupLabel => 'Configuración: ';
-	@override String get squashDescription => 'Combinar todos los commits en un solo commit';
-	@override String get stopButton => 'Detener';
-}
-
-// Path: quota
-class Translations$quota$es extends Translations$quota$en {
-	Translations$quota$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override late final Translations$quota$agents$es agents = Translations$quota$agents$es._(_root);
-	@override late final Translations$quota$chart$es chart = Translations$quota$chart$es._(_root);
-	@override late final Translations$quota$config$es config = Translations$quota$config$es._(_root);
-	@override late final Translations$quota$overview$es overview = Translations$quota$overview$es._(_root);
-	@override late final Translations$quota$section$es section = Translations$quota$section$es._(_root);
-}
-
-// Path: scheduler
-class Translations$scheduler$es extends Translations$scheduler$en {
-	Translations$scheduler$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String get checking => 'Comprobando…';
-	@override String get cronHint => 'Cron (min hora día mes día de la semana) — p. ej. 0 9 * * *';
-	@override String deleteMessage({required Object id}) => 'Esto elimina el trabajo recurrente ${id}. Las sesiones existentes se conservan.';
-	@override String get deleteTitle => '¿Eliminar la programación?';
-	@override String get editTitle => 'Editar programación';
-	@override String get newLabel => 'Nueva';
-	@override String nextIn({required Object time}) => 'próximo en ${time}';
-	@override String get promptHint => 'Prompt para el agente';
-	@override String get runs => 'Ejecuciones';
-	@override String session({required Object id}) => 'sesión ${id}';
-	@override String get worktree => 'worktree';
-}
-
-// Path: notifications
-class Translations$notifications$es extends Translations$notifications$en {
-	Translations$notifications$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String get deviceLabel => 'DDAgent Flutter';
-	@override late final Translations$notifications$errors$es errors = Translations$notifications$errors$es._(_root);
-}
-
-// Path: serverConnect
-class Translations$serverConnect$es extends Translations$serverConnect$en {
-	Translations$serverConnect$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String get connect => 'Conectar';
-	@override String get connecting => 'Conectando…';
-	@override String get changeServer => 'Cambiar servidor';
-	@override String connectionFailed({required Object error}) => 'Falló la conexión (${error})';
-	@override String get enterUrl => 'Introduce una URL de servidor';
-	@override late final Translations$serverConnect$local$es local = Translations$serverConnect$local$es._(_root);
-	@override String get subtitle => 'Conéctate a tu servidor de DDAgent';
-}
-
-// Path: voice
-class Translations$voice$es extends Translations$voice$en {
-	Translations$voice$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String get apiKeySaved => 'Clave API (guardada; escribe para reemplazar)';
-	@override String get preview => 'Vista previa';
-	@override String get saveFailed => 'No se pudo guardar la configuración de STT';
-	@override String get settingsSaved => 'Ajustes de entrada de voz guardados';
-}
-
-// Path: sharedContext
-class Translations$sharedContext$es extends Translations$sharedContext$en {
-	Translations$sharedContext$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Notas compartidas';
-}
-
-// Path: collab
-class Translations$collab$es extends Translations$collab$en {
-	Translations$collab$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String get copyToken => 'Copiar token';
-	@override String get createInvite => 'Crear invitación';
-	@override String get invite => 'Invitación';
-	@override String get inviteTeammate => 'Invitar a un compañero';
-	@override late final Translations$collab$roles$es roles = Translations$collab$roles$es._(_root);
-	@override String get shareTokenHint => 'Comparte este token de invitación — se muestra una sola vez y caduca en 72 h:';
-	@override String get team => 'Equipo';
+	@override late final Translations$knowledge$importSkills$es importSkills = Translations$knowledge$importSkills$es._(_root);
+	@override late final Translations$knowledge$critical$es critical = Translations$knowledge$critical$es._(_root);
+	@override late final Translations$knowledge$contextBudget$es contextBudget = Translations$knowledge$contextBudget$es._(_root);
+	@override late final Translations$knowledge$linkOptions$es linkOptions = Translations$knowledge$linkOptions$es._(_root);
+	@override late final Translations$knowledge$errors$es errors = Translations$knowledge$errors$es._(_root);
+	@override late final Translations$knowledge$entityTypes$es entityTypes = Translations$knowledge$entityTypes$es._(_root);
 }
 
 // Path: browser
@@ -515,66 +350,55 @@ class Translations$browser$es extends Translations$browser$en {
 	@override String get web => 'Web';
 }
 
-// Path: projects
-class Translations$projects$es extends Translations$projects$en {
-	Translations$projects$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: collab
+class Translations$collab$es extends Translations$collab$en {
+	Translations$collab$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get archive => 'Archivar';
-	@override String archivedSection({required Object count}) => 'Archivados (${count})';
-	@override String get clone => 'Clonar';
-	@override String get cloneFailed => 'La clonación falló';
-	@override String get cloneFinished => 'Clonación completada. Actualizando la lista de proyectos…';
-	@override String get cloneRepository => 'Clonar repositorio';
-	@override String get deletePermanently => 'Eliminar permanentemente';
-	@override String deleteProjectMessage({required Object name}) => 'Elimina permanentemente «${name}», incluidas todas las sesiones y el historial almacenado (borrado de JSONL). Esta acción no se puede deshacer.';
-	@override String get deleteProjectTitle => '¿Eliminar el proyecto?';
-	@override String get destinationPath => 'Ruta de destino';
-	@override String get destinationPathRequired => 'La ruta de destino es obligatoria';
-	@override String get displayNameOptional => 'Nombre para mostrar (opcional)';
-	@override String get failedToLoadTokens => 'No se pudieron cargar los tokens de GitHub';
-	@override String get githubTokenOptional => 'Token de GitHub (opcional)';
-	@override String get newer => 'Más reciente';
-	@override String get older => 'Más antiguo';
-	@override String get projectArchived => 'Proyecto archivado';
-	@override String get projectDeleted => 'Proyecto eliminado';
-	@override String get projectRenamed => 'Proyecto renombrado';
-	@override String get projectRestored => 'Proyecto restaurado';
-	@override String get repoUrlPlaceholder => 'https://github.com/org/repo.git';
-	@override String get repositoryCloned => 'Repositorio clonado';
-	@override String get repositoryUrlRequired => 'La URL del repositorio es obligatoria';
-	@override String get restore => 'Restaurar';
-	@override String sessionCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count,
-		one: '${count} sesión',
-		other: '${count} sesiones',
-	);
-	@override String get unknown => 'Desconocido';
-	@override String usingStoredToken({required Object name}) => 'Usando el token guardado: ${name}';
+	@override String get team => 'Equipo';
+	@override String get invite => 'Invitación';
+	@override String get inviteTeammate => 'Invitar a un compañero';
+	@override String get shareTokenHint => 'Comparte este token de invitación — se muestra una sola vez y caduca en 72 h:';
+	@override String get createInvite => 'Crear invitación';
+	@override String get copyToken => 'Copiar token';
+	@override late final Translations$collab$roles$es roles = Translations$collab$roles$es._(_root);
+	@override late final Translations$collab$viewing$es viewing = Translations$collab$viewing$es._(_root);
 }
 
-// Path: sessions
-class Translations$sessions$es extends Translations$sessions$en {
-	Translations$sessions$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: fileTree
+class Translations$fileTree$es extends Translations$fileTree$en {
+	Translations$fileTree$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override late final Translations$sessions$activity$es activity = Translations$sessions$activity$es._(_root);
-	@override late final Translations$sessions$age$es age = Translations$sessions$age$es._(_root);
-	@override String get archive => 'Archivar';
-	@override String get archivedSessions => 'Sesiones archivadas';
-	@override String get autoOrchestrator => 'Automático (orquestador)';
-	@override String get compareWith => 'Comparar con…';
-	@override String createFailed({required Object error}) => 'No se pudo crear la sesión: ${error}';
-	@override String deleteSessionMessage({required Object name}) => 'Elimina «${name}» y su transcripción. Esta acción no se puede deshacer.';
-	@override String get newSessionProvider => 'Nueva sesión — proveedor';
-	@override String get noRecentSessions => 'No hay sesiones recientes';
-	@override String get noSessions => 'No hay sesiones';
-	@override String get projectPath => 'Ruta del proyecto';
-	@override String get rename => 'Renombrar';
-	@override late final Translations$sessions$toasts$es toasts = Translations$sessions$toasts$es._(_root);
+	@override String get uploadTo => 'Subir a';
+	@override String get uploadHere => 'Subir aquí';
+	@override String get browseServerFilesystem => 'Explorar el sistema de archivos del servidor';
+	@override String get noFiles => 'Sin archivos';
+	@override String get copyContents => 'Copiar contenido';
+	@override String get chooseFolder => 'Elegir carpeta';
+	@override late final Translations$fileTree$search$es search = Translations$fileTree$search$es._(_root);
+	@override late final Translations$fileTree$titles$es titles = Translations$fileTree$titles$es._(_root);
+	@override String uploadedCount({required Object count}) => 'Subidos ${count} archivo(s)';
+	@override String get newName => 'Nombre nuevo';
+	@override String notRegisteredProject({required Object path}) => 'No es un proyecto registrado: ${path}';
+	@override String get showGitignoredFiles => 'Mostrar archivos ignorados por git';
+	@override String get hideGitignoredFiles => 'Ocultar archivos ignorados por git';
+	@override String get downloadUnsupportedOnWeb => 'Descarga no compatible en la web';
+	@override String get saveToPath => 'Guardar en ruta';
+	@override String savedTo({required Object path}) => 'Guardado en ${path}';
+	@override late final Translations$fileTree$relative$es relative = Translations$fileTree$relative$es._(_root);
+	@override String get projectRoot => '(raíz del proyecto)';
+	@override String uploadLimitCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count,
+		one: 'Puedes subir como máximo ${count} archivo a la vez.',
+		other: 'Puedes subir como máximo ${count} archivos a la vez.',
+	);
+	@override String fileTooLarge({required Object name}) => '${name} supera los 200 MB.';
+	@override String deleteFolderConfirm({required Object path}) => '¿Eliminar la carpeta "${path}"? Esta acción no se puede deshacer.';
+	@override String deleteFileConfirm({required Object path}) => '¿Eliminar el archivo "${path}"? Esta acción no se puede deshacer.';
 }
 
 // Path: git
@@ -584,25 +408,26 @@ class Translations$git$es extends Translations$git$en {
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get aiButton => '✦ IA';
 	@override late final Translations$git$checkpoints$es checkpoints = Translations$git$checkpoints$es._(_root);
-	@override String get commitCreated => 'Commit creado';
-	@override String get commitMessage => 'Mensaje del commit';
-	@override String get deleteFile => 'Eliminar archivo';
-	@override String get hunkStage => '+ Sección';
-	@override String get hunkUnstage => '− Sección';
-	@override String get largeDiff => 'Vista previa de diff grande: la representación está limitada para mantener la pestaña ágil.';
-	@override String loadDiffFailed({required Object error}) => 'No se pudo cargar el diff: ${error}';
-	@override String get noBranch => 'sin rama';
-	@override String get noDiff => 'No hay diff disponible';
-	@override String get selectProject => 'Selecciona un proyecto';
-	@override String get splitDiff => 'Diff lado a lado';
-	@override String get stageHunk => 'Preparar sección';
 	@override String get stagedChanges => 'Cambios preparados';
 	@override String get statusStaged => 'Preparado';
 	@override String get switchBranch => 'Cambiar de rama';
 	@override String get unifiedDiff => 'Diff unificado';
+	@override String get splitDiff => 'Diff lado a lado';
+	@override String get noDiff => 'No hay diff disponible';
+	@override String get largeDiff => 'Vista previa de diff grande: la representación está limitada para mantener la pestaña ágil.';
+	@override String loadDiffFailed({required Object error}) => 'No se pudo cargar el diff: ${error}';
+	@override String get hunkStage => '+ Sección';
+	@override String get hunkUnstage => '− Sección';
+	@override String get stageHunk => 'Preparar sección';
 	@override String get unstageHunk => 'Quitar preparación de la sección';
+	@override String get deleteFile => 'Eliminar archivo';
+	@override String get commitMessage => 'Mensaje del commit';
+	@override String get aiButton => '✦ IA';
+	@override String get commitCreated => 'Commit creado';
+	@override String get noBranch => 'sin rama';
+	@override String get selectProject => 'Selecciona un proyecto';
+	@override late final Translations$git$branchSections$es branchSections = Translations$git$branchSections$es._(_root);
 }
 
 // Path: kanban
@@ -614,11 +439,37 @@ class Translations$kanban$es extends Translations$kanban$en {
 	// Translations
 	@override late final Translations$kanban$card$es card = Translations$kanban$card$es._(_root);
 	@override late final Translations$kanban$comments$es comments = Translations$kanban$comments$es._(_root);
-	@override late final Translations$kanban$details$es details = Translations$kanban$details$es._(_root);
 	@override late final Translations$kanban$dialog$es dialog = Translations$kanban$dialog$es._(_root);
+	@override late final Translations$kanban$details$es details = Translations$kanban$details$es._(_root);
 	@override late final Translations$kanban$empty$es empty = Translations$kanban$empty$es._(_root);
 	@override String get saveFailed => 'No se pudo guardar la tarjeta';
 	@override late final Translations$kanban$time$es time = Translations$kanban$time$es._(_root);
+}
+
+// Path: mcp
+class Translations$mcp$es extends Translations$mcp$en {
+	Translations$mcp$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$mcp$install$es install = Translations$mcp$install$es._(_root);
+	@override late final Translations$mcp$servers$es servers = Translations$mcp$servers$es._(_root);
+	@override late final Translations$mcp$team$es team = Translations$mcp$team$es._(_root);
+	@override late final Translations$mcp$tokens$es tokens = Translations$mcp$tokens$es._(_root);
+	@override late final Translations$mcp$form$es form = Translations$mcp$form$es._(_root);
+}
+
+// Path: notifications
+class Translations$notifications$es extends Translations$notifications$en {
+	Translations$notifications$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get deviceLabel => 'DDAgent Flutter';
+	@override late final Translations$notifications$errors$es errors = Translations$notifications$errors$es._(_root);
+	@override late final Translations$notifications$androidChannel$es androidChannel = Translations$notifications$androidChannel$es._(_root);
 }
 
 // Path: onboarding
@@ -628,36 +479,191 @@ class Translations$onboarding$es extends Translations$onboarding$en {
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override late final Translations$onboarding$agents$es agents = Translations$onboarding$agents$es._(_root);
+	@override String get gitHint => 'Se usa para los commits creados por sesiones de DDAgent.';
 	@override String get completeSetup => 'Completar configuración';
 	@override late final Translations$onboarding$errors$es errors = Translations$onboarding$errors$es._(_root);
-	@override String get gitHint => 'Se usa para los commits creados por sesiones de DDAgent.';
+	@override late final Translations$onboarding$agents$es agents = Translations$onboarding$agents$es._(_root);
 	@override late final Translations$onboarding$mcp$es mcp = Translations$onboarding$mcp$es._(_root);
 }
 
-// Path: fileTree
-class Translations$fileTree$es extends Translations$fileTree$en {
-	Translations$fileTree$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: projects
+class Translations$projects$es extends Translations$projects$en {
+	Translations$projects$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get browseServerFilesystem => 'Explorar el sistema de archivos del servidor';
-	@override String get chooseFolder => 'Elegir carpeta';
-	@override String get copyContents => 'Copiar contenido';
-	@override String get noFiles => 'Sin archivos';
-	@override late final Translations$fileTree$search$es search = Translations$fileTree$search$es._(_root);
-	@override late final Translations$fileTree$titles$es titles = Translations$fileTree$titles$es._(_root);
-	@override String get uploadHere => 'Subir aquí';
-	@override String get uploadTo => 'Subir a';
-	@override String uploadedCount({required Object count}) => 'Subidos ${count} archivo(s)';
-	@override String get newName => 'Nombre nuevo';
-	@override String notRegisteredProject({required Object path}) => 'No es un proyecto registrado: ${path}';
-	@override String get showGitignoredFiles => 'Mostrar archivos ignorados por git';
-	@override String get hideGitignoredFiles => 'Ocultar archivos ignorados por git';
-	@override String get downloadUnsupportedOnWeb => 'Descarga no compatible en la web';
-	@override String get saveToPath => 'Guardar en ruta';
-	@override String savedTo({required Object path}) => 'Guardado en ${path}';
+	@override String get cloneRepository => 'Clonar repositorio';
+	@override String get repositoryCloned => 'Repositorio clonado';
+	@override String get clone => 'Clonar';
+	@override String get cloneFinished => 'Clonación completada. Actualizando la lista de proyectos…';
+	@override String get cloneFailed => 'La clonación falló';
+	@override String get repoUrlPlaceholder => 'https://github.com/org/repo.git';
+	@override String get destinationPath => 'Ruta de destino';
+	@override String get destinationPathRequired => 'La ruta de destino es obligatoria';
+	@override String get repositoryUrlRequired => 'La URL del repositorio es obligatoria';
+	@override String get githubTokenOptional => 'Token de GitHub (opcional)';
+	@override String get archive => 'Archivar';
+	@override String get restore => 'Restaurar';
+	@override String get deletePermanently => 'Eliminar permanentemente';
+	@override String get deleteProjectTitle => '¿Eliminar el proyecto?';
+	@override String deleteProjectMessage({required Object name}) => 'Elimina permanentemente «${name}», incluidas todas las sesiones y el historial almacenado (borrado de JSONL). Esta acción no se puede deshacer.';
+	@override String archivedSection({required Object count}) => 'Archivados (${count})';
+	@override String sessionCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count,
+		one: '${count} sesión',
+		other: '${count} sesiones',
+	);
+	@override String get newer => 'Más reciente';
+	@override String get older => 'Más antiguo';
+	@override String get projectArchived => 'Proyecto archivado';
+	@override String get projectRestored => 'Proyecto restaurado';
+	@override String get projectRenamed => 'Proyecto renombrado';
+	@override String get projectDeleted => 'Proyecto eliminado';
+	@override String get failedToLoadTokens => 'No se pudieron cargar los tokens de GitHub';
+	@override String get displayNameOptional => 'Nombre para mostrar (opcional)';
+	@override String usingStoredToken({required Object name}) => 'Usando el token guardado: ${name}';
+	@override String get unknown => 'Desconocido';
+	@override String get project => 'Proyecto';
+}
+
+// Path: quota
+class Translations$quota$es extends Translations$quota$en {
+	Translations$quota$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$quota$section$es section = Translations$quota$section$es._(_root);
+	@override late final Translations$quota$overview$es overview = Translations$quota$overview$es._(_root);
+	@override late final Translations$quota$agents$es agents = Translations$quota$agents$es._(_root);
+	@override late final Translations$quota$config$es config = Translations$quota$config$es._(_root);
+	@override late final Translations$quota$chart$es chart = Translations$quota$chart$es._(_root);
+	@override late final Translations$quota$duration$es duration = Translations$quota$duration$es._(_root);
+}
+
+// Path: scheduler
+class Translations$scheduler$es extends Translations$scheduler$en {
+	Translations$scheduler$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get newLabel => 'Nueva';
+	@override String get runs => 'Ejecuciones';
+	@override String get editTitle => 'Editar programación';
+	@override String get deleteTitle => '¿Eliminar la programación?';
+	@override String deleteMessage({required Object id}) => 'Esto elimina el trabajo recurrente ${id}. Las sesiones existentes se conservan.';
+	@override String get checking => 'Comprobando…';
+	@override String nextIn({required Object time}) => 'próximo en ${time}';
+	@override String get worktree => 'worktree';
+	@override String session({required Object id}) => 'sesión ${id}';
+	@override String get cronHint => 'Cron (min hora día mes día de la semana) — p. ej. 0 9 * * *';
+	@override String get promptHint => 'Prompt para el agente';
+	@override late final Translations$scheduler$runStatus$es runStatus = Translations$scheduler$runStatus$es._(_root);
+	@override late final Translations$scheduler$cronErrors$es cronErrors = Translations$scheduler$cronErrors$es._(_root);
+}
+
+// Path: serverConnect
+class Translations$serverConnect$es extends Translations$serverConnect$en {
+	Translations$serverConnect$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get subtitle => 'Conéctate a tu servidor de DDAgent';
+	@override String get enterUrl => 'Introduce una URL de servidor';
+	@override String connectionFailed({required Object error}) => 'Falló la conexión (${error})';
+	@override String get connect => 'Conectar';
+	@override String get connecting => 'Conectando…';
+	@override String get changeServer => 'Cambiar servidor';
+	@override late final Translations$serverConnect$local$es local = Translations$serverConnect$local$es._(_root);
+	@override String httpStatus({required Object code}) => 'HTTP ${code}';
+	@override String get networkError => 'Error de red';
+}
+
+// Path: sessions
+class Translations$sessions$es extends Translations$sessions$en {
+	Translations$sessions$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get noSessions => 'No hay sesiones';
+	@override String get noRecentSessions => 'No hay sesiones recientes';
+	@override String get archivedSessions => 'Sesiones archivadas';
+	@override String get rename => 'Renombrar';
+	@override String get archive => 'Archivar';
+	@override String get compareWith => 'Comparar con…';
+	@override String get projectPath => 'Ruta del proyecto';
+	@override String get newSessionProvider => 'Nueva sesión — proveedor';
+	@override String get autoOrchestrator => 'Automático (orquestador)';
+	@override String createFailed({required Object error}) => 'No se pudo crear la sesión: ${error}';
+	@override String deleteSessionMessage({required Object name}) => 'Elimina «${name}» y su transcripción. Esta acción no se puede deshacer.';
+	@override late final Translations$sessions$toasts$es toasts = Translations$sessions$toasts$es._(_root);
+	@override late final Translations$sessions$age$es age = Translations$sessions$age$es._(_root);
+	@override late final Translations$sessions$activity$es activity = Translations$sessions$activity$es._(_root);
+	@override String get autoMini => 'Automático (mini)';
+}
+
+// Path: sharedContext
+class Translations$sharedContext$es extends Translations$sharedContext$en {
+	Translations$sharedContext$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Notas compartidas';
+}
+
+// Path: skills
+class Translations$skills$es extends Translations$skills$en {
+	Translations$skills$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String moveSkill({required Object name}) => 'Mover ${name}';
+	@override String deleteSkill({required Object name}) => 'Eliminar ${name}';
+	@override String get projectLabel => 'Proyecto';
+	@override late final Translations$skills$addDialog$es addDialog = Translations$skills$addDialog$es._(_root);
+	@override late final Translations$skills$moveDialog$es moveDialog = Translations$skills$moveDialog$es._(_root);
+	@override late final Translations$skills$screen$es screen = Translations$skills$screen$es._(_root);
+	@override late final Translations$skills$empty$es empty = Translations$skills$empty$es._(_root);
+	@override late final Translations$skills$scopes$es scopes = Translations$skills$scopes$es._(_root);
+	@override late final Translations$skills$errors$es errors = Translations$skills$errors$es._(_root);
+	@override String get providerShared => 'Compartidas';
+}
+
+// Path: terminal
+class Translations$terminal$es extends Translations$terminal$en {
+	Translations$terminal$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$terminal$tabs$es tabs = Translations$terminal$tabs$es._(_root);
+	@override late final Translations$terminal$actions$es actions = Translations$terminal$actions$es._(_root);
+	@override late final Translations$terminal$authUrl$es authUrl = Translations$terminal$authUrl$es._(_root);
+	@override late final Translations$terminal$fileLink$es fileLink = Translations$terminal$fileLink$es._(_root);
+	@override late final Translations$terminal$shortcuts$es shortcuts = Translations$terminal$shortcuts$es._(_root);
+	@override late final Translations$terminal$paste$es paste = Translations$terminal$paste$es._(_root);
+	@override late final Translations$terminal$errors$es errors = Translations$terminal$errors$es._(_root);
+	@override late final Translations$terminal$loginDialog$es loginDialog = Translations$terminal$loginDialog$es._(_root);
+	@override late final Translations$terminal$empty$es empty = Translations$terminal$empty$es._(_root);
+	@override late final Translations$terminal$overlay$es overlay = Translations$terminal$overlay$es._(_root);
+}
+
+// Path: voice
+class Translations$voice$es extends Translations$voice$en {
+	Translations$voice$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get preview => 'Vista previa';
+	@override String get settingsSaved => 'Ajustes de entrada de voz guardados';
+	@override String get saveFailed => 'No se pudo guardar la configuración de STT';
+	@override String get apiKeySaved => 'Clave API (guardada; escribe para reemplazar)';
 }
 
 // Path: workspace
@@ -667,23 +673,108 @@ class Translations$workspace$es extends Translations$workspace$en {
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get archivedWorkspaceName => 'Archivado';
-	@override String get closePane => 'Cerrar panel';
-	@override String get closeSearch => 'Cerrar búsqueda';
-	@override String get deleteSessionNotice => 'Elimina la sesión y su transcripción. No se puede deshacer.';
 	@override String get exportChat => 'Exportar chat';
-	@override String get jumpToSession => 'Ir a la sesión…';
-	@override String get newChatProvider => 'Nuevo chat — proveedor';
-	@override String get nextMatch => 'Coincidencia siguiente';
-	@override String get previousMatch => 'Coincidencia anterior';
 	@override String get searchTranscript => 'Buscar en la transcripción';
+	@override String get previousMatch => 'Coincidencia anterior';
+	@override String get nextMatch => 'Coincidencia siguiente';
+	@override String get closeSearch => 'Cerrar búsqueda';
+	@override String get newChatProvider => 'Nuevo chat — proveedor';
+	@override String get closePane => 'Cerrar panel';
+	@override String get jumpToSession => 'Ir a la sesión…';
+	@override String get archivedWorkspaceName => 'Archivado';
 	@override String sendTo({required Object count}) => 'Enviar a ${count}';
+	@override String get deleteSessionNotice => 'Elimina la sesión y su transcripción. No se puede deshacer.';
 	@override String accountWithLabel({required Object label}) => 'Predeterminado · ${label}';
 	@override String get finishRunBeforeChangingWorkspace => 'Finaliza la ejecución antes de cambiar de espacio de trabajo';
 	@override String get restored => 'Espacio de trabajo restaurado';
 	@override String get maximizePane => 'Maximizar panel';
 	@override String get restorePanes => 'Restaurar paneles';
 	@override String get reviewChangedFiles => 'Revisar archivos modificados';
+	@override late final Translations$workspace$paneTitle$es paneTitle = Translations$workspace$paneTitle$es._(_root);
+	@override String get addEditorPane => 'Añadir panel de editor';
+	@override String get addGitPane => 'Añadir panel de Git';
+	@override String get unknownProjectPath => 'Ruta del proyecto desconocida';
+	@override String get autoMini => 'Auto (mini)';
+	@override String get exportAs => 'Exportar como:';
+	@override String get exportMarkdown => 'Markdown (.md)';
+	@override String get exportHtml => 'Página web (.html)';
+	@override String get exportPdf => 'PDF (Imprimir en archivo)';
+	@override String matchPosition({required Object current, required Object total}) => '${current} de ${total}';
+	@override String get launcherDescription => 'Elige un espacio de trabajo para este panel o crea uno nuevo.';
+	@override String get createWorkspace => 'Crear espacio de trabajo';
+}
+
+// Path: worktrees
+class Translations$worktrees$es extends Translations$worktrees$en {
+	Translations$worktrees$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get scripts => 'Scripts';
+	@override String get emptyTitle => 'No se encontraron worktrees';
+	@override String get emptyDescription => 'Crea un worktree para aislar el trabajo de una funcionalidad o las ejecuciones de agentes.';
+	@override String opened({required Object branch}) => 'Worktree abierto: ${branch}';
+	@override String get created => 'Worktree creado';
+	@override String get removed => 'Worktree eliminado';
+	@override String merged({required Object branch}) => 'Worktree fusionado en ${branch}';
+	@override String get scriptsSaved => 'Configuración de scripts guardada';
+	@override String get setupLabel => 'Configuración: ';
+	@override String get serverLabel => 'Servidor: ';
+	@override String get runRunning => 'en ejecución';
+	@override String runRunningWithPort({required Object port}) => 'en ejecución :${port}';
+	@override String get runButton => 'Ejecutar';
+	@override String get stopButton => 'Detener';
+	@override String get mainBadge => 'main';
+	@override String headDetachedAt({required Object sha}) => 'HEAD separado en ${sha}';
+	@override String get branchHint => 'Nombre de la nueva rama (p. ej. feature/login)';
+	@override String branchingOff({required Object branch}) => 'Ramificando desde ${branch}';
+	@override String mergeTitle({required Object branch}) => 'Fusionar ${branch}';
+	@override String mergeDescription({required Object branch}) => 'Fusionar los cambios en ${branch}.';
+	@override String get squashDescription => 'Combinar todos los commits en un solo commit';
+	@override String get cleanupDescription => 'Eliminar el worktree y borrar la rama una vez fusionada';
+	@override String removeTitle({required Object branch}) => '¿Eliminar el worktree ${branch}?';
+	@override String get removeDescription => 'Esto elimina la carpeta del worktree. Los proyectos vinculados se archivarán.';
+	@override String dirtyWarning({required Object count}) => 'Advertencia: este worktree tiene ${count} cambios sin confirmar que se perderán.';
+	@override String get forceRemoveLabel => 'Forzar eliminación (descartar cambios)';
+	@override String get deleteBranchLabel => 'Eliminar también la rama';
+	@override String get setupHint => 'Comando de configuración (p. ej. npm install)';
+	@override String get runHint => 'Comando de ejecución (p. ej. npm run dev)';
+	@override String get portHint => 'Puerto de ejecución (opcional, p. ej. 3000)';
+	@override String get unknownSha => 'desconocido';
+	@override String get baseBranchFallback => 'rama base';
+	@override late final Translations$worktrees$runtimeStatus$es runtimeStatus = Translations$worktrees$runtimeStatus$es._(_root);
+}
+
+// Path: browserUse
+class Translations$browserUse$es extends Translations$browserUse$en {
+	Translations$browserUse$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$browserUse$sessionStatus$es sessionStatus = Translations$browserUse$sessionStatus$es._(_root);
+}
+
+// Path: orchestrator
+class Translations$orchestrator$es extends Translations$orchestrator$en {
+	Translations$orchestrator$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String stepFallback({required Object n}) => 'Paso ${n}';
+}
+
+// Path: miniOrchestrator
+class Translations$miniOrchestrator$es extends Translations$miniOrchestrator$en {
+	Translations$miniOrchestrator$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$miniOrchestrator$taskTypes$es taskTypes = Translations$miniOrchestrator$taskTypes$es._(_root);
+	@override late final Translations$miniOrchestrator$roles$es roles = Translations$miniOrchestrator$roles$es._(_root);
 }
 
 // Path: auth.login
@@ -775,6 +866,24 @@ class Translations$chat$messageTypes$es extends Translations$chat$messageTypes$e
 	@override String get codex => 'Codex';
 	@override String get opencode => 'OpenCode';
 	@override String get devin => 'Devin';
+	@override String get orchestrator => 'Auto';
+}
+
+// Path: chat.orchestrator
+class Translations$chat$orchestrator$es extends Translations$chat$orchestrator$en {
+	Translations$chat$orchestrator$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$chat$orchestrator$routing$es routing = Translations$chat$orchestrator$routing$es._(_root);
+	@override late final Translations$chat$orchestrator$plan$es plan = Translations$chat$orchestrator$plan$es._(_root);
+	@override late final Translations$chat$orchestrator$decision$es decision = Translations$chat$orchestrator$decision$es._(_root);
+	@override late final Translations$chat$orchestrator$delegation$es delegation = Translations$chat$orchestrator$delegation$es._(_root);
+	@override late final Translations$chat$orchestrator$summary$es summary = Translations$chat$orchestrator$summary$es._(_root);
+	@override String get backToParent => 'Volver a la orquestación';
+	@override late final Translations$chat$orchestrator$taskmaster$es taskmaster = Translations$chat$orchestrator$taskmaster$es._(_root);
+	@override late final Translations$chat$orchestrator$gate$es gate = Translations$chat$orchestrator$gate$es._(_root);
 }
 
 // Path: chat.tools
@@ -854,6 +963,7 @@ class Translations$chat$thinking$es extends Translations$chat$thinking$en {
 	// Translations
 	@override String get title => 'Pensando...';
 	@override String get emoji => '💭 Pensando...';
+	@override String get thoughtFewSeconds => 'Pensó durante unos segundos';
 }
 
 // Path: chat.json
@@ -880,14 +990,14 @@ class Translations$chat$permissions$es extends Translations$chat$permissions$en 
 	@override String get error => 'No se pudieron actualizar los permisos. Inténtalo de nuevo.';
 	@override String get openSettings => 'Abrir ajustes';
 	@override String get allow => 'Permitir';
-	@override String allowAll({required Object count}) => 'Permitir todo (${count})';
-	@override String get allowWithChanges => 'Permitir con cambios';
 	@override String get always => 'Siempre';
-	@override String get deny => 'Denegar';
 	@override String get editAndAllow => 'Editar y permitir';
+	@override String get deny => 'Denegar';
+	@override String get reject => 'Rechazar';
+	@override String allowAll({required Object count}) => 'Permitir todo (${count})';
 	@override String get editInput => 'Editar entrada';
 	@override String get invalidJson => 'JSON no válido';
-	@override String get reject => 'Rechazar';
+	@override String get allowWithChanges => 'Permitir con cambios';
 }
 
 // Path: chat.todo
@@ -935,6 +1045,23 @@ class Translations$chat$codex$es extends Translations$chat$codex$en {
 	@override String get technicalDetails => 'Detalles técnicos';
 }
 
+// Path: chat.voice
+class Translations$chat$voice$es extends Translations$chat$voice$en {
+	Translations$chat$voice$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get autoRead => 'Leer respuestas en voz alta';
+	@override String get autoReadOn => 'Lectura de respuestas: activada';
+	@override String get autoReadOff => 'Lectura de respuestas: desactivada';
+	@override String get autoReadVoice => 'Voz de lectura';
+	@override String get autoReadVoiceAuto => 'Voz automática';
+	@override String get autoReadPreview => 'Así sonarán las respuestas.';
+	@override String get speakMessage => 'Leer en voz alta';
+	@override String get stopSpeaking => 'Detener lectura';
+}
+
 // Path: chat.input
 class Translations$chat$input$es extends Translations$chat$input$en {
 	Translations$chat$input$es._(TranslationsEs root) : this._root = root, super.internal(root);
@@ -946,6 +1073,12 @@ class Translations$chat$input$es extends Translations$chat$input$en {
 	@override String get placeholderDefault => 'Escribe tu mensaje...';
 	@override String get disabled => 'Entrada deshabilitada';
 	@override String get attachFiles => 'Adjuntar archivos';
+	@override String get attachFilesDesc => 'Subir fotos, archivos o documentos';
+	@override String get takePhoto => 'Tomar foto';
+	@override String get takePhotoDesc => 'Usar la cámara para capturar una foto';
+	@override String get moreTools => 'Más herramientas';
+	@override String get commandsDesc => 'Explorar atajos y comandos';
+	@override String get clearInputDesc => 'Descartar el texto actual';
 	@override String get attachImages => 'Adjuntar imágenes';
 	@override String get send => 'Enviar';
 	@override String get stop => 'Detener';
@@ -954,18 +1087,17 @@ class Translations$chat$input$es extends Translations$chat$input$en {
 	@override String get showAllCommands => 'Mostrar todos los comandos';
 	@override String get clearInput => 'Limpiar entrada';
 	@override String get scrollToBottom => 'Ir al final';
-	@override late final Translations$chat$input$queue$es queue = Translations$chat$input$queue$es._(_root);
-	@override String get attachFilesDesc => 'Subir fotos, archivos o documentos';
-	@override String get takePhoto => 'Tomar foto';
-	@override String get takePhotoDesc => 'Usar la cámara para capturar una foto';
-	@override String get moreTools => 'Más herramientas';
-	@override String get commandsDesc => 'Explorar atajos y comandos';
-	@override String get clearInputDesc => 'Descartar el texto actual';
 	@override String get newMessage => 'Nuevo mensaje';
 	@override String get newMessages => 'Nuevos mensajes';
+	@override late final Translations$chat$input$queue$es queue = Translations$chat$input$queue$es._(_root);
 	@override String get autoContinueTasks => 'Continuación automática';
 	@override String get autoContinueTasksTooltip => 'Activa para que Devin continúe automáticamente con la siguiente tarea de Task Master';
 	@override late final Translations$chat$input$offlineQueue$es offlineQueue = Translations$chat$input$offlineQueue$es._(_root);
+	@override String get voice => 'Entrada de voz';
+	@override String get voiceStart => 'Dictar un mensaje';
+	@override String get voiceStop => 'Detener el dictado';
+	@override String get pinFile => 'Fijar archivo al contexto';
+	@override String get voiceSettings => 'Ajustes de voz (STT)';
 	@override String cameraUnavailable({required Object error}) => 'Cámara no disponible: ${error}';
 }
 
@@ -976,15 +1108,24 @@ class Translations$chat$composer$es extends Translations$chat$composer$en {
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
+	@override String get toolsAndActions => 'Herramientas y acciones';
+	@override String get toolsAndActionsDesc => 'Herramientas y controles del editor de chat';
 	@override String get reasoning => 'Razonamiento';
 	@override String get model => 'Modelo';
 	@override String get effortDefault => 'Predeterminado';
 	@override String get loadingModels => 'Cargando modelos…';
 	@override String get modelMenu => 'Seleccionar modelo y esfuerzo de razonamiento';
 	@override String permissionHeading({required Object provider}) => '¿Cómo deben aprobarse las acciones de ${provider}?';
-	@override String get toolsAndActions => 'Herramientas y acciones';
-	@override String get toolsAndActionsDesc => 'Herramientas y controles del editor de chat';
 	@override String get favorites => 'Favoritos';
+	@override String get account => 'Cuenta';
+	@override String get accountMenu => 'Seleccionar cuenta';
+	@override String get accountDefault => 'Cuenta predeterminada';
+	@override String get accountAuto => 'Auto (predeterminada)';
+	@override String get accountIsDefault => 'Predeterminada';
+	@override late final Translations$chat$composer$effortLevels$es effortLevels = Translations$chat$composer$effortLevels$es._(_root);
+	@override String contextWindow({required Object size}) => 'contexto de ${size}';
+	@override String get accountAutoShort => 'Automático';
+	@override String get uploadNoRecords => 'La subida no devolvió ningún registro';
 }
 
 // Path: chat.providerSelection
@@ -997,15 +1138,19 @@ class Translations$chat$providerSelection$es extends Translations$chat$providerS
 	@override String get title => 'Elige tu asistente de IA';
 	@override String get description => 'Selecciona un proveedor para iniciar una conversación nueva';
 	@override String get selectModel => 'Seleccionar modelo';
-	@override late final Translations$chat$providerSelection$providerInfo$es providerInfo = Translations$chat$providerSelection$providerInfo$es._(_root);
-	@override late final Translations$chat$providerSelection$readyPrompt$es readyPrompt = Translations$chat$providerSelection$readyPrompt$es._(_root);
-	@override String pressToSearch({required Object shortcut}) => 'Pulsa <kbd>${shortcut}</kbd> para buscar sesiones, archivos y commits';
 	@override String get workspace => 'Espacio de trabajo';
 	@override String get noWorkspace => 'Ninguno';
 	@override String get clickToChangeWorkspace => 'Haz clic para cambiar de espacio de trabajo';
 	@override String get chooseWorkspace => 'Elegir un espacio de trabajo';
 	@override String get searchWorkspaces => 'Buscar espacios de trabajo...';
 	@override String get noWorkspacesFound => 'No se encontraron espacios de trabajo.';
+	@override late final Translations$chat$providerSelection$providerInfo$es providerInfo = Translations$chat$providerSelection$providerInfo$es._(_root);
+	@override late final Translations$chat$providerSelection$readyPrompt$es readyPrompt = Translations$chat$providerSelection$readyPrompt$es._(_root);
+	@override String get autoGroup => 'Auto';
+	@override String get autoLabel => 'Auto (orquestado)';
+	@override String get autoDescription => 'Envía cada paso al mejor proveedor y modelo disponibles';
+	@override String get orchestrated => 'orquestado';
+	@override String pressToSearch({required Object shortcut}) => 'Pulsa <kbd>${shortcut}</kbd> para buscar sesiones, archivos y commits';
 	@override String get all => 'Todos';
 	@override String get free => 'Gratis';
 	@override String get noModelsFound => 'No se encontraron modelos.';
@@ -1033,6 +1178,7 @@ class Translations$chat$session$es extends Translations$chat$session$en {
 	@override late final Translations$chat$session$messages$es messages = Translations$chat$session$messages$es._(_root);
 	@override String get deleteConfirm => 'Elimina la sesión y su transcripción. No se puede deshacer.';
 	@override String get finishRunBeforeWorkspaceChange => 'Finaliza la ejecución antes de cambiar de espacio de trabajo';
+	@override String get fallbackTitle => 'Sesión';
 }
 
 // Path: chat.shell
@@ -1095,23 +1241,6 @@ class Translations$chat$tasks$es extends Translations$chat$tasks$en {
 	@override String get nextTaskPrompt => 'Empezar la siguiente tarea';
 }
 
-// Path: chat.voice
-class Translations$chat$voice$es extends Translations$chat$voice$en {
-	Translations$chat$voice$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String get autoRead => 'Leer respuestas en voz alta';
-	@override String get autoReadOn => 'Lectura de respuestas: activada';
-	@override String get autoReadOff => 'Lectura de respuestas: desactivada';
-	@override String get autoReadVoice => 'Voz de lectura';
-	@override String get autoReadVoiceAuto => 'Voz automática';
-	@override String get autoReadPreview => 'Así sonarán las respuestas.';
-	@override String get speakMessage => 'Leer en voz alta';
-	@override String get stopSpeaking => 'Detener lectura';
-}
-
 // Path: chat.splitSession
 class Translations$chat$splitSession$es extends Translations$chat$splitSession$en {
 	Translations$chat$splitSession$es._(TranslationsEs root) : this._root = root, super.internal(root);
@@ -1158,6 +1287,7 @@ class Translations$chat$sessionPicker$es extends Translations$chat$sessionPicker
 	@override String get deleteFailed => 'Error al eliminar la sesión. Inténtalo de nuevo.';
 	@override String get running => 'La sesión está en ejecución';
 	@override String get unread => 'Sin leer — finalizada con nueva salida';
+	@override String get account => 'Cuenta';
 }
 
 // Path: chat.splitWorkspace
@@ -1170,9 +1300,12 @@ class Translations$chat$splitWorkspace$es extends Translations$chat$splitWorkspa
 	@override String get addChat => 'Añadir panel de chat';
 	@override String get addBrowser => 'Añadir panel de navegador';
 	@override String get addTerminal => 'Añadir panel de terminal';
+	@override String get addPreview => 'Añadir panel de vista previa';
 	@override String get overview => 'Mostrar todos los paneles';
 	@override String get exitFocusMode => 'Salir del modo enfoque (Ctrl+Mayús+F)';
 	@override String get focusMode => 'Modo enfoque (Ctrl+Mayús+F)';
+	@override String get broadcast => 'Difundir a sesiones';
+	@override String get addNotes => 'Añadir panel de notas compartidas';
 	@override String get browseSessions => 'Abrir lista de sesiones';
 }
 
@@ -1200,9 +1333,9 @@ class Translations$chat$askUserQuestion$es extends Translations$chat$askUserQues
 
 	// Translations
 	@override String needsInput({required Object provider}) => '${provider} necesita tu respuesta';
-	@override String get answerHint => 'Escribe tu respuesta…';
-	@override String get other => 'Otro…';
 	@override String get skip => 'Omitir';
+	@override String get other => 'Otro…';
+	@override String get answerHint => 'Escribe tu respuesta…';
 }
 
 // Path: chat.attachments
@@ -1215,6 +1348,8 @@ class Translations$chat$attachments$es extends Translations$chat$attachments$en 
 	@override String get downloadFailedRetry => 'Descarga fallida — clic para reintentar';
 	@override String get fileAttachment => 'Archivo adjunto';
 	@override String download({required Object name}) => 'Descargar ${name}';
+	@override String get attachedFile => 'Archivo adjunto';
+	@override String downloaded({required Object name}) => '${name} descargado';
 }
 
 // Path: chat.checkpoint
@@ -1227,6 +1362,9 @@ class Translations$chat$checkpoint$es extends Translations$chat$checkpoint$en {
 	@override String get creating => 'Creando instantánea…';
 	@override String get revertChanges => 'Revertir archivos al último checkpoint';
 	@override String get undo => 'Deshacer checkpoint';
+	@override String get undoAiRun => 'Deshacer ejecución de la IA';
+	@override String get undoing => 'Deshaciendo…';
+	@override String get undone => 'Deshecho';
 	@override String get beforeAiTurn => 'antes del turno de la IA';
 }
 
@@ -1253,6 +1391,7 @@ class Translations$chat$taskMaster$es extends Translations$chat$taskMaster$en {
 	@override String get taskShort => 'TAREA';
 	@override String get addToTask => 'Añadir a TaskMaster';
 	@override String get added => 'Añadido a TaskMaster';
+	@override String get defaultTaskTitle => 'Tarea del chat';
 }
 
 // Path: chat.tokenUsage
@@ -1264,6 +1403,11 @@ class Translations$chat$tokenUsage$es extends Translations$chat$tokenUsage$en {
 	// Translations
 	@override String get desc => 'Ver el consumo de tokens de la sesión';
 	@override String get title => 'Uso de tokens';
+	@override String get notAvailable => 'N/D';
+	@override String tokensBadge({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count,
+		one: '${count} token',
+		other: '${count} tokens',
+	);
 }
 
 // Path: chat.tool
@@ -1285,6 +1429,29 @@ class Translations$chat$quotaBadge$es extends Translations$chat$quotaBadge$en {
 	// Translations
 	@override String get ariaLabel => 'Límites de suscripción';
 	@override String get noData => 'No hay datos de suscripción para este modelo';
+	@override String get noSubscription => 'sin suscripción';
+	@override String windowLineReset({required Object label, required Object percent, required Object time}) => '${label}: ${percent} % · se restablece ${time}';
+	@override String windowRemaining({required Object percent}) => 'Queda el ${percent} % de la ventana antes del restablecimiento';
+}
+
+// Path: chat.broadcast
+class Translations$chat$broadcast$es extends Translations$chat$broadcast$en {
+	Translations$chat$broadcast$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Difundir a sesiones';
+	@override String get noSessions => 'No hay sesiones disponibles';
+	@override String get placeholder => 'Mensaje para enviar a cada sesión seleccionada…';
+	@override String partial({required Object count}) => '${count} sesión(es) rechazaron el mensaje';
+	@override String sent({required Object count}) => 'En cola para ${count} sesión(es)';
+	@override String get selectAll => 'Seleccionar todo';
+	@override String get selectOrchestrators => 'Seleccionar orquestadores';
+	@override String get orchestratorsOnly => 'Solo orquestadores';
+	@override String get noOrchestrators => 'No hay sesiones de orquestador disponibles';
+	@override String get sending => 'Enviando…';
+	@override String send({required Object count}) => 'Enviar a ${count}';
 }
 
 // Path: chat.paneHeader
@@ -1298,27 +1465,17 @@ class Translations$chat$paneHeader$es extends Translations$chat$paneHeader$en {
 	@override String get switchSession => 'Cambiar sesión';
 }
 
-// Path: chat.broadcast
-class Translations$chat$broadcast$es extends Translations$chat$broadcast$en {
-	Translations$chat$broadcast$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: chat.export
+class Translations$chat$export$es extends Translations$chat$export$en {
+	Translations$chat$export$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get selectOrchestrators => 'Seleccionar orquestadores';
-	@override String get orchestratorsOnly => 'Solo orquestadores';
-	@override String get noOrchestrators => 'No hay sesiones de orquestador disponibles';
-}
-
-// Path: chat.changes
-class Translations$chat$changes$es extends Translations$chat$changes$en {
-	Translations$chat$changes$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String get empty => 'Sin cambios en archivos';
-	@override String get failedToLoad => 'No se pudieron cargar los cambios';
+	@override String sessionTitle({required Object id}) => 'Sesión ${id}';
+	@override String get pdfFailed => 'Falló la exportación a PDF';
+	@override String get transcriptDownloaded => 'Transcripción descargada';
+	@override String savedTo({required Object path}) => 'Guardado en ${path}';
 }
 
 // Path: chat.commandResult
@@ -1342,19 +1499,69 @@ class Translations$chat$commands$es extends Translations$chat$commands$en {
 	// Translations
 	@override String get runConfirmTitle => '¿Ejecutar comando?';
 	@override String get executionCancelled => 'Ejecución del comando cancelada';
+	@override String get bashConfirmMessage => 'Este comando contiene comandos de bash que se ejecutarán. ¿Quieres continuar?';
+	@override String get proceed => 'Continuar';
 }
 
-// Path: chat.export
-class Translations$chat$export$es extends Translations$chat$export$en {
-	Translations$chat$export$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: chat.pinFile
+class Translations$chat$pinFile$es extends Translations$chat$pinFile$en {
+	Translations$chat$pinFile$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String sessionTitle({required Object id}) => 'Sesión ${id}';
-	@override String get pdfFailed => 'Falló la exportación a PDF';
-	@override String get transcriptDownloaded => 'Transcripción descargada';
-	@override String savedTo({required Object path}) => 'Guardado en ${path}';
+	@override String get title => 'Fijar archivo';
+	@override String get pathHint => 'path/to/file.ext';
+	@override String get action => 'Fijar';
+}
+
+// Path: chat.modelLibrary
+class Translations$chat$modelLibrary$es extends Translations$chat$modelLibrary$en {
+	Translations$chat$modelLibrary$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String editTooltip({required Object name}) => 'Editar ${name}';
+	@override String deleteTooltip({required Object name}) => 'Eliminar ${name}';
+	@override String get enterNameAndId => 'Introduce tanto un nombre de modelo como un ID de modelo.';
+	@override String get idNoSpaces => 'Los ID de modelo no pueden contener espacios.';
+	@override String get setAsDefault => 'Establecer como predeterminado';
+	@override String get defaultModel => 'Modelo predeterminado';
+	@override String get title => 'Biblioteca de modelos';
+	@override String get subtitle => 'Añade los ID de modelo que admite tu proveedor. Los modelos integrados permanecen bloqueados. El círculo marca el modelo predeterminado.';
+	@override String get yourModels => 'Tus modelos';
+	@override String get yourModelsHint => 'Editables y guardados en auth.db';
+	@override String get emptyTitle => 'Aún no hay modelos personalizados';
+	@override String get emptyHint => 'Añade uno con el formulario y aparecerá en todos los selectores de modelo.';
+	@override String get builtInModels => 'Modelos integrados';
+	@override String get builtInModelsHint => 'Mantenidos por DDAgent y de solo lectura';
+	@override String get editTitle => 'Editar modelo personalizado';
+	@override String get addTitle => 'Añadir un modelo personalizado';
+	@override String idSentAsWritten({required Object provider}) => 'El ID se envía a ${provider} exactamente como está escrito.';
+	@override String get nameLabel => 'Nombre del modelo';
+	@override String get nameHint => 'p. ej., GPT-5.5 Pro';
+	@override String get idLabel => 'ID del modelo';
+	@override String get idHint => 'p. ej., gpt-5.5-pro';
+	@override String get idHelp => 'Usa el identificador exacto que acepta la CLI del proveedor. Los ID no pueden contener espacios.';
+	@override String updatedNotice({required Object name}) => '${name} se ha actualizado.';
+	@override String addedNotice({required Object name}) => '${name} se ha añadido.';
+	@override String deletedNotice({required Object name}) => '${name} se ha eliminado.';
+	@override String get saving => 'Guardando…';
+	@override String get saveChanges => 'Guardar cambios';
+	@override String get deleteConfirm => '¿Eliminar este modelo de todos los selectores?';
+	@override String get customBadge => 'Personalizado';
+}
+
+// Path: chat.changes
+class Translations$chat$changes$es extends Translations$chat$changes$en {
+	Translations$chat$changes$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get failedToLoad => 'No se pudieron cargar los cambios';
+	@override String get empty => 'Sin cambios en archivos';
 }
 
 // Path: chat.message
@@ -1365,35 +1572,9 @@ class Translations$chat$message$es extends Translations$chat$message$en {
 
 	// Translations
 	@override String get compactedSummary => 'Resumen compactado';
-	@override String get rawView => 'Vista sin procesar';
 	@override String get resendHint => 'Vuelve a enviar desde el compositor';
-}
-
-// Path: chat.modelLibrary
-class Translations$chat$modelLibrary$es extends Translations$chat$modelLibrary$en {
-	Translations$chat$modelLibrary$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String deleteTooltip({required Object name}) => 'Eliminar ${name}';
-	@override String editTooltip({required Object name}) => 'Editar ${name}';
-	@override String get enterNameAndId => 'Introduce tanto un nombre de modelo como un ID de modelo.';
-	@override String get idNoSpaces => 'Los ID de modelo no pueden contener espacios.';
-	@override String get setAsDefault => 'Establecer como predeterminado';
-	@override String get defaultModel => 'Modelo predeterminado';
-}
-
-// Path: chat.pinFile
-class Translations$chat$pinFile$es extends Translations$chat$pinFile$en {
-	Translations$chat$pinFile$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String get action => 'Fijar';
-	@override String get pathHint => 'path/to/file.ext';
-	@override String get title => 'Fijar archivo';
+	@override String get rawView => 'Vista sin procesar';
+	@override String get runComplete => 'Ejecución completada';
 }
 
 // Path: chat.permissionRequest
@@ -1405,6 +1586,156 @@ class Translations$chat$permissionRequest$es extends Translations$chat$permissio
 	// Translations
 	@override String title({required Object tool}) => 'Solicitud de permiso · ${tool}';
 	@override String get question => 'Pregunta';
+	@override String get subagent => 'Subagente';
+	@override String get viewersCannotApprove => 'Los observadores no pueden aprobar';
+	@override late final Translations$chat$permissionRequest$recap$es recap = Translations$chat$permissionRequest$recap$es._(_root);
+	@override String needsApproval({required Object tool}) => '${tool} necesita aprobación';
+	@override String subagentNeedsApproval({required Object tool}) => 'Subagente: ${tool} necesita aprobación';
+	@override String moreQuestions({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count,
+		one: '${count} pregunta más en espera',
+		other: '${count} preguntas más en espera',
+	);
+}
+
+// Path: chat.commandDialog
+class Translations$chat$commandDialog$es extends Translations$chat$commandDialog$en {
+	Translations$chat$commandDialog$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$chat$commandDialog$help$es help = Translations$chat$commandDialog$help$es._(_root);
+	@override late final Translations$chat$commandDialog$models$es models = Translations$chat$commandDialog$models$es._(_root);
+	@override late final Translations$chat$commandDialog$cost$es cost = Translations$chat$commandDialog$cost$es._(_root);
+	@override late final Translations$chat$commandDialog$status$es status = Translations$chat$commandDialog$status$es._(_root);
+	@override String get defaultEyebrow => 'Comando';
+	@override String get defaultTitle => 'Resultado del comando';
+	@override String get escHint => 'Esc cierra la ventana.';
+	@override String get unknown => 'Desconocido';
+	@override String get noDescription => 'No hay descripción disponible.';
+	@override String get noCommandsMatch => 'Ningún comando coincide con ese filtro.';
+	@override late final Translations$chat$commandDialog$syntax$es syntax = Translations$chat$commandDialog$syntax$es._(_root);
+	@override String get commandFinished => 'Comando finalizado.';
+}
+
+// Path: chat.utilities
+class Translations$chat$utilities$es extends Translations$chat$utilities$en {
+	Translations$chat$utilities$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get tokenUsageUnavailable => 'Uso de tokens no disponible';
+	@override late final Translations$chat$utilities$tooltip$es tooltip = Translations$chat$utilities$tooltip$es._(_root);
+	@override String get used => 'Usados';
+	@override String get cacheWrite => 'Escritura en caché';
+	@override String get contextLabel => 'Contexto';
+	@override String get usageUnsupported => 'uso no admitido';
+	@override String get chatTranscript => 'Transcripción del chat';
+	@override String get you => 'Tú:';
+	@override String get providerAutoMini => 'Auto (mini)';
+}
+
+// Path: chat.toolBlocks
+class Translations$chat$toolBlocks$es extends Translations$chat$toolBlocks$en {
+	Translations$chat$toolBlocks$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String moreLines({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count,
+		one: '… ${count} línea más',
+		other: '… ${count} líneas más',
+	);
+	@override late final Translations$chat$toolBlocks$status$es status = Translations$chat$toolBlocks$status$es._(_root);
+	@override String get showLess => 'Mostrar menos';
+	@override String get showMore => 'Mostrar más';
+	@override String showMoreLines({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count,
+		one: 'Mostrar ${count} línea más',
+		other: 'Mostrar ${count} líneas más',
+	);
+	@override String get tools => 'Herramientas';
+	@override String get planReview => 'Revisión del plan';
+	@override String get planUpdate => 'Actualización del plan';
+	@override String get todoListUpdated => 'Lista de tareas actualizada';
+	@override String get creatingTask => 'Creando tarea';
+	@override String get updatingTask => 'actualizando';
+	@override String get fetchingTask => 'obteniendo';
+	@override String get listingTasks => 'listando tareas';
+	@override String get search => 'Buscar';
+	@override late final Translations$chat$toolBlocks$verbs$es verbs = Translations$chat$toolBlocks$verbs$es._(_root);
+	@override String get subagent => 'Subagente';
+	@override String toolCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count,
+		one: '${count} herramienta',
+		other: '${count} herramientas',
+	);
+	@override String get result => 'resultado';
+	@override String plusMore({required Object count}) => '+${count} más';
+	@override String get plan => 'Plan';
+	@override String questionProgress({required Object current, required Object total}) => 'Pregunta ${current}/${total}';
+	@override String lineCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count,
+		one: '${count} línea',
+		other: '${count} líneas',
+	);
+	@override String todoListItems({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count,
+		one: 'Lista de tareas (${count} elemento)',
+		other: 'Lista de tareas (${count} elementos)',
+	);
+	@override String tasksCompleted({required Object done, required Object total}) => '${done}/${total} completadas';
+}
+
+// Path: chat.commandMenu
+class Translations$chat$commandMenu$es extends Translations$chat$commandMenu$en {
+	Translations$chat$commandMenu$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get empty => 'No hay comandos disponibles';
+	@override late final Translations$chat$commandMenu$namespaces$es namespaces = Translations$chat$commandMenu$namespaces$es._(_root);
+}
+
+// Path: chat.mentionMenu
+class Translations$chat$mentionMenu$es extends Translations$chat$mentionMenu$en {
+	Translations$chat$mentionMenu$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$chat$mentionMenu$kinds$es kinds = Translations$chat$mentionMenu$kinds$es._(_root);
+	@override String taskTitle({required Object id}) => 'Tarea ${id}';
+}
+
+// Path: chat.subheader
+class Translations$chat$subheader$es extends Translations$chat$subheader$en {
+	Translations$chat$subheader$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String contextTooltip({required Object used, required Object total, required Object percent}) => 'Contexto: ${used} / ${total} tokens · ${percent} % usado';
+}
+
+// Path: chat.transcript
+class Translations$chat$transcript$es extends Translations$chat$transcript$en {
+	Translations$chat$transcript$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get requestFailed => 'La solicitud falló';
+}
+
+// Path: chat.review
+class Translations$chat$review$es extends Translations$chat$review$en {
+	Translations$chat$review$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get changedFiles => 'Archivos modificados';
+	@override String changedFilesCount({required Object count}) => 'Archivos modificados (${count})';
+	@override String get subagent => 'subagente';
 }
 
 // Path: codeEditor.toolbar
@@ -1422,10 +1753,10 @@ class Translations$codeEditor$toolbar$es extends Translations$codeEditor$toolbar
 	@override String get settings => 'Ajustes del editor';
 	@override String get collapse => 'Contraer editor';
 	@override String get expand => 'Expandir editor a ancho completo';
+	@override String get toggleDock => 'Alternar panel de archivos';
 	@override String get diffMerge => 'Diff / fusión';
 	@override String get previewInBrowser => 'Vista previa en el navegador';
 	@override String get reload => 'Recargar desde el disco';
-	@override String get toggleDock => 'Alternar panel de archivos';
 }
 
 // Path: codeEditor.header
@@ -1473,6 +1804,12 @@ class Translations$codeEditor$footer$es extends Translations$codeEditor$footer$e
 	@override String get lines => 'Líneas:';
 	@override String get characters => 'Caracteres:';
 	@override String get shortcuts => 'Ctrl+S para guardar • Esc para cerrar';
+	@override String get plainText => 'texto sin formato';
+	@override String lineCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count,
+		one: '${count} línea',
+		other: '${count} líneas',
+	);
+	@override String get modified => 'modificado';
 }
 
 // Path: codeEditor.binaryFile
@@ -1499,30 +1836,15 @@ class Translations$codeEditor$filePreview$es extends Translations$codeEditor$fil
 	@override String get openInNewTab => 'Abrir en una pestaña nueva';
 }
 
-// Path: codeEditor.diff
-class Translations$codeEditor$diff$es extends Translations$codeEditor$diff$en {
-	Translations$codeEditor$diff$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: codeEditor.mediaFile
+class Translations$codeEditor$mediaFile$es extends Translations$codeEditor$mediaFile$en {
+	Translations$codeEditor$mediaFile$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get applyMerge => 'Aplicar fusión';
-	@override String get base => 'Base';
-	@override String get close => 'Cerrar diff';
-	@override String get current => 'Actual';
-	@override String hunk({required Object number}) => 'Sección ${number}';
-	@override String get noChanges => 'Sin cambios';
-	@override String get deletedOnDisk => 'eliminado en el disco';
-}
-
-// Path: codeEditor.emptyState
-class Translations$codeEditor$emptyState$es extends Translations$codeEditor$emptyState$en {
-	Translations$codeEditor$emptyState$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Ningún archivo abierto';
+	@override String get title => 'Archivo multimedia';
+	@override String get subtitle => 'La vista previa de audio y vídeo aún no es compatible';
 }
 
 // Path: codeEditor.hexDump
@@ -1535,17 +1857,6 @@ class Translations$codeEditor$hexDump$es extends Translations$codeEditor$hexDump
 	@override String more({required Object size}) => '… ${size} más';
 }
 
-// Path: codeEditor.mediaFile
-class Translations$codeEditor$mediaFile$es extends Translations$codeEditor$mediaFile$en {
-	Translations$codeEditor$mediaFile$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String get subtitle => 'La vista previa de audio y vídeo aún no es compatible';
-	@override String get title => 'Archivo multimedia';
-}
-
 // Path: codeEditor.settings
 class Translations$codeEditor$settings$es extends Translations$codeEditor$settings$en {
 	Translations$codeEditor$settings$es._(TranslationsEs root) : this._root = root, super.internal(root);
@@ -1553,10 +1864,46 @@ class Translations$codeEditor$settings$es extends Translations$codeEditor$settin
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String fontSizeDecrease({required Object size}) => 'Tamaño de fuente −  (ahora ${size})';
-	@override String get fontSizeIncrease => 'Tamaño de fuente +';
 	@override String get minimap => 'Minimapa';
 	@override String tabSize({required Object size}) => 'Tamaño de tabulación: ${size}';
+	@override String fontSizeDecrease({required Object size}) => 'Tamaño de fuente −  (ahora ${size})';
+	@override String get fontSizeIncrease => 'Tamaño de fuente +';
+}
+
+// Path: codeEditor.diff
+class Translations$codeEditor$diff$es extends Translations$codeEditor$diff$en {
+	Translations$codeEditor$diff$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get noChanges => 'Sin cambios';
+	@override String hunk({required Object number}) => 'Sección ${number}';
+	@override String get close => 'Cerrar diff';
+	@override String get base => 'Base';
+	@override String get current => 'Actual';
+	@override String get applyMerge => 'Aplicar fusión';
+	@override String get deletedOnDisk => 'eliminado en el disco';
+	@override String get untrackedWillBeDeleted => 'Este archivo sin seguimiento se eliminará.';
+	@override String restoreConfirm({required Object name}) => '¿Restaurar ${name} a su estado confirmado?';
+	@override String get headVsWorkingCopy => 'HEAD frente a copia de trabajo';
+	@override String get savedVsBuffer => 'Último guardado frente a búfer (sin git)';
+	@override String unchangedLines({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count,
+		one: '${count} línea sin cambios',
+		other: '${count} líneas sin cambios',
+	);
+	@override String get revertToSaved => 'Revertir a lo guardado';
+}
+
+// Path: codeEditor.emptyState
+class Translations$codeEditor$emptyState$es extends Translations$codeEditor$emptyState$en {
+	Translations$codeEditor$emptyState$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Ningún archivo abierto';
+	@override String get hint => 'Abre archivos desde la pestaña Archivos';
 }
 
 // Path: codeEditor.toasts
@@ -1597,8 +1944,8 @@ class Translations$common$buttons$es extends Translations$common$buttons$en {
 	@override String get download => 'Descargar';
 	@override String get upload => 'Subir';
 	@override String get browse => 'Explorar';
-	@override String get openDiagram => 'Abrir diagrama';
 	@override String get update => 'Actualizar';
+	@override String get openDiagram => 'Abrir diagrama';
 }
 
 // Path: common.tabs
@@ -1613,10 +1960,53 @@ class Translations$common$tabs$es extends Translations$common$tabs$en {
 	@override String get files => 'Archivos';
 	@override String get git => 'Control de versiones';
 	@override String get tasks => 'Tareas';
+	@override String get board => 'Tablero';
 	@override String get browser => 'Navegador';
 	@override String get computer => 'Equipo';
-	@override String get board => 'Tablero';
 	@override String get usage => 'AI Control';
+}
+
+// Path: common.quota
+class Translations$common$quota$es extends Translations$common$quota$en {
+	Translations$common$quota$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get controlCenter => 'Centro de control de IA';
+	@override late final Translations$common$quota$section$es section = Translations$common$quota$section$es._(_root);
+	@override late final Translations$common$quota$filter$es filter = Translations$common$quota$filter$es._(_root);
+	@override late final Translations$common$quota$period$es period = Translations$common$quota$period$es._(_root);
+	@override late final Translations$common$quota$group$es group = Translations$common$quota$group$es._(_root);
+	@override late final Translations$common$quota$metric$es metric = Translations$common$quota$metric$es._(_root);
+	@override late final Translations$common$quota$cost$es cost = Translations$common$quota$cost$es._(_root);
+	@override late final Translations$common$quota$cost3$es cost3 = Translations$common$quota$cost3$es._(_root);
+	@override late final Translations$common$quota$overview$es overview = Translations$common$quota$overview$es._(_root);
+	@override late final Translations$common$quota$usage$es usage = Translations$common$quota$usage$es._(_root);
+	@override late final Translations$common$quota$agents$es agents = Translations$common$quota$agents$es._(_root);
+	@override late final Translations$common$quota$agentStatus$es agentStatus = Translations$common$quota$agentStatus$es._(_root);
+	@override late final Translations$common$quota$alert$es alert = Translations$common$quota$alert$es._(_root);
+	@override String get backToChat => 'Volver al chat';
+	@override String get syncNow => 'Sincronizar ahora';
+	@override String generatedAt({required Object value}) => 'Actualizado ${value}';
+	@override String get loading => 'Cargando límites de cuenta…';
+	@override String remaining({required Object value}) => '${value}% restante';
+	@override String resetsIn({required Object value}) => 'se reinicia en ${value}';
+	@override String projected({required Object value}) => 'al ritmo actual, este límite se agota en ${value}';
+	@override String syncedAgo({required Object value}) => 'sincronizado hace ${value}';
+	@override String get refreshAccount => 'Actualizar cuenta';
+	@override String get syncFailed => 'Error de sincronización';
+	@override String get history => 'Historial';
+	@override String historyPoints({required Object value}) => '${value} lecturas registradas';
+	@override String get historyEmpty => 'Aún no hay historial registrado';
+	@override String get noAgents => 'No hay agentes asignados';
+	@override String get noSubscription => 'Sin suscripción';
+	@override String get noSubscriptionHint => 'El proveedor no reporta ningún plan activo para esta cuenta.';
+	@override late final Translations$common$quota$quality$es quality = Translations$common$quota$quality$es._(_root);
+	@override late final Translations$common$quota$kpi$es kpi = Translations$common$quota$kpi$es._(_root);
+	@override late final Translations$common$quota$empty$es empty = Translations$common$quota$empty$es._(_root);
+	@override late final Translations$common$quota$settings$es settings = Translations$common$quota$settings$es._(_root);
+	@override late final Translations$common$quota$range$es range = Translations$common$quota$range$es._(_root);
 }
 
 // Path: common.status
@@ -1668,6 +2058,7 @@ class Translations$common$navigation$es extends Translations$common$navigation$e
 	@override String get next => 'Siguiente';
 	@override String get previous => 'Anterior';
 	@override String get logout => 'Cerrar sesión';
+	@override String get backToChat => 'Volver al chat';
 }
 
 // Path: common.common
@@ -1763,6 +2154,9 @@ class Translations$common$fileTree$es extends Translations$common$fileTree$en {
 	@override String get compactView => 'Vista compacta';
 	@override String get detailedView => 'Vista detallada';
 	@override String get searchPlaceholder => 'Buscar archivos y carpetas...';
+	@override String get searchContentPlaceholder => 'Buscar en archivos...';
+	@override String get searchInFiles => 'Buscar en archivos';
+	@override String get searchByName => 'Buscar por nombre';
 	@override String get clearSearch => 'Limpiar búsqueda';
 	@override String get name => 'Nombre';
 	@override String get size => 'Tamaño';
@@ -1770,8 +2164,13 @@ class Translations$common$fileTree$es extends Translations$common$fileTree$en {
 	@override String get permissions => 'Permisos';
 	@override String get noFilesFound => 'No se encontraron archivos';
 	@override String get checkProjectPath => 'Comprueba si la ruta del proyecto es accesible';
+	@override String get loadFailed => 'No se pudieron cargar los archivos';
 	@override String get noMatchesFound => 'No se encontraron coincidencias';
+	@override String get noSearchResults => 'No se encontraron coincidencias';
 	@override String get tryDifferentSearch => 'Prueba con otro término o limpia la búsqueda';
+	@override String get searchError => 'Error en la búsqueda';
+	@override String get searching => 'Buscando...';
+	@override String resultsTruncated({required Object count}) => 'Mostrando los primeros ${count} resultados';
 	@override String get justNow => 'justo ahora';
 	@override String minAgo({required Object count}) => 'hace ${count} min';
 	@override String hoursAgo({required Object count}) => 'hace ${count} horas';
@@ -1781,14 +2180,6 @@ class Translations$common$fileTree$es extends Translations$common$fileTree$en {
 	@override String get refresh => 'Actualizar';
 	@override String get collapseAll => 'Contraer todo';
 	@override late final Translations$common$fileTree$context$es context = Translations$common$fileTree$context$es._(_root);
-	@override String get searchContentPlaceholder => 'Buscar en archivos...';
-	@override String get searchInFiles => 'Buscar en archivos';
-	@override String get searchByName => 'Buscar por nombre';
-	@override String get loadFailed => 'No se pudieron cargar los archivos';
-	@override String get noSearchResults => 'No se encontraron coincidencias';
-	@override String get searchError => 'Error en la búsqueda';
-	@override String get searching => 'Buscando...';
-	@override String resultsTruncated({required Object count}) => 'Mostrando los primeros ${count} resultados';
 	@override String get allWorkspaces => 'Todos los espacios de trabajo';
 	@override late final Translations$common$fileTree$delete$es delete = Translations$common$fileTree$delete$es._(_root);
 	@override String get dropToUpload => 'Suelta archivos para subirlos';
@@ -1857,49 +2248,6 @@ class Translations$common$versionUpdate$es extends Translations$common$versionUp
 	@override String get updateFailed => 'La actualización falló';
 	@override late final Translations$common$versionUpdate$buttons$es buttons = Translations$common$versionUpdate$buttons$es._(_root);
 	@override late final Translations$common$versionUpdate$ariaLabels$es ariaLabels = Translations$common$versionUpdate$ariaLabels$es._(_root);
-}
-
-// Path: common.quota
-class Translations$common$quota$es extends Translations$common$quota$en {
-	Translations$common$quota$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String get controlCenter => 'AI Control Center';
-	@override late final Translations$common$quota$section$es section = Translations$common$quota$section$es._(_root);
-	@override late final Translations$common$quota$filter$es filter = Translations$common$quota$filter$es._(_root);
-	@override late final Translations$common$quota$period$es period = Translations$common$quota$period$es._(_root);
-	@override late final Translations$common$quota$group$es group = Translations$common$quota$group$es._(_root);
-	@override late final Translations$common$quota$metric$es metric = Translations$common$quota$metric$es._(_root);
-	@override late final Translations$common$quota$cost$es cost = Translations$common$quota$cost$es._(_root);
-	@override late final Translations$common$quota$cost3$es cost3 = Translations$common$quota$cost3$es._(_root);
-	@override late final Translations$common$quota$overview$es overview = Translations$common$quota$overview$es._(_root);
-	@override late final Translations$common$quota$usage$es usage = Translations$common$quota$usage$es._(_root);
-	@override late final Translations$common$quota$agents$es agents = Translations$common$quota$agents$es._(_root);
-	@override late final Translations$common$quota$agentStatus$es agentStatus = Translations$common$quota$agentStatus$es._(_root);
-	@override late final Translations$common$quota$alert$es alert = Translations$common$quota$alert$es._(_root);
-	@override String get backToChat => 'Volver al chat';
-	@override String get syncNow => 'Sincronizar ahora';
-	@override String generatedAt({required Object value}) => 'Actualizado ${value}';
-	@override String get loading => 'Cargando límites de cuenta…';
-	@override String remaining({required Object value}) => '${value}% restante';
-	@override String resetsIn({required Object value}) => 'se reinicia en ${value}';
-	@override String projected({required Object value}) => 'al ritmo actual, este límite se agota en ${value}';
-	@override String syncedAgo({required Object value}) => 'sincronizado hace ${value}';
-	@override String get refreshAccount => 'Actualizar cuenta';
-	@override String get syncFailed => 'Error de sincronización';
-	@override String get history => 'Historial';
-	@override String historyPoints({required Object value}) => '${value} lecturas registradas';
-	@override String get historyEmpty => 'Aún no hay historial registrado';
-	@override String get noAgents => 'No hay agentes asignados';
-	@override String get noSubscription => 'Sin suscripción';
-	@override String get noSubscriptionHint => 'El proveedor no reporta ningún plan activo para esta cuenta.';
-	@override late final Translations$common$quota$quality$es quality = Translations$common$quota$quality$es._(_root);
-	@override late final Translations$common$quota$kpi$es kpi = Translations$common$quota$kpi$es._(_root);
-	@override late final Translations$common$quota$empty$es empty = Translations$common$quota$empty$es._(_root);
-	@override late final Translations$common$quota$settings$es settings = Translations$common$quota$settings$es._(_root);
-	@override late final Translations$common$quota$range$es range = Translations$common$quota$range$es._(_root);
 }
 
 // Path: common.actions
@@ -2116,6 +2464,8 @@ class Translations$common$gitPanel$es extends Translations$common$gitPanel$en {
 	@override late final Translations$common$gitPanel$worktrees$es worktrees = Translations$common$gitPanel$worktrees$es._(_root);
 	@override String get wrap => 'Ajuste';
 	@override late final Translations$common$gitPanel$tabs$es tabs = Translations$common$gitPanel$tabs$es._(_root);
+	@override String get save => 'Guardar';
+	@override late final Translations$common$gitPanel$worktreeScripts$es worktreeScripts = Translations$common$gitPanel$worktreeScripts$es._(_root);
 }
 
 // Path: common.sessions
@@ -2136,6 +2486,20 @@ class Translations$common$projects$es extends Translations$common$projects$en {
 
 	// Translations
 	@override String get newSession => 'Nueva sesión';
+}
+
+// Path: common.sharedNotes
+class Translations$common$sharedNotes$es extends Translations$common$sharedNotes$en {
+	Translations$common$sharedNotes$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get subtitle => 'Memoria compartida — se inyecta en cada sesión de este proyecto';
+	@override String get save => 'Guardar';
+	@override String get saving => 'Guardando…';
+	@override String get noProject => 'Selecciona un espacio de trabajo para editar su contexto compartido';
+	@override String get placeholder => '# Contexto compartido\nConvenciones, decisiones y referencias que todo agente debería conocer…';
 }
 
 // Path: common.codeBlock
@@ -2181,6 +2545,26 @@ class Translations$common$update$es extends Translations$common$update$en {
 	@override String staged({required Object version}) => 'Actualización v${version} descargada — reinicia el servidor para instalarla.';
 	@override String get upToDate => 'El servidor ya tiene la última versión.';
 	@override String webHostFailed({required Object message}) => 'El servidor se actualizó, pero su interfaz web no: ${message}';
+}
+
+// Path: common.appShell
+class Translations$common$appShell$es extends Translations$common$appShell$en {
+	Translations$common$appShell$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String panelActive({required Object count}) => 'Panel · ${count} activas';
+}
+
+// Path: common.errors
+class Translations$common$errors$es extends Translations$common$errors$en {
+	Translations$common$errors$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get forbidden => 'Acceso denegado';
 }
 
 // Path: settings.changelog
@@ -2229,10 +2613,13 @@ class Translations$settings$updates$es extends Translations$settings$updates$en 
 	// Translations
 	@override String get title => 'Actualizaciones';
 	@override String get description => 'Busca en GitHub una versión de escritorio más reciente. Las nuevas versiones se descargan automáticamente y se instalan al salir.';
+	@override String get descriptionMobile => 'Busca en GitHub una versión más reciente de esta app. Las actualizaciones las instala el instalador del sistema de tu dispositivo.';
+	@override String get descriptionServer => 'Busca en GitHub una versión más reciente de DDAgent. El servidor conectado puede actualizarse solo — las sesiones activas se interrumpen mientras se reinicia.';
 	@override String get check => 'Buscar actualizaciones';
 	@override String get checking => 'Buscando…';
 	@override String upToDate({required Object version}) => 'Tienes la última versión (v${version}).';
 	@override String available({required Object version}) => 'Actualización v${version} encontrada — descargando en segundo plano; se instalará al cerrar DDAgent.';
+	@override String appAvailable({required Object version}) => 'Actualización de la app v${version} disponible — toca Actualizar para instalarla en este dispositivo.';
 	@override String downloaded({required Object version}) => 'Actualización v${version} descargada — cierra y reinicia DDAgent para instalarla.';
 	@override String get unavailable => 'La búsqueda de actualizaciones solo está disponible en builds de escritorio empaquetados.';
 	@override String error({required Object message}) => 'Error al buscar actualizaciones: ${message}';
@@ -2341,6 +2728,7 @@ class Translations$settings$quickSettings$es extends Translations$settings$quick
 	@override String get sendByCtrlEnterDescription => 'Si está activado, Ctrl+Enter envía el mensaje en lugar de solo Enter. Útil para usuarios de IME y evitar envíos accidentales.';
 	@override late final Translations$settings$quickSettings$dragHandle$es dragHandle = Translations$settings$quickSettings$dragHandle$es._(_root);
 	@override String get sendWithCtrlEnter => 'Enviar con Ctrl+Enter';
+	@override String get enterSendsHint => 'Si está desactivado, Enter envía y Shift+Enter inserta un salto de línea.';
 }
 
 // Path: settings.terminalShortcuts
@@ -2359,8 +2747,8 @@ class Translations$settings$terminalShortcuts$es extends Translations$settings$t
 	@override String get arrowUp => 'Flecha arriba';
 	@override String get arrowDown => 'Flecha abajo';
 	@override String get scrollDown => 'Desplazar hacia abajo';
-	@override late final Translations$settings$terminalShortcuts$handle$es handle = Translations$settings$terminalShortcuts$handle$es._(_root);
 	@override String get killTitle => 'Terminar proceso en ejecución (Ctrl+C)';
+	@override late final Translations$settings$terminalShortcuts$handle$es handle = Translations$settings$terminalShortcuts$handle$es._(_root);
 	@override String get paste => 'Pegar';
 }
 
@@ -2374,7 +2762,9 @@ class Translations$settings$mainTabs$es extends Translations$settings$mainTabs$e
 	@override String get label => 'Ajustes';
 	@override String get agents => 'Agentes';
 	@override String get orchestration => 'Orquestación';
+	@override String get miniOrchestration => 'Miniorquestación';
 	@override String get appearance => 'Apariencia';
+	@override String get workspaces => 'Espacios de trabajo';
 	@override String get git => 'Git';
 	@override String get apiTokens => 'API y tokens';
 	@override String get models => 'Modelos';
@@ -2383,8 +2773,27 @@ class Translations$settings$mainTabs$es extends Translations$settings$mainTabs$e
 	@override String get tools => 'Herramientas';
 	@override String get notifications => 'Notificaciones';
 	@override String get about => 'Acerca de';
-	@override String get workspaces => 'Espacios de trabajo';
-	@override String get quota => 'Control Center';
+	@override String get quota => 'Centro de control';
+	@override String get shortcuts => 'Atajos de teclado';
+}
+
+// Path: settings.miniOrchestration
+class Translations$settings$miniOrchestration$es extends Translations$settings$miniOrchestration$en {
+	Translations$settings$miniOrchestration$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Miniorquestación';
+	@override String get description => 'Un pipeline de dos modelos: un pensador no flash planifica y un ejecutor flash ejecuta.';
+	@override String get loading => 'Cargando los ajustes de miniorquestación…';
+	@override String get loadError => 'No se pudieron cargar los ajustes de miniorquestación.';
+	@override late final Translations$settings$miniOrchestration$enable$es enable = Translations$settings$miniOrchestration$enable$es._(_root);
+	@override late final Translations$settings$miniOrchestration$thinker$es thinker = Translations$settings$miniOrchestration$thinker$es._(_root);
+	@override late final Translations$settings$miniOrchestration$worker$es worker = Translations$settings$miniOrchestration$worker$es._(_root);
+	@override late final Translations$settings$miniOrchestration$fields$es fields = Translations$settings$miniOrchestration$fields$es._(_root);
+	@override late final Translations$settings$miniOrchestration$roles$es roles = Translations$settings$miniOrchestration$roles$es._(_root);
+	@override late final Translations$settings$miniOrchestration$planner$es planner = Translations$settings$miniOrchestration$planner$es._(_root);
 }
 
 // Path: settings.orchestration
@@ -2395,9 +2804,9 @@ class Translations$settings$orchestration$es extends Translations$settings$orche
 
 	// Translations
 	@override String get title => 'Orchestration';
-	@override String get description => 'Route chat tasks across your providers and models.';
-	@override String get loading => 'Loading orchestration settings…';
-	@override String get loadError => 'Could not load the orchestration settings.';
+	@override String get description => 'Reparte las tareas del chat entre tus proveedores y modelos.';
+	@override String get loading => 'Cargando los ajustes de orquestación…';
+	@override String get loadError => 'No se pudieron cargar los ajustes de orquestación.';
 	@override String get retry => 'Retry';
 	@override late final Translations$settings$orchestration$enable$es enable = Translations$settings$orchestration$enable$es._(_root);
 	@override late final Translations$settings$orchestration$pool$es pool = Translations$settings$orchestration$pool$es._(_root);
@@ -2422,6 +2831,7 @@ class Translations$settings$notifications$es extends Translations$settings$notif
 	@override late final Translations$settings$notifications$desktop$es desktop = Translations$settings$notifications$desktop$es._(_root);
 	@override late final Translations$settings$notifications$sound$es sound = Translations$settings$notifications$sound$es._(_root);
 	@override late final Translations$settings$notifications$events$es events = Translations$settings$notifications$events$es._(_root);
+	@override late final Translations$settings$notifications$messaging$es messaging = Translations$settings$notifications$messaging$es._(_root);
 	@override late final Translations$settings$notifications$channels$es channels = Translations$settings$notifications$channels$es._(_root);
 	@override String get unpair => 'Desvincular';
 }
@@ -2544,6 +2954,7 @@ class Translations$settings$agents$es extends Translations$settings$agents$en {
 	@override late final Translations$settings$agents$login$es login = Translations$settings$agents$login$es._(_root);
 	@override late final Translations$settings$agents$logout$es logout = Translations$settings$agents$logout$es._(_root);
 	@override String error({required Object error}) => 'Error: ${error}';
+	@override late final Translations$settings$agents$accounts$es accounts = Translations$settings$agents$accounts$es._(_root);
 }
 
 // Path: settings.permissions
@@ -2635,6 +3046,72 @@ class Translations$settings$workspaces$es extends Translations$settings$workspac
 	@override String get pathRequired => 'La ruta es obligatoria';
 }
 
+// Path: settings.stt
+class Translations$settings$stt$es extends Translations$settings$stt$en {
+	Translations$settings$stt$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Entrada de voz (voz a texto)';
+	@override String get description => 'Endpoint /audio/transcriptions compatible con Whisper (OpenAI, whisper.cpp, faster-whisper, Speaches). Activa el botón de micrófono en el editor.';
+	@override String get configured => 'configurado';
+	@override String get endpoint => 'URL del endpoint (p. ej. https://api.openai.com/v1)';
+	@override String get apiKey => 'Clave de API';
+	@override String get model => 'Modelo (predeterminado: whisper-1)';
+	@override String get save => 'Guardar';
+}
+
+// Path: settings.schedules
+class Translations$settings$schedules$es extends Translations$settings$schedules$en {
+	Translations$settings$schedules$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Programaciones';
+	@override String get description => 'Ejecuciones recurrentes de agentes según un calendario cron. Se lanzan sin supervisión y con los permisos omitidos.';
+	@override String get preventSleep => 'Evitar la suspensión mientras se ejecutan agentes';
+	@override String get preventSleepHint => 'En escritorio la pantalla se mantiene encendida; en el navegador se usa un bloqueo de activación de pantalla.';
+	@override String get kNew => 'Nueva programación';
+	@override String get loading => 'Cargando…';
+	@override String get empty => 'Aún no hay programaciones.';
+	@override String get project => 'Proyecto';
+	@override String get provider => 'Proveedor';
+	@override String get cron => 'Cron (min hora día mes día de la semana)';
+	@override String nextRun({required Object time}) => 'Próxima ejecución: ${time}';
+	@override String get cronInvalid => 'No hay próximas ejecuciones para esta expresión';
+	@override String get prompt => 'Prompt';
+	@override String get useWorktree => 'Ejecutar en un worktree nuevo';
+	@override String get catchUp => 'Recuperar ejecuciones perdidas';
+	@override String failures({required Object count}) => '${count} fallos';
+	@override String get disabled => 'desactivada';
+	@override String get history => 'Historial';
+	@override String get runNow => 'Ejecutar ahora';
+	@override String get delete => 'Eliminar';
+	@override String get noRuns => 'Aún no hay ejecuciones.';
+	@override String get next => 'próxima';
+	@override String get create => 'Crear';
+	@override String get toggleSchedule => 'Activar programación';
+}
+
+// Path: settings.mcpTokens
+class Translations$settings$mcpTokens$es extends Translations$settings$mcpTokens$en {
+	Translations$settings$mcpTokens$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Tokens del servidor MCP de DDAgent';
+	@override String get description => 'Las herramientas externas (Claude Desktop, OpenClaw) llaman a las herramientas de DDAgent mediante POST /mcp con uno de estos tokens bearer.';
+	@override String get dismiss => 'Descartar';
+	@override String get labelPlaceholder => 'Nombre del token (p. ej. Claude Desktop)';
+	@override String get create => 'Crear';
+	@override String get empty => 'Aún no hay tokens MCP.';
+	@override String lastUsed({required Object time}) => 'usado ${time}';
+	@override String get neverUsed => 'nunca usado';
+}
+
 // Path: settings.about
 class Translations$settings$about$es extends Translations$settings$about$en {
 	Translations$settings$about$es._(TranslationsEs root) : this._root = root, super.internal(root);
@@ -2644,10 +3121,10 @@ class Translations$settings$about$es extends Translations$settings$about$en {
 	// Translations
 	@override String get supportTitle => 'Apoya el proyecto';
 	@override String get buyMeACoffee => 'Invítame a un café';
-	@override String get learnMore => 'Más información';
-	@override late final Translations$settings$about$pro$es pro = Translations$settings$about$pro$es._(_root);
-	@override String get proFeatures => 'Funciones de DDAgent Pro';
 	@override String get tryHosted => 'Prueba DDAgent Hosted';
+	@override String get learnMore => 'Más información';
+	@override String get proFeatures => 'Funciones de DDAgent Pro';
+	@override late final Translations$settings$about$pro$es pro = Translations$settings$about$pro$es._(_root);
 	@override String get versionInfo => 'Información de versión';
 	@override String get client => 'Aplicación';
 	@override String get server => 'Servidor';
@@ -2655,6 +3132,58 @@ class Translations$settings$about$es extends Translations$settings$about$en {
 	@override String get platformDesktop => 'Escritorio';
 	@override String get platformWeb => 'Web';
 	@override String get unknown => 'desconocida';
+	@override String get copyright => '© 2026 DDAgent — todos los derechos reservados';
+	@override String get tagline => 'Interfaz de código abierto para asistentes de programación con IA';
+	@override String get docs => 'Documentación';
+	@override String get hostedDescription => 'Colaboración en equipo, configuraciones MCP compartidas, sincronización de ajustes entre entornos e infraestructura gestionada.';
+}
+
+// Path: settings.shortcuts
+class Translations$settings$shortcuts$es extends Translations$settings$shortcuts$en {
+	Translations$settings$shortcuts$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => 'Todos los atajos de teclado de DDAgent, separados por plataforma.';
+	@override String get action => 'Acción';
+	@override String get winLinux => 'Windows / Linux';
+	@override String get mac => 'macOS';
+	@override String get navigation => 'Navegación';
+	@override String get navWorkspace => 'Ir al espacio de trabajo';
+	@override String get navTasks => 'Ir a Tareas / Git';
+	@override String get navGit => 'Ir a Git';
+	@override String get navFocus => 'Alternar modo enfoque (barra lateral)';
+	@override String get navSwitcher => 'Selector rápido de sesiones';
+	@override String get navPalette => 'Paleta de comandos';
+	@override String get navSettings => 'Abrir ajustes';
+	@override String get navClose => 'Cerrar diálogo / restaurar paneles divididos';
+	@override String get composer => 'Editor';
+	@override String get compSend => 'Enviar mensaje';
+	@override String get compNewline => 'Nueva línea';
+	@override String get compNav => 'Navegar por las sugerencias';
+	@override String get compAccept => 'Aceptar sugerencia';
+	@override String get compCloseSuggest => 'Cerrar sugerencias';
+	@override String get transcript => 'Transcripción';
+	@override String get trCopy => 'Copiar texto seleccionado';
+	@override String get trClose => 'Cerrar búsqueda / panel de revisión';
+	@override String get terminal => 'Terminal';
+	@override String get termCopy => 'Copiar selección';
+	@override String get termInterrupt => 'Interrumpir proceso (sin selección)';
+	@override String get termPaste => 'Pegar';
+	@override String get termSelectAll => 'Seleccionar todo';
+	@override String get editor => 'Editor';
+	@override String get edSave => 'Guardar archivo';
+	@override String get edSaveAll => 'Guardar todos los archivos';
+	@override String get edClose => 'Cerrar pestaña';
+	@override String get edNextTab => 'Pestaña siguiente';
+	@override String get edPrevTab => 'Pestaña anterior';
+	@override String get edIndent => 'Aumentar / reducir sangría';
+	@override String get palette => 'Paleta de comandos';
+	@override String get palNav => 'Navegar por los elementos';
+	@override String get palRun => 'Ejecutar / abrir';
+	@override String get palBack => 'Atrás (búsqueda vacía)';
+	@override String get palClose => 'Cerrar';
 }
 
 // Path: sidebar.projects
@@ -2693,6 +3222,19 @@ class Translations$sidebar$app$es extends Translations$sidebar$app$en {
 	// Translations
 	@override String get title => 'DDAgent';
 	@override String get subtitle => 'Interfaz de asistente de programación con IA';
+}
+
+// Path: sidebar.panel
+class Translations$sidebar$panel$es extends Translations$sidebar$panel$en {
+	Translations$sidebar$panel$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get open => 'Panel';
+	@override String get newChat => 'Nuevo chat';
+	@override String get navigation => 'Navegación';
+	@override String get sessions => 'Sesiones';
 }
 
 // Path: sidebar.sessions
@@ -2789,6 +3331,22 @@ class Translations$sidebar$actions$es extends Translations$sidebar$actions$en {
 	@override String get buyMeACoffee => 'Invítame a un café';
 }
 
+// Path: sidebar.workspace
+class Translations$sidebar$workspace$es extends Translations$sidebar$workspace$en {
+	Translations$sidebar$workspace$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Cambiar el espacio de trabajo de la sesión';
+	@override String get description => 'El agente ejecuta sus próximos turnos en este directorio. El historial de sesión existente se conserva.';
+	@override String get pathLabel => 'Ruta del espacio de trabajo';
+	@override String get pathRequired => 'La ruta del espacio de trabajo es obligatoria.';
+	@override String get submit => 'Cambiar espacio de trabajo';
+	@override String get saving => 'Cambiando…';
+	@override String get changeAction => 'Cambiar espacio de trabajo';
+}
+
 // Path: sidebar.branding
 class Translations$sidebar$branding$es extends Translations$sidebar$branding$en {
 	Translations$sidebar$branding$es._(TranslationsEs root) : this._root = root, super.internal(root);
@@ -2848,6 +3406,8 @@ class Translations$sidebar$messages$es extends Translations$sidebar$messages$en 
 	@override String get deleteSessionError => 'Error al eliminar la sesión. Inténtalo de nuevo.';
 	@override String get renameSessionFailed => 'No se pudo renombrar la sesión. Inténtalo de nuevo.';
 	@override String get renameSessionError => 'Error al renombrar la sesión. Inténtalo de nuevo.';
+	@override String get changeWorkspaceFailed => 'Error al cambiar de espacio de trabajo. Inténtalo de nuevo.';
+	@override String get changeWorkspaceError => 'Error al cambiar de espacio de trabajo. Inténtalo de nuevo.';
 	@override String get deleteProjectFailed => 'No se pudo quitar el proyecto. Inténtalo de nuevo.';
 	@override String get deleteProjectError => 'Error al quitar el proyecto. Inténtalo de nuevo.';
 	@override String get createProjectFailed => 'No se pudo crear el proyecto. Inténtalo de nuevo.';
@@ -2858,8 +3418,6 @@ class Translations$sidebar$messages$es extends Translations$sidebar$messages$en 
 	@override String get restoreProjectError => 'Error al restaurar el proyecto. Inténtalo de nuevo.';
 	@override String get restoreSessionFailed => 'No se pudo restaurar la sesión. Inténtalo de nuevo.';
 	@override String get restoreSessionError => 'Error al restaurar la sesión. Inténtalo de nuevo.';
-	@override String get changeWorkspaceFailed => 'Error al cambiar de espacio de trabajo. Inténtalo de nuevo.';
-	@override String get changeWorkspaceError => 'Error al cambiar de espacio de trabajo. Inténtalo de nuevo.';
 	@override String bulkDeleteSessionsFailed({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count,
 		one: 'Error al eliminar ${count} sesión. Inténtalo de nuevo.',
 		other: 'Error al eliminar ${count} sesiones. Inténtalo de nuevo.',
@@ -2917,6 +3475,21 @@ class Translations$sidebar$search$es extends Translations$sidebar$search$en {
 	);
 }
 
+// Path: sidebar.recent
+class Translations$sidebar$recent$es extends Translations$sidebar$recent$en {
+	Translations$sidebar$recent$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Conversaciones recientes';
+	@override String get emptyTitle => 'Aún no hay conversaciones';
+	@override String get emptyDescription => 'Tus conversaciones actualizadas más recientemente aparecerán aquí.';
+	@override String get loadFailed => 'No se pudieron cargar las conversaciones recientes';
+	@override String get loadMore => 'Cargar conversaciones anteriores';
+	@override String get loadingMore => 'Cargando más...';
+}
+
 // Path: sidebar.deleteConfirmation
 class Translations$sidebar$deleteConfirmation$es extends Translations$sidebar$deleteConfirmation$en {
 	Translations$sidebar$deleteConfirmation$es._(TranslationsEs root) : this._root = root, super.internal(root);
@@ -2965,50 +3538,6 @@ class Translations$sidebar$zones$es extends Translations$sidebar$zones$en {
 	@override String get thisWeek => 'Esta semana';
 	@override String showMore({required Object count}) => 'Mostrar ${count} más';
 	@override String get showLess => 'Mostrar menos';
-}
-
-// Path: sidebar.panel
-class Translations$sidebar$panel$es extends Translations$sidebar$panel$en {
-	Translations$sidebar$panel$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String get open => 'Panel';
-	@override String get newChat => 'Nuevo chat';
-	@override String get navigation => 'Navegación';
-	@override String get sessions => 'Sesiones';
-}
-
-// Path: sidebar.workspace
-class Translations$sidebar$workspace$es extends Translations$sidebar$workspace$en {
-	Translations$sidebar$workspace$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Cambiar el espacio de trabajo de la sesión';
-	@override String get description => 'El agente ejecuta sus próximos turnos en este directorio. El historial de sesión existente se conserva.';
-	@override String get pathLabel => 'Ruta del espacio de trabajo';
-	@override String get pathRequired => 'La ruta del espacio de trabajo es obligatoria.';
-	@override String get submit => 'Cambiar espacio de trabajo';
-	@override String get saving => 'Cambiando…';
-	@override String get changeAction => 'Cambiar espacio de trabajo';
-}
-
-// Path: sidebar.recent
-class Translations$sidebar$recent$es extends Translations$sidebar$recent$en {
-	Translations$sidebar$recent$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Conversaciones recientes';
-	@override String get emptyTitle => 'Aún no hay conversaciones';
-	@override String get emptyDescription => 'Tus conversaciones actualizadas más recientemente aparecerán aquí.';
-	@override String get loadFailed => 'No se pudieron cargar las conversaciones recientes';
-	@override String get loadMore => 'Cargar conversaciones anteriores';
-	@override String get loadingMore => 'Cargando más...';
 }
 
 // Path: sidebar.tabs
@@ -3192,11 +3721,11 @@ class Translations$tasks$prd$es extends Translations$tasks$prd$en {
 	// Translations
 	@override String modified({required Object date}) => 'Modificado: ${date}';
 	@override String editorTitle({required Object name}) => 'PRD — ${name}';
-	@override String fileExistsMessage({required Object name}) => 'Ya existe un PRD llamado «${name}». ¿Quieres sobrescribirlo?';
-	@override String get fileExistsTitle => 'El archivo ya existe';
 	@override String get newFile => 'archivo nuevo';
-	@override String get parse => 'Analizar PRD';
 	@override String get template => 'Plantilla';
+	@override String get parse => 'Analizar PRD';
+	@override String get fileExistsTitle => 'El archivo ya existe';
+	@override String fileExistsMessage({required Object name}) => 'Ya existe un PRD llamado «${name}». ¿Quieres sobrescribirlo?';
 	@override String get fileNameHint => 'nombre de archivo (p. ej., prd.txt)';
 	@override String get saved => 'PRD guardado';
 	@override String get tasksGenerated => 'Tareas generadas desde el PRD';
@@ -3263,6 +3792,10 @@ class Translations$tasks$board$es extends Translations$tasks$board$en {
 	@override late final Translations$tasks$board$agent$es agent = Translations$tasks$board$agent$es._(_root);
 	@override late final Translations$tasks$board$deleteConfirm$es deleteConfirm = Translations$tasks$board$deleteConfirm$es._(_root);
 	@override String get project => 'Proyecto';
+	@override late final Translations$tasks$board$assignee$es assignee = Translations$tasks$board$assignee$es._(_root);
+	@override late final Translations$tasks$board$presence$es presence = Translations$tasks$board$presence$es._(_root);
+	@override late final Translations$tasks$board$activity$es activity = Translations$tasks$board$activity$es._(_root);
+	@override late final Translations$tasks$board$comments$es comments = Translations$tasks$board$comments$es._(_root);
 }
 
 // Path: tasks.card
@@ -3376,9 +3909,9 @@ class Translations$tasks$taskDetail$es extends Translations$tasks$taskDetail$en 
 	@override String get testStrategy => 'Estrategia de pruebas';
 	@override String get titleRequired => 'El título es obligatorio';
 	@override String get updateFailed => 'No se pudo actualizar la tarea';
-	@override String deleteConfirmMessage({required Object id}) => 'Se eliminará la tarea n.º ${id}. Esta acción no se puede deshacer.';
 	@override String get notFound => 'Tarea no encontrada';
 	@override String get subtasks => 'Subtareas';
+	@override String deleteConfirmMessage({required Object id}) => 'Se eliminará la tarea n.º ${id}. Esta acción no se puede deshacer.';
 	@override String get idCopied => 'ID de tarea copiado';
 }
 
@@ -3390,6 +3923,22 @@ class Translations$tasks$toasts$es extends Translations$tasks$toasts$en {
 
 	// Translations
 	@override String statusInProgress({required Object id}) => 'Tarea ${id} marcada como en curso';
+}
+
+// Path: tasks.taskmaster
+class Translations$tasks$taskmaster$es extends Translations$tasks$taskmaster$en {
+	Translations$tasks$taskmaster$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get noProjectHint => 'Primero añade un proyecto y luego crea tareas para él.';
+	@override late final Translations$tasks$taskmaster$sort$es sort = Translations$tasks$taskmaster$sort$es._(_root);
+	@override String installedVersion({required Object version}) => 'Instalado: ${version}';
+	@override String get initFailed => 'No se pudo inicializar TaskMaster';
+	@override late final Translations$tasks$taskmaster$prd$es prd = Translations$tasks$taskmaster$prd$es._(_root);
+	@override late final Translations$tasks$taskmaster$detail$es detail = Translations$tasks$taskmaster$detail$es._(_root);
+	@override String get untitledTask => 'Tarea sin título';
 }
 
 // Path: knowledge.tabs
@@ -3574,39 +4123,6 @@ class Translations$knowledge$tags$es extends Translations$knowledge$tags$en {
 	@override String get none => 'Aún no hay etiquetas.';
 }
 
-// Path: knowledge.contextBudget
-class Translations$knowledge$contextBudget$es extends Translations$knowledge$contextBudget$en {
-	Translations$knowledge$contextBudget$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String tokens({required Object tokens, required Object budget}) => '~${tokens} / ${budget} tok';
-}
-
-// Path: knowledge.critical
-class Translations$knowledge$critical$es extends Translations$knowledge$critical$en {
-	Translations$knowledge$critical$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String get make => 'Marcar como crítica';
-	@override String get makeAll => 'Marcar todas las reglas como críticas';
-	@override String get makeAllHint => 'Las añade al presupuesto de contexto inyectado';
-}
-
-// Path: knowledge.errors
-class Translations$knowledge$errors$es extends Translations$knowledge$errors$en {
-	Translations$knowledge$errors$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String importFailed({required Object error}) => 'La importación falló: ${error}';
-	@override String migrationFailed({required Object error}) => 'La migración falló: ${error}';
-}
-
 // Path: knowledge.graph
 class Translations$knowledge$graph$es extends Translations$knowledge$graph$en {
 	Translations$knowledge$graph$es._(TranslationsEs root) : this._root = root, super.internal(root);
@@ -3624,13 +4140,35 @@ class Translations$knowledge$importAll$es extends Translations$knowledge$importA
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get action => 'Importar todo';
+	@override String get title => 'Importar todo a DDAgent';
+	@override String projectsScanned({required Object count}) => 'Proyectos examinados: ${count}';
+	@override String skillsFound({required Object found, required Object newSkills}) => 'Skills de agentes encontradas: ${found} (nuevas: ${newSkills})';
+	@override String rulesSummary({required Object total, required Object duplicates}) => 'Reglas: ${total} · grupos duplicados: ${duplicates}';
 	@override String get mergeDuplicates => 'Fusionar entradas duplicadas';
 	@override String get mergeDuplicatesHint => 'Combina las filas duplicadas en DDAgent (no los archivos)';
-	@override String projectsScanned({required Object count}) => 'Proyectos examinados: ${count}';
-	@override String rulesSummary({required Object total, required Object duplicates}) => 'Reglas: ${total} · grupos duplicados: ${duplicates}';
-	@override String skillsFound({required Object found, required Object newSkills}) => 'Skills de agentes encontradas: ${found} (nuevas: ${newSkills})';
-	@override String get title => 'Importar todo a DDAgent';
+	@override String get action => 'Importar todo';
+	@override String get readOnlyNotice => 'Solo lectura para tus agentes: esto importa en la base de datos propia de DDAgent y NO modifica ni elimina ningún archivo ni configuración de las CLI. Las opciones de abajo solo cambian datos de DDAgent.';
+	@override String get dryRunNote => 'Simulación: aún no se ha escrito nada.';
+	@override String get importedNote => 'Importado.';
+	@override String result({required Object rules, required Object newSkills, required Object removed, required Object promoted}) => 'Importado: reglas: ${rules}, habilidades nuevas: ${newSkills}, eliminadas: ${removed}, promovidas: ${promoted}';
+	@override String get description => 'Analiza todos los proyectos e importa las habilidades de tus agentes a la base de conocimiento. Solo lectura para tus agentes: no se cambia nada en las CLI.';
+}
+
+// Path: knowledge.migrate
+class Translations$knowledge$migrate$es extends Translations$knowledge$migrate$en {
+	Translations$knowledge$migrate$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Migrar reglas existentes';
+	@override String scanned({required Object count}) => 'Se examinaron ${count} proyectos.';
+	@override String rulesSummary({required Object total, required Object critical}) => 'Reglas: ${total} en total, ${critical} críticas.';
+	@override String duplicates({required Object count}) => 'Grupos duplicados entre proyectos: ${count}';
+	@override String removedPromoted({required Object removed, required Object promoted}) => 'Eliminadas: ${removed}, promovidas: ${promoted}';
+	@override String get mergeDuplicates => 'Fusionar duplicados';
+	@override String get dryRunNote => 'Simulación: aún no se ha cambiado nada.';
+	@override String get applied => 'Aplicado.';
 }
 
 // Path: knowledge.importSkills
@@ -3640,9 +4178,35 @@ class Translations$knowledge$importSkills$es extends Translations$knowledge$impo
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
+	@override String get title => 'Importar skills de agentes';
 	@override String found({required Object count}) => 'Se encontraron ${count} skills en tus agentes.';
 	@override String summary({required Object imported, required Object skipped}) => 'Nuevas: ${imported} · omitidas: ${skipped}';
-	@override String get title => 'Importar skills de agentes';
+	@override String get dryRunHint => 'Importa las habilidades globales/predeterminadas de tus agentes (usuario, sistema, plugin) como habilidades de conocimiento. Simulación: aún no se ha importado nada.';
+	@override String get importedNote => 'Importado a la base de conocimiento.';
+}
+
+// Path: knowledge.critical
+class Translations$knowledge$critical$es extends Translations$knowledge$critical$en {
+	Translations$knowledge$critical$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get make => 'Marcar como crítica';
+	@override String get makeAll => 'Marcar todas las reglas como críticas';
+	@override String get makeAllHint => 'Las añade al presupuesto de contexto inyectado';
+}
+
+// Path: knowledge.contextBudget
+class Translations$knowledge$contextBudget$es extends Translations$knowledge$contextBudget$en {
+	Translations$knowledge$contextBudget$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String tokens({required Object tokens, required Object budget}) => '~${tokens} / ${budget} tok';
+	@override String get title => 'Contexto de reglas (siempre incluido)';
+	@override String get selectProject => 'Selecciona un proyecto para ver el tamaño de su contexto crítico.';
 }
 
 // Path: knowledge.linkOptions
@@ -3653,157 +4217,197 @@ class Translations$knowledge$linkOptions$es extends Translations$knowledge$linkO
 
 	// Translations
 	@override String memory({required Object title}) => 'Memoria: ${title}';
-	@override String personal({required Object title}) => 'Personal: ${title}';
 	@override String rule({required Object title}) => 'Regla: ${title}';
 	@override String skill({required Object name}) => 'Skill: ${name}';
+	@override String personal({required Object title}) => 'Personal: ${title}';
 }
 
-// Path: knowledge.migrate
-class Translations$knowledge$migrate$es extends Translations$knowledge$migrate$en {
-	Translations$knowledge$migrate$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: knowledge.errors
+class Translations$knowledge$errors$es extends Translations$knowledge$errors$en {
+	Translations$knowledge$errors$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String duplicates({required Object count}) => 'Grupos duplicados entre proyectos: ${count}';
-	@override String get mergeDuplicates => 'Fusionar duplicados';
-	@override String removedPromoted({required Object removed, required Object promoted}) => 'Eliminadas: ${removed}, promovidas: ${promoted}';
-	@override String rulesSummary({required Object total, required Object critical}) => 'Reglas: ${total} en total, ${critical} críticas.';
-	@override String scanned({required Object count}) => 'Se examinaron ${count} proyectos.';
-	@override String get title => 'Migrar reglas existentes';
+	@override String importFailed({required Object error}) => 'La importación falló: ${error}';
+	@override String migrationFailed({required Object error}) => 'La migración falló: ${error}';
 }
 
-// Path: skills.addDialog
-class Translations$skills$addDialog$es extends Translations$skills$addDialog$en {
-	Translations$skills$addDialog$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: knowledge.entityTypes
+class Translations$knowledge$entityTypes$es extends Translations$knowledge$entityTypes$en {
+	Translations$knowledge$entityTypes$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get chooseFileTitle => 'Elegir SKILL.md';
-	@override String get chooseFiles => 'Elegir archivos';
-	@override String get chooseFolder => 'Elegir carpeta';
-	@override String get chooseFolderTitle => 'Elegir una carpeta de skills';
-	@override String folderFilesMeta({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count,
-		one: '${count} archivo · ${size}',
-		other: '${count} archivos · ${size}',
-	);
-	@override String get folderUploadsNote => 'Las carpetas subidas conservan el nombre de la carpeta seleccionada; los archivos sueltos usan el `name` de `SKILL.md`.';
-	@override String get hideInstallLocation => 'Ocultar ubicación de instalación';
-	@override String get installSkill => 'Instalar Skill';
-	@override String installSkills({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count,
-		one: 'Instalar ${count} Skill',
-		other: 'Instalar ${count} Skills',
-	);
-	@override String markdownFileMeta({required Object size}) => 'Archivo Markdown · ${size}';
-	@override String get pickHint => 'Las carpetas pueden incluir scripts, referencias y recursos.';
-	@override String get pickTitle => 'Elige una carpeta de skills o SKILL.md';
-	@override String get readyToInstall => 'Listo para instalar';
-	@override String removeQueued({required Object name}) => 'Quitar ${name}';
-	@override String title({required Object provider}) => 'Añadir Skill de ${provider}';
-	@override String get uploadHint => 'Sube un archivo SKILL.md o una carpeta de skills completa.';
-	@override String get whereWillThisInstall => '¿Dónde se instalará esto?';
-}
-
-// Path: skills.empty
-class Translations$skills$empty$es extends Translations$skills$empty$en {
-	Translations$skills$empty$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String get noGlobalSkills => 'Aún no se han detectado skills globales';
-	@override String get noGlobalSkillsDescription => 'Añade una skill global arriba para que esté disponible en todos los proyectos.';
-	@override String get noMatchingSkills => 'No hay skills coincidentes';
-	@override String get noMatchingSkillsDescription => 'Prueba con otro comando, nombre, ámbito, proyecto o ruta de origen.';
-	@override String get noProjects => 'No hay proyectos disponibles';
-	@override String get noProjectsDescription => 'Añade un proyecto o espacio de trabajo para explorar sus skills.';
-	@override String get noSkillsInProject => 'No hay skills en este proyecto';
-	@override String get noSkillsInProjectDescription => 'Crea una carpeta .claude/skills, .cursor/skills o .agents/skills en el proyecto seleccionado.';
-}
-
-// Path: skills.errors
-class Translations$skills$errors$es extends Translations$skills$errors$en {
-	Translations$skills$errors$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String get addMarkdownFirst => 'Añade primero uno o más archivos markdown.';
-	@override String couldNotReadSkillFile({required Object name}) => 'No se pudo leer SKILL.md desde ${name}.';
-	@override String get dropMarkdownOrFolder => 'Suelta uno o más archivos markdown o una carpeta que contenga SKILL.md.';
-	@override String folderFileLimit({required Object count}) => 'Una carpeta de skills puede contener hasta ${count} archivos.';
-	@override String get folderReadFailed => 'No se pudo leer la carpeta de skills';
-	@override String get folderSizeLimit => 'Las carpetas de skills seleccionadas deben ocupar menos de 30 MB en total.';
-	@override String get importFailed => 'No se pudieron importar las skills';
-	@override String get missingSkillFile => 'La carpeta seleccionada no contiene un archivo SKILL.md.';
-}
-
-// Path: skills.moveDialog
-class Translations$skills$moveDialog$es extends Translations$skills$moveDialog$en {
-	Translations$skills$moveDialog$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String get moveToGlobal => 'Mover a global';
-	@override String get moveToProject => 'Mover a proyecto';
-	@override String get toGlobalHint => 'Mueve esta skill al directorio global de skills para que todos los proyectos puedan usarla.';
-	@override String get toProjectHint => 'Elige el proyecto al que debe pertenecer esta skill. Saldrá del directorio global de skills del proveedor.';
-}
-
-// Path: skills.scopes
-class Translations$skills$scopes$es extends Translations$skills$scopes$en {
-	Translations$skills$scopes$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String get admin => 'Admin';
-	@override String get plugin => 'Plugin';
+	@override String get memory => 'Memoria';
+	@override String get rule => 'Regla';
+	@override String get skill => 'Habilidad';
+	@override String get personal => 'Personal';
 	@override String get project => 'Proyecto';
-	@override String get repo => 'Repositorio';
-	@override String get system => 'Sistema';
-	@override String get user => 'Usuario';
+	@override String get tag => 'Etiqueta';
 }
 
-// Path: skills.screen
-class Translations$skills$screen$es extends Translations$skills$screen$en {
-	Translations$skills$screen$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: collab.roles
+class Translations$collab$roles$es extends Translations$collab$roles$en {
+	Translations$collab$roles$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get addSkill => 'Añadir Skill';
-	@override String get clearSearch => 'Limpiar búsqueda de skills';
-	@override String deleteDescription({required Object directory, required Object provider}) => 'Esto elimina el directorio ${directory} del directorio de skills gestionadas de ${provider}. Esta acción no se puede deshacer.';
-	@override String deleteTitle({required Object name}) => '¿Eliminar ${name}?';
-	@override String loadingSkills({required Object provider}) => 'Cargando skills de ${provider}…';
-	@override String manageDescription({required Object provider}) => 'Gestiona las skills de ${provider} desde archivos locales, carpetas completas y ubicaciones por proyecto.';
-	@override String get noDescription => 'No se ha proporcionado descripción en el front matter de la skill.';
-	@override String pluginBadge({required Object name}) => 'Plugin: ${name}';
-	@override String projectBadge({required Object name}) => 'Proyecto: ${name}';
-	@override String get savedSuccessfully => 'Skills guardadas correctamente.';
-	@override String get scanningProjectSkills => 'Escaneando skills del proyecto…';
-	@override String get searchHint => 'Buscar skills…';
-	@override String skillsCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count,
-		one: '${count} SKILL',
-		other: '${count} SKILLS',
+	@override String get member => 'Miembro';
+	@override String get viewer => 'Lector';
+}
+
+// Path: collab.viewing
+class Translations$collab$viewing$es extends Translations$collab$viewing$en {
+	Translations$collab$viewing$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get session => 'sesión';
+	@override String get card => 'tarjeta';
+	@override String get board => 'tablero';
+}
+
+// Path: fileTree.search
+class Translations$fileTree$search$es extends Translations$fileTree$search$en {
+	Translations$fileTree$search$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get hint => 'Filtra nombres / Enter para buscar en el contenido';
+	@override String get prompt => 'Escribe una consulta y pulsa Enter';
+	@override String get noMatches => 'Sin coincidencias';
+	@override String get resultsTruncated => 'Resultados truncados';
+}
+
+// Path: fileTree.titles
+class Translations$fileTree$titles$es extends Translations$fileTree$titles$en {
+	Translations$fileTree$titles$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String rename({required Object name}) => 'Renombrar ${name}';
+	@override String delete({required Object name}) => 'Eliminar ${name}';
+	@override String download({required Object name}) => 'Descargar ${name}';
+}
+
+// Path: fileTree.relative
+class Translations$fileTree$relative$es extends Translations$fileTree$relative$en {
+	Translations$fileTree$relative$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get now => 'ahora';
+	@override String minutes({required Object n}) => '${n} min';
+	@override String hours({required Object n}) => '${n} h';
+	@override String days({required Object n}) => '${n} d';
+}
+
+// Path: git.checkpoints
+class Translations$git$checkpoints$es extends Translations$git$checkpoints$en {
+	Translations$git$checkpoints$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Checkpoints';
+	@override String get restoreTitle => 'Restaurar checkpoint';
+	@override String get restoreMessage => '¿Restablecer el árbol de trabajo a este checkpoint? Los cambios actuales se reemplazarán.';
+	@override String get restored => 'Checkpoint restaurado';
+	@override String get labelHint => 'Etiqueta del checkpoint (opcional)';
+	@override String get empty => 'Aún no hay checkpoints';
+	@override String get create => 'Nuevo';
+}
+
+// Path: git.branchSections
+class Translations$git$branchSections$es extends Translations$git$branchSections$en {
+	Translations$git$branchSections$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get local => 'LOCALES';
+	@override String get remote => 'REMOTAS';
+}
+
+// Path: kanban.card
+class Translations$kanban$card$es extends Translations$kanban$card$en {
+	Translations$kanban$card$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get untitled => 'Sin título';
+}
+
+// Path: kanban.comments
+class Translations$kanban$comments$es extends Translations$kanban$comments$en {
+	Translations$kanban$comments$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get empty => 'Aún no hay comentarios';
+	@override String get add => 'Añadir comentario';
+}
+
+// Path: kanban.dialog
+class Translations$kanban$dialog$es extends Translations$kanban$dialog$en {
+	Translations$kanban$dialog$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get saving => 'Guardando…';
+}
+
+// Path: kanban.details
+class Translations$kanban$details$es extends Translations$kanban$details$en {
+	Translations$kanban$details$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Detalles de la tarjeta';
+	@override String status({required Object status}) => 'Estado: ${status}';
+}
+
+// Path: kanban.empty
+class Translations$kanban$empty$es extends Translations$kanban$empty$en {
+	Translations$kanban$empty$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get noProject => 'Ningún proyecto seleccionado';
+}
+
+// Path: kanban.time
+class Translations$kanban$time$es extends Translations$kanban$time$en {
+	Translations$kanban$time$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get now => 'ahora';
+	@override String minutesAgo({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count,
+		one: 'hace 1 min',
+		other: 'hace ${count} min',
 	);
-	@override String get sourceLabel => 'ORIGEN';
-}
-
-// Path: mcp.form
-class Translations$mcp$form$es extends Translations$mcp$form$en {
-	Translations$mcp$form$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override late final Translations$mcp$form$fields$es fields = Translations$mcp$form$fields$es._(_root);
-	@override late final Translations$mcp$form$scope$es scope = Translations$mcp$form$scope$es._(_root);
-	@override String submitTo({required Object provider}) => 'Añadir servidor a ${provider}';
-	@override late final Translations$mcp$form$validation$es validation = Translations$mcp$form$validation$es._(_root);
+	@override String hoursAgo({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count,
+		one: 'hace 1 hora',
+		other: 'hace ${count} horas',
+	);
+	@override String daysAgo({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count,
+		one: 'hace 1 día',
+		other: 'hace ${count} días',
+	);
 }
 
 // Path: mcp.install
@@ -3813,19 +4417,19 @@ class Translations$mcp$install$es extends Translations$mcp$install$en {
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get button => 'Instalar';
-	@override String get cardDescription => 'Da a tus agentes la base de conocimiento y las herramientas de DDAgent mediante MCP: elige agentes o instala para todos.';
+	@override String get title => 'Instalar el servidor MCP de DDAgent';
 	@override String get description => 'Permite que los agentes seleccionados usen la base de conocimiento y las herramientas de DDAgent mediante MCP.';
-	@override String get errorFallback => 'error';
-	@override String failed({required Object error}) => 'La instalación falló: ${error}';
-	@override String get installForAll => 'Instalar para todos';
+	@override String get cardDescription => 'Da a tus agentes la base de conocimiento y las herramientas de DDAgent mediante MCP: elige agentes o instala para todos.';
 	@override String get installSelected => 'Instalar seleccionados';
+	@override String get installForAll => 'Instalar para todos';
+	@override String get button => 'Instalar';
+	@override String failed({required Object error}) => 'La instalación falló: ${error}';
 	@override String installedCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count,
 		one: 'Instalado en ${count} agente.',
 		other: 'Instalado en ${count} agentes.',
 	);
 	@override String partialFailure({required Object count, required Object failed}) => 'Instalado en ${count}; falló: ${failed}';
-	@override String get title => 'Instalar el servidor MCP de DDAgent';
+	@override String get errorFallback => 'error';
 }
 
 // Path: mcp.servers
@@ -3835,15 +4439,19 @@ class Translations$mcp$servers$es extends Translations$mcp$servers$en {
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get addGlobalDescription => 'Añade este servidor MCP a todos los proveedores: Claude, Cursor, Codex, OpenCode y Devin. Solo se admiten los transportes stdio y HTTP porque la misma configuración debe funcionar en todos los proveedores.';
-	@override String get addGlobalMenuDescription => 'Añadir servidor MCP global escribe un servidor stdio o HTTP común en Claude, Cursor, Codex, OpenCode y Devin.';
-	@override String get addGlobalTitle => 'Añadir servidor MCP global';
-	@override String addProviderDescription({required Object provider}) => 'Añadir servidor MCP de ${provider} solo modifica ${provider}.';
-	@override String addProviderTitle({required Object provider}) => 'Añadir servidor MCP de ${provider}';
-	@override late final Translations$mcp$servers$config$es config = Translations$mcp$servers$config$es._(_root);
-	@override String descriptionGeneric({required Object provider}) => 'Los servidores del Model Context Protocol proporcionan herramientas y fuentes de datos adicionales a ${provider}';
 	@override String get loading => 'Cargando servidores MCP…';
 	@override String get refreshingScopes => 'Actualizando ámbitos de proyecto…';
+	@override String descriptionGeneric({required Object provider}) => 'Los servidores del Model Context Protocol proporcionan herramientas y fuentes de datos adicionales a ${provider}';
+	@override String get addGlobalTitle => 'Añadir servidor MCP global';
+	@override String get addGlobalDescription => 'Añade este servidor MCP a todos los proveedores: Claude, Cursor, Codex, OpenCode y Devin. Solo se admiten los transportes stdio y HTTP porque la misma configuración debe funcionar en todos los proveedores.';
+	@override String get addGlobalMenuDescription => 'Añadir servidor MCP global escribe un servidor stdio o HTTP común en Claude, Cursor, Codex, OpenCode y Devin.';
+	@override String addProviderTitle({required Object provider}) => 'Añadir servidor MCP de ${provider}';
+	@override String addProviderDescription({required Object provider}) => 'Añadir servidor MCP de ${provider} solo modifica ${provider}.';
+	@override late final Translations$mcp$servers$config$es config = Translations$mcp$servers$config$es._(_root);
+	@override String get selectProjectRequired => 'Selecciona un proyecto para los servidores MCP con ámbito de proyecto';
+	@override String get globalScopeUnsupported => 'Añadir servidor MCP solo admite el ámbito de usuario o de proyecto en todos los proveedores.';
+	@override String globalAddFailed({required Object details}) => 'No se pudo añadir el servidor MCP a todos los proveedores. ${details}';
+	@override String get scopeProject => 'proyecto';
 }
 
 // Path: mcp.team
@@ -3853,9 +4461,9 @@ class Translations$mcp$team$es extends Translations$mcp$team$en {
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get cta => 'Disponible con DDAgent Pro';
-	@override String get description => 'Comparte configuraciones de servidores MCP con tu equipo. Todos se mantienen sincronizados automáticamente.';
 	@override String get title => 'Configuraciones MCP del equipo';
+	@override String get description => 'Comparte configuraciones de servidores MCP con tu equipo. Todos se mantienen sincronizados automáticamente.';
+	@override String get cta => 'Disponible con DDAgent Pro';
 }
 
 // Path: mcp.tokens
@@ -3866,140 +4474,84 @@ class Translations$mcp$tokens$es extends Translations$mcp$tokens$en {
 
 	// Translations
 	@override String get scopeWrite => 'Escritura';
+	@override String get scopeRead => 'Lectura';
 }
 
-// Path: terminal.actions
-class Translations$terminal$actions$es extends Translations$terminal$actions$en {
-	Translations$terminal$actions$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: mcp.form
+class Translations$mcp$form$es extends Translations$mcp$form$en {
+	Translations$mcp$form$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get clearOutput => 'Limpiar salida';
-	@override String get connect => 'Conectar';
-	@override String get newShell => 'Shell nueva';
-	@override String get newTab => 'Nueva pestaña de terminal';
-	@override String get providerLogin => 'Inicio de sesión del proveedor';
-	@override String get restartSession => 'Reiniciar sesión';
+	@override String submitTo({required Object provider}) => 'Añadir servidor a ${provider}';
+	@override late final Translations$mcp$form$scope$es scope = Translations$mcp$form$scope$es._(_root);
+	@override late final Translations$mcp$form$fields$es fields = Translations$mcp$form$fields$es._(_root);
+	@override late final Translations$mcp$form$validation$es validation = Translations$mcp$form$validation$es._(_root);
 }
 
-// Path: terminal.authUrl
-class Translations$terminal$authUrl$es extends Translations$terminal$authUrl$en {
-	Translations$terminal$authUrl$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: notifications.errors
+class Translations$notifications$errors$es extends Translations$notifications$errors$en {
+	Translations$notifications$errors$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get openInBrowser => 'Abrir en el navegador';
+	@override String get registrationRejected => 'El servidor rechazó el registro';
+	@override String get noResponse => 'Sin respuesta del servidor';
 }
 
-// Path: terminal.errors
-class Translations$terminal$errors$es extends Translations$terminal$errors$en {
-	Translations$terminal$errors$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: notifications.androidChannel
+class Translations$notifications$androidChannel$es extends Translations$notifications$androidChannel$en {
+	Translations$notifications$androidChannel$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String couldNotOpenLink({required Object url}) => 'No se pudo abrir el enlace: ${url}';
+	@override String get name => 'Alertas de DDAgent';
+	@override String get description => 'Notificaciones de ejecuciones de agentes, aprobaciones y errores';
 }
 
-// Path: terminal.fileLink
-class Translations$terminal$fileLink$es extends Translations$terminal$fileLink$en {
-	Translations$terminal$fileLink$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: onboarding.errors
+class Translations$onboarding$errors$es extends Translations$onboarding$errors$en {
+	Translations$onboarding$errors$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String detected({required Object path}) => 'Archivo detectado: ${path}';
+	@override String get nameAndEmailRequired => 'Se requieren tanto el nombre como el correo de git.';
+	@override String get invalidEmail => 'Introduce una dirección de correo electrónico válida.';
 }
 
-// Path: terminal.paste
-class Translations$terminal$paste$es extends Translations$terminal$paste$en {
-	Translations$terminal$paste$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: onboarding.agents
+class Translations$onboarding$agents$es extends Translations$onboarding$agents$en {
+	Translations$onboarding$agents$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get hint => 'Ctrl+V / clic derecho → Pegar';
-	@override String get title => 'Pegar en la terminal';
+	@override String get title => 'Conecta tus agentes de IA';
+	@override String get description => 'Inicia sesión en uno o más asistentes de programación con IA. Todos son opcionales.';
+	@override String get laterHint => 'Puedes configurarlos más tarde en Ajustes.';
 }
 
-// Path: terminal.shortcuts
-class Translations$terminal$shortcuts$es extends Translations$terminal$shortcuts$en {
-	Translations$terminal$shortcuts$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: onboarding.mcp
+class Translations$onboarding$mcp$es extends Translations$onboarding$mcp$en {
+	Translations$onboarding$mcp$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get eof => 'EOF';
-	@override String get hide => 'Ocultar barra de atajos';
-	@override String get interrupt => 'Interrumpir (SIGINT)';
-	@override String get suspend => 'Suspender (SIGTSTP)';
-	@override String get showTooltip => 'Mostrar atajos';
-	@override String get hideTooltip => 'Ocultar atajos';
-}
-
-// Path: terminal.tabs
-class Translations$terminal$tabs$es extends Translations$terminal$tabs$en {
-	Translations$terminal$tabs$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String get antigravityCli => 'Antigravity CLI';
-	@override String get claudeCli => 'Claude CLI';
-	@override String get commandCodeCli => 'Command Code CLI';
-	@override String get cursorCli => 'Cursor CLI';
-	@override String get devinCli => 'Devin CLI';
-	@override String loginTitle({required Object provider}) => 'Inicio de sesión: ${provider}';
-	@override String get opencodeCli => 'OpenCode CLI';
-	@override String get plainShell => 'Shell simple';
-	@override String shellName({required Object index}) => 'Shell ${index}';
-}
-
-// Path: quota.agents
-class Translations$quota$agents$es extends Translations$quota$agents$en {
-	Translations$quota$agents$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String statusCount({required Object status, required Object count}) => '${status} (${count})';
-}
-
-// Path: quota.chart
-class Translations$quota$chart$es extends Translations$quota$chart$en {
-	Translations$quota$chart$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String get hide => 'Ocultar';
-	@override String get noData => 'No hay datos suficientes para una tendencia.';
-	@override String pointReadout({required Object date, required Object tokens, required Object cost}) => '${date} · ${tokens} tokens · ${cost}';
-	@override String get show => 'Mostrar';
-}
-
-// Path: quota.config
-class Translations$quota$config$es extends Translations$quota$config$en {
-	Translations$quota$config$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String get accountRouting => 'Enrutamiento de cuentas';
-	@override String get pollerTitle => 'Sondeo y alertas';
-	@override String get save => 'Guardar configuración';
-}
-
-// Path: quota.overview
-class Translations$quota$overview$es extends Translations$quota$overview$en {
-	Translations$quota$overview$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String get tokensAndCost => 'Tokens y costo';
+	@override String get title => 'Conecta los agentes con DDAgent';
+	@override String get description => 'Instala el servidor MCP de DDAgent para que tus agentes puedan usar la base de conocimiento y las herramientas de DDAgent. Elige agentes o instala para todos.';
+	@override String get installSelected => 'Instalar seleccionados';
+	@override String get installForAll => 'Instalar para todos';
+	@override String get laterHint => 'Opcional: también puedes instalarlo más tarde en Ajustes → MCP.';
+	@override String installedOn({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count,
+		one: 'Instalado en ${count} agente.',
+		other: 'Instalado en ${count} agentes.',
+	);
+	@override String installedWithFailures({required Object installedCount, required Object failed}) => 'Instalado en ${installedCount}; falló: ${failed}';
 }
 
 // Path: quota.section
@@ -4012,15 +4564,89 @@ class Translations$quota$section$es extends Translations$quota$section$en {
 	@override String get config => 'Configuración';
 }
 
-// Path: notifications.errors
-class Translations$notifications$errors$es extends Translations$notifications$errors$en {
-	Translations$notifications$errors$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: quota.overview
+class Translations$quota$overview$es extends Translations$quota$overview$en {
+	Translations$quota$overview$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get noResponse => 'Sin respuesta del servidor';
-	@override String get registrationRejected => 'El servidor rechazó el registro';
+	@override String get tokensAndCost => 'Tokens y costo';
+}
+
+// Path: quota.agents
+class Translations$quota$agents$es extends Translations$quota$agents$en {
+	Translations$quota$agents$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String statusCount({required Object status, required Object count}) => '${status} (${count})';
+}
+
+// Path: quota.config
+class Translations$quota$config$es extends Translations$quota$config$en {
+	Translations$quota$config$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get pollerTitle => 'Sondeo y alertas';
+	@override String get accountRouting => 'Enrutamiento de cuentas';
+	@override String get save => 'Guardar configuración';
+}
+
+// Path: quota.chart
+class Translations$quota$chart$es extends Translations$quota$chart$en {
+	Translations$quota$chart$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get show => 'Mostrar';
+	@override String get hide => 'Ocultar';
+	@override String get noData => 'No hay datos suficientes para una tendencia.';
+	@override String pointReadout({required Object date, required Object tokens, required Object cost}) => '${date} · ${tokens} tokens · ${cost}';
+}
+
+// Path: quota.duration
+class Translations$quota$duration$es extends Translations$quota$duration$en {
+	Translations$quota$duration$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String minutes({required Object minutes}) => '${minutes} min';
+	@override String hoursMinutes({required Object hours, required Object minutes}) => '${hours} h ${minutes} min';
+	@override String daysHours({required Object days, required Object hours}) => '${days} d ${hours} h';
+	@override String get now => 'ahora';
+}
+
+// Path: scheduler.runStatus
+class Translations$scheduler$runStatus$es extends Translations$scheduler$runStatus$en {
+	Translations$scheduler$runStatus$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get fired => 'lanzada';
+	@override String get skipped => 'omitida';
+	@override String get failed => 'fallida';
+	@override String get completed => 'completada';
+}
+
+// Path: scheduler.cronErrors
+class Translations$scheduler$cronErrors$es extends Translations$scheduler$cronErrors$en {
+	Translations$scheduler$cronErrors$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String fieldCount({required Object got}) => 'Se esperaban 5 campos, se recibieron ${got}';
+	@override String fieldError({required Object index, required Object error}) => 'Campo ${index}: ${error}';
+	@override String get empty => 'vacío';
+	@override String invalidPart({required Object part}) => '«${part}» no válido';
+	@override String invalidValue({required Object value}) => 'valor no válido «${value}»';
 }
 
 // Path: serverConnect.local
@@ -4043,50 +4669,7 @@ class Translations$serverConnect$local$es extends Translations$serverConnect$loc
 	@override String get connect => 'Usar este servidor';
 	@override String error({required Object error}) => 'Error del servidor local: ${error}';
 	@override String get or => 'o conecta un servidor remoto';
-}
-
-// Path: collab.roles
-class Translations$collab$roles$es extends Translations$collab$roles$en {
-	Translations$collab$roles$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String get member => 'Miembro';
-	@override String get viewer => 'Lector';
-}
-
-// Path: sessions.activity
-class Translations$sessions$activity$es extends Translations$sessions$activity$en {
-	Translations$sessions$activity$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String get committingChanges => 'Confirmando cambios';
-	@override String editingFile({required Object file}) => 'Editando ${file}';
-	@override String get editingFileGeneric => 'Editando un archivo';
-	@override String fetchingUrl({required Object url}) => 'Obteniendo ${url}';
-	@override String get pushingBranch => 'Enviando la rama';
-	@override String readingFile({required Object file}) => 'Leyendo ${file}';
-	@override String runningCommand({required Object command}) => 'Ejecutando `${command}`';
-	@override String get runningShellCommand => 'Ejecutando un comando de shell';
-	@override String runningTool({required Object name}) => 'Ejecutando ${name}';
-	@override String searching({required Object query}) => 'Buscando «${query}»';
-	@override String get subagentRunning => 'Subagente en ejecución';
-}
-
-// Path: sessions.age
-class Translations$sessions$age$es extends Translations$sessions$age$en {
-	Translations$sessions$age$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String days({required Object days}) => '${days} d';
-	@override String hours({required Object hours}) => '${hours} h';
-	@override String get lessThanMinute => '<1 min';
-	@override String minutes({required Object count}) => '${count} min';
+	@override late final Translations$serverConnect$local$errors$es errors = Translations$serverConnect$local$errors$es._(_root);
 }
 
 // Path: sessions.toasts
@@ -4097,169 +4680,356 @@ class Translations$sessions$toasts$es extends Translations$sessions$toasts$en {
 
 	// Translations
 	@override String get archived => 'Sesión archivada';
-	@override String get deleted => 'Sesión eliminada';
-	@override String get pinned => 'Sesión fijada';
-	@override String get renamed => 'Sesión renombrada';
 	@override String get restored => 'Sesión restaurada';
+	@override String get deleted => 'Sesión eliminada';
+	@override String get renamed => 'Sesión renombrada';
+	@override String get pinned => 'Sesión fijada';
 	@override String get unpinned => 'Sesión desfijada';
 	@override String get workspaceChanged => 'Espacio de trabajo cambiado';
 }
 
-// Path: git.checkpoints
-class Translations$git$checkpoints$es extends Translations$git$checkpoints$en {
-	Translations$git$checkpoints$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: sessions.age
+class Translations$sessions$age$es extends Translations$sessions$age$en {
+	Translations$sessions$age$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get create => 'Nuevo';
-	@override String get empty => 'Aún no hay checkpoints';
-	@override String get labelHint => 'Etiqueta del checkpoint (opcional)';
-	@override String get restoreMessage => '¿Restablecer el árbol de trabajo a este checkpoint? Los cambios actuales se reemplazarán.';
-	@override String get restoreTitle => 'Restaurar checkpoint';
-	@override String get restored => 'Checkpoint restaurado';
-	@override String get title => 'Checkpoints';
+	@override String get lessThanMinute => '<1 min';
+	@override String minutes({required Object count}) => '${count} min';
+	@override String hours({required Object hours}) => '${hours} h';
+	@override String days({required Object days}) => '${days} d';
 }
 
-// Path: kanban.card
-class Translations$kanban$card$es extends Translations$kanban$card$en {
-	Translations$kanban$card$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: sessions.activity
+class Translations$sessions$activity$es extends Translations$sessions$activity$en {
+	Translations$sessions$activity$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get untitled => 'Sin título';
+	@override String get subagentRunning => 'Subagente en ejecución';
+	@override String readingFile({required Object file}) => 'Leyendo ${file}';
+	@override String runningTool({required Object name}) => 'Ejecutando ${name}';
+	@override String editingFile({required Object file}) => 'Editando ${file}';
+	@override String get editingFileGeneric => 'Editando un archivo';
+	@override String get runningShellCommand => 'Ejecutando un comando de shell';
+	@override String runningCommand({required Object command}) => 'Ejecutando `${command}`';
+	@override String get committingChanges => 'Confirmando cambios';
+	@override String get pushingBranch => 'Enviando la rama';
+	@override String fetchingUrl({required Object url}) => 'Obteniendo ${url}';
+	@override String searching({required Object query}) => 'Buscando «${query}»';
 }
 
-// Path: kanban.comments
-class Translations$kanban$comments$es extends Translations$kanban$comments$en {
-	Translations$kanban$comments$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: skills.addDialog
+class Translations$skills$addDialog$es extends Translations$skills$addDialog$en {
+	Translations$skills$addDialog$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get add => 'Añadir comentario';
-	@override String get empty => 'Aún no hay comentarios';
-}
-
-// Path: kanban.details
-class Translations$kanban$details$es extends Translations$kanban$details$en {
-	Translations$kanban$details$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String status({required Object status}) => 'Estado: ${status}';
-	@override String get title => 'Detalles de la tarjeta';
-}
-
-// Path: kanban.dialog
-class Translations$kanban$dialog$es extends Translations$kanban$dialog$en {
-	Translations$kanban$dialog$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String get saving => 'Guardando…';
-}
-
-// Path: kanban.empty
-class Translations$kanban$empty$es extends Translations$kanban$empty$en {
-	Translations$kanban$empty$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String get noProject => 'Ningún proyecto seleccionado';
-}
-
-// Path: kanban.time
-class Translations$kanban$time$es extends Translations$kanban$time$en {
-	Translations$kanban$time$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String daysAgo({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count,
-		one: 'hace 1 día',
-		other: 'hace ${count} días',
+	@override String title({required Object provider}) => 'Añadir Skill de ${provider}';
+	@override String get chooseFileTitle => 'Elegir SKILL.md';
+	@override String get chooseFolderTitle => 'Elegir una carpeta de skills';
+	@override String get uploadHint => 'Sube un archivo SKILL.md o una carpeta de skills completa.';
+	@override String get pickTitle => 'Elige una carpeta de skills o SKILL.md';
+	@override String get pickHint => 'Las carpetas pueden incluir scripts, referencias y recursos.';
+	@override String get chooseFiles => 'Elegir archivos';
+	@override String get chooseFolder => 'Elegir carpeta';
+	@override String get readyToInstall => 'Listo para instalar';
+	@override String markdownFileMeta({required Object size}) => 'Archivo Markdown · ${size}';
+	@override String folderFilesMeta({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count,
+		one: '${count} archivo · ${size}',
+		other: '${count} archivos · ${size}',
 	);
-	@override String hoursAgo({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count,
-		one: 'hace 1 hora',
-		other: 'hace ${count} horas',
+	@override String removeQueued({required Object name}) => 'Quitar ${name}';
+	@override String get whereWillThisInstall => '¿Dónde se instalará esto?';
+	@override String get hideInstallLocation => 'Ocultar ubicación de instalación';
+	@override String get folderUploadsNote => 'Las carpetas subidas conservan el nombre de la carpeta seleccionada; los archivos sueltos usan el `name` de `SKILL.md`.';
+	@override String get installSkill => 'Instalar Skill';
+	@override String installSkills({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count,
+		one: 'Instalar ${count} Skill',
+		other: 'Instalar ${count} Skills',
 	);
-	@override String minutesAgo({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count,
-		one: 'hace 1 min',
-		other: 'hace ${count} min',
+}
+
+// Path: skills.moveDialog
+class Translations$skills$moveDialog$es extends Translations$skills$moveDialog$en {
+	Translations$skills$moveDialog$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get toProjectHint => 'Elige el proyecto al que debe pertenecer esta skill. Saldrá del directorio global de skills del proveedor.';
+	@override String get toGlobalHint => 'Mueve esta skill al directorio global de skills para que todos los proyectos puedan usarla.';
+	@override String get moveToProject => 'Mover a proyecto';
+	@override String get moveToGlobal => 'Mover a global';
+}
+
+// Path: skills.screen
+class Translations$skills$screen$es extends Translations$skills$screen$en {
+	Translations$skills$screen$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String manageDescription({required Object provider}) => 'Gestiona las skills de ${provider} desde archivos locales, carpetas completas y ubicaciones por proyecto.';
+	@override String get searchHint => 'Buscar skills…';
+	@override String get clearSearch => 'Limpiar búsqueda de skills';
+	@override String get addSkill => 'Añadir Skill';
+	@override String get scanningProjectSkills => 'Escaneando skills del proyecto…';
+	@override String get savedSuccessfully => 'Skills guardadas correctamente.';
+	@override String loadingSkills({required Object provider}) => 'Cargando skills de ${provider}…';
+	@override String skillsCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count,
+		one: '${count} SKILL',
+		other: '${count} SKILLS',
 	);
-	@override String get now => 'ahora';
+	@override String deleteTitle({required Object name}) => '¿Eliminar ${name}?';
+	@override String deleteDescription({required Object directory, required Object provider}) => 'Esto elimina el directorio ${directory} del directorio de skills gestionadas de ${provider}. Esta acción no se puede deshacer.';
+	@override String get noDescription => 'No se ha proporcionado descripción en el front matter de la skill.';
+	@override String pluginBadge({required Object name}) => 'Plugin: ${name}';
+	@override String projectBadge({required Object name}) => 'Proyecto: ${name}';
+	@override String get sourceLabel => 'ORIGEN';
 }
 
-// Path: onboarding.agents
-class Translations$onboarding$agents$es extends Translations$onboarding$agents$en {
-	Translations$onboarding$agents$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: skills.empty
+class Translations$skills$empty$es extends Translations$skills$empty$en {
+	Translations$skills$empty$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get description => 'Inicia sesión en uno o más asistentes de programación con IA. Todos son opcionales.';
-	@override String get laterHint => 'Puedes configurarlos más tarde en Ajustes.';
-	@override String get title => 'Conecta tus agentes de IA';
+	@override String get noProjects => 'No hay proyectos disponibles';
+	@override String get noProjectsDescription => 'Añade un proyecto o espacio de trabajo para explorar sus skills.';
+	@override String get noSkillsInProject => 'No hay skills en este proyecto';
+	@override String get noSkillsInProjectDescription => 'Crea una carpeta .claude/skills, .cursor/skills o .agents/skills en el proyecto seleccionado.';
+	@override String get noGlobalSkills => 'Aún no se han detectado skills globales';
+	@override String get noGlobalSkillsDescription => 'Añade una skill global arriba para que esté disponible en todos los proyectos.';
+	@override String get noMatchingSkills => 'No hay skills coincidentes';
+	@override String get noMatchingSkillsDescription => 'Prueba con otro comando, nombre, ámbito, proyecto o ruta de origen.';
 }
 
-// Path: onboarding.errors
-class Translations$onboarding$errors$es extends Translations$onboarding$errors$en {
-	Translations$onboarding$errors$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: skills.scopes
+class Translations$skills$scopes$es extends Translations$skills$scopes$en {
+	Translations$skills$scopes$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get invalidEmail => 'Introduce una dirección de correo electrónico válida.';
-	@override String get nameAndEmailRequired => 'Se requieren tanto el nombre como el correo de git.';
+	@override String get user => 'Usuario';
+	@override String get plugin => 'Plugin';
+	@override String get repo => 'Repositorio';
+	@override String get project => 'Proyecto';
+	@override String get admin => 'Admin';
+	@override String get system => 'Sistema';
 }
 
-// Path: onboarding.mcp
-class Translations$onboarding$mcp$es extends Translations$onboarding$mcp$en {
-	Translations$onboarding$mcp$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: skills.errors
+class Translations$skills$errors$es extends Translations$skills$errors$en {
+	Translations$skills$errors$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get description => 'Instala el servidor MCP de DDAgent para que tus agentes puedan usar la base de conocimiento y las herramientas de DDAgent. Elige agentes o instala para todos.';
-	@override String get installForAll => 'Instalar para todos';
-	@override String get installSelected => 'Instalar seleccionados';
-	@override String installedOn({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count,
-		one: 'Instalado en ${count} agente.',
-		other: 'Instalado en ${count} agentes.',
-	);
-	@override String installedWithFailures({required Object installedCount, required Object failed}) => 'Instalado en ${installedCount}; falló: ${failed}';
-	@override String get laterHint => 'Opcional: también puedes instalarlo más tarde en Ajustes → MCP.';
-	@override String get title => 'Conecta los agentes con DDAgent';
+	@override String get dropMarkdownOrFolder => 'Suelta uno o más archivos markdown o una carpeta que contenga SKILL.md.';
+	@override String get addMarkdownFirst => 'Añade primero uno o más archivos markdown.';
+	@override String get importFailed => 'No se pudieron importar las skills';
+	@override String get folderReadFailed => 'No se pudo leer la carpeta de skills';
+	@override String folderFileLimit({required Object count}) => 'Una carpeta de skills puede contener hasta ${count} archivos.';
+	@override String get folderSizeLimit => 'Las carpetas de skills seleccionadas deben ocupar menos de 30 MB en total.';
+	@override String get missingSkillFile => 'La carpeta seleccionada no contiene un archivo SKILL.md.';
+	@override String couldNotReadSkillFile({required Object name}) => 'No se pudo leer SKILL.md desde ${name}.';
 }
 
-// Path: fileTree.search
-class Translations$fileTree$search$es extends Translations$fileTree$search$en {
-	Translations$fileTree$search$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: terminal.tabs
+class Translations$terminal$tabs$es extends Translations$terminal$tabs$en {
+	Translations$terminal$tabs$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get hint => 'Filtra nombres / Enter para buscar en el contenido';
-	@override String get noMatches => 'Sin coincidencias';
-	@override String get prompt => 'Escribe una consulta y pulsa Enter';
-	@override String get resultsTruncated => 'Resultados truncados';
+	@override String shellName({required Object index}) => 'Shell ${index}';
+	@override String get plainShell => 'Shell simple';
+	@override String get claudeCli => 'Claude CLI';
+	@override String get opencodeCli => 'OpenCode CLI';
+	@override String get commandCodeCli => 'Command Code CLI';
+	@override String get antigravityCli => 'Antigravity CLI';
+	@override String get cursorCli => 'Cursor CLI';
+	@override String get devinCli => 'Devin CLI';
+	@override String loginTitle({required Object provider}) => 'Inicio de sesión: ${provider}';
+	@override String runTitle({required Object command}) => 'Ejecutar: ${command}';
 }
 
-// Path: fileTree.titles
-class Translations$fileTree$titles$es extends Translations$fileTree$titles$en {
-	Translations$fileTree$titles$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: terminal.actions
+class Translations$terminal$actions$es extends Translations$terminal$actions$en {
+	Translations$terminal$actions$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String delete({required Object name}) => 'Eliminar ${name}';
-	@override String download({required Object name}) => 'Descargar ${name}';
-	@override String rename({required Object name}) => 'Renombrar ${name}';
+	@override String get newTab => 'Nueva pestaña de terminal';
+	@override String get providerLogin => 'Inicio de sesión del proveedor';
+	@override String get restartSession => 'Reiniciar sesión';
+	@override String get clearOutput => 'Limpiar salida';
+	@override String get newShell => 'Shell nueva';
+	@override String get connect => 'Conectar';
+}
+
+// Path: terminal.authUrl
+class Translations$terminal$authUrl$es extends Translations$terminal$authUrl$en {
+	Translations$terminal$authUrl$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get openInBrowser => 'Abrir en el navegador';
+	@override String linkLabel({required Object url}) => 'Enlace de autenticación: ${url}';
+}
+
+// Path: terminal.fileLink
+class Translations$terminal$fileLink$es extends Translations$terminal$fileLink$en {
+	Translations$terminal$fileLink$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String detected({required Object path}) => 'Archivo detectado: ${path}';
+}
+
+// Path: terminal.shortcuts
+class Translations$terminal$shortcuts$es extends Translations$terminal$shortcuts$en {
+	Translations$terminal$shortcuts$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get interrupt => 'Interrumpir (SIGINT)';
+	@override String get eof => 'EOF';
+	@override String get suspend => 'Suspender (SIGTSTP)';
+	@override String get hide => 'Ocultar barra de atajos';
+	@override String get showTooltip => 'Mostrar atajos';
+	@override String get hideTooltip => 'Ocultar atajos';
+}
+
+// Path: terminal.paste
+class Translations$terminal$paste$es extends Translations$terminal$paste$en {
+	Translations$terminal$paste$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Pegar en la terminal';
+	@override String get hint => 'Ctrl+V / clic derecho → Pegar';
+}
+
+// Path: terminal.errors
+class Translations$terminal$errors$es extends Translations$terminal$errors$en {
+	Translations$terminal$errors$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String couldNotOpenLink({required Object url}) => 'No se pudo abrir el enlace: ${url}';
+	@override String frameError({required Object message}) => '[Error] ${message}';
+	@override String connectionError({required Object message}) => '[Error de conexión] ${message}';
+}
+
+// Path: terminal.loginDialog
+class Translations$terminal$loginDialog$es extends Translations$terminal$loginDialog$en {
+	Translations$terminal$loginDialog$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String title({required Object provider}) => 'Inicio de sesión en ${provider} CLI';
+	@override String exited({required Object code}) => 'Finalizado (${code})';
+	@override String get authLinkDetected => 'Enlace de autenticación detectado';
+}
+
+// Path: terminal.empty
+class Translations$terminal$empty$es extends Translations$terminal$empty$en {
+	Translations$terminal$empty$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'No hay terminal activa';
+	@override String get description => 'Crea una pestaña nueva para empezar';
+}
+
+// Path: terminal.overlay
+class Translations$terminal$overlay$es extends Translations$terminal$overlay$en {
+	Translations$terminal$overlay$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get processExited => 'El proceso ha finalizado: conéctate para iniciarlo de nuevo';
+	@override String processExitedWithCode({required Object code}) => 'El proceso ha finalizado (código ${code}): conéctate para iniciarlo de nuevo';
+	@override String resumeSession({required Object title}) => 'Reanudar la sesión ${title}';
+	@override String startSession({required Object path}) => 'Iniciar una sesión nueva en ${path}';
+}
+
+// Path: workspace.paneTitle
+class Translations$workspace$paneTitle$es extends Translations$workspace$paneTitle$en {
+	Translations$workspace$paneTitle$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get chat => 'Chat';
+	@override String get browser => 'Navegador';
+	@override String get terminal => 'Terminal';
+	@override String get notes => 'Notas compartidas';
+	@override String get editor => 'Editor';
+	@override String get git => 'Git';
+}
+
+// Path: worktrees.runtimeStatus
+class Translations$worktrees$runtimeStatus$es extends Translations$worktrees$runtimeStatus$en {
+	Translations$worktrees$runtimeStatus$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get idle => 'inactivo';
+	@override String get running => 'en ejecución';
+	@override String get done => 'listo';
+	@override String get failed => 'fallido';
+	@override String get exited => 'finalizado';
+}
+
+// Path: browserUse.sessionStatus
+class Translations$browserUse$sessionStatus$es extends Translations$browserUse$sessionStatus$en {
+	Translations$browserUse$sessionStatus$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get ready => 'Lista';
+	@override String get stopped => 'Detenida';
+	@override String get unavailable => 'No disponible';
+}
+
+// Path: miniOrchestrator.taskTypes
+class Translations$miniOrchestrator$taskTypes$es extends Translations$miniOrchestrator$taskTypes$en {
+	Translations$miniOrchestrator$taskTypes$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get gate => 'Puerta';
+}
+
+// Path: miniOrchestrator.roles
+class Translations$miniOrchestrator$roles$es extends Translations$miniOrchestrator$roles$en {
+	Translations$miniOrchestrator$roles$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get thinker => 'Pensador';
+	@override String get worker => 'Ejecutor';
 }
 
 // Path: auth.login.errors
@@ -4297,6 +5067,131 @@ class Translations$auth$register$errors$es extends Translations$auth$register$er
 	@override String get weakPassword => 'La contraseña es demasiado débil';
 	@override String get usernameTooShort => 'El nombre de usuario debe tener al menos 3 caracteres';
 	@override String get passwordTooShort => 'La contraseña debe tener al menos 6 caracteres';
+}
+
+// Path: chat.orchestrator.routing
+class Translations$chat$orchestrator$routing$es extends Translations$chat$orchestrator$routing$en {
+	Translations$chat$orchestrator$routing$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Enrutamiento';
+	@override String alternatives({required Object list}) => 'Alternativas: ${list}';
+	@override String first({required Object label, required Object task}) => '${label} — primer candidato para ${task}';
+	@override String skipped({required Object label, required Object list}) => '${label} — candidatos anteriores omitidos (${list})';
+}
+
+// Path: chat.orchestrator.plan
+class Translations$chat$orchestrator$plan$es extends Translations$chat$orchestrator$plan$en {
+	Translations$chat$orchestrator$plan$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Plan';
+	@override String get disabled => 'desactivado';
+	@override String get awaitingConfirm => 'Esperando la confirmación del plan.';
+	@override String get run => 'Ejecutar plan';
+	@override String get toggleStep => 'Activar paso';
+	@override String get confirmFailed => 'No se pudo iniciar — inténtalo de nuevo.';
+	@override String get fallback => 'planificador no disponible — alternativa de un solo paso';
+	@override String get templateSource => 'desde plantilla de pipeline';
+	@override String get offSource => 'planificador desactivado';
+	@override String stepCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count,
+		one: '${count} paso',
+		other: '${count} pasos',
+	);
+	@override String get supervisedSource => 'bucle supervisado';
+}
+
+// Path: chat.orchestrator.decision
+class Translations$chat$orchestrator$decision$es extends Translations$chat$orchestrator$decision$en {
+	Translations$chat$orchestrator$decision$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Decisión del supervisor';
+	@override String iteration({required Object n}) => 'iteración ${n}';
+	@override String get rationaleLabel => 'Motivo';
+	@override String get awaitingConfirm => 'Esperando tu aprobación antes de ejecutar estos pasos.';
+	@override String get proposedSteps => 'Pasos propuestos';
+	@override late final Translations$chat$orchestrator$decision$action$es action = Translations$chat$orchestrator$decision$action$es._(_root);
+	@override late final Translations$chat$orchestrator$decision$outcome$es outcome = Translations$chat$orchestrator$decision$outcome$es._(_root);
+}
+
+// Path: chat.orchestrator.delegation
+class Translations$chat$orchestrator$delegation$es extends Translations$chat$orchestrator$delegation$en {
+	Translations$chat$orchestrator$delegation$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Paso delegado';
+	@override String get openSession => 'Abrir sesión completa';
+	@override String attempt({required Object n}) => 'intento ${n}';
+	@override String get retryStep => 'Reintentar / Corregir';
+	@override String get continueStep => 'Continuar / Corregir';
+	@override String get continueFailed => 'Error — inténtalo de nuevo.';
+	@override late final Translations$chat$orchestrator$delegation$status$es status = Translations$chat$orchestrator$delegation$status$es._(_root);
+	@override String attempts({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count,
+		one: '${count} intento',
+		other: '${count} intentos',
+	);
+	@override String candidates({required Object list}) => 'candidatos: ${list}';
+	@override String candidateCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count,
+		one: '${count} candidato',
+		other: '${count} candidatos',
+	);
+}
+
+// Path: chat.orchestrator.summary
+class Translations$chat$orchestrator$summary$es extends Translations$chat$orchestrator$summary$en {
+	Translations$chat$orchestrator$summary$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Resumen';
+	@override String progress({required Object done, required Object total}) => 'Pasos completados: ${done}/${total}';
+	@override String get aborted => 'abortado';
+	@override String get timedOut => 'tiempo agotado';
+	@override String get capped => 'límite de iteraciones';
+	@override String failed({required Object list}) => 'Pasos fallidos: ${list}';
+	@override String get kContinue => 'Continuar';
+	@override String get continueWork => 'Continuar el trabajo';
+	@override String get resumeFailed => 'No se pudo reanudar — inténtalo de nuevo.';
+	@override String get runNextTask => 'Ejecutar la siguiente tarea';
+	@override String get endAllTasks => 'Finalizar todas las tareas';
+	@override String get tasksRunning => 'Trabajando en las tareas…';
+	@override String get cancelTasks => 'Cancelar';
+}
+
+// Path: chat.orchestrator.taskmaster
+class Translations$chat$orchestrator$taskmaster$es extends Translations$chat$orchestrator$taskmaster$en {
+	Translations$chat$orchestrator$taskmaster$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Cola de tareas';
+	@override String remaining({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count,
+		one: 'queda ${count}',
+		other: 'quedan ${count}',
+	);
+	@override late final Translations$chat$orchestrator$taskmaster$status$es status = Translations$chat$orchestrator$taskmaster$status$es._(_root);
+}
+
+// Path: chat.orchestrator.gate
+class Translations$chat$orchestrator$gate$es extends Translations$chat$orchestrator$gate$en {
+	Translations$chat$orchestrator$gate$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get timedOut => 'tiempo agotado';
+	@override String exit({required Object code}) => 'salida ${code}';
 }
 
 // Path: chat.codex.modes
@@ -4356,6 +5251,10 @@ class Translations$chat$input$queue$es extends Translations$chat$input$queue$en 
 	@override String get failed => 'Falló el envío';
 	@override String get sendNow => 'Enviar ahora';
 	@override String get sendNowAfterTurn => 'Este agente no acepta mensajes durante un turno: se enviará cuando termine el actual';
+	@override String filesAttached({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count,
+		one: '${count} archivo adjunto',
+		other: '${count} archivos adjuntos',
+	);
 }
 
 // Path: chat.input.offlineQueue
@@ -4369,6 +5268,24 @@ class Translations$chat$input$offlineQueue$es extends Translations$chat$input$of
 	@override String get clearBtn => 'Cancelar';
 	@override String multiple({required Object count}) => '${count} mensajes en cola sin conexión — se enviarán automáticamente al reconectar';
 	@override String get single => '1 mensaje en cola sin conexión — se enviará automáticamente al reconectar';
+}
+
+// Path: chat.composer.effortLevels
+class Translations$chat$composer$effortLevels$es extends Translations$chat$composer$effortLevels$en {
+	Translations$chat$composer$effortLevels$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get off => 'Desactivado';
+	@override String get none => 'Ninguno';
+	@override String get minimal => 'Mínimo';
+	@override String get low => 'Bajo';
+	@override String get medium => 'Medio';
+	@override String get high => 'Alto';
+	@override String get xhigh => 'Muy alto';
+	@override String get max => 'Máximo';
+	@override String get ultra => 'Ultra';
 }
 
 // Path: chat.providerSelection.providerInfo
@@ -4397,6 +5314,7 @@ class Translations$chat$providerSelection$readyPrompt$es extends Translations$ch
 	@override String opencode({required Object model}) => 'Listo para usar OpenCode con ${model}. Escribe tu mensaje abajo.';
 	@override String get kDefault => 'Selecciona un proveedor arriba para empezar';
 	@override String devin({required Object model}) => 'Listo con Devin ${model}';
+	@override String get orchestrator => 'Listo con Auto — el enrutador elige el mejor modelo para cada paso';
 }
 
 // Path: chat.session.kContinue
@@ -4433,15 +5351,15 @@ class Translations$chat$session$messages$es extends Translations$chat$session$me
 	@override String get scrollToLoad => 'Desplázate hacia arriba para cargar más';
 	@override String showingLast({required Object count, required Object total}) => 'Mostrando los últimos ${count} mensajes (${total} en total)';
 	@override String get loadEarlier => 'Cargar mensajes anteriores';
+	@override String get loadOlderFailed => 'No se pudieron cargar mensajes anteriores.';
+	@override String get retry => 'Reintentar';
 	@override String get loadAll => 'Cargar todos los mensajes';
 	@override String get loadingAll => 'Cargando todos los mensajes...';
 	@override String get allLoaded => 'Todos los mensajes cargados';
 	@override String get perfWarning => 'Todos los mensajes cargados — el desplazamiento puede ser más lento. Haz clic en "Ir al final" para recuperar el rendimiento.';
-	@override String get loadOlderFailed => 'No se pudieron cargar mensajes anteriores.';
-	@override String get retry => 'Reintentar';
 	@override String get noSearchMatches => 'Ningún mensaje coincide con la búsqueda.';
-	@override String loadAllCount({required Object count}) => 'Cargar todos (${count})';
 	@override String get loadOlder => 'Cargar mensajes anteriores';
+	@override String loadAllCount({required Object count}) => 'Cargar todos (${count})';
 	@override String retryLoadOlder({required Object error}) => 'Reintentar cargar los anteriores — ${error}';
 }
 
@@ -4479,8 +5397,6 @@ class Translations$chat$shell$actions$es extends Translations$chat$shell$actions
 	@override String get disconnectTitle => 'Desconectar de la shell';
 	@override String get restart => 'Reiniciar';
 	@override String get restartTitle => 'Reiniciar shell';
-	@override String get connect => 'Continuar en la shell';
-	@override String get connectTitle => 'Conectar a la shell';
 	@override String get kill => 'Terminar (SIGINT)';
 	@override String get killTitle => 'Terminar proceso en ejecución (Ctrl+C)';
 	@override String get copyOutput => 'Copiar salida';
@@ -4488,6 +5404,8 @@ class Translations$chat$shell$actions$es extends Translations$chat$shell$actions
 	@override String get copied => '¡Copiado!';
 	@override String get zoomInTitle => 'Acercar';
 	@override String get zoomOutTitle => 'Alejar';
+	@override String get connect => 'Continuar en la shell';
+	@override String get connectTitle => 'Conectar a la shell';
 }
 
 // Path: chat.claudeStatus.actions
@@ -4557,222 +5475,180 @@ class Translations$chat$commandResult$fallback$es extends Translations$chat$comm
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get config => 'Abre los ajustes y la configuración.';
-	@override String get cost => 'Revisa el uso de tokens de la sesión activa.';
-	@override String get help => 'Muestra la documentación y la sintaxis de los comandos.';
-	@override String get memory => 'Abre el archivo de memoria CLAUDE.md del proyecto.';
 	@override String get models => 'Explora los modelos disponibles para el proveedor activo.';
+	@override String get cost => 'Revisa el uso de tokens de la sesión activa.';
 	@override String get status => 'Inspecciona el estado del runtime, la versión, el proveedor y el entorno.';
+	@override String get memory => 'Abre el archivo de memoria CLAUDE.md del proyecto.';
+	@override String get config => 'Abre los ajustes y la configuración.';
+	@override String get help => 'Muestra la documentación y la sintaxis de los comandos.';
 }
 
-// Path: common.fileTree.context
-class Translations$common$fileTree$context$es extends Translations$common$fileTree$context$en {
-	Translations$common$fileTree$context$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: chat.permissionRequest.recap
+class Translations$chat$permissionRequest$recap$es extends Translations$chat$permissionRequest$recap$en {
+	Translations$chat$permissionRequest$recap$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get rename => 'Renombrar';
-	@override String get delete => 'Eliminar';
-	@override String get copyPath => 'Copiar ruta';
-	@override String get download => 'Descargar';
-	@override String get newFile => 'Archivo nuevo';
-	@override String get newFolder => 'Carpeta nueva';
-	@override String get upload => 'Subir archivos';
-	@override String get refresh => 'Actualizar';
-	@override String get menuLabel => 'Menú contextual de archivo';
-	@override String get loading => 'Cargando...';
+	@override String get timedOut => 'Tiempo agotado: denegado automáticamente';
+	@override String get cancelled => 'Cancelado: se detuvo el turno';
+	@override String get autoApproved => 'Aprobado automáticamente';
+	@override String get expired => 'La solicitud caducó: el agente ya no la espera';
+	@override String get answered => 'Respondida';
+	@override String get skipped => 'Omitida';
+	@override String get decided => 'Decidido';
 }
 
-// Path: common.fileTree.delete
-class Translations$common$fileTree$delete$es extends Translations$common$fileTree$delete$en {
-	Translations$common$fileTree$delete$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: chat.commandDialog.help
+class Translations$chat$commandDialog$help$es extends Translations$chat$commandDialog$help$en {
+	Translations$chat$commandDialog$help$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get confirm => 'Eliminar';
-	@override String get fileWarning => 'Este archivo se eliminará permanentemente.';
-	@override String get folderWarning => 'Esta carpeta y todo su contenido se eliminarán permanentemente.';
-	@override String title({required Object type}) => 'Eliminar ${type}';
+	@override String get eyebrow => 'Centro de comandos';
+	@override String get title => 'Ayuda y atajos';
+	@override String get subtitle => 'Busca comandos integrados, patrones de sintaxis y uso de comandos.';
 }
 
-// Path: common.fileTree.toast
-class Translations$common$fileTree$toast$es extends Translations$common$fileTree$toast$en {
-	Translations$common$fileTree$toast$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: chat.commandDialog.models
+class Translations$chat$commandDialog$models$es extends Translations$chat$commandDialog$models$en {
+	Translations$chat$commandDialog$models$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get copyFailed => 'No se pudo copiar la ruta';
-	@override String get fileCreated => 'Archivo creado correctamente';
-	@override String get fileDeleted => 'Archivo eliminado';
-	@override String get folderCreated => 'Carpeta creada correctamente';
-	@override String get folderDeleted => 'Carpeta eliminada';
-	@override String get folderDownloaded => 'Carpeta descargada como ZIP';
-	@override String get pathCopied => 'Ruta copiada al portapapeles';
-	@override String get renamed => 'Renombrado correctamente';
+	@override String get eyebrow => 'Selección de modelo';
+	@override String get title => 'Elige un modelo';
+	@override String get subtitle => 'Elige el modelo que debe usar este proveedor.';
+	@override String modelSetTo({required Object model}) => 'Modelo establecido en ${model}.';
+	@override String get activeModel => 'Modelo activo';
+	@override String get noModelsMatch => 'Ningún modelo coincide con ese filtro.';
+	@override String get choiceSavedForSession => 'Tu elección se guarda para esta sesión y pasa a ser la predeterminada para los chats nuevos.';
+	@override String get choiceDefault => 'Tu elección pasa a ser el modelo predeterminado para los chats nuevos.';
+	@override String get custom => 'Personalizado';
+	@override String get currentSelection => 'Selección actual';
 }
 
-// Path: common.fileTree.validation
-class Translations$common$fileTree$validation$es extends Translations$common$fileTree$validation$en {
-	Translations$common$fileTree$validation$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: chat.commandDialog.cost
+class Translations$chat$commandDialog$cost$es extends Translations$chat$commandDialog$cost$en {
+	Translations$chat$commandDialog$cost$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get dotsOnly => 'El nombre de archivo no puede ser solo puntos';
-	@override String get emptyName => 'El nombre de archivo no puede estar vacío';
-	@override String get invalidChars => 'El nombre de archivo contiene caracteres no válidos';
-	@override String get reserved => 'El nombre de archivo es un nombre reservado';
+	@override String get eyebrow => 'Telemetría de la sesión';
+	@override String get title => 'Uso de tokens';
+	@override String get subtitle => 'Recuento de tokens de entrada, salida y total de esta sesión.';
+	@override String get totalTokensUsed => 'Total de tokens usados';
+	@override String get inputTokens => 'Tokens de entrada';
+	@override String get cacheReadTokens => 'Tokens leídos de caché';
+	@override String get cacheWriteTokens => 'Tokens escritos en caché';
+	@override String get outputTokens => 'Tokens de salida';
+	@override String get breakdown => 'Desglose';
+	@override String get unavailable => 'No disponible';
+	@override String get contextWindow => 'Ventana de contexto';
+	@override String get estimatedCost => 'Coste estimado';
 }
 
-// Path: common.projectWizard.steps
-class Translations$common$projectWizard$steps$es extends Translations$common$projectWizard$steps$en {
-	Translations$common$projectWizard$steps$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: chat.commandDialog.status
+class Translations$chat$commandDialog$status$es extends Translations$chat$commandDialog$status$en {
+	Translations$chat$commandDialog$status$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get type => 'Tipo';
-	@override String get configure => 'Configurar';
-	@override String get confirm => 'Confirmar';
+	@override String get eyebrow => 'Estado del entorno';
+	@override String get title => 'Estado del sistema';
+	@override String get subtitle => 'Versión, proveedor, entorno de ejecución y detalles del entorno.';
+	@override String get package => 'Paquete';
+	@override String get uptime => 'Tiempo activo';
+	@override String get platform => 'Plataforma';
+	@override String get memory => 'Memoria';
+	@override String memoryRss({required Object mb}) => '${mb} MB RSS';
+	@override String get runtimeOnline => 'Entorno en línea';
+	@override String processResponding({required Object pid}) => 'El proceso #${pid} responde.';
+	@override String get processStatusResponding => 'El proceso responde.';
+	@override String get healthy => 'En buen estado';
 }
 
-// Path: common.projectWizard.step1
-class Translations$common$projectWizard$step1$es extends Translations$common$projectWizard$step1$en {
-	Translations$common$projectWizard$step1$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: chat.commandDialog.syntax
+class Translations$chat$commandDialog$syntax$es extends Translations$chat$commandDialog$syntax$en {
+	Translations$chat$commandDialog$syntax$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get question => '¿Ya tienes un espacio de trabajo o quieres crear uno nuevo?';
-	@override late final Translations$common$projectWizard$step1$existing$es existing = Translations$common$projectWizard$step1$existing$es._(_root);
-	@override late final Translations$common$projectWizard$step1$kNew$es kNew = Translations$common$projectWizard$step1$kNew$es._(_root);
+	@override String get title => 'Sintaxis';
+	@override String arguments({required Object arguments, required Object first, required Object second}) => '${arguments} pasa todos los argumentos; ${first}, ${second} posicionales.';
+	@override String file({required Object token}) => '${token} incluye el contenido del archivo.';
+	@override String bash({required Object token}) => '${token} ejecuta bash.';
 }
 
-// Path: common.projectWizard.step2
-class Translations$common$projectWizard$step2$es extends Translations$common$projectWizard$step2$en {
-	Translations$common$projectWizard$step2$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: chat.utilities.tooltip
+class Translations$chat$utilities$tooltip$es extends Translations$chat$utilities$tooltip$en {
+	Translations$chat$utilities$tooltip$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get existingPath => 'Ruta del espacio de trabajo';
-	@override String get newPath => 'Ruta del espacio de trabajo';
-	@override String get existingPlaceholder => '/ruta/al/espacio/existente';
-	@override String get newPlaceholder => '/ruta/al/espacio/nuevo';
-	@override String get existingHelp => 'Ruta completa al directorio de tu espacio de trabajo existente';
-	@override String get newHelp => 'Ruta completa al directorio de tu espacio de trabajo';
-	@override String get githubUrl => 'URL de GitHub (opcional)';
-	@override String get githubPlaceholder => 'https://github.com/usuario/repositorio';
-	@override String get githubHelp => 'Opcional: proporciona una URL de GitHub para clonar un repositorio';
-	@override String get githubAuth => 'Autenticación de GitHub (opcional)';
-	@override String get githubAuthHelp => 'Solo se requiere para repositorios privados. Los repos públicos se pueden clonar sin autenticación.';
-	@override String get loadingTokens => 'Cargando tokens guardados...';
-	@override String get storedToken => 'Token guardado';
-	@override String get newToken => 'Token nuevo';
-	@override String get nonePublic => 'Ninguno (público)';
-	@override String get selectToken => 'Seleccionar token';
-	@override String get selectTokenPlaceholder => '-- Selecciona un token --';
-	@override String get tokenPlaceholder => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
-	@override String get tokenHelp => 'Este token se usará solo para esta operación';
-	@override String get publicRepoInfo => 'Los repositorios públicos no requieren autenticación. Puedes omitir el token si clonas un repo público.';
-	@override String get noTokensHelp => 'No hay tokens guardados disponibles. Puedes añadir tokens en Ajustes → Claves API para reutilizarlos fácilmente.';
-	@override String get optionalTokenPublic => 'Token de GitHub (opcional para repos públicos)';
-	@override String get tokenPublicPlaceholder => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx (déjalo vacío para repos públicos)';
+	@override String tokensUsed({required Object tokens}) => '${tokens} tokens usados';
+	@override String contextOf({required Object percent, required Object total}) => 'contexto ${percent} % de ${total}';
+	@override String input({required Object value}) => 'entrada ${value}';
+	@override String cache({required Object read, required Object write}) => 'caché leída ${read} · escrita ${write}';
+	@override String output({required Object value}) => 'salida ${value}';
 }
 
-// Path: common.projectWizard.step3
-class Translations$common$projectWizard$step3$es extends Translations$common$projectWizard$step3$en {
-	Translations$common$projectWizard$step3$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: chat.toolBlocks.status
+class Translations$chat$toolBlocks$status$es extends Translations$chat$toolBlocks$status$en {
+	Translations$chat$toolBlocks$status$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get reviewConfig => 'Revisa tu configuración';
-	@override String get existingWorkspace => 'Espacio de trabajo existente';
-	@override String get newWorkspace => 'Espacio de trabajo nuevo';
-	@override String get path => 'Ruta:';
-	@override String get cloneFrom => 'Clonar desde:';
-	@override String get authentication => 'Autenticación:';
-	@override String get usingStoredToken => 'Usando token guardado:';
-	@override String get usingProvidedToken => 'Usando token proporcionado';
-	@override String get noAuthentication => 'Sin autenticación';
-	@override String get sshKey => 'Clave SSH';
-	@override String get existingInfo => 'El espacio de trabajo se añadirá a tu lista de proyectos y estará disponible para sesiones de Claude/Cursor.';
-	@override String get newWithClone => 'El repositorio se clonará desde esta carpeta.';
-	@override String get newEmpty => 'El espacio de trabajo se añadirá a tu lista de proyectos y estará disponible para sesiones de Claude/Cursor.';
-	@override String get cloningRepository => 'Clonando repositorio...';
+	@override String get running => 'En ejecución';
+	@override String get denied => 'Denegado';
 }
 
-// Path: common.projectWizard.buttons
-class Translations$common$projectWizard$buttons$es extends Translations$common$projectWizard$buttons$en {
-	Translations$common$projectWizard$buttons$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: chat.toolBlocks.verbs
+class Translations$chat$toolBlocks$verbs$es extends Translations$chat$toolBlocks$verbs$en {
+	Translations$chat$toolBlocks$verbs$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get cancel => 'Cancelar';
-	@override String get back => 'Atrás';
-	@override String get next => 'Siguiente';
-	@override String get createProject => 'Crear proyecto';
-	@override String get creating => 'Creando...';
-	@override String get cloning => 'Clonando...';
+	@override String get read => 'leer';
+	@override String get write => 'escribir';
+	@override String get edit => 'editar';
+	@override String get delete => 'eliminar';
+	@override String get move => 'mover';
 }
 
-// Path: common.projectWizard.errors
-class Translations$common$projectWizard$errors$es extends Translations$common$projectWizard$errors$en {
-	Translations$common$projectWizard$errors$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: chat.commandMenu.namespaces
+class Translations$chat$commandMenu$namespaces$es extends Translations$chat$commandMenu$namespaces$en {
+	Translations$chat$commandMenu$namespaces$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get selectType => 'Selecciona si tienes un espacio de trabajo existente o quieres crear uno nuevo';
-	@override String get providePath => 'Proporciona la ruta del espacio de trabajo';
-	@override String get failedToCreate => 'No se pudo crear el espacio de trabajo';
-	@override String get failedToCreateFolder => 'No se pudo crear la carpeta';
+	@override String get frequent => 'Usados con frecuencia';
+	@override String get builtin => 'Comandos integrados';
+	@override String get skill => 'Habilidades';
+	@override String get project => 'Comandos del proyecto';
+	@override String get user => 'Comandos del usuario';
+	@override String get other => 'Otros comandos';
 }
 
-// Path: common.notifications.codes
-class Translations$common$notifications$codes$es extends Translations$common$notifications$codes$en {
-	Translations$common$notifications$codes$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: chat.mentionMenu.kinds
+class Translations$chat$mentionMenu$kinds$es extends Translations$chat$mentionMenu$kinds$en {
+	Translations$chat$mentionMenu$kinds$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override late final Translations$common$notifications$codes$generic$es generic = Translations$common$notifications$codes$generic$es._(_root);
-	@override late final Translations$common$notifications$codes$permission$es permission = Translations$common$notifications$codes$permission$es._(_root);
-	@override late final Translations$common$notifications$codes$run$es run = Translations$common$notifications$codes$run$es._(_root);
-	@override late final Translations$common$notifications$codes$agent$es agent = Translations$common$notifications$codes$agent$es._(_root);
-}
-
-// Path: common.versionUpdate.buttons
-class Translations$common$versionUpdate$buttons$es extends Translations$common$versionUpdate$buttons$en {
-	Translations$common$versionUpdate$buttons$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String get close => 'Cerrar';
-	@override String get later => 'Más tarde';
-	@override String get copyCommand => 'Copiar comando';
-	@override String get updateNow => 'Actualizar ahora';
-	@override String get updating => 'Actualizando...';
-}
-
-// Path: common.versionUpdate.ariaLabels
-class Translations$common$versionUpdate$ariaLabels$es extends Translations$common$versionUpdate$ariaLabels$en {
-	Translations$common$versionUpdate$ariaLabels$es._(TranslationsEs root) : this._root = root, super.internal(root);
-
-	final TranslationsEs _root; // ignore: unused_field
-
-	// Translations
-	@override String get closeModal => 'Cerrar el modal de actualización de versión';
-	@override String get showSidebar => 'Mostrar barra lateral';
-	@override String get settings => 'Ajustes';
-	@override String get updateAvailable => 'Actualización disponible';
-	@override String get closeSidebar => 'Cerrar barra lateral';
+	@override String get file => 'archivo';
+	@override String get session => 'sesión';
+	@override String get task => 'tarea';
 }
 
 // Path: common.quota.section
@@ -5021,6 +5897,216 @@ class Translations$common$quota$range$es extends Translations$common$quota$range
 	@override String get k7d => '7d';
 	@override String get k30d => '30d';
 	@override String get all => 'Todos';
+}
+
+// Path: common.fileTree.context
+class Translations$common$fileTree$context$es extends Translations$common$fileTree$context$en {
+	Translations$common$fileTree$context$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get rename => 'Renombrar';
+	@override String get delete => 'Eliminar';
+	@override String get copyPath => 'Copiar ruta';
+	@override String get download => 'Descargar';
+	@override String get newFile => 'Archivo nuevo';
+	@override String get newFolder => 'Carpeta nueva';
+	@override String get upload => 'Subir archivos';
+	@override String get refresh => 'Actualizar';
+	@override String get menuLabel => 'Menú contextual de archivo';
+	@override String get loading => 'Cargando...';
+}
+
+// Path: common.fileTree.delete
+class Translations$common$fileTree$delete$es extends Translations$common$fileTree$delete$en {
+	Translations$common$fileTree$delete$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get confirm => 'Eliminar';
+	@override String get fileWarning => 'Este archivo se eliminará permanentemente.';
+	@override String get folderWarning => 'Esta carpeta y todo su contenido se eliminarán permanentemente.';
+	@override String title({required Object type}) => 'Eliminar ${type}';
+}
+
+// Path: common.fileTree.toast
+class Translations$common$fileTree$toast$es extends Translations$common$fileTree$toast$en {
+	Translations$common$fileTree$toast$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get copyFailed => 'No se pudo copiar la ruta';
+	@override String get fileCreated => 'Archivo creado correctamente';
+	@override String get fileDeleted => 'Archivo eliminado';
+	@override String get folderCreated => 'Carpeta creada correctamente';
+	@override String get folderDeleted => 'Carpeta eliminada';
+	@override String get folderDownloaded => 'Carpeta descargada como ZIP';
+	@override String get pathCopied => 'Ruta copiada al portapapeles';
+	@override String get renamed => 'Renombrado correctamente';
+}
+
+// Path: common.fileTree.validation
+class Translations$common$fileTree$validation$es extends Translations$common$fileTree$validation$en {
+	Translations$common$fileTree$validation$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get dotsOnly => 'El nombre de archivo no puede ser solo puntos';
+	@override String get emptyName => 'El nombre de archivo no puede estar vacío';
+	@override String get invalidChars => 'El nombre de archivo contiene caracteres no válidos';
+	@override String get reserved => 'El nombre de archivo es un nombre reservado';
+}
+
+// Path: common.projectWizard.steps
+class Translations$common$projectWizard$steps$es extends Translations$common$projectWizard$steps$en {
+	Translations$common$projectWizard$steps$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get type => 'Tipo';
+	@override String get configure => 'Configurar';
+	@override String get confirm => 'Confirmar';
+}
+
+// Path: common.projectWizard.step1
+class Translations$common$projectWizard$step1$es extends Translations$common$projectWizard$step1$en {
+	Translations$common$projectWizard$step1$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get question => '¿Ya tienes un espacio de trabajo o quieres crear uno nuevo?';
+	@override late final Translations$common$projectWizard$step1$existing$es existing = Translations$common$projectWizard$step1$existing$es._(_root);
+	@override late final Translations$common$projectWizard$step1$kNew$es kNew = Translations$common$projectWizard$step1$kNew$es._(_root);
+}
+
+// Path: common.projectWizard.step2
+class Translations$common$projectWizard$step2$es extends Translations$common$projectWizard$step2$en {
+	Translations$common$projectWizard$step2$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get existingPath => 'Ruta del espacio de trabajo';
+	@override String get newPath => 'Ruta del espacio de trabajo';
+	@override String get existingPlaceholder => '/ruta/al/espacio/existente';
+	@override String get newPlaceholder => '/ruta/al/espacio/nuevo';
+	@override String get existingHelp => 'Ruta completa al directorio de tu espacio de trabajo existente';
+	@override String get newHelp => 'Ruta completa al directorio de tu espacio de trabajo';
+	@override String get githubUrl => 'URL de GitHub (opcional)';
+	@override String get githubPlaceholder => 'https://github.com/usuario/repositorio';
+	@override String get githubHelp => 'Opcional: proporciona una URL de GitHub para clonar un repositorio';
+	@override String get githubAuth => 'Autenticación de GitHub (opcional)';
+	@override String get githubAuthHelp => 'Solo se requiere para repositorios privados. Los repos públicos se pueden clonar sin autenticación.';
+	@override String get loadingTokens => 'Cargando tokens guardados...';
+	@override String get storedToken => 'Token guardado';
+	@override String get newToken => 'Token nuevo';
+	@override String get nonePublic => 'Ninguno (público)';
+	@override String get selectToken => 'Seleccionar token';
+	@override String get selectTokenPlaceholder => '-- Selecciona un token --';
+	@override String get tokenPlaceholder => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
+	@override String get tokenHelp => 'Este token se usará solo para esta operación';
+	@override String get publicRepoInfo => 'Los repositorios públicos no requieren autenticación. Puedes omitir el token si clonas un repo público.';
+	@override String get noTokensHelp => 'No hay tokens guardados disponibles. Puedes añadir tokens en Ajustes → Claves API para reutilizarlos fácilmente.';
+	@override String get optionalTokenPublic => 'Token de GitHub (opcional para repos públicos)';
+	@override String get tokenPublicPlaceholder => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx (déjalo vacío para repos públicos)';
+}
+
+// Path: common.projectWizard.step3
+class Translations$common$projectWizard$step3$es extends Translations$common$projectWizard$step3$en {
+	Translations$common$projectWizard$step3$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get reviewConfig => 'Revisa tu configuración';
+	@override String get existingWorkspace => 'Espacio de trabajo existente';
+	@override String get newWorkspace => 'Espacio de trabajo nuevo';
+	@override String get path => 'Ruta:';
+	@override String get cloneFrom => 'Clonar desde:';
+	@override String get authentication => 'Autenticación:';
+	@override String get usingStoredToken => 'Usando token guardado:';
+	@override String get usingProvidedToken => 'Usando token proporcionado';
+	@override String get noAuthentication => 'Sin autenticación';
+	@override String get sshKey => 'Clave SSH';
+	@override String get existingInfo => 'El espacio de trabajo se añadirá a tu lista de proyectos y estará disponible para sesiones de Claude/Cursor.';
+	@override String get newWithClone => 'El repositorio se clonará desde esta carpeta.';
+	@override String get newEmpty => 'El espacio de trabajo se añadirá a tu lista de proyectos y estará disponible para sesiones de Claude/Cursor.';
+	@override String get cloningRepository => 'Clonando repositorio...';
+}
+
+// Path: common.projectWizard.buttons
+class Translations$common$projectWizard$buttons$es extends Translations$common$projectWizard$buttons$en {
+	Translations$common$projectWizard$buttons$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get cancel => 'Cancelar';
+	@override String get back => 'Atrás';
+	@override String get next => 'Siguiente';
+	@override String get createProject => 'Crear proyecto';
+	@override String get creating => 'Creando...';
+	@override String get cloning => 'Clonando...';
+}
+
+// Path: common.projectWizard.errors
+class Translations$common$projectWizard$errors$es extends Translations$common$projectWizard$errors$en {
+	Translations$common$projectWizard$errors$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get selectType => 'Selecciona si tienes un espacio de trabajo existente o quieres crear uno nuevo';
+	@override String get providePath => 'Proporciona la ruta del espacio de trabajo';
+	@override String get failedToCreate => 'No se pudo crear el espacio de trabajo';
+	@override String get failedToCreateFolder => 'No se pudo crear la carpeta';
+}
+
+// Path: common.notifications.codes
+class Translations$common$notifications$codes$es extends Translations$common$notifications$codes$en {
+	Translations$common$notifications$codes$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override late final Translations$common$notifications$codes$generic$es generic = Translations$common$notifications$codes$generic$es._(_root);
+	@override late final Translations$common$notifications$codes$permission$es permission = Translations$common$notifications$codes$permission$es._(_root);
+	@override late final Translations$common$notifications$codes$run$es run = Translations$common$notifications$codes$run$es._(_root);
+	@override late final Translations$common$notifications$codes$agent$es agent = Translations$common$notifications$codes$agent$es._(_root);
+}
+
+// Path: common.versionUpdate.buttons
+class Translations$common$versionUpdate$buttons$es extends Translations$common$versionUpdate$buttons$en {
+	Translations$common$versionUpdate$buttons$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => 'Cerrar';
+	@override String get later => 'Más tarde';
+	@override String get copyCommand => 'Copiar comando';
+	@override String get updateNow => 'Actualizar ahora';
+	@override String get updating => 'Actualizando...';
+}
+
+// Path: common.versionUpdate.ariaLabels
+class Translations$common$versionUpdate$ariaLabels$es extends Translations$common$versionUpdate$ariaLabels$en {
+	Translations$common$versionUpdate$ariaLabels$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get closeModal => 'Cerrar el modal de actualización de versión';
+	@override String get showSidebar => 'Mostrar barra lateral';
+	@override String get settings => 'Ajustes';
+	@override String get updateAvailable => 'Actualización disponible';
+	@override String get closeSidebar => 'Cerrar barra lateral';
 }
 
 // Path: common.browserUse.empty
@@ -5445,6 +6531,31 @@ class Translations$common$gitPanel$tabs$es extends Translations$common$gitPanel$
 	@override String get worktrees => 'Worktrees';
 }
 
+// Path: common.gitPanel.worktreeScripts
+class Translations$common$gitPanel$worktreeScripts$es extends Translations$common$gitPanel$worktreeScripts$en {
+	Translations$common$gitPanel$worktreeScripts$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Scripts del worktree';
+	@override String get setup => 'Script de configuración (se ejecuta tras crear/abrir)';
+	@override String get run => 'Iniciar servidor de desarrollo';
+	@override String get stop => 'Detener servidor de desarrollo';
+	@override String get runScript => 'Script de ejecución (servidor de desarrollo, bajo demanda)';
+	@override String get runPort => 'Puerto de vista previa (opcional — se detecta automáticamente si está vacío)';
+	@override String get invalidPort => 'El puerto debe estar entre 1 y 65535';
+	@override String get sourceProject => 'Guardado como configuración específica del proyecto';
+	@override String get sourceFile => 'Desde .ddagent/worktree.json — al guardar se crea una configuración específica del proyecto';
+	@override String get sourceNone => 'Aún no hay nada configurado';
+	@override String get saving => 'Guardando…';
+	@override String get setupRunning => 'configuración en curso';
+	@override String get setupFailed => 'la configuración falló';
+	@override String get running => 'en ejecución';
+	@override String get openPreview => 'Abrir vista previa';
+	@override String runExited({required Object code}) => 'la ejecución terminó (${code})';
+}
+
 // Path: settings.mcp.scope
 class Translations$settings$mcp$scope$es extends Translations$settings$mcp$scope$en {
 	Translations$settings$mcp$scope$es._(TranslationsEs root) : this._root = root, super.internal(root);
@@ -5464,9 +6575,9 @@ class Translations$settings$appearance$themeModes$es extends Translations$settin
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get dark => 'Oscuro';
-	@override String get light => 'Claro';
 	@override String get system => 'Sistema';
+	@override String get light => 'Claro';
+	@override String get dark => 'Oscuro';
 }
 
 // Path: settings.quickSettings.sections
@@ -5506,6 +6617,76 @@ class Translations$settings$terminalShortcuts$handle$es extends Translations$set
 	@override String get openPanel => 'Abrir panel de atajos';
 }
 
+// Path: settings.miniOrchestration.enable
+class Translations$settings$miniOrchestration$enable$es extends Translations$settings$miniOrchestration$enable$en {
+	Translations$settings$miniOrchestration$enable$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get label => 'Activar miniorquestación';
+	@override String get description => 'Envía las sesiones Auto (mini) a través del motor de dos roles en lugar del orquestador completo.';
+}
+
+// Path: settings.miniOrchestration.thinker
+class Translations$settings$miniOrchestration$thinker$es extends Translations$settings$miniOrchestration$thinker$en {
+	Translations$settings$miniOrchestration$thinker$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Pensador (no flash)';
+	@override String get description => 'Planifica, decide, revisa y redacta el informe final.';
+}
+
+// Path: settings.miniOrchestration.worker
+class Translations$settings$miniOrchestration$worker$es extends Translations$settings$miniOrchestration$worker$en {
+	Translations$settings$miniOrchestration$worker$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Ejecutor (flash)';
+	@override String get description => 'Ejecuta cada paso planificado.';
+}
+
+// Path: settings.miniOrchestration.fields
+class Translations$settings$miniOrchestration$fields$es extends Translations$settings$miniOrchestration$fields$en {
+	Translations$settings$miniOrchestration$fields$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get provider => 'Proveedor';
+	@override String get model => 'Modelo';
+	@override String get modelPlaceholder => 'Selecciona un modelo';
+	@override String get tier => 'Nivel';
+}
+
+// Path: settings.miniOrchestration.roles
+class Translations$settings$miniOrchestration$roles$es extends Translations$settings$miniOrchestration$roles$en {
+	Translations$settings$miniOrchestration$roles$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Modelo por tarea';
+	@override String get description => 'Qué modelo (rol) se encarga de cada tipo de tarea.';
+}
+
+// Path: settings.miniOrchestration.planner
+class Translations$settings$miniOrchestration$planner$es extends Translations$settings$miniOrchestration$planner$en {
+	Translations$settings$miniOrchestration$planner$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Planificador';
+	@override String get mode => 'Modo';
+	@override late final Translations$settings$miniOrchestration$planner$modes$es modes = Translations$settings$miniOrchestration$planner$modes$es._(_root);
+	@override String get requireConfirmLabel => 'Confirmar el plan antes de ejecutarlo';
+}
+
 // Path: settings.orchestration.enable
 class Translations$settings$orchestration$enable$es extends Translations$settings$orchestration$enable$en {
 	Translations$settings$orchestration$enable$es._(TranslationsEs root) : this._root = root, super.internal(root);
@@ -5513,8 +6694,8 @@ class Translations$settings$orchestration$enable$es extends Translations$setting
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get label => 'Enable orchestration';
-	@override String get description => 'Let the orchestrator pick a model per step instead of running everything on one provider.';
+	@override String get label => 'Activar orquestación';
+	@override String get description => 'Deja que el orquestador elija un modelo por paso en lugar de ejecutarlo todo en un único proveedor.';
 }
 
 // Path: settings.orchestration.pool
@@ -5524,10 +6705,10 @@ class Translations$settings$orchestration$pool$es extends Translations$settings$
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'Candidate pool';
-	@override String get description => 'Models the router can pick from, each pinned to a cost tier.';
-	@override String get add => 'Add candidate';
-	@override String get empty => 'No candidates yet — add one to start routing.';
+	@override String get title => 'Grupo de candidatos';
+	@override String get description => 'Modelos entre los que puede elegir el enrutador, cada uno asignado a un nivel de coste.';
+	@override String get add => 'Añadir candidato';
+	@override String get empty => 'Aún no hay candidatos — añade uno para empezar a enrutar.';
 	@override late final Translations$settings$orchestration$pool$fields$es fields = Translations$settings$orchestration$pool$fields$es._(_root);
 }
 
@@ -5551,12 +6732,12 @@ class Translations$settings$orchestration$rules$es extends Translations$settings
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'Routing rules';
-	@override String get description => 'Ordered candidates per task type — the first available one wins.';
-	@override String get addCandidate => 'Add candidate…';
-	@override String get empty => 'No candidates — nothing to route this task type to.';
+	@override String get title => 'Reglas de enrutamiento';
+	@override String get description => 'Candidatos ordenados por tipo de tarea — gana el primero disponible.';
+	@override String get addCandidate => 'Añadir candidato…';
+	@override String get empty => 'Sin candidatos — no hay adónde enrutar este tipo de tarea.';
 	@override String get missing => '(removed)';
-	@override String get remove => 'Remove candidate';
+	@override String get remove => 'Eliminar candidato';
 	@override late final Translations$settings$orchestration$rules$taskTypes$es taskTypes = Translations$settings$orchestration$rules$taskTypes$es._(_root);
 }
 
@@ -5568,16 +6749,20 @@ class Translations$settings$orchestration$planner$es extends Translations$settin
 
 	// Translations
 	@override String get title => 'Planner';
-	@override String get description => 'How a request is split into routed steps.';
-	@override String get modeLabel => 'Planning mode';
+	@override String get description => 'Cómo se divide una solicitud en pasos enrutados.';
+	@override String get modeLabel => 'Modo de planificación';
 	@override late final Translations$settings$orchestration$planner$modes$es modes = Translations$settings$orchestration$planner$modes$es._(_root);
 	@override late final Translations$settings$orchestration$planner$modeHints$es modeHints = Translations$settings$orchestration$planner$modeHints$es._(_root);
-	@override String get candidateLabel => 'Planner model';
-	@override String get candidateDescription => 'Pool candidate used for plan generation and classification calls.';
-	@override String get candidatePlaceholder => 'Select a pool candidate';
+	@override String get candidateLabel => 'Modelo planificador';
+	@override String get candidateDescription => 'Candidato del grupo usado para generar planes y para las llamadas de clasificación.';
+	@override String get candidatePlaceholder => 'Selecciona un candidato del grupo';
 	@override late final Translations$settings$orchestration$planner$templates$es templates = Translations$settings$orchestration$planner$templates$es._(_root);
-	@override String get requireConfirm => 'Confirm plan before running';
-	@override String get requireConfirmDescription => 'Pause after planning so you can edit or disable steps on the plan card.';
+	@override String get requireConfirm => 'Confirmar el plan antes de ejecutarlo';
+	@override String get requireConfirmDescription => 'Pausar tras planificar para que puedas editar o desactivar pasos en la tarjeta del plan.';
+	@override String get checkpointLabel => 'Autonomía';
+	@override late final Translations$settings$orchestration$planner$checkpointModes$es checkpointModes = Translations$settings$orchestration$planner$checkpointModes$es._(_root);
+	@override late final Translations$settings$orchestration$planner$checkpointHints$es checkpointHints = Translations$settings$orchestration$planner$checkpointHints$es._(_root);
+	@override String get checkpointIntervalLabel => 'Pasos entre puntos de control (1–50)';
 }
 
 // Path: settings.orchestration.execution
@@ -5587,17 +6772,30 @@ class Translations$settings$orchestration$execution$es extends Translations$sett
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'Execution limits';
-	@override String get description => 'Guardrails for parallel runs and fix loops.';
-	@override String get maxParallel => 'Max parallel steps';
-	@override String get maxParallelDescription => 'How many subtasks may run at once (1–8).';
-	@override String get maxFixLoops => 'Max fix loops';
-	@override String get maxFixLoopsDescription => 'Retries when a step fails verification (0–5).';
-	@override String get onNoCandidate => 'When no candidate is available';
-	@override String get onNoCandidateDescription => 'Ask before falling back, or skip the step.';
+	@override String get title => 'Límites de ejecución';
+	@override String get description => 'Salvaguardas para ejecuciones en paralelo y bucles de corrección.';
+	@override String get maxParallel => 'Máx. pasos en paralelo';
+	@override String get maxParallelDescription => 'Cuántas subtareas pueden ejecutarse a la vez (1–8).';
+	@override String get maxFixLoops => 'Máx. bucles de corrección';
+	@override String get maxFixLoopsDescription => 'Reintentos cuando un paso no supera la verificación (0–5).';
+	@override String get onNoCandidate => 'Cuando no hay ningún candidato disponible';
+	@override String get onNoCandidateDescription => 'Preguntar antes de recurrir a una alternativa u omitir el paso.';
 	@override late final Translations$settings$orchestration$execution$onNoCandidateOptions$es onNoCandidateOptions = Translations$settings$orchestration$execution$onNoCandidateOptions$es._(_root);
-	@override String get useWorktree => 'Isolated worktree';
-	@override String get useWorktreeDescription => 'Run all delegated steps in one shared git worktree instead of the project directory.';
+	@override String get useWorktree => 'Worktree aislado';
+	@override String get useWorktreeDescription => 'Ejecuta todos los pasos delegados en un único worktree de git compartido en lugar del directorio del proyecto.';
+	@override String get maxSupervisorIterations => 'Máx. iteraciones del supervisor';
+	@override String get maxSupervisorIterationsDescription => 'Límite de rondas de decisión del supervisor en modo automático (1–100); al alcanzarlo, la ejecución termina con un informe parcial.';
+	@override String get maxAttempts => 'Máx. intentos por paso';
+	@override String get maxAttemptsDescription => 'Presupuesto total de intentos para un paso entre carriles y reintentos (1–50).';
+	@override String get stepTimeoutMs => 'Tiempo límite por paso (ms)';
+	@override String get stepTimeoutMsDescription => 'Tiempo límite por intento de la ejecución secundaria en milisegundos; 0 lo desactiva.';
+	@override String get runTimeoutMs => 'Tiempo límite de ejecución (ms)';
+	@override String get runTimeoutMsDescription => 'Tiempo límite global de ejecución del plan en milisegundos; 0 lo desactiva.';
+	@override String get retryBackoffBaseMs => 'Base del backoff de reintentos (ms)';
+	@override String get retryBackoffBaseMsDescription => 'Base del backoff exponencial entre reintentos en el mismo carril (jitter completo).';
+	@override String get retryBudgetTitle => 'Presupuesto de reintentos por tipo de fallo';
+	@override String get retryBudgetDescription => 'Reintentos en el mismo carril antes de conmutar o enfriar (0–5).';
+	@override late final Translations$settings$orchestration$execution$retryClasses$es retryClasses = Translations$settings$orchestration$execution$retryClasses$es._(_root);
 }
 
 // Path: settings.orchestration.save
@@ -5607,13 +6805,13 @@ class Translations$settings$orchestration$save$es extends Translations$settings$
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get unsaved => 'Unsaved changes';
+	@override String get unsaved => 'Cambios sin guardar';
 	@override String get save => 'Save';
 	@override String get saving => 'Saving…';
 	@override String get saved => 'Saved';
 	@override String get discard => 'Discard';
 	@override String get error => 'Save failed';
-	@override String get emptyPool => 'Add at least one candidate before saving.';
+	@override String get emptyPool => 'Añade al menos un candidato antes de guardar.';
 }
 
 // Path: settings.notifications.webPush
@@ -5688,6 +6886,24 @@ class Translations$settings$notifications$events$es extends Translations$setting
 	@override String get error => 'Ejecución fallida';
 }
 
+// Path: settings.notifications.messaging
+class Translations$settings$notifications$messaging$es extends Translations$settings$notifications$messaging$en {
+	Translations$settings$notifications$messaging$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Aprobaciones por mensajería';
+	@override String get description => 'Aprueba o deniega las solicitudes de permisos de los agentes desde Telegram y recibe notificaciones de ejecución en Discord.';
+	@override String get enabled => 'Activado';
+	@override String get save => 'Guardar';
+	@override String get test => 'Probar';
+	@override String get pair => 'Vincular';
+	@override String get telegramToken => 'Token del bot de @BotFather (123456:ABC…)';
+	@override String get telegramHint => 'Envía cualquier mensaje a tu bot y luego vincula el chat abajo.';
+	@override String get discordWebhook => 'https://discord.com/api/webhooks/…';
+}
+
 // Path: settings.notifications.channels
 class Translations$settings$notifications$channels$es extends Translations$settings$notifications$channels$en {
 	Translations$settings$notifications$channels$es._(TranslationsEs root) : this._root = root, super.internal(root);
@@ -5695,8 +6911,8 @@ class Translations$settings$notifications$channels$es extends Translations$setti
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get discord => 'Discord';
 	@override String get telegram => 'Telegram';
+	@override String get discord => 'Discord';
 }
 
 // Path: settings.appearanceSettings.darkMode
@@ -6083,6 +7299,28 @@ class Translations$settings$agents$logout$es extends Translations$settings$agent
 	@override String get failed => 'No se pudo cerrar la sesión';
 }
 
+// Path: settings.agents.accounts
+class Translations$settings$agents$accounts$es extends Translations$settings$agents$accounts$en {
+	Translations$settings$agents$accounts$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Cuentas con nombre';
+	@override String get description => 'Conjuntos de credenciales adicionales. Una sesión asociada a una cuenta inicia la CLI con su directorio de configuración aislado. Inicia sesión ejecutando una vez la CLI del proveedor con las variables de entorno mostradas.';
+	@override String get sharedCli => 'Todas las cuentas comparten una instalación de la CLI — actualízala en la tarjeta de conexión de arriba.';
+	@override String get loading => 'Cargando cuentas…';
+	@override String get kDefault => 'Predeterminada';
+	@override String usage({required Object tokens}) => '${tokens} tokens';
+	@override String get usageButton => 'Uso';
+	@override String get showUsage => 'Mostrar uso de tokens';
+	@override String get makeDefault => 'Establecer como predeterminada';
+	@override String get remove => 'Eliminar cuenta';
+	@override String get newLabel => 'Nombre de la cuenta (p. ej. Trabajo)';
+	@override String get add => 'Añadir cuenta';
+	@override late final Translations$settings$agents$accounts$autoSwitch$es autoSwitch = Translations$settings$agents$accounts$autoSwitch$es._(_root);
+}
+
 // Path: settings.permissions.permissionMode
 class Translations$settings$permissions$permissionMode$es extends Translations$settings$permissions$permissionMode$en {
 	Translations$settings$permissions$permissionMode$es._(TranslationsEs root) : this._root = root, super.internal(root);
@@ -6198,8 +7436,8 @@ class Translations$settings$quota$settings$es extends Translations$settings$quot
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get tab => 'Control Center';
-	@override String get title => 'Control Center';
+	@override String get tab => 'Centro de control';
+	@override String get title => 'Centro de control';
 	@override String get description => 'Umbrales de alerta, política de enrutamiento y cuentas consultadas para cuotas.';
 	@override String get saved => 'Guardado';
 	@override String get alertsSection => 'Alertas';
@@ -6272,6 +7510,8 @@ class Translations$settings$about$pro$es extends Translations$settings$about$pro
 	// Translations
 	@override String get syncSettings => 'Sincronizar ajustes';
 	@override String get teamManagement => 'Gestión de equipo';
+	@override String get syncSettingsDescription => 'Mantén tus preferencias, configuraciones MCP y tema sincronizados en todos tus entornos.';
+	@override String get teamManagementDescription => 'Varios usuarios, acceso basado en roles y proyectos compartidos para tu equipo.';
 }
 
 // Path: tasks.notConfigured.features
@@ -6377,6 +7617,8 @@ class Translations$tasks$board$card$es extends Translations$tasks$board$card$en 
 	@override String get delete => 'Eliminar';
 	@override String get openSession => 'Abrir sesión';
 	@override String get pullRequest => 'Pull request';
+	@override String get edit => 'Editar';
+	@override String get moveTo => 'Mover a';
 }
 
 // Path: tasks.board.dialog
@@ -6424,40 +7666,84 @@ class Translations$tasks$board$deleteConfirm$es extends Translations$tasks$board
 	@override String get title => '¿Eliminar la tarjeta?';
 }
 
-// Path: mcp.form.fields
-class Translations$mcp$form$fields$es extends Translations$mcp$form$fields$en {
-	Translations$mcp$form$fields$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: tasks.board.assignee
+class Translations$tasks$board$assignee$es extends Translations$tasks$board$assignee$en {
+	Translations$tasks$board$assignee$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get bearerTokenEnvVar => 'Variable de entorno del token Bearer';
-	@override String get envVarNames => 'Nombres de variables de entorno';
-	@override String get workingDirectory => 'Directorio de trabajo';
+	@override String get label => 'Responsable';
+	@override String get all => 'Todos los responsables';
+	@override String get unassigned => 'Sin asignar';
 }
 
-// Path: mcp.form.scope
-class Translations$mcp$form$scope$es extends Translations$mcp$form$scope$en {
-	Translations$mcp$form$scope$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: tasks.board.presence
+class Translations$tasks$board$presence$es extends Translations$tasks$board$presence$en {
+	Translations$tasks$board$presence$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get claudeLocal => 'Claude local';
-	@override late final Translations$mcp$form$scope$description$es description = Translations$mcp$form$scope$description$es._(_root);
-	@override String get projectAllProviders => 'Proyecto (todos los proveedores)';
-	@override String get userAllProviders => 'Usuario (todos los proveedores)';
+	@override String online({required Object count}) => '${count} en línea';
 }
 
-// Path: mcp.form.validation
-class Translations$mcp$form$validation$es extends Translations$mcp$form$validation$en {
-	Translations$mcp$form$validation$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: tasks.board.activity
+class Translations$tasks$board$activity$es extends Translations$tasks$board$activity$en {
+	Translations$tasks$board$activity$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String unsupportedGlobal({required Object type}) => 'Añadir servidor MCP solo admite stdio y http en todos los proveedores, no ${type}.';
-	@override String unsupportedProvider({required Object provider, required Object type}) => '${provider} no admite servidores MCP de tipo ${type}';
+	@override String get title => 'Actividad';
+	@override String get empty => 'Aún no hay actividad';
+}
+
+// Path: tasks.board.comments
+class Translations$tasks$board$comments$es extends Translations$tasks$board$comments$en {
+	Translations$tasks$board$comments$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get label => 'Comentarios';
+	@override String get placeholder => 'Escribe un comentario…';
+	@override String get send => 'Enviar';
+	@override String get unknownAuthor => 'Alguien';
+}
+
+// Path: tasks.taskmaster.sort
+class Translations$tasks$taskmaster$sort$es extends Translations$tasks$taskmaster$sort$en {
+	Translations$tasks$taskmaster$sort$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get statusAz => 'Estado (A-Z)';
+	@override String get statusZa => 'Estado (Z-A)';
+}
+
+// Path: tasks.taskmaster.prd
+class Translations$tasks$taskmaster$prd$es extends Translations$tasks$taskmaster$prd$en {
+	Translations$tasks$taskmaster$prd$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get fileNameRequired => 'Indica un nombre de archivo para el PRD.';
+	@override String get contentRequired => 'Añade contenido antes de guardar.';
+	@override String get overwrite => 'Sobrescribir';
+	@override String get contentHint => '# Documento de requisitos del producto…';
+}
+
+// Path: tasks.taskmaster.detail
+class Translations$tasks$taskmaster$detail$es extends Translations$tasks$taskmaster$detail$en {
+	Translations$tasks$taskmaster$detail$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get dependenciesLabel => 'Dependencias (ID separados por comas)';
 }
 
 // Path: mcp.servers.config
@@ -6469,6 +7755,133 @@ class Translations$mcp$servers$config$es extends Translations$mcp$servers$config
 	// Translations
 	@override String get cwd => 'Cwd';
 	@override String get envVars => 'Variables de entorno';
+}
+
+// Path: mcp.form.scope
+class Translations$mcp$form$scope$es extends Translations$mcp$form$scope$en {
+	Translations$mcp$form$scope$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get userAllProviders => 'Usuario (todos los proveedores)';
+	@override String get claudeLocal => 'Claude local';
+	@override String get projectAllProviders => 'Proyecto (todos los proveedores)';
+	@override late final Translations$mcp$form$scope$description$es description = Translations$mcp$form$scope$description$es._(_root);
+}
+
+// Path: mcp.form.fields
+class Translations$mcp$form$fields$es extends Translations$mcp$form$fields$en {
+	Translations$mcp$form$fields$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get workingDirectory => 'Directorio de trabajo';
+	@override String get envVarNames => 'Nombres de variables de entorno';
+	@override String get bearerTokenEnvVar => 'Variable de entorno del token Bearer';
+}
+
+// Path: mcp.form.validation
+class Translations$mcp$form$validation$es extends Translations$mcp$form$validation$en {
+	Translations$mcp$form$validation$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String unsupportedGlobal({required Object type}) => 'Añadir servidor MCP solo admite stdio y http en todos los proveedores, no ${type}.';
+	@override String unsupportedProvider({required Object provider, required Object type}) => '${provider} no admite servidores MCP de tipo ${type}';
+	@override String get jsonMustBeObject => 'La configuración JSON debe ser un objeto';
+}
+
+// Path: serverConnect.local.errors
+class Translations$serverConnect$local$errors$es extends Translations$serverConnect$local$errors$en {
+	Translations$serverConnect$local$errors$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get releaseTagUnresolved => 'No se pudo determinar la etiqueta de la última versión de DDAgent.';
+	@override String get unsupportedPlatform => 'El servidor local no es compatible con esta plataforma.';
+	@override String unsupportedPlatformDetail({required Object platform}) => 'El servidor local no es compatible con esta plataforma (${platform}).';
+	@override String nodeExtractionFailed({required Object path}) => 'La extracción de Node.js no generó ${path}';
+	@override String downloadFailed({required Object error}) => 'Error al descargar el servidor: ${error}';
+	@override String installFailed({required Object error}) => 'Error al instalar el servidor: ${error}';
+	@override String get bundleNotInstalled => 'El paquete del servidor no está instalado.';
+	@override String spawnFailed({required Object error}) => 'No se pudo iniciar el servidor local: ${error}';
+	@override String portInUse({required Object port}) => 'El puerto ${port} ya está en uso por otra aplicación.';
+	@override String get exitedDuringStartup => 'El servidor local se cerró durante el inicio.';
+	@override String exitedDuringStartupWithOutput({required Object output}) => 'El servidor local se cerró durante el inicio: ${output}';
+	@override String get startTimeout => 'Se agotó el tiempo de espera para iniciar el servidor local.';
+	@override String tarFailed({required Object command, required Object code, required Object output}) => '${command} falló (código ${code}): ${output}';
+}
+
+// Path: chat.orchestrator.decision.action
+class Translations$chat$orchestrator$decision$action$es extends Translations$chat$orchestrator$decision$action$en {
+	Translations$chat$orchestrator$decision$action$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get kContinue => 'delegando';
+	@override String get done => 'finalizado';
+	@override String get invalid => 'sin decisión';
+}
+
+// Path: chat.orchestrator.decision.outcome
+class Translations$chat$orchestrator$decision$outcome$es extends Translations$chat$orchestrator$decision$outcome$en {
+	Translations$chat$orchestrator$decision$outcome$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get success => 'éxito';
+	@override String get partial => 'parcial';
+	@override String get failed => 'fallido';
+}
+
+// Path: chat.orchestrator.delegation.status
+class Translations$chat$orchestrator$delegation$status$es extends Translations$chat$orchestrator$delegation$status$en {
+	Translations$chat$orchestrator$delegation$status$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get queued => 'en cola';
+	@override String get running => 'en ejecución';
+	@override String get done => 'hecho';
+	@override String get failed => 'fallido';
+	@override String get aborted => 'abortado';
+	@override String get skipped => 'omitido';
+	@override String get awaitingDecision => 'esperando decisión';
+}
+
+// Path: chat.orchestrator.taskmaster.status
+class Translations$chat$orchestrator$taskmaster$status$es extends Translations$chat$orchestrator$taskmaster$status$en {
+	Translations$chat$orchestrator$taskmaster$status$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get started => 'en ejecución';
+	@override String get done => 'hecho';
+	@override String get complete => 'completado';
+	@override String get failed => 'fallido';
+	@override String get paused => 'en pausa';
+	@override String get blocked => 'bloqueado';
+	@override String get aborted => 'abortado';
+}
+
+// Path: common.quota.settings.routing
+class Translations$common$quota$settings$routing$es extends Translations$common$quota$settings$routing$en {
+	Translations$common$quota$settings$routing$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get manual => 'Manual — solo recomendación';
+	@override String get ask => 'Preguntar antes de cambiar de cuenta';
+	@override String get autoLowRisk => 'Cambio automático para tareas de bajo riesgo';
 }
 
 // Path: common.projectWizard.step1.existing
@@ -6534,16 +7947,15 @@ class Translations$common$notifications$codes$agent$es extends Translations$comm
 	@override late final Translations$common$notifications$codes$agent$notification$es notification = Translations$common$notifications$codes$agent$notification$es._(_root);
 }
 
-// Path: common.quota.settings.routing
-class Translations$common$quota$settings$routing$es extends Translations$common$quota$settings$routing$en {
-	Translations$common$quota$settings$routing$es._(TranslationsEs root) : this._root = root, super.internal(root);
+// Path: settings.miniOrchestration.planner.modes
+class Translations$settings$miniOrchestration$planner$modes$es extends Translations$settings$miniOrchestration$planner$modes$en {
+	Translations$settings$miniOrchestration$planner$modes$es._(TranslationsEs root) : this._root = root, super.internal(root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get manual => 'Manual — solo recomendación';
-	@override String get ask => 'Preguntar antes de cambiar de cuenta';
-	@override String get autoLowRisk => 'Cambio automático para tareas de bajo riesgo';
+	@override String get auto => 'Planificar con el pensador';
+	@override String get off => 'Un solo paso';
 }
 
 // Path: settings.orchestration.pool.fields
@@ -6554,19 +7966,19 @@ class Translations$settings$orchestration$pool$fields$es extends Translations$se
 
 	// Translations
 	@override String get label => 'Label';
-	@override String get labelPlaceholder => 'e.g. SWE-2 Medium';
+	@override String get labelPlaceholder => 'p. ej. SWE-2 Medium';
 	@override String get provider => 'Provider';
 	@override String get model => 'Model';
-	@override String get modelPlaceholder => 'Select a model';
+	@override String get modelPlaceholder => 'Selecciona un modelo';
 	@override String get effort => 'Effort';
-	@override String get effortDefault => 'Provider default';
+	@override String get effortDefault => 'Predeterminado del proveedor';
 	@override String get effortPlaceholder => 'default';
 	@override String get account => 'Account';
-	@override String get accountDefault => 'Provider default';
+	@override String get accountDefault => 'Predeterminada del proveedor';
 	@override String get redundantAccounts => 'Cuentas redundantes';
 	@override String get redundantAccountsNone => 'No hay otras cuentas para este proveedor';
 	@override String get tier => 'Cost tier';
-	@override String get remove => 'Remove candidate';
+	@override String get remove => 'Eliminar candidato';
 	@override String get moveUp => 'Move up';
 	@override String get moveDown => 'Move down';
 }
@@ -6579,13 +7991,14 @@ class Translations$settings$orchestration$rules$taskTypes$es extends Translation
 
 	// Translations
 	@override String get plan => 'Planning';
-	@override String get quick => 'Quick answers';
+	@override String get quick => 'Respuestas rápidas';
 	@override String get research => 'Research';
 	@override String get docs => 'Documentation';
 	@override String get code => 'Coding';
-	@override String get codeHard => 'Complex coding';
+	@override String get codeHard => 'Programación compleja';
 	@override String get test => 'Testing';
 	@override String get review => 'Review';
+	@override String get report => 'Informe';
 }
 
 // Path: settings.orchestration.planner.modes
@@ -6607,9 +8020,9 @@ class Translations$settings$orchestration$planner$modeHints$es extends Translati
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get auto => 'The planner model decomposes each request into typed steps.';
-	@override String get template => 'Requests run through a fixed pipeline you pick below.';
-	@override String get off => 'No planning — the whole request is routed as a single step.';
+	@override String get auto => 'El modelo planificador descompone cada solicitud en pasos tipificados.';
+	@override String get template => 'Las solicitudes pasan por un pipeline fijo que eliges abajo.';
+	@override String get off => 'Sin planificación — toda la solicitud se enruta como un único paso.';
 }
 
 // Path: settings.orchestration.planner.templates
@@ -6619,14 +8032,38 @@ class Translations$settings$orchestration$planner$templates$es extends Translati
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'Pipeline templates';
+	@override String get title => 'Plantillas de pipeline';
 	@override String get add => 'Add template';
-	@override String get namePlaceholder => 'Template name';
+	@override String get namePlaceholder => 'Nombre de la plantilla';
 	@override String get addStep => 'Add step…';
-	@override String get remove => 'Remove template';
+	@override String get remove => 'Eliminar plantilla';
 	@override String get removeStep => 'Remove step';
-	@override String get empty => 'No templates yet.';
-	@override String get emptySteps => 'No steps yet — add one below.';
+	@override String get empty => 'Aún no hay plantillas.';
+	@override String get emptySteps => 'Aún no hay pasos — añade uno abajo.';
+}
+
+// Path: settings.orchestration.planner.checkpointModes
+class Translations$settings$orchestration$planner$checkpointModes$es extends Translations$settings$orchestration$planner$checkpointModes$en {
+	Translations$settings$orchestration$planner$checkpointModes$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get off => 'Autónomo';
+	@override String get perStep => 'Por paso';
+	@override String get everyN => 'Cada N';
+}
+
+// Path: settings.orchestration.planner.checkpointHints
+class Translations$settings$orchestration$planner$checkpointHints$es extends Translations$settings$orchestration$planner$checkpointHints$en {
+	Translations$settings$orchestration$planner$checkpointHints$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get off => 'Las decisiones del supervisor se ejecutan sin preguntar (modo automático).';
+	@override String get perStep => 'Pedir aprobación antes de cada lote de pasos propuesto.';
+	@override String get everyN => 'Pedir aprobación cada N pasos completados.';
 }
 
 // Path: settings.orchestration.execution.onNoCandidateOptions
@@ -6638,6 +8075,20 @@ class Translations$settings$orchestration$execution$onNoCandidateOptions$es exte
 	// Translations
 	@override String get ask => 'Ask';
 	@override String get skip => 'Skip step';
+}
+
+// Path: settings.orchestration.execution.retryClasses
+class Translations$settings$orchestration$execution$retryClasses$es extends Translations$settings$orchestration$execution$retryClasses$en {
+	Translations$settings$orchestration$execution$retryClasses$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get rateLimit => 'Límite de tasa';
+	@override String get quota => 'Cuota';
+	@override String get auth => 'Autenticación';
+	@override String get timeout => 'Tiempo agotado';
+	@override String get transient => 'Transitorio';
 }
 
 // Path: settings.appearanceSettings.codeEditor.theme
@@ -6805,6 +8256,17 @@ class Translations$settings$agents$account$devin$es extends Translations$setting
 	@override String get description => 'Asistente CLI Devin';
 }
 
+// Path: settings.agents.accounts.autoSwitch
+class Translations$settings$agents$accounts$autoSwitch$es extends Translations$settings$agents$accounts$autoSwitch$en {
+	Translations$settings$agents$accounts$autoSwitch$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get label => 'Cambiar de cuenta automáticamente al alcanzar el límite';
+	@override String get description => 'Cuando una cuenta alcanza su límite de uso, la sesión pasa a otra cuenta del mismo agente que aún tenga cuota, incluso si elegiste manualmente la agotada. Nunca cambia a otro agente. Claude y Codex conservan la conversación; los demás agentes solo cambian en chats nuevos.';
+}
+
 // Path: settings.permissions.permissionMode.modes
 class Translations$settings$permissions$permissionMode$modes$es extends Translations$settings$permissions$permissionMode$modes$en {
 	Translations$settings$permissions$permissionMode$modes$es._(TranslationsEs root) : this._root = root, super.internal(root);
@@ -6887,11 +8349,11 @@ class Translations$mcp$form$scope$description$es extends Translations$mcp$form$s
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get local => 'Se guarda en los ajustes de usuario de Claude para el proyecto seleccionado';
-	@override String get project => 'Se guarda en el espacio de trabajo del proyecto seleccionado';
-	@override String get projectGlobal => 'Escribe en el espacio de trabajo del proyecto seleccionado para todos los proveedores';
-	@override String get user => 'Disponible en todos los proyectos de tu máquina';
 	@override String get userGlobal => 'Escribe en la configuración de usuario de cada proveedor y está disponible en todos los proyectos de esta máquina';
+	@override String get user => 'Disponible en todos los proyectos de tu máquina';
+	@override String get local => 'Se guarda en los ajustes de usuario de Claude para el proyecto seleccionado';
+	@override String get projectGlobal => 'Escribe en el espacio de trabajo del proyecto seleccionado para todos los proveedores';
+	@override String get project => 'Se guarda en el espacio de trabajo del proyecto seleccionado';
 }
 
 // Path: common.notifications.codes.generic.info
@@ -7054,6 +8516,74 @@ extension on TranslationsEs {
 			'chat.messageTypes.codex' => 'Codex',
 			'chat.messageTypes.opencode' => 'OpenCode',
 			'chat.messageTypes.devin' => 'Devin',
+			'chat.messageTypes.orchestrator' => 'Auto',
+			'chat.orchestrator.routing.title' => 'Enrutamiento',
+			'chat.orchestrator.routing.alternatives' => ({required Object list}) => 'Alternativas: ${list}',
+			'chat.orchestrator.routing.first' => ({required Object label, required Object task}) => '${label} — primer candidato para ${task}',
+			'chat.orchestrator.routing.skipped' => ({required Object label, required Object list}) => '${label} — candidatos anteriores omitidos (${list})',
+			'chat.orchestrator.plan.title' => 'Plan',
+			'chat.orchestrator.plan.disabled' => 'desactivado',
+			'chat.orchestrator.plan.awaitingConfirm' => 'Esperando la confirmación del plan.',
+			'chat.orchestrator.plan.run' => 'Ejecutar plan',
+			'chat.orchestrator.plan.toggleStep' => 'Activar paso',
+			'chat.orchestrator.plan.confirmFailed' => 'No se pudo iniciar — inténtalo de nuevo.',
+			'chat.orchestrator.plan.fallback' => 'planificador no disponible — alternativa de un solo paso',
+			'chat.orchestrator.plan.templateSource' => 'desde plantilla de pipeline',
+			'chat.orchestrator.plan.offSource' => 'planificador desactivado',
+			'chat.orchestrator.plan.stepCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: '${count} paso', other: '${count} pasos', ), 
+			'chat.orchestrator.plan.supervisedSource' => 'bucle supervisado',
+			'chat.orchestrator.decision.title' => 'Decisión del supervisor',
+			'chat.orchestrator.decision.iteration' => ({required Object n}) => 'iteración ${n}',
+			'chat.orchestrator.decision.rationaleLabel' => 'Motivo',
+			'chat.orchestrator.decision.awaitingConfirm' => 'Esperando tu aprobación antes de ejecutar estos pasos.',
+			'chat.orchestrator.decision.proposedSteps' => 'Pasos propuestos',
+			'chat.orchestrator.decision.action.kContinue' => 'delegando',
+			'chat.orchestrator.decision.action.done' => 'finalizado',
+			'chat.orchestrator.decision.action.invalid' => 'sin decisión',
+			'chat.orchestrator.decision.outcome.success' => 'éxito',
+			'chat.orchestrator.decision.outcome.partial' => 'parcial',
+			'chat.orchestrator.decision.outcome.failed' => 'fallido',
+			'chat.orchestrator.delegation.title' => 'Paso delegado',
+			'chat.orchestrator.delegation.openSession' => 'Abrir sesión completa',
+			'chat.orchestrator.delegation.attempt' => ({required Object n}) => 'intento ${n}',
+			'chat.orchestrator.delegation.retryStep' => 'Reintentar / Corregir',
+			'chat.orchestrator.delegation.continueStep' => 'Continuar / Corregir',
+			'chat.orchestrator.delegation.continueFailed' => 'Error — inténtalo de nuevo.',
+			'chat.orchestrator.delegation.status.queued' => 'en cola',
+			'chat.orchestrator.delegation.status.running' => 'en ejecución',
+			'chat.orchestrator.delegation.status.done' => 'hecho',
+			'chat.orchestrator.delegation.status.failed' => 'fallido',
+			'chat.orchestrator.delegation.status.aborted' => 'abortado',
+			'chat.orchestrator.delegation.status.skipped' => 'omitido',
+			'chat.orchestrator.delegation.status.awaitingDecision' => 'esperando decisión',
+			'chat.orchestrator.delegation.attempts' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: '${count} intento', other: '${count} intentos', ), 
+			'chat.orchestrator.delegation.candidates' => ({required Object list}) => 'candidatos: ${list}',
+			'chat.orchestrator.delegation.candidateCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: '${count} candidato', other: '${count} candidatos', ), 
+			'chat.orchestrator.summary.title' => 'Resumen',
+			'chat.orchestrator.summary.progress' => ({required Object done, required Object total}) => 'Pasos completados: ${done}/${total}',
+			'chat.orchestrator.summary.aborted' => 'abortado',
+			'chat.orchestrator.summary.timedOut' => 'tiempo agotado',
+			'chat.orchestrator.summary.capped' => 'límite de iteraciones',
+			'chat.orchestrator.summary.failed' => ({required Object list}) => 'Pasos fallidos: ${list}',
+			'chat.orchestrator.summary.kContinue' => 'Continuar',
+			'chat.orchestrator.summary.continueWork' => 'Continuar el trabajo',
+			'chat.orchestrator.summary.resumeFailed' => 'No se pudo reanudar — inténtalo de nuevo.',
+			'chat.orchestrator.summary.runNextTask' => 'Ejecutar la siguiente tarea',
+			'chat.orchestrator.summary.endAllTasks' => 'Finalizar todas las tareas',
+			'chat.orchestrator.summary.tasksRunning' => 'Trabajando en las tareas…',
+			'chat.orchestrator.summary.cancelTasks' => 'Cancelar',
+			'chat.orchestrator.backToParent' => 'Volver a la orquestación',
+			'chat.orchestrator.taskmaster.title' => 'Cola de tareas',
+			'chat.orchestrator.taskmaster.remaining' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: 'queda ${count}', other: 'quedan ${count}', ), 
+			'chat.orchestrator.taskmaster.status.started' => 'en ejecución',
+			'chat.orchestrator.taskmaster.status.done' => 'hecho',
+			'chat.orchestrator.taskmaster.status.complete' => 'completado',
+			'chat.orchestrator.taskmaster.status.failed' => 'fallido',
+			'chat.orchestrator.taskmaster.status.paused' => 'en pausa',
+			'chat.orchestrator.taskmaster.status.blocked' => 'bloqueado',
+			'chat.orchestrator.taskmaster.status.aborted' => 'abortado',
+			'chat.orchestrator.gate.timedOut' => 'tiempo agotado',
+			'chat.orchestrator.gate.exit' => ({required Object code}) => 'salida ${code}',
 			'chat.tools.settings' => 'Ajustes de herramientas',
 			'chat.tools.error' => 'Error de herramienta',
 			'chat.tools.result' => 'Resultado de herramienta',
@@ -7088,6 +8618,7 @@ extension on TranslationsEs {
 			'chat.interactive.instructionDetail' => 'En la CLI seleccionarías esta opción de forma interactiva con las flechas o escribiendo el número.',
 			'chat.thinking.title' => 'Pensando...',
 			'chat.thinking.emoji' => '💭 Pensando...',
+			'chat.thinking.thoughtFewSeconds' => 'Pensó durante unos segundos',
 			'chat.json.response' => 'Respuesta JSON',
 			'chat.permissions.grant' => ({required Object tool}) => 'Conceder permiso para ${tool}',
 			'chat.permissions.added' => 'Permiso añadido',
@@ -7096,14 +8627,14 @@ extension on TranslationsEs {
 			'chat.permissions.error' => 'No se pudieron actualizar los permisos. Inténtalo de nuevo.',
 			'chat.permissions.openSettings' => 'Abrir ajustes',
 			'chat.permissions.allow' => 'Permitir',
-			'chat.permissions.allowAll' => ({required Object count}) => 'Permitir todo (${count})',
-			'chat.permissions.allowWithChanges' => 'Permitir con cambios',
 			'chat.permissions.always' => 'Siempre',
-			'chat.permissions.deny' => 'Denegar',
 			'chat.permissions.editAndAllow' => 'Editar y permitir',
+			'chat.permissions.deny' => 'Denegar',
+			'chat.permissions.reject' => 'Rechazar',
+			'chat.permissions.allowAll' => ({required Object count}) => 'Permitir todo (${count})',
 			'chat.permissions.editInput' => 'Editar entrada',
 			'chat.permissions.invalidJson' => 'JSON no válido',
-			'chat.permissions.reject' => 'Rechazar',
+			'chat.permissions.allowWithChanges' => 'Permitir con cambios',
 			'chat.todo.updated' => 'La lista de pendientes se actualizó correctamente',
 			'chat.todo.current' => 'Lista de pendientes actual',
 			'chat.plan.viewPlan' => '📋 Ver plan de implementación',
@@ -7121,10 +8652,24 @@ extension on TranslationsEs {
 			'chat.codex.descriptions.bypassPermissions' => 'Acceso completo al sistema sin restricciones. Todos los comandos se ejecutan automáticamente con acceso total a disco y red. Úsalo con precaución.',
 			'chat.codex.descriptions.plan' => 'Modo de planificación: no se ejecutan comandos',
 			'chat.codex.technicalDetails' => 'Detalles técnicos',
+			'chat.voice.autoRead' => 'Leer respuestas en voz alta',
+			'chat.voice.autoReadOn' => 'Lectura de respuestas: activada',
+			'chat.voice.autoReadOff' => 'Lectura de respuestas: desactivada',
+			'chat.voice.autoReadVoice' => 'Voz de lectura',
+			'chat.voice.autoReadVoiceAuto' => 'Voz automática',
+			'chat.voice.autoReadPreview' => 'Así sonarán las respuestas.',
+			'chat.voice.speakMessage' => 'Leer en voz alta',
+			'chat.voice.stopSpeaking' => 'Detener lectura',
 			'chat.input.placeholder' => ({required Object provider}) => 'Escribe / para comandos, @ para archivos, o pregúntale lo que quieras a ${provider}...',
 			'chat.input.placeholderDefault' => 'Escribe tu mensaje...',
 			'chat.input.disabled' => 'Entrada deshabilitada',
 			'chat.input.attachFiles' => 'Adjuntar archivos',
+			'chat.input.attachFilesDesc' => 'Subir fotos, archivos o documentos',
+			'chat.input.takePhoto' => 'Tomar foto',
+			'chat.input.takePhotoDesc' => 'Usar la cámara para capturar una foto',
+			'chat.input.moreTools' => 'Más herramientas',
+			'chat.input.commandsDesc' => 'Explorar atajos y comandos',
+			'chat.input.clearInputDesc' => 'Descartar el texto actual',
 			'chat.input.attachImages' => 'Adjuntar imágenes',
 			'chat.input.send' => 'Enviar',
 			'chat.input.stop' => 'Detener',
@@ -7136,6 +8681,8 @@ extension on TranslationsEs {
 			'chat.input.showAllCommands' => 'Mostrar todos los comandos',
 			'chat.input.clearInput' => 'Limpiar entrada',
 			'chat.input.scrollToBottom' => 'Ir al final',
+			'chat.input.newMessage' => 'Nuevo mensaje',
+			'chat.input.newMessages' => 'Nuevos mensajes',
 			'chat.input.queue.sendNext' => 'Poner en cola el siguiente mensaje',
 			'chat.input.queue.update' => 'Actualizar mensaje en cola',
 			'chat.input.queue.label' => 'En cola',
@@ -7145,33 +8692,54 @@ extension on TranslationsEs {
 			'chat.input.queue.failed' => 'Falló el envío',
 			'chat.input.queue.sendNow' => 'Enviar ahora',
 			'chat.input.queue.sendNowAfterTurn' => 'Este agente no acepta mensajes durante un turno: se enviará cuando termine el actual',
-			'chat.input.attachFilesDesc' => 'Subir fotos, archivos o documentos',
-			'chat.input.takePhoto' => 'Tomar foto',
-			'chat.input.takePhotoDesc' => 'Usar la cámara para capturar una foto',
-			'chat.input.moreTools' => 'Más herramientas',
-			'chat.input.commandsDesc' => 'Explorar atajos y comandos',
-			'chat.input.clearInputDesc' => 'Descartar el texto actual',
-			'chat.input.newMessage' => 'Nuevo mensaje',
-			'chat.input.newMessages' => 'Nuevos mensajes',
+			'chat.input.queue.filesAttached' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: '${count} archivo adjunto', other: '${count} archivos adjuntos', ), 
 			'chat.input.autoContinueTasks' => 'Continuación automática',
 			'chat.input.autoContinueTasksTooltip' => 'Activa para que Devin continúe automáticamente con la siguiente tarea de Task Master',
 			'chat.input.offlineQueue.clear' => 'Cancelar y vaciar la cola sin conexión',
 			'chat.input.offlineQueue.clearBtn' => 'Cancelar',
 			'chat.input.offlineQueue.multiple' => ({required Object count}) => '${count} mensajes en cola sin conexión — se enviarán automáticamente al reconectar',
 			'chat.input.offlineQueue.single' => '1 mensaje en cola sin conexión — se enviará automáticamente al reconectar',
+			'chat.input.voice' => 'Entrada de voz',
+			'chat.input.voiceStart' => 'Dictar un mensaje',
+			'chat.input.voiceStop' => 'Detener el dictado',
+			'chat.input.pinFile' => 'Fijar archivo al contexto',
+			'chat.input.voiceSettings' => 'Ajustes de voz (STT)',
 			'chat.input.cameraUnavailable' => ({required Object error}) => 'Cámara no disponible: ${error}',
+			'chat.composer.toolsAndActions' => 'Herramientas y acciones',
+			'chat.composer.toolsAndActionsDesc' => 'Herramientas y controles del editor de chat',
 			'chat.composer.reasoning' => 'Razonamiento',
 			'chat.composer.model' => 'Modelo',
 			'chat.composer.effortDefault' => 'Predeterminado',
 			'chat.composer.loadingModels' => 'Cargando modelos…',
 			'chat.composer.modelMenu' => 'Seleccionar modelo y esfuerzo de razonamiento',
 			'chat.composer.permissionHeading' => ({required Object provider}) => '¿Cómo deben aprobarse las acciones de ${provider}?',
-			'chat.composer.toolsAndActions' => 'Herramientas y acciones',
-			'chat.composer.toolsAndActionsDesc' => 'Herramientas y controles del editor de chat',
 			'chat.composer.favorites' => 'Favoritos',
+			'chat.composer.account' => 'Cuenta',
+			'chat.composer.accountMenu' => 'Seleccionar cuenta',
+			'chat.composer.accountDefault' => 'Cuenta predeterminada',
+			'chat.composer.accountAuto' => 'Auto (predeterminada)',
+			'chat.composer.accountIsDefault' => 'Predeterminada',
+			'chat.composer.effortLevels.off' => 'Desactivado',
+			'chat.composer.effortLevels.none' => 'Ninguno',
+			'chat.composer.effortLevels.minimal' => 'Mínimo',
+			'chat.composer.effortLevels.low' => 'Bajo',
+			'chat.composer.effortLevels.medium' => 'Medio',
+			'chat.composer.effortLevels.high' => 'Alto',
+			'chat.composer.effortLevels.xhigh' => 'Muy alto',
+			'chat.composer.effortLevels.max' => 'Máximo',
+			'chat.composer.effortLevels.ultra' => 'Ultra',
+			'chat.composer.contextWindow' => ({required Object size}) => 'contexto de ${size}',
+			'chat.composer.accountAutoShort' => 'Automático',
+			'chat.composer.uploadNoRecords' => 'La subida no devolvió ningún registro',
 			'chat.providerSelection.title' => 'Elige tu asistente de IA',
 			'chat.providerSelection.description' => 'Selecciona un proveedor para iniciar una conversación nueva',
 			'chat.providerSelection.selectModel' => 'Seleccionar modelo',
+			'chat.providerSelection.workspace' => 'Espacio de trabajo',
+			'chat.providerSelection.noWorkspace' => 'Ninguno',
+			'chat.providerSelection.clickToChangeWorkspace' => 'Haz clic para cambiar de espacio de trabajo',
+			'chat.providerSelection.chooseWorkspace' => 'Elegir un espacio de trabajo',
+			'chat.providerSelection.searchWorkspaces' => 'Buscar espacios de trabajo...',
+			'chat.providerSelection.noWorkspacesFound' => 'No se encontraron espacios de trabajo.',
 			'chat.providerSelection.providerInfo.anthropic' => 'de Anthropic',
 			'chat.providerSelection.providerInfo.openai' => 'de OpenAI',
 			'chat.providerSelection.providerInfo.cursorEditor' => 'Editor de código con IA',
@@ -7182,13 +8750,12 @@ extension on TranslationsEs {
 			'chat.providerSelection.readyPrompt.opencode' => ({required Object model}) => 'Listo para usar OpenCode con ${model}. Escribe tu mensaje abajo.',
 			'chat.providerSelection.readyPrompt.kDefault' => 'Selecciona un proveedor arriba para empezar',
 			'chat.providerSelection.readyPrompt.devin' => ({required Object model}) => 'Listo con Devin ${model}',
+			'chat.providerSelection.readyPrompt.orchestrator' => 'Listo con Auto — el enrutador elige el mejor modelo para cada paso',
+			'chat.providerSelection.autoGroup' => 'Auto',
+			'chat.providerSelection.autoLabel' => 'Auto (orquestado)',
+			'chat.providerSelection.autoDescription' => 'Envía cada paso al mejor proveedor y modelo disponibles',
+			'chat.providerSelection.orchestrated' => 'orquestado',
 			'chat.providerSelection.pressToSearch' => ({required Object shortcut}) => 'Pulsa <kbd>${shortcut}</kbd> para buscar sesiones, archivos y commits',
-			'chat.providerSelection.workspace' => 'Espacio de trabajo',
-			'chat.providerSelection.noWorkspace' => 'Ninguno',
-			'chat.providerSelection.clickToChangeWorkspace' => 'Haz clic para cambiar de espacio de trabajo',
-			'chat.providerSelection.chooseWorkspace' => 'Elegir un espacio de trabajo',
-			'chat.providerSelection.searchWorkspaces' => 'Buscar espacios de trabajo...',
-			'chat.providerSelection.noWorkspacesFound' => 'No se encontraron espacios de trabajo.',
 			'chat.providerSelection.all' => 'Todos',
 			'chat.providerSelection.free' => 'Gratis',
 			'chat.providerSelection.noModelsFound' => 'No se encontraron modelos.',
@@ -7211,18 +8778,19 @@ extension on TranslationsEs {
 			'chat.session.messages.scrollToLoad' => 'Desplázate hacia arriba para cargar más',
 			'chat.session.messages.showingLast' => ({required Object count, required Object total}) => 'Mostrando los últimos ${count} mensajes (${total} en total)',
 			'chat.session.messages.loadEarlier' => 'Cargar mensajes anteriores',
+			'chat.session.messages.loadOlderFailed' => 'No se pudieron cargar mensajes anteriores.',
+			'chat.session.messages.retry' => 'Reintentar',
 			'chat.session.messages.loadAll' => 'Cargar todos los mensajes',
 			'chat.session.messages.loadingAll' => 'Cargando todos los mensajes...',
 			'chat.session.messages.allLoaded' => 'Todos los mensajes cargados',
 			'chat.session.messages.perfWarning' => 'Todos los mensajes cargados — el desplazamiento puede ser más lento. Haz clic en "Ir al final" para recuperar el rendimiento.',
-			'chat.session.messages.loadOlderFailed' => 'No se pudieron cargar mensajes anteriores.',
-			'chat.session.messages.retry' => 'Reintentar',
 			'chat.session.messages.noSearchMatches' => 'Ningún mensaje coincide con la búsqueda.',
-			'chat.session.messages.loadAllCount' => ({required Object count}) => 'Cargar todos (${count})',
 			'chat.session.messages.loadOlder' => 'Cargar mensajes anteriores',
+			'chat.session.messages.loadAllCount' => ({required Object count}) => 'Cargar todos (${count})',
 			'chat.session.messages.retryLoadOlder' => ({required Object error}) => 'Reintentar cargar los anteriores — ${error}',
 			'chat.session.deleteConfirm' => 'Elimina la sesión y su transcripción. No se puede deshacer.',
 			'chat.session.finishRunBeforeWorkspaceChange' => 'Finaliza la ejecución antes de cambiar de espacio de trabajo',
+			'chat.session.fallbackTitle' => 'Sesión',
 			'chat.shell.selectProject.title' => 'Selecciona un proyecto',
 			'chat.shell.selectProject.description' => 'Elige un proyecto para abrir una shell interactiva en ese directorio',
 			'chat.shell.status.newSession' => 'Sesión nueva',
@@ -7232,8 +8800,6 @@ extension on TranslationsEs {
 			'chat.shell.actions.disconnectTitle' => 'Desconectar de la shell',
 			'chat.shell.actions.restart' => 'Reiniciar',
 			'chat.shell.actions.restartTitle' => 'Reiniciar shell',
-			'chat.shell.actions.connect' => 'Continuar en la shell',
-			'chat.shell.actions.connectTitle' => 'Conectar a la shell',
 			'chat.shell.actions.kill' => 'Terminar (SIGINT)',
 			'chat.shell.actions.killTitle' => 'Terminar proceso en ejecución (Ctrl+C)',
 			'chat.shell.actions.copyOutput' => 'Copiar salida',
@@ -7241,6 +8807,8 @@ extension on TranslationsEs {
 			'chat.shell.actions.copied' => '¡Copiado!',
 			'chat.shell.actions.zoomInTitle' => 'Acercar',
 			'chat.shell.actions.zoomOutTitle' => 'Alejar',
+			'chat.shell.actions.connect' => 'Continuar en la shell',
+			'chat.shell.actions.connectTitle' => 'Conectar a la shell',
 			'chat.shell.loading' => 'Cargando terminal...',
 			'chat.shell.connecting' => 'Conectando a la shell...',
 			'chat.shell.startSession' => 'Iniciar una sesión nueva de Claude',
@@ -7269,14 +8837,6 @@ extension on TranslationsEs {
 			'chat.claudeStatus.backgroundTaskUnnamed' => 'Tarea sin nombre',
 			'chat.projectSelection.startChatWithProvider' => ({required Object provider}) => 'Selecciona un proyecto para empezar a chatear con ${provider}',
 			'chat.tasks.nextTaskPrompt' => 'Empezar la siguiente tarea',
-			'chat.voice.autoRead' => 'Leer respuestas en voz alta',
-			'chat.voice.autoReadOn' => 'Lectura de respuestas: activada',
-			'chat.voice.autoReadOff' => 'Lectura de respuestas: desactivada',
-			'chat.voice.autoReadVoice' => 'Voz de lectura',
-			'chat.voice.autoReadVoiceAuto' => 'Voz automática',
-			'chat.voice.autoReadPreview' => 'Así sonarán las respuestas.',
-			'chat.voice.speakMessage' => 'Leer en voz alta',
-			'chat.voice.stopSpeaking' => 'Detener lectura',
 			'chat.splitSession.toggle' => 'Dividir sesión',
 			'chat.splitSession.close' => 'Cerrar sesión dividida',
 			'chat.splitSession.selectSession' => 'Seleccionar sesión para comparar',
@@ -7307,12 +8867,16 @@ extension on TranslationsEs {
 			'chat.sessionPicker.deleteFailed' => 'Error al eliminar la sesión. Inténtalo de nuevo.',
 			'chat.sessionPicker.running' => 'La sesión está en ejecución',
 			'chat.sessionPicker.unread' => 'Sin leer — finalizada con nueva salida',
+			'chat.sessionPicker.account' => 'Cuenta',
 			'chat.splitWorkspace.addChat' => 'Añadir panel de chat',
 			'chat.splitWorkspace.addBrowser' => 'Añadir panel de navegador',
 			'chat.splitWorkspace.addTerminal' => 'Añadir panel de terminal',
+			'chat.splitWorkspace.addPreview' => 'Añadir panel de vista previa',
 			'chat.splitWorkspace.overview' => 'Mostrar todos los paneles',
 			'chat.splitWorkspace.exitFocusMode' => 'Salir del modo enfoque (Ctrl+Mayús+F)',
 			'chat.splitWorkspace.focusMode' => 'Modo enfoque (Ctrl+Mayús+F)',
+			'chat.splitWorkspace.broadcast' => 'Difundir a sesiones',
+			'chat.splitWorkspace.addNotes' => 'Añadir panel de notas compartidas',
 			'chat.splitWorkspace.browseSessions' => 'Abrir lista de sesiones',
 			'chat.splitOverview.title' => 'Vista general de paneles divididos',
 			'chat.splitOverview.count' => ({required Object count}) => '${count} paneles',
@@ -7322,15 +8886,20 @@ extension on TranslationsEs {
 			'chat.splitOverview.idle' => 'Inactivo',
 			'chat.splitOverview.active' => 'Activa',
 			'chat.askUserQuestion.needsInput' => ({required Object provider}) => '${provider} necesita tu respuesta',
-			'chat.askUserQuestion.answerHint' => 'Escribe tu respuesta…',
-			'chat.askUserQuestion.other' => 'Otro…',
 			'chat.askUserQuestion.skip' => 'Omitir',
+			'chat.askUserQuestion.other' => 'Otro…',
+			'chat.askUserQuestion.answerHint' => 'Escribe tu respuesta…',
 			'chat.attachments.downloadFailedRetry' => 'Descarga fallida — clic para reintentar',
 			'chat.attachments.fileAttachment' => 'Archivo adjunto',
 			'chat.attachments.download' => ({required Object name}) => 'Descargar ${name}',
+			'chat.attachments.attachedFile' => 'Archivo adjunto',
+			'chat.attachments.downloaded' => ({required Object name}) => '${name} descargado',
 			'chat.checkpoint.creating' => 'Creando instantánea…',
 			'chat.checkpoint.revertChanges' => 'Revertir archivos al último checkpoint',
 			'chat.checkpoint.undo' => 'Deshacer checkpoint',
+			'chat.checkpoint.undoAiRun' => 'Deshacer ejecución de la IA',
+			'chat.checkpoint.undoing' => 'Deshaciendo…',
+			'chat.checkpoint.undone' => 'Deshecho',
 			'chat.checkpoint.beforeAiTurn' => 'antes del turno de la IA',
 			'chat.common.close' => 'Cerrar',
 			'chat.taskMaster.saveToTask' => 'Tarea',
@@ -7339,46 +8908,206 @@ extension on TranslationsEs {
 			'chat.taskMaster.taskShort' => 'TAREA',
 			'chat.taskMaster.addToTask' => 'Añadir a TaskMaster',
 			'chat.taskMaster.added' => 'Añadido a TaskMaster',
+			'chat.taskMaster.defaultTaskTitle' => 'Tarea del chat',
 			'chat.tokenUsage.desc' => 'Ver el consumo de tokens de la sesión',
 			'chat.tokenUsage.title' => 'Uso de tokens',
+			'chat.tokenUsage.notAvailable' => 'N/D',
+			'chat.tokenUsage.tokensBadge' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: '${count} token', other: '${count} tokens', ), 
 			'chat.tool.emptyResult' => '(sin salida aún — la herramienta devolvió un resultado vacío)',
 			'chat.quotaBadge.ariaLabel' => 'Límites de suscripción',
 			'chat.quotaBadge.noData' => 'No hay datos de suscripción para este modelo',
-			'chat.paneHeader.processing' => 'Procesando…',
-			'chat.paneHeader.switchSession' => 'Cambiar sesión',
+			'chat.quotaBadge.noSubscription' => 'sin suscripción',
+			'chat.quotaBadge.windowLineReset' => ({required Object label, required Object percent, required Object time}) => '${label}: ${percent} % · se restablece ${time}',
+			'chat.quotaBadge.windowRemaining' => ({required Object percent}) => 'Queda el ${percent} % de la ventana antes del restablecimiento',
+			'chat.broadcast.title' => 'Difundir a sesiones',
+			'chat.broadcast.noSessions' => 'No hay sesiones disponibles',
+			'chat.broadcast.placeholder' => 'Mensaje para enviar a cada sesión seleccionada…',
+			'chat.broadcast.partial' => ({required Object count}) => '${count} sesión(es) rechazaron el mensaje',
+			'chat.broadcast.sent' => ({required Object count}) => 'En cola para ${count} sesión(es)',
+			'chat.broadcast.selectAll' => 'Seleccionar todo',
 			'chat.broadcast.selectOrchestrators' => 'Seleccionar orquestadores',
 			'chat.broadcast.orchestratorsOnly' => 'Solo orquestadores',
 			'chat.broadcast.noOrchestrators' => 'No hay sesiones de orquestador disponibles',
-			'chat.changes.empty' => 'Sin cambios en archivos',
-			'chat.changes.failedToLoad' => 'No se pudieron cargar los cambios',
-			'chat.commandResult.fallback.config' => 'Abre los ajustes y la configuración.',
-			'chat.commandResult.fallback.cost' => 'Revisa el uso de tokens de la sesión activa.',
-			'chat.commandResult.fallback.help' => 'Muestra la documentación y la sintaxis de los comandos.',
-			'chat.commandResult.fallback.memory' => 'Abre el archivo de memoria CLAUDE.md del proyecto.',
-			'chat.commandResult.fallback.models' => 'Explora los modelos disponibles para el proveedor activo.',
-			'chat.commandResult.fallback.status' => 'Inspecciona el estado del runtime, la versión, el proveedor y el entorno.',
-			'chat.commandResult.filterCommands' => 'Filtrar comandos...',
-			'chat.commandResult.searchModels' => ({required Object provider}) => 'Buscar modelos de ${provider}...',
-			'chat.commands.runConfirmTitle' => '¿Ejecutar comando?',
-			'chat.commands.executionCancelled' => 'Ejecución del comando cancelada',
+			'chat.broadcast.sending' => 'Enviando…',
+			'chat.broadcast.send' => ({required Object count}) => 'Enviar a ${count}',
+			'chat.paneHeader.processing' => 'Procesando…',
+			'chat.paneHeader.switchSession' => 'Cambiar sesión',
 			'chat.export.sessionTitle' => ({required Object id}) => 'Sesión ${id}',
 			'chat.export.pdfFailed' => 'Falló la exportación a PDF',
 			'chat.export.transcriptDownloaded' => 'Transcripción descargada',
 			'chat.export.savedTo' => ({required Object path}) => 'Guardado en ${path}',
-			'chat.message.compactedSummary' => 'Resumen compactado',
-			'chat.message.rawView' => 'Vista sin procesar',
-			'chat.message.resendHint' => 'Vuelve a enviar desde el compositor',
-			'chat.modelLibrary.deleteTooltip' => ({required Object name}) => 'Eliminar ${name}',
+			'chat.commandResult.fallback.models' => 'Explora los modelos disponibles para el proveedor activo.',
+			'chat.commandResult.fallback.cost' => 'Revisa el uso de tokens de la sesión activa.',
+			'chat.commandResult.fallback.status' => 'Inspecciona el estado del runtime, la versión, el proveedor y el entorno.',
+			'chat.commandResult.fallback.memory' => 'Abre el archivo de memoria CLAUDE.md del proyecto.',
+			'chat.commandResult.fallback.config' => 'Abre los ajustes y la configuración.',
+			'chat.commandResult.fallback.help' => 'Muestra la documentación y la sintaxis de los comandos.',
+			'chat.commandResult.filterCommands' => 'Filtrar comandos...',
+			'chat.commandResult.searchModels' => ({required Object provider}) => 'Buscar modelos de ${provider}...',
+			'chat.commands.runConfirmTitle' => '¿Ejecutar comando?',
+			'chat.commands.executionCancelled' => 'Ejecución del comando cancelada',
+			'chat.commands.bashConfirmMessage' => 'Este comando contiene comandos de bash que se ejecutarán. ¿Quieres continuar?',
+			'chat.commands.proceed' => 'Continuar',
+			'chat.pinFile.title' => 'Fijar archivo',
+			'chat.pinFile.pathHint' => 'path/to/file.ext',
+			'chat.pinFile.action' => 'Fijar',
 			'chat.modelLibrary.editTooltip' => ({required Object name}) => 'Editar ${name}',
+			'chat.modelLibrary.deleteTooltip' => ({required Object name}) => 'Eliminar ${name}',
 			'chat.modelLibrary.enterNameAndId' => 'Introduce tanto un nombre de modelo como un ID de modelo.',
 			'chat.modelLibrary.idNoSpaces' => 'Los ID de modelo no pueden contener espacios.',
 			'chat.modelLibrary.setAsDefault' => 'Establecer como predeterminado',
 			'chat.modelLibrary.defaultModel' => 'Modelo predeterminado',
-			'chat.pinFile.action' => 'Fijar',
-			'chat.pinFile.pathHint' => 'path/to/file.ext',
-			'chat.pinFile.title' => 'Fijar archivo',
+			'chat.modelLibrary.title' => 'Biblioteca de modelos',
+			'chat.modelLibrary.subtitle' => 'Añade los ID de modelo que admite tu proveedor. Los modelos integrados permanecen bloqueados. El círculo marca el modelo predeterminado.',
+			'chat.modelLibrary.yourModels' => 'Tus modelos',
+			'chat.modelLibrary.yourModelsHint' => 'Editables y guardados en auth.db',
+			'chat.modelLibrary.emptyTitle' => 'Aún no hay modelos personalizados',
+			'chat.modelLibrary.emptyHint' => 'Añade uno con el formulario y aparecerá en todos los selectores de modelo.',
+			'chat.modelLibrary.builtInModels' => 'Modelos integrados',
+			'chat.modelLibrary.builtInModelsHint' => 'Mantenidos por DDAgent y de solo lectura',
+			'chat.modelLibrary.editTitle' => 'Editar modelo personalizado',
+			'chat.modelLibrary.addTitle' => 'Añadir un modelo personalizado',
+			'chat.modelLibrary.idSentAsWritten' => ({required Object provider}) => 'El ID se envía a ${provider} exactamente como está escrito.',
+			'chat.modelLibrary.nameLabel' => 'Nombre del modelo',
+			'chat.modelLibrary.nameHint' => 'p. ej., GPT-5.5 Pro',
+			'chat.modelLibrary.idLabel' => 'ID del modelo',
+			'chat.modelLibrary.idHint' => 'p. ej., gpt-5.5-pro',
+			'chat.modelLibrary.idHelp' => 'Usa el identificador exacto que acepta la CLI del proveedor. Los ID no pueden contener espacios.',
+			'chat.modelLibrary.updatedNotice' => ({required Object name}) => '${name} se ha actualizado.',
+			'chat.modelLibrary.addedNotice' => ({required Object name}) => '${name} se ha añadido.',
+			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '${name} se ha eliminado.',
+			'chat.modelLibrary.saving' => 'Guardando…',
+			'chat.modelLibrary.saveChanges' => 'Guardar cambios',
+			'chat.modelLibrary.deleteConfirm' => '¿Eliminar este modelo de todos los selectores?',
+			'chat.modelLibrary.customBadge' => 'Personalizado',
+			'chat.changes.failedToLoad' => 'No se pudieron cargar los cambios',
+			'chat.changes.empty' => 'Sin cambios en archivos',
+			'chat.message.compactedSummary' => 'Resumen compactado',
+			_ => null,
+		} ?? switch (path) {
+			'chat.message.resendHint' => 'Vuelve a enviar desde el compositor',
+			'chat.message.rawView' => 'Vista sin procesar',
+			'chat.message.runComplete' => 'Ejecución completada',
 			'chat.permissionRequest.title' => ({required Object tool}) => 'Solicitud de permiso · ${tool}',
 			'chat.permissionRequest.question' => 'Pregunta',
+			'chat.permissionRequest.subagent' => 'Subagente',
+			'chat.permissionRequest.viewersCannotApprove' => 'Los observadores no pueden aprobar',
+			'chat.permissionRequest.recap.timedOut' => 'Tiempo agotado: denegado automáticamente',
+			'chat.permissionRequest.recap.cancelled' => 'Cancelado: se detuvo el turno',
+			'chat.permissionRequest.recap.autoApproved' => 'Aprobado automáticamente',
+			'chat.permissionRequest.recap.expired' => 'La solicitud caducó: el agente ya no la espera',
+			'chat.permissionRequest.recap.answered' => 'Respondida',
+			'chat.permissionRequest.recap.skipped' => 'Omitida',
+			'chat.permissionRequest.recap.decided' => 'Decidido',
+			'chat.permissionRequest.needsApproval' => ({required Object tool}) => '${tool} necesita aprobación',
+			'chat.permissionRequest.subagentNeedsApproval' => ({required Object tool}) => 'Subagente: ${tool} necesita aprobación',
+			'chat.permissionRequest.moreQuestions' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: '${count} pregunta más en espera', other: '${count} preguntas más en espera', ), 
+			'chat.commandDialog.help.eyebrow' => 'Centro de comandos',
+			'chat.commandDialog.help.title' => 'Ayuda y atajos',
+			'chat.commandDialog.help.subtitle' => 'Busca comandos integrados, patrones de sintaxis y uso de comandos.',
+			'chat.commandDialog.models.eyebrow' => 'Selección de modelo',
+			'chat.commandDialog.models.title' => 'Elige un modelo',
+			'chat.commandDialog.models.subtitle' => 'Elige el modelo que debe usar este proveedor.',
+			'chat.commandDialog.models.modelSetTo' => ({required Object model}) => 'Modelo establecido en ${model}.',
+			'chat.commandDialog.models.activeModel' => 'Modelo activo',
+			'chat.commandDialog.models.noModelsMatch' => 'Ningún modelo coincide con ese filtro.',
+			'chat.commandDialog.models.choiceSavedForSession' => 'Tu elección se guarda para esta sesión y pasa a ser la predeterminada para los chats nuevos.',
+			'chat.commandDialog.models.choiceDefault' => 'Tu elección pasa a ser el modelo predeterminado para los chats nuevos.',
+			'chat.commandDialog.models.custom' => 'Personalizado',
+			'chat.commandDialog.models.currentSelection' => 'Selección actual',
+			'chat.commandDialog.cost.eyebrow' => 'Telemetría de la sesión',
+			'chat.commandDialog.cost.title' => 'Uso de tokens',
+			'chat.commandDialog.cost.subtitle' => 'Recuento de tokens de entrada, salida y total de esta sesión.',
+			'chat.commandDialog.cost.totalTokensUsed' => 'Total de tokens usados',
+			'chat.commandDialog.cost.inputTokens' => 'Tokens de entrada',
+			'chat.commandDialog.cost.cacheReadTokens' => 'Tokens leídos de caché',
+			'chat.commandDialog.cost.cacheWriteTokens' => 'Tokens escritos en caché',
+			'chat.commandDialog.cost.outputTokens' => 'Tokens de salida',
+			'chat.commandDialog.cost.breakdown' => 'Desglose',
+			'chat.commandDialog.cost.unavailable' => 'No disponible',
+			'chat.commandDialog.cost.contextWindow' => 'Ventana de contexto',
+			'chat.commandDialog.cost.estimatedCost' => 'Coste estimado',
+			'chat.commandDialog.status.eyebrow' => 'Estado del entorno',
+			'chat.commandDialog.status.title' => 'Estado del sistema',
+			'chat.commandDialog.status.subtitle' => 'Versión, proveedor, entorno de ejecución y detalles del entorno.',
+			'chat.commandDialog.status.package' => 'Paquete',
+			'chat.commandDialog.status.uptime' => 'Tiempo activo',
+			'chat.commandDialog.status.platform' => 'Plataforma',
+			'chat.commandDialog.status.memory' => 'Memoria',
+			'chat.commandDialog.status.memoryRss' => ({required Object mb}) => '${mb} MB RSS',
+			'chat.commandDialog.status.runtimeOnline' => 'Entorno en línea',
+			'chat.commandDialog.status.processResponding' => ({required Object pid}) => 'El proceso #${pid} responde.',
+			'chat.commandDialog.status.processStatusResponding' => 'El proceso responde.',
+			'chat.commandDialog.status.healthy' => 'En buen estado',
+			'chat.commandDialog.defaultEyebrow' => 'Comando',
+			'chat.commandDialog.defaultTitle' => 'Resultado del comando',
+			'chat.commandDialog.escHint' => 'Esc cierra la ventana.',
+			'chat.commandDialog.unknown' => 'Desconocido',
+			'chat.commandDialog.noDescription' => 'No hay descripción disponible.',
+			'chat.commandDialog.noCommandsMatch' => 'Ningún comando coincide con ese filtro.',
+			'chat.commandDialog.syntax.title' => 'Sintaxis',
+			'chat.commandDialog.syntax.arguments' => ({required Object arguments, required Object first, required Object second}) => '${arguments} pasa todos los argumentos; ${first}, ${second} posicionales.',
+			'chat.commandDialog.syntax.file' => ({required Object token}) => '${token} incluye el contenido del archivo.',
+			'chat.commandDialog.syntax.bash' => ({required Object token}) => '${token} ejecuta bash.',
+			'chat.commandDialog.commandFinished' => 'Comando finalizado.',
+			'chat.utilities.tokenUsageUnavailable' => 'Uso de tokens no disponible',
+			'chat.utilities.tooltip.tokensUsed' => ({required Object tokens}) => '${tokens} tokens usados',
+			'chat.utilities.tooltip.contextOf' => ({required Object percent, required Object total}) => 'contexto ${percent} % de ${total}',
+			'chat.utilities.tooltip.input' => ({required Object value}) => 'entrada ${value}',
+			'chat.utilities.tooltip.cache' => ({required Object read, required Object write}) => 'caché leída ${read} · escrita ${write}',
+			'chat.utilities.tooltip.output' => ({required Object value}) => 'salida ${value}',
+			'chat.utilities.used' => 'Usados',
+			'chat.utilities.cacheWrite' => 'Escritura en caché',
+			'chat.utilities.contextLabel' => 'Contexto',
+			'chat.utilities.usageUnsupported' => 'uso no admitido',
+			'chat.utilities.chatTranscript' => 'Transcripción del chat',
+			'chat.utilities.you' => 'Tú:',
+			'chat.utilities.providerAutoMini' => 'Auto (mini)',
+			'chat.toolBlocks.moreLines' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: '… ${count} línea más', other: '… ${count} líneas más', ), 
+			'chat.toolBlocks.status.running' => 'En ejecución',
+			'chat.toolBlocks.status.denied' => 'Denegado',
+			'chat.toolBlocks.showLess' => 'Mostrar menos',
+			'chat.toolBlocks.showMore' => 'Mostrar más',
+			'chat.toolBlocks.showMoreLines' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: 'Mostrar ${count} línea más', other: 'Mostrar ${count} líneas más', ), 
+			'chat.toolBlocks.tools' => 'Herramientas',
+			'chat.toolBlocks.planReview' => 'Revisión del plan',
+			'chat.toolBlocks.planUpdate' => 'Actualización del plan',
+			'chat.toolBlocks.todoListUpdated' => 'Lista de tareas actualizada',
+			'chat.toolBlocks.creatingTask' => 'Creando tarea',
+			'chat.toolBlocks.updatingTask' => 'actualizando',
+			'chat.toolBlocks.fetchingTask' => 'obteniendo',
+			'chat.toolBlocks.listingTasks' => 'listando tareas',
+			'chat.toolBlocks.search' => 'Buscar',
+			'chat.toolBlocks.verbs.read' => 'leer',
+			'chat.toolBlocks.verbs.write' => 'escribir',
+			'chat.toolBlocks.verbs.edit' => 'editar',
+			'chat.toolBlocks.verbs.delete' => 'eliminar',
+			'chat.toolBlocks.verbs.move' => 'mover',
+			'chat.toolBlocks.subagent' => 'Subagente',
+			'chat.toolBlocks.toolCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: '${count} herramienta', other: '${count} herramientas', ), 
+			'chat.toolBlocks.result' => 'resultado',
+			'chat.toolBlocks.plusMore' => ({required Object count}) => '+${count} más',
+			'chat.toolBlocks.plan' => 'Plan',
+			'chat.toolBlocks.questionProgress' => ({required Object current, required Object total}) => 'Pregunta ${current}/${total}',
+			'chat.toolBlocks.lineCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: '${count} línea', other: '${count} líneas', ), 
+			'chat.toolBlocks.todoListItems' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: 'Lista de tareas (${count} elemento)', other: 'Lista de tareas (${count} elementos)', ), 
+			'chat.toolBlocks.tasksCompleted' => ({required Object done, required Object total}) => '${done}/${total} completadas',
+			'chat.commandMenu.empty' => 'No hay comandos disponibles',
+			'chat.commandMenu.namespaces.frequent' => 'Usados con frecuencia',
+			'chat.commandMenu.namespaces.builtin' => 'Comandos integrados',
+			'chat.commandMenu.namespaces.skill' => 'Habilidades',
+			'chat.commandMenu.namespaces.project' => 'Comandos del proyecto',
+			'chat.commandMenu.namespaces.user' => 'Comandos del usuario',
+			'chat.commandMenu.namespaces.other' => 'Otros comandos',
+			'chat.mentionMenu.kinds.file' => 'archivo',
+			'chat.mentionMenu.kinds.session' => 'sesión',
+			'chat.mentionMenu.kinds.task' => 'tarea',
+			'chat.mentionMenu.taskTitle' => ({required Object id}) => 'Tarea ${id}',
+			'chat.subheader.contextTooltip' => ({required Object used, required Object total, required Object percent}) => 'Contexto: ${used} / ${total} tokens · ${percent} % usado',
+			'chat.transcript.requestFailed' => 'La solicitud falló',
+			'chat.review.changedFiles' => 'Archivos modificados',
+			'chat.review.changedFilesCount' => ({required Object count}) => 'Archivos modificados (${count})',
+			'chat.review.subagent' => 'subagente',
 			'codeEditor.toolbar.changes' => 'cambios',
 			'codeEditor.toolbar.previousChange' => 'Cambio anterior',
 			'codeEditor.toolbar.nextChange' => 'Cambio siguiente',
@@ -7387,10 +9116,10 @@ extension on TranslationsEs {
 			'codeEditor.toolbar.settings' => 'Ajustes del editor',
 			'codeEditor.toolbar.collapse' => 'Contraer editor',
 			'codeEditor.toolbar.expand' => 'Expandir editor a ancho completo',
+			'codeEditor.toolbar.toggleDock' => 'Alternar panel de archivos',
 			'codeEditor.toolbar.diffMerge' => 'Diff / fusión',
 			'codeEditor.toolbar.previewInBrowser' => 'Vista previa en el navegador',
 			'codeEditor.toolbar.reload' => 'Recargar desde el disco',
-			'codeEditor.toolbar.toggleDock' => 'Alternar panel de archivos',
 			'codeEditor.loading' => ({required Object fileName}) => 'Cargando ${fileName}...',
 			'codeEditor.header.showingChanges' => 'Mostrando cambios',
 			'codeEditor.actions.copyPath' => 'Copiar ruta del archivo',
@@ -7412,30 +9141,40 @@ extension on TranslationsEs {
 			'codeEditor.footer.lines' => 'Líneas:',
 			'codeEditor.footer.characters' => 'Caracteres:',
 			'codeEditor.footer.shortcuts' => 'Ctrl+S para guardar • Esc para cerrar',
+			'codeEditor.footer.plainText' => 'texto sin formato',
+			'codeEditor.footer.lineCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: '${count} línea', other: '${count} líneas', ), 
+			'codeEditor.footer.modified' => 'modificado',
 			'codeEditor.binaryFile.title' => 'Archivo binario',
 			'codeEditor.binaryFile.message' => ({required Object fileName}) => 'El archivo "${fileName}" no se puede mostrar en el editor de texto porque es un archivo binario.',
 			'codeEditor.binaryFile.cannotDisplayAsText' => 'No se puede mostrar como texto',
 			'codeEditor.filePreview.loading' => 'Cargando vista previa...',
 			'codeEditor.filePreview.error' => 'No se puede mostrar este archivo.',
 			'codeEditor.filePreview.openInNewTab' => 'Abrir en una pestaña nueva',
-			'codeEditor.diff.applyMerge' => 'Aplicar fusión',
-			'codeEditor.diff.base' => 'Base',
-			'codeEditor.diff.close' => 'Cerrar diff',
-			'codeEditor.diff.current' => 'Actual',
-			'codeEditor.diff.hunk' => ({required Object number}) => 'Sección ${number}',
-			'codeEditor.diff.noChanges' => 'Sin cambios',
-			'codeEditor.diff.deletedOnDisk' => 'eliminado en el disco',
+			'codeEditor.unsavedChanges' => ({required Object name}) => 'Cambios sin guardar en ${name}',
 			'codeEditor.discardUnsavedChanges' => '¿Descartar los cambios sin guardar?',
-			'codeEditor.emptyState.title' => 'Ningún archivo abierto',
+			'codeEditor.mediaFile.title' => 'Archivo multimedia',
+			'codeEditor.mediaFile.subtitle' => 'La vista previa de audio y vídeo aún no es compatible',
 			'codeEditor.failedToLoad' => 'No se pudo cargar el archivo',
 			'codeEditor.hexDump.more' => ({required Object size}) => '… ${size} más',
-			'codeEditor.mediaFile.subtitle' => 'La vista previa de audio y vídeo aún no es compatible',
-			'codeEditor.mediaFile.title' => 'Archivo multimedia',
-			'codeEditor.settings.fontSizeDecrease' => ({required Object size}) => 'Tamaño de fuente −  (ahora ${size})',
-			'codeEditor.settings.fontSizeIncrease' => 'Tamaño de fuente +',
 			'codeEditor.settings.minimap' => 'Minimapa',
 			'codeEditor.settings.tabSize' => ({required Object size}) => 'Tamaño de tabulación: ${size}',
-			'codeEditor.unsavedChanges' => ({required Object name}) => 'Cambios sin guardar en ${name}',
+			'codeEditor.settings.fontSizeDecrease' => ({required Object size}) => 'Tamaño de fuente −  (ahora ${size})',
+			'codeEditor.settings.fontSizeIncrease' => 'Tamaño de fuente +',
+			'codeEditor.diff.noChanges' => 'Sin cambios',
+			'codeEditor.diff.hunk' => ({required Object number}) => 'Sección ${number}',
+			'codeEditor.diff.close' => 'Cerrar diff',
+			'codeEditor.diff.base' => 'Base',
+			'codeEditor.diff.current' => 'Actual',
+			'codeEditor.diff.applyMerge' => 'Aplicar fusión',
+			'codeEditor.diff.deletedOnDisk' => 'eliminado en el disco',
+			'codeEditor.diff.untrackedWillBeDeleted' => 'Este archivo sin seguimiento se eliminará.',
+			'codeEditor.diff.restoreConfirm' => ({required Object name}) => '¿Restaurar ${name} a su estado confirmado?',
+			'codeEditor.diff.headVsWorkingCopy' => 'HEAD frente a copia de trabajo',
+			'codeEditor.diff.savedVsBuffer' => 'Último guardado frente a búfer (sin git)',
+			'codeEditor.diff.unchangedLines' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: '${count} línea sin cambios', other: '${count} líneas sin cambios', ), 
+			'codeEditor.diff.revertToSaved' => 'Revertir a lo guardado',
+			'codeEditor.emptyState.title' => 'Ningún archivo abierto',
+			'codeEditor.emptyState.hint' => 'Abre archivos desde la pestaña Archivos',
 			'codeEditor.toasts.savedFile' => ({required Object name}) => '${name} guardado',
 			'codeEditor.toasts.saveFailed' => 'Falló el guardado',
 			'codeEditor.toasts.allSaved' => 'Todo guardado',
@@ -7458,246 +9197,18 @@ extension on TranslationsEs {
 			'common.buttons.download' => 'Descargar',
 			'common.buttons.upload' => 'Subir',
 			'common.buttons.browse' => 'Explorar',
-			'common.buttons.openDiagram' => 'Abrir diagrama',
 			'common.buttons.update' => 'Actualizar',
+			'common.buttons.openDiagram' => 'Abrir diagrama',
 			'common.tabs.chat' => 'Chat',
 			'common.tabs.shell' => 'Shell',
 			'common.tabs.files' => 'Archivos',
 			'common.tabs.git' => 'Control de versiones',
 			'common.tabs.tasks' => 'Tareas',
+			'common.tabs.board' => 'Tablero',
 			'common.tabs.browser' => 'Navegador',
 			'common.tabs.computer' => 'Equipo',
-			'common.tabs.board' => 'Tablero',
 			'common.tabs.usage' => 'AI Control',
-			'common.status.loading' => 'Cargando...',
-			'common.status.success' => 'Éxito',
-			'common.status.error' => 'Error',
-			'common.status.failed' => 'Falló',
-			'common.status.pending' => 'Pendiente',
-			'common.status.completed' => 'Completado',
-			'common.status.inProgress' => 'En curso',
-			'common.messages.savedSuccessfully' => 'Guardado correctamente',
-			'common.messages.deletedSuccessfully' => 'Eliminado correctamente',
-			'common.messages.updatedSuccessfully' => 'Actualizado correctamente',
-			'common.messages.operationFailed' => 'La operación falló',
-			'common.messages.networkError' => 'Error de red. Comprueba tu conexión.',
-			'common.messages.unauthorized' => 'No autorizado. Inicia sesión.',
-			'common.messages.notFound' => 'No encontrado',
-			'common.messages.invalidInput' => 'Entrada no válida',
-			'common.messages.requiredField' => 'Este campo es obligatorio',
-			'common.messages.unknownError' => 'Ocurrió un error desconocido',
-			'common.messages.renameSessionFailed' => 'No se pudo renombrar la sesión. Inténtalo de nuevo.',
-			'common.navigation.settings' => 'Ajustes',
-			'common.navigation.home' => 'Inicio',
-			'common.navigation.back' => 'Atrás',
-			'common.navigation.next' => 'Siguiente',
-			'common.navigation.previous' => 'Anterior',
-			'common.navigation.logout' => 'Cerrar sesión',
-			'common.common.language' => 'Idioma',
-			'common.common.theme' => 'Tema',
-			'common.common.darkMode' => 'Modo oscuro',
-			'common.common.lightMode' => 'Modo claro',
-			'common.common.name' => 'Nombre',
-			'common.common.description' => 'Descripción',
-			'common.common.enabled' => 'Activado',
-			'common.common.disabled' => 'Desactivado',
-			'common.common.optional' => 'Opcional',
-			'common.common.version' => 'Versión',
-			'common.common.select' => 'Seleccionar',
-			'common.common.selectAll' => 'Seleccionar todo',
-			'common.common.deselectAll' => 'Deseleccionar todo',
-			'common.common.done' => 'Hecho',
-			'common.common.failed' => 'Falló',
-			'common.time.justNow' => 'Justo ahora',
-			'common.time.minutesAgo' => ({required Object count}) => 'hace ${count} min',
-			'common.time.hoursAgo' => ({required Object count}) => 'hace ${count} horas',
-			'common.time.daysAgo' => ({required Object count}) => 'hace ${count} días',
-			'common.time.yesterday' => 'Ayer',
-			'common.fileOperations.newFile' => 'Archivo nuevo',
-			'common.fileOperations.newFolder' => 'Carpeta nueva',
-			'common.fileOperations.rename' => 'Renombrar',
-			'common.fileOperations.move' => 'Mover',
-			'common.fileOperations.copyPath' => 'Copiar ruta',
-			'common.fileOperations.openInEditor' => 'Abrir en el editor',
-			'common.mainContent.loading' => 'Cargando DDAgent',
-			'common.mainContent.settingUpWorkspace' => 'Preparando tu espacio de trabajo...',
-			_ => null,
-		} ?? switch (path) {
-			'common.mainContent.chooseProject' => 'Elige tu proyecto',
-			'common.mainContent.selectProjectDescription' => 'Selecciona un proyecto en la barra lateral para empezar a programar con Claude. Cada proyecto contiene tus sesiones de chat e historial de archivos.',
-			'common.mainContent.tip' => 'Consejo',
-			'common.mainContent.createProjectMobile' => 'Toca el botón de menú de arriba para acceder a los proyectos',
-			'common.mainContent.createProjectDesktop' => 'Crea un proyecto nuevo haciendo clic en el icono de carpeta de la barra lateral',
-			'common.mainContent.newSession' => 'Nueva sesión',
-			'common.mainContent.untitledSession' => 'Sesión sin título',
-			'common.mainContent.projectFiles' => 'Archivos del proyecto',
-			'common.mainContent.focusMode' => 'Modo concentración (Ctrl+Shift+F)',
-			'common.mainContent.exitFocusMode' => 'Salir del modo concentración (Ctrl+Shift+F)',
-			'common.mainContent.splitSession' => 'Dividir sesión',
-			'common.mainContent.closeSplitSession' => 'Cerrar sesión dividida',
-			'common.mainContent.chooseWorkspace' => 'Elige un espacio de trabajo',
-			'common.mainContent.chooseWorkspaceDescription' => 'Elige un espacio de trabajo para este chat o crea uno nuevo en Ajustes.',
-			'common.mainContent.createWorkspace' => 'Crear espacio de trabajo en Ajustes',
-			'common.mainContent.recentProjects' => 'Proyectos recientes',
-			'common.fileTree.loading' => 'Cargando archivos...',
-			'common.fileTree.files' => 'Archivos',
-			'common.fileTree.simpleView' => 'Vista simple',
-			'common.fileTree.compactView' => 'Vista compacta',
-			'common.fileTree.detailedView' => 'Vista detallada',
-			'common.fileTree.searchPlaceholder' => 'Buscar archivos y carpetas...',
-			'common.fileTree.clearSearch' => 'Limpiar búsqueda',
-			'common.fileTree.name' => 'Nombre',
-			'common.fileTree.size' => 'Tamaño',
-			'common.fileTree.modified' => 'Modificado',
-			'common.fileTree.permissions' => 'Permisos',
-			'common.fileTree.noFilesFound' => 'No se encontraron archivos',
-			'common.fileTree.checkProjectPath' => 'Comprueba si la ruta del proyecto es accesible',
-			'common.fileTree.noMatchesFound' => 'No se encontraron coincidencias',
-			'common.fileTree.tryDifferentSearch' => 'Prueba con otro término o limpia la búsqueda',
-			'common.fileTree.justNow' => 'justo ahora',
-			'common.fileTree.minAgo' => ({required Object count}) => 'hace ${count} min',
-			'common.fileTree.hoursAgo' => ({required Object count}) => 'hace ${count} horas',
-			'common.fileTree.daysAgo' => ({required Object count}) => 'hace ${count} días',
-			'common.fileTree.newFile' => 'Archivo nuevo (Cmd+N)',
-			'common.fileTree.newFolder' => 'Carpeta nueva (Cmd+Shift+N)',
-			'common.fileTree.refresh' => 'Actualizar',
-			'common.fileTree.collapseAll' => 'Contraer todo',
-			'common.fileTree.context.rename' => 'Renombrar',
-			'common.fileTree.context.delete' => 'Eliminar',
-			'common.fileTree.context.copyPath' => 'Copiar ruta',
-			'common.fileTree.context.download' => 'Descargar',
-			'common.fileTree.context.newFile' => 'Archivo nuevo',
-			'common.fileTree.context.newFolder' => 'Carpeta nueva',
-			'common.fileTree.context.upload' => 'Subir archivos',
-			'common.fileTree.context.refresh' => 'Actualizar',
-			'common.fileTree.context.menuLabel' => 'Menú contextual de archivo',
-			'common.fileTree.context.loading' => 'Cargando...',
-			'common.fileTree.searchContentPlaceholder' => 'Buscar en archivos...',
-			'common.fileTree.searchInFiles' => 'Buscar en archivos',
-			'common.fileTree.searchByName' => 'Buscar por nombre',
-			'common.fileTree.loadFailed' => 'No se pudieron cargar los archivos',
-			'common.fileTree.noSearchResults' => 'No se encontraron coincidencias',
-			'common.fileTree.searchError' => 'Error en la búsqueda',
-			'common.fileTree.searching' => 'Buscando...',
-			'common.fileTree.resultsTruncated' => ({required Object count}) => 'Mostrando los primeros ${count} resultados',
-			'common.fileTree.allWorkspaces' => 'Todos los espacios de trabajo',
-			'common.fileTree.delete.confirm' => 'Eliminar',
-			'common.fileTree.delete.fileWarning' => 'Este archivo se eliminará permanentemente.',
-			'common.fileTree.delete.folderWarning' => 'Esta carpeta y todo su contenido se eliminarán permanentemente.',
-			'common.fileTree.delete.title' => ({required Object type}) => 'Eliminar ${type}',
-			'common.fileTree.dropToUpload' => 'Suelta archivos para subirlos',
-			'common.fileTree.dropToUploadTo' => ({required Object folder}) => 'Suelta archivos para subirlos a «${folder}»',
-			'common.fileTree.noProject' => 'Añade primero un proyecto',
-			'common.fileTree.noRecentFiles' => 'Ningún archivo modificado en los últimos 7 días',
-			'common.fileTree.showAllFiles' => 'Mostrar todos los archivos',
-			'common.fileTree.showAllFilesHint' => 'Desactiva el filtro de recientes para ver todo.',
-			'common.fileTree.showRecentOnly' => 'Mostrar archivos modificados en los últimos 7 días',
-			'common.fileTree.toast.copyFailed' => 'No se pudo copiar la ruta',
-			'common.fileTree.toast.fileCreated' => 'Archivo creado correctamente',
-			'common.fileTree.toast.fileDeleted' => 'Archivo eliminado',
-			'common.fileTree.toast.folderCreated' => 'Carpeta creada correctamente',
-			'common.fileTree.toast.folderDeleted' => 'Carpeta eliminada',
-			'common.fileTree.toast.folderDownloaded' => 'Carpeta descargada como ZIP',
-			'common.fileTree.toast.pathCopied' => 'Ruta copiada al portapapeles',
-			'common.fileTree.toast.renamed' => 'Renombrado correctamente',
-			'common.fileTree.uploadComplete' => 'Subida completada',
-			'common.fileTree.uploadFailed' => 'Falló la subida',
-			'common.fileTree.uploadFiles' => ({required Object size}) => 'Subir archivos (máx. ${size} cada uno)',
-			'common.fileTree.uploadToFolder' => ({required Object folder}) => 'Subir archivos a «${folder}»',
-			'common.fileTree.uploadedCount' => ({required Object uploaded, required Object total, required Object label}) => 'Subidos ${uploaded} de ${total} ${label}',
-			'common.fileTree.uploadingFiles' => 'Subiendo archivos',
-			'common.fileTree.validation.dotsOnly' => 'El nombre de archivo no puede ser solo puntos',
-			'common.fileTree.validation.emptyName' => 'El nombre de archivo no puede estar vacío',
-			'common.fileTree.validation.invalidChars' => 'El nombre de archivo contiene caracteres no válidos',
-			'common.fileTree.validation.reserved' => 'El nombre de archivo es un nombre reservado',
-			'common.projectWizard.title' => 'Crear proyecto nuevo',
-			'common.projectWizard.steps.type' => 'Tipo',
-			'common.projectWizard.steps.configure' => 'Configurar',
-			'common.projectWizard.steps.confirm' => 'Confirmar',
-			'common.projectWizard.step1.question' => '¿Ya tienes un espacio de trabajo o quieres crear uno nuevo?',
-			'common.projectWizard.step1.existing.title' => 'Espacio de trabajo existente',
-			'common.projectWizard.step1.existing.description' => 'Ya tengo un espacio de trabajo en mi servidor y solo necesito añadirlo a la lista de proyectos',
-			'common.projectWizard.step1.kNew.title' => 'Espacio de trabajo nuevo',
-			'common.projectWizard.step1.kNew.description' => 'Crea un espacio de trabajo nuevo, opcionalmente clonando un repositorio de GitHub',
-			'common.projectWizard.step2.existingPath' => 'Ruta del espacio de trabajo',
-			'common.projectWizard.step2.newPath' => 'Ruta del espacio de trabajo',
-			'common.projectWizard.step2.existingPlaceholder' => '/ruta/al/espacio/existente',
-			'common.projectWizard.step2.newPlaceholder' => '/ruta/al/espacio/nuevo',
-			'common.projectWizard.step2.existingHelp' => 'Ruta completa al directorio de tu espacio de trabajo existente',
-			'common.projectWizard.step2.newHelp' => 'Ruta completa al directorio de tu espacio de trabajo',
-			'common.projectWizard.step2.githubUrl' => 'URL de GitHub (opcional)',
-			'common.projectWizard.step2.githubPlaceholder' => 'https://github.com/usuario/repositorio',
-			'common.projectWizard.step2.githubHelp' => 'Opcional: proporciona una URL de GitHub para clonar un repositorio',
-			'common.projectWizard.step2.githubAuth' => 'Autenticación de GitHub (opcional)',
-			'common.projectWizard.step2.githubAuthHelp' => 'Solo se requiere para repositorios privados. Los repos públicos se pueden clonar sin autenticación.',
-			'common.projectWizard.step2.loadingTokens' => 'Cargando tokens guardados...',
-			'common.projectWizard.step2.storedToken' => 'Token guardado',
-			'common.projectWizard.step2.newToken' => 'Token nuevo',
-			'common.projectWizard.step2.nonePublic' => 'Ninguno (público)',
-			'common.projectWizard.step2.selectToken' => 'Seleccionar token',
-			'common.projectWizard.step2.selectTokenPlaceholder' => '-- Selecciona un token --',
-			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-			'common.projectWizard.step2.tokenHelp' => 'Este token se usará solo para esta operación',
-			'common.projectWizard.step2.publicRepoInfo' => 'Los repositorios públicos no requieren autenticación. Puedes omitir el token si clonas un repo público.',
-			'common.projectWizard.step2.noTokensHelp' => 'No hay tokens guardados disponibles. Puedes añadir tokens en Ajustes → Claves API para reutilizarlos fácilmente.',
-			'common.projectWizard.step2.optionalTokenPublic' => 'Token de GitHub (opcional para repos públicos)',
-			'common.projectWizard.step2.tokenPublicPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx (déjalo vacío para repos públicos)',
-			'common.projectWizard.step3.reviewConfig' => 'Revisa tu configuración',
-			'common.projectWizard.step3.existingWorkspace' => 'Espacio de trabajo existente',
-			'common.projectWizard.step3.newWorkspace' => 'Espacio de trabajo nuevo',
-			'common.projectWizard.step3.path' => 'Ruta:',
-			'common.projectWizard.step3.cloneFrom' => 'Clonar desde:',
-			'common.projectWizard.step3.authentication' => 'Autenticación:',
-			'common.projectWizard.step3.usingStoredToken' => 'Usando token guardado:',
-			'common.projectWizard.step3.usingProvidedToken' => 'Usando token proporcionado',
-			'common.projectWizard.step3.noAuthentication' => 'Sin autenticación',
-			'common.projectWizard.step3.sshKey' => 'Clave SSH',
-			'common.projectWizard.step3.existingInfo' => 'El espacio de trabajo se añadirá a tu lista de proyectos y estará disponible para sesiones de Claude/Cursor.',
-			'common.projectWizard.step3.newWithClone' => 'El repositorio se clonará desde esta carpeta.',
-			'common.projectWizard.step3.newEmpty' => 'El espacio de trabajo se añadirá a tu lista de proyectos y estará disponible para sesiones de Claude/Cursor.',
-			'common.projectWizard.step3.cloningRepository' => 'Clonando repositorio...',
-			'common.projectWizard.buttons.cancel' => 'Cancelar',
-			'common.projectWizard.buttons.back' => 'Atrás',
-			'common.projectWizard.buttons.next' => 'Siguiente',
-			'common.projectWizard.buttons.createProject' => 'Crear proyecto',
-			'common.projectWizard.buttons.creating' => 'Creando...',
-			'common.projectWizard.buttons.cloning' => 'Clonando...',
-			'common.projectWizard.errors.selectType' => 'Selecciona si tienes un espacio de trabajo existente o quieres crear uno nuevo',
-			'common.projectWizard.errors.providePath' => 'Proporciona la ruta del espacio de trabajo',
-			'common.projectWizard.errors.failedToCreate' => 'No se pudo crear el espacio de trabajo',
-			'common.projectWizard.errors.failedToCreateFolder' => 'No se pudo crear la carpeta',
-			'common.notifications.genericTool' => 'una herramienta',
-			'common.notifications.codes.generic.info.title' => 'Notificación',
-			'common.notifications.codes.permission.required.title' => 'Acción requerida',
-			'common.notifications.codes.permission.required.body' => ({required Object toolName}) => '${toolName} está esperando tu decisión.',
-			'common.notifications.codes.run.stopped.title' => 'Ejecución detenida',
-			'common.notifications.codes.run.stopped.body' => ({required Object reason}) => 'Motivo: ${reason}',
-			'common.notifications.codes.run.failed.title' => 'La ejecución falló',
-			'common.notifications.codes.agent.notification.title' => 'Notificación del agente',
-			'common.versionUpdate.title' => 'Actualización disponible',
-			'common.versionUpdate.newVersionReady' => 'Hay una versión nueva lista',
-			'common.versionUpdate.currentVersion' => 'Versión actual',
-			'common.versionUpdate.latestVersion' => 'Última versión',
-			'common.versionUpdate.whatsNew' => 'Novedades:',
-			'common.versionUpdate.viewFullRelease' => 'Ver la publicación completa',
-			'common.versionUpdate.updateProgress' => 'Progreso de la actualización:',
-			'common.versionUpdate.manualUpgrade' => 'Actualización manual:',
-			'common.versionUpdate.npmUpgradeCommand' => 'npm install -g @ddagent-ai/ddagent@latest',
-			'common.versionUpdate.manualUpgradeHint' => 'O haz clic en "Actualizar ahora" para ejecutar la actualización automáticamente.',
-			'common.versionUpdate.updateCompleted' => '¡Actualización completada correctamente!',
-			'common.versionUpdate.restartServer' => 'Reinicia el servidor para aplicar los cambios.',
-			'common.versionUpdate.updateFailed' => 'La actualización falló',
-			'common.versionUpdate.buttons.close' => 'Cerrar',
-			'common.versionUpdate.buttons.later' => 'Más tarde',
-			'common.versionUpdate.buttons.copyCommand' => 'Copiar comando',
-			'common.versionUpdate.buttons.updateNow' => 'Actualizar ahora',
-			'common.versionUpdate.buttons.updating' => 'Actualizando...',
-			'common.versionUpdate.ariaLabels.closeModal' => 'Cerrar el modal de actualización de versión',
-			'common.versionUpdate.ariaLabels.showSidebar' => 'Mostrar barra lateral',
-			'common.versionUpdate.ariaLabels.settings' => 'Ajustes',
-			'common.versionUpdate.ariaLabels.updateAvailable' => 'Actualización disponible',
-			'common.versionUpdate.ariaLabels.closeSidebar' => 'Cerrar barra lateral',
-			'common.quota.controlCenter' => 'AI Control Center',
+			'common.quota.controlCenter' => 'Centro de control de IA',
 			'common.quota.section.overview' => 'Resumen',
 			'common.quota.section.quotas' => 'Cuotas',
 			'common.quota.section.usage' => 'Uso',
@@ -7811,6 +9322,235 @@ extension on TranslationsEs {
 			'common.quota.range.k7d' => '7d',
 			'common.quota.range.k30d' => '30d',
 			'common.quota.range.all' => 'Todos',
+			'common.status.loading' => 'Cargando...',
+			'common.status.success' => 'Éxito',
+			'common.status.error' => 'Error',
+			'common.status.failed' => 'Falló',
+			'common.status.pending' => 'Pendiente',
+			'common.status.completed' => 'Completado',
+			'common.status.inProgress' => 'En curso',
+			'common.messages.savedSuccessfully' => 'Guardado correctamente',
+			'common.messages.deletedSuccessfully' => 'Eliminado correctamente',
+			'common.messages.updatedSuccessfully' => 'Actualizado correctamente',
+			'common.messages.operationFailed' => 'La operación falló',
+			'common.messages.networkError' => 'Error de red. Comprueba tu conexión.',
+			'common.messages.unauthorized' => 'No autorizado. Inicia sesión.',
+			'common.messages.notFound' => 'No encontrado',
+			'common.messages.invalidInput' => 'Entrada no válida',
+			'common.messages.requiredField' => 'Este campo es obligatorio',
+			'common.messages.unknownError' => 'Ocurrió un error desconocido',
+			'common.messages.renameSessionFailed' => 'No se pudo renombrar la sesión. Inténtalo de nuevo.',
+			'common.navigation.settings' => 'Ajustes',
+			'common.navigation.home' => 'Inicio',
+			'common.navigation.back' => 'Atrás',
+			'common.navigation.next' => 'Siguiente',
+			'common.navigation.previous' => 'Anterior',
+			'common.navigation.logout' => 'Cerrar sesión',
+			'common.navigation.backToChat' => 'Volver al chat',
+			'common.common.language' => 'Idioma',
+			'common.common.theme' => 'Tema',
+			'common.common.darkMode' => 'Modo oscuro',
+			'common.common.lightMode' => 'Modo claro',
+			'common.common.name' => 'Nombre',
+			'common.common.description' => 'Descripción',
+			'common.common.enabled' => 'Activado',
+			'common.common.disabled' => 'Desactivado',
+			'common.common.optional' => 'Opcional',
+			'common.common.version' => 'Versión',
+			'common.common.select' => 'Seleccionar',
+			'common.common.selectAll' => 'Seleccionar todo',
+			'common.common.deselectAll' => 'Deseleccionar todo',
+			'common.common.done' => 'Hecho',
+			'common.common.failed' => 'Falló',
+			'common.time.justNow' => 'Justo ahora',
+			'common.time.minutesAgo' => ({required Object count}) => 'hace ${count} min',
+			'common.time.hoursAgo' => ({required Object count}) => 'hace ${count} horas',
+			'common.time.daysAgo' => ({required Object count}) => 'hace ${count} días',
+			'common.time.yesterday' => 'Ayer',
+			'common.fileOperations.newFile' => 'Archivo nuevo',
+			'common.fileOperations.newFolder' => 'Carpeta nueva',
+			'common.fileOperations.rename' => 'Renombrar',
+			'common.fileOperations.move' => 'Mover',
+			'common.fileOperations.copyPath' => 'Copiar ruta',
+			'common.fileOperations.openInEditor' => 'Abrir en el editor',
+			'common.mainContent.loading' => 'Cargando DDAgent',
+			'common.mainContent.settingUpWorkspace' => 'Preparando tu espacio de trabajo...',
+			'common.mainContent.chooseProject' => 'Elige tu proyecto',
+			'common.mainContent.selectProjectDescription' => 'Selecciona un proyecto en la barra lateral para empezar a programar con Claude. Cada proyecto contiene tus sesiones de chat e historial de archivos.',
+			'common.mainContent.tip' => 'Consejo',
+			'common.mainContent.createProjectMobile' => 'Toca el botón de menú de arriba para acceder a los proyectos',
+			'common.mainContent.createProjectDesktop' => 'Crea un proyecto nuevo haciendo clic en el icono de carpeta de la barra lateral',
+			'common.mainContent.newSession' => 'Nueva sesión',
+			'common.mainContent.untitledSession' => 'Sesión sin título',
+			'common.mainContent.projectFiles' => 'Archivos del proyecto',
+			'common.mainContent.focusMode' => 'Modo concentración (Ctrl+Shift+F)',
+			'common.mainContent.exitFocusMode' => 'Salir del modo concentración (Ctrl+Shift+F)',
+			'common.mainContent.splitSession' => 'Dividir sesión',
+			'common.mainContent.closeSplitSession' => 'Cerrar sesión dividida',
+			'common.mainContent.chooseWorkspace' => 'Elige un espacio de trabajo',
+			'common.mainContent.chooseWorkspaceDescription' => 'Elige un espacio de trabajo para este chat o crea uno nuevo en Ajustes.',
+			'common.mainContent.createWorkspace' => 'Crear espacio de trabajo en Ajustes',
+			'common.mainContent.recentProjects' => 'Proyectos recientes',
+			'common.fileTree.loading' => 'Cargando archivos...',
+			'common.fileTree.files' => 'Archivos',
+			'common.fileTree.simpleView' => 'Vista simple',
+			'common.fileTree.compactView' => 'Vista compacta',
+			'common.fileTree.detailedView' => 'Vista detallada',
+			'common.fileTree.searchPlaceholder' => 'Buscar archivos y carpetas...',
+			'common.fileTree.searchContentPlaceholder' => 'Buscar en archivos...',
+			'common.fileTree.searchInFiles' => 'Buscar en archivos',
+			'common.fileTree.searchByName' => 'Buscar por nombre',
+			'common.fileTree.clearSearch' => 'Limpiar búsqueda',
+			'common.fileTree.name' => 'Nombre',
+			'common.fileTree.size' => 'Tamaño',
+			'common.fileTree.modified' => 'Modificado',
+			'common.fileTree.permissions' => 'Permisos',
+			'common.fileTree.noFilesFound' => 'No se encontraron archivos',
+			'common.fileTree.checkProjectPath' => 'Comprueba si la ruta del proyecto es accesible',
+			'common.fileTree.loadFailed' => 'No se pudieron cargar los archivos',
+			'common.fileTree.noMatchesFound' => 'No se encontraron coincidencias',
+			'common.fileTree.noSearchResults' => 'No se encontraron coincidencias',
+			'common.fileTree.tryDifferentSearch' => 'Prueba con otro término o limpia la búsqueda',
+			'common.fileTree.searchError' => 'Error en la búsqueda',
+			'common.fileTree.searching' => 'Buscando...',
+			'common.fileTree.resultsTruncated' => ({required Object count}) => 'Mostrando los primeros ${count} resultados',
+			'common.fileTree.justNow' => 'justo ahora',
+			'common.fileTree.minAgo' => ({required Object count}) => 'hace ${count} min',
+			'common.fileTree.hoursAgo' => ({required Object count}) => 'hace ${count} horas',
+			'common.fileTree.daysAgo' => ({required Object count}) => 'hace ${count} días',
+			'common.fileTree.newFile' => 'Archivo nuevo (Cmd+N)',
+			'common.fileTree.newFolder' => 'Carpeta nueva (Cmd+Shift+N)',
+			'common.fileTree.refresh' => 'Actualizar',
+			'common.fileTree.collapseAll' => 'Contraer todo',
+			'common.fileTree.context.rename' => 'Renombrar',
+			'common.fileTree.context.delete' => 'Eliminar',
+			'common.fileTree.context.copyPath' => 'Copiar ruta',
+			'common.fileTree.context.download' => 'Descargar',
+			'common.fileTree.context.newFile' => 'Archivo nuevo',
+			'common.fileTree.context.newFolder' => 'Carpeta nueva',
+			'common.fileTree.context.upload' => 'Subir archivos',
+			'common.fileTree.context.refresh' => 'Actualizar',
+			'common.fileTree.context.menuLabel' => 'Menú contextual de archivo',
+			'common.fileTree.context.loading' => 'Cargando...',
+			'common.fileTree.allWorkspaces' => 'Todos los espacios de trabajo',
+			'common.fileTree.delete.confirm' => 'Eliminar',
+			'common.fileTree.delete.fileWarning' => 'Este archivo se eliminará permanentemente.',
+			'common.fileTree.delete.folderWarning' => 'Esta carpeta y todo su contenido se eliminarán permanentemente.',
+			'common.fileTree.delete.title' => ({required Object type}) => 'Eliminar ${type}',
+			'common.fileTree.dropToUpload' => 'Suelta archivos para subirlos',
+			'common.fileTree.dropToUploadTo' => ({required Object folder}) => 'Suelta archivos para subirlos a «${folder}»',
+			'common.fileTree.noProject' => 'Añade primero un proyecto',
+			'common.fileTree.noRecentFiles' => 'Ningún archivo modificado en los últimos 7 días',
+			'common.fileTree.showAllFiles' => 'Mostrar todos los archivos',
+			'common.fileTree.showAllFilesHint' => 'Desactiva el filtro de recientes para ver todo.',
+			'common.fileTree.showRecentOnly' => 'Mostrar archivos modificados en los últimos 7 días',
+			'common.fileTree.toast.copyFailed' => 'No se pudo copiar la ruta',
+			'common.fileTree.toast.fileCreated' => 'Archivo creado correctamente',
+			'common.fileTree.toast.fileDeleted' => 'Archivo eliminado',
+			'common.fileTree.toast.folderCreated' => 'Carpeta creada correctamente',
+			'common.fileTree.toast.folderDeleted' => 'Carpeta eliminada',
+			'common.fileTree.toast.folderDownloaded' => 'Carpeta descargada como ZIP',
+			'common.fileTree.toast.pathCopied' => 'Ruta copiada al portapapeles',
+			'common.fileTree.toast.renamed' => 'Renombrado correctamente',
+			'common.fileTree.uploadComplete' => 'Subida completada',
+			'common.fileTree.uploadFailed' => 'Falló la subida',
+			'common.fileTree.uploadFiles' => ({required Object size}) => 'Subir archivos (máx. ${size} cada uno)',
+			'common.fileTree.uploadToFolder' => ({required Object folder}) => 'Subir archivos a «${folder}»',
+			'common.fileTree.uploadedCount' => ({required Object uploaded, required Object total, required Object label}) => 'Subidos ${uploaded} de ${total} ${label}',
+			'common.fileTree.uploadingFiles' => 'Subiendo archivos',
+			'common.fileTree.validation.dotsOnly' => 'El nombre de archivo no puede ser solo puntos',
+			'common.fileTree.validation.emptyName' => 'El nombre de archivo no puede estar vacío',
+			'common.fileTree.validation.invalidChars' => 'El nombre de archivo contiene caracteres no válidos',
+			'common.fileTree.validation.reserved' => 'El nombre de archivo es un nombre reservado',
+			'common.projectWizard.title' => 'Crear proyecto nuevo',
+			'common.projectWizard.steps.type' => 'Tipo',
+			'common.projectWizard.steps.configure' => 'Configurar',
+			'common.projectWizard.steps.confirm' => 'Confirmar',
+			'common.projectWizard.step1.question' => '¿Ya tienes un espacio de trabajo o quieres crear uno nuevo?',
+			'common.projectWizard.step1.existing.title' => 'Espacio de trabajo existente',
+			'common.projectWizard.step1.existing.description' => 'Ya tengo un espacio de trabajo en mi servidor y solo necesito añadirlo a la lista de proyectos',
+			'common.projectWizard.step1.kNew.title' => 'Espacio de trabajo nuevo',
+			'common.projectWizard.step1.kNew.description' => 'Crea un espacio de trabajo nuevo, opcionalmente clonando un repositorio de GitHub',
+			'common.projectWizard.step2.existingPath' => 'Ruta del espacio de trabajo',
+			'common.projectWizard.step2.newPath' => 'Ruta del espacio de trabajo',
+			'common.projectWizard.step2.existingPlaceholder' => '/ruta/al/espacio/existente',
+			'common.projectWizard.step2.newPlaceholder' => '/ruta/al/espacio/nuevo',
+			'common.projectWizard.step2.existingHelp' => 'Ruta completa al directorio de tu espacio de trabajo existente',
+			'common.projectWizard.step2.newHelp' => 'Ruta completa al directorio de tu espacio de trabajo',
+			'common.projectWizard.step2.githubUrl' => 'URL de GitHub (opcional)',
+			'common.projectWizard.step2.githubPlaceholder' => 'https://github.com/usuario/repositorio',
+			'common.projectWizard.step2.githubHelp' => 'Opcional: proporciona una URL de GitHub para clonar un repositorio',
+			'common.projectWizard.step2.githubAuth' => 'Autenticación de GitHub (opcional)',
+			'common.projectWizard.step2.githubAuthHelp' => 'Solo se requiere para repositorios privados. Los repos públicos se pueden clonar sin autenticación.',
+			'common.projectWizard.step2.loadingTokens' => 'Cargando tokens guardados...',
+			'common.projectWizard.step2.storedToken' => 'Token guardado',
+			'common.projectWizard.step2.newToken' => 'Token nuevo',
+			'common.projectWizard.step2.nonePublic' => 'Ninguno (público)',
+			'common.projectWizard.step2.selectToken' => 'Seleccionar token',
+			'common.projectWizard.step2.selectTokenPlaceholder' => '-- Selecciona un token --',
+			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+			'common.projectWizard.step2.tokenHelp' => 'Este token se usará solo para esta operación',
+			'common.projectWizard.step2.publicRepoInfo' => 'Los repositorios públicos no requieren autenticación. Puedes omitir el token si clonas un repo público.',
+			'common.projectWizard.step2.noTokensHelp' => 'No hay tokens guardados disponibles. Puedes añadir tokens en Ajustes → Claves API para reutilizarlos fácilmente.',
+			'common.projectWizard.step2.optionalTokenPublic' => 'Token de GitHub (opcional para repos públicos)',
+			'common.projectWizard.step2.tokenPublicPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx (déjalo vacío para repos públicos)',
+			'common.projectWizard.step3.reviewConfig' => 'Revisa tu configuración',
+			'common.projectWizard.step3.existingWorkspace' => 'Espacio de trabajo existente',
+			'common.projectWizard.step3.newWorkspace' => 'Espacio de trabajo nuevo',
+			_ => null,
+		} ?? switch (path) {
+			'common.projectWizard.step3.path' => 'Ruta:',
+			'common.projectWizard.step3.cloneFrom' => 'Clonar desde:',
+			'common.projectWizard.step3.authentication' => 'Autenticación:',
+			'common.projectWizard.step3.usingStoredToken' => 'Usando token guardado:',
+			'common.projectWizard.step3.usingProvidedToken' => 'Usando token proporcionado',
+			'common.projectWizard.step3.noAuthentication' => 'Sin autenticación',
+			'common.projectWizard.step3.sshKey' => 'Clave SSH',
+			'common.projectWizard.step3.existingInfo' => 'El espacio de trabajo se añadirá a tu lista de proyectos y estará disponible para sesiones de Claude/Cursor.',
+			'common.projectWizard.step3.newWithClone' => 'El repositorio se clonará desde esta carpeta.',
+			'common.projectWizard.step3.newEmpty' => 'El espacio de trabajo se añadirá a tu lista de proyectos y estará disponible para sesiones de Claude/Cursor.',
+			'common.projectWizard.step3.cloningRepository' => 'Clonando repositorio...',
+			'common.projectWizard.buttons.cancel' => 'Cancelar',
+			'common.projectWizard.buttons.back' => 'Atrás',
+			'common.projectWizard.buttons.next' => 'Siguiente',
+			'common.projectWizard.buttons.createProject' => 'Crear proyecto',
+			'common.projectWizard.buttons.creating' => 'Creando...',
+			'common.projectWizard.buttons.cloning' => 'Clonando...',
+			'common.projectWizard.errors.selectType' => 'Selecciona si tienes un espacio de trabajo existente o quieres crear uno nuevo',
+			'common.projectWizard.errors.providePath' => 'Proporciona la ruta del espacio de trabajo',
+			'common.projectWizard.errors.failedToCreate' => 'No se pudo crear el espacio de trabajo',
+			'common.projectWizard.errors.failedToCreateFolder' => 'No se pudo crear la carpeta',
+			'common.notifications.genericTool' => 'una herramienta',
+			'common.notifications.codes.generic.info.title' => 'Notificación',
+			'common.notifications.codes.permission.required.title' => 'Acción requerida',
+			'common.notifications.codes.permission.required.body' => ({required Object toolName}) => '${toolName} está esperando tu decisión.',
+			'common.notifications.codes.run.stopped.title' => 'Ejecución detenida',
+			'common.notifications.codes.run.stopped.body' => ({required Object reason}) => 'Motivo: ${reason}',
+			'common.notifications.codes.run.failed.title' => 'La ejecución falló',
+			'common.notifications.codes.agent.notification.title' => 'Notificación del agente',
+			'common.versionUpdate.title' => 'Actualización disponible',
+			'common.versionUpdate.newVersionReady' => 'Hay una versión nueva lista',
+			'common.versionUpdate.currentVersion' => 'Versión actual',
+			'common.versionUpdate.latestVersion' => 'Última versión',
+			'common.versionUpdate.whatsNew' => 'Novedades:',
+			'common.versionUpdate.viewFullRelease' => 'Ver la publicación completa',
+			'common.versionUpdate.updateProgress' => 'Progreso de la actualización:',
+			'common.versionUpdate.manualUpgrade' => 'Actualización manual:',
+			'common.versionUpdate.npmUpgradeCommand' => 'npm install -g @ddagent-ai/ddagent@latest',
+			'common.versionUpdate.manualUpgradeHint' => 'O haz clic en "Actualizar ahora" para ejecutar la actualización automáticamente.',
+			'common.versionUpdate.updateCompleted' => '¡Actualización completada correctamente!',
+			'common.versionUpdate.restartServer' => 'Reinicia el servidor para aplicar los cambios.',
+			'common.versionUpdate.updateFailed' => 'La actualización falló',
+			'common.versionUpdate.buttons.close' => 'Cerrar',
+			'common.versionUpdate.buttons.later' => 'Más tarde',
+			'common.versionUpdate.buttons.copyCommand' => 'Copiar comando',
+			'common.versionUpdate.buttons.updateNow' => 'Actualizar ahora',
+			'common.versionUpdate.buttons.updating' => 'Actualizando...',
+			'common.versionUpdate.ariaLabels.closeModal' => 'Cerrar el modal de actualización de versión',
+			'common.versionUpdate.ariaLabels.showSidebar' => 'Mostrar barra lateral',
+			'common.versionUpdate.ariaLabels.settings' => 'Ajustes',
+			'common.versionUpdate.ariaLabels.updateAvailable' => 'Actualización disponible',
+			'common.versionUpdate.ariaLabels.closeSidebar' => 'Cerrar barra lateral',
 			'common.actions.cancel' => 'Cancelar',
 			'common.actions.retry' => 'Reintentar',
 			'common.actions.save' => 'Guardar',
@@ -8035,8 +9775,6 @@ extension on TranslationsEs {
 			'common.gitPanel.history.files' => 'Archivos',
 			'common.gitPanel.history.removed' => 'Eliminadas',
 			'common.gitPanel.mergeWorktree.cleanupDesc' => 'Eliminar el worktree y borrar su rama una vez fusionada',
-			_ => null,
-		} ?? switch (path) {
 			'common.gitPanel.mergeWorktree.cleanupLabel' => 'Limpiar tras la fusión',
 			'common.gitPanel.mergeWorktree.commitCount' => ({required Object count}) => '${count} commit(s)',
 			'common.gitPanel.mergeWorktree.merge' => 'Fusionar',
@@ -8146,8 +9884,30 @@ extension on TranslationsEs {
 			'common.gitPanel.tabs.history' => 'Commits',
 			'common.gitPanel.tabs.branches' => 'Ramas',
 			'common.gitPanel.tabs.worktrees' => 'Worktrees',
+			'common.gitPanel.save' => 'Guardar',
+			'common.gitPanel.worktreeScripts.title' => 'Scripts del worktree',
+			'common.gitPanel.worktreeScripts.setup' => 'Script de configuración (se ejecuta tras crear/abrir)',
+			'common.gitPanel.worktreeScripts.run' => 'Iniciar servidor de desarrollo',
+			'common.gitPanel.worktreeScripts.stop' => 'Detener servidor de desarrollo',
+			'common.gitPanel.worktreeScripts.runScript' => 'Script de ejecución (servidor de desarrollo, bajo demanda)',
+			'common.gitPanel.worktreeScripts.runPort' => 'Puerto de vista previa (opcional — se detecta automáticamente si está vacío)',
+			'common.gitPanel.worktreeScripts.invalidPort' => 'El puerto debe estar entre 1 y 65535',
+			'common.gitPanel.worktreeScripts.sourceProject' => 'Guardado como configuración específica del proyecto',
+			'common.gitPanel.worktreeScripts.sourceFile' => 'Desde .ddagent/worktree.json — al guardar se crea una configuración específica del proyecto',
+			'common.gitPanel.worktreeScripts.sourceNone' => 'Aún no hay nada configurado',
+			'common.gitPanel.worktreeScripts.saving' => 'Guardando…',
+			'common.gitPanel.worktreeScripts.setupRunning' => 'configuración en curso',
+			'common.gitPanel.worktreeScripts.setupFailed' => 'la configuración falló',
+			'common.gitPanel.worktreeScripts.running' => 'en ejecución',
+			'common.gitPanel.worktreeScripts.openPreview' => 'Abrir vista previa',
+			'common.gitPanel.worktreeScripts.runExited' => ({required Object code}) => 'la ejecución terminó (${code})',
 			'common.sessions.renameSession' => 'Renombrar sesión',
 			'common.projects.newSession' => 'Nueva sesión',
+			'common.sharedNotes.subtitle' => 'Memoria compartida — se inyecta en cada sesión de este proyecto',
+			'common.sharedNotes.save' => 'Guardar',
+			'common.sharedNotes.saving' => 'Guardando…',
+			'common.sharedNotes.noProject' => 'Selecciona un espacio de trabajo para editar su contexto compartido',
+			'common.sharedNotes.placeholder' => '# Contexto compartido\nConvenciones, decisiones y referencias que todo agente debería conocer…',
 			'common.codeBlock.wrapLines' => 'Ajustar líneas',
 			'common.codeBlock.noWrap' => 'Sin ajuste',
 			'common.update.available' => ({required Object version}) => 'Actualización disponible · v${version}',
@@ -8175,6 +9935,8 @@ extension on TranslationsEs {
 			'common.update.staged' => ({required Object version}) => 'Actualización v${version} descargada — reinicia el servidor para instalarla.',
 			'common.update.upToDate' => 'El servidor ya tiene la última versión.',
 			'common.update.webHostFailed' => ({required Object message}) => 'El servidor se actualizó, pero su interfaz web no: ${message}',
+			'common.appShell.panelActive' => ({required Object count}) => 'Panel · ${count} activas',
+			'common.errors.forbidden' => 'Acceso denegado',
 			'settings.title' => 'Ajustes',
 			'settings.changelog.title' => 'Registro de cambios',
 			'settings.changelog.loading' => 'Cargando…',
@@ -8197,10 +9959,13 @@ extension on TranslationsEs {
 			'settings.server.restartTimeout' => ({required Object seconds}) => 'El servidor no ha vuelto en ${seconds} s. Revisa el registro del servicio (/tmp/ddagent.log) o reinícialo manualmente.',
 			'settings.updates.title' => 'Actualizaciones',
 			'settings.updates.description' => 'Busca en GitHub una versión de escritorio más reciente. Las nuevas versiones se descargan automáticamente y se instalan al salir.',
+			'settings.updates.descriptionMobile' => 'Busca en GitHub una versión más reciente de esta app. Las actualizaciones las instala el instalador del sistema de tu dispositivo.',
+			'settings.updates.descriptionServer' => 'Busca en GitHub una versión más reciente de DDAgent. El servidor conectado puede actualizarse solo — las sesiones activas se interrumpen mientras se reinicia.',
 			'settings.updates.check' => 'Buscar actualizaciones',
 			'settings.updates.checking' => 'Buscando…',
 			'settings.updates.upToDate' => ({required Object version}) => 'Tienes la última versión (v${version}).',
 			'settings.updates.available' => ({required Object version}) => 'Actualización v${version} encontrada — descargando en segundo plano; se instalará al cerrar DDAgent.',
+			'settings.updates.appAvailable' => ({required Object version}) => 'Actualización de la app v${version} disponible — toca Actualizar para instalarla en este dispositivo.',
 			'settings.updates.downloaded' => ({required Object version}) => 'Actualización v${version} descargada — cierra y reinicia DDAgent para instalarla.',
 			'settings.updates.unavailable' => 'La búsqueda de actualizaciones solo está disponible en builds de escritorio empaquetados.',
 			'settings.updates.error' => ({required Object message}) => 'Error al buscar actualizaciones: ${message}',
@@ -8244,9 +10009,11 @@ extension on TranslationsEs {
 			'settings.appearance.showMinimap' => 'Mostrar minimapa',
 			'settings.appearance.lineNumbers' => 'Números de línea',
 			'settings.appearance.fontSize' => 'Tamaño de fuente',
-			'settings.appearance.themeModes.dark' => 'Oscuro',
-			'settings.appearance.themeModes.light' => 'Claro',
 			'settings.appearance.themeModes.system' => 'Sistema',
+			'settings.appearance.themeModes.light' => 'Claro',
+			_ => null,
+		} ?? switch (path) {
+			'settings.appearance.themeModes.dark' => 'Oscuro',
 			'settings.actions.saveChanges' => 'Guardar cambios',
 			'settings.actions.resetToDefaults' => 'Restablecer valores por defecto',
 			'settings.actions.cancelChanges' => 'Cancelar cambios',
@@ -8265,6 +10032,7 @@ extension on TranslationsEs {
 			'settings.quickSettings.dragHandle.draggingStatus' => 'Arrastrando...',
 			'settings.quickSettings.dragHandle.toggleAndMove' => 'Clic para alternar, arrastra para mover',
 			'settings.quickSettings.sendWithCtrlEnter' => 'Enviar con Ctrl+Enter',
+			'settings.quickSettings.enterSendsHint' => 'Si está desactivado, Enter envía y Shift+Enter inserta un salto de línea.',
 			'settings.terminalShortcuts.title' => 'Atajos de terminal',
 			'settings.terminalShortcuts.sectionKeys' => 'Teclas',
 			'settings.terminalShortcuts.sectionNavigation' => 'Navegación',
@@ -8274,14 +10042,16 @@ extension on TranslationsEs {
 			'settings.terminalShortcuts.arrowUp' => 'Flecha arriba',
 			'settings.terminalShortcuts.arrowDown' => 'Flecha abajo',
 			'settings.terminalShortcuts.scrollDown' => 'Desplazar hacia abajo',
+			'settings.terminalShortcuts.killTitle' => 'Terminar proceso en ejecución (Ctrl+C)',
 			'settings.terminalShortcuts.handle.closePanel' => 'Cerrar panel de atajos',
 			'settings.terminalShortcuts.handle.openPanel' => 'Abrir panel de atajos',
-			'settings.terminalShortcuts.killTitle' => 'Terminar proceso en ejecución (Ctrl+C)',
 			'settings.terminalShortcuts.paste' => 'Pegar',
 			'settings.mainTabs.label' => 'Ajustes',
 			'settings.mainTabs.agents' => 'Agentes',
 			'settings.mainTabs.orchestration' => 'Orquestación',
+			'settings.mainTabs.miniOrchestration' => 'Miniorquestación',
 			'settings.mainTabs.appearance' => 'Apariencia',
+			'settings.mainTabs.workspaces' => 'Espacios de trabajo',
 			'settings.mainTabs.git' => 'Git',
 			'settings.mainTabs.apiTokens' => 'API y tokens',
 			'settings.mainTabs.models' => 'Modelos',
@@ -8290,94 +10060,141 @@ extension on TranslationsEs {
 			'settings.mainTabs.tools' => 'Herramientas',
 			'settings.mainTabs.notifications' => 'Notificaciones',
 			'settings.mainTabs.about' => 'Acerca de',
-			'settings.mainTabs.workspaces' => 'Espacios de trabajo',
-			'settings.mainTabs.quota' => 'Control Center',
+			'settings.mainTabs.quota' => 'Centro de control',
+			'settings.mainTabs.shortcuts' => 'Atajos de teclado',
+			'settings.miniOrchestration.title' => 'Miniorquestación',
+			'settings.miniOrchestration.description' => 'Un pipeline de dos modelos: un pensador no flash planifica y un ejecutor flash ejecuta.',
+			'settings.miniOrchestration.loading' => 'Cargando los ajustes de miniorquestación…',
+			'settings.miniOrchestration.loadError' => 'No se pudieron cargar los ajustes de miniorquestación.',
+			'settings.miniOrchestration.enable.label' => 'Activar miniorquestación',
+			'settings.miniOrchestration.enable.description' => 'Envía las sesiones Auto (mini) a través del motor de dos roles en lugar del orquestador completo.',
+			'settings.miniOrchestration.thinker.title' => 'Pensador (no flash)',
+			'settings.miniOrchestration.thinker.description' => 'Planifica, decide, revisa y redacta el informe final.',
+			'settings.miniOrchestration.worker.title' => 'Ejecutor (flash)',
+			'settings.miniOrchestration.worker.description' => 'Ejecuta cada paso planificado.',
+			'settings.miniOrchestration.fields.provider' => 'Proveedor',
+			'settings.miniOrchestration.fields.model' => 'Modelo',
+			'settings.miniOrchestration.fields.modelPlaceholder' => 'Selecciona un modelo',
+			'settings.miniOrchestration.fields.tier' => 'Nivel',
+			'settings.miniOrchestration.roles.title' => 'Modelo por tarea',
+			'settings.miniOrchestration.roles.description' => 'Qué modelo (rol) se encarga de cada tipo de tarea.',
+			'settings.miniOrchestration.planner.title' => 'Planificador',
+			'settings.miniOrchestration.planner.mode' => 'Modo',
+			'settings.miniOrchestration.planner.modes.auto' => 'Planificar con el pensador',
+			'settings.miniOrchestration.planner.modes.off' => 'Un solo paso',
+			'settings.miniOrchestration.planner.requireConfirmLabel' => 'Confirmar el plan antes de ejecutarlo',
 			'settings.orchestration.title' => 'Orchestration',
-			'settings.orchestration.description' => 'Route chat tasks across your providers and models.',
-			'settings.orchestration.loading' => 'Loading orchestration settings…',
-			'settings.orchestration.loadError' => 'Could not load the orchestration settings.',
+			'settings.orchestration.description' => 'Reparte las tareas del chat entre tus proveedores y modelos.',
+			'settings.orchestration.loading' => 'Cargando los ajustes de orquestación…',
+			'settings.orchestration.loadError' => 'No se pudieron cargar los ajustes de orquestación.',
 			'settings.orchestration.retry' => 'Retry',
-			'settings.orchestration.enable.label' => 'Enable orchestration',
-			'settings.orchestration.enable.description' => 'Let the orchestrator pick a model per step instead of running everything on one provider.',
-			'settings.orchestration.pool.title' => 'Candidate pool',
-			'settings.orchestration.pool.description' => 'Models the router can pick from, each pinned to a cost tier.',
-			'settings.orchestration.pool.add' => 'Add candidate',
-			'settings.orchestration.pool.empty' => 'No candidates yet — add one to start routing.',
+			'settings.orchestration.enable.label' => 'Activar orquestación',
+			'settings.orchestration.enable.description' => 'Deja que el orquestador elija un modelo por paso en lugar de ejecutarlo todo en un único proveedor.',
+			'settings.orchestration.pool.title' => 'Grupo de candidatos',
+			'settings.orchestration.pool.description' => 'Modelos entre los que puede elegir el enrutador, cada uno asignado a un nivel de coste.',
+			'settings.orchestration.pool.add' => 'Añadir candidato',
+			'settings.orchestration.pool.empty' => 'Aún no hay candidatos — añade uno para empezar a enrutar.',
 			'settings.orchestration.pool.fields.label' => 'Label',
-			'settings.orchestration.pool.fields.labelPlaceholder' => 'e.g. SWE-2 Medium',
+			'settings.orchestration.pool.fields.labelPlaceholder' => 'p. ej. SWE-2 Medium',
 			'settings.orchestration.pool.fields.provider' => 'Provider',
 			'settings.orchestration.pool.fields.model' => 'Model',
-			'settings.orchestration.pool.fields.modelPlaceholder' => 'Select a model',
+			'settings.orchestration.pool.fields.modelPlaceholder' => 'Selecciona un modelo',
 			'settings.orchestration.pool.fields.effort' => 'Effort',
-			'settings.orchestration.pool.fields.effortDefault' => 'Provider default',
+			'settings.orchestration.pool.fields.effortDefault' => 'Predeterminado del proveedor',
 			'settings.orchestration.pool.fields.effortPlaceholder' => 'default',
 			'settings.orchestration.pool.fields.account' => 'Account',
-			'settings.orchestration.pool.fields.accountDefault' => 'Provider default',
+			'settings.orchestration.pool.fields.accountDefault' => 'Predeterminada del proveedor',
 			'settings.orchestration.pool.fields.redundantAccounts' => 'Cuentas redundantes',
 			'settings.orchestration.pool.fields.redundantAccountsNone' => 'No hay otras cuentas para este proveedor',
 			'settings.orchestration.pool.fields.tier' => 'Cost tier',
-			'settings.orchestration.pool.fields.remove' => 'Remove candidate',
+			'settings.orchestration.pool.fields.remove' => 'Eliminar candidato',
 			'settings.orchestration.pool.fields.moveUp' => 'Move up',
 			'settings.orchestration.pool.fields.moveDown' => 'Move down',
 			'settings.orchestration.tiers.free' => 'Free',
 			'settings.orchestration.tiers.cheap' => 'Cheap',
 			'settings.orchestration.tiers.mid' => 'Mid',
 			'settings.orchestration.tiers.premium' => 'Premium',
-			'settings.orchestration.rules.title' => 'Routing rules',
-			'settings.orchestration.rules.description' => 'Ordered candidates per task type — the first available one wins.',
-			'settings.orchestration.rules.addCandidate' => 'Add candidate…',
-			'settings.orchestration.rules.empty' => 'No candidates — nothing to route this task type to.',
+			'settings.orchestration.rules.title' => 'Reglas de enrutamiento',
+			'settings.orchestration.rules.description' => 'Candidatos ordenados por tipo de tarea — gana el primero disponible.',
+			'settings.orchestration.rules.addCandidate' => 'Añadir candidato…',
+			'settings.orchestration.rules.empty' => 'Sin candidatos — no hay adónde enrutar este tipo de tarea.',
 			'settings.orchestration.rules.missing' => '(removed)',
-			'settings.orchestration.rules.remove' => 'Remove candidate',
+			'settings.orchestration.rules.remove' => 'Eliminar candidato',
 			'settings.orchestration.rules.taskTypes.plan' => 'Planning',
-			'settings.orchestration.rules.taskTypes.quick' => 'Quick answers',
+			'settings.orchestration.rules.taskTypes.quick' => 'Respuestas rápidas',
 			'settings.orchestration.rules.taskTypes.research' => 'Research',
 			'settings.orchestration.rules.taskTypes.docs' => 'Documentation',
 			'settings.orchestration.rules.taskTypes.code' => 'Coding',
-			'settings.orchestration.rules.taskTypes.codeHard' => 'Complex coding',
+			'settings.orchestration.rules.taskTypes.codeHard' => 'Programación compleja',
 			'settings.orchestration.rules.taskTypes.test' => 'Testing',
 			'settings.orchestration.rules.taskTypes.review' => 'Review',
+			'settings.orchestration.rules.taskTypes.report' => 'Informe',
 			'settings.orchestration.planner.title' => 'Planner',
-			'settings.orchestration.planner.description' => 'How a request is split into routed steps.',
-			'settings.orchestration.planner.modeLabel' => 'Planning mode',
+			'settings.orchestration.planner.description' => 'Cómo se divide una solicitud en pasos enrutados.',
+			'settings.orchestration.planner.modeLabel' => 'Modo de planificación',
 			'settings.orchestration.planner.modes.auto' => 'Auto (LLM)',
 			'settings.orchestration.planner.modes.template' => 'Templates',
 			'settings.orchestration.planner.modes.off' => 'Off',
-			'settings.orchestration.planner.modeHints.auto' => 'The planner model decomposes each request into typed steps.',
-			'settings.orchestration.planner.modeHints.template' => 'Requests run through a fixed pipeline you pick below.',
-			'settings.orchestration.planner.modeHints.off' => 'No planning — the whole request is routed as a single step.',
-			'settings.orchestration.planner.candidateLabel' => 'Planner model',
-			'settings.orchestration.planner.candidateDescription' => 'Pool candidate used for plan generation and classification calls.',
-			'settings.orchestration.planner.candidatePlaceholder' => 'Select a pool candidate',
-			'settings.orchestration.planner.templates.title' => 'Pipeline templates',
+			'settings.orchestration.planner.modeHints.auto' => 'El modelo planificador descompone cada solicitud en pasos tipificados.',
+			'settings.orchestration.planner.modeHints.template' => 'Las solicitudes pasan por un pipeline fijo que eliges abajo.',
+			'settings.orchestration.planner.modeHints.off' => 'Sin planificación — toda la solicitud se enruta como un único paso.',
+			'settings.orchestration.planner.candidateLabel' => 'Modelo planificador',
+			'settings.orchestration.planner.candidateDescription' => 'Candidato del grupo usado para generar planes y para las llamadas de clasificación.',
+			'settings.orchestration.planner.candidatePlaceholder' => 'Selecciona un candidato del grupo',
+			'settings.orchestration.planner.templates.title' => 'Plantillas de pipeline',
 			'settings.orchestration.planner.templates.add' => 'Add template',
-			'settings.orchestration.planner.templates.namePlaceholder' => 'Template name',
+			'settings.orchestration.planner.templates.namePlaceholder' => 'Nombre de la plantilla',
 			'settings.orchestration.planner.templates.addStep' => 'Add step…',
-			'settings.orchestration.planner.templates.remove' => 'Remove template',
+			'settings.orchestration.planner.templates.remove' => 'Eliminar plantilla',
 			'settings.orchestration.planner.templates.removeStep' => 'Remove step',
-			'settings.orchestration.planner.templates.empty' => 'No templates yet.',
-			'settings.orchestration.planner.templates.emptySteps' => 'No steps yet — add one below.',
-			'settings.orchestration.planner.requireConfirm' => 'Confirm plan before running',
-			'settings.orchestration.planner.requireConfirmDescription' => 'Pause after planning so you can edit or disable steps on the plan card.',
-			'settings.orchestration.execution.title' => 'Execution limits',
-			'settings.orchestration.execution.description' => 'Guardrails for parallel runs and fix loops.',
-			'settings.orchestration.execution.maxParallel' => 'Max parallel steps',
-			'settings.orchestration.execution.maxParallelDescription' => 'How many subtasks may run at once (1–8).',
-			'settings.orchestration.execution.maxFixLoops' => 'Max fix loops',
-			'settings.orchestration.execution.maxFixLoopsDescription' => 'Retries when a step fails verification (0–5).',
-			'settings.orchestration.execution.onNoCandidate' => 'When no candidate is available',
-			'settings.orchestration.execution.onNoCandidateDescription' => 'Ask before falling back, or skip the step.',
+			'settings.orchestration.planner.templates.empty' => 'Aún no hay plantillas.',
+			'settings.orchestration.planner.templates.emptySteps' => 'Aún no hay pasos — añade uno abajo.',
+			'settings.orchestration.planner.requireConfirm' => 'Confirmar el plan antes de ejecutarlo',
+			'settings.orchestration.planner.requireConfirmDescription' => 'Pausar tras planificar para que puedas editar o desactivar pasos en la tarjeta del plan.',
+			'settings.orchestration.planner.checkpointLabel' => 'Autonomía',
+			'settings.orchestration.planner.checkpointModes.off' => 'Autónomo',
+			'settings.orchestration.planner.checkpointModes.perStep' => 'Por paso',
+			'settings.orchestration.planner.checkpointModes.everyN' => 'Cada N',
+			'settings.orchestration.planner.checkpointHints.off' => 'Las decisiones del supervisor se ejecutan sin preguntar (modo automático).',
+			'settings.orchestration.planner.checkpointHints.perStep' => 'Pedir aprobación antes de cada lote de pasos propuesto.',
+			'settings.orchestration.planner.checkpointHints.everyN' => 'Pedir aprobación cada N pasos completados.',
+			'settings.orchestration.planner.checkpointIntervalLabel' => 'Pasos entre puntos de control (1–50)',
+			'settings.orchestration.execution.title' => 'Límites de ejecución',
+			'settings.orchestration.execution.description' => 'Salvaguardas para ejecuciones en paralelo y bucles de corrección.',
+			'settings.orchestration.execution.maxParallel' => 'Máx. pasos en paralelo',
+			'settings.orchestration.execution.maxParallelDescription' => 'Cuántas subtareas pueden ejecutarse a la vez (1–8).',
+			'settings.orchestration.execution.maxFixLoops' => 'Máx. bucles de corrección',
+			'settings.orchestration.execution.maxFixLoopsDescription' => 'Reintentos cuando un paso no supera la verificación (0–5).',
+			'settings.orchestration.execution.onNoCandidate' => 'Cuando no hay ningún candidato disponible',
+			'settings.orchestration.execution.onNoCandidateDescription' => 'Preguntar antes de recurrir a una alternativa u omitir el paso.',
 			'settings.orchestration.execution.onNoCandidateOptions.ask' => 'Ask',
 			'settings.orchestration.execution.onNoCandidateOptions.skip' => 'Skip step',
-			'settings.orchestration.execution.useWorktree' => 'Isolated worktree',
-			'settings.orchestration.execution.useWorktreeDescription' => 'Run all delegated steps in one shared git worktree instead of the project directory.',
-			'settings.orchestration.save.unsaved' => 'Unsaved changes',
+			'settings.orchestration.execution.useWorktree' => 'Worktree aislado',
+			'settings.orchestration.execution.useWorktreeDescription' => 'Ejecuta todos los pasos delegados en un único worktree de git compartido en lugar del directorio del proyecto.',
+			'settings.orchestration.execution.maxSupervisorIterations' => 'Máx. iteraciones del supervisor',
+			'settings.orchestration.execution.maxSupervisorIterationsDescription' => 'Límite de rondas de decisión del supervisor en modo automático (1–100); al alcanzarlo, la ejecución termina con un informe parcial.',
+			'settings.orchestration.execution.maxAttempts' => 'Máx. intentos por paso',
+			'settings.orchestration.execution.maxAttemptsDescription' => 'Presupuesto total de intentos para un paso entre carriles y reintentos (1–50).',
+			'settings.orchestration.execution.stepTimeoutMs' => 'Tiempo límite por paso (ms)',
+			'settings.orchestration.execution.stepTimeoutMsDescription' => 'Tiempo límite por intento de la ejecución secundaria en milisegundos; 0 lo desactiva.',
+			'settings.orchestration.execution.runTimeoutMs' => 'Tiempo límite de ejecución (ms)',
+			'settings.orchestration.execution.runTimeoutMsDescription' => 'Tiempo límite global de ejecución del plan en milisegundos; 0 lo desactiva.',
+			'settings.orchestration.execution.retryBackoffBaseMs' => 'Base del backoff de reintentos (ms)',
+			'settings.orchestration.execution.retryBackoffBaseMsDescription' => 'Base del backoff exponencial entre reintentos en el mismo carril (jitter completo).',
+			'settings.orchestration.execution.retryBudgetTitle' => 'Presupuesto de reintentos por tipo de fallo',
+			'settings.orchestration.execution.retryBudgetDescription' => 'Reintentos en el mismo carril antes de conmutar o enfriar (0–5).',
+			'settings.orchestration.execution.retryClasses.rateLimit' => 'Límite de tasa',
+			'settings.orchestration.execution.retryClasses.quota' => 'Cuota',
+			'settings.orchestration.execution.retryClasses.auth' => 'Autenticación',
+			'settings.orchestration.execution.retryClasses.timeout' => 'Tiempo agotado',
+			'settings.orchestration.execution.retryClasses.transient' => 'Transitorio',
+			'settings.orchestration.save.unsaved' => 'Cambios sin guardar',
 			'settings.orchestration.save.save' => 'Save',
 			'settings.orchestration.save.saving' => 'Saving…',
 			'settings.orchestration.save.saved' => 'Saved',
 			'settings.orchestration.save.discard' => 'Discard',
 			'settings.orchestration.save.error' => 'Save failed',
-			'settings.orchestration.save.emptyPool' => 'Add at least one candidate before saving.',
+			'settings.orchestration.save.emptyPool' => 'Añade al menos un candidato antes de guardar.',
 			'settings.notifications.title' => 'Notificaciones',
 			'settings.notifications.description' => 'Controla qué eventos de notificación recibes.',
 			'settings.notifications.webPush.title' => 'Notificar en este navegador',
@@ -8407,8 +10224,17 @@ extension on TranslationsEs {
 			'settings.notifications.events.actionRequired' => 'Acción requerida',
 			'settings.notifications.events.stop' => 'Ejecución detenida',
 			'settings.notifications.events.error' => 'Ejecución fallida',
-			'settings.notifications.channels.discord' => 'Discord',
+			'settings.notifications.messaging.title' => 'Aprobaciones por mensajería',
+			'settings.notifications.messaging.description' => 'Aprueba o deniega las solicitudes de permisos de los agentes desde Telegram y recibe notificaciones de ejecución en Discord.',
+			'settings.notifications.messaging.enabled' => 'Activado',
+			'settings.notifications.messaging.save' => 'Guardar',
+			'settings.notifications.messaging.test' => 'Probar',
+			'settings.notifications.messaging.pair' => 'Vincular',
+			'settings.notifications.messaging.telegramToken' => 'Token del bot de @BotFather (123456:ABC…)',
+			'settings.notifications.messaging.telegramHint' => 'Envía cualquier mensaje a tu bot y luego vincula el chat abajo.',
+			'settings.notifications.messaging.discordWebhook' => 'https://discord.com/api/webhooks/…',
 			'settings.notifications.channels.telegram' => 'Telegram',
+			'settings.notifications.channels.discord' => 'Discord',
 			'settings.notifications.unpair' => 'Desvincular',
 			'settings.appearanceSettings.darkMode.label' => 'Modo oscuro',
 			'settings.appearanceSettings.darkMode.description' => 'Alterna entre el tema claro y el oscuro',
@@ -8549,8 +10375,6 @@ extension on TranslationsEs {
 			'settings.agents.account.cursor.description' => 'Editor de código con IA Cursor',
 			'settings.agents.account.codex.description' => 'Asistente de IA Codex de OpenAI',
 			'settings.agents.account.opencode.description' => 'Asistente CLI OpenCode',
-			_ => null,
-		} ?? switch (path) {
 			'settings.agents.account.commandcode.description' => 'Asistente CLI Command Code',
 			'settings.agents.account.antigravity.description' => 'Asistente CLI Antigravity',
 			'settings.agents.account.devin.description' => 'Asistente CLI Devin',
@@ -8569,6 +10393,20 @@ extension on TranslationsEs {
 			'settings.agents.logout.success' => 'Sesión cerrada',
 			'settings.agents.logout.failed' => 'No se pudo cerrar la sesión',
 			'settings.agents.error' => ({required Object error}) => 'Error: ${error}',
+			'settings.agents.accounts.title' => 'Cuentas con nombre',
+			'settings.agents.accounts.description' => 'Conjuntos de credenciales adicionales. Una sesión asociada a una cuenta inicia la CLI con su directorio de configuración aislado. Inicia sesión ejecutando una vez la CLI del proveedor con las variables de entorno mostradas.',
+			'settings.agents.accounts.sharedCli' => 'Todas las cuentas comparten una instalación de la CLI — actualízala en la tarjeta de conexión de arriba.',
+			'settings.agents.accounts.loading' => 'Cargando cuentas…',
+			'settings.agents.accounts.kDefault' => 'Predeterminada',
+			'settings.agents.accounts.usage' => ({required Object tokens}) => '${tokens} tokens',
+			'settings.agents.accounts.usageButton' => 'Uso',
+			'settings.agents.accounts.showUsage' => 'Mostrar uso de tokens',
+			'settings.agents.accounts.makeDefault' => 'Establecer como predeterminada',
+			'settings.agents.accounts.remove' => 'Eliminar cuenta',
+			'settings.agents.accounts.newLabel' => 'Nombre de la cuenta (p. ej. Trabajo)',
+			'settings.agents.accounts.add' => 'Añadir cuenta',
+			'settings.agents.accounts.autoSwitch.label' => 'Cambiar de cuenta automáticamente al alcanzar el límite',
+			'settings.agents.accounts.autoSwitch.description' => 'Cuando una cuenta alcanza su límite de uso, la sesión pasa a otra cuenta del mismo agente que aún tenga cuota, incluso si elegiste manualmente la agotada. Nunca cambia a otro agente. Claude y Codex conservan la conversación; los demás agentes solo cambian en chats nuevos.',
 			'settings.permissions.title' => 'Ajustes de permisos',
 			'settings.permissions.permissionMode.title' => 'Modo de permisos',
 			'settings.permissions.permissionMode.description' => ({required Object provider}) => 'Modo de permiso predeterminado para nuevas sesiones de ${provider}. Aún puedes anularlo para una sesión individual.',
@@ -8610,8 +10448,8 @@ extension on TranslationsEs {
 			'settings.mcpServers.help.description' => 'Codex admite servidores MCP basados en stdio. Puedes añadir servidores que amplíen las capacidades de Codex con herramientas y recursos adicionales.',
 			'settings.mcpServers.deleteConfirm.description' => ({required Object serverName}) => '«${serverName}» se eliminará de la configuración del proveedor.',
 			'settings.mcpServers.deleteConfirm.title' => '¿Eliminar el servidor MCP?',
-			'settings.quota.settings.tab' => 'Control Center',
-			'settings.quota.settings.title' => 'Control Center',
+			'settings.quota.settings.tab' => 'Centro de control',
+			'settings.quota.settings.title' => 'Centro de control',
 			'settings.quota.settings.description' => 'Umbrales de alerta, política de enrutamiento y cuentas consultadas para cuotas.',
 			'settings.quota.settings.saved' => 'Guardado',
 			'settings.quota.settings.alertsSection' => 'Alertas',
@@ -8677,13 +10515,56 @@ extension on TranslationsEs {
 			'settings.workspaces.remove' => 'Quitar espacio de trabajo',
 			'settings.workspaces.title' => 'Espacios de trabajo',
 			'settings.workspaces.pathRequired' => 'La ruta es obligatoria',
+			'settings.stt.title' => 'Entrada de voz (voz a texto)',
+			'settings.stt.description' => 'Endpoint /audio/transcriptions compatible con Whisper (OpenAI, whisper.cpp, faster-whisper, Speaches). Activa el botón de micrófono en el editor.',
+			'settings.stt.configured' => 'configurado',
+			'settings.stt.endpoint' => 'URL del endpoint (p. ej. https://api.openai.com/v1)',
+			'settings.stt.apiKey' => 'Clave de API',
+			'settings.stt.model' => 'Modelo (predeterminado: whisper-1)',
+			'settings.stt.save' => 'Guardar',
+			'settings.schedules.title' => 'Programaciones',
+			'settings.schedules.description' => 'Ejecuciones recurrentes de agentes según un calendario cron. Se lanzan sin supervisión y con los permisos omitidos.',
+			'settings.schedules.preventSleep' => 'Evitar la suspensión mientras se ejecutan agentes',
+			_ => null,
+		} ?? switch (path) {
+			'settings.schedules.preventSleepHint' => 'En escritorio la pantalla se mantiene encendida; en el navegador se usa un bloqueo de activación de pantalla.',
+			'settings.schedules.kNew' => 'Nueva programación',
+			'settings.schedules.loading' => 'Cargando…',
+			'settings.schedules.empty' => 'Aún no hay programaciones.',
+			'settings.schedules.project' => 'Proyecto',
+			'settings.schedules.provider' => 'Proveedor',
+			'settings.schedules.cron' => 'Cron (min hora día mes día de la semana)',
+			'settings.schedules.nextRun' => ({required Object time}) => 'Próxima ejecución: ${time}',
+			'settings.schedules.cronInvalid' => 'No hay próximas ejecuciones para esta expresión',
+			'settings.schedules.prompt' => 'Prompt',
+			'settings.schedules.useWorktree' => 'Ejecutar en un worktree nuevo',
+			'settings.schedules.catchUp' => 'Recuperar ejecuciones perdidas',
+			'settings.schedules.failures' => ({required Object count}) => '${count} fallos',
+			'settings.schedules.disabled' => 'desactivada',
+			'settings.schedules.history' => 'Historial',
+			'settings.schedules.runNow' => 'Ejecutar ahora',
+			'settings.schedules.delete' => 'Eliminar',
+			'settings.schedules.noRuns' => 'Aún no hay ejecuciones.',
+			'settings.schedules.next' => 'próxima',
+			'settings.schedules.create' => 'Crear',
+			'settings.schedules.toggleSchedule' => 'Activar programación',
+			'settings.mcpTokens.title' => 'Tokens del servidor MCP de DDAgent',
+			'settings.mcpTokens.description' => 'Las herramientas externas (Claude Desktop, OpenClaw) llaman a las herramientas de DDAgent mediante POST /mcp con uno de estos tokens bearer.',
+			'settings.mcpTokens.dismiss' => 'Descartar',
+			'settings.mcpTokens.labelPlaceholder' => 'Nombre del token (p. ej. Claude Desktop)',
+			'settings.mcpTokens.create' => 'Crear',
+			'settings.mcpTokens.empty' => 'Aún no hay tokens MCP.',
+			'settings.mcpTokens.lastUsed' => ({required Object time}) => 'usado ${time}',
+			'settings.mcpTokens.neverUsed' => 'nunca usado',
 			'settings.about.supportTitle' => 'Apoya el proyecto',
 			'settings.about.buyMeACoffee' => 'Invítame a un café',
+			'settings.about.tryHosted' => 'Prueba DDAgent Hosted',
 			'settings.about.learnMore' => 'Más información',
+			'settings.about.proFeatures' => 'Funciones de DDAgent Pro',
 			'settings.about.pro.syncSettings' => 'Sincronizar ajustes',
 			'settings.about.pro.teamManagement' => 'Gestión de equipo',
-			'settings.about.proFeatures' => 'Funciones de DDAgent Pro',
-			'settings.about.tryHosted' => 'Prueba DDAgent Hosted',
+			'settings.about.pro.syncSettingsDescription' => 'Mantén tus preferencias, configuraciones MCP y tema sincronizados en todos tus entornos.',
+			'settings.about.pro.teamManagementDescription' => 'Varios usuarios, acceso basado en roles y proyectos compartidos para tu equipo.',
 			'settings.about.versionInfo' => 'Información de versión',
 			'settings.about.client' => 'Aplicación',
 			'settings.about.server' => 'Servidor',
@@ -8691,6 +10572,49 @@ extension on TranslationsEs {
 			'settings.about.platformDesktop' => 'Escritorio',
 			'settings.about.platformWeb' => 'Web',
 			'settings.about.unknown' => 'desconocida',
+			'settings.about.copyright' => '© 2026 DDAgent — todos los derechos reservados',
+			'settings.about.tagline' => 'Interfaz de código abierto para asistentes de programación con IA',
+			'settings.about.docs' => 'Documentación',
+			'settings.about.hostedDescription' => 'Colaboración en equipo, configuraciones MCP compartidas, sincronización de ajustes entre entornos e infraestructura gestionada.',
+			'settings.shortcuts.description' => 'Todos los atajos de teclado de DDAgent, separados por plataforma.',
+			'settings.shortcuts.action' => 'Acción',
+			'settings.shortcuts.winLinux' => 'Windows / Linux',
+			'settings.shortcuts.mac' => 'macOS',
+			'settings.shortcuts.navigation' => 'Navegación',
+			'settings.shortcuts.navWorkspace' => 'Ir al espacio de trabajo',
+			'settings.shortcuts.navTasks' => 'Ir a Tareas / Git',
+			'settings.shortcuts.navGit' => 'Ir a Git',
+			'settings.shortcuts.navFocus' => 'Alternar modo enfoque (barra lateral)',
+			'settings.shortcuts.navSwitcher' => 'Selector rápido de sesiones',
+			'settings.shortcuts.navPalette' => 'Paleta de comandos',
+			'settings.shortcuts.navSettings' => 'Abrir ajustes',
+			'settings.shortcuts.navClose' => 'Cerrar diálogo / restaurar paneles divididos',
+			'settings.shortcuts.composer' => 'Editor',
+			'settings.shortcuts.compSend' => 'Enviar mensaje',
+			'settings.shortcuts.compNewline' => 'Nueva línea',
+			'settings.shortcuts.compNav' => 'Navegar por las sugerencias',
+			'settings.shortcuts.compAccept' => 'Aceptar sugerencia',
+			'settings.shortcuts.compCloseSuggest' => 'Cerrar sugerencias',
+			'settings.shortcuts.transcript' => 'Transcripción',
+			'settings.shortcuts.trCopy' => 'Copiar texto seleccionado',
+			'settings.shortcuts.trClose' => 'Cerrar búsqueda / panel de revisión',
+			'settings.shortcuts.terminal' => 'Terminal',
+			'settings.shortcuts.termCopy' => 'Copiar selección',
+			'settings.shortcuts.termInterrupt' => 'Interrumpir proceso (sin selección)',
+			'settings.shortcuts.termPaste' => 'Pegar',
+			'settings.shortcuts.termSelectAll' => 'Seleccionar todo',
+			'settings.shortcuts.editor' => 'Editor',
+			'settings.shortcuts.edSave' => 'Guardar archivo',
+			'settings.shortcuts.edSaveAll' => 'Guardar todos los archivos',
+			'settings.shortcuts.edClose' => 'Cerrar pestaña',
+			'settings.shortcuts.edNextTab' => 'Pestaña siguiente',
+			'settings.shortcuts.edPrevTab' => 'Pestaña anterior',
+			'settings.shortcuts.edIndent' => 'Aumentar / reducir sangría',
+			'settings.shortcuts.palette' => 'Paleta de comandos',
+			'settings.shortcuts.palNav' => 'Navegar por los elementos',
+			'settings.shortcuts.palRun' => 'Ejecutar / abrir',
+			'settings.shortcuts.palBack' => 'Atrás (búsqueda vacía)',
+			'settings.shortcuts.palClose' => 'Cerrar',
 			'sidebar.projects.title' => 'Proyectos',
 			'sidebar.projects.newProject' => 'Nuevo proyecto',
 			'sidebar.projects.deleteProject' => 'Quitar proyecto',
@@ -8711,6 +10635,10 @@ extension on TranslationsEs {
 			'sidebar.projects.runClaudeCli' => 'Ejecuta Claude CLI en el directorio de un proyecto para empezar',
 			'sidebar.app.title' => 'DDAgent',
 			'sidebar.app.subtitle' => 'Interfaz de asistente de programación con IA',
+			'sidebar.panel.open' => 'Panel',
+			'sidebar.panel.newChat' => 'Nuevo chat',
+			'sidebar.panel.navigation' => 'Navegación',
+			'sidebar.panel.sessions' => 'Sesiones',
 			'sidebar.sessions.title' => 'Sesiones',
 			'sidebar.sessions.newSession' => 'Nueva sesión',
 			'sidebar.sessions.deleteSession' => 'Eliminar sesión',
@@ -8766,6 +10694,13 @@ extension on TranslationsEs {
 			'sidebar.actions.reportIssue' => 'Informar de un problema',
 			'sidebar.actions.starOnGithub' => 'Dar estrella en GitHub',
 			'sidebar.actions.buyMeACoffee' => 'Invítame a un café',
+			'sidebar.workspace.title' => 'Cambiar el espacio de trabajo de la sesión',
+			'sidebar.workspace.description' => 'El agente ejecuta sus próximos turnos en este directorio. El historial de sesión existente se conserva.',
+			'sidebar.workspace.pathLabel' => 'Ruta del espacio de trabajo',
+			'sidebar.workspace.pathRequired' => 'La ruta del espacio de trabajo es obligatoria.',
+			'sidebar.workspace.submit' => 'Cambiar espacio de trabajo',
+			'sidebar.workspace.saving' => 'Cambiando…',
+			'sidebar.workspace.changeAction' => 'Cambiar espacio de trabajo',
 			'sidebar.branding.openSource' => 'Código abierto',
 			'sidebar.status.active' => 'Activa',
 			'sidebar.status.inactive' => 'Inactiva',
@@ -8791,6 +10726,8 @@ extension on TranslationsEs {
 			'sidebar.messages.deleteSessionError' => 'Error al eliminar la sesión. Inténtalo de nuevo.',
 			'sidebar.messages.renameSessionFailed' => 'No se pudo renombrar la sesión. Inténtalo de nuevo.',
 			'sidebar.messages.renameSessionError' => 'Error al renombrar la sesión. Inténtalo de nuevo.',
+			'sidebar.messages.changeWorkspaceFailed' => 'Error al cambiar de espacio de trabajo. Inténtalo de nuevo.',
+			'sidebar.messages.changeWorkspaceError' => 'Error al cambiar de espacio de trabajo. Inténtalo de nuevo.',
 			'sidebar.messages.deleteProjectFailed' => 'No se pudo quitar el proyecto. Inténtalo de nuevo.',
 			'sidebar.messages.deleteProjectError' => 'Error al quitar el proyecto. Inténtalo de nuevo.',
 			'sidebar.messages.createProjectFailed' => 'No se pudo crear el proyecto. Inténtalo de nuevo.',
@@ -8801,8 +10738,6 @@ extension on TranslationsEs {
 			'sidebar.messages.restoreProjectError' => 'Error al restaurar el proyecto. Inténtalo de nuevo.',
 			'sidebar.messages.restoreSessionFailed' => 'No se pudo restaurar la sesión. Inténtalo de nuevo.',
 			'sidebar.messages.restoreSessionError' => 'Error al restaurar la sesión. Inténtalo de nuevo.',
-			'sidebar.messages.changeWorkspaceFailed' => 'Error al cambiar de espacio de trabajo. Inténtalo de nuevo.',
-			'sidebar.messages.changeWorkspaceError' => 'Error al cambiar de espacio de trabajo. Inténtalo de nuevo.',
 			'sidebar.messages.bulkDeleteSessionsFailed' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: 'Error al eliminar ${count} sesión. Inténtalo de nuevo.', other: 'Error al eliminar ${count} sesiones. Inténtalo de nuevo.', ), 
 			'sidebar.version.updateAvailable' => 'Actualización disponible',
 			'sidebar.version.restartRequired' => 'Actualización instalada — reinicia el servidor para aplicarla',
@@ -8831,6 +10766,12 @@ extension on TranslationsEs {
 			'sidebar.search.runningPlaceholder' => 'Buscar sesiones activas...',
 			'sidebar.search.matches' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: '${count} coincidencia', other: '${count} coincidencias', ), 
 			'sidebar.search.projectsScanned' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: '${count} proyecto examinado', other: '${count} proyectos examinados', ), 
+			'sidebar.recent.title' => 'Conversaciones recientes',
+			'sidebar.recent.emptyTitle' => 'Aún no hay conversaciones',
+			'sidebar.recent.emptyDescription' => 'Tus conversaciones actualizadas más recientemente aparecerán aquí.',
+			'sidebar.recent.loadFailed' => 'No se pudieron cargar las conversaciones recientes',
+			'sidebar.recent.loadMore' => 'Cargar conversaciones anteriores',
+			'sidebar.recent.loadingMore' => 'Cargando más...',
 			'sidebar.deleteConfirmation.deleteProject' => 'Quitar proyecto',
 			'sidebar.deleteConfirmation.deleteSession' => 'Eliminar sesión',
 			'sidebar.deleteConfirmation.confirmDelete' => '¿Qué quieres hacer con',
@@ -8854,23 +10795,6 @@ extension on TranslationsEs {
 			'sidebar.zones.thisWeek' => 'Esta semana',
 			'sidebar.zones.showMore' => ({required Object count}) => 'Mostrar ${count} más',
 			'sidebar.zones.showLess' => 'Mostrar menos',
-			'sidebar.panel.open' => 'Panel',
-			'sidebar.panel.newChat' => 'Nuevo chat',
-			'sidebar.panel.navigation' => 'Navegación',
-			'sidebar.panel.sessions' => 'Sesiones',
-			'sidebar.workspace.title' => 'Cambiar el espacio de trabajo de la sesión',
-			'sidebar.workspace.description' => 'El agente ejecuta sus próximos turnos en este directorio. El historial de sesión existente se conserva.',
-			'sidebar.workspace.pathLabel' => 'Ruta del espacio de trabajo',
-			'sidebar.workspace.pathRequired' => 'La ruta del espacio de trabajo es obligatoria.',
-			'sidebar.workspace.submit' => 'Cambiar espacio de trabajo',
-			'sidebar.workspace.saving' => 'Cambiando…',
-			'sidebar.workspace.changeAction' => 'Cambiar espacio de trabajo',
-			'sidebar.recent.title' => 'Conversaciones recientes',
-			'sidebar.recent.emptyTitle' => 'Aún no hay conversaciones',
-			'sidebar.recent.emptyDescription' => 'Tus conversaciones actualizadas más recientemente aparecerán aquí.',
-			'sidebar.recent.loadFailed' => 'No se pudieron cargar las conversaciones recientes',
-			'sidebar.recent.loadMore' => 'Cargar conversaciones anteriores',
-			'sidebar.recent.loadingMore' => 'Cargando más...',
 			'sidebar.tabs.board' => 'Panel de agentes',
 			'sidebar.tabs.files' => 'Archivos',
 			'sidebar.tabs.git' => 'Control de código',
@@ -8967,11 +10891,11 @@ extension on TranslationsEs {
 			'tasks.buttons.prdsAvailable' => ({required Object count}) => '${count} PRD(s) disponibles',
 			'tasks.prd.modified' => ({required Object date}) => 'Modificado: ${date}',
 			'tasks.prd.editorTitle' => ({required Object name}) => 'PRD — ${name}',
-			'tasks.prd.fileExistsMessage' => ({required Object name}) => 'Ya existe un PRD llamado «${name}». ¿Quieres sobrescribirlo?',
-			'tasks.prd.fileExistsTitle' => 'El archivo ya existe',
 			'tasks.prd.newFile' => 'archivo nuevo',
-			'tasks.prd.parse' => 'Analizar PRD',
 			'tasks.prd.template' => 'Plantilla',
+			'tasks.prd.parse' => 'Analizar PRD',
+			'tasks.prd.fileExistsTitle' => 'El archivo ya existe',
+			'tasks.prd.fileExistsMessage' => ({required Object name}) => 'Ya existe un PRD llamado «${name}». ¿Quieres sobrescribirlo?',
 			'tasks.prd.fileNameHint' => 'nombre de archivo (p. ej., prd.txt)',
 			'tasks.prd.saved' => 'PRD guardado',
 			'tasks.prd.tasksGenerated' => 'Tareas generadas desde el PRD',
@@ -9005,6 +10929,8 @@ extension on TranslationsEs {
 			'tasks.board.card.delete' => 'Eliminar',
 			'tasks.board.card.openSession' => 'Abrir sesión',
 			'tasks.board.card.pullRequest' => 'Pull request',
+			'tasks.board.card.edit' => 'Editar',
+			'tasks.board.card.moveTo' => 'Mover a',
 			'tasks.board.dialog.createTitle' => 'Nueva tarjeta',
 			'tasks.board.dialog.editTitle' => 'Editar tarjeta',
 			'tasks.board.dialog.titleLabel' => 'Título',
@@ -9027,6 +10953,16 @@ extension on TranslationsEs {
 			'tasks.board.deleteConfirm.description' => ({required Object cardTitle}) => '«${cardTitle}» se eliminará permanentemente.',
 			'tasks.board.deleteConfirm.title' => '¿Eliminar la tarjeta?',
 			'tasks.board.project' => 'Proyecto',
+			'tasks.board.assignee.label' => 'Responsable',
+			'tasks.board.assignee.all' => 'Todos los responsables',
+			'tasks.board.assignee.unassigned' => 'Sin asignar',
+			'tasks.board.presence.online' => ({required Object count}) => '${count} en línea',
+			'tasks.board.activity.title' => 'Actividad',
+			'tasks.board.activity.empty' => 'Aún no hay actividad',
+			'tasks.board.comments.label' => 'Comentarios',
+			'tasks.board.comments.placeholder' => 'Escribe un comentario…',
+			'tasks.board.comments.send' => 'Enviar',
+			'tasks.board.comments.unknownAuthor' => 'Alguien',
 			'tasks.card.dependsOnList' => ({required Object tasks}) => 'Depende de: ${tasks}',
 			'tasks.card.dependsOnTooltip' => ({required Object id}) => 'Tarea ${id}',
 			'tasks.card.highPriority' => 'Prioridad alta',
@@ -9063,8 +10999,6 @@ extension on TranslationsEs {
 			'tasks.nextTask.feature3' => '- Vistas kanban y lista para el día a día.',
 			'tasks.nextTask.hideDetails' => 'Ocultar detalles',
 			'tasks.nextTask.initialize' => 'Inicializar',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.nextTask.noPending' => 'No hay tareas pendientes',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI no está configurado',
 			'tasks.nextTask.review' => 'Revisar',
@@ -9097,11 +11031,24 @@ extension on TranslationsEs {
 			'tasks.taskDetail.testStrategy' => 'Estrategia de pruebas',
 			'tasks.taskDetail.titleRequired' => 'El título es obligatorio',
 			'tasks.taskDetail.updateFailed' => 'No se pudo actualizar la tarea',
-			'tasks.taskDetail.deleteConfirmMessage' => ({required Object id}) => 'Se eliminará la tarea n.º ${id}. Esta acción no se puede deshacer.',
 			'tasks.taskDetail.notFound' => 'Tarea no encontrada',
 			'tasks.taskDetail.subtasks' => 'Subtareas',
+			'tasks.taskDetail.deleteConfirmMessage' => ({required Object id}) => 'Se eliminará la tarea n.º ${id}. Esta acción no se puede deshacer.',
 			'tasks.taskDetail.idCopied' => 'ID de tarea copiado',
 			'tasks.toasts.statusInProgress' => ({required Object id}) => 'Tarea ${id} marcada como en curso',
+			'tasks.taskmaster.noProjectHint' => 'Primero añade un proyecto y luego crea tareas para él.',
+			'tasks.taskmaster.sort.statusAz' => 'Estado (A-Z)',
+			'tasks.taskmaster.sort.statusZa' => 'Estado (Z-A)',
+			_ => null,
+		} ?? switch (path) {
+			'tasks.taskmaster.installedVersion' => ({required Object version}) => 'Instalado: ${version}',
+			'tasks.taskmaster.initFailed' => 'No se pudo inicializar TaskMaster',
+			'tasks.taskmaster.prd.fileNameRequired' => 'Indica un nombre de archivo para el PRD.',
+			'tasks.taskmaster.prd.contentRequired' => 'Añade contenido antes de guardar.',
+			'tasks.taskmaster.prd.overwrite' => 'Sobrescribir',
+			'tasks.taskmaster.prd.contentHint' => '# Documento de requisitos del producto…',
+			'tasks.taskmaster.detail.dependenciesLabel' => 'Dependencias (ID separados por comas)',
+			'tasks.taskmaster.untitledTask' => 'Tarea sin título',
 			'knowledge.title' => 'Conocimiento',
 			'knowledge.tabs.dashboard' => 'Panel',
 			'knowledge.tabs.memories' => 'Recuerdos',
@@ -9177,216 +11124,264 @@ extension on TranslationsEs {
 			'knowledge.tags.all' => 'Todas las etiquetas',
 			'knowledge.tags.manage' => 'Gestionar etiquetas',
 			'knowledge.tags.none' => 'Aún no hay etiquetas.',
-			'knowledge.contextBudget.tokens' => ({required Object tokens, required Object budget}) => '~${tokens} / ${budget} tok',
+			'knowledge.graph.truncated' => 'truncado',
+			'knowledge.importAll.title' => 'Importar todo a DDAgent',
+			'knowledge.importAll.projectsScanned' => ({required Object count}) => 'Proyectos examinados: ${count}',
+			'knowledge.importAll.skillsFound' => ({required Object found, required Object newSkills}) => 'Skills de agentes encontradas: ${found} (nuevas: ${newSkills})',
+			'knowledge.importAll.rulesSummary' => ({required Object total, required Object duplicates}) => 'Reglas: ${total} · grupos duplicados: ${duplicates}',
+			'knowledge.importAll.mergeDuplicates' => 'Fusionar entradas duplicadas',
+			'knowledge.importAll.mergeDuplicatesHint' => 'Combina las filas duplicadas en DDAgent (no los archivos)',
+			'knowledge.importAll.action' => 'Importar todo',
+			'knowledge.importAll.readOnlyNotice' => 'Solo lectura para tus agentes: esto importa en la base de datos propia de DDAgent y NO modifica ni elimina ningún archivo ni configuración de las CLI. Las opciones de abajo solo cambian datos de DDAgent.',
+			'knowledge.importAll.dryRunNote' => 'Simulación: aún no se ha escrito nada.',
+			'knowledge.importAll.importedNote' => 'Importado.',
+			'knowledge.importAll.result' => ({required Object rules, required Object newSkills, required Object removed, required Object promoted}) => 'Importado: reglas: ${rules}, habilidades nuevas: ${newSkills}, eliminadas: ${removed}, promovidas: ${promoted}',
+			'knowledge.importAll.description' => 'Analiza todos los proyectos e importa las habilidades de tus agentes a la base de conocimiento. Solo lectura para tus agentes: no se cambia nada en las CLI.',
+			'knowledge.migrate.title' => 'Migrar reglas existentes',
+			'knowledge.migrate.scanned' => ({required Object count}) => 'Se examinaron ${count} proyectos.',
+			'knowledge.migrate.rulesSummary' => ({required Object total, required Object critical}) => 'Reglas: ${total} en total, ${critical} críticas.',
+			'knowledge.migrate.duplicates' => ({required Object count}) => 'Grupos duplicados entre proyectos: ${count}',
+			'knowledge.migrate.removedPromoted' => ({required Object removed, required Object promoted}) => 'Eliminadas: ${removed}, promovidas: ${promoted}',
+			'knowledge.migrate.mergeDuplicates' => 'Fusionar duplicados',
+			'knowledge.migrate.dryRunNote' => 'Simulación: aún no se ha cambiado nada.',
+			'knowledge.migrate.applied' => 'Aplicado.',
+			'knowledge.importSkills.title' => 'Importar skills de agentes',
+			'knowledge.importSkills.found' => ({required Object count}) => 'Se encontraron ${count} skills en tus agentes.',
+			'knowledge.importSkills.summary' => ({required Object imported, required Object skipped}) => 'Nuevas: ${imported} · omitidas: ${skipped}',
+			'knowledge.importSkills.dryRunHint' => 'Importa las habilidades globales/predeterminadas de tus agentes (usuario, sistema, plugin) como habilidades de conocimiento. Simulación: aún no se ha importado nada.',
+			'knowledge.importSkills.importedNote' => 'Importado a la base de conocimiento.',
 			'knowledge.critical.make' => 'Marcar como crítica',
 			'knowledge.critical.makeAll' => 'Marcar todas las reglas como críticas',
 			'knowledge.critical.makeAllHint' => 'Las añade al presupuesto de contexto inyectado',
-			'knowledge.errors.importFailed' => ({required Object error}) => 'La importación falló: ${error}',
-			'knowledge.errors.migrationFailed' => ({required Object error}) => 'La migración falló: ${error}',
-			'knowledge.graph.truncated' => 'truncado',
-			'knowledge.importAll.action' => 'Importar todo',
-			'knowledge.importAll.mergeDuplicates' => 'Fusionar entradas duplicadas',
-			'knowledge.importAll.mergeDuplicatesHint' => 'Combina las filas duplicadas en DDAgent (no los archivos)',
-			'knowledge.importAll.projectsScanned' => ({required Object count}) => 'Proyectos examinados: ${count}',
-			'knowledge.importAll.rulesSummary' => ({required Object total, required Object duplicates}) => 'Reglas: ${total} · grupos duplicados: ${duplicates}',
-			'knowledge.importAll.skillsFound' => ({required Object found, required Object newSkills}) => 'Skills de agentes encontradas: ${found} (nuevas: ${newSkills})',
-			'knowledge.importAll.title' => 'Importar todo a DDAgent',
-			'knowledge.importSkills.found' => ({required Object count}) => 'Se encontraron ${count} skills en tus agentes.',
-			'knowledge.importSkills.summary' => ({required Object imported, required Object skipped}) => 'Nuevas: ${imported} · omitidas: ${skipped}',
-			'knowledge.importSkills.title' => 'Importar skills de agentes',
+			'knowledge.contextBudget.tokens' => ({required Object tokens, required Object budget}) => '~${tokens} / ${budget} tok',
+			'knowledge.contextBudget.title' => 'Contexto de reglas (siempre incluido)',
+			'knowledge.contextBudget.selectProject' => 'Selecciona un proyecto para ver el tamaño de su contexto crítico.',
 			'knowledge.linkOptions.memory' => ({required Object title}) => 'Memoria: ${title}',
-			'knowledge.linkOptions.personal' => ({required Object title}) => 'Personal: ${title}',
 			'knowledge.linkOptions.rule' => ({required Object title}) => 'Regla: ${title}',
 			'knowledge.linkOptions.skill' => ({required Object name}) => 'Skill: ${name}',
-			'knowledge.migrate.duplicates' => ({required Object count}) => 'Grupos duplicados entre proyectos: ${count}',
-			'knowledge.migrate.mergeDuplicates' => 'Fusionar duplicados',
-			'knowledge.migrate.removedPromoted' => ({required Object removed, required Object promoted}) => 'Eliminadas: ${removed}, promovidas: ${promoted}',
-			'knowledge.migrate.rulesSummary' => ({required Object total, required Object critical}) => 'Reglas: ${total} en total, ${critical} críticas.',
-			'knowledge.migrate.scanned' => ({required Object count}) => 'Se examinaron ${count} proyectos.',
-			'knowledge.migrate.title' => 'Migrar reglas existentes',
-			'skills.addDialog.chooseFileTitle' => 'Elegir SKILL.md',
-			'skills.addDialog.chooseFiles' => 'Elegir archivos',
-			'skills.addDialog.chooseFolder' => 'Elegir carpeta',
-			'skills.addDialog.chooseFolderTitle' => 'Elegir una carpeta de skills',
-			'skills.addDialog.folderFilesMeta' => ({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: '${count} archivo · ${size}', other: '${count} archivos · ${size}', ), 
-			'skills.addDialog.folderUploadsNote' => 'Las carpetas subidas conservan el nombre de la carpeta seleccionada; los archivos sueltos usan el `name` de `SKILL.md`.',
-			'skills.addDialog.hideInstallLocation' => 'Ocultar ubicación de instalación',
-			'skills.addDialog.installSkill' => 'Instalar Skill',
-			'skills.addDialog.installSkills' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: 'Instalar ${count} Skill', other: 'Instalar ${count} Skills', ), 
-			'skills.addDialog.markdownFileMeta' => ({required Object size}) => 'Archivo Markdown · ${size}',
-			'skills.addDialog.pickHint' => 'Las carpetas pueden incluir scripts, referencias y recursos.',
-			'skills.addDialog.pickTitle' => 'Elige una carpeta de skills o SKILL.md',
-			'skills.addDialog.readyToInstall' => 'Listo para instalar',
-			'skills.addDialog.removeQueued' => ({required Object name}) => 'Quitar ${name}',
-			'skills.addDialog.title' => ({required Object provider}) => 'Añadir Skill de ${provider}',
-			'skills.addDialog.uploadHint' => 'Sube un archivo SKILL.md o una carpeta de skills completa.',
-			'skills.addDialog.whereWillThisInstall' => '¿Dónde se instalará esto?',
-			'skills.deleteSkill' => ({required Object name}) => 'Eliminar ${name}',
-			'skills.empty.noGlobalSkills' => 'Aún no se han detectado skills globales',
-			'skills.empty.noGlobalSkillsDescription' => 'Añade una skill global arriba para que esté disponible en todos los proyectos.',
-			'skills.empty.noMatchingSkills' => 'No hay skills coincidentes',
-			'skills.empty.noMatchingSkillsDescription' => 'Prueba con otro comando, nombre, ámbito, proyecto o ruta de origen.',
-			'skills.empty.noProjects' => 'No hay proyectos disponibles',
-			'skills.empty.noProjectsDescription' => 'Añade un proyecto o espacio de trabajo para explorar sus skills.',
-			'skills.empty.noSkillsInProject' => 'No hay skills en este proyecto',
-			'skills.empty.noSkillsInProjectDescription' => 'Crea una carpeta .claude/skills, .cursor/skills o .agents/skills en el proyecto seleccionado.',
-			'skills.errors.addMarkdownFirst' => 'Añade primero uno o más archivos markdown.',
-			'skills.errors.couldNotReadSkillFile' => ({required Object name}) => 'No se pudo leer SKILL.md desde ${name}.',
-			'skills.errors.dropMarkdownOrFolder' => 'Suelta uno o más archivos markdown o una carpeta que contenga SKILL.md.',
-			'skills.errors.folderFileLimit' => ({required Object count}) => 'Una carpeta de skills puede contener hasta ${count} archivos.',
-			'skills.errors.folderReadFailed' => 'No se pudo leer la carpeta de skills',
-			'skills.errors.folderSizeLimit' => 'Las carpetas de skills seleccionadas deben ocupar menos de 30 MB en total.',
-			'skills.errors.importFailed' => 'No se pudieron importar las skills',
-			'skills.errors.missingSkillFile' => 'La carpeta seleccionada no contiene un archivo SKILL.md.',
-			'skills.moveDialog.moveToGlobal' => 'Mover a global',
-			'skills.moveDialog.moveToProject' => 'Mover a proyecto',
-			'skills.moveDialog.toGlobalHint' => 'Mueve esta skill al directorio global de skills para que todos los proyectos puedan usarla.',
-			'skills.moveDialog.toProjectHint' => 'Elige el proyecto al que debe pertenecer esta skill. Saldrá del directorio global de skills del proveedor.',
-			'skills.moveSkill' => ({required Object name}) => 'Mover ${name}',
-			'skills.projectLabel' => 'Proyecto',
-			'skills.scopes.admin' => 'Admin',
-			'skills.scopes.plugin' => 'Plugin',
-			'skills.scopes.project' => 'Proyecto',
-			'skills.scopes.repo' => 'Repositorio',
-			'skills.scopes.system' => 'Sistema',
-			'skills.scopes.user' => 'Usuario',
-			'skills.screen.addSkill' => 'Añadir Skill',
-			'skills.screen.clearSearch' => 'Limpiar búsqueda de skills',
-			'skills.screen.deleteDescription' => ({required Object directory, required Object provider}) => 'Esto elimina el directorio ${directory} del directorio de skills gestionadas de ${provider}. Esta acción no se puede deshacer.',
-			'skills.screen.deleteTitle' => ({required Object name}) => '¿Eliminar ${name}?',
-			'skills.screen.loadingSkills' => ({required Object provider}) => 'Cargando skills de ${provider}…',
-			'skills.screen.manageDescription' => ({required Object provider}) => 'Gestiona las skills de ${provider} desde archivos locales, carpetas completas y ubicaciones por proyecto.',
-			'skills.screen.noDescription' => 'No se ha proporcionado descripción en el front matter de la skill.',
-			'skills.screen.pluginBadge' => ({required Object name}) => 'Plugin: ${name}',
-			'skills.screen.projectBadge' => ({required Object name}) => 'Proyecto: ${name}',
-			'skills.screen.savedSuccessfully' => 'Skills guardadas correctamente.',
-			'skills.screen.scanningProjectSkills' => 'Escaneando skills del proyecto…',
-			'skills.screen.searchHint' => 'Buscar skills…',
-			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: '${count} SKILL', other: '${count} SKILLS', ), 
-			'skills.screen.sourceLabel' => 'ORIGEN',
-			'mcp.form.fields.bearerTokenEnvVar' => 'Variable de entorno del token Bearer',
-			'mcp.form.fields.envVarNames' => 'Nombres de variables de entorno',
-			'mcp.form.fields.workingDirectory' => 'Directorio de trabajo',
-			'mcp.form.scope.claudeLocal' => 'Claude local',
-			'mcp.form.scope.description.local' => 'Se guarda en los ajustes de usuario de Claude para el proyecto seleccionado',
-			'mcp.form.scope.description.project' => 'Se guarda en el espacio de trabajo del proyecto seleccionado',
-			'mcp.form.scope.description.projectGlobal' => 'Escribe en el espacio de trabajo del proyecto seleccionado para todos los proveedores',
-			'mcp.form.scope.description.user' => 'Disponible en todos los proyectos de tu máquina',
-			'mcp.form.scope.description.userGlobal' => 'Escribe en la configuración de usuario de cada proveedor y está disponible en todos los proyectos de esta máquina',
-			'mcp.form.scope.projectAllProviders' => 'Proyecto (todos los proveedores)',
-			'mcp.form.scope.userAllProviders' => 'Usuario (todos los proveedores)',
-			'mcp.form.submitTo' => ({required Object provider}) => 'Añadir servidor a ${provider}',
-			'mcp.form.validation.unsupportedGlobal' => ({required Object type}) => 'Añadir servidor MCP solo admite stdio y http en todos los proveedores, no ${type}.',
-			'mcp.form.validation.unsupportedProvider' => ({required Object provider, required Object type}) => '${provider} no admite servidores MCP de tipo ${type}',
-			'mcp.install.button' => 'Instalar',
-			'mcp.install.cardDescription' => 'Da a tus agentes la base de conocimiento y las herramientas de DDAgent mediante MCP: elige agentes o instala para todos.',
+			'knowledge.linkOptions.personal' => ({required Object title}) => 'Personal: ${title}',
+			'knowledge.errors.importFailed' => ({required Object error}) => 'La importación falló: ${error}',
+			'knowledge.errors.migrationFailed' => ({required Object error}) => 'La migración falló: ${error}',
+			'knowledge.entityTypes.memory' => 'Memoria',
+			'knowledge.entityTypes.rule' => 'Regla',
+			'knowledge.entityTypes.skill' => 'Habilidad',
+			'knowledge.entityTypes.personal' => 'Personal',
+			'knowledge.entityTypes.project' => 'Proyecto',
+			'knowledge.entityTypes.tag' => 'Etiqueta',
+			'browser.dialogTitle' => 'Navegador del agente',
+			'browser.viewError' => 'Error en la vista del navegador',
+			'browser.web' => 'Web',
+			'collab.team' => 'Equipo',
+			'collab.invite' => 'Invitación',
+			'collab.inviteTeammate' => 'Invitar a un compañero',
+			'collab.shareTokenHint' => 'Comparte este token de invitación — se muestra una sola vez y caduca en 72 h:',
+			'collab.createInvite' => 'Crear invitación',
+			'collab.copyToken' => 'Copiar token',
+			'collab.roles.member' => 'Miembro',
+			'collab.roles.viewer' => 'Lector',
+			'collab.viewing.session' => 'sesión',
+			'collab.viewing.card' => 'tarjeta',
+			'collab.viewing.board' => 'tablero',
+			'fileTree.uploadTo' => 'Subir a',
+			'fileTree.uploadHere' => 'Subir aquí',
+			'fileTree.browseServerFilesystem' => 'Explorar el sistema de archivos del servidor',
+			'fileTree.noFiles' => 'Sin archivos',
+			'fileTree.copyContents' => 'Copiar contenido',
+			'fileTree.chooseFolder' => 'Elegir carpeta',
+			'fileTree.search.hint' => 'Filtra nombres / Enter para buscar en el contenido',
+			'fileTree.search.prompt' => 'Escribe una consulta y pulsa Enter',
+			'fileTree.search.noMatches' => 'Sin coincidencias',
+			'fileTree.search.resultsTruncated' => 'Resultados truncados',
+			'fileTree.titles.rename' => ({required Object name}) => 'Renombrar ${name}',
+			'fileTree.titles.delete' => ({required Object name}) => 'Eliminar ${name}',
+			'fileTree.titles.download' => ({required Object name}) => 'Descargar ${name}',
+			'fileTree.uploadedCount' => ({required Object count}) => 'Subidos ${count} archivo(s)',
+			'fileTree.newName' => 'Nombre nuevo',
+			'fileTree.notRegisteredProject' => ({required Object path}) => 'No es un proyecto registrado: ${path}',
+			'fileTree.showGitignoredFiles' => 'Mostrar archivos ignorados por git',
+			'fileTree.hideGitignoredFiles' => 'Ocultar archivos ignorados por git',
+			'fileTree.downloadUnsupportedOnWeb' => 'Descarga no compatible en la web',
+			'fileTree.saveToPath' => 'Guardar en ruta',
+			'fileTree.savedTo' => ({required Object path}) => 'Guardado en ${path}',
+			'fileTree.relative.now' => 'ahora',
+			'fileTree.relative.minutes' => ({required Object n}) => '${n} min',
+			'fileTree.relative.hours' => ({required Object n}) => '${n} h',
+			'fileTree.relative.days' => ({required Object n}) => '${n} d',
+			'fileTree.projectRoot' => '(raíz del proyecto)',
+			'fileTree.uploadLimitCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: 'Puedes subir como máximo ${count} archivo a la vez.', other: 'Puedes subir como máximo ${count} archivos a la vez.', ), 
+			'fileTree.fileTooLarge' => ({required Object name}) => '${name} supera los 200 MB.',
+			'fileTree.deleteFolderConfirm' => ({required Object path}) => '¿Eliminar la carpeta "${path}"? Esta acción no se puede deshacer.',
+			'fileTree.deleteFileConfirm' => ({required Object path}) => '¿Eliminar el archivo "${path}"? Esta acción no se puede deshacer.',
+			'git.checkpoints.title' => 'Checkpoints',
+			'git.checkpoints.restoreTitle' => 'Restaurar checkpoint',
+			'git.checkpoints.restoreMessage' => '¿Restablecer el árbol de trabajo a este checkpoint? Los cambios actuales se reemplazarán.',
+			'git.checkpoints.restored' => 'Checkpoint restaurado',
+			'git.checkpoints.labelHint' => 'Etiqueta del checkpoint (opcional)',
+			'git.checkpoints.empty' => 'Aún no hay checkpoints',
+			'git.checkpoints.create' => 'Nuevo',
+			'git.stagedChanges' => 'Cambios preparados',
+			'git.statusStaged' => 'Preparado',
+			'git.switchBranch' => 'Cambiar de rama',
+			'git.unifiedDiff' => 'Diff unificado',
+			'git.splitDiff' => 'Diff lado a lado',
+			'git.noDiff' => 'No hay diff disponible',
+			'git.largeDiff' => 'Vista previa de diff grande: la representación está limitada para mantener la pestaña ágil.',
+			'git.loadDiffFailed' => ({required Object error}) => 'No se pudo cargar el diff: ${error}',
+			'git.hunkStage' => '+ Sección',
+			'git.hunkUnstage' => '− Sección',
+			'git.stageHunk' => 'Preparar sección',
+			'git.unstageHunk' => 'Quitar preparación de la sección',
+			'git.deleteFile' => 'Eliminar archivo',
+			'git.commitMessage' => 'Mensaje del commit',
+			'git.aiButton' => '✦ IA',
+			'git.commitCreated' => 'Commit creado',
+			'git.noBranch' => 'sin rama',
+			'git.selectProject' => 'Selecciona un proyecto',
+			'git.branchSections.local' => 'LOCALES',
+			'git.branchSections.remote' => 'REMOTAS',
+			'kanban.card.untitled' => 'Sin título',
+			'kanban.comments.empty' => 'Aún no hay comentarios',
+			'kanban.comments.add' => 'Añadir comentario',
+			'kanban.dialog.saving' => 'Guardando…',
+			'kanban.details.title' => 'Detalles de la tarjeta',
+			'kanban.details.status' => ({required Object status}) => 'Estado: ${status}',
+			'kanban.empty.noProject' => 'Ningún proyecto seleccionado',
+			'kanban.saveFailed' => 'No se pudo guardar la tarjeta',
+			'kanban.time.now' => 'ahora',
+			'kanban.time.minutesAgo' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: 'hace 1 min', other: 'hace ${count} min', ), 
+			'kanban.time.hoursAgo' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: 'hace 1 hora', other: 'hace ${count} horas', ), 
+			'kanban.time.daysAgo' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: 'hace 1 día', other: 'hace ${count} días', ), 
+			'mcp.install.title' => 'Instalar el servidor MCP de DDAgent',
 			'mcp.install.description' => 'Permite que los agentes seleccionados usen la base de conocimiento y las herramientas de DDAgent mediante MCP.',
-			'mcp.install.errorFallback' => 'error',
-			'mcp.install.failed' => ({required Object error}) => 'La instalación falló: ${error}',
-			'mcp.install.installForAll' => 'Instalar para todos',
+			'mcp.install.cardDescription' => 'Da a tus agentes la base de conocimiento y las herramientas de DDAgent mediante MCP: elige agentes o instala para todos.',
 			'mcp.install.installSelected' => 'Instalar seleccionados',
+			'mcp.install.installForAll' => 'Instalar para todos',
+			'mcp.install.button' => 'Instalar',
+			'mcp.install.failed' => ({required Object error}) => 'La instalación falló: ${error}',
 			'mcp.install.installedCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: 'Instalado en ${count} agente.', other: 'Instalado en ${count} agentes.', ), 
 			'mcp.install.partialFailure' => ({required Object count, required Object failed}) => 'Instalado en ${count}; falló: ${failed}',
-			'mcp.install.title' => 'Instalar el servidor MCP de DDAgent',
-			'mcp.servers.addGlobalDescription' => 'Añade este servidor MCP a todos los proveedores: Claude, Cursor, Codex, OpenCode y Devin. Solo se admiten los transportes stdio y HTTP porque la misma configuración debe funcionar en todos los proveedores.',
-			'mcp.servers.addGlobalMenuDescription' => 'Añadir servidor MCP global escribe un servidor stdio o HTTP común en Claude, Cursor, Codex, OpenCode y Devin.',
-			'mcp.servers.addGlobalTitle' => 'Añadir servidor MCP global',
-			'mcp.servers.addProviderDescription' => ({required Object provider}) => 'Añadir servidor MCP de ${provider} solo modifica ${provider}.',
-			'mcp.servers.addProviderTitle' => ({required Object provider}) => 'Añadir servidor MCP de ${provider}',
-			'mcp.servers.config.cwd' => 'Cwd',
-			'mcp.servers.config.envVars' => 'Variables de entorno',
-			'mcp.servers.descriptionGeneric' => ({required Object provider}) => 'Los servidores del Model Context Protocol proporcionan herramientas y fuentes de datos adicionales a ${provider}',
+			'mcp.install.errorFallback' => 'error',
 			'mcp.servers.loading' => 'Cargando servidores MCP…',
 			'mcp.servers.refreshingScopes' => 'Actualizando ámbitos de proyecto…',
-			'mcp.team.cta' => 'Disponible con DDAgent Pro',
-			'mcp.team.description' => 'Comparte configuraciones de servidores MCP con tu equipo. Todos se mantienen sincronizados automáticamente.',
+			'mcp.servers.descriptionGeneric' => ({required Object provider}) => 'Los servidores del Model Context Protocol proporcionan herramientas y fuentes de datos adicionales a ${provider}',
+			'mcp.servers.addGlobalTitle' => 'Añadir servidor MCP global',
+			'mcp.servers.addGlobalDescription' => 'Añade este servidor MCP a todos los proveedores: Claude, Cursor, Codex, OpenCode y Devin. Solo se admiten los transportes stdio y HTTP porque la misma configuración debe funcionar en todos los proveedores.',
+			'mcp.servers.addGlobalMenuDescription' => 'Añadir servidor MCP global escribe un servidor stdio o HTTP común en Claude, Cursor, Codex, OpenCode y Devin.',
+			'mcp.servers.addProviderTitle' => ({required Object provider}) => 'Añadir servidor MCP de ${provider}',
+			'mcp.servers.addProviderDescription' => ({required Object provider}) => 'Añadir servidor MCP de ${provider} solo modifica ${provider}.',
+			'mcp.servers.config.cwd' => 'Cwd',
+			'mcp.servers.config.envVars' => 'Variables de entorno',
+			'mcp.servers.selectProjectRequired' => 'Selecciona un proyecto para los servidores MCP con ámbito de proyecto',
+			'mcp.servers.globalScopeUnsupported' => 'Añadir servidor MCP solo admite el ámbito de usuario o de proyecto en todos los proveedores.',
+			'mcp.servers.globalAddFailed' => ({required Object details}) => 'No se pudo añadir el servidor MCP a todos los proveedores. ${details}',
+			'mcp.servers.scopeProject' => 'proyecto',
 			'mcp.team.title' => 'Configuraciones MCP del equipo',
+			'mcp.team.description' => 'Comparte configuraciones de servidores MCP con tu equipo. Todos se mantienen sincronizados automáticamente.',
+			'mcp.team.cta' => 'Disponible con DDAgent Pro',
 			'mcp.tokens.scopeWrite' => 'Escritura',
-			'terminal.actions.clearOutput' => 'Limpiar salida',
-			'terminal.actions.connect' => 'Conectar',
-			'terminal.actions.newShell' => 'Shell nueva',
-			'terminal.actions.newTab' => 'Nueva pestaña de terminal',
-			'terminal.actions.providerLogin' => 'Inicio de sesión del proveedor',
-			'terminal.actions.restartSession' => 'Reiniciar sesión',
-			'terminal.authUrl.openInBrowser' => 'Abrir en el navegador',
-			'terminal.errors.couldNotOpenLink' => ({required Object url}) => 'No se pudo abrir el enlace: ${url}',
-			'terminal.fileLink.detected' => ({required Object path}) => 'Archivo detectado: ${path}',
-			'terminal.paste.hint' => 'Ctrl+V / clic derecho → Pegar',
-			'terminal.paste.title' => 'Pegar en la terminal',
-			'terminal.shortcuts.eof' => 'EOF',
-			'terminal.shortcuts.hide' => 'Ocultar barra de atajos',
-			'terminal.shortcuts.interrupt' => 'Interrumpir (SIGINT)',
-			'terminal.shortcuts.suspend' => 'Suspender (SIGTSTP)',
-			'terminal.shortcuts.showTooltip' => 'Mostrar atajos',
-			'terminal.shortcuts.hideTooltip' => 'Ocultar atajos',
-			'terminal.tabs.antigravityCli' => 'Antigravity CLI',
-			'terminal.tabs.claudeCli' => 'Claude CLI',
-			'terminal.tabs.commandCodeCli' => 'Command Code CLI',
-			'terminal.tabs.cursorCli' => 'Cursor CLI',
-			'terminal.tabs.devinCli' => 'Devin CLI',
-			'terminal.tabs.loginTitle' => ({required Object provider}) => 'Inicio de sesión: ${provider}',
-			'terminal.tabs.opencodeCli' => 'OpenCode CLI',
-			'terminal.tabs.plainShell' => 'Shell simple',
-			'terminal.tabs.shellName' => ({required Object index}) => 'Shell ${index}',
-			'worktrees.branchHint' => 'Nombre de la nueva rama (p. ej. feature/login)',
-			'worktrees.branchingOff' => ({required Object branch}) => 'Ramificando desde ${branch}',
-			'worktrees.cleanupDescription' => 'Eliminar el worktree y borrar la rama una vez fusionada',
-			'worktrees.created' => 'Worktree creado',
-			'worktrees.deleteBranchLabel' => 'Eliminar también la rama',
-			'worktrees.dirtyWarning' => ({required Object count}) => 'Advertencia: este worktree tiene ${count} cambios sin confirmar que se perderán.',
-			'worktrees.emptyDescription' => 'Crea un worktree para aislar el trabajo de una funcionalidad o las ejecuciones de agentes.',
-			'worktrees.emptyTitle' => 'No se encontraron worktrees',
-			'worktrees.forceRemoveLabel' => 'Forzar eliminación (descartar cambios)',
-			'worktrees.headDetachedAt' => ({required Object sha}) => 'HEAD separado en ${sha}',
-			'worktrees.mainBadge' => 'main',
-			'worktrees.mergeDescription' => ({required Object branch}) => 'Fusionar los cambios en ${branch}.',
-			'worktrees.mergeTitle' => ({required Object branch}) => 'Fusionar ${branch}',
-			'worktrees.merged' => ({required Object branch}) => 'Worktree fusionado en ${branch}',
-			'worktrees.opened' => ({required Object branch}) => 'Worktree abierto: ${branch}',
-			'worktrees.portHint' => 'Puerto de ejecución (opcional, p. ej. 3000)',
-			'worktrees.removeDescription' => 'Esto elimina la carpeta del worktree. Los proyectos vinculados se archivarán.',
-			'worktrees.removeTitle' => ({required Object branch}) => '¿Eliminar el worktree ${branch}?',
-			'worktrees.removed' => 'Worktree eliminado',
-			'worktrees.runButton' => 'Ejecutar',
-			'worktrees.runHint' => 'Comando de ejecución (p. ej. npm run dev)',
-			'worktrees.runRunning' => 'en ejecución',
-			'worktrees.runRunningWithPort' => ({required Object port}) => 'en ejecución :${port}',
-			'worktrees.scripts' => 'Scripts',
-			'worktrees.scriptsSaved' => 'Configuración de scripts guardada',
-			'worktrees.serverLabel' => 'Servidor: ',
-			'worktrees.setupHint' => 'Comando de configuración (p. ej. npm install)',
-			'worktrees.setupLabel' => 'Configuración: ',
-			'worktrees.squashDescription' => 'Combinar todos los commits en un solo commit',
-			'worktrees.stopButton' => 'Detener',
+			'mcp.tokens.scopeRead' => 'Lectura',
+			'mcp.form.submitTo' => ({required Object provider}) => 'Añadir servidor a ${provider}',
+			'mcp.form.scope.userAllProviders' => 'Usuario (todos los proveedores)',
+			'mcp.form.scope.claudeLocal' => 'Claude local',
+			'mcp.form.scope.projectAllProviders' => 'Proyecto (todos los proveedores)',
+			'mcp.form.scope.description.userGlobal' => 'Escribe en la configuración de usuario de cada proveedor y está disponible en todos los proyectos de esta máquina',
+			'mcp.form.scope.description.user' => 'Disponible en todos los proyectos de tu máquina',
+			'mcp.form.scope.description.local' => 'Se guarda en los ajustes de usuario de Claude para el proyecto seleccionado',
+			'mcp.form.scope.description.projectGlobal' => 'Escribe en el espacio de trabajo del proyecto seleccionado para todos los proveedores',
+			'mcp.form.scope.description.project' => 'Se guarda en el espacio de trabajo del proyecto seleccionado',
+			'mcp.form.fields.workingDirectory' => 'Directorio de trabajo',
+			'mcp.form.fields.envVarNames' => 'Nombres de variables de entorno',
+			'mcp.form.fields.bearerTokenEnvVar' => 'Variable de entorno del token Bearer',
+			'mcp.form.validation.unsupportedGlobal' => ({required Object type}) => 'Añadir servidor MCP solo admite stdio y http en todos los proveedores, no ${type}.',
+			'mcp.form.validation.unsupportedProvider' => ({required Object provider, required Object type}) => '${provider} no admite servidores MCP de tipo ${type}',
+			'mcp.form.validation.jsonMustBeObject' => 'La configuración JSON debe ser un objeto',
+			'notifications.deviceLabel' => 'DDAgent Flutter',
+			'notifications.errors.registrationRejected' => 'El servidor rechazó el registro',
+			'notifications.errors.noResponse' => 'Sin respuesta del servidor',
+			'notifications.androidChannel.name' => 'Alertas de DDAgent',
+			'notifications.androidChannel.description' => 'Notificaciones de ejecuciones de agentes, aprobaciones y errores',
+			'onboarding.gitHint' => 'Se usa para los commits creados por sesiones de DDAgent.',
+			'onboarding.completeSetup' => 'Completar configuración',
+			'onboarding.errors.nameAndEmailRequired' => 'Se requieren tanto el nombre como el correo de git.',
+			'onboarding.errors.invalidEmail' => 'Introduce una dirección de correo electrónico válida.',
+			'onboarding.agents.title' => 'Conecta tus agentes de IA',
+			'onboarding.agents.description' => 'Inicia sesión en uno o más asistentes de programación con IA. Todos son opcionales.',
+			'onboarding.agents.laterHint' => 'Puedes configurarlos más tarde en Ajustes.',
+			'onboarding.mcp.title' => 'Conecta los agentes con DDAgent',
+			'onboarding.mcp.description' => 'Instala el servidor MCP de DDAgent para que tus agentes puedan usar la base de conocimiento y las herramientas de DDAgent. Elige agentes o instala para todos.',
+			'onboarding.mcp.installSelected' => 'Instalar seleccionados',
+			'onboarding.mcp.installForAll' => 'Instalar para todos',
+			'onboarding.mcp.laterHint' => 'Opcional: también puedes instalarlo más tarde en Ajustes → MCP.',
+			'onboarding.mcp.installedOn' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: 'Instalado en ${count} agente.', other: 'Instalado en ${count} agentes.', ), 
+			'onboarding.mcp.installedWithFailures' => ({required Object installedCount, required Object failed}) => 'Instalado en ${installedCount}; falló: ${failed}',
+			'projects.cloneRepository' => 'Clonar repositorio',
+			'projects.repositoryCloned' => 'Repositorio clonado',
+			'projects.clone' => 'Clonar',
+			'projects.cloneFinished' => 'Clonación completada. Actualizando la lista de proyectos…',
+			'projects.cloneFailed' => 'La clonación falló',
+			'projects.repoUrlPlaceholder' => 'https://github.com/org/repo.git',
+			'projects.destinationPath' => 'Ruta de destino',
+			'projects.destinationPathRequired' => 'La ruta de destino es obligatoria',
+			'projects.repositoryUrlRequired' => 'La URL del repositorio es obligatoria',
+			'projects.githubTokenOptional' => 'Token de GitHub (opcional)',
+			'projects.archive' => 'Archivar',
+			'projects.restore' => 'Restaurar',
+			'projects.deletePermanently' => 'Eliminar permanentemente',
+			'projects.deleteProjectTitle' => '¿Eliminar el proyecto?',
+			'projects.deleteProjectMessage' => ({required Object name}) => 'Elimina permanentemente «${name}», incluidas todas las sesiones y el historial almacenado (borrado de JSONL). Esta acción no se puede deshacer.',
+			'projects.archivedSection' => ({required Object count}) => 'Archivados (${count})',
+			'projects.sessionCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: '${count} sesión', other: '${count} sesiones', ), 
+			'projects.newer' => 'Más reciente',
+			'projects.older' => 'Más antiguo',
+			'projects.projectArchived' => 'Proyecto archivado',
+			'projects.projectRestored' => 'Proyecto restaurado',
+			'projects.projectRenamed' => 'Proyecto renombrado',
+			'projects.projectDeleted' => 'Proyecto eliminado',
+			'projects.failedToLoadTokens' => 'No se pudieron cargar los tokens de GitHub',
+			'projects.displayNameOptional' => 'Nombre para mostrar (opcional)',
+			'projects.usingStoredToken' => ({required Object name}) => 'Usando el token guardado: ${name}',
+			'projects.unknown' => 'Desconocido',
+			'projects.project' => 'Proyecto',
+			'quota.section.config' => 'Configuración',
+			'quota.overview.tokensAndCost' => 'Tokens y costo',
 			'quota.agents.statusCount' => ({required Object status, required Object count}) => '${status} (${count})',
+			'quota.config.pollerTitle' => 'Sondeo y alertas',
+			'quota.config.accountRouting' => 'Enrutamiento de cuentas',
+			'quota.config.save' => 'Guardar configuración',
+			'quota.chart.show' => 'Mostrar',
 			'quota.chart.hide' => 'Ocultar',
 			'quota.chart.noData' => 'No hay datos suficientes para una tendencia.',
 			'quota.chart.pointReadout' => ({required Object date, required Object tokens, required Object cost}) => '${date} · ${tokens} tokens · ${cost}',
-			'quota.chart.show' => 'Mostrar',
-			'quota.config.accountRouting' => 'Enrutamiento de cuentas',
-			'quota.config.pollerTitle' => 'Sondeo y alertas',
-			'quota.config.save' => 'Guardar configuración',
-			'quota.overview.tokensAndCost' => 'Tokens y costo',
-			'quota.section.config' => 'Configuración',
-			'scheduler.checking' => 'Comprobando…',
-			'scheduler.cronHint' => 'Cron (min hora día mes día de la semana) — p. ej. 0 9 * * *',
-			'scheduler.deleteMessage' => ({required Object id}) => 'Esto elimina el trabajo recurrente ${id}. Las sesiones existentes se conservan.',
-			'scheduler.deleteTitle' => '¿Eliminar la programación?',
-			'scheduler.editTitle' => 'Editar programación',
+			'quota.duration.minutes' => ({required Object minutes}) => '${minutes} min',
+			'quota.duration.hoursMinutes' => ({required Object hours, required Object minutes}) => '${hours} h ${minutes} min',
+			'quota.duration.daysHours' => ({required Object days, required Object hours}) => '${days} d ${hours} h',
+			'quota.duration.now' => 'ahora',
 			'scheduler.newLabel' => 'Nueva',
-			'scheduler.nextIn' => ({required Object time}) => 'próximo en ${time}',
-			'scheduler.promptHint' => 'Prompt para el agente',
 			'scheduler.runs' => 'Ejecuciones',
-			'scheduler.session' => ({required Object id}) => 'sesión ${id}',
+			'scheduler.editTitle' => 'Editar programación',
+			'scheduler.deleteTitle' => '¿Eliminar la programación?',
+			'scheduler.deleteMessage' => ({required Object id}) => 'Esto elimina el trabajo recurrente ${id}. Las sesiones existentes se conservan.',
+			'scheduler.checking' => 'Comprobando…',
+			'scheduler.nextIn' => ({required Object time}) => 'próximo en ${time}',
 			'scheduler.worktree' => 'worktree',
-			'notifications.deviceLabel' => 'DDAgent Flutter',
-			'notifications.errors.noResponse' => 'Sin respuesta del servidor',
-			'notifications.errors.registrationRejected' => 'El servidor rechazó el registro',
+			'scheduler.session' => ({required Object id}) => 'sesión ${id}',
+			'scheduler.cronHint' => 'Cron (min hora día mes día de la semana) — p. ej. 0 9 * * *',
+			'scheduler.promptHint' => 'Prompt para el agente',
+			'scheduler.runStatus.fired' => 'lanzada',
+			'scheduler.runStatus.skipped' => 'omitida',
+			'scheduler.runStatus.failed' => 'fallida',
+			'scheduler.runStatus.completed' => 'completada',
+			'scheduler.cronErrors.fieldCount' => ({required Object got}) => 'Se esperaban 5 campos, se recibieron ${got}',
+			'scheduler.cronErrors.fieldError' => ({required Object index, required Object error}) => 'Campo ${index}: ${error}',
+			'scheduler.cronErrors.empty' => 'vacío',
+			'scheduler.cronErrors.invalidPart' => ({required Object part}) => '«${part}» no válido',
+			'scheduler.cronErrors.invalidValue' => ({required Object value}) => 'valor no válido «${value}»',
+			'serverConnect.subtitle' => 'Conéctate a tu servidor de DDAgent',
+			'serverConnect.enterUrl' => 'Introduce una URL de servidor',
+			'serverConnect.connectionFailed' => ({required Object error}) => 'Falló la conexión (${error})',
 			'serverConnect.connect' => 'Conectar',
 			'serverConnect.connecting' => 'Conectando…',
 			'serverConnect.changeServer' => 'Cambiar servidor',
-			'serverConnect.connectionFailed' => ({required Object error}) => 'Falló la conexión (${error})',
-			'serverConnect.enterUrl' => 'Introduce una URL de servidor',
 			'serverConnect.local.title' => 'Este dispositivo',
 			'serverConnect.local.subtitle' => 'Ejecuta el servidor DDAgent en esta máquina',
 			'serverConnect.local.install' => 'Instalar servidor local',
@@ -9400,172 +11395,240 @@ extension on TranslationsEs {
 			'serverConnect.local.connect' => 'Usar este servidor',
 			'serverConnect.local.error' => ({required Object error}) => 'Error del servidor local: ${error}',
 			'serverConnect.local.or' => 'o conecta un servidor remoto',
-			'serverConnect.subtitle' => 'Conéctate a tu servidor de DDAgent',
-			'voice.apiKeySaved' => 'Clave API (guardada; escribe para reemplazar)',
-			'voice.preview' => 'Vista previa',
-			'voice.saveFailed' => 'No se pudo guardar la configuración de STT',
-			'voice.settingsSaved' => 'Ajustes de entrada de voz guardados',
-			'sharedContext.title' => 'Notas compartidas',
-			'collab.copyToken' => 'Copiar token',
-			'collab.createInvite' => 'Crear invitación',
-			'collab.invite' => 'Invitación',
-			'collab.inviteTeammate' => 'Invitar a un compañero',
-			'collab.roles.member' => 'Miembro',
-			'collab.roles.viewer' => 'Lector',
-			'collab.shareTokenHint' => 'Comparte este token de invitación — se muestra una sola vez y caduca en 72 h:',
-			'collab.team' => 'Equipo',
-			'browser.dialogTitle' => 'Navegador del agente',
-			'browser.viewError' => 'Error en la vista del navegador',
-			'browser.web' => 'Web',
-			'projects.archive' => 'Archivar',
-			'projects.archivedSection' => ({required Object count}) => 'Archivados (${count})',
-			'projects.clone' => 'Clonar',
-			'projects.cloneFailed' => 'La clonación falló',
-			'projects.cloneFinished' => 'Clonación completada. Actualizando la lista de proyectos…',
-			'projects.cloneRepository' => 'Clonar repositorio',
-			'projects.deletePermanently' => 'Eliminar permanentemente',
-			'projects.deleteProjectMessage' => ({required Object name}) => 'Elimina permanentemente «${name}», incluidas todas las sesiones y el historial almacenado (borrado de JSONL). Esta acción no se puede deshacer.',
-			'projects.deleteProjectTitle' => '¿Eliminar el proyecto?',
-			'projects.destinationPath' => 'Ruta de destino',
-			'projects.destinationPathRequired' => 'La ruta de destino es obligatoria',
-			'projects.displayNameOptional' => 'Nombre para mostrar (opcional)',
-			'projects.failedToLoadTokens' => 'No se pudieron cargar los tokens de GitHub',
-			'projects.githubTokenOptional' => 'Token de GitHub (opcional)',
-			'projects.newer' => 'Más reciente',
-			'projects.older' => 'Más antiguo',
-			'projects.projectArchived' => 'Proyecto archivado',
-			'projects.projectDeleted' => 'Proyecto eliminado',
-			'projects.projectRenamed' => 'Proyecto renombrado',
-			'projects.projectRestored' => 'Proyecto restaurado',
-			'projects.repoUrlPlaceholder' => 'https://github.com/org/repo.git',
-			'projects.repositoryCloned' => 'Repositorio clonado',
-			'projects.repositoryUrlRequired' => 'La URL del repositorio es obligatoria',
-			'projects.restore' => 'Restaurar',
-			'projects.sessionCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: '${count} sesión', other: '${count} sesiones', ), 
-			'projects.unknown' => 'Desconocido',
-			'projects.usingStoredToken' => ({required Object name}) => 'Usando el token guardado: ${name}',
-			'sessions.activity.committingChanges' => 'Confirmando cambios',
-			'sessions.activity.editingFile' => ({required Object file}) => 'Editando ${file}',
-			'sessions.activity.editingFileGeneric' => 'Editando un archivo',
-			'sessions.activity.fetchingUrl' => ({required Object url}) => 'Obteniendo ${url}',
-			'sessions.activity.pushingBranch' => 'Enviando la rama',
-			'sessions.activity.readingFile' => ({required Object file}) => 'Leyendo ${file}',
-			'sessions.activity.runningCommand' => ({required Object command}) => 'Ejecutando `${command}`',
-			'sessions.activity.runningShellCommand' => 'Ejecutando un comando de shell',
-			'sessions.activity.runningTool' => ({required Object name}) => 'Ejecutando ${name}',
-			'sessions.activity.searching' => ({required Object query}) => 'Buscando «${query}»',
-			'sessions.activity.subagentRunning' => 'Subagente en ejecución',
-			'sessions.age.days' => ({required Object days}) => '${days} d',
-			'sessions.age.hours' => ({required Object hours}) => '${hours} h',
-			'sessions.age.lessThanMinute' => '<1 min',
-			'sessions.age.minutes' => ({required Object count}) => '${count} min',
-			'sessions.archive' => 'Archivar',
+			'serverConnect.local.errors.releaseTagUnresolved' => 'No se pudo determinar la etiqueta de la última versión de DDAgent.',
+			'serverConnect.local.errors.unsupportedPlatform' => 'El servidor local no es compatible con esta plataforma.',
+			'serverConnect.local.errors.unsupportedPlatformDetail' => ({required Object platform}) => 'El servidor local no es compatible con esta plataforma (${platform}).',
+			'serverConnect.local.errors.nodeExtractionFailed' => ({required Object path}) => 'La extracción de Node.js no generó ${path}',
+			'serverConnect.local.errors.downloadFailed' => ({required Object error}) => 'Error al descargar el servidor: ${error}',
+			'serverConnect.local.errors.installFailed' => ({required Object error}) => 'Error al instalar el servidor: ${error}',
+			'serverConnect.local.errors.bundleNotInstalled' => 'El paquete del servidor no está instalado.',
+			'serverConnect.local.errors.spawnFailed' => ({required Object error}) => 'No se pudo iniciar el servidor local: ${error}',
+			'serverConnect.local.errors.portInUse' => ({required Object port}) => 'El puerto ${port} ya está en uso por otra aplicación.',
+			'serverConnect.local.errors.exitedDuringStartup' => 'El servidor local se cerró durante el inicio.',
+			'serverConnect.local.errors.exitedDuringStartupWithOutput' => ({required Object output}) => 'El servidor local se cerró durante el inicio: ${output}',
+			'serverConnect.local.errors.startTimeout' => 'Se agotó el tiempo de espera para iniciar el servidor local.',
+			'serverConnect.local.errors.tarFailed' => ({required Object command, required Object code, required Object output}) => '${command} falló (código ${code}): ${output}',
+			'serverConnect.httpStatus' => ({required Object code}) => 'HTTP ${code}',
+			'serverConnect.networkError' => 'Error de red',
+			'sessions.noSessions' => 'No hay sesiones',
+			'sessions.noRecentSessions' => 'No hay sesiones recientes',
 			'sessions.archivedSessions' => 'Sesiones archivadas',
-			'sessions.autoOrchestrator' => 'Automático (orquestador)',
+			'sessions.rename' => 'Renombrar',
+			'sessions.archive' => 'Archivar',
 			'sessions.compareWith' => 'Comparar con…',
+			'sessions.projectPath' => 'Ruta del proyecto',
+			'sessions.newSessionProvider' => 'Nueva sesión — proveedor',
+			'sessions.autoOrchestrator' => 'Automático (orquestador)',
 			'sessions.createFailed' => ({required Object error}) => 'No se pudo crear la sesión: ${error}',
 			'sessions.deleteSessionMessage' => ({required Object name}) => 'Elimina «${name}» y su transcripción. Esta acción no se puede deshacer.',
-			'sessions.newSessionProvider' => 'Nueva sesión — proveedor',
-			'sessions.noRecentSessions' => 'No hay sesiones recientes',
-			'sessions.noSessions' => 'No hay sesiones',
-			'sessions.projectPath' => 'Ruta del proyecto',
-			'sessions.rename' => 'Renombrar',
 			'sessions.toasts.archived' => 'Sesión archivada',
-			'sessions.toasts.deleted' => 'Sesión eliminada',
-			'sessions.toasts.pinned' => 'Sesión fijada',
-			'sessions.toasts.renamed' => 'Sesión renombrada',
 			'sessions.toasts.restored' => 'Sesión restaurada',
+			'sessions.toasts.deleted' => 'Sesión eliminada',
+			'sessions.toasts.renamed' => 'Sesión renombrada',
+			'sessions.toasts.pinned' => 'Sesión fijada',
 			'sessions.toasts.unpinned' => 'Sesión desfijada',
 			'sessions.toasts.workspaceChanged' => 'Espacio de trabajo cambiado',
-			'git.aiButton' => '✦ IA',
-			'git.checkpoints.create' => 'Nuevo',
-			'git.checkpoints.empty' => 'Aún no hay checkpoints',
-			'git.checkpoints.labelHint' => 'Etiqueta del checkpoint (opcional)',
-			'git.checkpoints.restoreMessage' => '¿Restablecer el árbol de trabajo a este checkpoint? Los cambios actuales se reemplazarán.',
-			'git.checkpoints.restoreTitle' => 'Restaurar checkpoint',
-			'git.checkpoints.restored' => 'Checkpoint restaurado',
-			'git.checkpoints.title' => 'Checkpoints',
-			'git.commitCreated' => 'Commit creado',
-			'git.commitMessage' => 'Mensaje del commit',
-			'git.deleteFile' => 'Eliminar archivo',
-			'git.hunkStage' => '+ Sección',
-			'git.hunkUnstage' => '− Sección',
-			'git.largeDiff' => 'Vista previa de diff grande: la representación está limitada para mantener la pestaña ágil.',
-			'git.loadDiffFailed' => ({required Object error}) => 'No se pudo cargar el diff: ${error}',
-			'git.noBranch' => 'sin rama',
-			'git.noDiff' => 'No hay diff disponible',
-			'git.selectProject' => 'Selecciona un proyecto',
-			'git.splitDiff' => 'Diff lado a lado',
-			'git.stageHunk' => 'Preparar sección',
-			'git.stagedChanges' => 'Cambios preparados',
-			'git.statusStaged' => 'Preparado',
-			'git.switchBranch' => 'Cambiar de rama',
-			'git.unifiedDiff' => 'Diff unificado',
-			'git.unstageHunk' => 'Quitar preparación de la sección',
-			'kanban.card.untitled' => 'Sin título',
-			'kanban.comments.add' => 'Añadir comentario',
-			'kanban.comments.empty' => 'Aún no hay comentarios',
-			'kanban.details.status' => ({required Object status}) => 'Estado: ${status}',
-			'kanban.details.title' => 'Detalles de la tarjeta',
-			'kanban.dialog.saving' => 'Guardando…',
-			'kanban.empty.noProject' => 'Ningún proyecto seleccionado',
-			'kanban.saveFailed' => 'No se pudo guardar la tarjeta',
-			'kanban.time.daysAgo' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: 'hace 1 día', other: 'hace ${count} días', ), 
-			'kanban.time.hoursAgo' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: 'hace 1 hora', other: 'hace ${count} horas', ), 
-			'kanban.time.minutesAgo' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: 'hace 1 min', other: 'hace ${count} min', ), 
-			'kanban.time.now' => 'ahora',
-			'onboarding.agents.description' => 'Inicia sesión en uno o más asistentes de programación con IA. Todos son opcionales.',
-			'onboarding.agents.laterHint' => 'Puedes configurarlos más tarde en Ajustes.',
-			'onboarding.agents.title' => 'Conecta tus agentes de IA',
-			'onboarding.completeSetup' => 'Completar configuración',
-			'onboarding.errors.invalidEmail' => 'Introduce una dirección de correo electrónico válida.',
-			'onboarding.errors.nameAndEmailRequired' => 'Se requieren tanto el nombre como el correo de git.',
-			'onboarding.gitHint' => 'Se usa para los commits creados por sesiones de DDAgent.',
-			'onboarding.mcp.description' => 'Instala el servidor MCP de DDAgent para que tus agentes puedan usar la base de conocimiento y las herramientas de DDAgent. Elige agentes o instala para todos.',
-			'onboarding.mcp.installForAll' => 'Instalar para todos',
-			'onboarding.mcp.installSelected' => 'Instalar seleccionados',
-			'onboarding.mcp.installedOn' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: 'Instalado en ${count} agente.', other: 'Instalado en ${count} agentes.', ), 
-			'onboarding.mcp.installedWithFailures' => ({required Object installedCount, required Object failed}) => 'Instalado en ${installedCount}; falló: ${failed}',
-			'onboarding.mcp.laterHint' => 'Opcional: también puedes instalarlo más tarde en Ajustes → MCP.',
-			'onboarding.mcp.title' => 'Conecta los agentes con DDAgent',
-			'fileTree.browseServerFilesystem' => 'Explorar el sistema de archivos del servidor',
-			'fileTree.chooseFolder' => 'Elegir carpeta',
-			'fileTree.copyContents' => 'Copiar contenido',
-			'fileTree.noFiles' => 'Sin archivos',
-			'fileTree.search.hint' => 'Filtra nombres / Enter para buscar en el contenido',
-			'fileTree.search.noMatches' => 'Sin coincidencias',
-			'fileTree.search.prompt' => 'Escribe una consulta y pulsa Enter',
-			'fileTree.search.resultsTruncated' => 'Resultados truncados',
-			'fileTree.titles.delete' => ({required Object name}) => 'Eliminar ${name}',
-			'fileTree.titles.download' => ({required Object name}) => 'Descargar ${name}',
-			'fileTree.titles.rename' => ({required Object name}) => 'Renombrar ${name}',
-			'fileTree.uploadHere' => 'Subir aquí',
-			'fileTree.uploadTo' => 'Subir a',
-			'fileTree.uploadedCount' => ({required Object count}) => 'Subidos ${count} archivo(s)',
-			'fileTree.newName' => 'Nombre nuevo',
-			'fileTree.notRegisteredProject' => ({required Object path}) => 'No es un proyecto registrado: ${path}',
-			'fileTree.showGitignoredFiles' => 'Mostrar archivos ignorados por git',
-			'fileTree.hideGitignoredFiles' => 'Ocultar archivos ignorados por git',
-			'fileTree.downloadUnsupportedOnWeb' => 'Descarga no compatible en la web',
-			'fileTree.saveToPath' => 'Guardar en ruta',
-			'fileTree.savedTo' => ({required Object path}) => 'Guardado en ${path}',
-			'workspace.archivedWorkspaceName' => 'Archivado',
-			'workspace.closePane' => 'Cerrar panel',
-			'workspace.closeSearch' => 'Cerrar búsqueda',
-			'workspace.deleteSessionNotice' => 'Elimina la sesión y su transcripción. No se puede deshacer.',
+			'sessions.age.lessThanMinute' => '<1 min',
+			'sessions.age.minutes' => ({required Object count}) => '${count} min',
+			'sessions.age.hours' => ({required Object hours}) => '${hours} h',
+			'sessions.age.days' => ({required Object days}) => '${days} d',
+			'sessions.activity.subagentRunning' => 'Subagente en ejecución',
+			'sessions.activity.readingFile' => ({required Object file}) => 'Leyendo ${file}',
+			'sessions.activity.runningTool' => ({required Object name}) => 'Ejecutando ${name}',
+			'sessions.activity.editingFile' => ({required Object file}) => 'Editando ${file}',
+			'sessions.activity.editingFileGeneric' => 'Editando un archivo',
+			'sessions.activity.runningShellCommand' => 'Ejecutando un comando de shell',
+			'sessions.activity.runningCommand' => ({required Object command}) => 'Ejecutando `${command}`',
+			'sessions.activity.committingChanges' => 'Confirmando cambios',
+			'sessions.activity.pushingBranch' => 'Enviando la rama',
+			'sessions.activity.fetchingUrl' => ({required Object url}) => 'Obteniendo ${url}',
+			'sessions.activity.searching' => ({required Object query}) => 'Buscando «${query}»',
+			'sessions.autoMini' => 'Automático (mini)',
+			'sharedContext.title' => 'Notas compartidas',
+			'skills.moveSkill' => ({required Object name}) => 'Mover ${name}',
+			'skills.deleteSkill' => ({required Object name}) => 'Eliminar ${name}',
+			'skills.projectLabel' => 'Proyecto',
+			'skills.addDialog.title' => ({required Object provider}) => 'Añadir Skill de ${provider}',
+			'skills.addDialog.chooseFileTitle' => 'Elegir SKILL.md',
+			'skills.addDialog.chooseFolderTitle' => 'Elegir una carpeta de skills',
+			'skills.addDialog.uploadHint' => 'Sube un archivo SKILL.md o una carpeta de skills completa.',
+			'skills.addDialog.pickTitle' => 'Elige una carpeta de skills o SKILL.md',
+			'skills.addDialog.pickHint' => 'Las carpetas pueden incluir scripts, referencias y recursos.',
+			'skills.addDialog.chooseFiles' => 'Elegir archivos',
+			'skills.addDialog.chooseFolder' => 'Elegir carpeta',
+			'skills.addDialog.readyToInstall' => 'Listo para instalar',
+			'skills.addDialog.markdownFileMeta' => ({required Object size}) => 'Archivo Markdown · ${size}',
+			'skills.addDialog.folderFilesMeta' => ({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: '${count} archivo · ${size}', other: '${count} archivos · ${size}', ), 
+			'skills.addDialog.removeQueued' => ({required Object name}) => 'Quitar ${name}',
+			'skills.addDialog.whereWillThisInstall' => '¿Dónde se instalará esto?',
+			'skills.addDialog.hideInstallLocation' => 'Ocultar ubicación de instalación',
+			'skills.addDialog.folderUploadsNote' => 'Las carpetas subidas conservan el nombre de la carpeta seleccionada; los archivos sueltos usan el `name` de `SKILL.md`.',
+			'skills.addDialog.installSkill' => 'Instalar Skill',
+			'skills.addDialog.installSkills' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: 'Instalar ${count} Skill', other: 'Instalar ${count} Skills', ), 
+			'skills.moveDialog.toProjectHint' => 'Elige el proyecto al que debe pertenecer esta skill. Saldrá del directorio global de skills del proveedor.',
+			'skills.moveDialog.toGlobalHint' => 'Mueve esta skill al directorio global de skills para que todos los proyectos puedan usarla.',
+			'skills.moveDialog.moveToProject' => 'Mover a proyecto',
+			'skills.moveDialog.moveToGlobal' => 'Mover a global',
+			'skills.screen.manageDescription' => ({required Object provider}) => 'Gestiona las skills de ${provider} desde archivos locales, carpetas completas y ubicaciones por proyecto.',
+			'skills.screen.searchHint' => 'Buscar skills…',
+			'skills.screen.clearSearch' => 'Limpiar búsqueda de skills',
+			'skills.screen.addSkill' => 'Añadir Skill',
+			'skills.screen.scanningProjectSkills' => 'Escaneando skills del proyecto…',
+			'skills.screen.savedSuccessfully' => 'Skills guardadas correctamente.',
+			'skills.screen.loadingSkills' => ({required Object provider}) => 'Cargando skills de ${provider}…',
+			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: '${count} SKILL', other: '${count} SKILLS', ), 
+			'skills.screen.deleteTitle' => ({required Object name}) => '¿Eliminar ${name}?',
+			'skills.screen.deleteDescription' => ({required Object directory, required Object provider}) => 'Esto elimina el directorio ${directory} del directorio de skills gestionadas de ${provider}. Esta acción no se puede deshacer.',
+			'skills.screen.noDescription' => 'No se ha proporcionado descripción en el front matter de la skill.',
+			'skills.screen.pluginBadge' => ({required Object name}) => 'Plugin: ${name}',
+			'skills.screen.projectBadge' => ({required Object name}) => 'Proyecto: ${name}',
+			'skills.screen.sourceLabel' => 'ORIGEN',
+			'skills.empty.noProjects' => 'No hay proyectos disponibles',
+			'skills.empty.noProjectsDescription' => 'Añade un proyecto o espacio de trabajo para explorar sus skills.',
+			'skills.empty.noSkillsInProject' => 'No hay skills en este proyecto',
+			'skills.empty.noSkillsInProjectDescription' => 'Crea una carpeta .claude/skills, .cursor/skills o .agents/skills en el proyecto seleccionado.',
+			'skills.empty.noGlobalSkills' => 'Aún no se han detectado skills globales',
+			'skills.empty.noGlobalSkillsDescription' => 'Añade una skill global arriba para que esté disponible en todos los proyectos.',
+			'skills.empty.noMatchingSkills' => 'No hay skills coincidentes',
+			'skills.empty.noMatchingSkillsDescription' => 'Prueba con otro comando, nombre, ámbito, proyecto o ruta de origen.',
+			'skills.scopes.user' => 'Usuario',
+			'skills.scopes.plugin' => 'Plugin',
+			'skills.scopes.repo' => 'Repositorio',
+			'skills.scopes.project' => 'Proyecto',
+			'skills.scopes.admin' => 'Admin',
+			'skills.scopes.system' => 'Sistema',
+			'skills.errors.dropMarkdownOrFolder' => 'Suelta uno o más archivos markdown o una carpeta que contenga SKILL.md.',
+			'skills.errors.addMarkdownFirst' => 'Añade primero uno o más archivos markdown.',
+			'skills.errors.importFailed' => 'No se pudieron importar las skills',
+			'skills.errors.folderReadFailed' => 'No se pudo leer la carpeta de skills',
+			'skills.errors.folderFileLimit' => ({required Object count}) => 'Una carpeta de skills puede contener hasta ${count} archivos.',
+			'skills.errors.folderSizeLimit' => 'Las carpetas de skills seleccionadas deben ocupar menos de 30 MB en total.',
+			'skills.errors.missingSkillFile' => 'La carpeta seleccionada no contiene un archivo SKILL.md.',
+			'skills.errors.couldNotReadSkillFile' => ({required Object name}) => 'No se pudo leer SKILL.md desde ${name}.',
+			'skills.providerShared' => 'Compartidas',
+			'terminal.tabs.shellName' => ({required Object index}) => 'Shell ${index}',
+			'terminal.tabs.plainShell' => 'Shell simple',
+			'terminal.tabs.claudeCli' => 'Claude CLI',
+			'terminal.tabs.opencodeCli' => 'OpenCode CLI',
+			'terminal.tabs.commandCodeCli' => 'Command Code CLI',
+			'terminal.tabs.antigravityCli' => 'Antigravity CLI',
+			'terminal.tabs.cursorCli' => 'Cursor CLI',
+			'terminal.tabs.devinCli' => 'Devin CLI',
+			'terminal.tabs.loginTitle' => ({required Object provider}) => 'Inicio de sesión: ${provider}',
+			'terminal.tabs.runTitle' => ({required Object command}) => 'Ejecutar: ${command}',
+			'terminal.actions.newTab' => 'Nueva pestaña de terminal',
+			'terminal.actions.providerLogin' => 'Inicio de sesión del proveedor',
+			'terminal.actions.restartSession' => 'Reiniciar sesión',
+			'terminal.actions.clearOutput' => 'Limpiar salida',
+			'terminal.actions.newShell' => 'Shell nueva',
+			'terminal.actions.connect' => 'Conectar',
+			'terminal.authUrl.openInBrowser' => 'Abrir en el navegador',
+			'terminal.authUrl.linkLabel' => ({required Object url}) => 'Enlace de autenticación: ${url}',
+			'terminal.fileLink.detected' => ({required Object path}) => 'Archivo detectado: ${path}',
+			'terminal.shortcuts.interrupt' => 'Interrumpir (SIGINT)',
+			'terminal.shortcuts.eof' => 'EOF',
+			'terminal.shortcuts.suspend' => 'Suspender (SIGTSTP)',
+			'terminal.shortcuts.hide' => 'Ocultar barra de atajos',
+			'terminal.shortcuts.showTooltip' => 'Mostrar atajos',
+			'terminal.shortcuts.hideTooltip' => 'Ocultar atajos',
+			'terminal.paste.title' => 'Pegar en la terminal',
+			'terminal.paste.hint' => 'Ctrl+V / clic derecho → Pegar',
+			'terminal.errors.couldNotOpenLink' => ({required Object url}) => 'No se pudo abrir el enlace: ${url}',
+			'terminal.errors.frameError' => ({required Object message}) => '[Error] ${message}',
+			'terminal.errors.connectionError' => ({required Object message}) => '[Error de conexión] ${message}',
+			'terminal.loginDialog.title' => ({required Object provider}) => 'Inicio de sesión en ${provider} CLI',
+			'terminal.loginDialog.exited' => ({required Object code}) => 'Finalizado (${code})',
+			'terminal.loginDialog.authLinkDetected' => 'Enlace de autenticación detectado',
+			'terminal.empty.title' => 'No hay terminal activa',
+			'terminal.empty.description' => 'Crea una pestaña nueva para empezar',
+			'terminal.overlay.processExited' => 'El proceso ha finalizado: conéctate para iniciarlo de nuevo',
+			'terminal.overlay.processExitedWithCode' => ({required Object code}) => 'El proceso ha finalizado (código ${code}): conéctate para iniciarlo de nuevo',
+			'terminal.overlay.resumeSession' => ({required Object title}) => 'Reanudar la sesión ${title}',
+			'terminal.overlay.startSession' => ({required Object path}) => 'Iniciar una sesión nueva en ${path}',
+			'voice.preview' => 'Vista previa',
+			'voice.settingsSaved' => 'Ajustes de entrada de voz guardados',
+			'voice.saveFailed' => 'No se pudo guardar la configuración de STT',
+			'voice.apiKeySaved' => 'Clave API (guardada; escribe para reemplazar)',
 			'workspace.exportChat' => 'Exportar chat',
-			'workspace.jumpToSession' => 'Ir a la sesión…',
-			'workspace.newChatProvider' => 'Nuevo chat — proveedor',
-			'workspace.nextMatch' => 'Coincidencia siguiente',
-			'workspace.previousMatch' => 'Coincidencia anterior',
 			'workspace.searchTranscript' => 'Buscar en la transcripción',
+			'workspace.previousMatch' => 'Coincidencia anterior',
+			'workspace.nextMatch' => 'Coincidencia siguiente',
+			_ => null,
+		} ?? switch (path) {
+			'workspace.closeSearch' => 'Cerrar búsqueda',
+			'workspace.newChatProvider' => 'Nuevo chat — proveedor',
+			'workspace.closePane' => 'Cerrar panel',
+			'workspace.jumpToSession' => 'Ir a la sesión…',
+			'workspace.archivedWorkspaceName' => 'Archivado',
 			'workspace.sendTo' => ({required Object count}) => 'Enviar a ${count}',
+			'workspace.deleteSessionNotice' => 'Elimina la sesión y su transcripción. No se puede deshacer.',
 			'workspace.accountWithLabel' => ({required Object label}) => 'Predeterminado · ${label}',
 			'workspace.finishRunBeforeChangingWorkspace' => 'Finaliza la ejecución antes de cambiar de espacio de trabajo',
 			'workspace.restored' => 'Espacio de trabajo restaurado',
 			'workspace.maximizePane' => 'Maximizar panel',
 			'workspace.restorePanes' => 'Restaurar paneles',
 			'workspace.reviewChangedFiles' => 'Revisar archivos modificados',
+			'workspace.paneTitle.chat' => 'Chat',
+			'workspace.paneTitle.browser' => 'Navegador',
+			'workspace.paneTitle.terminal' => 'Terminal',
+			'workspace.paneTitle.notes' => 'Notas compartidas',
+			'workspace.paneTitle.editor' => 'Editor',
+			'workspace.paneTitle.git' => 'Git',
+			'workspace.addEditorPane' => 'Añadir panel de editor',
+			'workspace.addGitPane' => 'Añadir panel de Git',
+			'workspace.unknownProjectPath' => 'Ruta del proyecto desconocida',
+			'workspace.autoMini' => 'Auto (mini)',
+			'workspace.exportAs' => 'Exportar como:',
+			'workspace.exportMarkdown' => 'Markdown (.md)',
+			'workspace.exportHtml' => 'Página web (.html)',
+			'workspace.exportPdf' => 'PDF (Imprimir en archivo)',
+			'workspace.matchPosition' => ({required Object current, required Object total}) => '${current} de ${total}',
+			'workspace.launcherDescription' => 'Elige un espacio de trabajo para este panel o crea uno nuevo.',
+			'workspace.createWorkspace' => 'Crear espacio de trabajo',
+			'worktrees.scripts' => 'Scripts',
+			'worktrees.emptyTitle' => 'No se encontraron worktrees',
+			'worktrees.emptyDescription' => 'Crea un worktree para aislar el trabajo de una funcionalidad o las ejecuciones de agentes.',
+			'worktrees.opened' => ({required Object branch}) => 'Worktree abierto: ${branch}',
+			'worktrees.created' => 'Worktree creado',
+			'worktrees.removed' => 'Worktree eliminado',
+			'worktrees.merged' => ({required Object branch}) => 'Worktree fusionado en ${branch}',
+			'worktrees.scriptsSaved' => 'Configuración de scripts guardada',
+			'worktrees.setupLabel' => 'Configuración: ',
+			'worktrees.serverLabel' => 'Servidor: ',
+			'worktrees.runRunning' => 'en ejecución',
+			'worktrees.runRunningWithPort' => ({required Object port}) => 'en ejecución :${port}',
+			'worktrees.runButton' => 'Ejecutar',
+			'worktrees.stopButton' => 'Detener',
+			'worktrees.mainBadge' => 'main',
+			'worktrees.headDetachedAt' => ({required Object sha}) => 'HEAD separado en ${sha}',
+			'worktrees.branchHint' => 'Nombre de la nueva rama (p. ej. feature/login)',
+			'worktrees.branchingOff' => ({required Object branch}) => 'Ramificando desde ${branch}',
+			'worktrees.mergeTitle' => ({required Object branch}) => 'Fusionar ${branch}',
+			'worktrees.mergeDescription' => ({required Object branch}) => 'Fusionar los cambios en ${branch}.',
+			'worktrees.squashDescription' => 'Combinar todos los commits en un solo commit',
+			'worktrees.cleanupDescription' => 'Eliminar el worktree y borrar la rama una vez fusionada',
+			'worktrees.removeTitle' => ({required Object branch}) => '¿Eliminar el worktree ${branch}?',
+			'worktrees.removeDescription' => 'Esto elimina la carpeta del worktree. Los proyectos vinculados se archivarán.',
+			'worktrees.dirtyWarning' => ({required Object count}) => 'Advertencia: este worktree tiene ${count} cambios sin confirmar que se perderán.',
+			'worktrees.forceRemoveLabel' => 'Forzar eliminación (descartar cambios)',
+			'worktrees.deleteBranchLabel' => 'Eliminar también la rama',
+			'worktrees.setupHint' => 'Comando de configuración (p. ej. npm install)',
+			'worktrees.runHint' => 'Comando de ejecución (p. ej. npm run dev)',
+			'worktrees.portHint' => 'Puerto de ejecución (opcional, p. ej. 3000)',
+			'worktrees.unknownSha' => 'desconocido',
+			'worktrees.baseBranchFallback' => 'rama base',
+			'worktrees.runtimeStatus.idle' => 'inactivo',
+			'worktrees.runtimeStatus.running' => 'en ejecución',
+			'worktrees.runtimeStatus.done' => 'listo',
+			'worktrees.runtimeStatus.failed' => 'fallido',
+			'worktrees.runtimeStatus.exited' => 'finalizado',
+			'browserUse.sessionStatus.ready' => 'Lista',
+			'browserUse.sessionStatus.stopped' => 'Detenida',
+			'browserUse.sessionStatus.unavailable' => 'No disponible',
+			'orchestrator.stepFallback' => ({required Object n}) => 'Paso ${n}',
+			'miniOrchestrator.taskTypes.gate' => 'Puerta',
+			'miniOrchestrator.roles.thinker' => 'Pensador',
+			'miniOrchestrator.roles.worker' => 'Ejecutor',
 			_ => null,
 		};
 	}

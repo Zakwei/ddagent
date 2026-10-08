@@ -1,5 +1,9 @@
 /// Pure parsing helpers for orchestrator transcript payloads — port of the
 /// defensive readers in `OrchestratorCards.tsx`. Dependency-free for tests.
+library;
+
+import 'package:ddagent_app/i18n/strings.g.dart';
+
 class PlanStep {
   const PlanStep({
     required this.id,
@@ -57,7 +61,7 @@ List<PlanStep> readSteps(Object? value) {
           return PlanStep(
             id: str(raw['id']) ?? 'step-${i + 1}',
             type: str(raw['type']) ?? 'task',
-            title: str(raw['title']) ?? 'Step ${i + 1}',
+            title: str(raw['title']) ?? t.orchestrator.stepFallback(n: i + 1),
             dependsOn: strList(raw['dependsOn']),
             enabled: raw['enabled'] != false,
             command: str(raw['command']),

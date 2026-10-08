@@ -15,21 +15,37 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Human label for a mini task type (the `OrchestratorTaskType` set).
-String _taskTypeLabel(String type) => switch (type) {
-  'plan' => 'Plan',
-  'quick' => 'Quick',
-  'research' => 'Research',
-  'docs' => 'Docs',
-  'code' => 'Code',
-  'code-hard' => 'Code (hard)',
-  'test' => 'Test',
-  'review' => 'Review',
-  'gate' => 'Gate',
-  'report' => 'Report',
-  _ => type,
-};
+String _taskTypeLabel(Translations t, String type) {
+  final types = t.settings.orchestration.rules.taskTypes;
+  return switch (type) {
+    'plan' => types.plan,
+    'quick' => types.quick,
+    'research' => types.research,
+    'docs' => types.docs,
+    'code' => types.code,
+    'code-hard' => types.codeHard,
+    'test' => types.test,
+    'review' => types.review,
+    'gate' => t.miniOrchestrator.taskTypes.gate,
+    'report' => types.report,
+    _ => type,
+  };
+}
 
-String _roleLabel(String role) => role == 'thinker' ? 'Thinker' : 'Worker';
+String _roleLabel(Translations t, String role) =>
+    role == 'thinker' ? t.miniOrchestrator.roles.thinker : t.miniOrchestrator.roles.worker;
+
+/// Localized cost-tier label; unknown values pass through.
+String _tierLabel(Translations t, String tier) {
+  final tiers = t.settings.orchestration.tiers;
+  return switch (tier) {
+    'free' => tiers.free,
+    'cheap' => tiers.cheap,
+    'mid' => tiers.mid,
+    'premium' => tiers.premium,
+    _ => tier,
+  };
+}
 
 /// Settings → Mini orchestration: the two-role engine's config — a non-flash
 /// thinker, a flash worker, and the per-task-type role map — behind one draft
@@ -214,7 +230,7 @@ class _RoleEditor extends StatelessWidget {
                 underline: const SizedBox.shrink(),
                 items: [
                   for (final tier in orchCostTiers)
-                    DropdownMenuItem(value: tier, child: Text(tier)),
+                    DropdownMenuItem(value: tier, child: Text(_tierLabel(t, tier))),
                 ],
                 onChanged: (tier) {
                   if (tier == null) return;
@@ -256,13 +272,13 @@ class _RolesEditor extends StatelessWidget {
           children: [
             for (final type in miniRoleTaskTypes)
               SettingsRow(
-                label: _taskTypeLabel(type),
+                label: _taskTypeLabel(t, type),
                 child: DropdownButton<String>(
                   value: draft.roles[type] ?? 'worker',
                   underline: const SizedBox.shrink(),
                   items: [
                     for (final role in miniRoleValues)
-                      DropdownMenuItem(value: role, child: Text(_roleLabel(role))),
+                      DropdownMenuItem(value: role, child: Text(_roleLabel(t, role))),
                   ],
                   onChanged: (role) {
                     if (role == null) return;

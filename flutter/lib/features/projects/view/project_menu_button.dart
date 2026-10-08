@@ -1,5 +1,6 @@
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/features/projects/data/projects_repository.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -12,7 +13,7 @@ class ProjectMenuButton extends StatelessWidget {
     required this.projects,
     required this.selected,
     required this.onSelected,
-    this.header = 'Project',
+    this.header,
     this.allWorkspacesLabel,
     this.icon = LucideIcons.folder,
   });
@@ -21,8 +22,9 @@ class ProjectMenuButton extends StatelessWidget {
   final Project? selected;
   final ValueChanged<Project> onSelected;
 
-  /// Menu header label (old UI shows the section name, e.g. 'Files').
-  final String header;
+  /// Menu header label (old UI shows the section name, e.g. 'Files');
+  /// defaults to the localized "Project".
+  final String? header;
 
   /// When set, the menu prepends a synthetic "all workspaces" entry whose
   /// [Project.projectId] equals this label's sentinel (caller decides).
@@ -34,6 +36,7 @@ class ProjectMenuButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
+    final header = this.header ?? Translations.of(context).projects.project;
     return PopupMenuButton<Project>(
       tooltip: header,
       position: PopupMenuPosition.under,

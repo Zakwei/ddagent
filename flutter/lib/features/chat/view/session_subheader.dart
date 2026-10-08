@@ -9,6 +9,7 @@ import 'package:ddagent_app/features/quota/data/quota_models.dart' hide UsageSum
 import 'package:ddagent_app/features/quota/data/quota_repository.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
 import 'package:ddagent_app/features/sessions/view/provider_logo.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -105,7 +106,7 @@ class SessionSubheader extends ConsumerWidget {
         (sessionModel != null && sessionModel.isNotEmpty ? sessionModel : null);
     String? modelLabel;
     if (p == 'orchestrator' || p == 'mini-orchestrator') {
-      modelLabel = 'orchestrated';
+      modelLabel = Translations.of(context).chat.providerSelection.orchestrated;
     } else {
       modelLabel = effectiveModel;
       for (final m in composer?.models ?? const []) {
@@ -237,9 +238,8 @@ class _ContextGauge extends StatelessWidget {
       fontFeatures: const [FontFeature.tabularFigures()],
     );
     return Tooltip(
-      message:
-          'Context: ${usage.used.round()} / ${usage.total.round()} tokens'
-          ' · $pct% used',
+      message: Translations.of(context).chat.subheader
+          .contextTooltip(used: usage.used.round(), total: usage.total.round(), percent: pct),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -413,10 +413,11 @@ class QuotaBadge extends ConsumerWidget {
         };
     if (sectionKey == null) return const SizedBox.shrink();
 
+    final qb = Translations.of(context).chat.quotaBadge;
     final account = quotaAccountFor(snap.accounts, sectionKey, accountId);
     final lines = <String>[];
     if (account != null && account.status != 'active') {
-      lines.add('${account.plan}: ${account.syncError ?? 'no subscription'}');
+      lines.add('${account.plan}: ${account.syncError ?? qb.noSubscription}');
     }
     QuotaWindow? worst;
     for (final w in account?.windows ?? const <QuotaWindow>[]) {
@@ -425,7 +426,7 @@ class QuotaBadge extends ConsumerWidget {
       lines.add(
         reset == null
             ? '${w.label}: ${_percentText(w.percent)}%'
-            : '${w.label}: ${_percentText(w.percent)}% · reset $reset',
+            : qb.windowLineReset(label: w.label, percent: _percentText(w.percent), time: reset),
       );
       if (worst == null || w.percent > worst.percent) worst = w;
     }
@@ -468,7 +469,7 @@ class QuotaBadge extends ConsumerWidget {
     final title = worst != null
         ? '${account?.plan ?? sectionKey} · ${lines.join('\n')}'
         : lines.join('\n').isEmpty
-        ? 'No subscription data for this model'
+        ? qb.noData
         : lines.join('\n');
 
     return Tooltip(
@@ -514,7 +515,7 @@ class QuotaBadge extends ConsumerWidget {
                         return Tooltip(
                           message: remaining == null
                               ? '${_percentText(segPercent)}%'
-                              : '${remaining.round()}% of the window left before reset',
+                              : qb.windowRemaining(percent: remaining.round()),
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
                             decoration: BoxDecoration(

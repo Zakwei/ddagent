@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:ddagent_app/features/skills/data/skill_models.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 
 /// Skills constants — port of the maps in `ProviderSkills.tsx`.
 
@@ -60,7 +61,9 @@ const kSkillQueueMax = 20;
 /// `SCOPE_ORDER` — group headers render in this order.
 const kSkillScopeOrder = SkillScope.values;
 
-String skillProviderName(String provider) => kSkillProviderNames[provider] ?? provider;
+/// `unified` is the only non-brand label, so it is localized at call time.
+String skillProviderName(String provider) =>
+    provider == 'unified' ? t.skills.providerShared : kSkillProviderNames[provider] ?? provider;
 
 /// `SCOPE_BADGE_CLASSES` — tailwind 500/30 border, 500/10 bg, 700 (light) /
 /// 300 (dark) text.

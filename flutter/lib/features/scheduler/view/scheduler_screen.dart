@@ -395,7 +395,13 @@ class _JobTileState extends ConsumerState<_JobTile> {
           ),
           SizedBox(
             width: 70,
-            child: Text(r.status, style: t.labelSmall?.copyWith(color: tone)),
+            child: Text(switch (r.status) {
+              'fired' => i18n.scheduler.runStatus.fired,
+              'skipped' => i18n.scheduler.runStatus.skipped,
+              'failed' => i18n.scheduler.runStatus.failed,
+              'completed' => i18n.scheduler.runStatus.completed,
+              _ => r.status,
+            }, style: t.labelSmall?.copyWith(color: tone)),
           ),
           Text(
             started?.toLocal().toString().split('.').first ?? r.startedAt,
@@ -616,7 +622,7 @@ class _JobDialogState extends ConsumerState<_JobDialog> {
           variant: AppButtonVariant.ghost,
           size: AppButtonSize.sm,
           onPressed: () => Navigator.of(context).pop(),
-          child: Text(i18n.chat.orchestrator.summary.cancelTasks),
+          child: Text(i18n.common.buttons.cancel),
         ),
         AppButton(
           size: AppButtonSize.sm,

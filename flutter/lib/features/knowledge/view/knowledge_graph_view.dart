@@ -168,11 +168,26 @@ class _KnowledgeGraphViewState extends ConsumerState<KnowledgeGraphView> {
         leading: _EntityIcon(type: selected.nodeType),
         title: Text(selected.label),
         subtitle: Text(
-          [selected.nodeType, if (relations.isNotEmpty) relations.join('\n')].join('\n'),
+          [
+            _nodeTypeLabel(Translations.of(context), selected.nodeType),
+            if (relations.isNotEmpty) relations.join('\n'),
+          ].join('\n'),
         ),
       ),
     );
   }
+
+  /// Localized label for a raw graph node type (entity kinds plus the
+  /// implicit `project` / `tag` hubs); unknown types are shown as-is.
+  static String _nodeTypeLabel(Translations t, String nodeType) => switch (nodeType) {
+    'memory' => t.knowledge.entityTypes.memory,
+    'rule' => t.knowledge.entityTypes.rule,
+    'skill' => t.knowledge.entityTypes.skill,
+    'personal' => t.knowledge.entityTypes.personal,
+    'project' => t.knowledge.entityTypes.project,
+    'tag' => t.knowledge.entityTypes.tag,
+    _ => nodeType,
+  };
 
   @override
   Widget build(BuildContext context) {

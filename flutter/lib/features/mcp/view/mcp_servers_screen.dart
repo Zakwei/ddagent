@@ -492,7 +492,13 @@ class _McpServerCard extends StatelessWidget {
                     Text(server.name, style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.w500)),
                     if (!managed) ...[
                       AppBadge(label: server.transport.wire),
-                      AppBadge(label: server.scope.wire),
+                      AppBadge(
+                        label: switch (server.scope) {
+                          McpScope.user => t.settings.mcpServers.scope.user,
+                          McpScope.local => t.settings.mcpServers.scope.local,
+                          McpScope.project => t.mcp.servers.scopeProject,
+                        },
+                      ),
                       if (server.projectDisplayName != null)
                         AppBadge(label: server.projectDisplayName!),
                     ] else

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:ddagent_app/core/network/api_error.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_node.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_repository.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -146,7 +147,7 @@ class FileTreeController extends Notifier<FileTreeState> {
     bool uploading = false,
   }) async {
     if (state.projectId == null) {
-      return 'No project selected';
+      return t.kanban.empty.noProject;
     }
     if (uploading) {
       state = state.copyWith(uploading: true);

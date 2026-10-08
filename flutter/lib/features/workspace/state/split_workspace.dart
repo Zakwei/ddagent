@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:hive/hive.dart';
 
 /// Multi-pane workspace (port of main-content/utils/splitWorkspace.ts +
@@ -146,6 +147,16 @@ PaneAction paneAction(
   return PaneAction.idle;
 }
 
+/// Localized display name of a pane kind.
+String paneKindLabel(PaneKind kind) => switch (kind) {
+  PaneKind.chat => t.workspace.paneTitle.chat,
+  PaneKind.browser => t.workspace.paneTitle.browser,
+  PaneKind.terminal => t.workspace.paneTitle.terminal,
+  PaneKind.notes => t.workspace.paneTitle.notes,
+  PaneKind.editor => t.workspace.paneTitle.editor,
+  PaneKind.git => t.workspace.paneTitle.git,
+};
+
 ({String title, String? subtitle, PaneAction action}) splitPaneDisplay(
   SplitPane pane, {
   Map<String, String> sessionTitles = const {},
@@ -155,11 +166,11 @@ PaneAction paneAction(
 }) {
   final subtitle = pane.projectId == null ? null : projectNames[pane.projectId];
   final title = switch (pane.kind) {
-    PaneKind.browser => 'Browser',
-    PaneKind.terminal => 'Terminal',
-    PaneKind.notes => 'Shared notes',
-    PaneKind.editor => 'Editor',
-    PaneKind.git => 'Git',
+    PaneKind.browser ||
+    PaneKind.terminal ||
+    PaneKind.notes ||
+    PaneKind.editor ||
+    PaneKind.git => paneKindLabel(pane.kind),
     PaneKind.chat =>
       sessionTitles[pane.sessionId] ??
           (pane.sessionId != null
@@ -167,7 +178,7 @@ PaneAction paneAction(
                   0,
                   pane.sessionId!.length < 8 ? pane.sessionId!.length : 8,
                 )
-              : 'Chat'),
+              : paneKindLabel(PaneKind.chat)),
   };
   return (
     title: title,

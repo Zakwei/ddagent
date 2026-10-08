@@ -214,7 +214,9 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
       if (!mounted) return;
       setState(() {
         _applyCatalog(_provider, res['models']);
-        _notice = editing != null ? '$name was updated.' : '$name was added.';
+        _notice = editing != null
+            ? t.chat.modelLibrary.updatedNotice(name: name)
+            : t.chat.modelLibrary.addedNotice(name: name);
         _resetForm();
       });
       // A renamed model keeps its default-model pick (web
@@ -230,6 +232,7 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
   }
 
   Future<void> _delete(Map<String, dynamic> option) async {
+    final t = Translations.of(context);
     final recordId = _recordId(option);
     if (recordId == null) return;
     setState(() {
@@ -244,7 +247,7 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
         _applyCatalog(_provider, res['models']);
         if (_recordId(_editing ?? const {}) == recordId) _resetForm();
         _confirmDeleteId = null;
-        _notice = '${_labelOf(option)} was deleted.';
+        _notice = t.chat.modelLibrary.deletedNotice(name: _labelOf(option));
       });
       // A deleted model can't stay the shared default — falls back to the
       // catalog DEFAULT on the next composer read.
@@ -261,6 +264,7 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
+    final ml = Translations.of(context).chat.modelLibrary;
     final options = _options[_provider] ?? const <Map<String, dynamic>>[];
     final customModels = [
       for (final m in options)
@@ -299,7 +303,7 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Model library',
+                  ml.title,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -308,8 +312,7 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
                   ),
                 ),
                 Text(
-                  'Add model IDs supported by your provider. Built-in models stay locked. '
-                  'The circle marks the default model.',
+                  ml.subtitle,
                   style: TextStyle(fontSize: 12, height: 16 / 12, color: c.mutedForeground),
                 ),
               ],
@@ -331,7 +334,7 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
       children: [
         _form(c),
         const SizedBox(height: 16),
-        _sectionHeader(c, 'Your models', 'Editable and stored in auth.db', customModels.length),
+        _sectionHeader(c, ml.yourModels, ml.yourModelsHint, customModels.length),
         const SizedBox(height: 6),
         if (customModels.isEmpty)
           Container(
@@ -346,11 +349,11 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
                 Icon(LucideIcons.package, size: 18, color: c.mutedForeground),
                 const SizedBox(height: 6),
                 Text(
-                  'No custom models yet',
+                  ml.emptyTitle,
                   style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: c.foreground),
                 ),
                 Text(
-                  'Add one with the form and it will appear in every model picker.',
+                  ml.emptyHint,
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 12, color: c.mutedForeground),
                 ),
@@ -360,12 +363,7 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
         else
           for (final m in customModels) _customRow(c, m, effectiveDefault),
         const SizedBox(height: 16),
-        _sectionHeader(
-          c,
-          'Built-in models',
-          'Maintained by ddagent and read-only',
-          predefined.length,
-        ),
+        _sectionHeader(c, ml.builtInModels, ml.builtInModelsHint, predefined.length),
         const SizedBox(height: 6),
         Container(
           decoration: BoxDecoration(
@@ -569,7 +567,7 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      editing ? 'Edit custom model' : 'Add a custom model',
+                      editing ? t.chat.modelLibrary.editTitle : t.chat.modelLibrary.addTitle,
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -577,7 +575,7 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
                       ),
                     ),
                     Text(
-                      'The ID is sent to ${providerLabel(_provider)} exactly as written.',
+                      t.chat.modelLibrary.idSentAsWritten(provider: providerLabel(_provider)),
                       style: TextStyle(fontSize: 11, color: c.mutedForeground),
                     ),
                   ],
@@ -594,29 +592,29 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Model name',
+            t.chat.modelLibrary.nameLabel,
             style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: c.foreground),
           ),
           const SizedBox(height: 4),
           AppInput(
             controller: _name,
-            hint: 'e.g. GPT-5.5 Pro',
+            hint: t.chat.modelLibrary.nameHint,
             onSubmitted: (_) => unawaited(_submit()),
           ),
           const SizedBox(height: 8),
           Text(
-            'Model ID',
+            t.chat.modelLibrary.idLabel,
             style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: c.foreground),
           ),
           const SizedBox(height: 4),
           AppInput(
             controller: _id,
-            hint: 'e.g. gpt-5.5-pro',
+            hint: t.chat.modelLibrary.idHint,
             onSubmitted: (_) => unawaited(_submit()),
           ),
           const SizedBox(height: 4),
           Text(
-            'Use the exact identifier accepted by the provider CLI. IDs cannot contain spaces.',
+            t.chat.modelLibrary.idHelp,
             style: TextStyle(fontSize: 10, height: 14 / 10, color: c.mutedForeground),
           ),
           if (_error != null)
@@ -660,10 +658,10 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
               loading: _saving,
               child: Text(
                 _saving
-                    ? 'Saving…'
+                    ? t.chat.modelLibrary.saving
                     : editing
-                    ? 'Save changes'
-                    : 'Add model',
+                    ? t.chat.modelLibrary.saveChanges
+                    : t.chat.providerSelection.addModel,
               ),
             ),
           ),
@@ -778,7 +776,7 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
                 children: [
                   Expanded(
                     child: Text(
-                      'Delete this model from all pickers?',
+                      t.chat.modelLibrary.deleteConfirm,
                       style: TextStyle(fontSize: 12, color: c.mutedForeground),
                     ),
                   ),
@@ -812,7 +810,7 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
       borderRadius: BorderRadius.circular(999),
     ),
     child: Text(
-      'Custom',
+      Translations.of(context).chat.modelLibrary.customBadge,
       style: TextStyle(
         fontSize: 9,
         height: 1,

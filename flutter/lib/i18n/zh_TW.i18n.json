@@ -63,7 +63,111 @@
       "cursor": "Cursor",
       "codex": "Codex",
       "opencode": "OpenCode",
-      "devin": "Devin"
+      "devin": "Devin",
+      "orchestrator": "自動"
+    },
+    "orchestrator": {
+      "routing": {
+        "title": "路由",
+        "alternatives": "備選：{{list}}",
+        "first": "{{label}} — {{task}} 的首選候選",
+        "skipped": "{{label}} — 已略過較前的候選（{{list}}）"
+      },
+      "plan": {
+        "title": "計畫",
+        "disabled": "已停用",
+        "awaitingConfirm": "正在等待確認計畫。",
+        "run": "執行計畫",
+        "toggleStep": "啟用步驟",
+        "confirmFailed": "啟動失敗，請再試一次。",
+        "fallback": "規劃器無法使用 — 改為單一步驟",
+        "templateSource": "來自流程範本",
+        "offSource": "規劃器已關閉",
+        "stepCount(param=count)": {
+          "one": "{{count}} 個步驟",
+          "other": "{{count}} 個步驟"
+        },
+        "supervisedSource": "監督迴圈"
+      },
+      "decision": {
+        "title": "監督者決策",
+        "iteration": "第 {{n}} 輪",
+        "rationaleLabel": "原因",
+        "awaitingConfirm": "執行這些步驟前，正在等待你的核准。",
+        "proposedSteps": "建議步驟",
+        "action": {
+          "continue": "委派中",
+          "done": "已完成",
+          "invalid": "無決策"
+        },
+        "outcome": {
+          "success": "成功",
+          "partial": "部分完成",
+          "failed": "失敗"
+        }
+      },
+      "delegation": {
+        "title": "委派步驟",
+        "openSession": "開啟完整工作階段",
+        "attempt": "第 {{n}} 次嘗試",
+        "retryStep": "重試／修正",
+        "continueStep": "繼續／修正",
+        "continueFailed": "失敗，請再試一次。",
+        "status": {
+          "queued": "已排入佇列",
+          "running": "執行中",
+          "done": "已完成",
+          "failed": "失敗",
+          "aborted": "已中止",
+          "skipped": "已略過",
+          "awaiting_decision": "等待決策"
+        },
+        "attempts(param=count)": {
+          "one": "{{count}} 次嘗試",
+          "other": "{{count}} 次嘗試"
+        },
+        "candidates": "候選：{{list}}",
+        "candidateCount(param=count)": {
+          "one": "{{count}} 個候選",
+          "other": "{{count}} 個候選"
+        }
+      },
+      "summary": {
+        "title": "摘要",
+        "progress": "已完成步驟：{{done}}/{{total}}",
+        "aborted": "已中止",
+        "timedOut": "已逾時",
+        "capped": "已達迭代上限",
+        "failed": "失敗的步驟：{{list}}",
+        "continue": "繼續",
+        "continueWork": "繼續工作",
+        "resumeFailed": "無法繼續執行，請再試一次。",
+        "runNextTask": "執行下一個任務",
+        "endAllTasks": "結束所有任務",
+        "tasksRunning": "正在處理任務…",
+        "cancelTasks": "取消"
+      },
+      "backToParent": "返回編排",
+      "taskmaster": {
+        "title": "任務佇列",
+        "remaining(param=count)": {
+          "one": "剩餘 {{count}} 個",
+          "other": "剩餘 {{count}} 個"
+        },
+        "status": {
+          "started": "執行中",
+          "done": "已完成",
+          "complete": "全部完成",
+          "failed": "失敗",
+          "paused": "已暫停",
+          "blocked": "受阻",
+          "aborted": "已中止"
+        }
+      },
+      "gate": {
+        "timedOut": "已逾時",
+        "exit(param=code)": "結束代碼 {{code}}"
+      }
     },
     "tools": {
       "settings": "工具設定",
@@ -107,7 +211,8 @@
     },
     "thinking": {
       "title": "思考中...",
-      "emoji": "💭 思考中..."
+      "emoji": "💭 思考中...",
+      "thoughtFewSeconds": "思考了幾秒鐘"
     },
     "json": {
       "response": "JSON 回應"
@@ -120,14 +225,14 @@
       "error": "無法更新權限。請重試。",
       "openSettings": "開啟設定",
       "allow": "允許",
-      "allowAll": "全部允許（{{count}}）",
-      "allowWithChanges": "允許並修改",
       "always": "一律",
-      "deny": "拒絕",
       "editAndAllow": "編輯並允許",
+      "deny": "拒絕",
+      "reject": "拒絕",
+      "allowAll": "全部允許（{{count}}）",
       "editInput": "編輯輸入",
       "invalidJson": "無效的 JSON",
-      "reject": "拒絕"
+      "allowWithChanges": "允許並修改"
     },
     "todo": {
       "updated": "待辦清單已成功更新",
@@ -158,11 +263,27 @@
       },
       "technicalDetails": "技術細節"
     },
+    "voice": {
+      "autoRead": "朗讀回覆",
+      "autoReadOn": "朗讀回覆：開",
+      "autoReadOff": "朗讀回覆：關",
+      "autoReadVoice": "朗讀聲音",
+      "autoReadVoiceAuto": "自動聲音",
+      "autoReadPreview": "回覆將以此聲音朗讀。",
+      "speakMessage": "朗讀",
+      "stopSpeaking": "停止朗讀"
+    },
     "input": {
       "placeholder": "輸入 / 叫用指令，@ 選取檔案，或向 {{provider}} 提問...",
       "placeholderDefault": "輸入您的訊息...",
       "disabled": "輸入已停用",
       "attachFiles": "附加檔案",
+      "attachFilesDesc": "上傳照片、檔案或文件",
+      "takePhoto": "拍攝照片",
+      "takePhotoDesc": "使用相機拍攝照片",
+      "moreTools": "更多工具",
+      "commandsDesc": "瀏覽快捷鍵與命令",
+      "clearInputDesc": "捨棄目前文字",
       "attachImages": "附加圖片",
       "send": "傳送",
       "stop": "停止",
@@ -176,12 +297,6 @@
       "showAllCommands": "顯示所有指令",
       "clearInput": "清空輸入",
       "scrollToBottom": "捲動到底部",
-      "attachFilesDesc": "上傳照片、檔案或文件",
-      "takePhoto": "拍攝照片",
-      "takePhotoDesc": "使用相機拍攝照片",
-      "moreTools": "更多工具",
-      "commandsDesc": "瀏覽快捷鍵與命令",
-      "clearInputDesc": "捨棄目前文字",
       "newMessage": "新訊息",
       "newMessages": "新訊息",
       "queue": {
@@ -193,7 +308,10 @@
         "delete": "刪除佇列中的訊息",
         "failed": "傳送失敗",
         "sendNow": "立即傳送",
-        "sendNowAfterTurn": "此代理無法在回合進行中接收訊息——將在目前回合結束後傳送"
+        "sendNowAfterTurn": "此代理無法在回合進行中接收訊息——將在目前回合結束後傳送",
+        "filesAttached(param=count)": {
+          "other": "已附加 {{count}} 個檔案"
+        }
       },
       "autoContinueTasks": "自動繼續",
       "autoContinueTasksTooltip": "啟用後讓 Devin 自動繼續下一個 Task Master 任務",
@@ -203,12 +321,53 @@
         "multiple": "{{count}} 則訊息在離線佇列中 — 重新連線後將自動傳送",
         "single": "1 則訊息在離線佇列中 — 重新連線後將自動傳送"
       },
+      "voice": "語音輸入",
+      "voiceStart": "口述訊息",
+      "voiceStop": "停止口述",
+      "pinFile": "將檔案釘選至上下文",
+      "voiceSettings": "語音設定（STT）",
       "cameraUnavailable": "相機無法使用：{{error}}"
+    },
+    "composer": {
+      "toolsAndActions": "工具與操作",
+      "toolsAndActionsDesc": "聊天輸入框的工具與控制項",
+      "reasoning": "推理中",
+      "model": "模型",
+      "effortDefault": "預設",
+      "loadingModels": "正在載入模型…",
+      "modelMenu": "選擇模型與推理強度",
+      "permissionHeading": "應如何核准 {{provider}} 的操作？",
+      "favorites": "收藏",
+      "account": "帳戶",
+      "accountMenu": "選擇帳戶",
+      "accountDefault": "預設帳戶",
+      "accountAuto": "自動（預設）",
+      "accountIsDefault": "預設",
+      "effortLevels": {
+        "off": "關閉",
+        "none": "無",
+        "minimal": "最低",
+        "low": "低",
+        "medium": "中",
+        "high": "高",
+        "xhigh": "極高",
+        "max": "最大",
+        "ultra": "超高"
+      },
+      "contextWindow": "{{size}} 上下文",
+      "accountAutoShort": "自動",
+      "uploadNoRecords": "上傳未傳回任何記錄"
     },
     "providerSelection": {
       "title": "選擇您的 AI 助手",
       "description": "選擇一個提供者以開始新對話",
       "selectModel": "選擇模型",
+      "workspace": "工作區",
+      "noWorkspace": "無",
+      "clickToChangeWorkspace": "點擊以更改工作區",
+      "chooseWorkspace": "選擇工作區",
+      "searchWorkspaces": "搜尋工作區...",
+      "noWorkspacesFound": "找不到工作區。",
       "providerInfo": {
         "anthropic": "由 Anthropic 提供",
         "openai": "由 OpenAI 提供",
@@ -219,17 +378,16 @@
         "claude": "準備好使用 {{model}} 的 Claude。請在下方開始輸入您的訊息。",
         "cursor": "準備好使用 {{model}} 的 Cursor。請在下方開始輸入您的訊息。",
         "codex": "準備好使用 {{model}} 的 Codex。請在下方開始輸入您的訊息。",
-        "default": "請在上方選擇一個提供者以開始",
         "opencode": "OpenCode 搭配 {{model}} 已就緒。請在下方輸入你的訊息。",
-        "devin": "Devin {{model}} 已就緒"
+        "default": "請在上方選擇一個提供者以開始",
+        "devin": "Devin {{model}} 已就緒",
+        "orchestrator": "「自動」已就緒 — 路由器會為每個步驟挑選最適合的模型"
       },
+      "autoGroup": "自動",
+      "autoLabel": "自動（編排）",
+      "autoDescription": "將每個步驟分派給最適合且可用的提供者與模型",
+      "orchestrated": "已編排",
       "pressToSearch": "按 <kbd>{{shortcut}}</kbd> 搜尋工作階段、檔案和提交",
-      "workspace": "工作區",
-      "noWorkspace": "無",
-      "clickToChangeWorkspace": "點擊以更改工作區",
-      "chooseWorkspace": "選擇工作區",
-      "searchWorkspaces": "搜尋工作區...",
-      "noWorkspacesFound": "找不到工作區。",
       "all": "全部",
       "free": "免費",
       "noModelsFound": "找不到模型。",
@@ -259,19 +417,20 @@
         "scrollToLoad": "向上捲動以載入更多",
         "showingLast": "顯示最近 {{count}} 則訊息（共 {{total}} 則）",
         "loadEarlier": "載入較早的訊息",
+        "loadOlderFailed": "載入較早訊息失敗。",
+        "retry": "重試",
         "loadAll": "載入全部訊息",
         "loadingAll": "正在載入全部訊息...",
         "allLoaded": "全部訊息已載入",
         "perfWarning": "已載入全部訊息 - 捲動可能變慢。點擊「捲動到底部」恢復效能。",
-        "loadOlderFailed": "載入較早訊息失敗。",
-        "retry": "重試",
         "noSearchMatches": "沒有訊息符合搜尋。",
-        "loadAllCount": "載入全部（{{count}}）",
         "loadOlder": "載入較早的訊息",
+        "loadAllCount": "載入全部（{{count}}）",
         "retryLoadOlder": "重試載入較早訊息 — {{error}}"
       },
       "deleteConfirm": "移除工作階段及其記錄。此操作無法復原。",
-      "finishRunBeforeWorkspaceChange": "變更工作區前請先完成執行"
+      "finishRunBeforeWorkspaceChange": "變更工作區前請先完成執行",
+      "fallbackTitle": "工作階段"
     },
     "shell": {
       "selectProject": {
@@ -288,15 +447,15 @@
         "disconnectTitle": "中斷 Shell 連線",
         "restart": "重新啟動",
         "restartTitle": "重新啟動 Shell（請先中斷連線）",
-        "connect": "在 Shell 中繼續",
-        "connectTitle": "連線到 Shell",
         "kill": "終止 (SIGINT)",
         "killTitle": "終止執行中的程序 (Ctrl+C)",
         "copyOutput": "複製輸出",
         "copyOutputTitle": "複製終端機輸出",
         "copied": "已複製！",
         "zoomInTitle": "放大",
-        "zoomOutTitle": "縮小"
+        "zoomOutTitle": "縮小",
+        "connect": "在 Shell 中繼續",
+        "connectTitle": "連線到 Shell"
       },
       "loading": "正在載入終端機...",
       "connecting": "正在連線到 Shell...",
@@ -325,16 +484,17 @@
         "label": "已過 {{time}}",
         "startingNow": "正要開始"
       },
+      "stop": "停止",
+      "backgroundTasks(param=count)": {
+        "one": "{{count}} 個背景工作正在執行",
+        "other": "{{count}} 個背景工作正在執行"
+      },
       "controls": {
         "stopGeneration": "停止生成",
         "pressEscToStop": "隨時按 Esc 即可停止"
       },
       "providers": {
         "assistant": "助理"
-      },
-      "stop": "停止",
-      "backgroundTasks(param=count)": {
-        "other": "{{count}} 個背景工作正在執行"
       },
       "backgroundTasksTitle": "正在背景執行",
       "backgroundTaskUnnamed": "未命名的工作"
@@ -344,27 +504,6 @@
     },
     "tasks": {
       "nextTaskPrompt": "開始下一個任務"
-    },
-    "voice": {
-      "autoRead": "朗讀回覆",
-      "autoReadOn": "朗讀回覆：開",
-      "autoReadOff": "朗讀回覆：關",
-      "autoReadVoice": "朗讀聲音",
-      "autoReadVoiceAuto": "自動聲音",
-      "autoReadPreview": "回覆將以此聲音朗讀。",
-      "speakMessage": "朗讀",
-      "stopSpeaking": "停止朗讀"
-    },
-    "composer": {
-      "toolsAndActions": "工具與操作",
-      "toolsAndActionsDesc": "聊天輸入框的工具與控制項",
-      "reasoning": "推理中",
-      "model": "模型",
-      "effortDefault": "預設",
-      "loadingModels": "正在載入模型…",
-      "modelMenu": "選擇模型與推理強度",
-      "permissionHeading": "應如何核准 {{provider}} 的操作？",
-      "favorites": "收藏"
     },
     "splitSession": {
       "toggle": "分割工作階段",
@@ -398,15 +537,19 @@
       "archiveFailed": "封存工作階段失敗。請重試。",
       "deleteFailed": "刪除工作階段失敗。請重試。",
       "running": "工作階段執行中",
-      "unread": "未讀 — 已完成並有新輸出"
+      "unread": "未讀 — 已完成並有新輸出",
+      "account": "帳戶"
     },
     "splitWorkspace": {
       "addChat": "新增聊天窗格",
       "addBrowser": "新增瀏覽器窗格",
       "addTerminal": "新增終端機窗格",
+      "addPreview": "新增預覽窗格",
       "overview": "顯示所有窗格",
       "exitFocusMode": "離開專注模式 (Ctrl+Shift+F)",
       "focusMode": "專注模式 (Ctrl+Shift+F)",
+      "broadcast": "廣播至工作階段",
+      "addNotes": "新增共用筆記窗格",
       "browseSessions": "開啟工作階段清單"
     },
     "splitOverview": {
@@ -420,19 +563,24 @@
     },
     "askUserQuestion": {
       "needsInput": "{{provider}} 需要你的輸入",
-      "answerHint": "輸入你的回答…",
+      "skip": "略過",
       "other": "其他…",
-      "skip": "略過"
+      "answerHint": "輸入你的回答…"
     },
     "attachments": {
       "downloadFailedRetry": "下載失敗 — 點擊重試",
       "fileAttachment": "檔案附件",
-      "download": "下載 {{name}}"
+      "download": "下載 {{name}}",
+      "attachedFile": "附件",
+      "downloaded": "已下載 {{name}}"
     },
     "checkpoint": {
       "creating": "正在建立快照…",
       "revertChanges": "將檔案還原到上一個檢查點",
       "undo": "復原檢查點",
+      "undoAiRun": "復原 AI 執行",
+      "undoing": "正在復原…",
+      "undone": "已復原",
       "beforeAiTurn": "AI 回合之前"
     },
     "common": {
@@ -444,47 +592,43 @@
       "saving": "正在儲存...",
       "taskShort": "任務",
       "addToTask": "新增至 TaskMaster",
-      "added": "已新增至 TaskMaster"
+      "added": "已新增至 TaskMaster",
+      "defaultTaskTitle": "來自聊天的任務"
     },
     "tokenUsage": {
       "desc": "檢視工作階段權杖消耗",
-      "title": "權杖用量"
+      "title": "權杖用量",
+      "notAvailable": "不適用",
+      "tokensBadge(param=count)": {
+        "other": "{{count}} 個 token"
+      }
     },
     "tool": {
       "emptyResult": "（暫無輸出 — 工具回傳了空結果）"
     },
     "quotaBadge": {
       "ariaLabel": "訂閱額度限制",
-      "noData": "此模型暫無訂閱資料"
+      "noData": "此模型暫無訂閱資料",
+      "noSubscription": "無訂閱",
+      "windowLineReset": "{{label}}：{{percent}}% · 重設於 {{time}}",
+      "windowRemaining": "距離重設還剩 {{percent}}% 的時間視窗"
+    },
+    "broadcast": {
+      "title": "廣播至工作階段",
+      "noSessions": "沒有可用的工作階段",
+      "placeholder": "要傳送給每個所選工作階段的訊息…",
+      "partial": "有 {{count}} 個工作階段拒絕了此訊息",
+      "sent": "已排入 {{count}} 個工作階段的佇列",
+      "selectAll": "全選",
+      "selectOrchestrators": "選擇編排器",
+      "orchestratorsOnly": "僅編排器",
+      "noOrchestrators": "沒有可用的編排器會話",
+      "sending": "正在傳送…",
+      "send": "傳送給 {{count}} 個"
     },
     "paneHeader": {
       "processing": "處理中…",
       "switchSession": "切換工作階段"
-    },
-    "broadcast": {
-      "selectOrchestrators": "選擇編排器",
-      "orchestratorsOnly": "僅編排器",
-      "noOrchestrators": "沒有可用的編排器會話"
-    },
-    "changes": {
-      "empty": "沒有檔案變更",
-      "failedToLoad": "載入變更失敗"
-    },
-    "commandResult": {
-      "fallback": {
-        "config": "開啟設定與組態。",
-        "cost": "檢視使用中工作階段的權杖用量。",
-        "help": "顯示指令文件與語法。",
-        "memory": "開啟專案的 CLAUDE.md 記憶檔案。",
-        "models": "瀏覽使用中提供者的可用模型。",
-        "status": "檢查執行階段、版本、提供者與環境狀態。"
-      },
-      "filterCommands": "篩選指令...",
-      "searchModels": "搜尋 {{provider}} 模型..."
-    },
-    "commands": {
-      "runConfirmTitle": "執行指令？",
-      "executionCancelled": "指令執行已取消"
     },
     "export": {
       "sessionTitle": "工作階段 {{id}}",
@@ -492,27 +636,241 @@
       "transcriptDownloaded": "記錄已下載",
       "savedTo": "已儲存 {{path}}"
     },
-    "message": {
-      "compactedSummary": "壓縮摘要",
-      "rawView": "原始檢視",
-      "resendHint": "從輸入框重新傳送"
+    "commandResult": {
+      "fallback": {
+        "models": "瀏覽使用中提供者的可用模型。",
+        "cost": "檢視使用中工作階段的權杖用量。",
+        "status": "檢查執行階段、版本、提供者與環境狀態。",
+        "memory": "開啟專案的 CLAUDE.md 記憶檔案。",
+        "config": "開啟設定與組態。",
+        "help": "顯示指令文件與語法。"
+      },
+      "filterCommands": "篩選指令...",
+      "searchModels": "搜尋 {{provider}} 模型..."
+    },
+    "commands": {
+      "runConfirmTitle": "執行指令？",
+      "executionCancelled": "指令執行已取消",
+      "bashConfirmMessage": "此指令包含將被執行的 bash 指令。要繼續嗎？",
+      "proceed": "繼續"
+    },
+    "pinFile": {
+      "title": "釘選檔案",
+      "pathHint": "path/to/file.ext",
+      "action": "釘選"
     },
     "modelLibrary": {
-      "deleteTooltip": "刪除 {{name}}",
       "editTooltip": "編輯 {{name}}",
+      "deleteTooltip": "刪除 {{name}}",
       "enterNameAndId": "請同時輸入模型名稱與模型 ID。",
       "idNoSpaces": "模型 ID 不能包含空格。",
       "setAsDefault": "設為預設",
-      "defaultModel": "預設模型"
+      "defaultModel": "預設模型",
+      "title": "模型庫",
+      "subtitle": "新增提供者支援的模型 ID。內建模型維持鎖定。圓圈標示預設模型。",
+      "yourModels": "你的模型",
+      "yourModelsHint": "可編輯，儲存在 auth.db 中",
+      "emptyTitle": "尚無自訂模型",
+      "emptyHint": "透過表單新增後，它會出現在所有模型選擇器中。",
+      "builtInModels": "內建模型",
+      "builtInModelsHint": "由 DDAgent 維護，唯讀",
+      "editTitle": "編輯自訂模型",
+      "addTitle": "新增自訂模型",
+      "idSentAsWritten": "ID 會依原樣傳送給 {{provider}}。",
+      "nameLabel": "模型名稱",
+      "nameHint": "例如 GPT-5.5 Pro",
+      "idLabel": "模型 ID",
+      "idHint": "例如 gpt-5.5-pro",
+      "idHelp": "請使用提供者 CLI 接受的確切識別碼。ID 不可包含空格。",
+      "updatedNotice": "已更新 {{name}}。",
+      "addedNotice": "已新增 {{name}}。",
+      "deletedNotice": "已刪除 {{name}}。",
+      "saving": "正在儲存…",
+      "saveChanges": "儲存變更",
+      "deleteConfirm": "要從所有選擇器中刪除此模型嗎？",
+      "customBadge": "自訂"
     },
-    "pinFile": {
-      "action": "釘選",
-      "pathHint": "path/to/file.ext",
-      "title": "釘選檔案"
+    "changes": {
+      "failedToLoad": "載入變更失敗",
+      "empty": "沒有檔案變更"
+    },
+    "message": {
+      "compactedSummary": "壓縮摘要",
+      "resendHint": "從輸入框重新傳送",
+      "rawView": "原始檢視",
+      "runComplete": "執行完成"
     },
     "permissionRequest": {
       "title": "權限要求 · {{tool}}",
-      "question": "問題"
+      "question": "問題",
+      "subagent": "子代理",
+      "viewersCannotApprove": "檢視者無法核准",
+      "recap": {
+        "timedOut": "已逾時 — 已自動拒絕",
+        "cancelled": "已取消 — 本輪已停止",
+        "autoApproved": "已自動核准",
+        "expired": "請求已過期 — 代理不再等待",
+        "answered": "已回答",
+        "skipped": "已略過",
+        "decided": "已決定"
+      },
+      "needsApproval": "{{tool}} 需要核准",
+      "subagentNeedsApproval": "子代理：{{tool}} 需要核准",
+      "moreQuestions(param=count)": {
+        "other": "還有 {{count}} 個問題在等待"
+      }
+    },
+    "commandDialog": {
+      "help": {
+        "eyebrow": "命令中心",
+        "title": "說明與快捷方式",
+        "subtitle": "搜尋內建命令、語法模式與命令用法。"
+      },
+      "models": {
+        "eyebrow": "模型選擇",
+        "title": "選擇模型",
+        "subtitle": "選擇此供應商要使用的模型。",
+        "modelSetTo": "模型已設定為 {{model}}。",
+        "activeModel": "目前模型",
+        "noModelsMatch": "沒有符合此篩選條件的模型。",
+        "choiceSavedForSession": "你的選擇會儲存到此工作階段，並成為新聊天的預設值。",
+        "choiceDefault": "你的選擇將成為新聊天的預設模型。",
+        "custom": "自訂",
+        "currentSelection": "目前選擇"
+      },
+      "cost": {
+        "eyebrow": "工作階段遙測",
+        "title": "Token 用量",
+        "subtitle": "此工作階段的輸入、輸出與總 token 數。",
+        "totalTokensUsed": "已用 token 總數",
+        "inputTokens": "輸入 token",
+        "cacheReadTokens": "快取讀取 token",
+        "cacheWriteTokens": "快取寫入 token",
+        "outputTokens": "輸出 token",
+        "breakdown": "明細",
+        "unavailable": "無法使用",
+        "contextWindow": "上下文視窗",
+        "estimatedCost": "預估費用"
+      },
+      "status": {
+        "eyebrow": "執行階段健康狀態",
+        "title": "系統狀態",
+        "subtitle": "版本、供應商、執行階段與環境詳細資料。",
+        "package": "套件",
+        "uptime": "運作時間",
+        "platform": "平台",
+        "memory": "記憶體",
+        "memoryRss": "{{mb}} MB RSS",
+        "runtimeOnline": "執行階段上線中",
+        "processResponding": "程序 #{{pid}} 正在回應。",
+        "processStatusResponding": "程序正在回應。",
+        "healthy": "正常"
+      },
+      "defaultEyebrow": "命令",
+      "defaultTitle": "命令結果",
+      "escHint": "按 Esc 關閉視窗。",
+      "unknown": "未知",
+      "noDescription": "沒有可用的說明。",
+      "noCommandsMatch": "沒有符合此篩選條件的命令。",
+      "syntax": {
+        "title": "語法",
+        "arguments": "{{arguments}} 傳遞所有引數；{{first}}、{{second}} 為位置引數。",
+        "file": "{{token}} 會包含檔案內容。",
+        "bash": "{{token}} 執行 bash。"
+      },
+      "commandFinished": "命令已完成。"
+    },
+    "utilities": {
+      "tokenUsageUnavailable": "無法取得 token 用量",
+      "tooltip": {
+        "tokensUsed": "已用 {{tokens}} token",
+        "contextOf": "上下文 {{percent}}% / {{total}}",
+        "input": "輸入 {{value}}",
+        "cache": "快取讀取 {{read}} · 寫入 {{write}}",
+        "output": "輸出 {{value}}"
+      },
+      "used": "已用",
+      "cacheWrite": "快取寫入",
+      "contextLabel": "上下文",
+      "usageUnsupported": "不支援用量統計",
+      "chatTranscript": "聊天記錄",
+      "you": "你：",
+      "providerAutoMini": "自動 (mini)"
+    },
+    "toolBlocks": {
+      "moreLines(param=count)": {
+        "other": "… 還有 {{count}} 行"
+      },
+      "status": {
+        "running": "執行中",
+        "denied": "已拒絕"
+      },
+      "showLess": "收合",
+      "showMore": "顯示更多",
+      "showMoreLines(param=count)": {
+        "other": "再顯示 {{count}} 行"
+      },
+      "tools": "工具",
+      "planReview": "計畫審閱",
+      "planUpdate": "計畫更新",
+      "todoListUpdated": "待辦清單已更新",
+      "creatingTask": "正在建立任務",
+      "updatingTask": "正在更新",
+      "fetchingTask": "正在擷取",
+      "listingTasks": "正在列出任務",
+      "search": "搜尋",
+      "verbs": {
+        "read": "讀取",
+        "write": "寫入",
+        "edit": "編輯",
+        "delete": "刪除",
+        "move": "移動"
+      },
+      "subagent": "子代理",
+      "toolCount(param=count)": {
+        "other": "{{count}} 個工具"
+      },
+      "result": "結果",
+      "plusMore": "+{{count}} 個",
+      "plan": "計畫",
+      "questionProgress": "問題 {{current}}/{{total}}",
+      "lineCount(param=count)": {
+        "other": "{{count}} 行"
+      },
+      "todoListItems(param=count)": {
+        "other": "待辦清單（{{count}} 項）"
+      },
+      "tasksCompleted": "已完成 {{done}}/{{total}}"
+    },
+    "commandMenu": {
+      "empty": "沒有可用的指令",
+      "namespaces": {
+        "frequent": "常用",
+        "builtin": "內建指令",
+        "skill": "技能",
+        "project": "專案指令",
+        "user": "使用者指令",
+        "other": "其他指令"
+      }
+    },
+    "mentionMenu": {
+      "kinds": {
+        "file": "檔案",
+        "session": "工作階段",
+        "task": "任務"
+      },
+      "taskTitle": "任務 {{id}}"
+    },
+    "subheader": {
+      "contextTooltip": "上下文：{{used}} / {{total}} 個 token · 已用 {{percent}}%"
+    },
+    "transcript": {
+      "requestFailed": "請求失敗"
+    },
+    "review": {
+      "changedFiles": "已變更的檔案",
+      "changedFilesCount": "已變更的檔案（{{count}}）",
+      "subagent": "子代理"
     }
   },
   "codeEditor": {
@@ -525,10 +883,10 @@
       "settings": "編輯器設定",
       "collapse": "收合編輯器",
       "expand": "展開編輯器到全寬",
+      "toggleDock": "切換檔案面板",
       "diffMerge": "差異 / 合併",
       "previewInBrowser": "在瀏覽器中預覽",
-      "reload": "從磁碟重新載入",
-      "toggleDock": "切換檔案面板"
+      "reload": "從磁碟重新載入"
     },
     "loading": "正在載入 {{fileName}}...",
     "header": {
@@ -555,7 +913,12 @@
     "footer": {
       "lines": "行數：",
       "characters": "字元數：",
-      "shortcuts": "按 Ctrl+S 儲存 • Esc 關閉"
+      "shortcuts": "按 Ctrl+S 儲存 • Esc 關閉",
+      "plainText": "純文字",
+      "lineCount(param=count)": {
+        "other": "{{count}} 行"
+      },
+      "modified": "已修改"
     },
     "binaryFile": {
       "title": "二進位檔案",
@@ -567,34 +930,43 @@
       "error": "無法顯示此檔案。",
       "openInNewTab": "在新分頁中開啟"
     },
-    "diff": {
-      "applyMerge": "套用合併",
-      "base": "基礎",
-      "close": "關閉差異",
-      "current": "目前",
-      "hunk": "區塊 {{number}}",
-      "noChanges": "沒有變更",
-      "deletedOnDisk": "已從磁碟刪除"
-    },
+    "unsavedChanges": "{{name}} 中有未儲存的變更",
     "discardUnsavedChanges": "捨棄未儲存的變更？",
-    "emptyState": {
-      "title": "未開啟任何檔案"
+    "mediaFile": {
+      "title": "媒體檔案",
+      "subtitle": "尚不支援音訊/視訊預覽"
     },
     "failedToLoad": "載入檔案失敗",
     "hexDump": {
       "more": "… 還有 {{size}}"
     },
-    "mediaFile": {
-      "subtitle": "尚不支援音訊/視訊預覽",
-      "title": "媒體檔案"
-    },
     "settings": {
-      "fontSizeDecrease": "字型大小 −  （目前 {{size}}）",
-      "fontSizeIncrease": "字型大小 +",
       "minimap": "縮圖",
-      "tabSize": "Tab 大小：{{size}}"
+      "tabSize": "Tab 大小：{{size}}",
+      "fontSizeDecrease": "字型大小 −  （目前 {{size}}）",
+      "fontSizeIncrease": "字型大小 +"
     },
-    "unsavedChanges": "{{name}} 中有未儲存的變更",
+    "diff": {
+      "noChanges": "沒有變更",
+      "hunk": "區塊 {{number}}",
+      "close": "關閉差異",
+      "base": "基礎",
+      "current": "目前",
+      "applyMerge": "套用合併",
+      "deletedOnDisk": "已從磁碟刪除",
+      "untrackedWillBeDeleted": "此未追蹤的檔案將被刪除。",
+      "restoreConfirm": "將 {{name}} 還原為已提交的狀態？",
+      "headVsWorkingCopy": "HEAD 與工作副本",
+      "savedVsBuffer": "上次儲存與緩衝區（無 git）",
+      "unchangedLines(param=count)": {
+        "other": "{{count}} 行未變更"
+      },
+      "revertToSaved": "還原為已儲存版本"
+    },
+    "emptyState": {
+      "title": "未開啟任何檔案",
+      "hint": "從「檔案」分頁開啟檔案"
+    },
     "toasts": {
       "savedFile": "已儲存 {{name}}",
       "saveFailed": "儲存失敗",
@@ -622,8 +994,8 @@
       "download": "下載",
       "upload": "上傳",
       "browse": "瀏覽",
-      "openDiagram": "開啟圖表",
-      "update": "更新"
+      "update": "更新",
+      "openDiagram": "開啟圖表"
     },
     "tabs": {
       "chat": "聊天",
@@ -631,10 +1003,162 @@
       "files": "檔案",
       "git": "版本控制",
       "tasks": "任務",
+      "board": "看板",
       "browser": "瀏覽器",
       "computer": "電腦",
-      "board": "看板",
       "usage": "AI Control"
+    },
+    "quota": {
+      "controlCenter": "AI Control Center",
+      "section": {
+        "overview": "總覽",
+        "quotas": "額度",
+        "usage": "用量",
+        "agents": "代理"
+      },
+      "filter": {
+        "all": "全部"
+      },
+      "period": {
+        "24h": "24h",
+        "7d": "7 天",
+        "30d": "30 天",
+        "all": "全部"
+      },
+      "group": {
+        "provider": "提供者",
+        "model": "模型",
+        "agent": "代理",
+        "tool": "工具"
+      },
+      "metric": {
+        "tokens": "權杖",
+        "input": "輸入",
+        "output": "輸出",
+        "cache": "快取讀取",
+        "calls": "API 呼叫",
+        "cost": "成本",
+        "sessions": "工作階段"
+      },
+      "cost": {
+        "billed": "已計費（API + 超額）",
+        "listPrice": "已用權杖的標價",
+        "subscriptionValue": "訂閱涵蓋",
+        "cacheSavings": "快取節省"
+      },
+      "cost3": {
+        "billed": "已計費（API + 超額）",
+        "listPrice": "已用權杖的標價",
+        "subscriptionValue": "訂閱涵蓋"
+      },
+      "overview": {
+        "trendTitle": "權杖與成本 — 最近 7 天",
+        "effectiveCost": "實際成本（7 天）",
+        "alertsTitle": "警示",
+        "noAlerts": "目前沒有需要注意的事項。",
+        "limitsTitle": "用量與限額",
+        "activeTasks": "活躍任務",
+        "viewAccounts": "所有帳戶",
+        "viewAgents": "所有代理",
+        "noTasks": "目前沒有正在執行的代理。"
+      },
+      "usage": {
+        "trendTitle": "每日趨勢",
+        "breakdownTitle": "依 {{group}} 細分",
+        "colName": "名稱",
+        "sourceUnavailable": "分析儲存不可用；未顯示資料。"
+      },
+      "agents": {
+        "runningCount": "{{value}} 個執行中",
+        "colAgent": "代理",
+        "colStatus": "狀態",
+        "colTask": "任務",
+        "colModel": "帳戶 / 模型",
+        "colTime": "時間",
+        "empty": "沒有代理符合此篩選條件。",
+        "detailSession": "工作階段",
+        "detailStarted": "已開始",
+        "detailRetries": "重試次數",
+        "detailResult": "結果",
+        "notTracked": "未追蹤"
+      },
+      "agentStatus": {
+        "running": "執行中",
+        "waiting": "等待中",
+        "failed": "失敗",
+        "finished": "已完成",
+        "queued": "排隊中"
+      },
+      "alert": {
+        "pace": "{{account}} · {{window}}：按目前速度，額度將在 {{value}} 後耗盡",
+        "threshold": "{{account}} · {{window}}：已用 {{value}}%（閾值 {{watch}}%）"
+      },
+      "backToChat": "返回聊天",
+      "syncNow": "立即同步",
+      "generatedAt": "更新於 {{value}}",
+      "loading": "正在載入帳戶額度…",
+      "remaining": "剩餘 {{value}}%",
+      "resetsIn": "{{value}} 後重置",
+      "projected": "按目前速度，此額度將在 {{value}} 後耗盡",
+      "syncedAgo": "{{value}} 前已同步",
+      "refreshAccount": "重新整理帳戶",
+      "syncFailed": "同步失敗",
+      "history": "歷史",
+      "historyPoints": "已記錄 {{value}} 筆讀數",
+      "historyEmpty": "尚無歷史記錄",
+      "noAgents": "未指派代理",
+      "noSubscription": "無訂閱",
+      "noSubscriptionHint": "提供者未回報此帳戶有有效方案。",
+      "quality": {
+        "live": "即時",
+        "cached": "快取",
+        "estimate": "估計",
+        "unknown": "未知",
+        "error": "錯誤"
+      },
+      "kpi": {
+        "atRisk": "有風險的額度",
+        "atRiskHint": "超過 {{value}}% 的帳戶",
+        "windowsAtRisk": "即將耗盡的窗口",
+        "errored": "同步失敗",
+        "activeAgents": "活躍代理",
+        "agentsHint": "{{waiting}} 等待 · {{queued}} 排隊",
+        "nextReset": "下次重置",
+        "tokens": "權杖",
+        "sessionsHint": "{{value}} 個工作階段",
+        "cost": "預估成本",
+        "costHint": "{{value}} 由方案涵蓋"
+      },
+      "empty": {
+        "title": "未連接任何帳戶",
+        "description": "登入 Claude、Codex、Gemini 或 CommandCode 即可在此追蹤額度。"
+      },
+      "settings": {
+        "title": "警示與路由",
+        "description": "控制儀表板何時警告你，以及如何為新工作建議帳戶。",
+        "alertsEnabled": "預測與閾值警示",
+        "alertsEnabledHint": "在額度按目前速度耗盡之前警告，而不是等到 90%。",
+        "watchThreshold": "觀察閾值（%）",
+        "dangerThreshold": "危險閾值（%）",
+        "routingMode": "路由",
+        "routing": {
+          "manual": "手動 — 僅建議",
+          "ask": "切換帳戶前詢問",
+          "auto-low-risk": "低風險任務自動切換"
+        },
+        "logSources": "日誌來源",
+        "logSourcesHint": "用量與代理畫面讀取這些唯讀來源。",
+        "quotaConsent": "允許額度輪詢",
+        "quotaConsentHint": "使用你儲存的憑證輪詢提供者端點以讀取即時額度。",
+        "perAccount": "按帳戶覆寫",
+        "tab": "Control Center 設定"
+      },
+      "range": {
+        "24h": "24h",
+        "7d": "7d",
+        "30d": "30d",
+        "all": "全部"
+      }
     },
     "status": {
       "loading": "載入中...",
@@ -664,7 +1188,8 @@
       "back": "返回",
       "next": "下一步",
       "previous": "上一步",
-      "logout": "登出"
+      "logout": "登出",
+      "backToChat": "返回聊天"
     },
     "common": {
       "language": "語言",
@@ -725,6 +1250,9 @@
       "compactView": "精簡檢視",
       "detailedView": "詳細檢視",
       "searchPlaceholder": "搜尋檔案和資料夾...",
+      "searchContentPlaceholder": "在檔案中搜尋...",
+      "searchInFiles": "在檔案中搜尋",
+      "searchByName": "按名稱搜尋",
       "clearSearch": "清除搜尋",
       "name": "名稱",
       "size": "大小",
@@ -732,8 +1260,13 @@
       "permissions": "權限",
       "noFilesFound": "找不到檔案",
       "checkProjectPath": "請檢查專案路徑是否可存取",
+      "loadFailed": "無法載入檔案",
       "noMatchesFound": "找不到符合項目",
+      "noSearchResults": "找不到符合項目",
       "tryDifferentSearch": "嘗試不同的搜尋詞或清除搜尋",
+      "searchError": "搜尋失敗",
+      "searching": "正在搜尋...",
+      "resultsTruncated": "顯示前 {{count}} 筆結果",
       "justNow": "剛剛",
       "minAgo": "{{count}} 分鐘前",
       "hoursAgo": "{{count}} 小時前",
@@ -754,14 +1287,6 @@
         "menuLabel": "檔案右鍵選單",
         "loading": "載入中..."
       },
-      "searchContentPlaceholder": "在檔案中搜尋...",
-      "searchInFiles": "在檔案中搜尋",
-      "searchByName": "按名稱搜尋",
-      "loadFailed": "無法載入檔案",
-      "noSearchResults": "找不到符合項目",
-      "searchError": "搜尋失敗",
-      "searching": "正在搜尋...",
-      "resultsTruncated": "顯示前 {{count}} 筆結果",
       "allWorkspaces": "所有工作區",
       "delete": {
         "confirm": "刪除",
@@ -932,158 +1457,6 @@
         "closeSidebar": "關閉側邊欄"
       }
     },
-    "quota": {
-      "controlCenter": "AI Control Center",
-      "section": {
-        "overview": "總覽",
-        "quotas": "額度",
-        "usage": "用量",
-        "agents": "代理"
-      },
-      "filter": {
-        "all": "全部"
-      },
-      "period": {
-        "24h": "24h",
-        "7d": "7 天",
-        "30d": "30 天",
-        "all": "全部"
-      },
-      "group": {
-        "provider": "提供者",
-        "model": "模型",
-        "agent": "代理",
-        "tool": "工具"
-      },
-      "metric": {
-        "tokens": "權杖",
-        "input": "輸入",
-        "output": "輸出",
-        "cache": "快取讀取",
-        "calls": "API 呼叫",
-        "cost": "成本",
-        "sessions": "工作階段"
-      },
-      "cost": {
-        "billed": "已計費（API + 超額）",
-        "listPrice": "已用權杖的標價",
-        "subscriptionValue": "訂閱涵蓋",
-        "cacheSavings": "快取節省"
-      },
-      "cost3": {
-        "billed": "已計費（API + 超額）",
-        "listPrice": "已用權杖的標價",
-        "subscriptionValue": "訂閱涵蓋"
-      },
-      "overview": {
-        "trendTitle": "權杖與成本 — 最近 7 天",
-        "effectiveCost": "實際成本（7 天）",
-        "alertsTitle": "警示",
-        "noAlerts": "目前沒有需要注意的事項。",
-        "limitsTitle": "用量與限額",
-        "activeTasks": "活躍任務",
-        "viewAccounts": "所有帳戶",
-        "viewAgents": "所有代理",
-        "noTasks": "目前沒有正在執行的代理。"
-      },
-      "usage": {
-        "trendTitle": "每日趨勢",
-        "breakdownTitle": "依 {{group}} 細分",
-        "colName": "名稱",
-        "sourceUnavailable": "分析儲存不可用；未顯示資料。"
-      },
-      "agents": {
-        "runningCount": "{{value}} 個執行中",
-        "colAgent": "代理",
-        "colStatus": "狀態",
-        "colTask": "任務",
-        "colModel": "帳戶 / 模型",
-        "colTime": "時間",
-        "empty": "沒有代理符合此篩選條件。",
-        "detailSession": "工作階段",
-        "detailStarted": "已開始",
-        "detailRetries": "重試次數",
-        "detailResult": "結果",
-        "notTracked": "未追蹤"
-      },
-      "agentStatus": {
-        "running": "執行中",
-        "waiting": "等待中",
-        "failed": "失敗",
-        "finished": "已完成",
-        "queued": "排隊中"
-      },
-      "alert": {
-        "pace": "{{account}} · {{window}}：按目前速度，額度將在 {{value}} 後耗盡",
-        "threshold": "{{account}} · {{window}}：已用 {{value}}%（閾值 {{watch}}%）"
-      },
-      "backToChat": "返回聊天",
-      "syncNow": "立即同步",
-      "generatedAt": "更新於 {{value}}",
-      "loading": "正在載入帳戶額度…",
-      "remaining": "剩餘 {{value}}%",
-      "resetsIn": "{{value}} 後重置",
-      "projected": "按目前速度，此額度將在 {{value}} 後耗盡",
-      "syncedAgo": "{{value}} 前已同步",
-      "refreshAccount": "重新整理帳戶",
-      "syncFailed": "同步失敗",
-      "history": "歷史",
-      "historyPoints": "已記錄 {{value}} 筆讀數",
-      "historyEmpty": "尚無歷史記錄",
-      "noAgents": "未指派代理",
-      "noSubscription": "無訂閱",
-      "noSubscriptionHint": "提供者未回報此帳戶有有效方案。",
-      "quality": {
-        "live": "即時",
-        "cached": "快取",
-        "estimate": "估計",
-        "unknown": "未知",
-        "error": "錯誤"
-      },
-      "kpi": {
-        "atRisk": "有風險的額度",
-        "atRiskHint": "超過 {{value}}% 的帳戶",
-        "windowsAtRisk": "即將耗盡的窗口",
-        "errored": "同步失敗",
-        "activeAgents": "活躍代理",
-        "agentsHint": "{{waiting}} 等待 · {{queued}} 排隊",
-        "nextReset": "下次重置",
-        "tokens": "權杖",
-        "sessionsHint": "{{value}} 個工作階段",
-        "cost": "預估成本",
-        "costHint": "{{value}} 由方案涵蓋"
-      },
-      "empty": {
-        "title": "未連接任何帳戶",
-        "description": "登入 Claude、Codex、Gemini 或 CommandCode 即可在此追蹤額度。"
-      },
-      "settings": {
-        "title": "警示與路由",
-        "description": "控制儀表板何時警告你，以及如何為新工作建議帳戶。",
-        "alertsEnabled": "預測與閾值警示",
-        "alertsEnabledHint": "在額度按目前速度耗盡之前警告，而不是等到 90%。",
-        "watchThreshold": "觀察閾值（%）",
-        "dangerThreshold": "危險閾值（%）",
-        "routingMode": "路由",
-        "routing": {
-          "manual": "手動 — 僅建議",
-          "ask": "切換帳戶前詢問",
-          "auto-low-risk": "低風險任務自動切換"
-        },
-        "logSources": "日誌來源",
-        "logSourcesHint": "用量與代理畫面讀取這些唯讀來源。",
-        "quotaConsent": "允許額度輪詢",
-        "quotaConsentHint": "使用你儲存的憑證輪詢提供者端點以讀取即時額度。",
-        "perAccount": "按帳戶覆寫",
-        "tab": "Control Center 設定"
-      },
-      "range": {
-        "24h": "24h",
-        "7d": "7d",
-        "30d": "30d",
-        "all": "全部"
-      }
-    },
     "actions": {
       "cancel": "取消",
       "retry": "重試",
@@ -1166,7 +1539,7 @@
       "subtitle": "監控 AI 代理開啟的瀏覽器工作階段。",
       "temporary": "臨時",
       "thisSession": "此工作階段",
-      "title": "Browser",
+      "title": "瀏覽器",
       "totalCount": "共 {{count}} 個",
       "updated": "更新於 {{time}}",
       "waiting": "等待中",
@@ -1477,6 +1850,25 @@
         "history": "提交",
         "branches": "分支",
         "worktrees": "工作樹"
+      },
+      "save": "儲存",
+      "worktreeScripts": {
+        "title": "Worktree 指令碼",
+        "setup": "設定指令碼（建立／開啟後執行）",
+        "run": "啟動開發伺服器",
+        "stop": "停止開發伺服器",
+        "runScript": "執行指令碼（開發伺服器，按需啟動）",
+        "runPort": "預覽連接埠（選填 — 留空時自動偵測）",
+        "invalidPort": "連接埠必須介於 1 到 65535 之間",
+        "sourceProject": "已儲存為專案覆寫設定",
+        "sourceFile": "來自 .ddagent/worktree.json — 儲存後會建立專案覆寫設定",
+        "sourceNone": "尚未設定任何項目",
+        "saving": "正在儲存…",
+        "setupRunning": "設定執行中",
+        "setupFailed": "設定失敗",
+        "running": "執行中",
+        "openPreview": "開啟預覽",
+        "runExited": "執行已結束（{{code}}）"
       }
     },
     "sessions": {
@@ -1484,6 +1876,13 @@
     },
     "projects": {
       "newSession": "新工作階段"
+    },
+    "sharedNotes": {
+      "subtitle": "共用記憶 — 會注入此專案的每個工作階段",
+      "save": "儲存",
+      "saving": "正在儲存…",
+      "noProject": "請選擇工作區以編輯其共用上下文",
+      "placeholder": "# 共用上下文\n每個代理都該知道的慣例、決策與參考資訊…"
     },
     "codeBlock": {
       "wrapLines": "自動換行",
@@ -1515,6 +1914,12 @@
       "staged": "已下載更新 v{{version}} — 請重新啟動伺服器以完成安裝。",
       "upToDate": "伺服器已是最新版本。",
       "webHostFailed": "伺服器已更新，但其 Web 介面沒有更新：{{message}}"
+    },
+    "appShell": {
+      "panelActive": "面板 · {{count}} 個執行中"
+    },
+    "errors": {
+      "forbidden": "存取遭拒"
     }
   },
   "settings": {
@@ -1545,10 +1950,13 @@
     "updates": {
       "title": "更新",
       "description": "在 GitHub 上檢查更新的桌面版本。新版本會自動下載並在退出時安裝。",
+      "descriptionMobile": "在 GitHub 上檢查此應用程式是否有較新的版本。更新會由裝置的系統安裝程式安裝。",
+      "descriptionServer": "在 GitHub 上檢查是否有較新的 DDAgent 版本。已連線的伺服器可自行更新 — 重新啟動期間，進行中的工作階段會中斷。",
       "check": "檢查更新",
       "checking": "正在檢查…",
       "upToDate": "已是最新版本（v{{version}}）。",
       "available": "發現更新 v{{version}} — 正在背景下載；退出 DDAgent 時自動安裝。",
+      "appAvailable": "有可用的應用程式更新 v{{version}} — 點選「更新」即可在此裝置上安裝。",
       "downloaded": "更新 v{{version}} 已下載 — 退出並重新啟動 DDAgent 即可安裝。",
       "unavailable": "更新檢查僅在打包的桌面版本中可用。",
       "error": "更新檢查失敗：{{message}}",
@@ -1562,8 +1970,8 @@
       "account": "帳戶",
       "permissions": "權限",
       "mcpServers": "MCP 伺服器",
-      "appearance": "外觀",
-      "skills": "技能"
+      "skills": "技能",
+      "appearance": "外觀"
     },
     "account": {
       "title": "帳戶",
@@ -1603,9 +2011,9 @@
       "lineNumbers": "行號",
       "fontSize": "字型大小",
       "themeModes": {
-        "dark": "深色",
+        "system": "系統",
         "light": "淺色",
-        "system": "系統"
+        "dark": "深色"
       }
     },
     "actions": {
@@ -1632,7 +2040,8 @@
         "draggingStatus": "正在拖曳...",
         "toggleAndMove": "點擊切換，拖曳移動"
       },
-      "sendWithCtrlEnter": "使用 Ctrl+Enter 傳送"
+      "sendWithCtrlEnter": "使用 Ctrl+Enter 傳送",
+      "enterSendsHint": "關閉時，按 Enter 傳送，按 Shift+Enter 換行。"
     },
     "terminalShortcuts": {
       "title": "終端機快速鍵",
@@ -1644,141 +2053,212 @@
       "arrowUp": "向上箭頭",
       "arrowDown": "向下箭頭",
       "scrollDown": "捲動到底部",
+      "killTitle": "終止執行中的程序 (Ctrl+C)",
       "handle": {
         "closePanel": "關閉快速鍵面板",
         "openPanel": "開啟快速鍵面板"
       },
-      "killTitle": "終止執行中的程序 (Ctrl+C)",
       "paste": "貼上"
     },
     "mainTabs": {
       "label": "設定",
       "agents": "智慧代理",
       "orchestration": "編排",
+      "miniOrchestration": "迷你編排",
       "appearance": "外觀",
+      "workspaces": "工作區",
       "git": "Git",
       "apiTokens": "API 和權杖",
       "models": "模型",
       "tasks": "任務",
+      "browser": "瀏覽器",
+      "tools": "工具",
       "notifications": "通知",
       "about": "關於",
-      "workspaces": "工作區",
-      "browser": "Browser",
-      "tools": "工具",
-      "quota": "Control Center"
+      "quota": "Control Center",
+      "shortcuts": "鍵盤快捷鍵"
+    },
+    "miniOrchestration": {
+      "title": "迷你編排",
+      "description": "雙模型流程：由非 flash 的思考者規劃，flash 執行者負責執行。",
+      "loading": "正在載入迷你編排設定…",
+      "loadError": "無法載入迷你編排設定。",
+      "enable": {
+        "label": "啟用迷你編排",
+        "description": "讓「自動（迷你）」工作階段改走雙角色引擎，而非完整的編排器。"
+      },
+      "thinker": {
+        "title": "思考者（非 flash）",
+        "description": "負責規劃、決策、審查並撰寫最終報告。"
+      },
+      "worker": {
+        "title": "執行者（flash）",
+        "description": "執行每個規劃好的步驟。"
+      },
+      "fields": {
+        "provider": "提供者",
+        "model": "模型",
+        "modelPlaceholder": "選擇模型",
+        "tier": "等級"
+      },
+      "roles": {
+        "title": "依任務指定模型",
+        "description": "各任務類型由哪個模型（角色）處理。"
+      },
+      "planner": {
+        "title": "規劃器",
+        "mode": "模式",
+        "modes": {
+          "auto": "由思考者規劃",
+          "off": "單一步驟"
+        },
+        "requireConfirmLabel": "執行前先確認計畫"
+      }
     },
     "orchestration": {
-      "title": "Orchestration",
-      "description": "Route chat tasks across your providers and models.",
-      "loading": "Loading orchestration settings…",
-      "loadError": "Could not load the orchestration settings.",
-      "retry": "Retry",
+      "title": "編排",
+      "description": "將聊天任務分派到你的各個提供者與模型。",
+      "loading": "正在載入編排設定…",
+      "loadError": "無法載入編排設定。",
+      "retry": "重試",
       "enable": {
-        "label": "Enable orchestration",
-        "description": "Let the orchestrator pick a model per step instead of running everything on one provider."
+        "label": "啟用編排",
+        "description": "讓編排器為每個步驟挑選模型，而不是全部在同一個提供者上執行。"
       },
       "pool": {
-        "title": "Candidate pool",
-        "description": "Models the router can pick from, each pinned to a cost tier.",
-        "add": "Add candidate",
-        "empty": "No candidates yet — add one to start routing.",
+        "title": "候選池",
+        "description": "路由器可挑選的模型，每個都對應一個成本等級。",
+        "add": "新增候選",
+        "empty": "尚無候選 — 新增一個即可開始路由。",
         "fields": {
-          "label": "Label",
-          "labelPlaceholder": "e.g. SWE-2 Medium",
-          "provider": "Provider",
-          "model": "Model",
-          "modelPlaceholder": "Select a model",
-          "effort": "Effort",
-          "effortDefault": "Provider default",
-          "effortPlaceholder": "default",
-          "account": "Account",
-          "accountDefault": "Provider default",
+          "label": "標籤",
+          "labelPlaceholder": "例如 SWE-2 Medium",
+          "provider": "提供者",
+          "model": "模型",
+          "modelPlaceholder": "選擇模型",
+          "effort": "推理強度",
+          "effortDefault": "提供者預設值",
+          "effortPlaceholder": "預設",
+          "account": "帳戶",
+          "accountDefault": "提供者預設值",
           "redundantAccounts": "備援帳號",
           "redundantAccountsNone": "此供應商沒有其他帳號",
-          "tier": "Cost tier",
-          "remove": "Remove candidate",
-          "moveUp": "Move up",
-          "moveDown": "Move down"
+          "tier": "成本等級",
+          "remove": "移除候選",
+          "moveUp": "上移",
+          "moveDown": "下移"
         }
       },
       "tiers": {
-        "free": "Free",
-        "cheap": "Cheap",
-        "mid": "Mid",
-        "premium": "Premium"
+        "free": "免費",
+        "cheap": "低價",
+        "mid": "中價",
+        "premium": "高階"
       },
       "rules": {
-        "title": "Routing rules",
-        "description": "Ordered candidates per task type — the first available one wins.",
-        "addCandidate": "Add candidate…",
-        "empty": "No candidates — nothing to route this task type to.",
-        "missing": "(removed)",
-        "remove": "Remove candidate",
+        "title": "路由規則",
+        "description": "依任務類型排序的候選 — 第一個可用者勝出。",
+        "addCandidate": "新增候選…",
+        "empty": "沒有候選 — 此任務類型無處可分派。",
+        "missing": "（已移除）",
+        "remove": "移除候選",
         "taskTypes": {
-          "plan": "Planning",
-          "quick": "Quick answers",
-          "research": "Research",
-          "docs": "Documentation",
-          "code": "Coding",
-          "code-hard": "Complex coding",
-          "test": "Testing",
-          "review": "Review"
+          "plan": "規劃",
+          "quick": "快速回答",
+          "research": "研究",
+          "docs": "文件",
+          "code": "程式撰寫",
+          "code-hard": "複雜程式撰寫",
+          "test": "測試",
+          "review": "審查",
+          "report": "報告"
         }
       },
       "planner": {
-        "title": "Planner",
-        "description": "How a request is split into routed steps.",
-        "modeLabel": "Planning mode",
+        "title": "規劃器",
+        "description": "請求如何拆分成可路由的步驟。",
+        "modeLabel": "規劃模式",
         "modes": {
-          "auto": "Auto (LLM)",
-          "template": "Templates",
-          "off": "Off"
+          "auto": "自動（LLM）",
+          "template": "範本",
+          "off": "關閉"
         },
         "modeHints": {
-          "auto": "The planner model decomposes each request into typed steps.",
-          "template": "Requests run through a fixed pipeline you pick below.",
-          "off": "No planning — the whole request is routed as a single step."
+          "auto": "規劃器模型會將每個請求拆解為具類型的步驟。",
+          "template": "請求會依你在下方選擇的固定流程執行。",
+          "off": "不進行規劃 — 整個請求以單一步驟路由。"
         },
-        "candidateLabel": "Planner model",
-        "candidateDescription": "Pool candidate used for plan generation and classification calls.",
-        "candidatePlaceholder": "Select a pool candidate",
+        "candidateLabel": "規劃器模型",
+        "candidateDescription": "用於產生計畫與分類呼叫的候選池模型。",
+        "candidatePlaceholder": "選擇候選池中的模型",
         "templates": {
-          "title": "Pipeline templates",
-          "add": "Add template",
-          "namePlaceholder": "Template name",
-          "addStep": "Add step…",
-          "remove": "Remove template",
-          "removeStep": "Remove step",
-          "empty": "No templates yet.",
-          "emptySteps": "No steps yet — add one below."
+          "title": "流程範本",
+          "add": "新增範本",
+          "namePlaceholder": "範本名稱",
+          "addStep": "新增步驟…",
+          "remove": "移除範本",
+          "removeStep": "移除步驟",
+          "empty": "尚無範本。",
+          "emptySteps": "尚無步驟 — 請在下方新增。"
         },
-        "requireConfirm": "Confirm plan before running",
-        "requireConfirmDescription": "Pause after planning so you can edit or disable steps on the plan card."
+        "requireConfirm": "執行前確認計畫",
+        "requireConfirmDescription": "規劃完成後暫停，讓你在計畫卡片上編輯或停用步驟。",
+        "checkpointLabel": "自主程度",
+        "checkpointModes": {
+          "off": "完全自主",
+          "per-step": "每個步驟",
+          "every-n": "每 N 個步驟"
+        },
+        "checkpointHints": {
+          "off": "監督者的決策會直接執行，不另行詢問（自動模式）。",
+          "per-step": "每批建議步驟執行前都先徵求核准。",
+          "every-n": "每完成 N 個步驟後徵求核准。"
+        },
+        "checkpointIntervalLabel": "檢查點之間的步驟數（1–50）"
       },
       "execution": {
-        "title": "Execution limits",
-        "description": "Guardrails for parallel runs and fix loops.",
-        "maxParallel": "Max parallel steps",
-        "maxParallelDescription": "How many subtasks may run at once (1–8).",
-        "maxFixLoops": "Max fix loops",
-        "maxFixLoopsDescription": "Retries when a step fails verification (0–5).",
-        "onNoCandidate": "When no candidate is available",
-        "onNoCandidateDescription": "Ask before falling back, or skip the step.",
+        "title": "執行限制",
+        "description": "平行執行與修正迴圈的防護設定。",
+        "maxParallel": "最大平行步驟數",
+        "maxParallelDescription": "可同時執行的子任務數量（1–8）。",
+        "maxFixLoops": "最大修正迴圈數",
+        "maxFixLoopsDescription": "步驟未通過驗證時的重試次數（0–5）。",
+        "onNoCandidate": "沒有可用候選時",
+        "onNoCandidateDescription": "改用備援前先詢問，或略過該步驟。",
         "onNoCandidateOptions": {
-          "ask": "Ask",
-          "skip": "Skip step"
+          "ask": "詢問",
+          "skip": "略過步驟"
         },
-        "useWorktree": "Isolated worktree",
-        "useWorktreeDescription": "Run all delegated steps in one shared git worktree instead of the project directory."
+        "useWorktree": "獨立 worktree",
+        "useWorktreeDescription": "在單一共用的 git worktree 中執行所有委派步驟，而非專案目錄。",
+        "maxSupervisorIterations": "監督者最大迭代次數",
+        "maxSupervisorIterationsDescription": "自動模式下監督者決策輪數的上限（1–100）；達到上限時，執行會以部分報告結束。",
+        "maxAttempts": "每個步驟的最大嘗試次數",
+        "maxAttemptsDescription": "單一步驟在所有通道與重試中可用的總嘗試次數（1–50）。",
+        "stepTimeoutMs": "步驟逾時（毫秒）",
+        "stepTimeoutMsDescription": "每次嘗試的子執行逾時（毫秒）；0 表示停用。",
+        "runTimeoutMs": "執行逾時（毫秒）",
+        "runTimeoutMsDescription": "整個計畫執行的全域逾時（毫秒）；0 表示停用。",
+        "retryBackoffBaseMs": "重試退避基準（毫秒）",
+        "retryBackoffBaseMsDescription": "同一通道重試之間指數退避的基準值（完全抖動）。",
+        "retryBudgetTitle": "各失敗類型的重試額度",
+        "retryBudgetDescription": "容錯移轉／冷卻前在同一通道的重試次數（0–5）。",
+        "retryClasses": {
+          "rate_limit": "速率限制",
+          "quota": "配額",
+          "auth": "驗證",
+          "timeout": "逾時",
+          "transient": "暫時性錯誤"
+        }
       },
       "save": {
-        "unsaved": "Unsaved changes",
-        "save": "Save",
-        "saving": "Saving…",
-        "saved": "Saved",
-        "discard": "Discard",
-        "error": "Save failed",
-        "emptyPool": "Add at least one candidate before saving."
+        "unsaved": "有未儲存的變更",
+        "save": "儲存",
+        "saving": "正在儲存…",
+        "saved": "已儲存",
+        "discard": "捨棄",
+        "error": "儲存失敗",
+        "emptyPool": "儲存前請至少新增一個候選。"
       }
     },
     "notifications": {
@@ -1802,6 +2282,13 @@
         "title": "通知此裝置",
         "enabled": "此裝置的通知已啟用"
       },
+      "desktop": {
+        "title": "通知此桌面應用程式",
+        "enable": "啟用推播通知",
+        "disable": "關閉推播通知",
+        "enabled": "此桌面應用程式已啟用通知",
+        "unsupported": "此系統不支援桌面通知。"
+      },
       "sound": {
         "title": "聲音",
         "description": "聊天執行完成時播放短提示音。",
@@ -1814,16 +2301,20 @@
         "stop": "執行已停止",
         "error": "執行失敗"
       },
-      "desktop": {
-        "title": "通知此桌面應用程式",
-        "enable": "啟用推播通知",
-        "disable": "關閉推播通知",
-        "enabled": "此桌面應用程式已啟用通知",
-        "unsupported": "此系統不支援桌面通知。"
+      "messaging": {
+        "title": "透過通訊軟體核准",
+        "description": "在 Telegram 上核准或拒絕代理的權限請求，並在 Discord 上接收執行通知。",
+        "enabled": "已啟用",
+        "save": "儲存",
+        "test": "測試",
+        "pair": "配對",
+        "telegramToken": "來自 @BotFather 的機器人權杖（123456:ABC…）",
+        "telegramHint": "先傳送任意訊息給你的機器人，再於下方配對該聊天。",
+        "discordWebhook": "https://discord.com/api/webhooks/…"
       },
       "channels": {
-        "discord": "Discord",
-        "telegram": "Telegram"
+        "telegram": "Telegram",
+        "discord": "Discord"
       },
       "unpair": "取消配對"
     },
@@ -2086,7 +2577,25 @@
         "success": "已登出",
         "failed": "登出失敗"
       },
-      "error": "錯誤：{{error}}"
+      "error": "錯誤：{{error}}",
+      "accounts": {
+        "title": "具名帳戶",
+        "description": "額外的憑證組。釘選到某個帳戶的工作階段，會以該帳戶獨立的設定目錄啟動 CLI。請使用下方顯示的環境變數執行一次提供者 CLI 以完成登入。",
+        "sharedCli": "所有帳戶共用同一個 CLI 安裝 — 請在上方的連線卡片中更新。",
+        "loading": "正在載入帳戶…",
+        "default": "預設",
+        "usage": "{{tokens}} 個 token",
+        "usageButton": "用量",
+        "showUsage": "顯示 token 用量",
+        "makeDefault": "設為預設",
+        "remove": "移除帳戶",
+        "newLabel": "帳戶標籤（例如：工作）",
+        "add": "新增帳戶",
+        "autoSwitch": {
+          "label": "達到用量上限時自動切換帳號",
+          "description": "當某個帳號達到用量上限時，工作階段會切換到同一代理程式下仍有額度的另一個帳號——即使你手動選擇了已用盡的帳號。絕不會切換到其他代理程式。Claude 和 Codex 會保留對話；其他代理程式僅在新對話中切換。"
+        }
+      }
     },
     "permissions": {
       "title": "權限設定",
@@ -2150,13 +2659,13 @@
         "edit": "編輯伺服器",
         "delete": "刪除伺服器"
       },
-      "help": {
-        "title": "關於 Codex MCP",
-        "description": "Codex 支援基於 stdio 的 MCP 伺服器。您可以新增伺服器，透過額外的工具和資源來擴充 Codex 的功能。"
-      },
       "managed": {
         "badge": "受管理",
         "hint": "由 DDAgent 管理。"
+      },
+      "help": {
+        "title": "關於 Codex MCP",
+        "description": "Codex 支援基於 stdio 的 MCP 伺服器。您可以新增伺服器，透過額外的工具和資源來擴充 Codex 的功能。"
       },
       "deleteConfirm": {
         "description": "「{{serverName}}」將從提供者設定中移除。",
@@ -2233,7 +2742,7 @@
       "statusLabel": "狀態",
       "statusReady": "就緒",
       "statusSetupRequired": "需要設定",
-      "title": "Browser"
+      "title": "瀏覽器"
     },
     "workspaces": {
       "cancel": "取消",
@@ -2246,23 +2755,115 @@
       "title": "工作區",
       "pathRequired": "路徑為必填項。"
     },
+    "stt": {
+      "title": "語音輸入（語音轉文字）",
+      "description": "相容 Whisper 的 /audio/transcriptions 端點（OpenAI、whisper.cpp、faster-whisper、Speaches）。啟用後，輸入區會出現麥克風按鈕。",
+      "configured": "已設定",
+      "endpoint": "端點 URL（例如 https://api.openai.com/v1）",
+      "apiKey": "API 金鑰",
+      "model": "模型（預設：whisper-1）",
+      "save": "儲存"
+    },
+    "schedules": {
+      "title": "排程",
+      "description": "依 cron 時間表定期執行代理。執行時無人看管，且會略過權限確認。",
+      "preventSleep": "代理執行時防止休眠",
+      "preventSleepHint": "桌面版會讓螢幕保持喚醒；瀏覽器中則使用螢幕喚醒鎖定。",
+      "new": "新增排程",
+      "loading": "正在載入…",
+      "empty": "尚無排程。",
+      "project": "專案",
+      "provider": "提供者",
+      "cron": "Cron（分 時 日 月 星期）",
+      "nextRun": "下次執行：{{time}}",
+      "cronInvalid": "此運算式沒有即將到來的執行時間",
+      "prompt": "提示詞",
+      "useWorktree": "在全新的 worktree 中執行",
+      "catchUp": "補執行錯過的排程",
+      "failures": "{{count}} 次失敗",
+      "disabled": "已停用",
+      "history": "歷史紀錄",
+      "runNow": "立即執行",
+      "delete": "刪除",
+      "noRuns": "尚無執行紀錄。",
+      "next": "下次",
+      "create": "建立",
+      "toggleSchedule": "啟用排程"
+    },
+    "mcpTokens": {
+      "title": "DDAgent MCP 伺服器權杖",
+      "description": "外部工具（Claude Desktop、OpenClaw）會透過 POST /mcp，並使用以下其中一個 Bearer 權杖來呼叫 DDAgent 工具。",
+      "dismiss": "關閉",
+      "labelPlaceholder": "權杖標籤（例如 Claude Desktop）",
+      "create": "建立",
+      "empty": "尚無 MCP 權杖。",
+      "lastUsed": "上次使用：{{time}}",
+      "neverUsed": "從未使用"
+    },
     "about": {
       "supportTitle": "支持此專案",
       "buyMeACoffee": "請我喝杯咖啡",
+      "tryHosted": "試用 DDAgent Hosted",
       "learnMore": "深入了解",
+      "proFeatures": "DDAgent Pro 功能",
       "pro": {
         "syncSettings": "同步設定",
-        "teamManagement": "團隊管理"
+        "teamManagement": "團隊管理",
+        "syncSettingsDescription": "在所有環境中同步你的偏好設定、MCP 設定與主題。",
+        "teamManagementDescription": "多使用者、角色型存取控制以及團隊共用專案。"
       },
-      "proFeatures": "DDAgent Pro 功能",
-      "tryHosted": "試用 DDAgent Hosted",
       "versionInfo": "版本資訊",
       "client": "應用程式",
       "server": "伺服器",
       "platformMobile": "行動裝置",
       "platformDesktop": "桌面版",
       "platformWeb": "網頁",
-      "unknown": "未知"
+      "unknown": "未知",
+      "copyright": "© 2026 DDAgent — 保留所有權利",
+      "tagline": "開源 AI 程式設計助理介面",
+      "docs": "文件",
+      "hostedDescription": "團隊協作、共用 MCP 設定、跨環境設定同步以及託管基礎架構。"
+    },
+    "shortcuts": {
+      "description": "DDAgent 中的所有鍵盤快捷鍵，依平台分類。",
+      "action": "動作",
+      "winLinux": "Windows / Linux",
+      "mac": "macOS",
+      "navigation": "導覽",
+      "navWorkspace": "前往工作區",
+      "navTasks": "前往任務／Git",
+      "navGit": "前往 Git",
+      "navFocus": "切換專注模式（側邊欄）",
+      "navSwitcher": "快速切換工作階段",
+      "navPalette": "命令面板",
+      "navSettings": "開啟設定",
+      "navClose": "關閉對話框／還原分割窗格",
+      "composer": "訊息輸入區",
+      "compSend": "傳送訊息",
+      "compNewline": "換行",
+      "compNav": "瀏覽建議",
+      "compAccept": "接受建議",
+      "compCloseSuggest": "關閉建議",
+      "transcript": "對話內容",
+      "trCopy": "複製所選文字",
+      "trClose": "關閉搜尋／審查面板",
+      "terminal": "終端機",
+      "termCopy": "複製選取內容",
+      "termInterrupt": "中斷程序（未選取時）",
+      "termPaste": "貼上",
+      "termSelectAll": "全選",
+      "editor": "編輯器",
+      "edSave": "儲存檔案",
+      "edSaveAll": "儲存所有檔案",
+      "edClose": "關閉分頁",
+      "edNextTab": "下一個分頁",
+      "edPrevTab": "上一個分頁",
+      "edIndent": "增加／減少縮排",
+      "palette": "命令面板",
+      "palNav": "瀏覽項目",
+      "palRun": "執行／開啟",
+      "palBack": "返回（搜尋為空時）",
+      "palClose": "關閉"
     }
   },
   "sidebar": {
@@ -2289,6 +2890,12 @@
     "app": {
       "title": "DDAgent",
       "subtitle": "AI 程式開發助手"
+    },
+    "panel": {
+      "open": "面板",
+      "newChat": "新聊天",
+      "navigation": "導覽",
+      "sessions": "工作階段"
     },
     "sessions": {
       "title": "工作階段",
@@ -2327,12 +2934,12 @@
       "removeFromFavorites": "從收藏移除",
       "editSessionName": "手動編輯工作階段名稱",
       "deleteSession": "永久刪除此工作階段",
+      "activeSessionIndicator": "最近活躍的工作階段（最近 10 分鐘）",
       "save": "儲存",
       "cancel": "取消",
       "clearSearch": "清除搜尋",
       "openCommandPalette": "開啟指令面板",
       "attentionRequiredIndicator": "工作階段需要處理",
-      "activeSessionIndicator": "最近活躍的工作階段（最近 10 分鐘）",
       "openSessions": "瀏覽工作階段"
     },
     "navigation": {
@@ -2355,6 +2962,15 @@
       "reportIssue": "回報問題",
       "starOnGithub": "在 GitHub 上加星",
       "buyMeACoffee": "請我喝杯咖啡"
+    },
+    "workspace": {
+      "title": "變更工作階段工作區",
+      "description": "代理將在此目錄中執行後續回合。現有工作階段歷史將被保留。",
+      "pathLabel": "工作區路徑",
+      "pathRequired": "工作區路徑為必填項。",
+      "submit": "變更工作區",
+      "saving": "正在變更…",
+      "changeAction": "變更工作區"
     },
     "branding": {
       "openSource": "開源"
@@ -2388,6 +3004,8 @@
       "deleteSessionError": "刪除工作階段時出錯，請重試。",
       "renameSessionFailed": "重新命名工作階段失敗，請重試。",
       "renameSessionError": "重新命名工作階段時出錯，請重試。",
+      "changeWorkspaceFailed": "更改工作區失敗。請重試。",
+      "changeWorkspaceError": "更改工作區時發生錯誤。請重試。",
       "deleteProjectFailed": "移除專案失敗，請重試。",
       "deleteProjectError": "移除專案時出錯，請重試。",
       "createProjectFailed": "建立專案失敗，請重試。",
@@ -2398,8 +3016,6 @@
       "restoreProjectError": "還原專案時出錯，請重試。",
       "restoreSessionFailed": "還原工作階段失敗，請重試。",
       "restoreSessionError": "還原工作階段時出錯，請重試。",
-      "changeWorkspaceFailed": "更改工作區失敗。請重試。",
-      "changeWorkspaceError": "更改工作區時發生錯誤。請重試。",
       "bulkDeleteSessionsFailed(param=count)": {
         "one": "刪除 {{count}} 個工作階段失敗。請重試。",
         "other": "刪除 {{count}} 個工作階段失敗。請重試。"
@@ -2442,6 +3058,14 @@
         "other": "{{count}} 個專案已掃描"
       }
     },
+    "recent": {
+      "title": "最近對話",
+      "emptyTitle": "尚無對話",
+      "emptyDescription": "你最近更新的對話將顯示在這裡。",
+      "loadFailed": "無法載入最近對話",
+      "loadMore": "載入更早的對話",
+      "loadingMore": "載入中..."
+    },
     "deleteConfirmation": {
       "deleteProject": "移除專案",
       "deleteSession": "刪除工作階段",
@@ -2477,29 +3101,6 @@
       "thisWeek": "本週",
       "showMore": "再顯示 {{count}} 個",
       "showLess": "收合"
-    },
-    "panel": {
-      "open": "面板",
-      "newChat": "新聊天",
-      "navigation": "導覽",
-      "sessions": "工作階段"
-    },
-    "workspace": {
-      "title": "變更工作階段工作區",
-      "description": "代理將在此目錄中執行後續回合。現有工作階段歷史將被保留。",
-      "pathLabel": "工作區路徑",
-      "pathRequired": "工作區路徑為必填項。",
-      "submit": "變更工作區",
-      "saving": "正在變更…",
-      "changeAction": "變更工作區"
-    },
-    "recent": {
-      "title": "最近對話",
-      "emptyTitle": "尚無對話",
-      "emptyDescription": "你最近更新的對話將顯示在這裡。",
-      "loadFailed": "無法載入最近對話",
-      "loadMore": "載入更早的對話",
-      "loadingMore": "載入中..."
     },
     "tabs": {
       "board": "代理面板",
@@ -2640,11 +3241,11 @@
     "prd": {
       "modified": "修改時間：{{date}}",
       "editorTitle": "PRD — {{name}}",
-      "fileExistsMessage": "已存在名為「{{name}}」的 PRD。要覆寫嗎？",
-      "fileExistsTitle": "檔案已存在",
       "newFile": "新檔案",
-      "parse": "解析 PRD",
       "template": "範本",
+      "parse": "解析 PRD",
+      "fileExistsTitle": "檔案已存在",
+      "fileExistsMessage": "已存在名為「{{name}}」的 PRD。要覆寫嗎？",
       "fileNameHint": "檔案名稱（例如 prd.txt）",
       "saved": "PRD 已儲存",
       "tasksGenerated": "已從 PRD 產生任務"
@@ -2690,7 +3291,9 @@
         "abort": "中止",
         "delete": "刪除",
         "openSession": "開啟工作階段",
-        "pullRequest": "拉取請求"
+        "pullRequest": "拉取請求",
+        "edit": "編輯",
+        "moveTo": "移至"
       },
       "dialog": {
         "createTitle": "新卡片",
@@ -2719,7 +3322,25 @@
         "description": "「{{cardTitle}}」將被永久刪除。",
         "title": "刪除卡片？"
       },
-      "project": "專案"
+      "project": "專案",
+      "assignee": {
+        "label": "負責人",
+        "all": "所有負責人",
+        "unassigned": "未指派"
+      },
+      "presence": {
+        "online": "{{count}} 人在線上"
+      },
+      "activity": {
+        "title": "活動",
+        "empty": "尚無活動"
+      },
+      "comments": {
+        "label": "留言",
+        "placeholder": "撰寫留言…",
+        "send": "傳送",
+        "unknownAuthor": "某人"
+      }
     },
     "card": {
       "dependsOnList": "依賴於：{{tasks}}",
@@ -2798,13 +3419,32 @@
       "testStrategy": "測試策略",
       "titleRequired": "標題為必填項",
       "updateFailed": "更新任務失敗",
-      "deleteConfirmMessage": "任務 #{{id}} 將被移除。此操作無法復原。",
       "notFound": "找不到任務",
       "subtasks": "子任務",
+      "deleteConfirmMessage": "任務 #{{id}} 將被移除。此操作無法復原。",
       "idCopied": "已複製任務 ID"
     },
     "toasts": {
       "statusInProgress": "任務 {{id}} 已設為進行中"
+    },
+    "taskmaster": {
+      "noProjectHint": "請先新增專案，然後為其建立任務。",
+      "sort": {
+        "statusAz": "狀態 (A-Z)",
+        "statusZa": "狀態 (Z-A)"
+      },
+      "installedVersion": "已安裝：{{version}}",
+      "initFailed": "初始化 TaskMaster 失敗",
+      "prd": {
+        "fileNameRequired": "請為 PRD 提供檔案名稱。",
+        "contentRequired": "儲存前請先新增內容。",
+        "overwrite": "覆寫",
+        "contentHint": "# 產品需求文件…"
+      },
+      "detail": {
+        "dependenciesLabel": "相依性（以逗號分隔的 ID）"
+      },
+      "untitledTask": "無標題任務"
     }
   },
   "knowledge": {
@@ -2907,318 +3547,398 @@
       "manage": "管理標籤",
       "none": "尚無標籤。"
     },
-    "contextBudget": {
-      "tokens": "~{{tokens}} / {{budget}} 權杖"
+    "graph": {
+      "truncated": "已截斷"
+    },
+    "importAll": {
+      "title": "將所有內容匯入 DDAgent",
+      "projectsScanned": "已掃描專案：{{count}}",
+      "skillsFound": "找到代理技能：{{found}}（新增：{{newSkills}}）",
+      "rulesSummary": "規則：{{total}} · 重複群組：{{duplicates}}",
+      "mergeDuplicates": "合併重複項目",
+      "mergeDuplicatesHint": "在 DDAgent 中合併重複的資料列（非檔案）",
+      "action": "匯入全部",
+      "readOnlyNotice": "對你的代理僅唯讀：此操作只會匯入到 DDAgent 自己的資料庫，不會修改或刪除任何 CLI 檔案或設定。以下選項只會變更 DDAgent 資料。",
+      "dryRunNote": "試執行——尚未寫入任何內容。",
+      "importedNote": "已匯入。",
+      "result": "已匯入——規則：{{rules}}，新技能：{{newSkills}}，已移除：{{removed}}，已提升：{{promoted}}",
+      "description": "掃描所有專案，並將代理的技能匯入知識庫。對代理僅唯讀——不會變更 CLI 中的任何內容。"
+    },
+    "migrate": {
+      "title": "移轉現有規則",
+      "scanned": "已掃描 {{count}} 個專案。",
+      "rulesSummary": "規則：共 {{total}} 條，{{critical}} 條嚴重。",
+      "duplicates": "跨專案的重複群組：{{count}}",
+      "removedPromoted": "已移除：{{removed}}，已提升：{{promoted}}",
+      "mergeDuplicates": "合併重複項目",
+      "dryRunNote": "試執行——尚未進行任何變更。",
+      "applied": "已套用。"
+    },
+    "importSkills": {
+      "title": "匯入代理技能",
+      "found": "在你的代理中找到 {{count}} 個技能。",
+      "summary": "新增：{{imported}} · 略過：{{skipped}}",
+      "dryRunHint": "將代理內建的全域/預設技能（使用者、系統、外掛）匯入為知識技能。試執行——尚未匯入任何內容。",
+      "importedNote": "已匯入知識庫。"
     },
     "critical": {
       "make": "設為嚴重",
       "makeAll": "將所有規則設為嚴重",
       "makeAllHint": "將它們加入注入的上下文預算"
     },
+    "contextBudget": {
+      "tokens": "~{{tokens}} / {{budget}} 權杖",
+      "title": "規則上下文（一律提供）",
+      "selectProject": "選擇一個專案以查看其關鍵上下文的大小。"
+    },
+    "linkOptions": {
+      "memory": "記憶：{{title}}",
+      "rule": "規則：{{title}}",
+      "skill": "技能：{{name}}",
+      "personal": "個人資訊：{{title}}"
+    },
     "errors": {
       "importFailed": "匯入失敗：{{error}}",
       "migrationFailed": "移轉失敗：{{error}}"
     },
-    "graph": {
-      "truncated": "已截斷"
-    },
-    "importAll": {
-      "action": "匯入全部",
-      "mergeDuplicates": "合併重複項目",
-      "mergeDuplicatesHint": "在 DDAgent 中合併重複的資料列（非檔案）",
-      "projectsScanned": "已掃描專案：{{count}}",
-      "rulesSummary": "規則：{{total}} · 重複群組：{{duplicates}}",
-      "skillsFound": "找到代理技能：{{found}}（新增：{{newSkills}}）",
-      "title": "將所有內容匯入 DDAgent"
-    },
-    "importSkills": {
-      "found": "在你的代理中找到 {{count}} 個技能。",
-      "summary": "新增：{{imported}} · 略過：{{skipped}}",
-      "title": "匯入代理技能"
-    },
-    "linkOptions": {
-      "memory": "記憶：{{title}}",
-      "personal": "個人資訊：{{title}}",
-      "rule": "規則：{{title}}",
-      "skill": "技能：{{name}}"
-    },
-    "migrate": {
-      "duplicates": "跨專案的重複群組：{{count}}",
-      "mergeDuplicates": "合併重複項目",
-      "removedPromoted": "已移除：{{removed}}，已提升：{{promoted}}",
-      "rulesSummary": "規則：共 {{total}} 條，{{critical}} 條嚴重。",
-      "scanned": "已掃描 {{count}} 個專案。",
-      "title": "移轉現有規則"
+    "entityTypes": {
+      "memory": "記憶",
+      "rule": "規則",
+      "skill": "技能",
+      "personal": "個人",
+      "project": "專案",
+      "tag": "標籤"
     }
   },
-  "skills": {
-    "addDialog": {
-      "chooseFileTitle": "選擇 SKILL.md",
-      "chooseFiles": "選擇檔案",
-      "chooseFolder": "選擇資料夾",
-      "chooseFolderTitle": "選擇技能資料夾",
-      "folderFilesMeta": {
-        "one": "{{count}} 個檔案 · {{size}}",
-        "other": "{{count}} 個檔案 · {{size}}"
-      },
-      "folderUploadsNote": "資料夾上傳會保留所選資料夾名稱；獨立檔案則使用 `SKILL.md` 中的 `name`。",
-      "hideInstallLocation": "隱藏安裝位置",
-      "installSkill": "安裝技能",
-      "installSkills": {
-        "one": "安裝 {{count}} 個技能",
-        "other": "安裝 {{count}} 個技能"
-      },
-      "markdownFileMeta": "Markdown 檔案 · {{size}}",
-      "pickHint": "資料夾可包含指令碼、參考資料與資源。",
-      "pickTitle": "選擇技能資料夾或 SKILL.md",
-      "readyToInstall": "可以安裝了",
-      "removeQueued": "移除 {{name}}",
-      "title": "新增 {{provider}} 技能",
-      "uploadHint": "上傳 SKILL.md 檔案或完整的技能資料夾。",
-      "whereWillThisInstall": "這會安裝到哪裡？"
+  "browser": {
+    "dialogTitle": "代理瀏覽器",
+    "viewError": "瀏覽器檢視錯誤",
+    "web": "網頁"
+  },
+  "collab": {
+    "team": "團隊",
+    "invite": "邀請",
+    "inviteTeammate": "邀請隊友",
+    "shareTokenHint": "分享此邀請權杖 — 僅顯示一次，並在 72 小時後過期：",
+    "createInvite": "建立邀請",
+    "copyToken": "複製權杖",
+    "roles": {
+      "member": "成員",
+      "viewer": "檢視者"
     },
-    "deleteSkill": "刪除 {{name}}",
+    "viewing": {
+      "session": "工作階段",
+      "card": "卡片",
+      "board": "看板"
+    }
+  },
+  "fileTree": {
+    "uploadTo": "上傳至",
+    "uploadHere": "上傳到此處",
+    "browseServerFilesystem": "瀏覽伺服器檔案系統",
+    "noFiles": "沒有檔案",
+    "copyContents": "複製內容",
+    "chooseFolder": "選擇資料夾",
+    "search": {
+      "hint": "篩選名稱 / 按 Enter 搜尋內容",
+      "prompt": "輸入查詢並按 Enter",
+      "noMatches": "沒有符合項目",
+      "resultsTruncated": "結果已截斷"
+    },
+    "titles": {
+      "rename": "重新命名 {{name}}",
+      "delete": "刪除 {{name}}",
+      "download": "下載 {{name}}"
+    },
+    "uploadedCount": "已上傳 {{count}} 個檔案",
+    "newName": "新名稱",
+    "notRegisteredProject": "不是已註冊的專案：{{path}}",
+    "showGitignoredFiles": "顯示被 gitignore 忽略的檔案",
+    "hideGitignoredFiles": "隱藏被 gitignore 忽略的檔案",
+    "downloadUnsupportedOnWeb": "網頁版不支援下載",
+    "saveToPath": "儲存至路徑",
+    "savedTo": "已儲存至 {{path}}",
+    "relative": {
+      "now": "剛剛",
+      "minutes": "{{n}} 分鐘",
+      "hours": "{{n}} 小時",
+      "days": "{{n}} 天"
+    },
+    "projectRoot": "（專案根目錄）",
+    "uploadLimitCount(param=count)": {
+      "other": "一次最多可上傳 {{count}} 個檔案。"
+    },
+    "fileTooLarge": "{{name}} 超過 200MB。",
+    "deleteFolderConfirm": "刪除資料夾「{{path}}」？此操作無法復原。",
+    "deleteFileConfirm": "刪除檔案「{{path}}」？此操作無法復原。"
+  },
+  "git": {
+    "checkpoints": {
+      "title": "檢查點",
+      "restoreTitle": "還原檢查點",
+      "restoreMessage": "要將工作樹重設到此檢查點嗎？目前的變更將被取代。",
+      "restored": "檢查點已還原",
+      "labelHint": "檢查點標籤（選填）",
+      "empty": "尚無檢查點",
+      "create": "新增"
+    },
+    "stagedChanges": "已暫存的變更",
+    "statusStaged": "已暫存",
+    "switchBranch": "切換分支",
+    "unifiedDiff": "統一差異",
+    "splitDiff": "並排差異",
+    "noDiff": "沒有可用的差異",
+    "largeDiff": "大型差異預覽：為保持分頁順暢，渲染範圍已受限。",
+    "loadDiffFailed": "載入差異失敗：{{error}}",
+    "hunkStage": "+ 區塊",
+    "hunkUnstage": "− 區塊",
+    "stageHunk": "暫存區塊",
+    "unstageHunk": "取消暫存區塊",
+    "deleteFile": "刪除檔案",
+    "commitMessage": "提交訊息",
+    "aiButton": "✦ AI",
+    "commitCreated": "已建立提交",
+    "noBranch": "沒有分支",
+    "selectProject": "選擇專案",
+    "branchSections": {
+      "local": "本機",
+      "remote": "遠端"
+    }
+  },
+  "kanban": {
+    "card": {
+      "untitled": "未命名"
+    },
+    "comments": {
+      "empty": "尚無留言",
+      "add": "新增留言"
+    },
+    "dialog": {
+      "saving": "儲存中…"
+    },
+    "details": {
+      "title": "卡片詳細資料",
+      "status": "狀態：{{status}}"
+    },
     "empty": {
-      "noGlobalSkills": "尚未找到全域技能",
-      "noGlobalSkillsDescription": "在上方新增全域技能，即可在所有專案中使用。",
-      "noMatchingSkills": "沒有符合的技能",
-      "noMatchingSkillsDescription": "請嘗試不同的指令、名稱、範圍、專案或來源路徑。",
-      "noProjects": "沒有可用的專案",
-      "noProjectsDescription": "新增專案或工作區以瀏覽其技能。",
-      "noSkillsInProject": "此專案沒有技能",
-      "noSkillsInProjectDescription": "在所選專案中建立 .claude/skills、.cursor/skills 或 .agents/skills 資料夾。"
+      "noProject": "未選擇專案"
     },
-    "errors": {
-      "addMarkdownFirst": "請先新增一個或多個 Markdown 檔案。",
-      "couldNotReadSkillFile": "無法從 {{name}} 讀取 SKILL.md。",
-      "dropMarkdownOrFolder": "拖放一個或多個 Markdown 檔案，或包含 SKILL.md 的資料夾。",
-      "folderFileLimit": "一個技能資料夾最多可包含 {{count}} 個檔案。",
-      "folderReadFailed": "讀取技能資料夾失敗",
-      "folderSizeLimit": "所選技能資料夾的總大小必須小於 30 MB。",
-      "importFailed": "匯入技能失敗",
-      "missingSkillFile": "所選資料夾不包含 SKILL.md 檔案。"
-    },
-    "moveDialog": {
-      "moveToGlobal": "移至全域",
-      "moveToProject": "移至專案",
-      "toGlobalHint": "將此技能移至全域技能目錄，讓所有專案都能使用。",
-      "toProjectHint": "選擇應擁有此技能的專案。它會移出提供者的全域技能目錄。"
-    },
-    "moveSkill": "移動 {{name}}",
-    "projectLabel": "專案",
-    "scopes": {
-      "admin": "管理員",
-      "plugin": "外掛",
-      "project": "專案",
-      "repo": "儲存庫",
-      "system": "系統",
-      "user": "使用者"
-    },
-    "screen": {
-      "addSkill": "新增技能",
-      "clearSearch": "清除技能搜尋",
-      "deleteDescription": "這會從 {{provider}} 的受管理技能目錄中移除 {{directory}} 目錄。此操作無法復原。",
-      "deleteTitle": "刪除 {{name}}？",
-      "loadingSkills": "正在載入 {{provider}} 技能…",
-      "manageDescription": "從本機檔案、完整資料夾和專案感知位置管理 {{provider}} 技能。",
-      "noDescription": "技能前置資料中未提供說明。",
-      "pluginBadge": "外掛：{{name}}",
-      "projectBadge": "專案：{{name}}",
-      "savedSuccessfully": "技能已成功儲存。",
-      "scanningProjectSkills": "正在掃描專案技能...",
-      "searchHint": "搜尋技能...",
-      "skillsCount": {
-        "one": "{{count}} 個技能",
-        "other": "{{count}} 個技能"
+    "saveFailed": "儲存卡片失敗",
+    "time": {
+      "now": "剛剛",
+      "minutesAgo(param=count)": {
+        "one": "1 分鐘前",
+        "other": "{{count}} 分鐘前"
       },
-      "sourceLabel": "來源"
+      "hoursAgo(param=count)": {
+        "one": "1 小時前",
+        "other": "{{count}} 小時前"
+      },
+      "daysAgo(param=count)": {
+        "one": "1 天前",
+        "other": "{{count}} 天前"
+      }
     }
   },
   "mcp": {
-    "form": {
-      "fields": {
-        "bearerTokenEnvVar": "Bearer 權杖環境變數",
-        "envVarNames": "環境變數名稱",
-        "workingDirectory": "工作目錄"
-      },
-      "scope": {
-        "claudeLocal": "Claude 本機",
-        "description": {
-          "local": "儲存在所選專案的 Claude 使用者設定中",
-          "project": "儲存在所選專案工作區中",
-          "projectGlobal": "為每個提供者寫入所選專案工作區",
-          "user": "可在您機器上的所有專案中使用",
-          "userGlobal": "寫入每個提供者的使用者設定，並可在此機器的所有專案中使用"
-        },
-        "projectAllProviders": "專案（所有提供者）",
-        "userAllProviders": "使用者（所有提供者）"
-      },
-      "submitTo": "將伺服器新增至 {{provider}}",
-      "validation": {
-        "unsupportedGlobal": "新增 MCP 伺服器在所有提供者中僅支援 stdio 和 http，不支援 {{type}}。",
-        "unsupportedProvider": "{{provider}} 不支援 {{type}} MCP 伺服器"
-      }
-    },
     "install": {
-      "button": "安裝",
-      "cardDescription": "透過 MCP 為你的代理提供知識庫與 DDAgent 工具 — 選擇代理，或為全部安裝。",
+      "title": "安裝 DDAgent MCP 伺服器",
       "description": "讓所選代理透過 MCP 使用 DDAgent 知識庫與工具。",
-      "errorFallback": "錯誤",
-      "failed": "安裝失敗：{{error}}",
-      "installForAll": "為全部安裝",
+      "cardDescription": "透過 MCP 為你的代理提供知識庫與 DDAgent 工具 — 選擇代理，或為全部安裝。",
       "installSelected": "安裝所選項目",
+      "installForAll": "為全部安裝",
+      "button": "安裝",
+      "failed": "安裝失敗：{{error}}",
       "installedCount(param=count)": {
         "one": "已安裝於 {{count}} 個代理。",
         "other": "已安裝於 {{count}} 個代理。"
       },
       "partialFailure": "已安裝於 {{count}} 個；失敗：{{failed}}",
-      "title": "安裝 DDAgent MCP 伺服器"
+      "errorFallback": "錯誤"
     },
     "servers": {
+      "loading": "正在載入 MCP 伺服器...",
+      "refreshingScopes": "正在重新整理專案範圍...",
+      "descriptionGeneric": "Model Context Protocol 伺服器為 {{provider}} 提供額外的工具和資料來源",
+      "addGlobalTitle": "新增全域 MCP 伺服器",
       "addGlobalDescription": "將此 MCP 伺服器新增至所有提供者：Claude、Cursor、Codex、OpenCode 和 Devin。由於相同設定必須在所有提供者中運作，因此僅支援 stdio 與 HTTP 傳輸。",
       "addGlobalMenuDescription": "新增全域 MCP 伺服器會將一個通用 stdio 或 HTTP 伺服器寫入 Claude、Cursor、Codex、OpenCode 和 Devin。",
-      "addGlobalTitle": "新增全域 MCP 伺服器",
-      "addProviderDescription": "新增 {{provider}} MCP 伺服器只會變更 {{provider}}。",
       "addProviderTitle": "新增 {{provider}} MCP 伺服器",
+      "addProviderDescription": "新增 {{provider}} MCP 伺服器只會變更 {{provider}}。",
       "config": {
         "cwd": "工作目錄",
         "envVars": "環境變數"
       },
-      "descriptionGeneric": "Model Context Protocol 伺服器為 {{provider}} 提供額外的工具和資料來源",
-      "loading": "正在載入 MCP 伺服器...",
-      "refreshingScopes": "正在重新整理專案範圍..."
+      "selectProjectRequired": "請為專案範圍的 MCP 伺服器選擇一個專案",
+      "globalScopeUnsupported": "為所有供應商新增 MCP 伺服器時僅支援使用者或專案範圍。",
+      "globalAddFailed": "無法將 MCP 伺服器新增至所有供應商。{{details}}",
+      "scopeProject": "專案"
     },
     "team": {
-      "cta": "DDAgent Pro 提供",
+      "title": "團隊 MCP 設定",
       "description": "在團隊中分享 MCP 伺服器設定。所有人都會自動保持同步。",
-      "title": "團隊 MCP 設定"
+      "cta": "DDAgent Pro 提供"
     },
     "tokens": {
-      "scopeWrite": "寫入"
+      "scopeWrite": "寫入",
+      "scopeRead": "讀取"
+    },
+    "form": {
+      "submitTo": "將伺服器新增至 {{provider}}",
+      "scope": {
+        "userAllProviders": "使用者（所有提供者）",
+        "claudeLocal": "Claude 本機",
+        "projectAllProviders": "專案（所有提供者）",
+        "description": {
+          "userGlobal": "寫入每個提供者的使用者設定，並可在此機器的所有專案中使用",
+          "user": "可在您機器上的所有專案中使用",
+          "local": "儲存在所選專案的 Claude 使用者設定中",
+          "projectGlobal": "為每個提供者寫入所選專案工作區",
+          "project": "儲存在所選專案工作區中"
+        }
+      },
+      "fields": {
+        "workingDirectory": "工作目錄",
+        "envVarNames": "環境變數名稱",
+        "bearerTokenEnvVar": "Bearer 權杖環境變數"
+      },
+      "validation": {
+        "unsupportedGlobal": "新增 MCP 伺服器在所有提供者中僅支援 stdio 和 http，不支援 {{type}}。",
+        "unsupportedProvider": "{{provider}} 不支援 {{type}} MCP 伺服器",
+        "jsonMustBeObject": "JSON 設定必須是一個物件"
+      }
     }
-  },
-  "terminal": {
-    "actions": {
-      "clearOutput": "清除輸出",
-      "connect": "連線",
-      "newShell": "新增 Shell",
-      "newTab": "新增終端機分頁",
-      "providerLogin": "提供者登入",
-      "restartSession": "重新啟動工作階段"
-    },
-    "authUrl": {
-      "openInBrowser": "在瀏覽器中開啟"
-    },
-    "errors": {
-      "couldNotOpenLink": "無法開啟連結：{{url}}"
-    },
-    "fileLink": {
-      "detected": "偵測到檔案：{{path}}"
-    },
-    "paste": {
-      "hint": "Ctrl+V / 按右鍵 → 貼上",
-      "title": "貼上至終端機"
-    },
-    "shortcuts": {
-      "eof": "EOF",
-      "hide": "隱藏快速鍵列",
-      "interrupt": "中斷 (SIGINT)",
-      "suspend": "暫停 (SIGTSTP)",
-      "showTooltip": "顯示快速鍵",
-      "hideTooltip": "隱藏快速鍵"
-    },
-    "tabs": {
-      "antigravityCli": "Antigravity CLI",
-      "claudeCli": "Claude CLI",
-      "commandCodeCli": "Command Code CLI",
-      "cursorCli": "Cursor CLI",
-      "devinCli": "Devin CLI",
-      "loginTitle": "登入：{{provider}}",
-      "opencodeCli": "OpenCode CLI",
-      "plainShell": "一般 Shell",
-      "shellName": "Shell {{index}}"
-    }
-  },
-  "worktrees": {
-    "branchHint": "新分支名稱（例如 feature/login）",
-    "branchingOff": "從 {{branch}} 建立分支",
-    "cleanupDescription": "合併後移除 worktree 並刪除分支",
-    "created": "已建立 worktree",
-    "deleteBranchLabel": "同時刪除分支",
-    "dirtyWarning": "警告：此 worktree 有 {{count}} 個未提交的變更將會遺失。",
-    "emptyDescription": "建立 worktree 以隔離功能開發或代理執行作業。",
-    "emptyTitle": "找不到 worktree",
-    "forceRemoveLabel": "強制移除（捨棄變更）",
-    "headDetachedAt": "HEAD 分離於 {{sha}}",
-    "mainBadge": "main",
-    "mergeDescription": "將變更合併至 {{branch}}。",
-    "mergeTitle": "合併 {{branch}}",
-    "merged": "已將 worktree 合併至 {{branch}}",
-    "opened": "已開啟 worktree：{{branch}}",
-    "portHint": "執行連接埠（選填，例如 3000）",
-    "removeDescription": "這會刪除 worktree 資料夾。連結的專案將被封存。",
-    "removeTitle": "移除 worktree {{branch}}？",
-    "removed": "已移除 worktree",
-    "runButton": "執行",
-    "runHint": "執行指令（例如 npm run dev）",
-    "runRunning": "執行中",
-    "runRunningWithPort": "執行中 :{{port}}",
-    "scripts": "指令碼",
-    "scriptsSaved": "指令碼設定已儲存",
-    "serverLabel": "伺服器：",
-    "setupHint": "設定指令（例如 npm install）",
-    "setupLabel": "設定：",
-    "squashDescription": "將所有提交合併為單一提交",
-    "stopButton": "停止"
-  },
-  "quota": {
-    "agents": {
-      "statusCount": "{{status}}（{{count}}）"
-    },
-    "chart": {
-      "hide": "隱藏",
-      "noData": "資料不足以顯示趨勢。",
-      "pointReadout": "{{date}} · {{tokens}} 權杖 · {{cost}}",
-      "show": "顯示"
-    },
-    "config": {
-      "accountRouting": "帳戶路由",
-      "pollerTitle": "輪詢器與警示",
-      "save": "儲存設定"
-    },
-    "overview": {
-      "tokensAndCost": "權杖與成本"
-    },
-    "section": {
-      "config": "設定"
-    }
-  },
-  "scheduler": {
-    "checking": "檢查中…",
-    "cronHint": "Cron（分 時 日 月 星期）— 例如 0 9 * * *",
-    "deleteMessage": "這會移除週期性工作 {{id}}。現有工作階段會保留。",
-    "deleteTitle": "刪除排程？",
-    "editTitle": "編輯排程",
-    "newLabel": "新增",
-    "nextIn": "{{time}} 後",
-    "promptHint": "代理的提示詞",
-    "runs": "執行次數",
-    "session": "工作階段 {{id}}",
-    "worktree": "worktree"
   },
   "notifications": {
     "deviceLabel": "DDAgent Flutter",
     "errors": {
-      "noResponse": "伺服器沒有回應",
-      "registrationRejected": "伺服器拒絕註冊"
+      "registrationRejected": "伺服器拒絕註冊",
+      "noResponse": "伺服器沒有回應"
+    },
+    "androidChannel": {
+      "name": "DDAgent 警示",
+      "description": "代理程式執行、核准與錯誤通知"
+    }
+  },
+  "onboarding": {
+    "gitHint": "用於 DDAgent 工作階段建立的提交。",
+    "completeSetup": "完成設定",
+    "errors": {
+      "nameAndEmailRequired": "git 名稱與電子郵件皆為必填。",
+      "invalidEmail": "請輸入有效的電子郵件地址。"
+    },
+    "agents": {
+      "title": "連接你的 AI 代理",
+      "description": "登入一個或多個 AI 程式開發助手。全部皆為選填。",
+      "laterHint": "你可以稍後在設定中進行設定。"
+    },
+    "mcp": {
+      "title": "將代理連接到 DDAgent",
+      "description": "安裝 DDAgent MCP 伺服器，讓你的代理可以使用知識庫與 DDAgent 工具。選擇代理，或為全部安裝。",
+      "installSelected": "安裝所選項目",
+      "installForAll": "為全部安裝",
+      "laterHint": "選填 — 你也可以稍後在設定 → MCP 中安裝。",
+      "installedOn(param=count)": {
+        "one": "已安裝於 {{count}} 個代理。",
+        "other": "已安裝於 {{count}} 個代理。"
+      },
+      "installedWithFailures": "已安裝於 {{installedCount}} 個；失敗：{{failed}}"
+    }
+  },
+  "projects": {
+    "cloneRepository": "複製儲存庫",
+    "repositoryCloned": "儲存庫已複製",
+    "clone": "複製",
+    "cloneFinished": "複製完成。正在重新整理專案清單…",
+    "cloneFailed": "複製失敗",
+    "repoUrlPlaceholder": "https://github.com/org/repo.git",
+    "destinationPath": "目的地路徑",
+    "destinationPathRequired": "目的地路徑為必填",
+    "repositoryUrlRequired": "儲存庫 URL 為必填",
+    "githubTokenOptional": "GitHub 權杖（選填）",
+    "archive": "封存",
+    "restore": "還原",
+    "deletePermanently": "永久刪除",
+    "deleteProjectTitle": "刪除專案？",
+    "deleteProjectMessage": "永久移除「{{name}}」，包括所有工作階段與儲存的歷史記錄（清除 JSONL）。此操作無法復原。",
+    "archivedSection": "已封存（{{count}}）",
+    "sessionCount": {
+      "one": "{{count}} 個工作階段",
+      "other": "{{count}} 個工作階段"
+    },
+    "newer": "較新",
+    "older": "較舊",
+    "projectArchived": "專案已封存",
+    "projectRestored": "專案已還原",
+    "projectRenamed": "專案已重新命名",
+    "projectDeleted": "專案已刪除",
+    "failedToLoadTokens": "載入 GitHub 權杖失敗",
+    "displayNameOptional": "顯示名稱（選填）",
+    "usingStoredToken": "使用已儲存的權杖：{{name}}",
+    "unknown": "未知",
+    "project": "專案"
+  },
+  "quota": {
+    "section": {
+      "config": "設定"
+    },
+    "overview": {
+      "tokensAndCost": "權杖與成本"
+    },
+    "agents": {
+      "statusCount": "{{status}}（{{count}}）"
+    },
+    "config": {
+      "pollerTitle": "輪詢器與警示",
+      "accountRouting": "帳戶路由",
+      "save": "儲存設定"
+    },
+    "chart": {
+      "show": "顯示",
+      "hide": "隱藏",
+      "noData": "資料不足以顯示趨勢。",
+      "pointReadout": "{{date}} · {{tokens}} 權杖 · {{cost}}"
+    },
+    "duration": {
+      "minutes": "{{minutes}} 分鐘",
+      "hoursMinutes": "{{hours}} 小時 {{minutes}} 分鐘",
+      "daysHours": "{{days}} 天 {{hours}} 小時",
+      "now": "剛剛"
+    }
+  },
+  "scheduler": {
+    "newLabel": "新增",
+    "runs": "執行次數",
+    "editTitle": "編輯排程",
+    "deleteTitle": "刪除排程？",
+    "deleteMessage": "這會移除週期性工作 {{id}}。現有工作階段會保留。",
+    "checking": "檢查中…",
+    "nextIn": "{{time}} 後",
+    "worktree": "worktree",
+    "session": "工作階段 {{id}}",
+    "cronHint": "Cron（分 時 日 月 星期）— 例如 0 9 * * *",
+    "promptHint": "代理的提示詞",
+    "runStatus": {
+      "fired": "已觸發",
+      "skipped": "已略過",
+      "failed": "失敗",
+      "completed": "已完成"
+    },
+    "cronErrors": {
+      "fieldCount": "需要 5 個欄位，實際為 {{got}} 個",
+      "fieldError": "欄位 {{index}}：{{error}}",
+      "empty": "為空",
+      "invalidPart": "無效的「{{part}}」",
+      "invalidValue": "無效值「{{value}}」"
     }
   },
   "serverConnect": {
+    "subtitle": "連線到你的 DDAgent 伺服器",
+    "enterUrl": "輸入伺服器 URL",
+    "connectionFailed": "連線失敗（{{error}}）",
     "connect": "連線",
     "connecting": "正在連線…",
     "changeServer": "更換伺服器",
-    "connectionFailed": "連線失敗（{{error}}）",
-    "enterUrl": "輸入伺服器 URL",
     "local": {
       "title": "此裝置",
       "subtitle": "在此電腦上執行 DDAgent 伺服器",
@@ -3232,242 +3952,318 @@
       "installed": "已安裝 (v{{version}})",
       "connect": "使用此伺服器",
       "error": "本機伺服器錯誤：{{error}}",
-      "or": "或連線到遠端伺服器"
+      "or": "或連線到遠端伺服器",
+      "errors": {
+        "releaseTagUnresolved": "無法取得最新的 DDAgent 發行標籤。",
+        "unsupportedPlatform": "此平台不支援本機伺服器。",
+        "unsupportedPlatformDetail": "此平台不支援本機伺服器（{{platform}}）。",
+        "nodeExtractionFailed": "Node.js 解壓縮後未產生 {{path}}",
+        "downloadFailed": "伺服器下載失敗：{{error}}",
+        "installFailed": "伺服器安裝失敗：{{error}}",
+        "bundleNotInstalled": "伺服器套件未安裝。",
+        "spawnFailed": "無法啟動本機伺服器：{{error}}",
+        "portInUse": "連接埠 {{port}} 已被其他應用程式使用。",
+        "exitedDuringStartup": "本機伺服器在啟動期間結束。",
+        "exitedDuringStartupWithOutput": "本機伺服器在啟動期間結束：{{output}}",
+        "startTimeout": "等待本機伺服器啟動逾時。",
+        "tarFailed": "{{command}} 失敗（結束代碼 {{code}}）：{{output}}"
+      }
     },
-    "subtitle": "連線到你的 DDAgent 伺服器"
+    "httpStatus": "HTTP {{code}}",
+    "networkError": "網路錯誤"
   },
-  "voice": {
-    "apiKeySaved": "API 金鑰（已儲存，輸入以取代）",
-    "preview": "預覽",
-    "saveFailed": "儲存 STT 設定失敗",
-    "settingsSaved": "語音輸入設定已儲存"
+  "sessions": {
+    "noSessions": "沒有工作階段",
+    "noRecentSessions": "沒有最近的工作階段",
+    "archivedSessions": "已封存的工作階段",
+    "rename": "重新命名",
+    "archive": "封存",
+    "compareWith": "比較…",
+    "projectPath": "專案路徑",
+    "newSessionProvider": "新工作階段 — 提供者",
+    "autoOrchestrator": "自動（編排器）",
+    "createFailed": "建立工作階段失敗：{{error}}",
+    "deleteSessionMessage": "移除「{{name}}」及其記錄。此操作無法復原。",
+    "toasts": {
+      "archived": "工作階段已封存",
+      "restored": "工作階段已還原",
+      "deleted": "工作階段已刪除",
+      "renamed": "工作階段已重新命名",
+      "pinned": "工作階段已釘選",
+      "unpinned": "工作階段已取消釘選",
+      "workspaceChanged": "工作區已變更"
+    },
+    "age": {
+      "lessThanMinute": "<1 分鐘",
+      "minutes": "{{count}} 分鐘",
+      "hours": "{{hours}} 小時",
+      "days": "{{days}} 天"
+    },
+    "activity": {
+      "subagentRunning": "子代理執行中",
+      "readingFile": "正在讀取 {{file}}",
+      "runningTool": "正在執行 {{name}}",
+      "editingFile": "正在編輯 {{file}}",
+      "editingFileGeneric": "正在編輯檔案",
+      "runningShellCommand": "正在執行 Shell 指令",
+      "runningCommand": "正在執行 `{{command}}`",
+      "committingChanges": "正在提交變更",
+      "pushingBranch": "正在推送分支",
+      "fetchingUrl": "正在取得 {{url}}",
+      "searching": "正在搜尋「{{query}}」"
+    },
+    "autoMini": "自動（迷你）"
   },
   "sharedContext": {
     "title": "共用筆記"
   },
-  "collab": {
-    "copyToken": "複製權杖",
-    "createInvite": "建立邀請",
-    "invite": "邀請",
-    "inviteTeammate": "邀請隊友",
-    "roles": {
-      "member": "成員",
-      "viewer": "檢視者"
+  "skills": {
+    "moveSkill": "移動 {{name}}",
+    "deleteSkill": "刪除 {{name}}",
+    "projectLabel": "專案",
+    "addDialog": {
+      "title": "新增 {{provider}} 技能",
+      "chooseFileTitle": "選擇 SKILL.md",
+      "chooseFolderTitle": "選擇技能資料夾",
+      "uploadHint": "上傳 SKILL.md 檔案或完整的技能資料夾。",
+      "pickTitle": "選擇技能資料夾或 SKILL.md",
+      "pickHint": "資料夾可包含指令碼、參考資料與資源。",
+      "chooseFiles": "選擇檔案",
+      "chooseFolder": "選擇資料夾",
+      "readyToInstall": "可以安裝了",
+      "markdownFileMeta": "Markdown 檔案 · {{size}}",
+      "folderFilesMeta": {
+        "one": "{{count}} 個檔案 · {{size}}",
+        "other": "{{count}} 個檔案 · {{size}}"
+      },
+      "removeQueued": "移除 {{name}}",
+      "whereWillThisInstall": "這會安裝到哪裡？",
+      "hideInstallLocation": "隱藏安裝位置",
+      "folderUploadsNote": "資料夾上傳會保留所選資料夾名稱；獨立檔案則使用 `SKILL.md` 中的 `name`。",
+      "installSkill": "安裝技能",
+      "installSkills": {
+        "one": "安裝 {{count}} 個技能",
+        "other": "安裝 {{count}} 個技能"
+      }
     },
-    "shareTokenHint": "分享此邀請權杖 — 僅顯示一次，並在 72 小時後過期：",
-    "team": "團隊"
-  },
-  "browser": {
-    "dialogTitle": "代理瀏覽器",
-    "viewError": "瀏覽器檢視錯誤",
-    "web": "網頁"
-  },
-  "projects": {
-    "archive": "封存",
-    "archivedSection": "已封存（{{count}}）",
-    "clone": "複製",
-    "cloneFailed": "複製失敗",
-    "cloneFinished": "複製完成。正在重新整理專案清單…",
-    "cloneRepository": "複製儲存庫",
-    "deletePermanently": "永久刪除",
-    "deleteProjectMessage": "永久移除「{{name}}」，包括所有工作階段與儲存的歷史記錄（清除 JSONL）。此操作無法復原。",
-    "deleteProjectTitle": "刪除專案？",
-    "destinationPath": "目的地路徑",
-    "destinationPathRequired": "目的地路徑為必填",
-    "displayNameOptional": "顯示名稱（選填）",
-    "failedToLoadTokens": "載入 GitHub 權杖失敗",
-    "githubTokenOptional": "GitHub 權杖（選填）",
-    "newer": "較新",
-    "older": "較舊",
-    "projectArchived": "專案已封存",
-    "projectDeleted": "專案已刪除",
-    "projectRenamed": "專案已重新命名",
-    "projectRestored": "專案已還原",
-    "repoUrlPlaceholder": "https://github.com/org/repo.git",
-    "repositoryCloned": "儲存庫已複製",
-    "repositoryUrlRequired": "儲存庫 URL 為必填",
-    "restore": "還原",
-    "sessionCount": {
-      "one": "{{count}} 個工作階段",
-      "other": "{{count}} 個工作階段"
+    "moveDialog": {
+      "toProjectHint": "選擇應擁有此技能的專案。它會移出提供者的全域技能目錄。",
+      "toGlobalHint": "將此技能移至全域技能目錄，讓所有專案都能使用。",
+      "moveToProject": "移至專案",
+      "moveToGlobal": "移至全域"
     },
-    "unknown": "未知",
-    "usingStoredToken": "使用已儲存的權杖：{{name}}"
-  },
-  "sessions": {
-    "activity": {
-      "committingChanges": "正在提交變更",
-      "editingFile": "正在編輯 {{file}}",
-      "editingFileGeneric": "正在編輯檔案",
-      "fetchingUrl": "正在取得 {{url}}",
-      "pushingBranch": "正在推送分支",
-      "readingFile": "正在讀取 {{file}}",
-      "runningCommand": "正在執行 `{{command}}`",
-      "runningShellCommand": "正在執行 Shell 指令",
-      "runningTool": "正在執行 {{name}}",
-      "searching": "正在搜尋「{{query}}」",
-      "subagentRunning": "子代理執行中"
-    },
-    "age": {
-      "days": "{{days}} 天",
-      "hours": "{{hours}} 小時",
-      "lessThanMinute": "<1 分鐘",
-      "minutes": "{{count}} 分鐘"
-    },
-    "archive": "封存",
-    "archivedSessions": "已封存的工作階段",
-    "autoOrchestrator": "自動（編排器）",
-    "compareWith": "比較…",
-    "createFailed": "建立工作階段失敗：{{error}}",
-    "deleteSessionMessage": "移除「{{name}}」及其記錄。此操作無法復原。",
-    "newSessionProvider": "新工作階段 — 提供者",
-    "noRecentSessions": "沒有最近的工作階段",
-    "noSessions": "沒有工作階段",
-    "projectPath": "專案路徑",
-    "rename": "重新命名",
-    "toasts": {
-      "archived": "工作階段已封存",
-      "deleted": "工作階段已刪除",
-      "pinned": "工作階段已釘選",
-      "renamed": "工作階段已重新命名",
-      "restored": "工作階段已還原",
-      "unpinned": "工作階段已取消釘選",
-      "workspaceChanged": "工作區已變更"
-    }
-  },
-  "git": {
-    "aiButton": "✦ AI",
-    "checkpoints": {
-      "create": "新增",
-      "empty": "尚無檢查點",
-      "labelHint": "檢查點標籤（選填）",
-      "restoreMessage": "要將工作樹重設到此檢查點嗎？目前的變更將被取代。",
-      "restoreTitle": "還原檢查點",
-      "restored": "檢查點已還原",
-      "title": "檢查點"
-    },
-    "commitCreated": "已建立提交",
-    "commitMessage": "提交訊息",
-    "deleteFile": "刪除檔案",
-    "hunkStage": "+ 區塊",
-    "hunkUnstage": "− 區塊",
-    "largeDiff": "大型差異預覽：為保持分頁順暢，渲染範圍已受限。",
-    "loadDiffFailed": "載入差異失敗：{{error}}",
-    "noBranch": "沒有分支",
-    "noDiff": "沒有可用的差異",
-    "selectProject": "選擇專案",
-    "splitDiff": "並排差異",
-    "stageHunk": "暫存區塊",
-    "stagedChanges": "已暫存的變更",
-    "statusStaged": "已暫存",
-    "switchBranch": "切換分支",
-    "unifiedDiff": "統一差異",
-    "unstageHunk": "取消暫存區塊"
-  },
-  "kanban": {
-    "card": {
-      "untitled": "未命名"
-    },
-    "comments": {
-      "add": "新增留言",
-      "empty": "尚無留言"
-    },
-    "details": {
-      "status": "狀態：{{status}}",
-      "title": "卡片詳細資料"
-    },
-    "dialog": {
-      "saving": "儲存中…"
+    "screen": {
+      "manageDescription": "從本機檔案、完整資料夾和專案感知位置管理 {{provider}} 技能。",
+      "searchHint": "搜尋技能...",
+      "clearSearch": "清除技能搜尋",
+      "addSkill": "新增技能",
+      "scanningProjectSkills": "正在掃描專案技能...",
+      "savedSuccessfully": "技能已成功儲存。",
+      "loadingSkills": "正在載入 {{provider}} 技能…",
+      "skillsCount": {
+        "one": "{{count}} 個技能",
+        "other": "{{count}} 個技能"
+      },
+      "deleteTitle": "刪除 {{name}}？",
+      "deleteDescription": "這會從 {{provider}} 的受管理技能目錄中移除 {{directory}} 目錄。此操作無法復原。",
+      "noDescription": "技能前置資料中未提供說明。",
+      "pluginBadge": "外掛：{{name}}",
+      "projectBadge": "專案：{{name}}",
+      "sourceLabel": "來源"
     },
     "empty": {
-      "noProject": "未選擇專案"
+      "noProjects": "沒有可用的專案",
+      "noProjectsDescription": "新增專案或工作區以瀏覽其技能。",
+      "noSkillsInProject": "此專案沒有技能",
+      "noSkillsInProjectDescription": "在所選專案中建立 .claude/skills、.cursor/skills 或 .agents/skills 資料夾。",
+      "noGlobalSkills": "尚未找到全域技能",
+      "noGlobalSkillsDescription": "在上方新增全域技能，即可在所有專案中使用。",
+      "noMatchingSkills": "沒有符合的技能",
+      "noMatchingSkillsDescription": "請嘗試不同的指令、名稱、範圍、專案或來源路徑。"
     },
-    "saveFailed": "儲存卡片失敗",
-    "time": {
-      "daysAgo(param=count)": {
-        "one": "1 天前",
-        "other": "{{count}} 天前"
-      },
-      "hoursAgo(param=count)": {
-        "one": "1 小時前",
-        "other": "{{count}} 小時前"
-      },
-      "minutesAgo(param=count)": {
-        "one": "1 分鐘前",
-        "other": "{{count}} 分鐘前"
-      },
-      "now": "剛剛"
-    }
-  },
-  "onboarding": {
-    "agents": {
-      "description": "登入一個或多個 AI 程式開發助手。全部皆為選填。",
-      "laterHint": "你可以稍後在設定中進行設定。",
-      "title": "連接你的 AI 代理"
+    "scopes": {
+      "user": "使用者",
+      "plugin": "外掛",
+      "repo": "儲存庫",
+      "project": "專案",
+      "admin": "管理員",
+      "system": "系統"
     },
-    "completeSetup": "完成設定",
     "errors": {
-      "invalidEmail": "請輸入有效的電子郵件地址。",
-      "nameAndEmailRequired": "git 名稱與電子郵件皆為必填。"
+      "dropMarkdownOrFolder": "拖放一個或多個 Markdown 檔案，或包含 SKILL.md 的資料夾。",
+      "addMarkdownFirst": "請先新增一個或多個 Markdown 檔案。",
+      "importFailed": "匯入技能失敗",
+      "folderReadFailed": "讀取技能資料夾失敗",
+      "folderFileLimit": "一個技能資料夾最多可包含 {{count}} 個檔案。",
+      "folderSizeLimit": "所選技能資料夾的總大小必須小於 30 MB。",
+      "missingSkillFile": "所選資料夾不包含 SKILL.md 檔案。",
+      "couldNotReadSkillFile": "無法從 {{name}} 讀取 SKILL.md。"
     },
-    "gitHint": "用於 DDAgent 工作階段建立的提交。",
-    "mcp": {
-      "description": "安裝 DDAgent MCP 伺服器，讓你的代理可以使用知識庫與 DDAgent 工具。選擇代理，或為全部安裝。",
-      "installForAll": "為全部安裝",
-      "installSelected": "安裝所選項目",
-      "installedOn(param=count)": {
-        "one": "已安裝於 {{count}} 個代理。",
-        "other": "已安裝於 {{count}} 個代理。"
-      },
-      "installedWithFailures": "已安裝於 {{installedCount}} 個；失敗：{{failed}}",
-      "laterHint": "選填 — 你也可以稍後在設定 → MCP 中安裝。",
-      "title": "將代理連接到 DDAgent"
+    "providerShared": "共用"
+  },
+  "terminal": {
+    "tabs": {
+      "shellName": "Shell {{index}}",
+      "plainShell": "一般 Shell",
+      "claudeCli": "Claude CLI",
+      "opencodeCli": "OpenCode CLI",
+      "commandCodeCli": "Command Code CLI",
+      "antigravityCli": "Antigravity CLI",
+      "cursorCli": "Cursor CLI",
+      "devinCli": "Devin CLI",
+      "loginTitle": "登入：{{provider}}",
+      "runTitle": "執行：{{command}}"
+    },
+    "actions": {
+      "newTab": "新增終端機分頁",
+      "providerLogin": "提供者登入",
+      "restartSession": "重新啟動工作階段",
+      "clearOutput": "清除輸出",
+      "newShell": "新增 Shell",
+      "connect": "連線"
+    },
+    "authUrl": {
+      "openInBrowser": "在瀏覽器中開啟",
+      "linkLabel": "驗證連結：{{url}}"
+    },
+    "fileLink": {
+      "detected": "偵測到檔案：{{path}}"
+    },
+    "shortcuts": {
+      "interrupt": "中斷 (SIGINT)",
+      "eof": "EOF",
+      "suspend": "暫停 (SIGTSTP)",
+      "hide": "隱藏快速鍵列",
+      "showTooltip": "顯示快速鍵",
+      "hideTooltip": "隱藏快速鍵"
+    },
+    "paste": {
+      "title": "貼上至終端機",
+      "hint": "Ctrl+V / 按右鍵 → 貼上"
+    },
+    "errors": {
+      "couldNotOpenLink": "無法開啟連結：{{url}}",
+      "frameError": "[錯誤] {{message}}",
+      "connectionError": "[連線錯誤] {{message}}"
+    },
+    "loginDialog": {
+      "title": "{{provider}} CLI 登入",
+      "exited": "已結束（{{code}}）",
+      "authLinkDetected": "偵測到驗證連結"
+    },
+    "empty": {
+      "title": "沒有作用中的終端機",
+      "description": "建立新分頁以開始"
+    },
+    "overlay": {
+      "processExited": "程序已結束 — 連線以重新啟動",
+      "processExitedWithCode": "程序已結束（代碼 {{code}}）— 連線以重新啟動",
+      "resumeSession": "繼續工作階段 {{title}}",
+      "startSession": "在 {{path}} 中開始新的工作階段"
     }
   },
-  "fileTree": {
-    "browseServerFilesystem": "瀏覽伺服器檔案系統",
-    "chooseFolder": "選擇資料夾",
-    "copyContents": "複製內容",
-    "noFiles": "沒有檔案",
-    "search": {
-      "hint": "篩選名稱 / 按 Enter 搜尋內容",
-      "noMatches": "沒有符合項目",
-      "prompt": "輸入查詢並按 Enter",
-      "resultsTruncated": "結果已截斷"
-    },
-    "titles": {
-      "delete": "刪除 {{name}}",
-      "download": "下載 {{name}}",
-      "rename": "重新命名 {{name}}"
-    },
-    "uploadHere": "上傳到此處",
-    "uploadTo": "上傳至",
-    "uploadedCount": "已上傳 {{count}} 個檔案",
-    "newName": "新名稱",
-    "notRegisteredProject": "不是已註冊的專案：{{path}}",
-    "showGitignoredFiles": "顯示被 gitignore 忽略的檔案",
-    "hideGitignoredFiles": "隱藏被 gitignore 忽略的檔案",
-    "downloadUnsupportedOnWeb": "網頁版不支援下載",
-    "saveToPath": "儲存至路徑",
-    "savedTo": "已儲存至 {{path}}"
+  "voice": {
+    "preview": "預覽",
+    "settingsSaved": "語音輸入設定已儲存",
+    "saveFailed": "儲存 STT 設定失敗",
+    "apiKeySaved": "API 金鑰（已儲存，輸入以取代）"
   },
   "workspace": {
-    "archivedWorkspaceName": "已封存",
-    "closePane": "關閉窗格",
-    "closeSearch": "關閉搜尋",
-    "deleteSessionNotice": "移除工作階段及其記錄。無法復原。",
     "exportChat": "匯出對話",
-    "jumpToSession": "跳至工作階段…",
-    "newChatProvider": "新對話 — 提供者",
-    "nextMatch": "下一個符合項目",
-    "previousMatch": "上一個符合項目",
     "searchTranscript": "搜尋記錄",
+    "previousMatch": "上一個符合項目",
+    "nextMatch": "下一個符合項目",
+    "closeSearch": "關閉搜尋",
+    "newChatProvider": "新對話 — 提供者",
+    "closePane": "關閉窗格",
+    "jumpToSession": "跳至工作階段…",
+    "archivedWorkspaceName": "已封存",
     "sendTo": "傳送至 {{count}}",
+    "deleteSessionNotice": "移除工作階段及其記錄。無法復原。",
     "accountWithLabel": "預設 · {{label}}",
     "finishRunBeforeChangingWorkspace": "變更工作區前請先完成執行",
     "restored": "工作區已還原",
     "maximizePane": "最大化窗格",
     "restorePanes": "還原窗格",
-    "reviewChangedFiles": "檢閱已變更的檔案"
+    "reviewChangedFiles": "檢閱已變更的檔案",
+    "paneTitle": {
+      "chat": "聊天",
+      "browser": "瀏覽器",
+      "terminal": "終端機",
+      "notes": "共用筆記",
+      "editor": "編輯器",
+      "git": "Git"
+    },
+    "addEditorPane": "新增編輯器窗格",
+    "addGitPane": "新增 Git 窗格",
+    "unknownProjectPath": "未知的專案路徑",
+    "autoMini": "自動 (mini)",
+    "exportAs": "匯出為：",
+    "exportMarkdown": "Markdown (.md)",
+    "exportHtml": "網頁 (.html)",
+    "exportPdf": "PDF（列印至檔案）",
+    "matchPosition": "{{current}} / {{total}}",
+    "launcherDescription": "為此窗格選擇一個工作區，或建立新的工作區。",
+    "createWorkspace": "建立工作區"
+  },
+  "worktrees": {
+    "scripts": "指令碼",
+    "emptyTitle": "找不到 worktree",
+    "emptyDescription": "建立 worktree 以隔離功能開發或代理執行作業。",
+    "opened": "已開啟 worktree：{{branch}}",
+    "created": "已建立 worktree",
+    "removed": "已移除 worktree",
+    "merged": "已將 worktree 合併至 {{branch}}",
+    "scriptsSaved": "指令碼設定已儲存",
+    "setupLabel": "設定：",
+    "serverLabel": "伺服器：",
+    "runRunning": "執行中",
+    "runRunningWithPort": "執行中 :{{port}}",
+    "runButton": "執行",
+    "stopButton": "停止",
+    "mainBadge": "main",
+    "headDetachedAt": "HEAD 分離於 {{sha}}",
+    "branchHint": "新分支名稱（例如 feature/login）",
+    "branchingOff": "從 {{branch}} 建立分支",
+    "mergeTitle": "合併 {{branch}}",
+    "mergeDescription": "將變更合併至 {{branch}}。",
+    "squashDescription": "將所有提交合併為單一提交",
+    "cleanupDescription": "合併後移除 worktree 並刪除分支",
+    "removeTitle": "移除 worktree {{branch}}？",
+    "removeDescription": "這會刪除 worktree 資料夾。連結的專案將被封存。",
+    "dirtyWarning": "警告：此 worktree 有 {{count}} 個未提交的變更將會遺失。",
+    "forceRemoveLabel": "強制移除（捨棄變更）",
+    "deleteBranchLabel": "同時刪除分支",
+    "setupHint": "設定指令（例如 npm install）",
+    "runHint": "執行指令（例如 npm run dev）",
+    "portHint": "執行連接埠（選填，例如 3000）",
+    "unknownSha": "未知",
+    "baseBranchFallback": "基礎分支",
+    "runtimeStatus": {
+      "idle": "閒置",
+      "running": "執行中",
+      "done": "已完成",
+      "failed": "失敗",
+      "exited": "已結束"
+    }
+  },
+  "browserUse": {
+    "sessionStatus": {
+      "ready": "就緒",
+      "stopped": "已停止",
+      "unavailable": "無法使用"
+    }
+  },
+  "orchestrator": {
+    "stepFallback": "步驟 {{n}}"
+  },
+  "miniOrchestrator": {
+    "taskTypes": {
+      "gate": "關卡"
+    },
+    "roles": {
+      "thinker": "思考者",
+      "worker": "執行者"
+    }
   }
 }

@@ -168,10 +168,10 @@ Widget taskPriorityTile(String priority, AppColors c, bool dark) {
     _ => (c.muted, LucideIcons.circle, c.mutedForeground),
   };
   final label = switch (priority) {
-    'high' => 'High priority',
-    'medium' => 'Medium priority',
-    'low' => 'Low priority',
-    _ => 'No priority set',
+    'high' => t.tasks.card.highPriority,
+    'medium' => t.tasks.card.mediumPriority,
+    'low' => t.tasks.card.lowPriority,
+    _ => t.tasks.card.noPriority,
   };
   return Tooltip(
     message: label,
@@ -383,11 +383,12 @@ class _TaskColumnEmpty extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
+    final i18n = Translations.of(context);
     final desc = switch (status) {
-      'pending' => 'Tasks will appear here',
-      'in-progress' => 'Move tasks here when started',
-      'done' => 'Completed tasks appear here',
-      _ => 'Tasks with this status will appear here',
+      'pending' => i18n.tasks.kanban.tasksWillAppear,
+      'in-progress' => i18n.tasks.kanban.moveTasksHere,
+      'done' => i18n.tasks.kanban.completedTasksHere,
+      _ => i18n.tasks.kanban.statusTasksHere,
     };
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 32),
@@ -405,7 +406,7 @@ class _TaskColumnEmpty extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'No tasks yet',
+            i18n.tasks.kanban.noTasksYet,
             style: TextStyle(color: c.foreground, fontSize: 12, fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 2),
@@ -506,7 +507,7 @@ class _TaskBoardCardState extends State<TaskBoardCard> {
                     ),
                     if (parentId != null && '$parentId'.isNotEmpty)
                       Text(
-                        'Task $parentId',
+                        i18n.tasks.card.parentTask(id: '$parentId'),
                         style: TextStyle(
                           color: c.mutedForeground,
                           fontSize: 12,
@@ -635,6 +636,7 @@ class _PriorityBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
+    final i18n = Translations.of(context);
     final (bg, fg, border) = switch (priority) {
       'high' => (
         dark ? const Color(0xFF450A0A).withValues(alpha: 0.5) : const Color(0xFFFEF2F2),
@@ -658,9 +660,9 @@ class _PriorityBadge extends StatelessWidget {
       ),
     };
     final label = switch (priority) {
-      'high' => 'High',
-      'medium' => 'Medium',
-      'low' => 'Low',
+      'high' => i18n.tasks.priorities.high,
+      'medium' => i18n.tasks.priorities.medium,
+      'low' => i18n.tasks.priorities.low,
       _ => priority,
     };
     return Container(
@@ -708,6 +710,7 @@ class _TaskCompactRowState extends State<TaskCompactRow> {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final dark = Theme.of(context).brightness == Brightness.dark;
+    final i18n = Translations.of(context);
     final task = widget.task;
     final done = task.status == 'done';
     final inProgress = task.status == 'in-progress';
@@ -733,10 +736,10 @@ class _TaskCompactRowState extends State<TaskCompactRow> {
             children: [
               Tooltip(
                 message: done
-                    ? 'Completed (click to reopen)'
+                    ? i18n.tasks.list.completedReopen
                     : inProgress
-                    ? 'In progress (click to complete)'
-                    : 'Mark completed',
+                    ? i18n.tasks.list.inProgressComplete
+                    : i18n.tasks.list.markCompleted,
                 child: InkWell(
                   onTap: widget.busy ? null : widget.onToggleDone,
                   borderRadius: BorderRadius.circular(9999),
@@ -789,7 +792,7 @@ class _TaskCompactRowState extends State<TaskCompactRow> {
                           borderRadius: AppRadii.borderSm,
                         ),
                         child: Text(
-                          'Task $parentId',
+                          i18n.tasks.card.parentTask(id: '$parentId'),
                           style: TextStyle(
                             color: dark ? const Color(0xFF9CA3AF) : const Color(0xFF9CA3AF),
                             fontSize: 10,

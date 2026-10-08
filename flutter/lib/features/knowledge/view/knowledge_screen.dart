@@ -160,11 +160,7 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
                       color: Colors.orange.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Text(
-                      "Read-only on your agents: this imports into ddagent's own database and does "
-                      'NOT modify or delete any CLI file or config. The options below only change '
-                      'ddagent data.',
-                    ),
+                    child: Text(t.knowledge.importAll.readOnlyNotice),
                   ),
                   CheckboxListTile(
                     dense: true,
@@ -187,7 +183,7 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
                     subtitle: Text(t.knowledge.critical.makeAllHint),
                   ),
                   Text(
-                    dryRun ? 'Dry run — nothing written yet.' : 'Imported.',
+                    dryRun ? t.knowledge.importAll.dryRunNote : t.knowledge.importAll.importedNote,
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],
@@ -219,10 +215,12 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
-                                  'Imported — rules: ${rules['total'] ?? 0}, '
-                                  'new skills: ${skills['imported'] ?? 0}, '
-                                  'removed: ${migration['removed'] ?? 0}, '
-                                  'promoted: ${migration['promoted'] ?? 0}',
+                                  t.knowledge.importAll.result(
+                                    rules: (rules['total'] ?? 0) as Object,
+                                    newSkills: (skills['imported'] ?? 0) as Object,
+                                    removed: (migration['removed'] ?? 0) as Object,
+                                    promoted: (migration['promoted'] ?? 0) as Object,
+                                  ),
                                 ),
                               ),
                             );
@@ -291,7 +289,7 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    dryRun ? 'Dry run — nothing has been changed yet.' : 'Applied.',
+                    dryRun ? t.knowledge.migrate.dryRunNote : t.knowledge.migrate.applied,
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],
@@ -371,9 +369,8 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
                   const SizedBox(height: 12),
                   Text(
                     dryRun
-                        ? 'Imports the global/default skills your agents ship (user, system, plugin) '
-                              'as knowledge skills. Dry run — nothing imported yet.'
-                        : 'Imported into the knowledge base.',
+                        ? t.knowledge.importSkills.dryRunHint
+                        : t.knowledge.importSkills.importedNote,
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],
@@ -792,7 +789,7 @@ class _ContextBudgetCard extends StatelessWidget {
                 const Icon(Icons.memory, size: 16),
                 const SizedBox(width: 8),
                 Text(
-                  'Rules context (always served)',
+                  t.knowledge.contextBudget.title,
                   style: Theme.of(context).textTheme.titleSmall,
                 ),
                 const Spacer(),
@@ -804,7 +801,7 @@ class _ContextBudgetCard extends StatelessWidget {
             if (!hasProject) ...[
               const SizedBox(height: 6),
               Text(
-                'Select a project to see its critical-context size.',
+                t.knowledge.contextBudget.selectProject,
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
@@ -842,11 +839,7 @@ class _ImportAllCard extends StatelessWidget {
                 children: [
                   Text(i18n.knowledge.importAll.title, style: t.textTheme.titleSmall),
                   const SizedBox(height: 2),
-                  Text(
-                    "Scan every project and import your agents' skills into the knowledge base. "
-                    'Read-only on your agents — nothing in the CLIs is changed.',
-                    style: t.textTheme.bodySmall,
-                  ),
+                  Text(i18n.knowledge.importAll.description, style: t.textTheme.bodySmall),
                 ],
               ),
             ),
@@ -1113,7 +1106,7 @@ class _MemoriesTab extends StatelessWidget {
                             Text(
                               [
                                 memory.memoryType,
-                                memory.priority.wire,
+                                memory.priority.label,
                                 if (memory.tags.isNotEmpty) memory.tags.join(', '),
                               ].join(' · '),
                               style: Theme.of(context).textTheme.labelSmall,

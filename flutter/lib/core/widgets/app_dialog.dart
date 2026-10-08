@@ -40,7 +40,7 @@ class AppDialog extends StatelessWidget {
     BuildContext context, {
     required String title,
     required String message,
-    String confirmLabel = 'Confirm',
+    String? confirmLabel,
   }) async {
     final t = Translations.of(context);
     final result = await showDialog<bool>(
@@ -52,9 +52,12 @@ class AppDialog extends StatelessWidget {
           AppButton(
             variant: AppButtonVariant.ghost,
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(t.chat.orchestrator.summary.cancelTasks),
+            child: Text(t.common.buttons.cancel),
           ),
-          AppButton(onPressed: () => Navigator.of(ctx).pop(true), child: Text(confirmLabel)),
+          AppButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(confirmLabel ?? t.common.buttons.confirm),
+          ),
         ],
       ),
     );

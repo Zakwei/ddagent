@@ -202,7 +202,7 @@ class _GitBranchesViewState extends ConsumerState<GitBranchesView> {
               : ListView(
                   children: [
                     if (local.isNotEmpty) ...[
-                      _section('LOCAL', local.length),
+                      _section(i18n.git.branchSections.local, local.length),
                       for (final b in local)
                         _BranchRow(
                           name: b,
@@ -216,7 +216,7 @@ class _GitBranchesViewState extends ConsumerState<GitBranchesView> {
                         ),
                     ],
                     if (remoteBranches.isNotEmpty) ...[
-                      _section('REMOTE', remoteBranches.length),
+                      _section(i18n.git.branchSections.remote, remoteBranches.length),
                       for (final b in remoteBranches)
                         _BranchRow(
                           name: b,

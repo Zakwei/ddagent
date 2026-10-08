@@ -78,7 +78,7 @@ class SplitOverviewDialog extends StatelessWidget {
                   Text(i18n.chat.splitOverview.title, style: t.textTheme.titleSmall),
                   const SizedBox(width: AppSpacing.sm),
                   Text(
-                    '${panes.length} panes',
+                    i18n.chat.splitOverview.count(count: panes.length),
                     style: t.textTheme.labelSmall?.copyWith(color: c.mutedForeground),
                   ),
                   const Spacer(),
@@ -143,7 +143,7 @@ class SplitOverviewDialog extends StatelessWidget {
                               ),
                               const SizedBox(width: AppSpacing.xs),
                               Text(
-                                info.pane.kind.name.toUpperCase(),
+                                paneKindLabel(info.pane.kind).toUpperCase(),
                                 style: t.textTheme.labelSmall?.copyWith(
                                   color: c.mutedForeground,
                                   fontSize: 10,
@@ -153,7 +153,7 @@ class SplitOverviewDialog extends StatelessWidget {
                               const Spacer(),
                               if (isActive)
                                 Text(
-                                  'ACTIVE',
+                                  i18n.chat.splitOverview.active.toUpperCase(),
                                   style: t.textTheme.labelSmall?.copyWith(
                                     color: c.primary,
                                     fontSize: 10,
@@ -189,7 +189,7 @@ class SplitOverviewDialog extends StatelessWidget {
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
-                                    'QUESTION — input required',
+                                    i18n.chat.splitOverview.question,
                                     style: t.textTheme.labelSmall?.copyWith(
                                       color: const Color(0xFFF59E0B),
                                     ),
@@ -208,7 +208,7 @@ class SplitOverviewDialog extends StatelessWidget {
                                   ),
                                   const SizedBox(width: 6),
                                   Text(
-                                    'PROCESSING',
+                                    i18n.chat.splitOverview.processing,
                                     style: t.textTheme.labelSmall?.copyWith(
                                       color: const Color(0xFF22C55E),
                                     ),
@@ -347,8 +347,8 @@ class _BroadcastDialogState extends ConsumerState<BroadcastDialog> {
                       child: Center(
                         child: Text(
                           _orchestratorsOnly
-                              ? 'No orchestrator sessions available'
-                              : 'No sessions available',
+                              ? i18n.chat.broadcast.noOrchestrators
+                              : i18n.chat.broadcast.noSessions,
                           style: t.textTheme.bodySmall?.copyWith(color: c.mutedForeground),
                         ),
                       ),
@@ -409,8 +409,10 @@ class _BroadcastDialogState extends ConsumerState<BroadcastDialog> {
               const SizedBox(height: AppSpacing.xs),
               Text(
                 _results!.where((r) => r['ok'] == false).isEmpty
-                    ? 'Queued for ${_results!.length} session(s)'
-                    : '${_results!.where((r) => r['ok'] == false).length} session(s) rejected the message',
+                    ? i18n.chat.broadcast.sent(count: _results!.length)
+                    : i18n.chat.broadcast.partial(
+                        count: _results!.where((r) => r['ok'] == false).length,
+                      ),
                 style: t.textTheme.bodySmall?.copyWith(
                   color: _results!.where((r) => r['ok'] == false).isEmpty
                       ? const Color(0xFF22C55E)

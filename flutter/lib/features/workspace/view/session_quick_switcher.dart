@@ -85,7 +85,7 @@ class _SessionQuickSwitcherDialogState extends ConsumerState<SessionQuickSwitche
                   ? Padding(
                       padding: const EdgeInsets.all(24),
                       child: Text(
-                        'No sessions',
+                        i18n.sessions.noSessions,
                         style: TextStyle(fontSize: 13, color: c.mutedForeground),
                       ),
                     )

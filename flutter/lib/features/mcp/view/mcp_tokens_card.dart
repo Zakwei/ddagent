@@ -127,7 +127,7 @@ class _McpTokensCardState extends ConsumerState<McpTokensCard> {
                 value: _scope,
                 underline: const SizedBox.shrink(),
                 items: [
-                  DropdownMenuItem(value: 'read', child: Text(t.chat.tools.read)),
+                  DropdownMenuItem(value: 'read', child: Text(t.mcp.tokens.scopeRead)),
                   DropdownMenuItem(value: 'write', child: Text(t.mcp.tokens.scopeWrite)),
                 ],
                 onChanged: (v) => setState(() => _scope = v ?? 'read'),
@@ -167,7 +167,7 @@ class _McpTokensCardState extends ConsumerState<McpTokensCard> {
                     ),
                     AppBadge(
                       label: switch (token.scope) {
-                        'read' => t.chat.tools.read,
+                        'read' => t.mcp.tokens.scopeRead,
                         'write' => t.mcp.tokens.scopeWrite,
                         _ => token.scope,
                       },

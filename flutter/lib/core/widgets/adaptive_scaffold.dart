@@ -284,7 +284,9 @@ class _AppRail extends ConsumerWidget {
         children: [
           _RailButton(
             icon: LucideIcons.messageSquarePlus,
-            label: runningCount > 0 ? 'Panel · $runningCount active' : 'Panel',
+            label: runningCount > 0
+                ? t.common.appShell.panelActive(count: runningCount)
+                : t.sidebar.panel.open,
             selected: selectedPath == '/workspace',
             badgeCount: runningCount,
             onTap: () => context.go('/workspace'),
@@ -532,7 +534,7 @@ class _CompactNavDrawer extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      'Navigation',
+                      t.sidebar.panel.navigation,
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,

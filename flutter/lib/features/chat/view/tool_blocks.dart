@@ -103,7 +103,8 @@ Map<String, dynamic> toolInputMap(Object? raw) {
 String capToolPreviewLines(String text, {int maxLines = 200}) {
   final lines = text.split('\n');
   if (lines.length <= maxLines) return text;
-  return '${lines.take(maxLines).join('\n')}\n… ${lines.length - maxLines} more lines';
+  return '${lines.take(maxLines).join('\n')}\n'
+      '${t.chat.toolBlocks.moreLines(count: lines.length - maxLines)}';
 }
 
 /// Diff text for string-replacement edits — Claude `Edit`/`MultiEdit`,
@@ -196,23 +197,40 @@ class ToolStatusBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
+    final t = Translations.of(context);
     final (bg, fg, label) = switch (status) {
       ToolStatus.running =>
         dark
-            ? (const Color(0xFF1E3A8A).withValues(alpha: 0.3), const Color(0xFF93C5FD), 'Running')
-            : (const Color(0xFFDBEAFE), const Color(0xFF1D4ED8), 'Running'),
+            ? (
+                const Color(0xFF1E3A8A).withValues(alpha: 0.3),
+                const Color(0xFF93C5FD),
+                t.chat.toolBlocks.status.running,
+              )
+            : (const Color(0xFFDBEAFE), const Color(0xFF1D4ED8), t.chat.toolBlocks.status.running),
       ToolStatus.completed =>
         dark
-            ? (const Color(0xFF14532D).withValues(alpha: 0.3), const Color(0xFF86EFAC), 'Completed')
-            : (const Color(0xFFDCFCE7), const Color(0xFF15803D), 'Completed'),
+            ? (
+                const Color(0xFF14532D).withValues(alpha: 0.3),
+                const Color(0xFF86EFAC),
+                t.common.status.completed,
+              )
+            : (const Color(0xFFDCFCE7), const Color(0xFF15803D), t.common.status.completed),
       ToolStatus.error =>
         dark
-            ? (const Color(0xFF7F1D1D).withValues(alpha: 0.3), const Color(0xFFFCA5A5), 'Error')
-            : (const Color(0xFFFEE2E2), const Color(0xFFB91C1C), 'Error'),
+            ? (
+                const Color(0xFF7F1D1D).withValues(alpha: 0.3),
+                const Color(0xFFFCA5A5),
+                t.common.status.error,
+              )
+            : (const Color(0xFFFEE2E2), const Color(0xFFB91C1C), t.common.status.error),
       ToolStatus.denied =>
         dark
-            ? (const Color(0xFF7C2D12).withValues(alpha: 0.3), const Color(0xFFFDBA74), 'Denied')
-            : (const Color(0xFFFFEDD5), const Color(0xFFC2410C), 'Denied'),
+            ? (
+                const Color(0xFF7C2D12).withValues(alpha: 0.3),
+                const Color(0xFFFDBA74),
+                t.chat.toolBlocks.status.denied,
+              )
+            : (const Color(0xFFFFEDD5), const Color(0xFFC2410C), t.chat.toolBlocks.status.denied),
     };
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
@@ -289,10 +307,10 @@ class _ToolOutputPreviewState extends State<ToolOutputPreview> {
                   ),
                   Text(
                     _expanded
-                        ? 'Show less'
+                        ? Translations.of(context).chat.toolBlocks.showLess
                         : remaining > 0
-                        ? 'Show $remaining more lines'
-                        : 'Show more',
+                        ? Translations.of(context).chat.toolBlocks.showMoreLines(count: remaining)
+                        : Translations.of(context).chat.toolBlocks.showMore,
                     style: TextStyle(fontSize: 12, color: c.mutedForeground),
                   ),
                 ],
@@ -336,7 +354,7 @@ String ocToolLabel(String? toolName) => switch (_norm(toolName)) {
   'web_search' || 'websearch' => 'Web Search',
   'webfetch' || 'web_fetch' => 'Web Fetch',
   'task' || 'agent' || 'delegate' || 'subagent' || 'spawn_agent' => 'Task',
-  _ => (toolName ?? 'Tools').trim(),
+  _ => (toolName ?? t.chat.toolBlocks.tools).trim(),
 };
 
 /// `getToolInputPreview` (ToolGroupContainer.tsx) — one-line input preview for
@@ -514,7 +532,9 @@ class ToolUseTile extends StatelessWidget {
           label:
               input['plan']?.toString() ??
               input['title']?.toString() ??
-              (n == 'plan_review' ? 'Plan review' : 'Plan update'),
+              (n == 'plan_review'
+                  ? Translations.of(context).chat.toolBlocks.planReview
+                  : Translations.of(context).chat.toolBlocks.planUpdate),
           output: _resultText(),
         );
       case ToolDisplay.oneLine:
@@ -525,7 +545,7 @@ class ToolUseTile extends StatelessWidget {
         return _ToolRow(
           message: message,
           glyph: ocToolGlyph(name),
-          label: _oneLineSummary(n, input),
+          label: _oneLineSummary(context, n, input),
           extras: [if (files.isNotEmpty) _FileListLinks(files: files, onFileOpen: onFileOpen)],
           output: files.isNotEmpty ? '' : _resultText(),
         );
@@ -538,8 +558,8 @@ class ToolUseTile extends StatelessWidget {
     }
     if (_todoWriteTools.contains(n)) return _todoWrite(context, input);
     if (_todoReadTools.contains(n)) return _todoRead(context);
-    if (_taskWriteTools.contains(n)) return _taskWrite(n, input);
-    if (_taskListTools.contains(n)) return _taskList(n, input);
+    if (_taskWriteTools.contains(n)) return _taskWrite(context, n, input);
+    if (_taskListTools.contains(n)) return _taskList(context, n, input);
     if (_fileTools.contains(n)) return _fileTool(context, cs, n, input);
     // Canonical shell names only — descriptive titles ("Ran grep, curl") fall
     // through to the default one-line row, exactly like the web's Default
@@ -580,7 +600,8 @@ class ToolUseTile extends StatelessWidget {
       label: t.chat.tools.updatingTodo,
       extras: [
         if (list.isNotEmpty) TodoListView(todos: list),
-        if (toolStatusFor(message) == ToolStatus.completed) const _SuccessLine('Todo list updated'),
+        if (toolStatusFor(message) == ToolStatus.completed)
+          _SuccessLine(t.chat.toolBlocks.todoListUpdated),
       ],
     );
   }
@@ -609,16 +630,17 @@ class ToolUseTile extends StatelessWidget {
 
   /// TaskCreate/TaskUpdate — one-line label, result hidden on success
   /// (web `hideOnSuccess`).
-  Widget _taskWrite(String n, Map<String, dynamic> input) {
+  Widget _taskWrite(BuildContext context, String n, Map<String, dynamic> input) {
+    final tb = Translations.of(context).chat.toolBlocks;
     final label = switch (n) {
-      'taskcreate' || 'task_create' => 'Task ${input['subject'] ?? 'Creating task'}',
+      'taskcreate' || 'task_create' => 'Task ${input['subject'] ?? tb.creatingTask}',
       _ => () {
         final parts = [
           if (input['taskId'] != null) '#${input['taskId']}',
           if (input['status'] != null) '${input['status']}',
           if (input['subject'] != null) '"${input['subject']}"',
         ].join(' → ');
-        return 'Task ${parts.isEmpty ? 'updating' : parts}';
+        return 'Task ${parts.isEmpty ? tb.updatingTask : parts}';
       }(),
     };
     return _ToolRow(
@@ -631,11 +653,12 @@ class ToolUseTile extends StatelessWidget {
 
   /// TaskList/TaskGet — one-line input; the result parses into the
   /// `#id [status] subject` TaskListContent rows.
-  Widget _taskList(String n, Map<String, dynamic> input) {
+  Widget _taskList(BuildContext context, String n, Map<String, dynamic> input) {
+    final tb = Translations.of(context).chat.toolBlocks;
     final label = switch (n) {
       'taskget' ||
-      'task_get' => 'Task ${input['taskId'] != null ? '#${input['taskId']}' : 'fetching'}',
-      _ => 'Tasks listing tasks',
+      'task_get' => 'Task ${input['taskId'] != null ? '#${input['taskId']}' : tb.fetchingTask}',
+      _ => 'Tasks ${tb.listingTasks}',
     };
     final content = _resultText();
     return _ToolRow(
@@ -647,13 +670,15 @@ class ToolUseTile extends StatelessWidget {
     );
   }
 
-  String _oneLineSummary(String n, Map<String, dynamic> input) {
+  String _oneLineSummary(BuildContext context, String n, Map<String, dynamic> input) {
     final path = input['path'] ?? input['file_path'] ?? input['filePath'] ?? input['pattern'];
     final query = input['query'] ?? input['pattern'] ?? input['path'];
     return switch (n) {
       'read_file' => 'Read ${path ?? ''}',
       'list_files' => 'List ${path ?? '.'}',
-      'grep' || 'search_files' => 'Search ${input['pattern'] ?? input['query'] ?? ''}',
+      'grep' || 'search_files' =>
+        '${Translations.of(context).chat.toolBlocks.search} '
+            '${input['pattern'] ?? input['query'] ?? ''}',
       'glob' => 'Glob ${path ?? ''}',
       'web_search' || 'websearch' => 'Web: $query',
       _ => query?.toString() ?? path?.toString() ?? '',
@@ -669,7 +694,7 @@ class ToolUseTile extends StatelessWidget {
     return _ToolRow(
       message: message,
       glyph: ocToolGlyph(n),
-      label: '${_verb(n)} $path',
+      label: '${_verb(context, n)} $path',
       copyText: '$path',
       // Web: Edit/Write/ApplyPatch titles open the file in the editor.
       openPath: '$path',
@@ -685,14 +710,17 @@ class ToolUseTile extends StatelessWidget {
     );
   }
 
-  String _verb(String n) => switch (n) {
-    'read_file' => 'read',
-    'write_file' || 'create_file' || 'update_file' => 'write',
-    'edit_file' || 'multiedit' || 'multi_edit' => 'edit',
-    'delete_file' => 'delete',
-    'rename_file' || 'move_file' => 'move',
-    _ => n,
-  };
+  String _verb(BuildContext context, String n) {
+    final v = Translations.of(context).chat.toolBlocks.verbs;
+    return switch (n) {
+      'read_file' => v.read,
+      'write_file' || 'create_file' || 'update_file' => v.write,
+      'edit_file' || 'multiedit' || 'multi_edit' => v.edit,
+      'delete_file' => v.delete,
+      'rename_file' || 'move_file' => v.move,
+      _ => n,
+    };
+  }
 
   /// `BashCommandDisplay` — always a rounded card: chevron + emerald `$` +
   /// command + status/lines, expanding to the combined stdout/stderr.
@@ -724,7 +752,8 @@ class ToolUseTile extends StatelessWidget {
   String _commandLabel(String cmd) => cmd.replaceAll(RegExp(r'\s+'), ' ').trim();
 
   Widget _subagent(BuildContext context, ColorScheme cs, Map<String, dynamic> input) {
-    final label = input['description'] ?? input['prompt'] ?? input['task'] ?? 'Subagent';
+    final tb = Translations.of(context).chat.toolBlocks;
+    final label = input['description'] ?? input['prompt'] ?? input['task'] ?? tb.subagent;
     // The subagent's final answer arrives as this call's tool result.
     final result = message.toolResult?['content']?.toString() ?? '';
     return ExpansionTile(
@@ -740,7 +769,7 @@ class ToolUseTile extends StatelessWidget {
       subtitle: children.isEmpty
           ? null
           : Text(
-              '${children.length} tool${children.length == 1 ? '' : 's'}',
+              tb.toolCount(count: children.length),
               style: TextStyle(fontSize: 11, color: cs.outline),
             ),
       children: [
@@ -919,7 +948,7 @@ class ToolResultTile extends StatelessWidget {
         color: message.isError ? cs.error : cs.outline,
       ),
       title: Text(
-        message.toolName ?? 'result',
+        message.toolName ?? Translations.of(context).chat.toolBlocks.result,
         style: TextStyle(fontSize: 12, color: message.isError ? cs.error : cs.outline),
       ),
       children: [
@@ -960,10 +989,11 @@ class ToolGroupTile extends StatelessWidget {
     final status = groupStatus(group.messages);
     final previews = tools.take(2).map(toolGroupPreview).where((p) => p.isNotEmpty).toList();
     final extra = tools.length - previews.length;
+    final more = Translations.of(context).chat.toolBlocks.plusMore(count: extra);
     final preview = previews.isEmpty
-        ? (extra > 0 ? '+$extra more' : '')
+        ? (extra > 0 ? more : '')
         : extra > 0
-        ? '${previews.join(', ')}, +$extra more'
+        ? '${previews.join(', ')}, $more'
         : previews.join(', ');
     final badgeStyle = TextStyle(
       fontSize: 11,
@@ -1061,7 +1091,7 @@ class _PlanReviewPanelState extends State<PlanReviewPanel> {
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
-                      fileName ?? 'Plan',
+                      fileName ?? Translations.of(context).chat.toolBlocks.plan,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -1262,7 +1292,8 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
-                  q['header']?.toString() ?? 'Question ${_step + 1}/${qs.length}',
+                  q['header']?.toString() ??
+                      t.chat.toolBlocks.questionProgress(current: _step + 1, total: qs.length),
                   style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
                 ),
               ),
@@ -1348,7 +1379,9 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
                 onPressed: _step < qs.length - 1
                     ? () => setState(() => _step++)
                     : () => widget.onDecision(true, {...widget.input, 'answers': _answers()}),
-                child: Text(_step < qs.length - 1 ? 'Next' : 'Submit'),
+                child: Text(
+                  _step < qs.length - 1 ? t.common.navigation.next : t.common.buttons.submit,
+                ),
               ),
             ],
           ),
@@ -1454,6 +1487,7 @@ class _ToolRowState extends ConsumerState<_ToolRow> {
     final hasBody = widget.extras.isNotEmpty || hasOutput;
     final lineCount = hasOutput ? output.split('\n').length : 0;
     final bash = widget.glyph == r'$';
+    final tb = Translations.of(context).chat.toolBlocks;
 
     final header = Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
@@ -1528,7 +1562,7 @@ class _ToolRowState extends ConsumerState<_ToolRow> {
             ToolStatusBadge(status: status),
           if (hasOutput && !_open)
             Text(
-              '$lineCount ${lineCount == 1 ? 'line' : 'lines'}',
+              tb.lineCount(count: lineCount),
               style: TextStyle(
                 fontSize: 11,
                 color: c.mutedForeground,
@@ -1631,6 +1665,7 @@ class TodoListView extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final tb = Translations.of(context).chat.toolBlocks;
     final items = [
       for (final todo in todos)
         if (todo is Map && todo['content'] is String && todo['status'] is String) todo,
@@ -1643,7 +1678,7 @@ class TodoListView extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(bottom: 4),
             child: Text(
-              'Todo List (${items.length} ${items.length == 1 ? 'item' : 'items'})',
+              tb.todoListItems(count: items.length),
               style: t.labelSmall?.copyWith(color: c.mutedForeground),
             ),
           ),
@@ -1701,6 +1736,7 @@ class TaskListView extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final i18n = Translations.of(context);
     final tasks = <({String id, String status, String subject})>[];
     for (final line in content.split('\n')) {
       final m = _lineRe.firstMatch(line);
@@ -1725,7 +1761,7 @@ class TaskListView extends StatelessWidget {
         Row(
           children: [
             Text(
-              '$done/${tasks.length} completed',
+              i18n.chat.toolBlocks.tasksCompleted(done: done, total: tasks.length),
               style: t.labelSmall?.copyWith(color: c.mutedForeground),
             ),
             const SizedBox(width: 8),
@@ -1782,10 +1818,11 @@ class TaskListView extends StatelessWidget {
                     borderRadius: BorderRadius.circular(3),
                     color: _statusColors[task.status]!.withValues(alpha: 0.12),
                   ),
-                  child: Text(
-                    task.status.replaceAll('_', ' '),
-                    style: TextStyle(fontSize: 10, color: _statusColors[task.status]),
-                  ),
+                  child: Text(switch (task.status) {
+                    'completed' => i18n.common.status.completed,
+                    'in_progress' => i18n.common.status.inProgress,
+                    _ => i18n.common.status.pending,
+                  }, style: TextStyle(fontSize: 10, color: _statusColors[task.status])),
                 ),
               ],
             ),

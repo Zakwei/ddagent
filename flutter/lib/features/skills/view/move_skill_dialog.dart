@@ -174,7 +174,7 @@ class _MoveSkillDialogState extends State<MoveSkillDialog> {
         AppButton(
           variant: AppButtonVariant.ghost,
           onPressed: _submitting ? null : () => Navigator.of(context).pop(false),
-          child: Text(t.chat.orchestrator.summary.cancelTasks),
+          child: Text(t.common.buttons.cancel),
         ),
         AppButton(
           size: AppButtonSize.sm,

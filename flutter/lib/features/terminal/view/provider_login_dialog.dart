@@ -87,16 +87,17 @@ class _ProviderLoginDialogState extends ConsumerState<ProviderLoginDialog> {
   String _getTitle(String provider) {
     final override = widget.title;
     if (override != null && override.isNotEmpty) return override;
-    return switch (provider) {
-      'claude' => 'Claude CLI Login',
-      'cursor' => 'Cursor CLI Login',
-      'codex' => 'Codex CLI Login',
-      'opencode' => 'OpenCode CLI Login',
-      'commandcode' => 'Command Code CLI Login',
-      'antigravity' => 'Antigravity CLI Login',
-      'devin' => 'Devin CLI Login',
-      _ => '$provider CLI Login',
+    final name = switch (provider) {
+      'claude' => 'Claude',
+      'cursor' => 'Cursor',
+      'codex' => 'Codex',
+      'opencode' => 'OpenCode',
+      'commandcode' => 'Command Code',
+      'antigravity' => 'Antigravity',
+      'devin' => 'Devin',
+      _ => provider,
     };
+    return Translations.of(context).terminal.loginDialog.title(provider: name);
   }
 
   void _startSession() {
@@ -180,7 +181,9 @@ class _ProviderLoginDialogState extends ConsumerState<ProviderLoginDialog> {
                         borderRadius: BorderRadius.circular(AppRadii.sm),
                       ),
                       child: Text(
-                        currentTab.exitCode == 0 ? 'Completed' : 'Exited (${currentTab.exitCode})',
+                        currentTab.exitCode == 0
+                            ? t.common.status.completed
+                            : t.terminal.loginDialog.exited(code: currentTab.exitCode ?? ''),
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -213,7 +216,7 @@ class _ProviderLoginDialogState extends ConsumerState<ProviderLoginDialog> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Authentication link detected',
+                        t.terminal.loginDialog.authLinkDetected,
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,

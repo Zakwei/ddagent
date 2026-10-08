@@ -225,8 +225,8 @@ Widget _accountRow(BuildContext ctx, String provider, _AccountChoice choice) {
 }
 
 String _providerLabel(String provider) => switch (provider) {
-  'orchestrator' => 'Auto (orchestrator)',
-  'mini-orchestrator' => 'Auto (mini)',
+  'orchestrator' => t.sessions.autoOrchestrator,
+  'mini-orchestrator' => t.sessions.autoMini,
   _ => provider,
 };
 

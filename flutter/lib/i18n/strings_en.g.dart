@@ -68,6 +68,9 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$voice$en voice = Translations$voice$en.internal(_root);
 	late final Translations$workspace$en workspace = Translations$workspace$en.internal(_root);
 	late final Translations$worktrees$en worktrees = Translations$worktrees$en.internal(_root);
+	late final Translations$browserUse$en browserUse = Translations$browserUse$en.internal(_root);
+	late final Translations$orchestrator$en orchestrator = Translations$orchestrator$en.internal(_root);
+	late final Translations$miniOrchestrator$en miniOrchestrator = Translations$miniOrchestrator$en.internal(_root);
 }
 
 // Path: auth
@@ -139,6 +142,14 @@ class Translations$chat$en {
 	late final Translations$chat$changes$en changes = Translations$chat$changes$en.internal(_root);
 	late final Translations$chat$message$en message = Translations$chat$message$en.internal(_root);
 	late final Translations$chat$permissionRequest$en permissionRequest = Translations$chat$permissionRequest$en.internal(_root);
+	late final Translations$chat$commandDialog$en commandDialog = Translations$chat$commandDialog$en.internal(_root);
+	late final Translations$chat$utilities$en utilities = Translations$chat$utilities$en.internal(_root);
+	late final Translations$chat$toolBlocks$en toolBlocks = Translations$chat$toolBlocks$en.internal(_root);
+	late final Translations$chat$commandMenu$en commandMenu = Translations$chat$commandMenu$en.internal(_root);
+	late final Translations$chat$mentionMenu$en mentionMenu = Translations$chat$mentionMenu$en.internal(_root);
+	late final Translations$chat$subheader$en subheader = Translations$chat$subheader$en.internal(_root);
+	late final Translations$chat$transcript$en transcript = Translations$chat$transcript$en.internal(_root);
+	late final Translations$chat$review$en review = Translations$chat$review$en.internal(_root);
 }
 
 // Path: codeEditor
@@ -208,6 +219,8 @@ class Translations$common$en {
 	late final Translations$common$sharedNotes$en sharedNotes = Translations$common$sharedNotes$en.internal(_root);
 	late final Translations$common$codeBlock$en codeBlock = Translations$common$codeBlock$en.internal(_root);
 	late final Translations$common$update$en update = Translations$common$update$en.internal(_root);
+	late final Translations$common$appShell$en appShell = Translations$common$appShell$en.internal(_root);
+	late final Translations$common$errors$en errors = Translations$common$errors$en.internal(_root);
 }
 
 // Path: settings
@@ -310,6 +323,7 @@ class Translations$tasks$en {
 	late final Translations$tasks$nextTask$en nextTask = Translations$tasks$nextTask$en.internal(_root);
 	late final Translations$tasks$taskDetail$en taskDetail = Translations$tasks$taskDetail$en.internal(_root);
 	late final Translations$tasks$toasts$en toasts = Translations$tasks$toasts$en.internal(_root);
+	late final Translations$tasks$taskmaster$en taskmaster = Translations$tasks$taskmaster$en.internal(_root);
 }
 
 // Path: knowledge
@@ -343,6 +357,7 @@ class Translations$knowledge$en {
 	late final Translations$knowledge$contextBudget$en contextBudget = Translations$knowledge$contextBudget$en.internal(_root);
 	late final Translations$knowledge$linkOptions$en linkOptions = Translations$knowledge$linkOptions$en.internal(_root);
 	late final Translations$knowledge$errors$en errors = Translations$knowledge$errors$en.internal(_root);
+	late final Translations$knowledge$entityTypes$en entityTypes = Translations$knowledge$entityTypes$en.internal(_root);
 }
 
 // Path: browser
@@ -390,6 +405,7 @@ class Translations$collab$en {
 	String get copyToken => 'Copy token';
 
 	late final Translations$collab$roles$en roles = Translations$collab$roles$en.internal(_root);
+	late final Translations$collab$viewing$en viewing = Translations$collab$viewing$en.internal(_root);
 }
 
 // Path: fileTree
@@ -444,6 +460,26 @@ class Translations$fileTree$en {
 
 	/// en: 'Saved to {{path}}'
 	String savedTo({required Object path}) => 'Saved to ${path}';
+
+	late final Translations$fileTree$relative$en relative = Translations$fileTree$relative$en.internal(_root);
+
+	/// en: '(project root)'
+	String get projectRoot => '(project root)';
+
+	/// en: '(one) {You can upload up to {{count}} file at once.} (other) {You can upload up to {{count}} files at once.}'
+	String uploadLimitCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count,
+		one: 'You can upload up to ${count} file at once.',
+		other: 'You can upload up to ${count} files at once.',
+	);
+
+	/// en: '{{name}} is larger than 200MB.'
+	String fileTooLarge({required Object name}) => '${name} is larger than 200MB.';
+
+	/// en: 'Delete folder "{{path}}"? This cannot be undone.'
+	String deleteFolderConfirm({required Object path}) => 'Delete folder "${path}"? This cannot be undone.';
+
+	/// en: 'Delete file "{{path}}"? This cannot be undone.'
+	String deleteFileConfirm({required Object path}) => 'Delete file "${path}"? This cannot be undone.';
 }
 
 // Path: git
@@ -508,6 +544,8 @@ class Translations$git$en {
 
 	/// en: 'Select a project'
 	String get selectProject => 'Select a project';
+
+	late final Translations$git$branchSections$en branchSections = Translations$git$branchSections$en.internal(_root);
 }
 
 // Path: kanban
@@ -555,6 +593,7 @@ class Translations$notifications$en {
 	String get deviceLabel => 'DDAgent Flutter';
 
 	late final Translations$notifications$errors$en errors = Translations$notifications$errors$en.internal(_root);
+	late final Translations$notifications$androidChannel$en androidChannel = Translations$notifications$androidChannel$en.internal(_root);
 }
 
 // Path: onboarding
@@ -667,6 +706,9 @@ class Translations$projects$en {
 
 	/// en: 'Unknown'
 	String get unknown => 'Unknown';
+
+	/// en: 'Project'
+	String get project => 'Project';
 }
 
 // Path: quota
@@ -681,6 +723,7 @@ class Translations$quota$en {
 	late final Translations$quota$agents$en agents = Translations$quota$agents$en.internal(_root);
 	late final Translations$quota$config$en config = Translations$quota$config$en.internal(_root);
 	late final Translations$quota$chart$en chart = Translations$quota$chart$en.internal(_root);
+	late final Translations$quota$duration$en duration = Translations$quota$duration$en.internal(_root);
 }
 
 // Path: scheduler
@@ -723,6 +766,9 @@ class Translations$scheduler$en {
 
 	/// en: 'Prompt for the agent'
 	String get promptHint => 'Prompt for the agent';
+
+	late final Translations$scheduler$runStatus$en runStatus = Translations$scheduler$runStatus$en.internal(_root);
+	late final Translations$scheduler$cronErrors$en cronErrors = Translations$scheduler$cronErrors$en.internal(_root);
 }
 
 // Path: serverConnect
@@ -752,6 +798,12 @@ class Translations$serverConnect$en {
 	String get changeServer => 'Change server';
 
 	late final Translations$serverConnect$local$en local = Translations$serverConnect$local$en.internal(_root);
+
+	/// en: 'HTTP {{code}}'
+	String httpStatus({required Object code}) => 'HTTP ${code}';
+
+	/// en: 'Network error'
+	String get networkError => 'Network error';
 }
 
 // Path: sessions
@@ -798,6 +850,9 @@ class Translations$sessions$en {
 	late final Translations$sessions$toasts$en toasts = Translations$sessions$toasts$en.internal(_root);
 	late final Translations$sessions$age$en age = Translations$sessions$age$en.internal(_root);
 	late final Translations$sessions$activity$en activity = Translations$sessions$activity$en.internal(_root);
+
+	/// en: 'Auto (mini)'
+	String get autoMini => 'Auto (mini)';
 }
 
 // Path: sharedContext
@@ -835,6 +890,9 @@ class Translations$skills$en {
 	late final Translations$skills$empty$en empty = Translations$skills$empty$en.internal(_root);
 	late final Translations$skills$scopes$en scopes = Translations$skills$scopes$en.internal(_root);
 	late final Translations$skills$errors$en errors = Translations$skills$errors$en.internal(_root);
+
+	/// en: 'Shared'
+	String get providerShared => 'Shared';
 }
 
 // Path: terminal
@@ -851,6 +909,9 @@ class Translations$terminal$en {
 	late final Translations$terminal$shortcuts$en shortcuts = Translations$terminal$shortcuts$en.internal(_root);
 	late final Translations$terminal$paste$en paste = Translations$terminal$paste$en.internal(_root);
 	late final Translations$terminal$errors$en errors = Translations$terminal$errors$en.internal(_root);
+	late final Translations$terminal$loginDialog$en loginDialog = Translations$terminal$loginDialog$en.internal(_root);
+	late final Translations$terminal$empty$en empty = Translations$terminal$empty$en.internal(_root);
+	late final Translations$terminal$overlay$en overlay = Translations$terminal$overlay$en.internal(_root);
 }
 
 // Path: voice
@@ -932,6 +993,41 @@ class Translations$workspace$en {
 
 	/// en: 'Review changed files'
 	String get reviewChangedFiles => 'Review changed files';
+
+	late final Translations$workspace$paneTitle$en paneTitle = Translations$workspace$paneTitle$en.internal(_root);
+
+	/// en: 'Add editor pane'
+	String get addEditorPane => 'Add editor pane';
+
+	/// en: 'Add git pane'
+	String get addGitPane => 'Add git pane';
+
+	/// en: 'Unknown project path'
+	String get unknownProjectPath => 'Unknown project path';
+
+	/// en: 'Auto (mini)'
+	String get autoMini => 'Auto (mini)';
+
+	/// en: 'Export as:'
+	String get exportAs => 'Export as:';
+
+	/// en: 'Markdown (.md)'
+	String get exportMarkdown => 'Markdown (.md)';
+
+	/// en: 'Web Page (.html)'
+	String get exportHtml => 'Web Page (.html)';
+
+	/// en: 'PDF (Print to File)'
+	String get exportPdf => 'PDF (Print to File)';
+
+	/// en: '{{current}} of {{total}}'
+	String matchPosition({required Object current, required Object total}) => '${current} of ${total}';
+
+	/// en: 'Pick a workspace for this pane, or create a new one.'
+	String get launcherDescription => 'Pick a workspace for this pane, or create a new one.';
+
+	/// en: 'Create workspace'
+	String get createWorkspace => 'Create workspace';
 }
 
 // Path: worktrees
@@ -1031,6 +1127,47 @@ class Translations$worktrees$en {
 
 	/// en: 'Run port (optional, e.g. 3000)'
 	String get portHint => 'Run port (optional, e.g. 3000)';
+
+	/// en: 'unknown'
+	String get unknownSha => 'unknown';
+
+	/// en: 'base branch'
+	String get baseBranchFallback => 'base branch';
+
+	late final Translations$worktrees$runtimeStatus$en runtimeStatus = Translations$worktrees$runtimeStatus$en.internal(_root);
+}
+
+// Path: browserUse
+class Translations$browserUse$en {
+	Translations$browserUse$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	late final Translations$browserUse$sessionStatus$en sessionStatus = Translations$browserUse$sessionStatus$en.internal(_root);
+}
+
+// Path: orchestrator
+class Translations$orchestrator$en {
+	Translations$orchestrator$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Step {{n}}'
+	String stepFallback({required Object n}) => 'Step ${n}';
+}
+
+// Path: miniOrchestrator
+class Translations$miniOrchestrator$en {
+	Translations$miniOrchestrator$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	late final Translations$miniOrchestrator$taskTypes$en taskTypes = Translations$miniOrchestrator$taskTypes$en.internal(_root);
+	late final Translations$miniOrchestrator$roles$en roles = Translations$miniOrchestrator$roles$en.internal(_root);
 }
 
 // Path: auth.login
@@ -1362,6 +1499,9 @@ class Translations$chat$thinking$en {
 
 	/// en: '💭 Thinking...'
 	String get emoji => '💭 Thinking...';
+
+	/// en: 'Thought for a few seconds'
+	String get thoughtFewSeconds => 'Thought for a few seconds';
 }
 
 // Path: chat.json
@@ -1668,6 +1808,17 @@ class Translations$chat$composer$en {
 
 	/// en: 'Default'
 	String get accountIsDefault => 'Default';
+
+	late final Translations$chat$composer$effortLevels$en effortLevels = Translations$chat$composer$effortLevels$en.internal(_root);
+
+	/// en: '{{size}} context'
+	String contextWindow({required Object size}) => '${size} context';
+
+	/// en: 'Auto'
+	String get accountAutoShort => 'Auto';
+
+	/// en: 'Upload returned no records'
+	String get uploadNoRecords => 'Upload returned no records';
 }
 
 // Path: chat.providerSelection
@@ -1779,6 +1930,9 @@ class Translations$chat$session$en {
 
 	/// en: 'Finish the run before changing workspace'
 	String get finishRunBeforeWorkspaceChange => 'Finish the run before changing workspace';
+
+	/// en: 'Session'
+	String get fallbackTitle => 'Session';
 }
 
 // Path: chat.shell
@@ -2085,6 +2239,12 @@ class Translations$chat$attachments$en {
 
 	/// en: 'Download {{name}}'
 	String download({required Object name}) => 'Download ${name}';
+
+	/// en: 'Attached file'
+	String get attachedFile => 'Attached file';
+
+	/// en: '{{name}} downloaded'
+	String downloaded({required Object name}) => '${name} downloaded';
 }
 
 // Path: chat.checkpoint
@@ -2154,6 +2314,9 @@ class Translations$chat$taskMaster$en {
 
 	/// en: 'Added to TaskMaster'
 	String get added => 'Added to TaskMaster';
+
+	/// en: 'Task from chat'
+	String get defaultTaskTitle => 'Task from chat';
 }
 
 // Path: chat.tokenUsage
@@ -2169,6 +2332,15 @@ class Translations$chat$tokenUsage$en {
 
 	/// en: 'Token usage'
 	String get title => 'Token usage';
+
+	/// en: 'N/A'
+	String get notAvailable => 'N/A';
+
+	/// en: '(one) {{{count}} token} (other) {{{count}} tokens}'
+	String tokensBadge({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count,
+		one: '${count} token',
+		other: '${count} tokens',
+	);
 }
 
 // Path: chat.tool
@@ -2196,6 +2368,15 @@ class Translations$chat$quotaBadge$en {
 
 	/// en: 'No subscription data for this model'
 	String get noData => 'No subscription data for this model';
+
+	/// en: 'no subscription'
+	String get noSubscription => 'no subscription';
+
+	/// en: '{{label}}: {{percent}}% · reset {{time}}'
+	String windowLineReset({required Object label, required Object percent, required Object time}) => '${label}: ${percent}% · reset ${time}';
+
+	/// en: '{{percent}}% of the window left before reset'
+	String windowRemaining({required Object percent}) => '${percent}% of the window left before reset';
 }
 
 // Path: chat.broadcast
@@ -2305,6 +2486,12 @@ class Translations$chat$commands$en {
 
 	/// en: 'Command execution cancelled'
 	String get executionCancelled => 'Command execution cancelled';
+
+	/// en: 'This command contains bash commands that will be executed. Do you want to proceed?'
+	String get bashConfirmMessage => 'This command contains bash commands that will be executed. Do you want to proceed?';
+
+	/// en: 'Proceed'
+	String get proceed => 'Proceed';
 }
 
 // Path: chat.pinFile
@@ -2350,6 +2537,75 @@ class Translations$chat$modelLibrary$en {
 
 	/// en: 'Default model'
 	String get defaultModel => 'Default model';
+
+	/// en: 'Model library'
+	String get title => 'Model library';
+
+	/// en: 'Add model IDs supported by your provider. Built-in models stay locked. The circle marks the default model.'
+	String get subtitle => 'Add model IDs supported by your provider. Built-in models stay locked. The circle marks the default model.';
+
+	/// en: 'Your models'
+	String get yourModels => 'Your models';
+
+	/// en: 'Editable and stored in auth.db'
+	String get yourModelsHint => 'Editable and stored in auth.db';
+
+	/// en: 'No custom models yet'
+	String get emptyTitle => 'No custom models yet';
+
+	/// en: 'Add one with the form and it will appear in every model picker.'
+	String get emptyHint => 'Add one with the form and it will appear in every model picker.';
+
+	/// en: 'Built-in models'
+	String get builtInModels => 'Built-in models';
+
+	/// en: 'Maintained by DDAgent and read-only'
+	String get builtInModelsHint => 'Maintained by DDAgent and read-only';
+
+	/// en: 'Edit custom model'
+	String get editTitle => 'Edit custom model';
+
+	/// en: 'Add a custom model'
+	String get addTitle => 'Add a custom model';
+
+	/// en: 'The ID is sent to {{provider}} exactly as written.'
+	String idSentAsWritten({required Object provider}) => 'The ID is sent to ${provider} exactly as written.';
+
+	/// en: 'Model name'
+	String get nameLabel => 'Model name';
+
+	/// en: 'e.g. GPT-5.5 Pro'
+	String get nameHint => 'e.g. GPT-5.5 Pro';
+
+	/// en: 'Model ID'
+	String get idLabel => 'Model ID';
+
+	/// en: 'e.g. gpt-5.5-pro'
+	String get idHint => 'e.g. gpt-5.5-pro';
+
+	/// en: 'Use the exact identifier accepted by the provider CLI. IDs cannot contain spaces.'
+	String get idHelp => 'Use the exact identifier accepted by the provider CLI. IDs cannot contain spaces.';
+
+	/// en: '{{name}} was updated.'
+	String updatedNotice({required Object name}) => '${name} was updated.';
+
+	/// en: '{{name}} was added.'
+	String addedNotice({required Object name}) => '${name} was added.';
+
+	/// en: '{{name}} was deleted.'
+	String deletedNotice({required Object name}) => '${name} was deleted.';
+
+	/// en: 'Saving…'
+	String get saving => 'Saving…';
+
+	/// en: 'Save changes'
+	String get saveChanges => 'Save changes';
+
+	/// en: 'Delete this model from all pickers?'
+	String get deleteConfirm => 'Delete this model from all pickers?';
+
+	/// en: 'Custom'
+	String get customBadge => 'Custom';
 }
 
 // Path: chat.changes
@@ -2383,6 +2639,9 @@ class Translations$chat$message$en {
 
 	/// en: 'Raw view'
 	String get rawView => 'Raw view';
+
+	/// en: 'Run complete'
+	String get runComplete => 'Run complete';
 }
 
 // Path: chat.permissionRequest
@@ -2398,6 +2657,260 @@ class Translations$chat$permissionRequest$en {
 
 	/// en: 'Question'
 	String get question => 'Question';
+
+	/// en: 'Subagent'
+	String get subagent => 'Subagent';
+
+	/// en: 'Viewers cannot approve'
+	String get viewersCannotApprove => 'Viewers cannot approve';
+
+	late final Translations$chat$permissionRequest$recap$en recap = Translations$chat$permissionRequest$recap$en.internal(_root);
+
+	/// en: '{{tool}} needs approval'
+	String needsApproval({required Object tool}) => '${tool} needs approval';
+
+	/// en: 'Subagent: {{tool}} needs approval'
+	String subagentNeedsApproval({required Object tool}) => 'Subagent: ${tool} needs approval';
+
+	/// en: '(one) {{{count}} more question waiting} (other) {{{count}} more questions waiting}'
+	String moreQuestions({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count,
+		one: '${count} more question waiting',
+		other: '${count} more questions waiting',
+	);
+}
+
+// Path: chat.commandDialog
+class Translations$chat$commandDialog$en {
+	Translations$chat$commandDialog$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	late final Translations$chat$commandDialog$help$en help = Translations$chat$commandDialog$help$en.internal(_root);
+	late final Translations$chat$commandDialog$models$en models = Translations$chat$commandDialog$models$en.internal(_root);
+	late final Translations$chat$commandDialog$cost$en cost = Translations$chat$commandDialog$cost$en.internal(_root);
+	late final Translations$chat$commandDialog$status$en status = Translations$chat$commandDialog$status$en.internal(_root);
+
+	/// en: 'Command'
+	String get defaultEyebrow => 'Command';
+
+	/// en: 'Command Result'
+	String get defaultTitle => 'Command Result';
+
+	/// en: 'Esc closes the modal.'
+	String get escHint => 'Esc closes the modal.';
+
+	/// en: 'Unknown'
+	String get unknown => 'Unknown';
+
+	/// en: 'No description available.'
+	String get noDescription => 'No description available.';
+
+	/// en: 'No commands match that filter.'
+	String get noCommandsMatch => 'No commands match that filter.';
+
+	late final Translations$chat$commandDialog$syntax$en syntax = Translations$chat$commandDialog$syntax$en.internal(_root);
+
+	/// en: 'Command finished.'
+	String get commandFinished => 'Command finished.';
+}
+
+// Path: chat.utilities
+class Translations$chat$utilities$en {
+	Translations$chat$utilities$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Token usage not available'
+	String get tokenUsageUnavailable => 'Token usage not available';
+
+	late final Translations$chat$utilities$tooltip$en tooltip = Translations$chat$utilities$tooltip$en.internal(_root);
+
+	/// en: 'Used'
+	String get used => 'Used';
+
+	/// en: 'Cache write'
+	String get cacheWrite => 'Cache write';
+
+	/// en: 'Context'
+	String get contextLabel => 'Context';
+
+	/// en: 'usage unsupported'
+	String get usageUnsupported => 'usage unsupported';
+
+	/// en: 'Chat transcript'
+	String get chatTranscript => 'Chat transcript';
+
+	/// en: 'You:'
+	String get you => 'You:';
+
+	/// en: 'Auto (mini)'
+	String get providerAutoMini => 'Auto (mini)';
+}
+
+// Path: chat.toolBlocks
+class Translations$chat$toolBlocks$en {
+	Translations$chat$toolBlocks$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: '(one) {… {{count}} more line} (other) {… {{count}} more lines}'
+	String moreLines({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count,
+		one: '… ${count} more line',
+		other: '… ${count} more lines',
+	);
+
+	late final Translations$chat$toolBlocks$status$en status = Translations$chat$toolBlocks$status$en.internal(_root);
+
+	/// en: 'Show less'
+	String get showLess => 'Show less';
+
+	/// en: 'Show more'
+	String get showMore => 'Show more';
+
+	/// en: '(one) {Show {{count}} more line} (other) {Show {{count}} more lines}'
+	String showMoreLines({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count,
+		one: 'Show ${count} more line',
+		other: 'Show ${count} more lines',
+	);
+
+	/// en: 'Tools'
+	String get tools => 'Tools';
+
+	/// en: 'Plan review'
+	String get planReview => 'Plan review';
+
+	/// en: 'Plan update'
+	String get planUpdate => 'Plan update';
+
+	/// en: 'Todo list updated'
+	String get todoListUpdated => 'Todo list updated';
+
+	/// en: 'Creating task'
+	String get creatingTask => 'Creating task';
+
+	/// en: 'updating'
+	String get updatingTask => 'updating';
+
+	/// en: 'fetching'
+	String get fetchingTask => 'fetching';
+
+	/// en: 'listing tasks'
+	String get listingTasks => 'listing tasks';
+
+	/// en: 'Search'
+	String get search => 'Search';
+
+	late final Translations$chat$toolBlocks$verbs$en verbs = Translations$chat$toolBlocks$verbs$en.internal(_root);
+
+	/// en: 'Subagent'
+	String get subagent => 'Subagent';
+
+	/// en: '(one) {{{count}} tool} (other) {{{count}} tools}'
+	String toolCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count,
+		one: '${count} tool',
+		other: '${count} tools',
+	);
+
+	/// en: 'result'
+	String get result => 'result';
+
+	/// en: '+{{count}} more'
+	String plusMore({required Object count}) => '+${count} more';
+
+	/// en: 'Plan'
+	String get plan => 'Plan';
+
+	/// en: 'Question {{current}}/{{total}}'
+	String questionProgress({required Object current, required Object total}) => 'Question ${current}/${total}';
+
+	/// en: '(one) {{{count}} line} (other) {{{count}} lines}'
+	String lineCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count,
+		one: '${count} line',
+		other: '${count} lines',
+	);
+
+	/// en: '(one) {Todo List ({{count}} item)} (other) {Todo List ({{count}} items)}'
+	String todoListItems({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count,
+		one: 'Todo List (${count} item)',
+		other: 'Todo List (${count} items)',
+	);
+
+	/// en: '{{done}}/{{total}} completed'
+	String tasksCompleted({required Object done, required Object total}) => '${done}/${total} completed';
+}
+
+// Path: chat.commandMenu
+class Translations$chat$commandMenu$en {
+	Translations$chat$commandMenu$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'No commands available'
+	String get empty => 'No commands available';
+
+	late final Translations$chat$commandMenu$namespaces$en namespaces = Translations$chat$commandMenu$namespaces$en.internal(_root);
+}
+
+// Path: chat.mentionMenu
+class Translations$chat$mentionMenu$en {
+	Translations$chat$mentionMenu$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	late final Translations$chat$mentionMenu$kinds$en kinds = Translations$chat$mentionMenu$kinds$en.internal(_root);
+
+	/// en: 'Task {{id}}'
+	String taskTitle({required Object id}) => 'Task ${id}';
+}
+
+// Path: chat.subheader
+class Translations$chat$subheader$en {
+	Translations$chat$subheader$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Context: {{used}} / {{total}} tokens · {{percent}}% used'
+	String contextTooltip({required Object used, required Object total, required Object percent}) => 'Context: ${used} / ${total} tokens · ${percent}% used';
+}
+
+// Path: chat.transcript
+class Translations$chat$transcript$en {
+	Translations$chat$transcript$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Request failed'
+	String get requestFailed => 'Request failed';
+}
+
+// Path: chat.review
+class Translations$chat$review$en {
+	Translations$chat$review$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Changed files'
+	String get changedFiles => 'Changed files';
+
+	/// en: 'Changed files ({{count}})'
+	String changedFilesCount({required Object count}) => 'Changed files (${count})';
+
+	/// en: 'subagent'
+	String get subagent => 'subagent';
 }
 
 // Path: codeEditor.toolbar
@@ -2530,6 +3043,18 @@ class Translations$codeEditor$footer$en {
 
 	/// en: 'Press Ctrl+S to save • Esc to close'
 	String get shortcuts => 'Press Ctrl+S to save • Esc to close';
+
+	/// en: 'plain text'
+	String get plainText => 'plain text';
+
+	/// en: '(one) {{{count}} line} (other) {{{count}} lines}'
+	String lineCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count,
+		one: '${count} line',
+		other: '${count} lines',
+	);
+
+	/// en: 'modified'
+	String get modified => 'modified';
 }
 
 // Path: codeEditor.binaryFile
@@ -2644,6 +3169,27 @@ class Translations$codeEditor$diff$en {
 
 	/// en: 'deleted on disk'
 	String get deletedOnDisk => 'deleted on disk';
+
+	/// en: 'This untracked file will be deleted.'
+	String get untrackedWillBeDeleted => 'This untracked file will be deleted.';
+
+	/// en: 'Restore {{name}} to its committed state?'
+	String restoreConfirm({required Object name}) => 'Restore ${name} to its committed state?';
+
+	/// en: 'HEAD vs working copy'
+	String get headVsWorkingCopy => 'HEAD vs working copy';
+
+	/// en: 'Last saved vs buffer (no git)'
+	String get savedVsBuffer => 'Last saved vs buffer (no git)';
+
+	/// en: '(one) {{{count}} unchanged line} (other) {{{count}} unchanged lines}'
+	String unchangedLines({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count,
+		one: '${count} unchanged line',
+		other: '${count} unchanged lines',
+	);
+
+	/// en: 'Revert to saved'
+	String get revertToSaved => 'Revert to saved';
 }
 
 // Path: codeEditor.emptyState
@@ -2656,6 +3202,9 @@ class Translations$codeEditor$emptyState$en {
 
 	/// en: 'No file open'
 	String get title => 'No file open';
+
+	/// en: 'Open files from the Files tab'
+	String get hint => 'Open files from the Files tab';
 }
 
 // Path: codeEditor.toasts
@@ -2960,6 +3509,9 @@ class Translations$common$navigation$en {
 
 	/// en: 'Logout'
 	String get logout => 'Logout';
+
+	/// en: 'Back to chat'
+	String get backToChat => 'Back to chat';
 }
 
 // Path: common.common
@@ -4042,6 +4594,30 @@ class Translations$common$update$en {
 	String webHostFailed({required Object message}) => 'The server was updated, but its web interface was not: ${message}';
 }
 
+// Path: common.appShell
+class Translations$common$appShell$en {
+	Translations$common$appShell$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Panel · {{count}} active'
+	String panelActive({required Object count}) => 'Panel · ${count} active';
+}
+
+// Path: common.errors
+class Translations$common$errors$en {
+	Translations$common$errors$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Access denied'
+	String get forbidden => 'Access denied';
+}
+
 // Path: settings.changelog
 class Translations$settings$changelog$en {
 	Translations$settings$changelog$en.internal(this._root);
@@ -4363,6 +4939,9 @@ class Translations$settings$quickSettings$en {
 
 	/// en: 'Send with Ctrl+Enter'
 	String get sendWithCtrlEnter => 'Send with Ctrl+Enter';
+
+	/// en: 'When off, Enter sends and Shift+Enter inserts a newline.'
+	String get enterSendsHint => 'When off, Enter sends and Shift+Enter inserts a newline.';
 }
 
 // Path: settings.terminalShortcuts
@@ -5065,6 +5644,18 @@ class Translations$settings$about$en {
 
 	/// en: 'unknown'
 	String get unknown => 'unknown';
+
+	/// en: '© 2026 DDAgent — all rights reserved'
+	String get copyright => '© 2026 DDAgent — all rights reserved';
+
+	/// en: 'Open-source AI coding assistant interface'
+	String get tagline => 'Open-source AI coding assistant interface';
+
+	/// en: 'Docs'
+	String get docs => 'Docs';
+
+	/// en: 'Team collaboration, shared MCP configs, settings sync across environments, and managed infrastructure.'
+	String get hostedDescription => 'Team collaboration, shared MCP configs, settings sync across environments, and managed infrastructure.';
 }
 
 // Path: settings.shortcuts
@@ -6643,6 +7234,32 @@ class Translations$tasks$toasts$en {
 	String statusInProgress({required Object id}) => 'Task ${id} set to in-progress';
 }
 
+// Path: tasks.taskmaster
+class Translations$tasks$taskmaster$en {
+	Translations$tasks$taskmaster$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Add a project first, then create tasks for it.'
+	String get noProjectHint => 'Add a project first, then create tasks for it.';
+
+	late final Translations$tasks$taskmaster$sort$en sort = Translations$tasks$taskmaster$sort$en.internal(_root);
+
+	/// en: 'Installed: {{version}}'
+	String installedVersion({required Object version}) => 'Installed: ${version}';
+
+	/// en: 'Failed to initialize TaskMaster'
+	String get initFailed => 'Failed to initialize TaskMaster';
+
+	late final Translations$tasks$taskmaster$prd$en prd = Translations$tasks$taskmaster$prd$en.internal(_root);
+	late final Translations$tasks$taskmaster$detail$en detail = Translations$tasks$taskmaster$detail$en.internal(_root);
+
+	/// en: 'Untitled Task'
+	String get untitledTask => 'Untitled Task';
+}
+
 // Path: knowledge.tabs
 class Translations$knowledge$tabs$en {
 	Translations$knowledge$tabs$en.internal(this._root);
@@ -7013,6 +7630,21 @@ class Translations$knowledge$importAll$en {
 
 	/// en: 'Import everything'
 	String get action => 'Import everything';
+
+	/// en: 'Read-only on your agents: this imports into DDAgent's own database and does NOT modify or delete any CLI file or config. The options below only change DDAgent data.'
+	String get readOnlyNotice => 'Read-only on your agents: this imports into DDAgent\'s own database and does NOT modify or delete any CLI file or config. The options below only change DDAgent data.';
+
+	/// en: 'Dry run — nothing written yet.'
+	String get dryRunNote => 'Dry run — nothing written yet.';
+
+	/// en: 'Imported.'
+	String get importedNote => 'Imported.';
+
+	/// en: 'Imported — rules: {{rules}}, new skills: {{newSkills}}, removed: {{removed}}, promoted: {{promoted}}'
+	String result({required Object rules, required Object newSkills, required Object removed, required Object promoted}) => 'Imported — rules: ${rules}, new skills: ${newSkills}, removed: ${removed}, promoted: ${promoted}';
+
+	/// en: 'Scan every project and import your agents' skills into the knowledge base. Read-only on your agents — nothing in the CLIs is changed.'
+	String get description => 'Scan every project and import your agents\' skills into the knowledge base. Read-only on your agents — nothing in the CLIs is changed.';
 }
 
 // Path: knowledge.migrate
@@ -7040,6 +7672,12 @@ class Translations$knowledge$migrate$en {
 
 	/// en: 'Merge duplicates'
 	String get mergeDuplicates => 'Merge duplicates';
+
+	/// en: 'Dry run — nothing has been changed yet.'
+	String get dryRunNote => 'Dry run — nothing has been changed yet.';
+
+	/// en: 'Applied.'
+	String get applied => 'Applied.';
 }
 
 // Path: knowledge.importSkills
@@ -7058,6 +7696,12 @@ class Translations$knowledge$importSkills$en {
 
 	/// en: 'New: {{imported}} · skipped: {{skipped}}'
 	String summary({required Object imported, required Object skipped}) => 'New: ${imported} · skipped: ${skipped}';
+
+	/// en: 'Imports the global/default skills your agents ship (user, system, plugin) as knowledge skills. Dry run — nothing imported yet.'
+	String get dryRunHint => 'Imports the global/default skills your agents ship (user, system, plugin) as knowledge skills. Dry run — nothing imported yet.';
+
+	/// en: 'Imported into the knowledge base.'
+	String get importedNote => 'Imported into the knowledge base.';
 }
 
 // Path: knowledge.critical
@@ -7088,6 +7732,12 @@ class Translations$knowledge$contextBudget$en {
 
 	/// en: '~{{tokens}} / {{budget}} tok'
 	String tokens({required Object tokens, required Object budget}) => '~${tokens} / ${budget} tok';
+
+	/// en: 'Rules context (always served)'
+	String get title => 'Rules context (always served)';
+
+	/// en: 'Select a project to see its critical-context size.'
+	String get selectProject => 'Select a project to see its critical-context size.';
 }
 
 // Path: knowledge.linkOptions
@@ -7126,6 +7776,33 @@ class Translations$knowledge$errors$en {
 	String migrationFailed({required Object error}) => 'Migration failed: ${error}';
 }
 
+// Path: knowledge.entityTypes
+class Translations$knowledge$entityTypes$en {
+	Translations$knowledge$entityTypes$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Memory'
+	String get memory => 'Memory';
+
+	/// en: 'Rule'
+	String get rule => 'Rule';
+
+	/// en: 'Skill'
+	String get skill => 'Skill';
+
+	/// en: 'Personal'
+	String get personal => 'Personal';
+
+	/// en: 'Project'
+	String get project => 'Project';
+
+	/// en: 'Tag'
+	String get tag => 'Tag';
+}
+
 // Path: collab.roles
 class Translations$collab$roles$en {
 	Translations$collab$roles$en.internal(this._root);
@@ -7139,6 +7816,24 @@ class Translations$collab$roles$en {
 
 	/// en: 'Viewer'
 	String get viewer => 'Viewer';
+}
+
+// Path: collab.viewing
+class Translations$collab$viewing$en {
+	Translations$collab$viewing$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'session'
+	String get session => 'session';
+
+	/// en: 'card'
+	String get card => 'card';
+
+	/// en: 'board'
+	String get board => 'board';
 }
 
 // Path: fileTree.search
@@ -7180,6 +7875,27 @@ class Translations$fileTree$titles$en {
 	String download({required Object name}) => 'Download ${name}';
 }
 
+// Path: fileTree.relative
+class Translations$fileTree$relative$en {
+	Translations$fileTree$relative$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'now'
+	String get now => 'now';
+
+	/// en: '{{n}}m'
+	String minutes({required Object n}) => '${n}m';
+
+	/// en: '{{n}}h'
+	String hours({required Object n}) => '${n}h';
+
+	/// en: '{{n}}d'
+	String days({required Object n}) => '${n}d';
+}
+
 // Path: git.checkpoints
 class Translations$git$checkpoints$en {
 	Translations$git$checkpoints$en.internal(this._root);
@@ -7208,6 +7924,21 @@ class Translations$git$checkpoints$en {
 
 	/// en: 'New'
 	String get create => 'New';
+}
+
+// Path: git.branchSections
+class Translations$git$branchSections$en {
+	Translations$git$branchSections$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'LOCAL'
+	String get local => 'LOCAL';
+
+	/// en: 'REMOTE'
+	String get remote => 'REMOTE';
 }
 
 // Path: kanban.card
@@ -7381,6 +8112,18 @@ class Translations$mcp$servers$en {
 	String addProviderDescription({required Object provider}) => 'Add ${provider} MCP Server only changes ${provider}.';
 
 	late final Translations$mcp$servers$config$en config = Translations$mcp$servers$config$en.internal(_root);
+
+	/// en: 'Select a project for project-scoped MCP servers'
+	String get selectProjectRequired => 'Select a project for project-scoped MCP servers';
+
+	/// en: 'Add MCP Server supports only user or project scope across all providers.'
+	String get globalScopeUnsupported => 'Add MCP Server supports only user or project scope across all providers.';
+
+	/// en: 'Failed to add MCP server to all providers. {{details}}'
+	String globalAddFailed({required Object details}) => 'Failed to add MCP server to all providers. ${details}';
+
+	/// en: 'project'
+	String get scopeProject => 'project';
 }
 
 // Path: mcp.team
@@ -7411,6 +8154,9 @@ class Translations$mcp$tokens$en {
 
 	/// en: 'Write'
 	String get scopeWrite => 'Write';
+
+	/// en: 'Read'
+	String get scopeRead => 'Read';
 }
 
 // Path: mcp.form
@@ -7442,6 +8188,21 @@ class Translations$notifications$errors$en {
 
 	/// en: 'No response from the server'
 	String get noResponse => 'No response from the server';
+}
+
+// Path: notifications.androidChannel
+class Translations$notifications$androidChannel$en {
+	Translations$notifications$androidChannel$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'DDAgent alerts'
+	String get name => 'DDAgent alerts';
+
+	/// en: 'Agent run, approval and error notifications'
+	String get description => 'Agent run, approval and error notifications';
 }
 
 // Path: onboarding.errors
@@ -7585,6 +8346,72 @@ class Translations$quota$chart$en {
 	String pointReadout({required Object date, required Object tokens, required Object cost}) => '${date} · ${tokens} tokens · ${cost}';
 }
 
+// Path: quota.duration
+class Translations$quota$duration$en {
+	Translations$quota$duration$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: '{{minutes}} min'
+	String minutes({required Object minutes}) => '${minutes} min';
+
+	/// en: '{{hours}} h {{minutes}} min'
+	String hoursMinutes({required Object hours, required Object minutes}) => '${hours} h ${minutes} min';
+
+	/// en: '{{days}} d {{hours}} h'
+	String daysHours({required Object days, required Object hours}) => '${days} d ${hours} h';
+
+	/// en: 'now'
+	String get now => 'now';
+}
+
+// Path: scheduler.runStatus
+class Translations$scheduler$runStatus$en {
+	Translations$scheduler$runStatus$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'fired'
+	String get fired => 'fired';
+
+	/// en: 'skipped'
+	String get skipped => 'skipped';
+
+	/// en: 'failed'
+	String get failed => 'failed';
+
+	/// en: 'completed'
+	String get completed => 'completed';
+}
+
+// Path: scheduler.cronErrors
+class Translations$scheduler$cronErrors$en {
+	Translations$scheduler$cronErrors$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Expected 5 fields, got {{got}}'
+	String fieldCount({required Object got}) => 'Expected 5 fields, got ${got}';
+
+	/// en: 'Field {{index}}: {{error}}'
+	String fieldError({required Object index, required Object error}) => 'Field ${index}: ${error}';
+
+	/// en: 'empty'
+	String get empty => 'empty';
+
+	/// en: 'invalid "{{part}}"'
+	String invalidPart({required Object part}) => 'invalid "${part}"';
+
+	/// en: 'invalid value "{{value}}"'
+	String invalidValue({required Object value}) => 'invalid value "${value}"';
+}
+
 // Path: serverConnect.local
 class Translations$serverConnect$local$en {
 	Translations$serverConnect$local$en.internal(this._root);
@@ -7631,6 +8458,8 @@ class Translations$serverConnect$local$en {
 
 	/// en: 'or connect to a remote server'
 	String get or => 'or connect to a remote server';
+
+	late final Translations$serverConnect$local$errors$en errors = Translations$serverConnect$local$errors$en.internal(_root);
 }
 
 // Path: sessions.toasts
@@ -7994,6 +8823,9 @@ class Translations$terminal$tabs$en {
 
 	/// en: 'Login: {{provider}}'
 	String loginTitle({required Object provider}) => 'Login: ${provider}';
+
+	/// en: 'Run: {{command}}'
+	String runTitle({required Object command}) => 'Run: ${command}';
 }
 
 // Path: terminal.actions
@@ -8033,6 +8865,9 @@ class Translations$terminal$authUrl$en {
 
 	/// en: 'Open in browser'
 	String get openInBrowser => 'Open in browser';
+
+	/// en: 'Auth link: {{url}}'
+	String linkLabel({required Object url}) => 'Auth link: ${url}';
 }
 
 // Path: terminal.fileLink
@@ -8099,6 +8934,162 @@ class Translations$terminal$errors$en {
 
 	/// en: 'Could not open link: {{url}}'
 	String couldNotOpenLink({required Object url}) => 'Could not open link: ${url}';
+
+	/// en: '[Error] {{message}}'
+	String frameError({required Object message}) => '[Error] ${message}';
+
+	/// en: '[Connection Error] {{message}}'
+	String connectionError({required Object message}) => '[Connection Error] ${message}';
+}
+
+// Path: terminal.loginDialog
+class Translations$terminal$loginDialog$en {
+	Translations$terminal$loginDialog$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: '{{provider}} CLI Login'
+	String title({required Object provider}) => '${provider} CLI Login';
+
+	/// en: 'Exited ({{code}})'
+	String exited({required Object code}) => 'Exited (${code})';
+
+	/// en: 'Authentication link detected'
+	String get authLinkDetected => 'Authentication link detected';
+}
+
+// Path: terminal.empty
+class Translations$terminal$empty$en {
+	Translations$terminal$empty$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'No Active Terminal'
+	String get title => 'No Active Terminal';
+
+	/// en: 'Create a new tab to begin'
+	String get description => 'Create a new tab to begin';
+}
+
+// Path: terminal.overlay
+class Translations$terminal$overlay$en {
+	Translations$terminal$overlay$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Process exited — connect to start it again'
+	String get processExited => 'Process exited — connect to start it again';
+
+	/// en: 'Process exited (code {{code}}) — connect to start it again'
+	String processExitedWithCode({required Object code}) => 'Process exited (code ${code}) — connect to start it again';
+
+	/// en: 'Resume session {{title}}'
+	String resumeSession({required Object title}) => 'Resume session ${title}';
+
+	/// en: 'Start a new session in {{path}}'
+	String startSession({required Object path}) => 'Start a new session in ${path}';
+}
+
+// Path: workspace.paneTitle
+class Translations$workspace$paneTitle$en {
+	Translations$workspace$paneTitle$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Chat'
+	String get chat => 'Chat';
+
+	/// en: 'Browser'
+	String get browser => 'Browser';
+
+	/// en: 'Terminal'
+	String get terminal => 'Terminal';
+
+	/// en: 'Shared notes'
+	String get notes => 'Shared notes';
+
+	/// en: 'Editor'
+	String get editor => 'Editor';
+
+	/// en: 'Git'
+	String get git => 'Git';
+}
+
+// Path: worktrees.runtimeStatus
+class Translations$worktrees$runtimeStatus$en {
+	Translations$worktrees$runtimeStatus$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'idle'
+	String get idle => 'idle';
+
+	/// en: 'running'
+	String get running => 'running';
+
+	/// en: 'done'
+	String get done => 'done';
+
+	/// en: 'failed'
+	String get failed => 'failed';
+
+	/// en: 'exited'
+	String get exited => 'exited';
+}
+
+// Path: browserUse.sessionStatus
+class Translations$browserUse$sessionStatus$en {
+	Translations$browserUse$sessionStatus$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Ready'
+	String get ready => 'Ready';
+
+	/// en: 'Stopped'
+	String get stopped => 'Stopped';
+
+	/// en: 'Unavailable'
+	String get unavailable => 'Unavailable';
+}
+
+// Path: miniOrchestrator.taskTypes
+class Translations$miniOrchestrator$taskTypes$en {
+	Translations$miniOrchestrator$taskTypes$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Gate'
+	String get gate => 'Gate';
+}
+
+// Path: miniOrchestrator.roles
+class Translations$miniOrchestrator$roles$en {
+	Translations$miniOrchestrator$roles$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Thinker'
+	String get thinker => 'Thinker';
+
+	/// en: 'Worker'
+	String get worker => 'Worker';
 }
 
 // Path: auth.login.errors
@@ -8481,6 +9472,12 @@ class Translations$chat$input$queue$en {
 
 	/// en: 'This agent can't take messages mid-turn — it will be sent after the current turn'
 	String get sendNowAfterTurn => 'This agent can\'t take messages mid-turn — it will be sent after the current turn';
+
+	/// en: '(one) {{{count}} file attached} (other) {{{count}} files attached}'
+	String filesAttached({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count,
+		one: '${count} file attached',
+		other: '${count} files attached',
+	);
 }
 
 // Path: chat.input.offlineQueue
@@ -8502,6 +9499,42 @@ class Translations$chat$input$offlineQueue$en {
 
 	/// en: '1 message queued offline — will send automatically when reconnected'
 	String get single => '1 message queued offline — will send automatically when reconnected';
+}
+
+// Path: chat.composer.effortLevels
+class Translations$chat$composer$effortLevels$en {
+	Translations$chat$composer$effortLevels$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Off'
+	String get off => 'Off';
+
+	/// en: 'None'
+	String get none => 'None';
+
+	/// en: 'Minimal'
+	String get minimal => 'Minimal';
+
+	/// en: 'Low'
+	String get low => 'Low';
+
+	/// en: 'Medium'
+	String get medium => 'Medium';
+
+	/// en: 'High'
+	String get high => 'High';
+
+	/// en: 'Extra high'
+	String get xhigh => 'Extra high';
+
+	/// en: 'Max'
+	String get max => 'Max';
+
+	/// en: 'Ultra'
+	String get ultra => 'Ultra';
 }
 
 // Path: chat.providerSelection.providerInfo
@@ -8835,6 +9868,312 @@ class Translations$chat$commandResult$fallback$en {
 
 	/// en: 'Show command documentation and syntax.'
 	String get help => 'Show command documentation and syntax.';
+}
+
+// Path: chat.permissionRequest.recap
+class Translations$chat$permissionRequest$recap$en {
+	Translations$chat$permissionRequest$recap$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Timed out — denied automatically'
+	String get timedOut => 'Timed out — denied automatically';
+
+	/// en: 'Cancelled — the turn was stopped'
+	String get cancelled => 'Cancelled — the turn was stopped';
+
+	/// en: 'Approved automatically'
+	String get autoApproved => 'Approved automatically';
+
+	/// en: 'Request expired — the agent is no longer waiting for it'
+	String get expired => 'Request expired — the agent is no longer waiting for it';
+
+	/// en: 'Answered'
+	String get answered => 'Answered';
+
+	/// en: 'Skipped'
+	String get skipped => 'Skipped';
+
+	/// en: 'Decided'
+	String get decided => 'Decided';
+}
+
+// Path: chat.commandDialog.help
+class Translations$chat$commandDialog$help$en {
+	Translations$chat$commandDialog$help$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Command center'
+	String get eyebrow => 'Command center';
+
+	/// en: 'Help & Shortcuts'
+	String get title => 'Help & Shortcuts';
+
+	/// en: 'Search built-ins, syntax patterns, and command usage.'
+	String get subtitle => 'Search built-ins, syntax patterns, and command usage.';
+}
+
+// Path: chat.commandDialog.models
+class Translations$chat$commandDialog$models$en {
+	Translations$chat$commandDialog$models$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Model selection'
+	String get eyebrow => 'Model selection';
+
+	/// en: 'Choose a Model'
+	String get title => 'Choose a Model';
+
+	/// en: 'Pick the model this provider should use.'
+	String get subtitle => 'Pick the model this provider should use.';
+
+	/// en: 'Model set to {{model}}.'
+	String modelSetTo({required Object model}) => 'Model set to ${model}.';
+
+	/// en: 'Active model'
+	String get activeModel => 'Active model';
+
+	/// en: 'No models match that filter.'
+	String get noModelsMatch => 'No models match that filter.';
+
+	/// en: 'Your choice is saved for this session and becomes the default for new chats.'
+	String get choiceSavedForSession => 'Your choice is saved for this session and becomes the default for new chats.';
+
+	/// en: 'Your choice becomes the default model for new chats.'
+	String get choiceDefault => 'Your choice becomes the default model for new chats.';
+
+	/// en: 'Custom'
+	String get custom => 'Custom';
+
+	/// en: 'Current selection'
+	String get currentSelection => 'Current selection';
+}
+
+// Path: chat.commandDialog.cost
+class Translations$chat$commandDialog$cost$en {
+	Translations$chat$commandDialog$cost$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Session telemetry'
+	String get eyebrow => 'Session telemetry';
+
+	/// en: 'Token Usage'
+	String get title => 'Token Usage';
+
+	/// en: 'Input, output, and total token counts for this session.'
+	String get subtitle => 'Input, output, and total token counts for this session.';
+
+	/// en: 'Total tokens used'
+	String get totalTokensUsed => 'Total tokens used';
+
+	/// en: 'Input tokens'
+	String get inputTokens => 'Input tokens';
+
+	/// en: 'Cache read tokens'
+	String get cacheReadTokens => 'Cache read tokens';
+
+	/// en: 'Cache write tokens'
+	String get cacheWriteTokens => 'Cache write tokens';
+
+	/// en: 'Output tokens'
+	String get outputTokens => 'Output tokens';
+
+	/// en: 'Breakdown'
+	String get breakdown => 'Breakdown';
+
+	/// en: 'Unavailable'
+	String get unavailable => 'Unavailable';
+
+	/// en: 'Context window'
+	String get contextWindow => 'Context window';
+
+	/// en: 'Estimated cost'
+	String get estimatedCost => 'Estimated cost';
+}
+
+// Path: chat.commandDialog.status
+class Translations$chat$commandDialog$status$en {
+	Translations$chat$commandDialog$status$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Runtime health'
+	String get eyebrow => 'Runtime health';
+
+	/// en: 'System Status'
+	String get title => 'System Status';
+
+	/// en: 'Version, provider, runtime, and environment details.'
+	String get subtitle => 'Version, provider, runtime, and environment details.';
+
+	/// en: 'Package'
+	String get package => 'Package';
+
+	/// en: 'Uptime'
+	String get uptime => 'Uptime';
+
+	/// en: 'Platform'
+	String get platform => 'Platform';
+
+	/// en: 'Memory'
+	String get memory => 'Memory';
+
+	/// en: '{{mb}} MB RSS'
+	String memoryRss({required Object mb}) => '${mb} MB RSS';
+
+	/// en: 'Runtime online'
+	String get runtimeOnline => 'Runtime online';
+
+	/// en: 'Process #{{pid}} is responding.'
+	String processResponding({required Object pid}) => 'Process #${pid} is responding.';
+
+	/// en: 'Process status is responding.'
+	String get processStatusResponding => 'Process status is responding.';
+
+	/// en: 'Healthy'
+	String get healthy => 'Healthy';
+}
+
+// Path: chat.commandDialog.syntax
+class Translations$chat$commandDialog$syntax$en {
+	Translations$chat$commandDialog$syntax$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Syntax'
+	String get title => 'Syntax';
+
+	/// en: '{{arguments}} passes all args; {{first}}, {{second}} positional.'
+	String arguments({required Object arguments, required Object first, required Object second}) => '${arguments} passes all args; ${first}, ${second} positional.';
+
+	/// en: '{{token}} includes file contents.'
+	String file({required Object token}) => '${token} includes file contents.';
+
+	/// en: '{{token}} runs bash.'
+	String bash({required Object token}) => '${token} runs bash.';
+}
+
+// Path: chat.utilities.tooltip
+class Translations$chat$utilities$tooltip$en {
+	Translations$chat$utilities$tooltip$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: '{{tokens}} tokens used'
+	String tokensUsed({required Object tokens}) => '${tokens} tokens used';
+
+	/// en: 'context {{percent}}% of {{total}}'
+	String contextOf({required Object percent, required Object total}) => 'context ${percent}% of ${total}';
+
+	/// en: 'input {{value}}'
+	String input({required Object value}) => 'input ${value}';
+
+	/// en: 'cache read {{read}} · write {{write}}'
+	String cache({required Object read, required Object write}) => 'cache read ${read} · write ${write}';
+
+	/// en: 'output {{value}}'
+	String output({required Object value}) => 'output ${value}';
+}
+
+// Path: chat.toolBlocks.status
+class Translations$chat$toolBlocks$status$en {
+	Translations$chat$toolBlocks$status$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Running'
+	String get running => 'Running';
+
+	/// en: 'Denied'
+	String get denied => 'Denied';
+}
+
+// Path: chat.toolBlocks.verbs
+class Translations$chat$toolBlocks$verbs$en {
+	Translations$chat$toolBlocks$verbs$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'read'
+	String get read => 'read';
+
+	/// en: 'write'
+	String get write => 'write';
+
+	/// en: 'edit'
+	String get edit => 'edit';
+
+	/// en: 'delete'
+	String get delete => 'delete';
+
+	/// en: 'move'
+	String get move => 'move';
+}
+
+// Path: chat.commandMenu.namespaces
+class Translations$chat$commandMenu$namespaces$en {
+	Translations$chat$commandMenu$namespaces$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Frequently Used'
+	String get frequent => 'Frequently Used';
+
+	/// en: 'Built-in Commands'
+	String get builtin => 'Built-in Commands';
+
+	/// en: 'Skills'
+	String get skill => 'Skills';
+
+	/// en: 'Project Commands'
+	String get project => 'Project Commands';
+
+	/// en: 'User Commands'
+	String get user => 'User Commands';
+
+	/// en: 'Other Commands'
+	String get other => 'Other Commands';
+}
+
+// Path: chat.mentionMenu.kinds
+class Translations$chat$mentionMenu$kinds$en {
+	Translations$chat$mentionMenu$kinds$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'file'
+	String get file => 'file';
+
+	/// en: 'session'
+	String get session => 'session';
+
+	/// en: 'task'
+	String get task => 'task';
 }
 
 // Path: common.quota.section
@@ -11776,6 +13115,8 @@ class Translations$settings$agents$accounts$en {
 
 	/// en: 'Add account'
 	String get add => 'Add account';
+
+	late final Translations$settings$agents$accounts$autoSwitch$en autoSwitch = Translations$settings$agents$accounts$autoSwitch$en.internal(_root);
 }
 
 // Path: settings.permissions.permissionMode
@@ -12095,6 +13436,12 @@ class Translations$settings$about$pro$en {
 
 	/// en: 'Team Management'
 	String get teamManagement => 'Team Management';
+
+	/// en: 'Keep your preferences, MCP configs, and theme in sync across all your environments.'
+	String get syncSettingsDescription => 'Keep your preferences, MCP configs, and theme in sync across all your environments.';
+
+	/// en: 'Multiple users, role-based access, and shared projects for your team.'
+	String get teamManagementDescription => 'Multiple users, role-based access, and shared projects for your team.';
 }
 
 // Path: tasks.notConfigured.features
@@ -12413,6 +13760,54 @@ class Translations$tasks$board$comments$en {
 	String get unknownAuthor => 'Someone';
 }
 
+// Path: tasks.taskmaster.sort
+class Translations$tasks$taskmaster$sort$en {
+	Translations$tasks$taskmaster$sort$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Status (A-Z)'
+	String get statusAz => 'Status (A-Z)';
+
+	/// en: 'Status (Z-A)'
+	String get statusZa => 'Status (Z-A)';
+}
+
+// Path: tasks.taskmaster.prd
+class Translations$tasks$taskmaster$prd$en {
+	Translations$tasks$taskmaster$prd$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Please provide a filename for the PRD.'
+	String get fileNameRequired => 'Please provide a filename for the PRD.';
+
+	/// en: 'Please add content before saving.'
+	String get contentRequired => 'Please add content before saving.';
+
+	/// en: 'Overwrite'
+	String get overwrite => 'Overwrite';
+
+	/// en: '# Product Requirements Document…'
+	String get contentHint => '# Product Requirements Document…';
+}
+
+// Path: tasks.taskmaster.detail
+class Translations$tasks$taskmaster$detail$en {
+	Translations$tasks$taskmaster$detail$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Dependencies (comma-separated ids)'
+	String get dependenciesLabel => 'Dependencies (comma-separated ids)';
+}
+
 // Path: mcp.servers.config
 class Translations$mcp$servers$config$en {
 	Translations$mcp$servers$config$en.internal(this._root);
@@ -12479,6 +13874,57 @@ class Translations$mcp$form$validation$en {
 
 	/// en: '{{provider}} does not support {{type}} MCP servers'
 	String unsupportedProvider({required Object provider, required Object type}) => '${provider} does not support ${type} MCP servers';
+
+	/// en: 'JSON configuration must be an object'
+	String get jsonMustBeObject => 'JSON configuration must be an object';
+}
+
+// Path: serverConnect.local.errors
+class Translations$serverConnect$local$errors$en {
+	Translations$serverConnect$local$errors$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Could not resolve the latest DDAgent release tag.'
+	String get releaseTagUnresolved => 'Could not resolve the latest DDAgent release tag.';
+
+	/// en: 'Local server is not supported on this platform.'
+	String get unsupportedPlatform => 'Local server is not supported on this platform.';
+
+	/// en: 'Local server is not supported on this platform ({{platform}}).'
+	String unsupportedPlatformDetail({required Object platform}) => 'Local server is not supported on this platform (${platform}).';
+
+	/// en: 'Node.js extraction did not produce {{path}}'
+	String nodeExtractionFailed({required Object path}) => 'Node.js extraction did not produce ${path}';
+
+	/// en: 'Server download failed: {{error}}'
+	String downloadFailed({required Object error}) => 'Server download failed: ${error}';
+
+	/// en: 'Server install failed: {{error}}'
+	String installFailed({required Object error}) => 'Server install failed: ${error}';
+
+	/// en: 'Server bundle is not installed.'
+	String get bundleNotInstalled => 'Server bundle is not installed.';
+
+	/// en: 'Failed to spawn the local server: {{error}}'
+	String spawnFailed({required Object error}) => 'Failed to spawn the local server: ${error}';
+
+	/// en: 'Port {{port}} is already in use by another application.'
+	String portInUse({required Object port}) => 'Port ${port} is already in use by another application.';
+
+	/// en: 'Local server exited during startup.'
+	String get exitedDuringStartup => 'Local server exited during startup.';
+
+	/// en: 'Local server exited during startup: {{output}}'
+	String exitedDuringStartupWithOutput({required Object output}) => 'Local server exited during startup: ${output}';
+
+	/// en: 'Timed out waiting for the local server to start.'
+	String get startTimeout => 'Timed out waiting for the local server to start.';
+
+	/// en: '{{command}} failed (exit {{code}}): {{output}}'
+	String tarFailed({required Object command, required Object code, required Object output}) => '${command} failed (exit ${code}): ${output}';
 }
 
 // Path: chat.orchestrator.decision.action
@@ -13143,6 +14589,21 @@ class Translations$settings$agents$account$devin$en {
 	String get description => 'Devin CLI assistant';
 }
 
+// Path: settings.agents.accounts.autoSwitch
+class Translations$settings$agents$accounts$autoSwitch$en {
+	Translations$settings$agents$accounts$autoSwitch$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Auto-switch account on usage limit'
+	String get label => 'Auto-switch account on usage limit';
+
+	/// en: 'When an account reaches its usage limit, the session moves to another account of the same agent that still has quota — even if you picked the exhausted one manually. Never switches to a different agent. Claude and Codex keep the conversation; other agents switch for new chats only.'
+	String get description => 'When an account reaches its usage limit, the session moves to another account of the same agent that still has quota — even if you picked the exhausted one manually. Never switches to a different agent. Claude and Codex keep the conversation; other agents switch for new chats only.';
+}
+
 // Path: settings.permissions.permissionMode.modes
 class Translations$settings$permissions$permissionMode$modes$en {
 	Translations$settings$permissions$permissionMode$modes$en.internal(this._root);
@@ -13570,6 +15031,7 @@ extension on Translations {
 			'chat.interactive.instructionDetail' => 'In the CLI, you would select this option interactively using arrow keys or by typing the number.',
 			'chat.thinking.title' => 'Thinking...',
 			'chat.thinking.emoji' => '💭 Thinking...',
+			'chat.thinking.thoughtFewSeconds' => 'Thought for a few seconds',
 			'chat.json.response' => 'JSON Response',
 			'chat.permissions.grant' => ({required Object tool}) => 'Grant permission for ${tool}',
 			'chat.permissions.added' => 'Permission added',
@@ -13643,6 +15105,7 @@ extension on Translations {
 			'chat.input.queue.failed' => 'Failed to send',
 			'chat.input.queue.sendNow' => 'Send now',
 			'chat.input.queue.sendNowAfterTurn' => 'This agent can\'t take messages mid-turn — it will be sent after the current turn',
+			'chat.input.queue.filesAttached' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: '${count} file attached', other: '${count} files attached', ), 
 			'chat.input.autoContinueTasks' => 'Auto-continue',
 			'chat.input.autoContinueTasksTooltip' => 'Enable to let Devin automatically continue to the next Task Master task',
 			'chat.input.offlineQueue.clear' => 'Cancel and clear offline queue',
@@ -13669,6 +15132,18 @@ extension on Translations {
 			'chat.composer.accountDefault' => 'Default account',
 			'chat.composer.accountAuto' => 'Auto (default)',
 			'chat.composer.accountIsDefault' => 'Default',
+			'chat.composer.effortLevels.off' => 'Off',
+			'chat.composer.effortLevels.none' => 'None',
+			'chat.composer.effortLevels.minimal' => 'Minimal',
+			'chat.composer.effortLevels.low' => 'Low',
+			'chat.composer.effortLevels.medium' => 'Medium',
+			'chat.composer.effortLevels.high' => 'High',
+			'chat.composer.effortLevels.xhigh' => 'Extra high',
+			'chat.composer.effortLevels.max' => 'Max',
+			'chat.composer.effortLevels.ultra' => 'Ultra',
+			'chat.composer.contextWindow' => ({required Object size}) => '${size} context',
+			'chat.composer.accountAutoShort' => 'Auto',
+			'chat.composer.uploadNoRecords' => 'Upload returned no records',
 			'chat.providerSelection.title' => 'Choose Your AI Assistant',
 			'chat.providerSelection.description' => 'Select a provider to start a new conversation',
 			'chat.providerSelection.selectModel' => 'Select Model',
@@ -13728,6 +15203,7 @@ extension on Translations {
 			'chat.session.messages.retryLoadOlder' => ({required Object error}) => 'Retry loading older — ${error}',
 			'chat.session.deleteConfirm' => 'Removes the session and its transcript. Cannot be undone.',
 			'chat.session.finishRunBeforeWorkspaceChange' => 'Finish the run before changing workspace',
+			'chat.session.fallbackTitle' => 'Session',
 			'chat.shell.selectProject.title' => 'Select a Project',
 			'chat.shell.selectProject.description' => 'Choose a project to open an interactive shell in that directory',
 			'chat.shell.status.newSession' => 'New Session',
@@ -13829,6 +15305,8 @@ extension on Translations {
 			'chat.attachments.downloadFailedRetry' => 'Download failed — click to retry',
 			'chat.attachments.fileAttachment' => 'File attachment',
 			'chat.attachments.download' => ({required Object name}) => 'Download ${name}',
+			'chat.attachments.attachedFile' => 'Attached file',
+			'chat.attachments.downloaded' => ({required Object name}) => '${name} downloaded',
 			'chat.checkpoint.creating' => 'Creating snapshot…',
 			'chat.checkpoint.revertChanges' => 'Revert files to last checkpoint',
 			'chat.checkpoint.undo' => 'Undo checkpoint',
@@ -13843,11 +15321,17 @@ extension on Translations {
 			'chat.taskMaster.taskShort' => 'TASK',
 			'chat.taskMaster.addToTask' => 'Add to TaskMaster',
 			'chat.taskMaster.added' => 'Added to TaskMaster',
+			'chat.taskMaster.defaultTaskTitle' => 'Task from chat',
 			'chat.tokenUsage.desc' => 'View session token consumption',
 			'chat.tokenUsage.title' => 'Token usage',
+			'chat.tokenUsage.notAvailable' => 'N/A',
+			'chat.tokenUsage.tokensBadge' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: '${count} token', other: '${count} tokens', ), 
 			'chat.tool.emptyResult' => '(no output yet — the tool returned an empty result)',
 			'chat.quotaBadge.ariaLabel' => 'Subscription limits',
 			'chat.quotaBadge.noData' => 'No subscription data for this model',
+			'chat.quotaBadge.noSubscription' => 'no subscription',
+			'chat.quotaBadge.windowLineReset' => ({required Object label, required Object percent, required Object time}) => '${label}: ${percent}% · reset ${time}',
+			'chat.quotaBadge.windowRemaining' => ({required Object percent}) => '${percent}% of the window left before reset',
 			'chat.broadcast.title' => 'Broadcast to sessions',
 			'chat.broadcast.noSessions' => 'No sessions available',
 			'chat.broadcast.placeholder' => 'Message to send to every selected session…',
@@ -13875,6 +15359,8 @@ extension on Translations {
 			'chat.commandResult.searchModels' => ({required Object provider}) => 'Search ${provider} models...',
 			'chat.commands.runConfirmTitle' => 'Run command?',
 			'chat.commands.executionCancelled' => 'Command execution cancelled',
+			'chat.commands.bashConfirmMessage' => 'This command contains bash commands that will be executed. Do you want to proceed?',
+			'chat.commands.proceed' => 'Proceed',
 			'chat.pinFile.title' => 'Pin file',
 			'chat.pinFile.pathHint' => 'path/to/file.ext',
 			'chat.pinFile.action' => 'Pin',
@@ -13884,13 +15370,157 @@ extension on Translations {
 			'chat.modelLibrary.idNoSpaces' => 'Model IDs cannot contain spaces.',
 			'chat.modelLibrary.setAsDefault' => 'Set as default',
 			'chat.modelLibrary.defaultModel' => 'Default model',
+			'chat.modelLibrary.title' => 'Model library',
+			'chat.modelLibrary.subtitle' => 'Add model IDs supported by your provider. Built-in models stay locked. The circle marks the default model.',
+			'chat.modelLibrary.yourModels' => 'Your models',
+			'chat.modelLibrary.yourModelsHint' => 'Editable and stored in auth.db',
+			'chat.modelLibrary.emptyTitle' => 'No custom models yet',
+			'chat.modelLibrary.emptyHint' => 'Add one with the form and it will appear in every model picker.',
+			'chat.modelLibrary.builtInModels' => 'Built-in models',
+			'chat.modelLibrary.builtInModelsHint' => 'Maintained by DDAgent and read-only',
+			'chat.modelLibrary.editTitle' => 'Edit custom model',
+			'chat.modelLibrary.addTitle' => 'Add a custom model',
+			'chat.modelLibrary.idSentAsWritten' => ({required Object provider}) => 'The ID is sent to ${provider} exactly as written.',
+			'chat.modelLibrary.nameLabel' => 'Model name',
+			'chat.modelLibrary.nameHint' => 'e.g. GPT-5.5 Pro',
+			'chat.modelLibrary.idLabel' => 'Model ID',
+			'chat.modelLibrary.idHint' => 'e.g. gpt-5.5-pro',
+			'chat.modelLibrary.idHelp' => 'Use the exact identifier accepted by the provider CLI. IDs cannot contain spaces.',
+			'chat.modelLibrary.updatedNotice' => ({required Object name}) => '${name} was updated.',
+			'chat.modelLibrary.addedNotice' => ({required Object name}) => '${name} was added.',
+			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '${name} was deleted.',
+			'chat.modelLibrary.saving' => 'Saving…',
+			'chat.modelLibrary.saveChanges' => 'Save changes',
+			'chat.modelLibrary.deleteConfirm' => 'Delete this model from all pickers?',
+			'chat.modelLibrary.customBadge' => 'Custom',
 			'chat.changes.failedToLoad' => 'Failed to load changes',
 			'chat.changes.empty' => 'No file changes',
 			'chat.message.compactedSummary' => 'Compacted summary',
+			_ => null,
+		} ?? switch (path) {
 			'chat.message.resendHint' => 'Resend from the composer',
 			'chat.message.rawView' => 'Raw view',
+			'chat.message.runComplete' => 'Run complete',
 			'chat.permissionRequest.title' => ({required Object tool}) => 'Permission request · ${tool}',
 			'chat.permissionRequest.question' => 'Question',
+			'chat.permissionRequest.subagent' => 'Subagent',
+			'chat.permissionRequest.viewersCannotApprove' => 'Viewers cannot approve',
+			'chat.permissionRequest.recap.timedOut' => 'Timed out — denied automatically',
+			'chat.permissionRequest.recap.cancelled' => 'Cancelled — the turn was stopped',
+			'chat.permissionRequest.recap.autoApproved' => 'Approved automatically',
+			'chat.permissionRequest.recap.expired' => 'Request expired — the agent is no longer waiting for it',
+			'chat.permissionRequest.recap.answered' => 'Answered',
+			'chat.permissionRequest.recap.skipped' => 'Skipped',
+			'chat.permissionRequest.recap.decided' => 'Decided',
+			'chat.permissionRequest.needsApproval' => ({required Object tool}) => '${tool} needs approval',
+			'chat.permissionRequest.subagentNeedsApproval' => ({required Object tool}) => 'Subagent: ${tool} needs approval',
+			'chat.permissionRequest.moreQuestions' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: '${count} more question waiting', other: '${count} more questions waiting', ), 
+			'chat.commandDialog.help.eyebrow' => 'Command center',
+			'chat.commandDialog.help.title' => 'Help & Shortcuts',
+			'chat.commandDialog.help.subtitle' => 'Search built-ins, syntax patterns, and command usage.',
+			'chat.commandDialog.models.eyebrow' => 'Model selection',
+			'chat.commandDialog.models.title' => 'Choose a Model',
+			'chat.commandDialog.models.subtitle' => 'Pick the model this provider should use.',
+			'chat.commandDialog.models.modelSetTo' => ({required Object model}) => 'Model set to ${model}.',
+			'chat.commandDialog.models.activeModel' => 'Active model',
+			'chat.commandDialog.models.noModelsMatch' => 'No models match that filter.',
+			'chat.commandDialog.models.choiceSavedForSession' => 'Your choice is saved for this session and becomes the default for new chats.',
+			'chat.commandDialog.models.choiceDefault' => 'Your choice becomes the default model for new chats.',
+			'chat.commandDialog.models.custom' => 'Custom',
+			'chat.commandDialog.models.currentSelection' => 'Current selection',
+			'chat.commandDialog.cost.eyebrow' => 'Session telemetry',
+			'chat.commandDialog.cost.title' => 'Token Usage',
+			'chat.commandDialog.cost.subtitle' => 'Input, output, and total token counts for this session.',
+			'chat.commandDialog.cost.totalTokensUsed' => 'Total tokens used',
+			'chat.commandDialog.cost.inputTokens' => 'Input tokens',
+			'chat.commandDialog.cost.cacheReadTokens' => 'Cache read tokens',
+			'chat.commandDialog.cost.cacheWriteTokens' => 'Cache write tokens',
+			'chat.commandDialog.cost.outputTokens' => 'Output tokens',
+			'chat.commandDialog.cost.breakdown' => 'Breakdown',
+			'chat.commandDialog.cost.unavailable' => 'Unavailable',
+			'chat.commandDialog.cost.contextWindow' => 'Context window',
+			'chat.commandDialog.cost.estimatedCost' => 'Estimated cost',
+			'chat.commandDialog.status.eyebrow' => 'Runtime health',
+			'chat.commandDialog.status.title' => 'System Status',
+			'chat.commandDialog.status.subtitle' => 'Version, provider, runtime, and environment details.',
+			'chat.commandDialog.status.package' => 'Package',
+			'chat.commandDialog.status.uptime' => 'Uptime',
+			'chat.commandDialog.status.platform' => 'Platform',
+			'chat.commandDialog.status.memory' => 'Memory',
+			'chat.commandDialog.status.memoryRss' => ({required Object mb}) => '${mb} MB RSS',
+			'chat.commandDialog.status.runtimeOnline' => 'Runtime online',
+			'chat.commandDialog.status.processResponding' => ({required Object pid}) => 'Process #${pid} is responding.',
+			'chat.commandDialog.status.processStatusResponding' => 'Process status is responding.',
+			'chat.commandDialog.status.healthy' => 'Healthy',
+			'chat.commandDialog.defaultEyebrow' => 'Command',
+			'chat.commandDialog.defaultTitle' => 'Command Result',
+			'chat.commandDialog.escHint' => 'Esc closes the modal.',
+			'chat.commandDialog.unknown' => 'Unknown',
+			'chat.commandDialog.noDescription' => 'No description available.',
+			'chat.commandDialog.noCommandsMatch' => 'No commands match that filter.',
+			'chat.commandDialog.syntax.title' => 'Syntax',
+			'chat.commandDialog.syntax.arguments' => ({required Object arguments, required Object first, required Object second}) => '${arguments} passes all args; ${first}, ${second} positional.',
+			'chat.commandDialog.syntax.file' => ({required Object token}) => '${token} includes file contents.',
+			'chat.commandDialog.syntax.bash' => ({required Object token}) => '${token} runs bash.',
+			'chat.commandDialog.commandFinished' => 'Command finished.',
+			'chat.utilities.tokenUsageUnavailable' => 'Token usage not available',
+			'chat.utilities.tooltip.tokensUsed' => ({required Object tokens}) => '${tokens} tokens used',
+			'chat.utilities.tooltip.contextOf' => ({required Object percent, required Object total}) => 'context ${percent}% of ${total}',
+			'chat.utilities.tooltip.input' => ({required Object value}) => 'input ${value}',
+			'chat.utilities.tooltip.cache' => ({required Object read, required Object write}) => 'cache read ${read} · write ${write}',
+			'chat.utilities.tooltip.output' => ({required Object value}) => 'output ${value}',
+			'chat.utilities.used' => 'Used',
+			'chat.utilities.cacheWrite' => 'Cache write',
+			'chat.utilities.contextLabel' => 'Context',
+			'chat.utilities.usageUnsupported' => 'usage unsupported',
+			'chat.utilities.chatTranscript' => 'Chat transcript',
+			'chat.utilities.you' => 'You:',
+			'chat.utilities.providerAutoMini' => 'Auto (mini)',
+			'chat.toolBlocks.moreLines' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: '… ${count} more line', other: '… ${count} more lines', ), 
+			'chat.toolBlocks.status.running' => 'Running',
+			'chat.toolBlocks.status.denied' => 'Denied',
+			'chat.toolBlocks.showLess' => 'Show less',
+			'chat.toolBlocks.showMore' => 'Show more',
+			'chat.toolBlocks.showMoreLines' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: 'Show ${count} more line', other: 'Show ${count} more lines', ), 
+			'chat.toolBlocks.tools' => 'Tools',
+			'chat.toolBlocks.planReview' => 'Plan review',
+			'chat.toolBlocks.planUpdate' => 'Plan update',
+			'chat.toolBlocks.todoListUpdated' => 'Todo list updated',
+			'chat.toolBlocks.creatingTask' => 'Creating task',
+			'chat.toolBlocks.updatingTask' => 'updating',
+			'chat.toolBlocks.fetchingTask' => 'fetching',
+			'chat.toolBlocks.listingTasks' => 'listing tasks',
+			'chat.toolBlocks.search' => 'Search',
+			'chat.toolBlocks.verbs.read' => 'read',
+			'chat.toolBlocks.verbs.write' => 'write',
+			'chat.toolBlocks.verbs.edit' => 'edit',
+			'chat.toolBlocks.verbs.delete' => 'delete',
+			'chat.toolBlocks.verbs.move' => 'move',
+			'chat.toolBlocks.subagent' => 'Subagent',
+			'chat.toolBlocks.toolCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: '${count} tool', other: '${count} tools', ), 
+			'chat.toolBlocks.result' => 'result',
+			'chat.toolBlocks.plusMore' => ({required Object count}) => '+${count} more',
+			'chat.toolBlocks.plan' => 'Plan',
+			'chat.toolBlocks.questionProgress' => ({required Object current, required Object total}) => 'Question ${current}/${total}',
+			'chat.toolBlocks.lineCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: '${count} line', other: '${count} lines', ), 
+			'chat.toolBlocks.todoListItems' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: 'Todo List (${count} item)', other: 'Todo List (${count} items)', ), 
+			'chat.toolBlocks.tasksCompleted' => ({required Object done, required Object total}) => '${done}/${total} completed',
+			'chat.commandMenu.empty' => 'No commands available',
+			'chat.commandMenu.namespaces.frequent' => 'Frequently Used',
+			'chat.commandMenu.namespaces.builtin' => 'Built-in Commands',
+			'chat.commandMenu.namespaces.skill' => 'Skills',
+			'chat.commandMenu.namespaces.project' => 'Project Commands',
+			'chat.commandMenu.namespaces.user' => 'User Commands',
+			'chat.commandMenu.namespaces.other' => 'Other Commands',
+			'chat.mentionMenu.kinds.file' => 'file',
+			'chat.mentionMenu.kinds.session' => 'session',
+			'chat.mentionMenu.kinds.task' => 'task',
+			'chat.mentionMenu.taskTitle' => ({required Object id}) => 'Task ${id}',
+			'chat.subheader.contextTooltip' => ({required Object used, required Object total, required Object percent}) => 'Context: ${used} / ${total} tokens · ${percent}% used',
+			'chat.transcript.requestFailed' => 'Request failed',
+			'chat.review.changedFiles' => 'Changed files',
+			'chat.review.changedFilesCount' => ({required Object count}) => 'Changed files (${count})',
+			'chat.review.subagent' => 'subagent',
 			'codeEditor.toolbar.changes' => 'changes',
 			'codeEditor.toolbar.previousChange' => 'Previous change',
 			'codeEditor.toolbar.nextChange' => 'Next change',
@@ -13924,6 +15554,9 @@ extension on Translations {
 			'codeEditor.footer.lines' => 'Lines:',
 			'codeEditor.footer.characters' => 'Characters:',
 			'codeEditor.footer.shortcuts' => 'Press Ctrl+S to save • Esc to close',
+			'codeEditor.footer.plainText' => 'plain text',
+			'codeEditor.footer.lineCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: '${count} line', other: '${count} lines', ), 
+			'codeEditor.footer.modified' => 'modified',
 			'codeEditor.binaryFile.title' => 'Binary File',
 			'codeEditor.binaryFile.message' => ({required Object fileName}) => 'The file "${fileName}" cannot be displayed in the text editor because it is a binary file.',
 			'codeEditor.binaryFile.cannotDisplayAsText' => 'Cannot display as text',
@@ -13935,8 +15568,6 @@ extension on Translations {
 			'codeEditor.mediaFile.title' => 'Media file',
 			'codeEditor.mediaFile.subtitle' => 'Audio/video preview is not supported yet',
 			'codeEditor.failedToLoad' => 'Failed to load file',
-			_ => null,
-		} ?? switch (path) {
 			'codeEditor.hexDump.more' => ({required Object size}) => '… ${size} more',
 			'codeEditor.settings.minimap' => 'Minimap',
 			'codeEditor.settings.tabSize' => ({required Object size}) => 'Tab size: ${size}',
@@ -13949,7 +15580,14 @@ extension on Translations {
 			'codeEditor.diff.current' => 'Current',
 			'codeEditor.diff.applyMerge' => 'Apply merge',
 			'codeEditor.diff.deletedOnDisk' => 'deleted on disk',
+			'codeEditor.diff.untrackedWillBeDeleted' => 'This untracked file will be deleted.',
+			'codeEditor.diff.restoreConfirm' => ({required Object name}) => 'Restore ${name} to its committed state?',
+			'codeEditor.diff.headVsWorkingCopy' => 'HEAD vs working copy',
+			'codeEditor.diff.savedVsBuffer' => 'Last saved vs buffer (no git)',
+			'codeEditor.diff.unchangedLines' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: '${count} unchanged line', other: '${count} unchanged lines', ), 
+			'codeEditor.diff.revertToSaved' => 'Revert to saved',
 			'codeEditor.emptyState.title' => 'No file open',
+			'codeEditor.emptyState.hint' => 'Open files from the Files tab',
 			'codeEditor.toasts.savedFile' => ({required Object name}) => 'Saved ${name}',
 			'codeEditor.toasts.saveFailed' => 'Save failed',
 			'codeEditor.toasts.allSaved' => 'All saved',
@@ -14121,6 +15759,7 @@ extension on Translations {
 			'common.navigation.next' => 'Next',
 			'common.navigation.previous' => 'Previous',
 			'common.navigation.logout' => 'Logout',
+			'common.navigation.backToChat' => 'Back to chat',
 			'common.common.language' => 'Language',
 			'common.common.theme' => 'Theme',
 			'common.common.darkMode' => 'Dark Mode',
@@ -14271,6 +15910,8 @@ extension on Translations {
 			'common.projectWizard.step3.reviewConfig' => 'Review Your Configuration',
 			'common.projectWizard.step3.existingWorkspace' => 'Existing Workspace',
 			'common.projectWizard.step3.newWorkspace' => 'New Workspace',
+			_ => null,
+		} ?? switch (path) {
 			'common.projectWizard.step3.path' => 'Path:',
 			'common.projectWizard.step3.cloneFrom' => 'Clone From:',
 			'common.projectWizard.step3.authentication' => 'Authentication:',
@@ -14449,8 +16090,6 @@ extension on Translations {
 			'common.commandPalette.pages.sessions' => 'Sessions',
 			'common.commandPalette.placeholder' => 'Type to search anything…',
 			'common.commandPalette.searchPagePlaceholder' => ({required Object page}) => 'Search ${page}…',
-			_ => null,
-		} ?? switch (path) {
 			'common.commandPalette.title' => 'Command palette',
 			'common.gitPanel.ahead' => ({required Object count}) => '${count} ahead',
 			'common.gitPanel.aheadLabel' => 'ahead',
@@ -14709,6 +16348,8 @@ extension on Translations {
 			'common.update.staged' => ({required Object version}) => 'Update v${version} downloaded — restart the server to install it.',
 			'common.update.upToDate' => 'The server is already on the latest release.',
 			'common.update.webHostFailed' => ({required Object message}) => 'The server was updated, but its web interface was not: ${message}',
+			'common.appShell.panelActive' => ({required Object count}) => 'Panel · ${count} active',
+			'common.errors.forbidden' => 'Access denied',
 			'settings.title' => 'Settings',
 			'settings.changelog.title' => 'Changelog',
 			'settings.changelog.loading' => 'Loading…',
@@ -14783,6 +16424,8 @@ extension on Translations {
 			'settings.appearance.fontSize' => 'Font Size',
 			'settings.appearance.themeModes.system' => 'System',
 			'settings.appearance.themeModes.light' => 'Light',
+			_ => null,
+		} ?? switch (path) {
 			'settings.appearance.themeModes.dark' => 'Dark',
 			'settings.actions.saveChanges' => 'Save Changes',
 			'settings.actions.resetToDefaults' => 'Reset to Defaults',
@@ -14802,6 +16445,7 @@ extension on Translations {
 			'settings.quickSettings.dragHandle.draggingStatus' => 'Dragging...',
 			'settings.quickSettings.dragHandle.toggleAndMove' => 'Click to toggle, drag to move',
 			'settings.quickSettings.sendWithCtrlEnter' => 'Send with Ctrl+Enter',
+			'settings.quickSettings.enterSendsHint' => 'When off, Enter sends and Shift+Enter inserts a newline.',
 			'settings.terminalShortcuts.title' => 'Terminal Shortcuts',
 			'settings.terminalShortcuts.sectionKeys' => 'Keys',
 			'settings.terminalShortcuts.sectionNavigation' => 'Navigation',
@@ -14963,8 +16607,6 @@ extension on Translations {
 			'settings.orchestration.save.saved' => 'Saved',
 			'settings.orchestration.save.discard' => 'Discard',
 			'settings.orchestration.save.error' => 'Save failed',
-			_ => null,
-		} ?? switch (path) {
 			'settings.orchestration.save.emptyPool' => 'Add at least one candidate before saving.',
 			'settings.notifications.title' => 'Notifications',
 			'settings.notifications.description' => 'Control which notification events you receive.',
@@ -15176,6 +16818,8 @@ extension on Translations {
 			'settings.agents.accounts.remove' => 'Remove account',
 			'settings.agents.accounts.newLabel' => 'Account label (e.g. Work)',
 			'settings.agents.accounts.add' => 'Add account',
+			'settings.agents.accounts.autoSwitch.label' => 'Auto-switch account on usage limit',
+			'settings.agents.accounts.autoSwitch.description' => 'When an account reaches its usage limit, the session moves to another account of the same agent that still has quota — even if you picked the exhausted one manually. Never switches to a different agent. Claude and Codex keep the conversation; other agents switch for new chats only.',
 			'settings.permissions.title' => 'Permission Settings',
 			'settings.permissions.permissionMode.title' => 'Permission Mode',
 			'settings.permissions.permissionMode.description' => ({required Object provider}) => 'Default permission mode for new ${provider} sessions. You can still override it for a single session with the mode button in the chat composer.',
@@ -15294,6 +16938,8 @@ extension on Translations {
 			'settings.schedules.title' => 'Schedules',
 			'settings.schedules.description' => 'Recurring agent runs on a cron timetable. Runs fire unattended with permissions bypassed.',
 			'settings.schedules.preventSleep' => 'Prevent sleep while agents run',
+			_ => null,
+		} ?? switch (path) {
 			'settings.schedules.preventSleepHint' => 'Desktop keeps the display awake; in the browser a screen wake lock is used.',
 			'settings.schedules.kNew' => 'New schedule',
 			'settings.schedules.loading' => 'Loading…',
@@ -15330,6 +16976,8 @@ extension on Translations {
 			'settings.about.proFeatures' => 'DDAgent Pro Features',
 			'settings.about.pro.syncSettings' => 'Sync Settings',
 			'settings.about.pro.teamManagement' => 'Team Management',
+			'settings.about.pro.syncSettingsDescription' => 'Keep your preferences, MCP configs, and theme in sync across all your environments.',
+			'settings.about.pro.teamManagementDescription' => 'Multiple users, role-based access, and shared projects for your team.',
 			'settings.about.versionInfo' => 'Version info',
 			'settings.about.client' => 'App',
 			'settings.about.server' => 'Server',
@@ -15337,6 +16985,10 @@ extension on Translations {
 			'settings.about.platformDesktop' => 'Desktop',
 			'settings.about.platformWeb' => 'Web',
 			'settings.about.unknown' => 'unknown',
+			'settings.about.copyright' => '© 2026 DDAgent — all rights reserved',
+			'settings.about.tagline' => 'Open-source AI coding assistant interface',
+			'settings.about.docs' => 'Docs',
+			'settings.about.hostedDescription' => 'Team collaboration, shared MCP configs, settings sync across environments, and managed infrastructure.',
 			'settings.shortcuts.description' => 'Every keyboard shortcut in DDAgent, split by platform.',
 			'settings.shortcuts.action' => 'Action',
 			'settings.shortcuts.winLinux' => 'Windows / Linux',
@@ -15477,8 +17129,6 @@ extension on Translations {
 			'sidebar.time.oneDayAgo' => '1 day ago',
 			'sidebar.time.daysAgo' => ({required Object count}) => '${count} days ago',
 			'sidebar.messages.deleteConfirm' => 'Are you sure you want to delete this?',
-			_ => null,
-		} ?? switch (path) {
 			'sidebar.messages.renameSuccess' => 'Renamed successfully',
 			'sidebar.messages.deleteSuccess' => 'Deleted successfully',
 			'sidebar.messages.errorOccurred' => 'An error occurred',
@@ -15799,6 +17449,19 @@ extension on Translations {
 			'tasks.taskDetail.deleteConfirmMessage' => ({required Object id}) => 'Task #${id} will be removed. This cannot be undone.',
 			'tasks.taskDetail.idCopied' => 'Task ID copied',
 			'tasks.toasts.statusInProgress' => ({required Object id}) => 'Task ${id} set to in-progress',
+			'tasks.taskmaster.noProjectHint' => 'Add a project first, then create tasks for it.',
+			'tasks.taskmaster.sort.statusAz' => 'Status (A-Z)',
+			'tasks.taskmaster.sort.statusZa' => 'Status (Z-A)',
+			_ => null,
+		} ?? switch (path) {
+			'tasks.taskmaster.installedVersion' => ({required Object version}) => 'Installed: ${version}',
+			'tasks.taskmaster.initFailed' => 'Failed to initialize TaskMaster',
+			'tasks.taskmaster.prd.fileNameRequired' => 'Please provide a filename for the PRD.',
+			'tasks.taskmaster.prd.contentRequired' => 'Please add content before saving.',
+			'tasks.taskmaster.prd.overwrite' => 'Overwrite',
+			'tasks.taskmaster.prd.contentHint' => '# Product Requirements Document…',
+			'tasks.taskmaster.detail.dependenciesLabel' => 'Dependencies (comma-separated ids)',
+			'tasks.taskmaster.untitledTask' => 'Untitled Task',
 			'knowledge.title' => 'Knowledge',
 			'knowledge.tabs.dashboard' => 'Dashboard',
 			'knowledge.tabs.memories' => 'Memories',
@@ -15882,25 +17545,42 @@ extension on Translations {
 			'knowledge.importAll.mergeDuplicates' => 'Merge duplicate entries',
 			'knowledge.importAll.mergeDuplicatesHint' => 'Collapses duplicate rows in DDAgent (not files)',
 			'knowledge.importAll.action' => 'Import everything',
+			'knowledge.importAll.readOnlyNotice' => 'Read-only on your agents: this imports into DDAgent\'s own database and does NOT modify or delete any CLI file or config. The options below only change DDAgent data.',
+			'knowledge.importAll.dryRunNote' => 'Dry run — nothing written yet.',
+			'knowledge.importAll.importedNote' => 'Imported.',
+			'knowledge.importAll.result' => ({required Object rules, required Object newSkills, required Object removed, required Object promoted}) => 'Imported — rules: ${rules}, new skills: ${newSkills}, removed: ${removed}, promoted: ${promoted}',
+			'knowledge.importAll.description' => 'Scan every project and import your agents\' skills into the knowledge base. Read-only on your agents — nothing in the CLIs is changed.',
 			'knowledge.migrate.title' => 'Migrate existing rules',
 			'knowledge.migrate.scanned' => ({required Object count}) => 'Scanned ${count} project(s).',
 			'knowledge.migrate.rulesSummary' => ({required Object total, required Object critical}) => 'Rules: ${total} total, ${critical} critical.',
 			'knowledge.migrate.duplicates' => ({required Object count}) => 'Duplicate groups across projects: ${count}',
 			'knowledge.migrate.removedPromoted' => ({required Object removed, required Object promoted}) => 'Removed: ${removed}, promoted: ${promoted}',
 			'knowledge.migrate.mergeDuplicates' => 'Merge duplicates',
+			'knowledge.migrate.dryRunNote' => 'Dry run — nothing has been changed yet.',
+			'knowledge.migrate.applied' => 'Applied.',
 			'knowledge.importSkills.title' => 'Import agent skills',
 			'knowledge.importSkills.found' => ({required Object count}) => 'Found ${count} skill(s) across your agents.',
 			'knowledge.importSkills.summary' => ({required Object imported, required Object skipped}) => 'New: ${imported} · skipped: ${skipped}',
+			'knowledge.importSkills.dryRunHint' => 'Imports the global/default skills your agents ship (user, system, plugin) as knowledge skills. Dry run — nothing imported yet.',
+			'knowledge.importSkills.importedNote' => 'Imported into the knowledge base.',
 			'knowledge.critical.make' => 'Make critical',
 			'knowledge.critical.makeAll' => 'Make all rules critical',
 			'knowledge.critical.makeAllHint' => 'Adds them to the injected context budget',
 			'knowledge.contextBudget.tokens' => ({required Object tokens, required Object budget}) => '~${tokens} / ${budget} tok',
+			'knowledge.contextBudget.title' => 'Rules context (always served)',
+			'knowledge.contextBudget.selectProject' => 'Select a project to see its critical-context size.',
 			'knowledge.linkOptions.memory' => ({required Object title}) => 'Memory: ${title}',
 			'knowledge.linkOptions.rule' => ({required Object title}) => 'Rule: ${title}',
 			'knowledge.linkOptions.skill' => ({required Object name}) => 'Skill: ${name}',
 			'knowledge.linkOptions.personal' => ({required Object title}) => 'Personal: ${title}',
 			'knowledge.errors.importFailed' => ({required Object error}) => 'Import failed: ${error}',
 			'knowledge.errors.migrationFailed' => ({required Object error}) => 'Migration failed: ${error}',
+			'knowledge.entityTypes.memory' => 'Memory',
+			'knowledge.entityTypes.rule' => 'Rule',
+			'knowledge.entityTypes.skill' => 'Skill',
+			'knowledge.entityTypes.personal' => 'Personal',
+			'knowledge.entityTypes.project' => 'Project',
+			'knowledge.entityTypes.tag' => 'Tag',
 			'browser.dialogTitle' => 'Agent Browser',
 			'browser.viewError' => 'Browser view error',
 			'browser.web' => 'Web',
@@ -15912,6 +17592,9 @@ extension on Translations {
 			'collab.copyToken' => 'Copy token',
 			'collab.roles.member' => 'Member',
 			'collab.roles.viewer' => 'Viewer',
+			'collab.viewing.session' => 'session',
+			'collab.viewing.card' => 'card',
+			'collab.viewing.board' => 'board',
 			'fileTree.uploadTo' => 'Upload to',
 			'fileTree.uploadHere' => 'Upload here',
 			'fileTree.browseServerFilesystem' => 'Browse server filesystem',
@@ -15933,6 +17616,15 @@ extension on Translations {
 			'fileTree.downloadUnsupportedOnWeb' => 'Download unsupported on web',
 			'fileTree.saveToPath' => 'Save to path',
 			'fileTree.savedTo' => ({required Object path}) => 'Saved to ${path}',
+			'fileTree.relative.now' => 'now',
+			'fileTree.relative.minutes' => ({required Object n}) => '${n}m',
+			'fileTree.relative.hours' => ({required Object n}) => '${n}h',
+			'fileTree.relative.days' => ({required Object n}) => '${n}d',
+			'fileTree.projectRoot' => '(project root)',
+			'fileTree.uploadLimitCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: 'You can upload up to ${count} file at once.', other: 'You can upload up to ${count} files at once.', ), 
+			'fileTree.fileTooLarge' => ({required Object name}) => '${name} is larger than 200MB.',
+			'fileTree.deleteFolderConfirm' => ({required Object path}) => 'Delete folder "${path}"? This cannot be undone.',
+			'fileTree.deleteFileConfirm' => ({required Object path}) => 'Delete file "${path}"? This cannot be undone.',
 			'git.checkpoints.title' => 'Checkpoints',
 			'git.checkpoints.restoreTitle' => 'Restore checkpoint',
 			'git.checkpoints.restoreMessage' => 'Reset the working tree to this checkpoint? Current changes will be replaced.',
@@ -15958,6 +17650,8 @@ extension on Translations {
 			'git.commitCreated' => 'Commit created',
 			'git.noBranch' => 'no branch',
 			'git.selectProject' => 'Select a project',
+			'git.branchSections.local' => 'LOCAL',
+			'git.branchSections.remote' => 'REMOTE',
 			'kanban.card.untitled' => 'Untitled',
 			'kanban.comments.empty' => 'No comments yet',
 			'kanban.comments.add' => 'Add comment',
@@ -15990,12 +17684,15 @@ extension on Translations {
 			'mcp.servers.addProviderDescription' => ({required Object provider}) => 'Add ${provider} MCP Server only changes ${provider}.',
 			'mcp.servers.config.cwd' => 'Cwd',
 			'mcp.servers.config.envVars' => 'Env Vars',
+			'mcp.servers.selectProjectRequired' => 'Select a project for project-scoped MCP servers',
+			'mcp.servers.globalScopeUnsupported' => 'Add MCP Server supports only user or project scope across all providers.',
+			'mcp.servers.globalAddFailed' => ({required Object details}) => 'Failed to add MCP server to all providers. ${details}',
+			'mcp.servers.scopeProject' => 'project',
 			'mcp.team.title' => 'Team MCP Configs',
-			_ => null,
-		} ?? switch (path) {
 			'mcp.team.description' => 'Share MCP server configurations across your team. Everyone stays in sync automatically.',
 			'mcp.team.cta' => 'Available with DDAgent Pro',
 			'mcp.tokens.scopeWrite' => 'Write',
+			'mcp.tokens.scopeRead' => 'Read',
 			'mcp.form.submitTo' => ({required Object provider}) => 'Add Server to ${provider}',
 			'mcp.form.scope.userAllProviders' => 'User (All Providers)',
 			'mcp.form.scope.claudeLocal' => 'Claude Local',
@@ -16010,9 +17707,12 @@ extension on Translations {
 			'mcp.form.fields.bearerTokenEnvVar' => 'Bearer Token Environment Variable',
 			'mcp.form.validation.unsupportedGlobal' => ({required Object type}) => 'Add MCP Server supports only stdio and http across all providers, not ${type}.',
 			'mcp.form.validation.unsupportedProvider' => ({required Object provider, required Object type}) => '${provider} does not support ${type} MCP servers',
+			'mcp.form.validation.jsonMustBeObject' => 'JSON configuration must be an object',
 			'notifications.deviceLabel' => 'DDAgent Flutter',
 			'notifications.errors.registrationRejected' => 'Registration rejected by server',
 			'notifications.errors.noResponse' => 'No response from the server',
+			'notifications.androidChannel.name' => 'DDAgent alerts',
+			'notifications.androidChannel.description' => 'Agent run, approval and error notifications',
 			'onboarding.gitHint' => 'Used for commits created by DDAgent sessions.',
 			'onboarding.completeSetup' => 'Complete Setup',
 			'onboarding.errors.nameAndEmailRequired' => 'Both git name and email are required.',
@@ -16054,6 +17754,7 @@ extension on Translations {
 			'projects.displayNameOptional' => 'Display name (optional)',
 			'projects.usingStoredToken' => ({required Object name}) => 'Using stored token: ${name}',
 			'projects.unknown' => 'Unknown',
+			'projects.project' => 'Project',
 			'quota.section.config' => 'Config',
 			'quota.overview.tokensAndCost' => 'Tokens and cost',
 			'quota.agents.statusCount' => ({required Object status, required Object count}) => '${status} (${count})',
@@ -16064,6 +17765,10 @@ extension on Translations {
 			'quota.chart.hide' => 'Hide',
 			'quota.chart.noData' => 'Not enough data for a trend.',
 			'quota.chart.pointReadout' => ({required Object date, required Object tokens, required Object cost}) => '${date} · ${tokens} tokens · ${cost}',
+			'quota.duration.minutes' => ({required Object minutes}) => '${minutes} min',
+			'quota.duration.hoursMinutes' => ({required Object hours, required Object minutes}) => '${hours} h ${minutes} min',
+			'quota.duration.daysHours' => ({required Object days, required Object hours}) => '${days} d ${hours} h',
+			'quota.duration.now' => 'now',
 			'scheduler.newLabel' => 'New',
 			'scheduler.runs' => 'Runs',
 			'scheduler.editTitle' => 'Edit schedule',
@@ -16075,6 +17780,15 @@ extension on Translations {
 			'scheduler.session' => ({required Object id}) => 'session ${id}',
 			'scheduler.cronHint' => 'Cron (min hour day month weekday) — e.g. 0 9 * * *',
 			'scheduler.promptHint' => 'Prompt for the agent',
+			'scheduler.runStatus.fired' => 'fired',
+			'scheduler.runStatus.skipped' => 'skipped',
+			'scheduler.runStatus.failed' => 'failed',
+			'scheduler.runStatus.completed' => 'completed',
+			'scheduler.cronErrors.fieldCount' => ({required Object got}) => 'Expected 5 fields, got ${got}',
+			'scheduler.cronErrors.fieldError' => ({required Object index, required Object error}) => 'Field ${index}: ${error}',
+			'scheduler.cronErrors.empty' => 'empty',
+			'scheduler.cronErrors.invalidPart' => ({required Object part}) => 'invalid "${part}"',
+			'scheduler.cronErrors.invalidValue' => ({required Object value}) => 'invalid value "${value}"',
 			'serverConnect.subtitle' => 'Connect to your DDAgent server',
 			'serverConnect.enterUrl' => 'Enter a server URL',
 			'serverConnect.connectionFailed' => ({required Object error}) => 'Connection failed (${error})',
@@ -16094,6 +17808,21 @@ extension on Translations {
 			'serverConnect.local.connect' => 'Use this server',
 			'serverConnect.local.error' => ({required Object error}) => 'Local server error: ${error}',
 			'serverConnect.local.or' => 'or connect to a remote server',
+			'serverConnect.local.errors.releaseTagUnresolved' => 'Could not resolve the latest DDAgent release tag.',
+			'serverConnect.local.errors.unsupportedPlatform' => 'Local server is not supported on this platform.',
+			'serverConnect.local.errors.unsupportedPlatformDetail' => ({required Object platform}) => 'Local server is not supported on this platform (${platform}).',
+			'serverConnect.local.errors.nodeExtractionFailed' => ({required Object path}) => 'Node.js extraction did not produce ${path}',
+			'serverConnect.local.errors.downloadFailed' => ({required Object error}) => 'Server download failed: ${error}',
+			'serverConnect.local.errors.installFailed' => ({required Object error}) => 'Server install failed: ${error}',
+			'serverConnect.local.errors.bundleNotInstalled' => 'Server bundle is not installed.',
+			'serverConnect.local.errors.spawnFailed' => ({required Object error}) => 'Failed to spawn the local server: ${error}',
+			'serverConnect.local.errors.portInUse' => ({required Object port}) => 'Port ${port} is already in use by another application.',
+			'serverConnect.local.errors.exitedDuringStartup' => 'Local server exited during startup.',
+			'serverConnect.local.errors.exitedDuringStartupWithOutput' => ({required Object output}) => 'Local server exited during startup: ${output}',
+			'serverConnect.local.errors.startTimeout' => 'Timed out waiting for the local server to start.',
+			'serverConnect.local.errors.tarFailed' => ({required Object command, required Object code, required Object output}) => '${command} failed (exit ${code}): ${output}',
+			'serverConnect.httpStatus' => ({required Object code}) => 'HTTP ${code}',
+			'serverConnect.networkError' => 'Network error',
 			'sessions.noSessions' => 'No sessions',
 			'sessions.noRecentSessions' => 'No recent sessions',
 			'sessions.archivedSessions' => 'Archived sessions',
@@ -16127,6 +17856,7 @@ extension on Translations {
 			'sessions.activity.pushingBranch' => 'Pushing branch',
 			'sessions.activity.fetchingUrl' => ({required Object url}) => 'Fetching ${url}',
 			'sessions.activity.searching' => ({required Object query}) => 'Searching “${query}”',
+			'sessions.autoMini' => 'Auto (mini)',
 			'sharedContext.title' => 'Shared Notes',
 			'skills.moveSkill' => ({required Object name}) => 'Move ${name}',
 			'skills.deleteSkill' => ({required Object name}) => 'Delete ${name}',
@@ -16188,6 +17918,7 @@ extension on Translations {
 			'skills.errors.folderSizeLimit' => 'Selected skill folders must be smaller than 30 MB in total.',
 			'skills.errors.missingSkillFile' => 'The selected folder does not contain a SKILL.md file.',
 			'skills.errors.couldNotReadSkillFile' => ({required Object name}) => 'Could not read SKILL.md from ${name}.',
+			'skills.providerShared' => 'Shared',
 			'terminal.tabs.shellName' => ({required Object index}) => 'Shell ${index}',
 			'terminal.tabs.plainShell' => 'Plain Shell',
 			'terminal.tabs.claudeCli' => 'Claude CLI',
@@ -16197,6 +17928,7 @@ extension on Translations {
 			'terminal.tabs.cursorCli' => 'Cursor CLI',
 			'terminal.tabs.devinCli' => 'Devin CLI',
 			'terminal.tabs.loginTitle' => ({required Object provider}) => 'Login: ${provider}',
+			'terminal.tabs.runTitle' => ({required Object command}) => 'Run: ${command}',
 			'terminal.actions.newTab' => 'New Terminal Tab',
 			'terminal.actions.providerLogin' => 'Provider Login',
 			'terminal.actions.restartSession' => 'Restart Session',
@@ -16204,6 +17936,7 @@ extension on Translations {
 			'terminal.actions.newShell' => 'New Shell',
 			'terminal.actions.connect' => 'Connect',
 			'terminal.authUrl.openInBrowser' => 'Open in browser',
+			'terminal.authUrl.linkLabel' => ({required Object url}) => 'Auth link: ${url}',
 			'terminal.fileLink.detected' => ({required Object path}) => 'File detected: ${path}',
 			'terminal.shortcuts.interrupt' => 'Interrupt (SIGINT)',
 			'terminal.shortcuts.eof' => 'EOF',
@@ -16214,6 +17947,17 @@ extension on Translations {
 			'terminal.paste.title' => 'Paste into terminal',
 			'terminal.paste.hint' => 'Ctrl+V / right-click → Paste',
 			'terminal.errors.couldNotOpenLink' => ({required Object url}) => 'Could not open link: ${url}',
+			'terminal.errors.frameError' => ({required Object message}) => '[Error] ${message}',
+			'terminal.errors.connectionError' => ({required Object message}) => '[Connection Error] ${message}',
+			'terminal.loginDialog.title' => ({required Object provider}) => '${provider} CLI Login',
+			'terminal.loginDialog.exited' => ({required Object code}) => 'Exited (${code})',
+			'terminal.loginDialog.authLinkDetected' => 'Authentication link detected',
+			'terminal.empty.title' => 'No Active Terminal',
+			'terminal.empty.description' => 'Create a new tab to begin',
+			'terminal.overlay.processExited' => 'Process exited — connect to start it again',
+			'terminal.overlay.processExitedWithCode' => ({required Object code}) => 'Process exited (code ${code}) — connect to start it again',
+			'terminal.overlay.resumeSession' => ({required Object title}) => 'Resume session ${title}',
+			'terminal.overlay.startSession' => ({required Object path}) => 'Start a new session in ${path}',
 			'voice.preview' => 'Preview',
 			'voice.settingsSaved' => 'Voice input settings saved',
 			'voice.saveFailed' => 'Failed to save STT configuration',
@@ -16222,6 +17966,8 @@ extension on Translations {
 			'workspace.searchTranscript' => 'Search transcript',
 			'workspace.previousMatch' => 'Previous match',
 			'workspace.nextMatch' => 'Next match',
+			_ => null,
+		} ?? switch (path) {
 			'workspace.closeSearch' => 'Close search',
 			'workspace.newChatProvider' => 'New chat — provider',
 			'workspace.closePane' => 'Close pane',
@@ -16235,6 +17981,23 @@ extension on Translations {
 			'workspace.maximizePane' => 'Maximize pane',
 			'workspace.restorePanes' => 'Restore panes',
 			'workspace.reviewChangedFiles' => 'Review changed files',
+			'workspace.paneTitle.chat' => 'Chat',
+			'workspace.paneTitle.browser' => 'Browser',
+			'workspace.paneTitle.terminal' => 'Terminal',
+			'workspace.paneTitle.notes' => 'Shared notes',
+			'workspace.paneTitle.editor' => 'Editor',
+			'workspace.paneTitle.git' => 'Git',
+			'workspace.addEditorPane' => 'Add editor pane',
+			'workspace.addGitPane' => 'Add git pane',
+			'workspace.unknownProjectPath' => 'Unknown project path',
+			'workspace.autoMini' => 'Auto (mini)',
+			'workspace.exportAs' => 'Export as:',
+			'workspace.exportMarkdown' => 'Markdown (.md)',
+			'workspace.exportHtml' => 'Web Page (.html)',
+			'workspace.exportPdf' => 'PDF (Print to File)',
+			'workspace.matchPosition' => ({required Object current, required Object total}) => '${current} of ${total}',
+			'workspace.launcherDescription' => 'Pick a workspace for this pane, or create a new one.',
+			'workspace.createWorkspace' => 'Create workspace',
 			'worktrees.scripts' => 'Scripts',
 			'worktrees.emptyTitle' => 'No worktrees found',
 			'worktrees.emptyDescription' => 'Create a worktree to isolate feature work or agent runs.',
@@ -16265,6 +18028,20 @@ extension on Translations {
 			'worktrees.setupHint' => 'Setup command (e.g. npm install)',
 			'worktrees.runHint' => 'Run command (e.g. npm run dev)',
 			'worktrees.portHint' => 'Run port (optional, e.g. 3000)',
+			'worktrees.unknownSha' => 'unknown',
+			'worktrees.baseBranchFallback' => 'base branch',
+			'worktrees.runtimeStatus.idle' => 'idle',
+			'worktrees.runtimeStatus.running' => 'running',
+			'worktrees.runtimeStatus.done' => 'done',
+			'worktrees.runtimeStatus.failed' => 'failed',
+			'worktrees.runtimeStatus.exited' => 'exited',
+			'browserUse.sessionStatus.ready' => 'Ready',
+			'browserUse.sessionStatus.stopped' => 'Stopped',
+			'browserUse.sessionStatus.unavailable' => 'Unavailable',
+			'orchestrator.stepFallback' => ({required Object n}) => 'Step ${n}',
+			'miniOrchestrator.taskTypes.gate' => 'Gate',
+			'miniOrchestrator.roles.thinker' => 'Thinker',
+			'miniOrchestrator.roles.worker' => 'Worker',
 			_ => null,
 		};
 	}

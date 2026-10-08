@@ -421,7 +421,7 @@ class _AddSkillDialogState extends State<AddSkillDialog> {
         AppButton(
           variant: AppButtonVariant.ghost,
           onPressed: _submitting ? null : () => Navigator.of(context).pop(false),
-          child: Text(t.chat.orchestrator.summary.cancelTasks),
+          child: Text(t.common.buttons.cancel),
         ),
         AppButton(
           size: AppButtonSize.sm,

@@ -180,9 +180,9 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
                       ListTile(
                         title: Text(
                           p == 'orchestrator'
-                              ? 'Auto (orchestrator)'
+                              ? Translations.of(ctx).sessions.autoOrchestrator
                               : p == 'mini-orchestrator'
-                              ? 'Auto (mini)'
+                              ? Translations.of(ctx).workspace.autoMini
                               : p,
                         ),
                         onTap: () => Navigator.of(ctx).pop(p),
@@ -291,9 +291,9 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
                         variant: AppButtonVariant.ghost,
                         size: AppButtonSize.sm,
                         onPressed: widget.onCancel,
-                        child: const Text(
-                          'Cancel',
-                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                        child: Text(
+                          i18n.common.buttons.cancel,
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
                         ),
                       ),
                     ),
@@ -354,6 +354,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
   }
 
   Widget _sessionList(AppColors c, List<Session> sessions, bool loading, SessionsController ctrl) {
+    final i18n = Translations.of(context);
     final hasQuery = _query.trim().isNotEmpty;
     // Port of resolvedCurrentProjectId (splitSessionUtils.ts): the pane's
     // project wins when it contributes candidates; when it doesn't (fresh,
@@ -405,10 +406,10 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
             SessionListEmptyState(
               icon: hasQuery ? LucideIcons.search : LucideIcons.messageSquarePlus,
               label: loading
-                  ? 'Loading…'
+                  ? i18n.common.status.loading
                   : hasQuery
-                  ? 'No sessions match your search'
-                  : 'No other sessions available',
+                  ? i18n.chat.sessionPicker.emptySearch
+                  : i18n.chat.splitSession.noOtherSessions,
             ),
           )
         else
@@ -420,12 +421,18 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
                 // picker splits the candidates once a project is bound
                 // (groupPickerSessions + SessionPicker.tsx:707).
                 if (currentProject.isNotEmpty) ...[
-                  SessionListGroupHeading('Current project (${_currentProjectName(resolvedPid)})'),
+                  SessionListGroupHeading(
+                    i18n.chat.splitSession.currentProjectGroup(
+                      name: _currentProjectName(resolvedPid),
+                    ),
+                  ),
                   for (final s in currentProject) _sessionRow(c, s, ctrl),
                 ],
                 if (otherProjects.isNotEmpty) ...[
                   SessionListGroupHeading(
-                    currentProject.isEmpty ? 'Recent sessions' : 'Other projects',
+                    currentProject.isEmpty
+                        ? i18n.chat.splitSession.recentSessionsGroup
+                        : i18n.chat.splitSession.otherProjectsGroup,
                   ),
                   for (final s in otherProjects) _sessionRow(c, s, ctrl),
                 ],
@@ -525,7 +532,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
               child: Column(
                 children: [
                   Text(
-                    'Could not load archived sessions',
+                    i18n.chat.sessionPicker.archivedError,
                     style: TextStyle(fontSize: 12, color: c.destructive),
                   ),
                   const SizedBox(height: 8),
@@ -676,7 +683,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 6),
               child: Text(
-                'Workspace archived — restore it to see its sessions.',
+                i18n.chat.sessionPicker.archivedProjectOnly,
                 style: TextStyle(fontSize: 10, color: c.mutedForeground),
               ),
             )
@@ -794,10 +801,8 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
     final ok = await AppDialog.confirm(
       context,
       title: i18n.common.browserUse.deleteSession,
-      message:
-          'Removes "${s.displayTitle}" and its transcript. '
-          'This cannot be undone.',
-      confirmLabel: 'Delete',
+      message: i18n.sessions.deleteSessionMessage(name: s.displayTitle),
+      confirmLabel: i18n.common.buttons.delete,
     );
     if (!ok) return;
     try {

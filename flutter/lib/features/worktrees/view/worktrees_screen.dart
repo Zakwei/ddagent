@@ -296,7 +296,9 @@ class _WorktreeCard extends StatelessWidget {
     final branchName =
         worktree.branch ??
         (worktree.isDetached
-            ? i18n.worktrees.headDetachedAt(sha: worktree.headSha?.substring(0, 7) ?? 'unknown')
+            ? i18n.worktrees.headDetachedAt(
+                sha: worktree.headSha?.substring(0, 7) ?? i18n.worktrees.unknownSha,
+              )
             : i18n.common.gitPanel.worktrees.detached);
 
     final runStatus = runtime?.run.status ?? 'idle';
@@ -434,7 +436,7 @@ class _WorktreeCard extends StatelessWidget {
                         Text(i18n.worktrees.setupLabel, style: t.labelSmall),
                         _badge(
                           context,
-                          runtime!.setup.status,
+                          _statusLabel(i18n, runtime!.setup.status),
                           runtime!.setup.status == 'done'
                               ? Colors.green
                               : runtime!.setup.status == 'failed'
@@ -460,7 +462,7 @@ class _WorktreeCard extends StatelessWidget {
                             ? (runtime!.run.port != null
                                   ? i18n.worktrees.runRunningWithPort(port: runtime!.run.port!)
                                   : i18n.worktrees.runRunning)
-                            : runStatus,
+                            : _statusLabel(i18n, runStatus),
                         style: t.labelSmall?.copyWith(
                           color: isRunRunning ? Colors.green : c.mutedForeground,
                         ),
@@ -483,6 +485,16 @@ class _WorktreeCard extends StatelessWidget {
       ),
     );
   }
+
+  /// Localized label for a setup/run runtime status; unknown values stay raw.
+  static String _statusLabel(Translations i18n, String status) => switch (status) {
+    'idle' => i18n.worktrees.runtimeStatus.idle,
+    'running' => i18n.worktrees.runtimeStatus.running,
+    'done' => i18n.worktrees.runtimeStatus.done,
+    'failed' => i18n.worktrees.runtimeStatus.failed,
+    'exited' => i18n.worktrees.runtimeStatus.exited,
+    _ => status,
+  };
 
   Widget _badge(BuildContext context, String label, Color color) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
@@ -634,7 +646,7 @@ class _MergeWorktreeDialogState extends State<_MergeWorktreeDialog> {
     super.initState();
     _msgCtrl = TextEditingController(
       text: t.common.gitPanel.mergeWorktree.mergeMessage(
-        branch: widget.worktree.branch ?? 'worktree',
+        branch: widget.worktree.branch ?? t.scheduler.worktree,
       ),
     );
   }
@@ -668,7 +680,9 @@ class _MergeWorktreeDialogState extends State<_MergeWorktreeDialog> {
     final i18n = Translations.of(context);
 
     return AlertDialog(
-      title: Text(i18n.worktrees.mergeTitle(branch: widget.worktree.branch ?? 'worktree')),
+      title: Text(
+        i18n.worktrees.mergeTitle(branch: widget.worktree.branch ?? i18n.scheduler.worktree),
+      ),
       content: SizedBox(
         width: 400,
         child: Column(
@@ -676,7 +690,9 @@ class _MergeWorktreeDialogState extends State<_MergeWorktreeDialog> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              i18n.worktrees.mergeDescription(branch: widget.baseBranch ?? 'base branch'),
+              i18n.worktrees.mergeDescription(
+                branch: widget.baseBranch ?? i18n.worktrees.baseBranchFallback,
+              ),
               style: t.bodyMedium?.copyWith(color: c.mutedForeground),
             ),
             const SizedBox(height: AppSpacing.sm),
@@ -692,10 +708,10 @@ class _MergeWorktreeDialogState extends State<_MergeWorktreeDialog> {
                   _squash = v ?? false;
                   _msgCtrl.text = _squash
                       ? i18n.common.gitPanel.mergeWorktree.squashMessage(
-                          branch: widget.worktree.branch ?? 'worktree',
+                          branch: widget.worktree.branch ?? i18n.scheduler.worktree,
                         )
                       : i18n.common.gitPanel.mergeWorktree.mergeMessage(
-                          branch: widget.worktree.branch ?? 'worktree',
+                          branch: widget.worktree.branch ?? i18n.scheduler.worktree,
                         );
                 });
               },

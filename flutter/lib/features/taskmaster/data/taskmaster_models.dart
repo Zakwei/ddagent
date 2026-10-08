@@ -2,6 +2,8 @@
 /// evolve per taskmaster version, so decoders are defensive and keep `raw`.
 library;
 
+import 'package:ddagent_app/i18n/strings.g.dart';
+
 String _str(Object? v) => v?.toString() ?? '';
 
 class TaskmasterTask {
@@ -41,7 +43,7 @@ class TaskmasterTask {
 
   static TaskmasterTask fromJson(Map<String, dynamic> json) => TaskmasterTask(
     id: json['id'] as Object? ?? '',
-    title: _str(json['title']).isEmpty ? 'Untitled Task' : _str(json['title']),
+    title: _str(json['title']).isEmpty ? t.tasks.taskmaster.untitledTask : _str(json['title']),
     description: _str(json['description']),
     status: _str(json['status']).isEmpty ? 'pending' : _str(json['status']),
     priority: _str(json['priority']).isEmpty ? 'medium' : _str(json['priority']),

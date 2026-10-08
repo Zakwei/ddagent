@@ -140,6 +140,7 @@ class _FileViewerPaneState extends ConsumerState<FileViewerPane> {
   }
 
   Future<void> _save() async {
+    final t = Translations.of(context);
     setState(() => _saving = true);
     try {
       await ref
@@ -152,7 +153,7 @@ class _FileViewerPaneState extends ConsumerState<FileViewerPane> {
         _saving = false;
         _dirty = false;
       });
-      AppToast.show(context, 'Saved');
+      AppToast.show(context, t.common.messages.savedSuccessfully);
     } on AppError catch (e) {
       if (mounted) {
         setState(() => _saving = false);
@@ -188,7 +189,7 @@ class _FileViewerPaneState extends ConsumerState<FileViewerPane> {
               icon: const Icon(Icons.copy_outlined, size: 18),
               onPressed: () {
                 Clipboard.setData(ClipboardData(text: _content.text));
-                AppToast.show(context, 'Copied');
+                AppToast.show(context, t.chat.codeBlock.copied);
               },
             ),
             IconButton(

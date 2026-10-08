@@ -1,3 +1,4 @@
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 
 /// Status colours for the Control Center — colour encodes status only, never
@@ -54,10 +55,10 @@ String formatCost(num value) {
 String formatDuration(num? seconds) {
   if (seconds == null || seconds <= 0) return '—';
   final minutes = (seconds / 60).round();
-  if (minutes < 60) return '$minutes min';
+  if (minutes < 60) return t.quota.duration.minutes(minutes: minutes);
   final hours = minutes ~/ 60;
-  if (hours < 24) return '$hours h ${minutes % 60} min';
-  return '${hours ~/ 24} d ${hours % 24} h';
+  if (hours < 24) return t.quota.duration.hoursMinutes(hours: hours, minutes: minutes % 60);
+  return t.quota.duration.daysHours(days: hours ~/ 24, hours: hours % 24);
 }
 
 String formatRelativeTo(String? iso) {
@@ -78,7 +79,7 @@ String formatAgo(String? iso) {
   final at = DateTime.tryParse(iso);
   if (at == null) return '—';
   final secs = (DateTime.now().millisecondsSinceEpoch - at.millisecondsSinceEpoch) / 1000;
-  return secs <= 0 ? 'now' : formatDuration(secs);
+  return secs <= 0 ? t.quota.duration.now : formatDuration(secs);
 }
 
 /// Absolute clock time — the old header renders `Updated 10:33:02`.
