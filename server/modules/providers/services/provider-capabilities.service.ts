@@ -25,6 +25,8 @@ type ProviderCapabilities = {
   supportsTokenUsage: boolean;
   /** Whether the provider runtime can accept model-level reasoning effort. */
   supportsEffort: boolean;
+  /** Whether a permission-mode change reaches a running turn (otherwise it applies from the next message). */
+  supportsLivePermissionMode: boolean;
 };
 
 /**
@@ -44,10 +46,12 @@ const PROVIDER_CAPABILITIES: Record<LLMProvider, ProviderCapabilities> = {
     supportsPermissionRequests: true,
     supportsTokenUsage: true,
     supportsEffort: true,
+    supportsLivePermissionMode: true,
   },
   cursor: {
     provider: 'cursor',
-    permissionModes: ['default', 'acceptEdits', 'bypassPermissions', 'plan'],
+    // cursor-agent print mode has no edits-only switch: only -f (bypass) and --mode plan exist.
+    permissionModes: ['default', 'bypassPermissions', 'plan'],
     defaultPermissionMode: 'default',
     supportsImages: true,
     supportsFiles: true,
@@ -55,6 +59,7 @@ const PROVIDER_CAPABILITIES: Record<LLMProvider, ProviderCapabilities> = {
     supportsPermissionRequests: false,
     supportsTokenUsage: false,
     supportsEffort: false,
+    supportsLivePermissionMode: false,
   },
   antigravity: {
     provider: 'antigravity',
@@ -71,6 +76,7 @@ const PROVIDER_CAPABILITIES: Record<LLMProvider, ProviderCapabilities> = {
     supportsPermissionRequests: false,
     supportsTokenUsage: true,
     supportsEffort: true,
+    supportsLivePermissionMode: false,
   },
   commandcode: {
     provider: 'commandcode',
@@ -86,6 +92,7 @@ const PROVIDER_CAPABILITIES: Record<LLMProvider, ProviderCapabilities> = {
     supportsPermissionRequests: true,
     supportsTokenUsage: true,
     supportsEffort: true,
+    supportsLivePermissionMode: true,
   },
   codex: {
     provider: 'codex',
@@ -97,6 +104,7 @@ const PROVIDER_CAPABILITIES: Record<LLMProvider, ProviderCapabilities> = {
     supportsPermissionRequests: false,
     supportsTokenUsage: true,
     supportsEffort: true,
+    supportsLivePermissionMode: false,
   },
   devin: {
     provider: 'devin',
@@ -108,6 +116,7 @@ const PROVIDER_CAPABILITIES: Record<LLMProvider, ProviderCapabilities> = {
     supportsPermissionRequests: true,
     supportsTokenUsage: true,
     supportsEffort: true,
+    supportsLivePermissionMode: true,
   },
   opencode: {
     provider: 'opencode',
@@ -124,6 +133,7 @@ const PROVIDER_CAPABILITIES: Record<LLMProvider, ProviderCapabilities> = {
     supportsPermissionRequests: true,
     supportsTokenUsage: true,
     supportsEffort: true,
+    supportsLivePermissionMode: true,
   },
 };
 
