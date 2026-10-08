@@ -1516,7 +1516,13 @@
       "restarting": "正在重新啟動… 伺服器恢復後頁面將自動重新整理。",
       "restartFailed": "重新啟動失敗",
       "unsupported": "僅當伺服器在服務管理員下執行時才可重新啟動。",
-      "ok": "確定"
+      "ok": "確定",
+      "restartTitle": "正在重新啟動伺服器",
+      "restartRequesting": "正在要求伺服器重新啟動…",
+      "restartWaiting": "正在等待伺服器恢復…（{{seconds}} 秒）",
+      "restartBack": "伺服器已恢復 — 版本 {{version}}。",
+      "restartReloading": "正在重新載入頁面…",
+      "restartTimeout": "伺服器未在 {{seconds}} 秒內恢復。請檢查服務記錄檔（/tmp/ddagent.log）或手動重新啟動。"
     },
     "updates": {
       "title": "應用程式更新",

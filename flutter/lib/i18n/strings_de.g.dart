@@ -2207,6 +2207,12 @@ class Translations$settings$server$de extends Translations$settings$server$en {
 	@override String get restartFailed => 'Neustart fehlgeschlagen';
 	@override String get unsupported => 'Neustart ist nur verfügbar, wenn der Server unter dem Dienst-Manager läuft.';
 	@override String get ok => 'OK';
+	@override String get restartTitle => 'Server wird neu gestartet';
+	@override String get restartRequesting => 'Server wird zum Neustart aufgefordert…';
+	@override String restartWaiting({required Object seconds}) => 'Warte, bis der Server wieder da ist… (${seconds} s)';
+	@override String restartBack({required Object version}) => 'Der Server läuft wieder — Version ${version}.';
+	@override String get restartReloading => 'Seite wird neu geladen…';
+	@override String restartTimeout({required Object seconds}) => 'Der Server ist nicht innerhalb von ${seconds} s zurückgekehrt. Prüfe das Dienstprotokoll (/tmp/ddagent.log) oder starte ihn manuell neu.';
 }
 
 // Path: settings.updates
@@ -8155,6 +8161,12 @@ extension on TranslationsDe {
 			'settings.server.restartFailed' => 'Neustart fehlgeschlagen',
 			'settings.server.unsupported' => 'Neustart ist nur verfügbar, wenn der Server unter dem Dienst-Manager läuft.',
 			'settings.server.ok' => 'OK',
+			'settings.server.restartTitle' => 'Server wird neu gestartet',
+			'settings.server.restartRequesting' => 'Server wird zum Neustart aufgefordert…',
+			'settings.server.restartWaiting' => ({required Object seconds}) => 'Warte, bis der Server wieder da ist… (${seconds} s)',
+			'settings.server.restartBack' => ({required Object version}) => 'Der Server läuft wieder — Version ${version}.',
+			'settings.server.restartReloading' => 'Seite wird neu geladen…',
+			'settings.server.restartTimeout' => ({required Object seconds}) => 'Der Server ist nicht innerhalb von ${seconds} s zurückgekehrt. Prüfe das Dienstprotokoll (/tmp/ddagent.log) oder starte ihn manuell neu.',
 			'settings.updates.title' => 'App-Updates',
 			'settings.updates.description' => 'Auf GitHub nach einer neueren Desktop-Version suchen. Neue Versionen werden automatisch heruntergeladen und beim Beenden installiert.',
 			'settings.updates.check' => 'Nach Updates suchen',
@@ -8527,14 +8539,14 @@ extension on TranslationsDe {
 			'settings.permissions.permissionMode.title' => 'Berechtigungsmodus',
 			'settings.permissions.permissionMode.description' => ({required Object provider}) => 'Standard-Berechtigungsmodus für neue ${provider}-Sitzungen. Du kannst ihn für eine einzelne Sitzung noch überschreiben.',
 			'settings.permissions.permissionMode.modes.kDefault.title' => 'Standard',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.kDefault.description' => 'Aktionen, die eine Berechtigung benötigen, werden dir im Chat zur Genehmigung gezeigt.',
 			'settings.permissions.permissionMode.modes.auto.title' => 'Auto-Modus',
 			'settings.permissions.permissionMode.modes.auto.description' => 'Ein Modell-Klassifizierer entscheidet pro Tool-Aufruf, ob genehmigt oder abgelehnt wird. Hohe Autonomie.',
 			'settings.permissions.permissionMode.modes.acceptEdits.title' => 'Bearbeitungen akzeptieren',
 			'settings.permissions.permissionMode.modes.acceptEdits.description' => 'Dateibearbeitungen werden automatisch genehmigt; andere Aktionen fragen weiterhin nach deiner Zustimmung.',
 			'settings.permissions.permissionMode.modes.bypassPermissions.title' => 'Berechtigungen umgehen',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.bypassPermissions.description' => 'Jede Aktion wird automatisch genehmigt — voller Zugriff ohne Nachfragen. Mit Vorsicht verwenden.',
 			'settings.permissions.permissionMode.modes.plan.title' => 'Plan',
 			'settings.permissions.permissionMode.modes.plan.description' => 'Planungsmodus: Der Agent erkundet und plant, ohne Befehle auszuführen.',
@@ -9041,14 +9053,14 @@ extension on TranslationsDe {
 			'tasks.taskDetail.implDetails' => 'Implementierungsdetails',
 			'tasks.taskDetail.noDependencies' => 'Keine Abhängigkeiten',
 			'tasks.taskDetail.noDescription' => 'Keine Beschreibung vorhanden',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.priority' => 'Priorität',
 			'tasks.taskDetail.priorityNotSet' => 'Nicht gesetzt',
 			'tasks.taskDetail.save' => 'Speichern',
 			'tasks.taskDetail.status' => 'Status',
 			'tasks.taskDetail.statusFailed' => 'Aufgabenstatus konnte nicht aktualisiert werden',
 			'tasks.taskDetail.taskId' => ({required Object id}) => 'Aufgabe ${id}',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'Aufgabe ${id}: ${title}',
 			'tasks.taskDetail.testStrategy' => 'Teststrategie',
 			'tasks.taskDetail.titleRequired' => 'Titel ist erforderlich',

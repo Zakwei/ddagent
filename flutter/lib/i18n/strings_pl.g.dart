@@ -2275,6 +2275,12 @@ class Translations$settings$server$pl extends Translations$settings$server$en {
 	@override String get restartFailed => 'Restart nie powiódł się';
 	@override String get unsupported => 'Restart jest dostępny tylko, gdy serwer działa pod menedżerem usług.';
 	@override String get ok => 'OK';
+	@override String get restartTitle => 'Restart serwera';
+	@override String get restartRequesting => 'Wysyłam do serwera polecenie restartu…';
+	@override String restartWaiting({required Object seconds}) => 'Czekam, aż serwer wróci… (${seconds} s)';
+	@override String restartBack({required Object version}) => 'Serwer działa — wersja ${version}.';
+	@override String get restartReloading => 'Przeładowuję stronę…';
+	@override String restartTimeout({required Object seconds}) => 'Serwer nie wrócił w ciągu ${seconds} s. Sprawdź log usługi (/tmp/ddagent.log) albo zrestartuj go ręcznie.';
 }
 
 // Path: settings.updates
@@ -8683,6 +8689,12 @@ extension on TranslationsPl {
 			'settings.server.restartFailed' => 'Restart nie powiódł się',
 			'settings.server.unsupported' => 'Restart jest dostępny tylko, gdy serwer działa pod menedżerem usług.',
 			'settings.server.ok' => 'OK',
+			'settings.server.restartTitle' => 'Restart serwera',
+			'settings.server.restartRequesting' => 'Wysyłam do serwera polecenie restartu…',
+			'settings.server.restartWaiting' => ({required Object seconds}) => 'Czekam, aż serwer wróci… (${seconds} s)',
+			'settings.server.restartBack' => ({required Object version}) => 'Serwer działa — wersja ${version}.',
+			'settings.server.restartReloading' => 'Przeładowuję stronę…',
+			'settings.server.restartTimeout' => ({required Object seconds}) => 'Serwer nie wrócił w ciągu ${seconds} s. Sprawdź log usługi (/tmp/ddagent.log) albo zrestartuj go ręcznie.',
 			'settings.updates.title' => 'Aktualizacje aplikacji',
 			'settings.updates.description' => 'Sprawdź GitHub w poszukiwaniu nowszej wersji desktopowej. Nowe wersje pobierają się automatycznie i instalują przy zamknięciu.',
 			'settings.updates.descriptionMobile' => 'Sprawdź GitHub w poszukiwaniu nowszej wersji tej aplikacji. Aktualizację instaluje instalator systemowy urządzenia.',
@@ -8951,14 +8963,14 @@ extension on TranslationsPl {
 			'settings.saveStatus.saving' => 'Zapisywanie...',
 			'settings.footerActions.save' => 'Zapisz ustawienia',
 			'settings.footerActions.cancel' => 'Anuluj',
+			_ => null,
+		} ?? switch (path) {
 			'settings.git.title' => 'Konfiguracja Git',
 			'settings.git.description' => 'Skonfiguruj swoją tożsamość Git do commitów. Te ustawienia zostaną zastosowane globalnie przez git config --global',
 			'settings.git.name.label' => 'Nazwa Git',
 			'settings.git.name.help' => 'Twoja nazwa do commitów Git',
 			'settings.git.name.placeholder' => 'John Doe',
 			'settings.git.email.label' => 'E-mail Git',
-			_ => null,
-		} ?? switch (path) {
 			'settings.git.email.help' => 'Twój e-mail do commitów Git',
 			'settings.git.email.placeholder' => 'john@example.com',
 			'settings.git.actions.save' => 'Zapisz konfigurację',
@@ -9465,14 +9477,14 @@ extension on TranslationsPl {
 			'tasks.notConfigured.writePrdFirst' => 'Najpierw napisz PRD',
 			'tasks.gettingStarted.title' => 'Pierwsze kroki z TaskMaster',
 			'tasks.gettingStarted.subtitle' => 'TaskMaster został zainicjowany! Oto co zrobić dalej:',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.gettingStarted.steps.createPRD.title' => 'Utwórz dokument wymagań produktu (PRD)',
 			'tasks.gettingStarted.steps.createPRD.description' => 'Omów swój pomysł na projekt i utwórz PRD opisujące, co chcesz zbudować.',
 			'tasks.gettingStarted.steps.createPRD.addButton' => 'Dodaj PRD',
 			'tasks.gettingStarted.steps.createPRD.existingPRDs' => 'Istniejące PRD:',
 			'tasks.gettingStarted.steps.generateTasks.title' => 'Generuj zadania z PRD',
 			'tasks.gettingStarted.steps.generateTasks.description' => 'Gdy masz już PRD, poproś asystenta AI o jego przetworzenie, a TaskMaster automatycznie podzieli je na łatwe w realizacji zadania ze szczegółami implementacji.',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.gettingStarted.steps.analyzeTasks.title' => 'Analizuj i rozwijaj zadania',
 			'tasks.gettingStarted.steps.analyzeTasks.description' => 'Poproś asystenta AI o analizę złożoności zadań i rozwinięcie ich w szczegółowe podzadania, aby ułatwić implementację.',
 			'tasks.gettingStarted.steps.startBuilding.title' => 'Zacznij budować',
@@ -9979,14 +9991,14 @@ extension on TranslationsPl {
 			'serverConnect.local.title' => 'To urządzenie',
 			'serverConnect.local.subtitle' => 'Uruchom serwer ddagent na tym komputerze',
 			'serverConnect.local.install' => 'Zainstaluj serwer lokalny',
+			_ => null,
+		} ?? switch (path) {
 			'serverConnect.local.start' => 'Uruchom serwer lokalny',
 			'serverConnect.local.stop' => 'Zatrzymaj',
 			'serverConnect.local.starting' => 'Uruchamianie serwera lokalnego…',
 			'serverConnect.local.downloading' => ({required Object percent}) => 'Pobieranie serwera… ${percent}%',
 			'serverConnect.local.installing' => 'Instalowanie…',
 			'serverConnect.local.running' => ({required Object url}) => 'Działa pod adresem ${url}',
-			_ => null,
-		} ?? switch (path) {
 			'serverConnect.local.installed' => ({required Object version}) => 'Zainstalowany (v${version})',
 			'serverConnect.local.connect' => 'Użyj tego serwera',
 			'serverConnect.local.error' => ({required Object error}) => 'Błąd serwera lokalnego: ${error}',

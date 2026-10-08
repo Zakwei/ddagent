@@ -1517,7 +1517,13 @@
       "restarting": "Reiniciando… la página se recargará cuando el servidor vuelva.",
       "restartFailed": "El reinicio falló",
       "unsupported": "El reinicio solo está disponible cuando el servidor se ejecuta bajo el gestor de servicios.",
-      "ok": "OK"
+      "ok": "OK",
+      "restartTitle": "Reiniciando el servidor",
+      "restartRequesting": "Pidiendo al servidor que se reinicie…",
+      "restartWaiting": "Esperando a que el servidor vuelva… ({{seconds}} s)",
+      "restartBack": "El servidor ha vuelto — versión {{version}}.",
+      "restartReloading": "Recargando la página…",
+      "restartTimeout": "El servidor no ha vuelto en {{seconds}} s. Revisa el registro del servicio (/tmp/ddagent.log) o reinícialo manualmente."
     },
     "updates": {
       "title": "Actualizaciones de la app",

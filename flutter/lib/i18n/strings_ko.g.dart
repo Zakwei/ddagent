@@ -2206,6 +2206,12 @@ class Translations$settings$server$ko extends Translations$settings$server$en {
 	@override String get restartFailed => '재시작 실패';
 	@override String get unsupported => '서버가 서비스 매니저로 실행 중일 때만 재시작할 수 있습니다.';
 	@override String get ok => '확인';
+	@override String get restartTitle => '서버 재시작 중';
+	@override String get restartRequesting => '서버에 재시작을 요청하는 중…';
+	@override String restartWaiting({required Object seconds}) => '서버가 다시 켜지기를 기다리는 중… (${seconds}초)';
+	@override String restartBack({required Object version}) => '서버가 다시 실행되었습니다 — 버전 ${version}.';
+	@override String get restartReloading => '페이지를 새로 고치는 중…';
+	@override String restartTimeout({required Object seconds}) => '${seconds}초 안에 서버가 돌아오지 않았습니다. 서비스 로그(/tmp/ddagent.log)를 확인하거나 직접 재시작하세요.';
 }
 
 // Path: settings.updates
@@ -8154,6 +8160,12 @@ extension on TranslationsKo {
 			'settings.server.restartFailed' => '재시작 실패',
 			'settings.server.unsupported' => '서버가 서비스 매니저로 실행 중일 때만 재시작할 수 있습니다.',
 			'settings.server.ok' => '확인',
+			'settings.server.restartTitle' => '서버 재시작 중',
+			'settings.server.restartRequesting' => '서버에 재시작을 요청하는 중…',
+			'settings.server.restartWaiting' => ({required Object seconds}) => '서버가 다시 켜지기를 기다리는 중… (${seconds}초)',
+			'settings.server.restartBack' => ({required Object version}) => '서버가 다시 실행되었습니다 — 버전 ${version}.',
+			'settings.server.restartReloading' => '페이지를 새로 고치는 중…',
+			'settings.server.restartTimeout' => ({required Object seconds}) => '${seconds}초 안에 서버가 돌아오지 않았습니다. 서비스 로그(/tmp/ddagent.log)를 확인하거나 직접 재시작하세요.',
 			'settings.updates.title' => '앱 업데이트',
 			'settings.updates.description' => 'GitHub에서 더 최신 데스크톱 빌드를 확인합니다. 새 버전은 자동으로 다운로드되어 종료 시 설치됩니다.',
 			'settings.updates.check' => '업데이트 확인',
@@ -8526,14 +8538,14 @@ extension on TranslationsKo {
 			'settings.permissions.permissionMode.title' => '권한 모드',
 			'settings.permissions.permissionMode.description' => ({required Object provider}) => '새 ${provider} 세션의 기본 권한 모드. 개별 세션에서 재정의할 수 있습니다.',
 			'settings.permissions.permissionMode.modes.kDefault.title' => '기본',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.kDefault.description' => '권한이 필요한 작업은 채팅에서 승인을 위해 표시됩니다.',
 			'settings.permissions.permissionMode.modes.auto.title' => '자동 모드',
 			'settings.permissions.permissionMode.modes.auto.description' => '모델 분류기가 도구 호출마다 승인 또는 거부를 결정합니다. 높은 자율성.',
 			'settings.permissions.permissionMode.modes.acceptEdits.title' => '편집 허용',
 			'settings.permissions.permissionMode.modes.acceptEdits.description' => '파일 편집은 자동 승인됩니다. 다른 작업은 계속 승인을 요청합니다.',
 			'settings.permissions.permissionMode.modes.bypassPermissions.title' => '권한 우회',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.bypassPermissions.description' => '모든 작업이 자동 승인됩니다 — 확인 없는 전체 접근. 주의해서 사용하세요.',
 			'settings.permissions.permissionMode.modes.plan.title' => '계획',
 			'settings.permissions.permissionMode.modes.plan.description' => '계획 모드: 에이전트가 명령을 실행하지 않고 탐색하고 계획합니다.',
@@ -9040,14 +9052,14 @@ extension on TranslationsKo {
 			'tasks.taskDetail.implDetails' => '구현 세부 정보',
 			'tasks.taskDetail.noDependencies' => '종속성 없음',
 			'tasks.taskDetail.noDescription' => '설명 없음',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.priority' => '우선순위',
 			'tasks.taskDetail.priorityNotSet' => '설정되지 않음',
 			'tasks.taskDetail.save' => '저장',
 			'tasks.taskDetail.status' => '상태',
 			'tasks.taskDetail.statusFailed' => '작업 상태 업데이트 실패',
 			'tasks.taskDetail.taskId' => ({required Object id}) => '작업 ${id}',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => '작업 ${id}: ${title}',
 			'tasks.taskDetail.testStrategy' => '테스트 전략',
 			'tasks.taskDetail.titleRequired' => '제목은 필수입니다',

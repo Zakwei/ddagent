@@ -1516,7 +1516,13 @@
       "restarting": "再起動中… サーバーが戻り次第、ページを再読み込みします。",
       "restartFailed": "再起動に失敗しました",
       "unsupported": "再起動は、サーバーがサービスマネージャー管理下で動作している場合のみ利用できます。",
-      "ok": "OK"
+      "ok": "OK",
+      "restartTitle": "サーバーを再起動しています",
+      "restartRequesting": "サーバーに再起動を要求しています…",
+      "restartWaiting": "サーバーの復帰を待っています…（{{seconds}} 秒）",
+      "restartBack": "サーバーが復帰しました — バージョン {{version}}。",
+      "restartReloading": "ページを再読み込みしています…",
+      "restartTimeout": "{{seconds}} 秒以内にサーバーが復帰しませんでした。サービスのログ（/tmp/ddagent.log）を確認するか、手動で再起動してください。"
     },
     "updates": {
       "title": "アプリの更新",

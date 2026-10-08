@@ -2207,6 +2207,12 @@ class Translations$settings$server$es extends Translations$settings$server$en {
 	@override String get restartFailed => 'El reinicio falló';
 	@override String get unsupported => 'El reinicio solo está disponible cuando el servidor se ejecuta bajo el gestor de servicios.';
 	@override String get ok => 'OK';
+	@override String get restartTitle => 'Reiniciando el servidor';
+	@override String get restartRequesting => 'Pidiendo al servidor que se reinicie…';
+	@override String restartWaiting({required Object seconds}) => 'Esperando a que el servidor vuelva… (${seconds} s)';
+	@override String restartBack({required Object version}) => 'El servidor ha vuelto — versión ${version}.';
+	@override String get restartReloading => 'Recargando la página…';
+	@override String restartTimeout({required Object seconds}) => 'El servidor no ha vuelto en ${seconds} s. Revisa el registro del servicio (/tmp/ddagent.log) o reinícialo manualmente.';
 }
 
 // Path: settings.updates
@@ -8155,6 +8161,12 @@ extension on TranslationsEs {
 			'settings.server.restartFailed' => 'El reinicio falló',
 			'settings.server.unsupported' => 'El reinicio solo está disponible cuando el servidor se ejecuta bajo el gestor de servicios.',
 			'settings.server.ok' => 'OK',
+			'settings.server.restartTitle' => 'Reiniciando el servidor',
+			'settings.server.restartRequesting' => 'Pidiendo al servidor que se reinicie…',
+			'settings.server.restartWaiting' => ({required Object seconds}) => 'Esperando a que el servidor vuelva… (${seconds} s)',
+			'settings.server.restartBack' => ({required Object version}) => 'El servidor ha vuelto — versión ${version}.',
+			'settings.server.restartReloading' => 'Recargando la página…',
+			'settings.server.restartTimeout' => ({required Object seconds}) => 'El servidor no ha vuelto en ${seconds} s. Revisa el registro del servicio (/tmp/ddagent.log) o reinícialo manualmente.',
 			'settings.updates.title' => 'Actualizaciones de la app',
 			'settings.updates.description' => 'Busca en GitHub una versión de escritorio más reciente. Las nuevas versiones se descargan automáticamente y se instalan al salir.',
 			'settings.updates.check' => 'Buscar actualizaciones',
@@ -8527,14 +8539,14 @@ extension on TranslationsEs {
 			'settings.permissions.permissionMode.title' => 'Modo de permisos',
 			'settings.permissions.permissionMode.description' => ({required Object provider}) => 'Modo de permiso predeterminado para nuevas sesiones de ${provider}. Aún puedes anularlo para una sesión individual.',
 			'settings.permissions.permissionMode.modes.kDefault.title' => 'Por defecto',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.kDefault.description' => 'Las acciones que necesitan permiso se te muestran para aprobación en el chat.',
 			'settings.permissions.permissionMode.modes.auto.title' => 'Modo automático',
 			'settings.permissions.permissionMode.modes.auto.description' => 'Un clasificador del modelo decide en cada llamada si aprobar o denegar. Sin intervención, pero más seguro que Omitir — las denegaciones siguen ocurriendo.',
 			'settings.permissions.permissionMode.modes.acceptEdits.title' => 'Aceptar ediciones',
 			'settings.permissions.permissionMode.modes.acceptEdits.description' => 'Las ediciones de archivos se aprueban automáticamente; otras acciones siguen pidiendo tu aprobación.',
 			'settings.permissions.permissionMode.modes.bypassPermissions.title' => 'Omitir permisos',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.bypassPermissions.description' => 'Cada acción se aprueba automáticamente — acceso total sin avisos. Úsalo con precaución.',
 			'settings.permissions.permissionMode.modes.plan.title' => 'Plan',
 			'settings.permissions.permissionMode.modes.plan.description' => 'Modo planificación: el agente explora y planifica sin ejecutar comandos.',
@@ -9041,14 +9053,14 @@ extension on TranslationsEs {
 			'tasks.taskDetail.implDetails' => 'Detalles de implementación',
 			'tasks.taskDetail.noDependencies' => 'Sin dependencias',
 			'tasks.taskDetail.noDescription' => 'Sin descripción',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.priority' => 'Prioridad',
 			'tasks.taskDetail.priorityNotSet' => 'No definida',
 			'tasks.taskDetail.save' => 'Guardar',
 			'tasks.taskDetail.status' => 'Estado',
 			'tasks.taskDetail.statusFailed' => 'No se pudo actualizar el estado de la tarea',
 			'tasks.taskDetail.taskId' => ({required Object id}) => 'Tarea ${id}',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'Tarea ${id}: ${title}',
 			'tasks.taskDetail.testStrategy' => 'Estrategia de pruebas',
 			'tasks.taskDetail.titleRequired' => 'El título es obligatorio',

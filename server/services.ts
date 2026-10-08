@@ -56,6 +56,9 @@ import { closeAllBrowserViewSessions } from './modules/browser-view/index.js';
 import { initializeDatabase, sessionsDb } from './modules/database/index.js';
 import { configureWebPush, startTelegramPoller, stopTelegramPoller } from './modules/notifications/index.js';
 
+// Start time of this server process, reported by /health.
+const PROCESS_STARTED_AT = new Date(Date.now() - process.uptime() * 1000).toISOString();
+
 /**
  * Overrides accepted by the services composition root.
  *
@@ -262,7 +265,10 @@ export async function createServices(options: CreateServicesOptions = {}): Promi
             status: 'ok',
             timestamp: new Date().toISOString(),
             installMode,
-            version: runningVersion
+            version: runningVersion,
+            // When this process started — changes on every restart, so a client
+            // waiting out a restart can tell the new process from the old one.
+            startedAt: PROCESS_STARTED_AT
         });
     });
 

@@ -740,12 +740,9 @@ class _UpdateCheckBlockState extends ConsumerState<_UpdateCheckBlock> {
   }
 }
 
-enum _RestartStatus { restarting, back, unsupported, failed }
-
-/// "Server" — port of `RestartSection.tsx`: confirm → `POST
-/// /api/system/restart` → poll `/health` until the process is back (the web
-/// reloads the page; here we re-read the health provider so the version
-/// badge refreshes).
+/// "Server" — port of `RestartSection.tsx`: confirm, then a blocking progress
+/// dialog ([_RestartProgressDialog]) asks the server to restart and waits
+/// until a new process answers `/health`.
 class _RestartBlock extends ConsumerStatefulWidget {
   const _RestartBlock();
 
@@ -754,9 +751,6 @@ class _RestartBlock extends ConsumerStatefulWidget {
 }
 
 class _RestartBlockState extends ConsumerState<_RestartBlock> {
-  static const _pollInterval = Duration(seconds: 1);
-  static const _timeout = Duration(seconds: 60);
-
   Future<void> _confirmAndRestart() async {
     final t = Translations.of(context).settings.server;
     final confirmed = await AppDialog.confirm(
@@ -766,70 +760,13 @@ class _RestartBlockState extends ConsumerState<_RestartBlock> {
       confirmLabel: t.restart,
     );
     if (!confirmed || !mounted) return;
-
-    var status = _RestartStatus.restarting;
-    String? detail;
-
-    try {
-      final restarting = await ref.read(systemRepositoryProvider).restart();
-      if (!restarting) status = _RestartStatus.unsupported;
-    } on Object catch (e) {
-      // The process exits right after responding — a transport error after a
-      // successful hand-off is expected; only a fast failure is fatal.
-      detail = e.toString();
-    }
-
-    if (!mounted) return;
-    if (status == _RestartStatus.unsupported) {
-      unawaited(_showResultDialog(_RestartStatus.unsupported, null));
-      return;
-    }
-
-    // Poll /health until the watchdog brings the process back.
-    final startedAt = DateTime.now();
-    var back = false;
-    while (DateTime.now().difference(startedAt) < _timeout) {
-      await Future<void>.delayed(_pollInterval);
-      try {
-        await ref.read(systemRepositoryProvider).health();
-        if (DateTime.now().difference(startedAt).inMilliseconds > 1500) {
-          back = true;
-          break;
-        }
-      } on Object {
-        // Server down mid-restart — keep polling until the deadline.
-      }
-      if (!mounted) return;
-    }
-    if (!mounted) return;
-    if (back) {
-      // Reload the web tab so the client re-bootstraps against the new process
-      // (the copy promises it, and the web original reloaded here). Desktop and
-      // mobile have no page to reload, so refresh the health state instead.
-      if (reloadClient()) return;
-      ref.invalidate(serverHealthProvider);
-      unawaited(_showResultDialog(_RestartStatus.back, null));
-    } else {
-      unawaited(_showResultDialog(_RestartStatus.failed, detail));
-    }
-  }
-
-  Future<void> _showResultDialog(_RestartStatus status, String? detail) {
-    final t = Translations.of(context).settings.server;
-    return AppDialog.show<void>(
-      context,
-      title: switch (status) {
-        _RestartStatus.back => t.restart,
-        _RestartStatus.unsupported => t.restart,
-        _ => t.restartFailed,
-      },
-      content: Text(switch (status) {
-        _RestartStatus.back => 'Server is back — health check responded after the restart.',
-        _RestartStatus.unsupported => t.unsupported,
-        _ => detail ?? t.restartFailed,
-      }),
-      actions: [AppButton(onPressed: () => AppDialog.pop(context), child: Text(t.ok))],
+    final back = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const _RestartProgressDialog(),
     );
+    // Desktop and mobile have no page to reload — refresh the version badge.
+    if (back == true && mounted) ref.invalidate(serverHealthProvider);
   }
 
   @override
@@ -867,6 +804,143 @@ class _RestartBlockState extends ConsumerState<_RestartBlock> {
           ),
         ),
       ],
+    );
+  }
+}
+
+enum _RestartPhase { requesting, waiting, back, unsupported, timedOut }
+
+/// Restart progress, from the request until a new server process answers.
+///
+/// "Back" means `/health` reports a different `startedAt` than before the
+/// restart — the old process can still answer for a moment after accepting
+/// the request. Servers without `startedAt` count as back once they were
+/// seen down and answer again. Pops `true` when the server came back.
+class _RestartProgressDialog extends ConsumerStatefulWidget {
+  const _RestartProgressDialog();
+
+  @override
+  ConsumerState<_RestartProgressDialog> createState() => _RestartProgressDialogState();
+}
+
+class _RestartProgressDialogState extends ConsumerState<_RestartProgressDialog> {
+  static const _pollInterval = Duration(seconds: 1);
+  // The watchdog waits 5 s before relaunching, then the server boots.
+  static const _timeout = Duration(seconds: 120);
+  // Long enough to read the result before the web tab reloads.
+  static const _reloadDelay = Duration(milliseconds: 1500);
+
+  var _phase = _RestartPhase.requesting;
+  var _elapsed = 0;
+  String? _version;
+  Timer? _ticker;
+
+  @override
+  void initState() {
+    super.initState();
+    unawaited(_run());
+  }
+
+  @override
+  void dispose() {
+    _ticker?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _run() async {
+    final repo = ref.read(systemRepositoryProvider);
+    String? before;
+    try {
+      before = (await repo.health())['startedAt']?.toString();
+    } on Object {
+      // Unknown start time — fall back to "seen down, then up".
+    }
+    try {
+      if (!await repo.restart()) {
+        _set(_RestartPhase.unsupported);
+        return;
+      }
+    } on Object {
+      // The process exits right after answering; a dropped connection here
+      // usually means the restart is already under way. The wait decides.
+    }
+    if (!mounted) return;
+    _set(_RestartPhase.waiting);
+    final startedAt = DateTime.now();
+    _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted) setState(() => _elapsed = DateTime.now().difference(startedAt).inSeconds);
+    });
+
+    var seenDown = false;
+    while (DateTime.now().difference(startedAt) < _timeout) {
+      await Future<void>.delayed(_pollInterval);
+      if (!mounted) return;
+      try {
+        final health = await repo.health();
+        final now = health['startedAt']?.toString();
+        final isNewProcess = now != null && before != null ? now != before : seenDown;
+        if (isNewProcess) {
+          _version = health['version']?.toString();
+          _ticker?.cancel();
+          _set(_RestartPhase.back);
+          await Future<void>.delayed(_reloadDelay);
+          if (!mounted) return;
+          // The web tab re-bootstraps against the new process; native clients
+          // close the dialog and refresh their health state.
+          if (!reloadClient()) Navigator.of(context).pop(true);
+          return;
+        }
+      } on Object {
+        seenDown = true;
+      }
+    }
+    _ticker?.cancel();
+    _set(_RestartPhase.timedOut);
+  }
+
+  void _set(_RestartPhase phase) {
+    if (mounted) setState(() => _phase = phase);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Translations.of(context).settings.server;
+    final c = context.appColors;
+    final done = switch (_phase) {
+      _RestartPhase.unsupported || _RestartPhase.timedOut => true,
+      _ => false,
+    };
+    final message = switch (_phase) {
+      _RestartPhase.requesting => t.restartRequesting,
+      _RestartPhase.waiting => t.restartWaiting(seconds: _elapsed),
+      _RestartPhase.back =>
+        '${t.restartBack(version: _version ?? '?')}${kIsWeb ? '\n${t.restartReloading}' : ''}',
+      _RestartPhase.unsupported => t.unsupported,
+      _RestartPhase.timedOut => t.restartTimeout(seconds: _timeout.inSeconds),
+    };
+    return PopScope(
+      canPop: done,
+      child: AppDialog(
+        title: done && _phase == _RestartPhase.timedOut ? t.restartFailed : t.restartTitle,
+        content: Row(
+          spacing: AppSpacing.md,
+          children: [
+            switch (_phase) {
+              _RestartPhase.back => const Icon(LucideIcons.circleCheck, color: Colors.green),
+              _RestartPhase.unsupported ||
+              _RestartPhase.timedOut => Icon(LucideIcons.circleAlert, color: c.destructive),
+              _ => const SizedBox.square(
+                dimension: 18,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            },
+            Expanded(child: Text(message)),
+          ],
+        ),
+        actions: [
+          if (done) AppButton(onPressed: () => Navigator.of(context).pop(false), child: Text(t.ok)),
+        ],
+      ),
     );
   }
 }

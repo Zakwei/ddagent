@@ -1650,7 +1650,13 @@
       "restarting": "Restartowanie… strona przeładuje się, gdy serwer wróci.",
       "restartFailed": "Restart nie powiódł się",
       "unsupported": "Restart jest dostępny tylko, gdy serwer działa pod menedżerem usług.",
-      "ok": "OK"
+      "ok": "OK",
+      "restartTitle": "Restart serwera",
+      "restartRequesting": "Wysyłam do serwera polecenie restartu…",
+      "restartWaiting": "Czekam, aż serwer wróci… ({{seconds}} s)",
+      "restartBack": "Serwer działa — wersja {{version}}.",
+      "restartReloading": "Przeładowuję stronę…",
+      "restartTimeout": "Serwer nie wrócił w ciągu {{seconds}} s. Sprawdź log usługi (/tmp/ddagent.log) albo zrestartuj go ręcznie."
     },
     "updates": {
       "title": "Aktualizacje aplikacji",

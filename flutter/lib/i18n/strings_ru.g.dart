@@ -2209,6 +2209,12 @@ class Translations$settings$server$ru extends Translations$settings$server$en {
 	@override String get restartFailed => 'Перезапуск не удался';
 	@override String get unsupported => 'Перезапуск доступен только когда сервер работает под менеджером служб.';
 	@override String get ok => 'OK';
+	@override String get restartTitle => 'Перезапуск сервера';
+	@override String get restartRequesting => 'Отправляю серверу команду перезапуска…';
+	@override String restartWaiting({required Object seconds}) => 'Жду, пока сервер вернётся… (${seconds} с)';
+	@override String restartBack({required Object version}) => 'Сервер снова работает — версия ${version}.';
+	@override String get restartReloading => 'Перезагружаю страницу…';
+	@override String restartTimeout({required Object seconds}) => 'Сервер не вернулся за ${seconds} с. Проверьте журнал службы (/tmp/ddagent.log) или перезапустите её вручную.';
 }
 
 // Path: settings.updates
@@ -8163,6 +8169,12 @@ extension on TranslationsRu {
 			'settings.server.restartFailed' => 'Перезапуск не удался',
 			'settings.server.unsupported' => 'Перезапуск доступен только когда сервер работает под менеджером служб.',
 			'settings.server.ok' => 'OK',
+			'settings.server.restartTitle' => 'Перезапуск сервера',
+			'settings.server.restartRequesting' => 'Отправляю серверу команду перезапуска…',
+			'settings.server.restartWaiting' => ({required Object seconds}) => 'Жду, пока сервер вернётся… (${seconds} с)',
+			'settings.server.restartBack' => ({required Object version}) => 'Сервер снова работает — версия ${version}.',
+			'settings.server.restartReloading' => 'Перезагружаю страницу…',
+			'settings.server.restartTimeout' => ({required Object seconds}) => 'Сервер не вернулся за ${seconds} с. Проверьте журнал службы (/tmp/ddagent.log) или перезапустите её вручную.',
 			'settings.updates.title' => 'Обновления приложения',
 			'settings.updates.description' => 'Проверить GitHub на наличие новой десктопной сборки. Новые версии скачиваются автоматически и устанавливаются при выходе.',
 			'settings.updates.check' => 'Проверить обновления',
@@ -8535,14 +8547,14 @@ extension on TranslationsRu {
 			'settings.permissions.permissionMode.title' => 'Режим разрешений',
 			'settings.permissions.permissionMode.description' => ({required Object provider}) => 'Режим разрешений по умолчанию для новых сессий ${provider}. Его всё ещё можно переопределить для отдельной сессии.',
 			'settings.permissions.permissionMode.modes.kDefault.title' => 'По умолчанию',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.kDefault.description' => 'Действия, требующие разрешения, показываются вам для одобрения в чате.',
 			'settings.permissions.permissionMode.modes.auto.title' => 'Авторежим',
 			'settings.permissions.permissionMode.modes.auto.description' => 'Классификатор модели решает для каждого вызова инструмента, одобрить или отклонить. Высокая автономность.',
 			'settings.permissions.permissionMode.modes.acceptEdits.title' => 'Принимать правки',
 			'settings.permissions.permissionMode.modes.acceptEdits.description' => 'Правки файлов одобряются автоматически; другие действия по-прежнему запрашивают одобрение.',
 			'settings.permissions.permissionMode.modes.bypassPermissions.title' => 'Обход разрешений',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.bypassPermissions.description' => 'Каждое действие одобряется автоматически — полный доступ без запросов. Используйте с осторожностью.',
 			'settings.permissions.permissionMode.modes.plan.title' => 'План',
 			'settings.permissions.permissionMode.modes.plan.description' => 'Режим планирования: агент исследует и планирует, не выполняя команд.',
@@ -9049,14 +9061,14 @@ extension on TranslationsRu {
 			'tasks.taskDetail.implDetails' => 'Детали реализации',
 			'tasks.taskDetail.noDependencies' => 'Нет зависимостей',
 			'tasks.taskDetail.noDescription' => 'Описание отсутствует',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.priority' => 'Приоритет',
 			'tasks.taskDetail.priorityNotSet' => 'Не задан',
 			'tasks.taskDetail.save' => 'Сохранить',
 			'tasks.taskDetail.status' => 'Статус',
 			'tasks.taskDetail.statusFailed' => 'Не удалось обновить статус задачи',
 			'tasks.taskDetail.taskId' => ({required Object id}) => 'Задача ${id}',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'Задача ${id}: ${title}',
 			'tasks.taskDetail.testStrategy' => 'Стратегия тестирования',
 			'tasks.taskDetail.titleRequired' => 'Название обязательно',

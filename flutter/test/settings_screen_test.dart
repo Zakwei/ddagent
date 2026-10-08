@@ -7,6 +7,7 @@ import 'package:ddagent_app/features/system/state/system_providers.dart';
 import 'package:ddagent_app/features/system/state/update_controller.dart'
     show appUpdateChannelProvider, appVersionProvider;
 import 'package:ddagent_app/i18n/strings.g.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -121,6 +122,50 @@ void main() {
     );
   });
 
+  testWidgets('restart shows progress until a new server process answers', (tester) async {
+    tester.view.physicalSize = const Size(1200, 2600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final repo = _FakeSystemRepository();
+    await tester.pumpWidget(
+      TranslationProvider(
+        child: ProviderScope(
+          overrides: [
+            releasesProvider.overrideWith((ref) async => <Release>[]),
+            serverHealthProvider.overrideWith((ref) async => {'status': 'ok', 'version': '0.0.0'}),
+            systemRepositoryProvider.overrideWithValue(repo),
+          ],
+          child: MaterialApp(
+            theme: AppTheme.light(),
+            home: const MediaQuery(
+              data: MediaQueryData(size: Size(1200, 2600)),
+              child: SettingsScreen(section: 'about'),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Restart').first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Restart').last); // confirm
+    await tester.pump();
+    await tester.pump();
+    expect(find.textContaining('Waiting for the server to come back'), findsOneWidget);
+    expect(repo.restarted, isTrue);
+
+    // Old process still up, then down twice, then the new one answers.
+    for (var i = 0; i < 4; i++) {
+      await tester.pump(const Duration(seconds: 1));
+    }
+    expect(find.text('The server is back — version 0.9.0.'), findsOneWidget);
+
+    // Native clients close the dialog on their own after a short pause.
+    await tester.pump(const Duration(seconds: 2));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('The server is back'), findsNothing);
+  });
+
   testWidgets('compact width switches the rail to pills', (tester) async {
     tester.view.physicalSize = const Size(360, 640);
     tester.view.devicePixelRatio = 1;
@@ -166,4 +211,26 @@ void main() {
     );
     expect(find.textContaining('system installer'), findsOneWidget);
   });
+}
+
+/// Health answers with the old process, fails while it is down, then reports a
+/// new `startedAt` — the sequence a watchdog restart produces.
+class _FakeSystemRepository extends SystemRepository {
+  _FakeSystemRepository() : super(Dio());
+
+  bool restarted = false;
+  int _healthCalls = 0;
+
+  @override
+  Future<bool> restart() async => restarted = true;
+
+  @override
+  Future<Map<String, dynamic>> health() async {
+    _healthCalls += 1;
+    if (!restarted || _healthCalls == 2) {
+      return {'status': 'ok', 'version': '0.8.11', 'startedAt': 'old'};
+    }
+    if (_healthCalls <= 4) throw Exception('connection refused');
+    return {'status': 'ok', 'version': '0.9.0', 'startedAt': 'new'};
+  }
 }

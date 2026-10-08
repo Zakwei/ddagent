@@ -2207,6 +2207,12 @@ class Translations$settings$server$fr extends Translations$settings$server$en {
 	@override String get restartFailed => 'Le redémarrage a échoué';
 	@override String get unsupported => 'Le redémarrage n\'est disponible que lorsque le serveur tourne sous le gestionnaire de services.';
 	@override String get ok => 'OK';
+	@override String get restartTitle => 'Redémarrage du serveur';
+	@override String get restartRequesting => 'Demande de redémarrage envoyée au serveur…';
+	@override String restartWaiting({required Object seconds}) => 'En attente du retour du serveur… (${seconds} s)';
+	@override String restartBack({required Object version}) => 'Le serveur est de retour — version ${version}.';
+	@override String get restartReloading => 'Rechargement de la page…';
+	@override String restartTimeout({required Object seconds}) => 'Le serveur n\'est pas revenu en ${seconds} s. Consultez le journal du service (/tmp/ddagent.log) ou redémarrez-le manuellement.';
 }
 
 // Path: settings.updates
@@ -8155,6 +8161,12 @@ extension on TranslationsFr {
 			'settings.server.restartFailed' => 'Le redémarrage a échoué',
 			'settings.server.unsupported' => 'Le redémarrage n\'est disponible que lorsque le serveur tourne sous le gestionnaire de services.',
 			'settings.server.ok' => 'OK',
+			'settings.server.restartTitle' => 'Redémarrage du serveur',
+			'settings.server.restartRequesting' => 'Demande de redémarrage envoyée au serveur…',
+			'settings.server.restartWaiting' => ({required Object seconds}) => 'En attente du retour du serveur… (${seconds} s)',
+			'settings.server.restartBack' => ({required Object version}) => 'Le serveur est de retour — version ${version}.',
+			'settings.server.restartReloading' => 'Rechargement de la page…',
+			'settings.server.restartTimeout' => ({required Object seconds}) => 'Le serveur n\'est pas revenu en ${seconds} s. Consultez le journal du service (/tmp/ddagent.log) ou redémarrez-le manuellement.',
 			'settings.updates.title' => 'Mises à jour de l\'app',
 			'settings.updates.description' => 'Rechercher une build de bureau plus récente sur GitHub. Les nouvelles versions se téléchargent automatiquement et s\'installent à la fermeture.',
 			'settings.updates.check' => 'Rechercher des mises à jour',
@@ -8527,14 +8539,14 @@ extension on TranslationsFr {
 			'settings.permissions.permissionMode.title' => 'Mode de permission',
 			'settings.permissions.permissionMode.description' => ({required Object provider}) => 'Mode de permission par défaut pour les nouvelles sessions ${provider}. Vous pouvez toujours le remplacer pour une session individuelle.',
 			'settings.permissions.permissionMode.modes.kDefault.title' => 'Par défaut',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.kDefault.description' => 'Les actions nécessitant une permission vous sont présentées pour approbation dans la discussion.',
 			'settings.permissions.permissionMode.modes.auto.title' => 'Mode automatique',
 			'settings.permissions.permissionMode.modes.auto.description' => 'Un classifieur de modèle décide pour chaque appel d\'outil d\'approuver ou refuser. Mode mains libres, mais plus sûr que le contournement — des refus peuvent toujours se produire.',
 			'settings.permissions.permissionMode.modes.acceptEdits.title' => 'Accepter les modifications',
 			'settings.permissions.permissionMode.modes.acceptEdits.description' => 'Les modifications de fichiers sont approuvées automatiquement ; les autres actions demandent toujours votre approbation.',
 			'settings.permissions.permissionMode.modes.bypassPermissions.title' => 'Contourner les permissions',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.bypassPermissions.description' => 'Chaque action est approuvée automatiquement — accès complet sans invites. À utiliser avec prudence.',
 			'settings.permissions.permissionMode.modes.plan.title' => 'Plan',
 			'settings.permissions.permissionMode.modes.plan.description' => 'Mode planification : l’agent explore et planifie sans exécuter de commandes.',
@@ -9041,14 +9053,14 @@ extension on TranslationsFr {
 			'tasks.taskDetail.implDetails' => 'Détails d’implémentation',
 			'tasks.taskDetail.noDependencies' => 'Aucune dépendance',
 			'tasks.taskDetail.noDescription' => 'Aucune description fournie',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.priority' => 'Priorité',
 			'tasks.taskDetail.priorityNotSet' => 'Non définie',
 			'tasks.taskDetail.save' => 'Enregistrer',
 			'tasks.taskDetail.status' => 'Statut',
 			'tasks.taskDetail.statusFailed' => 'Échec de la mise à jour du statut de la tâche',
 			'tasks.taskDetail.taskId' => ({required Object id}) => 'Tâche ${id}',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'Tâche ${id} : ${title}',
 			'tasks.taskDetail.testStrategy' => 'Stratégie de test',
 			'tasks.taskDetail.titleRequired' => 'Le titre est requis',

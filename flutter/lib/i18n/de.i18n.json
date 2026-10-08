@@ -1517,7 +1517,13 @@
       "restarting": "Neustart läuft… die Seite lädt neu, sobald der Server zurück ist.",
       "restartFailed": "Neustart fehlgeschlagen",
       "unsupported": "Neustart ist nur verfügbar, wenn der Server unter dem Dienst-Manager läuft.",
-      "ok": "OK"
+      "ok": "OK",
+      "restartTitle": "Server wird neu gestartet",
+      "restartRequesting": "Server wird zum Neustart aufgefordert…",
+      "restartWaiting": "Warte, bis der Server wieder da ist… ({{seconds}} s)",
+      "restartBack": "Der Server läuft wieder — Version {{version}}.",
+      "restartReloading": "Seite wird neu geladen…",
+      "restartTimeout": "Der Server ist nicht innerhalb von {{seconds}} s zurückgekehrt. Prüfe das Dienstprotokoll (/tmp/ddagent.log) oder starte ihn manuell neu."
     },
     "updates": {
       "title": "App-Updates",

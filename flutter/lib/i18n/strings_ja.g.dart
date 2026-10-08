@@ -2206,6 +2206,12 @@ class Translations$settings$server$ja extends Translations$settings$server$en {
 	@override String get restartFailed => '再起動に失敗しました';
 	@override String get unsupported => '再起動は、サーバーがサービスマネージャー管理下で動作している場合のみ利用できます。';
 	@override String get ok => 'OK';
+	@override String get restartTitle => 'サーバーを再起動しています';
+	@override String get restartRequesting => 'サーバーに再起動を要求しています…';
+	@override String restartWaiting({required Object seconds}) => 'サーバーの復帰を待っています…（${seconds} 秒）';
+	@override String restartBack({required Object version}) => 'サーバーが復帰しました — バージョン ${version}。';
+	@override String get restartReloading => 'ページを再読み込みしています…';
+	@override String restartTimeout({required Object seconds}) => '${seconds} 秒以内にサーバーが復帰しませんでした。サービスのログ（/tmp/ddagent.log）を確認するか、手動で再起動してください。';
 }
 
 // Path: settings.updates
@@ -8154,6 +8160,12 @@ extension on TranslationsJa {
 			'settings.server.restartFailed' => '再起動に失敗しました',
 			'settings.server.unsupported' => '再起動は、サーバーがサービスマネージャー管理下で動作している場合のみ利用できます。',
 			'settings.server.ok' => 'OK',
+			'settings.server.restartTitle' => 'サーバーを再起動しています',
+			'settings.server.restartRequesting' => 'サーバーに再起動を要求しています…',
+			'settings.server.restartWaiting' => ({required Object seconds}) => 'サーバーの復帰を待っています…（${seconds} 秒）',
+			'settings.server.restartBack' => ({required Object version}) => 'サーバーが復帰しました — バージョン ${version}。',
+			'settings.server.restartReloading' => 'ページを再読み込みしています…',
+			'settings.server.restartTimeout' => ({required Object seconds}) => '${seconds} 秒以内にサーバーが復帰しませんでした。サービスのログ（/tmp/ddagent.log）を確認するか、手動で再起動してください。',
 			'settings.updates.title' => 'アプリの更新',
 			'settings.updates.description' => 'GitHub で新しいデスクトップビルドを確認します。新しいバージョンは自動でダウンロードされ、終了時にインストールされます。',
 			'settings.updates.check' => '更新を確認',
@@ -8526,14 +8538,14 @@ extension on TranslationsJa {
 			'settings.permissions.permissionMode.title' => '権限モード',
 			'settings.permissions.permissionMode.description' => ({required Object provider}) => '新しい ${provider} セッションのデフォルト権限モード。個別のセッションで上書きできます。',
 			'settings.permissions.permissionMode.modes.kDefault.title' => 'デフォルト',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.kDefault.description' => '権限が必要なアクションはチャットで承認のために表示されます。',
 			'settings.permissions.permissionMode.modes.auto.title' => '自動モード',
 			'settings.permissions.permissionMode.modes.auto.description' => 'モデル分類器がツール呼び出しごとに承認または拒否を決定します。高い自律性。',
 			'settings.permissions.permissionMode.modes.acceptEdits.title' => '編集を許可',
 			'settings.permissions.permissionMode.modes.acceptEdits.description' => 'ファイル編集は自動承認されます。他のアクションは引き続き承認を求めます。',
 			'settings.permissions.permissionMode.modes.bypassPermissions.title' => '権限をバイパス',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.bypassPermissions.description' => 'すべてのアクションが自動承認されます — プロンプトなしの完全アクセス。注意して使用してください。',
 			'settings.permissions.permissionMode.modes.plan.title' => 'プラン',
 			'settings.permissions.permissionMode.modes.plan.description' => 'プランモード: エージェントはコマンドを実行せずに探索と計画を行います。',
@@ -9040,14 +9052,14 @@ extension on TranslationsJa {
 			'tasks.taskDetail.implDetails' => '実装の詳細',
 			'tasks.taskDetail.noDependencies' => '依存関係なし',
 			'tasks.taskDetail.noDescription' => '説明がありません',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.priority' => '優先度',
 			'tasks.taskDetail.priorityNotSet' => '未設定',
 			'tasks.taskDetail.save' => '保存',
 			'tasks.taskDetail.status' => 'ステータス',
 			'tasks.taskDetail.statusFailed' => 'タスクステータスの更新に失敗しました',
 			'tasks.taskDetail.taskId' => ({required Object id}) => 'タスク ${id}',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'タスク ${id}: ${title}',
 			'tasks.taskDetail.testStrategy' => 'テスト戦略',
 			'tasks.taskDetail.titleRequired' => 'タイトルは必須です',

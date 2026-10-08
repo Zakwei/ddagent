@@ -1516,7 +1516,13 @@
       "restarting": "Yeniden başlatılıyor… sunucu döndüğünde sayfa yenilenecek.",
       "restartFailed": "Yeniden başlatma başarısız",
       "unsupported": "Yeniden başlatma yalnızca sunucu servis yöneticisi altında çalışırken kullanılabilir.",
-      "ok": "Tamam"
+      "ok": "Tamam",
+      "restartTitle": "Sunucu yeniden başlatılıyor",
+      "restartRequesting": "Sunucudan yeniden başlaması isteniyor…",
+      "restartWaiting": "Sunucunun geri gelmesi bekleniyor… ({{seconds}} sn)",
+      "restartBack": "Sunucu yeniden çalışıyor — sürüm {{version}}.",
+      "restartReloading": "Sayfa yeniden yükleniyor…",
+      "restartTimeout": "Sunucu {{seconds}} sn içinde geri gelmedi. Hizmet günlüğünü (/tmp/ddagent.log) kontrol edin veya elle yeniden başlatın."
     },
     "updates": {
       "title": "Uygulama güncellemeleri",

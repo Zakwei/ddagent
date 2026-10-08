@@ -2206,6 +2206,12 @@ class Translations$settings$server$zh_TW extends Translations$settings$server$en
 	@override String get restartFailed => '重新啟動失敗';
 	@override String get unsupported => '僅當伺服器在服務管理員下執行時才可重新啟動。';
 	@override String get ok => '確定';
+	@override String get restartTitle => '正在重新啟動伺服器';
+	@override String get restartRequesting => '正在要求伺服器重新啟動…';
+	@override String restartWaiting({required Object seconds}) => '正在等待伺服器恢復…（${seconds} 秒）';
+	@override String restartBack({required Object version}) => '伺服器已恢復 — 版本 ${version}。';
+	@override String get restartReloading => '正在重新載入頁面…';
+	@override String restartTimeout({required Object seconds}) => '伺服器未在 ${seconds} 秒內恢復。請檢查服務記錄檔（/tmp/ddagent.log）或手動重新啟動。';
 }
 
 // Path: settings.updates
@@ -8154,6 +8160,12 @@ extension on TranslationsZhTw {
 			'settings.server.restartFailed' => '重新啟動失敗',
 			'settings.server.unsupported' => '僅當伺服器在服務管理員下執行時才可重新啟動。',
 			'settings.server.ok' => '確定',
+			'settings.server.restartTitle' => '正在重新啟動伺服器',
+			'settings.server.restartRequesting' => '正在要求伺服器重新啟動…',
+			'settings.server.restartWaiting' => ({required Object seconds}) => '正在等待伺服器恢復…（${seconds} 秒）',
+			'settings.server.restartBack' => ({required Object version}) => '伺服器已恢復 — 版本 ${version}。',
+			'settings.server.restartReloading' => '正在重新載入頁面…',
+			'settings.server.restartTimeout' => ({required Object seconds}) => '伺服器未在 ${seconds} 秒內恢復。請檢查服務記錄檔（/tmp/ddagent.log）或手動重新啟動。',
 			'settings.updates.title' => '應用程式更新',
 			'settings.updates.description' => '在 GitHub 上檢查更新的桌面版本。新版本會自動下載並在退出時安裝。',
 			'settings.updates.check' => '檢查更新',
@@ -8526,14 +8538,14 @@ extension on TranslationsZhTw {
 			'settings.permissions.permissionMode.title' => '權限模式',
 			'settings.permissions.permissionMode.description' => ({required Object provider}) => '新 ${provider} 工作階段的預設權限模式。你仍可為單一工作階段覆寫。',
 			'settings.permissions.permissionMode.modes.kDefault.title' => '預設',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.kDefault.description' => '需要權限的操作會在聊天中顯示供你核准。',
 			'settings.permissions.permissionMode.modes.auto.title' => '自動模式',
 			'settings.permissions.permissionMode.modes.auto.description' => '由模型分類器針對每次工具呼叫決定核准或拒絕。免手動操作，但比 Bypass 安全——仍可能發生拒絕。',
 			'settings.permissions.permissionMode.modes.acceptEdits.title' => '接受編輯',
 			'settings.permissions.permissionMode.modes.acceptEdits.description' => '檔案編輯自動核准；其他操作仍會請求你的核准。',
 			'settings.permissions.permissionMode.modes.bypassPermissions.title' => '略過權限',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.bypassPermissions.description' => '每個操作都自動核准 — 無提示完整存取。請謹慎使用。',
 			'settings.permissions.permissionMode.modes.plan.title' => '計畫',
 			'settings.permissions.permissionMode.modes.plan.description' => '計畫模式：代理只探索與規劃，不執行命令。',
@@ -9040,14 +9052,14 @@ extension on TranslationsZhTw {
 			'tasks.taskDetail.implDetails' => '實作細節',
 			'tasks.taskDetail.noDependencies' => '無依賴項',
 			'tasks.taskDetail.noDescription' => '無描述',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.priority' => '優先級',
 			'tasks.taskDetail.priorityNotSet' => '未設定',
 			'tasks.taskDetail.save' => '儲存',
 			'tasks.taskDetail.status' => '狀態',
 			'tasks.taskDetail.statusFailed' => '更新任務狀態失敗',
 			'tasks.taskDetail.taskId' => ({required Object id}) => '任務 ${id}',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => '任務 ${id}：${title}',
 			'tasks.taskDetail.testStrategy' => '測試策略',
 			'tasks.taskDetail.titleRequired' => '標題為必填項',

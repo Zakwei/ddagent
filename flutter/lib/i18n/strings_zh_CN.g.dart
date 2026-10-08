@@ -2206,6 +2206,12 @@ class Translations$settings$server$zh_CN extends Translations$settings$server$en
 	@override String get restartFailed => '重启失败';
 	@override String get unsupported => '仅当服务器在服务管理器下运行时才可重启。';
 	@override String get ok => '确定';
+	@override String get restartTitle => '正在重启服务器';
+	@override String get restartRequesting => '正在请求服务器重启…';
+	@override String restartWaiting({required Object seconds}) => '正在等待服务器恢复…（${seconds} 秒）';
+	@override String restartBack({required Object version}) => '服务器已恢复 — 版本 ${version}。';
+	@override String get restartReloading => '正在重新加载页面…';
+	@override String restartTimeout({required Object seconds}) => '服务器在 ${seconds} 秒内未恢复。请检查服务日志（/tmp/ddagent.log）或手动重启。';
 }
 
 // Path: settings.updates
@@ -8154,6 +8160,12 @@ extension on TranslationsZhCn {
 			'settings.server.restartFailed' => '重启失败',
 			'settings.server.unsupported' => '仅当服务器在服务管理器下运行时才可重启。',
 			'settings.server.ok' => '确定',
+			'settings.server.restartTitle' => '正在重启服务器',
+			'settings.server.restartRequesting' => '正在请求服务器重启…',
+			'settings.server.restartWaiting' => ({required Object seconds}) => '正在等待服务器恢复…（${seconds} 秒）',
+			'settings.server.restartBack' => ({required Object version}) => '服务器已恢复 — 版本 ${version}。',
+			'settings.server.restartReloading' => '正在重新加载页面…',
+			'settings.server.restartTimeout' => ({required Object seconds}) => '服务器在 ${seconds} 秒内未恢复。请检查服务日志（/tmp/ddagent.log）或手动重启。',
 			'settings.updates.title' => '应用更新',
 			'settings.updates.description' => '在 GitHub 上检查更新的桌面版本。新版本会自动下载并在退出时安装。',
 			'settings.updates.check' => '检查更新',
@@ -8526,14 +8538,14 @@ extension on TranslationsZhCn {
 			'settings.permissions.permissionMode.title' => '权限模式',
 			'settings.permissions.permissionMode.description' => ({required Object provider}) => '新 ${provider} 会话的默认权限模式。你仍可为单个会话覆盖。',
 			'settings.permissions.permissionMode.modes.kDefault.title' => '默认',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.kDefault.description' => '需要权限的操作会在聊天中显示供你批准。',
 			'settings.permissions.permissionMode.modes.auto.title' => '自动模式',
 			'settings.permissions.permissionMode.modes.auto.description' => '模型分类器决定每个工具调用是批准还是拒绝。高自主性。',
 			'settings.permissions.permissionMode.modes.acceptEdits.title' => '接受编辑',
 			'settings.permissions.permissionMode.modes.acceptEdits.description' => '文件编辑自动批准；其他操作仍会请求你的批准。',
 			'settings.permissions.permissionMode.modes.bypassPermissions.title' => '绕过权限',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.bypassPermissions.description' => '每个操作都自动批准 — 无提示完全访问。请谨慎使用。',
 			'settings.permissions.permissionMode.modes.plan.title' => '计划',
 			'settings.permissions.permissionMode.modes.plan.description' => '计划模式：代理只探索和规划，不执行命令。',
@@ -9040,14 +9052,14 @@ extension on TranslationsZhCn {
 			'tasks.taskDetail.implDetails' => '实现细节',
 			'tasks.taskDetail.noDependencies' => '无依赖项',
 			'tasks.taskDetail.noDescription' => '无描述',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.priority' => '优先级',
 			'tasks.taskDetail.priorityNotSet' => '未设置',
 			'tasks.taskDetail.save' => '保存',
 			'tasks.taskDetail.status' => '状态',
 			'tasks.taskDetail.statusFailed' => '更新任务状态失败',
 			'tasks.taskDetail.taskId' => ({required Object id}) => '任务 ${id}',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => '任务 ${id}：${title}',
 			'tasks.taskDetail.testStrategy' => '测试策略',
 			'tasks.taskDetail.titleRequired' => '标题为必填项',

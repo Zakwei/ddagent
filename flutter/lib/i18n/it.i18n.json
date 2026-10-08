@@ -1517,7 +1517,13 @@
       "restarting": "Riavvio in corso… la pagina si ricaricherà quando il server torna.",
       "restartFailed": "Riavvio non riuscito",
       "unsupported": "Il riavvio è disponibile solo quando il server è gestito dal service manager.",
-      "ok": "OK"
+      "ok": "OK",
+      "restartTitle": "Riavvio del server",
+      "restartRequesting": "Richiesta di riavvio inviata al server…",
+      "restartWaiting": "In attesa che il server torni disponibile… ({{seconds}} s)",
+      "restartBack": "Il server è di nuovo attivo — versione {{version}}.",
+      "restartReloading": "Ricaricamento della pagina…",
+      "restartTimeout": "Il server non è tornato entro {{seconds}} s. Controlla il log del servizio (/tmp/ddagent.log) o riavvialo manualmente."
     },
     "updates": {
       "title": "Aggiornamenti dell'app",

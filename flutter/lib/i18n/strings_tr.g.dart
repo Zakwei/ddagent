@@ -2206,6 +2206,12 @@ class Translations$settings$server$tr extends Translations$settings$server$en {
 	@override String get restartFailed => 'Yeniden başlatma başarısız';
 	@override String get unsupported => 'Yeniden başlatma yalnızca sunucu servis yöneticisi altında çalışırken kullanılabilir.';
 	@override String get ok => 'Tamam';
+	@override String get restartTitle => 'Sunucu yeniden başlatılıyor';
+	@override String get restartRequesting => 'Sunucudan yeniden başlaması isteniyor…';
+	@override String restartWaiting({required Object seconds}) => 'Sunucunun geri gelmesi bekleniyor… (${seconds} sn)';
+	@override String restartBack({required Object version}) => 'Sunucu yeniden çalışıyor — sürüm ${version}.';
+	@override String get restartReloading => 'Sayfa yeniden yükleniyor…';
+	@override String restartTimeout({required Object seconds}) => 'Sunucu ${seconds} sn içinde geri gelmedi. Hizmet günlüğünü (/tmp/ddagent.log) kontrol edin veya elle yeniden başlatın.';
 }
 
 // Path: settings.updates
@@ -8154,6 +8160,12 @@ extension on TranslationsTr {
 			'settings.server.restartFailed' => 'Yeniden başlatma başarısız',
 			'settings.server.unsupported' => 'Yeniden başlatma yalnızca sunucu servis yöneticisi altında çalışırken kullanılabilir.',
 			'settings.server.ok' => 'Tamam',
+			'settings.server.restartTitle' => 'Sunucu yeniden başlatılıyor',
+			'settings.server.restartRequesting' => 'Sunucudan yeniden başlaması isteniyor…',
+			'settings.server.restartWaiting' => ({required Object seconds}) => 'Sunucunun geri gelmesi bekleniyor… (${seconds} sn)',
+			'settings.server.restartBack' => ({required Object version}) => 'Sunucu yeniden çalışıyor — sürüm ${version}.',
+			'settings.server.restartReloading' => 'Sayfa yeniden yükleniyor…',
+			'settings.server.restartTimeout' => ({required Object seconds}) => 'Sunucu ${seconds} sn içinde geri gelmedi. Hizmet günlüğünü (/tmp/ddagent.log) kontrol edin veya elle yeniden başlatın.',
 			'settings.updates.title' => 'Uygulama güncellemeleri',
 			'settings.updates.description' => 'GitHub\'da daha yeni bir masaüstü sürümünü kontrol eder. Yeni sürümler otomatik indirilir ve çıkışta kurulur.',
 			'settings.updates.check' => 'Güncellemeleri denetle',
@@ -8526,14 +8538,14 @@ extension on TranslationsTr {
 			'settings.permissions.permissionMode.title' => 'İzin Modu',
 			'settings.permissions.permissionMode.description' => ({required Object provider}) => 'Yeni ${provider} oturumları için varsayılan izin modu. Tek bir oturum için yine de geçersiz kılabilirsin.',
 			'settings.permissions.permissionMode.modes.kDefault.title' => 'Varsayılan',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.kDefault.description' => 'İzin gerektiren eylemler onayın için sohbette gösterilir.',
 			'settings.permissions.permissionMode.modes.auto.title' => 'Otomatik Mod',
 			'settings.permissions.permissionMode.modes.auto.description' => 'Bir model sınıflandırıcı, her araç çağrısında onay veya ret kararı verir. Yüksek özerklik.',
 			'settings.permissions.permissionMode.modes.acceptEdits.title' => 'Düzenlemeleri Kabul Et',
 			'settings.permissions.permissionMode.modes.acceptEdits.description' => 'Dosya düzenlemeleri otomatik onaylanır; diğer eylemler yine onayını ister.',
 			'settings.permissions.permissionMode.modes.bypassPermissions.title' => 'İzinleri Atla',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.bypassPermissions.description' => 'Her eylem otomatik onaylanır — sorusuz tam erişim. Dikkatli kullan.',
 			'settings.permissions.permissionMode.modes.plan.title' => 'Plan',
 			'settings.permissions.permissionMode.modes.plan.description' => 'Planlama modu: agent komut çalıştırmadan keşfeder ve planlar.',
@@ -9040,14 +9052,14 @@ extension on TranslationsTr {
 			'tasks.taskDetail.implDetails' => 'Uygulama Ayrıntıları',
 			'tasks.taskDetail.noDependencies' => 'Bağımlılık yok',
 			'tasks.taskDetail.noDescription' => 'Açıklama yok',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.priority' => 'Öncelik',
 			'tasks.taskDetail.priorityNotSet' => 'Ayarlanmadı',
 			'tasks.taskDetail.save' => 'Kaydet',
 			'tasks.taskDetail.status' => 'Durum',
 			'tasks.taskDetail.statusFailed' => 'Görev durumu güncellenemedi',
 			'tasks.taskDetail.taskId' => ({required Object id}) => 'Görev ${id}',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'Görev ${id}: ${title}',
 			'tasks.taskDetail.testStrategy' => 'Test Stratejisi',
 			'tasks.taskDetail.titleRequired' => 'Başlık gerekli',

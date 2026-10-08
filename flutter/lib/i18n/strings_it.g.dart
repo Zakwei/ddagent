@@ -2207,6 +2207,12 @@ class Translations$settings$server$it extends Translations$settings$server$en {
 	@override String get restartFailed => 'Riavvio non riuscito';
 	@override String get unsupported => 'Il riavvio è disponibile solo quando il server è gestito dal service manager.';
 	@override String get ok => 'OK';
+	@override String get restartTitle => 'Riavvio del server';
+	@override String get restartRequesting => 'Richiesta di riavvio inviata al server…';
+	@override String restartWaiting({required Object seconds}) => 'In attesa che il server torni disponibile… (${seconds} s)';
+	@override String restartBack({required Object version}) => 'Il server è di nuovo attivo — versione ${version}.';
+	@override String get restartReloading => 'Ricaricamento della pagina…';
+	@override String restartTimeout({required Object seconds}) => 'Il server non è tornato entro ${seconds} s. Controlla il log del servizio (/tmp/ddagent.log) o riavvialo manualmente.';
 }
 
 // Path: settings.updates
@@ -8155,6 +8161,12 @@ extension on TranslationsIt {
 			'settings.server.restartFailed' => 'Riavvio non riuscito',
 			'settings.server.unsupported' => 'Il riavvio è disponibile solo quando il server è gestito dal service manager.',
 			'settings.server.ok' => 'OK',
+			'settings.server.restartTitle' => 'Riavvio del server',
+			'settings.server.restartRequesting' => 'Richiesta di riavvio inviata al server…',
+			'settings.server.restartWaiting' => ({required Object seconds}) => 'In attesa che il server torni disponibile… (${seconds} s)',
+			'settings.server.restartBack' => ({required Object version}) => 'Il server è di nuovo attivo — versione ${version}.',
+			'settings.server.restartReloading' => 'Ricaricamento della pagina…',
+			'settings.server.restartTimeout' => ({required Object seconds}) => 'Il server non è tornato entro ${seconds} s. Controlla il log del servizio (/tmp/ddagent.log) o riavvialo manualmente.',
 			'settings.updates.title' => 'Aggiornamenti dell\'app',
 			'settings.updates.description' => 'Controlla su GitHub una build desktop più recente. Le nuove versioni si scaricano automaticamente e si installano all\'uscita.',
 			'settings.updates.check' => 'Controlla aggiornamenti',
@@ -8527,14 +8539,14 @@ extension on TranslationsIt {
 			'settings.permissions.permissionMode.title' => 'Modalità permessi',
 			'settings.permissions.permissionMode.description' => ({required Object provider}) => 'Modalità di permesso predefinita per le nuove sessioni ${provider}. Puoi comunque sovrascriverla per una singola sessione.',
 			'settings.permissions.permissionMode.modes.kDefault.title' => 'Predefinito',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.kDefault.description' => 'Le azioni che richiedono un permesso ti vengono mostrate per approvazione nella chat.',
 			'settings.permissions.permissionMode.modes.auto.title' => 'Modalità automatica',
 			'settings.permissions.permissionMode.modes.auto.description' => 'Un classificatore di modello decide per ogni chiamata se approvare o negare. Alta autonomia.',
 			'settings.permissions.permissionMode.modes.acceptEdits.title' => 'Accetta modifiche',
 			'settings.permissions.permissionMode.modes.acceptEdits.description' => 'Le modifiche ai file sono approvate automaticamente; le altre azioni chiedono ancora la tua approvazione.',
 			'settings.permissions.permissionMode.modes.bypassPermissions.title' => 'Ignora permessi',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.bypassPermissions.description' => 'Ogni azione è approvata automaticamente — accesso completo senza richieste. Usa con cautela.',
 			'settings.permissions.permissionMode.modes.plan.title' => 'Piano',
 			'settings.permissions.permissionMode.modes.plan.description' => 'Modalità pianificazione: l’agente esplora e pianifica senza eseguire comandi.',
@@ -9041,14 +9053,14 @@ extension on TranslationsIt {
 			'tasks.taskDetail.implDetails' => 'Dettagli di implementazione',
 			'tasks.taskDetail.noDependencies' => 'Nessuna dipendenza',
 			'tasks.taskDetail.noDescription' => 'Nessuna descrizione fornita',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.priority' => 'Priorità',
 			'tasks.taskDetail.priorityNotSet' => 'Non impostata',
 			'tasks.taskDetail.save' => 'Salva',
 			'tasks.taskDetail.status' => 'Stato',
 			'tasks.taskDetail.statusFailed' => 'Impossibile aggiornare lo stato dell’attività',
 			'tasks.taskDetail.taskId' => ({required Object id}) => 'Attività ${id}',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'Attività ${id}: ${title}',
 			'tasks.taskDetail.testStrategy' => 'Strategia di test',
 			'tasks.taskDetail.titleRequired' => 'Il titolo è obbligatorio',

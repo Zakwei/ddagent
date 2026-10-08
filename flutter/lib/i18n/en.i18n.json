@@ -1685,7 +1685,13 @@
       "restarting": "Restarting… the page will reload when the server is back.",
       "restartFailed": "Restart failed",
       "unsupported": "Restart is only available when the server runs under the service manager.",
-      "ok": "OK"
+      "ok": "OK",
+      "restartTitle": "Restarting the server",
+      "restartRequesting": "Asking the server to restart…",
+      "restartWaiting": "Waiting for the server to come back… ({{seconds}} s)",
+      "restartBack": "The server is back — version {{version}}.",
+      "restartReloading": "Reloading the page…",
+      "restartTimeout": "The server did not come back within {{seconds}} s. Check the service log (/tmp/ddagent.log) or restart it manually."
     },
     "updates": {
       "title": "App updates",

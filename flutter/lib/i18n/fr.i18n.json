@@ -1517,7 +1517,13 @@
       "restarting": "Redémarrage… la page se rechargera quand le serveur sera de retour.",
       "restartFailed": "Le redémarrage a échoué",
       "unsupported": "Le redémarrage n'est disponible que lorsque le serveur tourne sous le gestionnaire de services.",
-      "ok": "OK"
+      "ok": "OK",
+      "restartTitle": "Redémarrage du serveur",
+      "restartRequesting": "Demande de redémarrage envoyée au serveur…",
+      "restartWaiting": "En attente du retour du serveur… ({{seconds}} s)",
+      "restartBack": "Le serveur est de retour — version {{version}}.",
+      "restartReloading": "Rechargement de la page…",
+      "restartTimeout": "Le serveur n'est pas revenu en {{seconds}} s. Consultez le journal du service (/tmp/ddagent.log) ou redémarrez-le manuellement."
     },
     "updates": {
       "title": "Mises à jour de l'app",

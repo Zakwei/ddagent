@@ -1516,7 +1516,13 @@
       "restarting": "正在重启… 服务器恢复后页面将自动刷新。",
       "restartFailed": "重启失败",
       "unsupported": "仅当服务器在服务管理器下运行时才可重启。",
-      "ok": "确定"
+      "ok": "确定",
+      "restartTitle": "正在重启服务器",
+      "restartRequesting": "正在请求服务器重启…",
+      "restartWaiting": "正在等待服务器恢复…（{{seconds}} 秒）",
+      "restartBack": "服务器已恢复 — 版本 {{version}}。",
+      "restartReloading": "正在重新加载页面…",
+      "restartTimeout": "服务器在 {{seconds}} 秒内未恢复。请检查服务日志（/tmp/ddagent.log）或手动重启。"
     },
     "updates": {
       "title": "应用更新",

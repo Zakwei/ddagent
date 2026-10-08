@@ -4090,6 +4090,24 @@ class Translations$settings$server$en {
 
 	/// en: 'OK'
 	String get ok => 'OK';
+
+	/// en: 'Restarting the server'
+	String get restartTitle => 'Restarting the server';
+
+	/// en: 'Asking the server to restart…'
+	String get restartRequesting => 'Asking the server to restart…';
+
+	/// en: 'Waiting for the server to come back… ({{seconds}} s)'
+	String restartWaiting({required Object seconds}) => 'Waiting for the server to come back… (${seconds} s)';
+
+	/// en: 'The server is back — version {{version}}.'
+	String restartBack({required Object version}) => 'The server is back — version ${version}.';
+
+	/// en: 'Reloading the page…'
+	String get restartReloading => 'Reloading the page…';
+
+	/// en: 'The server did not come back within {{seconds}} s. Check the service log (/tmp/ddagent.log) or restart it manually.'
+	String restartTimeout({required Object seconds}) => 'The server did not come back within ${seconds} s. Check the service log (/tmp/ddagent.log) or restart it manually.';
 }
 
 // Path: settings.updates
@@ -14668,6 +14686,12 @@ extension on Translations {
 			'settings.server.restartFailed' => 'Restart failed',
 			'settings.server.unsupported' => 'Restart is only available when the server runs under the service manager.',
 			'settings.server.ok' => 'OK',
+			'settings.server.restartTitle' => 'Restarting the server',
+			'settings.server.restartRequesting' => 'Asking the server to restart…',
+			'settings.server.restartWaiting' => ({required Object seconds}) => 'Waiting for the server to come back… (${seconds} s)',
+			'settings.server.restartBack' => ({required Object version}) => 'The server is back — version ${version}.',
+			'settings.server.restartReloading' => 'Reloading the page…',
+			'settings.server.restartTimeout' => ({required Object seconds}) => 'The server did not come back within ${seconds} s. Check the service log (/tmp/ddagent.log) or restart it manually.',
 			'settings.updates.title' => 'App updates',
 			'settings.updates.description' => 'Check GitHub for a newer desktop build. New versions download automatically and install when you quit.',
 			'settings.updates.descriptionMobile' => 'Check GitHub for a newer build of this app. Updates are installed by your device\'s system installer.',
@@ -14914,14 +14938,14 @@ extension on Translations {
 			'settings.notifications.webPush.testNotDelivered' => 'No device was reachable. Make sure the app is running and notifications are enabled.',
 			'settings.notifications.device.title' => 'Notify this device',
 			'settings.notifications.device.enabled' => 'Notifications are enabled for this device',
+			_ => null,
+		} ?? switch (path) {
 			'settings.notifications.desktop.title' => 'Notify this desktop app',
 			'settings.notifications.desktop.enable' => 'Enable notifications',
 			'settings.notifications.desktop.disable' => 'Disable notifications',
 			'settings.notifications.desktop.enabled' => 'Notifications are enabled for this desktop app',
 			'settings.notifications.desktop.unsupported' => 'Desktop notifications are not supported on this system.',
 			'settings.notifications.sound.title' => 'Sound',
-			_ => null,
-		} ?? switch (path) {
 			'settings.notifications.sound.description' => 'Play a short tone when a chat run finishes or needs tool approval.',
 			'settings.notifications.sound.enabled' => 'Enabled',
 			'settings.notifications.sound.test' => 'Test sound',
@@ -15428,14 +15452,14 @@ extension on Translations {
 			'sidebar.messages.createProjectFailed' => 'Failed to create project. Please try again.',
 			'sidebar.messages.createProjectError' => 'Error creating project. Please try again.',
 			'sidebar.messages.updateProjectError' => 'Error updating project. Please try again.',
+			_ => null,
+		} ?? switch (path) {
 			'sidebar.messages.refreshError' => 'Failed to refresh. Please try again.',
 			'sidebar.messages.restoreProjectFailed' => 'Failed to restore project. Please try again.',
 			'sidebar.messages.restoreProjectError' => 'Error restoring project. Please try again.',
 			'sidebar.messages.restoreSessionFailed' => 'Failed to restore session. Please try again.',
 			'sidebar.messages.restoreSessionError' => 'Error restoring session. Please try again.',
 			'sidebar.messages.bulkDeleteSessionsFailed' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: 'Failed to delete ${count} session. Please try again.', other: 'Failed to delete ${count} sessions. Please try again.', ), 
-			_ => null,
-		} ?? switch (path) {
 			'sidebar.version.updateAvailable' => 'Update available',
 			'sidebar.version.restartRequired' => 'Update installed — restart the server to apply',
 			'sidebar.version.updateNow' => 'Update now',
@@ -15942,14 +15966,14 @@ extension on Translations {
 			'mcp.form.fields.bearerTokenEnvVar' => 'Bearer Token Environment Variable',
 			'mcp.form.validation.unsupportedGlobal' => ({required Object type}) => 'Add MCP Server supports only stdio and http across all providers, not ${type}.',
 			'mcp.form.validation.unsupportedProvider' => ({required Object provider, required Object type}) => '${provider} does not support ${type} MCP servers',
+			_ => null,
+		} ?? switch (path) {
 			'notifications.deviceLabel' => 'ddagent Flutter',
 			'notifications.errors.registrationRejected' => 'Registration rejected by server',
 			'notifications.errors.noResponse' => 'No response from the server',
 			'onboarding.gitHint' => 'Used for commits created by ddagent sessions.',
 			'onboarding.completeSetup' => 'Complete Setup',
 			'onboarding.errors.nameAndEmailRequired' => 'Both git name and email are required.',
-			_ => null,
-		} ?? switch (path) {
 			'onboarding.errors.invalidEmail' => 'Please enter a valid email address.',
 			'onboarding.agents.title' => 'Connect Your AI Agents',
 			'onboarding.agents.description' => 'Login to one or more AI coding assistants. All are optional.',
