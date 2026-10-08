@@ -2094,7 +2094,12 @@ class _PermissionBanner extends ConsumerWidget {
                   if (provider == 'commandcode' || provider == 'devin') {
                     final freeText = extractQuestionFreeText(questions.first.input, updatedInput);
                     if (freeText.isNotEmpty) {
-                      notifier.answerQuestionWithText(freeText);
+                      unawaited(
+                        notifier.answerQuestionWithText(
+                          freeText,
+                          abortRun: provider != 'commandcode',
+                        ),
+                      );
                     }
                   }
                 },

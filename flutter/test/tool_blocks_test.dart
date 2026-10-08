@@ -1,4 +1,5 @@
 import 'package:ddagent_app/core/theme/app_theme.dart';
+import 'package:ddagent_app/features/chat/state/pending_permissions.dart';
 import 'package:ddagent_app/features/chat/view/tool_blocks.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
@@ -436,6 +437,62 @@ void main() {
       await tester.tap(find.text('edit lib/x.dart'));
       await tester.pump();
       expect(opened, 'lib/x.dart');
+    });
+  });
+
+  group('permission asks', () {
+    test('summary names what is approved', () {
+      expect(permissionInputSummary({'command': 'npm test', 'description': 'x'}), 'npm test');
+      expect(
+        permissionInputSummary({
+          'cmd': ['bash', '-lc', 'ls'],
+        }),
+        'bash -lc ls',
+      );
+      expect(permissionInputSummary({'file_path': '/a/b.ts', 'content': '...'}), '/a/b.ts');
+      expect(
+        permissionInputSummary({
+          'patterns': ['src/**', 'lib/**'],
+        }),
+        'src/**, lib/**',
+      );
+      expect(permissionInputSummary({'url': 'https://x.dev'}), 'https://x.dev');
+      expect(permissionInputSummary({'resolved': true}), '');
+      final long = permissionInputSummary({for (var i = 0; i < 10; i++) 'k$i': i});
+      expect(long.split('\n').length, 7);
+      expect(long.endsWith('…'), isTrue);
+    });
+
+    test('plan approval leaves plan mode; denial and other asks do not', () {
+      expect(planExitModeFor('ExitPlanMode', const {}, allow: true), 'default');
+      expect(planExitModeFor('ExitPlanMode', const {}, allow: false), isNull);
+      expect(planExitModeFor('Bash', const {}, allow: true), isNull);
+      const ask = {
+        'questions': [
+          {'question': 'Exit plan mode?', 'header': 'Exit Plan'},
+        ],
+      };
+      Map<String, dynamic> answer(String a) => {
+        'answers': {'Exit plan mode?': a},
+      };
+      expect(
+        planExitModeFor('ask', ask, allow: true, updatedInput: answer('Yes, auto-accept edits')),
+        'acceptEdits',
+      );
+      expect(planExitModeFor('ask', ask, allow: true, updatedInput: answer('Cancel')), isNull);
+    });
+
+    test('Always deny only when the agent offers reject_always', () {
+      expect(rejectAlwaysEntryOf(null), isNull);
+      expect(
+        rejectAlwaysEntryOf({
+          'options': [
+            {'kind': 'allow_once', 'name': 'Allow'},
+            {'kind': 'reject_always', 'name': 'Never allow'},
+          ],
+        }),
+        'Never allow',
+      );
     });
   });
 }

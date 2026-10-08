@@ -35,6 +35,7 @@ class SessionMessage {
     this.summary,
     this.exitCode,
     this.aborted = false,
+    this.sessionEvent = false,
     this.toolUseResult,
     this.actualSessionId,
     this.parentToolUseId,
@@ -85,6 +86,10 @@ class SessionMessage {
 
   /// `complete` of a run the user stopped.
   final bool aborted;
+
+  /// Persisted error/notice row merged into REST history by the server — not
+  /// a provider message, so it does not count toward paging offsets.
+  final bool sessionEvent;
 
   /// Structured result payload of a `tool_result` row (Claude Grep/Glob
   /// `filenames`, Agent ids) — folded into the tool card by
@@ -146,6 +151,7 @@ class SessionMessage {
     summary: summary ?? this.summary,
     exitCode: exitCode,
     aborted: aborted,
+    sessionEvent: sessionEvent,
     toolUseResult: toolUseResult,
     actualSessionId: actualSessionId,
     parentToolUseId: parentToolUseId,
@@ -198,6 +204,7 @@ class SessionMessage {
     summary: j['summary']?.toString(),
     exitCode: _int(j['exitCode']),
     aborted: j['aborted'] == true,
+    sessionEvent: j['sessionEvent'] == true,
     toolUseResult: j['toolUseResult'],
     actualSessionId: j['actualSessionId']?.toString(),
     parentToolUseId: j['parentToolUseId']?.toString(),

@@ -26,15 +26,28 @@ void main() {
     await frame('r1', 3, 'permission_request');
     await frame('r1', 4, 'background_tasks');
     await frame('r1', 5, 'text'); // anything else stays sealed
+    await frame('r1', 6, 'error'); // the run's late failure
+    await frame('r1', 7, 'status'); // plain status stays sealed
+    ws.emitFrame({
+      'sessionId': 's1',
+      'runId': 'r1',
+      'seq': 8,
+      'kind': 'status',
+      'notice': true,
+      'text': 'Rate limited',
+    });
+    await Future<void>.delayed(Duration.zero);
     // A newer run takes over; r1's late frames are now stale.
     await frame('r2', 1, 'stream_delta');
-    await frame('r1', 6, 'permission_request');
+    await frame('r1', 9, 'permission_request');
 
     expect(kinds, [
       'r1:stream_delta',
       'r1:complete',
       'r1:permission_request',
       'r1:background_tasks',
+      'r1:error',
+      'r1:status',
       'r2:stream_delta',
     ]);
     await sub.cancel();

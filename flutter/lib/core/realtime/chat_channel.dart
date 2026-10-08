@@ -63,12 +63,19 @@ MessageKind? messageKindOf(String kind) {
   return map[kind];
 }
 
-/// Protocol errors after which the run is still alive: the provider refused
-/// to interrupt, an abort named an older run, a role-gated frame, or the
-/// server says so (`runActive`).
-bool protocolErrorKeepsRun(Map<String, dynamic> raw) =>
-    raw['runActive'] == true ||
-    const {'ABORT_FAILED', 'STALE_RUN', 'FORBIDDEN_ROLE'}.contains(raw['code']);
+/// Protocol errors after which the run is still alive. Servers report it as
+/// `runActive`; older ones are judged by code (a refused interrupt, an abort
+/// aimed at an older run, a role-gated or unknown frame).
+bool protocolErrorKeepsRun(Map<String, dynamic> raw) {
+  final active = raw['runActive'];
+  if (active is bool) return active;
+  return protocolErrorIsNotice(raw) || const {'ABORT_FAILED', 'STALE_RUN'}.contains(raw['code']);
+}
+
+/// Protocol errors that answer a rejected frame (not a failed run): shown as
+/// a toast, never as a transcript error row.
+bool protocolErrorIsNotice(Map<String, dynamic> raw) =>
+    const {'FORBIDDEN_ROLE', 'UNKNOWN_MESSAGE_TYPE'}.contains(raw['code']);
 
 /// One decoded server frame. [raw] keeps every field — provider payloads are
 /// intentionally heterogeneous (NormalizedMessage has an index signature).

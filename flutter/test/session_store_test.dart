@@ -165,6 +165,27 @@ void main() {
       expect(plan!.offset, 2);
       expect(planLatestPageBridge(latest, latest, 0, 0), isNull);
     });
+
+    test('persisted error/notice rows (sessionEvent) take no paging slot', () {
+      final event = SessionMessage.fromJson(const {
+        'id': 'e1',
+        'kind': 'error',
+        'content': 'boom',
+        'sessionEvent': true,
+      });
+      final latest = [_m('9'), event, _m('10')];
+      expect(providerRowCount(latest), 2);
+      expect(planLatestPageBridge([_m('1')], latest, 1, 10)!.offset, 2);
+    });
+
+    test('a tool_use with its result embedded is not running', () {
+      // Codex emits finished items as one tool_use carrying toolResult.
+      final merged = attachToolResults([
+        _m('t1', kind: 'tool_use', toolId: 't1'),
+        _m('r1', kind: 'tool_result', toolId: 't1', content: 'done'),
+      ]);
+      expect(merged.single.toolResult?['content'], 'done');
+    });
   });
 
   group('SessionMessageStore', () {

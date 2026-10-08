@@ -344,7 +344,7 @@ class TranscriptController extends Notifier<TranscriptState> {
   Future<bool> _fetchOlder() => _withHistoryLock(() async {
     final res = await ref
         .read(sessionsRepositoryProvider)
-        .messages(_sessionId, limit: olderPageSize, offset: _serverMessages.length);
+        .messages(_sessionId, limit: olderPageSize, offset: providerRowCount(_serverMessages));
     final msgs = _parsePage(res);
     _store.prependOlderPage(_sessionId, msgs, hasMore: res['hasMore'] == true);
     return msgs.isNotEmpty;
@@ -417,7 +417,7 @@ class TranscriptController extends Notifier<TranscriptState> {
       }
       window = bridgeMerge.messages;
       oldestHasMore = bridgeRes['hasMore'] == true;
-      bridgedRows += bridgePage.length;
+      bridgedRows += providerRowCount(bridgePage);
       merged = mergeLatestServerPage(previous, window);
       if (!oldestHasMore) {
         reachedStart = true;
@@ -618,13 +618,16 @@ class TranscriptController extends Notifier<TranscriptState> {
   /// RUN_IN_PROGRESS (the server queues the text, so it showed both as an
   /// optimistic bubble and a queued card) and a send clears an abort still
   /// waiting for its runId.
-  Future<void> answerQuestionWithText(String text) async {
+  ///
+  /// [abortRun] false (Command Code): the server's `cancelled` reply already
+  /// ends the turn, so only wait for its `complete`.
+  Future<void> answerQuestionWithText(String text, {bool abortRun = true}) async {
     final value = text.trim();
     if (value.isEmpty) return;
     if (state.runStatus == 'running' || _activity.isProcessing(_sessionId)) {
       final settled = Completer<void>();
       _settleWaiters.add(settled);
-      abort();
+      if (abortRun) abort();
       // shortcut: a run that never settles (ABORT_FAILED) still gets the text
       // after 15 s — the server queues it behind the live run.
       await settled.future.timeout(const Duration(seconds: 15), onTimeout: () {});
@@ -729,7 +732,7 @@ class TranscriptController extends Notifier<TranscriptState> {
       final code = raw['code']?.toString();
       // The run outlives these: an interrupt the provider refused, an abort
       // aimed at an older run, or a role-gated frame. Say so, keep running.
-      if (protocolErrorKeepsRun(raw)) {
+      if (protocolErrorKeepsRun(raw) || protocolErrorIsNotice(raw)) {
         AppToast.global(raw['error']?.toString() ?? t.chat.transcript.requestFailed, isError: true);
         return;
       }

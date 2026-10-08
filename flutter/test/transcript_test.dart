@@ -85,6 +85,8 @@ Map<String, dynamic> _page(List<Map<String, dynamic>> msgs, {bool hasMore = fals
 };
 
 void main() {
+  // Protocol-error toasts look up the root messenger.
+  TestWidgetsFlutterBinding.ensureInitialized();
   late FakeWs ws;
   late ChatChannel channel;
   late ProviderContainer container;
@@ -250,7 +252,7 @@ void main() {
     expect(container.read(pendingPermissionsProvider).containsKey('q1'), isFalse);
   });
 
-  test('a timed-out ask records its reason and complete expires leftover asks', () async {
+  test('a timed-out ask records its reason; complete keeps asks the server still holds', () async {
     container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
     container.listen(transcriptProvider('s1'), (_, _) {});
     await pump();
@@ -289,12 +291,27 @@ void main() {
     );
     expect(rowInput('p1')['cancelReason'], 'timeout');
 
-    // Stop/run end: the server drops frames after `complete`, so the client
-    // must retire the ask itself instead of leaving an answerable card.
+    // A failed run ends, but its asks may outlive it (background subagents):
+    // complete re-subscribes instead of expiring them.
+    ws.emitState(WsState.open);
+    ws.sent.clear();
     ws.emitFrame({'kind': 'complete', 'sessionId': 's1', 'exitCode': 1});
     await pump();
+    expect(container.read(transcriptProvider('s1')).runStatus, 'error');
+    expect(container.read(pendingPermissionsProvider).containsKey('p2'), isTrue);
+    expect(ws.sent.where((f) => f['type'] == 'chat.subscribe'), isNotEmpty);
+
+    // The ack is authoritative: no longer listed → no longer answerable, and
+    // the idle ack keeps the failed status.
+    ws.emitFrame({
+      'kind': 'chat_subscribed',
+      'sessionId': 's1',
+      'isProcessing': false,
+      'pendingPermissions': const <dynamic>[],
+    });
+    await pump();
     expect(container.read(pendingPermissionsProvider).containsKey('p2'), isFalse);
-    expect(rowInput('p2')['cancelReason'], 'expired');
+    expect(container.read(transcriptProvider('s1')).runStatus, 'error');
   });
 
   test('permission_cancelled carries the picked answers to a non-answering window', () async {
@@ -346,7 +363,7 @@ void main() {
     expect(row.toolInput['answers'], {'Which scope?': 'MVP'});
   });
 
-  test('answerQuestionWithText aborts the blocked turn, then sends the text', () async {
+  test('answerQuestionWithText aborts the blocked turn, sends once it settled', () async {
     container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
     container.listen(transcriptProvider('s1'), (_, _) {});
     await pump();
@@ -359,14 +376,124 @@ void main() {
 
     // ACP providers can only echo a picked option id, so a typed question
     // answer is delivered by ending the turn and sending it as the next turn.
-    container
+    final done = container
         .read(transcriptProvider('s1').notifier)
         .answerQuestionWithText('lista do wyboru modelu');
-
-    final types = ws.sent.map((f) => f['type']).where((t) => t != 'chat.subscribe').toList();
-    expect(types, ['chat.abort', 'chat.send']);
+    await pump();
+    List<Object?> types() =>
+        ws.sent.map((f) => f['type']).where((t) => t != 'chat.subscribe').toList();
+    // No send while the aborted run is live — it would race RUN_IN_PROGRESS.
+    expect(types(), ['chat.abort']);
     expect(ws.sent.firstWhere((f) => f['type'] == 'chat.abort')['runId'], 'run-1');
+
+    ws.emitFrame({
+      'kind': 'complete',
+      'sessionId': 's1',
+      'runId': 'run-1',
+      'seq': 2,
+      'aborted': true,
+      'exitCode': 0,
+    });
+    await done;
+    expect(types(), ['chat.abort', 'chat.send']);
     expect(ws.sent.last['content'], 'lista do wyboru modelu');
+  });
+
+  test('answerQuestionWithText without abort waits for the turn the server ends', () async {
+    container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
+    container.listen(transcriptProvider('s1'), (_, _) {});
+    await pump();
+    ws.emitState(WsState.open);
+    ws.emitFrame({'kind': 'status', 'sessionId': 's1', 'runId': 'run-1', 'seq': 1});
+    await pump();
+    ws.sent.clear();
+    final done = container
+        .read(transcriptProvider('s1').notifier)
+        .answerQuestionWithText('typed', abortRun: false);
+    await pump();
+    expect(ws.sent.where((f) => f['type'] != 'chat.subscribe'), isEmpty);
+    ws.emitFrame({'kind': 'complete', 'sessionId': 's1', 'runId': 'run-1', 'seq': 2});
+    await done;
+    expect(ws.sent.last['type'], 'chat.send');
+  });
+
+  test('protocol errors: a live run survives ABORT_FAILED; runActive:false settles', () async {
+    container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
+    container.listen(transcriptProvider('s1'), (_, _) {});
+    container.listen(activityPollerProvider, (_, _) {});
+    await pump();
+    ws.emitFrame({'kind': 'status', 'sessionId': 's1'});
+    await pump();
+    ws.emitFrame({
+      'kind': 'protocol_error',
+      'sessionId': 's1',
+      'code': 'ABORT_FAILED',
+      'error': 'could not be interrupted',
+      'runActive': true,
+    });
+    await pump();
+    expect(container.read(transcriptProvider('s1')).runStatus, 'running');
+    expect(container.read(sessionActivityProvider).containsKey('s1'), isTrue);
+    expect(container.read(sessionMessagesProvider('s1')), isEmpty);
+
+    ws.emitFrame({
+      'kind': 'protocol_error',
+      'sessionId': 's1',
+      'code': 'INTERNAL_ERROR',
+      'error': 'boom',
+      'runActive': false,
+    });
+    await pump();
+    expect(container.read(transcriptProvider('s1')).runStatus, 'error');
+    expect(container.read(sessionActivityProvider).containsKey('s1'), isFalse);
+  });
+
+  test('a run the activity map drops (poll, sessionless error) settles runStatus', () async {
+    container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
+    container.listen(transcriptProvider('s1'), (_, _) {});
+    await pump();
+    container.read(transcriptProvider('s1').notifier).send('hi');
+    expect(container.read(transcriptProvider('s1')).runStatus, 'running');
+    container.read(sessionActivityProvider.notifier).markIdle('s1');
+    await pump();
+    expect(container.read(transcriptProvider('s1')).runStatus, 'done');
+  });
+
+  test('complete settles stopped / error from aborted / exitCode', () {
+    expect(runEndStatus({'aborted': true, 'exitCode': 0}), 'stopped');
+    expect(runEndStatus({'exitCode': 2}), 'error');
+    expect(runEndStatus({'exitCode': 0}), 'done');
+    expect(runEndStatus(const {}), 'done');
+  });
+
+  test('subscribe ack seeds and clears the background task count', () async {
+    container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
+    container.listen(transcriptProvider('s1'), (_, _) {});
+    await pump();
+    ws.emitFrame({'kind': 'chat_subscribed', 'sessionId': 's1', 'backgroundTasks': 2});
+    await pump();
+    expect(container.read(backgroundTasksProvider)['s1']?.count, 2);
+    ws.emitFrame({'kind': 'chat_subscribed', 'sessionId': 's1', 'backgroundTasks': 0});
+    await pump();
+    expect(container.read(backgroundTasksProvider).containsKey('s1'), isFalse);
+  });
+
+  test('notice status frames become rows without re-arming a finished run', () async {
+    container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
+    container.listen(transcriptProvider('s1'), (_, _) {});
+    container.listen(activityPollerProvider, (_, _) {});
+    await pump();
+    ws.emitFrame({
+      'kind': 'status',
+      'sessionId': 's1',
+      'notice': true,
+      'text': 'API retry 1/3',
+      'id': 'n1',
+    });
+    await pump();
+    expect(container.read(sessionMessagesProvider('s1')).single.text, 'API retry 1/3');
+    expect(container.read(sessionActivityProvider).containsKey('s1'), isFalse);
+    expect(container.read(transcriptProvider('s1')).runStatus, isNull);
   });
 
   test('activity: stream_end and error are not terminal — only complete is', () async {

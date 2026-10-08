@@ -139,9 +139,14 @@ void main() {
       .map((m) => m.content ?? '')
       .toList();
   void expectRunning(bool running) {
-    expect(container.read(transcriptProvider('s1')).runStatus, running ? 'running' : 'done');
+    // Settled = done or stopped (an aborted `complete`).
+    final settled = anyOf('done', 'stopped');
+    expect(container.read(transcriptProvider('s1')).runStatus, running ? 'running' : settled);
     expect(container.read(sessionActivityProvider).containsKey('s1'), running);
-    expect(container.read(sessionMessageStoreProvider)['s1']?.status, running ? 'running' : 'done');
+    expect(
+      container.read(sessionMessageStoreProvider)['s1']?.status,
+      running ? 'running' : settled,
+    );
   }
 
   void expectVisible(String text) {

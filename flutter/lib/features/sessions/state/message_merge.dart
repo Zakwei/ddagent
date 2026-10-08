@@ -516,6 +516,10 @@ bool olderPagePrecedesCachedHistory(List<SessionMessage> older, List<SessionMess
       : previousHasMore && oldestFetchedPageHasMore,
 );
 
+/// Rows that count toward the server's paging offsets — persisted
+/// error/notice rows (`sessionEvent`) ride along without taking a slot.
+int providerRowCount(Iterable<SessionMessage> rows) => rows.where((m) => !m.sessionEvent).length;
+
 /// Next finite bridge chunk when a turn added ≥1 page with no id overlap
 /// (Codex-style regenerated ids).
 ({int offset, int limit})? planLatestPageBridge(
@@ -529,11 +533,12 @@ bool olderPagePrecedesCachedHistory(List<SessionMessage> older, List<SessionMess
     return null;
   }
   final added = nextTotal - previousTotal;
-  final missing = (added > 0 ? added : 0) - latest.length - bridgeRowsFetched;
+  final latestRows = providerRowCount(latest);
+  final missing = (added > 0 ? added : 0) - latestRows - bridgeRowsFetched;
   final preferred = bridgeRowsFetched == 0
       ? (missing + 1 > 1 ? missing + 1 : 1)
       : sessionMessagesPageSize;
-  return (offset: latest.length + bridgeRowsFetched, limit: preferred);
+  return (offset: latestRows + bridgeRowsFetched, limit: preferred);
 }
 
 /// Content-only identity for cross-source matching — samePersistedRow minus

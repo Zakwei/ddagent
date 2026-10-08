@@ -139,7 +139,8 @@ void main() {
     await t.pump();
 
     expect(got, isNotNull);
-    expect(got!.$2['answers'], {'Which rule?': 'Inne (wpiszę), my own rule'});
+    // Single-select: the typed text is the answer, not "Inne (wpiszę), my own rule".
+    expect(got!.$2['answers'], {'Which rule?': 'my own rule'});
   });
 
   test('extractQuestionFreeText keeps only text that is not an option label', () {
