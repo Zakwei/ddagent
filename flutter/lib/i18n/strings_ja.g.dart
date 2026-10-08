@@ -56,7 +56,6 @@ class TranslationsJa extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final Translations$notifications$ja notifications = Translations$notifications$ja._(_root);
 	@override late final Translations$serverConnect$ja serverConnect = Translations$serverConnect$ja._(_root);
 	@override late final Translations$voice$ja voice = Translations$voice$ja._(_root);
-	@override late final Translations$preview$ja preview = Translations$preview$ja._(_root);
 	@override late final Translations$sharedContext$ja sharedContext = Translations$sharedContext$ja._(_root);
 	@override late final Translations$collab$ja collab = Translations$collab$ja._(_root);
 	@override late final Translations$browser$ja browser = Translations$browser$ja._(_root);
@@ -476,17 +475,6 @@ class Translations$voice$ja extends Translations$voice$en {
 	@override String get preview => 'プレビュー';
 	@override String get saveFailed => 'STT設定の保存に失敗しました';
 	@override String get settingsSaved => '音声入力設定を保存しました';
-}
-
-// Path: preview
-class Translations$preview$ja extends Translations$preview$en {
-	Translations$preview$ja._(TranslationsJa root) : this._root = root, super.internal(root);
-
-	final TranslationsJa _root; // ignore: unused_field
-
-	// Translations
-	@override String get embeddedWebOnly => '埋め込みプレビューはWebビルドでのみ利用できます';
-	@override String get startDevServerHint => '開発サーバーを起動すると（npm run dev、flutter run -d web-server…）\nそのポートがここに表示されます。';
 }
 
 // Path: sharedContext
@@ -9414,8 +9402,6 @@ extension on TranslationsJa {
 			'voice.preview' => 'プレビュー',
 			'voice.saveFailed' => 'STT設定の保存に失敗しました',
 			'voice.settingsSaved' => '音声入力設定を保存しました',
-			'preview.embeddedWebOnly' => '埋め込みプレビューはWebビルドでのみ利用できます',
-			'preview.startDevServerHint' => '開発サーバーを起動すると（npm run dev、flutter run -d web-server…）\nそのポートがここに表示されます。',
 			'sharedContext.title' => '共有ノート',
 			'collab.copyToken' => 'トークンをコピー',
 			'collab.createInvite' => '招待を作成',

@@ -56,7 +56,6 @@ class TranslationsKo extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final Translations$notifications$ko notifications = Translations$notifications$ko._(_root);
 	@override late final Translations$serverConnect$ko serverConnect = Translations$serverConnect$ko._(_root);
 	@override late final Translations$voice$ko voice = Translations$voice$ko._(_root);
-	@override late final Translations$preview$ko preview = Translations$preview$ko._(_root);
 	@override late final Translations$sharedContext$ko sharedContext = Translations$sharedContext$ko._(_root);
 	@override late final Translations$collab$ko collab = Translations$collab$ko._(_root);
 	@override late final Translations$browser$ko browser = Translations$browser$ko._(_root);
@@ -476,17 +475,6 @@ class Translations$voice$ko extends Translations$voice$en {
 	@override String get preview => '미리보기';
 	@override String get saveFailed => 'STT 설정 저장 실패';
 	@override String get settingsSaved => '음성 입력 설정이 저장되었습니다';
-}
-
-// Path: preview
-class Translations$preview$ko extends Translations$preview$en {
-	Translations$preview$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get embeddedWebOnly => '임베디드 미리보기는 웹 빌드에서 사용할 수 있습니다';
-	@override String get startDevServerHint => '개발 서버를 시작하면(npm run dev, flutter run -d web-server…) 해당 포트가 여기에 표시됩니다.';
 }
 
 // Path: sharedContext
@@ -9414,8 +9402,6 @@ extension on TranslationsKo {
 			'voice.preview' => '미리보기',
 			'voice.saveFailed' => 'STT 설정 저장 실패',
 			'voice.settingsSaved' => '음성 입력 설정이 저장되었습니다',
-			'preview.embeddedWebOnly' => '임베디드 미리보기는 웹 빌드에서 사용할 수 있습니다',
-			'preview.startDevServerHint' => '개발 서버를 시작하면(npm run dev, flutter run -d web-server…) 해당 포트가 여기에 표시됩니다.',
 			'sharedContext.title' => '공유 노트',
 			'collab.copyToken' => '토큰 복사',
 			'collab.createInvite' => '초대 만들기',

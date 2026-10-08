@@ -57,7 +57,6 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$mcp$en mcp = Translations$mcp$en.internal(_root);
 	late final Translations$notifications$en notifications = Translations$notifications$en.internal(_root);
 	late final Translations$onboarding$en onboarding = Translations$onboarding$en.internal(_root);
-	late final Translations$preview$en preview = Translations$preview$en.internal(_root);
 	late final Translations$projects$en projects = Translations$projects$en.internal(_root);
 	late final Translations$quota$en quota = Translations$quota$en.internal(_root);
 	late final Translations$scheduler$en scheduler = Translations$scheduler$en.internal(_root);
@@ -206,7 +205,6 @@ class Translations$common$en {
 	late final Translations$common$gitPanel$en gitPanel = Translations$common$gitPanel$en.internal(_root);
 	late final Translations$common$sessions$en sessions = Translations$common$sessions$en.internal(_root);
 	late final Translations$common$projects$en projects = Translations$common$projects$en.internal(_root);
-	late final Translations$common$previewPane$en previewPane = Translations$common$previewPane$en.internal(_root);
 	late final Translations$common$sharedNotes$en sharedNotes = Translations$common$sharedNotes$en.internal(_root);
 	late final Translations$common$codeBlock$en codeBlock = Translations$common$codeBlock$en.internal(_root);
 	late final Translations$common$update$en update = Translations$common$update$en.internal(_root);
@@ -576,21 +574,6 @@ class Translations$onboarding$en {
 	late final Translations$onboarding$errors$en errors = Translations$onboarding$errors$en.internal(_root);
 	late final Translations$onboarding$agents$en agents = Translations$onboarding$agents$en.internal(_root);
 	late final Translations$onboarding$mcp$en mcp = Translations$onboarding$mcp$en.internal(_root);
-}
-
-// Path: preview
-class Translations$preview$en {
-	Translations$preview$en.internal(this._root);
-
-	final Translations _root; // ignore: unused_field
-
-	// Translations
-
-	/// en: 'Embedded preview is available on the web build'
-	String get embeddedWebOnly => 'Embedded preview is available on the web build';
-
-	/// en: 'Start a dev server (npm run dev, flutter run -d web-server…) and its port appears here.'
-	String get startDevServerHint => 'Start a dev server (npm run dev, flutter run -d web-server…)\nand its port appears here.';
 }
 
 // Path: projects
@@ -3934,33 +3917,6 @@ class Translations$common$projects$en {
 
 	/// en: 'New Session'
 	String get newSession => 'New Session';
-}
-
-// Path: common.previewPane
-class Translations$common$previewPane$en {
-	Translations$common$previewPane$en.internal(this._root);
-
-	final Translations _root; // ignore: unused_field
-
-	// Translations
-
-	/// en: 'Could not load ports'
-	String get loadError => 'Could not load ports';
-
-	/// en: 'No dev servers detected'
-	String get noServers => 'No dev servers detected';
-
-	/// en: 'Open in system browser'
-	String get openExternal => 'Open in system browser';
-
-	/// en: 'Reload preview'
-	String get reload => 'Reload preview';
-
-	/// en: 'Dev server port'
-	String get selectPort => 'Dev server port';
-
-	/// en: 'Dev server preview'
-	String get title => 'Dev server preview';
 }
 
 // Path: common.sharedNotes
@@ -14717,12 +14673,6 @@ extension on Translations {
 			'common.gitPanel.worktreeScripts.runExited' => ({required Object code}) => 'run exited (${code})',
 			'common.sessions.renameSession' => 'Rename session',
 			'common.projects.newSession' => 'New Session',
-			'common.previewPane.loadError' => 'Could not load ports',
-			'common.previewPane.noServers' => 'No dev servers detected',
-			'common.previewPane.openExternal' => 'Open in system browser',
-			'common.previewPane.reload' => 'Reload preview',
-			'common.previewPane.selectPort' => 'Dev server port',
-			'common.previewPane.title' => 'Dev server preview',
 			'common.sharedNotes.subtitle' => 'Shared memory — injected into every session of this project',
 			'common.sharedNotes.save' => 'Save',
 			'common.sharedNotes.saving' => 'Saving…',
@@ -15004,14 +14954,14 @@ extension on Translations {
 			'settings.orchestration.execution.retryClasses.timeout' => 'Timeout',
 			'settings.orchestration.execution.retryClasses.transient' => 'Transient',
 			'settings.orchestration.save.unsaved' => 'Unsaved changes',
-			_ => null,
-		} ?? switch (path) {
 			'settings.orchestration.save.save' => 'Save',
 			'settings.orchestration.save.saving' => 'Saving…',
 			'settings.orchestration.save.saved' => 'Saved',
 			'settings.orchestration.save.discard' => 'Discard',
 			'settings.orchestration.save.error' => 'Save failed',
 			'settings.orchestration.save.emptyPool' => 'Add at least one candidate before saving.',
+			_ => null,
+		} ?? switch (path) {
 			'settings.notifications.title' => 'Notifications',
 			'settings.notifications.description' => 'Control which notification events you receive.',
 			'settings.notifications.webPush.title' => 'Notify this browser',
@@ -15518,14 +15468,14 @@ extension on Translations {
 			'sidebar.time.justNow' => 'Just now',
 			'sidebar.time.oneMinuteAgo' => '1 min ago',
 			'sidebar.time.minutesAgo' => ({required Object count}) => '${count} mins ago',
-			_ => null,
-		} ?? switch (path) {
 			'sidebar.time.oneHourAgo' => '1 hour ago',
 			'sidebar.time.hoursAgo' => ({required Object count}) => '${count} hours ago',
 			'sidebar.time.oneDayAgo' => '1 day ago',
 			'sidebar.time.daysAgo' => ({required Object count}) => '${count} days ago',
 			'sidebar.messages.deleteConfirm' => 'Are you sure you want to delete this?',
 			'sidebar.messages.renameSuccess' => 'Renamed successfully',
+			_ => null,
+		} ?? switch (path) {
 			'sidebar.messages.deleteSuccess' => 'Deleted successfully',
 			'sidebar.messages.errorOccurred' => 'An error occurred',
 			'sidebar.messages.deleteSessionConfirm' => 'Are you sure you want to delete this session? This action cannot be undone.',
@@ -16032,14 +15982,14 @@ extension on Translations {
 			'mcp.servers.addGlobalTitle' => 'Add Global MCP Server',
 			'mcp.servers.addGlobalDescription' => 'Adds this MCP server to every provider: Claude, Cursor, Codex, OpenCode, and Devin. Only stdio and HTTP transports are supported because the same config must work across all providers.',
 			'mcp.servers.addGlobalMenuDescription' => 'Add Global MCP Server writes one common stdio or HTTP server to Claude, Cursor, Codex, OpenCode, and Devin.',
-			_ => null,
-		} ?? switch (path) {
 			'mcp.servers.addProviderTitle' => ({required Object provider}) => 'Add ${provider} MCP Server',
 			'mcp.servers.addProviderDescription' => ({required Object provider}) => 'Add ${provider} MCP Server only changes ${provider}.',
 			'mcp.servers.config.cwd' => 'Cwd',
 			'mcp.servers.config.envVars' => 'Env Vars',
 			'mcp.team.title' => 'Team MCP Configs',
 			'mcp.team.description' => 'Share MCP server configurations across your team. Everyone stays in sync automatically.',
+			_ => null,
+		} ?? switch (path) {
 			'mcp.team.cta' => 'Available with ddagent Pro',
 			'mcp.tokens.scopeWrite' => 'Write',
 			'mcp.form.submitTo' => ({required Object provider}) => 'Add Server to ${provider}',
@@ -16073,8 +16023,6 @@ extension on Translations {
 			'onboarding.mcp.laterHint' => 'Optional — you can also install this later in Settings → MCP.',
 			'onboarding.mcp.installedOn' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: 'Installed on ${count} agent.', other: 'Installed on ${count} agents.', ), 
 			'onboarding.mcp.installedWithFailures' => ({required Object installedCount, required Object failed}) => 'Installed on ${installedCount}; failed: ${failed}',
-			'preview.embeddedWebOnly' => 'Embedded preview is available on the web build',
-			'preview.startDevServerHint' => 'Start a dev server (npm run dev, flutter run -d web-server…)\nand its port appears here.',
 			'projects.cloneRepository' => 'Clone repository',
 			'projects.repositoryCloned' => 'Repository cloned',
 			'projects.clone' => 'Clone',

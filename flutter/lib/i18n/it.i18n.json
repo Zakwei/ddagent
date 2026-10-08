@@ -3242,10 +3242,6 @@
     "saveFailed": "Impossibile salvare la configurazione STT",
     "settingsSaved": "Impostazioni di input vocale salvate"
   },
-  "preview": {
-    "embeddedWebOnly": "L'anteprima integrata è disponibile nella build web",
-    "startDevServerHint": "Avvia un server di sviluppo (npm run dev, flutter run -d web-server…)\ne la sua porta apparirà qui."
-  },
   "sharedContext": {
     "title": "Note condivise"
   },

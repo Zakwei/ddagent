@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:ddagent_app/core/realtime/chat_channel.dart';
-import 'package:ddagent_app/core/realtime/preview_ws.dart';
 import 'package:ddagent_app/core/realtime/sse_client.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -78,21 +77,6 @@ void main() {
       expect(events[0].data['scanned'], 1);
       expect(events[1].type, 'complete'); // type from data for unnamed frames
       expect(events[2].event, 'done');
-    });
-  });
-
-  group('previewTunnelUrl', () {
-    test('maps to /api/preview/<port>/<path> with token', () {
-      final uri = previewTunnelUrl(
-        baseUrl: 'https://srv:8443',
-        port: 5173,
-        upstreamPath: 'ws',
-        token: 'jwt',
-      );
-      expect(uri.toString(), 'wss://srv:8443/api/preview/5173/ws?token=jwt');
-    });
-    test('http base → ws scheme', () {
-      expect(previewTunnelUrl(baseUrl: 'http://h:10087', port: 80).scheme, 'ws');
     });
   });
 }

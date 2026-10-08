@@ -3250,10 +3250,6 @@
     "saveFailed": "Не удалось сохранить конфигурацию STT",
     "settingsSaved": "Настройки голосового ввода сохранены"
   },
-  "preview": {
-    "embeddedWebOnly": "Встроенный предпросмотр доступен в веб-сборке",
-    "startDevServerHint": "Запустите dev-сервер (npm run dev, flutter run -d web-server…),\nи его порт появится здесь."
-  },
   "sharedContext": {
     "title": "Общие заметки"
   },

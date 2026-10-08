@@ -56,7 +56,6 @@ class TranslationsPl extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final Translations$notifications$pl notifications = Translations$notifications$pl._(_root);
 	@override late final Translations$serverConnect$pl serverConnect = Translations$serverConnect$pl._(_root);
 	@override late final Translations$voice$pl voice = Translations$voice$pl._(_root);
-	@override late final Translations$preview$pl preview = Translations$preview$pl._(_root);
 	@override late final Translations$sharedContext$pl sharedContext = Translations$sharedContext$pl._(_root);
 	@override late final Translations$collab$pl collab = Translations$collab$pl._(_root);
 	@override late final Translations$browser$pl browser = Translations$browser$pl._(_root);
@@ -482,17 +481,6 @@ class Translations$voice$pl extends Translations$voice$en {
 	@override String get preview => 'Podgląd';
 	@override String get saveFailed => 'Nie udało się zapisać konfiguracji STT';
 	@override String get settingsSaved => 'Zapisano ustawienia wprowadzania głosowego';
-}
-
-// Path: preview
-class Translations$preview$pl extends Translations$preview$en {
-	Translations$preview$pl._(TranslationsPl root) : this._root = root, super.internal(root);
-
-	final TranslationsPl _root; // ignore: unused_field
-
-	// Translations
-	@override String get embeddedWebOnly => 'Wbudowany podgląd jest dostępny w wersji web';
-	@override String get startDevServerHint => 'Uruchom serwer deweloperski (npm run dev, flutter run -d web-server…),\na jego port pojawi się tutaj.';
 }
 
 // Path: sharedContext
@@ -10052,8 +10040,6 @@ extension on TranslationsPl {
 			'voice.preview' => 'Podgląd',
 			'voice.saveFailed' => 'Nie udało się zapisać konfiguracji STT',
 			'voice.settingsSaved' => 'Zapisano ustawienia wprowadzania głosowego',
-			'preview.embeddedWebOnly' => 'Wbudowany podgląd jest dostępny w wersji web',
-			'preview.startDevServerHint' => 'Uruchom serwer deweloperski (npm run dev, flutter run -d web-server…),\na jego port pojawi się tutaj.',
 			'sharedContext.title' => 'Współdzielone notatki',
 			'collab.copyToken' => 'Kopiuj token',
 			'collab.createInvite' => 'Utwórz zaproszenie',

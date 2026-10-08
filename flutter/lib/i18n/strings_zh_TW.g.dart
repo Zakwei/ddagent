@@ -56,7 +56,6 @@ class TranslationsZhTw extends Translations with BaseTranslations<AppLocale, Tra
 	@override late final Translations$notifications$zh_TW notifications = Translations$notifications$zh_TW.internal(_root);
 	@override late final Translations$serverConnect$zh_TW serverConnect = Translations$serverConnect$zh_TW.internal(_root);
 	@override late final Translations$voice$zh_TW voice = Translations$voice$zh_TW.internal(_root);
-	@override late final Translations$preview$zh_TW preview = Translations$preview$zh_TW.internal(_root);
 	@override late final Translations$sharedContext$zh_TW sharedContext = Translations$sharedContext$zh_TW.internal(_root);
 	@override late final Translations$collab$zh_TW collab = Translations$collab$zh_TW.internal(_root);
 	@override late final Translations$browser$zh_TW browser = Translations$browser$zh_TW.internal(_root);
@@ -476,17 +475,6 @@ class Translations$voice$zh_TW extends Translations$voice$en {
 	@override String get preview => '預覽';
 	@override String get saveFailed => '儲存 STT 設定失敗';
 	@override String get settingsSaved => '語音輸入設定已儲存';
-}
-
-// Path: preview
-class Translations$preview$zh_TW extends Translations$preview$en {
-	Translations$preview$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
-
-	final TranslationsZhTw _root; // ignore: unused_field
-
-	// Translations
-	@override String get embeddedWebOnly => '內嵌預覽僅在網頁版本中提供';
-	@override String get startDevServerHint => '啟動開發伺服器（npm run dev、flutter run -d web-server…）\n其連接埠會顯示在這裡。';
 }
 
 // Path: sharedContext
@@ -9414,8 +9402,6 @@ extension on TranslationsZhTw {
 			'voice.preview' => '預覽',
 			'voice.saveFailed' => '儲存 STT 設定失敗',
 			'voice.settingsSaved' => '語音輸入設定已儲存',
-			'preview.embeddedWebOnly' => '內嵌預覽僅在網頁版本中提供',
-			'preview.startDevServerHint' => '啟動開發伺服器（npm run dev、flutter run -d web-server…）\n其連接埠會顯示在這裡。',
 			'sharedContext.title' => '共用筆記',
 			'collab.copyToken' => '複製權杖',
 			'collab.createInvite' => '建立邀請',

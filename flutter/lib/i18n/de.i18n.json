@@ -3242,10 +3242,6 @@
     "saveFailed": "STT-Konfiguration konnte nicht gespeichert werden",
     "settingsSaved": "Spracheingabe-Einstellungen gespeichert"
   },
-  "preview": {
-    "embeddedWebOnly": "Die eingebettete Vorschau ist im Web-Build verfügbar",
-    "startDevServerHint": "Starte einen Dev-Server (npm run dev, flutter run -d web-server…)\nund sein Port erscheint hier."
-  },
   "sharedContext": {
     "title": "Gemeinsame Notizen"
   },

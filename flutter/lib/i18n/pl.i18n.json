@@ -3507,10 +3507,6 @@
     "saveFailed": "Nie udało się zapisać konfiguracji STT",
     "settingsSaved": "Zapisano ustawienia wprowadzania głosowego"
   },
-  "preview": {
-    "embeddedWebOnly": "Wbudowany podgląd jest dostępny w wersji web",
-    "startDevServerHint": "Uruchom serwer deweloperski (npm run dev, flutter run -d web-server…),\na jego port pojawi się tutaj."
-  },
   "sharedContext": {
     "title": "Współdzielone notatki"
   },

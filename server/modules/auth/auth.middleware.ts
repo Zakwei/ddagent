@@ -48,19 +48,6 @@ const authenticateToken = async (req, res, next) => {
     token = req.query.token;
   }
 
-  // Preview iframes can't set headers either — the preview route persists the
-  // query token as an HttpOnly cookie scoped to Path=/api/preview.
-  if (!token && req.headers.cookie) {
-    const match = /(?:^|;\s*)ddagent_preview_token=([^;]+)/.exec(req.headers.cookie);
-    if (match) {
-      try {
-        token = decodeURIComponent(match[1]);
-      } catch {
-        // Malformed % escape — treat as no cookie token.
-      }
-    }
-  }
-
   if (!token) {
     res.setHeader('X-Auth-Error', 'invalid-token');
     return res.status(401).json({

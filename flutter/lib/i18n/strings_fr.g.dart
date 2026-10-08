@@ -56,7 +56,6 @@ class TranslationsFr extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final Translations$notifications$fr notifications = Translations$notifications$fr._(_root);
 	@override late final Translations$serverConnect$fr serverConnect = Translations$serverConnect$fr._(_root);
 	@override late final Translations$voice$fr voice = Translations$voice$fr._(_root);
-	@override late final Translations$preview$fr preview = Translations$preview$fr._(_root);
 	@override late final Translations$sharedContext$fr sharedContext = Translations$sharedContext$fr._(_root);
 	@override late final Translations$collab$fr collab = Translations$collab$fr._(_root);
 	@override late final Translations$browser$fr browser = Translations$browser$fr._(_root);
@@ -476,17 +475,6 @@ class Translations$voice$fr extends Translations$voice$en {
 	@override String get preview => 'Aperçu';
 	@override String get saveFailed => 'Échec de l’enregistrement de la configuration STT';
 	@override String get settingsSaved => 'Paramètres de saisie vocale enregistrés';
-}
-
-// Path: preview
-class Translations$preview$fr extends Translations$preview$en {
-	Translations$preview$fr._(TranslationsFr root) : this._root = root, super.internal(root);
-
-	final TranslationsFr _root; // ignore: unused_field
-
-	// Translations
-	@override String get embeddedWebOnly => 'L’aperçu intégré est disponible dans la version web';
-	@override String get startDevServerHint => 'Démarrez un serveur de développement (npm run dev, flutter run -d web-server…)\net son port apparaît ici.';
 }
 
 // Path: sharedContext
@@ -9415,8 +9403,6 @@ extension on TranslationsFr {
 			'voice.preview' => 'Aperçu',
 			'voice.saveFailed' => 'Échec de l’enregistrement de la configuration STT',
 			'voice.settingsSaved' => 'Paramètres de saisie vocale enregistrés',
-			'preview.embeddedWebOnly' => 'L’aperçu intégré est disponible dans la version web',
-			'preview.startDevServerHint' => 'Démarrez un serveur de développement (npm run dev, flutter run -d web-server…)\net son port apparaît ici.',
 			'sharedContext.title' => 'Notes partagées',
 			'collab.copyToken' => 'Copier le token',
 			'collab.createInvite' => 'Créer une invitation',

@@ -138,8 +138,8 @@ const parityMatrix = <ParityEntry>[
   ParityEntry(
     source: ParitySource.web,
     key: 'preview',
-    status: ParityStatus.full,
-    flutterPath: 'lib/features/preview',
+    status: ParityStatus.notApplicable,
+    note: 'Dev-server preview pane removed — the byte-transparent proxy could not render root-absolute dev servers.',
   ),
   ParityEntry(
     source: ParitySource.web,

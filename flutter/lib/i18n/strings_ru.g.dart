@@ -56,7 +56,6 @@ class TranslationsRu extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final Translations$notifications$ru notifications = Translations$notifications$ru._(_root);
 	@override late final Translations$serverConnect$ru serverConnect = Translations$serverConnect$ru._(_root);
 	@override late final Translations$voice$ru voice = Translations$voice$ru._(_root);
-	@override late final Translations$preview$ru preview = Translations$preview$ru._(_root);
 	@override late final Translations$sharedContext$ru sharedContext = Translations$sharedContext$ru._(_root);
 	@override late final Translations$collab$ru collab = Translations$collab$ru._(_root);
 	@override late final Translations$browser$ru browser = Translations$browser$ru._(_root);
@@ -476,17 +475,6 @@ class Translations$voice$ru extends Translations$voice$en {
 	@override String get preview => 'Предпросмотр';
 	@override String get saveFailed => 'Не удалось сохранить конфигурацию STT';
 	@override String get settingsSaved => 'Настройки голосового ввода сохранены';
-}
-
-// Path: preview
-class Translations$preview$ru extends Translations$preview$en {
-	Translations$preview$ru._(TranslationsRu root) : this._root = root, super.internal(root);
-
-	final TranslationsRu _root; // ignore: unused_field
-
-	// Translations
-	@override String get embeddedWebOnly => 'Встроенный предпросмотр доступен в веб-сборке';
-	@override String get startDevServerHint => 'Запустите dev-сервер (npm run dev, flutter run -d web-server…),\nи его порт появится здесь.';
 }
 
 // Path: sharedContext
@@ -9423,8 +9411,6 @@ extension on TranslationsRu {
 			'voice.preview' => 'Предпросмотр',
 			'voice.saveFailed' => 'Не удалось сохранить конфигурацию STT',
 			'voice.settingsSaved' => 'Настройки голосового ввода сохранены',
-			'preview.embeddedWebOnly' => 'Встроенный предпросмотр доступен в веб-сборке',
-			'preview.startDevServerHint' => 'Запустите dev-сервер (npm run dev, flutter run -d web-server…),\nи его порт появится здесь.',
 			'sharedContext.title' => 'Общие заметки',
 			'collab.copyToken' => 'Копировать токен',
 			'collab.createInvite' => 'Создать приглашение',

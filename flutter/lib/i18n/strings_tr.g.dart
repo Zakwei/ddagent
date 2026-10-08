@@ -56,7 +56,6 @@ class TranslationsTr extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final Translations$notifications$tr notifications = Translations$notifications$tr._(_root);
 	@override late final Translations$serverConnect$tr serverConnect = Translations$serverConnect$tr._(_root);
 	@override late final Translations$voice$tr voice = Translations$voice$tr._(_root);
-	@override late final Translations$preview$tr preview = Translations$preview$tr._(_root);
 	@override late final Translations$sharedContext$tr sharedContext = Translations$sharedContext$tr._(_root);
 	@override late final Translations$collab$tr collab = Translations$collab$tr._(_root);
 	@override late final Translations$browser$tr browser = Translations$browser$tr._(_root);
@@ -476,17 +475,6 @@ class Translations$voice$tr extends Translations$voice$en {
 	@override String get preview => 'Önizle';
 	@override String get saveFailed => 'STT yapılandırması kaydedilemedi';
 	@override String get settingsSaved => 'Sesli giriş ayarları kaydedildi';
-}
-
-// Path: preview
-class Translations$preview$tr extends Translations$preview$en {
-	Translations$preview$tr._(TranslationsTr root) : this._root = root, super.internal(root);
-
-	final TranslationsTr _root; // ignore: unused_field
-
-	// Translations
-	@override String get embeddedWebOnly => 'Gömülü önizleme yalnızca web sürümünde kullanılabilir';
-	@override String get startDevServerHint => 'Bir geliştirme sunucusu başlatın (npm run dev, flutter run -d web-server…)\nve portu burada görünecek.';
 }
 
 // Path: sharedContext
@@ -9414,8 +9402,6 @@ extension on TranslationsTr {
 			'voice.preview' => 'Önizle',
 			'voice.saveFailed' => 'STT yapılandırması kaydedilemedi',
 			'voice.settingsSaved' => 'Sesli giriş ayarları kaydedildi',
-			'preview.embeddedWebOnly' => 'Gömülü önizleme yalnızca web sürümünde kullanılabilir',
-			'preview.startDevServerHint' => 'Bir geliştirme sunucusu başlatın (npm run dev, flutter run -d web-server…)\nve portu burada görünecek.',
 			'sharedContext.title' => 'Paylaşılan Notlar',
 			'collab.copyToken' => 'Token\'ı kopyala',
 			'collab.createInvite' => 'Davet oluştur',

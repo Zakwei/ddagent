@@ -10,7 +10,6 @@ IconData paneKindIcon(PaneKind kind) => switch (kind) {
   PaneKind.chat => Icons.chat_bubble_outline,
   PaneKind.browser => Icons.public,
   PaneKind.terminal => Icons.terminal,
-  PaneKind.preview => Icons.play_circle_outline,
   PaneKind.notes => Icons.edit_note,
   PaneKind.editor => Icons.code,
   PaneKind.git => Icons.alt_route,

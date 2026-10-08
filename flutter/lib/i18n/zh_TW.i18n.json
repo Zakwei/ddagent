@@ -3241,10 +3241,6 @@
     "saveFailed": "儲存 STT 設定失敗",
     "settingsSaved": "語音輸入設定已儲存"
   },
-  "preview": {
-    "embeddedWebOnly": "內嵌預覽僅在網頁版本中提供",
-    "startDevServerHint": "啟動開發伺服器（npm run dev、flutter run -d web-server…）\n其連接埠會顯示在這裡。"
-  },
   "sharedContext": {
     "title": "共用筆記"
   },

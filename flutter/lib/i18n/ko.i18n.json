@@ -3241,10 +3241,6 @@
     "saveFailed": "STT 설정 저장 실패",
     "settingsSaved": "음성 입력 설정이 저장되었습니다"
   },
-  "preview": {
-    "embeddedWebOnly": "임베디드 미리보기는 웹 빌드에서 사용할 수 있습니다",
-    "startDevServerHint": "개발 서버를 시작하면(npm run dev, flutter run -d web-server…) 해당 포트가 여기에 표시됩니다."
-  },
   "sharedContext": {
     "title": "공유 노트"
   },

@@ -14,7 +14,6 @@ import 'package:ddagent_app/features/editor/view/editor_screen.dart';
 import 'package:ddagent_app/features/git/view/git_screen.dart';
 import 'package:ddagent_app/features/mini_orchestrator/state/mini_orchestrator_controller.dart';
 import 'package:ddagent_app/features/orchestrator/state/orchestrator_controller.dart';
-import 'package:ddagent_app/features/preview/view/preview_pane.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/sessions/state/activity_poller.dart';
@@ -284,11 +283,6 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
       ),
       btn(LucideIcons.terminal, 'Add terminal pane', canAdd ? () => _add(PaneKind.terminal) : null),
       btn(
-        LucideIcons.monitorPlay,
-        'Add preview pane',
-        canAdd ? () => _add(PaneKind.preview) : null,
-      ),
-      btn(
         // React uses NotebookPen for the shared-notes pane button.
         LucideIcons.notebookPen,
         'Add shared-notes pane',
@@ -518,24 +512,6 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
           );
         }
         return GitScreen(projectId: pane.projectId);
-      case PaneKind.preview:
-        if (pane.projectId == null) {
-          return WorkspaceLauncher(
-            lastUsedProjectId: ws.lastUsedProjectId,
-            onSelectProject: (pid) {
-              ctrl.setLastUsedProjectId(pid);
-              ctrl.updatePane(pane.id, projectId: () => pid);
-            },
-          );
-        }
-        return PreviewPane(
-          projectPath: ref
-              .watch(projectsProvider)
-              .projects
-              .where((p) => p.projectId == pane.projectId)
-              .firstOrNull
-              ?.path,
-        );
       case PaneKind.notes:
         // No workspace binding = dead tile → the launcher (same as web).
         if (pane.projectId == null) {

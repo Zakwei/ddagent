@@ -56,7 +56,6 @@ class TranslationsZhCn extends Translations with BaseTranslations<AppLocale, Tra
 	@override late final Translations$notifications$zh_CN notifications = Translations$notifications$zh_CN.internal(_root);
 	@override late final Translations$serverConnect$zh_CN serverConnect = Translations$serverConnect$zh_CN.internal(_root);
 	@override late final Translations$voice$zh_CN voice = Translations$voice$zh_CN.internal(_root);
-	@override late final Translations$preview$zh_CN preview = Translations$preview$zh_CN.internal(_root);
 	@override late final Translations$sharedContext$zh_CN sharedContext = Translations$sharedContext$zh_CN.internal(_root);
 	@override late final Translations$collab$zh_CN collab = Translations$collab$zh_CN.internal(_root);
 	@override late final Translations$browser$zh_CN browser = Translations$browser$zh_CN.internal(_root);
@@ -476,17 +475,6 @@ class Translations$voice$zh_CN extends Translations$voice$en {
 	@override String get preview => '预览';
 	@override String get saveFailed => '保存 STT 配置失败';
 	@override String get settingsSaved => '语音输入设置已保存';
-}
-
-// Path: preview
-class Translations$preview$zh_CN extends Translations$preview$en {
-	Translations$preview$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
-
-	final TranslationsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get embeddedWebOnly => '内嵌预览仅在 Web 构建中可用';
-	@override String get startDevServerHint => '启动开发服务器（npm run dev、flutter run -d web-server…）\n其端口会显示在这里。';
 }
 
 // Path: sharedContext
@@ -9414,8 +9402,6 @@ extension on TranslationsZhCn {
 			'voice.preview' => '预览',
 			'voice.saveFailed' => '保存 STT 配置失败',
 			'voice.settingsSaved' => '语音输入设置已保存',
-			'preview.embeddedWebOnly' => '内嵌预览仅在 Web 构建中可用',
-			'preview.startDevServerHint' => '启动开发服务器（npm run dev、flutter run -d web-server…）\n其端口会显示在这里。',
 			'sharedContext.title' => '共享笔记',
 			'collab.copyToken' => '复制令牌',
 			'collab.createInvite' => '创建邀请',

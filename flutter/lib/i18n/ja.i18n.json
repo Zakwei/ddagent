@@ -3241,10 +3241,6 @@
     "saveFailed": "STT設定の保存に失敗しました",
     "settingsSaved": "音声入力設定を保存しました"
   },
-  "preview": {
-    "embeddedWebOnly": "埋め込みプレビューはWebビルドでのみ利用できます",
-    "startDevServerHint": "開発サーバーを起動すると（npm run dev、flutter run -d web-server…）\nそのポートがここに表示されます。"
-  },
   "sharedContext": {
     "title": "共有ノート"
   },

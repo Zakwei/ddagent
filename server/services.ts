@@ -51,7 +51,6 @@ import { sttRoutes } from './modules/stt/index.js';
 import { schedulerRoutes, schedulerService } from './modules/scheduler/index.js';
 import { mcpRouter, mcpTokensRouter } from './modules/mcp-server/index.js';
 import { collabRoutes } from './modules/collab/index.js';
-import { createPreviewModule } from './modules/preview/index.js';
 import { closeAllBrowserViewSessions } from './modules/browser-view/index.js';
 import { initializeDatabase, sessionsDb } from './modules/database/index.js';
 import { configureWebPush, startTelegramPoller, stopTelegramPoller } from './modules/notifications/index.js';
@@ -364,8 +363,6 @@ export async function createServices(options: CreateServicesOptions = {}): Promi
     // Text-to-speech routes (protected) — Edge neural voices for read-aloud
     app.use('/api/tts', authenticateToken, ttsRoutes);
     app.use('/api/stt', authenticateToken, sttRoutes);
-    // Dev-server preview: port discovery + reverse proxy to localhost (protected)
-    app.use('/api/preview', authenticateToken, createPreviewModule());
 
     // Scheduler: cron-driven agent runs (protected)
     app.use('/api/schedules', authenticateToken, schedulerRoutes);

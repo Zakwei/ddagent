@@ -3242,10 +3242,6 @@
     "saveFailed": "Échec de l’enregistrement de la configuration STT",
     "settingsSaved": "Paramètres de saisie vocale enregistrés"
   },
-  "preview": {
-    "embeddedWebOnly": "L’aperçu intégré est disponible dans la version web",
-    "startDevServerHint": "Démarrez un serveur de développement (npm run dev, flutter run -d web-server…)\net son port apparaît ici."
-  },
   "sharedContext": {
     "title": "Notes partagées"
   },

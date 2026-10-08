@@ -56,7 +56,6 @@ class TranslationsDe extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final Translations$notifications$de notifications = Translations$notifications$de._(_root);
 	@override late final Translations$serverConnect$de serverConnect = Translations$serverConnect$de._(_root);
 	@override late final Translations$voice$de voice = Translations$voice$de._(_root);
-	@override late final Translations$preview$de preview = Translations$preview$de._(_root);
 	@override late final Translations$sharedContext$de sharedContext = Translations$sharedContext$de._(_root);
 	@override late final Translations$collab$de collab = Translations$collab$de._(_root);
 	@override late final Translations$browser$de browser = Translations$browser$de._(_root);
@@ -476,17 +475,6 @@ class Translations$voice$de extends Translations$voice$en {
 	@override String get preview => 'Vorschau';
 	@override String get saveFailed => 'STT-Konfiguration konnte nicht gespeichert werden';
 	@override String get settingsSaved => 'Spracheingabe-Einstellungen gespeichert';
-}
-
-// Path: preview
-class Translations$preview$de extends Translations$preview$en {
-	Translations$preview$de._(TranslationsDe root) : this._root = root, super.internal(root);
-
-	final TranslationsDe _root; // ignore: unused_field
-
-	// Translations
-	@override String get embeddedWebOnly => 'Die eingebettete Vorschau ist im Web-Build verfügbar';
-	@override String get startDevServerHint => 'Starte einen Dev-Server (npm run dev, flutter run -d web-server…)\nund sein Port erscheint hier.';
 }
 
 // Path: sharedContext
@@ -9415,8 +9403,6 @@ extension on TranslationsDe {
 			'voice.preview' => 'Vorschau',
 			'voice.saveFailed' => 'STT-Konfiguration konnte nicht gespeichert werden',
 			'voice.settingsSaved' => 'Spracheingabe-Einstellungen gespeichert',
-			'preview.embeddedWebOnly' => 'Die eingebettete Vorschau ist im Web-Build verfügbar',
-			'preview.startDevServerHint' => 'Starte einen Dev-Server (npm run dev, flutter run -d web-server…)\nund sein Port erscheint hier.',
 			'sharedContext.title' => 'Gemeinsame Notizen',
 			'collab.copyToken' => 'Token kopieren',
 			'collab.createInvite' => 'Einladung erstellen',

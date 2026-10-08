@@ -56,7 +56,6 @@ class TranslationsIt extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final Translations$notifications$it notifications = Translations$notifications$it._(_root);
 	@override late final Translations$serverConnect$it serverConnect = Translations$serverConnect$it._(_root);
 	@override late final Translations$voice$it voice = Translations$voice$it._(_root);
-	@override late final Translations$preview$it preview = Translations$preview$it._(_root);
 	@override late final Translations$sharedContext$it sharedContext = Translations$sharedContext$it._(_root);
 	@override late final Translations$collab$it collab = Translations$collab$it._(_root);
 	@override late final Translations$browser$it browser = Translations$browser$it._(_root);
@@ -476,17 +475,6 @@ class Translations$voice$it extends Translations$voice$en {
 	@override String get preview => 'Anteprima';
 	@override String get saveFailed => 'Impossibile salvare la configurazione STT';
 	@override String get settingsSaved => 'Impostazioni di input vocale salvate';
-}
-
-// Path: preview
-class Translations$preview$it extends Translations$preview$en {
-	Translations$preview$it._(TranslationsIt root) : this._root = root, super.internal(root);
-
-	final TranslationsIt _root; // ignore: unused_field
-
-	// Translations
-	@override String get embeddedWebOnly => 'L\'anteprima integrata è disponibile nella build web';
-	@override String get startDevServerHint => 'Avvia un server di sviluppo (npm run dev, flutter run -d web-server…)\ne la sua porta apparirà qui.';
 }
 
 // Path: sharedContext
@@ -9415,8 +9403,6 @@ extension on TranslationsIt {
 			'voice.preview' => 'Anteprima',
 			'voice.saveFailed' => 'Impossibile salvare la configurazione STT',
 			'voice.settingsSaved' => 'Impostazioni di input vocale salvate',
-			'preview.embeddedWebOnly' => 'L\'anteprima integrata è disponibile nella build web',
-			'preview.startDevServerHint' => 'Avvia un server di sviluppo (npm run dev, flutter run -d web-server…)\ne la sua porta apparirà qui.',
 			'sharedContext.title' => 'Note condivise',
 			'collab.copyToken' => 'Copia token',
 			'collab.createInvite' => 'Crea invito',

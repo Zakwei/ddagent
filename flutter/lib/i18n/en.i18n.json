@@ -1638,14 +1638,6 @@
     "projects": {
       "newSession": "New Session"
     },
-    "previewPane": {
-      "loadError": "Could not load ports",
-      "noServers": "No dev servers detected",
-      "openExternal": "Open in system browser",
-      "reload": "Reload preview",
-      "selectPort": "Dev server port",
-      "title": "Dev server preview"
-    },
     "sharedNotes": {
       "subtitle": "Shared memory — injected into every session of this project",
       "save": "Save",
@@ -3526,10 +3518,6 @@
       },
       "installedWithFailures": "Installed on {{installedCount}}; failed: {{failed}}"
     }
-  },
-  "preview": {
-    "embeddedWebOnly": "Embedded preview is available on the web build",
-    "startDevServerHint": "Start a dev server (npm run dev, flutter run -d web-server…)\nand its port appears here."
   },
   "projects": {
     "cloneRepository": "Clone repository",
