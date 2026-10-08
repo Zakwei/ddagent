@@ -127,7 +127,8 @@ void main() {
       expect(item('Delete permanently').enabled, isFalse);
       expect(item('Change workspace').enabled, isFalse);
       expect(item('Rename').enabled, isTrue);
-      expect(item('Change session').enabled, isTrue);
+      // The history icon next to the menu switches sessions — no duplicate here.
+      expect(find.text('Change session'), findsNothing);
     });
 
     testWidgets('compact header grows the tap targets to 40px', (tester) async {

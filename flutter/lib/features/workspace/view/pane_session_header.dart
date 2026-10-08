@@ -188,8 +188,6 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
           switch (v) {
             case 'rename':
               unawaited(_renameDialog(context));
-            case 'change':
-              widget.onChangeSession();
             case 'workspace':
               widget.onChangeWorkspace?.call();
             case 'archive':
@@ -200,7 +198,6 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
         },
         itemBuilder: (_) => [
           PopupMenuItem(value: 'rename', child: Text(i18n.common.fileOperations.rename)),
-          PopupMenuItem(value: 'change', child: Text(i18n.chat.sessionPicker.changeSession)),
           if (widget.onChangeWorkspace != null)
             PopupMenuItem(
               value: 'workspace',
