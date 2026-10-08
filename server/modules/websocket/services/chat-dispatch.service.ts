@@ -597,8 +597,11 @@ export async function dispatchChatCommand(
     let lastDeltaPatchAt = 0;
     const originalSend = run.writer.send.bind(run.writer) as (data: unknown) => void;
     run.writer.send = (data: unknown) => {
-      if (chatRunRegistry.getRun(sessionId) !== run || run.status !== 'running') return;
+      // Previews track the live turn only; the registry decides what a
+      // finished run may still publish (asks, late errors and notices).
+      const live = chatRunRegistry.getRun(sessionId) === run && run.status === 'running';
       originalSend(data);
+      if (!live) return;
       const event = (data ?? {}) as NormalizedMessage;
       if (event.role === 'user') return;
       if (event.kind === 'text') {
@@ -638,13 +641,20 @@ export async function dispatchChatCommand(
     await runtime.run(provider, effectiveContent, runtimeOptions, run.writer);
     return { ok: true };
   } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
     // A cancelled/completed runtime can reject after the next turn starts.
     // Its terminal event already settled the run; do not emit a session-wide
     // protocol error that the client would attribute to the new turn.
     if (run.status === 'completed' || chatRunRegistry.getRun(sessionId) !== run) {
+      // Still the session's latest run (e.g. an early `complete`): surface the
+      // failure as a late run-scoped error (C7). The registry drops it when a
+      // newer run owns the session, after an abort, or when the same text was
+      // already sent for this run.
+      if (!run.aborted) {
+        run.writer.send(createNormalizedMessage({ kind: 'error', content: message, sessionId, provider }));
+      }
       return { ok: true };
     }
-    const message = error instanceof Error ? error.message : String(error);
     runError = message;
     console.error(`[Chat] Provider runtime "${provider}" failed`, { sessionId, error: message });
     return { ok: false, code: 'RUNTIME_ERROR', error: message, sessionId };

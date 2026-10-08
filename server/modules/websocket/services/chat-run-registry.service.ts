@@ -1,11 +1,12 @@
 import { randomUUID } from 'node:crypto';
 import path from 'node:path';
 
-import { projectsDb, sessionsDb } from '@/modules/database/index.js';
+import { projectsDb, sessionEventsDb, sessionsDb } from '@/modules/database/index.js';
 import { generateDisplayName } from '@/modules/projects/index.js';
 import { ChatSessionWriter } from '@/modules/websocket/services/chat-session-writer.service.js';
 import { connectedClients, WS_OPEN_STATE } from '@/modules/websocket/services/websocket-state.service.js';
 import { isSubagentSessionTitle, safeSocketSend } from '@/shared/index.js';
+import { readNormalizedMessageText } from '@/shared/utils.js';
 import type {
   LLMProvider,
   NormalizedMessage,
@@ -41,6 +42,8 @@ type ChatRun = {
   startedAt: number;
   completedAt: number | null;
   aborted?: boolean;
+  /** Texts of `error` events already forwarded — an identical repeat is dropped. */
+  errorTexts: Set<string>;
 };
 
 /**
@@ -53,6 +56,41 @@ const COMPLETED_RUN_RETENTION_MS = 5 * 60 * 1000;
 // Event kinds a completed run may still publish (see decorateAndRecordEvent):
 // asks from work outliving the turn, and the count of that work.
 const LATE_ASK_KINDS = new Set<string>(['permission_request', 'permission_cancelled', 'background_tasks']);
+
+/**
+ * `error` rows and C1 notice `status` rows: may still arrive after `complete`
+ * (a runtime rejecting after an early complete) and are persisted so they
+ * survive a history reload.
+ */
+function isErrorOrNotice(message: NormalizedMessage): boolean {
+  return message.kind === 'error' || (message.kind === 'status' && message.notice === true);
+}
+
+/**
+ * Last `background_tasks` count per app session (absent = 0). Reported in the
+ * `chat_subscribed` ack so a (re)subscribing client knows about work that
+ * outlived the turn without waiting for the next change.
+ */
+const backgroundTaskCounts = new Map<string, number>();
+
+function persistErrorOrNotice(run: ChatRun, outbound: NormalizedMessage): void {
+  const content = readNormalizedMessageText(outbound);
+  if (!content) return;
+  try {
+    sessionEventsDb.append({
+      id: outbound.id,
+      sessionId: run.appSessionId,
+      provider: run.provider,
+      kind: outbound.kind === 'error' ? 'error' : 'status',
+      content,
+      timestamp: outbound.timestamp,
+    });
+  } catch (error) {
+    // Best effort: the live frame is already on its way to the clients.
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('[ChatRunRegistry] Failed to persist session event', { appSessionId: run.appSessionId, error: message });
+  }
+}
 
 /**
  * Upper bound on buffered events per run so a very long tool-heavy run cannot
@@ -176,11 +214,23 @@ function decorateAndRecordEvent(run: ChatRun, message: NormalizedMessage): Norma
   // background work, whose follow-up turn can still ask for permission — a
   // dropped ask silently auto-denies (or, for a question, hangs). They pass
   // while no newer run owns the session, even after this one was evicted, as
-  // does the running-task count that work reports between turns.
+  // does the running-task count that work reports between turns. So do
+  // errors and notices (C7): a runtime can fail after an early `complete`, and
+  // dropping that error would hide why the turn went wrong. Late events keep
+  // the run's id and continue its seq, so replay cursors stay monotonic.
   const current = runs.get(run.appSessionId);
-  const lateAsk = LATE_ASK_KINDS.has(message.kind) && (current === undefined || current === run);
-  if (!lateAsk && (current !== run || run.status !== 'running')) {
+  const errorOrNotice = isErrorOrNotice(message);
+  const late = (LATE_ASK_KINDS.has(message.kind) || errorOrNotice) && (current === undefined || current === run);
+  if (!late && (current !== run || run.status !== 'running')) {
     return null;
+  }
+
+  // One error per text per run: providers and the dispatch safety net can
+  // report the same failure twice (C3 error + a rejected runtime promise).
+  if (message.kind === 'error') {
+    const text = readNormalizedMessageText(message);
+    if (text && run.errorTexts.has(text)) return null;
+    if (text) run.errorTexts.add(text);
   }
 
   run.lastSeq += 1;
@@ -191,6 +241,19 @@ function decorateAndRecordEvent(run: ChatRun, message: NormalizedMessage): Norma
     seq: run.lastSeq,
     runId: run.id,
   };
+
+  if (errorOrNotice) {
+    // The persisted history row reuses the live id so clients can dedupe.
+    outbound.id ||= randomUUID();
+    outbound.timestamp ||= new Date().toISOString();
+    persistErrorOrNotice(run, outbound);
+  }
+
+  if (message.kind === 'background_tasks') {
+    const count = typeof message.count === 'number' && message.count > 0 ? message.count : 0;
+    if (count > 0) backgroundTaskCounts.set(run.appSessionId, count);
+    else backgroundTaskCounts.delete(run.appSessionId);
+  }
 
   if (message.kind === 'complete') {
     // The provider may report its own id here; the frontend only ever knows
@@ -283,6 +346,7 @@ export const chatRunRegistry = {
       writer: null as unknown as ChatSessionWriter,
       startedAt: Date.now(),
       completedAt: null,
+      errorTexts: new Set(),
     };
 
     run.writer = new ChatSessionWriter({
@@ -312,6 +376,11 @@ export const chatRunRegistry = {
 
   isProcessing(appSessionId: string): boolean {
     return runs.get(appSessionId)?.status === 'running';
+  },
+
+  /** Latest reported `background_tasks` count for the session (0 if none/unknown). */
+  getBackgroundTaskCount(appSessionId: string): number {
+    return backgroundTaskCounts.get(appSessionId) ?? 0;
   },
 
   listRunningRuns(): Array<{
@@ -478,5 +547,6 @@ export const chatRunRegistry = {
   clearAll(): void {
     runs.clear();
     sessionSubscribers.clear();
+    backgroundTaskCounts.clear();
   },
 };

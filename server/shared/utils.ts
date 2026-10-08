@@ -716,6 +716,20 @@ export async function validateWorkspacePath(requestedPath: string): Promise<Work
 // ---------------------------
 //----------------- NORMALIZED PROVIDER MESSAGE UTILITIES ------------
 /**
+ * Returns the trimmed display text of an `error` or `status` message: errors
+ * carry it in `content` (falling back to `text`), statuses in `text` (falling
+ * back to `content`). Empty string when neither is a string.
+ *
+ * Consumed by the WebSocket run registry (dedupe/persist live error and
+ * notice rows) and the Providers sessions service (dedupe them against
+ * provider history).
+ */
+export function readNormalizedMessageText(message: NormalizedMessage): string {
+  const value = message.kind === 'error' ? message.content ?? message.text : message.text ?? message.content;
+  return typeof value === 'string' ? value.trim() : '';
+}
+
+/**
  * Generates a stable unique id for normalized provider messages.
  */
 export function generateMessageId(prefix = 'msg'): string {

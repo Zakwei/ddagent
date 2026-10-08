@@ -710,3 +710,38 @@ test('late child events and settlement cannot overwrite the next run in the pare
     assert.equal(chatRunRegistry.isProcessing(input.sessionId), false);
   });
 });
+
+test('a runtime rejecting after its own complete surfaces a late error once', async () => {
+  await withIsolatedDatabase(async () => {
+    sessionsDb.createAppSession('app-dispatch-late', 'codex', '/workspace/demo');
+    sessionsDb.markSharedContextInjected('app-dispatch-late');
+    const connection = new FakeConnection();
+    const runtime = {
+      ...noopRuntime,
+      run: async (_provider: unknown, _content: unknown, _options: unknown, writer: { send(data: unknown): void }) => {
+        writer.send({ kind: 'error', content: 'already reported', provider: 'codex' });
+        writer.send({ kind: 'complete', exitCode: 1, provider: 'codex' });
+        throw new Error('already reported');
+      },
+    } as unknown as ProviderRuntimeGateway;
+    const result = await dispatchChatCommand(runtime, {
+      sessionId: 'app-dispatch-late', content: 'hello', options: {}, userId: null, connection: connection as never,
+    });
+    assert.deepEqual(result, { ok: true });
+    assert.deepEqual(connection.frames.filter((f) => f.runId).map((f) => f.kind), ['error', 'complete']);
+
+    const lateRuntime = {
+      ...noopRuntime,
+      run: async (_provider: unknown, _content: unknown, _options: unknown, writer: { send(data: unknown): void }) => {
+        writer.send({ kind: 'complete', exitCode: 0, provider: 'codex' });
+        throw new Error('failed after complete');
+      },
+    } as unknown as ProviderRuntimeGateway;
+    const lateConnection = new FakeConnection();
+    await dispatchChatCommand(lateRuntime, {
+      sessionId: 'app-dispatch-late', content: 'again', options: {}, userId: null, connection: lateConnection as never,
+    });
+    const runFrames = lateConnection.frames.filter((f) => f.runId);
+    assert.deepEqual(runFrames.map((f) => [f.kind, f.content ?? null]), [['complete', null], ['error', 'failed after complete']]);
+  });
+});

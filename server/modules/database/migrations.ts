@@ -21,6 +21,7 @@ import {
 } from '@/modules/database/schema.js';
 import { MCP_TOKENS_TABLE_SCHEMA_SQL } from '@/modules/database/repositories/mcp-tokens.db.js';
 import { ORCHESTRATOR_MESSAGES_TABLE_SCHEMA_SQL } from '@/modules/database/repositories/orchestrator-messages.db.js';
+import { SESSION_EVENTS_TABLE_SCHEMA_SQL } from '@/modules/database/repositories/session-events.db.js';
 import { SUBAGENT_SESSION_MARKER } from '@/shared/utils.js';
 
 const SQLITE_UUID_SQL = `
@@ -780,6 +781,8 @@ export const runMigrations = (db: Database) => {
 
     db.exec(ORCHESTRATOR_MESSAGES_TABLE_SCHEMA_SQL);
     db.exec('CREATE INDEX IF NOT EXISTS idx_orchestrator_messages_session ON orchestrator_messages(session_id, seq)');
+
+    db.exec(SESSION_EVENTS_TABLE_SCHEMA_SQL);
 
     db.exec(PROJECTS_TABLE_SCHEMA_SQL);
     rebuildProjectsTableWithPrimaryKeySchema(db);

@@ -32,6 +32,8 @@ export { COLLAB_INVITES_TABLE_SCHEMA_SQL, collabInvitesDb } from '@/modules/data
 export type { CollabInvite } from '@/modules/database/repositories/collab-invites.db.js';
 export { sessionsDb } from '@/modules/database/repositories/sessions.db.js';
 export { ORCHESTRATOR_MESSAGES_TABLE_SCHEMA_SQL, orchestratorMessagesDb } from '@/modules/database/repositories/orchestrator-messages.db.js';
+// sessionEventsDb: used by the WebSocket run registry (writes) and Providers sessions service (history merge) so error/notice rows survive reloads.
+export { sessionEventsDb } from '@/modules/database/repositories/session-events.db.js';
 export { userDb } from '@/modules/database/repositories/users.js';
 // workspaceStateDb: used by the WebSocket module's workspace-sync service to persist open panes per user across devices.
 export { workspaceStateDb } from '@/modules/database/repositories/workspace-state.db.js';

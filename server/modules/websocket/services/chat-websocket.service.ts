@@ -80,15 +80,51 @@ function sendProtocolError(
   ws: WebSocket,
   code: string,
   error: string,
-  sessionId?: string
+  sessionId?: string | null,
+  extra: AnyRecord = {},
 ): void {
   sendJson(ws, {
+    ...extra,
     kind: 'protocol_error',
     code,
     error,
     sessionId: sessionId ?? null,
+    // Whether the session still has a running run once this error is sent:
+    // false → the client may settle its running state; true (e.g.
+    // ABORT_FAILED, a rejected approval) → the run keeps streaming.
+    runActive: sessionId ? chatRunRegistry.isProcessing(sessionId) : false,
     timestamp: new Date().toISOString(),
   });
+}
+
+/** Echoes the incoming frame's `requestId` (permission responses) on errors. */
+function readRequestIdField(data: AnyRecord | null): AnyRecord {
+  return typeof data?.requestId === 'string' && data.requestId ? { requestId: data.requestId } : {};
+}
+
+/** Delay between abort retries while the runtime has no handle for the run yet. */
+const ABORT_RETRY_DELAY_MS = 250;
+/** Abort attempts (first one included) before reporting ABORT_FAILED. */
+const ABORT_MAX_ATTEMPTS = 12;
+
+/**
+ * Asks the provider runtime to abort, retrying while `run` stays the
+ * session's running run: a Stop that lands before the runtime registered its
+ * handle (process still spawning) returns false although the run is alive.
+ * Resolves true once an attempt succeeds, false when every attempt failed;
+ * resolves true early (nothing left to abort) if the run ended meanwhile.
+ */
+async function abortWithRetry(
+  runtime: ProviderRuntimeGateway,
+  sessionId: string,
+  run: NonNullable<ReturnType<typeof chatRunRegistry.getRun>>,
+): Promise<boolean> {
+  for (let attempt = 1; ; attempt += 1) {
+    if (await runtime.abort(run.provider, sessionId)) return true;
+    if (attempt >= ABORT_MAX_ATTEMPTS) return false;
+    await new Promise((resolve) => setTimeout(resolve, ABORT_RETRY_DELAY_MS));
+    if (chatRunRegistry.getRun(sessionId) !== run || run.status !== 'running') return true;
+  }
 }
 
 function readRequiredSessionId(data: AnyRecord): string | null {
@@ -191,6 +227,8 @@ async function handleChatAbort(
     return;
   }
   if (!requestedRun || requestedRun.id !== data.runId) {
+    // `runActive` here means ANOTHER (newer) run is still going for the
+    // session — the requested one is gone either way.
     sendProtocolError(ws, 'STALE_RUN', 'The requested run is no longer active.', sessionId);
     return;
   }
@@ -224,20 +262,19 @@ async function handleChatAbort(
 
   chatRunRegistry.markAborted(sessionId);
 
-  const success = await dependencies.runtime.abort(run.provider, sessionId);
+  const success = await abortWithRetry(dependencies.runtime, sessionId, run);
   // Cancellation can settle after a queued or manually sent next turn starts.
   // Its result belongs exclusively to the run captured before the await.
   if (chatRunRegistry.getRun(sessionId) !== run || run.status !== 'running') {
     return;
   }
   if (!success) {
-    // The provider refused to interrupt (e.g. Claude's interrupt() threw) —
-    // the run is still alive. Roll the flag back and report the failure
-    // instead of emitting a terminal complete for a run that keeps streaming.
+    // The provider refused to interrupt on every retry (e.g. Claude's
+    // interrupt() threw) — the run is still alive. Roll the flag back and
+    // report the failure instead of emitting a terminal complete for a run
+    // that keeps streaming; `runActive` tells the client to keep it running.
     chatRunRegistry.markAborted(sessionId, false);
-    if (chatRunRegistry.isProcessing(sessionId)) {
-      sendProtocolError(ws, 'ABORT_FAILED', `Session "${sessionId}" could not be interrupted.`, sessionId);
-    }
+    sendProtocolError(ws, 'ABORT_FAILED', `Session "${sessionId}" could not be interrupted.`, sessionId);
     return;
   }
 
@@ -306,6 +343,9 @@ function handleChatSubscribe(
       // elapsed timer on the real run start instead of the ack's arrival.
       startedAt: run?.startedAt ?? null,
       pendingPermissions,
+      // C6: tasks outliving the turn are reported only when their count
+      // changes, so a late subscriber learns the current count here.
+      backgroundTasks: chatRunRegistry.getBackgroundTaskCount(sessionId),
       timestamp: new Date().toISOString(),
     });
 
@@ -398,13 +438,17 @@ export function handleChatConnection(
   workspaceSync.register(ws, workspaceUserId);
 
   ws.on('message', async (rawMessage) => {
+    // Kept outside the try so failures can still name the frame's session —
+    // clients drop protocol errors whose sessionId is null.
+    let data: AnyRecord | null = null;
     try {
       const parsed = parseIncomingJsonObject(rawMessage);
       if (!parsed) {
         throw new Error('Invalid websocket payload');
       }
 
-      const data = parsed as AnyRecord;
+      data = parsed as AnyRecord;
+      const frameSessionId = readRequiredSessionId(data);
       const messageType = typeof data.type === 'string' ? data.type : '';
 
       switch (messageType) {
@@ -420,7 +464,13 @@ export function handleChatConnection(
         case 'chat.permission-response':
           // Viewers can watch the board but must not resolve approvals.
           if (!roleAtLeast(request.user?.role, 'member')) {
-            sendProtocolError(ws, 'FORBIDDEN_ROLE', 'Requires member role to respond to approvals.');
+            sendProtocolError(
+              ws,
+              'FORBIDDEN_ROLE',
+              'Requires member role to respond to approvals.',
+              frameSessionId,
+              readRequestIdField(data),
+            );
             return;
           }
           handlePermissionResponse(data, dependencies);
@@ -429,7 +479,7 @@ export function handleChatConnection(
           // Same role gate as chat.permission-response: viewers may watch a
           // session but must not change how its actions get approved.
           if (!roleAtLeast(request.user?.role, 'member')) {
-            sendProtocolError(ws, 'FORBIDDEN_ROLE', 'Requires member role to change the permission mode.');
+            sendProtocolError(ws, 'FORBIDDEN_ROLE', 'Requires member role to change the permission mode.', frameSessionId);
             return;
           }
           handleSetPermissionMode(data, dependencies);
@@ -454,13 +504,21 @@ export function handleChatConnection(
           return;
         }
         default:
-          sendProtocolError(ws, 'UNKNOWN_MESSAGE_TYPE', `Unknown message type "${messageType}".`);
+          sendProtocolError(ws, 'UNKNOWN_MESSAGE_TYPE', `Unknown message type "${messageType}".`, frameSessionId);
           return;
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       console.error('[ERROR] Chat WebSocket error:', message);
-      sendProtocolError(ws, 'INTERNAL_ERROR', message);
+      // With the session id (e.g. a chat.send that threw) the client can
+      // clear its optimistic running state.
+      sendProtocolError(
+        ws,
+        'INTERNAL_ERROR',
+        message,
+        data ? readRequiredSessionId(data) : null,
+        readRequestIdField(data),
+      );
     }
   });
 

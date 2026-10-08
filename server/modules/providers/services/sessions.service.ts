@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
 
-import { orchestratorMessagesDb, projectsDb, providerAccountsDb, queuedMessagesDb, sessionsDb } from '@/modules/database/index.js';
+import { orchestratorMessagesDb, projectsDb, providerAccountsDb, queuedMessagesDb, sessionEventsDb, sessionsDb } from '@/modules/database/index.js';
 import { chatRunRegistry } from '@/modules/websocket/index.js';
 import { providerRegistry } from '@/modules/providers/provider.registry.js';
 import type {
@@ -12,7 +12,7 @@ import type {
   NormalizedMessage,
   OrchestratorMessage,
 } from '@/shared/types.js';
-import { AppError, countJsonlLines, isOrchestratorProvider, normalizeProjectPath, ORCHESTRATOR_PROVIDER, validateWorkspacePath } from '@/shared/utils.js';
+import { AppError, countJsonlLines, readNormalizedMessageText, isOrchestratorProvider, normalizeProjectPath, ORCHESTRATOR_PROVIDER, validateWorkspacePath } from '@/shared/utils.js';
 
 /**
  * Maps one orchestrator transcript row to the NormalizedMessage envelope the
@@ -54,6 +54,60 @@ function orchestratorMessageToNormalized(
         ? message.payload.text
         : `orchestrator:${message.kind}`,
   };
+}
+
+/** Max timestamp distance for a stored row to count as the provider's own copy. */
+const SESSION_EVENT_DEDUPE_WINDOW_MS = 60_000;
+
+/**
+ * Merges stored live `error` / notice `status` rows (session_events) into one
+ * page of provider history, in timestamp order.
+ *
+ * - Only rows inside the page's time range are merged, so each row lands on
+ *   exactly one page: the newest page also takes rows after its last message,
+ *   the oldest page rows before its first. Pages are offset-paged in provider
+ *   message units, so merged rows carry `sessionEvent: true` and must not
+ *   count toward the next page's offset.
+ * - A row is skipped when the provider history already holds the same kind
+ *   with the same text within SESSION_EVENT_DEDUPE_WINDOW_MS, or the same id.
+ *
+ * shortcut: a row whose timestamp falls between two pages' messages is not
+ * shown while paging; it appears once the neighboring page holds the newest
+ * messages (offset 0) — fine for the bounded, latest-turn-heavy event table.
+ *
+ * Exported for the sessions service tests.
+ */
+export function mergeSessionEvents(
+  messages: NormalizedMessage[],
+  events: NormalizedMessage[],
+  page: { isNewestPage: boolean; isOldestPage: boolean },
+): NormalizedMessage[] {
+  if (events.length === 0) return messages;
+  const times = messages.map((message) => Date.parse(message.timestamp)).filter(Number.isFinite);
+  if (times.length === 0 && !(page.isNewestPage && page.isOldestPage)) return messages;
+  const from = page.isOldestPage ? -Infinity : Math.min(...times);
+  const to = page.isNewestPage ? Infinity : Math.max(...times);
+  const ids = new Set(messages.map((message) => message.id));
+
+  const extra = events.filter((event) => {
+    const time = Date.parse(event.timestamp);
+    if (!(time >= from && time <= to) || ids.has(event.id)) return false;
+    const text = readNormalizedMessageText(event);
+    return !messages.some((message) => message.kind === event.kind
+      && readNormalizedMessageText(message) === text
+      && Math.abs(Date.parse(message.timestamp) - time) <= SESSION_EVENT_DEDUPE_WINDOW_MS);
+  });
+  if (extra.length === 0) return messages;
+
+  // Stable insert: a stored row goes after every message not newer than it.
+  const merged = [...messages];
+  for (const event of extra) {
+    const time = Date.parse(event.timestamp);
+    let index = merged.length;
+    while (index > 0 && Date.parse(merged[index - 1].timestamp) > time) index -= 1;
+    merged.splice(index, 0, { ...event, sessionEvent: true });
+  }
+  return merged;
 }
 
 type CreateAppSessionResult = {
@@ -537,10 +591,13 @@ export const sessionsService = {
     }
 
     // App-created sessions that never produced a provider transcript yet
-    // (e.g. first message still streaming) simply have no history.
+    // (e.g. first message still streaming) have no provider history — only
+    // the errors/notices stored when that first turn failed early.
     if (!session.provider_session_id) {
       return {
-        messages: [],
+        messages: (options.offset ?? 0) === 0
+          ? mergeSessionEvents([], sessionEventsDb.listBySession(sessionId), { isNewestPage: true, isOldestPage: true })
+          : [],
         total: 0,
         hasMore: false,
         offset: options.offset ?? 0,
@@ -556,12 +613,16 @@ export const sessionsService = {
       providerSessionId: session.provider_session_id,
     });
 
+    const messages = result.messages.map((message) => ({
+      ...message,
+      sessionId,
+    }));
     return {
       ...result,
-      messages: result.messages.map((message) => ({
-        ...message,
-        sessionId,
-      })),
+      messages: mergeSessionEvents(messages, sessionEventsDb.listBySession(sessionId), {
+        isNewestPage: (options.offset ?? 0) === 0,
+        isOldestPage: !result.hasMore,
+      }),
     };
   },
 
@@ -730,6 +791,7 @@ export const sessionsService = {
     // The session id is gone — its queued rows can never dispatch and would
     // linger as dead `failed` rows forever.
     queuedMessagesDb.removeBySession(sessionId);
+    sessionEventsDb.deleteForSession(sessionId);
     // Orchestrated sessions additionally own their transcript rows plus one
     // shared plan-run worktree; remove both on force-delete (archive keeps
     // them so restore can resume children).

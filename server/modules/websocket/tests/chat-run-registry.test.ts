@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { closeConnection, initializeDatabase, sessionsDb } from '@/modules/database/index.js';
+import { closeConnection, initializeDatabase, sessionEventsDb, sessionsDb } from '@/modules/database/index.js';
 import { chatRunRegistry } from '@/modules/websocket/services/chat-run-registry.service.js';
 import { connectedClients } from '@/modules/websocket/services/websocket-state.service.js';
 
@@ -511,5 +511,41 @@ test('a finished run still publishes asks, but nothing else and never over a new
     assert.ok(next);
     held.writer.send({ kind: 'permission_request', provider: 'claude', sessionId: 'native', requestId: 'r2', toolName: 'Bash' });
     assert.equal(connection.frames.filter((frame) => frame.kind === 'permission_request').length, 1);
+  });
+});
+
+test('errors and notices after complete still reach subscribers, keep the run cursor and are persisted', async () => {
+  await withIsolatedDatabase(() => {
+    sessionsDb.createAppSession('late-error', 'codex', '/workspace/demo');
+    const connection = new FakeConnection();
+    const run = chatRunRegistry.startRun({
+      appSessionId: 'late-error', provider: 'codex', providerSessionId: null, connection, userId: null,
+    })!;
+    let completions = 0;
+    const unsubscribe = chatRunRegistry.onRunCompleted(() => { completions += 1; });
+    try {
+      // Codex-style early complete, then the real failure and a second complete.
+      run.writer.send({ kind: 'complete', exitCode: 0, provider: 'codex' });
+      run.writer.send({ kind: 'error', content: 'turn failed', provider: 'codex' });
+      run.writer.send({ kind: 'error', content: 'turn failed', provider: 'codex' });
+      run.writer.send({ kind: 'status', text: 'retrying later', notice: true, provider: 'codex' });
+      run.writer.send({ kind: 'status', text: 'Thinking', provider: 'codex' });
+      run.writer.send({ kind: 'complete', exitCode: 1, provider: 'codex' });
+      chatRunRegistry.completeRunIfCurrent(run, { exitCode: 1 });
+    } finally {
+      unsubscribe();
+    }
+
+    assert.deepEqual(connection.frames.map((frame) => frame.kind), ['complete', 'error', 'status']);
+    assert.deepEqual(connection.frames.map((frame) => frame.seq), [1, 2, 3]);
+    assert.ok(connection.frames.every((frame) => frame.runId === run.id && frame.sessionId === 'late-error'));
+    assert.equal(completions, 1);
+
+    const stored = sessionEventsDb.listBySession('late-error');
+    assert.deepEqual(stored.map((row) => [row.kind, row.content ?? row.text, row.notice]), [
+      ['error', 'turn failed', undefined],
+      ['status', 'retrying later', true],
+    ]);
+    assert.equal(stored[0]?.id, connection.frames[1]?.id);
   });
 });

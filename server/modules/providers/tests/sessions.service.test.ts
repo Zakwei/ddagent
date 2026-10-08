@@ -4,11 +4,12 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { closeConnection, initializeDatabase, orchestratorMessagesDb, projectsDb, sessionsDb } from '@/modules/database/index.js';
+import { closeConnection, initializeDatabase, orchestratorMessagesDb, projectsDb, sessionEventsDb, sessionsDb } from '@/modules/database/index.js';
 import { chatRunRegistry } from '@/modules/websocket/index.js';
 import {
   buildDdagentSessionName,
   isAutoDerivedSessionName,
+  mergeSessionEvents,
   sessionsService,
 } from '@/modules/providers/services/sessions.service.js';
 import { WORKSPACES_ROOT } from '@/shared/utils.js';
@@ -497,5 +498,39 @@ test('deleteOrArchiveSessionById refuses while a delegated child is running', { 
     } finally {
       chatRunRegistry.clearAll();
     }
+  });
+});
+
+test('stored errors and notices merge into the history page they belong to, deduped', { concurrency: false }, () => {
+  const at = (s: number) => new Date(Date.UTC(2026, 0, 1, 0, 0, s)).toISOString();
+  const msg = (id: string, s: number, extra: Record<string, unknown> = {}) =>
+    ({ id, sessionId: 's', timestamp: at(s), provider: 'codex', kind: 'text', content: id, ...extra }) as never;
+  const page = [msg('a', 10), msg('b', 20), msg('provider-err', 30, { kind: 'error', content: 'same' })];
+  const events = [
+    msg('before', 5, { kind: 'error', content: 'old' }),
+    msg('mid', 15, { kind: 'status', text: 'note', notice: true }),
+    msg('dup', 31, { kind: 'error', content: 'same' }),
+    msg('after', 40, { kind: 'error', content: 'late' }),
+  ];
+  const ids = (list: Array<{ id: string }>) => list.map((m) => m.id);
+
+  // Newest page with older pages behind it: rows before its first message belong to an older page.
+  assert.deepEqual(ids(mergeSessionEvents(page, events, { isNewestPage: true, isOldestPage: false })),
+    ['a', 'mid', 'b', 'provider-err', 'after']);
+  // Oldest, non-newest page: takes earlier rows, never rows after its last message.
+  const merged = mergeSessionEvents(page, events, { isNewestPage: false, isOldestPage: true });
+  assert.deepEqual(ids(merged), ['before', 'a', 'mid', 'b', 'provider-err']);
+  assert.equal((merged[0] as { sessionEvent?: boolean }).sessionEvent, true);
+});
+
+test('a session whose first turn failed before any transcript still returns its stored error', { concurrency: false }, async () => {
+  await withIsolatedDatabase(async () => {
+    sessionsDb.createAppSession('app-early-fail', 'codex', '/workspace/demo');
+    sessionEventsDb.append({
+      id: 'e1', sessionId: 'app-early-fail', provider: 'codex', kind: 'error', content: 'codex not installed', timestamp: new Date().toISOString(),
+    });
+    const history = await sessionsService.fetchHistory('app-early-fail');
+    assert.deepEqual(history.messages.map((m) => [m.kind, m.content]), [['error', 'codex not installed']]);
+    assert.equal(history.total, 0);
   });
 });

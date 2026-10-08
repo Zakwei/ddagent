@@ -109,21 +109,104 @@ test('chat.abort: a refused provider abort keeps the run alive and reports ABORT
     assert.ok(run);
 
     // Claude's interrupt() threw — the runtime keeps streaming the run.
-    const runtime = { abort: async () => false };
+    let attempts = 0;
+    const runtime = { abort: async () => { attempts += 1; return false; } };
 
     handleChatConnection(socket as never, memberRequest as never, { runtime } as never);
     socket.emit('message', Buffer.from(JSON.stringify({ type: 'chat.abort', sessionId: 'app-ws-abort-1', runId: run.id })));
 
-    await waitFor(() => socket.frames.some((frame) => frame.kind === 'protocol_error'));
+    // The abort is retried for a few seconds before it is reported as failed.
+    await waitFor(() => socket.frames.some((frame) => frame.kind === 'protocol_error'), 6000);
 
     const errors = socket.frames.filter((frame) => frame.kind === 'protocol_error');
     assert.equal(errors.length, 1);
     assert.equal(errors[0]?.code, 'ABORT_FAILED');
+    assert.equal(errors[0]?.runActive, true);
+    assert.ok(attempts > 1);
     // No terminal complete for a run that keeps streaming, and the aborted
     // flag is rolled back so the run's own end is not mislabeled.
     assert.equal(socket.frames.some((frame) => frame.kind === 'complete'), false);
     assert.equal(chatRunRegistry.isProcessing('app-ws-abort-1'), true);
     assert.notEqual(run.aborted, true);
+  });
+});
+
+test('chat.abort: an abort that lands before the runtime handle exists is retried until it succeeds', async () => {
+  await withIsolatedDatabase(async () => {
+    sessionsDb.createAppSession('app-ws-abort-early', 'devin', '/workspace/demo');
+    const socket = new FakeSocket();
+    const run = chatRunRegistry.startRun({
+      appSessionId: 'app-ws-abort-early', provider: 'devin', providerSessionId: null, connection: socket as never, userId: null,
+    });
+    assert.ok(run);
+    // No process handle on the first attempt; it appears for the second.
+    let attempts = 0;
+    const runtime = { abort: async () => { attempts += 1; return attempts > 1; } };
+
+    handleChatConnection(socket as never, memberRequest as never, { runtime } as never);
+    socket.emit('message', Buffer.from(JSON.stringify({ type: 'chat.abort', sessionId: 'app-ws-abort-early', runId: run.id })));
+
+    await waitFor(() => socket.frames.some((frame) => frame.kind === 'complete'));
+    assert.equal(attempts, 2);
+    assert.equal(socket.frames.find((frame) => frame.kind === 'complete')?.aborted, true);
+    assert.equal(socket.frames.some((frame) => frame.kind === 'protocol_error'), false);
+  });
+});
+
+test('protocol errors name the frame\'s session (and requestId) so clients can route them', async () => {
+  await withIsolatedDatabase(async () => {
+    const socket = new FakeSocket();
+    const viewerRequest = { user: { id: 2, username: 'viewer', role: 'viewer' } };
+    handleChatConnection(socket as never, viewerRequest as never, { runtime: {} } as never);
+    socket.emit('message', Buffer.from(JSON.stringify({ type: 'chat.nope', sessionId: 's-unknown' })));
+    socket.emit('message', Buffer.from(JSON.stringify({
+      type: 'chat.permission-response', sessionId: 's-perm', requestId: 'req-1', allow: true, rememberEntry: 'Bash(*)',
+    })));
+    await waitFor(() => socket.frames.filter((frame) => frame.kind === 'protocol_error').length === 2);
+    const [unknown, forbidden] = socket.frames;
+    assert.equal(unknown?.code, 'UNKNOWN_MESSAGE_TYPE');
+    assert.equal(unknown?.sessionId, 's-unknown');
+    assert.equal(unknown?.runActive, false);
+    assert.equal(forbidden?.code, 'FORBIDDEN_ROLE');
+    assert.equal(forbidden?.sessionId, 's-perm');
+    assert.equal(forbidden?.requestId, 'req-1');
+  });
+});
+
+test('a chat.send that throws reports INTERNAL_ERROR with its sessionId', async () => {
+  await withIsolatedDatabase(async () => {
+    sessionsDb.createAppSession('app-ws-throw', 'claude', '/workspace/demo');
+    sessionsDb.markSharedContextInjected('app-ws-throw');
+    const socket = new FakeSocket();
+    const runtime = { hasRuntime: () => { throw new Error('boom'); } };
+    handleChatConnection(socket as never, memberRequest as never, { runtime } as never);
+    socket.emit('message', Buffer.from(JSON.stringify({ type: 'chat.send', sessionId: 'app-ws-throw', content: 'hi' })));
+    await waitFor(() => socket.frames.some((frame) => frame.kind === 'protocol_error'));
+    const error = socket.frames.find((frame) => frame.kind === 'protocol_error');
+    assert.equal(error?.code, 'INTERNAL_ERROR');
+    assert.equal(error?.sessionId, 'app-ws-throw');
+  });
+});
+
+test('chat_subscribed reports the latest background task count', async () => {
+  await withIsolatedDatabase(async () => {
+    sessionsDb.createAppSession('app-ws-bg', 'claude', '/workspace/demo');
+    const socket = new FakeSocket();
+    const run = chatRunRegistry.startRun({
+      appSessionId: 'app-ws-bg', provider: 'claude', providerSessionId: null, connection: socket as never, userId: null,
+    })!;
+    run.writer.send({ kind: 'complete', exitCode: 0, provider: 'claude' });
+    run.writer.send({ kind: 'background_tasks', count: 2, provider: 'claude' });
+    const runtime = { getPendingApprovalsForSession: () => [] };
+    handleChatConnection(socket as never, memberRequest as never, { runtime } as never);
+    const subscribe = () => socket.emit('message', Buffer.from(JSON.stringify({ type: 'chat.subscribe', sessions: [{ sessionId: 'app-ws-bg' }] })));
+    subscribe();
+    await waitFor(() => socket.frames.at(-1)?.kind === 'chat_subscribed');
+    assert.equal(socket.frames.at(-1)?.backgroundTasks, 2);
+    run.writer.send({ kind: 'background_tasks', count: 0, provider: 'claude' });
+    subscribe();
+    await waitFor(() => socket.frames.at(-1)?.kind === 'chat_subscribed');
+    assert.equal(socket.frames.at(-1)?.backgroundTasks, 0);
   });
 });
 
