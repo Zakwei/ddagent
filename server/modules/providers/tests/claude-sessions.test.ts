@@ -231,3 +231,37 @@ test('claude: a live SDK tool result keeps its tool_use_result payload', () => {
   const result = messages.find((message) => message.kind === 'tool_result');
   assert.deepEqual(result?.toolUseResult, { filenames: ['a.ts'] });
 });
+
+const notificationText = [
+  '<task-notification>',
+  '<task-id>a1</task-id>',
+  '<tool-use-id>toolu_agent</tool-use-id>',
+  '<status>completed</status>',
+  '<summary>Agent "Audit" finished</summary>',
+  '<result>All good.</result>',
+  '</task-notification>',
+].join('\n');
+
+test('claude: a background-task notification becomes a card, not a raw XML user bubble', () => {
+  const provider = new ClaudeSessionsProvider();
+  for (const raw of [
+    { type: 'user', uuid: 'n1', message: { role: 'user', content: notificationText } },
+    { type: 'attachment', uuid: 'n2', attachment: { type: 'queued_command', prompt: notificationText } },
+  ]) {
+    const [message] = provider.normalizeMessage(raw, 'app');
+    assert.equal(message.kind, 'task_notification');
+    assert.equal(message.content, 'Agent "Audit" finished');
+    assert.equal(message.toolId, 'toolu_agent');
+    assert.equal(message.status, 'completed');
+    assert.equal(message.summary, 'All good.');
+  }
+});
+
+test('claude: the async Agent launch placeholder is not shown as the subagent answer', () => {
+  const provider = new ClaudeSessionsProvider();
+  const [result] = provider.normalizeMessage({
+    type: 'user', uuid: 'u2',
+    message: { role: 'user', content: [{ type: 'tool_result', tool_use_id: 'toolu_agent', content: [{ type: 'text', text: 'Async agent launched successfully. agentId: a1' }] }] },
+  }, 'app');
+  assert.equal(result.content, '');
+});

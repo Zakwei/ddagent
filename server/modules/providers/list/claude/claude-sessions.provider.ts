@@ -39,11 +39,49 @@ type ClaudeHistoryMessagesResult =
 // results). Text blocks are joined so the card shows the answer, not raw JSON;
 // anything else (images, unknown shapes) stays serialized.
 function claudeToolResultText(content: unknown): string {
-  if (typeof content === 'string') return content;
+  if (typeof content === 'string') return asyncLaunchPlaceholderToEmpty(content);
   if (Array.isArray(content) && content.every((block) => block?.type === 'text')) {
-    return content.map((block) => String(block.text ?? '')).join('\n');
+    return asyncLaunchPlaceholderToEmpty(content.map((block) => String(block.text ?? '')).join('\n'));
   }
   return JSON.stringify(content);
+}
+
+// A background (`run_in_background`) Agent call returns this internal
+// placeholder at once; its real outcome arrives later as a task
+// notification. Showing the placeholder as the subagent's answer was wrong.
+function asyncLaunchPlaceholderToEmpty(text: string): string {
+  return text.startsWith('Async agent launched successfully') ? '' : text;
+}
+
+type ClaudeTaskNotification = {
+  toolUseId: string | null;
+  status: string | null;
+  summary: string | null;
+  result: string | null;
+};
+
+/**
+ * Parses the `<task-notification>` user turn Claude Code injects when a
+ * background task (async Agent, background shell) finishes. Null for any
+ * other text.
+ */
+function parseClaudeTaskNotification(text: string): ClaudeTaskNotification | null {
+  const trimmed = text.trimStart();
+  if (!trimmed.startsWith('<task-notification>')) return null;
+  const tag = (name: string) => {
+    const match = new RegExp(`<${name}>([\\s\\S]*?)</${name}>`).exec(trimmed);
+    return match ? match[1].trim() : null;
+  };
+  return { toolUseId: tag('tool-use-id'), status: tag('status'), summary: tag('summary'), result: tag('result') };
+}
+
+function readClaudeUserText(content: unknown): string {
+  if (typeof content === 'string') return content;
+  if (!Array.isArray(content)) return '';
+  return content
+    .filter((part: AnyRecord) => part?.type === 'text')
+    .map((part: AnyRecord) => String(part.text ?? ''))
+    .join('\n');
 }
 
 async function parseAgentTools(filePath: string): Promise<AnyRecord[]> {
@@ -89,13 +127,7 @@ async function parseAgentTools(filePath: string): Promise<AnyRecord[]> {
             }
 
             tool.toolResult = {
-              content: typeof part.content === 'string'
-                ? part.content
-                : Array.isArray(part.content)
-                  ? part.content
-                    .map((contentPart: AnyRecord) => contentPart?.text || '')
-                    .join('\n')
-                  : JSON.stringify(part.content),
+              content: claudeToolResultText(part.content),
               isError: Boolean(part.is_error),
             };
           }
@@ -388,6 +420,30 @@ export class ClaudeSessionsProvider implements IProviderSessions {
     const messages: NormalizedMessage[] = [];
     const ts = raw.timestamp || new Date().toISOString();
     const baseId = raw.uuid || generateMessageId('claude');
+
+    // A notification that lands mid-turn is queued as an attachment instead of
+    // a user turn; it reports the same finished background task.
+    const queuedPrompt = raw.type === 'attachment' && raw.attachment?.type === 'queued_command'
+      ? readClaudeUserText(raw.attachment.prompt)
+      : '';
+    if (raw.message?.role === 'user' || queuedPrompt) {
+      // A finished background task — a card, not a raw XML user bubble.
+      const notification = parseClaudeTaskNotification(queuedPrompt || readClaudeUserText(raw.message?.content));
+      if (notification) {
+        messages.push(createNormalizedMessage({
+          id: baseId,
+          sessionId,
+          timestamp: ts,
+          provider: PROVIDER,
+          kind: 'task_notification',
+          content: notification.summary || 'Background task finished',
+          ...(notification.toolUseId ? { toolId: notification.toolUseId } : {}),
+          ...(notification.status ? { status: notification.status } : {}),
+          ...(notification.result ? { summary: notification.result } : {}),
+        }));
+        return messages;
+      }
+    }
 
     if (raw.message?.role === 'user' && raw.message?.content && raw.isMeta !== true) {
       if (Array.isArray(raw.message.content)) {
@@ -763,6 +819,23 @@ export class ClaudeSessionsProvider implements IProviderSessions {
       }
     }
     normalized.splice(0, normalized.length, ...withSubagentRows);
+
+    // A background Agent's real outcome is its task notification: fold the
+    // latest one into the call's card (its own result was only the launch
+    // placeholder), so the card shows the answer and a failure as an error.
+    const notificationOutcome = new Map<string, NormalizedMessage>();
+    for (const msg of normalized) {
+      if (msg.kind === 'task_notification' && msg.toolId) notificationOutcome.set(msg.toolId, msg);
+    }
+    for (const msg of normalized) {
+      const outcome = msg.kind === 'tool_use' && msg.toolId ? notificationOutcome.get(msg.toolId) : undefined;
+      if (!outcome) continue;
+      msg.toolResult = {
+        ...(msg.toolResult as AnyRecord | undefined),
+        content: String(outcome.summary ?? outcome.content ?? ''),
+        isError: outcome.status === 'failed' || outcome.status === 'error',
+      };
+    }
 
     let total = 0;
     for (const msg of normalized) {
