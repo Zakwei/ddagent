@@ -108,14 +108,17 @@ const PROVIDER_CAPABILITIES: Record<LLMProvider, ProviderCapabilities> = {
   },
   devin: {
     provider: 'devin',
-    permissionModes: ['default', 'auto', 'acceptEdits', 'bypassPermissions', 'plan'],
+    // ACP session/set_mode: default→auto (asks), auto→smart, acceptEdits→
+    // accept-edits, bypassPermissions→dangerous. Devin has no plan mode.
+    permissionModes: ['default', 'auto', 'acceptEdits', 'bypassPermissions'],
     defaultPermissionMode: 'default',
     supportsImages: true,
     supportsFiles: true,
     supportsAbort: true,
     supportsPermissionRequests: true,
     supportsTokenUsage: true,
-    supportsEffort: true,
+    // The model catalog id already carries the thinking level (thought_level).
+    supportsEffort: false,
     supportsLivePermissionMode: true,
   },
   opencode: {
