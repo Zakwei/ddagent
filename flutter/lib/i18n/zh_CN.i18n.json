@@ -232,7 +232,11 @@
       "allowAll": "全部允许（{{count}}）",
       "editInput": "编辑输入",
       "invalidJson": "无效的 JSON",
-      "allowWithChanges": "按修改允许"
+      "allowWithChanges": "按修改允许",
+      "alwaysDeny": "始终拒绝",
+      "denyFeedbackTitle": "拒绝计划",
+      "denyFeedbackHint": "需要智能体修改什么？（可选）",
+      "modeAppliesNextMessage": "新的权限模式将从下一条消息开始生效。"
     },
     "todo": {
       "updated": "待办列表已成功更新",
@@ -698,7 +702,10 @@
       "compactedSummary": "压缩摘要",
       "resendHint": "从输入框重新发送",
       "rawView": "原始视图",
-      "runComplete": "运行完成"
+      "runComplete": "运行完成",
+      "runStopped": "已停止",
+      "runFailed": "运行失败（退出码 {{code}}）",
+      "taskKilled": "已终止"
     },
     "permissionRequest": {
       "title": "权限请求 · {{tool}}",

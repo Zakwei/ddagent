@@ -240,7 +240,11 @@
       "allowAll": "Zezwól na wszystko ({{count}})",
       "editInput": "Edytuj dane wejściowe",
       "invalidJson": "Nieprawidłowy JSON",
-      "allowWithChanges": "Zezwól ze zmianami"
+      "allowWithChanges": "Zezwól ze zmianami",
+      "alwaysDeny": "Zawsze odmawiaj",
+      "denyFeedbackTitle": "Odrzuć plan",
+      "denyFeedbackHint": "Co agent powinien zmienić? (opcjonalnie)",
+      "modeAppliesNextMessage": "Nowy tryb uprawnień zacznie obowiązywać od następnej wiadomości."
     },
     "todo": {
       "updated": "Lista zadań została pomyślnie zaktualizowana",
@@ -714,7 +718,10 @@
       "compactedSummary": "Skrócone podsumowanie",
       "resendHint": "Wyślij ponownie z pola wiadomości",
       "rawView": "Widok surowy",
-      "runComplete": "Przebieg zakończony"
+      "runComplete": "Przebieg zakończony",
+      "runStopped": "Zatrzymano",
+      "runFailed": "Uruchomienie nie powiodło się (kod {{code}})",
+      "taskKilled": "Przerwane"
     },
     "permissionRequest": {
       "title": "Prośba o uprawnienie · {{tool}}",

@@ -232,7 +232,11 @@
       "allowAll": "全部允許（{{count}}）",
       "editInput": "編輯輸入",
       "invalidJson": "無效的 JSON",
-      "allowWithChanges": "允許並修改"
+      "allowWithChanges": "允許並修改",
+      "alwaysDeny": "一律拒絕",
+      "denyFeedbackTitle": "拒絕計畫",
+      "denyFeedbackHint": "需要代理修改什麼？（選填）",
+      "modeAppliesNextMessage": "新的權限模式將從下一則訊息開始生效。"
     },
     "todo": {
       "updated": "待辦清單已成功更新",
@@ -698,7 +702,10 @@
       "compactedSummary": "壓縮摘要",
       "resendHint": "從輸入框重新傳送",
       "rawView": "原始檢視",
-      "runComplete": "執行完成"
+      "runComplete": "執行完成",
+      "runStopped": "已停止",
+      "runFailed": "執行失敗（結束代碼 {{code}}）",
+      "taskKilled": "已終止"
     },
     "permissionRequest": {
       "title": "權限要求 · {{tool}}",

@@ -691,19 +691,6 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     );
     final total = ref.watch(sessionMessageStoreProvider.select((s) => s[sessionId]?.total ?? 0));
 
-    // T17.3 — provider assigned a real session id; swap the route so
-    // subsequent deep-links/reloads land on the canonical session.
-    ref.listen(transcriptProvider(widget.sessionId).select((s) => s.replacedWith), (_, next) {
-      if (next == null || !mounted) return;
-      final query = Uri(
-        queryParameters: {
-          if (widget.projectId != null) 'projectId': widget.projectId!,
-          if (widget.projectPath != null) 'projectPath': widget.projectPath!,
-        },
-      ).query;
-      context.replace('/chat/$next${query.isEmpty ? '' : '?$query'}');
-    });
-
     _lastRows = grouped.rows;
 
     // Detached-viewport correction: any history mutation that shifts or
@@ -1111,14 +1098,17 @@ class MessageTile extends ConsumerWidget {
           ToolUseTile(message: message, childrenMap: childrenMap, onFileOpen: onFileOpen),
         );
       case 'tool_result':
-        // The web transcript folds a tool's output into its own row —
-        // standalone result lines only survive as errors.
-        if (!message.isError) return const SizedBox.shrink();
+        // Results with a matching tool_use are folded into its card
+        // (`attachToolResults`); one without renders as its own row.
+        final resultText = message.toolResult?['content']?.toString() ?? message.content ?? '';
+        if (!message.isError && resultText.trim().isEmpty) return const SizedBox.shrink();
         return _wrap(ToolResultTile(message: message));
       case 'status':
         final orchKind = message.context?['orchestratorKind']?.toString();
-        // Empty status rows carry no text — the old transcript skips them.
-        if (orchKind == null && (message.status ?? message.content ?? '').isEmpty) {
+        // Notices (live `notice: true` frames and history rows) carry their
+        // line in `text`; empty and control rows render nothing.
+        final statusText = message.status ?? message.text ?? message.content ?? '';
+        if (orchKind == null && (statusText.isEmpty || statusText == 'token_budget')) {
           return const SizedBox.shrink();
         }
         if (orchKind != null) {
@@ -1133,7 +1123,7 @@ class MessageTile extends ConsumerWidget {
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
-                  message.status ?? message.content ?? '',
+                  statusText,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: cs.outline,
                     fontStyle: FontStyle.italic,
@@ -1155,9 +1145,12 @@ class MessageTile extends ConsumerWidget {
               children: [
                 Text(message.content ?? message.text ?? ''),
                 TextButton(
-                  onPressed: () =>
-                      ScaffoldMessenger.of(context)
-                          .showSnackBar(SnackBar(content: Text(i18n.chat.message.resendHint))),
+                  onPressed: () {
+                    final sent = ref
+                        .read(transcriptProvider(sessionId).notifier)
+                        .retryLastUserMessage();
+                    if (!sent) AppToast.show(context, i18n.chat.message.resendHint);
+                  },
                   child: Text(i18n.chat.session.messages.retry),
                 ),
               ],
@@ -1165,26 +1158,35 @@ class MessageTile extends ConsumerWidget {
           ),
         );
       case 'complete':
+        final exitCode = message.exitCode ?? 0;
+        final failed = !message.aborted && exitCode != 0;
+        final lineColor = failed ? cs.error : cs.outlineVariant;
         return _wrap(
           Row(
             children: [
-              Expanded(child: Divider(color: cs.outlineVariant)),
+              Expanded(child: Divider(color: lineColor)),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: Text(
-                  i18n.chat.message.runComplete,
-                  style: theme.textTheme.labelSmall?.copyWith(color: cs.outline),
+                  message.aborted
+                      ? i18n.chat.message.runStopped
+                      : failed
+                      ? i18n.chat.message.runFailed(code: exitCode)
+                      : i18n.chat.message.runComplete,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: failed ? cs.error : cs.outline,
+                  ),
                 ),
               ),
-              Expanded(child: Divider(color: cs.outlineVariant)),
+              Expanded(child: Divider(color: lineColor)),
             ],
           ),
         );
       case 'permission_request':
         return _permissionCard(context, ref);
       // Control events — the web transcript never renders these
-      // (`useChatMessages.ts` skips stream_end/complete/session_created).
-      case 'stream_end' || 'complete' || 'session_created':
+      // (`useChatMessages.ts` skips stream_end/session_created).
+      case 'stream_end' || 'session_created':
         return const SizedBox.shrink();
       case 'permission_cancelled':
         return const SizedBox.shrink();
@@ -1210,21 +1212,41 @@ class MessageTile extends ConsumerWidget {
           ),
         );
       case 'task_notification':
-        final target = message.actualSessionId;
+        // A finished background task: `content` is its title, `status` how
+        // it ended, `summary` its result. No session link — the server
+        // reports the task's tool call, not a separate session.
+        final taskStatus = message.status?.toLowerCase();
+        final taskFailed = const {'failed', 'killed', 'error'}.contains(taskStatus);
+        final statusLabel = switch (taskStatus) {
+          null || '' => null,
+          'failed' || 'error' => i18n.common.status.failed,
+          'killed' => i18n.chat.message.taskKilled,
+          'completed' => i18n.common.status.completed,
+          _ => message.status,
+        };
+        final taskSummary = message.summary?.trim() ?? '';
         return _wrap(
           _card(
             cs,
-            icon: Icons.notifications_outlined,
+            color: taskFailed ? cs.errorContainer : null,
+            icon: taskFailed ? Icons.error_outline : Icons.notifications_outlined,
             title: i18n.common.notifications.codes.generic.info.title,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(message.content ?? message.summary ?? ''),
-                if (target != null && target.isNotEmpty && target != sessionId)
-                  TextButton.icon(
-                    icon: const Icon(Icons.open_in_new, size: 14),
-                    label: Text(i18n.tasks.board.card.openSession),
-                    onPressed: () => context.go('/chat/$target'),
+                if ((message.content ?? '').isNotEmpty) Text(message.content!),
+                if (statusLabel != null)
+                  Text(
+                    statusLabel,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: taskFailed ? cs.error : cs.outline,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                if (taskSummary.isNotEmpty && taskSummary != message.content)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: AppMarkdown(data: taskSummary, selectable: false),
                   ),
               ],
             ),
@@ -1388,6 +1410,8 @@ class MessageTile extends ConsumerWidget {
     final isPending =
         requestId != null && ref.watch(pendingPermissionsProvider).containsKey(requestId);
     final rememberEntry = message.context?['rememberEntry']?.toString();
+    final rejectAlways = rejectAlwaysEntryOf(message.context);
+    final isPlanExit = _isPlanExit(toolName);
     // Only Claude runs the edited input; ACP agents and OpenCode accept a bare
     // allow/deny, so "Edit & Allow" there would approve the original call.
     final canEditInput = message.provider == 'claude';
@@ -1396,7 +1420,7 @@ class MessageTile extends ConsumerWidget {
     // screen. Once decided, this card reappears as the read-only recap.
     if (isAskUser && isPending) return const SizedBox.shrink();
 
-    void decide({required bool allow, dynamic updatedInput, dynamic remember}) {
+    void decide({required bool allow, dynamic updatedInput, dynamic remember, String? feedback}) {
       if (requestId == null) return;
       ref
           .read(transcriptProvider(sessionId).notifier)
@@ -1405,6 +1429,7 @@ class MessageTile extends ConsumerWidget {
             allow: allow,
             updatedInput: updatedInput,
             rememberEntry: remember,
+            message: feedback,
           );
     }
 
@@ -1428,7 +1453,10 @@ class MessageTile extends ConsumerWidget {
                   style: TextStyle(fontSize: 11, color: cs.outline),
                 ),
               ),
-            if (!isAskUser) Text(message.content ?? message.text ?? ''),
+            if (!isAskUser && (message.content ?? message.text ?? '').isNotEmpty)
+              Text(message.content ?? message.text ?? ''),
+            // What is being approved — the command, path, plan or input.
+            if (!isAskUser) PermissionInputView(toolName: toolName, input: input),
             if (!isAskUser) const SizedBox(height: 8),
             // Server also enforces roleAtLeast('member') on this frame.
             RequireRole(
@@ -1471,8 +1499,19 @@ class MessageTile extends ConsumerWidget {
                             }),
                             child: Text(i18n.chat.permissions.editAndAllow),
                           ),
+                        if (rejectAlways != null)
+                          TextButton(
+                            onPressed: () => decide(allow: false, remember: rejectAlways),
+                            child: Text(i18n.chat.permissions.alwaysDeny),
+                          ),
                         TextButton(
-                          onPressed: () => decide(allow: false),
+                          onPressed: () async {
+                            if (!isPlanExit) return decide(allow: false);
+                            final feedback = await _askDenyFeedback(context);
+                            if (feedback != null) {
+                              decide(allow: false, feedback: feedback.isEmpty ? null : feedback);
+                            }
+                          },
                           child: Text(i18n.chat.permissions.deny),
                         ),
                       ],
@@ -1979,15 +2018,29 @@ class _PermissionBanner extends ConsumerWidget {
     final t = Theme.of(context).textTheme;
     final i18n = Translations.of(context);
 
-    // Only "Always" remembers the rule — a plain Allow (or Allow all) must
-    // approve this one call and nothing more.
-    void decide(PendingPermission p, {required bool allow, bool remember = false}) => ref
+    // Only "Always" / "Always deny" remember the rule — a plain Allow (or
+    // Allow all) must approve this one call and nothing more.
+    void decide(
+      PendingPermission p, {
+      required bool allow,
+      bool remember = false,
+      String? feedback,
+    }) => ref
         .read(transcriptProvider(sessionId).notifier)
         .decidePermission(
           p.requestId,
           allow: allow,
-          rememberEntry: allow && remember ? p.rememberEntry : null,
+          rememberEntry: remember ? (allow ? p.rememberEntry : p.rejectAlwaysEntry) : null,
+          message: feedback,
         );
+
+    Future<void> reject(PendingPermission p) async {
+      if (!_isPlanExit(p.toolName)) return decide(p, allow: false);
+      final feedback = await _askDenyFeedback(context);
+      if (feedback != null) {
+        decide(p, allow: false, feedback: feedback.isEmpty ? null : feedback);
+      }
+    }
 
     bool isQuestion(PendingPermission p) {
       final n = p.toolName.toLowerCase().replaceAll(' ', '_');
@@ -2058,38 +2111,56 @@ class _PermissionBanner extends ConsumerWidget {
           for (final p in permissions)
             Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(LucideIcons.lock, size: 14, color: Color(0xFFF59E0B)),
-                  const SizedBox(width: AppSpacing.sm),
-                  Expanded(
-                    child: Text(
-                      p.context?['agentId'] != null
-                          ? i18n.chat.permissionRequest.subagentNeedsApproval(tool: p.toolName)
-                          : i18n.chat.permissionRequest.needsApproval(tool: p.toolName),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: t.bodySmall?.copyWith(color: c.foreground),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () => decide(p, allow: true),
-                    child: Text(i18n.chat.permissions.allow),
-                  ),
-                  if (p.rememberEntry != null)
-                    Tooltip(
-                      message: i18n.chat.permissions.addTo(entry: p.rememberEntry!),
-                      child: TextButton(
-                        onPressed: () => decide(p, allow: true, remember: true),
-                        child: Text(i18n.chat.permissions.always),
+                  Row(
+                    children: [
+                      const Icon(LucideIcons.lock, size: 14, color: Color(0xFFF59E0B)),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: Text(
+                          p.context?['agentId'] != null
+                              ? i18n.chat.permissionRequest.subagentNeedsApproval(tool: p.toolName)
+                              : i18n.chat.permissionRequest.needsApproval(tool: p.toolName),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: t.bodySmall?.copyWith(color: c.foreground),
+                        ),
                       ),
-                    ),
-                  TextButton(
-                    onPressed: () => decide(p, allow: false),
-                    child: Text(
-                      i18n.chat.permissions.reject,
-                      style: TextStyle(color: c.destructive),
-                    ),
+                      TextButton(
+                        onPressed: () => decide(p, allow: true),
+                        child: Text(i18n.chat.permissions.allow),
+                      ),
+                      if (p.rememberEntry != null)
+                        Tooltip(
+                          message: i18n.chat.permissions.addTo(entry: p.rememberEntry!),
+                          child: TextButton(
+                            onPressed: () => decide(p, allow: true, remember: true),
+                            child: Text(i18n.chat.permissions.always),
+                          ),
+                        ),
+                      if (p.rejectAlwaysEntry != null)
+                        TextButton(
+                          onPressed: () => decide(p, allow: false, remember: true),
+                          child: Text(
+                            i18n.chat.permissions.alwaysDeny,
+                            style: TextStyle(color: c.destructive),
+                          ),
+                        ),
+                      TextButton(
+                        onPressed: () => unawaited(reject(p)),
+                        child: Text(
+                          i18n.chat.permissions.reject,
+                          style: TextStyle(color: c.destructive),
+                        ),
+                      ),
+                    ],
+                  ),
+                  // What is being approved — the command, path, plan or input.
+                  Padding(
+                    padding: const EdgeInsets.only(left: 22),
+                    child: PermissionInputView(toolName: p.toolName, input: p.input),
                   ),
                 ],
               ),
@@ -2196,4 +2267,44 @@ class _ReasoningRowState extends State<_ReasoningRow> {
       ],
     );
   }
+}
+
+bool _isPlanExit(String toolName) =>
+    toolName.toLowerCase().replaceAll(RegExp('[ _]'), '') == 'exitplanmode';
+
+/// Deny-with-feedback for a plan (ExitPlanMode): null when cancelled, else
+/// the (possibly empty) text sent to the agent as the denial `message`.
+Future<String?> _askDenyFeedback(BuildContext context) async {
+  final i18n = Translations.of(context);
+  final ctrl = TextEditingController();
+  final ok = await showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: Text(i18n.chat.permissions.denyFeedbackTitle),
+      content: SizedBox(
+        width: 480,
+        child: TextField(
+          controller: ctrl,
+          autofocus: true,
+          minLines: 2,
+          maxLines: 6,
+          decoration: InputDecoration(
+            hintText: i18n.chat.permissions.denyFeedbackHint,
+            border: const OutlineInputBorder(),
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(ctx, false),
+          child: Text(i18n.common.buttons.cancel),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.pop(ctx, true),
+          child: Text(i18n.chat.permissions.deny),
+        ),
+      ],
+    ),
+  );
+  return ok == true ? ctrl.text.trim() : null;
 }

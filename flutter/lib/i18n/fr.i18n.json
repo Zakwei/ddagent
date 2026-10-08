@@ -232,7 +232,11 @@
       "allowAll": "Tout autoriser ({{count}})",
       "editInput": "Modifier l’entrée",
       "invalidJson": "JSON invalide",
-      "allowWithChanges": "Autoriser avec modifications"
+      "allowWithChanges": "Autoriser avec modifications",
+      "alwaysDeny": "Toujours refuser",
+      "denyFeedbackTitle": "Refuser le plan",
+      "denyFeedbackHint": "Que doit changer l’agent ? (facultatif)",
+      "modeAppliesNextMessage": "Le nouveau mode d’autorisation s’applique à partir du prochain message."
     },
     "todo": {
       "updated": "La liste de tâches a été mise à jour avec succès",
@@ -700,7 +704,10 @@
       "compactedSummary": "Résumé compacté",
       "resendHint": "Renvoyer depuis le composeur",
       "rawView": "Vue brute",
-      "runComplete": "Exécution terminée"
+      "runComplete": "Exécution terminée",
+      "runStopped": "Arrêté",
+      "runFailed": "Échec de l’exécution (code {{code}})",
+      "taskKilled": "Arrêtée"
     },
     "permissionRequest": {
       "title": "Demande de permission · {{tool}}",

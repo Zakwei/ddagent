@@ -232,7 +232,11 @@
       "allowAll": "Permitir todo ({{count}})",
       "editInput": "Editar entrada",
       "invalidJson": "JSON no válido",
-      "allowWithChanges": "Permitir con cambios"
+      "allowWithChanges": "Permitir con cambios",
+      "alwaysDeny": "Denegar siempre",
+      "denyFeedbackTitle": "Rechazar el plan",
+      "denyFeedbackHint": "¿Qué debería cambiar el agente? (opcional)",
+      "modeAppliesNextMessage": "El nuevo modo de permisos se aplica a partir del siguiente mensaje."
     },
     "todo": {
       "updated": "La lista de pendientes se actualizó correctamente",
@@ -700,7 +704,10 @@
       "compactedSummary": "Resumen compactado",
       "resendHint": "Vuelve a enviar desde el compositor",
       "rawView": "Vista sin procesar",
-      "runComplete": "Ejecución completada"
+      "runComplete": "Ejecución completada",
+      "runStopped": "Detenido",
+      "runFailed": "La ejecución falló (salida {{code}})",
+      "taskKilled": "Terminada"
     },
     "permissionRequest": {
       "title": "Solicitud de permiso · {{tool}}",

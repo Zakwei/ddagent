@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:ddagent_app/core/realtime/chat_channel.dart';
 import 'package:ddagent_app/core/realtime/realtime_providers.dart';
+import 'package:ddagent_app/features/chat/state/pending_permissions.dart';
 import 'package:ddagent_app/features/chat/state/transcript_controller.dart';
 import 'package:ddagent_app/features/commands/data/commands_repository.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_node.dart';
@@ -39,6 +40,8 @@ class ComposerState {
     this.effort,
     this.permissionMode = 'default',
     this.permissionModes = const [],
+    this.supportsEffort = true,
+    this.supportsLivePermissionMode = true,
     this.accounts = const [],
     this.accountId,
     this.queue = const [],
@@ -60,6 +63,12 @@ class ComposerState {
   /// Modes the active provider accepts (backend capability matrix) — the
   /// permission menu hides entirely when the list is empty, web parity.
   final List<String> permissionModes;
+
+  /// Capability flags (absent on older servers → assume supported).
+  final bool supportsEffort;
+
+  /// False when a mode change only applies from the next message.
+  final bool supportsLivePermissionMode;
   final List<ProviderAccount> accounts;
   final String? accountId;
   final List<Map<String, dynamic>> queue;
@@ -97,6 +106,7 @@ class ComposerState {
   /// Effort levels offered by the active model's descriptor (web parity:
   /// `ProviderModelOption.effort.values`), else the provider superset.
   List<String> effortValues(String provider) {
+    if (!supportsEffort) return const [];
     for (final m in models) {
       if ((m['id'] ?? m['value']) == activeModel) {
         final vals = (m['effort'] as Map?)?['values'] as List?;
@@ -111,6 +121,7 @@ class ComposerState {
   /// Like [effortValues] but keeps each descriptor's `description` — the web
   /// `ComposerModelMenu` shows it under the effort label.
   List<({String value, String? description})> effortOptions(String provider) {
+    if (!supportsEffort) return const [];
     for (final m in models) {
       if ((m['id'] ?? m['value']) == activeModel) {
         final vals = (m['effort'] as Map?)?['values'] as List? ?? const [];
@@ -136,6 +147,8 @@ class ComposerState {
     String? Function()? effort,
     String? permissionMode,
     List<String>? permissionModes,
+    bool? supportsEffort,
+    bool? supportsLivePermissionMode,
     List<ProviderAccount>? accounts,
     String? Function()? accountId,
     List<Map<String, dynamic>>? queue,
@@ -153,6 +166,8 @@ class ComposerState {
     effort: effort != null ? effort() : this.effort,
     permissionMode: permissionMode ?? this.permissionMode,
     permissionModes: permissionModes ?? this.permissionModes,
+    supportsEffort: supportsEffort ?? this.supportsEffort,
+    supportsLivePermissionMode: supportsLivePermissionMode ?? this.supportsLivePermissionMode,
     accounts: accounts ?? this.accounts,
     accountId: accountId != null ? accountId() : this.accountId,
     queue: queue ?? this.queue,
@@ -234,6 +249,16 @@ class ComposerController extends Notifier<ComposerState> {
       }
     });
     ref.onDispose(() => unawaited(_eventsSub?.cancel()));
+    final sid = _sessionId;
+    if (sid != null) {
+      // Approving a plan (ExitPlanMode / plan review) leaves plan mode; a
+      // composer still on 'plan' would put the agent straight back.
+      ref.listen(planExitProvider(sid), (_, exit) {
+        if (exit == null || state.permissionMode != 'plan') return;
+        final modes = state.permissionModes;
+        selectPermissionMode(modes.isEmpty || modes.contains(exit.mode) ? exit.mode : 'default');
+      });
+    }
     Future(_init);
     return ComposerState(
       input: _sessionId != null
@@ -304,10 +329,11 @@ class ComposerController extends Notifier<ComposerState> {
         ? repo.details(sid).then<Session?>((s) => s).catchError((_) => null)
         : Future<Session?>.value(null);
     try {
-      final critical = await Future.wait([modelsF, activeF, _loadPermissionModes(), detailsF]);
+      final critical = await Future.wait([modelsF, activeF, _loadCapabilities(), detailsF]);
       if (!ref.mounted) return;
       final catalog = critical[0] as ({List<Map<String, dynamic>> options, String? defaultModel});
       final active = critical[1] as Map<String, dynamic>;
+      final caps = critical[2] as Map<String, dynamic>;
       final sessionRaw = (critical[3] as Session?)?.raw;
       // A `source: 'default'` payload is the catalog DEFAULT, not a session
       // pick — without the filter it shadows the stored `<provider>-model`
@@ -334,7 +360,9 @@ class ComposerController extends Notifier<ComposerState> {
             (storedModel != null && storedModel.isNotEmpty ? storedModel : null) ??
             catalog.defaultModel,
         effort: () => active['effort']?.toString() ?? storedEffort ?? 'default',
-        permissionModes: critical[2] as List<String>,
+        permissionModes: [for (final m in caps['permissionModes'] as List? ?? const []) '$m'],
+        supportsEffort: caps['supportsEffort'] != false,
+        supportsLivePermissionMode: caps['supportsLivePermissionMode'] != false,
         permissionMode: !_modeManuallySet && sessionMode != null && sessionMode.isNotEmpty
             ? sessionMode
             : null,
@@ -359,15 +387,15 @@ class ComposerController extends Notifier<ComposerState> {
     }
   }
 
-  /// Capability matrix → the permission modes the composer menu offers.
-  /// Empty on failure — the menu hides rather than guessing (web parity:
-  /// `ComposerPermissionMenu` returns null for an empty list).
-  Future<List<String>> _loadPermissionModes() async {
+  /// Capability matrix → the permission modes the composer menu offers and
+  /// the effort/live-mode flags. Empty on failure — the menu hides rather
+  /// than guessing (web parity: `ComposerPermissionMenu` returns null for an
+  /// empty list).
+  Future<Map<String, dynamic>> _loadCapabilities() async {
     try {
-      final caps = await ref.read(sessionsRepositoryProvider).capabilities(_arg.provider);
-      return [for (final m in caps['permissionModes'] as List? ?? const []) '$m'];
+      return await ref.read(sessionsRepositoryProvider).capabilities(_arg.provider);
     } on Object {
-      return const [];
+      return const {};
     }
   }
 
@@ -473,7 +501,7 @@ class ComposerController extends Notifier<ComposerState> {
 
   Map<String, dynamic> _sendOptions() => {
     if (state.activeModel != null) 'model': state.activeModel,
-    if (state.effort != null) 'effort': state.effort,
+    if (state.effort != null && state.supportsEffort) 'effort': state.effort,
     'permissionMode': state.permissionMode,
     // Orchestrator rows (plans, decisions, summary, report) are generated in
     // this language; without it the server defaults to English.
@@ -502,10 +530,13 @@ class ComposerController extends Notifier<ComposerState> {
     if (_sending) return;
     final text = _content().trim();
     final sid = _sessionId;
-    if (text.isEmpty || sid == null) return;
+    // Attachments alone are a valid turn (the server accepts empty content).
+    if ((text.isEmpty && state.attachments.isEmpty) || sid == null) return;
     _sending = true;
     try {
-      if (running) {
+      // The queue REST route requires text; an attachment-only draft goes over
+      // WS, where the server queues a send that races a live run itself.
+      if (running && text.isNotEmpty) {
         await ref
             .read(queueRepositoryProvider)
             .enqueue(sid, content: text, options: _sendOptions());

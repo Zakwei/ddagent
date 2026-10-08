@@ -997,6 +997,10 @@ class Translations$chat$permissions$ja extends Translations$chat$permissions$en 
 	@override String get editInput => '入力を編集';
 	@override String get invalidJson => '無効なJSON';
 	@override String get allowWithChanges => '変更を加えて許可';
+	@override String get alwaysDeny => '常に拒否';
+	@override String get denyFeedbackTitle => 'プランを却下';
+	@override String get denyFeedbackHint => 'エージェントに何を変更してほしいですか？（任意）';
+	@override String get modeAppliesNextMessage => '新しい権限モードは次のメッセージから適用されます。';
 }
 
 // Path: chat.todo
@@ -1573,6 +1577,9 @@ class Translations$chat$message$ja extends Translations$chat$message$en {
 	@override String get resendHint => '入力欄から再送信';
 	@override String get rawView => '生の表示';
 	@override String get runComplete => '実行完了';
+	@override String get runStopped => '停止しました';
+	@override String runFailed({required Object code}) => '実行に失敗しました（終了コード ${code}）';
+	@override String get taskKilled => '強制終了';
 }
 
 // Path: chat.permissionRequest
@@ -8624,6 +8631,10 @@ extension on TranslationsJa {
 			'chat.permissions.editInput' => '入力を編集',
 			'chat.permissions.invalidJson' => '無効なJSON',
 			'chat.permissions.allowWithChanges' => '変更を加えて許可',
+			'chat.permissions.alwaysDeny' => '常に拒否',
+			'chat.permissions.denyFeedbackTitle' => 'プランを却下',
+			'chat.permissions.denyFeedbackHint' => 'エージェントに何を変更してほしいですか？（任意）',
+			'chat.permissions.modeAppliesNextMessage' => '新しい権限モードは次のメッセージから適用されます。',
 			'chat.todo.updated' => 'Todoリストを更新しました',
 			'chat.todo.current' => '現在のTodoリスト',
 			'chat.plan.viewPlan' => '📋 実装プランを表示',
@@ -8968,15 +8979,18 @@ extension on TranslationsJa {
 			'chat.modelLibrary.saving' => '保存中…',
 			'chat.modelLibrary.saveChanges' => '変更を保存',
 			'chat.modelLibrary.deleteConfirm' => 'このモデルをすべての選択肢から削除しますか？',
+			_ => null,
+		} ?? switch (path) {
 			'chat.modelLibrary.customBadge' => 'カスタム',
 			'chat.changes.failedToLoad' => '変更の読み込みに失敗しました',
 			'chat.changes.empty' => 'ファイルの変更はありません',
 			'chat.message.compactedSummary' => '圧縮された要約',
-			_ => null,
-		} ?? switch (path) {
 			'chat.message.resendHint' => '入力欄から再送信',
 			'chat.message.rawView' => '生の表示',
 			'chat.message.runComplete' => '実行完了',
+			'chat.message.runStopped' => '停止しました',
+			'chat.message.runFailed' => ({required Object code}) => '実行に失敗しました（終了コード ${code}）',
+			'chat.message.taskKilled' => '強制終了',
 			'chat.permissionRequest.title' => ({required Object tool}) => '権限リクエスト · ${tool}',
 			'chat.permissionRequest.question' => '質問',
 			'chat.permissionRequest.subagent' => 'サブエージェント',
@@ -9479,6 +9493,8 @@ extension on TranslationsJa {
 			'common.projectWizard.step2.selectTokenPlaceholder' => '-- トークンを選択 --',
 			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
 			'common.projectWizard.step2.tokenHelp' => 'このトークンはこの操作にのみ使用されます',
+			_ => null,
+		} ?? switch (path) {
 			'common.projectWizard.step2.publicRepoInfo' => 'パブリックリポジトリには認証は不要です。パブリックリポジトリをクローンする場合、トークンは省略できます。',
 			'common.projectWizard.step2.noTokensHelp' => '保存済みトークンがありません。設定 → APIキーでトークンを追加すると再利用が簡単になります。',
 			'common.projectWizard.step2.optionalTokenPublic' => 'GitHubトークン（パブリックリポジトリの場合は任意）',
@@ -9486,8 +9502,6 @@ extension on TranslationsJa {
 			'common.projectWizard.step3.reviewConfig' => '設定の確認',
 			'common.projectWizard.step3.existingWorkspace' => '既存のワークスペース',
 			'common.projectWizard.step3.newWorkspace' => '新しいワークスペース',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.step3.path' => 'パス:',
 			'common.projectWizard.step3.cloneFrom' => 'クローン元:',
 			'common.projectWizard.step3.authentication' => '認証:',
@@ -9993,6 +10007,8 @@ extension on TranslationsJa {
 			'settings.appearance.title' => '外観',
 			'settings.appearance.theme' => 'テーマ',
 			'settings.appearance.codeEditor' => 'コードエディタ',
+			_ => null,
+		} ?? switch (path) {
 			'settings.appearance.editorTheme' => 'エディタのテーマ',
 			'settings.appearance.wordWrap' => '折り返し',
 			'settings.appearance.showMinimap' => 'ミニマップを表示',
@@ -10000,8 +10016,6 @@ extension on TranslationsJa {
 			'settings.appearance.fontSize' => 'フォントサイズ',
 			'settings.appearance.themeModes.system' => 'システム',
 			'settings.appearance.themeModes.light' => 'ライト',
-			_ => null,
-		} ?? switch (path) {
 			'settings.appearance.themeModes.dark' => 'ダーク',
 			'settings.actions.saveChanges' => '変更を保存',
 			'settings.actions.resetToDefaults' => 'デフォルトに戻す',
@@ -10507,6 +10521,8 @@ extension on TranslationsJa {
 			'settings.stt.title' => '音声入力 (音声認識)',
 			'settings.stt.description' => 'Whisper 互換の /audio/transcriptions エンドポイント (OpenAI、whisper.cpp、faster-whisper、Speaches)。入力欄のマイクボタンが有効になります。',
 			'settings.stt.configured' => '設定済み',
+			_ => null,
+		} ?? switch (path) {
 			'settings.stt.endpoint' => 'エンドポイント URL (例: https://api.openai.com/v1)',
 			'settings.stt.apiKey' => 'API キー',
 			'settings.stt.model' => 'モデル (デフォルト: whisper-1)',
@@ -10514,8 +10530,6 @@ extension on TranslationsJa {
 			'settings.schedules.title' => 'スケジュール',
 			'settings.schedules.description' => 'cron の時刻表に従ってエージェントを定期実行します。実行は無人で行われ、権限確認はバイパスされます。',
 			'settings.schedules.preventSleep' => 'エージェント実行中はスリープを防止',
-			_ => null,
-		} ?? switch (path) {
 			'settings.schedules.preventSleepHint' => 'デスクトップではディスプレイをオンのまま保ちます。ブラウザでは画面のウェイクロックを使用します。',
 			'settings.schedules.kNew' => '新しいスケジュール',
 			'settings.schedules.loading' => '読み込み中…',
@@ -11021,6 +11035,8 @@ extension on TranslationsJa {
 			'tasks.taskDetail.titleRequired' => 'タイトルは必須です',
 			'tasks.taskDetail.updateFailed' => 'タスクの更新に失敗しました',
 			'tasks.taskDetail.notFound' => 'タスクが見つかりません',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.subtasks' => 'サブタスク',
 			'tasks.taskDetail.deleteConfirmMessage' => ({required Object id}) => 'タスク #${id} は削除されます。元に戻せません。',
 			'tasks.taskDetail.idCopied' => 'タスクIDをコピーしました',
@@ -11028,8 +11044,6 @@ extension on TranslationsJa {
 			'tasks.taskmaster.noProjectHint' => 'まずプロジェクトを追加してから、タスクを作成してください。',
 			'tasks.taskmaster.sort.statusAz' => 'ステータス (A-Z)',
 			'tasks.taskmaster.sort.statusZa' => 'ステータス (Z-A)',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskmaster.installedVersion' => ({required Object version}) => 'インストール済み: ${version}',
 			'tasks.taskmaster.initFailed' => 'TaskMaster を初期化できませんでした',
 			'tasks.taskmaster.prd.fileNameRequired' => 'PRD のファイル名を入力してください。',
@@ -11535,6 +11549,8 @@ extension on TranslationsJa {
 			'terminal.overlay.resumeSession' => ({required Object title}) => 'セッション ${title} を再開',
 			'terminal.overlay.startSession' => ({required Object path}) => '${path} で新しいセッションを開始',
 			'voice.preview' => 'プレビュー',
+			_ => null,
+		} ?? switch (path) {
 			'voice.settingsSaved' => '音声入力設定を保存しました',
 			'voice.saveFailed' => 'STT設定の保存に失敗しました',
 			'voice.apiKeySaved' => 'APIキー（保存済み、変更するには入力）',
@@ -11542,8 +11558,6 @@ extension on TranslationsJa {
 			'workspace.searchTranscript' => 'トランスクリプトを検索',
 			'workspace.previousMatch' => '前の一致',
 			'workspace.nextMatch' => '次の一致',
-			_ => null,
-		} ?? switch (path) {
 			'workspace.closeSearch' => '検索を閉じる',
 			'workspace.newChatProvider' => '新しいチャット — プロバイダー',
 			'workspace.closePane' => 'ペインを閉じる',

@@ -232,7 +232,11 @@
       "allowAll": "Tümüne izin ver ({{count}})",
       "editInput": "Girdiyi düzenle",
       "invalidJson": "Geçersiz JSON",
-      "allowWithChanges": "Değişikliklerle izin ver"
+      "allowWithChanges": "Değişikliklerle izin ver",
+      "alwaysDeny": "Her zaman reddet",
+      "denyFeedbackTitle": "Planı reddet",
+      "denyFeedbackHint": "Ajan neyi değiştirmeli? (isteğe bağlı)",
+      "modeAppliesNextMessage": "Yeni izin modu bir sonraki mesajdan itibaren geçerli olur."
     },
     "todo": {
       "updated": "Yapılacaklar listesi başarıyla güncellendi",
@@ -700,7 +704,10 @@
       "compactedSummary": "Sıkıştırılmış özet",
       "resendHint": "Düzenleyiciden yeniden gönderin",
       "rawView": "Ham görünüm",
-      "runComplete": "Çalıştırma tamamlandı"
+      "runComplete": "Çalıştırma tamamlandı",
+      "runStopped": "Durduruldu",
+      "runFailed": "Çalıştırma başarısız (çıkış {{code}})",
+      "taskKilled": "Sonlandırıldı"
     },
     "permissionRequest": {
       "title": "İzin isteği · {{tool}}",

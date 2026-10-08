@@ -163,7 +163,15 @@ class SessionMessageStore extends Notifier<Map<String, SessionSlot>> {
 
   /// Optimistic echo for a sent message; removed once the persisted turn
   /// arrives (removeOptimisticUserEchoes).
-  void appendLocalEcho(String sessionId, String text, String provider) {
+  void appendLocalEcho(
+    String sessionId,
+    String text,
+    String provider, {
+    List<Map<String, dynamic>> attachments = const [],
+  }) {
+    bool isImage(Map<String, dynamic> a) => '${a['mimeType'] ?? ''}'.startsWith('image/');
+    final images = [...attachments.where(isImage)];
+    final files = [...attachments.where((a) => !isImage(a))];
     appendRealtime(
       sessionId,
       SessionMessage(
@@ -174,6 +182,8 @@ class SessionMessageStore extends Notifier<Map<String, SessionSlot>> {
         kind: 'text',
         role: 'user',
         content: text,
+        images: images.isEmpty ? null : images,
+        files: files.isEmpty ? null : files,
       ),
     );
   }

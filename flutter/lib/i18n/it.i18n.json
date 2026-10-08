@@ -232,7 +232,11 @@
       "allowAll": "Consenti tutto ({{count}})",
       "editInput": "Modifica input",
       "invalidJson": "JSON non valido",
-      "allowWithChanges": "Consenti con modifiche"
+      "allowWithChanges": "Consenti con modifiche",
+      "alwaysDeny": "Nega sempre",
+      "denyFeedbackTitle": "Rifiuta il piano",
+      "denyFeedbackHint": "Cosa dovrebbe cambiare l’agente? (facoltativo)",
+      "modeAppliesNextMessage": "La nuova modalità di autorizzazione si applica dal prossimo messaggio."
     },
     "todo": {
       "updated": "Lista attività aggiornata con successo",
@@ -700,7 +704,10 @@
       "compactedSummary": "Riepilogo compattato",
       "resendHint": "Reinvia dal compositore",
       "rawView": "Vista grezza",
-      "runComplete": "Esecuzione completata"
+      "runComplete": "Esecuzione completata",
+      "runStopped": "Interrotto",
+      "runFailed": "Esecuzione non riuscita (uscita {{code}})",
+      "taskKilled": "Terminata"
     },
     "permissionRequest": {
       "title": "Richiesta di permesso · {{tool}}",

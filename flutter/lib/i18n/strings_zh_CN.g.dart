@@ -997,6 +997,10 @@ class Translations$chat$permissions$zh_CN extends Translations$chat$permissions$
 	@override String get editInput => '编辑输入';
 	@override String get invalidJson => '无效的 JSON';
 	@override String get allowWithChanges => '按修改允许';
+	@override String get alwaysDeny => '始终拒绝';
+	@override String get denyFeedbackTitle => '拒绝计划';
+	@override String get denyFeedbackHint => '需要智能体修改什么？（可选）';
+	@override String get modeAppliesNextMessage => '新的权限模式将从下一条消息开始生效。';
 }
 
 // Path: chat.todo
@@ -1573,6 +1577,9 @@ class Translations$chat$message$zh_CN extends Translations$chat$message$en {
 	@override String get resendHint => '从输入框重新发送';
 	@override String get rawView => '原始视图';
 	@override String get runComplete => '运行完成';
+	@override String get runStopped => '已停止';
+	@override String runFailed({required Object code}) => '运行失败（退出码 ${code}）';
+	@override String get taskKilled => '已终止';
 }
 
 // Path: chat.permissionRequest
@@ -8624,6 +8631,10 @@ extension on TranslationsZhCn {
 			'chat.permissions.editInput' => '编辑输入',
 			'chat.permissions.invalidJson' => '无效的 JSON',
 			'chat.permissions.allowWithChanges' => '按修改允许',
+			'chat.permissions.alwaysDeny' => '始终拒绝',
+			'chat.permissions.denyFeedbackTitle' => '拒绝计划',
+			'chat.permissions.denyFeedbackHint' => '需要智能体修改什么？（可选）',
+			'chat.permissions.modeAppliesNextMessage' => '新的权限模式将从下一条消息开始生效。',
 			'chat.todo.updated' => '待办列表已成功更新',
 			'chat.todo.current' => '当前待办列表',
 			'chat.plan.viewPlan' => '📋 查看实施计划',
@@ -8968,15 +8979,18 @@ extension on TranslationsZhCn {
 			'chat.modelLibrary.saving' => '正在保存…',
 			'chat.modelLibrary.saveChanges' => '保存更改',
 			'chat.modelLibrary.deleteConfirm' => '要从所有选择器中删除此模型吗？',
+			_ => null,
+		} ?? switch (path) {
 			'chat.modelLibrary.customBadge' => '自定义',
 			'chat.changes.failedToLoad' => '加载更改失败',
 			'chat.changes.empty' => '没有文件更改',
 			'chat.message.compactedSummary' => '压缩摘要',
-			_ => null,
-		} ?? switch (path) {
 			'chat.message.resendHint' => '从输入框重新发送',
 			'chat.message.rawView' => '原始视图',
 			'chat.message.runComplete' => '运行完成',
+			'chat.message.runStopped' => '已停止',
+			'chat.message.runFailed' => ({required Object code}) => '运行失败（退出码 ${code}）',
+			'chat.message.taskKilled' => '已终止',
 			'chat.permissionRequest.title' => ({required Object tool}) => '权限请求 · ${tool}',
 			'chat.permissionRequest.question' => '问题',
 			'chat.permissionRequest.subagent' => '子代理',
@@ -9479,6 +9493,8 @@ extension on TranslationsZhCn {
 			'common.projectWizard.step2.selectTokenPlaceholder' => '-- 选择令牌 --',
 			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
 			'common.projectWizard.step2.tokenHelp' => '此令牌仅用于此操作',
+			_ => null,
+		} ?? switch (path) {
 			'common.projectWizard.step2.publicRepoInfo' => '公共仓库不需要身份验证。如果克隆公共仓库，可以跳过提供令牌。',
 			'common.projectWizard.step2.noTokensHelp' => '没有可用的已保存令牌。您可以在 设置 → API 密钥 中添加令牌以便重复使用。',
 			'common.projectWizard.step2.optionalTokenPublic' => 'GitHub 令牌（公共仓库可选）',
@@ -9486,8 +9502,6 @@ extension on TranslationsZhCn {
 			'common.projectWizard.step3.reviewConfig' => '查看您的配置',
 			'common.projectWizard.step3.existingWorkspace' => '现有工作区',
 			'common.projectWizard.step3.newWorkspace' => '新建工作区',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.step3.path' => '路径：',
 			'common.projectWizard.step3.cloneFrom' => '克隆自：',
 			'common.projectWizard.step3.authentication' => '身份验证：',
@@ -9993,6 +10007,8 @@ extension on TranslationsZhCn {
 			'settings.appearance.title' => '外观',
 			'settings.appearance.theme' => '主题',
 			'settings.appearance.codeEditor' => '代码编辑器',
+			_ => null,
+		} ?? switch (path) {
 			'settings.appearance.editorTheme' => '编辑器主题',
 			'settings.appearance.wordWrap' => '自动换行',
 			'settings.appearance.showMinimap' => '显示缩略图',
@@ -10000,8 +10016,6 @@ extension on TranslationsZhCn {
 			'settings.appearance.fontSize' => '字体大小',
 			'settings.appearance.themeModes.system' => '跟随系统',
 			'settings.appearance.themeModes.light' => '浅色',
-			_ => null,
-		} ?? switch (path) {
 			'settings.appearance.themeModes.dark' => '深色',
 			'settings.actions.saveChanges' => '保存更改',
 			'settings.actions.resetToDefaults' => '重置为默认值',
@@ -10507,6 +10521,8 @@ extension on TranslationsZhCn {
 			'settings.stt.title' => '语音输入（语音转文字）',
 			'settings.stt.description' => '兼容 Whisper 的 /audio/transcriptions 端点（OpenAI、whisper.cpp、faster-whisper、Speaches）。启用后输入框中会显示麦克风按钮。',
 			'settings.stt.configured' => '已配置',
+			_ => null,
+		} ?? switch (path) {
 			'settings.stt.endpoint' => '端点 URL（例如 https://api.openai.com/v1）',
 			'settings.stt.apiKey' => 'API 密钥',
 			'settings.stt.model' => '模型（默认：whisper-1）',
@@ -10514,8 +10530,6 @@ extension on TranslationsZhCn {
 			'settings.schedules.title' => '定时任务',
 			'settings.schedules.description' => '按 cron 时间表定期运行智能体。运行将在无人值守的情况下进行，并跳过权限确认。',
 			'settings.schedules.preventSleep' => '智能体运行时阻止休眠',
-			_ => null,
-		} ?? switch (path) {
 			'settings.schedules.preventSleepHint' => '桌面端会保持屏幕常亮；在浏览器中使用屏幕唤醒锁。',
 			'settings.schedules.kNew' => '新建定时任务',
 			'settings.schedules.loading' => '正在加载…',
@@ -11021,6 +11035,8 @@ extension on TranslationsZhCn {
 			'tasks.taskDetail.titleRequired' => '标题为必填项',
 			'tasks.taskDetail.updateFailed' => '更新任务失败',
 			'tasks.taskDetail.notFound' => '未找到任务',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.subtasks' => '子任务',
 			'tasks.taskDetail.deleteConfirmMessage' => ({required Object id}) => '任务 #${id} 将被移除。此操作无法撤销。',
 			'tasks.taskDetail.idCopied' => '任务 ID 已复制',
@@ -11028,8 +11044,6 @@ extension on TranslationsZhCn {
 			'tasks.taskmaster.noProjectHint' => '请先添加项目，然后为其创建任务。',
 			'tasks.taskmaster.sort.statusAz' => '状态 (A-Z)',
 			'tasks.taskmaster.sort.statusZa' => '状态 (Z-A)',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskmaster.installedVersion' => ({required Object version}) => '已安装：${version}',
 			'tasks.taskmaster.initFailed' => '初始化 TaskMaster 失败',
 			'tasks.taskmaster.prd.fileNameRequired' => '请为 PRD 提供文件名。',
@@ -11535,6 +11549,8 @@ extension on TranslationsZhCn {
 			'terminal.overlay.resumeSession' => ({required Object title}) => '恢复会话 ${title}',
 			'terminal.overlay.startSession' => ({required Object path}) => '在 ${path} 中开始新会话',
 			'voice.preview' => '预览',
+			_ => null,
+		} ?? switch (path) {
 			'voice.settingsSaved' => '语音输入设置已保存',
 			'voice.saveFailed' => '保存 STT 配置失败',
 			'voice.apiKeySaved' => 'API 密钥（已保存，输入以替换）',
@@ -11542,8 +11558,6 @@ extension on TranslationsZhCn {
 			'workspace.searchTranscript' => '搜索记录',
 			'workspace.previousMatch' => '上一个匹配项',
 			'workspace.nextMatch' => '下一个匹配项',
-			_ => null,
-		} ?? switch (path) {
 			'workspace.closeSearch' => '关闭搜索',
 			'workspace.newChatProvider' => '新聊天 — 提供商',
 			'workspace.closePane' => '关闭窗格',

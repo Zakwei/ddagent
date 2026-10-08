@@ -1123,6 +1123,106 @@ class _PlanReviewPanelState extends State<PlanReviewPanel> {
   }
 }
 
+/// Client-side stamps on a permission row's input — not part of the ask.
+const _permissionStampKeys = {'resolved', 'answers', 'cancelReason'};
+
+/// What a permission ask approves, in one readable line: the command for
+/// shell tools, the path for edit/write tools, OpenCode `patterns`, the URL
+/// for fetches — else compact JSON capped to a few lines.
+String permissionInputSummary(Map<String, dynamic> input) {
+  String? text(Object? v) {
+    if (v is String && v.trim().isNotEmpty) return v.trim();
+    if (v is List && v.isNotEmpty) return v.join(v.every((e) => e is String) ? ' ' : ', ');
+    return null;
+  }
+
+  final patterns = input['patterns'];
+  final picked =
+      text(input['command']) ??
+      text(input['cmd']) ??
+      text(input['file_path']) ??
+      text(input['filePath']) ??
+      text(input['path']) ??
+      (patterns is List && patterns.isNotEmpty ? patterns.join(', ') : text(patterns)) ??
+      text(input['url']) ??
+      text(input['pattern']) ??
+      text(input['query']);
+  if (picked != null) return picked;
+  final rest = {
+    for (final e in input.entries)
+      if (!_permissionStampKeys.contains(e.key)) e.key: e.value,
+  };
+  if (rest.isEmpty) return '';
+  final lines = const JsonEncoder.withIndent('  ').convert(rest).split('\n');
+  return lines.length <= 6 ? lines.join('\n') : '${lines.take(6).join('\n')}\n…';
+}
+
+/// Body of a permission ask (banner row and inline card): the plan for
+/// `ExitPlanMode`, else [permissionInputSummary] with the full input behind
+/// "Show more".
+class PermissionInputView extends StatefulWidget {
+  const PermissionInputView({required this.toolName, required this.input, super.key});
+
+  final String toolName;
+  final Map<String, dynamic> input;
+
+  @override
+  State<PermissionInputView> createState() => _PermissionInputViewState();
+}
+
+class _PermissionInputViewState extends State<PermissionInputView> {
+  bool _open = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final t = Translations.of(context);
+    final plan = widget.input['plan'];
+    final isPlanExit =
+        widget.toolName.toLowerCase().replaceAll(RegExp('[ _]'), '') == 'exitplanmode';
+    if (isPlanExit && plan is String && plan.trim().isNotEmpty) {
+      return PlanReviewPanel(content: plan, filePath: widget.input['planFilePath']?.toString());
+    }
+    final summary = permissionInputSummary(widget.input);
+    if (summary.isEmpty) return const SizedBox.shrink();
+    final full = const JsonEncoder.withIndent('  ').convert({
+      for (final e in widget.input.entries)
+        if (!_permissionStampKeys.contains(e.key)) e.key: e.value,
+    });
+    const mono = TextStyle(fontSize: 12, fontFamily: 'monospace');
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (!_open)
+          Text(summary, maxLines: 3, overflow: TextOverflow.ellipsis, style: mono)
+        else
+          Container(
+            constraints: const BoxConstraints(maxHeight: 240),
+            width: double.infinity,
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: cs.surface,
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: cs.outlineVariant),
+            ),
+            child: SingleChildScrollView(child: Text(full, style: mono)),
+          ),
+        if (full != summary)
+          InkWell(
+            onTap: () => setState(() => _open = !_open),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 2),
+              child: Text(
+                _open ? t.chat.toolBlocks.showLess : t.chat.toolBlocks.showMore,
+                style: TextStyle(fontSize: 11, color: cs.primary),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
 /// True when an option the model offered acts as a free-text entry ("Other",
 /// "Inne (wpiszę)", …). The tool schema tells models not to add such an option
 /// (the client provides one), but when they do a tap must reveal the text field
@@ -1241,9 +1341,12 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
     final out = <String, dynamic>{};
     for (var i = 0; i < _questions.length; i++) {
       final q = _questions[i];
-      final sel = <String>{...?_selections[i]};
-      if (_otherActive[i] == true && (_otherText[i]?.text.trim().isNotEmpty ?? false)) {
-        sel.add(_otherText[i]!.text.trim());
+      var sel = <String>{...?_selections[i]};
+      final other = _otherActive[i] == true ? _otherText[i]?.text.trim() ?? '' : '';
+      if (other.isNotEmpty) {
+        // Single-select answers with exactly one value: typed text replaces
+        // the pick instead of riding along as "OptA, typed text".
+        sel = q['multiSelect'] == true ? (sel..add(other)) : {other};
       }
       if (sel.isNotEmpty) {
         out[q['question']?.toString() ?? 'q$i'] = sel.join(', ');
@@ -1333,6 +1436,10 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
                     if (freeText) {
                       _otherActive[_step] = true;
                       _otherText[_step] ??= TextEditingController();
+                    } else {
+                      // One answer per single-select question: a pick clears Other.
+                      _otherActive[_step] = false;
+                      _otherText[_step]?.clear();
                     }
                   });
                   if (!widget.autoSubmit || freeText) return;
@@ -1359,7 +1466,7 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
                 ),
               ),
             ),
-          _otherField(cs, selected),
+          _otherField(cs, selected, multi: multi),
           const SizedBox(height: 8),
           Row(
             children: [
@@ -1369,9 +1476,11 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
                   child: Text(t.common.navigation.back),
                 ),
               const Spacer(),
+              // Skipping declines the question (deny is how the SDK expects
+              // an unanswered AskUserQuestion), not an "allow" with no answers.
               TextButton(
                 onPressed: () =>
-                    widget.onDecision(true, {...widget.input, 'answers': <String, dynamic>{}}),
+                    widget.onDecision(false, {...widget.input, 'answers': <String, dynamic>{}}),
                 child: Text(t.chat.askUserQuestion.skip),
               ),
               const SizedBox(width: 8),
@@ -1390,7 +1499,7 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
     );
   }
 
-  Widget _otherField(ColorScheme cs, Set<String> selected) {
+  Widget _otherField(ColorScheme cs, Set<String> selected, {required bool multi}) {
     final t = Translations.of(context);
     final active = _otherActive[_step] == true;
     if (!active) {
@@ -1417,6 +1526,12 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
       child: TextField(
         controller: _otherText[_step],
         autofocus: true,
+        onChanged: (v) {
+          // Typing a single-select answer deselects the picked option.
+          if (!multi && v.trim().isNotEmpty && selected.isNotEmpty) {
+            setState(selected.clear);
+          }
+        },
         style: const TextStyle(fontSize: 13),
         decoration: InputDecoration(
           isDense: true,

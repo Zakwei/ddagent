@@ -232,7 +232,11 @@
       "allowAll": "모두 허용 ({{count}})",
       "editInput": "입력 편집",
       "invalidJson": "잘못된 JSON",
-      "allowWithChanges": "변경 포함 허용"
+      "allowWithChanges": "변경 포함 허용",
+      "alwaysDeny": "항상 거부",
+      "denyFeedbackTitle": "계획 거부",
+      "denyFeedbackHint": "에이전트가 무엇을 바꿔야 하나요? (선택 사항)",
+      "modeAppliesNextMessage": "새 권한 모드는 다음 메시지부터 적용됩니다."
     },
     "todo": {
       "updated": "Todo 리스트가 업데이트되었습니다",
@@ -698,7 +702,10 @@
       "compactedSummary": "압축된 요약",
       "resendHint": "입력창에서 다시 전송",
       "rawView": "Raw 보기",
-      "runComplete": "실행 완료"
+      "runComplete": "실행 완료",
+      "runStopped": "중지됨",
+      "runFailed": "실행 실패 (종료 코드 {{code}})",
+      "taskKilled": "강제 종료됨"
     },
     "permissionRequest": {
       "title": "권한 요청 · {{tool}}",

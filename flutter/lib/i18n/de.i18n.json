@@ -232,7 +232,11 @@
       "allowAll": "Alle zulassen ({{count}})",
       "editInput": "Eingabe bearbeiten",
       "invalidJson": "Ungültiges JSON",
-      "allowWithChanges": "Mit Änderungen zulassen"
+      "allowWithChanges": "Mit Änderungen zulassen",
+      "alwaysDeny": "Immer ablehnen",
+      "denyFeedbackTitle": "Plan ablehnen",
+      "denyFeedbackHint": "Was soll der Agent ändern? (optional)",
+      "modeAppliesNextMessage": "Der neue Berechtigungsmodus gilt ab der nächsten Nachricht."
     },
     "todo": {
       "updated": "Aufgabenliste wurde erfolgreich aktualisiert",
@@ -700,7 +704,10 @@
       "compactedSummary": "Verdichtete Zusammenfassung",
       "resendHint": "Aus dem Chat-Editor erneut senden",
       "rawView": "Rohansicht",
-      "runComplete": "Lauf abgeschlossen"
+      "runComplete": "Lauf abgeschlossen",
+      "runStopped": "Gestoppt",
+      "runFailed": "Lauf fehlgeschlagen (Exit {{code}})",
+      "taskKilled": "Abgebrochen"
     },
     "permissionRequest": {
       "title": "Berechtigungsanfrage · {{tool}}",

@@ -4,6 +4,7 @@ import 'package:ddagent_app/core/network/api_error.dart';
 import 'package:ddagent_app/core/realtime/chat_channel.dart';
 import 'package:ddagent_app/core/realtime/realtime_providers.dart';
 import 'package:ddagent_app/core/realtime/ws_client.dart';
+import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/features/chat/state/pending_permissions.dart';
 import 'package:ddagent_app/features/notifications/data/notifications_repository.dart';
 import 'package:ddagent_app/features/sessions/data/chat_storage.dart';
@@ -25,6 +26,14 @@ const initialHistoryMinText = 2;
 const initialHistoryMaxExtraPages = 3;
 const olderPageSize = 40;
 
+/// Run status a `complete` frame settles to: `aborted` → stopped, a non-zero
+/// `exitCode` → error, else done.
+String runEndStatus(Map<String, dynamic> complete) {
+  if (complete['aborted'] == true) return 'stopped';
+  final exit = complete['exitCode'];
+  return exit is num && exit != 0 ? 'error' : 'done';
+}
+
 class TranscriptState {
   const TranscriptState({
     this.loading = false,
@@ -33,7 +42,6 @@ class TranscriptState {
     this.olderError,
     this.allLoaded = false,
     this.runStatus,
-    this.replacedWith,
     this.offlineCount = 0,
   });
 
@@ -43,12 +51,9 @@ class TranscriptState {
   final AppError? olderError;
   final bool allLoaded;
 
-  /// 'running' | 'done' | 'error' — derived from status/complete/error frames.
+  /// 'running' | 'done' | 'stopped' | 'error' — derived from
+  /// status/complete/error frames (`complete` carries `aborted`/`exitCode`).
   final String? runStatus;
-
-  /// T17.3 — set when a `session_created` frame assigns the real session id;
-  /// the view listens and replaces the route (`/chat/<new>`).
-  final String? replacedWith;
 
   /// Messages sitting in the `ddagent_offline_queue_<project>` bucket for
   /// this session — drives the amber OfflineQueueCard (web parity).
@@ -61,7 +66,6 @@ class TranscriptState {
     AppError? Function()? olderError,
     bool? allLoaded,
     String? Function()? runStatus,
-    String? Function()? replacedWith,
     int? offlineCount,
   }) => TranscriptState(
     loading: loading ?? this.loading,
@@ -70,7 +74,6 @@ class TranscriptState {
     olderError: olderError != null ? olderError() : this.olderError,
     allLoaded: allLoaded ?? this.allLoaded,
     runStatus: runStatus != null ? runStatus() : this.runStatus,
-    replacedWith: replacedWith != null ? replacedWith() : this.replacedWith,
     offlineCount: offlineCount ?? this.offlineCount,
   );
 }
@@ -99,9 +102,17 @@ class TranscriptController extends Notifier<TranscriptState> {
   Timer? _flushTimer;
   int _unsequencedRowId = 0;
 
-  /// Set once this pane sent a prompt — lets `session_created` (which carries
-  /// the provider-assigned id, not the draft route id) be attributed here.
-  bool _sentAny = false;
+  /// Options of this pane's last send — the error row's Retry reuses them.
+  Map<String, dynamic>? _lastSendOptions;
+
+  /// Decisions sent recently, kept so a FORBIDDEN_ROLE reply can put the ask
+  /// back instead of leaving it stamped as decided.
+  final _recentDecisions = <String, ({PendingPermission? pending, int at})>{};
+  static const _decisionRejectWindowMs = 5000;
+
+  /// Completers waiting for the current run to settle (see
+  /// [answerQuestionWithText]).
+  final _settleWaiters = <Completer<void>>[];
 
   SessionMessageStore get _store => ref.read(sessionMessageStoreProvider.notifier);
   ChatChannel get _channel => ref.read(chatChannelProvider);
@@ -112,6 +123,16 @@ class TranscriptController extends Notifier<TranscriptState> {
   /// acknowledgement can settle both the activity indicator and composer.
   void _applySubscribeAck(Map<String, dynamic> raw) {
     _syncPendingPermissions(raw['pendingPermissions']);
+    // Authoritative running-task count — a stale one from before a reload or
+    // a missed `background_tasks` frame must not linger.
+    final background = raw['backgroundTasks'];
+    if (background is num) {
+      final count = background.toInt();
+      final known = ref.read(backgroundTasksProvider)[_sessionId]?.tasks ?? const [];
+      ref
+          .read(backgroundTasksProvider.notifier)
+          .set(_sessionId, count, count > 0 ? known : const []);
+    }
     if (raw['isProcessing'] == true) {
       _activity.markProcessing(
         _sessionId,
@@ -121,7 +142,9 @@ class TranscriptController extends Notifier<TranscriptState> {
       _markRunRunning();
       return;
     }
-    _settleRun();
+    // An idle ack must not rewrite how the last run ended (stopped/failed).
+    final ended = state.runStatus;
+    _settleRun(ended == null || ended == 'running' ? 'done' : ended);
     // Skip the tail refetch when nothing needs reconciling: right after a
     // fresh history load with no live frames it would rewrite the
     // just-rendered page (visible reload). Leftover live rows, a stale slot,
@@ -165,36 +188,16 @@ class TranscriptController extends Notifier<TranscriptState> {
     }
   }
 
-  /// A finished run can no longer receive an answer, and the server drops
-  /// every frame after `complete` — so an ask cancelled by Stop or the run's
-  /// end would otherwise keep its live card forever.
-  void _expirePendingPermissions() {
-    final open = {
-      for (final p in ref.read(pendingPermissionsProvider).values)
-        if (p.sessionId == _sessionId) p.requestId,
-    };
-    if (open.isEmpty) return;
-    _store.patchRealtime(
-      _sessionId,
-      (m) => m.kind == 'permission_request' && open.contains(m.requestId),
-      (m) {
-        final input = m.toolInput is Map
-            ? Map<String, dynamic>.from(m.toolInput as Map)
-            : <String, dynamic>{};
-        input['resolved'] = true;
-        input['cancelReason'] = 'expired';
-        return m.copyWith(toolInput: input);
-      },
-    );
-    ref.read(pendingPermissionsProvider.notifier).removeForSession(_sessionId);
-  }
-
   void _settleRun([String status = 'done']) {
     _buffer.closeLiveRows(_sessionId, '');
     _store.setStatus(_sessionId, status);
     state = state.copyWith(runStatus: () => status);
     _activity.markIdle(_sessionId);
     _lastSentText = null;
+    for (final waiter in _settleWaiters) {
+      if (!waiter.isCompleted) waiter.complete();
+    }
+    _settleWaiters.clear();
   }
 
   Future<void> _refreshLatestSafely() async {
@@ -237,9 +240,28 @@ class TranscriptController extends Notifier<TranscriptState> {
         unawaited(_flushOffline());
       }
     });
+    // The activity map is also cleared by the running-sessions poll and by
+    // frames this pane never sees (a sessionless INTERNAL_ERROR on send) — a
+    // run the server no longer reports must not keep the composer running.
+    ref.listen(sessionActivityProvider.select((m) => m.containsKey(_sessionId)), (was, now) {
+      if (was == true && !now && state.runStatus == 'running') {
+        _settleRun();
+        unawaited(_refreshLatestSafely());
+      }
+    });
+    final background = ref.read(backgroundTasksProvider.notifier);
     ref.onDispose(() {
       _flushPendingRows();
       channel.unsubscribe(_sessionId);
+      // A closed pane stops receiving `background_tasks`; its count would go
+      // stale. The next subscribe ack restores it.
+      Future.microtask(() {
+        try {
+          background.set(_sessionId, 0, const []);
+        } on Object {
+          // Container already gone.
+        }
+      });
       unawaited(_eventsSub?.cancel());
       unawaited(_statesSub?.cancel());
     });
@@ -489,7 +511,7 @@ class TranscriptController extends Notifier<TranscriptState> {
     }
     _lastSentText = text;
     _lastSentAt = now;
-    _sentAny = true;
+    _lastSendOptions = options;
     // Optimistic: show the activity indicator immediately, before the server's
     // `status` frame lands (web `onSessionProcessing` on send).
     _markRunRunning();
@@ -502,7 +524,26 @@ class TranscriptController extends Notifier<TranscriptState> {
       // with the web client's ddagent_offline_queue_* bucket.
       _enqueueOffline(text, options);
     }
-    _store.appendLocalEcho(_sessionId, text, provider);
+    final attachments = options?['attachments'] is List
+        ? [
+            for (final a in options!['attachments'] as List)
+              if (a is Map) Map<String, dynamic>.from(a),
+          ]
+        : const <Map<String, dynamic>>[];
+    _store.appendLocalEcho(_sessionId, text, provider, attachments: attachments);
+  }
+
+  /// Error-row Retry: resend this session's last user message, with this
+  /// pane's last send options (model, effort, mode, attachments) when known.
+  bool retryLastUserMessage() {
+    final last = _store
+        .messages(_sessionId)
+        .where((m) => m.isUserText && (m.content ?? '').trim().isNotEmpty)
+        .lastOrNull;
+    if (last == null) return false;
+    _lastSentText = null; // a deliberate retry is not a double-fire
+    send(last.content!, options: _lastSendOptions);
+    return true;
   }
 
   void _enqueueOffline(String text, Map<String, dynamic>? options) {
@@ -572,10 +613,23 @@ class TranscriptController extends Notifier<TranscriptState> {
   /// a typed question answer cannot ride the ACP reply. End the blocked turn
   /// and send the text as the next turn, so the answer is applied right away
   /// instead of after the agent finishes guessing.
-  void answerQuestionWithText(String text) {
+  ///
+  /// Sequential on purpose: sending while the aborted run is still live races
+  /// RUN_IN_PROGRESS (the server queues the text, so it showed both as an
+  /// optimistic bubble and a queued card) and a send clears an abort still
+  /// waiting for its runId.
+  Future<void> answerQuestionWithText(String text) async {
     final value = text.trim();
     if (value.isEmpty) return;
-    abort();
+    if (state.runStatus == 'running' || _activity.isProcessing(_sessionId)) {
+      final settled = Completer<void>();
+      _settleWaiters.add(settled);
+      abort();
+      // shortcut: a run that never settles (ABORT_FAILED) still gets the text
+      // after 15 s — the server queues it behind the live run.
+      await settled.future.timeout(const Duration(seconds: 15), onTimeout: () {});
+      if (!ref.mounted) return;
+    }
     send(value);
   }
 
@@ -603,6 +657,20 @@ class TranscriptController extends Notifier<TranscriptState> {
     String? message,
     dynamic rememberEntry,
   }) async {
+    final pending = ref.read(pendingPermissionsProvider)[requestId];
+    final row = _store
+        .messages(_sessionId)
+        .where((m) => m.kind == 'permission_request' && m.requestId == requestId)
+        .firstOrNull;
+    _recentDecisions[requestId] = (pending: pending, at: DateTime.now().millisecondsSinceEpoch);
+    final planMode = planExitModeFor(
+      pending?.toolName ?? row?.toolName ?? '',
+      pending?.input ??
+          (row?.toolInput is Map ? Map<String, dynamic>.from(row!.toolInput as Map) : const {}),
+      allow: allow,
+      updatedInput: updatedInput,
+    );
+    if (planMode != null) ref.read(planExitProvider(_sessionId).notifier).request(planMode);
     ref.read(pendingPermissionsProvider.notifier).remove(requestId);
     final answers = updatedInput is Map ? updatedInput['answers'] : null;
     _store.patchRealtime(
@@ -644,17 +712,9 @@ class TranscriptController extends Notifier<TranscriptState> {
   }
 
   void _onEvent(ServerEvent e) {
-    // Defensive: the server WS rewrite currently swallows session_created
-    // (turns it into a DB mapping update). If a deployment forwards it,
-    // the frame carries the provider-captured id — only a pane that sent a
-    // prompt adopts the replacement id.
-    if (e.kind == 'session_created') {
-      final newId = e.raw['newSessionId']?.toString();
-      if (_sentAny && newId != null && newId != _sessionId) {
-        _sentAny = false;
-        state = state.copyWith(replacedWith: () => newId);
-      }
-      return;
+    // Answers a permission response this pane sent; often carries no sessionId.
+    if (e.kind == 'protocol_error' && e.raw['code'] == 'FORBIDDEN_ROLE') {
+      _restoreRejectedDecisions(e.raw['requestId']?.toString());
     }
     if (e.sessionId != _sessionId) return;
     final raw = e.raw;
@@ -666,12 +726,19 @@ class TranscriptController extends Notifier<TranscriptState> {
       return;
     }
     if (e.kind == 'protocol_error') {
+      final code = raw['code']?.toString();
+      // The run outlives these: an interrupt the provider refused, an abort
+      // aimed at an older run, or a role-gated frame. Say so, keep running.
+      if (protocolErrorKeepsRun(raw)) {
+        AppToast.global(raw['error']?.toString() ?? t.chat.transcript.requestFailed, isError: true);
+        return;
+      }
       // A rejected send/run settles the run immediately — no `complete`
       // follows. `NO_ACTIVE_RUN` is the benign abort-vs-complete race and
       // deserves no error row (web parity); either way the activity entry
       // must go.
-      _settleRun(raw['code'] == 'NO_ACTIVE_RUN' ? 'done' : 'error');
-      if (raw['code'] != 'NO_ACTIVE_RUN') {
+      _settleRun(code == 'NO_ACTIVE_RUN' ? 'done' : 'error');
+      if (code != 'NO_ACTIVE_RUN') {
         _queueRow(
           SessionMessage.fromJson({
             ...raw,
@@ -729,8 +796,14 @@ class TranscriptController extends Notifier<TranscriptState> {
       case 'complete':
         _completedRunId = e.runId;
         _buffer.closeLiveRows(_sessionId, provider);
-        _expirePendingPermissions();
-        _settleRun();
+        _settleRun(runEndStatus(raw));
+        // Asks and background work can outlive the turn (Claude background
+        // subagents), so neither is expired here — re-subscribe for the
+        // server's authoritative pending set and task count instead.
+        if ((ref.read(backgroundTasksProvider)[_sessionId]?.count ?? 0) > 0 ||
+            ref.read(pendingPermissionsProvider).values.any((p) => p.sessionId == _sessionId)) {
+          _channel.subscribe([_sessionId]);
+        }
         _maybeAutoRead(raw);
         // Web `requestLatestMessages`: once the turn is persisted, pull the
         // latest page so the server's copy replaces the realtime echo and
@@ -748,7 +821,8 @@ class TranscriptController extends Notifier<TranscriptState> {
         }
         break;
       case 'status':
-        _markRunRunning();
+        // Notices are transcript lines, and may trail the run's `complete`.
+        if (raw['notice'] != true) _markRunRunning();
         break;
       case 'tool_use' || 'tool_result':
         _markRunRunning();
@@ -806,11 +880,38 @@ class TranscriptController extends Notifier<TranscriptState> {
     }
     // Plain `status` frames are control events (React renders only the
     // orchestrator-payload rows); everything else here is a transcript row.
-    if (e.kind == 'status') {
+    if (e.kind == 'status' && raw['notice'] != true) {
       final orchKind = raw['context'] is Map ? (raw['context'] as Map)['orchestratorKind'] : null;
       if (orchKind == null || orchKind == 'user') return;
     }
     _queueRow(SessionMessage.fromJson({...raw, 'sessionId': _sessionId}));
+  }
+
+  /// FORBIDDEN_ROLE answered a permission response: the server never applied
+  /// it, so put the ask back instead of showing it as decided. Without a
+  /// requestId on the error, the decisions sent in the last few seconds are
+  /// the ones it can refer to.
+  void _restoreRejectedDecisions(String? requestId) {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    _recentDecisions.removeWhere((_, d) => now - d.at > _decisionRejectWindowMs);
+    final ids = requestId != null
+        ? [if (_recentDecisions.containsKey(requestId)) requestId]
+        : _recentDecisions.keys.toList();
+    for (final id in ids) {
+      final pending = _recentDecisions.remove(id)?.pending;
+      if (pending != null) ref.read(pendingPermissionsProvider.notifier).add(pending);
+      _store.patchRealtime(_sessionId, (m) => m.kind == 'permission_request' && m.requestId == id, (
+        m,
+      ) {
+        final input = m.toolInput is Map
+            ? Map<String, dynamic>.from(m.toolInput as Map)
+            : <String, dynamic>{};
+        input
+          ..remove('resolved')
+          ..remove('answers');
+        return m.copyWith(toolInput: input);
+      });
+    }
   }
 
   /// Auto-read hook: on the `complete` frame, speak the last assistant text

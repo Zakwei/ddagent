@@ -997,6 +997,10 @@ class Translations$chat$permissions$zh_TW extends Translations$chat$permissions$
 	@override String get editInput => '編輯輸入';
 	@override String get invalidJson => '無效的 JSON';
 	@override String get allowWithChanges => '允許並修改';
+	@override String get alwaysDeny => '一律拒絕';
+	@override String get denyFeedbackTitle => '拒絕計畫';
+	@override String get denyFeedbackHint => '需要代理修改什麼？（選填）';
+	@override String get modeAppliesNextMessage => '新的權限模式將從下一則訊息開始生效。';
 }
 
 // Path: chat.todo
@@ -1573,6 +1577,9 @@ class Translations$chat$message$zh_TW extends Translations$chat$message$en {
 	@override String get resendHint => '從輸入框重新傳送';
 	@override String get rawView => '原始檢視';
 	@override String get runComplete => '執行完成';
+	@override String get runStopped => '已停止';
+	@override String runFailed({required Object code}) => '執行失敗（結束代碼 ${code}）';
+	@override String get taskKilled => '已終止';
 }
 
 // Path: chat.permissionRequest
@@ -8624,6 +8631,10 @@ extension on TranslationsZhTw {
 			'chat.permissions.editInput' => '編輯輸入',
 			'chat.permissions.invalidJson' => '無效的 JSON',
 			'chat.permissions.allowWithChanges' => '允許並修改',
+			'chat.permissions.alwaysDeny' => '一律拒絕',
+			'chat.permissions.denyFeedbackTitle' => '拒絕計畫',
+			'chat.permissions.denyFeedbackHint' => '需要代理修改什麼？（選填）',
+			'chat.permissions.modeAppliesNextMessage' => '新的權限模式將從下一則訊息開始生效。',
 			'chat.todo.updated' => '待辦清單已成功更新',
 			'chat.todo.current' => '目前待辦清單',
 			'chat.plan.viewPlan' => '📋 查看實作計畫',
@@ -8968,15 +8979,18 @@ extension on TranslationsZhTw {
 			'chat.modelLibrary.saving' => '正在儲存…',
 			'chat.modelLibrary.saveChanges' => '儲存變更',
 			'chat.modelLibrary.deleteConfirm' => '要從所有選擇器中刪除此模型嗎？',
+			_ => null,
+		} ?? switch (path) {
 			'chat.modelLibrary.customBadge' => '自訂',
 			'chat.changes.failedToLoad' => '載入變更失敗',
 			'chat.changes.empty' => '沒有檔案變更',
 			'chat.message.compactedSummary' => '壓縮摘要',
-			_ => null,
-		} ?? switch (path) {
 			'chat.message.resendHint' => '從輸入框重新傳送',
 			'chat.message.rawView' => '原始檢視',
 			'chat.message.runComplete' => '執行完成',
+			'chat.message.runStopped' => '已停止',
+			'chat.message.runFailed' => ({required Object code}) => '執行失敗（結束代碼 ${code}）',
+			'chat.message.taskKilled' => '已終止',
 			'chat.permissionRequest.title' => ({required Object tool}) => '權限要求 · ${tool}',
 			'chat.permissionRequest.question' => '問題',
 			'chat.permissionRequest.subagent' => '子代理',
@@ -9479,6 +9493,8 @@ extension on TranslationsZhTw {
 			'common.projectWizard.step2.selectTokenPlaceholder' => '-- 選取權杖 --',
 			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
 			'common.projectWizard.step2.tokenHelp' => '此權杖僅用於此操作',
+			_ => null,
+		} ?? switch (path) {
 			'common.projectWizard.step2.publicRepoInfo' => '公開儲存庫不需要身分驗證。如果複製公開儲存庫，可以略過提供權杖。',
 			'common.projectWizard.step2.noTokensHelp' => '沒有可用的已儲存權杖。您可以在 設定 → API 金鑰 中新增權杖以便重複使用。',
 			'common.projectWizard.step2.optionalTokenPublic' => 'GitHub 權杖（公開儲存庫可選）',
@@ -9486,8 +9502,6 @@ extension on TranslationsZhTw {
 			'common.projectWizard.step3.reviewConfig' => '檢閱您的設定',
 			'common.projectWizard.step3.existingWorkspace' => '現有工作區',
 			'common.projectWizard.step3.newWorkspace' => '新建工作區',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.step3.path' => '路徑：',
 			'common.projectWizard.step3.cloneFrom' => '複製自：',
 			'common.projectWizard.step3.authentication' => '身分驗證：',
@@ -9993,6 +10007,8 @@ extension on TranslationsZhTw {
 			'settings.appearance.title' => '外觀',
 			'settings.appearance.theme' => '佈景主題',
 			'settings.appearance.codeEditor' => '程式碼編輯器',
+			_ => null,
+		} ?? switch (path) {
 			'settings.appearance.editorTheme' => '編輯器佈景主題',
 			'settings.appearance.wordWrap' => '自動換行',
 			'settings.appearance.showMinimap' => '顯示縮圖',
@@ -10000,8 +10016,6 @@ extension on TranslationsZhTw {
 			'settings.appearance.fontSize' => '字型大小',
 			'settings.appearance.themeModes.system' => '系統',
 			'settings.appearance.themeModes.light' => '淺色',
-			_ => null,
-		} ?? switch (path) {
 			'settings.appearance.themeModes.dark' => '深色',
 			'settings.actions.saveChanges' => '儲存變更',
 			'settings.actions.resetToDefaults' => '重設為預設值',
@@ -10507,6 +10521,8 @@ extension on TranslationsZhTw {
 			'settings.stt.title' => '語音輸入（語音轉文字）',
 			'settings.stt.description' => '相容 Whisper 的 /audio/transcriptions 端點（OpenAI、whisper.cpp、faster-whisper、Speaches）。啟用後，輸入區會出現麥克風按鈕。',
 			'settings.stt.configured' => '已設定',
+			_ => null,
+		} ?? switch (path) {
 			'settings.stt.endpoint' => '端點 URL（例如 https://api.openai.com/v1）',
 			'settings.stt.apiKey' => 'API 金鑰',
 			'settings.stt.model' => '模型（預設：whisper-1）',
@@ -10514,8 +10530,6 @@ extension on TranslationsZhTw {
 			'settings.schedules.title' => '排程',
 			'settings.schedules.description' => '依 cron 時間表定期執行代理。執行時無人看管，且會略過權限確認。',
 			'settings.schedules.preventSleep' => '代理執行時防止休眠',
-			_ => null,
-		} ?? switch (path) {
 			'settings.schedules.preventSleepHint' => '桌面版會讓螢幕保持喚醒；瀏覽器中則使用螢幕喚醒鎖定。',
 			'settings.schedules.kNew' => '新增排程',
 			'settings.schedules.loading' => '正在載入…',
@@ -11021,6 +11035,8 @@ extension on TranslationsZhTw {
 			'tasks.taskDetail.titleRequired' => '標題為必填項',
 			'tasks.taskDetail.updateFailed' => '更新任務失敗',
 			'tasks.taskDetail.notFound' => '找不到任務',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.subtasks' => '子任務',
 			'tasks.taskDetail.deleteConfirmMessage' => ({required Object id}) => '任務 #${id} 將被移除。此操作無法復原。',
 			'tasks.taskDetail.idCopied' => '已複製任務 ID',
@@ -11028,8 +11044,6 @@ extension on TranslationsZhTw {
 			'tasks.taskmaster.noProjectHint' => '請先新增專案，然後為其建立任務。',
 			'tasks.taskmaster.sort.statusAz' => '狀態 (A-Z)',
 			'tasks.taskmaster.sort.statusZa' => '狀態 (Z-A)',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskmaster.installedVersion' => ({required Object version}) => '已安裝：${version}',
 			'tasks.taskmaster.initFailed' => '初始化 TaskMaster 失敗',
 			'tasks.taskmaster.prd.fileNameRequired' => '請為 PRD 提供檔案名稱。',
@@ -11535,6 +11549,8 @@ extension on TranslationsZhTw {
 			'terminal.overlay.resumeSession' => ({required Object title}) => '繼續工作階段 ${title}',
 			'terminal.overlay.startSession' => ({required Object path}) => '在 ${path} 中開始新的工作階段',
 			'voice.preview' => '預覽',
+			_ => null,
+		} ?? switch (path) {
 			'voice.settingsSaved' => '語音輸入設定已儲存',
 			'voice.saveFailed' => '儲存 STT 設定失敗',
 			'voice.apiKeySaved' => 'API 金鑰（已儲存，輸入以取代）',
@@ -11542,8 +11558,6 @@ extension on TranslationsZhTw {
 			'workspace.searchTranscript' => '搜尋記錄',
 			'workspace.previousMatch' => '上一個符合項目',
 			'workspace.nextMatch' => '下一個符合項目',
-			_ => null,
-		} ?? switch (path) {
 			'workspace.closeSearch' => '關閉搜尋',
 			'workspace.newChatProvider' => '新對話 — 提供者',
 			'workspace.closePane' => '關閉窗格',

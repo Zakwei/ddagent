@@ -1000,6 +1000,10 @@ class Translations$chat$permissions$ru extends Translations$chat$permissions$en 
 	@override String get editInput => 'Изменить ввод';
 	@override String get invalidJson => 'Неверный JSON';
 	@override String get allowWithChanges => 'Разрешить с изменениями';
+	@override String get alwaysDeny => 'Всегда запрещать';
+	@override String get denyFeedbackTitle => 'Отклонить план';
+	@override String get denyFeedbackHint => 'Что агенту изменить? (необязательно)';
+	@override String get modeAppliesNextMessage => 'Новый режим разрешений применится со следующего сообщения.';
 }
 
 // Path: chat.todo
@@ -1581,6 +1585,9 @@ class Translations$chat$message$ru extends Translations$chat$message$en {
 	@override String get resendHint => 'Отправить повторно из поля ввода';
 	@override String get rawView => 'Исходный вид';
 	@override String get runComplete => 'Запуск завершён';
+	@override String get runStopped => 'Остановлено';
+	@override String runFailed({required Object code}) => 'Запуск завершился с ошибкой (код ${code})';
+	@override String get taskKilled => 'Прервана';
 }
 
 // Path: chat.permissionRequest
@@ -8673,6 +8680,10 @@ extension on TranslationsRu {
 			'chat.permissions.editInput' => 'Изменить ввод',
 			'chat.permissions.invalidJson' => 'Неверный JSON',
 			'chat.permissions.allowWithChanges' => 'Разрешить с изменениями',
+			'chat.permissions.alwaysDeny' => 'Всегда запрещать',
+			'chat.permissions.denyFeedbackTitle' => 'Отклонить план',
+			'chat.permissions.denyFeedbackHint' => 'Что агенту изменить? (необязательно)',
+			'chat.permissions.modeAppliesNextMessage' => 'Новый режим разрешений применится со следующего сообщения.',
 			'chat.todo.updated' => 'Список задач успешно обновлен',
 			'chat.todo.current' => 'Текущий список задач',
 			'chat.plan.viewPlan' => '📋 Просмотр плана реализации',
@@ -9017,15 +9028,18 @@ extension on TranslationsRu {
 			'chat.modelLibrary.saving' => 'Сохранение…',
 			'chat.modelLibrary.saveChanges' => 'Сохранить изменения',
 			'chat.modelLibrary.deleteConfirm' => 'Удалить эту модель из всех списков выбора?',
+			_ => null,
+		} ?? switch (path) {
 			'chat.modelLibrary.customBadge' => 'Свой',
 			'chat.changes.failedToLoad' => 'Не удалось загрузить изменения',
 			'chat.changes.empty' => 'Нет изменений файлов',
 			'chat.message.compactedSummary' => 'Сжатая сводка',
-			_ => null,
-		} ?? switch (path) {
 			'chat.message.resendHint' => 'Отправить повторно из поля ввода',
 			'chat.message.rawView' => 'Исходный вид',
 			'chat.message.runComplete' => 'Запуск завершён',
+			'chat.message.runStopped' => 'Остановлено',
+			'chat.message.runFailed' => ({required Object code}) => 'Запуск завершился с ошибкой (код ${code})',
+			'chat.message.taskKilled' => 'Прервана',
 			'chat.permissionRequest.title' => ({required Object tool}) => 'Запрос разрешения · ${tool}',
 			'chat.permissionRequest.question' => 'Вопрос',
 			'chat.permissionRequest.subagent' => 'Субагент',
@@ -9528,6 +9542,8 @@ extension on TranslationsRu {
 			'common.projectWizard.step2.selectTokenPlaceholder' => '-- Выберите токен --',
 			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
 			'common.projectWizard.step2.tokenHelp' => 'Этот токен будет использован только для этой операции',
+			_ => null,
+		} ?? switch (path) {
 			'common.projectWizard.step2.publicRepoInfo' => 'Публичные репозитории не требуют аутентификации. Вы можете пропустить токен при клонировании публичного репозитория.',
 			'common.projectWizard.step2.noTokensHelp' => 'Нет доступных сохраненных токенов. Вы можете добавить токены в Настройки → API ключи для удобного повторного использования.',
 			'common.projectWizard.step2.optionalTokenPublic' => 'Токен GitHub (необязательно для публичных репозиториев)',
@@ -9535,8 +9551,6 @@ extension on TranslationsRu {
 			'common.projectWizard.step3.reviewConfig' => 'Проверьте вашу конфигурацию',
 			'common.projectWizard.step3.existingWorkspace' => 'Существующее рабочее пространство',
 			'common.projectWizard.step3.newWorkspace' => 'Новое рабочее пространство',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.step3.path' => 'Путь:',
 			'common.projectWizard.step3.cloneFrom' => 'Клонировать из:',
 			'common.projectWizard.step3.authentication' => 'Аутентификация:',
@@ -10042,6 +10056,8 @@ extension on TranslationsRu {
 			'settings.appearance.title' => 'Внешний вид',
 			'settings.appearance.theme' => 'Тема',
 			'settings.appearance.codeEditor' => 'Редактор кода',
+			_ => null,
+		} ?? switch (path) {
 			'settings.appearance.editorTheme' => 'Тема редактора',
 			'settings.appearance.wordWrap' => 'Перенос слов',
 			'settings.appearance.showMinimap' => 'Показать миникарту',
@@ -10049,8 +10065,6 @@ extension on TranslationsRu {
 			'settings.appearance.fontSize' => 'Размер шрифта',
 			'settings.appearance.themeModes.system' => 'Системная',
 			'settings.appearance.themeModes.light' => 'Светлая',
-			_ => null,
-		} ?? switch (path) {
 			'settings.appearance.themeModes.dark' => 'Темная',
 			'settings.actions.saveChanges' => 'Сохранить изменения',
 			'settings.actions.resetToDefaults' => 'Сбросить к значениям по умолчанию',
@@ -10556,6 +10570,8 @@ extension on TranslationsRu {
 			'settings.stt.title' => 'Голосовой ввод (распознавание речи)',
 			'settings.stt.description' => 'Whisper-совместимая конечная точка /audio/transcriptions (OpenAI, whisper.cpp, faster-whisper, Speaches). Включает кнопку микрофона в поле ввода.',
 			'settings.stt.configured' => 'настроено',
+			_ => null,
+		} ?? switch (path) {
 			'settings.stt.endpoint' => 'URL конечной точки (например, https://api.openai.com/v1)',
 			'settings.stt.apiKey' => 'Ключ API',
 			'settings.stt.model' => 'Модель (по умолчанию: whisper-1)',
@@ -10563,8 +10579,6 @@ extension on TranslationsRu {
 			'settings.schedules.title' => 'Расписания',
 			'settings.schedules.description' => 'Повторяющиеся запуски агентов по расписанию cron. Запуски выполняются без присмотра и в обход запросов разрешений.',
 			'settings.schedules.preventSleep' => 'Не давать уходить в сон во время работы агентов',
-			_ => null,
-		} ?? switch (path) {
 			'settings.schedules.preventSleepHint' => 'Десктопное приложение не даёт экрану погаснуть; в браузере используется блокировка отключения экрана (wake lock).',
 			'settings.schedules.kNew' => 'Новое расписание',
 			'settings.schedules.loading' => 'Загрузка…',
@@ -11070,6 +11084,8 @@ extension on TranslationsRu {
 			'tasks.taskDetail.titleRequired' => 'Название обязательно',
 			'tasks.taskDetail.updateFailed' => 'Не удалось обновить задачу',
 			'tasks.taskDetail.notFound' => 'Задача не найдена',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.subtasks' => 'Подзадачи',
 			'tasks.taskDetail.deleteConfirmMessage' => ({required Object id}) => 'Задача #${id} будет удалена. Действие необратимо.',
 			'tasks.taskDetail.idCopied' => 'ID задачи скопирован',
@@ -11077,8 +11093,6 @@ extension on TranslationsRu {
 			'tasks.taskmaster.noProjectHint' => 'Сначала добавьте проект, затем создайте для него задачи.',
 			'tasks.taskmaster.sort.statusAz' => 'Статус (А–Я)',
 			'tasks.taskmaster.sort.statusZa' => 'Статус (Я–А)',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskmaster.installedVersion' => ({required Object version}) => 'Установлено: ${version}',
 			'tasks.taskmaster.initFailed' => 'Не удалось инициализировать TaskMaster',
 			'tasks.taskmaster.prd.fileNameRequired' => 'Укажите имя файла для PRD.',
@@ -11584,6 +11598,8 @@ extension on TranslationsRu {
 			'terminal.overlay.resumeSession' => ({required Object title}) => 'Возобновить сеанс ${title}',
 			'terminal.overlay.startSession' => ({required Object path}) => 'Начать новый сеанс в ${path}',
 			'voice.preview' => 'Предпросмотр',
+			_ => null,
+		} ?? switch (path) {
 			'voice.settingsSaved' => 'Настройки голосового ввода сохранены',
 			'voice.saveFailed' => 'Не удалось сохранить конфигурацию STT',
 			'voice.apiKeySaved' => 'API-ключ (сохранён, введите, чтобы заменить)',
@@ -11591,8 +11607,6 @@ extension on TranslationsRu {
 			'workspace.searchTranscript' => 'Поиск по транскрипту',
 			'workspace.previousMatch' => 'Предыдущее совпадение',
 			'workspace.nextMatch' => 'Следующее совпадение',
-			_ => null,
-		} ?? switch (path) {
 			'workspace.closeSearch' => 'Закрыть поиск',
 			'workspace.newChatProvider' => 'Новый чат — провайдер',
 			'workspace.closePane' => 'Закрыть панель',

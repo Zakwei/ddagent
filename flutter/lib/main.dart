@@ -38,9 +38,6 @@ Future<void> main() async {
   runApp(TranslationProvider(child: const ProviderScope(child: DdagentApp())));
 }
 
-/// Snackbars fired outside a route context (e.g. session-expired listener).
-final rootMessengerKey = GlobalKey<ScaffoldMessengerState>();
-
 /// Surfaces an inbound device notification: an OS/browser notification when the
 /// platform supports it, otherwise an in-app toast (web permission denied, or
 /// native builds without a notification plugin).

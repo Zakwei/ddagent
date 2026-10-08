@@ -240,7 +240,11 @@
       "allowAll": "Разрешить все ({{count}})",
       "editInput": "Изменить ввод",
       "invalidJson": "Неверный JSON",
-      "allowWithChanges": "Разрешить с изменениями"
+      "allowWithChanges": "Разрешить с изменениями",
+      "alwaysDeny": "Всегда запрещать",
+      "denyFeedbackTitle": "Отклонить план",
+      "denyFeedbackHint": "Что агенту изменить? (необязательно)",
+      "modeAppliesNextMessage": "Новый режим разрешений применится со следующего сообщения."
     },
     "todo": {
       "updated": "Список задач успешно обновлен",
@@ -714,7 +718,10 @@
       "compactedSummary": "Сжатая сводка",
       "resendHint": "Отправить повторно из поля ввода",
       "rawView": "Исходный вид",
-      "runComplete": "Запуск завершён"
+      "runComplete": "Запуск завершён",
+      "runStopped": "Остановлено",
+      "runFailed": "Запуск завершился с ошибкой (код {{code}})",
+      "taskKilled": "Прервана"
     },
     "permissionRequest": {
       "title": "Запрос разрешения · {{tool}}",

@@ -232,7 +232,11 @@
       "allowAll": "Allow all ({{count}})",
       "editInput": "Edit input",
       "invalidJson": "Invalid JSON",
-      "allowWithChanges": "Allow with changes"
+      "allowWithChanges": "Allow with changes",
+      "alwaysDeny": "Always deny",
+      "denyFeedbackTitle": "Deny the plan",
+      "denyFeedbackHint": "What should the agent change? (optional)",
+      "modeAppliesNextMessage": "The new permission mode applies from the next message."
     },
     "todo": {
       "updated": "Todo list has been updated successfully",
@@ -700,7 +704,10 @@
       "compactedSummary": "Compacted summary",
       "resendHint": "Resend from the composer",
       "rawView": "Raw view",
-      "runComplete": "Run complete"
+      "runComplete": "Run complete",
+      "runStopped": "Stopped",
+      "runFailed": "Run failed (exit {{code}})",
+      "taskKilled": "Killed"
     },
     "permissionRequest": {
       "title": "Permission request · {{tool}}",

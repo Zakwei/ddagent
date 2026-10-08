@@ -232,7 +232,11 @@
       "allowAll": "すべて許可 ({{count}})",
       "editInput": "入力を編集",
       "invalidJson": "無効なJSON",
-      "allowWithChanges": "変更を加えて許可"
+      "allowWithChanges": "変更を加えて許可",
+      "alwaysDeny": "常に拒否",
+      "denyFeedbackTitle": "プランを却下",
+      "denyFeedbackHint": "エージェントに何を変更してほしいですか？（任意）",
+      "modeAppliesNextMessage": "新しい権限モードは次のメッセージから適用されます。"
     },
     "todo": {
       "updated": "Todoリストを更新しました",
@@ -698,7 +702,10 @@
       "compactedSummary": "圧縮された要約",
       "resendHint": "入力欄から再送信",
       "rawView": "生の表示",
-      "runComplete": "実行完了"
+      "runComplete": "実行完了",
+      "runStopped": "停止しました",
+      "runFailed": "実行に失敗しました（終了コード {{code}}）",
+      "taskKilled": "強制終了"
     },
     "permissionRequest": {
       "title": "権限リクエスト · {{tool}}",

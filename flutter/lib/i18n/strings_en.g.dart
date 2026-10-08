@@ -1568,6 +1568,18 @@ class Translations$chat$permissions$en {
 
 	/// en: 'Allow with changes'
 	String get allowWithChanges => 'Allow with changes';
+
+	/// en: 'Always deny'
+	String get alwaysDeny => 'Always deny';
+
+	/// en: 'Deny the plan'
+	String get denyFeedbackTitle => 'Deny the plan';
+
+	/// en: 'What should the agent change? (optional)'
+	String get denyFeedbackHint => 'What should the agent change? (optional)';
+
+	/// en: 'The new permission mode applies from the next message.'
+	String get modeAppliesNextMessage => 'The new permission mode applies from the next message.';
 }
 
 // Path: chat.todo
@@ -2642,6 +2654,15 @@ class Translations$chat$message$en {
 
 	/// en: 'Run complete'
 	String get runComplete => 'Run complete';
+
+	/// en: 'Stopped'
+	String get runStopped => 'Stopped';
+
+	/// en: 'Run failed (exit {{code}})'
+	String runFailed({required Object code}) => 'Run failed (exit ${code})';
+
+	/// en: 'Killed'
+	String get taskKilled => 'Killed';
 }
 
 // Path: chat.permissionRequest
@@ -15048,6 +15069,10 @@ extension on Translations {
 			'chat.permissions.editInput' => 'Edit input',
 			'chat.permissions.invalidJson' => 'Invalid JSON',
 			'chat.permissions.allowWithChanges' => 'Allow with changes',
+			'chat.permissions.alwaysDeny' => 'Always deny',
+			'chat.permissions.denyFeedbackTitle' => 'Deny the plan',
+			'chat.permissions.denyFeedbackHint' => 'What should the agent change? (optional)',
+			'chat.permissions.modeAppliesNextMessage' => 'The new permission mode applies from the next message.',
 			'chat.todo.updated' => 'Todo list has been updated successfully',
 			'chat.todo.current' => 'Current Todo List',
 			'chat.plan.viewPlan' => '📋 View implementation plan',
@@ -15392,15 +15417,18 @@ extension on Translations {
 			'chat.modelLibrary.saving' => 'Saving…',
 			'chat.modelLibrary.saveChanges' => 'Save changes',
 			'chat.modelLibrary.deleteConfirm' => 'Delete this model from all pickers?',
+			_ => null,
+		} ?? switch (path) {
 			'chat.modelLibrary.customBadge' => 'Custom',
 			'chat.changes.failedToLoad' => 'Failed to load changes',
 			'chat.changes.empty' => 'No file changes',
 			'chat.message.compactedSummary' => 'Compacted summary',
-			_ => null,
-		} ?? switch (path) {
 			'chat.message.resendHint' => 'Resend from the composer',
 			'chat.message.rawView' => 'Raw view',
 			'chat.message.runComplete' => 'Run complete',
+			'chat.message.runStopped' => 'Stopped',
+			'chat.message.runFailed' => ({required Object code}) => 'Run failed (exit ${code})',
+			'chat.message.taskKilled' => 'Killed',
 			'chat.permissionRequest.title' => ({required Object tool}) => 'Permission request · ${tool}',
 			'chat.permissionRequest.question' => 'Question',
 			'chat.permissionRequest.subagent' => 'Subagent',
@@ -15903,6 +15931,8 @@ extension on Translations {
 			'common.projectWizard.step2.selectTokenPlaceholder' => '-- Select a token --',
 			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
 			'common.projectWizard.step2.tokenHelp' => 'This token will be used only for this operation',
+			_ => null,
+		} ?? switch (path) {
 			'common.projectWizard.step2.publicRepoInfo' => 'Public repositories don\'t require authentication. You can skip providing a token if cloning a public repo.',
 			'common.projectWizard.step2.noTokensHelp' => 'No stored tokens available. You can add tokens in Settings → API Keys for easier reuse.',
 			'common.projectWizard.step2.optionalTokenPublic' => 'GitHub Token (Optional for Public Repos)',
@@ -15910,8 +15940,6 @@ extension on Translations {
 			'common.projectWizard.step3.reviewConfig' => 'Review Your Configuration',
 			'common.projectWizard.step3.existingWorkspace' => 'Existing Workspace',
 			'common.projectWizard.step3.newWorkspace' => 'New Workspace',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.step3.path' => 'Path:',
 			'common.projectWizard.step3.cloneFrom' => 'Clone From:',
 			'common.projectWizard.step3.authentication' => 'Authentication:',
@@ -16417,6 +16445,8 @@ extension on Translations {
 			'settings.appearance.title' => 'Appearance',
 			'settings.appearance.theme' => 'Theme',
 			'settings.appearance.codeEditor' => 'Code Editor',
+			_ => null,
+		} ?? switch (path) {
 			'settings.appearance.editorTheme' => 'Editor Theme',
 			'settings.appearance.wordWrap' => 'Word Wrap',
 			'settings.appearance.showMinimap' => 'Show Minimap',
@@ -16424,8 +16454,6 @@ extension on Translations {
 			'settings.appearance.fontSize' => 'Font Size',
 			'settings.appearance.themeModes.system' => 'System',
 			'settings.appearance.themeModes.light' => 'Light',
-			_ => null,
-		} ?? switch (path) {
 			'settings.appearance.themeModes.dark' => 'Dark',
 			'settings.actions.saveChanges' => 'Save Changes',
 			'settings.actions.resetToDefaults' => 'Reset to Defaults',
@@ -16931,6 +16959,8 @@ extension on Translations {
 			'settings.stt.title' => 'Voice input (speech-to-text)',
 			'settings.stt.description' => 'Whisper-compatible /audio/transcriptions endpoint (OpenAI, whisper.cpp, faster-whisper, Speaches). Enables the mic button in the composer.',
 			'settings.stt.configured' => 'configured',
+			_ => null,
+		} ?? switch (path) {
 			'settings.stt.endpoint' => 'Endpoint URL (e.g. https://api.openai.com/v1)',
 			'settings.stt.apiKey' => 'API key',
 			'settings.stt.model' => 'Model (default: whisper-1)',
@@ -16938,8 +16968,6 @@ extension on Translations {
 			'settings.schedules.title' => 'Schedules',
 			'settings.schedules.description' => 'Recurring agent runs on a cron timetable. Runs fire unattended with permissions bypassed.',
 			'settings.schedules.preventSleep' => 'Prevent sleep while agents run',
-			_ => null,
-		} ?? switch (path) {
 			'settings.schedules.preventSleepHint' => 'Desktop keeps the display awake; in the browser a screen wake lock is used.',
 			'settings.schedules.kNew' => 'New schedule',
 			'settings.schedules.loading' => 'Loading…',
@@ -17445,6 +17473,8 @@ extension on Translations {
 			'tasks.taskDetail.titleRequired' => 'Title is required',
 			'tasks.taskDetail.updateFailed' => 'Failed to update task',
 			'tasks.taskDetail.notFound' => 'Task not found',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.subtasks' => 'Subtasks',
 			'tasks.taskDetail.deleteConfirmMessage' => ({required Object id}) => 'Task #${id} will be removed. This cannot be undone.',
 			'tasks.taskDetail.idCopied' => 'Task ID copied',
@@ -17452,8 +17482,6 @@ extension on Translations {
 			'tasks.taskmaster.noProjectHint' => 'Add a project first, then create tasks for it.',
 			'tasks.taskmaster.sort.statusAz' => 'Status (A-Z)',
 			'tasks.taskmaster.sort.statusZa' => 'Status (Z-A)',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskmaster.installedVersion' => ({required Object version}) => 'Installed: ${version}',
 			'tasks.taskmaster.initFailed' => 'Failed to initialize TaskMaster',
 			'tasks.taskmaster.prd.fileNameRequired' => 'Please provide a filename for the PRD.',
@@ -17959,6 +17987,8 @@ extension on Translations {
 			'terminal.overlay.resumeSession' => ({required Object title}) => 'Resume session ${title}',
 			'terminal.overlay.startSession' => ({required Object path}) => 'Start a new session in ${path}',
 			'voice.preview' => 'Preview',
+			_ => null,
+		} ?? switch (path) {
 			'voice.settingsSaved' => 'Voice input settings saved',
 			'voice.saveFailed' => 'Failed to save STT configuration',
 			'voice.apiKeySaved' => 'API Key (saved, enter to replace)',
@@ -17966,8 +17996,6 @@ extension on Translations {
 			'workspace.searchTranscript' => 'Search transcript',
 			'workspace.previousMatch' => 'Previous match',
 			'workspace.nextMatch' => 'Next match',
-			_ => null,
-		} ?? switch (path) {
 			'workspace.closeSearch' => 'Close search',
 			'workspace.newChatProvider' => 'New chat — provider',
 			'workspace.closePane' => 'Close pane',

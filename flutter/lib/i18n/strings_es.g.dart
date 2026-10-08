@@ -998,6 +998,10 @@ class Translations$chat$permissions$es extends Translations$chat$permissions$en 
 	@override String get editInput => 'Editar entrada';
 	@override String get invalidJson => 'JSON no válido';
 	@override String get allowWithChanges => 'Permitir con cambios';
+	@override String get alwaysDeny => 'Denegar siempre';
+	@override String get denyFeedbackTitle => 'Rechazar el plan';
+	@override String get denyFeedbackHint => '¿Qué debería cambiar el agente? (opcional)';
+	@override String get modeAppliesNextMessage => 'El nuevo modo de permisos se aplica a partir del siguiente mensaje.';
 }
 
 // Path: chat.todo
@@ -1575,6 +1579,9 @@ class Translations$chat$message$es extends Translations$chat$message$en {
 	@override String get resendHint => 'Vuelve a enviar desde el compositor';
 	@override String get rawView => 'Vista sin procesar';
 	@override String get runComplete => 'Ejecución completada';
+	@override String get runStopped => 'Detenido';
+	@override String runFailed({required Object code}) => 'La ejecución falló (salida ${code})';
+	@override String get taskKilled => 'Terminada';
 }
 
 // Path: chat.permissionRequest
@@ -8635,6 +8642,10 @@ extension on TranslationsEs {
 			'chat.permissions.editInput' => 'Editar entrada',
 			'chat.permissions.invalidJson' => 'JSON no válido',
 			'chat.permissions.allowWithChanges' => 'Permitir con cambios',
+			'chat.permissions.alwaysDeny' => 'Denegar siempre',
+			'chat.permissions.denyFeedbackTitle' => 'Rechazar el plan',
+			'chat.permissions.denyFeedbackHint' => '¿Qué debería cambiar el agente? (opcional)',
+			'chat.permissions.modeAppliesNextMessage' => 'El nuevo modo de permisos se aplica a partir del siguiente mensaje.',
 			'chat.todo.updated' => 'La lista de pendientes se actualizó correctamente',
 			'chat.todo.current' => 'Lista de pendientes actual',
 			'chat.plan.viewPlan' => '📋 Ver plan de implementación',
@@ -8979,15 +8990,18 @@ extension on TranslationsEs {
 			'chat.modelLibrary.saving' => 'Guardando…',
 			'chat.modelLibrary.saveChanges' => 'Guardar cambios',
 			'chat.modelLibrary.deleteConfirm' => '¿Eliminar este modelo de todos los selectores?',
+			_ => null,
+		} ?? switch (path) {
 			'chat.modelLibrary.customBadge' => 'Personalizado',
 			'chat.changes.failedToLoad' => 'No se pudieron cargar los cambios',
 			'chat.changes.empty' => 'Sin cambios en archivos',
 			'chat.message.compactedSummary' => 'Resumen compactado',
-			_ => null,
-		} ?? switch (path) {
 			'chat.message.resendHint' => 'Vuelve a enviar desde el compositor',
 			'chat.message.rawView' => 'Vista sin procesar',
 			'chat.message.runComplete' => 'Ejecución completada',
+			'chat.message.runStopped' => 'Detenido',
+			'chat.message.runFailed' => ({required Object code}) => 'La ejecución falló (salida ${code})',
+			'chat.message.taskKilled' => 'Terminada',
 			'chat.permissionRequest.title' => ({required Object tool}) => 'Solicitud de permiso · ${tool}',
 			'chat.permissionRequest.question' => 'Pregunta',
 			'chat.permissionRequest.subagent' => 'Subagente',
@@ -9490,6 +9504,8 @@ extension on TranslationsEs {
 			'common.projectWizard.step2.selectTokenPlaceholder' => '-- Selecciona un token --',
 			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
 			'common.projectWizard.step2.tokenHelp' => 'Este token se usará solo para esta operación',
+			_ => null,
+		} ?? switch (path) {
 			'common.projectWizard.step2.publicRepoInfo' => 'Los repositorios públicos no requieren autenticación. Puedes omitir el token si clonas un repo público.',
 			'common.projectWizard.step2.noTokensHelp' => 'No hay tokens guardados disponibles. Puedes añadir tokens en Ajustes → Claves API para reutilizarlos fácilmente.',
 			'common.projectWizard.step2.optionalTokenPublic' => 'Token de GitHub (opcional para repos públicos)',
@@ -9497,8 +9513,6 @@ extension on TranslationsEs {
 			'common.projectWizard.step3.reviewConfig' => 'Revisa tu configuración',
 			'common.projectWizard.step3.existingWorkspace' => 'Espacio de trabajo existente',
 			'common.projectWizard.step3.newWorkspace' => 'Espacio de trabajo nuevo',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.step3.path' => 'Ruta:',
 			'common.projectWizard.step3.cloneFrom' => 'Clonar desde:',
 			'common.projectWizard.step3.authentication' => 'Autenticación:',
@@ -10004,6 +10018,8 @@ extension on TranslationsEs {
 			'settings.appearance.title' => 'Apariencia',
 			'settings.appearance.theme' => 'Tema',
 			'settings.appearance.codeEditor' => 'Editor de código',
+			_ => null,
+		} ?? switch (path) {
 			'settings.appearance.editorTheme' => 'Tema del editor',
 			'settings.appearance.wordWrap' => 'Ajuste de línea',
 			'settings.appearance.showMinimap' => 'Mostrar minimapa',
@@ -10011,8 +10027,6 @@ extension on TranslationsEs {
 			'settings.appearance.fontSize' => 'Tamaño de fuente',
 			'settings.appearance.themeModes.system' => 'Sistema',
 			'settings.appearance.themeModes.light' => 'Claro',
-			_ => null,
-		} ?? switch (path) {
 			'settings.appearance.themeModes.dark' => 'Oscuro',
 			'settings.actions.saveChanges' => 'Guardar cambios',
 			'settings.actions.resetToDefaults' => 'Restablecer valores por defecto',
@@ -10518,6 +10532,8 @@ extension on TranslationsEs {
 			'settings.stt.title' => 'Entrada de voz (voz a texto)',
 			'settings.stt.description' => 'Endpoint /audio/transcriptions compatible con Whisper (OpenAI, whisper.cpp, faster-whisper, Speaches). Activa el botón de micrófono en el editor.',
 			'settings.stt.configured' => 'configurado',
+			_ => null,
+		} ?? switch (path) {
 			'settings.stt.endpoint' => 'URL del endpoint (p. ej. https://api.openai.com/v1)',
 			'settings.stt.apiKey' => 'Clave de API',
 			'settings.stt.model' => 'Modelo (predeterminado: whisper-1)',
@@ -10525,8 +10541,6 @@ extension on TranslationsEs {
 			'settings.schedules.title' => 'Programaciones',
 			'settings.schedules.description' => 'Ejecuciones recurrentes de agentes según un calendario cron. Se lanzan sin supervisión y con los permisos omitidos.',
 			'settings.schedules.preventSleep' => 'Evitar la suspensión mientras se ejecutan agentes',
-			_ => null,
-		} ?? switch (path) {
 			'settings.schedules.preventSleepHint' => 'En escritorio la pantalla se mantiene encendida; en el navegador se usa un bloqueo de activación de pantalla.',
 			'settings.schedules.kNew' => 'Nueva programación',
 			'settings.schedules.loading' => 'Cargando…',
@@ -11032,6 +11046,8 @@ extension on TranslationsEs {
 			'tasks.taskDetail.titleRequired' => 'El título es obligatorio',
 			'tasks.taskDetail.updateFailed' => 'No se pudo actualizar la tarea',
 			'tasks.taskDetail.notFound' => 'Tarea no encontrada',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.subtasks' => 'Subtareas',
 			'tasks.taskDetail.deleteConfirmMessage' => ({required Object id}) => 'Se eliminará la tarea n.º ${id}. Esta acción no se puede deshacer.',
 			'tasks.taskDetail.idCopied' => 'ID de tarea copiado',
@@ -11039,8 +11055,6 @@ extension on TranslationsEs {
 			'tasks.taskmaster.noProjectHint' => 'Primero añade un proyecto y luego crea tareas para él.',
 			'tasks.taskmaster.sort.statusAz' => 'Estado (A-Z)',
 			'tasks.taskmaster.sort.statusZa' => 'Estado (Z-A)',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskmaster.installedVersion' => ({required Object version}) => 'Instalado: ${version}',
 			'tasks.taskmaster.initFailed' => 'No se pudo inicializar TaskMaster',
 			'tasks.taskmaster.prd.fileNameRequired' => 'Indica un nombre de archivo para el PRD.',
@@ -11546,6 +11560,8 @@ extension on TranslationsEs {
 			'terminal.overlay.resumeSession' => ({required Object title}) => 'Reanudar la sesión ${title}',
 			'terminal.overlay.startSession' => ({required Object path}) => 'Iniciar una sesión nueva en ${path}',
 			'voice.preview' => 'Vista previa',
+			_ => null,
+		} ?? switch (path) {
 			'voice.settingsSaved' => 'Ajustes de entrada de voz guardados',
 			'voice.saveFailed' => 'No se pudo guardar la configuración de STT',
 			'voice.apiKeySaved' => 'Clave API (guardada; escribe para reemplazar)',
@@ -11553,8 +11569,6 @@ extension on TranslationsEs {
 			'workspace.searchTranscript' => 'Buscar en la transcripción',
 			'workspace.previousMatch' => 'Coincidencia anterior',
 			'workspace.nextMatch' => 'Coincidencia siguiente',
-			_ => null,
-		} ?? switch (path) {
 			'workspace.closeSearch' => 'Cerrar búsqueda',
 			'workspace.newChatProvider' => 'Nuevo chat — proveedor',
 			'workspace.closePane' => 'Cerrar panel',

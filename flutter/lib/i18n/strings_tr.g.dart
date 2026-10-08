@@ -998,6 +998,10 @@ class Translations$chat$permissions$tr extends Translations$chat$permissions$en 
 	@override String get editInput => 'Girdiyi düzenle';
 	@override String get invalidJson => 'Geçersiz JSON';
 	@override String get allowWithChanges => 'Değişikliklerle izin ver';
+	@override String get alwaysDeny => 'Her zaman reddet';
+	@override String get denyFeedbackTitle => 'Planı reddet';
+	@override String get denyFeedbackHint => 'Ajan neyi değiştirmeli? (isteğe bağlı)';
+	@override String get modeAppliesNextMessage => 'Yeni izin modu bir sonraki mesajdan itibaren geçerli olur.';
 }
 
 // Path: chat.todo
@@ -1575,6 +1579,9 @@ class Translations$chat$message$tr extends Translations$chat$message$en {
 	@override String get resendHint => 'Düzenleyiciden yeniden gönderin';
 	@override String get rawView => 'Ham görünüm';
 	@override String get runComplete => 'Çalıştırma tamamlandı';
+	@override String get runStopped => 'Durduruldu';
+	@override String runFailed({required Object code}) => 'Çalıştırma başarısız (çıkış ${code})';
+	@override String get taskKilled => 'Sonlandırıldı';
 }
 
 // Path: chat.permissionRequest
@@ -8630,6 +8637,10 @@ extension on TranslationsTr {
 			'chat.permissions.editInput' => 'Girdiyi düzenle',
 			'chat.permissions.invalidJson' => 'Geçersiz JSON',
 			'chat.permissions.allowWithChanges' => 'Değişikliklerle izin ver',
+			'chat.permissions.alwaysDeny' => 'Her zaman reddet',
+			'chat.permissions.denyFeedbackTitle' => 'Planı reddet',
+			'chat.permissions.denyFeedbackHint' => 'Ajan neyi değiştirmeli? (isteğe bağlı)',
+			'chat.permissions.modeAppliesNextMessage' => 'Yeni izin modu bir sonraki mesajdan itibaren geçerli olur.',
 			'chat.todo.updated' => 'Yapılacaklar listesi başarıyla güncellendi',
 			'chat.todo.current' => 'Mevcut Yapılacaklar Listesi',
 			'chat.plan.viewPlan' => '📋 Uygulama planını göster',
@@ -8974,15 +8985,18 @@ extension on TranslationsTr {
 			'chat.modelLibrary.saving' => 'Kaydediliyor…',
 			'chat.modelLibrary.saveChanges' => 'Değişiklikleri kaydet',
 			'chat.modelLibrary.deleteConfirm' => 'Bu model tüm seçicilerden silinsin mi?',
+			_ => null,
+		} ?? switch (path) {
 			'chat.modelLibrary.customBadge' => 'Özel',
 			'chat.changes.failedToLoad' => 'Değişiklikler yüklenemedi',
 			'chat.changes.empty' => 'Dosya değişikliği yok',
 			'chat.message.compactedSummary' => 'Sıkıştırılmış özet',
-			_ => null,
-		} ?? switch (path) {
 			'chat.message.resendHint' => 'Düzenleyiciden yeniden gönderin',
 			'chat.message.rawView' => 'Ham görünüm',
 			'chat.message.runComplete' => 'Çalıştırma tamamlandı',
+			'chat.message.runStopped' => 'Durduruldu',
+			'chat.message.runFailed' => ({required Object code}) => 'Çalıştırma başarısız (çıkış ${code})',
+			'chat.message.taskKilled' => 'Sonlandırıldı',
 			'chat.permissionRequest.title' => ({required Object tool}) => 'İzin isteği · ${tool}',
 			'chat.permissionRequest.question' => 'Soru',
 			'chat.permissionRequest.subagent' => 'Alt ajan',
@@ -9485,6 +9499,8 @@ extension on TranslationsTr {
 			'common.projectWizard.step2.selectTokenPlaceholder' => '-- Bir token seç --',
 			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
 			'common.projectWizard.step2.tokenHelp' => 'Bu token sadece bu işlem için kullanılacak',
+			_ => null,
+		} ?? switch (path) {
 			'common.projectWizard.step2.publicRepoInfo' => 'Genel depolar kimlik doğrulama gerektirmez. Genel bir depo klonluyorsan token girmeyi atlayabilirsin.',
 			'common.projectWizard.step2.noTokensHelp' => 'Kayıtlı token yok. Kolay tekrar kullanım için Ayarlar → API Anahtarları bölümünden token ekleyebilirsin.',
 			'common.projectWizard.step2.optionalTokenPublic' => 'GitHub Token (Genel Depolar için İsteğe Bağlı)',
@@ -9492,8 +9508,6 @@ extension on TranslationsTr {
 			'common.projectWizard.step3.reviewConfig' => 'Yapılandırmanı Gözden Geçir',
 			'common.projectWizard.step3.existingWorkspace' => 'Mevcut Çalışma Alanı',
 			'common.projectWizard.step3.newWorkspace' => 'Yeni Çalışma Alanı',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.step3.path' => 'Yol:',
 			'common.projectWizard.step3.cloneFrom' => 'Şuradan Klonla:',
 			'common.projectWizard.step3.authentication' => 'Kimlik Doğrulama:',
@@ -9999,6 +10013,8 @@ extension on TranslationsTr {
 			'settings.appearance.title' => 'Görünüm',
 			'settings.appearance.theme' => 'Tema',
 			'settings.appearance.codeEditor' => 'Kod Editörü',
+			_ => null,
+		} ?? switch (path) {
 			'settings.appearance.editorTheme' => 'Editör Teması',
 			'settings.appearance.wordWrap' => 'Kelime Kaydırma',
 			'settings.appearance.showMinimap' => 'Minimap\'i Göster',
@@ -10006,8 +10022,6 @@ extension on TranslationsTr {
 			'settings.appearance.fontSize' => 'Yazı Tipi Boyutu',
 			'settings.appearance.themeModes.system' => 'Sistem',
 			'settings.appearance.themeModes.light' => 'Açık',
-			_ => null,
-		} ?? switch (path) {
 			'settings.appearance.themeModes.dark' => 'Koyu',
 			'settings.actions.saveChanges' => 'Değişiklikleri Kaydet',
 			'settings.actions.resetToDefaults' => 'Varsayılanlara Döndür',
@@ -10513,6 +10527,8 @@ extension on TranslationsTr {
 			'settings.stt.title' => 'Sesli giriş (konuşmadan metne)',
 			'settings.stt.description' => 'Whisper uyumlu /audio/transcriptions uç noktası (OpenAI, whisper.cpp, faster-whisper, Speaches). Yazma alanındaki mikrofon düğmesini etkinleştirir.',
 			'settings.stt.configured' => 'yapılandırıldı',
+			_ => null,
+		} ?? switch (path) {
 			'settings.stt.endpoint' => 'Uç nokta URL\'si (örn. https://api.openai.com/v1)',
 			'settings.stt.apiKey' => 'API anahtarı',
 			'settings.stt.model' => 'Model (varsayılan: whisper-1)',
@@ -10520,8 +10536,6 @@ extension on TranslationsTr {
 			'settings.schedules.title' => 'Zamanlamalar',
 			'settings.schedules.description' => 'Cron takvimine göre yinelenen ajan çalıştırmaları. Çalıştırmalar gözetimsiz ve izinler atlanarak başlatılır.',
 			'settings.schedules.preventSleep' => 'Ajanlar çalışırken uykuyu engelle',
-			_ => null,
-		} ?? switch (path) {
 			'settings.schedules.preventSleepHint' => 'Masaüstü uygulaması ekranı açık tutar; tarayıcıda ekran uyanık tutma kilidi kullanılır.',
 			'settings.schedules.kNew' => 'Yeni zamanlama',
 			'settings.schedules.loading' => 'Yükleniyor…',
@@ -11027,6 +11041,8 @@ extension on TranslationsTr {
 			'tasks.taskDetail.titleRequired' => 'Başlık gerekli',
 			'tasks.taskDetail.updateFailed' => 'Görev güncellenemedi',
 			'tasks.taskDetail.notFound' => 'Görev bulunamadı',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.subtasks' => 'Alt görevler',
 			'tasks.taskDetail.deleteConfirmMessage' => ({required Object id}) => '#${id} görevi kaldırılacak. Bu işlem geri alınamaz.',
 			'tasks.taskDetail.idCopied' => 'Görev ID kopyalandı',
@@ -11034,8 +11050,6 @@ extension on TranslationsTr {
 			'tasks.taskmaster.noProjectHint' => 'Önce bir proje ekleyin, ardından bu proje için görevler oluşturun.',
 			'tasks.taskmaster.sort.statusAz' => 'Durum (A-Z)',
 			'tasks.taskmaster.sort.statusZa' => 'Durum (Z-A)',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskmaster.installedVersion' => ({required Object version}) => 'Yüklü: ${version}',
 			'tasks.taskmaster.initFailed' => 'TaskMaster başlatılamadı',
 			'tasks.taskmaster.prd.fileNameRequired' => 'Lütfen PRD için bir dosya adı girin.',
@@ -11541,6 +11555,8 @@ extension on TranslationsTr {
 			'terminal.overlay.resumeSession' => ({required Object title}) => '${title} oturumunu sürdür',
 			'terminal.overlay.startSession' => ({required Object path}) => '${path} içinde yeni bir oturum başlat',
 			'voice.preview' => 'Önizle',
+			_ => null,
+		} ?? switch (path) {
 			'voice.settingsSaved' => 'Sesli giriş ayarları kaydedildi',
 			'voice.saveFailed' => 'STT yapılandırması kaydedilemedi',
 			'voice.apiKeySaved' => 'API Anahtarı (kayıtlı, değiştirmek için girin)',
@@ -11548,8 +11564,6 @@ extension on TranslationsTr {
 			'workspace.searchTranscript' => 'Transkriptte ara',
 			'workspace.previousMatch' => 'Önceki eşleşme',
 			'workspace.nextMatch' => 'Sonraki eşleşme',
-			_ => null,
-		} ?? switch (path) {
 			'workspace.closeSearch' => 'Aramayı kapat',
 			'workspace.newChatProvider' => 'Yeni sohbet — sağlayıcı',
 			'workspace.closePane' => 'Bölmeyi kapat',

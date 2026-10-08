@@ -34,6 +34,7 @@ class SessionMessage {
     this.status,
     this.summary,
     this.exitCode,
+    this.aborted = false,
     this.toolUseResult,
     this.actualSessionId,
     this.parentToolUseId,
@@ -81,6 +82,9 @@ class SessionMessage {
   final String? status;
   final String? summary;
   final int? exitCode;
+
+  /// `complete` of a run the user stopped.
+  final bool aborted;
 
   /// Structured result payload of a `tool_result` row (Claude Grep/Glob
   /// `filenames`, Agent ids) — folded into the tool card by
@@ -141,6 +145,7 @@ class SessionMessage {
     status: status,
     summary: summary ?? this.summary,
     exitCode: exitCode,
+    aborted: aborted,
     toolUseResult: toolUseResult,
     actualSessionId: actualSessionId,
     parentToolUseId: parentToolUseId,
@@ -192,6 +197,7 @@ class SessionMessage {
     status: j['status']?.toString(),
     summary: j['summary']?.toString(),
     exitCode: _int(j['exitCode']),
+    aborted: j['aborted'] == true,
     toolUseResult: j['toolUseResult'],
     actualSessionId: j['actualSessionId']?.toString(),
     parentToolUseId: j['parentToolUseId']?.toString(),

@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:ddagent_app/core/realtime/chat_channel.dart';
 import 'package:ddagent_app/core/realtime/realtime_providers.dart';
+import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/sessions/state/session_activity.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
@@ -92,17 +93,41 @@ const _workFrameKinds = {
   'stream_replace',
 };
 
-void _onChannelEvent(ServerEvent e, SessionActivityController activity) {
+void _onChannelEvent(
+  ServerEvent e,
+  SessionActivityController activity,
+  Map<String, String?> completedRuns,
+) {
   final sid = e.sessionId;
-  if (sid == null) return;
+  if (sid == null) {
+    // No pane owns a sessionless protocol error (INTERNAL_ERROR, role gates)
+    // — say it once here instead of dropping it.
+    if (e.kind == 'protocol_error') {
+      AppToast.global(e.raw['error']?.toString() ?? t.chat.transcript.requestFailed, isError: true);
+    }
+    return;
+  }
   switch (e.kind) {
-    case 'complete' || 'protocol_error' || 'session_removed':
+    case 'complete':
+      completedRuns[sid] = e.runId;
+      activity.markIdle(sid);
+      return;
+    case 'protocol_error':
+      if (!protocolErrorKeepsRun(e.raw)) activity.markIdle(sid);
+      return;
+    case 'session_removed':
       activity.markIdle(sid);
       return;
     case 'stream_end' || 'error' || 'permission_cancelled':
       return;
     default:
       if (e.isGateway || e.isBroadcast || !_workFrameKinds.contains(e.kind)) {
+        return;
+      }
+      // Notices are transcript lines that may trail `complete`; a finished
+      // run's late ask (background subagent) does not restart it either.
+      if (e.kind == 'status' && e.raw['notice'] == true) return;
+      if (e.kind == 'permission_request' && e.runId != null && completedRuns[sid] == e.runId) {
         return;
       }
       activity.markProcessing(sid, statusText: _frameStatusText(e));
@@ -119,7 +144,8 @@ final activityPollerProvider = Provider<void>((ref) {
   // pane closes (it was the run's writer), so terminal frames still settle the
   // map here instead of relying on the poll's grace window.
   final channel = ref.watch(chatChannelProvider);
-  final eventsSub = channel.events.listen((e) => _onChannelEvent(e, activity));
+  final completedRuns = <String, String?>{};
+  final eventsSub = channel.events.listen((e) => _onChannelEvent(e, activity, completedRuns));
   Timer? timer;
   var inFlight = false;
 

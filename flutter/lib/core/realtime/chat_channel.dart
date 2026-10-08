@@ -63,6 +63,13 @@ MessageKind? messageKindOf(String kind) {
   return map[kind];
 }
 
+/// Protocol errors after which the run is still alive: the provider refused
+/// to interrupt, an abort named an older run, a role-gated frame, or the
+/// server says so (`runActive`).
+bool protocolErrorKeepsRun(Map<String, dynamic> raw) =>
+    raw['runActive'] == true ||
+    const {'ABORT_FAILED', 'STALE_RUN', 'FORBIDDEN_ROLE'}.contains(raw['code']);
+
 /// One decoded server frame. [raw] keeps every field — provider payloads are
 /// intentionally heterogeneous (NormalizedMessage has an index signature).
 class ServerEvent {
@@ -136,8 +143,17 @@ class ChatChannel {
   final _retiredRuns = <String, Map<String, DateTime>>{};
   static const _retiredRunRetention = Duration(minutes: 6);
 
-  /// Kinds a completed run may still publish (server `LATE_ASK_KINDS`).
-  static const _lateKinds = {'permission_request', 'permission_cancelled', 'background_tasks'};
+  /// Kinds a completed run may still publish (server `LATE_ASK_KINDS`), plus
+  /// the run's late failure (`error`) and informational `status` notices.
+  static const _lateKinds = {
+    'permission_request',
+    'permission_cancelled',
+    'background_tasks',
+    'error',
+  };
+
+  static bool _isLate(ServerEvent e) =>
+      _lateKinds.contains(e.kind) || (e.kind == 'status' && e.raw['notice'] == true);
   final _awaitingRun = <String>{};
   final _pendingAborts = <String>{};
   final _sendGeneration = <String, int>{};
@@ -334,7 +350,7 @@ class ChatChannel {
       // one's late frames would land on top of a newer turn.
       if (runId != null &&
           _isRetired(sid, runId) &&
-          !(_lateKinds.contains(event.kind) && runId == cursor(sid).runId)) {
+          !(_isLate(event) && runId == cursor(sid).runId)) {
         return;
       }
       if (event.kind == 'protocol_error') _awaitingRun.remove(sid);

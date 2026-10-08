@@ -1430,7 +1430,15 @@ class _OptionBar extends ConsumerWidget {
             autoContinue: state.autoContinue,
             onToggleAutoContinue: () =>
                 ref.read(composerProvider(arg).notifier).toggleAutoContinue(),
-            onSelect: (m) => ref.read(composerProvider(arg).notifier).selectPermissionMode(m),
+            onSelect: (m) {
+              ref.read(composerProvider(arg).notifier).selectPermissionMode(m);
+              final running =
+                  sessionId.isNotEmpty &&
+                  ref.read(transcriptProvider(sessionId)).runStatus == 'running';
+              if (running && !state.supportsLivePermissionMode) {
+                AppToast.show(context, t.chat.permissions.modeAppliesNextMessage);
+              }
+            },
           ),
         // `ComposerAccountMenu` — the web shows the account pick only in the
         // new-session composer; an active chat's footer is model+permission.
