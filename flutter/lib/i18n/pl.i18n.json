@@ -1674,7 +1674,7 @@
       "restartTimeout": "Serwer nie wrócił w ciągu {{seconds}} s. Sprawdź log usługi (/tmp/ddagent.log) albo zrestartuj go ręcznie."
     },
     "updates": {
-      "title": "Aktualizacje aplikacji",
+      "title": "Aktualizacje",
       "description": "Sprawdź GitHub w poszukiwaniu nowszej wersji desktopowej. Nowe wersje pobierają się automatycznie i instalują przy zamknięciu.",
       "descriptionMobile": "Sprawdź GitHub w poszukiwaniu nowszej wersji tej aplikacji. Aktualizację instaluje instalator systemowy urządzenia.",
       "descriptionServer": "Sprawdza na GitHubie, czy jest nowsze wydanie ddagent. Podłączony serwer może zaktualizować się sam — trwające sesje zostaną przerwane na czas restartu.",

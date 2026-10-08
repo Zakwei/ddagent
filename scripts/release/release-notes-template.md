@@ -11,193 +11,169 @@
 -->
 <!-- lang:en -->
 ### What's new
-- Background work is visible: a pill above the composer shows how many subagents and background shells are still running, and the turns they start when they report back stream live in the chat.
-- Messages you send while Claude subagents are still working go into the same live session instead of interrupting them.
-- Settings → About → Restart now shows its progress and confirms that the server really came back.
-- Tool permission asks offer a working "Always" answer.
-- Agent cards show the signed-in account's email; Claude's model-specific weekly limits are tracked, and the Claude model list comes straight from the CLI.
-- Settings: a CLI update button per agent and a logout that clears stored agent credentials.
-- Favorite models are stored on the server, and pasted images get a preview in the composer.
-- Rewritten README and guides in all 12 languages, with new screenshots.
+- Settings → About → Updates has its own button for each part: **Update app** (Android, Windows, Linux), **Update web interface** (web) and **Update server** — each with its installed and latest version.
+- The server can update itself however it was installed: installer script, git checkout or release tarball. Tarballs are checked against their checksum, installed on restart and rolled back automatically if the new version fails to start.
+- `start.sh` / `start.bat` now restart the server after an update or a restart from the app, without systemd.
+- A web interface hosted by the server is updated together with it, or on its own.
+- The desktop app's local server ("This device") can be updated on demand.
 
 ### Bug fixes
-- Claude subagents working in the background no longer lose their permission asks ("Stream closed"), and their asks reach the chat even after the turn has finished.
-- The installer script installs the newest release instead of the oldest.
-- Live chat: Cursor, Codex and OpenCode tool calls stream live and are no longer duplicated after a refresh; subagent activity and Agent results come back after a reload; edit diffs and very large tool inputs render properly.
-- Permissions: a call you denied or edited is never approved, unanswered asks say why they closed, and multi-select answers keep every selection.
+- The update message no longer tells you to tap an Update button that wasn't there.
+- With both the app and the server out of date, the server update was unreachable; the update badge now lets you pick.
+
+### Before you update
+- Servers on 0.8.12 or older installed with the installer script or a tarball must be updated to 0.8.13 once by hand (re-run `install.sh --version v0.8.13`, or unpack the new tarball over the old one); after that, updates work from the app. Release tarballs need Node.js 22.
 <!-- lang:pl -->
 ### Nowości
-- Praca w tle jest widoczna: pigułka nad polem wiadomości pokazuje, ile subagentów i poleceń w tle wciąż działa, a tury, które uruchamiają po zakończeniu, pojawiają się w czacie na żywo.
-- Wiadomości wysłane, gdy subagenty Claude jeszcze pracują, trafiają do tej samej sesji zamiast je przerywać.
-- Ustawienia → O aplikacji → Restart pokazuje teraz postęp i potwierdza, że serwer naprawdę wrócił.
-- Pytania o zgodę na narzędzia mają działającą odpowiedź „Zawsze”.
-- Karty agentów pokazują e-mail zalogowanego konta; śledzone są tygodniowe limity Claude dla poszczególnych modeli, a lista modeli Claude pochodzi bezpośrednio z CLI.
-- Ustawienia: przycisk aktualizacji CLI dla każdego agenta oraz wylogowanie, które usuwa zapisane dane logowania agenta.
-- Ulubione modele są zapisywane na serwerze, a wklejone obrazy mają podgląd w polu wiadomości.
-- Nowe README i przewodniki we wszystkich 12 językach, z nowymi zrzutami ekranu.
+- Ustawienia → O aplikacji → Aktualizacje ma osobny przycisk dla każdej części: **Aktualizuj aplikację** (Android, Windows, Linux), **Aktualizuj interfejs web** (web) i **Aktualizuj serwer** — każdy z zainstalowaną i najnowszą wersją.
+- Serwer aktualizuje się sam bez względu na sposób instalacji: skrypt instalacyjny, checkout gita albo tarball wydania. Tarballe są sprawdzane sumą kontrolną, instalowane przy restarcie i automatycznie wycofywane, jeśli nowa wersja nie wystartuje.
+- `start.sh` / `start.bat` same restartują serwer po aktualizacji lub restarcie z aplikacji, bez systemd.
+- Interfejs web hostowany przez serwer aktualizuje się razem z nim albo osobno.
+- Lokalny serwer aplikacji desktop („To urządzenie”) można zaktualizować na żądanie.
 
 ### Poprawki błędów
-- Subagenty Claude pracujące w tle nie tracą już pytań o zgodę („Stream closed”), a ich pytania docierają do czatu także po zakończeniu tury.
-- Skrypt instalacyjny instaluje najnowsze wydanie zamiast najstarszego.
-- Czat na żywo: wywołania narzędzi Cursor, Codex i OpenCode są strumieniowane na bieżąco i nie dublują się po odświeżeniu; aktywność subagentów i wyniki Agenta wracają po przeładowaniu; diffy edycji i bardzo duże wejścia narzędzi wyświetlają się poprawnie.
-- Zgody: odrzucone lub edytowane wywołanie nigdy nie zostaje zatwierdzone, nieodpowiedziane pytania mówią, dlaczego się zamknęły, a odpowiedzi wielokrotnego wyboru zachowują wszystkie zaznaczenia.
+- Komunikat o aktualizacji nie każe już klikać przycisku Aktualizuj, którego nie było.
+- Gdy nieaktualne były i aplikacja, i serwer, aktualizacja serwera była niedostępna; ikonka aktualizacji pozwala teraz wybrać.
+
+### Przed aktualizacją
+- Serwery w wersji 0.8.12 lub starszej zainstalowane skryptem instalacyjnym albo z tarballa trzeba raz zaktualizować do 0.8.13 ręcznie (ponownie uruchom `install.sh --version v0.8.13` albo rozpakuj nowy tarball na stary); potem aktualizacje działają z aplikacji. Tarballe wydań wymagają Node.js 22.
 <!-- lang:de -->
 ### Neu
-- Hintergrundarbeit ist sichtbar: Eine Anzeige über dem Eingabefeld zeigt, wie viele Subagenten und Hintergrund-Shells noch laufen, und die Runden, die sie beim Zurückmelden starten, erscheinen live im Chat.
-- Nachrichten, die du sendest, während Claude-Subagenten noch arbeiten, landen in derselben laufenden Sitzung, statt sie zu unterbrechen.
-- Einstellungen → Über → Neustart zeigt jetzt den Fortschritt und bestätigt, dass der Server wirklich wieder da ist.
-- Berechtigungsanfragen für Tools bieten eine funktionierende Antwort „Immer“.
-- Agentenkarten zeigen die E-Mail des angemeldeten Kontos; Claudes modellspezifische Wochenlimits werden erfasst, und die Claude-Modellliste kommt direkt aus der CLI.
-- Einstellungen: ein CLI-Update-Button pro Agent und eine Abmeldung, die gespeicherte Agent-Anmeldedaten löscht.
-- Favorisierte Modelle werden auf dem Server gespeichert, und eingefügte Bilder bekommen eine Vorschau im Eingabefeld.
-- Überarbeitete README und Anleitungen in allen 12 Sprachen, mit neuen Screenshots.
+- Einstellungen → Info → Updates hat für jeden Teil einen eigenen Button: **App aktualisieren** (Android, Windows, Linux), **Weboberfläche aktualisieren** (Web) und **Server aktualisieren** — jeweils mit installierter und neuester Version.
+- Der Server aktualisiert sich selbst, egal wie er installiert wurde: Installationsskript, Git-Checkout oder Release-Tarball. Tarballs werden per Prüfsumme geprüft, beim Neustart installiert und automatisch zurückgerollt, wenn die neue Version nicht startet.
+- `start.sh` / `start.bat` starten den Server nach einem Update oder Neustart aus der App selbst neu, ohne systemd.
+- Eine vom Server gehostete Weboberfläche wird mit ihm oder einzeln aktualisiert.
+- Der lokale Server der Desktop-App („Dieses Gerät“) lässt sich bei Bedarf aktualisieren.
 
 ### Fehlerbehebungen
-- Claude-Subagenten im Hintergrund verlieren ihre Berechtigungsanfragen nicht mehr („Stream closed“), und ihre Anfragen erreichen den Chat auch nach dem Ende der Runde.
-- Das Installationsskript installiert die neueste statt der ältesten Version.
-- Live-Chat: Tool-Aufrufe von Cursor, Codex und OpenCode werden live gestreamt und nach einer Aktualisierung nicht mehr doppelt angezeigt; Subagenten-Aktivität und Agent-Ergebnisse sind nach dem Neuladen wieder da; Edit-Diffs und sehr große Tool-Eingaben werden korrekt dargestellt.
-- Berechtigungen: Ein abgelehnter oder bearbeiteter Aufruf wird nie genehmigt, unbeantwortete Anfragen nennen den Grund für ihr Schließen, und Mehrfachauswahl-Antworten behalten jede Auswahl.
+- Die Update-Meldung verweist nicht mehr auf einen Aktualisieren-Button, den es nicht gab.
+- Waren App und Server veraltet, war das Server-Update nicht erreichbar; die Update-Anzeige lässt jetzt wählen.
+
+### Vor dem Update
+- Server mit 0.8.12 oder älter, die per Installationsskript oder Tarball installiert wurden, müssen einmal von Hand auf 0.8.13 gebracht werden (`install.sh --version v0.8.13` erneut ausführen oder den neuen Tarball über den alten entpacken); danach funktionieren Updates aus der App. Release-Tarballs benötigen Node.js 22.
 <!-- lang:es -->
 ### Novedades
-- El trabajo en segundo plano es visible: un indicador sobre el campo de mensaje muestra cuántos subagentes y shells en segundo plano siguen en marcha, y los turnos que inician al informar aparecen en directo en el chat.
-- Los mensajes que envías mientras los subagentes de Claude siguen trabajando entran en la misma sesión activa en lugar de interrumpirlos.
-- Ajustes → Acerca de → Reiniciar ahora muestra el progreso y confirma que el servidor ha vuelto de verdad.
-- Las solicitudes de permiso para herramientas ofrecen una respuesta «Siempre» que funciona.
-- Las tarjetas de agentes muestran el correo de la cuenta conectada; se controlan los límites semanales por modelo de Claude, y la lista de modelos de Claude se obtiene directamente de la CLI.
-- Ajustes: un botón para actualizar la CLI de cada agente y un cierre de sesión que borra las credenciales guardadas del agente.
-- Los modelos favoritos se guardan en el servidor y las imágenes pegadas tienen vista previa en el campo de mensaje.
-- README y guías reescritas en los 12 idiomas, con capturas nuevas.
+- Ajustes → Acerca de → Actualizaciones tiene un botón para cada parte: **Actualizar app** (Android, Windows, Linux), **Actualizar interfaz web** (web) y **Actualizar servidor**, cada uno con su versión instalada y la más reciente.
+- El servidor se actualiza solo, sin importar cómo se instaló: script de instalación, checkout de git o tarball de la versión. Los tarballs se verifican con su suma de comprobación, se instalan al reiniciar y se revierten automáticamente si la versión nueva no arranca.
+- `start.sh` / `start.bat` reinician el servidor tras una actualización o un reinicio desde la app, sin systemd.
+- Una interfaz web alojada por el servidor se actualiza junto con él o por separado.
+- El servidor local de la app de escritorio («Este dispositivo») se puede actualizar cuando quieras.
 
 ### Correcciones
-- Los subagentes de Claude que trabajan en segundo plano ya no pierden sus solicitudes de permiso («Stream closed»), y sus solicitudes llegan al chat incluso después de terminar el turno.
-- El script de instalación instala la versión más reciente en lugar de la más antigua.
-- Chat en directo: las llamadas a herramientas de Cursor, Codex y OpenCode se transmiten en directo y ya no se duplican al refrescar; la actividad de los subagentes y los resultados de Agent vuelven tras recargar; los diffs de edición y las entradas de herramientas muy grandes se muestran correctamente.
-- Permisos: una llamada que denegaste o editaste nunca se aprueba, las solicitudes sin responder indican por qué se cerraron y las respuestas de selección múltiple conservan todas las opciones.
+- El aviso de actualización ya no pide pulsar un botón Actualizar que no existía.
+- Si la app y el servidor estaban desactualizados, la actualización del servidor no estaba disponible; el indicador de actualización ahora permite elegir.
+
+### Antes de actualizar
+- Los servidores con 0.8.12 o anterior instalados con el script de instalación o un tarball deben actualizarse a 0.8.13 una vez a mano (vuelve a ejecutar `install.sh --version v0.8.13` o descomprime el nuevo tarball sobre el antiguo); después, las actualizaciones funcionan desde la app. Los tarballs de las versiones requieren Node.js 22.
 <!-- lang:fr -->
 ### Nouveautés
-- Le travail en arrière-plan est visible : un indicateur au-dessus de la zone de saisie affiche combien de sous-agents et de shells en arrière-plan tournent encore, et les tours qu'ils lancent en rendant compte s'affichent en direct dans le chat.
-- Les messages envoyés pendant que les sous-agents Claude travaillent encore rejoignent la même session active au lieu de les interrompre.
-- Paramètres → À propos → Redémarrer affiche désormais la progression et confirme que le serveur est bien revenu.
-- Les demandes d'autorisation d'outil proposent une réponse « Toujours » qui fonctionne.
-- Les cartes d'agent affichent l'e-mail du compte connecté ; les limites hebdomadaires par modèle de Claude sont suivies, et la liste des modèles Claude vient directement de la CLI.
-- Paramètres : un bouton de mise à jour de la CLI pour chaque agent et une déconnexion qui efface les identifiants enregistrés de l'agent.
-- Les modèles favoris sont enregistrés sur le serveur et les images collées ont un aperçu dans la zone de saisie.
-- README et guides réécrits dans les 12 langues, avec de nouvelles captures d'écran.
+- Paramètres → À propos → Mises à jour propose un bouton pour chaque partie : **Mettre à jour l'application** (Android, Windows, Linux), **Mettre à jour l'interface web** (web) et **Mettre à jour le serveur**, chacun avec sa version installée et la plus récente.
+- Le serveur se met à jour lui-même, quelle que soit son installation : script d'installation, checkout git ou archive de la version. Les archives sont vérifiées par somme de contrôle, installées au redémarrage et annulées automatiquement si la nouvelle version ne démarre pas.
+- `start.sh` / `start.bat` redémarrent le serveur après une mise à jour ou un redémarrage depuis l'application, sans systemd.
+- Une interface web hébergée par le serveur est mise à jour avec lui ou séparément.
+- Le serveur local de l'application de bureau (« Cet appareil ») peut être mis à jour à la demande.
 
 ### Corrections
-- Les sous-agents Claude en arrière-plan ne perdent plus leurs demandes d'autorisation (« Stream closed »), et ces demandes arrivent dans le chat même après la fin du tour.
-- Le script d'installation installe la version la plus récente au lieu de la plus ancienne.
-- Chat en direct : les appels d'outils de Cursor, Codex et OpenCode sont diffusés en direct et ne sont plus dupliqués après un rafraîchissement ; l'activité des sous-agents et les résultats d'Agent reviennent après un rechargement ; les diffs d'édition et les très grandes entrées d'outils s'affichent correctement.
-- Autorisations : un appel refusé ou modifié n'est jamais approuvé, les demandes restées sans réponse indiquent pourquoi elles se sont fermées, et les réponses à choix multiples conservent chaque sélection.
+- Le message de mise à jour ne demande plus de cliquer sur un bouton Mettre à jour inexistant.
+- Quand l'application et le serveur étaient tous deux en retard, la mise à jour du serveur était inaccessible ; l'indicateur de mise à jour permet maintenant de choisir.
+
+### Avant la mise à jour
+- Les serveurs en 0.8.12 ou plus ancien installés avec le script d'installation ou une archive doivent être mis à jour une fois à la main vers 0.8.13 (relancez `install.sh --version v0.8.13` ou décompressez la nouvelle archive par-dessus l'ancienne) ; ensuite, les mises à jour se font depuis l'application. Les archives des versions nécessitent Node.js 22.
 <!-- lang:it -->
 ### Novità
-- Il lavoro in background è visibile: un indicatore sopra il campo di testo mostra quanti subagenti e shell in background sono ancora in esecuzione, e i turni che avviano quando riferiscono appaiono in tempo reale nella chat.
-- I messaggi inviati mentre i subagenti di Claude stanno ancora lavorando entrano nella stessa sessione attiva invece di interromperli.
-- Impostazioni → Informazioni → Riavvia ora mostra l'avanzamento e conferma che il server è davvero tornato.
-- Le richieste di permesso per gli strumenti offrono una risposta «Sempre» funzionante.
-- Le schede degli agenti mostrano l'email dell'account connesso; vengono monitorati i limiti settimanali per modello di Claude, e l'elenco dei modelli Claude arriva direttamente dalla CLI.
-- Impostazioni: un pulsante per aggiornare la CLI di ogni agente e un logout che cancella le credenziali salvate dell'agente.
-- I modelli preferiti sono salvati sul server e le immagini incollate hanno un'anteprima nel campo di testo.
-- README e guide riscritti in tutte le 12 lingue, con nuovi screenshot.
+- Impostazioni → Informazioni → Aggiornamenti ha un pulsante per ogni parte: **Aggiorna app** (Android, Windows, Linux), **Aggiorna interfaccia web** (web) e **Aggiorna server**, ognuno con la versione installata e l'ultima.
+- Il server si aggiorna da solo, comunque sia stato installato: script di installazione, checkout git o tarball della release. I tarball vengono verificati con il checksum, installati al riavvio e annullati automaticamente se la nuova versione non parte.
+- `start.sh` / `start.bat` riavviano il server dopo un aggiornamento o un riavvio dall'app, senza systemd.
+- Un'interfaccia web ospitata dal server si aggiorna insieme a lui o da sola.
+- Il server locale dell'app desktop («Questo dispositivo») si può aggiornare su richiesta.
 
 ### Correzioni
-- I subagenti di Claude in background non perdono più le richieste di permesso («Stream closed»), e le loro richieste arrivano nella chat anche dopo la fine del turno.
-- Lo script di installazione installa la release più recente invece della più vecchia.
-- Chat in tempo reale: le chiamate agli strumenti di Cursor, Codex e OpenCode vengono trasmesse in diretta e non si duplicano più dopo un aggiornamento; l'attività dei subagenti e i risultati di Agent tornano dopo un ricaricamento; i diff delle modifiche e gli input molto grandi degli strumenti vengono mostrati correttamente.
-- Permessi: una chiamata negata o modificata non viene mai approvata, le richieste senza risposta spiegano perché si sono chiuse e le risposte a scelta multipla mantengono ogni selezione.
+- Il messaggio di aggiornamento non chiede più di premere un pulsante Aggiorna che non c'era.
+- Con app e server entrambi non aggiornati, l'aggiornamento del server non era raggiungibile; l'indicatore di aggiornamento ora permette di scegliere.
+
+### Prima di aggiornare
+- I server con 0.8.12 o precedente installati con lo script di installazione o un tarball vanno portati a 0.8.13 una volta a mano (riesegui `install.sh --version v0.8.13` o estrai il nuovo tarball sopra il vecchio); dopo, gli aggiornamenti funzionano dall'app. I tarball delle release richiedono Node.js 22.
 <!-- lang:ja -->
 ### 新機能
-- バックグラウンドの作業が見えるようになりました。入力欄の上に、まだ動いているサブエージェントやバックグラウンドシェルの数が表示され、それらが報告のために開始するターンはチャットにリアルタイムで表示されます。
-- Claude のサブエージェントが作業中に送ったメッセージは、作業を中断せずに同じセッションへ送られます。
-- 設定 → このアプリについて → 再起動 で進行状況が表示され、サーバーが本当に復帰したことを確認できるようになりました。
-- ツールの許可リクエストで「常に許可」が正しく機能するようになりました。
-- エージェントカードにサインイン中のアカウントのメールアドレスを表示。Claude のモデル別の週間上限を追跡し、Claude のモデル一覧は CLI から直接取得します。
-- 設定：エージェントごとの CLI 更新ボタンと、保存されたエージェントの認証情報を削除するログアウトを追加。
-- お気に入りのモデルはサーバーに保存され、貼り付けた画像は入力欄でプレビューされます。
-- README とガイドを全 12 言語で書き直し、スクリーンショットも新しくしました。
+- 設定 → 概要 → 更新 に、部分ごとのボタンが付きました：**アプリを更新**（Android、Windows、Linux）、**Web インターフェイスを更新**（Web）、**サーバーを更新**。それぞれインストール済みと最新のバージョンを表示します。
+- サーバーはインストール方法（インストールスクリプト、git チェックアウト、リリースの tarball）にかかわらず自分で更新できます。tarball はチェックサムで検証され、再起動時にインストールされ、新しいバージョンが起動しない場合は自動的に元に戻ります。
+- `start.sh` / `start.bat` は、アップデートやアプリからの再起動の後、systemd なしでサーバーを再起動します。
+- サーバーがホストする Web インターフェイスは、サーバーと一緒に、または単独で更新されます。
+- デスクトップアプリのローカルサーバー（「このデバイス」）を必要なときに更新できます。
 
 ### バグ修正
-- バックグラウンドで動く Claude のサブエージェントが許可リクエストを失わなくなりました（「Stream closed」）。ターン終了後のリクエストもチャットに届きます。
-- インストールスクリプトが最も古いリリースではなく最新のリリースをインストールするようになりました。
-- ライブチャット：Cursor、Codex、OpenCode のツール呼び出しがリアルタイムで表示され、更新後に重複しなくなりました。再読み込み後もサブエージェントの活動と Agent の結果が復元され、編集の差分や非常に大きなツール入力も正しく表示されます。
-- 許可：拒否または編集した呼び出しが承認されることはなくなり、未回答のリクエストは閉じた理由を表示し、複数選択の回答はすべての選択を保持します。
+- アップデートの案内が、存在しない「更新」ボタンを押すよう求めなくなりました。
+- アプリとサーバーの両方が古い場合にサーバーを更新できませんでしたが、アップデートバッジから選べるようになりました。
+
+### アップデートの前に
+- インストールスクリプトまたは tarball で導入した 0.8.12 以前のサーバーは、一度だけ手動で 0.8.13 に更新してください（`install.sh --version v0.8.13` を再実行するか、新しい tarball を古いものの上に展開）。その後はアプリから更新できます。リリースの tarball には Node.js 22 が必要です。
 <!-- lang:ko -->
 ### 새 기능
-- 백그라운드 작업이 보입니다. 입력창 위 표시줄에 아직 실행 중인 서브에이전트와 백그라운드 셸 수가 나타나고, 이들이 결과를 보고하며 시작하는 턴은 채팅에 실시간으로 표시됩니다.
-- Claude 서브에이전트가 작업 중일 때 보낸 메시지는 작업을 중단시키지 않고 같은 세션으로 전달됩니다.
-- 설정 → 정보 → 재시작에서 진행 상황을 보여 주고 서버가 실제로 다시 실행되었는지 확인합니다.
-- 도구 권한 요청에서 '항상 허용'이 제대로 동작합니다.
-- 에이전트 카드에 로그인한 계정의 이메일이 표시됩니다. Claude 모델별 주간 한도를 추적하고, Claude 모델 목록은 CLI에서 바로 가져옵니다.
-- 설정: 에이전트별 CLI 업데이트 버튼과 저장된 에이전트 자격 증명을 지우는 로그아웃이 추가되었습니다.
-- 즐겨찾는 모델이 서버에 저장되고, 붙여 넣은 이미지를 입력창에서 미리 볼 수 있습니다.
-- README와 가이드를 12개 언어 모두 새로 쓰고 스크린샷도 새로 바꿨습니다.
+- 설정 → 정보 → 업데이트에 부분별 버튼이 생겼습니다: **앱 업데이트**(Android, Windows, Linux), **웹 인터페이스 업데이트**(웹), **서버 업데이트**. 각각 설치된 버전과 최신 버전을 보여 줍니다.
+- 서버는 설치 방식(설치 스크립트, git 체크아웃, 릴리스 tarball)과 관계없이 스스로 업데이트됩니다. tarball은 체크섬으로 검증되고, 재시작할 때 설치되며, 새 버전이 시작되지 않으면 자동으로 되돌립니다.
+- `start.sh` / `start.bat`가 업데이트나 앱에서의 재시작 후 systemd 없이 서버를 다시 시작합니다.
+- 서버가 호스팅하는 웹 인터페이스는 서버와 함께 또는 따로 업데이트됩니다.
+- 데스크톱 앱의 로컬 서버('이 기기')를 원할 때 업데이트할 수 있습니다.
 
 ### 버그 수정
-- 백그라운드에서 작업하는 Claude 서브에이전트가 더 이상 권한 요청을 잃지 않으며('Stream closed'), 턴이 끝난 뒤의 요청도 채팅에 전달됩니다.
-- 설치 스크립트가 가장 오래된 릴리스가 아닌 최신 릴리스를 설치합니다.
-- 실시간 채팅: Cursor, Codex, OpenCode의 도구 호출이 실시간으로 표시되고 새로 고침 후 중복되지 않습니다. 다시 불러온 뒤에도 서브에이전트 활동과 Agent 결과가 복원되며, 편집 diff와 매우 큰 도구 입력도 올바르게 표시됩니다.
-- 권한: 거부하거나 수정한 호출은 절대 승인되지 않고, 답하지 않은 요청은 닫힌 이유를 알려 주며, 다중 선택 답변은 모든 선택을 유지합니다.
+- 업데이트 안내가 더 이상 존재하지 않는 업데이트 버튼을 누르라고 하지 않습니다.
+- 앱과 서버가 모두 오래되었을 때 서버 업데이트에 접근할 수 없었는데, 이제 업데이트 배지에서 선택할 수 있습니다.
+
+### 업데이트 전에
+- 설치 스크립트나 tarball로 설치한 0.8.12 이하 서버는 한 번만 직접 0.8.13으로 업데이트해야 합니다(`install.sh --version v0.8.13`을 다시 실행하거나 새 tarball을 기존 위치에 덮어서 풀기). 그 뒤로는 앱에서 업데이트됩니다. 릴리스 tarball에는 Node.js 22가 필요합니다.
 <!-- lang:ru -->
 ### Что нового
-- Фоновая работа теперь видна: индикатор над полем ввода показывает, сколько субагентов и фоновых команд ещё выполняется, а ходы, которые они начинают, отчитываясь о результате, появляются в чате в реальном времени.
-- Сообщения, отправленные, пока субагенты Claude ещё работают, попадают в ту же активную сессию и не прерывают их.
-- Настройки → О приложении → Перезапуск теперь показывает ход перезапуска и подтверждает, что сервер действительно вернулся.
-- В запросах разрешений для инструментов работает ответ «Всегда».
-- На карточках агентов отображается e-mail вошедшей учётной записи; отслеживаются недельные лимиты Claude для отдельных моделей, а список моделей Claude берётся прямо из CLI.
-- Настройки: кнопка обновления CLI для каждого агента и выход, удаляющий сохранённые учётные данные агента.
-- Избранные модели хранятся на сервере, а у вставленных изображений есть предпросмотр в поле ввода.
-- README и руководства переписаны на всех 12 языках, с новыми снимками экрана.
+- Настройки → О программе → Обновления у каждой части своя кнопка: **Обновить приложение** (Android, Windows, Linux), **Обновить веб-интерфейс** (веб) и **Обновить сервер** — с установленной и последней версией.
+- Сервер обновляется сам независимо от способа установки: скрипт установки, git-checkout или архив релиза. Архивы проверяются по контрольной сумме, устанавливаются при перезапуске и автоматически откатываются, если новая версия не запускается.
+- `start.sh` / `start.bat` сами перезапускают сервер после обновления или перезапуска из приложения, без systemd.
+- Веб-интерфейс, который размещает сервер, обновляется вместе с ним или отдельно.
+- Локальный сервер десктопного приложения («Это устройство») можно обновить по запросу.
 
 ### Исправления
-- Субагенты Claude, работающие в фоне, больше не теряют запросы разрешений («Stream closed»), и их запросы доходят до чата даже после завершения хода.
-- Скрипт установки ставит самый новый релиз, а не самый старый.
-- Чат в реальном времени: вызовы инструментов Cursor, Codex и OpenCode отображаются сразу и не дублируются после обновления; активность субагентов и результаты Agent восстанавливаются после перезагрузки; диффы правок и очень большие входные данные инструментов отображаются корректно.
-- Разрешения: отклонённый или изменённый вызов никогда не одобряется, запросы без ответа сообщают, почему закрылись, а ответы с множественным выбором сохраняют все выбранные варианты.
+- Сообщение об обновлении больше не предлагает нажать несуществующую кнопку «Обновить».
+- Когда устарели и приложение, и сервер, обновить сервер было нельзя; теперь значок обновления позволяет выбрать.
+
+### Перед обновлением
+- Серверы версии 0.8.12 и старше, установленные скриптом или из архива, нужно один раз обновить до 0.8.13 вручную (повторно запустите `install.sh --version v0.8.13` или распакуйте новый архив поверх старого); после этого обновления работают из приложения. Архивам релизов нужен Node.js 22.
 <!-- lang:tr -->
 ### Yenilikler
-- Arka plan işleri artık görünüyor: mesaj alanının üstündeki gösterge hâlâ çalışan alt ajanların ve arka plan kabuklarının sayısını gösterir; bunların rapor verirken başlattığı turlar sohbette canlı görünür.
-- Claude alt ajanları çalışırken gönderdiğiniz mesajlar onları kesmek yerine aynı etkin oturuma gider.
-- Ayarlar → Hakkında → Yeniden başlat artık ilerlemeyi gösterir ve sunucunun gerçekten geri geldiğini doğrular.
-- Araç izin isteklerinde çalışan bir "Her zaman" yanıtı var.
-- Ajan kartları oturum açılmış hesabın e-postasını gösterir; Claude'un modele özgü haftalık sınırları izlenir ve Claude model listesi doğrudan CLI'dan gelir.
-- Ayarlar: her ajan için CLI güncelleme düğmesi ve kayıtlı ajan kimlik bilgilerini silen oturum kapatma.
-- Favori modeller sunucuda saklanır, yapıştırılan görsellerin mesaj alanında önizlemesi olur.
-- README ve kılavuzlar 12 dilin hepsinde yeniden yazıldı, yeni ekran görüntüleriyle.
+- Ayarlar → Hakkında → Güncellemeler bölümünde her parça için ayrı düğme var: **Uygulamayı güncelle** (Android, Windows, Linux), **Web arayüzünü güncelle** (web) ve **Sunucuyu güncelle** — her biri kurulu ve en son sürümüyle.
+- Sunucu nasıl kurulduğundan bağımsız olarak kendini günceller: kurulum betiği, git checkout veya sürüm arşivi. Arşivler sağlama toplamıyla doğrulanır, yeniden başlatmada kurulur ve yeni sürüm başlamazsa otomatik olarak geri alınır.
+- `start.sh` / `start.bat` bir güncellemeden veya uygulamadan yeniden başlatmadan sonra sunucuyu systemd olmadan yeniden başlatır.
+- Sunucunun barındırdığı web arayüzü onunla birlikte ya da tek başına güncellenir.
+- Masaüstü uygulamasının yerel sunucusu ("Bu cihaz") istendiğinde güncellenebilir.
 
 ### Hata düzeltmeleri
-- Arka planda çalışan Claude alt ajanları artık izin isteklerini kaybetmiyor ("Stream closed") ve istekleri tur bittikten sonra da sohbete ulaşıyor.
-- Kurulum betiği en eski sürüm yerine en yeni sürümü kurar.
-- Canlı sohbet: Cursor, Codex ve OpenCode araç çağrıları canlı akar ve yenilemeden sonra yinelenmez; alt ajan etkinliği ve Agent sonuçları yeniden yüklemeden sonra geri gelir; düzenleme farkları ve çok büyük araç girdileri doğru görüntülenir.
-- İzinler: reddettiğiniz veya düzenlediğiniz bir çağrı asla onaylanmaz, yanıtlanmayan istekler neden kapandığını söyler ve çoklu seçim yanıtları tüm seçimleri korur.
+- Güncelleme mesajı artık olmayan bir Güncelle düğmesine basmanızı istemiyor.
+- Hem uygulama hem sunucu eskiyken sunucu güncellemesine ulaşılamıyordu; güncelleme rozeti artık seçim sunuyor.
+
+### Güncellemeden önce
+- Kurulum betiği veya arşivle kurulmuş 0.8.12 ve öncesi sunucular bir kez elle 0.8.13'e güncellenmeli (`install.sh --version v0.8.13` komutunu yeniden çalıştırın veya yeni arşivi eskisinin üzerine açın); sonrasında güncellemeler uygulamadan çalışır. Sürüm arşivleri Node.js 22 gerektirir.
 <!-- lang:zh-CN -->
 ### 新功能
-- 后台工作现在可见：输入框上方的提示条会显示仍在运行的子代理和后台 shell 数量，它们汇报结果时启动的回合会实时显示在聊天中。
-- 在 Claude 子代理仍在工作时发送的消息会进入同一个运行中的会话，而不会打断它们。
-- 设置 → 关于 → 重启 现在会显示进度，并确认服务器确实已恢复。
-- 工具权限请求提供可用的“始终允许”选项。
-- 代理卡片显示已登录账户的邮箱；会跟踪 Claude 各模型的每周限额，Claude 模型列表直接从 CLI 获取。
-- 设置：每个代理都有 CLI 更新按钮，以及可清除已保存代理凭据的退出登录。
-- 收藏的模型保存在服务器上，粘贴的图片会在输入框中显示预览。
-- README 和指南已用全部 12 种语言重写，并配有新截图。
+- 设置 → 关于 → 更新 为每个部分提供单独的按钮：**更新应用**（Android、Windows、Linux）、**更新 Web 界面**（Web）和 **更新服务器**，并显示各自已安装和最新的版本。
+- 无论服务器以何种方式安装（安装脚本、git 检出或发布的 tarball），都能自行更新。tarball 会用校验和验证，在重启时安装，新版本无法启动时会自动回滚。
+- `start.sh` / `start.bat` 会在更新或从应用重启后自行重启服务器，无需 systemd。
+- 服务器托管的 Web 界面会随服务器一起更新，也可以单独更新。
+- 桌面应用的本地服务器（“此设备”）可以随时手动更新。
 
 ### 问题修复
-- 在后台工作的 Claude 子代理不再丢失权限请求（“Stream closed”），回合结束后的请求也能送达聊天。
-- 安装脚本会安装最新版本，而不是最旧版本。
-- 实时聊天：Cursor、Codex 和 OpenCode 的工具调用实时显示，刷新后不再重复；重新加载后会恢复子代理活动和 Agent 结果；编辑差异和超大的工具输入都能正确显示。
-- 权限：你拒绝或修改过的调用绝不会被批准，未回答的请求会说明关闭原因，多选回答会保留所有选项。
+- 更新提示不再要求点击并不存在的“更新”按钮。
+- 应用和服务器都过期时无法更新服务器；现在更新标记可以让你选择。
+
+### 更新之前
+- 通过安装脚本或 tarball 安装的 0.8.12 及更早版本的服务器，需要手动更新到 0.8.13 一次（重新运行 `install.sh --version v0.8.13`，或将新的 tarball 解压覆盖旧文件）；之后即可在应用中更新。发布的 tarball 需要 Node.js 22。
 <!-- lang:zh-TW -->
 ### 新功能
-- 背景工作現在看得到：輸入框上方的提示列會顯示仍在執行的子代理與背景 shell 數量，它們回報結果時啟動的回合會即時顯示在聊天中。
-- 在 Claude 子代理仍在工作時傳送的訊息，會進入同一個執行中的工作階段，而不會中斷它們。
-- 設定 → 關於 → 重新啟動 現在會顯示進度，並確認伺服器確實已恢復。
-- 工具權限請求提供可正常運作的「一律允許」選項。
-- 代理卡片會顯示已登入帳號的電子郵件；會追蹤 Claude 各模型的每週上限，Claude 模型清單直接從 CLI 取得。
-- 設定：每個代理都有 CLI 更新按鈕，以及可清除已儲存代理憑證的登出功能。
-- 最愛的模型會儲存在伺服器上，貼上的圖片會在輸入框中顯示預覽。
-- README 與指南已以全部 12 種語言改寫，並附上新的螢幕截圖。
+- 設定 → 關於 → 更新 為每個部分提供個別的按鈕：**更新應用程式**（Android、Windows、Linux）、**更新 Web 介面**（Web）和 **更新伺服器**，並顯示各自已安裝與最新的版本。
+- 不論伺服器以何種方式安裝（安裝指令碼、git 簽出或發行版 tarball），都能自行更新。tarball 會以檢查碼驗證、在重新啟動時安裝，新版本無法啟動時會自動還原。
+- `start.sh` / `start.bat` 會在更新或從應用程式重新啟動後自行重新啟動伺服器，不需要 systemd。
+- 伺服器託管的 Web 介面會隨伺服器一起更新，也可以單獨更新。
+- 桌面應用程式的本機伺服器（「此裝置」）可以隨時手動更新。
 
 ### 錯誤修正
-- 在背景工作的 Claude 子代理不再遺失權限請求（「Stream closed」），回合結束後的請求也能送達聊天。
-- 安裝指令碼會安裝最新版本，而不是最舊版本。
-- 即時聊天：Cursor、Codex 與 OpenCode 的工具呼叫會即時顯示，重新整理後不再重複；重新載入後會還原子代理活動與 Agent 結果；編輯差異與非常大的工具輸入都能正確顯示。
-- 權限：你拒絕或修改過的呼叫絕不會被核准，未回答的請求會說明關閉原因，多選回答會保留所有選項。
+- 更新提示不再要求點選並不存在的「更新」按鈕。
+- 應用程式與伺服器都過期時無法更新伺服器；現在更新標記可以讓你選擇。
+
+### 更新之前
+- 以安裝指令碼或 tarball 安裝的 0.8.12 及更早版本伺服器，需要手動更新到 0.8.13 一次（重新執行 `install.sh --version v0.8.13`，或將新的 tarball 解壓縮覆蓋舊檔案）；之後即可從應用程式更新。發行版 tarball 需要 Node.js 22。

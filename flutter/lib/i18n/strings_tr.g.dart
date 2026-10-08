@@ -2236,7 +2236,7 @@ class Translations$settings$updates$tr extends Translations$settings$updates$en 
 	final TranslationsTr _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'Uygulama güncellemeleri';
+	@override String get title => 'Güncellemeler';
 	@override String get description => 'GitHub\'da daha yeni bir masaüstü sürümünü kontrol eder. Yeni sürümler otomatik indirilir ve çıkışta kurulur.';
 	@override String get check => 'Güncellemeleri denetle';
 	@override String get checking => 'Denetleniyor…';
@@ -8200,7 +8200,7 @@ extension on TranslationsTr {
 			'settings.server.restartBack' => ({required Object version}) => 'Sunucu yeniden çalışıyor — sürüm ${version}.',
 			'settings.server.restartReloading' => 'Sayfa yeniden yükleniyor…',
 			'settings.server.restartTimeout' => ({required Object seconds}) => 'Sunucu ${seconds} sn içinde geri gelmedi. Hizmet günlüğünü (/tmp/ddagent.log) kontrol edin veya elle yeniden başlatın.',
-			'settings.updates.title' => 'Uygulama güncellemeleri',
+			'settings.updates.title' => 'Güncellemeler',
 			'settings.updates.description' => 'GitHub\'da daha yeni bir masaüstü sürümünü kontrol eder. Yeni sürümler otomatik indirilir ve çıkışta kurulur.',
 			'settings.updates.check' => 'Güncellemeleri denetle',
 			'settings.updates.checking' => 'Denetleniyor…',

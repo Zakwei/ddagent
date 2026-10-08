@@ -125,7 +125,7 @@ Benötigt `git`, Node.js 22+ und `npm`. Das Skript klont ein Release-Tag nach `~
 curl -fsSL https://github.com/Zakwei/ddagent/releases/latest/download/install.sh | bash -s -- --systemd --port 3001
 ```
 
-Zum Aktualisieren führst du das Skript erneut mit `--version vX.Y.Z` aus; es aktualisiert den Checkout an Ort und Stelle. Danach startest du den Server:
+Danach startest du den Server:
 
 ```bash
 ~/.ddagent/app/start.sh        # API on http://<host>:3001 (set SERVER_PORT to change)
@@ -164,6 +164,18 @@ cd flutter
 flutter pub get
 flutter build linux --release      # or: windows, apk, web
 ```
+
+### Aktualisieren
+
+Unter **Einstellungen → Info → Updates** gibt es im Client für jeden Teil einen eigenen Button:
+
+| Teil | So wird aktualisiert |
+|---|---|
+| **Server** | Installationen per Installer-Skript und Git wechseln auf das neueste Release; Release-Tarballs laden den nächsten Tarball herunter, prüfen ihn (`.sha256`), installieren ihn beim Neustart und rollen automatisch zurück, wenn der Server nicht startet. `start.sh` / `start.bat` starten den Server selbst neu — systemd ist nicht nötig. Den lokalen Server eines Desktop-Clients („Dieses Gerät“) installiert die App neu. |
+| **Weboberfläche** | Wird aus dem Web-Zip des Releases ersetzt, wenn der Server sie ausliefert (`DDAGENT_WEB_DIR` oder `flutter/build/web`, ausgeliefert von `scripts/serve-flutter-web.cjs`); außerdem wird sie bei jedem Server-Update aufgefrischt. |
+| **Diese App** | Android installiert die neue APK; Windows und Linux laden den neuen Build im Hintergrund herunter und installieren ihn, wenn du die App beendest. |
+
+Release-Tarballs werden für Node.js 22 gebaut — der Server lehnt einen Tarball ab, der für eine andere Node.js-Hauptversion gebaut wurde. Server mit 0.8.12 oder älter (Installer-Skript oder Tarball) aktualisierst du einmalig von Hand auf 0.8.13 — führe `install.sh --version v0.8.13` erneut aus oder entpacke den neuen Tarball über den alten —, danach geht es über die Oberfläche.
 
 ### Aus dem Quellcode
 

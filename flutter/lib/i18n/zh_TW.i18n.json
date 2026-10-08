@@ -1540,7 +1540,7 @@
       "restartTimeout": "伺服器未在 {{seconds}} 秒內恢復。請檢查服務記錄檔（/tmp/ddagent.log）或手動重新啟動。"
     },
     "updates": {
-      "title": "應用程式更新",
+      "title": "更新",
       "description": "在 GitHub 上檢查更新的桌面版本。新版本會自動下載並在退出時安裝。",
       "check": "檢查更新",
       "checking": "正在檢查…",

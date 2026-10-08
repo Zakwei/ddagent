@@ -1540,7 +1540,7 @@
       "restartTimeout": "{{seconds}}초 안에 서버가 돌아오지 않았습니다. 서비스 로그(/tmp/ddagent.log)를 확인하거나 직접 재시작하세요."
     },
     "updates": {
-      "title": "앱 업데이트",
+      "title": "업데이트",
       "description": "GitHub에서 더 최신 데스크톱 빌드를 확인합니다. 새 버전은 자동으로 다운로드되어 종료 시 설치됩니다.",
       "check": "업데이트 확인",
       "checking": "확인 중…",

@@ -2236,7 +2236,7 @@ class Translations$settings$updates$ko extends Translations$settings$updates$en 
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => '앱 업데이트';
+	@override String get title => '업데이트';
 	@override String get description => 'GitHub에서 더 최신 데스크톱 빌드를 확인합니다. 새 버전은 자동으로 다운로드되어 종료 시 설치됩니다.';
 	@override String get check => '업데이트 확인';
 	@override String get checking => '확인 중…';
@@ -8200,7 +8200,7 @@ extension on TranslationsKo {
 			'settings.server.restartBack' => ({required Object version}) => '서버가 다시 실행되었습니다 — 버전 ${version}.',
 			'settings.server.restartReloading' => '페이지를 새로 고치는 중…',
 			'settings.server.restartTimeout' => ({required Object seconds}) => '${seconds}초 안에 서버가 돌아오지 않았습니다. 서비스 로그(/tmp/ddagent.log)를 확인하거나 직접 재시작하세요.',
-			'settings.updates.title' => '앱 업데이트',
+			'settings.updates.title' => '업데이트',
 			'settings.updates.description' => 'GitHub에서 더 최신 데스크톱 빌드를 확인합니다. 새 버전은 자동으로 다운로드되어 종료 시 설치됩니다.',
 			'settings.updates.check' => '업데이트 확인',
 			'settings.updates.checking' => '확인 중…',

@@ -2237,7 +2237,7 @@ class Translations$settings$updates$es extends Translations$settings$updates$en 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'Actualizaciones de la app';
+	@override String get title => 'Actualizaciones';
 	@override String get description => 'Busca en GitHub una versión de escritorio más reciente. Las nuevas versiones se descargan automáticamente y se instalan al salir.';
 	@override String get check => 'Buscar actualizaciones';
 	@override String get checking => 'Buscando…';
@@ -8201,7 +8201,7 @@ extension on TranslationsEs {
 			'settings.server.restartBack' => ({required Object version}) => 'El servidor ha vuelto — versión ${version}.',
 			'settings.server.restartReloading' => 'Recargando la página…',
 			'settings.server.restartTimeout' => ({required Object seconds}) => 'El servidor no ha vuelto en ${seconds} s. Revisa el registro del servicio (/tmp/ddagent.log) o reinícialo manualmente.',
-			'settings.updates.title' => 'Actualizaciones de la app',
+			'settings.updates.title' => 'Actualizaciones',
 			'settings.updates.description' => 'Busca en GitHub una versión de escritorio más reciente. Las nuevas versiones se descargan automáticamente y se instalan al salir.',
 			'settings.updates.check' => 'Buscar actualizaciones',
 			'settings.updates.checking' => 'Buscando…',

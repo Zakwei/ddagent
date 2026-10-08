@@ -1541,7 +1541,7 @@
       "restartTimeout": "Il server non è tornato entro {{seconds}} s. Controlla il log del servizio (/tmp/ddagent.log) o riavvialo manualmente."
     },
     "updates": {
-      "title": "Aggiornamenti dell'app",
+      "title": "Aggiornamenti",
       "description": "Controlla su GitHub una build desktop più recente. Le nuove versioni si scaricano automaticamente e si installano all'uscita.",
       "check": "Controlla aggiornamenti",
       "checking": "Controllo in corso…",

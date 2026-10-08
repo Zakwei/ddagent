@@ -2237,7 +2237,7 @@ class Translations$settings$updates$it extends Translations$settings$updates$en 
 	final TranslationsIt _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'Aggiornamenti dell\'app';
+	@override String get title => 'Aggiornamenti';
 	@override String get description => 'Controlla su GitHub una build desktop più recente. Le nuove versioni si scaricano automaticamente e si installano all\'uscita.';
 	@override String get check => 'Controlla aggiornamenti';
 	@override String get checking => 'Controllo in corso…';
@@ -8201,7 +8201,7 @@ extension on TranslationsIt {
 			'settings.server.restartBack' => ({required Object version}) => 'Il server è di nuovo attivo — versione ${version}.',
 			'settings.server.restartReloading' => 'Ricaricamento della pagina…',
 			'settings.server.restartTimeout' => ({required Object seconds}) => 'Il server non è tornato entro ${seconds} s. Controlla il log del servizio (/tmp/ddagent.log) o riavvialo manualmente.',
-			'settings.updates.title' => 'Aggiornamenti dell\'app',
+			'settings.updates.title' => 'Aggiornamenti',
 			'settings.updates.description' => 'Controlla su GitHub una build desktop più recente. Le nuove versioni si scaricano automaticamente e si installano all\'uscita.',
 			'settings.updates.check' => 'Controlla aggiornamenti',
 			'settings.updates.checking' => 'Controllo in corso…',

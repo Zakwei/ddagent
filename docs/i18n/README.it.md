@@ -125,7 +125,7 @@ Richiede `git`, Node.js 22+ e `npm`. Lo script clona un tag di release in `~/.dd
 curl -fsSL https://github.com/Zakwei/ddagent/releases/latest/download/install.sh | bash -s -- --systemd --port 3001
 ```
 
-Per aggiornare, riesegui lo script con `--version vX.Y.Z`; aggiorna il checkout sul posto. Poi avvia il server:
+Poi avvia il server:
 
 ```bash
 ~/.ddagent/app/start.sh        # API on http://<host>:3001 (set SERVER_PORT to change)
@@ -164,6 +164,18 @@ cd flutter
 flutter pub get
 flutter build linux --release      # or: windows, apk, web
 ```
+
+### Aggiornamento
+
+Nel client, **Impostazioni → Informazioni → Aggiornamenti** ha un pulsante separato per ogni parte:
+
+| Parte | Come si aggiorna |
+|---|---|
+| **Server** | Le installazioni tramite script di installazione o git passano all'ultima release; le installazioni da tarball scaricano il tarball successivo, lo verificano (`.sha256`) e lo installano al riavvio, con rollback automatico se il server non si avvia. `start.sh` / `start.bat` riavviano il server da soli — systemd non serve. Il server locale di un client desktop ("Questo dispositivo") viene reinstallato dall'app. |
+| **Interfaccia web** | Viene sostituita con lo zip web della release quando è il server a ospitarla (`DDAGENT_WEB_DIR`, oppure `flutter/build/web` servito da `scripts/serve-flutter-web.cjs`); viene inoltre aggiornata a ogni aggiornamento del server. |
+| **Questa app** | Android installa il nuovo APK; Windows e Linux scaricano la nuova build in background e la installano quando chiudi l'app. |
+
+I tarball delle release sono compilati per Node.js 22 — il server rifiuta un tarball compilato per una versione major diversa di Node.js. I server alla 0.8.12 o precedenti (script di installazione o tarball) vanno aggiornati a 0.8.13 a mano una sola volta — riesegui `install.sh --version v0.8.13` o estrai il nuovo tarball sopra quello vecchio — e da lì in poi dall'interfaccia.
 
 ### Da sorgente
 

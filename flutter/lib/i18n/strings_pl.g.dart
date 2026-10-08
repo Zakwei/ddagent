@@ -2305,7 +2305,7 @@ class Translations$settings$updates$pl extends Translations$settings$updates$en 
 	final TranslationsPl _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'Aktualizacje aplikacji';
+	@override String get title => 'Aktualizacje';
 	@override String get description => 'Sprawdź GitHub w poszukiwaniu nowszej wersji desktopowej. Nowe wersje pobierają się automatycznie i instalują przy zamknięciu.';
 	@override String get descriptionMobile => 'Sprawdź GitHub w poszukiwaniu nowszej wersji tej aplikacji. Aktualizację instaluje instalator systemowy urządzenia.';
 	@override String get descriptionServer => 'Sprawdza na GitHubie, czy jest nowsze wydanie ddagent. Podłączony serwer może zaktualizować się sam — trwające sesje zostaną przerwane na czas restartu.';
@@ -8730,7 +8730,7 @@ extension on TranslationsPl {
 			'settings.server.restartBack' => ({required Object version}) => 'Serwer działa — wersja ${version}.',
 			'settings.server.restartReloading' => 'Przeładowuję stronę…',
 			'settings.server.restartTimeout' => ({required Object seconds}) => 'Serwer nie wrócił w ciągu ${seconds} s. Sprawdź log usługi (/tmp/ddagent.log) albo zrestartuj go ręcznie.',
-			'settings.updates.title' => 'Aktualizacje aplikacji',
+			'settings.updates.title' => 'Aktualizacje',
 			'settings.updates.description' => 'Sprawdź GitHub w poszukiwaniu nowszej wersji desktopowej. Nowe wersje pobierają się automatycznie i instalują przy zamknięciu.',
 			'settings.updates.descriptionMobile' => 'Sprawdź GitHub w poszukiwaniu nowszej wersji tej aplikacji. Aktualizację instaluje instalator systemowy urządzenia.',
 			'settings.updates.descriptionServer' => 'Sprawdza na GitHubie, czy jest nowsze wydanie ddagent. Podłączony serwer może zaktualizować się sam — trwające sesje zostaną przerwane na czas restartu.',

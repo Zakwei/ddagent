@@ -2237,7 +2237,7 @@ class Translations$settings$updates$de extends Translations$settings$updates$en 
 	final TranslationsDe _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'App-Updates';
+	@override String get title => 'Updates';
 	@override String get description => 'Auf GitHub nach einer neueren Desktop-Version suchen. Neue Versionen werden automatisch heruntergeladen und beim Beenden installiert.';
 	@override String get check => 'Nach Updates suchen';
 	@override String get checking => 'Suche läuft…';
@@ -8201,7 +8201,7 @@ extension on TranslationsDe {
 			'settings.server.restartBack' => ({required Object version}) => 'Der Server läuft wieder — Version ${version}.',
 			'settings.server.restartReloading' => 'Seite wird neu geladen…',
 			'settings.server.restartTimeout' => ({required Object seconds}) => 'Der Server ist nicht innerhalb von ${seconds} s zurückgekehrt. Prüfe das Dienstprotokoll (/tmp/ddagent.log) oder starte ihn manuell neu.',
-			'settings.updates.title' => 'App-Updates',
+			'settings.updates.title' => 'Updates',
 			'settings.updates.description' => 'Auf GitHub nach einer neueren Desktop-Version suchen. Neue Versionen werden automatisch heruntergeladen und beim Beenden installiert.',
 			'settings.updates.check' => 'Nach Updates suchen',
 			'settings.updates.checking' => 'Suche läuft…',

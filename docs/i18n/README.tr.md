@@ -125,7 +125,7 @@ curl -fsSL https://github.com/Zakwei/ddagent/releases/latest/download/install.sh
 curl -fsSL https://github.com/Zakwei/ddagent/releases/latest/download/install.sh | bash -s -- --systemd --port 3001
 ```
 
-Güncellemek için betiği `--version vX.Y.Z` ile yeniden çalıştırın; mevcut kopyayı yerinde günceller. Ardından sunucuyu başlatın:
+Ardından sunucuyu başlatın:
 
 ```bash
 ~/.ddagent/app/start.sh        # API on http://<host>:3001 (set SERVER_PORT to change)
@@ -164,6 +164,18 @@ cd flutter
 flutter pub get
 flutter build linux --release      # or: windows, apk, web
 ```
+
+### Güncelleme
+
+İstemcideki **Ayarlar → Hakkında → Güncellemeler** bölümünde her parça için ayrı bir düğme bulunur:
+
+| Parça | Nasıl güncellenir |
+|---|---|
+| **Sunucu** | Kurulum betiği ve git ile yapılan kurulumlar en yeni sürüme geçer; sürüm tarball'larıyla yapılan kurulumlar bir sonraki tarball'u indirir, doğrular (`.sha256`) ve yeniden başlatmada kurar; sunucu başlamazsa değişikliği otomatik olarak geri alır. `start.sh` / `start.bat` sunucuyu kendiliğinden yeniden başlatır — systemd gerekmez. Masaüstü istemcisinin yerel sunucusu ("Bu cihaz") uygulama tarafından yeniden kurulur. |
+| **Web arayüzü** | Sunucu tarafından barındırılıyorsa (`DDAGENT_WEB_DIR` veya `scripts/serve-flutter-web.cjs` ile sunulan `flutter/build/web`) sürümün web zip dosyasıyla değiştirilir; ayrıca her sunucu güncellemesinde yenilenir. |
+| **Bu uygulama** | Android yeni APK'yı kurar; Windows ve Linux yeni derlemeyi arka planda indirir ve uygulamadan çıktığınızda kurar. |
+
+Sürüm tarball'ları Node.js 22 için derlenir — sunucu, farklı bir Node.js ana sürümü için derlenmiş tarball'u reddeder. 0.8.12 veya daha eski sürümlerdeki sunucular (kurulum betiği veya tarball) 0.8.13'e bir kez elle güncellenir — `install.sh --version v0.8.13` komutunu yeniden çalıştırın ya da yeni tarball'u eskisinin üzerine açın — sonrasında güncellemeler arayüzden yapılır.
 
 ### Kaynaktan
 

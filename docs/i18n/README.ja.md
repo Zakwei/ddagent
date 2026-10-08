@@ -125,7 +125,7 @@ curl -fsSL https://github.com/Zakwei/ddagent/releases/latest/download/install.sh
 curl -fsSL https://github.com/Zakwei/ddagent/releases/latest/download/install.sh | bash -s -- --systemd --port 3001
 ```
 
-更新するには、`--version vX.Y.Z` を付けてスクリプトを再実行します。チェックアウトがその場で更新されます。その後、サーバーを起動します:
+その後、サーバーを起動します:
 
 ```bash
 ~/.ddagent/app/start.sh        # API on http://<host>:3001 (set SERVER_PORT to change)
@@ -164,6 +164,18 @@ cd flutter
 flutter pub get
 flutter build linux --release      # or: windows, apk, web
 ```
+
+### 更新
+
+クライアントの **設定 → 概要 → 更新** には、部分ごとに個別のボタンがあります:
+
+| 対象 | 更新方法 |
+|---|---|
+| **サーバー** | インストーラースクリプトや git でインストールした場合は最新リリースに移行します。リリース tarball の場合は次の tarball をダウンロードして検証（`.sha256`）し、再起動時にインストールします。起動に失敗した場合は自動的にロールバックします。`start.sh` / `start.bat` が自らサーバーを再起動するため、systemd は不要です。デスクトップクライアントのローカルサーバー（「このデバイス」）はアプリが再インストールします。 |
+| **Web インターフェイス** | サーバーがホストしている場合（`DDAGENT_WEB_DIR`、または `scripts/serve-flutter-web.cjs` で配信される `flutter/build/web`）、リリースの Web zip で置き換えられます。サーバーを更新するたびにあわせて更新されます。 |
+| **このアプリ** | Android では新しい APK をインストールします。Windows と Linux では新しいビルドをバックグラウンドでダウンロードし、アプリの終了時にインストールします。 |
+
+リリース tarball は Node.js 22 向けにビルドされており、Node.js のメジャーバージョンが異なる tarball はサーバーが受け付けません。0.8.12 以前のサーバー（インストーラースクリプトまたは tarball）は、0.8.13 への更新を一度だけ手動で行ってください（`install.sh --version v0.8.13` を再実行するか、新しい tarball を古いものの上に展開します）。それ以降は UI から更新できます。
 
 ### ソースから
 

@@ -2236,7 +2236,7 @@ class Translations$settings$updates$ja extends Translations$settings$updates$en 
 	final TranslationsJa _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'アプリの更新';
+	@override String get title => '更新';
 	@override String get description => 'GitHub で新しいデスクトップビルドを確認します。新しいバージョンは自動でダウンロードされ、終了時にインストールされます。';
 	@override String get check => '更新を確認';
 	@override String get checking => '確認中…';
@@ -8200,7 +8200,7 @@ extension on TranslationsJa {
 			'settings.server.restartBack' => ({required Object version}) => 'サーバーが復帰しました — バージョン ${version}。',
 			'settings.server.restartReloading' => 'ページを再読み込みしています…',
 			'settings.server.restartTimeout' => ({required Object seconds}) => '${seconds} 秒以内にサーバーが復帰しませんでした。サービスのログ（/tmp/ddagent.log）を確認するか、手動で再起動してください。',
-			'settings.updates.title' => 'アプリの更新',
+			'settings.updates.title' => '更新',
 			'settings.updates.description' => 'GitHub で新しいデスクトップビルドを確認します。新しいバージョンは自動でダウンロードされ、終了時にインストールされます。',
 			'settings.updates.check' => '更新を確認',
 			'settings.updates.checking' => '確認中…',

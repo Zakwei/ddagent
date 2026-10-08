@@ -125,7 +125,7 @@ curl -fsSL https://github.com/Zakwei/ddagent/releases/latest/download/install.sh
 curl -fsSL https://github.com/Zakwei/ddagent/releases/latest/download/install.sh | bash -s -- --systemd --port 3001
 ```
 
-업데이트하려면 `--version vX.Y.Z`와 함께 스크립트를 다시 실행하세요. 기존 체크아웃이 제자리에서 업데이트됩니다. 그런 다음 서버를 시작합니다:
+그런 다음 서버를 시작합니다:
 
 ```bash
 ~/.ddagent/app/start.sh        # API on http://<host>:3001 (set SERVER_PORT to change)
@@ -164,6 +164,18 @@ cd flutter
 flutter pub get
 flutter build linux --release      # or: windows, apk, web
 ```
+
+### 업데이트
+
+클라이언트의 **설정 → 정보 → 업데이트**에는 구성 요소마다 별도의 버튼이 있습니다:
+
+| 구성 요소 | 업데이트 방식 |
+|---|---|
+| **서버** | 설치 스크립트나 git으로 설치한 경우 최신 릴리스로 전환됩니다. 릴리스 tarball로 설치한 경우 다음 tarball을 다운로드해 검증(`.sha256`)한 뒤 재시작할 때 설치하며, 서버가 시작되지 않으면 자동으로 롤백합니다. `start.sh` / `start.bat`이 알아서 서버를 재시작하므로 systemd가 필요 없습니다. 데스크톱 클라이언트의 로컬 서버("이 기기")는 앱이 다시 설치합니다. |
+| **웹 인터페이스** | 서버가 호스팅하는 경우(`DDAGENT_WEB_DIR`, 또는 `scripts/serve-flutter-web.cjs`가 제공하는 `flutter/build/web`) 릴리스의 웹 zip으로 교체됩니다. 서버를 업데이트할 때마다 함께 갱신됩니다. |
+| **이 앱** | Android는 새 APK를 설치합니다. Windows와 Linux는 새 빌드를 백그라운드에서 다운로드하고 앱을 종료할 때 설치합니다. |
+
+릴리스 tarball은 Node.js 22용으로 빌드되며, 서버는 다른 Node.js 메이저 버전용으로 빌드된 tarball을 거부합니다. 0.8.12 이하 버전의 서버(설치 스크립트 또는 tarball)는 0.8.13으로 한 번만 직접 업데이트해야 합니다. `install.sh --version v0.8.13`을 다시 실행하거나 새 tarball을 기존 설치 위에 풀면 되고, 그 이후로는 UI에서 업데이트할 수 있습니다.
 
 ### 소스에서
 

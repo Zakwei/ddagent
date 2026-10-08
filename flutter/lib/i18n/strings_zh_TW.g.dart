@@ -2236,7 +2236,7 @@ class Translations$settings$updates$zh_TW extends Translations$settings$updates$
 	final TranslationsZhTw _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => '應用程式更新';
+	@override String get title => '更新';
 	@override String get description => '在 GitHub 上檢查更新的桌面版本。新版本會自動下載並在退出時安裝。';
 	@override String get check => '檢查更新';
 	@override String get checking => '正在檢查…';
@@ -8200,7 +8200,7 @@ extension on TranslationsZhTw {
 			'settings.server.restartBack' => ({required Object version}) => '伺服器已恢復 — 版本 ${version}。',
 			'settings.server.restartReloading' => '正在重新載入頁面…',
 			'settings.server.restartTimeout' => ({required Object seconds}) => '伺服器未在 ${seconds} 秒內恢復。請檢查服務記錄檔（/tmp/ddagent.log）或手動重新啟動。',
-			'settings.updates.title' => '應用程式更新',
+			'settings.updates.title' => '更新',
 			'settings.updates.description' => '在 GitHub 上檢查更新的桌面版本。新版本會自動下載並在退出時安裝。',
 			'settings.updates.check' => '檢查更新',
 			'settings.updates.checking' => '正在檢查…',

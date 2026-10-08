@@ -1541,7 +1541,7 @@
       "restartTimeout": "El servidor no ha vuelto en {{seconds}} s. Revisa el registro del servicio (/tmp/ddagent.log) o reinícialo manualmente."
     },
     "updates": {
-      "title": "Actualizaciones de la app",
+      "title": "Actualizaciones",
       "description": "Busca en GitHub una versión de escritorio más reciente. Las nuevas versiones se descargan automáticamente y se instalan al salir.",
       "check": "Buscar actualizaciones",
       "checking": "Buscando…",

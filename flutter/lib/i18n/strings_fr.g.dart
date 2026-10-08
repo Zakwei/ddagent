@@ -2237,7 +2237,7 @@ class Translations$settings$updates$fr extends Translations$settings$updates$en 
 	final TranslationsFr _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'Mises à jour de l\'app';
+	@override String get title => 'Mises à jour';
 	@override String get description => 'Rechercher une build de bureau plus récente sur GitHub. Les nouvelles versions se téléchargent automatiquement et s\'installent à la fermeture.';
 	@override String get check => 'Rechercher des mises à jour';
 	@override String get checking => 'Recherche…';
@@ -8201,7 +8201,7 @@ extension on TranslationsFr {
 			'settings.server.restartBack' => ({required Object version}) => 'Le serveur est de retour — version ${version}.',
 			'settings.server.restartReloading' => 'Rechargement de la page…',
 			'settings.server.restartTimeout' => ({required Object seconds}) => 'Le serveur n\'est pas revenu en ${seconds} s. Consultez le journal du service (/tmp/ddagent.log) ou redémarrez-le manuellement.',
-			'settings.updates.title' => 'Mises à jour de l\'app',
+			'settings.updates.title' => 'Mises à jour',
 			'settings.updates.description' => 'Rechercher une build de bureau plus récente sur GitHub. Les nouvelles versions se téléchargent automatiquement et s\'installent à la fermeture.',
 			'settings.updates.check' => 'Rechercher des mises à jour',
 			'settings.updates.checking' => 'Recherche…',

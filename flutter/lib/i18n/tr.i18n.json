@@ -1540,7 +1540,7 @@
       "restartTimeout": "Sunucu {{seconds}} sn içinde geri gelmedi. Hizmet günlüğünü (/tmp/ddagent.log) kontrol edin veya elle yeniden başlatın."
     },
     "updates": {
-      "title": "Uygulama güncellemeleri",
+      "title": "Güncellemeler",
       "description": "GitHub'da daha yeni bir masaüstü sürümünü kontrol eder. Yeni sürümler otomatik indirilir ve çıkışta kurulur.",
       "check": "Güncellemeleri denetle",
       "checking": "Denetleniyor…",

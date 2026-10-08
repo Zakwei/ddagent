@@ -4163,8 +4163,8 @@ class Translations$settings$updates$en {
 
 	// Translations
 
-	/// en: 'App updates'
-	String get title => 'App updates';
+	/// en: 'Updates'
+	String get title => 'Updates';
 
 	/// en: 'Check GitHub for a newer desktop build. New versions download automatically and install when you quit.'
 	String get description => 'Check GitHub for a newer desktop build. New versions download automatically and install when you quit.';
@@ -14767,7 +14767,7 @@ extension on Translations {
 			'settings.server.restartBack' => ({required Object version}) => 'The server is back — version ${version}.',
 			'settings.server.restartReloading' => 'Reloading the page…',
 			'settings.server.restartTimeout' => ({required Object seconds}) => 'The server did not come back within ${seconds} s. Check the service log (/tmp/ddagent.log) or restart it manually.',
-			'settings.updates.title' => 'App updates',
+			'settings.updates.title' => 'Updates',
 			'settings.updates.description' => 'Check GitHub for a newer desktop build. New versions download automatically and install when you quit.',
 			'settings.updates.descriptionMobile' => 'Check GitHub for a newer build of this app. Updates are installed by your device\'s system installer.',
 			'settings.updates.descriptionServer' => 'Check GitHub for a newer ddagent release. The connected server can update itself — active sessions are interrupted while it restarts.',

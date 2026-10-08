@@ -125,7 +125,7 @@ curl -fsSL https://github.com/Zakwei/ddagent/releases/latest/download/install.sh
 curl -fsSL https://github.com/Zakwei/ddagent/releases/latest/download/install.sh | bash -s -- --systemd --port 3001
 ```
 
-若要更新，請加上 `--version vX.Y.Z` 重新執行指令碼，它會直接就地更新現有的副本。接著啟動伺服器：
+接著啟動伺服器：
 
 ```bash
 ~/.ddagent/app/start.sh        # API on http://<host>:3001 (set SERVER_PORT to change)
@@ -164,6 +164,18 @@ cd flutter
 flutter pub get
 flutter build linux --release      # or: windows, apk, web
 ```
+
+### 更新
+
+用戶端的 **設定 → 關於 → 更新** 為每個部分各提供一個按鈕：
+
+| 部分 | 更新方式 |
+|---|---|
+| **伺服器** | 透過安裝指令碼或 git 安裝的會切換到最新版本；透過發行版 tarball 安裝的會下載下一個 tarball，驗證（`.sha256`）後於重新啟動時安裝，若伺服器無法啟動則會自動回復到先前版本。`start.sh` / `start.bat` 會自行重新啟動伺服器，不需要 systemd。桌面用戶端的本機伺服器（「這部裝置」）會由應用程式重新安裝。 |
+| **Web 介面** | 由伺服器代管時（`DDAGENT_WEB_DIR`，或由 `scripts/serve-flutter-web.cjs` 提供的 `flutter/build/web`），會以發行版的 web zip 取代；每次更新伺服器時也會一併更新。 |
+| **此應用程式** | Android 會安裝新的 APK；Windows 與 Linux 會在背景下載新版本，並在你結束應用程式時安裝。 |
+
+發行版 tarball 是針對 Node.js 22 建置的——伺服器會拒絕針對其他 Node.js 主要版本建置的 tarball。0.8.12 或更早版本的伺服器（透過安裝指令碼或 tarball 安裝）需手動更新一次至 0.8.13——重新執行 `install.sh --version v0.8.13`，或將新的 tarball 解壓縮覆蓋舊版——之後即可從介面更新。
 
 ### 從原始碼建置
 

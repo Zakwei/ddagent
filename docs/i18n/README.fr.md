@@ -125,7 +125,7 @@ Nécessite `git`, Node.js 22+ et `npm`. Le script clone un tag de release dans `
 curl -fsSL https://github.com/Zakwei/ddagent/releases/latest/download/install.sh | bash -s -- --systemd --port 3001
 ```
 
-Pour mettre à jour, relancez le script avec `--version vX.Y.Z` ; il met à jour le checkout sur place. Démarrez ensuite le serveur :
+Démarrez ensuite le serveur :
 
 ```bash
 ~/.ddagent/app/start.sh        # API on http://<host>:3001 (set SERVER_PORT to change)
@@ -164,6 +164,18 @@ cd flutter
 flutter pub get
 flutter build linux --release      # or: windows, apk, web
 ```
+
+### Mise à jour
+
+Dans le client, **Paramètres → À propos → Mises à jour** propose un bouton distinct pour chaque partie :
+
+| Partie | Mode de mise à jour |
+|---|---|
+| **Serveur** | Les installations par script d'installation ou par git passent à la dernière release ; les installations depuis un tarball téléchargent le tarball suivant, le vérifient (`.sha256`), l'installent au redémarrage et reviennent automatiquement en arrière si le serveur ne démarre pas. `start.sh` / `start.bat` redémarrent le serveur d'eux-mêmes — pas besoin de systemd. Le serveur local d'un client desktop (« Cet appareil ») est réinstallé par l'application. |
+| **Interface web** | Remplacée à partir du zip web de la release lorsque le serveur l'héberge (`DDAGENT_WEB_DIR`, ou `flutter/build/web` servi par `scripts/serve-flutter-web.cjs`) ; elle est aussi rafraîchie à chaque mise à jour du serveur. |
+| **Cette application** | Sur Android, le nouvel APK est installé ; sous Windows et Linux, la nouvelle version est téléchargée en arrière-plan et installée lorsque vous quittez l'application. |
+
+Les tarballs des releases sont compilés pour Node.js 22 — le serveur refuse un tarball compilé pour une autre version majeure de Node.js. Les serveurs en 0.8.12 ou antérieure (script d'installation ou tarball) se mettent à jour vers 0.8.13 une seule fois à la main — relancez `install.sh --version v0.8.13` ou décompressez le nouveau tarball par-dessus l'ancien — puis depuis l'interface par la suite.
 
 ### Depuis les sources
 

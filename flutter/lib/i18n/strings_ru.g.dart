@@ -2239,7 +2239,7 @@ class Translations$settings$updates$ru extends Translations$settings$updates$en 
 	final TranslationsRu _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'Обновления приложения';
+	@override String get title => 'Обновления';
 	@override String get description => 'Проверить GitHub на наличие новой десктопной сборки. Новые версии скачиваются автоматически и устанавливаются при выходе.';
 	@override String get check => 'Проверить обновления';
 	@override String get checking => 'Проверка…';
@@ -8209,7 +8209,7 @@ extension on TranslationsRu {
 			'settings.server.restartBack' => ({required Object version}) => 'Сервер снова работает — версия ${version}.',
 			'settings.server.restartReloading' => 'Перезагружаю страницу…',
 			'settings.server.restartTimeout' => ({required Object seconds}) => 'Сервер не вернулся за ${seconds} с. Проверьте журнал службы (/tmp/ddagent.log) или перезапустите её вручную.',
-			'settings.updates.title' => 'Обновления приложения',
+			'settings.updates.title' => 'Обновления',
 			'settings.updates.description' => 'Проверить GitHub на наличие новой десктопной сборки. Новые версии скачиваются автоматически и устанавливаются при выходе.',
 			'settings.updates.check' => 'Проверить обновления',
 			'settings.updates.checking' => 'Проверка…',

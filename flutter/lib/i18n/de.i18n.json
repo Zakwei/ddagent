@@ -1541,7 +1541,7 @@
       "restartTimeout": "Der Server ist nicht innerhalb von {{seconds}} s zurückgekehrt. Prüfe das Dienstprotokoll (/tmp/ddagent.log) oder starte ihn manuell neu."
     },
     "updates": {
-      "title": "App-Updates",
+      "title": "Updates",
       "description": "Auf GitHub nach einer neueren Desktop-Version suchen. Neue Versionen werden automatisch heruntergeladen und beim Beenden installiert.",
       "check": "Nach Updates suchen",
       "checking": "Suche läuft…",

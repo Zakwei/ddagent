@@ -1541,7 +1541,7 @@
       "restartTimeout": "Le serveur n'est pas revenu en {{seconds}} s. Consultez le journal du service (/tmp/ddagent.log) ou redémarrez-le manuellement."
     },
     "updates": {
-      "title": "Mises à jour de l'app",
+      "title": "Mises à jour",
       "description": "Rechercher une build de bureau plus récente sur GitHub. Les nouvelles versions se téléchargent automatiquement et s'installent à la fermeture.",
       "check": "Rechercher des mises à jour",
       "checking": "Recherche…",
