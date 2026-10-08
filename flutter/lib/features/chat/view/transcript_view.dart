@@ -1415,6 +1415,12 @@ class MessageTile extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // A subagent's ask must not read as the main agent's.
+            if (message.context?['agentId'] != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Text('Subagent', style: TextStyle(fontSize: 11, color: cs.outline)),
+              ),
             if (!isAskUser) Text(message.content ?? message.text ?? ''),
             if (!isAskUser) const SizedBox(height: 8),
             // Server also enforces roleAtLeast('member') on this frame.
@@ -2037,7 +2043,9 @@ class _PermissionBanner extends ConsumerWidget {
                   const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Text(
-                      '${p.toolName} needs approval',
+                      p.context?['agentId'] != null
+                          ? 'Subagent: ${p.toolName} needs approval'
+                          : '${p.toolName} needs approval',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: t.bodySmall?.copyWith(color: c.foreground),

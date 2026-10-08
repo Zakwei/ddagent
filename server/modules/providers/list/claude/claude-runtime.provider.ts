@@ -798,12 +798,23 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
 
       const requestId = createRequestId();
       const rememberEntry = claudeRememberEntry(toolName, input);
+      // The SDK's own prompt sentence ("Claude wants to read foo.txt") is the
+      // card text; a subagent's ask is marked so it isn't mistaken for the
+      // main agent's.
+      const askContext = {
+        ...(rememberEntry ? { rememberEntry } : {}),
+        ...(typeof context?.agentID === 'string' && context.agentID ? { agentId: context.agentID } : {}),
+      };
+      const promptText = [context?.title, context?.decisionReason]
+        .filter((part: unknown) => typeof part === 'string' && part.trim())
+        .join(' — ');
       ws.send(createNormalizedMessage({
         kind: 'permission_request',
         requestId,
         toolName,
         input,
-        ...(rememberEntry ? { context: { rememberEntry } } : {}),
+        ...(promptText ? { content: promptText } : {}),
+        ...(Object.keys(askContext).length ? { context: askContext } : {}),
         sessionId: capturedSessionId || sessionId || null,
         provider: 'claude',
       }));
@@ -842,7 +853,7 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
           _sessionId: sessionId || capturedSessionId || null,
           _toolName: toolName,
           _input: input,
-          _context: rememberEntry ? { rememberEntry } : undefined,
+          _context: Object.keys(askContext).length ? askContext : undefined,
           _receivedAt: new Date(),
         },
         onCancel: (reason: any) => {
