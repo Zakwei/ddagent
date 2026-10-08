@@ -16,11 +16,39 @@ import {
 } from '@/shared/index.js';
 import { notifyRunFailed, notifyRunStopped } from '@/modules/notifications/index.js';
 
+import { normalizeCursorToolInput } from './cursor-sessions.provider.js';
+
 // cross-spawn resolves .cmd shims/PATHEXT on Windows and delegates to
 // child_process.spawn everywhere else.
 const spawnFunction = crossSpawn;
 
 let activeCursorProcesses = new Map<any, any>(); // Track active processes by session ID
+
+// SIGTERM -> SIGKILL grace, and how long cursor-agent may linger after its
+// `result` line before it is stopped (a lingering process keeps store.db open
+// while the next turn starts a second one).
+const CURSOR_KILL_GRACE_MS = 2000;
+const CURSOR_RESULT_EXIT_GRACE_MS = 3000;
+const CURSOR_STDERR_TAIL_CHARS = 4000;
+
+function hasExited(child: any) {
+  return child.exitCode != null || child.signalCode != null;
+}
+
+// Sends SIGTERM and escalates to SIGKILL if the process ignores it.
+function terminateCursorProcess(child: any): boolean {
+  if (hasExited(child)) {
+    return true;
+  }
+  const signalled = child.kill('SIGTERM');
+  const escalation = setTimeout(() => {
+    if (!hasExited(child)) {
+      child.kill('SIGKILL');
+    }
+  }, CURSOR_KILL_GRACE_MS);
+  escalation.unref?.();
+  return signalled;
+}
 
 const WORKSPACE_TRUST_PATTERNS: any = [
   /workspace trust required/i,
@@ -50,6 +78,8 @@ const CURSOR_TOOL_NAMES: Record<string, string> = {
   lsToolCall: 'List',
   todoToolCall: 'TodoWrite',
   updateTodosToolCall: 'TodoWrite',
+  // History names this tool ApplyPatch and shows it as Edit.
+  applyPatchToolCall: 'ApplyPatch',
 };
 
 function readCursorToolResultText(result: AnyRecord | undefined): { content: string; isError: boolean } {
@@ -80,17 +110,31 @@ export function buildCursorToolCallMessages(event: AnyRecord, sessionId: string 
   const kind = Object.keys(toolCall)[0];
   if (!kind) return [];
   const call = (toolCall[kind] ?? {}) as AnyRecord;
-  const toolName = kind === 'function'
+  let rawToolName = kind === 'function'
     ? String(call.name ?? 'Tool')
     : CURSOR_TOOL_NAMES[kind] ?? kind.replace(/ToolCall$/, '');
   let toolInput: unknown = call.args;
   if (kind === 'function' && typeof call.arguments === 'string') {
     try { toolInput = JSON.parse(call.arguments); } catch { toolInput = call.arguments; }
   }
+  // MCP calls wrap the real tool name and arguments.
+  if (kind === 'mcpToolCall' && call.args && typeof call.args === 'object') {
+    rawToolName = String(call.args.toolName ?? call.args.name ?? 'MCP');
+    toolInput = call.args.args ?? call.args;
+  }
+  // Same name/input normalization as the history loader, so live cards
+  // match the reloaded ones.
+  const toolName = rawToolName === 'ApplyPatch' ? 'Edit' : rawToolName;
 
   if (event.subtype === 'started') {
     return [createNormalizedMessage({
-      id: toolId, kind: 'tool_use', toolId, toolName, toolInput: toolInput ?? {}, sessionId, provider: 'cursor',
+      id: toolId,
+      kind: 'tool_use',
+      toolId,
+      toolName,
+      toolInput: normalizeCursorToolInput(rawToolName, toolInput ?? {}),
+      sessionId,
+      provider: 'cursor',
     })];
   }
   if (event.subtype === 'completed') {
@@ -133,12 +177,12 @@ export async function spawnCursor(command: string, options: AnyRecord = {}, ws: 
     // per run. Cursor surfaces completion twice (the `result` JSON line and
     // the process close), so the first emission wins.
     let completeSent = false;
-
-    // Use tools settings passed from frontend, or defaults
-    const settings = toolsSettings || {
-      allowedShellCommands: [],
-      skipPermissions: false
-    };
+    // Outcome of the `result` line: null until it arrives.
+    let resultSucceeded: boolean | null = null;
+    // Kind of the live row currently open on the client (`stream_end` closes it).
+    let openLiveKind: 'text' | 'thinking' | null = null;
+    // Tail of stderr; shown only when the run fails.
+    let stderrTail = '';
 
     // Build Cursor CLI command
     const baseArgs: any = [];
@@ -176,11 +220,15 @@ export async function spawnCursor(command: string, options: AnyRecord = {}, ws: 
 
     // Map DDAgent permission modes onto cursor-agent flags: bypass forces
     // every command (`-f`), plan starts the read-only `--mode plan`; default
-    // and acceptEdits keep print mode's own behaviour (edits allowed, shell
-    // commands gated by the CLI's allowlist).
-    if (skipPermissions || settings.skipPermissions || permissionMode === 'bypassPermissions') {
+    // keeps print mode's own behaviour (edits allowed, shell commands gated by
+    // the CLI's allowlist). Cursor no longer offers acceptEdits, so a stale
+    // stored 'acceptEdits' is the default mode.
+    // cursor-agent has no flag for a shell allowlist (it reads its own
+    // cli-config.json), so toolsSettings only contributes skipPermissions.
+    const effectivePermissionMode = permissionMode === 'acceptEdits' ? 'default' : permissionMode;
+    if (skipPermissions || toolsSettings?.skipPermissions || effectivePermissionMode === 'bypassPermissions') {
       baseArgs.push('-f');
-    } else if (permissionMode === 'plan') {
+    } else if (effectivePermissionMode === 'plan') {
       baseArgs.push('--mode', 'plan');
     }
 
@@ -199,11 +247,33 @@ export async function spawnCursor(command: string, options: AnyRecord = {}, ws: 
       callback();
     };
 
+    const liveSessionId = () => capturedSessionId || sessionId || null;
+
+    // Finalizes the open live text/thinking row so the next segment starts a
+    // new bubble instead of being glued onto it.
+    const closeLiveRow = () => {
+      if (!openLiveKind) {
+        return;
+      }
+      openLiveKind = null;
+      ws.send(createNormalizedMessage({ kind: 'stream_end', sessionId: liveSessionId(), provider: 'cursor' }));
+    };
+    const openLiveRow = (kind: 'text' | 'thinking') => {
+      if (openLiveKind !== kind) {
+        closeLiveRow();
+      }
+      openLiveKind = kind;
+    };
+    const withStderrTail = (message: string) => (
+      stderrTail.trim() ? `${message}\n${stderrTail.trim()}` : message
+    );
+
     const runCursorProcess = (args: any, runReason: any = 'initial') => {
       const isTrustRetry = runReason === 'trust-retry';
       let runSawWorkspaceTrustPrompt = false;
       let stdoutLineBuffer = '';
       let terminalNotificationSent = false;
+      stderrTail = '';
 
       const notifyTerminalState = ({ code = null, error = null }: any = {}) => {
         if (terminalNotificationSent) {
@@ -308,15 +378,32 @@ export async function spawnCursor(command: string, options: AnyRecord = {}, ws: 
             case 'assistant':
               // Accumulate assistant message chunks
               if (response.message && response.message.content && response.message.content.length > 0) {
-                const normalized = context.normalizeMessage(response, capturedSessionId || sessionId || null);
+                const normalized = context.normalizeMessage(response, liveSessionId());
+                if (normalized.length > 0) {
+                  openLiveRow('text');
+                }
                 for (const msg of normalized) ws.send(msg);
               }
               break;
 
+            case 'thinking': {
+              // stream-json thinking: `delta` frames carry `text`, `completed`
+              // ends the block (history stores it as a `reasoning` part).
+              const thinkingText = typeof response.text === 'string' ? response.text : '';
+              if (response.subtype === 'delta' && thinkingText) {
+                openLiveRow('thinking');
+                ws.send(createNormalizedMessage({ kind: 'thought_delta', content: thinkingText, sessionId: liveSessionId(), provider: 'cursor' }));
+              } else if (response.subtype === 'completed' && openLiveKind === 'thinking') {
+                closeLiveRow();
+              }
+              break;
+            }
+
             case 'tool_call': {
               // Tool calls stream as their own events; without this case they
               // only appeared after a history reload.
-              for (const msg of buildCursorToolCallMessages(response, capturedSessionId || sessionId || null)) {
+              closeLiveRow();
+              for (const msg of buildCursorToolCallMessages(response, liveSessionId())) {
                 ws.send(msg);
               }
               break;
@@ -324,14 +411,29 @@ export async function spawnCursor(command: string, options: AnyRecord = {}, ws: 
 
             case 'result': {
               // Session complete — terminal lifecycle event for this run
+              closeLiveRow();
+              resultSucceeded = response.subtype === 'success' && !response.is_error;
               if (!completeSent) {
                 completeSent = true;
+                if (!resultSucceeded) {
+                  const reason = [response.result, response.error?.message ?? response.error, response.message]
+                    .find((value) => typeof value === 'string' && value.trim());
+                  ws.send(createNormalizedMessage({
+                    kind: 'error',
+                    content: withStderrTail(reason || `cursor-agent run failed (${response.subtype || 'error'})`),
+                    sessionId: liveSessionId(),
+                    provider: 'cursor',
+                  }));
+                }
                 ws.send(createCompleteMessage({
                   provider: 'cursor',
-                  sessionId: capturedSessionId || sessionId || null,
-                  exitCode: response.subtype === 'success' ? 0 : 1,
+                  sessionId: liveSessionId(),
+                  exitCode: resultSucceeded ? 0 : 1,
                 }));
               }
+              // The run is over; stop a process that lingers after its result.
+              const lingerTimer = setTimeout(() => terminateCursorProcess(cursorProcess), CURSOR_RESULT_EXIT_GRACE_MS);
+              lingerTimer.unref?.();
               break;
             }
 
@@ -344,7 +446,10 @@ export async function spawnCursor(command: string, options: AnyRecord = {}, ws: 
           }
 
           // If not JSON, send as stream delta via adapter
-          const normalized = context.normalizeMessage(line, capturedSessionId || sessionId || null);
+          const normalized = context.normalizeMessage(line, liveSessionId());
+          if (normalized.length > 0) {
+            openLiveRow('text');
+          }
           for (const msg of normalized) ws.send(msg);
         }
       };
@@ -363,16 +468,16 @@ export async function spawnCursor(command: string, options: AnyRecord = {}, ws: 
         });
       });
 
-      // Handle stderr
+      // Handle stderr: buffered, surfaced only if the run fails (cursor-agent
+      // also writes warnings and progress there).
       cursorProcess.stderr!.on('data', (data: any) => {
         const stderrText = data.toString();
-        console.error('Cursor CLI stderr:', stderrText);
 
         if (shouldSuppressForTrustRetry(stderrText)) {
           return;
         }
 
-        ws.send(createNormalizedMessage({ kind: 'error', content: stderrText, sessionId: capturedSessionId || sessionId || null, provider: 'cursor' }));
+        stderrTail = (stderrTail + stderrText).slice(-CURSOR_STDERR_TAIL_CHARS);
       });
 
       // Handle process completion
@@ -402,11 +507,30 @@ export async function spawnCursor(command: string, options: AnyRecord = {}, ws: 
           return;
         }
 
+        closeLiveRow();
+
+        // A process stopped after a successful `result` (see lingerTimer) is
+        // still a successful run.
+        const succeeded = resultSucceeded ?? code === 0;
+
         // Terminal complete — unless the `result` line already sent it, or the
-        // run was aborted (abort-session sent the aborted complete).
+        // run was aborted (abort-session sent the aborted complete). A failure
+        // is reported as `error` first; `complete` closes the run.
         if (!completeSent && !cursorProcess.aborted) {
           completeSent = true;
-          ws.send(createCompleteMessage({ provider: 'cursor', sessionId: finalSessionId, exitCode: code }));
+          if (!succeeded) {
+            ws.send(createNormalizedMessage({
+              kind: 'error',
+              content: withStderrTail(`cursor-agent exited with code ${code}`),
+              sessionId: liveSessionId(),
+              provider: 'cursor',
+            }));
+          }
+          ws.send(createCompleteMessage({ provider: 'cursor', sessionId: finalSessionId, exitCode: succeeded ? 0 : (code || 1) }));
+        }
+
+        if (succeeded && stderrTail.trim()) {
+          console.warn('Cursor CLI stderr:', stderrTail.trim());
         }
 
         // An aborted run already reported its terminal complete; settle the
@@ -417,11 +541,12 @@ export async function spawnCursor(command: string, options: AnyRecord = {}, ws: 
           return;
         }
 
-        if (code === 0) {
-          notifyTerminalState({ code });
+        if (succeeded) {
+          notifyTerminalState({ code: 0 });
           settleOnce(() => resolve());
         } else {
-          notifyTerminalState({ code });
+          console.error('Cursor CLI failed:', withStderrTail(`exit code ${code}`));
+          notifyTerminalState({ code: code ?? 1 });
           settleOnce(() => reject(new Error(`Cursor CLI exited with code ${code}`)));
         }
       });
@@ -475,7 +600,7 @@ export function abortCursorSession(sessionId: any) {
     // process so its close handler does not emit a second one.
     process.aborted = true;
     try {
-      if (!process.kill('SIGTERM')) {
+      if (!terminateCursorProcess(process)) {
         process.aborted = false;
         return false;
       }

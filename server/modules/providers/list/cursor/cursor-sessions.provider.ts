@@ -166,7 +166,9 @@ function parseCursorToolInput(rawInput: unknown): unknown {
   }
 }
 
-function normalizeCursorToolInput(toolName: string, rawInput: unknown): unknown {
+// Consumed by the Cursor runtime so live tool cards carry the same input
+// shape as reloaded history.
+export function normalizeCursorToolInput(toolName: string, rawInput: unknown): unknown {
   const parsed = parseCursorToolInput(rawInput);
   if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
     return parsed;
