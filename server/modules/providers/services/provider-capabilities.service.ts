@@ -109,8 +109,8 @@ const PROVIDER_CAPABILITIES: Record<LLMProvider, ProviderCapabilities> = {
   devin: {
     provider: 'devin',
     // ACP session/set_mode: default→accept-edits (no ACP mode asks before
-    // edits), auto→smart, acceptEdits→accept-edits, bypassPermissions→bypass.
-    permissionModes: ['default', 'auto', 'acceptEdits', 'bypassPermissions'],
+    // edits), auto→smart, acceptEdits→accept-edits, bypassPermissions→bypass, plan→plan.
+    permissionModes: ['default', 'auto', 'acceptEdits', 'bypassPermissions', 'plan'],
     defaultPermissionMode: 'default',
     supportsImages: true,
     supportsFiles: true,

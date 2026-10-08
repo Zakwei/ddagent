@@ -72,6 +72,7 @@ test('Devin permission modes map onto the real ACP mode ids', async () => {
     ['acceptEdits', 'accept-edits'],
     ['default', 'accept-edits'],
     ['auto', 'smart'],
+    ['plan', 'plan'],
   ]) {
     const { state, calls } = modeState();
     await applyPermissionModeToDevinSession(state, mode);

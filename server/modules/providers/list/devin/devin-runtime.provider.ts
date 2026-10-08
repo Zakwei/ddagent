@@ -1054,6 +1054,7 @@ const DEVIN_ACP_MODE_BY_PERMISSION_MODE: Record<string, string> = {
     auto: 'smart',
     acceptEdits: 'accept-edits',
     bypassPermissions: 'bypass',
+    plan: 'plan',
 };
 
 // Mirrors the ACP-side mode (current id and the ids the session offers) from a

@@ -25,7 +25,7 @@ const agentPermissionModes = <String, List<String>>{
   'opencode': ['default', 'acceptEdits', 'bypassPermissions', 'plan'],
   'commandcode': ['default', 'acceptEdits', 'bypassPermissions', 'plan'],
   'antigravity': ['default', 'acceptEdits', 'bypassPermissions', 'plan'],
-  'devin': ['default', 'auto', 'acceptEdits', 'bypassPermissions'],
+  'devin': ['default', 'auto', 'acceptEdits', 'bypassPermissions', 'plan'],
 };
 
 /// Modes a provider's settings page offers — the server's capability matrix
