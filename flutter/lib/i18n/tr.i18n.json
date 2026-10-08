@@ -1496,7 +1496,22 @@
       "failed": "Güncelleme başarısız oldu.",
       "failedTitle": "Güncelleme başarısız",
       "appConfirm": "ddagent v{{version}} bu cihaza kurulsun mu? Android ilk seferde ddagent'tan yüklemeye izin vermenizi ister.",
-      "appPermission": "ddagent için “Bilinmeyen uygulamaları yükle” iznini verin, sonra tekrar Güncelle'ye dokunun."
+      "appPermission": "ddagent için “Bilinmeyen uygulamaları yükle” iznini verin, sonra tekrar Güncelle'ye dokunun.",
+      "chooseTitle": "Güncellemeler var",
+      "targetApp": "Bu uygulama",
+      "targetWeb": "Web arayüzü",
+      "targetServer": "Sunucu",
+      "updateApp": "Uygulamayı güncelle",
+      "updateWeb": "Web arayüzünü güncelle",
+      "updateServer": "Sunucuyu güncelle",
+      "webConfirm": "Web arayüzü v{{version}} sürümüne güncellensin mi? Sonrasında sayfa yeniden yüklenir.",
+      "webDone": "Web arayüzü v{{version}} sürümüne güncellendi — yeniden yükleniyor…",
+      "localServerConfirm": "Bu cihazdaki yerel sunucu v{{version}} sürümüne güncellensin mi? Etkin oturumlar kesilir.",
+      "localServerUpdating": "Yerel sunucu indiriliyor ve başlatılıyor…",
+      "serverDone": "Sunucu v{{version}} sürümünde çalışıyor.",
+      "staged": "v{{version}} güncellemesi indirildi — kurmak için sunucuyu yeniden başlatın.",
+      "upToDate": "Sunucu zaten en son sürümde.",
+      "webHostFailed": "Sunucu güncellendi ama web arayüzü güncellenmedi: {{message}}"
     }
   },
   "settings": {
@@ -1534,7 +1549,11 @@
       "downloaded": "v{{version}} güncellemesi indirildi — kurmak için ddagent'ı kapatıp yeniden başlatın.",
       "unavailable": "Güncelleme denetimi yalnızca paketlenmiş masaüstü sürümlerinde kullanılabilir.",
       "error": "Güncelleme denetimi başarısız: {{message}}",
-      "errorGeneric": "Güncelleme denetimi başarısız."
+      "errorGeneric": "Güncelleme denetimi başarısız.",
+      "versionLine": "v{{installed}} · en son v{{latest}}",
+      "current": "v{{version}} — güncel",
+      "webNotHosted": "Bu web arayüzü ayrı barındırılıyor — dosyalarını sürümdeki ddagent-flutter-web-v{{version}}.zip ile değiştirin.",
+      "serverCannotUpdate": "Bu sunucu buradan kendini güncelleyemez — install.sh veya bir sürüm arşiviyle yeniden kurun."
     },
     "tabs": {
       "account": "Hesap",

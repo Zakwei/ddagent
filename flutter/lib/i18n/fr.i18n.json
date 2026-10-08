@@ -1497,7 +1497,22 @@
       "failed": "Échec de la mise à jour.",
       "failedTitle": "Échec de la mise à jour",
       "appConfirm": "Installer ddagent v{{version}} sur cet appareil ? Android demandera l'autorisation d'installer des applications depuis ddagent la première fois.",
-      "appPermission": "Autorisez « Installer des applications inconnues » pour ddagent, puis appuyez à nouveau sur Mettre à jour."
+      "appPermission": "Autorisez « Installer des applications inconnues » pour ddagent, puis appuyez à nouveau sur Mettre à jour.",
+      "chooseTitle": "Mises à jour disponibles",
+      "targetApp": "Cette application",
+      "targetWeb": "Interface web",
+      "targetServer": "Serveur",
+      "updateApp": "Mettre à jour l'application",
+      "updateWeb": "Mettre à jour l'interface web",
+      "updateServer": "Mettre à jour le serveur",
+      "webConfirm": "Mettre à jour l'interface web vers v{{version}} ? La page sera rechargée ensuite.",
+      "webDone": "Interface web mise à jour vers v{{version}} — rechargement…",
+      "localServerConfirm": "Mettre à jour le serveur local de cet appareil vers v{{version}} ? Les sessions actives seront interrompues.",
+      "localServerUpdating": "Téléchargement et démarrage du serveur local…",
+      "serverDone": "Le serveur exécute v{{version}}.",
+      "staged": "Mise à jour v{{version}} téléchargée — redémarrez le serveur pour l'installer.",
+      "upToDate": "Le serveur est déjà sur la dernière version.",
+      "webHostFailed": "Le serveur a été mis à jour, mais pas son interface web : {{message}}"
     }
   },
   "settings": {
@@ -1535,7 +1550,11 @@
       "downloaded": "Mise à jour v{{version}} téléchargée — quittez et relancez ddagent pour l'installer.",
       "unavailable": "La recherche de mises à jour n'est disponible que dans les builds de bureau empaquetées.",
       "error": "Échec de la recherche de mises à jour : {{message}}",
-      "errorGeneric": "Échec de la recherche de mises à jour."
+      "errorGeneric": "Échec de la recherche de mises à jour.",
+      "versionLine": "v{{installed}} · dernière v{{latest}}",
+      "current": "v{{version}} — à jour",
+      "webNotHosted": "Cette interface web est hébergée séparément — remplacez ses fichiers par ddagent-flutter-web-v{{version}}.zip de la version.",
+      "serverCannotUpdate": "Ce serveur ne peut pas se mettre à jour d'ici — réinstallez-le avec install.sh ou une archive de la version."
     },
     "tabs": {
       "account": "Compte",

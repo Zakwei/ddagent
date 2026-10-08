@@ -214,7 +214,7 @@ void main() {
   });
 
   for (final android in [false, true]) {
-    testWidgets('a newer release offers an Update button (${android ? 'Android' : 'web'})', (
+    testWidgets('a newer release offers its own Update button (${android ? 'app' : 'server'})', (
       tester,
     ) async {
       tester.view.physicalSize = const Size(1200, 2600);
@@ -256,7 +256,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final update = find.widgetWithText(AppButton, 'Update');
+      final update = find.widgetWithText(AppButton, android ? 'Update app' : 'Update server');
       expect(update, findsOneWidget);
       await tester.tap(update);
       await tester.pumpAndSettle();

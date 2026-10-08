@@ -2175,6 +2175,21 @@ class Translations$common$update$tr extends Translations$common$update$en {
 	@override String get failedTitle => 'Güncelleme başarısız';
 	@override String appConfirm({required Object version}) => 'ddagent v${version} bu cihaza kurulsun mu? Android ilk seferde ddagent\'tan yüklemeye izin vermenizi ister.';
 	@override String get appPermission => 'ddagent için “Bilinmeyen uygulamaları yükle” iznini verin, sonra tekrar Güncelle\'ye dokunun.';
+	@override String get chooseTitle => 'Güncellemeler var';
+	@override String get targetApp => 'Bu uygulama';
+	@override String get targetWeb => 'Web arayüzü';
+	@override String get targetServer => 'Sunucu';
+	@override String get updateApp => 'Uygulamayı güncelle';
+	@override String get updateWeb => 'Web arayüzünü güncelle';
+	@override String get updateServer => 'Sunucuyu güncelle';
+	@override String webConfirm({required Object version}) => 'Web arayüzü v${version} sürümüne güncellensin mi? Sonrasında sayfa yeniden yüklenir.';
+	@override String webDone({required Object version}) => 'Web arayüzü v${version} sürümüne güncellendi — yeniden yükleniyor…';
+	@override String localServerConfirm({required Object version}) => 'Bu cihazdaki yerel sunucu v${version} sürümüne güncellensin mi? Etkin oturumlar kesilir.';
+	@override String get localServerUpdating => 'Yerel sunucu indiriliyor ve başlatılıyor…';
+	@override String serverDone({required Object version}) => 'Sunucu v${version} sürümünde çalışıyor.';
+	@override String staged({required Object version}) => 'v${version} güncellemesi indirildi — kurmak için sunucuyu yeniden başlatın.';
+	@override String get upToDate => 'Sunucu zaten en son sürümde.';
+	@override String webHostFailed({required Object message}) => 'Sunucu güncellendi ama web arayüzü güncellenmedi: ${message}';
 }
 
 // Path: settings.changelog
@@ -2231,6 +2246,10 @@ class Translations$settings$updates$tr extends Translations$settings$updates$en 
 	@override String get unavailable => 'Güncelleme denetimi yalnızca paketlenmiş masaüstü sürümlerinde kullanılabilir.';
 	@override String error({required Object message}) => 'Güncelleme denetimi başarısız: ${message}';
 	@override String get errorGeneric => 'Güncelleme denetimi başarısız.';
+	@override String versionLine({required Object installed, required Object latest}) => 'v${installed} · en son v${latest}';
+	@override String current({required Object version}) => 'v${version} — güncel';
+	@override String webNotHosted({required Object version}) => 'Bu web arayüzü ayrı barındırılıyor — dosyalarını sürümdeki ddagent-flutter-web-v${version}.zip ile değiştirin.';
+	@override String get serverCannotUpdate => 'Bu sunucu buradan kendini güncelleyemez — install.sh veya bir sürüm arşiviyle yeniden kurun.';
 }
 
 // Path: settings.tabs
@@ -8146,6 +8165,21 @@ extension on TranslationsTr {
 			'common.update.failedTitle' => 'Güncelleme başarısız',
 			'common.update.appConfirm' => ({required Object version}) => 'ddagent v${version} bu cihaza kurulsun mu? Android ilk seferde ddagent\'tan yüklemeye izin vermenizi ister.',
 			'common.update.appPermission' => 'ddagent için “Bilinmeyen uygulamaları yükle” iznini verin, sonra tekrar Güncelle\'ye dokunun.',
+			'common.update.chooseTitle' => 'Güncellemeler var',
+			'common.update.targetApp' => 'Bu uygulama',
+			'common.update.targetWeb' => 'Web arayüzü',
+			'common.update.targetServer' => 'Sunucu',
+			'common.update.updateApp' => 'Uygulamayı güncelle',
+			'common.update.updateWeb' => 'Web arayüzünü güncelle',
+			'common.update.updateServer' => 'Sunucuyu güncelle',
+			'common.update.webConfirm' => ({required Object version}) => 'Web arayüzü v${version} sürümüne güncellensin mi? Sonrasında sayfa yeniden yüklenir.',
+			'common.update.webDone' => ({required Object version}) => 'Web arayüzü v${version} sürümüne güncellendi — yeniden yükleniyor…',
+			'common.update.localServerConfirm' => ({required Object version}) => 'Bu cihazdaki yerel sunucu v${version} sürümüne güncellensin mi? Etkin oturumlar kesilir.',
+			'common.update.localServerUpdating' => 'Yerel sunucu indiriliyor ve başlatılıyor…',
+			'common.update.serverDone' => ({required Object version}) => 'Sunucu v${version} sürümünde çalışıyor.',
+			'common.update.staged' => ({required Object version}) => 'v${version} güncellemesi indirildi — kurmak için sunucuyu yeniden başlatın.',
+			'common.update.upToDate' => 'Sunucu zaten en son sürümde.',
+			'common.update.webHostFailed' => ({required Object message}) => 'Sunucu güncellendi ama web arayüzü güncellenmedi: ${message}',
 			'settings.title' => 'Ayarlar',
 			'settings.changelog.title' => 'Değişiklik günlüğü',
 			'settings.changelog.loading' => 'Yükleniyor…',
@@ -8176,6 +8210,10 @@ extension on TranslationsTr {
 			'settings.updates.unavailable' => 'Güncelleme denetimi yalnızca paketlenmiş masaüstü sürümlerinde kullanılabilir.',
 			'settings.updates.error' => ({required Object message}) => 'Güncelleme denetimi başarısız: ${message}',
 			'settings.updates.errorGeneric' => 'Güncelleme denetimi başarısız.',
+			'settings.updates.versionLine' => ({required Object installed, required Object latest}) => 'v${installed} · en son v${latest}',
+			'settings.updates.current' => ({required Object version}) => 'v${version} — güncel',
+			'settings.updates.webNotHosted' => ({required Object version}) => 'Bu web arayüzü ayrı barındırılıyor — dosyalarını sürümdeki ddagent-flutter-web-v${version}.zip ile değiştirin.',
+			'settings.updates.serverCannotUpdate' => 'Bu sunucu buradan kendini güncelleyemez — install.sh veya bir sürüm arşiviyle yeniden kurun.',
 			'settings.tabs.account' => 'Hesap',
 			'settings.tabs.permissions' => 'İzinler',
 			'settings.tabs.mcpServers' => 'MCP Sunucuları',
@@ -8519,6 +8557,8 @@ extension on TranslationsTr {
 			'settings.agents.account.commandcode.description' => 'Command Code CLI asistanı',
 			'settings.agents.account.antigravity.description' => 'Antigravity CLI asistanı',
 			'settings.agents.account.devin.description' => 'Devin CLI asistanı',
+			_ => null,
+		} ?? switch (path) {
 			'settings.agents.connectionStatus' => 'Bağlantı Durumu',
 			'settings.agents.login.title' => 'Giriş Yap',
 			'settings.agents.login.reAuthenticate' => 'Yeniden Kimlik Doğrula',
@@ -8538,8 +8578,6 @@ extension on TranslationsTr {
 			'settings.permissions.permissionMode.title' => 'İzin Modu',
 			'settings.permissions.permissionMode.description' => ({required Object provider}) => 'Yeni ${provider} oturumları için varsayılan izin modu. Tek bir oturum için yine de geçersiz kılabilirsin.',
 			'settings.permissions.permissionMode.modes.kDefault.title' => 'Varsayılan',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.kDefault.description' => 'İzin gerektiren eylemler onayın için sohbette gösterilir.',
 			'settings.permissions.permissionMode.modes.auto.title' => 'Otomatik Mod',
 			'settings.permissions.permissionMode.modes.auto.description' => 'Bir model sınıflandırıcı, her araç çağrısında onay veya ret kararı verir. Yüksek özerklik.',
@@ -9033,6 +9071,8 @@ extension on TranslationsTr {
 			'tasks.nextTask.noPending' => 'Bekleyen görev yok',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI yapılandırılmamış',
 			'tasks.nextTask.review' => 'İncele',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.startTask' => 'Görevi Başlat',
 			'tasks.nextTask.taskId' => ({required Object id}) => 'Görev ${id}',
 			'tasks.nextTask.viewAll' => 'Tüm görevleri görüntüle',
@@ -9052,8 +9092,6 @@ extension on TranslationsTr {
 			'tasks.taskDetail.implDetails' => 'Uygulama Ayrıntıları',
 			'tasks.taskDetail.noDependencies' => 'Bağımlılık yok',
 			'tasks.taskDetail.noDescription' => 'Açıklama yok',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.priority' => 'Öncelik',
 			'tasks.taskDetail.priorityNotSet' => 'Ayarlanmadı',
 			'tasks.taskDetail.save' => 'Kaydet',

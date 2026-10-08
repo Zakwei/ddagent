@@ -2176,6 +2176,21 @@ class Translations$common$update$fr extends Translations$common$update$en {
 	@override String get failedTitle => 'Échec de la mise à jour';
 	@override String appConfirm({required Object version}) => 'Installer ddagent v${version} sur cet appareil ? Android demandera l\'autorisation d\'installer des applications depuis ddagent la première fois.';
 	@override String get appPermission => 'Autorisez « Installer des applications inconnues » pour ddagent, puis appuyez à nouveau sur Mettre à jour.';
+	@override String get chooseTitle => 'Mises à jour disponibles';
+	@override String get targetApp => 'Cette application';
+	@override String get targetWeb => 'Interface web';
+	@override String get targetServer => 'Serveur';
+	@override String get updateApp => 'Mettre à jour l\'application';
+	@override String get updateWeb => 'Mettre à jour l\'interface web';
+	@override String get updateServer => 'Mettre à jour le serveur';
+	@override String webConfirm({required Object version}) => 'Mettre à jour l\'interface web vers v${version} ? La page sera rechargée ensuite.';
+	@override String webDone({required Object version}) => 'Interface web mise à jour vers v${version} — rechargement…';
+	@override String localServerConfirm({required Object version}) => 'Mettre à jour le serveur local de cet appareil vers v${version} ? Les sessions actives seront interrompues.';
+	@override String get localServerUpdating => 'Téléchargement et démarrage du serveur local…';
+	@override String serverDone({required Object version}) => 'Le serveur exécute v${version}.';
+	@override String staged({required Object version}) => 'Mise à jour v${version} téléchargée — redémarrez le serveur pour l\'installer.';
+	@override String get upToDate => 'Le serveur est déjà sur la dernière version.';
+	@override String webHostFailed({required Object message}) => 'Le serveur a été mis à jour, mais pas son interface web : ${message}';
 }
 
 // Path: settings.changelog
@@ -2232,6 +2247,10 @@ class Translations$settings$updates$fr extends Translations$settings$updates$en 
 	@override String get unavailable => 'La recherche de mises à jour n\'est disponible que dans les builds de bureau empaquetées.';
 	@override String error({required Object message}) => 'Échec de la recherche de mises à jour : ${message}';
 	@override String get errorGeneric => 'Échec de la recherche de mises à jour.';
+	@override String versionLine({required Object installed, required Object latest}) => 'v${installed} · dernière v${latest}';
+	@override String current({required Object version}) => 'v${version} — à jour';
+	@override String webNotHosted({required Object version}) => 'Cette interface web est hébergée séparément — remplacez ses fichiers par ddagent-flutter-web-v${version}.zip de la version.';
+	@override String get serverCannotUpdate => 'Ce serveur ne peut pas se mettre à jour d\'ici — réinstallez-le avec install.sh ou une archive de la version.';
 }
 
 // Path: settings.tabs
@@ -8147,6 +8166,21 @@ extension on TranslationsFr {
 			'common.update.failedTitle' => 'Échec de la mise à jour',
 			'common.update.appConfirm' => ({required Object version}) => 'Installer ddagent v${version} sur cet appareil ? Android demandera l\'autorisation d\'installer des applications depuis ddagent la première fois.',
 			'common.update.appPermission' => 'Autorisez « Installer des applications inconnues » pour ddagent, puis appuyez à nouveau sur Mettre à jour.',
+			'common.update.chooseTitle' => 'Mises à jour disponibles',
+			'common.update.targetApp' => 'Cette application',
+			'common.update.targetWeb' => 'Interface web',
+			'common.update.targetServer' => 'Serveur',
+			'common.update.updateApp' => 'Mettre à jour l\'application',
+			'common.update.updateWeb' => 'Mettre à jour l\'interface web',
+			'common.update.updateServer' => 'Mettre à jour le serveur',
+			'common.update.webConfirm' => ({required Object version}) => 'Mettre à jour l\'interface web vers v${version} ? La page sera rechargée ensuite.',
+			'common.update.webDone' => ({required Object version}) => 'Interface web mise à jour vers v${version} — rechargement…',
+			'common.update.localServerConfirm' => ({required Object version}) => 'Mettre à jour le serveur local de cet appareil vers v${version} ? Les sessions actives seront interrompues.',
+			'common.update.localServerUpdating' => 'Téléchargement et démarrage du serveur local…',
+			'common.update.serverDone' => ({required Object version}) => 'Le serveur exécute v${version}.',
+			'common.update.staged' => ({required Object version}) => 'Mise à jour v${version} téléchargée — redémarrez le serveur pour l\'installer.',
+			'common.update.upToDate' => 'Le serveur est déjà sur la dernière version.',
+			'common.update.webHostFailed' => ({required Object message}) => 'Le serveur a été mis à jour, mais pas son interface web : ${message}',
 			'settings.title' => 'Paramètres',
 			'settings.changelog.title' => 'Journal des modifications',
 			'settings.changelog.loading' => 'Chargement…',
@@ -8177,6 +8211,10 @@ extension on TranslationsFr {
 			'settings.updates.unavailable' => 'La recherche de mises à jour n\'est disponible que dans les builds de bureau empaquetées.',
 			'settings.updates.error' => ({required Object message}) => 'Échec de la recherche de mises à jour : ${message}',
 			'settings.updates.errorGeneric' => 'Échec de la recherche de mises à jour.',
+			'settings.updates.versionLine' => ({required Object installed, required Object latest}) => 'v${installed} · dernière v${latest}',
+			'settings.updates.current' => ({required Object version}) => 'v${version} — à jour',
+			'settings.updates.webNotHosted' => ({required Object version}) => 'Cette interface web est hébergée séparément — remplacez ses fichiers par ddagent-flutter-web-v${version}.zip de la version.',
+			'settings.updates.serverCannotUpdate' => 'Ce serveur ne peut pas se mettre à jour d\'ici — réinstallez-le avec install.sh ou une archive de la version.',
 			'settings.tabs.account' => 'Compte',
 			'settings.tabs.permissions' => 'Permissions',
 			'settings.tabs.mcpServers' => 'Serveurs MCP',
@@ -8520,6 +8558,8 @@ extension on TranslationsFr {
 			'settings.agents.account.commandcode.description' => 'Assistant CLI Command Code',
 			'settings.agents.account.antigravity.description' => 'Assistant CLI Antigravity',
 			'settings.agents.account.devin.description' => 'Assistant CLI Devin',
+			_ => null,
+		} ?? switch (path) {
 			'settings.agents.connectionStatus' => 'Statut de la connexion',
 			'settings.agents.login.title' => 'Connexion',
 			'settings.agents.login.reAuthenticate' => 'Se ré-authentifier',
@@ -8539,8 +8579,6 @@ extension on TranslationsFr {
 			'settings.permissions.permissionMode.title' => 'Mode de permission',
 			'settings.permissions.permissionMode.description' => ({required Object provider}) => 'Mode de permission par défaut pour les nouvelles sessions ${provider}. Vous pouvez toujours le remplacer pour une session individuelle.',
 			'settings.permissions.permissionMode.modes.kDefault.title' => 'Par défaut',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.kDefault.description' => 'Les actions nécessitant une permission vous sont présentées pour approbation dans la discussion.',
 			'settings.permissions.permissionMode.modes.auto.title' => 'Mode automatique',
 			'settings.permissions.permissionMode.modes.auto.description' => 'Un classifieur de modèle décide pour chaque appel d\'outil d\'approuver ou refuser. Mode mains libres, mais plus sûr que le contournement — des refus peuvent toujours se produire.',
@@ -9034,6 +9072,8 @@ extension on TranslationsFr {
 			'tasks.nextTask.noPending' => 'Aucune tâche en attente',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI n’est pas configuré',
 			'tasks.nextTask.review' => 'Vérifier',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.startTask' => 'Démarrer la tâche',
 			'tasks.nextTask.taskId' => ({required Object id}) => 'Tâche ${id}',
 			'tasks.nextTask.viewAll' => 'Voir toutes les tâches',
@@ -9053,8 +9093,6 @@ extension on TranslationsFr {
 			'tasks.taskDetail.implDetails' => 'Détails d’implémentation',
 			'tasks.taskDetail.noDependencies' => 'Aucune dépendance',
 			'tasks.taskDetail.noDescription' => 'Aucune description fournie',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.priority' => 'Priorité',
 			'tasks.taskDetail.priorityNotSet' => 'Non définie',
 			'tasks.taskDetail.save' => 'Enregistrer',

@@ -1496,7 +1496,22 @@
       "failed": "更新に失敗しました。",
       "failedTitle": "更新に失敗しました",
       "appConfirm": "この端末に ddagent v{{version}} をインストールしますか？ 初回は Android が ddagent からのインストール許可を求めます。",
-      "appPermission": "ddagent に「提供元不明のアプリ」のインストールを許可してから、もう一度「更新」をタップしてください。"
+      "appPermission": "ddagent に「提供元不明のアプリ」のインストールを許可してから、もう一度「更新」をタップしてください。",
+      "chooseTitle": "アップデートがあります",
+      "targetApp": "このアプリ",
+      "targetWeb": "Web インターフェイス",
+      "targetServer": "サーバー",
+      "updateApp": "アプリを更新",
+      "updateWeb": "Web インターフェイスを更新",
+      "updateServer": "サーバーを更新",
+      "webConfirm": "Web インターフェイスを v{{version}} に更新しますか？更新後にページが再読み込みされます。",
+      "webDone": "Web インターフェイスを v{{version}} に更新しました — 再読み込みしています…",
+      "localServerConfirm": "このデバイスのローカルサーバーを v{{version}} に更新しますか？実行中のセッションは中断されます。",
+      "localServerUpdating": "ローカルサーバーをダウンロードして起動しています…",
+      "serverDone": "サーバーは v{{version}} で動作しています。",
+      "staged": "アップデート v{{version}} をダウンロードしました — インストールするにはサーバーを再起動してください。",
+      "upToDate": "サーバーはすでに最新のリリースです。",
+      "webHostFailed": "サーバーは更新されましたが、Web インターフェイスは更新されませんでした：{{message}}"
     }
   },
   "settings": {
@@ -1534,7 +1549,11 @@
       "downloaded": "更新 v{{version}} をダウンロードしました — ddagent を終了して再起動するとインストールされます。",
       "unavailable": "更新チェックはパッケージ済みデスクトップビルドでのみ利用できます。",
       "error": "更新チェックに失敗しました: {{message}}",
-      "errorGeneric": "更新チェックに失敗しました。"
+      "errorGeneric": "更新チェックに失敗しました。",
+      "versionLine": "v{{installed}} · 最新 v{{latest}}",
+      "current": "v{{version}} — 最新です",
+      "webNotHosted": "この Web インターフェイスは別にホストされています。リリースの ddagent-flutter-web-v{{version}}.zip でファイルを置き換えてください。",
+      "serverCannotUpdate": "このサーバーはここから自動更新できません。install.sh またはリリースの tarball で再インストールしてください。"
     },
     "tabs": {
       "account": "アカウント",

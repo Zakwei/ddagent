@@ -35,3 +35,9 @@ int compareVersions(String a, String b) {
   }
   return 0;
 }
+
+/// `GET /api/system/update-info` — what the connected server can update
+/// (itself, its hosted web client). Null when the server predates it.
+final serverUpdateInfoProvider = FutureProvider.autoDispose<Map<String, dynamic>?>(
+  (ref) => ref.watch(systemRepositoryProvider).updateInfo(),
+);

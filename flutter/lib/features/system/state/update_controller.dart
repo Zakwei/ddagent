@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:ddagent_app/features/server_connect/data/server_profiles.dart';
 import 'package:ddagent_app/features/system/data/app_update_channel.dart';
 import 'package:ddagent_app/features/system/data/app_update_installer.dart';
 import 'package:ddagent_app/features/system/data/system_repository.dart';
@@ -77,6 +78,39 @@ final appUpdateAvailableProvider = Provider.autoDispose<bool>((ref) {
   final installed = ref.watch(appVersionProvider).value;
   if (release == null || installed == null || installed.isEmpty) return false;
   return compareVersions(normalizeVersion(release.tagName), installed) > 0;
+});
+
+/// Something that can be updated from the UI, each with its own button:
+/// this app (Android/desktop build), the web interface (web builds only — a
+/// separate bundle from the server), and the connected server.
+enum UpdateTarget { app, web, server }
+
+/// Whether the active server profile is the desktop app's own local server
+/// ("This device"), which the app updates itself rather than over the API.
+final activeServerIsLocalProvider = Provider<bool>((ref) {
+  final profiles = ref.watch(serverProfilesProvider);
+  return profiles.profiles.where((p) => p.url == profiles.activeUrl).firstOrNull?.isLocal ?? false;
+});
+
+/// Whether this web build is older than the latest release. The served
+/// bundle's `version.json` is what [appVersionProvider] reads on the web.
+final webUpdateAvailableProvider = Provider.autoDispose<bool>((ref) {
+  if (!kIsWeb) return false;
+  final release = ref.watch(latestReleaseProvider).value;
+  final installed = ref.watch(appVersionProvider).value;
+  if (release == null || installed == null || installed.isEmpty) return false;
+  return compareVersions(normalizeVersion(release.tagName), installed) > 0;
+});
+
+/// Every update the user can start right now, in display order. Drives the
+/// rail badge (which offers a choice when there is more than one) and the
+/// buttons in Settings → About.
+final availableUpdatesProvider = Provider.autoDispose<List<UpdateTarget>>((ref) {
+  return [
+    if (ref.watch(appUpdateAvailableProvider)) UpdateTarget.app,
+    if (ref.watch(webUpdateAvailableProvider)) UpdateTarget.web,
+    if (ref.watch(updateAvailableProvider)) UpdateTarget.server,
+  ];
 });
 
 enum DesktopUpdateStage { idle, downloading, ready, failed }

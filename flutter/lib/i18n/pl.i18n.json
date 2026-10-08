@@ -1630,7 +1630,22 @@
       "failed": "Aktualizacja nie powiodła się.",
       "failedTitle": "Aktualizacja nie powiodła się",
       "appConfirm": "Zainstalować ddagent v{{version}} na tym urządzeniu? Android za pierwszym razem zapyta o zgodę na instalowanie aplikacji z ddagent.",
-      "appPermission": "Zezwól ddagent na „Instalowanie nieznanych aplikacji”, a potem dotknij ponownie Aktualizuj."
+      "appPermission": "Zezwól ddagent na „Instalowanie nieznanych aplikacji”, a potem dotknij ponownie Aktualizuj.",
+      "chooseTitle": "Dostępne aktualizacje",
+      "targetApp": "Ta aplikacja",
+      "targetWeb": "Interfejs web",
+      "targetServer": "Serwer",
+      "updateApp": "Aktualizuj aplikację",
+      "updateWeb": "Aktualizuj interfejs web",
+      "updateServer": "Aktualizuj serwer",
+      "webConfirm": "Zaktualizować interfejs web do v{{version}}? Strona przeładuje się po aktualizacji.",
+      "webDone": "Interfejs web zaktualizowany do v{{version}} — przeładowuję…",
+      "localServerConfirm": "Zaktualizować lokalny serwer na tym urządzeniu do v{{version}}? Trwające sesje zostaną przerwane.",
+      "localServerUpdating": "Pobieram i uruchamiam lokalny serwer…",
+      "serverDone": "Serwer działa w wersji v{{version}}.",
+      "staged": "Pobrano aktualizację v{{version}} — zrestartuj serwer, aby ją zainstalować.",
+      "upToDate": "Serwer ma już najnowsze wydanie.",
+      "webHostFailed": "Serwer został zaktualizowany, ale jego interfejs web nie: {{message}}"
     }
   },
   "settings": {
@@ -1671,7 +1686,11 @@
       "downloaded": "Aktualizacja v{{version}} pobrana — zamknij i uruchom ddagent ponownie, aby ją zainstalować.",
       "unavailable": "Sprawdzanie aktualizacji dostępne tylko w spakietowanej aplikacji desktopowej.",
       "error": "Sprawdzanie aktualizacji nie powiodło się: {{message}}",
-      "errorGeneric": "Sprawdzanie aktualizacji nie powiodło się."
+      "errorGeneric": "Sprawdzanie aktualizacji nie powiodło się.",
+      "versionLine": "v{{installed}} · najnowsza v{{latest}}",
+      "current": "v{{version}} — aktualna",
+      "webNotHosted": "Ten interfejs web jest hostowany osobno — podmień jego pliki na ddagent-flutter-web-v{{version}}.zip z wydania.",
+      "serverCannotUpdate": "Ten serwer nie może zaktualizować się stąd — zainstaluj go ponownie przez install.sh albo z tarballa wydania."
     },
     "tabs": {
       "account": "Konto",

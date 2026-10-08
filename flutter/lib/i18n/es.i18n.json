@@ -1497,7 +1497,22 @@
       "failed": "La actualización falló.",
       "failedTitle": "La actualización falló",
       "appConfirm": "¿Instalar ddagent v{{version}} en este dispositivo? Android te pedirá permiso para instalar apps desde ddagent la primera vez.",
-      "appPermission": "Permite «Instalar apps desconocidas» para ddagent y vuelve a pulsar Actualizar."
+      "appPermission": "Permite «Instalar apps desconocidas» para ddagent y vuelve a pulsar Actualizar.",
+      "chooseTitle": "Actualizaciones disponibles",
+      "targetApp": "Esta app",
+      "targetWeb": "Interfaz web",
+      "targetServer": "Servidor",
+      "updateApp": "Actualizar app",
+      "updateWeb": "Actualizar interfaz web",
+      "updateServer": "Actualizar servidor",
+      "webConfirm": "¿Actualizar la interfaz web a v{{version}}? La página se recargará después.",
+      "webDone": "Interfaz web actualizada a v{{version}} — recargando…",
+      "localServerConfirm": "¿Actualizar el servidor local de este dispositivo a v{{version}}? Las sesiones activas se interrumpirán.",
+      "localServerUpdating": "Descargando e iniciando el servidor local…",
+      "serverDone": "El servidor ejecuta v{{version}}.",
+      "staged": "Actualización v{{version}} descargada — reinicia el servidor para instalarla.",
+      "upToDate": "El servidor ya tiene la última versión.",
+      "webHostFailed": "El servidor se actualizó, pero su interfaz web no: {{message}}"
     }
   },
   "settings": {
@@ -1535,7 +1550,11 @@
       "downloaded": "Actualización v{{version}} descargada — cierra y reinicia ddagent para instalarla.",
       "unavailable": "La búsqueda de actualizaciones solo está disponible en builds de escritorio empaquetados.",
       "error": "Error al buscar actualizaciones: {{message}}",
-      "errorGeneric": "Error al buscar actualizaciones."
+      "errorGeneric": "Error al buscar actualizaciones.",
+      "versionLine": "v{{installed}} · última v{{latest}}",
+      "current": "v{{version}} — actualizada",
+      "webNotHosted": "Esta interfaz web se aloja por separado: sustituye sus archivos por ddagent-flutter-web-v{{version}}.zip de la versión.",
+      "serverCannotUpdate": "Este servidor no puede actualizarse desde aquí: reinstálalo con install.sh o con un tarball de la versión."
     },
     "tabs": {
       "account": "Cuenta",

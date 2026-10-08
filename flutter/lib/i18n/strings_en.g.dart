@@ -4033,6 +4033,51 @@ class Translations$common$update$en {
 
 	/// en: 'Allow “Install unknown apps” for ddagent, then tap Update again.'
 	String get appPermission => 'Allow “Install unknown apps” for ddagent, then tap Update again.';
+
+	/// en: 'Updates available'
+	String get chooseTitle => 'Updates available';
+
+	/// en: 'This app'
+	String get targetApp => 'This app';
+
+	/// en: 'Web interface'
+	String get targetWeb => 'Web interface';
+
+	/// en: 'Server'
+	String get targetServer => 'Server';
+
+	/// en: 'Update app'
+	String get updateApp => 'Update app';
+
+	/// en: 'Update web interface'
+	String get updateWeb => 'Update web interface';
+
+	/// en: 'Update server'
+	String get updateServer => 'Update server';
+
+	/// en: 'Update the web interface to v{{version}}? The page reloads afterwards.'
+	String webConfirm({required Object version}) => 'Update the web interface to v${version}? The page reloads afterwards.';
+
+	/// en: 'Web interface updated to v{{version}} — reloading…'
+	String webDone({required Object version}) => 'Web interface updated to v${version} — reloading…';
+
+	/// en: 'Update the local server on this device to v{{version}}? Active sessions will be interrupted.'
+	String localServerConfirm({required Object version}) => 'Update the local server on this device to v${version}? Active sessions will be interrupted.';
+
+	/// en: 'Downloading and starting the local server…'
+	String get localServerUpdating => 'Downloading and starting the local server…';
+
+	/// en: 'The server runs v{{version}}.'
+	String serverDone({required Object version}) => 'The server runs v${version}.';
+
+	/// en: 'Update v{{version}} downloaded — restart the server to install it.'
+	String staged({required Object version}) => 'Update v${version} downloaded — restart the server to install it.';
+
+	/// en: 'The server is already on the latest release.'
+	String get upToDate => 'The server is already on the latest release.';
+
+	/// en: 'The server was updated, but its web interface was not: {{message}}'
+	String webHostFailed({required Object message}) => 'The server was updated, but its web interface was not: ${message}';
 }
 
 // Path: settings.changelog
@@ -4156,6 +4201,18 @@ class Translations$settings$updates$en {
 
 	/// en: 'Update check failed.'
 	String get errorGeneric => 'Update check failed.';
+
+	/// en: 'v{{installed}} · latest v{{latest}}'
+	String versionLine({required Object installed, required Object latest}) => 'v${installed} · latest v${latest}';
+
+	/// en: 'v{{version}} — up to date'
+	String current({required Object version}) => 'v${version} — up to date';
+
+	/// en: 'This web interface is hosted separately — replace its files with ddagent-flutter-web-v{{version}}.zip from the release.'
+	String webNotHosted({required Object version}) => 'This web interface is hosted separately — replace its files with ddagent-flutter-web-v${version}.zip from the release.';
+
+	/// en: 'This server cannot update itself from here — reinstall it with install.sh or a release tarball.'
+	String get serverCannotUpdate => 'This server cannot update itself from here — reinstall it with install.sh or a release tarball.';
 }
 
 // Path: settings.tabs
@@ -14675,6 +14732,21 @@ extension on Translations {
 			'common.update.failedTitle' => 'Update failed',
 			'common.update.appConfirm' => ({required Object version}) => 'Install ddagent v${version} on this device? Android will ask you to allow installs from ddagent the first time.',
 			'common.update.appPermission' => 'Allow “Install unknown apps” for ddagent, then tap Update again.',
+			'common.update.chooseTitle' => 'Updates available',
+			'common.update.targetApp' => 'This app',
+			'common.update.targetWeb' => 'Web interface',
+			'common.update.targetServer' => 'Server',
+			'common.update.updateApp' => 'Update app',
+			'common.update.updateWeb' => 'Update web interface',
+			'common.update.updateServer' => 'Update server',
+			'common.update.webConfirm' => ({required Object version}) => 'Update the web interface to v${version}? The page reloads afterwards.',
+			'common.update.webDone' => ({required Object version}) => 'Web interface updated to v${version} — reloading…',
+			'common.update.localServerConfirm' => ({required Object version}) => 'Update the local server on this device to v${version}? Active sessions will be interrupted.',
+			'common.update.localServerUpdating' => 'Downloading and starting the local server…',
+			'common.update.serverDone' => ({required Object version}) => 'The server runs v${version}.',
+			'common.update.staged' => ({required Object version}) => 'Update v${version} downloaded — restart the server to install it.',
+			'common.update.upToDate' => 'The server is already on the latest release.',
+			'common.update.webHostFailed' => ({required Object message}) => 'The server was updated, but its web interface was not: ${message}',
 			'settings.title' => 'Settings',
 			'settings.changelog.title' => 'Changelog',
 			'settings.changelog.loading' => 'Loading…',
@@ -14708,6 +14780,10 @@ extension on Translations {
 			'settings.updates.unavailable' => 'Update checks are only available in packaged desktop builds.',
 			'settings.updates.error' => ({required Object message}) => 'Update check failed: ${message}',
 			'settings.updates.errorGeneric' => 'Update check failed.',
+			'settings.updates.versionLine' => ({required Object installed, required Object latest}) => 'v${installed} · latest v${latest}',
+			'settings.updates.current' => ({required Object version}) => 'v${version} — up to date',
+			'settings.updates.webNotHosted' => ({required Object version}) => 'This web interface is hosted separately — replace its files with ddagent-flutter-web-v${version}.zip from the release.',
+			'settings.updates.serverCannotUpdate' => 'This server cannot update itself from here — reinstall it with install.sh or a release tarball.',
 			'settings.tabs.account' => 'Account',
 			'settings.tabs.permissions' => 'Permissions',
 			'settings.tabs.mcpServers' => 'MCP Servers',
@@ -14922,6 +14998,8 @@ extension on Translations {
 			'settings.orchestration.save.unsaved' => 'Unsaved changes',
 			'settings.orchestration.save.save' => 'Save',
 			'settings.orchestration.save.saving' => 'Saving…',
+			_ => null,
+		} ?? switch (path) {
 			'settings.orchestration.save.saved' => 'Saved',
 			'settings.orchestration.save.discard' => 'Discard',
 			'settings.orchestration.save.error' => 'Save failed',
@@ -14941,8 +15019,6 @@ extension on Translations {
 			'settings.notifications.webPush.testSuccess' => ({required Object count}) => 'Sent to ${count} device(s). If nothing appeared on the phone, add ddagent to the home screen (iOS requires this).',
 			'settings.notifications.webPush.testNotDelivered' => 'No device was reachable. Make sure the app is running and notifications are enabled.',
 			'settings.notifications.device.title' => 'Notify this device',
-			_ => null,
-		} ?? switch (path) {
 			'settings.notifications.device.enabled' => 'Notifications are enabled for this device',
 			'settings.notifications.desktop.title' => 'Notify this desktop app',
 			'settings.notifications.desktop.enable' => 'Enable notifications',
@@ -15436,6 +15512,8 @@ extension on Translations {
 			'sidebar.time.minutesAgo' => ({required Object count}) => '${count} mins ago',
 			'sidebar.time.oneHourAgo' => '1 hour ago',
 			'sidebar.time.hoursAgo' => ({required Object count}) => '${count} hours ago',
+			_ => null,
+		} ?? switch (path) {
 			'sidebar.time.oneDayAgo' => '1 day ago',
 			'sidebar.time.daysAgo' => ({required Object count}) => '${count} days ago',
 			'sidebar.messages.deleteConfirm' => 'Are you sure you want to delete this?',
@@ -15455,8 +15533,6 @@ extension on Translations {
 			'sidebar.messages.deleteProjectError' => 'Error removing project. Please try again.',
 			'sidebar.messages.createProjectFailed' => 'Failed to create project. Please try again.',
 			'sidebar.messages.createProjectError' => 'Error creating project. Please try again.',
-			_ => null,
-		} ?? switch (path) {
 			'sidebar.messages.updateProjectError' => 'Error updating project. Please try again.',
 			'sidebar.messages.refreshError' => 'Failed to refresh. Please try again.',
 			'sidebar.messages.restoreProjectFailed' => 'Failed to restore project. Please try again.',
@@ -15950,6 +16026,8 @@ extension on Translations {
 			'mcp.servers.addGlobalMenuDescription' => 'Add Global MCP Server writes one common stdio or HTTP server to Claude, Cursor, Codex, OpenCode, and Devin.',
 			'mcp.servers.addProviderTitle' => ({required Object provider}) => 'Add ${provider} MCP Server',
 			'mcp.servers.addProviderDescription' => ({required Object provider}) => 'Add ${provider} MCP Server only changes ${provider}.',
+			_ => null,
+		} ?? switch (path) {
 			'mcp.servers.config.cwd' => 'Cwd',
 			'mcp.servers.config.envVars' => 'Env Vars',
 			'mcp.team.title' => 'Team MCP Configs',
@@ -15969,8 +16047,6 @@ extension on Translations {
 			'mcp.form.fields.envVarNames' => 'Environment Variable Names',
 			'mcp.form.fields.bearerTokenEnvVar' => 'Bearer Token Environment Variable',
 			'mcp.form.validation.unsupportedGlobal' => ({required Object type}) => 'Add MCP Server supports only stdio and http across all providers, not ${type}.',
-			_ => null,
-		} ?? switch (path) {
 			'mcp.form.validation.unsupportedProvider' => ({required Object provider, required Object type}) => '${provider} does not support ${type} MCP servers',
 			'notifications.deviceLabel' => 'ddagent Flutter',
 			'notifications.errors.registrationRejected' => 'Registration rejected by server',

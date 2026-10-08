@@ -2,27 +2,24 @@ import 'dart:async';
 
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/utils/app_quit.dart';
+import 'package:ddagent_app/core/utils/app_reload.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
-import 'package:ddagent_app/features/server_connect/data/server_profiles.dart';
 import 'package:ddagent_app/features/server_connect/state/local_server_controller.dart';
 import 'package:ddagent_app/features/system/data/app_update_channel.dart';
 import 'package:ddagent_app/features/system/data/system_repository.dart';
 import 'package:ddagent_app/features/system/state/update_controller.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Port of `UpdateBadge.tsx` — an emerald rail button (or drawer row) shown
-/// when GitHub has a newer release. Two independent cases feed it:
-///
-/// * the connected server is behind — the dialog runs
-///   `POST /api/system/update` and polls `/health` for the new version
-///   (under systemd the server exits and the watchdog brings it back);
-/// * this app is behind on Android — the dialog downloads the release APK and
-///   hands it to the system installer, which is the only way a sideloaded
-///   build can replace itself.
+/// when GitHub has a newer release of something this client can update
+/// ([availableUpdatesProvider]): this app, the web interface, or the
+/// connected server. One update opens its dialog directly; several open a
+/// chooser with a button for each.
 class UpdateBadge extends ConsumerWidget {
   const UpdateBadge({super.key, this.variant = UpdateBadgeVariant.icon});
 
@@ -30,20 +27,11 @@ class UpdateBadge extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // The local server self-updates through the app's own bundle pipeline —
-    // POST /api/system/update can't work on a release bundle, so a *server*
-    // update on a local profile would only lead to a guaranteed failure. A
-    // self-update of THIS app still applies everywhere.
-    final profiles = ref.watch(serverProfilesProvider);
-    final active = profiles.profiles.where((p) => p.url == profiles.activeUrl).firstOrNull;
-    final serverUpdate = !(active?.isLocal ?? false) && ref.watch(updateAvailableProvider);
-    // A `_Status.updateAvailable` (above) still drives the badge on server
-    // updates; an app update only exists where the client can install itself.
-    if (!serverUpdate && !ref.watch(appUpdateAvailableProvider)) {
-      return const SizedBox.shrink();
-    }
+    final targets = ref.watch(availableUpdatesProvider);
+    final release = ref.watch(latestReleaseProvider).value;
+    if (targets.isEmpty || release == null) return const SizedBox.shrink();
     final t = Translations.of(context);
-    final version = normalizeVersion(ref.watch(latestReleaseProvider).value!.tagName);
+    final version = normalizeVersion(release.tagName);
     final label = t.common.update.available(version: version);
 
     if (variant == UpdateBadgeVariant.row) {
@@ -63,7 +51,7 @@ class UpdateBadge extends ConsumerWidget {
                 color: Color(0xFF34D399),
               ),
             ),
-            onTap: () => _open(context),
+            onTap: () => openUpdates(context, targets),
           ),
         ),
       );
@@ -74,7 +62,7 @@ class UpdateBadge extends ConsumerWidget {
       preferBelow: false,
       verticalOffset: 12,
       child: InkWell(
-        onTap: () => _open(context),
+        onTap: () => openUpdates(context, targets),
         borderRadius: AppRadii.borderLg,
         child: const SizedBox(
           width: 36,
@@ -89,10 +77,69 @@ class UpdateBadge extends ConsumerWidget {
       ),
     );
   }
-
-  void _open(BuildContext context) =>
-      showDialog<void>(context: context, builder: (_) => const UpdateDialog());
 }
+
+/// Opens the update flow for [targets]: the dialog of the only one, or a
+/// chooser listing each with its own button.
+void openUpdates(BuildContext context, List<UpdateTarget> targets) {
+  if (targets.length == 1) {
+    unawaited(showUpdateDialog(context, targets.single));
+    return;
+  }
+  unawaited(
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        final t = Translations.of(dialogContext);
+        return AlertDialog(
+          title: Text(t.common.update.chooseTitle),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: 8,
+            children: [
+              for (final target in targets)
+                AppButton(
+                  onPressed: () {
+                    Navigator.of(dialogContext).pop();
+                    unawaited(showUpdateDialog(context, target));
+                  },
+                  child: Text(updateTargetAction(t, target)),
+                ),
+            ],
+          ),
+          actions: [
+            AppButton(
+              variant: AppButtonVariant.secondary,
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(t.chat.common.close),
+            ),
+          ],
+        );
+      },
+    ),
+  );
+}
+
+/// Opens the update dialog for one [target].
+Future<void> showUpdateDialog(BuildContext context, UpdateTarget target) => showDialog<void>(
+  context: context,
+  builder: (_) => UpdateDialog(target: target),
+);
+
+/// Button label for updating [target] ("Update app", "Update server", …).
+String updateTargetAction(Translations t, UpdateTarget target) => switch (target) {
+  UpdateTarget.app => t.common.update.updateApp,
+  UpdateTarget.web => t.common.update.updateWeb,
+  UpdateTarget.server => t.common.update.updateServer,
+};
+
+/// Short name of [target] ("This app", "Web interface", "Server").
+String updateTargetName(Translations t, UpdateTarget target) => switch (target) {
+  UpdateTarget.app => t.common.update.targetApp,
+  UpdateTarget.web => t.common.update.targetWeb,
+  UpdateTarget.server => t.common.update.targetServer,
+};
 
 enum UpdateBadgeVariant { icon, row }
 
@@ -128,11 +175,21 @@ class _PulseDotState extends State<_PulseDot> with SingleTickerProviderStateMixi
   );
 }
 
-/// Update flow dialog — states mirror `UpdateBadge.tsx`:
-/// confirm → updating → restarting (poll /health) → done | manual-restart,
-/// or failed with the server's error detail.
+/// Update flow for one [target] — confirm → updating → (restarting, polling
+/// `/health`) → done | manual restart | failed:
+///
+/// * [UpdateTarget.app] — Android hands a downloaded APK to the system
+///   installer; desktop stages the build in the background and installs it
+///   on quit ([_buildDesktop]);
+/// * [UpdateTarget.web] — the server replaces the web client it hosts, then
+///   the page reloads;
+/// * [UpdateTarget.server] — `POST /api/system/update` on a remote server
+///   (its launcher restarts it, or it asks for a manual restart); the desktop
+///   app's own local server is re-installed through [localServerProvider].
 class UpdateDialog extends ConsumerStatefulWidget {
-  const UpdateDialog({super.key});
+  const UpdateDialog({super.key, required this.target});
+
+  final UpdateTarget target;
 
   @override
   ConsumerState<UpdateDialog> createState() => _UpdateDialogState();
@@ -142,10 +199,14 @@ enum _Status { confirm, updating, restarting, done, manualRestart, failed, permi
 
 class _UpdateDialogState extends ConsumerState<UpdateDialog> {
   static const _pollInterval = Duration(seconds: 2);
-  static const _restartDeadline = Duration(seconds: 90);
+  static const _restartDeadline = Duration(seconds: 120);
+  // Long enough to read the result before the web tab reloads.
+  static const _reloadDelay = Duration(milliseconds: 1500);
 
   _Status _status = _Status.confirm;
   String _error = '';
+  // Result line shown in the done / manual-restart states.
+  String? _note;
   double _progress = 0;
   Timer? _poller;
 
@@ -156,37 +217,113 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
   }
 
   Future<void> _runUpdate() async {
-    // Desktop (Linux/Windows) stages the new build in the background and
-    // installs it on quit — the button only re-checks or applies a staged one.
-    if (isDesktopChannel(ref.read(appUpdateChannelProvider)) &&
-        ref.read(appUpdateAvailableProvider)) {
-      return _runDesktopUpdate();
+    switch (widget.target) {
+      case UpdateTarget.app:
+        if (isDesktopChannel(ref.read(appUpdateChannelProvider))) return _runDesktopUpdate();
+        final asset = ref.read(appUpdateAssetProvider);
+        if (asset != null) return _runAppUpdate(asset);
+        _fail(Translations.of(context).common.update.failed);
+      case UpdateTarget.web:
+        return _runWebUpdate();
+      case UpdateTarget.server:
+        if (ref.read(activeServerIsLocalProvider)) return _runLocalServerUpdate();
+        return _runServerUpdate();
     }
-    // Android can install a newer APK of this app itself; every other case is
-    // the connected server updating itself.
-    final asset = ref.read(appUpdateAssetProvider);
-    if (asset != null && ref.read(appUpdateAvailableProvider)) {
-      return _runAppUpdate(asset);
-    }
-    final repo = ref.read(systemRepositoryProvider);
+  }
+
+  void _fail(String error) {
+    if (!mounted) return;
     setState(() {
-      _status = _Status.updating;
-      _error = '';
+      _status = _Status.failed;
+      _error = error;
     });
+  }
+
+  void _startUpdating() => setState(() {
+    _status = _Status.updating;
+    _error = '';
+    _note = null;
+    _progress = 0;
+  });
+
+  /// Remote server: it updates itself and — when a launcher supervises it —
+  /// exits so the new version comes up; otherwise it asks for a restart.
+  Future<void> _runServerUpdate() async {
+    final t = Translations.of(context).common.update;
+    final repo = ref.read(systemRepositoryProvider);
+    final version = _latestVersion;
+    _startUpdating();
+    final Map<String, dynamic> result;
     try {
-      await repo.update();
-    } on Exception catch (e) {
-      if (mounted) {
-        setState(() {
-          _status = _Status.failed;
-          _error = e.toString();
-        });
-      }
-      return;
+      result = await repo.update();
+    } on Object catch (e) {
+      return _fail(e.toString());
     }
     if (!mounted) return;
-    setState(() => _status = _Status.restarting);
-    _pollForVersion(repo);
+    final webError = result['webError']?.toString();
+    if (result['upToDate'] == true) {
+      setState(() {
+        _status = _Status.done;
+        _note = t.upToDate;
+      });
+      return;
+    }
+    if (result['restarting'] != true) {
+      setState(() {
+        _status = _Status.manualRestart;
+        _note = [
+          result['staged'] == true ? t.staged(version: version) : t.manualRestart,
+          if (webError != null) t.webHostFailed(message: webError),
+        ].join('\n\n');
+      });
+      return;
+    }
+    setState(() {
+      _status = _Status.restarting;
+      _note = webError == null ? null : t.webHostFailed(message: webError);
+    });
+    _pollForVersion(repo, reloadWeb: kIsWeb && webError == null);
+  }
+
+  /// The web client the server hosts — replaced on the server, then reloaded.
+  Future<void> _runWebUpdate() async {
+    _startUpdating();
+    final Map<String, dynamic> result;
+    try {
+      result = await ref.read(systemRepositoryProvider).updateWeb();
+    } on Object catch (e) {
+      return _fail(e.toString());
+    }
+    if (!mounted) return;
+    if (result['success'] == false) return _fail(result['error']?.toString() ?? '');
+    setState(() {
+      _status = _Status.done;
+      _note = Translations.of(context).common.update.webDone(version: _latestVersion);
+    });
+    await Future<void>.delayed(_reloadDelay);
+    reloadClient();
+  }
+
+  /// The desktop app's own server ("This device"): download the new bundle
+  /// and restart it locally — the API self-update doesn't apply to it.
+  Future<void> _runLocalServerUpdate() async {
+    _startUpdating();
+    try {
+      await ref.read(localServerProvider.notifier).installAndStart();
+    } on Object catch (e) {
+      return _fail(e.toString());
+    }
+    if (!mounted) return;
+    ref.invalidate(serverHealthProvider);
+    setState(() {
+      _status = _Status.done;
+      _note = Translations.of(context).common.update.serverDone(version: _latestVersion);
+    });
+  }
+
+  String get _latestVersion {
+    final release = ref.read(latestReleaseProvider).value;
+    return release == null ? '?' : normalizeVersion(release.tagName);
   }
 
   /// Downloads the release APK and hands it to the Android installer. Android
@@ -195,11 +332,7 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
   Future<void> _runAppUpdate(ReleaseAsset asset) async {
     final installer = ref.read(appUpdateInstallerProvider);
     final t = Translations.of(context);
-    setState(() {
-      _status = _Status.updating;
-      _error = '';
-      _progress = 0;
-    });
+    _startUpdating();
     try {
       if (!await installer.canInstallPackages()) {
         await installer.openInstallPermissionSettings();
@@ -218,13 +351,7 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
         },
       );
     } on Exception catch (e) {
-      if (mounted) {
-        setState(() {
-          _status = _Status.failed;
-          _error = e.toString();
-        });
-      }
-      return;
+      return _fail(e.toString());
     }
     // The system installer now owns the screen; nothing left to show here.
     if (mounted) Navigator.of(context).pop();
@@ -248,17 +375,28 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
     if (!quitApp() && mounted) Navigator.of(context).pop();
   }
 
-  /// `/health` poll until the restarted process reports the new version —
-  /// 90s deadline then 'manual-restart' (same as web).
-  void _pollForVersion(SystemRepository repo) {
-    final latest = normalizeVersion(ref.read(latestReleaseProvider).value!.tagName);
+  /// `/health` poll until the restarted server reports the new version, then
+  /// done (and a web tab reloads onto the updated web client); a server that
+  /// never comes back within the deadline needs a manual restart.
+  void _pollForVersion(SystemRepository repo, {required bool reloadWeb}) {
+    final latest = _latestVersion;
     final deadline = DateTime.now().add(_restartDeadline);
     _poller = Timer.periodic(_pollInterval, (timer) async {
       try {
         final health = await repo.health();
         if (health['version']?.toString() == latest) {
           timer.cancel();
-          if (mounted) setState(() => _status = _Status.done);
+          ref.invalidate(serverHealthProvider);
+          if (!mounted) return;
+          final t = Translations.of(context).common.update;
+          setState(() {
+            _status = _Status.done;
+            _note = [t.serverDone(version: latest), ?_note].join('\n\n');
+          });
+          if (reloadWeb) {
+            await Future<void>.delayed(_reloadDelay);
+            reloadClient();
+          }
           return;
         }
       } on Object {
@@ -284,27 +422,33 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
     final version = release != null ? normalizeVersion(release.tagName) : '?';
 
     // Desktop self-update stages in the background and installs on quit, so its
-    // dialog is driven by [desktopUpdateProvider] rather than the poll-based
-    // server flow below.
-    if (isDesktopChannel(ref.watch(appUpdateChannelProvider)) &&
-        ref.watch(appUpdateAvailableProvider)) {
+    // dialog is driven by [desktopUpdateProvider] rather than the flow below.
+    if (widget.target == UpdateTarget.app &&
+        isDesktopChannel(ref.watch(appUpdateChannelProvider))) {
       return _buildDesktop(context, t, c, release, version);
     }
 
     final busy = _status == _Status.updating || _status == _Status.restarting;
+    final localServer =
+        widget.target == UpdateTarget.server && ref.watch(activeServerIsLocalProvider);
 
     final body = switch (_status) {
-      _Status.confirm =>
-        ref.watch(appUpdateAvailableProvider)
-            ? t.common.update.appConfirm(version: version)
-            : t.common.update.confirm(version: version),
+      _Status.confirm => switch (widget.target) {
+        UpdateTarget.app => t.common.update.appConfirm(version: version),
+        UpdateTarget.web => t.common.update.webConfirm(version: version),
+        UpdateTarget.server when localServer => t.common.update.localServerConfirm(
+          version: version,
+        ),
+        UpdateTarget.server => t.common.update.confirm(version: version),
+      },
+      _Status.updating when localServer => t.common.update.localServerUpdating,
       _Status.updating =>
         _progress > 0
             ? '${t.common.update.downloading} ${(_progress * 100).round()}%'
             : t.common.update.downloading,
-      _Status.restarting => t.common.update.restarting,
-      _Status.done => t.common.update.done(version: version),
-      _Status.manualRestart => t.common.update.manualRestart,
+      _Status.restarting => [t.common.update.restarting, ?_note].join('\n\n'),
+      _Status.done => _note ?? t.common.update.done(version: version),
+      _Status.manualRestart => _note ?? t.common.update.manualRestart,
       _Status.failed => _error.isNotEmpty ? _error : t.common.update.failed,
       _Status.permission => _error.isNotEmpty ? _error : t.common.update.failed,
     };
@@ -328,7 +472,7 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
       title: Text(
         _status == _Status.failed
             ? t.common.update.failedTitle
-            : t.common.update.available(version: version),
+            : '${updateTargetName(t, widget.target)} · v$version',
         style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
       ),
       content: ConstrainedBox(
@@ -350,11 +494,7 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (_status == _Status.confirm ||
-                _status == _Status.failed ||
-                _status == _Status.permission ||
-                _status == _Status.manualRestart ||
-                _status == _Status.done)
+            if (!busy)
               AppButton(
                 variant: AppButtonVariant.secondary,
                 onPressed: _close,
@@ -362,7 +502,7 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
               ),
             if (_status == _Status.confirm) ...[
               const SizedBox(width: 12),
-              AppButton(onPressed: _runUpdate, child: Text(t.common.buttons.update)),
+              AppButton(onPressed: _runUpdate, child: Text(updateTargetAction(t, widget.target))),
             ],
             if (_status == _Status.failed || _status == _Status.permission) ...[
               const SizedBox(width: 12),

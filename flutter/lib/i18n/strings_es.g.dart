@@ -2176,6 +2176,21 @@ class Translations$common$update$es extends Translations$common$update$en {
 	@override String get failedTitle => 'La actualización falló';
 	@override String appConfirm({required Object version}) => '¿Instalar ddagent v${version} en este dispositivo? Android te pedirá permiso para instalar apps desde ddagent la primera vez.';
 	@override String get appPermission => 'Permite «Instalar apps desconocidas» para ddagent y vuelve a pulsar Actualizar.';
+	@override String get chooseTitle => 'Actualizaciones disponibles';
+	@override String get targetApp => 'Esta app';
+	@override String get targetWeb => 'Interfaz web';
+	@override String get targetServer => 'Servidor';
+	@override String get updateApp => 'Actualizar app';
+	@override String get updateWeb => 'Actualizar interfaz web';
+	@override String get updateServer => 'Actualizar servidor';
+	@override String webConfirm({required Object version}) => '¿Actualizar la interfaz web a v${version}? La página se recargará después.';
+	@override String webDone({required Object version}) => 'Interfaz web actualizada a v${version} — recargando…';
+	@override String localServerConfirm({required Object version}) => '¿Actualizar el servidor local de este dispositivo a v${version}? Las sesiones activas se interrumpirán.';
+	@override String get localServerUpdating => 'Descargando e iniciando el servidor local…';
+	@override String serverDone({required Object version}) => 'El servidor ejecuta v${version}.';
+	@override String staged({required Object version}) => 'Actualización v${version} descargada — reinicia el servidor para instalarla.';
+	@override String get upToDate => 'El servidor ya tiene la última versión.';
+	@override String webHostFailed({required Object message}) => 'El servidor se actualizó, pero su interfaz web no: ${message}';
 }
 
 // Path: settings.changelog
@@ -2232,6 +2247,10 @@ class Translations$settings$updates$es extends Translations$settings$updates$en 
 	@override String get unavailable => 'La búsqueda de actualizaciones solo está disponible en builds de escritorio empaquetados.';
 	@override String error({required Object message}) => 'Error al buscar actualizaciones: ${message}';
 	@override String get errorGeneric => 'Error al buscar actualizaciones.';
+	@override String versionLine({required Object installed, required Object latest}) => 'v${installed} · última v${latest}';
+	@override String current({required Object version}) => 'v${version} — actualizada';
+	@override String webNotHosted({required Object version}) => 'Esta interfaz web se aloja por separado: sustituye sus archivos por ddagent-flutter-web-v${version}.zip de la versión.';
+	@override String get serverCannotUpdate => 'Este servidor no puede actualizarse desde aquí: reinstálalo con install.sh o con un tarball de la versión.';
 }
 
 // Path: settings.tabs
@@ -8147,6 +8166,21 @@ extension on TranslationsEs {
 			'common.update.failedTitle' => 'La actualización falló',
 			'common.update.appConfirm' => ({required Object version}) => '¿Instalar ddagent v${version} en este dispositivo? Android te pedirá permiso para instalar apps desde ddagent la primera vez.',
 			'common.update.appPermission' => 'Permite «Instalar apps desconocidas» para ddagent y vuelve a pulsar Actualizar.',
+			'common.update.chooseTitle' => 'Actualizaciones disponibles',
+			'common.update.targetApp' => 'Esta app',
+			'common.update.targetWeb' => 'Interfaz web',
+			'common.update.targetServer' => 'Servidor',
+			'common.update.updateApp' => 'Actualizar app',
+			'common.update.updateWeb' => 'Actualizar interfaz web',
+			'common.update.updateServer' => 'Actualizar servidor',
+			'common.update.webConfirm' => ({required Object version}) => '¿Actualizar la interfaz web a v${version}? La página se recargará después.',
+			'common.update.webDone' => ({required Object version}) => 'Interfaz web actualizada a v${version} — recargando…',
+			'common.update.localServerConfirm' => ({required Object version}) => '¿Actualizar el servidor local de este dispositivo a v${version}? Las sesiones activas se interrumpirán.',
+			'common.update.localServerUpdating' => 'Descargando e iniciando el servidor local…',
+			'common.update.serverDone' => ({required Object version}) => 'El servidor ejecuta v${version}.',
+			'common.update.staged' => ({required Object version}) => 'Actualización v${version} descargada — reinicia el servidor para instalarla.',
+			'common.update.upToDate' => 'El servidor ya tiene la última versión.',
+			'common.update.webHostFailed' => ({required Object message}) => 'El servidor se actualizó, pero su interfaz web no: ${message}',
 			'settings.title' => 'Ajustes',
 			'settings.changelog.title' => 'Registro de cambios',
 			'settings.changelog.loading' => 'Cargando…',
@@ -8177,6 +8211,10 @@ extension on TranslationsEs {
 			'settings.updates.unavailable' => 'La búsqueda de actualizaciones solo está disponible en builds de escritorio empaquetados.',
 			'settings.updates.error' => ({required Object message}) => 'Error al buscar actualizaciones: ${message}',
 			'settings.updates.errorGeneric' => 'Error al buscar actualizaciones.',
+			'settings.updates.versionLine' => ({required Object installed, required Object latest}) => 'v${installed} · última v${latest}',
+			'settings.updates.current' => ({required Object version}) => 'v${version} — actualizada',
+			'settings.updates.webNotHosted' => ({required Object version}) => 'Esta interfaz web se aloja por separado: sustituye sus archivos por ddagent-flutter-web-v${version}.zip de la versión.',
+			'settings.updates.serverCannotUpdate' => 'Este servidor no puede actualizarse desde aquí: reinstálalo con install.sh o con un tarball de la versión.',
 			'settings.tabs.account' => 'Cuenta',
 			'settings.tabs.permissions' => 'Permisos',
 			'settings.tabs.mcpServers' => 'Servidores MCP',
@@ -8520,6 +8558,8 @@ extension on TranslationsEs {
 			'settings.agents.account.commandcode.description' => 'Asistente CLI Command Code',
 			'settings.agents.account.antigravity.description' => 'Asistente CLI Antigravity',
 			'settings.agents.account.devin.description' => 'Asistente CLI Devin',
+			_ => null,
+		} ?? switch (path) {
 			'settings.agents.connectionStatus' => 'Estado de la conexión',
 			'settings.agents.login.title' => 'Iniciar sesión',
 			'settings.agents.login.reAuthenticate' => 'Volver a autenticar',
@@ -8539,8 +8579,6 @@ extension on TranslationsEs {
 			'settings.permissions.permissionMode.title' => 'Modo de permisos',
 			'settings.permissions.permissionMode.description' => ({required Object provider}) => 'Modo de permiso predeterminado para nuevas sesiones de ${provider}. Aún puedes anularlo para una sesión individual.',
 			'settings.permissions.permissionMode.modes.kDefault.title' => 'Por defecto',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.kDefault.description' => 'Las acciones que necesitan permiso se te muestran para aprobación en el chat.',
 			'settings.permissions.permissionMode.modes.auto.title' => 'Modo automático',
 			'settings.permissions.permissionMode.modes.auto.description' => 'Un clasificador del modelo decide en cada llamada si aprobar o denegar. Sin intervención, pero más seguro que Omitir — las denegaciones siguen ocurriendo.',
@@ -9034,6 +9072,8 @@ extension on TranslationsEs {
 			'tasks.nextTask.noPending' => 'No hay tareas pendientes',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI no está configurado',
 			'tasks.nextTask.review' => 'Revisar',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.startTask' => 'Iniciar tarea',
 			'tasks.nextTask.taskId' => ({required Object id}) => 'Tarea ${id}',
 			'tasks.nextTask.viewAll' => 'Ver todas las tareas',
@@ -9053,8 +9093,6 @@ extension on TranslationsEs {
 			'tasks.taskDetail.implDetails' => 'Detalles de implementación',
 			'tasks.taskDetail.noDependencies' => 'Sin dependencias',
 			'tasks.taskDetail.noDescription' => 'Sin descripción',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.priority' => 'Prioridad',
 			'tasks.taskDetail.priorityNotSet' => 'No definida',
 			'tasks.taskDetail.save' => 'Guardar',

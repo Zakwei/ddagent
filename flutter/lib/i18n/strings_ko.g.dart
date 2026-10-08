@@ -2175,6 +2175,21 @@ class Translations$common$update$ko extends Translations$common$update$en {
 	@override String get failedTitle => '업데이트 실패';
 	@override String appConfirm({required Object version}) => '이 기기에 ddagent v${version}을(를) 설치할까요? 처음에는 Android가 ddagent의 앱 설치를 허용할지 물습니다.';
 	@override String get appPermission => 'ddagent에 \'알 수 없는 앱 설치\'를 허용한 뒤 업데이트를 다시 누르세요.';
+	@override String get chooseTitle => '업데이트 가능';
+	@override String get targetApp => '이 앱';
+	@override String get targetWeb => '웹 인터페이스';
+	@override String get targetServer => '서버';
+	@override String get updateApp => '앱 업데이트';
+	@override String get updateWeb => '웹 인터페이스 업데이트';
+	@override String get updateServer => '서버 업데이트';
+	@override String webConfirm({required Object version}) => '웹 인터페이스를 v${version}(으)로 업데이트할까요? 업데이트 후 페이지가 새로 고쳐집니다.';
+	@override String webDone({required Object version}) => '웹 인터페이스를 v${version}(으)로 업데이트했습니다 — 새로 고치는 중…';
+	@override String localServerConfirm({required Object version}) => '이 기기의 로컬 서버를 v${version}(으)로 업데이트할까요? 진행 중인 세션이 중단됩니다.';
+	@override String get localServerUpdating => '로컬 서버를 다운로드하고 시작하는 중…';
+	@override String serverDone({required Object version}) => '서버가 v${version}에서 실행 중입니다.';
+	@override String staged({required Object version}) => '업데이트 v${version}을(를) 다운로드했습니다 — 설치하려면 서버를 재시작하세요.';
+	@override String get upToDate => '서버가 이미 최신 릴리스입니다.';
+	@override String webHostFailed({required Object message}) => '서버는 업데이트되었지만 웹 인터페이스는 업데이트되지 않았습니다: ${message}';
 }
 
 // Path: settings.changelog
@@ -2231,6 +2246,10 @@ class Translations$settings$updates$ko extends Translations$settings$updates$en 
 	@override String get unavailable => '업데이트 확인은 패키지된 데스크톱 빌드에서만 사용할 수 있습니다.';
 	@override String error({required Object message}) => '업데이트 확인 실패: ${message}';
 	@override String get errorGeneric => '업데이트 확인에 실패했습니다.';
+	@override String versionLine({required Object installed, required Object latest}) => 'v${installed} · 최신 v${latest}';
+	@override String current({required Object version}) => 'v${version} — 최신 상태';
+	@override String webNotHosted({required Object version}) => '이 웹 인터페이스는 별도로 호스팅됩니다. 릴리스의 ddagent-flutter-web-v${version}.zip으로 파일을 교체하세요.';
+	@override String get serverCannotUpdate => '이 서버는 여기서 스스로 업데이트할 수 없습니다. install.sh나 릴리스 tarball로 다시 설치하세요.';
 }
 
 // Path: settings.tabs
@@ -8146,6 +8165,21 @@ extension on TranslationsKo {
 			'common.update.failedTitle' => '업데이트 실패',
 			'common.update.appConfirm' => ({required Object version}) => '이 기기에 ddagent v${version}을(를) 설치할까요? 처음에는 Android가 ddagent의 앱 설치를 허용할지 물습니다.',
 			'common.update.appPermission' => 'ddagent에 \'알 수 없는 앱 설치\'를 허용한 뒤 업데이트를 다시 누르세요.',
+			'common.update.chooseTitle' => '업데이트 가능',
+			'common.update.targetApp' => '이 앱',
+			'common.update.targetWeb' => '웹 인터페이스',
+			'common.update.targetServer' => '서버',
+			'common.update.updateApp' => '앱 업데이트',
+			'common.update.updateWeb' => '웹 인터페이스 업데이트',
+			'common.update.updateServer' => '서버 업데이트',
+			'common.update.webConfirm' => ({required Object version}) => '웹 인터페이스를 v${version}(으)로 업데이트할까요? 업데이트 후 페이지가 새로 고쳐집니다.',
+			'common.update.webDone' => ({required Object version}) => '웹 인터페이스를 v${version}(으)로 업데이트했습니다 — 새로 고치는 중…',
+			'common.update.localServerConfirm' => ({required Object version}) => '이 기기의 로컬 서버를 v${version}(으)로 업데이트할까요? 진행 중인 세션이 중단됩니다.',
+			'common.update.localServerUpdating' => '로컬 서버를 다운로드하고 시작하는 중…',
+			'common.update.serverDone' => ({required Object version}) => '서버가 v${version}에서 실행 중입니다.',
+			'common.update.staged' => ({required Object version}) => '업데이트 v${version}을(를) 다운로드했습니다 — 설치하려면 서버를 재시작하세요.',
+			'common.update.upToDate' => '서버가 이미 최신 릴리스입니다.',
+			'common.update.webHostFailed' => ({required Object message}) => '서버는 업데이트되었지만 웹 인터페이스는 업데이트되지 않았습니다: ${message}',
 			'settings.title' => '설정',
 			'settings.changelog.title' => '변경 로그',
 			'settings.changelog.loading' => '로딩 중…',
@@ -8176,6 +8210,10 @@ extension on TranslationsKo {
 			'settings.updates.unavailable' => '업데이트 확인은 패키지된 데스크톱 빌드에서만 사용할 수 있습니다.',
 			'settings.updates.error' => ({required Object message}) => '업데이트 확인 실패: ${message}',
 			'settings.updates.errorGeneric' => '업데이트 확인에 실패했습니다.',
+			'settings.updates.versionLine' => ({required Object installed, required Object latest}) => 'v${installed} · 최신 v${latest}',
+			'settings.updates.current' => ({required Object version}) => 'v${version} — 최신 상태',
+			'settings.updates.webNotHosted' => ({required Object version}) => '이 웹 인터페이스는 별도로 호스팅됩니다. 릴리스의 ddagent-flutter-web-v${version}.zip으로 파일을 교체하세요.',
+			'settings.updates.serverCannotUpdate' => '이 서버는 여기서 스스로 업데이트할 수 없습니다. install.sh나 릴리스 tarball로 다시 설치하세요.',
 			'settings.tabs.account' => '계정',
 			'settings.tabs.permissions' => '권한',
 			'settings.tabs.mcpServers' => 'MCP 서버',
@@ -8519,6 +8557,8 @@ extension on TranslationsKo {
 			'settings.agents.account.commandcode.description' => 'Command Code CLI 어시스턴트',
 			'settings.agents.account.antigravity.description' => 'Antigravity CLI 어시스턴트',
 			'settings.agents.account.devin.description' => 'Devin CLI 어시스턴트',
+			_ => null,
+		} ?? switch (path) {
 			'settings.agents.connectionStatus' => '연결 상태',
 			'settings.agents.login.title' => '로그인',
 			'settings.agents.login.reAuthenticate' => '재인증',
@@ -8538,8 +8578,6 @@ extension on TranslationsKo {
 			'settings.permissions.permissionMode.title' => '권한 모드',
 			'settings.permissions.permissionMode.description' => ({required Object provider}) => '새 ${provider} 세션의 기본 권한 모드. 개별 세션에서 재정의할 수 있습니다.',
 			'settings.permissions.permissionMode.modes.kDefault.title' => '기본',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.kDefault.description' => '권한이 필요한 작업은 채팅에서 승인을 위해 표시됩니다.',
 			'settings.permissions.permissionMode.modes.auto.title' => '자동 모드',
 			'settings.permissions.permissionMode.modes.auto.description' => '모델 분류기가 도구 호출마다 승인 또는 거부를 결정합니다. 높은 자율성.',
@@ -9033,6 +9071,8 @@ extension on TranslationsKo {
 			'tasks.nextTask.noPending' => '대기 중인 작업 없음',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI가 구성되지 않았습니다',
 			'tasks.nextTask.review' => '검토',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.startTask' => '작업 시작',
 			'tasks.nextTask.taskId' => ({required Object id}) => '작업 ${id}',
 			'tasks.nextTask.viewAll' => '모든 작업 보기',
@@ -9052,8 +9092,6 @@ extension on TranslationsKo {
 			'tasks.taskDetail.implDetails' => '구현 세부 정보',
 			'tasks.taskDetail.noDependencies' => '종속성 없음',
 			'tasks.taskDetail.noDescription' => '설명 없음',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.priority' => '우선순위',
 			'tasks.taskDetail.priorityNotSet' => '설정되지 않음',
 			'tasks.taskDetail.save' => '저장',

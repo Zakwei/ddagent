@@ -1665,7 +1665,22 @@
       "failed": "Update failed.",
       "failedTitle": "Update failed",
       "appConfirm": "Install ddagent v{{version}} on this device? Android will ask you to allow installs from ddagent the first time.",
-      "appPermission": "Allow “Install unknown apps” for ddagent, then tap Update again."
+      "appPermission": "Allow “Install unknown apps” for ddagent, then tap Update again.",
+      "chooseTitle": "Updates available",
+      "targetApp": "This app",
+      "targetWeb": "Web interface",
+      "targetServer": "Server",
+      "updateApp": "Update app",
+      "updateWeb": "Update web interface",
+      "updateServer": "Update server",
+      "webConfirm": "Update the web interface to v{{version}}? The page reloads afterwards.",
+      "webDone": "Web interface updated to v{{version}} — reloading…",
+      "localServerConfirm": "Update the local server on this device to v{{version}}? Active sessions will be interrupted.",
+      "localServerUpdating": "Downloading and starting the local server…",
+      "serverDone": "The server runs v{{version}}.",
+      "staged": "Update v{{version}} downloaded — restart the server to install it.",
+      "upToDate": "The server is already on the latest release.",
+      "webHostFailed": "The server was updated, but its web interface was not: {{message}}"
     }
   },
   "settings": {
@@ -1706,7 +1721,11 @@
       "downloaded": "Update v{{version}} downloaded — quit and relaunch ddagent to install.",
       "unavailable": "Update checks are only available in packaged desktop builds.",
       "error": "Update check failed: {{message}}",
-      "errorGeneric": "Update check failed."
+      "errorGeneric": "Update check failed.",
+      "versionLine": "v{{installed}} · latest v{{latest}}",
+      "current": "v{{version}} — up to date",
+      "webNotHosted": "This web interface is hosted separately — replace its files with ddagent-flutter-web-v{{version}}.zip from the release.",
+      "serverCannotUpdate": "This server cannot update itself from here — reinstall it with install.sh or a release tarball."
     },
     "tabs": {
       "account": "Account",

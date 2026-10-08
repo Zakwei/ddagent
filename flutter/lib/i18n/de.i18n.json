@@ -1497,7 +1497,22 @@
       "failed": "Update fehlgeschlagen.",
       "failedTitle": "Update fehlgeschlagen",
       "appConfirm": "ddagent v{{version}} auf diesem Gerät installieren? Android fragt beim ersten Mal, ob Installationen aus ddagent erlaubt sind.",
-      "appPermission": "Erlaube ddagent „Unbekannte Apps installieren“ und tippe dann erneut auf Aktualisieren."
+      "appPermission": "Erlaube ddagent „Unbekannte Apps installieren“ und tippe dann erneut auf Aktualisieren.",
+      "chooseTitle": "Updates verfügbar",
+      "targetApp": "Diese App",
+      "targetWeb": "Weboberfläche",
+      "targetServer": "Server",
+      "updateApp": "App aktualisieren",
+      "updateWeb": "Weboberfläche aktualisieren",
+      "updateServer": "Server aktualisieren",
+      "webConfirm": "Weboberfläche auf v{{version}} aktualisieren? Die Seite wird danach neu geladen.",
+      "webDone": "Weboberfläche auf v{{version}} aktualisiert — wird neu geladen…",
+      "localServerConfirm": "Den lokalen Server auf diesem Gerät auf v{{version}} aktualisieren? Laufende Sitzungen werden unterbrochen.",
+      "localServerUpdating": "Lokaler Server wird heruntergeladen und gestartet…",
+      "serverDone": "Der Server läuft mit v{{version}}.",
+      "staged": "Update v{{version}} heruntergeladen — starte den Server neu, um es zu installieren.",
+      "upToDate": "Der Server ist bereits auf der neuesten Version.",
+      "webHostFailed": "Der Server wurde aktualisiert, seine Weboberfläche aber nicht: {{message}}"
     }
   },
   "settings": {
@@ -1535,7 +1550,11 @@
       "downloaded": "Update v{{version}} heruntergeladen — ddagent beenden und neu starten, um es zu installieren.",
       "unavailable": "Die Update-Prüfung ist nur in paketierten Desktop-Builds verfügbar.",
       "error": "Update-Prüfung fehlgeschlagen: {{message}}",
-      "errorGeneric": "Update-Prüfung fehlgeschlagen."
+      "errorGeneric": "Update-Prüfung fehlgeschlagen.",
+      "versionLine": "v{{installed}} · neueste v{{latest}}",
+      "current": "v{{version}} — aktuell",
+      "webNotHosted": "Diese Weboberfläche wird separat gehostet — ersetze ihre Dateien durch ddagent-flutter-web-v{{version}}.zip aus dem Release.",
+      "serverCannotUpdate": "Dieser Server kann sich von hier aus nicht selbst aktualisieren — installiere ihn mit install.sh oder einem Release-Tarball neu."
     },
     "tabs": {
       "account": "Konto",

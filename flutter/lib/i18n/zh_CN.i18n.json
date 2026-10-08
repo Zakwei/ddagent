@@ -1496,7 +1496,22 @@
       "failed": "更新失败。",
       "failedTitle": "更新失败",
       "appConfirm": "要在此设备上安装 ddagent v{{version}} 吗？首次安装时 Android 会请求允许从 ddagent 安装应用。",
-      "appPermission": "请为 ddagent 允许“安装未知应用”，然后再次点击更新。"
+      "appPermission": "请为 ddagent 允许“安装未知应用”，然后再次点击更新。",
+      "chooseTitle": "有可用更新",
+      "targetApp": "此应用",
+      "targetWeb": "Web 界面",
+      "targetServer": "服务器",
+      "updateApp": "更新应用",
+      "updateWeb": "更新 Web 界面",
+      "updateServer": "更新服务器",
+      "webConfirm": "将 Web 界面更新到 v{{version}}？更新后页面会重新加载。",
+      "webDone": "Web 界面已更新到 v{{version}} — 正在重新加载…",
+      "localServerConfirm": "将此设备上的本地服务器更新到 v{{version}}？正在进行的会话会被中断。",
+      "localServerUpdating": "正在下载并启动本地服务器…",
+      "serverDone": "服务器正在运行 v{{version}}。",
+      "staged": "已下载更新 v{{version}} — 请重启服务器以完成安装。",
+      "upToDate": "服务器已是最新版本。",
+      "webHostFailed": "服务器已更新，但其 Web 界面未更新：{{message}}"
     }
   },
   "settings": {
@@ -1534,7 +1549,11 @@
       "downloaded": "更新 v{{version}} 已下载 — 退出并重新启动 ddagent 即可安装。",
       "unavailable": "更新检查仅在打包的桌面版本中可用。",
       "error": "更新检查失败：{{message}}",
-      "errorGeneric": "更新检查失败。"
+      "errorGeneric": "更新检查失败。",
+      "versionLine": "v{{installed}} · 最新 v{{latest}}",
+      "current": "v{{version}} — 已是最新",
+      "webNotHosted": "此 Web 界面单独托管——请用发布中的 ddagent-flutter-web-v{{version}}.zip 替换其文件。",
+      "serverCannotUpdate": "此服务器无法在这里自行更新——请用 install.sh 或发布的 tarball 重新安装。"
     },
     "tabs": {
       "account": "账户",

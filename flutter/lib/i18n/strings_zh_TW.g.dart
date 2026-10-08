@@ -2175,6 +2175,21 @@ class Translations$common$update$zh_TW extends Translations$common$update$en {
 	@override String get failedTitle => '更新失敗';
 	@override String appConfirm({required Object version}) => '要在此裝置上安裝 ddagent v${version} 嗎？首次安裝時 Android 會要求允許從 ddagent 安裝應用程式。';
 	@override String get appPermission => '請為 ddagent 允許「安裝未知應用程式」，然後再次點選更新。';
+	@override String get chooseTitle => '有可用的更新';
+	@override String get targetApp => '此應用程式';
+	@override String get targetWeb => 'Web 介面';
+	@override String get targetServer => '伺服器';
+	@override String get updateApp => '更新應用程式';
+	@override String get updateWeb => '更新 Web 介面';
+	@override String get updateServer => '更新伺服器';
+	@override String webConfirm({required Object version}) => '要將 Web 介面更新到 v${version} 嗎？更新後頁面會重新載入。';
+	@override String webDone({required Object version}) => 'Web 介面已更新到 v${version} — 正在重新載入…';
+	@override String localServerConfirm({required Object version}) => '要將此裝置上的本機伺服器更新到 v${version} 嗎？進行中的工作階段會被中斷。';
+	@override String get localServerUpdating => '正在下載並啟動本機伺服器…';
+	@override String serverDone({required Object version}) => '伺服器正在執行 v${version}。';
+	@override String staged({required Object version}) => '已下載更新 v${version} — 請重新啟動伺服器以完成安裝。';
+	@override String get upToDate => '伺服器已是最新版本。';
+	@override String webHostFailed({required Object message}) => '伺服器已更新，但其 Web 介面沒有更新：${message}';
 }
 
 // Path: settings.changelog
@@ -2231,6 +2246,10 @@ class Translations$settings$updates$zh_TW extends Translations$settings$updates$
 	@override String get unavailable => '更新檢查僅在打包的桌面版本中可用。';
 	@override String error({required Object message}) => '更新檢查失敗：${message}';
 	@override String get errorGeneric => '更新檢查失敗。';
+	@override String versionLine({required Object installed, required Object latest}) => 'v${installed} · 最新 v${latest}';
+	@override String current({required Object version}) => 'v${version} — 已是最新';
+	@override String webNotHosted({required Object version}) => '此 Web 介面另外託管——請以發行版中的 ddagent-flutter-web-v${version}.zip 取代其檔案。';
+	@override String get serverCannotUpdate => '此伺服器無法在這裡自行更新——請用 install.sh 或發行版的 tarball 重新安裝。';
 }
 
 // Path: settings.tabs
@@ -8146,6 +8165,21 @@ extension on TranslationsZhTw {
 			'common.update.failedTitle' => '更新失敗',
 			'common.update.appConfirm' => ({required Object version}) => '要在此裝置上安裝 ddagent v${version} 嗎？首次安裝時 Android 會要求允許從 ddagent 安裝應用程式。',
 			'common.update.appPermission' => '請為 ddagent 允許「安裝未知應用程式」，然後再次點選更新。',
+			'common.update.chooseTitle' => '有可用的更新',
+			'common.update.targetApp' => '此應用程式',
+			'common.update.targetWeb' => 'Web 介面',
+			'common.update.targetServer' => '伺服器',
+			'common.update.updateApp' => '更新應用程式',
+			'common.update.updateWeb' => '更新 Web 介面',
+			'common.update.updateServer' => '更新伺服器',
+			'common.update.webConfirm' => ({required Object version}) => '要將 Web 介面更新到 v${version} 嗎？更新後頁面會重新載入。',
+			'common.update.webDone' => ({required Object version}) => 'Web 介面已更新到 v${version} — 正在重新載入…',
+			'common.update.localServerConfirm' => ({required Object version}) => '要將此裝置上的本機伺服器更新到 v${version} 嗎？進行中的工作階段會被中斷。',
+			'common.update.localServerUpdating' => '正在下載並啟動本機伺服器…',
+			'common.update.serverDone' => ({required Object version}) => '伺服器正在執行 v${version}。',
+			'common.update.staged' => ({required Object version}) => '已下載更新 v${version} — 請重新啟動伺服器以完成安裝。',
+			'common.update.upToDate' => '伺服器已是最新版本。',
+			'common.update.webHostFailed' => ({required Object message}) => '伺服器已更新，但其 Web 介面沒有更新：${message}',
 			'settings.title' => '設定',
 			'settings.changelog.title' => '更新日誌',
 			'settings.changelog.loading' => '載入中…',
@@ -8176,6 +8210,10 @@ extension on TranslationsZhTw {
 			'settings.updates.unavailable' => '更新檢查僅在打包的桌面版本中可用。',
 			'settings.updates.error' => ({required Object message}) => '更新檢查失敗：${message}',
 			'settings.updates.errorGeneric' => '更新檢查失敗。',
+			'settings.updates.versionLine' => ({required Object installed, required Object latest}) => 'v${installed} · 最新 v${latest}',
+			'settings.updates.current' => ({required Object version}) => 'v${version} — 已是最新',
+			'settings.updates.webNotHosted' => ({required Object version}) => '此 Web 介面另外託管——請以發行版中的 ddagent-flutter-web-v${version}.zip 取代其檔案。',
+			'settings.updates.serverCannotUpdate' => '此伺服器無法在這裡自行更新——請用 install.sh 或發行版的 tarball 重新安裝。',
 			'settings.tabs.account' => '帳戶',
 			'settings.tabs.permissions' => '權限',
 			'settings.tabs.mcpServers' => 'MCP 伺服器',
@@ -8519,6 +8557,8 @@ extension on TranslationsZhTw {
 			'settings.agents.account.commandcode.description' => 'Command Code CLI 助手',
 			'settings.agents.account.antigravity.description' => 'Antigravity CLI 助手',
 			'settings.agents.account.devin.description' => 'Devin CLI 助手',
+			_ => null,
+		} ?? switch (path) {
 			'settings.agents.connectionStatus' => '連線狀態',
 			'settings.agents.login.title' => '登入',
 			'settings.agents.login.reAuthenticate' => '重新驗證',
@@ -8538,8 +8578,6 @@ extension on TranslationsZhTw {
 			'settings.permissions.permissionMode.title' => '權限模式',
 			'settings.permissions.permissionMode.description' => ({required Object provider}) => '新 ${provider} 工作階段的預設權限模式。你仍可為單一工作階段覆寫。',
 			'settings.permissions.permissionMode.modes.kDefault.title' => '預設',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.kDefault.description' => '需要權限的操作會在聊天中顯示供你核准。',
 			'settings.permissions.permissionMode.modes.auto.title' => '自動模式',
 			'settings.permissions.permissionMode.modes.auto.description' => '由模型分類器針對每次工具呼叫決定核准或拒絕。免手動操作，但比 Bypass 安全——仍可能發生拒絕。',
@@ -9033,6 +9071,8 @@ extension on TranslationsZhTw {
 			'tasks.nextTask.noPending' => '沒有待處理任務',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI 未設定',
 			'tasks.nextTask.review' => '審查',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.startTask' => '開始任務',
 			'tasks.nextTask.taskId' => ({required Object id}) => '任務 ${id}',
 			'tasks.nextTask.viewAll' => '檢視所有任務',
@@ -9052,8 +9092,6 @@ extension on TranslationsZhTw {
 			'tasks.taskDetail.implDetails' => '實作細節',
 			'tasks.taskDetail.noDependencies' => '無依賴項',
 			'tasks.taskDetail.noDescription' => '無描述',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.priority' => '優先級',
 			'tasks.taskDetail.priorityNotSet' => '未設定',
 			'tasks.taskDetail.save' => '儲存',

@@ -2176,6 +2176,21 @@ class Translations$common$update$de extends Translations$common$update$en {
 	@override String get failedTitle => 'Update fehlgeschlagen';
 	@override String appConfirm({required Object version}) => 'ddagent v${version} auf diesem Gerät installieren? Android fragt beim ersten Mal, ob Installationen aus ddagent erlaubt sind.';
 	@override String get appPermission => 'Erlaube ddagent „Unbekannte Apps installieren“ und tippe dann erneut auf Aktualisieren.';
+	@override String get chooseTitle => 'Updates verfügbar';
+	@override String get targetApp => 'Diese App';
+	@override String get targetWeb => 'Weboberfläche';
+	@override String get targetServer => 'Server';
+	@override String get updateApp => 'App aktualisieren';
+	@override String get updateWeb => 'Weboberfläche aktualisieren';
+	@override String get updateServer => 'Server aktualisieren';
+	@override String webConfirm({required Object version}) => 'Weboberfläche auf v${version} aktualisieren? Die Seite wird danach neu geladen.';
+	@override String webDone({required Object version}) => 'Weboberfläche auf v${version} aktualisiert — wird neu geladen…';
+	@override String localServerConfirm({required Object version}) => 'Den lokalen Server auf diesem Gerät auf v${version} aktualisieren? Laufende Sitzungen werden unterbrochen.';
+	@override String get localServerUpdating => 'Lokaler Server wird heruntergeladen und gestartet…';
+	@override String serverDone({required Object version}) => 'Der Server läuft mit v${version}.';
+	@override String staged({required Object version}) => 'Update v${version} heruntergeladen — starte den Server neu, um es zu installieren.';
+	@override String get upToDate => 'Der Server ist bereits auf der neuesten Version.';
+	@override String webHostFailed({required Object message}) => 'Der Server wurde aktualisiert, seine Weboberfläche aber nicht: ${message}';
 }
 
 // Path: settings.changelog
@@ -2232,6 +2247,10 @@ class Translations$settings$updates$de extends Translations$settings$updates$en 
 	@override String get unavailable => 'Die Update-Prüfung ist nur in paketierten Desktop-Builds verfügbar.';
 	@override String error({required Object message}) => 'Update-Prüfung fehlgeschlagen: ${message}';
 	@override String get errorGeneric => 'Update-Prüfung fehlgeschlagen.';
+	@override String versionLine({required Object installed, required Object latest}) => 'v${installed} · neueste v${latest}';
+	@override String current({required Object version}) => 'v${version} — aktuell';
+	@override String webNotHosted({required Object version}) => 'Diese Weboberfläche wird separat gehostet — ersetze ihre Dateien durch ddagent-flutter-web-v${version}.zip aus dem Release.';
+	@override String get serverCannotUpdate => 'Dieser Server kann sich von hier aus nicht selbst aktualisieren — installiere ihn mit install.sh oder einem Release-Tarball neu.';
 }
 
 // Path: settings.tabs
@@ -8147,6 +8166,21 @@ extension on TranslationsDe {
 			'common.update.failedTitle' => 'Update fehlgeschlagen',
 			'common.update.appConfirm' => ({required Object version}) => 'ddagent v${version} auf diesem Gerät installieren? Android fragt beim ersten Mal, ob Installationen aus ddagent erlaubt sind.',
 			'common.update.appPermission' => 'Erlaube ddagent „Unbekannte Apps installieren“ und tippe dann erneut auf Aktualisieren.',
+			'common.update.chooseTitle' => 'Updates verfügbar',
+			'common.update.targetApp' => 'Diese App',
+			'common.update.targetWeb' => 'Weboberfläche',
+			'common.update.targetServer' => 'Server',
+			'common.update.updateApp' => 'App aktualisieren',
+			'common.update.updateWeb' => 'Weboberfläche aktualisieren',
+			'common.update.updateServer' => 'Server aktualisieren',
+			'common.update.webConfirm' => ({required Object version}) => 'Weboberfläche auf v${version} aktualisieren? Die Seite wird danach neu geladen.',
+			'common.update.webDone' => ({required Object version}) => 'Weboberfläche auf v${version} aktualisiert — wird neu geladen…',
+			'common.update.localServerConfirm' => ({required Object version}) => 'Den lokalen Server auf diesem Gerät auf v${version} aktualisieren? Laufende Sitzungen werden unterbrochen.',
+			'common.update.localServerUpdating' => 'Lokaler Server wird heruntergeladen und gestartet…',
+			'common.update.serverDone' => ({required Object version}) => 'Der Server läuft mit v${version}.',
+			'common.update.staged' => ({required Object version}) => 'Update v${version} heruntergeladen — starte den Server neu, um es zu installieren.',
+			'common.update.upToDate' => 'Der Server ist bereits auf der neuesten Version.',
+			'common.update.webHostFailed' => ({required Object message}) => 'Der Server wurde aktualisiert, seine Weboberfläche aber nicht: ${message}',
 			'settings.title' => 'Einstellungen',
 			'settings.changelog.title' => 'Änderungsprotokoll',
 			'settings.changelog.loading' => 'Laden…',
@@ -8177,6 +8211,10 @@ extension on TranslationsDe {
 			'settings.updates.unavailable' => 'Die Update-Prüfung ist nur in paketierten Desktop-Builds verfügbar.',
 			'settings.updates.error' => ({required Object message}) => 'Update-Prüfung fehlgeschlagen: ${message}',
 			'settings.updates.errorGeneric' => 'Update-Prüfung fehlgeschlagen.',
+			'settings.updates.versionLine' => ({required Object installed, required Object latest}) => 'v${installed} · neueste v${latest}',
+			'settings.updates.current' => ({required Object version}) => 'v${version} — aktuell',
+			'settings.updates.webNotHosted' => ({required Object version}) => 'Diese Weboberfläche wird separat gehostet — ersetze ihre Dateien durch ddagent-flutter-web-v${version}.zip aus dem Release.',
+			'settings.updates.serverCannotUpdate' => 'Dieser Server kann sich von hier aus nicht selbst aktualisieren — installiere ihn mit install.sh oder einem Release-Tarball neu.',
 			'settings.tabs.account' => 'Konto',
 			'settings.tabs.permissions' => 'Berechtigungen',
 			'settings.tabs.mcpServers' => 'MCP-Server',
@@ -8520,6 +8558,8 @@ extension on TranslationsDe {
 			'settings.agents.account.commandcode.description' => 'Command Code CLI-Assistent',
 			'settings.agents.account.antigravity.description' => 'Antigravity CLI-Assistent',
 			'settings.agents.account.devin.description' => 'Devin CLI-Assistent',
+			_ => null,
+		} ?? switch (path) {
 			'settings.agents.connectionStatus' => 'Verbindungsstatus',
 			'settings.agents.login.title' => 'Anmelden',
 			'settings.agents.login.reAuthenticate' => 'Erneut authentifizieren',
@@ -8539,8 +8579,6 @@ extension on TranslationsDe {
 			'settings.permissions.permissionMode.title' => 'Berechtigungsmodus',
 			'settings.permissions.permissionMode.description' => ({required Object provider}) => 'Standard-Berechtigungsmodus für neue ${provider}-Sitzungen. Du kannst ihn für eine einzelne Sitzung noch überschreiben.',
 			'settings.permissions.permissionMode.modes.kDefault.title' => 'Standard',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.kDefault.description' => 'Aktionen, die eine Berechtigung benötigen, werden dir im Chat zur Genehmigung gezeigt.',
 			'settings.permissions.permissionMode.modes.auto.title' => 'Auto-Modus',
 			'settings.permissions.permissionMode.modes.auto.description' => 'Ein Modell-Klassifizierer entscheidet pro Tool-Aufruf, ob genehmigt oder abgelehnt wird. Hohe Autonomie.',
@@ -9034,6 +9072,8 @@ extension on TranslationsDe {
 			'tasks.nextTask.noPending' => 'Keine ausstehenden Aufgaben',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI ist nicht konfiguriert',
 			'tasks.nextTask.review' => 'Überprüfen',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.startTask' => 'Aufgabe starten',
 			'tasks.nextTask.taskId' => ({required Object id}) => 'Aufgabe ${id}',
 			'tasks.nextTask.viewAll' => 'Alle Aufgaben anzeigen',
@@ -9053,8 +9093,6 @@ extension on TranslationsDe {
 			'tasks.taskDetail.implDetails' => 'Implementierungsdetails',
 			'tasks.taskDetail.noDependencies' => 'Keine Abhängigkeiten',
 			'tasks.taskDetail.noDescription' => 'Keine Beschreibung vorhanden',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.priority' => 'Priorität',
 			'tasks.taskDetail.priorityNotSet' => 'Nicht gesetzt',
 			'tasks.taskDetail.save' => 'Speichern',

@@ -2175,6 +2175,21 @@ class Translations$common$update$zh_CN extends Translations$common$update$en {
 	@override String get failedTitle => '更新失败';
 	@override String appConfirm({required Object version}) => '要在此设备上安装 ddagent v${version} 吗？首次安装时 Android 会请求允许从 ddagent 安装应用。';
 	@override String get appPermission => '请为 ddagent 允许“安装未知应用”，然后再次点击更新。';
+	@override String get chooseTitle => '有可用更新';
+	@override String get targetApp => '此应用';
+	@override String get targetWeb => 'Web 界面';
+	@override String get targetServer => '服务器';
+	@override String get updateApp => '更新应用';
+	@override String get updateWeb => '更新 Web 界面';
+	@override String get updateServer => '更新服务器';
+	@override String webConfirm({required Object version}) => '将 Web 界面更新到 v${version}？更新后页面会重新加载。';
+	@override String webDone({required Object version}) => 'Web 界面已更新到 v${version} — 正在重新加载…';
+	@override String localServerConfirm({required Object version}) => '将此设备上的本地服务器更新到 v${version}？正在进行的会话会被中断。';
+	@override String get localServerUpdating => '正在下载并启动本地服务器…';
+	@override String serverDone({required Object version}) => '服务器正在运行 v${version}。';
+	@override String staged({required Object version}) => '已下载更新 v${version} — 请重启服务器以完成安装。';
+	@override String get upToDate => '服务器已是最新版本。';
+	@override String webHostFailed({required Object message}) => '服务器已更新，但其 Web 界面未更新：${message}';
 }
 
 // Path: settings.changelog
@@ -2231,6 +2246,10 @@ class Translations$settings$updates$zh_CN extends Translations$settings$updates$
 	@override String get unavailable => '更新检查仅在打包的桌面版本中可用。';
 	@override String error({required Object message}) => '更新检查失败：${message}';
 	@override String get errorGeneric => '更新检查失败。';
+	@override String versionLine({required Object installed, required Object latest}) => 'v${installed} · 最新 v${latest}';
+	@override String current({required Object version}) => 'v${version} — 已是最新';
+	@override String webNotHosted({required Object version}) => '此 Web 界面单独托管——请用发布中的 ddagent-flutter-web-v${version}.zip 替换其文件。';
+	@override String get serverCannotUpdate => '此服务器无法在这里自行更新——请用 install.sh 或发布的 tarball 重新安装。';
 }
 
 // Path: settings.tabs
@@ -8146,6 +8165,21 @@ extension on TranslationsZhCn {
 			'common.update.failedTitle' => '更新失败',
 			'common.update.appConfirm' => ({required Object version}) => '要在此设备上安装 ddagent v${version} 吗？首次安装时 Android 会请求允许从 ddagent 安装应用。',
 			'common.update.appPermission' => '请为 ddagent 允许“安装未知应用”，然后再次点击更新。',
+			'common.update.chooseTitle' => '有可用更新',
+			'common.update.targetApp' => '此应用',
+			'common.update.targetWeb' => 'Web 界面',
+			'common.update.targetServer' => '服务器',
+			'common.update.updateApp' => '更新应用',
+			'common.update.updateWeb' => '更新 Web 界面',
+			'common.update.updateServer' => '更新服务器',
+			'common.update.webConfirm' => ({required Object version}) => '将 Web 界面更新到 v${version}？更新后页面会重新加载。',
+			'common.update.webDone' => ({required Object version}) => 'Web 界面已更新到 v${version} — 正在重新加载…',
+			'common.update.localServerConfirm' => ({required Object version}) => '将此设备上的本地服务器更新到 v${version}？正在进行的会话会被中断。',
+			'common.update.localServerUpdating' => '正在下载并启动本地服务器…',
+			'common.update.serverDone' => ({required Object version}) => '服务器正在运行 v${version}。',
+			'common.update.staged' => ({required Object version}) => '已下载更新 v${version} — 请重启服务器以完成安装。',
+			'common.update.upToDate' => '服务器已是最新版本。',
+			'common.update.webHostFailed' => ({required Object message}) => '服务器已更新，但其 Web 界面未更新：${message}',
 			'settings.title' => '设置',
 			'settings.changelog.title' => '更新日志',
 			'settings.changelog.loading' => '加载中…',
@@ -8176,6 +8210,10 @@ extension on TranslationsZhCn {
 			'settings.updates.unavailable' => '更新检查仅在打包的桌面版本中可用。',
 			'settings.updates.error' => ({required Object message}) => '更新检查失败：${message}',
 			'settings.updates.errorGeneric' => '更新检查失败。',
+			'settings.updates.versionLine' => ({required Object installed, required Object latest}) => 'v${installed} · 最新 v${latest}',
+			'settings.updates.current' => ({required Object version}) => 'v${version} — 已是最新',
+			'settings.updates.webNotHosted' => ({required Object version}) => '此 Web 界面单独托管——请用发布中的 ddagent-flutter-web-v${version}.zip 替换其文件。',
+			'settings.updates.serverCannotUpdate' => '此服务器无法在这里自行更新——请用 install.sh 或发布的 tarball 重新安装。',
 			'settings.tabs.account' => '账户',
 			'settings.tabs.permissions' => '权限',
 			'settings.tabs.mcpServers' => 'MCP 服务器',
@@ -8519,6 +8557,8 @@ extension on TranslationsZhCn {
 			'settings.agents.account.commandcode.description' => 'Command Code CLI 助手',
 			'settings.agents.account.antigravity.description' => 'Antigravity CLI 助手',
 			'settings.agents.account.devin.description' => 'Devin CLI 助手',
+			_ => null,
+		} ?? switch (path) {
 			'settings.agents.connectionStatus' => '连接状态',
 			'settings.agents.login.title' => '登录',
 			'settings.agents.login.reAuthenticate' => '重新认证',
@@ -8538,8 +8578,6 @@ extension on TranslationsZhCn {
 			'settings.permissions.permissionMode.title' => '权限模式',
 			'settings.permissions.permissionMode.description' => ({required Object provider}) => '新 ${provider} 会话的默认权限模式。你仍可为单个会话覆盖。',
 			'settings.permissions.permissionMode.modes.kDefault.title' => '默认',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.kDefault.description' => '需要权限的操作会在聊天中显示供你批准。',
 			'settings.permissions.permissionMode.modes.auto.title' => '自动模式',
 			'settings.permissions.permissionMode.modes.auto.description' => '模型分类器决定每个工具调用是批准还是拒绝。高自主性。',
@@ -9033,6 +9071,8 @@ extension on TranslationsZhCn {
 			'tasks.nextTask.noPending' => '没有待处理任务',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI 未配置',
 			'tasks.nextTask.review' => '审查',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.startTask' => '开始任务',
 			'tasks.nextTask.taskId' => ({required Object id}) => '任务 ${id}',
 			'tasks.nextTask.viewAll' => '查看所有任务',
@@ -9052,8 +9092,6 @@ extension on TranslationsZhCn {
 			'tasks.taskDetail.implDetails' => '实现细节',
 			'tasks.taskDetail.noDependencies' => '无依赖项',
 			'tasks.taskDetail.noDescription' => '无描述',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.priority' => '优先级',
 			'tasks.taskDetail.priorityNotSet' => '未设置',
 			'tasks.taskDetail.save' => '保存',

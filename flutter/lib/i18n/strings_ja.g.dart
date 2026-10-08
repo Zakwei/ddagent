@@ -2175,6 +2175,21 @@ class Translations$common$update$ja extends Translations$common$update$en {
 	@override String get failedTitle => '更新に失敗しました';
 	@override String appConfirm({required Object version}) => 'この端末に ddagent v${version} をインストールしますか？ 初回は Android が ddagent からのインストール許可を求めます。';
 	@override String get appPermission => 'ddagent に「提供元不明のアプリ」のインストールを許可してから、もう一度「更新」をタップしてください。';
+	@override String get chooseTitle => 'アップデートがあります';
+	@override String get targetApp => 'このアプリ';
+	@override String get targetWeb => 'Web インターフェイス';
+	@override String get targetServer => 'サーバー';
+	@override String get updateApp => 'アプリを更新';
+	@override String get updateWeb => 'Web インターフェイスを更新';
+	@override String get updateServer => 'サーバーを更新';
+	@override String webConfirm({required Object version}) => 'Web インターフェイスを v${version} に更新しますか？更新後にページが再読み込みされます。';
+	@override String webDone({required Object version}) => 'Web インターフェイスを v${version} に更新しました — 再読み込みしています…';
+	@override String localServerConfirm({required Object version}) => 'このデバイスのローカルサーバーを v${version} に更新しますか？実行中のセッションは中断されます。';
+	@override String get localServerUpdating => 'ローカルサーバーをダウンロードして起動しています…';
+	@override String serverDone({required Object version}) => 'サーバーは v${version} で動作しています。';
+	@override String staged({required Object version}) => 'アップデート v${version} をダウンロードしました — インストールするにはサーバーを再起動してください。';
+	@override String get upToDate => 'サーバーはすでに最新のリリースです。';
+	@override String webHostFailed({required Object message}) => 'サーバーは更新されましたが、Web インターフェイスは更新されませんでした：${message}';
 }
 
 // Path: settings.changelog
@@ -2231,6 +2246,10 @@ class Translations$settings$updates$ja extends Translations$settings$updates$en 
 	@override String get unavailable => '更新チェックはパッケージ済みデスクトップビルドでのみ利用できます。';
 	@override String error({required Object message}) => '更新チェックに失敗しました: ${message}';
 	@override String get errorGeneric => '更新チェックに失敗しました。';
+	@override String versionLine({required Object installed, required Object latest}) => 'v${installed} · 最新 v${latest}';
+	@override String current({required Object version}) => 'v${version} — 最新です';
+	@override String webNotHosted({required Object version}) => 'この Web インターフェイスは別にホストされています。リリースの ddagent-flutter-web-v${version}.zip でファイルを置き換えてください。';
+	@override String get serverCannotUpdate => 'このサーバーはここから自動更新できません。install.sh またはリリースの tarball で再インストールしてください。';
 }
 
 // Path: settings.tabs
@@ -8146,6 +8165,21 @@ extension on TranslationsJa {
 			'common.update.failedTitle' => '更新に失敗しました',
 			'common.update.appConfirm' => ({required Object version}) => 'この端末に ddagent v${version} をインストールしますか？ 初回は Android が ddagent からのインストール許可を求めます。',
 			'common.update.appPermission' => 'ddagent に「提供元不明のアプリ」のインストールを許可してから、もう一度「更新」をタップしてください。',
+			'common.update.chooseTitle' => 'アップデートがあります',
+			'common.update.targetApp' => 'このアプリ',
+			'common.update.targetWeb' => 'Web インターフェイス',
+			'common.update.targetServer' => 'サーバー',
+			'common.update.updateApp' => 'アプリを更新',
+			'common.update.updateWeb' => 'Web インターフェイスを更新',
+			'common.update.updateServer' => 'サーバーを更新',
+			'common.update.webConfirm' => ({required Object version}) => 'Web インターフェイスを v${version} に更新しますか？更新後にページが再読み込みされます。',
+			'common.update.webDone' => ({required Object version}) => 'Web インターフェイスを v${version} に更新しました — 再読み込みしています…',
+			'common.update.localServerConfirm' => ({required Object version}) => 'このデバイスのローカルサーバーを v${version} に更新しますか？実行中のセッションは中断されます。',
+			'common.update.localServerUpdating' => 'ローカルサーバーをダウンロードして起動しています…',
+			'common.update.serverDone' => ({required Object version}) => 'サーバーは v${version} で動作しています。',
+			'common.update.staged' => ({required Object version}) => 'アップデート v${version} をダウンロードしました — インストールするにはサーバーを再起動してください。',
+			'common.update.upToDate' => 'サーバーはすでに最新のリリースです。',
+			'common.update.webHostFailed' => ({required Object message}) => 'サーバーは更新されましたが、Web インターフェイスは更新されませんでした：${message}',
 			'settings.title' => '設定',
 			'settings.changelog.title' => '変更履歴',
 			'settings.changelog.loading' => '読み込み中…',
@@ -8176,6 +8210,10 @@ extension on TranslationsJa {
 			'settings.updates.unavailable' => '更新チェックはパッケージ済みデスクトップビルドでのみ利用できます。',
 			'settings.updates.error' => ({required Object message}) => '更新チェックに失敗しました: ${message}',
 			'settings.updates.errorGeneric' => '更新チェックに失敗しました。',
+			'settings.updates.versionLine' => ({required Object installed, required Object latest}) => 'v${installed} · 最新 v${latest}',
+			'settings.updates.current' => ({required Object version}) => 'v${version} — 最新です',
+			'settings.updates.webNotHosted' => ({required Object version}) => 'この Web インターフェイスは別にホストされています。リリースの ddagent-flutter-web-v${version}.zip でファイルを置き換えてください。',
+			'settings.updates.serverCannotUpdate' => 'このサーバーはここから自動更新できません。install.sh またはリリースの tarball で再インストールしてください。',
 			'settings.tabs.account' => 'アカウント',
 			'settings.tabs.permissions' => '権限',
 			'settings.tabs.mcpServers' => 'MCPサーバー',
@@ -8519,6 +8557,8 @@ extension on TranslationsJa {
 			'settings.agents.account.commandcode.description' => 'Command Code CLI アシスタント',
 			'settings.agents.account.antigravity.description' => 'Antigravity CLI アシスタント',
 			'settings.agents.account.devin.description' => 'Devin CLI アシスタント',
+			_ => null,
+		} ?? switch (path) {
 			'settings.agents.connectionStatus' => '接続状態',
 			'settings.agents.login.title' => 'ログイン',
 			'settings.agents.login.reAuthenticate' => '再認証',
@@ -8538,8 +8578,6 @@ extension on TranslationsJa {
 			'settings.permissions.permissionMode.title' => '権限モード',
 			'settings.permissions.permissionMode.description' => ({required Object provider}) => '新しい ${provider} セッションのデフォルト権限モード。個別のセッションで上書きできます。',
 			'settings.permissions.permissionMode.modes.kDefault.title' => 'デフォルト',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.kDefault.description' => '権限が必要なアクションはチャットで承認のために表示されます。',
 			'settings.permissions.permissionMode.modes.auto.title' => '自動モード',
 			'settings.permissions.permissionMode.modes.auto.description' => 'モデル分類器がツール呼び出しごとに承認または拒否を決定します。高い自律性。',
@@ -9033,6 +9071,8 @@ extension on TranslationsJa {
 			'tasks.nextTask.noPending' => '保留中のタスクはありません',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI が設定されていません',
 			'tasks.nextTask.review' => '確認',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.startTask' => 'タスクを開始',
 			'tasks.nextTask.taskId' => ({required Object id}) => 'タスク ${id}',
 			'tasks.nextTask.viewAll' => 'すべてのタスクを表示',
@@ -9052,8 +9092,6 @@ extension on TranslationsJa {
 			'tasks.taskDetail.implDetails' => '実装の詳細',
 			'tasks.taskDetail.noDependencies' => '依存関係なし',
 			'tasks.taskDetail.noDescription' => '説明がありません',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.priority' => '優先度',
 			'tasks.taskDetail.priorityNotSet' => '未設定',
 			'tasks.taskDetail.save' => '保存',

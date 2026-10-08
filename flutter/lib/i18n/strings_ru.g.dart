@@ -2178,6 +2178,21 @@ class Translations$common$update$ru extends Translations$common$update$en {
 	@override String get failedTitle => 'Не удалось обновить';
 	@override String appConfirm({required Object version}) => 'Установить ddagent v${version} на это устройство? При первом запуске Android запросит разрешение на установку приложений из ddagent.';
 	@override String get appPermission => 'Разрешите ddagent «Установка неизвестных приложений», затем снова нажмите «Обновить».';
+	@override String get chooseTitle => 'Доступны обновления';
+	@override String get targetApp => 'Это приложение';
+	@override String get targetWeb => 'Веб-интерфейс';
+	@override String get targetServer => 'Сервер';
+	@override String get updateApp => 'Обновить приложение';
+	@override String get updateWeb => 'Обновить веб-интерфейс';
+	@override String get updateServer => 'Обновить сервер';
+	@override String webConfirm({required Object version}) => 'Обновить веб-интерфейс до v${version}? После обновления страница перезагрузится.';
+	@override String webDone({required Object version}) => 'Веб-интерфейс обновлён до v${version} — перезагружаю…';
+	@override String localServerConfirm({required Object version}) => 'Обновить локальный сервер на этом устройстве до v${version}? Активные сессии будут прерваны.';
+	@override String get localServerUpdating => 'Загружаю и запускаю локальный сервер…';
+	@override String serverDone({required Object version}) => 'Сервер работает на v${version}.';
+	@override String staged({required Object version}) => 'Обновление v${version} загружено — перезапустите сервер, чтобы установить его.';
+	@override String get upToDate => 'На сервере уже последний релиз.';
+	@override String webHostFailed({required Object message}) => 'Сервер обновлён, а его веб-интерфейс — нет: ${message}';
 }
 
 // Path: settings.changelog
@@ -2234,6 +2249,10 @@ class Translations$settings$updates$ru extends Translations$settings$updates$en 
 	@override String get unavailable => 'Проверка обновлений доступна только в упакованных десктопных сборках.';
 	@override String error({required Object message}) => 'Не удалось проверить обновления: ${message}';
 	@override String get errorGeneric => 'Не удалось проверить обновления.';
+	@override String versionLine({required Object installed, required Object latest}) => 'v${installed} · последняя v${latest}';
+	@override String current({required Object version}) => 'v${version} — актуальна';
+	@override String webNotHosted({required Object version}) => 'Этот веб-интерфейс размещён отдельно — замените его файлы на ddagent-flutter-web-v${version}.zip из релиза.';
+	@override String get serverCannotUpdate => 'Этот сервер не может обновиться отсюда — переустановите его через install.sh или из архива релиза.';
 }
 
 // Path: settings.tabs
@@ -8155,6 +8174,21 @@ extension on TranslationsRu {
 			'common.update.failedTitle' => 'Не удалось обновить',
 			'common.update.appConfirm' => ({required Object version}) => 'Установить ddagent v${version} на это устройство? При первом запуске Android запросит разрешение на установку приложений из ddagent.',
 			'common.update.appPermission' => 'Разрешите ddagent «Установка неизвестных приложений», затем снова нажмите «Обновить».',
+			'common.update.chooseTitle' => 'Доступны обновления',
+			'common.update.targetApp' => 'Это приложение',
+			'common.update.targetWeb' => 'Веб-интерфейс',
+			'common.update.targetServer' => 'Сервер',
+			'common.update.updateApp' => 'Обновить приложение',
+			'common.update.updateWeb' => 'Обновить веб-интерфейс',
+			'common.update.updateServer' => 'Обновить сервер',
+			'common.update.webConfirm' => ({required Object version}) => 'Обновить веб-интерфейс до v${version}? После обновления страница перезагрузится.',
+			'common.update.webDone' => ({required Object version}) => 'Веб-интерфейс обновлён до v${version} — перезагружаю…',
+			'common.update.localServerConfirm' => ({required Object version}) => 'Обновить локальный сервер на этом устройстве до v${version}? Активные сессии будут прерваны.',
+			'common.update.localServerUpdating' => 'Загружаю и запускаю локальный сервер…',
+			'common.update.serverDone' => ({required Object version}) => 'Сервер работает на v${version}.',
+			'common.update.staged' => ({required Object version}) => 'Обновление v${version} загружено — перезапустите сервер, чтобы установить его.',
+			'common.update.upToDate' => 'На сервере уже последний релиз.',
+			'common.update.webHostFailed' => ({required Object message}) => 'Сервер обновлён, а его веб-интерфейс — нет: ${message}',
 			'settings.title' => 'Настройки',
 			'settings.changelog.title' => 'Журнал изменений',
 			'settings.changelog.loading' => 'Загрузка…',
@@ -8185,6 +8219,10 @@ extension on TranslationsRu {
 			'settings.updates.unavailable' => 'Проверка обновлений доступна только в упакованных десктопных сборках.',
 			'settings.updates.error' => ({required Object message}) => 'Не удалось проверить обновления: ${message}',
 			'settings.updates.errorGeneric' => 'Не удалось проверить обновления.',
+			'settings.updates.versionLine' => ({required Object installed, required Object latest}) => 'v${installed} · последняя v${latest}',
+			'settings.updates.current' => ({required Object version}) => 'v${version} — актуальна',
+			'settings.updates.webNotHosted' => ({required Object version}) => 'Этот веб-интерфейс размещён отдельно — замените его файлы на ddagent-flutter-web-v${version}.zip из релиза.',
+			'settings.updates.serverCannotUpdate' => 'Этот сервер не может обновиться отсюда — переустановите его через install.sh или из архива релиза.',
 			'settings.tabs.account' => 'Аккаунт',
 			'settings.tabs.permissions' => 'Разрешения',
 			'settings.tabs.mcpServers' => 'MCP серверы',
@@ -8528,6 +8566,8 @@ extension on TranslationsRu {
 			'settings.agents.account.commandcode.description' => 'CLI-ассистент Command Code',
 			'settings.agents.account.antigravity.description' => 'CLI-ассистент Antigravity',
 			'settings.agents.account.devin.description' => 'CLI-ассистент Devin',
+			_ => null,
+		} ?? switch (path) {
 			'settings.agents.connectionStatus' => 'Статус подключения',
 			'settings.agents.login.title' => 'Вход',
 			'settings.agents.login.reAuthenticate' => 'Повторная аутентификация',
@@ -8547,8 +8587,6 @@ extension on TranslationsRu {
 			'settings.permissions.permissionMode.title' => 'Режим разрешений',
 			'settings.permissions.permissionMode.description' => ({required Object provider}) => 'Режим разрешений по умолчанию для новых сессий ${provider}. Его всё ещё можно переопределить для отдельной сессии.',
 			'settings.permissions.permissionMode.modes.kDefault.title' => 'По умолчанию',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.kDefault.description' => 'Действия, требующие разрешения, показываются вам для одобрения в чате.',
 			'settings.permissions.permissionMode.modes.auto.title' => 'Авторежим',
 			'settings.permissions.permissionMode.modes.auto.description' => 'Классификатор модели решает для каждого вызова инструмента, одобрить или отклонить. Высокая автономность.',
@@ -9042,6 +9080,8 @@ extension on TranslationsRu {
 			'tasks.nextTask.noPending' => 'Нет ожидающих задач',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI не настроен',
 			'tasks.nextTask.review' => 'Проверить',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.startTask' => 'Начать задачу',
 			'tasks.nextTask.taskId' => ({required Object id}) => 'Задача ${id}',
 			'tasks.nextTask.viewAll' => 'Все задачи',
@@ -9061,8 +9101,6 @@ extension on TranslationsRu {
 			'tasks.taskDetail.implDetails' => 'Детали реализации',
 			'tasks.taskDetail.noDependencies' => 'Нет зависимостей',
 			'tasks.taskDetail.noDescription' => 'Описание отсутствует',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.priority' => 'Приоритет',
 			'tasks.taskDetail.priorityNotSet' => 'Не задан',
 			'tasks.taskDetail.save' => 'Сохранить',

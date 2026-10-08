@@ -49,8 +49,34 @@ class SystemRepository {
     return [for (final r in list) Release.fromJson(r as Map<String, dynamic>)];
   });
 
-  /// Triggers server self-update (spawn + exit on the server side).
-  Future<void> update() => apiCall(() => _dio.post<dynamic>('/api/system/update'), (_) {});
+  /// Triggers the server self-update. The reply says what happened:
+  /// `restarting` (the server exits and its launcher brings the new version
+  /// up), `staged` (a release tarball was downloaded for the next start),
+  /// `upToDate`, and `webError` when the hosted web client failed to update.
+  Future<Map<String, dynamic>> update() => apiCall(
+    () => _dio.post<dynamic>('/api/system/update'),
+    (d) => d as Map<String, dynamic>? ?? const {},
+  );
+
+  /// Replaces the web client this server hosts with the newest release.
+  Future<Map<String, dynamic>> updateWeb() => apiCall(
+    () => _dio.post<dynamic>('/api/system/update-web'),
+    (d) => d as Map<String, dynamic>? ?? const {},
+  );
+
+  /// What the server can update from the UI — `{installMode, server:
+  /// {canUpdate, method, supervised}, web: {hosted, version}}`. Null for
+  /// servers older than 0.8.13, which don't report it.
+  Future<Map<String, dynamic>?> updateInfo() async {
+    try {
+      return await apiCall(
+        () => _dio.get<dynamic>('/api/system/update-info'),
+        (d) => d as Map<String, dynamic>?,
+      );
+    } on Object {
+      return null;
+    }
+  }
 
   /// Restarts the server process; the connection drops — callers should treat
   /// a transport error here as "restart in progress", not failure.

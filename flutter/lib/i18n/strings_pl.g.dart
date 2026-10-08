@@ -2244,6 +2244,21 @@ class Translations$common$update$pl extends Translations$common$update$en {
 	@override String get failedTitle => 'Aktualizacja nie powiodła się';
 	@override String appConfirm({required Object version}) => 'Zainstalować ddagent v${version} na tym urządzeniu? Android za pierwszym razem zapyta o zgodę na instalowanie aplikacji z ddagent.';
 	@override String get appPermission => 'Zezwól ddagent na „Instalowanie nieznanych aplikacji”, a potem dotknij ponownie Aktualizuj.';
+	@override String get chooseTitle => 'Dostępne aktualizacje';
+	@override String get targetApp => 'Ta aplikacja';
+	@override String get targetWeb => 'Interfejs web';
+	@override String get targetServer => 'Serwer';
+	@override String get updateApp => 'Aktualizuj aplikację';
+	@override String get updateWeb => 'Aktualizuj interfejs web';
+	@override String get updateServer => 'Aktualizuj serwer';
+	@override String webConfirm({required Object version}) => 'Zaktualizować interfejs web do v${version}? Strona przeładuje się po aktualizacji.';
+	@override String webDone({required Object version}) => 'Interfejs web zaktualizowany do v${version} — przeładowuję…';
+	@override String localServerConfirm({required Object version}) => 'Zaktualizować lokalny serwer na tym urządzeniu do v${version}? Trwające sesje zostaną przerwane.';
+	@override String get localServerUpdating => 'Pobieram i uruchamiam lokalny serwer…';
+	@override String serverDone({required Object version}) => 'Serwer działa w wersji v${version}.';
+	@override String staged({required Object version}) => 'Pobrano aktualizację v${version} — zrestartuj serwer, aby ją zainstalować.';
+	@override String get upToDate => 'Serwer ma już najnowsze wydanie.';
+	@override String webHostFailed({required Object message}) => 'Serwer został zaktualizowany, ale jego interfejs web nie: ${message}';
 }
 
 // Path: settings.changelog
@@ -2303,6 +2318,10 @@ class Translations$settings$updates$pl extends Translations$settings$updates$en 
 	@override String get unavailable => 'Sprawdzanie aktualizacji dostępne tylko w spakietowanej aplikacji desktopowej.';
 	@override String error({required Object message}) => 'Sprawdzanie aktualizacji nie powiodło się: ${message}';
 	@override String get errorGeneric => 'Sprawdzanie aktualizacji nie powiodło się.';
+	@override String versionLine({required Object installed, required Object latest}) => 'v${installed} · najnowsza v${latest}';
+	@override String current({required Object version}) => 'v${version} — aktualna';
+	@override String webNotHosted({required Object version}) => 'Ten interfejs web jest hostowany osobno — podmień jego pliki na ddagent-flutter-web-v${version}.zip z wydania.';
+	@override String get serverCannotUpdate => 'Ten serwer nie może zaktualizować się stąd — zainstaluj go ponownie przez install.sh albo z tarballa wydania.';
 }
 
 // Path: settings.tabs
@@ -8676,6 +8695,21 @@ extension on TranslationsPl {
 			'common.update.failedTitle' => 'Aktualizacja nie powiodła się',
 			'common.update.appConfirm' => ({required Object version}) => 'Zainstalować ddagent v${version} na tym urządzeniu? Android za pierwszym razem zapyta o zgodę na instalowanie aplikacji z ddagent.',
 			'common.update.appPermission' => 'Zezwól ddagent na „Instalowanie nieznanych aplikacji”, a potem dotknij ponownie Aktualizuj.',
+			'common.update.chooseTitle' => 'Dostępne aktualizacje',
+			'common.update.targetApp' => 'Ta aplikacja',
+			'common.update.targetWeb' => 'Interfejs web',
+			'common.update.targetServer' => 'Serwer',
+			'common.update.updateApp' => 'Aktualizuj aplikację',
+			'common.update.updateWeb' => 'Aktualizuj interfejs web',
+			'common.update.updateServer' => 'Aktualizuj serwer',
+			'common.update.webConfirm' => ({required Object version}) => 'Zaktualizować interfejs web do v${version}? Strona przeładuje się po aktualizacji.',
+			'common.update.webDone' => ({required Object version}) => 'Interfejs web zaktualizowany do v${version} — przeładowuję…',
+			'common.update.localServerConfirm' => ({required Object version}) => 'Zaktualizować lokalny serwer na tym urządzeniu do v${version}? Trwające sesje zostaną przerwane.',
+			'common.update.localServerUpdating' => 'Pobieram i uruchamiam lokalny serwer…',
+			'common.update.serverDone' => ({required Object version}) => 'Serwer działa w wersji v${version}.',
+			'common.update.staged' => ({required Object version}) => 'Pobrano aktualizację v${version} — zrestartuj serwer, aby ją zainstalować.',
+			'common.update.upToDate' => 'Serwer ma już najnowsze wydanie.',
+			'common.update.webHostFailed' => ({required Object message}) => 'Serwer został zaktualizowany, ale jego interfejs web nie: ${message}',
 			'settings.title' => 'Ustawienia',
 			'settings.changelog.title' => 'Dziennik zmian',
 			'settings.changelog.loading' => 'Ładowanie…',
@@ -8709,6 +8743,10 @@ extension on TranslationsPl {
 			'settings.updates.unavailable' => 'Sprawdzanie aktualizacji dostępne tylko w spakietowanej aplikacji desktopowej.',
 			'settings.updates.error' => ({required Object message}) => 'Sprawdzanie aktualizacji nie powiodło się: ${message}',
 			'settings.updates.errorGeneric' => 'Sprawdzanie aktualizacji nie powiodło się.',
+			'settings.updates.versionLine' => ({required Object installed, required Object latest}) => 'v${installed} · najnowsza v${latest}',
+			'settings.updates.current' => ({required Object version}) => 'v${version} — aktualna',
+			'settings.updates.webNotHosted' => ({required Object version}) => 'Ten interfejs web jest hostowany osobno — podmień jego pliki na ddagent-flutter-web-v${version}.zip z wydania.',
+			'settings.updates.serverCannotUpdate' => 'Ten serwer nie może zaktualizować się stąd — zainstaluj go ponownie przez install.sh albo z tarballa wydania.',
 			'settings.tabs.account' => 'Konto',
 			'settings.tabs.permissions' => 'Uprawnienia',
 			'settings.tabs.mcpServers' => 'Serwery MCP',
@@ -8945,6 +8983,8 @@ extension on TranslationsPl {
 			'settings.mcpForm.fields.url' => 'URL',
 			'settings.mcpForm.fields.envVars' => 'Zmienne środowiskowe (KLUCZ=wartość, po jednej w wierszu)',
 			'settings.mcpForm.fields.headers' => 'Nagłówki (KLUCZ=wartość, po jednym w wierszu)',
+			_ => null,
+		} ?? switch (path) {
 			'settings.mcpForm.fields.selectProject' => 'Wybierz projekt...',
 			'settings.mcpForm.placeholders.serverName' => 'my-server',
 			'settings.mcpForm.validation.missingType' => 'Brak wymaganego pola: type',
@@ -8964,8 +9004,6 @@ extension on TranslationsPl {
 			'settings.saveStatus.error' => 'Nie udało się zapisać ustawień',
 			'settings.saveStatus.saving' => 'Zapisywanie...',
 			'settings.footerActions.save' => 'Zapisz ustawienia',
-			_ => null,
-		} ?? switch (path) {
 			'settings.footerActions.cancel' => 'Anuluj',
 			'settings.git.title' => 'Konfiguracja Git',
 			'settings.git.description' => 'Skonfiguruj swoją tożsamość Git do commitów. Te ustawienia zostaną zastosowane globalnie przez git config --global',
@@ -9459,6 +9497,8 @@ extension on TranslationsPl {
 			'sidebar.zones.recent' => 'Ostatnio używane',
 			'sidebar.zones.today' => 'Dzisiaj',
 			'sidebar.zones.yesterday' => 'Wczoraj',
+			_ => null,
+		} ?? switch (path) {
 			'sidebar.zones.thisWeek' => 'W tym tygodniu',
 			'sidebar.zones.showMore' => ({required Object count}) => 'Pokaż jeszcze ${count}',
 			'sidebar.zones.showLess' => 'Pokaż mniej',
@@ -9478,8 +9518,6 @@ extension on TranslationsPl {
 			'tasks.notConfigured.initializeButton' => 'Zainicjuj TaskMaster AI',
 			'tasks.notConfigured.writePrdFirst' => 'Najpierw napisz PRD',
 			'tasks.gettingStarted.title' => 'Pierwsze kroki z TaskMaster',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.gettingStarted.subtitle' => 'TaskMaster został zainicjowany! Oto co zrobić dalej:',
 			'tasks.gettingStarted.steps.createPRD.title' => 'Utwórz dokument wymagań produktu (PRD)',
 			'tasks.gettingStarted.steps.createPRD.description' => 'Omów swój pomysł na projekt i utwórz PRD opisujące, co chcesz zbudować.',
@@ -9973,6 +10011,8 @@ extension on TranslationsPl {
 			'quota.section.config' => 'Konfiguracja',
 			'scheduler.checking' => 'Sprawdzanie…',
 			'scheduler.cronHint' => 'Cron (min godz dzień mies dzień-tyg) — np. 0 9 * * *',
+			_ => null,
+		} ?? switch (path) {
 			'scheduler.deleteMessage' => ({required Object id}) => 'Spowoduje to usunięcie zadania cyklicznego ${id}. Istniejące sesje zostaną zachowane.',
 			'scheduler.deleteTitle' => 'Usunąć harmonogram?',
 			'scheduler.editTitle' => 'Edytuj harmonogram',
@@ -9992,8 +10032,6 @@ extension on TranslationsPl {
 			'serverConnect.enterUrl' => 'Wpisz adres URL serwera',
 			'serverConnect.local.title' => 'To urządzenie',
 			'serverConnect.local.subtitle' => 'Uruchom serwer ddagent na tym komputerze',
-			_ => null,
-		} ?? switch (path) {
 			'serverConnect.local.install' => 'Zainstaluj serwer lokalny',
 			'serverConnect.local.start' => 'Uruchom serwer lokalny',
 			'serverConnect.local.stop' => 'Zatrzymaj',

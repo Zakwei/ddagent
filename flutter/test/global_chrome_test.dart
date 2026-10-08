@@ -106,7 +106,7 @@ void main() {
       await tester.tap(find.byIcon(LucideIcons.circleArrowUp));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
-      expect(find.text('Update'), findsOneWidget);
+      expect(find.text('Update server'), findsOneWidget);
       expect(find.textContaining('v1.3.0'), findsWidgets);
     });
   });

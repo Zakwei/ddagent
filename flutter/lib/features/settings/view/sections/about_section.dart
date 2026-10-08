@@ -6,7 +6,8 @@ import 'package:ddagent_app/core/utils/app_reload.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/core/widgets/app_markdown.dart';
-import 'package:ddagent_app/core/widgets/update_badge.dart' show UpdateDialog;
+import 'package:ddagent_app/core/widgets/update_badge.dart'
+    show showUpdateDialog, updateTargetAction;
 import 'package:ddagent_app/features/server_connect/data/server_profiles.dart';
 import 'package:ddagent_app/features/settings/state/locale_controller.dart';
 import 'package:ddagent_app/features/settings/view/sections/general_section.dart';
@@ -16,12 +17,13 @@ import 'package:ddagent_app/features/system/state/system_providers.dart';
 import 'package:ddagent_app/features/system/state/update_controller.dart'
     show
         DesktopUpdateStage,
-        appUpdateAvailableProvider,
+        UpdateTarget,
+        activeServerIsLocalProvider,
         appUpdateChannelProvider,
         appVersionProvider,
+        availableUpdatesProvider,
         desktopUpdateProvider,
-        normalizeVersion,
-        updateAvailableProvider;
+        normalizeVersion;
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -535,14 +537,17 @@ class _ProCard extends StatelessWidget {
   }
 }
 
-enum _CheckStatus { idle, checking, upToDate, updateAvailable, error }
-
-/// "App updates" — on desktop this reflects the background self-updater
-/// ([desktopUpdateProvider]): a newer build downloads automatically and installs
-/// on quit. Elsewhere it keeps the server-side check — the web's
-/// `UpdateCheckSection` talked to the Electron bridge, which doesn't exist here,
-/// so the equivalent is `GET /api/system/latest-release` (server-side GitHub
-/// check, same as `useVersionCheck`) compared against the server's version.
+/// "Updates" — one row per thing this client can update, each with its own
+/// button ([UpdateDialog] does the work):
+///
+/// * this app (Android APK, desktop build — staged in the background and
+///   installed on quit), or on the web the web interface, which the server
+///   replaces when it hosts it;
+/// * the connected server — over the API, or for the desktop app's own local
+///   server by re-installing it.
+///
+/// Versions come from the shared update providers, so this agrees with the
+/// rail badge; Check re-reads all of them.
 class _UpdateCheckBlock extends ConsumerStatefulWidget {
   const _UpdateCheckBlock();
 
@@ -551,153 +556,117 @@ class _UpdateCheckBlock extends ConsumerStatefulWidget {
 }
 
 class _UpdateCheckBlockState extends ConsumerState<_UpdateCheckBlock> {
-  _CheckStatus _status = _CheckStatus.idle;
-  String _detail = '';
+  bool _checking = false;
+  bool _failed = false;
 
   Future<void> _check() async {
-    // Desktop: re-run the release check and let the background self-updater
-    // stage the new build (applied on quit).
     if (isDesktopChannel(ref.read(appUpdateChannelProvider))) {
       ref.read(desktopUpdateProvider.notifier).recheck();
-      return;
-    }
-    // Android: re-read the release and this build's own version (the APK) so the
-    // section tracks the app, not the connected server.
-    if (ref.read(appUpdateChannelProvider) == AppUpdateChannel.android) {
-      setState(() {
-        _status = _CheckStatus.checking;
-        _detail = '';
-      });
-      ref.invalidate(latestReleaseProvider);
-      ref.invalidate(appVersionProvider);
-      try {
-        await Future.wait<Object?>([
-          ref.read(latestReleaseProvider.future),
-          ref.read(appVersionProvider.future),
-        ]);
-      } on Object {
-        // The providers carry their own error state; nothing to show here.
-      }
-      if (mounted) setState(() => _status = _CheckStatus.idle);
-      return;
     }
     setState(() {
-      _status = _CheckStatus.checking;
-      _detail = '';
+      _checking = true;
+      _failed = false;
     });
+    ref
+      ..invalidate(latestReleaseProvider)
+      ..invalidate(appVersionProvider)
+      ..invalidate(serverHealthProvider)
+      ..invalidate(serverUpdateInfoProvider);
+    Release? release;
     try {
-      final repo = ref.read(systemRepositoryProvider);
-      final results = await Future.wait<Object?>([repo.health(), repo.latestRelease()]);
-      if (!mounted) return;
-      final health = results[0] as Map<String, dynamic>;
-      final release = results[1] as Release?;
-      final current = health['version']?.toString() ?? '';
-      final latest = release?.tagName.replaceFirst(RegExp('^v'), '') ?? '';
+      final results = await Future.wait<Object?>([
+        ref.read(latestReleaseProvider.future),
+        ref.read(appVersionProvider.future),
+        ref.read(serverHealthProvider.future),
+        ref.read(serverUpdateInfoProvider.future),
+      ]);
+      release = results.first as Release?;
+    } on Object {
+      release = null;
+    }
+    if (mounted) {
       setState(() {
-        if (latest.isEmpty) {
-          _status = _CheckStatus.upToDate;
-        } else if (current.isNotEmpty && compareVersions(latest, current) > 0) {
-          _status = _CheckStatus.updateAvailable;
-          _detail = latest;
-        } else {
-          _status = _CheckStatus.upToDate;
-          _detail = current;
-        }
+        _checking = false;
+        _failed = release == null;
       });
-      ref
-        ..invalidate(serverHealthProvider)
-        ..invalidate(latestReleaseProvider);
-    } on Object catch (e) {
-      if (mounted) {
-        setState(() {
-          _status = _CheckStatus.error;
-          _detail = e.toString();
-        });
-      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final t = Translations.of(context).settings;
+    final t = Translations.of(context);
     final c = context.appColors;
     final tt = Theme.of(context).textTheme;
+    final u = t.settings.updates;
 
     final channel = ref.watch(appUpdateChannelProvider);
-    final latestRelease = normalizeVersion(ref.watch(latestReleaseProvider).value?.tagName ?? '');
-    // Server self-update: a remote server behind the latest release. A local
-    // server ("This device") updates with the app, never over the API.
-    final profiles = ref.watch(serverProfilesProvider);
-    final activeIsLocal =
-        profiles.profiles.where((p) => p.url == profiles.activeUrl).firstOrNull?.isLocal ?? false;
-    final serverBehind = !activeIsLocal && ref.watch(updateAvailableProvider);
-    // Something the Update dialog can act on: install this app's newer build
-    // (Android, desktop), or update the connected server.
-    final canUpdate = ref.watch(appUpdateAvailableProvider) || serverBehind;
+    final latest = normalizeVersion(ref.watch(latestReleaseProvider).value?.tagName ?? '');
+    final appVersion = ref.watch(appVersionProvider).value ?? '';
+    final serverVersion = ref.watch(serverHealthProvider).value?['version']?.toString() ?? '';
+    final updateInfo = ref.watch(serverUpdateInfoProvider).value;
+    final targets = ref.watch(availableUpdatesProvider);
+    final desktop = ref.watch(desktopUpdateProvider);
 
-    String? result;
-    var good = false;
-    var checking = _status == _CheckStatus.checking;
-
-    if (isDesktopChannel(channel)) {
-      // Desktop self-update state, read from the background updater.
-      final state = ref.watch(desktopUpdateProvider);
-      final installed = ref.watch(appVersionProvider).value ?? '';
-      final latest =
-          ref.watch(latestReleaseProvider).value?.tagName.replaceFirst(RegExp('^v'), '') ?? '';
-      checking = state.stage == DesktopUpdateStage.downloading;
-      switch (state.stage) {
-        case DesktopUpdateStage.ready:
-          result = t.updates.downloaded(version: state.version);
-          good = true;
-        case DesktopUpdateStage.downloading:
-          result = t.updates.available(version: state.version);
-          good = true;
-        case DesktopUpdateStage.failed:
-          result = t.updates.error(message: state.error ?? t.updates.errorGeneric);
-        case DesktopUpdateStage.idle:
-          if (latest.isNotEmpty && compareVersions(latest, installed) > 0) {
-            result = t.updates.available(version: latest);
-            good = true;
-          } else if (installed.isNotEmpty) {
-            result = t.updates.upToDate(version: installed);
-            good = true;
-          }
-      }
-    } else if (channel == AppUpdateChannel.android) {
-      // Android self-update: report this build's own APK version (and whether a
-      // newer APK exists) — never the connected server's version.
-      final installed = ref.watch(appVersionProvider).value ?? '';
-      final latest = (ref.watch(latestReleaseProvider).value?.tagName ?? '').replaceFirst(
-        RegExp('^v'),
-        '',
-      );
-      if (latest.isNotEmpty && installed.isNotEmpty && compareVersions(latest, installed) > 0) {
-        result = t.updates.appAvailable(version: latest);
-        good = true;
-      } else if (installed.isNotEmpty) {
-        result = t.updates.upToDate(version: installed);
-        good = true;
-      }
-    } else {
-      // A newer release than the connected server — known from the shared
-      // providers without pressing Check (the rail badge uses the same ones).
-      final behind = serverBehind && _status != _CheckStatus.checking;
-      final status = behind ? _CheckStatus.updateAvailable : _status;
-      final detail = behind ? latestRelease : _detail;
-      switch (status) {
-        case _CheckStatus.upToDate:
-          result = t.updates.upToDate(version: detail);
-          good = true;
-        case _CheckStatus.updateAvailable:
-          result = t.apiKeys.version.updateAvailable(version: detail);
-          good = true;
-        case _CheckStatus.error:
-          result = detail.isEmpty ? t.updates.errorGeneric : t.updates.error(message: detail);
-        case _CheckStatus.idle || _CheckStatus.checking:
-          result = null;
-      }
+    String versionLine(String installed) {
+      if (installed.isEmpty) return '';
+      return latest.isNotEmpty && compareVersions(latest, installed) > 0
+          ? u.versionLine(installed: installed, latest: latest)
+          : u.current(version: installed);
     }
+
+    final rows = <Widget>[];
+
+    // This app / the web interface.
+    if (kIsWeb) {
+      final webHosted = (updateInfo?['web'] as Map?)?['hosted'] == true;
+      final behind = targets.contains(UpdateTarget.web);
+      rows.add(
+        _UpdateRow(
+          label: t.common.update.targetWeb,
+          status: versionLine(appVersion),
+          hint: behind && !webHosted ? u.webNotHosted(version: latest) : null,
+          target: behind && webHosted ? UpdateTarget.web : null,
+        ),
+      );
+    } else if (channel == AppUpdateChannel.unsupported) {
+      rows.add(_UpdateRow(label: t.common.update.targetApp, status: u.unavailable));
+    } else {
+      final behind = targets.contains(UpdateTarget.app);
+      final status = !isDesktopChannel(channel)
+          ? (behind ? u.appAvailable(version: latest) : versionLine(appVersion))
+          : switch (desktop.stage) {
+              DesktopUpdateStage.ready => u.downloaded(version: desktop.version),
+              DesktopUpdateStage.downloading => u.available(version: desktop.version),
+              DesktopUpdateStage.failed => u.error(message: desktop.error ?? u.errorGeneric),
+              DesktopUpdateStage.idle => versionLine(appVersion),
+            };
+      rows.add(
+        _UpdateRow(
+          label: t.common.update.targetApp,
+          status: status,
+          error: isDesktopChannel(channel) && desktop.stage == DesktopUpdateStage.failed,
+          target: behind ? UpdateTarget.app : null,
+        ),
+      );
+    }
+
+    // The connected server.
+    final serverBehind = targets.contains(UpdateTarget.server);
+    final serverInfo = updateInfo?['server'] as Map?;
+    // Servers before 0.8.13 don't report update-info — offer the update and
+    // let the server answer for itself.
+    final serverCanUpdate =
+        ref.watch(activeServerIsLocalProvider) ||
+        serverInfo == null ||
+        serverInfo['canUpdate'] == true;
+    rows.add(
+      _UpdateRow(
+        label: t.common.update.targetServer,
+        status: versionLine(serverVersion),
+        hint: serverBehind && !serverCanUpdate ? u.serverCannotUpdate : null,
+        target: serverBehind && serverCanUpdate ? UpdateTarget.server : null,
+      ),
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -713,68 +682,111 @@ class _UpdateCheckBlockState extends ConsumerState<_UpdateCheckBlock> {
                     spacing: AppSpacing.sm,
                     children: [
                       Icon(LucideIcons.arrowDownToLine, size: 16, color: c.mutedForeground),
-                      Text(t.updates.title, style: tt.titleSmall),
+                      Text(u.title, style: tt.titleSmall),
                     ],
                   ),
                   const SizedBox(height: AppSpacing.xs),
                   Text(switch (channel) {
-                    AppUpdateChannel.android => t.updates.descriptionMobile,
+                    AppUpdateChannel.android => u.descriptionMobile,
                     // Web and other builds that can't install themselves —
                     // what's left to update is the connected server.
-                    AppUpdateChannel.unsupported => t.updates.descriptionServer,
-                    _ => t.updates.description,
+                    AppUpdateChannel.unsupported => u.descriptionServer,
+                    _ => u.description,
                   }, style: tt.labelSmall?.copyWith(color: c.mutedForeground)),
                 ],
               ),
             ),
-            if (canUpdate)
-              AppButton(
-                size: AppButtonSize.sm,
-                onPressed: () => unawaited(
-                  showDialog<void>(context: context, builder: (_) => const UpdateDialog()),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  spacing: AppSpacing.xs,
-                  children: [
-                    const Icon(LucideIcons.circleArrowUp, size: 12),
-                    Text(Translations.of(context).common.buttons.update),
-                  ],
-                ),
-              ),
             AppButton(
               variant: AppButtonVariant.outline,
               size: AppButtonSize.sm,
-              loading: checking,
+              loading: _checking,
               onPressed: () => unawaited(_check()),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 spacing: AppSpacing.xs,
                 children: [
                   const Icon(LucideIcons.refreshCw, size: 12),
-                  Text(checking ? t.updates.checking : t.updates.check),
+                  Text(_checking ? u.checking : u.check),
                 ],
               ),
             ),
           ],
         ),
-        if (result != null) ...[
-          const SizedBox(height: AppSpacing.sm),
-          InkWell(
-            onTap: _status == _CheckStatus.updateAvailable ? () => _openUrl(_releasesUrl) : null,
-            child: Text(
-              result,
-              style: tt.labelSmall?.copyWith(
-                color: _status == _CheckStatus.error
-                    ? c.destructive
-                    : good
-                    ? Colors.green.shade700
-                    : c.mutedForeground,
-              ),
+        const SizedBox(height: AppSpacing.sm),
+        ...rows,
+        if (_failed) Text(u.errorGeneric, style: tt.labelSmall?.copyWith(color: c.destructive)),
+      ],
+    );
+  }
+}
+
+/// One updatable thing: its name, version status, an optional hint when it
+/// can't be updated from here, and the button that opens its [UpdateDialog].
+class _UpdateRow extends StatelessWidget {
+  const _UpdateRow({
+    required this.label,
+    required this.status,
+    this.hint,
+    this.target,
+    this.error = false,
+  });
+
+  final String label;
+  final String status;
+  final String? hint;
+  final UpdateTarget? target;
+  final bool error;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Translations.of(context);
+    final c = context.appColors;
+    final tt = Theme.of(context).textTheme;
+    final target = this.target;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+      child: Row(
+        spacing: AppSpacing.md,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label, style: tt.labelMedium),
+                if (status.isNotEmpty)
+                  Text(
+                    status,
+                    style: tt.labelSmall?.copyWith(
+                      color: error
+                          ? c.destructive
+                          : target != null
+                          ? Colors.green.shade700
+                          : c.mutedForeground,
+                    ),
+                  ),
+                if (hint != null)
+                  InkWell(
+                    onTap: () => _openUrl(_releasesUrl),
+                    child: Text(hint!, style: tt.labelSmall?.copyWith(color: c.mutedForeground)),
+                  ),
+              ],
             ),
           ),
+          if (target != null)
+            AppButton(
+              size: AppButtonSize.sm,
+              onPressed: () => unawaited(showUpdateDialog(context, target)),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                spacing: AppSpacing.xs,
+                children: [
+                  const Icon(LucideIcons.circleArrowUp, size: 12),
+                  Text(updateTargetAction(t, target)),
+                ],
+              ),
+            ),
         ],
-      ],
+      ),
     );
   }
 }
