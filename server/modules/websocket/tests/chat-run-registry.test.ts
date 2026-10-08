@@ -549,3 +549,19 @@ test('errors and notices after complete still reach subscribers, keep the run cu
     assert.equal(stored[0]?.id, connection.frames[1]?.id);
   });
 });
+
+test('an aborted run publishes no late errors or notices and persists none', async () => {
+  await withIsolatedDatabase(() => {
+    sessionsDb.createAppSession('late-abort', 'claude', '/workspace/demo');
+    const connection = new FakeConnection();
+    const run = chatRunRegistry.startRun({
+      appSessionId: 'late-abort', provider: 'claude', providerSessionId: null, connection, userId: null,
+    })!;
+    chatRunRegistry.completeRun('late-abort', { exitCode: 0, aborted: true });
+    run.writer.send({ kind: 'error', content: 'interrupted', provider: 'claude' });
+    run.writer.send({ kind: 'status', text: 'stopped', notice: true, provider: 'claude' });
+
+    assert.deepEqual(connection.frames.map((frame) => frame.kind), ['complete']);
+    assert.deepEqual(sessionEventsDb.listBySession('late-abort'), []);
+  });
+});

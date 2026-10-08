@@ -220,7 +220,10 @@ function decorateAndRecordEvent(run: ChatRun, message: NormalizedMessage): Norma
   // the run's id and continue its seq, so replay cursors stay monotonic.
   const current = runs.get(run.appSessionId);
   const errorOrNotice = isErrorOrNotice(message);
-  const late = (LATE_ASK_KINDS.has(message.kind) || errorOrNotice) && (current === undefined || current === run);
+  // A stopped run's late errors are interrupt noise (e.g. a setup step
+  // throwing after a parked abort), not a failure the user should see.
+  const late = (LATE_ASK_KINDS.has(message.kind) || (errorOrNotice && !run.aborted))
+    && (current === undefined || current === run);
   if (!late && (current !== run || run.status !== 'running')) {
     return null;
   }
