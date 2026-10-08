@@ -373,8 +373,10 @@ function handleSetPermissionMode(data: AnyRecord, dependencies: ChatWebSocketDep
  * - `chat.permission-response` { requestId, allow, updatedInput?, message?, rememberEntry? }
  * - `chat.set-permission-mode` { sessionId, permissionMode }
  * - `workspace.get`            {} → `workspace_state` reply to the requester
- * - `workspace.update`         { state, deviceId? } → persists and broadcasts
- *   `workspace_state` to the user's other sockets (cross-device pane sync)
+ * - `workspace.update`         { state, deviceId?, baseRevision? } → persists and
+ *   broadcasts `workspace_state` to the user's other sockets (cross-device pane
+ *   sync); with `baseRevision` it is compare-and-swap — `workspace_ack` on
+ *   success, `workspace_state { conflict: true }` back to the sender if stale
  *
  * Outbound protocol (server to client): every frame is `kind`-based — either
  * a provider `NormalizedMessage` (with `seq`) or a gateway event
@@ -439,7 +441,13 @@ export function handleChatConnection(
           workspaceSync.sendCurrent(ws, workspaceUserId);
           return;
         case 'workspace.update': {
-          const result = workspaceSync.applyUpdate(ws, workspaceUserId, data.state, data.deviceId);
+          const result = workspaceSync.applyUpdate(
+            ws,
+            workspaceUserId,
+            data.state,
+            data.deviceId,
+            data.baseRevision,
+          );
           if (!result.ok) {
             sendProtocolError(ws, 'WORKSPACE_STATE_INVALID', result.error);
           }

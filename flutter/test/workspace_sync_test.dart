@@ -17,6 +17,16 @@ const _remote = WorkspaceState(
   lastUsedProjectId: 'proj-2',
 );
 
+const _picker = SplitPane(id: 'p2', kind: PaneKind.chat, picker: true);
+
+Map<String, dynamic> _state(WorkspaceState s, int rev, {String? origin, bool conflict = false}) => {
+  'kind': 'workspace_state',
+  'state': s.toJson(),
+  'revision': rev,
+  'originDeviceId': origin,
+  if (conflict) 'conflict': true,
+};
+
 class _Harness {
   _Harness() {
     sync = WorkspaceSync(
@@ -40,44 +50,33 @@ class _Harness {
   WorkspaceState current = _local;
   bool sendOk = true;
 
-  /// Marks the boot handshake as done: feeds a snapshot echoing the current
-  /// local state so `_lastSyncedJson` is set (this is a reconnect, not a cold
-  /// boot), then clears the captured side-effects.
-  void synced() {
-    sync.handleFrame({
-      'kind': 'workspace_state',
-      'state': current.toJson(),
-      'revision': 1,
-      'originDeviceId': null,
-    });
+  /// Boot handshake done: the server holds exactly the local state at [rev].
+  void synced({int rev = 1}) {
+    sync.handleFrame(_state(current, rev));
     sent.clear();
     applied = null;
   }
+
+  List<String> get paneIds => [for (final p in current.panes) p.id];
 }
 
 void main() {
-  test('requestSnapshot sends workspace.get with the device id', () {
+  test('requestSnapshot sends workspace.get and waits for the reply', () {
     final h = _Harness();
     h.sync.requestSnapshot();
     expect(h.sent, [
       {'type': 'workspace.get', 'deviceId': 'dev-test'},
     ]);
+    expect(h.sync.awaitingSnapshot, isTrue);
+    h.sync.handleFrame(_state(_remote, 3));
+    expect(h.sync.awaitingSnapshot, isFalse);
   });
 
   test('a cold boot adopts the server snapshot over stale local panes', () {
     final h = _Harness();
-    // First frame of the app run — local panes are restored-from-disk or
-    // auto-seeded guesses, the snapshot carries another device's live
-    // workspace. Remote wins and nothing is pushed back over it.
-    h.sync.handleFrame({
-      'kind': 'workspace_state',
-      'state': _remote.toJson(),
-      'revision': 3,
-      'originDeviceId': null,
-    });
+    h.sync.handleFrame(_state(_remote, 3));
 
-    expect(h.applied?.panes.length, 2);
-    expect(h.applied?.panes.first.id, 'p9');
+    expect(h.paneIds, ['p9', 'p8']);
     expect(h.sent, isEmpty);
   });
 
@@ -85,101 +84,137 @@ void main() {
     final h = _Harness();
     h.sync.pushLocal(); // e.g. the auto-seeded picker pane firing pre-snapshot
     expect(h.sent, isEmpty);
-    expect(h.sync.dirty, isFalse);
   });
 
-  test('a snapshot reply never clobbers a non-empty local workspace on reconnect', () {
+  test('waking up with no local edits adopts the server state (server wins)', () {
     final h = _Harness();
-    h.synced(); // past the boot handshake — this socket already saw the server
-    // Server reply to workspace.get → originDeviceId null, may be stale.
-    h.sync.handleFrame({
-      'kind': 'workspace_state',
-      'state': _remote.toJson(),
-      'revision': 3,
-      'originDeviceId': null,
-    });
+    h.synced();
+    // Phone slept; the desktop replaced the panes meanwhile.
+    h.sync.requestSnapshot();
+    h.sent.clear();
+    h.sync.handleFrame(_state(_remote, 4));
 
-    // Local panes were kept, not replaced, and pushed back so the server
-    // catches up (the "panes close on reconnect" regression).
-    expect(h.applied, isNull);
+    expect(h.paneIds, ['p9', 'p8']);
+    expect(h.current.activePaneId, 'p8');
+    expect(h.sent, isEmpty, reason: 'the stale layout must not be pushed back');
+  });
+
+  test('local edits survive a remote change and are rebased onto it', () {
+    final h = _Harness();
+    h.synced();
+    // Opened a pane while the socket was down.
+    h.sendOk = false;
+    h.current = WorkspaceState(panes: [..._local.panes, _picker], activePaneId: 'p2');
+    h.sync.pushLocal();
+    h.sendOk = true;
+
+    // Meanwhile another device opened p9.
+    final remote = WorkspaceState(
+      panes: [..._local.panes, _remote.panes.first],
+      activePaneId: 'p9',
+    );
+    h.sync.handleFrame(_state(remote, 2));
+
+    expect(h.paneIds, ['p1', 'p9', 'p2']);
+    expect(h.current.activePaneId, 'p2');
+    expect(h.sent.single['type'], 'workspace.update');
+    expect(h.sent.single['baseRevision'], 2);
+    expect(h.sent.single['state'], h.current.toJson());
+  });
+
+  test('a pane closed locally stays closed after the merge', () {
+    final h = _Harness();
+    h.current = _remote;
+    h.synced();
+    h.sendOk = false;
+    h.current = const WorkspaceState(
+      panes: [SplitPane(id: 'p9', kind: PaneKind.chat, sessionId: 's9')],
+      activePaneId: 'p9',
+    );
+    h.sync.pushLocal();
+    h.sendOk = true;
+
+    h.sync.handleFrame(_state(WorkspaceState(panes: [..._remote.panes, _picker]), 2));
+    expect(h.paneIds, ['p9', 'p2']);
+  });
+
+  test('local edits push one update with baseRevision; acks advance the base', () {
+    final h = _Harness();
+    h.synced(rev: 5);
+
+    h.current = _remote;
+    h.sync.pushLocal();
+    expect(h.sent.single['type'], 'workspace.update');
+    expect(h.sent.single['baseRevision'], 5);
+    expect(h.sent.single['state'], _remote.toJson());
+
+    // In flight: further pushes wait for the ack.
+    h.current = const WorkspaceState(panes: [_picker], activePaneId: 'p2');
+    h.sync.pushLocal();
     expect(h.sent.length, 1);
-    expect(h.sent[0]['type'], 'workspace.update');
-    expect(h.sent[0]['state'], _local.toJson());
+
+    h.sync.handleFrame({'kind': 'workspace_ack', 'revision': 6});
+    expect(h.sent.length, 2);
+    expect(h.sent[1]['baseRevision'], 6);
+    expect(h.sync.hasPendingEdits, isTrue);
+
+    h.sync.handleFrame({'kind': 'workspace_ack', 'revision': 7});
+    expect(h.sync.hasPendingEdits, isFalse);
+    h.sync.pushLocal(); // nothing new → silent
+    expect(h.sent.length, 2);
+  });
+
+  test('a conflict reply rebases the in-flight edit and retries', () {
+    final h = _Harness();
+    h.synced();
+    h.current = WorkspaceState(panes: [..._local.panes, _picker], activePaneId: 'p2');
+    h.sync.pushLocal();
+    h.sent.clear();
+
+    final server = WorkspaceState(
+      panes: [..._local.panes, _remote.panes.first],
+      activePaneId: 'p1',
+    );
+    h.sync.handleFrame(_state(server, 2, conflict: true));
+
+    expect(h.paneIds, ['p1', 'p9', 'p2']);
+    expect(h.sent.single['baseRevision'], 2);
   });
 
   test('an edit broadcast from another device is applied as sanitized state', () {
     final h = _Harness();
-    h.sync.handleFrame({
-      'kind': 'workspace_state',
-      'state': _remote.toJson(),
-      'revision': 3,
-      'originDeviceId': 'other-device',
-    });
-
-    expect(h.applied?.panes.length, 2);
-    expect(h.applied?.panes.last.kind, PaneKind.editor);
-    expect(h.applied?.panes.last.filePath, '/x.dart');
-
-    // Applying must not echo back — the local watcher now sees state equal to
-    // lastSynced and stays silent.
-    h.sync.pushLocal();
-    expect(h.sent, isEmpty);
-  });
-
-  test('a snapshot reply fills an empty local workspace', () {
-    final h = _Harness();
-    h.current = const WorkspaceState();
-    h.sync.handleFrame({
-      'kind': 'workspace_state',
-      'state': _remote.toJson(),
-      'revision': 3,
-      'originDeviceId': null,
-    });
-
-    // Fresh device — adopt the server's panes.
-    expect(h.applied?.panes.length, 2);
-    expect(h.sent, isEmpty);
-  });
-
-  test('local change pushes one workspace.update; unchanged state stays silent', () {
-    final h = _Harness();
     h.synced();
+    h.sync.handleFrame(_state(_remote, 2, origin: 'other-device'));
 
-    h.current = _remote;
-    h.sync.pushLocal();
-    expect(h.sent.length, 1);
-    expect(h.sent[0]['type'], 'workspace.update');
-    expect(h.sent[0]['state'], _remote.toJson());
+    expect(h.current.panes.last.kind, PaneKind.editor);
+    expect(h.current.panes.last.filePath, '/x.dart');
+    h.sync.pushLocal(); // applying must not echo back
+    expect(h.sent, isEmpty);
+  });
 
-    h.sync.pushLocal(); // same serialized state → deduped, stays silent
-    expect(h.sent.length, 1);
+  test('a broadcast older than the acked base is ignored', () {
+    final h = _Harness();
+    h.synced(rev: 5);
+    h.sync.handleFrame(_state(_remote, 4, origin: 'other-device'));
+    expect(h.applied, isNull);
   });
 
   test('empty server reply seeds it with the local workspace', () {
     final h = _Harness();
     h.sync.handleFrame({'kind': 'workspace_state', 'state': null, 'revision': 0});
 
-    expect(h.sent.length, 1);
-    expect(h.sent[0]['type'], 'workspace.update');
-    expect(h.sent[0]['state'], _local.toJson());
+    expect(h.sent.single['type'], 'workspace.update');
+    expect(h.sent.single['baseRevision'], 0);
+    expect(h.sent.single['state'], _local.toJson());
   });
 
-  test('unsent local edits win over an incoming remote state (dirty tie-break)', () {
+  test('flush sends a pending edit immediately', () {
     final h = _Harness();
     h.synced();
     h.current = _remote;
-    h.sendOk = false;
-    h.sync.pushLocal(); // socket down → dirty, nothing sent
-    h.sendOk = true;
-
-    h.sync.handleFrame({'kind': 'workspace_state', 'state': _local.toJson(), 'revision': 5});
-
-    // Remote was NOT applied; our dirty local state was pushed instead.
-    expect(h.applied, isNull);
-    expect(h.sent.length, 1);
-    expect(h.sent[0]['type'], 'workspace.update');
-    expect(h.sent[0]['state'], _remote.toJson());
-    expect(h.sync.dirty, isFalse);
+    h.sync.schedulePush();
+    h.sync.flush();
+    expect(h.sent.single['state'], _remote.toJson());
   });
 
   test('unrelated frames are ignored', () {
@@ -188,5 +223,35 @@ void main() {
     h.sync.handleFrame({'type': 'presence-roster', 'users': <String>[]});
     expect(h.applied, isNull);
     expect(h.sent, isEmpty);
+  });
+
+  group('mergeWorkspace', () {
+    test('no local edits → exactly the remote state', () {
+      final merged = mergeWorkspace(base: _local, local: _local, remote: _remote);
+      expect(merged.toJson(), _remote.toJson());
+    });
+
+    test('local reorder wins for shared panes', () {
+      const a = SplitPane(id: 'a', kind: PaneKind.chat);
+      const b = SplitPane(id: 'b', kind: PaneKind.git);
+      const c = SplitPane(id: 'c', kind: PaneKind.notes);
+      final merged = mergeWorkspace(
+        base: const WorkspaceState(panes: [a, b]),
+        local: const WorkspaceState(panes: [b, a]),
+        remote: const WorkspaceState(panes: [a, b, c]),
+      );
+      expect([for (final p in merged.panes) p.id], ['b', 'a', 'c']);
+    });
+
+    test('local re-bind of a pane wins over the remote copy', () {
+      const base = WorkspaceState(
+        panes: [SplitPane(id: 'a', kind: PaneKind.chat, picker: true)],
+      );
+      const local = WorkspaceState(
+        panes: [SplitPane(id: 'a', kind: PaneKind.chat, sessionId: 's')],
+      );
+      final merged = mergeWorkspace(base: base, local: local, remote: base);
+      expect(merged.panes.single.sessionId, 's');
+    });
   });
 }

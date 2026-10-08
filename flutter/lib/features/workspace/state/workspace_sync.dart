@@ -7,8 +7,16 @@ import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
 /// sync of the split workspace over the /ws chat socket.
 ///
 /// Server protocol: `workspace.get` → `workspace_state` reply to the requester;
-/// `workspace.update` → persisted + broadcast `workspace_state` to the user's
-/// other sockets. Conflicts are last-write-wins on the server.
+/// `workspace.update {state, baseRevision}` is a compare-and-swap — accepted
+/// writes are acked (`workspace_ack {revision}`) and broadcast as
+/// `workspace_state` to the user's other sockets; a stale `baseRevision` is
+/// rejected with the current state (`workspace_state {conflict: true}`).
+///
+/// The server is the source of truth. This device only ever contributes its
+/// own *edits* — the diff between the last server-confirmed state ([_base])
+/// and the local state — rebased onto whatever the server holds (see
+/// [mergeWorkspace]). A device that slept through other devices' changes
+/// therefore adopts them on wake instead of pushing its stale layout back.
 ///
 /// Pure logic lives here (no Riverpod) so tests need no socket or provider
 /// container — the [WorkspaceController] only wires timers, subscriptions,
@@ -28,99 +36,197 @@ class WorkspaceSync {
   final bool Function(Map<String, dynamic>) _send;
   final Duration _pushDebounce;
 
-  // Serialized state as last seen by the server. Null until the first
-  // workspace_state frame or successful push — NOT seeded with the boot state,
-  // because the notifier's `state` isn't readable while build() is still
-  // running. Doubles as the cold-boot marker: null means this app run has
-  // never seen the server, so pushes stay gated (see _push) and the first
-  // snapshot is adopted rather than fought.
-  String? _lastSyncedJson;
-  // True when a local edit couldn't reach the server (socket down). The next
-  // workspace_state reply then loses to our push — unsent edits beat remote
-  // state the user never saw.
-  bool _dirty = false;
+  // Last state the server confirmed (snapshot, broadcast, or ack) and its
+  // revision. Null until the first workspace_state frame of this app run —
+  // NOT seeded with the boot state: restored-from-disk panes are a guess, so
+  // pushes stay gated until the server has been read (see pushLocal).
+  WorkspaceState? _base;
+  int _baseRevision = 0;
+  // Update sent but not yet acked/rejected. One write in flight at a time, so
+  // every write carries the revision it was built on.
+  WorkspaceState? _inflight;
+  bool _awaitingSnapshot = false;
   Timer? _pushTimer;
 
-  bool get dirty => _dirty;
+  /// True while a `workspace.get` is unanswered — a reply that never comes
+  /// means the socket died while the app slept.
+  bool get awaitingSnapshot => _awaitingSnapshot;
+
+  /// Local edits not yet confirmed by the server.
+  bool get hasPendingEdits => _base != null && !_sameState(_getState(), _base!);
 
   static String _serialize(WorkspaceState state) => jsonEncode(state.toJson());
 
-  /// Sends `workspace.get`; call whenever the socket (re)opens.
+  static bool _sameState(WorkspaceState a, WorkspaceState b) => _serialize(a) == _serialize(b);
+
+  /// Sends `workspace.get`; call whenever the socket (re)opens and whenever
+  /// the app returns to the foreground. An update in flight on a previous
+  /// socket is forgotten — the snapshot shows whether it landed, and any edit
+  /// it carried is still a local-vs-base diff that gets rebased and re-sent.
   void requestSnapshot() {
-    _send({'type': 'workspace.get', 'deviceId': _deviceId()});
+    _inflight = null;
+    if (_send({'type': 'workspace.get', 'deviceId': _deviceId()})) {
+      _awaitingSnapshot = true;
+    }
   }
 
-  /// Debounced push after a local mutation. Echo frames land here too, but
-  /// the serialized dedup inside [_push] makes them a no-op.
+  /// Debounced push after a local mutation.
   void schedulePush() {
     _pushTimer?.cancel();
     _pushTimer = Timer(_pushDebounce, pushLocal);
   }
 
-  void pushLocal() => _push(_getState());
+  /// Sends a pending debounced push right away — the app is going to the
+  /// background and timers may never fire.
+  void flush() {
+    _pushTimer?.cancel();
+    pushLocal();
+  }
 
-  bool _push(WorkspaceState state) {
-    // Never write server state before reading it: a boot-time push (restored
-    // Hive panes or the auto-seeded picker pane) would broadcast this
-    // device's stale layout over every other device's live workspace — that
-    // push is what wiped the desktop's panes whenever the app opened on
-    // mobile. Not marked dirty: the first workspace_state frame resolves
-    // what wins, and an empty server is seeded by the branch below anyway.
-    if (_lastSyncedJson == null) return false;
-    final json = _serialize(state);
-    if (json == _lastSyncedJson) return true;
-    if (_send({'type': 'workspace.update', 'state': state.toJson(), 'deviceId': _deviceId()})) {
-      _lastSyncedJson = json;
-      return true;
-    }
-    _dirty = true;
-    return false;
+  void pushLocal() {
+    final base = _base;
+    // Never write before reading: a boot-time push (restored Hive panes or the
+    // auto-seeded picker pane) would broadcast this device's stale layout over
+    // every other device's live workspace.
+    if (base == null || _inflight != null) return;
+    final state = _getState();
+    if (_sameState(state, base)) return;
+    final sent = _send({
+      'type': 'workspace.update',
+      'state': state.toJson(),
+      'baseRevision': _baseRevision,
+      'deviceId': _deviceId(),
+    });
+    // A failed send leaves the edit as a local-vs-base diff; the snapshot on
+    // reconnect rebases and re-sends it.
+    if (sent) _inflight = state;
   }
 
   /// One inbound ws frame. Non-workspace frames are ignored.
-  /// Order: dirty push → snapshot keep-local → apply remote → seed empty server.
   void handleFrame(Map<String, dynamic> frame) {
-    if (frame['kind'] != 'workspace_state') return;
-
-    if (_dirty) {
-      // _push re-checks the serialized form, so a frame echoing our own
-      // pending write becomes a no-op instead of a redundant send.
-      _dirty = false;
-      pushLocal();
-      return;
-    }
-
-    final remote = frame['state'];
-    if (remote is Map) {
-      // `_lastSyncedJson == null` marks the first frame of this app run — a
-      // cold boot, where local panes are restored-from-disk or auto-seeded
-      // guesses, not live state. The server's copy reflects devices that were
-      // actually connected, so a cold boot adopts it even over non-empty
-      // local panes (a second device opening the app must not clobber the
-      // first). On a reconnect `_lastSyncedJson` survives and the snapshot
-      // (originDeviceId null) still loses to non-empty local panes — the
-      // server may predate this device's panes — so keep local and push it.
-      final coldBoot = _lastSyncedJson == null;
-      final next = WorkspaceState.sanitize(remote);
-      _lastSyncedJson = _serialize(next);
-      if (frame['originDeviceId'] == null && !coldBoot && _getState().panes.isNotEmpty) {
-        pushLocal();
-        return;
-      }
-      _applyRemote(next);
-      return;
-    }
-
-    // Server holds nothing yet — seed it with this device's workspace. Forced
-    // send: the payload equals the boot state, so the dedup inside _push would
-    // swallow the seed.
-    final state = _getState();
-    if (_send({'type': 'workspace.update', 'state': state.toJson(), 'deviceId': _deviceId()})) {
-      _lastSyncedJson = _serialize(state);
-    } else {
-      _dirty = true;
+    switch (frame['kind']) {
+      case 'workspace_ack':
+        _onAck(frame);
+      case 'workspace_state':
+        _onState(frame);
     }
   }
 
+  void _onAck(Map<String, dynamic> frame) {
+    final sent = _inflight;
+    final revision = frame['revision'];
+    if (sent == null || revision is! int) return;
+    _inflight = null;
+    _base = sent;
+    _baseRevision = revision;
+    // Edits made while the write was in flight.
+    pushLocal();
+  }
+
+  void _onState(Map<String, dynamic> frame) {
+    final revision = frame['revision'] is int ? frame['revision'] as int : 0;
+    final isReply = frame['originDeviceId'] == null;
+    if (isReply) _awaitingSnapshot = false;
+    if (frame['conflict'] == true) _inflight = null;
+
+    final base = _base;
+    // A broadcast older than what we already hold (e.g. overtaken by our own
+    // acked write) carries nothing new.
+    if (base != null && revision < _baseRevision) return;
+
+    final raw = frame['state'];
+    final remote = raw is Map ? WorkspaceState.sanitize(raw) : const WorkspaceState();
+    _base = remote;
+    _baseRevision = revision;
+
+    if (base == null) {
+      // First contact of this app run. Local panes are restored-from-disk or
+      // auto-seeded guesses — the server's copy wins. An empty server is
+      // seeded with this device's workspace instead.
+      if (raw is Map) {
+        _applyRemote(remote);
+      } else {
+        pushLocal();
+      }
+      return;
+    }
+
+    final merged = mergeWorkspace(base: base, local: _getState(), remote: remote);
+    if (!_sameState(merged, _getState())) _applyRemote(merged);
+    pushLocal();
+  }
+
   void dispose() => _pushTimer?.cancel();
+}
+
+/// Three-way merge of the pane layout: replays the local edits (`base` →
+/// `local`) on top of the server's `remote`. With no local edits the result is
+/// exactly `remote`, so the server always wins over a stale device; panes the
+/// user opened, closed, re-bound or reordered locally survive a concurrent
+/// change made on another device.
+WorkspaceState mergeWorkspace({
+  required WorkspaceState base,
+  required WorkspaceState local,
+  required WorkspaceState remote,
+}) {
+  String key(SplitPane p) => jsonEncode(p.toJson());
+  final baseById = {for (final p in base.panes) p.id: p};
+  final localIds = {for (final p in local.panes) p.id};
+
+  final removed = {
+    for (final id in baseById.keys)
+      if (!localIds.contains(id)) id,
+  };
+  final updated = {
+    for (final p in local.panes)
+      if (baseById[p.id] case final b? when key(b) != key(p)) p.id: p,
+  };
+
+  var panes = [
+    for (final p in remote.panes)
+      if (!removed.contains(p.id)) updated[p.id] ?? p,
+  ];
+
+  // Local reorder of panes that already existed → local order wins for them.
+  final baseOrder = [
+    for (final p in base.panes)
+      if (localIds.contains(p.id)) p.id,
+  ];
+  final localOrder = [
+    for (final p in local.panes)
+      if (baseById.containsKey(p.id)) p.id,
+  ];
+  if (baseOrder.join('\n') != localOrder.join('\n')) {
+    final rank = {for (final (i, id) in localOrder.indexed) id: i};
+    final ordered = [...panes.where((p) => rank.containsKey(p.id))]
+      ..sort((a, b) => rank[a.id]!.compareTo(rank[b.id]!));
+    panes = [...ordered, ...panes.where((p) => !rank.containsKey(p.id))];
+  }
+
+  final present = {for (final p in panes) p.id};
+  for (final p in local.panes) {
+    if (!baseById.containsKey(p.id) && !present.contains(p.id)) panes.add(p);
+  }
+  panes = panes.take(maxSplitPanes).toList();
+  final ids = {for (final p in panes) p.id};
+
+  String? pick(String? baseValue, String? localValue, String? remoteValue) =>
+      localValue != baseValue ? localValue : remoteValue;
+  final wanted = pick(base.activePaneId, local.activePaneId, remote.activePaneId);
+  final active = ids.contains(wanted)
+      ? wanted
+      : (ids.contains(remote.activePaneId)
+            ? remote.activePaneId
+            : (panes.isEmpty ? null : panes.first.id));
+
+  return WorkspaceState(
+    panes: panes,
+    activePaneId: active,
+    lastUsedProjectId: pick(
+      base.lastUsedProjectId,
+      local.lastUsedProjectId,
+      remote.lastUsedProjectId,
+    ),
+    maximizedPaneId: local.maximizedPaneId,
+  );
 }

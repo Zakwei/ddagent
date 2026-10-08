@@ -30,6 +30,7 @@ class WsClient {
   StreamSubscription<dynamic>? _sub;
   bool _closing = false;
   int _attempt = 0;
+  Completer<void>? _retryWake;
 
   Stream<Map<String, dynamic>> get frames => _frames.stream;
   Stream<WsState> get states => _states.stream;
@@ -111,8 +112,38 @@ class WsClient {
     final seconds = min(30, pow(2, _attempt - 1).toInt());
     final jitter = Random().nextDouble() * 0.4 * seconds;
     _setState(WsState.reconnecting);
-    await Future<void>.delayed(Duration(milliseconds: (seconds * 1000 + jitter * 1000).round()));
+    final wake = Completer<void>();
+    _retryWake = wake;
+    final timer = Timer(
+      Duration(milliseconds: (seconds * 1000 + jitter * 1000).round()),
+      () => wake.isCompleted ? null : wake.complete(),
+    );
+    await wake.future;
+    timer.cancel();
+    _retryWake = null;
     if (!_closing) await _connectOnce();
+  }
+
+  /// Reconnects immediately — for the app returning to the foreground. A
+  /// socket that sat through device sleep can look open while the server has
+  /// long dropped it, and a pending retry may still be up to 30 s away; both
+  /// would leave the app showing stale state.
+  void reconnectNow() {
+    if (_closing) return;
+    final wake = _retryWake;
+    if (wake != null) {
+      _attempt = 0;
+      if (!wake.isCompleted) wake.complete();
+      return;
+    }
+    if (_state != WsState.open) return; // a connect attempt is already running
+    // Cancel first so the old socket's onDone doesn't schedule a second loop.
+    unawaited(_sub?.cancel());
+    _sub = null;
+    unawaited(_channel?.sink.close());
+    _channel = null;
+    _attempt = 0;
+    unawaited(_connectOnce());
   }
 
   void _setState(WsState next) {
@@ -122,6 +153,8 @@ class WsClient {
 
   Future<void> close() async {
     _closing = true;
+    final wake = _retryWake;
+    if (wake != null && !wake.isCompleted) wake.complete();
     await _sub?.cancel();
     await _channel?.sink.close();
     _channel = null;

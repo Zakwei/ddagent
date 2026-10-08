@@ -171,6 +171,9 @@ class ChatChannel {
   Future<void> connect() => _ws.connect();
   Future<void> close() => _ws.close();
 
+  /// Drops a possibly half-open socket and reconnects right away (app resume).
+  void reconnectNow() => _ws.reconnectNow();
+
   // --- outbound (6.4) ---
 
   void sendMessage(String sessionId, String content, {Map<String, dynamic>? options}) {

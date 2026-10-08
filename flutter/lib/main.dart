@@ -15,6 +15,7 @@ import 'package:ddagent_app/features/notifications/state/device_notifications_co
 import 'package:ddagent_app/features/server_connect/state/local_server_controller.dart';
 import 'package:ddagent_app/features/settings/state/locale_controller.dart';
 import 'package:ddagent_app/features/system/state/update_controller.dart';
+import 'package:ddagent_app/features/workspace/state/workspace_controller.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -66,6 +67,11 @@ class _DdagentAppState extends ConsumerState<DdagentApp> {
   // app-spawned local server (an adopted external server is left alone;
   // orphans are re-adopted on next launch anyway).
   late final AppLifecycleListener _lifecycle = AppLifecycleListener(
+    // Cross-device workspace sync: flush pending pane edits before the OS
+    // suspends us, and re-read the server's panes on every wake.
+    onHide: () => _workspace()?.onAppBackgrounded(),
+    onPause: () => _workspace()?.onAppBackgrounded(),
+    onResume: () => _workspace()?.onAppResumed(),
     onExitRequested: () async {
       try {
         await ref.read(desktopUpdateProvider.notifier).applyOnExit();
@@ -76,6 +82,18 @@ class _DdagentAppState extends ConsumerState<DdagentApp> {
       return AppExitResponse.exit;
     },
   );
+
+  @override
+  void initState() {
+    super.initState();
+    // `late` is lazy — touch it so the listener registers at mount.
+    _lifecycle;
+  }
+
+  // Only when already built (signed in, workspace mounted) — never spin up the
+  // socket from a lifecycle callback.
+  WorkspaceController? _workspace() =>
+      ref.exists(workspaceProvider) ? ref.read(workspaceProvider.notifier) : null;
 
   @override
   void dispose() {

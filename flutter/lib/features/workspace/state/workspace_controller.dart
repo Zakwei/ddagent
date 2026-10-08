@@ -13,7 +13,11 @@ import 'package:hive/hive.dart';
 /// the workspace to the server so the account's other devices see the same
 /// open panes (see WorkspaceSync for the protocol).
 class WorkspaceController extends Notifier<WorkspaceState> {
+  static const _resumeProbeTimeout = Duration(seconds: 4);
+
   WorkspaceSync? _sync;
+  ChatChannel? _channel;
+  Timer? _resumeProbe;
   String? _deviceId;
   StreamSubscription<ServerEvent>? _eventsSub;
   StreamSubscription<WsState>? _statesSub;
@@ -35,6 +39,7 @@ class WorkspaceController extends Notifier<WorkspaceState> {
   /// push local mutations through [_set]'s debounced schedulePush.
   void _wireSync() {
     final channel = ref.read(chatChannelProvider);
+    _channel = channel;
     _sync = WorkspaceSync(
       // deviceId is informational on the wire (echo tagging); the resolved id
       // lands async from Hive — a boot placeholder is harmless meanwhile.
@@ -50,9 +55,32 @@ class WorkspaceController extends Notifier<WorkspaceState> {
     if (channel.wsState == WsState.open) _sync?.requestSnapshot();
     unawaited(WorkspaceStorage.deviceId().then((id) => _deviceId = id));
     ref.onDispose(() {
+      _resumeProbe?.cancel();
       _sync?.dispose();
       unawaited(_eventsSub?.cancel());
       unawaited(_statesSub?.cancel());
+    });
+  }
+
+  /// App going to the background (tab hidden, APK paused): send a pending
+  /// debounced edit now — a suspended app may never fire the timer.
+  void onAppBackgrounded() => _sync?.flush();
+
+  /// App back in the foreground: the server's workspace wins, so re-read it.
+  /// A socket that slept with the device may look open but be dead — if the
+  /// snapshot doesn't arrive promptly, force a reconnect (whose open re-reads).
+  void onAppResumed() {
+    final channel = _channel;
+    final sync = _sync;
+    if (channel == null || sync == null) return;
+    _resumeProbe?.cancel();
+    if (channel.wsState != WsState.open) {
+      channel.reconnectNow();
+      return;
+    }
+    sync.requestSnapshot();
+    _resumeProbe = Timer(_resumeProbeTimeout, () {
+      if (sync.awaitingSnapshot) channel.reconnectNow();
     });
   }
 

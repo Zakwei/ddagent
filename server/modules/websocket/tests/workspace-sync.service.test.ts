@@ -90,6 +90,44 @@ test('workspace.update rejects non-object and oversized states without persistin
   assert.equal(store.get(7), null);
 });
 
+test('workspace.update with a current baseRevision persists, acks the sender, and broadcasts', () => {
+  const sync = createWorkspaceSyncService(createFakeStore());
+  const sender = new FakeConnection();
+  const sibling = new FakeConnection();
+  sync.register(sender, 7);
+  sync.register(sibling, 7);
+
+  assert.deepEqual(sync.applyUpdate(sender, 7, STATE, 'dev-a', 0), { ok: true });
+
+  assert.deepEqual(sender.frames, [{ kind: 'workspace_ack', revision: 1 }]);
+  assert.equal(sibling.frames.length, 1);
+  assert.equal(sibling.frames[0].revision, 1);
+  assert.equal(sibling.frames[0].conflict, undefined);
+});
+
+test('workspace.update with a stale baseRevision is not persisted and returns the current state', () => {
+  const store = createFakeStore();
+  const sync = createWorkspaceSyncService(store);
+  const sender = new FakeConnection();
+  const sibling = new FakeConnection();
+  sync.register(sender, 7);
+  sync.register(sibling, 7);
+  sync.applyUpdate(sibling, 7, STATE, 'dev-b', 0); // revision 1
+  sibling.frames.length = 0;
+  sender.frames.length = 0;
+
+  const stale = { panes: [], activePaneId: null };
+  assert.deepEqual(sync.applyUpdate(sender, 7, stale, 'dev-a', 0), { ok: true });
+
+  assert.deepEqual(store.get(7), { state: STATE, revision: 1 });
+  assert.equal(sender.frames.length, 1);
+  assert.equal(sender.frames[0].kind, 'workspace_state');
+  assert.equal(sender.frames[0].conflict, true);
+  assert.equal(sender.frames[0].revision, 1);
+  assert.deepEqual(sender.frames[0].state, STATE);
+  assert.equal(sibling.frames.length, 0);
+});
+
 test('unregister drops the socket from broadcasts', () => {
   const sync = createWorkspaceSyncService(createFakeStore());
   const sender = new FakeConnection();
