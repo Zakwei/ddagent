@@ -185,7 +185,9 @@ function normalizeMessageEntry(
           kind: 'tool_result',
           toolId,
           content: extractToolResultContent(record.content),
-          isError: record.is_error === true || record.isError === true,
+          isError: record.is_error === true
+            || record.isError === true
+            || reportsNonZeroExit(extractToolResultContent(record.content)),
         }));
         continue;
       }
@@ -268,6 +270,14 @@ function normalizeMessageEntry(
 /**
  * Session reader/normalizer for Command Code transcripts.
  */
+// The CLI transcript never persists `is_error`; a failed shell command shows
+// only as a leading "Exit code: N" line, while live ACP updates mark the same
+// call `failed` — history has to agree.
+function reportsNonZeroExit(content: unknown): boolean {
+  const match = typeof content === 'string' ? /^\s*Exit code: (-?\d+)/.exec(content) : null;
+  return Boolean(match && match[1] !== '0');
+}
+
 export class CommandCodeSessionsProvider implements IProviderSessions {
   /**
    * Normalizes one raw transcript line. Live runtime events are already emitted

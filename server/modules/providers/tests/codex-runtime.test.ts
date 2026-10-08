@@ -322,3 +322,15 @@ test('live Codex tool items carry their outcome as toolResult', () => {
   );
   assert.deepEqual(fileChange.toolResult, { content: 'update a.ts', isError: false });
 });
+
+test('Codex history flags tool outputs with a non-zero exit code as errors', () => {
+  const provider = new CodexSessionsProvider();
+  // Rollout records go through the history normalizer (fetchHistory).
+  const result = (output: string) =>
+    (provider as any).normalizeHistoryEntry({ type: 'tool_result', toolCallId: 'call_1', output }, 'app')[0];
+
+  assert.equal(result('Script completed\nOutput:\n{"exit_code":2,"output":"no match"}').isError, true);
+  assert.equal(result('Script completed\nOutput:\n{"exit_code":0,"output":"ok"}').isError, false);
+  assert.equal(result('Process exited with code 1\nOutput:\nboom').isError, true);
+  assert.equal(result('plain output').isError, false);
+});

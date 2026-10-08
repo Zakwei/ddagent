@@ -7,7 +7,7 @@ import test from 'node:test';
 import { CommandCodeMcpProvider } from '@/modules/providers/list/commandcode/commandcode-mcp.provider.js';
 import { parseCommandCodeModelList } from '@/modules/providers/list/commandcode/commandcode-models.provider.js';
 import { questionAnswerOptionId, resolveCommandCodePlanReviewContent } from '@/modules/providers/list/commandcode/commandcode-runtime.provider.js';
-import { readCommandCodeTranscript } from '@/modules/providers/list/commandcode/commandcode-sessions.provider.js';
+import { CommandCodeSessionsProvider, readCommandCodeTranscript } from '@/modules/providers/list/commandcode/commandcode-sessions.provider.js';
 import {
   commandCodeProjectSlug,
   isCommandCodeTranscriptFileName,
@@ -318,4 +318,16 @@ test('questionAnswerOptionId cancels a multi-select pick instead of keeping only
   assert.equal(questionAnswerOptionId(params, { answers: { [question]: 'API, Docs' } }), null);
   assert.equal(questionAnswerOptionId(params, { answers: { [question]: ['API', 'UI'] } }), null);
   assert.equal(questionAnswerOptionId(params, { answers: { [question]: 'UI' } }), 'option_1');
+});
+
+test('Command Code history flags a tool result that reports a non-zero exit code', () => {
+  const provider = new CommandCodeSessionsProvider();
+  const resultFor = (text: string) => provider.normalizeMessage({
+    type: 'message', id: 'm1', timestamp: '2026-10-07T10:00:00Z',
+    message: { role: 'user', content: [{ type: 'tool_result', tool_use_id: 't1', content: [{ type: 'text', text }] }] },
+  }, 'app').find((message) => message.kind === 'tool_result');
+
+  assert.equal(resultFor('Exit code: 2\n\nnpm ERR!')?.isError, true);
+  assert.equal(resultFor('Exit code: 0\n\nok')?.isError, false);
+  assert.equal(resultFor('total 12\n-rw-r--r-- a.ts')?.isError, false);
 });

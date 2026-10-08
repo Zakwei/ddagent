@@ -652,6 +652,18 @@ function codexLiveToolResult(content: unknown, isError: boolean) {
   return { content: typeof content === 'string' ? content : '', isError };
 }
 
+// Rollout tool outputs carry no error flag — a failed command shows only as
+// a non-zero exit code inside the output text (the exec result JSON, or the
+// shell tool's "Process exited with code N" line). Live rows flag the same
+// calls through `exitCode`, so history must agree.
+function codexOutputReportsFailure(output: unknown): boolean {
+  if (typeof output !== 'string') return false;
+  const match = /"exit_code":\s*(-?\d+)/.exec(output)
+    ?? /Process exited with code (-?\d+)/.exec(output)
+    ?? /^Exit code: (-?\d+)/m.exec(output);
+  return Boolean(match && match[1] !== '0');
+}
+
 // MCP results carry ACP-style content blocks; keep their text.
 function codexMcpResultText(result: unknown): string {
   const blocks = readObjectRecord(result)?.content;
@@ -763,7 +775,7 @@ export class CodexSessionsProvider implements IProviderSessions {
         kind: 'tool_result',
         toolId: raw.toolCallId || '',
         content: raw.output || '',
-        isError: Boolean(raw.isError),
+        isError: Boolean(raw.isError) || codexOutputReportsFailure(raw.output),
       })];
     }
 
