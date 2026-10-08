@@ -1043,15 +1043,17 @@ async function buildPromptBlocks(promptText: any, options: any, workingDir: any,
     return blocks;
 }
 
-// Devin's ACP mode ids are its `--permission-mode` values: "auto" auto-approves
-// read-only tools and asks for the rest, "accept-edits" also approves workspace
-// edits, "smart" additionally auto-runs actions a fast model judges safe, and
-// "dangerous" approves everything. Devin has no plan mode.
+// Devin's ACP session modes (devin 3000.x) are accept-edits (the session
+// default), smart, ask, plan and bypass — not its CLI `--permission-mode`
+// values: set_mode "auto"/"dangerous" are not offered. No ACP mode asks before
+// workspace edits, so DDAgent "default" maps to accept-edits (still asks for
+// execs); mapping it to an unoffered id would leave a session stuck in
+// smart/bypass after the user switches back to default.
 const DEVIN_ACP_MODE_BY_PERMISSION_MODE: Record<string, string> = {
-    default: 'auto',
+    default: 'accept-edits',
     auto: 'smart',
     acceptEdits: 'accept-edits',
-    bypassPermissions: 'dangerous',
+    bypassPermissions: 'bypass',
 };
 
 // Mirrors the ACP-side mode (current id and the ids the session offers) from a

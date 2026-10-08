@@ -53,8 +53,9 @@ const modeState = (overrides: Record<string, unknown> = {}) => {
   const sent: any[] = [];
   const state: any = {
     devinSessionId: 'dev-1',
-    currentModeId: 'auto',
-    availableModeIds: ['auto', 'accept-edits', 'smart', 'dangerous'],
+    currentModeId: 'ask',
+    // What `devin acp` (3000.x) offers in session/new.
+    availableModeIds: ['accept-edits', 'smart', 'ask', 'plan', 'bypass'],
     currentWriter: { send: (message: any) => sent.push(message) },
     async sendRequest(method: string, params: any) {
       calls.push({ method, params });
@@ -67,8 +68,9 @@ const modeState = (overrides: Record<string, unknown> = {}) => {
 
 test('Devin permission modes map onto the real ACP mode ids', async () => {
   for (const [mode, modeId] of [
-    ['bypassPermissions', 'dangerous'],
+    ['bypassPermissions', 'bypass'],
     ['acceptEdits', 'accept-edits'],
+    ['default', 'accept-edits'],
     ['auto', 'smart'],
   ]) {
     const { state, calls } = modeState();
@@ -76,24 +78,24 @@ test('Devin permission modes map onto the real ACP mode ids', async () => {
     assert.deepEqual(calls, [{ method: 'session/set_mode', params: { sessionId: 'dev-1', modeId } }]);
     assert.equal(state.currentModeId, modeId);
   }
-  // default asks — a session left in another mode is switched back to auto.
-  const { state, calls } = modeState({ currentModeId: 'dangerous' });
+  // A session left in bypass is switched back when the user picks default.
+  const { state, calls } = modeState({ currentModeId: 'bypass' });
   await applyPermissionModeToDevinSession(state, 'default');
-  assert.equal(calls[0].params.modeId, 'auto');
+  assert.equal(calls[0].params.modeId, 'accept-edits');
   // Already in the target mode: nothing is sent.
   await applyPermissionModeToDevinSession(state, 'default');
   assert.equal(calls.length, 1);
 });
 
 test('Devin surfaces an unavailable or failed mode switch as a notice', async () => {
-  const unavailable = modeState({ availableModeIds: ['auto', 'accept-edits'] });
+  const unavailable = modeState({ availableModeIds: ['accept-edits', 'ask'] });
   await applyPermissionModeToDevinSession(unavailable.state, 'bypassPermissions');
   assert.equal(unavailable.calls.length, 0);
   assert.equal(unavailable.sent[0].notice, true);
 
   const failing = modeState({ async sendRequest() { throw new Error('bad mode'); } });
   await applyPermissionModeToDevinSession(failing.state, 'acceptEdits');
-  assert.equal(failing.state.currentModeId, 'auto');
+  assert.equal(failing.state.currentModeId, 'ask');
   assert.match(failing.sent[0].text, /bad mode/);
 });
 
