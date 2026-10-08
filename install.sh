@@ -50,7 +50,7 @@ if [ "$NODE_MAJOR" -lt 22 ]; then
 fi
 
 if [ "$VERSION" = "latest" ]; then
-  VERSION="$(git ls-remote --tags --sort=-v:refname "$REPO_URL" 'v*' | tail -n1 | sed 's|.*refs/tags/||')"
+  VERSION="$(git ls-remote --tags --sort=-v:refname "$REPO_URL" 'v*' | grep -v '\^{}' | head -n1 | sed 's|.*refs/tags/||')"
   [ -n "$VERSION" ] || { echo "error: could not resolve latest release tag" >&2; exit 1; }
 fi
 echo ">> Installing ddagent server $VERSION into $INSTALL_DIR"
