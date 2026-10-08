@@ -196,6 +196,7 @@ export async function createServices(options: CreateServicesOptions = {}): Promi
         appRoot,
         installMode,
         isPlatform,
+        runningVersion,
     });
 
     const app = express();

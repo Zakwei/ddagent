@@ -71,10 +71,20 @@ npm run build
 # Drop devDependencies — the server only needs the production set.
 npm prune --omit=dev
 
+# One { ... } block so a self-update rewriting files next to it can't make sh
+# read a half-updated script; exit code 75 = restart (restart/update from the UI).
 cat > start.sh <<'EOF'
 #!/bin/sh
 # Env: SERVER_PORT (default 3001), HOST (default 0.0.0.0). Optional .env file here.
-exec node "$(dirname "$0")/dist-server/server/index.js" "$@"
+{
+cd "$(dirname "$0")" || exit 1
+export DDAGENT_SUPERVISED=1
+while :; do
+  node dist-server/server/index.js "$@"
+  code=$?
+  [ "$code" -eq 75 ] || exit "$code"
+done
+}
 EOF
 chmod +x start.sh
 

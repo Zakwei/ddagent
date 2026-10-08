@@ -84,6 +84,11 @@ async function writeServerPackageJson(stageDir) {
 // without knowing the server entrypoint path.
 async function writeStandaloneLaunchers(stageDir) {
   const startShPath = path.join(stageDir, 'start.sh');
+  // The whole script is one { ... } block: sh parses it completely before
+  // running it, so an update that replaces files next to it can never make
+  // the shell read half-old, half-new lines. The loop restarts the server
+  // when it exits with 75 (restart/update from the UI) and applies a staged
+  // update first (scripts/apply-update.cjs).
   await fs.writeFile(
     startShPath,
     [
@@ -91,7 +96,22 @@ async function writeStandaloneLaunchers(stageDir) {
       '# Self-hosted ddagent server — serves the API/WS that the ddagent client',
       '# connects to. Node.js 22+ required.',
       '# Env: SERVER_PORT (default 3001), HOST (default 0.0.0.0). Optional .env file here.',
-      'exec node "$(dirname "$0")/dist-server/server/index.js" "$@"',
+      '{',
+      'cd "$(dirname "$0")" || exit 1',
+      'export DDAGENT_SUPERVISED=1',
+      'while :; do',
+      '  applied=',
+      '  [ -f .update/ready ] && node scripts/apply-update.cjs && applied=1',
+      '  started=$(date +%s)',
+      '  node dist-server/server/index.js "$@"',
+      '  code=$?',
+      '  [ "$code" -eq 75 ] && continue',
+      '  # An update that cannot even start: restore the previous version and run it.',
+      '  if [ -n "$applied" ] && [ "$code" -ne 0 ] && [ $(( $(date +%s) - started )) -lt 120 ] \\',
+      '    && node scripts/apply-update.cjs --rollback; then continue; fi',
+      '  exit "$code"',
+      'done',
+      '}',
       '',
     ].join('\n'),
     'utf8',
@@ -104,7 +124,19 @@ async function writeStandaloneLaunchers(stageDir) {
     [
       '@echo off',
       'rem Self-hosted ddagent server. Node.js 22+ required. Env: SERVER_PORT, HOST.',
-      'node "%~dp0dist-server\\server\\index.js" %*',
+      'rem Restarts on exit code 75 (restart/update from the UI), applying a staged update first.',
+      'setlocal',
+      'cd /d "%~dp0"',
+      'set DDAGENT_SUPERVISED=1',
+      ':loop',
+      'set APPLIED=',
+      'if exist ".update\\ready" node "scripts\\apply-update.cjs" && set APPLIED=1',
+      'node "dist-server\\server\\index.js" %*',
+      'set CODE=%ERRORLEVEL%',
+      'if "%CODE%"=="75" goto loop',
+      'rem An update that cannot even start: restore the previous version and run it.',
+      'if defined APPLIED if not "%CODE%"=="0" node "scripts\\apply-update.cjs" --rollback && goto loop',
+      'exit /b %CODE%',
       '',
     ].join('\r\n'),
     'utf8',
@@ -141,6 +173,7 @@ await copyRequired(stageDir, 'public');
 await copyRequired(stageDir, 'shared');
 await copyRequired(stageDir, 'package-lock.json');
 await copyIfExists(stageDir, 'scripts/fix-node-pty.js');
+await copyRequired(stageDir, 'scripts/apply-update.cjs');
 await copyIfExists(stageDir, 'LICENSE');
 await copyIfExists(stageDir, 'THIRD_PARTY_NOTICES.md');
 await writeServerPackageJson(stageDir);
@@ -162,7 +195,16 @@ if (await pathExists(path.join(stageDir, 'scripts', 'fix-node-pty.js'))) {
 
 await fs.writeFile(
   path.join(stageDir, '.installed.json'),
-  JSON.stringify({ version, platform, arch, builtAt: new Date().toISOString() }, null, 2),
+  JSON.stringify({
+    version,
+    platform,
+    arch,
+    builtAt: new Date().toISOString(),
+    // Native modules (better-sqlite3, node-pty) only load on this Node.js ABI;
+    // a self-update checks it before installing the bundle.
+    node: process.versions.node,
+    nodeModules: process.versions.modules,
+  }, null, 2),
   'utf8',
 );
 

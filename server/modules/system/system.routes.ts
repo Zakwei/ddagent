@@ -1,6 +1,11 @@
 import express from 'express';
 
-import type { createSystemUpdateService } from './system.service.js';
+import { RESTART_EXIT_CODE, type createSystemUpdateService } from './system.service.js';
+
+/** Id of the authenticated caller — picks their stored GitHub token. */
+function userIdOf(request: express.Request): number {
+  return (request as express.Request & { user?: { id: number } }).user?.id ?? 0;
+}
 
 /** Creates thin system routes that delegate update execution to the service. */
 export function createSystemRouter(
@@ -26,27 +31,43 @@ export function createSystemRouter(
     }
   });
 
+  router.get('/update-info', (_request, response) => {
+    response.json(systemUpdateService.getUpdateInfo());
+  });
+
   router.post('/restart', (_request, response) => {
-    // Under systemd (INVOCATION_ID is set) the watchdog in start-ddagent.sh
-    // brings the process back, so exiting is a self-restart. Otherwise report
-    // that restart is unsupported and keep running.
-    const restarting = Boolean(process.env.INVOCATION_ID);
+    // A supervising launcher (systemd, the bundled start script) starts the
+    // process again when it exits with RESTART_EXIT_CODE, so exiting is a
+    // self-restart. Otherwise report that restart is unsupported and keep running.
+    const restarting = systemUpdateService.getUpdateInfo().server.supervised;
     response.json({ restarting });
     if (restarting) {
-      setTimeout(() => process.exit(0), 500).unref();
+      setTimeout(() => process.exit(RESTART_EXIT_CODE), 500).unref();
     }
   });
 
-  router.post('/update', async (_request, response, next) => {
+  router.post('/update', async (request, response, next) => {
     try {
-      const result = await systemUpdateService.updateSystem();
-      // Under systemd (INVOCATION_ID is set) a watchdog brings the process back,
-      // so a successful update can hand off to the new code by exiting.
-      const restarting = Boolean(result.success && process.env.INVOCATION_ID);
+      const result = await systemUpdateService.updateSystem(userIdOf(request));
+      // Hand off to the new code by exiting when something restarts us; an
+      // update that found nothing newer has nothing to hand off.
+      const restarting = Boolean(
+        result.success && !('upToDate' in result && result.upToDate)
+          && systemUpdateService.getUpdateInfo().server.supervised,
+      );
       response.status(result.success ? 200 : 500).json({ ...result, restarting });
       if (restarting) {
-        setTimeout(() => process.exit(0), 1000).unref();
+        setTimeout(() => process.exit(RESTART_EXIT_CODE), 1000).unref();
       }
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.post('/update-web', async (request, response, next) => {
+    try {
+      const result = await systemUpdateService.updateWebClient(userIdOf(request));
+      response.status(result.success ? 200 : 500).json(result);
     } catch (error) {
       next(error);
     }
