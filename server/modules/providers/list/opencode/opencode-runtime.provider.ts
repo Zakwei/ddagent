@@ -1,10 +1,15 @@
 import fsSync from 'node:fs';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 import {
   appendFilesInputTag,
   appendImagesInputTag,
+  isAllowedImageSourcePath,
   normalizeAttachmentDescriptors,
+  normalizeImageDescriptors,
+  resolveImageAbsolutePath,
+  resolveImageMediaType,
   createCompleteMessage,
   createNormalizedMessage,
   getOpenCodeDatabasePath,
@@ -16,6 +21,7 @@ import {
 import { notifyRunFailed, notifyRunStopped } from '@/modules/notifications/index.js';
 import { orchestratorMessagesDb } from '@/modules/database/index.js';
 import { ensureServer, getServer } from '@/modules/providers/list/opencode/opencode-server.manager.js';
+import { extractOpenCodeErrorMessage } from '@/modules/providers/list/opencode/opencode-sessions.provider.js';
 import type {
   IProviderRuntime,
   AnyRecord,
@@ -239,6 +245,10 @@ type ForwardedQuestion = {
   multiSelect?: boolean;
 };
 
+// Label of the synthetic option added for `custom` questions — the client
+// opens its free-text field for "Other"-style options.
+const FREE_TEXT_OPTION_LABEL = 'Other';
+
 type PendingPermission = {
   requestId: string;
   appSessionId: string | null;
@@ -408,6 +418,27 @@ function messageTokenTotal(info: AnyRecord): number {
     + (cache ? (Number(cache.read) || 0) + (Number(cache.write) || 0) : 0);
 }
 
+const POISON_SIBLING_POLL_MS = 2000;
+
+/** Another run is mid-turn in the same serve instance + directory. */
+function hasLiveSiblingRun(run: ActiveRun): boolean {
+  const directory = path.resolve(run.directory);
+  for (const other of activeRuns.values()) {
+    if (
+      other !== run
+      && other.baseUrl === run.baseUrl
+      && path.resolve(other.directory) === directory
+      && other.promptPosted
+      && !other.completeSent
+      && !other.aborted
+      && !other.recovering
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
 /**
  * Resets the poisoned directory instance and reposts this run's prompt —
  * self-healing for the OpenCode stale-abort state (issue #30144). The run
@@ -426,6 +457,15 @@ async function recoverPoisonedRun(run: ActiveRun): Promise<void> {
   if (!run.baseUrl || !run.providerSessionId || !run.promptBody) {
     failRun(run, new Error('OpenCode aborted the prompt and the run cannot be retried.'));
     return;
+  }
+  // Disposing the directory instance kills every turn running in it, so wait
+  // for healthy sibling runs to settle first (Stop still ends this run).
+  while (hasLiveSiblingRun(run)) {
+    if (run.aborted || run.completeSent) {
+      run.resolve();
+      return;
+    }
+    await new Promise((resolve) => setTimeout(resolve, POISON_SIBLING_POLL_MS));
   }
   await ensureInstanceDisposed(run.baseUrl, run.directory);
   if (run.aborted || run.completeSent) {
@@ -560,12 +600,7 @@ function forwardPermissionRequest(
 ): void {
   const requestId = String(props.id);
   const toolName = String(props.permission || 'tool');
-  const input = {
-    permission: props.permission,
-    patterns: props.patterns,
-    metadata: props.metadata,
-    always: props.always,
-  };
+  const input = buildPermissionInput(props);
 
   pendingPermissions.set(requestId, {
     requestId,
@@ -588,6 +623,36 @@ function forwardPermissionRequest(
     sessionId: providerSessionId,
     provider: PROVIDER,
   }));
+}
+
+/**
+ * C4: what the user is approving — OpenCode's raw ask plus the readable
+ * fields the client's tool renderers already know (`command`, `file_path`,
+ * `url`), pulled from metadata or, failing that, the ask's patterns.
+ */
+function buildPermissionInput(props: AnyRecord): AnyRecord {
+  const metadata = readObjectRecord(props.metadata) ?? {};
+  const patterns = Array.isArray(props.patterns)
+    ? props.patterns.filter((pattern: unknown): pattern is string => typeof pattern === 'string' && pattern.length > 0)
+    : [];
+  const permission = String(props.permission ?? '');
+  const command = readOptionalString(metadata.command)
+    ?? (permission === 'bash' && patterns.length ? patterns.join('\n') : undefined);
+  const filePath = readOptionalString(metadata.filepath)
+    ?? readOptionalString(metadata.filePath)
+    ?? readOptionalString(metadata.file_path)
+    ?? readOptionalString(metadata.path)
+    ?? (['read', 'external_directory', ...EDIT_PERMISSIONS].includes(permission) ? patterns[0] : undefined);
+  const url = readOptionalString(metadata.url);
+  return {
+    permission: props.permission,
+    patterns: props.patterns,
+    metadata: props.metadata,
+    always: props.always,
+    ...(command ? { command } : {}),
+    ...(filePath ? { file_path: filePath } : {}),
+    ...(url ? { url } : {}),
+  };
 }
 
 // OpenCode lists the patterns an "always" reply approves for the session;
@@ -636,7 +701,10 @@ function handlePermissionAsked(baseUrl: string, props: AnyRecord): void {
 }
 
 function handlePermissionReplied(_baseUrl: string, props: AnyRecord): void {
-  const requestId = String(props.permissionID ?? '');
+  // 1.18 sends `requestID`; older builds sent `permissionID`. Asks OpenCode
+  // auto-resolves (an "always" reply covering siblings, a reject cascading)
+  // arrive here too, so their prompts are cleared below.
+  const requestId = String(props.requestID ?? props.permissionID ?? '');
   const pending = requestId ? pendingPermissions.get(requestId) : undefined;
   if (!pending) {
     return;
@@ -656,14 +724,19 @@ function handlePermissionReplied(_baseUrl: string, props: AnyRecord): void {
 }
 
 function mapQuestion(raw: AnyRecord): ForwardedQuestion {
-  const options = Array.isArray(raw.options) ? raw.options : [];
+  const options = (Array.isArray(raw.options) ? raw.options : []).map((option: AnyRecord) => ({
+    label: String(option?.label ?? ''),
+    description: typeof option?.description === 'string' ? option.description : undefined,
+  }));
+  // `custom` (default true) lets the user type their own answer; surface it
+  // as an "Other" option unless the model already offered one.
+  if (raw.custom !== false && !options.some((option: { label: string }) => /\b(other|custom)\b/i.test(option.label))) {
+    options.push({ label: FREE_TEXT_OPTION_LABEL, description: 'Type your own answer' });
+  }
   return {
     question: String(raw.question ?? ''),
     header: typeof raw.header === 'string' ? raw.header : undefined,
-    options: options.map((option: AnyRecord) => ({
-      label: String(option?.label ?? ''),
-      description: typeof option?.description === 'string' ? option.description : undefined,
-    })),
+    options,
     multiSelect: Boolean(raw.multiple),
   };
 }
@@ -746,9 +819,10 @@ function handleQuestionSettled(props: AnyRecord): void {
 
 /**
  * Turns the interactive panel's `answers` (question text → labels joined with
- * ", ") into OpenCode's positional `Array<Array<string>>`. When the value
- * equals a single option label exactly it is kept whole, so labels that
- * themselves contain ", " survive.
+ * ", ") into OpenCode's positional `Array<Array<string>>`. Only multi-select
+ * answers are split; a single-select or free-text answer is kept whole (free
+ * text may contain ", "). A multi-select value equal to one option label is
+ * also kept whole, so labels that themselves contain ", " survive.
  */
 function questionAnswersToApi(questions: ForwardedQuestion[], answers: unknown): string[][] {
   const map = answers && typeof answers === 'object' && !Array.isArray(answers)
@@ -762,7 +836,7 @@ function questionAnswersToApi(questions: ForwardedQuestion[], answers: unknown):
     if (typeof value !== 'string' || value.trim() === '') {
       return [];
     }
-    if (question.options.some((option) => option.label === value)) {
+    if (!question.multiSelect || question.options.some((option) => option.label === value)) {
       return [value];
     }
     return value.split(', ').map((part) => part.trim()).filter(Boolean);
@@ -889,6 +963,10 @@ function dispatchServerEvent(baseUrl: string, event: AnyRecord): void {
       && !run.aborted
       && !run.completeSent
       && !run.poisonRetried
+      // The retry-stall watchdog's own /abort also ends in a zero-token
+      // MessageAbortedError — that is not poison, and a dispose would kill
+      // sibling runs in the directory.
+      && !run.retryStallAborted
       && info.role === 'assistant'
       && error?.name === 'MessageAbortedError'
       && messageTokenTotal(info) === 0
@@ -908,14 +986,11 @@ function dispatchServerEvent(baseUrl: string, event: AnyRecord): void {
       && !run.aborted
       && !run.completeSent
       && !run.recovering
+      && !run.retryStallAborted
       && info.role === 'assistant'
       && error
     ) {
-      const detail =
-        readOptionalString(readObjectRecord(error.data)?.message)
-        ?? readOptionalString(error.message)
-        ?? String(error.name ?? 'OpenCode turn failed');
-      failRun(run, new Error(detail));
+      failRun(run, new Error(extractOpenCodeErrorMessage(error) ?? 'OpenCode turn failed'));
     }
     return;
   }
@@ -1008,6 +1083,17 @@ function dispatchServerEvent(baseUrl: string, event: AnyRecord): void {
     if (props.status.type === 'retry') {
       const attempt = Number(props.status.attempt) || 0;
       const detail = readOptionalString(props.status.message) ?? 'Rate limited';
+      // C1: one persistent line per retry streak; the label below keeps
+      // ticking with the attempt count.
+      if (run.retrySince === 0) {
+        run.writer.send(createNormalizedMessage({
+          kind: 'status',
+          text: `OpenCode is retrying: ${detail}`,
+          notice: true,
+          sessionId: run.providerSessionId ?? providerSessionId,
+          provider: PROVIDER,
+        }));
+      }
       run.writer.send(createNormalizedMessage({
         kind: 'status',
         text: attempt > 0 ? `${detail} — retry ${attempt}` : detail,
@@ -1055,10 +1141,7 @@ function dispatchServerEvent(baseUrl: string, event: AnyRecord): void {
     // previous turn — and an error during poison recovery belongs to the
     // killed turn, not the retried one.
     if (run.promptPosted && !run.recovering) {
-      const errorContent = props.error?.data?.message
-        ?? props.error?.message
-        ?? (typeof props.error === 'string' ? props.error : 'OpenCode session error');
-      failRun(run, new Error(String(errorContent)));
+      failRun(run, new Error(extractOpenCodeErrorMessage(props.error) ?? 'OpenCode session error'));
     }
   }
 }
@@ -1495,6 +1578,30 @@ function ensureEventStream(baseUrl: string): Promise<void> {
   return connected;
 }
 
+/**
+ * Images go to OpenCode as real `file` parts (it inlines `file://` images as
+ * data URLs for the model). The `<images_input>` tag stays in the text part
+ * only so reloaded history can rebuild the attachment chips.
+ */
+function buildImageFileParts(images: unknown, cwd: string): AnyRecord[] {
+  const parts: AnyRecord[] = [];
+  for (const descriptor of normalizeImageDescriptors(images)) {
+    const resolvedPath = resolveImageAbsolutePath(cwd, descriptor.path);
+    // Same trust boundary as the Claude/Codex builders: OpenCode reads it.
+    if (!isAllowedImageSourcePath(resolvedPath, cwd)) {
+      console.warn(`[OpenCode] Refusing to attach image outside allowed roots: ${descriptor.path}`);
+      continue;
+    }
+    parts.push({
+      type: 'file',
+      mime: resolveImageMediaType(descriptor) ?? 'application/octet-stream',
+      filename: descriptor.name ?? path.basename(resolvedPath),
+      url: pathToFileURL(resolvedPath).href,
+    });
+  }
+  return parts;
+}
+
 function splitModelRef(model: string | undefined): { providerID?: string; modelID?: string } {
   if (!model) {
     return {};
@@ -1701,6 +1808,9 @@ export async function spawnOpenCode(
         if (run.providerSessionId) {
           const exists = await providerSessionExists(server.baseUrl, workingDir, run.providerSessionId);
           if (!exists) {
+            if (providerToApp.get(run.providerSessionId) === appSessionId) {
+              providerToApp.delete(run.providerSessionId);
+            }
             run.providerSessionId = null;
           }
         }
@@ -1755,7 +1865,7 @@ export async function spawnOpenCode(
         run.promptPosted = true;
         run.promptPostedAt = Date.now();
         const promptBody: AnyRecord = {
-          parts: [{ type: 'text', text: promptText }],
+          parts: [{ type: 'text', text: promptText }, ...buildImageFileParts(images, workingDir)],
           ...(behavior.agent ? { agent: behavior.agent } : {}),
           ...(modelID ? { model: { providerID, modelID, ...(resolvedEffort ? { variant: resolvedEffort } : {}) } } : {}),
         };
@@ -1831,7 +1941,7 @@ export async function steerOpenCodeSession(sessionId: string, content: string, o
   const { status } = await apiRequest(run.baseUrl, `/session/${run.providerSessionId}/prompt_async`, {
     method: 'POST',
     query: { directory: run.directory },
-    body: { ...run.promptBody, parts: [{ type: 'text', text }] },
+    body: { ...run.promptBody, parts: [{ type: 'text', text }, ...buildImageFileParts(options.images, run.directory)] },
   });
   if (status >= 400) {
     return false;

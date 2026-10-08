@@ -419,6 +419,87 @@ test('default mode forwards asks and permissions.resolve replies to the server',
   });
 });
 
+test('permission_request carries a readable command and permission.replied (1.18 requestID) clears the ask', async () => {
+  await withFakeServe(async ({ state, tempRoot }) => {
+    const writer = makeWriter();
+    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-pr', permissionMode: 'default' }, writer, makeContext());
+
+    await waitFor(() => state.promptBodies.length === 1);
+    state.emit(askedEvent('ses_fake_1', 'per_x', 'bash'));
+    await waitFor(() => writer.messages.some((m) => m.kind === 'permission_request'));
+    const request = writer.messages.find((m) => m.kind === 'permission_request');
+    assert.equal(request.input.command, 'echo hi');
+    assert.deepEqual(request.input.patterns, ['echo *']);
+
+    // Auto-resolved by OpenCode (e.g. a sibling "always" reply).
+    state.emit({ type: 'permission.replied', properties: { sessionID: 'ses_fake_1', requestID: 'per_x', reply: 'always' } });
+    await waitFor(() => writer.messages.some((m) => m.kind === 'permission_cancelled' && m.requestId === 'per_x'));
+    assert.equal(opencodeRuntime.permissions.listPending('app-pr').length, 0);
+
+    state.emit(busyEvent('ses_fake_1'));
+    state.emit(idleEvent('ses_fake_1'));
+    await run;
+  });
+});
+
+test('single-select and free-text question answers are not split on ", "', async () => {
+  await withFakeServe(async ({ state, tempRoot }) => {
+    const writer = makeWriter();
+    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-q2', permissionMode: 'default' }, writer, makeContext());
+
+    await waitFor(() => state.promptBodies.length === 1);
+    state.emit(questionAskedEvent('ses_fake_1', 'que_2', sampleQuestions));
+    await waitFor(() => writer.messages.some((m) => m.kind === 'permission_request'));
+    opencodeRuntime.permissions.resolve('que_2', {
+      allow: true,
+      updatedInput: { answers: { 'Which approach?': 'Fast, but test the hot path', 'Which files?': 'a.ts' } },
+    });
+    await waitFor(() => state.questionReplies.length === 1);
+    assert.deepEqual(state.questionReplies[0].answers, [['Fast, but test the hot path'], ['a.ts']]);
+
+    state.emit(busyEvent('ses_fake_1'));
+    state.emit(idleEvent('ses_fake_1'));
+    await run;
+  });
+});
+
+test('images are posted as file parts and outside paths are refused', async () => {
+  await withFakeServe(async ({ state, tempRoot }) => {
+    const writer = makeWriter();
+    const run = opencodeRuntime.run('Look', {
+      cwd: tempRoot,
+      sessionId: 'app-img',
+      images: [{ path: path.join(tempRoot, 'shot.png') }, { path: '/etc/secret.png' }],
+    }, writer, makeContext());
+
+    await waitFor(() => state.promptBodies.length === 1);
+    const fileParts = state.promptBodies[0].body.parts.filter((part) => part.type === 'file');
+    assert.equal(fileParts.length, 1);
+    assert.equal(fileParts[0].mime, 'image/png');
+    assert.equal(fileParts[0].url, `file://${path.join(tempRoot, 'shot.png')}`);
+
+    state.emit(busyEvent('ses_fake_1'));
+    state.emit(idleEvent('ses_fake_1'));
+    await run;
+  });
+});
+
+test('a MessageOutputLengthError fails the run with readable text', async () => {
+  await withFakeServe(async ({ state, tempRoot }) => {
+    const writer = makeWriter();
+    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-ol' }, writer, makeContext());
+
+    await waitFor(() => state.promptBodies.length === 1);
+    state.emit({
+      type: 'message.updated',
+      properties: { sessionID: 'ses_fake_1', info: { role: 'assistant', error: { name: 'MessageOutputLengthError', data: {} } } },
+    });
+    await assert.rejects(run, /Output length limit reached/);
+    const kinds = writer.messages.filter((m) => m.kind === 'error' || m.kind === 'complete').map((m) => m.kind);
+    assert.deepEqual(kinds, ['error', 'complete']);
+  });
+});
+
 test('setPermissionMode to bypass auto-approves asks already pending mid-run', async () => {
   await withFakeServe(async ({ state, tempRoot }) => {
     const writer = makeWriter();
@@ -511,6 +592,8 @@ test('question.asked is forwarded to the UI and resolve replies with positional 
     await waitFor(() => state.questionReplies.length === 1);
     assert.equal(state.questionReplies[0].requestID, 'que_1');
     assert.deepEqual(state.questionReplies[0].answers, [['Fast'], ['a.ts', 'b.ts']]);
+    // `custom` defaults on: an "Other" free-text option is offered.
+    assert.equal(request.input.questions[0].options.at(-1).label, 'Other');
     assert.equal(opencodeRuntime.permissions.listPending('app-q1').length, 0);
 
     state.emit(busyEvent('ses_fake_1'));
@@ -932,8 +1015,16 @@ test('a session.status retry surfaces a rate-limit status to the client', async 
     });
     await waitFor(() => writer.messages.some((m) => m.kind === 'status' && m.text?.includes('retry')));
 
-    const statusMessage = writer.messages.find((m) => m.kind === 'status');
+    const statusMessage = writer.messages.find((m) => m.kind === 'status' && !m.notice);
     assert.equal(statusMessage.text, 'Rate Limited — retry 2');
+    // C1: one persistent notice per retry streak.
+    state.emit({
+      type: 'session.status',
+      properties: { sessionID: sid, status: { type: 'retry', attempt: 3, message: 'Rate Limited' } },
+    });
+    await waitFor(() => writer.messages.some((m) => m.text === 'Rate Limited — retry 3'));
+    const notices = writer.messages.filter((m) => m.kind === 'status' && m.notice === true);
+    assert.deepEqual(notices.map((m) => m.text), ['OpenCode is retrying: Rate Limited']);
 
     state.emit(busyEvent(sid));
     state.emit(idleEvent(sid));

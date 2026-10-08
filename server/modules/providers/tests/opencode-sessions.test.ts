@@ -1178,3 +1178,42 @@ test('OpenCode sessions provider rejects instead of returning a fake empty trans
     await rm(tempRoot, { recursive: true, force: true });
   }
 });
+
+test('OpenCode history renders readable errors, skips user aborts and shows compaction/subtask parts', { concurrency: false }, async () => {
+  const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'opencode-session-errors-'));
+  const workspacePath = path.join(tempRoot, 'workspace');
+  await mkdir(workspacePath, { recursive: true });
+  const restoreHomeDir = patchHomeDir(tempRoot);
+
+  try {
+    await createOpenCodeDatabase(tempRoot, workspacePath);
+    const db = new Database(path.join(tempRoot, '.local', 'share', 'opencode', 'opencode.db'));
+    try {
+      const insertMessage = db.prepare('INSERT INTO message (id, session_id, time_created, time_updated, data) VALUES (?, ?, ?, ?, ?)');
+      const insertPart = db.prepare('INSERT INTO part (id, message_id, session_id, time_created, time_updated, data) VALUES (?, ?, ?, ?, ?, ?)');
+      insertMessage.run('m-len', 'open-session-1', 1_700_000_020_000, 1_700_000_020_000,
+        JSON.stringify({ role: 'assistant', error: { name: 'MessageOutputLengthError', data: {} } }));
+      insertMessage.run('m-abort', 'open-session-1', 1_700_000_021_000, 1_700_000_021_000,
+        JSON.stringify({ role: 'assistant', error: { name: 'MessageAbortedError', data: { message: 'Aborted' } } }));
+      insertMessage.run('m-parts', 'open-session-1', 1_700_000_022_000, 1_700_000_022_000, JSON.stringify({ role: 'assistant' }));
+      insertPart.run('p-compact', 'm-parts', 'open-session-1', 1_700_000_022_100, 1_700_000_022_100,
+        JSON.stringify({ type: 'compaction', auto: true }));
+      insertPart.run('p-sub', 'm-parts', 'open-session-1', 1_700_000_022_200, 1_700_000_022_200,
+        JSON.stringify({ type: 'subtask', prompt: 'Find X', description: 'search', agent: 'explore' }));
+    } finally {
+      db.close();
+    }
+
+    const history = await new OpenCodeSessionsProvider().fetchHistory('open-session-1');
+    const errors = history.messages.filter((message) => message.kind === 'error').map((message) => message.content);
+    assert.deepEqual(errors, ['Output length limit reached']);
+    const notice = history.messages.find((message) => message.kind === 'status');
+    assert.equal(notice?.notice, true);
+    assert.equal(notice?.text, 'Context compacted automatically');
+    const agent = history.messages.find((message) => message.toolName === 'Agent');
+    assert.equal((agent?.toolInput as Record<string, unknown>)?.subagent_type, 'explore');
+  } finally {
+    restoreHomeDir();
+    await rm(tempRoot, { recursive: true, force: true });
+  }
+});

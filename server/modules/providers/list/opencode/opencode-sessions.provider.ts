@@ -106,6 +106,19 @@ const TRANSCRIPT_CACHE_MAX_MESSAGES = 100_000;
 // CLI formatter so the persisted patch/diff reaches the UI like the CLI.
 const formatToolContent = (value: unknown): string => formatCliToolResult(value, undefined);
 
+// Readable text for named OpenCode errors that carry no message of their own
+// (MessageOutputLengthError's `data` is empty).
+const OPENCODE_ERROR_LABELS: Record<string, string> = {
+  MessageOutputLengthError: 'Output length limit reached',
+  MessageAbortedError: 'The response was aborted',
+  ContextOverflowError: 'Context window exceeded',
+  ContentFilterError: 'The response was blocked by the provider content filter',
+  ProviderAuthError: 'Provider authentication failed',
+  StructuredOutputError: 'Structured output failed',
+  APIError: 'Provider API error',
+  UnknownError: 'OpenCode error',
+};
+
 /**
  * Extracts a human-readable error message from an OpenCode error payload.
  *
@@ -113,8 +126,13 @@ const formatToolContent = (value: unknown): string => formatCliToolResult(value,
  * - a plain string (`error: "text"`)
  * - an object with a `message` field (`error: { message: "text" }`)
  * - an object with `data.message` (`error: { name: "UnknownError", data: { message: "text" } }`)
+ * - a named error without a message (`{ name: "MessageOutputLengthError", data: {} }`),
+ *   mapped to a readable label instead of the bare class name.
+ *
+ * Consumed by the opencode runtime (live `message.updated` / `session.error`)
+ * so live and reloaded error rows read the same.
  */
-const extractOpenCodeErrorMessage = (value: unknown): string | undefined => {
+export const extractOpenCodeErrorMessage = (value: unknown): string | undefined => {
   if (typeof value === 'string') {
     return value.trim() || undefined;
   }
@@ -124,10 +142,33 @@ const extractOpenCodeErrorMessage = (value: unknown): string | undefined => {
     return undefined;
   }
 
+  const name = readOptionalString(record.name);
   return readOptionalString(record.message)
     ?? readOptionalString(readObjectRecord(record.data)?.message)
-    ?? undefined;
+    ?? (name ? OPENCODE_ERROR_LABELS[name] ?? name.replace(/Error$/, ' error').replace(/([a-z])([A-Z])/g, '$1 $2') : undefined);
 };
+
+/** A user Stop surfaces as MessageAbortedError — not an error worth a row. */
+const isOpenCodeAbortError = (value: unknown): boolean =>
+  readOptionalString(readObjectRecord(value)?.name) === 'MessageAbortedError';
+
+/** Compaction marker shown as a persistent notice (C1). */
+const compactionNoticeText = (part: AnyRecord): string =>
+  part.auto === true ? 'Context compacted automatically' : 'Context compacted';
+
+/** `subtask` parts render as an Agent tool card (the delegated prompt). */
+const subtaskToolInput = (part: AnyRecord): AnyRecord => ({
+  description: readOptionalString(part.description) ?? '',
+  prompt: readOptionalString(part.prompt) ?? '',
+  ...(readOptionalString(part.agent) ? { subagent_type: readOptionalString(part.agent) } : {}),
+});
+
+// The subtask part only records the hand-off (the run itself is the `task`
+// tool), so it is settled up front instead of spinning forever.
+const subtaskToolResult = (part: AnyRecord) => ({
+  content: `Delegated to ${readOptionalString(part.agent) ?? 'subagent'}`,
+  isError: false,
+});
 
 const extractText = (value: unknown): string => {
   if (typeof value === 'string') {
@@ -514,6 +555,32 @@ export class OpenCodeSessionsProvider implements IProviderSessions {
       })];
     }
 
+    if (type === 'compaction') {
+      return [createNormalizedMessage({
+        id: stableId,
+        sessionId: eventSessionId,
+        timestamp,
+        provider: PROVIDER,
+        kind: 'status',
+        text: compactionNoticeText(source),
+        notice: true,
+      })];
+    }
+
+    if (type === 'subtask') {
+      return [createNormalizedMessage({
+        id: stableId,
+        sessionId: eventSessionId,
+        timestamp,
+        provider: PROVIDER,
+        kind: 'tool_use',
+        toolName: 'Agent',
+        toolInput: subtaskToolInput(source),
+        toolId: stableId,
+        toolResult: subtaskToolResult(source),
+      })];
+    }
+
     // DCP / patch / agent live events surfaced so the UI does not lose context
     // while a distributed compute step or agent patch is in flight.
     if (type === 'patch' || type === 'agent') {
@@ -686,6 +753,7 @@ export class OpenCodeSessionsProvider implements IProviderSessions {
         messageInfo
         && messageRole === 'assistant'
         && messageInfo.error != null
+        && !isOpenCodeAbortError(messageInfo.error)
         && !emittedMessageErrors.has(row.message_id)
       ) {
         emittedMessageErrors.add(row.message_id);
@@ -695,7 +763,7 @@ export class OpenCodeSessionsProvider implements IProviderSessions {
           timestamp,
           provider: PROVIDER,
           kind: 'error',
-          content: formatToolContent(messageInfo.error),
+          content: extractOpenCodeErrorMessage(messageInfo.error) ?? formatToolContent(messageInfo.error),
         }));
       }
 
@@ -839,6 +907,34 @@ export class OpenCodeSessionsProvider implements IProviderSessions {
         }
 
         normalized.push(toolMessage);
+        continue;
+      }
+
+      if (partType === 'compaction') {
+        normalized.push(createNormalizedMessage({
+          id: baseId,
+          sessionId,
+          timestamp,
+          provider: PROVIDER,
+          kind: 'status',
+          text: compactionNoticeText(partData),
+          notice: true,
+        }));
+        continue;
+      }
+
+      if (partType === 'subtask') {
+        normalized.push(createNormalizedMessage({
+          id: baseId,
+          sessionId,
+          timestamp,
+          provider: PROVIDER,
+          kind: 'tool_use',
+          toolName: 'Agent',
+          toolInput: subtaskToolInput(partData),
+          toolId: row.part_id,
+          toolResult: subtaskToolResult(partData),
+        }));
         continue;
       }
 
