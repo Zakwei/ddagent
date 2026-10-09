@@ -161,7 +161,8 @@ final activityPollerProvider = Provider<void>((ref) {
           (
             sessionId: s.sessionId,
             statusText: null,
-            canInterrupt: true,
+            // A CLI running in tmux is not the app's process to stop.
+            canInterrupt: s.raw['external'] != true,
             startedAt: (s.raw['startedAt'] as num?)?.toInt(),
           ),
       ]);

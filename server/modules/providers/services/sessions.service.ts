@@ -1,5 +1,7 @@
 import { randomUUID } from 'node:crypto';
+import { readdirSync, readFileSync } from 'node:fs';
 import fsp from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
 
 import { orchestratorMessagesDb, projectsDb, providerAccountsDb, queuedMessagesDb, sessionEventsDb, sessionsDb } from '@/modules/database/index.js';
@@ -54,6 +56,55 @@ function orchestratorMessageToNormalized(
         ? message.payload.text
         : `orchestrator:${message.kind}`,
   };
+}
+
+/** One processing session as `/sessions/running` reports it. */
+type RunningSessionSummary = {
+  sessionId: string;
+  provider: LLMProvider;
+  startedAt: number;
+  lastSeq: number;
+  /** Run owned by a process outside the app (tmux CLI) — not interruptible here. */
+  external?: boolean;
+};
+
+/**
+ * Claude CLIs started outside the app (tmux, a terminal) publish their state in
+ * `~/.claude/sessions/<pid>.json`. Busy/waiting ones count as running so the
+ * pane shows activity for them; the app's own SDK runs live in the registry.
+ * Exported for `listRunningSessions` below and its module test.
+ */
+export function listExternalClaudeRuns(
+  dir = path.join(os.homedir(), '.claude', 'sessions'),
+): RunningSessionSummary[] {
+  let names: string[];
+  try {
+    names = readdirSync(dir);
+  } catch {
+    return [];
+  }
+  const runs: RunningSessionSummary[] = [];
+  for (const name of names) {
+    if (!name.endsWith('.json')) continue;
+    try {
+      const entry = JSON.parse(readFileSync(path.join(dir, name), 'utf8'));
+      if (entry.entrypoint !== 'cli' || (entry.status !== 'busy' && entry.status !== 'waiting')) continue;
+      // Throws for a CLI that died and left its state file behind.
+      process.kill(entry.pid, 0);
+      const row = sessionsDb.getSessionByProviderSessionId(entry.sessionId);
+      if (!row || row.isArchived) continue;
+      runs.push({
+        sessionId: row.session_id,
+        provider: 'claude',
+        startedAt: entry.statusUpdatedAt ?? entry.startedAt ?? Date.now(),
+        lastSeq: 0,
+        external: true,
+      });
+    } catch {
+      // Unreadable, mid-write or stale state file.
+    }
+  }
+  return runs;
 }
 
 /** Max timestamp distance for a stored row to count as the provider's own copy. */
@@ -394,13 +445,13 @@ export const sessionsService = {
    * This is intentionally status-only: callers that only need sidebar activity
    * indicators should not attach to chat streams or request replayed messages.
    */
-  listRunningSessions(): Array<{
-    sessionId: string;
-    provider: LLMProvider;
-    startedAt: number;
-    lastSeq: number;
-  }> {
-    return chatRunRegistry.listRunningRuns();
+  listRunningSessions(): RunningSessionSummary[] {
+    const runs: RunningSessionSummary[] = chatRunRegistry.listRunningRuns();
+    const known = new Set(runs.map((run) => run.sessionId));
+    for (const run of listExternalClaudeRuns()) {
+      if (!known.has(run.sessionId)) runs.push(run);
+    }
+    return runs;
   },
 
   /**

@@ -13,10 +13,12 @@ import { isSubagentSessionTitle, safeSocketSend } from '@/shared/utils.js';
 
 type WatcherEventType = 'add' | 'change';
 
-const PROVIDER_WATCH_PATHS: Array<{ provider: LLMProvider; rootPath: string }> = [
+const PROVIDER_WATCH_PATHS: Array<{ provider: LLMProvider; rootPath: string; interval?: number }> = [
   {
     provider: 'claude',
     rootPath: path.join(os.homedir(), '.claude', 'projects'),
+    // CLI sessions run in tmux reach open panes only through this poll.
+    interval: 2_000,
   },
   {
     provider: 'cursor',
@@ -326,7 +328,7 @@ export async function initializeSessionsWatcher(): Promise<void> {
     failures: initialSync.failures,
   });
 
-  for (const { provider, rootPath } of PROVIDER_WATCH_PATHS) {
+  for (const { provider, rootPath, interval = 6_000 } of PROVIDER_WATCH_PATHS) {
     try {
       await fsPromises.mkdir(rootPath, { recursive: true });
 
@@ -337,8 +339,8 @@ export async function initializeSessionsWatcher(): Promise<void> {
         followSymlinks: false,
         depth: 6,
         usePolling: true,
-        interval: 6_000,
-        binaryInterval: 6_000,
+        interval,
+        binaryInterval: interval,
       });
 
       watcher
