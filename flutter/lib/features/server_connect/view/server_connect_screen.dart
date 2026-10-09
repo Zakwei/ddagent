@@ -46,8 +46,9 @@ class _ServerConnectScreenState extends ConsumerState<ServerConnectScreen> {
     });
     // _busy gates the only retry affordance (the button is disabled while
     // loading), so it must always be cleared — otherwise any throw or stall
-    // below leaves the screen spinning forever with no way back.
-    var navigated = false;
+    // below leaves the screen spinning forever with no way back. That
+    // includes a successful go(): the auth guard may bounce the navigation
+    // back to /connect, which keeps this same State alive.
     try {
       if (isLocal) {
         // Saved local profile: the server may be stopped — start it before
@@ -71,16 +72,26 @@ class _ServerConnectScreenState extends ConsumerState<ServerConnectScreen> {
           .select(url, name: isLocal ? i18n.serverConnect.local.title : '', isLocal: isLocal);
       // Re-check status against the new server — may flip needsSetup → /setup.
       await ref.read(authControllerProvider.notifier).checkStatus();
+      final hasToken = await ref.read(authTokenStoreProvider).token != null;
       if (!mounted) return;
       final from = GoRouterState.of(context).uri.queryParameters['from'];
-      context.go(from != null && from.startsWith('/') ? from : '/login');
-      navigated = true;
+      final target = from != null && from.startsWith('/') ? from : null;
+      // Without a JWT a protected `from` is redirected straight back here by
+      // the auth guard — log in first and let the login screen restore it.
+      context.go(
+        hasToken && target != null
+            ? target
+            : Uri(
+                path: '/login',
+                queryParameters: target == null ? null : {'from': target},
+              ).toString(),
+      );
     } on Object catch (e) {
       if (mounted) {
         setState(() => _error = i18n.serverConnect.connectionFailed(error: '$e'));
       }
     } finally {
-      if (mounted && !navigated) setState(() => _busy = false);
+      if (mounted) setState(() => _busy = false);
     }
   }
 
@@ -141,25 +152,30 @@ class _ServerConnectScreenState extends ConsumerState<ServerConnectScreen> {
                     ],
                     if (profiles.isNotEmpty) ...[
                       for (final p in profiles)
-                        ListTile(
-                          dense: true,
-                          contentPadding: EdgeInsets.zero,
-                          selected: p.url == profilesState.activeUrl,
-                          leading: Icon(
-                            p.isLocal ? Icons.dns_outlined : Icons.cloud_outlined,
-                            size: 18,
-                            color: c.mutedForeground,
+                        // AppCard paints its own background — ListTile needs a
+                        // Material of its own for the selection/ink layers.
+                        Material(
+                          type: MaterialType.transparency,
+                          child: ListTile(
+                            dense: true,
+                            contentPadding: EdgeInsets.zero,
+                            selected: p.url == profilesState.activeUrl,
+                            leading: Icon(
+                              p.isLocal ? Icons.dns_outlined : Icons.cloud_outlined,
+                              size: 18,
+                              color: c.mutedForeground,
+                            ),
+                            title: Text(p.label, overflow: TextOverflow.ellipsis),
+                            subtitle: p.label == p.url
+                                ? null
+                                : Text(p.url, overflow: TextOverflow.ellipsis),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.close, size: 18),
+                              tooltip: i18n.common.gitPanel.remove,
+                              onPressed: () => _remove(p.url),
+                            ),
+                            onTap: _busy ? null : () => _connect(p.url, p.isLocal),
                           ),
-                          title: Text(p.label, overflow: TextOverflow.ellipsis),
-                          subtitle: p.label == p.url
-                              ? null
-                              : Text(p.url, overflow: TextOverflow.ellipsis),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.close, size: 18),
-                            tooltip: i18n.common.gitPanel.remove,
-                            onPressed: () => _remove(p.url),
-                          ),
-                          onTap: _busy ? null : () => _connect(p.url, p.isLocal),
                         ),
                       const Divider(height: AppSpacing.lg),
                     ],
