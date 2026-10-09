@@ -195,14 +195,11 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
       pendingActionSessionIds: pendingIds,
     );
 
-    final overviewPanes = [for (final p in ws.panes) (pane: p, display: display(p))];
-
     return Scaffold(
       body: Column(
         children: [
           _controls(
             canAdd: ctrl.canAdd,
-            overviewPanes: overviewPanes,
             activePaneId: ws.activePaneId,
             onSelectPane: (id) {
               ctrl.setActivePaneId(id);
@@ -259,26 +256,30 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
     }
   }
 
-  Future<void> _openOverview(
-    List<({SplitPane pane, ({String title, String? subtitle, PaneAction action}) display})>
-    overviewPanes,
-    ValueChanged<String> onSelectPane,
-  ) async {
+  /// Watched from the overview dialog's own route — a snapshot taken at open
+  /// time would never show an agent finishing or asking.
+  List<OverviewPaneInfo> _overviewPanes(WidgetRef r) {
+    final sessionTitles = _sessionTitles(r.watch(sessionsProvider(_scope)).sessions);
+    final projectNames = _projectNames(r.watch(projectsProvider));
+    final processingIds = r.watch(sessionActivityProvider).keys.toSet();
+    final pendingIds = r.watch(pendingPermissionSessionsProvider);
+    return [
+      for (final p in r.watch(workspaceProvider).panes)
+        if (splitPaneDisplay(
+              p,
+              sessionTitles: sessionTitles,
+              projectNames: projectNames,
+              processingSessionIds: processingIds,
+              pendingActionSessionIds: pendingIds,
+            )
+            case final d)
+          OverviewPaneInfo(pane: p, title: d.title, subtitle: d.subtitle, action: d.action),
+    ];
+  }
+
+  Future<void> _openOverview(ValueChanged<String> onSelectPane) async {
     setState(() => _overviewOpen = true);
-    await SplitOverviewDialog.show(
-      context,
-      activePaneId: ref.read(workspaceProvider).activePaneId,
-      onSelectPane: onSelectPane,
-      panes: [
-        for (final e in overviewPanes)
-          OverviewPaneInfo(
-            pane: e.pane,
-            title: e.display.title,
-            subtitle: e.display.subtitle,
-            action: e.display.action,
-          ),
-      ],
-    );
+    await SplitOverviewDialog.show(context, onSelectPane: onSelectPane, panes: _overviewPanes);
     if (mounted) setState(() => _overviewOpen = false);
   }
 
@@ -292,8 +293,6 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
 
   Widget _controls({
     required bool canAdd,
-    required List<({SplitPane pane, ({String title, String? subtitle, PaneAction action}) display})>
-    overviewPanes,
     required String? activePaneId,
     required ValueChanged<String> onSelectPane,
   }) {
@@ -354,7 +353,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
       btn(
         LucideIcons.layoutGrid,
         i18n.chat.splitWorkspace.overview,
-        () => _openOverview(overviewPanes, onSelectPane),
+        () => _openOverview(onSelectPane),
       ),
       // Focus mode — web hides this on `sm:` (desktop-only); it toggles
       // the rail via the persisted sidebarVisible pref.

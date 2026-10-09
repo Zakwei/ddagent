@@ -7,6 +7,7 @@ import 'package:ddagent_app/core/widgets/app_input.dart';
 import 'package:ddagent_app/features/queue/data/queue_repository.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
+import 'package:ddagent_app/features/workspace/state/workspace_controller.dart';
 import 'package:ddagent_app/features/workspace/view/split_workspace_grid.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
@@ -30,32 +31,27 @@ class OverviewPaneInfo {
 
 /// Split panes overview (port of SplitOverviewDialog.tsx): grid of pane
 /// cards with kind icon, title, subtitle and action badge; tap activates
-/// the pane and closes.
-class SplitOverviewDialog extends StatelessWidget {
-  const SplitOverviewDialog({
-    super.key,
-    required this.panes,
-    required this.onSelectPane,
-    this.activePaneId,
-  });
+/// the pane and closes. [panes] watches its sources so the badges follow the
+/// agents live while the dialog stays open.
+class SplitOverviewDialog extends ConsumerWidget {
+  const SplitOverviewDialog({super.key, required this.panes, required this.onSelectPane});
 
-  final List<OverviewPaneInfo> panes;
-  final String? activePaneId;
+  final List<OverviewPaneInfo> Function(WidgetRef ref) panes;
   final ValueChanged<String> onSelectPane;
 
   static Future<void> show(
     BuildContext context, {
-    required List<OverviewPaneInfo> panes,
+    required List<OverviewPaneInfo> Function(WidgetRef ref) panes,
     required ValueChanged<String> onSelectPane,
-    String? activePaneId,
   }) => showDialog<void>(
     context: context,
-    builder: (_) =>
-        SplitOverviewDialog(panes: panes, onSelectPane: onSelectPane, activePaneId: activePaneId),
+    builder: (_) => SplitOverviewDialog(panes: panes, onSelectPane: onSelectPane),
   );
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final panes = this.panes(ref);
+    final activePaneId = ref.watch(workspaceProvider).activePaneId;
     final t = Theme.of(context);
     final i18n = Translations.of(context);
     final c = context.appColors;
@@ -188,10 +184,15 @@ class SplitOverviewDialog extends StatelessWidget {
                                     color: Color(0xFFF59E0B),
                                   ),
                                   const SizedBox(width: 4),
-                                  Text(
-                                    i18n.chat.splitOverview.question,
-                                    style: t.textTheme.labelSmall?.copyWith(
-                                      color: const Color(0xFFF59E0B),
+                                  // Phone tiles are ~150px wide.
+                                  Flexible(
+                                    child: Text(
+                                      i18n.chat.splitOverview.question,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: t.textTheme.labelSmall?.copyWith(
+                                        color: const Color(0xFFF59E0B),
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -207,10 +208,15 @@ class SplitOverviewDialog extends StatelessWidget {
                                     ),
                                   ),
                                   const SizedBox(width: 6),
-                                  Text(
-                                    i18n.chat.splitOverview.processing,
-                                    style: t.textTheme.labelSmall?.copyWith(
-                                      color: const Color(0xFF22C55E),
+                                  // Phone tiles are ~150px wide.
+                                  Flexible(
+                                    child: Text(
+                                      i18n.chat.splitOverview.processing,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: t.textTheme.labelSmall?.copyWith(
+                                        color: const Color(0xFF22C55E),
+                                      ),
                                     ),
                                   ),
                                 ],
