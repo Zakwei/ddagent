@@ -1,6 +1,6 @@
 {
   "name": "@ddagent-ai/ddagent",
-  "version": "0.8.16",
+  "version": "0.8.17",
   "productName": "DDAgent",
   "description": "Self-hosted server and Flutter client (web, Linux, Windows, Android) for AI coding agents (Claude Code, Codex, Cursor CLI, OpenCode, Devin, Command Code, Antigravity)",
   "type": "module",
