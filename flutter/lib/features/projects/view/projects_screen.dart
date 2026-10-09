@@ -614,16 +614,21 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
       _error = null;
       _cloneProgress = '';
     });
-    if (_isClone) {
-      await _clone();
-      return;
+    // `_busy` locks the dialog (PopScope + every button), so each exit path
+    // that doesn't pop must release it — a stuck flag traps the user.
+    String? err;
+    try {
+      err = _isClone
+          ? await _clone()
+          : await ref
+                .read(projectsProvider.notifier)
+                .create(
+                  _path.text.trim(),
+                  customName: _name.text.trim().isEmpty ? null : _name.text.trim(),
+                );
+    } on Object catch (e) {
+      err = '$e';
     }
-    final err = await ref
-        .read(projectsProvider.notifier)
-        .create(
-          _path.text.trim(),
-          customName: _name.text.trim().isEmpty ? null : _name.text.trim(),
-        );
     if (!mounted) return;
     if (err == null) {
       Navigator.of(context).pop();
@@ -635,7 +640,10 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
     }
   }
 
-  Future<void> _clone() async {
+  /// Streams the clone; null on `complete`, otherwise the error to show. A
+  /// stream that ends without a terminal frame (server restart, proxy cut)
+  /// counts as a failure rather than leaving the wizard busy.
+  Future<String?> _clone() async {
     final i18n = Translations.of(context);
     _cancel = CancelToken();
     try {
@@ -653,30 +661,19 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
                     : null,
                 cancelToken: _cancel,
               )) {
-        if (!mounted) return;
+        if (!mounted) return null;
         final type = e.data['type'];
         if (type == 'error') {
-          setState(() {
-            _busy = false;
-            _error = (e.data['error'] ?? e.data['message'] ?? i18n.projects.cloneFailed).toString();
-          });
-          return;
+          return (e.data['error'] ?? e.data['message'] ?? i18n.projects.cloneFailed).toString();
         }
-        if (type == 'complete') {
-          if (mounted) Navigator.of(context).pop();
-          return;
-        }
+        if (type == 'complete') return null;
         final msg = (e.data['message'] ?? type).toString();
         if (msg.isNotEmpty) setState(() => _cloneProgress = msg);
       }
     } on DioException catch (e) {
-      if (mounted && !CancelToken.isCancel(e)) {
-        setState(() {
-          _busy = false;
-          _error = e.message;
-        });
-      }
+      return e.message ?? i18n.projects.cloneFailed;
     }
+    return i18n.projects.cloneFailed;
   }
 
   String _authLabel(Translations i18n) {
@@ -1243,6 +1240,13 @@ class _CloneDialogState extends ConsumerState<_CloneDialog> {
           return;
         }
         setState(() => _log.add((e.data['message'] ?? type).toString()));
+      }
+      // Stream closed without a terminal frame (server restart, proxy cut).
+      if (mounted && !(_cancel?.isCancelled ?? false)) {
+        setState(() {
+          _busy = false;
+          _error = i18n.projects.cloneFailed;
+        });
       }
     } on DioException catch (e) {
       if (mounted && !CancelToken.isCancel(e)) {

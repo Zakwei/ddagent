@@ -17,6 +17,11 @@ class LocalServerController extends Notifier<LocalServerStatus> {
   /// it concurrently without double-spawning.
   Future<String?>? _inFlightEnsure;
 
+  /// The update check ran this app session — the router guard calls
+  /// [ensureRunning] on every navigation, which must not re-run install()
+  /// (disk scans + a network lookup when offline) each time.
+  bool _updateChecked = false;
+
   @override
   LocalServerStatus build() {
     // Deferred — `state` is unavailable while build() is still running.
@@ -61,13 +66,16 @@ class LocalServerController extends Notifier<LocalServerStatus> {
       await refresh();
       return null; // nothing installed — app start never auto-downloads.
     }
-    try {
-      // Installed bundle → refresh to the newest release when reachable;
-      // install() already keeps the current one when it matches or the
-      // version check fails.
-      await _service.install(onProgress: null);
-    } on Object {
-      // A failed update must not block startup — boot what we have.
+    if (!_updateChecked) {
+      _updateChecked = true;
+      try {
+        // Installed bundle → refresh to the newest release when reachable;
+        // install() already keeps the current one when it matches or the
+        // version check fails.
+        await _service.install(onProgress: null);
+      } on Object {
+        // A failed update must not block startup — boot what we have.
+      }
     }
     try {
       return await _service.start();

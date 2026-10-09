@@ -40,7 +40,7 @@ class AuthRepository {
   });
 
   /// Stores the returned JWT; returns the logged-in user.
-  Future<AuthUser> login(String username, String password) => apiCall(
+  Future<AuthUser> login(String username, String password) => apiCallAsync(
     () => _dio.post<dynamic>('/api/auth/login', data: {'username': username, 'password': password}),
     (d) async {
       final map = d as Map<String, dynamic>;
@@ -52,32 +52,33 @@ class AuthRepository {
         'role': ?(token == null ? null : AuthTokenStore.roleOf(token)),
       });
     },
-  ).then((f) => f); // flatten Future<AuthUser> inside decode
+  );
 
-  Future<AuthUser> register(String username, String password, {String? inviteToken}) => apiCall(
-    () => _dio.post<dynamic>(
-      '/api/auth/register',
-      data: {'username': username, 'password': password, 'inviteToken': ?inviteToken},
-    ),
-    (d) async {
-      final map = d as Map<String, dynamic>;
-      final token = map['token'] as String?;
-      await _tokens.store(token);
-      return AuthUser.fromJson({
-        ...map['user'] as Map<String, dynamic>,
-        'role': ?(token == null ? null : AuthTokenStore.roleOf(token)),
-      });
-    },
-  ).then((f) => f);
+  Future<AuthUser> register(String username, String password, {String? inviteToken}) =>
+      apiCallAsync(
+        () => _dio.post<dynamic>(
+          '/api/auth/register',
+          data: {'username': username, 'password': password, 'inviteToken': ?inviteToken},
+        ),
+        (d) async {
+          final map = d as Map<String, dynamic>;
+          final token = map['token'] as String?;
+          await _tokens.store(token);
+          return AuthUser.fromJson({
+            ...map['user'] as Map<String, dynamic>,
+            'role': ?(token == null ? null : AuthTokenStore.roleOf(token)),
+          });
+        },
+      );
 
   Future<AuthUser> currentUser() => apiCall(
     () => _dio.get<dynamic>('/api/auth/user'),
     (d) => AuthUser.fromJson((d as Map<String, dynamic>)['user'] as Map<String, dynamic>),
   );
 
-  Future<void> refresh() => apiCall(() => _dio.post<dynamic>('/api/auth/refresh'), (d) async {
+  Future<void> refresh() => apiCallAsync(() => _dio.post<dynamic>('/api/auth/refresh'), (d) async {
     await _tokens.store((d as Map<String, dynamic>)['token'] as String?);
-  }).then((_) {});
+  });
 
   Future<void> logout() async {
     try {

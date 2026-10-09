@@ -91,6 +91,10 @@ class AuthController extends Notifier<AuthState> {
     } on AppError {
       // Server unreachable — keep the stored token; retry on next launch.
       state = const AuthState();
+    } on Object {
+      // Anything else (secure storage, …) must still clear isLoading — the
+      // login button stays disabled while it's set.
+      state = const AuthState();
     }
   }
 
@@ -116,6 +120,10 @@ class AuthController extends Notifier<AuthState> {
     } on AppError catch (e) {
       state = AuthState(needsSetup: state.needsSetup);
       return e;
+    } on Object catch (e) {
+      // Never leave isLoading stuck — it disables the login/setup buttons.
+      state = AuthState(needsSetup: state.needsSetup);
+      return ServerError('$e', 0);
     }
   }
 

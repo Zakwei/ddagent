@@ -117,7 +117,9 @@ class DeviceNotificationsController extends Notifier<DeviceNotificationsState> {
         'flutter-${DateTime.now().microsecondsSinceEpoch}-${Random().nextInt(1 << 30)}';
     final channel = ref.read(desktopNotificationsChannelProvider);
     try {
-      await channel.connect();
+      // connect() retries a failed handshake forever (no maxAttempts) — bound
+      // it, or `busy` sticks and every later enable()/disable() is a no-op.
+      await channel.connect().timeout(const Duration(seconds: 15));
       channel.register(
         deviceId: deviceId,
         label: t.notifications.deviceLabel,
@@ -179,6 +181,16 @@ class DeviceNotificationsController extends Notifier<DeviceNotificationsState> {
         );
       }
       return e.message;
+    } on Object catch (e) {
+      if (ref.mounted) {
+        state = DeviceNotificationsState(
+          enabled: state.enabled,
+          loading: false,
+          busy: false,
+          error: '$e',
+        );
+      }
+      return '$e';
     }
   }
 }

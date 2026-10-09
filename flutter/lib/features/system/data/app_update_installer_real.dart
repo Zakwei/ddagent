@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:ddagent_app/core/network/download.dart';
 import 'package:ddagent_app/features/system/data/app_update_channel.dart';
 import 'package:ddagent_app/features/system/data/system_repository.dart';
 import 'package:dio/dio.dart';
@@ -72,7 +73,8 @@ class AppUpdateInstaller {
     // Under <cache>/updates — the only path FileProvider exposes (file_paths.xml).
     final apk = File('${directory.path}/updates/${asset.name}');
     await apk.parent.create(recursive: true);
-    await _dio.download(
+    await downloadWithStallTimeout(
+      _dio,
       asset.downloadUrl,
       apk.path,
       deleteOnError: true,
@@ -125,7 +127,8 @@ class AppUpdateInstaller {
     final part = File('${target.path}.part');
     await _cleanStaging(keep: target);
     if (await part.exists()) await part.delete();
-    await _dio.download(
+    await downloadWithStallTimeout(
+      _dio,
       asset.downloadUrl,
       part.path,
       deleteOnError: true,

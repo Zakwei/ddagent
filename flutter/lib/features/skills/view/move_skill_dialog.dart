@@ -101,10 +101,16 @@ class _MoveSkillDialogState extends State<MoveSkillDialog> {
       _submitting = true;
       _submitError = null;
     });
-    final error = await widget.onSubmit(
-      toProject: widget.toProject,
-      targetWorkspacePath: widget.toProject && _target != null ? _projectPath(_target!) : null,
-    );
+    String? error;
+    try {
+      error = await widget.onSubmit(
+        toProject: widget.toProject,
+        targetWorkspacePath: widget.toProject && _target != null ? _projectPath(_target!) : null,
+      );
+    } on Object catch (e) {
+      // Cancel is disabled while submitting — never leave it stuck.
+      error = '$e';
+    }
     if (!mounted) return;
     if (error == null) {
       Navigator.of(context).pop(true);

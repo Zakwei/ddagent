@@ -4,6 +4,7 @@ import 'dart:developer' as developer;
 import 'dart:ffi';
 import 'dart:io';
 
+import 'package:ddagent_app/core/network/download.dart';
 import 'package:ddagent_app/features/server_connect/data/local_server_status.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
@@ -84,7 +85,7 @@ class LocalServerService {
     bool? isLinux,
     String? serverVersion,
     this.onStatus,
-  }) : _dio = dio ?? Dio(),
+  }) : _dio = dio ?? Dio(BaseOptions(connectTimeout: _connectTimeout)),
        // ignore: prefer_initializing_formals — named params can't be private.
        _rootDir = rootDir,
        _abi = abi ?? Abi.current(),
@@ -105,6 +106,11 @@ class LocalServerService {
   static const String pinnedNodeVersion = 'v22.20.0';
 
   static const Duration _probeTimeout = Duration(seconds: 2);
+  // The router guard awaits install() — a stalled release/index lookup must
+  // fail fast (install() then keeps the bundle on disk) instead of hanging
+  // navigation. Downloads only get the connect bound; they report progress.
+  static const Duration _connectTimeout = Duration(seconds: 10);
+  static const Duration _metadataTimeout = Duration(seconds: 15);
   static const Duration _startupTimeout = Duration(seconds: 60);
   static const Duration _pollInterval = Duration(milliseconds: 500);
   static const int _stderrTailBytes = 4096;
@@ -159,6 +165,7 @@ class LocalServerService {
   Future<String> _latestReleaseVersion() async {
     final res = await _dio.get<Map<String, dynamic>>(
       'https://api.github.com/repos/Zakwei/ddagent/releases/latest',
+      options: Options(receiveTimeout: _metadataTimeout),
     );
     final tag = res.data?['tag_name'] as String?;
     if (tag == null || tag.isEmpty) {
@@ -380,7 +387,10 @@ class LocalServerService {
   /// bundled native modules.
   Future<String> _latestNodeLtsVersion() async {
     try {
-      final res = await _dio.get<List<dynamic>>('https://nodejs.org/dist/index.json');
+      final res = await _dio.get<List<dynamic>>(
+        'https://nodejs.org/dist/index.json',
+        options: Options(receiveTimeout: _metadataTimeout),
+      );
       final found = latestLtsInMajor(res.data ?? const <dynamic>[], requiredNodeMajor);
       if (found != null) return found;
     } on Object {
@@ -401,7 +411,8 @@ class LocalServerService {
     final archive = File('${root.path}/$file');
     final nodeDir = await _nodeDir;
     try {
-      await _dio.download(
+      await downloadWithStallTimeout(
+        _dio,
         'https://nodejs.org/dist/$nodeVersion/$file',
         archive.path,
         onReceiveProgress: (received, total) {
@@ -485,7 +496,8 @@ class LocalServerService {
     final archive = File('${root.path}/ddagent-server-$serverVersion-$suffix.tar.gz');
     _emit(LocalServerStatus(stage: LocalServerStage.downloading, version: installed));
     try {
-      await _dio.download(
+      await downloadWithStallTimeout(
+        _dio,
         serverAssetUrl(serverVersion, suffix),
         archive.path,
         onReceiveProgress: (received, total) {

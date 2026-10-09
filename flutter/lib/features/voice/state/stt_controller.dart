@@ -32,7 +32,8 @@ class SttConfigController extends Notifier<SttConfig> {
       final ok = await _repo.saveSttConfig(endpointUrl: endpointUrl, apiKey: apiKey, model: model);
       if (ok) unawaited(refresh());
       return ok;
-    } on Exception {
+    } on Object {
+      // Errors too (bad payload casts) — the dialog's saving state waits on this.
       return false;
     }
   }

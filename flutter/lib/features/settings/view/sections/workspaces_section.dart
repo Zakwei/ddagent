@@ -186,12 +186,17 @@ class _AddWorkspaceDialogState extends ConsumerState<_AddWorkspaceDialog> {
       _busy = true;
       _error = null;
     });
-    final error = await ref
-        .read(projectsProvider.notifier)
-        .create(
-          _path.text.trim(),
-          customName: _name.text.trim().isEmpty ? null : _name.text.trim(),
-        );
+    String? error;
+    try {
+      error = await ref
+          .read(projectsProvider.notifier)
+          .create(
+            _path.text.trim(),
+            customName: _name.text.trim().isEmpty ? null : _name.text.trim(),
+          );
+    } on Object catch (e) {
+      error = '$e';
+    }
     if (!mounted) return;
     if (error == null) {
       Navigator.of(context).pop();

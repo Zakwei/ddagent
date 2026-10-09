@@ -72,20 +72,37 @@ AppError mapDioError(DioException e) {
 }
 
 /// Convenience: unwraps a Dio call into `T` or throws an [AppError].
-Future<T> apiCall<T>(
+///
+/// Decode failures (unexpected payload shape → TypeError/cast errors) are
+/// mapped to [ServerError] too: callers only catch [AppError], so a raw throw
+/// would skip their loading/busy reset and leave the UI spinning forever.
+Future<T> apiCall<T>(Future<Response<dynamic>> Function() call, T Function(dynamic data) decode) =>
+    apiCallAsync(call, (data) async => decode(data));
+
+/// [apiCall] for decoders that await (e.g. persisting a returned token) —
+/// their failures (secure-storage PlatformException, …) map to [AppError].
+Future<T> apiCallAsync<T>(
   Future<Response<dynamic>> Function() call,
-  T Function(dynamic data) decode,
+  Future<T> Function(dynamic data) decode,
 ) async {
+  final dynamic data;
   try {
     final response = await call();
-    var data = response.data;
+    var body = response.data;
     // Server envelope: {success: true, data: {...}} — unwrap so decoders see
     // the payload directly (bare lists and raw shapes pass through).
-    if (data is Map && data['success'] == true && data.containsKey('data')) {
-      data = data['data'];
+    if (body is Map && body['success'] == true && body.containsKey('data')) {
+      body = body['data'];
     }
-    return decode(data);
+    data = body;
   } on DioException catch (e) {
     throw mapDioError(e);
+  }
+  try {
+    return await decode(data);
+  } on AppError {
+    rethrow;
+  } on Object catch (e) {
+    throw ServerError('$e', 0);
   }
 }

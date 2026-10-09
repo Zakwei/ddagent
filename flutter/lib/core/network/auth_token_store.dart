@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 /// JWT store backed by flutter_secure_storage — port of src/utils/api.js.
@@ -21,8 +22,19 @@ class _SecureStorageKv implements SecureKv {
 
   final FlutterSecureStorage _inner;
 
+  /// An unreadable entry (e.g. a Windows DPAPI blob after a profile change)
+  /// reads as "no token" — the router guard awaits this on every navigation,
+  /// so a throw here would make the whole app unreachable instead of
+  /// simply asking for a fresh login.
   @override
-  Future<String?> read(String key) => _inner.read(key: key);
+  Future<String?> read(String key) async {
+    try {
+      return await _inner.read(key: key);
+    } on PlatformException {
+      return null;
+    }
+  }
+
   @override
   Future<void> write(String key, String value) => _inner.write(key: key, value: value);
   @override

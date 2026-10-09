@@ -64,7 +64,10 @@ class _BrowserSettingsBlockState extends ConsumerState<BrowserSettingsBlock> {
     unawaited(
       _loadStatus().catchError((Object e) {
         if (!mounted) return;
-        setState(() => _error = e.toString());
+        setState(() {
+          _error = e.toString();
+          _statusLoading = false;
+        });
       }),
     );
   }
