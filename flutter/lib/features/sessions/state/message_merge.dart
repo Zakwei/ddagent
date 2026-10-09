@@ -334,7 +334,24 @@ List<SessionMessage> computeMerged(List<SessionMessage> server, List<SessionMess
     return attachToolResults(dedupeAdjacentAssistantEchoes(server));
   }
   final reconciled = removeOptimisticUserEchoes(userEchoCandidates(), realtime);
-  final deduped = removeRealtimeUserDuplicateEchoes(server, reconciled);
+  final echoed = removeRealtimeUserDuplicateEchoes(server, reconciled);
+  // A closed stream row (no seq) duplicates the run's own `text` frame; in a
+  // subscribe replay they land apart, so the adjacent-echo pass misses them.
+  final sequencedTexts = {
+    for (final m in echoed)
+      if (m.kind == 'text' && m.role == 'assistant' && m.seq != null) (m.content ?? '').trim(),
+  };
+  final deduped = sequencedTexts.isEmpty
+      ? echoed
+      : echoed
+            .where(
+              (m) =>
+                  m.seq != null ||
+                  m.kind != 'text' ||
+                  m.role != 'assistant' ||
+                  !sequencedTexts.contains((m.content ?? '').trim()),
+            )
+            .toList();
 
   // Live re-publications of one orchestrator row — the newest frame per row
   // id wins (earlier patches to the same row are stale snapshots).

@@ -62,6 +62,7 @@ Dio _fakeDio(Map<String, dynamic> routes) {
       onRequest: (o, h) {
         var res = routes['${o.method} ${o.path}'];
         if (res is Function) res = res(o);
+        if (res is DioException) return h.reject(res);
         h.resolve(Response(requestOptions: o, data: res));
       },
     ),
@@ -457,6 +458,70 @@ void main() {
     container.read(sessionActivityProvider.notifier).markIdle('s1');
     await pump();
     expect(container.read(transcriptProvider('s1')).runStatus, 'done');
+  });
+
+  test('session_upserted pulls the tail written outside the app (tmux CLI)', () async {
+    var rows = [_msg('m1', 'text', content: 'hello', seq: 1)];
+    container = make({
+      'GET /api/providers/sessions/s1/messages': (RequestOptions _) => _page(rows),
+    });
+    ws.emitState(WsState.open);
+    container.listen(transcriptProvider('s1'), (_, _) {});
+    await pump();
+    rows = [...rows, _msg('m2', 'text', content: 'from tmux', seq: 2)];
+    ws.emitFrame({'kind': 'session_upserted', 'sessionId': 's1'});
+    await pump();
+    expect(container.read(sessionMessagesProvider('s1')).map((m) => m.id), ['m1', 'm2']);
+  });
+
+  test('opened mid-run: a failed history load retries; replay shows no doubled reply', () async {
+    var calls = 0;
+    container = make({
+      'GET /api/providers/sessions/s1/messages': (RequestOptions o) => ++calls == 1
+          ? DioException.receiveTimeout(timeout: const Duration(seconds: 30), requestOptions: o)
+          : _page([
+              _msg('old', 'text', content: 'earlier turn', seq: 1),
+              _msg('r1', 'text', content: 'reply', seq: 2),
+            ]),
+    });
+    ws.emitState(WsState.open);
+    container.listen(transcriptProvider('s1'), (_, _) {});
+    // Subscribe replay of the running turn: the full `text` frame arrives
+    // before the `stream_end` that closes its streamed copy.
+    for (final f in [
+      {'kind': 'chat_subscribed', 'sessionId': 's1', 'isProcessing': true},
+      {'kind': 'stream_delta', 'sessionId': 's1', 'runId': 'run', 'seq': 1, 'content': 'reply'},
+      {
+        'kind': 'text',
+        'sessionId': 's1',
+        'runId': 'run',
+        'seq': 2,
+        'id': 'r1',
+        'role': 'assistant',
+        'content': 'reply',
+        'timestamp': '2025-01-01T00:00:02',
+      },
+      {
+        'kind': 'tool_use',
+        'sessionId': 's1',
+        'runId': 'run',
+        'seq': 3,
+        'id': 't1',
+        'toolName': 'Bash',
+      },
+      {'kind': 'stream_end', 'sessionId': 's1', 'runId': 'run', 'seq': 4},
+    ]) {
+      ws.emitFrame(f);
+    }
+    await pump();
+    List<String?> texts() => [
+      for (final m in container.read(sessionMessagesProvider('s1')))
+        if (m.kind == 'text') m.content,
+    ];
+    expect(texts(), ['reply']);
+    await Future<void>.delayed(const Duration(milliseconds: 2200));
+    expect(calls, 2);
+    expect(texts(), ['earlier turn', 'reply']);
   });
 
   test('complete settles stopped / error from aborted / exitCode', () {

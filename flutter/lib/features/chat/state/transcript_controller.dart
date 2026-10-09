@@ -308,12 +308,28 @@ class TranscriptController extends Notifier<TranscriptState> {
         final done = await _fetchOlder();
         if (!done) break;
       }
+      _historyRetry = 0;
       if (ref.mounted) state = state.copyWith(loading: false);
     } on AppError catch (e) {
       if (ref.mounted) state = state.copyWith(loading: false, error: () => e);
+      _scheduleHistoryRetry();
     } on Object {
       if (ref.mounted) state = state.copyWith(loading: false);
+      _scheduleHistoryRetry();
     }
+  }
+
+  /// A failed first load would otherwise leave a pane opened mid-run showing
+  /// only the live replay — nothing refetches history until `complete`.
+  static const _historyRetryDelays = [2, 5, 15, 30];
+  int _historyRetry = 0;
+
+  void _scheduleHistoryRetry() {
+    if (_historyRetry >= _historyRetryDelays.length) return;
+    final delay = Duration(seconds: _historyRetryDelays[_historyRetry++]);
+    Future<void>.delayed(delay, () {
+      if (ref.mounted && _serverMessages.isEmpty) unawaited(loadInitial());
+    });
   }
 
   bool _shouldWalkOlder(int extra) {
@@ -753,6 +769,13 @@ class TranscriptController extends Notifier<TranscriptState> {
           }),
         );
       }
+      return;
+    }
+    // A transcript written outside this app (a CLI in tmux, another tool)
+    // reaches the pane only as the file watcher's upsert — pull the new tail.
+    // Own runs stream live and reconcile on `complete`, so skip them.
+    if (e.kind == 'session_upserted') {
+      if (state.runStatus != 'running') unawaited(_refreshLatestSafely());
       return;
     }
     // Remaining gateway/broadcast frames (presence, kanban…) are not
