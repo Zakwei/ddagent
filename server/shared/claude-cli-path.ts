@@ -6,6 +6,8 @@ import { providerChildEnv } from '@/shared/utils.js';
 
 const DEFAULT_CLAUDE_COMMAND = 'claude';
 const CLAUDE_SCRIPT_EXTENSIONS = new Set(['.cjs', '.js', '.jsx', '.mjs', '.ts', '.tsx']);
+/** Launchers plain Node can run without a loader. */
+const NODE_SCRIPT_EXTENSIONS = new Set(['.cjs', '.js', '.mjs']);
 const CLAUDE_WRAPPER_SEGMENTS = ['node_modules', '@anthropic-ai', 'claude-code', 'bin', 'claude.exe'] as const;
 
 export type ResolveClaudeCodeExecutablePathDependencies = {
@@ -139,4 +141,20 @@ export function resolveClaudeCodeExecutablePath(
   }
 
   return resolveWindowsClaudeExecutablePath(normalizedPath, deps);
+}
+
+/**
+ * The command that runs the Claude CLI at `cliPath` with `args`. A JavaScript
+ * launcher (`CLAUDE_CLI_PATH=…\\claude-wrapper.mjs`) is run with this Node:
+ * spawned directly — cross-spawn goes through `cmd /c` on Windows — the
+ * script is handed to its file association, so it opens in an editor or an
+ * "open with" prompt instead of running. Native binaries and PATH commands
+ * pass through unchanged. Consumed by the Claude auth provider's install
+ * probe (the SDK runs scripts through Node on its own).
+ */
+export function claudeCliInvocation(cliPath: string, args: string[]): { command: string; args: string[] } {
+  const extension = path.extname(cliPath).toLowerCase();
+  return NODE_SCRIPT_EXTENSIONS.has(extension)
+    ? { command: process.execPath, args: [cliPath, ...args] }
+    : { command: cliPath, args };
 }

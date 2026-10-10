@@ -6,6 +6,7 @@ import spawn from 'cross-spawn';
 
 import {
   providerChildEnv,
+  claudeCliInvocation,
   resolveClaudeCodeExecutablePath,
   readObjectRecord,
   readOptionalString,
@@ -36,10 +37,13 @@ export class ClaudeProviderAuth implements IProviderAuth {
    * Checks whether the Claude Code CLI is available on this host.
    */
   private checkInstalled(): boolean {
-    const cliPath = resolveClaudeCodeExecutablePath(process.env.CLAUDE_CLI_PATH);
+    const { command, args } = claudeCliInvocation(
+      resolveClaudeCodeExecutablePath(process.env.CLAUDE_CLI_PATH),
+      ['--version'],
+    );
     try {
       // cross-spawn reports ENOENT via `result.error` instead of throwing.
-      const result = spawn.sync(cliPath, ['--version'], { stdio: 'ignore', timeout: 5000, env: providerChildEnv() });
+      const result = spawn.sync(command, args, { stdio: 'ignore', timeout: 5000, env: providerChildEnv() });
       return !result.error && result.status === 0;
     } catch {
       return false;

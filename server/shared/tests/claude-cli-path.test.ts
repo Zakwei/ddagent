@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  claudeCliInvocation,
   resolveClaudeCodeExecutablePath,
   type ResolveClaudeCodeExecutablePathDependencies,
 } from '@/shared/claude-cli-path.js';
@@ -58,4 +59,16 @@ test('resolveClaudeCodeExecutablePath falls back to the configured command when 
   });
 
   assert.equal(resolved, 'claude');
+});
+
+test('claudeCliInvocation runs a JavaScript launcher through node instead of opening it', () => {
+  // A configured `CLAUDE_CLI_PATH=…\claude-ddagent.mjs`: spawned directly,
+  // Windows hands the script to its file association (an editor/"open with").
+  assert.deepEqual(claudeCliInvocation('C:\\Users\\me\\bin\\claude-ddagent.mjs', ['--version']), {
+    command: process.execPath,
+    args: ['C:\\Users\\me\\bin\\claude-ddagent.mjs', '--version'],
+  });
+  assert.deepEqual(claudeCliInvocation('/opt/claude/cli.js', ['--version']).command, process.execPath);
+  assert.deepEqual(claudeCliInvocation('claude', ['--version']), { command: 'claude', args: ['--version'] });
+  assert.deepEqual(claudeCliInvocation('C:\\x\\claude.exe', []), { command: 'C:\\x\\claude.exe', args: [] });
 });

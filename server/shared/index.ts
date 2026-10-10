@@ -14,7 +14,7 @@ export {
   toPosixPath,
 } from './image-attachments.js';
 export type { ChatAttachmentDescriptor } from './image-attachments.js';
-export { resolveClaudeCodeExecutablePath } from './claude-cli-path.js';
+export { claudeCliInvocation, resolveClaudeCodeExecutablePath } from './claude-cli-path.js';
 export {
   OPENCODE_EDIT_TOOL_NAMES,
   ORCHESTRATOR_PROVIDER,
@@ -81,6 +81,7 @@ export type {
   OrchestratorRoutingDecision,
   OrchestratorTaskType,
   QuotaAccount,
+  QuotaUnavailableReason,
   QuotaAssignedAgent,
   QuotaConfig,
   QuotaDataQuality,
