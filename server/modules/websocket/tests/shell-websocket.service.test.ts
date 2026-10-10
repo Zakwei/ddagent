@@ -393,3 +393,31 @@ test('an agent session shell still rejects a missing project path', () => {
   assert.equal(spawned, false);
   assert.ok(socket.frames.some((frame) => frame.includes('Invalid project path')));
 });
+
+test('a one-shot agent command with no project path runs from home', () => {
+  const pty = createFakePty();
+  let spawnedCwd: string | undefined;
+  const socket = createFakeSocket();
+  handleShellConnection(socket as never, {
+    resolveProviderSessionId: () => null,
+    spawnPty: ((_file: string, _args: string[], options: { cwd: string }) => {
+      spawnedCwd = options.cwd;
+      return pty;
+    }) as never,
+  });
+
+  socket.emit(
+    'message',
+    JSON.stringify({
+      type: 'init',
+      projectPath: '',
+      sessionId: `no-project-${Date.now()}`,
+      provider: 'plain-shell',
+      isPlainShell: true,
+      initialCommand: 'claude setup-token',
+    })
+  );
+
+  assert.equal(spawnedCwd, os.homedir());
+  pty.emitExit();
+});

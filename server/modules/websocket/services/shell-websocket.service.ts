@@ -443,14 +443,16 @@ export function handleShellConnection(
           return;
         }
 
-        let resolvedProjectPath = path.resolve(projectPath);
+        // A one-shot command (agent install/update/login from Settings) does
+        // not depend on its cwd: it runs from home when the client names no
+        // project, or one this server does not have (older clients send their
+        // first known project, which may live on another machine or be gone).
+        // An agent session must stay in its project to resume, so a missing
+        // path still fails there.
+        const isOneShotCommand = isPlainShell && !!initialCommand && !hasSession;
+        let resolvedProjectPath = !projectPath && isOneShotCommand ? os.homedir() : path.resolve(projectPath);
         if (!isDirectory(resolvedProjectPath)) {
-          // A one-shot command (agent install/update/login from Settings)
-          // does not depend on its cwd, yet the client sends its first known
-          // project — which may live on another machine or be gone. Run it
-          // from home instead of refusing; an agent session must stay in its
-          // project to resume, so that still fails.
-          if (!(isPlainShell && initialCommand && !hasSession)) {
+          if (!isOneShotCommand) {
             ws.send(JSON.stringify({ type: 'error', message: 'Invalid project path' }));
             return;
           }

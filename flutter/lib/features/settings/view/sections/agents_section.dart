@@ -11,7 +11,6 @@ import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/features/chat/view/model_library_panel.dart';
 import 'package:ddagent_app/features/mcp/view/ddagent_mcp_install_card.dart';
 import 'package:ddagent_app/features/mcp/view/mcp_servers_screen.dart';
-import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/provider_accounts/state/provider_accounts_controller.dart';
 import 'package:ddagent_app/features/sessions/view/provider_logo.dart';
 import 'package:ddagent_app/features/settings/data/agent_install.dart';
@@ -26,6 +25,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+/// Install/update/login commands do not depend on a project: an empty path
+/// lets the server pick (home on current servers). Sending a project from the
+/// list broke them whenever it did not exist on the connected server.
+const _agentCommandCwd = '';
 
 /// Agents settings section — port of `AgentsSettingsTab.tsx`: a provider
 /// pill selector (claude/cursor/codex/opencode/commandcode/antigravity/devin), category tabs
@@ -328,14 +332,6 @@ class _AccountContent extends ConsumerWidget {
     _ => '',
   };
 
-  /// Same resolution the terminal header uses for the login shell.
-  String _projectPath(WidgetRef ref) {
-    final projects = ref.read(projectsProvider).projects;
-    if (projects.isEmpty) return '';
-    final first = projects.first;
-    return (first.fullPath?.isNotEmpty ?? false) ? first.fullPath! : first.path;
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = Translations.of(context);
@@ -589,7 +585,7 @@ class _AccountContent extends ConsumerWidget {
       ProviderLoginDialog.show(
         context: context,
         provider: agent,
-        projectPath: _projectPath(ref),
+        projectPath: _agentCommandCwd,
         onComplete: (exitCode) {
           ref.invalidate(providerAuthStatusProvider(agent));
           if (!context.mounted) return;
@@ -615,7 +611,7 @@ class _AccountContent extends ConsumerWidget {
       ProviderLoginDialog.show(
         context: context,
         provider: agent,
-        projectPath: _projectPath(ref),
+        projectPath: _agentCommandCwd,
         customCommand: providerUpdateCommand(agent, windows: windows),
         title: '${t.button} · $name',
         onComplete: (exitCode) {
@@ -678,13 +674,6 @@ class _AgentNotInstalledCard extends ConsumerWidget {
 
   static const _orange = Color(0xFFEA580C);
 
-  String _projectPath(WidgetRef ref) {
-    final projects = ref.read(projectsProvider).projects;
-    if (projects.isEmpty) return '';
-    final first = projects.first;
-    return (first.fullPath?.isNotEmpty ?? false) ? first.fullPath! : first.path;
-  }
-
   void _install(BuildContext context, WidgetRef ref, String command) {
     final t = Translations.of(context).settings.agents.install;
     final name = AgentsSection._names[agent] ?? agent;
@@ -692,7 +681,7 @@ class _AgentNotInstalledCard extends ConsumerWidget {
       ProviderLoginDialog.show(
         context: context,
         provider: agent,
-        projectPath: _projectPath(ref),
+        projectPath: _agentCommandCwd,
         customCommand: command,
         title: '${t.button} · $name',
         onComplete: (exitCode) {
@@ -916,14 +905,6 @@ class _ProviderAccountsCardState extends ConsumerState<_ProviderAccountsCard> {
     }
   }
 
-  /// Same resolution _AccountContent uses for the login shell.
-  String _projectPath() {
-    final projects = ref.read(projectsProvider).projects;
-    if (projects.isEmpty) return '';
-    final first = projects.first;
-    return (first.fullPath?.isNotEmpty ?? false) ? first.fullPath! : first.path;
-  }
-
   /// Runs the provider's login CLI with the account's envOverrides applied,
   /// so e.g. an Antigravity account signs into its isolated HOME (~/.gemini).
   void _openAccountLogin(ProviderAccountEntry account) {
@@ -932,7 +913,7 @@ class _ProviderAccountsCardState extends ConsumerState<_ProviderAccountsCard> {
       ProviderLoginDialog.show(
         context: context,
         provider: widget.agent,
-        projectPath: _projectPath(),
+        projectPath: _agentCommandCwd,
         customCommand: ProviderLoginDialog.loginCommandFor(widget.agent),
         env: account.envOverrides,
         onComplete: (exitCode) {
