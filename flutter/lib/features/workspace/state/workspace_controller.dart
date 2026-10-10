@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:ddagent_app/core/network/api_providers.dart';
 import 'package:ddagent_app/core/realtime/chat_channel.dart';
 import 'package:ddagent_app/core/realtime/realtime_providers.dart';
 import 'package:ddagent_app/core/realtime/ws_client.dart';
@@ -19,17 +20,20 @@ class WorkspaceController extends Notifier<WorkspaceState> {
   ChatChannel? _channel;
   Timer? _resumeProbe;
   String? _deviceId;
+  String _serverUrl = '';
   StreamSubscription<ServerEvent>? _eventsSub;
   StreamSubscription<WsState>? _statesSub;
 
   @override
   WorkspaceState build() {
+    // Rebuilt on a server switch: each server has its own saved layout.
+    _serverUrl = ref.watch(serverBaseUrlProvider);
     final WorkspaceState initial;
     if (!Hive.isBoxOpen(WorkspaceStorage.boxName)) {
       unawaited(Hive.openBox<dynamic>(WorkspaceStorage.boxName));
       initial = const WorkspaceState();
     } else {
-      initial = WorkspaceStorage.read();
+      initial = WorkspaceStorage.read(_serverUrl);
     }
     _wireSync();
     return initial;
@@ -96,7 +100,7 @@ class WorkspaceController extends Notifier<WorkspaceState> {
 
   void _set(WorkspaceState next) {
     state = next;
-    unawaited(WorkspaceStorage.write(next));
+    unawaited(WorkspaceStorage.write(next, _serverUrl));
     _sync?.schedulePush();
   }
 

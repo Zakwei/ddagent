@@ -261,13 +261,19 @@ class WorkspaceState {
 
 class WorkspaceStorage {
   static const boxName = 'workspace';
-  static const _key = 'ddagent_workspace_panes';
+
+  /// One saved layout per server: panes hold that server's session and
+  /// project ids, which mean nothing on another one ("Session … was not
+  /// found" after switching). The former single key is not migrated — it
+  /// cannot tell which server it came from, and workspace-sync restores the
+  /// layout from the server on connect anyway.
+  static String _key(String serverUrl) => 'ddagent_workspace_panes@$serverUrl';
 
   static Box<dynamic> get _box => Hive.box<dynamic>(boxName);
 
-  static WorkspaceState read() {
+  static WorkspaceState read(String serverUrl) {
     try {
-      final raw = _box.get(_key);
+      final raw = _box.get(_key(serverUrl));
       if (raw is! String) return const WorkspaceState();
       return WorkspaceState.sanitize(jsonDecode(raw));
     } on Object {
@@ -275,9 +281,9 @@ class WorkspaceStorage {
     }
   }
 
-  static Future<void> write(WorkspaceState state) async {
+  static Future<void> write(WorkspaceState state, String serverUrl) async {
     try {
-      await _box.put(_key, jsonEncode(state.toJson()));
+      await _box.put(_key(serverUrl), jsonEncode(state.toJson()));
     } on Object {
       // Storage unavailable — the workspace simply will not persist.
     }

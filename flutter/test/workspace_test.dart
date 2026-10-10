@@ -1,3 +1,4 @@
+import 'package:ddagent_app/core/network/api_providers.dart';
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
 import 'package:ddagent_app/features/workspace/state/workspace_controller.dart';
 import 'package:ddagent_app/features/workspace/view/session_picker.dart';
@@ -47,6 +48,26 @@ void main() {
       final ids = {for (var i = 0; i < 200; i++) createPaneId()};
       expect(ids, hasLength(200));
       expect(ids.every((id) => id.startsWith('split-pane-')), isTrue);
+    });
+  });
+
+  group('per-server layout', () {
+    ProviderContainer onServer(String url) =>
+        ProviderContainer(overrides: [serverBaseUrlProvider.overrideWithValue(url)]);
+
+    test("a server never restores another server's panes", () async {
+      final vps = onServer('https://vps.example:8444');
+      vps.read(workspaceProvider.notifier).openPane(PaneKind.chat, sessionId: 'vps-session');
+      await pumpEventQueue();
+      vps.dispose();
+
+      final local = onServer('http://127.0.0.1:10087');
+      addTearDown(local.dispose);
+      expect(local.read(workspaceProvider).panes, isEmpty);
+
+      final vpsAgain = onServer('https://vps.example:8444');
+      addTearDown(vpsAgain.dispose);
+      expect(vpsAgain.read(workspaceProvider).panes.single.sessionId, 'vps-session');
     });
   });
 
