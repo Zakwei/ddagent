@@ -6,6 +6,7 @@ import { buildDdagentSessionName, isAutoDerivedSessionName, providerModelsServic
 import { buildSharedContextPrefix } from '@/modules/shared-context/index.js';
 import { applyUnifiedPrefix } from '@/modules/unified/index.js';
 import { chatRunRegistry } from '@/modules/websocket/services/chat-run-registry.service.js';
+import type { ChatSessionWriter } from '@/modules/websocket/services/chat-session-writer.service.js';
 import { connectedClients, WS_OPEN_STATE } from '@/modules/websocket/services/websocket-state.service.js';
 import {
   createNormalizedMessage,
@@ -27,6 +28,9 @@ import type {
   ProviderRuntimeWriter,
   RealtimeClientConnection,
 } from '@/shared/index.js';
+
+/** A usage/rate-limit hit read out of one turn's events by the failover service. */
+type LimitHit = NonNullable<ReturnType<typeof accountFailoverService.detectLimit>>;
 
 /**
  * Application boundary for dispatching provider runs and approvals.
@@ -575,6 +579,65 @@ export async function dispatchChatCommand(
 
   const accountEnv = accountId ? providerAccountsDb.get(accountId)?.envOverrides ?? null : null;
 
+  // A usage/rate-limit hit (an error, or Claude's limit banner reply) benches
+  // the account once its turn is over; with auto-switch on the session moves
+  // and the cut-off turn resumes on the new account. `accountId` stays the
+  // one this runtime was started with: turns the process runs later on its
+  // own still spend that account, even after the session has moved.
+  const reportTurnLimitHit = (hit: LimitHit, userAborted: boolean) => {
+    void accountFailoverService.reportLimitHit(failoverSession(), hit)
+      .then(async (limitSwitch) => {
+        if (!limitSwitch) return;
+        broadcastSessionAccount(sessionId, provider, limitSwitch.toAccountId, connection);
+        // The limit cut the turn short: resume it on the new account
+        // instead of waiting for the user to re-send.
+        if (!userAborted) {
+          await accountFailoverService.continueAfterSwitch({
+            sessionId,
+            userId,
+            options: clientOptions,
+            change: limitSwitch,
+          });
+        }
+      })
+      .catch((error: unknown) => console.error('[Chat] Account auto-switch after limit failed', { sessionId, error }));
+  };
+
+  // Watches one turn's writer for a limit hit. Covers the dispatched turn and
+  // every turn the provider process starts on its own (a background task
+  // reporting back), which streams through a follow-up run's writer. The
+  // returned `settle` reports the hit at most once; it runs when the turn's
+  // `complete` passes through and again as a safety net for crashed turns.
+  const watchTurnForLimit = (writer: ChatSessionWriter, isAborted: () => boolean): (() => void) => {
+    let hit: LimitHit | null = null;
+    let settled = false;
+    const settle = () => {
+      if (settled) return;
+      settled = true;
+      // Read now: the abort flag describes this turn, not a later one.
+      if (hit) reportTurnLimitHit(hit, isAborted());
+    };
+    const sendBeforeLimitWatch = writer.send.bind(writer) as (data: unknown) => void;
+    writer.send = (data: unknown) => {
+      sendBeforeLimitWatch(data);
+      const event = (data ?? {}) as NormalizedMessage;
+      if (event.role === 'user') return;
+      if (event.kind === 'complete') {
+        settle();
+        return;
+      }
+      if (hit || settled) return;
+      const text = (event.content ?? (event as Record<string, unknown>).text ?? '') as unknown;
+      hit = accountFailoverService.detectLimit(event.kind, typeof text === 'string' ? text : '');
+    };
+    const sendCompleteBeforeLimitWatch = writer.sendComplete.bind(writer);
+    writer.sendComplete = (opts) => {
+      sendCompleteBeforeLimitWatch(opts);
+      settle();
+    };
+    return settle;
+  };
+
   const runtimeOptions: AnyRecord = {
     ...clientOptions,
     ...(accountEnv ? { env: accountEnv } : {}),
@@ -590,13 +653,18 @@ export async function dispatchChatCommand(
     // background work) can start further turns on its own — a task reporting
     // back. Each gets a chat run of its own so clients show it working and
     // stream it; null while another run owns the session.
-    openFollowUpRun: () => chatRunRegistry.startRun({
-      appSessionId: sessionId,
-      provider,
-      providerSessionId: run.providerSessionId ?? session.provider_session_id,
-      connection,
-      userId,
-    })?.writer ?? null,
+    openFollowUpRun: () => {
+      const followUp = chatRunRegistry.startRun({
+        appSessionId: sessionId,
+        provider,
+        providerSessionId: run.providerSessionId ?? session.provider_session_id,
+        connection,
+        userId,
+      });
+      if (!followUp) return null;
+      watchTurnForLimit(followUp.writer, () => followUp.aborted === true);
+      return followUp.writer;
+    },
   };
 
   // Child→parent delegation status sync: if this session was spawned by an
@@ -642,18 +710,7 @@ export async function dispatchChatCommand(
     };
   }
 
-  // Watches the turn for a usage/rate-limit hit (an error, or Claude's limit
-  // banner reply). The account is benched once the turn ends, and with
-  // auto-switch on the session moves so the next message runs elsewhere.
-  let limitHit: ReturnType<typeof accountFailoverService.detectLimit> = null;
-  const sendBeforeLimitWatch = run.writer.send.bind(run.writer) as (data: unknown) => void;
-  run.writer.send = (data: unknown) => {
-    sendBeforeLimitWatch(data);
-    const event = (data ?? {}) as NormalizedMessage;
-    if (limitHit || event.role === 'user') return;
-    const text = (event.content ?? (event as Record<string, unknown>).text ?? '') as unknown;
-    limitHit = accountFailoverService.detectLimit(event.kind, typeof text === 'string' ? text : '');
-  };
+  const settleTurnLimit = watchTurnForLimit(run.writer, () => run.aborted === true);
 
   let runError: string | null = null;
   try {
@@ -684,26 +741,7 @@ export async function dispatchChatCommand(
     // a queued message can start the session's next run before this promise
     // settles, and the session-keyed completeRun would kill that new run.
     chatRunRegistry.completeRunIfCurrent(run, { exitCode: 1 });
-    if (limitHit) {
-      // Read now: `run.aborted` describes this turn, not a later one.
-      const userAborted = run.aborted === true;
-      void accountFailoverService.reportLimitHit(failoverSession(), limitHit)
-        .then(async (limitSwitch) => {
-          if (!limitSwitch) return;
-          broadcastSessionAccount(sessionId, provider, limitSwitch.toAccountId, connection);
-          // The limit cut the turn short: resume it on the new account
-          // instead of waiting for the user to re-send.
-          if (!userAborted) {
-            await accountFailoverService.continueAfterSwitch({
-              sessionId,
-              userId,
-              options: clientOptions,
-              change: limitSwitch,
-            });
-          }
-        })
-        .catch((error: unknown) => console.error('[Chat] Account auto-switch after limit failed', { sessionId, error }));
-    }
+    settleTurnLimit();
     // A superseded child must not overwrite the newer turn’s running preview.
     if (delegation && chatRunRegistry.getRun(sessionId) === run) {
       const { rowId, parentSessionId } = delegation;

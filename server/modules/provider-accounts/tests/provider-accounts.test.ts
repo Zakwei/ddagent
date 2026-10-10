@@ -17,8 +17,10 @@ import {
   dispatchChatCommand,
   type ProviderRuntimeGateway,
 } from '@/modules/websocket/index.js';
+import { accountFailoverService } from '@/modules/provider-accounts/index.js';
 import { providerAccountsService } from '@/modules/provider-accounts/provider-accounts.service.js';
 import type { AnyRecord } from '@/shared/types.js';
+import { createCompleteMessage, createNormalizedMessage } from '@/shared/utils.js';
 
 async function withIsolatedDatabase(runTest: () => void | Promise<void>): Promise<void> {
   const previousDatabasePath = process.env.DATABASE_PATH;
@@ -217,6 +219,105 @@ test('dispatchChatCommand passes account envOverrides as options.env; deleted ac
     });
     assert.equal(result2.ok, true);
     assert.equal(seen[1]?.env, undefined);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Runtime dispatch: limit hits reach the failover service
+// ---------------------------------------------------------------------------
+
+test('a limit hit in a turn the CLI started on its own (follow-up run) is reported', async () => {
+  await withIsolatedDatabase(async () => {
+    providerAccountsDb.create({
+      id: 'acc-1',
+      provider: 'claude',
+      label: 'A',
+      envOverrides: { CLAUDE_CONFIG_DIR: '/tmp/a' },
+    });
+    sessionsDb.createAppSession('s-follow', 'claude', '/tmp/p', 'hi', 'acc-1');
+
+    const reported: Array<{ accountId: string | null; resetAt: number | null }> = [];
+    const originalReport = accountFailoverService.reportLimitHit;
+    accountFailoverService.reportLimitHit = async (input, hit) => {
+      reported.push({ accountId: input.accountId, resetAt: hit.resetAt });
+      return null;
+    };
+    try {
+      const fakeRuntime = {
+        hasRuntime: () => true,
+        run: async (_p: string, _c: string, options: AnyRecord, writer: AnyRecord) => {
+          const message = (fields: AnyRecord) =>
+            createNormalizedMessage({ sessionId: 's-follow', provider: 'claude', ...fields } as never);
+          writer.send(message({ kind: 'text', content: 'Started two subagents.' }));
+          writer.send(createCompleteMessage({ provider: 'claude', sessionId: 's-follow', exitCode: 0 }));
+          // A background task reports back: the CLI runs a turn on its own,
+          // and that turn runs into the account's limit.
+          const followUp = options.openFollowUpRun();
+          assert.ok(followUp, 'the finished turn leaves room for a follow-up run');
+          followUp.send(message({
+            kind: 'text',
+            content: "You've hit your session limit · resets 9:30am (Europe/Warsaw)",
+          }));
+          followUp.send(createCompleteMessage({ provider: 'claude', sessionId: 's-follow', exitCode: 0 }));
+        },
+        abort: async () => true,
+        resolveToolApproval: () => undefined,
+        getPendingApprovalsForSession: () => [],
+      } as unknown as ProviderRuntimeGateway;
+
+      const result = await dispatchChatCommand(fakeRuntime, {
+        sessionId: 's-follow',
+        content: 'run the subagents',
+        options: {},
+        userId: 'u',
+        connection: new FakeConnection() as never,
+      });
+      assert.equal(result.ok, true);
+      assert.deepEqual(reported, [{ accountId: 'acc-1', resetAt: null }]);
+    } finally {
+      accountFailoverService.reportLimitHit = originalReport;
+    }
+  });
+});
+
+test('a limit hit in the dispatched turn is reported once', async () => {
+  await withIsolatedDatabase(async () => {
+    sessionsDb.createAppSession('s-direct', 'claude', '/tmp/p', 'hi');
+
+    let reports = 0;
+    const originalReport = accountFailoverService.reportLimitHit;
+    accountFailoverService.reportLimitHit = async () => {
+      reports += 1;
+      return null;
+    };
+    try {
+      const fakeRuntime = {
+        hasRuntime: () => true,
+        run: async (_p: string, _c: string, _options: AnyRecord, writer: AnyRecord) => {
+          writer.send(createNormalizedMessage({
+            sessionId: 's-direct',
+            provider: 'claude',
+            kind: 'text',
+            content: "You've hit your weekly limit · resets Mon 9am",
+          } as never));
+          writer.send(createCompleteMessage({ provider: 'claude', sessionId: 's-direct', exitCode: 0 }));
+        },
+        abort: async () => true,
+        resolveToolApproval: () => undefined,
+        getPendingApprovalsForSession: () => [],
+      } as unknown as ProviderRuntimeGateway;
+
+      await dispatchChatCommand(fakeRuntime, {
+        sessionId: 's-direct',
+        content: 'go',
+        options: {},
+        userId: 'u',
+        connection: new FakeConnection() as never,
+      });
+      assert.equal(reports, 1, 'settled by `complete`, not again by the dispatch safety net');
+    } finally {
+      accountFailoverService.reportLimitHit = originalReport;
+    }
   });
 });
 
