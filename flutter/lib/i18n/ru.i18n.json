@@ -447,7 +447,11 @@
       },
       "deleteConfirm": "Удаляет сессию и её транскрипт. Действие необратимо.",
       "finishRunBeforeWorkspaceChange": "Завершите запуск перед сменой рабочей области",
-      "fallbackTitle": "Сессия"
+      "fallbackTitle": "Сессия",
+      "missing": {
+        "message": "Этой сессии нет на подключённом сервере.",
+        "action": "Выбрать другую сессию"
+      }
     },
     "shell": {
       "selectProject": {

@@ -436,7 +436,11 @@
       },
       "deleteConfirm": "移除会话及其记录。此操作无法撤销。",
       "finishRunBeforeWorkspaceChange": "请先结束运行再更改工作区",
-      "fallbackTitle": "会话"
+      "fallbackTitle": "会话",
+      "missing": {
+        "message": "此会话在已连接的服务器上不存在。",
+        "action": "选择其他会话"
+      }
     },
     "shell": {
       "selectProject": {

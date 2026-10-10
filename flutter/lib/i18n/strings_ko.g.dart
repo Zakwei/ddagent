@@ -1184,6 +1184,7 @@ class Translations$chat$session$ko extends Translations$chat$session$en {
 	@override String get deleteConfirm => '세션과 트랜스크립트를 제거합니다. 되돌릴 수 없습니다.';
 	@override String get finishRunBeforeWorkspaceChange => '작업 영역을 변경하기 전에 실행을 완료하세요';
 	@override String get fallbackTitle => '세션';
+	@override late final Translations$chat$session$missing$ko missing = Translations$chat$session$missing$ko._(_root);
 }
 
 // Path: chat.shell
@@ -5361,6 +5362,17 @@ class Translations$chat$session$messages$ko extends Translations$chat$session$me
 	@override String retryLoadOlder({required Object error}) => '이전 메시지 로드 재시도 — ${error}';
 }
 
+// Path: chat.session.missing
+class Translations$chat$session$missing$ko extends Translations$chat$session$missing$en {
+	Translations$chat$session$missing$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get message => '이 세션은 연결된 서버에 없습니다.';
+	@override String get action => '다른 세션 선택';
+}
+
 // Path: chat.shell.selectProject
 class Translations$chat$shell$selectProject$ko extends Translations$chat$shell$selectProject$en {
 	Translations$chat$shell$selectProject$ko._(TranslationsKo root) : this._root = root, super.internal(root);
@@ -8795,6 +8807,8 @@ extension on TranslationsKo {
 			'chat.session.deleteConfirm' => '세션과 트랜스크립트를 제거합니다. 되돌릴 수 없습니다.',
 			'chat.session.finishRunBeforeWorkspaceChange' => '작업 영역을 변경하기 전에 실행을 완료하세요',
 			'chat.session.fallbackTitle' => '세션',
+			'chat.session.missing.message' => '이 세션은 연결된 서버에 없습니다.',
+			'chat.session.missing.action' => '다른 세션 선택',
 			'chat.shell.selectProject.title' => '프로젝트 선택',
 			'chat.shell.selectProject.description' => '해당 디렉토리에서 대화형 Shell을 열 프로젝트를 선택하세요',
 			'chat.shell.status.newSession' => '새 세션',
@@ -8979,10 +8993,10 @@ extension on TranslationsKo {
 			'chat.modelLibrary.idHelp' => '공급자 CLI가 허용하는 정확한 식별자를 사용하세요. ID에는 공백을 넣을 수 없습니다.',
 			'chat.modelLibrary.updatedNotice' => ({required Object name}) => '${name}을(를) 업데이트했습니다.',
 			'chat.modelLibrary.addedNotice' => ({required Object name}) => '${name}을(를) 추가했습니다.',
-			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '${name}을(를) 삭제했습니다.',
-			'chat.modelLibrary.saving' => '저장 중…',
 			_ => null,
 		} ?? switch (path) {
+			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '${name}을(를) 삭제했습니다.',
+			'chat.modelLibrary.saving' => '저장 중…',
 			'chat.modelLibrary.saveChanges' => '변경 사항 저장',
 			'chat.modelLibrary.deleteConfirm' => '모든 선택기에서 이 모델을 삭제할까요?',
 			'chat.modelLibrary.customBadge' => '사용자 지정',
@@ -9493,10 +9507,10 @@ extension on TranslationsKo {
 			'common.projectWizard.step2.storedToken' => '저장된 토큰',
 			'common.projectWizard.step2.newToken' => '새 토큰',
 			'common.projectWizard.step2.nonePublic' => '없음 (공개)',
-			'common.projectWizard.step2.selectToken' => '토큰 선택',
-			'common.projectWizard.step2.selectTokenPlaceholder' => '-- 토큰 선택 --',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step2.selectToken' => '토큰 선택',
+			'common.projectWizard.step2.selectTokenPlaceholder' => '-- 토큰 선택 --',
 			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
 			'common.projectWizard.step2.tokenHelp' => '이 토큰은 이 작업에만 사용됩니다',
 			'common.projectWizard.step2.publicRepoInfo' => '공개 저장소는 인증이 필요하지 않습니다. 공개 저장소를 clone하는 경우 토큰을 생략할 수 있습니다.',
@@ -10007,10 +10021,10 @@ extension on TranslationsKo {
 			'settings.mcp.disconnected' => '연결 끊김',
 			'settings.mcp.scope.label' => '범위',
 			'settings.mcp.scope.user' => '사용자',
-			'settings.mcp.scope.project' => '프로젝트',
-			'settings.appearance.title' => '외관',
 			_ => null,
 		} ?? switch (path) {
+			'settings.mcp.scope.project' => '프로젝트',
+			'settings.appearance.title' => '외관',
 			'settings.appearance.theme' => '테마',
 			'settings.appearance.codeEditor' => '코드 에디터',
 			'settings.appearance.editorTheme' => '에디터 테마',
@@ -10521,10 +10535,10 @@ extension on TranslationsKo {
 			'settings.workspaces.description' => '작업 영역은 DDAgent가 채팅하고, 코드를 실행하고, 탐색할 수 있는 디렉터리입니다.',
 			'settings.workspaces.remove' => '작업 영역 제거',
 			'settings.workspaces.title' => '작업 영역',
-			'settings.workspaces.pathRequired' => '경로는 필수입니다',
-			'settings.stt.title' => '음성 입력 (음성 인식)',
 			_ => null,
 		} ?? switch (path) {
+			'settings.workspaces.pathRequired' => '경로는 필수입니다',
+			'settings.stt.title' => '음성 입력 (음성 인식)',
 			'settings.stt.description' => 'Whisper 호환 /audio/transcriptions 엔드포인트 (OpenAI, whisper.cpp, faster-whisper, Speaches). 입력창의 마이크 버튼을 활성화합니다.',
 			'settings.stt.configured' => '구성됨',
 			'settings.stt.endpoint' => '엔드포인트 URL (예: https://api.openai.com/v1)',
@@ -11035,10 +11049,10 @@ extension on TranslationsKo {
 			'tasks.taskDetail.statusFailed' => '작업 상태 업데이트 실패',
 			'tasks.taskDetail.taskId' => ({required Object id}) => '작업 ${id}',
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => '작업 ${id}: ${title}',
-			'tasks.taskDetail.testStrategy' => '테스트 전략',
-			'tasks.taskDetail.titleRequired' => '제목은 필수입니다',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.testStrategy' => '테스트 전략',
+			'tasks.taskDetail.titleRequired' => '제목은 필수입니다',
 			'tasks.taskDetail.updateFailed' => '작업 업데이트 실패',
 			'tasks.taskDetail.notFound' => '작업을 찾을 수 없습니다',
 			'tasks.taskDetail.subtasks' => '하위 작업',
@@ -11549,10 +11563,10 @@ extension on TranslationsKo {
 			'terminal.empty.title' => '활성 터미널 없음',
 			'terminal.empty.description' => '시작하려면 새 탭을 만드세요',
 			'terminal.overlay.processExited' => '프로세스가 종료되었습니다 — 연결하면 다시 시작합니다',
-			'terminal.overlay.processExitedWithCode' => ({required Object code}) => '프로세스가 종료되었습니다(코드 ${code}) — 연결하면 다시 시작합니다',
-			'terminal.overlay.resumeSession' => ({required Object title}) => '세션 ${title} 재개',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.overlay.processExitedWithCode' => ({required Object code}) => '프로세스가 종료되었습니다(코드 ${code}) — 연결하면 다시 시작합니다',
+			'terminal.overlay.resumeSession' => ({required Object title}) => '세션 ${title} 재개',
 			'terminal.overlay.startSession' => ({required Object path}) => '${path}에서 새 세션 시작',
 			'voice.preview' => '미리보기',
 			'voice.settingsSaved' => '음성 입력 설정이 저장되었습니다',

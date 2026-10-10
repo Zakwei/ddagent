@@ -1184,6 +1184,7 @@ class Translations$chat$session$ja extends Translations$chat$session$en {
 	@override String get deleteConfirm => 'セッションとそのトランスクリプトを削除します。元に戻せません。';
 	@override String get finishRunBeforeWorkspaceChange => 'ワークスペースを変更する前に実行を終了してください';
 	@override String get fallbackTitle => 'セッション';
+	@override late final Translations$chat$session$missing$ja missing = Translations$chat$session$missing$ja._(_root);
 }
 
 // Path: chat.shell
@@ -5361,6 +5362,17 @@ class Translations$chat$session$messages$ja extends Translations$chat$session$me
 	@override String retryLoadOlder({required Object error}) => '過去のメッセージの読み込みを再試行 — ${error}';
 }
 
+// Path: chat.session.missing
+class Translations$chat$session$missing$ja extends Translations$chat$session$missing$en {
+	Translations$chat$session$missing$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get message => 'このセッションは接続中のサーバーに存在しません。';
+	@override String get action => '別のセッションを選択';
+}
+
 // Path: chat.shell.selectProject
 class Translations$chat$shell$selectProject$ja extends Translations$chat$shell$selectProject$en {
 	Translations$chat$shell$selectProject$ja._(TranslationsJa root) : this._root = root, super.internal(root);
@@ -8795,6 +8807,8 @@ extension on TranslationsJa {
 			'chat.session.deleteConfirm' => 'セッションとそのトランスクリプトを削除します。元に戻せません。',
 			'chat.session.finishRunBeforeWorkspaceChange' => 'ワークスペースを変更する前に実行を終了してください',
 			'chat.session.fallbackTitle' => 'セッション',
+			'chat.session.missing.message' => 'このセッションは接続中のサーバーに存在しません。',
+			'chat.session.missing.action' => '別のセッションを選択',
 			'chat.shell.selectProject.title' => 'プロジェクトを選択',
 			'chat.shell.selectProject.description' => 'プロジェクトを選択してそのディレクトリでシェルを開きます',
 			'chat.shell.status.newSession' => '新しいセッション',
@@ -8979,10 +8993,10 @@ extension on TranslationsJa {
 			'chat.modelLibrary.idHelp' => 'プロバイダー CLI が受け付ける識別子をそのまま使用してください。ID にスペースは使用できません。',
 			'chat.modelLibrary.updatedNotice' => ({required Object name}) => '${name} を更新しました。',
 			'chat.modelLibrary.addedNotice' => ({required Object name}) => '${name} を追加しました。',
-			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '${name} を削除しました。',
-			'chat.modelLibrary.saving' => '保存中…',
 			_ => null,
 		} ?? switch (path) {
+			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '${name} を削除しました。',
+			'chat.modelLibrary.saving' => '保存中…',
 			'chat.modelLibrary.saveChanges' => '変更を保存',
 			'chat.modelLibrary.deleteConfirm' => 'このモデルをすべての選択肢から削除しますか？',
 			'chat.modelLibrary.customBadge' => 'カスタム',
@@ -9493,10 +9507,10 @@ extension on TranslationsJa {
 			'common.projectWizard.step2.storedToken' => '保存済みトークン',
 			'common.projectWizard.step2.newToken' => '新しいトークン',
 			'common.projectWizard.step2.nonePublic' => 'なし（パブリック）',
-			'common.projectWizard.step2.selectToken' => 'トークンを選択',
-			'common.projectWizard.step2.selectTokenPlaceholder' => '-- トークンを選択 --',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step2.selectToken' => 'トークンを選択',
+			'common.projectWizard.step2.selectTokenPlaceholder' => '-- トークンを選択 --',
 			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
 			'common.projectWizard.step2.tokenHelp' => 'このトークンはこの操作にのみ使用されます',
 			'common.projectWizard.step2.publicRepoInfo' => 'パブリックリポジトリには認証は不要です。パブリックリポジトリをクローンする場合、トークンは省略できます。',
@@ -10007,10 +10021,10 @@ extension on TranslationsJa {
 			'settings.mcp.disconnected' => '未接続',
 			'settings.mcp.scope.label' => 'スコープ',
 			'settings.mcp.scope.user' => 'ユーザー',
-			'settings.mcp.scope.project' => 'プロジェクト',
-			'settings.appearance.title' => '外観',
 			_ => null,
 		} ?? switch (path) {
+			'settings.mcp.scope.project' => 'プロジェクト',
+			'settings.appearance.title' => '外観',
 			'settings.appearance.theme' => 'テーマ',
 			'settings.appearance.codeEditor' => 'コードエディタ',
 			'settings.appearance.editorTheme' => 'エディタのテーマ',
@@ -10521,10 +10535,10 @@ extension on TranslationsJa {
 			'settings.workspaces.description' => 'ワークスペースは、DDAgent がチャット・コード実行・ブラウジングできるディレクトリです。',
 			'settings.workspaces.remove' => 'ワークスペースを削除',
 			'settings.workspaces.title' => 'ワークスペース',
-			'settings.workspaces.pathRequired' => 'パスは必須です',
-			'settings.stt.title' => '音声入力 (音声認識)',
 			_ => null,
 		} ?? switch (path) {
+			'settings.workspaces.pathRequired' => 'パスは必須です',
+			'settings.stt.title' => '音声入力 (音声認識)',
 			'settings.stt.description' => 'Whisper 互換の /audio/transcriptions エンドポイント (OpenAI、whisper.cpp、faster-whisper、Speaches)。入力欄のマイクボタンが有効になります。',
 			'settings.stt.configured' => '設定済み',
 			'settings.stt.endpoint' => 'エンドポイント URL (例: https://api.openai.com/v1)',
@@ -11035,10 +11049,10 @@ extension on TranslationsJa {
 			'tasks.taskDetail.statusFailed' => 'タスクステータスの更新に失敗しました',
 			'tasks.taskDetail.taskId' => ({required Object id}) => 'タスク ${id}',
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'タスク ${id}: ${title}',
-			'tasks.taskDetail.testStrategy' => 'テスト戦略',
-			'tasks.taskDetail.titleRequired' => 'タイトルは必須です',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.testStrategy' => 'テスト戦略',
+			'tasks.taskDetail.titleRequired' => 'タイトルは必須です',
 			'tasks.taskDetail.updateFailed' => 'タスクの更新に失敗しました',
 			'tasks.taskDetail.notFound' => 'タスクが見つかりません',
 			'tasks.taskDetail.subtasks' => 'サブタスク',
@@ -11549,10 +11563,10 @@ extension on TranslationsJa {
 			'terminal.empty.title' => 'アクティブなターミナルがありません',
 			'terminal.empty.description' => '新しいタブを作成して開始してください',
 			'terminal.overlay.processExited' => 'プロセスが終了しました — 接続すると再起動します',
-			'terminal.overlay.processExitedWithCode' => ({required Object code}) => 'プロセスが終了しました（コード ${code}）— 接続すると再起動します',
-			'terminal.overlay.resumeSession' => ({required Object title}) => 'セッション ${title} を再開',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.overlay.processExitedWithCode' => ({required Object code}) => 'プロセスが終了しました（コード ${code}）— 接続すると再起動します',
+			'terminal.overlay.resumeSession' => ({required Object title}) => 'セッション ${title} を再開',
 			'terminal.overlay.startSession' => ({required Object path}) => '${path} で新しいセッションを開始',
 			'voice.preview' => 'プレビュー',
 			'voice.settingsSaved' => '音声入力設定を保存しました',

@@ -436,7 +436,11 @@
       },
       "deleteConfirm": "移除工作階段及其記錄。此操作無法復原。",
       "finishRunBeforeWorkspaceChange": "變更工作區前請先完成執行",
-      "fallbackTitle": "工作階段"
+      "fallbackTitle": "工作階段",
+      "missing": {
+        "message": "此工作階段不存在於已連線的伺服器上。",
+        "action": "選擇其他工作階段"
+      }
     },
     "shell": {
       "selectProject": {

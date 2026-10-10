@@ -437,7 +437,11 @@
       },
       "deleteConfirm": "Elimina la sesión y su transcripción. No se puede deshacer.",
       "finishRunBeforeWorkspaceChange": "Finaliza la ejecución antes de cambiar de espacio de trabajo",
-      "fallbackTitle": "Sesión"
+      "fallbackTitle": "Sesión",
+      "missing": {
+        "message": "Esta sesión no existe en el servidor conectado.",
+        "action": "Elegir otra sesión"
+      }
     },
     "shell": {
       "selectProject": {

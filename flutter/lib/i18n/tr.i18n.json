@@ -437,7 +437,11 @@
       },
       "deleteConfirm": "Oturumu ve transkriptini kaldırır. Geri alınamaz.",
       "finishRunBeforeWorkspaceChange": "Çalışma alanını değiştirmeden önce çalıştırmayı bitir",
-      "fallbackTitle": "Oturum"
+      "fallbackTitle": "Oturum",
+      "missing": {
+        "message": "Bu oturum bağlı sunucuda yok.",
+        "action": "Başka bir oturum seç"
+      }
     },
     "shell": {
       "selectProject": {

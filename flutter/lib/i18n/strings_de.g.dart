@@ -1185,6 +1185,7 @@ class Translations$chat$session$de extends Translations$chat$session$en {
 	@override String get deleteConfirm => 'Entfernt die Sitzung und ihr Transkript. Kann nicht rückgängig gemacht werden.';
 	@override String get finishRunBeforeWorkspaceChange => 'Beende den Lauf, bevor du den Arbeitsbereich wechselst';
 	@override String get fallbackTitle => 'Sitzung';
+	@override late final Translations$chat$session$missing$de missing = Translations$chat$session$missing$de._(_root);
 }
 
 // Path: chat.shell
@@ -5372,6 +5373,17 @@ class Translations$chat$session$messages$de extends Translations$chat$session$me
 	@override String retryLoadOlder({required Object error}) => 'Laden älterer Nachrichten erneut versuchen — ${error}';
 }
 
+// Path: chat.session.missing
+class Translations$chat$session$missing$de extends Translations$chat$session$missing$en {
+	Translations$chat$session$missing$de._(TranslationsDe root) : this._root = root, super.internal(root);
+
+	final TranslationsDe _root; // ignore: unused_field
+
+	// Translations
+	@override String get message => 'Diese Sitzung existiert auf dem verbundenen Server nicht.';
+	@override String get action => 'Andere Sitzung wählen';
+}
+
 // Path: chat.shell.selectProject
 class Translations$chat$shell$selectProject$de extends Translations$chat$shell$selectProject$en {
 	Translations$chat$shell$selectProject$de._(TranslationsDe root) : this._root = root, super.internal(root);
@@ -8806,6 +8818,8 @@ extension on TranslationsDe {
 			'chat.session.deleteConfirm' => 'Entfernt die Sitzung und ihr Transkript. Kann nicht rückgängig gemacht werden.',
 			'chat.session.finishRunBeforeWorkspaceChange' => 'Beende den Lauf, bevor du den Arbeitsbereich wechselst',
 			'chat.session.fallbackTitle' => 'Sitzung',
+			'chat.session.missing.message' => 'Diese Sitzung existiert auf dem verbundenen Server nicht.',
+			'chat.session.missing.action' => 'Andere Sitzung wählen',
 			'chat.shell.selectProject.title' => 'Projekt auswählen',
 			'chat.shell.selectProject.description' => 'Wähl ein Projekt, um ein interaktives Terminal in diesem Verzeichnis zu öffnen',
 			'chat.shell.status.newSession' => 'Neue Sitzung',
@@ -8990,10 +9004,10 @@ extension on TranslationsDe {
 			'chat.modelLibrary.idHelp' => 'Verwende genau die Kennung, die das CLI des Anbieters akzeptiert. IDs dürfen keine Leerzeichen enthalten.',
 			'chat.modelLibrary.updatedNotice' => ({required Object name}) => '${name} wurde aktualisiert.',
 			'chat.modelLibrary.addedNotice' => ({required Object name}) => '${name} wurde hinzugefügt.',
-			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '${name} wurde gelöscht.',
-			'chat.modelLibrary.saving' => 'Wird gespeichert…',
 			_ => null,
 		} ?? switch (path) {
+			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '${name} wurde gelöscht.',
+			'chat.modelLibrary.saving' => 'Wird gespeichert…',
 			'chat.modelLibrary.saveChanges' => 'Änderungen speichern',
 			'chat.modelLibrary.deleteConfirm' => 'Dieses Modell aus allen Auswahlen löschen?',
 			'chat.modelLibrary.customBadge' => 'Eigenes',
@@ -9504,10 +9518,10 @@ extension on TranslationsDe {
 			'common.projectWizard.step2.storedToken' => 'Gespeicherter Token',
 			'common.projectWizard.step2.newToken' => 'Neuer Token',
 			'common.projectWizard.step2.nonePublic' => 'Keiner (Öffentlich)',
-			'common.projectWizard.step2.selectToken' => 'Token auswählen',
-			'common.projectWizard.step2.selectTokenPlaceholder' => '-- Token auswählen --',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step2.selectToken' => 'Token auswählen',
+			'common.projectWizard.step2.selectTokenPlaceholder' => '-- Token auswählen --',
 			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
 			'common.projectWizard.step2.tokenHelp' => 'Dieser Token wird nur für diesen Vorgang verwendet',
 			'common.projectWizard.step2.publicRepoInfo' => 'Öffentliche Repositories benötigen keine Authentifizierung. Du kannst das Token beim Klonen eines öffentlichen Repos weglassen.',
@@ -10018,10 +10032,10 @@ extension on TranslationsDe {
 			'settings.mcp.disconnected' => 'Getrennt',
 			'settings.mcp.scope.label' => 'Geltungsbereich',
 			'settings.mcp.scope.user' => 'Benutzer:in',
-			'settings.mcp.scope.project' => 'Projekt',
-			'settings.appearance.title' => 'Darstellung',
 			_ => null,
 		} ?? switch (path) {
+			'settings.mcp.scope.project' => 'Projekt',
+			'settings.appearance.title' => 'Darstellung',
 			'settings.appearance.theme' => 'Design',
 			'settings.appearance.codeEditor' => 'Code-Editor',
 			'settings.appearance.editorTheme' => 'Editor-Design',
@@ -10532,10 +10546,10 @@ extension on TranslationsDe {
 			'settings.workspaces.description' => 'Workspaces sind Verzeichnisse, in denen DDAgent chatten, Code ausführen und browsen kann.',
 			'settings.workspaces.remove' => 'Workspace entfernen',
 			'settings.workspaces.title' => 'Arbeitsbereiche',
-			'settings.workspaces.pathRequired' => 'Pfad ist erforderlich',
-			'settings.stt.title' => 'Spracheingabe (Speech-to-Text)',
 			_ => null,
 		} ?? switch (path) {
+			'settings.workspaces.pathRequired' => 'Pfad ist erforderlich',
+			'settings.stt.title' => 'Spracheingabe (Speech-to-Text)',
 			'settings.stt.description' => 'Whisper-kompatibler /audio/transcriptions-Endpunkt (OpenAI, whisper.cpp, faster-whisper, Speaches). Aktiviert die Mikrofontaste im Eingabefeld.',
 			'settings.stt.configured' => 'konfiguriert',
 			'settings.stt.endpoint' => 'Endpunkt-URL (z. B. https://api.openai.com/v1)',
@@ -11046,10 +11060,10 @@ extension on TranslationsDe {
 			'tasks.taskDetail.statusFailed' => 'Aufgabenstatus konnte nicht aktualisiert werden',
 			'tasks.taskDetail.taskId' => ({required Object id}) => 'Aufgabe ${id}',
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'Aufgabe ${id}: ${title}',
-			'tasks.taskDetail.testStrategy' => 'Teststrategie',
-			'tasks.taskDetail.titleRequired' => 'Titel ist erforderlich',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.testStrategy' => 'Teststrategie',
+			'tasks.taskDetail.titleRequired' => 'Titel ist erforderlich',
 			'tasks.taskDetail.updateFailed' => 'Aufgabe konnte nicht aktualisiert werden',
 			'tasks.taskDetail.notFound' => 'Aufgabe nicht gefunden',
 			'tasks.taskDetail.subtasks' => 'Unteraufgaben',
@@ -11560,10 +11574,10 @@ extension on TranslationsDe {
 			'terminal.empty.title' => 'Kein aktives Terminal',
 			'terminal.empty.description' => 'Erstelle einen neuen Tab, um zu beginnen',
 			'terminal.overlay.processExited' => 'Prozess beendet — verbinde dich, um ihn erneut zu starten',
-			'terminal.overlay.processExitedWithCode' => ({required Object code}) => 'Prozess beendet (Code ${code}) — verbinde dich, um ihn erneut zu starten',
-			'terminal.overlay.resumeSession' => ({required Object title}) => 'Sitzung ${title} fortsetzen',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.overlay.processExitedWithCode' => ({required Object code}) => 'Prozess beendet (Code ${code}) — verbinde dich, um ihn erneut zu starten',
+			'terminal.overlay.resumeSession' => ({required Object title}) => 'Sitzung ${title} fortsetzen',
 			'terminal.overlay.startSession' => ({required Object path}) => 'Neue Sitzung in ${path} starten',
 			'voice.preview' => 'Vorschau',
 			'voice.settingsSaved' => 'Spracheingabe-Einstellungen gespeichert',

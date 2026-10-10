@@ -1951,6 +1951,8 @@ class Translations$chat$session$en {
 
 	/// en: 'Session'
 	String get fallbackTitle => 'Session';
+
+	late final Translations$chat$session$missing$en missing = Translations$chat$session$missing$en.internal(_root);
 }
 
 // Path: chat.shell
@@ -9699,6 +9701,21 @@ class Translations$chat$session$messages$en {
 	String retryLoadOlder({required Object error}) => 'Retry loading older — ${error}';
 }
 
+// Path: chat.session.missing
+class Translations$chat$session$missing$en {
+	Translations$chat$session$missing$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'This session does not exist on the connected server.'
+	String get message => 'This session does not exist on the connected server.';
+
+	/// en: 'Choose another session'
+	String get action => 'Choose another session';
+}
+
 // Path: chat.shell.selectProject
 class Translations$chat$shell$selectProject$en {
 	Translations$chat$shell$selectProject$en.internal(this._root);
@@ -15237,6 +15254,8 @@ extension on Translations {
 			'chat.session.deleteConfirm' => 'Removes the session and its transcript. Cannot be undone.',
 			'chat.session.finishRunBeforeWorkspaceChange' => 'Finish the run before changing workspace',
 			'chat.session.fallbackTitle' => 'Session',
+			'chat.session.missing.message' => 'This session does not exist on the connected server.',
+			'chat.session.missing.action' => 'Choose another session',
 			'chat.shell.selectProject.title' => 'Select a Project',
 			'chat.shell.selectProject.description' => 'Choose a project to open an interactive shell in that directory',
 			'chat.shell.status.newSession' => 'New Session',
@@ -15421,10 +15440,10 @@ extension on Translations {
 			'chat.modelLibrary.idHelp' => 'Use the exact identifier accepted by the provider CLI. IDs cannot contain spaces.',
 			'chat.modelLibrary.updatedNotice' => ({required Object name}) => '${name} was updated.',
 			'chat.modelLibrary.addedNotice' => ({required Object name}) => '${name} was added.',
-			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '${name} was deleted.',
-			'chat.modelLibrary.saving' => 'Saving…',
 			_ => null,
 		} ?? switch (path) {
+			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '${name} was deleted.',
+			'chat.modelLibrary.saving' => 'Saving…',
 			'chat.modelLibrary.saveChanges' => 'Save changes',
 			'chat.modelLibrary.deleteConfirm' => 'Delete this model from all pickers?',
 			'chat.modelLibrary.customBadge' => 'Custom',
@@ -15935,10 +15954,10 @@ extension on Translations {
 			'common.projectWizard.step2.storedToken' => 'Stored Token',
 			'common.projectWizard.step2.newToken' => 'New Token',
 			'common.projectWizard.step2.nonePublic' => 'None (Public)',
-			'common.projectWizard.step2.selectToken' => 'Select Token',
-			'common.projectWizard.step2.selectTokenPlaceholder' => '-- Select a token --',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step2.selectToken' => 'Select Token',
+			'common.projectWizard.step2.selectTokenPlaceholder' => '-- Select a token --',
 			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
 			'common.projectWizard.step2.tokenHelp' => 'This token will be used only for this operation',
 			'common.projectWizard.step2.publicRepoInfo' => 'Public repositories don\'t require authentication. You can skip providing a token if cloning a public repo.',
@@ -16449,10 +16468,10 @@ extension on Translations {
 			'settings.mcp.disconnected' => 'Disconnected',
 			'settings.mcp.scope.label' => 'Scope',
 			'settings.mcp.scope.user' => 'User',
-			'settings.mcp.scope.project' => 'Project',
-			'settings.appearance.title' => 'Appearance',
 			_ => null,
 		} ?? switch (path) {
+			'settings.mcp.scope.project' => 'Project',
+			'settings.appearance.title' => 'Appearance',
 			'settings.appearance.theme' => 'Theme',
 			'settings.appearance.codeEditor' => 'Code Editor',
 			'settings.appearance.editorTheme' => 'Editor Theme',
@@ -16963,10 +16982,10 @@ extension on Translations {
 			'settings.workspaces.description' => 'Workspaces are directories DDAgent can chat, run code, and browse inside.',
 			'settings.workspaces.remove' => 'Remove workspace',
 			'settings.workspaces.title' => 'Workspaces',
-			'settings.workspaces.pathRequired' => 'Path is required',
-			'settings.stt.title' => 'Voice input (speech-to-text)',
 			_ => null,
 		} ?? switch (path) {
+			'settings.workspaces.pathRequired' => 'Path is required',
+			'settings.stt.title' => 'Voice input (speech-to-text)',
 			'settings.stt.description' => 'Whisper-compatible /audio/transcriptions endpoint (OpenAI, whisper.cpp, faster-whisper, Speaches). Enables the mic button in the composer.',
 			'settings.stt.configured' => 'configured',
 			'settings.stt.endpoint' => 'Endpoint URL (e.g. https://api.openai.com/v1)',
@@ -17477,10 +17496,10 @@ extension on Translations {
 			'tasks.taskDetail.statusFailed' => 'Failed to update task status',
 			'tasks.taskDetail.taskId' => ({required Object id}) => 'Task ${id}',
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'Task ${id}: ${title}',
-			'tasks.taskDetail.testStrategy' => 'Test Strategy',
-			'tasks.taskDetail.titleRequired' => 'Title is required',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.testStrategy' => 'Test Strategy',
+			'tasks.taskDetail.titleRequired' => 'Title is required',
 			'tasks.taskDetail.updateFailed' => 'Failed to update task',
 			'tasks.taskDetail.notFound' => 'Task not found',
 			'tasks.taskDetail.subtasks' => 'Subtasks',
@@ -17991,10 +18010,10 @@ extension on Translations {
 			'terminal.empty.title' => 'No Active Terminal',
 			'terminal.empty.description' => 'Create a new tab to begin',
 			'terminal.overlay.processExited' => 'Process exited — connect to start it again',
-			'terminal.overlay.processExitedWithCode' => ({required Object code}) => 'Process exited (code ${code}) — connect to start it again',
-			'terminal.overlay.resumeSession' => ({required Object title}) => 'Resume session ${title}',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.overlay.processExitedWithCode' => ({required Object code}) => 'Process exited (code ${code}) — connect to start it again',
+			'terminal.overlay.resumeSession' => ({required Object title}) => 'Resume session ${title}',
 			'terminal.overlay.startSession' => ({required Object path}) => 'Start a new session in ${path}',
 			'voice.preview' => 'Preview',
 			'voice.settingsSaved' => 'Voice input settings saved',

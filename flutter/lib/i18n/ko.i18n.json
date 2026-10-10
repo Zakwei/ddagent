@@ -436,7 +436,11 @@
       },
       "deleteConfirm": "세션과 트랜스크립트를 제거합니다. 되돌릴 수 없습니다.",
       "finishRunBeforeWorkspaceChange": "작업 영역을 변경하기 전에 실행을 완료하세요",
-      "fallbackTitle": "세션"
+      "fallbackTitle": "세션",
+      "missing": {
+        "message": "이 세션은 연결된 서버에 없습니다.",
+        "action": "다른 세션 선택"
+      }
     },
     "shell": {
       "selectProject": {

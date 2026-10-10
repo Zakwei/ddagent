@@ -1185,6 +1185,7 @@ class Translations$chat$session$it extends Translations$chat$session$en {
 	@override String get deleteConfirm => 'Rimuove la sessione e la sua trascrizione. L\'azione è irreversibile.';
 	@override String get finishRunBeforeWorkspaceChange => 'Termina l\'esecuzione prima di cambiare spazio di lavoro';
 	@override String get fallbackTitle => 'Sessione';
+	@override late final Translations$chat$session$missing$it missing = Translations$chat$session$missing$it._(_root);
 }
 
 // Path: chat.shell
@@ -5372,6 +5373,17 @@ class Translations$chat$session$messages$it extends Translations$chat$session$me
 	@override String retryLoadOlder({required Object error}) => 'Riprova a caricare i precedenti — ${error}';
 }
 
+// Path: chat.session.missing
+class Translations$chat$session$missing$it extends Translations$chat$session$missing$en {
+	Translations$chat$session$missing$it._(TranslationsIt root) : this._root = root, super.internal(root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get message => 'Questa sessione non esiste sul server connesso.';
+	@override String get action => 'Scegli un\'altra sessione';
+}
+
 // Path: chat.shell.selectProject
 class Translations$chat$shell$selectProject$it extends Translations$chat$shell$selectProject$en {
 	Translations$chat$shell$selectProject$it._(TranslationsIt root) : this._root = root, super.internal(root);
@@ -8806,6 +8818,8 @@ extension on TranslationsIt {
 			'chat.session.deleteConfirm' => 'Rimuove la sessione e la sua trascrizione. L\'azione è irreversibile.',
 			'chat.session.finishRunBeforeWorkspaceChange' => 'Termina l\'esecuzione prima di cambiare spazio di lavoro',
 			'chat.session.fallbackTitle' => 'Sessione',
+			'chat.session.missing.message' => 'Questa sessione non esiste sul server connesso.',
+			'chat.session.missing.action' => 'Scegli un\'altra sessione',
 			'chat.shell.selectProject.title' => 'Seleziona un progetto',
 			'chat.shell.selectProject.description' => 'Scegli un progetto per aprire una shell interattiva in quella directory',
 			'chat.shell.status.newSession' => 'Nuova sessione',
@@ -8990,10 +9004,10 @@ extension on TranslationsIt {
 			'chat.modelLibrary.idHelp' => 'Usa l\'identificatore esatto accettato dalla CLI del provider. Gli ID non possono contenere spazi.',
 			'chat.modelLibrary.updatedNotice' => ({required Object name}) => '${name} è stato aggiornato.',
 			'chat.modelLibrary.addedNotice' => ({required Object name}) => '${name} è stato aggiunto.',
-			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '${name} è stato eliminato.',
-			'chat.modelLibrary.saving' => 'Salvataggio…',
 			_ => null,
 		} ?? switch (path) {
+			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '${name} è stato eliminato.',
+			'chat.modelLibrary.saving' => 'Salvataggio…',
 			'chat.modelLibrary.saveChanges' => 'Salva modifiche',
 			'chat.modelLibrary.deleteConfirm' => 'Eliminare questo modello da tutti i selettori?',
 			'chat.modelLibrary.customBadge' => 'Personalizzato',
@@ -9504,10 +9518,10 @@ extension on TranslationsIt {
 			'common.projectWizard.step2.storedToken' => 'Token salvato',
 			'common.projectWizard.step2.newToken' => 'Nuovo token',
 			'common.projectWizard.step2.nonePublic' => 'Nessuno (pubblico)',
-			'common.projectWizard.step2.selectToken' => 'Seleziona token',
-			'common.projectWizard.step2.selectTokenPlaceholder' => '-- Seleziona un token --',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step2.selectToken' => 'Seleziona token',
+			'common.projectWizard.step2.selectTokenPlaceholder' => '-- Seleziona un token --',
 			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
 			'common.projectWizard.step2.tokenHelp' => 'Questo token verrà utilizzato solo per questa operazione',
 			'common.projectWizard.step2.publicRepoInfo' => 'I repository pubblici non richiedono autenticazione. Puoi saltare il token se stai clonando un repository pubblico.',
@@ -10018,10 +10032,10 @@ extension on TranslationsIt {
 			'settings.mcp.disconnected' => 'Disconnesso',
 			'settings.mcp.scope.label' => 'Ambito',
 			'settings.mcp.scope.user' => 'Utente',
-			'settings.mcp.scope.project' => 'Progetto',
-			'settings.appearance.title' => 'Aspetto',
 			_ => null,
 		} ?? switch (path) {
+			'settings.mcp.scope.project' => 'Progetto',
+			'settings.appearance.title' => 'Aspetto',
 			'settings.appearance.theme' => 'Tema',
 			'settings.appearance.codeEditor' => 'Editor codice',
 			'settings.appearance.editorTheme' => 'Tema editor',
@@ -10532,10 +10546,10 @@ extension on TranslationsIt {
 			'settings.workspaces.description' => 'I workspace sono directory in cui DDAgent può chattare, eseguire codice e navigare.',
 			'settings.workspaces.remove' => 'Rimuovi workspace',
 			'settings.workspaces.title' => 'Workspace',
-			'settings.workspaces.pathRequired' => 'Il percorso è obbligatorio',
-			'settings.stt.title' => 'Input vocale (speech-to-text)',
 			_ => null,
 		} ?? switch (path) {
+			'settings.workspaces.pathRequired' => 'Il percorso è obbligatorio',
+			'settings.stt.title' => 'Input vocale (speech-to-text)',
 			'settings.stt.description' => 'Endpoint /audio/transcriptions compatibile con Whisper (OpenAI, whisper.cpp, faster-whisper, Speaches). Attiva il pulsante del microfono nel composer.',
 			'settings.stt.configured' => 'configurato',
 			'settings.stt.endpoint' => 'URL dell\'endpoint (es. https://api.openai.com/v1)',
@@ -11046,10 +11060,10 @@ extension on TranslationsIt {
 			'tasks.taskDetail.statusFailed' => 'Impossibile aggiornare lo stato dell’attività',
 			'tasks.taskDetail.taskId' => ({required Object id}) => 'Attività ${id}',
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'Attività ${id}: ${title}',
-			'tasks.taskDetail.testStrategy' => 'Strategia di test',
-			'tasks.taskDetail.titleRequired' => 'Il titolo è obbligatorio',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.testStrategy' => 'Strategia di test',
+			'tasks.taskDetail.titleRequired' => 'Il titolo è obbligatorio',
 			'tasks.taskDetail.updateFailed' => 'Impossibile aggiornare l’attività',
 			'tasks.taskDetail.notFound' => 'Attività non trovata',
 			'tasks.taskDetail.subtasks' => 'Sottoattività',
@@ -11560,10 +11574,10 @@ extension on TranslationsIt {
 			'terminal.empty.title' => 'Nessun terminale attivo',
 			'terminal.empty.description' => 'Crea una nuova scheda per iniziare',
 			'terminal.overlay.processExited' => 'Il processo è terminato: connettiti per avviarlo di nuovo',
-			'terminal.overlay.processExitedWithCode' => ({required Object code}) => 'Il processo è terminato (codice ${code}): connettiti per avviarlo di nuovo',
-			'terminal.overlay.resumeSession' => ({required Object title}) => 'Riprendi la sessione ${title}',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.overlay.processExitedWithCode' => ({required Object code}) => 'Il processo è terminato (codice ${code}): connettiti per avviarlo di nuovo',
+			'terminal.overlay.resumeSession' => ({required Object title}) => 'Riprendi la sessione ${title}',
 			'terminal.overlay.startSession' => ({required Object path}) => 'Avvia una nuova sessione in ${path}',
 			'voice.preview' => 'Anteprima',
 			'voice.settingsSaved' => 'Impostazioni di input vocale salvate',

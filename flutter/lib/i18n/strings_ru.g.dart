@@ -1187,6 +1187,7 @@ class Translations$chat$session$ru extends Translations$chat$session$en {
 	@override String get deleteConfirm => 'Удаляет сессию и её транскрипт. Действие необратимо.';
 	@override String get finishRunBeforeWorkspaceChange => 'Завершите запуск перед сменой рабочей области';
 	@override String get fallbackTitle => 'Сессия';
+	@override late final Translations$chat$session$missing$ru missing = Translations$chat$session$missing$ru._(_root);
 }
 
 // Path: chat.shell
@@ -5410,6 +5411,17 @@ class Translations$chat$session$messages$ru extends Translations$chat$session$me
 	@override String retryLoadOlder({required Object error}) => 'Повторить загрузку старых — ${error}';
 }
 
+// Path: chat.session.missing
+class Translations$chat$session$missing$ru extends Translations$chat$session$missing$en {
+	Translations$chat$session$missing$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get message => 'Этой сессии нет на подключённом сервере.';
+	@override String get action => 'Выбрать другую сессию';
+}
+
 // Path: chat.shell.selectProject
 class Translations$chat$shell$selectProject$ru extends Translations$chat$shell$selectProject$en {
 	Translations$chat$shell$selectProject$ru._(TranslationsRu root) : this._root = root, super.internal(root);
@@ -8844,6 +8856,8 @@ extension on TranslationsRu {
 			'chat.session.deleteConfirm' => 'Удаляет сессию и её транскрипт. Действие необратимо.',
 			'chat.session.finishRunBeforeWorkspaceChange' => 'Завершите запуск перед сменой рабочей области',
 			'chat.session.fallbackTitle' => 'Сессия',
+			'chat.session.missing.message' => 'Этой сессии нет на подключённом сервере.',
+			'chat.session.missing.action' => 'Выбрать другую сессию',
 			'chat.shell.selectProject.title' => 'Выберите проект',
 			'chat.shell.selectProject.description' => 'Выберите проект для открытия интерактивной оболочки в этом каталоге',
 			'chat.shell.status.newSession' => 'Новый сеанс',
@@ -9028,10 +9042,10 @@ extension on TranslationsRu {
 			'chat.modelLibrary.idHelp' => 'Используйте точный идентификатор, который принимает CLI провайдера. ID не может содержать пробелы.',
 			'chat.modelLibrary.updatedNotice' => ({required Object name}) => '${name} обновлена.',
 			'chat.modelLibrary.addedNotice' => ({required Object name}) => '${name} добавлена.',
-			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '${name} удалена.',
-			'chat.modelLibrary.saving' => 'Сохранение…',
 			_ => null,
 		} ?? switch (path) {
+			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '${name} удалена.',
+			'chat.modelLibrary.saving' => 'Сохранение…',
 			'chat.modelLibrary.saveChanges' => 'Сохранить изменения',
 			'chat.modelLibrary.deleteConfirm' => 'Удалить эту модель из всех списков выбора?',
 			'chat.modelLibrary.customBadge' => 'Свой',
@@ -9542,10 +9556,10 @@ extension on TranslationsRu {
 			'common.projectWizard.step2.storedToken' => 'Сохраненный токен',
 			'common.projectWizard.step2.newToken' => 'Новый токен',
 			'common.projectWizard.step2.nonePublic' => 'Нет (публичный)',
-			'common.projectWizard.step2.selectToken' => 'Выбрать токен',
-			'common.projectWizard.step2.selectTokenPlaceholder' => '-- Выберите токен --',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step2.selectToken' => 'Выбрать токен',
+			'common.projectWizard.step2.selectTokenPlaceholder' => '-- Выберите токен --',
 			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
 			'common.projectWizard.step2.tokenHelp' => 'Этот токен будет использован только для этой операции',
 			'common.projectWizard.step2.publicRepoInfo' => 'Публичные репозитории не требуют аутентификации. Вы можете пропустить токен при клонировании публичного репозитория.',
@@ -10056,10 +10070,10 @@ extension on TranslationsRu {
 			'settings.mcp.disconnected' => 'Отключен',
 			'settings.mcp.scope.label' => 'Область',
 			'settings.mcp.scope.user' => 'Пользователь',
-			'settings.mcp.scope.project' => 'Проект',
-			'settings.appearance.title' => 'Внешний вид',
 			_ => null,
 		} ?? switch (path) {
+			'settings.mcp.scope.project' => 'Проект',
+			'settings.appearance.title' => 'Внешний вид',
 			'settings.appearance.theme' => 'Тема',
 			'settings.appearance.codeEditor' => 'Редактор кода',
 			'settings.appearance.editorTheme' => 'Тема редактора',
@@ -10570,10 +10584,10 @@ extension on TranslationsRu {
 			'settings.workspaces.description' => 'Рабочие области — каталоги, в которых DDAgent может вести чаты, запускать код и просматривать файлы.',
 			'settings.workspaces.remove' => 'Удалить рабочую область',
 			'settings.workspaces.title' => 'Рабочие области',
-			'settings.workspaces.pathRequired' => 'Требуется путь',
-			'settings.stt.title' => 'Голосовой ввод (распознавание речи)',
 			_ => null,
 		} ?? switch (path) {
+			'settings.workspaces.pathRequired' => 'Требуется путь',
+			'settings.stt.title' => 'Голосовой ввод (распознавание речи)',
 			'settings.stt.description' => 'Whisper-совместимая конечная точка /audio/transcriptions (OpenAI, whisper.cpp, faster-whisper, Speaches). Включает кнопку микрофона в поле ввода.',
 			'settings.stt.configured' => 'настроено',
 			'settings.stt.endpoint' => 'URL конечной точки (например, https://api.openai.com/v1)',
@@ -11084,10 +11098,10 @@ extension on TranslationsRu {
 			'tasks.taskDetail.statusFailed' => 'Не удалось обновить статус задачи',
 			'tasks.taskDetail.taskId' => ({required Object id}) => 'Задача ${id}',
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'Задача ${id}: ${title}',
-			'tasks.taskDetail.testStrategy' => 'Стратегия тестирования',
-			'tasks.taskDetail.titleRequired' => 'Название обязательно',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.testStrategy' => 'Стратегия тестирования',
+			'tasks.taskDetail.titleRequired' => 'Название обязательно',
 			'tasks.taskDetail.updateFailed' => 'Не удалось обновить задачу',
 			'tasks.taskDetail.notFound' => 'Задача не найдена',
 			'tasks.taskDetail.subtasks' => 'Подзадачи',
@@ -11598,10 +11612,10 @@ extension on TranslationsRu {
 			'terminal.empty.title' => 'Нет активного терминала',
 			'terminal.empty.description' => 'Создайте новую вкладку, чтобы начать',
 			'terminal.overlay.processExited' => 'Процесс завершён — подключитесь, чтобы запустить его снова',
-			'terminal.overlay.processExitedWithCode' => ({required Object code}) => 'Процесс завершён (код ${code}) — подключитесь, чтобы запустить его снова',
-			'terminal.overlay.resumeSession' => ({required Object title}) => 'Возобновить сеанс ${title}',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.overlay.processExitedWithCode' => ({required Object code}) => 'Процесс завершён (код ${code}) — подключитесь, чтобы запустить его снова',
+			'terminal.overlay.resumeSession' => ({required Object title}) => 'Возобновить сеанс ${title}',
 			'terminal.overlay.startSession' => ({required Object path}) => 'Начать новый сеанс в ${path}',
 			'voice.preview' => 'Предпросмотр',
 			'voice.settingsSaved' => 'Настройки голосового ввода сохранены',

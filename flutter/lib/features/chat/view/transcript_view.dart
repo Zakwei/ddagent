@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:ui' show PointerDeviceKind;
 
+import 'package:ddagent_app/core/network/api_error.dart';
 import 'package:ddagent_app/core/theme/app_theme.dart';
 import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
@@ -63,6 +64,7 @@ class TranscriptView extends ConsumerStatefulWidget {
     this.dense = false,
     this.standalone = false,
     this.onOpenFile,
+    this.onSessionMissing,
     super.key,
   });
 
@@ -79,6 +81,11 @@ class TranscriptView extends ConsumerStatefulWidget {
   /// In-pane editor open (web `onFileOpen`) — the workspace wires this to
   /// `openFileInEditor`; standalone routes fall back to `/editor`.
   final void Function(String path)? onOpenFile;
+
+  /// The connected server does not know this session (404) — e.g. a pane
+  /// restored from another server. The workspace wires this to reopen the
+  /// pane's session picker; without it the pane only explains the state.
+  final VoidCallback? onSessionMissing;
 
   /// `[data-split-rows="2"]` parity — the subheader collapses to a slim
   /// strip (no path/separators) when the split grid stacks two rows.
@@ -364,6 +371,39 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
 
   /// ReviewFilesPanel.tsx — swapped in for the transcript while `reviewOpen`;
   /// Escape or × returns to chat.
+  /// The server answered 404 for this session: say so plainly instead of the
+  /// raw server error, and offer the pane's session picker when wired.
+  Widget _sessionMissing(BuildContext context) {
+    final t = Translations.of(context).chat.session.missing;
+    final c = context.appColors;
+    final onSessionMissing = widget.onSessionMissing;
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(LucideIcons.messageSquareOff, size: 28, color: c.mutedForeground),
+            const SizedBox(height: 12),
+            Text(
+              t.message,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: c.mutedForeground),
+            ),
+            if (onSessionMissing != null) ...[
+              const SizedBox(height: 16),
+              AppButton(
+                onPressed: onSessionMissing,
+                variant: AppButtonVariant.outline,
+                child: Text(t.action),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _reviewPanel(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
@@ -816,6 +856,10 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                               ? _reviewPanel(context)
                               : state.loading && messages.isEmpty
                               ? const Center(child: CircularProgressIndicator())
+                              : state.error is ServerError &&
+                                    (state.error! as ServerError).statusCode == 404 &&
+                                    messages.isEmpty
+                              ? _sessionMissing(context)
                               : state.error != null && messages.isEmpty
                               ? Center(child: Text('${state.error}'))
                               : Listener(

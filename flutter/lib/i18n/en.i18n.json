@@ -437,7 +437,11 @@
       },
       "deleteConfirm": "Removes the session and its transcript. Cannot be undone.",
       "finishRunBeforeWorkspaceChange": "Finish the run before changing workspace",
-      "fallbackTitle": "Session"
+      "fallbackTitle": "Session",
+      "missing": {
+        "message": "This session does not exist on the connected server.",
+        "action": "Choose another session"
+      }
     },
     "shell": {
       "selectProject": {

@@ -1184,6 +1184,7 @@ class Translations$chat$session$zh_TW extends Translations$chat$session$en {
 	@override String get deleteConfirm => '移除工作階段及其記錄。此操作無法復原。';
 	@override String get finishRunBeforeWorkspaceChange => '變更工作區前請先完成執行';
 	@override String get fallbackTitle => '工作階段';
+	@override late final Translations$chat$session$missing$zh_TW missing = Translations$chat$session$missing$zh_TW.internal(_root);
 }
 
 // Path: chat.shell
@@ -5361,6 +5362,17 @@ class Translations$chat$session$messages$zh_TW extends Translations$chat$session
 	@override String retryLoadOlder({required Object error}) => '重試載入較早訊息 — ${error}';
 }
 
+// Path: chat.session.missing
+class Translations$chat$session$missing$zh_TW extends Translations$chat$session$missing$en {
+	Translations$chat$session$missing$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get message => '此工作階段不存在於已連線的伺服器上。';
+	@override String get action => '選擇其他工作階段';
+}
+
 // Path: chat.shell.selectProject
 class Translations$chat$shell$selectProject$zh_TW extends Translations$chat$shell$selectProject$en {
 	Translations$chat$shell$selectProject$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
@@ -8795,6 +8807,8 @@ extension on TranslationsZhTw {
 			'chat.session.deleteConfirm' => '移除工作階段及其記錄。此操作無法復原。',
 			'chat.session.finishRunBeforeWorkspaceChange' => '變更工作區前請先完成執行',
 			'chat.session.fallbackTitle' => '工作階段',
+			'chat.session.missing.message' => '此工作階段不存在於已連線的伺服器上。',
+			'chat.session.missing.action' => '選擇其他工作階段',
 			'chat.shell.selectProject.title' => '選擇專案',
 			'chat.shell.selectProject.description' => '選擇一個專案以在該目錄中開啟互動式 Shell',
 			'chat.shell.status.newSession' => '新工作階段',
@@ -8979,10 +8993,10 @@ extension on TranslationsZhTw {
 			'chat.modelLibrary.idHelp' => '請使用提供者 CLI 接受的確切識別碼。ID 不可包含空格。',
 			'chat.modelLibrary.updatedNotice' => ({required Object name}) => '已更新 ${name}。',
 			'chat.modelLibrary.addedNotice' => ({required Object name}) => '已新增 ${name}。',
-			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '已刪除 ${name}。',
-			'chat.modelLibrary.saving' => '正在儲存…',
 			_ => null,
 		} ?? switch (path) {
+			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '已刪除 ${name}。',
+			'chat.modelLibrary.saving' => '正在儲存…',
 			'chat.modelLibrary.saveChanges' => '儲存變更',
 			'chat.modelLibrary.deleteConfirm' => '要從所有選擇器中刪除此模型嗎？',
 			'chat.modelLibrary.customBadge' => '自訂',
@@ -9493,10 +9507,10 @@ extension on TranslationsZhTw {
 			'common.projectWizard.step2.storedToken' => '已儲存的權杖',
 			'common.projectWizard.step2.newToken' => '新權杖',
 			'common.projectWizard.step2.nonePublic' => '無（公開）',
-			'common.projectWizard.step2.selectToken' => '選取權杖',
-			'common.projectWizard.step2.selectTokenPlaceholder' => '-- 選取權杖 --',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step2.selectToken' => '選取權杖',
+			'common.projectWizard.step2.selectTokenPlaceholder' => '-- 選取權杖 --',
 			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
 			'common.projectWizard.step2.tokenHelp' => '此權杖僅用於此操作',
 			'common.projectWizard.step2.publicRepoInfo' => '公開儲存庫不需要身分驗證。如果複製公開儲存庫，可以略過提供權杖。',
@@ -10007,10 +10021,10 @@ extension on TranslationsZhTw {
 			'settings.mcp.disconnected' => '未連線',
 			'settings.mcp.scope.label' => '範圍',
 			'settings.mcp.scope.user' => '使用者',
-			'settings.mcp.scope.project' => '專案',
-			'settings.appearance.title' => '外觀',
 			_ => null,
 		} ?? switch (path) {
+			'settings.mcp.scope.project' => '專案',
+			'settings.appearance.title' => '外觀',
 			'settings.appearance.theme' => '佈景主題',
 			'settings.appearance.codeEditor' => '程式碼編輯器',
 			'settings.appearance.editorTheme' => '編輯器佈景主題',
@@ -10521,10 +10535,10 @@ extension on TranslationsZhTw {
 			'settings.workspaces.description' => '工作區是 DDAgent 可以聊天、執行程式碼和瀏覽的目錄。',
 			'settings.workspaces.remove' => '移除工作區',
 			'settings.workspaces.title' => '工作區',
-			'settings.workspaces.pathRequired' => '路徑為必填項。',
-			'settings.stt.title' => '語音輸入（語音轉文字）',
 			_ => null,
 		} ?? switch (path) {
+			'settings.workspaces.pathRequired' => '路徑為必填項。',
+			'settings.stt.title' => '語音輸入（語音轉文字）',
 			'settings.stt.description' => '相容 Whisper 的 /audio/transcriptions 端點（OpenAI、whisper.cpp、faster-whisper、Speaches）。啟用後，輸入區會出現麥克風按鈕。',
 			'settings.stt.configured' => '已設定',
 			'settings.stt.endpoint' => '端點 URL（例如 https://api.openai.com/v1）',
@@ -11035,10 +11049,10 @@ extension on TranslationsZhTw {
 			'tasks.taskDetail.statusFailed' => '更新任務狀態失敗',
 			'tasks.taskDetail.taskId' => ({required Object id}) => '任務 ${id}',
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => '任務 ${id}：${title}',
-			'tasks.taskDetail.testStrategy' => '測試策略',
-			'tasks.taskDetail.titleRequired' => '標題為必填項',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.testStrategy' => '測試策略',
+			'tasks.taskDetail.titleRequired' => '標題為必填項',
 			'tasks.taskDetail.updateFailed' => '更新任務失敗',
 			'tasks.taskDetail.notFound' => '找不到任務',
 			'tasks.taskDetail.subtasks' => '子任務',
@@ -11549,10 +11563,10 @@ extension on TranslationsZhTw {
 			'terminal.empty.title' => '沒有作用中的終端機',
 			'terminal.empty.description' => '建立新分頁以開始',
 			'terminal.overlay.processExited' => '程序已結束 — 連線以重新啟動',
-			'terminal.overlay.processExitedWithCode' => ({required Object code}) => '程序已結束（代碼 ${code}）— 連線以重新啟動',
-			'terminal.overlay.resumeSession' => ({required Object title}) => '繼續工作階段 ${title}',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.overlay.processExitedWithCode' => ({required Object code}) => '程序已結束（代碼 ${code}）— 連線以重新啟動',
+			'terminal.overlay.resumeSession' => ({required Object title}) => '繼續工作階段 ${title}',
 			'terminal.overlay.startSession' => ({required Object path}) => '在 ${path} 中開始新的工作階段',
 			'voice.preview' => '預覽',
 			'voice.settingsSaved' => '語音輸入設定已儲存',

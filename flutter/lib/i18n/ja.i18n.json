@@ -436,7 +436,11 @@
       },
       "deleteConfirm": "セッションとそのトランスクリプトを削除します。元に戻せません。",
       "finishRunBeforeWorkspaceChange": "ワークスペースを変更する前に実行を終了してください",
-      "fallbackTitle": "セッション"
+      "fallbackTitle": "セッション",
+      "missing": {
+        "message": "このセッションは接続中のサーバーに存在しません。",
+        "action": "別のセッションを選択"
+      }
     },
     "shell": {
       "selectProject": {

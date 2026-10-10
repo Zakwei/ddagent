@@ -437,7 +437,11 @@
       },
       "deleteConfirm": "Cela supprime définitivement la session et sa transcription. Cette action est irréversible.",
       "finishRunBeforeWorkspaceChange": "Terminez l'exécution avant de changer d'espace de travail",
-      "fallbackTitle": "Session"
+      "fallbackTitle": "Session",
+      "missing": {
+        "message": "Cette session n'existe pas sur le serveur connecté.",
+        "action": "Choisir une autre session"
+      }
     },
     "shell": {
       "selectProject": {

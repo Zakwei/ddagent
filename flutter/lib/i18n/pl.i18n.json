@@ -447,7 +447,11 @@
       },
       "deleteConfirm": "Usuwa sesję i jej transkrypt. Tej operacji nie można cofnąć.",
       "finishRunBeforeWorkspaceChange": "Zakończ przebieg przed zmianą obszaru roboczego",
-      "fallbackTitle": "Sesja"
+      "fallbackTitle": "Sesja",
+      "missing": {
+        "message": "Ta sesja nie istnieje na połączonym serwerze.",
+        "action": "Wybierz inną sesję"
+      }
     },
     "shell": {
       "selectProject": {

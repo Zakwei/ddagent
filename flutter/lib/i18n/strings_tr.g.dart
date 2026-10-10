@@ -1185,6 +1185,7 @@ class Translations$chat$session$tr extends Translations$chat$session$en {
 	@override String get deleteConfirm => 'Oturumu ve transkriptini kaldırır. Geri alınamaz.';
 	@override String get finishRunBeforeWorkspaceChange => 'Çalışma alanını değiştirmeden önce çalıştırmayı bitir';
 	@override String get fallbackTitle => 'Oturum';
+	@override late final Translations$chat$session$missing$tr missing = Translations$chat$session$missing$tr._(_root);
 }
 
 // Path: chat.shell
@@ -5367,6 +5368,17 @@ class Translations$chat$session$messages$tr extends Translations$chat$session$me
 	@override String retryLoadOlder({required Object error}) => 'Eski mesajları yüklemeyi yeniden dene — ${error}';
 }
 
+// Path: chat.session.missing
+class Translations$chat$session$missing$tr extends Translations$chat$session$missing$en {
+	Translations$chat$session$missing$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get message => 'Bu oturum bağlı sunucuda yok.';
+	@override String get action => 'Başka bir oturum seç';
+}
+
 // Path: chat.shell.selectProject
 class Translations$chat$shell$selectProject$tr extends Translations$chat$shell$selectProject$en {
 	Translations$chat$shell$selectProject$tr._(TranslationsTr root) : this._root = root, super.internal(root);
@@ -8801,6 +8813,8 @@ extension on TranslationsTr {
 			'chat.session.deleteConfirm' => 'Oturumu ve transkriptini kaldırır. Geri alınamaz.',
 			'chat.session.finishRunBeforeWorkspaceChange' => 'Çalışma alanını değiştirmeden önce çalıştırmayı bitir',
 			'chat.session.fallbackTitle' => 'Oturum',
+			'chat.session.missing.message' => 'Bu oturum bağlı sunucuda yok.',
+			'chat.session.missing.action' => 'Başka bir oturum seç',
 			'chat.shell.selectProject.title' => 'Proje Seç',
 			'chat.shell.selectProject.description' => 'O dizinde etkileşimli shell açmak için bir proje seç',
 			'chat.shell.status.newSession' => 'Yeni Oturum',
@@ -8985,10 +8999,10 @@ extension on TranslationsTr {
 			'chat.modelLibrary.idHelp' => 'Sağlayıcı CLI aracının kabul ettiği tam tanımlayıcıyı kullanın. Kimlikler boşluk içeremez.',
 			'chat.modelLibrary.updatedNotice' => ({required Object name}) => '${name} güncellendi.',
 			'chat.modelLibrary.addedNotice' => ({required Object name}) => '${name} eklendi.',
-			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '${name} silindi.',
-			'chat.modelLibrary.saving' => 'Kaydediliyor…',
 			_ => null,
 		} ?? switch (path) {
+			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '${name} silindi.',
+			'chat.modelLibrary.saving' => 'Kaydediliyor…',
 			'chat.modelLibrary.saveChanges' => 'Değişiklikleri kaydet',
 			'chat.modelLibrary.deleteConfirm' => 'Bu model tüm seçicilerden silinsin mi?',
 			'chat.modelLibrary.customBadge' => 'Özel',
@@ -9499,10 +9513,10 @@ extension on TranslationsTr {
 			'common.projectWizard.step2.storedToken' => 'Kayıtlı Token',
 			'common.projectWizard.step2.newToken' => 'Yeni Token',
 			'common.projectWizard.step2.nonePublic' => 'Yok (Genel)',
-			'common.projectWizard.step2.selectToken' => 'Token Seç',
-			'common.projectWizard.step2.selectTokenPlaceholder' => '-- Bir token seç --',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step2.selectToken' => 'Token Seç',
+			'common.projectWizard.step2.selectTokenPlaceholder' => '-- Bir token seç --',
 			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
 			'common.projectWizard.step2.tokenHelp' => 'Bu token sadece bu işlem için kullanılacak',
 			'common.projectWizard.step2.publicRepoInfo' => 'Genel depolar kimlik doğrulama gerektirmez. Genel bir depo klonluyorsan token girmeyi atlayabilirsin.',
@@ -10013,10 +10027,10 @@ extension on TranslationsTr {
 			'settings.mcp.disconnected' => 'Bağlantı kesildi',
 			'settings.mcp.scope.label' => 'Kapsam',
 			'settings.mcp.scope.user' => 'Kullanıcı',
-			'settings.mcp.scope.project' => 'Proje',
-			'settings.appearance.title' => 'Görünüm',
 			_ => null,
 		} ?? switch (path) {
+			'settings.mcp.scope.project' => 'Proje',
+			'settings.appearance.title' => 'Görünüm',
 			'settings.appearance.theme' => 'Tema',
 			'settings.appearance.codeEditor' => 'Kod Editörü',
 			'settings.appearance.editorTheme' => 'Editör Teması',
@@ -10527,10 +10541,10 @@ extension on TranslationsTr {
 			'settings.workspaces.description' => 'Çalışma alanları, DDAgent’ın sohbet edebildiği, kod çalıştırabildiği ve gezinebildiği dizinlerdir.',
 			'settings.workspaces.remove' => 'Çalışma alanını kaldır',
 			'settings.workspaces.title' => 'Çalışma alanları',
-			'settings.workspaces.pathRequired' => 'Yol gerekli',
-			'settings.stt.title' => 'Sesli giriş (konuşmadan metne)',
 			_ => null,
 		} ?? switch (path) {
+			'settings.workspaces.pathRequired' => 'Yol gerekli',
+			'settings.stt.title' => 'Sesli giriş (konuşmadan metne)',
 			'settings.stt.description' => 'Whisper uyumlu /audio/transcriptions uç noktası (OpenAI, whisper.cpp, faster-whisper, Speaches). Yazma alanındaki mikrofon düğmesini etkinleştirir.',
 			'settings.stt.configured' => 'yapılandırıldı',
 			'settings.stt.endpoint' => 'Uç nokta URL\'si (örn. https://api.openai.com/v1)',
@@ -11041,10 +11055,10 @@ extension on TranslationsTr {
 			'tasks.taskDetail.statusFailed' => 'Görev durumu güncellenemedi',
 			'tasks.taskDetail.taskId' => ({required Object id}) => 'Görev ${id}',
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'Görev ${id}: ${title}',
-			'tasks.taskDetail.testStrategy' => 'Test Stratejisi',
-			'tasks.taskDetail.titleRequired' => 'Başlık gerekli',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.testStrategy' => 'Test Stratejisi',
+			'tasks.taskDetail.titleRequired' => 'Başlık gerekli',
 			'tasks.taskDetail.updateFailed' => 'Görev güncellenemedi',
 			'tasks.taskDetail.notFound' => 'Görev bulunamadı',
 			'tasks.taskDetail.subtasks' => 'Alt görevler',
@@ -11555,10 +11569,10 @@ extension on TranslationsTr {
 			'terminal.empty.title' => 'Etkin terminal yok',
 			'terminal.empty.description' => 'Başlamak için yeni bir sekme oluşturun',
 			'terminal.overlay.processExited' => 'İşlem sonlandı — yeniden başlatmak için bağlanın',
-			'terminal.overlay.processExitedWithCode' => ({required Object code}) => 'İşlem sonlandı (kod ${code}) — yeniden başlatmak için bağlanın',
-			'terminal.overlay.resumeSession' => ({required Object title}) => '${title} oturumunu sürdür',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.overlay.processExitedWithCode' => ({required Object code}) => 'İşlem sonlandı (kod ${code}) — yeniden başlatmak için bağlanın',
+			'terminal.overlay.resumeSession' => ({required Object title}) => '${title} oturumunu sürdür',
 			'terminal.overlay.startSession' => ({required Object path}) => '${path} içinde yeni bir oturum başlat',
 			'voice.preview' => 'Önizle',
 			'voice.settingsSaved' => 'Sesli giriş ayarları kaydedildi',

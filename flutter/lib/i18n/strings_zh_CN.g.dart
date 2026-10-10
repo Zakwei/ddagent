@@ -1184,6 +1184,7 @@ class Translations$chat$session$zh_CN extends Translations$chat$session$en {
 	@override String get deleteConfirm => '移除会话及其记录。此操作无法撤销。';
 	@override String get finishRunBeforeWorkspaceChange => '请先结束运行再更改工作区';
 	@override String get fallbackTitle => '会话';
+	@override late final Translations$chat$session$missing$zh_CN missing = Translations$chat$session$missing$zh_CN.internal(_root);
 }
 
 // Path: chat.shell
@@ -5361,6 +5362,17 @@ class Translations$chat$session$messages$zh_CN extends Translations$chat$session
 	@override String retryLoadOlder({required Object error}) => '重试加载更早的消息 — ${error}';
 }
 
+// Path: chat.session.missing
+class Translations$chat$session$missing$zh_CN extends Translations$chat$session$missing$en {
+	Translations$chat$session$missing$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get message => '此会话在已连接的服务器上不存在。';
+	@override String get action => '选择其他会话';
+}
+
 // Path: chat.shell.selectProject
 class Translations$chat$shell$selectProject$zh_CN extends Translations$chat$shell$selectProject$en {
 	Translations$chat$shell$selectProject$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
@@ -8795,6 +8807,8 @@ extension on TranslationsZhCn {
 			'chat.session.deleteConfirm' => '移除会话及其记录。此操作无法撤销。',
 			'chat.session.finishRunBeforeWorkspaceChange' => '请先结束运行再更改工作区',
 			'chat.session.fallbackTitle' => '会话',
+			'chat.session.missing.message' => '此会话在已连接的服务器上不存在。',
+			'chat.session.missing.action' => '选择其他会话',
 			'chat.shell.selectProject.title' => '选择项目',
 			'chat.shell.selectProject.description' => '选择一个项目以在该目录中打开交互式 Shell',
 			'chat.shell.status.newSession' => '新会话',
@@ -8979,10 +8993,10 @@ extension on TranslationsZhCn {
 			'chat.modelLibrary.idHelp' => '请使用提供方 CLI 接受的准确标识符。ID 不能包含空格。',
 			'chat.modelLibrary.updatedNotice' => ({required Object name}) => '已更新 ${name}。',
 			'chat.modelLibrary.addedNotice' => ({required Object name}) => '已添加 ${name}。',
-			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '已删除 ${name}。',
-			'chat.modelLibrary.saving' => '正在保存…',
 			_ => null,
 		} ?? switch (path) {
+			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '已删除 ${name}。',
+			'chat.modelLibrary.saving' => '正在保存…',
 			'chat.modelLibrary.saveChanges' => '保存更改',
 			'chat.modelLibrary.deleteConfirm' => '要从所有选择器中删除此模型吗？',
 			'chat.modelLibrary.customBadge' => '自定义',
@@ -9493,10 +9507,10 @@ extension on TranslationsZhCn {
 			'common.projectWizard.step2.storedToken' => '已保存的令牌',
 			'common.projectWizard.step2.newToken' => '新令牌',
 			'common.projectWizard.step2.nonePublic' => '无（公共）',
-			'common.projectWizard.step2.selectToken' => '选择令牌',
-			'common.projectWizard.step2.selectTokenPlaceholder' => '-- 选择令牌 --',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step2.selectToken' => '选择令牌',
+			'common.projectWizard.step2.selectTokenPlaceholder' => '-- 选择令牌 --',
 			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
 			'common.projectWizard.step2.tokenHelp' => '此令牌仅用于此操作',
 			'common.projectWizard.step2.publicRepoInfo' => '公共仓库不需要身份验证。如果克隆公共仓库，可以跳过提供令牌。',
@@ -10007,10 +10021,10 @@ extension on TranslationsZhCn {
 			'settings.mcp.disconnected' => '未连接',
 			'settings.mcp.scope.label' => '范围',
 			'settings.mcp.scope.user' => '用户',
-			'settings.mcp.scope.project' => '项目',
-			'settings.appearance.title' => '外观',
 			_ => null,
 		} ?? switch (path) {
+			'settings.mcp.scope.project' => '项目',
+			'settings.appearance.title' => '外观',
 			'settings.appearance.theme' => '主题',
 			'settings.appearance.codeEditor' => '代码编辑器',
 			'settings.appearance.editorTheme' => '编辑器主题',
@@ -10521,10 +10535,10 @@ extension on TranslationsZhCn {
 			'settings.workspaces.description' => '工作区是 DDAgent 可以聊天、运行代码和浏览的目录。',
 			'settings.workspaces.remove' => '移除工作区',
 			'settings.workspaces.title' => '工作区',
-			'settings.workspaces.pathRequired' => '路径为必填项',
-			'settings.stt.title' => '语音输入（语音转文字）',
 			_ => null,
 		} ?? switch (path) {
+			'settings.workspaces.pathRequired' => '路径为必填项',
+			'settings.stt.title' => '语音输入（语音转文字）',
 			'settings.stt.description' => '兼容 Whisper 的 /audio/transcriptions 端点（OpenAI、whisper.cpp、faster-whisper、Speaches）。启用后输入框中会显示麦克风按钮。',
 			'settings.stt.configured' => '已配置',
 			'settings.stt.endpoint' => '端点 URL（例如 https://api.openai.com/v1）',
@@ -11035,10 +11049,10 @@ extension on TranslationsZhCn {
 			'tasks.taskDetail.statusFailed' => '更新任务状态失败',
 			'tasks.taskDetail.taskId' => ({required Object id}) => '任务 ${id}',
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => '任务 ${id}：${title}',
-			'tasks.taskDetail.testStrategy' => '测试策略',
-			'tasks.taskDetail.titleRequired' => '标题为必填项',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.testStrategy' => '测试策略',
+			'tasks.taskDetail.titleRequired' => '标题为必填项',
 			'tasks.taskDetail.updateFailed' => '更新任务失败',
 			'tasks.taskDetail.notFound' => '未找到任务',
 			'tasks.taskDetail.subtasks' => '子任务',
@@ -11549,10 +11563,10 @@ extension on TranslationsZhCn {
 			'terminal.empty.title' => '没有活动终端',
 			'terminal.empty.description' => '新建标签页以开始',
 			'terminal.overlay.processExited' => '进程已退出 — 连接以重新启动',
-			'terminal.overlay.processExitedWithCode' => ({required Object code}) => '进程已退出（代码 ${code}）— 连接以重新启动',
-			'terminal.overlay.resumeSession' => ({required Object title}) => '恢复会话 ${title}',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.overlay.processExitedWithCode' => ({required Object code}) => '进程已退出（代码 ${code}）— 连接以重新启动',
+			'terminal.overlay.resumeSession' => ({required Object title}) => '恢复会话 ${title}',
 			'terminal.overlay.startSession' => ({required Object path}) => '在 ${path} 中开始新会话',
 			'voice.preview' => '预览',
 			'voice.settingsSaved' => '语音输入设置已保存',

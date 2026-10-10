@@ -437,7 +437,11 @@
       },
       "deleteConfirm": "Entfernt die Sitzung und ihr Transkript. Kann nicht rückgängig gemacht werden.",
       "finishRunBeforeWorkspaceChange": "Beende den Lauf, bevor du den Arbeitsbereich wechselst",
-      "fallbackTitle": "Sitzung"
+      "fallbackTitle": "Sitzung",
+      "missing": {
+        "message": "Diese Sitzung existiert auf dem verbundenen Server nicht.",
+        "action": "Andere Sitzung wählen"
+      }
     },
     "shell": {
       "selectProject": {
