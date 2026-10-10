@@ -199,6 +199,22 @@ final sessionsProvider =
 /// Session metadata by id — the chat pane resolves the provider (and the
 /// model the run uses) from here, like the web's `selectedSession`, so the
 /// banner/composer never have to guess from the first transcript row.
-final sessionDetailsProvider = FutureProvider.family<Session, String>(
-  (ref, sessionId) => ref.watch(sessionsRepositoryProvider).details(sessionId),
-);
+///
+/// Reloads when a `session_upserted` frame names a different account: the
+/// server's limit auto-switch moves a live session to another login, and the
+/// header's quota badge must follow it.
+final sessionDetailsProvider = FutureProvider.family<Session, String>((ref, sessionId) async {
+  String? loadedAccountId;
+  var loaded = false;
+  final sub = ref.read(chatChannelProvider).events.listen((e) {
+    if (!loaded || e.kind != 'session_upserted' || e.sessionId != sessionId) return;
+    final session = e.raw['session'];
+    if (session is! Map || !session.containsKey('accountId')) return;
+    if (session['accountId']?.toString() != loadedAccountId) ref.invalidateSelf();
+  });
+  ref.onDispose(sub.cancel);
+  final details = await ref.watch(sessionsRepositoryProvider).details(sessionId);
+  loadedAccountId = details.raw['accountId']?.toString();
+  loaded = true;
+  return details;
+});

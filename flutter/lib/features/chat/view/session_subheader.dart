@@ -98,9 +98,12 @@ class SessionSubheader extends ConsumerWidget {
     // composer's resolved pick replaces it once its init lands).
     final sessionRaw = ref.watch(sessionDetailsProvider(sessionId)).value?.raw;
     final sessionModel = sessionRaw?['model']?.toString();
-    // Multi-account: the login this session runs under — the composer's draft
-    // pick first (new chats), then the session row's pinned account.
-    final accountId = composer?.accountId ?? sessionRaw?['accountId']?.toString();
+    // Multi-account: the login this session runs under — the session row's
+    // account once it exists (a limit auto-switch moves it, and the composer's
+    // draft pick does not follow), the draft pick before that (new chats).
+    final accountId = sessionRaw != null
+        ? sessionRaw['accountId']?.toString()
+        : composer?.accountId;
     final effectiveModel =
         composer?.activeModel ??
         (sessionModel != null && sessionModel.isNotEmpty ? sessionModel : null);
