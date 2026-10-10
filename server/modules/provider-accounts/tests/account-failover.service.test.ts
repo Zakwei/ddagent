@@ -91,7 +91,7 @@ function setup(options: {
   };
 }
 
-const SWITCH = { fromAccountId: 'a', fromLabel: 'Label a', toAccountId: 'b', toLabel: 'Label b' };
+const SWITCH = { reason: 'limit' as const, fromAccountId: 'a', fromLabel: 'Label a', toAccountId: 'b', toLabel: 'Label b' };
 
 const turn = (accountId: string | null, providerSessionId: string | null = null, model = 'opus') => ({
   sessionId: 's1',
@@ -246,6 +246,41 @@ test('detectLimit matches limit errors and banners, not ordinary replies', () =>
   // Current Claude Code banner names the window ("session", "weekly").
   assert.ok(service.detectLimit('text', "You've hit your session limit · resets 9:30am (Europe/Warsaw)"));
   assert.ok(service.detectLimit('text', 'You’ve hit your weekly limit · resets Oct 12'));
+});
+
+test('a near-limit warning moves the session at its next turn, before the account runs out', async () => {
+  const { service, moves } = setup({
+    enabled: true,
+    accounts: [account('a', 'claude'), account('b', 'claude')],
+    quota: [quotaEntry('claude', 'a', [window('5h', 85)]), quotaEntry('claude', 'b', [window('5h', 10)])],
+  });
+  assert.equal(await service.prepareTurnAccount(turn('a')), null, 'headroom left and no warning yet');
+  service.reportLimitWarning(turn('a'), NOW + 90 * 60 * 1000);
+  const change = await service.prepareTurnAccount(turn('a'));
+  assert.equal(change?.reason, 'near-limit');
+  assert.equal(change?.toAccountId, 'b');
+  assert.deepEqual(moves, [{ sessionId: 's1', accountId: 'b' }]);
+});
+
+test('an early move waits while background work runs and never lands on a warned account', async () => {
+  const { service, moves, advance } = setup({
+    enabled: true,
+    accounts: [account('a', 'claude'), account('b', 'claude')],
+    quota: [quotaEntry('claude', 'a', [window('5h', 85)]), quotaEntry('claude', 'b', [window('5h', 80)])],
+  });
+  service.reportLimitWarning(turn('a'), NOW + 60 * 60 * 1000);
+  assert.equal(await service.prepareTurnAccount(turn('a'), { allowEarlySwitch: false }), null);
+
+  service.reportLimitWarning(turn('b'), NOW + 60 * 60 * 1000);
+  assert.equal(await service.prepareTurnAccount(turn('a')), null, 'b was warned too: no ping-pong');
+  // A hard limit still takes a warned account rather than none.
+  const hit = await service.reportLimitHit(turn('a'), { resetAt: null, transient: false });
+  assert.equal(hit?.reason, 'limit');
+  assert.equal(hit?.toAccountId, 'b');
+  // The warning lapses when the window resets.
+  advance(60 * 60 * 1000);
+  assert.equal(await service.prepareTurnAccount(turn('b')), null);
+  assert.deepEqual(moves, [{ sessionId: 's1', accountId: 'b' }]);
 });
 
 test('a switched session gets one continuation turn without turn-only options', async () => {

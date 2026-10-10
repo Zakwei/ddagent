@@ -374,18 +374,25 @@ function formatDuration(ms: number) {
 /**
  * The user-facing line for an SDK message that is worth a status row:
  * `notice: true` lines persist in the transcript (C1), the rest are ephemeral
- * activity labels. Null for every other message.
+ * activity labels. Null for every other message. Rate-limit lines also carry
+ * `usageLimit` (state + reset epoch ms) for the dispatcher's account
+ * failover, which acts on it instead of parsing the text.
  */
 // Exported for tests.
-export function claudeStatusLine(message: AnyRecord): { text: string; notice: boolean } | null {
+export function claudeStatusLine(message: AnyRecord): {
+  text: string;
+  notice: boolean;
+  usageLimit?: { state: 'warning' | 'reached'; resetAt: number | null };
+} | null {
   if (message?.type === 'rate_limit_event') {
     const info = message.rate_limit_info || {};
     if (info.status !== 'rejected' && info.status !== 'allowed_warning') return null;
     const kind = info.rateLimitType ? ` (${String(info.rateLimitType).replace(/_/g, ' ')})` : '';
-    const resets = Number(info.resetsAt) > 0 ? `, resets in ${formatDuration(Number(info.resetsAt) * 1000 - Date.now())}` : '';
+    const resetAt = Number(info.resetsAt) > 0 ? Number(info.resetsAt) * 1000 : null;
+    const resets = resetAt ? `, resets in ${formatDuration(resetAt - Date.now())}` : '';
     return info.status === 'rejected'
-      ? { text: `Claude usage limit reached${kind}${resets}.`, notice: true }
-      : { text: `Approaching the Claude usage limit${kind}${resets}.`, notice: true };
+      ? { text: `Claude usage limit reached${kind}${resets}.`, notice: true, usageLimit: { state: 'reached', resetAt } }
+      : { text: `Approaching the Claude usage limit${kind}${resets}.`, notice: true, usageLimit: { state: 'warning', resetAt } };
   }
   if (message?.type === 'result' && !describeClaudeResultFailure(message, null)) {
     if (message.stop_reason === 'refusal') return { text: 'Claude declined to continue (refusal).', notice: true };
@@ -1468,6 +1475,7 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
           kind: 'status',
           text: statusLine.text,
           ...(statusLine.notice ? { notice: true } : {}),
+          ...(statusLine.usageLimit ? { usageLimit: statusLine.usageLimit } : {}),
           sessionId: sid,
           provider: 'claude',
         }));

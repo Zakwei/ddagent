@@ -196,6 +196,15 @@ test('claude: status lines and result failures read clearly', () => {
   assert.match(claudeStatusLine({ type: 'system', subtype: 'permission_denied', tool_name: 'Bash', message: 'denied by rule' })!.text, /Bash denied: denied by rule/);
   assert.equal(claudeStatusLine({ type: 'rate_limit_event', rate_limit_info: { status: 'allowed' } }), null);
   assert.match(claudeStatusLine({ type: 'rate_limit_event', rate_limit_info: { status: 'rejected', rateLimitType: 'five_hour' } })!.text, /usage limit reached \(five hour\)/);
+  // The failover reads the structured state, not the text.
+  assert.deepEqual(
+    claudeStatusLine({ type: 'rate_limit_event', rate_limit_info: { status: 'allowed_warning', resetsAt: 1791460800 } })!.usageLimit,
+    { state: 'warning', resetAt: 1791460800000 },
+  );
+  assert.deepEqual(
+    claudeStatusLine({ type: 'rate_limit_event', rate_limit_info: { status: 'rejected' } })!.usageLimit,
+    { state: 'reached', resetAt: null },
+  );
   assert.match(claudeStatusLine({ type: 'result', subtype: 'success', is_error: false, stop_reason: 'refusal' })!.text, /refusal/);
 
   assert.equal(describeClaudeResultFailure({ subtype: 'success', is_error: false }, null), null);

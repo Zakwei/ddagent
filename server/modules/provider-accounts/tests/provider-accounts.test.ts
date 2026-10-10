@@ -321,6 +321,54 @@ test('a limit hit in the dispatched turn is reported once', async () => {
   });
 });
 
+test("Claude's near-limit warning moves the session's next turn to another account", async () => {
+  await withIsolatedDatabase(async () => {
+    // No CLAUDE_CONFIG_DIR: both accounts share one store, so carry-over is a no-op.
+    providerAccountsDb.create({ id: 'acc-warn-1', provider: 'claude', label: 'W1', envOverrides: { MARK: '1' } });
+    providerAccountsDb.create({ id: 'acc-warn-2', provider: 'claude', label: 'W2', envOverrides: { MARK: '2' } });
+    sessionsDb.createAppSession('s-warn', 'claude', '/tmp/p', 'hi', 'acc-warn-1');
+    accountFailoverService.updateSettings('claude', { autoSwitchOnLimit: true });
+
+    const envs: unknown[] = [];
+    const statuses: string[] = [];
+    const fakeRuntime = {
+      hasRuntime: () => true,
+      run: async (_p: string, _c: string, options: AnyRecord, writer: AnyRecord) => {
+        envs.push(options.env);
+        if (envs.length === 1) {
+          writer.send(createNormalizedMessage({
+            sessionId: 's-warn',
+            provider: 'claude',
+            kind: 'status',
+            text: 'Approaching the Claude usage limit (five hour), resets in 1h 38m.',
+            notice: true,
+            usageLimit: { state: 'warning', resetAt: Date.now() + 98 * 60 * 1000 },
+          } as never));
+        }
+        writer.send(createCompleteMessage({ provider: 'claude', sessionId: 's-warn', exitCode: 0 }));
+      },
+      abort: async () => true,
+      resolveToolApproval: () => undefined,
+      getPendingApprovalsForSession: () => [],
+    } as unknown as ProviderRuntimeGateway;
+    const connection = {
+      readyState: 1,
+      send: (data: string) => {
+        const event = JSON.parse(data) as AnyRecord;
+        if (event.kind === 'status' && typeof event.text === 'string') statuses.push(event.text);
+      },
+    } as never;
+
+    for (const content of ['first', 'second']) {
+      const result = await dispatchChatCommand(fakeRuntime, { sessionId: 's-warn', content, options: {}, userId: 'u', connection });
+      assert.equal(result.ok, true);
+    }
+    assert.deepEqual(envs, [{ MARK: '1' }, { MARK: '2' }]);
+    assert.equal(sessionsDb.getSessionById('s-warn')?.account_id, 'acc-warn-2');
+    assert.ok(statuses.some((text) => /almost reached on "W1".*"W2"/.test(text)), statuses.join(' | '));
+  });
+});
+
 // The per-provider spawn-env matrix lives in
 // server/modules/providers/tests/multi-account-env.test.ts (same-module imports
 // let it reach the runtime files directly).

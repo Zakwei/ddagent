@@ -32,6 +32,17 @@ import type {
 /** A usage/rate-limit hit read out of one turn's events by the failover service. */
 type LimitHit = NonNullable<ReturnType<typeof accountFailoverService.detectLimit>>;
 
+/** The `usageLimit` a provider attaches to its rate-limit status rows, or null. */
+function readUsageLimit(event: NormalizedMessage): { state: 'warning' | 'reached'; resetAt: number | null } | null {
+  if (event.kind !== 'status') return null;
+  const usageLimit = event.usageLimit as { state?: unknown; resetAt?: unknown } | undefined;
+  if (usageLimit?.state !== 'warning' && usageLimit?.state !== 'reached') return null;
+  return {
+    state: usageLimit.state,
+    resetAt: typeof usageLimit.resetAt === 'number' && usageLimit.resetAt > 0 ? usageLimit.resetAt : null,
+  };
+}
+
 /**
  * Application boundary for dispatching provider runs and approvals.
  *
@@ -148,10 +159,12 @@ function broadcastSessionAccount(
 }
 
 /** One-line status shown while the switched turn starts. */
-function describeAccountSwitch(change: { fromLabel: string; toLabel: string }): string {
+function describeAccountSwitch(change: { reason: 'limit' | 'near-limit'; fromLabel: string; toLabel: string }): string {
   const from = change.fromLabel || 'default login';
   const to = change.toLabel || 'default login';
-  return `Usage limit reached on "${from}" — switched to account "${to}"`;
+  return change.reason === 'near-limit'
+    ? `Usage limit almost reached on "${from}" — switched to account "${to}"`
+    : `Usage limit reached on "${from}" — switched to account "${to}"`;
 }
 
 /** Test seam: the background title generator contract. */
@@ -560,8 +573,13 @@ export async function dispatchChatCommand(
   // even over the user's manual pick. Never switches agents. Awaited only
   // when enabled, so the default path still starts the runtime in the same
   // tick as the run it registered.
+  // An early move (the account was only warned) spawns a fresh process on
+  // the new account, which would cut background work still running in the
+  // held one — so it waits until the session has none.
   const preTurnSwitch = accountFailoverService.getSettings(provider).autoSwitchOnLimit
-    ? await accountFailoverService.prepareTurnAccount(failoverSession()).catch((error: unknown) => {
+    ? await accountFailoverService.prepareTurnAccount(failoverSession(), {
+      allowEarlySwitch: chatRunRegistry.getBackgroundTaskCount(sessionId) === 0,
+    }).catch((error: unknown) => {
       console.error('[Chat] Account auto-switch check failed', { sessionId, error });
       return null;
     })
@@ -627,6 +645,17 @@ export async function dispatchChatCommand(
         return;
       }
       if (hit || settled) return;
+      // Structured rate-limit status (Claude's rate_limit_event): a warning
+      // marks the account so the next turn moves early; `reached` is a hit.
+      const usageLimit = readUsageLimit(event);
+      if (usageLimit?.state === 'warning') {
+        accountFailoverService.reportLimitWarning(failoverSession(), usageLimit.resetAt);
+        return;
+      }
+      if (usageLimit?.state === 'reached') {
+        hit = { resetAt: usageLimit.resetAt, transient: false };
+        return;
+      }
       const text = (event.content ?? (event as Record<string, unknown>).text ?? '') as unknown;
       hit = accountFailoverService.detectLimit(event.kind, typeof text === 'string' ? text : '');
     };

@@ -57,6 +57,8 @@ type UsageLimitHit = {
 
 /** One completed account move; `null` ids mean the provider's ambient login. */
 type AccountSwitch = {
+  /** `limit`: the account ran out; `near-limit`: it moved early, on the provider's warning. */
+  reason: 'limit' | 'near-limit';
   fromAccountId: string | null;
   fromLabel: string;
   toAccountId: string | null;
@@ -250,17 +252,25 @@ export function createAccountFailoverService(dependencies: AccountFailoverDepend
   /** `${provider}:${accountId}` → epoch ms until which a runtime limit hit benches the account. */
   const limitedUntil = new Map<string, number>();
   const limitKey = (provider: LLMProvider, accountId: string | null) => `${provider}:${accountId ?? ''}`;
+  /** Same key → epoch ms until which the provider warned the account is close to its limit. */
+  const nearLimitUntil = new Map<string, number>();
   /** sessionId → epoch ms of its recent automatic continuations. */
   const continuations = new Map<string, number[]>();
 
-  function isMarkedLimited(provider: LLMProvider, accountId: string | null): boolean {
+  /** Whether `marks` benches the account right now; expired marks are dropped. */
+  function isMarked(marks: Map<string, number>, provider: LLMProvider, accountId: string | null): boolean {
     const key = limitKey(provider, accountId);
-    const until = limitedUntil.get(key);
+    const until = marks.get(key);
     if (until === undefined) return false;
     if (until > dependencies.now()) return true;
-    limitedUntil.delete(key);
+    marks.delete(key);
     return false;
   }
+
+  const isMarkedLimited = (provider: LLMProvider, accountId: string | null) =>
+    isMarked(limitedUntil, provider, accountId);
+  const isMarkedNearLimit = (provider: LLMProvider, accountId: string | null) =>
+    isMarked(nearLimitUntil, provider, accountId);
 
   function readStored(): Record<string, boolean> {
     try {
@@ -300,19 +310,37 @@ export function createAccountFailoverService(dependencies: AccountFailoverDepend
    * Next account to move the session to, best headroom first. Every option
    * must be a confirmed, working login of the same provider (an active quota
    * reading) — except before the first quota sweep, when configured account
-   * rows are tried in their saved order (default first).
+   * rows are tried in their saved order (default first). Accounts the
+   * provider warned about are a last resort, and skipped entirely for an
+   * early (`near-limit`) move — trading one warned account for another only
+   * ping-pongs the session.
    */
   function pickTarget(
     provider: LLMProvider,
     currentAccountId: string | null,
     model: string,
     quota: QuotaAccount[] | null,
+    reason: AccountSwitch['reason'],
+  ): { accountId: string | null; label: string; env: Record<string, string> } | null {
+    const fresh = pickTargetAmong(provider, currentAccountId, model, quota, false);
+    if (fresh || reason === 'near-limit') return fresh;
+    return pickTargetAmong(provider, currentAccountId, model, quota, true);
+  }
+
+  function pickTargetAmong(
+    provider: LLMProvider,
+    currentAccountId: string | null,
+    model: string,
+    quota: QuotaAccount[] | null,
+    includeNearLimit: boolean,
   ): { accountId: string | null; label: string; env: Record<string, string> } | null {
     const rows = dependencies.listAccounts(provider);
     const options: Array<{ accountId: string | null; label: string; env: Record<string, string> }> = [
       { accountId: null, label: '', env: {} },
       ...rows.map((row) => ({ accountId: row.id, label: row.label, env: row.envOverrides })),
-    ].filter((option) => option.accountId !== currentAccountId && !isMarkedLimited(provider, option.accountId));
+    ].filter((option) => option.accountId !== currentAccountId
+      && !isMarkedLimited(provider, option.accountId)
+      && (includeNearLimit || !isMarkedNearLimit(provider, option.accountId)));
 
     if (!quota) {
       const rowOptions = options.filter((option) => option.accountId !== null);
@@ -348,6 +376,7 @@ export function createAccountFailoverService(dependencies: AccountFailoverDepend
     input: SessionTurnInput,
     target: { accountId: string | null; label: string; env: Record<string, string> },
     quota: QuotaAccount[] | null,
+    reason: AccountSwitch['reason'],
   ): AccountSwitch | null {
     if (input.providerSessionId) {
       const fromEnv = input.accountId
@@ -363,6 +392,7 @@ export function createAccountFailoverService(dependencies: AccountFailoverDepend
     }
     dependencies.setSessionAccount(input.sessionId, target.accountId);
     return {
+      reason,
       fromAccountId: input.accountId,
       fromLabel: labelOf(input.provider, input.accountId, quota),
       toAccountId: target.accountId,
@@ -408,17 +438,40 @@ export function createAccountFailoverService(dependencies: AccountFailoverDepend
     /**
      * Pre-turn check. Returns the switch it made, or null when the session
      * keeps its account (setting off, account has headroom, no other account
-     * with headroom, or the conversation cannot move).
+     * with headroom, or the conversation cannot move). An account the
+     * provider warned is close to its limit is left early — before it runs
+     * out mid-turn — but only for an account without a warning of its own,
+     * and only when `allowEarlySwitch` (the caller withholds it while the
+     * session's process still runs background work a new process would cut).
      */
-    async prepareTurnAccount(input: SessionTurnInput): Promise<AccountSwitch | null> {
+    async prepareTurnAccount(
+      input: SessionTurnInput,
+      { allowEarlySwitch = true }: { allowEarlySwitch?: boolean } = {},
+    ): Promise<AccountSwitch | null> {
       if (!getSettings(input.provider).autoSwitchOnLimit) return null;
       const model = input.model ?? '';
       const quota = await dependencies.readQuotaAccounts();
       const exhausted = isMarkedLimited(input.provider, input.accountId)
         || isQuotaExhausted(quotaEntryFor(quota, input.provider, input.accountId), model);
-      if (!exhausted) return null;
-      const target = pickTarget(input.provider, input.accountId, model, quota);
-      return target ? switchSession(input, target, quota) : null;
+      const reason: AccountSwitch['reason'] | null = exhausted
+        ? 'limit'
+        : allowEarlySwitch && isMarkedNearLimit(input.provider, input.accountId) ? 'near-limit' : null;
+      if (!reason) return null;
+      const target = pickTarget(input.provider, input.accountId, model, quota, reason);
+      return target ? switchSession(input, target, quota, reason) : null;
+    },
+
+    /**
+     * Records the provider's warning that an account is close to its limit
+     * (Claude's `allowed_warning`), until the window resets or a cooldown
+     * passes. The session moves at its next turn (see prepareTurnAccount).
+     */
+    reportLimitWarning(input: SessionTurnInput, resetAt: number | null): void {
+      const now = dependencies.now();
+      nearLimitUntil.set(
+        limitKey(input.provider, input.accountId),
+        resetAt && resetAt > now ? resetAt : now + USAGE_LIMIT_COOLDOWN_MS,
+      );
     },
 
     /**
@@ -435,8 +488,8 @@ export function createAccountFailoverService(dependencies: AccountFailoverDepend
       dependencies.refreshQuota();
       if (!getSettings(input.provider).autoSwitchOnLimit) return null;
       const quota = await dependencies.readQuotaAccounts();
-      const target = pickTarget(input.provider, input.accountId, input.model ?? '', quota);
-      return target ? switchSession(input, target, quota) : null;
+      const target = pickTarget(input.provider, input.accountId, input.model ?? '', quota, 'limit');
+      return target ? switchSession(input, target, quota, 'limit') : null;
     },
 
     /**
