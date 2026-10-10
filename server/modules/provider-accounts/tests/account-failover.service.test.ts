@@ -61,6 +61,7 @@ function setup(options: {
   const moves: Array<{ sessionId: string; accountId: string | null }> = [];
   const carried: Array<{ fromEnv: Record<string, string>; toEnv: Record<string, string> }> = [];
   const queued: Array<{ sessionId: string; content: string; options: Record<string, unknown> }> = [];
+  const cancelled: string[] = [];
   let refreshes = 0;
   let now = NOW;
   const service = createAccountFailoverService({
@@ -78,6 +79,7 @@ function setup(options: {
       queued.push({ sessionId: input.sessionId, content: input.content, options: input.options });
       return true;
     },
+    cancelContinuation: (sessionId) => void cancelled.push(sessionId),
     now: () => now,
   });
   if (options.enabled) service.updateSettings('claude', { autoSwitchOnLimit: true });
@@ -86,6 +88,7 @@ function setup(options: {
     moves,
     carried,
     queued,
+    cancelled,
     refreshes: () => refreshes,
     advance: (ms: number) => void (now += ms),
   };
@@ -295,6 +298,28 @@ test('a switched session gets one continuation turn without turn-only options', 
   assert.equal(queued.length, 1);
   assert.match(queued[0].content, /Label a.*Label b.*Continue/s);
   assert.deepEqual(queued[0].options, { model: 'opus', permissionMode: 'default', inboxSource: 'auto-continue' });
+});
+
+test('a turn off the exhausted account drops the queued continuation', async () => {
+  const { service, cancelled } = setup({ enabled: true });
+  assert.equal(await service.continueAfterSwitch({ sessionId: 's1', userId: null, options: {}, change: SWITCH }), true);
+  // The old process, still on the exhausted account, reporting back: no resume.
+  service.noteTurnStarted({ sessionId: 's1', accountId: 'a', isContinuation: false });
+  assert.deepEqual(cancelled, []);
+  // The user's message on the new account resumes the work by itself.
+  service.noteTurnStarted({ sessionId: 's1', accountId: 'b', isContinuation: false });
+  assert.deepEqual(cancelled, ['s1']);
+  // Only once per queued continuation.
+  service.noteTurnStarted({ sessionId: 's1', accountId: 'b', isContinuation: false });
+  assert.deepEqual(cancelled, ['s1']);
+});
+
+test('the continuation turn itself is not cancelled', async () => {
+  const { service, cancelled } = setup({ enabled: true });
+  await service.continueAfterSwitch({ sessionId: 's1', userId: null, options: {}, change: SWITCH });
+  service.noteTurnStarted({ sessionId: 's1', accountId: 'b', isContinuation: true });
+  service.noteTurnStarted({ sessionId: 's1', accountId: 'b', isContinuation: false });
+  assert.deepEqual(cancelled, []);
 });
 
 test('continuations are capped per session within the window', async () => {

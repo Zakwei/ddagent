@@ -36,6 +36,9 @@ const MAX_LIMIT_TEXT_LENGTH = 400;
 const MAX_AUTO_CONTINUATIONS = 3;
 const CONTINUATION_WINDOW_MS = 60 * 60 * 1000;
 
+/** `inboxSource` marking the queued "continue" turn this service adds after a limit switch. */
+const AUTO_CONTINUE_SOURCE = 'auto-continue';
+
 /** Options that belong to the interrupted turn only and must not ride into the continuation. */
 const TURN_ONLY_OPTION_KEYS = ['attachments', 'images', 'files', 'inboxSource', 'accountId'];
 
@@ -101,6 +104,8 @@ type AccountFailoverDependencies = {
    * messages waiting, which resume the work on their own.
    */
   queueContinuation(input: ContinuationInput): Promise<boolean>;
+  /** Drops the session's still-queued automatic continuation, if any. */
+  cancelContinuation(sessionId: string): void;
   now(): number;
 };
 
@@ -256,6 +261,8 @@ export function createAccountFailoverService(dependencies: AccountFailoverDepend
   const nearLimitUntil = new Map<string, number>();
   /** sessionId → epoch ms of its recent automatic continuations. */
   const continuations = new Map<string, number[]>();
+  /** sessionId → the exhausted account its queued continuation moved away from. */
+  const pendingContinuations = new Map<string, string | null>();
 
   /** Whether `marks` benches the account right now; expired marks are dropped. */
   function isMarked(marks: Map<string, number>, provider: LLMProvider, accountId: string | null): boolean {
@@ -521,11 +528,33 @@ export function createAccountFailoverService(dependencies: AccountFailoverDepend
         content: `[ddagent] The previous turn was cut off by the usage limit on account "${from}". `
           + `The session now runs on account "${to}". Continue exactly where you left off — `
           + 'redo any tool calls or subagents that failed because of the limit.',
-        options: { ...options, inboxSource: 'auto-continue' },
+        options: { ...options, inboxSource: AUTO_CONTINUE_SOURCE },
       });
-      if (queued) recent.push(now);
+      if (queued) {
+        recent.push(now);
+        pendingContinuations.set(input.sessionId, input.change.fromAccountId);
+      }
       continuations.set(input.sessionId, recent);
       return queued;
+    },
+
+    /**
+     * Called as each turn of a session starts. A queued continuation is
+     * dropped once another turn runs off the exhausted account — the user's
+     * message or a turn the agent started there resumes the work by itself,
+     * and a later "continue" would only repeat it. Turns of the old process
+     * still on the exhausted account do not count; the continuation's own
+     * turn just clears the bookkeeping.
+     */
+    noteTurnStarted(input: { sessionId: string; accountId: string | null; isContinuation: boolean }): void {
+      if (!pendingContinuations.has(input.sessionId)) return;
+      if (input.isContinuation) {
+        pendingContinuations.delete(input.sessionId);
+        return;
+      }
+      if (input.accountId === pendingContinuations.get(input.sessionId)) return;
+      pendingContinuations.delete(input.sessionId);
+      dependencies.cancelContinuation(input.sessionId);
     },
   };
 }
@@ -556,6 +585,17 @@ export const accountFailoverService = createAccountFailoverService({
     if (queuedMessagesService.list(sessionId).some((message) => message.status === 'queued')) return false;
     queuedMessagesService.enqueue({ sessionId, userId, content, options });
     return true;
+  },
+  cancelContinuation: (sessionId) => {
+    void import('@/modules/queued-messages/index.js')
+      .then(({ queuedMessagesService }) => {
+        for (const message of queuedMessagesService.list(sessionId)) {
+          if (message.status === 'queued' && message.options.inboxSource === AUTO_CONTINUE_SOURCE) {
+            queuedMessagesService.remove(message.id);
+          }
+        }
+      })
+      .catch((error: unknown) => console.error('[account-failover] could not drop the continuation:', error));
   },
   now: () => Date.now(),
 });

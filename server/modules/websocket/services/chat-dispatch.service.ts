@@ -596,6 +596,11 @@ export async function dispatchChatCommand(
   }
 
   const accountEnv = accountId ? providerAccountsDb.get(accountId)?.envOverrides ?? null : null;
+  accountFailoverService.noteTurnStarted({
+    sessionId,
+    accountId,
+    isContinuation: clientOptions.inboxSource === 'auto-continue',
+  });
 
   // A usage/rate-limit hit (an error, or Claude's limit banner reply) benches
   // the account once its turn is over; with auto-switch on the session moves
@@ -691,6 +696,7 @@ export async function dispatchChatCommand(
         userId,
       });
       if (!followUp) return null;
+      accountFailoverService.noteTurnStarted({ sessionId, accountId, isContinuation: false });
       watchTurnForLimit(followUp.writer, () => followUp.aborted === true);
       return followUp.writer;
     },
