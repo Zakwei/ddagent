@@ -134,6 +134,19 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
   void initState() {
     super.initState();
     _positions.itemPositions.addListener(_onPositionsChanged);
+    _revalidateTranscript();
+  }
+
+  /// A reopened session reuses its still-alive controller — see
+  /// [TranscriptController.revalidate]. Deferred past the frame: it may write
+  /// provider state, which is not allowed while the tree builds.
+  void _revalidateTranscript() {
+    final sessionId = widget.sessionId;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && widget.sessionId == sessionId) {
+        ref.read(transcriptProvider(sessionId).notifier).revalidate();
+      }
+    });
   }
 
   bool get _tailAligned {
@@ -305,6 +318,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     _seenCount = 0;
     _unread = 0;
     _resolvedProvider = null;
+    _revalidateTranscript();
   }
 
   @override

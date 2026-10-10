@@ -319,6 +319,21 @@ class TranscriptController extends Notifier<TranscriptState> {
     }
   }
 
+  /// Called when a pane (re)mounts this transcript. The controller is not
+  /// auto-disposed, so a session reopened after its pane closed reuses it and
+  /// never runs [build]'s initial load again — whatever happened to the slot
+  /// meanwhile (a wiped or never-filled history) would stay on screen. Refetch
+  /// an empty history; refresh a stale tail.
+  void revalidate() {
+    if (!ref.mounted || state.loading) return;
+    if (_serverMessages.isEmpty) {
+      _historyRetry = 0;
+      unawaited(loadInitial());
+    } else if (_store.isStale(_sessionId) && state.runStatus != 'running') {
+      unawaited(_refreshLatestSafely());
+    }
+  }
+
   /// A failed first load would otherwise leave a pane opened mid-run showing
   /// only the live replay — nothing refetches history until `complete`.
   static const _historyRetryDelays = [2, 5, 15, 30];
@@ -393,6 +408,10 @@ class TranscriptController extends Notifier<TranscriptState> {
     final latestTotal = (latestRes['total'] as num?)?.toInt() ?? latestPage.length;
     final latestHasMore = latestRes['hasMore'] == true;
 
+    // An empty latest page against a non-empty cache is a transient read (the
+    // transcript file mid-rewrite, a session row not yet re-indexed), not a
+    // history that shrank to nothing — keep what we have.
+    if (latestPage.isEmpty && previous.isNotEmpty) return;
     if (!latestHasMore || previous.isEmpty) {
       _store.replaceServerMessages(
         _sessionId,
