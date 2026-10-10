@@ -187,7 +187,7 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
         },
       ),
     );
-    Overlay.of(context).insert(_entry!);
+    Overlay.of(context, rootOverlay: true).insert(_entry!);
     HardwareKeyboard.instance.addHandler(_onKey);
     setState(() {});
   }
@@ -629,6 +629,11 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
 /// plus the anchored `ComposerMenuSurface`. Pass `rebuildable` (e.g. a
 /// `ValueNotifier`) when the menu has internal state that must repaint
 /// without re-opening — the model menu's search field and pills use it.
+///
+/// Insert it into the root overlay (`rootOverlay: true`): the anchor math is
+/// in screen coordinates, but the `ShellRoute` navigator's overlay sits in a
+/// `Scaffold` body that shrinks above the keyboard, so the popover would land
+/// a whole keyboard height too high.
 OverlayEntry composerMenuEntry({
   required BuildContext triggerContext,
   required GlobalKey promptBoxKey,

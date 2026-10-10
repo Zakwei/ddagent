@@ -100,6 +100,37 @@ Widget _app() => TranslationProvider(
   ),
 );
 
+/// Mirrors the app's `ShellRoute`: the chat page lives in a nested navigator
+/// inside a `Scaffold` body, which shrinks above the keyboard (and strips
+/// `viewInsets` from its subtree), so that navigator's overlay is shorter
+/// than the screen.
+Widget _shellApp() => TranslationProvider(
+  child: ProviderScope(
+    overrides: [
+      dioProvider.overrideWithValue(_fakeDio()),
+      chatChannelProvider.overrideWithValue(ChatChannel(_FakeWs())..start()),
+    ],
+    child: MaterialApp(
+      theme: AppTheme.ocChat(),
+      home: Scaffold(
+        body: Navigator(
+          onGenerateRoute: (_) => MaterialPageRoute<void>(
+            builder: (_) => const Scaffold(
+              body: Align(
+                alignment: Alignment.bottomCenter,
+                child: SizedBox(
+                  width: 400,
+                  child: ChatComposer(sessionId: 's1', projectId: 'p1'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
+  ),
+);
+
 Finder _modeTrigger() => find.byIcon(LucideIcons.hand);
 
 void main() {
@@ -178,6 +209,30 @@ void main() {
     // Never behind the status bar, never behind the keyboard.
     expect(menu.top, greaterThanOrEqualTo(40 - 0.5));
     expect(menu.bottom, lessThanOrEqualTo(800 - 300 + 0.5));
+  });
+
+  testWidgets('shell layout with the keyboard open: menu sits right above the composer', (
+    tester,
+  ) async {
+    _setView(tester, keyboard: 300, topInset: 40);
+    await tester.pumpWidget(_shellApp());
+    await tester.pumpAndSettle();
+
+    final trigger = _modeTrigger();
+    final trigRect = tester.getRect(trigger);
+    // The composer is lifted above the keyboard by the shrinking shell body.
+    expect(trigRect.bottom, lessThanOrEqualTo(800 - 300 + 0.5));
+
+    await tester.tap(trigger);
+    await tester.pumpAndSettle();
+
+    final menu = tester.getRect(find.byType(ComposerMenuSurface));
+    // Old bug: the nested navigator's overlay ended at the keyboard top while
+    // the anchor measured from the screen bottom, so the menu floated a whole
+    // keyboard height too high.
+    expect(menu.bottom, lessThan(trigRect.top));
+    // Above the whole composer box (~100px over the footer trigger), not ~400.
+    expect(trigRect.top - menu.bottom, lessThan(150));
   });
 
   testWidgets('action-sheet menu with the keyboard open does not fall behind it', (tester) async {

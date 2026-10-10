@@ -104,7 +104,7 @@ class _ComposerPermissionMenuState extends State<ComposerPermissionMenu> {
       rebuildable: _menuTick,
       builder: _menuItems,
     );
-    Overlay.of(context).insert(_entry!);
+    Overlay.of(context, rootOverlay: true).insert(_entry!);
     HardwareKeyboard.instance.addHandler(_onKey);
     setState(() {});
   }

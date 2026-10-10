@@ -229,7 +229,7 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
           },
         ),
       );
-      Overlay.of(context).insert(_slashEntry!);
+      Overlay.of(context, rootOverlay: true).insert(_slashEntry!);
     } else {
       _slashTick.value++;
     }
@@ -401,7 +401,7 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
           onSelect: _selectMention,
         ),
       );
-      Overlay.of(context).insert(_mentionEntry!);
+      Overlay.of(context, rootOverlay: true).insert(_mentionEntry!);
     } else {
       _mentionTick.value++;
     }
