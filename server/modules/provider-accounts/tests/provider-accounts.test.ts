@@ -18,6 +18,7 @@ import {
   type ProviderRuntimeGateway,
 } from '@/modules/websocket/index.js';
 import { accountFailoverService } from '@/modules/provider-accounts/index.js';
+import { quotaService } from '@/modules/quota/index.js';
 import { providerAccountsService } from '@/modules/provider-accounts/provider-accounts.service.js';
 import type { AnyRecord } from '@/shared/types.js';
 import { createCompleteMessage, createNormalizedMessage } from '@/shared/utils.js';
@@ -328,6 +329,12 @@ test("Claude's near-limit warning moves the session's next turn to another accou
     providerAccountsDb.create({ id: 'acc-warn-2', provider: 'claude', label: 'W2', envOverrides: { MARK: '2' } });
     sessionsDb.createAppSession('s-warn', 'claude', '/tmp/p', 'hi', 'acc-warn-1');
     accountFailoverService.updateSettings('claude', { autoSwitchOnLimit: true });
+    // Pin "before the first quota sweep" (account rows tried in order): the
+    // quota module sweeps on load, and a sweep that knows neither test
+    // account — fast on a CI box with no agent logins — leaves no target.
+    const originalPeek = quotaService.peekAccounts;
+    quotaService.peekAccounts = () => null;
+    try {
 
     const envs: unknown[] = [];
     const statuses: string[] = [];
@@ -366,6 +373,9 @@ test("Claude's near-limit warning moves the session's next turn to another accou
     assert.deepEqual(envs, [{ MARK: '1' }, { MARK: '2' }]);
     assert.equal(sessionsDb.getSessionById('s-warn')?.account_id, 'acc-warn-2');
     assert.ok(statuses.some((text) => /almost reached on "W1".*"W2"/.test(text)), statuses.join(' | '));
+    } finally {
+      quotaService.peekAccounts = originalPeek;
+    }
   });
 });
 
