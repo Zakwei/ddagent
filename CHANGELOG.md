@@ -22,6 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Limit auto-switch resumes the interrupted turn on the new account (at most 3 automatic continuations per session per hour)
+
 ### Changed
 
 - The client is now a single Flutter app (web, Linux & Windows desktop, Android); the former Electron desktop launcher and Expo/React Native mobile app were retired
