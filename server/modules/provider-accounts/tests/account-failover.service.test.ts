@@ -55,11 +55,14 @@ function setup(options: {
   accounts?: ProviderAccount[];
   quota?: QuotaAccount[] | null;
   carryOver?: boolean;
+  queueAccepts?: boolean;
 }) {
   const store = new Map<string, string>();
   const moves: Array<{ sessionId: string; accountId: string | null }> = [];
   const carried: Array<{ fromEnv: Record<string, string>; toEnv: Record<string, string> }> = [];
+  const queued: Array<{ sessionId: string; content: string; options: Record<string, unknown> }> = [];
   let refreshes = 0;
+  let now = NOW;
   const service = createAccountFailoverService({
     store: { get: (key) => store.get(key) ?? null, set: (key, value) => void store.set(key, value) },
     listAccounts: (provider) => (options.accounts ?? []).filter((row) => row.provider === provider),
@@ -70,11 +73,25 @@ function setup(options: {
       carried.push({ fromEnv: input.fromEnv, toEnv: input.toEnv });
       return options.carryOver ?? true;
     },
-    now: () => NOW,
+    queueContinuation: async (input) => {
+      if (options.queueAccepts === false) return false;
+      queued.push({ sessionId: input.sessionId, content: input.content, options: input.options });
+      return true;
+    },
+    now: () => now,
   });
   if (options.enabled) service.updateSettings('claude', { autoSwitchOnLimit: true });
-  return { service, moves, carried, refreshes: () => refreshes };
+  return {
+    service,
+    moves,
+    carried,
+    queued,
+    refreshes: () => refreshes,
+    advance: (ms: number) => void (now += ms),
+  };
 }
+
+const SWITCH = { fromAccountId: 'a', fromLabel: 'Label a', toAccountId: 'b', toLabel: 'Label b' };
 
 const turn = (accountId: string | null, providerSessionId: string | null = null, model = 'opus') => ({
   sessionId: 's1',
@@ -226,6 +243,40 @@ test('detectLimit matches limit errors and banners, not ordinary replies', () =>
   assert.equal(service.detectLimit('text', 'The API rate limit reached its peak, so I added backoff.'), null);
   assert.equal(service.detectLimit('error', 'Prompt is too long: token limit exceeded'), null);
   assert.equal(service.detectLimit('tool_result', 'usage limit reached'), null);
+  // Current Claude Code banner names the window ("session", "weekly").
+  assert.ok(service.detectLimit('text', "You've hit your session limit · resets 9:30am (Europe/Warsaw)"));
+  assert.ok(service.detectLimit('text', 'You’ve hit your weekly limit · resets Oct 12'));
+});
+
+test('a switched session gets one continuation turn without turn-only options', async () => {
+  const { service, queued } = setup({ enabled: true });
+  const ok = await service.continueAfterSwitch({
+    sessionId: 's1',
+    userId: 7,
+    options: { model: 'opus', permissionMode: 'default', attachments: [{ path: 'x' }], accountId: 'a' },
+    change: SWITCH,
+  });
+  assert.equal(ok, true);
+  assert.equal(queued.length, 1);
+  assert.match(queued[0].content, /Label a.*Label b.*Continue/s);
+  assert.deepEqual(queued[0].options, { model: 'opus', permissionMode: 'default', inboxSource: 'auto-continue' });
+});
+
+test('continuations are capped per session within the window', async () => {
+  const { service, queued, advance } = setup({ enabled: true });
+  const input = { sessionId: 's1', userId: null, options: {}, change: SWITCH };
+  for (let i = 0; i < 3; i += 1) assert.equal(await service.continueAfterSwitch(input), true);
+  assert.equal(await service.continueAfterSwitch(input), false);
+  assert.equal(await service.continueAfterSwitch({ ...input, sessionId: 's2' }), true);
+  advance(60 * 60 * 1000);
+  assert.equal(await service.continueAfterSwitch(input), true);
+  assert.equal(queued.length, 5);
+});
+
+test('a refused continuation does not use up the cap', async () => {
+  const { service } = setup({ enabled: true, queueAccepts: false });
+  const input = { sessionId: 's1', userId: null, options: {}, change: SWITCH };
+  for (let i = 0; i < 5; i += 1) assert.equal(await service.continueAfterSwitch(input), false);
 });
 
 test('carry-over copies Claude and Codex transcripts into the target account', async () => {

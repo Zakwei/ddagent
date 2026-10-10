@@ -685,9 +685,22 @@ export async function dispatchChatCommand(
     // settles, and the session-keyed completeRun would kill that new run.
     chatRunRegistry.completeRunIfCurrent(run, { exitCode: 1 });
     if (limitHit) {
+      // Read now: `run.aborted` describes this turn, not a later one.
+      const userAborted = run.aborted === true;
       void accountFailoverService.reportLimitHit(failoverSession(), limitHit)
-        .then((limitSwitch) => {
-          if (limitSwitch) broadcastSessionAccount(sessionId, provider, limitSwitch.toAccountId, connection);
+        .then(async (limitSwitch) => {
+          if (!limitSwitch) return;
+          broadcastSessionAccount(sessionId, provider, limitSwitch.toAccountId, connection);
+          // The limit cut the turn short: resume it on the new account
+          // instead of waiting for the user to re-send.
+          if (!userAborted) {
+            await accountFailoverService.continueAfterSwitch({
+              sessionId,
+              userId,
+              options: clientOptions,
+              change: limitSwitch,
+            });
+          }
         })
         .catch((error: unknown) => console.error('[Chat] Account auto-switch after limit failed', { sessionId, error }));
     }

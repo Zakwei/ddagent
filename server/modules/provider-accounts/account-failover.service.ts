@@ -28,9 +28,16 @@ const RATE_LIMIT_ERROR_PATTERN = /rate.?limit|too many requests|\b429\b/i;
  * talks about limits.
  */
 const USAGE_LIMIT_TEXT_PATTERN =
-  /^\s*(claude ai usage limit reached|you'?ve (hit|reached) your (usage )?limit|[\w -]{0,24}limit reached\s*[·∙|]|api error: 429\b)/i;
+  /^\s*(claude ai usage limit reached|you['’]?ve (hit|reached) your ((usage|session|weekly|daily|5-hour|opus|sonnet) )?limit|[\w -]{0,24}limit reached\s*[·∙|]|api error: 429\b)/i;
 
 const MAX_LIMIT_TEXT_LENGTH = 400;
+
+/** Automatic "continue" turns allowed per session within CONTINUATION_WINDOW_MS (loop guard). */
+const MAX_AUTO_CONTINUATIONS = 3;
+const CONTINUATION_WINDOW_MS = 60 * 60 * 1000;
+
+/** Options that belong to the interrupted turn only and must not ride into the continuation. */
+const TURN_ONLY_OPTION_KEYS = ['attachments', 'images', 'files', 'inboxSource', 'accountId'];
 
 type AccountFailoverSettings = {
   /** Move a session to another account of the same provider when its account hits a limit. */
@@ -86,7 +93,20 @@ type AccountFailoverDependencies = {
    * carry a conversation over (the session then stays on its account).
    */
   carryOverConversation(input: CarryOverInput): boolean;
+  /**
+   * Queues a follow-up turn for the session (sent as soon as it is idle).
+   * Resolves false when it was not queued — e.g. the user already has
+   * messages waiting, which resume the work on their own.
+   */
+  queueContinuation(input: ContinuationInput): Promise<boolean>;
   now(): number;
+};
+
+type ContinuationInput = {
+  sessionId: string;
+  userId: string | number | null;
+  content: string;
+  options: Record<string, unknown>;
 };
 
 /** Quota snapshot section a provider's account readings are filed under. */
@@ -230,6 +250,8 @@ export function createAccountFailoverService(dependencies: AccountFailoverDepend
   /** `${provider}:${accountId}` → epoch ms until which a runtime limit hit benches the account. */
   const limitedUntil = new Map<string, number>();
   const limitKey = (provider: LLMProvider, accountId: string | null) => `${provider}:${accountId ?? ''}`;
+  /** sessionId → epoch ms of its recent automatic continuations. */
+  const continuations = new Map<string, number[]>();
 
   function isMarkedLimited(provider: LLMProvider, accountId: string | null): boolean {
     const key = limitKey(provider, accountId);
@@ -416,6 +438,42 @@ export function createAccountFailoverService(dependencies: AccountFailoverDepend
       const target = pickTarget(input.provider, input.accountId, input.model ?? '', quota);
       return target ? switchSession(input, target, quota) : null;
     },
+
+    /**
+     * After a limit cut a turn short and the session moved accounts, queues a
+     * "continue" turn so the work resumes on the new account without the user
+     * re-sending. Capped per session (MAX_AUTO_CONTINUATIONS per window) so a
+     * misdetected limit can never loop; a turn the user aborted is never
+     * continued (the caller checks that). Returns whether a turn was queued.
+     */
+    async continueAfterSwitch(input: {
+      sessionId: string;
+      userId: string | number | null;
+      options: Record<string, unknown>;
+      change: AccountSwitch;
+    }): Promise<boolean> {
+      const now = dependencies.now();
+      const recent = (continuations.get(input.sessionId) ?? []).filter((at) => now - at < CONTINUATION_WINDOW_MS);
+      if (recent.length >= MAX_AUTO_CONTINUATIONS) {
+        continuations.set(input.sessionId, recent);
+        return false;
+      }
+      const options = { ...input.options };
+      for (const key of TURN_ONLY_OPTION_KEYS) delete options[key];
+      const from = input.change.fromLabel || 'default login';
+      const to = input.change.toLabel || 'default login';
+      const queued = await dependencies.queueContinuation({
+        sessionId: input.sessionId,
+        userId: input.userId,
+        content: `[ddagent] The previous turn was cut off by the usage limit on account "${from}". `
+          + `The session now runs on account "${to}". Continue exactly where you left off — `
+          + 'redo any tool calls or subagents that failed because of the limit.',
+        options: { ...options, inboxSource: 'auto-continue' },
+      });
+      if (queued) recent.push(now);
+      continuations.set(input.sessionId, recent);
+      return queued;
+    },
   };
 }
 
@@ -438,5 +496,13 @@ export const accountFailoverService = createAccountFailoverService({
       .catch((error: unknown) => console.error('[account-failover] quota refresh failed:', error));
   },
   carryOverConversation: carryOverConversationOnDisk,
+  // Lazy for the same reason as quota: the queue dispatches through the
+  // websocket chat layer, which imports this service.
+  queueContinuation: async ({ sessionId, userId, content, options }) => {
+    const { queuedMessagesService } = await import('@/modules/queued-messages/index.js');
+    if (queuedMessagesService.list(sessionId).some((message) => message.status === 'queued')) return false;
+    queuedMessagesService.enqueue({ sessionId, userId, content, options });
+    return true;
+  },
   now: () => Date.now(),
 });
