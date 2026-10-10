@@ -134,6 +134,9 @@ CREATE TABLE IF NOT EXISTS sessions (
     -- Context window the provider CLI last reported for this session (NULL =
     -- not reported yet); transcripts never record it.
     context_window INTEGER,
+    -- Stamped when a run completes, cleared when the next run starts (NULL =
+    -- running or no finished turn recorded).
+    turn_finished_at DATETIME,
     PRIMARY KEY (session_id),
     FOREIGN KEY (project_path) REFERENCES projects(project_path)
     ON DELETE SET NULL

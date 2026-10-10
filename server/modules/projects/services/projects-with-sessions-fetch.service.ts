@@ -17,6 +17,8 @@ type SessionSummary = {
   model: string | null;
   /** When the session's output was last marked viewed; null = never viewed. */
   lastViewedAt: string | null;
+  /** When the latest turn finished; null while a turn runs or none finished. */
+  turnFinishedAt: string | null;
 };
 
 type SessionRepositoryRow = {
@@ -28,6 +30,7 @@ type SessionRepositoryRow = {
   jsonl_path?: string | null;
   model?: string | null;
   last_viewed_at?: string | null;
+  turn_finished_at?: string | null;
 };
 
 export type ProjectListItem = {
@@ -140,6 +143,7 @@ function mapSessionRowToSummary(row: SessionRepositoryRow): SessionSummary {
     lastActivity: row.updated_at ?? row.created_at ?? new Date().toISOString(),
     model: row.model ?? null,
     lastViewedAt: row.last_viewed_at ?? null,
+    turnFinishedAt: row.turn_finished_at ?? null,
   };
 }
 

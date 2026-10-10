@@ -188,6 +188,8 @@ type RecentSessionListItem = Pick<
 > & {
   /** Last time the user opened the session's output; `null` = never viewed — drives the unread dot. */
   lastViewedAt: string | null;
+  /** When the latest turn finished; `null` while a turn runs or none finished — drives the green pane tab. */
+  turnFinishedAt: string | null;
 };
 
 type RecentSessionsPage = {
@@ -206,6 +208,8 @@ type SessionDetails = {
   lastActivity: string | null;
   /** Last time the user opened the session's output; `null` = never viewed. */
   lastViewedAt: string | null;
+  /** When the latest turn finished; `null` while a turn runs or none finished. */
+  turnFinishedAt: string | null;
   isArchived: boolean;
   /** Model recorded for the session; `null` until its first turn runs. */
   model: string | null;
@@ -479,6 +483,7 @@ export const sessionsService = {
         sessionTitle: session.custom_name?.trim() || session.session_id,
         lastActivity: session.updated_at ?? session.created_at ?? null,
         lastViewedAt: session.last_viewed_at ?? null,
+        turnFinishedAt: session.turn_finished_at ?? null,
         messageCount: countJsonlMessages(session.jsonl_path),
         accountId: session.account_id ?? null,
       };
@@ -707,6 +712,7 @@ export const sessionsService = {
       updatedAt: session.updated_at ?? null,
       lastActivity: session.updated_at ?? session.created_at ?? null,
       lastViewedAt: session.last_viewed_at ?? null,
+      turnFinishedAt: session.turn_finished_at ?? null,
       isArchived: Boolean(session.isArchived),
       model: session.model ?? null,
       permissionMode: session.permission_mode ?? null,

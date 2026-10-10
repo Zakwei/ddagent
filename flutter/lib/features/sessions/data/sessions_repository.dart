@@ -415,6 +415,10 @@ extension SessionView on Session {
 
   String? get lastViewedAt => raw['lastViewedAt'] as String?;
 
+  /// Server-stamped when the latest turn finished, cleared when the next one
+  /// starts — keeps a pane's green "finished" tab across reloads.
+  String? get turnFinishedAt => raw['turnFinishedAt'] as String?;
+
   /// Mobile parity: unread = not running and (never viewed or activity after
   /// the last view).
   bool get isUnread {

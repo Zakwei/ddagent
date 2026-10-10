@@ -564,6 +564,19 @@ const addSessionContextWindowColumn = (db: Database): void => {
 };
 
 /**
+ * Adds the `turn_finished_at` marker behind the green "agent finished" pane
+ * tab: stamped when a run completes, cleared when the next one starts.
+ *
+ * Existing rows stay NULL — no turn has been recorded as finished yet.
+ */
+const addSessionTurnFinishedAtColumn = (db: Database): void => {
+  const sessionsTableInfo = getTableInfo(db, 'sessions');
+  const columnNames = sessionsTableInfo.map((column) => column.name);
+
+  addColumnToTableIfNotExists(db, 'sessions', columnNames, 'turn_finished_at', 'DATETIME');
+};
+
+/**
  * SQLite CHECK constraints can't be altered in place, so when the
  * provider_models allow-list predates newer provider ids ('devin',
  * 'commandcode', 'antigravity') the table is rebuilt with the current schema. Rows are copied
@@ -799,6 +812,7 @@ export const runMigrations = (db: Database) => {
     addSessionLastViewedAtColumn(db);
     addSessionSharedContextColumn(db);
     addSessionContextWindowColumn(db);
+    addSessionTurnFinishedAtColumn(db);
     ensureProjectsForSessionPaths(db);
     hideLegacyTechnicalSessions(db);
     hideRenamedDevinTechnicalSessions(db);

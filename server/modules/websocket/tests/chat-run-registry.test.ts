@@ -101,6 +101,30 @@ test('session_created is swallowed and persisted as the provider-id mapping', as
   });
 });
 
+test('turn_finished_at is stamped on complete and cleared when the next run starts', async () => {
+  await withIsolatedDatabase(() => {
+    sessionsDb.createAppSession('app-run-turn', 'claude', '/workspace/demo');
+    const startRun = () => chatRunRegistry.startRun({
+      appSessionId: 'app-run-turn',
+      provider: 'claude',
+      providerSessionId: null,
+      connection: new FakeConnection(),
+      userId: null,
+    });
+    const turnFinishedAt = () => sessionsDb.getSessionById('app-run-turn')?.turn_finished_at ?? null;
+
+    const first = startRun();
+    assert.ok(first);
+    assert.equal(turnFinishedAt(), null);
+
+    first.writer.send({ kind: 'complete', provider: 'claude', sessionId: 'app-run-turn', exitCode: 0 });
+    assert.ok(turnFinishedAt());
+
+    assert.ok(startRun());
+    assert.equal(turnFinishedAt(), null);
+  });
+});
+
 test('complete marks the run finished and duplicate completes are dropped', async () => {
   await withIsolatedDatabase(() => {
     sessionsDb.createAppSession('app-run-3', 'codex', '/workspace/demo');

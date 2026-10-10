@@ -31,6 +31,8 @@ type SessionRow = {
   account_id?: string | null;
   /** Context window the provider CLI last reported; NULL until a run reports one. */
   context_window?: number | null;
+  /** Stamped when a run completes, cleared when the next starts; NULL = none finished. */
+  turn_finished_at?: string | null;
 };
 
 type RecentSessionsPage = {
@@ -39,7 +41,7 @@ type RecentSessionsPage = {
 };
 
 const SESSION_ROW_COLUMNS =
-  'session_id, provider, provider_session_id, project_path, jsonl_path, custom_name, model, effort, permission_mode, isArchived, created_at, updated_at, last_viewed_at, shared_context_injected_at, account_id, context_window';
+  'session_id, provider, provider_session_id, project_path, jsonl_path, custom_name, model, effort, permission_mode, isArchived, created_at, updated_at, last_viewed_at, shared_context_injected_at, account_id, context_window, turn_finished_at';
 
 const SQLITE_UTC_TIMESTAMP_REGEX = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
 
@@ -73,6 +75,7 @@ function normalizeSessionRow<T extends SessionRow | null | undefined>(row: T): T
     last_viewed_at: normalizeTimestamp(row.last_viewed_at) ?? row.last_viewed_at,
     shared_context_injected_at:
       normalizeTimestamp(row.shared_context_injected_at) ?? row.shared_context_injected_at,
+    turn_finished_at: normalizeTimestamp(row.turn_finished_at) ?? row.turn_finished_at,
   };
 }
 
@@ -286,6 +289,22 @@ export const sessionsDb = {
        SET context_window = ?
        WHERE session_id = ? AND context_window IS NOT ?`
     ).run(contextWindow, sessionId, contextWindow);
+  },
+
+  /**
+   * Stamps (`finished = true`) or clears the session's `turn_finished_at`.
+   *
+   * Written by the websocket chat run registry: stamped when a run completes,
+   * cleared when the next run starts, so clients can keep a finished pane
+   * flagged across reloads until the agent works again.
+   */
+  setSessionTurnFinished(sessionId: string, finished: boolean): void {
+    const db = getConnection();
+    db.prepare(
+      `UPDATE sessions
+       SET turn_finished_at = ${finished ? 'CURRENT_TIMESTAMP' : 'NULL'}
+       WHERE session_id = ?`
+    ).run(sessionId);
   },
 
   /**

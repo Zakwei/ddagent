@@ -183,6 +183,20 @@ async function broadcastCanonicalSessionUpsert(appSessionId: string): Promise<vo
   });
 }
 
+/**
+ * Persists whether the session's latest turn finished — the green "agent
+ * finished" pane tab, kept across client reloads until the next run starts.
+ */
+function persistTurnFinished(appSessionId: string, finished: boolean): void {
+  try {
+    sessionsDb.setSessionTurnFinished(appSessionId, finished);
+  } catch (error) {
+    // Best effort: only the pane tab colour depends on it.
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('[ChatRunRegistry] Failed to persist turn state', { appSessionId, error: message });
+  }
+}
+
 function evictRunLater({ appSessionId, id }: ChatRun): void {
   // Capture only identity: retaining the whole run would keep every replaced
   // turn's event buffer alive until its timer expires.
@@ -264,6 +278,7 @@ function decorateAndRecordEvent(run: ChatRun, message: NormalizedMessage): Norma
     outbound.actualSessionId = run.appSessionId;
     run.status = 'completed';
     run.completedAt = Date.now();
+    persistTurnFinished(run.appSessionId, true);
     evictRunLater(run);
   }
 
@@ -370,6 +385,7 @@ export const chatRunRegistry = {
     });
 
     runs.set(input.appSessionId, run);
+    persistTurnFinished(input.appSessionId, false);
     return run;
   },
 

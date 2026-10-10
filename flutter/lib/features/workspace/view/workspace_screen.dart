@@ -146,6 +146,18 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
       final pane = ws.panes.where((p) => p.id == id).firstOrNull;
       return pane == null || processingIds.contains(pane.sessionId);
     });
+    // The server keeps the finished turn (`turnFinishedAt`) so the flag
+    // survives a reload; the local set covers turns that ended since the
+    // session list was last fetched.
+    final turnFinishedIds = {
+      for (final s in sessions)
+        if (s.turnFinishedAt != null) s.sessionId,
+    };
+    final finishedPaneIds = {
+      ..._finishedPaneIds,
+      for (final p in ws.panes)
+        if (turnFinishedIds.contains(p.sessionId) && !processingIds.contains(p.sessionId)) p.id,
+    };
 
     // An empty workspace renders nothing, which makes "new session"
     // unreachable — seed one chat pane in picker state so the session list
@@ -215,7 +227,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
               onReorderPanes: ctrl.reorderPanes,
               maximizedPaneId: ws.maximizedPaneId,
               onToggleMaximizePane: ctrl.toggleMaximize,
-              finishedPaneIds: _finishedPaneIds,
+              finishedPaneIds: finishedPaneIds,
               actionPaneIds: {
                 for (final p in ws.panes)
                   if (display(p).action == PaneAction.question) p.id,
