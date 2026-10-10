@@ -126,23 +126,23 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
       }
     }
 
-    // processing → idle on a background pane flags its tab as finished.
+    // processing → idle flags the pane's tab as finished. The selected tab
+    // hides the accent, so the flag also covers the pane being watched.
     ref.listen(sessionActivityProvider, (prev, next) {
       final stopped = {
         for (final id in prev?.keys ?? const <String>[])
           if (!next.containsKey(id)) id,
       };
       if (stopped.isEmpty) return;
-      final current = ref.read(workspaceProvider);
       final hits = [
-        for (final p in current.panes)
-          if (p.id != current.activePaneId && stopped.contains(p.sessionId)) p.id,
+        for (final p in ref.read(workspaceProvider).panes)
+          if (stopped.contains(p.sessionId)) p.id,
       ];
       if (hits.isNotEmpty) setState(() => _finishedPaneIds.addAll(hits));
     });
-    // Opening the pane (or the agent starting again) clears the flag.
+    // The flag tracks the session's state, not whether it was seen: only the
+    // agent starting again (or the pane closing) clears it.
     _finishedPaneIds.removeWhere((id) {
-      if (id == ws.activePaneId) return true;
       final pane = ws.panes.where((p) => p.id == id).firstOrNull;
       return pane == null || processingIds.contains(pane.sessionId);
     });

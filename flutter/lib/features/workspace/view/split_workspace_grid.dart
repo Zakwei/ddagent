@@ -32,7 +32,7 @@ bool hoverFocusBlockedByField() {
 /// Split-pane grid (port of SplitWorkspaceGrid.tsx):
 /// - `getSplitLayout` column/row math + last-row-partial spanning via flex,
 /// - compact (<600pt): tab strip + only the active pane mounted; tabs whose
-///   agent finished in the background turn green until opened, tabs waiting
+///   agent finished turn green until it starts again, tabs waiting
 ///   on the user turn amber,
 /// - maximized pane: hidden panes stay mounted (Offstage) so chats/terminals
 ///   keep state,
@@ -66,8 +66,8 @@ class SplitWorkspaceGrid extends StatefulWidget {
   final String? maximizedPaneId;
   final ValueChanged<String>? onToggleMaximizePane;
 
-  /// Panes whose agent finished while they were in the background — their
-  /// compact tab turns green until opened.
+  /// Panes whose agent finished its turn — their compact tab turns green
+  /// (except while selected) until the agent starts again.
   final Set<String> finishedPaneIds;
 
   /// Panes waiting on the user (question / permission) — their compact tab
