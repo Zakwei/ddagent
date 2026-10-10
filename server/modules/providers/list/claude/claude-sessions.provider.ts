@@ -7,7 +7,7 @@ import type { IProviderSessions } from '@/shared/interfaces.js';
 import type { AnyRecord, FetchHistoryOptions, FetchHistoryResult, NormalizedMessage } from '@/shared/types.js';
 import { parseFilesInputTag } from '@/shared/image-attachments.js';
 import { AppError, createNormalizedMessage, generateMessageId, readObjectRecord, sliceTailPage } from '@/shared/utils.js';
-import { sessionsDb } from '@/modules/database/index.js';
+import { providerAccountsDb, sessionsDb } from '@/modules/database/index.js';
 
 const PROVIDER = 'claude';
 
@@ -158,13 +158,9 @@ async function parseAgentTools(filePath: string): Promise<{ tools: AnyRecord[]; 
   return { tools, steps };
 }
 
-// The synchronizer records `jsonl_path` only after its file watcher fires, so a
-// fresh session's first history read (e.g. another device refreshing on
-// `complete`) would come back empty. Look the transcript up by its id instead.
-// shortcut: only the default config dir is searched; isolated-account sessions wait for the synchronizer.
-async function findClaudeTranscript(providerSessionId: string): Promise<string | null> {
-  if (!providerSessionId) return null;
-  const projectsDir = path.join(process.env.CLAUDE_CONFIG_DIR?.trim() || path.join(os.homedir(), '.claude'), 'projects');
+/** Looks `<configDir>/projects/<encoded cwd>/<id>.jsonl` up by the session id. */
+async function findClaudeTranscriptIn(configDir: string, providerSessionId: string): Promise<string | null> {
+  const projectsDir = path.join(configDir, 'projects');
   const dirs = await fs.promises.readdir(projectsDir, { withFileTypes: true }).catch(() => []);
   for (const dir of dirs) {
     if (!dir.isDirectory()) continue;
@@ -172,6 +168,33 @@ async function findClaudeTranscript(providerSessionId: string): Promise<string |
     if (fs.existsSync(candidate)) return candidate;
   }
   return null;
+}
+
+/**
+ * The transcript a session's history is read from. A session bound to an
+ * isolated account (its own CLAUDE_CONFIG_DIR) is read from that account
+ * first: the synchronizer only watches the default config dir, so such
+ * sessions never get a `jsonl_path`, and after a limit auto-switch the
+ * indexed path still points at the copy the session left behind. Otherwise
+ * the indexed path, then a lookup by id in the default dir — the watcher
+ * records `jsonl_path` only after it fires, so a fresh session's first read
+ * (e.g. another device refreshing on `complete`) would come back empty.
+ */
+async function resolveClaudeTranscript(sessionId: string, providerSessionId: string): Promise<string | null> {
+  const session = sessionsDb.getSessionById(sessionId);
+  const accountConfigDir = session?.account_id
+    ? providerAccountsDb.get(session.account_id)?.envOverrides.CLAUDE_CONFIG_DIR?.trim()
+    : undefined;
+  if (accountConfigDir && providerSessionId) {
+    const onAccount = await findClaudeTranscriptIn(accountConfigDir, providerSessionId);
+    if (onAccount) return onAccount;
+  }
+  if (session?.jsonl_path) return session.jsonl_path;
+  if (!providerSessionId) return null;
+  return findClaudeTranscriptIn(
+    process.env.CLAUDE_CONFIG_DIR?.trim() || path.join(os.homedir(), '.claude'),
+    providerSessionId,
+  );
 }
 
 async function getSessionMessages(
@@ -183,8 +206,7 @@ async function getSessionMessages(
   try {
     // The DB row is keyed by the app-facing session id, while the JSONL rows
     // on disk carry the provider-native id — both ids are needed here.
-    const jsonLPath = sessionsDb.getSessionById(sessionId)?.jsonl_path
-      ?? await findClaudeTranscript(providerSessionId);
+    const jsonLPath = await resolveClaudeTranscript(sessionId, providerSessionId);
 
     if (!jsonLPath) {
       return { messages: [], total: 0, hasMore: false };
