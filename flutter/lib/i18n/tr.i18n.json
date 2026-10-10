@@ -1127,6 +1127,10 @@
       "noAgents": "Atanmış agent yok",
       "noSubscription": "Abonelik yok",
       "noSubscriptionHint": "Sağlayıcı bu hesap için aktif bir plan bildirmiyor.",
+      "notInstalled": "Yüklü değil",
+      "notInstalledHint": "Ajanın CLI'ı bu sunucuda yüklü değil — {{place}} bölümünden yükleyin.",
+      "notLoggedIn": "Oturum açılmadı",
+      "notLoggedInHint": "Ajan bu sunucuda oturum açmamış — {{place}} bölümünden oturum açın.",
       "quality": {
         "live": "Canlı",
         "cached": "Önbellekte",

@@ -2002,6 +2002,10 @@ class Translations$common$quota$ja extends Translations$common$quota$en {
 	@override String get noAgents => '割り当てられたエージェントなし';
 	@override String get noSubscription => 'サブスクリプションなし';
 	@override String get noSubscriptionHint => 'このアカウントのアクティブなプランはプロバイダーから報告されていません。';
+	@override String get notInstalled => '未インストール';
+	@override String notInstalledHint({required Object place}) => 'このサーバーにはエージェントの CLI がインストールされていません。${place} でインストールしてください。';
+	@override String get notLoggedIn => '未ログイン';
+	@override String notLoggedInHint({required Object place}) => 'このサーバーでエージェントにログインしていません。${place} でログインしてください。';
 	@override late final Translations$common$quota$quality$ja quality = Translations$common$quota$quality$ja._(_root);
 	@override late final Translations$common$quota$kpi$ja kpi = Translations$common$quota$kpi$ja._(_root);
 	@override late final Translations$common$quota$empty$ja empty = Translations$common$quota$empty$ja._(_root);
@@ -9305,6 +9309,10 @@ extension on TranslationsJa {
 			'common.quota.noAgents' => '割り当てられたエージェントなし',
 			'common.quota.noSubscription' => 'サブスクリプションなし',
 			'common.quota.noSubscriptionHint' => 'このアカウントのアクティブなプランはプロバイダーから報告されていません。',
+			'common.quota.notInstalled' => '未インストール',
+			'common.quota.notInstalledHint' => ({required Object place}) => 'このサーバーにはエージェントの CLI がインストールされていません。${place} でインストールしてください。',
+			'common.quota.notLoggedIn' => '未ログイン',
+			'common.quota.notLoggedInHint' => ({required Object place}) => 'このサーバーでエージェントにログインしていません。${place} でログインしてください。',
 			'common.quota.quality.live' => 'ライブ',
 			'common.quota.quality.cached' => 'キャッシュ',
 			'common.quota.quality.estimate' => '推定',
@@ -9503,12 +9511,12 @@ extension on TranslationsJa {
 			'common.projectWizard.step2.githubHelp' => '任意: リポジトリをクローンするためのGitHub URLを入力してください',
 			'common.projectWizard.step2.githubAuth' => 'GitHub認証（任意）',
 			'common.projectWizard.step2.githubAuthHelp' => 'プライベートリポジトリの場合のみ必要です。パブリックリポジトリは認証なしでクローンできます。',
+			_ => null,
+		} ?? switch (path) {
 			'common.projectWizard.step2.loadingTokens' => '保存済みトークンを読み込んでいます...',
 			'common.projectWizard.step2.storedToken' => '保存済みトークン',
 			'common.projectWizard.step2.newToken' => '新しいトークン',
 			'common.projectWizard.step2.nonePublic' => 'なし（パブリック）',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.step2.selectToken' => 'トークンを選択',
 			'common.projectWizard.step2.selectTokenPlaceholder' => '-- トークンを選択 --',
 			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
@@ -10017,12 +10025,12 @@ extension on TranslationsJa {
 			'settings.mcp.config' => '設定',
 			'settings.mcp.testConnection' => '接続テスト',
 			'settings.mcp.status' => '状態',
+			_ => null,
+		} ?? switch (path) {
 			'settings.mcp.connected' => '接続済み',
 			'settings.mcp.disconnected' => '未接続',
 			'settings.mcp.scope.label' => 'スコープ',
 			'settings.mcp.scope.user' => 'ユーザー',
-			_ => null,
-		} ?? switch (path) {
 			'settings.mcp.scope.project' => 'プロジェクト',
 			'settings.appearance.title' => '外観',
 			'settings.appearance.theme' => 'テーマ',
@@ -10531,12 +10539,12 @@ extension on TranslationsJa {
 			'settings.workspaces.create' => 'ワークスペースを追加',
 			'settings.workspaces.deleteConfirm' => 'このワークスペースを DDAgent から削除しますか？ファイルはディスクに残ります。',
 			'settings.workspaces.deleteFailed' => 'ワークスペースの削除に失敗しました。',
+			_ => null,
+		} ?? switch (path) {
 			'settings.workspaces.deleteTitle' => 'ワークスペースを削除',
 			'settings.workspaces.description' => 'ワークスペースは、DDAgent がチャット・コード実行・ブラウジングできるディレクトリです。',
 			'settings.workspaces.remove' => 'ワークスペースを削除',
 			'settings.workspaces.title' => 'ワークスペース',
-			_ => null,
-		} ?? switch (path) {
 			'settings.workspaces.pathRequired' => 'パスは必須です',
 			'settings.stt.title' => '音声入力 (音声認識)',
 			'settings.stt.description' => 'Whisper 互換の /audio/transcriptions エンドポイント (OpenAI、whisper.cpp、faster-whisper、Speaches)。入力欄のマイクボタンが有効になります。',
@@ -11045,12 +11053,12 @@ extension on TranslationsJa {
 			'tasks.taskDetail.priority' => '優先度',
 			'tasks.taskDetail.priorityNotSet' => '未設定',
 			'tasks.taskDetail.save' => '保存',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.status' => 'ステータス',
 			'tasks.taskDetail.statusFailed' => 'タスクステータスの更新に失敗しました',
 			'tasks.taskDetail.taskId' => ({required Object id}) => 'タスク ${id}',
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'タスク ${id}: ${title}',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.testStrategy' => 'テスト戦略',
 			'tasks.taskDetail.titleRequired' => 'タイトルは必須です',
 			'tasks.taskDetail.updateFailed' => 'タスクの更新に失敗しました',
@@ -11559,12 +11567,12 @@ extension on TranslationsJa {
 			'terminal.errors.connectionError' => ({required Object message}) => '[接続エラー] ${message}',
 			'terminal.loginDialog.title' => ({required Object provider}) => '${provider} CLI ログイン',
 			'terminal.loginDialog.exited' => ({required Object code}) => '終了 (${code})',
+			_ => null,
+		} ?? switch (path) {
 			'terminal.loginDialog.authLinkDetected' => '認証リンクを検出しました',
 			'terminal.empty.title' => 'アクティブなターミナルがありません',
 			'terminal.empty.description' => '新しいタブを作成して開始してください',
 			'terminal.overlay.processExited' => 'プロセスが終了しました — 接続すると再起動します',
-			_ => null,
-		} ?? switch (path) {
 			'terminal.overlay.processExitedWithCode' => ({required Object code}) => 'プロセスが終了しました（コード ${code}）— 接続すると再起動します',
 			'terminal.overlay.resumeSession' => ({required Object title}) => 'セッション ${title} を再開',
 			'terminal.overlay.startSession' => ({required Object path}) => '${path} で新しいセッションを開始',

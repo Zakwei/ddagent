@@ -2012,6 +2012,10 @@ class Translations$common$quota$es extends Translations$common$quota$en {
 	@override String get noAgents => 'No hay agentes asignados';
 	@override String get noSubscription => 'Sin suscripción';
 	@override String get noSubscriptionHint => 'El proveedor no reporta ningún plan activo para esta cuenta.';
+	@override String get notInstalled => 'No instalado';
+	@override String notInstalledHint({required Object place}) => 'La CLI del agente no está instalada en este servidor: instálala en ${place}.';
+	@override String get notLoggedIn => 'Sin sesión';
+	@override String notLoggedInHint({required Object place}) => 'El agente no tiene sesión iniciada en este servidor: inicia sesión en ${place}.';
 	@override late final Translations$common$quota$quality$es quality = Translations$common$quota$quality$es._(_root);
 	@override late final Translations$common$quota$kpi$es kpi = Translations$common$quota$kpi$es._(_root);
 	@override late final Translations$common$quota$empty$es empty = Translations$common$quota$empty$es._(_root);
@@ -9316,6 +9320,10 @@ extension on TranslationsEs {
 			'common.quota.noAgents' => 'No hay agentes asignados',
 			'common.quota.noSubscription' => 'Sin suscripción',
 			'common.quota.noSubscriptionHint' => 'El proveedor no reporta ningún plan activo para esta cuenta.',
+			'common.quota.notInstalled' => 'No instalado',
+			'common.quota.notInstalledHint' => ({required Object place}) => 'La CLI del agente no está instalada en este servidor: instálala en ${place}.',
+			'common.quota.notLoggedIn' => 'Sin sesión',
+			'common.quota.notLoggedInHint' => ({required Object place}) => 'El agente no tiene sesión iniciada en este servidor: inicia sesión en ${place}.',
 			'common.quota.quality.live' => 'En vivo',
 			'common.quota.quality.cached' => 'En caché',
 			'common.quota.quality.estimate' => 'Estimación',
@@ -9514,12 +9522,12 @@ extension on TranslationsEs {
 			'common.projectWizard.step2.githubHelp' => 'Opcional: proporciona una URL de GitHub para clonar un repositorio',
 			'common.projectWizard.step2.githubAuth' => 'Autenticación de GitHub (opcional)',
 			'common.projectWizard.step2.githubAuthHelp' => 'Solo se requiere para repositorios privados. Los repos públicos se pueden clonar sin autenticación.',
+			_ => null,
+		} ?? switch (path) {
 			'common.projectWizard.step2.loadingTokens' => 'Cargando tokens guardados...',
 			'common.projectWizard.step2.storedToken' => 'Token guardado',
 			'common.projectWizard.step2.newToken' => 'Token nuevo',
 			'common.projectWizard.step2.nonePublic' => 'Ninguno (público)',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.step2.selectToken' => 'Seleccionar token',
 			'common.projectWizard.step2.selectTokenPlaceholder' => '-- Selecciona un token --',
 			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
@@ -10028,12 +10036,12 @@ extension on TranslationsEs {
 			'settings.mcp.config' => 'Configuración',
 			'settings.mcp.testConnection' => 'Probar conexión',
 			'settings.mcp.status' => 'Estado',
+			_ => null,
+		} ?? switch (path) {
 			'settings.mcp.connected' => 'Conectado',
 			'settings.mcp.disconnected' => 'Desconectado',
 			'settings.mcp.scope.label' => 'Ámbito',
 			'settings.mcp.scope.user' => 'Usuario',
-			_ => null,
-		} ?? switch (path) {
 			'settings.mcp.scope.project' => 'Proyecto',
 			'settings.appearance.title' => 'Apariencia',
 			'settings.appearance.theme' => 'Tema',
@@ -10542,12 +10550,12 @@ extension on TranslationsEs {
 			'settings.workspaces.create' => 'Añadir espacio de trabajo',
 			'settings.workspaces.deleteConfirm' => '¿Quitar este espacio de trabajo de DDAgent? Sus archivos permanecen en el disco.',
 			'settings.workspaces.deleteFailed' => 'No se pudo quitar el espacio de trabajo.',
+			_ => null,
+		} ?? switch (path) {
 			'settings.workspaces.deleteTitle' => 'Quitar espacio de trabajo',
 			'settings.workspaces.description' => 'Los espacios de trabajo son directorios donde DDAgent puede chatear, ejecutar código y navegar.',
 			'settings.workspaces.remove' => 'Quitar espacio de trabajo',
 			'settings.workspaces.title' => 'Espacios de trabajo',
-			_ => null,
-		} ?? switch (path) {
 			'settings.workspaces.pathRequired' => 'La ruta es obligatoria',
 			'settings.stt.title' => 'Entrada de voz (voz a texto)',
 			'settings.stt.description' => 'Endpoint /audio/transcriptions compatible con Whisper (OpenAI, whisper.cpp, faster-whisper, Speaches). Activa el botón de micrófono en el editor.',
@@ -11056,12 +11064,12 @@ extension on TranslationsEs {
 			'tasks.taskDetail.priority' => 'Prioridad',
 			'tasks.taskDetail.priorityNotSet' => 'No definida',
 			'tasks.taskDetail.save' => 'Guardar',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.status' => 'Estado',
 			'tasks.taskDetail.statusFailed' => 'No se pudo actualizar el estado de la tarea',
 			'tasks.taskDetail.taskId' => ({required Object id}) => 'Tarea ${id}',
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'Tarea ${id}: ${title}',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.testStrategy' => 'Estrategia de pruebas',
 			'tasks.taskDetail.titleRequired' => 'El título es obligatorio',
 			'tasks.taskDetail.updateFailed' => 'No se pudo actualizar la tarea',
@@ -11570,12 +11578,12 @@ extension on TranslationsEs {
 			'terminal.errors.connectionError' => ({required Object message}) => '[Error de conexión] ${message}',
 			'terminal.loginDialog.title' => ({required Object provider}) => 'Inicio de sesión en ${provider} CLI',
 			'terminal.loginDialog.exited' => ({required Object code}) => 'Finalizado (${code})',
+			_ => null,
+		} ?? switch (path) {
 			'terminal.loginDialog.authLinkDetected' => 'Enlace de autenticación detectado',
 			'terminal.empty.title' => 'No hay terminal activa',
 			'terminal.empty.description' => 'Crea una pestaña nueva para empezar',
 			'terminal.overlay.processExited' => 'El proceso ha finalizado: conéctate para iniciarlo de nuevo',
-			_ => null,
-		} ?? switch (path) {
 			'terminal.overlay.processExitedWithCode' => ({required Object code}) => 'El proceso ha finalizado (código ${code}): conéctate para iniciarlo de nuevo',
 			'terminal.overlay.resumeSession' => ({required Object title}) => 'Reanudar la sesión ${title}',
 			'terminal.overlay.startSession' => ({required Object path}) => 'Iniciar una sesión nueva en ${path}',

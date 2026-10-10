@@ -5,6 +5,7 @@ import 'package:ddagent_app/features/quota/data/quota_models.dart';
 import 'package:ddagent_app/features/quota/state/quota_controller.dart';
 import 'package:ddagent_app/features/quota/view/quota_charts.dart';
 import 'package:ddagent_app/features/quota/view/quota_tone.dart';
+import 'package:ddagent_app/features/quota/view/quota_unavailable.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -38,9 +39,12 @@ class _AccountQuotaCardState extends ConsumerState<AccountQuotaCard> {
     final danger = config?.dangerThreshold ?? 90;
     final alertsEnabled = config?.alertsEnabled ?? true;
     final worst = account.windows.fold<double>(0, (m, w) => w.percent > m ? w.percent : m);
-    final errored = account.status == 'error';
-    final inactive = account.status == 'inactive';
-    final tone = errored ? QuotaTone.neutral : toneForPercent(worst, watch, danger);
+    // Not installed / not signed in / no plan: a neutral state, not a failure.
+    final unavailable = quotaUnavailableText(i18n, account);
+    final errored = account.status == 'error' && unavailable == null;
+    final tone = errored || unavailable != null
+        ? QuotaTone.neutral
+        : toneForPercent(worst, watch, danger);
 
     return Card(
       child: Padding(
@@ -83,7 +87,7 @@ class _AccountQuotaCardState extends ConsumerState<AccountQuotaCard> {
                     ],
                   ),
                 ),
-                _qualityBadge(account, inactive),
+                _qualityBadge(account, unavailable?.label),
                 if (state.refreshing)
                   const Padding(
                     padding: EdgeInsets.all(6),
@@ -101,11 +105,8 @@ class _AccountQuotaCardState extends ConsumerState<AccountQuotaCard> {
                 account.syncError ?? i18n.common.quota.syncFailed,
                 style: t.bodySmall?.copyWith(color: c.destructive),
               )
-            else if (inactive)
-              Text(
-                i18n.common.quota.noSubscriptionHint,
-                style: t.bodySmall?.copyWith(color: c.mutedForeground),
-              )
+            else if (unavailable != null)
+              Text(unavailable.hint, style: t.bodySmall?.copyWith(color: c.mutedForeground))
             else
               Column(
                 children: [
@@ -209,10 +210,12 @@ class _AccountQuotaCardState extends ConsumerState<AccountQuotaCard> {
     _ => i18n.common.quota.quality.unknown,
   };
 
-  Widget _qualityBadge(QuotaAccount a, bool inactive) {
+  /// [unavailableLabel] replaces the data-quality badge with the neutral
+  /// state of an account that has no reading (see [quotaUnavailableText]).
+  Widget _qualityBadge(QuotaAccount a, String? unavailableLabel) {
     final i18n = Translations.of(context);
-    final quality = inactive ? i18n.common.quota.noSubscription : _qualityLabel(i18n, a.quality);
-    final tone = inactive ? QuotaTone.neutral : toneForQuality(a.quality);
+    final quality = unavailableLabel ?? _qualityLabel(i18n, a.quality);
+    final tone = unavailableLabel != null ? QuotaTone.neutral : toneForQuality(a.quality);
     final color = quotaToneColor(tone);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),

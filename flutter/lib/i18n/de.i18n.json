@@ -1132,6 +1132,10 @@
       "noAgents": "Keine Agents zugewiesen",
       "noSubscription": "Kein Abonnement",
       "noSubscriptionHint": "Der Anbieter meldet keinen aktiven Plan für dieses Konto.",
+      "notInstalled": "Nicht installiert",
+      "notInstalledHint": "Die CLI des Agenten ist auf diesem Server nicht installiert – installiere sie unter {{place}}.",
+      "notLoggedIn": "Nicht angemeldet",
+      "notLoggedInHint": "Der Agent ist auf diesem Server nicht angemeldet – melde dich unter {{place}} an.",
       "quality": {
         "live": "Live",
         "cached": "Zwischengespeichert",

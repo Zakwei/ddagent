@@ -2052,6 +2052,14 @@ export type QuotaWindow = {
   burnRatePerHour: number | null;
 };
 
+/**
+ * Benign reason a quota account has no reading — used by the quota providers
+ * (which classify a failed read) and the quota service (which keeps these out
+ * of the sync-error KPI). The client shows a matching neutral state instead of
+ * a red sync error.
+ */
+export type QuotaUnavailableReason = 'not_installed' | 'not_logged_in' | 'no_subscription';
+
 /** One subscription account (provider + plan + optional nickname) with limits. */
 export type QuotaAccount = {
   /** Stable id, currently the provider key. */
@@ -2081,6 +2089,15 @@ export type QuotaAccount = {
   lastSyncedAt: string | null;
   /** Failure text of the most recent sync attempt, null when it succeeded. */
   syncError: string | null;
+  /**
+   * Why the account has no reading although nothing actually failed: the
+   * agent's CLI is not installed, it is not signed in (credentials missing,
+   * expired or rejected), or the login has no active subscription. Null for
+   * a real sync failure (network, 5xx, parse) and for working accounts.
+   * Optional so readers built before it existed keep type-checking; `status`
+   * is unchanged by it (`error` / `inactive`), so failover keeps its rules.
+   */
+  unavailableReason?: QuotaUnavailableReason | null;
   windows: QuotaWindow[];
   /**
    * Agents/workers currently routed to this account, resolved from the kanban

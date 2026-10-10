@@ -1122,6 +1122,10 @@
       "noAgents": "할당된 에이전트 없음",
       "noSubscription": "구독 없음",
       "noSubscriptionHint": "제공자가 이 계정에 대한 활성 플랜을 보고하지 않습니다.",
+      "notInstalled": "설치되지 않음",
+      "notInstalledHint": "이 서버에 에이전트 CLI가 설치되어 있지 않습니다. {{place}}에서 설치하세요.",
+      "notLoggedIn": "로그인되지 않음",
+      "notLoggedInHint": "이 서버에서 에이전트에 로그인되어 있지 않습니다. {{place}}에서 로그인하세요.",
       "quality": {
         "live": "실시간",
         "cached": "캐시됨",

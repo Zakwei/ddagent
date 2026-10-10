@@ -2007,6 +2007,10 @@ class Translations$common$quota$tr extends Translations$common$quota$en {
 	@override String get noAgents => 'Atanmış agent yok';
 	@override String get noSubscription => 'Abonelik yok';
 	@override String get noSubscriptionHint => 'Sağlayıcı bu hesap için aktif bir plan bildirmiyor.';
+	@override String get notInstalled => 'Yüklü değil';
+	@override String notInstalledHint({required Object place}) => 'Ajanın CLI\'ı bu sunucuda yüklü değil — ${place} bölümünden yükleyin.';
+	@override String get notLoggedIn => 'Oturum açılmadı';
+	@override String notLoggedInHint({required Object place}) => 'Ajan bu sunucuda oturum açmamış — ${place} bölümünden oturum açın.';
 	@override late final Translations$common$quota$quality$tr quality = Translations$common$quota$quality$tr._(_root);
 	@override late final Translations$common$quota$kpi$tr kpi = Translations$common$quota$kpi$tr._(_root);
 	@override late final Translations$common$quota$empty$tr empty = Translations$common$quota$empty$tr._(_root);
@@ -9311,6 +9315,10 @@ extension on TranslationsTr {
 			'common.quota.noAgents' => 'Atanmış agent yok',
 			'common.quota.noSubscription' => 'Abonelik yok',
 			'common.quota.noSubscriptionHint' => 'Sağlayıcı bu hesap için aktif bir plan bildirmiyor.',
+			'common.quota.notInstalled' => 'Yüklü değil',
+			'common.quota.notInstalledHint' => ({required Object place}) => 'Ajanın CLI\'ı bu sunucuda yüklü değil — ${place} bölümünden yükleyin.',
+			'common.quota.notLoggedIn' => 'Oturum açılmadı',
+			'common.quota.notLoggedInHint' => ({required Object place}) => 'Ajan bu sunucuda oturum açmamış — ${place} bölümünden oturum açın.',
 			'common.quota.quality.live' => 'Canlı',
 			'common.quota.quality.cached' => 'Önbellekte',
 			'common.quota.quality.estimate' => 'Tahmin',
@@ -9509,12 +9517,12 @@ extension on TranslationsTr {
 			'common.projectWizard.step2.githubHelp' => 'İsteğe bağlı: bir depoyu klonlamak için GitHub URL\'si gir',
 			'common.projectWizard.step2.githubAuth' => 'GitHub Kimlik Doğrulama (İsteğe Bağlı)',
 			'common.projectWizard.step2.githubAuthHelp' => 'Yalnızca özel depolar için gereklidir. Genel depolar kimlik doğrulama olmadan klonlanabilir.',
+			_ => null,
+		} ?? switch (path) {
 			'common.projectWizard.step2.loadingTokens' => 'Kayıtlı token\'lar yükleniyor...',
 			'common.projectWizard.step2.storedToken' => 'Kayıtlı Token',
 			'common.projectWizard.step2.newToken' => 'Yeni Token',
 			'common.projectWizard.step2.nonePublic' => 'Yok (Genel)',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.step2.selectToken' => 'Token Seç',
 			'common.projectWizard.step2.selectTokenPlaceholder' => '-- Bir token seç --',
 			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
@@ -10023,12 +10031,12 @@ extension on TranslationsTr {
 			'settings.mcp.config' => 'Yapılandırma',
 			'settings.mcp.testConnection' => 'Bağlantıyı Test Et',
 			'settings.mcp.status' => 'Durum',
+			_ => null,
+		} ?? switch (path) {
 			'settings.mcp.connected' => 'Bağlı',
 			'settings.mcp.disconnected' => 'Bağlantı kesildi',
 			'settings.mcp.scope.label' => 'Kapsam',
 			'settings.mcp.scope.user' => 'Kullanıcı',
-			_ => null,
-		} ?? switch (path) {
 			'settings.mcp.scope.project' => 'Proje',
 			'settings.appearance.title' => 'Görünüm',
 			'settings.appearance.theme' => 'Tema',
@@ -10537,12 +10545,12 @@ extension on TranslationsTr {
 			'settings.workspaces.create' => 'Çalışma alanı ekle',
 			'settings.workspaces.deleteConfirm' => 'Bu çalışma alanı DDAgent’tan kaldırılsın mı? Dosyaları diskte kalır.',
 			'settings.workspaces.deleteFailed' => 'Çalışma alanı kaldırılamadı.',
+			_ => null,
+		} ?? switch (path) {
 			'settings.workspaces.deleteTitle' => 'Çalışma alanını kaldır',
 			'settings.workspaces.description' => 'Çalışma alanları, DDAgent’ın sohbet edebildiği, kod çalıştırabildiği ve gezinebildiği dizinlerdir.',
 			'settings.workspaces.remove' => 'Çalışma alanını kaldır',
 			'settings.workspaces.title' => 'Çalışma alanları',
-			_ => null,
-		} ?? switch (path) {
 			'settings.workspaces.pathRequired' => 'Yol gerekli',
 			'settings.stt.title' => 'Sesli giriş (konuşmadan metne)',
 			'settings.stt.description' => 'Whisper uyumlu /audio/transcriptions uç noktası (OpenAI, whisper.cpp, faster-whisper, Speaches). Yazma alanındaki mikrofon düğmesini etkinleştirir.',
@@ -11051,12 +11059,12 @@ extension on TranslationsTr {
 			'tasks.taskDetail.priority' => 'Öncelik',
 			'tasks.taskDetail.priorityNotSet' => 'Ayarlanmadı',
 			'tasks.taskDetail.save' => 'Kaydet',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.status' => 'Durum',
 			'tasks.taskDetail.statusFailed' => 'Görev durumu güncellenemedi',
 			'tasks.taskDetail.taskId' => ({required Object id}) => 'Görev ${id}',
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'Görev ${id}: ${title}',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.testStrategy' => 'Test Stratejisi',
 			'tasks.taskDetail.titleRequired' => 'Başlık gerekli',
 			'tasks.taskDetail.updateFailed' => 'Görev güncellenemedi',
@@ -11565,12 +11573,12 @@ extension on TranslationsTr {
 			'terminal.errors.connectionError' => ({required Object message}) => '[Bağlantı hatası] ${message}',
 			'terminal.loginDialog.title' => ({required Object provider}) => '${provider} CLI Girişi',
 			'terminal.loginDialog.exited' => ({required Object code}) => 'Çıkıldı (${code})',
+			_ => null,
+		} ?? switch (path) {
 			'terminal.loginDialog.authLinkDetected' => 'Kimlik doğrulama bağlantısı algılandı',
 			'terminal.empty.title' => 'Etkin terminal yok',
 			'terminal.empty.description' => 'Başlamak için yeni bir sekme oluşturun',
 			'terminal.overlay.processExited' => 'İşlem sonlandı — yeniden başlatmak için bağlanın',
-			_ => null,
-		} ?? switch (path) {
 			'terminal.overlay.processExitedWithCode' => ({required Object code}) => 'İşlem sonlandı (kod ${code}) — yeniden başlatmak için bağlanın',
 			'terminal.overlay.resumeSession' => ({required Object title}) => '${title} oturumunu sürdür',
 			'terminal.overlay.startSession' => ({required Object path}) => '${path} içinde yeni bir oturum başlat',

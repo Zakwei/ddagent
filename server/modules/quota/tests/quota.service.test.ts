@@ -196,6 +196,25 @@ test('an inactive account keeps unknown quality and is not counted as errored', 
   assert.equal(snapshot.overview.accountsErrored, 0);
 });
 
+test('an agent that is not installed or signed in is not a sync error', async () => {
+  const { providers } = createProviders([
+    [makeAccount({
+      status: 'error',
+      quality: 'unknown',
+      windows: [],
+      syncError: 'missing Codex ChatGPT OAuth token — run codex login',
+      unavailableReason: 'not_logged_in',
+    })],
+  ]);
+  const service = createQuotaService({ providers, now: () => 1_000 });
+
+  const snapshot = await service.getSnapshot();
+
+  assert.equal(snapshot.accounts[0].quality, 'unknown');
+  assert.equal(snapshot.accounts[0].unavailableReason, 'not_logged_in');
+  assert.equal(snapshot.overview.accountsErrored, 0);
+});
+
 test('assigned agents skip backlog and done cards', async () => {
   const { providers } = createProviders([[makeAccount()]]);
   const service = createQuotaService({

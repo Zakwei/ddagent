@@ -2002,6 +2002,10 @@ class Translations$common$quota$zh_TW extends Translations$common$quota$en {
 	@override String get noAgents => '未指派代理';
 	@override String get noSubscription => '無訂閱';
 	@override String get noSubscriptionHint => '提供者未回報此帳戶有有效方案。';
+	@override String get notInstalled => '未安裝';
+	@override String notInstalledHint({required Object place}) => '此伺服器上未安裝該代理的 CLI——請在 ${place} 中安裝。';
+	@override String get notLoggedIn => '未登入';
+	@override String notLoggedInHint({required Object place}) => '該代理在此伺服器上未登入——請在 ${place} 中登入。';
 	@override late final Translations$common$quota$quality$zh_TW quality = Translations$common$quota$quality$zh_TW.internal(_root);
 	@override late final Translations$common$quota$kpi$zh_TW kpi = Translations$common$quota$kpi$zh_TW.internal(_root);
 	@override late final Translations$common$quota$empty$zh_TW empty = Translations$common$quota$empty$zh_TW.internal(_root);
@@ -9305,6 +9309,10 @@ extension on TranslationsZhTw {
 			'common.quota.noAgents' => '未指派代理',
 			'common.quota.noSubscription' => '無訂閱',
 			'common.quota.noSubscriptionHint' => '提供者未回報此帳戶有有效方案。',
+			'common.quota.notInstalled' => '未安裝',
+			'common.quota.notInstalledHint' => ({required Object place}) => '此伺服器上未安裝該代理的 CLI——請在 ${place} 中安裝。',
+			'common.quota.notLoggedIn' => '未登入',
+			'common.quota.notLoggedInHint' => ({required Object place}) => '該代理在此伺服器上未登入——請在 ${place} 中登入。',
 			'common.quota.quality.live' => '即時',
 			'common.quota.quality.cached' => '快取',
 			'common.quota.quality.estimate' => '估計',
@@ -9503,12 +9511,12 @@ extension on TranslationsZhTw {
 			'common.projectWizard.step2.githubHelp' => '選填：提供 GitHub URL 以複製儲存庫',
 			'common.projectWizard.step2.githubAuth' => 'GitHub 身分驗證（選填）',
 			'common.projectWizard.step2.githubAuthHelp' => '僅私有儲存庫需要。公開儲存庫無需身分驗證即可複製。',
+			_ => null,
+		} ?? switch (path) {
 			'common.projectWizard.step2.loadingTokens' => '正在載入已儲存的權杖...',
 			'common.projectWizard.step2.storedToken' => '已儲存的權杖',
 			'common.projectWizard.step2.newToken' => '新權杖',
 			'common.projectWizard.step2.nonePublic' => '無（公開）',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.step2.selectToken' => '選取權杖',
 			'common.projectWizard.step2.selectTokenPlaceholder' => '-- 選取權杖 --',
 			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
@@ -10017,12 +10025,12 @@ extension on TranslationsZhTw {
 			'settings.mcp.config' => '設定',
 			'settings.mcp.testConnection' => '測試連線',
 			'settings.mcp.status' => '狀態',
+			_ => null,
+		} ?? switch (path) {
 			'settings.mcp.connected' => '已連線',
 			'settings.mcp.disconnected' => '未連線',
 			'settings.mcp.scope.label' => '範圍',
 			'settings.mcp.scope.user' => '使用者',
-			_ => null,
-		} ?? switch (path) {
 			'settings.mcp.scope.project' => '專案',
 			'settings.appearance.title' => '外觀',
 			'settings.appearance.theme' => '佈景主題',
@@ -10531,12 +10539,12 @@ extension on TranslationsZhTw {
 			'settings.workspaces.create' => '新增工作區',
 			'settings.workspaces.deleteConfirm' => '從 DDAgent 移除此工作區？檔案將保留在磁碟上。',
 			'settings.workspaces.deleteFailed' => '移除工作區失敗。',
+			_ => null,
+		} ?? switch (path) {
 			'settings.workspaces.deleteTitle' => '移除工作區',
 			'settings.workspaces.description' => '工作區是 DDAgent 可以聊天、執行程式碼和瀏覽的目錄。',
 			'settings.workspaces.remove' => '移除工作區',
 			'settings.workspaces.title' => '工作區',
-			_ => null,
-		} ?? switch (path) {
 			'settings.workspaces.pathRequired' => '路徑為必填項。',
 			'settings.stt.title' => '語音輸入（語音轉文字）',
 			'settings.stt.description' => '相容 Whisper 的 /audio/transcriptions 端點（OpenAI、whisper.cpp、faster-whisper、Speaches）。啟用後，輸入區會出現麥克風按鈕。',
@@ -11045,12 +11053,12 @@ extension on TranslationsZhTw {
 			'tasks.taskDetail.priority' => '優先級',
 			'tasks.taskDetail.priorityNotSet' => '未設定',
 			'tasks.taskDetail.save' => '儲存',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.status' => '狀態',
 			'tasks.taskDetail.statusFailed' => '更新任務狀態失敗',
 			'tasks.taskDetail.taskId' => ({required Object id}) => '任務 ${id}',
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => '任務 ${id}：${title}',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.testStrategy' => '測試策略',
 			'tasks.taskDetail.titleRequired' => '標題為必填項',
 			'tasks.taskDetail.updateFailed' => '更新任務失敗',
@@ -11559,12 +11567,12 @@ extension on TranslationsZhTw {
 			'terminal.errors.connectionError' => ({required Object message}) => '[連線錯誤] ${message}',
 			'terminal.loginDialog.title' => ({required Object provider}) => '${provider} CLI 登入',
 			'terminal.loginDialog.exited' => ({required Object code}) => '已結束（${code}）',
+			_ => null,
+		} ?? switch (path) {
 			'terminal.loginDialog.authLinkDetected' => '偵測到驗證連結',
 			'terminal.empty.title' => '沒有作用中的終端機',
 			'terminal.empty.description' => '建立新分頁以開始',
 			'terminal.overlay.processExited' => '程序已結束 — 連線以重新啟動',
-			_ => null,
-		} ?? switch (path) {
 			'terminal.overlay.processExitedWithCode' => ({required Object code}) => '程序已結束（代碼 ${code}）— 連線以重新啟動',
 			'terminal.overlay.resumeSession' => ({required Object title}) => '繼續工作階段 ${title}',
 			'terminal.overlay.startSession' => ({required Object path}) => '在 ${path} 中開始新的工作階段',

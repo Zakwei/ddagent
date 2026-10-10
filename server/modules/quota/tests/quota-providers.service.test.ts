@@ -520,3 +520,45 @@ test('Claude expired tokens and malformed Codex auth do not trigger network call
   assert.equal(accounts.find((a) => a.provider === 'codex')?.status, 'error');
   assert.match(accounts.find((a) => a.provider === 'claude')?.syncError ?? '', /expired/);
 });
+
+test('a missing login reads as not logged in, or not installed when the CLI is absent', async () => {
+  const build = (installed: boolean) => createQuotaProviders(
+    {
+      homeDirectory: '/home/test',
+      env: { HOME: '/home/test' },
+      readTextFile: () => null,
+      request: async () => httpResponse(200, '{}'),
+    },
+    { isCliInstalled: (provider) => installed && provider !== 'cursor' },
+  );
+
+  const signedOut = await build(true).loadAll();
+  const codex = signedOut.find((a) => a.provider === 'codex')!;
+  assert.equal(codex.status, 'error', 'status keeps failover semantics');
+  assert.equal(codex.unavailableReason, 'not_logged_in');
+  assert.equal(codex.quality, 'unknown', 'not a red sync error');
+  assert.match(codex.syncError ?? '', /codex login/);
+  assert.equal(signedOut.find((a) => a.provider === 'cursor')!.unavailableReason, 'not_installed');
+
+  const notInstalled = await build(false).loadAll();
+  assert.ok(notInstalled.every((a) => a.unavailableReason === 'not_installed'));
+});
+
+test('a rejected login is not logged in, a server failure stays a sync error', async () => {
+  const files = { '/home/test/.local/share/opencode/auth.json': JSON.stringify({ 'opencode-go': { key: 'k' } }) };
+  const load = async (status: number) => (await createQuotaProviders(
+    {
+      homeDirectory: '/home/test',
+      env: { HOME: '/home/test' },
+      readTextFile: (filePath) => files[filePath as keyof typeof files] ?? null,
+      request: async () => httpResponse(status, 'nope'),
+    },
+    { isCliInstalled: () => true },
+  ).loadAll()).find((a) => a.provider === 'opencode')!;
+
+  const rejected = await load(401);
+  assert.equal(rejected.unavailableReason, 'not_logged_in');
+  const broken = await load(500);
+  assert.equal(broken.unavailableReason, null);
+  assert.equal(broken.quality, 'error');
+});

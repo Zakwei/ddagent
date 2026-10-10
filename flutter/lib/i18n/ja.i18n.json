@@ -1122,6 +1122,10 @@
       "noAgents": "割り当てられたエージェントなし",
       "noSubscription": "サブスクリプションなし",
       "noSubscriptionHint": "このアカウントのアクティブなプランはプロバイダーから報告されていません。",
+      "notInstalled": "未インストール",
+      "notInstalledHint": "このサーバーにはエージェントの CLI がインストールされていません。{{place}} でインストールしてください。",
+      "notLoggedIn": "未ログイン",
+      "notLoggedInHint": "このサーバーでエージェントにログインしていません。{{place}} でログインしてください。",
       "quality": {
         "live": "ライブ",
         "cached": "キャッシュ",

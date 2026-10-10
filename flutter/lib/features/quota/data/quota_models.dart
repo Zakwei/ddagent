@@ -67,6 +67,7 @@ class QuotaAccount {
     this.quality = 'unknown',
     this.lastSyncedAt,
     this.syncError,
+    this.unavailableReason,
     this.windows = const [],
     this.assignedAgents = const [],
   });
@@ -81,6 +82,11 @@ class QuotaAccount {
   final String quality; // live | cached | estimate | unknown | error
   final String? lastSyncedAt;
   final String? syncError;
+
+  /// Why there is no reading although nothing failed — `not_installed`,
+  /// `not_logged_in` or `no_subscription`; null for working accounts and real
+  /// sync errors. See [quotaUnavailableReason] for the effective value.
+  final String? unavailableReason;
   final List<QuotaWindow> windows;
   final List<QuotaAssignedAgent> assignedAgents;
 
@@ -95,6 +101,7 @@ class QuotaAccount {
     quality: _str(j['quality']).isEmpty ? 'unknown' : _str(j['quality']),
     lastSyncedAt: _strOrNull(j['lastSyncedAt']),
     syncError: _strOrNull(j['syncError']),
+    unavailableReason: _strOrNull(j['unavailableReason']),
     windows: [
       for (final w in j['windows'] as List? ?? const [])
         if (w is Map) QuotaWindow.fromJson(Map<String, dynamic>.from(w)),
@@ -468,3 +475,9 @@ class QuotaConfig {
     ],
   };
 }
+
+/// Effective reason an account has no reading: the server's
+/// `unavailableReason`, and `no_subscription` for an `inactive` account from
+/// a server that predates the field. Null means working, or a real error.
+String? quotaUnavailableReason(QuotaAccount a) =>
+    a.unavailableReason ?? (a.status == 'inactive' ? 'no_subscription' : null);

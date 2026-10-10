@@ -1,8 +1,15 @@
 import fsSync from 'node:fs';
 import os from 'node:os';
+import path from 'node:path';
 
-import { antigravityCredentialEmail, idTokenEmail, readObjectRecord, readOptionalString } from '@/shared/index.js';
-import type { QuotaAccount, QuotaWindow, QuotaWindowKind } from '@/shared/index.js';
+import {
+  antigravityCredentialEmail,
+  idTokenEmail,
+  providerChildEnv,
+  readObjectRecord,
+  readOptionalString,
+} from '@/shared/index.js';
+import type { QuotaAccount, QuotaUnavailableReason, QuotaWindow, QuotaWindowKind } from '@/shared/index.js';
 
 /** Used by quota provider tests to inject transport and credential reads.
  * Transport dependencies for the provider adapters.
@@ -30,6 +37,66 @@ export type QuotaProviderDependencies = {
     },
   ) => Promise<QuotaHttpResponse>;
 };
+
+/**
+ * A read that found nothing to fail on: the login is missing, expired or
+ * rejected, or it has no subscription. `loadAll` turns it into a neutral
+ * `unavailableReason` instead of a red sync error.
+ */
+class QuotaUnavailableError extends Error {
+  constructor(
+    readonly reason: QuotaUnavailableReason,
+    message: string,
+  ) {
+    super(message);
+  }
+}
+
+const notLoggedIn = (message: string) => new QuotaUnavailableError('not_logged_in', message);
+
+/**
+ * A non-2xx usage response: 401 means the stored login was rejected, 402 that
+ * it has no paid plan; anything else is a real failure.
+ */
+function httpFailure(message: string, status: number): Error {
+  if (status === 401) return new QuotaUnavailableError('not_logged_in', message);
+  if (status === 402) return new QuotaUnavailableError('no_subscription', message);
+  return new Error(message);
+}
+
+/** CLI names each quota section's agent installs as (quota key → binaries). */
+const CLI_NAMES: Record<string, string[]> = {
+  claude: ['claude'],
+  codex: ['codex'],
+  devin: ['devin'],
+  opencode: ['opencode'],
+  cursor: ['cursor-agent'],
+  gemini: ['agy', 'antigravity-cli', 'antigravity'],
+  commandcode: ['command-code', 'cmdc', 'commandcode'],
+};
+
+/**
+ * Whether any of the provider's CLI names is on the PATH agents run with.
+ * A pure filesystem scan (no spawn) — it runs on every quota sweep that hits
+ * a missing login. Unknown providers count as installed.
+ */
+function isCliOnPath(provider: string): boolean {
+  const names = CLI_NAMES[provider];
+  if (!names) return true;
+  const env = providerChildEnv();
+  const extensions = process.platform === 'win32'
+    ? (env.PATHEXT || '.COM;.EXE;.BAT;.CMD').split(';').filter(Boolean)
+    : [''];
+  for (const dir of (env.PATH || '').split(path.delimiter)) {
+    if (!dir) continue;
+    for (const name of names) {
+      for (const extension of extensions) {
+        if (fsSync.existsSync(path.join(dir, `${name}${extension}`))) return true;
+      }
+    }
+  }
+  return false;
+}
 
 /** Used by quota provider tests to supply decoded HTTP responses to adapters. */
 export type QuotaHttpResponse = {
@@ -134,6 +201,7 @@ function inactiveAccount(provider: string, label: string): QuotaAccount {
     status: 'inactive',
     quality: 'unknown',
     syncError: null,
+    unavailableReason: 'no_subscription',
   };
 }
 
@@ -145,16 +213,16 @@ async function fetchClaude(dependencies: QuotaProviderDependencies): Promise<Quo
   const token = readOptionalString(oauth?.accessToken);
   if (!token) {
     if (dependencies.env.ANTHROPIC_API_KEY) return inactiveAccount('claude', 'Claude Code');
-    throw new Error('missing Claude Code OAuth token — run claude /login');
+    throw notLoggedIn('missing Claude Code OAuth token — run claude /login');
   }
   if (typeof oauth?.expiresAt === 'number' && oauth.expiresAt <= Date.now()) {
-    throw new Error('Claude Code OAuth token expired — run claude /login');
+    throw notLoggedIn('Claude Code OAuth token expired — run claude /login');
   }
   const response = await dependencies.request('https://api.anthropic.com/api/oauth/usage', {
     headers: { Authorization: `Bearer ${token}`, 'anthropic-beta': 'oauth-2025-04-20' },
   });
   if (response.status < 200 || response.status >= 300) {
-    throw new Error(`Claude Code usage HTTP ${response.status}`);
+    throw httpFailure(`Claude Code usage HTTP ${response.status}`, response.status);
   }
   const data = readObjectRecord(JSON.parse(response.text)) ?? {};
   const windows: QuotaWindow[] = [];
@@ -213,14 +281,14 @@ async function fetchCodex(dependencies: QuotaProviderDependencies): Promise<Quot
     if (readOptionalString(auth.OPENAI_API_KEY) || auth.auth_mode === 'apikey') {
       return inactiveAccount('codex', 'Codex');
     }
-    throw new Error('missing Codex ChatGPT OAuth token — run codex login');
+    throw notLoggedIn('missing Codex ChatGPT OAuth token — run codex login');
   }
   const headers: Record<string, string> = { Authorization: `Bearer ${token}`, 'User-Agent': 'codex-cli' };
   const accountId = readOptionalString(tokens?.account_id);
   if (accountId) headers['ChatGPT-Account-Id'] = accountId;
   const response = await dependencies.request('https://chatgpt.com/backend-api/wham/usage', { headers });
   if (response.status < 200 || response.status >= 300) {
-    throw new Error(`Codex usage HTTP ${response.status}`);
+    throw httpFailure(`Codex usage HTTP ${response.status}`, response.status);
   }
   const data = readObjectRecord(JSON.parse(response.text)) ?? {};
   const limits = readObjectRecord(data.rate_limit);
@@ -352,7 +420,7 @@ async function fetchDevin(dependencies: QuotaProviderDependencies): Promise<Quot
   const credentials = dependencies.readTextFile(`${dataDir}/credentials.toml`);
   const key = readTomlValue(credentials, 'windsurf_api_key');
   if (!key) {
-    throw new Error('missing windsurf_api_key in credentials.toml');
+    throw notLoggedIn('missing windsurf_api_key in credentials.toml');
   }
 
   const headers = {
@@ -373,7 +441,7 @@ async function fetchDevin(dependencies: QuotaProviderDependencies): Promise<Quot
       .catch(() => null),
   ]);
   if (response.status < 200 || response.status >= 300) {
-    throw new Error(`HTTP ${response.status}: ${response.text.slice(0, 160)}`);
+    throw httpFailure(`HTTP ${response.status}: ${response.text.slice(0, 160)}`, response.status);
   }
 
   const top = walkProto(response.buffer);
@@ -420,7 +488,7 @@ async function fetchOpenCode(dependencies: QuotaProviderDependencies): Promise<Q
   const auth = authText ? (JSON.parse(authText) as Record<string, { key?: string }>) : null;
   const key = auth?.['opencode-go']?.key;
   if (!key) {
-    throw new Error('missing opencode-go key in auth.json');
+    throw notLoggedIn('missing opencode-go key in auth.json');
   }
 
   const response = await dependencies.request('https://opencode.ai/zen/go/v1/usage', {
@@ -435,7 +503,7 @@ async function fetchOpenCode(dependencies: QuotaProviderDependencies): Promise<Q
         syncError: null,
       };
     }
-    throw new Error(`HTTP ${response.status}: ${response.text.slice(0, 160)}`);
+    throw httpFailure(`HTTP ${response.status}: ${response.text.slice(0, 160)}`, response.status);
   }
 
   const data = JSON.parse(response.text) as {
@@ -491,11 +559,11 @@ async function fetchCursor(dependencies: QuotaProviderDependencies): Promise<Quo
   const accessToken = readOptionalString(auth.accessToken);
   if (!accessToken) {
     if (dependencies.env.CURSOR_API_KEY) return inactiveAccount('cursor', 'Cursor');
-    throw new Error(`missing Cursor session — ${CURSOR_LOGIN_HINT}`);
+    throw notLoggedIn(`missing Cursor session — ${CURSOR_LOGIN_HINT}`);
   }
   const jwt = cursorJwtPayload(accessToken);
   if (typeof jwt?.exp === 'number' && jwt.exp * 1000 <= Date.now()) {
-    throw new Error(`Cursor session expired — ${CURSOR_LOGIN_HINT}`);
+    throw notLoggedIn(`Cursor session expired — ${CURSOR_LOGIN_HINT}`);
   }
   const userId = (readOptionalString(jwt?.sub) ?? '').split('|').pop() ?? '';
   const response = await dependencies.request(CURSOR_USAGE_URL, {
@@ -507,7 +575,7 @@ async function fetchCursor(dependencies: QuotaProviderDependencies): Promise<Quo
   });
   if (response.status < 200 || response.status >= 300) {
     if (response.status === 401 || response.status === 403) {
-      throw new Error(`Cursor session expired — ${CURSOR_LOGIN_HINT}`);
+      throw notLoggedIn(`Cursor session expired — ${CURSOR_LOGIN_HINT}`);
     }
     throw new Error(`Cursor usage HTTP ${response.status}`);
   }
@@ -578,7 +646,7 @@ async function refreshAgyToken(
   const refreshToken = credentials?.token?.refresh_token;
   const expiredError = 'Antigravity CLI OAuth token expired — run `agy` to refresh it';
   if (!refreshToken) {
-    throw new Error(expiredError);
+    throw notLoggedIn(expiredError);
   }
   const response = await dependencies.request(AGY_OAUTH_TOKEN_URL, {
     method: 'POST',
@@ -594,7 +662,7 @@ async function refreshAgyToken(
     ? (JSON.parse(response.text) as { access_token?: string; refresh_token?: string; expires_in?: number })
     : null;
   if (!payload?.access_token) {
-    throw new Error(expiredError);
+    throw notLoggedIn(expiredError);
   }
   try {
     dependencies.writeTextFile?.(tokenPath, JSON.stringify({
@@ -619,7 +687,7 @@ async function fetchGemini(dependencies: QuotaProviderDependencies): Promise<Quo
   const credentials = tokenText ? (JSON.parse(tokenText) as AgyCredentials) : null;
   let accessToken = credentials?.token?.access_token;
   if (!accessToken && !credentials?.token?.refresh_token) {
-    throw new Error('Missing Antigravity CLI OAuth token — run `agy` to sign in');
+    throw notLoggedIn('Missing Antigravity CLI OAuth token — run `agy` to sign in');
   }
   const expiry = credentials?.token?.expiry ? Date.parse(credentials.token.expiry) : Number.POSITIVE_INFINITY;
   if (!accessToken || expiry <= Date.now()) {
@@ -751,7 +819,7 @@ function resolveCommandCodeKey(dependencies: QuotaProviderDependencies): string 
 async function fetchCommandCode(dependencies: QuotaProviderDependencies): Promise<QuotaAccount> {
   const key = resolveCommandCodeKey(dependencies);
   if (!key) {
-    throw new Error('missing CommandCode API key');
+    throw notLoggedIn('missing CommandCode API key');
   }
   const headers = { Authorization: `Bearer ${key}`, 'x-api-key': key };
   const [creditsResponse, subscriptionsResponse, whoamiResponse] = await Promise.all([
@@ -764,7 +832,7 @@ async function fetchCommandCode(dependencies: QuotaProviderDependencies): Promis
       .catch(() => null),
   ]);
   if (creditsResponse.status < 200 || creditsResponse.status >= 300) {
-    throw new Error(`HTTP ${creditsResponse.status}: ${creditsResponse.text.slice(0, 160)}`);
+    throw httpFailure(`HTTP ${creditsResponse.status}: ${creditsResponse.text.slice(0, 160)}`, creditsResponse.status);
   }
 
   const credits = JSON.parse(creditsResponse.text) as {
@@ -848,8 +916,27 @@ export function createQuotaProviders(
       label: string;
       envOverrides: Record<string, string>;
     }>;
+    /** Whether the provider's CLI is installed; tests inject it, production scans PATH. */
+    isCliInstalled?: (provider: string) => boolean;
   } = {},
 ) {
+  const isCliInstalled = options.isCliInstalled ?? isCliOnPath;
+
+  /**
+   * Account shell for a read that threw. A missing login of an agent whose
+   * CLI is not even installed reads as `not_installed`; other benign reasons
+   * stay neutral (`quality: unknown`); anything else is a sync error.
+   */
+  function failedAccount(provider: string, providerLabel: string, error: unknown): QuotaAccount {
+    const message = error instanceof Error ? error.message : String(error);
+    const shell = account(provider, providerLabel, providerLabel, '', []);
+    if (!(error instanceof QuotaUnavailableError)) {
+      return { ...shell, status: 'error', quality: 'error', syncError: message, unavailableReason: null };
+    }
+    const reason = error.reason === 'not_logged_in' && !isCliInstalled(provider) ? 'not_installed' : error.reason;
+    return { ...shell, status: 'error', quality: 'unknown', syncError: message, unavailableReason: reason };
+  }
+
   const dependencies: QuotaProviderDependencies = {
     homeDirectory: os.homedir(),
     env: process.env,
@@ -894,9 +981,7 @@ export function createQuotaProviders(
         try {
           return await adapter.load(dependencies);
         } catch (error) {
-          const message = error instanceof Error ? error.message : String(error);
-          const shell = account(adapter.provider, adapter.providerLabel, adapter.providerLabel, '', []);
-          return { ...shell, status: 'error' as const, quality: 'error' as const, syncError: message };
+          return failedAccount(adapter.provider, adapter.providerLabel, error);
         }
       });
 
@@ -921,16 +1006,11 @@ export function createQuotaProviders(
             const loaded = await adapter.load(accountDeps);
             return { ...loaded, id: row.id, accountId: row.id, accountLabel: row.label };
           } catch (error) {
-            const message = error instanceof Error ? error.message : String(error);
-            const shell = account(adapter.provider, adapter.providerLabel, adapter.providerLabel, '', []);
             return {
-              ...shell,
+              ...failedAccount(adapter.provider, adapter.providerLabel, error),
               id: row.id,
               accountId: row.id,
               accountLabel: row.label,
-              status: 'error' as const,
-              quality: 'error' as const,
-              syncError: message,
             };
           }
         })());

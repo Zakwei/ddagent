@@ -1132,6 +1132,10 @@
       "noAgents": "No agents assigned",
       "noSubscription": "No subscription",
       "noSubscriptionHint": "The provider reports no active plan for this account.",
+      "notInstalled": "Not installed",
+      "notInstalledHint": "The agent's CLI is not installed on this server — install it in {{place}}.",
+      "notLoggedIn": "Not signed in",
+      "notLoggedInHint": "The agent is not signed in on this server — sign in in {{place}}.",
       "quality": {
         "live": "Live",
         "cached": "Cached",

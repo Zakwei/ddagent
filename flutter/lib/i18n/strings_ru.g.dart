@@ -2034,6 +2034,10 @@ class Translations$common$quota$ru extends Translations$common$quota$en {
 	@override String get noAgents => 'Нет назначенных агентов';
 	@override String get noSubscription => 'Нет подписки';
 	@override String get noSubscriptionHint => 'Провайдер не сообщает об активном плане для этого аккаунта.';
+	@override String get notInstalled => 'Не установлен';
+	@override String notInstalledHint({required Object place}) => 'CLI агента не установлен на этом сервере — установите его в разделе ${place}.';
+	@override String get notLoggedIn => 'Вход не выполнен';
+	@override String notLoggedInHint({required Object place}) => 'Агент не авторизован на этом сервере — войдите в разделе ${place}.';
 	@override late final Translations$common$quota$quality$ru quality = Translations$common$quota$quality$ru._(_root);
 	@override late final Translations$common$quota$kpi$ru kpi = Translations$common$quota$kpi$ru._(_root);
 	@override late final Translations$common$quota$empty$ru empty = Translations$common$quota$empty$ru._(_root);
@@ -9354,6 +9358,10 @@ extension on TranslationsRu {
 			'common.quota.noAgents' => 'Нет назначенных агентов',
 			'common.quota.noSubscription' => 'Нет подписки',
 			'common.quota.noSubscriptionHint' => 'Провайдер не сообщает об активном плане для этого аккаунта.',
+			'common.quota.notInstalled' => 'Не установлен',
+			'common.quota.notInstalledHint' => ({required Object place}) => 'CLI агента не установлен на этом сервере — установите его в разделе ${place}.',
+			'common.quota.notLoggedIn' => 'Вход не выполнен',
+			'common.quota.notLoggedInHint' => ({required Object place}) => 'Агент не авторизован на этом сервере — войдите в разделе ${place}.',
 			'common.quota.quality.live' => 'Live',
 			'common.quota.quality.cached' => 'Кэшировано',
 			'common.quota.quality.estimate' => 'Оценка',
@@ -9552,12 +9560,12 @@ extension on TranslationsRu {
 			'common.projectWizard.step2.githubHelp' => 'Необязательно: укажите URL GitHub для клонирования репозитория',
 			'common.projectWizard.step2.githubAuth' => 'Аутентификация GitHub (необязательно)',
 			'common.projectWizard.step2.githubAuthHelp' => 'Требуется только для приватных репозиториев. Публичные репозитории можно клонировать без аутентификации.',
+			_ => null,
+		} ?? switch (path) {
 			'common.projectWizard.step2.loadingTokens' => 'Загрузка сохраненных токенов...',
 			'common.projectWizard.step2.storedToken' => 'Сохраненный токен',
 			'common.projectWizard.step2.newToken' => 'Новый токен',
 			'common.projectWizard.step2.nonePublic' => 'Нет (публичный)',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.step2.selectToken' => 'Выбрать токен',
 			'common.projectWizard.step2.selectTokenPlaceholder' => '-- Выберите токен --',
 			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
@@ -10066,12 +10074,12 @@ extension on TranslationsRu {
 			'settings.mcp.config' => 'Конфигурация',
 			'settings.mcp.testConnection' => 'Проверить подключение',
 			'settings.mcp.status' => 'Статус',
+			_ => null,
+		} ?? switch (path) {
 			'settings.mcp.connected' => 'Подключен',
 			'settings.mcp.disconnected' => 'Отключен',
 			'settings.mcp.scope.label' => 'Область',
 			'settings.mcp.scope.user' => 'Пользователь',
-			_ => null,
-		} ?? switch (path) {
 			'settings.mcp.scope.project' => 'Проект',
 			'settings.appearance.title' => 'Внешний вид',
 			'settings.appearance.theme' => 'Тема',
@@ -10580,12 +10588,12 @@ extension on TranslationsRu {
 			'settings.workspaces.create' => 'Добавить рабочую область',
 			'settings.workspaces.deleteConfirm' => 'Удалить эту рабочую область из DDAgent? Её файлы останутся на диске.',
 			'settings.workspaces.deleteFailed' => 'Не удалось удалить рабочую область.',
+			_ => null,
+		} ?? switch (path) {
 			'settings.workspaces.deleteTitle' => 'Удалить рабочую область',
 			'settings.workspaces.description' => 'Рабочие области — каталоги, в которых DDAgent может вести чаты, запускать код и просматривать файлы.',
 			'settings.workspaces.remove' => 'Удалить рабочую область',
 			'settings.workspaces.title' => 'Рабочие области',
-			_ => null,
-		} ?? switch (path) {
 			'settings.workspaces.pathRequired' => 'Требуется путь',
 			'settings.stt.title' => 'Голосовой ввод (распознавание речи)',
 			'settings.stt.description' => 'Whisper-совместимая конечная точка /audio/transcriptions (OpenAI, whisper.cpp, faster-whisper, Speaches). Включает кнопку микрофона в поле ввода.',
@@ -11094,12 +11102,12 @@ extension on TranslationsRu {
 			'tasks.taskDetail.priority' => 'Приоритет',
 			'tasks.taskDetail.priorityNotSet' => 'Не задан',
 			'tasks.taskDetail.save' => 'Сохранить',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.status' => 'Статус',
 			'tasks.taskDetail.statusFailed' => 'Не удалось обновить статус задачи',
 			'tasks.taskDetail.taskId' => ({required Object id}) => 'Задача ${id}',
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'Задача ${id}: ${title}',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.testStrategy' => 'Стратегия тестирования',
 			'tasks.taskDetail.titleRequired' => 'Название обязательно',
 			'tasks.taskDetail.updateFailed' => 'Не удалось обновить задачу',
@@ -11608,12 +11616,12 @@ extension on TranslationsRu {
 			'terminal.errors.connectionError' => ({required Object message}) => '[Ошибка подключения] ${message}',
 			'terminal.loginDialog.title' => ({required Object provider}) => 'Вход в ${provider} CLI',
 			'terminal.loginDialog.exited' => ({required Object code}) => 'Завершено (${code})',
+			_ => null,
+		} ?? switch (path) {
 			'terminal.loginDialog.authLinkDetected' => 'Обнаружена ссылка для аутентификации',
 			'terminal.empty.title' => 'Нет активного терминала',
 			'terminal.empty.description' => 'Создайте новую вкладку, чтобы начать',
 			'terminal.overlay.processExited' => 'Процесс завершён — подключитесь, чтобы запустить его снова',
-			_ => null,
-		} ?? switch (path) {
 			'terminal.overlay.processExitedWithCode' => ({required Object code}) => 'Процесс завершён (код ${code}) — подключитесь, чтобы запустить его снова',
 			'terminal.overlay.resumeSession' => ({required Object title}) => 'Возобновить сеанс ${title}',
 			'terminal.overlay.startSession' => ({required Object path}) => 'Начать новый сеанс в ${path}',

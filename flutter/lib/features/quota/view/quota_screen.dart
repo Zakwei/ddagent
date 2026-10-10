@@ -11,6 +11,7 @@ import 'package:ddagent_app/features/quota/state/quota_controller.dart';
 import 'package:ddagent_app/features/quota/view/account_quota_card.dart';
 import 'package:ddagent_app/features/quota/view/quota_charts.dart';
 import 'package:ddagent_app/features/quota/view/quota_tone.dart';
+import 'package:ddagent_app/features/quota/view/quota_unavailable.dart';
 import 'package:ddagent_app/features/quota/view/quota_usage_panel.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
@@ -601,7 +602,9 @@ class _AccountLimitRow extends StatelessWidget {
     final t = Theme.of(context).textTheme;
     final i18n = Translations.of(context);
     final w = window;
-    final tone = account.status == 'error'
+    final unavailable = quotaUnavailableText(i18n, account);
+    final errored = account.status == 'error' && unavailable == null;
+    final tone = errored
         ? QuotaTone.danger
         : w != null
         ? toneForPercent(w.percent, watch, danger)
@@ -636,7 +639,7 @@ class _AccountLimitRow extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            if (account.status == 'error')
+            if (errored)
               Text(
                 i18n.common.quota.quality.error,
                 style: t.bodySmall?.copyWith(
@@ -644,11 +647,8 @@ class _AccountLimitRow extends StatelessWidget {
                   fontFeatures: const [FontFeature.tabularFigures()],
                 ),
               )
-            else if (account.status == 'inactive')
-              Text(
-                i18n.common.quota.noSubscription,
-                style: t.bodySmall?.copyWith(color: c.mutedForeground),
-              )
+            else if (unavailable != null)
+              Text(unavailable.label, style: t.bodySmall?.copyWith(color: c.mutedForeground))
             else if (w != null)
               Text(
                 '${w.percent.toStringAsFixed(0)}% · ${formatRelativeTo(w.resetsAt)}',
@@ -665,7 +665,9 @@ class _AccountLimitRow extends StatelessWidget {
           child: SizedBox(
             height: 6,
             child: LinearProgressIndicator(
-              value: account.status == 'error' || w == null ? 0 : (w.percent / 100).clamp(0.0, 1.0),
+              value: account.status == 'error' || unavailable != null || w == null
+                  ? 0
+                  : (w.percent / 100).clamp(0.0, 1.0),
               color: quotaToneColor(tone),
               backgroundColor: c.muted,
             ),

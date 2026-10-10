@@ -593,6 +593,45 @@ void main() {
       expect(repo.calls, contains('history:codex'));
     });
 
+    testWidgets('agent bez instalacji lub logowania: neutralny stan zamiast błędu', (t) async {
+      final repo = _FakeQuotaRepo();
+      repo.snapshotJson = {
+        'accounts': [
+          {
+            'id': 'codex',
+            'provider': 'codex',
+            'providerLabel': 'Codex',
+            'plan': 'Codex',
+            'status': 'error',
+            'quality': 'unknown',
+            'syncError': 'missing Codex ChatGPT OAuth token — run codex login',
+            'unavailableReason': 'not_logged_in',
+            'windows': <dynamic>[],
+          },
+          {
+            'id': 'cursor',
+            'provider': 'cursor',
+            'providerLabel': 'Cursor',
+            'plan': 'Cursor',
+            'status': 'error',
+            'quality': 'unknown',
+            'syncError': 'missing Cursor session — run cursor-agent login',
+            'unavailableReason': 'not_installed',
+            'windows': <dynamic>[],
+          },
+        ],
+      };
+      await _pumpScreen(t, repo);
+      await _switchNav(t, 'Quotas');
+
+      expect(find.text('NOT SIGNED IN'), findsOneWidget);
+      expect(find.text('NOT INSTALLED'), findsOneWidget);
+      expect(find.textContaining('sign in in Settings → Agents'), findsOneWidget);
+      expect(find.textContaining('install it in Settings → Agents'), findsOneWidget);
+      expect(find.text('ERROR'), findsNothing);
+      expect(find.textContaining('run codex login'), findsNothing);
+    });
+
     testWidgets('karty kont: provider, plan, window, agenci oraz gating subskrypcyjny', (t) async {
       final repo = _FakeQuotaRepo();
       await _pumpScreen(t, repo);

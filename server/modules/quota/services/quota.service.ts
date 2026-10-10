@@ -205,7 +205,8 @@ export function createQuotaService(dependencies: QuotaServiceDependencies) {
       accountsAtRisk: accounts.filter((entry) =>
         entry.windows.some((window) => window.percent >= config.watchThreshold),
       ).length,
-      accountsErrored: accounts.filter((entry) => entry.status === 'error').length,
+      // A missing install/login/plan is a state to show, not a failed sync.
+      accountsErrored: accounts.filter((entry) => entry.status === 'error' && !entry.unavailableReason).length,
       windowsAtRisk: windows.filter((window) => window.projectedExhaustionAt !== null).length,
       nextResetAt: resetTimes.length > 0 ? new Date(Math.min(...resetTimes)).toISOString() : null,
       watchThreshold: config.watchThreshold,
@@ -276,7 +277,9 @@ export function createQuotaService(dependencies: QuotaServiceDependencies) {
 
       const accounts: QuotaAccount[] = cache!.accounts.map((entry) => ({
         ...entry,
-        quality: entry.status === 'error' ? 'error' : entry.status === 'inactive' ? 'unknown' : quality,
+        quality: entry.unavailableReason || entry.status === 'inactive'
+          ? 'unknown'
+          : entry.status === 'error' ? 'error' : quality,
         assignedAgents: assignedAgentsFor(entry, cards, providerToAccount),
       }));
 

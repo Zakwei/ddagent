@@ -1132,6 +1132,10 @@
       "noAgents": "Aucun agent assigné",
       "noSubscription": "Aucun abonnement",
       "noSubscriptionHint": "Le fournisseur ne signale aucun forfait actif pour ce compte.",
+      "notInstalled": "Non installé",
+      "notInstalledHint": "La CLI de l'agent n'est pas installée sur ce serveur — installez-la dans {{place}}.",
+      "notLoggedIn": "Non connecté",
+      "notLoggedInHint": "L'agent n'est pas connecté sur ce serveur — connectez-vous dans {{place}}.",
       "quality": {
         "live": "En direct",
         "cached": "En cache",

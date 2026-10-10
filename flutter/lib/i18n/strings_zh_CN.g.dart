@@ -2002,6 +2002,10 @@ class Translations$common$quota$zh_CN extends Translations$common$quota$en {
 	@override String get noAgents => '未分配代理';
 	@override String get noSubscription => '无订阅';
 	@override String get noSubscriptionHint => '提供商未报告此账户有有效套餐。';
+	@override String get notInstalled => '未安装';
+	@override String notInstalledHint({required Object place}) => '此服务器上未安装该代理的 CLI——请在 ${place} 中安装。';
+	@override String get notLoggedIn => '未登录';
+	@override String notLoggedInHint({required Object place}) => '该代理在此服务器上未登录——请在 ${place} 中登录。';
 	@override late final Translations$common$quota$quality$zh_CN quality = Translations$common$quota$quality$zh_CN.internal(_root);
 	@override late final Translations$common$quota$kpi$zh_CN kpi = Translations$common$quota$kpi$zh_CN.internal(_root);
 	@override late final Translations$common$quota$empty$zh_CN empty = Translations$common$quota$empty$zh_CN.internal(_root);
@@ -9305,6 +9309,10 @@ extension on TranslationsZhCn {
 			'common.quota.noAgents' => '未分配代理',
 			'common.quota.noSubscription' => '无订阅',
 			'common.quota.noSubscriptionHint' => '提供商未报告此账户有有效套餐。',
+			'common.quota.notInstalled' => '未安装',
+			'common.quota.notInstalledHint' => ({required Object place}) => '此服务器上未安装该代理的 CLI——请在 ${place} 中安装。',
+			'common.quota.notLoggedIn' => '未登录',
+			'common.quota.notLoggedInHint' => ({required Object place}) => '该代理在此服务器上未登录——请在 ${place} 中登录。',
 			'common.quota.quality.live' => '实时',
 			'common.quota.quality.cached' => '缓存',
 			'common.quota.quality.estimate' => '估计',
@@ -9503,12 +9511,12 @@ extension on TranslationsZhCn {
 			'common.projectWizard.step2.githubHelp' => '可选：提供 GitHub URL 以克隆仓库',
 			'common.projectWizard.step2.githubAuth' => 'GitHub 身份验证（可选）',
 			'common.projectWizard.step2.githubAuthHelp' => '仅私有仓库需要。公共仓库无需身份验证即可克隆。',
+			_ => null,
+		} ?? switch (path) {
 			'common.projectWizard.step2.loadingTokens' => '正在加载已保存的令牌...',
 			'common.projectWizard.step2.storedToken' => '已保存的令牌',
 			'common.projectWizard.step2.newToken' => '新令牌',
 			'common.projectWizard.step2.nonePublic' => '无（公共）',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.step2.selectToken' => '选择令牌',
 			'common.projectWizard.step2.selectTokenPlaceholder' => '-- 选择令牌 --',
 			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
@@ -10017,12 +10025,12 @@ extension on TranslationsZhCn {
 			'settings.mcp.config' => '配置',
 			'settings.mcp.testConnection' => '测试连接',
 			'settings.mcp.status' => '状态',
+			_ => null,
+		} ?? switch (path) {
 			'settings.mcp.connected' => '已连接',
 			'settings.mcp.disconnected' => '未连接',
 			'settings.mcp.scope.label' => '范围',
 			'settings.mcp.scope.user' => '用户',
-			_ => null,
-		} ?? switch (path) {
 			'settings.mcp.scope.project' => '项目',
 			'settings.appearance.title' => '外观',
 			'settings.appearance.theme' => '主题',
@@ -10531,12 +10539,12 @@ extension on TranslationsZhCn {
 			'settings.workspaces.create' => '添加工作区',
 			'settings.workspaces.deleteConfirm' => '从 DDAgent 移除此工作区？文件将保留在磁盘上。',
 			'settings.workspaces.deleteFailed' => '移除工作区失败。',
+			_ => null,
+		} ?? switch (path) {
 			'settings.workspaces.deleteTitle' => '移除工作区',
 			'settings.workspaces.description' => '工作区是 DDAgent 可以聊天、运行代码和浏览的目录。',
 			'settings.workspaces.remove' => '移除工作区',
 			'settings.workspaces.title' => '工作区',
-			_ => null,
-		} ?? switch (path) {
 			'settings.workspaces.pathRequired' => '路径为必填项',
 			'settings.stt.title' => '语音输入（语音转文字）',
 			'settings.stt.description' => '兼容 Whisper 的 /audio/transcriptions 端点（OpenAI、whisper.cpp、faster-whisper、Speaches）。启用后输入框中会显示麦克风按钮。',
@@ -11045,12 +11053,12 @@ extension on TranslationsZhCn {
 			'tasks.taskDetail.priority' => '优先级',
 			'tasks.taskDetail.priorityNotSet' => '未设置',
 			'tasks.taskDetail.save' => '保存',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.status' => '状态',
 			'tasks.taskDetail.statusFailed' => '更新任务状态失败',
 			'tasks.taskDetail.taskId' => ({required Object id}) => '任务 ${id}',
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => '任务 ${id}：${title}',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.testStrategy' => '测试策略',
 			'tasks.taskDetail.titleRequired' => '标题为必填项',
 			'tasks.taskDetail.updateFailed' => '更新任务失败',
@@ -11559,12 +11567,12 @@ extension on TranslationsZhCn {
 			'terminal.errors.connectionError' => ({required Object message}) => '[连接错误] ${message}',
 			'terminal.loginDialog.title' => ({required Object provider}) => '${provider} CLI 登录',
 			'terminal.loginDialog.exited' => ({required Object code}) => '已退出（${code}）',
+			_ => null,
+		} ?? switch (path) {
 			'terminal.loginDialog.authLinkDetected' => '检测到认证链接',
 			'terminal.empty.title' => '没有活动终端',
 			'terminal.empty.description' => '新建标签页以开始',
 			'terminal.overlay.processExited' => '进程已退出 — 连接以重新启动',
-			_ => null,
-		} ?? switch (path) {
 			'terminal.overlay.processExitedWithCode' => ({required Object code}) => '进程已退出（代码 ${code}）— 连接以重新启动',
 			'terminal.overlay.resumeSession' => ({required Object title}) => '恢复会话 ${title}',
 			'terminal.overlay.startSession' => ({required Object path}) => '在 ${path} 中开始新会话',

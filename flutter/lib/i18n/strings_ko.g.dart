@@ -2002,6 +2002,10 @@ class Translations$common$quota$ko extends Translations$common$quota$en {
 	@override String get noAgents => '할당된 에이전트 없음';
 	@override String get noSubscription => '구독 없음';
 	@override String get noSubscriptionHint => '제공자가 이 계정에 대한 활성 플랜을 보고하지 않습니다.';
+	@override String get notInstalled => '설치되지 않음';
+	@override String notInstalledHint({required Object place}) => '이 서버에 에이전트 CLI가 설치되어 있지 않습니다. ${place}에서 설치하세요.';
+	@override String get notLoggedIn => '로그인되지 않음';
+	@override String notLoggedInHint({required Object place}) => '이 서버에서 에이전트에 로그인되어 있지 않습니다. ${place}에서 로그인하세요.';
 	@override late final Translations$common$quota$quality$ko quality = Translations$common$quota$quality$ko._(_root);
 	@override late final Translations$common$quota$kpi$ko kpi = Translations$common$quota$kpi$ko._(_root);
 	@override late final Translations$common$quota$empty$ko empty = Translations$common$quota$empty$ko._(_root);
@@ -9305,6 +9309,10 @@ extension on TranslationsKo {
 			'common.quota.noAgents' => '할당된 에이전트 없음',
 			'common.quota.noSubscription' => '구독 없음',
 			'common.quota.noSubscriptionHint' => '제공자가 이 계정에 대한 활성 플랜을 보고하지 않습니다.',
+			'common.quota.notInstalled' => '설치되지 않음',
+			'common.quota.notInstalledHint' => ({required Object place}) => '이 서버에 에이전트 CLI가 설치되어 있지 않습니다. ${place}에서 설치하세요.',
+			'common.quota.notLoggedIn' => '로그인되지 않음',
+			'common.quota.notLoggedInHint' => ({required Object place}) => '이 서버에서 에이전트에 로그인되어 있지 않습니다. ${place}에서 로그인하세요.',
 			'common.quota.quality.live' => '실시간',
 			'common.quota.quality.cached' => '캐시됨',
 			'common.quota.quality.estimate' => '추정',
@@ -9503,12 +9511,12 @@ extension on TranslationsKo {
 			'common.projectWizard.step2.githubHelp' => '선택사항: 저장소를 clone하려면 GitHub URL을 입력하세요',
 			'common.projectWizard.step2.githubAuth' => 'GitHub 인증 (선택사항)',
 			'common.projectWizard.step2.githubAuthHelp' => '비공개 저장소에만 필요합니다. 공개 저장소는 인증 없이 clone할 수 있습니다.',
+			_ => null,
+		} ?? switch (path) {
 			'common.projectWizard.step2.loadingTokens' => '저장된 토큰 로딩 중...',
 			'common.projectWizard.step2.storedToken' => '저장된 토큰',
 			'common.projectWizard.step2.newToken' => '새 토큰',
 			'common.projectWizard.step2.nonePublic' => '없음 (공개)',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.step2.selectToken' => '토큰 선택',
 			'common.projectWizard.step2.selectTokenPlaceholder' => '-- 토큰 선택 --',
 			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
@@ -10017,12 +10025,12 @@ extension on TranslationsKo {
 			'settings.mcp.config' => '설정',
 			'settings.mcp.testConnection' => '연결 테스트',
 			'settings.mcp.status' => '상태',
+			_ => null,
+		} ?? switch (path) {
 			'settings.mcp.connected' => '연결됨',
 			'settings.mcp.disconnected' => '연결 끊김',
 			'settings.mcp.scope.label' => '범위',
 			'settings.mcp.scope.user' => '사용자',
-			_ => null,
-		} ?? switch (path) {
 			'settings.mcp.scope.project' => '프로젝트',
 			'settings.appearance.title' => '외관',
 			'settings.appearance.theme' => '테마',
@@ -10531,12 +10539,12 @@ extension on TranslationsKo {
 			'settings.workspaces.create' => '작업 영역 추가',
 			'settings.workspaces.deleteConfirm' => '이 작업 영역을 DDAgent에서 제거하시겠습니까? 파일은 디스크에 남습니다.',
 			'settings.workspaces.deleteFailed' => '작업 영역 제거에 실패했습니다.',
+			_ => null,
+		} ?? switch (path) {
 			'settings.workspaces.deleteTitle' => '작업 영역 제거',
 			'settings.workspaces.description' => '작업 영역은 DDAgent가 채팅하고, 코드를 실행하고, 탐색할 수 있는 디렉터리입니다.',
 			'settings.workspaces.remove' => '작업 영역 제거',
 			'settings.workspaces.title' => '작업 영역',
-			_ => null,
-		} ?? switch (path) {
 			'settings.workspaces.pathRequired' => '경로는 필수입니다',
 			'settings.stt.title' => '음성 입력 (음성 인식)',
 			'settings.stt.description' => 'Whisper 호환 /audio/transcriptions 엔드포인트 (OpenAI, whisper.cpp, faster-whisper, Speaches). 입력창의 마이크 버튼을 활성화합니다.',
@@ -11045,12 +11053,12 @@ extension on TranslationsKo {
 			'tasks.taskDetail.priority' => '우선순위',
 			'tasks.taskDetail.priorityNotSet' => '설정되지 않음',
 			'tasks.taskDetail.save' => '저장',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.status' => '상태',
 			'tasks.taskDetail.statusFailed' => '작업 상태 업데이트 실패',
 			'tasks.taskDetail.taskId' => ({required Object id}) => '작업 ${id}',
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => '작업 ${id}: ${title}',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.testStrategy' => '테스트 전략',
 			'tasks.taskDetail.titleRequired' => '제목은 필수입니다',
 			'tasks.taskDetail.updateFailed' => '작업 업데이트 실패',
@@ -11559,12 +11567,12 @@ extension on TranslationsKo {
 			'terminal.errors.connectionError' => ({required Object message}) => '[연결 오류] ${message}',
 			'terminal.loginDialog.title' => ({required Object provider}) => '${provider} CLI 로그인',
 			'terminal.loginDialog.exited' => ({required Object code}) => '종료됨 (${code})',
+			_ => null,
+		} ?? switch (path) {
 			'terminal.loginDialog.authLinkDetected' => '인증 링크가 감지되었습니다',
 			'terminal.empty.title' => '활성 터미널 없음',
 			'terminal.empty.description' => '시작하려면 새 탭을 만드세요',
 			'terminal.overlay.processExited' => '프로세스가 종료되었습니다 — 연결하면 다시 시작합니다',
-			_ => null,
-		} ?? switch (path) {
 			'terminal.overlay.processExitedWithCode' => ({required Object code}) => '프로세스가 종료되었습니다(코드 ${code}) — 연결하면 다시 시작합니다',
 			'terminal.overlay.resumeSession' => ({required Object title}) => '세션 ${title} 재개',
 			'terminal.overlay.startSession' => ({required Object path}) => '${path}에서 새 세션 시작',

@@ -1122,6 +1122,10 @@
       "noAgents": "未分配代理",
       "noSubscription": "无订阅",
       "noSubscriptionHint": "提供商未报告此账户有有效套餐。",
+      "notInstalled": "未安装",
+      "notInstalledHint": "此服务器上未安装该代理的 CLI——请在 {{place}} 中安装。",
+      "notLoggedIn": "未登录",
+      "notLoggedInHint": "该代理在此服务器上未登录——请在 {{place}} 中登录。",
       "quality": {
         "live": "实时",
         "cached": "缓存",

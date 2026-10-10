@@ -1162,6 +1162,10 @@
       "noAgents": "Brak przypisanych agentów",
       "noSubscription": "Brak subskrypcji",
       "noSubscriptionHint": "Provider nie widzi aktywnego planu dla tego konta.",
+      "notInstalled": "Nie zainstalowano",
+      "notInstalledHint": "CLI agenta nie jest zainstalowane na tym serwerze — zainstaluj je w {{place}}.",
+      "notLoggedIn": "Niezalogowany",
+      "notLoggedInHint": "Agent nie jest zalogowany na tym serwerze — zaloguj się w {{place}}.",
       "quality": {
         "live": "Na żywo",
         "cached": "Cache",

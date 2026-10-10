@@ -1122,6 +1122,10 @@
       "noAgents": "未指派代理",
       "noSubscription": "無訂閱",
       "noSubscriptionHint": "提供者未回報此帳戶有有效方案。",
+      "notInstalled": "未安裝",
+      "notInstalledHint": "此伺服器上未安裝該代理的 CLI——請在 {{place}} 中安裝。",
+      "notLoggedIn": "未登入",
+      "notLoggedInHint": "該代理在此伺服器上未登入——請在 {{place}} 中登入。",
       "quality": {
         "live": "即時",
         "cached": "快取",

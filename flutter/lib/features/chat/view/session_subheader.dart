@@ -7,6 +7,7 @@ import 'package:ddagent_app/features/chat/state/composer_controller.dart';
 import 'package:ddagent_app/features/chat/view/chat_utilities.dart';
 import 'package:ddagent_app/features/quota/data/quota_models.dart' hide UsageSummary;
 import 'package:ddagent_app/features/quota/data/quota_repository.dart';
+import 'package:ddagent_app/features/quota/view/quota_unavailable.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
 import 'package:ddagent_app/features/sessions/view/provider_logo.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
@@ -420,7 +421,10 @@ class QuotaBadge extends ConsumerWidget {
     final account = quotaAccountFor(snap.accounts, sectionKey, accountId);
     final lines = <String>[];
     if (account != null && account.status != 'active') {
-      lines.add('${account.plan}: ${account.syncError ?? qb.noSubscription}');
+      // Not installed / not signed in / no plan reads as that state, not
+      // as the raw credential error.
+      final unavailable = quotaUnavailableText(Translations.of(context), account);
+      lines.add('${account.plan}: ${unavailable?.label ?? account.syncError ?? qb.noSubscription}');
     }
     QuotaWindow? worst;
     for (final w in account?.windows ?? const <QuotaWindow>[]) {

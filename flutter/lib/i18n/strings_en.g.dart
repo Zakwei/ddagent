@@ -3434,6 +3434,18 @@ class Translations$common$quota$en {
 	/// en: 'The provider reports no active plan for this account.'
 	String get noSubscriptionHint => 'The provider reports no active plan for this account.';
 
+	/// en: 'Not installed'
+	String get notInstalled => 'Not installed';
+
+	/// en: 'The agent's CLI is not installed on this server — install it in {{place}}.'
+	String notInstalledHint({required Object place}) => 'The agent\'s CLI is not installed on this server — install it in ${place}.';
+
+	/// en: 'Not signed in'
+	String get notLoggedIn => 'Not signed in';
+
+	/// en: 'The agent is not signed in on this server — sign in in {{place}}.'
+	String notLoggedInHint({required Object place}) => 'The agent is not signed in on this server — sign in in ${place}.';
+
 	late final Translations$common$quota$quality$en quality = Translations$common$quota$quality$en.internal(_root);
 	late final Translations$common$quota$kpi$en kpi = Translations$common$quota$kpi$en.internal(_root);
 	late final Translations$common$quota$empty$en empty = Translations$common$quota$empty$en.internal(_root);
@@ -15752,6 +15764,10 @@ extension on Translations {
 			'common.quota.noAgents' => 'No agents assigned',
 			'common.quota.noSubscription' => 'No subscription',
 			'common.quota.noSubscriptionHint' => 'The provider reports no active plan for this account.',
+			'common.quota.notInstalled' => 'Not installed',
+			'common.quota.notInstalledHint' => ({required Object place}) => 'The agent\'s CLI is not installed on this server — install it in ${place}.',
+			'common.quota.notLoggedIn' => 'Not signed in',
+			'common.quota.notLoggedInHint' => ({required Object place}) => 'The agent is not signed in on this server — sign in in ${place}.',
 			'common.quota.quality.live' => 'Live',
 			'common.quota.quality.cached' => 'Cached',
 			'common.quota.quality.estimate' => 'Estimate',
@@ -15950,12 +15966,12 @@ extension on Translations {
 			'common.projectWizard.step2.githubHelp' => 'Optional: provide a GitHub URL to clone a repository',
 			'common.projectWizard.step2.githubAuth' => 'GitHub Authentication (Optional)',
 			'common.projectWizard.step2.githubAuthHelp' => 'Only required for private repositories. Public repos can be cloned without authentication.',
+			_ => null,
+		} ?? switch (path) {
 			'common.projectWizard.step2.loadingTokens' => 'Loading stored tokens...',
 			'common.projectWizard.step2.storedToken' => 'Stored Token',
 			'common.projectWizard.step2.newToken' => 'New Token',
 			'common.projectWizard.step2.nonePublic' => 'None (Public)',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.step2.selectToken' => 'Select Token',
 			'common.projectWizard.step2.selectTokenPlaceholder' => '-- Select a token --',
 			'common.projectWizard.step2.tokenPlaceholder' => 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
@@ -16464,12 +16480,12 @@ extension on Translations {
 			'settings.mcp.config' => 'Configuration',
 			'settings.mcp.testConnection' => 'Test Connection',
 			'settings.mcp.status' => 'Status',
+			_ => null,
+		} ?? switch (path) {
 			'settings.mcp.connected' => 'Connected',
 			'settings.mcp.disconnected' => 'Disconnected',
 			'settings.mcp.scope.label' => 'Scope',
 			'settings.mcp.scope.user' => 'User',
-			_ => null,
-		} ?? switch (path) {
 			'settings.mcp.scope.project' => 'Project',
 			'settings.appearance.title' => 'Appearance',
 			'settings.appearance.theme' => 'Theme',
@@ -16978,12 +16994,12 @@ extension on Translations {
 			'settings.workspaces.create' => 'Add workspace',
 			'settings.workspaces.deleteConfirm' => 'Remove this workspace from DDAgent? Its files stay on disk.',
 			'settings.workspaces.deleteFailed' => 'Failed to remove workspace.',
+			_ => null,
+		} ?? switch (path) {
 			'settings.workspaces.deleteTitle' => 'Remove workspace',
 			'settings.workspaces.description' => 'Workspaces are directories DDAgent can chat, run code, and browse inside.',
 			'settings.workspaces.remove' => 'Remove workspace',
 			'settings.workspaces.title' => 'Workspaces',
-			_ => null,
-		} ?? switch (path) {
 			'settings.workspaces.pathRequired' => 'Path is required',
 			'settings.stt.title' => 'Voice input (speech-to-text)',
 			'settings.stt.description' => 'Whisper-compatible /audio/transcriptions endpoint (OpenAI, whisper.cpp, faster-whisper, Speaches). Enables the mic button in the composer.',
@@ -17492,12 +17508,12 @@ extension on Translations {
 			'tasks.taskDetail.priority' => 'Priority',
 			'tasks.taskDetail.priorityNotSet' => 'Not set',
 			'tasks.taskDetail.save' => 'Save',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.status' => 'Status',
 			'tasks.taskDetail.statusFailed' => 'Failed to update task status',
 			'tasks.taskDetail.taskId' => ({required Object id}) => 'Task ${id}',
 			'tasks.taskDetail.taskTitle' => ({required Object id, required Object title}) => 'Task ${id}: ${title}',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.testStrategy' => 'Test Strategy',
 			'tasks.taskDetail.titleRequired' => 'Title is required',
 			'tasks.taskDetail.updateFailed' => 'Failed to update task',
@@ -18006,12 +18022,12 @@ extension on Translations {
 			'terminal.errors.connectionError' => ({required Object message}) => '[Connection Error] ${message}',
 			'terminal.loginDialog.title' => ({required Object provider}) => '${provider} CLI Login',
 			'terminal.loginDialog.exited' => ({required Object code}) => 'Exited (${code})',
+			_ => null,
+		} ?? switch (path) {
 			'terminal.loginDialog.authLinkDetected' => 'Authentication link detected',
 			'terminal.empty.title' => 'No Active Terminal',
 			'terminal.empty.description' => 'Create a new tab to begin',
 			'terminal.overlay.processExited' => 'Process exited — connect to start it again',
-			_ => null,
-		} ?? switch (path) {
 			'terminal.overlay.processExitedWithCode' => ({required Object code}) => 'Process exited (code ${code}) — connect to start it again',
 			'terminal.overlay.resumeSession' => ({required Object title}) => 'Resume session ${title}',
 			'terminal.overlay.startSession' => ({required Object path}) => 'Start a new session in ${path}',
