@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { EventEmitter } from 'node:events';
+import os from 'node:os';
 import test from 'node:test';
 
 import { WebSocket } from 'ws';
@@ -335,4 +336,60 @@ test('init env reaches the PTY environment, dropping invalid names and non-strin
   assert.equal(spawnedEnv.NUM, undefined);
   assert.equal(spawnedEnv.TERM, 'xterm-256color');
   pty.emitExit();
+});
+
+test('a one-shot agent command runs from home when the project path is missing on this server', () => {
+  const pty = createFakePty();
+  let spawnedCwd: string | undefined;
+  const socket = createFakeSocket();
+  handleShellConnection(socket as never, {
+    resolveProviderSessionId: () => null,
+    spawnPty: ((_file: string, _args: string[], options: { cwd: string }) => {
+      spawnedCwd = options.cwd;
+      return pty;
+    }) as never,
+  });
+
+  socket.emit(
+    'message',
+    JSON.stringify({
+      type: 'init',
+      // A project registered from another machine (or since deleted).
+      projectPath: '/no/such/project-dir',
+      sessionId: `missing-${Date.now()}`,
+      provider: 'plain-shell',
+      isPlainShell: true,
+      initialCommand: 'npm install -g @anthropic-ai/claude-code@latest',
+    })
+  );
+
+  assert.equal(spawnedCwd, os.homedir());
+  assert.ok(!socket.frames.some((frame) => frame.includes('Invalid project path')), socket.frames.join('\n'));
+  pty.emitExit();
+});
+
+test('an agent session shell still rejects a missing project path', () => {
+  const socket = createFakeSocket();
+  let spawned = false;
+  handleShellConnection(socket as never, {
+    resolveProviderSessionId: () => null,
+    spawnPty: (() => {
+      spawned = true;
+      return createFakePty();
+    }) as never,
+  });
+
+  socket.emit(
+    'message',
+    JSON.stringify({
+      type: 'init',
+      projectPath: '/no/such/project-dir',
+      sessionId: `missing-session-${Date.now()}`,
+      provider: 'claude',
+      hasSession: true,
+    })
+  );
+
+  assert.equal(spawned, false);
+  assert.ok(socket.frames.some((frame) => frame.includes('Invalid project path')));
 });

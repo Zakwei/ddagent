@@ -132,6 +132,15 @@ function readString(value: unknown, fallback = ''): string {
   return typeof value === 'string' ? value : fallback;
 }
 
+/** Whether `target` exists and is a directory. */
+function isDirectory(target: string): boolean {
+  try {
+    return fs.statSync(target).isDirectory();
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Reads a boolean field from untyped payloads and falls back when absent.
  */
@@ -434,15 +443,18 @@ export function handleShellConnection(
           return;
         }
 
-        const resolvedProjectPath = path.resolve(projectPath);
-        try {
-          const stats = fs.statSync(resolvedProjectPath);
-          if (!stats.isDirectory()) {
-            throw new Error('Not a directory');
+        let resolvedProjectPath = path.resolve(projectPath);
+        if (!isDirectory(resolvedProjectPath)) {
+          // A one-shot command (agent install/update/login from Settings)
+          // does not depend on its cwd, yet the client sends its first known
+          // project — which may live on another machine or be gone. Run it
+          // from home instead of refusing; an agent session must stay in its
+          // project to resume, so that still fails.
+          if (!(isPlainShell && initialCommand && !hasSession)) {
+            ws.send(JSON.stringify({ type: 'error', message: 'Invalid project path' }));
+            return;
           }
-        } catch {
-          ws.send(JSON.stringify({ type: 'error', message: 'Invalid project path' }));
-          return;
+          resolvedProjectPath = os.homedir();
         }
 
         const safeSessionIdPattern = /^[a-zA-Z0-9_.\-:]+$/;
