@@ -10,38 +10,62 @@
   fallback. All 12 UI locales are below.
 -->
 <!-- lang:en -->
+### New
+- Change server → “Open in new window” opens another app window pinned to the chosen server; each window keeps its own layout and login.
 ### Bug fixes
-- After a limit account switch, the automatic “continue” message is dropped from the queue once work already resumed on the new account (your message or a turn the agent started there), instead of arriving later as a redundant prompt.
+- Launching the desktop app a second time brings the running window forward instead of starting a broken copy whose chat panes stayed grey.
 <!-- lang:pl -->
+### Nowości
+- Zmień serwer → „Otwórz w nowym oknie” otwiera kolejne okno aplikacji przypięte do wybranego serwera; każde okno ma własny układ i logowanie.
 ### Poprawki
-- Po przełączeniu konta przy limicie automatyczna wiadomość „kontynuuj” jest usuwana z kolejki, gdy praca już ruszyła na nowym koncie (Twoja wiadomość albo tura uruchomiona tam przez agenta), zamiast przychodzić później jako zbędne polecenie.
+- Ponowne uruchomienie aplikacji desktopowej wysuwa otwarte już okno zamiast startować wadliwą kopię, w której panele czatu były szare.
 <!-- lang:de -->
+### Neu
+- Server wechseln → „In neuem Fenster öffnen“ öffnet ein weiteres App-Fenster für den gewählten Server; jedes Fenster behält eigenes Layout und eigene Anmeldung.
 ### Fehlerbehebungen
-- Nach einem Kontowechsel wegen Limit wird die automatische „Weiter“-Nachricht aus der Warteschlange entfernt, sobald die Arbeit auf dem neuen Konto bereits weiterläuft (deine Nachricht oder ein dort vom Agenten gestarteter Durchlauf), statt später als überflüssige Aufforderung anzukommen.
+- Ein zweiter Start der Desktop-App holt das laufende Fenster nach vorne, statt eine fehlerhafte Kopie mit grauen Chat-Bereichen zu starten.
 <!-- lang:es -->
+### Novedades
+- Cambiar servidor → «Abrir en una ventana nueva» abre otra ventana de la app fijada al servidor elegido; cada ventana conserva su propio diseño e inicio de sesión.
 ### Correcciones
-- Tras cambiar de cuenta por límite, el mensaje automático «continuar» se elimina de la cola cuando el trabajo ya se reanudó en la nueva cuenta (tu mensaje o un turno que el agente inició allí), en lugar de llegar más tarde como una orden redundante.
+- Abrir la app de escritorio por segunda vez trae al frente la ventana ya abierta en lugar de iniciar una copia defectuosa con los paneles de chat en gris.
 <!-- lang:fr -->
+### Nouveautés
+- Changer de serveur → « Ouvrir dans une nouvelle fenêtre » ouvre une autre fenêtre de l'app liée au serveur choisi ; chaque fenêtre garde sa propre disposition et sa connexion.
 ### Corrections
-- Après un changement de compte dû à une limite, le message automatique « continuer » est retiré de la file dès que le travail a déjà repris sur le nouveau compte (votre message ou un tour lancé par l'agent), au lieu d'arriver plus tard comme une consigne superflue.
+- Relancer l'app de bureau ramène la fenêtre déjà ouverte au premier plan au lieu de démarrer une copie défectueuse aux panneaux de chat gris.
 <!-- lang:it -->
+### Novità
+- Cambia server → «Apri in una nuova finestra» apre un'altra finestra dell'app legata al server scelto; ogni finestra mantiene layout e accesso propri.
 ### Correzioni
-- Dopo un cambio di account per limite, il messaggio automatico «continua» viene rimosso dalla coda quando il lavoro è già ripreso sul nuovo account (il tuo messaggio o un turno avviato lì dall'agente), invece di arrivare più tardi come richiesta superflua.
+- Avviare di nuovo l'app desktop porta in primo piano la finestra già aperta invece di avviare una copia difettosa con i pannelli chat grigi.
 <!-- lang:ja -->
+### 新機能
+- サーバーを変更 →「新しいウィンドウで開く」で、選んだサーバー専用のアプリウィンドウをもう一つ開けます。各ウィンドウはレイアウトとログインを個別に保持します。
 ### バグ修正
-- 上限による自動アカウント切り替え後、新しいアカウントで作業がすでに再開されていれば（あなたのメッセージやエージェントが開始したターン）、自動の「続行」メッセージをキューから削除し、後から不要な指示として届かないようにしました。
+- デスクトップアプリを再度起動すると、チャット欄が灰色になる不完全なコピーを起動せず、既に開いているウィンドウを前面に表示します。
 <!-- lang:ko -->
+### 새 기능
+- 서버 변경 → ‘새 창에서 열기’로 선택한 서버에 고정된 앱 창을 하나 더 열 수 있습니다. 각 창은 자체 레이아웃과 로그인을 유지합니다.
 ### 버그 수정
-- 한도로 계정이 전환된 뒤 새 계정에서 이미 작업이 재개되었다면(사용자 메시지나 에이전트가 시작한 턴) 자동 ‘계속’ 메시지를 대기열에서 제거하여, 나중에 불필요한 지시로 도착하지 않습니다.
+- 데스크톱 앱을 다시 실행하면 채팅 영역이 회색으로 남는 잘못된 복사본을 시작하지 않고 이미 열린 창을 앞으로 가져옵니다.
 <!-- lang:ru -->
+### Новое
+- Сменить сервер → «Открыть в новом окне» открывает ещё одно окно приложения, привязанное к выбранному серверу; у каждого окна своя раскладка и вход.
 ### Исправления
-- После переключения аккаунта из-за лимита автоматическое сообщение «продолжить» удаляется из очереди, если работа уже возобновилась на новом аккаунте (ваше сообщение или ход, запущенный там агентом), а не приходит позже как лишняя команда.
+- Повторный запуск десктопного приложения выводит уже открытое окно на передний план вместо запуска сломанной копии с серыми панелями чата.
 <!-- lang:tr -->
+### Yenilikler
+- Sunucuyu değiştir → “Yeni pencerede aç”, seçilen sunucuya bağlı başka bir uygulama penceresi açar; her pencere kendi düzenini ve oturumunu korur.
 ### Hata düzeltmeleri
-- Limit nedeniyle hesap değiştikten sonra, iş yeni hesapta zaten yeniden başladıysa (sizin mesajınız veya ajanın orada başlattığı bir tur) otomatik “devam et” mesajı kuyruktan kaldırılır; sonradan gereksiz bir komut olarak gelmez.
+- Masaüstü uygulamasını ikinci kez başlatmak, sohbet panelleri gri kalan bozuk bir kopya açmak yerine açık pencereyi öne getirir.
 <!-- lang:zh-CN -->
+### 新功能
+- 更换服务器 →“在新窗口中打开”可为所选服务器再打开一个应用窗口；每个窗口保留各自的布局和登录。
 ### 问题修复
-- 因额度切换账号后，如果工作已在新账号上恢复（你的消息或代理在那里发起的回合），自动“继续”消息会从队列中移除，而不会稍后作为多余的指令到达。
+- 再次启动桌面应用时会将已打开的窗口置于前台，而不是启动一个聊天面板显示为灰色的损坏副本。
 <!-- lang:zh-TW -->
+### 新功能
+- 更換伺服器 →「在新視窗中開啟」可為所選伺服器再開一個應用程式視窗；每個視窗保留各自的版面與登入。
 ### 錯誤修正
-- 因額度切換帳號後，如果工作已在新帳號上恢復（你的訊息或代理在那裡發起的回合），自動「繼續」訊息會從佇列中移除，而不會稍後作為多餘的指令送達。
+- 再次啟動桌面應用程式時會將已開啟的視窗移到最前方，而不是啟動聊天面板呈灰色的損壞副本。
