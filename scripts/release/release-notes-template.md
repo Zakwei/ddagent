@@ -10,38 +10,38 @@
   fallback. All 12 UI locales are below.
 -->
 <!-- lang:en -->
-### New
-- Handoff button in the chat bar once the context passes 40%: the agent writes a summary of the conversation, a new chat on the same agent and project starts from it, and the window switches to it automatically.
+### Fixes
+- Desktop app: Ctrl+V in the chat now pastes screenshots and files copied in the file manager as attachments, just like on the phone.
 <!-- lang:pl -->
-### Nowości
-- Przycisk „Handoff” w pasku czatu, gdy kontekst przekroczy 40%: agent pisze podsumowanie rozmowy, nowy czat z tym samym agentem i projektem startuje od niego, a okienko automatycznie się na niego przełącza.
+### Poprawki
+- Aplikacja desktopowa: Ctrl+V w czacie wkleja teraz zrzuty ekranu i pliki skopiowane w menedżerze plików jako załączniki, tak jak na telefonie.
 <!-- lang:de -->
-### Neu
-- Übergabe-Schaltfläche in der Chatleiste ab 40 % Kontextauslastung: Der Agent fasst das Gespräch zusammen, ein neuer Chat mit demselben Agenten und Projekt startet damit, und das Fenster wechselt automatisch dorthin.
+### Fehlerbehebungen
+- Desktop-App: Strg+V im Chat fügt jetzt Screenshots und im Dateimanager kopierte Dateien als Anhänge ein – wie auf dem Handy.
 <!-- lang:es -->
-### Novedades
-- Botón «Traspaso» en la barra del chat cuando el contexto supera el 40 %: el agente resume la conversación, un chat nuevo con el mismo agente y proyecto parte de ese resumen y la ventana cambia a él automáticamente.
+### Correcciones
+- App de escritorio: Ctrl+V en el chat ahora pega capturas de pantalla y archivos copiados en el explorador de archivos como adjuntos, igual que en el móvil.
 <!-- lang:fr -->
-### Nouveautés
-- Bouton « Passation » dans la barre du chat dès que le contexte dépasse 40 % : l'agent résume la conversation, un nouveau chat avec le même agent et projet repart de ce résumé, et la fenêtre bascule dessus automatiquement.
+### Corrections
+- Application de bureau : Ctrl+V dans le chat colle désormais les captures d'écran et les fichiers copiés dans le gestionnaire de fichiers en pièces jointes, comme sur le téléphone.
 <!-- lang:it -->
-### Novità
-- Pulsante «Passaggio» nella barra della chat quando il contesto supera il 40%: l'agente riassume la conversazione, una nuova chat con lo stesso agente e progetto riparte dal riepilogo e la finestra passa automaticamente a essa.
+### Correzioni
+- App desktop: Ctrl+V nella chat ora incolla screenshot e file copiati nel file manager come allegati, proprio come sul telefono.
 <!-- lang:ja -->
-### 新機能
-- コンテキストが40%を超えるとチャットバーに「引き継ぎ」ボタンが表示されます。エージェントが会話を要約し、同じエージェントとプロジェクトの新しいチャットがその要約から始まり、ウィンドウが自動で切り替わります。
+### 修正
+- デスクトップアプリ：チャットで Ctrl+V を押すと、スクリーンショットやファイルマネージャーでコピーしたファイルが添付ファイルとして貼り付けられるようになりました（スマートフォンと同様）。
 <!-- lang:ko -->
-### 새 기능
-- 컨텍스트가 40%를 넘으면 채팅 바에 ‘인계’ 버튼이 나타납니다. 에이전트가 대화를 요약하고, 같은 에이전트와 프로젝트로 새 채팅이 그 요약에서 시작되며, 창이 자동으로 전환됩니다.
+### 수정 사항
+- 데스크톱 앱: 이제 채팅에서 Ctrl+V로 스크린샷과 파일 관리자에서 복사한 파일을 첨부 파일로 붙여넣을 수 있습니다(휴대폰과 동일).
 <!-- lang:ru -->
-### Новое
-- Кнопка «Передача» в панели чата, когда контекст превышает 40%: агент кратко излагает разговор, новый чат с тем же агентом и проектом начинается с этой сводки, а окно автоматически переключается на него.
+### Исправления
+- Десктопное приложение: Ctrl+V в чате теперь вставляет скриншоты и файлы, скопированные в файловом менеджере, как вложения — как на телефоне.
 <!-- lang:tr -->
-### Yenilikler
-- Bağlam %40'ı aştığında sohbet çubuğunda “Devir” düğmesi: ajan konuşmayı özetler, aynı ajan ve projeyle yeni bir sohbet bu özetle başlar ve pencere otomatik olarak ona geçer.
+### Düzeltmeler
+- Masaüstü uygulaması: Sohbette Ctrl+V artık ekran görüntülerini ve dosya yöneticisinde kopyalanan dosyaları ek olarak yapıştırıyor; tıpkı telefonda olduğu gibi.
 <!-- lang:zh-CN -->
-### 新功能
-- 上下文超过 40% 时，聊天栏会显示“交接”按钮：智能体总结对话，使用同一智能体和项目的新对话从该摘要开始，窗口会自动切换过去。
+### 修复
+- 桌面应用：在聊天中按 Ctrl+V 现在可以将截图和在文件管理器中复制的文件粘贴为附件，与手机上一致。
 <!-- lang:zh-TW -->
-### 新功能
-- 上下文超過 40% 時，聊天列會顯示「交接」按鈕：代理會總結對話，使用相同代理與專案的新對話從該摘要開始，視窗會自動切換過去。
+### 修正
+- 桌面應用程式：在聊天中按 Ctrl+V 現在可以將螢幕截圖和在檔案管理員中複製的檔案貼上為附件，與手機上一致。
