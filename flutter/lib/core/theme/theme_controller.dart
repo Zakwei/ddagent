@@ -1,5 +1,4 @@
 import 'package:ddagent_app/core/platform/instance.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -34,14 +33,7 @@ final themeModeProvider = NotifierProvider<ThemeModeController, ThemeMode>(Theme
 /// Call once before runApp: opens the Hive boxes the app needs.
 Future<void> initStorage() async {
   await Hive.initFlutter(instanceStorageSubdir());
-  // settings, chat (drafts + offline queue), workspace (split-pane layout).
-  for (final name in const ['settings', 'chat', 'workspace']) {
-    try {
-      await Hive.openBox<dynamic>(name);
-    } on Object {
-      // Another app process holds this box's lock (a second plain launch) —
-      // run on an in-memory box instead of leaving every reader to throw.
-      await Hive.openBox<dynamic>(name, bytes: Uint8List(0));
-    }
-  }
+  await Hive.openBox<dynamic>('settings');
+  await Hive.openBox<dynamic>('chat'); // drafts + offline queue (chatStorage parity)
+  await Hive.openBox<dynamic>('workspace'); // split-pane workspace persistence
 }

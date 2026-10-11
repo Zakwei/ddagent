@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io' show FileSystemException, exit;
 import 'dart:ui' show AppExitResponse;
 
 import 'package:ddagent_app/core/network/api_providers.dart';
@@ -32,6 +33,10 @@ Future<void> main([List<String> args = const []]) async {
   // unavailable in some private-browsing modes.)
   try {
     await initStorage();
+  } on FileSystemException catch (e) {
+    // Another process of this instance holds the storage locks (the Windows
+    // runner already brought its window forward) — never run a second copy.
+    if (e.path?.endsWith('.lock') ?? false) exit(0);
   } on Object catch (_) {}
   usePathUrlStrategy(); // web: /chat/42 not /#/chat/42 (T7.4)
   try {
