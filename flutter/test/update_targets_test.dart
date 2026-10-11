@@ -37,6 +37,23 @@ Widget _app(List<Override> overrides, Widget child) => TranslationProvider(
 );
 
 void main() {
+  test('the local server is due an update only when behind this app, not the latest release', () {
+    ProviderContainer make(String running) => ProviderContainer(
+      overrides: [
+        latestReleaseProvider.overrideWith((ref) async => const Release(tagName: 'v9.9.9')),
+        activeServerIsLocalProvider.overrideWithValue(true),
+        appVersionProvider.overrideWithValue(const AsyncData('0.8.25')),
+        serverHealthProvider.overrideWithValue(AsyncData({'version': running})),
+      ],
+    );
+    final current = make('0.8.25');
+    addTearDown(current.dispose);
+    expect(current.read(updateAvailableProvider), isFalse);
+    final behind = make('0.8.24');
+    addTearDown(behind.dispose);
+    expect(behind.read(updateAvailableProvider), isTrue);
+  });
+
   testWidgets('the badge offers a separate button for each available update', (tester) async {
     await tester.pumpWidget(
       _app([

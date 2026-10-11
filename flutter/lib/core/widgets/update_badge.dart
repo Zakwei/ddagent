@@ -317,7 +317,9 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
     ref.invalidate(serverHealthProvider);
     setState(() {
       _status = _Status.done;
-      _note = Translations.of(context).common.update.serverDone(version: _latestVersion);
+      // The local server installs this app's version, not the newest release.
+      _note = Translations.of(context).common.update
+          .serverDone(version: ref.read(localServerProvider).version ?? _latestVersion);
     });
   }
 

@@ -34,11 +34,15 @@ String normalizeVersion(String v) => v.startsWith('v') || v.startsWith('V') ? v.
 /// Whether the server is behind the latest GitHub release — the web client's
 /// `useVersionCheck` (latest tag vs the version /health reports).
 final updateAvailableProvider = Provider.autoDispose<bool>((ref) {
-  final release = ref.watch(latestReleaseProvider).value;
   final health = ref.watch(serverHealthProvider).value;
   final running = health?['version']?.toString();
-  if (release == null || running == null || running.isEmpty) return false;
-  return compareVersions(normalizeVersion(release.tagName), running) > 0;
+  if (running == null || running.isEmpty) return false;
+  // The local server follows this app's version, not the newest release.
+  final target = ref.watch(activeServerIsLocalProvider)
+      ? ref.watch(appVersionProvider).value
+      : ref.watch(latestReleaseProvider).value?.tagName;
+  if (target == null || target.isEmpty) return false;
+  return compareVersions(normalizeVersion(target), running) > 0;
 });
 
 /// Installs a newer build of this app (Android via the system installer, a

@@ -8,6 +8,7 @@ import 'package:ddagent_app/core/network/download.dart';
 import 'package:ddagent_app/features/server_connect/data/local_server_status.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 
 export 'local_server_status.dart';
@@ -155,12 +156,18 @@ class LocalServerService {
   /// `<root>/node/` — portable Node.js runtime when the system one is missing.
   Future<Directory> get _nodeDir async => Directory('${(await _root).path}/node');
 
-  /// Server version = the newest GitHub release tag, minus the `v` prefix.
-  /// The app's own pubspec version is unrelated — server tarballs are
-  /// versioned by the repo `package.json`, so the release API is the only
-  /// reliable source. Cached; [serverVersion] overrides it (tests).
+  /// Server version = this app's own version: `npm run release` bumps the
+  /// pubspec and `package.json` together and one `v*` tag ships both, so an
+  /// app upgrade (or downgrade) pulls the matching local server. Falls back to
+  /// the newest GitHub release when the app version is unreadable. Cached;
+  /// [serverVersion] overrides it (tests).
   Future<String> get _serverVersion async =>
-      _resolvedServerVersion ??= _serverVersionOverride ?? await _latestReleaseVersion();
+      _resolvedServerVersion ??= _serverVersionOverride ?? await _appOrLatestVersion();
+
+  Future<String> _appOrLatestVersion() async {
+    final app = (await PackageInfo.fromPlatform()).version;
+    return app.isEmpty ? _latestReleaseVersion() : app;
+  }
 
   Future<String> _latestReleaseVersion() async {
     final res = await _dio.get<Map<String, dynamic>>(
