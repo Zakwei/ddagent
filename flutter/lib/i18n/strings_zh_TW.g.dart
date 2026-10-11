@@ -575,6 +575,7 @@ class Translations$serverConnect$zh_TW extends Translations$serverConnect$en {
 	@override String get connect => '連線';
 	@override String get connecting => '正在連線…';
 	@override String get changeServer => '更換伺服器';
+	@override String get openInNewWindow => '在新視窗中開啟';
 	@override late final Translations$serverConnect$local$zh_TW local = Translations$serverConnect$local$zh_TW.internal(_root);
 	@override String httpStatus({required Object code}) => 'HTTP ${code}';
 	@override String get networkError => '網路錯誤';
@@ -11411,6 +11412,7 @@ extension on TranslationsZhTw {
 			'serverConnect.connect' => '連線',
 			'serverConnect.connecting' => '正在連線…',
 			'serverConnect.changeServer' => '更換伺服器',
+			'serverConnect.openInNewWindow' => '在新視窗中開啟',
 			'serverConnect.local.title' => '此裝置',
 			'serverConnect.local.subtitle' => '在此電腦上執行 DDAgent 伺服器',
 			'serverConnect.local.install' => '安裝本機伺服器',
@@ -11566,9 +11568,9 @@ extension on TranslationsZhTw {
 			'terminal.errors.frameError' => ({required Object message}) => '[錯誤] ${message}',
 			'terminal.errors.connectionError' => ({required Object message}) => '[連線錯誤] ${message}',
 			'terminal.loginDialog.title' => ({required Object provider}) => '${provider} CLI 登入',
-			'terminal.loginDialog.exited' => ({required Object code}) => '已結束（${code}）',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.loginDialog.exited' => ({required Object code}) => '已結束（${code}）',
 			'terminal.loginDialog.authLinkDetected' => '偵測到驗證連結',
 			'terminal.empty.title' => '沒有作用中的終端機',
 			'terminal.empty.description' => '建立新分頁以開始',

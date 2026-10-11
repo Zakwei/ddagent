@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:ddagent_app/core/config/env.dart';
+import 'package:ddagent_app/core/platform/instance.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -72,7 +73,12 @@ class ServerProfilesController extends Notifier<ServerProfilesState> {
         for (final e in jsonDecode(raw) as List<dynamic>)
           ServerProfile.fromJson(Map<String, dynamic>.from(e as Map)),
     ];
-    var active = _box.get(_activeKey) as String?;
+    // A window pinned to a server (own storage) starts on that server.
+    final pinned = pinnedServerUrl;
+    if (pinned != null && !profiles.any((p) => p.url == pinned)) {
+      profiles.add(ServerProfile(url: pinned, isLocal: pinnedServerIsLocal));
+    }
+    var active = (_box.get(_activeKey) as String?) ?? pinned;
     // First launch: seed from --dart-define or the first saved profile.
     active ??= Env.defaultServerUrl.isNotEmpty ? Env.defaultServerUrl : null;
     active ??= profiles.isEmpty ? null : profiles.first.url;

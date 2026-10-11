@@ -3967,6 +3967,7 @@
     "connect": "Conectar",
     "connecting": "Conectando…",
     "changeServer": "Cambiar servidor",
+    "openInNewWindow": "Abrir en una ventana nueva",
     "local": {
       "title": "Este dispositivo",
       "subtitle": "Ejecuta el servidor DDAgent en esta máquina",

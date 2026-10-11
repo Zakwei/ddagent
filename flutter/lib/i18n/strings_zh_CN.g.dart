@@ -575,6 +575,7 @@ class Translations$serverConnect$zh_CN extends Translations$serverConnect$en {
 	@override String get connect => '连接';
 	@override String get connecting => '正在连接…';
 	@override String get changeServer => '更换服务器';
+	@override String get openInNewWindow => '在新窗口中打开';
 	@override late final Translations$serverConnect$local$zh_CN local = Translations$serverConnect$local$zh_CN.internal(_root);
 	@override String httpStatus({required Object code}) => 'HTTP ${code}';
 	@override String get networkError => '网络错误';
@@ -11411,6 +11412,7 @@ extension on TranslationsZhCn {
 			'serverConnect.connect' => '连接',
 			'serverConnect.connecting' => '正在连接…',
 			'serverConnect.changeServer' => '更换服务器',
+			'serverConnect.openInNewWindow' => '在新窗口中打开',
 			'serverConnect.local.title' => '本设备',
 			'serverConnect.local.subtitle' => '在此计算机上运行 DDAgent 服务器',
 			'serverConnect.local.install' => '安装本地服务器',
@@ -11566,9 +11568,9 @@ extension on TranslationsZhCn {
 			'terminal.errors.frameError' => ({required Object message}) => '[错误] ${message}',
 			'terminal.errors.connectionError' => ({required Object message}) => '[连接错误] ${message}',
 			'terminal.loginDialog.title' => ({required Object provider}) => '${provider} CLI 登录',
-			'terminal.loginDialog.exited' => ({required Object code}) => '已退出（${code}）',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.loginDialog.exited' => ({required Object code}) => '已退出（${code}）',
 			'terminal.loginDialog.authLinkDetected' => '检测到认证链接',
 			'terminal.empty.title' => '没有活动终端',
 			'terminal.empty.description' => '新建标签页以开始',

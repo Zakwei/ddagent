@@ -578,6 +578,7 @@ class Translations$serverConnect$ru extends Translations$serverConnect$en {
 	@override String get connect => 'Подключить';
 	@override String get connecting => 'Подключение…';
 	@override String get changeServer => 'Сменить сервер';
+	@override String get openInNewWindow => 'Открыть в новом окне';
 	@override late final Translations$serverConnect$local$ru local = Translations$serverConnect$local$ru._(_root);
 	@override String httpStatus({required Object code}) => 'HTTP ${code}';
 	@override String get networkError => 'Ошибка сети';
@@ -11460,6 +11461,7 @@ extension on TranslationsRu {
 			'serverConnect.connect' => 'Подключить',
 			'serverConnect.connecting' => 'Подключение…',
 			'serverConnect.changeServer' => 'Сменить сервер',
+			'serverConnect.openInNewWindow' => 'Открыть в новом окне',
 			'serverConnect.local.title' => 'Это устройство',
 			'serverConnect.local.subtitle' => 'Запустить сервер DDAgent на этой машине',
 			'serverConnect.local.install' => 'Установить локальный сервер',
@@ -11615,9 +11617,9 @@ extension on TranslationsRu {
 			'terminal.errors.frameError' => ({required Object message}) => '[Ошибка] ${message}',
 			'terminal.errors.connectionError' => ({required Object message}) => '[Ошибка подключения] ${message}',
 			'terminal.loginDialog.title' => ({required Object provider}) => 'Вход в ${provider} CLI',
-			'terminal.loginDialog.exited' => ({required Object code}) => 'Завершено (${code})',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.loginDialog.exited' => ({required Object code}) => 'Завершено (${code})',
 			'terminal.loginDialog.authLinkDetected' => 'Обнаружена ссылка для аутентификации',
 			'terminal.empty.title' => 'Нет активного терминала',
 			'terminal.empty.description' => 'Создайте новую вкладку, чтобы начать',

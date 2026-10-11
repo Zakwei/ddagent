@@ -576,6 +576,7 @@ class Translations$serverConnect$es extends Translations$serverConnect$en {
 	@override String get connect => 'Conectar';
 	@override String get connecting => 'Conectando…';
 	@override String get changeServer => 'Cambiar servidor';
+	@override String get openInNewWindow => 'Abrir en una ventana nueva';
 	@override late final Translations$serverConnect$local$es local = Translations$serverConnect$local$es._(_root);
 	@override String httpStatus({required Object code}) => 'HTTP ${code}';
 	@override String get networkError => 'Error de red';
@@ -11422,6 +11423,7 @@ extension on TranslationsEs {
 			'serverConnect.connect' => 'Conectar',
 			'serverConnect.connecting' => 'Conectando…',
 			'serverConnect.changeServer' => 'Cambiar servidor',
+			'serverConnect.openInNewWindow' => 'Abrir en una ventana nueva',
 			'serverConnect.local.title' => 'Este dispositivo',
 			'serverConnect.local.subtitle' => 'Ejecuta el servidor DDAgent en esta máquina',
 			'serverConnect.local.install' => 'Instalar servidor local',
@@ -11577,9 +11579,9 @@ extension on TranslationsEs {
 			'terminal.errors.frameError' => ({required Object message}) => '[Error] ${message}',
 			'terminal.errors.connectionError' => ({required Object message}) => '[Error de conexión] ${message}',
 			'terminal.loginDialog.title' => ({required Object provider}) => 'Inicio de sesión en ${provider} CLI',
-			'terminal.loginDialog.exited' => ({required Object code}) => 'Finalizado (${code})',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.loginDialog.exited' => ({required Object code}) => 'Finalizado (${code})',
 			'terminal.loginDialog.authLinkDetected' => 'Enlace de autenticación detectado',
 			'terminal.empty.title' => 'No hay terminal activa',
 			'terminal.empty.description' => 'Crea una pestaña nueva para empezar',

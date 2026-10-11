@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:ddagent_app/core/platform/instance.dart';
 import 'package:ddagent_app/features/server_connect/data/server_profiles.dart';
 import 'package:ddagent_app/features/system/data/app_update_channel.dart';
 import 'package:ddagent_app/features/system/data/app_update_installer.dart';
@@ -157,6 +158,8 @@ class DesktopUpdateController extends Notifier<DesktopUpdateState> {
 
   @override
   DesktopUpdateState build() {
+    // One updater per install — the primary window stages and applies it.
+    if (isSecondaryInstance) return _state;
     final channel = ref.watch(appUpdateChannelProvider);
     final release = ref.watch(latestReleaseProvider).value;
     final installed = ref.watch(appVersionProvider).value;
@@ -232,7 +235,7 @@ class DesktopUpdateController extends Notifier<DesktopUpdateState> {
   /// Applies the staged update while the app exits. Safe to call with nothing
   /// staged (no-op).
   Future<void> applyOnExit() async {
-    if (!ref.read(appUpdateSupportedProvider)) return;
+    if (isSecondaryInstance || !ref.read(appUpdateSupportedProvider)) return;
     await ref.read(appUpdateInstallerProvider).applyStagedOnExit();
   }
 

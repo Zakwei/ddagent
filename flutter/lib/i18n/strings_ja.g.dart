@@ -575,6 +575,7 @@ class Translations$serverConnect$ja extends Translations$serverConnect$en {
 	@override String get connect => '接続';
 	@override String get connecting => '接続中…';
 	@override String get changeServer => 'サーバーを変更';
+	@override String get openInNewWindow => '新しいウィンドウで開く';
 	@override late final Translations$serverConnect$local$ja local = Translations$serverConnect$local$ja._(_root);
 	@override String httpStatus({required Object code}) => 'HTTP ${code}';
 	@override String get networkError => 'ネットワークエラー';
@@ -11411,6 +11412,7 @@ extension on TranslationsJa {
 			'serverConnect.connect' => '接続',
 			'serverConnect.connecting' => '接続中…',
 			'serverConnect.changeServer' => 'サーバーを変更',
+			'serverConnect.openInNewWindow' => '新しいウィンドウで開く',
 			'serverConnect.local.title' => 'このデバイス',
 			'serverConnect.local.subtitle' => 'このマシンでDDAgentサーバーを実行します',
 			'serverConnect.local.install' => 'ローカルサーバーをインストール',
@@ -11566,9 +11568,9 @@ extension on TranslationsJa {
 			'terminal.errors.frameError' => ({required Object message}) => '[エラー] ${message}',
 			'terminal.errors.connectionError' => ({required Object message}) => '[接続エラー] ${message}',
 			'terminal.loginDialog.title' => ({required Object provider}) => '${provider} CLI ログイン',
-			'terminal.loginDialog.exited' => ({required Object code}) => '終了 (${code})',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.loginDialog.exited' => ({required Object code}) => '終了 (${code})',
 			'terminal.loginDialog.authLinkDetected' => '認証リンクを検出しました',
 			'terminal.empty.title' => 'アクティブなターミナルがありません',
 			'terminal.empty.description' => '新しいタブを作成して開始してください',

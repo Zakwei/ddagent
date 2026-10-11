@@ -576,6 +576,7 @@ class Translations$serverConnect$tr extends Translations$serverConnect$en {
 	@override String get connect => 'Bağlan';
 	@override String get connecting => 'Bağlanılıyor…';
 	@override String get changeServer => 'Sunucuyu değiştir';
+	@override String get openInNewWindow => 'Yeni pencerede aç';
 	@override late final Translations$serverConnect$local$tr local = Translations$serverConnect$local$tr._(_root);
 	@override String httpStatus({required Object code}) => 'HTTP ${code}';
 	@override String get networkError => 'Ağ hatası';
@@ -11417,6 +11418,7 @@ extension on TranslationsTr {
 			'serverConnect.connect' => 'Bağlan',
 			'serverConnect.connecting' => 'Bağlanılıyor…',
 			'serverConnect.changeServer' => 'Sunucuyu değiştir',
+			'serverConnect.openInNewWindow' => 'Yeni pencerede aç',
 			'serverConnect.local.title' => 'Bu cihaz',
 			'serverConnect.local.subtitle' => 'DDAgent sunucusunu bu makinede çalıştırın',
 			'serverConnect.local.install' => 'Yerel sunucuyu kur',
@@ -11572,9 +11574,9 @@ extension on TranslationsTr {
 			'terminal.errors.frameError' => ({required Object message}) => '[Hata] ${message}',
 			'terminal.errors.connectionError' => ({required Object message}) => '[Bağlantı hatası] ${message}',
 			'terminal.loginDialog.title' => ({required Object provider}) => '${provider} CLI Girişi',
-			'terminal.loginDialog.exited' => ({required Object code}) => 'Çıkıldı (${code})',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.loginDialog.exited' => ({required Object code}) => 'Çıkıldı (${code})',
 			'terminal.loginDialog.authLinkDetected' => 'Kimlik doğrulama bağlantısı algılandı',
 			'terminal.empty.title' => 'Etkin terminal yok',
 			'terminal.empty.description' => 'Başlamak için yeni bir sekme oluşturun',

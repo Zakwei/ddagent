@@ -3956,6 +3956,7 @@
     "connect": "連線",
     "connecting": "正在連線…",
     "changeServer": "更換伺服器",
+    "openInNewWindow": "在新視窗中開啟",
     "local": {
       "title": "此裝置",
       "subtitle": "在此電腦上執行 DDAgent 伺服器",

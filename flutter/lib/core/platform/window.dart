@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:ddagent_app/core/platform/instance.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -17,16 +18,17 @@ Future<void> initWindow() async {
   final saved = box.get('windowBounds');
 
   const minSize = Size(720, 480);
+  // Server-pinned windows name their server — several windows stay tellable.
+  final pinned = pinnedServerUrl;
+  final title = pinned == null
+      ? t.sidebar.app.title
+      : '${t.sidebar.app.title} — ${Uri.tryParse(pinned)?.host ?? pinned}';
   // No widget tree here (runs before `runApp`), so use the global accessor.
-  var opts = WindowOptions(
-    minimumSize: minSize,
-    title: t.sidebar.app.title,
-    titleBarStyle: TitleBarStyle.normal,
-  );
+  var opts = WindowOptions(minimumSize: minSize, title: title, titleBarStyle: TitleBarStyle.normal);
   if (saved is Map) {
     opts = WindowOptions(
       minimumSize: minSize,
-      title: t.sidebar.app.title,
+      title: title,
       titleBarStyle: TitleBarStyle.normal,
       size: Size((saved['w'] as num?)?.toDouble() ?? 1280, (saved['h'] as num?)?.toDouble() ?? 800),
     );

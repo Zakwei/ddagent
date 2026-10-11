@@ -4007,6 +4007,7 @@
     "connect": "Połącz",
     "connecting": "Łączenie…",
     "changeServer": "Zmień serwer",
+    "openInNewWindow": "Otwórz w nowym oknie",
     "local": {
       "title": "To urządzenie",
       "subtitle": "Uruchom serwer DDAgent na tym komputerze",

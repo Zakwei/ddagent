@@ -4005,6 +4005,7 @@
     "connect": "Подключить",
     "connecting": "Подключение…",
     "changeServer": "Сменить сервер",
+    "openInNewWindow": "Открыть в новом окне",
     "local": {
       "title": "Это устройство",
       "subtitle": "Запустить сервер DDAgent на этой машине",

@@ -797,6 +797,9 @@ class Translations$serverConnect$en {
 	/// en: 'Change server'
 	String get changeServer => 'Change server';
 
+	/// en: 'Open in new window'
+	String get openInNewWindow => 'Open in new window';
+
 	late final Translations$serverConnect$local$en local = Translations$serverConnect$local$en.internal(_root);
 
 	/// en: 'HTTP {{code}}'
@@ -17866,6 +17869,7 @@ extension on Translations {
 			'serverConnect.connect' => 'Connect',
 			'serverConnect.connecting' => 'Connecting…',
 			'serverConnect.changeServer' => 'Change server',
+			'serverConnect.openInNewWindow' => 'Open in new window',
 			'serverConnect.local.title' => 'This device',
 			'serverConnect.local.subtitle' => 'Run the DDAgent server on this machine',
 			'serverConnect.local.install' => 'Install local server',
@@ -18021,9 +18025,9 @@ extension on Translations {
 			'terminal.errors.frameError' => ({required Object message}) => '[Error] ${message}',
 			'terminal.errors.connectionError' => ({required Object message}) => '[Connection Error] ${message}',
 			'terminal.loginDialog.title' => ({required Object provider}) => '${provider} CLI Login',
-			'terminal.loginDialog.exited' => ({required Object code}) => 'Exited (${code})',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.loginDialog.exited' => ({required Object code}) => 'Exited (${code})',
 			'terminal.loginDialog.authLinkDetected' => 'Authentication link detected',
 			'terminal.empty.title' => 'No Active Terminal',
 			'terminal.empty.description' => 'Create a new tab to begin',

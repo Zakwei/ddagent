@@ -3956,6 +3956,7 @@
     "connect": "연결",
     "connecting": "연결 중…",
     "changeServer": "서버 변경",
+    "openInNewWindow": "새 창에서 열기",
     "local": {
       "title": "이 기기",
       "subtitle": "이 컴퓨터에서 DDAgent 서버를 실행합니다",

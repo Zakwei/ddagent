@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:ddagent_app/core/platform/instance.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -45,7 +46,9 @@ class AuthTokenStore {
   AuthTokenStore({SecureKv? storage})
     : _storage = storage ?? _SecureStorageKv(const FlutterSecureStorage());
 
-  static const _key = 'auth-token';
+  // Secure storage is shared by all app windows — a server-pinned window
+  // keeps its own slot so its login never replaces the primary's token.
+  static final _key = pinnedServerUrl == null ? 'auth-token' : 'auth-token@$pinnedServerUrl';
   static const expirySkew = Duration(seconds: 60);
 
   final SecureKv _storage;

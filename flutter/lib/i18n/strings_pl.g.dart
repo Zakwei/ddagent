@@ -578,6 +578,7 @@ class Translations$serverConnect$pl extends Translations$serverConnect$en {
 	@override String get connect => 'Połącz';
 	@override String get connecting => 'Łączenie…';
 	@override String get changeServer => 'Zmień serwer';
+	@override String get openInNewWindow => 'Otwórz w nowym oknie';
 	@override late final Translations$serverConnect$local$pl local = Translations$serverConnect$local$pl._(_root);
 	@override String httpStatus({required Object code}) => 'HTTP ${code}';
 	@override String get networkError => 'Błąd sieci';
@@ -11462,6 +11463,7 @@ extension on TranslationsPl {
 			'serverConnect.connect' => 'Połącz',
 			'serverConnect.connecting' => 'Łączenie…',
 			'serverConnect.changeServer' => 'Zmień serwer',
+			'serverConnect.openInNewWindow' => 'Otwórz w nowym oknie',
 			'serverConnect.local.title' => 'To urządzenie',
 			'serverConnect.local.subtitle' => 'Uruchom serwer DDAgent na tym komputerze',
 			'serverConnect.local.install' => 'Zainstaluj serwer lokalny',
@@ -11617,9 +11619,9 @@ extension on TranslationsPl {
 			'terminal.errors.frameError' => ({required Object message}) => '[Błąd] ${message}',
 			'terminal.errors.connectionError' => ({required Object message}) => '[Błąd połączenia] ${message}',
 			'terminal.loginDialog.title' => ({required Object provider}) => 'Logowanie do ${provider} CLI',
-			'terminal.loginDialog.exited' => ({required Object code}) => 'Zakończono (${code})',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.loginDialog.exited' => ({required Object code}) => 'Zakończono (${code})',
 			'terminal.loginDialog.authLinkDetected' => 'Wykryto link uwierzytelniający',
 			'terminal.empty.title' => 'Brak aktywnego terminala',
 			'terminal.empty.description' => 'Utwórz nową kartę, aby rozpocząć',

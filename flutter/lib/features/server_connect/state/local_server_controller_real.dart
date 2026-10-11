@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:ddagent_app/core/platform/instance.dart';
 import 'package:ddagent_app/features/server_connect/data/local_server.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -20,7 +21,9 @@ class LocalServerController extends Notifier<LocalServerStatus> {
   /// The update check ran this app session — the router guard calls
   /// [ensureRunning] on every navigation, which must not re-run install()
   /// (disk scans + a network lookup when offline) each time.
-  bool _updateChecked = false;
+  /// A server-pinned window never upgrades the local server — that would
+  /// restart it under the primary window.
+  bool _updateChecked = isSecondaryInstance;
 
   @override
   LocalServerStatus build() {

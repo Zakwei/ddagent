@@ -3956,6 +3956,7 @@
     "connect": "接続",
     "connecting": "接続中…",
     "changeServer": "サーバーを変更",
+    "openInNewWindow": "新しいウィンドウで開く",
     "local": {
       "title": "このデバイス",
       "subtitle": "このマシンでDDAgentサーバーを実行します",

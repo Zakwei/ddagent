@@ -575,6 +575,7 @@ class Translations$serverConnect$ko extends Translations$serverConnect$en {
 	@override String get connect => '연결';
 	@override String get connecting => '연결 중…';
 	@override String get changeServer => '서버 변경';
+	@override String get openInNewWindow => '새 창에서 열기';
 	@override late final Translations$serverConnect$local$ko local = Translations$serverConnect$local$ko._(_root);
 	@override String httpStatus({required Object code}) => 'HTTP ${code}';
 	@override String get networkError => '네트워크 오류';
@@ -11411,6 +11412,7 @@ extension on TranslationsKo {
 			'serverConnect.connect' => '연결',
 			'serverConnect.connecting' => '연결 중…',
 			'serverConnect.changeServer' => '서버 변경',
+			'serverConnect.openInNewWindow' => '새 창에서 열기',
 			'serverConnect.local.title' => '이 기기',
 			'serverConnect.local.subtitle' => '이 컴퓨터에서 DDAgent 서버를 실행합니다',
 			'serverConnect.local.install' => '로컬 서버 설치',
@@ -11566,9 +11568,9 @@ extension on TranslationsKo {
 			'terminal.errors.frameError' => ({required Object message}) => '[오류] ${message}',
 			'terminal.errors.connectionError' => ({required Object message}) => '[연결 오류] ${message}',
 			'terminal.loginDialog.title' => ({required Object provider}) => '${provider} CLI 로그인',
-			'terminal.loginDialog.exited' => ({required Object code}) => '종료됨 (${code})',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.loginDialog.exited' => ({required Object code}) => '종료됨 (${code})',
 			'terminal.loginDialog.authLinkDetected' => '인증 링크가 감지되었습니다',
 			'terminal.empty.title' => '활성 터미널 없음',
 			'terminal.empty.description' => '시작하려면 새 탭을 만드세요',

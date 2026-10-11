@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui' show AppExitResponse;
 
 import 'package:ddagent_app/core/network/api_providers.dart';
+import 'package:ddagent_app/core/platform/instance.dart';
 import 'package:ddagent_app/core/platform/window.dart';
 import 'package:ddagent_app/core/realtime/notifications_channel.dart';
 import 'package:ddagent_app/core/realtime/realtime_providers.dart';
@@ -23,8 +24,9 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 
-Future<void> main() async {
+Future<void> main([List<String> args = const []]) async {
   WidgetsFlutterBinding.ensureInitialized();
+  parseInstanceArgs(args);
   // A failed init must not leave a dead white page — the UI still renders and
   // degraded features surface their own errors. (e.g. IndexedDB is
   // unavailable in some private-browsing modes.)

@@ -1,4 +1,5 @@
 import 'package:ddagent_app/core/network/api_providers.dart';
+import 'package:ddagent_app/core/platform/instance.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_card.dart';
@@ -95,6 +96,15 @@ class _ServerConnectScreenState extends ConsumerState<ServerConnectScreen> {
     }
   }
 
+  /// Another app window pinned to [p] — this window keeps its own server.
+  Future<void> _openWindow(ServerProfile p) async {
+    try {
+      await openServerWindow(p.url, isLocal: p.isLocal);
+    } on Object catch (e) {
+      if (mounted) setState(() => _error = '$e');
+    }
+  }
+
   Future<void> _remove(String url) async {
     await ref.read(serverProfilesProvider.notifier).remove(url);
     if (mounted) setState(() {});
@@ -107,6 +117,10 @@ class _ServerConnectScreenState extends ConsumerState<ServerConnectScreen> {
     final c = context.appColors;
     final profilesState = ref.watch(serverProfilesProvider);
     final profiles = profilesState.profiles;
+    final desktop =
+        !kIsWeb &&
+        (defaultTargetPlatform == TargetPlatform.windows ||
+            defaultTargetPlatform == TargetPlatform.linux);
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -131,9 +145,7 @@ class _ServerConnectScreenState extends ConsumerState<ServerConnectScreen> {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: AppSpacing.lg),
-                    if (!kIsWeb &&
-                        (defaultTargetPlatform == TargetPlatform.windows ||
-                            defaultTargetPlatform == TargetPlatform.linux)) ...[
+                    if (desktop) ...[
                       _LocalServerCard(onConnect: (url) => _connect(url, true)),
                       Row(
                         children: [
@@ -169,10 +181,21 @@ class _ServerConnectScreenState extends ConsumerState<ServerConnectScreen> {
                             subtitle: p.label == p.url
                                 ? null
                                 : Text(p.url, overflow: TextOverflow.ellipsis),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.close, size: 18),
-                              tooltip: i18n.common.gitPanel.remove,
-                              onPressed: () => _remove(p.url),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (desktop)
+                                  IconButton(
+                                    icon: const Icon(Icons.open_in_new, size: 18),
+                                    tooltip: i18n.serverConnect.openInNewWindow,
+                                    onPressed: () => _openWindow(p),
+                                  ),
+                                IconButton(
+                                  icon: const Icon(Icons.close, size: 18),
+                                  tooltip: i18n.common.gitPanel.remove,
+                                  onPressed: () => _remove(p.url),
+                                ),
+                              ],
                             ),
                             onTap: _busy ? null : () => _connect(p.url, p.isLocal),
                           ),
