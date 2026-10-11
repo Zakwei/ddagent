@@ -6,6 +6,7 @@ import 'package:ddagent_app/core/realtime/ws_client.dart';
 import 'package:ddagent_app/core/theme/app_theme.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/projects/view/projects_screen.dart';
+import 'package:ddagent_app/features/server_connect/data/server_profiles.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -88,6 +89,34 @@ void main() {
     final s = c.read(projectsProvider);
     expect(s.projects.map((p) => p.projectId), ['a', 'b']);
     expect(s.archived.single.projectId, 'old');
+    c.dispose();
+  });
+
+  test('switching server reloads the list from the new server', () async {
+    final c = ProviderContainer(
+      overrides: [
+        dioProvider.overrideWith(
+          (ref) => _fakeDio(_routes([ref.watch(serverBaseUrlProvider) == 'http://a' ? 'a' : 'b'])),
+        ),
+        chatChannelProvider.overrideWith((ref) {
+          ref.watch(serverBaseUrlProvider);
+          return ChatChannel(WsClient(urlBuilder: () async => Uri.parse('ws://t')));
+        }),
+      ],
+    )..listen(projectsProvider, (_, _) {});
+    await c.read(serverProfilesProvider.notifier).select('http://a');
+    await _loaded(c);
+    expect(c.read(projectsProvider).projects.single.projectId, 'a');
+
+    await c.read(serverProfilesProvider.notifier).select('http://b');
+    for (
+      var i = 0;
+      i < 500 && c.read(projectsProvider).projects.firstOrNull?.projectId != 'b';
+      i++
+    ) {
+      await Future<void>.delayed(const Duration(milliseconds: 1));
+    }
+    expect(c.read(projectsProvider).projects.single.projectId, 'b');
     c.dispose();
   });
 

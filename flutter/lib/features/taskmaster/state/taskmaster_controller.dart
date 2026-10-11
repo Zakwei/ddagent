@@ -163,7 +163,7 @@ class TaskmasterController extends Notifier<TaskmasterState> {
 
   @override
   TaskmasterState build() {
-    _eventsSub = ref.read(chatChannelProvider).events.listen(handleServerEvent);
+    _eventsSub = ref.watch(chatChannelProvider).events.listen(handleServerEvent);
     ref.onDispose(() => unawaited(_eventsSub?.cancel()));
     return const TaskmasterState();
   }

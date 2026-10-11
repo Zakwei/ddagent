@@ -54,7 +54,7 @@ class KanbanController extends Notifier<KanbanState> {
   @override
   KanbanState build() {
     _eventsSub?.cancel();
-    _eventsSub = ref.read(chatChannelProvider).events.listen(handleServerEvent);
+    _eventsSub = ref.watch(chatChannelProvider).events.listen(handleServerEvent);
 
     ref.onDispose(() {
       unawaited(_eventsSub?.cancel());

@@ -43,7 +43,6 @@ class SessionsController extends Notifier<SessionsState> {
 
   Timer? _reloadDebounce;
   StreamSubscription<dynamic>? _eventsSub;
-  bool _loaded = false;
   StreamSubscription<WsState>? _statesSub;
 
   SessionsRepository get _repo => ref.read(sessionsRepositoryProvider);
@@ -51,15 +50,18 @@ class SessionsController extends Notifier<SessionsState> {
 
   @override
   SessionsState build() {
+    // Watched, not read: a server switch rebuilds the channel, which must
+    // rebuild (and reload) this list — otherwise it keeps the old server's.
+    final channel = ref.watch(chatChannelProvider);
     _eventsSub?.cancel();
-    _eventsSub = ref.read(chatChannelProvider).events.listen((e) {
+    _eventsSub = channel.events.listen((e) {
       if (e.kind == 'session_upserted' || e.kind == 'session_removed') {
         _reloadDebounce?.cancel();
         _reloadDebounce = Timer(const Duration(milliseconds: 400), () => unawaited(load()));
       }
     });
     _statesSub?.cancel();
-    _statesSub = ref.read(chatChannelProvider).states.listen((state) {
+    _statesSub = channel.states.listen((state) {
       if (state == WsState.open) {
         _reloadDebounce?.cancel();
         _reloadDebounce = Timer(const Duration(milliseconds: 400), () => unawaited(load()));
@@ -70,10 +72,7 @@ class SessionsController extends Notifier<SessionsState> {
       unawaited(_eventsSub?.cancel());
       _reloadDebounce?.cancel();
     });
-    if (!_loaded) {
-      _loaded = true;
-      Future(load);
-    }
+    Future(load);
     return const SessionsState();
   }
 

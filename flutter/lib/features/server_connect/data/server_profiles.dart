@@ -73,12 +73,13 @@ class ServerProfilesController extends Notifier<ServerProfilesState> {
         for (final e in jsonDecode(raw) as List<dynamic>)
           ServerProfile.fromJson(Map<String, dynamic>.from(e as Map)),
     ];
-    // A window pinned to a server (own storage) starts on that server.
+    // A window pinned to a server (own storage) always starts on that server,
+    // even if it was switched elsewhere last time.
     final pinned = pinnedServerUrl;
     if (pinned != null && !profiles.any((p) => p.url == pinned)) {
       profiles.add(ServerProfile(url: pinned, isLocal: pinnedServerIsLocal));
     }
-    var active = (_box.get(_activeKey) as String?) ?? pinned;
+    var active = pinned ?? _box.get(_activeKey) as String?;
     // First launch: seed from --dart-define or the first saved profile.
     active ??= Env.defaultServerUrl.isNotEmpty ? Env.defaultServerUrl : null;
     active ??= profiles.isEmpty ? null : profiles.first.url;

@@ -53,14 +53,16 @@ class ProjectsController extends Notifier<ProjectsState> {
   StreamSubscription<ServerEvent>? _eventsSub;
   Timer? _reloadDebounce;
   Timer? _progressTimer;
-  bool _loaded = false;
 
   ProjectsRepository get _repo => ref.read(projectsRepositoryProvider);
 
   @override
   ProjectsState build() {
+    // Watched, not read: a server switch rebuilds the channel, which must
+    // rebuild (and reload) the sidebar — otherwise it keeps the old server's.
+    final channel = ref.watch(chatChannelProvider);
     _eventsSub?.cancel();
-    _eventsSub = ref.read(chatChannelProvider).events.listen((e) {
+    _eventsSub = channel.events.listen((e) {
       if (e.kind == 'loading_progress') {
         _progressTimer?.cancel();
         state = state.copyWith(syncing: true);
@@ -84,10 +86,7 @@ class ProjectsController extends Notifier<ProjectsState> {
       _reloadDebounce?.cancel();
       _progressTimer?.cancel();
     });
-    if (!_loaded) {
-      _loaded = true;
-      Future(load);
-    }
+    Future(load);
     return const ProjectsState();
   }
 
