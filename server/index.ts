@@ -13,6 +13,10 @@ import { getConnectableHost } from '../shared/networkHosts.js';
 
 import { createServices } from './services.js';
 
+// The desktop app leaves its local server running after it quits, which breaks
+// the stdio pipes it spawned us with — a failed log write must not kill us.
+for (const stream of [process.stdout, process.stderr]) stream.on('error', () => {});
+
 console.log('SERVER_PORT from env:', process.env.SERVER_PORT);
 
 const SERVER_PORT = Number.parseInt(process.env.SERVER_PORT || '3001', 10);
