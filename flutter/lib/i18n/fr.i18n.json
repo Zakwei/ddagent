@@ -333,7 +333,8 @@
       "voiceStop": "Arrêter la dictée",
       "pinFile": "Épingler le fichier au contexte",
       "voiceSettings": "Paramètres vocaux (STT)",
-      "cameraUnavailable": "Appareil photo indisponible : {{error}}"
+      "cameraUnavailable": "Appareil photo indisponible : {{error}}",
+      "pasteFailed": "Impossible de coller depuis le presse-papiers : {{error}}"
     },
     "composer": {
       "toolsAndActions": "Outils et actions",

@@ -343,7 +343,8 @@
       "voiceStop": "Остановить диктовку",
       "pinFile": "Закрепить файл в контексте",
       "voiceSettings": "Настройки голоса (STT)",
-      "cameraUnavailable": "Камера недоступна: {{error}}"
+      "cameraUnavailable": "Камера недоступна: {{error}}",
+      "pasteFailed": "Не удалось вставить из буфера обмена: {{error}}"
     },
     "composer": {
       "toolsAndActions": "Инструменты и действия",

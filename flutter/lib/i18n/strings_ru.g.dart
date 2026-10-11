@@ -1108,6 +1108,7 @@ class Translations$chat$input$ru extends Translations$chat$input$en {
 	@override String get pinFile => 'Закрепить файл в контексте';
 	@override String get voiceSettings => 'Настройки голоса (STT)';
 	@override String cameraUnavailable({required Object error}) => 'Камера недоступна: ${error}';
+	@override String pasteFailed({required Object error}) => 'Не удалось вставить из буфера обмена: ${error}';
 }
 
 // Path: chat.composer
@@ -8779,6 +8780,7 @@ extension on TranslationsRu {
 			'chat.input.pinFile' => 'Закрепить файл в контексте',
 			'chat.input.voiceSettings' => 'Настройки голоса (STT)',
 			'chat.input.cameraUnavailable' => ({required Object error}) => 'Камера недоступна: ${error}',
+			'chat.input.pasteFailed' => ({required Object error}) => 'Не удалось вставить из буфера обмена: ${error}',
 			'chat.composer.toolsAndActions' => 'Инструменты и действия',
 			'chat.composer.toolsAndActionsDesc' => 'Инструменты и элементы управления полем ввода',
 			'chat.composer.reasoning' => 'Рассуждает',
@@ -9050,9 +9052,9 @@ extension on TranslationsRu {
 			'chat.modelLibrary.idHint' => 'например, gpt-5.5-pro',
 			'chat.modelLibrary.idHelp' => 'Используйте точный идентификатор, который принимает CLI провайдера. ID не может содержать пробелы.',
 			'chat.modelLibrary.updatedNotice' => ({required Object name}) => '${name} обновлена.',
-			'chat.modelLibrary.addedNotice' => ({required Object name}) => '${name} добавлена.',
 			_ => null,
 		} ?? switch (path) {
+			'chat.modelLibrary.addedNotice' => ({required Object name}) => '${name} добавлена.',
 			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '${name} удалена.',
 			'chat.modelLibrary.saving' => 'Сохранение…',
 			'chat.modelLibrary.saveChanges' => 'Сохранить изменения',
@@ -9564,9 +9566,9 @@ extension on TranslationsRu {
 			'common.projectWizard.step2.newPlaceholder' => '/путь/к/новому/пространству',
 			'common.projectWizard.step2.existingHelp' => 'Полный путь к каталогу вашего рабочего пространства',
 			'common.projectWizard.step2.newHelp' => 'Полный путь к каталогу вашего рабочего пространства',
-			'common.projectWizard.step2.githubUrl' => 'URL GitHub (необязательно)',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step2.githubUrl' => 'URL GitHub (необязательно)',
 			'common.projectWizard.step2.githubPlaceholder' => 'https://github.com/username/repository',
 			'common.projectWizard.step2.githubHelp' => 'Необязательно: укажите URL GitHub для клонирования репозитория',
 			'common.projectWizard.step2.githubAuth' => 'Аутентификация GitHub (необязательно)',
@@ -10078,9 +10080,9 @@ extension on TranslationsRu {
 			'settings.mcp.addServer' => 'Добавить сервер',
 			'settings.mcp.editServer' => 'Редактировать сервер',
 			'settings.mcp.deleteServer' => 'Удалить сервер',
-			'settings.mcp.serverName' => 'Имя сервера',
 			_ => null,
 		} ?? switch (path) {
+			'settings.mcp.serverName' => 'Имя сервера',
 			'settings.mcp.serverType' => 'Тип сервера',
 			'settings.mcp.config' => 'Конфигурация',
 			'settings.mcp.testConnection' => 'Проверить подключение',
@@ -10592,9 +10594,9 @@ extension on TranslationsRu {
 			'settings.browser.statusLabel' => 'Статус',
 			'settings.browser.statusReady' => 'готов',
 			'settings.browser.statusSetupRequired' => 'требуется настройка',
-			'settings.browser.title' => 'Browser',
 			_ => null,
 		} ?? switch (path) {
+			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => 'Отмена',
 			'settings.workspaces.create' => 'Добавить рабочую область',
 			'settings.workspaces.deleteConfirm' => 'Удалить эту рабочую область из DDAgent? Её файлы останутся на диске.',
@@ -11106,9 +11108,9 @@ extension on TranslationsRu {
 			'tasks.taskDetail.description' => 'Описание',
 			'tasks.taskDetail.edit' => 'Редактировать задачу',
 			'tasks.taskDetail.implDetails' => 'Детали реализации',
-			'tasks.taskDetail.noDependencies' => 'Нет зависимостей',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.noDependencies' => 'Нет зависимостей',
 			'tasks.taskDetail.noDescription' => 'Описание отсутствует',
 			'tasks.taskDetail.priority' => 'Приоритет',
 			'tasks.taskDetail.priorityNotSet' => 'Не задан',
@@ -11620,9 +11622,9 @@ extension on TranslationsRu {
 			'terminal.shortcuts.showTooltip' => 'Показать горячие клавиши',
 			'terminal.shortcuts.hideTooltip' => 'Скрыть горячие клавиши',
 			'terminal.paste.title' => 'Вставить в терминал',
-			'terminal.paste.hint' => 'Ctrl+V / правый клик → Вставить',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.paste.hint' => 'Ctrl+V / правый клик → Вставить',
 			'terminal.errors.couldNotOpenLink' => ({required Object url}) => 'Не удалось открыть ссылку: ${url}',
 			'terminal.errors.frameError' => ({required Object message}) => '[Ошибка] ${message}',
 			'terminal.errors.connectionError' => ({required Object message}) => '[Ошибка подключения] ${message}',

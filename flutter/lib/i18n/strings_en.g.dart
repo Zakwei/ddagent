@@ -1778,6 +1778,9 @@ class Translations$chat$input$en {
 
 	/// en: 'Camera unavailable: {{error}}'
 	String cameraUnavailable({required Object error}) => 'Camera unavailable: ${error}';
+
+	/// en: 'Could not paste from clipboard: {{error}}'
+	String pasteFailed({required Object error}) => 'Could not paste from clipboard: ${error}';
 }
 
 // Path: chat.composer
@@ -15195,6 +15198,7 @@ extension on Translations {
 			'chat.input.pinFile' => 'Pin file to context',
 			'chat.input.voiceSettings' => 'Voice settings (STT)',
 			'chat.input.cameraUnavailable' => ({required Object error}) => 'Camera unavailable: ${error}',
+			'chat.input.pasteFailed' => ({required Object error}) => 'Could not paste from clipboard: ${error}',
 			'chat.composer.toolsAndActions' => 'Tools & actions',
 			'chat.composer.toolsAndActionsDesc' => 'Tools and controls for chat composer',
 			'chat.composer.reasoning' => 'Reasoning',
@@ -15466,9 +15470,9 @@ extension on Translations {
 			'chat.modelLibrary.idHint' => 'e.g. gpt-5.5-pro',
 			'chat.modelLibrary.idHelp' => 'Use the exact identifier accepted by the provider CLI. IDs cannot contain spaces.',
 			'chat.modelLibrary.updatedNotice' => ({required Object name}) => '${name} was updated.',
-			'chat.modelLibrary.addedNotice' => ({required Object name}) => '${name} was added.',
 			_ => null,
 		} ?? switch (path) {
+			'chat.modelLibrary.addedNotice' => ({required Object name}) => '${name} was added.',
 			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '${name} was deleted.',
 			'chat.modelLibrary.saving' => 'Saving…',
 			'chat.modelLibrary.saveChanges' => 'Save changes',
@@ -15980,9 +15984,9 @@ extension on Translations {
 			'common.projectWizard.step2.newPlaceholder' => '/path/to/new/workspace',
 			'common.projectWizard.step2.existingHelp' => 'Full path to your existing workspace directory',
 			'common.projectWizard.step2.newHelp' => 'Full path to your workspace directory',
-			'common.projectWizard.step2.githubUrl' => 'GitHub URL (Optional)',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step2.githubUrl' => 'GitHub URL (Optional)',
 			'common.projectWizard.step2.githubPlaceholder' => 'https://github.com/username/repository',
 			'common.projectWizard.step2.githubHelp' => 'Optional: provide a GitHub URL to clone a repository',
 			'common.projectWizard.step2.githubAuth' => 'GitHub Authentication (Optional)',
@@ -16494,9 +16498,9 @@ extension on Translations {
 			'settings.mcp.addServer' => 'Add Server',
 			'settings.mcp.editServer' => 'Edit Server',
 			'settings.mcp.deleteServer' => 'Delete Server',
-			'settings.mcp.serverName' => 'Server Name',
 			_ => null,
 		} ?? switch (path) {
+			'settings.mcp.serverName' => 'Server Name',
 			'settings.mcp.serverType' => 'Server Type',
 			'settings.mcp.config' => 'Configuration',
 			'settings.mcp.testConnection' => 'Test Connection',
@@ -17008,9 +17012,9 @@ extension on Translations {
 			'settings.browser.statusLabel' => 'Status',
 			'settings.browser.statusReady' => 'ready',
 			'settings.browser.statusSetupRequired' => 'setup required',
-			'settings.browser.title' => 'Browser',
 			_ => null,
 		} ?? switch (path) {
+			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => 'Cancel',
 			'settings.workspaces.create' => 'Add workspace',
 			'settings.workspaces.deleteConfirm' => 'Remove this workspace from DDAgent? Its files stay on disk.',
@@ -17522,9 +17526,9 @@ extension on Translations {
 			'tasks.taskDetail.description' => 'Description',
 			'tasks.taskDetail.edit' => 'Edit task',
 			'tasks.taskDetail.implDetails' => 'Implementation Details',
-			'tasks.taskDetail.noDependencies' => 'No dependencies',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.noDependencies' => 'No dependencies',
 			'tasks.taskDetail.noDescription' => 'No description provided',
 			'tasks.taskDetail.priority' => 'Priority',
 			'tasks.taskDetail.priorityNotSet' => 'Not set',
@@ -18036,9 +18040,9 @@ extension on Translations {
 			'terminal.shortcuts.showTooltip' => 'Show Shortcuts',
 			'terminal.shortcuts.hideTooltip' => 'Hide Shortcuts',
 			'terminal.paste.title' => 'Paste into terminal',
-			'terminal.paste.hint' => 'Ctrl+V / right-click → Paste',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.paste.hint' => 'Ctrl+V / right-click → Paste',
 			'terminal.errors.couldNotOpenLink' => ({required Object url}) => 'Could not open link: ${url}',
 			'terminal.errors.frameError' => ({required Object message}) => '[Error] ${message}',
 			'terminal.errors.connectionError' => ({required Object message}) => '[Connection Error] ${message}',

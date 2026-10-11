@@ -1105,6 +1105,7 @@ class Translations$chat$input$ja extends Translations$chat$input$en {
 	@override String get pinFile => 'ファイルをコンテキストに固定';
 	@override String get voiceSettings => '音声設定 (STT)';
 	@override String cameraUnavailable({required Object error}) => 'カメラを利用できません: ${error}';
+	@override String pasteFailed({required Object error}) => 'クリップボードから貼り付けできませんでした: ${error}';
 }
 
 // Path: chat.composer
@@ -8730,6 +8731,7 @@ extension on TranslationsJa {
 			'chat.input.pinFile' => 'ファイルをコンテキストに固定',
 			'chat.input.voiceSettings' => '音声設定 (STT)',
 			'chat.input.cameraUnavailable' => ({required Object error}) => 'カメラを利用できません: ${error}',
+			'chat.input.pasteFailed' => ({required Object error}) => 'クリップボードから貼り付けできませんでした: ${error}',
 			'chat.composer.toolsAndActions' => 'ツールとアクション',
 			'chat.composer.toolsAndActionsDesc' => 'チャット入力欄のツールとコントロール',
 			'chat.composer.reasoning' => '推論',
@@ -9001,9 +9003,9 @@ extension on TranslationsJa {
 			'chat.modelLibrary.idHint' => '例: gpt-5.5-pro',
 			'chat.modelLibrary.idHelp' => 'プロバイダー CLI が受け付ける識別子をそのまま使用してください。ID にスペースは使用できません。',
 			'chat.modelLibrary.updatedNotice' => ({required Object name}) => '${name} を更新しました。',
-			'chat.modelLibrary.addedNotice' => ({required Object name}) => '${name} を追加しました。',
 			_ => null,
 		} ?? switch (path) {
+			'chat.modelLibrary.addedNotice' => ({required Object name}) => '${name} を追加しました。',
 			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '${name} を削除しました。',
 			'chat.modelLibrary.saving' => '保存中…',
 			'chat.modelLibrary.saveChanges' => '変更を保存',
@@ -9515,9 +9517,9 @@ extension on TranslationsJa {
 			'common.projectWizard.step2.newPlaceholder' => '/path/to/new/workspace',
 			'common.projectWizard.step2.existingHelp' => '既存のワークスペースディレクトリのフルパス',
 			'common.projectWizard.step2.newHelp' => 'ワークスペースディレクトリのフルパス',
-			'common.projectWizard.step2.githubUrl' => 'GitHub URL（任意）',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step2.githubUrl' => 'GitHub URL（任意）',
 			'common.projectWizard.step2.githubPlaceholder' => 'https://github.com/username/repository',
 			'common.projectWizard.step2.githubHelp' => '任意: リポジトリをクローンするためのGitHub URLを入力してください',
 			'common.projectWizard.step2.githubAuth' => 'GitHub認証（任意）',
@@ -10029,9 +10031,9 @@ extension on TranslationsJa {
 			'settings.mcp.addServer' => 'サーバーを追加',
 			'settings.mcp.editServer' => 'サーバーを編集',
 			'settings.mcp.deleteServer' => 'サーバーを削除',
-			'settings.mcp.serverName' => 'サーバー名',
 			_ => null,
 		} ?? switch (path) {
+			'settings.mcp.serverName' => 'サーバー名',
 			'settings.mcp.serverType' => 'サーバーの種類',
 			'settings.mcp.config' => '設定',
 			'settings.mcp.testConnection' => '接続テスト',
@@ -10543,9 +10545,9 @@ extension on TranslationsJa {
 			'settings.browser.statusLabel' => 'ステータス',
 			'settings.browser.statusReady' => '準備完了',
 			'settings.browser.statusSetupRequired' => 'セットアップが必要',
-			'settings.browser.title' => 'Browser',
 			_ => null,
 		} ?? switch (path) {
+			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => 'キャンセル',
 			'settings.workspaces.create' => 'ワークスペースを追加',
 			'settings.workspaces.deleteConfirm' => 'このワークスペースを DDAgent から削除しますか？ファイルはディスクに残ります。',
@@ -11057,9 +11059,9 @@ extension on TranslationsJa {
 			'tasks.taskDetail.description' => '説明',
 			'tasks.taskDetail.edit' => 'タスクを編集',
 			'tasks.taskDetail.implDetails' => '実装の詳細',
-			'tasks.taskDetail.noDependencies' => '依存関係なし',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.noDependencies' => '依存関係なし',
 			'tasks.taskDetail.noDescription' => '説明がありません',
 			'tasks.taskDetail.priority' => '優先度',
 			'tasks.taskDetail.priorityNotSet' => '未設定',
@@ -11571,9 +11573,9 @@ extension on TranslationsJa {
 			'terminal.shortcuts.showTooltip' => 'ショートカットを表示',
 			'terminal.shortcuts.hideTooltip' => 'ショートカットを非表示',
 			'terminal.paste.title' => 'ターミナルに貼り付け',
-			'terminal.paste.hint' => 'Ctrl+V / 右クリック → 貼り付け',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.paste.hint' => 'Ctrl+V / 右クリック → 貼り付け',
 			'terminal.errors.couldNotOpenLink' => ({required Object url}) => 'リンクを開けませんでした: ${url}',
 			'terminal.errors.frameError' => ({required Object message}) => '[エラー] ${message}',
 			'terminal.errors.connectionError' => ({required Object message}) => '[接続エラー] ${message}',

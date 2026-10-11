@@ -343,7 +343,8 @@
       "voiceStop": "Zatrzymaj dyktowanie",
       "pinFile": "Przypnij plik do kontekstu",
       "voiceSettings": "Ustawienia głosu (STT)",
-      "cameraUnavailable": "Aparat niedostępny: {{error}}"
+      "cameraUnavailable": "Aparat niedostępny: {{error}}",
+      "pasteFailed": "Nie udało się wkleić ze schowka: {{error}}"
     },
     "composer": {
       "toolsAndActions": "Narzędzia i akcje",

@@ -333,7 +333,8 @@
       "voiceStop": "Stop dictation",
       "pinFile": "Pin file to context",
       "voiceSettings": "Voice settings (STT)",
-      "cameraUnavailable": "Camera unavailable: {{error}}"
+      "cameraUnavailable": "Camera unavailable: {{error}}",
+      "pasteFailed": "Could not paste from clipboard: {{error}}"
     },
     "composer": {
       "toolsAndActions": "Tools & actions",

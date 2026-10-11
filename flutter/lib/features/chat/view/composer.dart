@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 
 import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
@@ -29,6 +30,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:pasteboard/pasteboard.dart';
 
 /// Chat composer (T14): multiline input, send/abort, attachments, model /
 /// effort / permission / account picks, slash commands, @-mentions, pinned
@@ -117,8 +119,11 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
       // send carries `accountId` (the load may still be in flight; `_init`
       // preserves the selection when the accounts list lands).
       final initialAccountId = widget.initialAccountId;
-      if (initialAccountId != null && ref.read(composerProvider(_arg)).accountId == null) {
-        ref.read(composerProvider(_arg).notifier).selectAccount(initialAccountId);
+      if (initialAccountId != null &&
+          ref.read(composerProvider(_arg)).accountId == null) {
+        ref
+            .read(composerProvider(_arg).notifier)
+            .selectAccount(initialAccountId);
       }
     });
   }
@@ -167,7 +172,9 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
 
   /// `filterSlashCommands` — `/prefix` matches first; a `:` query or a hit
   /// keeps prefix-only semantics, else name substring, else description.
-  List<Map<String, dynamic>> _filteredCommands(List<Map<String, dynamic>> cmds) {
+  List<Map<String, dynamic>> _filteredCommands(
+    List<Map<String, dynamic>> cmds,
+  ) {
     final q = _slashQuery.trim().toLowerCase();
     if (q.isEmpty) return cmds;
     final prefix = q.startsWith('/') ? q : '/$q';
@@ -189,9 +196,13 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
 
   /// Top-5 commands by per-project usage (`command_history_<projectId>`),
   /// deduplicated out of the regular groups by `SlashCommandList`.
-  List<Map<String, dynamic>> _frequentCommands(List<Map<String, dynamic>> cmds) {
+  List<Map<String, dynamic>> _frequentCommands(
+    List<Map<String, dynamic>> cmds,
+  ) {
     if (cmds.isEmpty) return const [];
-    final history = ref.read(composerProvider(_arg).notifier).commandUsageHistory();
+    final history = ref
+        .read(composerProvider(_arg).notifier)
+        .commandUsageHistory();
     final used = [
       for (final c in cmds)
         if ((history['${c['name']}'] ?? 0) > 0) (c, history['${c['name']}']!),
@@ -245,7 +256,9 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
   /// input, everything else executes through `/api/commands/execute`.
   Future<void> _selectSlashCommand(int i) async {
     final t = Translations.of(context);
-    final cmds = _filteredCommands(ref.read(composerProvider(_arg)).slashCommands);
+    final cmds = _filteredCommands(
+      ref.read(composerProvider(_arg)).slashCommands,
+    );
     if (i < 0 || i >= cmds.length) return;
     final c = cmds[i];
     ref.read(composerProvider(_arg).notifier).trackCommandUsage('${c['name']}');
@@ -257,10 +270,12 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
     // Web `executeCommand`: args come from the text after the command name
     // (`$ARGUMENTS`/`$1` substitute server-side), and `/cost` reads the
     // session's live token budget off `context.tokenUsage`.
-    final nameMatch = RegExp('${RegExp.escape('${c['name']}')}\\s*(.*)').firstMatch(_input.text);
-    final args = (nameMatch?.group(1)?.trim().split(RegExp(r'\s+')) ?? const <String>[])
-        .where((a) => a.isNotEmpty)
-        .toList();
+    final nameMatch = RegExp('${RegExp.escape('${c['name']}')}\\s*(.*)')
+        .firstMatch(_input.text);
+    final args =
+        (nameMatch?.group(1)?.trim().split(RegExp(r'\s+')) ?? const <String>[])
+            .where((a) => a.isNotEmpty)
+            .toList();
     final result = await ref
         .read(composerProvider(_arg).notifier)
         .executeCommand(c, args, tokenUsage: _tokenUsageMap());
@@ -322,8 +337,13 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
         }
         final path = data['path']?.toString();
         final projectId = widget.projectId;
-        if (data['exists'] == true && path != null && path.isNotEmpty && projectId != null) {
-          router?.go('/editor?projectId=$projectId&file=${Uri.encodeComponent(path)}');
+        if (data['exists'] == true &&
+            path != null &&
+            path.isNotEmpty &&
+            projectId != null) {
+          router?.go(
+            '/editor?projectId=$projectId&file=${Uri.encodeComponent(path)}',
+          );
         }
       case 'config':
         router?.go('/settings');
@@ -428,7 +448,9 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
     final value = insert.startsWith('@') ? insert : '@$insert';
     _input.value = TextEditingValue(
       text: '$before$value $rest',
-      selection: TextSelection.collapsed(offset: before.length + value.length + 1),
+      selection: TextSelection.collapsed(
+        offset: before.length + value.length + 1,
+      ),
     );
     _closeMention();
     _onChanged(_input.text);
@@ -440,6 +462,7 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
   /// it fires before the send Shortcut.
   KeyEventResult _onComposerKey(FocusNode node, KeyEvent e) {
     if (e is! KeyDownEvent) return KeyEventResult.ignored;
+    if (_isDesktopPaste(e)) unawaited(_pasteClipboardFiles());
     final slash = _slashEntry != null;
     final mention = _mentionEntry != null;
     if (!slash && !mention) return KeyEventResult.ignored;
@@ -457,7 +480,8 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
       return KeyEventResult.ignored;
     }
     final count = slash
-        ? _filteredCommands(ref.read(composerProvider(_arg)).slashCommands).length
+        ? _filteredCommands(ref.read(composerProvider(_arg)).slashCommands)
+              .length
         : _mentions.length;
     if (count == 0) return KeyEventResult.ignored;
     final index = slash ? _slashIndex : _mentionIndex;
@@ -466,7 +490,8 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
       next = index < count - 1 ? index + 1 : 0;
     } else if (key == LogicalKeyboardKey.arrowUp) {
       next = index > 0 ? index - 1 : count - 1;
-    } else if (key == LogicalKeyboardKey.enter || key == LogicalKeyboardKey.tab) {
+    } else if (key == LogicalKeyboardKey.enter ||
+        key == LogicalKeyboardKey.tab) {
       if (slash) {
         unawaited(_selectSlashCommand(index >= 0 ? index : 0));
       } else {
@@ -535,10 +560,15 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
       final x = await ImagePicker().pickImage(source: ImageSource.camera);
       if (x == null) return;
       final bytes = await x.readAsBytes();
-      await ref.read(composerProvider(_arg).notifier).attach(x.name, bytes, isImage: true);
+      await ref
+          .read(composerProvider(_arg).notifier)
+          .attach(x.name, bytes, isImage: true);
     } on Object catch (e) {
       if (mounted) {
-        AppToast.error(context, Translations.of(context).chat.input.cameraUnavailable(error: e));
+        AppToast.error(
+          context,
+          Translations.of(context).chat.input.cameraUnavailable(error: e),
+        );
       }
     }
   }
@@ -580,8 +610,86 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
     );
   }
 
-  static const _imageExts = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp', 'avif'};
-  static bool _isImageName(String name) => _imageExts.contains(name.split('.').last.toLowerCase());
+  static bool get _isNativeDesktop =>
+      !kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.windows ||
+          defaultTargetPlatform == TargetPlatform.linux ||
+          defaultTargetPlatform == TargetPlatform.macOS);
+
+  /// Ctrl+V / Shift+Insert (Cmd+V on macOS) in the native desktop app.
+  static bool _isDesktopPaste(KeyDownEvent e) {
+    if (!_isNativeDesktop) return false;
+    final keys = HardwareKeyboard.instance;
+    if (e.logicalKey == LogicalKeyboardKey.insert) return keys.isShiftPressed;
+    if (e.logicalKey != LogicalKeyboardKey.keyV) return false;
+    return defaultTargetPlatform == TargetPlatform.macOS
+        ? keys.isMetaPressed
+        : keys.isControlPressed;
+  }
+
+  /// Native desktop paste — Flutter's `TextField` only pastes text, so a
+  /// screenshot or files copied in the file manager are read off the system
+  /// clipboard here. The key event still falls through, so text pastes are
+  /// untouched.
+  Future<void> _pasteClipboardFiles() async {
+    final notifier = ref.read(composerProvider(_arg).notifier);
+    try {
+      final paths = await Pasteboard.files();
+      if (paths.isNotEmpty) {
+        for (final path in paths) {
+          final bytes = await XFile(path).readAsBytes();
+          await notifier.attach(
+            pathBasename(path),
+            bytes,
+            isImage: _isImageName(path),
+          );
+        }
+        return;
+      }
+      final raw = await Pasteboard.image;
+      if (raw == null || raw.isEmpty) return;
+      final png = await _toPng(raw);
+      final stamp = DateTime.now().millisecondsSinceEpoch;
+      await notifier.attach('pasted-image-$stamp.png', png, isImage: true);
+    } on Object catch (e) {
+      if (mounted) {
+        AppToast.error(
+          context,
+          Translations.of(context).chat.input.pasteFailed(error: '$e'),
+        );
+      }
+    }
+  }
+
+  /// Windows hands clipboard images over as BMP, which the server's upload
+  /// filter rejects — re-encode anything that isn't already PNG.
+  static Future<Uint8List> _toPng(Uint8List bytes) async {
+    final isPng =
+        bytes.length > 8 &&
+        bytes[0] == 0x89 &&
+        bytes[1] == 0x50 &&
+        bytes[2] == 0x4E;
+    if (isPng) return bytes;
+    final codec = await ui.instantiateImageCodec(bytes);
+    final frame = await codec.getNextFrame();
+    final data = await frame.image.toByteData(format: ui.ImageByteFormat.png);
+    frame.image.dispose();
+    codec.dispose();
+    if (data == null) throw StateError('PNG encode failed');
+    return data.buffer.asUint8List();
+  }
+
+  static const _imageExts = {
+    'png',
+    'jpg',
+    'jpeg',
+    'gif',
+    'webp',
+    'bmp',
+    'avif',
+  };
+  static bool _isImageName(String name) =>
+      _imageExts.contains(name.split('.').last.toLowerCase());
 
   Future<void> _send() async {
     // Snapshot before every AI turn so the whole turn can be undone (web
@@ -596,7 +704,8 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
             .create(label: t.chat.checkpoint.beforeAiTurn),
       );
     }
-    final running = ref.read(transcriptProvider(widget.sessionId)).runStatus == 'running';
+    final running =
+        ref.read(transcriptProvider(widget.sessionId)).runStatus == 'running';
     await ref.read(composerProvider(_arg).notifier).send(running: running);
   }
 
@@ -654,12 +763,18 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
     }
 
     final running =
-        ref.watch(transcriptProvider(widget.sessionId).select((s) => s.runStatus)) == 'running';
+        ref.watch(
+          transcriptProvider(widget.sessionId).select((s) => s.runStatus),
+        ) ==
+        'running';
     final offlineCount = ref.watch(
       transcriptProvider(widget.sessionId).select((s) => s.offlineCount),
     );
-    final sendByCtrlEnter = ref.watch(uiPreferencesProvider.select((p) => p.sendByCtrlEnter));
-    final hasDraft = state.input.trim().isNotEmpty || state.attachments.isNotEmpty;
+    final sendByCtrlEnter = ref.watch(
+      uiPreferencesProvider.select((p) => p.sendByCtrlEnter),
+    );
+    final hasDraft =
+        state.input.trim().isNotEmpty || state.attachments.isNotEmpty;
     final canQueueDraft = running && hasDraft;
 
     final optionBar = _OptionBar(
@@ -681,10 +796,13 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
           _OfflineQueueCard(
             count: offlineCount,
             onClear: () => unawaited(
-              ref.read(transcriptProvider(widget.sessionId).notifier).clearOfflineQueue(),
+              ref
+                  .read(transcriptProvider(widget.sessionId).notifier)
+                  .clearOfflineQueue(),
             ),
           ),
-        if (state.queue.isNotEmpty) _QueueCard(arg: _arg, queue: state.queue, running: running),
+        if (state.queue.isNotEmpty)
+          _QueueCard(arg: _arg, queue: state.queue, running: running),
         // `.chat-activity-tab` — spinner + rotating label + elapsed + Stop,
         // pinned above the prompt box while the session is processing
         // (web `ActivityIndicator`, rendered from ChatComposer).
@@ -717,8 +835,9 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                       for (var i = 0; i < state.attachments.length; i++)
                         _AttachmentChip(
                           record: state.attachments[i],
-                          onRemove: () =>
-                              ref.read(composerProvider(_arg).notifier).removeAttachment(i),
+                          onRemove: () => ref
+                              .read(composerProvider(_arg).notifier)
+                              .removeAttachment(i),
                         ),
                     ],
                   ),
@@ -752,16 +871,24 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                     // is off — with it on, Enter is a newline like
                     // Shift+Enter.
                     shortcuts: {
-                      const SingleActivator(LogicalKeyboardKey.enter, control: true):
-                          const _SendIntent(),
-                      const SingleActivator(LogicalKeyboardKey.enter, meta: true):
-                          const _SendIntent(),
+                      const SingleActivator(
+                        LogicalKeyboardKey.enter,
+                        control: true,
+                      ): const _SendIntent(),
+                      const SingleActivator(
+                        LogicalKeyboardKey.enter,
+                        meta: true,
+                      ): const _SendIntent(),
                       if (sendByCtrlEnter)
-                        const SingleActivator(LogicalKeyboardKey.enter): const _NewlineIntent()
+                        const SingleActivator(LogicalKeyboardKey.enter):
+                            const _NewlineIntent()
                       else
-                        const SingleActivator(LogicalKeyboardKey.enter): const _SendIntent(),
-                      const SingleActivator(LogicalKeyboardKey.enter, shift: true):
-                          const _NewlineIntent(),
+                        const SingleActivator(LogicalKeyboardKey.enter):
+                            const _SendIntent(),
+                      const SingleActivator(
+                        LogicalKeyboardKey.enter,
+                        shift: true,
+                      ): const _NewlineIntent(),
                     },
                     child: Actions(
                       actions: {
@@ -789,29 +916,37 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                         // tools/output opt into mono at their own call sites.
                         style: const TextStyle(fontSize: 14, height: 1.5),
                         onChanged: _onChanged,
-                        contentInsertionConfiguration: ContentInsertionConfiguration(
-                          onContentInserted: (v) {
-                            final bytes = v.data;
-                            if (bytes == null) return;
-                            unawaited(
-                              ref
-                                  .read(composerProvider(_arg).notifier)
-                                  .attach(v.uri, bytes, isImage: true),
-                            );
-                          },
-                        ),
+                        contentInsertionConfiguration:
+                            ContentInsertionConfiguration(
+                              onContentInserted: (v) {
+                                final bytes = v.data;
+                                if (bytes == null) return;
+                                unawaited(
+                                  ref
+                                      .read(composerProvider(_arg).notifier)
+                                      .attach(v.uri, bytes, isImage: true),
+                                );
+                              },
+                            ),
                         decoration: InputDecoration(
                           // `input.placeholder` from the old chat locale.
                           hintText: t.chat.input.placeholder(
                             provider: providerLabel(widget.provider),
                           ),
-                          hintStyle: TextStyle(color: c.mutedForeground.withValues(alpha: 0.5)),
+                          hintStyle: TextStyle(
+                            color: c.mutedForeground.withValues(alpha: 0.5),
+                          ),
                           border: InputBorder.none,
                           enabledBorder: InputBorder.none,
                           focusedBorder: InputBorder.none,
                           isDense: true,
                           // px-4 py-2 + pl-7 (the `>` caret column).
-                          contentPadding: const EdgeInsets.fromLTRB(28, 8, 16, 8),
+                          contentPadding: const EdgeInsets.fromLTRB(
+                            28,
+                            8,
+                            16,
+                            8,
+                          ),
                         ),
                       ),
                     ),
@@ -824,7 +959,10 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                 decoration: BoxDecoration(
                   border: Border(top: BorderSide(color: c.secondary)),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 child: Row(
                   spacing: 4,
                   children: [
@@ -843,7 +981,8 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                         tooltip: t.chat.input.attachFiles,
                         onPressed: _pickFile,
                       ),
-                      if (widget.sessionId.isNotEmpty) _AutoReadButton(sessionId: widget.sessionId),
+                      if (widget.sessionId.isNotEmpty)
+                        _AutoReadButton(sessionId: widget.sessionId),
                       if (sttConfig.configured)
                         _toolBtn(
                           voiceState.isRecording ? Icons.mic : Icons.mic_none,
@@ -851,15 +990,20 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                               ? t.chat.input.voiceStop
                               : t.chat.input.voiceStart,
                           color: voiceState.isRecording ? cs.error : null,
-                          onPressed: voiceState.isProcessing ? null : _toggleVoice,
+                          onPressed: voiceState.isProcessing
+                              ? null
+                              : _toggleVoice,
                           child: voiceState.isProcessing
                               ? const SizedBox.square(
                                   dimension: 16,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
                                 )
                               : null,
                         ),
-                      if (projectId != null) _CheckpointButton(projectId: projectId),
+                      if (projectId != null)
+                        _CheckpointButton(projectId: projectId),
                       _toolBtn(
                         Icons.push_pin_outlined,
                         tooltip: t.chat.input.pinFile,
@@ -893,7 +1037,11 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                                   child: _SubmitHint(
                                     text: canQueueDraft
                                         ? state.queue.isNotEmpty
-                                              ? t.chat.input.hintText.updateQueued
+                                              ? t
+                                                    .chat
+                                                    .input
+                                                    .hintText
+                                                    .updateQueued
                                               : t.chat.input.hintText.queue
                                         : sendByCtrlEnter
                                         ? t.chat.input.hintText.ctrlEnter
@@ -907,7 +1055,10 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                               // trailing icon buttons onto a second row.
                               ConstrainedBox(
                                 constraints: BoxConstraints(
-                                  maxWidth: math.max(0, box.maxWidth - (showHint ? 4 : 0)),
+                                  maxWidth: math.max(
+                                    0,
+                                    box.maxWidth - (showHint ? 4 : 0),
+                                  ),
                                 ),
                                 child: SingleChildScrollView(
                                   scrollDirection: Axis.horizontal,
@@ -936,7 +1087,10 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
         if (state.sendError != null)
           Padding(
             padding: const EdgeInsets.only(top: 4),
-            child: Text(state.sendError!, style: TextStyle(color: cs.error, fontSize: 12)),
+            child: Text(
+              state.sendError!,
+              style: TextStyle(color: cs.error, fontSize: 12),
+            ),
           ),
       ],
     );
@@ -1057,7 +1211,9 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                     _SheetBadge(
                       label: usage.unsupported
                           ? t.chat.tokenUsage.notAvailable
-                          : t.chat.tokenUsage.tokensBadge(count: usage.used.round()),
+                          : t.chat.tokenUsage.tokensBadge(
+                              count: usage.used.round(),
+                            ),
                     ),
                   ],
                 ),
@@ -1101,7 +1257,10 @@ class _SheetBadge extends StatelessWidget {
       color: context.appColors.primary.withValues(alpha: 0.12),
       borderRadius: AppRadii.borderSm,
     ),
-    child: Text(label, style: TextStyle(fontSize: 10, color: context.appColors.primary)),
+    child: Text(
+      label,
+      style: TextStyle(fontSize: 10, color: context.appColors.primary),
+    ),
   );
 }
 
@@ -1123,13 +1282,16 @@ class _AutoReadButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = Translations.of(context);
-    final armed = ref.watch(ttsControllerProvider.select((s) => s.isArmed(sessionId)));
+    final armed = ref.watch(
+      ttsControllerProvider.select((s) => s.isArmed(sessionId)),
+    );
     final c = context.appColors;
     return _ChatComposerState._toolBtn(
       Icons.graphic_eq,
       tooltip: armed ? t.chat.voice.autoReadOn : t.chat.voice.autoReadOff,
       color: armed ? c.primary : null,
-      onPressed: () => ref.read(ttsControllerProvider.notifier).toggleAutoRead(sessionId),
+      onPressed: () =>
+          ref.read(ttsControllerProvider.notifier).toggleAutoRead(sessionId),
     );
   }
 }
@@ -1155,7 +1317,9 @@ class _CheckpointButton extends ConsumerWidget {
       restored ? Icons.check : Icons.rotate_left,
       tooltip: restored
           ? t.chat.checkpoint.undone
-          : (restoring ? t.chat.checkpoint.undoing : t.chat.checkpoint.undoAiRun),
+          : (restoring
+                ? t.chat.checkpoint.undoing
+                : t.chat.checkpoint.undoAiRun),
       color: restored ? cs.primary : null,
       onPressed: st.creating || restoring
           ? null
@@ -1164,7 +1328,8 @@ class _CheckpointButton extends ConsumerWidget {
               if (!context.mounted) return;
               // Another pane left a newer checkpoint — restoring ours would
               // also revert that work, so confirm first (web parity).
-              if (ref.read(checkpointProvider(projectId)).error == 'newer-checkpoint') {
+              if (ref.read(checkpointProvider(projectId)).error ==
+                  'newer-checkpoint') {
                 final ok = await showDialog<bool>(
                   context: context,
                   builder: (ctx) => AlertDialog(
@@ -1214,10 +1379,12 @@ class _SendButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = Translations.of(context);
     final running =
-        ref.watch(transcriptProvider(sessionId).select((s) => s.runStatus)) == 'running';
+        ref.watch(transcriptProvider(sessionId).select((s) => s.runStatus)) ==
+        'running';
     final primary = Theme.of(context).colorScheme.primary;
     final onPrimary = Theme.of(context).colorScheme.onPrimary;
-    final hasDraft = state.input.trim().isNotEmpty || state.attachments.isNotEmpty;
+    final hasDraft =
+        state.input.trim().isNotEmpty || state.attachments.isNotEmpty;
     final style = IconButton.styleFrom(
       fixedSize: const Size(40, 40),
       shape: const RoundedRectangleBorder(borderRadius: AppRadii.borderLg),
@@ -1248,7 +1415,10 @@ class _SendButton extends ConsumerWidget {
       icon: state.uploading
           ? SizedBox.square(
               dimension: 16,
-              child: CircularProgressIndicator(strokeWidth: 2, color: onPrimary),
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: onPrimary,
+              ),
             )
           : const Icon(Icons.send, size: 16),
       tooltip: t.chat.input.send,
@@ -1281,8 +1451,10 @@ class _SubmitHint extends StatelessWidget {
             text,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.bodySmall
-                ?.copyWith(fontSize: 12, color: c.mutedForeground.withValues(alpha: 0.5)),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              fontSize: 12,
+              color: c.mutedForeground.withValues(alpha: 0.5),
+            ),
           ),
         ),
       ),
@@ -1305,7 +1477,8 @@ class _AttachmentChip extends StatelessWidget {
   String get _mime => '${record['mimeType'] ?? record['type'] ?? ''}';
 
   bool get _isImage =>
-      _mime.startsWith('image/') || _imageExts.contains(_name.split('.').last.toLowerCase());
+      _mime.startsWith('image/') ||
+      _imageExts.contains(_name.split('.').last.toLowerCase());
 
   /// File-type tag (`oc-chip-kind`) — the mime suffix or extension, 3 chars.
   String get _kind {
@@ -1377,9 +1550,15 @@ class _AttachmentChip extends StatelessWidget {
             ),
           ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 160), // ~22ch
-            child: Text(_name, maxLines: 1, overflow: TextOverflow.ellipsis, style: style),
+            child: Text(
+              _name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: style,
+            ),
           ),
-          if (_size.isNotEmpty) Text(_size, style: style?.copyWith(color: c.mutedForeground)),
+          if (_size.isNotEmpty)
+            Text(_size, style: style?.copyWith(color: c.mutedForeground)),
           GestureDetector(
             onTap: onRemove,
             child: Icon(Icons.close, size: 12, color: c.mutedForeground),
@@ -1390,7 +1569,10 @@ class _AttachmentChip extends StatelessWidget {
     if (imageUrl == null) return chip;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
-      child: GestureDetector(onTap: () => _openPreview(context, imageUrl), child: chip),
+      child: GestureDetector(
+        onTap: () => _openPreview(context, imageUrl),
+        child: chip,
+      ),
     );
   }
 }
@@ -1427,7 +1609,12 @@ class _OptionBar extends ConsumerWidget {
         // Favorites / collapsible Model with pills + search). Always visible
         // so the composer mirrors the web's model chip even before the list
         // finishes loading.
-        ComposerModelMenu(arg: arg, state: state, compact: compact, promptBoxKey: promptBoxKey),
+        ComposerModelMenu(
+          arg: arg,
+          state: state,
+          compact: compact,
+          promptBoxKey: promptBoxKey,
+        ),
         // `.oc-permission-trigger` — 32px icon button, active mode's icon,
         // opens the mode list (web ComposerPermissionMenu). Hidden when the
         // provider capability matrix reports no modes.
@@ -1445,9 +1632,13 @@ class _OptionBar extends ConsumerWidget {
               ref.read(composerProvider(arg).notifier).selectPermissionMode(m);
               final running =
                   sessionId.isNotEmpty &&
-                  ref.read(transcriptProvider(sessionId)).runStatus == 'running';
+                  ref.read(transcriptProvider(sessionId)).runStatus ==
+                      'running';
               if (running && !state.supportsLivePermissionMode) {
-                AppToast.show(context, t.chat.permissions.modeAppliesNextMessage);
+                AppToast.show(
+                  context,
+                  t.chat.permissions.modeAppliesNextMessage,
+                );
               }
             },
           ),
@@ -1460,9 +1651,13 @@ class _OptionBar extends ConsumerWidget {
             items: [null, for (final a in state.accounts) a.id],
             displayFor: (v) => v == null
                 ? t.chat.composer.accountAutoShort
-                : state.accounts.where((a) => a.id == v).map((a) => a.label ?? a.id).firstOrNull ??
+                : state.accounts
+                          .where((a) => a.id == v)
+                          .map((a) => a.label ?? a.id)
+                          .firstOrNull ??
                       v,
-            onChanged: (v) => ref.read(composerProvider(arg).notifier).selectAccount(v),
+            onChanged: (v) =>
+                ref.read(composerProvider(arg).notifier).selectAccount(v),
           ),
       ],
     );
@@ -1503,17 +1698,26 @@ class _MiniDropdown extends StatelessWidget {
           value: items.contains(value) ? value : null,
           isDense: true,
           style: textStyle,
-          hint: Text('$label: ${displayFor?.call(value) ?? value ?? auto}', style: textStyle),
+          hint: Text(
+            '$label: ${displayFor?.call(value) ?? value ?? auto}',
+            style: textStyle,
+          ),
           selectedItemBuilder: (_) => [
             for (final it in items)
               Align(
                 alignment: Alignment.centerLeft,
-                child: Text('$label: ${displayFor?.call(it) ?? it ?? auto}', style: textStyle),
+                child: Text(
+                  '$label: ${displayFor?.call(it) ?? it ?? auto}',
+                  style: textStyle,
+                ),
               ),
           ],
           items: [
             for (final it in items)
-              DropdownMenuItem<String>(value: it, child: Text(displayFor?.call(it) ?? it ?? auto)),
+              DropdownMenuItem<String>(
+                value: it,
+                child: Text(displayFor?.call(it) ?? it ?? auto),
+              ),
           ],
           onChanged: onChanged,
         ),
@@ -1563,7 +1767,8 @@ class _PinnedFilesBar extends ConsumerWidget {
                   ),
                 ),
                 GestureDetector(
-                  onTap: () => ref.read(composerProvider(arg).notifier).unpinFile(f),
+                  onTap: () =>
+                      ref.read(composerProvider(arg).notifier).unpinFile(f),
                   child: Icon(Icons.close, size: 12, color: c.mutedForeground),
                 ),
               ],
@@ -1582,7 +1787,11 @@ class _PinnedFilesBar extends ConsumerWidget {
 const _kSteersMidTurn = {'claude', 'opencode'};
 
 class _QueueCard extends ConsumerWidget {
-  const _QueueCard({required this.arg, required this.queue, required this.running});
+  const _QueueCard({
+    required this.arg,
+    required this.queue,
+    required this.running,
+  });
 
   final ComposerArg arg;
   final List<Map<String, dynamic>> queue;
@@ -1643,8 +1852,13 @@ class _QueueCard extends ConsumerWidget {
                         ),
                         if (_attachmentCount(m) > 0)
                           Text(
-                            t.chat.input.queue.filesAttached(count: _attachmentCount(m)),
-                            style: TextStyle(fontSize: 11, color: c.mutedForeground),
+                            t.chat.input.queue.filesAttached(
+                              count: _attachmentCount(m),
+                            ),
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: c.mutedForeground,
+                            ),
                           ),
                       ],
                     ),
@@ -1665,19 +1879,23 @@ class _QueueCard extends ConsumerWidget {
                       // 'sending' disables send-now (web `isSending`).
                       onPressed: m['status'] == 'sending'
                           ? null
-                          : () => ref.read(composerProvider(arg).notifier).sendNow('${m['id']}'),
+                          : () => ref
+                                .read(composerProvider(arg).notifier)
+                                .sendNow('${m['id']}'),
                     ),
                   _action(
                     Icons.edit_outlined,
                     tooltip: t.chat.input.queue.edit,
-                    onPressed: () =>
-                        ref.read(composerProvider(arg).notifier).editQueued('${m['id']}'),
+                    onPressed: () => ref
+                        .read(composerProvider(arg).notifier)
+                        .editQueued('${m['id']}'),
                   ),
                   _action(
                     Icons.close,
                     tooltip: t.chat.input.queue.delete,
-                    onPressed: () =>
-                        ref.read(composerProvider(arg).notifier).deleteQueued('${m['id']}'),
+                    onPressed: () => ref
+                        .read(composerProvider(arg).notifier)
+                        .deleteQueued('${m['id']}'),
                   ),
                 ],
               ),
@@ -1695,15 +1913,18 @@ class _QueueCard extends ConsumerWidget {
     return attachments is List ? attachments.length : 0;
   }
 
-  Widget _action(IconData icon, {required String tooltip, required VoidCallback? onPressed}) =>
-      IconButton(
-        icon: Icon(icon, size: 16),
-        tooltip: tooltip,
-        onPressed: onPressed,
-        visualDensity: VisualDensity.compact,
-        padding: EdgeInsets.zero,
-        constraints: const BoxConstraints.tightFor(width: 30, height: 30),
-      );
+  Widget _action(
+    IconData icon, {
+    required String tooltip,
+    required VoidCallback? onPressed,
+  }) => IconButton(
+    icon: Icon(icon, size: 16),
+    tooltip: tooltip,
+    onPressed: onPressed,
+    visualDensity: VisualDensity.compact,
+    padding: EdgeInsets.zero,
+    constraints: const BoxConstraints.tightFor(width: 30, height: 30),
+  );
 }
 
 /// `OfflineQueueCard` — messages parked in Hive while the socket is down;
@@ -1740,7 +1961,11 @@ class _OfflineQueueCard extends StatelessWidget {
                   : t.chat.input.offlineQueue.multiple(count: count),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: amber),
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: amber,
+              ),
             ),
           ),
           if (onClear != null)

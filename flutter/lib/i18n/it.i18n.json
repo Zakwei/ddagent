@@ -333,7 +333,8 @@
       "voiceStop": "Interrompi dettatura",
       "pinFile": "Fissa file nel contesto",
       "voiceSettings": "Impostazioni vocali (STT)",
-      "cameraUnavailable": "Fotocamera non disponibile: {{error}}"
+      "cameraUnavailable": "Fotocamera non disponibile: {{error}}",
+      "pasteFailed": "Impossibile incollare dagli appunti: {{error}}"
     },
     "composer": {
       "toolsAndActions": "Strumenti e azioni",

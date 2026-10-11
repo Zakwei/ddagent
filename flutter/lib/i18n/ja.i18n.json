@@ -332,7 +332,8 @@
       "voiceStop": "音声入力を停止",
       "pinFile": "ファイルをコンテキストに固定",
       "voiceSettings": "音声設定 (STT)",
-      "cameraUnavailable": "カメラを利用できません: {{error}}"
+      "cameraUnavailable": "カメラを利用できません: {{error}}",
+      "pasteFailed": "クリップボードから貼り付けできませんでした: {{error}}"
     },
     "composer": {
       "toolsAndActions": "ツールとアクション",

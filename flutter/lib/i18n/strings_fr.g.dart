@@ -1106,6 +1106,7 @@ class Translations$chat$input$fr extends Translations$chat$input$en {
 	@override String get pinFile => 'Épingler le fichier au contexte';
 	@override String get voiceSettings => 'Paramètres vocaux (STT)';
 	@override String cameraUnavailable({required Object error}) => 'Appareil photo indisponible : ${error}';
+	@override String pasteFailed({required Object error}) => 'Impossible de coller depuis le presse-papiers : ${error}';
 }
 
 // Path: chat.composer
@@ -8741,6 +8742,7 @@ extension on TranslationsFr {
 			'chat.input.pinFile' => 'Épingler le fichier au contexte',
 			'chat.input.voiceSettings' => 'Paramètres vocaux (STT)',
 			'chat.input.cameraUnavailable' => ({required Object error}) => 'Appareil photo indisponible : ${error}',
+			'chat.input.pasteFailed' => ({required Object error}) => 'Impossible de coller depuis le presse-papiers : ${error}',
 			'chat.composer.toolsAndActions' => 'Outils et actions',
 			'chat.composer.toolsAndActionsDesc' => 'Outils et contrôles du composeur de chat',
 			'chat.composer.reasoning' => 'Raisonnement',
@@ -9012,9 +9014,9 @@ extension on TranslationsFr {
 			'chat.modelLibrary.idHint' => 'ex. : gpt-5.5-pro',
 			'chat.modelLibrary.idHelp' => 'Utilisez l\'identifiant exact accepté par la CLI du fournisseur. Les identifiants ne peuvent pas contenir d\'espaces.',
 			'chat.modelLibrary.updatedNotice' => ({required Object name}) => '${name} a été mis à jour.',
-			'chat.modelLibrary.addedNotice' => ({required Object name}) => '${name} a été ajouté.',
 			_ => null,
 		} ?? switch (path) {
+			'chat.modelLibrary.addedNotice' => ({required Object name}) => '${name} a été ajouté.',
 			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '${name} a été supprimé.',
 			'chat.modelLibrary.saving' => 'Enregistrement…',
 			'chat.modelLibrary.saveChanges' => 'Enregistrer les modifications',
@@ -9526,9 +9528,9 @@ extension on TranslationsFr {
 			'common.projectWizard.step2.newPlaceholder' => '/chemin/vers/nouvel-espace',
 			'common.projectWizard.step2.existingHelp' => 'Chemin complet vers votre répertoire d\'espace de travail existant',
 			'common.projectWizard.step2.newHelp' => 'Chemin complet vers votre répertoire d\'espace de travail',
-			'common.projectWizard.step2.githubUrl' => 'URL GitHub (optionnel)',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step2.githubUrl' => 'URL GitHub (optionnel)',
 			'common.projectWizard.step2.githubPlaceholder' => 'https://github.com/utilisateur/depot',
 			'common.projectWizard.step2.githubHelp' => 'Optionnel : fournissez une URL GitHub pour cloner un dépôt',
 			'common.projectWizard.step2.githubAuth' => 'Authentification GitHub (optionnel)',
@@ -10040,9 +10042,9 @@ extension on TranslationsFr {
 			'settings.mcp.addServer' => 'Ajouter un serveur',
 			'settings.mcp.editServer' => 'Modifier le serveur',
 			'settings.mcp.deleteServer' => 'Supprimer le serveur',
-			'settings.mcp.serverName' => 'Nom du serveur',
 			_ => null,
 		} ?? switch (path) {
+			'settings.mcp.serverName' => 'Nom du serveur',
 			'settings.mcp.serverType' => 'Type de serveur',
 			'settings.mcp.config' => 'Configuration',
 			'settings.mcp.testConnection' => 'Tester la connexion',
@@ -10554,9 +10556,9 @@ extension on TranslationsFr {
 			'settings.browser.statusLabel' => 'Statut',
 			'settings.browser.statusReady' => 'prêt',
 			'settings.browser.statusSetupRequired' => 'configuration requise',
-			'settings.browser.title' => 'Browser',
 			_ => null,
 		} ?? switch (path) {
+			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => 'Annuler',
 			'settings.workspaces.create' => 'Ajouter un espace de travail',
 			'settings.workspaces.deleteConfirm' => 'Retirer cet espace de travail de DDAgent ? Ses fichiers restent sur le disque.',
@@ -11068,9 +11070,9 @@ extension on TranslationsFr {
 			'tasks.taskDetail.description' => 'Description',
 			'tasks.taskDetail.edit' => 'Modifier la tâche',
 			'tasks.taskDetail.implDetails' => 'Détails d’implémentation',
-			'tasks.taskDetail.noDependencies' => 'Aucune dépendance',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.noDependencies' => 'Aucune dépendance',
 			'tasks.taskDetail.noDescription' => 'Aucune description fournie',
 			'tasks.taskDetail.priority' => 'Priorité',
 			'tasks.taskDetail.priorityNotSet' => 'Non définie',
@@ -11582,9 +11584,9 @@ extension on TranslationsFr {
 			'terminal.shortcuts.showTooltip' => 'Afficher les raccourcis',
 			'terminal.shortcuts.hideTooltip' => 'Masquer les raccourcis',
 			'terminal.paste.title' => 'Coller dans le terminal',
-			'terminal.paste.hint' => 'Ctrl+V / clic droit → Coller',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.paste.hint' => 'Ctrl+V / clic droit → Coller',
 			'terminal.errors.couldNotOpenLink' => ({required Object url}) => 'Impossible d’ouvrir le lien : ${url}',
 			'terminal.errors.frameError' => ({required Object message}) => '[Erreur] ${message}',
 			'terminal.errors.connectionError' => ({required Object message}) => '[Erreur de connexion] ${message}',

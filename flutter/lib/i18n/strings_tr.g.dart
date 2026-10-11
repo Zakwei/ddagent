@@ -1106,6 +1106,7 @@ class Translations$chat$input$tr extends Translations$chat$input$en {
 	@override String get pinFile => 'Dosyayı bağlama sabitle';
 	@override String get voiceSettings => 'Ses ayarları (STT)';
 	@override String cameraUnavailable({required Object error}) => 'Kamera kullanılamıyor: ${error}';
+	@override String pasteFailed({required Object error}) => 'Panodan yapıştırılamadı: ${error}';
 }
 
 // Path: chat.composer
@@ -8736,6 +8737,7 @@ extension on TranslationsTr {
 			'chat.input.pinFile' => 'Dosyayı bağlama sabitle',
 			'chat.input.voiceSettings' => 'Ses ayarları (STT)',
 			'chat.input.cameraUnavailable' => ({required Object error}) => 'Kamera kullanılamıyor: ${error}',
+			'chat.input.pasteFailed' => ({required Object error}) => 'Panodan yapıştırılamadı: ${error}',
 			'chat.composer.toolsAndActions' => 'Araçlar ve eylemler',
 			'chat.composer.toolsAndActionsDesc' => 'Sohbet düzenleyici için araçlar ve denetimler',
 			'chat.composer.reasoning' => 'Mantık yürütüyor',
@@ -9007,9 +9009,9 @@ extension on TranslationsTr {
 			'chat.modelLibrary.idHint' => 'ör. gpt-5.5-pro',
 			'chat.modelLibrary.idHelp' => 'Sağlayıcı CLI aracının kabul ettiği tam tanımlayıcıyı kullanın. Kimlikler boşluk içeremez.',
 			'chat.modelLibrary.updatedNotice' => ({required Object name}) => '${name} güncellendi.',
-			'chat.modelLibrary.addedNotice' => ({required Object name}) => '${name} eklendi.',
 			_ => null,
 		} ?? switch (path) {
+			'chat.modelLibrary.addedNotice' => ({required Object name}) => '${name} eklendi.',
 			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '${name} silindi.',
 			'chat.modelLibrary.saving' => 'Kaydediliyor…',
 			'chat.modelLibrary.saveChanges' => 'Değişiklikleri kaydet',
@@ -9521,9 +9523,9 @@ extension on TranslationsTr {
 			'common.projectWizard.step2.newPlaceholder' => '/yeni/calisma-alani/yolu',
 			'common.projectWizard.step2.existingHelp' => 'Mevcut çalışma alanı dizinine giden tam yol',
 			'common.projectWizard.step2.newHelp' => 'Çalışma alanı dizinine giden tam yol',
-			'common.projectWizard.step2.githubUrl' => 'GitHub URL\'si (İsteğe Bağlı)',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step2.githubUrl' => 'GitHub URL\'si (İsteğe Bağlı)',
 			'common.projectWizard.step2.githubPlaceholder' => 'https://github.com/kullanici/depo',
 			'common.projectWizard.step2.githubHelp' => 'İsteğe bağlı: bir depoyu klonlamak için GitHub URL\'si gir',
 			'common.projectWizard.step2.githubAuth' => 'GitHub Kimlik Doğrulama (İsteğe Bağlı)',
@@ -10035,9 +10037,9 @@ extension on TranslationsTr {
 			'settings.mcp.addServer' => 'Sunucu Ekle',
 			'settings.mcp.editServer' => 'Sunucuyu Düzenle',
 			'settings.mcp.deleteServer' => 'Sunucuyu Sil',
-			'settings.mcp.serverName' => 'Sunucu Adı',
 			_ => null,
 		} ?? switch (path) {
+			'settings.mcp.serverName' => 'Sunucu Adı',
 			'settings.mcp.serverType' => 'Sunucu Türü',
 			'settings.mcp.config' => 'Yapılandırma',
 			'settings.mcp.testConnection' => 'Bağlantıyı Test Et',
@@ -10549,9 +10551,9 @@ extension on TranslationsTr {
 			'settings.browser.statusLabel' => 'Durum',
 			'settings.browser.statusReady' => 'hazır',
 			'settings.browser.statusSetupRequired' => 'kurulum gerekli',
-			'settings.browser.title' => 'Browser',
 			_ => null,
 		} ?? switch (path) {
+			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => 'İptal',
 			'settings.workspaces.create' => 'Çalışma alanı ekle',
 			'settings.workspaces.deleteConfirm' => 'Bu çalışma alanı DDAgent’tan kaldırılsın mı? Dosyaları diskte kalır.',
@@ -11063,9 +11065,9 @@ extension on TranslationsTr {
 			'tasks.taskDetail.description' => 'Açıklama',
 			'tasks.taskDetail.edit' => 'Görevi düzenle',
 			'tasks.taskDetail.implDetails' => 'Uygulama Ayrıntıları',
-			'tasks.taskDetail.noDependencies' => 'Bağımlılık yok',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.noDependencies' => 'Bağımlılık yok',
 			'tasks.taskDetail.noDescription' => 'Açıklama yok',
 			'tasks.taskDetail.priority' => 'Öncelik',
 			'tasks.taskDetail.priorityNotSet' => 'Ayarlanmadı',
@@ -11577,9 +11579,9 @@ extension on TranslationsTr {
 			'terminal.shortcuts.showTooltip' => 'Kısayolları göster',
 			'terminal.shortcuts.hideTooltip' => 'Kısayolları gizle',
 			'terminal.paste.title' => 'Terminale yapıştır',
-			'terminal.paste.hint' => 'Ctrl+V / sağ tık → Yapıştır',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.paste.hint' => 'Ctrl+V / sağ tık → Yapıştır',
 			'terminal.errors.couldNotOpenLink' => ({required Object url}) => 'Bağlantı açılamadı: ${url}',
 			'terminal.errors.frameError' => ({required Object message}) => '[Hata] ${message}',
 			'terminal.errors.connectionError' => ({required Object message}) => '[Bağlantı hatası] ${message}',

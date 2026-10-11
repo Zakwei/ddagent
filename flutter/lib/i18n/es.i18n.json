@@ -333,7 +333,8 @@
       "voiceStop": "Detener el dictado",
       "pinFile": "Fijar archivo al contexto",
       "voiceSettings": "Ajustes de voz (STT)",
-      "cameraUnavailable": "Cámara no disponible: {{error}}"
+      "cameraUnavailable": "Cámara no disponible: {{error}}",
+      "pasteFailed": "No se pudo pegar desde el portapapeles: {{error}}"
     },
     "composer": {
       "toolsAndActions": "Herramientas y acciones",

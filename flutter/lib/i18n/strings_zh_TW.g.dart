@@ -1105,6 +1105,7 @@ class Translations$chat$input$zh_TW extends Translations$chat$input$en {
 	@override String get pinFile => '將檔案釘選至上下文';
 	@override String get voiceSettings => '語音設定（STT）';
 	@override String cameraUnavailable({required Object error}) => '相機無法使用：${error}';
+	@override String pasteFailed({required Object error}) => '無法從剪貼簿貼上：${error}';
 }
 
 // Path: chat.composer
@@ -8730,6 +8731,7 @@ extension on TranslationsZhTw {
 			'chat.input.pinFile' => '將檔案釘選至上下文',
 			'chat.input.voiceSettings' => '語音設定（STT）',
 			'chat.input.cameraUnavailable' => ({required Object error}) => '相機無法使用：${error}',
+			'chat.input.pasteFailed' => ({required Object error}) => '無法從剪貼簿貼上：${error}',
 			'chat.composer.toolsAndActions' => '工具與操作',
 			'chat.composer.toolsAndActionsDesc' => '聊天輸入框的工具與控制項',
 			'chat.composer.reasoning' => '推理中',
@@ -9001,9 +9003,9 @@ extension on TranslationsZhTw {
 			'chat.modelLibrary.idHint' => '例如 gpt-5.5-pro',
 			'chat.modelLibrary.idHelp' => '請使用提供者 CLI 接受的確切識別碼。ID 不可包含空格。',
 			'chat.modelLibrary.updatedNotice' => ({required Object name}) => '已更新 ${name}。',
-			'chat.modelLibrary.addedNotice' => ({required Object name}) => '已新增 ${name}。',
 			_ => null,
 		} ?? switch (path) {
+			'chat.modelLibrary.addedNotice' => ({required Object name}) => '已新增 ${name}。',
 			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '已刪除 ${name}。',
 			'chat.modelLibrary.saving' => '正在儲存…',
 			'chat.modelLibrary.saveChanges' => '儲存變更',
@@ -9515,9 +9517,9 @@ extension on TranslationsZhTw {
 			'common.projectWizard.step2.newPlaceholder' => '/path/to/new/workspace',
 			'common.projectWizard.step2.existingHelp' => '您現有工作區目錄的完整路徑',
 			'common.projectWizard.step2.newHelp' => '工作區目錄的完整路徑',
-			'common.projectWizard.step2.githubUrl' => 'GitHub URL（選填）',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step2.githubUrl' => 'GitHub URL（選填）',
 			'common.projectWizard.step2.githubPlaceholder' => 'https://github.com/username/repository',
 			'common.projectWizard.step2.githubHelp' => '選填：提供 GitHub URL 以複製儲存庫',
 			'common.projectWizard.step2.githubAuth' => 'GitHub 身分驗證（選填）',
@@ -10029,9 +10031,9 @@ extension on TranslationsZhTw {
 			'settings.mcp.addServer' => '新增伺服器',
 			'settings.mcp.editServer' => '編輯伺服器',
 			'settings.mcp.deleteServer' => '刪除伺服器',
-			'settings.mcp.serverName' => '伺服器名稱',
 			_ => null,
 		} ?? switch (path) {
+			'settings.mcp.serverName' => '伺服器名稱',
 			'settings.mcp.serverType' => '伺服器類型',
 			'settings.mcp.config' => '設定',
 			'settings.mcp.testConnection' => '測試連線',
@@ -10543,9 +10545,9 @@ extension on TranslationsZhTw {
 			'settings.browser.statusLabel' => '狀態',
 			'settings.browser.statusReady' => '就緒',
 			'settings.browser.statusSetupRequired' => '需要設定',
-			'settings.browser.title' => '瀏覽器',
 			_ => null,
 		} ?? switch (path) {
+			'settings.browser.title' => '瀏覽器',
 			'settings.workspaces.cancel' => '取消',
 			'settings.workspaces.create' => '新增工作區',
 			'settings.workspaces.deleteConfirm' => '從 DDAgent 移除此工作區？檔案將保留在磁碟上。',
@@ -11057,9 +11059,9 @@ extension on TranslationsZhTw {
 			'tasks.taskDetail.description' => '描述',
 			'tasks.taskDetail.edit' => '編輯任務',
 			'tasks.taskDetail.implDetails' => '實作細節',
-			'tasks.taskDetail.noDependencies' => '無依賴項',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.noDependencies' => '無依賴項',
 			'tasks.taskDetail.noDescription' => '無描述',
 			'tasks.taskDetail.priority' => '優先級',
 			'tasks.taskDetail.priorityNotSet' => '未設定',
@@ -11571,9 +11573,9 @@ extension on TranslationsZhTw {
 			'terminal.shortcuts.showTooltip' => '顯示快速鍵',
 			'terminal.shortcuts.hideTooltip' => '隱藏快速鍵',
 			'terminal.paste.title' => '貼上至終端機',
-			'terminal.paste.hint' => 'Ctrl+V / 按右鍵 → 貼上',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.paste.hint' => 'Ctrl+V / 按右鍵 → 貼上',
 			'terminal.errors.couldNotOpenLink' => ({required Object url}) => '無法開啟連結：${url}',
 			'terminal.errors.frameError' => ({required Object message}) => '[錯誤] ${message}',
 			'terminal.errors.connectionError' => ({required Object message}) => '[連線錯誤] ${message}',

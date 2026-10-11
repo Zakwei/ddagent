@@ -333,7 +333,8 @@
       "voiceStop": "Dikteyi durdur",
       "pinFile": "Dosyayı bağlama sabitle",
       "voiceSettings": "Ses ayarları (STT)",
-      "cameraUnavailable": "Kamera kullanılamıyor: {{error}}"
+      "cameraUnavailable": "Kamera kullanılamıyor: {{error}}",
+      "pasteFailed": "Panodan yapıştırılamadı: {{error}}"
     },
     "composer": {
       "toolsAndActions": "Araçlar ve eylemler",

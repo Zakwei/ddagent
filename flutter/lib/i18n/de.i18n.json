@@ -333,7 +333,8 @@
       "voiceStop": "Diktat beenden",
       "pinFile": "Datei an Kontext anheften",
       "voiceSettings": "Spracheinstellungen (STT)",
-      "cameraUnavailable": "Kamera nicht verfügbar: {{error}}"
+      "cameraUnavailable": "Kamera nicht verfügbar: {{error}}",
+      "pasteFailed": "Einfügen aus der Zwischenablage fehlgeschlagen: {{error}}"
     },
     "composer": {
       "toolsAndActions": "Werkzeuge & Aktionen",

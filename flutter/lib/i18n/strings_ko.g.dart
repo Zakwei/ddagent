@@ -1105,6 +1105,7 @@ class Translations$chat$input$ko extends Translations$chat$input$en {
 	@override String get pinFile => '파일을 컨텍스트에 고정';
 	@override String get voiceSettings => '음성 설정 (STT)';
 	@override String cameraUnavailable({required Object error}) => '카메라를 사용할 수 없습니다: ${error}';
+	@override String pasteFailed({required Object error}) => '클립보드에서 붙여넣지 못했습니다: ${error}';
 }
 
 // Path: chat.composer
@@ -8730,6 +8731,7 @@ extension on TranslationsKo {
 			'chat.input.pinFile' => '파일을 컨텍스트에 고정',
 			'chat.input.voiceSettings' => '음성 설정 (STT)',
 			'chat.input.cameraUnavailable' => ({required Object error}) => '카메라를 사용할 수 없습니다: ${error}',
+			'chat.input.pasteFailed' => ({required Object error}) => '클립보드에서 붙여넣지 못했습니다: ${error}',
 			'chat.composer.toolsAndActions' => '도구 및 작업',
 			'chat.composer.toolsAndActionsDesc' => '채팅 입력창의 도구와 컨트롤',
 			'chat.composer.reasoning' => '추론',
@@ -9001,9 +9003,9 @@ extension on TranslationsKo {
 			'chat.modelLibrary.idHint' => '예: gpt-5.5-pro',
 			'chat.modelLibrary.idHelp' => '공급자 CLI가 허용하는 정확한 식별자를 사용하세요. ID에는 공백을 넣을 수 없습니다.',
 			'chat.modelLibrary.updatedNotice' => ({required Object name}) => '${name}을(를) 업데이트했습니다.',
-			'chat.modelLibrary.addedNotice' => ({required Object name}) => '${name}을(를) 추가했습니다.',
 			_ => null,
 		} ?? switch (path) {
+			'chat.modelLibrary.addedNotice' => ({required Object name}) => '${name}을(를) 추가했습니다.',
 			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '${name}을(를) 삭제했습니다.',
 			'chat.modelLibrary.saving' => '저장 중…',
 			'chat.modelLibrary.saveChanges' => '변경 사항 저장',
@@ -9515,9 +9517,9 @@ extension on TranslationsKo {
 			'common.projectWizard.step2.newPlaceholder' => '/path/to/new/workspace',
 			'common.projectWizard.step2.existingHelp' => '기존 워크스페이스 디렉토리의 전체 경로',
 			'common.projectWizard.step2.newHelp' => '워크스페이스 디렉토리의 전체 경로',
-			'common.projectWizard.step2.githubUrl' => 'GitHub URL (선택사항)',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step2.githubUrl' => 'GitHub URL (선택사항)',
 			'common.projectWizard.step2.githubPlaceholder' => 'https://github.com/username/repository',
 			'common.projectWizard.step2.githubHelp' => '선택사항: 저장소를 clone하려면 GitHub URL을 입력하세요',
 			'common.projectWizard.step2.githubAuth' => 'GitHub 인증 (선택사항)',
@@ -10029,9 +10031,9 @@ extension on TranslationsKo {
 			'settings.mcp.addServer' => '서버 추가',
 			'settings.mcp.editServer' => '서버 편집',
 			'settings.mcp.deleteServer' => '서버 삭제',
-			'settings.mcp.serverName' => '서버 이름',
 			_ => null,
 		} ?? switch (path) {
+			'settings.mcp.serverName' => '서버 이름',
 			'settings.mcp.serverType' => '서버 유형',
 			'settings.mcp.config' => '설정',
 			'settings.mcp.testConnection' => '연결 테스트',
@@ -10543,9 +10545,9 @@ extension on TranslationsKo {
 			'settings.browser.statusLabel' => '상태',
 			'settings.browser.statusReady' => '준비됨',
 			'settings.browser.statusSetupRequired' => '설정 필요',
-			'settings.browser.title' => 'Browser',
 			_ => null,
 		} ?? switch (path) {
+			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => '취소',
 			'settings.workspaces.create' => '작업 영역 추가',
 			'settings.workspaces.deleteConfirm' => '이 작업 영역을 DDAgent에서 제거하시겠습니까? 파일은 디스크에 남습니다.',
@@ -11057,9 +11059,9 @@ extension on TranslationsKo {
 			'tasks.taskDetail.description' => '설명',
 			'tasks.taskDetail.edit' => '작업 편집',
 			'tasks.taskDetail.implDetails' => '구현 세부 정보',
-			'tasks.taskDetail.noDependencies' => '종속성 없음',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.noDependencies' => '종속성 없음',
 			'tasks.taskDetail.noDescription' => '설명 없음',
 			'tasks.taskDetail.priority' => '우선순위',
 			'tasks.taskDetail.priorityNotSet' => '설정되지 않음',
@@ -11571,9 +11573,9 @@ extension on TranslationsKo {
 			'terminal.shortcuts.showTooltip' => '단축키 표시',
 			'terminal.shortcuts.hideTooltip' => '단축키 숨기기',
 			'terminal.paste.title' => '터미널에 붙여넣기',
-			'terminal.paste.hint' => 'Ctrl+V / 마우스 오른쪽 클릭 → 붙여넣기',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.paste.hint' => 'Ctrl+V / 마우스 오른쪽 클릭 → 붙여넣기',
 			'terminal.errors.couldNotOpenLink' => ({required Object url}) => '링크를 열 수 없습니다: ${url}',
 			'terminal.errors.frameError' => ({required Object message}) => '[오류] ${message}',
 			'terminal.errors.connectionError' => ({required Object message}) => '[연결 오류] ${message}',

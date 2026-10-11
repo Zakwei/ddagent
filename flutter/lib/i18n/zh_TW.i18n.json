@@ -332,7 +332,8 @@
       "voiceStop": "停止口述",
       "pinFile": "將檔案釘選至上下文",
       "voiceSettings": "語音設定（STT）",
-      "cameraUnavailable": "相機無法使用：{{error}}"
+      "cameraUnavailable": "相機無法使用：{{error}}",
+      "pasteFailed": "無法從剪貼簿貼上：{{error}}"
     },
     "composer": {
       "toolsAndActions": "工具與操作",

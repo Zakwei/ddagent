@@ -1106,6 +1106,7 @@ class Translations$chat$input$it extends Translations$chat$input$en {
 	@override String get pinFile => 'Fissa file nel contesto';
 	@override String get voiceSettings => 'Impostazioni vocali (STT)';
 	@override String cameraUnavailable({required Object error}) => 'Fotocamera non disponibile: ${error}';
+	@override String pasteFailed({required Object error}) => 'Impossibile incollare dagli appunti: ${error}';
 }
 
 // Path: chat.composer
@@ -8741,6 +8742,7 @@ extension on TranslationsIt {
 			'chat.input.pinFile' => 'Fissa file nel contesto',
 			'chat.input.voiceSettings' => 'Impostazioni vocali (STT)',
 			'chat.input.cameraUnavailable' => ({required Object error}) => 'Fotocamera non disponibile: ${error}',
+			'chat.input.pasteFailed' => ({required Object error}) => 'Impossibile incollare dagli appunti: ${error}',
 			'chat.composer.toolsAndActions' => 'Strumenti e azioni',
 			'chat.composer.toolsAndActionsDesc' => 'Strumenti e controlli per l’editor di chat',
 			'chat.composer.reasoning' => 'Ragionamento',
@@ -9012,9 +9014,9 @@ extension on TranslationsIt {
 			'chat.modelLibrary.idHint' => 'es. gpt-5.5-pro',
 			'chat.modelLibrary.idHelp' => 'Usa l\'identificatore esatto accettato dalla CLI del provider. Gli ID non possono contenere spazi.',
 			'chat.modelLibrary.updatedNotice' => ({required Object name}) => '${name} è stato aggiornato.',
-			'chat.modelLibrary.addedNotice' => ({required Object name}) => '${name} è stato aggiunto.',
 			_ => null,
 		} ?? switch (path) {
+			'chat.modelLibrary.addedNotice' => ({required Object name}) => '${name} è stato aggiunto.',
 			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '${name} è stato eliminato.',
 			'chat.modelLibrary.saving' => 'Salvataggio…',
 			'chat.modelLibrary.saveChanges' => 'Salva modifiche',
@@ -9526,9 +9528,9 @@ extension on TranslationsIt {
 			'common.projectWizard.step2.newPlaceholder' => '/percorso/nuova/area-di-lavoro',
 			'common.projectWizard.step2.existingHelp' => 'Percorso completo della directory dell\'area di lavoro esistente',
 			'common.projectWizard.step2.newHelp' => 'Percorso completo della directory dell\'area di lavoro',
-			'common.projectWizard.step2.githubUrl' => 'URL GitHub (opzionale)',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step2.githubUrl' => 'URL GitHub (opzionale)',
 			'common.projectWizard.step2.githubPlaceholder' => 'https://github.com/utente/repository',
 			'common.projectWizard.step2.githubHelp' => 'Opzionale: fornisci un URL GitHub per clonare un repository',
 			'common.projectWizard.step2.githubAuth' => 'Autenticazione GitHub (opzionale)',
@@ -10040,9 +10042,9 @@ extension on TranslationsIt {
 			'settings.mcp.addServer' => 'Aggiungi server',
 			'settings.mcp.editServer' => 'Modifica server',
 			'settings.mcp.deleteServer' => 'Elimina server',
-			'settings.mcp.serverName' => 'Nome server',
 			_ => null,
 		} ?? switch (path) {
+			'settings.mcp.serverName' => 'Nome server',
 			'settings.mcp.serverType' => 'Tipo server',
 			'settings.mcp.config' => 'Configurazione',
 			'settings.mcp.testConnection' => 'Testa connessione',
@@ -10554,9 +10556,9 @@ extension on TranslationsIt {
 			'settings.browser.statusLabel' => 'Stato',
 			'settings.browser.statusReady' => 'pronto',
 			'settings.browser.statusSetupRequired' => 'configurazione richiesta',
-			'settings.browser.title' => 'Browser',
 			_ => null,
 		} ?? switch (path) {
+			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => 'Annulla',
 			'settings.workspaces.create' => 'Aggiungi workspace',
 			'settings.workspaces.deleteConfirm' => 'Rimuovere questo workspace da DDAgent? I suoi file restano sul disco.',
@@ -11068,9 +11070,9 @@ extension on TranslationsIt {
 			'tasks.taskDetail.description' => 'Descrizione',
 			'tasks.taskDetail.edit' => 'Modifica attività',
 			'tasks.taskDetail.implDetails' => 'Dettagli di implementazione',
-			'tasks.taskDetail.noDependencies' => 'Nessuna dipendenza',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.noDependencies' => 'Nessuna dipendenza',
 			'tasks.taskDetail.noDescription' => 'Nessuna descrizione fornita',
 			'tasks.taskDetail.priority' => 'Priorità',
 			'tasks.taskDetail.priorityNotSet' => 'Non impostata',
@@ -11582,9 +11584,9 @@ extension on TranslationsIt {
 			'terminal.shortcuts.showTooltip' => 'Mostra scorciatoie',
 			'terminal.shortcuts.hideTooltip' => 'Nascondi scorciatoie',
 			'terminal.paste.title' => 'Incolla nel terminale',
-			'terminal.paste.hint' => 'Ctrl+V / clic destro → Incolla',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.paste.hint' => 'Ctrl+V / clic destro → Incolla',
 			'terminal.errors.couldNotOpenLink' => ({required Object url}) => 'Impossibile aprire il link: ${url}',
 			'terminal.errors.frameError' => ({required Object message}) => '[Errore] ${message}',
 			'terminal.errors.connectionError' => ({required Object message}) => '[Errore di connessione] ${message}',

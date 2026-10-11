@@ -332,7 +332,8 @@
       "voiceStop": "받아쓰기 중지",
       "pinFile": "파일을 컨텍스트에 고정",
       "voiceSettings": "음성 설정 (STT)",
-      "cameraUnavailable": "카메라를 사용할 수 없습니다: {{error}}"
+      "cameraUnavailable": "카메라를 사용할 수 없습니다: {{error}}",
+      "pasteFailed": "클립보드에서 붙여넣지 못했습니다: {{error}}"
     },
     "composer": {
       "toolsAndActions": "도구 및 작업",
