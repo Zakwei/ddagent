@@ -521,6 +521,44 @@ test('Claude expired tokens and malformed Codex auth do not trigger network call
   assert.match(accounts.find((a) => a.provider === 'claude')?.syncError ?? '', /expired/);
 });
 
+test('Claude refreshes an expired access token and persists the rotated tokens', async () => {
+  const written: Record<string, string> = {};
+  const providers = createQuotaProviders({
+    homeDirectory: '/home/test',
+    env: { HOME: '/home/test' },
+    readTextFile: (filePath) => filePath === '/home/test/.claude/.credentials.json'
+      ? JSON.stringify({ claudeAiOauth: {
+          accessToken: 'stale', refreshToken: 'refresh-1', expiresAt: 1, scopes: ['user:inference'], subscriptionType: 'team',
+        } })
+      : null,
+    writeTextFile: (filePath, content) => {
+      written[filePath] = content;
+    },
+    request: async (url, options) => {
+      if (url === 'https://platform.claude.com/v1/oauth/token') {
+        const body = JSON.parse(options?.body as string);
+        assert.equal(body.refresh_token, 'refresh-1');
+        assert.equal(body.scope, 'user:inference');
+        return httpResponse(200, JSON.stringify({ access_token: 'fresh', refresh_token: 'refresh-2', expires_in: 28800 }));
+      }
+      if (url === 'https://api.anthropic.com/api/oauth/usage') {
+        assert.equal(options?.headers?.Authorization, 'Bearer fresh');
+        return httpResponse(200, JSON.stringify({ five_hour: { utilization: 10 } }));
+      }
+      return httpResponse(404, '');
+    },
+  });
+
+  const claude = (await providers.loadAll()).find((a) => a.provider === 'claude')!;
+
+  assert.equal(claude.status, 'active');
+  const persisted = JSON.parse(written['/home/test/.claude/.credentials.json']).claudeAiOauth;
+  assert.equal(persisted.accessToken, 'fresh');
+  assert.equal(persisted.refreshToken, 'refresh-2');
+  assert.equal(persisted.subscriptionType, 'team');
+  assert.ok(persisted.expiresAt > Date.now());
+});
+
 test('a missing login reads as not logged in, or not installed when the CLI is absent', async () => {
   const build = (installed: boolean) => createQuotaProviders(
     {

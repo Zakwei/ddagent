@@ -205,18 +205,71 @@ function inactiveAccount(provider: string, label: string): QuotaAccount {
   };
 }
 
+const CLAUDE_OAUTH_TOKEN_URL = 'https://platform.claude.com/v1/oauth/token';
+const CLAUDE_OAUTH_CLIENT_ID = '9d1c250a-e61b-44d9-88ed-5944d1962f5e';
+
+/**
+ * Refreshes an expired Claude Code access token the same way the CLI does and
+ * writes the rotated tokens back into `.credentials.json`, so the CLI keeps
+ * working with the refresh token that is still valid after rotation.
+ */
+async function refreshClaudeToken(
+  dependencies: QuotaProviderDependencies,
+  credentialsPath: string,
+  auth: Record<string, unknown>,
+  oauth: Record<string, unknown>,
+): Promise<string> {
+  const refreshToken = readOptionalString(oauth.refreshToken);
+  const expiredError = 'Claude Code OAuth token expired — run claude /login';
+  if (!refreshToken) {
+    throw notLoggedIn(expiredError);
+  }
+  const scopes = Array.isArray(oauth.scopes) ? oauth.scopes.filter((s) => typeof s === 'string') : [];
+  const response = await dependencies.request(CLAUDE_OAUTH_TOKEN_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      grant_type: 'refresh_token',
+      refresh_token: refreshToken,
+      client_id: CLAUDE_OAUTH_CLIENT_ID,
+      ...(scopes.length ? { scope: scopes.join(' ') } : {}),
+    }),
+  });
+  const payload = response.status >= 200 && response.status < 300
+    ? (JSON.parse(response.text) as { access_token?: string; refresh_token?: string; expires_in?: number })
+    : null;
+  if (!payload?.access_token) {
+    throw notLoggedIn(expiredError);
+  }
+  try {
+    dependencies.writeTextFile?.(credentialsPath, JSON.stringify({
+      ...auth,
+      claudeAiOauth: {
+        ...oauth,
+        accessToken: payload.access_token,
+        refreshToken: payload.refresh_token ?? refreshToken,
+        expiresAt: Date.now() + (payload.expires_in ?? 3600) * 1000,
+      },
+    }));
+  } catch {
+    // A read-only credential store still gets this sweep on the in-memory token.
+  }
+  return payload.access_token;
+}
+
 /** Reads Claude Code's session and weekly subscription limits. */
 async function fetchClaude(dependencies: QuotaProviderDependencies): Promise<QuotaAccount> {
   const dir = dependencies.env.CLAUDE_CONFIG_DIR || `${dependencies.homeDirectory}/.claude`;
   const auth = readAuth(dependencies, `${dir}/.credentials.json`);
   const oauth = readObjectRecord(auth.claudeAiOauth);
-  const token = readOptionalString(oauth?.accessToken);
+  let token = readOptionalString(oauth?.accessToken);
   if (!token) {
     if (dependencies.env.ANTHROPIC_API_KEY) return inactiveAccount('claude', 'Claude Code');
     throw notLoggedIn('missing Claude Code OAuth token — run claude /login');
   }
   if (typeof oauth?.expiresAt === 'number' && oauth.expiresAt <= Date.now()) {
-    throw notLoggedIn('Claude Code OAuth token expired — run claude /login');
+    // Idle accounts keep an expired 8h access token until the CLI next runs.
+    token = await refreshClaudeToken(dependencies, `${dir}/.credentials.json`, auth, oauth);
   }
   const response = await dependencies.request('https://api.anthropic.com/api/oauth/usage', {
     headers: { Authorization: `Bearer ${token}`, 'anthropic-beta': 'oauth-2025-04-20' },
