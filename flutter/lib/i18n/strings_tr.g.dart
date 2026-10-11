@@ -577,6 +577,7 @@ class Translations$serverConnect$tr extends Translations$serverConnect$en {
 	@override String get connecting => 'Bağlanılıyor…';
 	@override String get changeServer => 'Sunucuyu değiştir';
 	@override String get openInNewWindow => 'Yeni pencerede aç';
+	@override String get startupDefault => 'Başlangıçta aç (varsayılan sunucu)';
 	@override late final Translations$serverConnect$local$tr local = Translations$serverConnect$local$tr._(_root);
 	@override String httpStatus({required Object code}) => 'HTTP ${code}';
 	@override String get networkError => 'Ağ hatası';
@@ -11429,6 +11430,7 @@ extension on TranslationsTr {
 			'serverConnect.connecting' => 'Bağlanılıyor…',
 			'serverConnect.changeServer' => 'Sunucuyu değiştir',
 			'serverConnect.openInNewWindow' => 'Yeni pencerede aç',
+			'serverConnect.startupDefault' => 'Başlangıçta aç (varsayılan sunucu)',
 			'serverConnect.local.title' => 'Bu cihaz',
 			'serverConnect.local.subtitle' => 'DDAgent sunucusunu bu makinede çalıştırın',
 			'serverConnect.local.install' => 'Yerel sunucuyu kur',
@@ -11578,9 +11580,9 @@ extension on TranslationsTr {
 			'terminal.shortcuts.hide' => 'Kısayol çubuğunu gizle',
 			'terminal.shortcuts.showTooltip' => 'Kısayolları göster',
 			'terminal.shortcuts.hideTooltip' => 'Kısayolları gizle',
-			'terminal.paste.title' => 'Terminale yapıştır',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.paste.title' => 'Terminale yapıştır',
 			'terminal.paste.hint' => 'Ctrl+V / sağ tık → Yapıştır',
 			'terminal.errors.couldNotOpenLink' => ({required Object url}) => 'Bağlantı açılamadı: ${url}',
 			'terminal.errors.frameError' => ({required Object message}) => '[Hata] ${message}',

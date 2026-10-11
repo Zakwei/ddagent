@@ -576,6 +576,7 @@ class Translations$serverConnect$zh_TW extends Translations$serverConnect$en {
 	@override String get connecting => '正在連線…';
 	@override String get changeServer => '更換伺服器';
 	@override String get openInNewWindow => '在新視窗中開啟';
+	@override String get startupDefault => '啟動時開啟（預設伺服器）';
 	@override late final Translations$serverConnect$local$zh_TW local = Translations$serverConnect$local$zh_TW.internal(_root);
 	@override String httpStatus({required Object code}) => 'HTTP ${code}';
 	@override String get networkError => '網路錯誤';
@@ -11423,6 +11424,7 @@ extension on TranslationsZhTw {
 			'serverConnect.connecting' => '正在連線…',
 			'serverConnect.changeServer' => '更換伺服器',
 			'serverConnect.openInNewWindow' => '在新視窗中開啟',
+			'serverConnect.startupDefault' => '啟動時開啟（預設伺服器）',
 			'serverConnect.local.title' => '此裝置',
 			'serverConnect.local.subtitle' => '在此電腦上執行 DDAgent 伺服器',
 			'serverConnect.local.install' => '安裝本機伺服器',
@@ -11572,9 +11574,9 @@ extension on TranslationsZhTw {
 			'terminal.shortcuts.hide' => '隱藏快速鍵列',
 			'terminal.shortcuts.showTooltip' => '顯示快速鍵',
 			'terminal.shortcuts.hideTooltip' => '隱藏快速鍵',
-			'terminal.paste.title' => '貼上至終端機',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.paste.title' => '貼上至終端機',
 			'terminal.paste.hint' => 'Ctrl+V / 按右鍵 → 貼上',
 			'terminal.errors.couldNotOpenLink' => ({required Object url}) => '無法開啟連結：${url}',
 			'terminal.errors.frameError' => ({required Object message}) => '[錯誤] ${message}',

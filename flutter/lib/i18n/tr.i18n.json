@@ -3968,6 +3968,7 @@
     "connecting": "Bağlanılıyor…",
     "changeServer": "Sunucuyu değiştir",
     "openInNewWindow": "Yeni pencerede aç",
+    "startupDefault": "Başlangıçta aç (varsayılan sunucu)",
     "local": {
       "title": "Bu cihaz",
       "subtitle": "DDAgent sunucusunu bu makinede çalıştırın",

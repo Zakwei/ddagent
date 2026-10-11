@@ -64,8 +64,10 @@ class _ServerConnectScreenState extends ConsumerState<ServerConnectScreen> {
         return;
       }
       // A different server won't accept the current JWT — drop it so the
-      // login flow on the new server starts clean.
-      if (normalizeServerUrl(url) != ref.read(serverProfilesProvider).activeUrl) {
+      // login flow on the new server starts clean. Compared with the token's
+      // server, not the active one: the startup picker has none active.
+      final profiles = ref.read(serverProfilesProvider);
+      if (normalizeServerUrl(url) != (profiles.activeUrl ?? profiles.lastUrl)) {
         await ref.read(authTokenStoreProvider).clear();
       }
       await ref
@@ -184,6 +186,19 @@ class _ServerConnectScreenState extends ConsumerState<ServerConnectScreen> {
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
+                                if (desktop)
+                                  IconButton(
+                                    icon: Icon(
+                                      p.url == profilesState.defaultUrl
+                                          ? Icons.star
+                                          : Icons.star_border,
+                                      size: 18,
+                                    ),
+                                    tooltip: i18n.serverConnect.startupDefault,
+                                    onPressed: () => ref
+                                        .read(serverProfilesProvider.notifier)
+                                        .toggleDefault(p.url),
+                                  ),
                                 if (desktop)
                                   IconButton(
                                     icon: const Icon(Icons.open_in_new, size: 18),

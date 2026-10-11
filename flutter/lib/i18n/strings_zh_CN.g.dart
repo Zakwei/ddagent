@@ -576,6 +576,7 @@ class Translations$serverConnect$zh_CN extends Translations$serverConnect$en {
 	@override String get connecting => '正在连接…';
 	@override String get changeServer => '更换服务器';
 	@override String get openInNewWindow => '在新窗口中打开';
+	@override String get startupDefault => '启动时打开（默认服务器）';
 	@override late final Translations$serverConnect$local$zh_CN local = Translations$serverConnect$local$zh_CN.internal(_root);
 	@override String httpStatus({required Object code}) => 'HTTP ${code}';
 	@override String get networkError => '网络错误';
@@ -11423,6 +11424,7 @@ extension on TranslationsZhCn {
 			'serverConnect.connecting' => '正在连接…',
 			'serverConnect.changeServer' => '更换服务器',
 			'serverConnect.openInNewWindow' => '在新窗口中打开',
+			'serverConnect.startupDefault' => '启动时打开（默认服务器）',
 			'serverConnect.local.title' => '本设备',
 			'serverConnect.local.subtitle' => '在此计算机上运行 DDAgent 服务器',
 			'serverConnect.local.install' => '安装本地服务器',
@@ -11572,9 +11574,9 @@ extension on TranslationsZhCn {
 			'terminal.shortcuts.hide' => '隐藏快捷键栏',
 			'terminal.shortcuts.showTooltip' => '显示快捷键',
 			'terminal.shortcuts.hideTooltip' => '隐藏快捷键',
-			'terminal.paste.title' => '粘贴到终端',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.paste.title' => '粘贴到终端',
 			'terminal.paste.hint' => 'Ctrl+V / 右键 → 粘贴',
 			'terminal.errors.couldNotOpenLink' => ({required Object url}) => '无法打开链接：${url}',
 			'terminal.errors.frameError' => ({required Object message}) => '[错误] ${message}',

@@ -576,6 +576,7 @@ class Translations$serverConnect$ko extends Translations$serverConnect$en {
 	@override String get connecting => '연결 중…';
 	@override String get changeServer => '서버 변경';
 	@override String get openInNewWindow => '새 창에서 열기';
+	@override String get startupDefault => '시작 시 열기 (기본 서버)';
 	@override late final Translations$serverConnect$local$ko local = Translations$serverConnect$local$ko._(_root);
 	@override String httpStatus({required Object code}) => 'HTTP ${code}';
 	@override String get networkError => '네트워크 오류';
@@ -11423,6 +11424,7 @@ extension on TranslationsKo {
 			'serverConnect.connecting' => '연결 중…',
 			'serverConnect.changeServer' => '서버 변경',
 			'serverConnect.openInNewWindow' => '새 창에서 열기',
+			'serverConnect.startupDefault' => '시작 시 열기 (기본 서버)',
 			'serverConnect.local.title' => '이 기기',
 			'serverConnect.local.subtitle' => '이 컴퓨터에서 DDAgent 서버를 실행합니다',
 			'serverConnect.local.install' => '로컬 서버 설치',
@@ -11572,9 +11574,9 @@ extension on TranslationsKo {
 			'terminal.shortcuts.hide' => '단축키 표시줄 숨기기',
 			'terminal.shortcuts.showTooltip' => '단축키 표시',
 			'terminal.shortcuts.hideTooltip' => '단축키 숨기기',
-			'terminal.paste.title' => '터미널에 붙여넣기',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.paste.title' => '터미널에 붙여넣기',
 			'terminal.paste.hint' => 'Ctrl+V / 마우스 오른쪽 클릭 → 붙여넣기',
 			'terminal.errors.couldNotOpenLink' => ({required Object url}) => '링크를 열 수 없습니다: ${url}',
 			'terminal.errors.frameError' => ({required Object message}) => '[오류] ${message}',

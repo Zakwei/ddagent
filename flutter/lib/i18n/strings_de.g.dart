@@ -577,6 +577,7 @@ class Translations$serverConnect$de extends Translations$serverConnect$en {
 	@override String get connecting => 'Verbinde…';
 	@override String get changeServer => 'Server wechseln';
 	@override String get openInNewWindow => 'In neuem Fenster öffnen';
+	@override String get startupDefault => 'Beim Start öffnen (Standardserver)';
 	@override late final Translations$serverConnect$local$de local = Translations$serverConnect$local$de._(_root);
 	@override String httpStatus({required Object code}) => 'HTTP ${code}';
 	@override String get networkError => 'Netzwerkfehler';
@@ -11434,6 +11435,7 @@ extension on TranslationsDe {
 			'serverConnect.connecting' => 'Verbinde…',
 			'serverConnect.changeServer' => 'Server wechseln',
 			'serverConnect.openInNewWindow' => 'In neuem Fenster öffnen',
+			'serverConnect.startupDefault' => 'Beim Start öffnen (Standardserver)',
 			'serverConnect.local.title' => 'Dieses Gerät',
 			'serverConnect.local.subtitle' => 'DDAgent-Server auf diesem Rechner ausführen',
 			'serverConnect.local.install' => 'Lokalen Server installieren',
@@ -11583,9 +11585,9 @@ extension on TranslationsDe {
 			'terminal.shortcuts.hide' => 'Tastenkürzel-Leiste ausblenden',
 			'terminal.shortcuts.showTooltip' => 'Tastenkürzel anzeigen',
 			'terminal.shortcuts.hideTooltip' => 'Tastenkürzel ausblenden',
-			'terminal.paste.title' => 'In Terminal einfügen',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.paste.title' => 'In Terminal einfügen',
 			'terminal.paste.hint' => 'Strg+V / Rechtsklick → Einfügen',
 			'terminal.errors.couldNotOpenLink' => ({required Object url}) => 'Link konnte nicht geöffnet werden: ${url}',
 			'terminal.errors.frameError' => ({required Object message}) => '[Fehler] ${message}',

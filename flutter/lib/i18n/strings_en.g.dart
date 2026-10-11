@@ -800,6 +800,9 @@ class Translations$serverConnect$en {
 	/// en: 'Open in new window'
 	String get openInNewWindow => 'Open in new window';
 
+	/// en: 'Open at startup (default server)'
+	String get startupDefault => 'Open at startup (default server)';
+
 	late final Translations$serverConnect$local$en local = Translations$serverConnect$local$en.internal(_root);
 
 	/// en: 'HTTP {{code}}'
@@ -17890,6 +17893,7 @@ extension on Translations {
 			'serverConnect.connecting' => 'Connecting…',
 			'serverConnect.changeServer' => 'Change server',
 			'serverConnect.openInNewWindow' => 'Open in new window',
+			'serverConnect.startupDefault' => 'Open at startup (default server)',
 			'serverConnect.local.title' => 'This device',
 			'serverConnect.local.subtitle' => 'Run the DDAgent server on this machine',
 			'serverConnect.local.install' => 'Install local server',
@@ -18039,9 +18043,9 @@ extension on Translations {
 			'terminal.shortcuts.hide' => 'Hide shortcuts bar',
 			'terminal.shortcuts.showTooltip' => 'Show Shortcuts',
 			'terminal.shortcuts.hideTooltip' => 'Hide Shortcuts',
-			'terminal.paste.title' => 'Paste into terminal',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.paste.title' => 'Paste into terminal',
 			'terminal.paste.hint' => 'Ctrl+V / right-click → Paste',
 			'terminal.errors.couldNotOpenLink' => ({required Object url}) => 'Could not open link: ${url}',
 			'terminal.errors.frameError' => ({required Object message}) => '[Error] ${message}',

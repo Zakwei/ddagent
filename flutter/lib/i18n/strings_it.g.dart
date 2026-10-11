@@ -577,6 +577,7 @@ class Translations$serverConnect$it extends Translations$serverConnect$en {
 	@override String get connecting => 'Connessione…';
 	@override String get changeServer => 'Cambia server';
 	@override String get openInNewWindow => 'Apri in una nuova finestra';
+	@override String get startupDefault => 'Apri all\'avvio (server predefinito)';
 	@override late final Translations$serverConnect$local$it local = Translations$serverConnect$local$it._(_root);
 	@override String httpStatus({required Object code}) => 'HTTP ${code}';
 	@override String get networkError => 'Errore di rete';
@@ -11434,6 +11435,7 @@ extension on TranslationsIt {
 			'serverConnect.connecting' => 'Connessione…',
 			'serverConnect.changeServer' => 'Cambia server',
 			'serverConnect.openInNewWindow' => 'Apri in una nuova finestra',
+			'serverConnect.startupDefault' => 'Apri all\'avvio (server predefinito)',
 			'serverConnect.local.title' => 'Questo dispositivo',
 			'serverConnect.local.subtitle' => 'Esegui il server DDAgent su questa macchina',
 			'serverConnect.local.install' => 'Installa il server locale',
@@ -11583,9 +11585,9 @@ extension on TranslationsIt {
 			'terminal.shortcuts.hide' => 'Nascondi barra scorciatoie',
 			'terminal.shortcuts.showTooltip' => 'Mostra scorciatoie',
 			'terminal.shortcuts.hideTooltip' => 'Nascondi scorciatoie',
-			'terminal.paste.title' => 'Incolla nel terminale',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.paste.title' => 'Incolla nel terminale',
 			'terminal.paste.hint' => 'Ctrl+V / clic destro → Incolla',
 			'terminal.errors.couldNotOpenLink' => ({required Object url}) => 'Impossibile aprire il link: ${url}',
 			'terminal.errors.frameError' => ({required Object message}) => '[Errore] ${message}',

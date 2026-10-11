@@ -579,6 +579,7 @@ class Translations$serverConnect$ru extends Translations$serverConnect$en {
 	@override String get connecting => 'Подключение…';
 	@override String get changeServer => 'Сменить сервер';
 	@override String get openInNewWindow => 'Открыть в новом окне';
+	@override String get startupDefault => 'Открывать при запуске (сервер по умолчанию)';
 	@override late final Translations$serverConnect$local$ru local = Translations$serverConnect$local$ru._(_root);
 	@override String httpStatus({required Object code}) => 'HTTP ${code}';
 	@override String get networkError => 'Ошибка сети';
@@ -11472,6 +11473,7 @@ extension on TranslationsRu {
 			'serverConnect.connecting' => 'Подключение…',
 			'serverConnect.changeServer' => 'Сменить сервер',
 			'serverConnect.openInNewWindow' => 'Открыть в новом окне',
+			'serverConnect.startupDefault' => 'Открывать при запуске (сервер по умолчанию)',
 			'serverConnect.local.title' => 'Это устройство',
 			'serverConnect.local.subtitle' => 'Запустить сервер DDAgent на этой машине',
 			'serverConnect.local.install' => 'Установить локальный сервер',
@@ -11621,9 +11623,9 @@ extension on TranslationsRu {
 			'terminal.shortcuts.hide' => 'Скрыть панель горячих клавиш',
 			'terminal.shortcuts.showTooltip' => 'Показать горячие клавиши',
 			'terminal.shortcuts.hideTooltip' => 'Скрыть горячие клавиши',
-			'terminal.paste.title' => 'Вставить в терминал',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.paste.title' => 'Вставить в терминал',
 			'terminal.paste.hint' => 'Ctrl+V / правый клик → Вставить',
 			'terminal.errors.couldNotOpenLink' => ({required Object url}) => 'Не удалось открыть ссылку: ${url}',
 			'terminal.errors.frameError' => ({required Object message}) => '[Ошибка] ${message}',

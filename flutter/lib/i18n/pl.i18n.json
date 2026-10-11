@@ -4013,6 +4013,7 @@
     "connecting": "Łączenie…",
     "changeServer": "Zmień serwer",
     "openInNewWindow": "Otwórz w nowym oknie",
+    "startupDefault": "Uruchamiaj przy starcie (serwer domyślny)",
     "local": {
       "title": "To urządzenie",
       "subtitle": "Uruchom serwer DDAgent na tym komputerze",

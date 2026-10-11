@@ -3973,6 +3973,7 @@
     "connecting": "Conectando…",
     "changeServer": "Cambiar servidor",
     "openInNewWindow": "Abrir en una ventana nueva",
+    "startupDefault": "Abrir al iniciar (servidor predeterminado)",
     "local": {
       "title": "Este dispositivo",
       "subtitle": "Ejecuta el servidor DDAgent en esta máquina",

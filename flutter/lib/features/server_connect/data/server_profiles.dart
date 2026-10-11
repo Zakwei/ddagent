@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:ddagent_app/core/config/env.dart';
 import 'package:ddagent_app/core/platform/instance.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -42,13 +44,33 @@ class ServerProfile {
 }
 
 class ServerProfilesState {
-  const ServerProfilesState({this.profiles = const [], this.activeUrl});
+  const ServerProfilesState({
+    this.profiles = const [],
+    this.activeUrl,
+    this.lastUrl,
+    this.defaultUrl,
+  });
 
   final List<ServerProfile> profiles;
 
   /// Currently selected server — null means "not configured" (remote UI
   /// must show the connect screen; embedded builds never hit this path).
   final String? activeUrl;
+
+  /// Server the stored JWT belongs to (last one connected) — may differ from
+  /// [activeUrl] while the startup picker shows, which leaves that null.
+  final String? lastUrl;
+
+  /// Server connected automatically at startup instead of showing the picker.
+  final String? defaultUrl;
+
+  ServerProfilesState copyWith({List<ServerProfile>? profiles, String? activeUrl}) =>
+      ServerProfilesState(
+        profiles: profiles ?? this.profiles,
+        activeUrl: activeUrl,
+        lastUrl: activeUrl ?? lastUrl,
+        defaultUrl: defaultUrl,
+      );
 }
 
 /// Saved remote-server profiles (multi-server equivalent of the RN client's
@@ -56,6 +78,13 @@ class ServerProfilesState {
 class ServerProfilesController extends Notifier<ServerProfilesState> {
   static const _profilesKey = 'serverProfiles';
   static const _activeKey = 'activeServerUrl';
+  static const _defaultKey = 'defaultServerUrl';
+
+  /// Desktop starts on the server picker unless a default server is set.
+  /// Overridable for tests (which run on a desktop host).
+  @visibleForTesting
+  static bool pickAtStartup =
+      !kIsWeb && (Platform.isLinux || Platform.isWindows || Platform.isMacOS);
 
   Box<dynamic> get _box => Hive.box<dynamic>('settings');
 
@@ -79,11 +108,46 @@ class ServerProfilesController extends Notifier<ServerProfilesState> {
     if (pinned != null && !profiles.any((p) => p.url == pinned)) {
       profiles.add(ServerProfile(url: pinned, isLocal: pinnedServerIsLocal));
     }
-    var active = pinned ?? _box.get(_activeKey) as String?;
+    final last = _box.get(_activeKey) as String?;
+    final def = _box.get(_defaultKey) as String?;
+    final defaultUrl = profiles.any((p) => p.url == def) ? def : null;
+    if (pinned == null && pickAtStartup) {
+      // Null active → the router guard opens /connect (the picker).
+      return ServerProfilesState(
+        profiles: profiles,
+        activeUrl: defaultUrl,
+        lastUrl: last,
+        defaultUrl: defaultUrl,
+      );
+    }
+    var active = pinned ?? last;
     // First launch: seed from --dart-define or the first saved profile.
     active ??= Env.defaultServerUrl.isNotEmpty ? Env.defaultServerUrl : null;
     active ??= profiles.isEmpty ? null : profiles.first.url;
-    return ServerProfilesState(profiles: profiles, activeUrl: active);
+    return ServerProfilesState(
+      profiles: profiles,
+      activeUrl: active,
+      lastUrl: last,
+      defaultUrl: defaultUrl,
+    );
+  }
+
+  /// Marks [url] as the startup server; null (or the current default) clears it.
+  Future<void> toggleDefault(String url) async {
+    final next = state.defaultUrl == url ? null : url;
+    if (Hive.isBoxOpen('settings')) {
+      if (next == null) {
+        await _box.delete(_defaultKey);
+      } else {
+        await _box.put(_defaultKey, next);
+      }
+    }
+    state = ServerProfilesState(
+      profiles: state.profiles,
+      activeUrl: state.activeUrl,
+      lastUrl: state.lastUrl,
+      defaultUrl: next,
+    );
   }
 
   /// Adds (or selects) a profile and persists it.
@@ -106,7 +170,7 @@ class ServerProfilesController extends Notifier<ServerProfilesState> {
       await _box.put(_profilesKey, jsonEncode([for (final p in profiles) p.toJson()]));
       await _box.put(_activeKey, url);
     }
-    state = ServerProfilesState(profiles: profiles, activeUrl: url);
+    state = state.copyWith(profiles: profiles, activeUrl: url);
   }
 
   Future<void> remove(String url) async {
@@ -115,6 +179,7 @@ class ServerProfilesController extends Notifier<ServerProfilesState> {
     if (active == url) {
       active = profiles.isEmpty ? null : profiles.first.url;
     }
+    if (state.defaultUrl == url) await toggleDefault(url);
     if (Hive.isBoxOpen('settings')) {
       await _box.put(_profilesKey, jsonEncode([for (final p in profiles) p.toJson()]));
       if (active == null) {
@@ -123,7 +188,7 @@ class ServerProfilesController extends Notifier<ServerProfilesState> {
         await _box.put(_activeKey, active);
       }
     }
-    state = ServerProfilesState(profiles: profiles, activeUrl: active);
+    state = state.copyWith(profiles: profiles, activeUrl: active);
   }
 }
 

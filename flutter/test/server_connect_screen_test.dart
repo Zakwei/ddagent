@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:ddagent_app/core/network/api_providers.dart';
 import 'package:ddagent_app/core/network/auth_token_store.dart';
 import 'package:ddagent_app/features/auth/view/auth_screens.dart';
+import 'package:ddagent_app/features/server_connect/data/server_profiles.dart';
 import 'package:ddagent_app/features/server_connect/view/server_connect_screen.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:ddagent_app/main.dart';
@@ -32,6 +33,8 @@ void main() {
   // loopback server below.
   setUpAll(() async {
     HttpOverrides.global = null;
+    // Mobile flow: the saved server is restored (desktop shows the picker).
+    ServerProfilesController.pickAtStartup = false;
     Hive.init('/tmp/ddagent_test_hive_connect');
     await Hive.openBox<dynamic>('settings');
   });

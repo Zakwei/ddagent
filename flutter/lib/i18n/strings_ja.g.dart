@@ -576,6 +576,7 @@ class Translations$serverConnect$ja extends Translations$serverConnect$en {
 	@override String get connecting => '接続中…';
 	@override String get changeServer => 'サーバーを変更';
 	@override String get openInNewWindow => '新しいウィンドウで開く';
+	@override String get startupDefault => '起動時に開く（デフォルトサーバー）';
 	@override late final Translations$serverConnect$local$ja local = Translations$serverConnect$local$ja._(_root);
 	@override String httpStatus({required Object code}) => 'HTTP ${code}';
 	@override String get networkError => 'ネットワークエラー';
@@ -11423,6 +11424,7 @@ extension on TranslationsJa {
 			'serverConnect.connecting' => '接続中…',
 			'serverConnect.changeServer' => 'サーバーを変更',
 			'serverConnect.openInNewWindow' => '新しいウィンドウで開く',
+			'serverConnect.startupDefault' => '起動時に開く（デフォルトサーバー）',
 			'serverConnect.local.title' => 'このデバイス',
 			'serverConnect.local.subtitle' => 'このマシンでDDAgentサーバーを実行します',
 			'serverConnect.local.install' => 'ローカルサーバーをインストール',
@@ -11572,9 +11574,9 @@ extension on TranslationsJa {
 			'terminal.shortcuts.hide' => 'ショートカットバーを非表示',
 			'terminal.shortcuts.showTooltip' => 'ショートカットを表示',
 			'terminal.shortcuts.hideTooltip' => 'ショートカットを非表示',
-			'terminal.paste.title' => 'ターミナルに貼り付け',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.paste.title' => 'ターミナルに貼り付け',
 			'terminal.paste.hint' => 'Ctrl+V / 右クリック → 貼り付け',
 			'terminal.errors.couldNotOpenLink' => ({required Object url}) => 'リンクを開けませんでした: ${url}',
 			'terminal.errors.frameError' => ({required Object message}) => '[エラー] ${message}',
