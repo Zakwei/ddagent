@@ -41,6 +41,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	Translations $copyWith({TranslationMetadata<AppLocale, Translations>? meta}) => Translations(meta: meta ?? this.$meta);
 
 	// Translations
+	late final Translations$boot$en boot = Translations$boot$en.internal(_root);
 	late final Translations$auth$en auth = Translations$auth$en.internal(_root);
 	late final Translations$chat$en chat = Translations$chat$en.internal(_root);
 	late final Translations$codeEditor$en codeEditor = Translations$codeEditor$en.internal(_root);
@@ -71,6 +72,21 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$browserUse$en browserUse = Translations$browserUse$en.internal(_root);
 	late final Translations$orchestrator$en orchestrator = Translations$orchestrator$en.internal(_root);
 	late final Translations$miniOrchestrator$en miniOrchestrator = Translations$miniOrchestrator$en.internal(_root);
+}
+
+// Path: boot
+class Translations$boot$en {
+	Translations$boot$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Starting DDAgent…'
+	String get starting => 'Starting DDAgent…';
+
+	/// en: 'Connecting to {{server}}…'
+	String connecting({required Object server}) => 'Connecting to ${server}…';
 }
 
 // Path: auth
@@ -14961,6 +14977,8 @@ class Translations$settings$permissions$permissionMode$modes$plan$en {
 extension on Translations {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
+			'boot.starting' => 'Starting DDAgent…',
+			'boot.connecting' => ({required Object server}) => 'Connecting to ${server}…',
 			'auth.sessionExpired' => 'Your session expired. Please log in again.',
 			'auth.login.title' => 'Welcome Back',
 			'auth.login.description' => 'Sign in to your DDAgent self-hosted account',
@@ -15471,10 +15489,10 @@ extension on Translations {
 			'chat.modelLibrary.nameHint' => 'e.g. GPT-5.5 Pro',
 			'chat.modelLibrary.idLabel' => 'Model ID',
 			'chat.modelLibrary.idHint' => 'e.g. gpt-5.5-pro',
-			'chat.modelLibrary.idHelp' => 'Use the exact identifier accepted by the provider CLI. IDs cannot contain spaces.',
-			'chat.modelLibrary.updatedNotice' => ({required Object name}) => '${name} was updated.',
 			_ => null,
 		} ?? switch (path) {
+			'chat.modelLibrary.idHelp' => 'Use the exact identifier accepted by the provider CLI. IDs cannot contain spaces.',
+			'chat.modelLibrary.updatedNotice' => ({required Object name}) => '${name} was updated.',
 			'chat.modelLibrary.addedNotice' => ({required Object name}) => '${name} was added.',
 			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '${name} was deleted.',
 			'chat.modelLibrary.saving' => 'Saving…',
@@ -15985,10 +16003,10 @@ extension on Translations {
 			'common.projectWizard.step2.newPath' => 'Workspace Path',
 			'common.projectWizard.step2.existingPlaceholder' => '/path/to/existing/workspace',
 			'common.projectWizard.step2.newPlaceholder' => '/path/to/new/workspace',
-			'common.projectWizard.step2.existingHelp' => 'Full path to your existing workspace directory',
-			'common.projectWizard.step2.newHelp' => 'Full path to your workspace directory',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step2.existingHelp' => 'Full path to your existing workspace directory',
+			'common.projectWizard.step2.newHelp' => 'Full path to your workspace directory',
 			'common.projectWizard.step2.githubUrl' => 'GitHub URL (Optional)',
 			'common.projectWizard.step2.githubPlaceholder' => 'https://github.com/username/repository',
 			'common.projectWizard.step2.githubHelp' => 'Optional: provide a GitHub URL to clone a repository',
@@ -16499,10 +16517,10 @@ extension on Translations {
 			'settings.account.changePassword' => 'Change Password',
 			'settings.mcp.title' => 'MCP Servers',
 			'settings.mcp.addServer' => 'Add Server',
-			'settings.mcp.editServer' => 'Edit Server',
-			'settings.mcp.deleteServer' => 'Delete Server',
 			_ => null,
 		} ?? switch (path) {
+			'settings.mcp.editServer' => 'Edit Server',
+			'settings.mcp.deleteServer' => 'Delete Server',
 			'settings.mcp.serverName' => 'Server Name',
 			'settings.mcp.serverType' => 'Server Type',
 			'settings.mcp.config' => 'Configuration',
@@ -17013,10 +17031,10 @@ extension on Translations {
 			'settings.browser.runtimeRequired' => 'Browser runtime required',
 			'settings.browser.statusDisabled' => 'disabled',
 			'settings.browser.statusLabel' => 'Status',
-			'settings.browser.statusReady' => 'ready',
-			'settings.browser.statusSetupRequired' => 'setup required',
 			_ => null,
 		} ?? switch (path) {
+			'settings.browser.statusReady' => 'ready',
+			'settings.browser.statusSetupRequired' => 'setup required',
 			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => 'Cancel',
 			'settings.workspaces.create' => 'Add workspace',
@@ -17527,10 +17545,10 @@ extension on Translations {
 			'tasks.taskDetail.dependencies' => 'Dependencies',
 			'tasks.taskDetail.dependenciesPlaceholder' => 'e.g. 1, 2, 3',
 			'tasks.taskDetail.description' => 'Description',
-			'tasks.taskDetail.edit' => 'Edit task',
-			'tasks.taskDetail.implDetails' => 'Implementation Details',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.edit' => 'Edit task',
+			'tasks.taskDetail.implDetails' => 'Implementation Details',
 			'tasks.taskDetail.noDependencies' => 'No dependencies',
 			'tasks.taskDetail.noDescription' => 'No description provided',
 			'tasks.taskDetail.priority' => 'Priority',
@@ -18041,10 +18059,10 @@ extension on Translations {
 			'terminal.shortcuts.eof' => 'EOF',
 			'terminal.shortcuts.suspend' => 'Suspend (SIGTSTP)',
 			'terminal.shortcuts.hide' => 'Hide shortcuts bar',
-			'terminal.shortcuts.showTooltip' => 'Show Shortcuts',
-			'terminal.shortcuts.hideTooltip' => 'Hide Shortcuts',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.shortcuts.showTooltip' => 'Show Shortcuts',
+			'terminal.shortcuts.hideTooltip' => 'Hide Shortcuts',
 			'terminal.paste.title' => 'Paste into terminal',
 			'terminal.paste.hint' => 'Ctrl+V / right-click → Paste',
 			'terminal.errors.couldNotOpenLink' => ({required Object url}) => 'Could not open link: ${url}',

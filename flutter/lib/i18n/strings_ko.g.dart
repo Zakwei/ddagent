@@ -39,6 +39,7 @@ class TranslationsKo extends Translations with BaseTranslations<AppLocale, Trans
 	TranslationsKo $copyWith({TranslationMetadata<AppLocale, Translations>? meta}) => TranslationsKo(meta: meta ?? this.$meta);
 
 	// Translations
+	@override late final Translations$boot$ko boot = Translations$boot$ko._(_root);
 	@override late final Translations$auth$ko auth = Translations$auth$ko._(_root);
 	@override late final Translations$chat$ko chat = Translations$chat$ko._(_root);
 	@override late final Translations$codeEditor$ko codeEditor = Translations$codeEditor$ko._(_root);
@@ -69,6 +70,17 @@ class TranslationsKo extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final Translations$browserUse$ko browserUse = Translations$browserUse$ko._(_root);
 	@override late final Translations$orchestrator$ko orchestrator = Translations$orchestrator$ko._(_root);
 	@override late final Translations$miniOrchestrator$ko miniOrchestrator = Translations$miniOrchestrator$ko._(_root);
+}
+
+// Path: boot
+class Translations$boot$ko extends Translations$boot$en {
+	Translations$boot$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get starting => 'DDAgent 시작 중…';
+	@override String connecting({required Object server}) => '${server}에 연결 중…';
 }
 
 // Path: auth
@@ -8492,6 +8504,8 @@ class Translations$settings$permissions$permissionMode$modes$plan$ko extends Tra
 extension on TranslationsKo {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
+			'boot.starting' => 'DDAgent 시작 중…',
+			'boot.connecting' => ({required Object server}) => '${server}에 연결 중…',
 			'auth.sessionExpired' => '세션이 만료되었습니다. 다시 로그인하세요.',
 			'auth.login.title' => '다시 오신 것을 환영합니다',
 			'auth.login.description' => 'DDAgent 계정에 로그인하세요',
@@ -9002,10 +9016,10 @@ extension on TranslationsKo {
 			'chat.modelLibrary.nameHint' => '예: GPT-5.5 Pro',
 			'chat.modelLibrary.idLabel' => '모델 ID',
 			'chat.modelLibrary.idHint' => '예: gpt-5.5-pro',
-			'chat.modelLibrary.idHelp' => '공급자 CLI가 허용하는 정확한 식별자를 사용하세요. ID에는 공백을 넣을 수 없습니다.',
-			'chat.modelLibrary.updatedNotice' => ({required Object name}) => '${name}을(를) 업데이트했습니다.',
 			_ => null,
 		} ?? switch (path) {
+			'chat.modelLibrary.idHelp' => '공급자 CLI가 허용하는 정확한 식별자를 사용하세요. ID에는 공백을 넣을 수 없습니다.',
+			'chat.modelLibrary.updatedNotice' => ({required Object name}) => '${name}을(를) 업데이트했습니다.',
 			'chat.modelLibrary.addedNotice' => ({required Object name}) => '${name}을(를) 추가했습니다.',
 			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '${name}을(를) 삭제했습니다.',
 			'chat.modelLibrary.saving' => '저장 중…',
@@ -9516,10 +9530,10 @@ extension on TranslationsKo {
 			'common.projectWizard.step2.newPath' => '워크스페이스 경로',
 			'common.projectWizard.step2.existingPlaceholder' => '/path/to/existing/workspace',
 			'common.projectWizard.step2.newPlaceholder' => '/path/to/new/workspace',
-			'common.projectWizard.step2.existingHelp' => '기존 워크스페이스 디렉토리의 전체 경로',
-			'common.projectWizard.step2.newHelp' => '워크스페이스 디렉토리의 전체 경로',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step2.existingHelp' => '기존 워크스페이스 디렉토리의 전체 경로',
+			'common.projectWizard.step2.newHelp' => '워크스페이스 디렉토리의 전체 경로',
 			'common.projectWizard.step2.githubUrl' => 'GitHub URL (선택사항)',
 			'common.projectWizard.step2.githubPlaceholder' => 'https://github.com/username/repository',
 			'common.projectWizard.step2.githubHelp' => '선택사항: 저장소를 clone하려면 GitHub URL을 입력하세요',
@@ -10030,10 +10044,10 @@ extension on TranslationsKo {
 			'settings.account.changePassword' => '비밀번호 변경',
 			'settings.mcp.title' => 'MCP 서버',
 			'settings.mcp.addServer' => '서버 추가',
-			'settings.mcp.editServer' => '서버 편집',
-			'settings.mcp.deleteServer' => '서버 삭제',
 			_ => null,
 		} ?? switch (path) {
+			'settings.mcp.editServer' => '서버 편집',
+			'settings.mcp.deleteServer' => '서버 삭제',
 			'settings.mcp.serverName' => '서버 이름',
 			'settings.mcp.serverType' => '서버 유형',
 			'settings.mcp.config' => '설정',
@@ -10544,10 +10558,10 @@ extension on TranslationsKo {
 			'settings.browser.runtimeRequired' => '브라우저 런타임 필요',
 			'settings.browser.statusDisabled' => '비활성화됨',
 			'settings.browser.statusLabel' => '상태',
-			'settings.browser.statusReady' => '준비됨',
-			'settings.browser.statusSetupRequired' => '설정 필요',
 			_ => null,
 		} ?? switch (path) {
+			'settings.browser.statusReady' => '준비됨',
+			'settings.browser.statusSetupRequired' => '설정 필요',
 			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => '취소',
 			'settings.workspaces.create' => '작업 영역 추가',
@@ -11058,10 +11072,10 @@ extension on TranslationsKo {
 			'tasks.taskDetail.dependencies' => '종속성',
 			'tasks.taskDetail.dependenciesPlaceholder' => '예: 1, 2, 3',
 			'tasks.taskDetail.description' => '설명',
-			'tasks.taskDetail.edit' => '작업 편집',
-			'tasks.taskDetail.implDetails' => '구현 세부 정보',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.edit' => '작업 편집',
+			'tasks.taskDetail.implDetails' => '구현 세부 정보',
 			'tasks.taskDetail.noDependencies' => '종속성 없음',
 			'tasks.taskDetail.noDescription' => '설명 없음',
 			'tasks.taskDetail.priority' => '우선순위',
@@ -11572,10 +11586,10 @@ extension on TranslationsKo {
 			'terminal.shortcuts.eof' => 'EOF',
 			'terminal.shortcuts.suspend' => '일시 중단 (SIGTSTP)',
 			'terminal.shortcuts.hide' => '단축키 표시줄 숨기기',
-			'terminal.shortcuts.showTooltip' => '단축키 표시',
-			'terminal.shortcuts.hideTooltip' => '단축키 숨기기',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.shortcuts.showTooltip' => '단축키 표시',
+			'terminal.shortcuts.hideTooltip' => '단축키 숨기기',
 			'terminal.paste.title' => '터미널에 붙여넣기',
 			'terminal.paste.hint' => 'Ctrl+V / 마우스 오른쪽 클릭 → 붙여넣기',
 			'terminal.errors.couldNotOpenLink' => ({required Object url}) => '링크를 열 수 없습니다: ${url}',

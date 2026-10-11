@@ -1,4 +1,8 @@
 {
+  "boot": {
+    "starting": "Запуск DDAgent…",
+    "connecting": "Подключение к {{server}}…"
+  },
   "auth": {
     "sessionExpired": "Срок действия сеанса истёк. Войдите снова.",
     "login": {

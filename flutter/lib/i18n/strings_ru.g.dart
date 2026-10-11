@@ -39,6 +39,7 @@ class TranslationsRu extends Translations with BaseTranslations<AppLocale, Trans
 	TranslationsRu $copyWith({TranslationMetadata<AppLocale, Translations>? meta}) => TranslationsRu(meta: meta ?? this.$meta);
 
 	// Translations
+	@override late final Translations$boot$ru boot = Translations$boot$ru._(_root);
 	@override late final Translations$auth$ru auth = Translations$auth$ru._(_root);
 	@override late final Translations$chat$ru chat = Translations$chat$ru._(_root);
 	@override late final Translations$codeEditor$ru codeEditor = Translations$codeEditor$ru._(_root);
@@ -69,6 +70,17 @@ class TranslationsRu extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final Translations$browserUse$ru browserUse = Translations$browserUse$ru._(_root);
 	@override late final Translations$orchestrator$ru orchestrator = Translations$orchestrator$ru._(_root);
 	@override late final Translations$miniOrchestrator$ru miniOrchestrator = Translations$miniOrchestrator$ru._(_root);
+}
+
+// Path: boot
+class Translations$boot$ru extends Translations$boot$en {
+	Translations$boot$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get starting => 'Запуск DDAgent…';
+	@override String connecting({required Object server}) => 'Подключение к ${server}…';
 }
 
 // Path: auth
@@ -8541,6 +8553,8 @@ class Translations$settings$permissions$permissionMode$modes$plan$ru extends Tra
 extension on TranslationsRu {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
+			'boot.starting' => 'Запуск DDAgent…',
+			'boot.connecting' => ({required Object server}) => 'Подключение к ${server}…',
 			'auth.sessionExpired' => 'Срок действия сеанса истёк. Войдите снова.',
 			'auth.login.title' => 'Добро пожаловать',
 			'auth.login.description' => 'Войдите в свой аккаунт DDAgent',
@@ -9051,10 +9065,10 @@ extension on TranslationsRu {
 			'chat.modelLibrary.nameHint' => 'например, GPT-5.5 Pro',
 			'chat.modelLibrary.idLabel' => 'ID модели',
 			'chat.modelLibrary.idHint' => 'например, gpt-5.5-pro',
-			'chat.modelLibrary.idHelp' => 'Используйте точный идентификатор, который принимает CLI провайдера. ID не может содержать пробелы.',
-			'chat.modelLibrary.updatedNotice' => ({required Object name}) => '${name} обновлена.',
 			_ => null,
 		} ?? switch (path) {
+			'chat.modelLibrary.idHelp' => 'Используйте точный идентификатор, который принимает CLI провайдера. ID не может содержать пробелы.',
+			'chat.modelLibrary.updatedNotice' => ({required Object name}) => '${name} обновлена.',
 			'chat.modelLibrary.addedNotice' => ({required Object name}) => '${name} добавлена.',
 			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '${name} удалена.',
 			'chat.modelLibrary.saving' => 'Сохранение…',
@@ -9565,10 +9579,10 @@ extension on TranslationsRu {
 			'common.projectWizard.step2.newPath' => 'Путь к рабочему пространству',
 			'common.projectWizard.step2.existingPlaceholder' => '/путь/к/существующему/пространству',
 			'common.projectWizard.step2.newPlaceholder' => '/путь/к/новому/пространству',
-			'common.projectWizard.step2.existingHelp' => 'Полный путь к каталогу вашего рабочего пространства',
-			'common.projectWizard.step2.newHelp' => 'Полный путь к каталогу вашего рабочего пространства',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step2.existingHelp' => 'Полный путь к каталогу вашего рабочего пространства',
+			'common.projectWizard.step2.newHelp' => 'Полный путь к каталогу вашего рабочего пространства',
 			'common.projectWizard.step2.githubUrl' => 'URL GitHub (необязательно)',
 			'common.projectWizard.step2.githubPlaceholder' => 'https://github.com/username/repository',
 			'common.projectWizard.step2.githubHelp' => 'Необязательно: укажите URL GitHub для клонирования репозитория',
@@ -10079,10 +10093,10 @@ extension on TranslationsRu {
 			'settings.account.changePassword' => 'Изменить пароль',
 			'settings.mcp.title' => 'MCP серверы',
 			'settings.mcp.addServer' => 'Добавить сервер',
-			'settings.mcp.editServer' => 'Редактировать сервер',
-			'settings.mcp.deleteServer' => 'Удалить сервер',
 			_ => null,
 		} ?? switch (path) {
+			'settings.mcp.editServer' => 'Редактировать сервер',
+			'settings.mcp.deleteServer' => 'Удалить сервер',
 			'settings.mcp.serverName' => 'Имя сервера',
 			'settings.mcp.serverType' => 'Тип сервера',
 			'settings.mcp.config' => 'Конфигурация',
@@ -10593,10 +10607,10 @@ extension on TranslationsRu {
 			'settings.browser.runtimeRequired' => 'Требуется среда выполнения браузера',
 			'settings.browser.statusDisabled' => 'отключён',
 			'settings.browser.statusLabel' => 'Статус',
-			'settings.browser.statusReady' => 'готов',
-			'settings.browser.statusSetupRequired' => 'требуется настройка',
 			_ => null,
 		} ?? switch (path) {
+			'settings.browser.statusReady' => 'готов',
+			'settings.browser.statusSetupRequired' => 'требуется настройка',
 			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => 'Отмена',
 			'settings.workspaces.create' => 'Добавить рабочую область',
@@ -11107,10 +11121,10 @@ extension on TranslationsRu {
 			'tasks.taskDetail.dependencies' => 'Зависимости',
 			'tasks.taskDetail.dependenciesPlaceholder' => 'напр. 1, 2, 3',
 			'tasks.taskDetail.description' => 'Описание',
-			'tasks.taskDetail.edit' => 'Редактировать задачу',
-			'tasks.taskDetail.implDetails' => 'Детали реализации',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.edit' => 'Редактировать задачу',
+			'tasks.taskDetail.implDetails' => 'Детали реализации',
 			'tasks.taskDetail.noDependencies' => 'Нет зависимостей',
 			'tasks.taskDetail.noDescription' => 'Описание отсутствует',
 			'tasks.taskDetail.priority' => 'Приоритет',
@@ -11621,10 +11635,10 @@ extension on TranslationsRu {
 			'terminal.shortcuts.eof' => 'EOF',
 			'terminal.shortcuts.suspend' => 'Приостановить (SIGTSTP)',
 			'terminal.shortcuts.hide' => 'Скрыть панель горячих клавиш',
-			'terminal.shortcuts.showTooltip' => 'Показать горячие клавиши',
-			'terminal.shortcuts.hideTooltip' => 'Скрыть горячие клавиши',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.shortcuts.showTooltip' => 'Показать горячие клавиши',
+			'terminal.shortcuts.hideTooltip' => 'Скрыть горячие клавиши',
 			'terminal.paste.title' => 'Вставить в терминал',
 			'terminal.paste.hint' => 'Ctrl+V / правый клик → Вставить',
 			'terminal.errors.couldNotOpenLink' => ({required Object url}) => 'Не удалось открыть ссылку: ${url}',

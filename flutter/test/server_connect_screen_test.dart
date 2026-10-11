@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:ddagent_app/core/network/api_providers.dart';
 import 'package:ddagent_app/core/network/auth_token_store.dart';
+import 'package:ddagent_app/core/widgets/boot_screen.dart';
 import 'package:ddagent_app/features/auth/view/auth_screens.dart';
 import 'package:ddagent_app/features/server_connect/data/server_profiles.dart';
 import 'package:ddagent_app/features/server_connect/view/server_connect_screen.dart';
@@ -70,6 +71,8 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.byType(ServerConnectScreen), findsOneWidget);
+    // The guard answered — the boot screen must not cover the first route.
+    expect(find.byType(BootScreen), findsNothing);
     final connectRouter = GoRouter.of(tester.element(find.byType(ServerConnectScreen)));
     expect(connectRouter.state.uri.queryParameters['from'], '/projects');
 

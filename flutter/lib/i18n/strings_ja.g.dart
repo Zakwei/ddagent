@@ -39,6 +39,7 @@ class TranslationsJa extends Translations with BaseTranslations<AppLocale, Trans
 	TranslationsJa $copyWith({TranslationMetadata<AppLocale, Translations>? meta}) => TranslationsJa(meta: meta ?? this.$meta);
 
 	// Translations
+	@override late final Translations$boot$ja boot = Translations$boot$ja._(_root);
 	@override late final Translations$auth$ja auth = Translations$auth$ja._(_root);
 	@override late final Translations$chat$ja chat = Translations$chat$ja._(_root);
 	@override late final Translations$codeEditor$ja codeEditor = Translations$codeEditor$ja._(_root);
@@ -69,6 +70,17 @@ class TranslationsJa extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final Translations$browserUse$ja browserUse = Translations$browserUse$ja._(_root);
 	@override late final Translations$orchestrator$ja orchestrator = Translations$orchestrator$ja._(_root);
 	@override late final Translations$miniOrchestrator$ja miniOrchestrator = Translations$miniOrchestrator$ja._(_root);
+}
+
+// Path: boot
+class Translations$boot$ja extends Translations$boot$en {
+	Translations$boot$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get starting => 'DDAgent を起動しています…';
+	@override String connecting({required Object server}) => '${server} に接続しています…';
 }
 
 // Path: auth
@@ -8492,6 +8504,8 @@ class Translations$settings$permissions$permissionMode$modes$plan$ja extends Tra
 extension on TranslationsJa {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
+			'boot.starting' => 'DDAgent を起動しています…',
+			'boot.connecting' => ({required Object server}) => '${server} に接続しています…',
 			'auth.sessionExpired' => 'セッションの有効期限が切れました。再度ログインしてください。',
 			'auth.login.title' => 'おかえりなさい',
 			'auth.login.description' => 'DDAgentアカウントにサインイン',
@@ -9002,10 +9016,10 @@ extension on TranslationsJa {
 			'chat.modelLibrary.nameHint' => '例: GPT-5.5 Pro',
 			'chat.modelLibrary.idLabel' => 'モデル ID',
 			'chat.modelLibrary.idHint' => '例: gpt-5.5-pro',
-			'chat.modelLibrary.idHelp' => 'プロバイダー CLI が受け付ける識別子をそのまま使用してください。ID にスペースは使用できません。',
-			'chat.modelLibrary.updatedNotice' => ({required Object name}) => '${name} を更新しました。',
 			_ => null,
 		} ?? switch (path) {
+			'chat.modelLibrary.idHelp' => 'プロバイダー CLI が受け付ける識別子をそのまま使用してください。ID にスペースは使用できません。',
+			'chat.modelLibrary.updatedNotice' => ({required Object name}) => '${name} を更新しました。',
 			'chat.modelLibrary.addedNotice' => ({required Object name}) => '${name} を追加しました。',
 			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '${name} を削除しました。',
 			'chat.modelLibrary.saving' => '保存中…',
@@ -9516,10 +9530,10 @@ extension on TranslationsJa {
 			'common.projectWizard.step2.newPath' => 'ワークスペースのパス',
 			'common.projectWizard.step2.existingPlaceholder' => '/path/to/existing/workspace',
 			'common.projectWizard.step2.newPlaceholder' => '/path/to/new/workspace',
-			'common.projectWizard.step2.existingHelp' => '既存のワークスペースディレクトリのフルパス',
-			'common.projectWizard.step2.newHelp' => 'ワークスペースディレクトリのフルパス',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step2.existingHelp' => '既存のワークスペースディレクトリのフルパス',
+			'common.projectWizard.step2.newHelp' => 'ワークスペースディレクトリのフルパス',
 			'common.projectWizard.step2.githubUrl' => 'GitHub URL（任意）',
 			'common.projectWizard.step2.githubPlaceholder' => 'https://github.com/username/repository',
 			'common.projectWizard.step2.githubHelp' => '任意: リポジトリをクローンするためのGitHub URLを入力してください',
@@ -10030,10 +10044,10 @@ extension on TranslationsJa {
 			'settings.account.changePassword' => 'パスワードを変更',
 			'settings.mcp.title' => 'MCPサーバー',
 			'settings.mcp.addServer' => 'サーバーを追加',
-			'settings.mcp.editServer' => 'サーバーを編集',
-			'settings.mcp.deleteServer' => 'サーバーを削除',
 			_ => null,
 		} ?? switch (path) {
+			'settings.mcp.editServer' => 'サーバーを編集',
+			'settings.mcp.deleteServer' => 'サーバーを削除',
 			'settings.mcp.serverName' => 'サーバー名',
 			'settings.mcp.serverType' => 'サーバーの種類',
 			'settings.mcp.config' => '設定',
@@ -10544,10 +10558,10 @@ extension on TranslationsJa {
 			'settings.browser.runtimeRequired' => 'ブラウザランタイムが必要です',
 			'settings.browser.statusDisabled' => '無効',
 			'settings.browser.statusLabel' => 'ステータス',
-			'settings.browser.statusReady' => '準備完了',
-			'settings.browser.statusSetupRequired' => 'セットアップが必要',
 			_ => null,
 		} ?? switch (path) {
+			'settings.browser.statusReady' => '準備完了',
+			'settings.browser.statusSetupRequired' => 'セットアップが必要',
 			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => 'キャンセル',
 			'settings.workspaces.create' => 'ワークスペースを追加',
@@ -11058,10 +11072,10 @@ extension on TranslationsJa {
 			'tasks.taskDetail.dependencies' => '依存関係',
 			'tasks.taskDetail.dependenciesPlaceholder' => '例: 1, 2, 3',
 			'tasks.taskDetail.description' => '説明',
-			'tasks.taskDetail.edit' => 'タスクを編集',
-			'tasks.taskDetail.implDetails' => '実装の詳細',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.edit' => 'タスクを編集',
+			'tasks.taskDetail.implDetails' => '実装の詳細',
 			'tasks.taskDetail.noDependencies' => '依存関係なし',
 			'tasks.taskDetail.noDescription' => '説明がありません',
 			'tasks.taskDetail.priority' => '優先度',
@@ -11572,10 +11586,10 @@ extension on TranslationsJa {
 			'terminal.shortcuts.eof' => 'EOF',
 			'terminal.shortcuts.suspend' => '一時停止 (SIGTSTP)',
 			'terminal.shortcuts.hide' => 'ショートカットバーを非表示',
-			'terminal.shortcuts.showTooltip' => 'ショートカットを表示',
-			'terminal.shortcuts.hideTooltip' => 'ショートカットを非表示',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.shortcuts.showTooltip' => 'ショートカットを表示',
+			'terminal.shortcuts.hideTooltip' => 'ショートカットを非表示',
 			'terminal.paste.title' => 'ターミナルに貼り付け',
 			'terminal.paste.hint' => 'Ctrl+V / 右クリック → 貼り付け',
 			'terminal.errors.couldNotOpenLink' => ({required Object url}) => 'リンクを開けませんでした: ${url}',

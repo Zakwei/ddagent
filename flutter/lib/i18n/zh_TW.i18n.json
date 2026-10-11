@@ -1,4 +1,8 @@
 {
+  "boot": {
+    "starting": "正在啟動 DDAgent…",
+    "connecting": "正在連線 {{server}}…"
+  },
   "auth": {
     "sessionExpired": "工作階段已過期，請重新登入。",
     "login": {

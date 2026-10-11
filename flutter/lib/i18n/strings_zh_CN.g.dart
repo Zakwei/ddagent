@@ -39,6 +39,7 @@ class TranslationsZhCn extends Translations with BaseTranslations<AppLocale, Tra
 	TranslationsZhCn $copyWith({TranslationMetadata<AppLocale, Translations>? meta}) => TranslationsZhCn(meta: meta ?? this.$meta);
 
 	// Translations
+	@override late final Translations$boot$zh_CN boot = Translations$boot$zh_CN.internal(_root);
 	@override late final Translations$auth$zh_CN auth = Translations$auth$zh_CN.internal(_root);
 	@override late final Translations$chat$zh_CN chat = Translations$chat$zh_CN.internal(_root);
 	@override late final Translations$codeEditor$zh_CN codeEditor = Translations$codeEditor$zh_CN.internal(_root);
@@ -69,6 +70,17 @@ class TranslationsZhCn extends Translations with BaseTranslations<AppLocale, Tra
 	@override late final Translations$browserUse$zh_CN browserUse = Translations$browserUse$zh_CN.internal(_root);
 	@override late final Translations$orchestrator$zh_CN orchestrator = Translations$orchestrator$zh_CN.internal(_root);
 	@override late final Translations$miniOrchestrator$zh_CN miniOrchestrator = Translations$miniOrchestrator$zh_CN.internal(_root);
+}
+
+// Path: boot
+class Translations$boot$zh_CN extends Translations$boot$en {
+	Translations$boot$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get starting => '正在启动 DDAgent…';
+	@override String connecting({required Object server}) => '正在连接 ${server}…';
 }
 
 // Path: auth
@@ -8492,6 +8504,8 @@ class Translations$settings$permissions$permissionMode$modes$plan$zh_CN extends 
 extension on TranslationsZhCn {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
+			'boot.starting' => '正在启动 DDAgent…',
+			'boot.connecting' => ({required Object server}) => '正在连接 ${server}…',
 			'auth.sessionExpired' => '会话已过期，请重新登录。',
 			'auth.login.title' => '欢迎回来',
 			'auth.login.description' => '登录您的 DDAgent 账户',
@@ -9002,10 +9016,10 @@ extension on TranslationsZhCn {
 			'chat.modelLibrary.nameHint' => '例如 GPT-5.5 Pro',
 			'chat.modelLibrary.idLabel' => '模型 ID',
 			'chat.modelLibrary.idHint' => '例如 gpt-5.5-pro',
-			'chat.modelLibrary.idHelp' => '请使用提供方 CLI 接受的准确标识符。ID 不能包含空格。',
-			'chat.modelLibrary.updatedNotice' => ({required Object name}) => '已更新 ${name}。',
 			_ => null,
 		} ?? switch (path) {
+			'chat.modelLibrary.idHelp' => '请使用提供方 CLI 接受的准确标识符。ID 不能包含空格。',
+			'chat.modelLibrary.updatedNotice' => ({required Object name}) => '已更新 ${name}。',
 			'chat.modelLibrary.addedNotice' => ({required Object name}) => '已添加 ${name}。',
 			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '已删除 ${name}。',
 			'chat.modelLibrary.saving' => '正在保存…',
@@ -9516,10 +9530,10 @@ extension on TranslationsZhCn {
 			'common.projectWizard.step2.newPath' => '工作区路径',
 			'common.projectWizard.step2.existingPlaceholder' => '/path/to/existing/workspace',
 			'common.projectWizard.step2.newPlaceholder' => '/path/to/new/workspace',
-			'common.projectWizard.step2.existingHelp' => '您现有工作区目录的完整路径',
-			'common.projectWizard.step2.newHelp' => '工作区目录的完整路径',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step2.existingHelp' => '您现有工作区目录的完整路径',
+			'common.projectWizard.step2.newHelp' => '工作区目录的完整路径',
 			'common.projectWizard.step2.githubUrl' => 'GitHub URL（可选）',
 			'common.projectWizard.step2.githubPlaceholder' => 'https://github.com/username/repository',
 			'common.projectWizard.step2.githubHelp' => '可选：提供 GitHub URL 以克隆仓库',
@@ -10030,10 +10044,10 @@ extension on TranslationsZhCn {
 			'settings.account.changePassword' => '修改密码',
 			'settings.mcp.title' => 'MCP 服务器',
 			'settings.mcp.addServer' => '添加服务器',
-			'settings.mcp.editServer' => '编辑服务器',
-			'settings.mcp.deleteServer' => '删除服务器',
 			_ => null,
 		} ?? switch (path) {
+			'settings.mcp.editServer' => '编辑服务器',
+			'settings.mcp.deleteServer' => '删除服务器',
 			'settings.mcp.serverName' => '服务器名称',
 			'settings.mcp.serverType' => '服务器类型',
 			'settings.mcp.config' => '配置',
@@ -10544,10 +10558,10 @@ extension on TranslationsZhCn {
 			'settings.browser.runtimeRequired' => '需要浏览器运行时',
 			'settings.browser.statusDisabled' => '已禁用',
 			'settings.browser.statusLabel' => '状态',
-			'settings.browser.statusReady' => '就绪',
-			'settings.browser.statusSetupRequired' => '需要设置',
 			_ => null,
 		} ?? switch (path) {
+			'settings.browser.statusReady' => '就绪',
+			'settings.browser.statusSetupRequired' => '需要设置',
 			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => '取消',
 			'settings.workspaces.create' => '添加工作区',
@@ -11058,10 +11072,10 @@ extension on TranslationsZhCn {
 			'tasks.taskDetail.dependencies' => '依赖项',
 			'tasks.taskDetail.dependenciesPlaceholder' => '例如：1, 2, 3',
 			'tasks.taskDetail.description' => '描述',
-			'tasks.taskDetail.edit' => '编辑任务',
-			'tasks.taskDetail.implDetails' => '实现细节',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.edit' => '编辑任务',
+			'tasks.taskDetail.implDetails' => '实现细节',
 			'tasks.taskDetail.noDependencies' => '无依赖项',
 			'tasks.taskDetail.noDescription' => '无描述',
 			'tasks.taskDetail.priority' => '优先级',
@@ -11572,10 +11586,10 @@ extension on TranslationsZhCn {
 			'terminal.shortcuts.eof' => 'EOF',
 			'terminal.shortcuts.suspend' => '挂起 (SIGTSTP)',
 			'terminal.shortcuts.hide' => '隐藏快捷键栏',
-			'terminal.shortcuts.showTooltip' => '显示快捷键',
-			'terminal.shortcuts.hideTooltip' => '隐藏快捷键',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.shortcuts.showTooltip' => '显示快捷键',
+			'terminal.shortcuts.hideTooltip' => '隐藏快捷键',
 			'terminal.paste.title' => '粘贴到终端',
 			'terminal.paste.hint' => 'Ctrl+V / 右键 → 粘贴',
 			'terminal.errors.couldNotOpenLink' => ({required Object url}) => '无法打开链接：${url}',

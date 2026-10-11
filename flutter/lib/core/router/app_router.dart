@@ -105,13 +105,28 @@ class PlaceholderPage extends StatelessWidget {
   );
 }
 
+/// True until the router guard answers for the first time — the app shows the
+/// boot screen meanwhile instead of an empty (black) window.
+class BootingController extends Notifier<bool> {
+  @override
+  bool build() => true;
+
+  void done() => state = false;
+}
+
+final bootingProvider = NotifierProvider<BootingController, bool>(BootingController.new);
+
+Future<String?> _endsBoot(Ref ref, Future<String?> Function() guard) =>
+    guard().whenComplete(() => ref.read(bootingProvider.notifier).done());
+
 /// Auth guard: without a stored JWT any in-app path redirects to /connect
 /// with the intended location in `?from=` so login can restore it.
 final routerProvider = Provider<GoRouter>((ref) {
   final tokens = ref.watch(authTokenStoreProvider);
   return GoRouter(
     initialLocation: '/projects',
-    redirect: (context, state) async {
+    // Any first answer ends the boot screen (the guard may await the local server).
+    redirect: (context, state) => _endsBoot(ref, () async {
       var path = state.uri.path;
       // ddagent://chat/42 arrives as host=chat, path=/42 — fold host into
       // the path like the RN linking config's screen mapping.
@@ -158,7 +173,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         return '/projects';
       }
       return remapped;
-    },
+    }),
     routes: [
       GoRoute(path: '/login', name: Routes.login, builder: (_, _) => const LoginScreen()),
       GoRoute(path: '/setup', name: Routes.setup, builder: (_, _) => const SetupScreen()),

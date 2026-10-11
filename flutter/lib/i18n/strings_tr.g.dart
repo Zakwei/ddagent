@@ -39,6 +39,7 @@ class TranslationsTr extends Translations with BaseTranslations<AppLocale, Trans
 	TranslationsTr $copyWith({TranslationMetadata<AppLocale, Translations>? meta}) => TranslationsTr(meta: meta ?? this.$meta);
 
 	// Translations
+	@override late final Translations$boot$tr boot = Translations$boot$tr._(_root);
 	@override late final Translations$auth$tr auth = Translations$auth$tr._(_root);
 	@override late final Translations$chat$tr chat = Translations$chat$tr._(_root);
 	@override late final Translations$codeEditor$tr codeEditor = Translations$codeEditor$tr._(_root);
@@ -69,6 +70,17 @@ class TranslationsTr extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final Translations$browserUse$tr browserUse = Translations$browserUse$tr._(_root);
 	@override late final Translations$orchestrator$tr orchestrator = Translations$orchestrator$tr._(_root);
 	@override late final Translations$miniOrchestrator$tr miniOrchestrator = Translations$miniOrchestrator$tr._(_root);
+}
+
+// Path: boot
+class Translations$boot$tr extends Translations$boot$en {
+	Translations$boot$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get starting => 'DDAgent başlatılıyor…';
+	@override String connecting({required Object server}) => '${server} sunucusuna bağlanılıyor…';
 }
 
 // Path: auth
@@ -8498,6 +8510,8 @@ class Translations$settings$permissions$permissionMode$modes$plan$tr extends Tra
 extension on TranslationsTr {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
+			'boot.starting' => 'DDAgent başlatılıyor…',
+			'boot.connecting' => ({required Object server}) => '${server} sunucusuna bağlanılıyor…',
 			'auth.sessionExpired' => 'Oturumunuzun süresi doldu. Lütfen tekrar giriş yapın.',
 			'auth.login.title' => 'Tekrar Hoş Geldin',
 			'auth.login.description' => 'Kendi DDAgent hesabına giriş yap',
@@ -9008,10 +9022,10 @@ extension on TranslationsTr {
 			'chat.modelLibrary.nameHint' => 'ör. GPT-5.5 Pro',
 			'chat.modelLibrary.idLabel' => 'Model kimliği',
 			'chat.modelLibrary.idHint' => 'ör. gpt-5.5-pro',
-			'chat.modelLibrary.idHelp' => 'Sağlayıcı CLI aracının kabul ettiği tam tanımlayıcıyı kullanın. Kimlikler boşluk içeremez.',
-			'chat.modelLibrary.updatedNotice' => ({required Object name}) => '${name} güncellendi.',
 			_ => null,
 		} ?? switch (path) {
+			'chat.modelLibrary.idHelp' => 'Sağlayıcı CLI aracının kabul ettiği tam tanımlayıcıyı kullanın. Kimlikler boşluk içeremez.',
+			'chat.modelLibrary.updatedNotice' => ({required Object name}) => '${name} güncellendi.',
 			'chat.modelLibrary.addedNotice' => ({required Object name}) => '${name} eklendi.',
 			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '${name} silindi.',
 			'chat.modelLibrary.saving' => 'Kaydediliyor…',
@@ -9522,10 +9536,10 @@ extension on TranslationsTr {
 			'common.projectWizard.step2.newPath' => 'Çalışma Alanı Yolu',
 			'common.projectWizard.step2.existingPlaceholder' => '/mevcut/calisma-alani/yolu',
 			'common.projectWizard.step2.newPlaceholder' => '/yeni/calisma-alani/yolu',
-			'common.projectWizard.step2.existingHelp' => 'Mevcut çalışma alanı dizinine giden tam yol',
-			'common.projectWizard.step2.newHelp' => 'Çalışma alanı dizinine giden tam yol',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step2.existingHelp' => 'Mevcut çalışma alanı dizinine giden tam yol',
+			'common.projectWizard.step2.newHelp' => 'Çalışma alanı dizinine giden tam yol',
 			'common.projectWizard.step2.githubUrl' => 'GitHub URL\'si (İsteğe Bağlı)',
 			'common.projectWizard.step2.githubPlaceholder' => 'https://github.com/kullanici/depo',
 			'common.projectWizard.step2.githubHelp' => 'İsteğe bağlı: bir depoyu klonlamak için GitHub URL\'si gir',
@@ -10036,10 +10050,10 @@ extension on TranslationsTr {
 			'settings.account.changePassword' => 'Şifreyi Değiştir',
 			'settings.mcp.title' => 'MCP Sunucuları',
 			'settings.mcp.addServer' => 'Sunucu Ekle',
-			'settings.mcp.editServer' => 'Sunucuyu Düzenle',
-			'settings.mcp.deleteServer' => 'Sunucuyu Sil',
 			_ => null,
 		} ?? switch (path) {
+			'settings.mcp.editServer' => 'Sunucuyu Düzenle',
+			'settings.mcp.deleteServer' => 'Sunucuyu Sil',
 			'settings.mcp.serverName' => 'Sunucu Adı',
 			'settings.mcp.serverType' => 'Sunucu Türü',
 			'settings.mcp.config' => 'Yapılandırma',
@@ -10550,10 +10564,10 @@ extension on TranslationsTr {
 			'settings.browser.runtimeRequired' => 'Tarayıcı runtime’ı gerekli',
 			'settings.browser.statusDisabled' => 'devre dışı',
 			'settings.browser.statusLabel' => 'Durum',
-			'settings.browser.statusReady' => 'hazır',
-			'settings.browser.statusSetupRequired' => 'kurulum gerekli',
 			_ => null,
 		} ?? switch (path) {
+			'settings.browser.statusReady' => 'hazır',
+			'settings.browser.statusSetupRequired' => 'kurulum gerekli',
 			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => 'İptal',
 			'settings.workspaces.create' => 'Çalışma alanı ekle',
@@ -11064,10 +11078,10 @@ extension on TranslationsTr {
 			'tasks.taskDetail.dependencies' => 'Bağımlılıklar',
 			'tasks.taskDetail.dependenciesPlaceholder' => 'örn. 1, 2, 3',
 			'tasks.taskDetail.description' => 'Açıklama',
-			'tasks.taskDetail.edit' => 'Görevi düzenle',
-			'tasks.taskDetail.implDetails' => 'Uygulama Ayrıntıları',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.edit' => 'Görevi düzenle',
+			'tasks.taskDetail.implDetails' => 'Uygulama Ayrıntıları',
 			'tasks.taskDetail.noDependencies' => 'Bağımlılık yok',
 			'tasks.taskDetail.noDescription' => 'Açıklama yok',
 			'tasks.taskDetail.priority' => 'Öncelik',
@@ -11578,10 +11592,10 @@ extension on TranslationsTr {
 			'terminal.shortcuts.eof' => 'EOF',
 			'terminal.shortcuts.suspend' => 'Askıya al (SIGTSTP)',
 			'terminal.shortcuts.hide' => 'Kısayol çubuğunu gizle',
-			'terminal.shortcuts.showTooltip' => 'Kısayolları göster',
-			'terminal.shortcuts.hideTooltip' => 'Kısayolları gizle',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.shortcuts.showTooltip' => 'Kısayolları göster',
+			'terminal.shortcuts.hideTooltip' => 'Kısayolları gizle',
 			'terminal.paste.title' => 'Terminale yapıştır',
 			'terminal.paste.hint' => 'Ctrl+V / sağ tık → Yapıştır',
 			'terminal.errors.couldNotOpenLink' => ({required Object url}) => 'Bağlantı açılamadı: ${url}',

@@ -11,9 +11,11 @@ import 'package:ddagent_app/core/router/app_router.dart';
 import 'package:ddagent_app/core/theme/app_theme.dart';
 import 'package:ddagent_app/core/theme/theme_controller.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
+import 'package:ddagent_app/core/widgets/boot_screen.dart';
 import 'package:ddagent_app/core/widgets/text_selection_scroll_behavior.dart';
 import 'package:ddagent_app/features/notifications/data/desktop_notification_presenter.dart';
 import 'package:ddagent_app/features/notifications/state/device_notifications_controller.dart';
+import 'package:ddagent_app/features/server_connect/data/local_server_status.dart';
 import 'package:ddagent_app/features/server_connect/state/local_server_controller.dart';
 import 'package:ddagent_app/features/settings/state/locale_controller.dart';
 import 'package:ddagent_app/features/system/state/update_controller.dart';
@@ -28,6 +30,9 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 Future<void> main([List<String> args = const []]) async {
   WidgetsFlutterBinding.ensureInitialized();
   parseInstanceArgs(args);
+  // First frame right away — the window shows a progress bar, not black,
+  // while storage and the window manager initialize.
+  runApp(const BootSplashApp());
   // A failed init must not leave a dead white page — the UI still renders and
   // degraded features surface their own errors. (e.g. IndexedDB is
   // unavailable in some private-browsing modes.)
@@ -104,6 +109,28 @@ class _DdagentAppState extends ConsumerState<DdagentApp> {
   WorkspaceController? _workspace() =>
       ref.exists(workspaceProvider) ? ref.read(workspaceProvider.notifier) : null;
 
+  /// What the first route is waiting for: the local server's stage when the
+  /// active server is this device, otherwise the server being contacted.
+  Widget _bootScreen() {
+    final i18n = Translations.of(context);
+    if (ref.watch(activeServerIsLocalProvider)) {
+      final s = ref.watch(localServerProvider);
+      final local = i18n.serverConnect.local;
+      return switch (s.stage) {
+        LocalServerStage.downloading => BootScreen(
+          message: local.downloading(percent: (s.progress * 100).round()),
+          progress: s.progress,
+        ),
+        LocalServerStage.installing => BootScreen(message: local.installing),
+        _ => BootScreen(message: local.starting),
+      };
+    }
+    final url = ref.watch(serverBaseUrlProvider);
+    return BootScreen(
+      message: url.isEmpty ? i18n.boot.starting : i18n.boot.connecting(server: url),
+    );
+  }
+
   @override
   void dispose() {
     _lifecycle.dispose();
@@ -151,7 +178,12 @@ class _DdagentAppState extends ConsumerState<DdagentApp> {
           systemNavigationBarColor: Colors.transparent,
           systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
         ),
-        child: child ?? const SizedBox.shrink(),
+        child: Stack(
+          children: [
+            child ?? const SizedBox.shrink(),
+            if (ref.watch(bootingProvider)) _bootScreen(),
+          ],
+        ),
       ),
       locale: locale.flutterLocale,
       supportedLocales: AppLocaleUtils.supportedLocales,

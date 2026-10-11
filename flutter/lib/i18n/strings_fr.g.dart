@@ -39,6 +39,7 @@ class TranslationsFr extends Translations with BaseTranslations<AppLocale, Trans
 	TranslationsFr $copyWith({TranslationMetadata<AppLocale, Translations>? meta}) => TranslationsFr(meta: meta ?? this.$meta);
 
 	// Translations
+	@override late final Translations$boot$fr boot = Translations$boot$fr._(_root);
 	@override late final Translations$auth$fr auth = Translations$auth$fr._(_root);
 	@override late final Translations$chat$fr chat = Translations$chat$fr._(_root);
 	@override late final Translations$codeEditor$fr codeEditor = Translations$codeEditor$fr._(_root);
@@ -69,6 +70,17 @@ class TranslationsFr extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final Translations$browserUse$fr browserUse = Translations$browserUse$fr._(_root);
 	@override late final Translations$orchestrator$fr orchestrator = Translations$orchestrator$fr._(_root);
 	@override late final Translations$miniOrchestrator$fr miniOrchestrator = Translations$miniOrchestrator$fr._(_root);
+}
+
+// Path: boot
+class Translations$boot$fr extends Translations$boot$en {
+	Translations$boot$fr._(TranslationsFr root) : this._root = root, super.internal(root);
+
+	final TranslationsFr _root; // ignore: unused_field
+
+	// Translations
+	@override String get starting => 'Démarrage de DDAgent…';
+	@override String connecting({required Object server}) => 'Connexion à ${server}…';
 }
 
 // Path: auth
@@ -8503,6 +8515,8 @@ class Translations$settings$permissions$permissionMode$modes$plan$fr extends Tra
 extension on TranslationsFr {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
+			'boot.starting' => 'Démarrage de DDAgent…',
+			'boot.connecting' => ({required Object server}) => 'Connexion à ${server}…',
 			'auth.sessionExpired' => 'Votre session a expiré. Veuillez vous reconnecter.',
 			'auth.login.title' => 'Bon retour',
 			'auth.login.description' => 'Connectez-vous à votre compte DDAgent auto-hébergé',
@@ -9013,10 +9027,10 @@ extension on TranslationsFr {
 			'chat.modelLibrary.nameHint' => 'ex. : GPT-5.5 Pro',
 			'chat.modelLibrary.idLabel' => 'Identifiant du modèle',
 			'chat.modelLibrary.idHint' => 'ex. : gpt-5.5-pro',
-			'chat.modelLibrary.idHelp' => 'Utilisez l\'identifiant exact accepté par la CLI du fournisseur. Les identifiants ne peuvent pas contenir d\'espaces.',
-			'chat.modelLibrary.updatedNotice' => ({required Object name}) => '${name} a été mis à jour.',
 			_ => null,
 		} ?? switch (path) {
+			'chat.modelLibrary.idHelp' => 'Utilisez l\'identifiant exact accepté par la CLI du fournisseur. Les identifiants ne peuvent pas contenir d\'espaces.',
+			'chat.modelLibrary.updatedNotice' => ({required Object name}) => '${name} a été mis à jour.',
 			'chat.modelLibrary.addedNotice' => ({required Object name}) => '${name} a été ajouté.',
 			'chat.modelLibrary.deletedNotice' => ({required Object name}) => '${name} a été supprimé.',
 			'chat.modelLibrary.saving' => 'Enregistrement…',
@@ -9527,10 +9541,10 @@ extension on TranslationsFr {
 			'common.projectWizard.step2.newPath' => 'Chemin de l\'espace de travail',
 			'common.projectWizard.step2.existingPlaceholder' => '/chemin/vers/espace-de-travail',
 			'common.projectWizard.step2.newPlaceholder' => '/chemin/vers/nouvel-espace',
-			'common.projectWizard.step2.existingHelp' => 'Chemin complet vers votre répertoire d\'espace de travail existant',
-			'common.projectWizard.step2.newHelp' => 'Chemin complet vers votre répertoire d\'espace de travail',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step2.existingHelp' => 'Chemin complet vers votre répertoire d\'espace de travail existant',
+			'common.projectWizard.step2.newHelp' => 'Chemin complet vers votre répertoire d\'espace de travail',
 			'common.projectWizard.step2.githubUrl' => 'URL GitHub (optionnel)',
 			'common.projectWizard.step2.githubPlaceholder' => 'https://github.com/utilisateur/depot',
 			'common.projectWizard.step2.githubHelp' => 'Optionnel : fournissez une URL GitHub pour cloner un dépôt',
@@ -10041,10 +10055,10 @@ extension on TranslationsFr {
 			'settings.account.changePassword' => 'Changer le mot de passe',
 			'settings.mcp.title' => 'Serveurs MCP',
 			'settings.mcp.addServer' => 'Ajouter un serveur',
-			'settings.mcp.editServer' => 'Modifier le serveur',
-			'settings.mcp.deleteServer' => 'Supprimer le serveur',
 			_ => null,
 		} ?? switch (path) {
+			'settings.mcp.editServer' => 'Modifier le serveur',
+			'settings.mcp.deleteServer' => 'Supprimer le serveur',
 			'settings.mcp.serverName' => 'Nom du serveur',
 			'settings.mcp.serverType' => 'Type de serveur',
 			'settings.mcp.config' => 'Configuration',
@@ -10555,10 +10569,10 @@ extension on TranslationsFr {
 			'settings.browser.runtimeRequired' => 'Runtime du navigateur requis',
 			'settings.browser.statusDisabled' => 'désactivé',
 			'settings.browser.statusLabel' => 'Statut',
-			'settings.browser.statusReady' => 'prêt',
-			'settings.browser.statusSetupRequired' => 'configuration requise',
 			_ => null,
 		} ?? switch (path) {
+			'settings.browser.statusReady' => 'prêt',
+			'settings.browser.statusSetupRequired' => 'configuration requise',
 			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => 'Annuler',
 			'settings.workspaces.create' => 'Ajouter un espace de travail',
@@ -11069,10 +11083,10 @@ extension on TranslationsFr {
 			'tasks.taskDetail.dependencies' => 'Dépendances',
 			'tasks.taskDetail.dependenciesPlaceholder' => 'ex. 1, 2, 3',
 			'tasks.taskDetail.description' => 'Description',
-			'tasks.taskDetail.edit' => 'Modifier la tâche',
-			'tasks.taskDetail.implDetails' => 'Détails d’implémentation',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.edit' => 'Modifier la tâche',
+			'tasks.taskDetail.implDetails' => 'Détails d’implémentation',
 			'tasks.taskDetail.noDependencies' => 'Aucune dépendance',
 			'tasks.taskDetail.noDescription' => 'Aucune description fournie',
 			'tasks.taskDetail.priority' => 'Priorité',
@@ -11583,10 +11597,10 @@ extension on TranslationsFr {
 			'terminal.shortcuts.eof' => 'EOF',
 			'terminal.shortcuts.suspend' => 'Suspendre (SIGTSTP)',
 			'terminal.shortcuts.hide' => 'Masquer la barre de raccourcis',
-			'terminal.shortcuts.showTooltip' => 'Afficher les raccourcis',
-			'terminal.shortcuts.hideTooltip' => 'Masquer les raccourcis',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.shortcuts.showTooltip' => 'Afficher les raccourcis',
+			'terminal.shortcuts.hideTooltip' => 'Masquer les raccourcis',
 			'terminal.paste.title' => 'Coller dans le terminal',
 			'terminal.paste.hint' => 'Ctrl+V / clic droit → Coller',
 			'terminal.errors.couldNotOpenLink' => ({required Object url}) => 'Impossible d’ouvrir le lien : ${url}',

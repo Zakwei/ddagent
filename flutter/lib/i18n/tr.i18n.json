@@ -1,4 +1,8 @@
 {
+  "boot": {
+    "starting": "DDAgent başlatılıyor…",
+    "connecting": "{{server}} sunucusuna bağlanılıyor…"
+  },
   "auth": {
     "sessionExpired": "Oturumunuzun süresi doldu. Lütfen tekrar giriş yapın.",
     "login": {

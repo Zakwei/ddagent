@@ -1,4 +1,8 @@
 {
+  "boot": {
+    "starting": "Avvio di DDAgent…",
+    "connecting": "Connessione a {{server}}…"
+  },
   "auth": {
     "sessionExpired": "La sessione è scaduta. Accedi di nuovo.",
     "login": {
