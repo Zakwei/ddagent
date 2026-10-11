@@ -1717,6 +1717,10 @@ class Translations$chat$subheader$zh_TW extends Translations$chat$subheader$en {
 
 	// Translations
 	@override String contextTooltip({required Object used, required Object total, required Object percent}) => '上下文：${used} / ${total} 個 token · 已用 ${percent}%';
+	@override String get handoff => '交接';
+	@override String get handoffTooltip => '請代理產生摘要，以便在新對話中繼續';
+	@override String get handoffPrompt => '請為這次對話寫一份「交接（handoff）」，讓我能在新對話中繼續。\n包括：\n1. 目標 / 我們在做什麼（1-2 句）\n2. 關鍵發現與決定（若重要請附理由）\n3. 目前工作狀態：已完成什麼、正在進行什麼\n4. 重要細節：不能遺失的名稱、數字、程式碼/文字片段\n5. 我對回答風格與格式的偏好\n6. 未解決的問題與後續步驟\n寫得簡潔，但不要遺漏繼續工作所需的任何內容。';
+	@override String get handoffContinue => '我們從這裡繼續。';
 }
 
 // Path: chat.transcript
@@ -9130,6 +9134,10 @@ extension on TranslationsZhTw {
 			'chat.mentionMenu.kinds.task' => '任務',
 			'chat.mentionMenu.taskTitle' => ({required Object id}) => '任務 ${id}',
 			'chat.subheader.contextTooltip' => ({required Object used, required Object total, required Object percent}) => '上下文：${used} / ${total} 個 token · 已用 ${percent}%',
+			'chat.subheader.handoff' => '交接',
+			'chat.subheader.handoffTooltip' => '請代理產生摘要，以便在新對話中繼續',
+			'chat.subheader.handoffPrompt' => '請為這次對話寫一份「交接（handoff）」，讓我能在新對話中繼續。\n包括：\n1. 目標 / 我們在做什麼（1-2 句）\n2. 關鍵發現與決定（若重要請附理由）\n3. 目前工作狀態：已完成什麼、正在進行什麼\n4. 重要細節：不能遺失的名稱、數字、程式碼/文字片段\n5. 我對回答風格與格式的偏好\n6. 未解決的問題與後續步驟\n寫得簡潔，但不要遺漏繼續工作所需的任何內容。',
+			'chat.subheader.handoffContinue' => '我們從這裡繼續。',
 			'chat.transcript.requestFailed' => '請求失敗',
 			'chat.review.changedFiles' => '已變更的檔案',
 			'chat.review.changedFilesCount' => ({required Object count}) => '已變更的檔案（${count}）',
@@ -9508,12 +9516,12 @@ extension on TranslationsZhTw {
 			'common.projectWizard.step2.existingHelp' => '您現有工作區目錄的完整路徑',
 			'common.projectWizard.step2.newHelp' => '工作區目錄的完整路徑',
 			'common.projectWizard.step2.githubUrl' => 'GitHub URL（選填）',
+			_ => null,
+		} ?? switch (path) {
 			'common.projectWizard.step2.githubPlaceholder' => 'https://github.com/username/repository',
 			'common.projectWizard.step2.githubHelp' => '選填：提供 GitHub URL 以複製儲存庫',
 			'common.projectWizard.step2.githubAuth' => 'GitHub 身分驗證（選填）',
 			'common.projectWizard.step2.githubAuthHelp' => '僅私有儲存庫需要。公開儲存庫無需身分驗證即可複製。',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.step2.loadingTokens' => '正在載入已儲存的權杖...',
 			'common.projectWizard.step2.storedToken' => '已儲存的權杖',
 			'common.projectWizard.step2.newToken' => '新權杖',
@@ -10022,12 +10030,12 @@ extension on TranslationsZhTw {
 			'settings.mcp.editServer' => '編輯伺服器',
 			'settings.mcp.deleteServer' => '刪除伺服器',
 			'settings.mcp.serverName' => '伺服器名稱',
+			_ => null,
+		} ?? switch (path) {
 			'settings.mcp.serverType' => '伺服器類型',
 			'settings.mcp.config' => '設定',
 			'settings.mcp.testConnection' => '測試連線',
 			'settings.mcp.status' => '狀態',
-			_ => null,
-		} ?? switch (path) {
 			'settings.mcp.connected' => '已連線',
 			'settings.mcp.disconnected' => '未連線',
 			'settings.mcp.scope.label' => '範圍',
@@ -10536,12 +10544,12 @@ extension on TranslationsZhTw {
 			'settings.browser.statusReady' => '就緒',
 			'settings.browser.statusSetupRequired' => '需要設定',
 			'settings.browser.title' => '瀏覽器',
+			_ => null,
+		} ?? switch (path) {
 			'settings.workspaces.cancel' => '取消',
 			'settings.workspaces.create' => '新增工作區',
 			'settings.workspaces.deleteConfirm' => '從 DDAgent 移除此工作區？檔案將保留在磁碟上。',
 			'settings.workspaces.deleteFailed' => '移除工作區失敗。',
-			_ => null,
-		} ?? switch (path) {
 			'settings.workspaces.deleteTitle' => '移除工作區',
 			'settings.workspaces.description' => '工作區是 DDAgent 可以聊天、執行程式碼和瀏覽的目錄。',
 			'settings.workspaces.remove' => '移除工作區',
@@ -11050,12 +11058,12 @@ extension on TranslationsZhTw {
 			'tasks.taskDetail.edit' => '編輯任務',
 			'tasks.taskDetail.implDetails' => '實作細節',
 			'tasks.taskDetail.noDependencies' => '無依賴項',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.noDescription' => '無描述',
 			'tasks.taskDetail.priority' => '優先級',
 			'tasks.taskDetail.priorityNotSet' => '未設定',
 			'tasks.taskDetail.save' => '儲存',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.status' => '狀態',
 			'tasks.taskDetail.statusFailed' => '更新任務狀態失敗',
 			'tasks.taskDetail.taskId' => ({required Object id}) => '任務 ${id}',
@@ -11564,12 +11572,12 @@ extension on TranslationsZhTw {
 			'terminal.shortcuts.hideTooltip' => '隱藏快速鍵',
 			'terminal.paste.title' => '貼上至終端機',
 			'terminal.paste.hint' => 'Ctrl+V / 按右鍵 → 貼上',
+			_ => null,
+		} ?? switch (path) {
 			'terminal.errors.couldNotOpenLink' => ({required Object url}) => '無法開啟連結：${url}',
 			'terminal.errors.frameError' => ({required Object message}) => '[錯誤] ${message}',
 			'terminal.errors.connectionError' => ({required Object message}) => '[連線錯誤] ${message}',
 			'terminal.loginDialog.title' => ({required Object provider}) => '${provider} CLI 登入',
-			_ => null,
-		} ?? switch (path) {
 			'terminal.loginDialog.exited' => ({required Object code}) => '已結束（${code}）',
 			'terminal.loginDialog.authLinkDetected' => '偵測到驗證連結',
 			'terminal.empty.title' => '沒有作用中的終端機',

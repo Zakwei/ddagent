@@ -1717,6 +1717,10 @@ class Translations$chat$subheader$zh_CN extends Translations$chat$subheader$en {
 
 	// Translations
 	@override String contextTooltip({required Object used, required Object total, required Object percent}) => '上下文：${used} / ${total} 个 token · 已用 ${percent}%';
+	@override String get handoff => '交接';
+	@override String get handoffTooltip => '让智能体生成摘要，以便在新对话中继续';
+	@override String get handoffPrompt => '请为这次对话写一份“交接（handoff）”，以便我在新对话中继续。\n包括：\n1. 目标 / 我们在做什么（1-2 句）\n2. 关键发现和决定（如重要请附理由）\n3. 当前工作状态：已完成什么、正在进行什么\n4. 重要细节：不能丢失的名称、数字、代码/文本片段\n5. 我对回答风格和格式的偏好\n6. 未解决的问题和后续步骤\n写得简洁，但不要遗漏继续工作所需的任何内容。';
+	@override String get handoffContinue => '我们从这里继续。';
 }
 
 // Path: chat.transcript
@@ -9130,6 +9134,10 @@ extension on TranslationsZhCn {
 			'chat.mentionMenu.kinds.task' => '任务',
 			'chat.mentionMenu.taskTitle' => ({required Object id}) => '任务 ${id}',
 			'chat.subheader.contextTooltip' => ({required Object used, required Object total, required Object percent}) => '上下文：${used} / ${total} 个 token · 已用 ${percent}%',
+			'chat.subheader.handoff' => '交接',
+			'chat.subheader.handoffTooltip' => '让智能体生成摘要，以便在新对话中继续',
+			'chat.subheader.handoffPrompt' => '请为这次对话写一份“交接（handoff）”，以便我在新对话中继续。\n包括：\n1. 目标 / 我们在做什么（1-2 句）\n2. 关键发现和决定（如重要请附理由）\n3. 当前工作状态：已完成什么、正在进行什么\n4. 重要细节：不能丢失的名称、数字、代码/文本片段\n5. 我对回答风格和格式的偏好\n6. 未解决的问题和后续步骤\n写得简洁，但不要遗漏继续工作所需的任何内容。',
+			'chat.subheader.handoffContinue' => '我们从这里继续。',
 			'chat.transcript.requestFailed' => '请求失败',
 			'chat.review.changedFiles' => '已更改的文件',
 			'chat.review.changedFilesCount' => ({required Object count}) => '已更改的文件（${count}）',
@@ -9508,12 +9516,12 @@ extension on TranslationsZhCn {
 			'common.projectWizard.step2.existingHelp' => '您现有工作区目录的完整路径',
 			'common.projectWizard.step2.newHelp' => '工作区目录的完整路径',
 			'common.projectWizard.step2.githubUrl' => 'GitHub URL（可选）',
+			_ => null,
+		} ?? switch (path) {
 			'common.projectWizard.step2.githubPlaceholder' => 'https://github.com/username/repository',
 			'common.projectWizard.step2.githubHelp' => '可选：提供 GitHub URL 以克隆仓库',
 			'common.projectWizard.step2.githubAuth' => 'GitHub 身份验证（可选）',
 			'common.projectWizard.step2.githubAuthHelp' => '仅私有仓库需要。公共仓库无需身份验证即可克隆。',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.step2.loadingTokens' => '正在加载已保存的令牌...',
 			'common.projectWizard.step2.storedToken' => '已保存的令牌',
 			'common.projectWizard.step2.newToken' => '新令牌',
@@ -10022,12 +10030,12 @@ extension on TranslationsZhCn {
 			'settings.mcp.editServer' => '编辑服务器',
 			'settings.mcp.deleteServer' => '删除服务器',
 			'settings.mcp.serverName' => '服务器名称',
+			_ => null,
+		} ?? switch (path) {
 			'settings.mcp.serverType' => '服务器类型',
 			'settings.mcp.config' => '配置',
 			'settings.mcp.testConnection' => '测试连接',
 			'settings.mcp.status' => '状态',
-			_ => null,
-		} ?? switch (path) {
 			'settings.mcp.connected' => '已连接',
 			'settings.mcp.disconnected' => '未连接',
 			'settings.mcp.scope.label' => '范围',
@@ -10536,12 +10544,12 @@ extension on TranslationsZhCn {
 			'settings.browser.statusReady' => '就绪',
 			'settings.browser.statusSetupRequired' => '需要设置',
 			'settings.browser.title' => 'Browser',
+			_ => null,
+		} ?? switch (path) {
 			'settings.workspaces.cancel' => '取消',
 			'settings.workspaces.create' => '添加工作区',
 			'settings.workspaces.deleteConfirm' => '从 DDAgent 移除此工作区？文件将保留在磁盘上。',
 			'settings.workspaces.deleteFailed' => '移除工作区失败。',
-			_ => null,
-		} ?? switch (path) {
 			'settings.workspaces.deleteTitle' => '移除工作区',
 			'settings.workspaces.description' => '工作区是 DDAgent 可以聊天、运行代码和浏览的目录。',
 			'settings.workspaces.remove' => '移除工作区',
@@ -11050,12 +11058,12 @@ extension on TranslationsZhCn {
 			'tasks.taskDetail.edit' => '编辑任务',
 			'tasks.taskDetail.implDetails' => '实现细节',
 			'tasks.taskDetail.noDependencies' => '无依赖项',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.noDescription' => '无描述',
 			'tasks.taskDetail.priority' => '优先级',
 			'tasks.taskDetail.priorityNotSet' => '未设置',
 			'tasks.taskDetail.save' => '保存',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.status' => '状态',
 			'tasks.taskDetail.statusFailed' => '更新任务状态失败',
 			'tasks.taskDetail.taskId' => ({required Object id}) => '任务 ${id}',
@@ -11564,12 +11572,12 @@ extension on TranslationsZhCn {
 			'terminal.shortcuts.hideTooltip' => '隐藏快捷键',
 			'terminal.paste.title' => '粘贴到终端',
 			'terminal.paste.hint' => 'Ctrl+V / 右键 → 粘贴',
+			_ => null,
+		} ?? switch (path) {
 			'terminal.errors.couldNotOpenLink' => ({required Object url}) => '无法打开链接：${url}',
 			'terminal.errors.frameError' => ({required Object message}) => '[错误] ${message}',
 			'terminal.errors.connectionError' => ({required Object message}) => '[连接错误] ${message}',
 			'terminal.loginDialog.title' => ({required Object provider}) => '${provider} CLI 登录',
-			_ => null,
-		} ?? switch (path) {
 			'terminal.loginDialog.exited' => ({required Object code}) => '已退出（${code}）',
 			'terminal.loginDialog.authLinkDetected' => '检测到认证链接',
 			'terminal.empty.title' => '没有活动终端',

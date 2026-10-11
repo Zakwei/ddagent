@@ -883,7 +883,11 @@
       "taskTitle": "Tarea {{id}}"
     },
     "subheader": {
-      "contextTooltip": "Contexto: {{used}} / {{total}} tokens · {{percent}} % usado"
+      "contextTooltip": "Contexto: {{used}} / {{total}} tokens · {{percent}} % usado",
+      "handoff": "Traspaso",
+      "handoffTooltip": "Pide al agente un resumen para continuar en un chat nuevo",
+      "handoffPrompt": "Haz un \"handoff\" (traspaso) de esta conversación para que pueda continuar en un chat nuevo.\nIncluye:\n1. Objetivo / en qué estamos trabajando (1-2 frases)\n2. Hallazgos y decisiones clave (con justificación, si es importante)\n3. Estado actual del trabajo: qué está hecho y qué está en curso\n4. Detalles importantes: nombres, números, fragmentos de código/texto que no deben perderse\n5. Mis preferencias de estilo y formato de las respuestas\n6. Preguntas abiertas y próximos pasos\nSé conciso, pero no omitas nada necesario para continuar.",
+      "handoffContinue": "Continuamos desde aquí."
     },
     "transcript": {
       "requestFailed": "La solicitud falló"

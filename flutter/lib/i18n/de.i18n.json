@@ -883,7 +883,11 @@
       "taskTitle": "Aufgabe {{id}}"
     },
     "subheader": {
-      "contextTooltip": "Kontext: {{used}} / {{total}} Tokens · {{percent}} % belegt"
+      "contextTooltip": "Kontext: {{used}} / {{total}} Tokens · {{percent}} % belegt",
+      "handoff": "Übergabe",
+      "handoffTooltip": "Den Agenten um eine Zusammenfassung für einen neuen Chat bitten",
+      "handoffPrompt": "Erstelle eine \"Übergabe\" (Handoff) dieses Gesprächs, damit ich in einem neuen Chat weitermachen kann.\nBerücksichtige:\n1. Ziel / woran wir arbeiten (1-2 Sätze)\n2. Wichtige Erkenntnisse und Entscheidungen (mit Begründung, falls wichtig)\n3. Aktueller Arbeitsstand: was erledigt ist, was in Arbeit ist\n4. Wichtige Details: Namen, Zahlen, Code-/Textfragmente, die nicht verloren gehen dürfen\n5. Meine Vorlieben zu Stil und Format der Antworten\n6. Offene Fragen und nächste Schritte\nSchreibe knapp, aber lass nichts weg, was zum Weitermachen nötig ist.",
+      "handoffContinue": "Wir machen an dieser Stelle weiter."
     },
     "transcript": {
       "requestFailed": "Anfrage fehlgeschlagen"

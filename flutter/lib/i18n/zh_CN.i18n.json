@@ -875,7 +875,11 @@
       "taskTitle": "任务 {{id}}"
     },
     "subheader": {
-      "contextTooltip": "上下文：{{used}} / {{total}} 个 token · 已用 {{percent}}%"
+      "contextTooltip": "上下文：{{used}} / {{total}} 个 token · 已用 {{percent}}%",
+      "handoff": "交接",
+      "handoffTooltip": "让智能体生成摘要，以便在新对话中继续",
+      "handoffPrompt": "请为这次对话写一份“交接（handoff）”，以便我在新对话中继续。\n包括：\n1. 目标 / 我们在做什么（1-2 句）\n2. 关键发现和决定（如重要请附理由）\n3. 当前工作状态：已完成什么、正在进行什么\n4. 重要细节：不能丢失的名称、数字、代码/文本片段\n5. 我对回答风格和格式的偏好\n6. 未解决的问题和后续步骤\n写得简洁，但不要遗漏继续工作所需的任何内容。",
+      "handoffContinue": "我们从这里继续。"
     },
     "transcript": {
       "requestFailed": "请求失败"

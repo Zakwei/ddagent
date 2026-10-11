@@ -1743,6 +1743,10 @@ class Translations$chat$subheader$ru extends Translations$chat$subheader$en {
 
 	// Translations
 	@override String contextTooltip({required Object used, required Object total, required Object percent}) => 'Контекст: ${used} / ${total} токенов · использовано ${percent}%';
+	@override String get handoff => 'Передача';
+	@override String get handoffTooltip => 'Попросить агента о сводке, чтобы продолжить в новом чате';
+	@override String get handoffPrompt => 'Сделай «handoff» (передачу) этого разговора, чтобы я мог продолжить в новом чате.\nУчти:\n1. Цель / над чем мы работаем (1-2 предложения)\n2. Ключевые выводы и решения (с обоснованием, если важно)\n3. Текущее состояние работы: что сделано, что в процессе\n4. Важные детали: имена, числа, фрагменты кода/текста, которые нельзя потерять\n5. Мои предпочтения по стилю и формату ответов\n6. Открытые вопросы и следующие шаги\nПиши кратко, но не упускай ничего, что нужно для продолжения.';
+	@override String get handoffContinue => 'Продолжаем с этого места.';
 }
 
 // Path: chat.transcript
@@ -9179,6 +9183,10 @@ extension on TranslationsRu {
 			'chat.mentionMenu.kinds.task' => 'задача',
 			'chat.mentionMenu.taskTitle' => ({required Object id}) => 'Задача ${id}',
 			'chat.subheader.contextTooltip' => ({required Object used, required Object total, required Object percent}) => 'Контекст: ${used} / ${total} токенов · использовано ${percent}%',
+			'chat.subheader.handoff' => 'Передача',
+			'chat.subheader.handoffTooltip' => 'Попросить агента о сводке, чтобы продолжить в новом чате',
+			'chat.subheader.handoffPrompt' => 'Сделай «handoff» (передачу) этого разговора, чтобы я мог продолжить в новом чате.\nУчти:\n1. Цель / над чем мы работаем (1-2 предложения)\n2. Ключевые выводы и решения (с обоснованием, если важно)\n3. Текущее состояние работы: что сделано, что в процессе\n4. Важные детали: имена, числа, фрагменты кода/текста, которые нельзя потерять\n5. Мои предпочтения по стилю и формату ответов\n6. Открытые вопросы и следующие шаги\nПиши кратко, но не упускай ничего, что нужно для продолжения.',
+			'chat.subheader.handoffContinue' => 'Продолжаем с этого места.',
 			'chat.transcript.requestFailed' => 'Запрос не выполнен',
 			'chat.review.changedFiles' => 'Изменённые файлы',
 			'chat.review.changedFilesCount' => ({required Object count}) => 'Изменённые файлы (${count})',
@@ -9557,12 +9565,12 @@ extension on TranslationsRu {
 			'common.projectWizard.step2.existingHelp' => 'Полный путь к каталогу вашего рабочего пространства',
 			'common.projectWizard.step2.newHelp' => 'Полный путь к каталогу вашего рабочего пространства',
 			'common.projectWizard.step2.githubUrl' => 'URL GitHub (необязательно)',
+			_ => null,
+		} ?? switch (path) {
 			'common.projectWizard.step2.githubPlaceholder' => 'https://github.com/username/repository',
 			'common.projectWizard.step2.githubHelp' => 'Необязательно: укажите URL GitHub для клонирования репозитория',
 			'common.projectWizard.step2.githubAuth' => 'Аутентификация GitHub (необязательно)',
 			'common.projectWizard.step2.githubAuthHelp' => 'Требуется только для приватных репозиториев. Публичные репозитории можно клонировать без аутентификации.',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.step2.loadingTokens' => 'Загрузка сохраненных токенов...',
 			'common.projectWizard.step2.storedToken' => 'Сохраненный токен',
 			'common.projectWizard.step2.newToken' => 'Новый токен',
@@ -10071,12 +10079,12 @@ extension on TranslationsRu {
 			'settings.mcp.editServer' => 'Редактировать сервер',
 			'settings.mcp.deleteServer' => 'Удалить сервер',
 			'settings.mcp.serverName' => 'Имя сервера',
+			_ => null,
+		} ?? switch (path) {
 			'settings.mcp.serverType' => 'Тип сервера',
 			'settings.mcp.config' => 'Конфигурация',
 			'settings.mcp.testConnection' => 'Проверить подключение',
 			'settings.mcp.status' => 'Статус',
-			_ => null,
-		} ?? switch (path) {
 			'settings.mcp.connected' => 'Подключен',
 			'settings.mcp.disconnected' => 'Отключен',
 			'settings.mcp.scope.label' => 'Область',
@@ -10585,12 +10593,12 @@ extension on TranslationsRu {
 			'settings.browser.statusReady' => 'готов',
 			'settings.browser.statusSetupRequired' => 'требуется настройка',
 			'settings.browser.title' => 'Browser',
+			_ => null,
+		} ?? switch (path) {
 			'settings.workspaces.cancel' => 'Отмена',
 			'settings.workspaces.create' => 'Добавить рабочую область',
 			'settings.workspaces.deleteConfirm' => 'Удалить эту рабочую область из DDAgent? Её файлы останутся на диске.',
 			'settings.workspaces.deleteFailed' => 'Не удалось удалить рабочую область.',
-			_ => null,
-		} ?? switch (path) {
 			'settings.workspaces.deleteTitle' => 'Удалить рабочую область',
 			'settings.workspaces.description' => 'Рабочие области — каталоги, в которых DDAgent может вести чаты, запускать код и просматривать файлы.',
 			'settings.workspaces.remove' => 'Удалить рабочую область',
@@ -11099,12 +11107,12 @@ extension on TranslationsRu {
 			'tasks.taskDetail.edit' => 'Редактировать задачу',
 			'tasks.taskDetail.implDetails' => 'Детали реализации',
 			'tasks.taskDetail.noDependencies' => 'Нет зависимостей',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.noDescription' => 'Описание отсутствует',
 			'tasks.taskDetail.priority' => 'Приоритет',
 			'tasks.taskDetail.priorityNotSet' => 'Не задан',
 			'tasks.taskDetail.save' => 'Сохранить',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.status' => 'Статус',
 			'tasks.taskDetail.statusFailed' => 'Не удалось обновить статус задачи',
 			'tasks.taskDetail.taskId' => ({required Object id}) => 'Задача ${id}',
@@ -11613,12 +11621,12 @@ extension on TranslationsRu {
 			'terminal.shortcuts.hideTooltip' => 'Скрыть горячие клавиши',
 			'terminal.paste.title' => 'Вставить в терминал',
 			'terminal.paste.hint' => 'Ctrl+V / правый клик → Вставить',
+			_ => null,
+		} ?? switch (path) {
 			'terminal.errors.couldNotOpenLink' => ({required Object url}) => 'Не удалось открыть ссылку: ${url}',
 			'terminal.errors.frameError' => ({required Object message}) => '[Ошибка] ${message}',
 			'terminal.errors.connectionError' => ({required Object message}) => '[Ошибка подключения] ${message}',
 			'terminal.loginDialog.title' => ({required Object provider}) => 'Вход в ${provider} CLI',
-			_ => null,
-		} ?? switch (path) {
 			'terminal.loginDialog.exited' => ({required Object code}) => 'Завершено (${code})',
 			'terminal.loginDialog.authLinkDetected' => 'Обнаружена ссылка для аутентификации',
 			'terminal.empty.title' => 'Нет активного терминала',

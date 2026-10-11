@@ -65,6 +65,7 @@ class TranscriptView extends ConsumerStatefulWidget {
     this.standalone = false,
     this.onOpenFile,
     this.onSessionMissing,
+    this.onSessionReplaced,
     super.key,
   });
 
@@ -86,6 +87,10 @@ class TranscriptView extends ConsumerStatefulWidget {
   /// restored from another server. The workspace wires this to reopen the
   /// pane's session picker; without it the pane only explains the state.
   final VoidCallback? onSessionMissing;
+
+  /// Handoff opened a fresh session — the workspace rebinds the pane to it;
+  /// standalone routes navigate to `/chat/<id>`.
+  final void Function(String sessionId)? onSessionReplaced;
 
   /// `[data-split-rows="2"]` parity — the subheader collapses to a slim
   /// strip (no path/separators) when the split grid stacks two rows.
@@ -806,6 +811,19 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                   projectPath: projectPath,
                   dense: widget.dense,
                   showMenuButton: widget.standalone,
+                  onSessionReplaced:
+                      widget.onSessionReplaced ??
+                      (widget.standalone
+                          ? (id) => context.go(
+                              Uri(
+                                path: '/chat/$id',
+                                queryParameters: {
+                                  'projectId': ?projectId,
+                                  'projectPath': ?projectPath,
+                                },
+                              ).toString(),
+                            )
+                          : null),
                 ),
                 if (hasMore)
                   Padding(

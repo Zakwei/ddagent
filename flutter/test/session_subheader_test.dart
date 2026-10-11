@@ -5,6 +5,7 @@ import 'package:ddagent_app/features/provider_accounts/data/provider_accounts_re
 import 'package:ddagent_app/features/queue/data/queue_repository.dart';
 import 'package:ddagent_app/features/quota/data/quota_models.dart';
 import 'package:ddagent_app/features/quota/data/quota_repository.dart';
+import 'package:ddagent_app/features/sessions/data/session_message.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
@@ -14,13 +15,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class _FakeSessions extends SessionsRepository {
-  _FakeSessions({this.modelLabel = 'Devin Default'}) : super(Dio());
+  _FakeSessions({this.modelLabel = 'Devin Default', this.used = 50000}) : super(Dio());
 
   final String modelLabel;
+  final int used;
 
   @override
   Future<Map<String, dynamic>> tokenUsage(String sessionId) async => {
-    'used': 50000,
+    'used': used,
     'inputTokens': 40000,
     'outputTokens': 10000,
     'total': 120000,
@@ -409,5 +411,52 @@ void main() {
     // badge still sits at its right edge.
     await pumpCase(width: 1400, quota: wideQuota, path: longPath);
     expect(stripContainerRect().width, lessThanOrEqualTo(900));
+  });
+
+  test('handoffSummary collects the reply after the newest handoff prompt', () {
+    SessionMessage msg(String id, String role, String text) => SessionMessage(
+      id: id,
+      sessionId: 's1',
+      timestamp: '',
+      provider: 'claude',
+      kind: 'text',
+      role: role,
+      content: text,
+    );
+    const prompt = 'Write a handoff';
+    expect(
+      handoffSummary([msg('1', 'user', 'hi'), msg('2', 'assistant', 'hello')], prompt),
+      isNull,
+    );
+    // Queued prompt not answered yet → keep waiting.
+    expect(handoffSummary([msg('1', 'user', prompt)], prompt), isNull);
+    expect(
+      handoffSummary([
+        msg('1', 'assistant', 'old'),
+        msg('2', 'user', prompt),
+        msg('3', 'assistant', 'Goal: X'),
+        msg('4', 'assistant', 'Next: Y'),
+      ], prompt),
+      'Goal: X\n\nNext: Y',
+    );
+  });
+
+  testWidgets('handoff button shows only from 40% context', (tester) async {
+    final subheader = SessionSubheader(
+      sessionId: 's1',
+      provider: 'devin',
+      onSessionReplaced: (_) {},
+    );
+    await tester.pumpWidget(_app(subheader));
+    await tester.pumpAndSettle();
+    expect(find.text('Handoff'), findsOneWidget);
+
+    // Fresh ProviderScope — the first one keeps the cached 42% usage.
+    await tester.pumpWidget(const SizedBox());
+    await tester.pumpWidget(_app(subheader, sessions: _FakeSessions(used: 30000)));
+    await tester.pumpAndSettle();
+    // 30000/120000 → 25%.
+    expect(find.text('25%'), findsOneWidget);
+    expect(find.text('Handoff'), findsNothing);
   });
 }

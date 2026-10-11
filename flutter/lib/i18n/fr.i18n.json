@@ -883,7 +883,11 @@
       "taskTitle": "Tâche {{id}}"
     },
     "subheader": {
-      "contextTooltip": "Contexte : {{used}} / {{total}} jetons · {{percent}} % utilisés"
+      "contextTooltip": "Contexte : {{used}} / {{total}} jetons · {{percent}} % utilisés",
+      "handoff": "Passation",
+      "handoffTooltip": "Demander à l'agent un résumé pour continuer dans un nouveau chat",
+      "handoffPrompt": "Fais un \"handoff\" (passation) de cette conversation pour que je puisse continuer dans un nouveau chat.\nInclus :\n1. Objectif / sur quoi nous travaillons (1-2 phrases)\n2. Constats et décisions clés (avec justification si important)\n3. État actuel du travail : ce qui est fait, ce qui est en cours\n4. Détails importants : noms, chiffres, extraits de code/texte à ne pas perdre\n5. Mes préférences de style et de format des réponses\n6. Questions ouvertes et prochaines étapes\nSois concis, mais n'omets rien de nécessaire pour continuer.",
+      "handoffContinue": "On continue à partir d'ici."
     },
     "transcript": {
       "requestFailed": "La requête a échoué"

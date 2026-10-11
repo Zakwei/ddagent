@@ -551,6 +551,22 @@ class ComposerController extends Notifier<ComposerState> {
     }
   }
 
+  /// Sends [text] as its own turn, leaving the draft and attachments alone
+  /// (subheader handoff). Queued like [send] while a run is active.
+  /// [toSessionId] targets another session (the handoff's fresh chat) with
+  /// this composer's model/effort/permission picks.
+  Future<void> sendText(String text, {bool running = false, String? toSessionId}) async {
+    final sid = toSessionId ?? _sessionId;
+    if (sid == null) return;
+    final options = _sendOptions()..remove('attachments');
+    if (running && toSessionId == null) {
+      await ref.read(queueRepositoryProvider).enqueue(sid, content: text, options: options);
+      await refreshQueue();
+    } else {
+      ref.read(transcriptProvider(sid).notifier).send(text, options: options);
+    }
+  }
+
   void abort() {
     final sid = _sessionId;
     if (sid != null) ref.read(chatChannelProvider).abort(sid);

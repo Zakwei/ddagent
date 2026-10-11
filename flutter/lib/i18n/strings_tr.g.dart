@@ -1720,6 +1720,10 @@ class Translations$chat$subheader$tr extends Translations$chat$subheader$en {
 
 	// Translations
 	@override String contextTooltip({required Object used, required Object total, required Object percent}) => 'Bağlam: ${used} / ${total} token · %${percent} kullanıldı';
+	@override String get handoff => 'Devir';
+	@override String get handoffTooltip => 'Yeni bir sohbette devam etmek için ajandan özet iste';
+	@override String get handoffPrompt => 'Yeni bir sohbette devam edebilmem için bu konuşmanın bir "handoff"unu (devir özetini) hazırla.\nŞunları dahil et:\n1. Amaç / ne üzerinde çalışıyoruz (1-2 cümle)\n2. Temel bulgular ve kararlar (önemliyse gerekçesiyle)\n3. Çalışmanın mevcut durumu: ne bitti, ne devam ediyor\n4. Önemli ayrıntılar: kaybedilmemesi gereken adlar, sayılar, kod/metin parçaları\n5. Yanıt stili ve biçimiyle ilgili tercihlerim\n6. Açık sorular ve sonraki adımlar\nKısa yaz, ama devam etmek için gereken hiçbir şeyi atlama.';
+	@override String get handoffContinue => 'Buradan devam ediyoruz.';
 }
 
 // Path: chat.transcript
@@ -9136,6 +9140,10 @@ extension on TranslationsTr {
 			'chat.mentionMenu.kinds.task' => 'görev',
 			'chat.mentionMenu.taskTitle' => ({required Object id}) => 'Görev ${id}',
 			'chat.subheader.contextTooltip' => ({required Object used, required Object total, required Object percent}) => 'Bağlam: ${used} / ${total} token · %${percent} kullanıldı',
+			'chat.subheader.handoff' => 'Devir',
+			'chat.subheader.handoffTooltip' => 'Yeni bir sohbette devam etmek için ajandan özet iste',
+			'chat.subheader.handoffPrompt' => 'Yeni bir sohbette devam edebilmem için bu konuşmanın bir "handoff"unu (devir özetini) hazırla.\nŞunları dahil et:\n1. Amaç / ne üzerinde çalışıyoruz (1-2 cümle)\n2. Temel bulgular ve kararlar (önemliyse gerekçesiyle)\n3. Çalışmanın mevcut durumu: ne bitti, ne devam ediyor\n4. Önemli ayrıntılar: kaybedilmemesi gereken adlar, sayılar, kod/metin parçaları\n5. Yanıt stili ve biçimiyle ilgili tercihlerim\n6. Açık sorular ve sonraki adımlar\nKısa yaz, ama devam etmek için gereken hiçbir şeyi atlama.',
+			'chat.subheader.handoffContinue' => 'Buradan devam ediyoruz.',
 			'chat.transcript.requestFailed' => 'İstek başarısız oldu',
 			'chat.review.changedFiles' => 'Değişen dosyalar',
 			'chat.review.changedFilesCount' => ({required Object count}) => 'Değişen dosyalar (${count})',
@@ -9514,12 +9522,12 @@ extension on TranslationsTr {
 			'common.projectWizard.step2.existingHelp' => 'Mevcut çalışma alanı dizinine giden tam yol',
 			'common.projectWizard.step2.newHelp' => 'Çalışma alanı dizinine giden tam yol',
 			'common.projectWizard.step2.githubUrl' => 'GitHub URL\'si (İsteğe Bağlı)',
+			_ => null,
+		} ?? switch (path) {
 			'common.projectWizard.step2.githubPlaceholder' => 'https://github.com/kullanici/depo',
 			'common.projectWizard.step2.githubHelp' => 'İsteğe bağlı: bir depoyu klonlamak için GitHub URL\'si gir',
 			'common.projectWizard.step2.githubAuth' => 'GitHub Kimlik Doğrulama (İsteğe Bağlı)',
 			'common.projectWizard.step2.githubAuthHelp' => 'Yalnızca özel depolar için gereklidir. Genel depolar kimlik doğrulama olmadan klonlanabilir.',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.step2.loadingTokens' => 'Kayıtlı token\'lar yükleniyor...',
 			'common.projectWizard.step2.storedToken' => 'Kayıtlı Token',
 			'common.projectWizard.step2.newToken' => 'Yeni Token',
@@ -10028,12 +10036,12 @@ extension on TranslationsTr {
 			'settings.mcp.editServer' => 'Sunucuyu Düzenle',
 			'settings.mcp.deleteServer' => 'Sunucuyu Sil',
 			'settings.mcp.serverName' => 'Sunucu Adı',
+			_ => null,
+		} ?? switch (path) {
 			'settings.mcp.serverType' => 'Sunucu Türü',
 			'settings.mcp.config' => 'Yapılandırma',
 			'settings.mcp.testConnection' => 'Bağlantıyı Test Et',
 			'settings.mcp.status' => 'Durum',
-			_ => null,
-		} ?? switch (path) {
 			'settings.mcp.connected' => 'Bağlı',
 			'settings.mcp.disconnected' => 'Bağlantı kesildi',
 			'settings.mcp.scope.label' => 'Kapsam',
@@ -10542,12 +10550,12 @@ extension on TranslationsTr {
 			'settings.browser.statusReady' => 'hazır',
 			'settings.browser.statusSetupRequired' => 'kurulum gerekli',
 			'settings.browser.title' => 'Browser',
+			_ => null,
+		} ?? switch (path) {
 			'settings.workspaces.cancel' => 'İptal',
 			'settings.workspaces.create' => 'Çalışma alanı ekle',
 			'settings.workspaces.deleteConfirm' => 'Bu çalışma alanı DDAgent’tan kaldırılsın mı? Dosyaları diskte kalır.',
 			'settings.workspaces.deleteFailed' => 'Çalışma alanı kaldırılamadı.',
-			_ => null,
-		} ?? switch (path) {
 			'settings.workspaces.deleteTitle' => 'Çalışma alanını kaldır',
 			'settings.workspaces.description' => 'Çalışma alanları, DDAgent’ın sohbet edebildiği, kod çalıştırabildiği ve gezinebildiği dizinlerdir.',
 			'settings.workspaces.remove' => 'Çalışma alanını kaldır',
@@ -11056,12 +11064,12 @@ extension on TranslationsTr {
 			'tasks.taskDetail.edit' => 'Görevi düzenle',
 			'tasks.taskDetail.implDetails' => 'Uygulama Ayrıntıları',
 			'tasks.taskDetail.noDependencies' => 'Bağımlılık yok',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.noDescription' => 'Açıklama yok',
 			'tasks.taskDetail.priority' => 'Öncelik',
 			'tasks.taskDetail.priorityNotSet' => 'Ayarlanmadı',
 			'tasks.taskDetail.save' => 'Kaydet',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.status' => 'Durum',
 			'tasks.taskDetail.statusFailed' => 'Görev durumu güncellenemedi',
 			'tasks.taskDetail.taskId' => ({required Object id}) => 'Görev ${id}',
@@ -11570,12 +11578,12 @@ extension on TranslationsTr {
 			'terminal.shortcuts.hideTooltip' => 'Kısayolları gizle',
 			'terminal.paste.title' => 'Terminale yapıştır',
 			'terminal.paste.hint' => 'Ctrl+V / sağ tık → Yapıştır',
+			_ => null,
+		} ?? switch (path) {
 			'terminal.errors.couldNotOpenLink' => ({required Object url}) => 'Bağlantı açılamadı: ${url}',
 			'terminal.errors.frameError' => ({required Object message}) => '[Hata] ${message}',
 			'terminal.errors.connectionError' => ({required Object message}) => '[Bağlantı hatası] ${message}',
 			'terminal.loginDialog.title' => ({required Object provider}) => '${provider} CLI Girişi',
-			_ => null,
-		} ?? switch (path) {
 			'terminal.loginDialog.exited' => ({required Object code}) => 'Çıkıldı (${code})',
 			'terminal.loginDialog.authLinkDetected' => 'Kimlik doğrulama bağlantısı algılandı',
 			'terminal.empty.title' => 'Etkin terminal yok',

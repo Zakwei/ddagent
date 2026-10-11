@@ -878,7 +878,11 @@
       "taskTitle": "Görev {{id}}"
     },
     "subheader": {
-      "contextTooltip": "Bağlam: {{used}} / {{total}} token · %{{percent}} kullanıldı"
+      "contextTooltip": "Bağlam: {{used}} / {{total}} token · %{{percent}} kullanıldı",
+      "handoff": "Devir",
+      "handoffTooltip": "Yeni bir sohbette devam etmek için ajandan özet iste",
+      "handoffPrompt": "Yeni bir sohbette devam edebilmem için bu konuşmanın bir \"handoff\"unu (devir özetini) hazırla.\nŞunları dahil et:\n1. Amaç / ne üzerinde çalışıyoruz (1-2 cümle)\n2. Temel bulgular ve kararlar (önemliyse gerekçesiyle)\n3. Çalışmanın mevcut durumu: ne bitti, ne devam ediyor\n4. Önemli ayrıntılar: kaybedilmemesi gereken adlar, sayılar, kod/metin parçaları\n5. Yanıt stili ve biçimiyle ilgili tercihlerim\n6. Açık sorular ve sonraki adımlar\nKısa yaz, ama devam etmek için gereken hiçbir şeyi atlama.",
+      "handoffContinue": "Buradan devam ediyoruz."
     },
     "transcript": {
       "requestFailed": "İstek başarısız oldu"

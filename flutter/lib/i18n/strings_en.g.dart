@@ -2913,6 +2913,18 @@ class Translations$chat$subheader$en {
 
 	/// en: 'Context: {{used}} / {{total}} tokens · {{percent}}% used'
 	String contextTooltip({required Object used, required Object total, required Object percent}) => 'Context: ${used} / ${total} tokens · ${percent}% used';
+
+	/// en: 'Handoff'
+	String get handoff => 'Handoff';
+
+	/// en: 'Ask the agent for a summary to continue in a new chat'
+	String get handoffTooltip => 'Ask the agent for a summary to continue in a new chat';
+
+	/// en: 'Write a "handoff" of this conversation so I can continue in a new chat. Include: 1. Goal / what we are working on (1-2 sentences) 2. Key findings and decisions (with rationale, if important) 3. Current state of work: what is done, what is in progress 4. Important details: names, numbers, code/text fragments that must not be lost 5. My preferences for response style and format 6. Open questions and next steps Be concise, but leave out nothing needed to continue.'
+	String get handoffPrompt => 'Write a "handoff" of this conversation so I can continue in a new chat.\nInclude:\n1. Goal / what we are working on (1-2 sentences)\n2. Key findings and decisions (with rationale, if important)\n3. Current state of work: what is done, what is in progress\n4. Important details: names, numbers, code/text fragments that must not be lost\n5. My preferences for response style and format\n6. Open questions and next steps\nBe concise, but leave out nothing needed to continue.';
+
+	/// en: 'Let's continue from here.'
+	String get handoffContinue => 'Let\'s continue from here.';
 }
 
 // Path: chat.transcript
@@ -15587,6 +15599,10 @@ extension on Translations {
 			'chat.mentionMenu.kinds.task' => 'task',
 			'chat.mentionMenu.taskTitle' => ({required Object id}) => 'Task ${id}',
 			'chat.subheader.contextTooltip' => ({required Object used, required Object total, required Object percent}) => 'Context: ${used} / ${total} tokens · ${percent}% used',
+			'chat.subheader.handoff' => 'Handoff',
+			'chat.subheader.handoffTooltip' => 'Ask the agent for a summary to continue in a new chat',
+			'chat.subheader.handoffPrompt' => 'Write a "handoff" of this conversation so I can continue in a new chat.\nInclude:\n1. Goal / what we are working on (1-2 sentences)\n2. Key findings and decisions (with rationale, if important)\n3. Current state of work: what is done, what is in progress\n4. Important details: names, numbers, code/text fragments that must not be lost\n5. My preferences for response style and format\n6. Open questions and next steps\nBe concise, but leave out nothing needed to continue.',
+			'chat.subheader.handoffContinue' => 'Let\'s continue from here.',
 			'chat.transcript.requestFailed' => 'Request failed',
 			'chat.review.changedFiles' => 'Changed files',
 			'chat.review.changedFilesCount' => ({required Object count}) => 'Changed files (${count})',
@@ -15965,12 +15981,12 @@ extension on Translations {
 			'common.projectWizard.step2.existingHelp' => 'Full path to your existing workspace directory',
 			'common.projectWizard.step2.newHelp' => 'Full path to your workspace directory',
 			'common.projectWizard.step2.githubUrl' => 'GitHub URL (Optional)',
+			_ => null,
+		} ?? switch (path) {
 			'common.projectWizard.step2.githubPlaceholder' => 'https://github.com/username/repository',
 			'common.projectWizard.step2.githubHelp' => 'Optional: provide a GitHub URL to clone a repository',
 			'common.projectWizard.step2.githubAuth' => 'GitHub Authentication (Optional)',
 			'common.projectWizard.step2.githubAuthHelp' => 'Only required for private repositories. Public repos can be cloned without authentication.',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.step2.loadingTokens' => 'Loading stored tokens...',
 			'common.projectWizard.step2.storedToken' => 'Stored Token',
 			'common.projectWizard.step2.newToken' => 'New Token',
@@ -16479,12 +16495,12 @@ extension on Translations {
 			'settings.mcp.editServer' => 'Edit Server',
 			'settings.mcp.deleteServer' => 'Delete Server',
 			'settings.mcp.serverName' => 'Server Name',
+			_ => null,
+		} ?? switch (path) {
 			'settings.mcp.serverType' => 'Server Type',
 			'settings.mcp.config' => 'Configuration',
 			'settings.mcp.testConnection' => 'Test Connection',
 			'settings.mcp.status' => 'Status',
-			_ => null,
-		} ?? switch (path) {
 			'settings.mcp.connected' => 'Connected',
 			'settings.mcp.disconnected' => 'Disconnected',
 			'settings.mcp.scope.label' => 'Scope',
@@ -16993,12 +17009,12 @@ extension on Translations {
 			'settings.browser.statusReady' => 'ready',
 			'settings.browser.statusSetupRequired' => 'setup required',
 			'settings.browser.title' => 'Browser',
+			_ => null,
+		} ?? switch (path) {
 			'settings.workspaces.cancel' => 'Cancel',
 			'settings.workspaces.create' => 'Add workspace',
 			'settings.workspaces.deleteConfirm' => 'Remove this workspace from DDAgent? Its files stay on disk.',
 			'settings.workspaces.deleteFailed' => 'Failed to remove workspace.',
-			_ => null,
-		} ?? switch (path) {
 			'settings.workspaces.deleteTitle' => 'Remove workspace',
 			'settings.workspaces.description' => 'Workspaces are directories DDAgent can chat, run code, and browse inside.',
 			'settings.workspaces.remove' => 'Remove workspace',
@@ -17507,12 +17523,12 @@ extension on Translations {
 			'tasks.taskDetail.edit' => 'Edit task',
 			'tasks.taskDetail.implDetails' => 'Implementation Details',
 			'tasks.taskDetail.noDependencies' => 'No dependencies',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.noDescription' => 'No description provided',
 			'tasks.taskDetail.priority' => 'Priority',
 			'tasks.taskDetail.priorityNotSet' => 'Not set',
 			'tasks.taskDetail.save' => 'Save',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.status' => 'Status',
 			'tasks.taskDetail.statusFailed' => 'Failed to update task status',
 			'tasks.taskDetail.taskId' => ({required Object id}) => 'Task ${id}',
@@ -18021,12 +18037,12 @@ extension on Translations {
 			'terminal.shortcuts.hideTooltip' => 'Hide Shortcuts',
 			'terminal.paste.title' => 'Paste into terminal',
 			'terminal.paste.hint' => 'Ctrl+V / right-click → Paste',
+			_ => null,
+		} ?? switch (path) {
 			'terminal.errors.couldNotOpenLink' => ({required Object url}) => 'Could not open link: ${url}',
 			'terminal.errors.frameError' => ({required Object message}) => '[Error] ${message}',
 			'terminal.errors.connectionError' => ({required Object message}) => '[Connection Error] ${message}',
 			'terminal.loginDialog.title' => ({required Object provider}) => '${provider} CLI Login',
-			_ => null,
-		} ?? switch (path) {
 			'terminal.loginDialog.exited' => ({required Object code}) => 'Exited (${code})',
 			'terminal.loginDialog.authLinkDetected' => 'Authentication link detected',
 			'terminal.empty.title' => 'No Active Terminal',

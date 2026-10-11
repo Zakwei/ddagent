@@ -909,7 +909,11 @@
       "taskTitle": "Zadanie {{id}}"
     },
     "subheader": {
-      "contextTooltip": "Kontekst: {{used}} / {{total}} tokenów · wykorzystano {{percent}}%"
+      "contextTooltip": "Kontekst: {{used}} / {{total}} tokenów · wykorzystano {{percent}}%",
+      "handoff": "Handoff",
+      "handoffTooltip": "Poproś agenta o podsumowanie do kontynuacji w nowym czacie",
+      "handoffPrompt": "Zrób \"handoff\" tej rozmowy, żebym mógł kontynuować w nowym czacie.\nUwzględnij:\n1. Cel / nad czym pracujemy (1-2 zdania)\n2. Kluczowe ustalenia i decyzje (z uzasadnieniem, jeśli ważne)\n3. Aktualny stan pracy: co jest zrobione, co w toku\n4. Ważne szczegóły: nazwy, liczby, fragmenty kodu/tekstu, których nie wolno zgubić\n5. Moje preferencje co do stylu i formatu odpowiedzi\n6. Otwarte pytania i następne kroki\nPisz zwięźle, ale nie pomijaj niczego, co byłoby potrzebne do kontynuacji.",
+      "handoffContinue": "Kontynuujemy od tego miejsca."
     },
     "transcript": {
       "requestFailed": "Żądanie nie powiodło się"

@@ -633,6 +633,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
       // A pane bound to a session this server does not have (restored from
       // another server, or deleted) — unbind it and offer the picker.
       onSessionMissing: () => ctrl.updatePane(pane.id, sessionId: () => null, picker: true),
+      onSessionReplaced: (id) => ctrl.updatePane(pane.id, sessionId: () => id),
     );
   }
 

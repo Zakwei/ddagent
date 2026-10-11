@@ -1717,6 +1717,10 @@ class Translations$chat$subheader$ja extends Translations$chat$subheader$en {
 
 	// Translations
 	@override String contextTooltip({required Object used, required Object total, required Object percent}) => 'コンテキスト: ${used} / ${total} トークン · ${percent}% 使用';
+	@override String get handoff => '引き継ぎ';
+	@override String get handoffTooltip => '新しいチャットで続けるための要約をエージェントに依頼';
+	@override String get handoffPrompt => '新しいチャットで続けられるよう、この会話の「引き継ぎ（handoff）」を作成してください。\n含める内容:\n1. 目的 / 取り組んでいる内容（1〜2文）\n2. 重要な発見と決定事項（重要なら理由も）\n3. 現在の作業状況: 完了したこと、進行中のこと\n4. 重要な詳細: 失ってはいけない名前、数値、コード/テキストの断片\n5. 回答のスタイルと形式に関する私の好み\n6. 未解決の質問と次のステップ\n簡潔に書きつつ、継続に必要なことは省略しないでください。';
+	@override String get handoffContinue => 'ここから続けましょう。';
 }
 
 // Path: chat.transcript
@@ -9130,6 +9134,10 @@ extension on TranslationsJa {
 			'chat.mentionMenu.kinds.task' => 'タスク',
 			'chat.mentionMenu.taskTitle' => ({required Object id}) => 'タスク ${id}',
 			'chat.subheader.contextTooltip' => ({required Object used, required Object total, required Object percent}) => 'コンテキスト: ${used} / ${total} トークン · ${percent}% 使用',
+			'chat.subheader.handoff' => '引き継ぎ',
+			'chat.subheader.handoffTooltip' => '新しいチャットで続けるための要約をエージェントに依頼',
+			'chat.subheader.handoffPrompt' => '新しいチャットで続けられるよう、この会話の「引き継ぎ（handoff）」を作成してください。\n含める内容:\n1. 目的 / 取り組んでいる内容（1〜2文）\n2. 重要な発見と決定事項（重要なら理由も）\n3. 現在の作業状況: 完了したこと、進行中のこと\n4. 重要な詳細: 失ってはいけない名前、数値、コード/テキストの断片\n5. 回答のスタイルと形式に関する私の好み\n6. 未解決の質問と次のステップ\n簡潔に書きつつ、継続に必要なことは省略しないでください。',
+			'chat.subheader.handoffContinue' => 'ここから続けましょう。',
 			'chat.transcript.requestFailed' => 'リクエストに失敗しました',
 			'chat.review.changedFiles' => '変更されたファイル',
 			'chat.review.changedFilesCount' => ({required Object count}) => '変更されたファイル (${count})',
@@ -9508,12 +9516,12 @@ extension on TranslationsJa {
 			'common.projectWizard.step2.existingHelp' => '既存のワークスペースディレクトリのフルパス',
 			'common.projectWizard.step2.newHelp' => 'ワークスペースディレクトリのフルパス',
 			'common.projectWizard.step2.githubUrl' => 'GitHub URL（任意）',
+			_ => null,
+		} ?? switch (path) {
 			'common.projectWizard.step2.githubPlaceholder' => 'https://github.com/username/repository',
 			'common.projectWizard.step2.githubHelp' => '任意: リポジトリをクローンするためのGitHub URLを入力してください',
 			'common.projectWizard.step2.githubAuth' => 'GitHub認証（任意）',
 			'common.projectWizard.step2.githubAuthHelp' => 'プライベートリポジトリの場合のみ必要です。パブリックリポジトリは認証なしでクローンできます。',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.step2.loadingTokens' => '保存済みトークンを読み込んでいます...',
 			'common.projectWizard.step2.storedToken' => '保存済みトークン',
 			'common.projectWizard.step2.newToken' => '新しいトークン',
@@ -10022,12 +10030,12 @@ extension on TranslationsJa {
 			'settings.mcp.editServer' => 'サーバーを編集',
 			'settings.mcp.deleteServer' => 'サーバーを削除',
 			'settings.mcp.serverName' => 'サーバー名',
+			_ => null,
+		} ?? switch (path) {
 			'settings.mcp.serverType' => 'サーバーの種類',
 			'settings.mcp.config' => '設定',
 			'settings.mcp.testConnection' => '接続テスト',
 			'settings.mcp.status' => '状態',
-			_ => null,
-		} ?? switch (path) {
 			'settings.mcp.connected' => '接続済み',
 			'settings.mcp.disconnected' => '未接続',
 			'settings.mcp.scope.label' => 'スコープ',
@@ -10536,12 +10544,12 @@ extension on TranslationsJa {
 			'settings.browser.statusReady' => '準備完了',
 			'settings.browser.statusSetupRequired' => 'セットアップが必要',
 			'settings.browser.title' => 'Browser',
+			_ => null,
+		} ?? switch (path) {
 			'settings.workspaces.cancel' => 'キャンセル',
 			'settings.workspaces.create' => 'ワークスペースを追加',
 			'settings.workspaces.deleteConfirm' => 'このワークスペースを DDAgent から削除しますか？ファイルはディスクに残ります。',
 			'settings.workspaces.deleteFailed' => 'ワークスペースの削除に失敗しました。',
-			_ => null,
-		} ?? switch (path) {
 			'settings.workspaces.deleteTitle' => 'ワークスペースを削除',
 			'settings.workspaces.description' => 'ワークスペースは、DDAgent がチャット・コード実行・ブラウジングできるディレクトリです。',
 			'settings.workspaces.remove' => 'ワークスペースを削除',
@@ -11050,12 +11058,12 @@ extension on TranslationsJa {
 			'tasks.taskDetail.edit' => 'タスクを編集',
 			'tasks.taskDetail.implDetails' => '実装の詳細',
 			'tasks.taskDetail.noDependencies' => '依存関係なし',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.noDescription' => '説明がありません',
 			'tasks.taskDetail.priority' => '優先度',
 			'tasks.taskDetail.priorityNotSet' => '未設定',
 			'tasks.taskDetail.save' => '保存',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.status' => 'ステータス',
 			'tasks.taskDetail.statusFailed' => 'タスクステータスの更新に失敗しました',
 			'tasks.taskDetail.taskId' => ({required Object id}) => 'タスク ${id}',
@@ -11564,12 +11572,12 @@ extension on TranslationsJa {
 			'terminal.shortcuts.hideTooltip' => 'ショートカットを非表示',
 			'terminal.paste.title' => 'ターミナルに貼り付け',
 			'terminal.paste.hint' => 'Ctrl+V / 右クリック → 貼り付け',
+			_ => null,
+		} ?? switch (path) {
 			'terminal.errors.couldNotOpenLink' => ({required Object url}) => 'リンクを開けませんでした: ${url}',
 			'terminal.errors.frameError' => ({required Object message}) => '[エラー] ${message}',
 			'terminal.errors.connectionError' => ({required Object message}) => '[接続エラー] ${message}',
 			'terminal.loginDialog.title' => ({required Object provider}) => '${provider} CLI ログイン',
-			_ => null,
-		} ?? switch (path) {
 			'terminal.loginDialog.exited' => ({required Object code}) => '終了 (${code})',
 			'terminal.loginDialog.authLinkDetected' => '認証リンクを検出しました',
 			'terminal.empty.title' => 'アクティブなターミナルがありません',

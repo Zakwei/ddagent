@@ -883,7 +883,11 @@
       "taskTitle": "Attività {{id}}"
     },
     "subheader": {
-      "contextTooltip": "Contesto: {{used}} / {{total}} token · {{percent}}% usato"
+      "contextTooltip": "Contesto: {{used}} / {{total}} token · {{percent}}% usato",
+      "handoff": "Passaggio",
+      "handoffTooltip": "Chiedi all'agente un riepilogo per continuare in una nuova chat",
+      "handoffPrompt": "Fai un \"handoff\" (passaggio di consegne) di questa conversazione, così posso continuare in una nuova chat.\nIncludi:\n1. Obiettivo / su cosa stiamo lavorando (1-2 frasi)\n2. Scoperte e decisioni chiave (con motivazione, se importante)\n3. Stato attuale del lavoro: cosa è fatto, cosa è in corso\n4. Dettagli importanti: nomi, numeri, frammenti di codice/testo da non perdere\n5. Le mie preferenze di stile e formato delle risposte\n6. Domande aperte e prossimi passi\nSii conciso, ma non tralasciare nulla di necessario per continuare.",
+      "handoffContinue": "Continuiamo da qui."
     },
     "transcript": {
       "requestFailed": "Richiesta non riuscita"

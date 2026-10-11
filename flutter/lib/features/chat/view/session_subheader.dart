@@ -3,11 +3,17 @@ import 'dart:async';
 import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_nav_menu.dart';
+import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/features/chat/state/composer_controller.dart';
+import 'package:ddagent_app/features/chat/state/transcript_controller.dart';
 import 'package:ddagent_app/features/chat/view/chat_utilities.dart';
+import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/quota/data/quota_models.dart' hide UsageSummary;
 import 'package:ddagent_app/features/quota/data/quota_repository.dart';
 import 'package:ddagent_app/features/quota/view/quota_unavailable.dart';
+import 'package:ddagent_app/features/sessions/data/session_message.dart';
+import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
+import 'package:ddagent_app/features/sessions/state/session_store.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
 import 'package:ddagent_app/features/sessions/view/provider_logo.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
@@ -49,6 +55,7 @@ class SessionSubheader extends ConsumerWidget {
     this.projectPath,
     this.dense = false,
     this.showMenuButton = false,
+    this.onSessionReplaced,
     super.key,
   });
 
@@ -65,6 +72,10 @@ class SessionSubheader extends ConsumerWidget {
   /// `/chat/:id` has no other header; workspace panes already carry one in
   /// the screen toolbar).
   final bool showMenuButton;
+
+  /// Swaps the hosting pane/route to [sessionId] — the handoff's fresh chat.
+  /// Without it the handoff button stays hidden.
+  final void Function(String sessionId)? onSessionReplaced;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -200,6 +211,21 @@ class SessionSubheader extends ConsumerWidget {
                         mainAxisSize: MainAxisSize.min,
                         spacing: spacing,
                         children: [
+                          if (composer != null &&
+                              onSessionReplaced != null &&
+                              p != 'orchestrator' &&
+                              p != 'mini-orchestrator' &&
+                              (usage?.contextPercent ?? 0) >= handoffContextPercent)
+                            _HandoffButton(
+                              arg: (
+                                sessionId: sessionId,
+                                projectId: projectId,
+                                provider: p,
+                                projectPath: projectPath,
+                              ),
+                              compact: compact,
+                              onSessionReplaced: onSessionReplaced!,
+                            ),
                           if (usage != null) _ContextGauge(usage: usage, compact: compact),
                           QuotaBadge(provider: p, model: effectiveModel, accountId: accountId),
                         ],
@@ -210,6 +236,136 @@ class SessionSubheader extends ConsumerWidget {
               );
             },
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Context fill (%) from which the subheader offers the handoff button.
+const handoffContextPercent = 40;
+
+/// The agent's reply to the newest handoff [prompt] turn in [messages] —
+/// `null` until some assistant text follows it.
+String? handoffSummary(List<SessionMessage> messages, String prompt) {
+  final start = messages.lastIndexWhere(
+    (m) => m.isUserText && (m.content ?? '').contains(prompt.trim()),
+  );
+  if (start < 0) return null;
+  final text = [
+    for (final m in messages.skip(start + 1))
+      if (m.kind == 'text' && m.role == 'assistant' && (m.content ?? '').trim().isNotEmpty)
+        m.content!.trim(),
+  ].join('\n\n');
+  return text.isEmpty ? null : text;
+}
+
+/// Handoff once the context window is filling up: asks the agent for a
+/// summary, then opens a fresh session on the same provider/project, sends
+/// it the summary and swaps the pane over to it.
+class _HandoffButton extends ConsumerStatefulWidget {
+  const _HandoffButton({required this.arg, required this.compact, required this.onSessionReplaced});
+
+  final ComposerArg arg;
+  final bool compact;
+  final void Function(String sessionId) onSessionReplaced;
+
+  @override
+  ConsumerState<_HandoffButton> createState() => _HandoffButtonState();
+}
+
+class _HandoffButtonState extends ConsumerState<_HandoffButton> {
+  /// The prompt sent, while waiting for the agent's summary.
+  String? _prompt;
+
+  String get _sid => widget.arg.sessionId!;
+
+  Future<void> _start() async {
+    final prompt = Translations.of(context).chat.subheader.handoffPrompt;
+    setState(() => _prompt = prompt);
+    try {
+      await ref
+          .read(composerProvider(widget.arg).notifier)
+          .sendText(prompt, running: ref.read(transcriptProvider(_sid)).runStatus == 'running');
+    } on Object catch (e) {
+      if (!mounted) return;
+      setState(() => _prompt = null);
+      AppToast.error(context, '$e');
+    }
+  }
+
+  /// Runs on every run-status / transcript change while waiting: the summary
+  /// counts once the run is over (a queued prompt waits out the current run).
+  void _check() {
+    final prompt = _prompt;
+    if (prompt == null || ref.read(transcriptProvider(_sid)).runStatus == 'running') return;
+    final summary = handoffSummary(
+      ref.read(sessionMessageStoreProvider)[_sid]?.merged ?? const [],
+      prompt,
+    );
+    if (summary != null) unawaited(_continueInNewSession(summary));
+  }
+
+  Future<void> _continueInNewSession(String summary) async {
+    final t = Translations.of(context);
+    final arg = widget.arg;
+    setState(() => _prompt = null);
+    try {
+      // POST /api/providers/sessions wants the full path (workspace parity).
+      final projectPath =
+          ref
+              .read(projectsProvider)
+              .projects
+              .where((p) => p.projectId == arg.projectId)
+              .map((p) => p.fullPath ?? p.path)
+              .firstOrNull ??
+          arg.projectPath;
+      if (projectPath == null || projectPath.isEmpty) {
+        throw StateError(t.workspace.unknownProjectPath);
+      }
+      final composer = ref.read(composerProvider(arg).notifier);
+      final accountId = ref.read(composerProvider(arg)).accountId;
+      final created = await ref.read(sessionsRepositoryProvider).createSession({
+        'provider': arg.provider,
+        'projectPath': projectPath,
+        if (accountId != null && accountId.isNotEmpty) 'accountId': accountId,
+      });
+      await composer.sendText(
+        '$summary\n\n${t.chat.subheader.handoffContinue}',
+        toSessionId: created.sessionId,
+      );
+      if (mounted) widget.onSessionReplaced(created.sessionId);
+    } on Object catch (e) {
+      if (mounted) {
+        AppToast.error(context, t.sessions.createFailed(error: e is StateError ? e.message : '$e'));
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    ref
+      ..listen(transcriptProvider(_sid).select((s) => s.runStatus), (_, _) => _check())
+      ..listen(sessionMessageStoreProvider.select((m) => m[_sid]?.merged), (_, _) => _check());
+    final compact = widget.compact;
+    final waiting = _prompt != null;
+    final s = Translations.of(context).chat.subheader;
+    return Tooltip(
+      message: s.handoffTooltip,
+      child: TextButton.icon(
+        onPressed: waiting ? null : _start,
+        icon: waiting
+            ? SizedBox.square(
+                dimension: compact ? 10 : 12,
+                child: const CircularProgressIndicator(strokeWidth: 1.5),
+              )
+            : Icon(LucideIcons.arrowRightLeft, size: compact ? 12 : 14),
+        label: Text(s.handoff, style: TextStyle(fontSize: compact ? 11 : 12)),
+        style: TextButton.styleFrom(
+          visualDensity: VisualDensity.compact,
+          padding: const EdgeInsets.symmetric(horizontal: 6),
+          minimumSize: Size.zero,
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
       ),
     );

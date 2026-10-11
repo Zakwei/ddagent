@@ -1725,6 +1725,10 @@ class Translations$chat$subheader$it extends Translations$chat$subheader$en {
 
 	// Translations
 	@override String contextTooltip({required Object used, required Object total, required Object percent}) => 'Contesto: ${used} / ${total} token · ${percent}% usato';
+	@override String get handoff => 'Passaggio';
+	@override String get handoffTooltip => 'Chiedi all\'agente un riepilogo per continuare in una nuova chat';
+	@override String get handoffPrompt => 'Fai un "handoff" (passaggio di consegne) di questa conversazione, così posso continuare in una nuova chat.\nIncludi:\n1. Obiettivo / su cosa stiamo lavorando (1-2 frasi)\n2. Scoperte e decisioni chiave (con motivazione, se importante)\n3. Stato attuale del lavoro: cosa è fatto, cosa è in corso\n4. Dettagli importanti: nomi, numeri, frammenti di codice/testo da non perdere\n5. Le mie preferenze di stile e formato delle risposte\n6. Domande aperte e prossimi passi\nSii conciso, ma non tralasciare nulla di necessario per continuare.';
+	@override String get handoffContinue => 'Continuiamo da qui.';
 }
 
 // Path: chat.transcript
@@ -9141,6 +9145,10 @@ extension on TranslationsIt {
 			'chat.mentionMenu.kinds.task' => 'attività',
 			'chat.mentionMenu.taskTitle' => ({required Object id}) => 'Attività ${id}',
 			'chat.subheader.contextTooltip' => ({required Object used, required Object total, required Object percent}) => 'Contesto: ${used} / ${total} token · ${percent}% usato',
+			'chat.subheader.handoff' => 'Passaggio',
+			'chat.subheader.handoffTooltip' => 'Chiedi all\'agente un riepilogo per continuare in una nuova chat',
+			'chat.subheader.handoffPrompt' => 'Fai un "handoff" (passaggio di consegne) di questa conversazione, così posso continuare in una nuova chat.\nIncludi:\n1. Obiettivo / su cosa stiamo lavorando (1-2 frasi)\n2. Scoperte e decisioni chiave (con motivazione, se importante)\n3. Stato attuale del lavoro: cosa è fatto, cosa è in corso\n4. Dettagli importanti: nomi, numeri, frammenti di codice/testo da non perdere\n5. Le mie preferenze di stile e formato delle risposte\n6. Domande aperte e prossimi passi\nSii conciso, ma non tralasciare nulla di necessario per continuare.',
+			'chat.subheader.handoffContinue' => 'Continuiamo da qui.',
 			'chat.transcript.requestFailed' => 'Richiesta non riuscita',
 			'chat.review.changedFiles' => 'File modificati',
 			'chat.review.changedFilesCount' => ({required Object count}) => 'File modificati (${count})',
@@ -9519,12 +9527,12 @@ extension on TranslationsIt {
 			'common.projectWizard.step2.existingHelp' => 'Percorso completo della directory dell\'area di lavoro esistente',
 			'common.projectWizard.step2.newHelp' => 'Percorso completo della directory dell\'area di lavoro',
 			'common.projectWizard.step2.githubUrl' => 'URL GitHub (opzionale)',
+			_ => null,
+		} ?? switch (path) {
 			'common.projectWizard.step2.githubPlaceholder' => 'https://github.com/utente/repository',
 			'common.projectWizard.step2.githubHelp' => 'Opzionale: fornisci un URL GitHub per clonare un repository',
 			'common.projectWizard.step2.githubAuth' => 'Autenticazione GitHub (opzionale)',
 			'common.projectWizard.step2.githubAuthHelp' => 'Richiesta solo per repository privati. I repository pubblici possono essere clonati senza autenticazione.',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.step2.loadingTokens' => 'Caricamento token salvati...',
 			'common.projectWizard.step2.storedToken' => 'Token salvato',
 			'common.projectWizard.step2.newToken' => 'Nuovo token',
@@ -10033,12 +10041,12 @@ extension on TranslationsIt {
 			'settings.mcp.editServer' => 'Modifica server',
 			'settings.mcp.deleteServer' => 'Elimina server',
 			'settings.mcp.serverName' => 'Nome server',
+			_ => null,
+		} ?? switch (path) {
 			'settings.mcp.serverType' => 'Tipo server',
 			'settings.mcp.config' => 'Configurazione',
 			'settings.mcp.testConnection' => 'Testa connessione',
 			'settings.mcp.status' => 'Stato',
-			_ => null,
-		} ?? switch (path) {
 			'settings.mcp.connected' => 'Connesso',
 			'settings.mcp.disconnected' => 'Disconnesso',
 			'settings.mcp.scope.label' => 'Ambito',
@@ -10547,12 +10555,12 @@ extension on TranslationsIt {
 			'settings.browser.statusReady' => 'pronto',
 			'settings.browser.statusSetupRequired' => 'configurazione richiesta',
 			'settings.browser.title' => 'Browser',
+			_ => null,
+		} ?? switch (path) {
 			'settings.workspaces.cancel' => 'Annulla',
 			'settings.workspaces.create' => 'Aggiungi workspace',
 			'settings.workspaces.deleteConfirm' => 'Rimuovere questo workspace da DDAgent? I suoi file restano sul disco.',
 			'settings.workspaces.deleteFailed' => 'Impossibile rimuovere il workspace.',
-			_ => null,
-		} ?? switch (path) {
 			'settings.workspaces.deleteTitle' => 'Rimuovi workspace',
 			'settings.workspaces.description' => 'I workspace sono directory in cui DDAgent può chattare, eseguire codice e navigare.',
 			'settings.workspaces.remove' => 'Rimuovi workspace',
@@ -11061,12 +11069,12 @@ extension on TranslationsIt {
 			'tasks.taskDetail.edit' => 'Modifica attività',
 			'tasks.taskDetail.implDetails' => 'Dettagli di implementazione',
 			'tasks.taskDetail.noDependencies' => 'Nessuna dipendenza',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.noDescription' => 'Nessuna descrizione fornita',
 			'tasks.taskDetail.priority' => 'Priorità',
 			'tasks.taskDetail.priorityNotSet' => 'Non impostata',
 			'tasks.taskDetail.save' => 'Salva',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.status' => 'Stato',
 			'tasks.taskDetail.statusFailed' => 'Impossibile aggiornare lo stato dell’attività',
 			'tasks.taskDetail.taskId' => ({required Object id}) => 'Attività ${id}',
@@ -11575,12 +11583,12 @@ extension on TranslationsIt {
 			'terminal.shortcuts.hideTooltip' => 'Nascondi scorciatoie',
 			'terminal.paste.title' => 'Incolla nel terminale',
 			'terminal.paste.hint' => 'Ctrl+V / clic destro → Incolla',
+			_ => null,
+		} ?? switch (path) {
 			'terminal.errors.couldNotOpenLink' => ({required Object url}) => 'Impossibile aprire il link: ${url}',
 			'terminal.errors.frameError' => ({required Object message}) => '[Errore] ${message}',
 			'terminal.errors.connectionError' => ({required Object message}) => '[Errore di connessione] ${message}',
 			'terminal.loginDialog.title' => ({required Object provider}) => 'Accesso a ${provider} CLI',
-			_ => null,
-		} ?? switch (path) {
 			'terminal.loginDialog.exited' => ({required Object code}) => 'Terminato (${code})',
 			'terminal.loginDialog.authLinkDetected' => 'Link di autenticazione rilevato',
 			'terminal.empty.title' => 'Nessun terminale attivo',

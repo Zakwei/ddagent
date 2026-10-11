@@ -883,7 +883,11 @@
       "taskTitle": "Task {{id}}"
     },
     "subheader": {
-      "contextTooltip": "Context: {{used}} / {{total}} tokens · {{percent}}% used"
+      "contextTooltip": "Context: {{used}} / {{total}} tokens · {{percent}}% used",
+      "handoff": "Handoff",
+      "handoffTooltip": "Ask the agent for a summary to continue in a new chat",
+      "handoffPrompt": "Write a \"handoff\" of this conversation so I can continue in a new chat.\nInclude:\n1. Goal / what we are working on (1-2 sentences)\n2. Key findings and decisions (with rationale, if important)\n3. Current state of work: what is done, what is in progress\n4. Important details: names, numbers, code/text fragments that must not be lost\n5. My preferences for response style and format\n6. Open questions and next steps\nBe concise, but leave out nothing needed to continue.",
+      "handoffContinue": "Let's continue from here."
     },
     "transcript": {
       "requestFailed": "Request failed"

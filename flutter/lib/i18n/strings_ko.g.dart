@@ -1717,6 +1717,10 @@ class Translations$chat$subheader$ko extends Translations$chat$subheader$en {
 
 	// Translations
 	@override String contextTooltip({required Object used, required Object total, required Object percent}) => '컨텍스트: ${used} / ${total} 토큰 · ${percent}% 사용';
+	@override String get handoff => '인계';
+	@override String get handoffTooltip => '새 채팅에서 이어가기 위한 요약을 에이전트에게 요청';
+	@override String get handoffPrompt => '새 채팅에서 이어갈 수 있도록 이 대화의 "인계(handoff)"를 작성해 줘.\n포함할 내용:\n1. 목표 / 우리가 작업 중인 것 (1-2문장)\n2. 핵심 발견 사항과 결정 (중요하면 근거 포함)\n3. 현재 작업 상태: 완료된 것, 진행 중인 것\n4. 중요한 세부 사항: 잃어버리면 안 되는 이름, 숫자, 코드/텍스트 조각\n5. 응답 스타일과 형식에 대한 내 선호\n6. 열린 질문과 다음 단계\n간결하게 쓰되, 이어가는 데 필요한 것은 빠뜨리지 마.';
+	@override String get handoffContinue => '여기서부터 이어가자.';
 }
 
 // Path: chat.transcript
@@ -9130,6 +9134,10 @@ extension on TranslationsKo {
 			'chat.mentionMenu.kinds.task' => '작업',
 			'chat.mentionMenu.taskTitle' => ({required Object id}) => '작업 ${id}',
 			'chat.subheader.contextTooltip' => ({required Object used, required Object total, required Object percent}) => '컨텍스트: ${used} / ${total} 토큰 · ${percent}% 사용',
+			'chat.subheader.handoff' => '인계',
+			'chat.subheader.handoffTooltip' => '새 채팅에서 이어가기 위한 요약을 에이전트에게 요청',
+			'chat.subheader.handoffPrompt' => '새 채팅에서 이어갈 수 있도록 이 대화의 "인계(handoff)"를 작성해 줘.\n포함할 내용:\n1. 목표 / 우리가 작업 중인 것 (1-2문장)\n2. 핵심 발견 사항과 결정 (중요하면 근거 포함)\n3. 현재 작업 상태: 완료된 것, 진행 중인 것\n4. 중요한 세부 사항: 잃어버리면 안 되는 이름, 숫자, 코드/텍스트 조각\n5. 응답 스타일과 형식에 대한 내 선호\n6. 열린 질문과 다음 단계\n간결하게 쓰되, 이어가는 데 필요한 것은 빠뜨리지 마.',
+			'chat.subheader.handoffContinue' => '여기서부터 이어가자.',
 			'chat.transcript.requestFailed' => '요청에 실패했습니다',
 			'chat.review.changedFiles' => '변경된 파일',
 			'chat.review.changedFilesCount' => ({required Object count}) => '변경된 파일 (${count})',
@@ -9508,12 +9516,12 @@ extension on TranslationsKo {
 			'common.projectWizard.step2.existingHelp' => '기존 워크스페이스 디렉토리의 전체 경로',
 			'common.projectWizard.step2.newHelp' => '워크스페이스 디렉토리의 전체 경로',
 			'common.projectWizard.step2.githubUrl' => 'GitHub URL (선택사항)',
+			_ => null,
+		} ?? switch (path) {
 			'common.projectWizard.step2.githubPlaceholder' => 'https://github.com/username/repository',
 			'common.projectWizard.step2.githubHelp' => '선택사항: 저장소를 clone하려면 GitHub URL을 입력하세요',
 			'common.projectWizard.step2.githubAuth' => 'GitHub 인증 (선택사항)',
 			'common.projectWizard.step2.githubAuthHelp' => '비공개 저장소에만 필요합니다. 공개 저장소는 인증 없이 clone할 수 있습니다.',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.step2.loadingTokens' => '저장된 토큰 로딩 중...',
 			'common.projectWizard.step2.storedToken' => '저장된 토큰',
 			'common.projectWizard.step2.newToken' => '새 토큰',
@@ -10022,12 +10030,12 @@ extension on TranslationsKo {
 			'settings.mcp.editServer' => '서버 편집',
 			'settings.mcp.deleteServer' => '서버 삭제',
 			'settings.mcp.serverName' => '서버 이름',
+			_ => null,
+		} ?? switch (path) {
 			'settings.mcp.serverType' => '서버 유형',
 			'settings.mcp.config' => '설정',
 			'settings.mcp.testConnection' => '연결 테스트',
 			'settings.mcp.status' => '상태',
-			_ => null,
-		} ?? switch (path) {
 			'settings.mcp.connected' => '연결됨',
 			'settings.mcp.disconnected' => '연결 끊김',
 			'settings.mcp.scope.label' => '범위',
@@ -10536,12 +10544,12 @@ extension on TranslationsKo {
 			'settings.browser.statusReady' => '준비됨',
 			'settings.browser.statusSetupRequired' => '설정 필요',
 			'settings.browser.title' => 'Browser',
+			_ => null,
+		} ?? switch (path) {
 			'settings.workspaces.cancel' => '취소',
 			'settings.workspaces.create' => '작업 영역 추가',
 			'settings.workspaces.deleteConfirm' => '이 작업 영역을 DDAgent에서 제거하시겠습니까? 파일은 디스크에 남습니다.',
 			'settings.workspaces.deleteFailed' => '작업 영역 제거에 실패했습니다.',
-			_ => null,
-		} ?? switch (path) {
 			'settings.workspaces.deleteTitle' => '작업 영역 제거',
 			'settings.workspaces.description' => '작업 영역은 DDAgent가 채팅하고, 코드를 실행하고, 탐색할 수 있는 디렉터리입니다.',
 			'settings.workspaces.remove' => '작업 영역 제거',
@@ -11050,12 +11058,12 @@ extension on TranslationsKo {
 			'tasks.taskDetail.edit' => '작업 편집',
 			'tasks.taskDetail.implDetails' => '구현 세부 정보',
 			'tasks.taskDetail.noDependencies' => '종속성 없음',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.noDescription' => '설명 없음',
 			'tasks.taskDetail.priority' => '우선순위',
 			'tasks.taskDetail.priorityNotSet' => '설정되지 않음',
 			'tasks.taskDetail.save' => '저장',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.status' => '상태',
 			'tasks.taskDetail.statusFailed' => '작업 상태 업데이트 실패',
 			'tasks.taskDetail.taskId' => ({required Object id}) => '작업 ${id}',
@@ -11564,12 +11572,12 @@ extension on TranslationsKo {
 			'terminal.shortcuts.hideTooltip' => '단축키 숨기기',
 			'terminal.paste.title' => '터미널에 붙여넣기',
 			'terminal.paste.hint' => 'Ctrl+V / 마우스 오른쪽 클릭 → 붙여넣기',
+			_ => null,
+		} ?? switch (path) {
 			'terminal.errors.couldNotOpenLink' => ({required Object url}) => '링크를 열 수 없습니다: ${url}',
 			'terminal.errors.frameError' => ({required Object message}) => '[오류] ${message}',
 			'terminal.errors.connectionError' => ({required Object message}) => '[연결 오류] ${message}',
 			'terminal.loginDialog.title' => ({required Object provider}) => '${provider} CLI 로그인',
-			_ => null,
-		} ?? switch (path) {
 			'terminal.loginDialog.exited' => ({required Object code}) => '종료됨 (${code})',
 			'terminal.loginDialog.authLinkDetected' => '인증 링크가 감지되었습니다',
 			'terminal.empty.title' => '활성 터미널 없음',
