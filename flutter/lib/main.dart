@@ -92,6 +92,11 @@ class _DdagentAppState extends ConsumerState<DdagentApp> {
     super.initState();
     // `late` is lazy — touch it so the listener registers at mount.
     _lifecycle;
+    ref.listenManual(
+      serverBaseUrlProvider,
+      (_, url) => unawaited(syncWindowTitle(url)),
+      fireImmediately: true,
+    );
   }
 
   // Only when already built (signed in, workspace mounted) — never spin up the
@@ -133,7 +138,7 @@ class _DdagentAppState extends ConsumerState<DdagentApp> {
     return MaterialApp.router(
       scaffoldMessengerKey: rootMessengerKey,
       scrollBehavior: const NoMouseDragScrollBehavior(),
-      title: Translations.of(context).sidebar.app.title,
+      title: appWindowTitle(ref.watch(serverBaseUrlProvider)),
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
       themeMode: themeMode,

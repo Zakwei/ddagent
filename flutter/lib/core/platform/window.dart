@@ -14,15 +14,13 @@ Future<void> initWindow() async {
     return;
   }
   await windowManager.ensureInitialized();
+  _windowReady = true;
   final box = Hive.box<dynamic>('settings');
   final saved = box.get('windowBounds');
 
   const minSize = Size(720, 480);
-  // Server-pinned windows name their server — several windows stay tellable.
-  final pinned = pinnedServerUrl;
-  final title = pinned == null
-      ? t.sidebar.app.title
-      : '${t.sidebar.app.title} — ${Uri.tryParse(pinned)?.host ?? pinned}';
+  // Pinned windows know their server already; others get it via syncWindowTitle.
+  final title = appWindowTitle(pinnedServerUrl);
   // No widget tree here (runs before `runApp`), so use the global accessor.
   var opts = WindowOptions(minimumSize: minSize, title: title, titleBarStyle: TitleBarStyle.normal);
   if (saved is Map) {
@@ -38,6 +36,23 @@ Future<void> initWindow() async {
     await windowManager.focus();
   });
   windowManager.addListener(_WindowBoundsPersister());
+}
+
+/// "DDAgent — host:port" — the title names the server so several windows (and
+/// a server switch) stay tellable apart.
+String appWindowTitle(String? serverUrl) {
+  if (serverUrl == null || serverUrl.isEmpty) return t.sidebar.app.title;
+  final uri = Uri.tryParse(serverUrl);
+  final address = uri == null || uri.host.isEmpty ? serverUrl : uri.authority;
+  return '${t.sidebar.app.title} — $address';
+}
+
+/// Set by [initWindow] — tests and web/mobile never get a window manager.
+bool _windowReady = false;
+
+/// Retitles the desktop window for the active server. No-op without a window.
+Future<void> syncWindowTitle(String serverUrl) async {
+  if (_windowReady) await windowManager.setTitle(appWindowTitle(serverUrl));
 }
 
 class _WindowBoundsPersister with WindowListener {
