@@ -43,6 +43,7 @@ import 'package:ddagent_app/features/workspace/view/pane_header_metrics.dart';
 import 'package:ddagent_app/features/workspace/view/pane_session_header.dart';
 import 'package:ddagent_app/features/workspace/view/split_workspace_grid.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show ScrollDirection;
 import 'package:flutter/services.dart';
@@ -606,84 +607,116 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
           onNotification: _onMetricsNotification,
           child: NotificationListener<ScrollNotification>(
             onNotification: _onScrollNotification,
-            // SelectableText (EditableText) scrolls the viewport to reveal the
-            // caret on every tap — in an index-anchored list that nudges the
-            // whole transcript. Region selection selects plain Text instead.
-            // The copy action is overridden: SelectionArea's default goes
-            // through Clipboard.setData → navigator.clipboard, which does not
-            // exist on the plain-HTTP deployment — copyText() falls back to
-            // execCommand. (A DOM `copy`-event bridge can't help — the engine
-            // preventDefaults the handled keydown.)
-            child: Actions(
-              actions: {
-                CopySelectionTextIntent: CallbackAction<CopySelectionTextIntent>(
-                  onInvoke: (_) {
-                    unawaited(copyText(_transcriptSelection));
-                    return null;
-                  },
-                ),
-              },
-              child: SelectionArea(
-                onSelectionChanged: (content) {
-                  _transcriptSelection = content?.plainText ?? '';
-                  reportSelectionText(_transcriptSelection);
-                },
-                child: ScrollablePositionedList.builder(
-                  key: ValueKey(sessionId),
-                  itemScrollController: _itemScroll,
-                  itemPositionsListener: _positions,
-                  initialScrollIndex: anchor?.$1 ?? grouped.rows.length,
-                  initialAlignment: anchor != null
-                      ? 1 - anchor.$2 / _viewportHeight
-                      : (_viewportHeight > 0
-                            ? (1 - _tailHeight / _viewportHeight).clamp(0.0, 1.0)
-                            : 0),
-                  // `.chat-messages-pane .mx-auto { max-width: 900px }` — the transcript
-                  // keeps a reading column instead of stretching edge to edge on wide
-                  // panes.
-                  padding: EdgeInsets.only(
-                    top: 16,
-                    left: _readingColumnPadding(constraints.maxWidth),
-                    right: _readingColumnPadding(constraints.maxWidth),
-                  ),
-                  itemCount: grouped.rows.length + 1,
-                  semanticChildCount: grouped.rows.length,
-                  itemBuilder: (context, i) {
-                    if (i == grouped.rows.length) {
-                      return SizedBox(height: _tailHeight.clamp(0.0, _viewportHeight));
-                    }
-                    final row = grouped.rows[i];
-                    if (row is ToolGroup) {
-                      return ToolGroupTile(
-                        key: ValueKey(row.messages.first.id),
-                        group: row,
-                        tileBuilder: (m) => MessageTile(
-                          message: m,
-                          sessionId: sessionId,
-                          projectId: widget.projectId,
-                          childrenMap: grouped.children,
-                          onFileOpen: _openChangedFile,
-                        ),
-                      );
-                    }
-                    final m = row as SessionMessage;
-                    final prevIdx = messages.indexWhere((x) => x.id == m.id);
-                    return MessageTile(
-                      key: ValueKey(m.id),
+            // Selection is owned by the pane-wide SelectionArea in build().
+            child: ScrollablePositionedList.builder(
+              key: ValueKey(sessionId),
+              itemScrollController: _itemScroll,
+              itemPositionsListener: _positions,
+              initialScrollIndex: anchor?.$1 ?? grouped.rows.length,
+              initialAlignment: anchor != null
+                  ? 1 - anchor.$2 / _viewportHeight
+                  : (_viewportHeight > 0 ? (1 - _tailHeight / _viewportHeight).clamp(0.0, 1.0) : 0),
+              // `.chat-messages-pane .mx-auto { max-width: 900px }` — the transcript
+              // keeps a reading column instead of stretching edge to edge on wide
+              // panes.
+              padding: EdgeInsets.only(
+                top: 16,
+                left: _readingColumnPadding(constraints.maxWidth),
+                right: _readingColumnPadding(constraints.maxWidth),
+              ),
+              itemCount: grouped.rows.length + 1,
+              semanticChildCount: grouped.rows.length,
+              itemBuilder: (context, i) {
+                if (i == grouped.rows.length) {
+                  return SizedBox(height: _tailHeight.clamp(0.0, _viewportHeight));
+                }
+                final row = grouped.rows[i];
+                if (row is ToolGroup) {
+                  return ToolGroupTile(
+                    key: ValueKey(row.messages.first.id),
+                    group: row,
+                    tileBuilder: (m) => MessageTile(
                       message: m,
-                      previous: prevIdx > 0 ? messages[prevIdx - 1] : null,
                       sessionId: sessionId,
                       projectId: widget.projectId,
                       childrenMap: grouped.children,
                       onFileOpen: _openChangedFile,
-                    );
-                  },
-                ),
-              ),
+                    ),
+                  );
+                }
+                final m = row as SessionMessage;
+                final prevIdx = messages.indexWhere((x) => x.id == m.id);
+                return MessageTile(
+                  key: ValueKey(m.id),
+                  message: m,
+                  previous: prevIdx > 0 ? messages[prevIdx - 1] : null,
+                  sessionId: sessionId,
+                  projectId: widget.projectId,
+                  childrenMap: grouped.children,
+                  onFileOpen: _openChangedFile,
+                );
+              },
             ),
           ),
         );
       },
+    );
+  }
+
+  /// Everything readable in the pane (banner, transcript, permission and
+  /// question cards) is one selection region, so a drag can select and copy
+  /// any of it. SelectableText (EditableText) would scroll the viewport to
+  /// reveal the caret on every tap — region selection selects plain Text.
+  /// Copy is overridden (Ctrl+C and the context menu): SelectionArea's default
+  /// goes through Clipboard.setData → navigator.clipboard, which does not exist
+  /// on the plain-HTTP deployment — copyText() falls back to execCommand. (A
+  /// DOM `copy`-event bridge can't help — the engine preventDefaults the
+  /// handled keydown.)
+  Widget _selectable(Widget child) {
+    void copy() => unawaited(copyText(_transcriptSelection));
+    // The browser's own menu cannot see a canvas selection — show Flutter's
+    // menu (with a working Copy) while the pointer is over the region.
+    Future<void> browserMenu(bool enable) async {
+      if (!kIsWeb) return;
+      enable
+          ? await BrowserContextMenu.enableContextMenu()
+          : await BrowserContextMenu.disableContextMenu();
+    }
+
+    return MouseRegion(
+      onEnter: (_) => unawaited(browserMenu(false)),
+      onExit: (_) => unawaited(browserMenu(true)),
+      child: Actions(
+        actions: {
+          CopySelectionTextIntent: CallbackAction<CopySelectionTextIntent>(
+            onInvoke: (_) {
+              copy();
+              return null;
+            },
+          ),
+        },
+        child: SelectionArea(
+          onSelectionChanged: (content) {
+            _transcriptSelection = content?.plainText ?? '';
+            reportSelectionText(_transcriptSelection);
+          },
+          contextMenuBuilder: (context, state) => AdaptiveTextSelectionToolbar.buttonItems(
+            anchors: state.contextMenuAnchors,
+            buttonItems: [
+              for (final item in state.contextMenuButtonItems)
+                item.type == ContextMenuButtonType.copy
+                    ? item.copyWith(
+                        onPressed: () {
+                          copy();
+                          state.hideToolbar();
+                        },
+                      )
+                    : item,
+            ],
+          ),
+          child: child,
+        ),
+      ),
     );
   }
 
@@ -802,117 +835,130 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
           children: [
             Column(
               children: [
-                // `.oc-banner` — provider · model · path · ctx gauge ·
-                // quota, pinned above the transcript.
-                SessionSubheader(
-                  sessionId: sessionId,
-                  provider: provider,
-                  projectId: projectId,
-                  projectPath: projectPath,
-                  dense: widget.dense,
-                  showMenuButton: widget.standalone,
-                  onSessionReplaced:
-                      widget.onSessionReplaced ??
-                      (widget.standalone
-                          ? (id) => context.go(
-                              Uri(
-                                path: '/chat/$id',
-                                queryParameters: {
-                                  'projectId': ?projectId,
-                                  'projectPath': ?projectPath,
-                                },
-                              ).toString(),
-                            )
-                          : null),
-                ),
-                if (hasMore)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: state.loadingOlder
-                        ? const SizedBox(
-                            height: 24,
-                            width: 24,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : Wrap(
-                            spacing: 8,
-                            alignment: WrapAlignment.center,
-                            children: [
-                              TextButton.icon(
-                                icon: const Icon(Icons.history, size: 16),
-                                label: Text(i18n.chat.session.messages.loadOlder),
-                                onPressed: _loadOlder,
-                              ),
-                              // Web LoadAllMessagesOverlay — one-shot load of
-                              // every remaining page, with the total count.
-                              TextButton.icon(
-                                icon: const Icon(Icons.unfold_more, size: 16),
-                                label: Text(i18n.chat.session.messages.loadAllCount(count: total)),
-                                onPressed: _loadAll,
-                              ),
-                            ],
-                          ),
-                  ),
-                if (state.olderError != null)
-                  TextButton(
-                    onPressed: _loadOlder,
-                    child: Text(
-                      i18n.chat.session.messages.retryLoadOlder(error: state.olderError ?? ''),
-                    ),
-                  ),
                 Expanded(
-                  // The tools/panel must resolve the oc-chat theme — this
-                  // state's `context` sits ABOVE the Theme wrapper.
-                  child: Builder(
-                    builder: (context) => Stack(
+                  child: _selectable(
+                    Column(
                       children: [
-                        Positioned.fill(
-                          child:
-                              ref.watch(
-                                transcriptToolsProvider(sessionId).select((s) => s.reviewOpen),
-                              )
-                              ? _reviewPanel(context)
-                              : state.loading && messages.isEmpty
-                              ? const Center(child: CircularProgressIndicator())
-                              : state.error is ServerError &&
-                                    (state.error! as ServerError).statusCode == 404 &&
-                                    messages.isEmpty
-                              ? _sessionMissing(context)
-                              : state.error != null && messages.isEmpty
-                              ? Center(child: Text('${state.error}'))
-                              : Listener(
-                                  onPointerDown: _onPointerDown,
-                                  onPointerUp: _onPointerUp,
-                                  onPointerCancel: _onPointerUp,
-                                  // A hover (no button) means the press ended
-                                  // outside the list — never leave it stuck.
-                                  onPointerHover: _onPointerUp,
-                                  child: _messagesList(grouped, messages),
-                                ),
+                        // `.oc-banner` — provider · model · path · ctx gauge ·
+                        // quota, pinned above the transcript.
+                        SessionSubheader(
+                          sessionId: sessionId,
+                          provider: provider,
+                          projectId: projectId,
+                          projectPath: projectPath,
+                          dense: widget.dense,
+                          showMenuButton: widget.standalone,
+                          onSessionReplaced:
+                              widget.onSessionReplaced ??
+                              (widget.standalone
+                                  ? (id) => context.go(
+                                      Uri(
+                                        path: '/chat/$id',
+                                        queryParameters: {
+                                          'projectId': ?projectId,
+                                          'projectPath': ?projectPath,
+                                        },
+                                      ).toString(),
+                                    )
+                                  : null),
                         ),
-                        // Jump-to-bottom — floats over the transcript's
-                        // bottom-right corner, clear of the composer below.
-                        if (!_following)
-                          Positioned(
-                            right: 16,
-                            bottom: 12,
-                            child: FloatingActionButton.small(
-                              onPressed: _jumpToBottom,
-                              child: Badge.count(
-                                count: _unread,
-                                isLabelVisible: _unread > 0,
-                                child: const Icon(Icons.arrow_downward),
+                        if (hasMore)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            child: state.loadingOlder
+                                ? const SizedBox(
+                                    height: 24,
+                                    width: 24,
+                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                  )
+                                : Wrap(
+                                    spacing: 8,
+                                    alignment: WrapAlignment.center,
+                                    children: [
+                                      TextButton.icon(
+                                        icon: const Icon(Icons.history, size: 16),
+                                        label: Text(i18n.chat.session.messages.loadOlder),
+                                        onPressed: _loadOlder,
+                                      ),
+                                      // Web LoadAllMessagesOverlay — one-shot load of
+                                      // every remaining page, with the total count.
+                                      TextButton.icon(
+                                        icon: const Icon(Icons.unfold_more, size: 16),
+                                        label: Text(
+                                          i18n.chat.session.messages.loadAllCount(count: total),
+                                        ),
+                                        onPressed: _loadAll,
+                                      ),
+                                    ],
+                                  ),
+                          ),
+                        if (state.olderError != null)
+                          TextButton(
+                            onPressed: _loadOlder,
+                            child: Text(
+                              i18n.chat.session.messages.retryLoadOlder(
+                                error: state.olderError ?? '',
                               ),
                             ),
                           ),
+                        Expanded(
+                          // The tools/panel must resolve the oc-chat theme — this
+                          // state's `context` sits ABOVE the Theme wrapper.
+                          child: Builder(
+                            builder: (context) => Stack(
+                              children: [
+                                Positioned.fill(
+                                  child:
+                                      ref.watch(
+                                        transcriptToolsProvider(sessionId)
+                                            .select((s) => s.reviewOpen),
+                                      )
+                                      ? _reviewPanel(context)
+                                      : state.loading && messages.isEmpty
+                                      ? const Center(child: CircularProgressIndicator())
+                                      : state.error is ServerError &&
+                                            (state.error! as ServerError).statusCode == 404 &&
+                                            messages.isEmpty
+                                      ? _sessionMissing(context)
+                                      : state.error != null && messages.isEmpty
+                                      ? Center(child: Text('${state.error}'))
+                                      : Listener(
+                                          onPointerDown: _onPointerDown,
+                                          onPointerUp: _onPointerUp,
+                                          onPointerCancel: _onPointerUp,
+                                          // A hover (no button) means the press ended
+                                          // outside the list — never leave it stuck.
+                                          onPointerHover: _onPointerUp,
+                                          child: _messagesList(grouped, messages),
+                                        ),
+                                ),
+                                // Jump-to-bottom — floats over the transcript's
+                                // bottom-right corner, clear of the composer below.
+                                if (!_following)
+                                  Positioned(
+                                    right: 16,
+                                    bottom: 12,
+                                    child: FloatingActionButton.small(
+                                      onPressed: _jumpToBottom,
+                                      child: Badge.count(
+                                        count: _unread,
+                                        isLabelVisible: _unread > 0,
+                                        child: const Icon(Icons.arrow_downward),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        _PermissionBanner(
+                          sessionId: sessionId,
+                          projectId: widget.projectId,
+                          provider: provider,
+                        ),
                       ],
                     ),
                   ),
-                ),
-                _PermissionBanner(
-                  sessionId: sessionId,
-                  projectId: widget.projectId,
-                  provider: provider,
                 ),
                 // `.oc-composer` dock — px-2 sm:px-4, pb-2 sm:pb-4 md:pb-6
                 // (+ safe-area). Compact/dense use the tight spacing.
