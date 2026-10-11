@@ -11,61 +11,37 @@
 -->
 <!-- lang:en -->
 ### New
-- Change server → “Open in new window” opens another app window pinned to the chosen server; each window keeps its own layout and login.
-### Bug fixes
-- Launching the desktop app a second time brings the running window forward instead of starting a broken copy whose chat panes stayed grey.
+- Handoff button in the chat bar once the context passes 40%: the agent writes a summary of the conversation, a new chat on the same agent and project starts from it, and the window switches to it automatically.
 <!-- lang:pl -->
 ### Nowości
-- Zmień serwer → „Otwórz w nowym oknie” otwiera kolejne okno aplikacji przypięte do wybranego serwera; każde okno ma własny układ i logowanie.
-### Poprawki
-- Ponowne uruchomienie aplikacji desktopowej wysuwa otwarte już okno zamiast startować wadliwą kopię, w której panele czatu były szare.
+- Przycisk „Handoff” w pasku czatu, gdy kontekst przekroczy 40%: agent pisze podsumowanie rozmowy, nowy czat z tym samym agentem i projektem startuje od niego, a okienko automatycznie się na niego przełącza.
 <!-- lang:de -->
 ### Neu
-- Server wechseln → „In neuem Fenster öffnen“ öffnet ein weiteres App-Fenster für den gewählten Server; jedes Fenster behält eigenes Layout und eigene Anmeldung.
-### Fehlerbehebungen
-- Ein zweiter Start der Desktop-App holt das laufende Fenster nach vorne, statt eine fehlerhafte Kopie mit grauen Chat-Bereichen zu starten.
+- Übergabe-Schaltfläche in der Chatleiste ab 40 % Kontextauslastung: Der Agent fasst das Gespräch zusammen, ein neuer Chat mit demselben Agenten und Projekt startet damit, und das Fenster wechselt automatisch dorthin.
 <!-- lang:es -->
 ### Novedades
-- Cambiar servidor → «Abrir en una ventana nueva» abre otra ventana de la app fijada al servidor elegido; cada ventana conserva su propio diseño e inicio de sesión.
-### Correcciones
-- Abrir la app de escritorio por segunda vez trae al frente la ventana ya abierta en lugar de iniciar una copia defectuosa con los paneles de chat en gris.
+- Botón «Traspaso» en la barra del chat cuando el contexto supera el 40 %: el agente resume la conversación, un chat nuevo con el mismo agente y proyecto parte de ese resumen y la ventana cambia a él automáticamente.
 <!-- lang:fr -->
 ### Nouveautés
-- Changer de serveur → « Ouvrir dans une nouvelle fenêtre » ouvre une autre fenêtre de l'app liée au serveur choisi ; chaque fenêtre garde sa propre disposition et sa connexion.
-### Corrections
-- Relancer l'app de bureau ramène la fenêtre déjà ouverte au premier plan au lieu de démarrer une copie défectueuse aux panneaux de chat gris.
+- Bouton « Passation » dans la barre du chat dès que le contexte dépasse 40 % : l'agent résume la conversation, un nouveau chat avec le même agent et projet repart de ce résumé, et la fenêtre bascule dessus automatiquement.
 <!-- lang:it -->
 ### Novità
-- Cambia server → «Apri in una nuova finestra» apre un'altra finestra dell'app legata al server scelto; ogni finestra mantiene layout e accesso propri.
-### Correzioni
-- Avviare di nuovo l'app desktop porta in primo piano la finestra già aperta invece di avviare una copia difettosa con i pannelli chat grigi.
+- Pulsante «Passaggio» nella barra della chat quando il contesto supera il 40%: l'agente riassume la conversazione, una nuova chat con lo stesso agente e progetto riparte dal riepilogo e la finestra passa automaticamente a essa.
 <!-- lang:ja -->
 ### 新機能
-- サーバーを変更 →「新しいウィンドウで開く」で、選んだサーバー専用のアプリウィンドウをもう一つ開けます。各ウィンドウはレイアウトとログインを個別に保持します。
-### バグ修正
-- デスクトップアプリを再度起動すると、チャット欄が灰色になる不完全なコピーを起動せず、既に開いているウィンドウを前面に表示します。
+- コンテキストが40%を超えるとチャットバーに「引き継ぎ」ボタンが表示されます。エージェントが会話を要約し、同じエージェントとプロジェクトの新しいチャットがその要約から始まり、ウィンドウが自動で切り替わります。
 <!-- lang:ko -->
 ### 새 기능
-- 서버 변경 → ‘새 창에서 열기’로 선택한 서버에 고정된 앱 창을 하나 더 열 수 있습니다. 각 창은 자체 레이아웃과 로그인을 유지합니다.
-### 버그 수정
-- 데스크톱 앱을 다시 실행하면 채팅 영역이 회색으로 남는 잘못된 복사본을 시작하지 않고 이미 열린 창을 앞으로 가져옵니다.
+- 컨텍스트가 40%를 넘으면 채팅 바에 ‘인계’ 버튼이 나타납니다. 에이전트가 대화를 요약하고, 같은 에이전트와 프로젝트로 새 채팅이 그 요약에서 시작되며, 창이 자동으로 전환됩니다.
 <!-- lang:ru -->
 ### Новое
-- Сменить сервер → «Открыть в новом окне» открывает ещё одно окно приложения, привязанное к выбранному серверу; у каждого окна своя раскладка и вход.
-### Исправления
-- Повторный запуск десктопного приложения выводит уже открытое окно на передний план вместо запуска сломанной копии с серыми панелями чата.
+- Кнопка «Передача» в панели чата, когда контекст превышает 40%: агент кратко излагает разговор, новый чат с тем же агентом и проектом начинается с этой сводки, а окно автоматически переключается на него.
 <!-- lang:tr -->
 ### Yenilikler
-- Sunucuyu değiştir → “Yeni pencerede aç”, seçilen sunucuya bağlı başka bir uygulama penceresi açar; her pencere kendi düzenini ve oturumunu korur.
-### Hata düzeltmeleri
-- Masaüstü uygulamasını ikinci kez başlatmak, sohbet panelleri gri kalan bozuk bir kopya açmak yerine açık pencereyi öne getirir.
+- Bağlam %40'ı aştığında sohbet çubuğunda “Devir” düğmesi: ajan konuşmayı özetler, aynı ajan ve projeyle yeni bir sohbet bu özetle başlar ve pencere otomatik olarak ona geçer.
 <!-- lang:zh-CN -->
 ### 新功能
-- 更换服务器 →“在新窗口中打开”可为所选服务器再打开一个应用窗口；每个窗口保留各自的布局和登录。
-### 问题修复
-- 再次启动桌面应用时会将已打开的窗口置于前台，而不是启动一个聊天面板显示为灰色的损坏副本。
+- 上下文超过 40% 时，聊天栏会显示“交接”按钮：智能体总结对话，使用同一智能体和项目的新对话从该摘要开始，窗口会自动切换过去。
 <!-- lang:zh-TW -->
 ### 新功能
-- 更換伺服器 →「在新視窗中開啟」可為所選伺服器再開一個應用程式視窗；每個視窗保留各自的版面與登入。
-### 錯誤修正
-- 再次啟動桌面應用程式時會將已開啟的視窗移到最前方，而不是啟動聊天面板呈灰色的損壞副本。
+- 上下文超過 40% 時，聊天列會顯示「交接」按鈕：代理會總結對話，使用相同代理與專案的新對話從該摘要開始，視窗會自動切換過去。
