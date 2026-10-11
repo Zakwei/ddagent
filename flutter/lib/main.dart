@@ -73,8 +73,8 @@ class DdagentApp extends ConsumerStatefulWidget {
 
 class _DdagentAppState extends ConsumerState<DdagentApp> {
   // On quit: apply a staged desktop update (detached installer), then kill the
-  // app-spawned local server (an adopted external server is left alone;
-  // orphans are re-adopted on next launch anyway).
+  // app-spawned local server unless the user keeps it running (the default —
+  // the next launch adopts it instead of a cold start).
   late final AppLifecycleListener _lifecycle = AppLifecycleListener(
     // Cross-device workspace sync: flush pending pane edits before the OS
     // suspends us, and re-read the server's panes on every wake.
@@ -87,7 +87,9 @@ class _DdagentAppState extends ConsumerState<DdagentApp> {
       } on Object catch (_) {
         // A failed hand-off must never block quitting.
       }
-      await ref.read(localServerProvider.notifier).stop();
+      if (!ref.read(localServerKeepRunningProvider)) {
+        await ref.read(localServerProvider.notifier).stop();
+      }
       return AppExitResponse.exit;
     },
   );

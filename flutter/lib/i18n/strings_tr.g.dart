@@ -4689,6 +4689,7 @@ class Translations$serverConnect$local$tr extends Translations$serverConnect$loc
 	@override String get install => 'Yerel sunucuyu kur';
 	@override String get start => 'Yerel sunucuyu başlat';
 	@override String get stop => 'Durdur';
+	@override String get keepRunning => 'Uygulama kapandıktan sonra çalışmaya devam etsin (daha hızlı başlangıç)';
 	@override String get starting => 'Yerel sunucu başlatılıyor…';
 	@override String downloading({required Object percent}) => 'Sunucu indiriliyor… %${percent}';
 	@override String get installing => 'Kuruluyor…';
@@ -11450,6 +11451,7 @@ extension on TranslationsTr {
 			'serverConnect.local.install' => 'Yerel sunucuyu kur',
 			'serverConnect.local.start' => 'Yerel sunucuyu başlat',
 			'serverConnect.local.stop' => 'Durdur',
+			'serverConnect.local.keepRunning' => 'Uygulama kapandıktan sonra çalışmaya devam etsin (daha hızlı başlangıç)',
 			'serverConnect.local.starting' => 'Yerel sunucu başlatılıyor…',
 			'serverConnect.local.downloading' => ({required Object percent}) => 'Sunucu indiriliyor… %${percent}',
 			'serverConnect.local.installing' => 'Kuruluyor…',
@@ -11591,9 +11593,9 @@ extension on TranslationsTr {
 			'terminal.shortcuts.interrupt' => 'Kes (SIGINT)',
 			'terminal.shortcuts.eof' => 'EOF',
 			'terminal.shortcuts.suspend' => 'Askıya al (SIGTSTP)',
-			'terminal.shortcuts.hide' => 'Kısayol çubuğunu gizle',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.shortcuts.hide' => 'Kısayol çubuğunu gizle',
 			'terminal.shortcuts.showTooltip' => 'Kısayolları göster',
 			'terminal.shortcuts.hideTooltip' => 'Kısayolları gizle',
 			'terminal.paste.title' => 'Terminale yapıştır',

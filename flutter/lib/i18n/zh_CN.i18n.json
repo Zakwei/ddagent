@@ -3973,6 +3973,7 @@
       "install": "安装本地服务器",
       "start": "启动本地服务器",
       "stop": "停止",
+      "keepRunning": "关闭应用后保持运行（启动更快）",
       "starting": "正在启动本地服务器…",
       "downloading": "正在下载服务器… {{percent}}%",
       "installing": "正在安装…",

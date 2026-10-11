@@ -4722,6 +4722,7 @@ class Translations$serverConnect$local$ru extends Translations$serverConnect$loc
 	@override String get install => 'Установить локальный сервер';
 	@override String get start => 'Запустить локальный сервер';
 	@override String get stop => 'Остановить';
+	@override String get keepRunning => 'Не останавливать после закрытия приложения (быстрее запуск)';
 	@override String get starting => 'Запуск локального сервера…';
 	@override String downloading({required Object percent}) => 'Загрузка сервера… ${percent}%';
 	@override String get installing => 'Установка…';
@@ -11493,6 +11494,7 @@ extension on TranslationsRu {
 			'serverConnect.local.install' => 'Установить локальный сервер',
 			'serverConnect.local.start' => 'Запустить локальный сервер',
 			'serverConnect.local.stop' => 'Остановить',
+			'serverConnect.local.keepRunning' => 'Не останавливать после закрытия приложения (быстрее запуск)',
 			'serverConnect.local.starting' => 'Запуск локального сервера…',
 			'serverConnect.local.downloading' => ({required Object percent}) => 'Загрузка сервера… ${percent}%',
 			'serverConnect.local.installing' => 'Установка…',
@@ -11634,9 +11636,9 @@ extension on TranslationsRu {
 			'terminal.shortcuts.interrupt' => 'Прервать (SIGINT)',
 			'terminal.shortcuts.eof' => 'EOF',
 			'terminal.shortcuts.suspend' => 'Приостановить (SIGTSTP)',
-			'terminal.shortcuts.hide' => 'Скрыть панель горячих клавиш',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.shortcuts.hide' => 'Скрыть панель горячих клавиш',
 			'terminal.shortcuts.showTooltip' => 'Показать горячие клавиши',
 			'terminal.shortcuts.hideTooltip' => 'Скрыть горячие клавиши',
 			'terminal.paste.title' => 'Вставить в терминал',

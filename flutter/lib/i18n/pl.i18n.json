@@ -4024,6 +4024,7 @@
       "install": "Zainstaluj serwer lokalny",
       "start": "Uruchom serwer lokalny",
       "stop": "Zatrzymaj",
+      "keepRunning": "Zostaw działający po zamknięciu aplikacji (szybszy start)",
       "starting": "Uruchamianie serwera lokalnego…",
       "downloading": "Pobieranie serwera… {{percent}}%",
       "installing": "Instalowanie…",

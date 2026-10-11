@@ -4684,6 +4684,7 @@ class Translations$serverConnect$local$zh_TW extends Translations$serverConnect$
 	@override String get install => '安裝本機伺服器';
 	@override String get start => '啟動本機伺服器';
 	@override String get stop => '停止';
+	@override String get keepRunning => '關閉應用程式後保持執行（啟動更快）';
 	@override String get starting => '正在啟動本機伺服器…';
 	@override String downloading({required Object percent}) => '正在下載伺服器… ${percent}%';
 	@override String get installing => '正在安裝…';
@@ -11444,6 +11445,7 @@ extension on TranslationsZhTw {
 			'serverConnect.local.install' => '安裝本機伺服器',
 			'serverConnect.local.start' => '啟動本機伺服器',
 			'serverConnect.local.stop' => '停止',
+			'serverConnect.local.keepRunning' => '關閉應用程式後保持執行（啟動更快）',
 			'serverConnect.local.starting' => '正在啟動本機伺服器…',
 			'serverConnect.local.downloading' => ({required Object percent}) => '正在下載伺服器… ${percent}%',
 			'serverConnect.local.installing' => '正在安裝…',
@@ -11585,9 +11587,9 @@ extension on TranslationsZhTw {
 			'terminal.shortcuts.interrupt' => '中斷 (SIGINT)',
 			'terminal.shortcuts.eof' => 'EOF',
 			'terminal.shortcuts.suspend' => '暫停 (SIGTSTP)',
-			'terminal.shortcuts.hide' => '隱藏快速鍵列',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.shortcuts.hide' => '隱藏快速鍵列',
 			'terminal.shortcuts.showTooltip' => '顯示快速鍵',
 			'terminal.shortcuts.hideTooltip' => '隱藏快速鍵',
 			'terminal.paste.title' => '貼上至終端機',

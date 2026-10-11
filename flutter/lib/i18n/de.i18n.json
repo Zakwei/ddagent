@@ -3984,6 +3984,7 @@
       "install": "Lokalen Server installieren",
       "start": "Lokalen Server starten",
       "stop": "Stoppen",
+      "keepRunning": "Nach dem Schließen der App weiterlaufen lassen (schnellerer Start)",
       "starting": "Lokaler Server wird gestartet…",
       "downloading": "Server wird heruntergeladen… {{percent}}%",
       "installing": "Wird installiert…",

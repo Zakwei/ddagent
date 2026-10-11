@@ -360,6 +360,17 @@ class _LocalServerCard extends ConsumerWidget {
               _ => local.install,
             }),
           ),
+          if (s.stage != LocalServerStage.notInstalled && s.stage != LocalServerStage.unsupported)
+            Material(
+              type: MaterialType.transparency,
+              child: SwitchListTile(
+                dense: true,
+                contentPadding: EdgeInsets.zero,
+                title: Text(local.keepRunning, style: t.textTheme.bodySmall),
+                value: ref.watch(localServerKeepRunningProvider),
+                onChanged: (v) => ref.read(localServerKeepRunningProvider.notifier).set(v),
+              ),
+            ),
         ],
       ),
     );

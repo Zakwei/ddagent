@@ -4694,6 +4694,7 @@ class Translations$serverConnect$local$es extends Translations$serverConnect$loc
 	@override String get install => 'Instalar servidor local';
 	@override String get start => 'Iniciar servidor local';
 	@override String get stop => 'Detener';
+	@override String get keepRunning => 'Mantener en ejecución al cerrar la app (inicio más rápido)';
 	@override String get starting => 'Iniciando el servidor local…';
 	@override String downloading({required Object percent}) => 'Descargando el servidor… ${percent}%';
 	@override String get installing => 'Instalando…';
@@ -11455,6 +11456,7 @@ extension on TranslationsEs {
 			'serverConnect.local.install' => 'Instalar servidor local',
 			'serverConnect.local.start' => 'Iniciar servidor local',
 			'serverConnect.local.stop' => 'Detener',
+			'serverConnect.local.keepRunning' => 'Mantener en ejecución al cerrar la app (inicio más rápido)',
 			'serverConnect.local.starting' => 'Iniciando el servidor local…',
 			'serverConnect.local.downloading' => ({required Object percent}) => 'Descargando el servidor… ${percent}%',
 			'serverConnect.local.installing' => 'Instalando…',
@@ -11596,9 +11598,9 @@ extension on TranslationsEs {
 			'terminal.shortcuts.interrupt' => 'Interrumpir (SIGINT)',
 			'terminal.shortcuts.eof' => 'EOF',
 			'terminal.shortcuts.suspend' => 'Suspender (SIGTSTP)',
-			'terminal.shortcuts.hide' => 'Ocultar barra de atajos',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.shortcuts.hide' => 'Ocultar barra de atajos',
 			'terminal.shortcuts.showTooltip' => 'Mostrar atajos',
 			'terminal.shortcuts.hideTooltip' => 'Ocultar atajos',
 			'terminal.paste.title' => 'Pegar en la terminal',

@@ -8513,6 +8513,9 @@ class Translations$serverConnect$local$en {
 	/// en: 'Stop'
 	String get stop => 'Stop';
 
+	/// en: 'Keep running after the app closes (faster start)'
+	String get keepRunning => 'Keep running after the app closes (faster start)';
+
 	/// en: 'Starting local server…'
 	String get starting => 'Starting local server…';
 
@@ -17917,6 +17920,7 @@ extension on Translations {
 			'serverConnect.local.install' => 'Install local server',
 			'serverConnect.local.start' => 'Start local server',
 			'serverConnect.local.stop' => 'Stop',
+			'serverConnect.local.keepRunning' => 'Keep running after the app closes (faster start)',
 			'serverConnect.local.starting' => 'Starting local server…',
 			'serverConnect.local.downloading' => ({required Object percent}) => 'Downloading server… ${percent}%',
 			'serverConnect.local.installing' => 'Installing…',
@@ -18058,9 +18062,9 @@ extension on Translations {
 			'terminal.shortcuts.interrupt' => 'Interrupt (SIGINT)',
 			'terminal.shortcuts.eof' => 'EOF',
 			'terminal.shortcuts.suspend' => 'Suspend (SIGTSTP)',
-			'terminal.shortcuts.hide' => 'Hide shortcuts bar',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.shortcuts.hide' => 'Hide shortcuts bar',
 			'terminal.shortcuts.showTooltip' => 'Show Shortcuts',
 			'terminal.shortcuts.hideTooltip' => 'Hide Shortcuts',
 			'terminal.paste.title' => 'Paste into terminal',

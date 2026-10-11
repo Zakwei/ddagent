@@ -3973,6 +3973,7 @@
       "install": "로컬 서버 설치",
       "start": "로컬 서버 시작",
       "stop": "중지",
+      "keepRunning": "앱을 닫은 후에도 계속 실행 (더 빠른 시작)",
       "starting": "로컬 서버 시작 중…",
       "downloading": "서버 다운로드 중… {{percent}}%",
       "installing": "설치 중…",

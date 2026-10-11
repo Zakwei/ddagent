@@ -3973,6 +3973,7 @@
       "install": "安裝本機伺服器",
       "start": "啟動本機伺服器",
       "stop": "停止",
+      "keepRunning": "關閉應用程式後保持執行（啟動更快）",
       "starting": "正在啟動本機伺服器…",
       "downloading": "正在下載伺服器… {{percent}}%",
       "installing": "正在安裝…",

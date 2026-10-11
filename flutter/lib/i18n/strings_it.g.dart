@@ -4694,6 +4694,7 @@ class Translations$serverConnect$local$it extends Translations$serverConnect$loc
 	@override String get install => 'Installa il server locale';
 	@override String get start => 'Avvia il server locale';
 	@override String get stop => 'Arresta';
+	@override String get keepRunning => 'Lascia in esecuzione dopo la chiusura dell\'app (avvio più rapido)';
 	@override String get starting => 'Avvio del server locale…';
 	@override String downloading({required Object percent}) => 'Download del server… ${percent}%';
 	@override String get installing => 'Installazione…';
@@ -11455,6 +11456,7 @@ extension on TranslationsIt {
 			'serverConnect.local.install' => 'Installa il server locale',
 			'serverConnect.local.start' => 'Avvia il server locale',
 			'serverConnect.local.stop' => 'Arresta',
+			'serverConnect.local.keepRunning' => 'Lascia in esecuzione dopo la chiusura dell\'app (avvio più rapido)',
 			'serverConnect.local.starting' => 'Avvio del server locale…',
 			'serverConnect.local.downloading' => ({required Object percent}) => 'Download del server… ${percent}%',
 			'serverConnect.local.installing' => 'Installazione…',
@@ -11596,9 +11598,9 @@ extension on TranslationsIt {
 			'terminal.shortcuts.interrupt' => 'Interrompi (SIGINT)',
 			'terminal.shortcuts.eof' => 'EOF',
 			'terminal.shortcuts.suspend' => 'Sospendi (SIGTSTP)',
-			'terminal.shortcuts.hide' => 'Nascondi barra scorciatoie',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.shortcuts.hide' => 'Nascondi barra scorciatoie',
 			'terminal.shortcuts.showTooltip' => 'Mostra scorciatoie',
 			'terminal.shortcuts.hideTooltip' => 'Nascondi scorciatoie',
 			'terminal.paste.title' => 'Incolla nel terminale',

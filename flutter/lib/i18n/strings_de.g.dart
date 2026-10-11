@@ -4694,6 +4694,7 @@ class Translations$serverConnect$local$de extends Translations$serverConnect$loc
 	@override String get install => 'Lokalen Server installieren';
 	@override String get start => 'Lokalen Server starten';
 	@override String get stop => 'Stoppen';
+	@override String get keepRunning => 'Nach dem Schließen der App weiterlaufen lassen (schnellerer Start)';
 	@override String get starting => 'Lokaler Server wird gestartet…';
 	@override String downloading({required Object percent}) => 'Server wird heruntergeladen… ${percent}%';
 	@override String get installing => 'Wird installiert…';
@@ -11455,6 +11456,7 @@ extension on TranslationsDe {
 			'serverConnect.local.install' => 'Lokalen Server installieren',
 			'serverConnect.local.start' => 'Lokalen Server starten',
 			'serverConnect.local.stop' => 'Stoppen',
+			'serverConnect.local.keepRunning' => 'Nach dem Schließen der App weiterlaufen lassen (schnellerer Start)',
 			'serverConnect.local.starting' => 'Lokaler Server wird gestartet…',
 			'serverConnect.local.downloading' => ({required Object percent}) => 'Server wird heruntergeladen… ${percent}%',
 			'serverConnect.local.installing' => 'Wird installiert…',
@@ -11596,9 +11598,9 @@ extension on TranslationsDe {
 			'terminal.shortcuts.interrupt' => 'Unterbrechen (SIGINT)',
 			'terminal.shortcuts.eof' => 'EOF',
 			'terminal.shortcuts.suspend' => 'Anhalten (SIGTSTP)',
-			'terminal.shortcuts.hide' => 'Tastenkürzel-Leiste ausblenden',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.shortcuts.hide' => 'Tastenkürzel-Leiste ausblenden',
 			'terminal.shortcuts.showTooltip' => 'Tastenkürzel anzeigen',
 			'terminal.shortcuts.hideTooltip' => 'Tastenkürzel ausblenden',
 			'terminal.paste.title' => 'In Terminal einfügen',

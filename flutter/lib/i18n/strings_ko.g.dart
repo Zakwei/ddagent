@@ -4684,6 +4684,7 @@ class Translations$serverConnect$local$ko extends Translations$serverConnect$loc
 	@override String get install => '로컬 서버 설치';
 	@override String get start => '로컬 서버 시작';
 	@override String get stop => '중지';
+	@override String get keepRunning => '앱을 닫은 후에도 계속 실행 (더 빠른 시작)';
 	@override String get starting => '로컬 서버 시작 중…';
 	@override String downloading({required Object percent}) => '서버 다운로드 중… ${percent}%';
 	@override String get installing => '설치 중…';
@@ -11444,6 +11445,7 @@ extension on TranslationsKo {
 			'serverConnect.local.install' => '로컬 서버 설치',
 			'serverConnect.local.start' => '로컬 서버 시작',
 			'serverConnect.local.stop' => '중지',
+			'serverConnect.local.keepRunning' => '앱을 닫은 후에도 계속 실행 (더 빠른 시작)',
 			'serverConnect.local.starting' => '로컬 서버 시작 중…',
 			'serverConnect.local.downloading' => ({required Object percent}) => '서버 다운로드 중… ${percent}%',
 			'serverConnect.local.installing' => '설치 중…',
@@ -11585,9 +11587,9 @@ extension on TranslationsKo {
 			'terminal.shortcuts.interrupt' => '중단 (SIGINT)',
 			'terminal.shortcuts.eof' => 'EOF',
 			'terminal.shortcuts.suspend' => '일시 중단 (SIGTSTP)',
-			'terminal.shortcuts.hide' => '단축키 표시줄 숨기기',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.shortcuts.hide' => '단축키 표시줄 숨기기',
 			'terminal.shortcuts.showTooltip' => '단축키 표시',
 			'terminal.shortcuts.hideTooltip' => '단축키 숨기기',
 			'terminal.paste.title' => '터미널에 붙여넣기',

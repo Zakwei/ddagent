@@ -3979,6 +3979,7 @@
       "install": "Yerel sunucuyu kur",
       "start": "Yerel sunucuyu başlat",
       "stop": "Durdur",
+      "keepRunning": "Uygulama kapandıktan sonra çalışmaya devam etsin (daha hızlı başlangıç)",
       "starting": "Yerel sunucu başlatılıyor…",
       "downloading": "Sunucu indiriliyor… %{{percent}}",
       "installing": "Kuruluyor…",

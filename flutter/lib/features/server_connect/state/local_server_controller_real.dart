@@ -2,13 +2,19 @@ import 'dart:async';
 
 import 'package:ddagent_app/core/platform/instance.dart';
 import 'package:ddagent_app/features/server_connect/data/local_server.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Mirrors [LocalServerService.status] into Riverpod — the service owns the
 /// process/disk logic, this notifier only forwards status changes and guards
 /// the install → start pipeline.
 class LocalServerController extends Notifier<LocalServerStatus> {
-  late final LocalServerService _service = LocalServerService(
+  LocalServerController({@visibleForTesting this.createService = LocalServerService.new});
+
+  final LocalServerService Function({void Function(LocalServerStatus status)? onStatus})
+  createService;
+
+  late final LocalServerService _service = createService(
     onStatus: (status) {
       if (ref.mounted) state = status;
     },
@@ -24,6 +30,11 @@ class LocalServerController extends Notifier<LocalServerStatus> {
   /// A server-pinned window never upgrades the local server — that would
   /// restart it under the primary window.
   bool _updateChecked = isSecondaryInstance;
+
+  /// Last time [ensureRunning] saw the server up — the router guard calls it
+  /// on every navigation, so recent proof skips the disk + HTTP probes.
+  DateTime? _verifiedAt;
+  static const _verifiedFor = Duration(seconds: 30);
 
   @override
   LocalServerStatus build() {
@@ -63,6 +74,12 @@ class LocalServerController extends Notifier<LocalServerStatus> {
       _inFlightEnsure ??= _ensureRunning().whenComplete(() => _inFlightEnsure = null);
 
   Future<String?> _ensureRunning() async {
+    final verified = _verifiedAt;
+    if (state.stage == LocalServerStage.running &&
+        verified != null &&
+        DateTime.now().difference(verified) < _verifiedFor) {
+      return state.url ?? LocalServerService.localUrl;
+    }
     // No early "running" return: a stale adopted/orphaned process must go
     // through install() + start() so it gets replaced with the bundle on disk.
     if (await _service.installedVersion == null && !await _service.hasBundleRemains) {
@@ -81,13 +98,18 @@ class LocalServerController extends Notifier<LocalServerStatus> {
       }
     }
     try {
-      return await _service.start();
+      final url = await _service.start();
+      _verifiedAt = DateTime.now();
+      return url;
     } on Object {
       return null; // error stage was already set by the service.
     }
   }
 
-  Future<void> stop() => _service.stop();
+  Future<void> stop() {
+    _verifiedAt = null;
+    return _service.stop();
+  }
 }
 
 final localServerProvider = NotifierProvider<LocalServerController, LocalServerStatus>(

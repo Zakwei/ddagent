@@ -4684,6 +4684,7 @@ class Translations$serverConnect$local$ja extends Translations$serverConnect$loc
 	@override String get install => 'ローカルサーバーをインストール';
 	@override String get start => 'ローカルサーバーを起動';
 	@override String get stop => '停止';
+	@override String get keepRunning => 'アプリ終了後も実行し続ける（起動が速くなります）';
 	@override String get starting => 'ローカルサーバーを起動中…';
 	@override String downloading({required Object percent}) => 'サーバーをダウンロード中… ${percent}%';
 	@override String get installing => 'インストール中…';
@@ -11444,6 +11445,7 @@ extension on TranslationsJa {
 			'serverConnect.local.install' => 'ローカルサーバーをインストール',
 			'serverConnect.local.start' => 'ローカルサーバーを起動',
 			'serverConnect.local.stop' => '停止',
+			'serverConnect.local.keepRunning' => 'アプリ終了後も実行し続ける（起動が速くなります）',
 			'serverConnect.local.starting' => 'ローカルサーバーを起動中…',
 			'serverConnect.local.downloading' => ({required Object percent}) => 'サーバーをダウンロード中… ${percent}%',
 			'serverConnect.local.installing' => 'インストール中…',
@@ -11585,9 +11587,9 @@ extension on TranslationsJa {
 			'terminal.shortcuts.interrupt' => '中断 (SIGINT)',
 			'terminal.shortcuts.eof' => 'EOF',
 			'terminal.shortcuts.suspend' => '一時停止 (SIGTSTP)',
-			'terminal.shortcuts.hide' => 'ショートカットバーを非表示',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.shortcuts.hide' => 'ショートカットバーを非表示',
 			'terminal.shortcuts.showTooltip' => 'ショートカットを表示',
 			'terminal.shortcuts.hideTooltip' => 'ショートカットを非表示',
 			'terminal.paste.title' => 'ターミナルに貼り付け',

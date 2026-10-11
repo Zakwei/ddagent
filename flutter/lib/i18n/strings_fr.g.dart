@@ -4694,6 +4694,7 @@ class Translations$serverConnect$local$fr extends Translations$serverConnect$loc
 	@override String get install => 'Installer le serveur local';
 	@override String get start => 'Démarrer le serveur local';
 	@override String get stop => 'Arrêter';
+	@override String get keepRunning => 'Laisser tourner après la fermeture de l\'app (démarrage plus rapide)';
 	@override String get starting => 'Démarrage du serveur local…';
 	@override String downloading({required Object percent}) => 'Téléchargement du serveur… ${percent} %';
 	@override String get installing => 'Installation…';
@@ -11455,6 +11456,7 @@ extension on TranslationsFr {
 			'serverConnect.local.install' => 'Installer le serveur local',
 			'serverConnect.local.start' => 'Démarrer le serveur local',
 			'serverConnect.local.stop' => 'Arrêter',
+			'serverConnect.local.keepRunning' => 'Laisser tourner après la fermeture de l\'app (démarrage plus rapide)',
 			'serverConnect.local.starting' => 'Démarrage du serveur local…',
 			'serverConnect.local.downloading' => ({required Object percent}) => 'Téléchargement du serveur… ${percent} %',
 			'serverConnect.local.installing' => 'Installation…',
@@ -11596,9 +11598,9 @@ extension on TranslationsFr {
 			'terminal.shortcuts.interrupt' => 'Interrompre (SIGINT)',
 			'terminal.shortcuts.eof' => 'EOF',
 			'terminal.shortcuts.suspend' => 'Suspendre (SIGTSTP)',
-			'terminal.shortcuts.hide' => 'Masquer la barre de raccourcis',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.shortcuts.hide' => 'Masquer la barre de raccourcis',
 			'terminal.shortcuts.showTooltip' => 'Afficher les raccourcis',
 			'terminal.shortcuts.hideTooltip' => 'Masquer les raccourcis',
 			'terminal.paste.title' => 'Coller dans le terminal',

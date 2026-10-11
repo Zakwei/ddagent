@@ -4684,6 +4684,7 @@ class Translations$serverConnect$local$zh_CN extends Translations$serverConnect$
 	@override String get install => '安装本地服务器';
 	@override String get start => '启动本地服务器';
 	@override String get stop => '停止';
+	@override String get keepRunning => '关闭应用后保持运行（启动更快）';
 	@override String get starting => '正在启动本地服务器…';
 	@override String downloading({required Object percent}) => '正在下载服务器… ${percent}%';
 	@override String get installing => '正在安装…';
@@ -11444,6 +11445,7 @@ extension on TranslationsZhCn {
 			'serverConnect.local.install' => '安装本地服务器',
 			'serverConnect.local.start' => '启动本地服务器',
 			'serverConnect.local.stop' => '停止',
+			'serverConnect.local.keepRunning' => '关闭应用后保持运行（启动更快）',
 			'serverConnect.local.starting' => '正在启动本地服务器…',
 			'serverConnect.local.downloading' => ({required Object percent}) => '正在下载服务器… ${percent}%',
 			'serverConnect.local.installing' => '正在安装…',
@@ -11585,9 +11587,9 @@ extension on TranslationsZhCn {
 			'terminal.shortcuts.interrupt' => '中断 (SIGINT)',
 			'terminal.shortcuts.eof' => 'EOF',
 			'terminal.shortcuts.suspend' => '挂起 (SIGTSTP)',
-			'terminal.shortcuts.hide' => '隐藏快捷键栏',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.shortcuts.hide' => '隐藏快捷键栏',
 			'terminal.shortcuts.showTooltip' => '显示快捷键',
 			'terminal.shortcuts.hideTooltip' => '隐藏快捷键',
 			'terminal.paste.title' => '粘贴到终端',

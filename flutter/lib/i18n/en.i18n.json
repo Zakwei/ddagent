@@ -3984,6 +3984,7 @@
       "install": "Install local server",
       "start": "Start local server",
       "stop": "Stop",
+      "keepRunning": "Keep running after the app closes (faster start)",
       "starting": "Starting local server…",
       "downloading": "Downloading server… {{percent}}%",
       "installing": "Installing…",
