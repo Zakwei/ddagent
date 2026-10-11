@@ -127,6 +127,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
   int _seenCount = 0;
   int _rowCount = 0;
   String _transcriptSelection = '';
+  final _selectableChildKey = GlobalKey();
 
   /// Composers keep their own node internally; this shared one is passed in
   /// so `focusFollowsPointer` can target the field from the pane level
@@ -681,6 +682,8 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
       enable
           ? await BrowserContextMenu.enableContextMenu()
           : await BrowserContextMenu.disableContextMenu();
+      // Swap the region now (see the SelectionArea key), not mid-drag.
+      if (mounted) setState(() {});
     }
 
     return MouseRegion(
@@ -695,7 +698,13 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
             },
           ),
         },
+        // SelectableRegion wraps its container for the browser menu only while
+        // that menu is enabled; flipping it under a live region re-registers
+        // the container out of order and leaves the region with nothing to
+        // select. A fresh region per flag value avoids that, and the GlobalKey
+        // keeps the transcript (scroll position, state) across the swap.
         child: SelectionArea(
+          key: ValueKey(BrowserContextMenu.enabled),
           onSelectionChanged: (content) {
             _transcriptSelection = content?.plainText ?? '';
             reportSelectionText(_transcriptSelection);
@@ -714,7 +723,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                     : item,
             ],
           ),
-          child: child,
+          child: KeyedSubtree(key: _selectableChildKey, child: child),
         ),
       ),
     );
