@@ -23,6 +23,7 @@ import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
 import 'package:ddagent_app/features/settings/state/ui_preferences_controller.dart';
 import 'package:ddagent_app/features/shared_context/view/shared_notes_pane.dart';
 import 'package:ddagent_app/features/terminal/view/terminal_screen.dart';
+import 'package:ddagent_app/features/workspace/state/finished_panes.dart';
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
 import 'package:ddagent_app/features/workspace/state/workspace_controller.dart';
 import 'package:ddagent_app/features/workspace/view/pane_header_metrics.dart';
@@ -148,16 +149,21 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
     });
     // The server keeps the finished turn (`turnFinishedAt`) so the flag
     // survives a reload; the local set covers turns that ended since the
-    // session list was last fetched.
+    // session list was last fetched. Claude sends `complete` while background
+    // subagents/shells may still run, so a session with background tasks is
+    // not finished yet — the tab turns green once their count drops to zero.
     final turnFinishedIds = {
       for (final s in sessions)
         if (s.turnFinishedAt != null) s.sessionId,
     };
-    final finishedPaneIds = {
-      ..._finishedPaneIds,
-      for (final p in ws.panes)
-        if (turnFinishedIds.contains(p.sessionId) && !processingIds.contains(p.sessionId)) p.id,
-    };
+    final backgroundTaskIds = ref.watch(backgroundTasksProvider).keys.toSet();
+    final finishedPaneIds = resolveFinishedPaneIds(
+      panes: ws.panes,
+      locallyFinishedPaneIds: _finishedPaneIds,
+      turnFinishedSessionIds: turnFinishedIds,
+      processingSessionIds: processingIds,
+      backgroundTaskSessionIds: backgroundTaskIds,
+    );
 
     // An empty workspace renders nothing, which makes "new session"
     // unreachable — seed one chat pane in picker state so the session list
