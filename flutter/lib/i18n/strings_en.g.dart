@@ -8396,6 +8396,12 @@ class Translations$quota$config$en {
 	/// en: 'Poller & alerts'
 	String get pollerTitle => 'Poller & alerts';
 
+	/// en: 'Start Claude 5h windows early'
+	String get claudeWindowWarmup => 'Start Claude 5h windows early';
+
+	/// en: 'Sends a tiny Haiku prompt to Claude accounts whose 5-hour window hasn't started (uses a little quota)'
+	String get claudeWindowWarmupHint => 'Sends a tiny Haiku prompt to Claude accounts whose 5-hour window hasn\'t started (uses a little quota)';
+
 	/// en: 'Account routing'
 	String get accountRouting => 'Account routing';
 
@@ -17877,6 +17883,8 @@ extension on Translations {
 			'quota.overview.tokensAndCost' => 'Tokens and cost',
 			'quota.agents.statusCount' => ({required Object status, required Object count}) => '${status} (${count})',
 			'quota.config.pollerTitle' => 'Poller & alerts',
+			'quota.config.claudeWindowWarmup' => 'Start Claude 5h windows early',
+			'quota.config.claudeWindowWarmupHint' => 'Sends a tiny Haiku prompt to Claude accounts whose 5-hour window hasn\'t started (uses a little quota)',
 			'quota.config.accountRouting' => 'Account routing',
 			'quota.config.save' => 'Save config',
 			'quota.chart.show' => 'Show',
@@ -18060,10 +18068,10 @@ extension on Translations {
 			'terminal.authUrl.linkLabel' => ({required Object url}) => 'Auth link: ${url}',
 			'terminal.fileLink.detected' => ({required Object path}) => 'File detected: ${path}',
 			'terminal.shortcuts.interrupt' => 'Interrupt (SIGINT)',
-			'terminal.shortcuts.eof' => 'EOF',
-			'terminal.shortcuts.suspend' => 'Suspend (SIGTSTP)',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.shortcuts.eof' => 'EOF',
+			'terminal.shortcuts.suspend' => 'Suspend (SIGTSTP)',
 			'terminal.shortcuts.hide' => 'Hide shortcuts bar',
 			'terminal.shortcuts.showTooltip' => 'Show Shortcuts',
 			'terminal.shortcuts.hideTooltip' => 'Hide Shortcuts',

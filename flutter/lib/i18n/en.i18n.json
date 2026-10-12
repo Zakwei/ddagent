@@ -3927,6 +3927,8 @@
     },
     "config": {
       "pollerTitle": "Poller & alerts",
+      "claudeWindowWarmup": "Start Claude 5h windows early",
+      "claudeWindowWarmupHint": "Sends a tiny Haiku prompt to Claude accounts whose 5-hour window hasn't started (uses a little quota)",
       "accountRouting": "Account routing",
       "save": "Save config"
     },

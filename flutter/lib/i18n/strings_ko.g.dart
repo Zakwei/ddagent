@@ -4615,6 +4615,8 @@ class Translations$quota$config$ko extends Translations$quota$config$en {
 
 	// Translations
 	@override String get pollerTitle => '폴링 및 알림';
+	@override String get claudeWindowWarmup => 'Claude 5시간 창 미리 시작';
+	@override String get claudeWindowWarmupHint => '5시간 창이 아직 시작되지 않은 Claude 계정에 작은 Haiku 프롬프트를 보냅니다 (할당량을 약간 사용)';
 	@override String get accountRouting => '계정 라우팅';
 	@override String get save => '설정 저장';
 }
@@ -11402,6 +11404,8 @@ extension on TranslationsKo {
 			'quota.overview.tokensAndCost' => '토큰 및 비용',
 			'quota.agents.statusCount' => ({required Object status, required Object count}) => '${status} (${count})',
 			'quota.config.pollerTitle' => '폴링 및 알림',
+			'quota.config.claudeWindowWarmup' => 'Claude 5시간 창 미리 시작',
+			'quota.config.claudeWindowWarmupHint' => '5시간 창이 아직 시작되지 않은 Claude 계정에 작은 Haiku 프롬프트를 보냅니다 (할당량을 약간 사용)',
 			'quota.config.accountRouting' => '계정 라우팅',
 			'quota.config.save' => '설정 저장',
 			'quota.chart.show' => '표시',
@@ -11585,10 +11589,10 @@ extension on TranslationsKo {
 			'terminal.authUrl.linkLabel' => ({required Object url}) => '인증 링크: ${url}',
 			'terminal.fileLink.detected' => ({required Object path}) => '파일 감지됨: ${path}',
 			'terminal.shortcuts.interrupt' => '중단 (SIGINT)',
-			'terminal.shortcuts.eof' => 'EOF',
-			'terminal.shortcuts.suspend' => '일시 중단 (SIGTSTP)',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.shortcuts.eof' => 'EOF',
+			'terminal.shortcuts.suspend' => '일시 중단 (SIGTSTP)',
 			'terminal.shortcuts.hide' => '단축키 표시줄 숨기기',
 			'terminal.shortcuts.showTooltip' => '단축키 표시',
 			'terminal.shortcuts.hideTooltip' => '단축키 숨기기',

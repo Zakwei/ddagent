@@ -4653,6 +4653,8 @@ class Translations$quota$config$ru extends Translations$quota$config$en {
 
 	// Translations
 	@override String get pollerTitle => 'Опрос и оповещения';
+	@override String get claudeWindowWarmup => 'Заранее запускать 5-часовые окна Claude';
+	@override String get claudeWindowWarmupHint => 'Отправляет крошечный запрос Haiku аккаунтам Claude, у которых 5-часовое окно ещё не началось (расходует немного лимита)';
 	@override String get accountRouting => 'Маршрутизация аккаунтов';
 	@override String get save => 'Сохранить конфигурацию';
 }
@@ -11451,6 +11453,8 @@ extension on TranslationsRu {
 			'quota.overview.tokensAndCost' => 'Токены и стоимость',
 			'quota.agents.statusCount' => ({required Object status, required Object count}) => '${status} (${count})',
 			'quota.config.pollerTitle' => 'Опрос и оповещения',
+			'quota.config.claudeWindowWarmup' => 'Заранее запускать 5-часовые окна Claude',
+			'quota.config.claudeWindowWarmupHint' => 'Отправляет крошечный запрос Haiku аккаунтам Claude, у которых 5-часовое окно ещё не началось (расходует немного лимита)',
 			'quota.config.accountRouting' => 'Маршрутизация аккаунтов',
 			'quota.config.save' => 'Сохранить конфигурацию',
 			'quota.chart.show' => 'Показать',
@@ -11634,10 +11638,10 @@ extension on TranslationsRu {
 			'terminal.authUrl.linkLabel' => ({required Object url}) => 'Ссылка для входа: ${url}',
 			'terminal.fileLink.detected' => ({required Object path}) => 'Обнаружен файл: ${path}',
 			'terminal.shortcuts.interrupt' => 'Прервать (SIGINT)',
-			'terminal.shortcuts.eof' => 'EOF',
-			'terminal.shortcuts.suspend' => 'Приостановить (SIGTSTP)',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.shortcuts.eof' => 'EOF',
+			'terminal.shortcuts.suspend' => 'Приостановить (SIGTSTP)',
 			'terminal.shortcuts.hide' => 'Скрыть панель горячих клавиш',
 			'terminal.shortcuts.showTooltip' => 'Показать горячие клавиши',
 			'terminal.shortcuts.hideTooltip' => 'Скрыть горячие клавиши',

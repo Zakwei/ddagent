@@ -87,9 +87,12 @@ class _FakeQuotaRepo extends QuotaRepository {
     ],
   };
 
+  Map<String, dynamic>? savedConfig;
+
   @override
   Future<void> saveConfig(Map<String, dynamic> body) async {
     if (opError != null) throw opError!;
+    savedConfig = body;
     calls.add('saveConfig:${body['routingMode']}');
   }
 
@@ -243,6 +246,7 @@ void main() {
       final json = {
         'routingMode': 'auto-low-risk',
         'alertsEnabled': true,
+        'claudeWindowWarmup': true,
         'watchThreshold': 65,
         'dangerThreshold': 85,
         'accounts': [
@@ -264,6 +268,8 @@ void main() {
       final config = QuotaConfig.fromJson(json);
       expect(config.routingMode, 'auto-low-risk');
       expect(config.alertsEnabled, isTrue);
+      expect(config.claudeWindowWarmup, isTrue);
+      expect(QuotaConfig.fromJson(const {}).claudeWindowWarmup, isFalse);
       expect(config.watchThreshold, 65.0);
       expect(config.dangerThreshold, 85.0);
       expect(config.accounts.length, 2);
@@ -275,6 +281,7 @@ void main() {
       final exported = config.toJson();
       expect(exported['routingMode'], 'auto-low-risk');
       expect(exported['alertsEnabled'], isTrue);
+      expect(exported['claudeWindowWarmup'], isTrue);
       expect((exported['accounts'] as List).length, 2);
     });
 
@@ -737,10 +744,17 @@ void main() {
       await t.tap(find.text('Auto-switch for low-risk tasks'));
       await t.pumpAndSettle();
 
+      // Włączenie wczesnego startu okien 5h Claude
+      await t.tap(find.text('Start Claude 5h windows early'));
+      await t.pumpAndSettle();
+
       // Zapis
+      await t.ensureVisible(find.text('Save config'));
+      await t.pumpAndSettle();
       await t.tap(find.text('Save config'));
       await t.pumpAndSettle();
       expect(repo.calls, contains('saveConfig:auto-low-risk'));
+      expect(repo.savedConfig!['claudeWindowWarmup'], isTrue);
     });
 
     testWidgets('przycisk Sync now wywołuje refresh()', (t) async {

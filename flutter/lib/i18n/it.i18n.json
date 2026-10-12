@@ -3927,6 +3927,8 @@
     },
     "config": {
       "pollerTitle": "Polling e avvisi",
+      "claudeWindowWarmup": "Avvia in anticipo le finestre di 5 ore di Claude",
+      "claudeWindowWarmupHint": "Invia un mini prompt Haiku agli account Claude la cui finestra di 5 ore non è ancora iniziata (consuma un po' di quota)",
       "accountRouting": "Routing account",
       "save": "Salva configurazione"
     },

@@ -437,6 +437,7 @@ class QuotaConfig {
   const QuotaConfig({
     this.routingMode = 'manual',
     this.alertsEnabled = true,
+    this.claudeWindowWarmup = false,
     this.watchThreshold = 0,
     this.dangerThreshold = 0,
     this.accounts = const [],
@@ -444,6 +445,7 @@ class QuotaConfig {
 
   final String routingMode; // manual | ask | auto-low-risk
   final bool alertsEnabled;
+  final bool claudeWindowWarmup;
   final double watchThreshold;
   final double dangerThreshold;
   final List<QuotaAccountConfig> accounts;
@@ -451,6 +453,7 @@ class QuotaConfig {
   static QuotaConfig fromJson(Map<String, dynamic> j) => QuotaConfig(
     routingMode: _str(j['routingMode']).isEmpty ? 'manual' : _str(j['routingMode']),
     alertsEnabled: j['alertsEnabled'] != false,
+    claudeWindowWarmup: j['claudeWindowWarmup'] == true,
     watchThreshold: _num(j['watchThreshold']).toDouble(),
     dangerThreshold: _num(j['dangerThreshold']).toDouble(),
     accounts: [
@@ -462,6 +465,7 @@ class QuotaConfig {
   Map<String, dynamic> toJson() => {
     'routingMode': routingMode,
     'alertsEnabled': alertsEnabled,
+    'claudeWindowWarmup': claudeWindowWarmup,
     'watchThreshold': watchThreshold,
     'dangerThreshold': dangerThreshold,
     'accounts': [

@@ -3967,6 +3967,8 @@
     },
     "config": {
       "pollerTitle": "Odpytywanie i alerty",
+      "claudeWindowWarmup": "Wcześniej uruchamiaj 5-godzinne okna Claude",
+      "claudeWindowWarmupHint": "Wysyła mini zapytanie Haiku do kont Claude, których 5-godzinne okno jeszcze nie biegnie (zużywa odrobinę limitu)",
       "accountRouting": "Routing kont",
       "save": "Zapisz konfigurację"
     },

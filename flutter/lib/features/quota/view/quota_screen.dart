@@ -1111,6 +1111,7 @@ class _ConfigPanelState extends ConsumerState<_ConfigPanel> {
   late final TextEditingController _watch;
   late final TextEditingController _danger;
   bool _alerts = true;
+  bool _warmup = false;
   String _routing = 'manual';
   final Map<String, bool> _accountRouting = {};
   bool _loaded = false;
@@ -1130,6 +1131,7 @@ class _ConfigPanelState extends ConsumerState<_ConfigPanel> {
     _watch.text = cfg.watchThreshold.toStringAsFixed(0);
     _danger.text = cfg.dangerThreshold.toStringAsFixed(0);
     _alerts = cfg.alertsEnabled;
+    _warmup = cfg.claudeWindowWarmup;
     _routing = cfg.routingMode;
     for (final a in cfg.accounts) {
       _accountRouting[a.accountId] = a.routingEnabled;
@@ -1186,6 +1188,17 @@ class _ConfigPanelState extends ConsumerState<_ConfigPanel> {
                   ),
                   value: _alerts,
                   onChanged: (v) => setState(() => _alerts = v),
+                ),
+                SwitchListTile(
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(i18n.quota.config.claudeWindowWarmup),
+                  subtitle: Text(
+                    i18n.quota.config.claudeWindowWarmupHint,
+                    style: t.labelSmall?.copyWith(color: c.mutedForeground),
+                  ),
+                  value: _warmup,
+                  onChanged: (v) => setState(() => _warmup = v),
                 ),
                 Wrap(
                   spacing: AppSpacing.sm,
@@ -1251,6 +1264,7 @@ class _ConfigPanelState extends ConsumerState<_ConfigPanel> {
                       final next = QuotaConfig(
                         routingMode: _routing,
                         alertsEnabled: _alerts,
+                        claudeWindowWarmup: _warmup,
                         watchThreshold: watchV.toDouble(),
                         dangerThreshold: dangerV.toDouble(),
                         accounts: [

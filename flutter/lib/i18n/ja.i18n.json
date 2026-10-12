@@ -3916,6 +3916,8 @@
     },
     "config": {
       "pollerTitle": "ポーラーとアラート",
+      "claudeWindowWarmup": "Claude の 5 時間枠を早めに開始",
+      "claudeWindowWarmupHint": "5 時間枠がまだ始まっていない Claude アカウントに小さな Haiku プロンプトを送信します（クォータを少し消費します）",
       "accountRouting": "アカウントのルーティング",
       "save": "設定を保存"
     },

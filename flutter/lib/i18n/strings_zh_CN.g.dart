@@ -4615,6 +4615,8 @@ class Translations$quota$config$zh_CN extends Translations$quota$config$en {
 
 	// Translations
 	@override String get pollerTitle => '轮询与提醒';
+	@override String get claudeWindowWarmup => '提前开启 Claude 5 小时窗口';
+	@override String get claudeWindowWarmupHint => '向 5 小时窗口尚未开始的 Claude 账户发送一条极小的 Haiku 提示（会消耗少量额度）';
 	@override String get accountRouting => '账户路由';
 	@override String get save => '保存配置';
 }
@@ -11402,6 +11404,8 @@ extension on TranslationsZhCn {
 			'quota.overview.tokensAndCost' => '令牌与成本',
 			'quota.agents.statusCount' => ({required Object status, required Object count}) => '${status}（${count}）',
 			'quota.config.pollerTitle' => '轮询与提醒',
+			'quota.config.claudeWindowWarmup' => '提前开启 Claude 5 小时窗口',
+			'quota.config.claudeWindowWarmupHint' => '向 5 小时窗口尚未开始的 Claude 账户发送一条极小的 Haiku 提示（会消耗少量额度）',
 			'quota.config.accountRouting' => '账户路由',
 			'quota.config.save' => '保存配置',
 			'quota.chart.show' => '显示',
@@ -11585,10 +11589,10 @@ extension on TranslationsZhCn {
 			'terminal.authUrl.linkLabel' => ({required Object url}) => '认证链接：${url}',
 			'terminal.fileLink.detected' => ({required Object path}) => '检测到文件：${path}',
 			'terminal.shortcuts.interrupt' => '中断 (SIGINT)',
-			'terminal.shortcuts.eof' => 'EOF',
-			'terminal.shortcuts.suspend' => '挂起 (SIGTSTP)',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.shortcuts.eof' => 'EOF',
+			'terminal.shortcuts.suspend' => '挂起 (SIGTSTP)',
 			'terminal.shortcuts.hide' => '隐藏快捷键栏',
 			'terminal.shortcuts.showTooltip' => '显示快捷键',
 			'terminal.shortcuts.hideTooltip' => '隐藏快捷键',

@@ -3922,6 +3922,8 @@
     },
     "config": {
       "pollerTitle": "Sorgulama ve uyarılar",
+      "claudeWindowWarmup": "Claude 5 saatlik pencerelerini erken başlat",
+      "claudeWindowWarmupHint": "5 saatlik penceresi henüz başlamamış Claude hesaplarına küçük bir Haiku istemi gönderir (biraz kota kullanır)",
       "accountRouting": "Hesap yönlendirme",
       "save": "Yapılandırmayı kaydet"
     },

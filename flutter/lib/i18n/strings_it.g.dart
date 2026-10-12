@@ -4625,6 +4625,8 @@ class Translations$quota$config$it extends Translations$quota$config$en {
 
 	// Translations
 	@override String get pollerTitle => 'Polling e avvisi';
+	@override String get claudeWindowWarmup => 'Avvia in anticipo le finestre di 5 ore di Claude';
+	@override String get claudeWindowWarmupHint => 'Invia un mini prompt Haiku agli account Claude la cui finestra di 5 ore non è ancora iniziata (consuma un po\' di quota)';
 	@override String get accountRouting => 'Routing account';
 	@override String get save => 'Salva configurazione';
 }
@@ -11413,6 +11415,8 @@ extension on TranslationsIt {
 			'quota.overview.tokensAndCost' => 'Token e costo',
 			'quota.agents.statusCount' => ({required Object status, required Object count}) => '${status} (${count})',
 			'quota.config.pollerTitle' => 'Polling e avvisi',
+			'quota.config.claudeWindowWarmup' => 'Avvia in anticipo le finestre di 5 ore di Claude',
+			'quota.config.claudeWindowWarmupHint' => 'Invia un mini prompt Haiku agli account Claude la cui finestra di 5 ore non è ancora iniziata (consuma un po\' di quota)',
 			'quota.config.accountRouting' => 'Routing account',
 			'quota.config.save' => 'Salva configurazione',
 			'quota.chart.show' => 'Mostra',
@@ -11596,10 +11600,10 @@ extension on TranslationsIt {
 			'terminal.authUrl.linkLabel' => ({required Object url}) => 'Link di autenticazione: ${url}',
 			'terminal.fileLink.detected' => ({required Object path}) => 'File rilevato: ${path}',
 			'terminal.shortcuts.interrupt' => 'Interrompi (SIGINT)',
-			'terminal.shortcuts.eof' => 'EOF',
-			'terminal.shortcuts.suspend' => 'Sospendi (SIGTSTP)',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.shortcuts.eof' => 'EOF',
+			'terminal.shortcuts.suspend' => 'Sospendi (SIGTSTP)',
 			'terminal.shortcuts.hide' => 'Nascondi barra scorciatoie',
 			'terminal.shortcuts.showTooltip' => 'Mostra scorciatoie',
 			'terminal.shortcuts.hideTooltip' => 'Nascondi scorciatoie',

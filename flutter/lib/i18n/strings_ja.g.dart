@@ -4615,6 +4615,8 @@ class Translations$quota$config$ja extends Translations$quota$config$en {
 
 	// Translations
 	@override String get pollerTitle => 'ポーラーとアラート';
+	@override String get claudeWindowWarmup => 'Claude の 5 時間枠を早めに開始';
+	@override String get claudeWindowWarmupHint => '5 時間枠がまだ始まっていない Claude アカウントに小さな Haiku プロンプトを送信します（クォータを少し消費します）';
 	@override String get accountRouting => 'アカウントのルーティング';
 	@override String get save => '設定を保存';
 }
@@ -11402,6 +11404,8 @@ extension on TranslationsJa {
 			'quota.overview.tokensAndCost' => 'トークンとコスト',
 			'quota.agents.statusCount' => ({required Object status, required Object count}) => '${status} (${count})',
 			'quota.config.pollerTitle' => 'ポーラーとアラート',
+			'quota.config.claudeWindowWarmup' => 'Claude の 5 時間枠を早めに開始',
+			'quota.config.claudeWindowWarmupHint' => '5 時間枠がまだ始まっていない Claude アカウントに小さな Haiku プロンプトを送信します（クォータを少し消費します）',
 			'quota.config.accountRouting' => 'アカウントのルーティング',
 			'quota.config.save' => '設定を保存',
 			'quota.chart.show' => '表示',
@@ -11585,10 +11589,10 @@ extension on TranslationsJa {
 			'terminal.authUrl.linkLabel' => ({required Object url}) => '認証リンク: ${url}',
 			'terminal.fileLink.detected' => ({required Object path}) => 'ファイルを検出: ${path}',
 			'terminal.shortcuts.interrupt' => '中断 (SIGINT)',
-			'terminal.shortcuts.eof' => 'EOF',
-			'terminal.shortcuts.suspend' => '一時停止 (SIGTSTP)',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.shortcuts.eof' => 'EOF',
+			'terminal.shortcuts.suspend' => '一時停止 (SIGTSTP)',
 			'terminal.shortcuts.hide' => 'ショートカットバーを非表示',
 			'terminal.shortcuts.showTooltip' => 'ショートカットを表示',
 			'terminal.shortcuts.hideTooltip' => 'ショートカットを非表示',

@@ -3916,6 +3916,8 @@
     },
     "config": {
       "pollerTitle": "폴링 및 알림",
+      "claudeWindowWarmup": "Claude 5시간 창 미리 시작",
+      "claudeWindowWarmupHint": "5시간 창이 아직 시작되지 않은 Claude 계정에 작은 Haiku 프롬프트를 보냅니다 (할당량을 약간 사용)",
       "accountRouting": "계정 라우팅",
       "save": "설정 저장"
     },

@@ -3916,6 +3916,8 @@
     },
     "config": {
       "pollerTitle": "轮询与提醒",
+      "claudeWindowWarmup": "提前开启 Claude 5 小时窗口",
+      "claudeWindowWarmupHint": "向 5 小时窗口尚未开始的 Claude 账户发送一条极小的 Haiku 提示（会消耗少量额度）",
       "accountRouting": "账户路由",
       "save": "保存配置"
     },

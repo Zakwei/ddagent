@@ -4620,6 +4620,8 @@ class Translations$quota$config$tr extends Translations$quota$config$en {
 
 	// Translations
 	@override String get pollerTitle => 'Sorgulama ve uyarılar';
+	@override String get claudeWindowWarmup => 'Claude 5 saatlik pencerelerini erken başlat';
+	@override String get claudeWindowWarmupHint => '5 saatlik penceresi henüz başlamamış Claude hesaplarına küçük bir Haiku istemi gönderir (biraz kota kullanır)';
 	@override String get accountRouting => 'Hesap yönlendirme';
 	@override String get save => 'Yapılandırmayı kaydet';
 }
@@ -11408,6 +11410,8 @@ extension on TranslationsTr {
 			'quota.overview.tokensAndCost' => 'Tokenlar ve maliyet',
 			'quota.agents.statusCount' => ({required Object status, required Object count}) => '${status} (${count})',
 			'quota.config.pollerTitle' => 'Sorgulama ve uyarılar',
+			'quota.config.claudeWindowWarmup' => 'Claude 5 saatlik pencerelerini erken başlat',
+			'quota.config.claudeWindowWarmupHint' => '5 saatlik penceresi henüz başlamamış Claude hesaplarına küçük bir Haiku istemi gönderir (biraz kota kullanır)',
 			'quota.config.accountRouting' => 'Hesap yönlendirme',
 			'quota.config.save' => 'Yapılandırmayı kaydet',
 			'quota.chart.show' => 'Göster',
@@ -11591,10 +11595,10 @@ extension on TranslationsTr {
 			'terminal.authUrl.linkLabel' => ({required Object url}) => 'Kimlik doğrulama bağlantısı: ${url}',
 			'terminal.fileLink.detected' => ({required Object path}) => 'Dosya algılandı: ${path}',
 			'terminal.shortcuts.interrupt' => 'Kes (SIGINT)',
-			'terminal.shortcuts.eof' => 'EOF',
-			'terminal.shortcuts.suspend' => 'Askıya al (SIGTSTP)',
 			_ => null,
 		} ?? switch (path) {
+			'terminal.shortcuts.eof' => 'EOF',
+			'terminal.shortcuts.suspend' => 'Askıya al (SIGTSTP)',
 			'terminal.shortcuts.hide' => 'Kısayol çubuğunu gizle',
 			'terminal.shortcuts.showTooltip' => 'Kısayolları göster',
 			'terminal.shortcuts.hideTooltip' => 'Kısayolları gizle',
