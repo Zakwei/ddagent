@@ -3917,7 +3917,7 @@
     "config": {
       "pollerTitle": "輪詢器與警示",
       "claudeWindowWarmup": "提前啟動 Claude 5 小時視窗",
-      "claudeWindowWarmupHint": "向 5 小時視窗尚未開始的 Claude 帳戶傳送一則極小的 Haiku 提示（會消耗少量額度）",
+      "claudeWindowWarmupHint": "向 5 小時視窗尚未開始的 Claude 帳號傳送一則極小的 Haiku 提示（會消耗少量額度）",
       "accountRouting": "帳戶路由",
       "save": "儲存設定"
     },

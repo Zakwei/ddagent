@@ -4616,7 +4616,7 @@ class Translations$quota$config$zh_TW extends Translations$quota$config$en {
 	// Translations
 	@override String get pollerTitle => '輪詢器與警示';
 	@override String get claudeWindowWarmup => '提前啟動 Claude 5 小時視窗';
-	@override String get claudeWindowWarmupHint => '向 5 小時視窗尚未開始的 Claude 帳戶傳送一則極小的 Haiku 提示（會消耗少量額度）';
+	@override String get claudeWindowWarmupHint => '向 5 小時視窗尚未開始的 Claude 帳號傳送一則極小的 Haiku 提示（會消耗少量額度）';
 	@override String get accountRouting => '帳戶路由';
 	@override String get save => '儲存設定';
 }
@@ -11405,7 +11405,7 @@ extension on TranslationsZhTw {
 			'quota.agents.statusCount' => ({required Object status, required Object count}) => '${status}（${count}）',
 			'quota.config.pollerTitle' => '輪詢器與警示',
 			'quota.config.claudeWindowWarmup' => '提前啟動 Claude 5 小時視窗',
-			'quota.config.claudeWindowWarmupHint' => '向 5 小時視窗尚未開始的 Claude 帳戶傳送一則極小的 Haiku 提示（會消耗少量額度）',
+			'quota.config.claudeWindowWarmupHint' => '向 5 小時視窗尚未開始的 Claude 帳號傳送一則極小的 Haiku 提示（會消耗少量額度）',
 			'quota.config.accountRouting' => '帳戶路由',
 			'quota.config.save' => '儲存設定',
 			'quota.chart.show' => '顯示',

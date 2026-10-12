@@ -225,6 +225,7 @@ export function startClaudeWindowOnce(env: Record<string, string | undefined>): 
   const last = claudeWindowStarts.get(key);
   if (last && Date.now() - last < CLAUDE_WINDOW_RETRY_MS) return;
   claudeWindowStarts.set(key, Date.now());
+  // --no-session-persistence writes no transcript, so the ping never shows up in session lists.
   const args = [
     '-p', 'hi', '--model', 'haiku', '--tools', '', '--strict-mcp-config', '--setting-sources', '',
     '--no-session-persistence', '--disable-slash-commands',
