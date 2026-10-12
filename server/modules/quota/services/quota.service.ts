@@ -221,6 +221,7 @@ export function createQuotaService(dependencies: QuotaServiceDependencies) {
       watchThreshold: 75,
       dangerThreshold: 90,
       accounts: [],
+      claudeWindowWarmup: false,
     };
   }
 

@@ -2171,6 +2171,8 @@ export type QuotaConfig = {
   watchThreshold: number;
   dangerThreshold: number;
   accounts: QuotaAccountConfig[];
+  /** Opt-in: ping idle Claude accounts so their 5-hour window starts early. */
+  claudeWindowWarmup: boolean;
 };
 
 /** One historical quota reading, used to draw the per-account sparkline. */

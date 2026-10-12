@@ -3,7 +3,7 @@ import type { KanbanCard } from '@/shared/types.js';
 import { createAgentFleetService } from '@/modules/quota/services/agents.service.js';
 import { createInsightSource } from '@/modules/quota/services/insights-source.service.js';
 import { createQuotaConfigService } from '@/modules/quota/services/quota-config.service.js';
-import { createQuotaProviders } from '@/modules/quota/services/quota-providers.service.js';
+import { createQuotaProviders, startClaudeWindowOnce } from '@/modules/quota/services/quota-providers.service.js';
 import { createQuotaService } from '@/modules/quota/services/quota.service.js';
 import { createUsageService } from '@/modules/quota/services/usage.service.js';
 import { createQuotaRouter } from '@/modules/quota/quota.routes.js';
@@ -29,12 +29,22 @@ function listAllKanbanCards(): KanbanCard[] {
   }
 }
 
+const quotaConfig = createQuotaConfigService({ store: appConfigDb });
+
 /** Production quota aggregator: real filesystem credentials and live HTTP. */
 export const quotaService = createQuotaService({
-  providers: createQuotaProviders({}, { listProviderAccounts: () => providerAccountsDb.list() }),
+  providers: createQuotaProviders(
+    {
+      // Read per call so toggling the setting applies on the next sweep.
+      startClaudeWindow: (env) => {
+        if (quotaConfig.getConfig().claudeWindowWarmup) startClaudeWindowOnce(env);
+      },
+    },
+    { listProviderAccounts: () => providerAccountsDb.list() },
+  ),
   now: () => Date.now(),
   history: quotaSnapshotsDb,
-  config: createQuotaConfigService({ store: appConfigDb }),
+  config: quotaConfig,
   listKanbanCards: listAllKanbanCards,
 });
 

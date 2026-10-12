@@ -28,6 +28,7 @@ function makeServices(): { services: QuotaRouterServices; forced: boolean[] } {
     watchThreshold: 75,
     dangerThreshold: 90,
     accounts: [],
+    claudeWindowWarmup: false,
   };
 
   return {

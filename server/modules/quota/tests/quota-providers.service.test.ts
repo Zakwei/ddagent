@@ -559,6 +559,26 @@ test('Claude refreshes an expired access token and persists the rotated tokens',
   assert.ok(persisted.expiresAt > Date.now());
 });
 
+test('Claude warms up only accounts whose 5h window has not started', async () => {
+  const warmed: Array<string | undefined> = [];
+  const build = (resetsAt: string | null) => createQuotaProviders({
+    homeDirectory: '/home/test',
+    env: { HOME: '/home/test' },
+    readTextFile: (filePath) => filePath === '/home/test/.claude/.credentials.json'
+      ? JSON.stringify({ claudeAiOauth: { accessToken: 'token' } })
+      : null,
+    request: async (url) => url === 'https://api.anthropic.com/api/oauth/usage'
+      ? httpResponse(200, JSON.stringify({ five_hour: { utilization: 0, resets_at: resetsAt } }))
+      : httpResponse(404, ''),
+    startClaudeWindow: (env) => warmed.push(env.HOME),
+  });
+
+  await build('2026-01-01T05:00:00Z').loadAll();
+  assert.deepEqual(warmed, []);
+  await build(null).loadAll();
+  assert.deepEqual(warmed, ['/home/test']);
+});
+
 test('a missing login reads as not logged in, or not installed when the CLI is absent', async () => {
   const build = (installed: boolean) => createQuotaProviders(
     {

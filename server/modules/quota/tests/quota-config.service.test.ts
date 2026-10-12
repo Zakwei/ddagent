@@ -24,6 +24,7 @@ test('returns defaults when nothing is stored', () => {
   assert.equal(config.watchThreshold, 75);
   assert.equal(config.dangerThreshold, 90);
   assert.deepEqual(config.accounts, []);
+  assert.equal(config.claudeWindowWarmup, false);
 });
 
 test('merges a partial update and persists it', () => {
@@ -34,6 +35,8 @@ test('merges a partial update and persists it', () => {
   assert.equal(saved.routingMode, 'ask');
   assert.equal(saved.watchThreshold, 60);
   assert.equal(service.getConfig().routingMode, 'ask');
+  assert.equal(service.saveConfig({ claudeWindowWarmup: true }).claudeWindowWarmup, true);
+  assert.equal(service.getConfig().watchThreshold, 60);
 });
 
 test('drops malformed account overrides and clamps thresholds', () => {

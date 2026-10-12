@@ -14,6 +14,7 @@ export const DEFAULT_QUOTA_CONFIG: QuotaConfig = {
   watchThreshold: 75,
   dangerThreshold: 90,
   accounts: [],
+  claudeWindowWarmup: false,
 };
 
 const ROUTING_MODES: QuotaRoutingMode[] = ['manual', 'ask', 'auto-low-risk'];
@@ -94,6 +95,7 @@ export function parseQuotaConfig(raw: string | null): QuotaConfig {
       clampPercent(source.watchThreshold, DEFAULT_QUOTA_CONFIG.watchThreshold),
     ),
     accounts: [],
+    claudeWindowWarmup: source.claudeWindowWarmup === true,
   };
 
   if (Array.isArray(source.accounts)) {

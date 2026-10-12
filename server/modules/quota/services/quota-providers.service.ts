@@ -1,3 +1,4 @@
+import { execFile } from 'node:child_process';
 import fsSync from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -27,6 +28,11 @@ export type QuotaProviderDependencies = {
   readTextFile: (filePath: string) => string | null;
   /** Writes a UTF-8 text file; used to persist refreshed OAuth tokens. */
   writeTextFile?: (filePath: string, content: string) => void;
+  /**
+   * Sends a minimal Claude Code prompt under `env` so an idle account's
+   * 5-hour window starts counting down before real work needs it.
+   */
+  startClaudeWindow?: (env: Record<string, string | undefined>) => void;
   /** Performs one HTTP request and returns the status plus decoded body. */
   request: (
     url: string,
@@ -205,7 +211,30 @@ function inactiveAccount(provider: string, label: string): QuotaAccount {
   };
 }
 
-const CLAUDE_OAUTH_TOKEN_URL = 'https://platform.claude.com/v1/oauth/token';
+/** Last warm-up per Claude config dir; a failed ping must not repeat every sweep. */
+const claudeWindowStarts = new Map<string, number>();
+const CLAUDE_WINDOW_RETRY_MS = 30 * 60 * 1000;
+
+/**
+ * Starts an idle account's 5-hour window with the cheapest prompt the CLI can
+ * send: Haiku, no tools, MCP or settings, nothing persisted (~3k tokens).
+ * Wired in by quota.module.ts for production only, so tests never spawn it.
+ */
+export function startClaudeWindowOnce(env: Record<string, string | undefined>): void {
+  const key = env.CLAUDE_CONFIG_DIR || 'default';
+  const last = claudeWindowStarts.get(key);
+  if (last && Date.now() - last < CLAUDE_WINDOW_RETRY_MS) return;
+  claudeWindowStarts.set(key, Date.now());
+  const args = [
+    '-p', 'hi', '--model', 'haiku', '--tools', '', '--strict-mcp-config', '--setting-sources', '',
+    '--no-session-persistence', '--disable-slash-commands',
+  ];
+  execFile('claude', args, { env: providerChildEnv({}, env), cwd: os.tmpdir(), timeout: 120_000 }, (error) => {
+    if (error) console.warn(`[quota] Claude 5h window warm-up failed (${key}):`, error.message);
+  });
+}
+
+const CLAUDE_OAUTH_TOKEN_URL ='https://platform.claude.com/v1/oauth/token';
 const CLAUDE_OAUTH_CLIENT_ID = '9d1c250a-e61b-44d9-88ed-5944d1962f5e';
 
 /**
@@ -289,6 +318,10 @@ async function fetchClaude(dependencies: QuotaProviderDependencies): Promise<Quo
     if (typeof usage?.utilization === 'number' && Number.isFinite(usage.utilization)) {
       windows.push(window(label, kind, usage.utilization, readOptionalString(usage.resets_at) ?? null));
     }
+  }
+  // No reset time on the 5h window means it has not started yet.
+  if (readObjectRecord(data.five_hour) && !readOptionalString(readObjectRecord(data.five_hour)?.resets_at)) {
+    dependencies.startClaudeWindow?.(dependencies.env);
   }
   // Newer caps (e.g. Fable) only appear in `limits` as model-scoped weekly
   // entries; the `<Model> · Weekly` label is what the client filters on.
