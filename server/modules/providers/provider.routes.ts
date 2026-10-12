@@ -756,6 +756,9 @@ router.post(
     const sessionId = parseSessionId(req.params.sessionId);
     const model = parseSessionModelPayload(req.body);
     const stored = providerModelsService.setSessionModel(provider, sessionId, model);
+    if (stored) {
+      void broadcastSessionUpserted(sessionId);
+    }
     // A session row only exists once the gateway has allocated one. Report the
     // selection back either way so the client can hold it until the first send.
     res.json(createApiSuccessResponse(

@@ -174,6 +174,8 @@ async function buildSessionUpsertedEvent(updatedProviderSessionId: string): Prom
       lastViewedAt: row.last_viewed_at ?? null,
       turnFinishedAt: row.turn_finished_at ?? null,
       accountId: row.account_id ?? null,
+      // Lets other devices' open composers follow a model switch made elsewhere.
+      model: row.model ?? null,
     },
     project: project
       ? {

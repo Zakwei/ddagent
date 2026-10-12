@@ -247,6 +247,16 @@ class ComposerController extends Notifier<ComposerState> {
       if (e.kind == BroadcastKinds.queuedMessagesUpdated && e.sessionId == _sessionId) {
         unawaited(refreshQueue());
       }
+      // This instance outlives the screen, so a model switched on another
+      // device would otherwise stay stale here — and be re-sent on the next
+      // message, flipping the session back.
+      if (e.kind == 'session_upserted' && e.sessionId == _sessionId) {
+        final session = e.raw['session'];
+        final model = session is Map ? session['model']?.toString() : null;
+        if (model != null && model.isNotEmpty && model != state.activeModel) {
+          state = state.copyWith(activeModel: () => model);
+        }
+      }
     });
     ref.onDispose(() => unawaited(_eventsSub?.cancel()));
     final sid = _sessionId;
