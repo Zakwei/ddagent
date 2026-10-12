@@ -68,9 +68,16 @@ class AppMarkdown extends ConsumerWidget {
       // Prose gets more leading than the dense UI default — the chat pane in
       // particular renders body copy in a monospace face, which needs it.
       p: theme.textTheme.bodyMedium?.copyWith(height: 1.65),
+      // Inline `code` boxes. A span background is painted together with the
+      // glyphs, i.e. OVER the selection highlight RenderParagraph draws first
+      // — an opaque box hides that the span is selected, so dragging across
+      // inline code looked like it skipped it. lighten/darken keeps the box
+      // its usual colour on the pane and lets the highlight show through.
       code: theme.textTheme.bodySmall!.copyWith(
         fontFamily: 'monospace',
-        backgroundColor: colors.muted,
+        background: Paint()
+          ..color = colors.muted
+          ..blendMode = theme.brightness == Brightness.dark ? BlendMode.lighten : BlendMode.darken,
         color: colors.foreground,
       ),
       codeblockDecoration: const BoxDecoration(), // CodeBlock draws its own

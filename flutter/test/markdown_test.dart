@@ -67,6 +67,37 @@ graph TD; A-->B
     expect(find.text('plain text'), findsOneWidget);
   });
 
+  // A span background paints over the selection highlight; an opaque inline
+  // code box would hide the selection on it, so the box blends instead.
+  testWidgets('inline code background lets the selection highlight through', (tester) async {
+    for (final theme in [AppTheme.light(), AppTheme.ocChat()]) {
+      await tester.pumpWidget(
+        TranslationProvider(
+          child: ProviderScope(
+            child: MaterialApp(
+              theme: theme,
+              home: const Scaffold(body: AppMarkdown(data: 'see `inline` here', selectable: false)),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      TextStyle? codeStyle;
+      for (final text in tester.widgetList<Text>(find.byType(Text))) {
+        text.textSpan?.visitChildren((span) {
+          if (span is TextSpan && span.text == 'inline') codeStyle = span.style;
+          return true;
+        });
+      }
+      expect(codeStyle, isNotNull);
+      expect(codeStyle!.backgroundColor, isNull);
+      expect(
+        codeStyle!.background?.blendMode,
+        theme.brightness == Brightness.dark ? BlendMode.lighten : BlendMode.darken,
+      );
+    }
+  });
+
   test('preprocess converts display math to math fence', () {
     final out = AppMarkdown.preprocess('a \$\$x+1\$\$ b');
     expect(out, contains('```math\nx+1\n```'));
