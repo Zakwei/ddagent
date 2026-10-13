@@ -559,11 +559,19 @@ export async function dispatchChatCommand(
   // providerChildEnv. A deleted account leaves account_id dangling — the
   // session then runs on the provider's ambient environment.
   let accountId = typeof session.account_id === 'string' && session.account_id ? session.account_id : null;
+  // The provider id is re-read on every call: a session's first turn starts
+  // before the runtime announces it, and a limit seen later (this turn, or a
+  // follow-up turn the held process starts on its own) must still carry the
+  // transcript over — a switch without it leaves the new account unable to
+  // resume ("No conversation found with session ID").
   const failoverSession = () => ({
     sessionId,
     provider,
     accountId,
-    providerSessionId: session.provider_session_id ?? null,
+    providerSessionId: sessionsDb.getSessionById(sessionId)?.provider_session_id
+      ?? run.providerSessionId
+      ?? session.provider_session_id
+      ?? null,
     model: session.model ?? (typeof clientOptions.model === 'string' ? clientOptions.model : null),
   });
 
