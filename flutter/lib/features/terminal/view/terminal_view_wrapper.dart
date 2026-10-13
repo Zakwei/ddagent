@@ -157,8 +157,21 @@ class _TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
   /// copies the selection when one exists (terminal convention); with no
   /// selection Ctrl+C stays a plain ^C to the PTY.
   KeyEventResult _onKeyEvent(FocusNode node, KeyEvent event) {
-    if (event is! KeyDownEvent) return KeyEventResult.ignored;
+    if (event is KeyUpEvent) return KeyEventResult.ignored;
     final kb = HardwareKeyboard.instance;
+    // AltGr arrives as Ctrl+Alt on Windows — without this, xterm's key path
+    // would turn AltGr+A ('ą') into a Ctrl/Alt chord instead of the character.
+    final character = event.character;
+    if (_isWindows &&
+        kb.isControlPressed &&
+        kb.isAltPressed &&
+        character != null &&
+        character.isNotEmpty &&
+        character.codeUnitAt(0) >= 0x20) {
+      widget.tab.terminal.textInput(character);
+      return KeyEventResult.handled;
+    }
+    if (event is! KeyDownEvent) return KeyEventResult.ignored;
     final modifier = kb.isControlPressed || kb.isMetaPressed;
     if (event.logicalKey == LogicalKeyboardKey.keyC && modifier) {
       final selection = _terminalViewController.selection;
@@ -244,6 +257,11 @@ class _TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
       (defaultTargetPlatform == TargetPlatform.android ||
           defaultTargetPlatform == TargetPlatform.iOS);
 
+  /// xterm's text-input client attaches without a `viewId`, which the Windows
+  /// embedder rejects ("view ID is null") — no characters would ever arrive.
+  /// Windows reads typed characters straight from key events instead.
+  bool get _isWindows => !kIsWeb && defaultTargetPlatform == TargetPlatform.windows;
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -268,6 +286,7 @@ class _TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
           // Android/iOS soft keyboards don't emit a hardware delete event — the
           // IME reports backspace textually, which xterm otherwise drops.
           deleteDetection: _isMobile,
+          hardwareKeyboardOnly: _isWindows,
           onTapUp: _handleTapUp,
           onSecondaryTapUp: (_, _) => unawaited(_paste()),
           onKeyEvent: _onKeyEvent,

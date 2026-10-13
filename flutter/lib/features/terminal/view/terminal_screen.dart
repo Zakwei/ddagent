@@ -409,24 +409,26 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
                         ref.read(terminalControllerProvider.notifier).clearTab(activeTab.id);
                       },
                     ),
-
-                  // Toggle touch shortcuts bar
-                  IconButton(
-                    tooltip: state.showShortcutsBar
-                        ? t.terminal.shortcuts.hideTooltip
-                        : t.terminal.shortcuts.showTooltip,
-                    icon: Icon(
-                      Icons.keyboard,
-                      size: 18,
-                      color: state.showShortcutsBar ? colors.primary : colors.mutedForeground,
-                    ),
-                    onPressed: () {
-                      ref.read(terminalControllerProvider.notifier).toggleShortcutsBar();
-                    },
-                  ),
                 ],
               ),
             ),
+          ),
+
+          // Toggle touch shortcuts bar — kept outside the scrolling cluster: a
+          // mouse can't drag-scroll it, so in a narrow pane the toggle would
+          // overflow out of reach and a hidden bar could never come back.
+          IconButton(
+            tooltip: state.showShortcutsBar
+                ? t.terminal.shortcuts.hideTooltip
+                : t.terminal.shortcuts.showTooltip,
+            icon: Icon(
+              Icons.keyboard,
+              size: 18,
+              color: state.showShortcutsBar ? colors.primary : colors.mutedForeground,
+            ),
+            onPressed: () {
+              ref.read(terminalControllerProvider.notifier).toggleShortcutsBar();
+            },
           ),
         ],
       ),

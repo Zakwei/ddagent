@@ -9,6 +9,7 @@ import 'package:ddagent_app/features/terminal/view/provider_login_dialog.dart';
 import 'package:ddagent_app/features/terminal/view/terminal_screen.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -503,6 +504,70 @@ void main() {
       await tester.tap(find.text('▲'));
       await tester.pump();
       expect(fakeWs.sent.last['data'], '\x1b[A');
+    });
+
+    testWidgets('typed characters reach the PTY on Windows', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(1000, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      final container = ProviderContainer(
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        TranslationProvider(
+          child: UncontrolledProviderScope(
+            container: container,
+            child: MaterialApp(
+              theme: AppTheme.dark(),
+              home: const Scaffold(body: TerminalScreen(projectPath: '/test/proj')),
+            ),
+          ),
+        ),
+      );
+
+      await connectTab(tester);
+      await tester.pumpAndSettle();
+      fakeWs.sent.clear();
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyA, platform: 'windows');
+      await tester.pump();
+      final inputs = fakeWs.sent.where((f) => f['type'] == 'input').map((f) => f['data']);
+      expect(inputs, contains('a'));
+    }, variant: TargetPlatformVariant.only(TargetPlatform.windows));
+
+    testWidgets('shortcuts bar toggle stays reachable in a narrow pane', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(360, 600));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      final container = ProviderContainer(
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        TranslationProvider(
+          child: UncontrolledProviderScope(
+            container: container,
+            child: MaterialApp(
+              theme: AppTheme.dark(),
+              home: const Scaffold(body: TerminalScreen(projectPath: '/test/proj')),
+            ),
+          ),
+        ),
+      );
+
+      await connectTab(tester);
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.keyboard));
+      await tester.pumpAndSettle();
+      expect(find.text('Escape'), findsNothing);
+
+      await tester.tap(find.byIcon(Icons.keyboard));
+      await tester.pumpAndSettle();
+      expect(find.text('Escape'), findsOneWidget);
     });
 
     testWidgets('displays auth URL banner and triggers tap', (tester) async {
