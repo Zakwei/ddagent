@@ -10,6 +10,7 @@ import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
 import 'package:ddagent_app/features/settings/state/ui_preferences_controller.dart';
 import 'package:ddagent_app/features/settings/view/quick_settings_sheet.dart';
 import 'package:ddagent_app/features/taskmaster/state/tasks_settings_controller.dart';
+import 'package:ddagent_app/features/terminal/view/terminal_view_wrapper.dart';
 import 'package:ddagent_app/features/workspace/view/session_quick_switcher.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
@@ -143,8 +144,10 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
     }
 
     // 2. Ctrl/Cmd+Shift+F — focus mode (desktop only; compact uses drawer).
+    // Inside a terminal pane the chord is Windows Terminal's "find" instead.
     if (ctrlOrMeta && kb.isShiftPressed && !kb.isAltPressed && key == LogicalKeyboardKey.keyF) {
       if (_modalOpen || context.breakpoint.isCompact) return false;
+      if (TerminalViewWrapperState.hasKeyboardFocus) return false;
       ref.read(uiPreferencesProvider.notifier).toggleSidebar();
       return true;
     }

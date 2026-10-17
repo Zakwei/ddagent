@@ -52,6 +52,15 @@ class TerminalViewWrapper extends ConsumerStatefulWidget {
 }
 
 class TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
+  /// True while keyboard focus sits inside a terminal pane (the xterm view or
+  /// its find box). App-wide `HardwareKeyboard` handlers run alongside focus
+  /// dispatch, so chords the terminal owns (Ctrl+Shift+F = find) must be
+  /// skipped there or both actions fire.
+  static bool get hasKeyboardFocus =>
+      FocusManager.instance.primaryFocus?.context
+          ?.findAncestorStateOfType<TerminalViewWrapperState>() !=
+      null;
+
   late final FocusNode _focusNode;
   late final xt.TerminalController _terminalViewController;
   late final ScrollController _scrollController;
@@ -487,8 +496,10 @@ class TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
         fontSize: widget.tab.fontSize,
         height: 1.2,
       ),
-      // WT default `cursorShape: bar`.
-      cursorType: xt.TerminalCursorType.verticalBar,
+      // WT defaults to a bar cursor, but xterm 4.0's bar/underline painter
+      // drops the row offset and draws the bar on the first visible line —
+      // a block cursor at the right place beats a bar at the wrong one.
+      cursorType: xt.TerminalCursorType.block,
       focusNode: _focusNode,
       autofocus: widget.autofocus,
       keyboardAppearance: Theme.of(context).brightness,

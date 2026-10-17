@@ -95,6 +95,7 @@ class TerminalTab {
     this.initialCommand,
     this.isPlainShell = true,
     this.isCommandMode = false,
+    this.ptySessionId,
     this.env,
     this.onComplete,
     required this.terminal,
@@ -115,6 +116,12 @@ class TerminalTab {
   final String? initialCommand;
   final bool isPlainShell;
   final bool isCommandMode;
+
+  /// Discriminator sent as the init frame's `sessionId` for the 2nd+ plain
+  /// shell of a project. The server keys PTYs by `projectPath_sessionId`,
+  /// so without it every "new tab" reattached the same shell. Null keeps
+  /// the first tab on the server's `default` key (shared with the web UI).
+  final String? ptySessionId;
 
   /// Extra PTY env sent with `init` (per-account login config dirs).
   final Map<String, String>? env;
@@ -156,6 +163,7 @@ class TerminalTab {
       initialCommand: initialCommand,
       isPlainShell: isPlainShell,
       isCommandMode: isCommandMode,
+      ptySessionId: ptySessionId,
       env: env,
       onComplete: onComplete,
       terminal: terminal,
@@ -269,6 +277,14 @@ class TerminalController extends Notifier<TerminalState> {
                   : initialCommand)
             : (isPlainShell ? t.terminal.tabs.shellName(index: tabIndex) : '$provider CLI'));
 
+    // Plain interactive shells after the first get their own PTY (WT: every
+    // tab is a fresh shell); one-shot commands and agent sessions keep their
+    // own keys already.
+    final plainInteractive = isPlainShell && !isCommandMode && sessionId == null;
+    final ptySessionId = plainInteractive && state.tabs.any(_isPlainInteractive)
+        ? 'shell-$tabIndex'
+        : null;
+
     final tab = TerminalTab(
       id: tabId,
       title: tabTitle,
@@ -278,6 +294,7 @@ class TerminalController extends Notifier<TerminalState> {
       initialCommand: initialCommand,
       isPlainShell: isPlainShell,
       isCommandMode: isCommandMode,
+      ptySessionId: ptySessionId,
       env: env,
       onComplete: onComplete,
       terminal: terminal,
@@ -313,7 +330,7 @@ class TerminalController extends Notifier<TerminalState> {
     // frame — nothing reaches the server until the WS is open).
     channel.init(
       projectPath: projectPath,
-      sessionId: sessionId,
+      sessionId: sessionId ?? ptySessionId,
       provider: provider,
       hasSession: sessionId != null,
       initialCommand: initialCommand,
@@ -337,6 +354,9 @@ class TerminalController extends Notifier<TerminalState> {
 
     return tab;
   }
+
+  static bool _isPlainInteractive(TerminalTab tab) =>
+      tab.isPlainShell && !tab.isCommandMode && tab.sessionId == null;
 
   void _handleFrame(String tabId, ShellFrame frame) {
     final tabIndex = state.tabs.indexWhere((t) => t.id == tabId);
@@ -700,7 +720,7 @@ class TerminalController extends Notifier<TerminalState> {
 
     tab.channel.init(
       projectPath: tab.projectPath,
-      sessionId: tab.sessionId,
+      sessionId: tab.sessionId ?? tab.ptySessionId,
       provider: tab.provider,
       hasSession: tab.sessionId != null,
       initialCommand: tab.initialCommand,

@@ -508,6 +508,30 @@ void main() {
       expect(ctrl.state.activeTabId, b.id);
     });
 
+    test('second plain shell gets its own PTY key; the first keeps the default', () async {
+      ctrl.createTab(projectPath: '/p');
+      await Future<void>.delayed(Duration.zero);
+      final first = fakeWs.sent.where((f) => f['type'] == 'init').toList();
+      expect(first.first.containsKey('sessionId'), isFalse);
+
+      fakeWs.sent.clear();
+      final second = ctrl.createTab(projectPath: '/p');
+      await Future<void>.delayed(Duration.zero);
+      final init = fakeWs.sent.firstWhere((f) => f['type'] == 'init');
+      expect(init['sessionId'], 'shell-2');
+      expect(init['hasSession'], isFalse);
+      expect(init['isPlainShell'], isTrue);
+      // The tab itself is still a plain shell (no agent session to resume).
+      expect(second.sessionId, isNull);
+      expect(second.ptySessionId, 'shell-2');
+
+      // Restart keeps the same PTY key.
+      fakeWs.sent.clear();
+      ctrl.restartTab(second.id);
+      await Future<void>.delayed(Duration.zero);
+      expect(fakeWs.sent.firstWhere((f) => f['type'] == 'init')['sessionId'], 'shell-2');
+    });
+
     test('zoomReset returns to the default size', () {
       final tab = ctrl.createTab(projectPath: '/p');
       ctrl.zoomIn(tab.id);
