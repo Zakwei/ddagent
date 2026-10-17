@@ -579,6 +579,18 @@ void main() {
       expect(f.feed(keep), keep);
     });
 
+    test('drops DCS/APC strings, also when split across chunks', () {
+      final f = TerminalOutputFilter();
+      // OpenCode's XTGETTCAP terminfo query.
+      expect(f.feed('a\x1bP+q4d73\x1b\\b'), 'ab');
+      // Kitty graphics APC.
+      expect(f.feed('\x1b_Gf=100,a=T;AAAA\x1b\\c'), 'c');
+      // Split: payload continues in the next frame, text after ST survives.
+      expect(f.feed('d\x1bP+q'), 'd');
+      expect(f.feed('4d73'), '');
+      expect(f.feed('\x1b\\e'), 'e');
+    });
+
     test('carries an escape split across chunks', () {
       final f = TerminalOutputFilter();
       expect(f.feed('one\x1b[>4'), 'one');
