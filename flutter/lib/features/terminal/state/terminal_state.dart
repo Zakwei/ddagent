@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:ddagent_app/core/realtime/realtime_providers.dart';
 import 'package:ddagent_app/core/realtime/shell_channel.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xterm/xterm.dart';
 
@@ -21,9 +22,64 @@ const _promptOptionScanLines = 15;
 const _promptMaxOptions = 5;
 const _promptMinOptions = 2;
 
-/// Terminal font bounds (web Shell zoom 9–24px).
+/// Terminal font bounds (web Shell zoom 9–24px) and the Ctrl+0 reset size.
 const terminalFontSizeMin = 9.0;
 const terminalFontSizeMax = 24.0;
+const terminalFontSizeDefault = 13.0;
+
+/// Modifier keys the on-screen key bar can latch for the next keystroke — a
+/// soft keyboard has no Ctrl/Alt, so a tap on `Ctrl` arms the modifier and
+/// the next typed character (or arrow) is sent as that chord.
+enum LatchedModifier { ctrl, alt }
+
+final _csiKeyRegex = RegExp(r'^\x1b\[(?:1;(\d))?([ABCDHF])$');
+final _csiTildeKeyRegex = RegExp(r'^\x1b\[(\d+)(?:;(\d))?~$');
+
+/// Applies latched modifiers to one input chunk (web/Termux key-bar
+/// semantics). A chunk that is not a single key the modifiers can decorate
+/// (multi-character paste, bare Esc) passes through untouched.
+///
+/// - Ctrl + letter/`[\]^_@` → the control code (`a` → `\x01`).
+/// - Ctrl/Alt + cursor key (`\x1b[A`, `\x1b[H`, `\x1b[5~`) → xterm modifier
+///   parameter (`\x1b[1;5A`, `\x1b[5;3~`).
+/// - Alt + printable character → ESC-prefixed character (`\x1bx`).
+String applyLatchedModifiers(String data, Set<LatchedModifier> modifiers) {
+  if (modifiers.isEmpty || data.isEmpty) return data;
+  final ctrl = modifiers.contains(LatchedModifier.ctrl);
+  final alt = modifiers.contains(LatchedModifier.alt);
+  // xterm modifier parameter: 1 + shift(1) + alt(2) + ctrl(4).
+  final param = 1 + (alt ? 2 : 0) + (ctrl ? 4 : 0);
+
+  final csi = _csiKeyRegex.firstMatch(data);
+  if (csi != null) {
+    final existing = int.tryParse(csi.group(1) ?? '1') ?? 1;
+    final merged = existing + param - 1;
+    return '\x1b[1;$merged${csi.group(2)}';
+  }
+  final tilde = _csiTildeKeyRegex.firstMatch(data);
+  if (tilde != null) {
+    final existing = int.tryParse(tilde.group(2) ?? '1') ?? 1;
+    final merged = existing + param - 1;
+    return '\x1b[${tilde.group(1)};$merged~';
+  }
+
+  if (data.runes.length != 1) return data;
+  final code = data.runes.first;
+  var out = data;
+  if (ctrl) {
+    if (code >= 0x61 && code <= 0x7a) {
+      out = String.fromCharCode(code - 0x60); // a-z
+    } else if (code >= 0x40 && code <= 0x5f) {
+      out = String.fromCharCode(code - 0x40); // @ A-Z [ \ ] ^ _
+    } else if (code == 0x3f) {
+      out = '\x7f'; // Ctrl+? → DEL
+    } else if (code == 0x20) {
+      out = '\x00'; // Ctrl+Space → NUL
+    }
+  }
+  if (alt) out = '\x1b$out';
+  return out;
+}
 
 final _exitCodeRegex = RegExp(r'Process exited with code (\d+)');
 final _promptFooterRegex = RegExp(r'esc to cancel|enter to select', caseSensitive: false);
@@ -50,7 +106,9 @@ class TerminalTab {
   }) : authUrls = authUrls ?? <String>[];
 
   final String id;
-  final String title;
+
+  /// Mutable — the tab strip's Rename action edits it in place.
+  String title;
   final String projectPath;
   final String? sessionId;
   final String provider;
@@ -71,7 +129,7 @@ class TerminalTab {
   StreamSubscription<ShellFrame>? subscription;
 
   /// Terminal font size (web Shell zoom, default 14 there / 13 here).
-  double fontSize = 13;
+  double fontSize = terminalFontSizeDefault;
 
   /// CLI prompt options detected on the buffer (null = no prompt active).
   List<CliPromptOption>? promptOptions;
@@ -113,11 +171,19 @@ class TerminalTab {
 }
 
 class TerminalState {
-  const TerminalState({this.tabs = const [], this.activeTabId, this.showShortcutsBar = true});
+  const TerminalState({
+    this.tabs = const [],
+    this.activeTabId,
+    this.showShortcutsBar = true,
+    this.latchedModifiers = const {},
+  });
 
   final List<TerminalTab> tabs;
   final String? activeTabId;
   final bool showShortcutsBar;
+
+  /// Modifiers armed by the on-screen key bar for the next keystroke.
+  final Set<LatchedModifier> latchedModifiers;
 
   TerminalTab? get activeTab {
     if (activeTabId == null || tabs.isEmpty) return null;
@@ -127,14 +193,30 @@ class TerminalState {
     return tabs.first;
   }
 
-  TerminalState copyWith({List<TerminalTab>? tabs, String? activeTabId, bool? showShortcutsBar}) {
+  int get activeIndex => tabs.indexWhere((tab) => tab.id == activeTab?.id);
+
+  TerminalState copyWith({
+    List<TerminalTab>? tabs,
+    String? activeTabId,
+    bool? showShortcutsBar,
+    Set<LatchedModifier>? latchedModifiers,
+  }) {
     return TerminalState(
       tabs: tabs ?? this.tabs,
       activeTabId: activeTabId ?? this.activeTabId,
       showShortcutsBar: showShortcutsBar ?? this.showShortcutsBar,
+      latchedModifiers: latchedModifiers ?? this.latchedModifiers,
     );
   }
 }
+
+/// Platforms whose primary input is a soft keyboard — the on-screen key bar
+/// is on by default there and off (toggleable) where a hardware keyboard is
+/// the norm, as a desktop terminal would have it.
+bool terminalKeyBarDefault(TargetPlatform platform) =>
+    platform == TargetPlatform.android ||
+    platform == TargetPlatform.iOS ||
+    platform == TargetPlatform.fuchsia;
 
 final terminalControllerProvider = NotifierProvider<TerminalController, TerminalState>(
   TerminalController.new,
@@ -157,7 +239,7 @@ class TerminalController extends Notifier<TerminalState> {
       }
       _activeTabs.clear();
     });
-    return const TerminalState();
+    return TerminalState(showShortcutsBar: terminalKeyBarDefault(defaultTargetPlatform));
   }
 
   TerminalTab createTab({
@@ -203,9 +285,10 @@ class TerminalController extends Notifier<TerminalState> {
       status: TerminalTabStatus.connecting,
     );
 
-    // Wire terminal user output -> channel input
+    // Wire terminal user output -> channel input. Soft-keyboard typing lands
+    // here too, so the key bar's latched Ctrl/Alt is applied on this path.
     terminal.onOutput = (data) {
-      channel.input(data);
+      channel.input(_consumeLatchedModifiers(data));
     };
 
     // Wire terminal resize -> channel resize
@@ -425,9 +508,15 @@ class TerminalController extends Notifier<TerminalState> {
     _notifyTabsChanged();
   }
 
-  /// Font zoom (web ShellHeader ±1px, clamped 9–24).
+  /// Font zoom (web ShellHeader ±1px, clamped 9–24); Ctrl+0 resets.
   void zoomIn(String tabId) => _zoom(tabId, 1);
   void zoomOut(String tabId) => _zoom(tabId, -1);
+  void zoomReset(String tabId) {
+    final tab = state.tabs.where((t) => t.id == tabId).firstOrNull;
+    if (tab == null || tab.fontSize == terminalFontSizeDefault) return;
+    tab.fontSize = terminalFontSizeDefault;
+    _notifyTabsChanged();
+  }
 
   void _zoom(String tabId, double delta) {
     final tab = state.tabs.where((t) => t.id == tabId).firstOrNull;
@@ -436,6 +525,99 @@ class TerminalController extends Notifier<TerminalState> {
     if (next == tab.fontSize) return;
     tab.fontSize = next;
     _notifyTabsChanged();
+  }
+
+  // --- Tab management (Windows Terminal tab-row semantics) ---
+
+  /// Ctrl+Tab / Ctrl+Shift+Tab — wraps around both ends.
+  void selectRelativeTab(int delta) {
+    if (state.tabs.length < 2) return;
+    final current = state.activeIndex < 0 ? 0 : state.activeIndex;
+    final next = (current + delta) % state.tabs.length;
+    selectTab(state.tabs[next < 0 ? next + state.tabs.length : next].id);
+  }
+
+  /// Ctrl+Alt+1..9 — 9 (or the last digit) always lands on the last tab.
+  void selectTabAt(int index) {
+    if (state.tabs.isEmpty) return;
+    final clamped = index.clamp(0, state.tabs.length - 1);
+    selectTab(state.tabs[clamped].id);
+  }
+
+  /// Drag-reorder on the tab strip — [newIndex] is the final position of
+  /// the moved tab (`ReorderableListView.onReorderItem` semantics).
+  void reorderTab(int oldIndex, int newIndex) {
+    final tabs = [...state.tabs];
+    if (oldIndex < 0 || oldIndex >= tabs.length) return;
+    final target = newIndex.clamp(0, tabs.length - 1);
+    if (target == oldIndex) return;
+    final moved = tabs.removeAt(oldIndex);
+    tabs.insert(target, moved);
+    state = state.copyWith(tabs: tabs);
+  }
+
+  void renameTab(String tabId, String title) {
+    final trimmed = title.trim();
+    final tab = state.tabs.where((t) => t.id == tabId).firstOrNull;
+    if (trimmed.isEmpty || tab == null || tab.title == trimmed) return;
+    tab.title = trimmed;
+    _notifyTabsChanged();
+  }
+
+  /// Ctrl+Shift+D — a fresh tab with the same profile, placed right after
+  /// the source tab.
+  TerminalTab? duplicateTab(String tabId) {
+    final index = state.tabs.indexWhere((t) => t.id == tabId);
+    if (index == -1) return null;
+    final source = state.tabs[index];
+    final tab = createTab(
+      projectPath: source.projectPath,
+      sessionId: source.sessionId,
+      provider: source.provider,
+      isPlainShell: source.isPlainShell,
+      // One-shot commands are not re-run on duplicate — the copy is a plain
+      // shell in the same directory, like duplicating a profile.
+      title: source.isCommandMode ? null : source.title,
+    );
+    reorderTab(state.tabs.length - 1, index + 1);
+    return tab;
+  }
+
+  void closeOtherTabs(String tabId) {
+    for (final tab in [...state.tabs]) {
+      if (tab.id != tabId) closeTab(tab.id);
+    }
+  }
+
+  void closeTabsToRight(String tabId) {
+    final index = state.tabs.indexWhere((t) => t.id == tabId);
+    if (index == -1) return;
+    for (final tab in state.tabs.sublist(index + 1)) {
+      closeTab(tab.id);
+    }
+  }
+
+  // --- Latched modifiers (on-screen key bar) ---
+
+  void toggleLatchedModifier(LatchedModifier modifier) {
+    final next = {...state.latchedModifiers};
+    if (!next.remove(modifier)) next.add(modifier);
+    state = state.copyWith(latchedModifiers: next);
+  }
+
+  void clearLatchedModifiers() {
+    if (state.latchedModifiers.isEmpty) return;
+    state = state.copyWith(latchedModifiers: const {});
+  }
+
+  /// Applies and releases the armed modifiers — one chord per tap, like the
+  /// sticky-keys behaviour of mobile terminal key bars.
+  String _consumeLatchedModifiers(String data) {
+    final modifiers = state.latchedModifiers;
+    if (modifiers.isEmpty) return data;
+    final out = applyLatchedModifiers(data, modifiers);
+    clearLatchedModifiers();
+    return out;
   }
 
   /// Buffer contents for "Copy output" (trailing blank rows trimmed — the
@@ -487,12 +669,14 @@ class TerminalController extends Notifier<TerminalState> {
     state = state.copyWith(tabs: remaining, activeTabId: newActiveId);
   }
 
+  /// Raw input from the key bar / prompt chips. Latched Ctrl/Alt apply here
+  /// as well, so `Ctrl` then `▲` sends Ctrl+Up.
   void sendInput(String tabId, String data) {
     final tab = state.tabs.firstWhere(
       (t) => t.id == tabId,
       orElse: () => throw Exception('Tab not found'),
     );
-    tab.channel.input(data);
+    tab.channel.input(_consumeLatchedModifiers(data));
   }
 
   void resize(String tabId, int cols, int rows) {

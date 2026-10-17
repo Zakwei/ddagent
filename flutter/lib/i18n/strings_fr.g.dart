@@ -665,6 +665,10 @@ class Translations$terminal$fr extends Translations$terminal$en {
 	@override late final Translations$terminal$loginDialog$fr loginDialog = Translations$terminal$loginDialog$fr._(_root);
 	@override late final Translations$terminal$empty$fr empty = Translations$terminal$empty$fr._(_root);
 	@override late final Translations$terminal$overlay$fr overlay = Translations$terminal$overlay$fr._(_root);
+	@override late final Translations$terminal$menu$fr menu = Translations$terminal$menu$fr._(_root);
+	@override late final Translations$terminal$rename$fr rename = Translations$terminal$rename$fr._(_root);
+	@override late final Translations$terminal$search$fr search = Translations$terminal$search$fr._(_root);
+	@override late final Translations$terminal$keyBar$fr keyBar = Translations$terminal$keyBar$fr._(_root);
 }
 
 // Path: voice
@@ -3205,6 +3209,23 @@ class Translations$settings$shortcuts$fr extends Translations$settings$shortcuts
 	@override String get termInterrupt => 'Interrompre le processus (sans sélection)';
 	@override String get termPaste => 'Coller';
 	@override String get termSelectAll => 'Tout sélectionner';
+	@override String get termFind => 'Rechercher dans le tampon';
+	@override String get termNewTab => 'Nouvel onglet';
+	@override String get termCloseTab => 'Fermer l\'onglet';
+	@override String get termDuplicate => 'Dupliquer l\'onglet';
+	@override String get termNextTab => 'Onglet suivant';
+	@override String get termPrevTab => 'Onglet précédent';
+	@override String get termGoToTab => 'Aller à l\'onglet 1–9';
+	@override String get termRename => 'Renommer l\'onglet (double-clic)';
+	@override String get termZoomIn => 'Zoom avant';
+	@override String get termZoomOut => 'Zoom arrière';
+	@override String get termZoomReset => 'Réinitialiser le zoom';
+	@override String get termScrollLine => 'Défiler d\'une ligne';
+	@override String get termScrollPage => 'Défiler d\'une page';
+	@override String get termScrollEdge => 'Aller en haut / en bas';
+	@override String get termMenu => 'Menu du terminal';
+	@override String get termClearSelection => 'Effacer la sélection';
+	@override String get termWebNote => 'Les navigateurs réservent Ctrl+Maj+T/W — la version web accepte aussi Ctrl+Alt+T / Ctrl+Alt+W.';
 	@override String get editor => 'Éditeur';
 	@override String get edSave => 'Enregistrer le fichier';
 	@override String get edSaveAll => 'Enregistrer tous les fichiers';
@@ -5004,6 +5025,70 @@ class Translations$terminal$overlay$fr extends Translations$terminal$overlay$en 
 	@override String processExitedWithCode({required Object code}) => 'Le processus s’est arrêté (code ${code}) — connectez-vous pour le relancer';
 	@override String resumeSession({required Object title}) => 'Reprendre la session ${title}';
 	@override String startSession({required Object path}) => 'Démarrer une nouvelle session dans ${path}';
+}
+
+// Path: terminal.menu
+class Translations$terminal$menu$fr extends Translations$terminal$menu$en {
+	Translations$terminal$menu$fr._(TranslationsFr root) : this._root = root, super.internal(root);
+
+	final TranslationsFr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Menu du terminal';
+	@override String get edit => 'Édition';
+	@override String get view => 'Affichage';
+	@override String get session => 'Session';
+	@override String get find => 'Rechercher';
+	@override String get renameTab => 'Renommer l\'onglet';
+	@override String get duplicateTab => 'Dupliquer l\'onglet';
+	@override String get closeTab => 'Fermer l\'onglet';
+	@override String get closeOtherTabs => 'Fermer les autres onglets';
+	@override String get closeTabsToRight => 'Fermer les onglets à droite';
+	@override String get zoomReset => 'Réinitialiser le zoom';
+	@override String get selectAll => 'Tout sélectionner';
+	@override String get keyBar => 'Barre de touches à l\'écran';
+	@override String get shortcutsHelp => 'Raccourcis clavier';
+}
+
+// Path: terminal.rename
+class Translations$terminal$rename$fr extends Translations$terminal$rename$en {
+	Translations$terminal$rename$fr._(TranslationsFr root) : this._root = root, super.internal(root);
+
+	final TranslationsFr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Renommer l\'onglet';
+	@override String get hint => 'Nom de l\'onglet';
+}
+
+// Path: terminal.search
+class Translations$terminal$search$fr extends Translations$terminal$search$en {
+	Translations$terminal$search$fr._(TranslationsFr root) : this._root = root, super.internal(root);
+
+	final TranslationsFr _root; // ignore: unused_field
+
+	// Translations
+	@override String get hint => 'Rechercher';
+	@override String get noResults => 'Aucun résultat';
+	@override String count({required Object current, required Object total}) => '${current} sur ${total}';
+	@override String get matchCase => 'Respecter la casse';
+	@override String get next => 'Résultat suivant';
+	@override String get previous => 'Résultat précédent';
+	@override String get close => 'Fermer la recherche';
+}
+
+// Path: terminal.keyBar
+class Translations$terminal$keyBar$fr extends Translations$terminal$keyBar$en {
+	Translations$terminal$keyBar$fr._(TranslationsFr root) : this._root = root, super.internal(root);
+
+	final TranslationsFr _root; // ignore: unused_field
+
+	// Translations
+	@override String get ctrl => 'Ctrl';
+	@override String get alt => 'Alt';
+	@override String get ctrlHint => 'Maintenir Ctrl pour la touche suivante';
+	@override String get altHint => 'Maintenir Alt pour la touche suivante';
+	@override String get showKeyboard => 'Afficher le clavier';
 }
 
 // Path: workspace.paneTitle
@@ -10672,6 +10757,23 @@ extension on TranslationsFr {
 			'settings.shortcuts.termInterrupt' => 'Interrompre le processus (sans sélection)',
 			'settings.shortcuts.termPaste' => 'Coller',
 			'settings.shortcuts.termSelectAll' => 'Tout sélectionner',
+			'settings.shortcuts.termFind' => 'Rechercher dans le tampon',
+			'settings.shortcuts.termNewTab' => 'Nouvel onglet',
+			'settings.shortcuts.termCloseTab' => 'Fermer l\'onglet',
+			'settings.shortcuts.termDuplicate' => 'Dupliquer l\'onglet',
+			'settings.shortcuts.termNextTab' => 'Onglet suivant',
+			'settings.shortcuts.termPrevTab' => 'Onglet précédent',
+			'settings.shortcuts.termGoToTab' => 'Aller à l\'onglet 1–9',
+			'settings.shortcuts.termRename' => 'Renommer l\'onglet (double-clic)',
+			'settings.shortcuts.termZoomIn' => 'Zoom avant',
+			'settings.shortcuts.termZoomOut' => 'Zoom arrière',
+			'settings.shortcuts.termZoomReset' => 'Réinitialiser le zoom',
+			'settings.shortcuts.termScrollLine' => 'Défiler d\'une ligne',
+			'settings.shortcuts.termScrollPage' => 'Défiler d\'une page',
+			'settings.shortcuts.termScrollEdge' => 'Aller en haut / en bas',
+			'settings.shortcuts.termMenu' => 'Menu du terminal',
+			'settings.shortcuts.termClearSelection' => 'Effacer la sélection',
+			'settings.shortcuts.termWebNote' => 'Les navigateurs réservent Ctrl+Maj+T/W — la version web accepte aussi Ctrl+Alt+T / Ctrl+Alt+W.',
 			'settings.shortcuts.editor' => 'Éditeur',
 			'settings.shortcuts.edSave' => 'Enregistrer le fichier',
 			'settings.shortcuts.edSaveAll' => 'Enregistrer tous les fichiers',
@@ -11069,6 +11171,8 @@ extension on TranslationsFr {
 			'tasks.nextTask.hideDetails' => 'Masquer les détails',
 			'tasks.nextTask.initialize' => 'Initialiser',
 			'tasks.nextTask.noPending' => 'Aucune tâche en attente',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI n’est pas configuré',
 			'tasks.nextTask.review' => 'Vérifier',
 			'tasks.nextTask.startTask' => 'Démarrer la tâche',
@@ -11086,8 +11190,6 @@ extension on TranslationsFr {
 			'tasks.taskDetail.dependencies' => 'Dépendances',
 			'tasks.taskDetail.dependenciesPlaceholder' => 'ex. 1, 2, 3',
 			'tasks.taskDetail.description' => 'Description',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.edit' => 'Modifier la tâche',
 			'tasks.taskDetail.implDetails' => 'Détails d’implémentation',
 			'tasks.taskDetail.noDependencies' => 'Aucune dépendance',
@@ -11583,6 +11685,8 @@ extension on TranslationsFr {
 			'terminal.tabs.shellName' => ({required Object index}) => 'Shell ${index}',
 			'terminal.tabs.plainShell' => 'Shell simple',
 			'terminal.tabs.claudeCli' => 'CLI Claude',
+			_ => null,
+		} ?? switch (path) {
 			'terminal.tabs.opencodeCli' => 'CLI OpenCode',
 			'terminal.tabs.commandCodeCli' => 'CLI Command Code',
 			'terminal.tabs.antigravityCli' => 'CLI Antigravity',
@@ -11600,8 +11704,6 @@ extension on TranslationsFr {
 			'terminal.authUrl.linkLabel' => ({required Object url}) => 'Lien d\'authentification : ${url}',
 			'terminal.fileLink.detected' => ({required Object path}) => 'Fichier détecté : ${path}',
 			'terminal.shortcuts.interrupt' => 'Interrompre (SIGINT)',
-			_ => null,
-		} ?? switch (path) {
 			'terminal.shortcuts.eof' => 'EOF',
 			'terminal.shortcuts.suspend' => 'Suspendre (SIGTSTP)',
 			'terminal.shortcuts.hide' => 'Masquer la barre de raccourcis',
@@ -11621,6 +11723,34 @@ extension on TranslationsFr {
 			'terminal.overlay.processExitedWithCode' => ({required Object code}) => 'Le processus s’est arrêté (code ${code}) — connectez-vous pour le relancer',
 			'terminal.overlay.resumeSession' => ({required Object title}) => 'Reprendre la session ${title}',
 			'terminal.overlay.startSession' => ({required Object path}) => 'Démarrer une nouvelle session dans ${path}',
+			'terminal.menu.title' => 'Menu du terminal',
+			'terminal.menu.edit' => 'Édition',
+			'terminal.menu.view' => 'Affichage',
+			'terminal.menu.session' => 'Session',
+			'terminal.menu.find' => 'Rechercher',
+			'terminal.menu.renameTab' => 'Renommer l\'onglet',
+			'terminal.menu.duplicateTab' => 'Dupliquer l\'onglet',
+			'terminal.menu.closeTab' => 'Fermer l\'onglet',
+			'terminal.menu.closeOtherTabs' => 'Fermer les autres onglets',
+			'terminal.menu.closeTabsToRight' => 'Fermer les onglets à droite',
+			'terminal.menu.zoomReset' => 'Réinitialiser le zoom',
+			'terminal.menu.selectAll' => 'Tout sélectionner',
+			'terminal.menu.keyBar' => 'Barre de touches à l\'écran',
+			'terminal.menu.shortcutsHelp' => 'Raccourcis clavier',
+			'terminal.rename.title' => 'Renommer l\'onglet',
+			'terminal.rename.hint' => 'Nom de l\'onglet',
+			'terminal.search.hint' => 'Rechercher',
+			'terminal.search.noResults' => 'Aucun résultat',
+			'terminal.search.count' => ({required Object current, required Object total}) => '${current} sur ${total}',
+			'terminal.search.matchCase' => 'Respecter la casse',
+			'terminal.search.next' => 'Résultat suivant',
+			'terminal.search.previous' => 'Résultat précédent',
+			'terminal.search.close' => 'Fermer la recherche',
+			'terminal.keyBar.ctrl' => 'Ctrl',
+			'terminal.keyBar.alt' => 'Alt',
+			'terminal.keyBar.ctrlHint' => 'Maintenir Ctrl pour la touche suivante',
+			'terminal.keyBar.altHint' => 'Maintenir Alt pour la touche suivante',
+			'terminal.keyBar.showKeyboard' => 'Afficher le clavier',
 			'voice.preview' => 'Aperçu',
 			'voice.settingsSaved' => 'Paramètres de saisie vocale enregistrés',
 			'voice.saveFailed' => 'Échec de l’enregistrement de la configuration STT',

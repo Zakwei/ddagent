@@ -2888,6 +2888,23 @@
       "termInterrupt": "Interrompre le processus (sans sélection)",
       "termPaste": "Coller",
       "termSelectAll": "Tout sélectionner",
+      "termFind": "Rechercher dans le tampon",
+      "termNewTab": "Nouvel onglet",
+      "termCloseTab": "Fermer l'onglet",
+      "termDuplicate": "Dupliquer l'onglet",
+      "termNextTab": "Onglet suivant",
+      "termPrevTab": "Onglet précédent",
+      "termGoToTab": "Aller à l'onglet 1–9",
+      "termRename": "Renommer l'onglet (double-clic)",
+      "termZoomIn": "Zoom avant",
+      "termZoomOut": "Zoom arrière",
+      "termZoomReset": "Réinitialiser le zoom",
+      "termScrollLine": "Défiler d'une ligne",
+      "termScrollPage": "Défiler d'une page",
+      "termScrollEdge": "Aller en haut / en bas",
+      "termMenu": "Menu du terminal",
+      "termClearSelection": "Effacer la sélection",
+      "termWebNote": "Les navigateurs réservent Ctrl+Maj+T/W — la version web accepte aussi Ctrl+Alt+T / Ctrl+Alt+W.",
       "editor": "Éditeur",
       "edSave": "Enregistrer le fichier",
       "edSaveAll": "Enregistrer tous les fichiers",
@@ -4202,6 +4219,42 @@
       "processExitedWithCode": "Le processus s’est arrêté (code {{code}}) — connectez-vous pour le relancer",
       "resumeSession": "Reprendre la session {{title}}",
       "startSession": "Démarrer une nouvelle session dans {{path}}"
+    },
+    "menu": {
+      "title": "Menu du terminal",
+      "edit": "Édition",
+      "view": "Affichage",
+      "session": "Session",
+      "find": "Rechercher",
+      "renameTab": "Renommer l'onglet",
+      "duplicateTab": "Dupliquer l'onglet",
+      "closeTab": "Fermer l'onglet",
+      "closeOtherTabs": "Fermer les autres onglets",
+      "closeTabsToRight": "Fermer les onglets à droite",
+      "zoomReset": "Réinitialiser le zoom",
+      "selectAll": "Tout sélectionner",
+      "keyBar": "Barre de touches à l'écran",
+      "shortcutsHelp": "Raccourcis clavier"
+    },
+    "rename": {
+      "title": "Renommer l'onglet",
+      "hint": "Nom de l'onglet"
+    },
+    "search": {
+      "hint": "Rechercher",
+      "noResults": "Aucun résultat",
+      "count": "{{current}} sur {{total}}",
+      "matchCase": "Respecter la casse",
+      "next": "Résultat suivant",
+      "previous": "Résultat précédent",
+      "close": "Fermer la recherche"
+    },
+    "keyBar": {
+      "ctrl": "Ctrl",
+      "alt": "Alt",
+      "ctrlHint": "Maintenir Ctrl pour la touche suivante",
+      "altHint": "Maintenir Alt pour la touche suivante",
+      "showKeyboard": "Afficher le clavier"
     }
   },
   "voice": {

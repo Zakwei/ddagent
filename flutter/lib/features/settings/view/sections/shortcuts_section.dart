@@ -46,13 +46,30 @@ class ShortcutsSection extends StatelessWidget {
           (t.trClose, const ['Esc'], const ['Esc']),
         ],
       ),
+      // Windows Terminal default bindings (defaults.json); see
+      // features/terminal/view/terminal_keymap.dart.
       (
         t.terminal,
         [
-          (t.termCopy, const ['Ctrl+C', 'Ctrl+Shift+C'], const ['⌘C']),
+          (t.termCopy, const ['Ctrl+C', 'Ctrl+Shift+C', 'Ctrl+Ins'], const ['⌘C']),
           (t.termInterrupt, const ['Ctrl+C'], const ['⌃C']),
-          (t.termPaste, const ['Ctrl+V', 'Shift+Ins'], const ['⌘V']),
-          (t.termSelectAll, const ['Ctrl+A'], const ['⌘A']),
+          (t.termPaste, const ['Ctrl+V', 'Ctrl+Shift+V', 'Shift+Ins'], const ['⌘V']),
+          (t.termSelectAll, const ['Ctrl+Shift+A'], const ['⌘A']),
+          (t.termClearSelection, const ['Esc'], const ['Esc']),
+          (t.termFind, const ['Ctrl+Shift+F'], const ['⌘F']),
+          (t.termNewTab, const ['Ctrl+Shift+T'], const ['⌘T']),
+          (t.termCloseTab, const ['Ctrl+Shift+W'], const ['⌘W']),
+          (t.termDuplicate, const ['Ctrl+Shift+D'], const ['⌘⇧D']),
+          (t.termNextTab, const ['Ctrl+Tab', 'Ctrl+PgDn'], const ['⌘⇧]']),
+          (t.termPrevTab, const ['Ctrl+Shift+Tab', 'Ctrl+PgUp'], const ['⌘⇧[']),
+          (t.termGoToTab, const ['Ctrl+Alt+1…9'], const ['⌘1…9']),
+          (t.termZoomIn, const ['Ctrl++', 'Ctrl+Wheel'], const ['⌘+']),
+          (t.termZoomOut, const ['Ctrl+-', 'Ctrl+Wheel'], const ['⌘−']),
+          (t.termZoomReset, const ['Ctrl+0'], const ['⌘0']),
+          (t.termScrollLine, const ['Ctrl+Shift+↑ ↓'], const ['⌘⇧↑ ↓']),
+          (t.termScrollPage, const ['Ctrl+Shift+PgUp PgDn'], const ['⌘⇧PgUp PgDn']),
+          (t.termScrollEdge, const ['Ctrl+Shift+Home End'], const ['⌘⇧Home End']),
+          (t.termMenu, const ['Ctrl+Shift+P'], const ['⌘⇧P']),
         ],
       ),
       (
@@ -85,7 +102,11 @@ class ShortcutsSection extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: AppSpacing.lg),
             child: SettingsSectionBlock(
               title: title,
-              description: title == t.navigation ? t.description : null,
+              description: title == t.navigation
+                  ? t.description
+                  : title == t.terminal
+                  ? t.termWebNote
+                  : null,
               children: [
                 AppCard(
                   child: Column(

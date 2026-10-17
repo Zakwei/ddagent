@@ -665,6 +665,10 @@ class Translations$terminal$tr extends Translations$terminal$en {
 	@override late final Translations$terminal$loginDialog$tr loginDialog = Translations$terminal$loginDialog$tr._(_root);
 	@override late final Translations$terminal$empty$tr empty = Translations$terminal$empty$tr._(_root);
 	@override late final Translations$terminal$overlay$tr overlay = Translations$terminal$overlay$tr._(_root);
+	@override late final Translations$terminal$menu$tr menu = Translations$terminal$menu$tr._(_root);
+	@override late final Translations$terminal$rename$tr rename = Translations$terminal$rename$tr._(_root);
+	@override late final Translations$terminal$search$tr search = Translations$terminal$search$tr._(_root);
+	@override late final Translations$terminal$keyBar$tr keyBar = Translations$terminal$keyBar$tr._(_root);
 }
 
 // Path: voice
@@ -3200,6 +3204,23 @@ class Translations$settings$shortcuts$tr extends Translations$settings$shortcuts
 	@override String get termInterrupt => 'İşlemi kes (seçim yokken)';
 	@override String get termPaste => 'Yapıştır';
 	@override String get termSelectAll => 'Tümünü seç';
+	@override String get termFind => 'Arabellekte bul';
+	@override String get termNewTab => 'Yeni sekme';
+	@override String get termCloseTab => 'Sekmeyi kapat';
+	@override String get termDuplicate => 'Sekmeyi çoğalt';
+	@override String get termNextTab => 'Sonraki sekme';
+	@override String get termPrevTab => 'Önceki sekme';
+	@override String get termGoToTab => '1–9. sekmeye git';
+	@override String get termRename => 'Sekmeyi yeniden adlandır (çift tık)';
+	@override String get termZoomIn => 'Yakınlaştır';
+	@override String get termZoomOut => 'Uzaklaştır';
+	@override String get termZoomReset => 'Yakınlaştırmayı sıfırla';
+	@override String get termScrollLine => 'Bir satır kaydır';
+	@override String get termScrollPage => 'Bir sayfa kaydır';
+	@override String get termScrollEdge => 'En üste / en alta kaydır';
+	@override String get termMenu => 'Terminal menüsü';
+	@override String get termClearSelection => 'Seçimi kaldır';
+	@override String get termWebNote => 'Tarayıcılar Ctrl+Shift+T/W tuşlarını ayırır — web sürümü Ctrl+Alt+T / Ctrl+Alt+W tuşlarını da kabul eder.';
 	@override String get editor => 'Düzenleyici';
 	@override String get edSave => 'Dosyayı kaydet';
 	@override String get edSaveAll => 'Tüm dosyaları kaydet';
@@ -4999,6 +5020,70 @@ class Translations$terminal$overlay$tr extends Translations$terminal$overlay$en 
 	@override String processExitedWithCode({required Object code}) => 'İşlem sonlandı (kod ${code}) — yeniden başlatmak için bağlanın';
 	@override String resumeSession({required Object title}) => '${title} oturumunu sürdür';
 	@override String startSession({required Object path}) => '${path} içinde yeni bir oturum başlat';
+}
+
+// Path: terminal.menu
+class Translations$terminal$menu$tr extends Translations$terminal$menu$en {
+	Translations$terminal$menu$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Terminal menüsü';
+	@override String get edit => 'Düzenle';
+	@override String get view => 'Görünüm';
+	@override String get session => 'Oturum';
+	@override String get find => 'Bul';
+	@override String get renameTab => 'Sekmeyi yeniden adlandır';
+	@override String get duplicateTab => 'Sekmeyi çoğalt';
+	@override String get closeTab => 'Sekmeyi kapat';
+	@override String get closeOtherTabs => 'Diğer sekmeleri kapat';
+	@override String get closeTabsToRight => 'Sağdaki sekmeleri kapat';
+	@override String get zoomReset => 'Yakınlaştırmayı sıfırla';
+	@override String get selectAll => 'Tümünü seç';
+	@override String get keyBar => 'Ekran tuş çubuğu';
+	@override String get shortcutsHelp => 'Klavye kısayolları';
+}
+
+// Path: terminal.rename
+class Translations$terminal$rename$tr extends Translations$terminal$rename$en {
+	Translations$terminal$rename$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Sekmeyi yeniden adlandır';
+	@override String get hint => 'Sekme adı';
+}
+
+// Path: terminal.search
+class Translations$terminal$search$tr extends Translations$terminal$search$en {
+	Translations$terminal$search$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get hint => 'Bul';
+	@override String get noResults => 'Sonuç yok';
+	@override String count({required Object current, required Object total}) => '${current} / ${total}';
+	@override String get matchCase => 'Büyük/küçük harf eşleştir';
+	@override String get next => 'Sonraki eşleşme';
+	@override String get previous => 'Önceki eşleşme';
+	@override String get close => 'Aramayı kapat';
+}
+
+// Path: terminal.keyBar
+class Translations$terminal$keyBar$tr extends Translations$terminal$keyBar$en {
+	Translations$terminal$keyBar$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get ctrl => 'Ctrl';
+	@override String get alt => 'Alt';
+	@override String get ctrlHint => 'Sonraki tuş için Ctrl basılı tut';
+	@override String get altHint => 'Sonraki tuş için Alt basılı tut';
+	@override String get showKeyboard => 'Klavyeyi göster';
 }
 
 // Path: workspace.paneTitle
@@ -10667,6 +10752,23 @@ extension on TranslationsTr {
 			'settings.shortcuts.termInterrupt' => 'İşlemi kes (seçim yokken)',
 			'settings.shortcuts.termPaste' => 'Yapıştır',
 			'settings.shortcuts.termSelectAll' => 'Tümünü seç',
+			'settings.shortcuts.termFind' => 'Arabellekte bul',
+			'settings.shortcuts.termNewTab' => 'Yeni sekme',
+			'settings.shortcuts.termCloseTab' => 'Sekmeyi kapat',
+			'settings.shortcuts.termDuplicate' => 'Sekmeyi çoğalt',
+			'settings.shortcuts.termNextTab' => 'Sonraki sekme',
+			'settings.shortcuts.termPrevTab' => 'Önceki sekme',
+			'settings.shortcuts.termGoToTab' => '1–9. sekmeye git',
+			'settings.shortcuts.termRename' => 'Sekmeyi yeniden adlandır (çift tık)',
+			'settings.shortcuts.termZoomIn' => 'Yakınlaştır',
+			'settings.shortcuts.termZoomOut' => 'Uzaklaştır',
+			'settings.shortcuts.termZoomReset' => 'Yakınlaştırmayı sıfırla',
+			'settings.shortcuts.termScrollLine' => 'Bir satır kaydır',
+			'settings.shortcuts.termScrollPage' => 'Bir sayfa kaydır',
+			'settings.shortcuts.termScrollEdge' => 'En üste / en alta kaydır',
+			'settings.shortcuts.termMenu' => 'Terminal menüsü',
+			'settings.shortcuts.termClearSelection' => 'Seçimi kaldır',
+			'settings.shortcuts.termWebNote' => 'Tarayıcılar Ctrl+Shift+T/W tuşlarını ayırır — web sürümü Ctrl+Alt+T / Ctrl+Alt+W tuşlarını da kabul eder.',
 			'settings.shortcuts.editor' => 'Düzenleyici',
 			'settings.shortcuts.edSave' => 'Dosyayı kaydet',
 			'settings.shortcuts.edSaveAll' => 'Tüm dosyaları kaydet',
@@ -11064,6 +11166,8 @@ extension on TranslationsTr {
 			'tasks.nextTask.hideDetails' => 'Ayrıntıları gizle',
 			'tasks.nextTask.initialize' => 'Başlat',
 			'tasks.nextTask.noPending' => 'Bekleyen görev yok',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI yapılandırılmamış',
 			'tasks.nextTask.review' => 'İncele',
 			'tasks.nextTask.startTask' => 'Görevi Başlat',
@@ -11081,8 +11185,6 @@ extension on TranslationsTr {
 			'tasks.taskDetail.dependencies' => 'Bağımlılıklar',
 			'tasks.taskDetail.dependenciesPlaceholder' => 'örn. 1, 2, 3',
 			'tasks.taskDetail.description' => 'Açıklama',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.edit' => 'Görevi düzenle',
 			'tasks.taskDetail.implDetails' => 'Uygulama Ayrıntıları',
 			'tasks.taskDetail.noDependencies' => 'Bağımlılık yok',
@@ -11578,6 +11680,8 @@ extension on TranslationsTr {
 			'terminal.tabs.shellName' => ({required Object index}) => 'Kabuk ${index}',
 			'terminal.tabs.plainShell' => 'Basit Shell',
 			'terminal.tabs.claudeCli' => 'Claude CLI',
+			_ => null,
+		} ?? switch (path) {
 			'terminal.tabs.opencodeCli' => 'OpenCode CLI',
 			'terminal.tabs.commandCodeCli' => 'Command Code CLI',
 			'terminal.tabs.antigravityCli' => 'Antigravity CLI',
@@ -11595,8 +11699,6 @@ extension on TranslationsTr {
 			'terminal.authUrl.linkLabel' => ({required Object url}) => 'Kimlik doğrulama bağlantısı: ${url}',
 			'terminal.fileLink.detected' => ({required Object path}) => 'Dosya algılandı: ${path}',
 			'terminal.shortcuts.interrupt' => 'Kes (SIGINT)',
-			_ => null,
-		} ?? switch (path) {
 			'terminal.shortcuts.eof' => 'EOF',
 			'terminal.shortcuts.suspend' => 'Askıya al (SIGTSTP)',
 			'terminal.shortcuts.hide' => 'Kısayol çubuğunu gizle',
@@ -11616,6 +11718,34 @@ extension on TranslationsTr {
 			'terminal.overlay.processExitedWithCode' => ({required Object code}) => 'İşlem sonlandı (kod ${code}) — yeniden başlatmak için bağlanın',
 			'terminal.overlay.resumeSession' => ({required Object title}) => '${title} oturumunu sürdür',
 			'terminal.overlay.startSession' => ({required Object path}) => '${path} içinde yeni bir oturum başlat',
+			'terminal.menu.title' => 'Terminal menüsü',
+			'terminal.menu.edit' => 'Düzenle',
+			'terminal.menu.view' => 'Görünüm',
+			'terminal.menu.session' => 'Oturum',
+			'terminal.menu.find' => 'Bul',
+			'terminal.menu.renameTab' => 'Sekmeyi yeniden adlandır',
+			'terminal.menu.duplicateTab' => 'Sekmeyi çoğalt',
+			'terminal.menu.closeTab' => 'Sekmeyi kapat',
+			'terminal.menu.closeOtherTabs' => 'Diğer sekmeleri kapat',
+			'terminal.menu.closeTabsToRight' => 'Sağdaki sekmeleri kapat',
+			'terminal.menu.zoomReset' => 'Yakınlaştırmayı sıfırla',
+			'terminal.menu.selectAll' => 'Tümünü seç',
+			'terminal.menu.keyBar' => 'Ekran tuş çubuğu',
+			'terminal.menu.shortcutsHelp' => 'Klavye kısayolları',
+			'terminal.rename.title' => 'Sekmeyi yeniden adlandır',
+			'terminal.rename.hint' => 'Sekme adı',
+			'terminal.search.hint' => 'Bul',
+			'terminal.search.noResults' => 'Sonuç yok',
+			'terminal.search.count' => ({required Object current, required Object total}) => '${current} / ${total}',
+			'terminal.search.matchCase' => 'Büyük/küçük harf eşleştir',
+			'terminal.search.next' => 'Sonraki eşleşme',
+			'terminal.search.previous' => 'Önceki eşleşme',
+			'terminal.search.close' => 'Aramayı kapat',
+			'terminal.keyBar.ctrl' => 'Ctrl',
+			'terminal.keyBar.alt' => 'Alt',
+			'terminal.keyBar.ctrlHint' => 'Sonraki tuş için Ctrl basılı tut',
+			'terminal.keyBar.altHint' => 'Sonraki tuş için Alt basılı tut',
+			'terminal.keyBar.showKeyboard' => 'Klavyeyi göster',
 			'voice.preview' => 'Önizle',
 			'voice.settingsSaved' => 'Sesli giriş ayarları kaydedildi',
 			'voice.saveFailed' => 'STT yapılandırması kaydedilemedi',

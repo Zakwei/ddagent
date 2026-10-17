@@ -2888,6 +2888,23 @@
       "termInterrupt": "Interrupt process (no selection)",
       "termPaste": "Paste",
       "termSelectAll": "Select all",
+      "termFind": "Find in buffer",
+      "termNewTab": "New tab",
+      "termCloseTab": "Close tab",
+      "termDuplicate": "Duplicate tab",
+      "termNextTab": "Next tab",
+      "termPrevTab": "Previous tab",
+      "termGoToTab": "Go to tab 1–9",
+      "termRename": "Rename tab (double-click)",
+      "termZoomIn": "Zoom in",
+      "termZoomOut": "Zoom out",
+      "termZoomReset": "Reset zoom",
+      "termScrollLine": "Scroll one line",
+      "termScrollPage": "Scroll one page",
+      "termScrollEdge": "Scroll to top / bottom",
+      "termMenu": "Terminal menu",
+      "termClearSelection": "Clear selection",
+      "termWebNote": "Browsers reserve Ctrl+Shift+T/W — the web build also accepts Ctrl+Alt+T / Ctrl+Alt+W.",
       "editor": "Editor",
       "edSave": "Save file",
       "edSaveAll": "Save all files",
@@ -4202,6 +4219,42 @@
       "processExitedWithCode": "Process exited (code {{code}}) — connect to start it again",
       "resumeSession": "Resume session {{title}}",
       "startSession": "Start a new session in {{path}}"
+    },
+    "menu": {
+      "title": "Terminal menu",
+      "edit": "Edit",
+      "view": "View",
+      "session": "Session",
+      "find": "Find",
+      "renameTab": "Rename tab",
+      "duplicateTab": "Duplicate tab",
+      "closeTab": "Close tab",
+      "closeOtherTabs": "Close other tabs",
+      "closeTabsToRight": "Close tabs to the right",
+      "zoomReset": "Reset zoom",
+      "selectAll": "Select all",
+      "keyBar": "On-screen key bar",
+      "shortcutsHelp": "Keyboard shortcuts"
+    },
+    "rename": {
+      "title": "Rename tab",
+      "hint": "Tab name"
+    },
+    "search": {
+      "hint": "Find",
+      "noResults": "No results",
+      "count": "{{current}} of {{total}}",
+      "matchCase": "Match case",
+      "next": "Next match",
+      "previous": "Previous match",
+      "close": "Close search"
+    },
+    "keyBar": {
+      "ctrl": "Ctrl",
+      "alt": "Alt",
+      "ctrlHint": "Hold Ctrl for the next key",
+      "altHint": "Hold Alt for the next key",
+      "showKeyboard": "Show keyboard"
     }
   },
   "voice": {

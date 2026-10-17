@@ -664,6 +664,10 @@ class Translations$terminal$zh_TW extends Translations$terminal$en {
 	@override late final Translations$terminal$loginDialog$zh_TW loginDialog = Translations$terminal$loginDialog$zh_TW.internal(_root);
 	@override late final Translations$terminal$empty$zh_TW empty = Translations$terminal$empty$zh_TW.internal(_root);
 	@override late final Translations$terminal$overlay$zh_TW overlay = Translations$terminal$overlay$zh_TW.internal(_root);
+	@override late final Translations$terminal$menu$zh_TW menu = Translations$terminal$menu$zh_TW.internal(_root);
+	@override late final Translations$terminal$rename$zh_TW rename = Translations$terminal$rename$zh_TW.internal(_root);
+	@override late final Translations$terminal$search$zh_TW search = Translations$terminal$search$zh_TW.internal(_root);
+	@override late final Translations$terminal$keyBar$zh_TW keyBar = Translations$terminal$keyBar$zh_TW.internal(_root);
 }
 
 // Path: voice
@@ -3195,6 +3199,23 @@ class Translations$settings$shortcuts$zh_TW extends Translations$settings$shortc
 	@override String get termInterrupt => '中斷程序（未選取時）';
 	@override String get termPaste => '貼上';
 	@override String get termSelectAll => '全選';
+	@override String get termFind => '在緩衝區中尋找';
+	@override String get termNewTab => '新增分頁';
+	@override String get termCloseTab => '關閉分頁';
+	@override String get termDuplicate => '複製分頁';
+	@override String get termNextTab => '下一個分頁';
+	@override String get termPrevTab => '上一個分頁';
+	@override String get termGoToTab => '前往分頁 1–9';
+	@override String get termRename => '重新命名分頁（按兩下）';
+	@override String get termZoomIn => '放大';
+	@override String get termZoomOut => '縮小';
+	@override String get termZoomReset => '重設縮放';
+	@override String get termScrollLine => '捲動一行';
+	@override String get termScrollPage => '捲動一頁';
+	@override String get termScrollEdge => '捲動到頂端 / 底端';
+	@override String get termMenu => '終端機選單';
+	@override String get termClearSelection => '清除選取';
+	@override String get termWebNote => '瀏覽器保留了 Ctrl+Shift+T/W — 網頁版也接受 Ctrl+Alt+T / Ctrl+Alt+W。';
 	@override String get editor => '編輯器';
 	@override String get edSave => '儲存檔案';
 	@override String get edSaveAll => '儲存所有檔案';
@@ -4994,6 +5015,70 @@ class Translations$terminal$overlay$zh_TW extends Translations$terminal$overlay$
 	@override String processExitedWithCode({required Object code}) => '程序已結束（代碼 ${code}）— 連線以重新啟動';
 	@override String resumeSession({required Object title}) => '繼續工作階段 ${title}';
 	@override String startSession({required Object path}) => '在 ${path} 中開始新的工作階段';
+}
+
+// Path: terminal.menu
+class Translations$terminal$menu$zh_TW extends Translations$terminal$menu$en {
+	Translations$terminal$menu$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '終端機選單';
+	@override String get edit => '編輯';
+	@override String get view => '檢視';
+	@override String get session => '工作階段';
+	@override String get find => '尋找';
+	@override String get renameTab => '重新命名分頁';
+	@override String get duplicateTab => '複製分頁';
+	@override String get closeTab => '關閉分頁';
+	@override String get closeOtherTabs => '關閉其他分頁';
+	@override String get closeTabsToRight => '關閉右側分頁';
+	@override String get zoomReset => '重設縮放';
+	@override String get selectAll => '全選';
+	@override String get keyBar => '螢幕按鍵列';
+	@override String get shortcutsHelp => '鍵盤快速鍵';
+}
+
+// Path: terminal.rename
+class Translations$terminal$rename$zh_TW extends Translations$terminal$rename$en {
+	Translations$terminal$rename$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '重新命名分頁';
+	@override String get hint => '分頁名稱';
+}
+
+// Path: terminal.search
+class Translations$terminal$search$zh_TW extends Translations$terminal$search$en {
+	Translations$terminal$search$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get hint => '尋找';
+	@override String get noResults => '沒有結果';
+	@override String count({required Object current, required Object total}) => '第 ${current} 項，共 ${total} 項';
+	@override String get matchCase => '區分大小寫';
+	@override String get next => '下一個符合項目';
+	@override String get previous => '上一個符合項目';
+	@override String get close => '關閉搜尋';
+}
+
+// Path: terminal.keyBar
+class Translations$terminal$keyBar$zh_TW extends Translations$terminal$keyBar$en {
+	Translations$terminal$keyBar$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get ctrl => 'Ctrl';
+	@override String get alt => 'Alt';
+	@override String get ctrlHint => '為下一個按鍵按住 Ctrl';
+	@override String get altHint => '為下一個按鍵按住 Alt';
+	@override String get showKeyboard => '顯示鍵盤';
 }
 
 // Path: workspace.paneTitle
@@ -10661,6 +10746,23 @@ extension on TranslationsZhTw {
 			'settings.shortcuts.termInterrupt' => '中斷程序（未選取時）',
 			'settings.shortcuts.termPaste' => '貼上',
 			'settings.shortcuts.termSelectAll' => '全選',
+			'settings.shortcuts.termFind' => '在緩衝區中尋找',
+			'settings.shortcuts.termNewTab' => '新增分頁',
+			'settings.shortcuts.termCloseTab' => '關閉分頁',
+			'settings.shortcuts.termDuplicate' => '複製分頁',
+			'settings.shortcuts.termNextTab' => '下一個分頁',
+			'settings.shortcuts.termPrevTab' => '上一個分頁',
+			'settings.shortcuts.termGoToTab' => '前往分頁 1–9',
+			'settings.shortcuts.termRename' => '重新命名分頁（按兩下）',
+			'settings.shortcuts.termZoomIn' => '放大',
+			'settings.shortcuts.termZoomOut' => '縮小',
+			'settings.shortcuts.termZoomReset' => '重設縮放',
+			'settings.shortcuts.termScrollLine' => '捲動一行',
+			'settings.shortcuts.termScrollPage' => '捲動一頁',
+			'settings.shortcuts.termScrollEdge' => '捲動到頂端 / 底端',
+			'settings.shortcuts.termMenu' => '終端機選單',
+			'settings.shortcuts.termClearSelection' => '清除選取',
+			'settings.shortcuts.termWebNote' => '瀏覽器保留了 Ctrl+Shift+T/W — 網頁版也接受 Ctrl+Alt+T / Ctrl+Alt+W。',
 			'settings.shortcuts.editor' => '編輯器',
 			'settings.shortcuts.edSave' => '儲存檔案',
 			'settings.shortcuts.edSaveAll' => '儲存所有檔案',
@@ -11058,6 +11160,8 @@ extension on TranslationsZhTw {
 			'tasks.nextTask.hideDetails' => '隱藏詳情',
 			'tasks.nextTask.initialize' => '初始化',
 			'tasks.nextTask.noPending' => '沒有待處理任務',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI 未設定',
 			'tasks.nextTask.review' => '審查',
 			'tasks.nextTask.startTask' => '開始任務',
@@ -11075,8 +11179,6 @@ extension on TranslationsZhTw {
 			'tasks.taskDetail.dependencies' => '依賴項',
 			'tasks.taskDetail.dependenciesPlaceholder' => '例如：1, 2, 3',
 			'tasks.taskDetail.description' => '描述',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.edit' => '編輯任務',
 			'tasks.taskDetail.implDetails' => '實作細節',
 			'tasks.taskDetail.noDependencies' => '無依賴項',
@@ -11572,6 +11674,8 @@ extension on TranslationsZhTw {
 			'terminal.tabs.shellName' => ({required Object index}) => 'Shell ${index}',
 			'terminal.tabs.plainShell' => '一般 Shell',
 			'terminal.tabs.claudeCli' => 'Claude CLI',
+			_ => null,
+		} ?? switch (path) {
 			'terminal.tabs.opencodeCli' => 'OpenCode CLI',
 			'terminal.tabs.commandCodeCli' => 'Command Code CLI',
 			'terminal.tabs.antigravityCli' => 'Antigravity CLI',
@@ -11589,8 +11693,6 @@ extension on TranslationsZhTw {
 			'terminal.authUrl.linkLabel' => ({required Object url}) => '驗證連結：${url}',
 			'terminal.fileLink.detected' => ({required Object path}) => '偵測到檔案：${path}',
 			'terminal.shortcuts.interrupt' => '中斷 (SIGINT)',
-			_ => null,
-		} ?? switch (path) {
 			'terminal.shortcuts.eof' => 'EOF',
 			'terminal.shortcuts.suspend' => '暫停 (SIGTSTP)',
 			'terminal.shortcuts.hide' => '隱藏快速鍵列',
@@ -11610,6 +11712,34 @@ extension on TranslationsZhTw {
 			'terminal.overlay.processExitedWithCode' => ({required Object code}) => '程序已結束（代碼 ${code}）— 連線以重新啟動',
 			'terminal.overlay.resumeSession' => ({required Object title}) => '繼續工作階段 ${title}',
 			'terminal.overlay.startSession' => ({required Object path}) => '在 ${path} 中開始新的工作階段',
+			'terminal.menu.title' => '終端機選單',
+			'terminal.menu.edit' => '編輯',
+			'terminal.menu.view' => '檢視',
+			'terminal.menu.session' => '工作階段',
+			'terminal.menu.find' => '尋找',
+			'terminal.menu.renameTab' => '重新命名分頁',
+			'terminal.menu.duplicateTab' => '複製分頁',
+			'terminal.menu.closeTab' => '關閉分頁',
+			'terminal.menu.closeOtherTabs' => '關閉其他分頁',
+			'terminal.menu.closeTabsToRight' => '關閉右側分頁',
+			'terminal.menu.zoomReset' => '重設縮放',
+			'terminal.menu.selectAll' => '全選',
+			'terminal.menu.keyBar' => '螢幕按鍵列',
+			'terminal.menu.shortcutsHelp' => '鍵盤快速鍵',
+			'terminal.rename.title' => '重新命名分頁',
+			'terminal.rename.hint' => '分頁名稱',
+			'terminal.search.hint' => '尋找',
+			'terminal.search.noResults' => '沒有結果',
+			'terminal.search.count' => ({required Object current, required Object total}) => '第 ${current} 項，共 ${total} 項',
+			'terminal.search.matchCase' => '區分大小寫',
+			'terminal.search.next' => '下一個符合項目',
+			'terminal.search.previous' => '上一個符合項目',
+			'terminal.search.close' => '關閉搜尋',
+			'terminal.keyBar.ctrl' => 'Ctrl',
+			'terminal.keyBar.alt' => 'Alt',
+			'terminal.keyBar.ctrlHint' => '為下一個按鍵按住 Ctrl',
+			'terminal.keyBar.altHint' => '為下一個按鍵按住 Alt',
+			'terminal.keyBar.showKeyboard' => '顯示鍵盤',
 			'voice.preview' => '預覽',
 			'voice.settingsSaved' => '語音輸入設定已儲存',
 			'voice.saveFailed' => '儲存 STT 設定失敗',

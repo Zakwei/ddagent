@@ -2878,6 +2878,23 @@
       "termInterrupt": "中斷程序（未選取時）",
       "termPaste": "貼上",
       "termSelectAll": "全選",
+      "termFind": "在緩衝區中尋找",
+      "termNewTab": "新增分頁",
+      "termCloseTab": "關閉分頁",
+      "termDuplicate": "複製分頁",
+      "termNextTab": "下一個分頁",
+      "termPrevTab": "上一個分頁",
+      "termGoToTab": "前往分頁 1–9",
+      "termRename": "重新命名分頁（按兩下）",
+      "termZoomIn": "放大",
+      "termZoomOut": "縮小",
+      "termZoomReset": "重設縮放",
+      "termScrollLine": "捲動一行",
+      "termScrollPage": "捲動一頁",
+      "termScrollEdge": "捲動到頂端 / 底端",
+      "termMenu": "終端機選單",
+      "termClearSelection": "清除選取",
+      "termWebNote": "瀏覽器保留了 Ctrl+Shift+T/W — 網頁版也接受 Ctrl+Alt+T / Ctrl+Alt+W。",
       "editor": "編輯器",
       "edSave": "儲存檔案",
       "edSaveAll": "儲存所有檔案",
@@ -4191,6 +4208,42 @@
       "processExitedWithCode": "程序已結束（代碼 {{code}}）— 連線以重新啟動",
       "resumeSession": "繼續工作階段 {{title}}",
       "startSession": "在 {{path}} 中開始新的工作階段"
+    },
+    "menu": {
+      "title": "終端機選單",
+      "edit": "編輯",
+      "view": "檢視",
+      "session": "工作階段",
+      "find": "尋找",
+      "renameTab": "重新命名分頁",
+      "duplicateTab": "複製分頁",
+      "closeTab": "關閉分頁",
+      "closeOtherTabs": "關閉其他分頁",
+      "closeTabsToRight": "關閉右側分頁",
+      "zoomReset": "重設縮放",
+      "selectAll": "全選",
+      "keyBar": "螢幕按鍵列",
+      "shortcutsHelp": "鍵盤快速鍵"
+    },
+    "rename": {
+      "title": "重新命名分頁",
+      "hint": "分頁名稱"
+    },
+    "search": {
+      "hint": "尋找",
+      "noResults": "沒有結果",
+      "count": "第 {{current}} 項，共 {{total}} 項",
+      "matchCase": "區分大小寫",
+      "next": "下一個符合項目",
+      "previous": "上一個符合項目",
+      "close": "關閉搜尋"
+    },
+    "keyBar": {
+      "ctrl": "Ctrl",
+      "alt": "Alt",
+      "ctrlHint": "為下一個按鍵按住 Ctrl",
+      "altHint": "為下一個按鍵按住 Alt",
+      "showKeyboard": "顯示鍵盤"
     }
   },
   "voice": {

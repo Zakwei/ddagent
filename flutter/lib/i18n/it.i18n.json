@@ -2888,6 +2888,23 @@
       "termInterrupt": "Interrompi processo (senza selezione)",
       "termPaste": "Incolla",
       "termSelectAll": "Seleziona tutto",
+      "termFind": "Cerca nel buffer",
+      "termNewTab": "Nuova scheda",
+      "termCloseTab": "Chiudi scheda",
+      "termDuplicate": "Duplica scheda",
+      "termNextTab": "Scheda successiva",
+      "termPrevTab": "Scheda precedente",
+      "termGoToTab": "Vai alla scheda 1–9",
+      "termRename": "Rinomina scheda (doppio clic)",
+      "termZoomIn": "Ingrandisci",
+      "termZoomOut": "Riduci",
+      "termZoomReset": "Reimposta zoom",
+      "termScrollLine": "Scorri di una riga",
+      "termScrollPage": "Scorri di una pagina",
+      "termScrollEdge": "Vai all'inizio / alla fine",
+      "termMenu": "Menu del terminale",
+      "termClearSelection": "Annulla selezione",
+      "termWebNote": "I browser riservano Ctrl+Shift+T/W — la versione web accetta anche Ctrl+Alt+T / Ctrl+Alt+W.",
       "editor": "Editor",
       "edSave": "Salva file",
       "edSaveAll": "Salva tutti i file",
@@ -4202,6 +4219,42 @@
       "processExitedWithCode": "Il processo è terminato (codice {{code}}): connettiti per avviarlo di nuovo",
       "resumeSession": "Riprendi la sessione {{title}}",
       "startSession": "Avvia una nuova sessione in {{path}}"
+    },
+    "menu": {
+      "title": "Menu del terminale",
+      "edit": "Modifica",
+      "view": "Visualizza",
+      "session": "Sessione",
+      "find": "Trova",
+      "renameTab": "Rinomina scheda",
+      "duplicateTab": "Duplica scheda",
+      "closeTab": "Chiudi scheda",
+      "closeOtherTabs": "Chiudi le altre schede",
+      "closeTabsToRight": "Chiudi le schede a destra",
+      "zoomReset": "Reimposta zoom",
+      "selectAll": "Seleziona tutto",
+      "keyBar": "Barra tasti su schermo",
+      "shortcutsHelp": "Scorciatoie da tastiera"
+    },
+    "rename": {
+      "title": "Rinomina scheda",
+      "hint": "Nome scheda"
+    },
+    "search": {
+      "hint": "Trova",
+      "noResults": "Nessun risultato",
+      "count": "{{current}} di {{total}}",
+      "matchCase": "Maiuscole/minuscole",
+      "next": "Risultato successivo",
+      "previous": "Risultato precedente",
+      "close": "Chiudi ricerca"
+    },
+    "keyBar": {
+      "ctrl": "Ctrl",
+      "alt": "Alt",
+      "ctrlHint": "Tieni Ctrl per il tasto successivo",
+      "altHint": "Tieni Alt per il tasto successivo",
+      "showKeyboard": "Mostra tastiera"
     }
   },
   "voice": {

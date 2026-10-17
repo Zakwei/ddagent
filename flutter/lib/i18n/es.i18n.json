@@ -2888,6 +2888,23 @@
       "termInterrupt": "Interrumpir proceso (sin selección)",
       "termPaste": "Pegar",
       "termSelectAll": "Seleccionar todo",
+      "termFind": "Buscar en el búfer",
+      "termNewTab": "Nueva pestaña",
+      "termCloseTab": "Cerrar pestaña",
+      "termDuplicate": "Duplicar pestaña",
+      "termNextTab": "Pestaña siguiente",
+      "termPrevTab": "Pestaña anterior",
+      "termGoToTab": "Ir a la pestaña 1–9",
+      "termRename": "Renombrar pestaña (doble clic)",
+      "termZoomIn": "Acercar",
+      "termZoomOut": "Alejar",
+      "termZoomReset": "Restablecer zoom",
+      "termScrollLine": "Desplazar una línea",
+      "termScrollPage": "Desplazar una página",
+      "termScrollEdge": "Ir al principio / final",
+      "termMenu": "Menú del terminal",
+      "termClearSelection": "Quitar selección",
+      "termWebNote": "Los navegadores reservan Ctrl+Shift+T/W — la versión web también acepta Ctrl+Alt+T / Ctrl+Alt+W.",
       "editor": "Editor",
       "edSave": "Guardar archivo",
       "edSaveAll": "Guardar todos los archivos",
@@ -4202,6 +4219,42 @@
       "processExitedWithCode": "El proceso ha finalizado (código {{code}}): conéctate para iniciarlo de nuevo",
       "resumeSession": "Reanudar la sesión {{title}}",
       "startSession": "Iniciar una sesión nueva en {{path}}"
+    },
+    "menu": {
+      "title": "Menú del terminal",
+      "edit": "Editar",
+      "view": "Ver",
+      "session": "Sesión",
+      "find": "Buscar",
+      "renameTab": "Renombrar pestaña",
+      "duplicateTab": "Duplicar pestaña",
+      "closeTab": "Cerrar pestaña",
+      "closeOtherTabs": "Cerrar las demás pestañas",
+      "closeTabsToRight": "Cerrar pestañas a la derecha",
+      "zoomReset": "Restablecer zoom",
+      "selectAll": "Seleccionar todo",
+      "keyBar": "Barra de teclas en pantalla",
+      "shortcutsHelp": "Atajos de teclado"
+    },
+    "rename": {
+      "title": "Renombrar pestaña",
+      "hint": "Nombre de la pestaña"
+    },
+    "search": {
+      "hint": "Buscar",
+      "noResults": "Sin resultados",
+      "count": "{{current}} de {{total}}",
+      "matchCase": "Coincidir mayúsculas",
+      "next": "Siguiente coincidencia",
+      "previous": "Coincidencia anterior",
+      "close": "Cerrar búsqueda"
+    },
+    "keyBar": {
+      "ctrl": "Ctrl",
+      "alt": "Alt",
+      "ctrlHint": "Mantener Ctrl para la siguiente tecla",
+      "altHint": "Mantener Alt para la siguiente tecla",
+      "showKeyboard": "Mostrar teclado"
     }
   },
   "voice": {

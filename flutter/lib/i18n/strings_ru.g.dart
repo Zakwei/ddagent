@@ -667,6 +667,10 @@ class Translations$terminal$ru extends Translations$terminal$en {
 	@override late final Translations$terminal$loginDialog$ru loginDialog = Translations$terminal$loginDialog$ru._(_root);
 	@override late final Translations$terminal$empty$ru empty = Translations$terminal$empty$ru._(_root);
 	@override late final Translations$terminal$overlay$ru overlay = Translations$terminal$overlay$ru._(_root);
+	@override late final Translations$terminal$menu$ru menu = Translations$terminal$menu$ru._(_root);
+	@override late final Translations$terminal$rename$ru rename = Translations$terminal$rename$ru._(_root);
+	@override late final Translations$terminal$search$ru search = Translations$terminal$search$ru._(_root);
+	@override late final Translations$terminal$keyBar$ru keyBar = Translations$terminal$keyBar$ru._(_root);
 }
 
 // Path: voice
@@ -3227,6 +3231,23 @@ class Translations$settings$shortcuts$ru extends Translations$settings$shortcuts
 	@override String get termInterrupt => 'Прервать процесс (без выделения)';
 	@override String get termPaste => 'Вставить';
 	@override String get termSelectAll => 'Выделить всё';
+	@override String get termFind => 'Поиск в буфере';
+	@override String get termNewTab => 'Новая вкладка';
+	@override String get termCloseTab => 'Закрыть вкладку';
+	@override String get termDuplicate => 'Дублировать вкладку';
+	@override String get termNextTab => 'Следующая вкладка';
+	@override String get termPrevTab => 'Предыдущая вкладка';
+	@override String get termGoToTab => 'Перейти к вкладке 1–9';
+	@override String get termRename => 'Переименовать вкладку (двойной клик)';
+	@override String get termZoomIn => 'Увеличить';
+	@override String get termZoomOut => 'Уменьшить';
+	@override String get termZoomReset => 'Сбросить масштаб';
+	@override String get termScrollLine => 'Прокрутить на строку';
+	@override String get termScrollPage => 'Прокрутить на страницу';
+	@override String get termScrollEdge => 'Прокрутить в начало / конец';
+	@override String get termMenu => 'Меню терминала';
+	@override String get termClearSelection => 'Снять выделение';
+	@override String get termWebNote => 'Браузеры резервируют Ctrl+Shift+T/W — веб-версия также принимает Ctrl+Alt+T / Ctrl+Alt+W.';
 	@override String get editor => 'Редактор';
 	@override String get edSave => 'Сохранить файл';
 	@override String get edSaveAll => 'Сохранить все файлы';
@@ -5032,6 +5053,70 @@ class Translations$terminal$overlay$ru extends Translations$terminal$overlay$en 
 	@override String processExitedWithCode({required Object code}) => 'Процесс завершён (код ${code}) — подключитесь, чтобы запустить его снова';
 	@override String resumeSession({required Object title}) => 'Возобновить сеанс ${title}';
 	@override String startSession({required Object path}) => 'Начать новый сеанс в ${path}';
+}
+
+// Path: terminal.menu
+class Translations$terminal$menu$ru extends Translations$terminal$menu$en {
+	Translations$terminal$menu$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Меню терминала';
+	@override String get edit => 'Правка';
+	@override String get view => 'Вид';
+	@override String get session => 'Сеанс';
+	@override String get find => 'Найти';
+	@override String get renameTab => 'Переименовать вкладку';
+	@override String get duplicateTab => 'Дублировать вкладку';
+	@override String get closeTab => 'Закрыть вкладку';
+	@override String get closeOtherTabs => 'Закрыть другие вкладки';
+	@override String get closeTabsToRight => 'Закрыть вкладки справа';
+	@override String get zoomReset => 'Сбросить масштаб';
+	@override String get selectAll => 'Выделить всё';
+	@override String get keyBar => 'Экранная панель клавиш';
+	@override String get shortcutsHelp => 'Горячие клавиши';
+}
+
+// Path: terminal.rename
+class Translations$terminal$rename$ru extends Translations$terminal$rename$en {
+	Translations$terminal$rename$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Переименовать вкладку';
+	@override String get hint => 'Название вкладки';
+}
+
+// Path: terminal.search
+class Translations$terminal$search$ru extends Translations$terminal$search$en {
+	Translations$terminal$search$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get hint => 'Найти';
+	@override String get noResults => 'Ничего не найдено';
+	@override String count({required Object current, required Object total}) => '${current} из ${total}';
+	@override String get matchCase => 'Учитывать регистр';
+	@override String get next => 'Следующее совпадение';
+	@override String get previous => 'Предыдущее совпадение';
+	@override String get close => 'Закрыть поиск';
+}
+
+// Path: terminal.keyBar
+class Translations$terminal$keyBar$ru extends Translations$terminal$keyBar$en {
+	Translations$terminal$keyBar$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get ctrl => 'Ctrl';
+	@override String get alt => 'Alt';
+	@override String get ctrlHint => 'Удержать Ctrl для следующей клавиши';
+	@override String get altHint => 'Удержать Alt для следующей клавиши';
+	@override String get showKeyboard => 'Показать клавиатуру';
 }
 
 // Path: workspace.paneTitle
@@ -10710,6 +10795,23 @@ extension on TranslationsRu {
 			'settings.shortcuts.termInterrupt' => 'Прервать процесс (без выделения)',
 			'settings.shortcuts.termPaste' => 'Вставить',
 			'settings.shortcuts.termSelectAll' => 'Выделить всё',
+			'settings.shortcuts.termFind' => 'Поиск в буфере',
+			'settings.shortcuts.termNewTab' => 'Новая вкладка',
+			'settings.shortcuts.termCloseTab' => 'Закрыть вкладку',
+			'settings.shortcuts.termDuplicate' => 'Дублировать вкладку',
+			'settings.shortcuts.termNextTab' => 'Следующая вкладка',
+			'settings.shortcuts.termPrevTab' => 'Предыдущая вкладка',
+			'settings.shortcuts.termGoToTab' => 'Перейти к вкладке 1–9',
+			'settings.shortcuts.termRename' => 'Переименовать вкладку (двойной клик)',
+			'settings.shortcuts.termZoomIn' => 'Увеличить',
+			'settings.shortcuts.termZoomOut' => 'Уменьшить',
+			'settings.shortcuts.termZoomReset' => 'Сбросить масштаб',
+			'settings.shortcuts.termScrollLine' => 'Прокрутить на строку',
+			'settings.shortcuts.termScrollPage' => 'Прокрутить на страницу',
+			'settings.shortcuts.termScrollEdge' => 'Прокрутить в начало / конец',
+			'settings.shortcuts.termMenu' => 'Меню терминала',
+			'settings.shortcuts.termClearSelection' => 'Снять выделение',
+			'settings.shortcuts.termWebNote' => 'Браузеры резервируют Ctrl+Shift+T/W — веб-версия также принимает Ctrl+Alt+T / Ctrl+Alt+W.',
 			'settings.shortcuts.editor' => 'Редактор',
 			'settings.shortcuts.edSave' => 'Сохранить файл',
 			'settings.shortcuts.edSaveAll' => 'Сохранить все файлы',
@@ -11107,6 +11209,8 @@ extension on TranslationsRu {
 			'tasks.nextTask.hideDetails' => 'Скрыть детали',
 			'tasks.nextTask.initialize' => 'Инициализировать',
 			'tasks.nextTask.noPending' => 'Нет ожидающих задач',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI не настроен',
 			'tasks.nextTask.review' => 'Проверить',
 			'tasks.nextTask.startTask' => 'Начать задачу',
@@ -11124,8 +11228,6 @@ extension on TranslationsRu {
 			'tasks.taskDetail.dependencies' => 'Зависимости',
 			'tasks.taskDetail.dependenciesPlaceholder' => 'напр. 1, 2, 3',
 			'tasks.taskDetail.description' => 'Описание',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.edit' => 'Редактировать задачу',
 			'tasks.taskDetail.implDetails' => 'Детали реализации',
 			'tasks.taskDetail.noDependencies' => 'Нет зависимостей',
@@ -11621,6 +11723,8 @@ extension on TranslationsRu {
 			'terminal.tabs.shellName' => ({required Object index}) => 'Оболочка ${index}',
 			'terminal.tabs.plainShell' => 'Простая оболочка',
 			'terminal.tabs.claudeCli' => 'Claude CLI',
+			_ => null,
+		} ?? switch (path) {
 			'terminal.tabs.opencodeCli' => 'OpenCode CLI',
 			'terminal.tabs.commandCodeCli' => 'Command Code CLI',
 			'terminal.tabs.antigravityCli' => 'Antigravity CLI',
@@ -11638,8 +11742,6 @@ extension on TranslationsRu {
 			'terminal.authUrl.linkLabel' => ({required Object url}) => 'Ссылка для входа: ${url}',
 			'terminal.fileLink.detected' => ({required Object path}) => 'Обнаружен файл: ${path}',
 			'terminal.shortcuts.interrupt' => 'Прервать (SIGINT)',
-			_ => null,
-		} ?? switch (path) {
 			'terminal.shortcuts.eof' => 'EOF',
 			'terminal.shortcuts.suspend' => 'Приостановить (SIGTSTP)',
 			'terminal.shortcuts.hide' => 'Скрыть панель горячих клавиш',
@@ -11659,6 +11761,34 @@ extension on TranslationsRu {
 			'terminal.overlay.processExitedWithCode' => ({required Object code}) => 'Процесс завершён (код ${code}) — подключитесь, чтобы запустить его снова',
 			'terminal.overlay.resumeSession' => ({required Object title}) => 'Возобновить сеанс ${title}',
 			'terminal.overlay.startSession' => ({required Object path}) => 'Начать новый сеанс в ${path}',
+			'terminal.menu.title' => 'Меню терминала',
+			'terminal.menu.edit' => 'Правка',
+			'terminal.menu.view' => 'Вид',
+			'terminal.menu.session' => 'Сеанс',
+			'terminal.menu.find' => 'Найти',
+			'terminal.menu.renameTab' => 'Переименовать вкладку',
+			'terminal.menu.duplicateTab' => 'Дублировать вкладку',
+			'terminal.menu.closeTab' => 'Закрыть вкладку',
+			'terminal.menu.closeOtherTabs' => 'Закрыть другие вкладки',
+			'terminal.menu.closeTabsToRight' => 'Закрыть вкладки справа',
+			'terminal.menu.zoomReset' => 'Сбросить масштаб',
+			'terminal.menu.selectAll' => 'Выделить всё',
+			'terminal.menu.keyBar' => 'Экранная панель клавиш',
+			'terminal.menu.shortcutsHelp' => 'Горячие клавиши',
+			'terminal.rename.title' => 'Переименовать вкладку',
+			'terminal.rename.hint' => 'Название вкладки',
+			'terminal.search.hint' => 'Найти',
+			'terminal.search.noResults' => 'Ничего не найдено',
+			'terminal.search.count' => ({required Object current, required Object total}) => '${current} из ${total}',
+			'terminal.search.matchCase' => 'Учитывать регистр',
+			'terminal.search.next' => 'Следующее совпадение',
+			'terminal.search.previous' => 'Предыдущее совпадение',
+			'terminal.search.close' => 'Закрыть поиск',
+			'terminal.keyBar.ctrl' => 'Ctrl',
+			'terminal.keyBar.alt' => 'Alt',
+			'terminal.keyBar.ctrlHint' => 'Удержать Ctrl для следующей клавиши',
+			'terminal.keyBar.altHint' => 'Удержать Alt для следующей клавиши',
+			'terminal.keyBar.showKeyboard' => 'Показать клавиатуру',
 			'voice.preview' => 'Предпросмотр',
 			'voice.settingsSaved' => 'Настройки голосового ввода сохранены',
 			'voice.saveFailed' => 'Не удалось сохранить конфигурацию STT',

@@ -665,6 +665,10 @@ class Translations$terminal$es extends Translations$terminal$en {
 	@override late final Translations$terminal$loginDialog$es loginDialog = Translations$terminal$loginDialog$es._(_root);
 	@override late final Translations$terminal$empty$es empty = Translations$terminal$empty$es._(_root);
 	@override late final Translations$terminal$overlay$es overlay = Translations$terminal$overlay$es._(_root);
+	@override late final Translations$terminal$menu$es menu = Translations$terminal$menu$es._(_root);
+	@override late final Translations$terminal$rename$es rename = Translations$terminal$rename$es._(_root);
+	@override late final Translations$terminal$search$es search = Translations$terminal$search$es._(_root);
+	@override late final Translations$terminal$keyBar$es keyBar = Translations$terminal$keyBar$es._(_root);
 }
 
 // Path: voice
@@ -3205,6 +3209,23 @@ class Translations$settings$shortcuts$es extends Translations$settings$shortcuts
 	@override String get termInterrupt => 'Interrumpir proceso (sin selección)';
 	@override String get termPaste => 'Pegar';
 	@override String get termSelectAll => 'Seleccionar todo';
+	@override String get termFind => 'Buscar en el búfer';
+	@override String get termNewTab => 'Nueva pestaña';
+	@override String get termCloseTab => 'Cerrar pestaña';
+	@override String get termDuplicate => 'Duplicar pestaña';
+	@override String get termNextTab => 'Pestaña siguiente';
+	@override String get termPrevTab => 'Pestaña anterior';
+	@override String get termGoToTab => 'Ir a la pestaña 1–9';
+	@override String get termRename => 'Renombrar pestaña (doble clic)';
+	@override String get termZoomIn => 'Acercar';
+	@override String get termZoomOut => 'Alejar';
+	@override String get termZoomReset => 'Restablecer zoom';
+	@override String get termScrollLine => 'Desplazar una línea';
+	@override String get termScrollPage => 'Desplazar una página';
+	@override String get termScrollEdge => 'Ir al principio / final';
+	@override String get termMenu => 'Menú del terminal';
+	@override String get termClearSelection => 'Quitar selección';
+	@override String get termWebNote => 'Los navegadores reservan Ctrl+Shift+T/W — la versión web también acepta Ctrl+Alt+T / Ctrl+Alt+W.';
 	@override String get editor => 'Editor';
 	@override String get edSave => 'Guardar archivo';
 	@override String get edSaveAll => 'Guardar todos los archivos';
@@ -5004,6 +5025,70 @@ class Translations$terminal$overlay$es extends Translations$terminal$overlay$en 
 	@override String processExitedWithCode({required Object code}) => 'El proceso ha finalizado (código ${code}): conéctate para iniciarlo de nuevo';
 	@override String resumeSession({required Object title}) => 'Reanudar la sesión ${title}';
 	@override String startSession({required Object path}) => 'Iniciar una sesión nueva en ${path}';
+}
+
+// Path: terminal.menu
+class Translations$terminal$menu$es extends Translations$terminal$menu$en {
+	Translations$terminal$menu$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Menú del terminal';
+	@override String get edit => 'Editar';
+	@override String get view => 'Ver';
+	@override String get session => 'Sesión';
+	@override String get find => 'Buscar';
+	@override String get renameTab => 'Renombrar pestaña';
+	@override String get duplicateTab => 'Duplicar pestaña';
+	@override String get closeTab => 'Cerrar pestaña';
+	@override String get closeOtherTabs => 'Cerrar las demás pestañas';
+	@override String get closeTabsToRight => 'Cerrar pestañas a la derecha';
+	@override String get zoomReset => 'Restablecer zoom';
+	@override String get selectAll => 'Seleccionar todo';
+	@override String get keyBar => 'Barra de teclas en pantalla';
+	@override String get shortcutsHelp => 'Atajos de teclado';
+}
+
+// Path: terminal.rename
+class Translations$terminal$rename$es extends Translations$terminal$rename$en {
+	Translations$terminal$rename$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Renombrar pestaña';
+	@override String get hint => 'Nombre de la pestaña';
+}
+
+// Path: terminal.search
+class Translations$terminal$search$es extends Translations$terminal$search$en {
+	Translations$terminal$search$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get hint => 'Buscar';
+	@override String get noResults => 'Sin resultados';
+	@override String count({required Object current, required Object total}) => '${current} de ${total}';
+	@override String get matchCase => 'Coincidir mayúsculas';
+	@override String get next => 'Siguiente coincidencia';
+	@override String get previous => 'Coincidencia anterior';
+	@override String get close => 'Cerrar búsqueda';
+}
+
+// Path: terminal.keyBar
+class Translations$terminal$keyBar$es extends Translations$terminal$keyBar$en {
+	Translations$terminal$keyBar$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get ctrl => 'Ctrl';
+	@override String get alt => 'Alt';
+	@override String get ctrlHint => 'Mantener Ctrl para la siguiente tecla';
+	@override String get altHint => 'Mantener Alt para la siguiente tecla';
+	@override String get showKeyboard => 'Mostrar teclado';
 }
 
 // Path: workspace.paneTitle
@@ -10672,6 +10757,23 @@ extension on TranslationsEs {
 			'settings.shortcuts.termInterrupt' => 'Interrumpir proceso (sin selección)',
 			'settings.shortcuts.termPaste' => 'Pegar',
 			'settings.shortcuts.termSelectAll' => 'Seleccionar todo',
+			'settings.shortcuts.termFind' => 'Buscar en el búfer',
+			'settings.shortcuts.termNewTab' => 'Nueva pestaña',
+			'settings.shortcuts.termCloseTab' => 'Cerrar pestaña',
+			'settings.shortcuts.termDuplicate' => 'Duplicar pestaña',
+			'settings.shortcuts.termNextTab' => 'Pestaña siguiente',
+			'settings.shortcuts.termPrevTab' => 'Pestaña anterior',
+			'settings.shortcuts.termGoToTab' => 'Ir a la pestaña 1–9',
+			'settings.shortcuts.termRename' => 'Renombrar pestaña (doble clic)',
+			'settings.shortcuts.termZoomIn' => 'Acercar',
+			'settings.shortcuts.termZoomOut' => 'Alejar',
+			'settings.shortcuts.termZoomReset' => 'Restablecer zoom',
+			'settings.shortcuts.termScrollLine' => 'Desplazar una línea',
+			'settings.shortcuts.termScrollPage' => 'Desplazar una página',
+			'settings.shortcuts.termScrollEdge' => 'Ir al principio / final',
+			'settings.shortcuts.termMenu' => 'Menú del terminal',
+			'settings.shortcuts.termClearSelection' => 'Quitar selección',
+			'settings.shortcuts.termWebNote' => 'Los navegadores reservan Ctrl+Shift+T/W — la versión web también acepta Ctrl+Alt+T / Ctrl+Alt+W.',
 			'settings.shortcuts.editor' => 'Editor',
 			'settings.shortcuts.edSave' => 'Guardar archivo',
 			'settings.shortcuts.edSaveAll' => 'Guardar todos los archivos',
@@ -11069,6 +11171,8 @@ extension on TranslationsEs {
 			'tasks.nextTask.hideDetails' => 'Ocultar detalles',
 			'tasks.nextTask.initialize' => 'Inicializar',
 			'tasks.nextTask.noPending' => 'No hay tareas pendientes',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI no está configurado',
 			'tasks.nextTask.review' => 'Revisar',
 			'tasks.nextTask.startTask' => 'Iniciar tarea',
@@ -11086,8 +11190,6 @@ extension on TranslationsEs {
 			'tasks.taskDetail.dependencies' => 'Dependencias',
 			'tasks.taskDetail.dependenciesPlaceholder' => 'p. ej. 1, 2, 3',
 			'tasks.taskDetail.description' => 'Descripción',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.edit' => 'Editar tarea',
 			'tasks.taskDetail.implDetails' => 'Detalles de implementación',
 			'tasks.taskDetail.noDependencies' => 'Sin dependencias',
@@ -11583,6 +11685,8 @@ extension on TranslationsEs {
 			'terminal.tabs.shellName' => ({required Object index}) => 'Shell ${index}',
 			'terminal.tabs.plainShell' => 'Shell simple',
 			'terminal.tabs.claudeCli' => 'Claude CLI',
+			_ => null,
+		} ?? switch (path) {
 			'terminal.tabs.opencodeCli' => 'OpenCode CLI',
 			'terminal.tabs.commandCodeCli' => 'Command Code CLI',
 			'terminal.tabs.antigravityCli' => 'Antigravity CLI',
@@ -11600,8 +11704,6 @@ extension on TranslationsEs {
 			'terminal.authUrl.linkLabel' => ({required Object url}) => 'Enlace de autenticación: ${url}',
 			'terminal.fileLink.detected' => ({required Object path}) => 'Archivo detectado: ${path}',
 			'terminal.shortcuts.interrupt' => 'Interrumpir (SIGINT)',
-			_ => null,
-		} ?? switch (path) {
 			'terminal.shortcuts.eof' => 'EOF',
 			'terminal.shortcuts.suspend' => 'Suspender (SIGTSTP)',
 			'terminal.shortcuts.hide' => 'Ocultar barra de atajos',
@@ -11621,6 +11723,34 @@ extension on TranslationsEs {
 			'terminal.overlay.processExitedWithCode' => ({required Object code}) => 'El proceso ha finalizado (código ${code}): conéctate para iniciarlo de nuevo',
 			'terminal.overlay.resumeSession' => ({required Object title}) => 'Reanudar la sesión ${title}',
 			'terminal.overlay.startSession' => ({required Object path}) => 'Iniciar una sesión nueva en ${path}',
+			'terminal.menu.title' => 'Menú del terminal',
+			'terminal.menu.edit' => 'Editar',
+			'terminal.menu.view' => 'Ver',
+			'terminal.menu.session' => 'Sesión',
+			'terminal.menu.find' => 'Buscar',
+			'terminal.menu.renameTab' => 'Renombrar pestaña',
+			'terminal.menu.duplicateTab' => 'Duplicar pestaña',
+			'terminal.menu.closeTab' => 'Cerrar pestaña',
+			'terminal.menu.closeOtherTabs' => 'Cerrar las demás pestañas',
+			'terminal.menu.closeTabsToRight' => 'Cerrar pestañas a la derecha',
+			'terminal.menu.zoomReset' => 'Restablecer zoom',
+			'terminal.menu.selectAll' => 'Seleccionar todo',
+			'terminal.menu.keyBar' => 'Barra de teclas en pantalla',
+			'terminal.menu.shortcutsHelp' => 'Atajos de teclado',
+			'terminal.rename.title' => 'Renombrar pestaña',
+			'terminal.rename.hint' => 'Nombre de la pestaña',
+			'terminal.search.hint' => 'Buscar',
+			'terminal.search.noResults' => 'Sin resultados',
+			'terminal.search.count' => ({required Object current, required Object total}) => '${current} de ${total}',
+			'terminal.search.matchCase' => 'Coincidir mayúsculas',
+			'terminal.search.next' => 'Siguiente coincidencia',
+			'terminal.search.previous' => 'Coincidencia anterior',
+			'terminal.search.close' => 'Cerrar búsqueda',
+			'terminal.keyBar.ctrl' => 'Ctrl',
+			'terminal.keyBar.alt' => 'Alt',
+			'terminal.keyBar.ctrlHint' => 'Mantener Ctrl para la siguiente tecla',
+			'terminal.keyBar.altHint' => 'Mantener Alt para la siguiente tecla',
+			'terminal.keyBar.showKeyboard' => 'Mostrar teclado',
 			'voice.preview' => 'Vista previa',
 			'voice.settingsSaved' => 'Ajustes de entrada de voz guardados',
 			'voice.saveFailed' => 'No se pudo guardar la configuración de STT',

@@ -2878,6 +2878,23 @@
       "termInterrupt": "プロセスを中断 (選択なし時)",
       "termPaste": "貼り付け",
       "termSelectAll": "すべて選択",
+      "termFind": "バッファ内を検索",
+      "termNewTab": "新しいタブ",
+      "termCloseTab": "タブを閉じる",
+      "termDuplicate": "タブを複製",
+      "termNextTab": "次のタブ",
+      "termPrevTab": "前のタブ",
+      "termGoToTab": "タブ 1–9 へ移動",
+      "termRename": "タブ名を変更（ダブルクリック）",
+      "termZoomIn": "拡大",
+      "termZoomOut": "縮小",
+      "termZoomReset": "ズームをリセット",
+      "termScrollLine": "1 行スクロール",
+      "termScrollPage": "1 ページスクロール",
+      "termScrollEdge": "先頭 / 末尾へスクロール",
+      "termMenu": "ターミナルメニュー",
+      "termClearSelection": "選択を解除",
+      "termWebNote": "ブラウザは Ctrl+Shift+T/W を予約しています — Web 版では Ctrl+Alt+T / Ctrl+Alt+W も使えます。",
       "editor": "エディター",
       "edSave": "ファイルを保存",
       "edSaveAll": "すべてのファイルを保存",
@@ -4191,6 +4208,42 @@
       "processExitedWithCode": "プロセスが終了しました（コード {{code}}）— 接続すると再起動します",
       "resumeSession": "セッション {{title}} を再開",
       "startSession": "{{path}} で新しいセッションを開始"
+    },
+    "menu": {
+      "title": "ターミナルメニュー",
+      "edit": "編集",
+      "view": "表示",
+      "session": "セッション",
+      "find": "検索",
+      "renameTab": "タブ名を変更",
+      "duplicateTab": "タブを複製",
+      "closeTab": "タブを閉じる",
+      "closeOtherTabs": "他のタブを閉じる",
+      "closeTabsToRight": "右側のタブを閉じる",
+      "zoomReset": "ズームをリセット",
+      "selectAll": "すべて選択",
+      "keyBar": "画面上のキーバー",
+      "shortcutsHelp": "キーボードショートカット"
+    },
+    "rename": {
+      "title": "タブ名を変更",
+      "hint": "タブ名"
+    },
+    "search": {
+      "hint": "検索",
+      "noResults": "一致なし",
+      "count": "{{current}} / {{total}}",
+      "matchCase": "大文字と小文字を区別",
+      "next": "次の一致",
+      "previous": "前の一致",
+      "close": "検索を閉じる"
+    },
+    "keyBar": {
+      "ctrl": "Ctrl",
+      "alt": "Alt",
+      "ctrlHint": "次のキーに Ctrl を適用",
+      "altHint": "次のキーに Alt を適用",
+      "showKeyboard": "キーボードを表示"
     }
   },
   "voice": {

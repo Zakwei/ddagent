@@ -664,6 +664,10 @@ class Translations$terminal$ko extends Translations$terminal$en {
 	@override late final Translations$terminal$loginDialog$ko loginDialog = Translations$terminal$loginDialog$ko._(_root);
 	@override late final Translations$terminal$empty$ko empty = Translations$terminal$empty$ko._(_root);
 	@override late final Translations$terminal$overlay$ko overlay = Translations$terminal$overlay$ko._(_root);
+	@override late final Translations$terminal$menu$ko menu = Translations$terminal$menu$ko._(_root);
+	@override late final Translations$terminal$rename$ko rename = Translations$terminal$rename$ko._(_root);
+	@override late final Translations$terminal$search$ko search = Translations$terminal$search$ko._(_root);
+	@override late final Translations$terminal$keyBar$ko keyBar = Translations$terminal$keyBar$ko._(_root);
 }
 
 // Path: voice
@@ -3195,6 +3199,23 @@ class Translations$settings$shortcuts$ko extends Translations$settings$shortcuts
 	@override String get termInterrupt => '프로세스 중단 (선택 없음)';
 	@override String get termPaste => '붙여넣기';
 	@override String get termSelectAll => '모두 선택';
+	@override String get termFind => '버퍼에서 찾기';
+	@override String get termNewTab => '새 탭';
+	@override String get termCloseTab => '탭 닫기';
+	@override String get termDuplicate => '탭 복제';
+	@override String get termNextTab => '다음 탭';
+	@override String get termPrevTab => '이전 탭';
+	@override String get termGoToTab => '탭 1–9로 이동';
+	@override String get termRename => '탭 이름 바꾸기(더블 클릭)';
+	@override String get termZoomIn => '확대';
+	@override String get termZoomOut => '축소';
+	@override String get termZoomReset => '확대/축소 초기화';
+	@override String get termScrollLine => '한 줄 스크롤';
+	@override String get termScrollPage => '한 페이지 스크롤';
+	@override String get termScrollEdge => '맨 위 / 맨 아래로 스크롤';
+	@override String get termMenu => '터미널 메뉴';
+	@override String get termClearSelection => '선택 해제';
+	@override String get termWebNote => '브라우저는 Ctrl+Shift+T/W를 예약합니다 — 웹 버전에서는 Ctrl+Alt+T / Ctrl+Alt+W도 사용할 수 있습니다.';
 	@override String get editor => '편집기';
 	@override String get edSave => '파일 저장';
 	@override String get edSaveAll => '모든 파일 저장';
@@ -4994,6 +5015,70 @@ class Translations$terminal$overlay$ko extends Translations$terminal$overlay$en 
 	@override String processExitedWithCode({required Object code}) => '프로세스가 종료되었습니다(코드 ${code}) — 연결하면 다시 시작합니다';
 	@override String resumeSession({required Object title}) => '세션 ${title} 재개';
 	@override String startSession({required Object path}) => '${path}에서 새 세션 시작';
+}
+
+// Path: terminal.menu
+class Translations$terminal$menu$ko extends Translations$terminal$menu$en {
+	Translations$terminal$menu$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '터미널 메뉴';
+	@override String get edit => '편집';
+	@override String get view => '보기';
+	@override String get session => '세션';
+	@override String get find => '찾기';
+	@override String get renameTab => '탭 이름 바꾸기';
+	@override String get duplicateTab => '탭 복제';
+	@override String get closeTab => '탭 닫기';
+	@override String get closeOtherTabs => '다른 탭 닫기';
+	@override String get closeTabsToRight => '오른쪽 탭 닫기';
+	@override String get zoomReset => '확대/축소 초기화';
+	@override String get selectAll => '모두 선택';
+	@override String get keyBar => '화면 키 바';
+	@override String get shortcutsHelp => '키보드 단축키';
+}
+
+// Path: terminal.rename
+class Translations$terminal$rename$ko extends Translations$terminal$rename$en {
+	Translations$terminal$rename$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '탭 이름 바꾸기';
+	@override String get hint => '탭 이름';
+}
+
+// Path: terminal.search
+class Translations$terminal$search$ko extends Translations$terminal$search$en {
+	Translations$terminal$search$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get hint => '찾기';
+	@override String get noResults => '결과 없음';
+	@override String count({required Object current, required Object total}) => '${current} / ${total}';
+	@override String get matchCase => '대/소문자 구분';
+	@override String get next => '다음 일치 항목';
+	@override String get previous => '이전 일치 항목';
+	@override String get close => '검색 닫기';
+}
+
+// Path: terminal.keyBar
+class Translations$terminal$keyBar$ko extends Translations$terminal$keyBar$en {
+	Translations$terminal$keyBar$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get ctrl => 'Ctrl';
+	@override String get alt => 'Alt';
+	@override String get ctrlHint => '다음 키에 Ctrl 적용';
+	@override String get altHint => '다음 키에 Alt 적용';
+	@override String get showKeyboard => '키보드 표시';
 }
 
 // Path: workspace.paneTitle
@@ -10661,6 +10746,23 @@ extension on TranslationsKo {
 			'settings.shortcuts.termInterrupt' => '프로세스 중단 (선택 없음)',
 			'settings.shortcuts.termPaste' => '붙여넣기',
 			'settings.shortcuts.termSelectAll' => '모두 선택',
+			'settings.shortcuts.termFind' => '버퍼에서 찾기',
+			'settings.shortcuts.termNewTab' => '새 탭',
+			'settings.shortcuts.termCloseTab' => '탭 닫기',
+			'settings.shortcuts.termDuplicate' => '탭 복제',
+			'settings.shortcuts.termNextTab' => '다음 탭',
+			'settings.shortcuts.termPrevTab' => '이전 탭',
+			'settings.shortcuts.termGoToTab' => '탭 1–9로 이동',
+			'settings.shortcuts.termRename' => '탭 이름 바꾸기(더블 클릭)',
+			'settings.shortcuts.termZoomIn' => '확대',
+			'settings.shortcuts.termZoomOut' => '축소',
+			'settings.shortcuts.termZoomReset' => '확대/축소 초기화',
+			'settings.shortcuts.termScrollLine' => '한 줄 스크롤',
+			'settings.shortcuts.termScrollPage' => '한 페이지 스크롤',
+			'settings.shortcuts.termScrollEdge' => '맨 위 / 맨 아래로 스크롤',
+			'settings.shortcuts.termMenu' => '터미널 메뉴',
+			'settings.shortcuts.termClearSelection' => '선택 해제',
+			'settings.shortcuts.termWebNote' => '브라우저는 Ctrl+Shift+T/W를 예약합니다 — 웹 버전에서는 Ctrl+Alt+T / Ctrl+Alt+W도 사용할 수 있습니다.',
 			'settings.shortcuts.editor' => '편집기',
 			'settings.shortcuts.edSave' => '파일 저장',
 			'settings.shortcuts.edSaveAll' => '모든 파일 저장',
@@ -11058,6 +11160,8 @@ extension on TranslationsKo {
 			'tasks.nextTask.hideDetails' => '세부 정보 숨기기',
 			'tasks.nextTask.initialize' => '초기화',
 			'tasks.nextTask.noPending' => '대기 중인 작업 없음',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI가 구성되지 않았습니다',
 			'tasks.nextTask.review' => '검토',
 			'tasks.nextTask.startTask' => '작업 시작',
@@ -11075,8 +11179,6 @@ extension on TranslationsKo {
 			'tasks.taskDetail.dependencies' => '종속성',
 			'tasks.taskDetail.dependenciesPlaceholder' => '예: 1, 2, 3',
 			'tasks.taskDetail.description' => '설명',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.edit' => '작업 편집',
 			'tasks.taskDetail.implDetails' => '구현 세부 정보',
 			'tasks.taskDetail.noDependencies' => '종속성 없음',
@@ -11572,6 +11674,8 @@ extension on TranslationsKo {
 			'terminal.tabs.shellName' => ({required Object index}) => '셸 ${index}',
 			'terminal.tabs.plainShell' => '일반 Shell',
 			'terminal.tabs.claudeCli' => 'Claude CLI',
+			_ => null,
+		} ?? switch (path) {
 			'terminal.tabs.opencodeCli' => 'OpenCode CLI',
 			'terminal.tabs.commandCodeCli' => 'Command Code CLI',
 			'terminal.tabs.antigravityCli' => 'Antigravity CLI',
@@ -11589,8 +11693,6 @@ extension on TranslationsKo {
 			'terminal.authUrl.linkLabel' => ({required Object url}) => '인증 링크: ${url}',
 			'terminal.fileLink.detected' => ({required Object path}) => '파일 감지됨: ${path}',
 			'terminal.shortcuts.interrupt' => '중단 (SIGINT)',
-			_ => null,
-		} ?? switch (path) {
 			'terminal.shortcuts.eof' => 'EOF',
 			'terminal.shortcuts.suspend' => '일시 중단 (SIGTSTP)',
 			'terminal.shortcuts.hide' => '단축키 표시줄 숨기기',
@@ -11610,6 +11712,34 @@ extension on TranslationsKo {
 			'terminal.overlay.processExitedWithCode' => ({required Object code}) => '프로세스가 종료되었습니다(코드 ${code}) — 연결하면 다시 시작합니다',
 			'terminal.overlay.resumeSession' => ({required Object title}) => '세션 ${title} 재개',
 			'terminal.overlay.startSession' => ({required Object path}) => '${path}에서 새 세션 시작',
+			'terminal.menu.title' => '터미널 메뉴',
+			'terminal.menu.edit' => '편집',
+			'terminal.menu.view' => '보기',
+			'terminal.menu.session' => '세션',
+			'terminal.menu.find' => '찾기',
+			'terminal.menu.renameTab' => '탭 이름 바꾸기',
+			'terminal.menu.duplicateTab' => '탭 복제',
+			'terminal.menu.closeTab' => '탭 닫기',
+			'terminal.menu.closeOtherTabs' => '다른 탭 닫기',
+			'terminal.menu.closeTabsToRight' => '오른쪽 탭 닫기',
+			'terminal.menu.zoomReset' => '확대/축소 초기화',
+			'terminal.menu.selectAll' => '모두 선택',
+			'terminal.menu.keyBar' => '화면 키 바',
+			'terminal.menu.shortcutsHelp' => '키보드 단축키',
+			'terminal.rename.title' => '탭 이름 바꾸기',
+			'terminal.rename.hint' => '탭 이름',
+			'terminal.search.hint' => '찾기',
+			'terminal.search.noResults' => '결과 없음',
+			'terminal.search.count' => ({required Object current, required Object total}) => '${current} / ${total}',
+			'terminal.search.matchCase' => '대/소문자 구분',
+			'terminal.search.next' => '다음 일치 항목',
+			'terminal.search.previous' => '이전 일치 항목',
+			'terminal.search.close' => '검색 닫기',
+			'terminal.keyBar.ctrl' => 'Ctrl',
+			'terminal.keyBar.alt' => 'Alt',
+			'terminal.keyBar.ctrlHint' => '다음 키에 Ctrl 적용',
+			'terminal.keyBar.altHint' => '다음 키에 Alt 적용',
+			'terminal.keyBar.showKeyboard' => '키보드 표시',
 			'voice.preview' => '미리보기',
 			'voice.settingsSaved' => '음성 입력 설정이 저장되었습니다',
 			'voice.saveFailed' => 'STT 설정 저장 실패',

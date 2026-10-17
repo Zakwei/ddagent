@@ -664,6 +664,10 @@ class Translations$terminal$ja extends Translations$terminal$en {
 	@override late final Translations$terminal$loginDialog$ja loginDialog = Translations$terminal$loginDialog$ja._(_root);
 	@override late final Translations$terminal$empty$ja empty = Translations$terminal$empty$ja._(_root);
 	@override late final Translations$terminal$overlay$ja overlay = Translations$terminal$overlay$ja._(_root);
+	@override late final Translations$terminal$menu$ja menu = Translations$terminal$menu$ja._(_root);
+	@override late final Translations$terminal$rename$ja rename = Translations$terminal$rename$ja._(_root);
+	@override late final Translations$terminal$search$ja search = Translations$terminal$search$ja._(_root);
+	@override late final Translations$terminal$keyBar$ja keyBar = Translations$terminal$keyBar$ja._(_root);
 }
 
 // Path: voice
@@ -3195,6 +3199,23 @@ class Translations$settings$shortcuts$ja extends Translations$settings$shortcuts
 	@override String get termInterrupt => 'プロセスを中断 (選択なし時)';
 	@override String get termPaste => '貼り付け';
 	@override String get termSelectAll => 'すべて選択';
+	@override String get termFind => 'バッファ内を検索';
+	@override String get termNewTab => '新しいタブ';
+	@override String get termCloseTab => 'タブを閉じる';
+	@override String get termDuplicate => 'タブを複製';
+	@override String get termNextTab => '次のタブ';
+	@override String get termPrevTab => '前のタブ';
+	@override String get termGoToTab => 'タブ 1–9 へ移動';
+	@override String get termRename => 'タブ名を変更（ダブルクリック）';
+	@override String get termZoomIn => '拡大';
+	@override String get termZoomOut => '縮小';
+	@override String get termZoomReset => 'ズームをリセット';
+	@override String get termScrollLine => '1 行スクロール';
+	@override String get termScrollPage => '1 ページスクロール';
+	@override String get termScrollEdge => '先頭 / 末尾へスクロール';
+	@override String get termMenu => 'ターミナルメニュー';
+	@override String get termClearSelection => '選択を解除';
+	@override String get termWebNote => 'ブラウザは Ctrl+Shift+T/W を予約しています — Web 版では Ctrl+Alt+T / Ctrl+Alt+W も使えます。';
 	@override String get editor => 'エディター';
 	@override String get edSave => 'ファイルを保存';
 	@override String get edSaveAll => 'すべてのファイルを保存';
@@ -4994,6 +5015,70 @@ class Translations$terminal$overlay$ja extends Translations$terminal$overlay$en 
 	@override String processExitedWithCode({required Object code}) => 'プロセスが終了しました（コード ${code}）— 接続すると再起動します';
 	@override String resumeSession({required Object title}) => 'セッション ${title} を再開';
 	@override String startSession({required Object path}) => '${path} で新しいセッションを開始';
+}
+
+// Path: terminal.menu
+class Translations$terminal$menu$ja extends Translations$terminal$menu$en {
+	Translations$terminal$menu$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'ターミナルメニュー';
+	@override String get edit => '編集';
+	@override String get view => '表示';
+	@override String get session => 'セッション';
+	@override String get find => '検索';
+	@override String get renameTab => 'タブ名を変更';
+	@override String get duplicateTab => 'タブを複製';
+	@override String get closeTab => 'タブを閉じる';
+	@override String get closeOtherTabs => '他のタブを閉じる';
+	@override String get closeTabsToRight => '右側のタブを閉じる';
+	@override String get zoomReset => 'ズームをリセット';
+	@override String get selectAll => 'すべて選択';
+	@override String get keyBar => '画面上のキーバー';
+	@override String get shortcutsHelp => 'キーボードショートカット';
+}
+
+// Path: terminal.rename
+class Translations$terminal$rename$ja extends Translations$terminal$rename$en {
+	Translations$terminal$rename$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'タブ名を変更';
+	@override String get hint => 'タブ名';
+}
+
+// Path: terminal.search
+class Translations$terminal$search$ja extends Translations$terminal$search$en {
+	Translations$terminal$search$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get hint => '検索';
+	@override String get noResults => '一致なし';
+	@override String count({required Object current, required Object total}) => '${current} / ${total}';
+	@override String get matchCase => '大文字と小文字を区別';
+	@override String get next => '次の一致';
+	@override String get previous => '前の一致';
+	@override String get close => '検索を閉じる';
+}
+
+// Path: terminal.keyBar
+class Translations$terminal$keyBar$ja extends Translations$terminal$keyBar$en {
+	Translations$terminal$keyBar$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get ctrl => 'Ctrl';
+	@override String get alt => 'Alt';
+	@override String get ctrlHint => '次のキーに Ctrl を適用';
+	@override String get altHint => '次のキーに Alt を適用';
+	@override String get showKeyboard => 'キーボードを表示';
 }
 
 // Path: workspace.paneTitle
@@ -10661,6 +10746,23 @@ extension on TranslationsJa {
 			'settings.shortcuts.termInterrupt' => 'プロセスを中断 (選択なし時)',
 			'settings.shortcuts.termPaste' => '貼り付け',
 			'settings.shortcuts.termSelectAll' => 'すべて選択',
+			'settings.shortcuts.termFind' => 'バッファ内を検索',
+			'settings.shortcuts.termNewTab' => '新しいタブ',
+			'settings.shortcuts.termCloseTab' => 'タブを閉じる',
+			'settings.shortcuts.termDuplicate' => 'タブを複製',
+			'settings.shortcuts.termNextTab' => '次のタブ',
+			'settings.shortcuts.termPrevTab' => '前のタブ',
+			'settings.shortcuts.termGoToTab' => 'タブ 1–9 へ移動',
+			'settings.shortcuts.termRename' => 'タブ名を変更（ダブルクリック）',
+			'settings.shortcuts.termZoomIn' => '拡大',
+			'settings.shortcuts.termZoomOut' => '縮小',
+			'settings.shortcuts.termZoomReset' => 'ズームをリセット',
+			'settings.shortcuts.termScrollLine' => '1 行スクロール',
+			'settings.shortcuts.termScrollPage' => '1 ページスクロール',
+			'settings.shortcuts.termScrollEdge' => '先頭 / 末尾へスクロール',
+			'settings.shortcuts.termMenu' => 'ターミナルメニュー',
+			'settings.shortcuts.termClearSelection' => '選択を解除',
+			'settings.shortcuts.termWebNote' => 'ブラウザは Ctrl+Shift+T/W を予約しています — Web 版では Ctrl+Alt+T / Ctrl+Alt+W も使えます。',
 			'settings.shortcuts.editor' => 'エディター',
 			'settings.shortcuts.edSave' => 'ファイルを保存',
 			'settings.shortcuts.edSaveAll' => 'すべてのファイルを保存',
@@ -11058,6 +11160,8 @@ extension on TranslationsJa {
 			'tasks.nextTask.hideDetails' => '詳細を隠す',
 			'tasks.nextTask.initialize' => '初期化',
 			'tasks.nextTask.noPending' => '保留中のタスクはありません',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI が設定されていません',
 			'tasks.nextTask.review' => '確認',
 			'tasks.nextTask.startTask' => 'タスクを開始',
@@ -11075,8 +11179,6 @@ extension on TranslationsJa {
 			'tasks.taskDetail.dependencies' => '依存関係',
 			'tasks.taskDetail.dependenciesPlaceholder' => '例: 1, 2, 3',
 			'tasks.taskDetail.description' => '説明',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.edit' => 'タスクを編集',
 			'tasks.taskDetail.implDetails' => '実装の詳細',
 			'tasks.taskDetail.noDependencies' => '依存関係なし',
@@ -11572,6 +11674,8 @@ extension on TranslationsJa {
 			'terminal.tabs.shellName' => ({required Object index}) => 'シェル ${index}',
 			'terminal.tabs.plainShell' => '通常のシェル',
 			'terminal.tabs.claudeCli' => 'Claude CLI',
+			_ => null,
+		} ?? switch (path) {
 			'terminal.tabs.opencodeCli' => 'OpenCode CLI',
 			'terminal.tabs.commandCodeCli' => 'Command Code CLI',
 			'terminal.tabs.antigravityCli' => 'Antigravity CLI',
@@ -11589,8 +11693,6 @@ extension on TranslationsJa {
 			'terminal.authUrl.linkLabel' => ({required Object url}) => '認証リンク: ${url}',
 			'terminal.fileLink.detected' => ({required Object path}) => 'ファイルを検出: ${path}',
 			'terminal.shortcuts.interrupt' => '中断 (SIGINT)',
-			_ => null,
-		} ?? switch (path) {
 			'terminal.shortcuts.eof' => 'EOF',
 			'terminal.shortcuts.suspend' => '一時停止 (SIGTSTP)',
 			'terminal.shortcuts.hide' => 'ショートカットバーを非表示',
@@ -11610,6 +11712,34 @@ extension on TranslationsJa {
 			'terminal.overlay.processExitedWithCode' => ({required Object code}) => 'プロセスが終了しました（コード ${code}）— 接続すると再起動します',
 			'terminal.overlay.resumeSession' => ({required Object title}) => 'セッション ${title} を再開',
 			'terminal.overlay.startSession' => ({required Object path}) => '${path} で新しいセッションを開始',
+			'terminal.menu.title' => 'ターミナルメニュー',
+			'terminal.menu.edit' => '編集',
+			'terminal.menu.view' => '表示',
+			'terminal.menu.session' => 'セッション',
+			'terminal.menu.find' => '検索',
+			'terminal.menu.renameTab' => 'タブ名を変更',
+			'terminal.menu.duplicateTab' => 'タブを複製',
+			'terminal.menu.closeTab' => 'タブを閉じる',
+			'terminal.menu.closeOtherTabs' => '他のタブを閉じる',
+			'terminal.menu.closeTabsToRight' => '右側のタブを閉じる',
+			'terminal.menu.zoomReset' => 'ズームをリセット',
+			'terminal.menu.selectAll' => 'すべて選択',
+			'terminal.menu.keyBar' => '画面上のキーバー',
+			'terminal.menu.shortcutsHelp' => 'キーボードショートカット',
+			'terminal.rename.title' => 'タブ名を変更',
+			'terminal.rename.hint' => 'タブ名',
+			'terminal.search.hint' => '検索',
+			'terminal.search.noResults' => '一致なし',
+			'terminal.search.count' => ({required Object current, required Object total}) => '${current} / ${total}',
+			'terminal.search.matchCase' => '大文字と小文字を区別',
+			'terminal.search.next' => '次の一致',
+			'terminal.search.previous' => '前の一致',
+			'terminal.search.close' => '検索を閉じる',
+			'terminal.keyBar.ctrl' => 'Ctrl',
+			'terminal.keyBar.alt' => 'Alt',
+			'terminal.keyBar.ctrlHint' => '次のキーに Ctrl を適用',
+			'terminal.keyBar.altHint' => '次のキーに Alt を適用',
+			'terminal.keyBar.showKeyboard' => 'キーボードを表示',
 			'voice.preview' => 'プレビュー',
 			'voice.settingsSaved' => '音声入力設定を保存しました',
 			'voice.saveFailed' => 'STT設定の保存に失敗しました',

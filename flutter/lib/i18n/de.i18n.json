@@ -2888,6 +2888,23 @@
       "termInterrupt": "Prozess unterbrechen (ohne Auswahl)",
       "termPaste": "Einfügen",
       "termSelectAll": "Alles auswählen",
+      "termFind": "Im Puffer suchen",
+      "termNewTab": "Neuer Tab",
+      "termCloseTab": "Tab schließen",
+      "termDuplicate": "Tab duplizieren",
+      "termNextTab": "Nächster Tab",
+      "termPrevTab": "Vorheriger Tab",
+      "termGoToTab": "Zu Tab 1–9 wechseln",
+      "termRename": "Tab umbenennen (Doppelklick)",
+      "termZoomIn": "Vergrößern",
+      "termZoomOut": "Verkleinern",
+      "termZoomReset": "Zoom zurücksetzen",
+      "termScrollLine": "Eine Zeile scrollen",
+      "termScrollPage": "Eine Seite scrollen",
+      "termScrollEdge": "Zum Anfang / Ende scrollen",
+      "termMenu": "Terminalmenü",
+      "termClearSelection": "Auswahl aufheben",
+      "termWebNote": "Browser reservieren Strg+Umschalt+T/W — die Web-Version akzeptiert zusätzlich Strg+Alt+T / Strg+Alt+W.",
       "editor": "Editor",
       "edSave": "Datei speichern",
       "edSaveAll": "Alle Dateien speichern",
@@ -4202,6 +4219,42 @@
       "processExitedWithCode": "Prozess beendet (Code {{code}}) — verbinde dich, um ihn erneut zu starten",
       "resumeSession": "Sitzung {{title}} fortsetzen",
       "startSession": "Neue Sitzung in {{path}} starten"
+    },
+    "menu": {
+      "title": "Terminalmenü",
+      "edit": "Bearbeiten",
+      "view": "Ansicht",
+      "session": "Sitzung",
+      "find": "Suchen",
+      "renameTab": "Tab umbenennen",
+      "duplicateTab": "Tab duplizieren",
+      "closeTab": "Tab schließen",
+      "closeOtherTabs": "Andere Tabs schließen",
+      "closeTabsToRight": "Tabs rechts schließen",
+      "zoomReset": "Zoom zurücksetzen",
+      "selectAll": "Alles auswählen",
+      "keyBar": "Bildschirm-Tastenleiste",
+      "shortcutsHelp": "Tastenkürzel"
+    },
+    "rename": {
+      "title": "Tab umbenennen",
+      "hint": "Tab-Name"
+    },
+    "search": {
+      "hint": "Suchen",
+      "noResults": "Keine Treffer",
+      "count": "{{current}} von {{total}}",
+      "matchCase": "Groß-/Kleinschreibung beachten",
+      "next": "Nächster Treffer",
+      "previous": "Vorheriger Treffer",
+      "close": "Suche schließen"
+    },
+    "keyBar": {
+      "ctrl": "Strg",
+      "alt": "Alt",
+      "ctrlHint": "Strg für die nächste Taste halten",
+      "altHint": "Alt für die nächste Taste halten",
+      "showKeyboard": "Tastatur anzeigen"
     }
   },
   "voice": {

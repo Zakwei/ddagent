@@ -2918,6 +2918,23 @@
       "termInterrupt": "Przerwij proces (bez zaznaczenia)",
       "termPaste": "Wklej",
       "termSelectAll": "Zaznacz wszystko",
+      "termFind": "Szukaj w buforze",
+      "termNewTab": "Nowa karta",
+      "termCloseTab": "Zamknij kartę",
+      "termDuplicate": "Duplikuj kartę",
+      "termNextTab": "Następna karta",
+      "termPrevTab": "Poprzednia karta",
+      "termGoToTab": "Przejdź do karty 1–9",
+      "termRename": "Zmień nazwę karty (dwuklik)",
+      "termZoomIn": "Powiększ",
+      "termZoomOut": "Pomniejsz",
+      "termZoomReset": "Resetuj powiększenie",
+      "termScrollLine": "Przewiń o wiersz",
+      "termScrollPage": "Przewiń o stronę",
+      "termScrollEdge": "Przewiń na początek / koniec",
+      "termMenu": "Menu terminala",
+      "termClearSelection": "Wyczyść zaznaczenie",
+      "termWebNote": "Przeglądarki rezerwują Ctrl+Shift+T/W — wersja web przyjmuje też Ctrl+Alt+T / Ctrl+Alt+W.",
       "editor": "Edytor",
       "edSave": "Zapisz plik",
       "edSaveAll": "Zapisz wszystkie pliki",
@@ -4242,6 +4259,42 @@
       "processExitedWithCode": "Proces zakończył działanie (kod {{code}}) — połącz się, aby uruchomić go ponownie",
       "resumeSession": "Wznów sesję {{title}}",
       "startSession": "Rozpocznij nową sesję w {{path}}"
+    },
+    "menu": {
+      "title": "Menu terminala",
+      "edit": "Edycja",
+      "view": "Widok",
+      "session": "Sesja",
+      "find": "Znajdź",
+      "renameTab": "Zmień nazwę karty",
+      "duplicateTab": "Duplikuj kartę",
+      "closeTab": "Zamknij kartę",
+      "closeOtherTabs": "Zamknij pozostałe karty",
+      "closeTabsToRight": "Zamknij karty po prawej",
+      "zoomReset": "Resetuj powiększenie",
+      "selectAll": "Zaznacz wszystko",
+      "keyBar": "Ekranowy pasek klawiszy",
+      "shortcutsHelp": "Skróty klawiszowe"
+    },
+    "rename": {
+      "title": "Zmień nazwę karty",
+      "hint": "Nazwa karty"
+    },
+    "search": {
+      "hint": "Znajdź",
+      "noResults": "Brak wyników",
+      "count": "{{current}} z {{total}}",
+      "matchCase": "Uwzględnij wielkość liter",
+      "next": "Następne trafienie",
+      "previous": "Poprzednie trafienie",
+      "close": "Zamknij wyszukiwanie"
+    },
+    "keyBar": {
+      "ctrl": "Ctrl",
+      "alt": "Alt",
+      "ctrlHint": "Przytrzymaj Ctrl dla następnego klawisza",
+      "altHint": "Przytrzymaj Alt dla następnego klawisza",
+      "showKeyboard": "Pokaż klawiaturę"
     }
   },
   "voice": {

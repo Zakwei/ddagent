@@ -664,6 +664,10 @@ class Translations$terminal$zh_CN extends Translations$terminal$en {
 	@override late final Translations$terminal$loginDialog$zh_CN loginDialog = Translations$terminal$loginDialog$zh_CN.internal(_root);
 	@override late final Translations$terminal$empty$zh_CN empty = Translations$terminal$empty$zh_CN.internal(_root);
 	@override late final Translations$terminal$overlay$zh_CN overlay = Translations$terminal$overlay$zh_CN.internal(_root);
+	@override late final Translations$terminal$menu$zh_CN menu = Translations$terminal$menu$zh_CN.internal(_root);
+	@override late final Translations$terminal$rename$zh_CN rename = Translations$terminal$rename$zh_CN.internal(_root);
+	@override late final Translations$terminal$search$zh_CN search = Translations$terminal$search$zh_CN.internal(_root);
+	@override late final Translations$terminal$keyBar$zh_CN keyBar = Translations$terminal$keyBar$zh_CN.internal(_root);
 }
 
 // Path: voice
@@ -3195,6 +3199,23 @@ class Translations$settings$shortcuts$zh_CN extends Translations$settings$shortc
 	@override String get termInterrupt => '中断进程（无选中内容时）';
 	@override String get termPaste => '粘贴';
 	@override String get termSelectAll => '全选';
+	@override String get termFind => '在缓冲区中查找';
+	@override String get termNewTab => '新建标签页';
+	@override String get termCloseTab => '关闭标签页';
+	@override String get termDuplicate => '复制标签页';
+	@override String get termNextTab => '下一个标签页';
+	@override String get termPrevTab => '上一个标签页';
+	@override String get termGoToTab => '跳转到标签页 1–9';
+	@override String get termRename => '重命名标签页（双击）';
+	@override String get termZoomIn => '放大';
+	@override String get termZoomOut => '缩小';
+	@override String get termZoomReset => '重置缩放';
+	@override String get termScrollLine => '滚动一行';
+	@override String get termScrollPage => '滚动一页';
+	@override String get termScrollEdge => '滚动到顶部 / 底部';
+	@override String get termMenu => '终端菜单';
+	@override String get termClearSelection => '清除选择';
+	@override String get termWebNote => '浏览器保留了 Ctrl+Shift+T/W — 网页版同时接受 Ctrl+Alt+T / Ctrl+Alt+W。';
 	@override String get editor => '编辑器';
 	@override String get edSave => '保存文件';
 	@override String get edSaveAll => '保存所有文件';
@@ -4994,6 +5015,70 @@ class Translations$terminal$overlay$zh_CN extends Translations$terminal$overlay$
 	@override String processExitedWithCode({required Object code}) => '进程已退出（代码 ${code}）— 连接以重新启动';
 	@override String resumeSession({required Object title}) => '恢复会话 ${title}';
 	@override String startSession({required Object path}) => '在 ${path} 中开始新会话';
+}
+
+// Path: terminal.menu
+class Translations$terminal$menu$zh_CN extends Translations$terminal$menu$en {
+	Translations$terminal$menu$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '终端菜单';
+	@override String get edit => '编辑';
+	@override String get view => '视图';
+	@override String get session => '会话';
+	@override String get find => '查找';
+	@override String get renameTab => '重命名标签页';
+	@override String get duplicateTab => '复制标签页';
+	@override String get closeTab => '关闭标签页';
+	@override String get closeOtherTabs => '关闭其他标签页';
+	@override String get closeTabsToRight => '关闭右侧标签页';
+	@override String get zoomReset => '重置缩放';
+	@override String get selectAll => '全选';
+	@override String get keyBar => '屏幕按键栏';
+	@override String get shortcutsHelp => '键盘快捷键';
+}
+
+// Path: terminal.rename
+class Translations$terminal$rename$zh_CN extends Translations$terminal$rename$en {
+	Translations$terminal$rename$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '重命名标签页';
+	@override String get hint => '标签页名称';
+}
+
+// Path: terminal.search
+class Translations$terminal$search$zh_CN extends Translations$terminal$search$en {
+	Translations$terminal$search$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get hint => '查找';
+	@override String get noResults => '无结果';
+	@override String count({required Object current, required Object total}) => '第 ${current} 项，共 ${total} 项';
+	@override String get matchCase => '区分大小写';
+	@override String get next => '下一个匹配';
+	@override String get previous => '上一个匹配';
+	@override String get close => '关闭搜索';
+}
+
+// Path: terminal.keyBar
+class Translations$terminal$keyBar$zh_CN extends Translations$terminal$keyBar$en {
+	Translations$terminal$keyBar$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get ctrl => 'Ctrl';
+	@override String get alt => 'Alt';
+	@override String get ctrlHint => '为下一个按键按住 Ctrl';
+	@override String get altHint => '为下一个按键按住 Alt';
+	@override String get showKeyboard => '显示键盘';
 }
 
 // Path: workspace.paneTitle
@@ -10661,6 +10746,23 @@ extension on TranslationsZhCn {
 			'settings.shortcuts.termInterrupt' => '中断进程（无选中内容时）',
 			'settings.shortcuts.termPaste' => '粘贴',
 			'settings.shortcuts.termSelectAll' => '全选',
+			'settings.shortcuts.termFind' => '在缓冲区中查找',
+			'settings.shortcuts.termNewTab' => '新建标签页',
+			'settings.shortcuts.termCloseTab' => '关闭标签页',
+			'settings.shortcuts.termDuplicate' => '复制标签页',
+			'settings.shortcuts.termNextTab' => '下一个标签页',
+			'settings.shortcuts.termPrevTab' => '上一个标签页',
+			'settings.shortcuts.termGoToTab' => '跳转到标签页 1–9',
+			'settings.shortcuts.termRename' => '重命名标签页（双击）',
+			'settings.shortcuts.termZoomIn' => '放大',
+			'settings.shortcuts.termZoomOut' => '缩小',
+			'settings.shortcuts.termZoomReset' => '重置缩放',
+			'settings.shortcuts.termScrollLine' => '滚动一行',
+			'settings.shortcuts.termScrollPage' => '滚动一页',
+			'settings.shortcuts.termScrollEdge' => '滚动到顶部 / 底部',
+			'settings.shortcuts.termMenu' => '终端菜单',
+			'settings.shortcuts.termClearSelection' => '清除选择',
+			'settings.shortcuts.termWebNote' => '浏览器保留了 Ctrl+Shift+T/W — 网页版同时接受 Ctrl+Alt+T / Ctrl+Alt+W。',
 			'settings.shortcuts.editor' => '编辑器',
 			'settings.shortcuts.edSave' => '保存文件',
 			'settings.shortcuts.edSaveAll' => '保存所有文件',
@@ -11058,6 +11160,8 @@ extension on TranslationsZhCn {
 			'tasks.nextTask.hideDetails' => '隐藏详情',
 			'tasks.nextTask.initialize' => '初始化',
 			'tasks.nextTask.noPending' => '没有待处理任务',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI 未配置',
 			'tasks.nextTask.review' => '审查',
 			'tasks.nextTask.startTask' => '开始任务',
@@ -11075,8 +11179,6 @@ extension on TranslationsZhCn {
 			'tasks.taskDetail.dependencies' => '依赖项',
 			'tasks.taskDetail.dependenciesPlaceholder' => '例如：1, 2, 3',
 			'tasks.taskDetail.description' => '描述',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.edit' => '编辑任务',
 			'tasks.taskDetail.implDetails' => '实现细节',
 			'tasks.taskDetail.noDependencies' => '无依赖项',
@@ -11572,6 +11674,8 @@ extension on TranslationsZhCn {
 			'terminal.tabs.shellName' => ({required Object index}) => '终端 ${index}',
 			'terminal.tabs.plainShell' => '普通 Shell',
 			'terminal.tabs.claudeCli' => 'Claude CLI',
+			_ => null,
+		} ?? switch (path) {
 			'terminal.tabs.opencodeCli' => 'OpenCode CLI',
 			'terminal.tabs.commandCodeCli' => 'Command Code CLI',
 			'terminal.tabs.antigravityCli' => 'Antigravity CLI',
@@ -11589,8 +11693,6 @@ extension on TranslationsZhCn {
 			'terminal.authUrl.linkLabel' => ({required Object url}) => '认证链接：${url}',
 			'terminal.fileLink.detected' => ({required Object path}) => '检测到文件：${path}',
 			'terminal.shortcuts.interrupt' => '中断 (SIGINT)',
-			_ => null,
-		} ?? switch (path) {
 			'terminal.shortcuts.eof' => 'EOF',
 			'terminal.shortcuts.suspend' => '挂起 (SIGTSTP)',
 			'terminal.shortcuts.hide' => '隐藏快捷键栏',
@@ -11610,6 +11712,34 @@ extension on TranslationsZhCn {
 			'terminal.overlay.processExitedWithCode' => ({required Object code}) => '进程已退出（代码 ${code}）— 连接以重新启动',
 			'terminal.overlay.resumeSession' => ({required Object title}) => '恢复会话 ${title}',
 			'terminal.overlay.startSession' => ({required Object path}) => '在 ${path} 中开始新会话',
+			'terminal.menu.title' => '终端菜单',
+			'terminal.menu.edit' => '编辑',
+			'terminal.menu.view' => '视图',
+			'terminal.menu.session' => '会话',
+			'terminal.menu.find' => '查找',
+			'terminal.menu.renameTab' => '重命名标签页',
+			'terminal.menu.duplicateTab' => '复制标签页',
+			'terminal.menu.closeTab' => '关闭标签页',
+			'terminal.menu.closeOtherTabs' => '关闭其他标签页',
+			'terminal.menu.closeTabsToRight' => '关闭右侧标签页',
+			'terminal.menu.zoomReset' => '重置缩放',
+			'terminal.menu.selectAll' => '全选',
+			'terminal.menu.keyBar' => '屏幕按键栏',
+			'terminal.menu.shortcutsHelp' => '键盘快捷键',
+			'terminal.rename.title' => '重命名标签页',
+			'terminal.rename.hint' => '标签页名称',
+			'terminal.search.hint' => '查找',
+			'terminal.search.noResults' => '无结果',
+			'terminal.search.count' => ({required Object current, required Object total}) => '第 ${current} 项，共 ${total} 项',
+			'terminal.search.matchCase' => '区分大小写',
+			'terminal.search.next' => '下一个匹配',
+			'terminal.search.previous' => '上一个匹配',
+			'terminal.search.close' => '关闭搜索',
+			'terminal.keyBar.ctrl' => 'Ctrl',
+			'terminal.keyBar.alt' => 'Alt',
+			'terminal.keyBar.ctrlHint' => '为下一个按键按住 Ctrl',
+			'terminal.keyBar.altHint' => '为下一个按键按住 Alt',
+			'terminal.keyBar.showKeyboard' => '显示键盘',
 			'voice.preview' => '预览',
 			'voice.settingsSaved' => '语音输入设置已保存',
 			'voice.saveFailed' => '保存 STT 配置失败',

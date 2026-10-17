@@ -2918,6 +2918,23 @@
       "termInterrupt": "Прервать процесс (без выделения)",
       "termPaste": "Вставить",
       "termSelectAll": "Выделить всё",
+      "termFind": "Поиск в буфере",
+      "termNewTab": "Новая вкладка",
+      "termCloseTab": "Закрыть вкладку",
+      "termDuplicate": "Дублировать вкладку",
+      "termNextTab": "Следующая вкладка",
+      "termPrevTab": "Предыдущая вкладка",
+      "termGoToTab": "Перейти к вкладке 1–9",
+      "termRename": "Переименовать вкладку (двойной клик)",
+      "termZoomIn": "Увеличить",
+      "termZoomOut": "Уменьшить",
+      "termZoomReset": "Сбросить масштаб",
+      "termScrollLine": "Прокрутить на строку",
+      "termScrollPage": "Прокрутить на страницу",
+      "termScrollEdge": "Прокрутить в начало / конец",
+      "termMenu": "Меню терминала",
+      "termClearSelection": "Снять выделение",
+      "termWebNote": "Браузеры резервируют Ctrl+Shift+T/W — веб-версия также принимает Ctrl+Alt+T / Ctrl+Alt+W.",
       "editor": "Редактор",
       "edSave": "Сохранить файл",
       "edSaveAll": "Сохранить все файлы",
@@ -4240,6 +4257,42 @@
       "processExitedWithCode": "Процесс завершён (код {{code}}) — подключитесь, чтобы запустить его снова",
       "resumeSession": "Возобновить сеанс {{title}}",
       "startSession": "Начать новый сеанс в {{path}}"
+    },
+    "menu": {
+      "title": "Меню терминала",
+      "edit": "Правка",
+      "view": "Вид",
+      "session": "Сеанс",
+      "find": "Найти",
+      "renameTab": "Переименовать вкладку",
+      "duplicateTab": "Дублировать вкладку",
+      "closeTab": "Закрыть вкладку",
+      "closeOtherTabs": "Закрыть другие вкладки",
+      "closeTabsToRight": "Закрыть вкладки справа",
+      "zoomReset": "Сбросить масштаб",
+      "selectAll": "Выделить всё",
+      "keyBar": "Экранная панель клавиш",
+      "shortcutsHelp": "Горячие клавиши"
+    },
+    "rename": {
+      "title": "Переименовать вкладку",
+      "hint": "Название вкладки"
+    },
+    "search": {
+      "hint": "Найти",
+      "noResults": "Ничего не найдено",
+      "count": "{{current}} из {{total}}",
+      "matchCase": "Учитывать регистр",
+      "next": "Следующее совпадение",
+      "previous": "Предыдущее совпадение",
+      "close": "Закрыть поиск"
+    },
+    "keyBar": {
+      "ctrl": "Ctrl",
+      "alt": "Alt",
+      "ctrlHint": "Удержать Ctrl для следующей клавиши",
+      "altHint": "Удержать Alt для следующей клавиши",
+      "showKeyboard": "Показать клавиатуру"
     }
   },
   "voice": {

@@ -934,6 +934,10 @@ class Translations$terminal$en {
 	late final Translations$terminal$loginDialog$en loginDialog = Translations$terminal$loginDialog$en.internal(_root);
 	late final Translations$terminal$empty$en empty = Translations$terminal$empty$en.internal(_root);
 	late final Translations$terminal$overlay$en overlay = Translations$terminal$overlay$en.internal(_root);
+	late final Translations$terminal$menu$en menu = Translations$terminal$menu$en.internal(_root);
+	late final Translations$terminal$rename$en rename = Translations$terminal$rename$en.internal(_root);
+	late final Translations$terminal$search$en search = Translations$terminal$search$en.internal(_root);
+	late final Translations$terminal$keyBar$en keyBar = Translations$terminal$keyBar$en.internal(_root);
 }
 
 // Path: voice
@@ -5825,6 +5829,57 @@ class Translations$settings$shortcuts$en {
 	/// en: 'Select all'
 	String get termSelectAll => 'Select all';
 
+	/// en: 'Find in buffer'
+	String get termFind => 'Find in buffer';
+
+	/// en: 'New tab'
+	String get termNewTab => 'New tab';
+
+	/// en: 'Close tab'
+	String get termCloseTab => 'Close tab';
+
+	/// en: 'Duplicate tab'
+	String get termDuplicate => 'Duplicate tab';
+
+	/// en: 'Next tab'
+	String get termNextTab => 'Next tab';
+
+	/// en: 'Previous tab'
+	String get termPrevTab => 'Previous tab';
+
+	/// en: 'Go to tab 1–9'
+	String get termGoToTab => 'Go to tab 1–9';
+
+	/// en: 'Rename tab (double-click)'
+	String get termRename => 'Rename tab (double-click)';
+
+	/// en: 'Zoom in'
+	String get termZoomIn => 'Zoom in';
+
+	/// en: 'Zoom out'
+	String get termZoomOut => 'Zoom out';
+
+	/// en: 'Reset zoom'
+	String get termZoomReset => 'Reset zoom';
+
+	/// en: 'Scroll one line'
+	String get termScrollLine => 'Scroll one line';
+
+	/// en: 'Scroll one page'
+	String get termScrollPage => 'Scroll one page';
+
+	/// en: 'Scroll to top / bottom'
+	String get termScrollEdge => 'Scroll to top / bottom';
+
+	/// en: 'Terminal menu'
+	String get termMenu => 'Terminal menu';
+
+	/// en: 'Clear selection'
+	String get termClearSelection => 'Clear selection';
+
+	/// en: 'Browsers reserve Ctrl+Shift+T/W — the web build also accepts Ctrl+Alt+T / Ctrl+Alt+W.'
+	String get termWebNote => 'Browsers reserve Ctrl+Shift+T/W — the web build also accepts Ctrl+Alt+T / Ctrl+Alt+W.';
+
 	/// en: 'Editor'
 	String get editor => 'Editor';
 
@@ -9081,6 +9136,126 @@ class Translations$terminal$overlay$en {
 
 	/// en: 'Start a new session in {{path}}'
 	String startSession({required Object path}) => 'Start a new session in ${path}';
+}
+
+// Path: terminal.menu
+class Translations$terminal$menu$en {
+	Translations$terminal$menu$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Terminal menu'
+	String get title => 'Terminal menu';
+
+	/// en: 'Edit'
+	String get edit => 'Edit';
+
+	/// en: 'View'
+	String get view => 'View';
+
+	/// en: 'Session'
+	String get session => 'Session';
+
+	/// en: 'Find'
+	String get find => 'Find';
+
+	/// en: 'Rename tab'
+	String get renameTab => 'Rename tab';
+
+	/// en: 'Duplicate tab'
+	String get duplicateTab => 'Duplicate tab';
+
+	/// en: 'Close tab'
+	String get closeTab => 'Close tab';
+
+	/// en: 'Close other tabs'
+	String get closeOtherTabs => 'Close other tabs';
+
+	/// en: 'Close tabs to the right'
+	String get closeTabsToRight => 'Close tabs to the right';
+
+	/// en: 'Reset zoom'
+	String get zoomReset => 'Reset zoom';
+
+	/// en: 'Select all'
+	String get selectAll => 'Select all';
+
+	/// en: 'On-screen key bar'
+	String get keyBar => 'On-screen key bar';
+
+	/// en: 'Keyboard shortcuts'
+	String get shortcutsHelp => 'Keyboard shortcuts';
+}
+
+// Path: terminal.rename
+class Translations$terminal$rename$en {
+	Translations$terminal$rename$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Rename tab'
+	String get title => 'Rename tab';
+
+	/// en: 'Tab name'
+	String get hint => 'Tab name';
+}
+
+// Path: terminal.search
+class Translations$terminal$search$en {
+	Translations$terminal$search$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Find'
+	String get hint => 'Find';
+
+	/// en: 'No results'
+	String get noResults => 'No results';
+
+	/// en: '{{current}} of {{total}}'
+	String count({required Object current, required Object total}) => '${current} of ${total}';
+
+	/// en: 'Match case'
+	String get matchCase => 'Match case';
+
+	/// en: 'Next match'
+	String get next => 'Next match';
+
+	/// en: 'Previous match'
+	String get previous => 'Previous match';
+
+	/// en: 'Close search'
+	String get close => 'Close search';
+}
+
+// Path: terminal.keyBar
+class Translations$terminal$keyBar$en {
+	Translations$terminal$keyBar$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Ctrl'
+	String get ctrl => 'Ctrl';
+
+	/// en: 'Alt'
+	String get alt => 'Alt';
+
+	/// en: 'Hold Ctrl for the next key'
+	String get ctrlHint => 'Hold Ctrl for the next key';
+
+	/// en: 'Hold Alt for the next key'
+	String get altHint => 'Hold Alt for the next key';
+
+	/// en: 'Show keyboard'
+	String get showKeyboard => 'Show keyboard';
 }
 
 // Path: workspace.paneTitle
@@ -17140,6 +17315,23 @@ extension on Translations {
 			'settings.shortcuts.termInterrupt' => 'Interrupt process (no selection)',
 			'settings.shortcuts.termPaste' => 'Paste',
 			'settings.shortcuts.termSelectAll' => 'Select all',
+			'settings.shortcuts.termFind' => 'Find in buffer',
+			'settings.shortcuts.termNewTab' => 'New tab',
+			'settings.shortcuts.termCloseTab' => 'Close tab',
+			'settings.shortcuts.termDuplicate' => 'Duplicate tab',
+			'settings.shortcuts.termNextTab' => 'Next tab',
+			'settings.shortcuts.termPrevTab' => 'Previous tab',
+			'settings.shortcuts.termGoToTab' => 'Go to tab 1–9',
+			'settings.shortcuts.termRename' => 'Rename tab (double-click)',
+			'settings.shortcuts.termZoomIn' => 'Zoom in',
+			'settings.shortcuts.termZoomOut' => 'Zoom out',
+			'settings.shortcuts.termZoomReset' => 'Reset zoom',
+			'settings.shortcuts.termScrollLine' => 'Scroll one line',
+			'settings.shortcuts.termScrollPage' => 'Scroll one page',
+			'settings.shortcuts.termScrollEdge' => 'Scroll to top / bottom',
+			'settings.shortcuts.termMenu' => 'Terminal menu',
+			'settings.shortcuts.termClearSelection' => 'Clear selection',
+			'settings.shortcuts.termWebNote' => 'Browsers reserve Ctrl+Shift+T/W — the web build also accepts Ctrl+Alt+T / Ctrl+Alt+W.',
 			'settings.shortcuts.editor' => 'Editor',
 			'settings.shortcuts.edSave' => 'Save file',
 			'settings.shortcuts.edSaveAll' => 'Save all files',
@@ -17537,6 +17729,8 @@ extension on Translations {
 			'tasks.nextTask.hideDetails' => 'Hide details',
 			'tasks.nextTask.initialize' => 'Initialize',
 			'tasks.nextTask.noPending' => 'No pending tasks',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI is not configured',
 			'tasks.nextTask.review' => 'Review',
 			'tasks.nextTask.startTask' => 'Start Task',
@@ -17554,8 +17748,6 @@ extension on Translations {
 			'tasks.taskDetail.dependencies' => 'Dependencies',
 			'tasks.taskDetail.dependenciesPlaceholder' => 'e.g. 1, 2, 3',
 			'tasks.taskDetail.description' => 'Description',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.edit' => 'Edit task',
 			'tasks.taskDetail.implDetails' => 'Implementation Details',
 			'tasks.taskDetail.noDependencies' => 'No dependencies',
@@ -18051,6 +18243,8 @@ extension on Translations {
 			'terminal.tabs.shellName' => ({required Object index}) => 'Shell ${index}',
 			'terminal.tabs.plainShell' => 'Plain Shell',
 			'terminal.tabs.claudeCli' => 'Claude CLI',
+			_ => null,
+		} ?? switch (path) {
 			'terminal.tabs.opencodeCli' => 'OpenCode CLI',
 			'terminal.tabs.commandCodeCli' => 'Command Code CLI',
 			'terminal.tabs.antigravityCli' => 'Antigravity CLI',
@@ -18068,8 +18262,6 @@ extension on Translations {
 			'terminal.authUrl.linkLabel' => ({required Object url}) => 'Auth link: ${url}',
 			'terminal.fileLink.detected' => ({required Object path}) => 'File detected: ${path}',
 			'terminal.shortcuts.interrupt' => 'Interrupt (SIGINT)',
-			_ => null,
-		} ?? switch (path) {
 			'terminal.shortcuts.eof' => 'EOF',
 			'terminal.shortcuts.suspend' => 'Suspend (SIGTSTP)',
 			'terminal.shortcuts.hide' => 'Hide shortcuts bar',
@@ -18089,6 +18281,34 @@ extension on Translations {
 			'terminal.overlay.processExitedWithCode' => ({required Object code}) => 'Process exited (code ${code}) — connect to start it again',
 			'terminal.overlay.resumeSession' => ({required Object title}) => 'Resume session ${title}',
 			'terminal.overlay.startSession' => ({required Object path}) => 'Start a new session in ${path}',
+			'terminal.menu.title' => 'Terminal menu',
+			'terminal.menu.edit' => 'Edit',
+			'terminal.menu.view' => 'View',
+			'terminal.menu.session' => 'Session',
+			'terminal.menu.find' => 'Find',
+			'terminal.menu.renameTab' => 'Rename tab',
+			'terminal.menu.duplicateTab' => 'Duplicate tab',
+			'terminal.menu.closeTab' => 'Close tab',
+			'terminal.menu.closeOtherTabs' => 'Close other tabs',
+			'terminal.menu.closeTabsToRight' => 'Close tabs to the right',
+			'terminal.menu.zoomReset' => 'Reset zoom',
+			'terminal.menu.selectAll' => 'Select all',
+			'terminal.menu.keyBar' => 'On-screen key bar',
+			'terminal.menu.shortcutsHelp' => 'Keyboard shortcuts',
+			'terminal.rename.title' => 'Rename tab',
+			'terminal.rename.hint' => 'Tab name',
+			'terminal.search.hint' => 'Find',
+			'terminal.search.noResults' => 'No results',
+			'terminal.search.count' => ({required Object current, required Object total}) => '${current} of ${total}',
+			'terminal.search.matchCase' => 'Match case',
+			'terminal.search.next' => 'Next match',
+			'terminal.search.previous' => 'Previous match',
+			'terminal.search.close' => 'Close search',
+			'terminal.keyBar.ctrl' => 'Ctrl',
+			'terminal.keyBar.alt' => 'Alt',
+			'terminal.keyBar.ctrlHint' => 'Hold Ctrl for the next key',
+			'terminal.keyBar.altHint' => 'Hold Alt for the next key',
+			'terminal.keyBar.showKeyboard' => 'Show keyboard',
 			'voice.preview' => 'Preview',
 			'voice.settingsSaved' => 'Voice input settings saved',
 			'voice.saveFailed' => 'Failed to save STT configuration',

@@ -665,6 +665,10 @@ class Translations$terminal$it extends Translations$terminal$en {
 	@override late final Translations$terminal$loginDialog$it loginDialog = Translations$terminal$loginDialog$it._(_root);
 	@override late final Translations$terminal$empty$it empty = Translations$terminal$empty$it._(_root);
 	@override late final Translations$terminal$overlay$it overlay = Translations$terminal$overlay$it._(_root);
+	@override late final Translations$terminal$menu$it menu = Translations$terminal$menu$it._(_root);
+	@override late final Translations$terminal$rename$it rename = Translations$terminal$rename$it._(_root);
+	@override late final Translations$terminal$search$it search = Translations$terminal$search$it._(_root);
+	@override late final Translations$terminal$keyBar$it keyBar = Translations$terminal$keyBar$it._(_root);
 }
 
 // Path: voice
@@ -3205,6 +3209,23 @@ class Translations$settings$shortcuts$it extends Translations$settings$shortcuts
 	@override String get termInterrupt => 'Interrompi processo (senza selezione)';
 	@override String get termPaste => 'Incolla';
 	@override String get termSelectAll => 'Seleziona tutto';
+	@override String get termFind => 'Cerca nel buffer';
+	@override String get termNewTab => 'Nuova scheda';
+	@override String get termCloseTab => 'Chiudi scheda';
+	@override String get termDuplicate => 'Duplica scheda';
+	@override String get termNextTab => 'Scheda successiva';
+	@override String get termPrevTab => 'Scheda precedente';
+	@override String get termGoToTab => 'Vai alla scheda 1–9';
+	@override String get termRename => 'Rinomina scheda (doppio clic)';
+	@override String get termZoomIn => 'Ingrandisci';
+	@override String get termZoomOut => 'Riduci';
+	@override String get termZoomReset => 'Reimposta zoom';
+	@override String get termScrollLine => 'Scorri di una riga';
+	@override String get termScrollPage => 'Scorri di una pagina';
+	@override String get termScrollEdge => 'Vai all\'inizio / alla fine';
+	@override String get termMenu => 'Menu del terminale';
+	@override String get termClearSelection => 'Annulla selezione';
+	@override String get termWebNote => 'I browser riservano Ctrl+Shift+T/W — la versione web accetta anche Ctrl+Alt+T / Ctrl+Alt+W.';
 	@override String get editor => 'Editor';
 	@override String get edSave => 'Salva file';
 	@override String get edSaveAll => 'Salva tutti i file';
@@ -5004,6 +5025,70 @@ class Translations$terminal$overlay$it extends Translations$terminal$overlay$en 
 	@override String processExitedWithCode({required Object code}) => 'Il processo è terminato (codice ${code}): connettiti per avviarlo di nuovo';
 	@override String resumeSession({required Object title}) => 'Riprendi la sessione ${title}';
 	@override String startSession({required Object path}) => 'Avvia una nuova sessione in ${path}';
+}
+
+// Path: terminal.menu
+class Translations$terminal$menu$it extends Translations$terminal$menu$en {
+	Translations$terminal$menu$it._(TranslationsIt root) : this._root = root, super.internal(root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Menu del terminale';
+	@override String get edit => 'Modifica';
+	@override String get view => 'Visualizza';
+	@override String get session => 'Sessione';
+	@override String get find => 'Trova';
+	@override String get renameTab => 'Rinomina scheda';
+	@override String get duplicateTab => 'Duplica scheda';
+	@override String get closeTab => 'Chiudi scheda';
+	@override String get closeOtherTabs => 'Chiudi le altre schede';
+	@override String get closeTabsToRight => 'Chiudi le schede a destra';
+	@override String get zoomReset => 'Reimposta zoom';
+	@override String get selectAll => 'Seleziona tutto';
+	@override String get keyBar => 'Barra tasti su schermo';
+	@override String get shortcutsHelp => 'Scorciatoie da tastiera';
+}
+
+// Path: terminal.rename
+class Translations$terminal$rename$it extends Translations$terminal$rename$en {
+	Translations$terminal$rename$it._(TranslationsIt root) : this._root = root, super.internal(root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Rinomina scheda';
+	@override String get hint => 'Nome scheda';
+}
+
+// Path: terminal.search
+class Translations$terminal$search$it extends Translations$terminal$search$en {
+	Translations$terminal$search$it._(TranslationsIt root) : this._root = root, super.internal(root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get hint => 'Trova';
+	@override String get noResults => 'Nessun risultato';
+	@override String count({required Object current, required Object total}) => '${current} di ${total}';
+	@override String get matchCase => 'Maiuscole/minuscole';
+	@override String get next => 'Risultato successivo';
+	@override String get previous => 'Risultato precedente';
+	@override String get close => 'Chiudi ricerca';
+}
+
+// Path: terminal.keyBar
+class Translations$terminal$keyBar$it extends Translations$terminal$keyBar$en {
+	Translations$terminal$keyBar$it._(TranslationsIt root) : this._root = root, super.internal(root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get ctrl => 'Ctrl';
+	@override String get alt => 'Alt';
+	@override String get ctrlHint => 'Tieni Ctrl per il tasto successivo';
+	@override String get altHint => 'Tieni Alt per il tasto successivo';
+	@override String get showKeyboard => 'Mostra tastiera';
 }
 
 // Path: workspace.paneTitle
@@ -10672,6 +10757,23 @@ extension on TranslationsIt {
 			'settings.shortcuts.termInterrupt' => 'Interrompi processo (senza selezione)',
 			'settings.shortcuts.termPaste' => 'Incolla',
 			'settings.shortcuts.termSelectAll' => 'Seleziona tutto',
+			'settings.shortcuts.termFind' => 'Cerca nel buffer',
+			'settings.shortcuts.termNewTab' => 'Nuova scheda',
+			'settings.shortcuts.termCloseTab' => 'Chiudi scheda',
+			'settings.shortcuts.termDuplicate' => 'Duplica scheda',
+			'settings.shortcuts.termNextTab' => 'Scheda successiva',
+			'settings.shortcuts.termPrevTab' => 'Scheda precedente',
+			'settings.shortcuts.termGoToTab' => 'Vai alla scheda 1–9',
+			'settings.shortcuts.termRename' => 'Rinomina scheda (doppio clic)',
+			'settings.shortcuts.termZoomIn' => 'Ingrandisci',
+			'settings.shortcuts.termZoomOut' => 'Riduci',
+			'settings.shortcuts.termZoomReset' => 'Reimposta zoom',
+			'settings.shortcuts.termScrollLine' => 'Scorri di una riga',
+			'settings.shortcuts.termScrollPage' => 'Scorri di una pagina',
+			'settings.shortcuts.termScrollEdge' => 'Vai all\'inizio / alla fine',
+			'settings.shortcuts.termMenu' => 'Menu del terminale',
+			'settings.shortcuts.termClearSelection' => 'Annulla selezione',
+			'settings.shortcuts.termWebNote' => 'I browser riservano Ctrl+Shift+T/W — la versione web accetta anche Ctrl+Alt+T / Ctrl+Alt+W.',
 			'settings.shortcuts.editor' => 'Editor',
 			'settings.shortcuts.edSave' => 'Salva file',
 			'settings.shortcuts.edSaveAll' => 'Salva tutti i file',
@@ -11069,6 +11171,8 @@ extension on TranslationsIt {
 			'tasks.nextTask.hideDetails' => 'Nascondi dettagli',
 			'tasks.nextTask.initialize' => 'Inizializza',
 			'tasks.nextTask.noPending' => 'Nessuna attività in sospeso',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI non è configurato',
 			'tasks.nextTask.review' => 'Revisiona',
 			'tasks.nextTask.startTask' => 'Avvia attività',
@@ -11086,8 +11190,6 @@ extension on TranslationsIt {
 			'tasks.taskDetail.dependencies' => 'Dipendenze',
 			'tasks.taskDetail.dependenciesPlaceholder' => 'es. 1, 2, 3',
 			'tasks.taskDetail.description' => 'Descrizione',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.edit' => 'Modifica attività',
 			'tasks.taskDetail.implDetails' => 'Dettagli di implementazione',
 			'tasks.taskDetail.noDependencies' => 'Nessuna dipendenza',
@@ -11583,6 +11685,8 @@ extension on TranslationsIt {
 			'terminal.tabs.shellName' => ({required Object index}) => 'Shell ${index}',
 			'terminal.tabs.plainShell' => 'Shell semplice',
 			'terminal.tabs.claudeCli' => 'Claude CLI',
+			_ => null,
+		} ?? switch (path) {
 			'terminal.tabs.opencodeCli' => 'OpenCode CLI',
 			'terminal.tabs.commandCodeCli' => 'Command Code CLI',
 			'terminal.tabs.antigravityCli' => 'Antigravity CLI',
@@ -11600,8 +11704,6 @@ extension on TranslationsIt {
 			'terminal.authUrl.linkLabel' => ({required Object url}) => 'Link di autenticazione: ${url}',
 			'terminal.fileLink.detected' => ({required Object path}) => 'File rilevato: ${path}',
 			'terminal.shortcuts.interrupt' => 'Interrompi (SIGINT)',
-			_ => null,
-		} ?? switch (path) {
 			'terminal.shortcuts.eof' => 'EOF',
 			'terminal.shortcuts.suspend' => 'Sospendi (SIGTSTP)',
 			'terminal.shortcuts.hide' => 'Nascondi barra scorciatoie',
@@ -11621,6 +11723,34 @@ extension on TranslationsIt {
 			'terminal.overlay.processExitedWithCode' => ({required Object code}) => 'Il processo è terminato (codice ${code}): connettiti per avviarlo di nuovo',
 			'terminal.overlay.resumeSession' => ({required Object title}) => 'Riprendi la sessione ${title}',
 			'terminal.overlay.startSession' => ({required Object path}) => 'Avvia una nuova sessione in ${path}',
+			'terminal.menu.title' => 'Menu del terminale',
+			'terminal.menu.edit' => 'Modifica',
+			'terminal.menu.view' => 'Visualizza',
+			'terminal.menu.session' => 'Sessione',
+			'terminal.menu.find' => 'Trova',
+			'terminal.menu.renameTab' => 'Rinomina scheda',
+			'terminal.menu.duplicateTab' => 'Duplica scheda',
+			'terminal.menu.closeTab' => 'Chiudi scheda',
+			'terminal.menu.closeOtherTabs' => 'Chiudi le altre schede',
+			'terminal.menu.closeTabsToRight' => 'Chiudi le schede a destra',
+			'terminal.menu.zoomReset' => 'Reimposta zoom',
+			'terminal.menu.selectAll' => 'Seleziona tutto',
+			'terminal.menu.keyBar' => 'Barra tasti su schermo',
+			'terminal.menu.shortcutsHelp' => 'Scorciatoie da tastiera',
+			'terminal.rename.title' => 'Rinomina scheda',
+			'terminal.rename.hint' => 'Nome scheda',
+			'terminal.search.hint' => 'Trova',
+			'terminal.search.noResults' => 'Nessun risultato',
+			'terminal.search.count' => ({required Object current, required Object total}) => '${current} di ${total}',
+			'terminal.search.matchCase' => 'Maiuscole/minuscole',
+			'terminal.search.next' => 'Risultato successivo',
+			'terminal.search.previous' => 'Risultato precedente',
+			'terminal.search.close' => 'Chiudi ricerca',
+			'terminal.keyBar.ctrl' => 'Ctrl',
+			'terminal.keyBar.alt' => 'Alt',
+			'terminal.keyBar.ctrlHint' => 'Tieni Ctrl per il tasto successivo',
+			'terminal.keyBar.altHint' => 'Tieni Alt per il tasto successivo',
+			'terminal.keyBar.showKeyboard' => 'Mostra tastiera',
 			'voice.preview' => 'Anteprima',
 			'voice.settingsSaved' => 'Impostazioni di input vocale salvate',
 			'voice.saveFailed' => 'Impossibile salvare la configurazione STT',

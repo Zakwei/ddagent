@@ -5,15 +5,30 @@ import 'package:ddagent_app/core/theme/typography.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/terminal/state/terminal_state.dart';
 import 'package:ddagent_app/features/terminal/view/provider_login_dialog.dart';
+import 'package:ddagent_app/features/terminal/view/terminal_keymap.dart';
 import 'package:ddagent_app/features/terminal/view/terminal_shortcuts_bar.dart';
+import 'package:ddagent_app/features/terminal/view/terminal_tab_strip.dart';
+import 'package:ddagent_app/features/terminal/view/terminal_theme.dart';
 import 'package:ddagent_app/features/terminal/view/terminal_view_wrapper.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+/// Provider profiles offered by the `⌄` dropdown (WT profile list).
+const _providerProfiles = ['claude', 'opencode', 'commandcode', 'antigravity', 'cursor', 'devin'];
+
+/// Dense rows (WT dropdown height) — the default 48px Material rows push a
+/// 12-entry menu past a phone's landscape height.
+final _menuItemStyle = MenuItemButton.styleFrom(
+  minimumSize: const Size(0, 36),
+  padding: const EdgeInsets.symmetric(horizontal: 12),
+  visualDensity: VisualDensity.compact,
+);
 
 class TerminalScreen extends ConsumerStatefulWidget {
   const TerminalScreen({
@@ -34,9 +49,22 @@ class TerminalScreen extends ConsumerStatefulWidget {
 }
 
 class _TerminalScreenState extends ConsumerState<TerminalScreen> {
-  /// "Copied!" flash on the copy-output button (web 2s timer).
+  /// "Copied!" flash on the copy-output menu entry (web 2s timer).
   bool _copied = false;
   Timer? _copyTimer;
+  final _menuController = MenuController();
+
+  /// One pane state per tab (selection, scroll, search survive switching
+  /// tabs); the key doubles as the handle the menu and shortcuts call into.
+  final _viewKeys = <String, GlobalKey<TerminalViewWrapperState>>{};
+
+  GlobalKey<TerminalViewWrapperState> _viewKeyFor(TerminalTab tab) =>
+      _viewKeys.putIfAbsent(tab.id, GlobalKey<TerminalViewWrapperState>.new);
+
+  TerminalViewWrapperState? get _activePane {
+    final active = ref.read(terminalControllerProvider).activeTab;
+    return active == null ? null : _viewKeys[active.id]?.currentState;
+  }
 
   @override
   void initState() {
@@ -51,6 +79,8 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
     _copyTimer?.cancel();
     super.dispose();
   }
+
+  TerminalController get _ctrl => ref.read(terminalControllerProvider.notifier);
 
   String _resolveProjectPath() {
     if (widget.projectPath != null && widget.projectPath!.isNotEmpty) {
@@ -77,17 +107,29 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
     if (terminalState.tabs.isEmpty) {
       final t = Translations.of(context);
       final path = _resolveProjectPath();
-      ref
-          .read(terminalControllerProvider.notifier)
-          .createTab(
-            title: widget.sessionId != null
-                ? t.chat.export.sessionTitle(id: widget.sessionId!)
-                : t.terminal.tabs.shellName(index: 1),
-            projectPath: path,
-            sessionId: widget.sessionId,
-            isPlainShell: widget.sessionId == null,
-          );
+      _ctrl.createTab(
+        title: widget.sessionId != null
+            ? t.chat.export.sessionTitle(id: widget.sessionId!)
+            : t.terminal.tabs.shellName(index: 1),
+        projectPath: path,
+        sessionId: widget.sessionId,
+        isPlainShell: widget.sessionId == null,
+      );
     }
+  }
+
+  /// `+` / Ctrl+Shift+T — the default profile is a plain shell.
+  void _newDefaultTab() {
+    _ctrl.createTab(projectPath: _resolveProjectPath(), isPlainShell: true);
+  }
+
+  void _newProviderTab(String provider) {
+    _ctrl.createTab(
+      projectPath: _resolveProjectPath(),
+      provider: provider,
+      isPlainShell: false,
+      title: '$provider CLI',
+    );
   }
 
   void _handleOpenFile(String filePath, int? line) {
@@ -111,48 +153,360 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
     }
   }
 
+  Future<void> _copyOutput(TerminalTab tab) async {
+    final text = _ctrl.copyOutputText(tab.id);
+    if (text == null || text.isEmpty) return;
+    await Clipboard.setData(ClipboardData(text: text));
+    if (!mounted) return;
+    setState(() => _copied = true);
+    _copyTimer?.cancel();
+    _copyTimer = Timer(const Duration(seconds: 2), () {
+      if (mounted) setState(() => _copied = false);
+    });
+  }
+
+  /// Tab-level commands — from the pane's key handler, the screen-level
+  /// fallback handler (focus outside the pane) and the dropdown menu.
+  void _runTabCommand(TerminalCommand command, int? index) {
+    final active = ref.read(terminalControllerProvider).activeTab;
+    switch (command) {
+      case TerminalCommand.newTab:
+        _newDefaultTab();
+      case TerminalCommand.closeTab:
+        if (active != null) _ctrl.closeTab(active.id);
+      case TerminalCommand.duplicateTab:
+        if (active != null) _ctrl.duplicateTab(active.id);
+      case TerminalCommand.nextTab:
+        _ctrl.selectRelativeTab(1);
+      case TerminalCommand.previousTab:
+        _ctrl.selectRelativeTab(-1);
+      case TerminalCommand.selectTab:
+        if (index != null) _ctrl.selectTabAt(index);
+      case TerminalCommand.zoomIn:
+        if (active != null) _ctrl.zoomIn(active.id);
+      case TerminalCommand.zoomOut:
+        if (active != null) _ctrl.zoomOut(active.id);
+      case TerminalCommand.zoomReset:
+        if (active != null) _ctrl.zoomReset(active.id);
+      case TerminalCommand.commandMenu:
+        _menuController.isOpen ? _menuController.close() : _menuController.open();
+      case TerminalCommand.find:
+        _activePane?.openSearch();
+      case TerminalCommand.copy:
+      case TerminalCommand.paste:
+      case TerminalCommand.selectAll:
+      case TerminalCommand.clearSelection:
+      case TerminalCommand.scrollUpLine:
+      case TerminalCommand.scrollDownLine:
+      case TerminalCommand.scrollUpPage:
+      case TerminalCommand.scrollDownPage:
+      case TerminalCommand.scrollToTop:
+      case TerminalCommand.scrollToBottom:
+        _activePane?.runCommand(command, index);
+    }
+  }
+
+  /// Chords that arrive while focus is outside the pane (connection
+  /// overlay, tab strip, key bar) — the pane handles them itself when it
+  /// has focus, so only tab-level commands are taken here.
+  KeyEventResult _onScreenKey(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent) return KeyEventResult.ignored;
+    final kb = HardwareKeyboard.instance;
+    final binding = resolveTerminalCommand(
+      key: event.logicalKey,
+      control: kb.isControlPressed,
+      shift: kb.isShiftPressed,
+      alt: kb.isAltPressed,
+      meta: kb.isMetaPressed,
+      platform: defaultTargetPlatform,
+      hasSelection: false,
+    );
+    if (binding == null) return KeyEventResult.ignored;
+    const tabLevel = {
+      TerminalCommand.newTab,
+      TerminalCommand.closeTab,
+      TerminalCommand.duplicateTab,
+      TerminalCommand.nextTab,
+      TerminalCommand.previousTab,
+      TerminalCommand.selectTab,
+      TerminalCommand.zoomIn,
+      TerminalCommand.zoomOut,
+      TerminalCommand.zoomReset,
+      TerminalCommand.commandMenu,
+      TerminalCommand.find,
+    };
+    if (!tabLevel.contains(binding.command)) return KeyEventResult.ignored;
+    _runTabCommand(binding.command, binding.index);
+    return KeyEventResult.handled;
+  }
+
+  bool get _isTouchPlatform =>
+      defaultTargetPlatform == TargetPlatform.android ||
+      defaultTargetPlatform == TargetPlatform.iOS ||
+      defaultTargetPlatform == TargetPlatform.fuchsia;
+
   @override
   Widget build(BuildContext context) {
-    final colors = context.appColors;
+    final palette = TerminalPalette.of(context);
+    final t = Translations.of(context);
     final terminalState = ref.watch(terminalControllerProvider);
     final activeTab = terminalState.activeTab;
 
-    return Scaffold(
-      backgroundColor: colors.background,
-      body: Column(
-        children: [
-          // Top bar / Tab Strip
-          _buildTabStrip(context, terminalState, activeTab),
-
-          // Active tab Auth URL banner (if any)
-          if (activeTab != null && bestAuthUrl(activeTab.authUrls) != null)
-            _buildAuthUrlBanner(bestAuthUrl(activeTab.authUrls)!),
-
-          // Main terminal view or empty state
-          Expanded(child: activeTab != null ? _terminalArea(activeTab) : _buildEmptyState()),
-
-          // Touch / Mobile Shortcuts Bar
-          if (terminalState.showShortcutsBar && activeTab != null)
-            TerminalShortcutsBar(
-              onSendInput: (input) {
-                ref.read(terminalControllerProvider.notifier).sendInput(activeTab.id, input);
-              },
-              onClear: () {
-                ref.read(terminalControllerProvider.notifier).clearTab(activeTab.id);
-              },
-              onClose: () {
-                ref.read(terminalControllerProvider.notifier).toggleShortcutsBar();
-              },
+    return Focus(
+      onKeyEvent: _onScreenKey,
+      child: Scaffold(
+        backgroundColor: palette.background,
+        body: Column(
+          children: [
+            TerminalTabStrip(
+              tabs: terminalState.tabs,
+              activeTabId: terminalState.activeTabId,
+              onSelect: _ctrl.selectTab,
+              onClose: _ctrl.closeTab,
+              onReorder: _ctrl.reorderTab,
+              onRename: _ctrl.renameTab,
+              onDuplicate: _ctrl.duplicateTab,
+              onCloseOthers: _ctrl.closeOtherTabs,
+              onCloseToRight: _ctrl.closeTabsToRight,
+              onNewTab: _newDefaultTab,
+              menuController: _menuController,
+              menuChildren: _buildMenu(context, terminalState, activeTab),
+              trailing: [
+                if (activeTab != null)
+                  TerminalStripAction(
+                    tooltip:
+                        '${t.terminal.menu.find}  '
+                        '${terminalShortcutLabel(TerminalCommand.find, defaultTargetPlatform)}',
+                    icon: LucideIcons.search,
+                    onPressed: () => _activePane?.openSearch(),
+                  ),
+                TerminalStripAction(
+                  tooltip: terminalState.showShortcutsBar
+                      ? t.terminal.shortcuts.hideTooltip
+                      : t.terminal.shortcuts.showTooltip,
+                  icon: LucideIcons.keyboard,
+                  active: terminalState.showShortcutsBar,
+                  onPressed: _ctrl.toggleShortcutsBar,
+                ),
+              ],
             ),
-        ],
+
+            // Active tab Auth URL banner (if any)
+            if (activeTab != null && bestAuthUrl(activeTab.authUrls) != null)
+              _buildAuthUrlBanner(bestAuthUrl(activeTab.authUrls)!),
+
+            // Main terminal view or empty state
+            Expanded(child: activeTab != null ? _terminalArea(activeTab) : _buildEmptyState()),
+
+            // Touch / keyboard-less key bar
+            if (terminalState.showShortcutsBar && activeTab != null)
+              TerminalShortcutsBar(
+                latched: terminalState.latchedModifiers,
+                onToggleModifier: _ctrl.toggleLatchedModifier,
+                onSendInput: (input) => _ctrl.sendInput(activeTab.id, input),
+                onPaste: () => _activePane?.paste(),
+                onClear: () => _ctrl.clearTab(activeTab.id),
+                onClose: _ctrl.toggleShortcutsBar,
+                onShowKeyboard: _isTouchPlatform ? () => _activePane?.showSoftKeyboard() : null,
+              ),
+          ],
+        ),
       ),
     );
+  }
+
+  /// The `⌄` dropdown (WT profile menu + the actions the old icon row held).
+  List<Widget> _buildMenu(BuildContext context, TerminalState state, TerminalTab? activeTab) {
+    final t = Translations.of(context);
+    final c = context.appColors;
+    final platform = defaultTargetPlatform;
+    final connected = activeTab?.status == TerminalTabStatus.connected;
+
+    MenuItemButton entry(
+      IconData icon,
+      String label, {
+      VoidCallback? onTap,
+      TerminalCommand? shortcut,
+      String? shortcutText,
+      Color? iconColor,
+    }) {
+      final chord =
+          shortcutText ?? (shortcut != null ? terminalShortcutLabel(shortcut, platform) : null);
+      return MenuItemButton(
+        onPressed: onTap,
+        style: _menuItemStyle,
+        leadingIcon: Icon(icon, size: 15, color: onTap == null ? c.mutedForeground : iconColor),
+        trailingIcon: chord == null
+            ? null
+            : Padding(
+                padding: const EdgeInsets.only(left: 24),
+                child: Text(
+                  chord,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: c.mutedForeground,
+                    fontFamilyFallback: AppFonts.mono,
+                  ),
+                ),
+              ),
+        child: Text(label, style: const TextStyle(fontSize: 13)),
+      );
+    }
+
+    String profileLabel(String provider) => switch (provider) {
+      'claude' => t.terminal.tabs.claudeCli,
+      'opencode' => t.terminal.tabs.opencodeCli,
+      'commandcode' => t.terminal.tabs.commandCodeCli,
+      'antigravity' => t.terminal.tabs.antigravityCli,
+      'cursor' => t.terminal.tabs.cursorCli,
+      'devin' => t.terminal.tabs.devinCli,
+      _ => '$provider CLI',
+    };
+
+    SubmenuButton group(IconData icon, String label, List<Widget> children) => SubmenuButton(
+      style: _menuItemStyle,
+      leadingIcon: Icon(icon, size: 15),
+      menuChildren: children,
+      child: Text(label, style: const TextStyle(fontSize: 13)),
+    );
+
+    return [
+      // Profiles — the default (plain shell) first, like WT's list.
+      entry(
+        terminalProfileIcon('', isPlainShell: true),
+        t.terminal.tabs.plainShell,
+        onTap: _newDefaultTab,
+        shortcut: TerminalCommand.newTab,
+      ),
+      for (final provider in _providerProfiles)
+        entry(
+          terminalProfileIcon(provider, isPlainShell: false),
+          profileLabel(provider),
+          onTap: () => _newProviderTab(provider),
+        ),
+      const Divider(height: 8),
+      // Pane actions grouped in submenus so the dropdown stays short enough
+      // for a phone in landscape.
+      if (activeTab != null) ...[
+        group(LucideIcons.textCursorInput, t.terminal.menu.edit, [
+          entry(
+            LucideIcons.search,
+            t.terminal.menu.find,
+            onTap: () => _activePane?.openSearch(),
+            shortcut: TerminalCommand.find,
+          ),
+          entry(
+            _copied ? LucideIcons.check : LucideIcons.copy,
+            _copied ? t.chat.shell.actions.copied : t.chat.shell.actions.copyOutputTitle,
+            onTap: () => _copyOutput(activeTab),
+            iconColor: _copied ? const Color(0xFF16C60C) : null,
+          ),
+          entry(
+            LucideIcons.textSelect,
+            t.terminal.menu.selectAll,
+            onTap: () => _activePane?.selectAll(),
+            shortcut: TerminalCommand.selectAll,
+          ),
+          entry(
+            LucideIcons.clipboardPaste,
+            t.settings.terminalShortcuts.paste,
+            onTap: () => _activePane?.paste(),
+            shortcut: TerminalCommand.paste,
+          ),
+          entry(
+            LucideIcons.eraser,
+            t.terminal.actions.clearOutput,
+            onTap: () => _ctrl.clearTab(activeTab.id),
+          ),
+        ]),
+        group(LucideIcons.zoomIn, t.terminal.menu.view, [
+          entry(
+            LucideIcons.zoomIn,
+            t.chat.shell.actions.zoomInTitle,
+            onTap: activeTab.fontSize < terminalFontSizeMax
+                ? () => _ctrl.zoomIn(activeTab.id)
+                : null,
+            shortcut: TerminalCommand.zoomIn,
+          ),
+          entry(
+            LucideIcons.zoomOut,
+            t.chat.shell.actions.zoomOutTitle,
+            onTap: activeTab.fontSize > terminalFontSizeMin
+                ? () => _ctrl.zoomOut(activeTab.id)
+                : null,
+            shortcut: TerminalCommand.zoomOut,
+          ),
+          entry(
+            LucideIcons.aLargeSmall,
+            t.terminal.menu.zoomReset,
+            onTap: activeTab.fontSize != terminalFontSizeDefault
+                ? () => _ctrl.zoomReset(activeTab.id)
+                : null,
+            shortcut: TerminalCommand.zoomReset,
+          ),
+          entry(
+            state.showShortcutsBar ? LucideIcons.keyboardOff : LucideIcons.keyboard,
+            t.terminal.menu.keyBar,
+            onTap: _ctrl.toggleShortcutsBar,
+          ),
+        ]),
+        group(LucideIcons.squareTerminal, t.terminal.menu.session, [
+          entry(
+            LucideIcons.copyPlus,
+            t.terminal.menu.duplicateTab,
+            onTap: () => _ctrl.duplicateTab(activeTab.id),
+            shortcut: TerminalCommand.duplicateTab,
+          ),
+          entry(
+            LucideIcons.square,
+            t.chat.shell.actions.killTitle,
+            onTap: connected ? () => _ctrl.sendInput(activeTab.id, '\x03') : null,
+            iconColor: connected ? const Color(0xFFE74856) : null,
+          ),
+          entry(
+            LucideIcons.rotateCcw,
+            t.terminal.actions.restartSession,
+            onTap: () => _ctrl.restartTab(activeTab.id),
+          ),
+          if (connected)
+            entry(
+              LucideIcons.unplug,
+              t.chat.shell.actions.disconnect,
+              onTap: () => _ctrl.disconnectTab(activeTab.id),
+              iconColor: const Color(0xFFE74856),
+            )
+          else
+            entry(
+              LucideIcons.plug,
+              t.terminal.actions.connect,
+              onTap: () => _ctrl.restartTab(activeTab.id),
+            ),
+          entry(
+            LucideIcons.x,
+            t.terminal.menu.closeTab,
+            onTap: () => _ctrl.closeTab(activeTab.id),
+            shortcut: TerminalCommand.closeTab,
+          ),
+        ]),
+        const Divider(height: 8),
+      ],
+      entry(
+        LucideIcons.keyRound,
+        t.terminal.actions.providerLogin,
+        onTap: () => ProviderLoginDialog.show(context: context, projectPath: _resolveProjectPath()),
+      ),
+      entry(
+        LucideIcons.command,
+        t.terminal.menu.shortcutsHelp,
+        onTap: () => context.go('/settings/shortcuts'),
+        shortcut: TerminalCommand.commandMenu,
+      ),
+    ];
   }
 
   /// Terminal + overlays (web `relative flex-1`): connection overlay with the
   /// explicit Connect CTA, and the CLI-prompt option chips strip.
   Widget _terminalArea(TerminalTab activeTab) {
-    final notifier = ref.read(terminalControllerProvider.notifier);
     final connected = activeTab.status == TerminalTabStatus.connected;
     // `md:hidden short:!block` — the chips exist for touch/small screens.
     final showChips =
@@ -164,9 +518,12 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
       children: [
         Positioned.fill(
           child: TerminalViewWrapper(
-            key: ValueKey(activeTab.id),
+            // One pane state per tab; the GlobalKey moves to whichever tab is
+            // active so the menu/shortcuts always address the visible pane.
+            key: _viewKeyFor(activeTab),
             tab: activeTab,
             onFileOpen: _handleOpenFile,
+            onTabCommand: _runTabCommand,
           ),
         ),
         if (showChips)
@@ -176,320 +533,12 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
             bottom: 0,
             child: _PromptChipsBar(
               options: activeTab.promptOptions!,
-              onAnswer: (input) => notifier.answerPrompt(activeTab.id, input),
+              onAnswer: (input) => _ctrl.answerPrompt(activeTab.id, input),
             ),
           ),
         if (activeTab.status != TerminalTabStatus.connected)
-          _ConnectionOverlay(tab: activeTab, onConnect: () => notifier.restartTab(activeTab.id)),
+          _ConnectionOverlay(tab: activeTab, onConnect: () => _ctrl.restartTab(activeTab.id)),
       ],
-    );
-  }
-
-  Future<void> _copyOutput(TerminalTab tab) async {
-    final text = ref.read(terminalControllerProvider.notifier).copyOutputText(tab.id);
-    if (text == null || text.isEmpty) return;
-    await Clipboard.setData(ClipboardData(text: text));
-    if (!mounted) return;
-    setState(() => _copied = true);
-    _copyTimer?.cancel();
-    _copyTimer = Timer(const Duration(seconds: 2), () {
-      if (mounted) setState(() => _copied = false);
-    });
-  }
-
-  Widget _buildTabStrip(BuildContext context, TerminalState state, TerminalTab? activeTab) {
-    final colors = context.appColors;
-    final t = Translations.of(context);
-
-    return Container(
-      height: 40,
-      decoration: BoxDecoration(
-        color: colors.card,
-        border: Border(bottom: BorderSide(color: colors.border)),
-      ),
-      child: Row(
-        children: [
-          // Scrollable tab items
-          Expanded(
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: state.tabs.length,
-              itemBuilder: (context, index) {
-                final tab = state.tabs[index];
-                final isActive = tab.id == state.activeTabId;
-
-                return _buildTabItem(context, tab, isActive);
-              },
-            ),
-          ),
-
-          // Action cluster — ShellHeader port: zoom, copy, kill, restart,
-          // disconnect (+ Flutter extras: provider login, clear, shortcuts).
-          // Horizontally scrollable so narrow panes keep the tabs visible.
-          Flexible(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Font zoom (9–24px, disabled at the bounds).
-                  if (activeTab != null) ...[
-                    IconButton(
-                      tooltip: t.chat.shell.actions.zoomOutTitle,
-                      icon: const Icon(LucideIcons.zoomOut, size: 16),
-                      onPressed: activeTab.fontSize > terminalFontSizeMin
-                          ? () =>
-                                ref.read(terminalControllerProvider.notifier).zoomOut(activeTab.id)
-                          : null,
-                    ),
-                    IconButton(
-                      tooltip: t.chat.shell.actions.zoomInTitle,
-                      icon: const Icon(LucideIcons.zoomIn, size: 16),
-                      onPressed: activeTab.fontSize < terminalFontSizeMax
-                          ? () => ref.read(terminalControllerProvider.notifier).zoomIn(activeTab.id)
-                          : null,
-                    ),
-                    // Copy output → 2s "copied" check.
-                    IconButton(
-                      tooltip: _copied
-                          ? t.chat.shell.actions.copied
-                          : t.chat.shell.actions.copyOutputTitle,
-                      icon: Icon(
-                        _copied ? Icons.check : LucideIcons.copy,
-                        size: 16,
-                        color: _copied ? const Color(0xFF22C55E) : colors.foreground,
-                      ),
-                      onPressed: () => _copyOutput(activeTab),
-                    ),
-                  ],
-
-                  // New tab popup button
-                  PopupMenuButton<String>(
-                    tooltip: t.terminal.actions.newTab,
-                    icon: const Icon(Icons.add, size: 20),
-                    onSelected: (choice) {
-                      final path = _resolveProjectPath();
-                      final notifier = ref.read(terminalControllerProvider.notifier);
-                      if (choice == 'plain') {
-                        notifier.createTab(projectPath: path, isPlainShell: true);
-                      } else {
-                        notifier.createTab(
-                          projectPath: path,
-                          provider: choice,
-                          isPlainShell: false,
-                          title: '$choice CLI',
-                        );
-                      }
-                    },
-                    itemBuilder: (context) => [
-                      PopupMenuItem(
-                        value: 'plain',
-                        child: Row(
-                          children: [
-                            const Icon(Icons.terminal, size: 16),
-                            const SizedBox(width: 8),
-                            Text(t.terminal.tabs.plainShell),
-                          ],
-                        ),
-                      ),
-                      const PopupMenuDivider(),
-                      PopupMenuItem(
-                        value: 'claude',
-                        child: Row(
-                          children: [
-                            const Icon(Icons.smart_toy_outlined, size: 16),
-                            const SizedBox(width: 8),
-                            Text(t.terminal.tabs.claudeCli),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem(
-                        value: 'opencode',
-                        child: Row(
-                          children: [
-                            const Icon(Icons.code, size: 16),
-                            const SizedBox(width: 8),
-                            Text(t.terminal.tabs.opencodeCli),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem(
-                        value: 'commandcode',
-                        child: Row(
-                          children: [
-                            const Icon(Icons.code, size: 16),
-                            const SizedBox(width: 8),
-                            Text(t.terminal.tabs.commandCodeCli),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem(
-                        value: 'antigravity',
-                        child: Row(
-                          children: [
-                            const Icon(Icons.code, size: 16),
-                            const SizedBox(width: 8),
-                            Text(t.terminal.tabs.antigravityCli),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem(
-                        value: 'cursor',
-                        child: Row(
-                          children: [
-                            const Icon(Icons.computer, size: 16),
-                            const SizedBox(width: 8),
-                            Text(t.terminal.tabs.cursorCli),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem(
-                        value: 'devin',
-                        child: Row(
-                          children: [
-                            const Icon(Icons.psychology, size: 16),
-                            const SizedBox(width: 8),
-                            Text(t.terminal.tabs.devinCli),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  // Provider Login action
-                  IconButton(
-                    tooltip: t.terminal.actions.providerLogin,
-                    icon: const Icon(Icons.vpn_key_outlined, size: 18),
-                    onPressed: () {
-                      ProviderLoginDialog.show(
-                        context: context,
-                        projectPath: _resolveProjectPath(),
-                      );
-                    },
-                  ),
-
-                  // Kill running process (SIGINT) — connected only.
-                  if (activeTab != null && activeTab.status == TerminalTabStatus.connected)
-                    IconButton(
-                      tooltip: t.chat.shell.actions.killTitle,
-                      icon: Icon(LucideIcons.square, size: 14, color: colors.destructive),
-                      onPressed: () {
-                        ref
-                            .read(terminalControllerProvider.notifier)
-                            .sendInput(activeTab.id, '\x03');
-                      },
-                    ),
-
-                  // Restart current session
-                  if (activeTab != null)
-                    IconButton(
-                      tooltip: t.terminal.actions.restartSession,
-                      icon: const Icon(Icons.refresh, size: 18),
-                      onPressed: () {
-                        ref.read(terminalControllerProvider.notifier).restartTab(activeTab.id);
-                      },
-                    ),
-
-                  // Disconnect — connected only; overlay's Connect resumes.
-                  if (activeTab != null && activeTab.status == TerminalTabStatus.connected)
-                    IconButton(
-                      tooltip: t.chat.shell.actions.disconnect,
-                      icon: Icon(LucideIcons.x, size: 18, color: colors.destructive),
-                      onPressed: () {
-                        ref.read(terminalControllerProvider.notifier).disconnectTab(activeTab.id);
-                      },
-                    ),
-
-                  // Clear terminal buffer
-                  if (activeTab != null)
-                    IconButton(
-                      tooltip: t.terminal.actions.clearOutput,
-                      icon: const Icon(Icons.clear_all, size: 18),
-                      onPressed: () {
-                        ref.read(terminalControllerProvider.notifier).clearTab(activeTab.id);
-                      },
-                    ),
-                ],
-              ),
-            ),
-          ),
-
-          // Toggle touch shortcuts bar — kept outside the scrolling cluster: a
-          // mouse can't drag-scroll it, so in a narrow pane the toggle would
-          // overflow out of reach and a hidden bar could never come back.
-          IconButton(
-            tooltip: state.showShortcutsBar
-                ? t.terminal.shortcuts.hideTooltip
-                : t.terminal.shortcuts.showTooltip,
-            icon: Icon(
-              Icons.keyboard,
-              size: 18,
-              color: state.showShortcutsBar ? colors.primary : colors.mutedForeground,
-            ),
-            onPressed: () {
-              ref.read(terminalControllerProvider.notifier).toggleShortcutsBar();
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTabItem(BuildContext context, TerminalTab tab, bool isActive) {
-    final colors = context.appColors;
-    final statusColor = switch (tab.status) {
-      TerminalTabStatus.connecting => const Color(0xFFF59E0B),
-      TerminalTabStatus.connected => const Color(0xFF22C55E),
-      TerminalTabStatus.disconnected => colors.mutedForeground,
-      TerminalTabStatus.exited => tab.exitCode == 0 ? const Color(0xFF22C55E) : colors.destructive,
-    };
-
-    return Material(
-      color: isActive ? colors.background : colors.card,
-      child: InkWell(
-        onTap: () {
-          ref.read(terminalControllerProvider.notifier).selectTab(tab.id);
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          decoration: BoxDecoration(
-            border: Border(
-              right: BorderSide(color: colors.border),
-              bottom: BorderSide(color: isActive ? colors.primary : Colors.transparent, width: 2),
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 8,
-                height: 8,
-                decoration: BoxDecoration(color: statusColor, shape: BoxShape.circle),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                tab.title,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
-                  color: isActive ? colors.foreground : colors.mutedForeground,
-                ),
-              ),
-              const SizedBox(width: 6),
-              InkWell(
-                borderRadius: BorderRadius.circular(10),
-                onTap: () {
-                  ref.read(terminalControllerProvider.notifier).closeTab(tab.id);
-                },
-                child: const Padding(
-                  padding: EdgeInsets.all(2.0),
-                  child: Icon(Icons.close, size: 14),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 
@@ -532,35 +581,33 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
   }
 
   Widget _buildEmptyState() {
-    final colors = context.appColors;
+    final palette = TerminalPalette.of(context);
     final t = Translations.of(context);
+    final fg = palette.tabStripForeground;
 
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.terminal, size: 48, color: colors.mutedForeground),
+          Icon(Icons.terminal_rounded, size: 48, color: fg.withValues(alpha: 0.5)),
           const SizedBox(height: 12),
           Text(
             t.terminal.empty.title,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: colors.foreground),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: fg),
           ),
           const SizedBox(height: 8),
           Text(
             t.terminal.empty.description,
-            style: TextStyle(fontSize: 13, color: colors.mutedForeground),
+            style: TextStyle(fontSize: 13, color: fg.withValues(alpha: 0.6)),
           ),
           const SizedBox(height: 16),
           FilledButton.icon(
             onPressed: () {
-              final path = _resolveProjectPath();
-              ref
-                  .read(terminalControllerProvider.notifier)
-                  .createTab(
-                    title: t.terminal.tabs.shellName(index: 1),
-                    projectPath: path,
-                    isPlainShell: true,
-                  );
+              _ctrl.createTab(
+                title: t.terminal.tabs.shellName(index: 1),
+                projectPath: _resolveProjectPath(),
+                isPlainShell: true,
+              );
             },
             icon: const Icon(Icons.add),
             label: Text(t.terminal.actions.newShell),
@@ -571,8 +618,8 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
   }
 }
 
-/// `ShellConnectionOverlay` port — `bg-gray-950/90` full-cover layer:
-/// spinner + "Connecting…" while connecting; an explicit Connect CTA
+/// `ShellConnectionOverlay` port — translucent full-cover layer over the
+/// pane: spinner + "Connecting…" while connecting; an explicit Connect CTA
 /// (description underneath) once disconnected/exited.
 class _ConnectionOverlay extends StatelessWidget {
   const _ConnectionOverlay({required this.tab, required this.onConnect});
@@ -583,6 +630,7 @@ class _ConnectionOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = Translations.of(context);
+    final palette = TerminalPalette.of(context);
     final connecting = tab.status == TerminalTabStatus.connecting;
     final description = switch (tab.status) {
       TerminalTabStatus.exited =>
@@ -594,8 +642,13 @@ class _ConnectionOverlay extends StatelessWidget {
             ? t.terminal.overlay.resumeSession(title: tab.title)
             : t.terminal.overlay.startSession(path: tab.projectPath),
     };
+    final descriptionStyle = TextStyle(
+      fontSize: 13,
+      height: 1.5,
+      color: palette.foreground.withValues(alpha: 0.85),
+    );
     return Container(
-      color: const Color(0xE6030713), // gray-950/90
+      color: palette.background.withValues(alpha: 0.9),
       child: Center(
         child: connecting
             ? Column(
@@ -608,7 +661,7 @@ class _ConnectionOverlay extends StatelessWidget {
                         dimension: 16,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: Color(0xFFFDE047), // yellow-300
+                          color: Color(0xFFF9F1A5), // Campbell bright yellow
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -617,7 +670,7 @@ class _ConnectionOverlay extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w500,
-                          color: Color(0xFFFDE047),
+                          color: Color(0xFFF9F1A5),
                         ),
                       ),
                     ],
@@ -625,14 +678,7 @@ class _ConnectionOverlay extends StatelessWidget {
                   const SizedBox(height: 12),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Text(
-                      description,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: Color(0xFFD1D5DB), // gray-300
-                      ),
-                    ),
+                    child: Text(description, textAlign: TextAlign.center, style: descriptionStyle),
                   ),
                 ],
               )
@@ -644,7 +690,7 @@ class _ConnectionOverlay extends StatelessWidget {
                     icon: const Icon(LucideIcons.rotateCcw, size: 16),
                     label: Text(t.terminal.actions.connect),
                     style: FilledButton.styleFrom(
-                      backgroundColor: const Color(0xFF059669), // emerald-600
+                      backgroundColor: const Color(0xFF13A10E), // Campbell green
                       foregroundColor: Colors.white,
                       minimumSize: const Size(0, 48),
                       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -659,7 +705,7 @@ class _ConnectionOverlay extends StatelessWidget {
                       child: Text(
                         description,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 13, height: 1.5, color: Color(0xFFD1D5DB)),
+                        style: descriptionStyle,
                       ),
                     ),
                   ),
@@ -680,11 +726,11 @@ class _PromptChipsBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.appColors;
+    final palette = TerminalPalette.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: colors.card.withValues(alpha: 0.95),
-        border: Border(top: BorderSide(color: colors.border.withValues(alpha: 0.8))),
+        color: palette.tabStrip.withValues(alpha: 0.95),
+        border: Border(top: BorderSide(color: palette.chromeBorder.withValues(alpha: 0.8))),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: Wrap(
@@ -695,7 +741,7 @@ class _PromptChipsBar extends StatelessWidget {
             Tooltip(
               message: '${opt.number}. ${opt.label}',
               child: Material(
-                color: const Color(0xFF2563EB), // blue-600
+                color: const Color(0xFF3B78FF), // Campbell bright blue
                 borderRadius: BorderRadius.circular(4),
                 child: InkWell(
                   onTap: () => onAnswer(opt.number),
@@ -717,7 +763,7 @@ class _PromptChipsBar extends StatelessWidget {
               ),
             ),
           Material(
-            color: colors.muted,
+            color: palette.chrome,
             borderRadius: BorderRadius.circular(4),
             child: InkWell(
               onTap: () => onAnswer('\x1b'),
@@ -729,7 +775,7 @@ class _PromptChipsBar extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
-                    color: colors.foreground,
+                    color: palette.tabStripForeground,
                   ),
                 ),
               ),

@@ -2883,6 +2883,23 @@
       "termInterrupt": "İşlemi kes (seçim yokken)",
       "termPaste": "Yapıştır",
       "termSelectAll": "Tümünü seç",
+      "termFind": "Arabellekte bul",
+      "termNewTab": "Yeni sekme",
+      "termCloseTab": "Sekmeyi kapat",
+      "termDuplicate": "Sekmeyi çoğalt",
+      "termNextTab": "Sonraki sekme",
+      "termPrevTab": "Önceki sekme",
+      "termGoToTab": "1–9. sekmeye git",
+      "termRename": "Sekmeyi yeniden adlandır (çift tık)",
+      "termZoomIn": "Yakınlaştır",
+      "termZoomOut": "Uzaklaştır",
+      "termZoomReset": "Yakınlaştırmayı sıfırla",
+      "termScrollLine": "Bir satır kaydır",
+      "termScrollPage": "Bir sayfa kaydır",
+      "termScrollEdge": "En üste / en alta kaydır",
+      "termMenu": "Terminal menüsü",
+      "termClearSelection": "Seçimi kaldır",
+      "termWebNote": "Tarayıcılar Ctrl+Shift+T/W tuşlarını ayırır — web sürümü Ctrl+Alt+T / Ctrl+Alt+W tuşlarını da kabul eder.",
       "editor": "Düzenleyici",
       "edSave": "Dosyayı kaydet",
       "edSaveAll": "Tüm dosyaları kaydet",
@@ -4197,6 +4214,42 @@
       "processExitedWithCode": "İşlem sonlandı (kod {{code}}) — yeniden başlatmak için bağlanın",
       "resumeSession": "{{title}} oturumunu sürdür",
       "startSession": "{{path}} içinde yeni bir oturum başlat"
+    },
+    "menu": {
+      "title": "Terminal menüsü",
+      "edit": "Düzenle",
+      "view": "Görünüm",
+      "session": "Oturum",
+      "find": "Bul",
+      "renameTab": "Sekmeyi yeniden adlandır",
+      "duplicateTab": "Sekmeyi çoğalt",
+      "closeTab": "Sekmeyi kapat",
+      "closeOtherTabs": "Diğer sekmeleri kapat",
+      "closeTabsToRight": "Sağdaki sekmeleri kapat",
+      "zoomReset": "Yakınlaştırmayı sıfırla",
+      "selectAll": "Tümünü seç",
+      "keyBar": "Ekran tuş çubuğu",
+      "shortcutsHelp": "Klavye kısayolları"
+    },
+    "rename": {
+      "title": "Sekmeyi yeniden adlandır",
+      "hint": "Sekme adı"
+    },
+    "search": {
+      "hint": "Bul",
+      "noResults": "Sonuç yok",
+      "count": "{{current}} / {{total}}",
+      "matchCase": "Büyük/küçük harf eşleştir",
+      "next": "Sonraki eşleşme",
+      "previous": "Önceki eşleşme",
+      "close": "Aramayı kapat"
+    },
+    "keyBar": {
+      "ctrl": "Ctrl",
+      "alt": "Alt",
+      "ctrlHint": "Sonraki tuş için Ctrl basılı tut",
+      "altHint": "Sonraki tuş için Alt basılı tut",
+      "showKeyboard": "Klavyeyi göster"
     }
   },
   "voice": {

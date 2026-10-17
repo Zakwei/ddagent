@@ -2878,6 +2878,23 @@
       "termInterrupt": "中断进程（无选中内容时）",
       "termPaste": "粘贴",
       "termSelectAll": "全选",
+      "termFind": "在缓冲区中查找",
+      "termNewTab": "新建标签页",
+      "termCloseTab": "关闭标签页",
+      "termDuplicate": "复制标签页",
+      "termNextTab": "下一个标签页",
+      "termPrevTab": "上一个标签页",
+      "termGoToTab": "跳转到标签页 1–9",
+      "termRename": "重命名标签页（双击）",
+      "termZoomIn": "放大",
+      "termZoomOut": "缩小",
+      "termZoomReset": "重置缩放",
+      "termScrollLine": "滚动一行",
+      "termScrollPage": "滚动一页",
+      "termScrollEdge": "滚动到顶部 / 底部",
+      "termMenu": "终端菜单",
+      "termClearSelection": "清除选择",
+      "termWebNote": "浏览器保留了 Ctrl+Shift+T/W — 网页版同时接受 Ctrl+Alt+T / Ctrl+Alt+W。",
       "editor": "编辑器",
       "edSave": "保存文件",
       "edSaveAll": "保存所有文件",
@@ -4191,6 +4208,42 @@
       "processExitedWithCode": "进程已退出（代码 {{code}}）— 连接以重新启动",
       "resumeSession": "恢复会话 {{title}}",
       "startSession": "在 {{path}} 中开始新会话"
+    },
+    "menu": {
+      "title": "终端菜单",
+      "edit": "编辑",
+      "view": "视图",
+      "session": "会话",
+      "find": "查找",
+      "renameTab": "重命名标签页",
+      "duplicateTab": "复制标签页",
+      "closeTab": "关闭标签页",
+      "closeOtherTabs": "关闭其他标签页",
+      "closeTabsToRight": "关闭右侧标签页",
+      "zoomReset": "重置缩放",
+      "selectAll": "全选",
+      "keyBar": "屏幕按键栏",
+      "shortcutsHelp": "键盘快捷键"
+    },
+    "rename": {
+      "title": "重命名标签页",
+      "hint": "标签页名称"
+    },
+    "search": {
+      "hint": "查找",
+      "noResults": "无结果",
+      "count": "第 {{current}} 项，共 {{total}} 项",
+      "matchCase": "区分大小写",
+      "next": "下一个匹配",
+      "previous": "上一个匹配",
+      "close": "关闭搜索"
+    },
+    "keyBar": {
+      "ctrl": "Ctrl",
+      "alt": "Alt",
+      "ctrlHint": "为下一个按键按住 Ctrl",
+      "altHint": "为下一个按键按住 Alt",
+      "showKeyboard": "显示键盘"
     }
   },
   "voice": {
