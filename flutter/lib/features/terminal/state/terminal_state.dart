@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:ddagent_app/core/realtime/realtime_providers.dart';
 import 'package:ddagent_app/core/realtime/shell_channel.dart';
+import 'package:ddagent_app/features/terminal/state/terminal_output_filter.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -134,6 +135,10 @@ class TerminalTab {
   int? exitCode;
   final List<String> authUrls;
   StreamSubscription<ShellFrame>? subscription;
+
+  /// Drops the keyboard-protocol negotiation sequences xterm.dart misreads
+  /// (see [TerminalOutputFilter]); carries split escapes across frames.
+  final outputFilter = TerminalOutputFilter();
 
   /// Terminal font size (web Shell zoom, default 14 there / 13 here).
   double fontSize = terminalFontSizeDefault;
@@ -364,7 +369,7 @@ class TerminalController extends Notifier<TerminalState> {
     final tab = state.tabs[tabIndex];
 
     if (frame.isOutput) {
-      tab.terminal.write(frame.output);
+      tab.terminal.write(tab.outputFilter.feed(frame.output));
 
       if (tab.status != TerminalTabStatus.connected && !tab.isCompleted) {
         tab.status = TerminalTabStatus.connected;

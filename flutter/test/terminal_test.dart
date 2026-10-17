@@ -4,6 +4,7 @@ import 'package:ddagent_app/core/realtime/realtime_providers.dart';
 import 'package:ddagent_app/core/realtime/shell_channel.dart';
 import 'package:ddagent_app/core/realtime/ws_client.dart';
 import 'package:ddagent_app/core/theme/app_theme.dart';
+import 'package:ddagent_app/features/terminal/state/terminal_output_filter.dart';
 import 'package:ddagent_app/features/terminal/state/terminal_state.dart';
 import 'package:ddagent_app/features/terminal/view/provider_login_dialog.dart';
 import 'package:ddagent_app/features/terminal/view/terminal_keymap.dart';
@@ -562,6 +563,49 @@ void main() {
       ctrl.toggleLatchedModifier(LatchedModifier.ctrl);
       ctrl.sendInput(tab.id, 'x');
       expect(fakeWs.sent.last['data'], 'x');
+    });
+  });
+
+  group('TerminalOutputFilter', () {
+    test('drops private-prefixed CSI that xterm misreads as SGR / cursor ops', () {
+      final f = TerminalOutputFilter();
+      expect(f.feed('a\x1b[>4;2mb\x1b[>4mc'), 'abc');
+      expect(f.feed('\x1b[>1u\x1b[<u\x1b[?u\x1b[>0qx'), 'x');
+    });
+
+    test('keeps real SGR, DEC private modes and device attribute queries', () {
+      final f = TerminalOutputFilter();
+      const keep = '\x1b[4mu\x1b[0m \x1b[?25l\x1b[?2004h \x1b[>c\x1b[=c \x1b[38;2;1;2;3mz';
+      expect(f.feed(keep), keep);
+    });
+
+    test('carries an escape split across chunks', () {
+      final f = TerminalOutputFilter();
+      expect(f.feed('one\x1b[>4'), 'one');
+      expect(f.feed(';2mtwo'), 'two');
+      expect(f.feed('x\x1b'), 'x');
+      expect(f.feed('[31mred'), '\x1b[31mred');
+      expect(f.feed('y\x1b'), 'y');
+      expect(f.feed('(Bz'), '\x1b(Bz');
+      expect(f.feed('plain'), 'plain');
+    });
+
+    test('modifyOtherKeys from Claude Code no longer underlines the buffer', () async {
+      final container = ProviderContainer(
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
+      );
+      addTearDown(container.dispose);
+      final tab = container.read(terminalControllerProvider.notifier).createTab(projectPath: '/p');
+
+      fakeWs.emitFrame({'type': 'output', 'data': '\x1b[>4;2mClaude \x1b[4mlink\x1b[0m'});
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+
+      final line = tab.terminal.buffer.lines[0];
+      expect(line.getText().trimRight(), 'Claude link');
+      expect(line.getAttributes(0) & xt.CellFlags.underline, 0);
+      expect(line.getAttributes(0) & xt.CellFlags.faint, 0);
+      // Genuine SGR 4 still underlines.
+      expect(line.getAttributes(7) & xt.CellFlags.underline, isNot(0));
     });
   });
 
