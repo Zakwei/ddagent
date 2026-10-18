@@ -4190,6 +4190,7 @@
       "shellName": "Shell {{index}}",
       "plainShell": "Shell simple",
       "claudeCli": "CLI Claude",
+      "codexCli": "Codex CLI",
       "opencodeCli": "CLI OpenCode",
       "commandCodeCli": "CLI Command Code",
       "antigravityCli": "CLI Antigravity",

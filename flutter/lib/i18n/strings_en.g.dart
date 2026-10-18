@@ -9032,6 +9032,9 @@ class Translations$terminal$tabs$en {
 	/// en: 'Claude CLI'
 	String get claudeCli => 'Claude CLI';
 
+	/// en: 'Codex CLI'
+	String get codexCli => 'Codex CLI';
+
 	/// en: 'OpenCode CLI'
 	String get opencodeCli => 'OpenCode CLI';
 
@@ -18353,6 +18356,7 @@ extension on Translations {
 			'terminal.tabs.shellName' => ({required Object index}) => 'Shell ${index}',
 			'terminal.tabs.plainShell' => 'Plain Shell',
 			'terminal.tabs.claudeCli' => 'Claude CLI',
+			'terminal.tabs.codexCli' => 'Codex CLI',
 			'terminal.tabs.opencodeCli' => 'OpenCode CLI',
 			'terminal.tabs.commandCodeCli' => 'Command Code CLI',
 			'terminal.tabs.antigravityCli' => 'Antigravity CLI',

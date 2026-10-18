@@ -4230,6 +4230,7 @@
       "shellName": "Shell {{index}}",
       "plainShell": "Zwykły shell",
       "claudeCli": "Claude CLI",
+      "codexCli": "Codex CLI",
       "opencodeCli": "OpenCode CLI",
       "commandCodeCli": "Command Code CLI",
       "antigravityCli": "Antigravity CLI",

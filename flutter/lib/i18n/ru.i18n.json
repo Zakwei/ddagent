@@ -4228,6 +4228,7 @@
       "shellName": "Оболочка {{index}}",
       "plainShell": "Простая оболочка",
       "claudeCli": "Claude CLI",
+      "codexCli": "Codex CLI",
       "opencodeCli": "OpenCode CLI",
       "commandCodeCli": "Command Code CLI",
       "antigravityCli": "Antigravity CLI",

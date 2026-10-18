@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/theme/typography.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
+import 'package:ddagent_app/features/provider_accounts/state/provider_accounts_controller.dart';
+import 'package:ddagent_app/features/terminal/state/terminal_account_profiles.dart';
 import 'package:ddagent_app/features/terminal/state/terminal_state.dart';
 import 'package:ddagent_app/features/terminal/view/provider_login_dialog.dart';
 import 'package:ddagent_app/features/terminal/view/terminal_keymap.dart';
@@ -21,6 +23,19 @@ import 'package:url_launcher/url_launcher.dart';
 
 /// Provider profiles offered by the `⌄` dropdown (WT profile list).
 const _providerProfiles = ['claude', 'opencode', 'commandcode', 'antigravity', 'cursor', 'devin'];
+
+/// Providers whose named accounts get their own "CLI · account" profiles —
+/// every CLI the server's shell bridge can start (Codex included, which has
+/// no plain profile of its own in the list above).
+const _accountProfileProviders = [
+  'claude',
+  'codex',
+  'opencode',
+  'commandcode',
+  'antigravity',
+  'cursor',
+  'devin',
+];
 
 /// Dense rows (WT dropdown height) — the default 48px Material rows push a
 /// 12-entry menu past a phone's landscape height.
@@ -123,13 +138,30 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
     _ctrl.createTab(projectPath: _resolveProjectPath(), isPlainShell: true);
   }
 
-  void _newProviderTab(String provider) {
+  /// A provider CLI tab; with [account] the PTY gets that named account's
+  /// env overrides, so the CLI runs signed in as that account.
+  void _newProviderTab(String provider, {TerminalAccountProfile? account}) {
     _ctrl.createTab(
       projectPath: _resolveProjectPath(),
       provider: provider,
       isPlainShell: false,
-      title: '$provider CLI',
+      title: account?.title(_profileLabel(provider)) ?? '$provider CLI',
+      env: account?.account.envOverrides,
     );
+  }
+
+  String _profileLabel(String provider) {
+    final t = Translations.of(context).terminal.tabs;
+    return switch (provider) {
+      'claude' => t.claudeCli,
+      'codex' => t.codexCli,
+      'opencode' => t.opencodeCli,
+      'commandcode' => t.commandCodeCli,
+      'antigravity' => t.antigravityCli,
+      'cursor' => t.cursorCli,
+      'devin' => t.devinCli,
+      _ => '$provider CLI',
+    };
   }
 
   void _handleOpenFile(String filePath, int? line) {
@@ -353,15 +385,13 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
       );
     }
 
-    String profileLabel(String provider) => switch (provider) {
-      'claude' => t.terminal.tabs.claudeCli,
-      'opencode' => t.terminal.tabs.opencodeCli,
-      'commandcode' => t.terminal.tabs.commandCodeCli,
-      'antigravity' => t.terminal.tabs.antigravityCli,
-      'cursor' => t.terminal.tabs.cursorCli,
-      'devin' => t.terminal.tabs.devinCli,
-      _ => '$provider CLI',
-    };
+    final profileLabel = _profileLabel;
+    // Named accounts (Settings → Agents → accounts) become extra profiles:
+    // "Claude CLI · Work" starts the CLI with that account's config dir.
+    final accountProfiles = terminalAccountProfiles(
+      ref.watch(providerAccountsProvider('')).accounts,
+      providers: _accountProfileProviders,
+    );
 
     SubmenuButton group(IconData icon, String label, List<Widget> children) => SubmenuButton(
       style: _menuItemStyle,
@@ -383,6 +413,13 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
           terminalProfileIcon(provider, isPlainShell: false),
           profileLabel(provider),
           onTap: () => _newProviderTab(provider),
+        ),
+      if (accountProfiles.isNotEmpty) const Divider(height: 8),
+      for (final profile in accountProfiles)
+        entry(
+          LucideIcons.userRound,
+          profile.title(profileLabel(profile.provider)),
+          onTap: () => _newProviderTab(profile.provider, account: profile),
         ),
       const Divider(height: 8),
       // Pane actions grouped in submenus so the dropdown stays short enough

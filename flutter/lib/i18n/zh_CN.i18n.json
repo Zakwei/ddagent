@@ -4179,6 +4179,7 @@
       "shellName": "终端 {{index}}",
       "plainShell": "普通 Shell",
       "claudeCli": "Claude CLI",
+      "codexCli": "Codex CLI",
       "opencodeCli": "OpenCode CLI",
       "commandCodeCli": "Command Code CLI",
       "antigravityCli": "Antigravity CLI",

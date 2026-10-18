@@ -4949,6 +4949,7 @@ class Translations$terminal$tabs$fr extends Translations$terminal$tabs$en {
 	@override String shellName({required Object index}) => 'Shell ${index}';
 	@override String get plainShell => 'Shell simple';
 	@override String get claudeCli => 'CLI Claude';
+	@override String get codexCli => 'Codex CLI';
 	@override String get opencodeCli => 'CLI OpenCode';
 	@override String get commandCodeCli => 'CLI Command Code';
 	@override String get antigravityCli => 'CLI Antigravity';
@@ -11750,6 +11751,7 @@ extension on TranslationsFr {
 			'terminal.tabs.shellName' => ({required Object index}) => 'Shell ${index}',
 			'terminal.tabs.plainShell' => 'Shell simple',
 			'terminal.tabs.claudeCli' => 'CLI Claude',
+			'terminal.tabs.codexCli' => 'Codex CLI',
 			'terminal.tabs.opencodeCli' => 'CLI OpenCode',
 			'terminal.tabs.commandCodeCli' => 'CLI Command Code',
 			'terminal.tabs.antigravityCli' => 'CLI Antigravity',
