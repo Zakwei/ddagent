@@ -121,6 +121,16 @@ class TerminalTab {
   /// Mutable — the tab strip's Rename action edits it in place.
   String title;
 
+  /// Window title the running program set (OSC 0/2) — Claude Code and other
+  /// agent CLIs put their session name there. Shown instead of [title] until
+  /// the user renames the tab; an empty one hands the tab its name back.
+  String? appTitle;
+
+  /// Set by Rename — the user's name then wins over [appTitle], as in WT.
+  bool renamed = false;
+
+  String get displayTitle => renamed ? title : appTitle ?? title;
+
   /// Which tab row shows this tab ([terminalRouteHost] or a workspace pane
   /// id). Mutable — "Move to new pane" reassigns it; the PTY never notices.
   String hostId;
@@ -365,6 +375,13 @@ class TerminalController extends Notifier<TerminalState> {
       channel: channel,
       status: TerminalTabStatus.connecting,
     );
+
+    terminal.onTitleChange = (value) {
+      final next = value.trim().isEmpty ? null : value.trim();
+      if (tab.appTitle == next) return;
+      tab.appTitle = next;
+      if (!tab.renamed) _notifyTabsChanged();
+    };
 
     // Wire terminal user output -> channel input. Soft-keyboard typing lands
     // here too, so the key bar's latched Ctrl/Alt is applied on this path.
@@ -715,8 +732,9 @@ class TerminalController extends Notifier<TerminalState> {
   void renameTab(String tabId, String title) {
     final trimmed = title.trim();
     final tab = state.tabs.where((t) => t.id == tabId).firstOrNull;
-    if (trimmed.isEmpty || tab == null || tab.title == trimmed) return;
+    if (trimmed.isEmpty || tab == null || (tab.renamed && tab.title == trimmed)) return;
     tab.title = trimmed;
+    tab.renamed = true;
     _notifyTabsChanged();
   }
 

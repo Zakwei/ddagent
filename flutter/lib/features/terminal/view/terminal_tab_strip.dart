@@ -173,7 +173,7 @@ class TerminalTabStrip extends StatelessWidget {
   Future<void> _rename(BuildContext context, TerminalTab tab) async {
     final result = await showDialog<String>(
       context: context,
-      builder: (_) => _RenameTabDialog(initial: tab.title),
+      builder: (_) => _RenameTabDialog(initial: tab.displayTitle),
     );
     if (result != null && result.trim().isNotEmpty) onRename(tab.id, result);
   }
@@ -395,7 +395,7 @@ class _TerminalTabItemState extends State<_TerminalTabItem> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            widget.tab.title,
+                            widget.tab.displayTitle,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(

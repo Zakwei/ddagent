@@ -505,6 +505,19 @@ void main() {
       expect(ctrl.state.activeTab?.title, 'build');
     });
 
+    test('the program title names the tab until the user renames it', () {
+      final tab = ctrl.createTab(projectPath: '/p', title: 'Shell 4');
+      tab.terminal.write('\x1b]0;✳ Fix login bug\x07');
+      expect(tab.displayTitle, '✳ Fix login bug');
+      // Claude Code clears its title on exit — the tab gets its name back.
+      tab.terminal.write('\x1b]0;\x07');
+      expect(tab.displayTitle, 'Shell 4');
+      tab.terminal.write('\x1b]2;vim\x07');
+      ctrl.renameTab(tab.id, 'build');
+      tab.terminal.write('\x1b]0;other\x07');
+      expect(tab.displayTitle, 'build');
+    });
+
     test('duplicateTab copies the profile and lands right after the source', () {
       final a = ctrl.createTab(
         projectPath: '/p',
