@@ -96,10 +96,13 @@ class TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
   double? _pinchBaseDistance;
   double _pinchAccum = 0;
 
+  /// Last focus state sent to the program (DECSET 1004).
+  bool _reportedFocus = false;
+
   @override
   void initState() {
     super.initState();
-    _focusNode = FocusNode();
+    _focusNode = FocusNode()..addListener(_reportFocus);
     _terminalViewController = xt.TerminalController()..addListener(_onSelectionChanged);
     _scrollController = _TouchDragScrollController(touchDown: () => _pointers.isNotEmpty);
     HardwareKeyboard.instance.addHandler(_trackModifiers);
@@ -136,6 +139,16 @@ class TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
     _scrollController.dispose();
     _focusNode.dispose();
     super.dispose();
+  }
+
+  /// Focus reporting (DECSET 1004, which Claude Code enables): xterm.dart
+  /// tracks the mode but never sends the events.
+  void _reportFocus() {
+    final focused = _focusNode.hasFocus;
+    if (focused == _reportedFocus) return;
+    _reportedFocus = focused;
+    final terminal = widget.tab.terminal;
+    if (terminal.reportFocusMode) terminal.onOutput?.call(focused ? '\x1b[I' : '\x1b[O');
   }
 
   @override

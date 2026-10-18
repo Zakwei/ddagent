@@ -191,4 +191,30 @@ void main() {
     await hoverTerminal(tester);
     expect(primaryInsideWrapper(), isFalse);
   });
+
+  testWidgets('a focus change is reported once DECSET 1004 is on', (tester) async {
+    final tab = makeTab();
+    final sent = <String>[];
+    tab.terminal
+      ..onOutput = sent.add
+      ..write('\x1b[?1004h');
+    final key = GlobalKey<TerminalViewWrapperState>();
+    await tester.pumpWidget(
+      TranslationProvider(
+        child: ProviderScope(
+          child: MaterialApp(
+            theme: AppTheme.dark(),
+            home: Scaffold(
+              body: TerminalViewWrapper(key: key, tab: tab, autofocus: false),
+            ),
+          ),
+        ),
+      ),
+    );
+    key.currentState!.focusTerminal();
+    await tester.pump();
+    FocusManager.instance.primaryFocus?.unfocus();
+    await tester.pump();
+    expect(sent, ['\x1b[I', '\x1b[O']);
+  });
 }
