@@ -4,6 +4,9 @@ import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/theme/typography.dart';
 import 'package:ddagent_app/core/utils/clipboard.dart';
 import 'package:ddagent_app/core/utils/selection_copy.dart';
+import 'package:ddagent_app/core/widgets/app_toast.dart';
+import 'package:ddagent_app/features/chat/data/chat_drop.dart';
+import 'package:ddagent_app/features/misc/data/misc_repository.dart';
 import 'package:ddagent_app/features/settings/state/ui_preferences_controller.dart';
 import 'package:ddagent_app/features/terminal/state/terminal_state.dart';
 import 'package:ddagent_app/features/terminal/view/terminal_keymap.dart';
@@ -11,12 +14,14 @@ import 'package:ddagent_app/features/terminal/view/terminal_search.dart';
 import 'package:ddagent_app/features/terminal/view/terminal_theme.dart';
 import 'package:ddagent_app/features/workspace/view/split_workspace_grid.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:pasteboard/pasteboard.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:xterm/xterm.dart' as xt;
 
@@ -60,6 +65,13 @@ class TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
       FocusManager.instance.primaryFocus?.context
           ?.findAncestorStateOfType<TerminalViewWrapperState>() !=
       null;
+
+  /// True while a terminal paste dialog is open: a browser-level image
+  /// paste belongs to it, so the chat composer's document listener yields.
+  /// (A focused pane never sees that event — its handled Ctrl+V keydown is
+  /// `preventDefault`ed, so the browser fires no `paste`.)
+  static bool get claimsPaste => _pasteDialogsOpen > 0;
+  static int _pasteDialogsOpen = 0;
 
   late final FocusNode _focusNode;
   late final xt.TerminalController _terminalViewController;
@@ -285,11 +297,13 @@ class TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
   // --- Clipboard ---
 
   /// Paste entry point for every gesture (Ctrl/Cmd+V, Ctrl+Shift+V,
-  /// Shift+Insert, right-click, key bar). When `Clipboard.getData` can't
-  /// read the clipboard — permission denied, or a plain-HTTP non-secure
-  /// context where `navigator.clipboard` doesn't exist — a dialog with a
-  /// real text field takes over: native browser paste into an input still
-  /// works without the Clipboard API.
+  /// Shift+Insert, right-click, key bar). Text goes straight to the PTY; a
+  /// clipboard image (screenshot) is uploaded and pasted as its server path.
+  /// When `Clipboard.getData` can't read the clipboard — permission denied,
+  /// or a plain-HTTP non-secure context where `navigator.clipboard` doesn't
+  /// exist — a dialog with a real text field takes over: native browser
+  /// paste into an input still works without the Clipboard API, for images
+  /// too (`chat_drop.dart` reads them off the DOM paste event).
   Future<void> paste() async {
     String? text;
     try {
@@ -302,13 +316,47 @@ class TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
       _terminalViewController.clearSelection();
       return;
     }
+    Uint8List? image;
+    try {
+      image = await Pasteboard.image;
+    } on Object {
+      // No clipboard backend (non-secure web context, mobile) — dialog below.
+    }
+    if (image != null && image.isNotEmpty) {
+      await _pasteImage(image, 'pasted-image-${DateTime.now().millisecondsSinceEpoch}.png');
+      return;
+    }
     if (!mounted) return;
-    final pasted = await showDialog<String>(
+    final pasted = await showDialog<Object>(
       context: context,
       builder: (context) => const _TerminalPasteDialog(),
     );
-    if (pasted != null && pasted.isNotEmpty) {
+    if (pasted is String && pasted.isNotEmpty) {
       widget.tab.terminal.paste(pasted);
+    } else if (pasted is DroppedFile) {
+      await _pasteImage(pasted.bytes, pasted.name);
+    }
+  }
+
+  /// A screenshot copied on the user's PC can't reach the CLI's own Ctrl+V,
+  /// which reads the *server's* clipboard. Instead the image is stored in
+  /// `~/.ddagent/assets` next to the PTY and its absolute path is pasted:
+  /// Claude Code treats a pasted path ending in png/jpg/gif/webp as an image
+  /// and reads the file.
+  Future<void> _pasteImage(Uint8List bytes, String name) async {
+    try {
+      final png = await toPngBytes(bytes);
+      final form = FormData.fromMap({'images': MultipartFile.fromBytes(png, filename: name)});
+      final res = await ref.read(miscRepositoryProvider).uploadImage(form);
+      final record = (res['images'] as List?)?.firstOrNull;
+      final path = record is Map ? record['path'] as String? : null;
+      if (path == null || path.isEmpty) throw StateError('upload returned no path');
+      widget.tab.terminal.paste(path);
+      _terminalViewController.clearSelection();
+    } on Object catch (e) {
+      if (mounted) {
+        AppToast.error(context, Translations.of(context).chat.input.pasteFailed(error: '$e'));
+      }
     }
   }
 
@@ -874,7 +922,8 @@ class _SelectionToolbar extends StatelessWidget {
 /// Fallback for [TerminalViewWrapperState.paste]: when the Clipboard API
 /// is unavailable (plain-HTTP non-secure context, denied permission) the
 /// user pastes natively into this field — browser paste events on a real
-/// input don't need `navigator.clipboard`.
+/// input don't need `navigator.clipboard`. Pops with a [String] for text
+/// or a [DroppedFile] for an image pasted into the field.
 class _TerminalPasteDialog extends StatefulWidget {
   const _TerminalPasteDialog();
 
@@ -884,11 +933,29 @@ class _TerminalPasteDialog extends StatefulWidget {
 
 class _TerminalPasteDialogState extends State<_TerminalPasteDialog> {
   final _ctrl = TextEditingController();
+  late final void Function() _detachFileInputs;
+  bool _popped = false;
+
+  @override
+  void initState() {
+    super.initState();
+    TerminalViewWrapperState._pasteDialogsOpen++;
+    _detachFileInputs = listenForChatFileInputs(_onFile);
+  }
 
   @override
   void dispose() {
+    _detachFileInputs();
+    TerminalViewWrapperState._pasteDialogsOpen--;
     _ctrl.dispose();
     super.dispose();
+  }
+
+  /// First image of a browser paste/drop closes the dialog with it.
+  void _onFile(DroppedFile file) {
+    if (_popped || !mounted) return;
+    _popped = true;
+    Navigator.of(context).pop(file);
   }
 
   void _submit() => Navigator.of(context).pop(_ctrl.text);

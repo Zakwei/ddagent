@@ -1,7 +1,10 @@
+import 'dart:ui' as ui;
+
 import 'package:ddagent_app/core/utils/clipboard_fallback_stub.dart'
     if (dart.library.js_interop) 'package:ddagent_app/core/utils/clipboard_fallback_web.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -34,4 +37,19 @@ Future<bool> copyTextWithFeedback(BuildContext context, String text) async {
   }
   if (context.mounted) AppToast.show(context, t.copied);
   return true;
+}
+
+/// Re-encodes clipboard image bytes as PNG. Windows hands clipboard images
+/// over as BMP, which the server's image upload filter rejects; bytes that
+/// already carry the PNG signature pass through untouched.
+Future<Uint8List> toPngBytes(Uint8List bytes) async {
+  final isPng = bytes.length > 8 && bytes[0] == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E;
+  if (isPng) return bytes;
+  final codec = await ui.instantiateImageCodec(bytes);
+  final frame = await codec.getNextFrame();
+  final data = await frame.image.toByteData(format: ui.ImageByteFormat.png);
+  frame.image.dispose();
+  codec.dispose();
+  if (data == null) throw StateError('PNG encode failed');
+  return data.buffer.asUint8List();
 }

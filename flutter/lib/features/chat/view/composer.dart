@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:math' as math;
-import 'dart:ui' as ui;
 
 import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
+import 'package:ddagent_app/core/utils/clipboard.dart';
 import 'package:ddagent_app/core/utils/path_utils.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
@@ -19,6 +19,7 @@ import 'package:ddagent_app/features/chat/view/composer_model_menu.dart';
 import 'package:ddagent_app/features/chat/view/composer_permission_menu.dart';
 import 'package:ddagent_app/features/git/state/checkpoint_controller.dart';
 import 'package:ddagent_app/features/settings/state/ui_preferences_controller.dart';
+import 'package:ddagent_app/features/terminal/view/terminal_view_wrapper.dart';
 import 'package:ddagent_app/features/voice/state/stt_controller.dart';
 import 'package:ddagent_app/features/voice/state/tts_controller.dart';
 import 'package:ddagent_app/features/voice/view/stt_config_dialog.dart';
@@ -574,6 +575,8 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
   /// framework, so the listener in `chat_drop.dart` reads them off the DOM.
   void _onDroppedFile(DroppedFile file) {
     if (!mounted) return;
+    // An open terminal paste dialog owns the screenshot.
+    if (TerminalViewWrapperState.claimsPaste) return;
     // With several panes open, only the focused composer claims the file.
     if (_mounted > 1 && !_focus.hasFocus) return;
     unawaited(
@@ -617,7 +620,7 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
       }
       final raw = await Pasteboard.image;
       if (raw == null || raw.isEmpty) return;
-      final png = await _toPng(raw);
+      final png = await toPngBytes(raw);
       final stamp = DateTime.now().millisecondsSinceEpoch;
       await notifier.attach('pasted-image-$stamp.png', png, isImage: true);
     } on Object catch (e) {
@@ -625,20 +628,6 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
         AppToast.error(context, Translations.of(context).chat.input.pasteFailed(error: '$e'));
       }
     }
-  }
-
-  /// Windows hands clipboard images over as BMP, which the server's upload
-  /// filter rejects — re-encode anything that isn't already PNG.
-  static Future<Uint8List> _toPng(Uint8List bytes) async {
-    final isPng = bytes.length > 8 && bytes[0] == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E;
-    if (isPng) return bytes;
-    final codec = await ui.instantiateImageCodec(bytes);
-    final frame = await codec.getNextFrame();
-    final data = await frame.image.toByteData(format: ui.ImageByteFormat.png);
-    frame.image.dispose();
-    codec.dispose();
-    if (data == null) throw StateError('PNG encode failed');
-    return data.buffer.asUint8List();
   }
 
   static const _imageExts = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp', 'avif'};
