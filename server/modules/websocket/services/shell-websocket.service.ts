@@ -475,10 +475,14 @@ export function handleShellConnection(
 
           if (existingSession.buffer.length > 0) {
             existingSession.buffer.forEach((bufferedData) => {
+              // `replay` lets the client redraw old output without answering
+              // the terminal queries in it again — those replies would land
+              // in the shell as typed input.
               ws.send(
                 JSON.stringify({
                   type: 'output',
                   data: bufferedData,
+                  replay: true,
                 })
               );
             });

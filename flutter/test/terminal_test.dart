@@ -201,6 +201,28 @@ void main() {
       expect(fakeWs.sent.first['rows'], 40);
     });
 
+    test('replayed output redraws without answering its terminal queries', () async {
+      final container = ProviderContainer(
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
+      );
+      addTearDown(container.dispose);
+      final controller = container.read(terminalControllerProvider.notifier);
+      final tab = controller.createTab(projectPath: '/p', cols: 80, rows: 24);
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      fakeWs.sent.clear();
+
+      // Claude Code's device-attributes and background-colour queries.
+      const queries = '\x1b[c\x1b]11;?\x07';
+      fakeWs.emitFrame({'type': 'output', 'data': 'old$queries', 'replay': true});
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      expect(fakeWs.sent.where((f) => f['type'] == 'input'), isEmpty);
+      expect(tab.terminal.buffer.lines[0].toString(), startsWith('old'));
+
+      fakeWs.emitFrame({'type': 'output', 'data': queries});
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      expect(fakeWs.sent.where((f) => f['type'] == 'input').length, 2);
+    });
+
     test('output frames update terminal buffer and detect exit code', () async {
       final container = ProviderContainer(
         overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],

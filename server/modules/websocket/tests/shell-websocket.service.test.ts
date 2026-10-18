@@ -83,6 +83,44 @@ test('a stale socket close cannot detach the socket that replaced it', () => {
   pty.emitExit();
 });
 
+test('a reattached socket gets the buffered output marked as replay', () => {
+  const pty = createFakePty();
+  const dependencies = {
+    resolveProviderSessionId: () => null,
+    spawnPty: () => pty as never,
+  };
+  const initMessage = JSON.stringify({
+    type: 'init',
+    projectPath: process.cwd(),
+    sessionId: `replay-${Date.now()}`,
+    hasSession: false,
+    provider: 'plain-shell',
+    isPlainShell: true,
+    initialCommand: 'test-command',
+  });
+
+  const firstSocket = createFakeSocket();
+  handleShellConnection(firstSocket as never, dependencies);
+  firstSocket.emit('message', initMessage);
+  // Claude Code's device-attributes query — answering it again on replay
+  // typed "1;2c" into the shell.
+  pty.emitData('\x1b[c');
+
+  const replacementSocket = createFakeSocket();
+  handleShellConnection(replacementSocket as never, dependencies);
+  replacementSocket.emit('message', initMessage);
+  const replayed = replacementSocket.frames
+    .map((frame) => JSON.parse(frame) as { data?: string; replay?: boolean })
+    .find((frame) => frame.data === '\x1b[c');
+  assert.equal(replayed?.replay, true);
+
+  pty.emitData('live');
+  const live = JSON.parse(replacementSocket.frames.at(-1)!) as { replay?: boolean };
+  assert.equal(live.replay, undefined);
+
+  pty.emitExit();
+});
+
 test('shell output detects and normalizes a wrapped authentication URL', () => {
   const pty = createFakePty();
   const socket = createFakeSocket();

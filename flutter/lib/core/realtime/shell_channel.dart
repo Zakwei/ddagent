@@ -16,6 +16,10 @@ class ShellFrame {
   String? get authUrl => raw['url'] as String?;
   bool get authUrlAutoOpen => raw['autoOpen'] == true;
   bool get isOutput => type == 'output';
+
+  /// Output the server re-sends from its buffer on reattach — already seen
+  /// (and its terminal queries already answered) when it was live.
+  bool get isReplay => raw['replay'] == true;
   bool get isError => type == 'error';
   bool get isAuthUrl => type == 'auth_url';
 }

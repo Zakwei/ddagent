@@ -133,6 +133,11 @@ class TerminalTab {
 
   String get displayTitle => renamed ? title : appTitle ?? title;
 
+  /// True while a replayed frame is written — the emulator's replies to the
+  /// queries in it (device attributes, colours) and its OSC 52 copies were
+  /// already handled live; re-sending would type "1;2c" into the shell.
+  bool replaying = false;
+
   /// Which tab row shows this tab ([terminalRouteHost] or a workspace pane
   /// id). Mutable — "Move to new pane" reassigns it; the PTY never notices.
   String hostId;
@@ -387,7 +392,7 @@ class TerminalController extends Notifier<TerminalState> {
     // OSC 52 — how a CLI on the server sets the viewer's clipboard (Claude
     // Code's /copy, tmux, nvim). Reads ('?') are never answered.
     terminal.onPrivateOSC = (code, args) {
-      if (code != '52' || args.length < 2 || args[1] == '?') return;
+      if (tab.replaying || code != '52' || args.length < 2 || args[1] == '?') return;
       try {
         unawaited(copyText(utf8.decode(base64.decode(args[1]))));
       } on FormatException {
@@ -398,6 +403,7 @@ class TerminalController extends Notifier<TerminalState> {
     // Wire terminal user output -> channel input. Soft-keyboard typing lands
     // here too, so the key bar's latched Ctrl/Alt is applied on this path.
     terminal.onOutput = (data) {
+      if (tab.replaying) return;
       channel.input(_consumeLatchedModifiers(data));
     };
 
@@ -513,10 +519,13 @@ class TerminalController extends Notifier<TerminalState> {
     final tab = state.tabs[tabIndex];
 
     if (frame.isOutput) {
+      tab.replaying = frame.isReplay;
       tab.terminal.write(tab.outputFilter.feed(frame.output));
+      tab.replaying = false;
       // Answer the colour / mode probes the emulator cannot (theme detection
-      // in OpenCode, Codex, Claude Code).
-      for (final query in tab.outputFilter.takeQueries()) {
+      // in OpenCode, Codex, Claude Code) — live ones only.
+      final queries = tab.outputFilter.takeQueries();
+      for (final query in frame.isReplay ? const <TerminalQuery>[] : queries) {
         tab.channel.input(
           terminalQueryReply(query, foreground: _paletteForeground, background: _paletteBackground),
         );
