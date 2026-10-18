@@ -970,13 +970,33 @@ void main() {
       expect(find.text('Clear Output'), findsOneWidget);
       expect(find.text('Find'), findsOneWidget);
 
+      // An agent profile runs in the shell the user is looking at: the CLI
+      // is typed into the connected active tab, no new tab is opened.
+      fakeWs.sent.clear();
+      await tester.tap(find.text('Claude CLI'));
+      await tester.pumpAndSettle();
+      expect(container.read(terminalControllerProvider).tabs.length, 2);
+      final typed = fakeWs.sent.where((f) => f['type'] == 'input').toList();
+      expect(typed.single['data'], 'claude --allow-dangerously-skip-permissions\r');
+
+      // With no shell able to take input (the active tab is a one-shot
+      // command), the profile falls back to its own tab.
+      container
+          .read(terminalControllerProvider.notifier)
+          .runOneShotCommand(projectPath: '/test/proj', command: 'echo hi');
+      await tester.pump();
+      // Settle the one-shot tab's connecting overlay (its spinner never
+      // settles on its own) before driving the menu.
+      await connectTab(tester);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(LucideIcons.chevronDown));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Claude CLI'));
       await tester.pump();
-      // The provider tab starts connecting — settle it before asserting.
       await connectTab(tester);
       await tester.pumpAndSettle();
       expect(find.text('claude CLI'), findsOneWidget);
-      expect(container.read(terminalControllerProvider).tabs.length, 3);
+      expect(container.read(terminalControllerProvider).tabs.length, 4);
     });
 
     testWidgets('tab context menu: rename, close others', (tester) async {

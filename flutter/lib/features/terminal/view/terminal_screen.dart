@@ -151,27 +151,28 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
     );
   }
 
-  /// Account profiles run *in the shell the user is looking at*: the CLI is
-  /// typed into the active tab as `env K=V … claude` (PowerShell: `$env:K=…;
-  /// claude`), so it starts in that shell's working directory with the
-  /// account's config dir. Only a plain, connected shell can take typed input
-  /// without it landing inside some other program; anything else (a running
-  /// CLI, a one-shot command, a dead tab, no tab) falls back to a new tab
-  /// started with the same env.
-  void _runAccountProfile(TerminalAccountProfile profile, TerminalTab? activeTab) {
+  /// Agent profiles run *in the shell the user is looking at*: the CLI is
+  /// typed into the active tab (`claude …`, or `env K=V … claude` for a named
+  /// account; PowerShell: `$env:K=…; claude`), so it starts in that shell's
+  /// working directory — and, with [account], signed in as that account.
+  /// Only a plain, connected shell can take typed input without it landing
+  /// inside some other program; anything else (a running CLI, a one-shot
+  /// command, a dead tab, no tab) falls back to a new tab with the same
+  /// command and env.
+  void _runCliProfile(String provider, TerminalTab? activeTab, {TerminalAccountProfile? account}) {
     final canType =
         activeTab != null &&
         activeTab.status == TerminalTabStatus.connected &&
         activeTab.isPlainShell &&
         !activeTab.isCommandMode;
     if (!canType) {
-      _newProviderTab(profile.provider, account: profile);
+      _newProviderTab(provider, account: account);
       return;
     }
     final windows = ref.read(serverHealthProvider).value?['platform'] == 'win32';
     final command = terminalAccountCommand(
-      provider: profile.provider,
-      env: profile.account.envOverrides,
+      provider: provider,
+      env: account?.account.envOverrides ?? const {},
       windows: windows,
     );
     _ctrl.sendInput(activeTab.id, '$command\r');
@@ -439,14 +440,14 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
         entry(
           terminalProfileIcon(provider, isPlainShell: false),
           profileLabel(provider),
-          onTap: () => _newProviderTab(provider),
+          onTap: () => _runCliProfile(provider, activeTab),
         ),
       if (accountProfiles.isNotEmpty) const Divider(height: 8),
       for (final profile in accountProfiles)
         entry(
           LucideIcons.userRound,
           profile.title(profileLabel(profile.provider)),
-          onTap: () => _runAccountProfile(profile, activeTab),
+          onTap: () => _runCliProfile(profile.provider, activeTab, account: profile),
         ),
       const Divider(height: 8),
       // Pane actions grouped in submenus so the dropdown stays short enough
