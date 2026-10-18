@@ -75,7 +75,7 @@ class TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
 
   late final FocusNode _focusNode;
   late final xt.TerminalController _terminalViewController;
-  late final ScrollController _scrollController;
+  late final _TouchDragScrollController _scrollController;
   late final TerminalSearch _search;
   final _searchFieldFocus = FocusNode();
   final _searchFieldController = TextEditingController();
@@ -100,7 +100,7 @@ class TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
     super.initState();
     _focusNode = FocusNode();
     _terminalViewController = xt.TerminalController()..addListener(_onSelectionChanged);
-    _scrollController = ScrollController();
+    _scrollController = _TouchDragScrollController(touchDown: () => _pointers.isNotEmpty);
     HardwareKeyboard.instance.addHandler(_trackModifiers);
     final palette = TerminalPalette.campbell;
     _search = TerminalSearch(
@@ -551,6 +551,15 @@ class TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
       (defaultTargetPlatform == TargetPlatform.android ||
           defaultTargetPlatform == TargetPlatform.iOS);
 
+  /// Phones and tablets (app and mobile web): the soft keyboard opens only on
+  /// a completed tap (see [_onPointerDown]) — a freshly inflated pane (new or
+  /// switched tab) must not autofocus, or xterm opens the keyboard by itself
+  /// and snaps to the bottom on every inset change while it slides up, so a
+  /// finger drag started meanwhile never scrolls.
+  bool get _isTouchPlatform =>
+      defaultTargetPlatform == TargetPlatform.android ||
+      defaultTargetPlatform == TargetPlatform.iOS;
+
   /// xterm's text-input client attaches without a `viewId`, which the Windows
   /// embedder rejects ("view ID is null") — no characters would ever arrive.
   /// Windows reads typed characters straight from key events instead.
@@ -579,7 +588,7 @@ class TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
       // a block cursor at the right place beats a bar at the wrong one.
       cursorType: xt.TerminalCursorType.block,
       focusNode: _focusNode,
-      autofocus: widget.autofocus,
+      autofocus: widget.autofocus && !_isTouchPlatform,
       keyboardAppearance: Theme.of(context).brightness,
       // Android/iOS soft keyboards don't emit a hardware delete event — the
       // IME reports backspace textually, which xterm otherwise drops.
@@ -985,5 +994,47 @@ class _TerminalPasteDialogState extends State<_TerminalPasteDialog> {
         FilledButton(onPressed: _submit, child: Text(t.settings.terminalShortcuts.paste)),
       ],
     );
+  }
+}
+
+/// xterm jumps to the bottom on every soft-keyboard inset change while the
+/// pane is focused (its KeyboardVisibility → `_scrollToBottom`). With the
+/// keyboard already open (a fresh tab used to autofocus it) those changes
+/// also land mid-drag — the slide-up itself, a mobile browser's viewport
+/// churn — and `jumpTo` goes idle first, which cancels the finger's drag:
+/// the terminal "cannot be scrolled". No jump moves the viewport while a
+/// finger is down; the drag itself goes through `applyUserOffset`.
+class _TouchDragScrollController extends ScrollController {
+  _TouchDragScrollController({required this.touchDown});
+
+  final bool Function() touchDown;
+
+  @override
+  ScrollPosition createScrollPosition(
+    ScrollPhysics physics,
+    ScrollContext context,
+    ScrollPosition? oldPosition,
+  ) => _TouchDragScrollPosition(
+    physics: physics,
+    context: context,
+    oldPosition: oldPosition,
+    touchDown: touchDown,
+  );
+}
+
+class _TouchDragScrollPosition extends ScrollPositionWithSingleContext {
+  _TouchDragScrollPosition({
+    required super.physics,
+    required super.context,
+    super.oldPosition,
+    required this.touchDown,
+  });
+
+  final bool Function() touchDown;
+
+  @override
+  void jumpTo(double value) {
+    if (touchDown()) return;
+    super.jumpTo(value);
   }
 }

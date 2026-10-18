@@ -1145,7 +1145,8 @@ void main() {
       await tester.pumpAndSettle();
       expect(state().tabs.length, 1);
       expect(state().activeTabId, first);
-    });
+      // Desktop: a fresh pane autofocuses there (touch platforms wait for a tap).
+    }, variant: const TargetPlatformVariant({TargetPlatform.linux}));
 
     testWidgets('TerminalShortcutsBar sends key codes on tap', (tester) async {
       await tester.binding.setSurfaceSize(const Size(1000, 800));
