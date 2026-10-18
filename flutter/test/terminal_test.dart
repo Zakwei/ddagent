@@ -518,6 +518,22 @@ void main() {
       expect(tab.displayTitle, 'build');
     });
 
+    test('OSC 52 from the program sets the clipboard; reads are ignored', () async {
+      final copied = <Object?>[];
+      final messenger = TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+      messenger.setMockMethodCallHandler(SystemChannels.platform, (call) async {
+        if (call.method == 'Clipboard.setData') copied.add((call.arguments as Map)['text']);
+        return null;
+      });
+      addTearDown(() => messenger.setMockMethodCallHandler(SystemChannels.platform, null));
+
+      final tab = ctrl.createTab(projectPath: '/p', title: 'A');
+      tab.terminal.write('\x1b]52;c;?\x07'); // read request
+      tab.terminal.write('\x1b]52;c;T0su\x07'); // "OK." — Claude Code's /copy
+      await pumpEventQueue();
+      expect(copied, ['OK.']);
+    });
+
     test('duplicateTab copies the profile and lands right after the source', () {
       final a = ctrl.createTab(
         projectPath: '/p',

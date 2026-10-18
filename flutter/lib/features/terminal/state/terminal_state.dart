@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:ddagent_app/core/realtime/realtime_providers.dart';
 import 'package:ddagent_app/core/realtime/shell_channel.dart';
+import 'package:ddagent_app/core/utils/clipboard.dart';
 import 'package:ddagent_app/features/terminal/state/terminal_key_handler.dart';
 import 'package:ddagent_app/features/terminal/state/terminal_mouse_handler.dart';
 import 'package:ddagent_app/features/terminal/state/terminal_output_filter.dart';
@@ -381,6 +383,16 @@ class TerminalController extends Notifier<TerminalState> {
       if (tab.appTitle == next) return;
       tab.appTitle = next;
       if (!tab.renamed) _notifyTabsChanged();
+    };
+    // OSC 52 — how a CLI on the server sets the viewer's clipboard (Claude
+    // Code's /copy, tmux, nvim). Reads ('?') are never answered.
+    terminal.onPrivateOSC = (code, args) {
+      if (code != '52' || args.length < 2 || args[1] == '?') return;
+      try {
+        unawaited(copyText(utf8.decode(base64.decode(args[1]))));
+      } on FormatException {
+        return;
+      }
     };
 
     // Wire terminal user output -> channel input. Soft-keyboard typing lands
