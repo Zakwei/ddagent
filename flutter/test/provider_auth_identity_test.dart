@@ -330,7 +330,7 @@ void main() {
       // npm-packaged CLIs must pin @latest, otherwise an installed older
       // version satisfies the range and the update is a no-op.
       final command = providerUpdateCommand(agent);
-      if (command.startsWith('npm install')) {
+      if (command.startsWith('npm install') || command.startsWith('claude update')) {
         expect(command, endsWith('@latest'), reason: agent);
       } else {
         expect(command, providerInstallCommand(agent), reason: agent);
@@ -351,7 +351,17 @@ void main() {
   test('npm-installed CLIs allow their install scripts (npm 11.19 blocks them by default)', () {
     expect(
       providerUpdateCommand('claude'),
+      'claude update || '
       'npm install -g --allow-scripts=@anthropic-ai/claude-code @anthropic-ai/claude-code@latest',
+    );
+    expect(
+      providerUpdateCommand('claude', windows: true),
+      r'claude update; if ($LASTEXITCODE -ne 0) { '
+      'npm install -g --allow-scripts=@anthropic-ai/claude-code @anthropic-ai/claude-code@latest }',
+    );
+    expect(
+      providerInstallCommand('claude'),
+      'npm install -g --allow-scripts=@anthropic-ai/claude-code @anthropic-ai/claude-code',
     );
     expect(
       providerInstallCommand('opencode'),

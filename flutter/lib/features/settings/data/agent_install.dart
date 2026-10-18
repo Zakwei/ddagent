@@ -47,8 +47,22 @@ String npmGlobalInstallCommand(String package, {bool latest = false}) =>
 /// provider-level action, never a per-account one.
 String providerUpdateCommand(String provider, {bool windows = false}) => switch (provider) {
   'cursor' || 'antigravity' || 'devin' => providerInstallCommand(provider, windows: windows),
+  // Claude Code is usually a *native* install (its install.sh, or the npm
+  // package's postinstall) living under ~/.local/share/claude/versions with a
+  // launcher in ~/.local/bin; `npm install -g` would only refresh a package
+  // that launcher never runs. `claude update` upgrades a native install and
+  // exits non-zero for a pure npm one, where the npm command then applies.
+  'claude' => _firstThatSucceeds(
+    'claude update',
+    npmGlobalInstallCommand(providerNpmPackage(provider), latest: true),
+    windows: windows,
+  ),
   _ => npmGlobalInstallCommand(providerNpmPackage(provider), latest: true),
 };
+
+/// `first || second` for the server's shell — PowerShell 5 has no `||`.
+String _firstThatSucceeds(String first, String second, {required bool windows}) =>
+    windows ? '$first; if (\$LASTEXITCODE -ne 0) { $second }' : '$first || $second';
 
 /// Official installation docs for a provider CLI. Null when no stable docs
 /// URL is known; the install card then hides its documentation link.
