@@ -112,10 +112,35 @@ void main() {
       expect(state.activeTabId, tab.id);
       expect(state.activeTab?.projectPath, '/test/proj');
       expect(state.activeTab?.isPlainShell, isTrue);
-      expect(fakeWs.sent, isNotEmpty);
+      // Nothing is spawned before the view is laid out: a PTY started at the
+      // 80×24 placeholder would draw its prompt for the wrong width.
+      expect(fakeWs.sent, isEmpty);
+      tab.terminal.resize(132, 43, 1056, 731);
+      expect(fakeWs.sent.length, 1);
       expect(fakeWs.sent.first['type'], 'init');
       expect(fakeWs.sent.first['projectPath'], '/test/proj');
       expect(fakeWs.sent.first['isPlainShell'], isTrue);
+      expect(fakeWs.sent.first['cols'], 132);
+      expect(fakeWs.sent.first['rows'], 43);
+      // Later layouts are plain resizes.
+      tab.terminal.resize(100, 30, 800, 510);
+      expect(fakeWs.sent.last['type'], 'resize');
+      expect(fakeWs.sent.last['cols'], 100);
+    });
+
+    test('a tab that is never laid out still starts after the grace period', () async {
+      final container = ProviderContainer(
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
+      );
+      addTearDown(container.dispose);
+
+      final controller = container.read(terminalControllerProvider.notifier);
+      controller.createTab(projectPath: '/test/proj', autoSelect: false);
+      expect(fakeWs.sent, isEmpty);
+      await Future<void>.delayed(const Duration(milliseconds: 600));
+      expect(fakeWs.sent.single['type'], 'init');
+      expect(fakeWs.sent.single['cols'], 80);
+      expect(fakeWs.sent.single['rows'], 24);
     });
 
     test('createTab for provider CLI initializes with provider name', () {
@@ -409,13 +434,14 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      container
+      final tab = container
           .read(terminalControllerProvider.notifier)
           .runOneShotCommand(
             projectPath: '/test/proj',
             command: 'claude setup-token',
             env: {'CLAUDE_CONFIG_DIR': '/tmp/acct'},
           );
+      tab.terminal.resize(80, 24, 640, 384); // first layout spawns the PTY
       await Future<void>.delayed(Duration.zero);
 
       final inits = fakeWs.sent.where((f) => f['type'] == 'init').toList();
@@ -510,13 +536,14 @@ void main() {
     });
 
     test('second plain shell gets its own PTY key; the first keeps the default', () async {
-      ctrl.createTab(projectPath: '/p');
+      ctrl.createTab(projectPath: '/p').terminal.resize(80, 24, 640, 384);
       await Future<void>.delayed(Duration.zero);
       final first = fakeWs.sent.where((f) => f['type'] == 'init').toList();
       expect(first.first.containsKey('sessionId'), isFalse);
 
       fakeWs.sent.clear();
       final second = ctrl.createTab(projectPath: '/p');
+      second.terminal.resize(80, 24, 640, 384);
       await Future<void>.delayed(Duration.zero);
       final init = fakeWs.sent.firstWhere((f) => f['type'] == 'init');
       expect(init['sessionId'], 'shell-2');

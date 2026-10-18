@@ -39,10 +39,13 @@ List<TerminalAccountProfile> terminalAccountProfiles(
 /// Binary the server's shell bridge starts for a provider CLI tab — kept in
 /// step with `buildShellCommand` in shell-websocket.service.ts.
 String providerCliBinary(String provider, {required bool windows}) => switch (provider) {
+  // Same flag the server's shell bridge adds: it puts "bypass permissions"
+  // into Claude's Shift+Tab cycle without starting in it.
+  'claude' => 'claude --allow-dangerously-skip-permissions',
   'cursor' => 'cursor-agent',
   'commandcode' => windows ? 'cmdc' : 'command-code',
   'antigravity' => 'agy',
-  'claude' || 'codex' || 'opencode' || 'devin' => provider,
+  'codex' || 'opencode' || 'devin' => provider,
   _ => provider,
 };
 

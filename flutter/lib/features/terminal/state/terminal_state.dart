@@ -147,7 +147,13 @@ class TerminalTab {
   /// CLI prompt options detected on the buffer (null = no prompt active).
   List<CliPromptOption>? promptOptions;
 
+  /// Pending "spawn at 80×24 anyway" fallback of a tab not yet laid out;
+  /// cancelled by the first layout or by closing the tab.
+  Timer? initGraceTimer;
+
   void dispose() {
+    initGraceTimer?.cancel();
+    initGraceTimer = null;
     subscription?.cancel();
     subscription = null;
     channel.dispose();
@@ -268,6 +274,10 @@ class TerminalController extends Notifier<TerminalState> {
     return TerminalState(showShortcutsBar: terminalKeyBarDefault(defaultTargetPlatform));
   }
 
+  /// How long a tab created in the background may wait for its first layout
+  /// before the PTY is spawned at the 80×24 default anyway.
+  static const _initGracePeriod = Duration(milliseconds: 400);
+
   TerminalTab createTab({
     String? title,
     required String projectPath,
@@ -326,8 +336,41 @@ class TerminalController extends Notifier<TerminalState> {
       channel.input(_consumeLatchedModifiers(data));
     };
 
-    // Wire terminal resize -> channel resize
+    // The PTY must be spawned at the size the pane really has: a shell
+    // started at the 80×24 placeholder draws its prompt for that width and
+    // the later resize reflows it into overlapping lines. So `init` waits
+    // for the view's first layout (xterm reports it through onResize) and
+    // carries that size; a tab that is never laid out (created in the
+    // background) still starts after a short grace period at the default.
+    var initSent = false;
+    void sendInit(int initCols, int initRows) {
+      if (initSent) return;
+      initSent = true;
+      tab.initGraceTimer?.cancel();
+      tab.initGraceTimer = null;
+      channel.init(
+        projectPath: projectPath,
+        sessionId: sessionId ?? ptySessionId,
+        provider: provider,
+        hasSession: sessionId != null,
+        initialCommand: initialCommand,
+        isPlainShell: isPlainShell,
+        // A one-shot command (install/update/login) is a fresh run: the server
+        // keys PTYs by a short command prefix, so reattaching could land on a
+        // stale run of a different command or account.
+        forceRestart: isCommandMode,
+        env: env,
+        cols: initCols,
+        rows: initRows,
+      );
+    }
+
+    // Wire terminal resize -> channel resize (the first one spawns the PTY).
     terminal.onResize = (width, height, pixelWidth, pixelHeight) {
+      if (!initSent) {
+        sendInit(width, height);
+        return;
+      }
       channel.resize(width, height);
     };
 
@@ -344,23 +387,17 @@ class TerminalController extends Notifier<TerminalState> {
       },
     );
 
-    // Initialize PTY session + open the socket (`init` alone only stores the
-    // frame — nothing reaches the server until the WS is open).
-    channel.init(
-      projectPath: projectPath,
-      sessionId: sessionId ?? ptySessionId,
-      provider: provider,
-      hasSession: sessionId != null,
-      initialCommand: initialCommand,
-      isPlainShell: isPlainShell,
-      // A one-shot command (install/update/login) is a fresh run: the server
-      // keys PTYs by a short command prefix, so reattaching could land on a
-      // stale run of a different command or account.
-      forceRestart: isCommandMode,
-      env: env,
-      cols: cols ?? 80,
-      rows: rows ?? 24,
-    );
+    // Open the socket now (`init` only stores its frame until the WS is
+    // open, so the order does not matter); spawn with a known size right
+    // away, otherwise at first layout — or after the grace period.
+    if (cols != null && rows != null) {
+      sendInit(cols, rows);
+    } else {
+      tab.initGraceTimer = Timer(_initGracePeriod, () {
+        tab.initGraceTimer = null;
+        if (_activeTabs.contains(tab)) sendInit(80, 24);
+      });
+    }
     unawaited(channel.connect());
 
     _activeTabs.add(tab);
@@ -752,8 +789,9 @@ class TerminalController extends Notifier<TerminalState> {
       isPlainShell: tab.isPlainShell,
       forceRestart: true,
       env: tab.env,
-      cols: 80,
-      rows: 24,
+      // The view is laid out already — restart at its real size.
+      cols: tab.terminal.viewWidth,
+      rows: tab.terminal.viewHeight,
     );
     // A disconnected tab needs the socket re-opened first (`init` only
     // sends when already open; `start()` re-sends it on reconnect anyway).

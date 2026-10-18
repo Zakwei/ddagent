@@ -56,7 +56,8 @@ void _commandTests() {
         env: const {'CLAUDE_CONFIG_DIR': "/home/me/.ddagent/accounts/a'b/claude"},
         windows: false,
       ),
-      "env CLAUDE_CONFIG_DIR='/home/me/.ddagent/accounts/a'\\''b/claude' claude",
+      "env CLAUDE_CONFIG_DIR='/home/me/.ddagent/accounts/a'\\''b/claude' "
+      'claude --allow-dangerously-skip-permissions',
     );
     expect(
       terminalAccountCommand(

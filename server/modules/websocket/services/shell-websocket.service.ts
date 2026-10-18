@@ -39,6 +39,8 @@ type PtySessionEntry = {
 };
 
 const ptySessionsMap = new Map<string, PtySessionEntry>();
+/** Flags every terminal-started Claude CLI gets; the account profiles in the client type the same ones. */
+const CLAUDE_TERMINAL_FLAGS = '--allow-dangerously-skip-permissions';
 const PTY_SESSION_TIMEOUT = 30 * 60 * 1000;
 const SHELL_URL_PARSE_BUFFER_LIMIT = 32768;
 // OSC (`ESC]…BEL/ST`, e.g. `\x1b]8;;\x07` hyperlinks) must come before the
@@ -317,12 +319,17 @@ function buildShellCommand(
     return initialCommand || 'agy';
   }
 
-  const command = initialCommand || 'claude';
+  // `--allow-dangerously-skip-permissions` only adds "bypass permissions" to
+  // the Shift+Tab mode cycle (Claude Code ≥ 2.1) — the session still starts
+  // in the default mode. Without it the terminal CLI has no way to reach
+  // bypass at all, unlike the chat composer.
+  const claude = `claude ${CLAUDE_TERMINAL_FLAGS}`;
+  const command = initialCommand || claude;
   if (resumeSessionId) {
     if (os.platform() === 'win32') {
-      return `claude --resume "${resumeSessionId}"; if ($LASTEXITCODE -ne 0) { claude }`;
+      return `${claude} --resume "${resumeSessionId}"; if ($LASTEXITCODE -ne 0) { ${claude} }`;
     }
-    return `claude --resume "${resumeSessionId}" || claude`;
+    return `${claude} --resume "${resumeSessionId}" || ${claude}`;
   }
   return command;
 }
