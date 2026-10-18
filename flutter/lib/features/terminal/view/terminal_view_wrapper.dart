@@ -191,6 +191,11 @@ class TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
   // --- Links ---
 
   void _handleTapUp(TapUpDetails details, xt.CellOffset offset) {
+    // A completed touch tap is what opens the soft keyboard (see
+    // [_onPointerDown]); xterm's own tap-down request was suppressed.
+    if (details.kind == PointerDeviceKind.touch || details.kind == PointerDeviceKind.stylus) {
+      showSoftKeyboard();
+    }
     final terminal = widget.tab.terminal;
     final lines = terminal.buffer.lines;
     if (offset.y < 0 || offset.y >= lines.length) return;
@@ -424,9 +429,27 @@ class TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
     widget.onTabCommand?.call(dy < 0 ? TerminalCommand.zoomIn : TerminalCommand.zoomOut, null);
   }
 
+  /// Whether the soft keyboard is up — read from the FlutterView, not the
+  /// pane's MediaQuery (the Scaffold strips the bottom inset from its body).
+  bool get _softKeyboardOpen => View.of(context).viewInsets.bottom > 0;
+
   void _onPointerDown(PointerDownEvent event) {
     if (event.kind != _lastPointerKind) setState(() => _lastPointerKind = event.kind);
-    if (event.kind != PointerDeviceKind.touch) return;
+    final touchLike =
+        event.kind == PointerDeviceKind.touch || event.kind == PointerDeviceKind.stylus;
+    // xterm asks for the soft keyboard on *tap-down*, which fires after a
+    // 100 ms press — i.e. for most finger drags too. With the keyboard closed
+    // that pops it up mid-drag: the body shrinks and xterm snaps to the bottom
+    // on every inset change, so the scroll is swallowed ("the terminal cannot
+    // be scrolled on a phone"). Keep the keyboard closed until the gesture is
+    // a completed tap ([_handleTapUp]): drop focus (xterm only re-opens an
+    // input connection while focused) and refuse focus until the pointer
+    // lifts. An open keyboard is left alone — tap-down is a no-op then.
+    if (touchLike && !_softKeyboardOpen) {
+      if (_focusNode.hasFocus) _focusNode.unfocus();
+      _focusNode.canRequestFocus = false;
+    }
+    if (!touchLike) return;
     _pointers[event.pointer] = event.position;
     if (_pointers.length == 2) {
       _pinchBaseDistance = _pinchDistance();
@@ -449,6 +472,9 @@ class TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
   }
 
   void _onPointerEnd(PointerEvent event) {
+    // Runs before the gesture arena resolves the up, so a real tap's
+    // [_handleTapUp] can focus and open the keyboard again.
+    _focusNode.canRequestFocus = true;
     _pointers.remove(event.pointer);
     if (_pointers.length < 2) _pinchBaseDistance = null;
   }
