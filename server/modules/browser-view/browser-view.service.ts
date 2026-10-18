@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { createRequire } from 'node:module';
 
+import { getAppPreviewDevice } from '@/modules/app-preview/index.js';
 import { applyChromiumFontConfig, applyChromiumLibraryPath, getChromiumLaunchArgs } from '@/shared/utils.js';
 
 const require = createRequire(import.meta.url);
@@ -67,6 +68,33 @@ type KeyInput = {
 };
 
 /**
+ * Device emulation requested by the Preview pane. `device` is a preset id from
+ * the app-preview catalog and expands to the preset's mobile flag and user
+ * agent; explicit `mobile`/`userAgent` override whatever the preset says.
+ * Passing nothing (or `mobile: false` without a user agent) restores the
+ * plain desktop page.
+ */
+export type ViewEmulationInput = {
+  device?: string | null;
+  mobile?: boolean;
+  userAgent?: string | null;
+};
+
+type ViewEmulation = { mobile: boolean; userAgent: string | null };
+
+const NO_EMULATION: ViewEmulation = { mobile: false, userAgent: null };
+
+function resolveEmulation(input: ViewEmulationInput | undefined): ViewEmulation {
+  if (!input) return NO_EMULATION;
+  const preset = input.device ? getAppPreviewDevice(input.device) : null;
+  const mobile = typeof input.mobile === 'boolean' ? input.mobile : preset?.mobile ?? false;
+  const userAgent = input.userAgent !== undefined
+    ? (input.userAgent || null)
+    : preset?.userAgent ?? null;
+  return { mobile, userAgent };
+}
+
+/**
  * One live, user-driven browser session streamed to a single websocket client.
  *
  * A session owns a Chromium page and pipes CDP screencast frames out while
@@ -84,6 +112,8 @@ export type BrowserViewSession = {
   dispatchMouse: (input: MouseInput) => Promise<void>;
   dispatchKey: (input: KeyInput) => Promise<void>;
   resize: (width: number, height: number) => Promise<void>;
+  /** Switches mobile/desktop emulation on the live page (Preview pane device change). */
+  emulate: (input: ViewEmulationInput | undefined) => Promise<void>;
   close: () => Promise<void>;
 };
 
@@ -201,6 +231,7 @@ export async function createBrowserViewSession(options: {
   userId: string;
   viewport?: Partial<Viewport>;
   initialUrl?: string | null;
+  emulation?: ViewEmulationInput;
   callbacks: ViewSessionCallbacks;
 }): Promise<BrowserViewSession> {
   if (sessions.size >= MAX_VIEW_SESSIONS) {
@@ -252,6 +283,41 @@ export async function createBrowserViewSession(options: {
   let loading = false;
   let closed = false;
   let pressedButtons = 0;
+  let emulation: ViewEmulation = resolveEmulation(options.emulation);
+
+  /**
+   * Applies the current emulation to the page. Mobile mode makes Chromium
+   * honour `<meta viewport>`, report touch support, translate our mouse input
+   * into touch events (so drags scroll like a finger) and send a phone user
+   * agent — which is what turns a responsive app into its phone layout. The
+   * metrics override must be re-issued on every resize because it pins the
+   * viewport size.
+   */
+  const applyEmulation = async (): Promise<void> => {
+    if (closed) return;
+    await cdp.send('Emulation.setDeviceMetricsOverride', {
+      width: viewport.width,
+      height: viewport.height,
+      deviceScaleFactor: 1,
+      mobile: emulation.mobile,
+      screenWidth: viewport.width,
+      screenHeight: viewport.height,
+    });
+    await cdp.send('Emulation.setTouchEmulationEnabled', {
+      enabled: emulation.mobile,
+      maxTouchPoints: emulation.mobile ? 5 : 1,
+    });
+    await cdp.send('Emulation.setEmitTouchEventsForMouse', {
+      enabled: emulation.mobile,
+      configuration: emulation.mobile ? 'mobile' : 'desktop',
+    });
+    if (emulation.userAgent) {
+      await cdp.send('Emulation.setUserAgentOverride', {
+        userAgent: emulation.userAgent,
+        platform: emulation.mobile ? (/Android/i.test(emulation.userAgent) ? 'Linux armv8l' : 'iPhone') : undefined,
+      });
+    }
+  };
 
   // Socket teardown (pane close, Focus Mode toggle, split resize during
   // unmount) races in-flight page calls: Playwright then rejects with
@@ -306,6 +372,11 @@ export async function createBrowserViewSession(options: {
 
   try {
     await cdp.send('Page.enable');
+    // Only touch the emulation domain when a preset asked for it: a plain
+    // browser pane keeps Chromium's defaults exactly as before.
+    if (emulation.mobile || emulation.userAgent) {
+      await applyEmulation();
+    }
     await cdp.send('Page.startScreencast', {
       format: 'jpeg',
       quality: FRAME_QUALITY,
@@ -457,6 +528,9 @@ export async function createBrowserViewSession(options: {
       viewport.height = next.height;
       try {
         await page.setViewportSize(next);
+        if (emulation.mobile || emulation.userAgent) {
+          await applyEmulation();
+        }
         await cdp.send('Page.startScreencast', {
           format: 'jpeg',
           quality: FRAME_QUALITY,
@@ -467,6 +541,31 @@ export async function createBrowserViewSession(options: {
       } catch (error) {
         // The socket can close (Focus Mode toggle, pane removal) while the
         // resize is in flight — a dead target must not surface as fatal.
+        if (!isTeardownError(error)) throw error;
+      }
+    },
+    async emulate(input: ViewEmulationInput | undefined) {
+      if (closed || page.isClosed()) return;
+      const next = resolveEmulation(input);
+      const unchanged = next.mobile === emulation.mobile && next.userAgent === emulation.userAgent;
+      if (unchanged) return;
+      const hadUserAgent = Boolean(emulation.userAgent);
+      emulation = next;
+      try {
+        if (hadUserAgent && !next.userAgent) {
+          // CDP has no "clear" for the UA override; restoring Chromium's own
+          // string is the closest thing to switching the phone preset off.
+          const version = await cdp.send('Browser.getVersion').catch(() => null);
+          const original = typeof version?.userAgent === 'string' ? version.userAgent : '';
+          if (original) {
+            await cdp.send('Emulation.setUserAgentOverride', { userAgent: original.replace(/Headless/g, '') });
+          }
+        }
+        await applyEmulation();
+        // The page already laid itself out for the previous device; a reload
+        // is the only way its responsive breakpoints and UA sniffing re-run.
+        await page.reload({ waitUntil: 'domcontentloaded', timeout: 30_000 }).catch(() => undefined);
+      } catch (error) {
         if (!isTeardownError(error)) throw error;
       }
     },

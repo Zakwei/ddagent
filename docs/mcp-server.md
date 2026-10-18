@@ -41,6 +41,38 @@ The same list is available over REST (session-authenticated):
 | `send_message` | write | `sessionId`, `message` |
 | `create_worktree` | write | `projectPath`, `branch`, `baseBranch?` |
 | `knowledge_*` | read / write | see [Knowledge base → MCP tools](KNOWLEDGE.md#mcp-tools-on-demand) |
+| `preview_open` | write | `url`, `title?`, `platform?` (`mobile`/`web`/`desktop`), `device?`, `orientation?`, `projectPath?`, `note?` |
+| `preview_update` | write | `previewId`, plus any of `url`, `title`, `platform`, `device`, `orientation`, `note` |
+| `preview_reload` | write | `previewId` |
+| `preview_close` | write | `previewId` |
+| `preview_list` | read | — |
+| `preview_devices` | read | — |
+
+### App preview pane
+
+The `preview_*` tools drive the **Preview** pane of the workspace (toolbar
+icon next to the browser globe). The agent starts the dev server of the app it
+is building, then calls `preview_open` with its URL; the pane opens by itself
+in every connected client and shows the page inside a device frame:
+
+- `mobile` — phone/tablet bezel with status bar and home indicator. Chromium
+  renders the page with mobile emulation (meta viewport, touch events, phone
+  user agent) at the device's CSS size, so responsive apps show their phone
+  layout. Presets: `iphone-15-pro`, `iphone-se`, `pixel-8`, `galaxy-s24`,
+  `ipad-pro-11`, `android-tablet`.
+- `web` — browser chrome with address bar: `web-laptop` (1366×768),
+  `web-desktop` (1920×1080).
+- `desktop` — OS window with title bar: `desktop-window` (1280×800),
+  `desktop-large` (1440×900).
+
+Passing `device` implies the platform; passing only `platform` uses that
+platform's first preset. The page is rendered by the Chromium that runs on the
+DDAgent server (the same engine as the browser pane), so `localhost` URLs must
+be reachable from that machine. Re-registering an existing URL updates the
+target instead of adding a second one, and `preview_reload` refreshes every
+pane showing it after a rebuild without hot reload. Targets live in memory
+only; the pane also offers a manual URL field and the device/orientation
+controls, and the REST mirror lives at `/api/app-preview`.
 
 ## Install into your agents
 

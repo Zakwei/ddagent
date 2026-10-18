@@ -1,5 +1,14 @@
 import { randomUUID } from 'node:crypto';
 
+import {
+  getDefaultAppPreviewDevice,
+  listAppPreviewDevices,
+  listAppPreviews,
+  registerAppPreview,
+  reloadAppPreview,
+  removeAppPreview,
+  updateAppPreview,
+} from '@/modules/app-preview/index.js';
 import { kanbanCardsDb, projectsDb, sessionsDb, type McpTokenScope } from '@/modules/database/index.js';
 import { buildProjectContext, knowledgeService } from '@/modules/knowledge/index.js';
 import { queuedMessagesService } from '@/modules/queued-messages/index.js';
@@ -334,6 +343,78 @@ const MCP_TOOL_DEFINITIONS: McpToolDefinition[] = [
     description: 'Delete a relation by id.',
     scope: 'write',
     inputSchema: { type: 'object', properties: { id: STRING }, required: ['id'] },
+  },
+  // ------------------------------------------------------- app preview pane
+  {
+    name: 'preview_open',
+    description:
+      'Show the app you are building live in the DDAgent Preview pane, framed as a phone, a browser window or a desktop window. '
+      + 'Start the app\'s dev server first (e.g. `flutter run -d web-server --web-port 8088`, `npm run dev`, `python -m http.server`), '
+      + 'then pass its URL. The page is rendered by a Chromium running on the DDAgent server, so localhost URLs must be reachable from that server. '
+      + 'Calling it again with the same URL updates the existing preview instead of opening another one.',
+    scope: 'write',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        url: { type: 'string', description: 'URL of the running app, e.g. http://localhost:8088.' },
+        title: { type: 'string', description: 'Short label shown on the preview, e.g. "Teal login".' },
+        platform: {
+          type: 'string',
+          enum: ['mobile', 'web', 'desktop'],
+          description: 'Frame family: mobile = phone/tablet bezel, web = browser chrome, desktop = OS window. Defaults to web, or to the device\'s platform.',
+        },
+        device: {
+          type: 'string',
+          description: 'Device preset id from preview_devices (e.g. iphone-15-pro, pixel-8, ipad-pro-11, web-laptop, desktop-window). Implies the platform.',
+        },
+        orientation: { type: 'string', enum: ['portrait', 'landscape'], description: 'Mobile only; defaults to portrait.' },
+        projectPath: { type: 'string', description: 'Absolute path of the project the app belongs to.' },
+        note: { type: 'string', description: 'What to look at, e.g. "sign-up toggle after the fix".' },
+      },
+      required: ['url'],
+    },
+  },
+  {
+    name: 'preview_update',
+    description: 'Change an open preview: new URL (dev server moved), device, platform, orientation, title or note.',
+    scope: 'write',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        previewId: STRING,
+        url: STRING,
+        title: STRING,
+        platform: { type: 'string', enum: ['mobile', 'web', 'desktop'] },
+        device: STRING,
+        orientation: { type: 'string', enum: ['portrait', 'landscape'] },
+        note: STRING,
+      },
+      required: ['previewId'],
+    },
+  },
+  {
+    name: 'preview_reload',
+    description: 'Reload the page in every pane showing the preview — use after a rebuild when the dev server has no hot reload.',
+    scope: 'write',
+    inputSchema: { type: 'object', properties: { previewId: STRING }, required: ['previewId'] },
+  },
+  {
+    name: 'preview_close',
+    description: 'Remove a preview from the Preview pane.',
+    scope: 'write',
+    inputSchema: { type: 'object', properties: { previewId: STRING }, required: ['previewId'] },
+  },
+  {
+    name: 'preview_list',
+    description: 'List the previews currently registered in the Preview pane.',
+    scope: 'read',
+    inputSchema: { type: 'object', properties: {} },
+  },
+  {
+    name: 'preview_devices',
+    description: 'List the device presets (id, label, platform, viewport) the Preview pane can frame an app in.',
+    scope: 'read',
+    inputSchema: { type: 'object', properties: {} },
   },
 ];
 
@@ -685,6 +766,57 @@ export async function callMcpTool(
     case 'knowledge_unlink': {
       knowledgeService.deleteConnection(readRequiredString(input.id, 'id'));
       return { deleted: true };
+    }
+
+    // ---------------------------------------------------- app preview pane
+    case 'preview_open': {
+      const result = registerAppPreview({
+        url: readRequiredString(input.url, 'url'),
+        title: readOptionalString(input.title),
+        platform: readOptionalString(input.platform),
+        device: readOptionalString(input.device),
+        orientation: readOptionalString(input.orientation),
+        projectPath: readOptionalString(input.projectPath),
+        note: readOptionalString(input.note),
+      });
+      const device = result.preview.device
+        ? listAppPreviewDevices().find((entry) => entry.id === result.preview.device) ?? null
+        : getDefaultAppPreviewDevice(result.preview.platform);
+      return {
+        ...result,
+        device,
+        hint: result.created
+          ? 'The Preview pane opens automatically in the DDAgent workspace. Call preview_reload after rebuilds without hot reload.'
+          : 'An existing preview for this URL was updated in place.',
+      };
+    }
+
+    case 'preview_update': {
+      return updateAppPreview(readRequiredString(input.previewId, 'previewId'), {
+        url: readOptionalString(input.url),
+        title: readOptionalString(input.title),
+        platform: readOptionalString(input.platform),
+        device: readOptionalString(input.device),
+        orientation: readOptionalString(input.orientation),
+        note: readOptionalString(input.note),
+      });
+    }
+
+    case 'preview_reload': {
+      return reloadAppPreview(readRequiredString(input.previewId, 'previewId'));
+    }
+
+    case 'preview_close': {
+      removeAppPreview(readRequiredString(input.previewId, 'previewId'));
+      return { closed: true };
+    }
+
+    case 'preview_list': {
+      return { previews: listAppPreviews() };
+    }
+
+    case 'preview_devices': {
+      return { devices: listAppPreviewDevices() };
     }
 
     default:

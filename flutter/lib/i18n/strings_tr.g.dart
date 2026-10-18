@@ -49,6 +49,7 @@ class TranslationsTr extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final Translations$tasks$tr tasks = Translations$tasks$tr._(_root);
 	@override late final Translations$knowledge$tr knowledge = Translations$knowledge$tr._(_root);
 	@override late final Translations$browser$tr browser = Translations$browser$tr._(_root);
+	@override late final Translations$appPreview$tr appPreview = Translations$appPreview$tr._(_root);
 	@override late final Translations$collab$tr collab = Translations$collab$tr._(_root);
 	@override late final Translations$fileTree$tr fileTree = Translations$fileTree$tr._(_root);
 	@override late final Translations$git$tr git = Translations$git$tr._(_root);
@@ -360,6 +361,33 @@ class Translations$browser$tr extends Translations$browser$en {
 	@override String get dialogTitle => 'Agent Tarayıcısı';
 	@override String get viewError => 'Tarayıcı görünümü hatası';
 	@override String get web => 'Web';
+}
+
+// Path: appPreview
+class Translations$appPreview$tr extends Translations$appPreview$en {
+	Translations$appPreview$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get selectTarget => 'Önizleme seç';
+	@override String get enterUrl => 'URL gir…';
+	@override String get urlHint => 'http://localhost:8080';
+	@override String get open => 'Aç';
+	@override String get emptyTitle => 'Henüz önizlenecek bir şey yok';
+	@override String get emptyBody => 'Uygulamanın geliştirme sunucusunu başlatın ve ajanın preview_open MCP aracını çağırmasına izin verin ya da URL\'sini buraya girin.';
+	@override String get mcpHint => 'Ajanlar bu bölmeye DDAgent MCP sunucusu üzerinden ulaşır (Ayarlar → MCP → Yükle) ve geliştirme sunucusu URL\'siyle preview_open çağırır.';
+	@override late final Translations$appPreview$platform$tr platform = Translations$appPreview$platform$tr._(_root);
+	@override String get device => 'Cihaz';
+	@override String get rotate => 'Döndür';
+	@override String get back => 'Geri';
+	@override String get reload => 'Yenile';
+	@override String get openExternal => 'Sistem tarayıcısında aç';
+	@override String get removeTarget => 'Önizlemeyi kaldır';
+	@override String get fit => 'Bölmeye sığdır';
+	@override String get actualSize => 'Gerçek boyut';
+	@override String get starting => 'Önizleme başlatılıyor…';
+	@override String get retry => 'Yeniden dene';
 }
 
 // Path: collab
@@ -4297,6 +4325,19 @@ class Translations$knowledge$entityTypes$tr extends Translations$knowledge$entit
 	@override String get tag => 'Etiket';
 }
 
+// Path: appPreview.platform
+class Translations$appPreview$platform$tr extends Translations$appPreview$platform$en {
+	Translations$appPreview$platform$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get label => 'Platform';
+	@override String get mobile => 'Mobil';
+	@override String get web => 'Web';
+	@override String get desktop => 'Masaüstü';
+}
+
 // Path: collab.roles
 class Translations$collab$roles$tr extends Translations$collab$roles$en {
 	Translations$collab$roles$tr._(TranslationsTr root) : this._root = root, super.internal(root);
@@ -5099,6 +5140,7 @@ class Translations$workspace$paneTitle$tr extends Translations$workspace$paneTit
 	@override String get notes => 'Paylaşılan notlar';
 	@override String get editor => 'Düzenleyici';
 	@override String get git => 'Git';
+	@override String get preview => 'Önizleme';
 }
 
 // Path: worktrees.runtimeStatus
@@ -11337,6 +11379,27 @@ extension on TranslationsTr {
 			'browser.dialogTitle' => 'Agent Tarayıcısı',
 			'browser.viewError' => 'Tarayıcı görünümü hatası',
 			'browser.web' => 'Web',
+			'appPreview.selectTarget' => 'Önizleme seç',
+			'appPreview.enterUrl' => 'URL gir…',
+			'appPreview.urlHint' => 'http://localhost:8080',
+			'appPreview.open' => 'Aç',
+			'appPreview.emptyTitle' => 'Henüz önizlenecek bir şey yok',
+			'appPreview.emptyBody' => 'Uygulamanın geliştirme sunucusunu başlatın ve ajanın preview_open MCP aracını çağırmasına izin verin ya da URL\'sini buraya girin.',
+			'appPreview.mcpHint' => 'Ajanlar bu bölmeye DDAgent MCP sunucusu üzerinden ulaşır (Ayarlar → MCP → Yükle) ve geliştirme sunucusu URL\'siyle preview_open çağırır.',
+			'appPreview.platform.label' => 'Platform',
+			'appPreview.platform.mobile' => 'Mobil',
+			'appPreview.platform.web' => 'Web',
+			'appPreview.platform.desktop' => 'Masaüstü',
+			'appPreview.device' => 'Cihaz',
+			'appPreview.rotate' => 'Döndür',
+			'appPreview.back' => 'Geri',
+			'appPreview.reload' => 'Yenile',
+			'appPreview.openExternal' => 'Sistem tarayıcısında aç',
+			'appPreview.removeTarget' => 'Önizlemeyi kaldır',
+			'appPreview.fit' => 'Bölmeye sığdır',
+			'appPreview.actualSize' => 'Gerçek boyut',
+			'appPreview.starting' => 'Önizleme başlatılıyor…',
+			'appPreview.retry' => 'Yeniden dene',
 			'collab.team' => 'Takım',
 			'collab.invite' => 'Davet et',
 			'collab.inviteTeammate' => 'Takım arkadaşını davet et',
@@ -11659,6 +11722,8 @@ extension on TranslationsTr {
 			'skills.empty.noSkillsInProject' => 'Bu projede beceri yok',
 			'skills.empty.noSkillsInProjectDescription' => 'Seçili projede bir .claude/skills, .cursor/skills veya .agents/skills klasörü oluşturun.',
 			'skills.empty.noGlobalSkills' => 'Henüz genel beceri bulunamadı',
+			_ => null,
+		} ?? switch (path) {
 			'skills.empty.noGlobalSkillsDescription' => 'Her projede kullanılabilir olması için yukarıdan bir genel beceri ekleyin.',
 			'skills.empty.noMatchingSkills' => 'Eşleşen beceri yok',
 			'skills.empty.noMatchingSkillsDescription' => 'Farklı bir komut, ad, kapsam, proje veya kaynak yolu deneyin.',
@@ -11680,8 +11745,6 @@ extension on TranslationsTr {
 			'terminal.tabs.shellName' => ({required Object index}) => 'Kabuk ${index}',
 			'terminal.tabs.plainShell' => 'Basit Shell',
 			'terminal.tabs.claudeCli' => 'Claude CLI',
-			_ => null,
-		} ?? switch (path) {
 			'terminal.tabs.opencodeCli' => 'OpenCode CLI',
 			'terminal.tabs.commandCodeCli' => 'Command Code CLI',
 			'terminal.tabs.antigravityCli' => 'Antigravity CLI',
@@ -11773,6 +11836,7 @@ extension on TranslationsTr {
 			'workspace.paneTitle.notes' => 'Paylaşılan notlar',
 			'workspace.paneTitle.editor' => 'Düzenleyici',
 			'workspace.paneTitle.git' => 'Git',
+			'workspace.paneTitle.preview' => 'Önizleme',
 			'workspace.addEditorPane' => 'Düzenleyici paneli ekle',
 			'workspace.addGitPane' => 'Git paneli ekle',
 			'workspace.unknownProjectPath' => 'Bilinmeyen proje yolu',

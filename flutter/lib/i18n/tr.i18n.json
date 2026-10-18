@@ -3663,6 +3663,31 @@
     "viewError": "Tarayıcı görünümü hatası",
     "web": "Web"
   },
+  "appPreview": {
+    "selectTarget": "Önizleme seç",
+    "enterUrl": "URL gir…",
+    "urlHint": "http://localhost:8080",
+    "open": "Aç",
+    "emptyTitle": "Henüz önizlenecek bir şey yok",
+    "emptyBody": "Uygulamanın geliştirme sunucusunu başlatın ve ajanın preview_open MCP aracını çağırmasına izin verin ya da URL'sini buraya girin.",
+    "mcpHint": "Ajanlar bu bölmeye DDAgent MCP sunucusu üzerinden ulaşır (Ayarlar → MCP → Yükle) ve geliştirme sunucusu URL'siyle preview_open çağırır.",
+    "platform": {
+      "label": "Platform",
+      "mobile": "Mobil",
+      "web": "Web",
+      "desktop": "Masaüstü"
+    },
+    "device": "Cihaz",
+    "rotate": "Döndür",
+    "back": "Geri",
+    "reload": "Yenile",
+    "openExternal": "Sistem tarayıcısında aç",
+    "removeTarget": "Önizlemeyi kaldır",
+    "fit": "Bölmeye sığdır",
+    "actualSize": "Gerçek boyut",
+    "starting": "Önizleme başlatılıyor…",
+    "retry": "Yeniden dene"
+  },
   "collab": {
     "team": "Takım",
     "invite": "Davet et",
@@ -4282,7 +4307,8 @@
       "terminal": "Terminal",
       "notes": "Paylaşılan notlar",
       "editor": "Düzenleyici",
-      "git": "Git"
+      "git": "Git",
+      "preview": "Önizleme"
     },
     "addEditorPane": "Düzenleyici paneli ekle",
     "addGitPane": "Git paneli ekle",

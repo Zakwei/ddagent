@@ -121,6 +121,7 @@ class WorkspaceController extends Notifier<WorkspaceState> {
     String? projectId,
     String? url,
     String? filePath,
+    String? device,
     bool picker = false,
   }) {
     if (!canAddSplitPane(state.panes)) return;
@@ -131,6 +132,7 @@ class WorkspaceController extends Notifier<WorkspaceState> {
       projectId: projectId,
       url: url,
       filePath: filePath,
+      device: device,
       picker: picker,
     );
     _set(state.copyWith(panes: addSplitPane(state.panes, pane), activePaneId: () => pane.id));
@@ -159,6 +161,7 @@ class WorkspaceController extends Notifier<WorkspaceState> {
     String? Function()? projectId,
     String? Function()? url,
     String? Function()? filePath,
+    String? Function()? device,
     bool? picker,
   }) {
     final next = updateSplitPane(
@@ -169,6 +172,7 @@ class WorkspaceController extends Notifier<WorkspaceState> {
         projectId: projectId != null ? projectId() : p.projectId,
         url: url != null ? url() : p.url,
         filePath: filePath != null ? filePath() : p.filePath,
+        device: device != null ? device() : p.device,
         picker: picker ?? p.picker,
       ),
     );

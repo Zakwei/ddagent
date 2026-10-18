@@ -3668,6 +3668,31 @@
     "viewError": "Errore della vista browser",
     "web": "Web"
   },
+  "appPreview": {
+    "selectTarget": "Scegli anteprima",
+    "enterUrl": "Inserisci URL…",
+    "urlHint": "http://localhost:8080",
+    "open": "Apri",
+    "emptyTitle": "Ancora niente da visualizzare",
+    "emptyBody": "Avvia il dev server dell'app e lascia che l'agente chiami lo strumento MCP preview_open, oppure inserisci qui il suo URL.",
+    "mcpHint": "Gli agenti raggiungono questo riquadro tramite il server MCP di DDAgent (Impostazioni → MCP → Installa) e chiamano preview_open con l'URL del dev server.",
+    "platform": {
+      "label": "Piattaforma",
+      "mobile": "Mobile",
+      "web": "Web",
+      "desktop": "Desktop"
+    },
+    "device": "Dispositivo",
+    "rotate": "Ruota",
+    "back": "Indietro",
+    "reload": "Ricarica",
+    "openExternal": "Apri nel browser di sistema",
+    "removeTarget": "Rimuovi anteprima",
+    "fit": "Adatta al riquadro",
+    "actualSize": "Dimensione reale",
+    "starting": "Avvio anteprima…",
+    "retry": "Riprova"
+  },
   "collab": {
     "team": "Team",
     "invite": "Invito",
@@ -4287,7 +4312,8 @@
       "terminal": "Terminale",
       "notes": "Note condivise",
       "editor": "Editor",
-      "git": "Git"
+      "git": "Git",
+      "preview": "Anteprima"
     },
     "addEditorPane": "Aggiungi pannello editor",
     "addGitPane": "Aggiungi pannello Git",

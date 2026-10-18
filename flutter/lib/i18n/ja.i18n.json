@@ -3658,6 +3658,31 @@
     "viewError": "ブラウザ表示エラー",
     "web": "Web"
   },
+  "appPreview": {
+    "selectTarget": "プレビューを選択",
+    "enterUrl": "URL を入力…",
+    "urlHint": "http://localhost:8080",
+    "open": "開く",
+    "emptyTitle": "まだプレビューするものがありません",
+    "emptyBody": "アプリの開発サーバーを起動してエージェントに MCP ツール preview_open を呼ばせるか、ここに URL を入力してください。",
+    "mcpHint": "エージェントは DDAgent MCP サーバー（設定 → MCP → インストール）経由でこのペインに接続し、開発サーバーの URL を指定して preview_open を呼び出します。",
+    "platform": {
+      "label": "プラットフォーム",
+      "mobile": "モバイル",
+      "web": "Web",
+      "desktop": "デスクトップ"
+    },
+    "device": "デバイス",
+    "rotate": "回転",
+    "back": "戻る",
+    "reload": "再読み込み",
+    "openExternal": "システムブラウザで開く",
+    "removeTarget": "プレビューを削除",
+    "fit": "ペインに合わせる",
+    "actualSize": "実寸",
+    "starting": "プレビューを起動中…",
+    "retry": "再試行"
+  },
   "collab": {
     "team": "チーム",
     "invite": "招待",
@@ -4276,7 +4301,8 @@
       "terminal": "ターミナル",
       "notes": "共有メモ",
       "editor": "エディター",
-      "git": "Git"
+      "git": "Git",
+      "preview": "プレビュー"
     },
     "addEditorPane": "エディターペインを追加",
     "addGitPane": "Git ペインを追加",

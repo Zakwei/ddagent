@@ -7,7 +7,7 @@ import 'package:hive/hive.dart';
 /// Multi-pane workspace (port of main-content/utils/splitWorkspace.ts +
 /// workspacePanes.ts). Panes are first-class and persisted — the URL never
 /// owns a session; a reload restores the exact same workspace.
-enum PaneKind { chat, browser, terminal, notes, editor, git }
+enum PaneKind { chat, browser, terminal, notes, editor, git, preview }
 
 class SplitPane {
   const SplitPane({
@@ -17,6 +17,7 @@ class SplitPane {
     this.projectId,
     this.url,
     this.filePath,
+    this.device,
     this.picker = false,
   });
 
@@ -29,6 +30,10 @@ class SplitPane {
   /// Editor pane — the file currently open (web `editorFile` pane state).
   final String? filePath;
 
+  /// Preview pane — the device preset id the app is framed in (see the
+  /// server's app-preview device catalog). `null` = follow the target.
+  final String? device;
+
   /// Chat pane renders the session picker instead of the chat UI.
   final bool picker;
 
@@ -37,6 +42,7 @@ class SplitPane {
     String? projectId,
     String? url,
     String? filePath,
+    String? device,
     bool? picker,
   }) => SplitPane(
     id: id,
@@ -45,6 +51,7 @@ class SplitPane {
     projectId: projectId ?? this.projectId,
     url: url ?? this.url,
     filePath: filePath ?? this.filePath,
+    device: device ?? this.device,
     picker: picker ?? this.picker,
   );
 
@@ -55,6 +62,7 @@ class SplitPane {
     'projectId': ?projectId,
     'url': ?url,
     'filePath': ?filePath,
+    'device': ?device,
     if (picker) 'picker': true,
   };
 
@@ -71,6 +79,7 @@ class SplitPane {
       projectId: s(value['projectId']),
       url: s(value['url']),
       filePath: s(value['filePath']),
+      device: s(value['device']),
       picker: value['picker'] == true,
     );
   }
@@ -155,6 +164,7 @@ String paneKindLabel(PaneKind kind) => switch (kind) {
   PaneKind.notes => t.workspace.paneTitle.notes,
   PaneKind.editor => t.workspace.paneTitle.editor,
   PaneKind.git => t.workspace.paneTitle.git,
+  PaneKind.preview => t.workspace.paneTitle.preview,
 };
 
 ({String title, String? subtitle, PaneAction action}) splitPaneDisplay(
@@ -170,7 +180,8 @@ String paneKindLabel(PaneKind kind) => switch (kind) {
     PaneKind.terminal ||
     PaneKind.notes ||
     PaneKind.editor ||
-    PaneKind.git => paneKindLabel(pane.kind),
+    PaneKind.git ||
+    PaneKind.preview => paneKindLabel(pane.kind),
     PaneKind.chat =>
       sessionTitles[pane.sessionId] ??
           (pane.sessionId != null
@@ -182,7 +193,7 @@ String paneKindLabel(PaneKind kind) => switch (kind) {
   };
   return (
     title: title,
-    subtitle: pane.kind == PaneKind.browser
+    subtitle: pane.kind == PaneKind.browser || pane.kind == PaneKind.preview
         ? (Uri.tryParse(pane.url ?? '')?.host).let((h) => h == '' ? pane.url : h)
         : subtitle,
     action: paneAction(

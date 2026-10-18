@@ -13,6 +13,7 @@ IconData paneKindIcon(PaneKind kind) => switch (kind) {
   PaneKind.notes => Icons.edit_note,
   PaneKind.editor => Icons.code,
   PaneKind.git => Icons.alt_route,
+  PaneKind.preview => Icons.devices,
 };
 
 /// Shared `focusFollowsPointer` guard (web `onPointerEnter` in Shell.tsx

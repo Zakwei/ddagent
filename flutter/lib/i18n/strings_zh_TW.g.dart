@@ -49,6 +49,7 @@ class TranslationsZhTw extends Translations with BaseTranslations<AppLocale, Tra
 	@override late final Translations$tasks$zh_TW tasks = Translations$tasks$zh_TW.internal(_root);
 	@override late final Translations$knowledge$zh_TW knowledge = Translations$knowledge$zh_TW.internal(_root);
 	@override late final Translations$browser$zh_TW browser = Translations$browser$zh_TW.internal(_root);
+	@override late final Translations$appPreview$zh_TW appPreview = Translations$appPreview$zh_TW.internal(_root);
 	@override late final Translations$collab$zh_TW collab = Translations$collab$zh_TW.internal(_root);
 	@override late final Translations$fileTree$zh_TW fileTree = Translations$fileTree$zh_TW.internal(_root);
 	@override late final Translations$git$zh_TW git = Translations$git$zh_TW.internal(_root);
@@ -360,6 +361,33 @@ class Translations$browser$zh_TW extends Translations$browser$en {
 	@override String get dialogTitle => '代理瀏覽器';
 	@override String get viewError => '瀏覽器檢視錯誤';
 	@override String get web => '網頁';
+}
+
+// Path: appPreview
+class Translations$appPreview$zh_TW extends Translations$appPreview$en {
+	Translations$appPreview$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get selectTarget => '選擇預覽';
+	@override String get enterUrl => '輸入 URL…';
+	@override String get urlHint => 'http://localhost:8080';
+	@override String get open => '開啟';
+	@override String get emptyTitle => '目前沒有可預覽的內容';
+	@override String get emptyBody => '啟動應用程式的開發伺服器，讓代理程式呼叫 MCP 工具 preview_open，或在此輸入其 URL。';
+	@override String get mcpHint => '代理程式透過 DDAgent MCP 伺服器（設定 → MCP → 安裝）連線到此面板，並以開發伺服器 URL 呼叫 preview_open。';
+	@override late final Translations$appPreview$platform$zh_TW platform = Translations$appPreview$platform$zh_TW.internal(_root);
+	@override String get device => '裝置';
+	@override String get rotate => '旋轉';
+	@override String get back => '返回';
+	@override String get reload => '重新載入';
+	@override String get openExternal => '在系統瀏覽器中開啟';
+	@override String get removeTarget => '移除預覽';
+	@override String get fit => '符合面板';
+	@override String get actualSize => '實際大小';
+	@override String get starting => '正在啟動預覽…';
+	@override String get retry => '重試';
 }
 
 // Path: collab
@@ -4292,6 +4320,19 @@ class Translations$knowledge$entityTypes$zh_TW extends Translations$knowledge$en
 	@override String get tag => '標籤';
 }
 
+// Path: appPreview.platform
+class Translations$appPreview$platform$zh_TW extends Translations$appPreview$platform$en {
+	Translations$appPreview$platform$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get label => '平台';
+	@override String get mobile => '行動裝置';
+	@override String get web => 'Web';
+	@override String get desktop => '桌面';
+}
+
 // Path: collab.roles
 class Translations$collab$roles$zh_TW extends Translations$collab$roles$en {
 	Translations$collab$roles$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
@@ -5094,6 +5135,7 @@ class Translations$workspace$paneTitle$zh_TW extends Translations$workspace$pane
 	@override String get notes => '共用筆記';
 	@override String get editor => '編輯器';
 	@override String get git => 'Git';
+	@override String get preview => '預覽';
 }
 
 // Path: worktrees.runtimeStatus
@@ -11331,6 +11373,27 @@ extension on TranslationsZhTw {
 			'browser.dialogTitle' => '代理瀏覽器',
 			'browser.viewError' => '瀏覽器檢視錯誤',
 			'browser.web' => '網頁',
+			'appPreview.selectTarget' => '選擇預覽',
+			'appPreview.enterUrl' => '輸入 URL…',
+			'appPreview.urlHint' => 'http://localhost:8080',
+			'appPreview.open' => '開啟',
+			'appPreview.emptyTitle' => '目前沒有可預覽的內容',
+			'appPreview.emptyBody' => '啟動應用程式的開發伺服器，讓代理程式呼叫 MCP 工具 preview_open，或在此輸入其 URL。',
+			'appPreview.mcpHint' => '代理程式透過 DDAgent MCP 伺服器（設定 → MCP → 安裝）連線到此面板，並以開發伺服器 URL 呼叫 preview_open。',
+			'appPreview.platform.label' => '平台',
+			'appPreview.platform.mobile' => '行動裝置',
+			'appPreview.platform.web' => 'Web',
+			'appPreview.platform.desktop' => '桌面',
+			'appPreview.device' => '裝置',
+			'appPreview.rotate' => '旋轉',
+			'appPreview.back' => '返回',
+			'appPreview.reload' => '重新載入',
+			'appPreview.openExternal' => '在系統瀏覽器中開啟',
+			'appPreview.removeTarget' => '移除預覽',
+			'appPreview.fit' => '符合面板',
+			'appPreview.actualSize' => '實際大小',
+			'appPreview.starting' => '正在啟動預覽…',
+			'appPreview.retry' => '重試',
 			'collab.team' => '團隊',
 			'collab.invite' => '邀請',
 			'collab.inviteTeammate' => '邀請隊友',
@@ -11653,6 +11716,8 @@ extension on TranslationsZhTw {
 			'skills.empty.noSkillsInProject' => '此專案沒有技能',
 			'skills.empty.noSkillsInProjectDescription' => '在所選專案中建立 .claude/skills、.cursor/skills 或 .agents/skills 資料夾。',
 			'skills.empty.noGlobalSkills' => '尚未找到全域技能',
+			_ => null,
+		} ?? switch (path) {
 			'skills.empty.noGlobalSkillsDescription' => '在上方新增全域技能，即可在所有專案中使用。',
 			'skills.empty.noMatchingSkills' => '沒有符合的技能',
 			'skills.empty.noMatchingSkillsDescription' => '請嘗試不同的指令、名稱、範圍、專案或來源路徑。',
@@ -11674,8 +11739,6 @@ extension on TranslationsZhTw {
 			'terminal.tabs.shellName' => ({required Object index}) => 'Shell ${index}',
 			'terminal.tabs.plainShell' => '一般 Shell',
 			'terminal.tabs.claudeCli' => 'Claude CLI',
-			_ => null,
-		} ?? switch (path) {
 			'terminal.tabs.opencodeCli' => 'OpenCode CLI',
 			'terminal.tabs.commandCodeCli' => 'Command Code CLI',
 			'terminal.tabs.antigravityCli' => 'Antigravity CLI',
@@ -11767,6 +11830,7 @@ extension on TranslationsZhTw {
 			'workspace.paneTitle.notes' => '共用筆記',
 			'workspace.paneTitle.editor' => '編輯器',
 			'workspace.paneTitle.git' => 'Git',
+			'workspace.paneTitle.preview' => '預覽',
 			'workspace.addEditorPane' => '新增編輯器窗格',
 			'workspace.addGitPane' => '新增 Git 窗格',
 			'workspace.unknownProjectPath' => '未知的專案路徑',

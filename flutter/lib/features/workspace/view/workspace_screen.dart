@@ -15,6 +15,8 @@ import 'package:ddagent_app/features/editor/view/editor_screen.dart';
 import 'package:ddagent_app/features/git/view/git_screen.dart';
 import 'package:ddagent_app/features/mini_orchestrator/state/mini_orchestrator_controller.dart';
 import 'package:ddagent_app/features/orchestrator/state/orchestrator_controller.dart';
+import 'package:ddagent_app/features/preview/state/app_preview_controller.dart';
+import 'package:ddagent_app/features/preview/view/app_preview_pane.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/sessions/state/activity_poller.dart';
@@ -114,6 +116,9 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
     // Keep the server's running-session pulse alive while the workspace is
     // mounted (web AppContent polls /sessions/running every 5 s).
     ref.watch(activityPollerProvider);
+    // Keeps the preview registry mirrored so an agent's `preview_open` MCP
+    // call opens / retargets a preview pane while the workspace is on screen.
+    ref.watch(appPreviewControllerProvider);
     final processingIds = ref.watch(sessionActivityProvider).keys.toSet();
     final pendingIds = ref.watch(pendingPermissionSessionsProvider);
 
@@ -344,6 +349,11 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
             : null,
       ),
       btn(
+        LucideIcons.monitorSmartphone,
+        i18n.chat.splitWorkspace.addPreview,
+        canAdd ? () => _add(PaneKind.preview) : null,
+      ),
+      btn(
         LucideIcons.terminal,
         i18n.chat.splitWorkspace.addTerminal,
         canAdd ? () => _add(PaneKind.terminal) : null,
@@ -553,6 +563,9 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
           url: pane.url,
           onUrlChange: (u) => ctrl.updatePane(pane.id, url: () => u),
         );
+      case PaneKind.preview:
+        // Keyed by pane id: each preview pane owns its own Chromium stream.
+        return AppPreviewPane(key: ValueKey('preview-${pane.id}'), pane: pane);
       case PaneKind.editor:
         if (pane.projectId == null) {
           return WorkspaceLauncher(

@@ -3658,6 +3658,31 @@
     "viewError": "브라우저 뷰 오류",
     "web": "웹"
   },
+  "appPreview": {
+    "selectTarget": "미리보기 선택",
+    "enterUrl": "URL 입력…",
+    "urlHint": "http://localhost:8080",
+    "open": "열기",
+    "emptyTitle": "아직 미리볼 항목이 없습니다",
+    "emptyBody": "앱의 개발 서버를 실행하고 에이전트가 MCP 도구 preview_open을 호출하게 하거나, 여기에 URL을 입력하세요.",
+    "mcpHint": "에이전트는 DDAgent MCP 서버(설정 → MCP → 설치)를 통해 이 창에 연결하고 개발 서버 URL로 preview_open을 호출합니다.",
+    "platform": {
+      "label": "플랫폼",
+      "mobile": "모바일",
+      "web": "웹",
+      "desktop": "데스크톱"
+    },
+    "device": "기기",
+    "rotate": "회전",
+    "back": "뒤로",
+    "reload": "새로고침",
+    "openExternal": "시스템 브라우저에서 열기",
+    "removeTarget": "미리보기 제거",
+    "fit": "창에 맞추기",
+    "actualSize": "실제 크기",
+    "starting": "미리보기 시작 중…",
+    "retry": "다시 시도"
+  },
   "collab": {
     "team": "팀",
     "invite": "초대",
@@ -4276,7 +4301,8 @@
       "terminal": "터미널",
       "notes": "공유 노트",
       "editor": "편집기",
-      "git": "Git"
+      "git": "Git",
+      "preview": "미리보기"
     },
     "addEditorPane": "편집기 창 추가",
     "addGitPane": "Git 창 추가",

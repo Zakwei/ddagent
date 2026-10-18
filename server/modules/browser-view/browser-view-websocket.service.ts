@@ -3,10 +3,17 @@ import type { WebSocket } from 'ws';
 import type { AuthenticatedWebSocketRequest } from '@/shared/types.js';
 import { parseIncomingJsonObject } from '@/shared/utils.js';
 
-import { createBrowserViewSession, type BrowserViewSession } from './browser-view.service.js';
+import {
+  createBrowserViewSession,
+  type BrowserViewSession,
+  type ViewEmulationInput,
+} from './browser-view.service.js';
+
+type EmulationFields = { device?: string; mobile?: boolean; userAgent?: string };
 
 type BrowserViewIncoming =
-  | { type: 'start'; url?: string; width?: number; height?: number }
+  | ({ type: 'start'; url?: string; width?: number; height?: number } & EmulationFields)
+  | ({ type: 'emulate' } & EmulationFields)
   | { type: 'navigate'; url?: string }
   | { type: 'back' }
   | { type: 'forward' }
@@ -52,12 +59,23 @@ function readMouseButton(value: unknown): 'left' | 'middle' | 'right' | undefine
   return value === 'left' || value === 'middle' || value === 'right' ? value : undefined;
 }
 
+/** Emulation fields of `start`/`emulate`; `undefined` when the message carries none (plain browser pane). */
+function readEmulation(message: EmulationFields): ViewEmulationInput | undefined {
+  const device = typeof message.device === 'string' && message.device.trim() ? message.device.trim() : undefined;
+  const mobile = typeof message.mobile === 'boolean' ? message.mobile : undefined;
+  const userAgent = typeof message.userAgent === 'string' && message.userAgent.trim() ? message.userAgent.trim() : undefined;
+  if (device === undefined && mobile === undefined && userAgent === undefined) return undefined;
+  return { device, mobile, userAgent };
+}
+
 /**
  * Bridges one `/browser-view` websocket to a live Chromium page.
  *
  * The first client message must be `start`; every message afterwards drives
  * the existing page. Screencast frames, navigation state, and errors are
  * pushed back over the same socket. The session is disposed on socket close.
+ * `start` and `emulate` may carry a Preview-pane device preset (`device`) or
+ * raw `mobile`/`userAgent` flags to render the page as a phone would.
  */
 export function handleBrowserViewConnection(
   ws: WebSocket,
@@ -91,6 +109,7 @@ export function handleBrowserViewConnection(
       const session = await createBrowserViewSession({
         userId,
         viewport: { width: readNumber(message.width) ?? 1280, height: readNumber(message.height) ?? 800 },
+        emulation: readEmulation(message),
         callbacks: {
           onFrame: (frame) => sendJson(ws, { type: 'frame', ...frame }, { droppable: true }),
           onNavigation: (state) => sendJson(ws, { type: 'navigation', ...state }),
@@ -166,6 +185,10 @@ export function handleBrowserViewConnection(
             break;
           case 'resize':
             await session.resize(readNumber(data.width) ?? 1280, readNumber(data.height) ?? 800);
+            break;
+          case 'emulate':
+            // No fields = back to the plain desktop page.
+            await session.emulate(readEmulation(data));
             break;
           case 'mouse':
             if (data.event === 'move' || data.event === 'down' || data.event === 'up' || data.event === 'wheel') {

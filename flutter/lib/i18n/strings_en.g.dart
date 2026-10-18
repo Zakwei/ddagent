@@ -51,6 +51,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$tasks$en tasks = Translations$tasks$en.internal(_root);
 	late final Translations$knowledge$en knowledge = Translations$knowledge$en.internal(_root);
 	late final Translations$browser$en browser = Translations$browser$en.internal(_root);
+	late final Translations$appPreview$en appPreview = Translations$appPreview$en.internal(_root);
 	late final Translations$collab$en collab = Translations$collab$en.internal(_root);
 	late final Translations$fileTree$en fileTree = Translations$fileTree$en.internal(_root);
 	late final Translations$git$en git = Translations$git$en.internal(_root);
@@ -392,6 +393,68 @@ class Translations$browser$en {
 
 	/// en: 'Web'
 	String get web => 'Web';
+}
+
+// Path: appPreview
+class Translations$appPreview$en {
+	Translations$appPreview$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Select preview'
+	String get selectTarget => 'Select preview';
+
+	/// en: 'Enter URL…'
+	String get enterUrl => 'Enter URL…';
+
+	/// en: 'http://localhost:8080'
+	String get urlHint => 'http://localhost:8080';
+
+	/// en: 'Open'
+	String get open => 'Open';
+
+	/// en: 'Nothing to preview yet'
+	String get emptyTitle => 'Nothing to preview yet';
+
+	/// en: 'Start the app's dev server and let the agent call the preview_open MCP tool, or enter its URL here.'
+	String get emptyBody => 'Start the app\'s dev server and let the agent call the preview_open MCP tool, or enter its URL here.';
+
+	/// en: 'Agents reach this pane through the DDAgent MCP server (Settings → MCP → Install) and call preview_open with the dev-server URL.'
+	String get mcpHint => 'Agents reach this pane through the DDAgent MCP server (Settings → MCP → Install) and call preview_open with the dev-server URL.';
+
+	late final Translations$appPreview$platform$en platform = Translations$appPreview$platform$en.internal(_root);
+
+	/// en: 'Device'
+	String get device => 'Device';
+
+	/// en: 'Rotate'
+	String get rotate => 'Rotate';
+
+	/// en: 'Back'
+	String get back => 'Back';
+
+	/// en: 'Reload'
+	String get reload => 'Reload';
+
+	/// en: 'Open in system browser'
+	String get openExternal => 'Open in system browser';
+
+	/// en: 'Remove preview'
+	String get removeTarget => 'Remove preview';
+
+	/// en: 'Fit to pane'
+	String get fit => 'Fit to pane';
+
+	/// en: 'Actual size'
+	String get actualSize => 'Actual size';
+
+	/// en: 'Starting preview…'
+	String get starting => 'Starting preview…';
+
+	/// en: 'Retry'
+	String get retry => 'Retry';
 }
 
 // Path: collab
@@ -7936,6 +7999,27 @@ class Translations$knowledge$entityTypes$en {
 	String get tag => 'Tag';
 }
 
+// Path: appPreview.platform
+class Translations$appPreview$platform$en {
+	Translations$appPreview$platform$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Platform'
+	String get label => 'Platform';
+
+	/// en: 'Mobile'
+	String get mobile => 'Mobile';
+
+	/// en: 'Web'
+	String get web => 'Web';
+
+	/// en: 'Desktop'
+	String get desktop => 'Desktop';
+}
+
 // Path: collab.roles
 class Translations$collab$roles$en {
 	Translations$collab$roles$en.internal(this._root);
@@ -9283,6 +9367,9 @@ class Translations$workspace$paneTitle$en {
 
 	/// en: 'Git'
 	String get git => 'Git';
+
+	/// en: 'Preview'
+	String get preview => 'Preview';
 }
 
 // Path: worktrees.runtimeStatus
@@ -17900,6 +17987,27 @@ extension on Translations {
 			'browser.dialogTitle' => 'Agent Browser',
 			'browser.viewError' => 'Browser view error',
 			'browser.web' => 'Web',
+			'appPreview.selectTarget' => 'Select preview',
+			'appPreview.enterUrl' => 'Enter URL…',
+			'appPreview.urlHint' => 'http://localhost:8080',
+			'appPreview.open' => 'Open',
+			'appPreview.emptyTitle' => 'Nothing to preview yet',
+			'appPreview.emptyBody' => 'Start the app\'s dev server and let the agent call the preview_open MCP tool, or enter its URL here.',
+			'appPreview.mcpHint' => 'Agents reach this pane through the DDAgent MCP server (Settings → MCP → Install) and call preview_open with the dev-server URL.',
+			'appPreview.platform.label' => 'Platform',
+			'appPreview.platform.mobile' => 'Mobile',
+			'appPreview.platform.web' => 'Web',
+			'appPreview.platform.desktop' => 'Desktop',
+			'appPreview.device' => 'Device',
+			'appPreview.rotate' => 'Rotate',
+			'appPreview.back' => 'Back',
+			'appPreview.reload' => 'Reload',
+			'appPreview.openExternal' => 'Open in system browser',
+			'appPreview.removeTarget' => 'Remove preview',
+			'appPreview.fit' => 'Fit to pane',
+			'appPreview.actualSize' => 'Actual size',
+			'appPreview.starting' => 'Starting preview…',
+			'appPreview.retry' => 'Retry',
 			'collab.team' => 'Team',
 			'collab.invite' => 'Invite',
 			'collab.inviteTeammate' => 'Invite teammate',
@@ -18222,6 +18330,8 @@ extension on Translations {
 			'skills.empty.noSkillsInProject' => 'No skills in this project',
 			'skills.empty.noSkillsInProjectDescription' => 'Create a .claude/skills, .cursor/skills or .agents/skills folder in the selected project.',
 			'skills.empty.noGlobalSkills' => 'No global skills discovered yet',
+			_ => null,
+		} ?? switch (path) {
 			'skills.empty.noGlobalSkillsDescription' => 'Add a global skill above to make it available across every project.',
 			'skills.empty.noMatchingSkills' => 'No matching skills',
 			'skills.empty.noMatchingSkillsDescription' => 'Try a different command, name, scope, project, or source path.',
@@ -18243,8 +18353,6 @@ extension on Translations {
 			'terminal.tabs.shellName' => ({required Object index}) => 'Shell ${index}',
 			'terminal.tabs.plainShell' => 'Plain Shell',
 			'terminal.tabs.claudeCli' => 'Claude CLI',
-			_ => null,
-		} ?? switch (path) {
 			'terminal.tabs.opencodeCli' => 'OpenCode CLI',
 			'terminal.tabs.commandCodeCli' => 'Command Code CLI',
 			'terminal.tabs.antigravityCli' => 'Antigravity CLI',
@@ -18336,6 +18444,7 @@ extension on Translations {
 			'workspace.paneTitle.notes' => 'Shared notes',
 			'workspace.paneTitle.editor' => 'Editor',
 			'workspace.paneTitle.git' => 'Git',
+			'workspace.paneTitle.preview' => 'Preview',
 			'workspace.addEditorPane' => 'Add editor pane',
 			'workspace.addGitPane' => 'Add git pane',
 			'workspace.unknownProjectPath' => 'Unknown project path',

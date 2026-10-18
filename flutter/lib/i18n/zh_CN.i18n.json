@@ -3658,6 +3658,31 @@
     "viewError": "浏览器视图错误",
     "web": "Web"
   },
+  "appPreview": {
+    "selectTarget": "选择预览",
+    "enterUrl": "输入 URL…",
+    "urlHint": "http://localhost:8080",
+    "open": "打开",
+    "emptyTitle": "暂无可预览内容",
+    "emptyBody": "启动应用的开发服务器，让智能体调用 MCP 工具 preview_open，或在此输入其 URL。",
+    "mcpHint": "智能体通过 DDAgent MCP 服务器（设置 → MCP → 安装）连接此面板，并以开发服务器 URL 调用 preview_open。",
+    "platform": {
+      "label": "平台",
+      "mobile": "移动端",
+      "web": "Web",
+      "desktop": "桌面端"
+    },
+    "device": "设备",
+    "rotate": "旋转",
+    "back": "后退",
+    "reload": "重新加载",
+    "openExternal": "在系统浏览器中打开",
+    "removeTarget": "移除预览",
+    "fit": "适应面板",
+    "actualSize": "实际大小",
+    "starting": "正在启动预览…",
+    "retry": "重试"
+  },
   "collab": {
     "team": "团队",
     "invite": "邀请",
@@ -4276,7 +4301,8 @@
       "terminal": "终端",
       "notes": "共享笔记",
       "editor": "编辑器",
-      "git": "Git"
+      "git": "Git",
+      "preview": "预览"
     },
     "addEditorPane": "添加编辑器窗格",
     "addGitPane": "添加 Git 窗格",

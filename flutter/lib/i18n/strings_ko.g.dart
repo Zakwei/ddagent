@@ -49,6 +49,7 @@ class TranslationsKo extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final Translations$tasks$ko tasks = Translations$tasks$ko._(_root);
 	@override late final Translations$knowledge$ko knowledge = Translations$knowledge$ko._(_root);
 	@override late final Translations$browser$ko browser = Translations$browser$ko._(_root);
+	@override late final Translations$appPreview$ko appPreview = Translations$appPreview$ko._(_root);
 	@override late final Translations$collab$ko collab = Translations$collab$ko._(_root);
 	@override late final Translations$fileTree$ko fileTree = Translations$fileTree$ko._(_root);
 	@override late final Translations$git$ko git = Translations$git$ko._(_root);
@@ -360,6 +361,33 @@ class Translations$browser$ko extends Translations$browser$en {
 	@override String get dialogTitle => '에이전트 브라우저';
 	@override String get viewError => '브라우저 뷰 오류';
 	@override String get web => '웹';
+}
+
+// Path: appPreview
+class Translations$appPreview$ko extends Translations$appPreview$en {
+	Translations$appPreview$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get selectTarget => '미리보기 선택';
+	@override String get enterUrl => 'URL 입력…';
+	@override String get urlHint => 'http://localhost:8080';
+	@override String get open => '열기';
+	@override String get emptyTitle => '아직 미리볼 항목이 없습니다';
+	@override String get emptyBody => '앱의 개발 서버를 실행하고 에이전트가 MCP 도구 preview_open을 호출하게 하거나, 여기에 URL을 입력하세요.';
+	@override String get mcpHint => '에이전트는 DDAgent MCP 서버(설정 → MCP → 설치)를 통해 이 창에 연결하고 개발 서버 URL로 preview_open을 호출합니다.';
+	@override late final Translations$appPreview$platform$ko platform = Translations$appPreview$platform$ko._(_root);
+	@override String get device => '기기';
+	@override String get rotate => '회전';
+	@override String get back => '뒤로';
+	@override String get reload => '새로고침';
+	@override String get openExternal => '시스템 브라우저에서 열기';
+	@override String get removeTarget => '미리보기 제거';
+	@override String get fit => '창에 맞추기';
+	@override String get actualSize => '실제 크기';
+	@override String get starting => '미리보기 시작 중…';
+	@override String get retry => '다시 시도';
 }
 
 // Path: collab
@@ -4292,6 +4320,19 @@ class Translations$knowledge$entityTypes$ko extends Translations$knowledge$entit
 	@override String get tag => '태그';
 }
 
+// Path: appPreview.platform
+class Translations$appPreview$platform$ko extends Translations$appPreview$platform$en {
+	Translations$appPreview$platform$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get label => '플랫폼';
+	@override String get mobile => '모바일';
+	@override String get web => '웹';
+	@override String get desktop => '데스크톱';
+}
+
 // Path: collab.roles
 class Translations$collab$roles$ko extends Translations$collab$roles$en {
 	Translations$collab$roles$ko._(TranslationsKo root) : this._root = root, super.internal(root);
@@ -5094,6 +5135,7 @@ class Translations$workspace$paneTitle$ko extends Translations$workspace$paneTit
 	@override String get notes => '공유 노트';
 	@override String get editor => '편집기';
 	@override String get git => 'Git';
+	@override String get preview => '미리보기';
 }
 
 // Path: worktrees.runtimeStatus
@@ -11331,6 +11373,27 @@ extension on TranslationsKo {
 			'browser.dialogTitle' => '에이전트 브라우저',
 			'browser.viewError' => '브라우저 뷰 오류',
 			'browser.web' => '웹',
+			'appPreview.selectTarget' => '미리보기 선택',
+			'appPreview.enterUrl' => 'URL 입력…',
+			'appPreview.urlHint' => 'http://localhost:8080',
+			'appPreview.open' => '열기',
+			'appPreview.emptyTitle' => '아직 미리볼 항목이 없습니다',
+			'appPreview.emptyBody' => '앱의 개발 서버를 실행하고 에이전트가 MCP 도구 preview_open을 호출하게 하거나, 여기에 URL을 입력하세요.',
+			'appPreview.mcpHint' => '에이전트는 DDAgent MCP 서버(설정 → MCP → 설치)를 통해 이 창에 연결하고 개발 서버 URL로 preview_open을 호출합니다.',
+			'appPreview.platform.label' => '플랫폼',
+			'appPreview.platform.mobile' => '모바일',
+			'appPreview.platform.web' => '웹',
+			'appPreview.platform.desktop' => '데스크톱',
+			'appPreview.device' => '기기',
+			'appPreview.rotate' => '회전',
+			'appPreview.back' => '뒤로',
+			'appPreview.reload' => '새로고침',
+			'appPreview.openExternal' => '시스템 브라우저에서 열기',
+			'appPreview.removeTarget' => '미리보기 제거',
+			'appPreview.fit' => '창에 맞추기',
+			'appPreview.actualSize' => '실제 크기',
+			'appPreview.starting' => '미리보기 시작 중…',
+			'appPreview.retry' => '다시 시도',
 			'collab.team' => '팀',
 			'collab.invite' => '초대',
 			'collab.inviteTeammate' => '팀원 초대',
@@ -11653,6 +11716,8 @@ extension on TranslationsKo {
 			'skills.empty.noSkillsInProject' => '이 프로젝트에 스킬이 없습니다',
 			'skills.empty.noSkillsInProjectDescription' => '선택한 프로젝트에 .claude/skills, .cursor/skills 또는 .agents/skills 폴더를 만드세요.',
 			'skills.empty.noGlobalSkills' => '아직 발견된 전역 스킬이 없습니다',
+			_ => null,
+		} ?? switch (path) {
 			'skills.empty.noGlobalSkillsDescription' => '위에서 전역 스킬을 추가하면 모든 프로젝트에서 사용할 수 있습니다.',
 			'skills.empty.noMatchingSkills' => '일치하는 스킬 없음',
 			'skills.empty.noMatchingSkillsDescription' => '다른 명령어, 이름, 범위, 프로젝트 또는 소스 경로를 시도해보세요.',
@@ -11674,8 +11739,6 @@ extension on TranslationsKo {
 			'terminal.tabs.shellName' => ({required Object index}) => '셸 ${index}',
 			'terminal.tabs.plainShell' => '일반 Shell',
 			'terminal.tabs.claudeCli' => 'Claude CLI',
-			_ => null,
-		} ?? switch (path) {
 			'terminal.tabs.opencodeCli' => 'OpenCode CLI',
 			'terminal.tabs.commandCodeCli' => 'Command Code CLI',
 			'terminal.tabs.antigravityCli' => 'Antigravity CLI',
@@ -11767,6 +11830,7 @@ extension on TranslationsKo {
 			'workspace.paneTitle.notes' => '공유 노트',
 			'workspace.paneTitle.editor' => '편집기',
 			'workspace.paneTitle.git' => 'Git',
+			'workspace.paneTitle.preview' => '미리보기',
 			'workspace.addEditorPane' => '편집기 창 추가',
 			'workspace.addGitPane' => 'Git 창 추가',
 			'workspace.unknownProjectPath' => '알 수 없는 프로젝트 경로',

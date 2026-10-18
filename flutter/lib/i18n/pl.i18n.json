@@ -3706,6 +3706,31 @@
     "viewError": "Błąd widoku przeglądarki",
     "web": "Web"
   },
+  "appPreview": {
+    "selectTarget": "Wybierz podgląd",
+    "enterUrl": "Wpisz adres URL…",
+    "urlHint": "http://localhost:8080",
+    "open": "Otwórz",
+    "emptyTitle": "Nie ma jeszcze czego podglądać",
+    "emptyBody": "Uruchom serwer deweloperski aplikacji i pozwól agentowi wywołać narzędzie MCP preview_open albo wpisz tutaj jego adres URL.",
+    "mcpHint": "Agenci łączą się z tym panelem przez serwer MCP DDAgent (Ustawienia → MCP → Zainstaluj) i wywołują preview_open z adresem serwera deweloperskiego.",
+    "platform": {
+      "label": "Platforma",
+      "mobile": "Mobilna",
+      "web": "Web",
+      "desktop": "Desktop"
+    },
+    "device": "Urządzenie",
+    "rotate": "Obróć",
+    "back": "Wstecz",
+    "reload": "Odśwież",
+    "openExternal": "Otwórz w przeglądarce systemowej",
+    "removeTarget": "Usuń podgląd",
+    "fit": "Dopasuj do panelu",
+    "actualSize": "Rzeczywisty rozmiar",
+    "starting": "Uruchamianie podglądu…",
+    "retry": "Ponów"
+  },
   "collab": {
     "team": "Zespół",
     "invite": "Zaproś",
@@ -4327,7 +4352,8 @@
       "terminal": "Terminal",
       "notes": "Wspólne notatki",
       "editor": "Edytor",
-      "git": "Git"
+      "git": "Git",
+      "preview": "Podgląd"
     },
     "addEditorPane": "Dodaj panel edytora",
     "addGitPane": "Dodaj panel Git",

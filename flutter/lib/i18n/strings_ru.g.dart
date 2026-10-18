@@ -49,6 +49,7 @@ class TranslationsRu extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final Translations$tasks$ru tasks = Translations$tasks$ru._(_root);
 	@override late final Translations$knowledge$ru knowledge = Translations$knowledge$ru._(_root);
 	@override late final Translations$browser$ru browser = Translations$browser$ru._(_root);
+	@override late final Translations$appPreview$ru appPreview = Translations$appPreview$ru._(_root);
 	@override late final Translations$collab$ru collab = Translations$collab$ru._(_root);
 	@override late final Translations$fileTree$ru fileTree = Translations$fileTree$ru._(_root);
 	@override late final Translations$git$ru git = Translations$git$ru._(_root);
@@ -360,6 +361,33 @@ class Translations$browser$ru extends Translations$browser$en {
 	@override String get dialogTitle => 'Браузер агента';
 	@override String get viewError => 'Ошибка представления браузера';
 	@override String get web => 'Веб';
+}
+
+// Path: appPreview
+class Translations$appPreview$ru extends Translations$appPreview$en {
+	Translations$appPreview$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get selectTarget => 'Выбрать предпросмотр';
+	@override String get enterUrl => 'Ввести URL…';
+	@override String get urlHint => 'http://localhost:8080';
+	@override String get open => 'Открыть';
+	@override String get emptyTitle => 'Пока нечего показывать';
+	@override String get emptyBody => 'Запустите dev-сервер приложения и дайте агенту вызвать MCP-инструмент preview_open или введите его URL здесь.';
+	@override String get mcpHint => 'Агенты подключаются к этой панели через MCP-сервер DDAgent (Настройки → MCP → Установить) и вызывают preview_open с URL dev-сервера.';
+	@override late final Translations$appPreview$platform$ru platform = Translations$appPreview$platform$ru._(_root);
+	@override String get device => 'Устройство';
+	@override String get rotate => 'Повернуть';
+	@override String get back => 'Назад';
+	@override String get reload => 'Обновить';
+	@override String get openExternal => 'Открыть в системном браузере';
+	@override String get removeTarget => 'Убрать предпросмотр';
+	@override String get fit => 'Вписать в панель';
+	@override String get actualSize => 'Реальный размер';
+	@override String get starting => 'Запуск предпросмотра…';
+	@override String get retry => 'Повторить';
 }
 
 // Path: collab
@@ -4330,6 +4358,19 @@ class Translations$knowledge$entityTypes$ru extends Translations$knowledge$entit
 	@override String get tag => 'Тег';
 }
 
+// Path: appPreview.platform
+class Translations$appPreview$platform$ru extends Translations$appPreview$platform$en {
+	Translations$appPreview$platform$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get label => 'Платформа';
+	@override String get mobile => 'Мобильная';
+	@override String get web => 'Веб';
+	@override String get desktop => 'Десктоп';
+}
+
 // Path: collab.roles
 class Translations$collab$roles$ru extends Translations$collab$roles$en {
 	Translations$collab$roles$ru._(TranslationsRu root) : this._root = root, super.internal(root);
@@ -5132,6 +5173,7 @@ class Translations$workspace$paneTitle$ru extends Translations$workspace$paneTit
 	@override String get notes => 'Общие заметки';
 	@override String get editor => 'Редактор';
 	@override String get git => 'Git';
+	@override String get preview => 'Предпросмотр';
 }
 
 // Path: worktrees.runtimeStatus
@@ -11380,6 +11422,27 @@ extension on TranslationsRu {
 			'browser.dialogTitle' => 'Браузер агента',
 			'browser.viewError' => 'Ошибка представления браузера',
 			'browser.web' => 'Веб',
+			'appPreview.selectTarget' => 'Выбрать предпросмотр',
+			'appPreview.enterUrl' => 'Ввести URL…',
+			'appPreview.urlHint' => 'http://localhost:8080',
+			'appPreview.open' => 'Открыть',
+			'appPreview.emptyTitle' => 'Пока нечего показывать',
+			'appPreview.emptyBody' => 'Запустите dev-сервер приложения и дайте агенту вызвать MCP-инструмент preview_open или введите его URL здесь.',
+			'appPreview.mcpHint' => 'Агенты подключаются к этой панели через MCP-сервер DDAgent (Настройки → MCP → Установить) и вызывают preview_open с URL dev-сервера.',
+			'appPreview.platform.label' => 'Платформа',
+			'appPreview.platform.mobile' => 'Мобильная',
+			'appPreview.platform.web' => 'Веб',
+			'appPreview.platform.desktop' => 'Десктоп',
+			'appPreview.device' => 'Устройство',
+			'appPreview.rotate' => 'Повернуть',
+			'appPreview.back' => 'Назад',
+			'appPreview.reload' => 'Обновить',
+			'appPreview.openExternal' => 'Открыть в системном браузере',
+			'appPreview.removeTarget' => 'Убрать предпросмотр',
+			'appPreview.fit' => 'Вписать в панель',
+			'appPreview.actualSize' => 'Реальный размер',
+			'appPreview.starting' => 'Запуск предпросмотра…',
+			'appPreview.retry' => 'Повторить',
 			'collab.team' => 'Команда',
 			'collab.invite' => 'Пригласить',
 			'collab.inviteTeammate' => 'Пригласить коллегу',
@@ -11702,6 +11765,8 @@ extension on TranslationsRu {
 			'skills.empty.noSkillsInProject' => 'В этом проекте нет навыков',
 			'skills.empty.noSkillsInProjectDescription' => 'Создайте папку .claude/skills, .cursor/skills или .agents/skills в выбранном проекте.',
 			'skills.empty.noGlobalSkills' => 'Глобальные навыки пока не найдены',
+			_ => null,
+		} ?? switch (path) {
 			'skills.empty.noGlobalSkillsDescription' => 'Добавьте глобальный навык выше, чтобы он был доступен во всех проектах.',
 			'skills.empty.noMatchingSkills' => 'Нет подходящих навыков',
 			'skills.empty.noMatchingSkillsDescription' => 'Попробуйте другую команду, имя, область, проект или исходный путь.',
@@ -11723,8 +11788,6 @@ extension on TranslationsRu {
 			'terminal.tabs.shellName' => ({required Object index}) => 'Оболочка ${index}',
 			'terminal.tabs.plainShell' => 'Простая оболочка',
 			'terminal.tabs.claudeCli' => 'Claude CLI',
-			_ => null,
-		} ?? switch (path) {
 			'terminal.tabs.opencodeCli' => 'OpenCode CLI',
 			'terminal.tabs.commandCodeCli' => 'Command Code CLI',
 			'terminal.tabs.antigravityCli' => 'Antigravity CLI',
@@ -11816,6 +11879,7 @@ extension on TranslationsRu {
 			'workspace.paneTitle.notes' => 'Общие заметки',
 			'workspace.paneTitle.editor' => 'Редактор',
 			'workspace.paneTitle.git' => 'Git',
+			'workspace.paneTitle.preview' => 'Предпросмотр',
 			'workspace.addEditorPane' => 'Добавить панель редактора',
 			'workspace.addGitPane' => 'Добавить панель Git',
 			'workspace.unknownProjectPath' => 'Неизвестный путь проекта',

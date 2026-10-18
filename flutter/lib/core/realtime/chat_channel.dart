@@ -37,6 +37,10 @@ abstract final class BroadcastKinds {
   static const kanbanPrefix = 'kanban-';
   static const taskmasterPrefix = 'taskmaster-';
 
+  /// App-preview registry changes (`app-preview-upserted|removed|reloaded`),
+  /// pushed to every client when an agent opens a preview over MCP.
+  static const appPreviewPrefix = 'app-preview-';
+
   /// Per-user workspace-state sync — broadcast to the account's other sockets.
   static const workspaceState = 'workspace_state';
 }
@@ -102,7 +106,8 @@ class ServerEvent {
       kind == BroadcastKinds.sessionRemoved ||
       kind == BroadcastKinds.workspaceState ||
       kind.startsWith(BroadcastKinds.kanbanPrefix) ||
-      kind.startsWith(BroadcastKinds.taskmasterPrefix);
+      kind.startsWith(BroadcastKinds.taskmasterPrefix) ||
+      kind.startsWith(BroadcastKinds.appPreviewPrefix);
 }
 
 /// Replay cursor for one session — `{runId, seq}` pair (seq restarts per run).

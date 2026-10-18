@@ -52,6 +52,7 @@ import { schedulerRoutes, schedulerService } from './modules/scheduler/index.js'
 import { mcpRouter, mcpTokensRouter } from './modules/mcp-server/index.js';
 import { collabRoutes } from './modules/collab/index.js';
 import { closeAllBrowserViewSessions } from './modules/browser-view/index.js';
+import { appPreviewRoutes } from './modules/app-preview/index.js';
 import { initializeDatabase, sessionsDb } from './modules/database/index.js';
 import { configureWebPush, startTelegramPoller, stopTelegramPoller } from './modules/notifications/index.js';
 
@@ -353,6 +354,9 @@ export async function createServices(options: CreateServicesOptions = {}): Promi
 
     // Browser API Routes (protected)
     app.use('/api/browser-use', authenticateToken, browserUseRoutes);
+
+    // App preview targets registered by agents for the Preview pane (protected)
+    app.use('/api/app-preview', authenticateToken, appPreviewRoutes);
 
     // Unified provider MCP routes (protected)
     app.use('/api/providers', authenticateToken, providerRoutes);

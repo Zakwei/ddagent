@@ -6,6 +6,7 @@ import 'package:ddagent_app/core/realtime/realtime_providers.dart';
 import 'package:ddagent_app/core/realtime/ws_client.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
+import 'package:ddagent_app/features/browser/view/browser_key_mapping.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -197,67 +198,16 @@ class _RemoteBrowserViewState extends ConsumerState<RemoteBrowserView> {
     _safeSend(() => _ch.mouse(event, x: p.dx, y: p.dy, button: _downButton));
   }
 
-  int get _modifiers =>
-      (HardwareKeyboard.instance.isAltPressed ? 1 : 0) |
-      (HardwareKeyboard.instance.isControlPressed ? 2 : 0) |
-      (HardwareKeyboard.instance.isMetaPressed ? 4 : 0) |
-      (HardwareKeyboard.instance.isShiftPressed ? 8 : 0);
-
-  /// Windows virtual-key codes CDP needs for editing/navigation keys —
-  /// Flutter's `keyId` for these is a plane-prefixed id Chromium ignores.
-  static const _vkCodes = <String, int>{
-    'Backspace': 8,
-    'Tab': 9,
-    'Enter': 13,
-    'Escape': 27,
-    'PageUp': 33,
-    'PageDown': 34,
-    'End': 35,
-    'Home': 36,
-    'ArrowLeft': 37,
-    'ArrowUp': 38,
-    'ArrowRight': 39,
-    'ArrowDown': 40,
-    'Insert': 45,
-    'Delete': 46,
-  };
-
   void _key(KeyEvent e, String phase) {
-    var modifiers = _modifiers;
-    // `keyLabel` is the key cap ("A", "1"), not the typed character — the
-    // real text (case, Shift symbols, AltGr letters like "ą") is
-    // `character`. AltGr reports as Ctrl+Alt, so it still counts as text.
-    final char = e.character;
-    final altGr = (modifiers & (1 | 2 | 4)) == (1 | 2);
-    final printable =
-        char != null &&
-        char.isNotEmpty &&
-        char.codeUnitAt(0) >= 0x20 &&
-        char.codeUnitAt(0) != 0x7f &&
-        ((modifiers & (1 | 2 | 4)) == 0 || altGr);
-    if (printable && altGr) modifiers &= ~(1 | 2);
-    final id = e.logicalKey.keyId;
-    final named = e.logicalKey.keyLabel.replaceAll(' ', ''); // "Arrow Left" → DOM "ArrowLeft"
-    final key = printable ? char : (id < 0x80 ? String.fromCharCode(id) : named);
-    final keyCode = id >= 0x61 && id <= 0x7a
-        ? id -
-              0x20 // a-z → VK_A..VK_Z
-        : id < 0x80
-        ? id
-        : _vkCodes[named];
+    final p = browserKeyPayload(e, phase);
     _safeSend(
       () => _ch.key(
         phase,
-        key: key,
-        code: id >= 0x61 && id <= 0x7a
-            ? 'Key${String.fromCharCode(id - 0x20)}'
-            : id >= 0x30 && id <= 0x39
-            ? 'Digit${String.fromCharCode(id)}'
-            : (_vkCodes.containsKey(named) ? named : null),
-        keyCode: keyCode,
-        // Enter only submits forms when the keydown carries "\r".
-        text: phase == 'down' ? (printable ? char : (named == 'Enter' ? '\r' : null)) : null,
-        modifiers: modifiers,
+        key: p.key,
+        code: p.code,
+        keyCode: p.keyCode,
+        text: p.text,
+        modifiers: p.modifiers,
       ),
     );
   }

@@ -3668,6 +3668,31 @@
     "viewError": "Error en la vista del navegador",
     "web": "Web"
   },
+  "appPreview": {
+    "selectTarget": "Elegir vista previa",
+    "enterUrl": "Introducir URL…",
+    "urlHint": "http://localhost:8080",
+    "open": "Abrir",
+    "emptyTitle": "Todavía no hay nada que previsualizar",
+    "emptyBody": "Inicia el servidor de desarrollo de la app y deja que el agente llame a la herramienta MCP preview_open, o introduce su URL aquí.",
+    "mcpHint": "Los agentes llegan a este panel a través del servidor MCP de DDAgent (Ajustes → MCP → Instalar) y llaman a preview_open con la URL del servidor de desarrollo.",
+    "platform": {
+      "label": "Plataforma",
+      "mobile": "Móvil",
+      "web": "Web",
+      "desktop": "Escritorio"
+    },
+    "device": "Dispositivo",
+    "rotate": "Girar",
+    "back": "Atrás",
+    "reload": "Recargar",
+    "openExternal": "Abrir en el navegador del sistema",
+    "removeTarget": "Quitar vista previa",
+    "fit": "Ajustar al panel",
+    "actualSize": "Tamaño real",
+    "starting": "Iniciando vista previa…",
+    "retry": "Reintentar"
+  },
   "collab": {
     "team": "Equipo",
     "invite": "Invitación",
@@ -4287,7 +4312,8 @@
       "terminal": "Terminal",
       "notes": "Notas compartidas",
       "editor": "Editor",
-      "git": "Git"
+      "git": "Git",
+      "preview": "Vista previa"
     },
     "addEditorPane": "Añadir panel de editor",
     "addGitPane": "Añadir panel de Git",

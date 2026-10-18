@@ -49,6 +49,7 @@ class TranslationsPl extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final Translations$tasks$pl tasks = Translations$tasks$pl._(_root);
 	@override late final Translations$knowledge$pl knowledge = Translations$knowledge$pl._(_root);
 	@override late final Translations$browser$pl browser = Translations$browser$pl._(_root);
+	@override late final Translations$appPreview$pl appPreview = Translations$appPreview$pl._(_root);
 	@override late final Translations$collab$pl collab = Translations$collab$pl._(_root);
 	@override late final Translations$fileTree$pl fileTree = Translations$fileTree$pl._(_root);
 	@override late final Translations$git$pl git = Translations$git$pl._(_root);
@@ -360,6 +361,33 @@ class Translations$browser$pl extends Translations$browser$en {
 	@override String get dialogTitle => 'Browser agenta';
 	@override String get viewError => 'Błąd widoku przeglądarki';
 	@override String get web => 'Web';
+}
+
+// Path: appPreview
+class Translations$appPreview$pl extends Translations$appPreview$en {
+	Translations$appPreview$pl._(TranslationsPl root) : this._root = root, super.internal(root);
+
+	final TranslationsPl _root; // ignore: unused_field
+
+	// Translations
+	@override String get selectTarget => 'Wybierz podgląd';
+	@override String get enterUrl => 'Wpisz adres URL…';
+	@override String get urlHint => 'http://localhost:8080';
+	@override String get open => 'Otwórz';
+	@override String get emptyTitle => 'Nie ma jeszcze czego podglądać';
+	@override String get emptyBody => 'Uruchom serwer deweloperski aplikacji i pozwól agentowi wywołać narzędzie MCP preview_open albo wpisz tutaj jego adres URL.';
+	@override String get mcpHint => 'Agenci łączą się z tym panelem przez serwer MCP DDAgent (Ustawienia → MCP → Zainstaluj) i wywołują preview_open z adresem serwera deweloperskiego.';
+	@override late final Translations$appPreview$platform$pl platform = Translations$appPreview$platform$pl._(_root);
+	@override String get device => 'Urządzenie';
+	@override String get rotate => 'Obróć';
+	@override String get back => 'Wstecz';
+	@override String get reload => 'Odśwież';
+	@override String get openExternal => 'Otwórz w przeglądarce systemowej';
+	@override String get removeTarget => 'Usuń podgląd';
+	@override String get fit => 'Dopasuj do panelu';
+	@override String get actualSize => 'Rzeczywisty rozmiar';
+	@override String get starting => 'Uruchamianie podglądu…';
+	@override String get retry => 'Ponów';
 }
 
 // Path: collab
@@ -4332,6 +4360,19 @@ class Translations$knowledge$entityTypes$pl extends Translations$knowledge$entit
 	@override String get tag => 'Tag';
 }
 
+// Path: appPreview.platform
+class Translations$appPreview$platform$pl extends Translations$appPreview$platform$en {
+	Translations$appPreview$platform$pl._(TranslationsPl root) : this._root = root, super.internal(root);
+
+	final TranslationsPl _root; // ignore: unused_field
+
+	// Translations
+	@override String get label => 'Platforma';
+	@override String get mobile => 'Mobilna';
+	@override String get web => 'Web';
+	@override String get desktop => 'Desktop';
+}
+
 // Path: collab.roles
 class Translations$collab$roles$pl extends Translations$collab$roles$en {
 	Translations$collab$roles$pl._(TranslationsPl root) : this._root = root, super.internal(root);
@@ -5134,6 +5175,7 @@ class Translations$workspace$paneTitle$pl extends Translations$workspace$paneTit
 	@override String get notes => 'Wspólne notatki';
 	@override String get editor => 'Edytor';
 	@override String get git => 'Git';
+	@override String get preview => 'Podgląd';
 }
 
 // Path: worktrees.runtimeStatus
@@ -11382,6 +11424,27 @@ extension on TranslationsPl {
 			'browser.dialogTitle' => 'Browser agenta',
 			'browser.viewError' => 'Błąd widoku przeglądarki',
 			'browser.web' => 'Web',
+			'appPreview.selectTarget' => 'Wybierz podgląd',
+			'appPreview.enterUrl' => 'Wpisz adres URL…',
+			'appPreview.urlHint' => 'http://localhost:8080',
+			'appPreview.open' => 'Otwórz',
+			'appPreview.emptyTitle' => 'Nie ma jeszcze czego podglądać',
+			'appPreview.emptyBody' => 'Uruchom serwer deweloperski aplikacji i pozwól agentowi wywołać narzędzie MCP preview_open albo wpisz tutaj jego adres URL.',
+			'appPreview.mcpHint' => 'Agenci łączą się z tym panelem przez serwer MCP DDAgent (Ustawienia → MCP → Zainstaluj) i wywołują preview_open z adresem serwera deweloperskiego.',
+			'appPreview.platform.label' => 'Platforma',
+			'appPreview.platform.mobile' => 'Mobilna',
+			'appPreview.platform.web' => 'Web',
+			'appPreview.platform.desktop' => 'Desktop',
+			'appPreview.device' => 'Urządzenie',
+			'appPreview.rotate' => 'Obróć',
+			'appPreview.back' => 'Wstecz',
+			'appPreview.reload' => 'Odśwież',
+			'appPreview.openExternal' => 'Otwórz w przeglądarce systemowej',
+			'appPreview.removeTarget' => 'Usuń podgląd',
+			'appPreview.fit' => 'Dopasuj do panelu',
+			'appPreview.actualSize' => 'Rzeczywisty rozmiar',
+			'appPreview.starting' => 'Uruchamianie podglądu…',
+			'appPreview.retry' => 'Ponów',
 			'collab.team' => 'Zespół',
 			'collab.invite' => 'Zaproś',
 			'collab.inviteTeammate' => 'Zaproś członka zespołu',
@@ -11704,6 +11767,8 @@ extension on TranslationsPl {
 			'skills.empty.noSkillsInProject' => 'Brak skilli w tym projekcie',
 			'skills.empty.noSkillsInProjectDescription' => 'Utwórz folder .claude/skills, .cursor/skills lub .agents/skills w wybranym projekcie.',
 			'skills.empty.noGlobalSkills' => 'Nie wykryto jeszcze globalnych skilli',
+			_ => null,
+		} ?? switch (path) {
 			'skills.empty.noGlobalSkillsDescription' => 'Dodaj globalny skill powyżej, aby był dostępny we wszystkich projektach.',
 			'skills.empty.noMatchingSkills' => 'Brak pasujących skilli',
 			'skills.empty.noMatchingSkillsDescription' => 'Spróbuj innego polecenia, nazwy, zakresu, projektu lub ścieżki źródłowej.',
@@ -11725,8 +11790,6 @@ extension on TranslationsPl {
 			'terminal.tabs.shellName' => ({required Object index}) => 'Shell ${index}',
 			'terminal.tabs.plainShell' => 'Zwykły shell',
 			'terminal.tabs.claudeCli' => 'Claude CLI',
-			_ => null,
-		} ?? switch (path) {
 			'terminal.tabs.opencodeCli' => 'OpenCode CLI',
 			'terminal.tabs.commandCodeCli' => 'Command Code CLI',
 			'terminal.tabs.antigravityCli' => 'Antigravity CLI',
@@ -11818,6 +11881,7 @@ extension on TranslationsPl {
 			'workspace.paneTitle.notes' => 'Wspólne notatki',
 			'workspace.paneTitle.editor' => 'Edytor',
 			'workspace.paneTitle.git' => 'Git',
+			'workspace.paneTitle.preview' => 'Podgląd',
 			'workspace.addEditorPane' => 'Dodaj panel edytora',
 			'workspace.addGitPane' => 'Dodaj panel Git',
 			'workspace.unknownProjectPath' => 'Nieznana ścieżka projektu',

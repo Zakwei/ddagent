@@ -3668,6 +3668,31 @@
     "viewError": "Erreur d’affichage du navigateur",
     "web": "Web"
   },
+  "appPreview": {
+    "selectTarget": "Choisir un aperçu",
+    "enterUrl": "Saisir une URL…",
+    "urlHint": "http://localhost:8080",
+    "open": "Ouvrir",
+    "emptyTitle": "Rien à prévisualiser pour l'instant",
+    "emptyBody": "Démarrez le serveur de développement de l'app et laissez l'agent appeler l'outil MCP preview_open, ou saisissez son URL ici.",
+    "mcpHint": "Les agents atteignent ce volet via le serveur MCP DDAgent (Paramètres → MCP → Installer) et appellent preview_open avec l'URL du serveur de développement.",
+    "platform": {
+      "label": "Plateforme",
+      "mobile": "Mobile",
+      "web": "Web",
+      "desktop": "Bureau"
+    },
+    "device": "Appareil",
+    "rotate": "Pivoter",
+    "back": "Retour",
+    "reload": "Recharger",
+    "openExternal": "Ouvrir dans le navigateur système",
+    "removeTarget": "Retirer l'aperçu",
+    "fit": "Ajuster au volet",
+    "actualSize": "Taille réelle",
+    "starting": "Démarrage de l'aperçu…",
+    "retry": "Réessayer"
+  },
   "collab": {
     "team": "Équipe",
     "invite": "Inviter",
@@ -4287,7 +4312,8 @@
       "terminal": "Terminal",
       "notes": "Notes partagées",
       "editor": "Éditeur",
-      "git": "Git"
+      "git": "Git",
+      "preview": "Aperçu"
     },
     "addEditorPane": "Ajouter un panneau d’éditeur",
     "addGitPane": "Ajouter un panneau Git",

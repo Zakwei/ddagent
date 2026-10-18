@@ -189,6 +189,12 @@ test('tools/list exposes the ddagent tool catalog', async () => {
         'knowledge_update_rule',
         'knowledge_update_skill',
         'list_sessions',
+        'preview_close',
+        'preview_devices',
+        'preview_list',
+        'preview_open',
+        'preview_reload',
+        'preview_update',
         'send_message',
       ]);
     });

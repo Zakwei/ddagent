@@ -49,6 +49,7 @@ class TranslationsJa extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final Translations$tasks$ja tasks = Translations$tasks$ja._(_root);
 	@override late final Translations$knowledge$ja knowledge = Translations$knowledge$ja._(_root);
 	@override late final Translations$browser$ja browser = Translations$browser$ja._(_root);
+	@override late final Translations$appPreview$ja appPreview = Translations$appPreview$ja._(_root);
 	@override late final Translations$collab$ja collab = Translations$collab$ja._(_root);
 	@override late final Translations$fileTree$ja fileTree = Translations$fileTree$ja._(_root);
 	@override late final Translations$git$ja git = Translations$git$ja._(_root);
@@ -360,6 +361,33 @@ class Translations$browser$ja extends Translations$browser$en {
 	@override String get dialogTitle => 'エージェントブラウザ';
 	@override String get viewError => 'ブラウザ表示エラー';
 	@override String get web => 'Web';
+}
+
+// Path: appPreview
+class Translations$appPreview$ja extends Translations$appPreview$en {
+	Translations$appPreview$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get selectTarget => 'プレビューを選択';
+	@override String get enterUrl => 'URL を入力…';
+	@override String get urlHint => 'http://localhost:8080';
+	@override String get open => '開く';
+	@override String get emptyTitle => 'まだプレビューするものがありません';
+	@override String get emptyBody => 'アプリの開発サーバーを起動してエージェントに MCP ツール preview_open を呼ばせるか、ここに URL を入力してください。';
+	@override String get mcpHint => 'エージェントは DDAgent MCP サーバー（設定 → MCP → インストール）経由でこのペインに接続し、開発サーバーの URL を指定して preview_open を呼び出します。';
+	@override late final Translations$appPreview$platform$ja platform = Translations$appPreview$platform$ja._(_root);
+	@override String get device => 'デバイス';
+	@override String get rotate => '回転';
+	@override String get back => '戻る';
+	@override String get reload => '再読み込み';
+	@override String get openExternal => 'システムブラウザで開く';
+	@override String get removeTarget => 'プレビューを削除';
+	@override String get fit => 'ペインに合わせる';
+	@override String get actualSize => '実寸';
+	@override String get starting => 'プレビューを起動中…';
+	@override String get retry => '再試行';
 }
 
 // Path: collab
@@ -4292,6 +4320,19 @@ class Translations$knowledge$entityTypes$ja extends Translations$knowledge$entit
 	@override String get tag => 'タグ';
 }
 
+// Path: appPreview.platform
+class Translations$appPreview$platform$ja extends Translations$appPreview$platform$en {
+	Translations$appPreview$platform$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get label => 'プラットフォーム';
+	@override String get mobile => 'モバイル';
+	@override String get web => 'Web';
+	@override String get desktop => 'デスクトップ';
+}
+
 // Path: collab.roles
 class Translations$collab$roles$ja extends Translations$collab$roles$en {
 	Translations$collab$roles$ja._(TranslationsJa root) : this._root = root, super.internal(root);
@@ -5094,6 +5135,7 @@ class Translations$workspace$paneTitle$ja extends Translations$workspace$paneTit
 	@override String get notes => '共有メモ';
 	@override String get editor => 'エディター';
 	@override String get git => 'Git';
+	@override String get preview => 'プレビュー';
 }
 
 // Path: worktrees.runtimeStatus
@@ -11331,6 +11373,27 @@ extension on TranslationsJa {
 			'browser.dialogTitle' => 'エージェントブラウザ',
 			'browser.viewError' => 'ブラウザ表示エラー',
 			'browser.web' => 'Web',
+			'appPreview.selectTarget' => 'プレビューを選択',
+			'appPreview.enterUrl' => 'URL を入力…',
+			'appPreview.urlHint' => 'http://localhost:8080',
+			'appPreview.open' => '開く',
+			'appPreview.emptyTitle' => 'まだプレビューするものがありません',
+			'appPreview.emptyBody' => 'アプリの開発サーバーを起動してエージェントに MCP ツール preview_open を呼ばせるか、ここに URL を入力してください。',
+			'appPreview.mcpHint' => 'エージェントは DDAgent MCP サーバー（設定 → MCP → インストール）経由でこのペインに接続し、開発サーバーの URL を指定して preview_open を呼び出します。',
+			'appPreview.platform.label' => 'プラットフォーム',
+			'appPreview.platform.mobile' => 'モバイル',
+			'appPreview.platform.web' => 'Web',
+			'appPreview.platform.desktop' => 'デスクトップ',
+			'appPreview.device' => 'デバイス',
+			'appPreview.rotate' => '回転',
+			'appPreview.back' => '戻る',
+			'appPreview.reload' => '再読み込み',
+			'appPreview.openExternal' => 'システムブラウザで開く',
+			'appPreview.removeTarget' => 'プレビューを削除',
+			'appPreview.fit' => 'ペインに合わせる',
+			'appPreview.actualSize' => '実寸',
+			'appPreview.starting' => 'プレビューを起動中…',
+			'appPreview.retry' => '再試行',
 			'collab.team' => 'チーム',
 			'collab.invite' => '招待',
 			'collab.inviteTeammate' => 'チームメイトを招待',
@@ -11653,6 +11716,8 @@ extension on TranslationsJa {
 			'skills.empty.noSkillsInProject' => 'このプロジェクトにスキルがありません',
 			'skills.empty.noSkillsInProjectDescription' => '選択したプロジェクトに .claude/skills、.cursor/skills、または .agents/skills フォルダを作成してください。',
 			'skills.empty.noGlobalSkills' => 'グローバルスキルはまだ見つかっていません',
+			_ => null,
+		} ?? switch (path) {
 			'skills.empty.noGlobalSkillsDescription' => '上でグローバルスキルを追加すると、すべてのプロジェクトで利用できるようになります。',
 			'skills.empty.noMatchingSkills' => '一致するスキルがありません',
 			'skills.empty.noMatchingSkillsDescription' => '別のコマンド、名前、スコープ、プロジェクト、ソースパスをお試しください。',
@@ -11674,8 +11739,6 @@ extension on TranslationsJa {
 			'terminal.tabs.shellName' => ({required Object index}) => 'シェル ${index}',
 			'terminal.tabs.plainShell' => '通常のシェル',
 			'terminal.tabs.claudeCli' => 'Claude CLI',
-			_ => null,
-		} ?? switch (path) {
 			'terminal.tabs.opencodeCli' => 'OpenCode CLI',
 			'terminal.tabs.commandCodeCli' => 'Command Code CLI',
 			'terminal.tabs.antigravityCli' => 'Antigravity CLI',
@@ -11767,6 +11830,7 @@ extension on TranslationsJa {
 			'workspace.paneTitle.notes' => '共有メモ',
 			'workspace.paneTitle.editor' => 'エディター',
 			'workspace.paneTitle.git' => 'Git',
+			'workspace.paneTitle.preview' => 'プレビュー',
 			'workspace.addEditorPane' => 'エディターペインを追加',
 			'workspace.addGitPane' => 'Git ペインを追加',
 			'workspace.unknownProjectPath' => 'プロジェクトのパスが不明です',

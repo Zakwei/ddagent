@@ -63,6 +63,15 @@ final browserViewChannelProvider = Provider<BrowserViewChannel>((ref) {
   return channel;
 });
 
+/// Preview-pane browser stream — one socket (and one server-side Chromium
+/// page) per preview pane, keyed by pane id, so the app preview never fights
+/// the browser pane over the single shared [browserViewChannelProvider].
+final previewViewChannelProvider = Provider.family<BrowserViewChannel, String>((ref, paneId) {
+  final channel = BrowserViewChannel(_ws(ref, '/browser-view'))..start();
+  ref.onDispose(channel.dispose);
+  return channel;
+});
+
 final desktopNotificationsChannelProvider = Provider<DesktopNotificationsChannel>((ref) {
   final channel = DesktopNotificationsChannel(_ws(ref, '/desktop-notifications'))..start();
   ref.onDispose(channel.dispose);

@@ -19,10 +19,15 @@ class BrowserViewFrame {
 
 /// `/browser-view` channel — embedded-browser remote control.
 ///
-/// Inbound:  start {url?, width?, height?} | navigate | back | forward |
-///           reload | stop | resize | mouse {event,x,y,button?,deltaY?} |
+/// Inbound:  start {url?, width?, height?, device?} | emulate {device?} |
+///           navigate | back | forward | reload | stop | resize |
+///           mouse {event,x,y,button?,deltaY?} |
 ///           key {event,key,code,keyCode,text?,modifiers?} | close
 /// Outbound: ready | frame | navigation | error
+///
+/// `device` is an app-preview device preset id (e.g. `iphone-15-pro`); the
+/// server turns it into Chromium mobile emulation (meta viewport, touch,
+/// phone user agent) so the Preview pane shows a phone layout.
 class BrowserViewChannel {
   BrowserViewChannel(this._ws);
 
@@ -32,13 +37,22 @@ class BrowserViewChannel {
 
   Stream<BrowserViewFrame> get frames => _framesOut.stream;
   Stream<WsState> get states => _ws.states;
+  WsState get wsState => _ws.state;
 
   void start() {
     _sub ??= _ws.frames.listen((raw) => _framesOut.add(BrowserViewFrame(raw: raw)));
   }
 
-  void startView({String? url, int? width, int? height}) =>
-      _ws.send({'type': 'start', 'url': ?url, 'width': ?width, 'height': ?height});
+  void startView({String? url, int? width, int? height, String? device}) => _ws.send({
+    'type': 'start',
+    'url': ?url,
+    'width': ?width,
+    'height': ?height,
+    'device': ?device,
+  });
+
+  /// Switch the live page's device emulation; `null` = plain desktop page.
+  void emulate({String? device}) => _ws.send({'type': 'emulate', 'device': ?device});
   void navigate(String url) => _ws.send({'type': 'navigate', 'url': url});
   void back() => _ws.send({'type': 'back'});
   void forward() => _ws.send({'type': 'forward'});

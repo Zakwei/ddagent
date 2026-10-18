@@ -3658,6 +3658,31 @@
     "viewError": "瀏覽器檢視錯誤",
     "web": "網頁"
   },
+  "appPreview": {
+    "selectTarget": "選擇預覽",
+    "enterUrl": "輸入 URL…",
+    "urlHint": "http://localhost:8080",
+    "open": "開啟",
+    "emptyTitle": "目前沒有可預覽的內容",
+    "emptyBody": "啟動應用程式的開發伺服器，讓代理程式呼叫 MCP 工具 preview_open，或在此輸入其 URL。",
+    "mcpHint": "代理程式透過 DDAgent MCP 伺服器（設定 → MCP → 安裝）連線到此面板，並以開發伺服器 URL 呼叫 preview_open。",
+    "platform": {
+      "label": "平台",
+      "mobile": "行動裝置",
+      "web": "Web",
+      "desktop": "桌面"
+    },
+    "device": "裝置",
+    "rotate": "旋轉",
+    "back": "返回",
+    "reload": "重新載入",
+    "openExternal": "在系統瀏覽器中開啟",
+    "removeTarget": "移除預覽",
+    "fit": "符合面板",
+    "actualSize": "實際大小",
+    "starting": "正在啟動預覽…",
+    "retry": "重試"
+  },
   "collab": {
     "team": "團隊",
     "invite": "邀請",
@@ -4276,7 +4301,8 @@
       "terminal": "終端機",
       "notes": "共用筆記",
       "editor": "編輯器",
-      "git": "Git"
+      "git": "Git",
+      "preview": "預覽"
     },
     "addEditorPane": "新增編輯器窗格",
     "addGitPane": "新增 Git 窗格",

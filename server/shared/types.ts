@@ -2673,3 +2673,94 @@ export type OrchestratorMetricsSnapshot = {
   candidates: OrchestratorCandidateMetrics[];
   generatedAt: string;
 };
+
+// ---------------------------
+//----------------- APP PREVIEW CONTRACTS ------------
+
+/**
+ * Form factor an app preview target is meant to be shown in. The client maps
+ * it to a device frame family: `mobile` = phone/tablet bezel with status bar
+ * and home indicator, `web` = browser chrome with an address bar, `desktop` =
+ * an OS window with a title bar. Shared by the app-preview module (storage and
+ * validation), its REST routes, and the MCP `preview_*` tools.
+ */
+export type AppPreviewPlatform = 'mobile' | 'web' | 'desktop';
+
+/**
+ * Screen orientation of a mobile preview. Ignored for `web` and `desktop`
+ * targets, whose frames are always landscape.
+ */
+export type AppPreviewOrientation = 'portrait' | 'landscape';
+
+/**
+ * One device preset the preview pane can render. `id` is the stable key the
+ * agent passes to `preview_open`/`preview_update`; `width`/`height` are the
+ * CSS-pixel viewport of the device in portrait (phones/tablets) or its window
+ * size (web/desktop). `mobile` turns on Chromium's mobile emulation (meta
+ * viewport, touch events, mobile user agent) for the streamed page.
+ */
+export type AppPreviewDevice = {
+  id: string;
+  label: string;
+  platform: AppPreviewPlatform;
+  width: number;
+  height: number;
+  mobile: boolean;
+  /** User agent sent to the previewed app so it serves its mobile/desktop layout. */
+  userAgent: string | null;
+};
+
+/**
+ * A registered preview target: the URL of an app the agent is building plus
+ * how it should be framed. Targets live in server memory only — they describe
+ * dev servers that do not survive a restart anyway. `reloadToken` increments
+ * on every `preview_reload`, which is how a connected pane learns it must
+ * refresh the page without the URL changing.
+ */
+export type AppPreviewTarget = {
+  id: string;
+  url: string;
+  title: string;
+  platform: AppPreviewPlatform;
+  /** Preset id from the device catalog; `null` = the platform's default device. */
+  device: string | null;
+  orientation: AppPreviewOrientation;
+  /** Absolute project path the target belongs to, when the agent supplied one. */
+  projectPath: string | null;
+  /** Free-form note from the agent ("login screen", "after dark-mode fix"). */
+  note: string | null;
+  createdAt: string;
+  updatedAt: string;
+  reloadToken: number;
+};
+
+/**
+ * Input accepted when the agent (MCP) or the client (REST) registers a target.
+ * Everything but `url` is optional; the service fills defaults and validates
+ * enums, so callers never need to pre-normalise.
+ */
+export type RegisterAppPreviewInput = {
+  url: string;
+  title?: string | null;
+  platform?: string | null;
+  device?: string | null;
+  orientation?: string | null;
+  projectPath?: string | null;
+  note?: string | null;
+};
+
+/**
+ * Partial update for an existing target. `url` may change (the dev server
+ * moved ports); omitted fields are kept, `null` clears nullable fields.
+ */
+export type UpdateAppPreviewInput = Partial<RegisterAppPreviewInput>;
+
+/**
+ * Websocket broadcast emitted on `/ws` whenever the registry changes. The
+ * Flutter preview pane listens for these to open itself, follow URL/device
+ * changes, and refresh on reload.
+ */
+export type AppPreviewBroadcast =
+  | { type: 'app-preview-upserted'; preview: AppPreviewTarget; created: boolean }
+  | { type: 'app-preview-removed'; previewId: string }
+  | { type: 'app-preview-reloaded'; preview: AppPreviewTarget };
