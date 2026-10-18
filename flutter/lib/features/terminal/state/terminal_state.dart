@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:ddagent_app/core/realtime/realtime_providers.dart';
 import 'package:ddagent_app/core/realtime/shell_channel.dart';
+import 'package:ddagent_app/features/terminal/state/terminal_key_handler.dart';
 import 'package:ddagent_app/features/terminal/state/terminal_mouse_handler.dart';
 import 'package:ddagent_app/features/terminal/state/terminal_output_filter.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
@@ -324,7 +325,11 @@ class TerminalController extends Notifier<TerminalState> {
   }) {
     final tabIndex = _nextTabId++;
     final tabId = 'term-$tabIndex';
-    final terminal = Terminal(maxLines: 10000, mouseHandler: XtermMouseHandler());
+    final terminal = Terminal(
+      maxLines: 10000,
+      inputHandler: const XtermInputHandler(),
+      mouseHandler: XtermMouseHandler(),
+    );
     final channel = ref.read(shellChannelProvider(tabId));
 
     final tabTitle =
