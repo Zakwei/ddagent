@@ -349,65 +349,75 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
     final terminalState = ref.watch(terminalControllerProvider);
     final activeTab = terminalState.activeTabFor(widget.hostId);
 
-    return Focus(
-      onKeyEvent: _onScreenKey,
-      child: Scaffold(
-        backgroundColor: palette.background,
-        body: Column(
-          children: [
-            TerminalTabStrip(
-              tabs: terminalState.tabsFor(widget.hostId),
-              activeTabId: activeTab?.id,
-              onSelect: _ctrl.selectTab,
-              onClose: _ctrl.closeTab,
-              onReorder: (from, to) => _ctrl.reorderTab(from, to, hostId: widget.hostId),
-              onRename: _ctrl.renameTab,
-              onDuplicate: _ctrl.duplicateTab,
-              onMoveToPane: _moveTabToNewPane,
-              onCloseOthers: _ctrl.closeOtherTabs,
-              onCloseToRight: _ctrl.closeTabsToRight,
-              onNewTab: _newDefaultTab,
-              menuController: _menuController,
-              menuChildren: _buildMenu(context, terminalState, activeTab),
-              trailing: [
-                if (activeTab != null)
+    // Right-click is the app's (tab menu, pane copy/paste) — the browser's own
+    // menu must not open on top of it.
+    return MouseRegion(
+      onEnter: (_) {
+        if (kIsWeb) unawaited(BrowserContextMenu.disableContextMenu());
+      },
+      onExit: (_) {
+        if (kIsWeb) unawaited(BrowserContextMenu.enableContextMenu());
+      },
+      child: Focus(
+        onKeyEvent: _onScreenKey,
+        child: Scaffold(
+          backgroundColor: palette.background,
+          body: Column(
+            children: [
+              TerminalTabStrip(
+                tabs: terminalState.tabsFor(widget.hostId),
+                activeTabId: activeTab?.id,
+                onSelect: _ctrl.selectTab,
+                onClose: _ctrl.closeTab,
+                onReorder: (from, to) => _ctrl.reorderTab(from, to, hostId: widget.hostId),
+                onRename: _ctrl.renameTab,
+                onDuplicate: _ctrl.duplicateTab,
+                onMoveToPane: _moveTabToNewPane,
+                onCloseOthers: _ctrl.closeOtherTabs,
+                onCloseToRight: _ctrl.closeTabsToRight,
+                onNewTab: _newDefaultTab,
+                menuController: _menuController,
+                menuChildren: _buildMenu(context, terminalState, activeTab),
+                trailing: [
+                  if (activeTab != null)
+                    TerminalStripAction(
+                      tooltip:
+                          '${t.terminal.menu.find}  '
+                          '${terminalShortcutLabel(TerminalCommand.find, defaultTargetPlatform)}',
+                      icon: LucideIcons.search,
+                      onPressed: () => _activePane?.openSearch(),
+                    ),
                   TerminalStripAction(
-                    tooltip:
-                        '${t.terminal.menu.find}  '
-                        '${terminalShortcutLabel(TerminalCommand.find, defaultTargetPlatform)}',
-                    icon: LucideIcons.search,
-                    onPressed: () => _activePane?.openSearch(),
+                    tooltip: terminalState.showShortcutsBar
+                        ? t.terminal.shortcuts.hideTooltip
+                        : t.terminal.shortcuts.showTooltip,
+                    icon: LucideIcons.keyboard,
+                    active: terminalState.showShortcutsBar,
+                    onPressed: _ctrl.toggleShortcutsBar,
                   ),
-                TerminalStripAction(
-                  tooltip: terminalState.showShortcutsBar
-                      ? t.terminal.shortcuts.hideTooltip
-                      : t.terminal.shortcuts.showTooltip,
-                  icon: LucideIcons.keyboard,
-                  active: terminalState.showShortcutsBar,
-                  onPressed: _ctrl.toggleShortcutsBar,
-                ),
-              ],
-            ),
-
-            // Active tab Auth URL banner (if any)
-            if (activeTab != null && bestAuthUrl(activeTab.authUrls) != null)
-              _buildAuthUrlBanner(bestAuthUrl(activeTab.authUrls)!),
-
-            // Main terminal view or empty state
-            Expanded(child: activeTab != null ? _terminalArea(activeTab) : _buildEmptyState()),
-
-            // Touch / keyboard-less key bar
-            if (terminalState.showShortcutsBar && activeTab != null)
-              TerminalShortcutsBar(
-                latched: terminalState.latchedModifiers,
-                onToggleModifier: _ctrl.toggleLatchedModifier,
-                onSendInput: (input) => _ctrl.sendInput(activeTab.id, input),
-                onPaste: () => _activePane?.paste(),
-                onClear: () => _ctrl.clearTab(activeTab.id),
-                onClose: _ctrl.toggleShortcutsBar,
-                onShowKeyboard: _isTouchPlatform ? () => _activePane?.showSoftKeyboard() : null,
+                ],
               ),
-          ],
+
+              // Active tab Auth URL banner (if any)
+              if (activeTab != null && bestAuthUrl(activeTab.authUrls) != null)
+                _buildAuthUrlBanner(bestAuthUrl(activeTab.authUrls)!),
+
+              // Main terminal view or empty state
+              Expanded(child: activeTab != null ? _terminalArea(activeTab) : _buildEmptyState()),
+
+              // Touch / keyboard-less key bar
+              if (terminalState.showShortcutsBar && activeTab != null)
+                TerminalShortcutsBar(
+                  latched: terminalState.latchedModifiers,
+                  onToggleModifier: _ctrl.toggleLatchedModifier,
+                  onSendInput: (input) => _ctrl.sendInput(activeTab.id, input),
+                  onPaste: () => _activePane?.paste(),
+                  onClear: () => _ctrl.clearTab(activeTab.id),
+                  onClose: _ctrl.toggleShortcutsBar,
+                  onShowKeyboard: _isTouchPlatform ? () => _activePane?.showSoftKeyboard() : null,
+                ),
+            ],
+          ),
         ),
       ),
     );
