@@ -109,6 +109,16 @@ class TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
       hitColor: palette.theme.searchHitBackground,
       currentHitColor: palette.theme.searchHitBackgroundCurrent,
     )..addListener(_onSearchChanged);
+    // A freshly inflated pane (new or switched tab) starts with the soft
+    // keyboard closed: the previous tab's IME otherwise stays up over a pane
+    // nothing has focused yet. A tap brings it back ([_handleTapUp]).
+    if (_isTouchPlatform) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && !_focusNode.hasFocus) {
+          unawaited(SystemChannels.textInput.invokeMethod<void>('TextInput.hide'));
+        }
+      });
+    }
   }
 
   @override
