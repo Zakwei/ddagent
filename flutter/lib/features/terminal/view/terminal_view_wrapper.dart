@@ -8,6 +8,7 @@ import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/features/chat/data/chat_drop.dart';
 import 'package:ddagent_app/features/misc/data/misc_repository.dart';
 import 'package:ddagent_app/features/settings/state/ui_preferences_controller.dart';
+import 'package:ddagent_app/features/terminal/state/terminal_mouse_handler.dart';
 import 'package:ddagent_app/features/terminal/state/terminal_state.dart';
 import 'package:ddagent_app/features/terminal/view/terminal_keymap.dart';
 import 'package:ddagent_app/features/terminal/view/terminal_search.dart';
@@ -493,6 +494,8 @@ class TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
 
   void _onPointerDown(PointerDownEvent event) {
     if (event.kind != _lastPointerKind) setState(() => _lastPointerKind = event.kind);
+    final mouse = widget.tab.terminal.mouseHandler;
+    if (mouse is XtermMouseHandler) mouse.middleDown = event.buttons == kMiddleMouseButton;
     final touchLike =
         event.kind == PointerDeviceKind.touch || event.kind == PointerDeviceKind.stylus;
     // xterm asks for the soft keyboard on *tap-down*, which fires after a
