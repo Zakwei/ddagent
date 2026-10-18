@@ -152,9 +152,11 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
       return true;
     }
 
-    // 3. Ctrl/Cmd+K — session quick switcher.
+    // 3. Ctrl/Cmd+K — session quick switcher. A focused terminal keeps the
+    // chord: it is kill-to-end-of-line in shells and CLIs.
     if (ctrlOrMeta && !kb.isShiftPressed && !kb.isAltPressed && key == LogicalKeyboardKey.keyK) {
       if (_modalOpen) return false;
+      if (TerminalViewWrapperState.hasKeyboardFocus) return false;
       unawaited(showSessionQuickSwitcher(context));
       return true;
     }
