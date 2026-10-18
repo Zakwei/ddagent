@@ -49,18 +49,33 @@ class SystemRepository {
     return [for (final r in list) Release.fromJson(r as Map<String, dynamic>)];
   });
 
+  /// The server answers `/update` only after `git pull && npm install && npm
+  /// run build` (or a tarball download) has finished — minutes, not seconds.
+  /// The app-wide 10 s connect / 30 s receive timeouts cut that short: on web
+  /// Dio cannot see the TCP connect, so an empty-body POST that gets no
+  /// headers within `connectTimeout` is reported as a *connection* timeout
+  /// even though the server is busy updating. These requests get their own
+  /// budget instead.
+  static const updateTimeout = Duration(minutes: 20);
+
+  static Options get _longRunning => Options(
+    connectTimeout: updateTimeout,
+    sendTimeout: updateTimeout,
+    receiveTimeout: updateTimeout,
+  );
+
   /// Triggers the server self-update. The reply says what happened:
   /// `restarting` (the server exits and its launcher brings the new version
   /// up), `staged` (a release tarball was downloaded for the next start),
   /// `upToDate`, and `webError` when the hosted web client failed to update.
   Future<Map<String, dynamic>> update() => apiCall(
-    () => _dio.post<dynamic>('/api/system/update'),
+    () => _dio.post<dynamic>('/api/system/update', options: _longRunning),
     (d) => d as Map<String, dynamic>? ?? const {},
   );
 
   /// Replaces the web client this server hosts with the newest release.
   Future<Map<String, dynamic>> updateWeb() => apiCall(
-    () => _dio.post<dynamic>('/api/system/update-web'),
+    () => _dio.post<dynamic>('/api/system/update-web', options: _longRunning),
     (d) => d as Map<String, dynamic>? ?? const {},
   );
 

@@ -1,3 +1,4 @@
+import 'package:ddagent_app/core/network/api_error.dart';
 import 'package:ddagent_app/core/theme/app_theme.dart';
 import 'package:ddagent_app/core/widgets/update_badge.dart';
 import 'package:ddagent_app/features/system/data/system_repository.dart';
@@ -20,6 +21,25 @@ class _StagingRepository extends SystemRepository {
     'staged': true,
     'restarting': false,
   };
+}
+
+/// Server whose update request never answers — the launcher restarts it (or a
+/// proxy cuts the long POST) before the reply — but whose `/health` already
+/// reports the new version on the first probe.
+class _DroppingRepository extends SystemRepository {
+  _DroppingRepository() : super(Dio());
+
+  int healthCalls = 0;
+
+  @override
+  Future<Map<String, dynamic>> update() async =>
+      throw const NetworkError('The request connection took longer than 0:00:10 and was aborted.');
+
+  @override
+  Future<Map<String, dynamic>> health() async {
+    healthCalls++;
+    return {'status': 'ok', 'version': '9.9.9'};
+  }
 }
 
 Widget _app(List<Override> overrides, Widget child) => TranslationProvider(
@@ -103,5 +123,38 @@ void main() {
       find.text('Update v9.9.9 downloaded — restart the server to install it.'),
       findsOneWidget,
     );
+  });
+
+  testWidgets('a dropped update request waits for the new version instead of failing', (
+    tester,
+  ) async {
+    final repo = _DroppingRepository();
+    await tester.pumpWidget(
+      _app(
+        [systemRepositoryProvider.overrideWithValue(repo)],
+        Builder(
+          builder: (context) => TextButton(
+            onPressed: () => showUpdateDialog(context, UpdateTarget.server),
+            child: const Text('open'),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('open'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.tap(find.text('Update server'));
+    await tester.pump();
+    await tester.pump();
+
+    // The transport error is not a failure: the dialog is polling /health.
+    expect(find.textContaining('Update failed'), findsNothing);
+    expect(find.textContaining('Restarting the server'), findsOneWidget);
+
+    await tester.pump(const Duration(seconds: 2));
+    await tester.pump();
+    expect(repo.healthCalls, 1);
+    expect(find.text('The server runs v9.9.9.'), findsOneWidget);
   });
 }

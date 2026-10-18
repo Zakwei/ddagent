@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:ddagent_app/core/network/api_error.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/utils/app_quit.dart';
 import 'package:ddagent_app/core/utils/app_reload.dart';
@@ -256,6 +257,16 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
     final Map<String, dynamic> result;
     try {
       result = await repo.update();
+    } on NetworkError {
+      // The connection dropped while the server was still working or had
+      // already exited to hand off to the new build (a proxy/platform timeout
+      // or the restart itself). Nothing says the update failed — watch
+      // /health for the new version instead of reporting an error; only a
+      // server that never comes back with it ends in "restart it manually".
+      if (!mounted) return;
+      setState(() => _status = _Status.restarting);
+      _pollForVersion(repo, reloadWeb: kIsWeb, deadline: SystemRepository.updateTimeout);
+      return;
     } on Object catch (e) {
       return _fail(e.toString());
     }
@@ -380,9 +391,13 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
   /// `/health` poll until the restarted server reports the new version, then
   /// done (and a web tab reloads onto the updated web client); a server that
   /// never comes back within the deadline needs a manual restart.
-  void _pollForVersion(SystemRepository repo, {required bool reloadWeb}) {
+  void _pollForVersion(
+    SystemRepository repo, {
+    required bool reloadWeb,
+    Duration deadline = _restartDeadline,
+  }) {
     final latest = _latestVersion;
-    final deadline = DateTime.now().add(_restartDeadline);
+    final deadlineAt = DateTime.now().add(deadline);
     _poller = Timer.periodic(_pollInterval, (timer) async {
       try {
         final health = await repo.health();
@@ -404,7 +419,7 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
       } on Object {
         // Server down mid-restart — keep polling until the deadline.
       }
-      if (DateTime.now().isAfter(deadline)) {
+      if (DateTime.now().isAfter(deadlineAt)) {
         timer.cancel();
         if (mounted) setState(() => _status = _Status.manualRestart);
       }
