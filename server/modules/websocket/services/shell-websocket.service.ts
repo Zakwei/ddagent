@@ -106,6 +106,44 @@ function extractUrlsFromText(value: string): string[] {
   return Array.from(new Set([...directMatches, ...wrappedMatches]));
 }
 
+// URL shapes produced by CLI sign-in flows (OAuth authorize pages, device-code
+// pages, provider login portals). Anything else printed by a CLI — docs links
+// in notices, release pages, hyperlinks in command output — is not a login
+// link and must not light up the client's "auth link" banner.
+const AUTH_URL_HINT_REGEX =
+  /oauth|authori[sz]|\/auth\b|auth\.|login|log-in|signin|sign-in|sign_in|sso|device|verif|activate|account|session|token|callback|cli\b/i;
+const AUTH_URL_QUERY_HINT_REGEX = /(?:^|[?&])(?:code|client_id|state|redirect_uri|user_code|token|nonce|challenge)=/i;
+// Prose a CLI prints around a login link ("Open this URL in your browser to
+// sign in"). Looked up in the text just before the URL so a bare short link
+// still counts when the surrounding sentence is unmistakably a login prompt.
+const AUTH_CONTEXT_HINT_REGEX =
+  /log\s?in|sign\s?in|authenticat|authoriz|authorise|verification code|device code|enter (?:the|this) code|open (?:this|the) (?:url|link)|in your browser|visit/i;
+const AUTH_CONTEXT_WINDOW = 400;
+
+// Decides whether a URL seen in PTY output is a sign-in link worth surfacing
+// to the client. Either the URL itself looks like an auth endpoint or the
+// text immediately preceding it reads like a login instruction.
+function isLikelyAuthUrl(normalizedUrl: string, cleanOutput: string): boolean {
+  let parsedUrl: URL;
+  try {
+    parsedUrl = new URL(normalizedUrl);
+  } catch {
+    return false;
+  }
+  const locator = `${parsedUrl.hostname}${parsedUrl.pathname}`;
+  if (AUTH_URL_HINT_REGEX.test(locator) || AUTH_URL_QUERY_HINT_REGEX.test(parsedUrl.search)) {
+    return true;
+  }
+  // The buffer holds the display text, which may wrap the URL; search for
+  // its origin so a wrapped URL still anchors the context window.
+  const anchor = cleanOutput.lastIndexOf(parsedUrl.origin);
+  if (anchor === -1) {
+    return false;
+  }
+  const context = cleanOutput.slice(Math.max(0, anchor - AUTH_CONTEXT_WINDOW), anchor);
+  return AUTH_CONTEXT_HINT_REGEX.test(context);
+}
+
 function shouldAutoOpenUrlFromOutput(value: string): boolean {
   const normalizedOutput = value.toLowerCase();
   return (
@@ -542,6 +580,9 @@ export function handleShellConnection(
             const emitAuthUrl = (detectedUrl: string, autoOpen = false) => {
               const normalizedUrl = normalizeDetectedUrl(detectedUrl);
               if (!normalizedUrl || announcedAuthUrls.has(normalizedUrl)) {
+                return;
+              }
+              if (!autoOpen && !isLikelyAuthUrl(normalizedUrl, cleanDetectionBuffer)) {
                 return;
               }
 

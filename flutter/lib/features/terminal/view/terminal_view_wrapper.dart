@@ -118,8 +118,12 @@ class TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final theme = TerminalPalette.of(context).theme;
+    final palette = TerminalPalette.of(context);
+    final theme = palette.theme;
     _search.setColors(hit: theme.searchHitBackground, current: theme.searchHitBackgroundCurrent);
+    ref
+        .read(terminalControllerProvider.notifier)
+        .setPaletteColors(foreground: palette.foreground, background: palette.background);
   }
 
   bool _trackModifiers(KeyEvent event) {

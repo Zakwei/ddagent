@@ -421,3 +421,70 @@ test('a one-shot agent command with no project path runs from home', () => {
   assert.equal(spawnedCwd, os.homedir());
   pty.emitExit();
 });
+
+test('shell output ignores documentation and release URLs that are not sign-in links', () => {
+  const pty = createFakePty();
+  const socket = createFakeSocket();
+  const dependencies = {
+    resolveProviderSessionId: () => null,
+    spawnPty: () => pty as never,
+  };
+
+  handleShellConnection(socket as never, dependencies);
+  socket.emit(
+    'message',
+    JSON.stringify({
+      type: 'init',
+      projectPath: process.cwd(),
+      sessionId: `docs-url-${Date.now()}`,
+      hasSession: false,
+      provider: 'plain-shell',
+      isPlainShell: true,
+      initialCommand: 'test-command',
+    })
+  );
+  socket.frames.length = 0;
+
+  pty.emitData(
+    'Auto mode is now the default permission mode.\nhttps://code.claude.com/docs/en/permission-modes\n' +
+      'See full release notes:\nhttps://github.com/openai/codex/releases/latest\n'
+  );
+
+  const frames = socket.frames.map((frame) => JSON.parse(frame) as Record<string, unknown>);
+  assert.deepEqual(frames.filter((frame) => frame.type === 'auth_url'), []);
+
+  pty.emitExit();
+});
+
+test('shell output surfaces a plain URL when the surrounding text is a login prompt', () => {
+  const pty = createFakePty();
+  const socket = createFakeSocket();
+  const dependencies = {
+    resolveProviderSessionId: () => null,
+    spawnPty: () => pty as never,
+  };
+
+  handleShellConnection(socket as never, dependencies);
+  socket.emit(
+    'message',
+    JSON.stringify({
+      type: 'init',
+      projectPath: process.cwd(),
+      sessionId: `context-url-${Date.now()}`,
+      hasSession: false,
+      provider: 'plain-shell',
+      isPlainShell: true,
+      initialCommand: 'test-command',
+    })
+  );
+  socket.frames.length = 0;
+
+  pty.emitData('Open this URL in your browser to sign in:\nhttps://example.com/abc123\n');
+
+  const frames = socket.frames.map((frame) => JSON.parse(frame) as Record<string, unknown>);
+  assert.deepEqual(frames.filter((frame) => frame.type === 'auth_url'), [
+    { type: 'auth_url', url: 'https://example.com/abc123', autoOpen: false },
+  ]);
+
+  pty.emitExit();
+});

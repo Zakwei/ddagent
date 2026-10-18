@@ -6,6 +6,7 @@ import 'package:ddagent_app/core/realtime/shell_channel.dart';
 import 'package:ddagent_app/features/terminal/state/terminal_output_filter.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/painting.dart' show Color;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xterm/xterm.dart';
 
@@ -237,6 +238,18 @@ final terminalControllerProvider = NotifierProvider<TerminalController, Terminal
 
 class TerminalController extends Notifier<TerminalState> {
   int _nextTabId = 1;
+
+  /// Pane colours reported to TUIs that query them (OSC 10/11) — the view
+  /// keeps these in sync with the active palette; Campbell until then.
+  (int, int, int) _paletteForeground = (0xCC, 0xCC, 0xCC);
+  (int, int, int) _paletteBackground = (0x0C, 0x0C, 0x0C);
+
+  void setPaletteColors({required Color foreground, required Color background}) {
+    (int, int, int) rgb(Color c) => ((c.r * 255).round(), (c.g * 255).round(), (c.b * 255).round());
+    _paletteForeground = rgb(foreground);
+    _paletteBackground = rgb(background);
+  }
+
   final List<TerminalTab> _activeTabs = [];
   final Map<String, Timer> _promptTimers = {};
 
@@ -370,6 +383,13 @@ class TerminalController extends Notifier<TerminalState> {
 
     if (frame.isOutput) {
       tab.terminal.write(tab.outputFilter.feed(frame.output));
+      // Answer the colour / mode probes the emulator cannot (theme detection
+      // in OpenCode, Codex, Claude Code).
+      for (final query in tab.outputFilter.takeQueries()) {
+        tab.channel.input(
+          terminalQueryReply(query, foreground: _paletteForeground, background: _paletteBackground),
+        );
+      }
 
       if (tab.status != TerminalTabStatus.connected && !tab.isCompleted) {
         tab.status = TerminalTabStatus.connected;
