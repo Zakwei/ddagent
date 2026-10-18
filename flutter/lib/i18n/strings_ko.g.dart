@@ -5073,6 +5073,7 @@ class Translations$terminal$menu$ko extends Translations$terminal$menu$en {
 	@override String get find => '찾기';
 	@override String get renameTab => '탭 이름 바꾸기';
 	@override String get duplicateTab => '탭 복제';
+	@override String get moveToNewPane => '새 창으로 이동';
 	@override String get closeTab => '탭 닫기';
 	@override String get closeOtherTabs => '다른 탭 닫기';
 	@override String get closeTabsToRight => '오른쪽 탭 닫기';
@@ -11784,6 +11785,7 @@ extension on TranslationsKo {
 			'terminal.menu.find' => '찾기',
 			'terminal.menu.renameTab' => '탭 이름 바꾸기',
 			'terminal.menu.duplicateTab' => '탭 복제',
+			'terminal.menu.moveToNewPane' => '새 창으로 이동',
 			'terminal.menu.closeTab' => '탭 닫기',
 			'terminal.menu.closeOtherTabs' => '다른 탭 닫기',
 			'terminal.menu.closeTabsToRight' => '오른쪽 탭 닫기',

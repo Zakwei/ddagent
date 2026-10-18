@@ -5113,6 +5113,7 @@ class Translations$terminal$menu$pl extends Translations$terminal$menu$en {
 	@override String get find => 'Znajdź';
 	@override String get renameTab => 'Zmień nazwę karty';
 	@override String get duplicateTab => 'Duplikuj kartę';
+	@override String get moveToNewPane => 'Przenieś do nowego panelu';
 	@override String get closeTab => 'Zamknij kartę';
 	@override String get closeOtherTabs => 'Zamknij pozostałe karty';
 	@override String get closeTabsToRight => 'Zamknij karty po prawej';
@@ -11835,6 +11836,7 @@ extension on TranslationsPl {
 			'terminal.menu.find' => 'Znajdź',
 			'terminal.menu.renameTab' => 'Zmień nazwę karty',
 			'terminal.menu.duplicateTab' => 'Duplikuj kartę',
+			'terminal.menu.moveToNewPane' => 'Przenieś do nowego panelu',
 			'terminal.menu.closeTab' => 'Zamknij kartę',
 			'terminal.menu.closeOtherTabs' => 'Zamknij pozostałe karty',
 			'terminal.menu.closeTabsToRight' => 'Zamknij karty po prawej',

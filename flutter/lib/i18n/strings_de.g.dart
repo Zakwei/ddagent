@@ -5083,6 +5083,7 @@ class Translations$terminal$menu$de extends Translations$terminal$menu$en {
 	@override String get find => 'Suchen';
 	@override String get renameTab => 'Tab umbenennen';
 	@override String get duplicateTab => 'Tab duplizieren';
+	@override String get moveToNewPane => 'In neues Panel verschieben';
 	@override String get closeTab => 'Tab schließen';
 	@override String get closeOtherTabs => 'Andere Tabs schließen';
 	@override String get closeTabsToRight => 'Tabs rechts schließen';
@@ -11795,6 +11796,7 @@ extension on TranslationsDe {
 			'terminal.menu.find' => 'Suchen',
 			'terminal.menu.renameTab' => 'Tab umbenennen',
 			'terminal.menu.duplicateTab' => 'Tab duplizieren',
+			'terminal.menu.moveToNewPane' => 'In neues Panel verschieben',
 			'terminal.menu.closeTab' => 'Tab schließen',
 			'terminal.menu.closeOtherTabs' => 'Andere Tabs schließen',
 			'terminal.menu.closeTabsToRight' => 'Tabs rechts schließen',

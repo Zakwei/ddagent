@@ -4254,6 +4254,7 @@
       "find": "Find",
       "renameTab": "Rename tab",
       "duplicateTab": "Duplicate tab",
+      "moveToNewPane": "Move to new pane",
       "closeTab": "Close tab",
       "closeOtherTabs": "Close other tabs",
       "closeTabsToRight": "Close tabs to the right",

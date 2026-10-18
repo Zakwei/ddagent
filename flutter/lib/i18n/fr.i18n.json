@@ -4254,6 +4254,7 @@
       "find": "Rechercher",
       "renameTab": "Renommer l'onglet",
       "duplicateTab": "Dupliquer l'onglet",
+      "moveToNewPane": "Déplacer vers un nouveau panneau",
       "closeTab": "Fermer l'onglet",
       "closeOtherTabs": "Fermer les autres onglets",
       "closeTabsToRight": "Fermer les onglets à droite",

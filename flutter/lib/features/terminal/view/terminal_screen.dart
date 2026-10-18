@@ -13,6 +13,8 @@ import 'package:ddagent_app/features/terminal/view/terminal_shortcuts_bar.dart';
 import 'package:ddagent_app/features/terminal/view/terminal_tab_strip.dart';
 import 'package:ddagent_app/features/terminal/view/terminal_theme.dart';
 import 'package:ddagent_app/features/terminal/view/terminal_view_wrapper.dart';
+import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
+import 'package:ddagent_app/features/workspace/state/workspace_controller.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -53,8 +55,11 @@ class TerminalScreen extends ConsumerStatefulWidget {
     this.projectId,
     this.sessionId,
     this.onFileOpen,
+    this.hostId = terminalRouteHost,
   });
 
+  /// Which tab row this screen shows — the route's, or a workspace pane's.
+  final String hostId;
   final String? projectPath;
   final String? projectId;
   final String? sessionId;
@@ -78,7 +83,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
       _viewKeys.putIfAbsent(tab.id, GlobalKey<TerminalViewWrapperState>.new);
 
   TerminalViewWrapperState? get _activePane {
-    final active = ref.read(terminalControllerProvider).activeTab;
+    final active = ref.read(terminalControllerProvider).activeTabFor(widget.hostId);
     return active == null ? null : _viewKeys[active.id]?.currentState;
   }
 
@@ -120,7 +125,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
 
   void _ensureInitialTab() {
     final terminalState = ref.read(terminalControllerProvider);
-    if (terminalState.tabs.isEmpty) {
+    if (terminalState.tabsFor(widget.hostId).isEmpty) {
       final t = Translations.of(context);
       final path = _resolveProjectPath();
       _ctrl.createTab(
@@ -128,6 +133,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
             ? t.chat.export.sessionTitle(id: widget.sessionId!)
             : t.terminal.tabs.shellName(index: 1),
         projectPath: path,
+        hostId: widget.hostId,
         sessionId: widget.sessionId,
         isPlainShell: widget.sessionId == null,
       );
@@ -136,7 +142,37 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
 
   /// `+` / Ctrl+Shift+T — the default profile is a plain shell.
   void _newDefaultTab() {
-    _ctrl.createTab(projectPath: _resolveProjectPath(), isPlainShell: true);
+    _ctrl.createTab(projectPath: _resolveProjectPath(), hostId: widget.hostId, isPlainShell: true);
+  }
+
+  /// Tab context menu → "Move to new pane": opens a terminal pane in the
+  /// workspace and hands the live tab over (same PTY, buffer intact). The
+  /// pane needs a project id or it renders the launcher instead of the
+  /// terminal; the move is done in the same tick as `openPane`, before the
+  /// new pane's `_ensureInitialTab` could spawn an extra shell.
+  void _moveTabToNewPane(String tabId) {
+    final tab = ref.read(terminalControllerProvider).tabs.where((t) => t.id == tabId).firstOrNull;
+    if (tab == null) return;
+    final workspace = ref.read(workspaceProvider.notifier);
+    final ws = ref.read(workspaceProvider);
+    final projectId =
+        widget.projectId ??
+        ref
+            .read(projectsProvider)
+            .projects
+            .where((p) => p.fullPath == tab.projectPath || p.path == tab.projectPath)
+            .firstOrNull
+            ?.projectId ??
+        WorkspaceStorage.pickProjectId(ws);
+    final paneId = workspace.openPane(PaneKind.terminal, projectId: projectId);
+    // shortcut: a full workspace (6 panes) is a silent no-op; add a toast if
+    // users hit it. The workspace is only read here, not watched in build —
+    // its controller opens Hive, which widget tests don't set up.
+    if (paneId == null) return;
+    _ctrl.moveTab(tabId, toHost: paneId);
+    // A maximized source pane would leave the new one offstage.
+    if (ws.maximizedPaneId != null) workspace.toggleMaximize(ws.maximizedPaneId!);
+    if (widget.hostId == terminalRouteHost) context.go('/workspace');
   }
 
   /// A provider CLI tab; with [account] the PTY gets that named account's
@@ -144,6 +180,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
   void _newProviderTab(String provider, {TerminalAccountProfile? account}) {
     _ctrl.createTab(
       projectPath: _resolveProjectPath(),
+      hostId: widget.hostId,
       provider: provider,
       isPlainShell: false,
       title: account?.title(_profileLabel(provider)) ?? '$provider CLI',
@@ -228,7 +265,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
   /// Tab-level commands — from the pane's key handler, the screen-level
   /// fallback handler (focus outside the pane) and the dropdown menu.
   void _runTabCommand(TerminalCommand command, int? index) {
-    final active = ref.read(terminalControllerProvider).activeTab;
+    final active = ref.read(terminalControllerProvider).activeTabFor(widget.hostId);
     switch (command) {
       case TerminalCommand.newTab:
         _newDefaultTab();
@@ -237,11 +274,11 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
       case TerminalCommand.duplicateTab:
         if (active != null) _ctrl.duplicateTab(active.id);
       case TerminalCommand.nextTab:
-        _ctrl.selectRelativeTab(1);
+        _ctrl.selectRelativeTab(1, hostId: widget.hostId);
       case TerminalCommand.previousTab:
-        _ctrl.selectRelativeTab(-1);
+        _ctrl.selectRelativeTab(-1, hostId: widget.hostId);
       case TerminalCommand.selectTab:
-        if (index != null) _ctrl.selectTabAt(index);
+        if (index != null) _ctrl.selectTabAt(index, hostId: widget.hostId);
       case TerminalCommand.zoomIn:
         if (active != null) _ctrl.zoomIn(active.id);
       case TerminalCommand.zoomOut:
@@ -310,7 +347,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
     final palette = TerminalPalette.of(context);
     final t = Translations.of(context);
     final terminalState = ref.watch(terminalControllerProvider);
-    final activeTab = terminalState.activeTab;
+    final activeTab = terminalState.activeTabFor(widget.hostId);
 
     return Focus(
       onKeyEvent: _onScreenKey,
@@ -319,13 +356,14 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
         body: Column(
           children: [
             TerminalTabStrip(
-              tabs: terminalState.tabs,
-              activeTabId: terminalState.activeTabId,
+              tabs: terminalState.tabsFor(widget.hostId),
+              activeTabId: activeTab?.id,
               onSelect: _ctrl.selectTab,
               onClose: _ctrl.closeTab,
-              onReorder: _ctrl.reorderTab,
+              onReorder: (from, to) => _ctrl.reorderTab(from, to, hostId: widget.hostId),
               onRename: _ctrl.renameTab,
               onDuplicate: _ctrl.duplicateTab,
+              onMoveToPane: _moveTabToNewPane,
               onCloseOthers: _ctrl.closeOtherTabs,
               onCloseToRight: _ctrl.closeTabsToRight,
               onNewTab: _newDefaultTab,
@@ -671,6 +709,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
               _ctrl.createTab(
                 title: t.terminal.tabs.shellName(index: 1),
                 projectPath: _resolveProjectPath(),
+                hostId: widget.hostId,
                 isPlainShell: true,
               );
             },

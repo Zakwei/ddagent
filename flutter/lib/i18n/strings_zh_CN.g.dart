@@ -5073,6 +5073,7 @@ class Translations$terminal$menu$zh_CN extends Translations$terminal$menu$en {
 	@override String get find => '查找';
 	@override String get renameTab => '重命名标签页';
 	@override String get duplicateTab => '复制标签页';
+	@override String get moveToNewPane => '移到新面板';
 	@override String get closeTab => '关闭标签页';
 	@override String get closeOtherTabs => '关闭其他标签页';
 	@override String get closeTabsToRight => '关闭右侧标签页';
@@ -11784,6 +11785,7 @@ extension on TranslationsZhCn {
 			'terminal.menu.find' => '查找',
 			'terminal.menu.renameTab' => '重命名标签页',
 			'terminal.menu.duplicateTab' => '复制标签页',
+			'terminal.menu.moveToNewPane' => '移到新面板',
 			'terminal.menu.closeTab' => '关闭标签页',
 			'terminal.menu.closeOtherTabs' => '关闭其他标签页',
 			'terminal.menu.closeTabsToRight' => '关闭右侧标签页',

@@ -4254,6 +4254,7 @@
       "find": "Suchen",
       "renameTab": "Tab umbenennen",
       "duplicateTab": "Tab duplizieren",
+      "moveToNewPane": "In neues Panel verschieben",
       "closeTab": "Tab schließen",
       "closeOtherTabs": "Andere Tabs schließen",
       "closeTabsToRight": "Tabs rechts schließen",

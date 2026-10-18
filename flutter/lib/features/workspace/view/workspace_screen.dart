@@ -587,7 +587,13 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
             },
           );
         }
-        return TerminalScreen(projectId: pane.projectId, sessionId: pane.sessionId);
+        // Keyed + hosted by pane id: each pane owns its own tab row.
+        return TerminalScreen(
+          key: ValueKey('terminal-${pane.id}'),
+          hostId: pane.id,
+          projectId: pane.projectId,
+          sessionId: pane.sessionId,
+        );
       case PaneKind.git:
         if (pane.projectId == null) {
           return WorkspaceLauncher(

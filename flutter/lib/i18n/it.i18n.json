@@ -4254,6 +4254,7 @@
       "find": "Trova",
       "renameTab": "Rinomina scheda",
       "duplicateTab": "Duplica scheda",
+      "moveToNewPane": "Sposta in un nuovo pannello",
       "closeTab": "Chiudi scheda",
       "closeOtherTabs": "Chiudi le altre schede",
       "closeTabsToRight": "Chiudi le schede a destra",

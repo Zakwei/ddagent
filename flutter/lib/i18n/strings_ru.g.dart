@@ -5111,6 +5111,7 @@ class Translations$terminal$menu$ru extends Translations$terminal$menu$en {
 	@override String get find => 'Найти';
 	@override String get renameTab => 'Переименовать вкладку';
 	@override String get duplicateTab => 'Дублировать вкладку';
+	@override String get moveToNewPane => 'Переместить в новую панель';
 	@override String get closeTab => 'Закрыть вкладку';
 	@override String get closeOtherTabs => 'Закрыть другие вкладки';
 	@override String get closeTabsToRight => 'Закрыть вкладки справа';
@@ -11833,6 +11834,7 @@ extension on TranslationsRu {
 			'terminal.menu.find' => 'Найти',
 			'terminal.menu.renameTab' => 'Переименовать вкладку',
 			'terminal.menu.duplicateTab' => 'Дублировать вкладку',
+			'terminal.menu.moveToNewPane' => 'Переместить в новую панель',
 			'terminal.menu.closeTab' => 'Закрыть вкладку',
 			'terminal.menu.closeOtherTabs' => 'Закрыть другие вкладки',
 			'terminal.menu.closeTabsToRight' => 'Закрыть вкладки справа',

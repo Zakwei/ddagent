@@ -115,7 +115,8 @@ class WorkspaceController extends Notifier<WorkspaceState> {
   }
 
   /// Add a pane and focus it. Kind-specific fields ride on `pane`.
-  void openPane(
+  /// Returns the new pane's id, or null when the workspace is full.
+  String? openPane(
     PaneKind kind, {
     String? sessionId,
     String? projectId,
@@ -124,7 +125,7 @@ class WorkspaceController extends Notifier<WorkspaceState> {
     String? device,
     bool picker = false,
   }) {
-    if (!canAddSplitPane(state.panes)) return;
+    if (!canAddSplitPane(state.panes)) return null;
     final pane = SplitPane(
       id: createPaneId(),
       kind: kind,
@@ -136,6 +137,7 @@ class WorkspaceController extends Notifier<WorkspaceState> {
       picker: picker,
     );
     _set(state.copyWith(panes: addSplitPane(state.panes, pane), activePaneId: () => pane.id));
+    return pane.id;
   }
 
   void removePane(String id) {

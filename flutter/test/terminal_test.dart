@@ -535,6 +535,37 @@ void main() {
       expect(ctrl.state.activeTabId, b.id);
     });
 
+    test('moveTab hands a live tab to another host without touching its PTY', () async {
+      final a = ctrl.createTab(projectPath: '/p', title: 'A');
+      final b = ctrl.createTab(projectPath: '/p', title: 'B');
+      ctrl.createTab(projectPath: '/p', title: 'C', hostId: 'pane-1');
+      expect(ctrl.state.activeTabId, b.id);
+
+      ctrl.moveTab(b.id, toHost: 'pane-2');
+
+      expect(ctrl.state.tabsFor(terminalRouteHost).map((t) => t.title), ['A']);
+      expect(ctrl.state.tabsFor('pane-2').map((t) => t.title), ['B']);
+      expect(ctrl.state.activeTabId, a.id);
+      expect(ctrl.state.activeTabFor('pane-2')?.id, b.id);
+      final moved = ctrl.state.tabsFor('pane-2').single;
+      expect(identical(moved.terminal, b.terminal), isTrue);
+      expect(identical(moved.channel, b.channel), isTrue);
+
+      // Frames still land in the moved tab's buffer.
+      fakeWs.emitFrame({'type': 'output', 'data': 'after move\r\n'});
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      expect(moved.terminal.buffer.lines[0].getText(), startsWith('after move'));
+      expect(moved.status, TerminalTabStatus.connected);
+
+      // Per-host rows: reorder/close in one host leave the others alone.
+      ctrl.createTab(projectPath: '/p', title: 'D');
+      ctrl.reorderTab(0, 1);
+      expect(ctrl.state.tabsFor(terminalRouteHost).map((t) => t.title), ['D', 'A']);
+      expect(ctrl.state.tabsFor('pane-1').map((t) => t.title), ['C']);
+      ctrl.closeOtherTabs(a.id);
+      expect(ctrl.state.tabs.map((t) => t.title), ['B', 'C', 'A']);
+    });
+
     test('second plain shell gets its own PTY key; the first keeps the default', () async {
       ctrl.createTab(projectPath: '/p').terminal.resize(80, 24, 640, 384);
       await Future<void>.delayed(Duration.zero);

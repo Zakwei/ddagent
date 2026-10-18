@@ -24,6 +24,7 @@ class TerminalTabStrip extends StatelessWidget {
     required this.onReorder,
     required this.onRename,
     required this.onDuplicate,
+    this.onMoveToPane,
     required this.onCloseOthers,
     required this.onCloseToRight,
     required this.onNewTab,
@@ -39,6 +40,9 @@ class TerminalTabStrip extends StatelessWidget {
   final void Function(int oldIndex, int newIndex) onReorder;
   final void Function(String tabId, String title) onRename;
   final void Function(String tabId) onDuplicate;
+
+  /// "Move to new pane" — null hides the entry (no workspace to move into).
+  final void Function(String tabId)? onMoveToPane;
   final void Function(String tabId) onCloseOthers;
   final void Function(String tabId) onCloseToRight;
   final VoidCallback onNewTab;
@@ -216,6 +220,8 @@ class TerminalTabStrip extends StatelessWidget {
       items: [
         item(LucideIcons.pencil, t.terminal.menu.renameTab, () => _rename(context, tab)),
         item(LucideIcons.copyPlus, t.terminal.menu.duplicateTab, () => onDuplicate(tab.id)),
+        if (onMoveToPane case final move?)
+          item(LucideIcons.panelRight, t.terminal.menu.moveToNewPane, () => move(tab.id)),
         const PopupMenuDivider(height: 8),
         item(LucideIcons.x, t.terminal.menu.closeTab, () => onClose(tab.id)),
         item(

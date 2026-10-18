@@ -24,6 +24,11 @@ const _promptOptionScanLines = 15;
 const _promptMaxOptions = 5;
 const _promptMinOptions = 2;
 
+/// Host of the tabs shown on the standalone `/terminal` screen (and the
+/// provider-login dialog). Workspace terminal panes use their pane id, so
+/// every pane owns its own tab row and a tab can move between them.
+const terminalRouteHost = 'route';
+
 /// Terminal font bounds (web Shell zoom 9–24px) and the Ctrl+0 reset size.
 const terminalFontSizeMin = 9.0;
 const terminalFontSizeMax = 24.0;
@@ -92,6 +97,7 @@ class TerminalTab {
     required this.id,
     required this.title,
     required this.projectPath,
+    this.hostId = terminalRouteHost,
     this.sessionId,
     this.provider = 'claude',
     this.initialCommand,
@@ -112,6 +118,10 @@ class TerminalTab {
 
   /// Mutable — the tab strip's Rename action edits it in place.
   String title;
+
+  /// Which tab row shows this tab ([terminalRouteHost] or a workspace pane
+  /// id). Mutable — "Move to new pane" reassigns it; the PTY never notices.
+  String hostId;
   final String projectPath;
   final String? sessionId;
   final String provider;
@@ -170,6 +180,7 @@ class TerminalTab {
       id: id,
       title: title ?? this.title,
       projectPath: projectPath,
+      hostId: hostId,
       sessionId: sessionId,
       provider: provider,
       initialCommand: initialCommand,
@@ -193,37 +204,54 @@ class TerminalTab {
 class TerminalState {
   const TerminalState({
     this.tabs = const [],
-    this.activeTabId,
+    this.activeTabIds = const {},
     this.showShortcutsBar = true,
     this.latchedModifiers = const {},
   });
 
+  /// Every tab of every host, in strip order (hosts interleave freely).
   final List<TerminalTab> tabs;
-  final String? activeTabId;
+
+  /// Active tab per host — each tab row remembers its own selection.
+  final Map<String, String> activeTabIds;
   final bool showShortcutsBar;
 
   /// Modifiers armed by the on-screen key bar for the next keystroke.
   final Set<LatchedModifier> latchedModifiers;
 
-  TerminalTab? get activeTab {
-    if (activeTabId == null || tabs.isEmpty) return null;
-    for (final tab in tabs) {
-      if (tab.id == activeTabId) return tab;
+  List<TerminalTab> tabsFor(String hostId) => [
+    for (final tab in tabs)
+      if (tab.hostId == hostId) tab,
+  ];
+
+  TerminalTab? activeTabFor(String hostId) {
+    final own = tabsFor(hostId);
+    if (own.isEmpty) return null;
+    final id = activeTabIds[hostId];
+    for (final tab in own) {
+      if (tab.id == id) return tab;
     }
-    return tabs.first;
+    return own.first;
   }
 
-  int get activeIndex => tabs.indexWhere((tab) => tab.id == activeTab?.id);
+  int activeIndexFor(String hostId) =>
+      tabsFor(hostId).indexWhere((tab) => tab.id == activeTabFor(hostId)?.id);
+
+  /// The `/terminal` screen's selection (the common case for callers that
+  /// know no pane).
+  String? get activeTabId => activeTabFor(terminalRouteHost)?.id;
+  TerminalTab? get activeTab => activeTabFor(terminalRouteHost);
+  int get activeIndex => activeIndexFor(terminalRouteHost);
 
   TerminalState copyWith({
     List<TerminalTab>? tabs,
-    String? activeTabId,
+    Map<String, String>? activeTabIds,
     bool? showShortcutsBar,
     Set<LatchedModifier>? latchedModifiers,
   }) {
     return TerminalState(
       tabs: tabs ?? this.tabs,
-      activeTabId: activeTabId ?? this.activeTabId,
+      activeTabIds: activeTabIds ?? this.activeTabIds,
       showShortcutsBar: showShortcutsBar ?? this.showShortcutsBar,
       latchedModifiers: latchedModifiers ?? this.latchedModifiers,
     );
@@ -281,6 +309,7 @@ class TerminalController extends Notifier<TerminalState> {
   TerminalTab createTab({
     String? title,
     required String projectPath,
+    String hostId = terminalRouteHost,
     String? sessionId,
     String provider = 'claude',
     String? initialCommand,
@@ -317,6 +346,7 @@ class TerminalController extends Notifier<TerminalState> {
       id: tabId,
       title: tabTitle,
       projectPath: projectPath,
+      hostId: hostId,
       sessionId: sessionId,
       provider: provider,
       initialCommand: initialCommand,
@@ -404,10 +434,39 @@ class TerminalController extends Notifier<TerminalState> {
     final newTabs = [...state.tabs, tab];
     state = state.copyWith(
       tabs: newTabs,
-      activeTabId: autoSelect ? tabId : state.activeTabId ?? tabId,
+      activeTabIds: autoSelect || !state.activeTabIds.containsKey(hostId)
+          ? _withActive(hostId, tabId)
+          : null,
     );
 
     return tab;
+  }
+
+  Map<String, String> _withActive(String hostId, String? tabId) {
+    final next = {...state.activeTabIds};
+    if (tabId == null) {
+      next.remove(hostId);
+    } else {
+      next[hostId] = tabId;
+    }
+    return next;
+  }
+
+  /// Hands a tab to another host (a workspace pane) — the live `Terminal`,
+  /// `ShellChannel` and frame subscription stay as they are, so the shell
+  /// keeps running and its buffer follows the tab.
+  void moveTab(String tabId, {required String toHost}) {
+    final tab = state.tabs.where((t) => t.id == tabId).firstOrNull;
+    if (tab == null || tab.hostId == toHost) return;
+    final fromHost = tab.hostId;
+    tab.hostId = toHost;
+    var active = {...state.activeTabIds, toHost: tabId};
+    if (active[fromHost] == tabId) {
+      active.remove(fromHost);
+      final next = state.tabsFor(fromHost).firstOrNull;
+      if (next != null) active = {...active, fromHost: next.id};
+    }
+    state = state.copyWith(tabs: [...state.tabs], activeTabIds: active);
   }
 
   static bool _isPlainInteractive(TerminalTab tab) =>
@@ -612,30 +671,39 @@ class TerminalController extends Notifier<TerminalState> {
   // --- Tab management (Windows Terminal tab-row semantics) ---
 
   /// Ctrl+Tab / Ctrl+Shift+Tab — wraps around both ends.
-  void selectRelativeTab(int delta) {
-    if (state.tabs.length < 2) return;
-    final current = state.activeIndex < 0 ? 0 : state.activeIndex;
-    final next = (current + delta) % state.tabs.length;
-    selectTab(state.tabs[next < 0 ? next + state.tabs.length : next].id);
+  void selectRelativeTab(int delta, {String hostId = terminalRouteHost}) {
+    final tabs = state.tabsFor(hostId);
+    if (tabs.length < 2) return;
+    final index = state.activeIndexFor(hostId);
+    final current = index < 0 ? 0 : index;
+    final next = (current + delta) % tabs.length;
+    selectTab(tabs[next < 0 ? next + tabs.length : next].id);
   }
 
   /// Ctrl+Alt+1..9 — 9 (or the last digit) always lands on the last tab.
-  void selectTabAt(int index) {
-    if (state.tabs.isEmpty) return;
-    final clamped = index.clamp(0, state.tabs.length - 1);
-    selectTab(state.tabs[clamped].id);
+  void selectTabAt(int index, {String hostId = terminalRouteHost}) {
+    final tabs = state.tabsFor(hostId);
+    if (tabs.isEmpty) return;
+    selectTab(tabs[index.clamp(0, tabs.length - 1)].id);
   }
 
-  /// Drag-reorder on the tab strip — [newIndex] is the final position of
-  /// the moved tab (`ReorderableListView.onReorderItem` semantics).
-  void reorderTab(int oldIndex, int newIndex) {
-    final tabs = [...state.tabs];
-    if (oldIndex < 0 || oldIndex >= tabs.length) return;
-    final target = newIndex.clamp(0, tabs.length - 1);
+  /// Drag-reorder on the tab strip — indices are positions within the
+  /// host's own row, [newIndex] the final one of the moved tab
+  /// (`ReorderableListView.onReorderItem` semantics). Other hosts' tabs keep
+  /// their slots in the full list.
+  void reorderTab(int oldIndex, int newIndex, {String hostId = terminalRouteHost}) {
+    final own = state.tabsFor(hostId);
+    if (oldIndex < 0 || oldIndex >= own.length) return;
+    final target = newIndex.clamp(0, own.length - 1);
     if (target == oldIndex) return;
-    final moved = tabs.removeAt(oldIndex);
-    tabs.insert(target, moved);
-    state = state.copyWith(tabs: tabs);
+    final moved = own.removeAt(oldIndex);
+    own.insert(target, moved);
+    final iterator = own.iterator;
+    state = state.copyWith(
+      tabs: [
+        for (final tab in state.tabs) tab.hostId == hostId ? (iterator..moveNext()).current : tab,
+      ],
+    );
   }
 
   void renameTab(String tabId, String title) {
@@ -649,11 +717,12 @@ class TerminalController extends Notifier<TerminalState> {
   /// Ctrl+Shift+D — a fresh tab with the same profile, placed right after
   /// the source tab.
   TerminalTab? duplicateTab(String tabId) {
-    final index = state.tabs.indexWhere((t) => t.id == tabId);
-    if (index == -1) return null;
-    final source = state.tabs[index];
+    final source = state.tabs.where((t) => t.id == tabId).firstOrNull;
+    if (source == null) return null;
+    final index = state.tabsFor(source.hostId).indexOf(source);
     final tab = createTab(
       projectPath: source.projectPath,
+      hostId: source.hostId,
       sessionId: source.sessionId,
       provider: source.provider,
       isPlainShell: source.isPlainShell,
@@ -661,20 +730,23 @@ class TerminalController extends Notifier<TerminalState> {
       // shell in the same directory, like duplicating a profile.
       title: source.isCommandMode ? null : source.title,
     );
-    reorderTab(state.tabs.length - 1, index + 1);
+    reorderTab(state.tabsFor(source.hostId).length - 1, index + 1, hostId: source.hostId);
     return tab;
   }
 
   void closeOtherTabs(String tabId) {
-    for (final tab in [...state.tabs]) {
+    final source = state.tabs.where((t) => t.id == tabId).firstOrNull;
+    if (source == null) return;
+    for (final tab in state.tabsFor(source.hostId)) {
       if (tab.id != tabId) closeTab(tab.id);
     }
   }
 
   void closeTabsToRight(String tabId) {
-    final index = state.tabs.indexWhere((t) => t.id == tabId);
-    if (index == -1) return;
-    for (final tab in state.tabs.sublist(index + 1)) {
+    final source = state.tabs.where((t) => t.id == tabId).firstOrNull;
+    if (source == null) return;
+    final own = state.tabsFor(source.hostId);
+    for (final tab in own.sublist(own.indexOf(source) + 1)) {
       closeTab(tab.id);
     }
   }
@@ -723,32 +795,30 @@ class TerminalController extends Notifier<TerminalState> {
   }
 
   void selectTab(String tabId) {
-    if (state.activeTabId != tabId) {
-      state = state.copyWith(activeTabId: tabId);
-    }
+    final tab = state.tabs.where((t) => t.id == tabId).firstOrNull;
+    if (tab == null || state.activeTabIds[tab.hostId] == tabId) return;
+    state = state.copyWith(activeTabIds: _withActive(tab.hostId, tabId));
   }
 
   void closeTab(String tabId) {
-    final tabIndex = state.tabs.indexWhere((t) => t.id == tabId);
-    if (tabIndex == -1) return;
+    final tab = state.tabs.where((t) => t.id == tabId).firstOrNull;
+    if (tab == null) return;
 
-    final tab = state.tabs[tabIndex];
     _activeTabs.remove(tab);
     tab.dispose();
 
+    final own = state.tabsFor(tab.hostId);
+    final tabIndex = own.indexOf(tab);
     final remaining = state.tabs.where((t) => t.id != tabId).toList();
-    String? newActiveId = state.activeTabId;
+    var active = state.activeTabIds;
 
-    if (state.activeTabId == tabId) {
-      if (remaining.isNotEmpty) {
-        final nextIdx = (tabIndex < remaining.length) ? tabIndex : remaining.length - 1;
-        newActiveId = remaining[nextIdx].id;
-      } else {
-        newActiveId = null;
-      }
+    if (state.activeTabFor(tab.hostId)?.id == tabId) {
+      own.removeAt(tabIndex);
+      final nextIdx = (tabIndex < own.length) ? tabIndex : own.length - 1;
+      active = _withActive(tab.hostId, nextIdx < 0 ? null : own[nextIdx].id);
     }
 
-    state = state.copyWith(tabs: remaining, activeTabId: newActiveId);
+    state = state.copyWith(tabs: remaining, activeTabIds: active);
   }
 
   /// Raw input from the key bar / prompt chips. Latched Ctrl/Alt apply here

@@ -9254,6 +9254,9 @@ class Translations$terminal$menu$en {
 	/// en: 'Duplicate tab'
 	String get duplicateTab => 'Duplicate tab';
 
+	/// en: 'Move to new pane'
+	String get moveToNewPane => 'Move to new pane';
+
 	/// en: 'Close tab'
 	String get closeTab => 'Close tab';
 
@@ -18400,6 +18403,7 @@ extension on Translations {
 			'terminal.menu.find' => 'Find',
 			'terminal.menu.renameTab' => 'Rename tab',
 			'terminal.menu.duplicateTab' => 'Duplicate tab',
+			'terminal.menu.moveToNewPane' => 'Move to new pane',
 			'terminal.menu.closeTab' => 'Close tab',
 			'terminal.menu.closeOtherTabs' => 'Close other tabs',
 			'terminal.menu.closeTabsToRight' => 'Close tabs to the right',

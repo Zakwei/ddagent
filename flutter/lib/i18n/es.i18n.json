@@ -4254,6 +4254,7 @@
       "find": "Buscar",
       "renameTab": "Renombrar pestaña",
       "duplicateTab": "Duplicar pestaña",
+      "moveToNewPane": "Mover a un panel nuevo",
       "closeTab": "Cerrar pestaña",
       "closeOtherTabs": "Cerrar las demás pestañas",
       "closeTabsToRight": "Cerrar pestañas a la derecha",

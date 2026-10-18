@@ -4243,6 +4243,7 @@
       "find": "찾기",
       "renameTab": "탭 이름 바꾸기",
       "duplicateTab": "탭 복제",
+      "moveToNewPane": "새 창으로 이동",
       "closeTab": "탭 닫기",
       "closeOtherTabs": "다른 탭 닫기",
       "closeTabsToRight": "오른쪽 탭 닫기",

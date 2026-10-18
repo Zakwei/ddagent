@@ -5078,6 +5078,7 @@ class Translations$terminal$menu$tr extends Translations$terminal$menu$en {
 	@override String get find => 'Bul';
 	@override String get renameTab => 'Sekmeyi yeniden adlandır';
 	@override String get duplicateTab => 'Sekmeyi çoğalt';
+	@override String get moveToNewPane => 'Yeni bölmeye taşı';
 	@override String get closeTab => 'Sekmeyi kapat';
 	@override String get closeOtherTabs => 'Diğer sekmeleri kapat';
 	@override String get closeTabsToRight => 'Sağdaki sekmeleri kapat';
@@ -11790,6 +11791,7 @@ extension on TranslationsTr {
 			'terminal.menu.find' => 'Bul',
 			'terminal.menu.renameTab' => 'Sekmeyi yeniden adlandır',
 			'terminal.menu.duplicateTab' => 'Sekmeyi çoğalt',
+			'terminal.menu.moveToNewPane' => 'Yeni bölmeye taşı',
 			'terminal.menu.closeTab' => 'Sekmeyi kapat',
 			'terminal.menu.closeOtherTabs' => 'Diğer sekmeleri kapat',
 			'terminal.menu.closeTabsToRight' => 'Sağdaki sekmeleri kapat',

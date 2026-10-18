@@ -5083,6 +5083,7 @@ class Translations$terminal$menu$fr extends Translations$terminal$menu$en {
 	@override String get find => 'Rechercher';
 	@override String get renameTab => 'Renommer l\'onglet';
 	@override String get duplicateTab => 'Dupliquer l\'onglet';
+	@override String get moveToNewPane => 'Déplacer vers un nouveau panneau';
 	@override String get closeTab => 'Fermer l\'onglet';
 	@override String get closeOtherTabs => 'Fermer les autres onglets';
 	@override String get closeTabsToRight => 'Fermer les onglets à droite';
@@ -11795,6 +11796,7 @@ extension on TranslationsFr {
 			'terminal.menu.find' => 'Rechercher',
 			'terminal.menu.renameTab' => 'Renommer l\'onglet',
 			'terminal.menu.duplicateTab' => 'Dupliquer l\'onglet',
+			'terminal.menu.moveToNewPane' => 'Déplacer vers un nouveau panneau',
 			'terminal.menu.closeTab' => 'Fermer l\'onglet',
 			'terminal.menu.closeOtherTabs' => 'Fermer les autres onglets',
 			'terminal.menu.closeTabsToRight' => 'Fermer les onglets à droite',

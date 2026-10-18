@@ -5073,6 +5073,7 @@ class Translations$terminal$menu$ja extends Translations$terminal$menu$en {
 	@override String get find => '検索';
 	@override String get renameTab => 'タブ名を変更';
 	@override String get duplicateTab => 'タブを複製';
+	@override String get moveToNewPane => '新しいペインに移動';
 	@override String get closeTab => 'タブを閉じる';
 	@override String get closeOtherTabs => '他のタブを閉じる';
 	@override String get closeTabsToRight => '右側のタブを閉じる';
@@ -11784,6 +11785,7 @@ extension on TranslationsJa {
 			'terminal.menu.find' => '検索',
 			'terminal.menu.renameTab' => 'タブ名を変更',
 			'terminal.menu.duplicateTab' => 'タブを複製',
+			'terminal.menu.moveToNewPane' => '新しいペインに移動',
 			'terminal.menu.closeTab' => 'タブを閉じる',
 			'terminal.menu.closeOtherTabs' => '他のタブを閉じる',
 			'terminal.menu.closeTabsToRight' => '右側のタブを閉じる',

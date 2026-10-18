@@ -5073,6 +5073,7 @@ class Translations$terminal$menu$zh_TW extends Translations$terminal$menu$en {
 	@override String get find => '尋找';
 	@override String get renameTab => '重新命名分頁';
 	@override String get duplicateTab => '複製分頁';
+	@override String get moveToNewPane => '移到新面板';
 	@override String get closeTab => '關閉分頁';
 	@override String get closeOtherTabs => '關閉其他分頁';
 	@override String get closeTabsToRight => '關閉右側分頁';
@@ -11784,6 +11785,7 @@ extension on TranslationsZhTw {
 			'terminal.menu.find' => '尋找',
 			'terminal.menu.renameTab' => '重新命名分頁',
 			'terminal.menu.duplicateTab' => '複製分頁',
+			'terminal.menu.moveToNewPane' => '移到新面板',
 			'terminal.menu.closeTab' => '關閉分頁',
 			'terminal.menu.closeOtherTabs' => '關閉其他分頁',
 			'terminal.menu.closeTabsToRight' => '關閉右側分頁',
