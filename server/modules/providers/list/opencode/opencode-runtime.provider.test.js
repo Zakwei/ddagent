@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import http from 'node:http';
-import { mkdtemp, rm } from 'node:fs/promises';
+import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
@@ -14,6 +14,7 @@ import { resetServersForTest, setServerForTest } from './opencode-server.manager
 import { OpenCodeSessionsProvider } from './opencode-sessions.provider.js';
 
 const sessionsProvider = new OpenCodeSessionsProvider();
+const TEST_PASSWORD = 'test-serve-password';
 
 const makeContext = (providerSessionId = null) => ({
   resolveProviderSessionId: () => providerSessionId,
@@ -36,22 +37,30 @@ const makeWriter = () => ({
 });
 
 /**
- * In-memory `opencode serve` stub. The runtime talks plain HTTP/SSE, so the
- * stub only needs route handlers for session, prompt, permission replies,
- * abort and a hold-open `/event` stream.
+ * In-memory OpenCode 2 `serve` stub: the `/api/*` routes the runtime uses
+ * (basic auth, JSON envelopes, SSE at `/api/event`) with recorders for every
+ * request the tests assert on.
  */
 function createFakeServe() {
   const state = {
     sseClients: new Set(),
     sseConnects: 0,
     sseLastEventIds: [],
+    authHeaders: [],
     promptBodies: [],
+    modelBodies: [],
+    agentBodies: [],
     permissionReplies: [],
-    questionReplies: [],
-    questionRejects: [],
-    aborts: [],
-    disposes: [],
+    formReplies: [],
+    formCancels: [],
+    interrupts: [],
+    evictions: [],
     nextSessionId: 1,
+    /** `GET /api/session/active` body — session id → `{ type: 'running' }`. */
+    active: {},
+    /** `GET /api/session/:id` records (`location.directory` matters). */
+    sessionRecords: {},
+    interruptedResponse: undefined,
     emit(event) {
       const line = `data: ${JSON.stringify(event)}\n\n`;
       for (const res of state.sseClients) {
@@ -62,6 +71,7 @@ function createFakeServe() {
 
   const server = http.createServer((req, res) => {
     const url = new URL(req.url, 'http://localhost');
+    state.authHeaders.push(req.headers.authorization ?? null);
     let body = '';
     req.on('data', (chunk) => { body += chunk; });
     req.on('end', () => {
@@ -69,81 +79,95 @@ function createFakeServe() {
       try {
         parsed = body ? JSON.parse(body) : null;
       } catch { /* ignore */ }
-
-      if (req.method === 'GET' && url.pathname === '/config') {
+      const json = (payload, status = 200) => {
+        res.statusCode = status;
         res.setHeader('Content-Type', 'application/json');
-        res.end('{}');
+        res.end(JSON.stringify(payload));
+      };
+      const noContent = () => {
+        res.statusCode = 204;
+        res.end();
+      };
+
+      if (req.method === 'GET' && url.pathname === '/api/info') {
+        json({ version: '2.0.32', pid: process.pid, urls: [], paths: { tmp: os.tmpdir() } });
         return;
       }
-      if (req.method === 'GET' && url.pathname === '/event') {
+      if (req.method === 'GET' && url.pathname === '/api/event') {
         state.sseConnects += 1;
         state.sseLastEventIds.push(req.headers['last-event-id'] ?? null);
         res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache' });
-        res.write('data: {"type":"server.connected"}\n\n');
+        res.write('data: {"type":"server.connected","data":{}}\n\n');
         state.sseClients.add(res);
-        // 'close' must hang off the response — on a GET the request's close
-        // fires as soon as the headers are read, which would drop this client
-        // from the set before any emit reaches it.
         res.on('close', () => state.sseClients.delete(res));
         return;
       }
-      if (req.method === 'POST' && url.pathname === '/session') {
-        res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({ id: `ses_fake_${state.nextSessionId++}` }));
+      if (req.method === 'POST' && url.pathname === '/api/session') {
+        const id = `ses_fake_${state.nextSessionId++}`;
+        json({ data: { id, location: parsed?.location ?? {}, title: parsed?.title ?? '' } });
+        state.onSessionCreated?.(id);
         return;
       }
-      // Must precede /session/:id — the bare-id regex would swallow 'status'.
-      if (req.method === 'GET' && url.pathname === '/session/status') {
-        res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify(state.sessionStatuses ?? {}));
+      if (req.method === 'GET' && url.pathname === '/api/session/active') {
+        json({ data: state.active });
         return;
       }
-      const sessionGet = url.pathname.match(/^\/session\/([^/]+)$/);
+      const sessionGet = url.pathname.match(/^\/api\/session\/([^/]+)$/);
       if (req.method === 'GET' && sessionGet) {
-        res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify(state.sessionRecords?.[sessionGet[1]] ?? {}));
+        json({ data: state.sessionRecords?.[sessionGet[1]] ?? { id: sessionGet[1] } });
         return;
       }
-      const prompt = url.pathname.match(/^\/session\/([^/]+)\/prompt_async$/);
+      const model = url.pathname.match(/^\/api\/session\/([^/]+)\/model$/);
+      if (req.method === 'POST' && model) {
+        state.modelBodies.push({ sessionID: model[1], body: parsed });
+        noContent();
+        return;
+      }
+      const agent = url.pathname.match(/^\/api\/session\/([^/]+)\/agent$/);
+      if (req.method === 'POST' && agent) {
+        state.agentBodies.push({ sessionID: agent[1], body: parsed });
+        noContent();
+        return;
+      }
+      const prompt = url.pathname.match(/^\/api\/session\/([^/]+)\/prompt$/);
       if (req.method === 'POST' && prompt) {
-        state.promptBodies.push({ sessionID: prompt[1], body: parsed });
-        res.statusCode = 204;
-        res.end();
+        state.promptBodies.push({ sessionID: prompt[1], body: parsed, directory: url.searchParams.get('location[directory]') });
+        json({ data: { id: `msg_${state.promptBodies.length}`, sessionID: prompt[1], type: 'user', payload: { text: parsed?.text } } });
         return;
       }
-      const permission = url.pathname.match(/^\/session\/([^/]+)\/permissions\/([^/]+)$/);
+      const permission = url.pathname.match(/^\/api\/session\/([^/]+)\/permission\/([^/]+)\/reply$/);
       if (req.method === 'POST' && permission) {
         state.permissionReplies.push({
           sessionID: permission[1],
           permissionID: permission[2],
-          response: parsed?.response,
+          decision: parsed?.decision,
+          message: parsed?.message,
         });
-        res.end('true');
+        noContent();
         return;
       }
-      const questionReply = url.pathname.match(/^\/question\/([^/]+)\/reply$/);
-      if (req.method === 'POST' && questionReply) {
-        state.questionReplies.push({ requestID: questionReply[1], answers: parsed?.answers });
-        res.end('true');
+      const formReply = url.pathname.match(/^\/api\/session\/([^/]+)\/form\/([^/]+)\/reply$/);
+      if (req.method === 'POST' && formReply) {
+        state.formReplies.push({ sessionID: formReply[1], formID: formReply[2], answer: parsed?.answer });
+        noContent();
         return;
       }
-      const questionReject = url.pathname.match(/^\/question\/([^/]+)\/reject$/);
-      if (req.method === 'POST' && questionReject) {
-        state.questionRejects.push(questionReject[1]);
-        res.end('true');
+      const formCancel = url.pathname.match(/^\/api\/session\/([^/]+)\/form\/([^/]+)$/);
+      if (req.method === 'DELETE' && formCancel) {
+        state.formCancels.push({ sessionID: formCancel[1], formID: formCancel[2] });
+        noContent();
         return;
       }
-      const abort = url.pathname.match(/^\/session\/([^/]+)\/abort$/);
-      if (req.method === 'POST' && abort) {
-        state.aborts.push(abort[1]);
-        state.onAbort?.(abort[1]);
-        res.statusCode = 204;
-        setTimeout(() => res.end(), state.abortDelayMs ?? 0);
+      const interrupt = url.pathname.match(/^\/api\/session\/([^/]+)\/interrupt$/);
+      if (req.method === 'POST' && interrupt) {
+        state.interrupts.push(interrupt[1]);
+        state.onInterrupt?.(interrupt[1]);
+        setTimeout(() => json({ interrupted: state.interruptedResponse ?? true }), state.interruptDelayMs ?? 0);
         return;
       }
-      if (req.method === 'POST' && url.pathname === '/instance/dispose') {
-        state.disposes.push(url.searchParams.get('directory'));
-        res.end('true');
+      if (req.method === 'DELETE' && url.pathname === '/api/debug/location') {
+        state.evictions.push(url.searchParams.get('location[directory]'));
+        noContent();
         return;
       }
       res.statusCode = 404;
@@ -169,29 +193,24 @@ async function withFakeServe(fn) {
   const { server, state } = createFakeServe();
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
   const baseUrl = `http://127.0.0.1:${server.address().port}`;
-  const previous = process.env.OPENCODE_SERVE_BASE_URL;
-  const previousStall = process.env.OPENCODE_SSE_STALL_MS;
-  const previousRetryStall = process.env.OPENCODE_RETRY_STALL_MS;
+  const previous = {
+    OPENCODE_SERVE_BASE_URL: process.env.OPENCODE_SERVE_BASE_URL,
+    OPENCODE_SERVE_PASSWORD: process.env.OPENCODE_SERVE_PASSWORD,
+    OPENCODE_SSE_STALL_MS: process.env.OPENCODE_SSE_STALL_MS,
+    OPENCODE_RETRY_STALL_MS: process.env.OPENCODE_RETRY_STALL_MS,
+  };
   process.env.OPENCODE_SERVE_BASE_URL = baseUrl;
+  process.env.OPENCODE_SERVE_PASSWORD = TEST_PASSWORD;
   resetServersForTest();
-
   try {
     await fn({ state, tempRoot, baseUrl });
   } finally {
-    if (previous === undefined) {
-      delete process.env.OPENCODE_SERVE_BASE_URL;
-    } else {
-      process.env.OPENCODE_SERVE_BASE_URL = previous;
-    }
-    if (previousStall === undefined) {
-      delete process.env.OPENCODE_SSE_STALL_MS;
-    } else {
-      process.env.OPENCODE_SSE_STALL_MS = previousStall;
-    }
-    if (previousRetryStall === undefined) {
-      delete process.env.OPENCODE_RETRY_STALL_MS;
-    } else {
-      process.env.OPENCODE_RETRY_STALL_MS = previousRetryStall;
+    for (const [key, value] of Object.entries(previous)) {
+      if (value === undefined) {
+        delete process.env[key];
+      } else {
+        process.env[key] = value;
+      }
     }
     resetServersForTest();
     // Hold-open SSE responses would otherwise keep server.close pending.
@@ -204,1036 +223,573 @@ async function withFakeServe(fn) {
   }
 }
 
-const textPartEvent = (sessionID, text) => ({
-  type: 'message.part.updated',
-  properties: {
-    sessionID,
-    part: { type: 'text', text, id: 'prt_1', messageID: 'msg_1', sessionID },
-    time: Date.now(),
-  },
+// --- OpenCode 2 event envelopes (`{ type, data }`) ---
+const ev = (type, data) => ({ type, data });
+const executionStarted = (sessionID) => ev('session.execution.started', { sessionID });
+const stepStarted = (sessionID, assistantMessageID = 'msg_a') => ev('session.step.started', { sessionID, assistantMessageID, agent: 'build' });
+const textStarted = (sessionID, ordinal = 0, assistantMessageID = 'msg_a') => ev('session.text.started', { sessionID, assistantMessageID, ordinal });
+const textDelta = (sessionID, delta, ordinal = 0, assistantMessageID = 'msg_a') => ev('session.text.delta', { sessionID, assistantMessageID, ordinal, delta });
+const textEnded = (sessionID, text, ordinal = 0, assistantMessageID = 'msg_a') => ev('session.text.ended', { sessionID, assistantMessageID, ordinal, text });
+const toolInputStarted = (sessionID, id, name, assistantMessageID = 'msg_a') => ev('session.tool.input.started', { sessionID, assistantMessageID, id, name });
+const toolCalled = (sessionID, id, input, assistantMessageID = 'msg_a') => ev('session.tool.called', { sessionID, assistantMessageID, id, input, executed: false });
+const toolSuccess = (sessionID, id, text, metadata, assistantMessageID = 'msg_a') => ev('session.tool.success', { sessionID, assistantMessageID, id, content: [{ type: 'text', text }], metadata });
+const toolFailed = (sessionID, id, message, assistantMessageID = 'msg_a') => ev('session.tool.failed', { sessionID, assistantMessageID, id, error: { type: 'ToolError', message } });
+const stepEnded = (sessionID, assistantMessageID = 'msg_a') => ev('session.step.ended', { sessionID, assistantMessageID, finish: 'stop' });
+const succeeded = (sessionID) => ev('session.execution.succeeded', { sessionID });
+const failed = (sessionID, error) => ev('session.execution.failed', { sessionID, error });
+const interrupted = (sessionID) => ev('session.execution.interrupted', { sessionID });
+const retryScheduled = (sessionID, attempt, message) => ev('session.retry.scheduled', { sessionID, attempt, error: { type: 'APIError', message } });
+const askedEvent = (sessionID, id, action, extra = {}) => ev('permission.asked', {
+  id,
+  sessionID,
+  action,
+  resources: ['echo *'],
+  save: ['echo *'],
+  metadata: { command: 'echo hi' },
+  source: { type: 'tool', messageID: 'msg_a', id: 'call_1' },
+  ...extra,
+});
+const formCreated = (sessionID, id, fields) => ev('form.created', {
+  form: { id, sessionID, title: 'Questions', metadata: { kind: 'question' }, fields },
 });
 
-const toolPartEvent = (sessionID, { id, messageID, tool, input, output, metadata }) => ({
-  type: 'message.part.updated',
-  properties: {
-    sessionID,
-    part: {
-      type: 'tool',
-      id,
-      messageID,
-      callID: `${id}_call`,
-      tool,
-      state: { status: 'completed', input, output, metadata },
-      sessionID,
-    },
-    time: Date.now(),
-  },
-});
+async function startRun({ state, tempRoot }, options = {}, context = makeContext(options.providerSessionId ?? null)) {
+  const writer = makeWriter();
+  const run = opencodeRuntime.run(options.command ?? 'hello', {
+    sessionId: 'app-session',
+    cwd: tempRoot,
+    ...options,
+  }, writer, context);
+  await waitFor(() => state.promptBodies.length >= (options.expectedPrompts ?? 1));
+  const sessionID = state.promptBodies.at(-1).sessionID;
+  return { writer, run, sessionID };
+}
 
-const patchPartEvent = (sessionID, { id, messageID }) => ({
-  type: 'message.part.updated',
-  properties: {
-    sessionID,
-    part: { type: 'patch', id, messageID, hash: 'abc123', files: ['/repo/a.ts'], sessionID },
-    time: Date.now(),
-  },
-});
+test('run creates a session, selects the model and agent, posts the prompt and completes on execution.succeeded', async () => {
+  await withFakeServe(async (ctx) => {
+    const { state } = ctx;
+    const { writer, run, sessionID } = await startRun(ctx, { model: 'anthropic/claude-haiku-5-5' });
 
-const idleEvent = (sessionID) => ({
-  type: 'session.idle',
-  properties: { sessionID },
-});
+    assert.ok(state.authHeaders.every((header) => header === `Basic ${Buffer.from(`opencode:${TEST_PASSWORD}`).toString('base64')}`));
+    assert.deepEqual(state.modelBodies, [{ sessionID, body: { model: { id: 'claude-haiku-5-5', providerID: 'anthropic' } } }]);
+    assert.deepEqual(state.agentBodies, [{ sessionID, body: { agent: 'build' } }]);
+    assert.deepEqual(state.promptBodies[0].body, { text: 'hello' });
+    assert.equal(state.promptBodies[0].directory, ctx.tempRoot);
+    assert.ok(writer.messages.some((message) => message.kind === 'session_created' && message.newSessionId === sessionID));
 
-// Real `opencode serve` emits session.status busy when a turn starts and
-// idle when it ends — the runtime only accepts an idle as terminal for a
-// run that saw its own busy.
-const busyEvent = (sessionID) => ({
-  type: 'session.status',
-  properties: { sessionID, status: { type: 'busy' } },
-});
-
-const askedEvent = (sessionID, id, permission) => ({
-  type: 'permission.asked',
-  properties: {
-    id,
-    sessionID,
-    permission,
-    patterns: ['echo *'],
-    metadata: { command: 'echo hi' },
-    always: ['echo *'],
-    tool: { messageID: 'msg_1', callID: 'call_1' },
-  },
-});
-
-test('run creates a provider session, posts prompt_async and completes on session.idle', async () => {
-  await withFakeServe(async ({ state, tempRoot }) => {
-    const writer = makeWriter();
-    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-1' }, writer, makeContext());
-
-    await waitFor(() => state.promptBodies.length === 1);
-    assert.equal(state.promptBodies[0].sessionID, 'ses_fake_1');
-    assert.equal(state.promptBodies[0].body.parts[0].text, 'Hi');
-    assert.equal(state.promptBodies[0].body.agent, undefined);
-
-    state.emit(textPartEvent('ses_fake_1', 'assistant response'));
-    state.emit(busyEvent('ses_fake_1'));
-    state.emit(idleEvent('ses_fake_1'));
+    state.emit(executionStarted(sessionID));
+    state.emit(stepStarted(sessionID));
+    state.emit(textStarted(sessionID));
+    state.emit(textDelta(sessionID, 'Hel'));
+    state.emit(textDelta(sessionID, 'lo'));
+    state.emit(textEnded(sessionID, 'Hello'));
+    state.emit(stepEnded(sessionID));
+    state.emit(succeeded(sessionID));
     await run;
 
-    const created = writer.messages.findIndex((m) => m.kind === 'session_created');
-    const textIndex = writer.messages.findIndex((m) => m.kind === 'text' && m.content === 'assistant response');
-    const complete = writer.messages.find((m) => m.kind === 'complete');
-    assert.notEqual(created, -1);
-    assert.ok(created < textIndex);
-    assert.equal(writer.messages[created].newSessionId, 'ses_fake_1');
-    assert.equal(writer.sessionId, 'ses_fake_1');
-    assert.equal(complete?.exitCode, 0);
-    assert.equal(writer.messages.some((m) => m.kind === 'error'), false);
+    const kinds = writer.messages.map((message) => message.kind);
+    assert.deepEqual(writer.messages.filter((m) => m.kind === 'stream_delta').map((m) => m.content), ['Hel', 'lo']);
+    // Streamed text is not repeated as a snapshot when the part ends.
+    assert.equal(writer.messages.filter((m) => m.kind === 'text').length, 0);
+    assert.equal(kinds.at(-1), 'complete');
+    assert.equal(writer.messages.at(-1).exitCode, 0);
   });
 });
 
 test('run resumes an existing provider session without session_created', async () => {
-  await withFakeServe(async ({ state, tempRoot }) => {
-    const writer = makeWriter();
-    const run = opencodeRuntime.run(
-      'Hi',
-      { cwd: tempRoot, sessionId: 'app-2' },
-      writer,
-      makeContext('ses_existing'),
-    );
+  await withFakeServe(async (ctx) => {
+    const { state } = ctx;
+    state.sessionRecords.ses_existing = { id: 'ses_existing', location: { directory: ctx.tempRoot } };
+    const { writer, run, sessionID } = await startRun(ctx, { providerSessionId: 'ses_existing' });
 
-    await waitFor(() => state.promptBodies.length === 1);
-    assert.equal(state.promptBodies[0].sessionID, 'ses_existing');
-    state.emit(busyEvent('ses_existing'));
-    state.emit(idleEvent('ses_existing'));
+    assert.equal(sessionID, 'ses_existing');
+    assert.equal(writer.messages.some((message) => message.kind === 'session_created'), false);
+    state.emit(executionStarted(sessionID));
+    state.emit(succeeded(sessionID));
     await run;
-
-    assert.equal(writer.messages.some((m) => m.kind === 'session_created'), false);
-    assert.equal(writer.messages.some((m) => m.kind === 'complete'), true);
   });
 });
 
 test('run ignores a stored provider session bound to another directory', async () => {
-  await withFakeServe(async ({ state, tempRoot }) => {
-    // opencode serve is global — a repointed workspace must not resume the
-    // session rooted in the old directory, it starts a fresh one instead.
-    state.sessionRecords = { ses_old: { id: 'ses_old', directory: '/tmp/other-dir' } };
-    const writer = makeWriter();
-    const run = opencodeRuntime.run(
-      'Hi',
-      { cwd: tempRoot, sessionId: 'app-9' },
-      writer,
-      makeContext('ses_old'),
-    );
+  await withFakeServe(async (ctx) => {
+    const { state } = ctx;
+    state.sessionRecords.ses_elsewhere = { id: 'ses_elsewhere', location: { directory: path.join(ctx.tempRoot, 'other') } };
+    const { writer, run, sessionID } = await startRun(ctx, { providerSessionId: 'ses_elsewhere' });
 
-    await waitFor(() => state.promptBodies.length === 1);
-    assert.equal(state.promptBodies[0].sessionID, 'ses_fake_1');
-    state.emit(busyEvent('ses_fake_1'));
-    state.emit(idleEvent('ses_fake_1'));
+    assert.notEqual(sessionID, 'ses_elsewhere');
+    assert.ok(writer.messages.some((message) => message.kind === 'session_created'));
+    state.emit(executionStarted(sessionID));
+    state.emit(succeeded(sessionID));
     await run;
-
-    assert.equal(writer.messages.some((m) => m.kind === 'session_created'), true);
-    assert.equal(writer.sessionId, 'ses_fake_1');
   });
 });
 
-test('bypassPermissions auto-approves permission.asked with a once reply', async () => {
-  await withFakeServe(async ({ state, tempRoot }) => {
-    const writer = makeWriter();
-    const run = opencodeRuntime.run(
-      'Hi',
-      { cwd: tempRoot, sessionId: 'app-3', permissionMode: 'bypassPermissions' },
-      writer,
-      makeContext(),
-    );
+test('text that was not streamed lands as one assistant text with the history id', async () => {
+  await withFakeServe(async (ctx) => {
+    const { state } = ctx;
+    const { writer, run, sessionID } = await startRun(ctx);
+    state.emit(executionStarted(sessionID));
+    state.emit(textStarted(sessionID, 2, 'msg_7'));
+    state.emit(textEnded(sessionID, 'Done.', 2, 'msg_7'));
+    state.emit(succeeded(sessionID));
+    await run;
 
-    await waitFor(() => state.promptBodies.length === 1);
-    state.emit(askedEvent('ses_fake_1', 'per_1', 'bash'));
+    const text = writer.messages.find((message) => message.kind === 'text');
+    assert.equal(text.content, 'Done.');
+    assert.equal(text.role, 'assistant');
+    assert.equal(text.id, 'msg_7_text_2');
+  });
+});
+
+test('tool calls stream as tool_use + tool_result with the call id', async () => {
+  await withFakeServe(async (ctx) => {
+    const { state } = ctx;
+    const { writer, run, sessionID } = await startRun(ctx);
+    state.emit(executionStarted(sessionID));
+    state.emit(toolInputStarted(sessionID, 'call_1', 'bash'));
+    state.emit(toolCalled(sessionID, 'call_1', { command: 'ls' }));
+    state.emit(toolSuccess(sessionID, 'call_1', 'a.ts\nb.ts'));
+    state.emit(toolInputStarted(sessionID, 'call_2', 'read'));
+    state.emit(toolCalled(sessionID, 'call_2', { filePath: '/x' }));
+    state.emit(toolFailed(sessionID, 'call_2', 'ENOENT'));
+    state.emit(succeeded(sessionID));
+    await run;
+
+    const uses = writer.messages.filter((message) => message.kind === 'tool_use');
+    const results = writer.messages.filter((message) => message.kind === 'tool_result');
+    assert.deepEqual(uses.map((m) => [m.toolName, m.toolId, m.id]), [['bash', 'call_1', 'msg_a_call_1'], ['read', 'call_2', 'msg_a_call_2']]);
+    assert.equal(results[0].content.includes('a.ts'), true);
+    assert.equal(results[0].isError, false);
+    assert.equal(results[1].isError, true);
+    assert.ok(results[1].content.includes('ENOENT'));
+  });
+});
+
+test('bypassPermissions auto-approves permission.asked with a once decision', async () => {
+  await withFakeServe(async (ctx) => {
+    const { state } = ctx;
+    const { writer, run, sessionID } = await startRun(ctx, { permissionMode: 'bypassPermissions' });
+    state.emit(executionStarted(sessionID));
+    state.emit(askedEvent(sessionID, 'per_1', 'bash'));
     await waitFor(() => state.permissionReplies.length === 1);
-
-    assert.equal(state.permissionReplies[0].permissionID, 'per_1');
-    assert.equal(state.permissionReplies[0].response, 'once');
-    assert.equal(writer.messages.some((m) => m.kind === 'permission_request'), false);
-
-    state.emit(busyEvent('ses_fake_1'));
-    state.emit(idleEvent('ses_fake_1'));
+    assert.deepEqual(state.permissionReplies[0], { sessionID, permissionID: 'per_1', decision: 'once', message: undefined });
+    assert.equal(writer.messages.some((message) => message.kind === 'permission_request'), false);
+    state.emit(succeeded(sessionID));
     await run;
   });
 });
 
 test('acceptEdits auto-approves edit asks but forwards bash to the UI', async () => {
-  await withFakeServe(async ({ state, tempRoot }) => {
-    const writer = makeWriter();
-    const run = opencodeRuntime.run(
-      'Hi',
-      { cwd: tempRoot, sessionId: 'app-4', permissionMode: 'acceptEdits' },
-      writer,
-      makeContext(),
-    );
-
-    await waitFor(() => state.promptBodies.length === 1);
-    state.emit(askedEvent('ses_fake_1', 'per_edit', 'edit'));
+  await withFakeServe(async (ctx) => {
+    const { state } = ctx;
+    const { writer, run, sessionID } = await startRun(ctx, { permissionMode: 'acceptEdits' });
+    state.emit(executionStarted(sessionID));
+    state.emit(askedEvent(sessionID, 'per_edit', 'edit', { resources: ['/repo/a.ts'], metadata: { filepath: '/repo/a.ts' } }));
     await waitFor(() => state.permissionReplies.length === 1);
-    assert.equal(state.permissionReplies[0].response, 'once');
+    assert.equal(state.permissionReplies[0].decision, 'once');
 
-    state.emit(askedEvent('ses_fake_1', 'per_bash', 'bash'));
-    await waitFor(() => writer.messages.some((m) => m.kind === 'permission_request'));
-    const request = writer.messages.find((m) => m.kind === 'permission_request');
-    assert.equal(request.requestId, 'per_bash');
+    state.emit(askedEvent(sessionID, 'per_bash', 'bash'));
+    await waitFor(() => writer.messages.some((message) => message.kind === 'permission_request'));
+    const request = writer.messages.find((message) => message.kind === 'permission_request');
     assert.equal(request.toolName, 'bash');
-
-    state.emit(busyEvent('ses_fake_1'));
-    state.emit(idleEvent('ses_fake_1'));
-    await run;
-  });
-});
-
-test('default mode forwards asks and permissions.resolve replies to the server', async () => {
-  await withFakeServe(async ({ state, tempRoot }) => {
-    const writer = makeWriter();
-    const run = opencodeRuntime.run(
-      'Hi',
-      { cwd: tempRoot, sessionId: 'app-5', permissionMode: 'default' },
-      writer,
-      makeContext(),
-    );
-
-    await waitFor(() => state.promptBodies.length === 1);
-    state.emit(askedEvent('ses_fake_1', 'per_a', 'bash'));
-    state.emit(askedEvent('ses_fake_1', 'per_b', 'bash'));
-    await waitFor(() => writer.messages.filter((m) => m.kind === 'permission_request').length === 2);
-
-    assert.deepEqual(
-      opencodeRuntime.permissions.listPending('app-5').map((p) => p.requestId),
-      ['per_a', 'per_b'],
-    );
-
-    opencodeRuntime.permissions.resolve('per_a', { allow: true });
-    opencodeRuntime.permissions.resolve('per_b', { allow: false });
-    await waitFor(() => state.permissionReplies.length === 2);
-    assert.equal(state.permissionReplies[0].response, 'once');
-    assert.equal(state.permissionReplies[1].response, 'reject');
-
-    state.emit(busyEvent('ses_fake_1'));
-    state.emit(idleEvent('ses_fake_1'));
-    await run;
-  });
-});
-
-test('permission_request carries a readable command and permission.replied (1.18 requestID) clears the ask', async () => {
-  await withFakeServe(async ({ state, tempRoot }) => {
-    const writer = makeWriter();
-    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-pr', permissionMode: 'default' }, writer, makeContext());
-
-    await waitFor(() => state.promptBodies.length === 1);
-    state.emit(askedEvent('ses_fake_1', 'per_x', 'bash'));
-    await waitFor(() => writer.messages.some((m) => m.kind === 'permission_request'));
-    const request = writer.messages.find((m) => m.kind === 'permission_request');
     assert.equal(request.input.command, 'echo hi');
-    assert.deepEqual(request.input.patterns, ['echo *']);
+    assert.equal(request.context.rememberEntry, 'bash: echo *');
+    assert.equal(state.permissionReplies.length, 1);
 
-    // Auto-resolved by OpenCode (e.g. a sibling "always" reply).
-    state.emit({ type: 'permission.replied', properties: { sessionID: 'ses_fake_1', requestID: 'per_x', reply: 'always' } });
-    await waitFor(() => writer.messages.some((m) => m.kind === 'permission_cancelled' && m.requestId === 'per_x'));
-    assert.equal(opencodeRuntime.permissions.listPending('app-pr').length, 0);
-
-    state.emit(busyEvent('ses_fake_1'));
-    state.emit(idleEvent('ses_fake_1'));
+    state.emit(succeeded(sessionID));
     await run;
   });
 });
 
-test('single-select and free-text question answers are not split on ", "', async () => {
-  await withFakeServe(async ({ state, tempRoot }) => {
-    const writer = makeWriter();
-    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-q2', permissionMode: 'default' }, writer, makeContext());
+test('default mode forwards asks; resolve replies once / always / reject-with-feedback', async () => {
+  await withFakeServe(async (ctx) => {
+    const { state } = ctx;
+    const { writer, run, sessionID } = await startRun(ctx);
+    state.emit(executionStarted(sessionID));
+    for (const id of ['per_1', 'per_2', 'per_3']) {
+      state.emit(askedEvent(sessionID, id, 'bash'));
+    }
+    await waitFor(() => writer.messages.filter((message) => message.kind === 'permission_request').length === 3);
+    assert.deepEqual(opencodeRuntime.permissions.listPending('app-session').map((entry) => entry.requestId), ['per_1', 'per_2', 'per_3']);
 
-    await waitFor(() => state.promptBodies.length === 1);
-    state.emit(questionAskedEvent('ses_fake_1', 'que_2', sampleQuestions));
-    await waitFor(() => writer.messages.some((m) => m.kind === 'permission_request'));
-    opencodeRuntime.permissions.resolve('que_2', {
-      allow: true,
-      updatedInput: { answers: { 'Which approach?': 'Fast, but test the hot path', 'Which files?': 'a.ts' } },
-    });
-    await waitFor(() => state.questionReplies.length === 1);
-    assert.deepEqual(state.questionReplies[0].answers, [['Fast, but test the hot path'], ['a.ts']]);
+    opencodeRuntime.permissions.resolve('per_1', { allow: true });
+    opencodeRuntime.permissions.resolve('per_2', { allow: true, rememberEntry: 'bash: echo *' });
+    opencodeRuntime.permissions.resolve('per_3', { allow: false, message: 'Use mkdir -p instead' });
+    await waitFor(() => state.permissionReplies.length === 3);
+    assert.deepEqual(state.permissionReplies.map((reply) => [reply.permissionID, reply.decision, reply.message]), [
+      ['per_1', 'once', undefined],
+      ['per_2', 'always', undefined],
+      ['per_3', 'reject', 'Use mkdir -p instead'],
+    ]);
+    // Every other viewer drops the prompt once it is answered.
+    assert.equal(writer.messages.filter((message) => message.kind === 'permission_cancelled').length, 3);
 
-    state.emit(busyEvent('ses_fake_1'));
-    state.emit(idleEvent('ses_fake_1'));
+    state.emit(succeeded(sessionID));
     await run;
   });
 });
 
-test('images are posted as file parts and outside paths are refused', async () => {
-  await withFakeServe(async ({ state, tempRoot }) => {
-    const writer = makeWriter();
-    const run = opencodeRuntime.run('Look', {
-      cwd: tempRoot,
-      sessionId: 'app-img',
-      images: [{ path: path.join(tempRoot, 'shot.png') }, { path: '/etc/secret.png' }],
-    }, writer, makeContext());
-
-    await waitFor(() => state.promptBodies.length === 1);
-    const fileParts = state.promptBodies[0].body.parts.filter((part) => part.type === 'file');
-    assert.equal(fileParts.length, 1);
-    assert.equal(fileParts[0].mime, 'image/png');
-    assert.equal(fileParts[0].url, `file://${path.join(tempRoot, 'shot.png')}`);
-
-    state.emit(busyEvent('ses_fake_1'));
-    state.emit(idleEvent('ses_fake_1'));
+test('permission.replied from another client clears the pending ask', async () => {
+  await withFakeServe(async (ctx) => {
+    const { state } = ctx;
+    const { writer, run, sessionID } = await startRun(ctx);
+    state.emit(executionStarted(sessionID));
+    state.emit(askedEvent(sessionID, 'per_1', 'bash'));
+    await waitFor(() => writer.messages.some((message) => message.kind === 'permission_request'));
+    state.emit(ev('permission.replied', { sessionID, requestID: 'per_1', reply: 'once' }));
+    await waitFor(() => writer.messages.some((message) => message.kind === 'permission_cancelled'));
+    assert.equal(opencodeRuntime.permissions.listPending('app-session').length, 0);
+    state.emit(succeeded(sessionID));
     await run;
   });
 });
 
-test('a MessageOutputLengthError fails the run with readable text', async () => {
-  await withFakeServe(async ({ state, tempRoot }) => {
-    const writer = makeWriter();
-    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-ol' }, writer, makeContext());
-
-    await waitFor(() => state.promptBodies.length === 1);
-    state.emit({
-      type: 'message.updated',
-      properties: { sessionID: 'ses_fake_1', info: { role: 'assistant', error: { name: 'MessageOutputLengthError', data: {} } } },
-    });
-    await assert.rejects(run, /Output length limit reached/);
-    const kinds = writer.messages.filter((m) => m.kind === 'error' || m.kind === 'complete').map((m) => m.kind);
-    assert.deepEqual(kinds, ['error', 'complete']);
-  });
-});
-
-test('setPermissionMode to bypass auto-approves asks already pending mid-run', async () => {
-  await withFakeServe(async ({ state, tempRoot }) => {
-    const writer = makeWriter();
-    const run = opencodeRuntime.run(
-      'Hi',
-      { cwd: tempRoot, sessionId: 'app-6', permissionMode: 'default' },
-      writer,
-      makeContext(),
-    );
-
-    await waitFor(() => state.promptBodies.length === 1);
-    state.emit(askedEvent('ses_fake_1', 'per_live', 'bash'));
-    await waitFor(() => writer.messages.some((m) => m.kind === 'permission_request'));
-
-    opencodeRuntime.setPermissionMode('app-6', 'bypassPermissions');
-    await waitFor(() => state.permissionReplies.length === 1);
-    assert.equal(state.permissionReplies[0].response, 'once');
-    assert.equal(
-      writer.messages.some((m) => m.kind === 'permission_cancelled' && m.requestId === 'per_live'),
-      true,
-    );
-
-    state.emit(busyEvent('ses_fake_1'));
-    state.emit(idleEvent('ses_fake_1'));
-    await run;
-  });
-});
-
-const questionAskedEvent = (sessionID, id, questions) => ({
-  type: 'question.asked',
-  properties: {
-    id,
-    sessionID,
-    questions,
-    tool: { messageID: 'msg_1', callID: 'call_1' },
-  },
-});
-
-const sampleQuestions = [
-  {
-    question: 'Which approach?',
-    header: 'Approach',
-    options: [
-      { label: 'Fast', description: 'Ship it' },
-      { label: 'Safe', description: 'Test it' },
-    ],
-  },
-  {
-    question: 'Which files?',
-    header: 'Files',
-    multiple: true,
-    options: [{ label: 'a.ts', description: 'a' }, { label: 'b.ts', description: 'b' }],
-  },
-];
-
-test('question.asked is forwarded to the UI and resolve replies with positional answers', async () => {
-  await withFakeServe(async ({ state, tempRoot }) => {
-    const writer = makeWriter();
-    const run = opencodeRuntime.run(
-      'Hi',
-      { cwd: tempRoot, sessionId: 'app-q1', permissionMode: 'default' },
-      writer,
-      makeContext(),
-    );
-
-    await waitFor(() => state.promptBodies.length === 1);
-    state.emit(questionAskedEvent('ses_fake_1', 'que_1', sampleQuestions));
-    await waitFor(() => writer.messages.some((m) => m.kind === 'permission_request'));
-
-    const request = writer.messages.find((m) => m.kind === 'permission_request');
-    assert.equal(request.requestId, 'que_1');
+test('form.created is forwarded as a question and answered through the form reply endpoint', async () => {
+  await withFakeServe(async (ctx) => {
+    const { state } = ctx;
+    const { writer, run, sessionID } = await startRun(ctx);
+    state.emit(executionStarted(sessionID));
+    state.emit(formCreated(sessionID, 'frm_1', [
+      {
+        key: 'color',
+        title: 'Color preference',
+        description: 'Which color?',
+        type: 'string',
+        options: [{ value: 'red', label: 'Red' }, { value: 'blue', label: 'Blue' }],
+        custom: true,
+      },
+      {
+        key: 'tags',
+        title: 'Tags',
+        type: 'multiselect',
+        options: [{ value: 'a', label: 'Alpha' }, { value: 'b', label: 'Beta, really' }],
+      },
+      { key: 'count', title: 'How many?', type: 'integer' },
+      { key: 'confirm', title: 'Proceed?', type: 'boolean' },
+      { key: 'secret', title: 'hidden', type: 'string', hidden: true },
+    ]));
+    await waitFor(() => writer.messages.some((message) => message.kind === 'permission_request'));
+    const request = writer.messages.find((message) => message.kind === 'permission_request');
     assert.equal(request.toolName, 'AskUserQuestion');
-    assert.equal(request.input.questions.length, 2);
-    assert.equal(request.input.questions[0].options[0].label, 'Fast');
-    assert.deepEqual(
-      opencodeRuntime.permissions.listPending('app-q1').map((p) => p.requestId),
-      ['que_1'],
-    );
+    assert.equal(request.requestId, 'frm_1');
+    assert.deepEqual(request.input.questions.map((question) => question.question), ['Color preference', 'Tags', 'How many?', 'Proceed?']);
+    assert.deepEqual(request.input.questions[0].options.map((option) => option.label), ['Red', 'Blue', 'Other']);
+    assert.equal(request.input.questions[1].multiSelect, true);
+    assert.deepEqual(request.input.questions[3].options.map((option) => option.label), ['Yes', 'No']);
 
-    opencodeRuntime.permissions.resolve('que_1', {
+    opencodeRuntime.permissions.resolve('frm_1', {
       allow: true,
       updatedInput: {
-        questions: sampleQuestions,
         answers: {
-          'Which approach?': 'Fast',
-          'Which files?': 'a.ts, b.ts',
+          'Color preference': 'Red',
+          Tags: 'Beta, really',
+          'How many?': '3',
+          'Proceed?': 'Yes',
         },
       },
     });
-    await waitFor(() => state.questionReplies.length === 1);
-    assert.equal(state.questionReplies[0].requestID, 'que_1');
-    assert.deepEqual(state.questionReplies[0].answers, [['Fast'], ['a.ts', 'b.ts']]);
-    // `custom` defaults on: an "Other" free-text option is offered.
-    assert.equal(request.input.questions[0].options.at(-1).label, 'Other');
-    assert.equal(opencodeRuntime.permissions.listPending('app-q1').length, 0);
-
-    state.emit(busyEvent('ses_fake_1'));
-    state.emit(idleEvent('ses_fake_1'));
-    await run;
-  });
-});
-
-test('question.asked skip (empty answers) replies with empty selections', async () => {
-  await withFakeServe(async ({ state, tempRoot }) => {
-    const writer = makeWriter();
-    const run = opencodeRuntime.run(
-      'Hi',
-      { cwd: tempRoot, sessionId: 'app-q2', permissionMode: 'default' },
-      writer,
-      makeContext(),
-    );
-
-    await waitFor(() => state.promptBodies.length === 1);
-    state.emit(questionAskedEvent('ses_fake_1', 'que_skip', sampleQuestions));
-    await waitFor(() => writer.messages.some((m) => m.kind === 'permission_request'));
-
-    opencodeRuntime.permissions.resolve('que_skip', { allow: true, updatedInput: { answers: {} } });
-    await waitFor(() => state.questionReplies.length === 1);
-    assert.deepEqual(state.questionReplies[0].answers, [[], []]);
-
-    state.emit(busyEvent('ses_fake_1'));
-    state.emit(idleEvent('ses_fake_1'));
-    await run;
-  });
-});
-
-test('question.asked reject posts to the question reject endpoint', async () => {
-  await withFakeServe(async ({ state, tempRoot }) => {
-    const writer = makeWriter();
-    const run = opencodeRuntime.run(
-      'Hi',
-      { cwd: tempRoot, sessionId: 'app-q3', permissionMode: 'default' },
-      writer,
-      makeContext(),
-    );
-
-    await waitFor(() => state.promptBodies.length === 1);
-    state.emit(questionAskedEvent('ses_fake_1', 'que_rej', sampleQuestions));
-    await waitFor(() => writer.messages.some((m) => m.kind === 'permission_request'));
-
-    opencodeRuntime.permissions.resolve('que_rej', { allow: false });
-    await waitFor(() => state.questionRejects.length === 1);
-    assert.equal(state.questionRejects[0], 'que_rej');
-
-    state.emit(busyEvent('ses_fake_1'));
-    state.emit(idleEvent('ses_fake_1'));
-    await run;
-  });
-});
-
-test('question.v2.asked (nested data) is forwarded to the UI even in bypass mode', async () => {
-  await withFakeServe(async ({ state, tempRoot }) => {
-    const writer = makeWriter();
-    const run = opencodeRuntime.run(
-      'Hi',
-      { cwd: tempRoot, sessionId: 'app-q4', permissionMode: 'bypassPermissions' },
-      writer,
-      makeContext(),
-    );
-
-    await waitFor(() => state.promptBodies.length === 1);
-    state.emit({
-      type: 'question.v2.asked',
-      properties: { id: 'que_v2', sessionID: 'ses_fake_1', questions: sampleQuestions },
+    await waitFor(() => state.formReplies.length === 1);
+    assert.deepEqual(state.formReplies[0], {
+      sessionID,
+      formID: 'frm_1',
+      answer: { color: 'red', tags: ['b'], count: 3, confirm: true },
     });
-    // Questions are user input, not permissions: bypass must not auto-answer.
-    await waitFor(() => writer.messages.some((m) => m.kind === 'permission_request'));
-    const request = writer.messages.find((m) => m.kind === 'permission_request');
-    assert.equal(request.requestId, 'que_v2');
-    assert.equal(request.toolName, 'AskUserQuestion');
-    assert.equal(state.questionReplies.length, 0);
 
-    opencodeRuntime.permissions.resolve('que_v2', {
-      allow: true,
-      updatedInput: { answers: { 'Which approach?': 'Safe' } },
+    state.emit(succeeded(sessionID));
+    await run;
+  });
+});
+
+test('a rejected form is cancelled; a free-text answer and a split multi-select survive', async () => {
+  await withFakeServe(async (ctx) => {
+    const { state } = ctx;
+    const { writer, run, sessionID } = await startRun(ctx);
+    state.emit(executionStarted(sessionID));
+    state.emit(formCreated(sessionID, 'frm_a', [{ key: 'q0', title: 'Why?', type: 'string', options: [{ value: 'x', label: 'X' }] }]));
+    state.emit(formCreated(sessionID, 'frm_b', [
+      { key: 'picks', title: 'Pick', type: 'multiselect', options: [{ value: '1', label: 'One' }, { value: '2', label: 'Two' }] },
+    ]));
+    await waitFor(() => writer.messages.filter((message) => message.kind === 'permission_request').length === 2);
+
+    opencodeRuntime.permissions.resolve('frm_a', { allow: true, updatedInput: { answers: { 'Why?': 'because, obviously' } } });
+    opencodeRuntime.permissions.resolve('frm_b', { allow: true, updatedInput: { answers: { Pick: 'One, Two' } } });
+    await waitFor(() => state.formReplies.length === 2);
+    assert.deepEqual(state.formReplies[0].answer, { q0: 'because, obviously' });
+    assert.deepEqual(state.formReplies[1].answer, { picks: ['1', '2'] });
+
+    state.emit(formCreated(sessionID, 'frm_c', [{ key: 'q', title: 'Sure?', type: 'string' }]));
+    await waitFor(() => writer.messages.filter((message) => message.kind === 'permission_request').length === 3);
+    opencodeRuntime.permissions.resolve('frm_c', { allow: false });
+    await waitFor(() => state.formCancels.length === 1);
+    assert.deepEqual(state.formCancels[0], { sessionID, formID: 'frm_c' });
+
+    state.emit(succeeded(sessionID));
+    await run;
+  });
+});
+
+test('bypassPermissions still forwards forms — user input is not a permission', async () => {
+  await withFakeServe(async (ctx) => {
+    const { state } = ctx;
+    const { writer, run, sessionID } = await startRun(ctx, { permissionMode: 'bypassPermissions' });
+    state.emit(executionStarted(sessionID));
+    state.emit(formCreated(sessionID, 'frm_1', [{ key: 'q', title: 'Which?', type: 'string', options: [{ value: 'a', label: 'A' }] }]));
+    await waitFor(() => writer.messages.some((message) => message.kind === 'permission_request'));
+    assert.equal(state.formReplies.length, 0);
+    state.emit(ev('form.cancelled', { sessionID, formID: 'frm_1' }));
+    await waitFor(() => writer.messages.some((message) => message.kind === 'permission_cancelled'));
+    state.emit(succeeded(sessionID));
+    await run;
+  });
+});
+
+test('images are posted as file attachments and outside paths are refused', async () => {
+  await withFakeServe(async (ctx) => {
+    const { state, tempRoot } = ctx;
+    const inside = path.join(tempRoot, 'shot.png');
+    await writeFile(inside, 'png');
+    const { run, sessionID } = await startRun(ctx, {
+      images: [{ path: 'shot.png', name: 'shot.png', mediaType: 'image/png' }, { path: '/etc/passwd', name: 'passwd' }],
     });
-    await waitFor(() => state.questionReplies.length === 1);
-    assert.equal(state.questionReplies[0].requestID, 'que_v2');
-    assert.deepEqual(state.questionReplies[0].answers, [['Safe'], []]);
-
-    state.emit(busyEvent('ses_fake_1'));
-    state.emit(idleEvent('ses_fake_1'));
+    const body = state.promptBodies[0].body;
+    assert.equal(body.files.length, 1);
+    assert.equal(body.files[0].uri, `file://${inside}`);
+    assert.equal(body.files[0].name, 'shot.png');
+    assert.ok(body.text.includes('<images_input>'));
+    state.emit(executionStarted(sessionID));
+    state.emit(succeeded(sessionID));
     await run;
   });
 });
 
-test('question.replied clears a pending question for another client', async () => {
-  await withFakeServe(async ({ state, tempRoot }) => {
-    const writer = makeWriter();
-    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-q5' }, writer, makeContext());
-
-    await waitFor(() => state.promptBodies.length === 1);
-    state.emit(questionAskedEvent('ses_fake_1', 'que_other', sampleQuestions));
-    await waitFor(() => writer.messages.some((m) => m.kind === 'permission_request'));
-
-    state.emit({
-      type: 'question.replied',
-      properties: { sessionID: 'ses_fake_1', requestID: 'que_other', answers: [['Fast'], []] },
-    });
-    await waitFor(() => writer.messages.some((m) => m.kind === 'permission_cancelled' && m.requestId === 'que_other'));
-
-    state.emit(busyEvent('ses_fake_1'));
-    state.emit(idleEvent('ses_fake_1'));
+test('plan mode selects the plan agent; an effort variant rides on the model', async () => {
+  await withFakeServe(async (ctx) => {
+    const { state } = ctx;
+    const context = {
+      ...makeContext(),
+      getProviderModels: async () => ({
+        OPTIONS: [{ value: 'openai/gpt-5', effort: { default: 'medium', values: [{ value: 'low' }, { value: 'high' }] } }],
+        DEFAULT: 'openai/gpt-5',
+      }),
+    };
+    const { run, sessionID } = await startRun(ctx, { permissionMode: 'plan', model: 'openai/gpt-5', effort: 'high' }, context);
+    assert.deepEqual(state.agentBodies.at(-1).body, { agent: 'plan' });
+    assert.deepEqual(state.modelBodies.at(-1).body, { model: { id: 'gpt-5', providerID: 'openai', variant: 'high' } });
+    state.emit(executionStarted(sessionID));
+    state.emit(succeeded(sessionID));
     await run;
   });
 });
 
-test('plan mode sends the plan agent on prompt_async', async () => {
-  await withFakeServe(async ({ state, tempRoot }) => {
-    const writer = makeWriter();
-    const run = opencodeRuntime.run(
-      'Hi',
-      { cwd: tempRoot, sessionId: 'app-7', permissionMode: 'plan' },
-      writer,
-      makeContext(),
-    );
-
-    await waitFor(() => state.promptBodies.length === 1);
-    assert.equal(state.promptBodies[0].body.agent, 'plan');
-
-    state.emit(busyEvent('ses_fake_1'));
-    state.emit(idleEvent('ses_fake_1'));
-    await run;
+test('session.execution.failed fails the run with the provider error text', async () => {
+  await withFakeServe(async (ctx) => {
+    const { state } = ctx;
+    const { writer, run, sessionID } = await startRun(ctx);
+    state.emit(executionStarted(sessionID));
+    state.emit(failed(sessionID, { type: 'provider.auth', message: 'Missing API key' }));
+    await assert.rejects(run, /Missing API key/);
+    assert.equal(writer.messages.at(-1).kind, 'complete');
+    assert.equal(writer.messages.at(-1).exitCode, 1);
+    assert.ok(writer.messages.some((message) => message.kind === 'error' && message.content === 'Missing API key'));
   });
 });
 
-test('a stale session.idle arriving before the prompt posts does not settle the run', async () => {
-  await withFakeServe(async ({ state, tempRoot }) => {
-    const writer = makeWriter();
-    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-10' }, writer, makeContext('ses_stale'));
+test('a stale execution.succeeded arriving before the prompt posts does not settle the run', async () => {
+  await withFakeServe(async (ctx) => {
+    const { state } = ctx;
+    // The previous turn's trailing completion lands right after the session
+    // is created — before this run's prompt went out.
+    state.onSessionCreated = (sessionID) => state.emit(succeeded(sessionID));
+    const { writer, run, sessionID } = await startRun(ctx);
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    assert.equal(writer.messages.some((message) => message.kind === 'complete'), false);
 
-    // The aborted/previous turn's trailing idle arrives while the new run is
-    // still in setup — it must neither resolve the run nor skip the prompt.
-    state.emit(idleEvent('ses_stale'));
-
-    let settled = false;
-    void run.then(() => { settled = true; }, () => { settled = true; });
-    await new Promise((resolve) => setTimeout(resolve, 100));
-    assert.equal(settled, false);
-
-    await waitFor(() => state.promptBodies.length === 1);
-    assert.equal(state.promptBodies[0].sessionID, 'ses_stale');
-
-    state.emit(busyEvent('ses_stale'));
-    state.emit(idleEvent('ses_stale'));
+    state.emit(executionStarted(sessionID));
+    state.emit(succeeded(sessionID));
     await run;
-    assert.equal(writer.messages.some((m) => m.kind === 'complete' && m.exitCode === 0), true);
+    assert.equal(writer.messages.at(-1).kind, 'complete');
   });
 });
 
-test('an idle with no busy still completes the run after the grace window', async () => {
-  await withFakeServe(async ({ state, tempRoot }) => {
-    const writer = makeWriter();
-    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-11' }, writer, makeContext());
-
-    await waitFor(() => state.promptBodies.length === 1);
-    // A turn that produced no busy event must not hang forever.
-    state.emit(idleEvent('ses_fake_1'));
+test('a succeeded with no live event still completes once the status poll confirms the session is idle', async () => {
+  await withFakeServe(async (ctx) => {
+    const { state } = ctx;
+    const { writer, run, sessionID } = await startRun(ctx);
+    // No execution.started — the only word is the completion itself.
+    state.emit(succeeded(sessionID));
     await run;
-    assert.equal(writer.messages.some((m) => m.kind === 'complete' && m.exitCode === 0), true);
+    assert.equal(writer.messages.at(-1).kind, 'complete');
+  });
+}, { timeout: 20000 });
+
+test('live rows end at every part boundary so text around a tool never merges', async () => {
+  await withFakeServe(async (ctx) => {
+    const { state } = ctx;
+    const { writer, run, sessionID } = await startRun(ctx);
+    state.emit(executionStarted(sessionID));
+    state.emit(ev('session.reasoning.started', { sessionID, assistantMessageID: 'm1', ordinal: 0 }));
+    state.emit(ev('session.reasoning.delta', { sessionID, assistantMessageID: 'm1', ordinal: 0, delta: 'plan' }));
+    state.emit(textStarted(sessionID, 0, 'm1'));
+    state.emit(textDelta(sessionID, 'first', 0, 'm1'));
+    state.emit(toolInputStarted(sessionID, 'call_1', 'bash', 'm1'));
+    state.emit(toolCalled(sessionID, 'call_1', { command: 'ls' }, 'm1'));
+    state.emit(textStarted(sessionID, 1, 'm1'));
+    state.emit(textDelta(sessionID, 'done', 1, 'm1'));
+    state.emit(succeeded(sessionID));
+    await run;
+
+    const trace = writer.messages
+      .filter((message) => ['thought_delta', 'stream_delta', 'stream_end', 'tool_use'].includes(message.kind))
+      .map((message) => message.kind === 'stream_end' ? '|' : message.kind === 'tool_use' ? `[${message.toolName}]` : message.content);
+    assert.deepEqual(trace, ['plan', '|', 'first', '|', '[bash]', 'done']);
   });
 });
 
-const deltaEvent = (sessionID, partID, delta, field = 'text') => ({
-  type: 'message.part.delta',
-  properties: { sessionID, messageID: 'msg_1', partID, field, delta },
-});
+test('abort posts to the interrupt endpoint and resolves the run; a refused interrupt keeps it live', async () => {
+  await withFakeServe(async (ctx) => {
+    const { state } = ctx;
+    const { writer, run, sessionID } = await startRun(ctx);
+    state.emit(executionStarted(sessionID));
 
-const partUpdateEvent = (sessionID, partID, partType, text = '') => ({
-  type: 'message.part.updated',
-  properties: {
-    sessionID,
-    part: { type: partType, text, id: partID, messageID: 'msg_1', sessionID },
-    time: Date.now(),
-  },
-});
+    state.interruptedResponse = false;
+    assert.equal(await opencodeRuntime.abort('app-session'), false);
+    assert.equal(opencodeRuntime.isSessionActive?.('app-session') ?? true, true);
 
-test('message.part.delta forwards live stream_delta/thought_delta chunks', async () => {
-  await withFakeServe(async ({ state, tempRoot }) => {
-    const writer = makeWriter();
-    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-d1' }, writer, makeContext());
-
-    await waitFor(() => state.promptBodies.length === 1);
-    const sid = 'ses_fake_1';
-    // Reasoning part announced first, then its deltas stream as thought_delta.
-    state.emit(partUpdateEvent(sid, 'prt_r1', 'reasoning', ''));
-    state.emit(deltaEvent(sid, 'prt_r1', 'thinking…'));
-    state.emit(deltaEvent(sid, 'prt_r1', ' still thinking'));
-    // Text part: creation update, two deltas, then the final snapshot.
-    state.emit(partUpdateEvent(sid, 'prt_t1', 'text', ''));
-    state.emit(deltaEvent(sid, 'prt_t1', 'Hello '));
-    state.emit(deltaEvent(sid, 'prt_t1', 'world'));
-    // The final text snapshot must be suppressed too, not just reasoning's:
-    // its deltas already streamed, and re-sending it as a `text` row would
-    // duplicate the live row (the client's echo dedupe only merges adjacent
-    // twins, so an interleaved tool row keeps the duplicate visible).
-    state.emit(partUpdateEvent(sid, 'prt_t1', 'text', 'Hello world'));
-    // Final reasoning snapshot must be suppressed — its deltas already streamed.
-    state.emit(partUpdateEvent(sid, 'prt_r1', 'reasoning', 'thinking… still thinking'));
-    state.emit(busyEvent(sid));
-    state.emit(idleEvent(sid));
+    state.interruptedResponse = true;
+    assert.equal(await opencodeRuntime.abort('app-session'), true);
+    assert.deepEqual(state.interrupts, [sessionID, sessionID]);
     await run;
-
-    const deltas = writer.messages.filter((m) => m.kind === 'stream_delta').map((m) => m.content);
-    const thoughts = writer.messages.filter((m) => m.kind === 'thought_delta').map((m) => m.content);
-    assert.deepEqual(deltas, ['Hello ', 'world']);
-    assert.deepEqual(thoughts, ['thinking…', ' still thinking']);
-    assert.equal(writer.messages.some((m) => m.kind === 'text' && m.content === 'Hello world'), false);
-    assert.equal(writer.messages.some((m) => m.kind === 'thinking'), false);
-    assert.equal(writer.messages.some((m) => m.kind === 'complete' && m.exitCode === 0), true);
+    assert.equal(writer.messages.some((message) => message.kind === 'complete'), false);
   });
 });
 
-test('the auto-generated patch echo of a live edit tool is dropped', async () => {
-  await withFakeServe(async ({ state, tempRoot }) => {
-    const writer = makeWriter();
-    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-patch-echo' }, writer, makeContext());
-
-    await waitFor(() => state.promptBodies.length === 1);
-    const sid = 'ses_fake_1';
-    // The edit tool carries the diff in its own metadata; OpenCode then mirrors
-    // it with a `patch` part in the same message. Only the edit must render.
-    state.emit(toolPartEvent(sid, {
-      id: 'prt_e1',
-      messageID: 'msg_1',
-      tool: 'edit',
-      input: { filePath: '/repo/a.ts', oldString: 'x', newString: 'y' },
-      output: 'Edit applied successfully.',
-      metadata: { diff: 'Index: /repo/a.ts\n+added' },
-    }));
-    state.emit(patchPartEvent(sid, { id: 'prt_p1', messageID: 'msg_1' }));
-    // A genuine standalone patch in a message with no edit tool still renders.
-    state.emit(patchPartEvent(sid, { id: 'prt_p2', messageID: 'msg_2' }));
-    state.emit(busyEvent(sid));
-    state.emit(idleEvent(sid));
+test('steer posts the message to the running turn with steer delivery', async () => {
+  await withFakeServe(async (ctx) => {
+    const { state } = ctx;
+    const { writer, run, sessionID } = await startRun(ctx);
+    assert.equal(await opencodeRuntime.steer('app-session', 'also this', {}), false);
+    state.active = { [sessionID]: { type: 'running' } };
+    state.emit(executionStarted(sessionID));
+    state.emit(textStarted(sessionID));
+    state.emit(textDelta(sessionID, 'working'));
+    await waitFor(() => writer.messages.some((message) => message.kind === 'stream_delta'));
+    assert.equal(await opencodeRuntime.steer('app-session', 'also this', {}), true);
+    assert.deepEqual(state.promptBodies.at(-1).body, { text: 'also this', delivery: 'steer' });
+    assert.ok(writer.messages.some((message) => message.kind === 'text' && message.role === 'user' && message.content === 'also this'));
+    state.emit(succeeded(sessionID));
     await run;
-
-    const editRows = writer.messages.filter((m) => m.kind === 'tool_use' && m.toolName === 'edit');
-    const patchRows = writer.messages.filter((m) => m.kind === 'tool_use' && m.toolName === 'Patch');
-    assert.equal(editRows.length, 1);
-    assert.equal(patchRows.length, 1);
-    assert.equal((patchRows[0].toolInput ?? {}).id, 'prt_p2');
-    assert.match(editRows[0].toolResult.content, /\+added/);
   });
 });
 
 test('a turn that finished while the event stream was down completes via the status resync', async () => {
-  await withFakeServe(async ({ state, tempRoot }) => {
-    const writer = makeWriter();
-    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-sse1' }, writer, makeContext());
-
-    await waitFor(() => state.promptBodies.length === 1);
-    const sid = 'ses_fake_1';
-    state.emit(busyEvent(sid));
-
-    // The stream drops and the turn finishes while it is down — its
-    // session.idle never arrives. The reconnect's /session/status resync
-    // must settle the run instead of letting it hang.
-    state.sessionStatuses = { [sid]: { type: 'idle' } };
+  await withFakeServe(async (ctx) => {
+    const { state } = ctx;
+    const { writer, run, sessionID } = await startRun(ctx);
+    state.emit(executionStarted(sessionID));
+    await waitFor(() => state.sseClients.size === 1);
+    // The turn ends during the outage: no completion event is ever seen,
+    // and `/session/active` no longer lists the session.
+    state.active = {};
     for (const res of state.sseClients) {
       res.end();
     }
-    state.sseClients.clear();
-
     await run;
-    assert.equal(writer.messages.some((m) => m.kind === 'complete' && m.exitCode === 0), true);
+    assert.equal(writer.messages.at(-1).kind, 'complete');
+    assert.ok(state.sseConnects >= 2);
+  });
+}, { timeout: 20000 });
+
+test('a running status observed in reconcile adopts the turn so a later succeeded settles it', async () => {
+  await withFakeServe(async (ctx) => {
+    const { state, baseUrl } = ctx;
+    const { writer, run, sessionID } = await startRun(ctx);
+    state.active = { [sessionID]: { type: 'running' } };
+    await reconcileActiveRuns(baseUrl);
+    state.emit(succeeded(sessionID));
+    await run;
+    assert.equal(writer.messages.at(-1).kind, 'complete');
   });
 });
 
-test('a finished turn omitted from the status map settles after the resync re-polls', async () => {
-  await withFakeServe(async ({ state, tempRoot }) => {
-    const writer = makeWriter();
-    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-sse2' }, writer, makeContext());
-
-    await waitFor(() => state.promptBodies.length === 1);
-    const sid = 'ses_fake_1';
-    state.emit(busyEvent(sid));
-
-    // This build omits finished sessions from /session/status entirely, so
-    // the post-reconnect poll finds no entry at all. The resync must confirm
-    // the absence over its bounded re-polls and settle the run.
-    state.sessionStatuses = {};
-    for (const res of state.sseClients) {
-      res.end();
-    }
-    state.sseClients.clear();
-
-    await run;
-    assert.equal(writer.messages.some((m) => m.kind === 'complete' && m.exitCode === 0), true);
-  });
-});
-
-test('a stalled (half-open) event stream is aborted and reconnected', async () => {
-  await withFakeServe(async ({ state, tempRoot }) => {
-    process.env.OPENCODE_SSE_STALL_MS = '300';
-    const writer = makeWriter();
-    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-stall' }, writer, makeContext());
-
-    await waitFor(() => state.promptBodies.length === 1);
-    const sid = 'ses_fake_1';
-    // A tagged event seeds the Last-Event-ID cursor for the reconnect.
-    state.emit({ id: 'ev-42', ...busyEvent(sid) });
-
-    // The first connection never delivers anything again — the watchdog must
-    // notice the silence and re-establish the stream on its own.
-    await waitFor(() => state.sseConnects >= 2);
-    assert.equal(state.sseLastEventIds[0], null);
-    assert.equal(state.sseLastEventIds[1], 'ev-42');
-
-    state.emit(idleEvent(sid));
-    await run;
-    assert.equal(writer.messages.some((m) => m.kind === 'complete' && m.exitCode === 0), true);
-  });
-});
-
-test('a run survives its serve process being replaced mid-turn', async () => {
-  const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'opencode-serve-test-'));
-  const first = createFakeServe();
-  const second = createFakeServe();
-  await new Promise((resolve) => first.server.listen(0, '127.0.0.1', resolve));
-  await new Promise((resolve) => second.server.listen(0, '127.0.0.1', resolve));
-  const firstUrl = `http://127.0.0.1:${first.server.address().port}`;
-  const secondUrl = `http://127.0.0.1:${second.server.address().port}`;
-  resetServersForTest();
-  // The env seam would bypass the servers map entirely — inject handles so
-  // the real ensureServer/getServer lookups drive the run.
-  setServerForTest(tempRoot, { baseUrl: firstUrl, directory: tempRoot, child: null });
-
+test('a session.retry.scheduled surfaces a retry status; a stalled retry aborts the wedged turn', async () => {
+  process.env.OPENCODE_RETRY_STALL_MS = '200';
   try {
-    const writer = makeWriter();
-    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-fo1' }, writer, makeContext());
-    await waitFor(() => first.state.promptBodies.length === 1);
-    const sid = 'ses_fake_1';
-    first.state.emit(busyEvent(sid));
+    await withFakeServe(async (ctx) => {
+      const { state } = ctx;
+      const { writer, run, sessionID } = await startRun(ctx);
+      // A retrying turn is still listed as running by the status poll.
+      state.active = { [sessionID]: { type: 'running' } };
+      state.emit(executionStarted(sessionID));
+      state.emit(retryScheduled(sessionID, 1, 'rate limited'));
+      await waitFor(() => writer.messages.some((message) => message.kind === 'status' && /retry 1/.test(message.text)));
+      assert.ok(writer.messages.some((message) => message.kind === 'status' && message.notice && /rate limited/.test(message.text)));
 
-    // The serve process dies and its replacement is already registered —
-    // the event stream must hop to the new port instead of failing the run
-    // after a retry budget spent on a dead one.
-    setServerForTest(tempRoot, { baseUrl: secondUrl, directory: tempRoot, child: null });
-    for (const res of first.state.sseClients) {
-      res.end();
-    }
-    first.server.closeAllConnections();
-    await new Promise((resolve) => first.server.close(resolve));
-
-    await waitFor(() => second.state.sseConnects >= 1);
-    second.state.emit(busyEvent(sid));
-    second.state.emit(idleEvent(sid));
-    await run;
-
-    assert.equal(writer.messages.some((m) => m.kind === 'complete' && m.exitCode === 0), true);
-    assert.equal(writer.messages.some((m) => m.kind === 'error'), false);
+      await new Promise((resolve) => setTimeout(resolve, 250));
+      state.emit(retryScheduled(sessionID, 1, 'rate limited'));
+      await assert.rejects(run, /retry stalled/);
+      assert.deepEqual(state.interrupts, [sessionID]);
+    });
   } finally {
-    resetServersForTest();
-    for (const res of [...first.state.sseClients, ...second.state.sseClients]) {
-      res.end();
-    }
-    second.server.closeAllConnections?.();
-    await new Promise((resolve) => second.server.close(resolve));
-    await rm(tempRoot, { recursive: true, force: true });
+    delete process.env.OPENCODE_RETRY_STALL_MS;
   }
 });
 
-test('periodic status reconcile settles a run whose terminal idle was missed', async () => {
-  await withFakeServe(async ({ state, tempRoot, baseUrl }) => {
-    const writer = makeWriter();
-    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-rec1' }, writer, makeContext());
-
-    await waitFor(() => state.promptBodies.length === 1);
-    const sid = 'ses_fake_1';
-    state.emit(busyEvent(sid));
-
-    // The stream stays connected but the session.idle event never arrives.
-    // The status poll must settle the run on its own.
-    state.sessionStatuses = { [sid]: { type: 'idle' } };
-    await reconcileActiveRuns(baseUrl);
-
-    await run;
-    assert.equal(writer.messages.some((m) => m.kind === 'complete' && m.exitCode === 0), true);
-  });
-});
-
-test('a busy status observed in reconcile adopts the turn so a later idle settles', async () => {
-  await withFakeServe(async ({ state, tempRoot, baseUrl }) => {
-    const writer = makeWriter();
-    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-rec2' }, writer, makeContext());
-
-    await waitFor(() => state.promptBodies.length === 1);
-    const sid = 'ses_fake_1';
-
-    // The SSE busy event was lost; the status map still reports the turn as
-    // live. Reconcile must credit the run with its own busy so the eventual
-    // idle is accepted instead of debated as stale.
-    state.sessionStatuses = { [sid]: { type: 'busy' } };
-    await reconcileActiveRuns(baseUrl);
-
-    state.emit(idleEvent(sid));
-    await run;
-    assert.equal(writer.messages.some((m) => m.kind === 'complete' && m.exitCode === 0), true);
-  });
-});
-
-test('a session.status retry surfaces a rate-limit status to the client', async () => {
-  await withFakeServe(async ({ state, tempRoot }) => {
-    const writer = makeWriter();
-    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-rl1' }, writer, makeContext());
-
-    await waitFor(() => state.promptBodies.length === 1);
-    const sid = 'ses_fake_1';
-    state.emit({
-      type: 'session.status',
-      properties: { sessionID: sid, status: { type: 'retry', attempt: 2, message: 'Rate Limited' } },
+test('a stalled (half-open) event stream is aborted and reconnected', async () => {
+  process.env.OPENCODE_SSE_STALL_MS = '150';
+  try {
+    await withFakeServe(async (ctx) => {
+      const { state } = ctx;
+      const { run, sessionID } = await startRun(ctx);
+      state.emit(executionStarted(sessionID));
+      await waitFor(() => state.sseConnects >= 2, 5000);
+      state.emit(succeeded(sessionID));
+      await run;
     });
-    await waitFor(() => writer.messages.some((m) => m.kind === 'status' && m.text?.includes('retry')));
+  } finally {
+    delete process.env.OPENCODE_SSE_STALL_MS;
+  }
+});
 
-    const statusMessage = writer.messages.find((m) => m.kind === 'status' && !m.notice);
-    assert.equal(statusMessage.text, 'Rate Limited — retry 2');
-    // C1: one persistent notice per retry streak.
-    state.emit({
-      type: 'session.status',
-      properties: { sessionID: sid, status: { type: 'retry', attempt: 3, message: 'Rate Limited' } },
-    });
-    await waitFor(() => writer.messages.some((m) => m.text === 'Rate Limited — retry 3'));
-    const notices = writer.messages.filter((m) => m.kind === 'status' && m.notice === true);
-    assert.deepEqual(notices.map((m) => m.text), ['OpenCode is retrying: Rate Limited']);
+test('a run survives its serve process being replaced mid-turn', async () => {
+  await withFakeServe(async (ctx) => {
+    const { state, tempRoot } = ctx;
+    const { writer, run, sessionID } = await startRun(ctx);
+    state.emit(executionStarted(sessionID));
 
-    state.emit(busyEvent(sid));
-    state.emit(idleEvent(sid));
+    // Replacement server on another port — the stream must follow it.
+    const replacement = createFakeServe();
+    await new Promise((resolve) => replacement.server.listen(0, '127.0.0.1', resolve));
+    const replacementUrl = `http://127.0.0.1:${replacement.server.address().port}`;
+    replacement.state.active = { [sessionID]: { type: 'running' } };
+    try {
+      delete process.env.OPENCODE_SERVE_BASE_URL;
+      setServerForTest(tempRoot, { baseUrl: replacementUrl, directory: tempRoot, child: null, password: TEST_PASSWORD });
+      for (const res of state.sseClients) {
+        res.end();
+      }
+      await waitFor(() => replacement.state.sseClients.size === 1, 5000);
+      replacement.state.emit(succeeded(sessionID));
+      await run;
+      assert.equal(writer.messages.at(-1).kind, 'complete');
+    } finally {
+      for (const res of replacement.state.sseClients) {
+        res.end();
+      }
+      replacement.server.closeAllConnections?.();
+      await new Promise((resolve) => replacement.server.close(resolve));
+    }
+  });
+}, { timeout: 20000 });
+
+test('a turn interrupted from elsewhere completes the run instead of failing it', async () => {
+  await withFakeServe(async (ctx) => {
+    const { state } = ctx;
+    const { writer, run, sessionID } = await startRun(ctx);
+    state.emit(executionStarted(sessionID));
+    state.emit(interrupted(sessionID));
     await run;
-  });
-});
-
-test('a provider retry that stops advancing aborts the wedged turn instead of hanging', async () => {
-  await withFakeServe(async ({ state, tempRoot, baseUrl }) => {
-    process.env.OPENCODE_RETRY_STALL_MS = '150';
-    const writer = makeWriter();
-    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-rs1' }, writer, makeContext());
-
-    await waitFor(() => state.promptBodies.length === 1);
-    const sid = 'ses_fake_1';
-    state.emit({
-      type: 'session.status',
-      properties: { sessionID: sid, status: { type: 'retry', attempt: 1, message: 'Provider response headers timed out' } },
-    });
-    state.sessionStatuses = { [sid]: { type: 'retry', attempt: 1 } };
-
-    // The attempt counter never advances — the provider call is hung past
-    // its own timeout. The status poll must abort the wedged turn and fail
-    // the run instead of spinning on "retry 1" forever.
-    await new Promise((resolve) => setTimeout(resolve, 250));
-    await reconcileActiveRuns(baseUrl);
-
-    await assert.rejects(run, /retry stalled/);
-    assert.deepEqual(state.aborts, [sid]);
-    assert.equal(writer.messages.some((m) => m.kind === 'error' && /retry stalled/.test(m.content)), true);
-    assert.equal(writer.messages.some((m) => m.kind === 'complete' && m.exitCode === 1), true);
-  });
-});
-
-test('a retry-stall abort whose own idle arrives first still fails the run', async () => {
-  await withFakeServe(async ({ state, tempRoot, baseUrl }) => {
-    process.env.OPENCODE_RETRY_STALL_MS = '150';
-    const writer = makeWriter();
-    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-rs2' }, writer, makeContext());
-
-    await waitFor(() => state.promptBodies.length === 1);
-    const sid = 'ses_fake_1';
-    state.emit({
-      type: 'session.status',
-      properties: { sessionID: sid, status: { type: 'retry', attempt: 1, message: 'Timed out' } },
-    });
-    state.sessionStatuses = { [sid]: { type: 'retry', attempt: 1 } };
-    // OpenCode publishes the aborted message and the idle before the abort
-    // POST returns.
-    state.onAbort = () => {
-      state.emit({
-        type: 'message.updated',
-        properties: { sessionID: sid, info: { role: 'assistant', error: { name: 'MessageAbortedError', data: {} } } },
-      });
-      state.emit(idleEvent(sid));
-    };
-    state.abortDelayMs = 100;
-    await waitFor(() => writer.messages.some((m) => m.text?.includes('retry 1')));
-    const rejected = assert.rejects(run, /retry stalled/);
-    await new Promise((resolve) => setTimeout(resolve, 250));
-    await reconcileActiveRuns(baseUrl);
-    await rejected;
-    const completes = writer.messages.filter((m) => m.kind === 'complete');
-    assert.deepEqual(completes.map((m) => m.exitCode), [1]);
-  });
-});
-
-test('abort posts to the session abort endpoint and resolves the run', async () => {
-  await withFakeServe(async ({ state, tempRoot }) => {
-    const writer = makeWriter();
-    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-8' }, writer, makeContext());
-
-    await waitFor(() => state.promptBodies.length === 1);
-    const didAbort = await opencodeRuntime.abort('app-8');
-    assert.equal(didAbort, true);
-    await run;
-
-    assert.deepEqual(state.aborts, ['ses_fake_1']);
-  });
-});
-
-const abortedAssistantEvent = (sessionID, outputTokens = 0) => ({
-  type: 'message.updated',
-  properties: {
-    sessionID,
-    info: {
-      id: 'msg_aborted',
-      role: 'assistant',
-      sessionID,
-      error: { name: 'MessageAbortedError', data: { message: 'Aborted' } },
-      tokens: { input: 0, output: outputTokens, reasoning: 0, cache: { read: 0, write: 0 } },
-    },
-  },
-});
-
-test('an instant MessageAbortedError resets the instance and retries the prompt once', async () => {
-  await withFakeServe(async ({ state, tempRoot }) => {
-    const writer = makeWriter();
-    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-p1' }, writer, makeContext());
-
-    await waitFor(() => state.promptBodies.length === 1);
-    // Poisoned directory instance (opencode #30144): the turn dies instantly
-    // with no tokens, and its trailing session.idle must not settle the run.
-    state.emit(abortedAssistantEvent('ses_fake_1'));
-    state.emit(idleEvent('ses_fake_1'));
-
-    await waitFor(() => state.disposes.length === 1);
-    assert.equal(state.disposes[0], tempRoot);
-    await waitFor(() => state.promptBodies.length === 2);
-    assert.equal(state.promptBodies[1].body.parts[0].text, 'Hi');
-    // Let the repost response land so the run leaves the recovering state.
-    await new Promise((resolve) => setTimeout(resolve, 50));
-
-    let settled = false;
-    void run.then(() => { settled = true; }, () => { settled = true; });
-    assert.equal(settled, false);
-
-    state.emit(busyEvent('ses_fake_1'));
-    state.emit(idleEvent('ses_fake_1'));
-    await run;
-    assert.equal(writer.messages.some((m) => m.kind === 'complete' && m.exitCode === 0), true);
-    assert.equal(writer.messages.some((m) => m.kind === 'error'), false);
-  });
-});
-
-test('a second instant abort after the retry does not loop', async () => {
-  await withFakeServe(async ({ state, tempRoot }) => {
-    const writer = makeWriter();
-    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-p2' }, writer, makeContext());
-
-    await waitFor(() => state.promptBodies.length === 1);
-    state.emit(abortedAssistantEvent('ses_fake_1'));
-    await waitFor(() => state.promptBodies.length === 2);
-    await new Promise((resolve) => setTimeout(resolve, 50));
-
-    // Still poisoned after one retry — the run must fail instead of looping,
-    // so a caller (the orchestrator) can fail over to the next candidate.
-    state.emit(abortedAssistantEvent('ses_fake_1'));
-    await assert.rejects(run, /Aborted/);
-
-    assert.equal(state.promptBodies.length, 2);
-    assert.equal(state.disposes.length, 1);
-  });
-});
-
-test('a user-aborted turn does not trigger instance dispose', async () => {
-  await withFakeServe(async ({ state, tempRoot }) => {
-    const writer = makeWriter();
-    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-p3' }, writer, makeContext());
-
-    await waitFor(() => state.promptBodies.length === 1);
-    const didAbort = await opencodeRuntime.abort('app-p3');
-    assert.equal(didAbort, true);
-    state.emit(abortedAssistantEvent('ses_fake_1'));
-    await new Promise((resolve) => setTimeout(resolve, 100));
-
-    assert.equal(state.disposes.length, 0);
-    assert.equal(state.promptBodies.length, 1);
-    await run;
-  });
-});
-
-test('an aborted assistant message carrying tokens is not retried', async () => {
-  await withFakeServe(async ({ state, tempRoot }) => {
-    const writer = makeWriter();
-    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-p4' }, writer, makeContext());
-
-    await waitFor(() => state.promptBodies.length === 1);
-    // A mid-stream provider abort already produced output — replaying the
-    // prompt would duplicate it, so the turn fails through normally.
-    state.emit(abortedAssistantEvent('ses_fake_1', 5));
-    state.emit(busyEvent('ses_fake_1'));
-    state.emit(idleEvent('ses_fake_1'));
-    await assert.rejects(run, /Aborted/);
-
-    assert.equal(state.disposes.length, 0);
-    assert.equal(state.promptBodies.length, 1);
-  });
-});
-
-const erroredAssistantEvent = (sessionID, name, message) => ({
-  type: 'message.updated',
-  properties: {
-    sessionID,
-    info: {
-      id: 'msg_err',
-      role: 'assistant',
-      sessionID,
-      error: { name, data: { message } },
-      tokens: { input: 5, output: 3, reasoning: 0, cache: { read: 0, write: 0 } },
-    },
-  },
-});
-
-test('a terminal assistant-message error fails the run instead of idle-settling as success', async () => {
-  await withFakeServe(async ({ state, tempRoot }) => {
-    const writer = makeWriter();
-    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-err1' }, writer, makeContext());
-
-    await waitFor(() => state.promptBodies.length === 1);
-    const sid = 'ses_fake_1';
-    state.emit(busyEvent(sid));
-    state.emit(erroredAssistantEvent(sid, 'APIError', 'All 2 account(s) rate-limited for claude'));
-    state.emit(idleEvent(sid));
-
-    await assert.rejects(run, /rate-limited/);
-    assert.equal(writer.messages.some((m) => m.kind === 'error' && /rate-limited/.test(m.content)), true);
-    assert.equal(writer.messages.some((m) => m.kind === 'complete' && m.exitCode === 1), true);
+    assert.equal(writer.messages.at(-1).kind, 'complete');
+    assert.equal(writer.messages.at(-1).exitCode, 0);
   });
 });
 

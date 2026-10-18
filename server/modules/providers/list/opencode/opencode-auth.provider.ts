@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import { readFile, rm } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
@@ -5,7 +6,7 @@ import path from 'node:path';
 import spawn from 'cross-spawn';
 
 import type { IProviderAuth, ProviderAuthStatus } from '@/shared/index.js';
-import { providerChildEnv, readObjectRecord, readOptionalString } from '@/shared/index.js';
+import { openSqliteReadonlyDatabase, providerChildEnv, readObjectRecord, readOptionalString } from '@/shared/index.js';
 
 type OpenCodeCredentialsStatus = {
   authenticated: boolean;
@@ -58,9 +59,38 @@ export class OpenCodeProviderAuth implements IProviderAuth {
    * the same relocation provider accounts use to isolate the store.
    */
   private authStorePath(): string {
+    return path.join(this.dataDir(), 'auth.json');
+  }
+
+  private dataDir(): string {
     const dataHome = process.env.XDG_DATA_HOME?.trim();
     const base = dataHome && dataHome.length > 0 ? dataHome : path.join(os.homedir(), '.local', 'share');
-    return path.join(base, 'opencode', 'auth.json');
+    return path.join(base, 'opencode');
+  }
+
+  /**
+   * True when OpenCode 2's `opencode.db` holds at least one saved credential.
+   * A 1.x database (no `credential` table) or a missing file reads as none.
+   */
+  private hasStoredCredentialV2(): boolean {
+    const dbPath = path.join(this.dataDir(), 'opencode.db');
+    if (!existsSync(dbPath)) {
+      return false;
+    }
+    try {
+      const db = openSqliteReadonlyDatabase(dbPath);
+      try {
+        const table = db.prepare("SELECT 1 AS present FROM sqlite_master WHERE type = 'table' AND name = 'credential'").get();
+        if (!table) {
+          return false;
+        }
+        return Boolean(db.prepare('SELECT 1 AS present FROM credential LIMIT 1').get());
+      } finally {
+        db.close();
+      }
+    } catch {
+      return false;
+    }
   }
 
   /**
@@ -111,6 +141,16 @@ export class OpenCodeProviderAuth implements IProviderAuth {
           error: 'Failed to read OpenCode auth',
         };
       }
+    }
+
+    // OpenCode 2 keeps `opencode auth login` credentials in its SQLite
+    // store (`credential` table) instead of auth.json.
+    if (this.hasStoredCredentialV2()) {
+      return {
+        authenticated: true,
+        email: null,
+        method: 'credentials_file',
+      };
     }
 
     const envCredential = OPENCODE_ENV_CREDENTIAL_KEYS.find((key) => process.env[key]?.trim());

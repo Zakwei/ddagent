@@ -54,6 +54,31 @@ const openOpenCodeDatabase = (): Database.Database | null => {
   return openSqliteReadonlyDatabase(dbPath);
 };
 
+const openCodeTableExists = (db: Database.Database, table: string): boolean =>
+  Boolean(db.prepare("SELECT 1 AS present FROM sqlite_master WHERE type = 'table' AND name = ?").get(table));
+
+/**
+ * OpenCode 2 stores a session in `session_v2` with one `session_message` row
+ * per transcript entry (user, assistant, idle, system, …). Sessions created
+ * by 1.x stay in `session`/`message`/`part` until OpenCode migrates them, so
+ * the layout is decided per session.
+ */
+const isOpenCodeV2Session = (db: Database.Database, sessionIds: string[]): boolean => {
+  if (sessionIds.length === 0 || !openCodeTableExists(db, 'session_v2')) {
+    return false;
+  }
+  const placeholders = sessionIds.map(() => '?').join(', ');
+  return Boolean(db.prepare(`SELECT 1 AS present FROM session_v2 WHERE id IN (${placeholders}) LIMIT 1`).get(...sessionIds));
+};
+
+type OpenCodeV2MessageRow = {
+  id: string;
+  type: string;
+  seq: number;
+  time_created: number | null;
+  data: string | null;
+};
+
 type SessionFingerprint = {
   messageCount: number;
   partCount: number;
@@ -81,6 +106,22 @@ const readSessionFingerprint = (
       (SELECT MAX(time_updated) FROM part WHERE session_id IN (${placeholders})) AS partUpdated
   `).get(...sessionIds, ...sessionIds, ...sessionIds, ...sessionIds) as SessionFingerprint;
   return row;
+};
+
+/** `session_message` variant of [readSessionFingerprint] (no part rows). */
+const readV2SessionFingerprint = (
+  db: Database.Database,
+  sessionIds: string[],
+): SessionFingerprint => {
+  const placeholders = sessionIds.map(() => '?').join(', ');
+  const row = db.prepare(`
+    SELECT
+      COUNT(*) AS messageCount,
+      MAX(time_updated) AS messageUpdated
+    FROM session_message
+    WHERE session_id IN (${placeholders})
+  `).get(...sessionIds) as { messageCount: number; messageUpdated: number | null };
+  return { messageCount: row.messageCount, partCount: 0, messageUpdated: row.messageUpdated, partUpdated: null };
 };
 
 const sameFingerprint = (a: SessionFingerprint, b: SessionFingerprint): boolean =>
@@ -142,15 +183,44 @@ export const extractOpenCodeErrorMessage = (value: unknown): string | undefined 
     return undefined;
   }
 
-  const name = readOptionalString(record.name);
+  // 1.x: `{ name, data: { message } }`; OpenCode 2: `{ type, message }`.
+  const name = readOptionalString(record.name) ?? readOptionalString(record.type);
   return readOptionalString(record.message)
     ?? readOptionalString(readObjectRecord(record.data)?.message)
     ?? (name ? OPENCODE_ERROR_LABELS[name] ?? name.replace(/Error$/, ' error').replace(/([a-z])([A-Z])/g, '$1 $2') : undefined);
 };
 
 /** A user Stop surfaces as MessageAbortedError — not an error worth a row. */
-const isOpenCodeAbortError = (value: unknown): boolean =>
-  readOptionalString(readObjectRecord(value)?.name) === 'MessageAbortedError';
+const isOpenCodeAbortError = (value: unknown): boolean => {
+  const record = readObjectRecord(value);
+  const name = readOptionalString(record?.name) ?? readOptionalString(record?.type) ?? '';
+  return name === 'MessageAbortedError' || /abort|interrupt/i.test(name);
+};
+
+/**
+ * Text of an OpenCode 2 tool result: `content` is a list of text items and
+ * file references (`{type:'file', uri, mime, name}`). Consumed by the
+ * OpenCode runtime for live `session.tool.success` events and by the
+ * history reader below.
+ */
+export const joinOpenCodeToolContent = (content: unknown): string | undefined => {
+  if (!Array.isArray(content)) {
+    return undefined;
+  }
+  const parts: string[] = [];
+  for (const item of content) {
+    const record = readObjectRecord(item);
+    if (!record) {
+      continue;
+    }
+    if (typeof record.text === 'string') {
+      parts.push(record.text);
+    } else if (typeof record.uri === 'string') {
+      parts.push(`[file] ${readOptionalString(record.name) ?? ''} ${record.uri}`.replace(/\s+/g, ' ').trim());
+    }
+  }
+  return parts.length > 0 ? parts.join('\n') : undefined;
+};
 
 /** Compaction marker shown as a persistent notice (C1). */
 const compactionNoticeText = (part: AnyRecord): string =>
@@ -270,10 +340,39 @@ const readOpenCodeSessionColumnTokenUsage = (
   });
 };
 
+/** OpenCode 2 keeps per-session token totals on the `session_v2` row. */
+const readOpenCodeV2TokenUsage = (
+  db: Database.Database,
+  sessionId: string,
+): AnyRecord | undefined => {
+  const row = db.prepare(`
+    SELECT
+      tokens_input AS inputTokens,
+      tokens_output AS outputTokens,
+      tokens_reasoning AS reasoningTokens,
+      tokens_cache_read AS cacheReadTokens,
+      tokens_cache_write AS cacheWriteTokens,
+      cost AS costUsd
+    FROM session_v2
+    WHERE id = ?
+  `).get(sessionId) as (OpenCodeTokenTotals & { costUsd: number | null }) | undefined;
+  if (!row) {
+    return undefined;
+  }
+  return buildTokenUsage({
+    inputTokens: Number(row.inputTokens ?? 0),
+    outputTokens: Number(row.outputTokens ?? 0),
+    reasoningTokens: Number(row.reasoningTokens ?? 0),
+    cacheReadTokens: Number(row.cacheReadTokens ?? 0),
+    cacheWriteTokens: Number(row.cacheWriteTokens ?? 0),
+    costUsd: Number(row.costUsd ?? 0),
+  });
+};
+
 /**
- * OpenCode stores per-message token counts on assistant `message.data` objects
- * (see MessageV2.Assistant). Older DBs also had session-level counters; this
- * matches current `opencode.db` layouts that only persist message JSON.
+ * OpenCode 1.x stores per-message token counts on assistant `message.data`
+ * objects (see MessageV2.Assistant); some 1.x builds also kept session-level
+ * counters, which win when present.
  */
 const aggregateOpenCodeSessionTokenUsage = (
   db: Database.Database,
@@ -640,9 +739,12 @@ export class OpenCodeSessionsProvider implements IProviderSessions {
       const cacheKey = `${providerSessionId}${sessionId}`;
       // Older fixtures/schemas can lack time_updated — fall back to always
       // rebuilding instead of failing the fetch.
+      const v2 = isOpenCodeV2Session(db, providerSessionIds);
       let fingerprint: SessionFingerprint | null = null;
       try {
-        fingerprint = readSessionFingerprint(db, providerSessionIds);
+        fingerprint = v2
+          ? readV2SessionFingerprint(db, providerSessionIds)
+          : readSessionFingerprint(db, providerSessionIds);
       } catch {
         fingerprint = null;
       }
@@ -664,28 +766,40 @@ export class OpenCodeSessionsProvider implements IProviderSessions {
       }
 
       const placeholders = providerSessionIds.map(() => '?').join(', ');
-      const rows = db.prepare(`
-        SELECT
-          m.id AS message_id,
-          m.time_created AS message_time_created,
-          m.data AS message_data,
-          p.id AS part_id,
-          p.time_created AS part_time_created,
-          p.data AS part_data
-        FROM message m
-        LEFT JOIN part p
-          ON p.session_id = m.session_id
-         AND p.message_id = m.id
-        WHERE m.session_id IN (${placeholders})
-        ORDER BY
-          COALESCE(m.time_created, 0),
-          m.id,
-          COALESCE(p.time_created, 0),
-          p.id
-      `).iterate(...providerSessionIds) as Iterable<OpenCodeHistoryRow>;
-
-      const normalized = this.normalizeHistoryRows(rows, sessionId);
-      const tokenUsage = aggregateOpenCodeSessionTokenUsage(db, providerSessionId);
+      let normalized: NormalizedMessage[];
+      let tokenUsage: AnyRecord | undefined;
+      if (v2) {
+        const rows = db.prepare(`
+          SELECT id, type, seq, time_created, data
+          FROM session_message
+          WHERE session_id IN (${placeholders})
+          ORDER BY seq, time_created, id
+        `).iterate(...providerSessionIds) as Iterable<OpenCodeV2MessageRow>;
+        normalized = this.normalizeV2Rows(rows, sessionId);
+        tokenUsage = readOpenCodeV2TokenUsage(db, providerSessionId);
+      } else {
+        const rows = db.prepare(`
+          SELECT
+            m.id AS message_id,
+            m.time_created AS message_time_created,
+            m.data AS message_data,
+            p.id AS part_id,
+            p.time_created AS part_time_created,
+            p.data AS part_data
+          FROM message m
+          LEFT JOIN part p
+            ON p.session_id = m.session_id
+           AND p.message_id = m.id
+          WHERE m.session_id IN (${placeholders})
+          ORDER BY
+            COALESCE(m.time_created, 0),
+            m.id,
+            COALESCE(p.time_created, 0),
+            p.id
+        `).iterate(...providerSessionIds) as Iterable<OpenCodeHistoryRow>;
+        normalized = this.normalizeHistoryRows(rows, sessionId);
+        tokenUsage = aggregateOpenCodeSessionTokenUsage(db, providerSessionId);
+      }
 
       if (fingerprint && normalized.length <= TRANSCRIPT_CACHE_MAX_MESSAGES) {
         this.transcriptCache.set(cacheKey, { fingerprint, normalized, tokenUsage });
@@ -719,6 +833,176 @@ export class OpenCodeSessionsProvider implements IProviderSessions {
     } finally {
       db.close();
     }
+  }
+
+  /**
+   * OpenCode 2 transcript: one `session_message` row per entry. An assistant
+   * row carries its text, reasoning and tool calls in `content`; ids are
+   * `<messageID>_text_<n>` / `<messageID>_reasoning_<n>` / `<messageID>_<callID>`
+   * — the same ids the live runtime emits, so streamed rows and reloaded
+   * history de-duplicate in the session store.
+   */
+  private normalizeV2Rows(rows: Iterable<OpenCodeV2MessageRow>, sessionId: string): NormalizedMessage[] {
+    const normalized: NormalizedMessage[] = [];
+    let lastAssistantErrorText: string | null = null;
+
+    for (const row of rows) {
+      const data = readJsonRecord(row.data) ?? {};
+      const rowTime = readObjectRecord(data.time);
+      const timestamp = normalizeProviderTimestamp(rowTime?.created ?? row.time_created);
+
+      if (row.type === 'user') {
+        const rawContent = extractText(data);
+        const parsedImages = parseImagesInputTag(rawContent);
+        const parsedFiles = parseFilesInputTag(parsedImages.text);
+        if (!parsedFiles.text.trim() && parsedImages.attachments.length === 0 && parsedFiles.attachments.length === 0) {
+          continue;
+        }
+        normalized.push(createNormalizedMessage({
+          id: row.id,
+          sessionId,
+          timestamp,
+          provider: PROVIDER,
+          kind: 'text',
+          role: 'user',
+          content: parsedFiles.text,
+          images: parsedImages.attachments.length > 0 ? parsedImages.attachments : undefined,
+          files: parsedFiles.attachments.length > 0 ? parsedFiles.attachments : undefined,
+        }));
+        continue;
+      }
+
+      if (row.type === 'assistant') {
+        lastAssistantErrorText = null;
+        const counters = { text: 0, reasoning: 0 };
+        const content = Array.isArray(data.content) ? data.content : [];
+        for (const entry of content) {
+          const item = readObjectRecord(entry);
+          const itemType = readOptionalString(item?.type);
+          if (!item || !itemType) {
+            continue;
+          }
+          const itemTime = readObjectRecord(item.time);
+          const itemTimestamp = normalizeProviderTimestamp(itemTime?.created ?? rowTime?.created ?? row.time_created);
+          if (itemType === 'text' || itemType === 'reasoning') {
+            const ordinal = counters[itemType]++;
+            const text = extractText(item);
+            if (!text.trim()) {
+              continue;
+            }
+            normalized.push(createNormalizedMessage({
+              id: `${row.id}_${itemType}_${ordinal}`,
+              sessionId,
+              timestamp: itemTimestamp,
+              provider: PROVIDER,
+              kind: itemType === 'text' ? 'text' : 'thinking',
+              ...(itemType === 'text' ? { role: 'assistant' } : {}),
+              content: text,
+            }));
+            continue;
+          }
+          if (itemType === 'tool') {
+            const callId = readOptionalString(item.id) ?? `${row.id}_${normalized.length}`;
+            const state = readObjectRecord(item.state) ?? {};
+            const status = readOptionalString(state.status);
+            const rawToolName = readOptionalString(item.name) ?? 'Tool';
+            const toolName = rawToolName.toLowerCase() === 'task' ? 'Task' : rawToolName;
+            let toolInput: unknown = state.input ?? {};
+            if (typeof toolInput === 'string') {
+              toolInput = readJsonRecord(toolInput) ?? { input: toolInput };
+            }
+            const toolMessage = createNormalizedMessage({
+              id: `${row.id}_${callId}`,
+              sessionId,
+              timestamp: itemTimestamp,
+              provider: PROVIDER,
+              kind: 'tool_use',
+              toolName,
+              toolInput,
+              toolId: callId,
+            });
+            if (status === 'completed' || status === 'error') {
+              toolMessage.toolResult = {
+                content: formatCliToolResult(joinOpenCodeToolContent(state.content), state.error, state.metadata),
+                isError: status === 'error',
+              };
+            }
+            normalized.push(toolMessage);
+          }
+        }
+        if (data.error != null && !isOpenCodeAbortError(data.error)) {
+          const text = extractOpenCodeErrorMessage(data.error) ?? formatToolContent(data.error);
+          lastAssistantErrorText = text;
+          normalized.push(createNormalizedMessage({
+            id: `${row.id}_error`,
+            sessionId,
+            timestamp,
+            provider: PROVIDER,
+            kind: 'error',
+            content: text,
+          }));
+        }
+        continue;
+      }
+
+      if (row.type === 'idle') {
+        // The turn's outcome; a failure that the assistant row already
+        // reported is not repeated.
+        if (readOptionalString(data.outcome) === 'failed' && data.error != null && !isOpenCodeAbortError(data.error)) {
+          const text = extractOpenCodeErrorMessage(data.error) ?? formatToolContent(data.error);
+          if (text !== lastAssistantErrorText) {
+            normalized.push(createNormalizedMessage({
+              id: `${row.id}_error`,
+              sessionId,
+              timestamp,
+              provider: PROVIDER,
+              kind: 'error',
+              content: text,
+            }));
+          }
+        }
+        continue;
+      }
+
+      if (row.type === 'compaction') {
+        normalized.push(createNormalizedMessage({
+          id: row.id,
+          sessionId,
+          timestamp,
+          provider: PROVIDER,
+          kind: 'status',
+          text: readOptionalString(data.reason) === 'auto' ? 'Context compacted automatically' : 'Context compacted',
+          notice: true,
+        }));
+        continue;
+      }
+
+      if (row.type === 'shell') {
+        // A `!command` the user ran inside the session — shown as a Bash card.
+        const output = readObjectRecord(data.output);
+        const toolMessage = createNormalizedMessage({
+          id: row.id,
+          sessionId,
+          timestamp,
+          provider: PROVIDER,
+          kind: 'tool_use',
+          toolName: 'Bash',
+          toolInput: { command: readOptionalString(data.command) ?? '' },
+          toolId: row.id,
+        });
+        const status = readOptionalString(data.status);
+        if (status && status !== 'running') {
+          toolMessage.toolResult = {
+            content: readOptionalString(output?.output) ?? '',
+            isError: status !== 'exited' || (typeof data.exit === 'number' && data.exit !== 0),
+          };
+        }
+        normalized.push(toolMessage);
+      }
+      // system / synthetic / skill / agent-switched / model-switched /
+      // location-switched rows are model context, not conversation.
+    }
+    return normalized;
   }
 
   private normalizeHistoryRows(rows: Iterable<OpenCodeHistoryRow>, sessionId: string): NormalizedMessage[] {

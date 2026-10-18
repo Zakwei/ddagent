@@ -13,15 +13,18 @@ import {
   createCompleteMessage,
   createNormalizedMessage,
   getOpenCodeDatabasePath,
-  OPENCODE_EDIT_TOOL_NAMES,
   openSqliteReadonlyDatabase,
   readObjectRecord,
   readOptionalString,
 } from '@/shared/index.js';
+import { formatCliToolResult } from '@/shared/utils.js';
 import { notifyRunFailed, notifyRunStopped } from '@/modules/notifications/index.js';
 import { orchestratorMessagesDb } from '@/modules/database/index.js';
-import { ensureServer, getServer } from '@/modules/providers/list/opencode/opencode-server.manager.js';
-import { extractOpenCodeErrorMessage } from '@/modules/providers/list/opencode/opencode-sessions.provider.js';
+import { ensureServer, getServer, serverAuthHeaders } from '@/modules/providers/list/opencode/opencode-server.manager.js';
+import {
+  extractOpenCodeErrorMessage,
+  joinOpenCodeToolContent,
+} from '@/modules/providers/list/opencode/opencode-sessions.provider.js';
 import type {
   IProviderRuntime,
   AnyRecord,
@@ -89,23 +92,35 @@ function readOpenCodeTokenUsage(sessionId: string | null): AnyRecord | null {
   let db: ReturnType<typeof openSqliteReadonlyDatabase> | null = null;
   try {
     db = openSqliteReadonlyDatabase(dbPath);
-    const columns = db.prepare('PRAGMA table_info(session)').all() as { name: string }[];
-    const columnNames = new Set(columns.map((column) => column.name));
+    // OpenCode 2 rows live in `session_v2`; a session created by 1.x (or a
+    // 1.x-only database) is still in `session`.
+    const tables = (db.prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name IN ('session_v2', 'session')")
+      .all() as { name: string }[]).map((entry) => entry.name);
     const requiredColumns = ['tokens_input', 'tokens_output', 'tokens_reasoning', 'tokens_cache_read', 'tokens_cache_write'];
-    if (!requiredColumns.every((column) => columnNames.has(column))) {
-      return null;
+    let row: AnyRecord | undefined;
+    for (const table of ['session_v2', 'session']) {
+      if (!tables.includes(table)) {
+        continue;
+      }
+      const columns = db.prepare(`PRAGMA table_info(${table})`).all() as { name: string }[];
+      const columnNames = new Set(columns.map((column) => column.name));
+      if (!requiredColumns.every((column) => columnNames.has(column))) {
+        continue;
+      }
+      row = db.prepare(`
+        SELECT
+          tokens_input AS inputTokens,
+          tokens_output AS outputTokens,
+          tokens_reasoning AS reasoningTokens,
+          tokens_cache_read AS cacheReadTokens,
+          tokens_cache_write AS cacheWriteTokens
+        FROM ${table}
+        WHERE id = ?
+      `).get(sessionId) as AnyRecord | undefined;
+      if (row) {
+        break;
+      }
     }
-
-    const row = db.prepare(`
-      SELECT
-        tokens_input AS inputTokens,
-        tokens_output AS outputTokens,
-        tokens_reasoning AS reasoningTokens,
-        tokens_cache_read AS cacheReadTokens,
-        tokens_cache_write AS cacheWriteTokens
-      FROM session
-      WHERE id = ?
-    `).get(sessionId) as AnyRecord | undefined;
 
     if (!row) {
       return null;
@@ -265,6 +280,8 @@ type PendingPermission = {
    */
   kind: 'permission' | 'question';
   questions?: ForwardedQuestion[];
+  /** Field keys/types behind [questions] — a `question` entry's form. */
+  formFields?: FormFieldSpec[];
 };
 
 type EventStreamState = {
@@ -346,13 +363,6 @@ const STALE_IDLE_GRACE_MS = 2000;
  */
 const STALE_IDLE_MIN_TURN_AGE_MS = 10_000;
 /**
- * Window during which a completed `/instance/dispose` still counts as the
- * reset a later poisoned run needs — two turns killed by the same poisoned
- * instance (e.g. a parent plus its orchestrated child) must not dispose
- * twice and kill each other's retry.
- */
-const INSTANCE_DISPOSE_FRESH_MS = 30_000;
-/**
  * Budget for a provider `retry` status whose attempt counter stops
  * advancing. A healthy try is bounded by the provider's own upstream
  * timeout, so an attempt older than this is wedged — the request hung past
@@ -364,155 +374,28 @@ const INSTANCE_DISPOSE_FRESH_MS = 30_000;
 const RETRY_STALL_TIMEOUT_MS = 15 * 60_000;
 
 /**
- * Per-directory dispose bookkeeping for the poisoned-instance recovery
- * (OpenCode issue #30144: an early prompt cancel leaves every later prompt
- * in that directory instantly aborted until the instance is disposed).
+ * One call against the OpenCode 2 HTTP API: routes live under `/api`, every
+ * request carries the serve instance's basic-auth password, and the project
+ * directory travels as the `location[directory]` query parameter (the 1.x
+ * `directory` parameter is gone). Response bodies are JSON envelopes
+ * (`{ data: … }`) — callers unwrap what they need.
  */
-const instanceDisposeInFlight = new Map<string, Promise<void>>();
-const instanceDisposedAt = new Map<string, number>();
-
-/**
- * Disposes the serve-side project instance once per burst: callers sharing a
- * fresh disposal skip their own so a retried turn is never killed by a
- * sibling's late dispose.
- */
-async function ensureInstanceDisposed(baseUrl: string, directory: string): Promise<void> {
-  const key = `${baseUrl}|${directory}`;
-  if ((instanceDisposedAt.get(key) ?? 0) > Date.now() - INSTANCE_DISPOSE_FRESH_MS) {
-    return;
-  }
-  const inFlight = instanceDisposeInFlight.get(key);
-  if (inFlight) {
-    return inFlight;
-  }
-  const pending = apiRequest(baseUrl, '/instance/dispose', {
-    method: 'POST',
-    query: { directory },
-  }).then(() => {
-    instanceDisposedAt.set(key, Date.now());
-  }).catch((error) => {
-    console.warn('[OpenCode] Instance dispose failed:', error instanceof Error ? error.message : String(error));
-  }).finally(() => {
-    if (instanceDisposeInFlight.get(key) === pending) {
-      instanceDisposeInFlight.delete(key);
-    }
-  });
-  instanceDisposeInFlight.set(key, pending);
-  return pending;
-}
-
-/**
- * Total tokens a `message.updated` info reports — poisoned pre-turn aborts
- * complete with zero, which separates them from a mid-stream provider abort
- * (that one already produced output and must not be replayed).
- */
-function messageTokenTotal(info: AnyRecord): number {
-  const tokens = readObjectRecord(info.tokens);
-  if (!tokens) {
-    return 0;
-  }
-  const cache = readObjectRecord(tokens.cache);
-  return ['input', 'output', 'reasoning']
-    .map((field) => Number(tokens[field]) || 0)
-    .reduce((sum, value) => sum + value, 0)
-    + (cache ? (Number(cache.read) || 0) + (Number(cache.write) || 0) : 0);
-}
-
-const POISON_SIBLING_POLL_MS = 2000;
-
-/** Another run is mid-turn in the same serve instance + directory. */
-function hasLiveSiblingRun(run: ActiveRun): boolean {
-  const directory = path.resolve(run.directory);
-  for (const other of activeRuns.values()) {
-    if (
-      other !== run
-      && other.baseUrl === run.baseUrl
-      && path.resolve(other.directory) === directory
-      && other.promptPosted
-      && !other.completeSent
-      && !other.aborted
-      && !other.recovering
-    ) {
-      return true;
-    }
-  }
-  return false;
-}
-
-/**
- * Resets the poisoned directory instance and reposts this run's prompt —
- * self-healing for the OpenCode stale-abort state (issue #30144). The run
- * stays open; the retried turn's own SSE events settle it.
- */
-async function recoverPoisonedRun(run: ActiveRun): Promise<void> {
-  console.warn(`[OpenCode] Instant MessageAbortedError on ${run.providerSessionId} — directory instance is poisoned, resetting it and retrying the prompt once.`);
-  run.writer.send(createNormalizedMessage({
-    kind: 'status',
-    text: 'OpenCode instance wedged — resetting it and retrying the prompt',
-    canInterrupt: true,
-    sessionId: run.providerSessionId ?? run.appSessionId,
-    provider: PROVIDER,
-  }));
-
-  if (!run.baseUrl || !run.providerSessionId || !run.promptBody) {
-    failRun(run, new Error('OpenCode aborted the prompt and the run cannot be retried.'));
-    return;
-  }
-  // Disposing the directory instance kills every turn running in it, so wait
-  // for healthy sibling runs to settle first (Stop still ends this run).
-  while (hasLiveSiblingRun(run)) {
-    if (run.aborted || run.completeSent) {
-      run.resolve();
-      return;
-    }
-    await new Promise((resolve) => setTimeout(resolve, POISON_SIBLING_POLL_MS));
-  }
-  await ensureInstanceDisposed(run.baseUrl, run.directory);
-  if (run.aborted || run.completeSent) {
-    run.resolve();
-    return;
-  }
-
-  let status: number;
-  let data: unknown;
-  try {
-    ({ status, data } = await apiRequest(
-      run.baseUrl,
-      `/session/${run.providerSessionId}/prompt_async`,
-      {
-        method: 'POST',
-        query: { directory: run.directory },
-        body: run.promptBody,
-      },
-    ));
-  } catch (error) {
-    failRun(run, error instanceof Error ? error : new Error(String(error)));
-    return;
-  }
-  if (status >= 400) {
-    failRun(run, new Error(`OpenCode prompt failed after instance reset (HTTP ${status}): ${JSON.stringify(data)}`));
-    return;
-  }
-  // Hand settling back to the retried turn's events — busy credit from the
-  // killed turn is stale and would accept its trailing idle.
-  run.sawBusy = false;
-  run.promptPostedAt = Date.now();
-  run.recovering = false;
-}
-
 async function apiRequest(
   baseUrl: string,
   path: string,
   options: { method?: string; query?: Record<string, string>; body?: unknown } = {},
 ): Promise<{ status: number; data: unknown }> {
-  const url = new URL(`${baseUrl}${path}`);
+  const url = new URL(`${baseUrl}/api${path}`);
   for (const [key, value] of Object.entries(options.query ?? {})) {
-    url.searchParams.set(key, value);
+    url.searchParams.set(key === 'directory' ? 'location[directory]' : key, value);
   }
 
   const response = await fetch(url.toString(), {
     method: options.method ?? 'GET',
-    headers: options.body !== undefined ? { 'Content-Type': 'application/json' } : undefined,
+    headers: {
+      ...serverAuthHeaders(baseUrl),
+      ...(options.body !== undefined ? { 'Content-Type': 'application/json' } : {}),
+    },
     body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
     signal: AbortSignal.timeout(API_TIMEOUT_MS),
   });
@@ -529,49 +412,58 @@ async function apiRequest(
   return { status: response.status, data };
 }
 
+/**
+ * `POST /session/{id}/permission/{request}/reply` — a bare `reject` halts
+ * the agent; with [message] OpenCode feeds the text back and keeps going.
+ */
 function replyPermission(
   baseUrl: string,
   directory: string,
   providerSessionId: string,
   permissionID: string,
-  response: 'once' | 'always' | 'reject',
+  decision: 'once' | 'always' | 'reject',
+  message?: string,
 ): Promise<{ status: number; data: unknown }> {
-  return apiRequest(baseUrl, `/session/${providerSessionId}/permissions/${permissionID}`, {
+  return apiRequest(baseUrl, `/session/${providerSessionId}/permission/${permissionID}/reply`, {
     method: 'POST',
     query: { directory },
-    body: { response },
+    body: { decision, ...(message ? { message } : {}) },
   }).catch((error) => {
     console.warn('[OpenCode] Permission reply failed:', error instanceof Error ? error.message : String(error));
     return { status: 0, data: null };
   });
 }
 
-function replyQuestion(
+/** `POST /session/{id}/form/{form}/reply` — answers keyed by field key. */
+function replyForm(
   baseUrl: string,
   directory: string,
-  requestId: string,
-  answers: string[][],
+  providerSessionId: string,
+  formId: string,
+  answer: AnyRecord,
 ): Promise<{ status: number; data: unknown }> {
-  return apiRequest(baseUrl, `/question/${requestId}/reply`, {
+  return apiRequest(baseUrl, `/session/${providerSessionId}/form/${formId}/reply`, {
     method: 'POST',
     query: { directory },
-    body: { answers },
+    body: { answer },
   }).catch((error) => {
-    console.warn('[OpenCode] Question reply failed:', error instanceof Error ? error.message : String(error));
+    console.warn('[OpenCode] Form reply failed:', error instanceof Error ? error.message : String(error));
     return { status: 0, data: null };
   });
 }
 
-function rejectQuestion(
+/** `DELETE /session/{id}/form/{form}` — the user declined to answer. */
+function cancelForm(
   baseUrl: string,
   directory: string,
-  requestId: string,
+  providerSessionId: string,
+  formId: string,
 ): Promise<{ status: number; data: unknown }> {
-  return apiRequest(baseUrl, `/question/${requestId}/reject`, {
-    method: 'POST',
+  return apiRequest(baseUrl, `/session/${providerSessionId}/form/${formId}`, {
+    method: 'DELETE',
     query: { directory },
   }).catch((error) => {
-    console.warn('[OpenCode] Question reject failed:', error instanceof Error ? error.message : String(error));
+    console.warn('[OpenCode] Form cancel failed:', error instanceof Error ? error.message : String(error));
     return { status: 0, data: null };
   });
 }
@@ -723,76 +615,115 @@ function handlePermissionReplied(_baseUrl: string, props: AnyRecord): void {
   }));
 }
 
-function mapQuestion(raw: AnyRecord): ForwardedQuestion {
-  const options = (Array.isArray(raw.options) ? raw.options : []).map((option: AnyRecord) => ({
-    label: String(option?.label ?? ''),
-    description: typeof option?.description === 'string' ? option.description : undefined,
-  }));
-  // `custom` (default true) lets the user type their own answer; surface it
-  // as an "Other" option unless the model already offered one.
-  if (raw.custom !== false && !options.some((option: { label: string }) => /\b(other|custom)\b/i.test(option.label))) {
+/**
+ * A form field as the interactive panel knows it: the UI renders questions
+ * with option labels, OpenCode wants `{ [field.key]: value }` back, so the
+ * label → value map and the field type ride along in the pending entry.
+ */
+type FormFieldSpec = {
+  key: string;
+  type: string;
+  multi: boolean;
+  valueByLabel: Record<string, string>;
+};
+
+function mapFormField(field: AnyRecord): { question: ForwardedQuestion; spec: FormFieldSpec } | null {
+  const key = readOptionalString(field.key);
+  if (!key || field.hidden === true) {
+    return null;
+  }
+  const type = readOptionalString(field.type) ?? 'string';
+  const rawOptions = Array.isArray(field.options) ? field.options : [];
+  const mapped = rawOptions
+    .map((option: unknown) => {
+      const record = readObjectRecord(option) ?? {};
+      const value = readOptionalString(record.value) ?? readOptionalString(record.label) ?? '';
+      const label = readOptionalString(record.label) ?? value;
+      return { label, value, description: readOptionalString(record.description) };
+    })
+    .filter((option: { label: string }) => option.label);
+  let options: { label: string; description?: string }[] = mapped.map(({ label, description }) => ({ label, description }));
+  const valueByLabel: Record<string, string> = Object.fromEntries(mapped.map(({ label, value }) => [label, value]));
+  if (type === 'boolean') {
+    options = [{ label: 'Yes' }, { label: 'No' }];
+    valueByLabel.Yes = 'true';
+    valueByLabel.No = 'false';
+  }
+  // `custom` (default on for option lists) lets the user type an answer;
+  // free-form fields have nothing else. Surface it as an "Other" option
+  // unless the model already offered one.
+  const allowCustom = type !== 'boolean' && type !== 'external' && (field.custom !== false || options.length === 0);
+  if (allowCustom && !options.some((option) => /\b(other|custom)\b/i.test(option.label))) {
     options.push({ label: FREE_TEXT_OPTION_LABEL, description: 'Type your own answer' });
   }
   return {
-    question: String(raw.question ?? ''),
-    header: typeof raw.header === 'string' ? raw.header : undefined,
-    options,
-    multiSelect: Boolean(raw.multiple),
+    question: {
+      question: readOptionalString(field.title) ?? key,
+      header: readOptionalString(field.description),
+      options,
+      multiSelect: type === 'multiselect',
+    },
+    spec: { key, type, multi: type === 'multiselect', valueByLabel },
   };
 }
 
 /**
- * The `question` tool is a first-class OpenCode event family of its own
- * (`question.asked`), not a permission. We surface it to the UI through the
- * same `permission_request` channel so the existing interactive panel renders,
- * and answer it through `/question/{id}/reply` from `resolve`.
+ * OpenCode 2 asks the user through forms (`form.created`; the `question`
+ * tool produces one with `metadata.kind = "question"`). They are surfaced to
+ * the UI through the same `permission_request` channel so the existing
+ * interactive panel renders, and answered through the form reply endpoint
+ * from `resolve`.
  */
-function handleQuestionAsked(baseUrl: string, props: AnyRecord): void {
-  const providerSessionId = String(props.sessionID ?? '');
-  const requestId = String(props.id ?? '');
-  if (!providerSessionId || !requestId) {
+function handleFormCreated(baseUrl: string, form: AnyRecord): void {
+  const providerSessionId = String(form.sessionID ?? '');
+  const formId = String(form.id ?? '');
+  if (!providerSessionId || !formId) {
     return;
   }
 
   const appSessionId = resolveAskAppSessionId(providerSessionId);
   const run = appSessionId ? activeRuns.get(appSessionId) : undefined;
-  const questions = (Array.isArray(props.questions) ? props.questions : []).map(mapQuestion);
+  const fields = (Array.isArray(form.fields) ? form.fields : [])
+    .map((field: unknown) => mapFormField(readObjectRecord(field) ?? {}))
+    .filter((entry): entry is { question: ForwardedQuestion; spec: FormFieldSpec } => entry !== null);
 
-  // No run means there is no UI to answer through — rejecting lets the
+  // No run means there is no UI to answer through — cancelling lets the
   // provider continue instead of hanging the turn forever.
-  if (!run || !run.baseUrl || questions.length === 0) {
-    void rejectQuestion(baseUrl, run?.directory ?? '', requestId);
+  if (!run || !run.baseUrl || fields.length === 0) {
+    void cancelForm(baseUrl, run?.directory ?? '', providerSessionId, formId);
     return;
   }
 
-  // The question tool is user input, not a permission: bypassPermissions
-  // must not answer for the user. Only headless delegated children keep the
+  // A form is user input, not a permission: bypassPermissions must not
+  // answer for the user. Only headless delegated children keep the
   // empty-answer skip — there is no one to render the panel to.
   if (
     resolveOpenCodePermissionBehavior(modeForSession(appSessionId)).autoApprove === 'all'
     && isDelegatedChildSession(appSessionId)
   ) {
-    void replyQuestion(run.baseUrl, run.directory, requestId, questions.map(() => []));
+    void replyForm(run.baseUrl, run.directory, providerSessionId, formId, {});
     return;
   }
 
+  const questions = fields.map((entry) => entry.question);
   const input = { questions };
-  pendingPermissions.set(requestId, {
-    requestId,
+  pendingPermissions.set(formId, {
+    requestId: formId,
     appSessionId: run.appSessionId,
     providerSessionId,
-    permissionID: requestId,
+    permissionID: formId,
     baseUrl: run.baseUrl,
     directory: run.directory,
     toolName: 'AskUserQuestion',
     input,
     kind: 'question',
     questions,
+    formFields: fields.map((entry) => entry.spec),
   });
 
   run.writer.send(createNormalizedMessage({
     kind: 'permission_request',
-    requestId,
+    requestId: formId,
     toolName: 'AskUserQuestion',
     input,
     sessionId: providerSessionId,
@@ -800,17 +731,16 @@ function handleQuestionAsked(baseUrl: string, props: AnyRecord): void {
   }));
 }
 
-function handleQuestionSettled(props: AnyRecord): void {
-  const requestId = String(props.requestID ?? '');
-  const pending = requestId ? pendingPermissions.get(requestId) : undefined;
+function handleFormSettled(formId: string): void {
+  const pending = formId ? pendingPermissions.get(formId) : undefined;
   if (!pending || pending.kind !== 'question') {
     return;
   }
-  pendingPermissions.delete(requestId);
+  pendingPermissions.delete(formId);
   const run = pending.appSessionId ? activeRuns.get(pending.appSessionId) : undefined;
   run?.writer.send(createNormalizedMessage({
     kind: 'permission_cancelled',
-    requestId,
+    requestId: formId,
     reason: 'resolved',
     sessionId: pending.providerSessionId,
     provider: PROVIDER,
@@ -818,29 +748,51 @@ function handleQuestionSettled(props: AnyRecord): void {
 }
 
 /**
- * Turns the interactive panel's `answers` (question text → labels joined with
- * ", ") into OpenCode's positional `Array<Array<string>>`. Only multi-select
- * answers are split; a single-select or free-text answer is kept whole (free
- * text may contain ", "). A multi-select value equal to one option label is
- * also kept whole, so labels that themselves contain ", " survive.
+ * Turns the interactive panel's `answers` (question text → label, or labels
+ * joined with ", ") into OpenCode's `{ [field.key]: value }`. Only
+ * multi-select answers are split; a single-select or free-text answer is
+ * kept whole (free text may contain ", "). A multi-select value equal to one
+ * option label is also kept whole, so labels that themselves contain ", "
+ * survive. Labels map back to option values; numbers and booleans are typed.
  */
-function questionAnswersToApi(questions: ForwardedQuestion[], answers: unknown): string[][] {
+function formAnswerFromUi(questions: ForwardedQuestion[], specs: FormFieldSpec[], answers: unknown): AnyRecord {
   const map = answers && typeof answers === 'object' && !Array.isArray(answers)
     ? (answers as Record<string, unknown>)
     : {};
-  return questions.map((question) => {
-    const value = map[question.question];
-    if (Array.isArray(value)) {
-      return value.map(String);
+  const answer: AnyRecord = {};
+  specs.forEach((spec, index) => {
+    const question = questions[index];
+    if (!question) {
+      return;
     }
-    if (typeof value !== 'string' || value.trim() === '') {
-      return [];
+    const raw = map[question.question];
+    const toValue = (label: string) => spec.valueByLabel[label] ?? label;
+    if (spec.multi) {
+      let labels: string[] = [];
+      if (Array.isArray(raw)) {
+        labels = raw.map(String);
+      } else if (typeof raw === 'string' && raw.trim()) {
+        labels = question.options.some((option) => option.label === raw)
+          ? [raw]
+          : raw.split(', ').map((part) => part.trim()).filter(Boolean);
+      }
+      answer[spec.key] = labels.map(toValue);
+      return;
     }
-    if (!question.multiSelect || question.options.some((option) => option.label === value)) {
-      return [value];
+    if (typeof raw !== 'string' || raw.trim() === '') {
+      return;
     }
-    return value.split(', ').map((part) => part.trim()).filter(Boolean);
+    const value = toValue(raw);
+    if (spec.type === 'number' || spec.type === 'integer') {
+      const parsed = Number(value);
+      answer[spec.key] = Number.isFinite(parsed) ? parsed : value;
+    } else if (spec.type === 'boolean') {
+      answer[spec.key] = value === 'true' || /^(yes|y|true)$/i.test(raw);
+    } else {
+      answer[spec.key] = value;
+    }
   });
+  return answer;
 }
 
 function finishRun(run: ActiveRun): void {
@@ -905,40 +857,73 @@ function closeLivePart(run: ActiveRun, sessionId: string): void {
   run.writer.send(createNormalizedMessage({ kind: 'stream_end', sessionId, provider: PROVIDER }));
 }
 
+/**
+ * OpenCode 2's `permission.asked` carries a `Permission.Request`
+ * (`action`, `resources`, `save`, `metadata`, `source`); the handlers below
+ * were written for the 1.x names and keep them, so the request is mapped.
+ */
+function normalizePermissionRequest(props: AnyRecord): AnyRecord {
+  if (props.permission !== undefined || props.action === undefined) {
+    return props;
+  }
+  return {
+    ...props,
+    permission: props.action,
+    patterns: Array.isArray(props.resources) ? props.resources : [],
+    always: Array.isArray(props.save) ? props.save : [],
+    tool: props.source,
+  };
+}
+
+const livePartKey = (messageId: string, kind: 'text' | 'reasoning', ordinal: number): string =>
+  `${messageId}_${kind}_${ordinal}`;
+
+const toolMessageId = (messageId: string, callId: string): string =>
+  messageId ? `${messageId}_${callId}` : callId;
+
+/** A turn is visibly live — a later idle/succeeded is ours to settle. */
+function markTurnLive(run: ActiveRun): void {
+  adoptLiveStatus(run);
+  clearRetryStatus(run);
+}
+
+/**
+ * Routes one server event to the run that owns the session. OpenCode 2
+ * streams a turn as `session.execution.started` → `session.step.*` with
+ * `session.text.*` / `session.reasoning.*` / `session.tool.*` inside →
+ * `session.execution.succeeded|failed|interrupted`. Permission asks and
+ * forms arrive as `permission.*` / `form.*`.
+ */
 function dispatchServerEvent(baseUrl: string, event: AnyRecord): void {
-  const props = (event.properties ?? {}) as AnyRecord;
+  // OpenCode 2 envelope: `{ id, type, data }`. The 1.x `properties` shape is
+  // still read so the status reconcile's synthetic events stay simple.
+  const props = (readObjectRecord(event.data) ?? readObjectRecord(event.properties) ?? {}) as AnyRecord;
   const type = String(event.type ?? '');
 
   if (type === 'permission.asked') {
-    handlePermissionAsked(baseUrl, props);
+    handlePermissionAsked(baseUrl, normalizePermissionRequest(props));
     return;
   }
-  if (type === 'permission.replied') {
+  if (type === 'permission.replied' || type === 'permission.rejected') {
     handlePermissionReplied(baseUrl, props);
     return;
   }
-
-  if (type === 'question.asked' || type === 'question.v2.asked') {
-    // SSE carries the payload flat under `properties`; durable variants nest
-    // it under `data`. Accept either.
-    handleQuestionAsked(baseUrl, (event.data ?? props.data ?? props) as AnyRecord);
+  if (type === 'form.created') {
+    handleFormCreated(baseUrl, readObjectRecord(props.form) ?? props);
     return;
   }
-  if (
-    type === 'question.replied'
-    || type === 'question.rejected'
-    || type === 'question.v2.replied'
-    || type === 'question.v2.rejected'
-  ) {
-    const data = (event.data ?? props.data ?? props) as AnyRecord;
-    handleQuestionSettled({ requestID: data.requestID ?? data.id });
+  if (type === 'form.replied' || type === 'form.cancelled') {
+    const form = readObjectRecord(props.form);
+    handleFormSettled(
+      readOptionalString(props.formID) ?? readOptionalString(form?.id) ?? readOptionalString(props.id) ?? '',
+    );
     return;
   }
 
   if (type === 'session.created' || type === 'session.updated') {
     const info = readObjectRecord(props.info);
-    const childId = readOptionalString(info?.id);
-    const parentId = readOptionalString(info?.parentID);
+    const childId = readOptionalString(props.sessionID) ?? readOptionalString(info?.id);
+    const parentId = readOptionalString(props.parentID) ?? readOptionalString(info?.parentID);
     if (childId && parentId) childToParent.set(childId, parentId);
   }
 
@@ -952,147 +937,166 @@ function dispatchServerEvent(baseUrl: string, event: AnyRecord): void {
     return;
   }
   run.lastEventAt = Date.now();
+  const sessionId = run.providerSessionId ?? providerSessionId;
+  const messageId = readOptionalString(props.assistantMessageID) ?? '';
+  const ordinal = Number(props.ordinal) || 0;
 
-  // Poisoned-instance abort (OpenCode issue #30144): the assistant turn dies
-  // instantly with MessageAbortedError and zero tokens even though we never
-  // aborted it. Reset the directory instance and repost the prompt once —
-  // a mid-stream provider abort carries tokens and is left to fail normally.
-  if (type === 'message.updated') {
-    const info = readObjectRecord(props.info) ?? {};
-    const error = readObjectRecord(info.error);
-    if (
-      run.promptPosted
-      && !run.aborted
-      && !run.completeSent
-      && !run.poisonRetried
-      // The retry-stall watchdog's own /abort also ends in a zero-token
-      // MessageAbortedError — that is not poison, and a dispose would kill
-      // sibling runs in the directory.
-      && !run.retryStallAborted
-      && info.role === 'assistant'
-      && error?.name === 'MessageAbortedError'
-      && messageTokenTotal(info) === 0
-    ) {
-      run.poisonRetried = true;
-      run.recovering = true;
-      void recoverPoisonedRun(run);
+  switch (type) {
+    case 'session.execution.started':
+      markTurnLive(run);
       return;
-    }
-    // Any other terminal assistant-message error (provider API/auth/rate-
-    // limit failure, a mid-stream abort that already emitted tokens) ends the
-    // turn in OpenCode — without failing here, the trailing session.idle
-    // settles the run as a success and an orchestrated step gets marked done
-    // on a dead lane.
-    if (
-      run.promptPosted
-      && !run.aborted
-      && !run.completeSent
-      && !run.recovering
-      && !run.retryStallAborted
-      && info.role === 'assistant'
-      && error
-    ) {
-      failRun(run, new Error(extractOpenCodeErrorMessage(error) ?? 'OpenCode turn failed'));
-    }
-    return;
-  }
 
-  if (type === 'message.part.updated') {
-    const part = (props.part ?? {}) as AnyRecord;
-    const partId = typeof part.id === 'string' ? part.id : '';
-    const partType = typeof part.type === 'string' ? part.type : '';
-    if (partId && partType) {
-      run.partTypes.set(partId, partType);
-    }
-    if (partType && partType !== 'text' && partType !== 'reasoning') {
-      closeLivePart(run, run.providerSessionId ?? providerSessionId);
-    }
-    // OpenCode mirrors every edit/write tool with an auto-generated `patch`
-    // part in the same message (same diff) — the CLI shows one card, so drop
-    // the patch echo once the edit tool was seen. The edit tool carries the
-    // diff in its own metadata, so nothing is lost.
-    const partMessageId = typeof part.messageID === 'string' ? part.messageID : '';
-    if (partType === 'patch' && partMessageId && run.editedMessageIds.has(partMessageId)) {
+    case 'session.step.started':
+      markTurnLive(run);
+      run.writer.send(createNormalizedMessage({
+        kind: 'status',
+        text: 'Thinking',
+        canInterrupt: true,
+        sessionId,
+        provider: PROVIDER,
+      }));
       return;
-    }
-    if (partType === 'tool' && partMessageId) {
-      const toolName = readOptionalString(part.tool)?.toLowerCase() ?? '';
-      if (OPENCODE_EDIT_TOOL_NAMES.has(toolName)) {
-        run.editedMessageIds.add(partMessageId);
+
+    case 'session.text.started':
+    case 'session.reasoning.started': {
+      markTurnLive(run);
+      const kind = type === 'session.text.started' ? 'text' : 'reasoning';
+      const key = livePartKey(messageId, kind, ordinal);
+      if (run.livePartId !== key) {
+        closeLivePart(run, sessionId);
+        run.livePartId = key;
       }
-    }
-    // A part whose deltas already streamed must not also land as a snapshot:
-    // the client would render the live row plus the snapshot row, and its
-    // echo dedupe only collapses *adjacent* twins — a tool row interleaved by
-    // timestamp (e.g. `compress` between the text and its turn) splits them
-    // into a visible duplicate. Reasoning had this guard; text was missing it.
-    if ((partType === 'reasoning' || partType === 'text') && run.streamedParts.has(partId)) {
+      run.partTypes.set(key, kind);
       return;
     }
-    let normalized: ReturnType<ProviderRuntimeContext['normalizeMessage']> = [];
-    try {
-      normalized = run.context.normalizeMessage(props, run.providerSessionId ?? providerSessionId);
-    } catch (error) {
-      console.error('[OpenCode] Failed to normalize server event:', error);
-    }
-    for (const message of normalized) {
-      run.writer.send(message);
-    }
-    return;
-  }
 
-  // Token-level streaming: OpenCode emits `message.part.delta` while the model
-  // generates — forwarding them makes the reply grow live instead of landing
-  // as one snapshot when the part finishes (`message.part.updated`).
-  if (type === 'message.part.delta') {
-    const delta = typeof props.delta === 'string' ? props.delta : '';
-    const field = typeof props.field === 'string' ? props.field : '';
-    if (!delta || field !== 'text') {
-      return;
-    }
-    const partId = typeof props.partID === 'string' ? props.partID : '';
-    const partType = partId ? run.partTypes.get(partId) : undefined;
-    if (partType !== undefined && partType !== 'text' && partType !== 'reasoning') {
-      return;
-    }
-    if (partId) {
-      run.streamedParts.add(partId);
-      if (run.livePartId !== partId) {
-        closeLivePart(run, run.providerSessionId ?? providerSessionId);
-        run.livePartId = partId;
+    // Token-level streaming — forwarding deltas makes the reply grow live
+    // instead of landing as one snapshot when the part ends.
+    case 'session.text.delta':
+    case 'session.reasoning.delta': {
+      const delta = typeof props.delta === 'string' ? props.delta : '';
+      if (!delta) {
+        return;
       }
+      const kind = type === 'session.text.delta' ? 'text' : 'reasoning';
+      const key = livePartKey(messageId, kind, ordinal);
+      if (run.livePartId !== key) {
+        closeLivePart(run, sessionId);
+        run.livePartId = key;
+      }
+      run.streamedParts.add(key);
+      run.writer.send(createNormalizedMessage({
+        kind: kind === 'reasoning' ? 'thought_delta' : 'stream_delta',
+        content: delta,
+        sessionId,
+        provider: PROVIDER,
+      }));
+      return;
     }
-    run.writer.send(createNormalizedMessage({
-      kind: partType === 'reasoning' ? 'thought_delta' : 'stream_delta',
-      content: delta,
-      sessionId: run.providerSessionId ?? providerSessionId,
-      provider: PROVIDER,
-    }));
-    return;
-  }
 
-  // Any non-idle status means a turn is live. Counted per run so a later
-  // `session.idle` is known to be ours — not a leftover from the aborted or
-  // pre-restart turn that shared this provider session.
-  if (type === 'session.status' && props.status?.type && props.status.type !== 'idle') {
-    run.sawBusy = true;
-    if (run.idleTimer) {
-      clearTimeout(run.idleTimer);
-      run.idleTimer = undefined;
+    case 'session.text.ended':
+    case 'session.reasoning.ended': {
+      const kind = type === 'session.text.ended' ? 'text' : 'reasoning';
+      const key = livePartKey(messageId, kind, ordinal);
+      // A part whose deltas already streamed must not also land as a
+      // snapshot — the client would render the live row plus the snapshot.
+      if (run.streamedParts.has(key)) {
+        if (run.livePartId === key) {
+          closeLivePart(run, sessionId);
+        }
+        return;
+      }
+      const text = typeof props.text === 'string' ? props.text : '';
+      if (!text.trim()) {
+        return;
+      }
+      closeLivePart(run, sessionId);
+      run.writer.send(createNormalizedMessage({
+        id: key,
+        kind: kind === 'text' ? 'text' : 'thinking',
+        ...(kind === 'text' ? { role: 'assistant' } : {}),
+        content: text,
+        sessionId,
+        provider: PROVIDER,
+      }));
+      return;
     }
-    // OpenCode reports provider rate limiting as a `retry` status rather
-    // than an error — surface the backoff so the turn does not look frozen.
-    if (props.status.type === 'retry') {
-      const attempt = Number(props.status.attempt) || 0;
-      const detail = readOptionalString(props.status.message) ?? 'Rate limited';
-      // C1: one persistent line per retry streak; the label below keeps
-      // ticking with the attempt count.
+
+    case 'session.tool.input.started': {
+      markTurnLive(run);
+      closeLivePart(run, sessionId);
+      const callId = readOptionalString(props.id);
+      const name = readOptionalString(props.name);
+      if (callId && name) {
+        run.partTypes.set(`tool:${callId}`, name);
+      }
+      return;
+    }
+
+    case 'session.tool.called': {
+      closeLivePart(run, sessionId);
+      const callId = readOptionalString(props.id) ?? '';
+      if (!callId) {
+        return;
+      }
+      const rawName = readOptionalString(props.name) ?? run.partTypes.get(`tool:${callId}`) ?? 'Tool';
+      const toolName = rawName.toLowerCase() === 'task' ? 'Task' : rawName;
+      run.writer.send(createNormalizedMessage({
+        id: toolMessageId(messageId, callId),
+        kind: 'tool_use',
+        toolName,
+        toolInput: readObjectRecord(props.input) ?? {},
+        toolId: callId,
+        sessionId,
+        provider: PROVIDER,
+      }));
+      return;
+    }
+
+    case 'session.tool.success':
+    case 'session.tool.failed': {
+      const callId = readOptionalString(props.id) ?? '';
+      if (!callId) {
+        return;
+      }
+      const isError = type === 'session.tool.failed';
+      const content = formatCliToolResult(
+        joinOpenCodeToolContent(props.content),
+        isError ? (props.error ?? 'Tool failed') : undefined,
+        readObjectRecord(props.metadata) ?? undefined,
+      );
+      run.writer.send(createNormalizedMessage({
+        id: `${toolMessageId(messageId, callId)}_result`,
+        kind: 'tool_result',
+        toolId: callId,
+        content,
+        isError,
+        sessionId,
+        provider: PROVIDER,
+      }));
+      return;
+    }
+
+    case 'session.step.ended':
+      closeLivePart(run, sessionId);
+      return;
+
+    case 'session.retry.scheduled': {
+      // The provider call failed and OpenCode is backing off: surface the
+      // attempt so the pane shows progress, and track the streak so a wedged
+      // retry loop is aborted instead of spinning forever. (adoptLiveStatus,
+      // not markTurnLive — the latter would reset the very streak this
+      // event feeds.)
+      adoptLiveStatus(run);
+      const attempt = Number(props.attempt) || 0;
+      const reason = extractOpenCodeErrorMessage(props.error) ?? readOptionalString(props.message);
+      const detail = reason ? `Provider error — retrying (${reason})` : 'Provider error — retrying';
       if (run.retrySince === 0) {
         run.writer.send(createNormalizedMessage({
           kind: 'status',
           text: `OpenCode is retrying: ${detail}`,
           notice: true,
-          sessionId: run.providerSessionId ?? providerSessionId,
+          sessionId,
           provider: PROVIDER,
         }));
       }
@@ -1100,51 +1104,66 @@ function dispatchServerEvent(baseUrl: string, event: AnyRecord): void {
         kind: 'status',
         text: attempt > 0 ? `${detail} — retry ${attempt}` : detail,
         canInterrupt: true,
-        sessionId: run.providerSessionId ?? providerSessionId,
+        sessionId,
         provider: PROVIDER,
       }));
       trackRetryStatus(run, attempt);
-    } else {
-      clearRetryStatus(run);
-    }
-    return;
-  }
-
-  const idle = type === 'session.idle'
-    || (type === 'session.status' && props.status?.type === 'idle');
-  if (idle) {
-    if (run.recovering) {
-      // The killed turn's trailing idle — the retried turn settles the run.
       return;
     }
-    // An idle is terminal only for a run whose own prompt went out AND whose
-    // turn was seen busy. Otherwise it is a stale event (the abort's
-    // trailing idle, or replayed state) — finishing now would resolve the
-    // run while setup still posts prompt_async, orphaning the whole turn.
-    if (run.promptPosted && run.sawBusy) {
-      finishRun(run);
+
+    case 'session.execution.failed':
+    case 'session.error':
+      // An error predating our prompt belongs to the previous turn; the
+      // retry-stall watchdog's own abort reports through trackRetryStatus.
+      if (run.promptPosted && !run.recovering && !run.retryStallAborted) {
+        failRun(run, new Error(extractOpenCodeErrorMessage(props.error) ?? 'OpenCode session error'));
+      }
       return;
-    }
-    // Fallback for an OpenCode that never emits a busy status: the idle is
-    // debated by settleStaleIdle — verified against live status and the
-    // run's own event traffic instead of blindly accepted after the grace.
-    if (run.promptPosted && !run.aborted && !run.completeSent && !run.idleTimer) {
-      run.idleSeenAt = run.lastEventAt;
-      run.idleTimer = setTimeout(() => {
-        void settleStaleIdle(run);
-      }, STALE_IDLE_GRACE_MS);
-      run.idleTimer.unref?.();
-    }
+
+    case 'session.execution.interrupted':
+      if (run.aborted) {
+        run.resolve();
+        return;
+      }
+      // Stopped from another client — the turn is over, not broken.
+      if (run.promptPosted) {
+        finishRun(run);
+      }
+      return;
+
+    case 'session.execution.succeeded':
+    case 'session.idle':
+      settleIdle(run);
+      return;
+
+    default:
+      return;
+  }
+}
+
+/**
+ * A terminal idle/succeeded is accepted only for a run whose own prompt went
+ * out AND whose turn was seen live. Otherwise it is a stale event (the
+ * abort's trailing idle, replayed state) — finishing now would resolve the
+ * run while setup still posts the prompt, orphaning the whole turn.
+ */
+function settleIdle(run: ActiveRun): void {
+  if (run.recovering) {
     return;
   }
-
-  if (type === 'session.error') {
-    // Same stale-event guard: an error predating our prompt belongs to the
-    // previous turn — and an error during poison recovery belongs to the
-    // killed turn, not the retried one.
-    if (run.promptPosted && !run.recovering && !run.retryStallAborted) {
-      failRun(run, new Error(extractOpenCodeErrorMessage(props.error) ?? 'OpenCode session error'));
-    }
+  if (run.promptPosted && run.sawBusy) {
+    finishRun(run);
+    return;
+  }
+  // Fallback for a turn that never emitted a live event: the idle is
+  // debated by settleStaleIdle — verified against live status and the
+  // run's own event traffic instead of blindly accepted after the grace.
+  if (run.promptPosted && !run.aborted && !run.completeSent && !run.idleTimer) {
+    run.idleSeenAt = run.lastEventAt;
+    run.idleTimer = setTimeout(() => {
+      void settleStaleIdle(run);
+    }, STALE_IDLE_GRACE_MS);
+    run.idleTimer.unref?.();
   }
 }
 
@@ -1171,8 +1190,8 @@ async function fetchSessionStatusType(run: ActiveRun): Promise<string | null | u
     return undefined;
   }
   try {
-    const { status, data } = await apiRequest(run.baseUrl, '/session/status');
-    const statuses = readObjectRecord(data);
+    const { status, data } = await apiRequest(run.baseUrl, '/session/active');
+    const statuses = readObjectRecord(readObjectRecord(data)?.data);
     if (status >= 400 || !statuses) {
       return undefined;
     }
@@ -1228,7 +1247,7 @@ function trackRetryStatus(run: ActiveRun, attempt: number): void {
   console.warn(`[OpenCode] Session ${run.providerSessionId} stuck on retry attempt ${attempt} for over ${Math.round(stallMs / 1000)}s — aborting the wedged turn.`);
   void (async () => {
     if (run.baseUrl && run.providerSessionId) {
-      await apiRequest(run.baseUrl, `/session/${run.providerSessionId}/abort`, {
+      await apiRequest(run.baseUrl, `/session/${run.providerSessionId}/interrupt`, {
         method: 'POST',
         query: { directory: run.directory },
       }).catch((error) => {
@@ -1301,8 +1320,10 @@ export async function reconcileActiveRuns(baseUrl: string): Promise<void> {
 async function pollRunStatuses(baseUrl: string, runs: ActiveRun[], poll: number): Promise<void> {
   const missing: ActiveRun[] = [];
   try {
-    const { status, data } = await apiRequest(baseUrl, '/session/status');
-    const statuses = readObjectRecord(data);
+    // `GET /api/session/active` lists only sessions with a running turn —
+    // a finished session is simply absent.
+    const { status, data } = await apiRequest(baseUrl, '/session/active');
+    const statuses = readObjectRecord(readObjectRecord(data)?.data);
     if (status >= 400 || !statuses) {
       return;
     }
@@ -1451,8 +1472,9 @@ function ensureEventStream(baseUrl: string): Promise<void> {
       state.controller.signal.addEventListener('abort', onShutdown, { once: true });
       let stallWatchdog: ReturnType<typeof setInterval> | undefined;
       try {
-        const response = await fetch(`${currentBaseUrl}/event`, {
+        const response = await fetch(`${currentBaseUrl}/api/event`, {
           headers: {
+            ...serverAuthHeaders(currentBaseUrl),
             Accept: 'text/event-stream',
             // Server ignores this today; if a future build replays from the
             // durable event log, the cursor makes reconnects lossless.
@@ -1581,9 +1603,9 @@ function ensureEventStream(baseUrl: string): Promise<void> {
 }
 
 /**
- * Images go to OpenCode as real `file` parts (it inlines `file://` images as
- * data URLs for the model). The `<images_input>` tag stays in the text part
- * only so reloaded history can rebuild the attachment chips.
+ * Images go to OpenCode as prompt file attachments (`{ uri, name }`; it reads
+ * `file://` images and inlines them for the model). The `<images_input>` tag
+ * stays in the text only so reloaded history can rebuild the attachment chips.
  */
 function buildImageFileParts(images: unknown, cwd: string): AnyRecord[] {
   const parts: AnyRecord[] = [];
@@ -1595,10 +1617,9 @@ function buildImageFileParts(images: unknown, cwd: string): AnyRecord[] {
       continue;
     }
     parts.push({
-      type: 'file',
-      mime: resolveImageMediaType(descriptor) ?? 'application/octet-stream',
-      filename: descriptor.name ?? path.basename(resolvedPath),
-      url: pathToFileURL(resolvedPath).href,
+      uri: pathToFileURL(resolvedPath).href,
+      name: descriptor.name ?? path.basename(resolvedPath),
+      description: resolveImageMediaType(descriptor) ?? undefined,
     });
   }
   return parts;
@@ -1622,10 +1643,9 @@ async function createProviderSession(
 ): Promise<string> {
   const { status, data } = await apiRequest(baseUrl, '/session', {
     method: 'POST',
-    query: { directory },
-    body: { title: title || 'DDAgent session' },
+    body: { title: title || 'DDAgent session', location: { directory } },
   });
-  const id = (data as AnyRecord | null)?.id;
+  const id = readObjectRecord(readObjectRecord(data)?.data)?.id;
   if (status >= 400 || typeof id !== 'string' || !id) {
     throw new Error(`Failed to create OpenCode session (HTTP ${status})`);
   }
@@ -1644,12 +1664,13 @@ async function providerSessionExists(
     if (status >= 400) {
       return false;
     }
-    // `opencode serve` is global: the `directory` query only picks the request
+    // `opencode serve` is global: the location query only picks the request
     // context, so a session created elsewhere still returns 200. Its stored
-    // `directory` decides where prompts actually run, and a repointed
-    // workspace must start a fresh provider session instead of resuming the
-    // old directory's session.
-    const sessionDirectory = (data as AnyRecord | null)?.directory;
+    // location decides where prompts actually run, and a repointed workspace
+    // must start a fresh provider session instead of resuming the old
+    // directory's session.
+    const info = readObjectRecord(readObjectRecord(data)?.data);
+    const sessionDirectory = readObjectRecord(info?.location)?.directory ?? info?.directory;
     return typeof sessionDirectory !== 'string'
       || path.resolve(sessionDirectory) === path.resolve(directory);
   } catch {
@@ -1865,19 +1886,39 @@ export async function spawnOpenCode(
           return;
         }
 
+        // OpenCode 2 keeps model and agent on the session, not the prompt.
+        if (modelID) {
+          const modelResponse = await apiRequest(server.baseUrl, `/session/${run.providerSessionId}/model`, {
+            method: 'POST',
+            query: { directory: workingDir },
+            body: { model: { id: modelID, providerID, ...(resolvedEffort ? { variant: resolvedEffort } : {}) } },
+          });
+          if (modelResponse.status >= 400) {
+            throw new Error(`OpenCode rejected model "${resolvedModel}" (HTTP ${modelResponse.status}): ${extractOpenCodeErrorMessage(modelResponse.data) ?? JSON.stringify(modelResponse.data)}`);
+          }
+        }
+        const agentResponse = await apiRequest(server.baseUrl, `/session/${run.providerSessionId}/agent`, {
+          method: 'POST',
+          query: { directory: workingDir },
+          body: { agent: behavior.agent ?? 'build' },
+        });
+        if (agentResponse.status >= 400) {
+          console.warn(`[OpenCode] Agent select failed (HTTP ${agentResponse.status}) — continuing with the session default.`);
+        }
+
         // Set before the POST resolves: terminal events arriving while the
         // request is in flight already belong to this run.
         run.promptPosted = true;
         run.promptPostedAt = Date.now();
+        const promptFiles = buildImageFileParts(images, workingDir);
         const promptBody: AnyRecord = {
-          parts: [{ type: 'text', text: promptText }, ...buildImageFileParts(images, workingDir)],
-          ...(behavior.agent ? { agent: behavior.agent } : {}),
-          ...(modelID ? { model: { providerID, modelID, ...(resolvedEffort ? { variant: resolvedEffort } : {}) } } : {}),
+          text: promptText,
+          ...(promptFiles.length ? { files: promptFiles } : {}),
         };
         run.promptBody = promptBody;
         const { status, data } = await apiRequest(
           server.baseUrl,
-          `/session/${run.providerSessionId}/prompt_async`,
+          `/session/${run.providerSessionId}/prompt`,
           {
             method: 'POST',
             query: { directory: workingDir },
@@ -1892,8 +1933,8 @@ export async function spawnOpenCode(
         if (run.aborted) {
           run.resolve();
         }
-        // Otherwise the SSE event stream settles the run on session.idle /
-        // session.error.
+        // Otherwise the SSE event stream settles the run on
+        // session.execution.succeeded / failed.
       } catch (error) {
         if (!run.aborted) {
           const installed = await context.isProviderInstalled().catch(() => true);
@@ -1942,11 +1983,14 @@ export async function steerOpenCodeSession(sessionId: string, content: string, o
   }
 
   const text = appendFilesInputTag(appendImagesInputTag(content.trim(), options.images), options.files);
-  // Same agent/model/variant as the turn it joins — only the text differs.
-  const { status } = await apiRequest(run.baseUrl, `/session/${run.providerSessionId}/prompt_async`, {
+  // Model and agent live on the session, so the steer only carries the text;
+  // `delivery: steer` hands it to the running turn (the default for a prompt
+  // on a busy session).
+  const files = buildImageFileParts(options.images, run.directory);
+  const { status } = await apiRequest(run.baseUrl, `/session/${run.providerSessionId}/prompt`, {
     method: 'POST',
     query: { directory: run.directory },
-    body: { ...run.promptBody, parts: [{ type: 'text', text }, ...buildImageFileParts(options.images, run.directory)] },
+    body: { text, ...(files.length ? { files } : {}), delivery: 'steer' },
   });
   if (status >= 400) {
     return false;
@@ -1974,11 +2018,14 @@ export async function abortOpenCodeSession(sessionId: string): Promise<boolean> 
   run.aborted = true;
   try {
     if (run.baseUrl && run.providerSessionId) {
-      const response = await apiRequest(run.baseUrl, `/session/${run.providerSessionId}/abort`, {
+      const response = await apiRequest(run.baseUrl, `/session/${run.providerSessionId}/interrupt`, {
         method: 'POST',
         query: { directory: run.directory },
       });
-      if (response.status < 200 || response.status >= 300 || response.data === false) {
+      // `{ interrupted: false }` means no running turn was found — the same
+      // refusal the 1.x endpoint reported as a bare `false`.
+      const interrupted = readObjectRecord(response.data)?.interrupted;
+      if (response.status < 200 || response.status >= 300 || response.data === false || interrupted === false) {
         throw new Error(`OpenCode refused abort (HTTP ${response.status})`);
       }
     }
@@ -2059,13 +2106,14 @@ function resolveOpenCodePermission(requestId: string, decision: ProviderPermissi
 
   if (pending.kind === 'question') {
     if (decision.allow) {
-      const answers = questionAnswersToApi(
+      const answer = formAnswerFromUi(
         pending.questions ?? [],
+        pending.formFields ?? [],
         (decision.updatedInput as AnyRecord | undefined)?.answers,
       );
-      void replyQuestion(pending.baseUrl, pending.directory, pending.requestId, answers);
+      void replyForm(pending.baseUrl, pending.directory, pending.providerSessionId, pending.requestId, answer);
     } else {
-      void rejectQuestion(pending.baseUrl, pending.directory, pending.requestId);
+      void cancelForm(pending.baseUrl, pending.directory, pending.providerSessionId, pending.requestId);
     }
     return;
   }
@@ -2073,19 +2121,16 @@ function resolveOpenCodePermission(requestId: string, decision: ProviderPermissi
   const response = decision.allow
     ? (decision.rememberEntry ? 'always' : 'once')
     : 'reject';
+  // A bare reject halts the agent; with a message OpenCode feeds it back and keeps going.
   const feedback = !decision.allow && typeof decision.message === 'string' ? decision.message.trim() : '';
-  if (feedback) {
-    // A bare reject halts the agent; with a message OpenCode feeds it back and keeps going.
-    void apiRequest(pending.baseUrl, `/permission/${pending.permissionID}/reply`, {
-      method: 'POST',
-      query: { directory: pending.directory },
-      body: { reply: 'reject', message: feedback },
-    })
-      .then(({ status }) => status >= 400 ? replyPermission(pending.baseUrl, pending.directory, pending.providerSessionId, pending.permissionID, 'reject') : undefined)
-      .catch(() => replyPermission(pending.baseUrl, pending.directory, pending.providerSessionId, pending.permissionID, 'reject'));
-    return;
-  }
-  void replyPermission(pending.baseUrl, pending.directory, pending.providerSessionId, pending.permissionID, response);
+  void replyPermission(
+    pending.baseUrl,
+    pending.directory,
+    pending.providerSessionId,
+    pending.permissionID,
+    response,
+    feedback || undefined,
+  );
 }
 
 function listOpenCodePendingPermissions(sessionId: string): unknown[] {

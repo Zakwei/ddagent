@@ -1217,3 +1217,237 @@ test('OpenCode history renders readable errors, skips user aborts and shows comp
     await rm(tempRoot, { recursive: true, force: true });
   }
 });
+
+/**
+ * OpenCode 2 layout: `session_v2` + `session_message` rows, alongside a
+ * leftover 1.x `session` row that was never migrated.
+ */
+const createOpenCodeV2Database = async (homeDir: string, workspacePath: string): Promise<void> => {
+  const dataDir = path.join(homeDir, '.local', 'share', 'opencode');
+  await mkdir(dataDir, { recursive: true });
+
+  const db = new Database(path.join(dataDir, 'opencode.db'));
+  try {
+    db.exec(`
+      CREATE TABLE project (
+        id TEXT PRIMARY KEY,
+        worktree TEXT NOT NULL,
+        time_created INTEGER NOT NULL,
+        time_updated INTEGER NOT NULL,
+        sandboxes TEXT NOT NULL
+      );
+      CREATE TABLE session (
+        id TEXT PRIMARY KEY,
+        project_id TEXT NOT NULL,
+        parent_id TEXT,
+        slug TEXT NOT NULL,
+        directory TEXT NOT NULL,
+        title TEXT NOT NULL,
+        version TEXT NOT NULL,
+        time_created INTEGER NOT NULL,
+        time_updated INTEGER NOT NULL,
+        time_archived INTEGER
+      );
+      CREATE TABLE message (
+        id TEXT PRIMARY KEY,
+        session_id TEXT NOT NULL,
+        time_created INTEGER NOT NULL,
+        time_updated INTEGER NOT NULL,
+        data TEXT NOT NULL
+      );
+      CREATE TABLE part (
+        id TEXT PRIMARY KEY,
+        message_id TEXT NOT NULL,
+        session_id TEXT NOT NULL,
+        time_created INTEGER NOT NULL,
+        time_updated INTEGER NOT NULL,
+        data TEXT NOT NULL
+      );
+      CREATE TABLE session_v2 (
+        id TEXT PRIMARY KEY,
+        project_id TEXT NOT NULL,
+        workspace_id TEXT,
+        parent_id TEXT,
+        slug TEXT NOT NULL,
+        directory TEXT NOT NULL,
+        title TEXT,
+        version TEXT NOT NULL,
+        cost REAL DEFAULT 0 NOT NULL,
+        tokens_input INTEGER DEFAULT 0 NOT NULL,
+        tokens_output INTEGER DEFAULT 0 NOT NULL,
+        tokens_reasoning INTEGER DEFAULT 0 NOT NULL,
+        tokens_cache_read INTEGER DEFAULT 0 NOT NULL,
+        tokens_cache_write INTEGER DEFAULT 0 NOT NULL,
+        agent TEXT,
+        model TEXT,
+        time_created INTEGER NOT NULL,
+        time_updated INTEGER NOT NULL,
+        time_archived INTEGER
+      );
+      CREATE TABLE session_message (
+        id TEXT PRIMARY KEY,
+        session_id TEXT NOT NULL,
+        type TEXT NOT NULL,
+        seq INTEGER NOT NULL,
+        time_created INTEGER NOT NULL,
+        time_updated INTEGER NOT NULL,
+        data TEXT NOT NULL
+      );
+    `);
+
+    db.prepare('INSERT INTO project (id, worktree, time_created, time_updated, sandboxes) VALUES (?, ?, ?, ?, ?)')
+      .run('project-1', workspacePath, 1_700_000_000_000, 1_700_000_001_000, '[]');
+
+    // Legacy 1.x session that predates the upgrade.
+    db.prepare(`
+      INSERT INTO session (id, project_id, slug, directory, title, version, time_created, time_updated)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `).run('legacy-session', 'project-1', 'legacy', workspacePath, 'Legacy v1 title', '1.19.3', 1_700_000_000_000, 1_700_000_002_000);
+
+    const insertV2 = db.prepare(`
+      INSERT INTO session_v2 (
+        id, project_id, parent_id, slug, directory, title, version, cost,
+        tokens_input, tokens_output, tokens_reasoning, tokens_cache_read, tokens_cache_write,
+        agent, model, time_created, time_updated
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+    insertV2.run(
+      'v2-session', 'project-1', null, 'v2', workspacePath, 'OpenCode 2 title', '2.0.32', 0.5,
+      100, 40, 7, 30, 20, 'build', JSON.stringify({ id: 'claude-haiku-5-5', providerID: 'anthropic' }),
+      1_700_000_010_000, 1_700_000_020_000,
+    );
+    // Untitled v2 session: the sidebar name comes from its first user prompt.
+    insertV2.run(
+      'v2-untitled', 'project-1', null, 'v2u', workspacePath, null, '2.0.32', 0,
+      0, 0, 0, 0, 0, 'build', null, 1_700_000_005_000, 1_700_000_006_000,
+    );
+    // Subagent child — never indexed.
+    insertV2.run(
+      'v2-child', 'project-1', 'v2-session', 'v2c', workspacePath, 'child', '2.0.32', 0,
+      0, 0, 0, 0, 0, 'explore', null, 1_700_000_015_000, 1_700_000_016_000,
+    );
+
+    const insertMessage = db.prepare(`
+      INSERT INTO session_message (id, session_id, type, seq, time_created, time_updated, data)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `);
+    insertMessage.run('m-sys', 'v2-session', 'system', 0, 1_700_000_010_000, 1_700_000_010_000, JSON.stringify({ text: 'You are OpenCode.' }));
+    insertMessage.run('m-user', 'v2-session', 'user', 1, 1_700_000_011_000, 1_700_000_011_000, JSON.stringify({
+      time: { created: 1_700_000_011_000 },
+      text: appendImagesInputTag('Build the OpenCode 2 integration.', [{ path: '/tmp/shot.png', name: 'shot.png', mediaType: 'image/png' }]),
+    }));
+    insertMessage.run('m-assistant', 'v2-session', 'assistant', 2, 1_700_000_012_000, 1_700_000_013_000, JSON.stringify({
+      time: { created: 1_700_000_012_000, completed: 1_700_000_013_000 },
+      agent: 'build',
+      model: { id: 'claude-haiku-5-5', providerID: 'anthropic' },
+      content: [
+        { type: 'reasoning', text: 'Inspect the provider first.', time: { created: 1_700_000_012_100 } },
+        {
+          type: 'tool',
+          id: 'call-1',
+          name: 'bash',
+          executed: true,
+          state: {
+            status: 'completed',
+            input: { command: 'npm test' },
+            content: [{ type: 'text', text: 'ok' }],
+            metadata: {},
+          },
+          time: { created: 1_700_000_012_200 },
+        },
+        {
+          type: 'tool',
+          id: 'call-2',
+          name: 'read',
+          state: { status: 'error', input: { filePath: '/x' }, content: [], error: { type: 'ToolError', message: 'ENOENT' } },
+        },
+        { type: 'text', text: 'The provider is wired.', time: { created: 1_700_000_012_900 } },
+      ],
+    }));
+    insertMessage.run('m-idle', 'v2-session', 'idle', 3, 1_700_000_013_000, 1_700_000_013_000, JSON.stringify({ outcome: 'succeeded' }));
+    insertMessage.run('m-assistant-2', 'v2-session', 'assistant', 4, 1_700_000_014_000, 1_700_000_014_000, JSON.stringify({
+      content: [],
+      error: { type: 'provider.transport', message: 'Timed out waiting for the response to complete' },
+    }));
+    insertMessage.run('m-idle-2', 'v2-session', 'idle', 5, 1_700_000_014_100, 1_700_000_014_100, JSON.stringify({
+      outcome: 'failed',
+      error: { type: 'provider.transport', message: 'Timed out waiting for the response to complete' },
+    }));
+
+    insertMessage.run('mu-user', 'v2-untitled', 'user', 0, 1_700_000_005_000, 1_700_000_005_000, JSON.stringify({ text: 'Rename the helpers' }));
+  } finally {
+    db.close();
+  }
+};
+
+test('OpenCode sessions provider reads an OpenCode 2 transcript and session token totals', { concurrency: false }, async () => {
+  const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'opencode-v2-history-'));
+  const workspacePath = path.join(tempRoot, 'workspace');
+  await mkdir(workspacePath, { recursive: true });
+  const restoreHomeDir = patchHomeDir(tempRoot);
+
+  try {
+    await createOpenCodeV2Database(tempRoot, workspacePath);
+    const provider = new OpenCodeSessionsProvider();
+    const history = await provider.fetchHistory('v2-session');
+
+    assert.deepEqual(history.messages.map((message) => [message.kind, message.id]), [
+      ['text', 'm-user'],
+      ['thinking', 'm-assistant_reasoning_0'],
+      ['tool_use', 'm-assistant_call-1'],
+      ['tool_use', 'm-assistant_call-2'],
+      ['text', 'm-assistant_text_0'],
+      ['error', 'm-assistant-2_error'],
+    ]);
+    assert.equal(history.messages[0]?.role, 'user');
+    assert.equal(history.messages[0]?.content, 'Build the OpenCode 2 integration.');
+    assert.equal((history.messages[0]?.images as unknown[] | undefined)?.length, 1);
+    assert.equal(history.messages[2]?.toolName, 'bash');
+    assert.deepEqual(history.messages[2]?.toolInput, { command: 'npm test' });
+    assert.deepEqual(history.messages[2]?.toolResult, { content: 'ok', isError: false });
+    assert.equal(history.messages[3]?.toolResult?.isError, true);
+    assert.match(String(history.messages[3]?.toolResult?.content), /ENOENT/);
+    assert.equal(history.messages[4]?.role, 'assistant');
+    assert.equal(history.messages[5]?.content, 'Timed out waiting for the response to complete');
+    assert.deepEqual(history.tokenUsage, {
+      used: 197,
+      inputTokens: 100,
+      outputTokens: 40,
+      cacheReadTokens: 30,
+      cacheCreationTokens: 20,
+      costUsd: 0.5,
+      breakdown: { input: 100, output: 40, cacheRead: 30, cacheCreation: 20 },
+    });
+  } finally {
+    restoreHomeDir();
+    await rm(tempRoot, { recursive: true, force: true });
+  }
+});
+
+test('OpenCode session synchronizer indexes session_v2 and legacy session rows together', { concurrency: false }, async () => {
+  const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'opencode-v2-sync-'));
+  const workspacePath = path.join(tempRoot, 'workspace');
+  await mkdir(workspacePath, { recursive: true });
+  const restoreHomeDir = patchHomeDir(tempRoot);
+
+  try {
+    await createOpenCodeV2Database(tempRoot, workspacePath);
+    await withIsolatedDatabase(async () => {
+      const synchronizer = new OpenCodeSessionSynchronizer();
+      const processed = await synchronizer.synchronize();
+      assert.equal(processed, 3);
+
+      assert.equal(sessionsDb.getSessionById('v2-session')?.custom_name, 'OpenCode 2 title');
+      assert.equal(sessionsDb.getSessionById('v2-untitled')?.custom_name, 'Rename the helpers');
+      assert.equal(sessionsDb.getSessionById('legacy-session')?.custom_name, 'Legacy v1 title');
+      assert.equal(sessionsDb.getSessionById('v2-child') ?? null, null);
+
+      // The watcher picks the newest row across both layouts.
+      const latest = await synchronizer.synchronizeFile(path.join(tempRoot, '.local', 'share', 'opencode', 'opencode.db'));
+      assert.equal(latest, 'v2-session');
+    });
+  } finally {
+    restoreHomeDir();
+    await rm(tempRoot, { recursive: true, force: true });
+  }
+});

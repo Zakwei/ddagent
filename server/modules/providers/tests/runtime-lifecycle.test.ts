@@ -701,8 +701,14 @@ test('OpenCode: a deny with feedback uses the reply endpoint so the agent keeps 
   runtime.opencodeRuntime.permissions.resolve('perm-2', { allow: false });
   await new Promise((resolve) => setImmediate(resolve));
 
-  assert.deepEqual(requests.find((r) => r.path === '/permission/per_1/reply')?.body, { reply: 'reject', message: 'Use mkdir -p instead' });
-  assert.deepEqual(requests.find((r) => r.path === '/session/ses_1/permissions/per_2')?.body, { response: 'reject' });
+  assert.deepEqual(
+    requests.find((r) => r.path === '/api/session/ses_1/permission/per_1/reply')?.body,
+    { decision: 'reject', message: 'Use mkdir -p instead' },
+  );
+  assert.deepEqual(
+    requests.find((r) => r.path === '/api/session/ses_1/permission/per_2/reply')?.body,
+    { decision: 'reject' },
+  );
 });
 
 test('OpenCode: a subagent child session ask reaches the parent run instead of being rejected', async () => {
@@ -720,17 +726,18 @@ test('OpenCode: a subagent child session ask reaches the parent run instead of b
   });
   providerToApp.set('ses_parent', 'app');
 
+  // OpenCode 2 envelopes: `{ type, data }`; the ask is a Permission.Request.
   dispatchServerEvent('http://127.0.0.1:1', {
     type: 'session.created',
-    properties: { sessionID: 'ses_child', info: { id: 'ses_child', parentID: 'ses_parent' } },
+    data: { sessionID: 'ses_child', parentID: 'ses_parent' },
   });
   dispatchServerEvent('http://127.0.0.1:1', {
     type: 'permission.asked',
-    properties: { id: 'per_1', sessionID: 'ses_child', permission: 'bash', patterns: ['ls'] },
+    data: { id: 'per_1', sessionID: 'ses_child', action: 'bash', resources: ['ls'] },
   });
   await new Promise((resolve) => setImmediate(resolve));
 
-  assert.ok(requests.every((pathname) => !pathname.endsWith('/permissions/per_1')), requests.join(', '));
+  assert.ok(requests.every((pathname) => !pathname.endsWith('/permission/per_1/reply')), requests.join(', '));
   assert.equal(sent.filter((message) => message.kind === 'permission_request').length, 1);
   assert.equal(pendingPermissions.size, 1);
 });
@@ -776,25 +783,25 @@ test('OpenCode: live rows end at every part boundary so text around a tool never
     writer: { send: (message: any) => sent.push(message) },
     context: { normalizeMessage: () => [] },
     partTypes: new Map(), streamedParts: new Set(), editedMessageIds: new Set(), livePartId: null,
+    promptPosted: true, sawBusy: true, retrySince: 0, retryAttempt: 0,
   });
   providerToApp.set('ses_1', 'app');
-  const updated = (id: string, type: string) => dispatchServerEvent('http://x', {
-    type: 'message.part.updated', properties: { sessionID: 'ses_1', part: { id, type, messageID: 'm1' } },
-  });
-  const delta = (partID: string, text: string) => dispatchServerEvent('http://x', {
-    type: 'message.part.delta', properties: { sessionID: 'ses_1', partID, field: 'text', delta: text },
+  const event = (type: string, data: Record<string, unknown>) => dispatchServerEvent('http://x', {
+    type, data: { sessionID: 'ses_1', assistantMessageID: 'm1', ...data },
   });
 
-  // The order a real `opencode serve` run produced.
-  updated('r1', 'reasoning'); delta('r1', 'plan');
-  updated('t1', 'text'); delta('t1', 'first');
-  updated('tool1', 'tool');
-  updated('r2', 'reasoning'); delta('r2', 'again');
-  updated('t2', 'text'); delta('t2', 'done');
+  // The order a real OpenCode 2 `serve` run produced.
+  event('session.reasoning.started', { ordinal: 0 }); event('session.reasoning.delta', { ordinal: 0, delta: 'plan' });
+  event('session.text.started', { ordinal: 0 }); event('session.text.delta', { ordinal: 0, delta: 'first' });
+  event('session.tool.input.started', { id: 'call_1', name: 'bash' });
+  event('session.tool.called', { id: 'call_1', input: { command: 'ls' } });
+  event('session.reasoning.started', { ordinal: 1 }); event('session.reasoning.delta', { ordinal: 1, delta: 'again' });
+  event('session.text.started', { ordinal: 1 }); event('session.text.delta', { ordinal: 1, delta: 'done' });
 
-  assert.deepEqual(sent.map((message) => message.kind === 'stream_end' ? '|' : message.content), [
-    'plan', '|', 'first', '|', 'again', '|', 'done',
-  ]);
+  assert.deepEqual(
+    sent.map((message) => message.kind === 'stream_end' ? '|' : message.kind === 'tool_use' ? `[${message.toolName}]` : message.content),
+    ['plan', '|', 'first', '|', '[bash]', 'again', '|', 'done'],
+  );
 });
 
 test('claude: Always rules are safe command prefixes and never approve a chained command', async () => {

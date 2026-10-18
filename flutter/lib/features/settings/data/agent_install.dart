@@ -15,7 +15,7 @@ String providerInstallCommand(String provider, {bool windows = false}) => switch
   'claude' => 'npm install -g @anthropic-ai/claude-code',
   'cursor' => 'curl https://cursor.com/install -fsS | bash',
   'codex' => 'npm install -g @openai/codex',
-  'opencode' => 'npm install -g opencode-ai',
+  'opencode' => 'npm install -g @opencode/cli',
   'commandcode' => 'npm install -g command-code',
   'antigravity' => 'curl -fsSL https://antigravity.google/cli/install.sh | bash',
   'devin' => 'curl -fsSL https://cli.devin.ai/install.sh | bash',
@@ -33,7 +33,7 @@ String providerInstallCommand(String provider, {bool windows = false}) => switch
 String providerUpdateCommand(String provider, {bool windows = false}) => switch (provider) {
   'claude' => 'npm install -g @anthropic-ai/claude-code@latest',
   'codex' => 'npm install -g @openai/codex@latest',
-  'opencode' => 'npm install -g opencode-ai@latest',
+  'opencode' => 'npm install -g @opencode/cli@latest',
   'commandcode' => 'npm install -g command-code@latest',
   'cursor' || 'antigravity' || 'devin' => providerInstallCommand(provider, windows: windows),
   _ => 'npm install -g $provider@latest',

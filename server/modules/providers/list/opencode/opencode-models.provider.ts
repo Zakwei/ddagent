@@ -74,6 +74,11 @@ export const OPENCODE_PREDEFINED_MODELS: ProviderModelsDefinition = {
   DEFAULT: 'opencode/big-pickle',
 };
 
+const openCodeTableExists = (db: ReturnType<typeof openSqliteReadonlyDatabase>, table: string): boolean =>
+  Boolean(db.prepare("SELECT 1 AS present FROM sqlite_master WHERE type = 'table' AND name = ?").get(table));
+
+// OpenCode 2 stores `{"id":"claude-haiku-5-5","providerID":"anthropic"}`;
+// the catalog value is `providerID/modelID`, so both halves are joined.
 const parseOpenCodeSessionModelValue = (rawModel: unknown): string | null => {
   if (typeof rawModel === 'string') {
     const trimmed = rawModel.trim();
@@ -91,6 +96,12 @@ const parseOpenCodeSessionModelValue = (rawModel: unknown): string | null => {
   const record = readObjectRecord(rawModel);
   if (!record) {
     return null;
+  }
+
+  const providerId = readOptionalString(record.providerID);
+  const modelId = readOptionalString(record.modelID) ?? readOptionalString(record.id);
+  if (providerId && modelId && !modelId.startsWith(`${providerId}/`)) {
+    return `${providerId}/${modelId}`;
   }
 
   return readOptionalString(record.id)
@@ -195,11 +206,73 @@ const parseEffortFromVariants = (variants: unknown): ProviderModelOption['effort
 };
 
 /**
- * Splits `opencode models --verbose` output into discrete JSON blocks.
- *
- * The CLI prints one model id per line, followed by a pretty-printed JSON
- * object. The id line is unindented and contains a slash; every JSON line is
- * indented until the closing `}`.
+ * Converts one catalog record (an OpenCode 2 `model.list` entry or a 1.x
+ * `--verbose` block) into a model option. The option value is
+ * `providerID/modelID` — what `opencode models` prints and what the runtime
+ * splits back into a `Model.Ref` (a modelID may itself contain a slash).
+ */
+const buildOpenCodeModelOption = (id: string, parsed: Record<string, unknown>): ProviderModelOption => {
+  const providerId = readOptionalString(parsed.providerID) ?? id.split('/')[0] ?? 'opencode';
+  const label = readOptionalString(parsed.name) ?? id.split('/').slice(1).join('/') ?? id;
+  const limit = parsed.limit && typeof parsed.limit === 'object'
+    ? parsed.limit as Record<string, unknown>
+    : {};
+  const context = readNumber(limit.context);
+  const isAntigravity = id.toLowerCase().includes('antigravity')
+    || providerId.toLowerCase().includes('antigravity')
+    || label.toLowerCase().includes('antigravity');
+  // NVIDIA Build is a free BYOK catalog; its verbose JSON carries no `cost`.
+  const tier = (!isAntigravity && (providerId === 'nvidia' || isFreeFromCost(parsed.cost)) ? 'free' : 'paid') as 'free' | 'paid';
+  const effort = parseEffortFromVariants(parsed.variants);
+
+  return {
+    value: id,
+    label,
+    description: getProviderDisplayName(providerId),
+    context,
+    tier,
+    effort,
+  };
+};
+
+/**
+ * Parses `opencode api model.list` output (OpenCode 2): a JSON document whose
+ * `data` array holds model records (`providerID`, `modelID`, `name`, `limit`,
+ * `cost`, `variants`, `enabled`, …). Disabled models are skipped.
+ */
+const parseOpenCodeModelListJson = (stdout: string): ProviderModelOption[] => {
+  const text = stdout.trim();
+  if (!text.startsWith('{') && !text.startsWith('[')) {
+    return [];
+  }
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(text);
+  } catch {
+    return [];
+  }
+  const record = readObjectRecord(parsed);
+  const entries = Array.isArray(record?.data) ? record.data : Array.isArray(parsed) ? parsed : [];
+  const options: ProviderModelOption[] = [];
+  for (const entry of entries) {
+    const model = readObjectRecord(entry);
+    if (!model || model.enabled === false) {
+      continue;
+    }
+    const providerId = readOptionalString(model.providerID);
+    const modelId = readOptionalString(model.modelID) ?? readOptionalString(model.id);
+    if (!providerId || !modelId) {
+      continue;
+    }
+    options.push(buildOpenCodeModelOption(`${providerId}/${modelId}`, { ...model, providerID: providerId }));
+  }
+  return options.filter((option) => option.value && option.label);
+};
+
+/**
+ * Splits `opencode models --verbose` output (OpenCode 1.x) into discrete
+ * JSON blocks: one unindented model id per line followed by a pretty-printed
+ * JSON object. Kept as the fallback for a 1.x binary still on PATH.
  */
 const parseOpenCodeVerboseOutput = (stdout: string): ProviderModelOption[] => {
   const text = stdout.trim();
@@ -219,49 +292,41 @@ const parseOpenCodeVerboseOutput = (stdout: string): ProviderModelOption[] => {
     } catch {
       // If the JSON is malformed, still surface the model id with minimal data.
     }
-
-    const providerId = readOptionalString(parsed.providerID) ?? id.split('/')[0] ?? 'opencode';
-    const label = readOptionalString(parsed.name) ?? id.split('/')[1] ?? id;
-    const limit = parsed.limit && typeof parsed.limit === 'object'
-      ? parsed.limit as Record<string, unknown>
-      : {};
-    const context = readNumber(limit.context);
-    const isAntigravity = id.toLowerCase().includes('antigravity')
-      || providerId.toLowerCase().includes('antigravity')
-      || label.toLowerCase().includes('antigravity');
-    // NVIDIA Build is a free BYOK catalog; its verbose JSON carries no `cost`.
-    const tier = (!isAntigravity && (providerId === 'nvidia' || isFreeFromCost(parsed.cost)) ? 'free' : 'paid') as 'free' | 'paid';
-    const effort = parseEffortFromVariants(parsed.variants);
-
-    return {
-      value: id,
-      label,
-      description: getProviderDisplayName(providerId),
-      context,
-      tier,
-      effort,
-    };
+    return buildOpenCodeModelOption(id, parsed);
   }).filter((option) => option.value && option.label);
 };
 
-/** Loads the live OpenCode model catalog from the OpenCode CLI. */
+/**
+ * Loads the live OpenCode model catalog from the OpenCode CLI.
+ *
+ * OpenCode 2: `opencode api model.list --standalone` runs the OpenAPI
+ * operation against a private in-process server (`--standalone` keeps the
+ * CLI from starting the user's shared background service) and prints the
+ * JSON catalog. A 1.x binary rejects the `api` command, so the 1.x
+ * `models --verbose` listing is tried next.
+ */
 const loadOpenCodeModels = async (
   deps: { execFile?: OpenCodeExecFile } = {},
 ): Promise<ProviderModelsDefinition> => {
   const run = deps.execFile ?? execCliFile;
+  const execOptions = {
+    encoding: 'utf8' as const,
+    timeout: OPENCODE_MODEL_LIST_TIMEOUT_MS,
+    maxBuffer: 16 * 1024 * 1024,
+  };
 
   try {
-    const { stdout } = await run(
-      'opencode',
-      ['models', '--verbose'],
-      {
-        encoding: 'utf8',
-        timeout: OPENCODE_MODEL_LIST_TIMEOUT_MS,
-        maxBuffer: 16 * 1024 * 1024,
-      },
-    );
-
-    const options = parseOpenCodeVerboseOutput(stdout);
+    let options: ProviderModelOption[] = [];
+    try {
+      const { stdout } = await run('opencode', ['api', 'model.list', '--standalone'], execOptions);
+      options = parseOpenCodeModelListJson(stdout);
+    } catch (error) {
+      console.warn('[OpenCodeProviderModels] `opencode api model.list` failed, trying the 1.x listing:', error instanceof Error ? error.message : String(error));
+    }
+    if (options.length === 0) {
+      const { stdout } = await run('opencode', ['models', '--verbose'], execOptions);
+      options = parseOpenCodeVerboseOutput(stdout);
+    }
     if (options.length === 0) {
       throw new Error('OpenCode returned an empty model list.');
     }
@@ -309,7 +374,7 @@ export class OpenCodeProviderModels implements IProviderModels {
       );
     }
 
-    // OpenCode's `session` table is keyed by its own session id, so the stable
+    // OpenCode's session tables are keyed by its own session id, so the stable
     // app id has to be translated first; sessions discovered on disk store the
     // provider id in both columns and resolve to themselves.
     const providerSessionId = sessionsDb.getSessionById(sessionId)?.provider_session_id ?? sessionId;
@@ -319,32 +384,25 @@ export class OpenCodeProviderModels implements IProviderModels {
       const db = openSqliteReadonlyDatabase(dbPath);
 
       try {
-        const row = db.prepare(`
-          SELECT
-            s.id AS sessionId,
-            s.model AS model,
-            s.agent AS agent,
-            s.directory AS directory,
-            s.time_updated AS timeUpdated,
-            s.time_created AS timeCreated
-          FROM session s
-          WHERE s.id = ?
-          ORDER BY COALESCE(s.time_updated, s.time_created, 0) DESC
-          LIMIT 1
-        `).get(providerSessionId) as {
-          sessionId?: string;
-          model?: unknown;
-          agent?: string | null;
-          directory?: string | null;
-          timeUpdated?: number | null;
-          timeCreated?: number | null;
-        } | undefined;
-
-        const model = parseOpenCodeSessionModelValue(row?.model);
-        if (model) {
-          return {
-            model,
-          };
+        // OpenCode 2 keeps sessions in `session_v2`; 1.x sessions (and a
+        // 1.x-only database) still live in `session`.
+        for (const table of ['session_v2', 'session']) {
+          if (!openCodeTableExists(db, table)) {
+            continue;
+          }
+          const row = db.prepare(`
+            SELECT s.id AS sessionId, s.model AS model
+            FROM ${table} s
+            WHERE s.id = ?
+            LIMIT 1
+          `).get(providerSessionId) as { sessionId?: string; model?: unknown } | undefined;
+          const model = parseOpenCodeSessionModelValue(row?.model);
+          if (model) {
+            return { model };
+          }
+          if (row) {
+            break;
+          }
         }
       } finally {
         db.close();

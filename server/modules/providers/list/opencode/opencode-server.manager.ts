@@ -1,4 +1,5 @@
 import type { ChildProcess } from 'node:child_process';
+import { randomBytes } from 'node:crypto';
 import path from 'node:path';
 
 // cross-spawn resolves .cmd shims/PATHEXT on Windows — plain node spawn
@@ -17,7 +18,36 @@ export type OpenCodeServerHandle = {
   directory: string;
   /** Null when the handle came from the OPENCODE_SERVE_BASE_URL test seam. */
   child: ChildProcess | null;
+  /**
+   * HTTP basic-auth password the server was started with
+   * (`OPENCODE_SERVER_PASSWORD`). OpenCode 2 refuses unauthenticated API
+   * calls; null when the seam server runs without one.
+   */
+  password: string | null;
 };
+
+/** OpenCode 2 accepts basic auth for any user name; it only checks the password. */
+const SERVER_AUTH_USER = 'opencode';
+
+// baseUrl → password for every server this process knows about, so the
+// runtime can authenticate by base URL alone (its runs and event streams are
+// keyed that way).
+const passwordsByBaseUrl = new Map<string, string>();
+
+/**
+ * Request headers that authenticate against the serve instance at
+ * [baseUrl]. Consumed by the OpenCode runtime adapter for every API call and
+ * the SSE subscription; empty for a seam server without a password.
+ */
+export function serverAuthHeaders(baseUrl: string): Record<string, string> {
+  const password = passwordsByBaseUrl.get(baseUrl.replace(/\/+$/, ''))
+    ?? process.env.OPENCODE_SERVE_PASSWORD
+    ?? null;
+  if (!password) {
+    return {};
+  }
+  return { Authorization: `Basic ${Buffer.from(`${SERVER_AUTH_USER}:${password}`).toString('base64')}` };
+}
 
 type ServerEntry = {
   handle: OpenCodeServerHandle | null;
@@ -29,6 +59,8 @@ type ServerEntry = {
 // the HTTP API is what makes mid-response permission replies possible.
 const servers = new Map<string, ServerEntry>();
 
+// OpenCode 2 prints `server listening on http://…` (1.x printed the same
+// phrase without the prefix).
 const LISTENING_PATTERN = /listening on (https?:\/\/[^\s]+)/i;
 const STARTUP_TIMEOUT_MS = 15000;
 const HEALTH_TIMEOUT_MS = 2000;
@@ -49,7 +81,11 @@ function resolveDirectory(directory: string): string {
   return path.resolve(directory || process.cwd());
 }
 
-function waitForListenUrl(child: ChildProcess, directory: string): Promise<OpenCodeServerHandle> {
+function waitForListenUrl(
+  child: ChildProcess,
+  directory: string,
+  password: string,
+): Promise<OpenCodeServerHandle> {
   return new Promise((resolve, reject) => {
     let buffer = '';
     let settled = false;
@@ -93,7 +129,7 @@ function waitForListenUrl(child: ChildProcess, directory: string): Promise<OpenC
       buffer += chunk.toString();
       const match = buffer.match(LISTENING_PATTERN);
       if (match) {
-        finish(null, { baseUrl: match[1].replace(/\/+$/, ''), directory, child });
+        finish(null, { baseUrl: match[1].replace(/\/+$/, ''), directory, child, password });
       }
     };
 
@@ -108,7 +144,8 @@ function waitForListenUrl(child: ChildProcess, directory: string): Promise<OpenC
 
 async function isServerHealthy(baseUrl: string): Promise<boolean> {
   try {
-    const response = await fetch(`${baseUrl}/config`, {
+    const response = await fetch(`${baseUrl}/api/info`, {
+      headers: serverAuthHeaders(baseUrl),
       signal: AbortSignal.timeout(HEALTH_TIMEOUT_MS),
     });
     return response.ok;
@@ -155,6 +192,7 @@ function dropEntry(serverKey: string, entry: ServerEntry): void {
     servers.delete(serverKey);
   }
   if (entry.handle) {
+    passwordsByBaseUrl.delete(entry.handle.baseUrl);
     killChild(entry.handle.child);
   }
 }
@@ -192,7 +230,12 @@ export async function ensureServer(
   const resolved = resolveDirectory(directory);
   const override = process.env.OPENCODE_SERVE_BASE_URL;
   if (override) {
-    return { baseUrl: override.replace(/\/+$/, ''), directory: resolved, child: null };
+    return {
+      baseUrl: override.replace(/\/+$/, ''),
+      directory: resolved,
+      child: null,
+      password: process.env.OPENCODE_SERVE_PASSWORD ?? null,
+    };
   }
 
   const serverKey = serverKeyFor(directory, envOverrides);
@@ -222,20 +265,25 @@ export async function ensureServer(
         killChild(oldChild);
       }
 
+      // One random password per spawn — OpenCode 2's API is basic-auth only,
+      // and a fixed secret would let any local process drive the agent.
+      const password = randomBytes(24).toString('base64url');
       const child = crossSpawn('opencode', ['serve', '--port', '0', '--hostname', '127.0.0.1'], {
         cwd: resolved,
         stdio: ['ignore', 'pipe', 'pipe'],
         // Multi-account: env overrides (e.g. XDG_CONFIG_HOME/opencode config dir)
         // isolate this server instance's credentials from other accounts.
-        env: providerChildEnv(envOverrides ?? {}),
+        env: providerChildEnv({ ...(envOverrides ?? {}), OPENCODE_SERVER_PASSWORD: password }),
       });
       try {
-        const handle = await waitForListenUrl(child, resolved);
+        const handle = await waitForListenUrl(child, resolved, password);
+        passwordsByBaseUrl.set(handle.baseUrl, password);
         // The old child's exit handler may have dropped the entry while the
         // health check was in flight — make sure the respawn is mapped.
         servers.set(serverKey, entry);
         entry.handle = handle;
         child.once('exit', () => {
+          passwordsByBaseUrl.delete(handle.baseUrl);
           if (entry.handle === handle) {
             entry.handle = null;
             dropEntry(serverKey, entry);
@@ -262,6 +310,9 @@ export async function ensureServer(
  */
 export function setServerForTest(directory: string, handle: OpenCodeServerHandle): void {
   servers.set(serverKeyFor(directory), { handle, pending: null });
+  if (handle.password) {
+    passwordsByBaseUrl.set(handle.baseUrl, handle.password);
+  }
 }
 
 /**
@@ -277,6 +328,7 @@ export function getServer(
 /** Test seam: drops the cached map so each test starts with no servers. */
 export function resetServersForTest(): void {
   servers.clear();
+  passwordsByBaseUrl.clear();
 }
 
 /**

@@ -49,11 +49,57 @@ google/antigravity-gemini-3.8-flash
   "variants": {}
 }`;
 
-const createExecFile = (output: string, shouldFail = false) => async () => {
+// `opencode api model.list --standalone` (OpenCode 2) — the JSON catalog.
+const sampleModelListJson = JSON.stringify({
+  location: { directory: '/repo' },
+  data: [
+    {
+      id: 'big-pickle',
+      modelID: 'big-pickle',
+      providerID: 'opencode',
+      name: 'Big Pickle',
+      cost: { input: 0, output: 0, cache: { read: 0, write: 0 } },
+      limit: { context: 200000, output: 32000 },
+      variants: {},
+      enabled: true,
+    },
+    {
+      id: 'nvidia/nemotron-3.5-super',
+      modelID: 'nvidia/nemotron-3.5-super',
+      providerID: 'nvidia',
+      name: 'Nemotron 3.5 Super',
+      limit: { context: 131072 },
+      variants: { low: { reasoningEffort: 'low' }, medium: { reasoningEffort: 'medium' } },
+      enabled: true,
+    },
+    {
+      id: 'disabled-model',
+      modelID: 'disabled-model',
+      providerID: 'openai',
+      name: 'Disabled',
+      enabled: false,
+    },
+  ],
+});
+
+/**
+ * Fake CLI: OpenCode 2 answers `api model.list` with JSON; a 1.x binary
+ * rejects `api` and only knows `models --verbose`.
+ */
+const createExecFile = (output: string, shouldFail = false, { v1 = true } = {}) => async (
+  _file: string,
+  args: string[],
+) => {
   if (shouldFail) {
     throw new Error('opencode not available');
   }
-  return { stdout: output, stderr: '' };
+  if (args[0] === 'api') {
+    if (v1) {
+      throw new Error('Unknown command: api');
+    }
+    return { stdout: output, stderr: '' };
+  }
+  return { stdout: v1 ? output : '', stderr: '' };
 };
 
 test('OpenCodeProviderModels discovers dynamic models with context, tier, and effort', async () => {
@@ -95,7 +141,7 @@ test('OpenCodeProviderModels does not re-run the CLI for repeat catalog reads', 
   const adapter = new OpenCodeProviderModels({
     execFile: async () => {
       execCalls += 1;
-      return { stdout: sampleVerboseOutput, stderr: '' };
+      return { stdout: sampleModelListJson, stderr: '' };
     },
   });
 
@@ -103,6 +149,27 @@ test('OpenCodeProviderModels does not re-run the CLI for repeat catalog reads', 
   await adapter.getSupportedModels();
 
   assert.equal(execCalls, 1);
+});
+
+test('OpenCodeProviderModels reads the OpenCode 2 JSON catalog and skips disabled models', async () => {
+  const calls: string[][] = [];
+  const adapter = new OpenCodeProviderModels({
+    execFile: async (_file, args) => {
+      calls.push(args);
+      return { stdout: args[0] === 'api' ? sampleModelListJson : '', stderr: '' };
+    },
+  });
+
+  const models = await adapter.getSupportedModels();
+
+  assert.deepEqual(calls, [['api', 'model.list', '--standalone']]);
+  assert.deepEqual(models.OPTIONS.map((option) => option.value), ['opencode/big-pickle', 'nvidia/nvidia/nemotron-3.5-super']);
+  const nemotron = models.OPTIONS[1];
+  assert.equal(nemotron.label, 'Nemotron 3.5 Super');
+  assert.equal(nemotron.context, 131072);
+  assert.equal(nemotron.tier, 'free');
+  assert.equal(nemotron.effort?.default, 'medium');
+  assert.equal(models.DEFAULT, 'opencode/big-pickle');
 });
 
 test('OpenCodeProviderModels falls back to the predefined catalog when the CLI fails', async () => {
