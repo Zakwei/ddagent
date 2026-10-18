@@ -35,3 +35,36 @@ List<TerminalAccountProfile> terminalAccountProfiles(
   }
   return profiles;
 }
+
+/// Binary the server's shell bridge starts for a provider CLI tab — kept in
+/// step with `buildShellCommand` in shell-websocket.service.ts.
+String providerCliBinary(String provider, {required bool windows}) => switch (provider) {
+  'cursor' => 'cursor-agent',
+  'commandcode' => windows ? 'cmdc' : 'command-code',
+  'antigravity' => 'agy',
+  'claude' || 'codex' || 'opencode' || 'devin' => provider,
+  _ => provider,
+};
+
+String _posixQuote(String value) => "'${value.replaceAll("'", r"'\''")}'";
+String _powerShellQuote(String value) => "'${value.replaceAll("'", "''")}'";
+
+/// One shell line that starts [provider]'s CLI with [env] applied, typed into
+/// the shell the user already has open — so the CLI runs in that shell's
+/// working directory. POSIX shells get `env K=V … bin`, which scopes the
+/// variables to the CLI process; PowerShell has no such prefix form, so the
+/// variables are assigned to the session first (`$env:K='V'; bin`) and stay
+/// set in that tab afterwards.
+String terminalAccountCommand({
+  required String provider,
+  required Map<String, String> env,
+  required bool windows,
+}) {
+  final bin = providerCliBinary(provider, windows: windows);
+  final keys = env.keys.toList()..sort();
+  if (windows) {
+    return [for (final k in keys) '\$env:$k=${_powerShellQuote(env[k]!)};', bin].join(' ');
+  }
+  if (keys.isEmpty) return bin;
+  return ['env', for (final k in keys) '$k=${_posixQuote(env[k]!)}', bin].join(' ');
+}

@@ -15,6 +15,7 @@ ProviderAccountEntry _account(
 );
 
 void main() {
+  _commandTests();
   test('account profiles follow the provider order, then the label', () {
     final profiles = terminalAccountProfiles(
       [
@@ -44,5 +45,43 @@ void main() {
     );
     expect(profiles.map((p) => p.account.label).toList(), ['Isolated']);
     expect(profiles.single.account.envOverrides, {'CLAUDE_CONFIG_DIR': '/x'});
+  });
+}
+
+void _commandTests() {
+  test('POSIX command scopes the account env to the CLI process', () {
+    expect(
+      terminalAccountCommand(
+        provider: 'claude',
+        env: const {'CLAUDE_CONFIG_DIR': "/home/me/.ddagent/accounts/a'b/claude"},
+        windows: false,
+      ),
+      "env CLAUDE_CONFIG_DIR='/home/me/.ddagent/accounts/a'\\''b/claude' claude",
+    );
+    expect(
+      terminalAccountCommand(
+        provider: 'opencode',
+        env: const {'XDG_DATA_HOME': '/d', 'XDG_CONFIG_HOME': '/c'},
+        windows: false,
+      ),
+      "env XDG_CONFIG_HOME='/c' XDG_DATA_HOME='/d' opencode",
+    );
+    expect(
+      terminalAccountCommand(provider: 'cursor', env: const {}, windows: false),
+      'cursor-agent',
+    );
+  });
+
+  test('PowerShell command assigns the env then starts the CLI binary', () {
+    expect(
+      terminalAccountCommand(
+        provider: 'commandcode',
+        env: const {'HOME': r"C:\Users\me\it's", 'USERPROFILE': r'C:\Users\me'},
+        windows: true,
+      ),
+      r"$env:HOME='C:\Users\me\it''s'; $env:USERPROFILE='C:\Users\me'; cmdc",
+    );
+    expect(providerCliBinary('commandcode', windows: false), 'command-code');
+    expect(providerCliBinary('antigravity', windows: true), 'agy');
   });
 }

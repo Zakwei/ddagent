@@ -4,6 +4,7 @@ import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/theme/typography.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/provider_accounts/state/provider_accounts_controller.dart';
+import 'package:ddagent_app/features/system/state/system_providers.dart';
 import 'package:ddagent_app/features/terminal/state/terminal_account_profiles.dart';
 import 'package:ddagent_app/features/terminal/state/terminal_state.dart';
 import 'package:ddagent_app/features/terminal/view/provider_login_dialog.dart';
@@ -148,6 +149,32 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
       title: account?.title(_profileLabel(provider)) ?? '$provider CLI',
       env: account?.account.envOverrides,
     );
+  }
+
+  /// Account profiles run *in the shell the user is looking at*: the CLI is
+  /// typed into the active tab as `env K=V … claude` (PowerShell: `$env:K=…;
+  /// claude`), so it starts in that shell's working directory with the
+  /// account's config dir. Only a plain, connected shell can take typed input
+  /// without it landing inside some other program; anything else (a running
+  /// CLI, a one-shot command, a dead tab, no tab) falls back to a new tab
+  /// started with the same env.
+  void _runAccountProfile(TerminalAccountProfile profile, TerminalTab? activeTab) {
+    final canType =
+        activeTab != null &&
+        activeTab.status == TerminalTabStatus.connected &&
+        activeTab.isPlainShell &&
+        !activeTab.isCommandMode;
+    if (!canType) {
+      _newProviderTab(profile.provider, account: profile);
+      return;
+    }
+    final windows = ref.read(serverHealthProvider).value?['platform'] == 'win32';
+    final command = terminalAccountCommand(
+      provider: profile.provider,
+      env: profile.account.envOverrides,
+      windows: windows,
+    );
+    _ctrl.sendInput(activeTab.id, '$command\r');
   }
 
   String _profileLabel(String provider) {
@@ -419,7 +446,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
         entry(
           LucideIcons.userRound,
           profile.title(profileLabel(profile.provider)),
-          onTap: () => _newProviderTab(profile.provider, account: profile),
+          onTap: () => _runAccountProfile(profile, activeTab),
         ),
       const Divider(height: 8),
       // Pane actions grouped in submenus so the dropdown stays short enough
