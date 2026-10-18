@@ -12,15 +12,30 @@ String providerInstallCommand(String provider, {bool windows = false}) => switch
   'cursor' when windows => "irm 'https://cursor.com/install?win32=true' | iex",
   'antigravity' when windows => 'irm https://antigravity.google/cli/install.ps1 | iex',
   'devin' when windows => 'irm https://static.devin.ai/cli/setup.ps1 | iex',
-  'claude' => 'npm install -g @anthropic-ai/claude-code',
   'cursor' => 'curl https://cursor.com/install -fsS | bash',
-  'codex' => 'npm install -g @openai/codex',
-  'opencode' => 'npm install -g @opencode/cli',
-  'commandcode' => 'npm install -g command-code',
   'antigravity' => 'curl -fsSL https://antigravity.google/cli/install.sh | bash',
   'devin' => 'curl -fsSL https://cli.devin.ai/install.sh | bash',
-  _ => 'npm install -g $provider',
+  _ => npmGlobalInstallCommand(providerNpmPackage(provider)),
 };
+
+/// npm package behind the npm-distributed provider CLIs.
+String providerNpmPackage(String provider) => switch (provider) {
+  'claude' => '@anthropic-ai/claude-code',
+  'codex' => '@openai/codex',
+  'opencode' => '@opencode/cli',
+  'commandcode' => 'command-code',
+  _ => provider,
+};
+
+/// `npm install -g` for a provider package. npm 11.19+ refuses to run a
+/// package's install scripts unless it is on the `allow-scripts` list, and
+/// prints only a warning: `@anthropic-ai/claude-code` (postinstall fetches
+/// the native binary) and `@opencode/cli` then "install" with exit code 0 but
+/// are left without a working binary — the in-app update looked successful
+/// and changed nothing. The flag names the package explicitly; older npm
+/// ignores the unknown option with a warning.
+String npmGlobalInstallCommand(String package, {bool latest = false}) =>
+    'npm install -g --allow-scripts=$package $package${latest ? '@latest' : ''}';
 
 /// Per-provider CLI update commands, run through the same terminal dialog as
 /// [providerInstallCommand]. The npm-packaged CLIs re-install pinned to
@@ -31,12 +46,8 @@ String providerInstallCommand(String provider, {bool windows = false}) => switch
 /// from PATH), shared by every named provider account — so updating is a
 /// provider-level action, never a per-account one.
 String providerUpdateCommand(String provider, {bool windows = false}) => switch (provider) {
-  'claude' => 'npm install -g @anthropic-ai/claude-code@latest',
-  'codex' => 'npm install -g @openai/codex@latest',
-  'opencode' => 'npm install -g @opencode/cli@latest',
-  'commandcode' => 'npm install -g command-code@latest',
   'cursor' || 'antigravity' || 'devin' => providerInstallCommand(provider, windows: windows),
-  _ => 'npm install -g $provider@latest',
+  _ => npmGlobalInstallCommand(providerNpmPackage(provider), latest: true),
 };
 
 /// Official installation docs for a provider CLI. Null when no stable docs

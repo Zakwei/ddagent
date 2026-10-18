@@ -348,6 +348,19 @@ void main() {
     expect(providerInstallCommand('claude', windows: true), providerInstallCommand('claude'));
   });
 
+  test('npm-installed CLIs allow their install scripts (npm 11.19 blocks them by default)', () {
+    expect(
+      providerUpdateCommand('claude'),
+      'npm install -g --allow-scripts=@anthropic-ai/claude-code @anthropic-ai/claude-code@latest',
+    );
+    expect(
+      providerInstallCommand('opencode'),
+      'npm install -g --allow-scripts=@opencode/cli @opencode/cli',
+    );
+    expect(providerInstallCommand('commandcode'), contains('--allow-scripts=command-code'));
+    expect(providerUpdateCommand('codex'), endsWith('@openai/codex@latest'));
+  });
+
   testWidgets('logout confirms, calls the server, and refreshes the status', (tester) async {
     tester.view.physicalSize = const Size(1600, 1200);
     tester.view.devicePixelRatio = 1;
