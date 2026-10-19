@@ -104,7 +104,12 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
     super.initState();
     if (widget.syncTabs) {
       ref.listenManual(workspaceProvider, (_, _) => _onWorkspaceChanged());
-      ref.listenManual(terminalControllerProvider, (_, _) => _publishLocalRow());
+      // Keyed on the row's shape only — output frames notify the controller
+      // on every chunk, and must not re-encode the row each time.
+      ref.listenManual(
+        terminalControllerProvider.select((s) => _rowShape(s, widget.hostId)),
+        (_, _) => _publishLocalRow(),
+      );
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -149,6 +154,11 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
       _applyingSyncedRow = false;
     }
   }
+
+  static String _rowShape(TerminalState s, String hostId) => [
+    s.activeTabFor(hostId)?.syncId,
+    for (final tab in s.tabsFor(hostId)) '${tab.syncId}|${tab.renamed}|${tab.title}',
+  ].join('\n');
 
   /// Local tab edit (open, close, rename, reorder, select, move) → the
   /// workspace row, which the workspace sync pushes to the other devices.
