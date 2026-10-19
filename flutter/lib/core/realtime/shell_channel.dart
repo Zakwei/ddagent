@@ -103,6 +103,14 @@ class ShellChannel {
     _ws.send({'type': 'resize', 'cols': cols, 'rows': rows});
   }
 
+  /// App back in the foreground: a socket dropped while backgrounded may sit
+  /// in a reconnect backoff of up to 30 s — retry right away. An open socket
+  /// is left alone (a reconnect would replay the buffer for nothing), and so
+  /// is one the user disconnected.
+  void wake() {
+    if (_ws.state != WsState.open) _ws.reconnectNow();
+  }
+
   Future<void> connect() => _ws.connect();
   Future<void> close() => _ws.close();
 

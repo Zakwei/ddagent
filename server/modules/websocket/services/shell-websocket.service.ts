@@ -49,7 +49,10 @@ type PtySessionEntry = {
   /** Last size each viewer reported (init or resize). */
   sizes: Map<WebSocket, TerminalSize>;
   size: TerminalSize;
+  /** Recent raw output, replayed to a socket that (re)attaches. */
   buffer: string[];
+  /** Total length of [buffer] — capped by PTY_BUFFER_MAX_CHARS. */
+  bufferChars: number;
   timeoutId: NodeJS.Timeout | null;
   projectPath: string;
   sessionId: string | null;
@@ -70,6 +73,52 @@ function broadcastOutput(session: PtySessionEntry, data: string): void {
       socket,
       socket === session.owner ? { type: 'output', data } : { type: 'output', data, replay: true }
     );
+  }
+}
+
+// The replay window: enough to repaint a TUI and keep recent scrollback, small
+// enough that a reattach does not freeze the client. Writing 5000 unbounded
+// chunks (~23 MB of Claude Code redraws) blocked the web UI for 13 s on every
+// reconnect.
+const PTY_BUFFER_MAX_CHUNKS = 5000;
+const PTY_BUFFER_MAX_CHARS = 512 * 1024;
+// Replay is sent in a few large frames rather than one per chunk.
+const REPLAY_FRAME_CHARS = 64 * 1024;
+// Erase screen + scrollback, cursor home — the replay repaints from a blank
+// terminal instead of appending another copy of history the client shows.
+const REPLAY_CLEAR_SEQUENCE = '\x1b[2J\x1b[3J\x1b[H';
+
+/** Appends live output to the replay window, evicting the oldest chunks. */
+function appendToReplayBuffer(session: PtySessionEntry, chunk: string): void {
+  session.buffer.push(chunk);
+  session.bufferChars += chunk.length;
+  while (
+    session.buffer.length > PTY_BUFFER_MAX_CHUNKS ||
+    (session.bufferChars > PTY_BUFFER_MAX_CHARS && session.buffer.length > 1)
+  ) {
+    session.bufferChars -= session.buffer.shift()!.length;
+  }
+}
+
+/**
+ * Sends the replay window to a (re)attaching socket: a clear first, then the
+ * buffered output joined into frames of at most REPLAY_FRAME_CHARS. Every
+ * frame is flagged `replay` so the client does not answer the terminal
+ * queries in it again — those replies would land in the shell as typed input.
+ */
+function sendReplay(socket: WebSocket, session: PtySessionEntry, banner: string): void {
+  sendIfOpen(socket, { type: 'output', data: REPLAY_CLEAR_SEQUENCE, replay: true });
+  sendIfOpen(socket, { type: 'output', data: banner });
+  let pending = '';
+  for (const chunk of session.buffer) {
+    if (pending && pending.length + chunk.length > REPLAY_FRAME_CHARS) {
+      sendIfOpen(socket, { type: 'output', data: pending, replay: true });
+      pending = '';
+    }
+    pending += chunk;
+  }
+  if (pending) {
+    sendIfOpen(socket, { type: 'output', data: pending, replay: true });
   }
 }
 
@@ -599,27 +648,7 @@ export function handleShellConnection(
             applyViewerSize(existingSession, ws);
           }
 
-          ws.send(
-            JSON.stringify({
-              type: 'output',
-              data: '\x1b[36m[Reconnected to existing session]\x1b[0m\r\n',
-            })
-          );
-
-          if (existingSession.buffer.length > 0) {
-            existingSession.buffer.forEach((bufferedData) => {
-              // `replay` lets the client redraw old output without answering
-              // the terminal queries in it again — those replies would land
-              // in the shell as typed input.
-              ws.send(
-                JSON.stringify({
-                  type: 'output',
-                  data: bufferedData,
-                  replay: true,
-                })
-              );
-            });
-          }
+          sendReplay(ws, existingSession, '\x1b[36m[Reconnected to existing session]\x1b[0m\r\n');
           return;
         }
 
@@ -686,6 +715,7 @@ export function handleShellConnection(
           sizes: viewerSizes,
           size: initSize,
           buffer: [],
+          bufferChars: 0,
           timeoutId: null,
           projectPath,
           sessionId,
@@ -703,12 +733,7 @@ export function handleShellConnection(
             return;
           }
 
-          if (session.buffer.length < 5000) {
-            session.buffer.push(chunk);
-          } else {
-            session.buffer.shift();
-            session.buffer.push(chunk);
-          }
+          appendToReplayBuffer(session, chunk);
 
           if (session.sockets.size > 0) {
             let outputData = chunk;

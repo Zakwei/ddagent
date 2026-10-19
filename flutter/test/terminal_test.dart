@@ -45,6 +45,10 @@ class FakeWsClient extends WsClient {
   }
 
   int connectCalls = 0;
+  int reconnectNowCalls = 0;
+
+  @override
+  void reconnectNow() => reconnectNowCalls++;
 
   @override
   Future<void> connect() async {
@@ -273,6 +277,23 @@ void main() {
 
       final currentTab = controller.state.tabs.firstWhere((t) => t.id == tab.id);
       expect(currentTab.authUrls, contains('https://claude.ai/oauth/login?code=123'));
+    });
+
+    test('resume retries a dropped shell right away and leaves an open one alone', () async {
+      final container = ProviderContainer(
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
+      );
+      addTearDown(container.dispose);
+      final controller = container.read(terminalControllerProvider.notifier);
+      controller.createTab(projectPath: '/test/proj');
+      await Future<void>.delayed(Duration.zero);
+
+      controller.onAppResumed();
+      expect(fakeWs.reconnectNowCalls, 0);
+
+      fakeWs.emitState(WsState.reconnecting);
+      controller.onAppResumed();
+      expect(fakeWs.reconnectNowCalls, 1);
     });
 
     test('a loopback auth_url from an older server shows no login banner', () async {

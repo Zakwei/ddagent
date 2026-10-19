@@ -792,6 +792,13 @@ class TerminalController extends Notifier<TerminalState> {
     _notifyTabsChanged();
   }
 
+  /// App back in the foreground — reconnect the shells that dropped.
+  void onAppResumed() {
+    for (final tab in state.tabs) {
+      tab.channel.wake();
+    }
+  }
+
   /// Font zoom (web ShellHeader ±1px, clamped 9–24); Ctrl+0 resets.
   void zoomIn(String tabId) => _zoom(tabId, 1);
   void zoomOut(String tabId) => _zoom(tabId, -1);

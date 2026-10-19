@@ -201,7 +201,7 @@ Path must exist and be a directory; `sessionId` must match safe pattern.
 4. Command build:
 Provider-specific command construction with resume semantics.
 5. PTY output buffering:
-Stores up to 5000 chunks for replay on reconnect.
+Keeps the newest output (at most 5000 chunks and 512 KB) for replay on reconnect. A reattaching socket first gets a clear (so the client does not show history twice), then the window joined into `replay` frames of at most 64 KB — replaying thousands of unbounded chunks froze the web client for seconds on every reconnect.
 6. URL detection:
 Strips ANSI, accumulates text buffer, extracts URLs, emits `auth_url` once per normalized URL, supports `autoOpen`.
 7. Close behavior:

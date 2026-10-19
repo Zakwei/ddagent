@@ -121,6 +121,53 @@ test('a reattached socket gets the buffered output marked as replay', () => {
   pty.emitExit();
 });
 
+test('a reattach replays a bounded window in a few frames, after a clear', () => {
+  const pty = createFakePty();
+  const dependencies = {
+    resolveProviderSessionId: () => null,
+    spawnPty: () => pty as never,
+  };
+  const initMessage = JSON.stringify({
+    type: 'init',
+    projectPath: process.cwd(),
+    sessionId: `replay-window-${Date.now()}`,
+    hasSession: false,
+    provider: 'plain-shell',
+    isPlainShell: true,
+  });
+
+  const firstSocket = createFakeSocket();
+  handleShellConnection(firstSocket as never, dependencies);
+  firstSocket.emit('message', initMessage);
+  // ~2 MB of 4 KB TUI redraws — four times the replay window.
+  const chunk = (i: number) => `frame-${String(i).padStart(5, '0')}`.padEnd(4096, '.');
+  for (let i = 0; i < 512; i++) {
+    pty.emitData(chunk(i));
+  }
+
+  const replacementSocket = createFakeSocket();
+  handleShellConnection(replacementSocket as never, dependencies);
+  replacementSocket.emit('message', initMessage);
+  const frames = replacementSocket.frames.map(
+    (frame) => JSON.parse(frame) as { data: string; replay?: boolean }
+  );
+
+  // The client's copy of history is cleared, not doubled.
+  assert.deepEqual(frames[0], { type: 'output', data: '\x1b[2J\x1b[3J\x1b[H', replay: true });
+  assert.match(frames[1].data, /Reconnected to existing session/);
+  const replayed = frames.slice(2);
+  assert.ok(replayed.every((frame) => frame.replay === true));
+  assert.ok(replayed.every((frame) => frame.data.length <= 64 * 1024));
+  assert.equal(replayed.length, 8);
+  const text = replayed.map((frame) => frame.data).join('');
+  assert.equal(text.length, 512 * 1024);
+  // The newest output is kept; the oldest is dropped.
+  assert.ok(text.endsWith(chunk(511)));
+  assert.ok(!text.includes('frame-00000'));
+
+  pty.emitExit();
+});
+
 /** Two devices viewing one synced terminal tab. */
 function attachTwoViewers(name: string) {
   const writes: string[] = [];

@@ -19,6 +19,7 @@ import 'package:ddagent_app/features/server_connect/data/local_server_status.dar
 import 'package:ddagent_app/features/server_connect/state/local_server_controller.dart';
 import 'package:ddagent_app/features/settings/state/locale_controller.dart';
 import 'package:ddagent_app/features/system/state/update_controller.dart';
+import 'package:ddagent_app/features/terminal/state/terminal_state.dart';
 import 'package:ddagent_app/features/workspace/state/workspace_controller.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
@@ -80,7 +81,12 @@ class _DdagentAppState extends ConsumerState<DdagentApp> {
     // suspends us, and re-read the server's panes on every wake.
     onHide: () => _workspace()?.onAppBackgrounded(),
     onPause: () => _workspace()?.onAppBackgrounded(),
-    onResume: () => _workspace()?.onAppResumed(),
+    onResume: () {
+      _workspace()?.onAppResumed();
+      if (ref.exists(terminalControllerProvider)) {
+        ref.read(terminalControllerProvider.notifier).onAppResumed();
+      }
+    },
     onExitRequested: () async {
       try {
         await ref.read(desktopUpdateProvider.notifier).applyOnExit();
