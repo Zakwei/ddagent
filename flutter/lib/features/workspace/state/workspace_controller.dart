@@ -51,6 +51,10 @@ class WorkspaceController extends Notifier<WorkspaceState> {
       getState: () => state,
       applyRemote: _applyRemote,
       send: channel.sendFrame,
+      // Transient flag only — nothing to persist or push.
+      onLoaded: () {
+        if (!state.serverLoaded) state = state.copyWith(serverLoaded: true);
+      },
     );
     _eventsSub = channel.events.listen((e) => _sync?.handleFrame(e.raw));
     _statesSub = channel.states.listen((s) {
@@ -94,6 +98,7 @@ class WorkspaceController extends Notifier<WorkspaceState> {
     _set(
       next.copyWith(
         maximizedPaneId: () => cleanupMaximizedPaneId(state.maximizedPaneId, next.panes),
+        serverLoaded: true,
       ),
     );
   }
@@ -152,7 +157,18 @@ class WorkspaceController extends Notifier<WorkspaceState> {
       state.copyWith(
         panes: next,
         activePaneId: () => active,
+        terminals: WorkspaceState.terminalHostsFor(state.terminals, next),
         maximizedPaneId: () => cleanupMaximizedPaneId(state.maximizedPaneId, next),
+      ),
+    );
+  }
+
+  /// A terminal host's tab row changed on this device.
+  void setTerminalHost(String hostId, TerminalHostSpec row) {
+    if (state.terminals[hostId]?.encode() == row.encode()) return;
+    _set(
+      state.copyWith(
+        terminals: WorkspaceState.terminalHostsFor({...state.terminals, hostId: row}, state.panes),
       ),
     );
   }

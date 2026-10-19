@@ -69,7 +69,8 @@ void main() {
   });
 
   TerminalTab makeTab() => TerminalTab(
-    id: 't${tabSeq++}',
+    id: 't$tabSeq',
+    syncId: 'sync-t${tabSeq++}',
     title: 't',
     projectPath: '/p',
     terminal: xt.Terminal(),

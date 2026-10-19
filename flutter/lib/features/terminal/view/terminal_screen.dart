@@ -56,10 +56,16 @@ class TerminalScreen extends ConsumerStatefulWidget {
     this.sessionId,
     this.onFileOpen,
     this.hostId = terminalRouteHost,
+    this.syncTabs = false,
   });
 
   /// Which tab row this screen shows — the route's, or a workspace pane's.
   final String hostId;
+
+  /// Mirror this tab row on the account's other devices through the
+  /// workspace sync (like the panes themselves). Off where no workspace
+  /// exists — the login dialog, widget tests.
+  final bool syncTabs;
   final String? projectPath;
   final String? projectId;
   final String? sessionId;
@@ -87,11 +93,26 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
     return active == null ? null : _viewKeys[active.id]?.currentState;
   }
 
+  /// Last tab row exchanged with the workspace (applied or published) — a
+  /// differing workspace row is another device's edit, a differing local row
+  /// is this device's. Null until the row was first seen or published.
+  TerminalHostSpec? _syncedRow;
+  bool _applyingSyncedRow = false;
+
   @override
   void initState() {
     super.initState();
+    if (widget.syncTabs) {
+      ref.listenManual(workspaceProvider, (_, _) => _onWorkspaceChanged());
+      ref.listenManual(terminalControllerProvider, (_, _) => _publishLocalRow());
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _ensureInitialTab();
+      if (!mounted) return;
+      if (widget.syncTabs) {
+        _onWorkspaceChanged();
+      } else {
+        _ensureInitialTab();
+      }
     });
   }
 
@@ -99,6 +120,45 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
   void dispose() {
     _copyTimer?.cancel();
     super.dispose();
+  }
+
+  /// Workspace changed (any field, from any device). Nothing happens before
+  /// the server's workspace was read: a row restored from disk may name tabs
+  /// closed elsewhere since, and a seeded tab would duplicate another
+  /// device's.
+  void _onWorkspaceChanged() {
+    final workspace = ref.read(workspaceProvider);
+    if (!workspace.serverLoaded) return;
+    final row = workspace.terminals[widget.hostId];
+    if (row == null) {
+      // Never opened on any device: announce what this device holds (a tab
+      // just moved here), or open the default tab — published by the
+      // controller listener.
+      if (_syncedRow == null) {
+        if (_ctrl.syncedRowFor(widget.hostId).tabs.isEmpty) _ensureInitialTab();
+        _publishLocalRow();
+      }
+      return;
+    }
+    if (row.encode() == _syncedRow?.encode()) return;
+    _syncedRow = row;
+    _applyingSyncedRow = true;
+    try {
+      _ctrl.applySyncedRow(widget.hostId, row);
+    } finally {
+      _applyingSyncedRow = false;
+    }
+  }
+
+  /// Local tab edit (open, close, rename, reorder, select, move) → the
+  /// workspace row, which the workspace sync pushes to the other devices.
+  void _publishLocalRow() {
+    if (_applyingSyncedRow || !ref.read(workspaceProvider).serverLoaded) return;
+    final row = _ctrl.syncedRowFor(widget.hostId);
+    if (row.encode() == _syncedRow?.encode()) return;
+    if (_syncedRow == null && row.tabs.isEmpty) return;
+    _syncedRow = row;
+    ref.read(workspaceProvider.notifier).setTerminalHost(widget.hostId, row);
   }
 
   TerminalController get _ctrl => ref.read(terminalControllerProvider.notifier);

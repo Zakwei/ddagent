@@ -24,6 +24,7 @@ import 'package:ddagent_app/features/sessions/state/session_activity.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
 import 'package:ddagent_app/features/settings/state/ui_preferences_controller.dart';
 import 'package:ddagent_app/features/shared_context/view/shared_notes_pane.dart';
+import 'package:ddagent_app/features/terminal/state/terminal_state.dart';
 import 'package:ddagent_app/features/terminal/view/terminal_screen.dart';
 import 'package:ddagent_app/features/workspace/state/finished_panes.dart';
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
@@ -146,6 +147,17 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
       ];
       if (hits.isNotEmpty) setState(() => _finishedPaneIds.addAll(hits));
     });
+    // A terminal pane closed here or on another device takes its tabs along.
+    ref.listen(
+      workspaceProvider.select(
+        (s) => [
+          for (final p in s.panes)
+            if (p.kind == PaneKind.terminal) p.id,
+        ].join('\n'),
+      ),
+      (_, next) =>
+          ref.read(terminalControllerProvider.notifier).closeHostsExcept(next.split('\n').toSet()),
+    );
     // The flag tracks the session's state, not whether it was seen: only the
     // agent starting again (or the pane closing) clears it.
     _finishedPaneIds.removeWhere((id) {
@@ -593,6 +605,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
           hostId: pane.id,
           projectId: pane.projectId,
           sessionId: pane.sessionId,
+          syncTabs: true,
         );
       case PaneKind.git:
         if (pane.projectId == null) {

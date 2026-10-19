@@ -254,4 +254,88 @@ void main() {
       expect(merged.panes.single.sessionId, 's');
     });
   });
+
+  group('terminal tab rows', () {
+    const pane = SplitPane(id: 'term-pane', kind: PaneKind.terminal, projectId: 'proj-1');
+    TerminalTabSpec tab(String id) =>
+        TerminalTabSpec(id: id, title: id, projectPath: '/p', ptySessionId: id);
+    WorkspaceState withRow(List<String> ids, {String? active, String host = 'term-pane'}) =>
+        WorkspaceState(
+          panes: const [pane],
+          activePaneId: pane.id,
+          terminals: {
+            host: TerminalHostSpec(tabs: [for (final id in ids) tab(id)], activeTabId: active),
+          },
+        );
+    List<String> ids(WorkspaceState s, [String host = 'term-pane']) => [
+      for (final t in s.terminals[host]!.tabs) t.id,
+    ];
+
+    test('round-trip through JSON keeps rows of live hosts only', () {
+      final json = withRow(['a', 'b'], active: 'b').toJson();
+      (json['terminals'] as Map)['closed-pane'] = withRow(['x']).terminals['term-pane']!.toJson();
+      (json['terminals'] as Map)[terminalRouteHost] = withRow(['r']).terminals['term-pane']!
+          .toJson();
+
+      final restored = WorkspaceState.sanitize(json);
+      expect(restored.terminals.keys.toSet(), {'term-pane', terminalRouteHost});
+      expect(ids(restored), ['a', 'b']);
+      expect(restored.terminals['term-pane']!.activeTabId, 'b');
+      expect(restored.terminals['term-pane']!.tabs.first.ptySessionId, 'a');
+    });
+
+    test('an active id naming no tab falls back to the first', () {
+      final restored = WorkspaceState.sanitize(withRow(['a', 'b'], active: 'zzz').toJson());
+      expect(restored.terminals['term-pane']!.activeTabId, 'a');
+    });
+
+    test('an untouched row is exactly the server one', () {
+      final base = withRow(['a']);
+      final merged = mergeWorkspace(base: base, local: base, remote: withRow(['a', 'b']));
+      expect(ids(merged), ['a', 'b']);
+    });
+
+    test('tabs opened and closed on two devices at once both survive', () {
+      final base = withRow(['a', 'b']);
+      final local = withRow(['a', 'b', 'mine'], active: 'mine');
+      final remote = withRow(['b', 'theirs'], active: 'theirs');
+
+      final merged = mergeWorkspace(base: base, local: local, remote: remote);
+      expect(ids(merged), ['b', 'theirs', 'mine']);
+      expect(merged.terminals['term-pane']!.activeTabId, 'mine');
+    });
+
+    test('a row of a pane closed elsewhere is dropped', () {
+      final base = withRow(['a']);
+      final local = withRow(['a', 'b']);
+      const remote = WorkspaceState();
+      final merged = mergeWorkspace(base: base, local: local, remote: remote);
+      expect(merged.terminals, isEmpty);
+    });
+
+    test('the /terminal screen row merges without any pane', () {
+      final base = withRow(['a'], host: terminalRouteHost);
+      final merged = mergeWorkspace(
+        base: base,
+        local: withRow(['a', 'b'], host: terminalRouteHost),
+        remote: withRow(['a', 'c'], host: terminalRouteHost),
+      );
+      expect(ids(merged, terminalRouteHost), ['a', 'c', 'b']);
+    });
+
+    test('a cold boot signals the first server contact even with no workspace stored', () {
+      var loaded = 0;
+      final sync = WorkspaceSync(
+        deviceId: () => 'dev',
+        getState: () => const WorkspaceState(),
+        applyRemote: (_) {},
+        send: (_) => true,
+        onLoaded: () => loaded++,
+        pushDebounce: Duration.zero,
+      );
+      sync.handleFrame({'kind': 'workspace_state', 'state': null, 'revision': 0});
+      sync.handleFrame({'kind': 'workspace_state', 'state': null, 'revision': 0});
+      expect(loaded, 1);
+    });
+  });
 }

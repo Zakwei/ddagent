@@ -204,6 +204,108 @@ String paneKindLabel(PaneKind kind) => switch (kind) {
   );
 }
 
+/// Host of the tabs shown on the standalone `/terminal` screen (and the
+/// provider-login dialog). Workspace terminal panes use their pane id, so
+/// every pane owns its own tab row and a tab can move between them.
+const terminalRouteHost = 'route';
+
+/// Upper bound of synced tabs per tab row — keeps the workspace payload far
+/// below the server's 64KB cap.
+const maxSyncedTerminalTabs = 24;
+
+/// One terminal tab as the account's devices share it: enough to attach to
+/// the same server PTY and show the same strip entry, nothing live (buffer,
+/// socket, zoom stay per device). One-shot command tabs are never synced —
+/// restoring one would re-run the install/login.
+class TerminalTabSpec {
+  const TerminalTabSpec({
+    required this.id,
+    required this.title,
+    required this.projectPath,
+    this.renamed = false,
+    this.provider = 'claude',
+    this.isPlainShell = true,
+    this.sessionId,
+    this.ptySessionId,
+  });
+
+  /// Stable across devices (unlike the per-process local tab id).
+  final String id;
+  final String title;
+  final bool renamed;
+  final String projectPath;
+  final String provider;
+  final bool isPlainShell;
+
+  /// Agent session the tab resumes.
+  final String? sessionId;
+
+  /// The tab's own PTY key on the server — every device attaches to it.
+  final String? ptySessionId;
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'title': title,
+    if (renamed) 'renamed': true,
+    'projectPath': projectPath,
+    'provider': provider,
+    'isPlainShell': isPlainShell,
+    'sessionId': ?sessionId,
+    'ptySessionId': ?ptySessionId,
+  };
+
+  static TerminalTabSpec? fromJson(Object? value) {
+    if (value is! Map) return null;
+    String? s(Object? v) => v is String && v.trim().isNotEmpty ? v : null;
+    final id = s(value['id']);
+    final projectPath = value['projectPath'];
+    if (id == null || projectPath is! String) return null;
+    return TerminalTabSpec(
+      id: id,
+      title: s(value['title']) ?? '',
+      renamed: value['renamed'] == true,
+      projectPath: projectPath,
+      provider: s(value['provider']) ?? 'claude',
+      isPlainShell: value['isPlainShell'] != false,
+      sessionId: s(value['sessionId']),
+      ptySessionId: s(value['ptySessionId']),
+    );
+  }
+}
+
+/// The synced tab row of one terminal host ([terminalRouteHost] or a
+/// terminal pane id). An empty row is meaningful: the user closed every tab.
+class TerminalHostSpec {
+  const TerminalHostSpec({this.tabs = const [], this.activeTabId});
+
+  final List<TerminalTabSpec> tabs;
+  final String? activeTabId;
+
+  Map<String, dynamic> toJson() => {
+    'tabs': [for (final tab in tabs) tab.toJson()],
+    'activeTabId': ?activeTabId,
+  };
+
+  /// Drops malformed and duplicate tabs; the active id always names a tab
+  /// (or is null for an empty row), so every device derives the same value.
+  static TerminalHostSpec fromJson(Object? value) {
+    if (value is! Map) return const TerminalHostSpec();
+    final raw = value['tabs'];
+    final seen = <String>{};
+    final tabs = [
+      if (raw is List)
+        for (final entry in raw)
+          if (TerminalTabSpec.fromJson(entry) case final tab? when seen.add(tab.id)) tab,
+    ].take(maxSyncedTerminalTabs).toList();
+    return TerminalHostSpec(tabs: tabs, activeTabId: _validActive(value['activeTabId'], tabs));
+  }
+
+  static String? _validActive(Object? wanted, List<TerminalTabSpec> tabs) =>
+      tabs.any((t) => t.id == wanted) ? wanted as String : tabs.firstOrNull?.id;
+
+  String encode() => jsonEncode(toJson());
+}
+
 String? cleanupMaximizedPaneId(String? maximizedId, List<SplitPane> panes) =>
     maximizedId != null && !panes.any((p) => p.id == maximizedId) ? null : maximizedId;
 
@@ -219,7 +321,9 @@ class WorkspaceState {
     this.panes = const [],
     this.activePaneId,
     this.lastUsedProjectId,
+    this.terminals = const {},
     this.maximizedPaneId,
+    this.serverLoaded = false,
   });
 
   final List<SplitPane> panes;
@@ -228,8 +332,17 @@ class WorkspaceState {
   /// Most recently chosen workspace — the launcher's default project.
   final String? lastUsedProjectId;
 
+  /// Terminal tab rows by host ([terminalRouteHost] or a terminal pane id).
+  /// A host with no entry has never been opened; it gets a default tab.
+  final Map<String, TerminalHostSpec> terminals;
+
   /// Transient (never persisted): the pane currently filling the workspace.
   final String? maximizedPaneId;
+
+  /// Transient: the server's workspace has been read in this app run. Until
+  /// then terminal tabs are neither attached nor seeded — a restored-from-disk
+  /// row is a guess, and a seeded tab would duplicate another device's.
+  final bool serverLoaded;
 
   /// Wire/persisted shape — shared with the web client's WorkspaceState so a
   /// workspace_state frame round-trips between Flutter and web untouched.
@@ -237,18 +350,27 @@ class WorkspaceState {
     'panes': [for (final p in panes) p.toJson()],
     'activePaneId': ?activePaneId,
     'lastUsedProjectId': ?lastUsedProjectId,
+    // Sorted, so equal rows always serialize alike (sync compares JSON).
+    if (terminals.isNotEmpty)
+      'terminals': {
+        for (final host in terminals.keys.toList()..sort()) host: terminals[host]!.toJson(),
+      },
   };
 
   WorkspaceState copyWith({
     List<SplitPane>? panes,
     String? Function()? activePaneId,
     String? Function()? lastUsedProjectId,
+    Map<String, TerminalHostSpec>? terminals,
     String? Function()? maximizedPaneId,
+    bool? serverLoaded,
   }) => WorkspaceState(
     panes: panes ?? this.panes,
     activePaneId: activePaneId != null ? activePaneId() : this.activePaneId,
     lastUsedProjectId: lastUsedProjectId != null ? lastUsedProjectId() : this.lastUsedProjectId,
+    terminals: terminals ?? this.terminals,
     maximizedPaneId: maximizedPaneId != null ? maximizedPaneId() : this.maximizedPaneId,
+    serverLoaded: serverLoaded ?? this.serverLoaded,
   );
 
   static WorkspaceState sanitize(Object? value) {
@@ -262,11 +384,35 @@ class WorkspaceState {
         ? active
         : (panes.isEmpty ? null : panes.first.id);
     final last = value['lastUsedProjectId'];
+    final rawTerminals = value['terminals'];
     return WorkspaceState(
       panes: panes,
       activePaneId: activeId,
       lastUsedProjectId: last is String && last.isNotEmpty ? last : null,
+      terminals: rawTerminals is Map
+          ? terminalHostsFor({
+              for (final MapEntry(:key, :value) in rawTerminals.entries)
+                if (key is String) key: TerminalHostSpec.fromJson(value),
+            }, panes)
+          : const {},
     );
+  }
+
+  /// Keeps the rows of hosts that still exist: the `/terminal` screen and
+  /// open terminal panes. A closed pane takes its row with it.
+  static Map<String, TerminalHostSpec> terminalHostsFor(
+    Map<String, TerminalHostSpec> terminals,
+    List<SplitPane> panes,
+  ) {
+    final hosts = {
+      terminalRouteHost,
+      for (final p in panes)
+        if (p.kind == PaneKind.terminal) p.id,
+    };
+    return {
+      for (final MapEntry(:key, :value) in terminals.entries)
+        if (hosts.contains(key)) key: value,
+    };
   }
 }
 

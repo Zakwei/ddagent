@@ -257,6 +257,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               projectId: s.uri.queryParameters['projectId'],
               projectPath: s.uri.queryParameters['projectPath'],
               sessionId: s.uri.queryParameters['sessionId'],
+              syncTabs: true,
             ),
           ),
           GoRoute(

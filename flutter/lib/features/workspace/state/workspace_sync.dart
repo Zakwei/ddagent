@@ -27,6 +27,7 @@ class WorkspaceSync {
     required this._getState,
     required this._applyRemote,
     required this._send,
+    this._onLoaded,
     this._pushDebounce = const Duration(milliseconds: 400),
   });
 
@@ -34,6 +35,10 @@ class WorkspaceSync {
   final WorkspaceState Function() _getState;
   final void Function(WorkspaceState) _applyRemote;
   final bool Function(Map<String, dynamic>) _send;
+
+  /// First server contact of this app run (also when the server holds no
+  /// workspace yet, where nothing is applied).
+  final void Function()? _onLoaded;
   final Duration _pushDebounce;
 
   // Last state the server confirmed (snapshot, broadcast, or ack) and its
@@ -148,6 +153,7 @@ class WorkspaceSync {
       } else {
         pushLocal();
       }
+      _onLoaded?.call();
       return;
     }
 
@@ -169,64 +175,135 @@ WorkspaceState mergeWorkspace({
   required WorkspaceState local,
   required WorkspaceState remote,
 }) {
-  String key(SplitPane p) => jsonEncode(p.toJson());
-  final baseById = {for (final p in base.panes) p.id: p};
-  final localIds = {for (final p in local.panes) p.id};
-
-  final removed = {
-    for (final id in baseById.keys)
-      if (!localIds.contains(id)) id,
-  };
-  final updated = {
-    for (final p in local.panes)
-      if (baseById[p.id] case final b? when key(b) != key(p)) p.id: p,
-  };
-
-  var panes = [
-    for (final p in remote.panes)
-      if (!removed.contains(p.id)) updated[p.id] ?? p,
-  ];
-
-  // Local reorder of panes that already existed → local order wins for them.
-  final baseOrder = [
-    for (final p in base.panes)
-      if (localIds.contains(p.id)) p.id,
-  ];
-  final localOrder = [
-    for (final p in local.panes)
-      if (baseById.containsKey(p.id)) p.id,
-  ];
-  if (baseOrder.join('\n') != localOrder.join('\n')) {
-    final rank = {for (final (i, id) in localOrder.indexed) id: i};
-    final ordered = [...panes.where((p) => rank.containsKey(p.id))]
-      ..sort((a, b) => rank[a.id]!.compareTo(rank[b.id]!));
-    panes = [...ordered, ...panes.where((p) => !rank.containsKey(p.id))];
-  }
-
-  final present = {for (final p in panes) p.id};
-  for (final p in local.panes) {
-    if (!baseById.containsKey(p.id) && !present.contains(p.id)) panes.add(p);
-  }
-  panes = panes.take(maxSplitPanes).toList();
-  final ids = {for (final p in panes) p.id};
-
-  String? pick(String? baseValue, String? localValue, String? remoteValue) =>
-      localValue != baseValue ? localValue : remoteValue;
-  final wanted = pick(base.activePaneId, local.activePaneId, remote.activePaneId);
-  final active = ids.contains(wanted)
-      ? wanted
-      : (ids.contains(remote.activePaneId)
-            ? remote.activePaneId
-            : (panes.isEmpty ? null : panes.first.id));
+  final panes = _mergeList(
+    base: base.panes,
+    local: local.panes,
+    remote: remote.panes,
+    id: (p) => p.id,
+    encode: (p) => jsonEncode(p.toJson()),
+  ).take(maxSplitPanes).toList();
 
   return WorkspaceState(
     panes: panes,
-    activePaneId: active,
-    lastUsedProjectId: pick(
+    activePaneId: _mergeActive(
+      base: base.activePaneId,
+      local: local.activePaneId,
+      remote: remote.activePaneId,
+      ids: [for (final p in panes) p.id],
+    ),
+    lastUsedProjectId: _pick(
       base.lastUsedProjectId,
       local.lastUsedProjectId,
       remote.lastUsedProjectId,
     ),
+    terminals: WorkspaceState.terminalHostsFor(
+      _mergeTerminals(base: base.terminals, local: local.terminals, remote: remote.terminals),
+      panes,
+    ),
     maximizedPaneId: local.maximizedPaneId,
   );
+}
+
+String? _pick(String? baseValue, String? localValue, String? remoteValue) =>
+    localValue != baseValue ? localValue : remoteValue;
+
+/// The locally chosen item if it survived the merge, else the remote one,
+/// else the first.
+String? _mergeActive({
+  required String? base,
+  required String? local,
+  required String? remote,
+  required List<String> ids,
+}) {
+  final wanted = _pick(base, local, remote);
+  if (ids.contains(wanted)) return wanted;
+  if (ids.contains(remote)) return remote;
+  return ids.firstOrNull;
+}
+
+/// Terminal tab rows, host by host, with the same rules as the panes: a row
+/// this device did not touch is exactly the server's; a touched one replays
+/// the local tab edits on top of the server's row.
+Map<String, TerminalHostSpec> _mergeTerminals({
+  required Map<String, TerminalHostSpec> base,
+  required Map<String, TerminalHostSpec> local,
+  required Map<String, TerminalHostSpec> remote,
+}) {
+  final merged = <String, TerminalHostSpec>{};
+  for (final host in {...remote.keys, ...local.keys}) {
+    final baseRow = base[host];
+    final localRow = local[host];
+    final remoteRow = remote[host];
+    if (localRow?.encode() == baseRow?.encode()) {
+      if (remoteRow != null) merged[host] = remoteRow;
+      continue;
+    }
+    if (localRow == null) continue;
+    final tabs = _mergeList<TerminalTabSpec>(
+      base: baseRow?.tabs ?? const [],
+      local: localRow.tabs,
+      remote: remoteRow?.tabs ?? const [],
+      id: (t) => t.id,
+      encode: (t) => jsonEncode(t.toJson()),
+    ).take(maxSyncedTerminalTabs).toList();
+    merged[host] = TerminalHostSpec(
+      tabs: tabs,
+      activeTabId: _mergeActive(
+        base: baseRow?.activeTabId,
+        local: localRow.activeTabId,
+        remote: remoteRow?.activeTabId,
+        ids: [for (final t in tabs) t.id],
+      ),
+    );
+  }
+  return merged;
+}
+
+/// Three-way list merge: the items removed, changed, reordered or added
+/// locally (`base` → `local`) are replayed onto `remote`.
+List<T> _mergeList<T>({
+  required List<T> base,
+  required List<T> local,
+  required List<T> remote,
+  required String Function(T) id,
+  required String Function(T) encode,
+}) {
+  final baseById = {for (final item in base) id(item): item};
+  final localIds = {for (final item in local) id(item)};
+
+  final removed = {
+    for (final itemId in baseById.keys)
+      if (!localIds.contains(itemId)) itemId,
+  };
+  final updated = {
+    for (final item in local)
+      if (baseById[id(item)] case final b? when encode(b) != encode(item)) id(item): item,
+  };
+
+  var items = [
+    for (final item in remote)
+      if (!removed.contains(id(item))) updated[id(item)] ?? item,
+  ];
+
+  // Local reorder of items that already existed → local order wins for them.
+  final baseOrder = [
+    for (final item in base)
+      if (localIds.contains(id(item))) id(item),
+  ];
+  final localOrder = [
+    for (final item in local)
+      if (baseById.containsKey(id(item))) id(item),
+  ];
+  if (baseOrder.join('\n') != localOrder.join('\n')) {
+    final rank = {for (final (i, itemId) in localOrder.indexed) itemId: i};
+    final ordered = [...items.where((item) => rank.containsKey(id(item)))]
+      ..sort((a, b) => rank[id(a)]!.compareTo(rank[id(b)]!));
+    items = [...ordered, ...items.where((item) => !rank.containsKey(id(item)))];
+  }
+
+  final present = {for (final item in items) id(item)};
+  for (final item in local) {
+    if (!baseById.containsKey(id(item)) && !present.contains(id(item))) items.add(item);
+  }
+  return items;
 }

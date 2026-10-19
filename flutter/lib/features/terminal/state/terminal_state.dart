@@ -8,11 +8,15 @@ import 'package:ddagent_app/core/utils/clipboard.dart';
 import 'package:ddagent_app/features/terminal/state/terminal_key_handler.dart';
 import 'package:ddagent_app/features/terminal/state/terminal_mouse_handler.dart';
 import 'package:ddagent_app/features/terminal/state/terminal_output_filter.dart';
+import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart' show Color;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xterm/xterm.dart';
+
+export 'package:ddagent_app/features/workspace/state/split_workspace.dart'
+    show TerminalHostSpec, TerminalTabSpec, terminalRouteHost;
 
 enum TerminalTabStatus { connecting, connected, disconnected, exited }
 
@@ -28,10 +32,13 @@ const _promptOptionScanLines = 15;
 const _promptMaxOptions = 5;
 const _promptMinOptions = 2;
 
-/// Host of the tabs shown on the standalone `/terminal` screen (and the
-/// provider-login dialog). Workspace terminal panes use their pane id, so
-/// every pane owns its own tab row and a tab can move between them.
-const terminalRouteHost = 'route';
+final _syncIdRandom = Random();
+
+/// A tab id unique across the account's devices — also the tab's PTY key,
+/// so it stays within the server's safe session-id alphabet.
+String newTerminalTabSyncId() =>
+    'tab-${DateTime.now().millisecondsSinceEpoch.toRadixString(36)}-'
+    '${_syncIdRandom.nextInt(kPaneIdSpace).toRadixString(36)}';
 
 /// Terminal font bounds (web Shell zoom 9–24px) and the Ctrl+0 reset size.
 const terminalFontSizeMin = 9.0;
@@ -99,6 +106,7 @@ final _promptOptionRegex = RegExp(r'^\s*[❯›>]?\s*(\d+)\.\s+(.+)');
 class TerminalTab {
   TerminalTab({
     required this.id,
+    required this.syncId,
     required this.title,
     required this.projectPath,
     this.hostId = terminalRouteHost,
@@ -118,7 +126,11 @@ class TerminalTab {
     List<String>? authUrls,
   }) : authUrls = authUrls ?? <String>[];
 
+  /// Local id — unique within this app run (also keys the shell channel).
   final String id;
+
+  /// The tab's id on every device of the account ([TerminalTabSpec.id]).
+  final String syncId;
 
   /// Mutable — the tab strip's Rename action edits it in place.
   String title;
@@ -148,10 +160,11 @@ class TerminalTab {
   final bool isPlainShell;
   final bool isCommandMode;
 
-  /// Discriminator sent as the init frame's `sessionId` for the 2nd+ plain
-  /// shell of a project. The server keys PTYs by `projectPath_sessionId`,
-  /// so without it every "new tab" reattached the same shell. Null keeps
-  /// the first tab on the server's `default` key (shared with the web UI).
+  /// Discriminator sent as the init frame's `sessionId` for a shell or CLI
+  /// tab with no agent session. The server keys PTYs by
+  /// `projectPath_sessionId`, so without it every "new tab" reattached the
+  /// same shell. Unique per tab and synced, so every device showing the tab
+  /// attaches to the same PTY.
   final String? ptySessionId;
 
   /// Extra PTY env sent with `init` (per-account login config dirs).
@@ -197,6 +210,7 @@ class TerminalTab {
   }) {
     final tab = TerminalTab(
       id: id,
+      syncId: syncId,
       title: title ?? this.title,
       projectPath: projectPath,
       hostId: hostId,
@@ -339,9 +353,11 @@ class TerminalController extends Notifier<TerminalState> {
     int? cols,
     int? rows,
     bool autoSelect = true,
+    TerminalTabSpec? synced,
   }) {
     final tabIndex = _nextTabId++;
     final tabId = 'term-$tabIndex';
+    final syncId = synced?.id ?? newTerminalTabSyncId();
     final terminal = Terminal(
       maxLines: 10000,
       inputHandler: const XtermInputHandler(),
@@ -357,16 +373,15 @@ class TerminalController extends Notifier<TerminalState> {
                   : initialCommand)
             : (isPlainShell ? t.terminal.tabs.shellName(index: tabIndex) : '$provider CLI'));
 
-    // Plain interactive shells after the first get their own PTY (WT: every
-    // tab is a fresh shell); one-shot commands and agent sessions keep their
-    // own keys already.
-    final plainInteractive = isPlainShell && !isCommandMode && sessionId == null;
-    final ptySessionId = plainInteractive && state.tabs.any(_isPlainInteractive)
-        ? 'shell-$tabIndex'
-        : null;
+    // Every shell / CLI tab gets its own PTY (WT: every tab is a fresh
+    // shell), keyed by its sync id so the account's other devices attach to
+    // the same one. One-shot commands and agent sessions keep their own keys.
+    final ptySessionId =
+        synced?.ptySessionId ?? (!isCommandMode && sessionId == null ? syncId : null);
 
     final tab = TerminalTab(
       id: tabId,
+      syncId: syncId,
       title: tabTitle,
       projectPath: projectPath,
       hostId: hostId,
@@ -510,8 +525,92 @@ class TerminalController extends Notifier<TerminalState> {
     state = state.copyWith(tabs: [...state.tabs], activeTabIds: active);
   }
 
-  static bool _isPlainInteractive(TerminalTab tab) =>
-      tab.isPlainShell && !tab.isCommandMode && tab.sessionId == null;
+  // --- Cross-device tab rows (see TerminalHostSpec) ---
+
+  /// This device's tab row of [hostId] as it is synced — command tabs left
+  /// out. The active id follows [TerminalHostSpec.fromJson]'s rule, so a row
+  /// applied by [applySyncedRow] derives back to exactly itself.
+  TerminalHostSpec syncedRowFor(String hostId) {
+    final tabs = [
+      for (final tab in state.tabsFor(hostId))
+        if (!tab.isCommandMode)
+          TerminalTabSpec(
+            id: tab.syncId,
+            title: tab.title,
+            renamed: tab.renamed,
+            projectPath: tab.projectPath,
+            provider: tab.provider,
+            isPlainShell: tab.isPlainShell,
+            sessionId: tab.sessionId,
+            ptySessionId: tab.ptySessionId,
+          ),
+    ].take(maxSyncedTerminalTabs).toList();
+    final active = state.activeTabFor(hostId)?.syncId;
+    return TerminalHostSpec(
+      tabs: tabs,
+      activeTabId: tabs.any((t) => t.id == active) ? active : tabs.firstOrNull?.id,
+    );
+  }
+
+  /// Makes [hostId]'s tabs match a row from another device: attaches the
+  /// tabs it added (to the same PTYs), closes the ones it closed, and takes
+  /// its order, titles and selection. Live tabs it already holds are kept
+  /// as they are — buffer, socket and zoom untouched. Command tabs stay.
+  void applySyncedRow(String hostId, TerminalHostSpec row) {
+    final wanted = {for (final spec in row.tabs) spec.id};
+    for (final tab in state.tabsFor(hostId)) {
+      if (!tab.isCommandMode && !wanted.contains(tab.syncId)) closeTab(tab.id);
+    }
+
+    final local = {
+      for (final tab in state.tabsFor(hostId))
+        if (!tab.isCommandMode) tab.syncId: tab,
+    };
+    for (final spec in row.tabs) {
+      final tab =
+          local[spec.id] ??
+          createTab(
+            title: spec.title.isEmpty ? null : spec.title,
+            projectPath: spec.projectPath,
+            hostId: hostId,
+            sessionId: spec.sessionId,
+            provider: spec.provider,
+            isPlainShell: spec.isPlainShell,
+            autoSelect: false,
+            synced: spec,
+          );
+      local[spec.id] = tab;
+      if (spec.title.isNotEmpty) tab.title = spec.title;
+      tab.renamed = spec.renamed;
+    }
+
+    // The row's order; command tabs follow it, other hosts keep their slots.
+    final keep = [
+      for (final spec in row.tabs) local[spec.id]!,
+      for (final tab in state.tabsFor(hostId))
+        if (tab.isCommandMode) tab,
+    ];
+    // A stray duplicate of a synced tab would break the slot fill below.
+    for (final tab in state.tabsFor(hostId)) {
+      if (!keep.contains(tab)) closeTab(tab.id);
+    }
+    final ordered = keep.iterator;
+    final active = row.activeTabId == null ? null : local[row.activeTabId]?.id;
+    state = state.copyWith(
+      tabs: [
+        for (final tab in state.tabs) tab.hostId == hostId ? (ordered..moveNext()).current : tab,
+      ],
+      activeTabIds: active == null ? null : _withActive(hostId, active),
+    );
+  }
+
+  /// Closes the tabs of hosts that no longer exist (terminal panes closed
+  /// here or on another device) — their sockets would keep the PTYs alive.
+  void closeHostsExcept(Set<String> liveHosts) {
+    for (final tab in [...state.tabs]) {
+      if (tab.hostId != terminalRouteHost && !liveHosts.contains(tab.hostId)) closeTab(tab.id);
+    }
+  }
 
   void _handleFrame(String tabId, ShellFrame frame) {
     final tabIndex = state.tabs.indexWhere((t) => t.id == tabId);

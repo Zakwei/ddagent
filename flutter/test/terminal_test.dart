@@ -617,29 +617,92 @@ void main() {
       expect(ctrl.state.tabs.map((t) => t.title), ['B', 'C', 'A']);
     });
 
-    test('second plain shell gets its own PTY key; the first keeps the default', () async {
-      ctrl.createTab(projectPath: '/p').terminal.resize(80, 24, 640, 384);
+    test('every shell and CLI tab gets its own PTY key — its sync id', () async {
+      final first = ctrl.createTab(projectPath: '/p');
+      first.terminal.resize(80, 24, 640, 384);
       await Future<void>.delayed(Duration.zero);
-      final first = fakeWs.sent.where((f) => f['type'] == 'init').toList();
-      expect(first.first.containsKey('sessionId'), isFalse);
+      expect(fakeWs.sent.firstWhere((f) => f['type'] == 'init')['sessionId'], first.syncId);
 
       fakeWs.sent.clear();
       final second = ctrl.createTab(projectPath: '/p');
       second.terminal.resize(80, 24, 640, 384);
       await Future<void>.delayed(Duration.zero);
       final init = fakeWs.sent.firstWhere((f) => f['type'] == 'init');
-      expect(init['sessionId'], 'shell-2');
+      expect(second.syncId, isNot(first.syncId));
+      expect(init['sessionId'], second.syncId);
       expect(init['hasSession'], isFalse);
       expect(init['isPlainShell'], isTrue);
       // The tab itself is still a plain shell (no agent session to resume).
       expect(second.sessionId, isNull);
-      expect(second.ptySessionId, 'shell-2');
+      expect(second.ptySessionId, second.syncId);
+
+      // A CLI tab no longer lands on a shell's key either.
+      final cli = ctrl.createTab(projectPath: '/p', provider: 'codex', isPlainShell: false);
+      expect(cli.ptySessionId, cli.syncId);
+      // One-shot commands and agent sessions keep the server's own keys.
+      expect(ctrl.runOneShotCommand(projectPath: '/p', command: 'ls').ptySessionId, isNull);
+      expect(ctrl.createTab(projectPath: '/p', sessionId: 's1').ptySessionId, isNull);
 
       // Restart keeps the same PTY key.
       fakeWs.sent.clear();
       ctrl.restartTab(second.id);
       await Future<void>.delayed(Duration.zero);
-      expect(fakeWs.sent.firstWhere((f) => f['type'] == 'init')['sessionId'], 'shell-2');
+      expect(fakeWs.sent.firstWhere((f) => f['type'] == 'init')['sessionId'], second.syncId);
+    });
+
+    test('syncedRowFor leaves command tabs out; a renamed title rides along', () {
+      final a = ctrl.createTab(projectPath: '/p', hostId: 'pane-1', title: 'A');
+      ctrl.runOneShotCommand(projectPath: '/p', command: 'npm i');
+      final b = ctrl.createTab(projectPath: '/p', hostId: 'pane-1', title: 'B');
+      ctrl.renameTab(b.id, 'Logs');
+
+      final row = ctrl.syncedRowFor('pane-1');
+      expect(row.tabs.map((t) => t.id), [a.syncId, b.syncId]);
+      expect(row.tabs.last.title, 'Logs');
+      expect(row.tabs.last.renamed, isTrue);
+      expect(row.tabs.last.ptySessionId, b.syncId);
+      expect(row.activeTabId, b.syncId);
+      expect(ctrl.syncedRowFor(terminalRouteHost).tabs, isEmpty);
+    });
+
+    test('applySyncedRow attaches, closes, orders and selects like the other device', () {
+      final kept = ctrl.createTab(projectPath: '/p', hostId: 'pane-1', title: 'Kept');
+      final gone = ctrl.createTab(projectPath: '/p', hostId: 'pane-1', title: 'Gone');
+      final other = ctrl.createTab(projectPath: '/p', title: 'Route');
+
+      final row = TerminalHostSpec(
+        tabs: [
+          const TerminalTabSpec(
+            id: 'remote-1',
+            title: 'Remote',
+            projectPath: '/p',
+            ptySessionId: 'remote-1',
+          ),
+          TerminalTabSpec(
+            id: kept.syncId,
+            title: 'Renamed elsewhere',
+            renamed: true,
+            projectPath: '/p',
+            ptySessionId: kept.ptySessionId,
+          ),
+        ],
+        activeTabId: 'remote-1',
+      );
+      ctrl.applySyncedRow('pane-1', row);
+
+      final tabs = ctrl.state.tabsFor('pane-1');
+      expect(tabs.map((t) => t.syncId), ['remote-1', kept.syncId]);
+      expect(tabs.first.ptySessionId, 'remote-1');
+      expect(identical(tabs.last, kept), isTrue);
+      expect(kept.displayTitle, 'Renamed elsewhere');
+      expect(ctrl.state.tabs.contains(gone), isFalse);
+      expect(ctrl.state.activeTabFor('pane-1')?.syncId, 'remote-1');
+      expect(ctrl.state.tabsFor(terminalRouteHost), [other]);
+      // Applied rows derive back to themselves — no echo back to the server.
+      expect(ctrl.syncedRowFor('pane-1').encode(), row.encode());
+
+      ctrl.closeHostsExcept({});
+      expect(ctrl.state.tabs, [other]);
     });
 
     test('zoomReset returns to the default size', () {

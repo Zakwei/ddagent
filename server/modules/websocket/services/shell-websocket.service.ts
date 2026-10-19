@@ -29,9 +29,26 @@ type ShellIncomingMessage = {
   env?: Record<string, string>;
 };
 
+type TerminalSize = { cols: number; rows: number };
+
 type PtySessionEntry = {
   pty: IPty;
-  ws: WebSocket | null;
+  /**
+   * Every socket showing this PTY — the same terminal tab open on several
+   * devices (tabs are synced across the user's devices). Output fans out to
+   * all of them; the kill timer starts only once the last one detaches.
+   */
+  sockets: Set<WebSocket>;
+  /**
+   * The viewer in charge: the last one to attach or type. Its emulator alone
+   * answers terminal queries (the others get live output flagged `replay`, so
+   * a device-attributes probe is not answered twice into the shell) and its
+   * size is the PTY's size.
+   */
+  owner: WebSocket | null;
+  /** Last size each viewer reported (init or resize). */
+  sizes: Map<WebSocket, TerminalSize>;
+  size: TerminalSize;
   buffer: string[];
   timeoutId: NodeJS.Timeout | null;
   projectPath: string;
@@ -39,6 +56,76 @@ type PtySessionEntry = {
 };
 
 const ptySessionsMap = new Map<string, PtySessionEntry>();
+
+function sendIfOpen(socket: WebSocket, frame: Record<string, unknown>): void {
+  if (socket.readyState === WebSocket.OPEN) {
+    socket.send(JSON.stringify(frame));
+  }
+}
+
+/** Live PTY output: verbatim to the owner, flagged `replay` to the other viewers. */
+function broadcastOutput(session: PtySessionEntry, data: string): void {
+  for (const socket of session.sockets) {
+    sendIfOpen(
+      socket,
+      socket === session.owner ? { type: 'output', data } : { type: 'output', data, replay: true }
+    );
+  }
+}
+
+function broadcastFrame(session: PtySessionEntry, frame: Record<string, unknown>): void {
+  for (const socket of session.sockets) {
+    sendIfOpen(socket, frame);
+  }
+}
+
+/** Resizes the PTY to `socket`'s last reported size when it differs. */
+function applyViewerSize(session: PtySessionEntry, socket: WebSocket): void {
+  const size = session.sizes.get(socket);
+  if (!size || (size.cols === session.size.cols && size.rows === session.size.rows)) {
+    return;
+  }
+  session.pty.resize(size.cols, size.rows);
+  session.size = size;
+}
+
+/**
+ * Removes one viewer from a PTY. The next most recent viewer takes over;
+ * with none left the PTY lingers for PTY_SESSION_TIMEOUT so a reconnect
+ * can reattach.
+ */
+function detachViewer(sessionKey: string, socket: WebSocket): void {
+  const session = ptySessionsMap.get(sessionKey);
+  // Mobile networks can deliver an old socket's close after its replacement
+  // has attached — only a socket still in the viewer set may detach.
+  if (!session || !session.sockets.delete(socket)) {
+    return;
+  }
+  session.sizes.delete(socket);
+  if (session.owner === socket) {
+    session.owner = [...session.sockets].at(-1) ?? null;
+    if (session.owner) {
+      applyViewerSize(session, session.owner);
+    }
+  }
+  if (session.sockets.size > 0) {
+    return;
+  }
+
+  if (session.timeoutId) {
+    clearTimeout(session.timeoutId);
+  }
+  session.timeoutId = setTimeout(() => {
+    // A reconnect may win just as this timer becomes runnable. Re-check the
+    // viewers so a queued cleanup can never kill a reattached PTY.
+    if (ptySessionsMap.get(sessionKey) !== session || session.sockets.size > 0) {
+      return;
+    }
+
+    session.pty.kill();
+    ptySessionsMap.delete(sessionKey);
+  }, PTY_SESSION_TIMEOUT);
+}
 /** Flags every terminal-started Claude CLI gets; the account profiles in the client type the same ones. */
 const CLAUDE_TERMINAL_FLAGS = '--allow-dangerously-skip-permissions';
 const PTY_SESSION_TIMEOUT = 30 * 60 * 1000;
@@ -403,6 +490,7 @@ function prioritizeUserNpmGlobalBin(env: NodeJS.ProcessEnv): { key: string; valu
 /**
  * Used by this module's websocket gateway to connect the standalone Shell UI
  * to a retained PTY while keeping process lifecycle ownership on the server.
+ * Several sockets (the same synced tab on several devices) may view one PTY.
  */
 export function handleShellConnection(
   ws: WebSocket,
@@ -410,10 +498,13 @@ export function handleShellConnection(
 ): void {
   console.log('[INFO] Shell websocket connected');
 
-  let shellProcess: IPty | null = null;
   let ptySessionKey: string | null = null;
-  let urlDetectionBuffer = '';
-  const announcedAuthUrls = new Set<string>();
+
+  /** The PTY this socket views — input and resize go there, never elsewhere. */
+  const viewedSession = (): PtySessionEntry | null => {
+    const session = ptySessionKey ? ptySessionsMap.get(ptySessionKey) : undefined;
+    return session?.sockets.has(ws) ? session : null;
+  };
 
   ws.on('message', async (rawMessage) => {
     try {
@@ -430,9 +521,10 @@ export function handleShellConnection(
         const initialCommand = readString(data.initialCommand);
         const forceRestart = readBoolean(data.forceRestart);
         const isPlainShell = readIsPlainShell(data);
-
-        urlDetectionBuffer = '';
-        announcedAuthUrls.clear();
+        const initSize: TerminalSize = {
+          cols: readNumber(data.cols, 80),
+          rows: readNumber(data.rows, 24),
+        };
 
         const isLoginCommand =
           !!initialCommand &&
@@ -444,14 +536,24 @@ export function handleShellConnection(
           isPlainShell && initialCommand
             ? `_cmd_${Buffer.from(initialCommand).toString('base64').slice(0, 16)}`
             : '';
-        ptySessionKey = `${projectPath}_${sessionId ?? 'default'}${commandSuffix}`;
+        const nextSessionKey = `${projectPath}_${sessionId ?? 'default'}${commandSuffix}`;
+        // A socket views one PTY at a time; re-init onto another key leaves the old one.
+        if (ptySessionKey && ptySessionKey !== nextSessionKey) {
+          detachViewer(ptySessionKey, ws);
+        }
+        ptySessionKey = nextSessionKey;
 
+        // A respawn keeps the other devices' viewers: they see the new run.
+        let carriedViewers: WebSocket[] = [];
         if (isLoginCommand || forceRestart) {
           const oldSession = ptySessionsMap.get(ptySessionKey);
           if (oldSession) {
             if (oldSession.timeoutId) {
               clearTimeout(oldSession.timeoutId);
             }
+            carriedViewers = [...oldSession.sockets].filter(
+              (socket) => socket !== ws && socket.readyState === WebSocket.OPEN
+            );
             oldSession.pty.kill();
             ptySessionsMap.delete(ptySessionKey);
           }
@@ -460,10 +562,20 @@ export function handleShellConnection(
         const existingSession =
           isLoginCommand || forceRestart ? null : ptySessionsMap.get(ptySessionKey);
         if (existingSession) {
-          shellProcess = existingSession.pty;
           if (existingSession.timeoutId) {
             clearTimeout(existingSession.timeoutId);
             existingSession.timeoutId = null;
+          }
+          // Re-adding moves the socket to the end: it is now the most recent viewer.
+          existingSession.sockets.delete(ws);
+          existingSession.sockets.add(ws);
+          existingSession.sizes.set(ws, initSize);
+          existingSession.owner = ws;
+          // Only a lone viewer resizes on attach: another device opening the
+          // tab (possibly in the background, at the 80×24 placeholder) must
+          // not reflow the shell under the person typing in it.
+          if (existingSession.sockets.size === 1) {
+            applyViewerSize(existingSession, ws);
           }
 
           ws.send(
@@ -487,8 +599,6 @@ export function handleShellConnection(
               );
             });
           }
-
-          existingSession.ws = ws;
           return;
         }
 
@@ -519,14 +629,12 @@ export function handleShellConnection(
         const shell = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
         const shellArgs =
           os.platform() === 'win32' ? powerShellArgs(shellCommand) : ['-c', shellCommand];
-        const termCols = readNumber(data.cols, 80);
-        const termRows = readNumber(data.rows, 24);
         const prioritizedPath = prioritizeUserNpmGlobalBin(process.env);
 
-        shellProcess = (dependencies.spawnPty ?? pty.spawn)(shell, shellArgs, {
+        const spawnedPty = (dependencies.spawnPty ?? pty.spawn)(shell, shellArgs, {
           name: 'xterm-256color',
-          cols: termCols,
-          rows: termRows,
+          cols: initSize.cols,
+          rows: initSize.rows,
           cwd: resolvedProjectPath,
           env: providerChildEnv(
             {
@@ -540,29 +648,36 @@ export function handleShellConnection(
           ),
         });
 
-        // Captured for the lifecycle handlers below: `shellProcess` is
-        // reassigned when a later init respawns this terminal (login command /
-        // forceRestart), and a stale handler comparing against it would pass
-        // the ownership check, then delete the NEW session's map entry.
-        const spawnedPty = shellProcess;
-
-        ptySessionsMap.set(ptySessionKey, {
-          pty: shellProcess,
-          ws,
+        // The lifecycle handlers below compare against `spawnedPty` and this
+        // key: a later init may respawn the terminal under the same key (login
+        // command / forceRestart) or move this socket to another key, and a
+        // stale handler must neither write to nor delete the NEW entry.
+        const sessionKey = ptySessionKey;
+        const viewerSizes = new Map<WebSocket, TerminalSize>();
+        for (const socket of carriedViewers) {
+          viewerSizes.set(socket, initSize);
+        }
+        viewerSizes.set(ws, initSize);
+        ptySessionsMap.set(sessionKey, {
+          pty: spawnedPty,
+          sockets: new Set([...carriedViewers, ws]),
+          owner: ws,
+          sizes: viewerSizes,
+          size: initSize,
           buffer: [],
           timeoutId: null,
           projectPath,
           sessionId,
         });
 
-        shellProcess.onData((chunk) => {
-          if (!ptySessionKey) {
-            return;
-          }
+        // Auth-link detection state lives with the PTY, not with a socket.
+        let urlDetectionBuffer = '';
+        const announcedAuthUrls = new Set<string>();
 
+        spawnedPty.onData((chunk) => {
           // A respawned terminal leaves this handler attached to the old PTY;
           // only the PTY that owns the current map entry may write to it.
-          const session = ptySessionsMap.get(ptySessionKey);
+          const session = ptySessionsMap.get(sessionKey);
           if (!session || session.pty !== spawnedPty) {
             return;
           }
@@ -574,7 +689,7 @@ export function handleShellConnection(
             session.buffer.push(chunk);
           }
 
-          if (session.ws && session.ws.readyState === WebSocket.OPEN) {
+          if (session.sockets.size > 0) {
             let outputData = chunk;
             const cleanChunk = stripAnsiSequences(chunk);
             // The buffer keeps the raw stream: escape sequences split across
@@ -609,13 +724,7 @@ export function handleShellConnection(
               }
 
               announcedAuthUrls.add(normalizedUrl);
-              session.ws?.send(
-                JSON.stringify({
-                  type: 'auth_url',
-                  url: normalizedUrl,
-                  autoOpen,
-                })
-              );
+              broadcastFrame(session, { type: 'auth_url', url: normalizedUrl, autoOpen });
             };
 
             // OSC-8 hyperlink targets are canonical full URLs — emit before
@@ -645,46 +754,30 @@ export function handleShellConnection(
               emitAuthUrl(bestUrl, true);
             }
 
-            session.ws.send(
-              JSON.stringify({
-                type: 'output',
-                data: outputData,
-              })
-            );
+            broadcastOutput(session, outputData);
           }
         });
 
-        shellProcess.onExit((exitCode) => {
-          if (!ptySessionKey) {
-            return;
-          }
-
-          const session = ptySessionsMap.get(ptySessionKey);
+        spawnedPty.onExit((exitCode) => {
+          const session = ptySessionsMap.get(sessionKey);
           if (session && session.pty !== spawnedPty) {
             return;
           }
 
-          if (session && session.ws && session.ws.readyState === WebSocket.OPEN) {
-            session.ws.send(
-              JSON.stringify({
-                type: 'output',
-                data: `\r\n\x1b[33mProcess exited with code ${exitCode.exitCode}${
-                  exitCode.signal != null ? ` (${exitCode.signal})` : ''
-                }\x1b[0m\r\n`,
-              })
-            );
+          if (session) {
+            broadcastFrame(session, {
+              type: 'output',
+              data: `\r\n\x1b[33mProcess exited with code ${exitCode.exitCode}${
+                exitCode.signal != null ? ` (${exitCode.signal})` : ''
+              }\x1b[0m\r\n`,
+            });
           }
 
           if (session?.timeoutId) {
             clearTimeout(session.timeoutId);
           }
 
-          ptySessionsMap.delete(ptySessionKey);
-          // Only clear the shared reference when it still points at the PTY
-          // that exited — a respawn may already have installed the next one.
-          if (shellProcess === spawnedPty) {
-            shellProcess = null;
-          }
+          ptySessionsMap.delete(sessionKey);
         });
 
         let welcomeMsg = `\x1b[36mStarting terminal in: ${projectPath}\x1b[0m\r\n`;
@@ -706,25 +799,32 @@ export function handleShellConnection(
             : `\x1b[36mStarting new ${providerName} session in: ${projectPath}\x1b[0m\r\n`;
         }
 
-        ws.send(
-          JSON.stringify({
-            type: 'output',
-            data: welcomeMsg,
-          })
-        );
+        // Carried viewers of a respawn see the new run start too.
+        broadcastFrame(ptySessionsMap.get(sessionKey)!, { type: 'output', data: welcomeMsg });
         return;
       }
 
       if (data.type === 'input') {
-        if (shellProcess) {
-          shellProcess.write(readString(data.data));
+        const session = viewedSession();
+        if (session) {
+          // Typing makes this device the one in charge: it answers the next
+          // terminal queries and the PTY takes its size.
+          if (session.owner !== ws) {
+            session.owner = ws;
+            applyViewerSize(session, ws);
+          }
+          session.pty.write(readString(data.data));
         }
         return;
       }
 
       if (data.type === 'resize') {
-        if (shellProcess) {
-          shellProcess.resize(readNumber(data.cols, 80), readNumber(data.rows, 24));
+        const session = viewedSession();
+        if (session) {
+          session.sizes.set(ws, { cols: readNumber(data.cols, 80), rows: readNumber(data.rows, 24) });
+          if (session.owner === ws) {
+            applyViewerSize(session, ws);
+          }
         }
       }
     } catch (error) {
@@ -742,35 +842,9 @@ export function handleShellConnection(
   });
 
   ws.on('close', () => {
-    if (!ptySessionKey) {
-      return;
+    if (ptySessionKey) {
+      detachViewer(ptySessionKey, ws);
     }
-
-    const session = ptySessionsMap.get(ptySessionKey);
-    if (!session) {
-      return;
-    }
-
-    // Mobile networks can deliver an old socket's close after its replacement
-    // has attached. Only the socket that currently owns the PTY may detach it.
-    if (session.ws !== ws) {
-      return;
-    }
-
-    session.ws = null;
-    if (session.timeoutId) {
-      clearTimeout(session.timeoutId);
-    }
-    session.timeoutId = setTimeout(() => {
-      // A reconnect may win just as this timer becomes runnable. Re-check the
-      // active socket so a queued cleanup can never kill a reattached PTY.
-      if (ptySessionsMap.get(ptySessionKey as string) !== session || session.ws !== null) {
-        return;
-      }
-
-      session.pty.kill();
-      ptySessionsMap.delete(ptySessionKey as string);
-    }, PTY_SESSION_TIMEOUT);
   });
 
   ws.on('error', (error) => {

@@ -121,6 +121,110 @@ test('a reattached socket gets the buffered output marked as replay', () => {
   pty.emitExit();
 });
 
+/** Two devices viewing one synced terminal tab. */
+function attachTwoViewers(name: string) {
+  const writes: string[] = [];
+  const resizes: Array<[number, number]> = [];
+  const pty = Object.assign(createFakePty(), {
+    write(data: string) {
+      writes.push(data);
+    },
+    resize(cols: number, rows: number) {
+      resizes.push([cols, rows]);
+    },
+  });
+  const dependencies = {
+    resolveProviderSessionId: () => null,
+    spawnPty: () => pty as never,
+  };
+  const sessionId = `${name}-${Date.now()}`;
+  const init = (cols: number, rows: number, forceRestart = false) =>
+    JSON.stringify({
+      type: 'init',
+      projectPath: process.cwd(),
+      sessionId,
+      hasSession: false,
+      provider: 'plain-shell',
+      isPlainShell: true,
+      forceRestart,
+      cols,
+      rows,
+    });
+
+  const desktop = createFakeSocket();
+  handleShellConnection(desktop as never, dependencies);
+  desktop.emit('message', init(200, 50));
+  const phone = createFakeSocket();
+  handleShellConnection(phone as never, dependencies);
+  phone.emit('message', init(80, 24));
+  desktop.frames.length = 0;
+  phone.frames.length = 0;
+  const lastFrame = (socket: ReturnType<typeof createFakeSocket>) =>
+    JSON.parse(socket.frames.at(-1)!) as { data?: string; replay?: boolean };
+  return { pty, writes, resizes, desktop, phone, init, lastFrame };
+}
+
+test('every device viewing a PTY gets its output; only the one in charge answers queries', () => {
+  const { pty, desktop, phone, lastFrame } = attachTwoViewers('fan-out');
+
+  pty.emitData('\x1b[c');
+
+  // The phone attached last — it is in charge until the desktop types.
+  assert.deepEqual(lastFrame(phone), { type: 'output', data: '\x1b[c' });
+  assert.deepEqual(lastFrame(desktop), { type: 'output', data: '\x1b[c', replay: true });
+
+  desktop.emit('message', JSON.stringify({ type: 'input', data: 'ls\r' }));
+  pty.emitData('live');
+  assert.equal(lastFrame(desktop).replay, undefined);
+  assert.equal(lastFrame(phone).replay, true);
+
+  pty.emitExit();
+});
+
+test('a second device attaching does not resize the shell; typing on a device does', () => {
+  const { pty, resizes, writes, desktop, phone } = attachTwoViewers('resize');
+
+  assert.deepEqual(resizes, []);
+  // A non-owner's layout is only remembered.
+  desktop.emit('message', JSON.stringify({ type: 'resize', cols: 190, rows: 48 }));
+  assert.deepEqual(resizes, []);
+
+  desktop.emit('message', JSON.stringify({ type: 'input', data: 'x' }));
+  assert.deepEqual(resizes, [[190, 48]]);
+  assert.deepEqual(writes, ['x']);
+
+  phone.emit('message', JSON.stringify({ type: 'input', data: 'y' }));
+  assert.deepEqual(resizes, [[190, 48], [80, 24]]);
+  assert.deepEqual(writes, ['x', 'y']);
+
+  pty.emitExit();
+});
+
+test('one device closing leaves the PTY running for the other', () => {
+  const { pty, desktop, phone, lastFrame } = attachTwoViewers('close');
+
+  phone.emit('close');
+  pty.emitData('still-here');
+
+  assert.equal(pty.killed, false);
+  assert.deepEqual(lastFrame(desktop), { type: 'output', data: 'still-here' });
+
+  pty.emitExit();
+});
+
+test('a restart keeps the other devices attached to the new run', () => {
+  const { pty, desktop, phone, init, lastFrame } = attachTwoViewers('restart');
+
+  desktop.emit('message', init(200, 50, true));
+  phone.frames.length = 0;
+
+  pty.emitData('after-restart');
+  assert.equal(pty.killed, true);
+  assert.match(lastFrame(phone).data ?? '', /after-restart/);
+
+  pty.emitExit();
+});
+
 test('shell output detects and normalizes a wrapped authentication URL', () => {
   const pty = createFakePty();
   const socket = createFakeSocket();
