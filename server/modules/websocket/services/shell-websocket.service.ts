@@ -233,6 +233,27 @@ function isLikelyAuthUrl(normalizedUrl: string, cleanOutput: string): boolean {
   return AUTH_CONTEXT_HINT_REGEX.test(context);
 }
 
+/**
+ * A loopback address is never a sign-in link to offer: it is a dev server's
+ * own route (`localhost:5000/api/auth/login`), and on the device viewing the
+ * terminal it would point at that device, not at this server.
+ */
+function isLoopbackUrl(normalizedUrl: string): boolean {
+  let hostname: string;
+  try {
+    hostname = new URL(normalizedUrl).hostname.toLowerCase();
+  } catch {
+    return false;
+  }
+  return (
+    hostname === 'localhost' ||
+    hostname.endsWith('.localhost') ||
+    hostname === '[::1]' ||
+    hostname === '0.0.0.0' ||
+    /^127(?:\.\d{1,3}){3}$/.test(hostname)
+  );
+}
+
 function shouldAutoOpenUrlFromOutput(value: string): boolean {
   const normalizedOutput = value.toLowerCase();
   return (
@@ -705,7 +726,11 @@ export function handleShellConnection(
 
             const emitAuthUrl = (detectedUrl: string, autoOpen = false) => {
               const normalizedUrl = normalizeDetectedUrl(detectedUrl);
-              if (!normalizedUrl || announcedAuthUrls.has(normalizedUrl)) {
+              if (
+                !normalizedUrl ||
+                announcedAuthUrls.has(normalizedUrl) ||
+                isLoopbackUrl(normalizedUrl)
+              ) {
                 return;
               }
               if (!autoOpen && !isLikelyAuthUrl(normalizedUrl, cleanDetectionBuffer)) {

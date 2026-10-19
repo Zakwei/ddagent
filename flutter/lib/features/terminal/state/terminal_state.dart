@@ -646,7 +646,7 @@ class TerminalController extends Notifier<TerminalState> {
       _notifyTabsChanged();
     } else if (frame.isAuthUrl) {
       final url = frame.authUrl;
-      if (url != null && !tab.authUrls.contains(url)) {
+      if (url != null && !isLoopbackUrl(url) && !tab.authUrls.contains(url)) {
         tab.authUrls.add(url);
       }
       _notifyTabsChanged();
@@ -1066,6 +1066,19 @@ class TerminalController extends Notifier<TerminalState> {
 /// mid-render. Used by the login dialog and the terminal banner.
 String? bestAuthUrl(List<String> authUrls) =>
     authUrls.isEmpty ? null : authUrls.reduce((a, b) => b.length > a.length ? b : a);
+
+/// A loopback address is never a sign-in link to offer: it is a dev
+/// server's own route (`localhost:5000/api/auth/login`), and on this device
+/// it would not reach the server. Older servers still announce such URLs.
+bool isLoopbackUrl(String url) {
+  final host = Uri.tryParse(url)?.host.toLowerCase();
+  if (host == null) return false;
+  return host == 'localhost' ||
+      host.endsWith('.localhost') ||
+      host == '::1' ||
+      host == '0.0.0.0' ||
+      RegExp(r'^127(?:\.\d{1,3}){3}$').hasMatch(host);
+}
 
 /// The provider's interactive login shell command. Shared by the login
 /// dialog, the terminal header and per-account logins (which wrap it in

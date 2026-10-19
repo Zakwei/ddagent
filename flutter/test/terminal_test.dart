@@ -275,6 +275,28 @@ void main() {
       expect(currentTab.authUrls, contains('https://claude.ai/oauth/login?code=123'));
     });
 
+    test('a loopback auth_url from an older server shows no login banner', () async {
+      final container = ProviderContainer(
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
+      );
+      addTearDown(container.dispose);
+
+      final controller = container.read(terminalControllerProvider.notifier);
+      final tab = controller.createTab(projectPath: '/test/proj');
+      for (final url in [
+        'http://localhost:5000/api/auth/login',
+        'http://127.0.0.1:8080/login',
+        'http://[::1]:3000/oauth/callback',
+        'http://app.localhost:4000/signin',
+      ]) {
+        fakeWs.emitFrame({'type': 'auth_url', 'url': url});
+      }
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+
+      expect(tab.authUrls, isEmpty);
+      expect(isLoopbackUrl('https://claude.ai/oauth/authorize'), isFalse);
+    });
+
     test('bestAuthUrl picks the longest URL over mid-render fragments', () {
       final urls = [
         'https://accounts.google.com/o/oauth2/auth?client_id=abc',

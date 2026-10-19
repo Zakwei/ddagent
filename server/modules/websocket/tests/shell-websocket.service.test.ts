@@ -598,6 +598,44 @@ test('shell output ignores documentation and release URLs that are not sign-in l
   pty.emitExit();
 });
 
+test('shell output never offers a loopback URL as a sign-in link', () => {
+  const pty = createFakePty();
+  const socket = createFakeSocket();
+  const dependencies = {
+    resolveProviderSessionId: () => null,
+    spawnPty: () => pty as never,
+  };
+
+  handleShellConnection(socket as never, dependencies);
+  socket.emit(
+    'message',
+    JSON.stringify({
+      type: 'init',
+      projectPath: process.cwd(),
+      sessionId: `loopback-url-${Date.now()}`,
+      hasSession: false,
+      provider: 'plain-shell',
+      isPlainShell: true,
+      initialCommand: 'test-command',
+    })
+  );
+  socket.frames.length = 0;
+
+  // A dev server's own routes — `/auth`, `login` and a login prompt around
+  // them, even an "open this URL" line, are no CLI sign-in.
+  pty.emitData(
+    'POST http://localhost:5000/api/auth/login 200\n' +
+      'Log in at http://127.0.0.1:8080/login?token=abc\n' +
+      'Open this URL in your browser: http://[::1]:3000/oauth/callback\n' +
+      'Sign in: http://app.localhost:4000/signin\n'
+  );
+
+  const frames = socket.frames.map((frame) => JSON.parse(frame) as Record<string, unknown>);
+  assert.deepEqual(frames.filter((frame) => frame.type === 'auth_url'), []);
+
+  pty.emitExit();
+});
+
 test('shell output surfaces a plain URL when the surrounding text is a login prompt', () => {
   const pty = createFakePty();
   const socket = createFakeSocket();
