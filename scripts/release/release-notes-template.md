@@ -11,145 +11,121 @@
 -->
 <!-- lang:en -->
 ### What's new
-- **Terminal tab names**: a tab shows the title its program sets — Claude Code's session name instead of "Shell 4"; it falls back when the program exits, and a rename always wins.
-- **Claude Code `/copy` reaches your clipboard**: copies a CLI makes over OSC 52 now land in the clipboard of the device you are using.
+- **Terminal tabs follow you across devices**: the tabs of terminal panes and of the Terminal screen sync like the panes themselves — open, close, rename, reorder or select a tab on one device and your other devices show the same, attached to the same shell with its output.
+- **One shell, several devices**: every device viewing a tab gets its live output and can type into it; the device you type on sets the shell's size, so opening the tab on a phone no longer reflows it on the desktop. Restarting a tab keeps the other devices attached.
+- Every new shell or CLI tab starts its own shell — a CLI tab no longer lands in an already open shell.
 
 ### Fixes
-- **Scrolling in Claude Code**: the mouse wheel and a finger drag scroll its fullscreen view again — the wheel was reported as Shift+wheel. The middle button and row positions of clicks are reported correctly too.
-- **Keyboard in the terminal**: Shift/Alt+arrows, Alt+letter (lower case), Alt+Enter (new line in Claude Code), Alt+Backspace, Alt+., Ctrl+/ [ ] \ and Ctrl+F1–F4 send what xterm sends; application cursor mode is honoured.
-- **Ctrl+K** in a focused terminal deletes to end of line instead of opening the session switcher.
-- **Right-click** on a terminal tab or pane no longer opens the browser's menu as well (web).
-- **Reopened tabs** no longer type "1;2c" into the shell — replayed output is not answered again (needs the updated server).
-- Programs that ask for focus events (Claude Code) now get them.
+- **No false login link**: addresses on localhost printed by a dev server (e.g. `http://localhost:5000/api/auth/login`) no longer show the "Login link" banner in the terminal.
+
+Sync across devices needs the updated server.
 <!-- lang:pl -->
 ### Nowości
-- **Nazwy kart terminala**: karta pokazuje tytuł ustawiony przez program — nazwę sesji Claude Code zamiast „Shell 4”; po wyjściu z programu wraca poprzednia nazwa, a ręczna zmiana nazwy zawsze wygrywa.
-- **`/copy` w Claude Code trafia do Twojego schowka**: kopiowanie przez OSC 52 trafia teraz do schowka urządzenia, którego używasz.
+- **Karty terminala podążają za Tobą między urządzeniami**: karty paneli terminala i ekranu Terminal synchronizują się tak jak same panele — otwarcie, zamknięcie, zmiana nazwy, kolejności czy wybór karty na jednym urządzeniu pojawia się na pozostałych, podpięte do tego samego shella z jego wyjściem.
+- **Jeden shell, kilka urządzeń**: każde urządzenie, które ogląda kartę, dostaje jej wyjście na żywo i może w niej pisać; rozmiar shella ustawia urządzenie, na którym piszesz, więc otwarcie karty na telefonie nie przełamuje już widoku na desktopie. Restart karty zostawia pozostałe urządzenia podpięte.
+- Każda nowa karta shella lub CLI startuje własny shell — karta CLI nie trafia już do otwartego wcześniej shella.
 
 ### Poprawki
-- **Przewijanie w Claude Code**: kółko myszy i przeciąganie palcem znów przewijają widok pełnoekranowy — kółko było zgłaszane jako Shift+kółko. Środkowy przycisk i wiersz kliknięcia są też zgłaszane poprawnie.
-- **Klawiatura w terminalu**: Shift/Alt+strzałki, Alt+litera (mała), Alt+Enter (nowa linia w Claude Code), Alt+Backspace, Alt+., Ctrl+/ [ ] \ oraz Ctrl+F1–F4 wysyłają to samo co xterm; tryb kursora aplikacji jest respektowany.
-- **Ctrl+K** w aktywnym terminalu usuwa do końca linii zamiast otwierać przełącznik sesji.
-- **Prawy klik** na karcie lub panelu terminala nie otwiera już dodatkowo menu przeglądarki (web).
-- **Ponownie otwarte karty** nie wpisują już „1;2c” do powłoki — odtwarzane wyjście nie dostaje drugiej odpowiedzi (wymaga zaktualizowanego serwera).
-- Programy proszące o zdarzenia fokusu (Claude Code) teraz je dostają.
+- **Bez fałszywego linku logowania**: adresy localhost wypisywane przez serwer deweloperski (np. `http://localhost:5000/api/auth/login`) nie pokazują już w terminalu paska „Link logowania”.
+
+Synchronizacja między urządzeniami wymaga zaktualizowanego serwera.
 <!-- lang:de -->
 ### Neu
-- **Namen der Terminal-Tabs**: Ein Tab zeigt den Titel, den sein Programm setzt — den Sitzungsnamen von Claude Code statt „Shell 4“; nach dem Beenden kehrt der alte Name zurück, und eine manuelle Umbenennung hat immer Vorrang.
-- **`/copy` in Claude Code landet in deiner Zwischenablage**: Kopien, die eine CLI per OSC 52 macht, landen jetzt in der Zwischenablage deines Geräts.
+- **Terminal-Tabs folgen dir über Geräte hinweg**: Die Tabs von Terminal-Bereichen und des Terminal-Bildschirms werden wie die Bereiche selbst synchronisiert — Öffnen, Schließen, Umbenennen, Umsortieren oder Auswählen eines Tabs auf einem Gerät erscheint auf deinen anderen Geräten, verbunden mit derselben Shell samt Ausgabe.
+- **Eine Shell, mehrere Geräte**: Jedes Gerät, das einen Tab zeigt, erhält die Live-Ausgabe und kann darin tippen; das Gerät, auf dem du tippst, bestimmt die Größe der Shell, sodass das Öffnen auf dem Handy die Ansicht am Desktop nicht mehr umbricht. Ein Neustart des Tabs lässt die anderen Geräte verbunden.
+- Jeder neue Shell- oder CLI-Tab startet eine eigene Shell — ein CLI-Tab landet nicht mehr in einer bereits offenen Shell.
 
 ### Fehlerbehebungen
-- **Scrollen in Claude Code**: Mausrad und Wischen scrollen die Vollbildansicht wieder — das Rad wurde als Umschalt+Rad gemeldet. Mittlere Maustaste und Zeile eines Klicks werden ebenfalls korrekt gemeldet.
-- **Tastatur im Terminal**: Umschalt/Alt+Pfeile, Alt+Buchstabe (klein), Alt+Enter (neue Zeile in Claude Code), Alt+Rücktaste, Alt+., Strg+/ [ ] \ und Strg+F1–F4 senden dasselbe wie xterm; der Anwendungs-Cursormodus wird beachtet.
-- **Strg+K** in einem fokussierten Terminal löscht bis zum Zeilenende, statt den Sitzungswechsler zu öffnen.
-- **Rechtsklick** auf einen Terminal-Tab oder -Bereich öffnet nicht mehr zusätzlich das Browsermenü (Web).
-- **Wieder geöffnete Tabs** tippen kein „1;2c“ mehr in die Shell — wiedergegebene Ausgabe wird nicht erneut beantwortet (erfordert den aktualisierten Server).
-- Programme, die Fokus-Ereignisse anfordern (Claude Code), erhalten sie jetzt.
+- **Kein falscher Anmeldelink**: Localhost-Adressen, die ein Entwicklungsserver ausgibt (z. B. `http://localhost:5000/api/auth/login`), zeigen im Terminal kein „Anmeldelink“-Banner mehr.
+
+Die Synchronisierung zwischen Geräten erfordert den aktualisierten Server.
 <!-- lang:es -->
 ### Novedades
-- **Nombres de pestañas del terminal**: una pestaña muestra el título que fija su programa — el nombre de la sesión de Claude Code en lugar de «Shell 4»; al salir vuelve el nombre anterior y un cambio de nombre manual siempre prevalece.
-- **`/copy` de Claude Code llega a tu portapapeles**: lo que una CLI copia mediante OSC 52 ahora llega al portapapeles del dispositivo que usas.
+- **Las pestañas del terminal te siguen entre dispositivos**: las pestañas de los paneles de terminal y de la pantalla Terminal se sincronizan como los propios paneles — abrir, cerrar, renombrar, reordenar o seleccionar una pestaña en un dispositivo aparece en los demás, conectada al mismo shell con su salida.
+- **Un shell, varios dispositivos**: cada dispositivo que muestra una pestaña recibe su salida en directo y puede escribir en ella; el dispositivo en el que escribes fija el tamaño del shell, así que abrir la pestaña en el móvil ya no reajusta la vista del escritorio. Reiniciar una pestaña mantiene conectados los demás dispositivos.
+- Cada nueva pestaña de shell o CLI inicia su propio shell — una pestaña CLI ya no acaba en un shell ya abierto.
 
 ### Correcciones
-- **Desplazamiento en Claude Code**: la rueda del ratón y el arrastre con el dedo vuelven a desplazar su vista a pantalla completa — la rueda se enviaba como Mayús+rueda. El botón central y la fila de los clics también se envían correctamente.
-- **Teclado en el terminal**: Mayús/Alt+flechas, Alt+letra (minúscula), Alt+Intro (nueva línea en Claude Code), Alt+Retroceso, Alt+., Ctrl+/ [ ] \ y Ctrl+F1–F4 envían lo mismo que xterm; se respeta el modo de cursor de aplicación.
-- **Ctrl+K** en un terminal con foco borra hasta el final de la línea en lugar de abrir el selector de sesiones.
-- **Clic derecho** en una pestaña o panel del terminal ya no abre además el menú del navegador (web).
-- **Las pestañas reabiertas** ya no escriben «1;2c» en el shell — la salida reproducida no se vuelve a responder (requiere el servidor actualizado).
-- Los programas que piden eventos de foco (Claude Code) ahora los reciben.
+- **Sin enlaces de inicio de sesión falsos**: las direcciones localhost que imprime un servidor de desarrollo (p. ej. `http://localhost:5000/api/auth/login`) ya no muestran el aviso «Enlace de inicio de sesión» en el terminal.
+
+La sincronización entre dispositivos requiere el servidor actualizado.
 <!-- lang:fr -->
 ### Nouveautés
-- **Noms des onglets du terminal** : un onglet affiche le titre défini par son programme — le nom de la session Claude Code au lieu de « Shell 4 » ; l'ancien nom revient à la sortie du programme, et un renommage manuel l'emporte toujours.
-- **`/copy` de Claude Code arrive dans votre presse-papiers** : ce qu'une CLI copie via OSC 52 arrive désormais dans le presse-papiers de l'appareil utilisé.
+- **Les onglets du terminal vous suivent d'un appareil à l'autre** : les onglets des volets de terminal et de l'écran Terminal se synchronisent comme les volets eux-mêmes — ouvrir, fermer, renommer, réordonner ou sélectionner un onglet sur un appareil apparaît sur les autres, connecté au même shell avec sa sortie.
+- **Un shell, plusieurs appareils** : chaque appareil qui affiche un onglet reçoit sa sortie en direct et peut y taper ; l'appareil sur lequel vous tapez fixe la taille du shell, si bien qu'ouvrir l'onglet sur le téléphone ne réagence plus la vue du bureau. Redémarrer un onglet laisse les autres appareils connectés.
+- Chaque nouvel onglet shell ou CLI démarre son propre shell — un onglet CLI n'atterrit plus dans un shell déjà ouvert.
 
 ### Corrections
-- **Défilement dans Claude Code** : la molette et le glissement du doigt font de nouveau défiler sa vue plein écran — la molette était signalée comme Maj+molette. Le bouton du milieu et la ligne des clics sont aussi signalés correctement.
-- **Clavier dans le terminal** : Maj/Alt+flèches, Alt+lettre (minuscule), Alt+Entrée (nouvelle ligne dans Claude Code), Alt+Retour arrière, Alt+., Ctrl+/ [ ] \ et Ctrl+F1–F4 envoient la même chose que xterm ; le mode curseur application est respecté.
-- **Ctrl+K** dans un terminal actif efface jusqu'à la fin de la ligne au lieu d'ouvrir le sélecteur de sessions.
-- **Le clic droit** sur un onglet ou un volet de terminal n'ouvre plus aussi le menu du navigateur (web).
-- **Les onglets rouverts** ne tapent plus « 1;2c » dans le shell — la sortie rejouée n'obtient plus de seconde réponse (nécessite le serveur mis à jour).
-- Les programmes qui demandent les événements de focus (Claude Code) les reçoivent désormais.
+- **Plus de faux lien de connexion** : les adresses localhost affichées par un serveur de développement (par ex. `http://localhost:5000/api/auth/login`) n'affichent plus le bandeau « Lien de connexion » dans le terminal.
+
+La synchronisation entre appareils nécessite le serveur mis à jour.
 <!-- lang:it -->
 ### Novità
-- **Nomi delle schede del terminale**: una scheda mostra il titolo impostato dal suo programma — il nome della sessione di Claude Code invece di «Shell 4»; all'uscita torna il nome precedente e una rinomina manuale ha sempre la precedenza.
-- **`/copy` di Claude Code arriva negli appunti**: ciò che una CLI copia via OSC 52 ora finisce negli appunti del dispositivo che usi.
+- **Le schede del terminale ti seguono tra i dispositivi**: le schede dei riquadri terminale e della schermata Terminale si sincronizzano come i riquadri stessi — aprire, chiudere, rinominare, riordinare o selezionare una scheda su un dispositivo compare sugli altri, collegata alla stessa shell con il suo output.
+- **Una shell, più dispositivi**: ogni dispositivo che mostra una scheda riceve l'output in diretta e può scriverci; il dispositivo su cui scrivi imposta la dimensione della shell, quindi aprire la scheda sul telefono non riformatta più la vista sul desktop. Riavviare una scheda lascia collegati gli altri dispositivi.
+- Ogni nuova scheda shell o CLI avvia una propria shell — una scheda CLI non finisce più in una shell già aperta.
 
 ### Correzioni
-- **Scorrimento in Claude Code**: la rotella e il trascinamento con il dito scorrono di nuovo la vista a schermo intero — la rotella veniva segnalata come Maiusc+rotella. Anche il pulsante centrale e la riga dei clic sono segnalati correttamente.
-- **Tastiera nel terminale**: Maiusc/Alt+frecce, Alt+lettera (minuscola), Alt+Invio (nuova riga in Claude Code), Alt+Backspace, Alt+., Ctrl+/ [ ] \ e Ctrl+F1–F4 inviano lo stesso di xterm; la modalità cursore applicazione è rispettata.
-- **Ctrl+K** in un terminale attivo cancella fino a fine riga invece di aprire il selettore di sessioni.
-- **Il clic destro** su una scheda o un riquadro del terminale non apre più anche il menu del browser (web).
-- **Le schede riaperte** non digitano più «1;2c» nella shell — all'output riprodotto non si risponde di nuovo (richiede il server aggiornato).
-- I programmi che chiedono gli eventi di focus (Claude Code) ora li ricevono.
+- **Niente falsi link di accesso**: gli indirizzi localhost stampati da un server di sviluppo (es. `http://localhost:5000/api/auth/login`) non mostrano più il banner «Link di accesso» nel terminale.
+
+La sincronizzazione tra dispositivi richiede il server aggiornato.
 <!-- lang:ja -->
 ### 新機能
-- **ターミナルタブの名前**：タブはプログラムが設定したタイトルを表示します。「Shell 4」ではなく Claude Code のセッション名になり、プログラム終了で元に戻ります。手動の名前変更は常に優先されます。
-- **Claude Code の `/copy` がクリップボードに届く**：CLI が OSC 52 でコピーした内容が、使用中のデバイスのクリップボードに入るようになりました。
+- **ターミナルタブがデバイス間で同期**：ターミナルペインとターミナル画面のタブがペインと同じように同期されます。あるデバイスでタブを開く・閉じる・名前変更・並べ替え・選択すると、他のデバイスにも同じ状態が表示され、出力を含め同じシェルに接続されます。
+- **1 つのシェルを複数のデバイスで**：タブを表示しているすべてのデバイスにライブ出力が届き、入力もできます。シェルのサイズは入力しているデバイスに合わせるため、スマートフォンでタブを開いてもデスクトップの表示が崩れません。タブを再起動しても他のデバイスは接続されたままです。
+- 新しいシェルや CLI のタブはそれぞれ専用のシェルで起動します。CLI タブが既に開いているシェルに入ることはなくなりました。
 
 ### 修正
-- **Claude Code でのスクロール**：マウスホイールと指のドラッグで全画面ビューを再びスクロールできます（ホイールが Shift+ホイールとして送られていました）。中ボタンとクリック行も正しく送られます。
-- **ターミナルのキーボード**：Shift/Alt+矢印、Alt+文字（小文字）、Alt+Enter（Claude Code で改行）、Alt+Backspace、Alt+.、Ctrl+/ [ ] \、Ctrl+F1–F4 が xterm と同じシーケンスを送ります。アプリケーションカーソルモードにも対応しました。
-- フォーカス中のターミナルで **Ctrl+K** はセッション切り替えを開かず、行末まで削除します。
-- ターミナルのタブやペインを **右クリック** してもブラウザのメニューが一緒に開かなくなりました（Web）。
-- **再度開いたタブ** がシェルに「1;2c」を入力しなくなりました。再生された出力には再応答しません（更新済みサーバーが必要）。
-- フォーカスイベントを要求するプログラム（Claude Code）がそれを受け取れるようになりました。
+- **誤ったログインリンクを表示しない**：開発サーバーが出力する localhost のアドレス（例：`http://localhost:5000/api/auth/login`）で、ターミナルに「ログインリンク」バナーが表示されなくなりました。
+
+デバイス間の同期には更新済みサーバーが必要です。
 <!-- lang:ko -->
 ### 새로운 기능
-- **터미널 탭 이름**: 탭에 프로그램이 설정한 제목이 표시됩니다. "Shell 4" 대신 Claude Code 세션 이름이 표시되고, 프로그램이 종료되면 원래 이름으로 돌아가며, 직접 바꾼 이름이 항상 우선합니다.
-- **Claude Code의 `/copy`가 클립보드로**: CLI가 OSC 52로 복사한 내용이 이제 사용 중인 기기의 클립보드에 들어갑니다.
+- **터미널 탭이 기기 간에 따라옵니다**: 터미널 창과 터미널 화면의 탭이 창과 마찬가지로 동기화됩니다. 한 기기에서 탭을 열고, 닫고, 이름을 바꾸고, 순서를 바꾸거나 선택하면 다른 기기에도 똑같이 나타나며, 출력과 함께 같은 셸에 연결됩니다.
+- **하나의 셸, 여러 기기**: 탭을 보고 있는 모든 기기가 실시간 출력을 받고 입력할 수 있습니다. 셸 크기는 입력 중인 기기에 맞춰지므로 휴대폰에서 탭을 열어도 데스크톱 화면이 다시 배치되지 않습니다. 탭을 다시 시작해도 다른 기기는 연결된 상태로 유지됩니다.
+- 새 셸 또는 CLI 탭은 각자 자신의 셸로 시작합니다. CLI 탭이 이미 열려 있는 셸로 들어가지 않습니다.
 
 ### 수정
-- **Claude Code에서 스크롤**: 마우스 휠과 손가락 드래그로 전체 화면 보기를 다시 스크롤할 수 있습니다(휠이 Shift+휠로 전달되고 있었습니다). 가운데 버튼과 클릭한 행도 올바르게 전달됩니다.
-- **터미널 키보드**: Shift/Alt+화살표, Alt+문자(소문자), Alt+Enter(Claude Code에서 줄바꿈), Alt+Backspace, Alt+., Ctrl+/ [ ] \, Ctrl+F1–F4가 xterm과 같은 시퀀스를 보냅니다. 애플리케이션 커서 모드도 지원합니다.
-- 포커스된 터미널에서 **Ctrl+K**는 세션 전환기를 열지 않고 줄 끝까지 삭제합니다.
-- 터미널 탭이나 창을 **오른쪽 클릭**해도 더 이상 브라우저 메뉴가 함께 열리지 않습니다(웹).
-- **다시 연 탭**이 더 이상 셸에 "1;2c"를 입력하지 않습니다. 재생된 출력에는 다시 응답하지 않습니다(업데이트된 서버 필요).
-- 포커스 이벤트를 요청하는 프로그램(Claude Code)이 이제 이벤트를 받습니다.
+- **잘못된 로그인 링크 없음**: 개발 서버가 출력하는 localhost 주소(예: `http://localhost:5000/api/auth/login`)에 대해 터미널에 "로그인 링크" 배너가 더 이상 표시되지 않습니다.
+
+기기 간 동기화에는 업데이트된 서버가 필요합니다.
 <!-- lang:ru -->
 ### Что нового
-- **Названия вкладок терминала**: вкладка показывает заголовок, который задаёт программа, — имя сеанса Claude Code вместо «Shell 4»; после выхода из программы возвращается прежнее имя, а ручное переименование всегда имеет приоритет.
-- **`/copy` в Claude Code попадает в ваш буфер обмена**: то, что CLI копирует через OSC 52, теперь попадает в буфер обмена вашего устройства.
+- **Вкладки терминала следуют за вами между устройствами**: вкладки панелей терминала и экрана «Терминал» синхронизируются так же, как сами панели, — открытие, закрытие, переименование, изменение порядка или выбор вкладки на одном устройстве появляются на остальных, подключённые к той же оболочке вместе с её выводом.
+- **Одна оболочка, несколько устройств**: каждое устройство, показывающее вкладку, получает её вывод в реальном времени и может в ней печатать; размер оболочки задаёт устройство, на котором вы печатаете, поэтому открытие вкладки на телефоне больше не перестраивает вид на компьютере. Перезапуск вкладки оставляет остальные устройства подключёнными.
+- Каждая новая вкладка оболочки или CLI запускает собственную оболочку — вкладка CLI больше не попадает в уже открытую оболочку.
 
 ### Исправления
-- **Прокрутка в Claude Code**: колесо мыши и перетаскивание пальцем снова прокручивают полноэкранный вид — колесо передавалось как Shift+колесо. Средняя кнопка и строка щелчка тоже передаются правильно.
-- **Клавиатура в терминале**: Shift/Alt+стрелки, Alt+буква (строчная), Alt+Enter (новая строка в Claude Code), Alt+Backspace, Alt+., Ctrl+/ [ ] \ и Ctrl+F1–F4 отправляют то же, что xterm; режим курсора приложения учитывается.
-- **Ctrl+K** в активном терминале удаляет до конца строки вместо открытия переключателя сеансов.
-- **Правый щелчок** по вкладке или панели терминала больше не открывает заодно меню браузера (веб).
-- **Повторно открытые вкладки** больше не вводят «1;2c» в оболочку — на воспроизведённый вывод не отвечают повторно (нужен обновлённый сервер).
-- Программы, запрашивающие события фокуса (Claude Code), теперь их получают.
+- **Без ложной ссылки для входа**: адреса localhost, которые выводит сервер разработки (например, `http://localhost:5000/api/auth/login`), больше не показывают в терминале баннер «Ссылка для входа».
+
+Для синхронизации между устройствами нужен обновлённый сервер.
 <!-- lang:tr -->
 ### Yenilikler
-- **Terminal sekmesi adları**: Sekme, programının belirlediği başlığı gösterir — „Shell 4” yerine Claude Code oturum adı; program kapanınca eski ad geri gelir ve elle verilen ad her zaman önceliklidir.
-- **Claude Code `/copy` panonuza ulaşır**: Bir CLI'nin OSC 52 ile kopyaladıkları artık kullandığınız cihazın panosuna gelir.
+- **Terminal sekmeleri cihazlar arasında sizi izler**: Terminal bölmelerinin ve Terminal ekranının sekmeleri bölmelerin kendisi gibi eşitlenir — bir cihazda sekme açmak, kapatmak, yeniden adlandırmak, sıralamak veya seçmek diğer cihazlarda da görünür ve çıktısıyla birlikte aynı kabuğa bağlanır.
+- **Tek kabuk, birden çok cihaz**: Bir sekmeyi gösteren her cihaz canlı çıktıyı alır ve içine yazabilir; kabuğun boyutunu yazdığınız cihaz belirler, bu yüzden sekmeyi telefonda açmak masaüstündeki görünümü artık yeniden düzenlemez. Sekmeyi yeniden başlatmak diğer cihazları bağlı tutar.
+- Her yeni kabuk veya CLI sekmesi kendi kabuğunu başlatır — bir CLI sekmesi artık açık bir kabuğa düşmez.
 
 ### Düzeltmeler
-- **Claude Code'da kaydırma**: Fare tekerleği ve parmakla sürükleme tam ekran görünümü yeniden kaydırır — tekerlek Shift+tekerlek olarak bildiriliyordu. Orta düğme ve tıklama satırı da doğru bildirilir.
-- **Terminalde klavye**: Shift/Alt+oklar, Alt+harf (küçük), Alt+Enter (Claude Code'da yeni satır), Alt+Backspace, Alt+., Ctrl+/ [ ] \ ve Ctrl+F1–F4 xterm ile aynı diziyi gönderir; uygulama imleç modu dikkate alınır.
-- Odaktaki terminalde **Ctrl+K** oturum değiştiriciyi açmak yerine satır sonuna kadar siler.
-- Terminal sekmesine veya bölmesine **sağ tıklamak** artık tarayıcı menüsünü de açmıyor (web).
-- **Yeniden açılan sekmeler** artık kabuğa „1;2c” yazmıyor — yeniden oynatılan çıktıya tekrar yanıt verilmez (güncel sunucu gerekir).
-- Odak olaylarını isteyen programlar (Claude Code) artık bunları alır.
+- **Sahte giriş bağlantısı yok**: Bir geliştirme sunucusunun yazdığı localhost adresleri (ör. `http://localhost:5000/api/auth/login`) terminalde artık „Giriş bağlantısı” bandını göstermez.
+
+Cihazlar arası eşitleme güncel sunucu gerektirir.
 <!-- lang:zh-CN -->
 ### 新功能
-- **终端标签名称**：标签显示程序设置的标题——显示 Claude Code 的会话名称而不是"Shell 4"；程序退出后恢复原名，手动重命名始终优先。
-- **Claude Code 的 `/copy` 进入你的剪贴板**：CLI 通过 OSC 52 复制的内容现在会进入你所用设备的剪贴板。
+- **终端标签跨设备同步**：终端面板和终端界面的标签会像面板本身一样同步——在一台设备上打开、关闭、重命名、排序或选择标签，你的其他设备也会同样显示，并连接到同一个 shell 及其输出。
+- **一个 shell，多台设备**：每台显示该标签的设备都会收到实时输出并可输入；shell 的尺寸由你正在输入的设备决定，因此在手机上打开标签不会再打乱桌面上的显示。重启标签时其他设备保持连接。
+- 每个新的 shell 或 CLI 标签都会启动自己的 shell——CLI 标签不再落入已打开的 shell。
 
 ### 修复
-- **Claude Code 中的滚动**：鼠标滚轮和手指拖动可以再次滚动其全屏视图——此前滚轮被报告为 Shift+滚轮。中键和点击所在行也能正确报告。
-- **终端键盘**：Shift/Alt+方向键、Alt+字母（小写）、Alt+Enter（在 Claude Code 中换行）、Alt+Backspace、Alt+.、Ctrl+/ [ ] \ 和 Ctrl+F1–F4 发送与 xterm 相同的序列；支持应用光标模式。
-- 在获得焦点的终端中，**Ctrl+K** 删除到行尾，而不是打开会话切换器。
-- **右键点击**终端标签或面板时不再同时打开浏览器菜单（Web）。
-- **重新打开的标签**不再向 shell 输入"1;2c"——不再重复应答回放的输出（需要更新后的服务器）。
-- 请求焦点事件的程序（Claude Code）现在可以收到这些事件。
+- **不再出现错误的登录链接**：开发服务器输出的 localhost 地址（例如 `http://localhost:5000/api/auth/login`）不再在终端中显示"登录链接"横幅。
+
+跨设备同步需要更新后的服务器。
 <!-- lang:zh-TW -->
 ### 新功能
-- **終端機分頁名稱**：分頁顯示程式設定的標題——顯示 Claude Code 的工作階段名稱而非「Shell 4」；程式結束後恢復原名，手動重新命名永遠優先。
-- **Claude Code 的 `/copy` 進入你的剪貼簿**：CLI 透過 OSC 52 複製的內容現在會進入你所用裝置的剪貼簿。
+- **終端機分頁跨裝置同步**：終端機面板與終端機畫面的分頁會像面板本身一樣同步——在一台裝置上開啟、關閉、重新命名、排序或選取分頁，你的其他裝置也會同樣顯示，並連接到同一個 shell 及其輸出。
+- **一個 shell，多台裝置**：每台顯示該分頁的裝置都會收到即時輸出並可輸入；shell 的尺寸由你正在輸入的裝置決定，因此在手機上開啟分頁不會再打亂桌面上的畫面。重新啟動分頁時其他裝置保持連線。
+- 每個新的 shell 或 CLI 分頁都會啟動自己的 shell——CLI 分頁不再落入已開啟的 shell。
 
 ### 修正
-- **Claude Code 中的捲動**：滑鼠滾輪和手指拖曳可以再次捲動其全螢幕畫面——先前滾輪被回報為 Shift+滾輪。中鍵和點擊所在列也能正確回報。
-- **終端機鍵盤**：Shift/Alt+方向鍵、Alt+字母（小寫）、Alt+Enter（在 Claude Code 中換行）、Alt+Backspace、Alt+.、Ctrl+/ [ ] \ 和 Ctrl+F1–F4 傳送與 xterm 相同的序列；支援應用程式游標模式。
-- 在取得焦點的終端機中，**Ctrl+K** 刪除到行尾，而不是開啟工作階段切換器。
-- **右鍵點擊**終端機分頁或面板時不再同時開啟瀏覽器選單（Web）。
-- **重新開啟的分頁**不再向 shell 輸入「1;2c」——不再重複回應重播的輸出（需要更新後的伺服器）。
-- 要求焦點事件的程式（Claude Code）現在可以收到這些事件。
+- **不再出現錯誤的登入連結**：開發伺服器輸出的 localhost 位址（例如 `http://localhost:5000/api/auth/login`）不再在終端機中顯示「登入連結」橫幅。
+
+跨裝置同步需要更新後的伺服器。
