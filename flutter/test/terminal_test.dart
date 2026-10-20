@@ -285,7 +285,11 @@ void main() {
       expect(tab.isCompleted, isFalse);
       expect(tab.status, TerminalTabStatus.connected);
 
-      fakeWs.emitFrame({'type': 'output', 'data': '\r\nProcess exited with code 2\r\n', 'exitCode': 2});
+      fakeWs.emitFrame({
+        'type': 'output',
+        'data': '\r\nProcess exited with code 2\r\n',
+        'exitCode': 2,
+      });
       await Future<void>.delayed(Duration.zero);
       expect(tab.status, TerminalTabStatus.exited);
       expect(tab.exitCode, 2);
