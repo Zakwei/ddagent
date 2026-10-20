@@ -41,6 +41,10 @@ void main() {
     expect(key(TerminalKey.backspace, alt: true), '\x1b\x7f');
   });
 
+  test('Shift+Enter sends ESC CR — a newline in agent CLIs, not a submit', () {
+    expect(key(TerminalKey.enter, shift: true), '\x1b\r');
+  });
+
   test('Ctrl+symbols send their control codes', () {
     expect(key(TerminalKey.bracketLeft, ctrl: true), '\x1b');
     expect(key(TerminalKey.backslash, ctrl: true), '\x1c');
@@ -50,8 +54,6 @@ void main() {
 
   test('keys xterm.dart already gets right fall through unchanged', () {
     expect(key(TerminalKey.enter), '\r');
-    // Shift+Enter is \r in xterm too — a newline in Claude Code is Alt+Enter.
-    expect(key(TerminalKey.enter, shift: true), '\r');
     expect(key(TerminalKey.keyL, ctrl: true), '\x0c');
     expect(key(TerminalKey.space, ctrl: true), '\x00');
     expect(key(TerminalKey.tab, shift: true), '\x1b[Z');

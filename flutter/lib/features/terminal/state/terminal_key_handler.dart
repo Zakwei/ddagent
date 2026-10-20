@@ -5,7 +5,9 @@ import 'package:xterm/xterm.dart';
 /// them wrong; everything else falls through to [defaultInputHandler]. Its
 /// keytab sends Shift/Alt+arrows as Ctrl ones (or nothing), keys DECCKM off
 /// the keypad mode, upper-cases Alt+letter (Alt+b → ESC B), and drops
-/// Alt+Enter, Alt+. and Ctrl+[ \ ] /.
+/// Alt+Enter, Alt+. and Ctrl+[ \ ] /. Shift+Enter sends ESC CR like Alt+Enter
+/// — what Claude Code's `/terminal-setup` binds it to in VS Code — so it
+/// inserts a newline in an agent CLI instead of submitting.
 class XtermInputHandler implements TerminalInputHandler {
   const XtermInputHandler();
 
@@ -49,6 +51,8 @@ class XtermInputHandler implements TerminalInputHandler {
       final symbol = _ctrlSymbols[key];
       if (symbol != null) return symbol;
     }
+
+    if (key == TerminalKey.enter && event.shift && !event.ctrl && !event.alt) return '\x1b\r';
 
     // Ctrl+Alt is left alone: on Windows that is AltGr.
     if (event.alt && !event.ctrl) {
