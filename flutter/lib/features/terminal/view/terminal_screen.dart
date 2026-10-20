@@ -213,9 +213,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
   }
 
   String _resolveProjectPath() {
-    if (_pickedProjectId == null &&
-        widget.projectPath != null &&
-        widget.projectPath!.isNotEmpty) {
+    if (_pickedProjectId == null && widget.projectPath != null && widget.projectPath!.isNotEmpty) {
       return widget.projectPath!;
     }
     final project = _currentProject();
@@ -1022,7 +1020,6 @@ class _PromptChipsBar extends StatelessWidget {
     );
   }
 }
-
 
 /// The strip's project selector: shows the project of the active tab and
 /// opens a new tab in the project picked from its menu.
