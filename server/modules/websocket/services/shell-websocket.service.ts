@@ -937,8 +937,11 @@ export function handleShellConnection(
             return;
           }
 
+          // `exitCode` is what clients act on: the text alone also shows up in
+          // a program's own output (an agent transcript quoting it).
           broadcastFrame(session, {
             type: 'output',
+            exitCode: exitCode.exitCode,
             data: `\r\n\x1b[33mProcess exited with code ${exitCode.exitCode}${
               exitCode.signal != null ? ` (${exitCode.signal})` : ''
             }\x1b[0m\r\n`,

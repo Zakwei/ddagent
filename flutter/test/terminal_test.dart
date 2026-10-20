@@ -263,6 +263,34 @@ void main() {
       expect(completedExitCode, 0);
     });
 
+    test('the exit line text inside program output does not end the tab', () async {
+      final container = ProviderContainer(
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
+      );
+      addTearDown(container.dispose);
+
+      final controller = container.read(terminalControllerProvider.notifier);
+      final tab = controller.createTab(projectPath: '/test/proj');
+      // An agent session resumed in the shell redraws a transcript quoting it.
+      fakeWs.emitFrame({
+        'type': 'output',
+        'data': '\x1b[2;3H● The tab shows "Process exited with code 0" right away.',
+      });
+      fakeWs.emitFrame({
+        'type': 'output',
+        'data': '\r\n\x1b[33mProcess exited with code 0\x1b[0m\r\n',
+        'replay': true,
+      });
+      await Future<void>.delayed(Duration.zero);
+      expect(tab.isCompleted, isFalse);
+      expect(tab.status, TerminalTabStatus.connected);
+
+      fakeWs.emitFrame({'type': 'output', 'data': '\r\nProcess exited with code 2\r\n', 'exitCode': 2});
+      await Future<void>.delayed(Duration.zero);
+      expect(tab.status, TerminalTabStatus.exited);
+      expect(tab.exitCode, 2);
+    });
+
     test('detects auth_url frames', () async {
       final container = ProviderContainer(
         overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
@@ -406,7 +434,7 @@ void main() {
       expect(fakeWs.reconnectNowCalls, 1);
 
       fakeWs.emitState(WsState.open);
-      fakeWs.emitFrame({'type': 'output', 'data': 'Process exited with code 0'});
+      fakeWs.emitFrame({'type': 'output', 'data': 'Process exited with code 0', 'exitCode': 0});
       await Future<void>.delayed(Duration.zero);
       fakeWs.sent.clear();
       controller.reconnectTab(tab.id);

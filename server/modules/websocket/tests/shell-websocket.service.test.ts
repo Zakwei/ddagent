@@ -337,6 +337,14 @@ test('a second device attaching does not resize the shell; typing on a device do
   pty.emitExit();
 });
 
+test('the exit line carries the exit code as a field', () => {
+  const { pty, first, parsed } = startStream('exit-code');
+  pty.emitExit();
+  const exitFrame = parsed(first).at(-1)!;
+  assert.equal((exitFrame as { exitCode?: number }).exitCode, 0);
+  assert.match(exitFrame.data!, /Process exited with code 0/);
+});
+
 test('one device closing leaves the PTY running for the other', () => {
   const { pty, desktop, phone, lastFrame } = attachTwoViewers('close');
 
@@ -673,11 +681,12 @@ test('a login command reattaches on a re-sent init; only forceRestart respawns i
       return fresh as never;
     },
   };
+  const sessionId = `login-${Date.now()}`;
   const init = (forceRestart: boolean) =>
     JSON.stringify({
       type: 'init',
       projectPath: process.cwd(),
-      sessionId: `login-${Date.now()}`,
+      sessionId,
       provider: 'plain-shell',
       isPlainShell: true,
       initialCommand: 'opencode auth login',

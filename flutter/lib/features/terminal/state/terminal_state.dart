@@ -99,7 +99,13 @@ String applyLatchedModifiers(String data, Set<LatchedModifier> modifiers) {
   return out;
 }
 
-final _exitCodeRegex = RegExp(r'Process exited with code (\d+)');
+/// The exit line of servers that predate the `exitCode` field — matched only
+/// as a whole live frame: the bare text also appears inside a program's own
+/// output (resuming an agent session whose transcript quotes it marked a
+/// running tab as exited).
+final _legacyExitLineRegex = RegExp(
+  r'^\r\n\x1b\[33mProcess exited with code (\d+)(?: \(\d+\))?\x1b\[0m\r\n$',
+);
 final _promptFooterRegex = RegExp(r'esc to cancel|enter to select', caseSensitive: false);
 final _promptOptionRegex = RegExp(r'^\s*[❯›>]?\s*(\d+)\.\s+(.+)');
 
@@ -667,9 +673,9 @@ class TerminalController extends Notifier<TerminalState> {
         tab.status = TerminalTabStatus.connected;
       }
 
-      final match = _exitCodeRegex.firstMatch(frame.output);
-      if (match != null) {
-        final code = int.tryParse(match.group(1) ?? '0') ?? 0;
+      final legacyExit = frame.isReplay ? null : _legacyExitLineRegex.firstMatch(frame.output);
+      final code = frame.exitCode ?? int.tryParse(legacyExit?.group(1) ?? '');
+      if (code != null) {
         tab.isCompleted = true;
         tab.exitCode = code;
         tab.status = TerminalTabStatus.exited;

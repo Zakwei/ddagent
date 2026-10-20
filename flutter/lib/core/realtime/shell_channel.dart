@@ -25,6 +25,9 @@ class ShellFrame {
   /// servers) — what a reattach reports back as `seen`.
   int? get end => raw['end'] as int?;
 
+  /// Set on the server's exit line: the PTY's process ended with this code.
+  int? get exitCode => raw['exitCode'] as int?;
+
   /// `stream` frame: the PTY run whose output follows.
   bool get isStream => type == 'stream';
   String? get streamId => raw['id'] as String?;
