@@ -201,7 +201,8 @@ Path must exist and be a directory; `sessionId` must match safe pattern.
 4. Command build:
 Provider-specific command construction with resume semantics.
 5. PTY output buffering:
-Keeps the newest output (at most 5000 chunks and 512 KB) for replay on reconnect. A reattaching socket first gets a clear (so the client does not show history twice), then the window joined into `replay` frames of at most 64 KB — replaying thousands of unbounded chunks froze the web client for seconds on every reconnect.
+Keeps the newest output (at most 5000 chunks and 512 KB) for replay on reconnect. Every run has a stream id (sent as `{ type: 'stream', id }` on spawn and attach) and every output frame carries `end`, its offset in that stream. A reattaching client sends back `stream` and `seen` in its `init`: if the window still covers the gap it gets only the missed output (flagged `replay`) and keeps its scrollback. Otherwise — another device, a reload, an older run or a gap past the window — it first gets a clear (so the client does not show history twice), then the whole window joined into `replay` frames of at most 64 KB — replaying thousands of unbounded chunks froze the web client for seconds on every reconnect.
+   A viewer whose socket holds more than 1 MB of unsent data gets no further frames; it is polled every 250 ms and catches up from its offset once drained, so a slow link neither grows server memory nor falls ever further behind.
 6. URL detection:
 Strips ANSI, accumulates text buffer, extracts URLs, emits `auth_url` once per normalized URL, supports `autoOpen`.
 7. Close behavior:

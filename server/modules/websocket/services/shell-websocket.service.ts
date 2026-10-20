@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -27,6 +28,9 @@ type ShellIncomingMessage = {
   forceRestart?: boolean;
   /** Extra env vars for the PTY (e.g. a provider account's config dir). */
   env?: Record<string, string>;
+  /** Reattach: the output stream the client already shows, and how far. */
+  stream?: string;
+  seen?: number;
 };
 
 type TerminalSize = { cols: number; rows: number };
@@ -50,10 +54,21 @@ type PtySessionEntry = {
   /** Last size each viewer reported (init or resize). */
   sizes: Map<WebSocket, TerminalSize>;
   size: TerminalSize;
-  /** Recent raw output, replayed to a socket that (re)attaches. */
+  /** Recent output, replayed to a socket that (re)attaches. */
   buffer: string[];
   /** Total length of [buffer] — capped by PTY_BUFFER_MAX_CHARS. */
   bufferChars: number;
+  /**
+   * Identifies this run's output. Offsets are comparable only within one
+   * stream: a respawn under the same key starts a new one.
+   */
+  streamId: string;
+  /** Characters of output this run produced so far — the end of [buffer]. */
+  outputEnd: number;
+  /** How far into the stream each viewer has been sent. */
+  sentEnds: Map<WebSocket, number>;
+  /** Viewers whose socket backed up, polled until they can catch up. */
+  catchUpTimers: Map<WebSocket, NodeJS.Timeout>;
   projectPath: string;
   sessionId: string | null;
 };
@@ -66,16 +81,6 @@ function sendIfOpen(socket: WebSocket, frame: Record<string, unknown>): void {
   }
 }
 
-/** Live PTY output: verbatim to the owner, flagged `replay` to the other viewers. */
-function broadcastOutput(session: PtySessionEntry, data: string): void {
-  for (const socket of session.sockets) {
-    sendIfOpen(
-      socket,
-      socket === session.owner ? { type: 'output', data } : { type: 'output', data, replay: true }
-    );
-  }
-}
-
 // The replay window: enough to repaint a TUI and keep recent scrollback, small
 // enough that a reattach does not freeze the client. Writing 5000 unbounded
 // chunks (~23 MB of Claude Code redraws) blocked the web UI for 13 s on every
@@ -84,14 +89,20 @@ const PTY_BUFFER_MAX_CHUNKS = 5000;
 const PTY_BUFFER_MAX_CHARS = 512 * 1024;
 // Replay is sent in a few large frames rather than one per chunk.
 const REPLAY_FRAME_CHARS = 64 * 1024;
-// Erase screen + scrollback, cursor home — the replay repaints from a blank
+// Erase screen + scrollback, cursor home — a full replay repaints from a blank
 // terminal instead of appending another copy of history the client shows.
 const REPLAY_CLEAR_SEQUENCE = '\x1b[2J\x1b[3J\x1b[H';
+// A viewer whose socket holds more unsent data than this gets no more frames
+// until it drains, then catches up from its offset — a slow phone link must
+// not pile megabytes of redraws into server memory or lag ever further behind.
+const VIEWER_MAX_BUFFERED_BYTES = 1024 * 1024;
+const VIEWER_CATCH_UP_POLL_MS = 250;
 
-/** Appends live output to the replay window, evicting the oldest chunks. */
+/** Appends output to the replay window, evicting the oldest chunks. */
 function appendToReplayBuffer(session: PtySessionEntry, chunk: string): void {
   session.buffer.push(chunk);
   session.bufferChars += chunk.length;
+  session.outputEnd += chunk.length;
   while (
     session.buffer.length > PTY_BUFFER_MAX_CHUNKS ||
     (session.bufferChars > PTY_BUFFER_MAX_CHARS && session.buffer.length > 1)
@@ -100,26 +111,142 @@ function appendToReplayBuffer(session: PtySessionEntry, chunk: string): void {
   }
 }
 
+/** Stream offset of the oldest output still in the replay window. */
+function bufferStart(session: PtySessionEntry): number {
+  return session.outputEnd - session.bufferChars;
+}
+
 /**
- * Sends the replay window to a (re)attaching socket: a clear first, then the
- * buffered output joined into frames of at most REPLAY_FRAME_CHARS. Every
- * frame is flagged `replay` so the client does not answer the terminal
- * queries in it again — those replies would land in the shell as typed input.
+ * The buffered output from stream offset `from` on, joined into frames of at
+ * most REPLAY_FRAME_CHARS, each with the stream offset it ends at.
  */
-function sendReplay(socket: WebSocket, session: PtySessionEntry, banner: string): void {
-  sendIfOpen(socket, { type: 'output', data: REPLAY_CLEAR_SEQUENCE, replay: true });
-  sendIfOpen(socket, { type: 'output', data: banner });
+function bufferedFramesSince(
+  session: PtySessionEntry,
+  from: number
+): Array<{ data: string; end: number }> {
+  const parts: string[] = [];
+  let offset = session.outputEnd;
+  for (let index = session.buffer.length - 1; index >= 0 && offset > from; index -= 1) {
+    const chunk = session.buffer[index];
+    const chunkStart = offset - chunk.length;
+    parts.push(chunkStart < from ? chunk.slice(from - chunkStart) : chunk);
+    offset = chunkStart;
+  }
+  parts.reverse();
+
+  const frames: Array<{ data: string; end: number }> = [];
+  let end = Math.max(from, offset);
   let pending = '';
-  for (const chunk of session.buffer) {
-    if (pending && pending.length + chunk.length > REPLAY_FRAME_CHARS) {
-      sendIfOpen(socket, { type: 'output', data: pending, replay: true });
+  for (const part of parts) {
+    if (pending && pending.length + part.length > REPLAY_FRAME_CHARS) {
+      frames.push({ data: pending, end });
       pending = '';
     }
-    pending += chunk;
+    pending += part;
+    end += part.length;
   }
   if (pending) {
-    sendIfOpen(socket, { type: 'output', data: pending, replay: true });
+    frames.push({ data: pending, end });
   }
+  return frames;
+}
+
+/**
+ * Full repaint for a socket whose client holds none of this stream (another
+ * device, a reload, or a gap older than the window): a clear first, then the
+ * whole replay window. Every frame is flagged `replay` so the client does not
+ * answer the terminal queries in it again — those replies would land in the
+ * shell as typed input.
+ */
+function sendReplayWindow(socket: WebSocket, session: PtySessionEntry, banner?: string): void {
+  sendIfOpen(socket, { type: 'output', data: REPLAY_CLEAR_SEQUENCE, replay: true });
+  if (banner) {
+    sendIfOpen(socket, { type: 'output', data: banner });
+  }
+  for (const frame of bufferedFramesSince(session, bufferStart(session))) {
+    sendIfOpen(socket, { type: 'output', data: frame.data, end: frame.end, replay: true });
+  }
+  session.sentEnds.set(socket, session.outputEnd);
+}
+
+/**
+ * Sends `socket` the output it has not been sent yet. When the only gap is the
+ * chunk that starts at `liveChunkStart`, it goes out live: verbatim to the
+ * owner, flagged `replay` to the other viewers (only one emulator answers
+ * terminal queries). Any wider gap — a backed-up socket catching up, or a
+ * reattach — is all flagged `replay`: its queries were answered by another
+ * viewer or are stale by now.
+ */
+function deliverOutput(session: PtySessionEntry, socket: WebSocket, liveChunkStart?: number): void {
+  if (socket.readyState !== WebSocket.OPEN) {
+    return;
+  }
+  const sentEnd = session.sentEnds.get(socket) ?? session.outputEnd;
+  if (sentEnd >= session.outputEnd) {
+    return;
+  }
+  if (socket.bufferedAmount > VIEWER_MAX_BUFFERED_BYTES) {
+    scheduleCatchUp(session, socket);
+    return;
+  }
+
+  if (sentEnd === liveChunkStart) {
+    const data = session.buffer.at(-1)!;
+    const end = session.outputEnd;
+    sendIfOpen(
+      socket,
+      socket === session.owner ? { type: 'output', data, end } : { type: 'output', data, end, replay: true }
+    );
+  } else if (sentEnd < bufferStart(session)) {
+    sendReplayWindow(socket, session);
+  } else {
+    for (const frame of bufferedFramesSince(session, sentEnd)) {
+      sendIfOpen(socket, { type: 'output', data: frame.data, end: frame.end, replay: true });
+    }
+  }
+  session.sentEnds.set(socket, session.outputEnd);
+}
+
+/** Retries delivery to a backed-up socket once it may have drained. */
+function scheduleCatchUp(session: PtySessionEntry, socket: WebSocket): void {
+  if (session.catchUpTimers.has(socket)) {
+    return;
+  }
+  session.catchUpTimers.set(
+    socket,
+    setTimeout(() => {
+      session.catchUpTimers.delete(socket);
+      if (session.sockets.has(socket)) {
+        deliverOutput(session, socket);
+      }
+    }, VIEWER_CATCH_UP_POLL_MS)
+  );
+}
+
+/** Stops the per-viewer timers of a PTY that is going away. */
+function disposeSession(session: PtySessionEntry): void {
+  for (const timer of session.catchUpTimers.values()) {
+    clearTimeout(timer);
+  }
+  session.catchUpTimers.clear();
+}
+
+/**
+ * Where a reattaching client can resume: its `seen` offset when it shows this
+ * very stream and the replay window still covers the gap, otherwise null.
+ */
+function readResumeOffset(message: ShellIncomingMessage, session: PtySessionEntry): number | null {
+  const seen = message.seen;
+  if (
+    message.stream !== session.streamId ||
+    typeof seen !== 'number' ||
+    !Number.isInteger(seen) ||
+    seen < bufferStart(session) ||
+    seen > session.outputEnd
+  ) {
+    return null;
+  }
+  return seen;
 }
 
 function broadcastFrame(session: PtySessionEntry, frame: Record<string, unknown>): void {
@@ -151,6 +278,12 @@ function detachViewer(sessionKey: string, socket: WebSocket): void {
     return;
   }
   session.sizes.delete(socket);
+  session.sentEnds.delete(socket);
+  const catchUp = session.catchUpTimers.get(socket);
+  if (catchUp) {
+    clearTimeout(catchUp);
+    session.catchUpTimers.delete(socket);
+  }
   if (session.owner === socket) {
     session.owner = [...session.sockets].at(-1) ?? null;
     if (session.owner) {
@@ -604,6 +737,7 @@ export function handleShellConnection(
             carriedViewers = [...oldSession.sockets].filter(
               (socket) => socket !== ws && socket.readyState === WebSocket.OPEN
             );
+            disposeSession(oldSession);
             oldSession.pty.kill();
             ptySessionsMap.delete(ptySessionKey);
           }
@@ -624,7 +758,16 @@ export function handleShellConnection(
             applyViewerSize(existingSession, ws);
           }
 
-          sendReplay(ws, existingSession, '\x1b[36m[Reconnected to existing session]\x1b[0m\r\n');
+          // A client still showing this stream gets only what it missed and
+          // keeps its scrollback; any other one is repainted from the window.
+          sendIfOpen(ws, { type: 'stream', id: existingSession.streamId });
+          const resumeFrom = readResumeOffset(data, existingSession);
+          if (resumeFrom === null) {
+            sendReplayWindow(ws, existingSession, '\x1b[36m[Reconnected to existing session]\x1b[0m\r\n');
+          } else {
+            existingSession.sentEnds.set(ws, resumeFrom);
+            deliverOutput(existingSession, ws);
+          }
           return;
         }
 
@@ -692,6 +835,10 @@ export function handleShellConnection(
           size: initSize,
           buffer: [],
           bufferChars: 0,
+          streamId: randomUUID(),
+          outputEnd: 0,
+          sentEnds: new Map([...carriedViewers, ws].map((socket) => [socket, 0])),
+          catchUpTimers: new Map(),
           projectPath,
           sessionId,
         });
@@ -708,21 +855,21 @@ export function handleShellConnection(
             return;
           }
 
-          appendToReplayBuffer(session, chunk);
+          // The replay window holds exactly what viewers are sent, so stream
+          // offsets mean the same on both ends.
+          const outputData = chunk.replace(
+            /OPEN_URL:\s*(https?:\/\/[^\s\x1b\x07]+)/g,
+            '[INFO] Opening in browser: $1'
+          );
+          appendToReplayBuffer(session, outputData);
 
           if (session.sockets.size > 0) {
-            let outputData = chunk;
             const cleanChunk = stripAnsiSequences(chunk);
             // The buffer keeps the raw stream: escape sequences split across
             // chunks (e.g. an OSC-8 hyperlink) reassemble here and strip
             // cleanly instead of leaking `8;id=…`/`8;;` remnants into URLs.
             urlDetectionBuffer = `${urlDetectionBuffer}${chunk}`.slice(-SHELL_URL_PARSE_BUFFER_LIMIT);
             const cleanDetectionBuffer = stripAnsiSequences(urlDetectionBuffer);
-
-            outputData = outputData.replace(
-              /OPEN_URL:\s*(https?:\/\/[^\s\x1b\x07]+)/g,
-              '[INFO] Opening in browser: $1'
-            );
 
             const emitAuthUrl = (detectedUrl: string, autoOpen = false) => {
               const normalizedUrl = normalizeDetectedUrl(detectedUrl);
@@ -779,7 +926,10 @@ export function handleShellConnection(
               emitAuthUrl(bestUrl, true);
             }
 
-            broadcastOutput(session, outputData);
+            const liveChunkStart = session.outputEnd - outputData.length;
+            for (const socket of session.sockets) {
+              deliverOutput(session, socket, liveChunkStart);
+            }
           }
         });
 
@@ -797,6 +947,7 @@ export function handleShellConnection(
             }\x1b[0m\r\n`,
           });
 
+          disposeSession(session);
           ptySessionsMap.delete(sessionKey);
         });
 
@@ -820,7 +971,9 @@ export function handleShellConnection(
         }
 
         // Carried viewers of a respawn see the new run start too.
-        broadcastFrame(ptySessionsMap.get(sessionKey)!, { type: 'output', data: welcomeMsg });
+        const spawnedSession = ptySessionsMap.get(sessionKey)!;
+        broadcastFrame(spawnedSession, { type: 'stream', id: spawnedSession.streamId });
+        broadcastFrame(spawnedSession, { type: 'output', data: welcomeMsg });
         return;
       }
 
@@ -842,6 +995,7 @@ export function handleShellConnection(
         // The tab was closed in the panel: end the shell for every device.
         const session = viewedSession();
         if (session && ptySessionKey) {
+          disposeSession(session);
           ptySessionsMap.delete(ptySessionKey);
           session.pty.kill();
         }

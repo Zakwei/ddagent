@@ -368,6 +368,31 @@ void main() {
       expect(fakeWs.connectCalls, 1);
     });
 
+    test('a reconnect resumes the stream it shows instead of a full replay', () {
+      final container = ProviderContainer(
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
+      );
+      addTearDown(container.dispose);
+
+      final controller = container.read(terminalControllerProvider.notifier);
+      controller.createTab(projectPath: '/test/proj', cols: 100, rows: 30);
+      fakeWs.emitFrame({'type': 'stream', 'id': 'run-1'});
+      fakeWs.emitFrame({'type': 'output', 'data': 'hello', 'end': 5});
+
+      return Future<void>.delayed(Duration.zero, () {
+        expect(controller.state.tabs.single.status, TerminalTabStatus.connected);
+        fakeWs.sent.clear();
+        fakeWs.emitState(WsState.reconnecting);
+        fakeWs.emitState(WsState.open);
+        return Future<void>.delayed(Duration.zero, () {
+          final init = fakeWs.sent.single;
+          expect(init['type'], 'init');
+          expect(init['stream'], 'run-1');
+          expect(init['seen'], 5);
+        });
+      });
+    });
+
     test('closing a tab ends its PTY; a tab another device closed keeps it', () {
       final container = ProviderContainer(
         overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],

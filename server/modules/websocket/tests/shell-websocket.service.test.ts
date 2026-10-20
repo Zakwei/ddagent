@@ -148,9 +148,9 @@ test('a reattach replays a bounded window in a few frames, after a clear', () =>
   const replacementSocket = createFakeSocket();
   handleShellConnection(replacementSocket as never, dependencies);
   replacementSocket.emit('message', initMessage);
-  const frames = replacementSocket.frames.map(
-    (frame) => JSON.parse(frame) as { data: string; replay?: boolean }
-  );
+  const frames = replacementSocket.frames
+    .map((frame) => JSON.parse(frame) as { type: string; data: string; replay?: boolean })
+    .filter((frame) => frame.type === 'output');
 
   // The client's copy of history is cleared, not doubled.
   assert.deepEqual(frames[0], { type: 'output', data: '\x1b[2J\x1b[3J\x1b[H', replay: true });
@@ -164,6 +164,96 @@ test('a reattach replays a bounded window in a few frames, after a clear', () =>
   // The newest output is kept; the oldest is dropped.
   assert.ok(text.endsWith(chunk(511)));
   assert.ok(!text.includes('frame-00000'));
+
+  pty.emitExit();
+});
+
+/** One plain-shell PTY with a first viewer attached; `attach` adds another socket. */
+function startStream(name: string) {
+  const pty = createFakePty();
+  const dependencies = {
+    resolveProviderSessionId: () => null,
+    spawnPty: () => pty as never,
+  };
+  const sessionId = `${name}-${Date.now()}`;
+  const init = (extra: Record<string, unknown> = {}) =>
+    JSON.stringify({
+      type: 'init',
+      projectPath: process.cwd(),
+      sessionId,
+      hasSession: false,
+      provider: 'plain-shell',
+      isPlainShell: true,
+      ...extra,
+    });
+  const attach = (extra?: Record<string, unknown>) => {
+    const socket = createFakeSocket();
+    handleShellConnection(socket as never, dependencies);
+    socket.emit('message', init(extra));
+    return socket;
+  };
+  const parsed = (socket: ReturnType<typeof createFakeSocket>) =>
+    socket.frames.map(
+      (frame) => JSON.parse(frame) as { type: string; id?: string; data?: string; end?: number; replay?: boolean }
+    );
+  const first = attach();
+  const streamId = parsed(first).find((frame) => frame.type === 'stream')!.id!;
+  return { pty, attach, parsed, first, streamId };
+}
+
+test('a reattach with the stream offset gets only the missed output, without a clear', () => {
+  const { pty, attach, parsed, first, streamId } = startStream('resume');
+  pty.emitData('seen-');
+  const seen = parsed(first).at(-1)!.end!;
+  first.emit('close');
+  pty.emitData('missed-1 ');
+  pty.emitData('missed-2');
+
+  const back = attach({ stream: streamId, seen });
+  const output = parsed(back).filter((frame) => frame.type === 'output');
+
+  assert.equal(output.map((frame) => frame.data).join(''), 'missed-1 missed-2');
+  assert.ok(output.every((frame) => frame.replay === true));
+  assert.equal(output.at(-1)!.end, 'seen-missed-1 missed-2'.length);
+  assert.ok(!back.frames.some((frame) => frame.includes('[3J') || frame.includes('Reconnected')));
+
+  pty.emitExit();
+});
+
+test('a reattach from another stream or a gap past the window repaints in full', () => {
+  const { pty, attach, parsed } = startStream('resume-stale');
+  pty.emitData('output');
+
+  for (const resume of [{ stream: 'an-older-run', seen: 0 }, {}]) {
+    const socket = attach(resume);
+    const output = parsed(socket).filter((frame) => frame.type === 'output');
+    assert.equal(output[0].data, '\x1b[2J\x1b[3J\x1b[H');
+    assert.ok(output.some((frame) => frame.data === 'output'));
+  }
+
+  pty.emitExit();
+});
+
+test('a backed-up viewer gets no live frames and later catches up from its offset', (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  const { pty, parsed, first } = startStream('backpressure');
+  pty.emitData('a');
+  const backedUp = first as typeof first & { bufferedAmount: number };
+  backedUp.bufferedAmount = 2 * 1024 * 1024;
+  const sentBefore = first.frames.length;
+
+  pty.emitData('b');
+  pty.emitData('c');
+  t.mock.timers.tick(250);
+  assert.equal(first.frames.length, sentBefore);
+
+  backedUp.bufferedAmount = 0;
+  t.mock.timers.tick(250);
+  const caughtUp = parsed(first).slice(sentBefore);
+  assert.deepEqual(caughtUp, [{ type: 'output', data: 'bc', end: 3, replay: true }]);
+
+  pty.emitData('d');
+  assert.deepEqual(parsed(first).at(-1), { type: 'output', data: 'd', end: 4 });
 
   pty.emitExit();
 });
@@ -217,8 +307,8 @@ test('every device viewing a PTY gets its output; only the one in charge answers
   pty.emitData('\x1b[c');
 
   // The phone attached last — it is in charge until the desktop types.
-  assert.deepEqual(lastFrame(phone), { type: 'output', data: '\x1b[c' });
-  assert.deepEqual(lastFrame(desktop), { type: 'output', data: '\x1b[c', replay: true });
+  assert.deepEqual(lastFrame(phone), { type: 'output', data: '\x1b[c', end: 3 });
+  assert.deepEqual(lastFrame(desktop), { type: 'output', data: '\x1b[c', end: 3, replay: true });
 
   desktop.emit('message', JSON.stringify({ type: 'input', data: 'ls\r' }));
   pty.emitData('live');
@@ -254,7 +344,7 @@ test('one device closing leaves the PTY running for the other', () => {
   pty.emitData('still-here');
 
   assert.equal(pty.killed, false);
-  assert.deepEqual(lastFrame(desktop), { type: 'output', data: 'still-here' });
+  assert.deepEqual(lastFrame(desktop), { type: 'output', data: 'still-here', end: 10 });
 
   pty.emitExit();
 });

@@ -150,6 +150,12 @@ class TerminalTab {
   /// already handled live; re-sending would type "1;2c" into the shell.
   bool replaying = false;
 
+  /// The PTY run this tab shows and how far into its output — sent back on a
+  /// reattach so the server replays only what was missed and the scrollback
+  /// survives (a full replay starts with a clear).
+  String? streamId;
+  int seenEnd = 0;
+
   /// Which tab row shows this tab ([terminalRouteHost] or a workspace pane
   /// id). Mutable — "Move to new pane" reassigns it; the PTY never notices.
   String hostId;
@@ -460,6 +466,15 @@ class TerminalController extends Notifier<TerminalState> {
       channel.resize(width, height);
     };
 
+    // A reconnect re-sends `init`: resume this tab's stream where it left off,
+    // at the size the view has now (not the one the PTY was spawned at).
+    channel.reattachFields = () => {
+      'stream': ?tab.streamId,
+      'seen': tab.seenEnd,
+      'cols': terminal.viewWidth,
+      'rows': terminal.viewHeight,
+    };
+
     // Listen to incoming frames
     tab.subscription = channel.frames.listen(
       (ShellFrame frame) {
@@ -477,7 +492,8 @@ class TerminalController extends Notifier<TerminalState> {
     // open, so the order does not matter); spawn with a known size right
     // away, otherwise at first layout — or after the grace period.
     if (cols != null && rows != null) {
-      sendInit(cols, rows);
+      // The emulator takes that size too; its onResize sends the init.
+      terminal.resize(cols, rows);
     } else {
       tab.initGraceTimer = Timer(_initGracePeriod, () {
         tab.initGraceTimer = null;
@@ -619,7 +635,22 @@ class TerminalController extends Notifier<TerminalState> {
     if (tabIndex == -1) return;
     final tab = state.tabs[tabIndex];
 
+    if (frame.isStream) {
+      if (frame.streamId != tab.streamId) {
+        tab.streamId = frame.streamId;
+        tab.seenEnd = 0;
+      }
+      // A reattach that missed nothing sends no output to mark it connected.
+      if (tab.status != TerminalTabStatus.connected && !tab.isCompleted) {
+        tab.status = TerminalTabStatus.connected;
+        _notifyTabsChanged();
+      }
+      return;
+    }
+
     if (frame.isOutput) {
+      final end = frame.end;
+      if (end != null) tab.seenEnd = end;
       tab.replaying = frame.isReplay;
       tab.terminal.write(tab.outputFilter.feed(frame.output));
       tab.replaying = false;
