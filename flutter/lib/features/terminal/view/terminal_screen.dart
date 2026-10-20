@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/theme/typography.dart';
+import 'package:ddagent_app/features/projects/data/projects_repository.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/provider_accounts/state/provider_accounts_controller.dart';
 import 'package:ddagent_app/features/system/state/system_providers.dart';
@@ -99,6 +100,10 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
   TerminalHostSpec? _syncedRow;
   bool _applyingSyncedRow = false;
 
+  /// Project picked in the strip's project menu — new tabs open there. Wins
+  /// over the route's query params; a pane also stores it as its project.
+  String? _pickedProjectId;
+
   @override
   void initState() {
     super.initState();
@@ -173,24 +178,63 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
 
   TerminalController get _ctrl => ref.read(terminalControllerProvider.notifier);
 
+  static String _pathOf(Project project) =>
+      (project.fullPath?.isNotEmpty ?? false) ? project.fullPath! : project.path;
+
+  /// The project new tabs open in: the one picked in the strip, else the
+  /// pane's / route's, else the last used one, else the first project.
+  Project? _currentProject() {
+    final projects = ref.read(projectsProvider).projects;
+    Project? byId(String? id) =>
+        id == null ? null : projects.where((p) => p.projectId == id).firstOrNull;
+    final picked = byId(_pickedProjectId);
+    if (picked != null) return picked;
+    final routePath = widget.projectPath;
+    if (routePath != null && routePath.isNotEmpty) {
+      return projects.where((p) => _pathOf(p) == routePath || p.path == routePath).firstOrNull;
+    }
+    // The workspace is only read where it is synced — its controller opens
+    // Hive, which widget tests don't set up.
+    final lastUsed = widget.syncTabs ? ref.read(workspaceProvider).lastUsedProjectId : null;
+    return byId(widget.projectId) ?? byId(lastUsed) ?? projects.firstOrNull;
+  }
+
+  /// The project the strip shows: the active tab's own, else where new tabs open.
+  Project? _projectShownFor(TerminalTab? tab) {
+    final path = tab?.projectPath;
+    final own = path == null
+        ? null
+        : ref
+              .read(projectsProvider)
+              .projects
+              .where((p) => _pathOf(p) == path || p.path == path)
+              .firstOrNull;
+    return own ?? _currentProject();
+  }
+
   String _resolveProjectPath() {
-    if (widget.projectPath != null && widget.projectPath!.isNotEmpty) {
+    if (_pickedProjectId == null &&
+        widget.projectPath != null &&
+        widget.projectPath!.isNotEmpty) {
       return widget.projectPath!;
     }
-    final projectsState = ref.read(projectsProvider);
-    if (widget.projectId != null) {
-      final match = projectsState.projects
-          .where((p) => p.projectId == widget.projectId)
-          .firstOrNull;
-      if (match != null) {
-        return (match.fullPath?.isNotEmpty ?? false) ? match.fullPath! : match.path;
+    final project = _currentProject();
+    return project == null ? '' : _pathOf(project);
+  }
+
+  /// Strip's project menu: new tabs of this pane (or of the standalone
+  /// terminal) open in [project] from now on, and one opens right away —
+  /// running shells keep their directory.
+  void _selectProject(Project project) {
+    setState(() => _pickedProjectId = project.projectId);
+    if (widget.syncTabs) {
+      final workspace = ref.read(workspaceProvider.notifier);
+      workspace.setLastUsedProjectId(project.projectId);
+      if (widget.hostId != terminalRouteHost) {
+        workspace.updatePane(widget.hostId, projectId: () => project.projectId);
       }
     }
-    final first = projectsState.projects.firstOrNull;
-    if (first != null) {
-      return (first.fullPath?.isNotEmpty ?? false) ? first.fullPath! : first.path;
-    }
-    return '';
+    _newDefaultTab();
   }
 
   void _ensureInitialTab() {
@@ -449,6 +493,14 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
                 menuController: _menuController,
                 menuChildren: _buildMenu(context, terminalState, activeTab),
                 trailing: [
+                  // Panes and the standalone terminal only — the login
+                  // dialog runs in a fixed directory.
+                  if (widget.syncTabs)
+                    _TerminalProjectMenu(
+                      projects: ref.watch(projectsProvider).projects,
+                      selected: _projectShownFor(activeTab),
+                      onSelected: _selectProject,
+                    ),
                   if (activeTab != null)
                     TerminalStripAction(
                       tooltip:
@@ -966,6 +1018,96 @@ class _PromptChipsBar extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+
+/// The strip's project selector: shows the project of the active tab and
+/// opens a new tab in the project picked from its menu.
+class _TerminalProjectMenu extends StatelessWidget {
+  const _TerminalProjectMenu({
+    required this.projects,
+    required this.selected,
+    required this.onSelected,
+  });
+
+  final List<Project> projects;
+  final Project? selected;
+  final ValueChanged<Project> onSelected;
+
+  static String _label(Project p) => p.displayName.isEmpty ? p.projectId : p.displayName;
+
+  @override
+  Widget build(BuildContext context) {
+    if (projects.isEmpty) return const SizedBox.shrink();
+    final palette = TerminalPalette.of(context);
+    final colors = context.appColors;
+    final t = Translations.of(context);
+    final current = selected;
+    return PopupMenuButton<Project>(
+      tooltip: t.projects.project,
+      position: PopupMenuPosition.under,
+      onSelected: onSelected,
+      itemBuilder: (_) => [
+        PopupMenuItem<Project>(
+          enabled: false,
+          height: 28,
+          child: Text(
+            t.projects.project,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: colors.mutedForeground,
+            ),
+          ),
+        ),
+        for (final project in projects)
+          PopupMenuItem<Project>(
+            value: project,
+            height: 36,
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 20,
+                  child: project.projectId == current?.projectId
+                      ? const Icon(LucideIcons.check, size: 14)
+                      : null,
+                ),
+                Flexible(
+                  child: Text(
+                    _label(project),
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 13),
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(LucideIcons.folder, size: 14, color: palette.foreground.withValues(alpha: 0.75)),
+            const SizedBox(width: 4),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 140),
+              child: Text(
+                current == null ? t.projects.project : _label(current),
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 12, color: palette.foreground.withValues(alpha: 0.75)),
+              ),
+            ),
+            Icon(
+              LucideIcons.chevronDown,
+              size: 12,
+              color: palette.foreground.withValues(alpha: 0.6),
+            ),
+          ],
+        ),
       ),
     );
   }

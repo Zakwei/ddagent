@@ -32,6 +32,7 @@ const _kCoffeeUrl = 'https://buymeacoffee.com/ddnet';
 const _destinations = [
   (icon: LucideIcons.messageSquarePlus, path: '/workspace'),
   (icon: LucideIcons.history, path: '/sessions'),
+  (icon: LucideIcons.squareTerminal, path: '/terminal'),
 ];
 
 const _pageDestinations = [
@@ -66,6 +67,7 @@ const _allDestinations = [
 String _destinationLabel(Translations t, String path) => switch (path) {
   '/workspace' => t.sidebar.panel.open,
   '/sessions' => t.common.quota.metric.sessions,
+  '/terminal' => t.sidebar.navigation.terminal,
   '/board' => t.sidebar.tabs.board,
   '/tasks' => t.common.tabs.tasks,
   '/quota' => t.sidebar.tabs.usage,
@@ -301,6 +303,13 @@ class _AppRail extends ConsumerWidget {
             label: t.common.quota.metric.sessions,
             selected: selectedPath == '/sessions',
             onTap: () => context.go('/sessions'),
+          ),
+          // A terminal outside the panes, like a session opened on its own.
+          _RailButton(
+            icon: LucideIcons.squareTerminal,
+            label: _destinationLabel(t, '/terminal'),
+            selected: selectedPath == '/terminal',
+            onTap: () => context.go('/terminal'),
           ),
           _NavDivider(color: nav.dividerColor),
           for (final d in pageDestinations)
@@ -558,6 +567,7 @@ class _CompactNavDrawer extends ConsumerWidget {
               badge: runningCount,
             ),
             item(LucideIcons.history, _destinationLabel(t, '/sessions'), '/sessions'),
+            item(LucideIcons.squareTerminal, _destinationLabel(t, '/terminal'), '/terminal'),
             _drawerDivider(nav.dividerColor),
             for (final d in _pageDestinations)
               if (showTasks || d.path != '/tasks')

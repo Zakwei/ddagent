@@ -566,6 +566,13 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
                   'files explorer tree',
                   () => context.go('/files'),
                 ),
+                (
+                  'terminal',
+                  LucideIcons.squareTerminal,
+                  Translations.of(context).sidebar.navigation.terminal,
+                  'terminal shell console standalone tab',
+                  () => context.go('/terminal'),
+                ),
               ])
             _Item(
               id: 'nav-$id',
