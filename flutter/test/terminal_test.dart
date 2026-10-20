@@ -393,6 +393,26 @@ void main() {
       });
     });
 
+    test('Connect reattaches a running PTY and restarts only an exited one', () async {
+      final container = ProviderContainer(
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
+      );
+      addTearDown(container.dispose);
+
+      final controller = container.read(terminalControllerProvider.notifier);
+      final tab = controller.createTab(projectPath: '/test/proj', cols: 80, rows: 24);
+      fakeWs.emitState(WsState.reconnecting);
+      controller.reconnectTab(tab.id);
+      expect(fakeWs.reconnectNowCalls, 1);
+
+      fakeWs.emitState(WsState.open);
+      fakeWs.emitFrame({'type': 'output', 'data': 'Process exited with code 0'});
+      await Future<void>.delayed(Duration.zero);
+      fakeWs.sent.clear();
+      controller.reconnectTab(tab.id);
+      expect(fakeWs.sent.single['forceRestart'], isTrue);
+    });
+
     test('closing a tab ends its PTY; a tab another device closed keeps it', () {
       final container = ProviderContainer(
         overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
@@ -1589,13 +1609,16 @@ void main() {
       expect(find.text('Connect'), findsOneWidget);
       expect(fakeWs.state, WsState.closed);
 
-      // Connect → restart (forceRestart init resent on the reopened socket).
+      // Connect → reattach the running PTY on the reopened socket; a
+      // restart would kill a session that is still running.
       fakeWs.sent.clear();
       await tester.tap(find.text('Connect'));
       await tester.pump();
       await tester.pump();
       expect(tab.status, TerminalTabStatus.connecting);
-      expect(fakeWs.sent.any((f) => f['type'] == 'init' && f['forceRestart'] == true), isTrue);
+      final inits = fakeWs.sent.where((f) => f['type'] == 'init');
+      expect(inits, isNotEmpty);
+      expect(inits.every((f) => f['forceRestart'] != true), isTrue);
     });
 
     testWidgets('ProviderLoginDialog lists providers and launches terminal', (tester) async {

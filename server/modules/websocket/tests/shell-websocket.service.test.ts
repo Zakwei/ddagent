@@ -663,6 +663,44 @@ test('init env reaches the PTY environment, dropping invalid names and non-strin
   pty.emitExit();
 });
 
+test('a login command reattaches on a re-sent init; only forceRestart respawns it', () => {
+  const spawned: Array<ReturnType<typeof createFakePty>> = [];
+  const dependencies = {
+    resolveProviderSessionId: () => null,
+    spawnPty: () => {
+      const fresh = createFakePty();
+      spawned.push(fresh);
+      return fresh as never;
+    },
+  };
+  const init = (forceRestart: boolean) =>
+    JSON.stringify({
+      type: 'init',
+      projectPath: process.cwd(),
+      sessionId: `login-${Date.now()}`,
+      provider: 'plain-shell',
+      isPlainShell: true,
+      initialCommand: 'opencode auth login',
+      forceRestart,
+    });
+
+  const socket = createFakeSocket();
+  handleShellConnection(socket as never, dependencies);
+  socket.emit('message', init(true));
+  // Back from the browser: the reconnect re-sends init without forceRestart.
+  const back = createFakeSocket();
+  handleShellConnection(back as never, dependencies);
+  back.emit('message', init(false));
+  assert.equal(spawned.length, 1);
+  assert.equal(spawned[0].killed, false);
+
+  back.emit('message', init(true));
+  assert.equal(spawned.length, 2);
+  assert.equal(spawned[0].killed, true);
+
+  spawned[1].emitExit();
+});
+
 test('a one-shot agent command runs from home when the project path is missing on this server', () => {
   const pty = createFakePty();
   let spawnedCwd: string | undefined;

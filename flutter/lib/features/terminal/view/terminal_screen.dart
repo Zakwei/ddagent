@@ -662,7 +662,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
             entry(
               LucideIcons.plug,
               t.terminal.actions.connect,
-              onTap: () => _ctrl.restartTab(activeTab.id),
+              onTap: () => _ctrl.reconnectTab(activeTab.id),
             ),
           entry(
             LucideIcons.x,
@@ -720,7 +720,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
             ),
           ),
         if (activeTab.status != TerminalTabStatus.connected)
-          _ConnectionOverlay(tab: activeTab, onConnect: () => _ctrl.restartTab(activeTab.id)),
+          _ConnectionOverlay(tab: activeTab, onConnect: () => _ctrl.reconnectTab(activeTab.id)),
       ],
     );
   }

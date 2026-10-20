@@ -170,7 +170,7 @@ This enables reconnect behavior and isolates command-specific plain-shell sessio
 stateDiagram-v2
   [*] --> WaitingInit
   WaitingInit --> ValidateInit: message.type == init
-  ValidateInit --> ReconnectExisting: session key exists and not login reset
+  ValidateInit --> ReconnectExisting: session key exists and no forceRestart
   ValidateInit --> SpawnNewPTY: valid path + valid sessionId
   ValidateInit --> EmitError: invalid payload/path/sessionId
 
@@ -194,8 +194,8 @@ stateDiagram-v2
 
 1. `init`:
 Reads `projectPath`, `sessionId`, `provider`, `hasSession`, `initialCommand`, `isPlainShell`.
-2. Login reset:
-For login-like commands (or `forceRestart`), the existing keyed PTY session is killed and recreated.
+2. Restart:
+Only `forceRestart` kills and recreates the existing keyed PTY session. The client sets it on the first send of a one-shot command (login/install) and on Restart, never on the `init` it re-sends to reattach — so a login survives the app going to the browser and back.
 3. Validation:
 Path must exist and be a directory; `sessionId` must match safe pattern.
 4. Command build:
@@ -208,7 +208,7 @@ Strips ANSI, accumulates text buffer, extracts URLs, emits `auth_url` once per n
 7. Close behavior:
 Socket disconnect never kills the PTY: with no viewer left it keeps running (a phone may sit in the background for hours) until the process exits or a client sends `{ type: 'terminate' }` — the client does that when the user closes the tab in the panel.
 8. Several viewers:
-Terminal tabs are synced across a user's devices, so one PTY can have several sockets attached. Output, `auth_url` and the exit line go to all of them. The viewer that attached or typed most recently is in charge: it gets live output verbatim, the others get it flagged `replay: true` (so only one emulator answers terminal queries), and the PTY takes its size — another device attaching never resizes a shell that already has viewers. A `forceRestart`/login respawn keeps the other viewers attached to the new run.
+Terminal tabs are synced across a user's devices, so one PTY can have several sockets attached. Output, `auth_url` and the exit line go to all of them. The viewer that attached or typed most recently is in charge: it gets live output verbatim, the others get it flagged `replay: true` (so only one emulator answers terminal queries), and the PTY takes its size — another device attaching never resizes a shell that already has viewers. A `forceRestart` respawn keeps the other viewers attached to the new run.
 
 ## Shared Client Registry and Broadcasts
 

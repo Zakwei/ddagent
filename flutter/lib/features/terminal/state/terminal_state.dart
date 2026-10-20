@@ -825,6 +825,17 @@ class TerminalController extends Notifier<TerminalState> {
     _notifyTabsChanged();
   }
 
+  /// The Connect CTA. A process that exited starts over; any other tab
+  /// reattaches its PTY — restarting there killed a session still running.
+  void reconnectTab(String tabId) {
+    final tab = state.tabs.where((t) => t.id == tabId).firstOrNull;
+    if (tab == null) return;
+    if (tab.isCompleted) return restartTab(tabId);
+    tab.status = TerminalTabStatus.connecting;
+    tab.channel.reconnect();
+    _notifyTabsChanged();
+  }
+
   /// App back in the foreground — reconnect the shells that dropped.
   void onAppResumed() {
     for (final tab in state.tabs) {

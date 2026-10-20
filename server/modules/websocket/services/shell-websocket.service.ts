@@ -712,12 +712,6 @@ export function handleShellConnection(
           rows: readNumber(data.rows, 24),
         };
 
-        const isLoginCommand =
-          !!initialCommand &&
-          (initialCommand.includes('setup-token') ||
-            initialCommand.includes('cursor-agent login') ||
-            initialCommand.includes('auth login'));
-
         const commandSuffix =
           isPlainShell && initialCommand
             ? `_cmd_${Buffer.from(initialCommand).toString('base64').slice(0, 16)}`
@@ -729,9 +723,13 @@ export function handleShellConnection(
         }
         ptySessionKey = nextSessionKey;
 
+        // Only an explicit `forceRestart` (the client's first send of a one-shot
+        // command, or Restart) respawns. Login commands used to respawn on every
+        // init — and a reconnect re-sends it, so coming back from the browser
+        // where the sign-in was approved killed the login waiting for it.
         // A respawn keeps the other devices' viewers: they see the new run.
         let carriedViewers: WebSocket[] = [];
-        if (isLoginCommand || forceRestart) {
+        if (forceRestart) {
           const oldSession = ptySessionsMap.get(ptySessionKey);
           if (oldSession) {
             carriedViewers = [...oldSession.sockets].filter(
@@ -743,8 +741,7 @@ export function handleShellConnection(
           }
         }
 
-        const existingSession =
-          isLoginCommand || forceRestart ? null : ptySessionsMap.get(ptySessionKey);
+        const existingSession = forceRestart ? null : ptySessionsMap.get(ptySessionKey);
         if (existingSession) {
           // Re-adding moves the socket to the end: it is now the most recent viewer.
           existingSession.sockets.delete(ws);

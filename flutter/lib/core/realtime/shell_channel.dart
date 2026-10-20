@@ -140,6 +140,16 @@ class ShellChannel {
     if (_ws.state != WsState.open) _ws.reconnectNow();
   }
 
+  /// Connect CTA: re-opens a socket the user disconnected, or retries a
+  /// dropped one right away. Either way `start()` re-sends init to reattach.
+  void reconnect() {
+    if (_ws.state == WsState.closed) {
+      unawaited(_ws.connect());
+    } else {
+      wake();
+    }
+  }
+
   Future<void> connect() => _ws.connect();
   Future<void> close() => _ws.close();
 
