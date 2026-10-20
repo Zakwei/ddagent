@@ -37,9 +37,9 @@ class ShellFrame {
 
 /// `/shell` PTY channel (Task 6.5).
 ///
-/// Inbound:  init | input {data} | resize {cols, rows} | terminate
-/// Outbound: stream {id} | output {data: ANSI, end?} | auth_url {url, autoOpen}
-///           | error {message}
+/// Inbound:  init | input {data} | resize {cols, rows} | terminate | ping
+/// Outbound: stream {id} | output {data: ANSI, end?, exitCode?}
+///           | auth_url {url, autoOpen} | error {message} | pong
 ///
 /// PTY sessions are keyed server-side by `<projectPath>_<sessionId>[_cmd_*]`;
 /// on reconnect the same key re-attaches — so [init] is re-sent automatically
@@ -47,7 +47,7 @@ class ShellFrame {
 /// already shows), and the server sends only the output it missed.
 /// A PTY with no socket attached keeps running; only [terminate] ends it.
 class ShellChannel {
-  ShellChannel(this._ws);
+  ShellChannel(this._ws, {this.pongTimeout = const Duration(seconds: 3)});
 
   final WsClient _ws;
   final _framesOut = StreamController<ShellFrame>.broadcast();
@@ -57,6 +57,18 @@ class ShellChannel {
 
   /// Whether [_initFrame] went out already — only a re-send reattaches.
   bool _initSent = false;
+
+  /// Keystrokes typed while the socket reconnects, sent right after the
+  /// re-init — dropping them lost the start of a command typed on return.
+  final _pendingInput = StringBuffer();
+
+  /// Bounds [_pendingInput]: a long outage must not replay a wall of keys.
+  static const maxPendingInputChars = 4096;
+
+  /// How long [wake] waits for a `pong` before treating an open-looking
+  /// socket as dead (a phone's socket can survive sleep only on paper).
+  final Duration pongTimeout;
+  Timer? _pongTimer;
 
   /// Fields merged into every re-sent `init` that does not restart the PTY:
   /// the tab's `stream` / `seen` offset and its current `cols` / `rows`.
@@ -103,11 +115,22 @@ class ShellChannel {
     _ws.send({...frame, ...?reattach});
     _initSent = true;
     _initFrame = {..._initFrame!, 'forceRestart': false};
+    if (_pendingInput.isNotEmpty) {
+      _ws.send({'type': 'input', 'data': _pendingInput.toString()});
+      _pendingInput.clear();
+    }
   }
 
   /// Binds frames + auto re-init on reconnect. Call once.
   void start() {
-    _sub ??= _ws.frames.listen((raw) => _framesOut.add(ShellFrame(raw: raw)));
+    _sub ??= _ws.frames.listen((raw) {
+      if (raw['type'] == 'pong') {
+        _pongTimer?.cancel();
+        _pongTimer = null;
+        return;
+      }
+      _framesOut.add(ShellFrame(raw: raw));
+    });
     _statesSub = _ws.states.listen((s) {
       if (s == WsState.open && _initFrame != null) {
         _sendInit();
@@ -115,12 +138,17 @@ class ShellChannel {
     });
   }
 
-  /// Silently drops input while the socket isn't open (web
-  /// `sendSocketMessage` guards on readyState the same way) — a
-  /// disconnected terminal must not throw on keystrokes.
+  /// Input while the socket reconnects is queued (up to
+  /// [maxPendingInputChars]) and sent after the re-init; on a socket the user
+  /// disconnected it is dropped — a disconnected terminal must not throw on
+  /// keystrokes.
   void input(String data) {
-    if (_ws.state != WsState.open) return;
-    _ws.send({'type': 'input', 'data': data});
+    if (_ws.state == WsState.open) {
+      _ws.send({'type': 'input', 'data': data});
+      return;
+    }
+    if (_ws.state == WsState.closed || _initFrame == null) return;
+    if (_pendingInput.length + data.length <= maxPendingInputChars) _pendingInput.write(data);
   }
 
   void resize(int cols, int rows) {
@@ -137,10 +165,21 @@ class ShellChannel {
 
   /// App back in the foreground: a socket dropped while backgrounded may sit
   /// in a reconnect backoff of up to 30 s — retry right away. An open socket
-  /// is left alone (a reconnect would replay the buffer for nothing), and so
-  /// is one the user disconnected.
+  /// is pinged: one that sat through device sleep can look open while the
+  /// server dropped it long ago, so no `pong` within [pongTimeout] reconnects
+  /// it (cheap — the server replays only what the tab missed). One the user
+  /// disconnected is left alone.
   void wake() {
-    if (_ws.state != WsState.open) _ws.reconnectNow();
+    if (_ws.state != WsState.open) {
+      _ws.reconnectNow();
+      return;
+    }
+    if (_pongTimer != null) return;
+    _ws.send({'type': 'ping'});
+    _pongTimer = Timer(pongTimeout, () {
+      _pongTimer = null;
+      _ws.reconnectNow();
+    });
   }
 
   /// Connect CTA: re-opens a socket the user disconnected, or retries a
@@ -154,9 +193,16 @@ class ShellChannel {
   }
 
   Future<void> connect() => _ws.connect();
-  Future<void> close() => _ws.close();
+  Future<void> close() {
+    _pongTimer?.cancel();
+    _pongTimer = null;
+    _pendingInput.clear();
+    return _ws.close();
+  }
 
   Future<void> dispose() async {
+    _pongTimer?.cancel();
+    _pongTimer = null;
     await _sub?.cancel();
     await _statesSub?.cancel();
     await _framesOut.close();

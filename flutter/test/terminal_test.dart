@@ -311,21 +311,78 @@ void main() {
       expect(currentTab.authUrls, contains('https://claude.ai/oauth/login?code=123'));
     });
 
-    test('resume retries a dropped shell right away and leaves an open one alone', () async {
+    test('resume retries a dropped shell right away and pings an open one', () async {
+      final channel = ShellChannel(fakeWs, pongTimeout: const Duration(milliseconds: 20))..start();
+      final container = ProviderContainer(
+        overrides: [shellChannelProvider.overrideWith((ref, key) => channel)],
+      );
+      addTearDown(container.dispose);
+      final controller = container.read(terminalControllerProvider.notifier);
+      controller.createTab(projectPath: '/test/proj', cols: 80, rows: 24);
+      await Future<void>.delayed(Duration.zero);
+
+      // An open socket that answers stays as it is.
+      fakeWs.sent.clear();
+      controller.onAppResumed();
+      expect(fakeWs.sent.single['type'], 'ping');
+      fakeWs.emitFrame({'type': 'pong'});
+      await Future<void>.delayed(const Duration(milliseconds: 40));
+      expect(fakeWs.reconnectNowCalls, 0);
+
+      // One that went dead in the background is reconnected.
+      controller.onAppResumed();
+      await Future<void>.delayed(const Duration(milliseconds: 40));
+      expect(fakeWs.reconnectNowCalls, 1);
+
+      fakeWs.emitState(WsState.reconnecting);
+      controller.onAppResumed();
+      expect(fakeWs.reconnectNowCalls, 2);
+    });
+
+    test('keys typed while reconnecting are sent after the re-init', () async {
       final container = ProviderContainer(
         overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
       );
       addTearDown(container.dispose);
       final controller = container.read(terminalControllerProvider.notifier);
-      controller.createTab(projectPath: '/test/proj');
+      final tab = controller.createTab(projectPath: '/test/proj', cols: 80, rows: 24);
       await Future<void>.delayed(Duration.zero);
 
-      controller.onAppResumed();
-      expect(fakeWs.reconnectNowCalls, 0);
-
       fakeWs.emitState(WsState.reconnecting);
-      controller.onAppResumed();
-      expect(fakeWs.reconnectNowCalls, 1);
+      controller.sendInput(tab.id, 'git st');
+      controller.sendInput(tab.id, 'atus\r');
+      fakeWs.sent.clear();
+      fakeWs.emitState(WsState.open);
+      await Future<void>.delayed(Duration.zero);
+      expect(fakeWs.sent.map((f) => f['type']), ['init', 'input']);
+      expect(fakeWs.sent.last['data'], 'git status\r');
+
+      // A socket the user disconnected drops keys instead.
+      await fakeChannel.close();
+      fakeWs.sent.clear();
+      controller.sendInput(tab.id, 'x');
+      fakeWs.emitState(WsState.open);
+      await Future<void>.delayed(Duration.zero);
+      expect(fakeWs.sent.where((f) => f['type'] == 'input'), isEmpty);
+    });
+
+    test('a tab opened in the background starts at the size of the tab on show', () async {
+      final container = ProviderContainer(
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
+      );
+      addTearDown(container.dispose);
+      final controller = container.read(terminalControllerProvider.notifier);
+      controller.createTab(projectPath: '/test/proj', cols: 140, rows: 40);
+      fakeWs.sent.clear();
+
+      final background = controller.createTab(projectPath: '/test/proj', autoSelect: false);
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+      expect(background.terminal.viewWidth, 140);
+      expect(background.terminal.viewHeight, 40);
+      // The tabs share the fake socket here: the background tab's init is last.
+      final init = fakeWs.sent.lastWhere((f) => f['type'] == 'init');
+      expect(init['cols'], 140);
+      expect(init['rows'], 40);
     });
 
     test('a loopback auth_url from an older server shows no login banner', () async {

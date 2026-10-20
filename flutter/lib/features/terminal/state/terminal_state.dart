@@ -503,7 +503,15 @@ class TerminalController extends Notifier<TerminalState> {
     } else {
       tab.initGraceTimer = Timer(_initGracePeriod, () {
         tab.initGraceTimer = null;
-        if (_activeTabs.contains(tab)) sendInit(80, 24);
+        if (!_activeTabs.contains(tab)) return;
+        // Every tab of a host is shown in the same pane: start at the size
+        // its visible tab has, not 80×24 — the shell reflows into garbled
+        // lines when the tab is first shown, and a lone viewer at 80×24
+        // shrinks a PTY other devices show at full size.
+        final shown = state.activeTabFor(tab.hostId);
+        final sized = shown != null && shown != tab ? shown.terminal : null;
+        // The emulator takes the size too; its onResize sends the init.
+        terminal.resize(sized?.viewWidth ?? 80, sized?.viewHeight ?? 24);
       });
     }
     unawaited(channel.connect());

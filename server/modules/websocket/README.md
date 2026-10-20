@@ -205,9 +205,11 @@ Keeps the newest output (at most 5000 chunks and 512 KB) for replay on reconnect
    A viewer whose socket holds more than 1 MB of unsent data gets no further frames; it is polled every 250 ms and catches up from its offset once drained, so a slow link neither grows server memory nor falls ever further behind.
 6. URL detection:
 Strips ANSI, accumulates text buffer, extracts URLs, emits `auth_url` once per normalized URL, supports `autoOpen`.
-7. Close behavior:
+7. Liveness:
+A `{ type: 'ping' }` is answered with `{ type: 'pong' }` — the client pings an open-looking socket when the app returns to the foreground and reconnects when no pong arrives.
+8. Close behavior:
 Socket disconnect never kills the PTY: with no viewer left it keeps running (a phone may sit in the background for hours) until the process exits or a client sends `{ type: 'terminate' }` — the client does that when the user closes the tab in the panel.
-8. Several viewers:
+9. Several viewers:
 Terminal tabs are synced across a user's devices, so one PTY can have several sockets attached. Output, `auth_url` and the exit line go to all of them. The viewer that attached or typed most recently is in charge: it gets live output verbatim, the others get it flagged `replay: true` (so only one emulator answers terminal queries), and the PTY takes its size — another device attaching never resizes a shell that already has viewers. A `forceRestart` respawn keeps the other viewers attached to the new run.
 
 ## Shared Client Registry and Broadcasts

@@ -337,6 +337,13 @@ test('a second device attaching does not resize the shell; typing on a device do
   pty.emitExit();
 });
 
+test('a ping is answered with a pong', () => {
+  const { pty, first, parsed } = startStream('ping');
+  first.emit('message', JSON.stringify({ type: 'ping' }));
+  assert.deepEqual(parsed(first).at(-1), { type: 'pong' });
+  pty.emitExit();
+});
+
 test('the exit line carries the exit code as a field', () => {
   const { pty, first, parsed } = startStream('exit-code');
   pty.emitExit();

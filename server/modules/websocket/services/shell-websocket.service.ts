@@ -991,6 +991,12 @@ export function handleShellConnection(
         return;
       }
 
+      if (data.type === 'ping') {
+        // The client checks a socket that may have died while it slept.
+        sendIfOpen(ws, { type: 'pong' });
+        return;
+      }
+
       if (data.type === 'terminate') {
         // The tab was closed in the panel: end the shell for every device.
         const session = viewedSession();
