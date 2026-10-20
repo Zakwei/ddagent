@@ -368,6 +368,24 @@ void main() {
       expect(fakeWs.connectCalls, 1);
     });
 
+    test('closing a tab ends its PTY; a tab another device closed keeps it', () {
+      final container = ProviderContainer(
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
+      );
+      addTearDown(container.dispose);
+
+      final controller = container.read(terminalControllerProvider.notifier);
+      final synced = controller.createTab(projectPath: '/test/proj');
+      final closed = controller.createTab(projectPath: '/test/proj');
+      fakeWs.sent.clear();
+
+      controller.closeTab(synced.id, keepSession: true);
+      expect(fakeWs.sent, isEmpty);
+
+      controller.closeTab(closed.id);
+      expect(fakeWs.sent.single['type'], 'terminate');
+    });
+
     test('disconnectTab closes the socket; connectTab reopens it', () {
       final container = ProviderContainer(
         overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],

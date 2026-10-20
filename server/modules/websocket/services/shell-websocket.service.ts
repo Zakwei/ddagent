@@ -36,7 +36,8 @@ type PtySessionEntry = {
   /**
    * Every socket showing this PTY — the same terminal tab open on several
    * devices (tabs are synced across the user's devices). Output fans out to
-   * all of them; the kill timer starts only once the last one detaches.
+   * all of them. The PTY outlives its last viewer: only a `terminate` from a
+   * closed tab (or the process exiting) ends it.
    */
   sockets: Set<WebSocket>;
   /**
@@ -53,7 +54,6 @@ type PtySessionEntry = {
   buffer: string[];
   /** Total length of [buffer] — capped by PTY_BUFFER_MAX_CHARS. */
   bufferChars: number;
-  timeoutId: NodeJS.Timeout | null;
   projectPath: string;
   sessionId: string | null;
 };
@@ -140,8 +140,8 @@ function applyViewerSize(session: PtySessionEntry, socket: WebSocket): void {
 
 /**
  * Removes one viewer from a PTY. The next most recent viewer takes over;
- * with none left the PTY lingers for PTY_SESSION_TIMEOUT so a reconnect
- * can reattach.
+ * with none left the PTY keeps running for the next reattach — a phone may
+ * sit in the background for hours, and the tab is still open there.
  */
 function detachViewer(sessionKey: string, socket: WebSocket): void {
   const session = ptySessionsMap.get(sessionKey);
@@ -157,27 +157,10 @@ function detachViewer(sessionKey: string, socket: WebSocket): void {
       applyViewerSize(session, session.owner);
     }
   }
-  if (session.sockets.size > 0) {
-    return;
-  }
-
-  if (session.timeoutId) {
-    clearTimeout(session.timeoutId);
-  }
-  session.timeoutId = setTimeout(() => {
-    // A reconnect may win just as this timer becomes runnable. Re-check the
-    // viewers so a queued cleanup can never kill a reattached PTY.
-    if (ptySessionsMap.get(sessionKey) !== session || session.sockets.size > 0) {
-      return;
-    }
-
-    session.pty.kill();
-    ptySessionsMap.delete(sessionKey);
-  }, PTY_SESSION_TIMEOUT);
 }
+
 /** Flags every terminal-started Claude CLI gets; the account profiles in the client type the same ones. */
 const CLAUDE_TERMINAL_FLAGS = '--allow-dangerously-skip-permissions';
-const PTY_SESSION_TIMEOUT = 30 * 60 * 1000;
 const SHELL_URL_PARSE_BUFFER_LIMIT = 32768;
 // OSC (`ESC]…BEL/ST`, e.g. `\x1b]8;;\x07` hyperlinks) must come before the
 // generic Fe alternative — `]` alone would match it and leave `8;;`-style
@@ -618,9 +601,6 @@ export function handleShellConnection(
         if (isLoginCommand || forceRestart) {
           const oldSession = ptySessionsMap.get(ptySessionKey);
           if (oldSession) {
-            if (oldSession.timeoutId) {
-              clearTimeout(oldSession.timeoutId);
-            }
             carriedViewers = [...oldSession.sockets].filter(
               (socket) => socket !== ws && socket.readyState === WebSocket.OPEN
             );
@@ -632,10 +612,6 @@ export function handleShellConnection(
         const existingSession =
           isLoginCommand || forceRestart ? null : ptySessionsMap.get(ptySessionKey);
         if (existingSession) {
-          if (existingSession.timeoutId) {
-            clearTimeout(existingSession.timeoutId);
-            existingSession.timeoutId = null;
-          }
           // Re-adding moves the socket to the end: it is now the most recent viewer.
           existingSession.sockets.delete(ws);
           existingSession.sockets.add(ws);
@@ -716,7 +692,6 @@ export function handleShellConnection(
           size: initSize,
           buffer: [],
           bufferChars: 0,
-          timeoutId: null,
           projectPath,
           sessionId,
         });
@@ -809,23 +784,18 @@ export function handleShellConnection(
         });
 
         spawnedPty.onExit((exitCode) => {
+          // A terminated PTY left the map already; a new one may hold its key.
           const session = ptySessionsMap.get(sessionKey);
-          if (session && session.pty !== spawnedPty) {
+          if (!session || session.pty !== spawnedPty) {
             return;
           }
 
-          if (session) {
-            broadcastFrame(session, {
-              type: 'output',
-              data: `\r\n\x1b[33mProcess exited with code ${exitCode.exitCode}${
-                exitCode.signal != null ? ` (${exitCode.signal})` : ''
-              }\x1b[0m\r\n`,
-            });
-          }
-
-          if (session?.timeoutId) {
-            clearTimeout(session.timeoutId);
-          }
+          broadcastFrame(session, {
+            type: 'output',
+            data: `\r\n\x1b[33mProcess exited with code ${exitCode.exitCode}${
+              exitCode.signal != null ? ` (${exitCode.signal})` : ''
+            }\x1b[0m\r\n`,
+          });
 
           ptySessionsMap.delete(sessionKey);
         });
@@ -864,6 +834,16 @@ export function handleShellConnection(
             applyViewerSize(session, ws);
           }
           session.pty.write(readString(data.data));
+        }
+        return;
+      }
+
+      if (data.type === 'terminate') {
+        // The tab was closed in the panel: end the shell for every device.
+        const session = viewedSession();
+        if (session && ptySessionKey) {
+          ptySessionsMap.delete(ptySessionKey);
+          session.pty.kill();
         }
         return;
       }

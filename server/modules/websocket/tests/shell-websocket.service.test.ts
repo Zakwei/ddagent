@@ -259,6 +259,52 @@ test('one device closing leaves the PTY running for the other', () => {
   pty.emitExit();
 });
 
+test('the last device detaching leaves the PTY running for a later reattach', (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  const { pty, desktop, phone, init, lastFrame } = attachTwoViewers('detach-all');
+
+  desktop.emit('close');
+  phone.emit('close');
+  t.mock.timers.tick(24 * 60 * 60 * 1000);
+  pty.emitData('after-a-day');
+
+  assert.equal(pty.killed, false);
+  const returning = createFakeSocket();
+  handleShellConnection(returning as never, {
+    resolveProviderSessionId: () => null,
+    spawnPty: () => assert.fail('a reattach must not spawn a new PTY'),
+  });
+  returning.emit('message', init(80, 24));
+  assert.ok(returning.frames.some((frame) => frame.includes('after-a-day')));
+  assert.equal(lastFrame(returning).replay, true);
+
+  pty.emitExit();
+});
+
+test('a terminate from a closed tab kills the PTY for every device', () => {
+  const { pty, desktop, phone, init } = attachTwoViewers('terminate');
+
+  phone.emit('message', JSON.stringify({ type: 'terminate' }));
+  assert.equal(pty.killed, true);
+  pty.emitExit();
+
+  const spawned: unknown[] = [];
+  const next = createFakeSocket();
+  handleShellConnection(next as never, {
+    resolveProviderSessionId: () => null,
+    spawnPty: () => {
+      const fresh = createFakePty();
+      spawned.push(fresh);
+      return fresh as never;
+    },
+  });
+  next.emit('message', init(80, 24));
+  assert.equal(spawned.length, 1);
+  assert.equal(desktop.frames.some((frame) => frame.includes('Process exited')), false);
+
+  (spawned[0] as ReturnType<typeof createFakePty>).emitExit();
+});
+
 test('a restart keeps the other devices attached to the new run', () => {
   const { pty, desktop, phone, init, lastFrame } = attachTwoViewers('restart');
 

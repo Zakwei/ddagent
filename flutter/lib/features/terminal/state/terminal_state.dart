@@ -559,7 +559,9 @@ class TerminalController extends Notifier<TerminalState> {
   void applySyncedRow(String hostId, TerminalHostSpec row) {
     final wanted = {for (final spec in row.tabs) spec.id};
     for (final tab in state.tabsFor(hostId)) {
-      if (!tab.isCommandMode && !wanted.contains(tab.syncId)) closeTab(tab.id);
+      if (!tab.isCommandMode && !wanted.contains(tab.syncId)) {
+        closeTab(tab.id, keepSession: true);
+      }
     }
 
     final local = {
@@ -592,7 +594,7 @@ class TerminalController extends Notifier<TerminalState> {
     ];
     // A stray duplicate of a synced tab would break the slot fill below.
     for (final tab in state.tabsFor(hostId)) {
-      if (!keep.contains(tab)) closeTab(tab.id);
+      if (!keep.contains(tab)) closeTab(tab.id, keepSession: true);
     }
     final ordered = keep.iterator;
     final active = row.activeTabId == null ? null : local[row.activeTabId]?.id;
@@ -951,10 +953,14 @@ class TerminalController extends Notifier<TerminalState> {
     state = state.copyWith(activeTabIds: _withActive(tab.hostId, tabId));
   }
 
-  void closeTab(String tabId) {
+  /// Closes [tabId] and, unless [keepSession], ends its PTY on the server —
+  /// otherwise it keeps running there for a reattach. A tab dropped because
+  /// another device closed it keeps the session: that device ended it.
+  void closeTab(String tabId, {bool keepSession = false}) {
     final tab = state.tabs.where((t) => t.id == tabId).firstOrNull;
     if (tab == null) return;
 
+    if (!keepSession) tab.channel.terminate();
     _activeTabs.remove(tab);
     tab.dispose();
 

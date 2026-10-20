@@ -205,7 +205,7 @@ Keeps the newest output (at most 5000 chunks and 512 KB) for replay on reconnect
 6. URL detection:
 Strips ANSI, accumulates text buffer, extracts URLs, emits `auth_url` once per normalized URL, supports `autoOpen`.
 7. Close behavior:
-Socket disconnect does not instantly kill the PTY; once its last viewer is gone the session is kept alive for 30 minutes and then terminated.
+Socket disconnect never kills the PTY: with no viewer left it keeps running (a phone may sit in the background for hours) until the process exits or a client sends `{ type: 'terminate' }` — the client does that when the user closes the tab in the panel.
 8. Several viewers:
 Terminal tabs are synced across a user's devices, so one PTY can have several sockets attached. Output, `auth_url` and the exit line go to all of them. The viewer that attached or typed most recently is in charge: it gets live output verbatim, the others get it flagged `replay: true` (so only one emulator answers terminal queries), and the PTY takes its size — another device attaching never resizes a shell that already has viewers. A `forceRestart`/login respawn keeps the other viewers attached to the new run.
 

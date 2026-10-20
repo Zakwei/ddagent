@@ -26,12 +26,13 @@ class ShellFrame {
 
 /// `/shell` PTY channel (Task 6.5).
 ///
-/// Inbound:  init | input {data} | resize {cols, rows}
+/// Inbound:  init | input {data} | resize {cols, rows} | terminate
 /// Outbound: output {data: ANSI} | auth_url {url, autoOpen} | error {message}
 ///
 /// PTY sessions are keyed server-side by `<projectPath>_<sessionId>[_cmd_*]`;
 /// on reconnect the same key re-attaches and the server replays its output
 /// ring buffer — so [init] is re-sent automatically on every reconnect.
+/// A PTY with no socket attached keeps running; only [terminate] ends it.
 class ShellChannel {
   ShellChannel(this._ws);
 
@@ -101,6 +102,13 @@ class ShellChannel {
   void resize(int cols, int rows) {
     if (_ws.state != WsState.open) return;
     _ws.send({'type': 'resize', 'cols': cols, 'rows': rows});
+  }
+
+  /// The tab was closed: the server kills the PTY for every device. A socket
+  /// that is not open cannot carry it — that PTY outlives the tab.
+  void terminate() {
+    if (_ws.state != WsState.open) return;
+    _ws.send({'type': 'terminate'});
   }
 
   /// App back in the foreground: a socket dropped while backgrounded may sit
