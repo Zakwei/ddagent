@@ -991,6 +991,45 @@ export function classifyStepError(error: string | null | undefined): Orchestrato
 // ---------------------------
 
 // ---------------------------
+//----------------- PROCESS TREE TERMINATION ------------
+/**
+ * Ends a terminal's whole process group, not just its leader.
+ *
+ * node-pty starts every PTY child with `setsid`, so its pid is the leader of
+ * a process group holding everything the shell started (an agent CLI, its
+ * MCP servers, background jobs). Killing only the leader left those running
+ * after the user closed the tab. The group gets SIGHUP — what a closing
+ * terminal sends — and SIGKILL after `graceMs` if anything is still alive.
+ *
+ * `fallbackKill` runs when there is no usable pid (a test double, Windows,
+ * where process groups do not exist) or the group is already gone. Used by
+ * the WebSocket shell service and the PTY host daemon.
+ */
+export function killProcessGroup(
+  pid: number | undefined,
+  fallbackKill: () => void,
+  graceMs = 2000
+): void {
+  if (!pid || pid <= 0 || process.platform === 'win32') {
+    fallbackKill();
+    return;
+  }
+  try {
+    process.kill(-pid, 'SIGHUP');
+  } catch {
+    fallbackKill();
+    return;
+  }
+  setTimeout(() => {
+    try {
+      process.kill(-pid, 'SIGKILL');
+    } catch {
+      // The group exited on SIGHUP.
+    }
+  }, graceMs).unref();
+}
+
+// ---------------------------
 //----------------- CONVERSATION HISTORY PAGINATION UTILITIES ------------
 /**
  * Slices one page from the END of a chronologically ordered message list.

@@ -3,11 +3,20 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import pty, { type IPty } from 'node-pty';
+import pty from 'node-pty';
 import { WebSocket, type RawData } from 'ws';
 
+import { workspaceStateDb } from '@/modules/database/index.js';
+import {
+  connectPtyHost,
+  resolvePtyHostSocketPath,
+  type HostedPty,
+  type PtyHostClient,
+  type PtyHostSnapshot,
+} from '@/modules/pty-host/index.js';
 import {
   ENV_KEY_PATTERN,
+  killProcessGroup,
   parseIncomingJsonObject,
   powerShellArgs,
   providerChildEnv,
@@ -36,7 +45,19 @@ type ShellIncomingMessage = {
 type TerminalSize = { cols: number; rows: number };
 
 type PtySessionEntry = {
-  pty: IPty;
+  pty: HostedPty;
+  /** Held by the PTY host daemon (survives server restarts), not by this process. */
+  hosted: boolean;
+  /**
+   * A one-shot command (`_cmd_` key) or a PTY without a tab id: never in the
+   * synced tab list, so the sweep ends it after a long stretch unviewed.
+   */
+  isCommand: boolean;
+  createdAt: number;
+  /** When the last viewer left (or the entry was adopted with none); null while viewed. */
+  detachedAt: number | null;
+  /** Since when no synced tab names this PTY; null while one does. */
+  missingSince: number | null;
   /**
    * Every socket showing this PTY — the same terminal tab open on several
    * devices (tabs are synced across the user's devices). Output fans out to
@@ -74,6 +95,9 @@ type PtySessionEntry = {
 };
 
 const ptySessionsMap = new Map<string, PtySessionEntry>();
+
+/** The PTY host daemon connection, when one runs (see startShellPtyHost). */
+let ptyHost: PtyHostClient | null = null;
 
 function sendIfOpen(socket: WebSocket, frame: Record<string, unknown>): void {
   if (socket.readyState === WebSocket.OPEN) {
@@ -171,13 +195,19 @@ function sendReplayWindow(socket: WebSocket, session: PtySessionEntry, banner?: 
 
 /**
  * Sends `socket` the output it has not been sent yet. When the only gap is the
- * chunk that starts at `liveChunkStart`, it goes out live: verbatim to the
+ * chunk that starts at `liveChunkStart`, it goes out live (as `liveData`,
+ * the chunk with display rewrites applied): verbatim to the
  * owner, flagged `replay` to the other viewers (only one emulator answers
  * terminal queries). Any wider gap — a backed-up socket catching up, or a
  * reattach — is all flagged `replay`: its queries were answered by another
  * viewer or are stale by now.
  */
-function deliverOutput(session: PtySessionEntry, socket: WebSocket, liveChunkStart?: number): void {
+function deliverOutput(
+  session: PtySessionEntry,
+  socket: WebSocket,
+  liveChunkStart?: number,
+  liveData?: string
+): void {
   if (socket.readyState !== WebSocket.OPEN) {
     return;
   }
@@ -191,7 +221,7 @@ function deliverOutput(session: PtySessionEntry, socket: WebSocket, liveChunkSta
   }
 
   if (sentEnd === liveChunkStart) {
-    const data = session.buffer.at(-1)!;
+    const data = liveData ?? session.buffer.at(-1)!;
     const end = session.outputEnd;
     sendIfOpen(
       socket,
@@ -229,6 +259,20 @@ function disposeSession(session: PtySessionEntry): void {
     clearTimeout(timer);
   }
   session.catchUpTimers.clear();
+}
+
+/**
+ * Ends a PTY together with everything started in it (an agent CLI's MCP
+ * servers, background jobs) — see killProcessGroup. The daemon does the same
+ * for a PTY it holds.
+ */
+function endPty(session: PtySessionEntry): void {
+  disposeSession(session);
+  if (session.hosted) {
+    session.pty.kill();
+    return;
+  }
+  killProcessGroup(session.pty.pid, () => session.pty.kill());
 }
 
 /**
@@ -290,6 +334,284 @@ function detachViewer(sessionKey: string, socket: WebSocket): void {
       applyViewerSize(session, session.owner);
     }
   }
+  if (session.sockets.size === 0) {
+    session.detachedAt = Date.now();
+  }
+}
+
+/**
+ * Wires a PTY's output and exit to its session entry under `sessionKey`:
+ * buffering, auth-link detection, delivery to the viewers, and the exit line.
+ * Used for freshly spawned PTYs and for ones adopted from the PTY host.
+ */
+function wirePtySession(sessionKey: string, spawnedPty: HostedPty): void {
+  // Auth-link detection state lives with the PTY, not with a socket.
+  let urlDetectionBuffer = '';
+  const announcedAuthUrls = new Set<string>();
+
+  spawnedPty.onData((chunk) => {
+    // A respawned terminal leaves this handler attached to the old PTY;
+    // only the PTY that owns the current map entry may write to it.
+    const session = ptySessionsMap.get(sessionKey);
+    if (!session || session.pty !== spawnedPty) {
+      return;
+    }
+
+    // The replay window keeps the raw stream, so stream offsets agree with
+    // the PTY host's (an adopted buffer continues them); the display rewrite
+    // below only touches the live frame.
+    appendToReplayBuffer(session, chunk);
+    const outputData = chunk.replace(
+      /OPEN_URL:\s*(https?:\/\/[^\s\x1b\x07]+)/g,
+      '[INFO] Opening in browser: $1'
+    );
+
+    if (session.sockets.size > 0) {
+      const cleanChunk = stripAnsiSequences(chunk);
+      // The buffer keeps the raw stream: escape sequences split across
+      // chunks (e.g. an OSC-8 hyperlink) reassemble here and strip
+      // cleanly instead of leaking `8;id=…`/`8;;` remnants into URLs.
+      urlDetectionBuffer = `${urlDetectionBuffer}${chunk}`.slice(-SHELL_URL_PARSE_BUFFER_LIMIT);
+      const cleanDetectionBuffer = stripAnsiSequences(urlDetectionBuffer);
+
+      const emitAuthUrl = (detectedUrl: string, autoOpen = false) => {
+        const normalizedUrl = normalizeDetectedUrl(detectedUrl);
+        if (
+          !normalizedUrl ||
+          announcedAuthUrls.has(normalizedUrl) ||
+          isLoopbackUrl(normalizedUrl)
+        ) {
+          return;
+        }
+        if (!autoOpen && !isLikelyAuthUrl(normalizedUrl, cleanDetectionBuffer)) {
+          return;
+        }
+
+        // Progressive TUI renders (Ink re-draws) cut the URL mid-chunk,
+        // emitting truncated prefixes. Suppress a URL that is a prefix
+        // of an already-announced one; a longer URL extending an
+        // earlier fragment still emits so the client lands on the
+        // complete link.
+        for (const announcedUrl of announcedAuthUrls) {
+          if (announcedUrl.startsWith(normalizedUrl)) {
+            return;
+          }
+        }
+
+        announcedAuthUrls.add(normalizedUrl);
+        broadcastFrame(session, { type: 'auth_url', url: normalizedUrl, autoOpen });
+      };
+
+      // OSC-8 hyperlink targets are canonical full URLs — emit before
+      // the display-text pass so fragments can't win the client's pick.
+      for (const match of urlDetectionBuffer.matchAll(OSC8_HYPERLINK_URL_REGEX)) {
+        emitAuthUrl(match[1]);
+      }
+
+      const normalizedDetectedUrls = extractUrlsFromText(cleanDetectionBuffer)
+        .map((url) => normalizeDetectedUrl(url))
+        .filter((url): url is string => Boolean(url));
+
+      const dedupedDetectedUrls = Array.from(new Set(normalizedDetectedUrls)).filter(
+        (url, _, urls) =>
+          !urls.some((otherUrl) => otherUrl !== url && otherUrl.startsWith(url))
+      );
+
+      dedupedDetectedUrls.forEach((url) => emitAuthUrl(url, false));
+
+      if (
+        shouldAutoOpenUrlFromOutput(cleanChunk) &&
+        dedupedDetectedUrls.length > 0
+      ) {
+        const bestUrl = dedupedDetectedUrls.reduce((longest, current) =>
+          current.length > longest.length ? current : longest
+        );
+        emitAuthUrl(bestUrl, true);
+      }
+
+      const liveChunkStart = session.outputEnd - chunk.length;
+      for (const socket of session.sockets) {
+        deliverOutput(session, socket, liveChunkStart, outputData);
+      }
+    }
+  });
+
+  spawnedPty.onExit((exitCode) => {
+    // A terminated PTY left the map already; a new one may hold its key.
+    const session = ptySessionsMap.get(sessionKey);
+    if (!session || session.pty !== spawnedPty) {
+      return;
+    }
+
+    // `exitCode` is what clients act on: the text alone also shows up in
+    // a program's own output (an agent transcript quoting it).
+    broadcastFrame(session, {
+      type: 'output',
+      exitCode: exitCode.exitCode,
+      data: `\r\n\x1b[33mProcess exited with code ${exitCode.exitCode}${
+        exitCode.signal != null ? ` (${exitCode.signal})` : ''
+      }\x1b[0m\r\n`,
+    });
+
+    disposeSession(session);
+    ptySessionsMap.delete(sessionKey);
+  });
+}
+
+/** Rebuilds the session entry of a PTY the daemon kept through a server restart. */
+function adoptHostedPty(snapshot: PtyHostSnapshot, heldPty: HostedPty, now: number): void {
+  const meta = snapshot.meta;
+  const sessionKey = typeof meta.sessionKey === 'string' ? meta.sessionKey : null;
+  if (!sessionKey || ptySessionsMap.has(sessionKey)) {
+    // Not ours to show (or a stray duplicate of a key): nothing could reattach it.
+    heldPty.kill();
+    return;
+  }
+  ptySessionsMap.set(sessionKey, {
+    pty: heldPty,
+    hosted: true,
+    isCommand: meta.isCommand === true,
+    createdAt: readNumber(meta.createdAt, now),
+    detachedAt: now,
+    missingSince: null,
+    sockets: new Set(),
+    owner: null,
+    sizes: new Map(),
+    size: { cols: snapshot.cols, rows: snapshot.rows },
+    buffer: snapshot.buffer ? [snapshot.buffer] : [],
+    bufferChars: snapshot.buffer.length,
+    // The daemon id is the stream id the PTY was spawned with, and its
+    // offsets count the same raw output — clients resume without a repaint.
+    streamId: snapshot.id,
+    outputEnd: snapshot.outputEnd,
+    sentEnds: new Map(),
+    catchUpTimers: new Map(),
+    projectPath: readString(meta.projectPath),
+    sessionId: typeof meta.sessionId === 'string' ? meta.sessionId : null,
+  });
+  wirePtySession(sessionKey, heldPty);
+}
+
+/**
+ * Connects the `/shell` gateway to the PTY host daemon when one listens on
+ * `socketPath`, and adopts the terminals it kept through a server restart —
+ * with their scrollback and stream offsets. Without a daemon PTYs are spawned
+ * in this process, as before, and die with it. Resolves with the daemon
+ * connection (null without one). Used by the server entrypoint at startup,
+ * before it accepts connections.
+ */
+export async function startShellPtyHost(
+  socketPath = resolvePtyHostSocketPath()
+): Promise<PtyHostClient | null> {
+  const client = await connectPtyHost(socketPath);
+  if (!client) {
+    return null;
+  }
+  ptyHost = client;
+  client.onClose(() => {
+    if (ptyHost === client) {
+      ptyHost = null;
+    }
+  });
+  const now = Date.now();
+  const adopted = await client.adoptAll((snapshot, heldPty) => adoptHostedPty(snapshot, heldPty, now));
+  console.log(`[INFO] PTY host connected at ${socketPath}; adopted ${adopted} terminal(s)`);
+  return client;
+}
+
+// A tab's PTY exists before the client publishes the tab, and a closed tab's
+// row lingers until the next push: only a PTY unseen this long is an orphan.
+const ORPHAN_GRACE_MS = 2 * 60 * 1000;
+// One-shot commands (login, install) are not synced tabs; nobody returns to
+// one after this long without a viewer.
+const COMMAND_IDLE_MS = 30 * 60 * 1000;
+const SWEEP_INTERVAL_MS = 60 * 1000;
+
+/**
+ * The PTY session ids (`ptySessionId`, or the agent `sessionId`) of every
+ * terminal tab in the users' synced workspaces; null when no workspace was
+ * ever synced, which tells nothing about which tabs exist.
+ */
+function readSyncedTabIds(states: unknown[]): Set<string> | null {
+  if (states.length === 0) {
+    return null;
+  }
+  const ids = new Set<string>();
+  for (const state of states) {
+    const terminals = (state as { terminals?: unknown } | null)?.terminals;
+    if (!terminals || typeof terminals !== 'object') {
+      continue;
+    }
+    for (const row of Object.values(terminals)) {
+      const tabs = (row as { tabs?: unknown } | null)?.tabs;
+      for (const tab of Array.isArray(tabs) ? tabs : []) {
+        for (const id of [tab?.ptySessionId, tab?.sessionId]) {
+          if (typeof id === 'string') {
+            ids.add(id);
+          }
+        }
+      }
+    }
+  }
+  return ids;
+}
+
+/**
+ * Ends the PTYs nobody can reach any more and returns their keys. A PTY is
+ * kept while any viewer is attached. A tab's PTY ends once no synced tab
+ * names it for ORPHAN_GRACE_MS — its tab was closed while the socket that
+ * would have sent `terminate` was down, or by an older client that never
+ * sends it. A one-shot command's PTY ends after COMMAND_IDLE_MS unviewed.
+ * Exported for the sweep timer and tests.
+ */
+export function sweepOrphanedShellSessions(syncedStates: unknown[], now = Date.now()): string[] {
+  const tabIds = readSyncedTabIds(syncedStates);
+  const ended: string[] = [];
+  for (const [sessionKey, session] of ptySessionsMap) {
+    if (session.sockets.size > 0) {
+      session.missingSince = null;
+      continue;
+    }
+    let reason: string | null = null;
+    if (session.isCommand) {
+      if (session.detachedAt !== null && now - session.detachedAt >= COMMAND_IDLE_MS) {
+        reason = 'one-shot command unviewed for 30 min';
+      }
+    } else if (tabIds && !(session.sessionId && tabIds.has(session.sessionId))) {
+      if (now - session.createdAt >= ORPHAN_GRACE_MS) {
+        session.missingSince ??= now;
+        if (now - session.missingSince >= ORPHAN_GRACE_MS) {
+          reason = 'no synced tab shows it';
+        }
+      }
+    } else {
+      session.missingSince = null;
+    }
+    if (reason) {
+      console.log(`[INFO] Ending orphaned terminal ${sessionKey}: ${reason}`);
+      ptySessionsMap.delete(sessionKey);
+      endPty(session);
+      ended.push(sessionKey);
+    }
+  }
+  return ended;
+}
+
+/**
+ * Runs sweepOrphanedShellSessions every minute against the stored workspaces.
+ * The timer is unref'd so it never keeps the process alive. Used by the
+ * server entrypoint at startup.
+ */
+export function startShellSessionSweep(
+  listWorkspaceStates: () => unknown[] = () => workspaceStateDb.listStates()
+): NodeJS.Timeout {
+  return setInterval(() => {
+    try {
+      sweepOrphanedShellSessions(listWorkspaceStates());
+    } catch (error) {
+      console.error('[ERROR] Terminal sweep failed:', error);
+    }
+  }, SWEEP_INTERVAL_MS).unref();
 }
 
 /** Flags every terminal-started Claude CLI gets; the account profiles in the client type the same ones. */
@@ -735,9 +1057,8 @@ export function handleShellConnection(
             carriedViewers = [...oldSession.sockets].filter(
               (socket) => socket !== ws && socket.readyState === WebSocket.OPEN
             );
-            disposeSession(oldSession);
-            oldSession.pty.kill();
             ptySessionsMap.delete(ptySessionKey);
+            endPty(oldSession);
           }
         }
 
@@ -746,6 +1067,7 @@ export function handleShellConnection(
           // Re-adding moves the socket to the end: it is now the most recent viewer.
           existingSession.sockets.delete(ws);
           existingSession.sockets.add(ws);
+          existingSession.detachedAt = null;
           existingSession.sizes.set(ws, initSize);
           existingSession.owner = ws;
           // Only a lone viewer resizes on attach: another device opening the
@@ -797,7 +1119,7 @@ export function handleShellConnection(
           os.platform() === 'win32' ? powerShellArgs(shellCommand) : ['-c', shellCommand];
         const prioritizedPath = prioritizeUserNpmGlobalBin(process.env);
 
-        const spawnedPty = (dependencies.spawnPty ?? pty.spawn)(shell, shellArgs, {
+        const spawnOptions = {
           name: 'xterm-256color',
           cols: initSize.cols,
           rows: initSize.rows,
@@ -812,13 +1134,29 @@ export function handleShellConnection(
             // providerChildEnv also puts the running node.exe dir on a Windows PATH.
             { ...process.env, [prioritizedPath.key]: prioritizedPath.value }
           ),
-        });
-
-        // The lifecycle handlers below compare against `spawnedPty` and this
-        // key: a later init may respawn the terminal under the same key (login
-        // command / forceRestart) or move this socket to another key, and a
-        // stale handler must neither write to nor delete the NEW entry.
+        };
+        // The lifecycle handlers compare against `spawnedPty` and this key: a
+        // later init may respawn the terminal under the same key
+        // (forceRestart) or move this socket to another key, and a stale
+        // handler must neither write to nor delete the NEW entry.
         const sessionKey = ptySessionKey;
+        const streamId = randomUUID();
+        const createdAt = Date.now();
+        const isCommand = !!commandSuffix || !sessionId;
+        // With the PTY host daemon running the terminal survives a server
+        // restart; tests inject spawnPty and always stay in-process.
+        const hostClient = dependencies.spawnPty ? null : ptyHost;
+        const spawnedPty: HostedPty = hostClient
+          ? hostClient.spawn(streamId, shell, shellArgs, spawnOptions, {
+              sessionKey,
+              projectPath,
+              sessionId,
+              isCommand,
+              createdAt,
+            })
+          : (dependencies.spawnPty ?? pty.spawn)(shell, shellArgs, spawnOptions);
+
+
         const viewerSizes = new Map<WebSocket, TerminalSize>();
         for (const socket of carriedViewers) {
           viewerSizes.set(socket, initSize);
@@ -832,124 +1170,21 @@ export function handleShellConnection(
           size: initSize,
           buffer: [],
           bufferChars: 0,
-          streamId: randomUUID(),
+          streamId,
           outputEnd: 0,
           sentEnds: new Map([...carriedViewers, ws].map((socket) => [socket, 0])),
           catchUpTimers: new Map(),
           projectPath,
           sessionId,
+          hosted: !!hostClient,
+          isCommand,
+          createdAt,
+          detachedAt: null,
+          missingSince: null,
         });
 
-        // Auth-link detection state lives with the PTY, not with a socket.
-        let urlDetectionBuffer = '';
-        const announcedAuthUrls = new Set<string>();
+        wirePtySession(sessionKey, spawnedPty);
 
-        spawnedPty.onData((chunk) => {
-          // A respawned terminal leaves this handler attached to the old PTY;
-          // only the PTY that owns the current map entry may write to it.
-          const session = ptySessionsMap.get(sessionKey);
-          if (!session || session.pty !== spawnedPty) {
-            return;
-          }
-
-          // The replay window holds exactly what viewers are sent, so stream
-          // offsets mean the same on both ends.
-          const outputData = chunk.replace(
-            /OPEN_URL:\s*(https?:\/\/[^\s\x1b\x07]+)/g,
-            '[INFO] Opening in browser: $1'
-          );
-          appendToReplayBuffer(session, outputData);
-
-          if (session.sockets.size > 0) {
-            const cleanChunk = stripAnsiSequences(chunk);
-            // The buffer keeps the raw stream: escape sequences split across
-            // chunks (e.g. an OSC-8 hyperlink) reassemble here and strip
-            // cleanly instead of leaking `8;id=…`/`8;;` remnants into URLs.
-            urlDetectionBuffer = `${urlDetectionBuffer}${chunk}`.slice(-SHELL_URL_PARSE_BUFFER_LIMIT);
-            const cleanDetectionBuffer = stripAnsiSequences(urlDetectionBuffer);
-
-            const emitAuthUrl = (detectedUrl: string, autoOpen = false) => {
-              const normalizedUrl = normalizeDetectedUrl(detectedUrl);
-              if (
-                !normalizedUrl ||
-                announcedAuthUrls.has(normalizedUrl) ||
-                isLoopbackUrl(normalizedUrl)
-              ) {
-                return;
-              }
-              if (!autoOpen && !isLikelyAuthUrl(normalizedUrl, cleanDetectionBuffer)) {
-                return;
-              }
-
-              // Progressive TUI renders (Ink re-draws) cut the URL mid-chunk,
-              // emitting truncated prefixes. Suppress a URL that is a prefix
-              // of an already-announced one; a longer URL extending an
-              // earlier fragment still emits so the client lands on the
-              // complete link.
-              for (const announcedUrl of announcedAuthUrls) {
-                if (announcedUrl.startsWith(normalizedUrl)) {
-                  return;
-                }
-              }
-
-              announcedAuthUrls.add(normalizedUrl);
-              broadcastFrame(session, { type: 'auth_url', url: normalizedUrl, autoOpen });
-            };
-
-            // OSC-8 hyperlink targets are canonical full URLs — emit before
-            // the display-text pass so fragments can't win the client's pick.
-            for (const match of urlDetectionBuffer.matchAll(OSC8_HYPERLINK_URL_REGEX)) {
-              emitAuthUrl(match[1]);
-            }
-
-            const normalizedDetectedUrls = extractUrlsFromText(cleanDetectionBuffer)
-              .map((url) => normalizeDetectedUrl(url))
-              .filter((url): url is string => Boolean(url));
-
-            const dedupedDetectedUrls = Array.from(new Set(normalizedDetectedUrls)).filter(
-              (url, _, urls) =>
-                !urls.some((otherUrl) => otherUrl !== url && otherUrl.startsWith(url))
-            );
-
-            dedupedDetectedUrls.forEach((url) => emitAuthUrl(url, false));
-
-            if (
-              shouldAutoOpenUrlFromOutput(cleanChunk) &&
-              dedupedDetectedUrls.length > 0
-            ) {
-              const bestUrl = dedupedDetectedUrls.reduce((longest, current) =>
-                current.length > longest.length ? current : longest
-              );
-              emitAuthUrl(bestUrl, true);
-            }
-
-            const liveChunkStart = session.outputEnd - outputData.length;
-            for (const socket of session.sockets) {
-              deliverOutput(session, socket, liveChunkStart);
-            }
-          }
-        });
-
-        spawnedPty.onExit((exitCode) => {
-          // A terminated PTY left the map already; a new one may hold its key.
-          const session = ptySessionsMap.get(sessionKey);
-          if (!session || session.pty !== spawnedPty) {
-            return;
-          }
-
-          // `exitCode` is what clients act on: the text alone also shows up in
-          // a program's own output (an agent transcript quoting it).
-          broadcastFrame(session, {
-            type: 'output',
-            exitCode: exitCode.exitCode,
-            data: `\r\n\x1b[33mProcess exited with code ${exitCode.exitCode}${
-              exitCode.signal != null ? ` (${exitCode.signal})` : ''
-            }\x1b[0m\r\n`,
-          });
-
-          disposeSession(session);
-          ptySessionsMap.delete(sessionKey);
-        });
 
         let welcomeMsg = `\x1b[36mStarting terminal in: ${projectPath}\x1b[0m\r\n`;
         if (!isPlainShell) {
@@ -1001,9 +1236,8 @@ export function handleShellConnection(
         // The tab was closed in the panel: end the shell for every device.
         const session = viewedSession();
         if (session && ptySessionKey) {
-          disposeSession(session);
           ptySessionsMap.delete(ptySessionKey);
-          session.pty.kill();
+          endPty(session);
         }
         return;
       }

@@ -7,7 +7,7 @@ import os from 'os';
 import http from 'http';
 
 import { getErrorCode, getErrorMessage, terminalTextStyles } from '@/shared/utils.js';
-import { createWebSocketServer } from '@/modules/websocket/index.js';
+import { createWebSocketServer, startShellPtyHost, startShellSessionSweep } from '@/modules/websocket/index.js';
 
 import { getConnectableHost } from '../shared/networkHosts.js';
 
@@ -63,6 +63,11 @@ async function startServer() {
         const { app, wsDeps, appRoot, installMode, services, shutdown } = await createServices();
 
         const server = http.createServer(app);
+
+        // Terminals held by the PTY host daemon outlive this process: take
+        // them over before any client can reattach.
+        await startShellPtyHost();
+        startShellSessionSweep();
 
         // Single WebSocket server that handles chat and shell paths.
         const wss = createWebSocketServer(server, wsDeps);

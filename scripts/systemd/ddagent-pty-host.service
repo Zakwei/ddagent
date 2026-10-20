@@ -1,0 +1,32 @@
+# Keeps ddagent's terminals alive across restarts of ddagent.service.
+#
+# A unit of its own puts the PTYs outside ddagent.service's cgroup, which
+# KillMode=control-group empties on every stop. Restarting THIS unit ends
+# every terminal, so do it only to upgrade the daemon.
+#
+# Install (adjust paths/user for your host):
+#   sudo cp scripts/systemd/ddagent-pty-host.service /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now ddagent-pty-host
+#   sudo systemctl restart ddagent    # the server adopts the daemon at startup
+[Unit]
+Description=ddagent PTY host (terminals that survive ddagent restarts)
+Before=ddagent.service
+
+[Service]
+Type=simple
+User=opencode
+Group=opencode
+Environment=HOME=/home/opencode
+EnvironmentFile=-/home/opencode/.config/ddagent.env
+WorkingDirectory=/workspace/ddagent-src
+# Same node as the server: node-pty's native module is built for it. The
+# daemon loads all its code at startup, so a later server build swapping
+# dist-server/ does not affect it — only restarting this unit picks it up.
+ExecStart=/home/opencode/.nvm/versions/node/v24.20.0/bin/node /workspace/ddagent-src/dist-server/server/modules/pty-host/pty-host-daemon.js
+Restart=on-failure
+RestartSec=5
+# Stopping the daemon ends its terminals; don't let systemd SIGTERM them one by one first.
+KillMode=mixed
+
+[Install]
+WantedBy=multi-user.target

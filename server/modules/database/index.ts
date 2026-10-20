@@ -35,7 +35,8 @@ export { ORCHESTRATOR_MESSAGES_TABLE_SCHEMA_SQL, orchestratorMessagesDb } from '
 // sessionEventsDb: used by the WebSocket run registry (writes) and Providers sessions service (history merge) so error/notice rows survive reloads.
 export { sessionEventsDb } from '@/modules/database/repositories/session-events.db.js';
 export { userDb } from '@/modules/database/repositories/users.js';
-// workspaceStateDb: used by the WebSocket module's workspace-sync service to persist open panes per user across devices.
+// workspaceStateDb: used by the WebSocket module's workspace-sync service to persist open panes per user across devices,
+// and by its shell service to end PTYs whose synced terminal tab is gone.
 export { workspaceStateDb } from '@/modules/database/repositories/workspace-state.db.js';
 export type { WorkspaceStateRow } from '@/modules/database/repositories/workspace-state.db.js';
 export { vapidKeysDb } from '@/modules/database/repositories/vapid-keys.js';

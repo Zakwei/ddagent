@@ -8,3 +8,6 @@ export { chatRunRegistry } from './services/chat-run-registry.service.js';
 export { dispatchChatCommand, steerChatCommand } from './services/chat-dispatch.service.js';
 // ProviderRuntimeGateway: used by provider-accounts tests to fake the runtime.
 export type { ProviderRuntimeGateway } from './services/chat-dispatch.service.js';
+// startShellPtyHost / startShellSessionSweep: used by the server entrypoint at startup to keep
+// terminals in the PTY host daemon across restarts and to end PTYs whose tab is gone.
+export { startShellPtyHost, startShellSessionSweep } from './services/shell-websocket.service.js';

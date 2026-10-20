@@ -1,11 +1,18 @@
 import assert from 'node:assert/strict';
 import { EventEmitter } from 'node:events';
+import fs from 'node:fs';
 import os from 'node:os';
+import path from 'node:path';
 import test from 'node:test';
 
 import { WebSocket } from 'ws';
 
-import { handleShellConnection } from '@/modules/websocket/services/shell-websocket.service.js';
+import { connectPtyHost, runPtyHostDaemon } from '@/modules/pty-host/index.js';
+import {
+  handleShellConnection,
+  startShellPtyHost,
+  sweepOrphanedShellSessions,
+} from '@/modules/websocket/services/shell-websocket.service.js';
 
 function createFakeSocket() {
   const socket = new EventEmitter() as EventEmitter & {
@@ -198,7 +205,7 @@ function startStream(name: string) {
     );
   const first = attach();
   const streamId = parsed(first).find((frame) => frame.type === 'stream')!.id!;
-  return { pty, attach, parsed, first, streamId };
+  return { pty, attach, parsed, first, streamId, sessionId };
 }
 
 test('a reattach with the stream offset gets only the missed output, without a clear', () => {
@@ -904,4 +911,123 @@ test('shell output surfaces a plain URL when the surrounding text is a login pro
   ]);
 
   pty.emitExit();
+});
+
+/** One synced workspace naming the given terminal tab ids. */
+const workspaceWithTabs = (...ids: string[]) => [
+  { terminals: { route: { tabs: ids.map((id) => ({ id, ptySessionId: id, projectPath: '/p' })) } } },
+];
+
+test('the sweep ends a PTY whose tab no synced workspace shows, after a grace period', () => {
+  const { pty, first } = startStream('orphan');
+  const key = `${process.cwd()}_${'orphan'}`;
+  const now = Date.now();
+  first.emit('close');
+
+  // Too young: its tab may not be published yet.
+  assert.ok(!sweepOrphanedShellSessions(workspaceWithTabs('other'), now).some((k) => k.startsWith(key)));
+  // Missing from the first old-enough sweep on, ended once that lasts.
+  assert.ok(!sweepOrphanedShellSessions(workspaceWithTabs('other'), now + 3 * 60_000).some((k) => k.startsWith(key)));
+  assert.equal(pty.killed, false);
+  const ended = sweepOrphanedShellSessions(workspaceWithTabs('other'), now + 6 * 60_000);
+  assert.ok(ended.some((k) => k.startsWith(key)));
+  assert.equal(pty.killed, true);
+});
+
+test('the sweep keeps a PTY that is viewed, or named by a synced tab, or when nothing is synced', () => {
+  const viewed = startStream('kept-viewed');
+  const named = startStream('kept-named');
+  named.first.emit('close');
+  const now = Date.now();
+
+  for (const later of [now + 10 * 60_000, now + 20 * 60_000]) {
+    sweepOrphanedShellSessions(workspaceWithTabs(named.sessionId), later);
+  }
+  assert.equal(viewed.pty.killed, false);
+  assert.equal(named.pty.killed, false);
+
+  // No synced workspace at all says nothing about which tabs exist.
+  const unknown = startStream('kept-unsynced');
+  unknown.first.emit('close');
+  for (const later of [now + 10 * 60_000, now + 20 * 60_000]) {
+    sweepOrphanedShellSessions([], later);
+  }
+  assert.equal(unknown.pty.killed, false);
+
+  for (const { pty } of [viewed, named, unknown]) pty.emitExit();
+});
+
+test('a one-shot command PTY ends 30 minutes after its last viewer left', () => {
+  const pty = createFakePty();
+  const socket = createFakeSocket();
+  handleShellConnection(socket as never, { resolveProviderSessionId: () => null, spawnPty: () => pty as never });
+  socket.emit(
+    'message',
+    JSON.stringify({
+      type: 'init',
+      projectPath: process.cwd(),
+      sessionId: `cmd-${Date.now()}`,
+      provider: 'plain-shell',
+      isPlainShell: true,
+      initialCommand: 'npm install -g something',
+    })
+  );
+  socket.emit('close');
+  sweepOrphanedShellSessions([], Date.now() + 29 * 60_000);
+  assert.equal(pty.killed, false);
+  sweepOrphanedShellSessions([], Date.now() + 31 * 60_000);
+  assert.equal(pty.killed, true);
+});
+
+test('after a restart the gateway adopts PTYs from the host and resumes their stream', async (t) => {
+  const socketPath = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'shell-host-')), 'host.sock');
+  const held = createFakePty();
+  const daemon = runPtyHostDaemon(socketPath, (() => held) as never);
+  t.after(() => daemon.close());
+  await new Promise((resolve) => setTimeout(resolve, 30));
+
+  // The previous server process spawned this PTY and saw 'before ' of it.
+  const sessionId = `adopt-${Date.now()}`;
+  const sessionKey = `${process.cwd()}_${sessionId}`;
+  const previous = (await connectPtyHost(socketPath))!;
+  previous.spawn('run-7', 'bash', [], { name: 'xterm', cols: 80, rows: 24, cwd: '/', env: {} }, {
+    sessionKey,
+    projectPath: process.cwd(),
+    sessionId,
+    isCommand: false,
+    createdAt: Date.now(),
+  });
+  await new Promise((resolve) => setTimeout(resolve, 30));
+  held.emitData('before ');
+  previous.close();
+  held.emitData('during-restart');
+
+  const host = (await startShellPtyHost(socketPath))!;
+  t.after(() => host.close());
+
+  const socket = createFakeSocket();
+  handleShellConnection(socket as never, { resolveProviderSessionId: () => null });
+  socket.emit(
+    'message',
+    JSON.stringify({
+      type: 'init',
+      projectPath: process.cwd(),
+      sessionId,
+      provider: 'plain-shell',
+      isPlainShell: true,
+      stream: 'run-7',
+      seen: 'before '.length,
+    })
+  );
+  const frames = socket.frames.map((frame) => JSON.parse(frame) as { type: string; data?: string; id?: string });
+  assert.deepEqual(frames[0], { type: 'stream', id: 'run-7' });
+  assert.equal(
+    frames
+      .filter((frame) => frame.type === 'output')
+      .map((frame) => frame.data)
+      .join(''),
+    'during-restart'
+  );
+
+  held.emitExit();
 });
