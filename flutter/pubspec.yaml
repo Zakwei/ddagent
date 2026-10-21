@@ -78,6 +78,9 @@ dependencies:
 # is additive over 0.7.8, so forcing it satisfies both.
 dependency_overrides:
   dbus: ^0.8.0
+  # Vendored with Gboard voice typing enabled — see packages/xterm/README.md.
+  xterm:
+    path: packages/xterm
 
 dev_dependencies:
   flutter_test:
