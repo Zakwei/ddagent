@@ -177,7 +177,7 @@ class CustomTextEditState extends State<CustomTextEdit> with TextInputClient {
 
       // setEditableRect(Rect.zero, Rect.zero);
 
-      _connection!.setEditingState(_initEditingState);
+      _resetEditingState();
     }
   }
 
@@ -210,41 +210,62 @@ class CustomTextEditState extends State<CustomTextEdit> with TextInputClient {
     return null;
   }
 
+  /// Field text already sent to the terminal. ddagent: upstream reset the
+  /// field after every commit, and an app-side edit mid-dictation ends
+  /// Gboard voice typing (cut off mid-word) — so the field keeps what the IME
+  /// wrote and only the difference reaches the terminal.
+  late var _sentText = _initEditingState.text;
+
+  void _resetEditingState() {
+    _currentEditingState = _initEditingState.copyWith();
+    _sentText = _initEditingState.text;
+    _connection?.setEditingState(_initEditingState);
+  }
+
   @override
   void updateEditingValue(TextEditingValue value) {
     _currentEditingState = value;
 
     // Get input after composing is done
-    if (!_currentEditingState.composing.isCollapsed) {
-      final text = _currentEditingState.text;
-      final composingText = _currentEditingState.composing.textInside(text);
-      widget.onComposing(composingText);
+    if (!value.composing.isCollapsed) {
+      widget.onComposing(value.composing.textInside(value.text));
       return;
     }
 
     widget.onComposing(null);
 
-    if (_currentEditingState.text.length < _initEditingState.text.length) {
-      widget.onDelete();
-    } else {
-      final textDelta = _currentEditingState.text.substring(
-        _initEditingState.text.length,
-      );
-
-      widget.onInsert(textDelta);
+    final text = value.text;
+    var common = 0;
+    while (common < _sentText.length &&
+        common < text.length &&
+        _sentText.codeUnitAt(common) == text.codeUnitAt(common)) {
+      common++;
     }
+    // Never split a surrogate pair (two emoji sharing a high surrogate).
+    if (common > 0 && _isHighSurrogate(text.codeUnitAt(common - 1))) common--;
 
-    // Reset editing state if composing is done
-    if (_currentEditingState.composing.isCollapsed &&
-        _currentEditingState.text != _initEditingState.text) {
-      _connection!.setEditingState(_initEditingState);
+    // shortcut: an IME edit away from the end of the field (cursor moved
+    // inside it) is replayed as backspaces plus retyping — the terminal has
+    // no cursor in this field.
+    for (var i = _sentText.substring(common).runes.length; i > 0; i--) {
+      widget.onDelete();
+    }
+    if (common < text.length) widget.onInsert(text.substring(common));
+    _sentText = text;
+
+    // Start over once a line is done or the delete-detection padding is gone.
+    if (text.length < _initEditingState.text.length || text.contains('\n')) {
+      _resetEditingState();
     }
   }
+
+  static bool _isHighSurrogate(int unit) => unit >= 0xD800 && unit <= 0xDBFF;
 
   @override
   void performAction(TextInputAction action) {
     // print('performAction $action');
     widget.onAction(action);
+    _resetEditingState();
   }
 
   @override
