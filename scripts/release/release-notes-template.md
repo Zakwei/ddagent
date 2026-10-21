@@ -11,49 +11,37 @@
 -->
 <!-- lang:en -->
 ### Fixes
-- **Voice typing works in the terminal on Android**: Gboard's microphone was greyed out there, because the terminal asked the keyboard not to learn from input, which Gboard treats as incognito mode.
-- **The standalone terminal has a way back**: on a phone its tab strip now starts with the menu button, and on a desktop with the side menu hidden, with a button that shows it again. Before, opening it was a one-way trip.
+- **Voice typing in the terminal (Android)**: Gboard dictation no longer stops partway through the first word. The terminal cleared the keyboard's text field after every recognised fragment, which ended the voice session; it now keeps the field and sends only what changed — corrections Gboard makes to its own text arrive as the right number of backspaces.
 <!-- lang:pl -->
 ### Poprawki
-- **Pisanie głosowe działa w terminalu na Androidzie**: mikrofon Gboard był tam wyszarzony, bo terminal prosił klawiaturę, żeby nie uczyła się z wpisywanego tekstu, co Gboard traktuje jak tryb incognito.
-- **Z osobnego terminala da się wrócić**: na telefonie jego pasek kart zaczyna się teraz od przycisku menu, a na komputerze z ukrytym menu bocznym od przycisku, który je przywraca. Wcześniej wejście tam było drogą w jedną stronę.
+- **Dyktowanie w terminalu (Android)**: dyktowanie Gboard nie urywa się już w połowie pierwszego słowa. Terminal czyścił pole klawiatury po każdym rozpoznanym fragmencie, co kończyło sesję głosową; teraz zachowuje pole i wysyła tylko zmiany — poprawki, które Gboard robi we własnym tekście, docierają jako właściwa liczba Backspace’ów.
 <!-- lang:de -->
 ### Fehlerbehebungen
-- **Spracheingabe funktioniert im Terminal unter Android**: Das Mikrofon von Gboard war dort ausgegraut, weil das Terminal die Tastatur bat, nicht aus der Eingabe zu lernen – was Gboard als Inkognito-Modus behandelt.
-- **Aus dem eigenständigen Terminal geht es wieder zurück**: Auf dem Handy beginnt seine Tab-Leiste jetzt mit der Menü-Schaltfläche, auf dem Desktop bei ausgeblendetem Seitenmenü mit einer Schaltfläche, die es wieder einblendet. Bisher war es eine Einbahnstraße.
+- **Spracheingabe im Terminal (Android)**: Das Gboard-Diktat bricht nicht mehr mitten im ersten Wort ab. Das Terminal leerte das Tastaturfeld nach jedem erkannten Fragment, was die Spracheingabe beendete; jetzt bleibt das Feld erhalten und nur Änderungen werden gesendet — Korrekturen, die Gboard an seinem eigenen Text vornimmt, kommen als passende Anzahl Rücktasten an.
 <!-- lang:es -->
 ### Correcciones
-- **El dictado por voz funciona en el terminal en Android**: el micrófono de Gboard aparecía desactivado ahí, porque el terminal pedía al teclado que no aprendiera de lo escrito, algo que Gboard trata como modo incógnito.
-- **Del terminal independiente se puede volver**: en el móvil su barra de pestañas empieza ahora con el botón de menú y, en el escritorio con el menú lateral oculto, con un botón que lo vuelve a mostrar. Antes entrar era un camino sin vuelta.
+- **Dictado por voz en el terminal (Android)**: el dictado de Gboard ya no se corta a mitad de la primera palabra. El terminal vaciaba el campo del teclado tras cada fragmento reconocido, lo que terminaba la sesión de voz; ahora conserva el campo y envía solo los cambios — las correcciones que Gboard hace en su propio texto llegan como el número correcto de retrocesos.
 <!-- lang:fr -->
 ### Corrections
-- **La saisie vocale fonctionne dans le terminal sous Android** : le micro de Gboard y était grisé, car le terminal demandait au clavier de ne pas apprendre de la saisie, ce que Gboard traite comme le mode navigation privée.
-- **On peut ressortir du terminal autonome** : sur téléphone, sa barre d'onglets commence désormais par le bouton de menu, et sur ordinateur avec le menu latéral masqué, par un bouton qui le réaffiche. Avant, y entrer était un aller simple.
+- **Saisie vocale dans le terminal (Android)** : la dictée Gboard ne s'arrête plus au milieu du premier mot. Le terminal vidait le champ du clavier après chaque fragment reconnu, ce qui mettait fin à la saisie vocale ; il conserve désormais le champ et n'envoie que les changements — les corrections que Gboard apporte à son propre texte arrivent sous forme du bon nombre de retours arrière.
 <!-- lang:it -->
 ### Correzioni
-- **La digitazione vocale funziona nel terminale su Android**: lì il microfono di Gboard era disattivato, perché il terminale chiedeva alla tastiera di non imparare dall'input, cosa che Gboard tratta come modalità in incognito.
-- **Dal terminale autonomo si può tornare indietro**: sul telefono la sua barra delle schede ora inizia con il pulsante del menu e, sul desktop con il menu laterale nascosto, con un pulsante che lo mostra di nuovo. Prima entrarci era una strada senza ritorno.
+- **Dettatura nel terminale (Android)**: la dettatura di Gboard non si interrompe più a metà della prima parola. Il terminale svuotava il campo della tastiera dopo ogni frammento riconosciuto, chiudendo la sessione vocale; ora mantiene il campo e invia solo le modifiche — le correzioni che Gboard fa al proprio testo arrivano come il giusto numero di Backspace.
 <!-- lang:ja -->
 ### 修正
-- **Android のターミナルで音声入力が使えるようになりました**：ターミナルがキーボードに入力内容を学習しないよう求めており、Gboard はこれをシークレットモードとして扱うため、マイクがグレー表示になっていました。
-- **独立したターミナルから戻れるようになりました**：スマホではタブバーの先頭にメニューボタンが、デスクトップでサイドメニューを隠しているときはそれを再表示するボタンが表示されます。以前は一度開くと戻れませんでした。
+- **ターミナルでの音声入力（Android）**：Gboard の音声入力が最初の単語の途中で止まらなくなりました。ターミナルが認識された断片ごとにキーボードの入力欄を消去しており、それが音声セッションを終了させていました。現在は入力欄を保持して変更分だけを送信し、Gboard による自身のテキストの修正は正しい数の Backspace として届きます。
 <!-- lang:ko -->
 ### 수정
-- **Android 터미널에서 음성 입력이 됩니다**: 터미널이 키보드에 입력 내용을 학습하지 말라고 요청했고, Gboard는 이를 시크릿 모드로 처리해 마이크가 비활성화되어 있었습니다.
-- **독립 터미널에서 돌아갈 수 있습니다**: 휴대폰에서는 탭 표시줄 맨 앞에 메뉴 버튼이, 데스크톱에서 사이드 메뉴를 숨긴 경우에는 다시 표시하는 버튼이 있습니다. 이전에는 한 번 들어가면 돌아갈 수 없었습니다.
+- **터미널 음성 입력(Android)**: Gboard 음성 입력이 더 이상 첫 단어 중간에 끊기지 않습니다. 터미널이 인식된 조각마다 키보드 입력란을 비워 음성 세션이 종료되었습니다. 이제 입력란을 유지하고 바뀐 부분만 보내며, Gboard가 자신의 텍스트를 고치면 올바른 개수의 Backspace로 전달됩니다.
 <!-- lang:ru -->
 ### Исправления
-- **Голосовой ввод работает в терминале на Android**: микрофон Gboard был там неактивен, потому что терминал просил клавиатуру не обучаться на вводе, а Gboard считает это режимом инкогнито.
-- **Из отдельного терминала можно вернуться**: на телефоне его панель вкладок теперь начинается с кнопки меню, а на компьютере со скрытым боковым меню — с кнопки, которая показывает его снова. Раньше войти туда было дорогой в один конец.
+- **Голосовой ввод в терминале (Android)**: диктовка Gboard больше не обрывается посреди первого слова. Терминал очищал поле клавиатуры после каждого распознанного фрагмента, и это завершало голосовой сеанс; теперь поле сохраняется, а отправляются только изменения — исправления, которые Gboard вносит в свой текст, приходят нужным числом Backspace.
 <!-- lang:tr -->
 ### Düzeltmeler
-- **Android'de terminalde sesle yazma çalışıyor**: terminal klavyeden girdiden öğrenmemesini istiyordu; Gboard bunu gizli mod olarak ele aldığı için mikrofon orada gri görünüyordu.
-- **Bağımsız terminalden geri dönülebiliyor**: telefonda sekme çubuğu artık menü düğmesiyle, masaüstünde yan menü gizliyken onu yeniden gösteren bir düğmeyle başlıyor. Önceden oraya girmek tek yönlü bir yoldu.
+- **Terminalde sesle yazma (Android)**: Gboard dikte artık ilk kelimenin ortasında kesilmiyor. Terminal, tanınan her parçadan sonra klavye alanını temizliyordu ve bu ses oturumunu sonlandırıyordu; artık alan korunuyor ve yalnızca değişiklikler gönderiliyor — Gboard'un kendi metninde yaptığı düzeltmeler doğru sayıda Backspace olarak ulaşıyor.
 <!-- lang:zh-CN -->
 ### 修复
-- **Android 终端中可以使用语音输入了**：终端要求键盘不要从输入中学习，Gboard 会将其视为无痕模式，因此麦克风显示为灰色。
-- **可以从独立终端返回了**：在手机上，其标签栏开头现在有菜单按钮；在桌面端隐藏侧边菜单时，开头会有重新显示它的按钮。以前一旦进入就无法返回。
+- **终端语音输入（Android）**：Gboard 语音输入不再在第一个词中途中断。终端此前在每个识别出的片段之后清空键盘输入框，从而结束了语音会话；现在保留输入框，只发送变化的部分——Gboard 对自身文字的修改会以正确数量的退格键送达。
 <!-- lang:zh-TW -->
 ### 修正
-- **Android 終端機中可以使用語音輸入了**：終端機要求鍵盤不要從輸入中學習，Gboard 會將其視為無痕模式，因此麥克風呈灰色。
-- **可以從獨立終端機返回了**：在手機上，其分頁列開頭現在有選單按鈕；在桌面端隱藏側邊選單時，開頭會有重新顯示它的按鈕。以前一旦進入就無法返回。
+- **終端機語音輸入（Android）**：Gboard 語音輸入不再在第一個詞中途中斷。終端機先前在每個辨識出的片段之後清空鍵盤輸入框，因而結束了語音工作階段；現在保留輸入框，只傳送變更的部分——Gboard 對自身文字的修改會以正確數量的退格鍵送達。
