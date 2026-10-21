@@ -1,10 +1,13 @@
 import 'dart:async';
 
+import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/theme/typography.dart';
+import 'package:ddagent_app/core/widgets/app_nav_menu.dart';
 import 'package:ddagent_app/features/projects/data/projects_repository.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/provider_accounts/state/provider_accounts_controller.dart';
+import 'package:ddagent_app/features/settings/state/ui_preferences_controller.dart';
 import 'package:ddagent_app/features/system/state/system_providers.dart';
 import 'package:ddagent_app/features/terminal/state/terminal_account_profiles.dart';
 import 'package:ddagent_app/features/terminal/state/terminal_state.dart';
@@ -490,6 +493,21 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
                 onNewTab: _newDefaultTab,
                 menuController: _menuController,
                 menuChildren: _buildMenu(context, terminalState, activeTab),
+                // The standalone terminal has no header of its own: without
+                // these a phone (drawer) or a hidden rail (focus mode) left no
+                // way back to the rest of the app.
+                leading: [
+                  if (widget.hostId == terminalRouteHost && widget.syncTabs) ...[
+                    const AppNavMenuButton(),
+                    if (!context.breakpoint.isCompact &&
+                        !ref.watch(uiPreferencesProvider).sidebarVisible)
+                      TerminalStripAction(
+                        tooltip: t.chat.splitWorkspace.focusMode,
+                        icon: LucideIcons.panelLeftOpen,
+                        onPressed: () => ref.read(uiPreferencesProvider.notifier).toggleSidebar(),
+                      ),
+                  ],
+                ],
                 trailing: [
                   // Panes and the standalone terminal only — the login
                   // dialog runs in a fixed directory.

@@ -30,6 +30,7 @@ class TerminalTabStrip extends StatelessWidget {
     required this.onNewTab,
     required this.menuController,
     required this.menuChildren,
+    this.leading = const [],
     this.trailing = const [],
   });
 
@@ -51,6 +52,10 @@ class TerminalTabStrip extends StatelessWidget {
   final MenuController menuController;
   final List<Widget> menuChildren;
 
+  /// Widgets pinned at the far left — the standalone terminal's way back to
+  /// the app navigation.
+  final List<Widget> leading;
+
   /// Compact icon buttons pinned at the far right (find, key bar toggle).
   final List<Widget> trailing;
 
@@ -71,6 +76,7 @@ class TerminalTabStrip extends StatelessWidget {
       color: palette.tabStrip,
       child: Row(
         children: [
+          ...leading,
           Expanded(
             child: LayoutBuilder(
               builder: (context, constraints) {
