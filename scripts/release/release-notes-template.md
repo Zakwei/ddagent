@@ -10,50 +10,50 @@
   fallback. All 12 UI locales are below.
 -->
 <!-- lang:en -->
-### New
-- **Choose a terminal's project**: the terminal's tab strip shows the active tab's project; pick another one from it to open a new tab there. The pane remembers it for its next tabs (synced across devices). Before, a new terminal pane took the last used project and it could not be changed.
-- **A terminal outside the panes**: a Terminal entry in the side menu and in the command palette (Ctrl+K) opens a full-screen terminal of its own, like a session opened from Sessions.
+### Fixes
+- **Voice typing works in the terminal on Android**: Gboard's microphone was greyed out there, because the terminal asked the keyboard not to learn from input, which Gboard treats as incognito mode.
+- **The standalone terminal has a way back**: on a phone its tab strip now starts with the menu button, and on a desktop with the side menu hidden, with a button that shows it again. Before, opening it was a one-way trip.
 <!-- lang:pl -->
-### Nowości
-- **Wybór projektu terminala**: pasek kart terminala pokazuje projekt aktywnej karty; wybierz z niego inny, aby otworzyć w nim nową kartę. Panel zapamiętuje go dla kolejnych kart (synchronizowane między urządzeniami). Wcześniej nowy panel terminala dostawał ostatnio używany projekt i nie dało się go zmienić.
-- **Terminal poza panelami**: wpis Terminal w menu bocznym i w palecie komend (Ctrl+K) otwiera osobny terminal na całym ekranie, tak jak sesję otwartą z listy Sesji.
+### Poprawki
+- **Pisanie głosowe działa w terminalu na Androidzie**: mikrofon Gboard był tam wyszarzony, bo terminal prosił klawiaturę, żeby nie uczyła się z wpisywanego tekstu, co Gboard traktuje jak tryb incognito.
+- **Z osobnego terminala da się wrócić**: na telefonie jego pasek kart zaczyna się teraz od przycisku menu, a na komputerze z ukrytym menu bocznym od przycisku, który je przywraca. Wcześniej wejście tam było drogą w jedną stronę.
 <!-- lang:de -->
-### Neu
-- **Projekt eines Terminals wählen**: Die Tab-Leiste des Terminals zeigt das Projekt des aktiven Tabs; wähle dort ein anderes, um darin einen neuen Tab zu öffnen. Der Bereich merkt es sich für seine nächsten Tabs (geräteübergreifend synchronisiert). Bisher übernahm ein neuer Terminal-Bereich das zuletzt verwendete Projekt, und es ließ sich nicht ändern.
-- **Ein Terminal außerhalb der Bereiche**: Ein Eintrag „Terminal“ im Seitenmenü und in der Befehlspalette (Strg+K) öffnet ein eigenes Vollbild-Terminal, wie eine aus „Sitzungen“ geöffnete Sitzung.
+### Fehlerbehebungen
+- **Spracheingabe funktioniert im Terminal unter Android**: Das Mikrofon von Gboard war dort ausgegraut, weil das Terminal die Tastatur bat, nicht aus der Eingabe zu lernen – was Gboard als Inkognito-Modus behandelt.
+- **Aus dem eigenständigen Terminal geht es wieder zurück**: Auf dem Handy beginnt seine Tab-Leiste jetzt mit der Menü-Schaltfläche, auf dem Desktop bei ausgeblendetem Seitenmenü mit einer Schaltfläche, die es wieder einblendet. Bisher war es eine Einbahnstraße.
 <!-- lang:es -->
-### Novedades
-- **Elige el proyecto de un terminal**: la barra de pestañas del terminal muestra el proyecto de la pestaña activa; elige otro ahí para abrir una pestaña nueva en él. El panel lo recuerda para sus siguientes pestañas (sincronizado entre dispositivos). Antes, un panel de terminal nuevo tomaba el último proyecto usado y no se podía cambiar.
-- **Un terminal fuera de los paneles**: una entrada Terminal en el menú lateral y en la paleta de comandos (Ctrl+K) abre un terminal propio a pantalla completa, como una sesión abierta desde Sesiones.
+### Correcciones
+- **El dictado por voz funciona en el terminal en Android**: el micrófono de Gboard aparecía desactivado ahí, porque el terminal pedía al teclado que no aprendiera de lo escrito, algo que Gboard trata como modo incógnito.
+- **Del terminal independiente se puede volver**: en el móvil su barra de pestañas empieza ahora con el botón de menú y, en el escritorio con el menú lateral oculto, con un botón que lo vuelve a mostrar. Antes entrar era un camino sin vuelta.
 <!-- lang:fr -->
-### Nouveautés
-- **Choisir le projet d'un terminal** : la barre d'onglets du terminal affiche le projet de l'onglet actif ; choisissez-en un autre pour y ouvrir un nouvel onglet. Le panneau le retient pour ses prochains onglets (synchronisé entre appareils). Avant, un nouveau panneau de terminal prenait le dernier projet utilisé et on ne pouvait pas le changer.
-- **Un terminal hors des panneaux** : une entrée Terminal dans le menu latéral et dans la palette de commandes (Ctrl+K) ouvre un terminal plein écran à part, comme une session ouverte depuis Sessions.
+### Corrections
+- **La saisie vocale fonctionne dans le terminal sous Android** : le micro de Gboard y était grisé, car le terminal demandait au clavier de ne pas apprendre de la saisie, ce que Gboard traite comme le mode navigation privée.
+- **On peut ressortir du terminal autonome** : sur téléphone, sa barre d'onglets commence désormais par le bouton de menu, et sur ordinateur avec le menu latéral masqué, par un bouton qui le réaffiche. Avant, y entrer était un aller simple.
 <!-- lang:it -->
-### Novità
-- **Scegli il progetto di un terminale**: la barra delle schede del terminale mostra il progetto della scheda attiva; scegline un altro per aprirvi una nuova scheda. Il riquadro lo ricorda per le schede successive (sincronizzato tra dispositivi). Prima un nuovo riquadro del terminale prendeva l'ultimo progetto usato e non si poteva cambiare.
-- **Un terminale fuori dai riquadri**: la voce Terminale nel menu laterale e nella palette dei comandi (Ctrl+K) apre un terminale a schermo intero a sé, come una sessione aperta da Sessioni.
+### Correzioni
+- **La digitazione vocale funziona nel terminale su Android**: lì il microfono di Gboard era disattivato, perché il terminale chiedeva alla tastiera di non imparare dall'input, cosa che Gboard tratta come modalità in incognito.
+- **Dal terminale autonomo si può tornare indietro**: sul telefono la sua barra delle schede ora inizia con il pulsante del menu e, sul desktop con il menu laterale nascosto, con un pulsante che lo mostra di nuovo. Prima entrarci era una strada senza ritorno.
 <!-- lang:ja -->
-### 新機能
-- **ターミナルのプロジェクトを選べるようになりました**：ターミナルのタブバーにアクティブなタブのプロジェクトが表示され、別のプロジェクトを選ぶとそこに新しいタブが開きます。ペインは次のタブのためにそれを記憶します（デバイス間で同期）。以前は新しいターミナルペインが最後に使ったプロジェクトになり、変更できませんでした。
-- **ペインの外でターミナルを開けます**：サイドメニューとコマンドパレット（Ctrl+K）の「ターミナル」から、セッション一覧から開いたセッションのように独立した全画面ターミナルを開けます。
+### 修正
+- **Android のターミナルで音声入力が使えるようになりました**：ターミナルがキーボードに入力内容を学習しないよう求めており、Gboard はこれをシークレットモードとして扱うため、マイクがグレー表示になっていました。
+- **独立したターミナルから戻れるようになりました**：スマホではタブバーの先頭にメニューボタンが、デスクトップでサイドメニューを隠しているときはそれを再表示するボタンが表示されます。以前は一度開くと戻れませんでした。
 <!-- lang:ko -->
-### 새 기능
-- **터미널의 프로젝트 선택**: 터미널 탭 표시줄에 활성 탭의 프로젝트가 표시되며, 여기서 다른 프로젝트를 고르면 그 프로젝트에 새 탭이 열립니다. 창은 다음 탭을 위해 이를 기억합니다(기기 간 동기화). 이전에는 새 터미널 창이 마지막으로 사용한 프로젝트로 고정되어 바꿀 수 없었습니다.
-- **창 밖의 터미널**: 사이드 메뉴와 명령 팔레트(Ctrl+K)의 터미널 항목으로, 세션 목록에서 연 세션처럼 별도의 전체 화면 터미널을 엽니다.
+### 수정
+- **Android 터미널에서 음성 입력이 됩니다**: 터미널이 키보드에 입력 내용을 학습하지 말라고 요청했고, Gboard는 이를 시크릿 모드로 처리해 마이크가 비활성화되어 있었습니다.
+- **독립 터미널에서 돌아갈 수 있습니다**: 휴대폰에서는 탭 표시줄 맨 앞에 메뉴 버튼이, 데스크톱에서 사이드 메뉴를 숨긴 경우에는 다시 표시하는 버튼이 있습니다. 이전에는 한 번 들어가면 돌아갈 수 없었습니다.
 <!-- lang:ru -->
-### Новое
-- **Выбор проекта терминала**: на панели вкладок терминала показан проект активной вкладки; выберите там другой, чтобы открыть в нём новую вкладку. Панель запоминает его для следующих вкладок (синхронизируется между устройствами). Раньше новая панель терминала получала последний использованный проект, и изменить его было нельзя.
-- **Терминал вне панелей**: пункт «Терминал» в боковом меню и в палитре команд (Ctrl+K) открывает отдельный полноэкранный терминал, как сеанс, открытый из списка сеансов.
+### Исправления
+- **Голосовой ввод работает в терминале на Android**: микрофон Gboard был там неактивен, потому что терминал просил клавиатуру не обучаться на вводе, а Gboard считает это режимом инкогнито.
+- **Из отдельного терминала можно вернуться**: на телефоне его панель вкладок теперь начинается с кнопки меню, а на компьютере со скрытым боковым меню — с кнопки, которая показывает его снова. Раньше войти туда было дорогой в один конец.
 <!-- lang:tr -->
-### Yenilikler
-- **Bir terminalin projesini seçin**: terminalin sekme çubuğu etkin sekmenin projesini gösterir; orada başka bir proje seçerek içinde yeni bir sekme açın. Bölme bunu sonraki sekmeleri için hatırlar (cihazlar arasında eşitlenir). Önceden yeni bir terminal bölmesi son kullanılan projeyi alıyordu ve değiştirilemiyordu.
-- **Bölmelerin dışında bir terminal**: yan menüdeki ve komut paletindeki (Ctrl+K) Terminal girişi, Oturumlar'dan açılan bir oturum gibi ayrı, tam ekran bir terminal açar.
+### Düzeltmeler
+- **Android'de terminalde sesle yazma çalışıyor**: terminal klavyeden girdiden öğrenmemesini istiyordu; Gboard bunu gizli mod olarak ele aldığı için mikrofon orada gri görünüyordu.
+- **Bağımsız terminalden geri dönülebiliyor**: telefonda sekme çubuğu artık menü düğmesiyle, masaüstünde yan menü gizliyken onu yeniden gösteren bir düğmeyle başlıyor. Önceden oraya girmek tek yönlü bir yoldu.
 <!-- lang:zh-CN -->
-### 新功能
-- **选择终端的项目**：终端的标签栏会显示当前标签页的项目；在这里选择其他项目即可在其中打开新标签页。面板会为之后的标签页记住它（在设备间同步）。以前新的终端面板会沿用上次使用的项目，且无法更改。
-- **面板之外的终端**：侧边菜单和命令面板（Ctrl+K）中的“终端”入口会打开一个独立的全屏终端，就像从会话列表打开的会话一样。
+### 修复
+- **Android 终端中可以使用语音输入了**：终端要求键盘不要从输入中学习，Gboard 会将其视为无痕模式，因此麦克风显示为灰色。
+- **可以从独立终端返回了**：在手机上，其标签栏开头现在有菜单按钮；在桌面端隐藏侧边菜单时，开头会有重新显示它的按钮。以前一旦进入就无法返回。
 <!-- lang:zh-TW -->
-### 新功能
-- **選擇終端機的專案**：終端機的分頁列會顯示目前分頁的專案；在這裡選擇其他專案即可在其中開啟新分頁。窗格會為之後的分頁記住它（在裝置間同步）。以前新的終端機窗格會沿用上次使用的專案，且無法變更。
-- **窗格之外的終端機**：側邊選單和命令面板（Ctrl+K）中的「終端機」項目會開啟一個獨立的全螢幕終端機，就像從工作階段清單開啟的工作階段一樣。
+### 修正
+- **Android 終端機中可以使用語音輸入了**：終端機要求鍵盤不要從輸入中學習，Gboard 會將其視為無痕模式，因此麥克風呈灰色。
+- **可以從獨立終端機返回了**：在手機上，其分頁列開頭現在有選單按鈕；在桌面端隱藏側邊選單時，開頭會有重新顯示它的按鈕。以前一旦進入就無法返回。
