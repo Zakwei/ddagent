@@ -44,6 +44,14 @@ type ShellIncomingMessage = {
 
 type TerminalSize = { cols: number; rows: number };
 
+/**
+ * Terminal state a program sets once and the replay window loses when that
+ * output is evicted: the window title (OSC 0/2 — Claude Code's session name)
+ * and each DEC private mode's last `h`/`l` (mouse tracking, alt screen,
+ * bracketed paste…). `tail` holds an escape sequence cut off by a chunk end.
+ */
+type TerminalReplayState = { title: string | null; modes: Map<number, boolean>; tail: string };
+
 type PtySessionEntry = {
   pty: HostedPty;
   /** Held by the PTY host daemon (survives server restarts), not by this process. */
@@ -79,6 +87,8 @@ type PtySessionEntry = {
   buffer: string[];
   /** Total length of [buffer] — capped by PTY_BUFFER_MAX_CHARS. */
   bufferChars: number;
+  /** Restored ahead of a full replay, whose window may start after it was set. */
+  replayState: TerminalReplayState;
   /**
    * Identifies this run's output. Offsets are comparable only within one
    * stream: a respawn under the same key starts a new one.
@@ -135,6 +145,51 @@ function appendToReplayBuffer(session: PtySessionEntry, chunk: string): void {
   }
 }
 
+// A title (OSC 0/2), a DEC private mode set/reset, or a full reset (RIS).
+const TERMINAL_STATE_SEQUENCE = /\x1b\][02];([^\x07\x1b]*)(?:\x07|\x1b\\)|\x1b\[\?([\d;]+)([hl])|\x1bc/g;
+// An OSC or CSI cut off by the end of a chunk — rescanned with the next one.
+const TERMINAL_STATE_TAIL = /\x1b(?:\][^\x07\x1b]*|\[\??[\d;]*)?$/;
+const TERMINAL_STATE_TAIL_MAX_CHARS = 4096;
+
+function createTerminalReplayState(): TerminalReplayState {
+  return { title: null, modes: new Map(), tail: '' };
+}
+
+/** Records the title and private modes `chunk` sets, in stream order. */
+function trackTerminalState(state: TerminalReplayState, chunk: string): void {
+  const text = state.tail + chunk;
+  for (const match of text.matchAll(TERMINAL_STATE_SEQUENCE)) {
+    if (match[1] !== undefined) {
+      state.title = match[1];
+    } else if (match[2] !== undefined) {
+      for (const mode of match[2].split(';')) {
+        if (mode) {
+          // Re-inserted so the preamble replays modes in the order last set.
+          state.modes.delete(Number(mode));
+          state.modes.set(Number(mode), match[3] === 'h');
+        }
+      }
+    } else {
+      state.modes.clear();
+    }
+  }
+  const tail = TERMINAL_STATE_TAIL.exec(text)?.[0] ?? '';
+  state.tail = tail.length <= TERMINAL_STATE_TAIL_MAX_CHARS ? tail : '';
+}
+
+/**
+ * The sequences that put a blank emulator into the tracked state. Sent before
+ * the window, so every mode ends at its last value: a later change inside
+ * the window is replayed over it.
+ */
+function terminalStatePreamble(state: TerminalReplayState): string {
+  let preamble = state.title === null ? '' : `\x1b]2;${state.title}\x07`;
+  for (const [mode, enabled] of state.modes) {
+    preamble += `\x1b[?${mode}${enabled ? 'h' : 'l'}`;
+  }
+  return preamble;
+}
+
 /** Stream offset of the oldest output still in the replay window. */
 function bufferStart(session: PtySessionEntry): number {
   return session.outputEnd - session.bufferChars;
@@ -183,7 +238,11 @@ function bufferedFramesSince(
  * shell as typed input.
  */
 function sendReplayWindow(socket: WebSocket, session: PtySessionEntry, banner?: string): void {
-  sendIfOpen(socket, { type: 'output', data: REPLAY_CLEAR_SEQUENCE, replay: true });
+  sendIfOpen(socket, {
+    type: 'output',
+    data: REPLAY_CLEAR_SEQUENCE + terminalStatePreamble(session.replayState),
+    replay: true,
+  });
   if (banner) {
     sendIfOpen(socket, { type: 'output', data: banner });
   }
@@ -361,6 +420,7 @@ function wirePtySession(sessionKey: string, spawnedPty: HostedPty): void {
     // the PTY host's (an adopted buffer continues them); the display rewrite
     // below only touches the live frame.
     appendToReplayBuffer(session, chunk);
+    trackTerminalState(session.replayState, chunk);
     const outputData = chunk.replace(
       /OPEN_URL:\s*(https?:\/\/[^\s\x1b\x07]+)/g,
       '[INFO] Opening in browser: $1'
@@ -467,6 +527,9 @@ function adoptHostedPty(snapshot: PtyHostSnapshot, heldPty: HostedPty, now: numb
     heldPty.kill();
     return;
   }
+  // Only what the daemon's window still holds — older state is gone.
+  const replayState = createTerminalReplayState();
+  trackTerminalState(replayState, snapshot.buffer);
   ptySessionsMap.set(sessionKey, {
     pty: heldPty,
     hosted: true,
@@ -480,6 +543,7 @@ function adoptHostedPty(snapshot: PtyHostSnapshot, heldPty: HostedPty, now: numb
     size: { cols: snapshot.cols, rows: snapshot.rows },
     buffer: snapshot.buffer ? [snapshot.buffer] : [],
     bufferChars: snapshot.buffer.length,
+    replayState,
     // The daemon id is the stream id the PTY was spawned with, and its
     // offsets count the same raw output — clients resume without a repaint.
     streamId: snapshot.id,
@@ -1170,6 +1234,7 @@ export function handleShellConnection(
           size: initSize,
           buffer: [],
           bufferChars: 0,
+          replayState: createTerminalReplayState(),
           streamId,
           outputEnd: 0,
           sentEnds: new Map([...carriedViewers, ws].map((socket) => [socket, 0])),

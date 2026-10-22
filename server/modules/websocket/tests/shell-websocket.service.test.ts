@@ -175,6 +175,48 @@ test('a reattach replays a bounded window in a few frames, after a clear', () =>
   pty.emitExit();
 });
 
+test('a full replay restores the title and modes set before its window', () => {
+  const pty = createFakePty();
+  const dependencies = {
+    resolveProviderSessionId: () => null,
+    spawnPty: () => pty as never,
+  };
+  const initMessage = JSON.stringify({
+    type: 'init',
+    projectPath: process.cwd(),
+    sessionId: `replay-state-${Date.now()}`,
+    hasSession: false,
+    provider: 'plain-shell',
+    isPlainShell: true,
+  });
+
+  const firstSocket = createFakeSocket();
+  handleShellConnection(firstSocket as never, dependencies);
+  firstSocket.emit('message', initMessage);
+  // Claude Code at startup: session title, mouse tracking, bracketed paste —
+  // the mode list split across two chunks.
+  pty.emitData('\x1b]0;My session\x07\x1b[?1000;10');
+  pty.emitData('06h\x1b[?2004h\x1b[?2004l');
+  for (let i = 0; i < 256; i++) {
+    pty.emitData('.'.repeat(4096));
+  }
+
+  const replacementSocket = createFakeSocket();
+  handleShellConnection(replacementSocket as never, dependencies);
+  replacementSocket.emit('message', initMessage);
+  const first = replacementSocket.frames
+    .map((frame) => JSON.parse(frame) as { type: string; data: string; replay?: boolean })
+    .find((frame) => frame.type === 'output');
+
+  assert.deepEqual(first, {
+    type: 'output',
+    data: '\x1b[2J\x1b[3J\x1b[H\x1b]2;My session\x07\x1b[?1000h\x1b[?1006h\x1b[?2004l',
+    replay: true,
+  });
+
+  pty.emitExit();
+});
+
 /** One plain-shell PTY with a first viewer attached; `attach` adds another socket. */
 function startStream(name: string) {
   const pty = createFakePty();
