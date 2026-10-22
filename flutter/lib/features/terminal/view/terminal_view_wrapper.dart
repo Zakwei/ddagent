@@ -21,6 +21,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:pasteboard/pasteboard.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -362,6 +363,24 @@ class TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
     }
   }
 
+  /// Phone screenshots never reach the clipboard [paste] reads — pick them
+  /// from the gallery and paste their server paths, space-separated.
+  Future<void> pickImages() async {
+    final List<XFile> picked;
+    try {
+      picked = await ImagePicker().pickMultiImage();
+    } on Object catch (e) {
+      if (mounted) {
+        AppToast.error(context, Translations.of(context).chat.input.pasteFailed(error: '$e'));
+      }
+      return;
+    }
+    for (final (i, image) in picked.indexed) {
+      if (i > 0) widget.tab.terminal.paste(' ');
+      await _pasteImage(await image.readAsBytes(), image.name);
+    }
+  }
+
   /// A screenshot copied on the user's PC can't reach the CLI's own Ctrl+V,
   /// which reads the *server's* clipboard. Instead the image is stored in
   /// `~/.ddagent/assets` next to the PTY and its absolute path is pasted:
@@ -370,7 +389,9 @@ class TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
   Future<void> _pasteImage(Uint8List bytes, String name) async {
     try {
       final png = await toPngBytes(bytes);
-      final form = FormData.fromMap({'images': MultipartFile.fromBytes(png, filename: name)});
+      // The bytes are PNG now — a `.jpg` name would make the CLI misread them.
+      final pngName = '${name.replaceFirst(RegExp(r'\.[^./]*$'), '')}.png';
+      final form = FormData.fromMap({'images': MultipartFile.fromBytes(png, filename: pngName)});
       final res = await ref.read(miscRepositoryProvider).uploadImage(form);
       final record = (res['images'] as List?)?.firstOrNull;
       final path = record is Map ? record['path'] as String? : null;

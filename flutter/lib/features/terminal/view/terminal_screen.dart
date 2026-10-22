@@ -550,6 +550,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
                   onToggleModifier: _ctrl.toggleLatchedModifier,
                   onSendInput: (input) => _ctrl.sendInput(activeTab.id, input),
                   onPaste: () => _activePane?.paste(),
+                  onPickImages: () => _activePane?.pickImages(),
                   onClear: () => _ctrl.clearTab(activeTab.id),
                   onClose: _ctrl.toggleShortcutsBar,
                   onShowKeyboard: _isTouchPlatform ? () => _activePane?.showSoftKeyboard() : null,
@@ -663,6 +664,11 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
             t.settings.terminalShortcuts.paste,
             onTap: () => _activePane?.paste(),
             shortcut: TerminalCommand.paste,
+          ),
+          entry(
+            LucideIcons.image,
+            t.chat.input.attachImages,
+            onTap: () => _activePane?.pickImages(),
           ),
           entry(
             LucideIcons.eraser,

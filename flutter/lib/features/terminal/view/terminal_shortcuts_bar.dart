@@ -19,6 +19,7 @@ class TerminalShortcutsBar extends StatelessWidget {
     required this.onClear,
     required this.onClose,
     required this.onPaste,
+    required this.onPickImages,
     required this.latched,
     required this.onToggleModifier,
     this.onShowKeyboard,
@@ -28,6 +29,7 @@ class TerminalShortcutsBar extends StatelessWidget {
   final VoidCallback onClear;
   final VoidCallback onClose;
   final VoidCallback onPaste;
+  final VoidCallback onPickImages;
   final Set<LatchedModifier> latched;
   final void Function(LatchedModifier modifier) onToggleModifier;
 
@@ -141,6 +143,7 @@ class TerminalShortcutsBar extends StatelessWidget {
                         icon: LucideIcons.clipboardPaste,
                         onTap: onPaste,
                       ),
+                      key(t.chat.input.attachImages, icon: LucideIcons.image, onTap: onPickImages),
                       key(t.common.buttons.clear, icon: LucideIcons.eraser, onTap: onClear),
                     ]),
                   ],
