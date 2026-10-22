@@ -104,6 +104,7 @@ class TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
   void initState() {
     super.initState();
     _focusNode = FocusNode()..addListener(_reportFocus);
+    widget.tab.terminal.addListener(_reportFocus);
     _terminalViewController = xt.TerminalController()..addListener(_onSelectionChanged);
     _scrollController = _TouchDragScrollController(touchDown: () => _pointers.isNotEmpty);
     HardwareKeyboard.instance.addHandler(_trackModifiers);
@@ -144,6 +145,7 @@ class TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
 
   @override
   void dispose() {
+    widget.tab.terminal.removeListener(_reportFocus);
     HardwareKeyboard.instance.removeHandler(_trackModifiers);
     _search
       ..removeListener(_onSearchChanged)
@@ -160,18 +162,20 @@ class TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
 
   /// Focus reporting (DECSET 1004, which Claude Code enables): xterm.dart
   /// tracks the mode but never sends the events.
+  /// Claude Code ignores clicks while it was last told the terminal lost
+  /// focus, and for a moment after it regains it — so the program must hear
+  /// about focus as soon as it asks (DECSET 1004, often in a reload's replay),
+  /// not at the click. On a phone the pane on screen counts as focused: a tap
+  /// drops keyboard focus only to keep the soft keyboard down ([_onPointerDown]).
   void _reportFocus() {
-    // A touch press drops focus only to keep the soft keyboard down
-    // ([_onPointerDown]) — the pane is still the one in use.
-    if (!_focusNode.hasFocus && !_focusNode.canRequestFocus) return;
-    _sendFocusReport(_focusNode.hasFocus);
-  }
-
-  void _sendFocusReport(bool focused) {
-    if (focused == _reportedFocus) return;
-    _reportedFocus = focused;
+    if (!mounted) return;
     final terminal = widget.tab.terminal;
-    if (terminal.reportFocusMode) terminal.onOutput?.call(focused ? '\x1b[I' : '\x1b[O');
+    final focused = _isTouchPlatform || _focusNode.hasFocus;
+    if (!terminal.reportFocusMode || focused == _reportedFocus) return;
+    // A replayed frame's output is dropped ([TerminalTab.replaying]).
+    if (widget.tab.replaying) return scheduleMicrotask(_reportFocus);
+    _reportedFocus = focused;
+    terminal.onOutput?.call(focused ? '\x1b[I' : '\x1b[O');
   }
 
   @override
@@ -554,10 +558,6 @@ class TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
     if (mouse is XtermMouseHandler) mouse.middleDown = event.buttons == kMiddleMouseButton;
     final touchLike =
         event.kind == PointerDeviceKind.touch || event.kind == PointerDeviceKind.stylus;
-    // A press in the pane focuses it for the program before xterm reports the
-    // click, as a real terminal does: Claude Code ignores clicks after a focus
-    // out (sent by the page a reload closed, or another pane).
-    _sendFocusReport(true);
     // xterm asks for the soft keyboard on *tap-down*, which fires after a
     // 100 ms press — i.e. for most finger drags too. With the keyboard closed
     // that pops it up mid-drag: the body shrinks and xterm snaps to the bottom
