@@ -151,6 +151,10 @@ class TerminalTab {
 
   String get displayTitle => renamed ? title : appTitle ?? title;
 
+  /// How far above the bottom the pane was scrolled when it was last shown —
+  /// switching tabs inflates a fresh pane, which restores it.
+  double scrollFromBottom = 0;
+
   /// True while a replayed frame is written — the emulator's replies to the
   /// queries in it (device attributes, colours) and its OSC 52 copies were
   /// already handled live; re-sending would type "1;2c" into the shell.

@@ -117,6 +117,12 @@ class TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
     // A freshly inflated pane (new or switched tab) starts with the soft
     // keyboard closed: the previous tab's IME otherwise stays up over a pane
     // nothing has focused yet. A tap brings it back ([_handleTapUp]).
+    // Back on a tab scrolled into its history: the fresh pane would show the bottom.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final fromBottom = widget.tab.scrollFromBottom;
+      if (!mounted || fromBottom <= 0 || !_scrollController.hasClients) return;
+      _scrollTo(_scrollController.position.maxScrollExtent - fromBottom);
+    });
     if (_isTouchPlatform) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted && !_focusNode.hasFocus) {
@@ -124,6 +130,16 @@ class TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
         }
       });
     }
+  }
+
+  @override
+  void deactivate() {
+    // Children are gone by dispose — the scroll view is still attached here.
+    if (_scrollController.hasClients) {
+      final position = _scrollController.position;
+      widget.tab.scrollFromBottom = position.maxScrollExtent - position.pixels;
+    }
+    super.deactivate();
   }
 
   @override
