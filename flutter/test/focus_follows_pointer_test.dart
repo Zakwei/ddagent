@@ -8,6 +8,7 @@ import 'package:ddagent_app/features/terminal/view/terminal_view_wrapper.dart';
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
 import 'package:ddagent_app/features/workspace/view/split_workspace_grid.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -217,5 +218,60 @@ void main() {
     FocusManager.instance.primaryFocus?.unfocus();
     await tester.pump();
     expect(sent, ['\x1b[I', '\x1b[O']);
+  });
+  // Claude Code ignores clicks while it was last told its window lost focus —
+  // e.g. by the page a reload just closed, or a tap that drops the keyboard focus.
+  Future<List<String>> pressInPane(WidgetTester tester, {required bool touch}) async {
+    final tab = makeTab();
+    final sent = <String>[];
+    tab.terminal
+      ..onOutput = sent.add
+      ..write('\x1b[?1004h\x1b[?1000h\x1b[?1006h');
+    final key = GlobalKey<TerminalViewWrapperState>();
+    await tester.pumpWidget(
+      TranslationProvider(
+        child: ProviderScope(
+          child: MaterialApp(
+            theme: AppTheme.dark(),
+            home: Scaffold(
+              body: TerminalViewWrapper(key: key, tab: tab, autofocus: false),
+            ),
+          ),
+        ),
+      ),
+    );
+    if (touch) {
+      key.currentState!.focusTerminal();
+      await tester.pump();
+      sent.clear();
+    }
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.byType(xt.TerminalView)),
+      kind: touch ? PointerDeviceKind.touch : PointerDeviceKind.mouse,
+    );
+    await tester.pump(const Duration(milliseconds: 50));
+    await gesture.up();
+    // Lets the double-tap timer run out.
+    await tester.pump(const Duration(seconds: 1));
+    return sent;
+  }
+
+  testWidgets('a mouse press reports focus before the click', (tester) async {
+    final sent = await pressInPane(tester, touch: false);
+    final press = sent.indexWhere((s) => s.startsWith('\x1b[<0;'));
+    expect(press, isNonNegative, reason: '$sent');
+    expect(sent.take(press), contains('\x1b[I'), reason: '$sent');
+  });
+
+  testWidgets('a tap does not report focus lost before its click', (tester) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.android;
+    try {
+      final sent = await pressInPane(tester, touch: true);
+      final press = sent.indexWhere((s) => s.startsWith('\x1b[<0;'));
+      expect(press, isNonNegative, reason: '$sent');
+      expect(sent, isNot(contains('\x1b[O')), reason: '$sent');
+    } finally {
+      debugDefaultTargetPlatformOverride = null;
+    }
   });
 }

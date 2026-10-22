@@ -114,15 +114,15 @@ class TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
       hitColor: palette.theme.searchHitBackground,
       currentHitColor: palette.theme.searchHitBackgroundCurrent,
     )..addListener(_onSearchChanged);
-    // A freshly inflated pane (new or switched tab) starts with the soft
-    // keyboard closed: the previous tab's IME otherwise stays up over a pane
-    // nothing has focused yet. A tap brings it back ([_handleTapUp]).
     // Back on a tab scrolled into its history: the fresh pane would show the bottom.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final fromBottom = widget.tab.scrollFromBottom;
       if (!mounted || fromBottom <= 0 || !_scrollController.hasClients) return;
       _scrollTo(_scrollController.position.maxScrollExtent - fromBottom);
     });
+    // A freshly inflated pane (new or switched tab) starts with the soft
+    // keyboard closed: the previous tab's IME otherwise stays up over a pane
+    // nothing has focused yet. A tap brings it back ([_handleTapUp]).
     if (_isTouchPlatform) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted && !_focusNode.hasFocus) {
@@ -161,7 +161,13 @@ class TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
   /// Focus reporting (DECSET 1004, which Claude Code enables): xterm.dart
   /// tracks the mode but never sends the events.
   void _reportFocus() {
-    final focused = _focusNode.hasFocus;
+    // A touch press drops focus only to keep the soft keyboard down
+    // ([_onPointerDown]) — the pane is still the one in use.
+    if (!_focusNode.hasFocus && !_focusNode.canRequestFocus) return;
+    _sendFocusReport(_focusNode.hasFocus);
+  }
+
+  void _sendFocusReport(bool focused) {
     if (focused == _reportedFocus) return;
     _reportedFocus = focused;
     final terminal = widget.tab.terminal;
@@ -548,6 +554,10 @@ class TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
     if (mouse is XtermMouseHandler) mouse.middleDown = event.buttons == kMiddleMouseButton;
     final touchLike =
         event.kind == PointerDeviceKind.touch || event.kind == PointerDeviceKind.stylus;
+    // A press in the pane focuses it for the program before xterm reports the
+    // click, as a real terminal does: Claude Code ignores clicks after a focus
+    // out (sent by the page a reload closed, or another pane).
+    _sendFocusReport(true);
     // xterm asks for the soft keyboard on *tap-down*, which fires after a
     // 100 ms press — i.e. for most finger drags too. With the keyboard closed
     // that pops it up mid-drag: the body shrinks and xterm snaps to the bottom
