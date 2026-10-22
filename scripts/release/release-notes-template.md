@@ -10,38 +10,38 @@
   fallback. All 12 UI locales are below.
 -->
 <!-- lang:en -->
-### Fixes
-- **Voice typing in the terminal (Android)**: Gboard dictation no longer stops partway through the first word. The terminal cleared the keyboard's text field after every recognised fragment, which ended the voice session; it now keeps the field and sends only what changed — corrections Gboard makes to its own text arrive as the right number of backspaces.
+### New
+- **Images from the phone gallery in the terminal**: the key bar and the ⌄ → Edit menu have an “Attach images” button. Pick one or more screenshots — they are uploaded and their paths are pasted into the shell, so Claude Code and other CLIs can read them. Pasted images are now saved as `.png` to match their content.
 <!-- lang:pl -->
-### Poprawki
-- **Dyktowanie w terminalu (Android)**: dyktowanie Gboard nie urywa się już w połowie pierwszego słowa. Terminal czyścił pole klawiatury po każdym rozpoznanym fragmencie, co kończyło sesję głosową; teraz zachowuje pole i wysyła tylko zmiany — poprawki, które Gboard robi we własnym tekście, docierają jako właściwa liczba Backspace’ów.
+### Nowości
+- **Obrazy z galerii telefonu w terminalu**: pasek klawiszy i menu ⌄ → Edycja mają przycisk „Załącz obrazy”. Wybierz jeden lub kilka zrzutów — zostaną wysłane, a ich ścieżki wklejone do powłoki, więc Claude Code i inne CLI mogą je odczytać. Wklejane obrazy są teraz zapisywane jako `.png`, zgodnie z zawartością.
 <!-- lang:de -->
-### Fehlerbehebungen
-- **Spracheingabe im Terminal (Android)**: Das Gboard-Diktat bricht nicht mehr mitten im ersten Wort ab. Das Terminal leerte das Tastaturfeld nach jedem erkannten Fragment, was die Spracheingabe beendete; jetzt bleibt das Feld erhalten und nur Änderungen werden gesendet — Korrekturen, die Gboard an seinem eigenen Text vornimmt, kommen als passende Anzahl Rücktasten an.
+### Neu
+- **Bilder aus der Handy-Galerie im Terminal**: Die Tastenleiste und das Menü ⌄ → Bearbeiten haben eine Schaltfläche „Bilder anhängen“. Wähle einen oder mehrere Screenshots — sie werden hochgeladen und ihre Pfade in die Shell eingefügt, sodass Claude Code und andere CLIs sie lesen können. Eingefügte Bilder werden jetzt passend zum Inhalt als `.png` gespeichert.
 <!-- lang:es -->
-### Correcciones
-- **Dictado por voz en el terminal (Android)**: el dictado de Gboard ya no se corta a mitad de la primera palabra. El terminal vaciaba el campo del teclado tras cada fragmento reconocido, lo que terminaba la sesión de voz; ahora conserva el campo y envía solo los cambios — las correcciones que Gboard hace en su propio texto llegan como el número correcto de retrocesos.
+### Novedades
+- **Imágenes de la galería del teléfono en el terminal**: la barra de teclas y el menú ⌄ → Editar tienen un botón «Adjuntar imágenes». Elige una o varias capturas: se suben y sus rutas se pegan en la shell, para que Claude Code y otras CLI puedan leerlas. Las imágenes pegadas ahora se guardan como `.png`, acorde a su contenido.
 <!-- lang:fr -->
-### Corrections
-- **Saisie vocale dans le terminal (Android)** : la dictée Gboard ne s'arrête plus au milieu du premier mot. Le terminal vidait le champ du clavier après chaque fragment reconnu, ce qui mettait fin à la saisie vocale ; il conserve désormais le champ et n'envoie que les changements — les corrections que Gboard apporte à son propre texte arrivent sous forme du bon nombre de retours arrière.
+### Nouveautés
+- **Images de la galerie du téléphone dans le terminal** : la barre de touches et le menu ⌄ → Édition ont un bouton « Joindre des images ». Choisissez une ou plusieurs captures : elles sont envoyées et leurs chemins collés dans le shell, pour que Claude Code et les autres CLI puissent les lire. Les images collées sont désormais enregistrées en `.png`, conformément à leur contenu.
 <!-- lang:it -->
-### Correzioni
-- **Dettatura nel terminale (Android)**: la dettatura di Gboard non si interrompe più a metà della prima parola. Il terminale svuotava il campo della tastiera dopo ogni frammento riconosciuto, chiudendo la sessione vocale; ora mantiene il campo e invia solo le modifiche — le correzioni che Gboard fa al proprio testo arrivano come il giusto numero di Backspace.
+### Novità
+- **Immagini dalla galleria del telefono nel terminale**: la barra dei tasti e il menu ⌄ → Modifica hanno un pulsante «Allega immagini». Scegli uno o più screenshot: vengono caricati e i loro percorsi incollati nella shell, così Claude Code e le altre CLI possono leggerli. Le immagini incollate ora vengono salvate come `.png`, coerentemente con il contenuto.
 <!-- lang:ja -->
-### 修正
-- **ターミナルでの音声入力（Android）**：Gboard の音声入力が最初の単語の途中で止まらなくなりました。ターミナルが認識された断片ごとにキーボードの入力欄を消去しており、それが音声セッションを終了させていました。現在は入力欄を保持して変更分だけを送信し、Gboard による自身のテキストの修正は正しい数の Backspace として届きます。
+### 新機能
+- **ターミナルでスマホのギャラリー画像を使用**：キーバーと ⌄ → 編集 メニューに「画像を添付」ボタンを追加しました。スクリーンショットを1枚以上選ぶとアップロードされ、そのパスがシェルに貼り付けられるため、Claude Code などの CLI が読み取れます。貼り付けた画像は内容に合わせて `.png` として保存されるようになりました。
 <!-- lang:ko -->
-### 수정
-- **터미널 음성 입력(Android)**: Gboard 음성 입력이 더 이상 첫 단어 중간에 끊기지 않습니다. 터미널이 인식된 조각마다 키보드 입력란을 비워 음성 세션이 종료되었습니다. 이제 입력란을 유지하고 바뀐 부분만 보내며, Gboard가 자신의 텍스트를 고치면 올바른 개수의 Backspace로 전달됩니다.
+### 새 기능
+- **터미널에서 휴대폰 갤러리 이미지 사용**: 키 바와 ⌄ → 편집 메뉴에 「이미지 첨부」 버튼이 생겼습니다. 스크린샷을 하나 이상 고르면 업로드되고 경로가 셸에 붙여넣어져 Claude Code 등 CLI가 읽을 수 있습니다. 붙여넣은 이미지는 이제 내용에 맞게 `.png`로 저장됩니다.
 <!-- lang:ru -->
-### Исправления
-- **Голосовой ввод в терминале (Android)**: диктовка Gboard больше не обрывается посреди первого слова. Терминал очищал поле клавиатуры после каждого распознанного фрагмента, и это завершало голосовой сеанс; теперь поле сохраняется, а отправляются только изменения — исправления, которые Gboard вносит в свой текст, приходят нужным числом Backspace.
+### Новое
+- **Изображения из галереи телефона в терминале**: на панели клавиш и в меню ⌄ → Правка появилась кнопка «Прикрепить изображения». Выберите один или несколько скриншотов — они загрузятся, а их пути вставятся в оболочку, чтобы Claude Code и другие CLI могли их прочитать. Вставленные изображения теперь сохраняются как `.png`, в соответствии с содержимым.
 <!-- lang:tr -->
-### Düzeltmeler
-- **Terminalde sesle yazma (Android)**: Gboard dikte artık ilk kelimenin ortasında kesilmiyor. Terminal, tanınan her parçadan sonra klavye alanını temizliyordu ve bu ses oturumunu sonlandırıyordu; artık alan korunuyor ve yalnızca değişiklikler gönderiliyor — Gboard'un kendi metninde yaptığı düzeltmeler doğru sayıda Backspace olarak ulaşıyor.
+### Yenilikler
+- **Terminalde telefon galerisinden görseller**: tuş çubuğunda ve ⌄ → Düzenle menüsünde «Resim ekle» düğmesi var. Bir veya birkaç ekran görüntüsü seçin — yüklenir ve yolları kabuğa yapıştırılır, böylece Claude Code ve diğer CLI'lar onları okuyabilir. Yapıştırılan görseller artık içeriklerine uygun olarak `.png` olarak kaydediliyor.
 <!-- lang:zh-CN -->
-### 修复
-- **终端语音输入（Android）**：Gboard 语音输入不再在第一个词中途中断。终端此前在每个识别出的片段之后清空键盘输入框，从而结束了语音会话；现在保留输入框，只发送变化的部分——Gboard 对自身文字的修改会以正确数量的退格键送达。
+### 新功能
+- **在终端中使用手机相册图片**：按键栏和 ⌄ → 编辑 菜单新增「附加图片」按钮。选择一张或多张截图后会上传，并把路径粘贴到 shell 中，Claude Code 等 CLI 即可读取。粘贴的图片现在按其内容保存为 `.png`。
 <!-- lang:zh-TW -->
-### 修正
-- **終端機語音輸入（Android）**：Gboard 語音輸入不再在第一個詞中途中斷。終端機先前在每個辨識出的片段之後清空鍵盤輸入框，因而結束了語音工作階段；現在保留輸入框，只傳送變更的部分——Gboard 對自身文字的修改會以正確數量的退格鍵送達。
+### 新功能
+- **在終端機中使用手機相簿圖片**：按鍵列和 ⌄ → 編輯 選單新增「附加圖片」按鈕。選擇一張或多張截圖後會上傳，並將路徑貼到 shell 中，Claude Code 等 CLI 即可讀取。貼上的圖片現在依其內容儲存為 `.png`。
