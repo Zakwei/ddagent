@@ -46,9 +46,10 @@ const terminalFontSizeMax = 24.0;
 const terminalFontSizeDefault = 13.0;
 
 /// Modifier keys the on-screen key bar can latch for the next keystroke — a
-/// soft keyboard has no Ctrl/Alt, so a tap on `Ctrl` arms the modifier and
-/// the next typed character (or arrow) is sent as that chord.
-enum LatchedModifier { ctrl, alt }
+/// soft keyboard has no Ctrl/Shift for keys like Tab or the arrows, so a tap
+/// on `Ctrl` arms the modifier and the next typed character (or arrow) is
+/// sent as that chord.
+enum LatchedModifier { ctrl, shift }
 
 final _csiKeyRegex = RegExp(r'^\x1b\[(?:1;(\d))?([ABCDHF])$');
 final _csiTildeKeyRegex = RegExp(r'^\x1b\[(\d+)(?:;(\d))?~$');
@@ -58,15 +59,18 @@ final _csiTildeKeyRegex = RegExp(r'^\x1b\[(\d+)(?:;(\d))?~$');
 /// (multi-character paste, bare Esc) passes through untouched.
 ///
 /// - Ctrl + letter/`[\]^_@` → the control code (`a` → `\x01`).
-/// - Ctrl/Alt + cursor key (`\x1b[A`, `\x1b[H`, `\x1b[5~`) → xterm modifier
-///   parameter (`\x1b[1;5A`, `\x1b[5;3~`).
-/// - Alt + printable character → ESC-prefixed character (`\x1bx`).
+/// - Ctrl/Shift + cursor key (`\x1b[A`, `\x1b[H`, `\x1b[5~`) → xterm modifier
+///   parameter (`\x1b[1;5A`, `\x1b[5;2~`).
+/// - Shift + Tab → back-tab (`\x1b[Z`, Claude Code's mode switch); Shift +
+///   Enter → ESC CR, the newline [XtermInputHandler] sends; Shift + letter → upper case.
 String applyLatchedModifiers(String data, Set<LatchedModifier> modifiers) {
   if (modifiers.isEmpty || data.isEmpty) return data;
   final ctrl = modifiers.contains(LatchedModifier.ctrl);
-  final alt = modifiers.contains(LatchedModifier.alt);
+  final shift = modifiers.contains(LatchedModifier.shift);
+  if (shift && data == '\t') return '\x1b[Z';
+  if (shift && data == '\r') return '\x1b\r';
   // xterm modifier parameter: 1 + shift(1) + alt(2) + ctrl(4).
-  final param = 1 + (alt ? 2 : 0) + (ctrl ? 4 : 0);
+  final param = 1 + (shift ? 1 : 0) + (ctrl ? 4 : 0);
 
   final csi = _csiKeyRegex.firstMatch(data);
   if (csi != null) {
@@ -95,7 +99,7 @@ String applyLatchedModifiers(String data, Set<LatchedModifier> modifiers) {
       out = '\x00'; // Ctrl+Space → NUL
     }
   }
-  if (alt) out = '\x1b$out';
+  if (shift && !ctrl && code >= 0x61 && code <= 0x7a) out = data.toUpperCase();
   return out;
 }
 

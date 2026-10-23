@@ -4267,9 +4267,9 @@
     },
     "keyBar": {
       "ctrl": "Ctrl",
-      "alt": "Alt",
+      "shift": "Shift",
       "ctrlHint": "次のキーに Ctrl を適用",
-      "altHint": "次のキーに Alt を適用",
+      "shiftHint": "次のキーに Shift を適用",
       "showKeyboard": "キーボードを表示"
     }
   },

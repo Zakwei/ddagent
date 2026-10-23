@@ -4273,9 +4273,9 @@
     },
     "keyBar": {
       "ctrl": "Ctrl",
-      "alt": "Alt",
+      "shift": "Shift",
       "ctrlHint": "Sonraki tuş için Ctrl basılı tut",
-      "altHint": "Sonraki tuş için Alt basılı tut",
+      "shiftHint": "Sonraki tuş için Shift basılı tut",
       "showKeyboard": "Klavyeyi göster"
     }
   },

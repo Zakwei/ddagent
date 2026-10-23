@@ -5118,9 +5118,9 @@ class Translations$terminal$keyBar$ja extends Translations$terminal$keyBar$en {
 
 	// Translations
 	@override String get ctrl => 'Ctrl';
-	@override String get alt => 'Alt';
+	@override String get shift => 'Shift';
 	@override String get ctrlHint => '次のキーに Ctrl を適用';
-	@override String get altHint => '次のキーに Alt を適用';
+	@override String get shiftHint => '次のキーに Shift を適用';
 	@override String get showKeyboard => 'キーボードを表示';
 }
 
@@ -11803,9 +11803,9 @@ extension on TranslationsJa {
 			'terminal.search.previous' => '前の一致',
 			'terminal.search.close' => '検索を閉じる',
 			'terminal.keyBar.ctrl' => 'Ctrl',
-			'terminal.keyBar.alt' => 'Alt',
+			'terminal.keyBar.shift' => 'Shift',
 			'terminal.keyBar.ctrlHint' => '次のキーに Ctrl を適用',
-			'terminal.keyBar.altHint' => '次のキーに Alt を適用',
+			'terminal.keyBar.shiftHint' => '次のキーに Shift を適用',
 			'terminal.keyBar.showKeyboard' => 'キーボードを表示',
 			'voice.preview' => 'プレビュー',
 			'voice.settingsSaved' => '音声入力設定を保存しました',

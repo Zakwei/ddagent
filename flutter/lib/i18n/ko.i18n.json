@@ -4267,9 +4267,9 @@
     },
     "keyBar": {
       "ctrl": "Ctrl",
-      "alt": "Alt",
+      "shift": "Shift",
       "ctrlHint": "다음 키에 Ctrl 적용",
-      "altHint": "다음 키에 Alt 적용",
+      "shiftHint": "다음 키에 Shift 적용",
       "showKeyboard": "키보드 표시"
     }
   },

@@ -5156,9 +5156,9 @@ class Translations$terminal$keyBar$ru extends Translations$terminal$keyBar$en {
 
 	// Translations
 	@override String get ctrl => 'Ctrl';
-	@override String get alt => 'Alt';
+	@override String get shift => 'Shift';
 	@override String get ctrlHint => 'Удержать Ctrl для следующей клавиши';
-	@override String get altHint => 'Удержать Alt для следующей клавиши';
+	@override String get shiftHint => 'Удержать Shift для следующей клавиши';
 	@override String get showKeyboard => 'Показать клавиатуру';
 }
 
@@ -11852,9 +11852,9 @@ extension on TranslationsRu {
 			'terminal.search.previous' => 'Предыдущее совпадение',
 			'terminal.search.close' => 'Закрыть поиск',
 			'terminal.keyBar.ctrl' => 'Ctrl',
-			'terminal.keyBar.alt' => 'Alt',
+			'terminal.keyBar.shift' => 'Shift',
 			'terminal.keyBar.ctrlHint' => 'Удержать Ctrl для следующей клавиши',
-			'terminal.keyBar.altHint' => 'Удержать Alt для следующей клавиши',
+			'terminal.keyBar.shiftHint' => 'Удержать Shift для следующей клавиши',
 			'terminal.keyBar.showKeyboard' => 'Показать клавиатуру',
 			'voice.preview' => 'Предпросмотр',
 			'voice.settingsSaved' => 'Настройки голосового ввода сохранены',

@@ -5158,9 +5158,9 @@ class Translations$terminal$keyBar$pl extends Translations$terminal$keyBar$en {
 
 	// Translations
 	@override String get ctrl => 'Ctrl';
-	@override String get alt => 'Alt';
+	@override String get shift => 'Shift';
 	@override String get ctrlHint => 'Przytrzymaj Ctrl dla następnego klawisza';
-	@override String get altHint => 'Przytrzymaj Alt dla następnego klawisza';
+	@override String get shiftHint => 'Przytrzymaj Shift dla następnego klawisza';
 	@override String get showKeyboard => 'Pokaż klawiaturę';
 }
 
@@ -11854,9 +11854,9 @@ extension on TranslationsPl {
 			'terminal.search.previous' => 'Poprzednie trafienie',
 			'terminal.search.close' => 'Zamknij wyszukiwanie',
 			'terminal.keyBar.ctrl' => 'Ctrl',
-			'terminal.keyBar.alt' => 'Alt',
+			'terminal.keyBar.shift' => 'Shift',
 			'terminal.keyBar.ctrlHint' => 'Przytrzymaj Ctrl dla następnego klawisza',
-			'terminal.keyBar.altHint' => 'Przytrzymaj Alt dla następnego klawisza',
+			'terminal.keyBar.shiftHint' => 'Przytrzymaj Shift dla następnego klawisza',
 			'terminal.keyBar.showKeyboard' => 'Pokaż klawiaturę',
 			'voice.preview' => 'Podgląd',
 			'voice.settingsSaved' => 'Zapisano ustawienia wprowadzania głosowego',

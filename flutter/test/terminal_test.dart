@@ -921,9 +921,14 @@ void main() {
       tab.terminal.textInput('c');
       expect(fakeWs.sent.last['data'], 'c');
 
-      ctrl.toggleLatchedModifier(LatchedModifier.alt);
+      ctrl.toggleLatchedModifier(LatchedModifier.shift);
       ctrl.sendInput(tab.id, '\x1b[D');
-      expect(fakeWs.sent.last['data'], '\x1b[1;3D');
+      expect(fakeWs.sent.last['data'], '\x1b[1;2D');
+
+      // Shift + the key bar's Tab → back-tab (Claude Code's Shift+Tab).
+      ctrl.toggleLatchedModifier(LatchedModifier.shift);
+      ctrl.sendInput(tab.id, '\t');
+      expect(fakeWs.sent.last['data'], '\x1b[Z');
 
       // Toggling twice disarms.
       ctrl.toggleLatchedModifier(LatchedModifier.ctrl);
@@ -990,8 +995,8 @@ void main() {
 
   group('applyLatchedModifiers', () {
     const ctrl = {LatchedModifier.ctrl};
-    const alt = {LatchedModifier.alt};
-    const both = {LatchedModifier.ctrl, LatchedModifier.alt};
+    const shift = {LatchedModifier.shift};
+    const both = {LatchedModifier.ctrl, LatchedModifier.shift};
 
     test('control codes for letters and punctuation', () {
       expect(applyLatchedModifiers('a', ctrl), '\x01');
@@ -1003,17 +1008,20 @@ void main() {
       expect(applyLatchedModifiers('1', ctrl), '1');
     });
 
-    test('alt prefixes ESC; both combine', () {
-      expect(applyLatchedModifiers('x', alt), '\x1bx');
-      expect(applyLatchedModifiers('b', both), '\x1b\x02');
+    test('shift: back-tab, newline Enter, upper case; ctrl wins on letters', () {
+      expect(applyLatchedModifiers('\t', shift), '\x1b[Z');
+      expect(applyLatchedModifiers('\r', shift), '\x1b\r');
+      expect(applyLatchedModifiers('x', shift), 'X');
+      expect(applyLatchedModifiers('1', shift), '1');
+      expect(applyLatchedModifiers('b', both), '\x02');
     });
 
     test('CSI keys receive the xterm modifier parameter', () {
       expect(applyLatchedModifiers('\x1b[A', ctrl), '\x1b[1;5A');
-      expect(applyLatchedModifiers('\x1b[H', alt), '\x1b[1;3H');
-      expect(applyLatchedModifiers('\x1b[F', both), '\x1b[1;7F');
+      expect(applyLatchedModifiers('\x1b[H', shift), '\x1b[1;2H');
+      expect(applyLatchedModifiers('\x1b[F', both), '\x1b[1;6F');
       expect(applyLatchedModifiers('\x1b[5~', ctrl), '\x1b[5;5~');
-      expect(applyLatchedModifiers('\x1b[6~', alt), '\x1b[6;3~');
+      expect(applyLatchedModifiers('\x1b[6~', shift), '\x1b[6;2~');
       // Already-modified sequences merge instead of nesting.
       expect(applyLatchedModifiers('\x1b[1;2A', ctrl), '\x1b[1;6A');
     });

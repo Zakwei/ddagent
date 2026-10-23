@@ -5118,9 +5118,9 @@ class Translations$terminal$keyBar$zh_TW extends Translations$terminal$keyBar$en
 
 	// Translations
 	@override String get ctrl => 'Ctrl';
-	@override String get alt => 'Alt';
+	@override String get shift => 'Shift';
 	@override String get ctrlHint => '為下一個按鍵按住 Ctrl';
-	@override String get altHint => '為下一個按鍵按住 Alt';
+	@override String get shiftHint => '為下一個按鍵按住 Shift';
 	@override String get showKeyboard => '顯示鍵盤';
 }
 
@@ -11803,9 +11803,9 @@ extension on TranslationsZhTw {
 			'terminal.search.previous' => '上一個符合項目',
 			'terminal.search.close' => '關閉搜尋',
 			'terminal.keyBar.ctrl' => 'Ctrl',
-			'terminal.keyBar.alt' => 'Alt',
+			'terminal.keyBar.shift' => 'Shift',
 			'terminal.keyBar.ctrlHint' => '為下一個按鍵按住 Ctrl',
-			'terminal.keyBar.altHint' => '為下一個按鍵按住 Alt',
+			'terminal.keyBar.shiftHint' => '為下一個按鍵按住 Shift',
 			'terminal.keyBar.showKeyboard' => '顯示鍵盤',
 			'voice.preview' => '預覽',
 			'voice.settingsSaved' => '語音輸入設定已儲存',

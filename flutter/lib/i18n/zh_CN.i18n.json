@@ -4267,9 +4267,9 @@
     },
     "keyBar": {
       "ctrl": "Ctrl",
-      "alt": "Alt",
+      "shift": "Shift",
       "ctrlHint": "为下一个按键按住 Ctrl",
-      "altHint": "为下一个按键按住 Alt",
+      "shiftHint": "为下一个按键按住 Shift",
       "showKeyboard": "显示键盘"
     }
   },

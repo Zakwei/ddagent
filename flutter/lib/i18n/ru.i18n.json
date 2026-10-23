@@ -4316,9 +4316,9 @@
     },
     "keyBar": {
       "ctrl": "Ctrl",
-      "alt": "Alt",
+      "shift": "Shift",
       "ctrlHint": "Удержать Ctrl для следующей клавиши",
-      "altHint": "Удержать Alt для следующей клавиши",
+      "shiftHint": "Удержать Shift для следующей клавиши",
       "showKeyboard": "Показать клавиатуру"
     }
   },

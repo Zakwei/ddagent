@@ -4318,9 +4318,9 @@
     },
     "keyBar": {
       "ctrl": "Ctrl",
-      "alt": "Alt",
+      "shift": "Shift",
       "ctrlHint": "Przytrzymaj Ctrl dla następnego klawisza",
-      "altHint": "Przytrzymaj Alt dla następnego klawisza",
+      "shiftHint": "Przytrzymaj Shift dla następnego klawisza",
       "showKeyboard": "Pokaż klawiaturę"
     }
   },

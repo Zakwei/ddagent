@@ -9335,14 +9335,14 @@ class Translations$terminal$keyBar$en {
 	/// en: 'Ctrl'
 	String get ctrl => 'Ctrl';
 
-	/// en: 'Alt'
-	String get alt => 'Alt';
+	/// en: 'Shift'
+	String get shift => 'Shift';
 
 	/// en: 'Hold Ctrl for the next key'
 	String get ctrlHint => 'Hold Ctrl for the next key';
 
-	/// en: 'Hold Alt for the next key'
-	String get altHint => 'Hold Alt for the next key';
+	/// en: 'Hold Shift for the next key'
+	String get shiftHint => 'Hold Shift for the next key';
 
 	/// en: 'Show keyboard'
 	String get showKeyboard => 'Show keyboard';
@@ -18421,9 +18421,9 @@ extension on Translations {
 			'terminal.search.previous' => 'Previous match',
 			'terminal.search.close' => 'Close search',
 			'terminal.keyBar.ctrl' => 'Ctrl',
-			'terminal.keyBar.alt' => 'Alt',
+			'terminal.keyBar.shift' => 'Shift',
 			'terminal.keyBar.ctrlHint' => 'Hold Ctrl for the next key',
-			'terminal.keyBar.altHint' => 'Hold Alt for the next key',
+			'terminal.keyBar.shiftHint' => 'Hold Shift for the next key',
 			'terminal.keyBar.showKeyboard' => 'Show keyboard',
 			'voice.preview' => 'Preview',
 			'voice.settingsSaved' => 'Voice input settings saved',

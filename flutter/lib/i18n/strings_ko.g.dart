@@ -5118,9 +5118,9 @@ class Translations$terminal$keyBar$ko extends Translations$terminal$keyBar$en {
 
 	// Translations
 	@override String get ctrl => 'Ctrl';
-	@override String get alt => 'Alt';
+	@override String get shift => 'Shift';
 	@override String get ctrlHint => '다음 키에 Ctrl 적용';
-	@override String get altHint => '다음 키에 Alt 적용';
+	@override String get shiftHint => '다음 키에 Shift 적용';
 	@override String get showKeyboard => '키보드 표시';
 }
 
@@ -11803,9 +11803,9 @@ extension on TranslationsKo {
 			'terminal.search.previous' => '이전 일치 항목',
 			'terminal.search.close' => '검색 닫기',
 			'terminal.keyBar.ctrl' => 'Ctrl',
-			'terminal.keyBar.alt' => 'Alt',
+			'terminal.keyBar.shift' => 'Shift',
 			'terminal.keyBar.ctrlHint' => '다음 키에 Ctrl 적용',
-			'terminal.keyBar.altHint' => '다음 키에 Alt 적용',
+			'terminal.keyBar.shiftHint' => '다음 키에 Shift 적용',
 			'terminal.keyBar.showKeyboard' => '키보드 표시',
 			'voice.preview' => '미리보기',
 			'voice.settingsSaved' => '음성 입력 설정이 저장되었습니다',

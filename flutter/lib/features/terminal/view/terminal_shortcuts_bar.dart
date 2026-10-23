@@ -44,7 +44,7 @@ class TerminalShortcutsBar extends StatelessWidget {
     final palette = TerminalPalette.of(context);
     final t = Translations.of(context);
     final ctrl = latched.contains(LatchedModifier.ctrl);
-    final alt = latched.contains(LatchedModifier.alt);
+    final shift = latched.contains(LatchedModifier.shift);
 
     Widget key(
       String label, {
@@ -102,10 +102,10 @@ class TerminalShortcutsBar extends StatelessWidget {
                         onTap: () => onToggleModifier(LatchedModifier.ctrl),
                       ),
                       key(
-                        t.terminal.keyBar.alt,
-                        active: alt,
-                        tooltip: t.terminal.keyBar.altHint,
-                        onTap: () => onToggleModifier(LatchedModifier.alt),
+                        t.terminal.keyBar.shift,
+                        active: shift,
+                        tooltip: t.terminal.keyBar.shiftHint,
+                        onTap: () => onToggleModifier(LatchedModifier.shift),
                       ),
                     ]),
                     _Divider(palette: palette),

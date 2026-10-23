@@ -4278,9 +4278,9 @@
     },
     "keyBar": {
       "ctrl": "Ctrl",
-      "alt": "Alt",
+      "shift": "Shift",
       "ctrlHint": "Hold Ctrl for the next key",
-      "altHint": "Hold Alt for the next key",
+      "shiftHint": "Hold Shift for the next key",
       "showKeyboard": "Show keyboard"
     }
   },

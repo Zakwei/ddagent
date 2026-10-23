@@ -4278,9 +4278,9 @@
     },
     "keyBar": {
       "ctrl": "Strg",
-      "alt": "Alt",
+      "shift": "Shift",
       "ctrlHint": "Strg für die nächste Taste halten",
-      "altHint": "Alt für die nächste Taste halten",
+      "shiftHint": "Shift für die nächste Taste halten",
       "showKeyboard": "Tastatur anzeigen"
     }
   },

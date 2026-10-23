@@ -5123,9 +5123,9 @@ class Translations$terminal$keyBar$tr extends Translations$terminal$keyBar$en {
 
 	// Translations
 	@override String get ctrl => 'Ctrl';
-	@override String get alt => 'Alt';
+	@override String get shift => 'Shift';
 	@override String get ctrlHint => 'Sonraki tuş için Ctrl basılı tut';
-	@override String get altHint => 'Sonraki tuş için Alt basılı tut';
+	@override String get shiftHint => 'Sonraki tuş için Shift basılı tut';
 	@override String get showKeyboard => 'Klavyeyi göster';
 }
 
@@ -11809,9 +11809,9 @@ extension on TranslationsTr {
 			'terminal.search.previous' => 'Önceki eşleşme',
 			'terminal.search.close' => 'Aramayı kapat',
 			'terminal.keyBar.ctrl' => 'Ctrl',
-			'terminal.keyBar.alt' => 'Alt',
+			'terminal.keyBar.shift' => 'Shift',
 			'terminal.keyBar.ctrlHint' => 'Sonraki tuş için Ctrl basılı tut',
-			'terminal.keyBar.altHint' => 'Sonraki tuş için Alt basılı tut',
+			'terminal.keyBar.shiftHint' => 'Sonraki tuş için Shift basılı tut',
 			'terminal.keyBar.showKeyboard' => 'Klavyeyi göster',
 			'voice.preview' => 'Önizle',
 			'voice.settingsSaved' => 'Sesli giriş ayarları kaydedildi',
