@@ -10,62 +10,62 @@
   fallback. All 12 UI locales are below.
 -->
 <!-- lang:en -->
+### New
+- **Shift on the terminal key bar**: the on-screen key bar has Shift instead of Alt. Shift+Tab switches Claude Code's mode, Shift+Enter inserts a newline, Shift with arrows/Home/End/PgUp/PgDn sends the shifted keys.
 ### Fixes
-- **Claude Code buttons in the terminal**: clickable status-line buttons (mods) react again after a page reload and on phone taps. The terminal told Claude Code it had lost focus (on reload, and on every tap with the keyboard down), and Claude Code ignores clicks then.
-- **Terminal title after a reload**: a restored session keeps the name its program set (e.g. Claude Code's session title) and its mouse and screen modes, even when that output is no longer in the replay buffer.
-- **Scroll position when switching tabs**: each terminal tab returns to the place you scrolled to instead of jumping.
+- **Clean terminal after a reload or a server restart**: a restored Claude Code session no longer shows words cut at the margin or overlapping status lines. The server makes the program redraw its whole screen when a device reattaches, and keeps the title and terminal modes through server restarts.
 <!-- lang:pl -->
+### Nowości
+- **Shift na pasku klawiszy terminala**: pasek ekranowy ma Shift zamiast Alt. Shift+Tab przełącza tryb Claude Code, Shift+Enter wstawia nową linię, Shift ze strzałkami/Home/End/PgUp/PgDn wysyła klawisze z Shiftem.
 ### Poprawki
-- **Przyciski Claude Code w terminalu**: klikalne przyciski paska stanu (mody) znów reagują po przeładowaniu strony i po dotknięciu na telefonie. Terminal zgłaszał Claude Code utratę fokusu (po przeładowaniu i przy każdym dotknięciu ze schowaną klawiaturą), a wtedy Claude Code ignoruje kliknięcia.
-- **Tytuł terminala po przeładowaniu**: przywrócona sesja zachowuje nazwę ustawioną przez program (np. tytuł sesji Claude Code) oraz tryby myszy i ekranu, nawet gdy tego wyjścia nie ma już w buforze odtwarzania.
-- **Pozycja przewinięcia przy zmianie kart**: każda karta terminala wraca w miejsce, do którego ją przewinięto, zamiast skakać.
+- **Czysty terminal po przeładowaniu lub restarcie serwera**: przywrócona sesja Claude Code nie pokazuje już słów pociętych na krawędzi ani nachodzących linii statusu. Serwer każe programowi przerysować cały ekran, gdy urządzenie się ponownie podłącza, i zachowuje tytuł oraz tryby terminala przez restarty serwera.
 <!-- lang:de -->
+### Neu
+- **Shift in der Terminal-Tastenleiste**: Die Bildschirm-Tastenleiste hat Shift statt Alt. Shift+Tab wechselt den Modus von Claude Code, Shift+Enter fügt einen Zeilenumbruch ein, Shift mit Pfeilen/Pos1/Ende/Bild↑/Bild↓ sendet die Tasten mit Shift.
 ### Fehlerbehebungen
-- **Claude-Code-Schaltflächen im Terminal**: Klickbare Statusleisten-Schaltflächen (Mods) reagieren wieder nach einem Neuladen der Seite und beim Tippen auf dem Handy. Das Terminal meldete Claude Code einen Fokusverlust (beim Neuladen und bei jedem Tippen mit eingeklappter Tastatur), und dann ignoriert Claude Code Klicks.
-- **Terminaltitel nach dem Neuladen**: Eine wiederhergestellte Sitzung behält den Namen, den ihr Programm gesetzt hat (z. B. den Sitzungstitel von Claude Code), sowie Maus- und Bildschirmmodi, auch wenn diese Ausgabe nicht mehr im Wiedergabepuffer liegt.
-- **Scrollposition beim Tabwechsel**: Jeder Terminal-Tab kehrt an die Stelle zurück, an die du gescrollt hast, statt zu springen.
+- **Sauberes Terminal nach Neuladen oder Server-Neustart**: Eine wiederhergestellte Claude-Code-Sitzung zeigt keine am Rand abgeschnittenen Wörter oder überlappenden Statuszeilen mehr. Der Server lässt das Programm beim erneuten Verbinden eines Geräts den ganzen Bildschirm neu zeichnen und behält Titel und Terminalmodi über Server-Neustarts hinweg.
 <!-- lang:es -->
+### Novedades
+- **Shift en la barra de teclas del terminal**: la barra de teclas en pantalla tiene Shift en lugar de Alt. Shift+Tab cambia el modo de Claude Code, Shift+Enter inserta un salto de línea y Shift con flechas/Inicio/Fin/RePág/AvPág envía las teclas con Shift.
 ### Correcciones
-- **Botones de Claude Code en el terminal**: los botones clicables de la barra de estado (mods) vuelven a responder tras recargar la página y al tocar en el teléfono. El terminal indicaba a Claude Code que había perdido el foco (al recargar y en cada toque con el teclado oculto), y entonces Claude Code ignora los clics.
-- **Título del terminal tras recargar**: una sesión restaurada conserva el nombre que fijó su programa (p. ej. el título de sesión de Claude Code) y sus modos de ratón y pantalla, aunque esa salida ya no esté en el búfer de reproducción.
-- **Posición de desplazamiento al cambiar de pestaña**: cada pestaña del terminal vuelve al punto al que la desplazaste en lugar de saltar.
+- **Terminal limpio tras recargar o reiniciar el servidor**: una sesión restaurada de Claude Code ya no muestra palabras cortadas en el margen ni líneas de estado superpuestas. El servidor hace que el programa redibuje toda la pantalla cuando un dispositivo se reconecta y conserva el título y los modos del terminal tras los reinicios.
 <!-- lang:fr -->
+### Nouveautés
+- **Shift dans la barre de touches du terminal** : la barre de touches à l'écran propose Shift au lieu d'Alt. Shift+Tab change le mode de Claude Code, Shift+Entrée insère un saut de ligne, Shift avec les flèches/Début/Fin/PgPréc/PgSuiv envoie les touches avec Shift.
 ### Corrections
-- **Boutons Claude Code dans le terminal** : les boutons cliquables de la barre d'état (mods) réagissent de nouveau après un rechargement de la page et aux appuis sur téléphone. Le terminal signalait à Claude Code une perte de focus (au rechargement et à chaque appui clavier masqué), et Claude Code ignore alors les clics.
-- **Titre du terminal après rechargement** : une session restaurée conserve le nom défini par son programme (par ex. le titre de session de Claude Code) ainsi que ses modes souris et écran, même quand cette sortie n'est plus dans le tampon de relecture.
-- **Position de défilement au changement d'onglet** : chaque onglet du terminal revient à l'endroit où vous l'aviez fait défiler au lieu de sauter.
+- **Terminal propre après un rechargement ou un redémarrage du serveur** : une session Claude Code restaurée n'affiche plus de mots coupés en marge ni de lignes d'état superposées. Le serveur fait redessiner tout l'écran au programme quand un appareil se reconnecte et conserve le titre et les modes du terminal lors des redémarrages.
 <!-- lang:it -->
+### Novità
+- **Shift nella barra dei tasti del terminale**: la barra dei tasti a schermo ha Shift al posto di Alt. Shift+Tab cambia la modalità di Claude Code, Shift+Invio inserisce un a capo, Shift con frecce/Home/Fine/PagSu/PagGiù invia i tasti con Shift.
 ### Correzioni
-- **Pulsanti di Claude Code nel terminale**: i pulsanti cliccabili della barra di stato (mod) tornano a rispondere dopo il ricaricamento della pagina e ai tocchi sul telefono. Il terminale segnalava a Claude Code la perdita del focus (al ricaricamento e a ogni tocco con la tastiera chiusa), e allora Claude Code ignora i clic.
-- **Titolo del terminale dopo il ricaricamento**: una sessione ripristinata mantiene il nome impostato dal programma (ad es. il titolo di sessione di Claude Code) e le modalità mouse e schermo, anche quando quell'output non è più nel buffer di riproduzione.
-- **Posizione di scorrimento al cambio scheda**: ogni scheda del terminale torna al punto in cui l'avevi scorsa invece di saltare.
+- **Terminale pulito dopo un ricaricamento o un riavvio del server**: una sessione di Claude Code ripristinata non mostra più parole tagliate al margine né righe di stato sovrapposte. Il server fa ridisegnare l'intero schermo al programma quando un dispositivo si ricollega e mantiene titolo e modalità del terminale tra i riavvii.
 <!-- lang:ja -->
+### 新機能
+- **ターミナルのキーバーに Shift**：画面上のキーバーが Alt の代わりに Shift になりました。Shift+Tab で Claude Code のモードを切り替え、Shift+Enter で改行を挿入し、矢印/Home/End/PgUp/PgDn と組み合わせると Shift 付きのキーを送信します。
 ### 修正
-- **ターミナル内の Claude Code ボタン**：ステータスラインのクリック可能なボタン（mod）が、ページ再読み込み後やスマホでのタップでも再び反応するようになりました。ターミナルが Claude Code にフォーカス喪失を通知しており（再読み込み時、およびキーボードを閉じた状態でのタップごと）、その間 Claude Code はクリックを無視していました。
-- **再読み込み後のターミナルタイトル**：復元されたセッションは、プログラムが設定した名前（Claude Code のセッションタイトルなど）とマウス・画面モードを保持します。その出力が再生バッファから消えていても同様です。
-- **タブ切り替え時のスクロール位置**：各ターミナルタブは、ジャンプせずにスクロールした位置へ戻ります。
+- **再読み込みやサーバー再起動後もきれいなターミナル**：復元した Claude Code セッションで、端で切れた単語や重なったステータス行が表示されなくなりました。デバイスが再接続するとサーバーがプログラムに画面全体を再描画させ、サーバー再起動後もタイトルとターミナルモードを保持します。
 <!-- lang:ko -->
+### 새 기능
+- **터미널 키 바의 Shift**: 화면 키 바에 Alt 대신 Shift가 있습니다. Shift+Tab으로 Claude Code 모드를 바꾸고, Shift+Enter로 줄을 바꾸며, 화살표/Home/End/PgUp/PgDn과 함께 누르면 Shift가 적용된 키를 보냅니다.
 ### 수정
-- **터미널의 Claude Code 버튼**: 상태 표시줄의 클릭 가능한 버튼(mod)이 페이지를 새로고침한 뒤와 휴대폰에서 탭할 때 다시 반응합니다. 터미널이 Claude Code에 포커스를 잃었다고 알렸고(새로고침 시, 그리고 키보드가 내려간 상태에서 탭할 때마다), 그동안 Claude Code는 클릭을 무시했습니다.
-- **새로고침 후 터미널 제목**: 복원된 세션은 프로그램이 설정한 이름(예: Claude Code 세션 제목)과 마우스·화면 모드를 유지합니다. 그 출력이 재생 버퍼에 더 이상 없어도 마찬가지입니다.
-- **탭 전환 시 스크롤 위치**: 각 터미널 탭이 튀지 않고 스크롤해 둔 위치로 돌아갑니다.
+- **새로고침이나 서버 재시작 후에도 깨끗한 터미널**: 복원된 Claude Code 세션에서 가장자리에서 잘린 단어나 겹친 상태 줄이 더 이상 보이지 않습니다. 기기가 다시 연결되면 서버가 프로그램에 전체 화면을 다시 그리게 하고, 서버를 재시작해도 제목과 터미널 모드를 유지합니다.
 <!-- lang:ru -->
+### Новое
+- **Shift на панели клавиш терминала**: на экранной панели клавиш теперь Shift вместо Alt. Shift+Tab переключает режим Claude Code, Shift+Enter вставляет перевод строки, Shift со стрелками/Home/End/PgUp/PgDn отправляет клавиши с Shift.
 ### Исправления
-- **Кнопки Claude Code в терминале**: кликабельные кнопки строки состояния (моды) снова реагируют после перезагрузки страницы и при касании на телефоне. Терминал сообщал Claude Code о потере фокуса (при перезагрузке и при каждом касании со скрытой клавиатурой), а в этом состоянии Claude Code игнорирует клики.
-- **Заголовок терминала после перезагрузки**: восстановленный сеанс сохраняет имя, заданное программой (например, заголовок сеанса Claude Code), а также режимы мыши и экрана, даже если этого вывода уже нет в буфере воспроизведения.
-- **Позиция прокрутки при смене вкладок**: каждая вкладка терминала возвращается туда, куда вы её прокрутили, а не прыгает.
+- **Чистый терминал после перезагрузки страницы или перезапуска сервера**: восстановленный сеанс Claude Code больше не показывает слова, обрезанные у края, и наложенные строки состояния. Сервер заставляет программу перерисовать весь экран при повторном подключении устройства и сохраняет заголовок и режимы терминала при перезапусках.
 <!-- lang:tr -->
+### Yenilikler
+- **Terminal tuş çubuğunda Shift**: ekran tuş çubuğunda Alt yerine Shift var. Shift+Tab Claude Code modunu değiştirir, Shift+Enter yeni satır ekler, oklar/Home/End/PgUp/PgDn ile Shift'li tuşları gönderir.
 ### Düzeltmeler
-- **Terminaldeki Claude Code düğmeleri**: durum satırındaki tıklanabilir düğmeler (mod'lar) sayfa yeniden yüklendikten sonra ve telefonda dokunulduğunda yeniden tepki veriyor. Terminal, Claude Code'a odağın kaybolduğunu bildiriyordu (yeniden yüklemede ve klavye kapalıyken her dokunuşta) ve Claude Code bu durumda tıklamaları yok sayıyor.
-- **Yeniden yüklemeden sonra terminal başlığı**: geri yüklenen oturum, programının belirlediği adı (ör. Claude Code oturum başlığı) ile fare ve ekran modlarını koruyor; bu çıktı artık yeniden oynatma arabelleğinde olmasa bile.
-- **Sekme değiştirirken kaydırma konumu**: her terminal sekmesi zıplamak yerine kaydırdığınız yere geri dönüyor.
+- **Yeniden yükleme veya sunucu yeniden başlatıldıktan sonra temiz terminal**: geri yüklenen Claude Code oturumunda kenarda kesilmiş kelimeler veya üst üste binen durum satırları artık görünmüyor. Bir cihaz yeniden bağlandığında sunucu programın tüm ekranı yeniden çizmesini sağlıyor; başlık ve terminal modları yeniden başlatmalarda korunuyor.
 <!-- lang:zh-CN -->
+### 新功能
+- **终端按键栏中的 Shift**：屏幕按键栏用 Shift 替换了 Alt。Shift+Tab 切换 Claude Code 模式，Shift+Enter 插入换行，Shift 配合方向键/Home/End/PgUp/PgDn 发送带 Shift 的按键。
 ### 修复
-- **终端中的 Claude Code 按钮**：状态栏中可点击的按钮（mod）在页面重新加载后以及在手机上点按时会再次响应。终端此前会告诉 Claude Code 已失去焦点（重新加载时，以及键盘收起时的每次点按），而此时 Claude Code 会忽略点击。
-- **重新加载后的终端标题**：恢复的会话会保留其程序设置的名称（例如 Claude Code 的会话标题）以及鼠标和屏幕模式，即使这些输出已不在回放缓冲区中。
-- **切换标签页时的滚动位置**：每个终端标签页都会回到你滚动到的位置，而不会跳动。
+- **重新加载或服务器重启后终端保持整洁**：恢复的 Claude Code 会话不再出现边缘被截断的单词或重叠的状态行。设备重新连接时服务器会让程序重绘整个屏幕，并在服务器重启后保留标题和终端模式。
 <!-- lang:zh-TW -->
+### 新功能
+- **終端機按鍵列中的 Shift**：螢幕按鍵列以 Shift 取代了 Alt。Shift+Tab 切換 Claude Code 模式，Shift+Enter 插入換行，Shift 搭配方向鍵/Home/End/PgUp/PgDn 傳送帶 Shift 的按鍵。
 ### 修正
-- **終端機中的 Claude Code 按鈕**：狀態列中可點擊的按鈕（mod）在頁面重新載入後以及在手機上點按時會再次回應。終端機先前會告訴 Claude Code 已失去焦點（重新載入時，以及鍵盤收起時的每次點按），而此時 Claude Code 會忽略點擊。
-- **重新載入後的終端機標題**：還原的工作階段會保留其程式設定的名稱（例如 Claude Code 的工作階段標題）以及滑鼠和螢幕模式，即使這些輸出已不在重播緩衝區中。
-- **切換分頁時的捲動位置**：每個終端機分頁都會回到你捲動到的位置，而不會跳動。
+- **重新載入或伺服器重新啟動後終端機保持整潔**：還原的 Claude Code 工作階段不再出現邊緣被截斷的字詞或重疊的狀態列。裝置重新連線時伺服器會讓程式重繪整個畫面，並在伺服器重新啟動後保留標題和終端機模式。
