@@ -2,8 +2,9 @@ import 'package:flutter/widgets.dart';
 import 'package:xterm/core.dart';
 import 'package:xterm/src/ui/infinite_scroll_view.dart';
 
-/// Handles scrolling gestures in the alternate screen buffer. In alternate
-/// screen buffer, the terminal don't have a scrollback buffer, instead, the
+/// Handles scrolling gestures in the alternate screen buffer — and, as in
+/// xterm, wherever the application asked for mouse wheel reports (ddagent
+/// change: upstream sent them from the alternate buffer only). There the
 /// scroll gestures are converted to escape sequences based on the current
 /// report mode declared by the application.
 class TerminalScrollGestureHandler extends StatefulWidget {
@@ -38,9 +39,12 @@ class TerminalScrollGestureHandler extends StatefulWidget {
 
 class _TerminalScrollGestureHandlerState
     extends State<TerminalScrollGestureHandler> {
-  /// Whether the application is in alternate screen buffer. If false, then this
-  /// widget does nothing.
+  /// Whether scroll gestures go to the application: it is in the alternate
+  /// screen buffer or reports the mouse wheel. If false, this widget does nothing.
   var isAltBuffer = false;
+
+  bool get _appScrolls =>
+      widget.terminal.isUsingAltBuffer || widget.terminal.mouseMode.reportScroll;
 
   /// The variable that tracks the line offset in last scroll event. Used to
   /// determine how many the scroll events should be sent to the terminal.
@@ -53,7 +57,7 @@ class _TerminalScrollGestureHandlerState
   @override
   void initState() {
     widget.terminal.addListener(_onTerminalUpdated);
-    isAltBuffer = widget.terminal.isUsingAltBuffer;
+    isAltBuffer = _appScrolls;
     super.initState();
   }
 
@@ -68,14 +72,14 @@ class _TerminalScrollGestureHandlerState
     if (oldWidget.terminal != widget.terminal) {
       oldWidget.terminal.removeListener(_onTerminalUpdated);
       widget.terminal.addListener(_onTerminalUpdated);
-      isAltBuffer = widget.terminal.isUsingAltBuffer;
+      isAltBuffer = _appScrolls;
     }
     super.didUpdateWidget(oldWidget);
   }
 
   void _onTerminalUpdated() {
-    if (isAltBuffer != widget.terminal.isUsingAltBuffer) {
-      isAltBuffer = widget.terminal.isUsingAltBuffer;
+    if (isAltBuffer != _appScrolls) {
+      isAltBuffer = _appScrolls;
       setState(() {});
     }
   }
