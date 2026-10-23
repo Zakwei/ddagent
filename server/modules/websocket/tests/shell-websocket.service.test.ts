@@ -32,6 +32,7 @@ function createFakePty() {
 
   return {
     killed: false,
+    resizes: [] as Array<[number, number]>,
     onData(listener: (data: string) => void) {
       dataListener = listener;
       return { dispose: () => undefined };
@@ -47,7 +48,9 @@ function createFakePty() {
       exitListener?.({ exitCode: 0 });
     },
     write() {},
-    resize() {},
+    resize(cols: number, rows: number) {
+      this.resizes.push([cols, rows]);
+    },
     kill() {
       this.killed = true;
     },
@@ -370,7 +373,9 @@ test('every device viewing a PTY gets its output; only the one in charge answers
 test('a second device attaching does not resize the shell; typing on a device does', () => {
   const { pty, resizes, writes, desktop, phone } = attachTwoViewers('resize');
 
-  assert.deepEqual(resizes, []);
+  // The phone's full replay only nudges a repaint at the shell's own size.
+  assert.deepEqual(resizes, [[200, 49]]);
+  resizes.length = 0;
   // A non-owner's layout is only remembered.
   desktop.emit('message', JSON.stringify({ type: 'resize', cols: 190, rows: 48 }));
   assert.deepEqual(resizes, []);
@@ -1072,4 +1077,79 @@ test('after a restart the gateway adopts PTYs from the host and resumes their st
   );
 
   held.emitExit();
+});
+
+test('an adopted PTY replays the title and modes the daemon saw before its window', async (t) => {
+  const socketPath = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'shell-host-')), 'host.sock');
+  const held = createFakePty();
+  const daemon = runPtyHostDaemon(socketPath, (() => held) as never);
+  t.after(() => daemon.close());
+  await new Promise((resolve) => setTimeout(resolve, 30));
+
+  const sessionId = `adopt-state-${Date.now()}`;
+  const previous = (await connectPtyHost(socketPath))!;
+  previous.spawn('run-8', 'bash', [], { name: 'xterm', cols: 80, rows: 24, cwd: '/', env: {} }, {
+    sessionKey: `${process.cwd()}_${sessionId}`,
+    projectPath: process.cwd(),
+    sessionId,
+    isCommand: false,
+    createdAt: Date.now(),
+  });
+  await new Promise((resolve) => setTimeout(resolve, 30));
+  // Claude Code at startup, then far more redraws than the daemon's window holds.
+  held.emitData('\x1b]0;My session\x07\x1b[?1049h\x1b[?1000;1006h');
+  for (let i = 0; i < 256; i++) {
+    held.emitData('.'.repeat(4096));
+  }
+  await new Promise((resolve) => setTimeout(resolve, 30));
+  previous.close();
+
+  const host = (await startShellPtyHost(socketPath))!;
+  t.after(() => host.close());
+  const socket = createFakeSocket();
+  handleShellConnection(socket as never, { resolveProviderSessionId: () => null });
+  socket.emit(
+    'message',
+    JSON.stringify({ type: 'init', projectPath: process.cwd(), sessionId, provider: 'plain-shell', isPlainShell: true })
+  );
+  const first = socket.frames
+    .map((frame) => JSON.parse(frame) as { type: string; data: string })
+    .find((frame) => frame.type === 'output');
+  assert.equal(
+    first?.data,
+    '\x1b[2J\x1b[3J\x1b[H\x1b]2;My session\x07\x1b[?1049h\x1b[?1000h\x1b[?1006h'
+  );
+
+  held.emitExit();
+});
+
+test('a full replay makes the program repaint its screen', async () => {
+  const pty = createFakePty();
+  const dependencies = { resolveProviderSessionId: () => null, spawnPty: () => pty as never };
+  const initMessage = JSON.stringify({
+    type: 'init',
+    projectPath: process.cwd(),
+    sessionId: `repaint-${Date.now()}`,
+    provider: 'plain-shell',
+    isPlainShell: true,
+    cols: 80,
+    rows: 24,
+  });
+  const firstSocket = createFakeSocket();
+  handleShellConnection(firstSocket as never, dependencies);
+  firstSocket.emit('message', initMessage);
+  pty.emitData('drawn by differences');
+  pty.resizes.length = 0;
+
+  // A reload: the replayed tail is not the screen the program believes it drew.
+  const reloaded = createFakeSocket();
+  handleShellConnection(reloaded as never, dependencies);
+  reloaded.emit('message', initMessage);
+  await new Promise((resolve) => setTimeout(resolve, 200));
+  assert.deepEqual(pty.resizes, [
+    [80, 23],
+    [80, 24],
+  ]);
+
+  pty.emitExit();
 });

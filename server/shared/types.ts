@@ -2764,3 +2764,14 @@ export type AppPreviewBroadcast =
   | { type: 'app-preview-upserted'; preview: AppPreviewTarget; created: boolean }
   | { type: 'app-preview-removed'; previewId: string }
   | { type: 'app-preview-reloaded'; preview: AppPreviewTarget };
+
+// ---------------------------
+//----------------- TERMINAL REPLAY STATE ------------
+/**
+ * Terminal state a program sets once and a replay window loses when that
+ * output is evicted: the window title (OSC 0/2 — Claude Code's session name)
+ * and each DEC private mode's last `h`/`l` (mouse tracking, alt screen,
+ * bracketed paste…). `tail` holds an escape sequence cut off by a chunk end.
+ * Kept per PTY by the PTY host daemon and the WebSocket shell gateway.
+ */
+export type TerminalReplayState = { title: string | null; modes: Map<number, boolean>; tail: string };

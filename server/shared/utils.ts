@@ -36,6 +36,7 @@ import type {
   ProviderCurrentActiveModel,
   ProviderModelsDefinition,
   ProviderSkillSource,
+  TerminalReplayState,
   WorkspacePathValidationResult,
 } from '@/shared/types.js';
 
@@ -2518,4 +2519,61 @@ export function safeSocketSend(
     // Dead socket mid-broadcast — delivery to the rest already happened or
     // continues; the close handler removes it from the subscriber sets.
   }
+}
+
+// ---------------------------
+//----------------- TERMINAL REPLAY STATE ------------
+// A title (OSC 0/2), a DEC private mode set/reset, or a full reset (RIS).
+const TERMINAL_STATE_SEQUENCE = /\x1b\][02];([^\x07\x1b]*)(?:\x07|\x1b\\)|\x1b\[\?([\d;]+)([hl])|\x1bc/g;
+// An OSC or CSI cut off by the end of a chunk — rescanned with the next one.
+const TERMINAL_STATE_TAIL = /\x1b(?:\][^\x07\x1b]*|\[\??[\d;]*)?$/;
+const TERMINAL_STATE_TAIL_MAX_CHARS = 4096;
+
+/**
+ * A blank [TerminalReplayState] for a freshly spawned PTY. Used by the PTY host
+ * daemon and the WebSocket shell gateway when they start tracking a PTY.
+ */
+export function createTerminalReplayState(): TerminalReplayState {
+  return { title: null, modes: new Map(), tail: '' };
+}
+
+/**
+ * Records the title and DEC private modes `chunk` sets, in stream order; an
+ * escape sequence split across chunks is completed with the next one. Fed
+ * every output chunk by the PTY host daemon (so the state survives server
+ * restarts) and by the WebSocket shell gateway (PTYs it spawns itself).
+ */
+export function trackTerminalState(state: TerminalReplayState, chunk: string): void {
+  const text = state.tail + chunk;
+  for (const match of text.matchAll(TERMINAL_STATE_SEQUENCE)) {
+    if (match[1] !== undefined) {
+      state.title = match[1];
+    } else if (match[2] !== undefined) {
+      for (const mode of match[2].split(';')) {
+        if (mode) {
+          // Re-inserted so the preamble replays modes in the order last set.
+          state.modes.delete(Number(mode));
+          state.modes.set(Number(mode), match[3] === 'h');
+        }
+      }
+    } else {
+      state.modes.clear();
+    }
+  }
+  const tail = TERMINAL_STATE_TAIL.exec(text)?.[0] ?? '';
+  state.tail = tail.length <= TERMINAL_STATE_TAIL_MAX_CHARS ? tail : '';
+}
+
+/**
+ * The sequences that put a blank emulator into the tracked state. The
+ * WebSocket shell gateway sends them before a full replay window, so every
+ * mode ends at its last value: a later change inside the window is replayed
+ * over it.
+ */
+export function terminalStatePreamble(state: TerminalReplayState): string {
+  let preamble = state.title === null ? '' : `\x1b]2;${state.title}\x07`;
+  for (const [mode, enabled] of state.modes) {
+    preamble += `\x1b[?${mode}${enabled ? 'h' : 'l'}`;
+  }
+  return preamble;
 }

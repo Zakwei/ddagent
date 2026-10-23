@@ -26,7 +26,8 @@ import path from 'node:path';
 
 import pty, { type IPty } from 'node-pty';
 
-import { killProcessGroup } from '@/shared/utils.js';
+import type { TerminalReplayState } from '@/shared/types.js';
+import { createTerminalReplayState, killProcessGroup, trackTerminalState } from '@/shared/utils.js';
 
 type PtyHostSpawnOptions = {
   name: string;
@@ -71,6 +72,11 @@ export type PtyHostSnapshot = {
   meta: Record<string, unknown>;
   buffer: string;
   outputEnd: number;
+  /**
+   * Title and private modes set over the PTY's whole run, older than `buffer`
+   * may reach. Absent from a daemon started before it tracked them.
+   */
+  terminalState?: { title: string | null; modes: Array<[number, boolean]> };
 };
 
 /**
@@ -130,6 +136,7 @@ type DaemonPty = {
   buffer: string[];
   bufferChars: number;
   outputEnd: number;
+  terminalState: TerminalReplayState;
 };
 
 /**
@@ -162,6 +169,10 @@ export function runPtyHostDaemon(
           meta: held.meta,
           buffer: held.buffer.join(''),
           outputEnd: held.outputEnd,
+          terminalState: {
+            title: held.terminalState.title,
+            modes: [...held.terminalState.modes],
+          },
         })),
       });
       return;
@@ -187,12 +198,14 @@ export function runPtyHostDaemon(
         buffer: [],
         bufferChars: 0,
         outputEnd: 0,
+        terminalState: createTerminalReplayState(),
       };
       ptys.set(request.id, held);
       spawned.onData((data) => {
         held.buffer.push(data);
         held.bufferChars += data.length;
         held.outputEnd += data.length;
+        trackTerminalState(held.terminalState, data);
         while (held.bufferChars > DAEMON_BUFFER_MAX_CHARS && held.buffer.length > 1) {
           held.bufferChars -= held.buffer.shift()!.length;
         }
