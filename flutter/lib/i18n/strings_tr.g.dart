@@ -260,6 +260,7 @@ class Translations$settings$tr extends Translations$settings$en {
 	@override late final Translations$settings$mcpTokens$tr mcpTokens = Translations$settings$mcpTokens$tr._(_root);
 	@override late final Translations$settings$about$tr about = Translations$settings$about$tr._(_root);
 	@override late final Translations$settings$shortcuts$tr shortcuts = Translations$settings$shortcuts$tr._(_root);
+	@override late final Translations$settings$disk$tr disk = Translations$settings$disk$tr._(_root);
 }
 
 // Path: sidebar
@@ -3261,6 +3262,22 @@ class Translations$settings$shortcuts$tr extends Translations$settings$shortcuts
 	@override String get palRun => 'Çalıştır / aç';
 	@override String get palBack => 'Geri (boş arama)';
 	@override String get palClose => 'Kapat';
+}
+
+// Path: settings.disk
+class Translations$settings$disk$tr extends Translations$settings$disk$en {
+	Translations$settings$disk$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Disk alanı';
+	@override String free({required Object total, required Object free}) => '${total} içinde ${free} boş';
+	@override String get app => 'Uygulama';
+	@override String get data => 'Veri';
+	@override String get workspace => 'Çalışma alanları';
+	@override String get unavailable => 'Disk kullanımı alınamadı';
+	@override String lowBanner({required Object paths, required Object free}) => 'Sunucuda disk alanı az: ${paths} üzerinde ${free} kaldı. Uygulama durmadan önce yer açın.';
 }
 
 // Path: sidebar.projects
@@ -10825,6 +10842,13 @@ extension on TranslationsTr {
 			'settings.shortcuts.palRun' => 'Çalıştır / aç',
 			'settings.shortcuts.palBack' => 'Geri (boş arama)',
 			'settings.shortcuts.palClose' => 'Kapat',
+			'settings.disk.title' => 'Disk alanı',
+			'settings.disk.free' => ({required Object total, required Object free}) => '${total} içinde ${free} boş',
+			'settings.disk.app' => 'Uygulama',
+			'settings.disk.data' => 'Veri',
+			'settings.disk.workspace' => 'Çalışma alanları',
+			'settings.disk.unavailable' => 'Disk kullanımı alınamadı',
+			'settings.disk.lowBanner' => ({required Object paths, required Object free}) => 'Sunucuda disk alanı az: ${paths} üzerinde ${free} kaldı. Uygulama durmadan önce yer açın.',
 			'sidebar.projects.title' => 'Projeler',
 			'sidebar.projects.newProject' => 'Yeni Proje',
 			'sidebar.projects.deleteProject' => 'Projeyi Kaldır',
@@ -11203,6 +11227,8 @@ extension on TranslationsTr {
 			'tasks.list.toggleStatusAria' => ({required Object id}) => 'Görev ${id} durumunu değiştir',
 			'tasks.list.markDone' => 'Tamamlandı olarak işaretle',
 			'tasks.list.reopen' => 'Yeniden aç',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.allComplete' => 'Tüm görevler tamamlandı',
 			'tasks.nextTask.feature1' => '- Bağımlılıklar ve alt görevlerle AI destekli görev yönetimi.',
 			'tasks.nextTask.feature2' => '- Daha hızlı proje başlangıcı için PRD tabanlı görev oluşturma.',
@@ -11210,8 +11236,6 @@ extension on TranslationsTr {
 			'tasks.nextTask.hideDetails' => 'Ayrıntıları gizle',
 			'tasks.nextTask.initialize' => 'Başlat',
 			'tasks.nextTask.noPending' => 'Bekleyen görev yok',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI yapılandırılmamış',
 			'tasks.nextTask.review' => 'İncele',
 			'tasks.nextTask.startTask' => 'Görevi Başlat',
@@ -11717,6 +11741,8 @@ extension on TranslationsTr {
 			'skills.screen.deleteDescription' => ({required Object directory, required Object provider}) => 'Bu, ${directory} dizinini ${provider} tarafından yönetilen beceriler dizininden kaldırır. Bu işlem geri alınamaz.',
 			'skills.screen.noDescription' => 'Beceri front matter bölümünde açıklama belirtilmemiş.',
 			'skills.screen.pluginBadge' => ({required Object name}) => 'Eklenti: ${name}',
+			_ => null,
+		} ?? switch (path) {
 			'skills.screen.projectBadge' => ({required Object name}) => 'Proje: ${name}',
 			'skills.screen.sourceLabel' => 'KAYNAK',
 			'skills.empty.noProjects' => 'Kullanılabilir proje yok',
@@ -11724,8 +11750,6 @@ extension on TranslationsTr {
 			'skills.empty.noSkillsInProject' => 'Bu projede beceri yok',
 			'skills.empty.noSkillsInProjectDescription' => 'Seçili projede bir .claude/skills, .cursor/skills veya .agents/skills klasörü oluşturun.',
 			'skills.empty.noGlobalSkills' => 'Henüz genel beceri bulunamadı',
-			_ => null,
-		} ?? switch (path) {
 			'skills.empty.noGlobalSkillsDescription' => 'Her projede kullanılabilir olması için yukarıdan bir genel beceri ekleyin.',
 			'skills.empty.noMatchingSkills' => 'Eşleşen beceri yok',
 			'skills.empty.noMatchingSkillsDescription' => 'Farklı bir komut, ad, kapsam, proje veya kaynak yolu deneyin.',

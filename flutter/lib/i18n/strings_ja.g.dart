@@ -260,6 +260,7 @@ class Translations$settings$ja extends Translations$settings$en {
 	@override late final Translations$settings$mcpTokens$ja mcpTokens = Translations$settings$mcpTokens$ja._(_root);
 	@override late final Translations$settings$about$ja about = Translations$settings$about$ja._(_root);
 	@override late final Translations$settings$shortcuts$ja shortcuts = Translations$settings$shortcuts$ja._(_root);
+	@override late final Translations$settings$disk$ja disk = Translations$settings$disk$ja._(_root);
 }
 
 // Path: sidebar
@@ -3256,6 +3257,22 @@ class Translations$settings$shortcuts$ja extends Translations$settings$shortcuts
 	@override String get palRun => '実行 / 開く';
 	@override String get palBack => '戻る (検索が空の時)';
 	@override String get palClose => '閉じる';
+}
+
+// Path: settings.disk
+class Translations$settings$disk$ja extends Translations$settings$disk$en {
+	Translations$settings$disk$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'ディスク容量';
+	@override String free({required Object total, required Object free}) => '${total} 中 ${free} 空き';
+	@override String get app => 'アプリ';
+	@override String get data => 'データ';
+	@override String get workspace => 'ワークスペース';
+	@override String get unavailable => 'ディスク使用量を取得できません';
+	@override String lowBanner({required Object paths, required Object free}) => 'サーバーのディスク容量が不足しています: ${paths} の残り ${free}。アプリが停止する前に空き容量を確保してください。';
 }
 
 // Path: sidebar.projects
@@ -10819,6 +10836,13 @@ extension on TranslationsJa {
 			'settings.shortcuts.palRun' => '実行 / 開く',
 			'settings.shortcuts.palBack' => '戻る (検索が空の時)',
 			'settings.shortcuts.palClose' => '閉じる',
+			'settings.disk.title' => 'ディスク容量',
+			'settings.disk.free' => ({required Object total, required Object free}) => '${total} 中 ${free} 空き',
+			'settings.disk.app' => 'アプリ',
+			'settings.disk.data' => 'データ',
+			'settings.disk.workspace' => 'ワークスペース',
+			'settings.disk.unavailable' => 'ディスク使用量を取得できません',
+			'settings.disk.lowBanner' => ({required Object paths, required Object free}) => 'サーバーのディスク容量が不足しています: ${paths} の残り ${free}。アプリが停止する前に空き容量を確保してください。',
 			'sidebar.projects.title' => 'プロジェクト',
 			'sidebar.projects.newProject' => '新規プロジェクト',
 			'sidebar.projects.deleteProject' => 'プロジェクトを除去',
@@ -11197,6 +11221,8 @@ extension on TranslationsJa {
 			'tasks.list.toggleStatusAria' => ({required Object id}) => 'タスク ${id} のステータスを切り替え',
 			'tasks.list.markDone' => '完了にする',
 			'tasks.list.reopen' => '再開',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.allComplete' => 'すべてのタスクが完了',
 			'tasks.nextTask.feature1' => '- 依存関係とサブタスクを備えたAIタスク管理。',
 			'tasks.nextTask.feature2' => '- PRD駆動のタスク生成でプロジェクトを迅速に開始。',
@@ -11204,8 +11230,6 @@ extension on TranslationsJa {
 			'tasks.nextTask.hideDetails' => '詳細を隠す',
 			'tasks.nextTask.initialize' => '初期化',
 			'tasks.nextTask.noPending' => '保留中のタスクはありません',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI が設定されていません',
 			'tasks.nextTask.review' => '確認',
 			'tasks.nextTask.startTask' => 'タスクを開始',
@@ -11711,6 +11735,8 @@ extension on TranslationsJa {
 			'skills.screen.deleteDescription' => ({required Object provider, required Object directory}) => '${provider} の管理対象スキルディレクトリから ${directory} ディレクトリを削除します。元に戻せません。',
 			'skills.screen.noDescription' => 'スキルのフロントマターに説明がありません。',
 			'skills.screen.pluginBadge' => ({required Object name}) => 'プラグイン: ${name}',
+			_ => null,
+		} ?? switch (path) {
 			'skills.screen.projectBadge' => ({required Object name}) => 'プロジェクト: ${name}',
 			'skills.screen.sourceLabel' => 'ソース',
 			'skills.empty.noProjects' => '利用可能なプロジェクトがありません',
@@ -11718,8 +11744,6 @@ extension on TranslationsJa {
 			'skills.empty.noSkillsInProject' => 'このプロジェクトにスキルがありません',
 			'skills.empty.noSkillsInProjectDescription' => '選択したプロジェクトに .claude/skills、.cursor/skills、または .agents/skills フォルダを作成してください。',
 			'skills.empty.noGlobalSkills' => 'グローバルスキルはまだ見つかっていません',
-			_ => null,
-		} ?? switch (path) {
 			'skills.empty.noGlobalSkillsDescription' => '上でグローバルスキルを追加すると、すべてのプロジェクトで利用できるようになります。',
 			'skills.empty.noMatchingSkills' => '一致するスキルがありません',
 			'skills.empty.noMatchingSkillsDescription' => '別のコマンド、名前、スコープ、プロジェクト、ソースパスをお試しください。',

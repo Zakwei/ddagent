@@ -260,6 +260,7 @@ class Translations$settings$zh_CN extends Translations$settings$en {
 	@override late final Translations$settings$mcpTokens$zh_CN mcpTokens = Translations$settings$mcpTokens$zh_CN.internal(_root);
 	@override late final Translations$settings$about$zh_CN about = Translations$settings$about$zh_CN.internal(_root);
 	@override late final Translations$settings$shortcuts$zh_CN shortcuts = Translations$settings$shortcuts$zh_CN.internal(_root);
+	@override late final Translations$settings$disk$zh_CN disk = Translations$settings$disk$zh_CN.internal(_root);
 }
 
 // Path: sidebar
@@ -3256,6 +3257,22 @@ class Translations$settings$shortcuts$zh_CN extends Translations$settings$shortc
 	@override String get palRun => '运行 / 打开';
 	@override String get palBack => '返回（搜索为空时）';
 	@override String get palClose => '关闭';
+}
+
+// Path: settings.disk
+class Translations$settings$disk$zh_CN extends Translations$settings$disk$en {
+	Translations$settings$disk$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '磁盘空间';
+	@override String free({required Object total, required Object free}) => '${total} 中可用 ${free}';
+	@override String get app => '应用';
+	@override String get data => '数据';
+	@override String get workspace => '工作区';
+	@override String get unavailable => '无法获取磁盘使用情况';
+	@override String lowBanner({required Object paths, required Object free}) => '服务器磁盘空间不足：${paths} 仅剩 ${free}。请在应用停止工作前释放空间。';
 }
 
 // Path: sidebar.projects
@@ -10819,6 +10836,13 @@ extension on TranslationsZhCn {
 			'settings.shortcuts.palRun' => '运行 / 打开',
 			'settings.shortcuts.palBack' => '返回（搜索为空时）',
 			'settings.shortcuts.palClose' => '关闭',
+			'settings.disk.title' => '磁盘空间',
+			'settings.disk.free' => ({required Object total, required Object free}) => '${total} 中可用 ${free}',
+			'settings.disk.app' => '应用',
+			'settings.disk.data' => '数据',
+			'settings.disk.workspace' => '工作区',
+			'settings.disk.unavailable' => '无法获取磁盘使用情况',
+			'settings.disk.lowBanner' => ({required Object paths, required Object free}) => '服务器磁盘空间不足：${paths} 仅剩 ${free}。请在应用停止工作前释放空间。',
 			'sidebar.projects.title' => '项目',
 			'sidebar.projects.newProject' => '新建项目',
 			'sidebar.projects.deleteProject' => '移除项目',
@@ -11197,6 +11221,8 @@ extension on TranslationsZhCn {
 			'tasks.list.toggleStatusAria' => ({required Object id}) => '切换任务 ${id} 的状态',
 			'tasks.list.markDone' => '标记为已完成',
 			'tasks.list.reopen' => '重新打开',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.allComplete' => '所有任务已完成',
 			'tasks.nextTask.feature1' => '- AI 任务管理，支持依赖和子任务。',
 			'tasks.nextTask.feature2' => '- PRD 驱动的任务生成，快速启动项目。',
@@ -11204,8 +11230,6 @@ extension on TranslationsZhCn {
 			'tasks.nextTask.hideDetails' => '隐藏详情',
 			'tasks.nextTask.initialize' => '初始化',
 			'tasks.nextTask.noPending' => '没有待处理任务',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI 未配置',
 			'tasks.nextTask.review' => '审查',
 			'tasks.nextTask.startTask' => '开始任务',
@@ -11711,6 +11735,8 @@ extension on TranslationsZhCn {
 			'skills.screen.deleteDescription' => ({required Object directory, required Object provider}) => '这会将 ${directory} 目录从 ${provider} 的托管技能目录中移除。此操作无法撤销。',
 			'skills.screen.noDescription' => '技能的 front matter 中未提供描述。',
 			'skills.screen.pluginBadge' => ({required Object name}) => '插件：${name}',
+			_ => null,
+		} ?? switch (path) {
 			'skills.screen.projectBadge' => ({required Object name}) => '项目：${name}',
 			'skills.screen.sourceLabel' => '来源',
 			'skills.empty.noProjects' => '没有可用的项目',
@@ -11718,8 +11744,6 @@ extension on TranslationsZhCn {
 			'skills.empty.noSkillsInProject' => '此项目中没有技能',
 			'skills.empty.noSkillsInProjectDescription' => '在所选项目中创建 .claude/skills、.cursor/skills 或 .agents/skills 文件夹。',
 			'skills.empty.noGlobalSkills' => '尚未发现全局技能',
-			_ => null,
-		} ?? switch (path) {
 			'skills.empty.noGlobalSkillsDescription' => '在上方添加全局技能，使其可用于所有项目。',
 			'skills.empty.noMatchingSkills' => '没有匹配的技能',
 			'skills.empty.noMatchingSkillsDescription' => '请尝试其他命令、名称、范围、项目或来源路径。',

@@ -260,6 +260,7 @@ class Translations$settings$ko extends Translations$settings$en {
 	@override late final Translations$settings$mcpTokens$ko mcpTokens = Translations$settings$mcpTokens$ko._(_root);
 	@override late final Translations$settings$about$ko about = Translations$settings$about$ko._(_root);
 	@override late final Translations$settings$shortcuts$ko shortcuts = Translations$settings$shortcuts$ko._(_root);
+	@override late final Translations$settings$disk$ko disk = Translations$settings$disk$ko._(_root);
 }
 
 // Path: sidebar
@@ -3256,6 +3257,22 @@ class Translations$settings$shortcuts$ko extends Translations$settings$shortcuts
 	@override String get palRun => '실행 / 열기';
 	@override String get palBack => '뒤로 (검색어가 비어 있을 때)';
 	@override String get palClose => '닫기';
+}
+
+// Path: settings.disk
+class Translations$settings$disk$ko extends Translations$settings$disk$en {
+	Translations$settings$disk$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '디스크 공간';
+	@override String free({required Object total, required Object free}) => '${total} 중 ${free} 사용 가능';
+	@override String get app => '앱';
+	@override String get data => '데이터';
+	@override String get workspace => '워크스페이스';
+	@override String get unavailable => '디스크 사용량을 확인할 수 없음';
+	@override String lowBanner({required Object paths, required Object free}) => '서버 디스크 공간 부족: ${paths}에 ${free} 남음. 앱이 멈추기 전에 공간을 확보하세요.';
 }
 
 // Path: sidebar.projects
@@ -10819,6 +10836,13 @@ extension on TranslationsKo {
 			'settings.shortcuts.palRun' => '실행 / 열기',
 			'settings.shortcuts.palBack' => '뒤로 (검색어가 비어 있을 때)',
 			'settings.shortcuts.palClose' => '닫기',
+			'settings.disk.title' => '디스크 공간',
+			'settings.disk.free' => ({required Object total, required Object free}) => '${total} 중 ${free} 사용 가능',
+			'settings.disk.app' => '앱',
+			'settings.disk.data' => '데이터',
+			'settings.disk.workspace' => '워크스페이스',
+			'settings.disk.unavailable' => '디스크 사용량을 확인할 수 없음',
+			'settings.disk.lowBanner' => ({required Object paths, required Object free}) => '서버 디스크 공간 부족: ${paths}에 ${free} 남음. 앱이 멈추기 전에 공간을 확보하세요.',
 			'sidebar.projects.title' => '프로젝트',
 			'sidebar.projects.newProject' => '새 프로젝트',
 			'sidebar.projects.deleteProject' => '프로젝트 제거',
@@ -11197,6 +11221,8 @@ extension on TranslationsKo {
 			'tasks.list.toggleStatusAria' => ({required Object id}) => '작업 ${id} 상태 전환',
 			'tasks.list.markDone' => '완료로 표시',
 			'tasks.list.reopen' => '다시 열기',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.allComplete' => '모든 작업 완료',
 			'tasks.nextTask.feature1' => '- 종속성 및 하위 작업을 지원하는 AI 작업 관리.',
 			'tasks.nextTask.feature2' => '- PRD 기반 작업 생성으로 프로젝트 빠른 시작.',
@@ -11204,8 +11230,6 @@ extension on TranslationsKo {
 			'tasks.nextTask.hideDetails' => '세부 정보 숨기기',
 			'tasks.nextTask.initialize' => '초기화',
 			'tasks.nextTask.noPending' => '대기 중인 작업 없음',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI가 구성되지 않았습니다',
 			'tasks.nextTask.review' => '검토',
 			'tasks.nextTask.startTask' => '작업 시작',
@@ -11711,6 +11735,8 @@ extension on TranslationsKo {
 			'skills.screen.deleteDescription' => ({required Object provider, required Object directory}) => '${provider}의 관리형 스킬 디렉터리에서 ${directory} 디렉터리를 제거합니다. 되돌릴 수 없습니다.',
 			'skills.screen.noDescription' => '스킬 프런트 매터에 설명이 없습니다.',
 			'skills.screen.pluginBadge' => ({required Object name}) => '플러그인: ${name}',
+			_ => null,
+		} ?? switch (path) {
 			'skills.screen.projectBadge' => ({required Object name}) => '프로젝트: ${name}',
 			'skills.screen.sourceLabel' => '소스',
 			'skills.empty.noProjects' => '사용 가능한 프로젝트 없음',
@@ -11718,8 +11744,6 @@ extension on TranslationsKo {
 			'skills.empty.noSkillsInProject' => '이 프로젝트에 스킬이 없습니다',
 			'skills.empty.noSkillsInProjectDescription' => '선택한 프로젝트에 .claude/skills, .cursor/skills 또는 .agents/skills 폴더를 만드세요.',
 			'skills.empty.noGlobalSkills' => '아직 발견된 전역 스킬이 없습니다',
-			_ => null,
-		} ?? switch (path) {
 			'skills.empty.noGlobalSkillsDescription' => '위에서 전역 스킬을 추가하면 모든 프로젝트에서 사용할 수 있습니다.',
 			'skills.empty.noMatchingSkills' => '일치하는 스킬 없음',
 			'skills.empty.noMatchingSkillsDescription' => '다른 명령어, 이름, 범위, 프로젝트 또는 소스 경로를 시도해보세요.',

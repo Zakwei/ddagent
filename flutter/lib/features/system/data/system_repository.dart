@@ -31,6 +31,34 @@ abstract class ReleaseAsset with _$ReleaseAsset {
   factory ReleaseAsset.fromJson(Map<String, dynamic> json) => _$ReleaseAssetFromJson(json);
 }
 
+/// One filesystem on the server and which of its directories live on it
+/// (`app` code, `data` database, `workspace` root) — `GET /api/system/disk`.
+class DiskVolume {
+  const DiskVolume({
+    required this.locations,
+    required this.totalBytes,
+    required this.freeBytes,
+    required this.low,
+  });
+
+  factory DiskVolume.fromJson(Map<String, dynamic> json) => DiskVolume(
+    locations: [
+      for (final l in json['locations'] as List)
+        (kind: (l as Map)['kind'] as String, path: l['path'] as String),
+    ],
+    totalBytes: (json['totalBytes'] as num).toInt(),
+    freeBytes: (json['freeBytes'] as num).toInt(),
+    low: json['low'] == true,
+  );
+
+  final List<({String kind, String path})> locations;
+  final int totalBytes;
+  final int freeBytes;
+
+  /// Server-side threshold (under 5 GB or 10% free) — drives the alarm banner.
+  final bool low;
+}
+
 /// /api/system — releases feed, self-update, restart.
 class SystemRepository {
   const SystemRepository(this._dio);
@@ -92,6 +120,15 @@ class SystemRepository {
       return null;
     }
   }
+
+  /// Free/total space of the disks holding the server code, data and workspaces.
+  Future<List<DiskVolume>> diskUsage() => apiCall(
+    () => _dio.get<dynamic>('/api/system/disk'),
+    (d) => [
+      for (final v in (d as Map<String, dynamic>)['volumes'] as List)
+        DiskVolume.fromJson(v as Map<String, dynamic>),
+    ],
+  );
 
   /// Restarts the server process; the connection drops — callers should treat
   /// a transport error here as "restart in progress", not failure.

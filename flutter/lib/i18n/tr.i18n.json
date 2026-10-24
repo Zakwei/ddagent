@@ -2912,6 +2912,15 @@
       "palRun": "Çalıştır / aç",
       "palBack": "Geri (boş arama)",
       "palClose": "Kapat"
+    },
+    "disk": {
+      "title": "Disk alanı",
+      "free": "{{total}} içinde {{free}} boş",
+      "app": "Uygulama",
+      "data": "Veri",
+      "workspace": "Çalışma alanları",
+      "unavailable": "Disk kullanımı alınamadı",
+      "lowBanner": "Sunucuda disk alanı az: {{paths}} üzerinde {{free}} kaldı. Uygulama durmadan önce yer açın."
     }
   },
   "sidebar": {

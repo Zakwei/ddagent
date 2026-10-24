@@ -2907,6 +2907,15 @@
       "palRun": "執行／開啟",
       "palBack": "返回（搜尋為空時）",
       "palClose": "關閉"
+    },
+    "disk": {
+      "title": "磁碟空間",
+      "free": "{{total}} 中可用 {{free}}",
+      "app": "應用程式",
+      "data": "資料",
+      "workspace": "工作區",
+      "unavailable": "無法取得磁碟使用情況",
+      "lowBanner": "伺服器磁碟空間不足：{{paths}} 僅剩 {{free}}。請在應用程式停止運作前釋出空間。"
     }
   },
   "sidebar": {

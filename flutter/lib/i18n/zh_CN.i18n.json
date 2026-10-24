@@ -2907,6 +2907,15 @@
       "palRun": "运行 / 打开",
       "palBack": "返回（搜索为空时）",
       "palClose": "关闭"
+    },
+    "disk": {
+      "title": "磁盘空间",
+      "free": "{{total}} 中可用 {{free}}",
+      "app": "应用",
+      "data": "数据",
+      "workspace": "工作区",
+      "unavailable": "无法获取磁盘使用情况",
+      "lowBanner": "服务器磁盘空间不足：{{paths}} 仅剩 {{free}}。请在应用停止工作前释放空间。"
     }
   },
   "sidebar": {

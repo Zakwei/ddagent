@@ -2917,6 +2917,15 @@
       "palRun": "Run / open",
       "palBack": "Back (empty search)",
       "palClose": "Close"
+    },
+    "disk": {
+      "title": "Disk space",
+      "free": "{{free}} free of {{total}}",
+      "app": "App",
+      "data": "Data",
+      "workspace": "Workspaces",
+      "unavailable": "Disk usage unavailable",
+      "lowBanner": "Low disk space on the server: {{free}} left on {{paths}}. Free up space before the app stops working."
     }
   },
   "sidebar": {

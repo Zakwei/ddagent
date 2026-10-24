@@ -2917,6 +2917,15 @@
       "palRun": "Ausführen / öffnen",
       "palBack": "Zurück (leere Suche)",
       "palClose": "Schließen"
+    },
+    "disk": {
+      "title": "Speicherplatz",
+      "free": "{{free}} frei von {{total}}",
+      "app": "App",
+      "data": "Daten",
+      "workspace": "Arbeitsbereiche",
+      "unavailable": "Speicherinfo nicht verfügbar",
+      "lowBanner": "Wenig Speicherplatz auf dem Server: noch {{free}} auf {{paths}}. Gib Speicher frei, bevor die App ausfällt."
     }
   },
   "sidebar": {

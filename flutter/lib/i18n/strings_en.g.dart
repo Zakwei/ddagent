@@ -283,6 +283,7 @@ class Translations$settings$en {
 	late final Translations$settings$mcpTokens$en mcpTokens = Translations$settings$mcpTokens$en.internal(_root);
 	late final Translations$settings$about$en about = Translations$settings$about$en.internal(_root);
 	late final Translations$settings$shortcuts$en shortcuts = Translations$settings$shortcuts$en.internal(_root);
+	late final Translations$settings$disk$en disk = Translations$settings$disk$en.internal(_root);
 }
 
 // Path: sidebar
@@ -5978,6 +5979,36 @@ class Translations$settings$shortcuts$en {
 
 	/// en: 'Close'
 	String get palClose => 'Close';
+}
+
+// Path: settings.disk
+class Translations$settings$disk$en {
+	Translations$settings$disk$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Disk space'
+	String get title => 'Disk space';
+
+	/// en: '{{free}} free of {{total}}'
+	String free({required Object free, required Object total}) => '${free} free of ${total}';
+
+	/// en: 'App'
+	String get app => 'App';
+
+	/// en: 'Data'
+	String get data => 'Data';
+
+	/// en: 'Workspaces'
+	String get workspace => 'Workspaces';
+
+	/// en: 'Disk usage unavailable'
+	String get unavailable => 'Disk usage unavailable';
+
+	/// en: 'Low disk space on the server: {{free}} left on {{paths}}. Free up space before the app stops working.'
+	String lowBanner({required Object free, required Object paths}) => 'Low disk space on the server: ${free} left on ${paths}. Free up space before the app stops working.';
 }
 
 // Path: sidebar.projects
@@ -17437,6 +17468,13 @@ extension on Translations {
 			'settings.shortcuts.palRun' => 'Run / open',
 			'settings.shortcuts.palBack' => 'Back (empty search)',
 			'settings.shortcuts.palClose' => 'Close',
+			'settings.disk.title' => 'Disk space',
+			'settings.disk.free' => ({required Object free, required Object total}) => '${free} free of ${total}',
+			'settings.disk.app' => 'App',
+			'settings.disk.data' => 'Data',
+			'settings.disk.workspace' => 'Workspaces',
+			'settings.disk.unavailable' => 'Disk usage unavailable',
+			'settings.disk.lowBanner' => ({required Object free, required Object paths}) => 'Low disk space on the server: ${free} left on ${paths}. Free up space before the app stops working.',
 			'sidebar.projects.title' => 'Projects',
 			'sidebar.projects.newProject' => 'New Project',
 			'sidebar.projects.deleteProject' => 'Remove Project',
@@ -17815,6 +17853,8 @@ extension on Translations {
 			'tasks.list.toggleStatusAria' => ({required Object id}) => 'Toggle task ${id} status',
 			'tasks.list.markDone' => 'Mark done',
 			'tasks.list.reopen' => 'Reopen',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.allComplete' => 'All tasks complete',
 			'tasks.nextTask.feature1' => '- AI-powered task management with dependencies and subtasks.',
 			'tasks.nextTask.feature2' => '- PRD-driven task generation for faster project bootstrapping.',
@@ -17822,8 +17862,6 @@ extension on Translations {
 			'tasks.nextTask.hideDetails' => 'Hide details',
 			'tasks.nextTask.initialize' => 'Initialize',
 			'tasks.nextTask.noPending' => 'No pending tasks',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI is not configured',
 			'tasks.nextTask.review' => 'Review',
 			'tasks.nextTask.startTask' => 'Start Task',
@@ -18329,6 +18367,8 @@ extension on Translations {
 			'skills.screen.deleteDescription' => ({required Object directory, required Object provider}) => 'This removes the ${directory} directory from ${provider}\'s managed skills directory. This cannot be undone.',
 			'skills.screen.noDescription' => 'No description provided in the skill front matter.',
 			'skills.screen.pluginBadge' => ({required Object name}) => 'Plugin: ${name}',
+			_ => null,
+		} ?? switch (path) {
 			'skills.screen.projectBadge' => ({required Object name}) => 'Project: ${name}',
 			'skills.screen.sourceLabel' => 'SOURCE',
 			'skills.empty.noProjects' => 'No projects available',
@@ -18336,8 +18376,6 @@ extension on Translations {
 			'skills.empty.noSkillsInProject' => 'No skills in this project',
 			'skills.empty.noSkillsInProjectDescription' => 'Create a .claude/skills, .cursor/skills or .agents/skills folder in the selected project.',
 			'skills.empty.noGlobalSkills' => 'No global skills discovered yet',
-			_ => null,
-		} ?? switch (path) {
 			'skills.empty.noGlobalSkillsDescription' => 'Add a global skill above to make it available across every project.',
 			'skills.empty.noMatchingSkills' => 'No matching skills',
 			'skills.empty.noMatchingSkillsDescription' => 'Try a different command, name, scope, project, or source path.',

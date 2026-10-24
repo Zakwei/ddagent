@@ -260,6 +260,7 @@ class Translations$settings$ru extends Translations$settings$en {
 	@override late final Translations$settings$mcpTokens$ru mcpTokens = Translations$settings$mcpTokens$ru._(_root);
 	@override late final Translations$settings$about$ru about = Translations$settings$about$ru._(_root);
 	@override late final Translations$settings$shortcuts$ru shortcuts = Translations$settings$shortcuts$ru._(_root);
+	@override late final Translations$settings$disk$ru disk = Translations$settings$disk$ru._(_root);
 }
 
 // Path: sidebar
@@ -3288,6 +3289,22 @@ class Translations$settings$shortcuts$ru extends Translations$settings$shortcuts
 	@override String get palRun => 'Выполнить / открыть';
 	@override String get palBack => 'Назад (пустой поиск)';
 	@override String get palClose => 'Закрыть';
+}
+
+// Path: settings.disk
+class Translations$settings$disk$ru extends Translations$settings$disk$en {
+	Translations$settings$disk$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Место на диске';
+	@override String free({required Object free, required Object total}) => 'Свободно ${free} из ${total}';
+	@override String get app => 'Приложение';
+	@override String get data => 'Данные';
+	@override String get workspace => 'Рабочие области';
+	@override String get unavailable => 'Данные о диске недоступны';
+	@override String lowBanner({required Object free, required Object paths}) => 'Мало места на сервере: осталось ${free} на ${paths}. Освободите место, пока приложение не перестало работать.';
 }
 
 // Path: sidebar.projects
@@ -10868,6 +10885,13 @@ extension on TranslationsRu {
 			'settings.shortcuts.palRun' => 'Выполнить / открыть',
 			'settings.shortcuts.palBack' => 'Назад (пустой поиск)',
 			'settings.shortcuts.palClose' => 'Закрыть',
+			'settings.disk.title' => 'Место на диске',
+			'settings.disk.free' => ({required Object free, required Object total}) => 'Свободно ${free} из ${total}',
+			'settings.disk.app' => 'Приложение',
+			'settings.disk.data' => 'Данные',
+			'settings.disk.workspace' => 'Рабочие области',
+			'settings.disk.unavailable' => 'Данные о диске недоступны',
+			'settings.disk.lowBanner' => ({required Object free, required Object paths}) => 'Мало места на сервере: осталось ${free} на ${paths}. Освободите место, пока приложение не перестало работать.',
 			'sidebar.projects.title' => 'Проекты',
 			'sidebar.projects.newProject' => 'Новый проект',
 			'sidebar.projects.deleteProject' => 'Убрать проект',
@@ -11246,6 +11270,8 @@ extension on TranslationsRu {
 			'tasks.list.toggleStatusAria' => ({required Object id}) => 'Переключить статус задачи ${id}',
 			'tasks.list.markDone' => 'Отметить как выполненную',
 			'tasks.list.reopen' => 'Возобновить',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.allComplete' => 'Все задачи выполнены',
 			'tasks.nextTask.feature1' => '- Управление задачами с ИИ: зависимости и подзадачи.',
 			'tasks.nextTask.feature2' => '- Генерация задач из PRD для быстрого старта проекта.',
@@ -11253,8 +11279,6 @@ extension on TranslationsRu {
 			'tasks.nextTask.hideDetails' => 'Скрыть детали',
 			'tasks.nextTask.initialize' => 'Инициализировать',
 			'tasks.nextTask.noPending' => 'Нет ожидающих задач',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI не настроен',
 			'tasks.nextTask.review' => 'Проверить',
 			'tasks.nextTask.startTask' => 'Начать задачу',
@@ -11760,6 +11784,8 @@ extension on TranslationsRu {
 			'skills.screen.deleteDescription' => ({required Object directory, required Object provider}) => 'Это удалит папку ${directory} из управляемой папки навыков ${provider}. Действие необратимо.',
 			'skills.screen.noDescription' => 'Описание не указано во front matter навыка.',
 			'skills.screen.pluginBadge' => ({required Object name}) => 'Плагин: ${name}',
+			_ => null,
+		} ?? switch (path) {
 			'skills.screen.projectBadge' => ({required Object name}) => 'Проект: ${name}',
 			'skills.screen.sourceLabel' => 'ИСТОЧНИК',
 			'skills.empty.noProjects' => 'Нет доступных проектов',
@@ -11767,8 +11793,6 @@ extension on TranslationsRu {
 			'skills.empty.noSkillsInProject' => 'В этом проекте нет навыков',
 			'skills.empty.noSkillsInProjectDescription' => 'Создайте папку .claude/skills, .cursor/skills или .agents/skills в выбранном проекте.',
 			'skills.empty.noGlobalSkills' => 'Глобальные навыки пока не найдены',
-			_ => null,
-		} ?? switch (path) {
 			'skills.empty.noGlobalSkillsDescription' => 'Добавьте глобальный навык выше, чтобы он был доступен во всех проектах.',
 			'skills.empty.noMatchingSkills' => 'Нет подходящих навыков',
 			'skills.empty.noMatchingSkillsDescription' => 'Попробуйте другую команду, имя, область, проект или исходный путь.',

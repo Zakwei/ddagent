@@ -5,8 +5,11 @@ import path from 'node:path';
 import spawn from 'cross-spawn';
 import type { Router } from 'express';
 
-import { githubTokensDb } from '../database/index.js';
+import { WORKSPACES_ROOT } from '@/shared/utils.js';
 
+import { getDatabasePath, githubTokensDb } from '../database/index.js';
+
+import { createDiskUsageService } from './disk-usage.service.js';
 import { createSystemRouter } from './system.routes.js';
 import { createSystemUpdateService } from './system.service.js';
 
@@ -94,5 +97,13 @@ export function createSystemModule(options: SystemModuleOptions): Router {
     }, 5 * 60 * 1000).unref();
   }
 
-  return createSystemRouter(systemUpdateService);
+  const diskUsageService = createDiskUsageService({
+    locations: [
+      { kind: 'app', path: options.appRoot },
+      { kind: 'data', path: path.dirname(getDatabasePath()) },
+      { kind: 'workspace', path: WORKSPACES_ROOT },
+    ],
+  });
+
+  return createSystemRouter(systemUpdateService, diskUsageService);
 }

@@ -260,6 +260,7 @@ class Translations$settings$es extends Translations$settings$en {
 	@override late final Translations$settings$mcpTokens$es mcpTokens = Translations$settings$mcpTokens$es._(_root);
 	@override late final Translations$settings$about$es about = Translations$settings$about$es._(_root);
 	@override late final Translations$settings$shortcuts$es shortcuts = Translations$settings$shortcuts$es._(_root);
+	@override late final Translations$settings$disk$es disk = Translations$settings$disk$es._(_root);
 }
 
 // Path: sidebar
@@ -3266,6 +3267,22 @@ class Translations$settings$shortcuts$es extends Translations$settings$shortcuts
 	@override String get palRun => 'Ejecutar / abrir';
 	@override String get palBack => 'Atrás (búsqueda vacía)';
 	@override String get palClose => 'Cerrar';
+}
+
+// Path: settings.disk
+class Translations$settings$disk$es extends Translations$settings$disk$en {
+	Translations$settings$disk$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Espacio en disco';
+	@override String free({required Object free, required Object total}) => '${free} libres de ${total}';
+	@override String get app => 'Aplicación';
+	@override String get data => 'Datos';
+	@override String get workspace => 'Espacios de trabajo';
+	@override String get unavailable => 'Uso de disco no disponible';
+	@override String lowBanner({required Object free, required Object paths}) => 'Poco espacio en el servidor: quedan ${free} en ${paths}. Libera espacio antes de que la app deje de funcionar.';
 }
 
 // Path: sidebar.projects
@@ -10830,6 +10847,13 @@ extension on TranslationsEs {
 			'settings.shortcuts.palRun' => 'Ejecutar / abrir',
 			'settings.shortcuts.palBack' => 'Atrás (búsqueda vacía)',
 			'settings.shortcuts.palClose' => 'Cerrar',
+			'settings.disk.title' => 'Espacio en disco',
+			'settings.disk.free' => ({required Object free, required Object total}) => '${free} libres de ${total}',
+			'settings.disk.app' => 'Aplicación',
+			'settings.disk.data' => 'Datos',
+			'settings.disk.workspace' => 'Espacios de trabajo',
+			'settings.disk.unavailable' => 'Uso de disco no disponible',
+			'settings.disk.lowBanner' => ({required Object free, required Object paths}) => 'Poco espacio en el servidor: quedan ${free} en ${paths}. Libera espacio antes de que la app deje de funcionar.',
 			'sidebar.projects.title' => 'Proyectos',
 			'sidebar.projects.newProject' => 'Nuevo proyecto',
 			'sidebar.projects.deleteProject' => 'Quitar proyecto',
@@ -11208,6 +11232,8 @@ extension on TranslationsEs {
 			'tasks.list.toggleStatusAria' => ({required Object id}) => 'Alternar estado de la tarea ${id}',
 			'tasks.list.markDone' => 'Marcar como completada',
 			'tasks.list.reopen' => 'Reabrir',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.allComplete' => 'Todas las tareas completadas',
 			'tasks.nextTask.feature1' => '- Gestión de tareas con IA, dependencias y subtareas.',
 			'tasks.nextTask.feature2' => '- Generación de tareas desde PRD para un arranque más rápido.',
@@ -11215,8 +11241,6 @@ extension on TranslationsEs {
 			'tasks.nextTask.hideDetails' => 'Ocultar detalles',
 			'tasks.nextTask.initialize' => 'Inicializar',
 			'tasks.nextTask.noPending' => 'No hay tareas pendientes',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI no está configurado',
 			'tasks.nextTask.review' => 'Revisar',
 			'tasks.nextTask.startTask' => 'Iniciar tarea',
@@ -11722,6 +11746,8 @@ extension on TranslationsEs {
 			'skills.screen.deleteDescription' => ({required Object directory, required Object provider}) => 'Esto elimina el directorio ${directory} del directorio de skills gestionadas de ${provider}. Esta acción no se puede deshacer.',
 			'skills.screen.noDescription' => 'No se ha proporcionado descripción en el front matter de la skill.',
 			'skills.screen.pluginBadge' => ({required Object name}) => 'Plugin: ${name}',
+			_ => null,
+		} ?? switch (path) {
 			'skills.screen.projectBadge' => ({required Object name}) => 'Proyecto: ${name}',
 			'skills.screen.sourceLabel' => 'ORIGEN',
 			'skills.empty.noProjects' => 'No hay proyectos disponibles',
@@ -11729,8 +11755,6 @@ extension on TranslationsEs {
 			'skills.empty.noSkillsInProject' => 'No hay skills en este proyecto',
 			'skills.empty.noSkillsInProjectDescription' => 'Crea una carpeta .claude/skills, .cursor/skills o .agents/skills en el proyecto seleccionado.',
 			'skills.empty.noGlobalSkills' => 'Aún no se han detectado skills globales',
-			_ => null,
-		} ?? switch (path) {
 			'skills.empty.noGlobalSkillsDescription' => 'Añade una skill global arriba para que esté disponible en todos los proyectos.',
 			'skills.empty.noMatchingSkills' => 'No hay skills coincidentes',
 			'skills.empty.noMatchingSkillsDescription' => 'Prueba con otro comando, nombre, ámbito, proyecto o ruta de origen.',

@@ -260,6 +260,7 @@ class Translations$settings$zh_TW extends Translations$settings$en {
 	@override late final Translations$settings$mcpTokens$zh_TW mcpTokens = Translations$settings$mcpTokens$zh_TW.internal(_root);
 	@override late final Translations$settings$about$zh_TW about = Translations$settings$about$zh_TW.internal(_root);
 	@override late final Translations$settings$shortcuts$zh_TW shortcuts = Translations$settings$shortcuts$zh_TW.internal(_root);
+	@override late final Translations$settings$disk$zh_TW disk = Translations$settings$disk$zh_TW.internal(_root);
 }
 
 // Path: sidebar
@@ -3256,6 +3257,22 @@ class Translations$settings$shortcuts$zh_TW extends Translations$settings$shortc
 	@override String get palRun => '執行／開啟';
 	@override String get palBack => '返回（搜尋為空時）';
 	@override String get palClose => '關閉';
+}
+
+// Path: settings.disk
+class Translations$settings$disk$zh_TW extends Translations$settings$disk$en {
+	Translations$settings$disk$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '磁碟空間';
+	@override String free({required Object total, required Object free}) => '${total} 中可用 ${free}';
+	@override String get app => '應用程式';
+	@override String get data => '資料';
+	@override String get workspace => '工作區';
+	@override String get unavailable => '無法取得磁碟使用情況';
+	@override String lowBanner({required Object paths, required Object free}) => '伺服器磁碟空間不足：${paths} 僅剩 ${free}。請在應用程式停止運作前釋出空間。';
 }
 
 // Path: sidebar.projects
@@ -10819,6 +10836,13 @@ extension on TranslationsZhTw {
 			'settings.shortcuts.palRun' => '執行／開啟',
 			'settings.shortcuts.palBack' => '返回（搜尋為空時）',
 			'settings.shortcuts.palClose' => '關閉',
+			'settings.disk.title' => '磁碟空間',
+			'settings.disk.free' => ({required Object total, required Object free}) => '${total} 中可用 ${free}',
+			'settings.disk.app' => '應用程式',
+			'settings.disk.data' => '資料',
+			'settings.disk.workspace' => '工作區',
+			'settings.disk.unavailable' => '無法取得磁碟使用情況',
+			'settings.disk.lowBanner' => ({required Object paths, required Object free}) => '伺服器磁碟空間不足：${paths} 僅剩 ${free}。請在應用程式停止運作前釋出空間。',
 			'sidebar.projects.title' => '專案',
 			'sidebar.projects.newProject' => '新增專案',
 			'sidebar.projects.deleteProject' => '移除專案',
@@ -11197,6 +11221,8 @@ extension on TranslationsZhTw {
 			'tasks.list.toggleStatusAria' => ({required Object id}) => '切換任務 ${id} 的狀態',
 			'tasks.list.markDone' => '標記為完成',
 			'tasks.list.reopen' => '重新開啟',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.allComplete' => '所有任務已完成',
 			'tasks.nextTask.feature1' => '- AI 任務管理，支援依賴和子任務。',
 			'tasks.nextTask.feature2' => '- PRD 驅動的任務產生，快速啟動專案。',
@@ -11204,8 +11230,6 @@ extension on TranslationsZhTw {
 			'tasks.nextTask.hideDetails' => '隱藏詳情',
 			'tasks.nextTask.initialize' => '初始化',
 			'tasks.nextTask.noPending' => '沒有待處理任務',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI 未設定',
 			'tasks.nextTask.review' => '審查',
 			'tasks.nextTask.startTask' => '開始任務',
@@ -11711,6 +11735,8 @@ extension on TranslationsZhTw {
 			'skills.screen.deleteDescription' => ({required Object provider, required Object directory}) => '這會從 ${provider} 的受管理技能目錄中移除 ${directory} 目錄。此操作無法復原。',
 			'skills.screen.noDescription' => '技能前置資料中未提供說明。',
 			'skills.screen.pluginBadge' => ({required Object name}) => '外掛：${name}',
+			_ => null,
+		} ?? switch (path) {
 			'skills.screen.projectBadge' => ({required Object name}) => '專案：${name}',
 			'skills.screen.sourceLabel' => '來源',
 			'skills.empty.noProjects' => '沒有可用的專案',
@@ -11718,8 +11744,6 @@ extension on TranslationsZhTw {
 			'skills.empty.noSkillsInProject' => '此專案沒有技能',
 			'skills.empty.noSkillsInProjectDescription' => '在所選專案中建立 .claude/skills、.cursor/skills 或 .agents/skills 資料夾。',
 			'skills.empty.noGlobalSkills' => '尚未找到全域技能',
-			_ => null,
-		} ?? switch (path) {
 			'skills.empty.noGlobalSkillsDescription' => '在上方新增全域技能，即可在所有專案中使用。',
 			'skills.empty.noMatchingSkills' => '沒有符合的技能',
 			'skills.empty.noMatchingSkillsDescription' => '請嘗試不同的指令、名稱、範圍、專案或來源路徑。',

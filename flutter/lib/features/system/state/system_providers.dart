@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:ddagent_app/features/system/data/system_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -41,3 +43,11 @@ int compareVersions(String a, String b) {
 final serverUpdateInfoProvider = FutureProvider.autoDispose<Map<String, dynamic>?>(
   (ref) => ref.watch(systemRepositoryProvider).updateInfo(),
 );
+
+/// `GET /api/system/disk`, re-polled every 5 minutes while watched (the shell
+/// banner keeps it alive) — a full disk stops the whole server.
+final diskUsageProvider = FutureProvider.autoDispose<List<DiskVolume>>((ref) {
+  final timer = Timer(const Duration(minutes: 5), ref.invalidateSelf);
+  ref.onDispose(timer.cancel);
+  return ref.watch(systemRepositoryProvider).diskUsage();
+});

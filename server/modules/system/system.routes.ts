@@ -1,5 +1,6 @@
 import express from 'express';
 
+import type { createDiskUsageService } from './disk-usage.service.js';
 import { RESTART_EXIT_CODE, type createSystemUpdateService } from './system.service.js';
 
 /** Id of the authenticated caller — picks their stored GitHub token. */
@@ -10,6 +11,7 @@ function userIdOf(request: express.Request): number {
 /** Creates thin system routes that delegate update execution to the service. */
 export function createSystemRouter(
   systemUpdateService: ReturnType<typeof createSystemUpdateService>,
+  diskUsageService: ReturnType<typeof createDiskUsageService>,
 ): express.Router {
   const router = express.Router();
 
@@ -26,6 +28,14 @@ export function createSystemRouter(
     try {
       const user = (request as express.Request & { user?: { id: number } }).user;
       response.json(await systemUpdateService.listReleases(user?.id ?? 0));
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.get('/disk', async (_request, response, next) => {
+    try {
+      response.json(await diskUsageService.getDiskUsage());
     } catch (error) {
       next(error);
     }

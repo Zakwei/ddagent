@@ -2907,6 +2907,15 @@
       "palRun": "実行 / 開く",
       "palBack": "戻る (検索が空の時)",
       "palClose": "閉じる"
+    },
+    "disk": {
+      "title": "ディスク容量",
+      "free": "{{total}} 中 {{free}} 空き",
+      "app": "アプリ",
+      "data": "データ",
+      "workspace": "ワークスペース",
+      "unavailable": "ディスク使用量を取得できません",
+      "lowBanner": "サーバーのディスク容量が不足しています: {{paths}} の残り {{free}}。アプリが停止する前に空き容量を確保してください。"
     }
   },
   "sidebar": {

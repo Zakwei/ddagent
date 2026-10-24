@@ -2947,6 +2947,15 @@
       "palRun": "Uruchom / otwórz",
       "palBack": "Wstecz (puste pole)",
       "palClose": "Zamknij"
+    },
+    "disk": {
+      "title": "Miejsce na dysku",
+      "free": "{{free}} wolne z {{total}}",
+      "app": "Aplikacja",
+      "data": "Dane",
+      "workspace": "Workspace",
+      "unavailable": "Brak informacji o dysku",
+      "lowBanner": "Mało miejsca na serwerze: zostało {{free}} na {{paths}}. Zwolnij miejsce, zanim aplikacja przestanie działać."
     }
   },
   "sidebar": {

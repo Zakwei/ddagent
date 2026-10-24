@@ -2917,6 +2917,15 @@
       "palRun": "Exécuter / ouvrir",
       "palBack": "Retour (recherche vide)",
       "palClose": "Fermer"
+    },
+    "disk": {
+      "title": "Espace disque",
+      "free": "{{free}} libres sur {{total}}",
+      "app": "Application",
+      "data": "Données",
+      "workspace": "Espaces de travail",
+      "unavailable": "Utilisation du disque indisponible",
+      "lowBanner": "Espace disque faible sur le serveur : il reste {{free}} sur {{paths}}. Libérez de l'espace avant que l'application cesse de fonctionner."
     }
   },
   "sidebar": {

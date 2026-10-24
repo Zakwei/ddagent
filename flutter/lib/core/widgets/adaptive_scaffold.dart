@@ -9,6 +9,7 @@ import 'package:ddagent_app/features/palette/command_palette.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
 import 'package:ddagent_app/features/settings/state/ui_preferences_controller.dart';
 import 'package:ddagent_app/features/settings/view/quick_settings_sheet.dart';
+import 'package:ddagent_app/features/system/view/disk_usage.dart';
 import 'package:ddagent_app/features/taskmaster/state/tasks_settings_controller.dart';
 import 'package:ddagent_app/features/terminal/view/terminal_view_wrapper.dart';
 import 'package:ddagent_app/features/workspace/view/session_quick_switcher.dart';
@@ -221,26 +222,33 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
           key: _drawerKey,
           drawer: _CompactNavDrawer(selectedPath: _selectedPath(context), showTasks: _showTasks),
           // Edge-to-edge (Android 15+): keep content off the status/nav bars.
-          body: SafeArea(child: widget.child),
+          body: SafeArea(child: _withBanner(widget.child)),
         ),
       );
     }
     // Focus mode — web `sidebarVisible` pref: hiding the rail is the desktop
     // focus affordance (the Flutter shell has no second sidebar to collapse).
     if (!ref.watch(uiPreferencesProvider).sidebarVisible) {
-      return Scaffold(body: SafeArea(child: widget.child));
+      return Scaffold(body: SafeArea(child: _withBanner(widget.child)));
     }
     return Scaffold(
       body: SafeArea(
         child: Row(
           children: [
             _AppRail(selectedPath: _selectedPath(context), showTasks: _showTasks),
-            Expanded(child: widget.child),
+            Expanded(child: _withBanner(widget.child)),
           ],
         ),
       ),
     );
   }
+
+  Widget _withBanner(Widget child) => Column(
+    children: [
+      const LowDiskBanner(),
+      Expanded(child: child),
+    ],
+  );
 
   String? _selectedPath(BuildContext context) {
     final loc = GoRouterState.of(context).uri.path;

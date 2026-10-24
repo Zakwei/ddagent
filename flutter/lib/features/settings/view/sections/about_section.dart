@@ -24,6 +24,7 @@ import 'package:ddagent_app/features/system/state/update_controller.dart'
         availableUpdatesProvider,
         desktopUpdateProvider,
         normalizeVersion;
+import 'package:ddagent_app/features/system/view/disk_usage.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -60,6 +61,8 @@ class AboutSection extends ConsumerWidget {
         const _UpdateCheckBlock(),
         Divider(height: AppSpacing.xl * 2, color: context.appColors.border),
         const _RestartBlock(),
+        Divider(height: AppSpacing.xl * 2, color: context.appColors.border),
+        const DiskUsageBlock(),
         Divider(height: AppSpacing.xl * 2, color: context.appColors.border),
         const _ChangelogBlock(),
         Divider(height: AppSpacing.xl * 2, color: context.appColors.border),
