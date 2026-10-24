@@ -5,6 +5,8 @@ import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/core/widgets/auth_image.dart';
+import 'package:ddagent_app/features/editor/data/editor_file_kind.dart';
+import 'package:ddagent_app/features/editor/view/editor_preview.dart';
 import 'package:ddagent_app/features/file_tree/data/file_saver.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_node.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_repository.dart';
@@ -102,15 +104,22 @@ class FileViewerPane extends ConsumerStatefulWidget {
 
 class _FileViewerPaneState extends ConsumerState<FileViewerPane> {
   final _content = TextEditingController();
+  late final _kind = editorFileKind(widget.node.path);
   bool _loading = true;
   bool _saving = false;
   bool _dirty = false;
   String? _error;
 
+  // Media/binary must never go through the text endpoint: it renders bytes
+  // as garbage and Save would write that garbage back over the file.
+  bool get _textual => _kind == EditorFileKind.text || _kind == EditorFileKind.markdown;
+
   @override
   void initState() {
     super.initState();
-    _load();
+    if (_textual) {
+      _load();
+    }
   }
 
   @override
@@ -164,6 +173,9 @@ class _FileViewerPaneState extends ConsumerState<FileViewerPane> {
 
   @override
   Widget build(BuildContext context) {
+    if (!_textual) {
+      return EditorPreview(kind: _kind, projectId: widget.projectId, path: widget.node.path);
+    }
     if (_loading) {
       return const Center(child: CircularProgressIndicator());
     }

@@ -1,7 +1,10 @@
+import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:ddagent_app/core/network/api_providers.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/utils/path_utils.dart';
+import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_markdown.dart';
 import 'package:ddagent_app/core/widgets/auth_image.dart';
 import 'package:ddagent_app/features/editor/data/editor_file_kind.dart';
@@ -11,6 +14,7 @@ import 'package:ddagent_app/features/file_tree/view/file_viewer.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Preview pane for non-text editor tabs: markdown renders through the
 /// shared [AppMarkdown], images through authenticated [AuthImage] with
@@ -46,13 +50,7 @@ class EditorPreview extends StatelessWidget {
           child: Center(child: AuthImage(url: fileContentUrl(projectId, path))),
         );
       case EditorFileKind.media:
-        return _BinaryCard(
-          projectId: projectId,
-          path: path,
-          icon: Icons.play_circle_outline,
-          title: t.codeEditor.mediaFile.title,
-          subtitle: t.codeEditor.mediaFile.subtitle,
-        );
+        return _MediaCard(projectId: projectId, path: path);
       case EditorFileKind.binary:
       case EditorFileKind.text:
         return _BinaryCard(
@@ -63,6 +61,49 @@ class EditorPreview extends StatelessWidget {
           subtitle: t.codeEditor.binaryFile.cannotDisplayAsText,
         );
     }
+  }
+}
+
+/// Audio/video card: Flutter has no decoder without a plugin, so playback is
+/// handed to the browser/system player via the raw-content URL. No blob
+/// fetch here — renders are often hundreds of MB.
+class _MediaCard extends ConsumerWidget {
+  const _MediaCard({required this.projectId, required this.path});
+
+  final String projectId;
+  final String path;
+
+  Future<void> _open(WidgetRef ref) async {
+    final base = ref.read(serverBaseUrlProvider);
+    // The new tab can't send the Bearer header — same `?token=` the SSE/WS
+    // transports use; Uri.base resolves the proxied relative `/api` on web.
+    final token = await ref.read(authTokenStoreProvider).tokenQueryParam();
+    final url = '$base${fileContentUrl(projectId, path)}${token == null ? '' : '&$token'}';
+    await launchUrl(Uri.base.resolve(url), mode: LaunchMode.externalApplication);
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.appColors;
+    final t = Translations.of(context);
+    final muted = Theme.of(context).textTheme.bodySmall?.copyWith(color: colors.mutedForeground);
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.play_circle_outline, size: 48, color: colors.mutedForeground),
+          const SizedBox(height: AppSpacing.sm),
+          Text(t.codeEditor.mediaFile.title, style: Theme.of(context).textTheme.titleSmall),
+          Text(pathBasename(path), style: muted),
+          Text(t.codeEditor.mediaFile.subtitle, style: muted),
+          const SizedBox(height: AppSpacing.md),
+          AppButton(
+            onPressed: () => unawaited(_open(ref)),
+            child: Text(t.codeEditor.filePreview.openInNewTab),
+          ),
+        ],
+      ),
+    );
   }
 }
 

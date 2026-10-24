@@ -1,3 +1,4 @@
+import 'package:ddagent_app/core/network/api_error.dart';
 import 'package:ddagent_app/core/theme/app_theme.dart';
 import 'package:ddagent_app/core/widgets/app_markdown.dart';
 import 'package:ddagent_app/features/editor/data/editor_file_kind.dart';
@@ -7,6 +8,7 @@ import 'package:ddagent_app/features/editor/view/code_editor.dart';
 import 'package:ddagent_app/features/editor/view/editor_screen.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_node.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_repository.dart';
+import 'package:ddagent_app/features/file_tree/view/file_viewer.dart';
 import 'package:ddagent_app/features/git/data/git_repository.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
@@ -223,6 +225,27 @@ void main() {
       expect(find.byType(CodeEditor), findsNothing);
       // Blob fetch fails against the fake repo → error line appears.
       await tester.pumpAndSettle();
+    });
+
+    testWidgets('file tree pane shows mp4 as media card, never via the text endpoint', (
+      tester,
+    ) async {
+      files.readError = const ServerError('text endpoint hit', 500);
+      await tester.pumpWidget(
+        _app(
+          files: files,
+          git: git,
+          child: const FileViewerPane(
+            projectId: 'p1',
+            node: FileTreeNode(name: 'clip.mp4', path: '/r/clip.mp4', isDirectory: false),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Media file'), findsOneWidget);
+      expect(find.text('Open in new tab'), findsOneWidget);
+      expect(find.text('text endpoint hit'), findsNothing);
+      expect(find.byType(TextField), findsNothing);
     });
 
     testWidgets('html file shows preview+download; text file only download', (tester) async {
