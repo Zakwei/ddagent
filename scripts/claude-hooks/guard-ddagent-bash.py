@@ -33,7 +33,7 @@ RULES = [
     (r"\bgit\s+(checkout|restore)\s+(--\s+)?\.(\s|$)", "Discarding the whole working tree needs the user's approval."),
     (r"\bgit\s+push\b.*(--force\b|-f\b|\+\S+)", "Force-pushing needs the user's explicit approval."),
     # Nested interactive Claude Code sessions inherit this session's env and hooks.
-    (r"(^|[\s;&|(])(claude|/[\w./-]*/claude)(\s+--allow-dangerously-skip-permissions|\s+--dangerously-skip-permissions)?(\s*$|\s*[;&|)])", "Do not launch an interactive `claude` from a Claude session — it inherits this session's environment and runs the user's hooks. Use a pty probe only with the user's approval."),
+    (r"(^|[\s;&|(])(claude|/[\w./-]*/claude)(\s+(--allow-dangerously-skip-permissions|--dangerously-skip-permissions|--resume|-r|--continue|-c)(\s+\S+)?)*(\s*$|\s*[;&|)])", "Do not launch an interactive `claude` from a Claude session — it inherits this session's environment and runs the user's hooks. Use a pty probe only with the user's approval."),
 ]
 
 
