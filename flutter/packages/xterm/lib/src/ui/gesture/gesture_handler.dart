@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
+import 'package:xterm/src/core/buffer/cell_offset.dart';
 import 'package:xterm/src/core/mouse/button.dart';
 import 'package:xterm/src/core/mouse/button_state.dart';
 import 'package:xterm/src/terminal_view.dart';
@@ -59,6 +60,16 @@ class _TerminalGestureHandlerState extends State<TerminalGestureHandler> {
 
   LongPressStartDetails? _lastLongPressStartDetails;
 
+  /// Where the left press in flight was reported to the application, or null
+  /// when none was (ddagent change). A mouse drag then reports its motion and
+  /// its release too, as xterm does: a program that tracks the mouse (Claude
+  /// Code selects transcript text from press / motion / release) otherwise
+  /// saw a press that never ended.
+  Offset? _reportedPress;
+
+  /// Last cell a drag was reported at — one report per cell, not per pixel.
+  CellOffset? _reportedDragCell;
+
   @override
   Widget build(BuildContext context) {
     return TerminalGestureDetector(
@@ -75,6 +86,8 @@ class _TerminalGestureHandlerState extends State<TerminalGestureHandler> {
       // onLongPressUp: onLongPressUp,
       onDragStart: onDragStart,
       onDragUpdate: onDragUpdate,
+      onDragEnd: onDragEnd,
+      onDragCancel: onDragCancel,
       onDoubleTapDown: onDoubleTapDown,
     );
   }
@@ -82,6 +95,12 @@ class _TerminalGestureHandlerState extends State<TerminalGestureHandler> {
   bool get _shouldSendTapEvent =>
       !widget.readOnly &&
       widget.terminalController.shouldSendPointerInput(PointerInput.tap);
+
+  /// A finger's press is reported together with its release, on the
+  /// completed tap: tap-down fires for a finger that rests before a scroll
+  /// too, and that press would never get its release.
+  static bool _isTouch(PointerDeviceKind? kind) =>
+      kind == PointerDeviceKind.touch || kind == PointerDeviceKind.stylus;
 
   void _tapDown(
     GestureTapDownCallback? callback,
@@ -91,12 +110,15 @@ class _TerminalGestureHandlerState extends State<TerminalGestureHandler> {
   }) {
     // Check if the terminal should and can handle the tap down event.
     var handled = false;
-    if (_shouldSendTapEvent) {
+    if (_shouldSendTapEvent && !_isTouch(details.kind)) {
       handled = renderTerminal.mouseEvent(
         button,
         TerminalMouseButtonState.down,
         details.localPosition,
       );
+      if (handled && button == TerminalMouseButton.left) {
+        _reportedPress = details.localPosition;
+      }
     }
     // If the event was not handled by the terminal, use the supplied callback.
     if (!handled || forceCallback) {
@@ -113,16 +135,36 @@ class _TerminalGestureHandlerState extends State<TerminalGestureHandler> {
     // Check if the terminal should and can handle the tap up event.
     var handled = false;
     if (_shouldSendTapEvent) {
+      if (_isTouch(details.kind)) {
+        renderTerminal.mouseEvent(
+          button,
+          TerminalMouseButtonState.down,
+          details.localPosition,
+        );
+      }
       handled = renderTerminal.mouseEvent(
         button,
         TerminalMouseButtonState.up,
         details.localPosition,
       );
+      if (button == TerminalMouseButton.left) _reportedPress = null;
     }
     // If the event was not handled by the terminal, use the supplied callback.
     if (!handled || forceCallback) {
       callback?.call(details);
     }
+  }
+
+  /// Reports the release of the press in flight, if any, at [position].
+  void _releaseReportedPress(Offset position) {
+    if (_reportedPress == null) return;
+    _reportedPress = null;
+    _reportedDragCell = null;
+    renderTerminal.mouseEvent(
+      TerminalMouseButton.left,
+      TerminalMouseButtonState.up,
+      position,
+    );
   }
 
   void onTapDown(TapDownDetails details) {
@@ -177,15 +219,48 @@ class _TerminalGestureHandlerState extends State<TerminalGestureHandler> {
   void onDragStart(DragStartDetails details) {
     _lastDragStartDetails = details;
 
+    // A quick drag starts before the tap deadline, so tap-down never ran.
+    if (_shouldSendTapEvent &&
+        !_isTouch(details.kind) &&
+        _reportedPress == null &&
+        renderTerminal.mouseEvent(
+          TerminalMouseButton.left,
+          TerminalMouseButtonState.down,
+          details.localPosition,
+        )) {
+      _reportedPress = details.localPosition;
+    }
+
     details.kind == PointerDeviceKind.mouse
         ? renderTerminal.selectCharacters(details.localPosition)
         : renderTerminal.selectWord(details.localPosition);
   }
 
   void onDragUpdate(DragUpdateDetails details) {
+    if (_reportedPress != null) {
+      final cell = renderTerminal.getCellOffset(details.localPosition);
+      if (cell != _reportedDragCell) {
+        _reportedDragCell = cell;
+        renderTerminal.mouseEvent(
+          TerminalMouseButton.left,
+          TerminalMouseButtonState.move,
+          details.localPosition,
+        );
+      }
+    }
+
     renderTerminal.selectCharacters(
       _lastDragStartDetails!.localPosition,
       details.localPosition,
     );
+  }
+
+  void onDragEnd(DragEndDetails details) {
+    _releaseReportedPress(details.localPosition);
+  }
+
+  void onDragCancel() {
+    final last = _lastDragStartDetails?.localPosition ?? _reportedPress;
+    if (last != null) _releaseReportedPress(last);
   }
 }

@@ -25,6 +25,30 @@ void main() {
     expect(report('\x1b[?1000h\x1b[?1015h', TerminalMouseButton.wheelUp), '\x1b[96;77;26M');
   });
 
+  test('a drag reports the button plus 32 in the drag and any-motion modes only', () {
+    expect(
+      report(
+        '\x1b[?1002h\x1b[?1006h',
+        TerminalMouseButton.left,
+        state: TerminalMouseButtonState.move,
+      ),
+      '\x1b[<32;77;26M',
+    );
+    expect(
+      report(
+        '\x1b[?1003h\x1b[?1006h',
+        TerminalMouseButton.left,
+        state: TerminalMouseButtonState.move,
+      ),
+      '\x1b[<32;77;26M',
+    );
+    expect(report(sgr, TerminalMouseButton.left, state: TerminalMouseButtonState.move), isNull);
+    expect(
+      report('\x1b[?1002h', TerminalMouseButton.left, state: TerminalMouseButtonState.move),
+      '\x1b[M${String.fromCharCodes([32 + 32, 32 + 77, 32 + 26])}',
+    );
+  });
+
   test('clicks report button, release and 1-based cell in SGR mode', () {
     expect(report(sgr, TerminalMouseButton.left), '\x1b[<0;77;26M');
     expect(

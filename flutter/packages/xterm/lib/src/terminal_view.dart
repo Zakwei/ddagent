@@ -244,8 +244,12 @@ class TerminalViewState extends State<TerminalView> {
     child = TerminalScrollGestureHandler(
       terminal: widget.terminal,
       simulateScroll: widget.simulateScroll,
-      getCellOffset: (offset) => renderTerminal.getCellOffset(offset),
+      // The handler sees global pointer positions (ddagent change: upstream
+      // mapped them as if local, so a wheel report named the wrong cell).
+      getCellOffset: (offset) =>
+          renderTerminal.getCellOffset(renderTerminal.globalToLocal(offset)),
       getLineHeight: () => renderTerminal.lineHeight,
+      scrollController: _scrollController,
       child: child,
     );
 

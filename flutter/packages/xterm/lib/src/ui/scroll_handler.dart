@@ -1,3 +1,5 @@
+import 'package:flutter/gestures.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:xterm/core.dart';
 import 'package:xterm/src/ui/infinite_scroll_view.dart';
@@ -7,6 +9,12 @@ import 'package:xterm/src/ui/infinite_scroll_view.dart';
 /// change: upstream sent them from the alternate buffer only). There the
 /// scroll gestures are converted to escape sequences based on the current
 /// report mode declared by the application.
+///
+/// While the application scrolls, the terminal's own scrollable refuses the
+/// wheel and finger drags (ddagent change): with scrollback behind a program
+/// that reports the mouse — Claude Code whose alt-screen switch was lost in a
+/// replay — the inner scrollable used to take the wheel first and the program
+/// never saw it. Shift+wheel still moves that scrollback, as in xterm.
 class TerminalScrollGestureHandler extends StatefulWidget {
   const TerminalScrollGestureHandler({
     super.key,
@@ -14,12 +22,13 @@ class TerminalScrollGestureHandler extends StatefulWidget {
     required this.getCellOffset,
     required this.getLineHeight,
     this.simulateScroll = true,
+    this.scrollController,
     required this.child,
   });
 
   final Terminal terminal;
 
-  /// Returns the cell offset for the pixel offset.
+  /// Returns the cell offset for the global pixel offset.
   final CellOffset Function(Offset) getCellOffset;
 
   /// Returns the pixel height of lines in the terminal.
@@ -29,6 +38,10 @@ class TerminalScrollGestureHandler extends StatefulWidget {
   /// doesn't declare it supports mouse wheel events. true by default as it
   /// is the default behavior of most terminals.
   final bool simulateScroll;
+
+  /// The terminal's own scrollable, moved by Shift+wheel while the
+  /// application scrolls.
+  final ScrollController? scrollController;
 
   final Widget child;
 
@@ -103,6 +116,27 @@ class _TerminalScrollGestureHandlerState
     }
   }
 
+  /// Shift+wheel moves the terminal's own scrollback instead of the program.
+  /// A Flutter scrollable reads the wheel's horizontal delta while Shift is
+  /// held, so neither scrollable claims the event — this handler does.
+  void _onPointerSignal(PointerSignalEvent event) {
+    lastPointerPosition = event.position;
+    final controller = widget.scrollController;
+    if (event is! PointerScrollEvent ||
+        !HardwareKeyboard.instance.isShiftPressed ||
+        controller == null ||
+        !controller.hasClients) {
+      return;
+    }
+    GestureBinding.instance.pointerSignalResolver.register(event, (event) {
+      final position = controller.position;
+      position.jumpTo(
+        (position.pixels + (event as PointerScrollEvent).scrollDelta.dy)
+            .clamp(position.minScrollExtent, position.maxScrollExtent),
+      );
+    });
+  }
+
   void _onScroll(double offset) {
     final currentLineOffset = offset ~/ widget.getLineHeight();
 
@@ -122,15 +156,18 @@ class _TerminalScrollGestureHandlerState
     }
 
     return Listener(
-      onPointerSignal: (event) {
-        lastPointerPosition = event.position;
-      },
+      onPointerSignal: _onPointerSignal,
       onPointerDown: (event) {
         lastPointerPosition = event.position;
       },
       child: InfiniteScrollView(
         onScroll: _onScroll,
-        child: widget.child,
+        child: ScrollConfiguration(
+          behavior: ScrollConfiguration.of(context).copyWith(
+            physics: const NeverScrollableScrollPhysics(),
+          ),
+          child: widget.child,
+        ),
       ),
     );
   }

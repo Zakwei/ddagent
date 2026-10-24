@@ -103,6 +103,12 @@ class UpDownMouseHandler implements TerminalMouseHandler {
             event.buttonState == TerminalMouseButtonState.up) {
           return null;
         }
+        // A drag is reported by the button-event (1002) and any-event (1003)
+        // modes only.
+        if (event.buttonState == TerminalMouseButtonState.move &&
+            event.state.mouseMode == MouseMode.upDownScroll) {
+          return null;
+        }
         return MouseReporter.report(
           event.button,
           event.buttonState,
