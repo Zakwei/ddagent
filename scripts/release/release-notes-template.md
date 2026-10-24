@@ -10,62 +10,50 @@
   fallback. All 12 UI locales are below.
 -->
 <!-- lang:en -->
-### New
-- **Server disk space**: Settings → About shows free space on the disks holding the app, its data and the workspaces, and a red banner warns on every screen when a disk drops below 10% or 5 GB free. A full disk used to stop the whole app without warning.
 ### Fixes
-- **Videos in Files**: an .mp4 or other audio/video file opens as a media card with an "Open in new tab" button that plays it in the browser, instead of showing raw bytes as text. Binary files get an info card, so saving can no longer overwrite them with garbage.
+- **Terminal scrolling in Claude Code**: the mouse wheel and a finger drag now reach a program that tracks the mouse even when the pane still has its own scrollback behind it (a Claude Code session reattached after a server restart). Shift+wheel scrolls the pane's own history instead. Wheel reports also name the cell under the pointer; in a right-hand pane they used to land on the last column and several rows down.
+- **Mouse selection in Claude Code**: a mouse drag is reported to the program as press, motion and release, like in a desktop terminal. Claude Code selects the transcript text itself and copies it to the clipboard; before, it only saw a press that never ended and the selection landed a few lines off. A finger tap reports its press and release together, so scrolling with a finger never leaves a press hanging.
 <!-- lang:pl -->
-### Nowości
-- **Miejsce na dysku serwera**: Ustawienia → O aplikacji pokazują wolne miejsce na dyskach z aplikacją, jej danymi i workspace, a czerwony baner na każdym ekranie ostrzega, gdy na dysku zostaje mniej niż 10% lub 5 GB. Pełny dysk zatrzymywał wcześniej całą aplikację bez ostrzeżenia.
 ### Poprawki
-- **Filmy w Plikach**: plik .mp4 lub inny plik audio/wideo otwiera się jako karta z przyciskiem „Otwórz w nowej karcie”, który odtwarza go w przeglądarce, zamiast pokazywać surowe bajty jako tekst. Pliki binarne dostają kartę informacyjną, więc zapis nie nadpisze ich już śmieciami.
+- **Przewijanie terminala w Claude Code**: kółko myszy i przeciągnięcie palcem docierają teraz do programu śledzącego mysz także wtedy, gdy panel ma za nim własną historię (sesja Claude Code podpięta ponownie po restarcie serwera). Shift+kółko przewija historię panelu. Raporty kółka wskazują też komórkę pod kursorem; w prawym panelu trafiały na ostatnią kolumnę i kilka wierszy niżej.
+- **Zaznaczanie myszą w Claude Code**: przeciągnięcie myszą jest raportowane programowi jako naciśnięcie, ruch i zwolnienie, jak w terminalu na komputerze. Claude Code sam zaznacza tekst rozmowy i kopiuje go do schowka; wcześniej widział tylko naciśnięcie bez końca, a zaznaczenie lądowało kilka linii obok. Dotknięcie palcem raportuje naciśnięcie razem ze zwolnieniem, więc przewijanie palcem nie zostawia „wiszącego” naciśnięcia.
 <!-- lang:de -->
-### Neu
-- **Speicherplatz des Servers**: Einstellungen → Über zeigt den freien Speicher der Laufwerke mit der App, ihren Daten und den Arbeitsbereichen, und ein rotes Banner warnt auf jedem Bildschirm, wenn weniger als 10 % oder 5 GB frei sind. Eine volle Festplatte hat die ganze App bisher ohne Warnung angehalten.
 ### Fehlerbehebungen
-- **Videos in Dateien**: Eine .mp4- oder andere Audio-/Videodatei öffnet sich als Medienkarte mit der Schaltfläche „In neuem Tab öffnen“, die sie im Browser abspielt, statt rohe Bytes als Text anzuzeigen. Binärdateien erhalten eine Infokarte, sodass Speichern sie nicht mehr mit Datenmüll überschreiben kann.
+- **Terminal-Scrollen in Claude Code**: Mausrad und Fingerwischen erreichen jetzt ein Programm mit Mausverfolgung auch dann, wenn der Bereich dahinter noch einen eigenen Verlauf hat (eine nach einem Server-Neustart wieder angebundene Claude-Code-Sitzung). Umschalt+Mausrad scrollt stattdessen den Verlauf des Bereichs. Radmeldungen nennen jetzt die Zelle unter dem Zeiger; in einem rechten Bereich landeten sie in der letzten Spalte und einige Zeilen tiefer.
+- **Mausauswahl in Claude Code**: Ziehen mit der Maus wird dem Programm als Drücken, Bewegen und Loslassen gemeldet, wie in einem Desktop-Terminal. Claude Code markiert den Text selbst und kopiert ihn in die Zwischenablage; vorher sah es nur ein Drücken ohne Ende, und die Auswahl lag einige Zeilen daneben. Ein Fingertipp meldet Drücken und Loslassen zusammen, sodass Scrollen mit dem Finger kein offenes Drücken hinterlässt.
 <!-- lang:es -->
-### Novedades
-- **Espacio en disco del servidor**: Ajustes → Acerca de muestra el espacio libre en los discos con la app, sus datos y los espacios de trabajo, y un banner rojo avisa en todas las pantallas cuando quedan menos del 10 % o 5 GB libres. Un disco lleno detenía toda la app sin aviso.
 ### Correcciones
-- **Vídeos en Archivos**: un .mp4 u otro archivo de audio/vídeo se abre como tarjeta multimedia con el botón «Abrir en una pestaña nueva», que lo reproduce en el navegador, en lugar de mostrar bytes en bruto como texto. Los archivos binarios muestran una tarjeta informativa, así que guardar ya no puede sobrescribirlos con basura.
+- **Desplazamiento del terminal en Claude Code**: la rueda del ratón y el arrastre con el dedo llegan ahora a un programa que sigue el ratón aunque el panel aún tenga su propio historial detrás (una sesión de Claude Code reconectada tras reiniciar el servidor). Mayús+rueda desplaza el historial del panel. Los informes de la rueda indican además la celda bajo el puntero; en un panel derecho caían en la última columna y varias filas más abajo.
+- **Selección con el ratón en Claude Code**: arrastrar con el ratón se comunica al programa como pulsar, mover y soltar, como en un terminal de escritorio. Claude Code selecciona el texto él mismo y lo copia al portapapeles; antes solo veía una pulsación sin fin y la selección caía unas líneas más abajo. Un toque con el dedo comunica la pulsación junto con la liberación, así que desplazar con el dedo no deja una pulsación pendiente.
 <!-- lang:fr -->
-### Nouveautés
-- **Espace disque du serveur** : Paramètres → À propos affiche l'espace libre des disques contenant l'application, ses données et les espaces de travail, et une bannière rouge avertit sur chaque écran quand il reste moins de 10 % ou 5 Go. Un disque plein arrêtait toute l'application sans prévenir.
 ### Corrections
-- **Vidéos dans Fichiers** : un .mp4 ou un autre fichier audio/vidéo s'ouvre en carte média avec un bouton « Ouvrir dans un nouvel onglet » qui le lit dans le navigateur, au lieu d'afficher les octets bruts en texte. Les fichiers binaires ont une carte d'information : l'enregistrement ne peut plus les écraser avec des données illisibles.
+- **Défilement du terminal dans Claude Code** : la molette et le glissement du doigt atteignent désormais un programme qui suit la souris même si le panneau garde son propre historique derrière lui (une session Claude Code rattachée après un redémarrage du serveur). Maj+molette fait défiler l'historique du panneau. Les rapports de molette indiquent aussi la cellule sous le pointeur ; dans un panneau de droite ils tombaient sur la dernière colonne, quelques lignes plus bas.
+- **Sélection à la souris dans Claude Code** : un glissement de souris est transmis au programme comme appui, déplacement et relâchement, comme dans un terminal de bureau. Claude Code sélectionne lui-même le texte et le copie dans le presse-papiers ; avant, il ne voyait qu'un appui sans fin et la sélection tombait quelques lignes à côté. Un appui du doigt transmet l'appui et le relâchement ensemble, donc faire défiler au doigt ne laisse plus d'appui en suspens.
 <!-- lang:it -->
-### Novità
-- **Spazio su disco del server**: Impostazioni → Informazioni mostra lo spazio libero sui dischi con l'app, i suoi dati e i workspace, e un banner rosso avvisa in ogni schermata quando resta meno del 10% o di 5 GB. Un disco pieno fermava l'intera app senza preavviso.
 ### Correzioni
-- **Video in File**: un .mp4 o un altro file audio/video si apre come scheda multimediale con il pulsante «Apri in una nuova scheda», che lo riproduce nel browser, invece di mostrare i byte grezzi come testo. I file binari mostrano una scheda informativa, quindi il salvataggio non può più sovrascriverli con dati illeggibili.
+- **Scorrimento del terminale in Claude Code**: la rotellina e il trascinamento con il dito raggiungono ora un programma che segue il mouse anche quando il pannello ha ancora la propria cronologia dietro (una sessione Claude Code riagganciata dopo un riavvio del server). Maiusc+rotellina scorre la cronologia del pannello. Le segnalazioni della rotellina indicano inoltre la cella sotto il puntatore; in un pannello di destra finivano nell'ultima colonna, alcune righe più in basso.
+- **Selezione con il mouse in Claude Code**: un trascinamento con il mouse viene segnalato al programma come pressione, movimento e rilascio, come in un terminale desktop. Claude Code seleziona il testo da sé e lo copia negli appunti; prima vedeva solo una pressione senza fine e la selezione finiva qualche riga più sotto. Un tocco con il dito segnala pressione e rilascio insieme, così lo scorrimento con il dito non lascia pressioni in sospeso.
 <!-- lang:ja -->
-### 新機能
-- **サーバーのディスク容量**：設定 → 概要に、アプリ・データ・ワークスペースがあるディスクの空き容量を表示します。空きが 10% または 5 GB を下回ると、すべての画面に赤いバナーで警告します。これまではディスクが満杯になると警告なしにアプリ全体が停止していました。
 ### 修正
-- **ファイルでの動画**：.mp4 などの音声・動画ファイルは、生のバイトをテキスト表示する代わりに、ブラウザで再生する「新しいタブで開く」ボタン付きのメディアカードとして開きます。バイナリファイルには情報カードが表示され、保存で壊れたデータに上書きされることはなくなりました。
+- **Claude Code でのターミナルのスクロール**：マウスホイールと指のドラッグが、ペインの背後に独自のスクロールバックが残っている場合（サーバー再起動後に再接続した Claude Code セッション）でも、マウスを追跡するプログラムに届くようになりました。Shift+ホイールでペイン自身の履歴をスクロールします。ホイールの通知はポインター直下のセルを示すようになり、右側のペインで最終列・数行下にずれる問題も解消しました。
+- **Claude Code でのマウス選択**：マウスのドラッグは、デスクトップのターミナルと同様に、押下・移動・解放としてプログラムへ通知されます。Claude Code が自分でトランスクリプトを選択してクリップボードへコピーします。以前は終わりのない押下しか届かず、選択が数行ずれていました。指のタップは押下と解放をまとめて通知するため、指でスクロールしても押下が残りません。
 <!-- lang:ko -->
-### 새 기능
-- **서버 디스크 공간**: 설정 → 정보에서 앱, 데이터, 워크스페이스가 있는 디스크의 여유 공간을 보여 주며, 여유 공간이 10% 또는 5GB 미만이 되면 모든 화면에 빨간 배너로 경고합니다. 이전에는 디스크가 가득 차면 경고 없이 앱 전체가 멈췄습니다.
 ### 수정
-- **파일의 동영상**: .mp4 등 오디오/동영상 파일은 원시 바이트를 텍스트로 보여 주는 대신 브라우저에서 재생하는 "새 탭에서 열기" 버튼이 있는 미디어 카드로 열립니다. 바이너리 파일은 정보 카드로 표시되어 저장 시 깨진 데이터로 덮어쓰지 않습니다.
+- **Claude Code에서 터미널 스크롤**: 창 뒤에 자체 스크롤백이 남아 있어도(서버 재시작 후 다시 연결된 Claude Code 세션) 마우스 휠과 손가락 드래그가 마우스를 추적하는 프로그램에 전달됩니다. Shift+휠은 창 자체의 기록을 스크롤합니다. 휠 보고는 포인터 아래의 셀을 가리키며, 오른쪽 창에서 마지막 열과 몇 줄 아래로 어긋나던 문제가 해결되었습니다.
+- **Claude Code에서 마우스 선택**: 마우스 드래그가 데스크톱 터미널처럼 누름·이동·놓음으로 프로그램에 보고됩니다. Claude Code가 직접 대화 텍스트를 선택해 클립보드에 복사합니다. 이전에는 끝나지 않는 누름만 전달되어 선택이 몇 줄 어긋났습니다. 손가락 탭은 누름과 놓음을 함께 보고하므로 손가락 스크롤이 누름을 남기지 않습니다.
 <!-- lang:ru -->
-### Новое
-- **Место на диске сервера**: Настройки → О программе показывают свободное место на дисках с приложением, его данными и рабочими областями, а красный баннер на каждом экране предупреждает, когда свободно меньше 10% или 5 ГБ. Раньше заполненный диск останавливал всё приложение без предупреждения.
 ### Исправления
-- **Видео в Файлах**: .mp4 или другой аудио-/видеофайл открывается карточкой с кнопкой «Открыть в новой вкладке», которая воспроизводит его в браузере, вместо показа сырых байтов как текста. Для двоичных файлов показывается информационная карточка, поэтому сохранение больше не перезапишет их мусором.
+- **Прокрутка терминала в Claude Code**: колесо мыши и перетаскивание пальцем теперь доходят до программы, отслеживающей мышь, даже если за панелью остаётся её собственная история (сессия Claude Code, переподключённая после перезапуска сервера). Shift+колесо прокручивает историю панели. Отчёты колеса указывают ячейку под указателем; в правой панели они попадали в последний столбец на несколько строк ниже.
+- **Выделение мышью в Claude Code**: перетаскивание мышью передаётся программе как нажатие, движение и отпускание, как в настольном терминале. Claude Code сам выделяет текст и копирует его в буфер обмена; раньше он видел лишь нажатие без конца, и выделение оказывалось на несколько строк ниже. Касание пальцем передаёт нажатие вместе с отпусканием, поэтому прокрутка пальцем не оставляет «висящего» нажатия.
 <!-- lang:tr -->
-### Yenilikler
-- **Sunucu disk alanı**: Ayarlar → Hakkında, uygulamanın, verilerinin ve çalışma alanlarının bulunduğu disklerdeki boş alanı gösteriyor; boş alan %10 veya 5 GB altına düştüğünde her ekranda kırmızı bir afiş uyarıyor. Dolu bir disk daha önce tüm uygulamayı uyarı vermeden durduruyordu.
 ### Düzeltmeler
-- **Dosyalar'da videolar**: .mp4 veya başka bir ses/video dosyası, ham baytları metin olarak göstermek yerine tarayıcıda oynatan "Yeni sekmede aç" düğmeli bir medya kartı olarak açılıyor. İkili dosyalar bilgi kartı alıyor; kaydetme artık onların üzerine bozuk veri yazamıyor.
+- **Claude Code'da terminal kaydırma**: fare tekerleği ve parmakla sürükleme, bölmenin arkasında hâlâ kendi geçmişi olsa bile (sunucu yeniden başlatıldıktan sonra yeniden bağlanan bir Claude Code oturumu) fareyi izleyen programa ulaşıyor. Shift+tekerlek bölmenin kendi geçmişini kaydırır. Tekerlek bildirimleri artık imlecin altındaki hücreyi gösteriyor; sağdaki bölmede son sütuna ve birkaç satır aşağıya düşüyordu.
+- **Claude Code'da fareyle seçim**: fareyle sürükleme, masaüstü terminalinde olduğu gibi programa basma, hareket ve bırakma olarak bildiriliyor. Claude Code metni kendisi seçip panoya kopyalıyor; önceden yalnızca hiç bitmeyen bir basma görüyor ve seçim birkaç satır kayıyordu. Parmak dokunuşu basma ile bırakmayı birlikte bildirdiğinden parmakla kaydırma askıda basma bırakmıyor.
 <!-- lang:zh-CN -->
-### 新功能
-- **服务器磁盘空间**：设置 → 关于 会显示存放应用、数据和工作区的磁盘的可用空间；当可用空间低于 10% 或 5 GB 时，每个页面都会出现红色横幅警告。此前磁盘写满会在毫无提示的情况下让整个应用停止工作。
 ### 修复
-- **文件中的视频**：.mp4 等音视频文件会以媒体卡片打开，并提供在浏览器中播放的“在新标签页中打开”按钮，而不再把原始字节显示为文本。二进制文件改为显示信息卡片，保存时不会再用乱码覆盖它们。
+- **Claude Code 中的终端滚动**：即使面板后面仍保留自己的回滚历史（服务器重启后重新连接的 Claude Code 会话），鼠标滚轮和手指拖动现在也能送达跟踪鼠标的程序。Shift+滚轮改为滚动面板自身的历史。滚轮上报现在指向指针下方的单元格；此前在右侧面板中会落到最后一列并向下偏移几行。
+- **Claude Code 中的鼠标选择**：鼠标拖动会像桌面终端一样以按下、移动、释放上报给程序。Claude Code 自行选中对话文本并复制到剪贴板；此前它只收到一个永不结束的按下，选区会偏移几行。手指点按会同时上报按下和释放，因此手指滚动不会留下悬而未决的按下。
 <!-- lang:zh-TW -->
-### 新功能
-- **伺服器磁碟空間**：設定 → 關於 會顯示存放應用程式、資料與工作區的磁碟可用空間；可用空間低於 10% 或 5 GB 時，每個畫面都會出現紅色橫幅警告。先前磁碟寫滿會在毫無提示的情況下讓整個應用程式停止運作。
 ### 修正
-- **檔案中的影片**：.mp4 等音訊/影片檔會以媒體卡片開啟，並提供在瀏覽器中播放的「在新分頁中開啟」按鈕，不再把原始位元組顯示為文字。二進位檔改為顯示資訊卡片，儲存時不會再以亂碼覆寫它們。
+- **Claude Code 中的終端機捲動**：即使面板後方仍保留自己的回捲歷史（伺服器重新啟動後重新連線的 Claude Code 工作階段），滑鼠滾輪與手指拖曳現在也會送達追蹤滑鼠的程式。Shift+滾輪改為捲動面板本身的歷史。滾輪回報現在指向游標下方的儲存格；先前在右側面板會落在最後一欄並向下偏移數行。
+- **Claude Code 中的滑鼠選取**：滑鼠拖曳會像桌面終端機一樣以按下、移動、放開回報給程式。Claude Code 會自行選取對話文字並複製到剪貼簿；先前它只收到一個永不結束的按下，選取範圍會偏移數行。手指點按會同時回報按下與放開，因此手指捲動不會留下懸而未決的按下。
