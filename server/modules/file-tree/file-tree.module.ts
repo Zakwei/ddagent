@@ -83,7 +83,11 @@ const fileTreeServices = createFileTreeService({
   fileSystem: fileTreeFileSystem,
   projects: fileTreeProjects,
   workspace: fileTreeWorkspace,
-  resolveMimeType: (filePath) => mime.lookup(filePath) || 'application/octet-stream',
+  // mime-db ≥1.53 maps .mp4 to application/mp4, which browsers download instead of playing.
+  resolveMimeType: (filePath) =>
+    /\.mp4$/i.test(filePath)
+      ? 'video/mp4'
+      : mime.lookup(filePath) || 'application/octet-stream',
   fileSystemConcurrency: readFileSystemConcurrency(),
   logger: fileTreeLogger,
 });
