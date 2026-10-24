@@ -104,7 +104,9 @@ temp/
 .netlify
 
 # AI specific
-.claude/
+# .claude/settings.json is tracked: it wires the guard hook (scripts/claude-hooks).
+.claude/*
+!.claude/settings.json
 .cursor/
 .roo/
 .taskmaster/
