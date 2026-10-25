@@ -745,6 +745,9 @@ const AUTH_URL_QUERY_HINT_REGEX = /(?:^|[?&])(?:code|client_id|state|redirect_ur
 const AUTH_CONTEXT_HINT_REGEX =
   /log\s?in|sign\s?in|authenticat|authoriz|authorise|verification code|device code|enter (?:the|this) code|open (?:this|the) (?:url|link)|in your browser|visit/i;
 const AUTH_CONTEXT_WINDOW = 400;
+// Only the prompt's own lines count as context: an agent CLI showing a diff
+// or a file has "login"/"visit" a few lines above any URL in the code.
+const AUTH_CONTEXT_LINES = 3;
 
 // Decides whether a URL seen in PTY output is a sign-in link worth surfacing
 // to the client. Either the URL itself looks like an auth endpoint or the
@@ -754,6 +757,11 @@ function isLikelyAuthUrl(normalizedUrl: string, cleanOutput: string): boolean {
   try {
     parsedUrl = new URL(normalizedUrl);
   } catch {
+    return false;
+  }
+  // Sign-in pages live on real hosts; `http://a/` or `http://web:8080/` in
+  // code an agent prints is never one.
+  if (!isPublicHostname(parsedUrl.hostname)) {
     return false;
   }
   const locator = `${parsedUrl.hostname}${parsedUrl.pathname}`;
@@ -766,8 +774,17 @@ function isLikelyAuthUrl(normalizedUrl: string, cleanOutput: string): boolean {
   if (anchor === -1) {
     return false;
   }
-  const context = cleanOutput.slice(Math.max(0, anchor - AUTH_CONTEXT_WINDOW), anchor);
+  const context = cleanOutput
+    .slice(Math.max(0, anchor - AUTH_CONTEXT_WINDOW), anchor)
+    .split(/\r?\n/)
+    .slice(-AUTH_CONTEXT_LINES)
+    .join('\n');
   return AUTH_CONTEXT_HINT_REGEX.test(context);
+}
+
+/** A dotted DNS name or an IP literal — not a single-label name like `a`. */
+function isPublicHostname(hostname: string): boolean {
+  return hostname.includes('.') || hostname.startsWith('[');
 }
 
 /**

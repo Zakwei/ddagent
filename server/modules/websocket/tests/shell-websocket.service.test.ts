@@ -513,6 +513,45 @@ test('shell output detects and normalizes a wrapped authentication URL', () => {
   pty.emitExit();
 });
 
+test('shell output ignores URLs in code an agent shows, even below login prose', () => {
+  const pty = createFakePty();
+  const socket = createFakeSocket();
+  const dependencies = {
+    resolveProviderSessionId: () => null,
+    spawnPty: () => pty as never,
+  };
+
+  handleShellConnection(socket as never, dependencies);
+  socket.emit(
+    'message',
+    JSON.stringify({
+      type: 'init',
+      projectPath: process.cwd(),
+      sessionId: `code-url-${Date.now()}`,
+      hasSession: false,
+      provider: 'plain-shell',
+      isPlainShell: true,
+      initialCommand: 'test-command',
+    })
+  );
+  socket.frames.length = 0;
+
+  // A diff: a single-label host, and a real host whose login hint sits
+  // further up than the prompt's own lines.
+  pty.emitData("+  test('login opens the browser', () => {\r\n");
+  pty.emitData("+    final id = n.openPane(url: 'http://a/')!;\r\n");
+  pty.emitData('+    // one\r\n+    // two\r\n+    // three\r\n');
+  pty.emitData("+    expect(pane.url, 'https://example.com/docs');\r\n");
+
+  const frames = socket.frames.map((frame) => JSON.parse(frame) as Record<string, unknown>);
+  assert.deepEqual(
+    frames.filter((frame) => frame.type === 'auth_url'),
+    []
+  );
+
+  pty.emitExit();
+});
+
 test('shell output keeps an auth URL repeated on the next line as a separate link', () => {
   const pty = createFakePty();
   const socket = createFakeSocket();
