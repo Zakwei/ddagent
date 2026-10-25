@@ -186,6 +186,10 @@ class TerminalTab {
   final ShellChannel channel;
 
   TerminalTabStatus status;
+
+  /// Why the PTY could not start (the server's `error` frame before any
+  /// output, e.g. a project directory gone) — the overlay shows it.
+  String? startError;
   bool isCompleted;
   int? exitCode;
   final List<String> authUrls;
@@ -702,6 +706,7 @@ class TerminalController extends Notifier<TerminalState> {
       // A reattach that missed nothing sends no output to mark it connected.
       if (tab.status != TerminalTabStatus.connected && !tab.isCompleted) {
         tab.status = TerminalTabStatus.connected;
+        tab.startError = null;
         _notifyTabsChanged();
       }
       return;
@@ -724,6 +729,7 @@ class TerminalController extends Notifier<TerminalState> {
 
       if (tab.status != TerminalTabStatus.connected && !tab.isCompleted) {
         tab.status = TerminalTabStatus.connected;
+        tab.startError = null;
       }
 
       final legacyExit = frame.isReplay ? null : _legacyExitLineRegex.firstMatch(frame.output);
@@ -749,6 +755,12 @@ class TerminalController extends Notifier<TerminalState> {
       tab.terminal.write(
         '\r\n\x1b[31m${t.terminal.errors.frameError(message: frame.error ?? '')}\x1b[0m\r\n',
       );
+      // An error before the PTY started means it never will: stop the
+      // "Connecting…" overlay and offer Connect with the reason.
+      if (tab.status == TerminalTabStatus.connecting) {
+        tab.status = TerminalTabStatus.disconnected;
+        tab.startError = frame.error ?? '';
+      }
       _notifyTabsChanged();
     }
   }

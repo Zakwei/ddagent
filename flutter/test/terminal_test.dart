@@ -311,6 +311,27 @@ void main() {
       expect(currentTab.authUrls, contains('https://claude.ai/oauth/login?code=123'));
     });
 
+    test('a start error ends "connecting" and keeps the reason; output clears it', () async {
+      final container = ProviderContainer(
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
+      );
+      addTearDown(container.dispose);
+
+      final controller = container.read(terminalControllerProvider.notifier);
+      final tab = controller.createTab(projectPath: '/gone', title: 'Gone');
+      expect(tab.status, TerminalTabStatus.connecting);
+
+      fakeWs.emitFrame({'type': 'error', 'message': 'Invalid project path'});
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      expect(tab.status, TerminalTabStatus.disconnected);
+      expect(tab.startError, 'Invalid project path');
+
+      fakeWs.emitFrame({'type': 'output', 'data': r'$ '});
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      expect(tab.status, TerminalTabStatus.connected);
+      expect(tab.startError, isNull);
+    });
+
     test('a dismissed sign-in link stays hidden when replayed', () async {
       final container = ProviderContainer(
         overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],

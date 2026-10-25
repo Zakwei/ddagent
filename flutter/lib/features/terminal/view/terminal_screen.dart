@@ -1002,7 +1002,11 @@ class _ConnectionOverlay extends StatelessWidget {
     final t = Translations.of(context);
     final palette = TerminalPalette.of(context);
     final connecting = tab.status == TerminalTabStatus.connecting;
+    final startError = tab.startError;
     final description = switch (tab.status) {
+      TerminalTabStatus.disconnected when startError != null => t.terminal.errors.frameError(
+        message: startError,
+      ),
       TerminalTabStatus.exited =>
         tab.exitCode != null
             ? t.terminal.overlay.processExitedWithCode(code: tab.exitCode!)
