@@ -5,6 +5,7 @@ import 'package:ddagent_app/core/realtime/sse_client.dart';
 import 'package:ddagent_app/core/theme/theme_controller.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/utils/model_pricing.dart';
+import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_node.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_repository.dart';
 import 'package:ddagent_app/features/git/data/git_models.dart';
@@ -14,6 +15,7 @@ import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/settings/view/settings_screen.dart';
 import 'package:ddagent_app/features/taskmaster/state/tasks_settings_controller.dart';
+import 'package:ddagent_app/features/terminal/state/session_terminal.dart';
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
 import 'package:ddagent_app/features/workspace/state/workspace_controller.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
@@ -425,19 +427,19 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
     then?.call();
   }
 
-  void _openChatSession(String sessionId, String? projectId) {
-    // Web openSession: focuses an existing chat pane, else opens a new one.
-    _goWorkspace(() {
-      final ws = ref.read(workspaceProvider);
-      final ctl = ref.read(workspaceProvider.notifier);
-      for (final p in ws.panes) {
-        if (p.kind == PaneKind.chat && p.sessionId == sessionId) {
-          ctl.setActivePaneId(p.id);
-          return;
-        }
-      }
-      ctl.openPane(PaneKind.chat, sessionId: sessionId, projectId: projectId);
-    });
+  /// Resumes the session in a terminal tab (see [openSessionInTerminal]) and
+  /// shows the screen holding it. The palette is closed by then, so the
+  /// router and container are captured before the await.
+  Future<void> _openSessionTerminal(String sessionId, {bool newPane = false}) async {
+    final router = GoRouter.of(context);
+    final result = await openSessionInTerminal(
+      ProviderScope.containerOf(context, listen: false),
+      sessionId,
+      newPane: newPane,
+    );
+    final error = result.error;
+    if (error != null) AppToast.global(error, isError: true);
+    router.go(result.route ?? '/workspace');
   }
 
   void _openGit() {
@@ -451,8 +453,10 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
     final a = _compare[0];
     final b = _compare[1];
     if (a == null || b == null || a == b) return;
-    _openChatSession(a, _projectId);
-    _openChatSession(b, _projectId);
+    // Side by side: each session in a terminal pane of its own.
+    unawaited(
+      _openSessionTerminal(a, newPane: true).then((_) => _openSessionTerminal(b, newPane: true)),
+    );
   }
 
   // ─── Item list ───────────────────────────────────────────────────────────
@@ -472,16 +476,16 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
       groups.add(
         _Group(t.groups.actions, [
           _Item(
-            id: 'new-chat',
-            icon: LucideIcons.messageSquarePlus,
-            label: t.items.startNewChat,
+            id: 'new-terminal',
+            icon: LucideIcons.squareTerminal,
+            label: Translations.of(context).chat.splitWorkspace.addTerminal,
             enabled: hasProject,
             disabledHint: hasProject ? null : t.items.selectProjectFirst,
             onSelect: () => _run(
               () => _goWorkspace(
                 () => ref
                     .read(workspaceProvider.notifier)
-                    .openPane(PaneKind.chat, projectId: projectId),
+                    .openPane(PaneKind.terminal, projectId: projectId),
               ),
             ),
           ),
@@ -656,7 +660,7 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
                 subtitle: s.snippet?.isNotEmpty == true ? s.snippet : null,
                 trailing: s.provider,
                 keywords: s.id,
-                onSelect: () => _run(() => _openChatSession(s.id, s.projectId)),
+                onSelect: () => _run(() => unawaited(_openSessionTerminal(s.id))),
               ),
             if (_page == null && shown.length > _browseLimit)
               _Item(

@@ -311,6 +311,31 @@ void main() {
       expect(currentTab.authUrls, contains('https://claude.ai/oauth/login?code=123'));
     });
 
+    test('a dismissed sign-in link stays hidden when replayed', () async {
+      final container = ProviderContainer(
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
+      );
+      addTearDown(container.dispose);
+
+      final controller = container.read(terminalControllerProvider.notifier);
+      final tab = controller.createTab(projectPath: '/test/proj', title: 'Auth test');
+      const url = 'https://claude.ai/oauth/login?code=123';
+      fakeWs.emitFrame({'type': 'auth_url', 'url': url});
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+
+      controller.dismissAuthUrls(tab.id);
+      expect(tab.authUrls, isEmpty);
+      // A reattach re-announces the link and its truncated re-renders.
+      fakeWs.emitFrame({'type': 'auth_url', 'url': url});
+      fakeWs.emitFrame({'type': 'auth_url', 'url': url.substring(0, 30)});
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      expect(tab.authUrls, isEmpty);
+
+      fakeWs.emitFrame({'type': 'auth_url', 'url': 'https://claude.ai/oauth/login?code=456'});
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      expect(tab.authUrls, ['https://claude.ai/oauth/login?code=456']);
+    });
+
     test('resume retries a dropped shell right away and pings an open one', () async {
       final channel = ShellChannel(fakeWs, pongTimeout: const Duration(milliseconds: 20))..start();
       final container = ProviderContainer(
@@ -337,6 +362,16 @@ void main() {
       fakeWs.emitState(WsState.reconnecting);
       controller.onAppResumed();
       expect(fakeWs.reconnectNowCalls, 2);
+    });
+
+    test('ShellChannel.isOpen tracks the socket state', () {
+      expect(fakeChannel.isOpen, isTrue);
+      for (final s in [WsState.connecting, WsState.reconnecting, WsState.closed]) {
+        fakeWs.emitState(s);
+        expect(fakeChannel.isOpen, isFalse, reason: s.name);
+      }
+      fakeWs.emitState(WsState.open);
+      expect(fakeChannel.isOpen, isTrue);
     });
 
     test('keys typed while reconnecting are sent after the re-init', () async {

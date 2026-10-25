@@ -78,6 +78,15 @@ class _FakeSessions extends SessionsRepository {
   _FakeSessions() : super(Dio());
 
   @override
+  Future<Session> details(String sessionId) async => Session.fromApi({
+    'id': sessionId,
+    'provider': sessionId == 's-2' ? 'codex' : 'claude',
+    'summary': sessionId == 's-2' ? 'Refactor auth' : 'Fix login bug',
+    'projectPath': '/p',
+    'projectId': 'p1',
+  });
+
+  @override
   Future<Map<String, dynamic>> tokenUsage(String sessionId) async => {
     'data': {
       'used': 1200,
@@ -185,7 +194,7 @@ void main() {
 
       expect(find.text('Actions'), findsOneWidget);
       expect(find.text('Navigate'), findsWidgets); // group + kbd hint label
-      expect(find.text('Start new chat'), findsOneWidget);
+      expect(find.text('Add terminal pane'), findsOneWidget);
       expect(find.text('Ctrl+Shift+K'), findsOneWidget);
 
       await search(tester, 'git:');
@@ -216,7 +225,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Git: Pull'), findsOneWidget);
-      expect(find.text('Start new chat'), findsNothing);
+      expect(find.text('Add terminal pane'), findsNothing);
       expect(find.text('Git: Fetch'), findsNothing);
     });
 
@@ -230,16 +239,24 @@ void main() {
       expect(find.byType(CommandPaletteDialog), findsNothing);
     });
 
-    testWidgets('session opens a chat pane in the workspace', (tester) async {
+    testWidgets('session resumes in a terminal tab of the workspace', (tester) async {
       final h = _Harness();
       await open(tester, h);
       await search(tester, 'login');
       await tester.tap(find.text('Fix login bug'));
+      // The tab waits (bounded) for the server's workspace before it lands.
+      await tester.pump(const Duration(seconds: 6));
       await tester.pumpAndSettle();
 
       expect(find.text('PAGE:/workspace'), findsOneWidget);
-      final panes = h.container.read(workspaceProvider).panes;
-      expect(panes.any((p) => p.kind == PaneKind.chat && p.sessionId == 's-1'), isTrue);
+      final ws = h.container.read(workspaceProvider);
+      final pane = ws.panes.singleWhere((p) => p.kind == PaneKind.terminal);
+      final tab = ws.terminals[pane.id]!.tabs.single;
+      expect(
+        (tab.sessionId, tab.provider, tab.projectPath, tab.isPlainShell),
+        ('s-1', 'claude', '/p', false),
+      );
+      expect(ws.terminals[pane.id]!.activeTabId, tab.id);
       // Drain the workspace sync debounce scheduled when the pane opened.
       await tester.pump(const Duration(milliseconds: 400));
     });
@@ -303,11 +320,11 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('f0.dart'), findsOneWidget);
       // Page chip shows the active page; actions are hidden.
-      expect(find.text('Start new chat'), findsNothing);
+      expect(find.text('Add terminal pane'), findsNothing);
 
       await tester.tap(find.byIcon(Icons.cancel));
       await tester.pumpAndSettle();
-      expect(find.text('Start new chat'), findsOneWidget);
+      expect(find.text('Add terminal pane'), findsOneWidget);
     });
 
     testWidgets('compare picks two sessions and opens split view', (tester) async {
@@ -334,13 +351,15 @@ void main() {
       expect(find.text('claude-sonnet-4'), findsWidgets);
 
       await tester.tap(splitBtn);
+      await tester.pump(const Duration(seconds: 6));
+      await tester.pump(const Duration(seconds: 6));
       await tester.pumpAndSettle();
       expect(find.text('PAGE:/workspace'), findsOneWidget);
-      final panes = h.container.read(workspaceProvider).panes;
-      expect(
-        panes.where((p) => p.kind == PaneKind.chat).map((p) => p.sessionId),
-        containsAll(['s-1', 's-2']),
-      );
+      // Side by side: one terminal pane per session.
+      final ws = h.container.read(workspaceProvider);
+      final panes = ws.panes.where((p) => p.kind == PaneKind.terminal).toList();
+      expect(panes, hasLength(2));
+      expect([for (final p in panes) ws.terminals[p.id]!.tabs.single.sessionId], ['s-1', 's-2']);
       await tester.pump(const Duration(milliseconds: 400));
     });
 

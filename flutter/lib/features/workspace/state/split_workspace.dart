@@ -6,8 +6,9 @@ import 'package:hive/hive.dart';
 
 /// Multi-pane workspace (port of main-content/utils/splitWorkspace.ts +
 /// workspacePanes.ts). Panes are first-class and persisted — the URL never
-/// owns a session; a reload restores the exact same workspace.
-enum PaneKind { chat, browser, terminal, notes, editor, git, preview }
+/// owns a session; a reload restores the exact same workspace. Agents run as
+/// CLIs in terminal panes — there is no chat pane any more.
+enum PaneKind { browser, terminal, notes, editor, git, preview }
 
 class SplitPane {
   const SplitPane({
@@ -18,7 +19,6 @@ class SplitPane {
     this.url,
     this.filePath,
     this.device,
-    this.picker = false,
   });
 
   final String id;
@@ -34,25 +34,21 @@ class SplitPane {
   /// server's app-preview device catalog). `null` = follow the target.
   final String? device;
 
-  /// Chat pane renders the session picker instead of the chat UI.
-  final bool picker;
-
+  /// Fields are thunks so a field can be cleared: `url: () => null`.
   SplitPane copyWith({
-    String? sessionId,
-    String? projectId,
-    String? url,
-    String? filePath,
-    String? device,
-    bool? picker,
+    String? Function()? sessionId,
+    String? Function()? projectId,
+    String? Function()? url,
+    String? Function()? filePath,
+    String? Function()? device,
   }) => SplitPane(
     id: id,
     kind: kind,
-    sessionId: sessionId ?? this.sessionId,
-    projectId: projectId ?? this.projectId,
-    url: url ?? this.url,
-    filePath: filePath ?? this.filePath,
-    device: device ?? this.device,
-    picker: picker ?? this.picker,
+    sessionId: sessionId != null ? sessionId() : this.sessionId,
+    projectId: projectId != null ? projectId() : this.projectId,
+    url: url != null ? url() : this.url,
+    filePath: filePath != null ? filePath() : this.filePath,
+    device: device != null ? device() : this.device,
   );
 
   Map<String, dynamic> toJson() => {
@@ -63,15 +59,20 @@ class SplitPane {
     'url': ?url,
     'filePath': ?filePath,
     'device': ?device,
-    if (picker) 'picker': true,
   };
 
   static SplitPane? fromJson(Object? value) {
     if (value is! Map) return null;
     final id = value['id'];
-    final kind = PaneKind.values.asNameMap()[value['kind']];
-    if (id is! String || id.isEmpty || kind == null) return null;
     String? s(Object? v) => v is String && v.trim().isNotEmpty ? v : null;
+    // A chat pane saved before panes went terminal-only: one bound to a
+    // session becomes a terminal pane that resumes it in its CLI (the
+    // terminal opens that tab when the pane has no tab row yet); an unbound
+    // one (the old session picker) is dropped.
+    final legacyChat = value['kind'] == 'chat';
+    if (legacyChat && s(value['sessionId']) == null) return null;
+    final kind = legacyChat ? PaneKind.terminal : PaneKind.values.asNameMap()[value['kind']];
+    if (id is! String || id.isEmpty || kind == null) return null;
     return SplitPane(
       id: id,
       kind: kind,
@@ -80,7 +81,6 @@ class SplitPane {
       url: s(value['url']),
       filePath: s(value['filePath']),
       device: s(value['device']),
-      picker: value['picker'] == true,
     );
   }
 }
@@ -136,29 +136,12 @@ List<SplitPane> reorderSplitPanes(List<SplitPane> panes, String fromId, int toIn
   return next;
 }
 
-/// What a pane tile should flag: an unanswered question beats "busy".
-enum PaneAction { idle, processing, question }
-
-PaneAction paneAction(
-  SplitPane pane, {
-  required Set<String> processingSessionIds,
-  required Set<String> pendingActionSessionIds,
-}) {
-  if (pane.kind != PaneKind.chat || pane.sessionId == null) {
-    return PaneAction.idle;
-  }
-  if (pendingActionSessionIds.contains(pane.sessionId)) {
-    return PaneAction.question;
-  }
-  if (processingSessionIds.contains(pane.sessionId)) {
-    return PaneAction.processing;
-  }
-  return PaneAction.idle;
-}
+/// What a pane tile should flag: a CLI in one of the pane's terminal tabs
+/// waiting for the user to pick an option.
+enum PaneAction { idle, question }
 
 /// Localized display name of a pane kind.
 String paneKindLabel(PaneKind kind) => switch (kind) {
-  PaneKind.chat => t.workspace.paneTitle.chat,
   PaneKind.browser => t.workspace.paneTitle.browser,
   PaneKind.terminal => t.workspace.paneTitle.terminal,
   PaneKind.notes => t.workspace.paneTitle.notes,
@@ -167,40 +150,19 @@ String paneKindLabel(PaneKind kind) => switch (kind) {
   PaneKind.preview => t.workspace.paneTitle.preview,
 };
 
+/// [questionPaneIds]: panes with a terminal tab showing a CLI prompt.
 ({String title, String? subtitle, PaneAction action}) splitPaneDisplay(
   SplitPane pane, {
-  Map<String, String> sessionTitles = const {},
   Map<String, String> projectNames = const {},
-  Set<String> processingSessionIds = const {},
-  Set<String> pendingActionSessionIds = const {},
+  Set<String> questionPaneIds = const {},
 }) {
   final subtitle = pane.projectId == null ? null : projectNames[pane.projectId];
-  final title = switch (pane.kind) {
-    PaneKind.browser ||
-    PaneKind.terminal ||
-    PaneKind.notes ||
-    PaneKind.editor ||
-    PaneKind.git ||
-    PaneKind.preview => paneKindLabel(pane.kind),
-    PaneKind.chat =>
-      sessionTitles[pane.sessionId] ??
-          (pane.sessionId != null
-              ? pane.sessionId!.substring(
-                  0,
-                  pane.sessionId!.length < 8 ? pane.sessionId!.length : 8,
-                )
-              : paneKindLabel(PaneKind.chat)),
-  };
   return (
-    title: title,
+    title: paneKindLabel(pane.kind),
     subtitle: pane.kind == PaneKind.browser || pane.kind == PaneKind.preview
         ? (Uri.tryParse(pane.url ?? '')?.host).let((h) => h == '' ? pane.url : h)
         : subtitle,
-    action: paneAction(
-      pane,
-      processingSessionIds: processingSessionIds,
-      pendingActionSessionIds: pendingActionSessionIds,
-    ),
+    action: questionPaneIds.contains(pane.id) ? PaneAction.question : PaneAction.idle,
   );
 }
 
@@ -212,6 +174,12 @@ const terminalRouteHost = 'route';
 /// Upper bound of synced tabs per tab row — keeps the workspace payload far
 /// below the server's 64KB cap.
 const maxSyncedTerminalTabs = 24;
+
+/// A tab id unique across the account's devices — also the tab's PTY key,
+/// so it stays within the server's safe session-id alphabet.
+String newTerminalTabSyncId() =>
+    'tab-${DateTime.now().millisecondsSinceEpoch.toRadixString(36)}-'
+    '${_rand.nextInt(kPaneIdSpace).toRadixString(36)}';
 
 /// One terminal tab as the account's devices share it: enough to attach to
 /// the same server PTY and show the same strip entry, nothing live (buffer,
@@ -478,11 +446,4 @@ class WorkspaceStorage {
     }
     return s.lastUsedProjectId;
   }
-}
-
-// ─── Broadcast helpers (port of broadcastSessionUtils.ts) ──────────────────
-
-bool isOrchestratorSession(Map<String, dynamic> session) {
-  final provider = session['provider'] ?? session['__provider'];
-  return provider == 'orchestrator' || provider == 'mini-orchestrator';
 }

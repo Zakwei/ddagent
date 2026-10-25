@@ -313,7 +313,7 @@ void main() {
       final restored = SplitPane.fromJson(pane.toJson())!;
       expect(restored.kind, PaneKind.git);
       expect(paneKindIcon(PaneKind.git), isNotNull);
-      final display = splitPaneDisplay(pane, sessionTitles: const {}, projectNames: const {});
+      final display = splitPaneDisplay(pane, projectNames: const {});
       expect(display.title, 'Git');
     });
   });

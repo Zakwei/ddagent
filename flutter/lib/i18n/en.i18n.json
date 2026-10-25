@@ -4291,6 +4291,11 @@
       "ctrlHint": "Hold Ctrl for the next key",
       "shiftHint": "Hold Shift for the next key",
       "showKeyboard": "Show keyboard"
+    },
+    "openSession": {
+      "notResumable": "This session has no command-line agent to resume it in a terminal.",
+      "failed": "Could not open the session: {{error}}",
+      "full": "This terminal has no room for another tab — close one first."
     }
   },
   "voice": {

@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 
 /// Kind icon per pane (port of PANE_KIND_ICONS in SplitWorkspaceGrid.tsx).
 IconData paneKindIcon(PaneKind kind) => switch (kind) {
-  PaneKind.chat => Icons.chat_bubble_outline,
   PaneKind.browser => Icons.public,
   PaneKind.terminal => Icons.terminal,
   PaneKind.notes => Icons.edit_note,
@@ -328,8 +327,12 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
         ),
       );
     }
-    return GestureDetector(
-      onTapDown: (_) => widget.onActivatePane?.call(pane.id),
+    // A raw pointer listener, not a tap recognizer: the pane body's own
+    // recognizers (the terminal's tap/selection) win the arena on a quick
+    // click, which then never reported a tap-down — the keyboard went to the
+    // clicked terminal while another pane stayed the active one.
+    return Listener(
+      onPointerDown: (_) => widget.onActivatePane?.call(pane.id),
       behavior: HitTestBehavior.translucent,
       child: tile,
     );

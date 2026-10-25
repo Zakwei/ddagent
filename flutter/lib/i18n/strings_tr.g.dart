@@ -698,6 +698,7 @@ class Translations$terminal$tr extends Translations$terminal$en {
 	@override late final Translations$terminal$rename$tr rename = Translations$terminal$rename$tr._(_root);
 	@override late final Translations$terminal$search$tr search = Translations$terminal$search$tr._(_root);
 	@override late final Translations$terminal$keyBar$tr keyBar = Translations$terminal$keyBar$tr._(_root);
+	@override late final Translations$terminal$openSession$tr openSession = Translations$terminal$openSession$tr._(_root);
 }
 
 // Path: voice
@@ -5144,6 +5145,18 @@ class Translations$terminal$keyBar$tr extends Translations$terminal$keyBar$en {
 	@override String get ctrlHint => 'Sonraki tuş için Ctrl basılı tut';
 	@override String get shiftHint => 'Sonraki tuş için Shift basılı tut';
 	@override String get showKeyboard => 'Klavyeyi göster';
+}
+
+// Path: terminal.openSession
+class Translations$terminal$openSession$tr extends Translations$terminal$openSession$en {
+	Translations$terminal$openSession$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get notResumable => 'Bu oturumu terminalde sürdürecek bir komut satırı ajanı yok.';
+	@override String failed({required Object error}) => 'Oturum açılamadı: ${error}';
+	@override String get full => 'Bu terminalde başka bir sekme için yer yok — önce birini kapatın.';
 }
 
 // Path: workspace.paneTitle
@@ -11837,6 +11850,9 @@ extension on TranslationsTr {
 			'terminal.keyBar.ctrlHint' => 'Sonraki tuş için Ctrl basılı tut',
 			'terminal.keyBar.shiftHint' => 'Sonraki tuş için Shift basılı tut',
 			'terminal.keyBar.showKeyboard' => 'Klavyeyi göster',
+			'terminal.openSession.notResumable' => 'Bu oturumu terminalde sürdürecek bir komut satırı ajanı yok.',
+			'terminal.openSession.failed' => ({required Object error}) => 'Oturum açılamadı: ${error}',
+			'terminal.openSession.full' => 'Bu terminalde başka bir sekme için yer yok — önce birini kapatın.',
 			'voice.preview' => 'Önizle',
 			'voice.settingsSaved' => 'Sesli giriş ayarları kaydedildi',
 			'voice.saveFailed' => 'STT yapılandırması kaydedilemedi',

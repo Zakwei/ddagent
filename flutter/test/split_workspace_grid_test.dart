@@ -17,7 +17,7 @@ void main() {
     addTearDown(() => FlutterError.onError = previous);
 
     final panes = [
-      for (var i = 0; i < paneCount; i++) SplitPane(id: 'pane-$i', kind: PaneKind.chat),
+      for (var i = 0; i < paneCount; i++) SplitPane(id: 'pane-$i', kind: PaneKind.terminal),
     ];
     await tester.pumpWidget(
       TranslationProvider(
@@ -63,8 +63,8 @@ void main() {
           home: Scaffold(
             body: SplitWorkspaceGrid(
               panes: const [
-                SplitPane(id: 'pane-0', kind: PaneKind.chat),
-                SplitPane(id: 'pane-1', kind: PaneKind.chat),
+                SplitPane(id: 'pane-0', kind: PaneKind.terminal),
+                SplitPane(id: 'pane-1', kind: PaneKind.terminal),
               ],
               paneTitle: (pane) => pane.id,
               onClosePane: (_) {},
@@ -106,8 +106,8 @@ void main() {
         home: Scaffold(
           body: SplitWorkspaceGrid(
             panes: const [
-              SplitPane(id: 'pane-0', kind: PaneKind.chat),
-              SplitPane(id: 'pane-1', kind: PaneKind.chat),
+              SplitPane(id: 'pane-0', kind: PaneKind.terminal),
+              SplitPane(id: 'pane-1', kind: PaneKind.terminal),
             ],
             activePaneId: activeId,
             finishedPaneIds: const {'pane-1'},
@@ -137,8 +137,8 @@ void main() {
           home: Scaffold(
             body: SplitWorkspaceGrid(
               panes: const [
-                SplitPane(id: 'pane-0', kind: PaneKind.chat),
-                SplitPane(id: 'pane-1', kind: PaneKind.chat),
+                SplitPane(id: 'pane-0', kind: PaneKind.terminal),
+                SplitPane(id: 'pane-1', kind: PaneKind.terminal),
               ],
               activePaneId: 'pane-0',
               finishedPaneIds: const {'pane-1'},

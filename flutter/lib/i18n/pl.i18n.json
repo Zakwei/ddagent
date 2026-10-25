@@ -4331,6 +4331,11 @@
       "ctrlHint": "Przytrzymaj Ctrl dla następnego klawisza",
       "shiftHint": "Przytrzymaj Shift dla następnego klawisza",
       "showKeyboard": "Pokaż klawiaturę"
+    },
+    "openSession": {
+      "notResumable": "Ta sesja nie ma agenta CLI, którym można ją wznowić w terminalu.",
+      "failed": "Nie udało się otworzyć sesji: {{error}}",
+      "full": "W tym terminalu nie ma miejsca na kolejną kartę — najpierw zamknij którąś."
     }
   },
   "voice": {

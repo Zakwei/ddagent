@@ -4286,6 +4286,11 @@
       "ctrlHint": "Sonraki tuş için Ctrl basılı tut",
       "shiftHint": "Sonraki tuş için Shift basılı tut",
       "showKeyboard": "Klavyeyi göster"
+    },
+    "openSession": {
+      "notResumable": "Bu oturumu terminalde sürdürecek bir komut satırı ajanı yok.",
+      "failed": "Oturum açılamadı: {{error}}",
+      "full": "Bu terminalde başka bir sekme için yer yok — önce birini kapatın."
     }
   },
   "voice": {

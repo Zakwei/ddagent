@@ -14,6 +14,12 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 ///
 /// Mouse: drag to reorder, middle-click closes, right-click opens the tab
 /// menu, double-click renames. Touch: long-press opens the tab menu.
+/// Background-tab dot: the CLI waits on a pick-an-option prompt.
+const terminalAskColor = Color(0xFFF59E0B);
+
+/// Background-tab dot: the CLI rang the bell (its turn finished).
+const terminalBellColor = Color(0xFF22C55E);
+
 class TerminalTabStrip extends StatelessWidget {
   const TerminalTabStrip({
     super.key,
@@ -301,9 +307,14 @@ class _TerminalTabItem extends StatefulWidget {
 class _TerminalTabItemState extends State<_TerminalTabItem> {
   bool _hovered = false;
 
+  /// Connected tabs in the background flag an agent asking (amber) or
+  /// done with its turn (green) — the visible tab shows that itself.
   Color? _statusColor(AppColors colors) => switch (widget.tab.status) {
+    TerminalTabStatus.connected when widget.isActive => null,
+    TerminalTabStatus.connected when widget.tab.promptOptions != null => terminalAskColor,
+    TerminalTabStatus.connected when widget.tab.bell => terminalBellColor,
     TerminalTabStatus.connected => null,
-    TerminalTabStatus.connecting => const Color(0xFFF59E0B),
+    TerminalTabStatus.connecting => const Color(0xFFF9F1A5), // the overlay spinner's yellow
     TerminalTabStatus.disconnected => colors.mutedForeground,
     TerminalTabStatus.exited =>
       widget.tab.exitCode == 0 ? const Color(0xFF22C55E) : const Color(0xFFE74856),

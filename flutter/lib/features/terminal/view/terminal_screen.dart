@@ -7,8 +7,10 @@ import 'package:ddagent_app/core/widgets/app_nav_menu.dart';
 import 'package:ddagent_app/features/projects/data/projects_repository.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/provider_accounts/state/provider_accounts_controller.dart';
+import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/settings/state/ui_preferences_controller.dart';
 import 'package:ddagent_app/features/system/state/system_providers.dart';
+import 'package:ddagent_app/features/terminal/state/session_terminal.dart';
 import 'package:ddagent_app/features/terminal/state/terminal_account_profiles.dart';
 import 'package:ddagent_app/features/terminal/state/terminal_state.dart';
 import 'package:ddagent_app/features/terminal/view/provider_login_dialog.dart';
@@ -85,6 +87,9 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
   Timer? _copyTimer;
   final _menuController = MenuController();
 
+  /// Wraps the whole screen — whether the keyboard is in this tab row.
+  final _screenFocus = FocusNode(debugLabel: 'TerminalScreen');
+
   /// One pane state per tab (selection, scroll, search survive switching
   /// tabs); the key doubles as the handle the menu and shortcuts call into.
   final _viewKeys = <String, GlobalKey<TerminalViewWrapperState>>{};
@@ -119,6 +124,27 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
         (_, _) => _publishLocalRow(),
       );
     }
+    // The visible tab of the focused row is not in the background: its bell
+    // (an agent finishing while the user watches) is seen, not a flag.
+    ref.listenManual(
+      terminalControllerProvider.select((s) => s.activeTabFor(widget.hostId)?.bell ?? false),
+      (_, rung) {
+        if (rung) scheduleMicrotask(_acknowledgeBellIfFocused);
+      },
+      fireImmediately: true,
+    );
+    // A newly visible tab (opened, closed, switched) takes the keyboard when
+    // this row had it: its fresh view cannot autofocus while the focus scope
+    // remembers another pane's terminal, so typing landed in that pane.
+    ref.listenManual(terminalControllerProvider.select((s) => s.activeTabFor(widget.hostId)?.id), (
+      prev,
+      next,
+    ) {
+      if (next == null || next == prev || _isTouchPlatform || !_screenFocus.hasFocus) return;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _activePane?.focusTerminal();
+      });
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       if (widget.syncTabs) {
@@ -132,6 +158,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
   @override
   void dispose() {
     _copyTimer?.cancel();
+    _screenFocus.dispose();
     super.dispose();
   }
 
@@ -154,13 +181,47 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
       return;
     }
     if (row.encode() == _syncedRow?.encode()) return;
+    // The server's first row cannot name tabs opened here before it arrived
+    // (empty state, `+`, a shortcut): applying it as-is closed them and left
+    // their PTYs running on the server with no tab. They join the row, which
+    // then goes out as this device's edit.
+    final applied = _syncedRow == null ? _withLocalTabs(row) : row;
     _syncedRow = row;
     _applyingSyncedRow = true;
     try {
-      _ctrl.applySyncedRow(widget.hostId, row);
+      _ctrl.applySyncedRow(widget.hostId, applied);
     } finally {
       _applyingSyncedRow = false;
     }
+    if (!identical(applied, row)) _publishLocalRow();
+  }
+
+  /// [row] plus this host's tabs it does not name; the local selection wins
+  /// when it is one of those (the shell the user just opened stays shown).
+  TerminalHostSpec _withLocalTabs(TerminalHostSpec row) {
+    final local = _ctrl.syncedRowFor(widget.hostId);
+    final named = {for (final spec in row.tabs) spec.id};
+    final extra = [
+      for (final spec in local.tabs)
+        if (!named.contains(spec.id)) spec,
+    ];
+    if (extra.isEmpty) return row;
+    final localActive = local.activeTabId;
+    return TerminalHostSpec(
+      tabs: [...row.tabs, ...extra].take(maxSyncedTerminalTabs).toList(),
+      activeTabId: extra.any((spec) => spec.id == localActive) ? localActive : row.activeTabId,
+    );
+  }
+
+  /// The standalone terminal is focused while shown; a pane while it is the
+  /// workspace's active one (the others keep the flag until focused).
+  void _acknowledgeBellIfFocused() {
+    if (!mounted) return;
+    final focused =
+        !widget.syncTabs ||
+        widget.hostId == terminalRouteHost ||
+        ref.read(workspaceProvider).activePaneId == widget.hostId;
+    if (focused) _ctrl.acknowledgeBell(widget.hostId);
   }
 
   static String _rowShape(TerminalState s, String hostId) => [
@@ -239,20 +300,46 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
   }
 
   void _ensureInitialTab() {
-    final terminalState = ref.read(terminalControllerProvider);
-    if (terminalState.tabsFor(widget.hostId).isEmpty) {
-      final t = Translations.of(context);
-      final path = _resolveProjectPath();
-      _ctrl.createTab(
-        title: widget.sessionId != null
-            ? t.chat.export.sessionTitle(id: widget.sessionId!)
-            : t.terminal.tabs.shellName(index: 1),
-        projectPath: path,
-        hostId: widget.hostId,
-        sessionId: widget.sessionId,
-        isPlainShell: widget.sessionId == null,
-      );
+    if (ref.read(terminalControllerProvider).tabsFor(widget.hostId).isNotEmpty) return;
+    final sessionId = widget.sessionId;
+    if (sessionId != null) {
+      unawaited(_openInitialSessionTab(sessionId));
+      return;
     }
+    _ctrl.createTab(
+      title: Translations.of(context).terminal.tabs.shellName(index: 1),
+      projectPath: _resolveProjectPath(),
+      hostId: widget.hostId,
+    );
+  }
+
+  /// The first tab resumes [sessionId] in its own CLI and directory (a
+  /// `/terminal?sessionId=` link, or a pane migrated from a session pane);
+  /// a session no CLI can resume opens a plain shell instead.
+  Future<void> _openInitialSessionTab(String sessionId) async {
+    Session? session;
+    try {
+      session = await ref.read(sessionsRepositoryProvider).details(sessionId);
+    } on Object {
+      session = null;
+    }
+    if (!mounted || ref.read(terminalControllerProvider).tabsFor(widget.hostId).isNotEmpty) {
+      return;
+    }
+    final provider = session?.provider ?? 'claude';
+    final resumable = terminalResumableProviders.contains(provider);
+    final path = session?.projectFullPath ?? session?.projectPath;
+    _ctrl.createTab(
+      title: resumable
+          ? session?.displayTitle ??
+                Translations.of(context).chat.export.sessionTitle(id: sessionId)
+          : null,
+      projectPath: path == null || path.isEmpty ? _resolveProjectPath() : path,
+      hostId: widget.hostId,
+      sessionId: resumable ? sessionId : null,
+      provider: resumable ? provider : 'claude',
+      isPlainShell: !resumable,
+    );
   }
 
   /// `+` / Ctrl+Shift+T — the default profile is a plain shell.
@@ -452,6 +539,18 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
     return KeyEventResult.handled;
   }
 
+  /// A click on the strip selects the tab and hands it the keyboard — the
+  /// focus otherwise stayed in whichever pane's terminal last had it, so
+  /// typing after picking a tab in another pane went to the old one. Not on
+  /// touch platforms: a tab tap must not pop the soft keyboard.
+  void _selectTabFromStrip(String tabId) {
+    _ctrl.selectTab(tabId);
+    if (_isTouchPlatform) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _activePane?.focusTerminal();
+    });
+  }
+
   bool get _isTouchPlatform =>
       defaultTargetPlatform == TargetPlatform.android ||
       defaultTargetPlatform == TargetPlatform.iOS ||
@@ -474,6 +573,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
         if (kIsWeb) unawaited(BrowserContextMenu.enableContextMenu());
       },
       child: Focus(
+        focusNode: _screenFocus,
         onKeyEvent: _onScreenKey,
         child: Scaffold(
           backgroundColor: palette.background,
@@ -482,12 +582,13 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
               TerminalTabStrip(
                 tabs: terminalState.tabsFor(widget.hostId),
                 activeTabId: activeTab?.id,
-                onSelect: _ctrl.selectTab,
+                onSelect: _selectTabFromStrip,
                 onClose: _ctrl.closeTab,
                 onReorder: (from, to) => _ctrl.reorderTab(from, to, hostId: widget.hostId),
                 onRename: _ctrl.renameTab,
                 onDuplicate: _ctrl.duplicateTab,
-                onMoveToPane: _moveTabToNewPane,
+                // No workspace to move into where the row is not synced.
+                onMoveToPane: widget.syncTabs ? _moveTabToNewPane : null,
                 onCloseOthers: _ctrl.closeOtherTabs,
                 onCloseToRight: _ctrl.closeTabsToRight,
                 onNewTab: _newDefaultTab,
@@ -538,7 +639,10 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
 
               // Active tab Auth URL banner (if any)
               if (activeTab != null && bestAuthUrl(activeTab.authUrls) != null)
-                _buildAuthUrlBanner(bestAuthUrl(activeTab.authUrls)!),
+                _buildAuthUrlBanner(
+                  bestAuthUrl(activeTab.authUrls)!,
+                  onDismiss: () => _ctrl.dismissAuthUrls(activeTab.id),
+                ),
 
               // Main terminal view or empty state
               Expanded(child: activeTab != null ? _terminalArea(activeTab) : _buildEmptyState()),
@@ -799,7 +903,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
     );
   }
 
-  Widget _buildAuthUrlBanner(String authUrl) {
+  Widget _buildAuthUrlBanner(String authUrl, {required VoidCallback onDismiss}) {
     final colors = Theme.of(context).extension<AppColors>() ?? AppColors.dark;
     final t = Translations.of(context);
     return Container(
@@ -831,6 +935,14 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
               visualDensity: VisualDensity.compact,
               padding: const EdgeInsets.symmetric(horizontal: 8),
             ),
+          ),
+          IconButton(
+            tooltip: t.chat.splitOverview.close,
+            onPressed: onDismiss,
+            icon: Icon(Icons.close, size: 16, color: colors.primary),
+            visualDensity: VisualDensity.compact,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints.tightFor(width: 28, height: 28),
           ),
         ],
       ),

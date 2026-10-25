@@ -12,7 +12,6 @@ import 'package:ddagent_app/features/settings/view/quick_settings_sheet.dart';
 import 'package:ddagent_app/features/system/view/disk_usage.dart';
 import 'package:ddagent_app/features/taskmaster/state/tasks_settings_controller.dart';
 import 'package:ddagent_app/features/terminal/view/terminal_view_wrapper.dart';
-import 'package:ddagent_app/features/workspace/view/session_quick_switcher.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -26,13 +25,12 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 const _kCoffeeUrl = 'https://buymeacoffee.com/ddnet';
 
 /// Top-level destinations shown in the rail, mirroring the web client's
-/// SidebarRail order: pane workspace + sessions first, then standalone pages.
+/// SidebarRail order: pane workspace + terminal first, then standalone pages.
 /// New-app-only pages (projects, scheduler) sit in a second group below.
 /// Labels are resolved from i18n via [_destinationLabel] so the tables stay
 /// `const`.
 const _destinations = [
   (icon: LucideIcons.messageSquarePlus, path: '/workspace'),
-  (icon: LucideIcons.history, path: '/sessions'),
   (icon: LucideIcons.squareTerminal, path: '/terminal'),
 ];
 
@@ -67,7 +65,6 @@ const _allDestinations = [
 /// Localized label for a destination entry in the rail/drawer.
 String _destinationLabel(Translations t, String path) => switch (path) {
   '/workspace' => t.sidebar.panel.open,
-  '/sessions' => t.common.quota.metric.sessions,
   '/terminal' => t.sidebar.navigation.terminal,
   '/board' => t.sidebar.tabs.board,
   '/tasks' => t.common.tabs.tasks,
@@ -109,7 +106,7 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
   void initState() {
     super.initState();
     // Global shortcuts (web `useAppKeyboardShortcuts`): Ctrl/Cmd+Shift+F focus
-    // mode, Ctrl/Cmd+K session quick switcher, Alt+1..3 tab nav.
+    // mode, Alt+1..3 tab nav.
     // HardwareKeyboard level so it works regardless of which pane is focused.
     HardwareKeyboard.instance.addHandler(_globalKey);
   }
@@ -131,7 +128,12 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
     final ctrlOrMeta = kb.isControlPressed || kb.isMetaPressed;
 
     // 1. Alt+1..3 quick switch — 1: Panel, 2: Tasks (gated) else Git, 3: Git.
-    if (kb.isAltPressed && !ctrlOrMeta && !kb.isShiftPressed) {
+    // A focused terminal keeps the chords: Alt+digit is readline's numeric
+    // argument and a key binding in many TUIs.
+    if (kb.isAltPressed &&
+        !ctrlOrMeta &&
+        !kb.isShiftPressed &&
+        !TerminalViewWrapperState.hasKeyboardFocus) {
       final path = switch (key) {
         LogicalKeyboardKey.digit1 => '/workspace',
         LogicalKeyboardKey.digit2 => _showTasks ? '/tasks' : '/git',
@@ -155,16 +157,7 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
       return true;
     }
 
-    // 3. Ctrl/Cmd+K — session quick switcher. A focused terminal keeps the
-    // chord: it is kill-to-end-of-line in shells and CLIs.
-    if (ctrlOrMeta && !kb.isShiftPressed && !kb.isAltPressed && key == LogicalKeyboardKey.keyK) {
-      if (_modalOpen) return false;
-      if (TerminalViewWrapperState.hasKeyboardFocus) return false;
-      unawaited(showSessionQuickSwitcher(context));
-      return true;
-    }
-
-    // 4. Ctrl/Cmd+Shift+K — command palette (web CommandPalette). Toggles:
+    // 3. Ctrl/Cmd+Shift+K — command palette (web CommandPalette). Toggles:
     // when the palette itself is the top modal, the shortcut closes it.
     if (ctrlOrMeta && kb.isShiftPressed && !kb.isAltPressed && key == LogicalKeyboardKey.keyK) {
       if (_paletteOpen) {
@@ -177,7 +170,7 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
       return true;
     }
 
-    // 5. Ctrl/Cmd+, — open settings (web CommandPalette's second binding;
+    // 4. Ctrl/Cmd+, — open settings (web CommandPalette's second binding;
     // also backs the shortcut badge it renders).
     if (ctrlOrMeta && !kb.isShiftPressed && !kb.isAltPressed && key == LogicalKeyboardKey.comma) {
       if (_modalOpen) return false;
@@ -305,12 +298,6 @@ class _AppRail extends ConsumerWidget {
             selected: selectedPath == '/workspace',
             badgeCount: runningCount,
             onTap: () => context.go('/workspace'),
-          ),
-          _RailButton(
-            icon: LucideIcons.history,
-            label: t.common.quota.metric.sessions,
-            selected: selectedPath == '/sessions',
-            onTap: () => context.go('/sessions'),
           ),
           // A terminal outside the panes, like a session opened on its own.
           _RailButton(
@@ -574,7 +561,6 @@ class _CompactNavDrawer extends ConsumerWidget {
               '/workspace',
               badge: runningCount,
             ),
-            item(LucideIcons.history, _destinationLabel(t, '/sessions'), '/sessions'),
             item(LucideIcons.squareTerminal, _destinationLabel(t, '/terminal'), '/terminal'),
             _drawerDivider(nav.dividerColor),
             for (final d in _pageDestinations)

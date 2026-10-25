@@ -700,6 +700,7 @@ class Translations$terminal$pl extends Translations$terminal$en {
 	@override late final Translations$terminal$rename$pl rename = Translations$terminal$rename$pl._(_root);
 	@override late final Translations$terminal$search$pl search = Translations$terminal$search$pl._(_root);
 	@override late final Translations$terminal$keyBar$pl keyBar = Translations$terminal$keyBar$pl._(_root);
+	@override late final Translations$terminal$openSession$pl openSession = Translations$terminal$openSession$pl._(_root);
 }
 
 // Path: voice
@@ -5179,6 +5180,18 @@ class Translations$terminal$keyBar$pl extends Translations$terminal$keyBar$en {
 	@override String get ctrlHint => 'Przytrzymaj Ctrl dla następnego klawisza';
 	@override String get shiftHint => 'Przytrzymaj Shift dla następnego klawisza';
 	@override String get showKeyboard => 'Pokaż klawiaturę';
+}
+
+// Path: terminal.openSession
+class Translations$terminal$openSession$pl extends Translations$terminal$openSession$en {
+	Translations$terminal$openSession$pl._(TranslationsPl root) : this._root = root, super.internal(root);
+
+	final TranslationsPl _root; // ignore: unused_field
+
+	// Translations
+	@override String get notResumable => 'Ta sesja nie ma agenta CLI, którym można ją wznowić w terminalu.';
+	@override String failed({required Object error}) => 'Nie udało się otworzyć sesji: ${error}';
+	@override String get full => 'W tym terminalu nie ma miejsca na kolejną kartę — najpierw zamknij którąś.';
 }
 
 // Path: workspace.paneTitle
@@ -11882,6 +11895,9 @@ extension on TranslationsPl {
 			'terminal.keyBar.ctrlHint' => 'Przytrzymaj Ctrl dla następnego klawisza',
 			'terminal.keyBar.shiftHint' => 'Przytrzymaj Shift dla następnego klawisza',
 			'terminal.keyBar.showKeyboard' => 'Pokaż klawiaturę',
+			'terminal.openSession.notResumable' => 'Ta sesja nie ma agenta CLI, którym można ją wznowić w terminalu.',
+			'terminal.openSession.failed' => ({required Object error}) => 'Nie udało się otworzyć sesji: ${error}',
+			'terminal.openSession.full' => 'W tym terminalu nie ma miejsca na kolejną kartę — najpierw zamknij którąś.',
 			'voice.preview' => 'Podgląd',
 			'voice.settingsSaved' => 'Zapisano ustawienia wprowadzania głosowego',
 			'voice.saveFailed' => 'Nie udało się zapisać konfiguracji STT',

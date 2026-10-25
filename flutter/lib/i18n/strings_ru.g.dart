@@ -700,6 +700,7 @@ class Translations$terminal$ru extends Translations$terminal$en {
 	@override late final Translations$terminal$rename$ru rename = Translations$terminal$rename$ru._(_root);
 	@override late final Translations$terminal$search$ru search = Translations$terminal$search$ru._(_root);
 	@override late final Translations$terminal$keyBar$ru keyBar = Translations$terminal$keyBar$ru._(_root);
+	@override late final Translations$terminal$openSession$ru openSession = Translations$terminal$openSession$ru._(_root);
 }
 
 // Path: voice
@@ -5177,6 +5178,18 @@ class Translations$terminal$keyBar$ru extends Translations$terminal$keyBar$en {
 	@override String get ctrlHint => 'Удержать Ctrl для следующей клавиши';
 	@override String get shiftHint => 'Удержать Shift для следующей клавиши';
 	@override String get showKeyboard => 'Показать клавиатуру';
+}
+
+// Path: terminal.openSession
+class Translations$terminal$openSession$ru extends Translations$terminal$openSession$en {
+	Translations$terminal$openSession$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get notResumable => 'У этой сессии нет агента командной строки, чтобы продолжить её в терминале.';
+	@override String failed({required Object error}) => 'Не удалось открыть сессию: ${error}';
+	@override String get full => 'В этом терминале нет места для новой вкладки — сначала закройте одну.';
 }
 
 // Path: workspace.paneTitle
@@ -11880,6 +11893,9 @@ extension on TranslationsRu {
 			'terminal.keyBar.ctrlHint' => 'Удержать Ctrl для следующей клавиши',
 			'terminal.keyBar.shiftHint' => 'Удержать Shift для следующей клавиши',
 			'terminal.keyBar.showKeyboard' => 'Показать клавиатуру',
+			'terminal.openSession.notResumable' => 'У этой сессии нет агента командной строки, чтобы продолжить её в терминале.',
+			'terminal.openSession.failed' => ({required Object error}) => 'Не удалось открыть сессию: ${error}',
+			'terminal.openSession.full' => 'В этом терминале нет места для новой вкладки — сначала закройте одну.',
 			'voice.preview' => 'Предпросмотр',
 			'voice.settingsSaved' => 'Настройки голосового ввода сохранены',
 			'voice.saveFailed' => 'Не удалось сохранить конфигурацию STT',

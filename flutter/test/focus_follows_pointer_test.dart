@@ -87,13 +87,13 @@ void main() {
         home: Scaffold(
           body: SplitWorkspaceGrid(
             panes: const [
-              SplitPane(id: 'chat', kind: PaneKind.chat),
+              SplitPane(id: 'git', kind: PaneKind.git),
               SplitPane(id: 'term', kind: PaneKind.terminal),
             ],
             activePaneId: 'term',
             onClosePane: (_) {},
             onReorderPanes: (_, _) {},
-            renderPane: (pane, _) => pane.id == 'chat'
+            renderPane: (pane, _) => pane.id == 'git'
                 ? field ?? const SizedBox()
                 : TerminalViewWrapper(tab: makeTab(), autofocus: false),
           ),

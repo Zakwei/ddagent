@@ -698,6 +698,7 @@ class Translations$terminal$fr extends Translations$terminal$en {
 	@override late final Translations$terminal$rename$fr rename = Translations$terminal$rename$fr._(_root);
 	@override late final Translations$terminal$search$fr search = Translations$terminal$search$fr._(_root);
 	@override late final Translations$terminal$keyBar$fr keyBar = Translations$terminal$keyBar$fr._(_root);
+	@override late final Translations$terminal$openSession$fr openSession = Translations$terminal$openSession$fr._(_root);
 }
 
 // Path: voice
@@ -5149,6 +5150,18 @@ class Translations$terminal$keyBar$fr extends Translations$terminal$keyBar$en {
 	@override String get ctrlHint => 'Maintenir Ctrl pour la touche suivante';
 	@override String get shiftHint => 'Maintenir Shift pour la touche suivante';
 	@override String get showKeyboard => 'Afficher le clavier';
+}
+
+// Path: terminal.openSession
+class Translations$terminal$openSession$fr extends Translations$terminal$openSession$en {
+	Translations$terminal$openSession$fr._(TranslationsFr root) : this._root = root, super.internal(root);
+
+	final TranslationsFr _root; // ignore: unused_field
+
+	// Translations
+	@override String get notResumable => 'Cette session n\'a pas d\'agent en ligne de commande pour la reprendre dans un terminal.';
+	@override String failed({required Object error}) => 'Impossible d\'ouvrir la session : ${error}';
+	@override String get full => 'Ce terminal n\'a plus de place pour un autre onglet — fermez-en un d\'abord.';
 }
 
 // Path: workspace.paneTitle
@@ -11842,6 +11855,9 @@ extension on TranslationsFr {
 			'terminal.keyBar.ctrlHint' => 'Maintenir Ctrl pour la touche suivante',
 			'terminal.keyBar.shiftHint' => 'Maintenir Shift pour la touche suivante',
 			'terminal.keyBar.showKeyboard' => 'Afficher le clavier',
+			'terminal.openSession.notResumable' => 'Cette session n\'a pas d\'agent en ligne de commande pour la reprendre dans un terminal.',
+			'terminal.openSession.failed' => ({required Object error}) => 'Impossible d\'ouvrir la session : ${error}',
+			'terminal.openSession.full' => 'Ce terminal n\'a plus de place pour un autre onglet — fermez-en un d\'abord.',
 			'voice.preview' => 'Aperçu',
 			'voice.settingsSaved' => 'Paramètres de saisie vocale enregistrés',
 			'voice.saveFailed' => 'Échec de l’enregistrement de la configuration STT',

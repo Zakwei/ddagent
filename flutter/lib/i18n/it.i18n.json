@@ -4291,6 +4291,11 @@
       "ctrlHint": "Tieni Ctrl per il tasto successivo",
       "shiftHint": "Tieni Shift per il tasto successivo",
       "showKeyboard": "Mostra tastiera"
+    },
+    "openSession": {
+      "notResumable": "Questa sessione non ha un agente a riga di comando con cui riprenderla in un terminale.",
+      "failed": "Impossibile aprire la sessione: {{error}}",
+      "full": "Questo terminale non ha spazio per un'altra scheda: chiudine prima una."
     }
   },
   "voice": {

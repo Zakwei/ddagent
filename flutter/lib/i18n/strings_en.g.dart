@@ -1002,6 +1002,7 @@ class Translations$terminal$en {
 	late final Translations$terminal$rename$en rename = Translations$terminal$rename$en.internal(_root);
 	late final Translations$terminal$search$en search = Translations$terminal$search$en.internal(_root);
 	late final Translations$terminal$keyBar$en keyBar = Translations$terminal$keyBar$en.internal(_root);
+	late final Translations$terminal$openSession$en openSession = Translations$terminal$openSession$en.internal(_root);
 }
 
 // Path: voice
@@ -9377,6 +9378,24 @@ class Translations$terminal$keyBar$en {
 
 	/// en: 'Show keyboard'
 	String get showKeyboard => 'Show keyboard';
+}
+
+// Path: terminal.openSession
+class Translations$terminal$openSession$en {
+	Translations$terminal$openSession$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'This session has no command-line agent to resume it in a terminal.'
+	String get notResumable => 'This session has no command-line agent to resume it in a terminal.';
+
+	/// en: 'Could not open the session: {{error}}'
+	String failed({required Object error}) => 'Could not open the session: ${error}';
+
+	/// en: 'This terminal has no room for another tab — close one first.'
+	String get full => 'This terminal has no room for another tab — close one first.';
 }
 
 // Path: workspace.paneTitle
@@ -18463,6 +18482,9 @@ extension on Translations {
 			'terminal.keyBar.ctrlHint' => 'Hold Ctrl for the next key',
 			'terminal.keyBar.shiftHint' => 'Hold Shift for the next key',
 			'terminal.keyBar.showKeyboard' => 'Show keyboard',
+			'terminal.openSession.notResumable' => 'This session has no command-line agent to resume it in a terminal.',
+			'terminal.openSession.failed' => ({required Object error}) => 'Could not open the session: ${error}',
+			'terminal.openSession.full' => 'This terminal has no room for another tab — close one first.',
 			'voice.preview' => 'Preview',
 			'voice.settingsSaved' => 'Voice input settings saved',
 			'voice.saveFailed' => 'Failed to save STT configuration',

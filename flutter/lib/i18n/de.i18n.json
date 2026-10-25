@@ -4291,6 +4291,11 @@
       "ctrlHint": "Strg für die nächste Taste halten",
       "shiftHint": "Shift für die nächste Taste halten",
       "showKeyboard": "Tastatur anzeigen"
+    },
+    "openSession": {
+      "notResumable": "Für diese Sitzung gibt es keinen Kommandozeilen-Agenten, mit dem sie im Terminal fortgesetzt werden kann.",
+      "failed": "Die Sitzung konnte nicht geöffnet werden: {{error}}",
+      "full": "In diesem Terminal ist kein Platz für einen weiteren Tab – schließe zuerst einen."
     }
   },
   "voice": {

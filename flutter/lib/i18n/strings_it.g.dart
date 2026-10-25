@@ -698,6 +698,7 @@ class Translations$terminal$it extends Translations$terminal$en {
 	@override late final Translations$terminal$rename$it rename = Translations$terminal$rename$it._(_root);
 	@override late final Translations$terminal$search$it search = Translations$terminal$search$it._(_root);
 	@override late final Translations$terminal$keyBar$it keyBar = Translations$terminal$keyBar$it._(_root);
+	@override late final Translations$terminal$openSession$it openSession = Translations$terminal$openSession$it._(_root);
 }
 
 // Path: voice
@@ -5149,6 +5150,18 @@ class Translations$terminal$keyBar$it extends Translations$terminal$keyBar$en {
 	@override String get ctrlHint => 'Tieni Ctrl per il tasto successivo';
 	@override String get shiftHint => 'Tieni Shift per il tasto successivo';
 	@override String get showKeyboard => 'Mostra tastiera';
+}
+
+// Path: terminal.openSession
+class Translations$terminal$openSession$it extends Translations$terminal$openSession$en {
+	Translations$terminal$openSession$it._(TranslationsIt root) : this._root = root, super.internal(root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get notResumable => 'Questa sessione non ha un agente a riga di comando con cui riprenderla in un terminale.';
+	@override String failed({required Object error}) => 'Impossibile aprire la sessione: ${error}';
+	@override String get full => 'Questo terminale non ha spazio per un\'altra scheda: chiudine prima una.';
 }
 
 // Path: workspace.paneTitle
@@ -11842,6 +11855,9 @@ extension on TranslationsIt {
 			'terminal.keyBar.ctrlHint' => 'Tieni Ctrl per il tasto successivo',
 			'terminal.keyBar.shiftHint' => 'Tieni Shift per il tasto successivo',
 			'terminal.keyBar.showKeyboard' => 'Mostra tastiera',
+			'terminal.openSession.notResumable' => 'Questa sessione non ha un agente a riga di comando con cui riprenderla in un terminale.',
+			'terminal.openSession.failed' => ({required Object error}) => 'Impossibile aprire la sessione: ${error}',
+			'terminal.openSession.full' => 'Questo terminale non ha spazio per un\'altra scheda: chiudine prima una.',
 			'voice.preview' => 'Anteprima',
 			'voice.settingsSaved' => 'Impostazioni di input vocale salvate',
 			'voice.saveFailed' => 'Impossibile salvare la configurazione STT',

@@ -4291,6 +4291,11 @@
       "ctrlHint": "Mantener Ctrl para la siguiente tecla",
       "shiftHint": "Mantener Shift para la siguiente tecla",
       "showKeyboard": "Mostrar teclado"
+    },
+    "openSession": {
+      "notResumable": "Esta sesión no tiene un agente de línea de comandos para reanudarla en un terminal.",
+      "failed": "No se pudo abrir la sesión: {{error}}",
+      "full": "Este terminal no tiene espacio para otra pestaña; cierra una primero."
     }
   },
   "voice": {

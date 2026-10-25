@@ -32,14 +32,6 @@ const _promptOptionScanLines = 15;
 const _promptMaxOptions = 5;
 const _promptMinOptions = 2;
 
-final _syncIdRandom = Random();
-
-/// A tab id unique across the account's devices — also the tab's PTY key,
-/// so it stays within the server's safe session-id alphabet.
-String newTerminalTabSyncId() =>
-    'tab-${DateTime.now().millisecondsSinceEpoch.toRadixString(36)}-'
-    '${_syncIdRandom.nextInt(kPaneIdSpace).toRadixString(36)}';
-
 /// Terminal font bounds (web Shell zoom 9–24px) and the Ctrl+0 reset size.
 const terminalFontSizeMin = 9.0;
 const terminalFontSizeMax = 24.0;
@@ -197,6 +189,10 @@ class TerminalTab {
   bool isCompleted;
   int? exitCode;
   final List<String> authUrls;
+
+  /// Sign-in links the user closed the banner on — a reattach replays them
+  /// and must not bring the banner back.
+  final Set<String> dismissedAuthUrls = {};
   StreamSubscription<ShellFrame>? subscription;
 
   /// Drops the keyboard-protocol negotiation sequences xterm.dart misreads
@@ -208,6 +204,15 @@ class TerminalTab {
 
   /// CLI prompt options detected on the buffer (null = no prompt active).
   List<CliPromptOption>? promptOptions;
+
+  /// The program asked for attention (BEL, or an OSC 9 / 777 notification —
+  /// how agent CLIs announce a finished turn) since the user last selected
+  /// or typed into this tab.
+  bool bell = false;
+
+  /// When the user last sent input — a bell right after it is the shell's
+  /// own feedback (failed completion), not a call for attention.
+  DateTime? lastInputAt;
 
   /// Pending "spawn at 80×24 anyway" fallback of a tab not yet laid out;
   /// cancelled by the first layout or by closing the tab.
@@ -424,9 +429,13 @@ class TerminalController extends Notifier<TerminalState> {
       tab.appTitle = next;
       if (!tab.renamed) _notifyTabsChanged();
     };
+    terminal.onBell = () => _ringBell(tab);
     // OSC 52 — how a CLI on the server sets the viewer's clipboard (Claude
-    // Code's /copy, tmux, nvim). Reads ('?') are never answered.
+    // Code's /copy, tmux, nvim). Reads ('?') are never answered. OSC 9 and
+    // 777 are desktop notifications (an agent's turn finished) — except
+    // OSC 9;4, ConEmu's progress report, which CLIs send while working.
     terminal.onPrivateOSC = (code, args) {
+      if ((code == '9' && args.firstOrNull != '4') || code == '777') return _ringBell(tab);
       if (tab.replaying || code != '52' || args.length < 2 || args[1] == '?') return;
       try {
         unawaited(copyText(utf8.decode(base64.decode(args[1]))));
@@ -439,6 +448,7 @@ class TerminalController extends Notifier<TerminalState> {
     // here too, so the key bar's latched Ctrl/Alt is applied on this path.
     terminal.onOutput = (data) {
       if (tab.replaying) return;
+      _noteInput(tab);
       channel.input(_consumeLatchedModifiers(data));
     };
 
@@ -534,6 +544,33 @@ class TerminalController extends Notifier<TerminalState> {
     );
 
     return tab;
+  }
+
+  /// Grace after typing in which a bell is the shell's own feedback.
+  static const _bellInputGrace = Duration(milliseconds: 1500);
+
+  void _ringBell(TerminalTab tab) {
+    if (tab.replaying || tab.bell || !_activeTabs.contains(tab)) return;
+    final typed = tab.lastInputAt;
+    if (typed != null && DateTime.now().difference(typed) < _bellInputGrace) return;
+    tab.bell = true;
+    _notifyTabsChanged();
+  }
+
+  /// The user typed into [tab] — they are looking at it.
+  void _noteInput(TerminalTab tab) {
+    tab.lastInputAt = DateTime.now();
+    if (!tab.bell) return;
+    tab.bell = false;
+    _notifyTabsChanged();
+  }
+
+  /// The user looked at [hostId]'s visible tab (its pane was focused).
+  void acknowledgeBell(String hostId) {
+    final tab = state.activeTabFor(hostId);
+    if (tab == null || !tab.bell) return;
+    tab.bell = false;
+    _notifyTabsChanged();
   }
 
   Map<String, String> _withActive(String hostId, String? tabId) {
@@ -701,7 +738,10 @@ class TerminalController extends Notifier<TerminalState> {
       _notifyTabsChanged();
     } else if (frame.isAuthUrl) {
       final url = frame.authUrl;
-      if (url != null && !isLoopbackUrl(url) && !tab.authUrls.contains(url)) {
+      if (url != null &&
+          !isLoopbackUrl(url) &&
+          !tab.authUrls.contains(url) &&
+          !tab.dismissedAuthUrls.any((seen) => seen.startsWith(url))) {
         tab.authUrls.add(url);
       }
       _notifyTabsChanged();
@@ -932,7 +972,9 @@ class TerminalController extends Notifier<TerminalState> {
   }
 
   /// Ctrl+Shift+D — a fresh tab with the same profile, placed right after
-  /// the source tab.
+  /// the source tab. A resumed agent session duplicates to a new session of
+  /// the same CLI: resuming it again would attach the very same PTY (and
+  /// closing either tab would end both).
   TerminalTab? duplicateTab(String tabId) {
     final source = state.tabs.where((t) => t.id == tabId).firstOrNull;
     if (source == null) return null;
@@ -940,12 +982,12 @@ class TerminalController extends Notifier<TerminalState> {
     final tab = createTab(
       projectPath: source.projectPath,
       hostId: source.hostId,
-      sessionId: source.sessionId,
       provider: source.provider,
       isPlainShell: source.isPlainShell,
+      env: source.isCommandMode ? null : source.env,
       // One-shot commands are not re-run on duplicate — the copy is a plain
       // shell in the same directory, like duplicating a profile.
-      title: source.isCommandMode ? null : source.title,
+      title: source.isCommandMode || source.sessionId != null ? null : source.title,
     );
     reorderTab(state.tabsFor(source.hostId).length - 1, index + 1, hostId: source.hostId);
     return tab;
@@ -1013,7 +1055,12 @@ class TerminalController extends Notifier<TerminalState> {
 
   void selectTab(String tabId) {
     final tab = state.tabs.where((t) => t.id == tabId).firstOrNull;
-    if (tab == null || state.activeTabIds[tab.hostId] == tabId) return;
+    if (tab == null) return;
+    if (tab.bell) {
+      tab.bell = false;
+      _notifyTabsChanged();
+    }
+    if (state.activeTabIds[tab.hostId] == tabId) return;
     state = state.copyWith(activeTabIds: _withActive(tab.hostId, tabId));
   }
 
@@ -1049,6 +1096,7 @@ class TerminalController extends Notifier<TerminalState> {
       (t) => t.id == tabId,
       orElse: () => throw Exception('Tab not found'),
     );
+    _noteInput(tab);
     tab.channel.input(_consumeLatchedModifiers(data));
   }
 
@@ -1064,7 +1112,6 @@ class TerminalController extends Notifier<TerminalState> {
     final tabIndex = state.tabs.indexWhere((t) => t.id == tabId);
     if (tabIndex == -1) return;
     final tab = state.tabs[tabIndex];
-
     tab.terminal.write('\x1b[2J\x1b[3J\x1b[H');
     tab.isCompleted = false;
     tab.exitCode = null;
@@ -1084,10 +1131,22 @@ class TerminalController extends Notifier<TerminalState> {
       cols: tab.terminal.viewWidth,
       rows: tab.terminal.viewHeight,
     );
-    // A disconnected tab needs the socket re-opened first (`init` only
-    // sends when already open; `start()` re-sends it on reconnect anyway).
-    unawaited(tab.channel.connect());
+    // A socket that is not open needs re-dialing first (`init` only sends
+    // when already open; `start()` re-sends it on reconnect anyway): a
+    // user-closed one re-opens, one sitting in a reconnect backoff retries
+    // right away. Only then: `connect()` on an open socket dials a second
+    // one and orphans the first, still attached to the PTY.
+    if (!tab.channel.isOpen) tab.channel.reconnect();
 
+    _notifyTabsChanged();
+  }
+
+  /// The banner's close button: hides the tab's sign-in links for good.
+  void dismissAuthUrls(String tabId) {
+    final tab = state.tabs.where((t) => t.id == tabId).firstOrNull;
+    if (tab == null || tab.authUrls.isEmpty) return;
+    tab.dismissedAuthUrls.addAll(tab.authUrls);
+    tab.authUrls.clear();
     _notifyTabsChanged();
   }
 

@@ -1,7 +1,8 @@
-import 'package:ddagent_app/core/realtime/chat_channel.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'dart:async';
 
-import 'transcript_test.dart' show FakeWs;
+import 'package:ddagent_app/core/realtime/chat_channel.dart';
+import 'package:ddagent_app/core/realtime/ws_client.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('a finished run still delivers asks and task counts, only from the latest run', () async {
@@ -52,4 +53,43 @@ void main() {
     ]);
     await sub.cancel();
   });
+}
+
+class FakeWs extends WsClient {
+  FakeWs() : super(urlBuilder: () async => Uri.parse('ws://t'));
+
+  final sent = <Map<String, dynamic>>[];
+  final _frames = StreamController<Map<String, dynamic>>.broadcast();
+  final _states = StreamController<WsState>.broadcast();
+  WsState _state = WsState.closed;
+
+  @override
+  Stream<Map<String, dynamic>> get frames => _frames.stream;
+  @override
+  Stream<WsState> get states => _states.stream;
+  @override
+  WsState get state => _state;
+
+  @override
+  void send(Map<String, dynamic> frame) {
+    if (_state != WsState.open) throw StateError('WebSocket is not open');
+    sent.add(frame);
+  }
+
+  void emitState(WsState s) {
+    _state = s;
+    _states.add(s);
+  }
+
+  void emitFrame(Map<String, dynamic> f) => _frames.add(f);
+
+  @override
+  Future<void> connect() async {}
+  @override
+  Future<void> close() async => _state = WsState.closed;
+  @override
+  Future<void> dispose() async {
+    await _frames.close();
+    await _states.close();
+  }
 }

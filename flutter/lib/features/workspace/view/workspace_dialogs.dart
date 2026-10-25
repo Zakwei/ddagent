@@ -1,11 +1,4 @@
-import 'dart:async';
-
 import 'package:ddagent_app/core/theme/tokens.dart';
-import 'package:ddagent_app/core/widgets/app_button.dart';
-import 'package:ddagent_app/core/widgets/app_dialog.dart';
-import 'package:ddagent_app/core/widgets/app_input.dart';
-import 'package:ddagent_app/features/queue/data/queue_repository.dart';
-import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
 import 'package:ddagent_app/features/workspace/state/workspace_controller.dart';
 import 'package:ddagent_app/features/workspace/view/split_workspace_grid.dart';
@@ -21,12 +14,17 @@ class OverviewPaneInfo {
     required this.title,
     this.subtitle,
     this.action = PaneAction.idle,
+    this.finished = false,
   });
 
   final SplitPane pane;
   final String title;
   final String? subtitle;
   final PaneAction action;
+
+  /// A terminal tab of the pane rang the bell (an agent finished its turn)
+  /// since the user last looked — shown unless a question outranks it.
+  final bool finished;
 }
 
 /// Split panes overview (port of SplitOverviewDialog.tsx): grid of pane
@@ -38,6 +36,9 @@ class SplitOverviewDialog extends ConsumerWidget {
 
   final List<OverviewPaneInfo> Function(WidgetRef ref) panes;
   final ValueChanged<String> onSelectPane;
+
+  /// Emerald — the compact pane strip's "finished" tab.
+  static const _finishedColor = Color(0xFF10B981);
 
   static Future<void> show(
     BuildContext context, {
@@ -105,9 +106,9 @@ class SplitOverviewDialog extends ConsumerWidget {
                       const Color(0xFFF59E0B),
                       const Color(0xFFF59E0B).withValues(alpha: 0.05),
                     ),
-                    PaneAction.processing => (
-                      const Color(0xFF22C55E),
-                      const Color(0xFF22C55E).withValues(alpha: 0.05),
+                    PaneAction.idle when info.finished => (
+                      _finishedColor,
+                      _finishedColor.withValues(alpha: 0.05),
                     ),
                     PaneAction.idle => (c.border, c.card),
                   };
@@ -197,25 +198,17 @@ class SplitOverviewDialog extends ConsumerWidget {
                                   ),
                                 ],
                               ),
-                              PaneAction.processing => Row(
+                              PaneAction.idle when info.finished => Row(
                                 children: [
-                                  Container(
-                                    width: 8,
-                                    height: 8,
-                                    decoration: const BoxDecoration(
-                                      color: Color(0xFF22C55E),
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  // Phone tiles are ~150px wide.
+                                  const Icon(Icons.check_circle, size: 14, color: _finishedColor),
+                                  const SizedBox(width: 4),
                                   Flexible(
                                     child: Text(
-                                      i18n.chat.splitOverview.processing,
+                                      i18n.chat.sessionPicker.unread,
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: t.textTheme.labelSmall?.copyWith(
-                                        color: const Color(0xFF22C55E),
+                                        color: _finishedColor,
                                       ),
                                     ),
                                   ),
@@ -234,219 +227,6 @@ class SplitOverviewDialog extends ConsumerWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-/// Broadcast (port of BroadcastDialog.tsx): multi-select non-archived
-/// sessions — orchestrators-only toggle + select-all — then one queued
-/// message per session via `POST /api/queue/broadcast`; the server returns
-/// per-session results so rejected targets surface here instead of a snackbar.
-class BroadcastDialog extends ConsumerStatefulWidget {
-  const BroadcastDialog({super.key, required this.sessions});
-
-  /// Candidate sessions; archived rows are filtered out.
-  final List<Session> sessions;
-
-  static Future<void> show(BuildContext context, {required List<Session> sessions}) =>
-      showDialog<void>(
-        context: context,
-        builder: (_) => BroadcastDialog(sessions: sessions),
-      );
-
-  @override
-  ConsumerState<BroadcastDialog> createState() => _BroadcastDialogState();
-}
-
-class _BroadcastDialogState extends ConsumerState<BroadcastDialog> {
-  final _message = TextEditingController();
-  final _selected = <String>{};
-  bool _orchestratorsOnly = false;
-  bool _sending = false;
-  List<Map<String, dynamic>>? _results;
-  String? _error;
-
-  static bool _isOrchestrator(Session s) {
-    final provider = s.provider ?? s.raw['__provider'];
-    return provider == 'orchestrator' || provider == 'mini-orchestrator';
-  }
-
-  List<Session> get _selectable => [
-    for (final s in widget.sessions)
-      if (!s.isArchived) s,
-  ];
-
-  List<Session> get _visible => _orchestratorsOnly
-      ? [
-          for (final s in _selectable)
-            if (_isOrchestrator(s)) s,
-        ]
-      : _selectable;
-
-  @override
-  void dispose() {
-    _message.dispose();
-    super.dispose();
-  }
-
-  Future<void> _send() async {
-    final content = _message.text.trim();
-    if (content.isEmpty || _selected.isEmpty) return;
-    setState(() {
-      _sending = true;
-      _results = null;
-      _error = null;
-    });
-    try {
-      final results = await ref
-          .read(queueRepositoryProvider)
-          .broadcast(_selected.toList(), content);
-      if (mounted) setState(() => _results = results);
-    } on Object catch (e) {
-      if (mounted) setState(() => _error = '$e');
-    } finally {
-      if (mounted) setState(() => _sending = false);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final t = Theme.of(context);
-    final i18n = Translations.of(context);
-    final c = context.appColors;
-    final hasOrchestrators = _selectable.any(_isOrchestrator);
-    return AppDialog(
-      title: i18n.chat.splitWorkspace.broadcast,
-      content: SizedBox(
-        width: 420,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (hasOrchestrators || _orchestratorsOnly)
-              CheckboxListTile(
-                dense: true,
-                contentPadding: EdgeInsets.zero,
-                controlAffinity: ListTileControlAffinity.leading,
-                title: Text(i18n.chat.broadcast.orchestratorsOnly, style: t.textTheme.bodySmall),
-                value: _orchestratorsOnly,
-                onChanged: (v) {
-                  setState(() {
-                    _orchestratorsOnly = v ?? false;
-                    if (_orchestratorsOnly) {
-                      _selected.removeWhere(
-                        (id) => !_selectable.any((s) => s.sessionId == id && _isOrchestrator(s)),
-                      );
-                    }
-                  });
-                },
-              ),
-            Container(
-              constraints: const BoxConstraints(maxHeight: 220),
-              decoration: BoxDecoration(
-                border: Border.all(color: c.border),
-                borderRadius: AppRadii.borderMd,
-              ),
-              child: _visible.isEmpty
-                  ? Padding(
-                      padding: const EdgeInsets.all(AppSpacing.md),
-                      child: Center(
-                        child: Text(
-                          _orchestratorsOnly
-                              ? i18n.chat.broadcast.noOrchestrators
-                              : i18n.chat.broadcast.noSessions,
-                          style: t.textTheme.bodySmall?.copyWith(color: c.mutedForeground),
-                        ),
-                      ),
-                    )
-                  : ListView(
-                      shrinkWrap: true,
-                      children: [
-                        for (final s in _visible)
-                          CheckboxListTile(
-                            dense: true,
-                            controlAffinity: ListTileControlAffinity.leading,
-                            title: Text(
-                              s.displayTitle,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: t.textTheme.bodySmall,
-                            ),
-                            value: _selected.contains(s.sessionId),
-                            onChanged: (v) => setState(() {
-                              if (v ?? false) {
-                                _selected.add(s.sessionId);
-                              } else {
-                                _selected.remove(s.sessionId);
-                              }
-                            }),
-                          ),
-                      ],
-                    ),
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            Row(
-              children: [
-                TextButton(
-                  onPressed: () => setState(
-                    () => _selected
-                      ..clear()
-                      ..addAll([for (final s in _visible) s.sessionId]),
-                  ),
-                  child: Text(i18n.chat.broadcast.selectAll),
-                ),
-                if (hasOrchestrators && !_orchestratorsOnly)
-                  TextButton(
-                    onPressed: () => setState(
-                      () => _selected
-                        ..clear()
-                        ..addAll([
-                          for (final s in _visible)
-                            if (_isOrchestrator(s)) s.sessionId,
-                        ]),
-                    ),
-                    child: Text(i18n.chat.broadcast.selectOrchestrators),
-                  ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            AppInput(controller: _message, hint: i18n.chat.broadcast.placeholder, maxLines: 3),
-            if (_results != null) ...[
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                _results!.where((r) => r['ok'] == false).isEmpty
-                    ? i18n.chat.broadcast.sent(count: _results!.length)
-                    : i18n.chat.broadcast.partial(
-                        count: _results!.where((r) => r['ok'] == false).length,
-                      ),
-                style: t.textTheme.bodySmall?.copyWith(
-                  color: _results!.where((r) => r['ok'] == false).isEmpty
-                      ? const Color(0xFF22C55E)
-                      : const Color(0xFFF59E0B),
-                ),
-              ),
-            ],
-            if (_error != null) ...[
-              const SizedBox(height: AppSpacing.xs),
-              Text(_error!, style: t.textTheme.bodySmall?.copyWith(color: c.destructive)),
-            ],
-          ],
-        ),
-      ),
-      actions: [
-        AppButton(
-          variant: AppButtonVariant.ghost,
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(i18n.chat.orchestrator.summary.cancelTasks),
-        ),
-        AppButton(
-          loading: _sending,
-          onPressed: _selected.isEmpty || _message.text.trim().isEmpty
-              ? null
-              : () => unawaited(_send()),
-          child: Text(i18n.workspace.sendTo(count: _selected.length)),
-        ),
-      ],
     );
   }
 }

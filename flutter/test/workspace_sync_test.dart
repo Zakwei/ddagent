@@ -3,21 +3,21 @@ import 'package:ddagent_app/features/workspace/state/workspace_sync.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const _local = WorkspaceState(
-  panes: [SplitPane(id: 'p1', kind: PaneKind.chat, sessionId: 's1', projectId: 'proj-1')],
+  panes: [SplitPane(id: 'p1', kind: PaneKind.terminal, sessionId: 's1', projectId: 'proj-1')],
   activePaneId: 'p1',
   lastUsedProjectId: 'proj-1',
 );
 
 const _remote = WorkspaceState(
   panes: [
-    SplitPane(id: 'p9', kind: PaneKind.chat, sessionId: 's9'),
+    SplitPane(id: 'p9', kind: PaneKind.terminal, sessionId: 's9'),
     SplitPane(id: 'p8', kind: PaneKind.editor, projectId: 'proj-2', filePath: '/x.dart'),
   ],
   activePaneId: 'p8',
   lastUsedProjectId: 'proj-2',
 );
 
-const _picker = SplitPane(id: 'p2', kind: PaneKind.chat, picker: true);
+const _extra = SplitPane(id: 'p2', kind: PaneKind.notes);
 
 Map<String, dynamic> _state(WorkspaceState s, int rev, {String? origin, bool conflict = false}) => {
   'kind': 'workspace_state',
@@ -82,7 +82,7 @@ void main() {
 
   test('pre-sync pushes stay silent so boot state never reaches the server', () {
     final h = _Harness();
-    h.sync.pushLocal(); // e.g. the auto-seeded picker pane firing pre-snapshot
+    h.sync.pushLocal(); // e.g. an auto-seeded pane firing pre-snapshot
     expect(h.sent, isEmpty);
   });
 
@@ -104,7 +104,7 @@ void main() {
     h.synced();
     // Opened a pane while the socket was down.
     h.sendOk = false;
-    h.current = WorkspaceState(panes: [..._local.panes, _picker], activePaneId: 'p2');
+    h.current = WorkspaceState(panes: [..._local.panes, _extra], activePaneId: 'p2');
     h.sync.pushLocal();
     h.sendOk = true;
 
@@ -128,13 +128,13 @@ void main() {
     h.synced();
     h.sendOk = false;
     h.current = const WorkspaceState(
-      panes: [SplitPane(id: 'p9', kind: PaneKind.chat, sessionId: 's9')],
+      panes: [SplitPane(id: 'p9', kind: PaneKind.terminal, sessionId: 's9')],
       activePaneId: 'p9',
     );
     h.sync.pushLocal();
     h.sendOk = true;
 
-    h.sync.handleFrame(_state(WorkspaceState(panes: [..._remote.panes, _picker]), 2));
+    h.sync.handleFrame(_state(WorkspaceState(panes: [..._remote.panes, _extra]), 2));
     expect(h.paneIds, ['p9', 'p2']);
   });
 
@@ -149,7 +149,7 @@ void main() {
     expect(h.sent.single['state'], _remote.toJson());
 
     // In flight: further pushes wait for the ack.
-    h.current = const WorkspaceState(panes: [_picker], activePaneId: 'p2');
+    h.current = const WorkspaceState(panes: [_extra], activePaneId: 'p2');
     h.sync.pushLocal();
     expect(h.sent.length, 1);
 
@@ -167,7 +167,7 @@ void main() {
   test('a conflict reply rebases the in-flight edit and retries', () {
     final h = _Harness();
     h.synced();
-    h.current = WorkspaceState(panes: [..._local.panes, _picker], activePaneId: 'p2');
+    h.current = WorkspaceState(panes: [..._local.panes, _extra], activePaneId: 'p2');
     h.sync.pushLocal();
     h.sent.clear();
 
@@ -232,7 +232,7 @@ void main() {
     });
 
     test('local reorder wins for shared panes', () {
-      const a = SplitPane(id: 'a', kind: PaneKind.chat);
+      const a = SplitPane(id: 'a', kind: PaneKind.terminal);
       const b = SplitPane(id: 'b', kind: PaneKind.git);
       const c = SplitPane(id: 'c', kind: PaneKind.notes);
       final merged = mergeWorkspace(
@@ -245,10 +245,10 @@ void main() {
 
     test('local re-bind of a pane wins over the remote copy', () {
       const base = WorkspaceState(
-        panes: [SplitPane(id: 'a', kind: PaneKind.chat, picker: true)],
+        panes: [SplitPane(id: 'a', kind: PaneKind.terminal)],
       );
       const local = WorkspaceState(
-        panes: [SplitPane(id: 'a', kind: PaneKind.chat, sessionId: 's')],
+        panes: [SplitPane(id: 'a', kind: PaneKind.terminal, sessionId: 's')],
       );
       final merged = mergeWorkspace(base: base, local: local, remote: base);
       expect(merged.panes.single.sessionId, 's');

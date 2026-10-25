@@ -77,6 +77,10 @@ class ShellChannel {
   Stream<ShellFrame> get frames => _framesOut.stream;
   Stream<WsState> get states => _ws.states;
 
+  /// The socket is up — anything sent now reaches the server. Connecting,
+  /// reconnecting (possibly in a backoff) and user-closed all count as not.
+  bool get isOpen => _ws.state == WsState.open;
+
   /// Spawns/reattaches the PTY. Re-sent on reconnect for buffer replay.
   void init({
     required String projectPath,

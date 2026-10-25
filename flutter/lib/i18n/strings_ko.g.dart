@@ -697,6 +697,7 @@ class Translations$terminal$ko extends Translations$terminal$en {
 	@override late final Translations$terminal$rename$ko rename = Translations$terminal$rename$ko._(_root);
 	@override late final Translations$terminal$search$ko search = Translations$terminal$search$ko._(_root);
 	@override late final Translations$terminal$keyBar$ko keyBar = Translations$terminal$keyBar$ko._(_root);
+	@override late final Translations$terminal$openSession$ko openSession = Translations$terminal$openSession$ko._(_root);
 }
 
 // Path: voice
@@ -5139,6 +5140,18 @@ class Translations$terminal$keyBar$ko extends Translations$terminal$keyBar$en {
 	@override String get ctrlHint => '다음 키에 Ctrl 적용';
 	@override String get shiftHint => '다음 키에 Shift 적용';
 	@override String get showKeyboard => '키보드 표시';
+}
+
+// Path: terminal.openSession
+class Translations$terminal$openSession$ko extends Translations$terminal$openSession$en {
+	Translations$terminal$openSession$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get notResumable => '이 세션에는 터미널에서 다시 시작할 수 있는 명령줄 에이전트가 없습니다.';
+	@override String failed({required Object error}) => '세션을 열 수 없습니다: ${error}';
+	@override String get full => '이 터미널에는 탭을 더 추가할 수 없습니다. 먼저 탭을 닫으세요.';
 }
 
 // Path: workspace.paneTitle
@@ -11831,6 +11844,9 @@ extension on TranslationsKo {
 			'terminal.keyBar.ctrlHint' => '다음 키에 Ctrl 적용',
 			'terminal.keyBar.shiftHint' => '다음 키에 Shift 적용',
 			'terminal.keyBar.showKeyboard' => '키보드 표시',
+			'terminal.openSession.notResumable' => '이 세션에는 터미널에서 다시 시작할 수 있는 명령줄 에이전트가 없습니다.',
+			'terminal.openSession.failed' => ({required Object error}) => '세션을 열 수 없습니다: ${error}',
+			'terminal.openSession.full' => '이 터미널에는 탭을 더 추가할 수 없습니다. 먼저 탭을 닫으세요.',
 			'voice.preview' => '미리보기',
 			'voice.settingsSaved' => '음성 입력 설정이 저장되었습니다',
 			'voice.saveFailed' => 'STT 설정 저장 실패',

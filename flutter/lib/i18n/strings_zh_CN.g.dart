@@ -697,6 +697,7 @@ class Translations$terminal$zh_CN extends Translations$terminal$en {
 	@override late final Translations$terminal$rename$zh_CN rename = Translations$terminal$rename$zh_CN.internal(_root);
 	@override late final Translations$terminal$search$zh_CN search = Translations$terminal$search$zh_CN.internal(_root);
 	@override late final Translations$terminal$keyBar$zh_CN keyBar = Translations$terminal$keyBar$zh_CN.internal(_root);
+	@override late final Translations$terminal$openSession$zh_CN openSession = Translations$terminal$openSession$zh_CN.internal(_root);
 }
 
 // Path: voice
@@ -5139,6 +5140,18 @@ class Translations$terminal$keyBar$zh_CN extends Translations$terminal$keyBar$en
 	@override String get ctrlHint => '为下一个按键按住 Ctrl';
 	@override String get shiftHint => '为下一个按键按住 Shift';
 	@override String get showKeyboard => '显示键盘';
+}
+
+// Path: terminal.openSession
+class Translations$terminal$openSession$zh_CN extends Translations$terminal$openSession$en {
+	Translations$terminal$openSession$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get notResumable => '此会话没有可在终端中恢复它的命令行代理。';
+	@override String failed({required Object error}) => '无法打开会话：${error}';
+	@override String get full => '此终端无法再添加标签页——请先关闭一个。';
 }
 
 // Path: workspace.paneTitle
@@ -11831,6 +11844,9 @@ extension on TranslationsZhCn {
 			'terminal.keyBar.ctrlHint' => '为下一个按键按住 Ctrl',
 			'terminal.keyBar.shiftHint' => '为下一个按键按住 Shift',
 			'terminal.keyBar.showKeyboard' => '显示键盘',
+			'terminal.openSession.notResumable' => '此会话没有可在终端中恢复它的命令行代理。',
+			'terminal.openSession.failed' => ({required Object error}) => '无法打开会话：${error}',
+			'terminal.openSession.full' => '此终端无法再添加标签页——请先关闭一个。',
 			'voice.preview' => '预览',
 			'voice.settingsSaved' => '语音输入设置已保存',
 			'voice.saveFailed' => '保存 STT 配置失败',

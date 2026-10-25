@@ -4280,6 +4280,11 @@
       "ctrlHint": "為下一個按鍵按住 Ctrl",
       "shiftHint": "為下一個按鍵按住 Shift",
       "showKeyboard": "顯示鍵盤"
+    },
+    "openSession": {
+      "notResumable": "此工作階段沒有可在終端機中繼續的命令列代理。",
+      "failed": "無法開啟工作階段：{{error}}",
+      "full": "此終端機無法再新增分頁——請先關閉一個。"
     }
   },
   "voice": {

@@ -698,6 +698,7 @@ class Translations$terminal$de extends Translations$terminal$en {
 	@override late final Translations$terminal$rename$de rename = Translations$terminal$rename$de._(_root);
 	@override late final Translations$terminal$search$de search = Translations$terminal$search$de._(_root);
 	@override late final Translations$terminal$keyBar$de keyBar = Translations$terminal$keyBar$de._(_root);
+	@override late final Translations$terminal$openSession$de openSession = Translations$terminal$openSession$de._(_root);
 }
 
 // Path: voice
@@ -5149,6 +5150,18 @@ class Translations$terminal$keyBar$de extends Translations$terminal$keyBar$en {
 	@override String get ctrlHint => 'Strg für die nächste Taste halten';
 	@override String get shiftHint => 'Shift für die nächste Taste halten';
 	@override String get showKeyboard => 'Tastatur anzeigen';
+}
+
+// Path: terminal.openSession
+class Translations$terminal$openSession$de extends Translations$terminal$openSession$en {
+	Translations$terminal$openSession$de._(TranslationsDe root) : this._root = root, super.internal(root);
+
+	final TranslationsDe _root; // ignore: unused_field
+
+	// Translations
+	@override String get notResumable => 'Für diese Sitzung gibt es keinen Kommandozeilen-Agenten, mit dem sie im Terminal fortgesetzt werden kann.';
+	@override String failed({required Object error}) => 'Die Sitzung konnte nicht geöffnet werden: ${error}';
+	@override String get full => 'In diesem Terminal ist kein Platz für einen weiteren Tab – schließe zuerst einen.';
 }
 
 // Path: workspace.paneTitle
@@ -11842,6 +11855,9 @@ extension on TranslationsDe {
 			'terminal.keyBar.ctrlHint' => 'Strg für die nächste Taste halten',
 			'terminal.keyBar.shiftHint' => 'Shift für die nächste Taste halten',
 			'terminal.keyBar.showKeyboard' => 'Tastatur anzeigen',
+			'terminal.openSession.notResumable' => 'Für diese Sitzung gibt es keinen Kommandozeilen-Agenten, mit dem sie im Terminal fortgesetzt werden kann.',
+			'terminal.openSession.failed' => ({required Object error}) => 'Die Sitzung konnte nicht geöffnet werden: ${error}',
+			'terminal.openSession.full' => 'In diesem Terminal ist kein Platz für einen weiteren Tab – schließe zuerst einen.',
 			'voice.preview' => 'Vorschau',
 			'voice.settingsSaved' => 'Spracheingabe-Einstellungen gespeichert',
 			'voice.saveFailed' => 'STT-Konfiguration konnte nicht gespeichert werden',

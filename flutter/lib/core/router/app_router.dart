@@ -6,7 +6,6 @@ import 'package:ddagent_app/core/widgets/app_nav_menu.dart';
 import 'package:ddagent_app/features/auth/state/auth_controller.dart';
 import 'package:ddagent_app/features/auth/view/auth_screens.dart';
 import 'package:ddagent_app/features/browser/view/web_browser_screen.dart';
-import 'package:ddagent_app/features/chat/view/transcript_view.dart';
 import 'package:ddagent_app/features/editor/view/editor_screen.dart';
 import 'package:ddagent_app/features/file_tree/view/file_tree_screen.dart';
 import 'package:ddagent_app/features/git/view/git_screen.dart';
@@ -20,11 +19,11 @@ import 'package:ddagent_app/features/scheduler/view/scheduler_screen.dart';
 import 'package:ddagent_app/features/server_connect/data/server_profiles.dart';
 import 'package:ddagent_app/features/server_connect/state/local_server_controller.dart';
 import 'package:ddagent_app/features/server_connect/view/server_connect_screen.dart';
-import 'package:ddagent_app/features/sessions/view/sessions_screen.dart';
 import 'package:ddagent_app/features/settings/view/settings_screen.dart';
 import 'package:ddagent_app/features/shared_context/view/shared_notes_pane.dart';
 import 'package:ddagent_app/features/skills/view/skills_screen.dart';
 import 'package:ddagent_app/features/taskmaster/view/taskmaster_screen.dart';
+import 'package:ddagent_app/features/terminal/view/session_terminal_route.dart';
 import 'package:ddagent_app/features/terminal/view/terminal_screen.dart';
 import 'package:ddagent_app/features/workspace/view/workspace_screen.dart';
 import 'package:ddagent_app/features/worktrees/view/worktrees_screen.dart';
@@ -44,9 +43,7 @@ abstract final class Routes {
   static const connect = 'connect';
   static const onboarding = 'onboarding';
   static const projects = 'projects';
-  static const sessions = 'sessions';
   static const workspace = 'workspace';
-  static const recent = 'recent';
   static const chat = 'chat';
   static const board = 'board';
   static const tasks = 'tasks';
@@ -196,33 +193,21 @@ final routerProvider = Provider<GoRouter>((ref) {
             name: Routes.projects,
             builder: (_, _) => const ProjectsScreen(),
           ),
-          GoRoute(
-            path: '/sessions',
-            name: Routes.sessions,
-            builder: (_, s) => SessionsScreen(
-              projectId: s.uri.queryParameters['projectId'],
-              projectPath: s.uri.queryParameters['projectPath'],
-            ),
-          ),
+          // Sessions open as terminal tabs now; the old session list and
+          // recents links (`ddagent://sessions/…`) land on the workspace.
+          GoRoute(path: '/sessions', redirect: (_, _) => '/workspace'),
           GoRoute(
             path: '/workspace',
             name: Routes.workspace,
             builder: (_, _) => const WorkspaceScreen(),
           ),
-          GoRoute(path: '/recent', name: Routes.recent, builder: (_, _) => const RecentScreen()),
+          GoRoute(path: '/recent', redirect: (_, _) => '/workspace'),
+          // Every "open session" link resumes the session in a terminal tab.
           GoRoute(
             path: '/chat/:id',
             name: Routes.chat,
-            builder: (_, s) => TranscriptView(
-              sessionId: s.pathParameters['id'] ?? '',
-              projectId: s.uri.queryParameters['projectId'],
-              projectPath: s.uri.queryParameters['projectPath'],
-              // Draft `/chat/new` carries the provider/account the user picked
-              // in the provider dialog so the composer mounts on the right one.
-              initialProvider: s.uri.queryParameters['provider'],
-              initialAccountId: s.uri.queryParameters['accountId'],
-              standalone: true,
-            ),
+            redirect: (_, s) => s.pathParameters['id'] == 'new' ? '/workspace' : null,
+            builder: (_, s) => SessionTerminalRoute(sessionId: s.pathParameters['id'] ?? ''),
           ),
           GoRoute(
             path: '/board',

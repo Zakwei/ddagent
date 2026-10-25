@@ -27,7 +27,7 @@ void main() {
       expect(restored.url, 'http://localhost:8088/');
       expect(restored.device, 'pixel-8');
       expect(paneKindIcon(PaneKind.preview), isNotNull);
-      final display = splitPaneDisplay(pane, sessionTitles: const {}, projectNames: const {});
+      final display = splitPaneDisplay(pane, projectNames: const {});
       expect(display.title, 'Preview');
       expect(display.subtitle, 'localhost');
     });
@@ -79,8 +79,8 @@ void main() {
 
   group('previewFollowAction', () {
     const empty = WorkspaceState();
-    const chatOnly = WorkspaceState(
-      panes: [SplitPane(id: 'c', kind: PaneKind.chat)],
+    const terminalOnly = WorkspaceState(
+      panes: [SplitPane(id: 'c', kind: PaneKind.terminal)],
       activePaneId: 'c',
     );
 
@@ -90,14 +90,16 @@ void main() {
         isA<OpenPreviewPane>(),
       );
       expect(
-        previewFollowAction(chatOnly, _target('http://a/'), created: false),
+        previewFollowAction(terminalOnly, _target('http://a/'), created: false),
         isA<OpenPreviewPane>(),
       );
     });
 
     test('does nothing when the grid is full', () {
       final full = WorkspaceState(
-        panes: [for (var i = 0; i < maxSplitPanes; i++) SplitPane(id: 'p$i', kind: PaneKind.chat)],
+        panes: [
+          for (var i = 0; i < maxSplitPanes; i++) SplitPane(id: 'p$i', kind: PaneKind.terminal),
+        ],
       );
       expect(
         previewFollowAction(full, _target('http://a/'), created: true),

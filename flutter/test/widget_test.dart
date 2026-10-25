@@ -123,7 +123,9 @@ void main() {
     await tester.tap(find.byIcon(LucideIcons.menu));
     await tester.pumpAndSettle();
     expect(find.text('Navigation'), findsOneWidget);
-    expect(find.text('Sessions'), findsWidgets);
+    expect(find.text('Terminal'), findsWidgets);
+    // The sessions list went away with the chat UI.
+    expect(find.text('Sessions'), findsNothing);
   });
 
   testWidgets('wide width shows NavigationRail', (tester) async {

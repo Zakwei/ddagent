@@ -2,10 +2,7 @@ import 'dart:typed_data';
 
 import 'package:ddagent_app/core/network/api_error.dart';
 import 'package:ddagent_app/core/theme/app_theme.dart';
-import 'package:ddagent_app/features/chat/view/composer.dart';
-import 'package:ddagent_app/features/chat/view/transcript_view.dart';
 import 'package:ddagent_app/features/sessions/data/chat_storage.dart';
-import 'package:ddagent_app/features/sessions/data/session_message.dart';
 import 'package:ddagent_app/features/voice/data/voice_models.dart';
 import 'package:ddagent_app/features/voice/data/voice_repository.dart';
 import 'package:ddagent_app/features/voice/state/stt_controller.dart';
@@ -223,102 +220,7 @@ void main() {
     });
   });
 
-  group('3. Testy widgetowe STT + TTS (Test strategii: nagrywanie → transcript, play na wiadomości → audio)', () {
-    testWidgets('nagrywanie → transcript w composerze', (tester) async {
-      final repo = _FakeVoiceRepo();
-
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            voiceRepositoryProvider.overrideWithValue(repo),
-            ttsPlayAudioProvider.overrideWithValue((bytes, {onEnd}) async {}),
-          ],
-          child: TranslationProvider(
-            child: MaterialApp(
-              theme: AppTheme.light(),
-              home: const Scaffold(body: ChatComposer(sessionId: 'sess_test_1')),
-            ),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      // Przycisk mikrofonu jest widoczny gdy STT jest skonfigurowane
-      final micButton = find.byTooltip('Dictate a message');
-      expect(micButton, findsOneWidget);
-
-      // Kliknij mikrofon aby rozpocząć nagrywanie
-      await tester.tap(micButton);
-      await tester.pump();
-
-      // Ikona mikrofonu zmienia się na aktywną (Stop recording)
-      final stopButton = find.byTooltip('Stop dictation');
-      expect(stopButton, findsOneWidget);
-
-      // Kliknij ponownie aby zatrzymać i przetranskrybować
-      await tester.tap(stopButton);
-      await tester.pumpAndSettle();
-
-      expect(repo.calls.where((c) => c.startsWith('transcribeAudio:')).length, 1);
-      final tf = tester.widget<TextField>(find.byType(TextField));
-      expect(tf.controller?.text, 'Dzień dobry, zróbmy test mowy');
-    });
-
-    testWidgets('play na wiadomości → audio (synteza TTS)', (tester) async {
-      final repo = _FakeVoiceRepo();
-
-      const testMsg = SessionMessage(
-        id: 'msg_assistant_1',
-        sessionId: 'sess_1',
-        timestamp: '2026-01-01T12:00:00Z',
-        provider: 'claude',
-        kind: 'text',
-        role: 'assistant',
-        content: 'Oto odpowiedź asystenta na Twoje pytanie.',
-      );
-
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            voiceRepositoryProvider.overrideWithValue(repo),
-            ttsPlayAudioProvider.overrideWithValue((bytes, {onEnd}) async {}),
-          ],
-          child: TranslationProvider(
-            child: MaterialApp(
-              theme: AppTheme.light(),
-              home: const Scaffold(
-                body: MessageActions(
-                  message: testMsg,
-                  child: Text('Oto odpowiedź asystenta na Twoje pytanie.'),
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      // Przycisk odtwarzania mowy jest widoczny przy wiadomości
-      final ttsButton = find.byTooltip('Read aloud');
-      expect(ttsButton, findsOneWidget);
-
-      // Kliknij odtwórz
-      await tester.tap(ttsButton);
-      await tester.pumpAndSettle();
-
-      expect(
-        repo.calls,
-        contains('synthesizeSpeech:Oto odpowiedź asystenta na Twoje pytanie.:null'),
-      );
-      // Ikona zmienia się w przycisk zatrzymania
-      expect(find.byTooltip('Stop reading'), findsOneWidget);
-
-      // Kliknij zatrzymaj
-      await tester.tap(find.byTooltip('Stop reading'));
-      await tester.pumpAndSettle();
-      expect(find.byTooltip('Read aloud'), findsOneWidget);
-    });
-
+  group('3. Testy widgetowe STT + TTS', () {
     testWidgets('STT Config Dialog: edycja i zapis endpointu', (tester) async {
       final repo = _FakeVoiceRepo();
 

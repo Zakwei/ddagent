@@ -698,6 +698,7 @@ class Translations$terminal$es extends Translations$terminal$en {
 	@override late final Translations$terminal$rename$es rename = Translations$terminal$rename$es._(_root);
 	@override late final Translations$terminal$search$es search = Translations$terminal$search$es._(_root);
 	@override late final Translations$terminal$keyBar$es keyBar = Translations$terminal$keyBar$es._(_root);
+	@override late final Translations$terminal$openSession$es openSession = Translations$terminal$openSession$es._(_root);
 }
 
 // Path: voice
@@ -5149,6 +5150,18 @@ class Translations$terminal$keyBar$es extends Translations$terminal$keyBar$en {
 	@override String get ctrlHint => 'Mantener Ctrl para la siguiente tecla';
 	@override String get shiftHint => 'Mantener Shift para la siguiente tecla';
 	@override String get showKeyboard => 'Mostrar teclado';
+}
+
+// Path: terminal.openSession
+class Translations$terminal$openSession$es extends Translations$terminal$openSession$en {
+	Translations$terminal$openSession$es._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get notResumable => 'Esta sesión no tiene un agente de línea de comandos para reanudarla en un terminal.';
+	@override String failed({required Object error}) => 'No se pudo abrir la sesión: ${error}';
+	@override String get full => 'Este terminal no tiene espacio para otra pestaña; cierra una primero.';
 }
 
 // Path: workspace.paneTitle
@@ -11842,6 +11855,9 @@ extension on TranslationsEs {
 			'terminal.keyBar.ctrlHint' => 'Mantener Ctrl para la siguiente tecla',
 			'terminal.keyBar.shiftHint' => 'Mantener Shift para la siguiente tecla',
 			'terminal.keyBar.showKeyboard' => 'Mostrar teclado',
+			'terminal.openSession.notResumable' => 'Esta sesión no tiene un agente de línea de comandos para reanudarla en un terminal.',
+			'terminal.openSession.failed' => ({required Object error}) => 'No se pudo abrir la sesión: ${error}',
+			'terminal.openSession.full' => 'Este terminal no tiene espacio para otra pestaña; cierra una primero.',
 			'voice.preview' => 'Vista previa',
 			'voice.settingsSaved' => 'Ajustes de entrada de voz guardados',
 			'voice.saveFailed' => 'No se pudo guardar la configuración de STT',

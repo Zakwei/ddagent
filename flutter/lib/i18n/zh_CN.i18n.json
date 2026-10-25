@@ -4280,6 +4280,11 @@
       "ctrlHint": "为下一个按键按住 Ctrl",
       "shiftHint": "为下一个按键按住 Shift",
       "showKeyboard": "显示键盘"
+    },
+    "openSession": {
+      "notResumable": "此会话没有可在终端中恢复它的命令行代理。",
+      "failed": "无法打开会话：{{error}}",
+      "full": "此终端无法再添加标签页——请先关闭一个。"
     }
   },
   "voice": {

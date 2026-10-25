@@ -697,6 +697,7 @@ class Translations$terminal$zh_TW extends Translations$terminal$en {
 	@override late final Translations$terminal$rename$zh_TW rename = Translations$terminal$rename$zh_TW.internal(_root);
 	@override late final Translations$terminal$search$zh_TW search = Translations$terminal$search$zh_TW.internal(_root);
 	@override late final Translations$terminal$keyBar$zh_TW keyBar = Translations$terminal$keyBar$zh_TW.internal(_root);
+	@override late final Translations$terminal$openSession$zh_TW openSession = Translations$terminal$openSession$zh_TW.internal(_root);
 }
 
 // Path: voice
@@ -5139,6 +5140,18 @@ class Translations$terminal$keyBar$zh_TW extends Translations$terminal$keyBar$en
 	@override String get ctrlHint => '為下一個按鍵按住 Ctrl';
 	@override String get shiftHint => '為下一個按鍵按住 Shift';
 	@override String get showKeyboard => '顯示鍵盤';
+}
+
+// Path: terminal.openSession
+class Translations$terminal$openSession$zh_TW extends Translations$terminal$openSession$en {
+	Translations$terminal$openSession$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get notResumable => '此工作階段沒有可在終端機中繼續的命令列代理。';
+	@override String failed({required Object error}) => '無法開啟工作階段：${error}';
+	@override String get full => '此終端機無法再新增分頁——請先關閉一個。';
 }
 
 // Path: workspace.paneTitle
@@ -11831,6 +11844,9 @@ extension on TranslationsZhTw {
 			'terminal.keyBar.ctrlHint' => '為下一個按鍵按住 Ctrl',
 			'terminal.keyBar.shiftHint' => '為下一個按鍵按住 Shift',
 			'terminal.keyBar.showKeyboard' => '顯示鍵盤',
+			'terminal.openSession.notResumable' => '此工作階段沒有可在終端機中繼續的命令列代理。',
+			'terminal.openSession.failed' => ({required Object error}) => '無法開啟工作階段：${error}',
+			'terminal.openSession.full' => '此終端機無法再新增分頁——請先關閉一個。',
 			'voice.preview' => '預覽',
 			'voice.settingsSaved' => '語音輸入設定已儲存',
 			'voice.saveFailed' => '儲存 STT 設定失敗',

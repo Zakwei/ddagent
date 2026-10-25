@@ -1,5 +1,3 @@
-import 'package:ddagent_app/features/chat/view/tool_blocks.dart';
-import 'package:ddagent_app/features/sessions/data/session_message.dart';
 import 'package:ddagent_app/features/taskmaster/data/taskmaster_models.dart';
 import 'package:ddagent_app/features/taskmaster/state/taskmaster_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -8,26 +6,6 @@ import 'package:flutter_test/flutter_test.dart';
 /// (these are smoke budgets, not precise perf numbers — they catch order-of-
 /// magnitude regressions).
 void main() {
-  test('groupToolRuns handles 5k messages under 1s', () {
-    final msgs = [
-      for (var i = 0; i < 5000; i++)
-        SessionMessage(
-          id: 'm$i',
-          sessionId: 's',
-          timestamp: DateTime.fromMillisecondsSinceEpoch(i).toIso8601String(),
-          provider: 'claude',
-          kind: 'tool_use',
-          toolName: 'read',
-          toolId: 't$i',
-        ),
-    ];
-    final sw = Stopwatch()..start();
-    final grouped = groupToolRuns(msgs);
-    sw.stop();
-    expect(grouped.rows, isNotEmpty);
-    expect(sw.elapsedMilliseconds, lessThan(1000));
-  });
-
   test('filteredTasks over 2k tasks stays under 500ms', () {
     final state = TaskmasterState(
       tasks: [

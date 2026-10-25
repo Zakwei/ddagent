@@ -4291,6 +4291,11 @@
       "ctrlHint": "Maintenir Ctrl pour la touche suivante",
       "shiftHint": "Maintenir Shift pour la touche suivante",
       "showKeyboard": "Afficher le clavier"
+    },
+    "openSession": {
+      "notResumable": "Cette session n'a pas d'agent en ligne de commande pour la reprendre dans un terminal.",
+      "failed": "Impossible d'ouvrir la session : {{error}}",
+      "full": "Ce terminal n'a plus de place pour un autre onglet — fermez-en un d'abord."
     }
   },
   "voice": {

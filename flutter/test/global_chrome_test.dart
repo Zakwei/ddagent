@@ -1,17 +1,20 @@
 import 'dart:io';
 
+import 'package:ddagent_app/core/network/api_providers.dart';
+import 'package:ddagent_app/core/realtime/chat_channel.dart';
+import 'package:ddagent_app/core/realtime/realtime_providers.dart';
+import 'package:ddagent_app/core/realtime/ws_client.dart';
 import 'package:ddagent_app/core/theme/app_theme.dart';
+import 'package:ddagent_app/core/widgets/adaptive_scaffold.dart';
 import 'package:ddagent_app/core/widgets/update_badge.dart';
-import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
-import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
 import 'package:ddagent_app/features/settings/state/ui_preferences_controller.dart';
 import 'package:ddagent_app/features/settings/view/quick_settings_sheet.dart';
 import 'package:ddagent_app/features/system/data/system_repository.dart';
 import 'package:ddagent_app/features/system/state/update_controller.dart';
-import 'package:ddagent_app/features/workspace/view/session_quick_switcher.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -31,19 +34,36 @@ class _FakeSystemRepo extends SystemRepository {
   Future<Map<String, dynamic>> health() async => {'version': version};
 }
 
-/// Skips the real controller's WS subscription + HTTP load.
-class _FakeSessions extends SessionsController {
-  _FakeSessions() : super((null, null));
+/// chatChannelProvider auto-connects — a real WsClient leaves a reconnect
+/// Timer pending and hangs pumpAndSettle.
+class _FakeWs extends WsClient {
+  _FakeWs() : super(urlBuilder: () async => Uri.parse('ws://t'));
 
   @override
-  SessionsState build() => const SessionsState(
-    loading: false,
-    sessions: [
-      Session(sessionId: 's-alpha', summary: 'Alpha task'),
-      Session(sessionId: 's-beta', summary: 'Beta task', isArchived: true),
-    ],
-  );
+  Stream<Map<String, dynamic>> get frames => const Stream.empty();
+  @override
+  Stream<WsState> get states => const Stream.empty();
+  @override
+  WsState get state => WsState.closed;
+
+  @override
+  Future<void> connect() async {}
 }
+
+Dio _fakeDio() => Dio(BaseOptions(baseUrl: 'http://t'))
+  ..interceptors.add(
+    InterceptorsWrapper(
+      onRequest: (o, h) => h.resolve(
+        Response(
+          requestOptions: o,
+          data: {
+            'success': true,
+            'data': {'conversations': <dynamic>[], 'total': 0, 'hasMore': false},
+          },
+        ),
+      ),
+    ),
+  );
 
 Widget _app(Widget child) => TranslationProvider(
   child: ProviderScope(
@@ -140,44 +160,56 @@ void main() {
     });
   });
 
-  group('session quick switcher — T59', () {
-    testWidgets('lists sessions and navigates to /chat/:id on tap', (tester) async {
+  group('global shortcuts — session quick switcher removed', () {
+    setUpAll(() async {
+      Hive.init(Directory.systemTemp.createTempSync('hive_chrome_keys').path);
+      if (!Hive.isBoxOpen('settings')) await Hive.openBox<dynamic>('settings');
+    });
+
+    testWidgets('Ctrl+K no longer opens a dialog; Ctrl+Shift+K still opens the palette', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(1400, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
       final router = GoRouter(
-        initialLocation: '/',
+        initialLocation: '/projects',
         routes: [
-          GoRoute(
-            path: '/',
-            builder: (context, _) => Scaffold(
-              body: Builder(
-                builder: (context) => TextButton(
-                  onPressed: () => showSessionQuickSwitcher(context),
-                  child: const Text('open'),
-                ),
-              ),
-            ),
+          ShellRoute(
+            builder: (_, _, child) => AdaptiveScaffold(child: child),
+            routes: [GoRoute(path: '/projects', builder: (_, _) => const Text('Projects'))],
           ),
-          GoRoute(path: '/chat/:id', builder: (_, s) => Text('CHAT:${s.pathParameters['id']}')),
         ],
       );
-
       await tester.pumpWidget(
         TranslationProvider(
           child: ProviderScope(
-            overrides: [sessionsProvider((null, null)).overrideWith(_FakeSessions.new)],
+            overrides: [
+              dioProvider.overrideWithValue(_fakeDio()),
+              chatChannelProvider.overrideWithValue(ChatChannel(_FakeWs())),
+            ],
             child: MaterialApp.router(theme: AppTheme.light(), routerConfig: router),
           ),
         ),
       );
       await tester.pumpAndSettle();
-      await tester.tap(find.text('open'));
-      await tester.pumpAndSettle();
+      final routes = find.byWidgetPredicate((w) => w is ModalBarrier);
+      final baseline = routes.evaluate().length;
 
-      expect(find.text('Alpha task'), findsOneWidget);
-      expect(find.text('Beta task'), findsNothing); // archived filtered
-
-      await tester.tap(find.text('Alpha task'));
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyK);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
       await tester.pumpAndSettle();
-      expect(find.text('CHAT:s-alpha'), findsOneWidget);
+      expect(find.byType(Dialog), findsNothing);
+      expect(routes.evaluate().length, baseline);
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.shiftLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyK);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.shiftLeft);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+      await tester.pumpAndSettle();
+      expect(routes.evaluate().length, greaterThan(baseline));
     });
   });
 }

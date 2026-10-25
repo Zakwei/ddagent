@@ -60,9 +60,8 @@ const parityMatrix = <ParityEntry>[
   ParityEntry(
     source: ParitySource.web,
     key: 'chat',
-    status: ParityStatus.partial,
-    flutterPath: 'lib/features/chat',
-    note: 'Missing: builtin slash-command result modals, model library, offline-queue card UI, todo tool renderers, file-open affordances, attachment download, composer prefs (sendByCtrlEnter/showThinking/showRawParameters), camera capture.',
+    status: ParityStatus.notApplicable,
+    note: 'Chat transcript/composer dropped by design — agents run as their CLIs in terminal panes/tabs (/chat/:id resumes the session in a terminal tab).',
   ),
   ParityEntry(
     source: ParitySource.web,
@@ -75,8 +74,8 @@ const parityMatrix = <ParityEntry>[
     source: ParitySource.web,
     key: 'command-palette',
     status: ParityStatus.partial,
-    flutterPath: 'lib/features/commands',
-    note: 'Slash-command list/execute shipped; fuzzy palette overlay UI not ported.',
+    flutterPath: 'lib/features/palette/command_palette.dart',
+    note: 'Fuzzy palette overlay (Ctrl/Cmd+Shift+K) shipped; slash commands now go to the agent CLI in its terminal.',
   ),
   ParityEntry(
     source: ParitySource.web,
@@ -230,8 +229,8 @@ const parityMatrix = <ParityEntry>[
   ParityEntry(
     source: ParitySource.mobile,
     key: 'ChatScreen',
-    status: ParityStatus.full,
-    flutterPath: 'lib/features/chat',
+    status: ParityStatus.notApplicable,
+    note: 'Chat screen dropped — /chat/:id resumes the session as its CLI in a terminal tab.',
   ),
   ParityEntry(
     source: ParitySource.mobile,
@@ -272,8 +271,8 @@ const parityMatrix = <ParityEntry>[
   ParityEntry(
     source: ParitySource.mobile,
     key: 'RecentScreen',
-    status: ParityStatus.full,
-    flutterPath: 'lib/features/sessions',
+    status: ParityStatus.notApplicable,
+    note: 'Session list dropped with the chat UI — /recent redirects to /workspace.',
   ),
   ParityEntry(
     source: ParitySource.mobile,
@@ -284,8 +283,8 @@ const parityMatrix = <ParityEntry>[
   ParityEntry(
     source: ParitySource.mobile,
     key: 'SessionsScreen',
-    status: ParityStatus.full,
-    flutterPath: 'lib/features/sessions',
+    status: ParityStatus.notApplicable,
+    note: 'Session list dropped with the chat UI — /sessions redirects to /workspace.',
   ),
   ParityEntry(
     source: ParitySource.mobile,
@@ -363,8 +362,8 @@ const parityMatrix = <ParityEntry>[
   ParityEntry(
     source: ParitySource.settings,
     key: 'orchestration',
-    status: ParityStatus.missing,
-    note: 'Config GET/PUT repo exists; no settings UI.',
+    status: ParityStatus.notApplicable,
+    note: 'Orchestrator and mini-orchestrator UI removed with the chat sessions.',
   ),
   ParityEntry(
     source: ParitySource.settings,

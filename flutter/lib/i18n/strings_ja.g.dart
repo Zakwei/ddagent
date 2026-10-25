@@ -697,6 +697,7 @@ class Translations$terminal$ja extends Translations$terminal$en {
 	@override late final Translations$terminal$rename$ja rename = Translations$terminal$rename$ja._(_root);
 	@override late final Translations$terminal$search$ja search = Translations$terminal$search$ja._(_root);
 	@override late final Translations$terminal$keyBar$ja keyBar = Translations$terminal$keyBar$ja._(_root);
+	@override late final Translations$terminal$openSession$ja openSession = Translations$terminal$openSession$ja._(_root);
 }
 
 // Path: voice
@@ -5139,6 +5140,18 @@ class Translations$terminal$keyBar$ja extends Translations$terminal$keyBar$en {
 	@override String get ctrlHint => '次のキーに Ctrl を適用';
 	@override String get shiftHint => '次のキーに Shift を適用';
 	@override String get showKeyboard => 'キーボードを表示';
+}
+
+// Path: terminal.openSession
+class Translations$terminal$openSession$ja extends Translations$terminal$openSession$en {
+	Translations$terminal$openSession$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get notResumable => 'このセッションにはターミナルで再開できるコマンドラインエージェントがありません。';
+	@override String failed({required Object error}) => 'セッションを開けませんでした: ${error}';
+	@override String get full => 'このターミナルにはこれ以上タブを追加できません。先にタブを閉じてください。';
 }
 
 // Path: workspace.paneTitle
@@ -11831,6 +11844,9 @@ extension on TranslationsJa {
 			'terminal.keyBar.ctrlHint' => '次のキーに Ctrl を適用',
 			'terminal.keyBar.shiftHint' => '次のキーに Shift を適用',
 			'terminal.keyBar.showKeyboard' => 'キーボードを表示',
+			'terminal.openSession.notResumable' => 'このセッションにはターミナルで再開できるコマンドラインエージェントがありません。',
+			'terminal.openSession.failed' => ({required Object error}) => 'セッションを開けませんでした: ${error}',
+			'terminal.openSession.full' => 'このターミナルにはこれ以上タブを追加できません。先にタブを閉じてください。',
 			'voice.preview' => 'プレビュー',
 			'voice.settingsSaved' => '音声入力設定を保存しました',
 			'voice.saveFailed' => 'STT設定の保存に失敗しました',

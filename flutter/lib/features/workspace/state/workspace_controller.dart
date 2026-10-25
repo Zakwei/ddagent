@@ -128,7 +128,6 @@ class WorkspaceController extends Notifier<WorkspaceState> {
     String? url,
     String? filePath,
     String? device,
-    bool picker = false,
   }) {
     if (!canAddSplitPane(state.panes)) return null;
     final pane = SplitPane(
@@ -139,7 +138,6 @@ class WorkspaceController extends Notifier<WorkspaceState> {
       url: url,
       filePath: filePath,
       device: device,
-      picker: picker,
     );
     _set(state.copyWith(panes: addSplitPane(state.panes, pane), activePaneId: () => pane.id));
     return pane.id;
@@ -180,18 +178,16 @@ class WorkspaceController extends Notifier<WorkspaceState> {
     String? Function()? url,
     String? Function()? filePath,
     String? Function()? device,
-    bool? picker,
   }) {
     final next = updateSplitPane(
       state.panes,
       id,
       (p) => p.copyWith(
-        sessionId: sessionId != null ? sessionId() : p.sessionId,
-        projectId: projectId != null ? projectId() : p.projectId,
-        url: url != null ? url() : p.url,
-        filePath: filePath != null ? filePath() : p.filePath,
-        device: device != null ? device() : p.device,
-        picker: picker ?? p.picker,
+        sessionId: sessionId,
+        projectId: projectId,
+        url: url,
+        filePath: filePath,
+        device: device,
       ),
     );
     _set(state.copyWith(panes: next));
@@ -208,6 +204,64 @@ class WorkspaceController extends Notifier<WorkspaceState> {
       }
     }
     openPane(PaneKind.editor, projectId: projectId, filePath: filePath);
+  }
+
+  /// Opens an agent session as a terminal tab running its CLI with
+  /// `--resume`. A tab already showing the session is focused instead (a
+  /// second one would attach the same PTY). Otherwise the tab goes to the
+  /// active terminal pane, else the first one, else a new pane — or, in a
+  /// full workspace, the standalone terminal. The tab is added to the synced
+  /// row, so the host's terminal screen attaches it (now or once mounted)
+  /// and the account's other devices see it too. Returns the host the tab
+  /// is in, or null when that row is full. [newPane] skips the existing
+  /// panes (side-by-side compare).
+  String? openSessionTab({
+    required String sessionId,
+    required String provider,
+    required String projectPath,
+    String? projectId,
+    String? title,
+    bool newPane = false,
+  }) {
+    for (final MapEntry(key: host, value: row) in state.terminals.entries) {
+      final open = row.tabs.where((tab) => tab.sessionId == sessionId).firstOrNull;
+      if (open == null) continue;
+      setTerminalHost(host, TerminalHostSpec(tabs: row.tabs, activeTabId: open.id));
+      _focusHost(host);
+      return host;
+    }
+
+    final terminals = [
+      for (final p in state.panes)
+        if (p.kind == PaneKind.terminal) p,
+    ];
+    final host =
+        (newPane ? null : terminals.where((p) => p.id == state.activePaneId).firstOrNull?.id) ??
+        (newPane ? null : terminals.firstOrNull?.id) ??
+        openPane(PaneKind.terminal, projectId: projectId) ??
+        terminalRouteHost;
+    final row = state.terminals[host] ?? const TerminalHostSpec();
+    if (row.tabs.length >= maxSyncedTerminalTabs) return null;
+    final tab = TerminalTabSpec(
+      id: newTerminalTabSyncId(),
+      title: title ?? '',
+      projectPath: projectPath,
+      provider: provider,
+      isPlainShell: false,
+      sessionId: sessionId,
+    );
+    setTerminalHost(host, TerminalHostSpec(tabs: [...row.tabs, tab], activeTabId: tab.id));
+    _focusHost(host);
+    return host;
+  }
+
+  /// Brings a terminal pane forward — focused, and not hidden behind
+  /// another pane's maximized view.
+  void _focusHost(String host) {
+    if (host == terminalRouteHost) return;
+    setActivePaneId(host);
+    final maximized = state.maximizedPaneId;
+    if (maximized != null && maximized != host) toggleMaximize(maximized);
   }
 
   void reorderPanes(String fromId, int toIndex) {
