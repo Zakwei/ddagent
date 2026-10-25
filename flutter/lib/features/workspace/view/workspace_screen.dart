@@ -91,6 +91,13 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
 
   /// Terminal panes with a tab whose CLI shows a pick-an-option prompt (a
   /// permission or question from the agent).
+  /// Each terminal pane's visible tab title (`host\ttitle` lines — a
+  /// string, so output frames that leave the titles alone don't rebuild).
+  static String _activeTabTitles(TerminalState s) => [
+    for (final host in {for (final tab in s.tabs) tab.hostId})
+      '$host\t${s.activeTabFor(host)?.displayTitle ?? ''}',
+  ].join('\n');
+
   static Set<String> _questionHosts(TerminalState s) => {
     for (final tab in s.tabs)
       if (tab.promptOptions != null && tab.status == TerminalTabStatus.connected) tab.hostId,
@@ -112,6 +119,10 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
     // call opens / retargets a preview pane while the workspace is on screen.
     ref.watch(appPreviewControllerProvider);
     final questionHosts = ref.watch(terminalControllerProvider.select(_questionHosts));
+    final tabTitles = {
+      for (final line in ref.watch(terminalControllerProvider.select(_activeTabTitles)).split('\n'))
+        if (line.split('\t') case [final host, final title] when title.isNotEmpty) host: title,
+    };
     final bellHosts = ref.watch(terminalControllerProvider.select(_bellHosts));
 
     // Focusing a pane (or leaving it) means its visible tab has been seen.
@@ -169,7 +180,9 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
               onToggleMaximizePane: ctrl.toggleMaximize,
               finishedPaneIds: bellHosts,
               actionPaneIds: questionHosts,
-              paneTitle: (p) => display(p).title,
+              // Compact mode's pane strip names a terminal pane by the tab it
+              // shows — "Terminal" twice tells the panes apart from nothing.
+              paneTitle: (p) => tabTitles[p.id] ?? display(p).title,
               renderPaneHeaderContent: (p, actions) =>
                   _headerContent(display(p), actions, finished: bellHosts.contains(p.id)),
               renderPane: _paneBody,

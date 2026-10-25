@@ -8,14 +8,27 @@ final rootMessengerKey = GlobalKey<ScaffoldMessengerState>();
 /// Toast/snackbar helper — floating snackbar themed via `snackBarTheme`.
 abstract final class AppToast {
   /// Toast without a widget context; a no-op before the app has mounted.
+  /// Talks to the root messenger directly — its own context has no
+  /// ScaffoldMessenger above it to look up.
   static void global(String message, {bool isError = false}) {
-    final context = rootMessengerKey.currentContext;
-    if (context != null && context.mounted) show(context, message, isError: isError);
+    final messenger = rootMessengerKey.currentState;
+    if (messenger == null || !messenger.mounted) return;
+    _showOn(messenger, message, isError: isError);
   }
 
-  static void show(BuildContext context, String message, {bool isError = false}) {
-    final c = context.appColors;
-    ScaffoldMessenger.of(context)
+  static void show(BuildContext context, String message, {bool isError = false}) =>
+      _showOn(ScaffoldMessenger.of(context), message, isError: isError);
+
+  static void _showOn(ScaffoldMessengerState messenger, String message, {required bool isError}) {
+    final context = messenger.context;
+    // The root messenger sits above the app's Theme (MaterialApp builds it
+    // outside), so its context finds no AppColors — fall back by brightness.
+    final c =
+        Theme.of(context).extension<AppColors>() ??
+        (MediaQuery.maybePlatformBrightnessOf(context) == Brightness.dark
+            ? AppColors.dark
+            : AppColors.light);
+    messenger
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(

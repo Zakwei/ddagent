@@ -94,6 +94,24 @@ void main() {
       await drainTimers(tester);
     });
 
+    testWidgets('each pane in the strip is named after the tab it shows', (tester) async {
+      final c = await pumpCompact(tester);
+      await showPane(tester, c, 1);
+      await showPane(tester, c, 0);
+      final ctrl = c.read(terminalControllerProvider.notifier);
+      ctrl.renameTab(terminalOf(c).tabsFor('pA').single.id, 'api server');
+      // The hidden pane's agent sets its window title (OSC 2).
+      shells.of(terminalOf(c).tabsFor('pB').single).output('\x1b]2;claude: fix login\x07');
+      await tester.pump();
+
+      expect(find.descendant(of: paneTab(0), matching: find.text('api server')), findsOneWidget);
+      expect(
+        find.descendant(of: paneTab(1), matching: find.text('claude: fix login')),
+        findsOneWidget,
+      );
+      await drainTimers(tester);
+    });
+
     testWidgets('a hidden pane turns green on a bell, amber on a prompt; focus clears the bell', (
       tester,
     ) async {
@@ -154,7 +172,10 @@ void main() {
       expect(paneTabs(), findsNWidgets(2), reason: 'two panes → strip');
       expect(find.byType(TerminalScreen), findsOneWidget);
       expect(identical(terminalOf(c).tabsFor(fresh.id).single, logs), isTrue);
-      expect(find.text('logs'), findsOneWidget);
+      expect(
+        find.descendant(of: find.byType(TerminalTabStrip), matching: find.text('logs')),
+        findsOneWidget,
+      );
       await drainTimers(tester);
     });
 

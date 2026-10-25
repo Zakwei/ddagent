@@ -59,10 +59,7 @@ Future<void> presentDesktopNotification(DesktopNotification event) async {
   final body = event.body?.trim() ?? '';
   final resolvedTitle = (title == null || title.isEmpty) ? 'DDAgent' : title;
   if (await showDesktopNotification(title: resolvedTitle, body: body)) return;
-  final context = rootMessengerKey.currentContext;
-  if (context != null && context.mounted) {
-    AppToast.show(context, body.isEmpty ? resolvedTitle : '$resolvedTitle: $body');
-  }
+  AppToast.global(body.isEmpty ? resolvedTitle : '$resolvedTitle: $body');
 }
 
 class DdagentApp extends ConsumerStatefulWidget {
@@ -160,8 +157,7 @@ class _DdagentAppState extends ConsumerState<DdagentApp> {
     });
     // X-Auth-Error / expired JWT → toast + back to login (T8.5).
     ref.listen(sessionExpiredProvider, (_, _) {
-      final ctx = rootMessengerKey.currentContext;
-      if (ctx != null) AppToast.error(ctx, Translations.of(ctx).auth.sessionExpired);
+      AppToast.global(t.auth.sessionExpired, isError: true);
       ref.read(routerProvider).go('/login');
     });
     final themeMode = ref.watch(themeModeProvider);

@@ -130,6 +130,30 @@ void main() {
     await drainTimers(tester);
   }, variant: const TargetPlatformVariant({TargetPlatform.linux}));
 
+  testWidgets('a pane added or picked in the workspace takes the keyboard', (tester) async {
+    final c = await pumpGrid(tester);
+    await focusPane(tester, 'pA');
+    expect(focusedHost(), 'pA');
+
+    // "Add terminal pane": the new pane's first tab gets the keyboard.
+    final added = c.read(workspaceProvider.notifier).openPane(PaneKind.terminal, projectId: 'pa')!;
+    await tester.pump();
+    await tester.pump();
+    await tester.pump();
+    await connectAll(tester, c, shells);
+    await tester.pumpAndSettle();
+    expect(focusedHost(), added);
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pump();
+    expect(shells.of(terminalOf(c).activeTabFor(added)!).inputs, ['\x1b']);
+
+    // Picking another pane (overview, compact strip, a session opened there).
+    c.read(workspaceProvider.notifier).setActivePaneId('pB');
+    await tester.pumpAndSettle();
+    expect(focusedHost(), 'pB');
+    await drainTimers(tester);
+  }, variant: const TargetPlatformVariant({TargetPlatform.linux}));
+
   /// A tab's tap lands once the double-tap (rename) window has passed.
   Future<void> tapTab(WidgetTester tester, TerminalTab tab) async {
     await tester.tap(find.byKey(ValueKey('terminal-tab-${tab.id}')));

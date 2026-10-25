@@ -140,11 +140,27 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
       prev,
       next,
     ) {
-      if (next == null || next == prev || _isTouchPlatform || !_screenFocus.hasFocus) return;
+      if (next == null || next == prev || _isTouchPlatform) return;
+      // A pane's first tab also takes it when the pane is the focused one —
+      // the user just opened the pane and expects to type there.
+      if (!_screenFocus.hasFocus && !(prev == null && _isActivePane)) return;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) _activePane?.focusTerminal();
       });
     });
+    // The workspace focused this pane (added, picked in the overview or the
+    // compact strip, a session opened into it): the keyboard follows.
+    if (widget.syncTabs && widget.hostId != terminalRouteHost) {
+      ref.listenManual(workspaceProvider.select((s) => s.activePaneId == widget.hostId), (
+        was,
+        isActive,
+      ) {
+        if (!isActive || was == true || _isTouchPlatform || _screenFocus.hasFocus) return;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) _activePane?.focusTerminal();
+        });
+      });
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       if (widget.syncTabs) {
@@ -550,6 +566,11 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
       if (mounted) _activePane?.focusTerminal();
     });
   }
+
+  bool get _isActivePane =>
+      widget.syncTabs &&
+      widget.hostId != terminalRouteHost &&
+      ref.read(workspaceProvider).activePaneId == widget.hostId;
 
   bool get _isTouchPlatform =>
       defaultTargetPlatform == TargetPlatform.android ||
