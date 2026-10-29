@@ -666,6 +666,55 @@ void main() {
       expect(fakeWs.sent.last['data'], '1');
     });
 
+    test(
+      'a Claude Code question with long option descriptions still yields every option',
+      () async {
+        final container = ProviderContainer(
+          overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
+        );
+        addTearDown(container.dispose);
+
+        final controller = container.read(terminalControllerProvider.notifier);
+        final tab = controller.createTab(projectPath: '/test/proj');
+
+        // AskUserQuestion: wrapped descriptions push `1.` far above the
+        // footer, and a numbered list earlier in the reply must not leak in.
+        String desc(int n) =>
+            [for (var i = 0; i < 5; i++) '     description $n line $i'].join('\r\n');
+        fakeWs.emitFrame({
+          'type': 'output',
+          'data': [
+            'Plan:',
+            '7. an earlier numbered list item',
+            '☐ CI',
+            '',
+            'How should CI run?',
+            '',
+            '❯ 1. Third runner (Recommended)',
+            desc(1),
+            '  2. Hybrid',
+            desc(2),
+            '  3. Only unblock GitHub',
+            desc(3),
+            '  4. Type something.',
+            '────────────',
+            '  5. Chat about this',
+            '',
+            'Enter to select · Tab/Arrow keys to navigate · Esc to cancel',
+            '',
+          ].join('\r\n'),
+        });
+        await Future<void>.delayed(const Duration(milliseconds: 600));
+        expect(tab.promptOptions?.map((o) => o.label), [
+          'Third runner (Recommended)',
+          'Hybrid',
+          'Only unblock GitHub',
+          'Type something.',
+          'Chat about this',
+        ]);
+      },
+    );
+
     test('non-prompt output clears any stale prompt options', () async {
       final container = ProviderContainer(
         overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
@@ -1674,8 +1723,8 @@ void main() {
     });
 
     testWidgets('connection overlay: Connect CTA, disconnect button, prompt chips', (tester) async {
-      // <768px wide → the prompt chips strip is allowed (web md:hidden).
-      tester.view.physicalSize = const Size(700, 600);
+      // A desktop-sized window — the prompt chips show at every size.
+      tester.view.physicalSize = const Size(1280, 800);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
@@ -1772,6 +1821,56 @@ void main() {
       final inits = fakeWs.sent.where((f) => f['type'] == 'init');
       expect(inits, isNotEmpty);
       expect(inits.every((f) => f['forceRestart'] != true), isTrue);
+    });
+
+    testWidgets('on a phone the prompt chips stack as full-width two-line rows', (tester) async {
+      tester.view.physicalSize = const Size(390, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final container = ProviderContainer(
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        TranslationProvider(
+          child: UncontrolledProviderScope(
+            container: container,
+            child: MaterialApp(
+              theme: AppTheme.dark(),
+              home: const Scaffold(body: TerminalScreen(projectPath: '/test/proj')),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      const long = 'Third runner on the gaming box for this repository (Recommended)';
+      await tester.runAsync(() async {
+        fakeWs.emitFrame({
+          'type': 'output',
+          'data': 'How should CI run?\r\n❯ 1. $long\r\n  2. Hybrid\r\nEsc to cancel\r\n',
+        });
+        await Future<void>.delayed(const Duration(milliseconds: 30));
+      });
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 600));
+      await tester.pump();
+
+      final first = find.text('1. $long');
+      expect(first, findsOneWidget);
+      expect(tester.widget<Text>(first).maxLines, 2);
+      // Full-width rows: both options share the left edge, one under the other.
+      final second = find.text('2. Hybrid');
+      expect(tester.getTopLeft(first).dx, tester.getTopLeft(second).dx);
+      expect(tester.getTopLeft(second).dy, greaterThan(tester.getTopLeft(first).dy));
+
+      fakeWs.sent.clear();
+      await tester.tap(second);
+      await tester.pump();
+      expect(fakeWs.sent.last['data'], '2');
     });
 
     testWidgets('ProviderLoginDialog lists providers and launches terminal', (tester) async {

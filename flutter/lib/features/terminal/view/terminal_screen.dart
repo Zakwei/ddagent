@@ -890,11 +890,9 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
   /// explicit Connect CTA, and the CLI-prompt option chips strip.
   Widget _terminalArea(TerminalTab activeTab) {
     final connected = activeTab.status == TerminalTabStatus.connected;
-    // `md:hidden short:!block` — the chips exist for touch/small screens.
-    final showChips =
-        activeTab.promptOptions != null &&
-        connected &&
-        (MediaQuery.sizeOf(context).width < 768 || MediaQuery.sizeOf(context).height < 450);
+    // Shown at every size: answering an agent's question by tap beats
+    // arrow keys in the CLI, on a phone above all.
+    final showChips = activeTab.promptOptions != null && connected;
 
     return Stack(
       children: [
@@ -1112,72 +1110,78 @@ class _ConnectionOverlay extends StatelessWidget {
 }
 
 /// CLI prompt option chips (web `cliPromptOptions` strip) — `N. label`
-/// buttons send the digit; the Esc chip sends `\x1b`.
+/// buttons send the digit; the Esc chip sends `\x1b`. On a phone they stack
+/// as full-width, two-line, finger-sized rows (long AskUserQuestion labels).
 class _PromptChipsBar extends StatelessWidget {
   const _PromptChipsBar({required this.options, required this.onAnswer});
 
   final List<CliPromptOption> options;
   final void Function(String input) onAnswer;
 
+  static const _compactWidth = 600.0;
+
   @override
   Widget build(BuildContext context) {
     final palette = TerminalPalette.of(context);
+    final size = MediaQuery.sizeOf(context);
+    final compact = size.width < _compactWidth;
+
+    Widget chip(String label, VoidCallback onTap, {required bool primary}) => Material(
+      color: primary ? const Color(0xFF3B78FF) : palette.chrome, // Campbell bright blue
+      borderRadius: BorderRadius.circular(compact ? 6 : 4),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(compact ? 6 : 4),
+        child: Padding(
+          padding: compact
+              ? const EdgeInsets.symmetric(horizontal: 14, vertical: 11)
+              : const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          child: Text(
+            label,
+            overflow: TextOverflow.ellipsis,
+            maxLines: compact ? 2 : 1,
+            style: TextStyle(
+              fontSize: compact ? 14 : 12,
+              fontWeight: FontWeight.w500,
+              color: primary ? Colors.white : palette.tabStripForeground,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final chips = [
+      for (final opt in options)
+        Tooltip(
+          message: '${opt.number}. ${opt.label}',
+          child: chip('${opt.number}. ${opt.label}', () => onAnswer(opt.number), primary: true),
+        ),
+      chip('Esc', () => onAnswer('\x1b'), primary: false),
+    ];
+
     return Container(
       decoration: BoxDecoration(
         color: palette.tabStrip.withValues(alpha: 0.95),
         border: Border(top: BorderSide(color: palette.chromeBorder.withValues(alpha: 0.8))),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      child: Wrap(
-        spacing: 8,
-        runSpacing: 6,
-        children: [
-          for (final opt in options)
-            Tooltip(
-              message: '${opt.number}. ${opt.label}',
-              child: Material(
-                color: const Color(0xFF3B78FF), // Campbell bright blue
-                borderRadius: BorderRadius.circular(4),
-                child: InkWell(
-                  onTap: () => onAnswer(opt.number),
-                  borderRadius: BorderRadius.circular(4),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    child: Text(
-                      '${opt.number}. ${opt.label}',
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
+      child: compact
+          // Capped so the question above stays readable; scrolls past that.
+          ? ConstrainedBox(
+              constraints: BoxConstraints(maxHeight: size.height * 0.45),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    for (final (i, c) in chips.indexed) ...[
+                      if (i > 0) const SizedBox(height: 6),
+                      c,
+                    ],
+                  ],
                 ),
               ),
-            ),
-          Material(
-            color: palette.chrome,
-            borderRadius: BorderRadius.circular(4),
-            child: InkWell(
-              onTap: () => onAnswer('\x1b'),
-              borderRadius: BorderRadius.circular(4),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                child: Text(
-                  'Esc',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: palette.tabStripForeground,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+            )
+          : Wrap(spacing: 8, runSpacing: 6, children: chips),
     );
   }
 }

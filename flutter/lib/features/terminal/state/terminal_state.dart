@@ -25,11 +25,13 @@ enum TerminalTabStatus { connecting, connected, disconnected, exited }
 /// footer).
 typedef CliPromptOption = ({String number, String label});
 
-// Web `constants.ts` — the buffer-scan window + option bounds.
+// The buffer-scan window + option bounds. Wide enough for a Claude Code
+// AskUserQuestion on a phone: ~40 columns wrap each option description over
+// many rows, which pushed `1.` out of the old 15-row window (no chips).
 const _promptDebounce = Duration(milliseconds: 500);
-const _promptBufferScanLines = 20;
-const _promptOptionScanLines = 15;
-const _promptMaxOptions = 5;
+const _promptBufferScanLines = 80;
+const _promptOptionScanLines = 70;
+const _promptMaxOptions = 9;
 const _promptMinOptions = 2;
 
 /// Terminal font bounds (web Shell zoom 9–24px) and the Ctrl+0 reset size.
@@ -809,9 +811,18 @@ class TerminalController extends Notifier<TerminalState> {
     final scanStart = max(0, lastRow - _promptBufferScanLines);
     if (scanEnd <= scanStart) return;
 
-    final lines = [
-      for (var i = scanStart; i <= scanEnd; i++) buffer.lines[i].getText().trimRight(),
-    ];
+    // Rows the terminal soft-wrapped (a long option on a phone) join their
+    // line, so a chip carries the whole label rather than its first row.
+    final rows = <String>[];
+    for (var i = scanStart; i <= scanEnd; i++) {
+      final line = buffer.lines[i];
+      if (line.isWrapped && rows.isNotEmpty) {
+        rows.last += line.getText();
+      } else {
+        rows.add(line.getText());
+      }
+    }
+    final lines = [for (final row in rows) row.trimRight()];
 
     var footerIdx = -1;
     for (var i = lines.length - 1; i >= 0; i--) {
@@ -836,6 +847,9 @@ class TerminalController extends Notifier<TerminalState> {
       if (int.parse(num) <= _promptMaxOptions && label.isNotEmpty && !optMap.containsKey(num)) {
         optMap[num] = label;
       }
+      // Options read top-down from `1.`: anything above it (a numbered list
+      // in the agent's reply) is not part of this prompt.
+      if (num == '1') break;
     }
 
     final options = <CliPromptOption>[];
