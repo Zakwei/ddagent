@@ -10,6 +10,18 @@ function httpResponse(status: number, body: string): QuotaHttpResponse {
   return { status, buffer: Buffer.from(body, 'utf8'), text: body };
 }
 
+/**
+ * The test process's env without the config-dir overrides of the CLIs: a run
+ * inside an agent session (CLAUDE_CONFIG_DIR set) would otherwise read that
+ * session's real credentials instead of the in-memory files.
+ */
+function hostEnv(): NodeJS.ProcessEnv {
+  const env = { ...process.env };
+  delete env.CLAUDE_CONFIG_DIR;
+  delete env.CODEX_HOME;
+  return env;
+}
+
 /** Builds a provider set reading from an in-memory file map with a stub HTTP. */
 function buildProviders(
   files: Record<string, string>,
@@ -17,7 +29,7 @@ function buildProviders(
 ) {
   return createQuotaProviders({
     homeDirectory: '/home/test',
-    env: { ...process.env, HOME: '/home/test' },
+    env: { ...hostEnv(), HOME: '/home/test' },
     readTextFile: (filePath) => files[filePath] ?? null,
     request: async (url) => respond(url),
   });
@@ -268,7 +280,7 @@ test('Cursor maps plan and on-demand usage into monthly windows', async () => {
     homeDirectory: '/home/test',
     // Pin the config root: the Cursor adapter honors XDG_CONFIG_HOME, and an
     // inherited value on the runner would point it away from the fake auth file.
-    env: { ...process.env, HOME: '/home/test', XDG_CONFIG_HOME: '/home/test/.config' },
+    env: { ...hostEnv(), HOME: '/home/test', XDG_CONFIG_HOME: '/home/test/.config' },
     readTextFile: (filePath) =>
       filePath === '/home/test/.config/cursor/auth.json' ? JSON.stringify({ accessToken: jwt }) : null,
     request: async (url, options) => {
@@ -314,7 +326,7 @@ test('Antigravity refreshes an expired access token and persists the new one', a
   const written: Record<string, string> = {};
   const providers = createQuotaProviders({
     homeDirectory: '/home/test',
-    env: { ...process.env, HOME: '/home/test' },
+    env: { ...hostEnv(), HOME: '/home/test' },
     readTextFile: (filePath) =>
       filePath === '/home/test/.gemini/antigravity-cli/antigravity-oauth-token'
         ? JSON.stringify({
@@ -379,7 +391,7 @@ test('a provider_accounts row loads under its own env overrides as a separate ac
   const providers = createQuotaProviders(
     {
       homeDirectory: '/home/test',
-      env: { ...process.env, HOME: '/home/test' },
+      env: { ...hostEnv(), HOME: '/home/test' },
       readTextFile: (filePath) =>
         filePath === '/acc/home/.gemini/antigravity-cli/antigravity-oauth-token'
           ? JSON.stringify({
@@ -423,7 +435,7 @@ test('a provider_accounts row loads under its own env overrides as a separate ac
 test('Codex maps ChatGPT windows and uses the workspace header', async () => {
   const providers = createQuotaProviders({
     homeDirectory: '/home/test',
-    env: { ...process.env, HOME: '/home/test' },
+    env: { ...hostEnv(), HOME: '/home/test' },
     readTextFile: (path) => path.endsWith('/.codex/auth.json')
       ? JSON.stringify({ tokens: {
           access_token: 'native-token',
@@ -464,7 +476,7 @@ test('Codex API-key accounts are inactive and make no subscription request', asy
 test('Claude maps session, weekly and model-specific windows without inventing null limits', async () => {
   const providers = createQuotaProviders({
     homeDirectory: '/home/test',
-    env: { ...process.env, HOME: '/home/test' },
+    env: { ...hostEnv(), HOME: '/home/test' },
     readTextFile: (path) => path === '/home/test/.claude.json'
       ? JSON.stringify({ oauthAccount: { emailAddress: 'claude@example.com' } })
       : path.endsWith('/.claude/.credentials.json')
