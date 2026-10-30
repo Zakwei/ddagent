@@ -79,4 +79,12 @@ void main() {
     final t = term(10, 3)..write('0123456789\x1b[5G\x1b[1K');
     expect(row(t, 0), '     56789');
   });
+
+  test('cursor position reports are 1-based', () {
+    final sent = <String>[];
+    term(20, 5)
+      ..onOutput = sent.add
+      ..write('\x1b[3;7H\x1b[6n');
+    expect(sent, ['\x1b[3;7R']);
+  });
 }

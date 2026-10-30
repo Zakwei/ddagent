@@ -10,7 +10,9 @@ void main() {
     TerminalMouseButtonState state = TerminalMouseButtonState.down,
   }) {
     String? out;
+    // Large enough that the cell below is on screen (rows past it clamp).
     final terminal = Terminal(mouseHandler: XtermMouseHandler()..middleDown = middleDown)
+      ..resize(120, 40)
       ..onOutput = ((data) => out = data)
       ..write(modes);
     terminal.mouseInput(button, state, const CellOffset(76, 25));

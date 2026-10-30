@@ -330,15 +330,20 @@ class Terminal with Observable implements TerminalState, EscapeHandler {
   }
 
   // Handle a mouse event and return true if it was handled.
+  ///
+  /// [position] is a buffer cell (what the view hit-tests); the program is
+  /// told the screen cell — with scrollback above, the buffer row reported a
+  /// click on the top line as row 164 (ddagent change).
   bool mouseInput(
     TerminalMouseButton button,
     TerminalMouseButtonState buttonState,
     CellOffset position,
   ) {
+    final screenRow = (position.y - _buffer.scrollBack).clamp(0, viewHeight - 1);
     final output = mouseHandler?.call(TerminalMouseEvent(
       button: button,
       buttonState: buttonState,
-      position: position,
+      position: CellOffset(position.x, screenRow),
       state: this,
       platform: platform,
     ));
@@ -554,7 +559,9 @@ class Terminal with Observable implements TerminalState, EscapeHandler {
 
   @override
   void sendCursorPosition() {
-    onOutput?.call(_emitter.cursorPosition(_buffer.cursorX, _buffer.cursorY));
+    // CPR is 1-based (ddagent change: `ESC[0;0R` put inline TUIs one off).
+    onOutput?.call(
+        _emitter.cursorPosition(_buffer.cursorX + 1, _buffer.cursorY + 1));
   }
 
   @override

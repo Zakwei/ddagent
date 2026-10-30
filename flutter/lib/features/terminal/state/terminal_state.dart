@@ -31,6 +31,14 @@ typedef CliPromptOption = ({String number, String label});
 // many rows, which pushed `1.` out of the old 15-row window (no chips).
 const _promptDebounce = Duration(milliseconds: 500);
 
+/// Output the emulator generates itself: SGR / X10 mouse reports, focus
+/// in/out, cursor-position, device-attribute and status replies, DCS / OSC
+/// answers.
+final _emulatorReport = RegExp(
+  r'^(?:\x1b\[<[\d;]+[Mm]|\x1b\[M[\s\S]{3}|\x1b\[[IO]|\x1b\[\d+;\d+R'
+  r'|\x1b\[[?>][\d;]*c|\x1b\[\d*n|\x1bP[\s\S]*?\x1b\\|\x1b\][\s\S]*?(?:\x07|\x1b\\))+$',
+);
+
 /// How the server starts a full repaint (`REPLAY_CLEAR_SEQUENCE`).
 const _fullRepaintPrefix = '\x1b[2J\x1b[3J\x1b[H';
 const _promptBufferScanLines = 80;
@@ -473,6 +481,10 @@ class TerminalController extends Notifier<TerminalState> {
     // here too, so the key bar's latched Ctrl/Alt is applied on this path.
     terminal.onOutput = (data) {
       if (tab.replaying) return;
+      // The emulator's own reports (mouse, focus, query replies) are not
+      // keys: they must neither use up a latched Ctrl/Shift nor count as the
+      // user typing (which clears the bell).
+      if (_emulatorReport.hasMatch(data)) return channel.input(data);
       _noteInput(tab);
       channel.input(_consumeLatchedModifiers(data));
     };

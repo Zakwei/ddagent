@@ -67,6 +67,10 @@ class _TerminalGestureHandlerState extends State<TerminalGestureHandler> {
   /// saw a press that never ended.
   Offset? _reportedPress;
 
+  /// The left press was released by [onDragCancel]; the tap-up that follows
+  /// must not release it again.
+  bool _pressReleasedByCancel = false;
+
   /// Last cell a drag was reported at — one report per cell, not per pixel.
   CellOffset? _reportedDragCell;
 
@@ -74,7 +78,6 @@ class _TerminalGestureHandlerState extends State<TerminalGestureHandler> {
   Widget build(BuildContext context) {
     return TerminalGestureDetector(
       child: widget.child,
-      onTapUp: widget.onTapUp,
       onSingleTapUp: onSingleTapUp,
       onTapDown: onTapDown,
       onSecondaryTapDown: onSecondaryTapDown,
@@ -108,6 +111,7 @@ class _TerminalGestureHandlerState extends State<TerminalGestureHandler> {
     TerminalMouseButton button, {
     bool forceCallback = false,
   }) {
+    if (button == TerminalMouseButton.left) _pressReleasedByCancel = false;
     // Check if the terminal should and can handle the tap down event.
     var handled = false;
     if (_shouldSendTapEvent && !_isTouch(details.kind)) {
@@ -134,7 +138,11 @@ class _TerminalGestureHandlerState extends State<TerminalGestureHandler> {
   }) {
     // Check if the terminal should and can handle the tap up event.
     var handled = false;
-    if (_shouldSendTapEvent) {
+    if (button == TerminalMouseButton.left && _pressReleasedByCancel) {
+      // A slow click's press was released when its drag was cancelled.
+      _pressReleasedByCancel = false;
+      handled = true;
+    } else if (_shouldSendTapEvent) {
       if (_isTouch(details.kind)) {
         renderTerminal.mouseEvent(
           button,
@@ -178,8 +186,20 @@ class _TerminalGestureHandlerState extends State<TerminalGestureHandler> {
     );
   }
 
+  /// Also runs the view's [onTapUp] (links, the soft keyboard after a finger
+  /// tap): it sat in a detector slot nothing calls (ddagent change). A
+  /// finger tap always reaches it — the keyboard must open even while the
+  /// program tracks the mouse.
   void onSingleTapUp(TapUpDetails details) {
-    _tapUp(widget.onSingleTapUp, details, TerminalMouseButton.left);
+    _tapUp(
+      (details) {
+        widget.onSingleTapUp?.call(details);
+        widget.onTapUp?.call(details);
+      },
+      details,
+      TerminalMouseButton.left,
+      forceCallback: _isTouch(details.kind),
+    );
   }
 
   void onSecondaryTapDown(TapDownDetails details) {
@@ -256,11 +276,18 @@ class _TerminalGestureHandlerState extends State<TerminalGestureHandler> {
   }
 
   void onDragEnd(DragEndDetails details) {
+    _lastDragStartDetails = null;
     _releaseReportedPress(details.localPosition);
   }
 
+  /// A press held still past the drag slop cancels the drag, then completes
+  /// as a tap: release once, where it was pressed — a previous drag's stale
+  /// start sent a second release at another cell (ddagent change).
   void onDragCancel() {
-    final last = _lastDragStartDetails?.localPosition ?? _reportedPress;
-    if (last != null) _releaseReportedPress(last);
+    _lastDragStartDetails = null;
+    final pressed = _reportedPress;
+    if (pressed == null) return;
+    _releaseReportedPress(pressed);
+    _pressReleasedByCancel = true;
   }
 }

@@ -240,12 +240,16 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
           if (p.id != widget.maximizedPaneId)
             Positioned.fill(
               child: Offstage(
-                child: _tile(
-                  p,
-                  panes.indexOf(p),
-                  single: false,
-                  tabMode: false,
-                  maximizeActive: true,
+                // A hidden pane must not take focus: its terminal autofocuses
+                // when (re)built, and keys then went into a shell off screen.
+                child: ExcludeFocus(
+                  child: _tile(
+                    p,
+                    panes.indexOf(p),
+                    single: false,
+                    tabMode: false,
+                    maximizeActive: true,
+                  ),
                 ),
               ),
             ),

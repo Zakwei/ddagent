@@ -175,4 +175,61 @@ void main() {
     expect(sent.where((s) => s.startsWith('\x1b[<0;')), isEmpty, reason: '$sent');
     expect(wheelUps(sent), isNotEmpty);
   });
+
+  group('clicks', () {
+    const tracking = '\x1b[?1000h\x1b[?1002h\x1b[?1006h';
+    List<String> reports(List<String> sent) => [
+      for (final s in sent)
+        if (s.startsWith('\x1b[<')) s,
+    ];
+
+    testWidgets('a click on the top row with scrollback above reports row 1', (tester) async {
+      final (_, sent, _) = await pumpTerminal(tester, modes: tracking, lines: 200);
+      final view = tester.getRect(find.byType(TerminalView));
+      await tester.tapAt(view.topLeft + const Offset(20, 12));
+      await tester.pumpAndSettle();
+      expect(reports(sent).first, matches(RegExp(r'^\x1b\[<0;\d+;1M$')));
+      await tester.pump(kDoubleTapTimeout);
+    });
+
+    testWidgets('a slow click after a drag releases once, where it was pressed', (tester) async {
+      final (_, sent, _) = await pumpTerminal(tester, modes: tracking);
+      final center = tester.getCenter(find.byType(TerminalView));
+      await tester.dragFrom(
+        center - const Offset(100, 60),
+        const Offset(80, 0),
+        kind: PointerDeviceKind.mouse,
+      );
+      await tester.pumpAndSettle();
+      sent.clear();
+
+      final gesture = await tester.startGesture(center, kind: PointerDeviceKind.mouse);
+      await tester.pump(const Duration(milliseconds: 300));
+      await gesture.up();
+      await tester.pumpAndSettle();
+      final out = reports(sent);
+      expect(out, hasLength(2));
+      expect(out.last, out.first.replaceFirst(RegExp(r'M$'), 'm'));
+      await tester.pump(kDoubleTapTimeout);
+    });
+
+    testWidgets("the view's onTapUp runs for a click and for a finger tap", (tester) async {
+      final terminal = Terminal(mouseHandler: XtermMouseHandler());
+      final kinds = <PointerDeviceKind?>[];
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(body: TerminalView(terminal, onTapUp: (d, _) => kinds.add(d.kind))),
+        ),
+      );
+      await tester.pump();
+      final center = tester.getCenter(find.byType(TerminalView));
+      await tester.tapAt(center, kind: PointerDeviceKind.mouse);
+      await tester.pump(kDoubleTapTimeout);
+      terminal.write(tracking);
+      await tester.tapAt(center, kind: PointerDeviceKind.touch);
+      await tester.pumpAndSettle();
+      expect(kinds, [PointerDeviceKind.mouse, PointerDeviceKind.touch]);
+      await tester.pump(kDoubleTapTimeout);
+    });
+  });
 }

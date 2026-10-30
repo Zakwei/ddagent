@@ -3,7 +3,8 @@
 // act on one row only, a moved tab stays live, closed panes take their tabs
 // along, synced rows are per host, and the bell / ask flags.
 import 'package:ddagent_app/features/terminal/state/terminal_state.dart';
-import 'package:ddagent_app/features/workspace/state/split_workspace.dart' show maxSyncedTerminalTabs;
+import 'package:ddagent_app/features/workspace/state/split_workspace.dart'
+    show maxSyncedTerminalTabs;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -188,6 +189,16 @@ void main() {
       expect(shells.of(b).inputs.last, '\x03');
       ctrl().sendInput(a.id, 'c');
       expect(shells.of(a).inputs.last, 'c', reason: 'released after one chord');
+    });
+
+    test("the emulator's own reports keep a latched modifier armed", () async {
+      final a = await open('pane-a');
+      ctrl().toggleLatchedModifier(LatchedModifier.ctrl);
+      a.terminal.onOutput!('\x1b[<0;5;3M');
+      a.terminal.onOutput!('\x1b[I');
+      a.terminal.onOutput!('\x1b[2;1R');
+      ctrl().sendInput(a.id, 'c');
+      expect(shells.of(a).inputs, ['\x1b[<0;5;3M', '\x1b[I', '\x1b[2;1R', '\x03']);
     });
   });
 
