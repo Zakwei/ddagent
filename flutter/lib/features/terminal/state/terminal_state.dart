@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:ddagent_app/core/realtime/realtime_providers.dart';
 import 'package:ddagent_app/core/realtime/shell_channel.dart';
+import 'package:ddagent_app/core/realtime/ws_client.dart';
 import 'package:ddagent_app/core/utils/clipboard.dart';
 import 'package:ddagent_app/features/terminal/state/terminal_key_handler.dart';
 import 'package:ddagent_app/features/terminal/state/terminal_mouse_handler.dart';
@@ -29,6 +30,9 @@ typedef CliPromptOption = ({String number, String label});
 // AskUserQuestion on a phone: ~40 columns wrap each option description over
 // many rows, which pushed `1.` out of the old 15-row window (no chips).
 const _promptDebounce = Duration(milliseconds: 500);
+
+/// How the server starts a full repaint (`REPLAY_CLEAR_SEQUENCE`).
+const _fullRepaintPrefix = '\x1b[2J\x1b[3J\x1b[H';
 const _promptBufferScanLines = 80;
 const _promptOptionScanLines = 70;
 const _promptMaxOptions = 9;
@@ -158,6 +162,11 @@ class TerminalTab {
   /// already handled live; re-sending would type "1;2c" into the shell.
   bool replaying = false;
 
+  /// True while output already seen before is written (a reattach's
+  /// replay) — unlike [replaying], not for another device's live output, so
+  /// a bell there still marks the tab.
+  bool replayingHistory = false;
+
   /// The PTY run this tab shows and how far into its output — sent back on a
   /// reattach so the server replays only what was missed and the scrollback
   /// survives (a full replay starts with a clear).
@@ -200,6 +209,11 @@ class TerminalTab {
   /// and must not bring the banner back.
   final Set<String> dismissedAuthUrls = {};
   StreamSubscription<ShellFrame>? subscription;
+  StreamSubscription<WsState>? socketStates;
+
+  /// Pending switch to "connecting" while the socket stays down — a short
+  /// drop keeps the terminal usable (keys typed meanwhile are queued).
+  Timer? reconnectingTimer;
 
   /// Drops the keyboard-protocol negotiation sequences xterm.dart misreads
   /// (see [TerminalOutputFilter]); carries split escapes across frames.
@@ -229,6 +243,10 @@ class TerminalTab {
     initGraceTimer = null;
     subscription?.cancel();
     subscription = null;
+    socketStates?.cancel();
+    socketStates = null;
+    reconnectingTimer?.cancel();
+    reconnectingTimer = null;
     channel.dispose();
   }
 
@@ -369,6 +387,7 @@ class TerminalController extends Notifier<TerminalState> {
   /// How long a tab created in the background may wait for its first layout
   /// before the PTY is spawned at the 80×24 default anyway.
   static const _initGracePeriod = Duration(milliseconds: 400);
+  static const _reconnectingGrace = Duration(seconds: 3);
 
   TerminalTab createTab({
     String? title,
@@ -518,6 +537,25 @@ class TerminalController extends Notifier<TerminalState> {
       },
     );
 
+    // A socket that stays down shows on the tab instead of a live-looking
+    // terminal that silently queues or drops keys; the reattach's `stream`
+    // frame marks it connected again.
+    tab.socketStates = channel.states.listen((socketState) {
+      if (socketState == WsState.open || socketState == WsState.closed) {
+        tab.reconnectingTimer?.cancel();
+        tab.reconnectingTimer = null;
+        return;
+      }
+      tab.reconnectingTimer ??= Timer(_reconnectingGrace, () {
+        tab.reconnectingTimer = null;
+        if (!_activeTabs.contains(tab) || channel.isOpen) return;
+        if (tab.status != TerminalTabStatus.connected) return;
+        tab.status = TerminalTabStatus.connecting;
+        _clearPrompt(tab);
+        _notifyTabsChanged();
+      });
+    });
+
     // Open the socket now (`init` only stores its frame until the WS is
     // open, so the order does not matter); spawn with a known size right
     // away, otherwise at first layout — or after the grace period.
@@ -556,7 +594,7 @@ class TerminalController extends Notifier<TerminalState> {
   static const _bellInputGrace = Duration(milliseconds: 1500);
 
   void _ringBell(TerminalTab tab) {
-    if (tab.replaying || tab.bell || !_activeTabs.contains(tab)) return;
+    if (tab.replayingHistory || tab.bell || !_activeTabs.contains(tab)) return;
     final typed = tab.lastInputAt;
     if (typed != null && DateTime.now().difference(typed) < _bellInputGrace) return;
     tab.bell = true;
@@ -639,8 +677,15 @@ class TerminalController extends Notifier<TerminalState> {
   /// as they are — buffer, socket and zoom untouched. Command tabs stay.
   void applySyncedRow(String hostId, TerminalHostSpec row) {
     final wanted = {for (final spec in row.tabs) spec.id};
+    // Tabs past the synced cap were never published, so no row names them:
+    // closing them dropped the tab and orphaned its PTY.
+    final unpublished = [
+      for (final tab
+          in state.tabsFor(hostId).where((t) => !t.isCommandMode).skip(maxSyncedTerminalTabs))
+        if (!wanted.contains(tab.syncId)) tab,
+    ];
     for (final tab in state.tabsFor(hostId)) {
-      if (!tab.isCommandMode && !wanted.contains(tab.syncId)) {
+      if (!tab.isCommandMode && !wanted.contains(tab.syncId) && !unpublished.contains(tab)) {
         closeTab(tab.id, keepSession: true);
       }
     }
@@ -670,6 +715,7 @@ class TerminalController extends Notifier<TerminalState> {
     // The row's order; command tabs follow it, other hosts keep their slots.
     final keep = [
       for (final spec in row.tabs) local[spec.id]!,
+      ...unpublished,
       for (final tab in state.tabsFor(hostId))
         if (tab.isCommandMode) tab,
     ];
@@ -704,6 +750,7 @@ class TerminalController extends Notifier<TerminalState> {
       if (frame.streamId != tab.streamId) {
         tab.streamId = frame.streamId;
         tab.seenEnd = 0;
+        tab.outputFilter.reset();
       }
       // A reattach that missed nothing sends no output to mark it connected.
       if (tab.status != TerminalTabStatus.connected && !tab.isCompleted) {
@@ -717,9 +764,13 @@ class TerminalController extends Notifier<TerminalState> {
     if (frame.isOutput) {
       final end = frame.end;
       if (end != null) tab.seenEnd = end;
+      // A full repaint never continues a sequence cut off before it.
+      if (frame.isReplay && frame.output.startsWith(_fullRepaintPrefix)) tab.outputFilter.reset();
       tab.replaying = frame.isReplay;
+      tab.replayingHistory = frame.isReplay && !frame.isLive;
       tab.terminal.write(tab.outputFilter.feed(frame.output));
       tab.replaying = false;
+      tab.replayingHistory = false;
       // Answer the colour / mode probes the emulator cannot (theme detection
       // in OpenCode, Codex, Claude Code) — live ones only.
       final queries = tab.outputFilter.takeQueries();
@@ -736,10 +787,12 @@ class TerminalController extends Notifier<TerminalState> {
 
       final legacyExit = frame.isReplay ? null : _legacyExitLineRegex.firstMatch(frame.output);
       final code = frame.exitCode ?? int.tryParse(legacyExit?.group(1) ?? '');
-      if (code != null) {
+      if (code != null && !tab.isCompleted) {
         tab.isCompleted = true;
         tab.exitCode = code;
         tab.status = TerminalTabStatus.exited;
+        // A reconnect must not spawn the finished command again.
+        tab.channel.stopReattaching();
         tab.onComplete?.call(code);
       }
       _schedulePromptScan(tab);
@@ -1142,6 +1195,7 @@ class TerminalController extends Notifier<TerminalState> {
     if (tabIndex == -1) return;
     final tab = state.tabs[tabIndex];
     tab.terminal.write('\x1b[2J\x1b[3J\x1b[H');
+    tab.outputFilter.reset();
     tab.isCompleted = false;
     tab.exitCode = null;
     tab.promptOptions = null;

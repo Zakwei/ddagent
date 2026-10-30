@@ -21,6 +21,11 @@ class ShellFrame {
   /// (and its terminal queries already answered) when it was live.
   bool get isReplay => raw['replay'] == true;
 
+  /// Set with [isReplay] on live output sent to a device that does not own
+  /// the PTY: not to answer its queries, but new output all the same (a
+  /// bell in it still marks the tab).
+  bool get isLive => raw['live'] == true;
+
   /// Stream offset this output frame ends at (absent on banners and older
   /// servers) — what a reattach reports back as `seen`.
   int? get end => raw['end'] as int?;
@@ -205,12 +210,23 @@ class ShellChannel {
 
   /// Connect CTA: re-opens a socket the user disconnected, or retries a
   /// dropped one right away. Either way `start()` re-sends init to reattach.
+  /// An open socket whose PTY failed to start (the server answered `init`
+  /// with an error and kept the socket) is asked again — a ping alone would
+  /// leave the tab on "Connecting…" for good.
   void reconnect() {
     if (_ws.state == WsState.closed) {
       unawaited(_ws.connect());
-    } else {
-      wake();
+      return;
     }
+    if (_ws.state == WsState.open && _initFrame != null) _sendInit();
+    wake();
+  }
+
+  /// The run ended: a reconnect no longer re-sends `init`, which would spawn
+  /// the command again. [init] (Restart) arms it anew.
+  void stopReattaching() {
+    _initFrame = null;
+    _pendingInput.clear();
   }
 
   Future<void> connect() => _ws.connect();

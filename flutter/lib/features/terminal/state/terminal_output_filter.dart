@@ -110,6 +110,14 @@ class TerminalOutputFilter {
   }
 
   /// Queries intercepted by the last [feed] calls; cleared on read.
+  /// Drops a sequence held back from the previous output: a new run or a full
+  /// repaint never continues it, and a stale open OSC/DCS would swallow the
+  /// whole new screen up to the next terminator.
+  void reset() {
+    _pending = '';
+    _queries.clear();
+  }
+
   List<TerminalQuery> takeQueries() {
     final out = List<TerminalQuery>.unmodifiable(_queries);
     _queries.clear();

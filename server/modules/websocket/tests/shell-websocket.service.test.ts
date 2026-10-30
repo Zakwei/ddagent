@@ -360,7 +360,7 @@ test('every device viewing a PTY gets its output; only the one in charge answers
 
   // The phone attached last — it is in charge until the desktop types.
   assert.deepEqual(lastFrame(phone), { type: 'output', data: '\x1b[c', end: 3 });
-  assert.deepEqual(lastFrame(desktop), { type: 'output', data: '\x1b[c', end: 3, replay: true });
+  assert.deepEqual(lastFrame(desktop), { type: 'output', data: '\x1b[c', end: 3, replay: true, live: true });
 
   desktop.emit('message', JSON.stringify({ type: 'input', data: 'ls\r' }));
   pty.emitData('live');

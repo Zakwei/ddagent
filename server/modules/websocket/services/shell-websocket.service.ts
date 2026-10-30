@@ -311,7 +311,10 @@ function deliverOutput(
     const end = session.outputEnd;
     sendIfOpen(
       socket,
-      socket === session.owner ? { type: 'output', data, end } : { type: 'output', data, end, replay: true }
+      socket === session.owner
+        ? { type: 'output', data, end }
+        : // `live`: new output all the same — a bell in it marks the tab there.
+          { type: 'output', data, end, replay: true, live: true }
     );
   } else if (sentEnd < bufferStart(session)) {
     sendReplayWindow(socket, session);

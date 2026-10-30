@@ -3,6 +3,7 @@
 // act on one row only, a moved tab stays live, closed panes take their tabs
 // along, synced rows are per host, and the bell / ask flags.
 import 'package:ddagent_app/features/terminal/state/terminal_state.dart';
+import 'package:ddagent_app/features/workspace/state/split_workspace.dart' show maxSyncedTerminalTabs;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -386,5 +387,89 @@ void main() {
     ctrl().answerPrompt(a.id, '2');
     expect(shells.of(a).inputs.last, '2');
     expect(a.promptOptions, isNull);
+  });
+
+  group('connection and run lifecycle', () {
+    test('Connect after a start error asks the server again', () async {
+      final tab = ctrl().createTab(projectPath: '/gone', hostId: 'pane-a', cols: 100, rows: 30);
+      shells.of(tab).emit({'type': 'error', 'message': 'Invalid project path'});
+      await flush();
+      expect(tab.status, TerminalTabStatus.disconnected);
+
+      shells.of(tab).sent.clear();
+      ctrl().reconnectTab(tab.id);
+      expect(shells.of(tab).inits, hasLength(1));
+    });
+
+    test('a finished run is reported once and not spawned again on reconnect', () async {
+      final codes = <int>[];
+      final tab = ctrl().createTab(
+        projectPath: '/work/a',
+        hostId: 'pane-a',
+        initialCommand: 'npm i -g foo',
+        onComplete: codes.add,
+        cols: 100,
+        rows: 30,
+      );
+      shells.of(tab).output('done\r\n', exitCode: 0);
+      await flush();
+      shells.of(tab).output('again\r\n', exitCode: 0);
+      await flush();
+      expect(codes, [0]);
+
+      shells.of(tab).sent.clear();
+      shells.of(tab).drop();
+      await shells.of(tab).connect();
+      await flush();
+      expect(shells.of(tab).inits, isEmpty);
+
+      ctrl().restartTab(tab.id);
+      expect(shells.of(tab).inits.single['forceRestart'], isTrue);
+    });
+
+    test("a bell in another device's live output still marks the tab", () async {
+      final a = await open('pane-a');
+      shells.of(a).emit({'type': 'output', 'data': '\x07', 'replay': true, 'live': true});
+      await flush();
+      expect(a.bell, isTrue);
+    });
+
+    test('a new run does not continue a sequence cut off in the old one', () async {
+      final a = await open('pane-a');
+      shells.of(a).emit({'type': 'stream', 'id': 'run-1'});
+      shells.of(a).output('\x1b]0;my ti');
+      await flush();
+      shells.of(a).emit({'type': 'stream', 'id': 'run-2'});
+      shells.of(a).output('fresh prompt');
+      await flush();
+      expect(ctrl().copyOutputText(a.id), contains('fresh prompt'));
+    });
+
+    test('a socket down for a while shows as connecting until the reattach', () async {
+      final a = await open('pane-a');
+      shells.of(a).drop();
+      await Future<void>.delayed(const Duration(milliseconds: 3200));
+      expect(a.status, TerminalTabStatus.connecting);
+
+      await shells.of(a).connect();
+      shells.of(a).emit({'type': 'stream', 'id': 'run-1'});
+      await flush();
+      expect(a.status, TerminalTabStatus.connected);
+    });
+
+    test('tabs past the synced cap survive a row from another device', () async {
+      final tabs = [
+        for (var i = 0; i <= maxSyncedTerminalTabs; i++) await open('pane-a', title: 't$i'),
+      ];
+      final row = ctrl().syncedRowFor('pane-a');
+      expect(row.tabs, hasLength(maxSyncedTerminalTabs));
+
+      ctrl().applySyncedRow(
+        'pane-a',
+        TerminalHostSpec(tabs: row.tabs, activeTabId: row.tabs.first.id),
+      );
+      expect(state().tabsFor('pane-a'), tabs);
+      expect(shells.of(tabs.last).terminated, isFalse);
+    });
   });
 }
