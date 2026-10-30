@@ -392,7 +392,7 @@ test('a second device attaching does not resize the shell; typing on a device do
 });
 
 test('a device the user looks at claims the shell size without typing', () => {
-  const { pty, resizes, writes, desktop, phone, lastFrame } = attachTwoViewers('claim');
+  const { pty, resizes, writes, desktop, phone, init, lastFrame } = attachTwoViewers('claim');
   resizes.length = 0;
   desktop.emit('message', JSON.stringify({ type: 'resize', cols: 190, rows: 48 }));
 
@@ -407,6 +407,11 @@ test('a device the user looks at claims the shell size without typing', () => {
   desktop.emit('message', JSON.stringify({ type: 'claim' }));
   phone.emit('message', JSON.stringify({ type: 'claim' }));
   assert.deepEqual(resizes, [[190, 48], [80, 24]]);
+
+  // A shown tab reattaching sends its claim right behind the init.
+  desktop.emit('message', init(150, 40));
+  desktop.emit('message', JSON.stringify({ type: 'claim' }));
+  assert.deepEqual(resizes.at(-1), [150, 40]);
 
   pty.emitExit();
 });

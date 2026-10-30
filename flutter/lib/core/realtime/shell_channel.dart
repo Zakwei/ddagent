@@ -124,6 +124,7 @@ class ShellChannel {
     _ws.send({...frame, ...?reattach});
     _initSent = true;
     _initFrame = {..._initFrame!, 'forceRestart': false};
+    // The server attaches a reattaching socket before it reads the next frame.
     if (views > 0) _ws.send({'type': 'claim'});
     if (_pendingInput.isNotEmpty) {
       _ws.send({'type': 'input', 'data': _pendingInput.toString()});
