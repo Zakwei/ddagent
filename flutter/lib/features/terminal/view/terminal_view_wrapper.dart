@@ -115,6 +115,12 @@ class TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
       hitColor: palette.theme.searchHitBackground,
       currentHitColor: palette.theme.searchHitBackgroundCurrent,
     )..addListener(_onSearchChanged);
+    // A shown tab takes the PTY's size, laid out first so the claim carries
+    // this pane's size ([ShellChannel.claim]).
+    widget.tab.channel.views++;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) widget.tab.channel.claim();
+    });
     // Back on a tab scrolled into its history: the fresh pane would show the bottom.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final fromBottom = widget.tab.scrollFromBottom;
@@ -145,6 +151,7 @@ class TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
 
   @override
   void dispose() {
+    widget.tab.channel.views--;
     widget.tab.terminal.removeListener(_reportFocus);
     HardwareKeyboard.instance.removeHandler(_trackModifiers);
     _search
@@ -553,6 +560,7 @@ class TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
   bool get _softKeyboardOpen => View.of(context).viewInsets.bottom > 0;
 
   void _onPointerDown(PointerDownEvent event) {
+    widget.tab.channel.claim();
     if (event.kind != _lastPointerKind) setState(() => _lastPointerKind = event.kind);
     final mouse = widget.tab.terminal.mouseHandler;
     if (mouse is XtermMouseHandler) mouse.middleDown = event.buttons == kMiddleMouseButton;

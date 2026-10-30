@@ -391,6 +391,26 @@ test('a second device attaching does not resize the shell; typing on a device do
   pty.emitExit();
 });
 
+test('a device the user looks at claims the shell size without typing', () => {
+  const { pty, resizes, writes, desktop, phone, lastFrame } = attachTwoViewers('claim');
+  resizes.length = 0;
+  desktop.emit('message', JSON.stringify({ type: 'resize', cols: 190, rows: 48 }));
+
+  desktop.emit('message', JSON.stringify({ type: 'claim' }));
+  assert.deepEqual(resizes, [[190, 48]]);
+  assert.deepEqual(writes, []);
+  pty.emitData('live');
+  assert.equal(lastFrame(desktop).replay, undefined);
+  assert.equal(lastFrame(phone).replay, true);
+
+  // A repeated claim at the same size does not reflow the shell.
+  desktop.emit('message', JSON.stringify({ type: 'claim' }));
+  phone.emit('message', JSON.stringify({ type: 'claim' }));
+  assert.deepEqual(resizes, [[190, 48], [80, 24]]);
+
+  pty.emitExit();
+});
+
 test('a ping is answered with a pong', () => {
   const { pty, first, parsed } = startStream('ping');
   first.emit('message', JSON.stringify({ type: 'ping' }));

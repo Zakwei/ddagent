@@ -37,7 +37,7 @@ class ShellFrame {
 
 /// `/shell` PTY channel (Task 6.5).
 ///
-/// Inbound:  init | input {data} | resize {cols, rows} | terminate | ping
+/// Inbound:  init | input {data} | resize {cols, rows} | claim | terminate | ping
 /// Outbound: stream {id} | output {data: ANSI, end?, exitCode?}
 ///           | auth_url {url, autoOpen} | error {message} | pong
 ///
@@ -73,6 +73,11 @@ class ShellChannel {
   /// Fields merged into every re-sent `init` that does not restart the PTY:
   /// the tab's `stream` / `seen` offset and its current `cols` / `rows`.
   Map<String, Object?> Function()? reattachFields;
+
+  /// Panes on this device showing the terminal. While any does, every
+  /// (re)attach also [claim]s: the server applies an attaching viewer's size
+  /// only when no other device views the PTY.
+  int views = 0;
 
   Stream<ShellFrame> get frames => _framesOut.stream;
   Stream<WsState> get states => _ws.states;
@@ -119,6 +124,7 @@ class ShellChannel {
     _ws.send({...frame, ...?reattach});
     _initSent = true;
     _initFrame = {..._initFrame!, 'forceRestart': false};
+    if (views > 0) _ws.send({'type': 'claim'});
     if (_pendingInput.isNotEmpty) {
       _ws.send({'type': 'input', 'data': _pendingInput.toString()});
       _pendingInput.clear();
@@ -158,6 +164,16 @@ class ShellChannel {
   void resize(int cols, int rows) {
     if (_ws.state != WsState.open) return;
     _ws.send({'type': 'resize', 'cols': cols, 'rows': rows});
+  }
+
+  /// The user looks at this terminal on this device: the PTY takes its size
+  /// and it answers the terminal queries, as after a keystroke. Otherwise a
+  /// tab another device typed in last stays drawn for that device's screen —
+  /// cut lines, the live area below the view, clicks on the wrong rows.
+  /// Before the first init the attach itself claims ([views]).
+  void claim() {
+    if (_ws.state != WsState.open || !_initSent) return;
+    _ws.send({'type': 'claim'});
   }
 
   /// The tab was closed: the server kills the PTY for every device. A socket

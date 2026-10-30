@@ -1294,6 +1294,18 @@ export function handleShellConnection(
         return;
       }
 
+      if (data.type === 'claim') {
+        // The user looks at this device now (pane shown, app or window back
+        // in front, a tap): it takes charge as typing does, so the shell is
+        // not drawn for another device's screen until the first keystroke.
+        const session = viewedSession();
+        if (session) {
+          session.owner = ws;
+          applyViewerSize(session, ws);
+        }
+        return;
+      }
+
       if (data.type === 'ping') {
         // The client checks a socket that may have died while it slept.
         sendIfOpen(ws, { type: 'pong' });

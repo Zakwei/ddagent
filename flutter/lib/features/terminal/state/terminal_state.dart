@@ -924,10 +924,13 @@ class TerminalController extends Notifier<TerminalState> {
     _notifyTabsChanged();
   }
 
-  /// App back in the foreground — reconnect the shells that dropped.
+  /// App back in the foreground (on web: the window regained focus) —
+  /// reconnect the shells that dropped; the ones on screen take their PTY's
+  /// size back from the device used meanwhile.
   void onAppResumed() {
     for (final tab in state.tabs) {
       tab.channel.wake();
+      if (tab.channel.views > 0) tab.channel.claim();
     }
   }
 

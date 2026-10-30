@@ -422,6 +422,32 @@ void main() {
       expect(fakeWs.sent.where((f) => f['type'] == 'input'), isEmpty);
     });
 
+    test('a shown tab claims its PTY on resume and on reattach; a hidden one does not', () async {
+      final container = ProviderContainer(
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
+      );
+      addTearDown(container.dispose);
+      final controller = container.read(terminalControllerProvider.notifier);
+      final tab = controller.createTab(projectPath: '/test/proj', cols: 80, rows: 24);
+      await Future<void>.delayed(Duration.zero);
+
+      fakeWs.sent.clear();
+      controller.onAppResumed();
+      expect(fakeWs.sent.map((f) => f['type']), ['ping']);
+
+      tab.channel.views++;
+      fakeWs.sent.clear();
+      controller.onAppResumed();
+      expect(fakeWs.sent.map((f) => f['type']), ['claim']);
+
+      fakeWs.emitState(WsState.reconnecting);
+      tab.channel.claim();
+      fakeWs.sent.clear();
+      fakeWs.emitState(WsState.open);
+      await Future<void>.delayed(Duration.zero);
+      expect(fakeWs.sent.map((f) => f['type']), ['init', 'claim']);
+    });
+
     test('a tab opened in the background starts at the size of the tab on show', () async {
       final container = ProviderContainer(
         overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
