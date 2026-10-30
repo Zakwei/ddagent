@@ -103,6 +103,39 @@ type PtySessionEntry = {
 
 const ptySessionsMap = new Map<string, PtySessionEntry>();
 
+type PtyExit = { exitCode: number; signal?: number | null };
+
+/**
+ * Runs that ended, by PTY key: a device away when its PTY exited reattaches
+ * naming that stream and must see the exit — not respawn the command (a
+ * one-shot install run twice, an agent the user quit resumed on the phone).
+ */
+const exitedStreams = new Map<string, { streamId: string; exit: PtyExit; at: number }>();
+const EXITED_STREAM_TTL_MS = 24 * 60 * 60 * 1000;
+const EXITED_STREAMS_MAX = 500;
+
+function rememberExit(sessionKey: string, streamId: string, exit: PtyExit): void {
+  const now = Date.now();
+  for (const [key, entry] of exitedStreams) {
+    if (now - entry.at > EXITED_STREAM_TTL_MS || exitedStreams.size >= EXITED_STREAMS_MAX) {
+      exitedStreams.delete(key);
+    }
+  }
+  exitedStreams.delete(sessionKey);
+  exitedStreams.set(sessionKey, { streamId, exit, at: now });
+}
+
+/** The exit line every viewer gets; clients act on `exitCode`, not the text. */
+function exitFrame(exit: PtyExit): Record<string, unknown> {
+  return {
+    type: 'output',
+    exitCode: exit.exitCode,
+    data: `\r\n\x1b[33mProcess exited with code ${exit.exitCode}${
+      exit.signal != null ? ` (${exit.signal})` : ''
+    }\x1b[0m\r\n`,
+  };
+}
+
 /** The PTY host daemon connection, when one runs (see startShellPtyHost). */
 let ptyHost: PtyHostClient | null = null;
 
@@ -140,6 +173,19 @@ function appendToReplayBuffer(session: PtySessionEntry, chunk: string): void {
   ) {
     session.bufferChars -= session.buffer.shift()!.length;
   }
+}
+
+/**
+ * Splits an adopted daemon window into replay-frame-sized chunks. Kept whole,
+ * the first new output pushed it over the cap and eviction dropped all of it,
+ * so every later reattach after a server restart lost its scrollback.
+ */
+function splitReplayWindow(window: string): string[] {
+  const chunks: string[] = [];
+  for (let start = 0; start < window.length; start += REPLAY_FRAME_CHARS) {
+    chunks.push(window.slice(start, start + REPLAY_FRAME_CHARS));
+  }
+  return chunks;
 }
 
 /** Stream offset of the oldest output still in the replay window. */
@@ -484,15 +530,19 @@ function wirePtySession(sessionKey: string, spawnedPty: HostedPty): void {
       return;
     }
 
+    // A viewer held back by a full socket would otherwise get the exit line
+    // without the output that explains it: its catch-up dies with the session.
+    for (const socket of session.sockets) {
+      const from = Math.max(session.sentEnds.get(socket) ?? session.outputEnd, bufferStart(session));
+      for (const frame of bufferedFramesSince(session, from)) {
+        sendIfOpen(socket, { type: 'output', data: frame.data, end: frame.end, replay: true });
+      }
+      session.sentEnds.set(socket, session.outputEnd);
+    }
+    rememberExit(sessionKey, session.streamId, exitCode);
     // `exitCode` is what clients act on: the text alone also shows up in
     // a program's own output (an agent transcript quoting it).
-    broadcastFrame(session, {
-      type: 'output',
-      exitCode: exitCode.exitCode,
-      data: `\r\n\x1b[33mProcess exited with code ${exitCode.exitCode}${
-        exitCode.signal != null ? ` (${exitCode.signal})` : ''
-      }\x1b[0m\r\n`,
-    });
+    broadcastFrame(session, exitFrame(exitCode));
 
     disposeSession(session);
     ptySessionsMap.delete(sessionKey);
@@ -527,7 +577,7 @@ function adoptHostedPty(snapshot: PtyHostSnapshot, heldPty: HostedPty, now: numb
     owner: null,
     sizes: new Map(),
     size: { cols: snapshot.cols, rows: snapshot.rows },
-    buffer: snapshot.buffer ? [snapshot.buffer] : [],
+    buffer: splitReplayWindow(snapshot.buffer),
     bufferChars: snapshot.buffer.length,
     replayState,
     // The daemon id is the stream id the PTY was spawned with, and its
@@ -1118,12 +1168,20 @@ export function handleShellConnection(
         // where the sign-in was approved killed the login waiting for it.
         // A respawn keeps the other devices' viewers: they see the new run.
         let carriedViewers: WebSocket[] = [];
+        // Each carried viewer keeps its own size, so its `claim` can apply it.
+        const carriedSizes = new Map<WebSocket, TerminalSize>();
         if (forceRestart) {
           const oldSession = ptySessionsMap.get(ptySessionKey);
           if (oldSession) {
             carriedViewers = [...oldSession.sockets].filter(
               (socket) => socket !== ws && socket.readyState === WebSocket.OPEN
             );
+            for (const socket of carriedViewers) {
+              const size = oldSession.sizes.get(socket);
+              if (size) {
+                carriedSizes.set(socket, size);
+              }
+            }
             ptySessionsMap.delete(ptySessionKey);
             endPty(oldSession);
           }
@@ -1136,10 +1194,12 @@ export function handleShellConnection(
           existingSession.sockets.add(ws);
           existingSession.detachedAt = null;
           existingSession.sizes.set(ws, initSize);
+          // The attaching socket takes charge (a reconnect's old socket may
+          // linger half-dead), but only a lone viewer resizes: another device
+          // opening the tab (possibly in the background, at the 80×24
+          // placeholder) must not reflow the shell under the person typing in
+          // it. The device in use takes it back with `claim` (focus, a click).
           existingSession.owner = ws;
-          // Only a lone viewer resizes on attach: another device opening the
-          // tab (possibly in the background, at the 80×24 placeholder) must
-          // not reflow the shell under the person typing in it.
           if (existingSession.sockets.size === 1) {
             applyViewerSize(existingSession, ws);
           }
@@ -1156,6 +1216,16 @@ export function handleShellConnection(
           }
           return;
         }
+
+        // The run this client shows ended while it was away: report the exit
+        // instead of spawning the command again. Restart sends forceRestart.
+        const exited = forceRestart ? undefined : exitedStreams.get(ptySessionKey);
+        if (exited && typeof data.stream === 'string' && data.stream === exited.streamId) {
+          sendIfOpen(ws, { type: 'stream', id: exited.streamId });
+          sendIfOpen(ws, exitFrame(exited.exit));
+          return;
+        }
+        exitedStreams.delete(ptySessionKey);
 
         // A one-shot command (agent install/update/login from Settings) does
         // not depend on its cwd: it runs from home when the client names no
@@ -1226,7 +1296,7 @@ export function handleShellConnection(
 
         const viewerSizes = new Map<WebSocket, TerminalSize>();
         for (const socket of carriedViewers) {
-          viewerSizes.set(socket, initSize);
+          viewerSizes.set(socket, carriedSizes.get(socket) ?? initSize);
         }
         viewerSizes.set(ws, initSize);
         ptySessionsMap.set(sessionKey, {

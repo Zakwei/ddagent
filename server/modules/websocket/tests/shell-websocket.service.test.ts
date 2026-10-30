@@ -1143,6 +1143,139 @@ test('after a restart the gateway adopts PTYs from the host and resumes their st
   held.emitExit();
 });
 
+test('output after adopting a full daemon window keeps the window for a later resume', async (t) => {
+  const socketPath = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'shell-host-')), 'host.sock');
+  const held = createFakePty();
+  const daemon = runPtyHostDaemon(socketPath, (() => held) as never);
+  t.after(() => daemon.close());
+  await new Promise((resolve) => setTimeout(resolve, 30));
+
+  const sessionId = `adopt-full-${Date.now()}`;
+  const previous = (await connectPtyHost(socketPath))!;
+  previous.spawn('run-9', 'bash', [], { name: 'xterm', cols: 80, rows: 24, cwd: '/', env: {} }, {
+    sessionKey: `${process.cwd()}_${sessionId}`,
+    projectPath: process.cwd(),
+    sessionId,
+    isCommand: false,
+    createdAt: Date.now(),
+  });
+  await new Promise((resolve) => setTimeout(resolve, 30));
+  // Fill the daemon's window to its cap, then the server restarts.
+  for (let index = 0; index < 9; index += 1) {
+    held.emitData('x'.repeat(64 * 1024));
+  }
+  previous.close();
+  const host = (await startShellPtyHost(socketPath))!;
+  t.after(() => host.close());
+  held.emitData('spinner');
+  await new Promise((resolve) => setTimeout(resolve, 30));
+
+  const seen = 9 * 64 * 1024 - 10;
+  const socket = createFakeSocket();
+  handleShellConnection(socket as never, { resolveProviderSessionId: () => null });
+  socket.emit(
+    'message',
+    JSON.stringify({
+      type: 'init',
+      projectPath: process.cwd(),
+      sessionId,
+      provider: 'plain-shell',
+      isPlainShell: true,
+      stream: 'run-9',
+      seen,
+    })
+  );
+  const output = socket.frames
+    .map((frame) => JSON.parse(frame) as { type: string; data?: string })
+    .filter((frame) => frame.type === 'output')
+    .map((frame) => frame.data)
+    .join('');
+  assert.equal(output, `${'x'.repeat(10)}spinner`);
+
+  held.emitExit();
+});
+
+test('a backed-up viewer still gets the last output before the exit line', () => {
+  const pty = createFakePty();
+  const socket = Object.assign(createFakeSocket(), { bufferedAmount: 0 });
+  handleShellConnection(socket as never, { resolveProviderSessionId: () => null, spawnPty: () => pty as never });
+  socket.emit(
+    'message',
+    JSON.stringify({
+      type: 'init',
+      projectPath: process.cwd(),
+      sessionId: `exit-flush-${Date.now()}`,
+      provider: 'plain-shell',
+      isPlainShell: true,
+      initialCommand: 'npm i -g foo',
+    })
+  );
+  socket.bufferedAmount = 2 * 1024 * 1024;
+  pty.emitData('FINAL-ERROR');
+  socket.bufferedAmount = 0;
+  pty.emitExit();
+
+  const outputs = socket.frames
+    .map((frame) => JSON.parse(frame) as { data?: string; exitCode?: number })
+    .filter((frame) => frame.data !== undefined);
+  assert.equal(outputs.at(-2)?.data, 'FINAL-ERROR');
+  assert.equal(outputs.at(-1)?.exitCode, 0);
+});
+
+test('a device away when its PTY exited sees the exit on reattach instead of a rerun', () => {
+  let spawns = 0;
+  const pty = createFakePty();
+  const dependencies = {
+    resolveProviderSessionId: () => null,
+    spawnPty: () => {
+      spawns += 1;
+      return pty as never;
+    },
+  };
+  const init = (stream?: string, forceRestart = false) =>
+    JSON.stringify({
+      type: 'init',
+      projectPath: process.cwd(),
+      sessionId: 'exit-away-tab',
+      provider: 'plain-shell',
+      isPlainShell: true,
+      initialCommand: 'npm i -g foo',
+      forceRestart,
+      stream,
+      seen: 0,
+    });
+  const phone = createFakeSocket();
+  handleShellConnection(phone as never, dependencies);
+  phone.emit('message', init());
+  const streamId = (JSON.parse(phone.frames[0]) as { id: string }).id;
+  phone.emit('close');
+  pty.emitExit();
+
+  const back = createFakeSocket();
+  handleShellConnection(back as never, dependencies);
+  back.emit('message', init(streamId));
+  assert.equal(spawns, 1);
+  const frames = back.frames.map((frame) => JSON.parse(frame) as { type: string; id?: string; exitCode?: number });
+  assert.deepEqual(frames[0], { type: 'stream', id: streamId });
+  assert.equal(frames[1].exitCode, 0);
+
+  // Restart still runs it again.
+  back.emit('message', init(streamId, true));
+  assert.equal(spawns, 2);
+  pty.emitExit();
+});
+
+test('after a restart each carried device keeps its own size for its claim', () => {
+  const { pty, resizes, desktop, phone, init } = attachTwoViewers('restart-size');
+  phone.emit('message', init(80, 24, true));
+  resizes.length = 0;
+
+  desktop.emit('message', JSON.stringify({ type: 'claim' }));
+  assert.deepEqual(resizes, [[200, 50]]);
+
+  pty.emitExit();
+});
+
 test('an adopted PTY replays the title and modes the daemon saw before its window', async (t) => {
   const socketPath = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'shell-host-')), 'host.sock');
   const held = createFakePty();
