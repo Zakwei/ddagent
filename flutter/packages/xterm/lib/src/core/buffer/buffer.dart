@@ -110,11 +110,25 @@ class Buffer {
     codePoint = charset.translate(codePoint);
 
     final cellWidth = unicodeV11.wcwidth(codePoint);
+    // A combining mark, ZWJ or zero-width space takes no column (wcwidth 0,
+    // as programs lay text out); a cell of its own shifted the rest of the
+    // line right. 0 is a wide char's second half; VS16 keeps a cell, which
+    // makes `⚠️` the 2 columns programs count for it.
+    if (cellWidth == 0 && codePoint != 0 && codePoint != 0xFE0F) {
+      return;
+    }
+    // A wide char does not fit in the last column: it wraps whole.
+    if (cellWidth == 2 && _cursorX == viewWidth - 1 && terminal.autoWrapMode) {
+      _cursorX = viewWidth;
+    }
     if (_cursorX >= terminal.viewWidth) {
-      index();
-      setCursorX(0);
       if (terminal.autoWrapMode) {
+        index();
+        setCursorX(0);
         currentLine.isWrapped = true;
+      } else {
+        // DECAWM off: overwrite the last column instead of wrapping.
+        _cursorX = max(viewWidth - cellWidth, 0);
       }
     }
 
@@ -190,7 +204,7 @@ class Buffer {
   /// cursor.
   void eraseLineToCursor() {
     currentLine.isWrapped = false;
-    currentLine.eraseRange(0, _cursorX, terminal.cursor);
+    currentLine.eraseRange(0, min(_cursorX + 1, viewWidth), terminal.cursor);
   }
 
   /// Erases the line at the current cursor position.
@@ -233,6 +247,7 @@ class Buffer {
   /// changing the column position. If the active position is at the bottom
   /// margin, a scroll up is performed.
   void index() {
+    _clearPendingWrap();
     if (isInVerticalMargin) {
       if (_cursorY == _marginBottom) {
         if (marginTop == 0 && !isAltBuffer) {
@@ -269,6 +284,7 @@ class Buffer {
 
   /// https://terminalguide.namepad.de/seq/a_esc_cm/
   void reverseIndex() {
+    _clearPendingWrap();
     if (isInVerticalMargin) {
       if (_cursorY == _marginTop) {
         scrollDown(1);
@@ -289,11 +305,21 @@ class Buffer {
   }
 
   void setCursorY(int cursorY) {
+    _clearPendingWrap();
     _cursorY = cursorY.clamp(0, viewHeight - 1);
   }
 
   void moveCursorX(int offset) {
+    _clearPendingWrap();
     setCursorX(_cursorX + offset);
+  }
+
+  /// After the last column is written the cursor waits past it (x ==
+  /// viewWidth) for the next char to wrap. Any cursor move ends that wait at
+  /// the last column — kept, a move up/down or a line feed made the next
+  /// char wrap one row too far.
+  void _clearPendingWrap() {
+    if (_cursorX >= viewWidth) _cursorX = viewWidth - 1;
   }
 
   void moveCursorY(int offset) {
@@ -330,8 +356,10 @@ class Buffer {
 
   /// Restore cursor position, charmap and text attributes.
   void restoreCursor() {
-    _cursorX = _savedCursorX;
-    _cursorY = _savedCursorY;
+    // The screen may have shrunk since the save (a phone rotated, the soft
+    // keyboard opened): an unclamped row threw in the next write.
+    _cursorX = _savedCursorX.clamp(0, viewWidth);
+    _cursorY = _savedCursorY.clamp(0, viewHeight - 1);
     terminal.cursor.foreground = _savedCursorStyle.foreground;
     terminal.cursor.background = _savedCursorStyle.background;
     terminal.cursor.attrs = _savedCursorStyle.attrs;

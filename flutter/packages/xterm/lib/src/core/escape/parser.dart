@@ -1,3 +1,5 @@
+import 'dart:math' show max;
+
 import 'package:xterm/src/core/color.dart';
 import 'package:xterm/src/core/mouse/mode.dart';
 import 'package:xterm/src/core/escape/handler.dart';
@@ -36,14 +38,21 @@ class EscapeParser {
       tokenBegin = _queue.totalConsumed;
       final char = _queue.consume();
 
-      if (char == Ascii.ESC) {
-        final processed = _processEscape();
-        if (!processed) {
-          _queue.rollback(tokenEnd - tokenBegin);
-          return;
+      // A malformed sequence a handler cannot apply is dropped; throwing
+      // here left the rest of the chunk unparsed (and unpainted) until the
+      // program's next output — a terminal frozen mid-screen.
+      try {
+        if (char == Ascii.ESC) {
+          final processed = _processEscape();
+          if (!processed) {
+            _queue.rollback(tokenEnd - tokenBegin);
+            return;
+          }
+        } else {
+          _processChar(char);
         }
-      } else {
-        _processChar(char);
+      } on Error catch (_) {
+        continue;
       }
     }
   }
@@ -219,7 +228,9 @@ class EscapeParser {
 
     // test whether the csi is a `CSI ? Ps ...` or `CSI Ps ...`
     final prefix = _queue.peek();
-    if (prefix >= Ascii.colon && prefix <= Ascii.questionMark) {
+    // Private prefixes are `< = > ?`; a leading `;` or `:` is an empty first
+    // parameter, not a prefix (`ESC [ ; 5 H` moved to row 5).
+    if (prefix >= Ascii.lessThan && prefix <= Ascii.questionMark) {
       _csi.prefix = prefix;
       _queue.consume();
     } else {
@@ -228,6 +239,10 @@ class EscapeParser {
 
     var param = 0;
     var hasParam = false;
+    // Inside `:` sub-parameters (`4:3` curly underline, `38:2::r:g:b`): their
+    // digits are skipped — run together they read as another code (`43`,
+    // a yellow background). The main parameter keeps its meaning.
+    var inSubParam = false;
     while (true) {
       // The sequence isn't completed, just ignore it.
       if (_queue.isEmpty) {
@@ -237,14 +252,22 @@ class EscapeParser {
       final char = _queue.consume();
 
       if (char == Ascii.semicolon) {
-        if (hasParam) {
-          _csi.params.add(param);
-        }
+        // An empty parameter is a default (0): `ESC [ ; 5 H` is column 5,
+        // not a lone `5` read as the row.
+        _csi.params.add(param);
+        hasParam = false;
+        inSubParam = false;
         param = 0;
         continue;
       }
 
+      if (char == Ascii.colon) {
+        inSubParam = true;
+        continue;
+      }
+
       if (char >= Ascii.num0 && char <= Ascii.num9) {
+        if (inSubParam) continue;
         hasParam = true;
         param *= 10;
         param += char - Ascii.num0;
@@ -257,7 +280,7 @@ class EscapeParser {
       }
 
       if (char >= Ascii.atSign && char <= Ascii.tilde) {
-        if (hasParam) {
+        if (hasParam || _csi.params.isNotEmpty) {
           _csi.params.add(param);
         }
 
@@ -358,10 +381,10 @@ class EscapeParser {
     var row = 1;
     var col = 1;
 
-    if (_csi.params.length == 2) {
-      row = _csi.params[0];
-      col = _csi.params[1];
-    }
+    // Missing or 0 means 1: `ESC [ 3 H` is row 3, column 1.
+    final params = _csi.params;
+    if (params.isNotEmpty && params[0] > 0) row = params[0];
+    if (params.length > 1 && params[1] > 0) col = params[1];
 
     handler.setCursor(col - 1, row - 1);
   }
@@ -497,20 +520,24 @@ class EscapeParser {
           handler.setForegroundColor16(NamedColor.white);
           continue;
         case 38:
-          final mode = params[i + 1];
+          // A truncated colour (`ESC [ 38 m`, `38;5m`) is ignored — reading
+          // past the parameters threw and stalled the terminal.
+          final mode = i + 1 < params.length ? params[i + 1] : null;
           switch (mode) {
-            case 2:
+            case 2 when i + 4 < params.length:
               final r = params[i + 2];
               final g = params[i + 3];
               final b = params[i + 4];
               handler.setForegroundColorRgb(r, g, b);
               i += 4;
               break;
-            case 5:
+            case 5 when i + 2 < params.length:
               final index = params[i + 2];
               handler.setForegroundColor256(index);
               i += 2;
               break;
+            default:
+              i = params.length;
           }
           continue;
         case 39:
@@ -542,24 +569,40 @@ class EscapeParser {
           handler.setBackgroundColor16(NamedColor.white);
           continue;
         case 48:
-          final mode = params[i + 1];
+          // A truncated colour (`ESC [ 38 m`, `38;5m`) is ignored — reading
+          // past the parameters threw and stalled the terminal.
+          final mode = i + 1 < params.length ? params[i + 1] : null;
           switch (mode) {
-            case 2:
+            case 2 when i + 4 < params.length:
               final r = params[i + 2];
               final g = params[i + 3];
               final b = params[i + 4];
               handler.setBackgroundColorRgb(r, g, b);
               i += 4;
               break;
-            case 5:
+            case 5 when i + 2 < params.length:
               final index = params[i + 2];
               handler.setBackgroundColor256(index);
               i += 2;
               break;
+            default:
+              i = params.length;
           }
           continue;
         case 49:
           handler.resetBackground();
+          continue;
+        // Underline colour is not drawn; its arguments must not be read as
+        // codes of their own (`58;2;r;g;b` turned on faint and more).
+        case 58:
+          final mode = i + 1 < params.length ? params[i + 1] : null;
+          i += switch (mode) {
+            2 => 4,
+            5 => 2,
+            _ => params.length,
+          };
+          continue;
+        case 59:
           continue;
 
         case 90:
@@ -643,7 +686,7 @@ class EscapeParser {
     if (_csi.params.length > 2) return;
 
     if (_csi.params.isNotEmpty) {
-      top = _csi.params[0];
+      top = max(_csi.params[0], 1);
 
       if (_csi.params.length == 2) {
         bottom = _csi.params[1] - 1;
