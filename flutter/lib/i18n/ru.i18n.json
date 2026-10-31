@@ -2987,7 +2987,11 @@
       "open": "Панель",
       "newChat": "Новый чат",
       "navigation": "Навигация",
-      "sessions": "Сессии"
+      "sessions": "Сессии",
+      "sectionWork": "Работа",
+      "sectionPages": "Страницы",
+      "sectionMore": "Ещё",
+      "sectionApp": "Приложение"
     },
     "sessions": {
       "title": "Сеансы",

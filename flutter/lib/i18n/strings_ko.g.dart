@@ -3325,6 +3325,10 @@ class Translations$sidebar$panel$ko extends Translations$sidebar$panel$en {
 	@override String get newChat => '새 채팅';
 	@override String get navigation => '탐색';
 	@override String get sessions => '세션';
+	@override String get sectionWork => '작업';
+	@override String get sectionPages => '페이지';
+	@override String get sectionMore => '더 보기';
+	@override String get sectionApp => '앱';
 }
 
 // Path: sidebar.sessions
@@ -10880,6 +10884,10 @@ extension on TranslationsKo {
 			'sidebar.panel.newChat' => '새 채팅',
 			'sidebar.panel.navigation' => '탐색',
 			'sidebar.panel.sessions' => '세션',
+			'sidebar.panel.sectionWork' => '작업',
+			'sidebar.panel.sectionPages' => '페이지',
+			'sidebar.panel.sectionMore' => '더 보기',
+			'sidebar.panel.sectionApp' => '앱',
 			'sidebar.sessions.title' => '세션',
 			'sidebar.sessions.newSession' => '새 세션',
 			'sidebar.sessions.deleteSession' => '세션 삭제',
@@ -11230,12 +11238,12 @@ extension on TranslationsKo {
 			'tasks.createTask.titlePlaceholder' => '무엇을 해야 하나요?',
 			'tasks.list.completedReopen' => '완료됨 (클릭하여 다시 열기)',
 			'tasks.list.inProgressComplete' => '진행 중 (클릭하여 완료)',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.list.markCompleted' => '완료로 표시',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => '작업 ${id} 상태 전환',
 			'tasks.list.markDone' => '완료로 표시',
 			'tasks.list.reopen' => '다시 열기',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.nextTask.allComplete' => '모든 작업 완료',
 			'tasks.nextTask.feature1' => '- 종속성 및 하위 작업을 지원하는 AI 작업 관리.',
 			'tasks.nextTask.feature2' => '- PRD 기반 작업 생성으로 프로젝트 빠른 시작.',
@@ -11744,12 +11752,12 @@ extension on TranslationsKo {
 			'skills.screen.savedSuccessfully' => '스킬이 저장되었습니다.',
 			'skills.screen.loadingSkills' => ({required Object provider}) => '${provider} 스킬 로드 중…',
 			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, one: 'SKILL ${count}개', other: 'SKILL ${count}개', ), 
+			_ => null,
+		} ?? switch (path) {
 			'skills.screen.deleteTitle' => ({required Object name}) => '${name}을(를) 삭제할까요?',
 			'skills.screen.deleteDescription' => ({required Object provider, required Object directory}) => '${provider}의 관리형 스킬 디렉터리에서 ${directory} 디렉터리를 제거합니다. 되돌릴 수 없습니다.',
 			'skills.screen.noDescription' => '스킬 프런트 매터에 설명이 없습니다.',
 			'skills.screen.pluginBadge' => ({required Object name}) => '플러그인: ${name}',
-			_ => null,
-		} ?? switch (path) {
 			'skills.screen.projectBadge' => ({required Object name}) => '프로젝트: ${name}',
 			'skills.screen.sourceLabel' => '소스',
 			'skills.empty.noProjects' => '사용 가능한 프로젝트 없음',

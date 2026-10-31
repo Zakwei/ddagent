@@ -487,7 +487,6 @@ class _CompactNavDrawer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.appColors;
-    final nav = context.appNav;
     final t = Translations.of(context);
     final runningCount = ref
         .watch(sessionsProvider((null, null)))
@@ -537,24 +536,7 @@ class _CompactNavDrawer extends ConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.symmetric(vertical: 4),
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 8, 4),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      t.sidebar.panel.navigation,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.5,
-                        color: c.mutedForeground,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            _sectionHeader(t.sidebar.panel.sectionWork, c.mutedForeground),
             item(
               LucideIcons.messageSquarePlus,
               _destinationLabel(t, '/workspace'),
@@ -562,11 +544,13 @@ class _CompactNavDrawer extends ConsumerWidget {
               badge: runningCount,
             ),
             item(LucideIcons.squareTerminal, _destinationLabel(t, '/terminal'), '/terminal'),
-            _drawerDivider(nav.dividerColor),
+            _drawerDivider(c.border),
+            _sectionHeader(t.sidebar.panel.sectionPages, c.mutedForeground),
             for (final d in _pageDestinations)
               if (showTasks || d.path != '/tasks')
                 item(d.icon, _destinationLabel(t, d.path), d.path),
-            _drawerDivider(nav.dividerColor),
+            _drawerDivider(c.border),
+            _sectionHeader(t.sidebar.panel.sectionMore, c.mutedForeground),
             for (final d in _extraDestinations) item(d.icon, _destinationLabel(t, d.path), d.path),
             if (browserEnabled)
               item(
@@ -574,7 +558,8 @@ class _CompactNavDrawer extends ConsumerWidget {
                 _destinationLabel(t, _browserDestination.path),
                 _browserDestination.path,
               ),
-            _drawerDivider(nav.dividerColor),
+            _drawerDivider(c.border),
+            _sectionHeader(t.sidebar.panel.sectionApp, c.mutedForeground),
             const UpdateBadge(variant: UpdateBadgeVariant.row),
             ListTile(
               leading: const Icon(LucideIcons.server, size: 18),
@@ -611,8 +596,18 @@ class _CompactNavDrawer extends ConsumerWidget {
     );
   }
 
+  /// Groups read as groups on a phone: a full-strength rule with room
+  /// around it — the half-alpha hairline over a half-alpha token vanished.
   Widget _drawerDivider(Color color) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 4),
-    child: Divider(height: 1, color: color.withValues(alpha: 0.5)),
+    padding: const EdgeInsets.symmetric(vertical: 8),
+    child: Divider(height: 1, thickness: 1, indent: 16, endIndent: 16, color: color),
+  );
+
+  Widget _sectionHeader(String label, Color color) => Padding(
+    padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+    child: Text(
+      label.toUpperCase(),
+      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 0.6, color: color),
+    ),
   );
 }

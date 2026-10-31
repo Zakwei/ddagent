@@ -2952,7 +2952,11 @@
       "open": "Panel",
       "newChat": "Yeni sohbet",
       "navigation": "Gezinme",
-      "sessions": "Oturumlar"
+      "sessions": "Oturumlar",
+      "sectionWork": "Çalışma",
+      "sectionPages": "Sayfalar",
+      "sectionMore": "Daha fazla",
+      "sectionApp": "Uygulama"
     },
     "sessions": {
       "title": "Oturumlar",

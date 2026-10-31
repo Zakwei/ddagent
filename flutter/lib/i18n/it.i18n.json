@@ -2957,7 +2957,11 @@
       "open": "Pannello",
       "newChat": "Nuova chat",
       "navigation": "Navigazione",
-      "sessions": "Sessioni"
+      "sessions": "Sessioni",
+      "sectionWork": "Lavoro",
+      "sectionPages": "Pagine",
+      "sectionMore": "Altro",
+      "sectionApp": "App"
     },
     "sessions": {
       "title": "Sessioni",

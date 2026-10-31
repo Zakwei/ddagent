@@ -3335,6 +3335,10 @@ class Translations$sidebar$panel$es extends Translations$sidebar$panel$en {
 	@override String get newChat => 'Nuevo chat';
 	@override String get navigation => 'Navegación';
 	@override String get sessions => 'Sesiones';
+	@override String get sectionWork => 'Trabajo';
+	@override String get sectionPages => 'Páginas';
+	@override String get sectionMore => 'Más';
+	@override String get sectionApp => 'Aplicación';
 }
 
 // Path: sidebar.sessions
@@ -10891,6 +10895,10 @@ extension on TranslationsEs {
 			'sidebar.panel.newChat' => 'Nuevo chat',
 			'sidebar.panel.navigation' => 'Navegación',
 			'sidebar.panel.sessions' => 'Sesiones',
+			'sidebar.panel.sectionWork' => 'Trabajo',
+			'sidebar.panel.sectionPages' => 'Páginas',
+			'sidebar.panel.sectionMore' => 'Más',
+			'sidebar.panel.sectionApp' => 'Aplicación',
 			'sidebar.sessions.title' => 'Sesiones',
 			'sidebar.sessions.newSession' => 'Nueva sesión',
 			'sidebar.sessions.deleteSession' => 'Eliminar sesión',
@@ -11241,12 +11249,12 @@ extension on TranslationsEs {
 			'tasks.createTask.titlePlaceholder' => '¿Qué hay que hacer?',
 			'tasks.list.completedReopen' => 'Completada (clic para reabrir)',
 			'tasks.list.inProgressComplete' => 'En curso (clic para completar)',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.list.markCompleted' => 'Marcar como completada',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => 'Alternar estado de la tarea ${id}',
 			'tasks.list.markDone' => 'Marcar como completada',
 			'tasks.list.reopen' => 'Reabrir',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.nextTask.allComplete' => 'Todas las tareas completadas',
 			'tasks.nextTask.feature1' => '- Gestión de tareas con IA, dependencias y subtareas.',
 			'tasks.nextTask.feature2' => '- Generación de tareas desde PRD para un arranque más rápido.',
@@ -11755,12 +11763,12 @@ extension on TranslationsEs {
 			'skills.screen.savedSuccessfully' => 'Skills guardadas correctamente.',
 			'skills.screen.loadingSkills' => ({required Object provider}) => 'Cargando skills de ${provider}…',
 			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('es'))(count, one: '${count} SKILL', other: '${count} SKILLS', ), 
+			_ => null,
+		} ?? switch (path) {
 			'skills.screen.deleteTitle' => ({required Object name}) => '¿Eliminar ${name}?',
 			'skills.screen.deleteDescription' => ({required Object directory, required Object provider}) => 'Esto elimina el directorio ${directory} del directorio de skills gestionadas de ${provider}. Esta acción no se puede deshacer.',
 			'skills.screen.noDescription' => 'No se ha proporcionado descripción en el front matter de la skill.',
 			'skills.screen.pluginBadge' => ({required Object name}) => 'Plugin: ${name}',
-			_ => null,
-		} ?? switch (path) {
 			'skills.screen.projectBadge' => ({required Object name}) => 'Proyecto: ${name}',
 			'skills.screen.sourceLabel' => 'ORIGEN',
 			'skills.empty.noProjects' => 'No hay proyectos disponibles',

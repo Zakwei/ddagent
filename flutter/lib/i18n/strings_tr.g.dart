@@ -3330,6 +3330,10 @@ class Translations$sidebar$panel$tr extends Translations$sidebar$panel$en {
 	@override String get newChat => 'Yeni sohbet';
 	@override String get navigation => 'Gezinme';
 	@override String get sessions => 'Oturumlar';
+	@override String get sectionWork => 'Çalışma';
+	@override String get sectionPages => 'Sayfalar';
+	@override String get sectionMore => 'Daha fazla';
+	@override String get sectionApp => 'Uygulama';
 }
 
 // Path: sidebar.sessions
@@ -10886,6 +10890,10 @@ extension on TranslationsTr {
 			'sidebar.panel.newChat' => 'Yeni sohbet',
 			'sidebar.panel.navigation' => 'Gezinme',
 			'sidebar.panel.sessions' => 'Oturumlar',
+			'sidebar.panel.sectionWork' => 'Çalışma',
+			'sidebar.panel.sectionPages' => 'Sayfalar',
+			'sidebar.panel.sectionMore' => 'Daha fazla',
+			'sidebar.panel.sectionApp' => 'Uygulama',
 			'sidebar.sessions.title' => 'Oturumlar',
 			'sidebar.sessions.newSession' => 'Yeni Oturum',
 			'sidebar.sessions.deleteSession' => 'Oturumu Sil',
@@ -11236,12 +11244,12 @@ extension on TranslationsTr {
 			'tasks.createTask.titlePlaceholder' => 'Ne yapılması gerekiyor?',
 			'tasks.list.completedReopen' => 'Tamamlandı (yeniden açmak için tıklayın)',
 			'tasks.list.inProgressComplete' => 'Devam ediyor (tamamlamak için tıklayın)',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.list.markCompleted' => 'Tamamlandı olarak işaretle',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => 'Görev ${id} durumunu değiştir',
 			'tasks.list.markDone' => 'Tamamlandı olarak işaretle',
 			'tasks.list.reopen' => 'Yeniden aç',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.nextTask.allComplete' => 'Tüm görevler tamamlandı',
 			'tasks.nextTask.feature1' => '- Bağımlılıklar ve alt görevlerle AI destekli görev yönetimi.',
 			'tasks.nextTask.feature2' => '- Daha hızlı proje başlangıcı için PRD tabanlı görev oluşturma.',
@@ -11750,12 +11758,12 @@ extension on TranslationsTr {
 			'skills.screen.savedSuccessfully' => 'Beceriler başarıyla kaydedildi.',
 			'skills.screen.loadingSkills' => ({required Object provider}) => '${provider} becerileri yükleniyor…',
 			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('tr'))(count, one: '${count} BECERİ', other: '${count} BECERİ', ), 
+			_ => null,
+		} ?? switch (path) {
 			'skills.screen.deleteTitle' => ({required Object name}) => '${name} silinsin mi?',
 			'skills.screen.deleteDescription' => ({required Object directory, required Object provider}) => 'Bu, ${directory} dizinini ${provider} tarafından yönetilen beceriler dizininden kaldırır. Bu işlem geri alınamaz.',
 			'skills.screen.noDescription' => 'Beceri front matter bölümünde açıklama belirtilmemiş.',
 			'skills.screen.pluginBadge' => ({required Object name}) => 'Eklenti: ${name}',
-			_ => null,
-		} ?? switch (path) {
 			'skills.screen.projectBadge' => ({required Object name}) => 'Proje: ${name}',
 			'skills.screen.sourceLabel' => 'KAYNAK',
 			'skills.empty.noProjects' => 'Kullanılabilir proje yok',

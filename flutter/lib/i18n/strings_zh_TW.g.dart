@@ -3325,6 +3325,10 @@ class Translations$sidebar$panel$zh_TW extends Translations$sidebar$panel$en {
 	@override String get newChat => '新聊天';
 	@override String get navigation => '導覽';
 	@override String get sessions => '工作階段';
+	@override String get sectionWork => '工作';
+	@override String get sectionPages => '頁面';
+	@override String get sectionMore => '更多';
+	@override String get sectionApp => '應用程式';
 }
 
 // Path: sidebar.sessions
@@ -10880,6 +10884,10 @@ extension on TranslationsZhTw {
 			'sidebar.panel.newChat' => '新聊天',
 			'sidebar.panel.navigation' => '導覽',
 			'sidebar.panel.sessions' => '工作階段',
+			'sidebar.panel.sectionWork' => '工作',
+			'sidebar.panel.sectionPages' => '頁面',
+			'sidebar.panel.sectionMore' => '更多',
+			'sidebar.panel.sectionApp' => '應用程式',
 			'sidebar.sessions.title' => '工作階段',
 			'sidebar.sessions.newSession' => '新增工作階段',
 			'sidebar.sessions.deleteSession' => '刪除工作階段',
@@ -11230,12 +11238,12 @@ extension on TranslationsZhTw {
 			'tasks.createTask.titlePlaceholder' => '需要做什麼？',
 			'tasks.list.completedReopen' => '已完成（點擊重新開啟）',
 			'tasks.list.inProgressComplete' => '進行中（點擊完成）',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.list.markCompleted' => '標記為已完成',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => '切換任務 ${id} 的狀態',
 			'tasks.list.markDone' => '標記為完成',
 			'tasks.list.reopen' => '重新開啟',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.nextTask.allComplete' => '所有任務已完成',
 			'tasks.nextTask.feature1' => '- AI 任務管理，支援依賴和子任務。',
 			'tasks.nextTask.feature2' => '- PRD 驅動的任務產生，快速啟動專案。',
@@ -11744,12 +11752,12 @@ extension on TranslationsZhTw {
 			'skills.screen.savedSuccessfully' => '技能已成功儲存。',
 			'skills.screen.loadingSkills' => ({required Object provider}) => '正在載入 ${provider} 技能…',
 			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '${count} 個技能', other: '${count} 個技能', ), 
+			_ => null,
+		} ?? switch (path) {
 			'skills.screen.deleteTitle' => ({required Object name}) => '刪除 ${name}？',
 			'skills.screen.deleteDescription' => ({required Object provider, required Object directory}) => '這會從 ${provider} 的受管理技能目錄中移除 ${directory} 目錄。此操作無法復原。',
 			'skills.screen.noDescription' => '技能前置資料中未提供說明。',
 			'skills.screen.pluginBadge' => ({required Object name}) => '外掛：${name}',
-			_ => null,
-		} ?? switch (path) {
 			'skills.screen.projectBadge' => ({required Object name}) => '專案：${name}',
 			'skills.screen.sourceLabel' => '來源',
 			'skills.empty.noProjects' => '沒有可用的專案',

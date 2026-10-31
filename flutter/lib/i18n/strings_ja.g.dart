@@ -3325,6 +3325,10 @@ class Translations$sidebar$panel$ja extends Translations$sidebar$panel$en {
 	@override String get newChat => '新しいチャット';
 	@override String get navigation => 'ナビゲーション';
 	@override String get sessions => 'セッション';
+	@override String get sectionWork => '作業';
+	@override String get sectionPages => 'ページ';
+	@override String get sectionMore => 'その他';
+	@override String get sectionApp => 'アプリ';
 }
 
 // Path: sidebar.sessions
@@ -10880,6 +10884,10 @@ extension on TranslationsJa {
 			'sidebar.panel.newChat' => '新しいチャット',
 			'sidebar.panel.navigation' => 'ナビゲーション',
 			'sidebar.panel.sessions' => 'セッション',
+			'sidebar.panel.sectionWork' => '作業',
+			'sidebar.panel.sectionPages' => 'ページ',
+			'sidebar.panel.sectionMore' => 'その他',
+			'sidebar.panel.sectionApp' => 'アプリ',
 			'sidebar.sessions.title' => 'セッション',
 			'sidebar.sessions.newSession' => '新しいセッション',
 			'sidebar.sessions.deleteSession' => 'セッションを削除',
@@ -11230,12 +11238,12 @@ extension on TranslationsJa {
 			'tasks.createTask.titlePlaceholder' => '何をすべきですか？',
 			'tasks.list.completedReopen' => '完了（クリックで再開）',
 			'tasks.list.inProgressComplete' => '進行中（クリックで完了）',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.list.markCompleted' => '完了としてマーク',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => 'タスク ${id} のステータスを切り替え',
 			'tasks.list.markDone' => '完了にする',
 			'tasks.list.reopen' => '再開',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.nextTask.allComplete' => 'すべてのタスクが完了',
 			'tasks.nextTask.feature1' => '- 依存関係とサブタスクを備えたAIタスク管理。',
 			'tasks.nextTask.feature2' => '- PRD駆動のタスク生成でプロジェクトを迅速に開始。',
@@ -11744,12 +11752,12 @@ extension on TranslationsJa {
 			'skills.screen.savedSuccessfully' => 'スキルを保存しました。',
 			'skills.screen.loadingSkills' => ({required Object provider}) => '${provider} のスキルを読み込み中…',
 			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ja'))(count, one: '${count} スキル', other: '${count} スキル', ), 
+			_ => null,
+		} ?? switch (path) {
 			'skills.screen.deleteTitle' => ({required Object name}) => '${name} を削除しますか？',
 			'skills.screen.deleteDescription' => ({required Object provider, required Object directory}) => '${provider} の管理対象スキルディレクトリから ${directory} ディレクトリを削除します。元に戻せません。',
 			'skills.screen.noDescription' => 'スキルのフロントマターに説明がありません。',
 			'skills.screen.pluginBadge' => ({required Object name}) => 'プラグイン: ${name}',
-			_ => null,
-		} ?? switch (path) {
 			'skills.screen.projectBadge' => ({required Object name}) => 'プロジェクト: ${name}',
 			'skills.screen.sourceLabel' => 'ソース',
 			'skills.empty.noProjects' => '利用可能なプロジェクトがありません',

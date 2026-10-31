@@ -2947,7 +2947,11 @@
       "open": "面板",
       "newChat": "新聊天",
       "navigation": "導覽",
-      "sessions": "工作階段"
+      "sessions": "工作階段",
+      "sectionWork": "工作",
+      "sectionPages": "頁面",
+      "sectionMore": "更多",
+      "sectionApp": "應用程式"
     },
     "sessions": {
       "title": "工作階段",

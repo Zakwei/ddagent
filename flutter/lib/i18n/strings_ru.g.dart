@@ -3357,6 +3357,10 @@ class Translations$sidebar$panel$ru extends Translations$sidebar$panel$en {
 	@override String get newChat => 'Новый чат';
 	@override String get navigation => 'Навигация';
 	@override String get sessions => 'Сессии';
+	@override String get sectionWork => 'Работа';
+	@override String get sectionPages => 'Страницы';
+	@override String get sectionMore => 'Ещё';
+	@override String get sectionApp => 'Приложение';
 }
 
 // Path: sidebar.sessions
@@ -10929,6 +10933,10 @@ extension on TranslationsRu {
 			'sidebar.panel.newChat' => 'Новый чат',
 			'sidebar.panel.navigation' => 'Навигация',
 			'sidebar.panel.sessions' => 'Сессии',
+			'sidebar.panel.sectionWork' => 'Работа',
+			'sidebar.panel.sectionPages' => 'Страницы',
+			'sidebar.panel.sectionMore' => 'Ещё',
+			'sidebar.panel.sectionApp' => 'Приложение',
 			'sidebar.sessions.title' => 'Сеансы',
 			'sidebar.sessions.newSession' => 'Новый сеанс',
 			'sidebar.sessions.deleteSession' => 'Удалить сеанс',
@@ -11279,12 +11287,12 @@ extension on TranslationsRu {
 			'tasks.createTask.titlePlaceholder' => 'Что нужно сделать?',
 			'tasks.list.completedReopen' => 'Выполнена (нажмите, чтобы переоткрыть)',
 			'tasks.list.inProgressComplete' => 'Выполняется (нажмите, чтобы завершить)',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.list.markCompleted' => 'Отметить как выполненную',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => 'Переключить статус задачи ${id}',
 			'tasks.list.markDone' => 'Отметить как выполненную',
 			'tasks.list.reopen' => 'Возобновить',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.nextTask.allComplete' => 'Все задачи выполнены',
 			'tasks.nextTask.feature1' => '- Управление задачами с ИИ: зависимости и подзадачи.',
 			'tasks.nextTask.feature2' => '- Генерация задач из PRD для быстрого старта проекта.',
@@ -11793,12 +11801,12 @@ extension on TranslationsRu {
 			'skills.screen.savedSuccessfully' => 'Навыки успешно сохранены.',
 			'skills.screen.loadingSkills' => ({required Object provider}) => 'Загрузка навыков ${provider}…',
 			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(count, one: '${count} НАВЫК', other: '${count} НАВЫКОВ', ), 
+			_ => null,
+		} ?? switch (path) {
 			'skills.screen.deleteTitle' => ({required Object name}) => 'Удалить ${name}?',
 			'skills.screen.deleteDescription' => ({required Object directory, required Object provider}) => 'Это удалит папку ${directory} из управляемой папки навыков ${provider}. Действие необратимо.',
 			'skills.screen.noDescription' => 'Описание не указано во front matter навыка.',
 			'skills.screen.pluginBadge' => ({required Object name}) => 'Плагин: ${name}',
-			_ => null,
-		} ?? switch (path) {
 			'skills.screen.projectBadge' => ({required Object name}) => 'Проект: ${name}',
 			'skills.screen.sourceLabel' => 'ИСТОЧНИК',
 			'skills.empty.noProjects' => 'Нет доступных проектов',

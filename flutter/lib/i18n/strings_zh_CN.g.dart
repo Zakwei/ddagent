@@ -3325,6 +3325,10 @@ class Translations$sidebar$panel$zh_CN extends Translations$sidebar$panel$en {
 	@override String get newChat => '新聊天';
 	@override String get navigation => '导航';
 	@override String get sessions => '会话';
+	@override String get sectionWork => '工作';
+	@override String get sectionPages => '页面';
+	@override String get sectionMore => '更多';
+	@override String get sectionApp => '应用';
 }
 
 // Path: sidebar.sessions
@@ -10880,6 +10884,10 @@ extension on TranslationsZhCn {
 			'sidebar.panel.newChat' => '新聊天',
 			'sidebar.panel.navigation' => '导航',
 			'sidebar.panel.sessions' => '会话',
+			'sidebar.panel.sectionWork' => '工作',
+			'sidebar.panel.sectionPages' => '页面',
+			'sidebar.panel.sectionMore' => '更多',
+			'sidebar.panel.sectionApp' => '应用',
 			'sidebar.sessions.title' => '会话',
 			'sidebar.sessions.newSession' => '新建会话',
 			'sidebar.sessions.deleteSession' => '删除会话',
@@ -11230,12 +11238,12 @@ extension on TranslationsZhCn {
 			'tasks.createTask.titlePlaceholder' => '需要做什么？',
 			'tasks.list.completedReopen' => '已完成（点击重新打开）',
 			'tasks.list.inProgressComplete' => '进行中（点击完成）',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.list.markCompleted' => '标记为已完成',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => '切换任务 ${id} 的状态',
 			'tasks.list.markDone' => '标记为已完成',
 			'tasks.list.reopen' => '重新打开',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.nextTask.allComplete' => '所有任务已完成',
 			'tasks.nextTask.feature1' => '- AI 任务管理，支持依赖和子任务。',
 			'tasks.nextTask.feature2' => '- PRD 驱动的任务生成，快速启动项目。',
@@ -11744,12 +11752,12 @@ extension on TranslationsZhCn {
 			'skills.screen.savedSuccessfully' => '技能保存成功。',
 			'skills.screen.loadingSkills' => ({required Object provider}) => '正在加载 ${provider} 技能…',
 			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '${count} 个技能', other: '${count} 个技能', ), 
+			_ => null,
+		} ?? switch (path) {
 			'skills.screen.deleteTitle' => ({required Object name}) => '删除 ${name}？',
 			'skills.screen.deleteDescription' => ({required Object directory, required Object provider}) => '这会将 ${directory} 目录从 ${provider} 的托管技能目录中移除。此操作无法撤销。',
 			'skills.screen.noDescription' => '技能的 front matter 中未提供描述。',
 			'skills.screen.pluginBadge' => ({required Object name}) => '插件：${name}',
-			_ => null,
-		} ?? switch (path) {
 			'skills.screen.projectBadge' => ({required Object name}) => '项目：${name}',
 			'skills.screen.sourceLabel' => '来源',
 			'skills.empty.noProjects' => '没有可用的项目',

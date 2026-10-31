@@ -6109,6 +6109,18 @@ class Translations$sidebar$panel$en {
 
 	/// en: 'Sessions'
 	String get sessions => 'Sessions';
+
+	/// en: 'Work'
+	String get sectionWork => 'Work';
+
+	/// en: 'Pages'
+	String get sectionPages => 'Pages';
+
+	/// en: 'More'
+	String get sectionMore => 'More';
+
+	/// en: 'App'
+	String get sectionApp => 'App';
 }
 
 // Path: sidebar.sessions
@@ -17518,6 +17530,10 @@ extension on Translations {
 			'sidebar.panel.newChat' => 'New chat',
 			'sidebar.panel.navigation' => 'Navigation',
 			'sidebar.panel.sessions' => 'Sessions',
+			'sidebar.panel.sectionWork' => 'Work',
+			'sidebar.panel.sectionPages' => 'Pages',
+			'sidebar.panel.sectionMore' => 'More',
+			'sidebar.panel.sectionApp' => 'App',
 			'sidebar.sessions.title' => 'Sessions',
 			'sidebar.sessions.newSession' => 'New Session',
 			'sidebar.sessions.deleteSession' => 'Delete Session',
@@ -17868,12 +17884,12 @@ extension on Translations {
 			'tasks.createTask.titlePlaceholder' => 'What needs to be done?',
 			'tasks.list.completedReopen' => 'Completed (click to reopen)',
 			'tasks.list.inProgressComplete' => 'In progress (click to complete)',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.list.markCompleted' => 'Mark completed',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => 'Toggle task ${id} status',
 			'tasks.list.markDone' => 'Mark done',
 			'tasks.list.reopen' => 'Reopen',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.nextTask.allComplete' => 'All tasks complete',
 			'tasks.nextTask.feature1' => '- AI-powered task management with dependencies and subtasks.',
 			'tasks.nextTask.feature2' => '- PRD-driven task generation for faster project bootstrapping.',
@@ -18382,12 +18398,12 @@ extension on Translations {
 			'skills.screen.savedSuccessfully' => 'Skills saved successfully.',
 			'skills.screen.loadingSkills' => ({required Object provider}) => 'Loading ${provider} skills…',
 			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: '${count} SKILL', other: '${count} SKILLS', ), 
+			_ => null,
+		} ?? switch (path) {
 			'skills.screen.deleteTitle' => ({required Object name}) => 'Delete ${name}?',
 			'skills.screen.deleteDescription' => ({required Object directory, required Object provider}) => 'This removes the ${directory} directory from ${provider}\'s managed skills directory. This cannot be undone.',
 			'skills.screen.noDescription' => 'No description provided in the skill front matter.',
 			'skills.screen.pluginBadge' => ({required Object name}) => 'Plugin: ${name}',
-			_ => null,
-		} ?? switch (path) {
 			'skills.screen.projectBadge' => ({required Object name}) => 'Project: ${name}',
 			'skills.screen.sourceLabel' => 'SOURCE',
 			'skills.empty.noProjects' => 'No projects available',

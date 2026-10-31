@@ -2947,7 +2947,11 @@
       "open": "パネル",
       "newChat": "新しいチャット",
       "navigation": "ナビゲーション",
-      "sessions": "セッション"
+      "sessions": "セッション",
+      "sectionWork": "作業",
+      "sectionPages": "ページ",
+      "sectionMore": "その他",
+      "sectionApp": "アプリ"
     },
     "sessions": {
       "title": "セッション",

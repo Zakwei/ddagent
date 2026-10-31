@@ -2947,7 +2947,11 @@
       "open": "패널",
       "newChat": "새 채팅",
       "navigation": "탐색",
-      "sessions": "세션"
+      "sessions": "세션",
+      "sectionWork": "작업",
+      "sectionPages": "페이지",
+      "sectionMore": "더 보기",
+      "sectionApp": "앱"
     },
     "sessions": {
       "title": "세션",

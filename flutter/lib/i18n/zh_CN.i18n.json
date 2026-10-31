@@ -2947,7 +2947,11 @@
       "open": "面板",
       "newChat": "新聊天",
       "navigation": "导航",
-      "sessions": "会话"
+      "sessions": "会话",
+      "sectionWork": "工作",
+      "sectionPages": "页面",
+      "sectionMore": "更多",
+      "sectionApp": "应用"
     },
     "sessions": {
       "title": "会话",

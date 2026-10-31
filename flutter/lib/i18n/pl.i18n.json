@@ -2987,7 +2987,11 @@
       "open": "Panel",
       "newChat": "Nowy czat",
       "navigation": "Nawigacja",
-      "sessions": "Sesje"
+      "sessions": "Sesje",
+      "sectionWork": "Praca",
+      "sectionPages": "Strony",
+      "sectionMore": "Więcej",
+      "sectionApp": "Aplikacja"
     },
     "sessions": {
       "title": "Sesje",

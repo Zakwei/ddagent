@@ -3357,6 +3357,10 @@ class Translations$sidebar$panel$pl extends Translations$sidebar$panel$en {
 	@override String get newChat => 'Nowy czat';
 	@override String get navigation => 'Nawigacja';
 	@override String get sessions => 'Sesje';
+	@override String get sectionWork => 'Praca';
+	@override String get sectionPages => 'Strony';
+	@override String get sectionMore => 'Więcej';
+	@override String get sectionApp => 'Aplikacja';
 }
 
 // Path: sidebar.sessions
@@ -10931,6 +10935,10 @@ extension on TranslationsPl {
 			'sidebar.panel.newChat' => 'Nowy czat',
 			'sidebar.panel.navigation' => 'Nawigacja',
 			'sidebar.panel.sessions' => 'Sesje',
+			'sidebar.panel.sectionWork' => 'Praca',
+			'sidebar.panel.sectionPages' => 'Strony',
+			'sidebar.panel.sectionMore' => 'Więcej',
+			'sidebar.panel.sectionApp' => 'Aplikacja',
 			'sidebar.sessions.title' => 'Sesje',
 			'sidebar.sessions.newSession' => 'Nowa sesja',
 			'sidebar.sessions.deleteSession' => 'Usuń sesję',
@@ -11281,12 +11289,12 @@ extension on TranslationsPl {
 			'tasks.createTask.titlePlaceholder' => 'Co trzeba zrobić?',
 			'tasks.list.completedReopen' => 'Ukończone (kliknij, aby ponownie otworzyć)',
 			'tasks.list.inProgressComplete' => 'W trakcie (kliknij, aby ukończyć)',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.list.markCompleted' => 'Oznacz jako ukończone',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => 'Przełącz status zadania ${id}',
 			'tasks.list.markDone' => 'Oznacz jako ukończone',
 			'tasks.list.reopen' => 'Otwórz ponownie',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.nextTask.allComplete' => 'Wszystkie zadania ukończone',
 			'tasks.nextTask.feature1' => '- Zarządzanie zadaniami wspomagane AI z zależnościami i podzadaniami.',
 			'tasks.nextTask.feature2' => '- Generowanie zadań na podstawie PRD dla szybszego startu projektu.',
@@ -11795,12 +11803,12 @@ extension on TranslationsPl {
 			'skills.screen.savedSuccessfully' => 'Skille zapisano pomyślnie.',
 			'skills.screen.loadingSkills' => ({required Object provider}) => 'Wczytywanie skilli ${provider}…',
 			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('pl'))(count, one: '${count} SKILL', other: '${count} SKILLI', ), 
+			_ => null,
+		} ?? switch (path) {
 			'skills.screen.deleteTitle' => ({required Object name}) => 'Usunąć ${name}?',
 			'skills.screen.deleteDescription' => ({required Object directory, required Object provider}) => 'Spowoduje to usunięcie katalogu ${directory} z zarządzanego katalogu skilli ${provider}. Tej operacji nie można cofnąć.',
 			'skills.screen.noDescription' => 'Nie podano opisu w metadanych skilla.',
 			'skills.screen.pluginBadge' => ({required Object name}) => 'Wtyczka: ${name}',
-			_ => null,
-		} ?? switch (path) {
 			'skills.screen.projectBadge' => ({required Object name}) => 'Projekt: ${name}',
 			'skills.screen.sourceLabel' => 'ŹRÓDŁO',
 			'skills.empty.noProjects' => 'Brak dostępnych projektów',

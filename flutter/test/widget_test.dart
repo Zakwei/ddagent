@@ -122,7 +122,10 @@ void main() {
     expect(find.byType(NavigationBar), findsNothing);
     await tester.tap(find.byIcon(LucideIcons.menu));
     await tester.pumpAndSettle();
-    expect(find.text('Navigation'), findsOneWidget);
+    // Grouped, with a header per section.
+    for (final section in ['WORK', 'PAGES', 'MORE', 'APP']) {
+      expect(find.text(section), findsOneWidget);
+    }
     expect(find.text('Terminal'), findsWidgets);
     // The sessions list went away with the chat UI.
     expect(find.text('Sessions'), findsNothing);
