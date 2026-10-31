@@ -207,7 +207,7 @@ class _AppPreviewPaneState extends ConsumerState<AppPreviewPane> {
                   value: 'url',
                   child: Row(
                     children: [
-                      const Icon(Icons.link, size: 14),
+                      const Icon(LucideIcons.link, size: 14),
                       const SizedBox(width: 8),
                       Text(i18n.appPreview.enterUrl),
                     ],
@@ -229,7 +229,7 @@ class _AppPreviewPaneState extends ConsumerState<AppPreviewPane> {
                         style: t.bodySmall?.copyWith(color: c.foreground),
                       ),
                     ),
-                    Icon(Icons.arrow_drop_down, size: 16, color: fg),
+                    Icon(LucideIcons.chevronDown, size: 16, color: fg),
                   ],
                 ),
               ),
@@ -277,7 +277,7 @@ class _AppPreviewPaneState extends ConsumerState<AppPreviewPane> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(device.label, style: t.labelSmall?.copyWith(color: fg)),
-                  Icon(Icons.arrow_drop_down, size: 16, color: fg),
+                  Icon(LucideIcons.chevronDown, size: 16, color: fg),
                 ],
               ),
             ),
@@ -341,7 +341,7 @@ class _AppPreviewPaneState extends ConsumerState<AppPreviewPane> {
           if (onClose != null)
             IconButton(
               onPressed: onClose,
-              icon: Icon(Icons.close, size: 14, color: c.destructive),
+              icon: Icon(LucideIcons.x, size: 14, color: c.destructive),
               visualDensity: VisualDensity.compact,
             ),
         ],

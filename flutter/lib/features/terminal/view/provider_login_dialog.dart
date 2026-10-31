@@ -4,6 +4,7 @@ import 'package:ddagent_app/features/terminal/view/terminal_view_wrapper.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ProviderLoginDialog extends ConsumerStatefulWidget {
@@ -204,7 +205,7 @@ class _ProviderLoginDialogState extends ConsumerState<ProviderLoginDialog> {
                     const SizedBox(width: 8),
                   ],
                   IconButton(
-                    icon: const Icon(Icons.close, size: 20),
+                    icon: const Icon(LucideIcons.x, size: 20),
                     onPressed: () => Navigator.of(context).pop(),
                     tooltip: t.chat.common.close,
                   ),
@@ -220,7 +221,7 @@ class _ProviderLoginDialogState extends ConsumerState<ProviderLoginDialog> {
                 color: colors.primary.withValues(alpha: 0.12),
                 child: Row(
                   children: [
-                    Icon(Icons.link, size: 16, color: colors.primary),
+                    Icon(LucideIcons.link, size: 16, color: colors.primary),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
@@ -234,7 +235,7 @@ class _ProviderLoginDialogState extends ConsumerState<ProviderLoginDialog> {
                     ),
                     TextButton.icon(
                       onPressed: () => _openAuthUrl(latestAuthUrl),
-                      icon: const Icon(Icons.open_in_new, size: 14),
+                      icon: const Icon(LucideIcons.externalLink, size: 14),
                       label: Text(t.terminal.authUrl.openInBrowser),
                       style: TextButton.styleFrom(visualDensity: VisualDensity.compact),
                     ),

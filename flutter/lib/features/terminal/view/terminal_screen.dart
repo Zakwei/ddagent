@@ -931,7 +931,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
       color: colors.primary.withValues(alpha: 0.12),
       child: Row(
         children: [
-          Icon(Icons.link, size: 16, color: colors.primary),
+          Icon(LucideIcons.link, size: 16, color: colors.primary),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -948,7 +948,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
           const SizedBox(width: 8),
           TextButton.icon(
             onPressed: () => _openAuthUrl(authUrl),
-            icon: const Icon(Icons.open_in_new, size: 14),
+            icon: const Icon(LucideIcons.externalLink, size: 14),
             label: Text(t.common.gitPanel.worktrees.open),
             style: TextButton.styleFrom(
               visualDensity: VisualDensity.compact,
@@ -958,7 +958,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
           IconButton(
             tooltip: t.chat.splitOverview.close,
             onPressed: onDismiss,
-            icon: Icon(Icons.close, size: 16, color: colors.primary),
+            icon: Icon(LucideIcons.x, size: 16, color: colors.primary),
             visualDensity: VisualDensity.compact,
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints.tightFor(width: 28, height: 28),
@@ -977,7 +977,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.terminal_rounded, size: 48, color: fg.withValues(alpha: 0.5)),
+          Icon(LucideIcons.squareTerminal, size: 48, color: fg.withValues(alpha: 0.5)),
           const SizedBox(height: 12),
           Text(
             t.terminal.empty.title,
@@ -998,7 +998,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
                 isPlainShell: true,
               );
             },
-            icon: const Icon(Icons.add),
+            icon: const Icon(LucideIcons.plus),
             label: Text(t.terminal.actions.newShell),
           ),
         ],

@@ -5,6 +5,7 @@ import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
+import 'package:ddagent_app/core/widgets/edge_fade.dart';
 import 'package:ddagent_app/core/widgets/subpage_header.dart';
 import 'package:ddagent_app/features/collab/data/collab_repository.dart';
 import 'package:ddagent_app/features/collab/state/presence_controller.dart';
@@ -347,6 +348,81 @@ class _KanbanScreenState extends ConsumerState<KanbanScreen> {
     final cards = _filteredCards(state);
     final activeProject = projects.where((p) => p.projectId == pid).firstOrNull;
 
+    final title = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (projects.isNotEmpty)
+          _ProjectMenu(
+            projects: projects,
+            selected: activeProject,
+            onSelect: (p) => _selectProject(p.projectId),
+          )
+        else
+          Text(
+            activeProject?.displayName ?? pid,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: c.foreground, fontSize: 14, fontWeight: FontWeight.w600),
+          ),
+        Text(
+          t.tasks.board.subtitle,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(color: c.mutedForeground, fontSize: 11),
+        ),
+      ],
+    );
+    final actions = <Widget>[
+      PresenceAvatars(roster: roster),
+      if (users.isNotEmpty) ...[
+        const SizedBox(width: 4),
+        _AssigneeMenu(
+          users: users,
+          value: _assigneeFilter,
+          onChanged: (v) => setState(() => _assigneeFilter = v),
+        ),
+      ],
+      const SizedBox(width: 4),
+      _BoardAgentChips(projectId: pid, config: state.boardConfig),
+      const SizedBox(width: 4),
+      AppButton(
+        variant: AppButtonVariant.ghost,
+        size: AppButtonSize.sm,
+        onPressed: state.isLoading
+            ? null
+            : () => unawaited(ref.read(kanbanControllerProvider.notifier).load(pid)),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (state.isLoading)
+              SizedBox(
+                width: 14,
+                height: 14,
+                child: CircularProgressIndicator(strokeWidth: 2, color: c.mutedForeground),
+              )
+            else
+              const Icon(LucideIcons.refreshCw, size: 16),
+            const SizedBox(width: 4),
+            Text(t.common.buttons.refresh, style: const TextStyle(fontSize: 14)),
+          ],
+        ),
+      ),
+      const SizedBox(width: 4),
+      AppButton(
+        key: const Key('add-card-button'),
+        size: AppButtonSize.sm,
+        onPressed: () => _showCardDialog(context),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(LucideIcons.plus, size: 16),
+            const SizedBox(width: 4),
+            Text(t.tasks.board.newCard, style: const TextStyle(fontSize: 14)),
+          ],
+        ),
+      ),
+    ];
+
     return Column(
       children: [
         // Panel header — `border-b border-border/60 px-4 py-2`.
@@ -355,90 +431,30 @@ class _KanbanScreenState extends ConsumerState<KanbanScreen> {
             border: Border(bottom: BorderSide(color: c.border.withValues(alpha: 0.6))),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          child: context.breakpoint.isCompact
+              // A phone can't fit the title and every control on one line:
+              // the title collapsed and the buttons ran off the screen.
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    if (projects.isNotEmpty)
-                      _ProjectMenu(
-                        projects: projects,
-                        selected: activeProject,
-                        onSelect: (p) => _selectProject(p.projectId),
-                      )
-                    else
-                      Text(
-                        activeProject?.displayName ?? pid,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: c.foreground,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
+                    title,
+                    const SizedBox(height: 8),
+                    HorizontalEdgeFade(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(children: actions),
                       ),
-                    Text(
-                      t.tasks.board.subtitle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(color: c.mutedForeground, fontSize: 11),
                     ),
                   ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              PresenceAvatars(roster: roster),
-              if (users.isNotEmpty) ...[
-                const SizedBox(width: 4),
-                _AssigneeMenu(
-                  users: users,
-                  value: _assigneeFilter,
-                  onChanged: (v) => setState(() => _assigneeFilter = v),
-                ),
-              ],
-              const SizedBox(width: 4),
-              _BoardAgentChips(projectId: pid, config: state.boardConfig),
-              const SizedBox(width: 4),
-              AppButton(
-                variant: AppButtonVariant.ghost,
-                size: AppButtonSize.sm,
-                onPressed: state.isLoading
-                    ? null
-                    : () => unawaited(ref.read(kanbanControllerProvider.notifier).load(pid)),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
+                )
+              : Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (state.isLoading)
-                      SizedBox(
-                        width: 14,
-                        height: 14,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: c.mutedForeground),
-                      )
-                    else
-                      const Icon(LucideIcons.refreshCw, size: 16),
-                    const SizedBox(width: 4),
-                    Text(t.common.buttons.refresh, style: const TextStyle(fontSize: 14)),
+                    Expanded(child: title),
+                    const SizedBox(width: 8),
+                    ...actions,
                   ],
                 ),
-              ),
-              const SizedBox(width: 4),
-              AppButton(
-                key: const Key('add-card-button'),
-                size: AppButtonSize.sm,
-                onPressed: () => _showCardDialog(context),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(LucideIcons.plus, size: 16),
-                    const SizedBox(width: 4),
-                    Text(t.tasks.board.newCard, style: const TextStyle(fontSize: 14)),
-                  ],
-                ),
-              ),
-            ],
-          ),
         ),
         if (state.error != null)
           Padding(

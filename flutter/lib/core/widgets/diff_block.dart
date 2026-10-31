@@ -4,6 +4,7 @@ import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/utils/clipboard.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Unified-diff block (tool_result edit output) — add/del/context line
 /// coloring (T16.4).
@@ -51,7 +52,7 @@ class DiffBlock extends StatelessWidget {
                 IconButton(
                   tooltip: t.chat.codeBlock.copy,
                   visualDensity: VisualDensity.compact,
-                  icon: const Icon(Icons.copy_outlined, size: 15),
+                  icon: const Icon(LucideIcons.copy, size: 15),
                   onPressed: () => unawaited(copyTextWithFeedback(context, diff)),
                 ),
               ],

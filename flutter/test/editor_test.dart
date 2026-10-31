@@ -15,6 +15,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class FakeFileTreeRepository extends FileTreeRepository {
   FakeFileTreeRepository() : super(Dio());
@@ -374,7 +375,7 @@ void main() {
         expect(find.byIcon(Icons.circle), findsOneWidget);
 
         // Próba zamknięcia karty - pojawia się dialog ostrzeżenia
-        await tester.tap(find.byIcon(Icons.close));
+        await tester.tap(find.byIcon(LucideIcons.x));
         await tester.pumpAndSettle();
         expect(find.text('Unsaved changes in file1.dart'), findsOneWidget);
         expect(find.text('Discard unsaved changes?'), findsOneWidget);

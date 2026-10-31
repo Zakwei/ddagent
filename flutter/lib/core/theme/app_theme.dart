@@ -51,8 +51,14 @@ abstract final class AppTheme {
       // token), which in dark mode is the card colour — the switch vanished.
       switchTheme: SwitchThemeData(
         thumbColor: _switchColor(c.primaryForeground, c.mutedForeground),
-        trackColor: _switchColor(c.primary, c.muted),
+        trackColor: _switchColor(c.primaryFill, c.muted),
         trackOutlineColor: _switchColor(Colors.transparent, c.mutedForeground),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: c.primaryFill,
+          foregroundColor: c.primaryForeground,
+        ),
       ),
       cardTheme: CardThemeData(
         color: c.card,

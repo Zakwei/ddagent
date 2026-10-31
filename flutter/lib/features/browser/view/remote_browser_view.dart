@@ -12,6 +12,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class _Nav {
@@ -266,17 +267,17 @@ class _RemoteBrowserViewState extends ConsumerState<RemoteBrowserView> {
           child: Row(
             children: [
               _navButton(
-                Icons.arrow_back,
+                LucideIcons.arrowLeft,
                 i18n.common.browserPane.back,
                 _nav.canGoBack ? () => _safeSend(_ch.back) : null,
               ),
               _navButton(
-                Icons.arrow_forward,
+                LucideIcons.arrowRight,
                 i18n.common.browserPane.forward,
                 _nav.canGoForward ? () => _safeSend(_ch.forward) : null,
               ),
               _navButton(
-                _nav.loading ? Icons.close : Icons.refresh,
+                _nav.loading ? LucideIcons.x : LucideIcons.refreshCw,
                 _nav.loading ? i18n.common.browserPane.stop : i18n.common.browserPane.reload,
                 () => _safeSend(_nav.loading ? _ch.stop : _ch.reload),
               ),
@@ -293,7 +294,7 @@ class _RemoteBrowserViewState extends ConsumerState<RemoteBrowserView> {
                   ),
                 ),
               ),
-              _navButton(Icons.open_in_new, i18n.common.browserPane.openExternal, () {
+              _navButton(LucideIcons.externalLink, i18n.common.browserPane.openExternal, () {
                 final u = _nav.url.isEmpty ? widget.url : _nav.url;
                 if (_isHttp(u)) {
                   unawaited(launchUrl(Uri.parse(u!), mode: LaunchMode.externalApplication));
@@ -368,7 +369,7 @@ class _RemoteBrowserViewState extends ConsumerState<RemoteBrowserView> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.public, size: 24, color: c.mutedForeground),
+                            Icon(LucideIcons.globe, size: 24, color: c.mutedForeground),
                             const SizedBox(height: AppSpacing.xs),
                             Text(
                               _status == 'connecting'

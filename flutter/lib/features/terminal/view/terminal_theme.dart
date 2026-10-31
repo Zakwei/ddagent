@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:xterm/xterm.dart' as xt;
 
 /// Windows Terminal colour schemes. Dark mode renders "Campbell" (the WT
@@ -119,11 +120,11 @@ class TerminalPalette {
 
 /// Tab/profile icon — WT shows the profile glyph before the title.
 IconData terminalProfileIcon(String provider, {required bool isPlainShell}) {
-  if (isPlainShell) return Icons.terminal_rounded;
+  if (isPlainShell) return LucideIcons.squareTerminal;
   return switch (provider) {
-    'claude' => Icons.auto_awesome_rounded,
-    'devin' => Icons.psychology_rounded,
-    'cursor' => Icons.computer_rounded,
-    _ => Icons.smart_toy_outlined,
+    'claude' => LucideIcons.sparkles,
+    'devin' => LucideIcons.brain,
+    'cursor' => LucideIcons.monitor,
+    _ => LucideIcons.bot,
   };
 }

@@ -2,6 +2,7 @@ import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/features/taskmaster/data/taskmaster_models.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 const taskStatuses = ['pending', 'in-progress', 'review', 'done', 'deferred', 'cancelled'];
 
@@ -17,10 +18,10 @@ Color taskStatusColor(String status, AppColors c) => switch (status) {
 
 IconData taskStatusIcon(String status) => switch (status) {
   'done' => Icons.check_circle,
-  'in-progress' => Icons.schedule,
-  'review' => Icons.error_outline,
-  'deferred' => Icons.pause_circle_outline,
-  'cancelled' => Icons.cancel_outlined,
+  'in-progress' => LucideIcons.clock,
+  'review' => LucideIcons.circleAlert,
+  'deferred' => LucideIcons.circlePause,
+  'cancelled' => LucideIcons.circleX,
   _ => Icons.radio_button_unchecked,
 };
 
@@ -202,7 +203,7 @@ class TaskmasterTaskTile extends StatelessWidget {
                       : i18n.tasks.nextTask.startTask,
                   onPressed: busy || inProgress ? null : onRun,
                   icon: Icon(
-                    Icons.play_arrow,
+                    LucideIcons.play,
                     size: 18,
                     color: inProgress ? c.primary : c.mutedForeground,
                   ),

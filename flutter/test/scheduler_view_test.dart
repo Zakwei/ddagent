@@ -10,6 +10,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class _Repo extends SchedulerRepository {
   _Repo() : super(Dio());
@@ -160,7 +161,7 @@ void main() {
     expect(repo.calls, contains('runNow:j1'));
     expect(repo.calls, contains('runs:j1'));
 
-    await t.tap(find.byIcon(Icons.delete_outline).first);
+    await t.tap(find.byIcon(LucideIcons.trash2).first);
     await t.pumpAndSettle();
     await t.tap(find.text('Delete').last);
     await t.pumpAndSettle();

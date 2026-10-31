@@ -17,6 +17,7 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.popover,
     required this.popoverForeground,
     required this.primary,
+    required this.primaryFill,
     required this.primaryForeground,
     required this.secondary,
     required this.secondaryForeground,
@@ -38,6 +39,13 @@ class AppColors extends ThemeExtension<AppColors> {
   final Color popover;
   final Color popoverForeground;
   final Color primary;
+
+  /// Fill of solid primary surfaces (buttons, badges, active toggles) that
+  /// carry [primaryForeground] text. Dark mode keeps [primary] light enough
+  /// to read as link/accent text on the dark background, and fills with a
+  /// deeper blue so white text on it stays legible (5.2:1) — dark text on
+  /// the light blue looked muddy.
+  final Color primaryFill;
   final Color primaryForeground;
   final Color secondary;
   final Color secondaryForeground;
@@ -60,6 +68,7 @@ class AppColors extends ThemeExtension<AppColors> {
     popover: Color(0xFFFFFFFF),
     popoverForeground: Color(0xFF0D0B08),
     primary: Color(0xFF2563EB), // hsl(221.2 83.2% 53.3%)
+    primaryFill: Color(0xFF2563EB),
     primaryForeground: Color(0xFFF8FAFC),
     secondary: Color(0xFFEBEAE5), // hsl(44 15% 91%)
     secondaryForeground: Color(0xFF352F27), // hsl(36 15% 18%)
@@ -83,7 +92,8 @@ class AppColors extends ThemeExtension<AppColors> {
     popover: Color(0xFF1F1F1F),
     popoverForeground: Color(0xFFEFEEEC),
     primary: Color(0xFF3B82F6), // hsl(217.2 91.2% 59.8%)
-    primaryForeground: Color(0xFF141414),
+    primaryFill: Color(0xFF2563EB),
+    primaryForeground: Color(0xFFF8FAFC),
     secondary: Color(0xFF2B2B2B), // hsl(0 0% 17%)
     secondaryForeground: Color(0xFFEFEEEC),
     muted: Color(0xFF2B2B2B),
@@ -108,6 +118,7 @@ class AppColors extends ThemeExtension<AppColors> {
     popover: Color(0xFF282828),
     popoverForeground: Color(0xFFF4F4F4),
     primary: Color(0xFFFAB283),
+    primaryFill: Color(0xFFFAB283),
     primaryForeground: Color(0xFF0A0A0A),
     secondary: Color(0xFF222222),
     secondaryForeground: Color(0xFFF4F4F4),

@@ -18,6 +18,7 @@ import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 final _emailPattern = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
 
@@ -141,7 +142,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           Icon(
                             i < _step
                                 ? Icons.check_circle
-                                : (i == _step ? Icons.radio_button_checked : Icons.circle_outlined),
+                                : (i == _step ? Icons.radio_button_checked : LucideIcons.circle),
                             size: 18,
                             color: i <= _step ? c.primary : c.mutedForeground,
                           ),
@@ -451,7 +452,7 @@ class _AgentConnectionCard extends ConsumerWidget {
                     if (connected) ...[
                       const SizedBox(width: 4),
                       const Icon(
-                        Icons.check,
+                        LucideIcons.check,
                         size: 14,
                         color: Color(0xFF10B981), // emerald-500
                       ),

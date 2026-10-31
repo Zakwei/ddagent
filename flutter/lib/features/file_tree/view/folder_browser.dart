@@ -6,6 +6,7 @@ import 'package:ddagent_app/features/file_tree/data/file_tree_repository.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Server filesystem folder picker (browse-filesystem, depth=1).
 /// Pops with the selected absolute path.
@@ -86,7 +87,7 @@ class _FolderBrowserDialogState extends ConsumerState<FolderBrowserDialog> {
                         for (final d in _dirs)
                           ListTile(
                             dense: true,
-                            leading: const Icon(Icons.folder_outlined, size: 18),
+                            leading: const Icon(LucideIcons.folder, size: 18),
                             title: Text(d['name'] as String? ?? ''),
                             onTap: () => _load(d['path'] as String?),
                           ),

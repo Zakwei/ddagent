@@ -5,6 +5,7 @@ import 'package:ddagent_app/features/knowledge/data/knowledge_models.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// One selectable project in the memory/rule scope dropdown.
 class KnowledgeProjectOption {
@@ -216,11 +217,7 @@ class _KnowledgeFormDialogState extends State<KnowledgeFormDialog> {
                     ClipRRect(
                       borderRadius: BorderRadius.circular(8),
                       child: _icon.isEmpty
-                          ? const SizedBox(
-                              width: 48,
-                              height: 48,
-                              child: Icon(Icons.auto_awesome_outlined),
-                            )
+                          ? const SizedBox(width: 48, height: 48, child: Icon(LucideIcons.sparkles))
                           : Image.memory(
                               base64Decode(_icon.split(',').last),
                               width: 48,

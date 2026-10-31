@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:ddagent_app/features/preview/data/app_preview_models.dart';
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Chrome colours shared by every frame style (always dark, like a real
 /// device bezel — independent of the app theme, same as the Teal-login demo).
@@ -437,12 +438,12 @@ class _WindowFrame extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: Row(
                   children: [
-                    const Icon(Icons.arrow_back, size: 16, color: _FrameColors.windowBarFg),
+                    const Icon(LucideIcons.arrowLeft, size: 16, color: _FrameColors.windowBarFg),
                     const SizedBox(width: 10),
-                    const Icon(Icons.arrow_forward, size: 16, color: Color(0xFF6B6E78)),
+                    const Icon(LucideIcons.arrowRight, size: 16, color: Color(0xFF6B6E78)),
                     const SizedBox(width: 10),
                     Icon(
-                      loading ? Icons.close : Icons.refresh,
+                      loading ? LucideIcons.x : LucideIcons.refreshCw,
                       size: 16,
                       color: _FrameColors.windowBarFg,
                     ),
@@ -459,7 +460,7 @@ class _WindowFrame extends StatelessWidget {
                         child: Row(
                           children: [
                             Icon(
-                              url.startsWith('https://') ? Icons.lock_outline : Icons.info_outline,
+                              url.startsWith('https://') ? LucideIcons.lock : LucideIcons.info,
                               size: 12,
                               color: const Color(0xFF8A8D97),
                             ),

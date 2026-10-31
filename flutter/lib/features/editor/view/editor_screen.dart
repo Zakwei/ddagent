@@ -16,6 +16,7 @@ import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// `/editor` screen: multi-tab code editor. Opens `?projectId=&file=` deep
 /// links, renders text tabs in [CodeEditor], markdown with an edit/preview
@@ -352,7 +353,7 @@ class _TabChip extends StatelessWidget {
               borderRadius: AppRadii.borderMd,
               child: Padding(
                 padding: const EdgeInsets.all(2),
-                child: Icon(Icons.close, size: 13, color: colors.mutedForeground),
+                child: Icon(LucideIcons.x, size: 13, color: colors.mutedForeground),
               ),
             ),
           ],
@@ -407,11 +408,7 @@ class _Toolbar extends StatelessWidget {
           IconButton(
             tooltip: t.codeEditor.toolbar.toggleDock,
             visualDensity: VisualDensity.compact,
-            icon: Icon(
-              Icons.view_sidebar_outlined,
-              size: 18,
-              color: dockOpen ? colors.primary : null,
-            ),
+            icon: Icon(LucideIcons.panelRight, size: 18, color: dockOpen ? colors.primary : null),
             onPressed: onToggleDock,
           ),
           Expanded(
@@ -427,38 +424,34 @@ class _Toolbar extends StatelessWidget {
                   ? t.codeEditor.actions.editMarkdown
                   : t.codeEditor.actions.previewMarkdown,
               visualDensity: VisualDensity.compact,
-              icon: Icon(previewOn ? Icons.edit_outlined : Icons.visibility_outlined, size: 18),
+              icon: Icon(previewOn ? LucideIcons.pencil : LucideIcons.eye, size: 18),
               onPressed: onTogglePreview,
             ),
           if (isTextual)
             IconButton(
               tooltip: t.codeEditor.toolbar.diffMerge,
               visualDensity: VisualDensity.compact,
-              icon: Icon(
-                Icons.difference_outlined,
-                size: 18,
-                color: diffOpen ? colors.primary : null,
-              ),
+              icon: Icon(LucideIcons.diff, size: 18, color: diffOpen ? colors.primary : null),
               onPressed: onToggleDiff,
             ),
           if (isHtml)
             IconButton(
               tooltip: t.codeEditor.toolbar.previewInBrowser,
               visualDensity: VisualDensity.compact,
-              icon: const Icon(Icons.visibility_outlined, size: 18),
+              icon: const Icon(LucideIcons.eye, size: 18),
               onPressed: onHtmlPreview,
             ),
           if (isTextual)
             IconButton(
               tooltip: t.codeEditor.toolbar.reload,
               visualDensity: VisualDensity.compact,
-              icon: const Icon(Icons.refresh, size: 18),
+              icon: const Icon(LucideIcons.refreshCw, size: 18),
               onPressed: onReload,
             ),
           IconButton(
             tooltip: t.common.buttons.download,
             visualDensity: VisualDensity.compact,
-            icon: const Icon(Icons.download_outlined, size: 18),
+            icon: const Icon(LucideIcons.download, size: 18),
             onPressed: onDownload,
           ),
           AppButton(
@@ -490,7 +483,7 @@ class _SettingsMenu extends ConsumerWidget {
     final t = Translations.of(context);
     return PopupMenuButton<String>(
       tooltip: t.codeEditor.toolbar.settings,
-      icon: const Icon(Icons.settings_outlined, size: 18),
+      icon: const Icon(LucideIcons.settings, size: 18),
       onSelected: (v) {
         switch (v) {
           case 'wrap':
@@ -569,7 +562,7 @@ class _EmptyState extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.edit_note, size: 48, color: colors.mutedForeground),
+          Icon(LucideIcons.notebookPen, size: 48, color: colors.mutedForeground),
           const SizedBox(height: AppSpacing.sm),
           Text(t.codeEditor.emptyState.title, style: Theme.of(context).textTheme.titleSmall),
           Text(

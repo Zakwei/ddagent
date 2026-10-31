@@ -26,7 +26,7 @@ class AppButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final (bg, fg, border) = switch (variant) {
-      AppButtonVariant.primary => (c.primary, c.primaryForeground, Colors.transparent),
+      AppButtonVariant.primary => (c.primaryFill, c.primaryForeground, Colors.transparent),
       AppButtonVariant.secondary => (c.secondary, c.secondaryForeground, Colors.transparent),
       AppButtonVariant.destructive => (c.destructive, c.destructiveForeground, Colors.transparent),
       // `outline` — border-input bg-background shadow-sm.

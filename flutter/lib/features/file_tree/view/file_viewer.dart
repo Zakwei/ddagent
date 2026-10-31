@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Raw-content URL for a project file (image viewer + downloads).
 String fileContentUrl(String projectId, String path) =>
@@ -198,7 +199,7 @@ class _FileViewerPaneState extends ConsumerState<FileViewerPane> {
             ),
             IconButton(
               tooltip: t.fileTree.copyContents,
-              icon: const Icon(Icons.copy_outlined, size: 18),
+              icon: const Icon(LucideIcons.copy, size: 18),
               onPressed: () {
                 Clipboard.setData(ClipboardData(text: _content.text));
                 AppToast.show(context, t.chat.codeBlock.copied);
@@ -206,7 +207,7 @@ class _FileViewerPaneState extends ConsumerState<FileViewerPane> {
             ),
             IconButton(
               tooltip: t.common.fileOperations.openInEditor,
-              icon: const Icon(Icons.edit_note, size: 18),
+              icon: const Icon(LucideIcons.notebookPen, size: 18),
               onPressed: () => context.go(
                 '/editor?projectId=${widget.projectId}'
                 '&file=${Uri.encodeQueryComponent(widget.node.path)}',

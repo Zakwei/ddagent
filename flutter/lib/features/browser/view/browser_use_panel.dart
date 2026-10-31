@@ -103,15 +103,23 @@ class _BrowserUsePanelState extends ConsumerState<BrowserUsePanel> {
             children: [
               if (compact) const AppNavMenuButton(),
               Icon(LucideIcons.monitorPlay, size: 16, color: c.primary),
-              Flexible(
-                child: Text(
-                  t.common.browserUse.title,
-                  overflow: TextOverflow.ellipsis,
-                  style: tt.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+              // A loose Flexible beside a Spacer kept half the free width,
+              // so the actions never reached the right edge.
+              Expanded(
+                child: Row(
+                  spacing: AppSpacing.sm,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        t.common.browserUse.title,
+                        overflow: TextOverflow.ellipsis,
+                        style: tt.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    _Badge(label: runtimeLabel, highlighted: runtimeReady),
+                  ],
                 ),
               ),
-              _Badge(label: runtimeLabel, highlighted: runtimeReady),
-              const Spacer(),
               IconButton(
                 tooltip: t.common.browserUse.openSettings,
                 icon: const Icon(LucideIcons.settings, size: 14),

@@ -6,6 +6,7 @@ import 'package:ddagent_app/features/git/data/git_repository.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Project git status for the Changed Files dock section — null when the
 /// project isn't a repository (status 400 NOT_A_GIT_REPOSITORY) or the call
@@ -91,11 +92,11 @@ class _ChangedSection extends ConsumerWidget {
   final EditorDock dock;
 
   static const _groups = [
-    ('staged', Icons.add_task),
-    ('modified', Icons.edit_outlined),
-    ('added', Icons.add_circle_outline),
-    ('deleted', Icons.remove_circle_outline),
-    ('untracked', Icons.help_outline),
+    ('staged', LucideIcons.listPlus),
+    ('modified', LucideIcons.pencil),
+    ('added', LucideIcons.circlePlus),
+    ('deleted', LucideIcons.circleMinus),
+    ('untracked', LucideIcons.circleHelp),
   ];
 
   List<String> _paths(String key) => [
@@ -198,9 +199,9 @@ class _FileRow extends ConsumerWidget {
             Icon(
               n.isDirectory
                   ? (ref.read(fileTreeProvider).expanded.contains(n.path)
-                        ? Icons.expand_more
-                        : Icons.chevron_right)
-                  : Icons.insert_drive_file_outlined,
+                        ? LucideIcons.chevronDown
+                        : LucideIcons.chevronRight)
+                  : LucideIcons.file,
               size: 13,
               color: c.mutedForeground,
             ),

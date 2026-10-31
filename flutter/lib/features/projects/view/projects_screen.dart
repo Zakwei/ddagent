@@ -109,7 +109,7 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
                 ),
                 IconButton(
                   tooltip: i18n.sidebar.projects.newProject,
-                  icon: Icon(Icons.add, color: c.primary),
+                  icon: Icon(LucideIcons.plus, color: c.primary),
                   onPressed: () => showDialog<void>(
                     context: context,
                     builder: (_) => const _CreateProjectDialog(),
@@ -184,7 +184,7 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
                         child: Row(
                           children: [
                             Icon(
-                              _archivedOpen ? Icons.expand_more : Icons.chevron_right,
+                              _archivedOpen ? LucideIcons.chevronDown : LucideIcons.chevronRight,
                               size: 18,
                               color: c.mutedForeground,
                             ),
@@ -293,7 +293,7 @@ class _ProjectMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => PopupMenuButton<int>(
-    icon: const Icon(Icons.more_vert, size: 18),
+    icon: const Icon(LucideIcons.ellipsisVertical, size: 18),
     onSelected: (i) => entries[i].$2(),
     itemBuilder: (_) => [
       for (var i = 0; i < entries.length; i++)
@@ -347,7 +347,7 @@ class _ProjectTileState extends ConsumerState<_ProjectTile> {
           children: [
             Row(
               children: [
-                Icon(Icons.folder_outlined, size: 20, color: c.mutedForeground),
+                Icon(LucideIcons.folder, size: 20, color: c.mutedForeground),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Column(
@@ -364,7 +364,7 @@ class _ProjectTileState extends ConsumerState<_ProjectTile> {
                           ),
                           if (widget.taskmasterBadge) ...[
                             const SizedBox(width: AppSpacing.xs),
-                            Icon(Icons.task_alt, size: 15, color: c.primary),
+                            Icon(LucideIcons.circleCheckBig, size: 15, color: c.primary),
                           ],
                         ],
                       ),
@@ -398,7 +398,7 @@ class _ProjectTileState extends ConsumerState<_ProjectTile> {
                   ),
                 widget.menu,
                 Icon(
-                  _expanded ? Icons.expand_less : Icons.expand_more,
+                  _expanded ? LucideIcons.chevronUp : LucideIcons.chevronDown,
                   size: 18,
                   color: c.mutedForeground,
                 ),
@@ -455,7 +455,7 @@ class _SessionsList extends ConsumerWidget {
             ListTile(
               dense: true,
               contentPadding: EdgeInsets.zero,
-              leading: Icon(Icons.chat_bubble_outline, size: 16, color: c.mutedForeground),
+              leading: Icon(LucideIcons.messageSquare, size: 16, color: c.mutedForeground),
               title: Text(
                 (s['title'] ?? s['displayName'] ?? s['id'] ?? i18n.sidebar.projects.untitledSession)
                     .toString(),
@@ -723,7 +723,7 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close, size: 20),
+                      icon: const Icon(LucideIcons.x, size: 20),
                       tooltip: i18n.chat.common.close,
                       onPressed: _busy ? null : () => Navigator.of(context).pop(),
                     ),
@@ -805,7 +805,7 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
           ),
           IconButton(
             tooltip: i18n.common.buttons.browse,
-            icon: const Icon(Icons.folder_open),
+            icon: const Icon(LucideIcons.folderOpen),
             onPressed: _busy ? null : _browse,
           ),
         ],
@@ -1085,12 +1085,12 @@ class _WizardProgress extends StatelessWidget {
             color: s < step
                 ? const Color(0xFF22C55E)
                 : s == step
-                ? c.primary
+                ? c.primaryFill
                 : c.muted,
           ),
           child: Center(
             child: s < step
-                ? const Icon(Icons.check, size: 16, color: Colors.white)
+                ? const Icon(LucideIcons.check, size: 16, color: Colors.white)
                 : Text(
                     '$s',
                     style: t.bodySmall?.copyWith(
@@ -1280,7 +1280,7 @@ class _CloneDialogState extends ConsumerState<_CloneDialog> {
                   ),
                   IconButton(
                     tooltip: i18n.common.buttons.browse,
-                    icon: const Icon(Icons.folder_open),
+                    icon: const Icon(LucideIcons.folderOpen),
                     onPressed: _browseDest,
                   ),
                 ],

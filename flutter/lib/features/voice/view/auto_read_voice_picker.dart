@@ -4,6 +4,7 @@ import 'package:ddagent_app/features/voice/state/tts_controller.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Global voice picker for TTS read-aloud.
 class AutoReadVoicePicker extends ConsumerWidget {
@@ -66,7 +67,7 @@ class AutoReadVoicePicker extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                  ttsState.isSpeakingMessage('preview') ? Icons.stop : Icons.volume_up,
+                  ttsState.isSpeakingMessage('preview') ? LucideIcons.square : LucideIcons.volume2,
                   size: 16,
                   color: c.primary,
                 ),

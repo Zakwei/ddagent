@@ -611,17 +611,47 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
           leading: context.breakpoint.isCompact ? const AppNavMenuButton() : null,
           title: Text(t.knowledge.title),
           actions: [
-            DropdownButton<String?>(
-              value: state.projectFilter,
-              underline: const SizedBox.shrink(),
-              hint: Text(t.knowledge.common.allProjects),
-              items: [
-                DropdownMenuItem<String?>(value: null, child: Text(t.knowledge.common.allProjects)),
-                for (final project in projects)
-                  DropdownMenuItem<String?>(value: project.id, child: Text(project.name)),
-              ],
-              onChanged: (value) => controller.setProjectFilter(value),
-            ),
+            // On a phone the dropdown took the whole bar and pushed the
+            // title out — there the filter folds into an icon menu.
+            if (context.breakpoint.isCompact)
+              // '' stands for "all projects": a null pick reads as a cancel.
+              PopupMenuButton<String>(
+                tooltip: t.knowledge.common.allProjects,
+                icon: Icon(
+                  state.projectFilter == null ? LucideIcons.folders : LucideIcons.folderCheck,
+                  size: 18,
+                ),
+                initialValue: state.projectFilter ?? '',
+                onSelected: (id) => controller.setProjectFilter(id.isEmpty ? null : id),
+                itemBuilder: (_) => [
+                  CheckedPopupMenuItem<String>(
+                    value: '',
+                    checked: state.projectFilter == null,
+                    child: Text(t.knowledge.common.allProjects),
+                  ),
+                  for (final project in projects)
+                    CheckedPopupMenuItem<String>(
+                      value: project.id,
+                      checked: state.projectFilter == project.id,
+                      child: Text(project.name),
+                    ),
+                ],
+              )
+            else
+              DropdownButton<String?>(
+                value: state.projectFilter,
+                underline: const SizedBox.shrink(),
+                hint: Text(t.knowledge.common.allProjects),
+                items: [
+                  DropdownMenuItem<String?>(
+                    value: null,
+                    child: Text(t.knowledge.common.allProjects),
+                  ),
+                  for (final project in projects)
+                    DropdownMenuItem<String?>(value: project.id, child: Text(project.name)),
+                ],
+                onChanged: (value) => controller.setProjectFilter(value),
+              ),
             const SizedBox(width: 8),
             if (state.projectFilter != null)
               IconButton(
@@ -707,7 +737,7 @@ Widget _historyButton(
   required Map<String, dynamic> Function(KbHistoryEntry entry) body,
   required Future<String?> Function(Map<String, dynamic> body) save,
 }) => IconButton(
-  icon: const Icon(Icons.history),
+  icon: const Icon(LucideIcons.history),
   onPressed: () async {
     final entry = await KnowledgeHistoryDialog.show(context, entityType: type, entityId: entityId);
     if (entry == null) return;
@@ -1038,7 +1068,7 @@ class _TagFilterBar extends StatelessWidget {
           ),
           IconButton(
             tooltip: t.knowledge.tags.manage,
-            icon: const Icon(Icons.sell_outlined),
+            icon: const Icon(LucideIcons.tag),
             onPressed: () => _manageTags(context, state, controller),
           ),
         ],
@@ -1071,7 +1101,7 @@ Future<void> _manageTags(
                     title: Text(tag.name),
                     subtitle: Text('${tag.count}'),
                     trailing: IconButton(
-                      icon: const Icon(Icons.delete_outline),
+                      icon: const Icon(LucideIcons.trash2),
                       onPressed: () async {
                         final removed = await AppDialog.confirm(
                           ctx,
@@ -1115,7 +1145,7 @@ class _MemoriesTab extends StatelessWidget {
           );
           if (body != null) await controller.saveMemory(body: body);
         },
-        child: const Icon(Icons.add),
+        child: const Icon(LucideIcons.plus),
       ),
       body: Column(
         children: [
@@ -1166,7 +1196,7 @@ class _MemoriesTab extends StatelessWidget {
                               save: (body) => controller.saveMemory(id: memory.id, body: body),
                             ),
                             IconButton(
-                              icon: const Icon(Icons.edit_outlined),
+                              icon: const Icon(LucideIcons.pencil),
                               onPressed: () async {
                                 final body = await KnowledgeFormDialog.show(
                                   context,
@@ -1188,7 +1218,7 @@ class _MemoriesTab extends StatelessWidget {
                               },
                             ),
                             IconButton(
-                              icon: const Icon(Icons.delete_outline),
+                              icon: const Icon(LucideIcons.trash2),
                               onPressed: () =>
                                   _confirmDelete(context, () => controller.deleteMemory(memory.id)),
                             ),
@@ -1224,7 +1254,7 @@ class _RulesTab extends StatelessWidget {
           );
           if (body != null) await controller.saveRule(body: body);
         },
-        child: const Icon(Icons.add),
+        child: const Icon(LucideIcons.plus),
       ),
       body: state.rules.isEmpty
           ? _empty(t.knowledge.empty.rules)
@@ -1259,7 +1289,7 @@ class _RulesTab extends StatelessWidget {
                         save: (body) => controller.saveRule(id: rule.id, body: body),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.edit_outlined),
+                        icon: const Icon(LucideIcons.pencil),
                         onPressed: () async {
                           final body = await KnowledgeFormDialog.show(
                             context,
@@ -1278,7 +1308,7 @@ class _RulesTab extends StatelessWidget {
                         },
                       ),
                       IconButton(
-                        icon: const Icon(Icons.delete_outline),
+                        icon: const Icon(LucideIcons.trash2),
                         onPressed: () =>
                             _confirmDelete(context, () => controller.deleteRule(rule.id)),
                       ),
@@ -1306,7 +1336,7 @@ class _SkillsTab extends StatelessWidget {
           final body = await KnowledgeFormDialog.show(context, kind: KnowledgeEntityType.skill);
           if (body != null) await controller.saveSkill(body: body);
         },
-        child: const Icon(Icons.add),
+        child: const Icon(LucideIcons.plus),
       ),
       body: state.skills.isEmpty
           ? _empty(t.knowledge.empty.skills)
@@ -1317,7 +1347,7 @@ class _SkillsTab extends StatelessWidget {
                 final skill = state.skills[index];
                 return ListTile(
                   leading: skill.icon.isEmpty
-                      ? const Icon(Icons.auto_awesome_outlined)
+                      ? const Icon(LucideIcons.sparkles)
                       : ClipRRect(
                           borderRadius: BorderRadius.circular(6),
                           child: Image.memory(
@@ -1344,7 +1374,7 @@ class _SkillsTab extends StatelessWidget {
                         save: (body) => controller.saveSkill(id: skill.id, body: body),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.edit_outlined),
+                        icon: const Icon(LucideIcons.pencil),
                         onPressed: () async {
                           final body = await KnowledgeFormDialog.show(
                             context,
@@ -1362,7 +1392,7 @@ class _SkillsTab extends StatelessWidget {
                         },
                       ),
                       IconButton(
-                        icon: const Icon(Icons.delete_outline),
+                        icon: const Icon(LucideIcons.trash2),
                         onPressed: () =>
                             _confirmDelete(context, () => controller.deleteSkill(skill.id)),
                       ),
@@ -1390,7 +1420,7 @@ class _PersonalTab extends StatelessWidget {
           final body = await KnowledgeFormDialog.show(context, kind: KnowledgeEntityType.personal);
           if (body != null) await controller.savePersonal(body: body);
         },
-        child: const Icon(Icons.add),
+        child: const Icon(LucideIcons.plus),
       ),
       body: state.personal.isEmpty
           ? _empty(t.knowledge.empty.personal)
@@ -1400,7 +1430,7 @@ class _PersonalTab extends StatelessWidget {
               itemBuilder: (context, index) {
                 final info = state.personal[index];
                 return ListTile(
-                  leading: const Icon(Icons.person_outline),
+                  leading: const Icon(LucideIcons.user),
                   title: Text(info.title),
                   subtitle: Text(info.key),
                   trailing: Row(
@@ -1414,7 +1444,7 @@ class _PersonalTab extends StatelessWidget {
                         save: (body) => controller.savePersonal(id: info.id, body: body),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.edit_outlined),
+                        icon: const Icon(LucideIcons.pencil),
                         onPressed: () async {
                           final body = await KnowledgeFormDialog.show(
                             context,
@@ -1430,7 +1460,7 @@ class _PersonalTab extends StatelessWidget {
                         },
                       ),
                       IconButton(
-                        icon: const Icon(Icons.delete_outline),
+                        icon: const Icon(LucideIcons.trash2),
                         onPressed: () =>
                             _confirmDelete(context, () => controller.deletePersonal(info.id)),
                       ),

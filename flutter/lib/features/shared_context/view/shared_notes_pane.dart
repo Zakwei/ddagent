@@ -5,6 +5,7 @@ import 'package:ddagent_app/features/shared_context/state/shared_context_control
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Editor pane for a project's shared context document (.ddagent/shared-context.md).
 /// Can be mounted standalone in a screen or embedded as a workspace pane (PaneKind.notes).
@@ -71,7 +72,7 @@ class _SharedNotesPaneState extends ConsumerState<SharedNotesPane> {
             ),
             child: Row(
               children: [
-                Icon(Icons.description_outlined, size: 16, color: c.mutedForeground),
+                Icon(LucideIcons.fileText, size: 16, color: c.mutedForeground),
                 const SizedBox(width: AppSpacing.xs),
                 Expanded(
                   child: Text(
@@ -101,7 +102,7 @@ class _SharedNotesPaneState extends ConsumerState<SharedNotesPane> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.check, size: 14),
+                      const Icon(LucideIcons.check, size: 14),
                       const SizedBox(width: 4),
                       Text(
                         state.saving
@@ -127,7 +128,7 @@ class _SharedNotesPaneState extends ConsumerState<SharedNotesPane> {
                   ),
                   InkWell(
                     onTap: ctrl.clearError,
-                    child: Icon(Icons.close, size: 14, color: c.destructive),
+                    child: Icon(LucideIcons.x, size: 14, color: c.destructive),
                   ),
                 ],
               ),
@@ -222,7 +223,7 @@ class _SharedNotesScreenState extends ConsumerState<SharedNotesScreen> {
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
-                    Icon(Icons.notes, size: 20, color: c.mutedForeground),
+                    Icon(LucideIcons.notebookText, size: 20, color: c.mutedForeground),
                     const SizedBox(width: AppSpacing.xs),
                     Text(i18n.sharedContext.title, style: t.titleSmall),
                     const SizedBox(width: AppSpacing.md),

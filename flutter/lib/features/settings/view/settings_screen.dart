@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
+import 'package:ddagent_app/core/widgets/edge_fade.dart';
 import 'package:ddagent_app/core/widgets/subpage_header.dart';
 import 'package:ddagent_app/features/auth/view/auth_screens.dart';
 import 'package:ddagent_app/features/settings/view/sections/about_section.dart';
@@ -173,23 +174,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
             // Section nav — pill bar on compact, side rail otherwise.
             if (compact)
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 4),
-                child: Row(
-                  children: [
-                    for (final s in settingsSections)
-                      Padding(
-                        padding: const EdgeInsets.only(right: 4),
-                        child: ChoiceChip(
-                          avatar: Icon(s.icon, size: 14),
-                          label: Text(s.label(t)),
-                          selected: active.id == s.id,
-                          onSelected: (_) => context.go('/settings/${s.id}'),
-                          visualDensity: VisualDensity.compact,
+              HorizontalEdgeFade(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 4),
+                  child: Row(
+                    children: [
+                      for (final s in settingsSections)
+                        Padding(
+                          padding: const EdgeInsets.only(right: 4),
+                          child: ChoiceChip(
+                            avatar: Icon(s.icon, size: 14),
+                            label: Text(s.label(t)),
+                            selected: active.id == s.id,
+                            onSelected: (_) => context.go('/settings/${s.id}'),
+                            visualDensity: VisualDensity.compact,
+                          ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             Expanded(

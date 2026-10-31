@@ -470,7 +470,7 @@ class _GitHistoryViewState extends ConsumerState<GitHistoryView> {
                             Padding(
                               padding: const EdgeInsets.only(top: 2),
                               child: Icon(
-                                isOpen ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_right,
+                                isOpen ? LucideIcons.chevronDown : LucideIcons.chevronRight,
                                 size: 14,
                                 color: c.mutedForeground,
                               ),

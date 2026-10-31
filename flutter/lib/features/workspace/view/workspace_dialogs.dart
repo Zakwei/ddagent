@@ -5,6 +5,7 @@ import 'package:ddagent_app/features/workspace/view/split_workspace_grid.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// One tile in the overview grid — title/subtitle/action already resolved
 /// through `splitPaneDisplay` by the caller.
@@ -81,7 +82,7 @@ class SplitOverviewDialog extends ConsumerWidget {
                   const Spacer(),
                   IconButton(
                     tooltip: i18n.chat.splitOverview.close,
-                    icon: const Icon(Icons.close, size: 18),
+                    icon: const Icon(LucideIcons.x, size: 18),
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                 ],
@@ -180,7 +181,7 @@ class SplitOverviewDialog extends ConsumerWidget {
                               PaneAction.question => Row(
                                 children: [
                                   const Icon(
-                                    Icons.warning_amber_rounded,
+                                    LucideIcons.triangleAlert,
                                     size: 14,
                                     color: Color(0xFFF59E0B),
                                   ),

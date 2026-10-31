@@ -545,7 +545,7 @@ class _ErrorBanner extends StatelessWidget {
           ),
           InkWell(
             onTap: onDismiss,
-            child: Icon(Icons.close, size: 14, color: c.destructive),
+            child: Icon(LucideIcons.x, size: 14, color: c.destructive),
           ),
         ],
       ),
@@ -654,7 +654,7 @@ class _GitHeader extends ConsumerWidget {
                 value: '__new__',
                 child: Row(
                   children: [
-                    const Icon(Icons.add, size: 14),
+                    const Icon(LucideIcons.plus, size: 14),
                     const SizedBox(width: 8),
                     // Ellipsis retained from the original literal: the widget
                     // tests locate this menu item by its full text.
@@ -979,7 +979,7 @@ class _FileRow extends StatelessWidget {
                   ),
                   const SizedBox(width: 6),
                   Icon(
-                    expanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_right,
+                    expanded ? LucideIcons.chevronDown : LucideIcons.chevronRight,
                     size: 14,
                     color: c.mutedForeground,
                   ),
@@ -1016,7 +1016,7 @@ class _FileRow extends StatelessWidget {
                   ),
                   if (!staged)
                     _FileAction(
-                      icon: status == 'U' ? Icons.delete_outline : Icons.undo,
+                      icon: status == 'U' ? LucideIcons.trash2 : LucideIcons.undo2,
                       tooltip: status == 'U'
                           ? i18n.git.deleteFile
                           : i18n.common.gitPanel.discardChanges,

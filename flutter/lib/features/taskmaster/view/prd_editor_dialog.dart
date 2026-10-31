@@ -10,6 +10,7 @@ import 'package:ddagent_app/features/taskmaster/state/taskmaster_controller.dart
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// PRD editor (port of prd-editor/PRDEditor): file name, template picker,
 /// markdown content with a preview toggle, Save and "Parse PRD" (generates
@@ -157,7 +158,7 @@ class _PrdEditorDialogState extends ConsumerState<PrdEditorDialog> {
                       : i18n.codeEditor.actions.previewMarkdown,
                   onPressed: () => setState(() => _preview = !_preview),
                   icon: Icon(
-                    _preview ? Icons.edit_note : Icons.preview_outlined,
+                    _preview ? LucideIcons.notebookPen : LucideIcons.eye,
                     size: 18,
                     color: _preview ? c.primary : c.mutedForeground,
                   ),

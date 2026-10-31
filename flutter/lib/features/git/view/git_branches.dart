@@ -180,7 +180,7 @@ class _GitBranchesViewState extends ConsumerState<GitBranchesView> {
               if (_search.text.isNotEmpty)
                 InkWell(
                   onTap: () => setState(_search.clear),
-                  child: Icon(Icons.close, size: 14, color: c.mutedForeground),
+                  child: Icon(LucideIcons.x, size: 14, color: c.mutedForeground),
                 ),
             ],
           ),

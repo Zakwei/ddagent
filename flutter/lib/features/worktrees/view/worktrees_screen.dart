@@ -12,6 +12,7 @@ import 'package:ddagent_app/features/worktrees/state/worktrees_controller.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Screen displaying Git worktrees for a project: list, create, open, merge, remove,
 /// script config and run/stop execution.
@@ -75,7 +76,7 @@ class _WorktreesScreenState extends ConsumerState<WorktreesScreen> {
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
-                    Icon(Icons.fork_right, size: 20, color: c.mutedForeground),
+                    Icon(LucideIcons.gitFork, size: 20, color: c.mutedForeground),
                     const SizedBox(width: AppSpacing.xs),
                     Text(i18n.common.gitPanel.tabs.worktrees, style: t.titleSmall),
                     const SizedBox(width: AppSpacing.md),
@@ -103,7 +104,7 @@ class _WorktreesScreenState extends ConsumerState<WorktreesScreen> {
                       variant: AppButtonVariant.ghost,
                       size: AppButtonSize.sm,
                       onPressed: state.loading ? null : ctrl.refresh,
-                      child: const Icon(Icons.refresh, size: 16),
+                      child: const Icon(LucideIcons.refreshCw, size: 16),
                     ),
                     const SizedBox(width: 4),
                     AppButton(
@@ -120,7 +121,7 @@ class _WorktreesScreenState extends ConsumerState<WorktreesScreen> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.code, size: 16),
+                          const Icon(LucideIcons.code, size: 16),
                           if (!compact) ...[const SizedBox(width: 4), Text(i18n.worktrees.scripts)],
                         ],
                       ),
@@ -139,7 +140,7 @@ class _WorktreesScreenState extends ConsumerState<WorktreesScreen> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.add, size: 16),
+                          const Icon(LucideIcons.plus, size: 16),
                           if (!compact) ...[
                             const SizedBox(width: 4),
                             Text(i18n.common.gitPanel.worktrees.kNew),
@@ -164,7 +165,7 @@ class _WorktreesScreenState extends ConsumerState<WorktreesScreen> {
                     ),
                     InkWell(
                       onTap: ctrl.clearError,
-                      child: Icon(Icons.close, size: 14, color: c.destructive),
+                      child: Icon(LucideIcons.x, size: 14, color: c.destructive),
                     ),
                   ],
                 ),
@@ -179,7 +180,7 @@ class _WorktreesScreenState extends ConsumerState<WorktreesScreen> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.fork_right, size: 48, color: c.mutedForeground),
+                          Icon(LucideIcons.gitFork, size: 48, color: c.mutedForeground),
                           const SizedBox(height: AppSpacing.sm),
                           Text(i18n.worktrees.emptyTitle, style: t.titleMedium),
                           const SizedBox(height: AppSpacing.xs),
@@ -318,7 +319,7 @@ class _WorktreeCard extends StatelessWidget {
           Row(
             children: [
               Icon(
-                isMain ? Icons.home_outlined : Icons.fork_right,
+                isMain ? LucideIcons.house : LucideIcons.gitFork,
                 size: 18,
                 color: isMain ? c.primary : c.mutedForeground,
               ),
@@ -373,7 +374,7 @@ class _WorktreeCard extends StatelessWidget {
                     variant: AppButtonVariant.ghost,
                     size: AppButtonSize.sm,
                     onPressed: onRemove,
-                    child: Icon(Icons.delete_outline, size: 16, color: c.destructive),
+                    child: Icon(LucideIcons.trash2, size: 16, color: c.destructive),
                   ),
                 ],
               ],

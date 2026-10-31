@@ -321,7 +321,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
     final flag = context.breakpoint.isCompact
         ? null
         : display.action == PaneAction.question
-        ? (Icons.warning_amber_rounded, _questionColor, i18n.chat.splitOverview.question)
+        ? (LucideIcons.triangleAlert, _questionColor, i18n.chat.splitOverview.question)
         : finished
         ? (Icons.check_circle, _finishedColor, i18n.chat.sessionPicker.unread)
         : null;
@@ -335,19 +335,31 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
               child: Icon(icon, size: 14, color: color),
             ),
           ),
-        Flexible(
-          child: Text(display.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: style),
-        ),
-        if (subtitle != null && subtitle.isNotEmpty)
-          Flexible(
-            child: Text(
-              ' · $subtitle',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: style?.copyWith(color: c.mutedForeground.withValues(alpha: 0.7)),
-            ),
+        // One Expanded for the text: loose Flexibles beside a Spacer each kept
+        // a share of the width, so the close button sat mid-header.
+        Expanded(
+          child: Row(
+            children: [
+              Flexible(
+                child: Text(
+                  display.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: style,
+                ),
+              ),
+              if (subtitle != null && subtitle.isNotEmpty)
+                Flexible(
+                  child: Text(
+                    ' · $subtitle',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: style?.copyWith(color: c.mutedForeground.withValues(alpha: 0.7)),
+                  ),
+                ),
+            ],
           ),
-        const Spacer(),
+        ),
         ...actions,
       ],
     );

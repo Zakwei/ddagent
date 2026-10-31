@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:ddagent_app/core/widgets/code_block.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Mermaid diagram (T16.5/16.7 decision): no native Flutter mermaid renderer
@@ -32,7 +33,7 @@ class MermaidBlock extends StatelessWidget {
         Align(
           alignment: Alignment.centerRight,
           child: TextButton.icon(
-            icon: const Icon(Icons.open_in_new, size: 14),
+            icon: const Icon(LucideIcons.externalLink, size: 14),
             label: Text(t.common.buttons.openDiagram),
             onPressed: () => launchUrl(_islandUri, mode: LaunchMode.externalApplication),
           ),

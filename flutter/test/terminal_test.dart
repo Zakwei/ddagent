@@ -1423,7 +1423,7 @@ void main() {
       expect(find.text('Shell 1'), findsOneWidget);
       expect(find.byIcon(LucideIcons.plus), findsOneWidget);
       expect(find.byIcon(LucideIcons.chevronDown), findsOneWidget);
-      expect(find.byIcon(Icons.refresh), findsNothing);
+      expect(find.byIcon(LucideIcons.refreshCw), findsNothing);
 
       // `+` opens the default profile (plain shell) straight away.
       await tester.tap(find.byIcon(LucideIcons.plus));

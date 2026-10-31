@@ -10,6 +10,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class _FakeWorktreesRepo extends WorktreesRepository {
   _FakeWorktreesRepo() : super(Dio());
@@ -507,7 +508,7 @@ void main() {
       expect(find.text('Add auth module'), findsOneWidget);
       expect(find.text('Open'), findsNWidgets(2));
       expect(find.text('Merge'), findsOneWidget);
-      expect(find.byIcon(Icons.delete_outline), findsOneWidget);
+      expect(find.byIcon(LucideIcons.trash2), findsOneWidget);
     });
 
     testWidgets('pełny cykl: create → open → run script → merge → remove', (tester) async {
@@ -554,7 +555,7 @@ void main() {
       expect(repo.calls.any((c) => c.startsWith('merge:p1:')), isTrue);
 
       // Krok 5: REMOVE worktree
-      await tester.tap(find.byIcon(Icons.delete_outline).first);
+      await tester.tap(find.byIcon(LucideIcons.trash2).first);
       await tester.pumpAndSettle();
 
       // W modalnym potwierdzeniu usuwania: zaznacz force remove

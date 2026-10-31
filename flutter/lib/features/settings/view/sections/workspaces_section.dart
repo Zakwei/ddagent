@@ -230,7 +230,7 @@ class _AddWorkspaceDialogState extends ConsumerState<_AddWorkspaceDialog> {
               ),
               IconButton(
                 tooltip: i18n.common.buttons.browse,
-                icon: const Icon(Icons.folder_open),
+                icon: const Icon(LucideIcons.folderOpen),
                 onPressed: () => unawaited(_browse()),
               ),
             ],

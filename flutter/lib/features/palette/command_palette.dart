@@ -879,7 +879,7 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
                   focusNode: _inputFocus,
                   decoration: InputDecoration(
                     isDense: true,
-                    prefixIcon: const Icon(Icons.search, size: 18),
+                    prefixIcon: const Icon(LucideIcons.search, size: 18),
                     hintText: page != null
                         ? t.searchPagePlaceholder(page: _pageLabel(t, page).toLowerCase())
                         : t.placeholder,

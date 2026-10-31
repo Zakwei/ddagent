@@ -6,6 +6,7 @@ import 'package:ddagent_app/features/knowledge/state/knowledge_controller.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Force-directed relation graph for the knowledge base.
 ///
@@ -229,7 +230,10 @@ class _KnowledgeGraphViewState extends ConsumerState<KnowledgeGraphView> {
                   padding: const EdgeInsets.only(right: 8),
                   child: Text(t.knowledge.graph.truncated, style: const TextStyle(fontSize: 11)),
                 ),
-              IconButton(onPressed: _loading ? null : _load, icon: const Icon(Icons.refresh)),
+              IconButton(
+                onPressed: _loading ? null : _load,
+                icon: const Icon(LucideIcons.refreshCw),
+              ),
             ],
           ),
         ),
@@ -298,12 +302,12 @@ class _EntityIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final icon = switch (type) {
-      'rule' => Icons.rule,
-      'skill' => Icons.auto_awesome_outlined,
-      'personal' => Icons.person_outline,
-      'project' => Icons.folder_outlined,
-      'tag' => Icons.sell_outlined,
-      _ => Icons.psychology_outlined,
+      'rule' => LucideIcons.listChecks,
+      'skill' => LucideIcons.sparkles,
+      'personal' => LucideIcons.user,
+      'project' => LucideIcons.folder,
+      'tag' => LucideIcons.tag,
+      _ => LucideIcons.brain,
     };
     return Icon(icon);
   }

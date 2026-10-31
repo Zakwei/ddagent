@@ -239,7 +239,7 @@ class _KeyCap extends StatelessWidget {
     final button = Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 5),
       child: Material(
-        color: active ? colors.primary : palette.chrome,
+        color: active ? colors.primaryFill : palette.chrome,
         borderRadius: BorderRadius.circular(AppRadii.sm),
         child: InkWell(
           borderRadius: BorderRadius.circular(AppRadii.sm),

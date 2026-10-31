@@ -6,6 +6,7 @@ import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 // ---------------------------------------------------------------------------
 // Token usage (T17.4) — port of TokenUsageSummary.tsx helpers.
@@ -210,7 +211,7 @@ class TokenUsageChip extends ConsumerWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.bolt, size: 14, color: cs.primary),
+              Icon(LucideIcons.zap, size: 14, color: cs.primary),
               const SizedBox(width: 4),
               Text(
                 formatTokenCount(usage.used),

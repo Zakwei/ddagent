@@ -38,16 +38,16 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
   const orange = Colors.deepOrange;
   const grey = Colors.blueGrey;
   return switch (ext) {
-    'dart' => (icon: Icons.code, color: blue),
-    'js' || 'jsx' || 'mjs' || 'cjs' => (icon: Icons.javascript, color: amber),
-    'ts' || 'tsx' || 'mts' => (icon: Icons.code, color: blue),
-    'py' || 'pyw' || 'ipynb' => (icon: Icons.code, color: green),
-    'rs' || 'go' || 'c' || 'cpp' || 'h' => (icon: Icons.settings_suggest, color: orange),
-    'rb' || 'java' || 'kt' || 'swift' || 'php' => (icon: Icons.code, color: orange),
-    'json' || 'yaml' || 'yml' || 'toml' || 'xml' => (icon: Icons.data_object, color: grey),
-    'md' || 'txt' || 'rtf' => (icon: Icons.description_outlined, color: grey),
-    'html' || 'css' || 'scss' => (icon: Icons.language, color: blue),
-    'sh' || 'bash' || 'zsh' || 'ps1' => (icon: Icons.terminal, color: green),
+    'dart' => (icon: LucideIcons.code, color: blue),
+    'js' || 'jsx' || 'mjs' || 'cjs' => (icon: LucideIcons.fileCode, color: amber),
+    'ts' || 'tsx' || 'mts' => (icon: LucideIcons.code, color: blue),
+    'py' || 'pyw' || 'ipynb' => (icon: LucideIcons.code, color: green),
+    'rs' || 'go' || 'c' || 'cpp' || 'h' => (icon: LucideIcons.settings2, color: orange),
+    'rb' || 'java' || 'kt' || 'swift' || 'php' => (icon: LucideIcons.code, color: orange),
+    'json' || 'yaml' || 'yml' || 'toml' || 'xml' => (icon: LucideIcons.braces, color: grey),
+    'md' || 'txt' || 'rtf' => (icon: LucideIcons.fileText, color: grey),
+    'html' || 'css' || 'scss' => (icon: LucideIcons.globe, color: blue),
+    'sh' || 'bash' || 'zsh' || 'ps1' => (icon: LucideIcons.squareTerminal, color: green),
     'png' ||
     'jpg' ||
     'jpeg' ||
@@ -55,14 +55,14 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
     'svg' ||
     'webp' ||
     'ico' ||
-    'bmp' => (icon: Icons.image_outlined, color: Colors.purple),
-    'zip' || 'tar' || 'gz' || '7z' || 'rar' => (icon: Icons.archive_outlined, color: amber),
-    'pdf' => (icon: Icons.picture_as_pdf_outlined, color: Colors.red),
-    'mp3' || 'wav' || 'ogg' || 'flac' => (icon: Icons.music_note_outlined, color: Colors.pink),
-    'mp4' || 'mov' || 'mkv' || 'webm' => (icon: Icons.videocam_outlined, color: Colors.red),
-    'sql' || 'db' || 'sqlite' => (icon: Icons.storage_outlined, color: blue),
-    'env' || 'lock' || 'pem' || 'key' => (icon: Icons.lock_outline, color: grey),
-    _ => (icon: Icons.insert_drive_file_outlined, color: grey),
+    'bmp' => (icon: LucideIcons.image, color: Colors.purple),
+    'zip' || 'tar' || 'gz' || '7z' || 'rar' => (icon: LucideIcons.archive, color: amber),
+    'pdf' => (icon: LucideIcons.fileText, color: Colors.red),
+    'mp3' || 'wav' || 'ogg' || 'flac' => (icon: LucideIcons.music, color: Colors.pink),
+    'mp4' || 'mov' || 'mkv' || 'webm' => (icon: LucideIcons.video, color: Colors.red),
+    'sql' || 'db' || 'sqlite' => (icon: LucideIcons.database, color: blue),
+    'env' || 'lock' || 'pem' || 'key' => (icon: LucideIcons.lock, color: grey),
+    _ => (icon: LucideIcons.file, color: grey),
   };
 }
 
@@ -249,7 +249,7 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
             for (final d in dirs)
               ListTile(
                 dense: true,
-                leading: const Icon(Icons.folder_outlined, size: 18),
+                leading: const Icon(LucideIcons.folder, size: 18),
                 title: Text(d.isEmpty ? t.fileTree.projectRoot : d),
                 onTap: () => AppDialog.pop(context, d),
               ),
@@ -434,12 +434,12 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
       if (!node.isDirectory) ...[
         AppMenuItem(
           label: t.common.gitPanel.worktrees.open,
-          icon: Icons.open_in_new,
+          icon: LucideIcons.externalLink,
           onTap: () => _open(node),
         ),
         AppMenuItem(
           label: t.common.fileOperations.openInEditor,
-          icon: Icons.edit_note,
+          icon: LucideIcons.notebookPen,
           onTap: () => context.go(
             '/editor?projectId=$_projectId'
             '&file=${Uri.encodeQueryComponent(node.path)}',
@@ -449,23 +449,23 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
       if (node.isDirectory) ...[
         AppMenuItem(
           label: t.chat.fileOperations.newFile,
-          icon: Icons.note_add_outlined,
+          icon: LucideIcons.filePlus,
           onTap: () => _createEntry(node, 'file'),
         ),
         AppMenuItem(
           label: t.common.fileOperations.newFolder,
-          icon: Icons.create_new_folder_outlined,
+          icon: LucideIcons.folderPlus,
           onTap: () => _createEntry(node, 'directory'),
         ),
         AppMenuItem(
           label: t.fileTree.uploadHere,
-          icon: Icons.upload_outlined,
+          icon: LucideIcons.upload,
           onTap: () => _upload(node.path),
         ),
       ],
       AppMenuItem(
         label: t.common.fileOperations.copyPath,
-        icon: Icons.copy_outlined,
+        icon: LucideIcons.copy,
         onTap: () {
           Clipboard.setData(ClipboardData(text: node.path));
           AppToast.show(context, t.common.fileTree.toast.pathCopied);
@@ -474,17 +474,17 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
       if (!node.isDirectory)
         AppMenuItem(
           label: t.common.buttons.download,
-          icon: Icons.download_outlined,
+          icon: LucideIcons.download,
           onTap: () => downloadFile(context, ref, projectId: _projectId, node: node),
         ),
       AppMenuItem(
         label: t.common.fileOperations.rename,
-        icon: Icons.edit_outlined,
+        icon: LucideIcons.pencil,
         onTap: () => _rename(node),
       ),
       AppMenuItem(
         label: t.common.buttons.delete,
-        icon: Icons.delete_outline,
+        icon: LucideIcons.trash2,
         destructive: true,
         onTap: () => _delete(node),
       ),
@@ -757,7 +757,7 @@ class _IconBtn extends StatelessWidget {
           width: 28,
           height: 28,
           decoration: BoxDecoration(
-            color: active ? c.primary : null,
+            color: active ? c.primaryFill : null,
             borderRadius: AppRadii.borderMd,
           ),
           child: Center(
@@ -971,7 +971,7 @@ class _NodeRow extends StatelessWidget {
     final dense = viewMode != FileTreeViewMode.simple;
     final icon = node.isDirectory
         ? Icon(
-            expanded ? Icons.folder_open : Icons.folder_outlined,
+            expanded ? LucideIcons.folderOpen : LucideIcons.folder,
             size: 16,
             color: Colors.amber.shade700,
           )
@@ -1003,7 +1003,7 @@ class _NodeRow extends StatelessWidget {
                 width: 16,
                 child: node.isDirectory
                     ? Icon(
-                        expanded ? Icons.expand_more : Icons.chevron_right,
+                        expanded ? LucideIcons.chevronDown : LucideIcons.chevronRight,
                         size: 16,
                         color: c.mutedForeground,
                       )

@@ -5,6 +5,7 @@ import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
 import 'package:ddagent_app/core/widgets/app_interactive.dart';
+import 'package:ddagent_app/core/widgets/edge_fade.dart';
 import 'package:ddagent_app/core/widgets/subpage_header.dart';
 import 'package:ddagent_app/features/quota/data/quota_models.dart';
 import 'package:ddagent_app/features/quota/state/quota_controller.dart';
@@ -120,30 +121,32 @@ class _QuotaScreenState extends ConsumerState<QuotaScreen> {
                     ),
                     InkWell(
                       onTap: ctrl.clearError,
-                      child: Icon(Icons.close, size: 14, color: c.destructive),
+                      child: Icon(LucideIcons.x, size: 14, color: c.destructive),
                     ),
                   ],
                 ),
               ),
             // Section nav — top bar on compact, side rail otherwise.
             if (compact)
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 4),
-                child: Row(
-                  children: [
-                    for (final s in _sections)
-                      Padding(
-                        padding: const EdgeInsets.only(right: 4),
-                        child: ChoiceChip(
-                          avatar: Icon(_sectionIcon(s), size: 14),
-                          label: Text(_sectionLabel(i18n, s)),
-                          selected: _section == s,
-                          onSelected: (_) => setState(() => _section = s),
-                          visualDensity: VisualDensity.compact,
+              HorizontalEdgeFade(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 4),
+                  child: Row(
+                    children: [
+                      for (final s in _sections)
+                        Padding(
+                          padding: const EdgeInsets.only(right: 4),
+                          child: ChoiceChip(
+                            avatar: Icon(_sectionIcon(s), size: 14),
+                            label: Text(_sectionLabel(i18n, s)),
+                            selected: _section == s,
+                            onSelected: (_) => setState(() => _section = s),
+                            visualDensity: VisualDensity.compact,
+                          ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             Expanded(
@@ -806,7 +809,7 @@ class _AccountsPanelState extends State<_AccountsPanel> {
             padding: const EdgeInsets.all(AppSpacing.xl),
             child: Column(
               children: [
-                Icon(Icons.speed, size: 32, color: c.mutedForeground),
+                Icon(LucideIcons.gauge, size: 32, color: c.mutedForeground),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
                   i18n.common.quota.empty.title,
@@ -976,7 +979,7 @@ class _FleetPanelState extends State<_FleetPanel> {
             child: Row(
               children: [
                 Icon(
-                  expanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                  expanded ? LucideIcons.chevronUp : LucideIcons.chevronDown,
                   size: 14,
                   color: c.mutedForeground,
                 ),

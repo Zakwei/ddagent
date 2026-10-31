@@ -18,6 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class _FakeBrowserRepo extends BrowserUseRepository {
   _FakeBrowserRepo() : super(Dio());
@@ -371,10 +372,10 @@ void main() {
       await tester.pumpAndSettle();
 
       // Kontrolki nawigacyjne
-      expect(find.byIcon(Icons.arrow_back), findsOneWidget);
-      expect(find.byIcon(Icons.arrow_forward), findsOneWidget);
-      expect(find.byIcon(Icons.refresh), findsOneWidget);
-      expect(find.byIcon(Icons.open_in_new), findsOneWidget);
+      expect(find.byIcon(LucideIcons.arrowLeft), findsOneWidget);
+      expect(find.byIcon(LucideIcons.arrowRight), findsOneWidget);
+      expect(find.byIcon(LucideIcons.refreshCw), findsOneWidget);
+      expect(find.byIcon(LucideIcons.externalLink), findsOneWidget);
       expect(find.byType(TextField), findsOneWidget);
 
       // Komunikat łączenia
@@ -444,15 +445,15 @@ void main() {
 
       // Przycisk wstecz staje się aktywny
       final backButton = tester.widget<IconButton>(
-        find.ancestor(of: find.byIcon(Icons.arrow_back), matching: find.byType(IconButton)),
+        find.ancestor(of: find.byIcon(LucideIcons.arrowLeft), matching: find.byType(IconButton)),
       );
       expect(backButton.onPressed, isNotNull);
 
-      await tester.tap(find.byIcon(Icons.arrow_back));
+      await tester.tap(find.byIcon(LucideIcons.arrowLeft));
       expect(ws.sent, contains(predicate<Map<String, dynamic>>((m) => m['type'] == 'back')));
 
       // Przycisk odśwież wysyła reload
-      await tester.tap(find.byIcon(Icons.refresh));
+      await tester.tap(find.byIcon(LucideIcons.refreshCw));
       expect(ws.sent, contains(predicate<Map<String, dynamic>>((m) => m['type'] == 'reload')));
     });
 

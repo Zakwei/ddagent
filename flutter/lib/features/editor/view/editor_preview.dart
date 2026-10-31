@@ -14,6 +14,7 @@ import 'package:ddagent_app/features/file_tree/view/file_viewer.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Preview pane for non-text editor tabs: markdown renders through the
@@ -56,7 +57,7 @@ class EditorPreview extends StatelessWidget {
         return _BinaryCard(
           projectId: projectId,
           path: path,
-          icon: Icons.insert_drive_file_outlined,
+          icon: LucideIcons.file,
           title: t.codeEditor.binaryFile.title,
           subtitle: t.codeEditor.binaryFile.cannotDisplayAsText,
         );
@@ -91,7 +92,7 @@ class _MediaCard extends ConsumerWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.play_circle_outline, size: 48, color: colors.mutedForeground),
+          Icon(LucideIcons.circlePlay, size: 48, color: colors.mutedForeground),
           const SizedBox(height: AppSpacing.sm),
           Text(t.codeEditor.mediaFile.title, style: Theme.of(context).textTheme.titleSmall),
           Text(pathBasename(path), style: muted),

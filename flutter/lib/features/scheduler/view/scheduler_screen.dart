@@ -86,7 +86,7 @@ class SchedulerScreen extends ConsumerWidget {
                     ),
                     InkWell(
                       onTap: ctrl.clearError,
-                      child: Icon(Icons.close, size: 14, color: c.destructive),
+                      child: Icon(LucideIcons.x, size: 14, color: c.destructive),
                     ),
                   ],
                 ),
@@ -212,7 +212,11 @@ class _JobTileState extends ConsumerState<_JobTile> {
               spacing: AppSpacing.xs,
               runSpacing: 4,
               children: [
-                Icon(Icons.event_repeat, size: 16, color: j.enabled ? c.mutedForeground : c.border),
+                Icon(
+                  LucideIcons.calendarSync,
+                  size: 16,
+                  color: j.enabled ? c.mutedForeground : c.border,
+                ),
                 ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 400),
                   child: Text(
@@ -266,7 +270,7 @@ class _JobTileState extends ConsumerState<_JobTile> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.history, size: 14),
+                      const Icon(LucideIcons.history, size: 14),
                       const SizedBox(width: 4),
                       Text(i18n.scheduler.runs, style: Theme.of(context).textTheme.labelSmall),
                     ],
@@ -279,7 +283,7 @@ class _JobTileState extends ConsumerState<_JobTile> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.play_arrow, size: 14),
+                      const Icon(LucideIcons.play, size: 14),
                       const SizedBox(width: 2),
                       Text(
                         i18n.settings.schedules.runNow,
@@ -311,7 +315,7 @@ class _JobTileState extends ConsumerState<_JobTile> {
                       unawaited(ctrl.deleteJob(j.id));
                     }
                   },
-                  child: Icon(Icons.delete_outline, size: 14, color: c.destructive),
+                  child: Icon(LucideIcons.trash2, size: 14, color: c.destructive),
                 ),
                 Transform.scale(
                   scale: 0.75,

@@ -6,6 +6,7 @@ import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 final collabUsersProvider = FutureProvider<List<CollabUser>>(
   (ref) => ref.watch(collabRepositoryProvider).users(),
@@ -40,7 +41,7 @@ class CollabSection extends ConsumerWidget {
             const Spacer(),
             if (isOwner)
               TextButton.icon(
-                icon: const Icon(Icons.person_add_alt_1, size: 16),
+                icon: const Icon(LucideIcons.userPlus, size: 16),
                 label: Text(t.collab.invite),
                 onPressed: () => showInviteDialog(context, ref),
               ),
@@ -54,10 +55,10 @@ class CollabSection extends ConsumerWidget {
                 Chip(
                   avatar: Icon(
                     u.role == 'owner'
-                        ? Icons.shield_outlined
+                        ? LucideIcons.shield
                         : u.role == 'viewer'
-                        ? Icons.visibility_outlined
-                        : Icons.person_outline,
+                        ? LucideIcons.eye
+                        : LucideIcons.user,
                     size: 14,
                   ),
                   label: Text(u.displayName ?? u.username),
@@ -139,7 +140,7 @@ Future<void> showInviteDialog(BuildContext context, WidgetRef ref) async {
             )
           else
             FilledButton.icon(
-              icon: const Icon(Icons.copy, size: 16),
+              icon: const Icon(LucideIcons.copy, size: 16),
               label: Text(t.collab.copyToken),
               onPressed: () async {
                 await Clipboard.setData(ClipboardData(text: '${invite!['token']}'));

@@ -4,6 +4,7 @@ import 'package:ddagent_app/core/network/api_providers.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Image loaded through Dio — carries Bearer + x-api-key auth for the assets
 /// API and resolves relative `/api/…` paths against the configured server.
@@ -30,7 +31,7 @@ class AuthImage extends ConsumerWidget {
       future: _fetch(ref, resolved),
       builder: (context, snap) {
         if (snap.hasError) {
-          return const Icon(Icons.broken_image_outlined);
+          return const Icon(LucideIcons.imageOff);
         }
         if (!snap.hasData) {
           return const SizedBox(

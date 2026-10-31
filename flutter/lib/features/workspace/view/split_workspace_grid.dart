@@ -4,15 +4,16 @@ import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
 import 'package:ddagent_app/features/workspace/view/pane_header_metrics.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Kind icon per pane (port of PANE_KIND_ICONS in SplitWorkspaceGrid.tsx).
 IconData paneKindIcon(PaneKind kind) => switch (kind) {
-  PaneKind.browser => Icons.public,
-  PaneKind.terminal => Icons.terminal,
-  PaneKind.notes => Icons.edit_note,
-  PaneKind.editor => Icons.code,
-  PaneKind.git => Icons.alt_route,
-  PaneKind.preview => Icons.devices,
+  PaneKind.browser => LucideIcons.globe,
+  PaneKind.terminal => LucideIcons.squareTerminal,
+  PaneKind.notes => LucideIcons.notebookPen,
+  PaneKind.editor => LucideIcons.code,
+  PaneKind.git => LucideIcons.split,
+  PaneKind.preview => LucideIcons.monitorSmartphone,
 };
 
 /// Shared `focusFollowsPointer` guard (web `onPointerEnter` in Shell.tsx
@@ -148,7 +149,7 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
     final (accent, accentIcon) = selected
         ? (null, null)
         : widget.actionPaneIds.contains(pane.id)
-        ? (_actionColor, Icons.warning_amber_rounded)
+        ? (_actionColor, LucideIcons.triangleAlert)
         : widget.finishedPaneIds.contains(pane.id)
         ? (_finishedColor, Icons.check_circle)
         : (null, null);
@@ -366,17 +367,17 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
           child: SizedBox(
             width: m.hit,
             height: m.hit,
-            child: Icon(Icons.drag_indicator, size: m.icon, color: c.mutedForeground),
+            child: Icon(LucideIcons.gripVertical, size: m.icon, color: c.mutedForeground),
           ),
         ),
       if (!tabMode && (widget.panes.length > 1 || isMaximized))
         _headerButton(
-          icon: isMaximized ? Icons.close_fullscreen : Icons.open_in_full,
+          icon: isMaximized ? LucideIcons.minimize2 : LucideIcons.maximize2,
           tooltip: isMaximized ? i18n.workspace.restorePanes : i18n.workspace.maximizePane,
           onPressed: () => widget.onToggleMaximizePane?.call(pane.id),
         ),
       _headerButton(
-        icon: Icons.close,
+        icon: LucideIcons.x,
         tooltip: i18n.workspace.closePane,
         onPressed: () => widget.onClosePane(pane.id),
       ),

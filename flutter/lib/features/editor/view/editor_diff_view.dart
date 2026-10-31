@@ -8,6 +8,7 @@ import 'package:ddagent_app/features/git/data/git_repository.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Diff/merge view: buffer (right/added) vs git HEAD or — when the project
 /// isn't a repo or the fetch fails — the tab's last-saved content (left/
@@ -225,7 +226,7 @@ class _DiffHeader extends StatelessWidget {
           if (onClose != null)
             IconButton(
               tooltip: t.codeEditor.diff.close,
-              icon: const Icon(Icons.close, size: 18),
+              icon: const Icon(LucideIcons.x, size: 18),
               onPressed: onClose,
             ),
         ],
@@ -354,9 +355,9 @@ class _ChoiceChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
         decoration: BoxDecoration(
-          color: selected ? colors.primary : Colors.transparent,
+          color: selected ? colors.primaryFill : Colors.transparent,
           borderRadius: AppRadii.borderMd,
-          border: Border.all(color: selected ? colors.primary : colors.border),
+          border: Border.all(color: selected ? colors.primaryFill : colors.border),
         ),
         child: Text(
           label,

@@ -136,7 +136,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
           ),
           InkWell(
             onTap: ref.read(taskmasterProvider.notifier).clearError,
-            child: Icon(Icons.close, size: 14, color: c.destructive),
+            child: Icon(LucideIcons.x, size: 14, color: c.destructive),
           ),
         ],
       ),
@@ -1239,7 +1239,7 @@ class _HelpDialog extends StatelessWidget {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close, size: 20),
+                    icon: const Icon(LucideIcons.x, size: 20),
                     tooltip: i18n.tasks.helpGuide.closeTitle,
                     onPressed: () => Navigator.of(context).pop(),
                   ),
@@ -1956,7 +1956,7 @@ class _SetupDialogState extends ConsumerState<_SetupDialog> {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.close, size: 20),
+            icon: const Icon(LucideIcons.x, size: 20),
             tooltip: i18n.tasks.setupModal.closeTitle,
             onPressed: _close,
           ),

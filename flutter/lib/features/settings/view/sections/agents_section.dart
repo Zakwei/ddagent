@@ -8,6 +8,7 @@ import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
 import 'package:ddagent_app/core/widgets/app_spinner.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
+import 'package:ddagent_app/core/widgets/edge_fade.dart';
 import 'package:ddagent_app/features/chat/view/model_library_panel.dart';
 import 'package:ddagent_app/features/mcp/view/ddagent_mcp_install_card.dart';
 import 'package:ddagent_app/features/mcp/view/mcp_servers_screen.dart';
@@ -137,22 +138,24 @@ class _AgentsSectionState extends ConsumerState<AgentsSection> {
             border: Border(bottom: BorderSide(color: c.border)),
           ),
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                for (final agent in AgentsSection.agents)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 4),
-                    child: _AgentPill(
-                      agent: agent,
-                      name: AgentsSection._names[agent] ?? agent,
-                      selected: _agent == agent,
-                      dotColor: AgentsSection.dotColor(agent, c),
-                      onTap: () => setState(() => _agent = agent),
+          child: HorizontalEdgeFade(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  for (final agent in AgentsSection.agents)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 4),
+                      child: _AgentPill(
+                        agent: agent,
+                        name: AgentsSection._names[agent] ?? agent,
+                        selected: _agent == agent,
+                        dotColor: AgentsSection.dotColor(agent, c),
+                        onTap: () => setState(() => _agent = agent),
+                      ),
                     ),
-                  ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -163,36 +166,38 @@ class _AgentsSectionState extends ConsumerState<AgentsSection> {
             border: Border(bottom: BorderSide(color: c.border)),
           ),
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                for (final category in AgentsSection.categories)
-                  InkWell(
-                    onTap: () => setState(() => _category = category),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.lg,
-                        vertical: AppSpacing.md,
-                      ),
-                      decoration: BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                            width: 2,
-                            color: _category == category ? c.primary : Colors.transparent,
+          child: HorizontalEdgeFade(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  for (final category in AgentsSection.categories)
+                    InkWell(
+                      onTap: () => setState(() => _category = category),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.lg,
+                          vertical: AppSpacing.md,
+                        ),
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(
+                              width: 2,
+                              color: _category == category ? c.primary : Colors.transparent,
+                            ),
+                          ),
+                        ),
+                        child: Text(
+                          _categoryLabel(t, category),
+                          style: tt.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w500,
+                            color: _category == category ? c.primary : c.mutedForeground,
                           ),
                         ),
                       ),
-                      child: Text(
-                        _categoryLabel(t, category),
-                        style: tt.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w500,
-                          color: _category == category ? c.primary : c.mutedForeground,
-                        ),
-                      ),
                     ),
-                  ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

@@ -4,6 +4,7 @@ import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Shown inside a pane with no workspace binding yet (port of
 /// WorkspaceLauncher.tsx): pick a project to bind the pane, or jump to
@@ -46,7 +47,7 @@ class WorkspaceLauncher extends ConsumerWidget {
                   color: c.muted.withValues(alpha: 0.5),
                   borderRadius: AppRadii.borderLg,
                 ),
-                child: Icon(Icons.folder_outlined, color: c.mutedForeground),
+                child: Icon(LucideIcons.folder, color: c.mutedForeground),
               ),
               const SizedBox(height: AppSpacing.md),
               Text(i18n.chat.providerSelection.chooseWorkspace, style: t.textTheme.titleMedium),
@@ -74,7 +75,7 @@ class WorkspaceLauncher extends ConsumerWidget {
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.folder_outlined, size: 14, color: c.mutedForeground),
+                          Icon(LucideIcons.folder, size: 14, color: c.mutedForeground),
                           const SizedBox(width: AppSpacing.sm),
                           Expanded(
                             child: Text(
@@ -113,7 +114,7 @@ class WorkspaceLauncher extends ConsumerWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.add, size: 14, color: c.mutedForeground),
+                      Icon(LucideIcons.plus, size: 14, color: c.mutedForeground),
                       const SizedBox(width: AppSpacing.sm),
                       Text(
                         i18n.workspace.createWorkspace,

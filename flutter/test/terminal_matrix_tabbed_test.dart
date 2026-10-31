@@ -129,12 +129,12 @@ void main() {
       shells.of(bTab).output(_prompt);
       await tester.pump(const Duration(milliseconds: 600));
       await tester.pump();
-      expect(find.byIcon(Icons.warning_amber_rounded), findsOneWidget);
+      expect(find.byIcon(LucideIcons.triangleAlert), findsOneWidget);
       expect(find.byIcon(Icons.check_circle), findsNothing, reason: 'a question outranks done');
 
       await showPane(tester, c, 1);
       expect(bTab.bell, isFalse);
-      expect(find.byIcon(Icons.warning_amber_rounded), findsNothing, reason: 'selected pane');
+      expect(find.byIcon(LucideIcons.triangleAlert), findsNothing, reason: 'selected pane');
       // Phone width: the visible tab's prompt shows as answer chips.
       expect(find.text('1. Yes'), findsOneWidget);
       await tester.tap(find.text('2. No'));

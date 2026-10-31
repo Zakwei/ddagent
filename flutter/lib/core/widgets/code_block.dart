@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_highlight/themes/atom-one-dark.dart';
 import 'package:flutter_highlight/themes/atom-one-light.dart';
 import 'package:highlight/highlight.dart' show highlight, Node;
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Fenced code block: syntax highlight + filename/language header + copy
 /// button + line-wrap toggle (T16.2).
@@ -100,13 +101,16 @@ class _CodeBlockState extends State<CodeBlock> {
           IconButton(
             tooltip: _wrap ? t.common.codeBlock.noWrap : t.common.codeBlock.wrapLines,
             visualDensity: VisualDensity.compact,
-            icon: Icon(_wrap ? Icons.wrap_text : Icons.align_horizontal_left, size: 15),
+            icon: Icon(
+              _wrap ? LucideIcons.wrapText : LucideIcons.alignHorizontalJustifyStart,
+              size: 15,
+            ),
             onPressed: () => setState(() => _wrap = !_wrap),
           ),
           IconButton(
             tooltip: t.chat.codeBlock.copy,
             visualDensity: VisualDensity.compact,
-            icon: const Icon(Icons.copy_outlined, size: 15),
+            icon: const Icon(LucideIcons.copy, size: 15),
             onPressed: () => unawaited(copyTextWithFeedback(context, widget.code)),
           ),
         ],

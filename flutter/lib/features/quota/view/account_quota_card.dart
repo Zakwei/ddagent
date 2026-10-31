@@ -9,6 +9,7 @@ import 'package:ddagent_app/features/quota/view/quota_unavailable.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Per-account quota card (port of AccountQuotaCard.tsx): window progress
 /// bars with reset timers and pace projection, routed-agent chips, a
@@ -123,11 +124,11 @@ class _AccountQuotaCardState extends ConsumerState<AccountQuotaCard> {
               runSpacing: 4,
               children: [
                 if (account.assignedAgents.isEmpty)
-                  _chip(icon: Icons.group_outlined, label: i18n.common.quota.noAgents, dashed: true)
+                  _chip(icon: LucideIcons.users, label: i18n.common.quota.noAgents, dashed: true)
                 else
                   for (final a in account.assignedAgents)
                     _chip(
-                      icon: Icons.group,
+                      icon: LucideIcons.users,
                       label: '${a.agentId}${a.role.isEmpty ? '' : ' · ${a.role}'}',
                     ),
               ],
@@ -145,14 +146,14 @@ class _AccountQuotaCardState extends ConsumerState<AccountQuotaCard> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.history, size: 14, color: c.mutedForeground),
+                    Icon(LucideIcons.history, size: 14, color: c.mutedForeground),
                     const SizedBox(width: 4),
                     Text(
                       i18n.common.quota.history,
                       style: t.labelSmall?.copyWith(color: c.mutedForeground),
                     ),
                     Icon(
-                      _historyOpen ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                      _historyOpen ? LucideIcons.chevronUp : LucideIcons.chevronDown,
                       size: 14,
                       color: c.mutedForeground,
                     ),

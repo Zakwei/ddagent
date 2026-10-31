@@ -4,6 +4,7 @@ import 'package:ddagent_app/features/workspace/view/split_workspace_grid.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Regression guard: the drag wrapper used to read the mutable `tile`
 /// variable from its own builder, so every pane that was draggable
@@ -152,7 +153,7 @@ void main() {
         ),
       ),
     );
-    expect(find.byIcon(Icons.warning_amber_rounded), findsOneWidget);
+    expect(find.byIcon(LucideIcons.triangleAlert), findsOneWidget);
     expect(find.byIcon(Icons.check_circle), findsNothing);
   });
 }

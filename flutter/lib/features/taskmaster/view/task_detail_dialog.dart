@@ -12,6 +12,7 @@ import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Task details + edit dialog (port of TaskDetailModal): status select is
 /// always live; the rest flips between view and edit mode; dependencies are
@@ -147,7 +148,7 @@ class _TaskDetailDialogState extends ConsumerState<TaskDetailDialog> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.arrow_right_alt, size: 14, color: color),
+            Icon(LucideIcons.arrowRight, size: 14, color: color),
             const SizedBox(width: 4),
             Text(id, style: t.bodySmall?.copyWith(color: color)),
           ],
@@ -242,12 +243,12 @@ class _TaskDetailDialogState extends ConsumerState<TaskDetailDialog> {
                 IconButton(
                   tooltip: i18n.tasks.taskDetail.copyTaskId,
                   onPressed: busy ? null : () => unawaited(_copyId(task.idText)),
-                  icon: Icon(Icons.copy, size: 16, color: c.mutedForeground),
+                  icon: Icon(LucideIcons.copy, size: 16, color: c.mutedForeground),
                 ),
                 IconButton(
                   tooltip: i18n.tasks.taskDetail.delete,
                   onPressed: busy ? null : () => unawaited(_delete(task)),
-                  icon: Icon(Icons.delete_outline, size: 18, color: c.destructive),
+                  icon: Icon(LucideIcons.trash2, size: 18, color: c.destructive),
                 ),
               ],
             ),

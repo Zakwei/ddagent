@@ -15,7 +15,7 @@ class AppBadge extends StatelessWidget {
     final c = context.appColors;
     final (bg, fg) = switch (variant) {
       AppBadgeVariant.neutral => (c.muted, c.mutedForeground),
-      AppBadgeVariant.primary => (c.primary, c.primaryForeground),
+      AppBadgeVariant.primary => (c.primaryFill, c.primaryForeground),
       AppBadgeVariant.destructive => (c.destructive, c.destructiveForeground),
     };
     return Container(

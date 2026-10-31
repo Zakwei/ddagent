@@ -6,6 +6,7 @@ import 'package:ddagent_app/features/voice/state/stt_controller.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class SttConfigDialog extends ConsumerStatefulWidget {
   const SttConfigDialog({super.key});
@@ -70,7 +71,7 @@ class _SttConfigDialogState extends ConsumerState<SttConfigDialog> {
     return AlertDialog(
       title: Row(
         children: [
-          const Icon(Icons.mic, size: 20),
+          const Icon(LucideIcons.mic, size: 20),
           const SizedBox(width: AppSpacing.xs),
           Text(i18n.settings.stt.title),
           const Spacer(),

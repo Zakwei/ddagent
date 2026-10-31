@@ -236,7 +236,7 @@ class _BrandHeader extends ConsumerWidget {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: c.primary.withValues(alpha: 0.9),
+            color: c.primaryFill.withValues(alpha: 0.9),
             borderRadius: AppRadii.borderLg,
           ),
           child: Icon(LucideIcons.messageSquare, size: 20, color: c.primaryForeground),

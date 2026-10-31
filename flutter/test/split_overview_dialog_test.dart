@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:xterm/xterm.dart' as xt;
 
 class _FakeWs extends WsClient {
@@ -104,19 +105,19 @@ void main() {
         ),
       ),
     );
-    expect(find.byIcon(Icons.warning_amber_rounded), findsNothing);
+    expect(find.byIcon(LucideIcons.triangleAlert), findsNothing);
 
     // The CLI shows a numbered prompt → the tile turns into a question.
     tab.promptOptions = const [(number: '1', label: 'Yes'), (number: '2', label: 'No')];
     terminal.emit(TerminalState(tabs: [tab]));
     await tester.pump();
-    expect(find.byIcon(Icons.warning_amber_rounded), findsOneWidget);
+    expect(find.byIcon(LucideIcons.triangleAlert), findsOneWidget);
 
     // Answered → back to idle.
     tab.promptOptions = null;
     terminal.emit(TerminalState(tabs: [tab]));
     await tester.pump();
-    expect(find.byIcon(Icons.warning_amber_rounded), findsNothing);
+    expect(find.byIcon(LucideIcons.triangleAlert), findsNothing);
 
     // A prompt left on a disconnected tab is stale, not a live question.
     tab
@@ -124,6 +125,6 @@ void main() {
       ..status = TerminalTabStatus.disconnected;
     terminal.emit(TerminalState(tabs: [tab]));
     await tester.pump();
-    expect(find.byIcon(Icons.warning_amber_rounded), findsNothing);
+    expect(find.byIcon(LucideIcons.triangleAlert), findsNothing);
   });
 }

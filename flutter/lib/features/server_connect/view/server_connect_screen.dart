@@ -13,6 +13,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Server connect — URL entry + /auth/status probe + saved profiles
 /// (multi-server parity with the RN client's server list).
@@ -175,7 +176,7 @@ class _ServerConnectScreenState extends ConsumerState<ServerConnectScreen> {
                             contentPadding: EdgeInsets.zero,
                             selected: p.url == profilesState.activeUrl,
                             leading: Icon(
-                              p.isLocal ? Icons.dns_outlined : Icons.cloud_outlined,
+                              p.isLocal ? LucideIcons.server : LucideIcons.cloud,
                               size: 18,
                               color: c.mutedForeground,
                             ),
@@ -201,12 +202,12 @@ class _ServerConnectScreenState extends ConsumerState<ServerConnectScreen> {
                                   ),
                                 if (desktop)
                                   IconButton(
-                                    icon: const Icon(Icons.open_in_new, size: 18),
+                                    icon: const Icon(LucideIcons.externalLink, size: 18),
                                     tooltip: i18n.serverConnect.openInNewWindow,
                                     onPressed: () => _openWindow(p),
                                   ),
                                 IconButton(
-                                  icon: const Icon(Icons.close, size: 18),
+                                  icon: const Icon(LucideIcons.x, size: 18),
                                   tooltip: i18n.common.gitPanel.remove,
                                   onPressed: () => _remove(p.url),
                                 ),
@@ -279,7 +280,7 @@ class _LocalServerCard extends ConsumerWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.dns_outlined, size: 20, color: c.mutedForeground),
+              Icon(LucideIcons.server, size: 20, color: c.mutedForeground),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Column(
