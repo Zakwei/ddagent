@@ -2768,6 +2768,7 @@ class Translations$settings$appearance$it extends Translations$settings$appearan
 	@override String get lineNumbers => 'Numeri di riga';
 	@override String get fontSize => 'Dimensione carattere';
 	@override late final Translations$settings$appearance$themeModes$it themeModes = Translations$settings$appearance$themeModes$it._(_root);
+	@override String get screen => 'Schermo';
 }
 
 // Path: settings.actions
@@ -10252,6 +10253,7 @@ extension on TranslationsIt {
 			'settings.appearance.themeModes.system' => 'Sistema',
 			'settings.appearance.themeModes.light' => 'Chiaro',
 			'settings.appearance.themeModes.dark' => 'Scuro',
+			'settings.appearance.screen' => 'Schermo',
 			'settings.actions.saveChanges' => 'Salva modifiche',
 			'settings.actions.resetToDefaults' => 'Ripristina predefiniti',
 			'settings.actions.cancelChanges' => 'Annulla modifiche',
@@ -10737,9 +10739,9 @@ extension on TranslationsIt {
 			'settings.browser.installRuntime' => 'Installa runtime',
 			'settings.browser.installed' => 'installato',
 			'settings.browser.installing' => 'Installazione...',
-			'settings.browser.missing' => 'mancante',
 			_ => null,
 		} ?? switch (path) {
+			'settings.browser.missing' => 'mancante',
 			'settings.browser.runtimeRequired' => 'Runtime del browser richiesto',
 			'settings.browser.statusDisabled' => 'disabilitato',
 			'settings.browser.statusLabel' => 'Stato',
@@ -11251,9 +11253,9 @@ extension on TranslationsIt {
 			'tasks.createTask.submit' => 'Aggiungi attività',
 			'tasks.createTask.submitting' => 'Aggiunta...',
 			'tasks.createTask.title' => 'Aggiungi attività',
-			'tasks.createTask.titleLabel' => 'Titolo',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.createTask.titleLabel' => 'Titolo',
 			'tasks.createTask.titlePlaceholder' => 'Cosa va fatto?',
 			'tasks.list.completedReopen' => 'Completata (clicca per riaprire)',
 			'tasks.list.inProgressComplete' => 'In corso (clicca per completare)',
@@ -11765,9 +11767,9 @@ extension on TranslationsIt {
 			'skills.screen.searchHint' => 'Cerca skill…',
 			'skills.screen.clearSearch' => 'Cancella ricerca skill',
 			'skills.screen.addSkill' => 'Aggiungi Skill',
-			'skills.screen.scanningProjectSkills' => 'Scansione delle skill del progetto…',
 			_ => null,
 		} ?? switch (path) {
+			'skills.screen.scanningProjectSkills' => 'Scansione delle skill del progetto…',
 			'skills.screen.savedSuccessfully' => 'Skill salvate correttamente.',
 			'skills.screen.loadingSkills' => ({required Object provider}) => 'Caricamento delle skill di ${provider}…',
 			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('it'))(count, one: '${count} SKILL', other: '${count} SKILL', ), 

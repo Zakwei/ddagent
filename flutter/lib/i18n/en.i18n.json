@@ -2053,7 +2053,8 @@
         "system": "System",
         "light": "Light",
         "dark": "Dark"
-      }
+      },
+      "screen": "Screen"
     },
     "actions": {
       "saveChanges": "Save Changes",

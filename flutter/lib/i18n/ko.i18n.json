@@ -2043,7 +2043,8 @@
         "system": "시스템",
         "light": "라이트",
         "dark": "다크"
-      }
+      },
+      "screen": "화면"
     },
     "actions": {
       "saveChanges": "변경사항 저장",

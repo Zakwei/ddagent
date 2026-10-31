@@ -450,8 +450,8 @@ void main() {
       expect(find.text('disabled'), findsOneWidget);
       expect(find.text('2 failures'), findsOneWidget);
       expect(find.text('Run now'), findsNWidgets(2));
-      // 2 job toggles + the scheduler-wide prevent-sleep switch.
-      expect(find.byType(Switch), findsNWidgets(3));
+      // One toggle per job — prevent-sleep moved to Settings → Appearance.
+      expect(find.byType(Switch), findsNWidgets(2));
     });
 
     testWidgets('uruchomienie akcji Run Now', (tester) async {

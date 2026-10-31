@@ -2758,6 +2758,7 @@ class Translations$settings$appearance$zh_TW extends Translations$settings$appea
 	@override String get lineNumbers => '行號';
 	@override String get fontSize => '字型大小';
 	@override late final Translations$settings$appearance$themeModes$zh_TW themeModes = Translations$settings$appearance$themeModes$zh_TW.internal(_root);
+	@override String get screen => '螢幕';
 }
 
 // Path: settings.actions
@@ -10241,6 +10242,7 @@ extension on TranslationsZhTw {
 			'settings.appearance.themeModes.system' => '系統',
 			'settings.appearance.themeModes.light' => '淺色',
 			'settings.appearance.themeModes.dark' => '深色',
+			'settings.appearance.screen' => '螢幕',
 			'settings.actions.saveChanges' => '儲存變更',
 			'settings.actions.resetToDefaults' => '重設為預設值',
 			'settings.actions.cancelChanges' => '取消變更',
@@ -10726,9 +10728,9 @@ extension on TranslationsZhTw {
 			'settings.browser.installRuntime' => '安裝執行環境',
 			'settings.browser.installed' => '已安裝',
 			'settings.browser.installing' => '正在安裝...',
-			'settings.browser.missing' => '缺失',
 			_ => null,
 		} ?? switch (path) {
+			'settings.browser.missing' => '缺失',
 			'settings.browser.runtimeRequired' => '需要瀏覽器執行環境',
 			'settings.browser.statusDisabled' => '已停用',
 			'settings.browser.statusLabel' => '狀態',
@@ -11240,9 +11242,9 @@ extension on TranslationsZhTw {
 			'tasks.createTask.submit' => '新增任務',
 			'tasks.createTask.submitting' => '正在新增...',
 			'tasks.createTask.title' => '新增任務',
-			'tasks.createTask.titleLabel' => '標題',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.createTask.titleLabel' => '標題',
 			'tasks.createTask.titlePlaceholder' => '需要做什麼？',
 			'tasks.list.completedReopen' => '已完成（點擊重新開啟）',
 			'tasks.list.inProgressComplete' => '進行中（點擊完成）',
@@ -11754,9 +11756,9 @@ extension on TranslationsZhTw {
 			'skills.screen.searchHint' => '搜尋技能...',
 			'skills.screen.clearSearch' => '清除技能搜尋',
 			'skills.screen.addSkill' => '新增技能',
-			'skills.screen.scanningProjectSkills' => '正在掃描專案技能...',
 			_ => null,
 		} ?? switch (path) {
+			'skills.screen.scanningProjectSkills' => '正在掃描專案技能...',
 			'skills.screen.savedSuccessfully' => '技能已成功儲存。',
 			'skills.screen.loadingSkills' => ({required Object provider}) => '正在載入 ${provider} 技能…',
 			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '${count} 個技能', other: '${count} 個技能', ), 

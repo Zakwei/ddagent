@@ -2758,6 +2758,7 @@ class Translations$settings$appearance$ja extends Translations$settings$appearan
 	@override String get lineNumbers => '行番号';
 	@override String get fontSize => 'フォントサイズ';
 	@override late final Translations$settings$appearance$themeModes$ja themeModes = Translations$settings$appearance$themeModes$ja._(_root);
+	@override String get screen => '画面';
 }
 
 // Path: settings.actions
@@ -10241,6 +10242,7 @@ extension on TranslationsJa {
 			'settings.appearance.themeModes.system' => 'システム',
 			'settings.appearance.themeModes.light' => 'ライト',
 			'settings.appearance.themeModes.dark' => 'ダーク',
+			'settings.appearance.screen' => '画面',
 			'settings.actions.saveChanges' => '変更を保存',
 			'settings.actions.resetToDefaults' => 'デフォルトに戻す',
 			'settings.actions.cancelChanges' => '変更をキャンセル',
@@ -10726,9 +10728,9 @@ extension on TranslationsJa {
 			'settings.browser.installRuntime' => 'ランタイムをインストール',
 			'settings.browser.installed' => 'インストール済み',
 			'settings.browser.installing' => 'インストール中...',
-			'settings.browser.missing' => '未インストール',
 			_ => null,
 		} ?? switch (path) {
+			'settings.browser.missing' => '未インストール',
 			'settings.browser.runtimeRequired' => 'ブラウザランタイムが必要です',
 			'settings.browser.statusDisabled' => '無効',
 			'settings.browser.statusLabel' => 'ステータス',
@@ -11240,9 +11242,9 @@ extension on TranslationsJa {
 			'tasks.createTask.submit' => 'タスクを追加',
 			'tasks.createTask.submitting' => '追加中...',
 			'tasks.createTask.title' => 'タスクを追加',
-			'tasks.createTask.titleLabel' => 'タイトル',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.createTask.titleLabel' => 'タイトル',
 			'tasks.createTask.titlePlaceholder' => '何をすべきですか？',
 			'tasks.list.completedReopen' => '完了（クリックで再開）',
 			'tasks.list.inProgressComplete' => '進行中（クリックで完了）',
@@ -11754,9 +11756,9 @@ extension on TranslationsJa {
 			'skills.screen.searchHint' => 'スキルを検索...',
 			'skills.screen.clearSearch' => 'スキル検索をクリア',
 			'skills.screen.addSkill' => 'スキルを追加',
-			'skills.screen.scanningProjectSkills' => 'プロジェクトのスキルをスキャン中...',
 			_ => null,
 		} ?? switch (path) {
+			'skills.screen.scanningProjectSkills' => 'プロジェクトのスキルをスキャン中...',
 			'skills.screen.savedSuccessfully' => 'スキルを保存しました。',
 			'skills.screen.loadingSkills' => ({required Object provider}) => '${provider} のスキルを読み込み中…',
 			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ja'))(count, one: '${count} スキル', other: '${count} スキル', ), 

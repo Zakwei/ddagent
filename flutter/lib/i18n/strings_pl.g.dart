@@ -2790,6 +2790,7 @@ class Translations$settings$appearance$pl extends Translations$settings$appearan
 	@override String get lineNumbers => 'Numery wierszy';
 	@override String get fontSize => 'Rozmiar czcionki';
 	@override late final Translations$settings$appearance$themeModes$pl themeModes = Translations$settings$appearance$themeModes$pl._(_root);
+	@override String get screen => 'Ekran';
 }
 
 // Path: settings.actions
@@ -10292,6 +10293,7 @@ extension on TranslationsPl {
 			'settings.appearance.themeModes.system' => 'Systemowy',
 			'settings.appearance.themeModes.light' => 'Jasny',
 			'settings.appearance.themeModes.dark' => 'Ciemny',
+			'settings.appearance.screen' => 'Ekran',
 			'settings.actions.saveChanges' => 'Zapisz zmiany',
 			'settings.actions.resetToDefaults' => 'Przywróć ustawienia domyślne',
 			'settings.actions.cancelChanges' => 'Anuluj zmiany',
@@ -10777,9 +10779,9 @@ extension on TranslationsPl {
 			'settings.browser.installRuntime' => 'Zainstaluj środowisko',
 			'settings.browser.installed' => 'zainstalowane',
 			'settings.browser.installing' => 'Instalowanie...',
-			'settings.browser.missing' => 'brak',
 			_ => null,
 		} ?? switch (path) {
+			'settings.browser.missing' => 'brak',
 			'settings.browser.runtimeRequired' => 'Wymagane środowisko przeglądarki',
 			'settings.browser.statusDisabled' => 'wyłączony',
 			'settings.browser.statusLabel' => 'Status',
@@ -11291,9 +11293,9 @@ extension on TranslationsPl {
 			'tasks.createTask.submit' => 'Dodaj zadanie',
 			'tasks.createTask.submitting' => 'Dodawanie...',
 			'tasks.createTask.title' => 'Dodaj zadanie',
-			'tasks.createTask.titleLabel' => 'Tytuł',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.createTask.titleLabel' => 'Tytuł',
 			'tasks.createTask.titlePlaceholder' => 'Co trzeba zrobić?',
 			'tasks.list.completedReopen' => 'Ukończone (kliknij, aby ponownie otworzyć)',
 			'tasks.list.inProgressComplete' => 'W trakcie (kliknij, aby ukończyć)',
@@ -11805,9 +11807,9 @@ extension on TranslationsPl {
 			'skills.screen.searchHint' => 'Szukaj skilli...',
 			'skills.screen.clearSearch' => 'Wyczyść wyszukiwanie skilli',
 			'skills.screen.addSkill' => 'Dodaj skill',
-			'skills.screen.scanningProjectSkills' => 'Skanowanie skilli projektu...',
 			_ => null,
 		} ?? switch (path) {
+			'skills.screen.scanningProjectSkills' => 'Skanowanie skilli projektu...',
 			'skills.screen.savedSuccessfully' => 'Skille zapisano pomyślnie.',
 			'skills.screen.loadingSkills' => ({required Object provider}) => 'Wczytywanie skilli ${provider}…',
 			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('pl'))(count, one: '${count} SKILL', other: '${count} SKILLI', ), 

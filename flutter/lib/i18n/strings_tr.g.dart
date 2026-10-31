@@ -2763,6 +2763,7 @@ class Translations$settings$appearance$tr extends Translations$settings$appearan
 	@override String get lineNumbers => 'Satır Numaraları';
 	@override String get fontSize => 'Yazı Tipi Boyutu';
 	@override late final Translations$settings$appearance$themeModes$tr themeModes = Translations$settings$appearance$themeModes$tr._(_root);
+	@override String get screen => 'Ekran';
 }
 
 // Path: settings.actions
@@ -10247,6 +10248,7 @@ extension on TranslationsTr {
 			'settings.appearance.themeModes.system' => 'Sistem',
 			'settings.appearance.themeModes.light' => 'Açık',
 			'settings.appearance.themeModes.dark' => 'Koyu',
+			'settings.appearance.screen' => 'Ekran',
 			'settings.actions.saveChanges' => 'Değişiklikleri Kaydet',
 			'settings.actions.resetToDefaults' => 'Varsayılanlara Döndür',
 			'settings.actions.cancelChanges' => 'Değişiklikleri İptal Et',
@@ -10732,9 +10734,9 @@ extension on TranslationsTr {
 			'settings.browser.installRuntime' => 'Runtime’ı Kur',
 			'settings.browser.installed' => 'kurulu',
 			'settings.browser.installing' => 'Kuruluyor...',
-			'settings.browser.missing' => 'eksik',
 			_ => null,
 		} ?? switch (path) {
+			'settings.browser.missing' => 'eksik',
 			'settings.browser.runtimeRequired' => 'Tarayıcı runtime’ı gerekli',
 			'settings.browser.statusDisabled' => 'devre dışı',
 			'settings.browser.statusLabel' => 'Durum',
@@ -11246,9 +11248,9 @@ extension on TranslationsTr {
 			'tasks.createTask.submit' => 'Görev Ekle',
 			'tasks.createTask.submitting' => 'Ekleniyor...',
 			'tasks.createTask.title' => 'Görev Ekle',
-			'tasks.createTask.titleLabel' => 'Başlık',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.createTask.titleLabel' => 'Başlık',
 			'tasks.createTask.titlePlaceholder' => 'Ne yapılması gerekiyor?',
 			'tasks.list.completedReopen' => 'Tamamlandı (yeniden açmak için tıklayın)',
 			'tasks.list.inProgressComplete' => 'Devam ediyor (tamamlamak için tıklayın)',
@@ -11760,9 +11762,9 @@ extension on TranslationsTr {
 			'skills.screen.searchHint' => 'Beceri ara...',
 			'skills.screen.clearSearch' => 'Beceri aramasını temizle',
 			'skills.screen.addSkill' => 'Beceri Ekle',
-			'skills.screen.scanningProjectSkills' => 'Proje becerileri taranıyor...',
 			_ => null,
 		} ?? switch (path) {
+			'skills.screen.scanningProjectSkills' => 'Proje becerileri taranıyor...',
 			'skills.screen.savedSuccessfully' => 'Beceriler başarıyla kaydedildi.',
 			'skills.screen.loadingSkills' => ({required Object provider}) => '${provider} becerileri yükleniyor…',
 			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('tr'))(count, one: '${count} BECERİ', other: '${count} BECERİ', ), 

@@ -107,6 +107,26 @@ class AppearanceSection extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: AppSpacing.xl),
+        // Used to sit on the Scheduler page — it applies app-wide (the wake
+        // lock lives in AdaptiveScaffold), not to schedules only.
+        SettingsSectionBlock(
+          title: t.settings.appearance.screen,
+          children: [
+            card([
+              SettingsRow(
+                label: t.settings.schedules.preventSleep,
+                description: t.settings.schedules.preventSleepHint,
+                child: Switch(
+                  value: prefs.preventSleep,
+                  onChanged: (v) => ref
+                      .read(uiPreferencesProvider.notifier)
+                      .update((p) => p.copyWith(preventSleep: v)),
+                ),
+              ),
+            ]),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.xl),
         SettingsSectionBlock(
           title: appearance.codeEditor.title,
           children: [

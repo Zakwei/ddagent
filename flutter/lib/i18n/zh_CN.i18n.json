@@ -2043,7 +2043,8 @@
         "system": "跟随系统",
         "light": "浅色",
         "dark": "深色"
-      }
+      },
+      "screen": "屏幕"
     },
     "actions": {
       "saveChanges": "保存更改",

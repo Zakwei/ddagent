@@ -72,6 +72,15 @@ void main() {
     expect(find.text('Appearance'), findsWidgets);
     expect(find.byType(DropdownButton<AppLocale>), findsOneWidget);
     expect(find.byType(SegmentedButton<ThemeMode>), findsOneWidget);
+    // Prevent-sleep lives here now, not on the Scheduler page.
+    await tester.scrollUntilVisible(
+      find.text('Prevent sleep while agents run'),
+      200,
+      scrollable: find
+          .ancestor(of: find.byType(SegmentedButton<ThemeMode>), matching: find.byType(Scrollable))
+          .first,
+    );
+    expect(find.text('Prevent sleep while agents run'), findsOneWidget);
     // Nav rail lists all sections at non-compact widths.
     expect(find.text('Notifications'), findsOneWidget);
   });

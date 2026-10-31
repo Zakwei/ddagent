@@ -2758,6 +2758,7 @@ class Translations$settings$appearance$ko extends Translations$settings$appearan
 	@override String get lineNumbers => '줄 번호';
 	@override String get fontSize => '글꼴 크기';
 	@override late final Translations$settings$appearance$themeModes$ko themeModes = Translations$settings$appearance$themeModes$ko._(_root);
+	@override String get screen => '화면';
 }
 
 // Path: settings.actions
@@ -10241,6 +10242,7 @@ extension on TranslationsKo {
 			'settings.appearance.themeModes.system' => '시스템',
 			'settings.appearance.themeModes.light' => '라이트',
 			'settings.appearance.themeModes.dark' => '다크',
+			'settings.appearance.screen' => '화면',
 			'settings.actions.saveChanges' => '변경사항 저장',
 			'settings.actions.resetToDefaults' => '기본값으로 초기화',
 			'settings.actions.cancelChanges' => '변경 취소',
@@ -10726,9 +10728,9 @@ extension on TranslationsKo {
 			'settings.browser.installRuntime' => '런타임 설치',
 			'settings.browser.installed' => '설치됨',
 			'settings.browser.installing' => '설치 중...',
-			'settings.browser.missing' => '없음',
 			_ => null,
 		} ?? switch (path) {
+			'settings.browser.missing' => '없음',
 			'settings.browser.runtimeRequired' => '브라우저 런타임 필요',
 			'settings.browser.statusDisabled' => '비활성화됨',
 			'settings.browser.statusLabel' => '상태',
@@ -11240,9 +11242,9 @@ extension on TranslationsKo {
 			'tasks.createTask.submit' => '작업 추가',
 			'tasks.createTask.submitting' => '추가 중...',
 			'tasks.createTask.title' => '작업 추가',
-			'tasks.createTask.titleLabel' => '제목',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.createTask.titleLabel' => '제목',
 			'tasks.createTask.titlePlaceholder' => '무엇을 해야 하나요?',
 			'tasks.list.completedReopen' => '완료됨 (클릭하여 다시 열기)',
 			'tasks.list.inProgressComplete' => '진행 중 (클릭하여 완료)',
@@ -11754,9 +11756,9 @@ extension on TranslationsKo {
 			'skills.screen.searchHint' => '스킬 검색...',
 			'skills.screen.clearSearch' => '스킬 검색 지우기',
 			'skills.screen.addSkill' => '스킬 추가',
-			'skills.screen.scanningProjectSkills' => '프로젝트 스킬 검사 중...',
 			_ => null,
 		} ?? switch (path) {
+			'skills.screen.scanningProjectSkills' => '프로젝트 스킬 검사 중...',
 			'skills.screen.savedSuccessfully' => '스킬이 저장되었습니다.',
 			'skills.screen.loadingSkills' => ({required Object provider}) => '${provider} 스킬 로드 중…',
 			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, one: 'SKILL ${count}개', other: 'SKILL ${count}개', ), 

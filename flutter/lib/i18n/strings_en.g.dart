@@ -5043,6 +5043,9 @@ class Translations$settings$appearance$en {
 	String get fontSize => 'Font Size';
 
 	late final Translations$settings$appearance$themeModes$en themeModes = Translations$settings$appearance$themeModes$en.internal(_root);
+
+	/// en: 'Screen'
+	String get screen => 'Screen';
 }
 
 // Path: settings.actions
@@ -16893,6 +16896,7 @@ extension on Translations {
 			'settings.appearance.themeModes.system' => 'System',
 			'settings.appearance.themeModes.light' => 'Light',
 			'settings.appearance.themeModes.dark' => 'Dark',
+			'settings.appearance.screen' => 'Screen',
 			'settings.actions.saveChanges' => 'Save Changes',
 			'settings.actions.resetToDefaults' => 'Reset to Defaults',
 			'settings.actions.cancelChanges' => 'Cancel Changes',
@@ -17378,9 +17382,9 @@ extension on Translations {
 			'settings.browser.installRuntime' => 'Install Runtime',
 			'settings.browser.installed' => 'installed',
 			'settings.browser.installing' => 'Installing...',
-			'settings.browser.missing' => 'missing',
 			_ => null,
 		} ?? switch (path) {
+			'settings.browser.missing' => 'missing',
 			'settings.browser.runtimeRequired' => 'Browser runtime required',
 			'settings.browser.statusDisabled' => 'disabled',
 			'settings.browser.statusLabel' => 'Status',
@@ -17892,9 +17896,9 @@ extension on Translations {
 			'tasks.createTask.submit' => 'Add Task',
 			'tasks.createTask.submitting' => 'Adding...',
 			'tasks.createTask.title' => 'Add Task',
-			'tasks.createTask.titleLabel' => 'Title',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.createTask.titleLabel' => 'Title',
 			'tasks.createTask.titlePlaceholder' => 'What needs to be done?',
 			'tasks.list.completedReopen' => 'Completed (click to reopen)',
 			'tasks.list.inProgressComplete' => 'In progress (click to complete)',
@@ -18406,9 +18410,9 @@ extension on Translations {
 			'skills.screen.searchHint' => 'Search skills...',
 			'skills.screen.clearSearch' => 'Clear skill search',
 			'skills.screen.addSkill' => 'Add Skill',
-			'skills.screen.scanningProjectSkills' => 'Scanning project skills...',
 			_ => null,
 		} ?? switch (path) {
+			'skills.screen.scanningProjectSkills' => 'Scanning project skills...',
 			'skills.screen.savedSuccessfully' => 'Skills saved successfully.',
 			'skills.screen.loadingSkills' => ({required Object provider}) => 'Loading ${provider} skills…',
 			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: '${count} SKILL', other: '${count} SKILLS', ), 

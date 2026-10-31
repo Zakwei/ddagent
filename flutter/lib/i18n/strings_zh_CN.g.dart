@@ -2758,6 +2758,7 @@ class Translations$settings$appearance$zh_CN extends Translations$settings$appea
 	@override String get lineNumbers => '行号';
 	@override String get fontSize => '字体大小';
 	@override late final Translations$settings$appearance$themeModes$zh_CN themeModes = Translations$settings$appearance$themeModes$zh_CN.internal(_root);
+	@override String get screen => '屏幕';
 }
 
 // Path: settings.actions
@@ -10241,6 +10242,7 @@ extension on TranslationsZhCn {
 			'settings.appearance.themeModes.system' => '跟随系统',
 			'settings.appearance.themeModes.light' => '浅色',
 			'settings.appearance.themeModes.dark' => '深色',
+			'settings.appearance.screen' => '屏幕',
 			'settings.actions.saveChanges' => '保存更改',
 			'settings.actions.resetToDefaults' => '重置为默认值',
 			'settings.actions.cancelChanges' => '取消更改',
@@ -10726,9 +10728,9 @@ extension on TranslationsZhCn {
 			'settings.browser.installRuntime' => '安装运行时',
 			'settings.browser.installed' => '已安装',
 			'settings.browser.installing' => '正在安装...',
-			'settings.browser.missing' => '缺失',
 			_ => null,
 		} ?? switch (path) {
+			'settings.browser.missing' => '缺失',
 			'settings.browser.runtimeRequired' => '需要浏览器运行时',
 			'settings.browser.statusDisabled' => '已禁用',
 			'settings.browser.statusLabel' => '状态',
@@ -11240,9 +11242,9 @@ extension on TranslationsZhCn {
 			'tasks.createTask.submit' => '添加任务',
 			'tasks.createTask.submitting' => '正在添加...',
 			'tasks.createTask.title' => '添加任务',
-			'tasks.createTask.titleLabel' => '标题',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.createTask.titleLabel' => '标题',
 			'tasks.createTask.titlePlaceholder' => '需要做什么？',
 			'tasks.list.completedReopen' => '已完成（点击重新打开）',
 			'tasks.list.inProgressComplete' => '进行中（点击完成）',
@@ -11754,9 +11756,9 @@ extension on TranslationsZhCn {
 			'skills.screen.searchHint' => '搜索技能...',
 			'skills.screen.clearSearch' => '清除技能搜索',
 			'skills.screen.addSkill' => '添加技能',
-			'skills.screen.scanningProjectSkills' => '正在扫描项目技能...',
 			_ => null,
 		} ?? switch (path) {
+			'skills.screen.scanningProjectSkills' => '正在扫描项目技能...',
 			'skills.screen.savedSuccessfully' => '技能保存成功。',
 			'skills.screen.loadingSkills' => ({required Object provider}) => '正在加载 ${provider} 技能…',
 			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '${count} 个技能', other: '${count} 个技能', ), 

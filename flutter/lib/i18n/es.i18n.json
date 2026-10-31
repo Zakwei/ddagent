@@ -2053,7 +2053,8 @@
         "system": "Sistema",
         "light": "Claro",
         "dark": "Oscuro"
-      }
+      },
+      "screen": "Pantalla"
     },
     "actions": {
       "saveChanges": "Guardar cambios",

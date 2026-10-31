@@ -2043,7 +2043,8 @@
         "system": "システム",
         "light": "ライト",
         "dark": "ダーク"
-      }
+      },
+      "screen": "画面"
     },
     "actions": {
       "saveChanges": "変更を保存",

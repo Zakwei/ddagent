@@ -2053,7 +2053,8 @@
         "system": "System",
         "light": "Hell",
         "dark": "Dunkel"
-      }
+      },
+      "screen": "Bildschirm"
     },
     "actions": {
       "saveChanges": "Änderungen speichern",

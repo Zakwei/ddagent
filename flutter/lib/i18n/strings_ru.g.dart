@@ -2790,6 +2790,7 @@ class Translations$settings$appearance$ru extends Translations$settings$appearan
 	@override String get lineNumbers => 'Номера строк';
 	@override String get fontSize => 'Размер шрифта';
 	@override late final Translations$settings$appearance$themeModes$ru themeModes = Translations$settings$appearance$themeModes$ru._(_root);
+	@override String get screen => 'Экран';
 }
 
 // Path: settings.actions
@@ -10290,6 +10291,7 @@ extension on TranslationsRu {
 			'settings.appearance.themeModes.system' => 'Системная',
 			'settings.appearance.themeModes.light' => 'Светлая',
 			'settings.appearance.themeModes.dark' => 'Темная',
+			'settings.appearance.screen' => 'Экран',
 			'settings.actions.saveChanges' => 'Сохранить изменения',
 			'settings.actions.resetToDefaults' => 'Сбросить к значениям по умолчанию',
 			'settings.actions.cancelChanges' => 'Отменить изменения',
@@ -10775,9 +10777,9 @@ extension on TranslationsRu {
 			'settings.browser.installRuntime' => 'Установить среду выполнения',
 			'settings.browser.installed' => 'установлено',
 			'settings.browser.installing' => 'Установка...',
-			'settings.browser.missing' => 'отсутствует',
 			_ => null,
 		} ?? switch (path) {
+			'settings.browser.missing' => 'отсутствует',
 			'settings.browser.runtimeRequired' => 'Требуется среда выполнения браузера',
 			'settings.browser.statusDisabled' => 'отключён',
 			'settings.browser.statusLabel' => 'Статус',
@@ -11289,9 +11291,9 @@ extension on TranslationsRu {
 			'tasks.createTask.submit' => 'Добавить задачу',
 			'tasks.createTask.submitting' => 'Добавление...',
 			'tasks.createTask.title' => 'Добавить задачу',
-			'tasks.createTask.titleLabel' => 'Название',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.createTask.titleLabel' => 'Название',
 			'tasks.createTask.titlePlaceholder' => 'Что нужно сделать?',
 			'tasks.list.completedReopen' => 'Выполнена (нажмите, чтобы переоткрыть)',
 			'tasks.list.inProgressComplete' => 'Выполняется (нажмите, чтобы завершить)',
@@ -11803,9 +11805,9 @@ extension on TranslationsRu {
 			'skills.screen.searchHint' => 'Поиск навыков…',
 			'skills.screen.clearSearch' => 'Очистить поиск навыков',
 			'skills.screen.addSkill' => 'Добавить навык',
-			'skills.screen.scanningProjectSkills' => 'Сканирование навыков проекта…',
 			_ => null,
 		} ?? switch (path) {
+			'skills.screen.scanningProjectSkills' => 'Сканирование навыков проекта…',
 			'skills.screen.savedSuccessfully' => 'Навыки успешно сохранены.',
 			'skills.screen.loadingSkills' => ({required Object provider}) => 'Загрузка навыков ${provider}…',
 			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(count, one: '${count} НАВЫК', other: '${count} НАВЫКОВ', ), 

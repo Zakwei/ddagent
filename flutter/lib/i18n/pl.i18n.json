@@ -2083,7 +2083,8 @@
         "system": "Systemowy",
         "light": "Jasny",
         "dark": "Ciemny"
-      }
+      },
+      "screen": "Ekran"
     },
     "actions": {
       "saveChanges": "Zapisz zmiany",
