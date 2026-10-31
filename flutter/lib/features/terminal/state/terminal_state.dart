@@ -857,9 +857,12 @@ class TerminalController extends Notifier<TerminalState> {
 
   // --- CLI prompt chips (web checkBufferForPrompt) ---
 
-  /// Debounced buffer scan after each output frame (PROMPT_DEBOUNCE_MS).
+  /// Buffer scan at most [_promptDebounce] after an output frame. A pending
+  /// scan is not pushed back: an agent's spinner repaints every ~100 ms, so a
+  /// timer reset per frame never fired while it worked — a question answered
+  /// in the CLI kept its chips until the turn ended.
   void _schedulePromptScan(TerminalTab tab) {
-    _promptTimers[tab.id]?.cancel();
+    if (_promptTimers[tab.id]?.isActive ?? false) return;
     _promptTimers[tab.id] = Timer(_promptDebounce, () {
       _promptTimers.remove(tab.id);
       _scanPrompt(tab);
@@ -880,8 +883,9 @@ class TerminalController extends Notifier<TerminalState> {
       lastRow--;
     }
     final scanEnd = lastRow;
+    // A screen down to one row (cleared, the CLI exited) still gets scanned:
+    // returning early here left the last question's chips up.
     final scanStart = max(0, lastRow - _promptBufferScanLines);
-    if (scanEnd <= scanStart) return;
 
     // Rows the terminal soft-wrapped (a long option on a phone) join their
     // line, so a chip carries the whole label rather than its first row.

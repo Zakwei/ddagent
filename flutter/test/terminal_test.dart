@@ -774,6 +774,62 @@ void main() {
       expect(tab.promptOptions?.map((o) => o.label), ['First', 'Second', 'Type something.']);
     });
 
+    test('a question answered in the CLI clears its chips while the agent streams', () async {
+      final container = ProviderContainer(
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
+      );
+      addTearDown(container.dispose);
+
+      final controller = container.read(terminalControllerProvider.notifier);
+      final tab = controller.createTab(projectPath: '/test/proj');
+
+      fakeWs.emitFrame({
+        'type': 'output',
+        'data': [
+          'Which one?',
+          '❯ 1. First',
+          '  2. Second',
+          'Enter to select · Esc to cancel',
+        ].join('\r\n'),
+      });
+      await Future<void>.delayed(const Duration(milliseconds: 600));
+      expect(tab.promptOptions, isNotNull);
+
+      // Answered by keyboard (or another device): the dialog is gone and the
+      // agent's spinner repaints faster than the scan's 500 ms debounce.
+      fakeWs.emitFrame({
+        'type': 'output',
+        'data': '\x1b[2J\x1b[H● Working\r\n\r\n❯ \r\n  ⏵⏵ bypass permissions on',
+      });
+      for (var i = 0; i < 15; i++) {
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+        fakeWs.emitFrame({'type': 'output', 'data': '\x1b[1;2H Working $i'});
+      }
+      expect(tab.promptOptions, isNull);
+      await Future<void>.delayed(const Duration(milliseconds: 600));
+    });
+
+    test('a screen cleared down to one row drops the chips', () async {
+      final container = ProviderContainer(
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
+      );
+      addTearDown(container.dispose);
+
+      final controller = container.read(terminalControllerProvider.notifier);
+      final tab = controller.createTab(projectPath: '/test/proj');
+
+      fakeWs.emitFrame({
+        'type': 'output',
+        'data': ['❯ 1. First', '  2. Second', 'Esc to cancel'].join('\r\n'),
+      });
+      await Future<void>.delayed(const Duration(milliseconds: 600));
+      expect(tab.promptOptions, isNotNull);
+
+      fakeWs.emitFrame({'type': 'output', 'data': '\x1b[2J\x1b[H\$ '});
+      await Future<void>.delayed(const Duration(milliseconds: 600));
+      expect(tab.promptOptions, isNull);
+    });
+
     test('non-prompt output clears any stale prompt options', () async {
       final container = ProviderContainer(
         overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
