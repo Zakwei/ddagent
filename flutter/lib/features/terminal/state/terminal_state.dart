@@ -871,8 +871,15 @@ class TerminalController extends Notifier<TerminalState> {
   void _scanPrompt(TerminalTab tab) {
     if (!state.tabs.contains(tab)) return;
     final buffer = tab.terminal.buffer;
-    final lastRow = buffer.absoluteCursorY;
-    final scanEnd = min(buffer.lines.length - 1, lastRow + 10);
+    // Anchor on the last row with text, not the cursor: a program may park
+    // the cursor high in its dialog (an input above the options), which left
+    // the footer outside a cursor-relative window — no chips for the first
+    // question, chips once the next one moved the cursor.
+    var lastRow = buffer.lines.length - 1;
+    while (lastRow > buffer.absoluteCursorY && buffer.lines[lastRow].getText().trim().isEmpty) {
+      lastRow--;
+    }
+    final scanEnd = lastRow;
     final scanStart = max(0, lastRow - _promptBufferScanLines);
     if (scanEnd <= scanStart) return;
 

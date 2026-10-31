@@ -741,6 +741,39 @@ void main() {
       },
     );
 
+    test('a question is found wherever the program leaves the cursor', () async {
+      final container = ProviderContainer(
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
+      );
+      addTearDown(container.dispose);
+
+      final controller = container.read(terminalControllerProvider.notifier);
+      final tab = controller.createTab(projectPath: '/test/proj');
+
+      // Long descriptions put the footer far below the dialog's top, and the
+      // program parks the cursor up there (an input it renders above).
+      String desc(int n) =>
+          [for (var i = 0; i < 6; i++) '     description $n line $i'].join('\r\n');
+      fakeWs.emitFrame({
+        'type': 'output',
+        'data': [
+          'Which one?',
+          '',
+          '❯ 1. First',
+          desc(1),
+          '  2. Second',
+          desc(2),
+          '  3. Type something.',
+          '',
+          'Enter to select · Tab/Arrow keys to navigate · Esc to cancel',
+          '',
+        ].join('\r\n'),
+      });
+      fakeWs.emitFrame({'type': 'output', 'data': '\x1b[22A'});
+      await Future<void>.delayed(const Duration(milliseconds: 600));
+      expect(tab.promptOptions?.map((o) => o.label), ['First', 'Second', 'Type something.']);
+    });
+
     test('non-prompt output clears any stale prompt options', () async {
       final container = ProviderContainer(
         overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
