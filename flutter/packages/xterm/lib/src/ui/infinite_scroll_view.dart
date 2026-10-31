@@ -74,11 +74,17 @@ class _RenderInfiniteScrollView extends RenderShiftedBox {
         super(child);
 
   ViewportOffset _position;
+
+  /// Moves the scroll listener to the new position (ddagent change): the
+  /// Scrollable swaps positions whenever its physics change — Ctrl toggles
+  /// them for Ctrl+wheel zoom, so every Ctrl chord (Ctrl+V paste) left the
+  /// listener on the dead position and the wheel stopped reaching the
+  /// application until the view was rebuilt.
   set position(ViewportOffset value) {
     if (_position == value) return;
-    if (attached) _position.removeListener(markNeedsLayout);
+    if (attached) _position.removeListener(_onScroll);
     _position = value;
-    if (attached) _position.addListener(markNeedsLayout);
+    if (attached) _position.addListener(_onScroll);
     markNeedsLayout();
   }
 
