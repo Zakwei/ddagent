@@ -15,6 +15,7 @@ import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Scheduler dashboard (port of settings/SchedulesSettingsTab.tsx): list of
 /// cron-driven agent runs with quick actions + expandable run history.
@@ -47,7 +48,7 @@ class SchedulerScreen extends ConsumerWidget {
               child: Row(
                 children: [
                   const AppNavMenuButton(),
-                  Icon(Icons.schedule, size: 18, color: c.mutedForeground),
+                  Icon(LucideIcons.calendarClock, size: 18, color: c.mutedForeground),
                   const SizedBox(width: AppSpacing.xs),
                   Flexible(
                     child: Text(
@@ -62,7 +63,7 @@ class SchedulerScreen extends ConsumerWidget {
                     variant: AppButtonVariant.ghost,
                     size: AppButtonSize.sm,
                     onPressed: ctrl.refresh,
-                    child: const Icon(Icons.refresh, size: 16),
+                    child: const Icon(LucideIcons.refreshCw, size: 16),
                   ),
                   AppButton(
                     size: AppButtonSize.sm,
@@ -98,7 +99,7 @@ class SchedulerScreen extends ConsumerWidget {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.schedule, size: 32, color: c.mutedForeground),
+                          Icon(LucideIcons.calendarClock, size: 32, color: c.mutedForeground),
                           const SizedBox(height: AppSpacing.sm),
                           Text(
                             i18n.settings.schedules.empty,
@@ -149,7 +150,7 @@ class _SchedulerPrefsBar extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          Icon(Icons.bedtime_outlined, size: 16, color: c.mutedForeground),
+          Icon(LucideIcons.moon, size: 16, color: c.mutedForeground),
           const SizedBox(width: AppSpacing.xs),
           Expanded(
             child: Column(

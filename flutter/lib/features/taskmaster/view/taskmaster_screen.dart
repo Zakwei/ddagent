@@ -1528,22 +1528,24 @@ class _GettingStarted extends ConsumerWidget {
                           ),
                         ),
                         const SizedBox(width: 12),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              gs.title,
-                              style: TextStyle(
-                                color: c.foreground,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                gs.title,
+                                style: TextStyle(
+                                  color: c.foreground,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
-                            ),
-                            Text(
-                              gs.subtitle,
-                              style: TextStyle(color: c.mutedForeground, fontSize: 14),
-                            ),
-                          ],
+                              Text(
+                                gs.subtitle,
+                                style: TextStyle(color: c.mutedForeground, fontSize: 14),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),

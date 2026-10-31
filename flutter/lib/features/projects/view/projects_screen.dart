@@ -101,7 +101,7 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
                   ),
                 IconButton(
                   tooltip: i18n.projects.cloneRepository,
-                  icon: const Icon(Icons.cloud_download_outlined),
+                  icon: Icon(LucideIcons.cloudDownload, size: 20, color: c.mutedForeground),
                   onPressed: () => showDialog<void>(
                     context: context,
                     builder: (_) => const _CloneDialog(),

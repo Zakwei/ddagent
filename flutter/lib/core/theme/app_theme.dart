@@ -47,6 +47,13 @@ abstract final class AppTheme {
         scrolledUnderElevation: 0,
         titleTextStyle: textTheme.titleLarge,
       ),
+      // An off switch takes its thumb and rim from `outline` (the border
+      // token), which in dark mode is the card colour — the switch vanished.
+      switchTheme: SwitchThemeData(
+        thumbColor: _switchColor(c.primaryForeground, c.mutedForeground),
+        trackColor: _switchColor(c.primary, c.muted),
+        trackOutlineColor: _switchColor(Colors.transparent, c.mutedForeground),
+      ),
       cardTheme: CardThemeData(
         color: c.card,
         elevation: 0,
@@ -106,4 +113,10 @@ abstract final class AppTheme {
       highlightColor: Colors.transparent,
     );
   }
+
+  static WidgetStateProperty<Color> _switchColor(Color on, Color off) =>
+      WidgetStateProperty.resolveWith((s) {
+        final color = s.contains(WidgetState.selected) ? on : off;
+        return s.contains(WidgetState.disabled) ? color.withValues(alpha: 0.38) : color;
+      });
 }

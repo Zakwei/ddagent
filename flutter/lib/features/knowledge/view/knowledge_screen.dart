@@ -13,6 +13,7 @@ import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Knowledge base screen — dashboard plus one tab per entity kind, with a
 /// project scope filter and a button to (re)scan the project's AI-context files.
@@ -625,7 +626,7 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
             if (state.projectFilter != null)
               IconButton(
                 tooltip: t.knowledge.actions.scan,
-                icon: const Icon(Icons.refresh),
+                icon: const Icon(LucideIcons.refreshCw, size: 18),
                 onPressed: state.busy
                     ? null
                     : () async {
@@ -639,16 +640,16 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
             const SizedBox(width: 8),
             IconButton(
               tooltip: t.knowledge.search.title,
-              icon: const Icon(Icons.search),
+              icon: const Icon(LucideIcons.search, size: 18),
               onPressed: _openSearch,
             ),
             IconButton(
               tooltip: t.knowledge.links.title,
-              icon: const Icon(Icons.link),
+              icon: const Icon(LucideIcons.link, size: 18),
               onPressed: _openLink,
             ),
             PopupMenuButton<String>(
-              icon: const Icon(Icons.more_vert),
+              icon: const Icon(LucideIcons.ellipsisVertical, size: 18),
               onSelected: (value) {
                 if (value == 'export') _exportKnowledge();
                 if (value == 'import') _importKnowledge();
@@ -786,13 +787,15 @@ class _ContextBudgetCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.memory, size: 16),
+                const Icon(LucideIcons.cpu, size: 16),
                 const SizedBox(width: 8),
-                Text(
-                  t.knowledge.contextBudget.title,
-                  style: Theme.of(context).textTheme.titleSmall,
+                Expanded(
+                  child: Text(
+                    t.knowledge.contextBudget.title,
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
                 ),
-                const Spacer(),
+                const SizedBox(width: 8),
                 Text(t.knowledge.contextBudget.tokens(tokens: tokens, budget: budget)),
               ],
             ),
@@ -825,36 +828,46 @@ class _ImportAllCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = Theme.of(context);
     final i18n = Translations.of(context);
+    final button = FilledButton(
+      onPressed: busy ? null : onPressed,
+      child: busy
+          ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+          : Text(i18n.knowledge.importAll.action),
+    );
+    final text = Row(
+      children: [
+        const Icon(LucideIcons.download, size: 20),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(i18n.knowledge.importAll.title, style: t.textTheme.titleSmall),
+              const SizedBox(height: 2),
+              Text(i18n.knowledge.importAll.description, style: t.textTheme.bodySmall),
+            ],
+          ),
+        ),
+      ],
+    );
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            const Icon(Icons.download),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(i18n.knowledge.importAll.title, style: t.textTheme.titleSmall),
-                  const SizedBox(height: 2),
-                  Text(i18n.knowledge.importAll.description, style: t.textTheme.bodySmall),
-                ],
-              ),
-            ),
-            const SizedBox(width: 16),
-            FilledButton(
-              onPressed: busy ? null : onPressed,
-              child: busy
-                  ? const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(i18n.knowledge.importAll.action),
-            ),
-          ],
+        // On a phone the button beside the text squeezed it to a word a line.
+        child: LayoutBuilder(
+          builder: (context, box) => box.maxWidth < 480
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [text, const SizedBox(height: 12), button],
+                )
+              : Row(
+                  children: [
+                    Expanded(child: text),
+                    const SizedBox(width: 16),
+                    button,
+                  ],
+                ),
         ),
       ),
     );
@@ -885,16 +898,31 @@ class _DashboardTab extends StatelessWidget {
       children: [
         _ImportAllCard(onPressed: onImportAll, busy: importing),
         const SizedBox(height: 24),
-        Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: [
-            _StatCard(label: t.knowledge.dashboard.memories, value: state.stats.memories),
-            _StatCard(label: t.knowledge.dashboard.rules, value: state.stats.rules),
-            _StatCard(label: t.knowledge.dashboard.skills, value: state.stats.skills),
-            _StatCard(label: t.knowledge.dashboard.personal, value: state.stats.personal),
-            _StatCard(label: t.knowledge.dashboard.connections, value: state.stats.connections),
-          ],
+        // Equal-width tiles, as many per row as fit — sized by their label
+        // they formed a ragged grid.
+        LayoutBuilder(
+          builder: (context, box) {
+            const gap = 12.0;
+            final perRow = ((box.maxWidth + gap) ~/ (96 + gap)).clamp(1, 5);
+            final width = (box.maxWidth - gap * (perRow - 1)) / perRow;
+            return Wrap(
+              spacing: gap,
+              runSpacing: gap,
+              children: [
+                for (final (label, value) in [
+                  (t.knowledge.dashboard.memories, state.stats.memories),
+                  (t.knowledge.dashboard.rules, state.stats.rules),
+                  (t.knowledge.dashboard.skills, state.stats.skills),
+                  (t.knowledge.dashboard.personal, state.stats.personal),
+                  (t.knowledge.dashboard.connections, state.stats.connections),
+                ])
+                  SizedBox(
+                    width: width,
+                    child: _StatCard(label: label, value: value),
+                  ),
+              ],
+            );
+          },
         ),
         const SizedBox(height: 24),
         _ContextBudgetCard(
@@ -929,13 +957,18 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Card(
     child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text('$value', style: Theme.of(context).textTheme.headlineSmall),
           const SizedBox(height: 4),
-          Text(label, style: Theme.of(context).textTheme.labelMedium),
+          Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.labelMedium,
+          ),
         ],
       ),
     ),
