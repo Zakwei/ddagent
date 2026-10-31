@@ -9,6 +9,7 @@ import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Centered card shell shared by login/setup (AuthScreenLayout parity).
 class _AuthShell extends StatelessWidget {
@@ -247,13 +248,17 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
 /// Sign-out with a confirm dialog — clears the JWT; the guard then routes
 /// to /connect. Mounted in the settings page until T34 builds the real tab.
 class LogoutButton extends ConsumerWidget {
-  const LogoutButton({super.key});
+  const LogoutButton({super.key, this.iconOnly = false});
+
+  /// Icon with a tooltip — a phone header has no room for the label.
+  final bool iconOnly;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = Translations.of(context);
-    return AppButton(
-      variant: AppButtonVariant.ghost,
+    final button = AppButton(
+      variant: AppButtonVariant.outline,
+      size: AppButtonSize.sm,
       onPressed: () async {
         final confirmed = await AppDialog.confirm(
           context,
@@ -263,7 +268,17 @@ class LogoutButton extends ConsumerWidget {
         );
         if (confirmed) await ref.read(authControllerProvider.notifier).logout();
       },
-      child: Text(t.auth.logout.button),
+      child: iconOnly
+          ? const Icon(LucideIcons.logOut, size: 16)
+          : Row(
+              mainAxisSize: MainAxisSize.min,
+              spacing: AppSpacing.xs,
+              children: [
+                const Icon(LucideIcons.logOut, size: 14),
+                Flexible(child: Text(t.auth.logout.button, overflow: TextOverflow.ellipsis)),
+              ],
+            ),
     );
+    return iconOnly ? Tooltip(message: t.auth.logout.button, child: button) : button;
   }
 }

@@ -1985,7 +1985,10 @@
       "panelActive": "Panel · aktywne: {{count}}"
     },
     "errors": {
-      "forbidden": "Brak dostępu"
+      "forbidden": "Brak dostępu",
+      "notFoundTitle": "Nie znaleziono strony",
+      "notFoundBody": "Pod adresem {{path}} nic nie ma.",
+      "goToProjects": "Przejdź do projektów"
     }
   },
   "settings": {

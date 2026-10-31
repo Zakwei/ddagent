@@ -49,6 +49,9 @@ class BootSplashApp extends StatelessWidget {
   Widget build(BuildContext context) => MaterialApp(
     theme: AppTheme.light(),
     darkTheme: AppTheme.dark(),
-    home: const Scaffold(body: BootScreen()),
+    // `builder` without `home`: no Navigator. On web a root Navigator reports
+    // `/` to the browser and the opened path (/terminal…) was lost before the
+    // real router started.
+    builder: (_, _) => const Material(child: BootScreen()),
   );
 }

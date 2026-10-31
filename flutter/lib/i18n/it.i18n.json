@@ -1955,7 +1955,10 @@
       "panelActive": "Pannello · {{count}} attive"
     },
     "errors": {
-      "forbidden": "Accesso negato"
+      "forbidden": "Accesso negato",
+      "notFoundTitle": "Pagina non trovata",
+      "notFoundBody": "Non c'è nulla in {{path}}.",
+      "goToProjects": "Vai ai progetti"
     }
   },
   "settings": {

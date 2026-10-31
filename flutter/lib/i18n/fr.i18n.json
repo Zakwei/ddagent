@@ -1955,7 +1955,10 @@
       "panelActive": "Panneau · {{count}} actives"
     },
     "errors": {
-      "forbidden": "Accès refusé"
+      "forbidden": "Accès refusé",
+      "notFoundTitle": "Page introuvable",
+      "notFoundBody": "Rien ne se trouve à {{path}}.",
+      "goToProjects": "Aller aux projets"
     }
   },
   "settings": {

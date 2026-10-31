@@ -2622,6 +2622,9 @@ class Translations$common$errors$ja extends Translations$common$errors$en {
 
 	// Translations
 	@override String get forbidden => 'アクセスが拒否されました';
+	@override String get notFoundTitle => 'ページが見つかりません';
+	@override String notFoundBody({required Object path}) => '${path} には何もありません。';
+	@override String get goToProjects => 'プロジェクトへ';
 }
 
 // Path: settings.changelog
@@ -10158,6 +10161,9 @@ extension on TranslationsJa {
 			'common.update.webHostFailed' => ({required Object message}) => 'サーバーは更新されましたが、Web インターフェイスは更新されませんでした：${message}',
 			'common.appShell.panelActive' => ({required Object count}) => 'パネル · ${count} 件実行中',
 			'common.errors.forbidden' => 'アクセスが拒否されました',
+			'common.errors.notFoundTitle' => 'ページが見つかりません',
+			'common.errors.notFoundBody' => ({required Object path}) => '${path} には何もありません。',
+			'common.errors.goToProjects' => 'プロジェクトへ',
 			'settings.title' => '設定',
 			'settings.changelog.title' => '変更履歴',
 			'settings.changelog.loading' => '読み込み中…',
@@ -10207,11 +10213,11 @@ extension on TranslationsJa {
 			'settings.account.username' => 'ユーザー名',
 			'settings.account.email' => 'メールアドレス',
 			'settings.account.profile' => 'プロフィール',
+			_ => null,
+		} ?? switch (path) {
 			'settings.account.changePassword' => 'パスワードを変更',
 			'settings.mcp.title' => 'MCPサーバー',
 			'settings.mcp.addServer' => 'サーバーを追加',
-			_ => null,
-		} ?? switch (path) {
 			'settings.mcp.editServer' => 'サーバーを編集',
 			'settings.mcp.deleteServer' => 'サーバーを削除',
 			'settings.mcp.serverName' => 'サーバー名',
@@ -10721,11 +10727,11 @@ extension on TranslationsJa {
 			'settings.browser.installed' => 'インストール済み',
 			'settings.browser.installing' => 'インストール中...',
 			'settings.browser.missing' => '未インストール',
+			_ => null,
+		} ?? switch (path) {
 			'settings.browser.runtimeRequired' => 'ブラウザランタイムが必要です',
 			'settings.browser.statusDisabled' => '無効',
 			'settings.browser.statusLabel' => 'ステータス',
-			_ => null,
-		} ?? switch (path) {
 			'settings.browser.statusReady' => '準備完了',
 			'settings.browser.statusSetupRequired' => 'セットアップが必要',
 			'settings.browser.title' => 'Browser',
@@ -11235,11 +11241,11 @@ extension on TranslationsJa {
 			'tasks.createTask.submitting' => '追加中...',
 			'tasks.createTask.title' => 'タスクを追加',
 			'tasks.createTask.titleLabel' => 'タイトル',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.createTask.titlePlaceholder' => '何をすべきですか？',
 			'tasks.list.completedReopen' => '完了（クリックで再開）',
 			'tasks.list.inProgressComplete' => '進行中（クリックで完了）',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.list.markCompleted' => '完了としてマーク',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => 'タスク ${id} のステータスを切り替え',
 			'tasks.list.markDone' => '完了にする',
@@ -11749,11 +11755,11 @@ extension on TranslationsJa {
 			'skills.screen.clearSearch' => 'スキル検索をクリア',
 			'skills.screen.addSkill' => 'スキルを追加',
 			'skills.screen.scanningProjectSkills' => 'プロジェクトのスキルをスキャン中...',
+			_ => null,
+		} ?? switch (path) {
 			'skills.screen.savedSuccessfully' => 'スキルを保存しました。',
 			'skills.screen.loadingSkills' => ({required Object provider}) => '${provider} のスキルを読み込み中…',
 			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ja'))(count, one: '${count} スキル', other: '${count} スキル', ), 
-			_ => null,
-		} ?? switch (path) {
 			'skills.screen.deleteTitle' => ({required Object name}) => '${name} を削除しますか？',
 			'skills.screen.deleteDescription' => ({required Object provider, required Object directory}) => '${provider} の管理対象スキルディレクトリから ${directory} ディレクトリを削除します。元に戻せません。',
 			'skills.screen.noDescription' => 'スキルのフロントマターに説明がありません。',

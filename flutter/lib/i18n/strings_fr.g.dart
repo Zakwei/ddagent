@@ -2632,6 +2632,9 @@ class Translations$common$errors$fr extends Translations$common$errors$en {
 
 	// Translations
 	@override String get forbidden => 'Accès refusé';
+	@override String get notFoundTitle => 'Page introuvable';
+	@override String notFoundBody({required Object path}) => 'Rien ne se trouve à ${path}.';
+	@override String get goToProjects => 'Aller aux projets';
 }
 
 // Path: settings.changelog
@@ -10169,6 +10172,9 @@ extension on TranslationsFr {
 			'common.update.webHostFailed' => ({required Object message}) => 'Le serveur a été mis à jour, mais pas son interface web : ${message}',
 			'common.appShell.panelActive' => ({required Object count}) => 'Panneau · ${count} actives',
 			'common.errors.forbidden' => 'Accès refusé',
+			'common.errors.notFoundTitle' => 'Page introuvable',
+			'common.errors.notFoundBody' => ({required Object path}) => 'Rien ne se trouve à ${path}.',
+			'common.errors.goToProjects' => 'Aller aux projets',
 			'settings.title' => 'Paramètres',
 			'settings.changelog.title' => 'Journal des modifications',
 			'settings.changelog.loading' => 'Chargement…',
@@ -10218,11 +10224,11 @@ extension on TranslationsFr {
 			'settings.account.username' => 'Nom d\'utilisateur',
 			'settings.account.email' => 'E-mail',
 			'settings.account.profile' => 'Profil',
+			_ => null,
+		} ?? switch (path) {
 			'settings.account.changePassword' => 'Changer le mot de passe',
 			'settings.mcp.title' => 'Serveurs MCP',
 			'settings.mcp.addServer' => 'Ajouter un serveur',
-			_ => null,
-		} ?? switch (path) {
 			'settings.mcp.editServer' => 'Modifier le serveur',
 			'settings.mcp.deleteServer' => 'Supprimer le serveur',
 			'settings.mcp.serverName' => 'Nom du serveur',
@@ -10732,11 +10738,11 @@ extension on TranslationsFr {
 			'settings.browser.installed' => 'installé',
 			'settings.browser.installing' => 'Installation...',
 			'settings.browser.missing' => 'manquant',
+			_ => null,
+		} ?? switch (path) {
 			'settings.browser.runtimeRequired' => 'Runtime du navigateur requis',
 			'settings.browser.statusDisabled' => 'désactivé',
 			'settings.browser.statusLabel' => 'Statut',
-			_ => null,
-		} ?? switch (path) {
 			'settings.browser.statusReady' => 'prêt',
 			'settings.browser.statusSetupRequired' => 'configuration requise',
 			'settings.browser.title' => 'Browser',
@@ -11246,11 +11252,11 @@ extension on TranslationsFr {
 			'tasks.createTask.submitting' => 'Ajout...',
 			'tasks.createTask.title' => 'Ajouter une tâche',
 			'tasks.createTask.titleLabel' => 'Titre',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.createTask.titlePlaceholder' => 'Que faut-il faire ?',
 			'tasks.list.completedReopen' => 'Terminée (cliquer pour rouvrir)',
 			'tasks.list.inProgressComplete' => 'En cours (cliquer pour terminer)',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.list.markCompleted' => 'Marquer comme terminée',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => 'Basculer le statut de la tâche ${id}',
 			'tasks.list.markDone' => 'Marquer comme terminé',
@@ -11760,11 +11766,11 @@ extension on TranslationsFr {
 			'skills.screen.clearSearch' => 'Effacer la recherche de compétences',
 			'skills.screen.addSkill' => 'Ajouter une compétence',
 			'skills.screen.scanningProjectSkills' => 'Analyse des compétences du projet...',
+			_ => null,
+		} ?? switch (path) {
 			'skills.screen.savedSuccessfully' => 'Compétences enregistrées avec succès.',
 			'skills.screen.loadingSkills' => ({required Object provider}) => 'Chargement des compétences de ${provider}…',
 			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('fr'))(count, one: '${count} COMPÉTENCE', other: '${count} COMPÉTENCES', ), 
-			_ => null,
-		} ?? switch (path) {
 			'skills.screen.deleteTitle' => ({required Object name}) => 'Supprimer ${name} ?',
 			'skills.screen.deleteDescription' => ({required Object directory, required Object provider}) => 'Cela supprime le répertoire ${directory} du répertoire de compétences géré par ${provider}. Cette action est irréversible.',
 			'skills.screen.noDescription' => 'Aucune description fournie dans le front matter de la compétence.',

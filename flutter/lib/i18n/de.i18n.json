@@ -1955,7 +1955,10 @@
       "panelActive": "Panel · {{count}} aktiv"
     },
     "errors": {
-      "forbidden": "Zugriff verweigert"
+      "forbidden": "Zugriff verweigert",
+      "notFoundTitle": "Seite nicht gefunden",
+      "notFoundBody": "Unter {{path}} gibt es nichts.",
+      "goToProjects": "Zu den Projekten"
     }
   },
   "settings": {

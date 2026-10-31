@@ -2622,6 +2622,9 @@ class Translations$common$errors$ko extends Translations$common$errors$en {
 
 	// Translations
 	@override String get forbidden => '액세스가 거부되었습니다';
+	@override String get notFoundTitle => '페이지를 찾을 수 없습니다';
+	@override String notFoundBody({required Object path}) => '${path}에는 아무것도 없습니다.';
+	@override String get goToProjects => '프로젝트로 이동';
 }
 
 // Path: settings.changelog
@@ -10158,6 +10161,9 @@ extension on TranslationsKo {
 			'common.update.webHostFailed' => ({required Object message}) => '서버는 업데이트되었지만 웹 인터페이스는 업데이트되지 않았습니다: ${message}',
 			'common.appShell.panelActive' => ({required Object count}) => '패널 · ${count}개 실행 중',
 			'common.errors.forbidden' => '액세스가 거부되었습니다',
+			'common.errors.notFoundTitle' => '페이지를 찾을 수 없습니다',
+			'common.errors.notFoundBody' => ({required Object path}) => '${path}에는 아무것도 없습니다.',
+			'common.errors.goToProjects' => '프로젝트로 이동',
 			'settings.title' => '설정',
 			'settings.changelog.title' => '변경 로그',
 			'settings.changelog.loading' => '로딩 중…',
@@ -10207,11 +10213,11 @@ extension on TranslationsKo {
 			'settings.account.username' => '사용자명',
 			'settings.account.email' => '이메일',
 			'settings.account.profile' => '프로필',
+			_ => null,
+		} ?? switch (path) {
 			'settings.account.changePassword' => '비밀번호 변경',
 			'settings.mcp.title' => 'MCP 서버',
 			'settings.mcp.addServer' => '서버 추가',
-			_ => null,
-		} ?? switch (path) {
 			'settings.mcp.editServer' => '서버 편집',
 			'settings.mcp.deleteServer' => '서버 삭제',
 			'settings.mcp.serverName' => '서버 이름',
@@ -10721,11 +10727,11 @@ extension on TranslationsKo {
 			'settings.browser.installed' => '설치됨',
 			'settings.browser.installing' => '설치 중...',
 			'settings.browser.missing' => '없음',
+			_ => null,
+		} ?? switch (path) {
 			'settings.browser.runtimeRequired' => '브라우저 런타임 필요',
 			'settings.browser.statusDisabled' => '비활성화됨',
 			'settings.browser.statusLabel' => '상태',
-			_ => null,
-		} ?? switch (path) {
 			'settings.browser.statusReady' => '준비됨',
 			'settings.browser.statusSetupRequired' => '설정 필요',
 			'settings.browser.title' => 'Browser',
@@ -11235,11 +11241,11 @@ extension on TranslationsKo {
 			'tasks.createTask.submitting' => '추가 중...',
 			'tasks.createTask.title' => '작업 추가',
 			'tasks.createTask.titleLabel' => '제목',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.createTask.titlePlaceholder' => '무엇을 해야 하나요?',
 			'tasks.list.completedReopen' => '완료됨 (클릭하여 다시 열기)',
 			'tasks.list.inProgressComplete' => '진행 중 (클릭하여 완료)',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.list.markCompleted' => '완료로 표시',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => '작업 ${id} 상태 전환',
 			'tasks.list.markDone' => '완료로 표시',
@@ -11749,11 +11755,11 @@ extension on TranslationsKo {
 			'skills.screen.clearSearch' => '스킬 검색 지우기',
 			'skills.screen.addSkill' => '스킬 추가',
 			'skills.screen.scanningProjectSkills' => '프로젝트 스킬 검사 중...',
+			_ => null,
+		} ?? switch (path) {
 			'skills.screen.savedSuccessfully' => '스킬이 저장되었습니다.',
 			'skills.screen.loadingSkills' => ({required Object provider}) => '${provider} 스킬 로드 중…',
 			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, one: 'SKILL ${count}개', other: 'SKILL ${count}개', ), 
-			_ => null,
-		} ?? switch (path) {
 			'skills.screen.deleteTitle' => ({required Object name}) => '${name}을(를) 삭제할까요?',
 			'skills.screen.deleteDescription' => ({required Object provider, required Object directory}) => '${provider}의 관리형 스킬 디렉터리에서 ${directory} 디렉터리를 제거합니다. 되돌릴 수 없습니다.',
 			'skills.screen.noDescription' => '스킬 프런트 매터에 설명이 없습니다.',

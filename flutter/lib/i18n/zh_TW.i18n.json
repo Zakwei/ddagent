@@ -1945,7 +1945,10 @@
       "panelActive": "面板 · {{count}} 個執行中"
     },
     "errors": {
-      "forbidden": "存取遭拒"
+      "forbidden": "存取遭拒",
+      "notFoundTitle": "找不到頁面",
+      "notFoundBody": "{{path}} 沒有任何內容。",
+      "goToProjects": "前往專案"
     }
   },
   "settings": {

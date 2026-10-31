@@ -696,6 +696,8 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
           ],
           bottom: TabBar(
             isScrollable: true,
+            // M3 indents a scrollable bar by 52 px; the tabs start at the edge.
+            tabAlignment: TabAlignment.start,
             tabs: [
               Tab(text: t.knowledge.tabs.dashboard),
               Tab(text: t.knowledge.tabs.memories),

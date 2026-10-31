@@ -2622,6 +2622,9 @@ class Translations$common$errors$zh_TW extends Translations$common$errors$en {
 
 	// Translations
 	@override String get forbidden => '存取遭拒';
+	@override String get notFoundTitle => '找不到頁面';
+	@override String notFoundBody({required Object path}) => '${path} 沒有任何內容。';
+	@override String get goToProjects => '前往專案';
 }
 
 // Path: settings.changelog
@@ -10158,6 +10161,9 @@ extension on TranslationsZhTw {
 			'common.update.webHostFailed' => ({required Object message}) => '伺服器已更新，但其 Web 介面沒有更新：${message}',
 			'common.appShell.panelActive' => ({required Object count}) => '面板 · ${count} 個執行中',
 			'common.errors.forbidden' => '存取遭拒',
+			'common.errors.notFoundTitle' => '找不到頁面',
+			'common.errors.notFoundBody' => ({required Object path}) => '${path} 沒有任何內容。',
+			'common.errors.goToProjects' => '前往專案',
 			'settings.title' => '設定',
 			'settings.changelog.title' => '更新日誌',
 			'settings.changelog.loading' => '載入中…',
@@ -10207,11 +10213,11 @@ extension on TranslationsZhTw {
 			'settings.account.username' => '使用者名稱',
 			'settings.account.email' => '電子郵件',
 			'settings.account.profile' => '個人檔案',
+			_ => null,
+		} ?? switch (path) {
 			'settings.account.changePassword' => '變更密碼',
 			'settings.mcp.title' => 'MCP 伺服器',
 			'settings.mcp.addServer' => '新增伺服器',
-			_ => null,
-		} ?? switch (path) {
 			'settings.mcp.editServer' => '編輯伺服器',
 			'settings.mcp.deleteServer' => '刪除伺服器',
 			'settings.mcp.serverName' => '伺服器名稱',
@@ -10721,11 +10727,11 @@ extension on TranslationsZhTw {
 			'settings.browser.installed' => '已安裝',
 			'settings.browser.installing' => '正在安裝...',
 			'settings.browser.missing' => '缺失',
+			_ => null,
+		} ?? switch (path) {
 			'settings.browser.runtimeRequired' => '需要瀏覽器執行環境',
 			'settings.browser.statusDisabled' => '已停用',
 			'settings.browser.statusLabel' => '狀態',
-			_ => null,
-		} ?? switch (path) {
 			'settings.browser.statusReady' => '就緒',
 			'settings.browser.statusSetupRequired' => '需要設定',
 			'settings.browser.title' => '瀏覽器',
@@ -11235,11 +11241,11 @@ extension on TranslationsZhTw {
 			'tasks.createTask.submitting' => '正在新增...',
 			'tasks.createTask.title' => '新增任務',
 			'tasks.createTask.titleLabel' => '標題',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.createTask.titlePlaceholder' => '需要做什麼？',
 			'tasks.list.completedReopen' => '已完成（點擊重新開啟）',
 			'tasks.list.inProgressComplete' => '進行中（點擊完成）',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.list.markCompleted' => '標記為已完成',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => '切換任務 ${id} 的狀態',
 			'tasks.list.markDone' => '標記為完成',
@@ -11749,11 +11755,11 @@ extension on TranslationsZhTw {
 			'skills.screen.clearSearch' => '清除技能搜尋',
 			'skills.screen.addSkill' => '新增技能',
 			'skills.screen.scanningProjectSkills' => '正在掃描專案技能...',
+			_ => null,
+		} ?? switch (path) {
 			'skills.screen.savedSuccessfully' => '技能已成功儲存。',
 			'skills.screen.loadingSkills' => ({required Object provider}) => '正在載入 ${provider} 技能…',
 			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '${count} 個技能', other: '${count} 個技能', ), 
-			_ => null,
-		} ?? switch (path) {
 			'skills.screen.deleteTitle' => ({required Object name}) => '刪除 ${name}？',
 			'skills.screen.deleteDescription' => ({required Object provider, required Object directory}) => '這會從 ${provider} 的受管理技能目錄中移除 ${directory} 目錄。此操作無法復原。',
 			'skills.screen.noDescription' => '技能前置資料中未提供說明。',

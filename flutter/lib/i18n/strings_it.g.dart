@@ -2632,6 +2632,9 @@ class Translations$common$errors$it extends Translations$common$errors$en {
 
 	// Translations
 	@override String get forbidden => 'Accesso negato';
+	@override String get notFoundTitle => 'Pagina non trovata';
+	@override String notFoundBody({required Object path}) => 'Non c\'è nulla in ${path}.';
+	@override String get goToProjects => 'Vai ai progetti';
 }
 
 // Path: settings.changelog
@@ -10169,6 +10172,9 @@ extension on TranslationsIt {
 			'common.update.webHostFailed' => ({required Object message}) => 'Il server è stato aggiornato, ma la sua interfaccia web no: ${message}',
 			'common.appShell.panelActive' => ({required Object count}) => 'Pannello · ${count} attive',
 			'common.errors.forbidden' => 'Accesso negato',
+			'common.errors.notFoundTitle' => 'Pagina non trovata',
+			'common.errors.notFoundBody' => ({required Object path}) => 'Non c\'è nulla in ${path}.',
+			'common.errors.goToProjects' => 'Vai ai progetti',
 			'settings.title' => 'Impostazioni',
 			'settings.changelog.title' => 'Registro delle modifiche',
 			'settings.changelog.loading' => 'Caricamento…',
@@ -10218,11 +10224,11 @@ extension on TranslationsIt {
 			'settings.account.username' => 'Nome utente',
 			'settings.account.email' => 'Email',
 			'settings.account.profile' => 'Profilo',
+			_ => null,
+		} ?? switch (path) {
 			'settings.account.changePassword' => 'Cambia password',
 			'settings.mcp.title' => 'Server MCP',
 			'settings.mcp.addServer' => 'Aggiungi server',
-			_ => null,
-		} ?? switch (path) {
 			'settings.mcp.editServer' => 'Modifica server',
 			'settings.mcp.deleteServer' => 'Elimina server',
 			'settings.mcp.serverName' => 'Nome server',
@@ -10732,11 +10738,11 @@ extension on TranslationsIt {
 			'settings.browser.installed' => 'installato',
 			'settings.browser.installing' => 'Installazione...',
 			'settings.browser.missing' => 'mancante',
+			_ => null,
+		} ?? switch (path) {
 			'settings.browser.runtimeRequired' => 'Runtime del browser richiesto',
 			'settings.browser.statusDisabled' => 'disabilitato',
 			'settings.browser.statusLabel' => 'Stato',
-			_ => null,
-		} ?? switch (path) {
 			'settings.browser.statusReady' => 'pronto',
 			'settings.browser.statusSetupRequired' => 'configurazione richiesta',
 			'settings.browser.title' => 'Browser',
@@ -11246,11 +11252,11 @@ extension on TranslationsIt {
 			'tasks.createTask.submitting' => 'Aggiunta...',
 			'tasks.createTask.title' => 'Aggiungi attività',
 			'tasks.createTask.titleLabel' => 'Titolo',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.createTask.titlePlaceholder' => 'Cosa va fatto?',
 			'tasks.list.completedReopen' => 'Completata (clicca per riaprire)',
 			'tasks.list.inProgressComplete' => 'In corso (clicca per completare)',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.list.markCompleted' => 'Segna come completata',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => 'Cambia stato dell’attività ${id}',
 			'tasks.list.markDone' => 'Segna come completata',
@@ -11760,11 +11766,11 @@ extension on TranslationsIt {
 			'skills.screen.clearSearch' => 'Cancella ricerca skill',
 			'skills.screen.addSkill' => 'Aggiungi Skill',
 			'skills.screen.scanningProjectSkills' => 'Scansione delle skill del progetto…',
+			_ => null,
+		} ?? switch (path) {
 			'skills.screen.savedSuccessfully' => 'Skill salvate correttamente.',
 			'skills.screen.loadingSkills' => ({required Object provider}) => 'Caricamento delle skill di ${provider}…',
 			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('it'))(count, one: '${count} SKILL', other: '${count} SKILL', ), 
-			_ => null,
-		} ?? switch (path) {
 			'skills.screen.deleteTitle' => ({required Object name}) => 'Eliminare ${name}?',
 			'skills.screen.deleteDescription' => ({required Object directory, required Object provider}) => 'Rimuove la cartella ${directory} dalla cartella delle skill gestite di ${provider}. L\'azione è irreversibile.',
 			'skills.screen.noDescription' => 'Nessuna descrizione fornita nel front matter della skill.',

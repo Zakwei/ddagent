@@ -1985,7 +1985,10 @@
       "panelActive": "Панель · активных: {{count}}"
     },
     "errors": {
-      "forbidden": "Доступ запрещён"
+      "forbidden": "Доступ запрещён",
+      "notFoundTitle": "Страница не найдена",
+      "notFoundBody": "По адресу {{path}} ничего нет.",
+      "goToProjects": "К проектам"
     }
   },
   "settings": {

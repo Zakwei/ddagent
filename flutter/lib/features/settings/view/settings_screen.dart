@@ -170,7 +170,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             SubpageHeader(
               icon: LucideIcons.settings,
               title: t.settings.mainTabs.label,
-              trailing: const [LogoutButton()],
+              trailing: [LogoutButton(iconOnly: compact)],
             ),
             // Section nav — pill bar on compact, side rail otherwise.
             if (compact)

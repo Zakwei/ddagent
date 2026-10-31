@@ -2654,6 +2654,9 @@ class Translations$common$errors$pl extends Translations$common$errors$en {
 
 	// Translations
 	@override String get forbidden => 'Brak dostępu';
+	@override String get notFoundTitle => 'Nie znaleziono strony';
+	@override String notFoundBody({required Object path}) => 'Pod adresem ${path} nic nie ma.';
+	@override String get goToProjects => 'Przejdź do projektów';
 }
 
 // Path: settings.changelog
@@ -10209,6 +10212,9 @@ extension on TranslationsPl {
 			'common.update.webHostFailed' => ({required Object message}) => 'Serwer został zaktualizowany, ale jego interfejs web nie: ${message}',
 			'common.appShell.panelActive' => ({required Object count}) => 'Panel · aktywne: ${count}',
 			'common.errors.forbidden' => 'Brak dostępu',
+			'common.errors.notFoundTitle' => 'Nie znaleziono strony',
+			'common.errors.notFoundBody' => ({required Object path}) => 'Pod adresem ${path} nic nie ma.',
+			'common.errors.goToProjects' => 'Przejdź do projektów',
 			'settings.title' => 'Ustawienia',
 			'settings.changelog.title' => 'Dziennik zmian',
 			'settings.changelog.loading' => 'Ładowanie…',
@@ -10258,11 +10264,11 @@ extension on TranslationsPl {
 			'settings.account.username' => 'Nazwa użytkownika',
 			'settings.account.email' => 'E-mail',
 			'settings.account.profile' => 'Profil',
+			_ => null,
+		} ?? switch (path) {
 			'settings.account.changePassword' => 'Zmień hasło',
 			'settings.mcp.title' => 'Serwery MCP',
 			'settings.mcp.addServer' => 'Dodaj serwer',
-			_ => null,
-		} ?? switch (path) {
 			'settings.mcp.editServer' => 'Edytuj serwer',
 			'settings.mcp.deleteServer' => 'Usuń serwer',
 			'settings.mcp.serverName' => 'Nazwa serwera',
@@ -10772,11 +10778,11 @@ extension on TranslationsPl {
 			'settings.browser.installed' => 'zainstalowane',
 			'settings.browser.installing' => 'Instalowanie...',
 			'settings.browser.missing' => 'brak',
+			_ => null,
+		} ?? switch (path) {
 			'settings.browser.runtimeRequired' => 'Wymagane środowisko przeglądarki',
 			'settings.browser.statusDisabled' => 'wyłączony',
 			'settings.browser.statusLabel' => 'Status',
-			_ => null,
-		} ?? switch (path) {
 			'settings.browser.statusReady' => 'gotowy',
 			'settings.browser.statusSetupRequired' => 'wymagana konfiguracja',
 			'settings.browser.title' => 'Browser',
@@ -11286,11 +11292,11 @@ extension on TranslationsPl {
 			'tasks.createTask.submitting' => 'Dodawanie...',
 			'tasks.createTask.title' => 'Dodaj zadanie',
 			'tasks.createTask.titleLabel' => 'Tytuł',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.createTask.titlePlaceholder' => 'Co trzeba zrobić?',
 			'tasks.list.completedReopen' => 'Ukończone (kliknij, aby ponownie otworzyć)',
 			'tasks.list.inProgressComplete' => 'W trakcie (kliknij, aby ukończyć)',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.list.markCompleted' => 'Oznacz jako ukończone',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => 'Przełącz status zadania ${id}',
 			'tasks.list.markDone' => 'Oznacz jako ukończone',
@@ -11800,11 +11806,11 @@ extension on TranslationsPl {
 			'skills.screen.clearSearch' => 'Wyczyść wyszukiwanie skilli',
 			'skills.screen.addSkill' => 'Dodaj skill',
 			'skills.screen.scanningProjectSkills' => 'Skanowanie skilli projektu...',
+			_ => null,
+		} ?? switch (path) {
 			'skills.screen.savedSuccessfully' => 'Skille zapisano pomyślnie.',
 			'skills.screen.loadingSkills' => ({required Object provider}) => 'Wczytywanie skilli ${provider}…',
 			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('pl'))(count, one: '${count} SKILL', other: '${count} SKILLI', ), 
-			_ => null,
-		} ?? switch (path) {
 			'skills.screen.deleteTitle' => ({required Object name}) => 'Usunąć ${name}?',
 			'skills.screen.deleteDescription' => ({required Object directory, required Object provider}) => 'Spowoduje to usunięcie katalogu ${directory} z zarządzanego katalogu skilli ${provider}. Tej operacji nie można cofnąć.',
 			'skills.screen.noDescription' => 'Nie podano opisu w metadanych skilla.',

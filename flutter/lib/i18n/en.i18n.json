@@ -1955,7 +1955,10 @@
       "panelActive": "Panel · {{count}} active"
     },
     "errors": {
-      "forbidden": "Access denied"
+      "forbidden": "Access denied",
+      "notFoundTitle": "Page not found",
+      "notFoundBody": "Nothing lives at {{path}}.",
+      "goToProjects": "Go to projects"
     }
   },
   "settings": {

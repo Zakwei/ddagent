@@ -1945,7 +1945,10 @@
       "panelActive": "面板 · {{count}} 个运行中"
     },
     "errors": {
-      "forbidden": "访问被拒绝"
+      "forbidden": "访问被拒绝",
+      "notFoundTitle": "页面未找到",
+      "notFoundBody": "{{path}} 处没有内容。",
+      "goToProjects": "前往项目"
     }
   },
   "settings": {

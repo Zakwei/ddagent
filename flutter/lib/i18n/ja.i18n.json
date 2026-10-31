@@ -1945,7 +1945,10 @@
       "panelActive": "パネル · {{count}} 件実行中"
     },
     "errors": {
-      "forbidden": "アクセスが拒否されました"
+      "forbidden": "アクセスが拒否されました",
+      "notFoundTitle": "ページが見つかりません",
+      "notFoundBody": "{{path}} には何もありません。",
+      "goToProjects": "プロジェクトへ"
     }
   },
   "settings": {

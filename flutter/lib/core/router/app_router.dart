@@ -3,6 +3,7 @@ import 'package:ddagent_app/core/network/api_providers.dart';
 import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/widgets/adaptive_scaffold.dart';
 import 'package:ddagent_app/core/widgets/app_nav_menu.dart';
+import 'package:ddagent_app/core/widgets/not_found_screen.dart';
 import 'package:ddagent_app/features/auth/state/auth_controller.dart';
 import 'package:ddagent_app/features/auth/view/auth_screens.dart';
 import 'package:ddagent_app/features/browser/view/web_browser_screen.dart';
@@ -171,6 +172,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       }
       return remapped;
     }),
+    errorBuilder: (_, state) => NotFoundScreen(path: state.uri.path),
     routes: [
       GoRoute(path: '/login', name: Routes.login, builder: (_, _) => const LoginScreen()),
       GoRoute(path: '/setup', name: Routes.setup, builder: (_, _) => const SetupScreen()),

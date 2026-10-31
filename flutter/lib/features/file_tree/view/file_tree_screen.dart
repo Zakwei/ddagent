@@ -824,7 +824,6 @@ class _TreeToolbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
-    final t = Theme.of(context).textTheme;
     final i18n = Translations.of(context);
     final canEdit = projectId != null;
     return Container(
@@ -840,12 +839,8 @@ class _TreeToolbar extends StatelessWidget {
       child: Column(
         children: [
           Row(
+            // The page header above already says "Files" — a toolbar, not a second title.
             children: [
-              Text(
-                i18n.common.tabs.files,
-                style: t.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
-              ),
-              const Spacer(),
               _IconBtn(
                 tooltip: i18n.common.fileTree.context.upload,
                 icon: LucideIcons.upload,

@@ -2654,6 +2654,9 @@ class Translations$common$errors$ru extends Translations$common$errors$en {
 
 	// Translations
 	@override String get forbidden => 'Доступ запрещён';
+	@override String get notFoundTitle => 'Страница не найдена';
+	@override String notFoundBody({required Object path}) => 'По адресу ${path} ничего нет.';
+	@override String get goToProjects => 'К проектам';
 }
 
 // Path: settings.changelog
@@ -10207,6 +10210,9 @@ extension on TranslationsRu {
 			'common.update.webHostFailed' => ({required Object message}) => 'Сервер обновлён, а его веб-интерфейс — нет: ${message}',
 			'common.appShell.panelActive' => ({required Object count}) => 'Панель · активных: ${count}',
 			'common.errors.forbidden' => 'Доступ запрещён',
+			'common.errors.notFoundTitle' => 'Страница не найдена',
+			'common.errors.notFoundBody' => ({required Object path}) => 'По адресу ${path} ничего нет.',
+			'common.errors.goToProjects' => 'К проектам',
 			'settings.title' => 'Настройки',
 			'settings.changelog.title' => 'Журнал изменений',
 			'settings.changelog.loading' => 'Загрузка…',
@@ -10256,11 +10262,11 @@ extension on TranslationsRu {
 			'settings.account.username' => 'Имя пользователя',
 			'settings.account.email' => 'Эл. почта',
 			'settings.account.profile' => 'Профиль',
+			_ => null,
+		} ?? switch (path) {
 			'settings.account.changePassword' => 'Изменить пароль',
 			'settings.mcp.title' => 'MCP серверы',
 			'settings.mcp.addServer' => 'Добавить сервер',
-			_ => null,
-		} ?? switch (path) {
 			'settings.mcp.editServer' => 'Редактировать сервер',
 			'settings.mcp.deleteServer' => 'Удалить сервер',
 			'settings.mcp.serverName' => 'Имя сервера',
@@ -10770,11 +10776,11 @@ extension on TranslationsRu {
 			'settings.browser.installed' => 'установлено',
 			'settings.browser.installing' => 'Установка...',
 			'settings.browser.missing' => 'отсутствует',
+			_ => null,
+		} ?? switch (path) {
 			'settings.browser.runtimeRequired' => 'Требуется среда выполнения браузера',
 			'settings.browser.statusDisabled' => 'отключён',
 			'settings.browser.statusLabel' => 'Статус',
-			_ => null,
-		} ?? switch (path) {
 			'settings.browser.statusReady' => 'готов',
 			'settings.browser.statusSetupRequired' => 'требуется настройка',
 			'settings.browser.title' => 'Browser',
@@ -11284,11 +11290,11 @@ extension on TranslationsRu {
 			'tasks.createTask.submitting' => 'Добавление...',
 			'tasks.createTask.title' => 'Добавить задачу',
 			'tasks.createTask.titleLabel' => 'Название',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.createTask.titlePlaceholder' => 'Что нужно сделать?',
 			'tasks.list.completedReopen' => 'Выполнена (нажмите, чтобы переоткрыть)',
 			'tasks.list.inProgressComplete' => 'Выполняется (нажмите, чтобы завершить)',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.list.markCompleted' => 'Отметить как выполненную',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => 'Переключить статус задачи ${id}',
 			'tasks.list.markDone' => 'Отметить как выполненную',
@@ -11798,11 +11804,11 @@ extension on TranslationsRu {
 			'skills.screen.clearSearch' => 'Очистить поиск навыков',
 			'skills.screen.addSkill' => 'Добавить навык',
 			'skills.screen.scanningProjectSkills' => 'Сканирование навыков проекта…',
+			_ => null,
+		} ?? switch (path) {
 			'skills.screen.savedSuccessfully' => 'Навыки успешно сохранены.',
 			'skills.screen.loadingSkills' => ({required Object provider}) => 'Загрузка навыков ${provider}…',
 			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(count, one: '${count} НАВЫК', other: '${count} НАВЫКОВ', ), 
-			_ => null,
-		} ?? switch (path) {
 			'skills.screen.deleteTitle' => ({required Object name}) => 'Удалить ${name}?',
 			'skills.screen.deleteDescription' => ({required Object directory, required Object provider}) => 'Это удалит папку ${directory} из управляемой папки навыков ${provider}. Действие необратимо.',
 			'skills.screen.noDescription' => 'Описание не указано во front matter навыка.',

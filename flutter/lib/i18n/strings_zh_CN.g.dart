@@ -2622,6 +2622,9 @@ class Translations$common$errors$zh_CN extends Translations$common$errors$en {
 
 	// Translations
 	@override String get forbidden => '访问被拒绝';
+	@override String get notFoundTitle => '页面未找到';
+	@override String notFoundBody({required Object path}) => '${path} 处没有内容。';
+	@override String get goToProjects => '前往项目';
 }
 
 // Path: settings.changelog
@@ -10158,6 +10161,9 @@ extension on TranslationsZhCn {
 			'common.update.webHostFailed' => ({required Object message}) => '服务器已更新，但其 Web 界面未更新：${message}',
 			'common.appShell.panelActive' => ({required Object count}) => '面板 · ${count} 个运行中',
 			'common.errors.forbidden' => '访问被拒绝',
+			'common.errors.notFoundTitle' => '页面未找到',
+			'common.errors.notFoundBody' => ({required Object path}) => '${path} 处没有内容。',
+			'common.errors.goToProjects' => '前往项目',
 			'settings.title' => '设置',
 			'settings.changelog.title' => '更新日志',
 			'settings.changelog.loading' => '加载中…',
@@ -10207,11 +10213,11 @@ extension on TranslationsZhCn {
 			'settings.account.username' => '用户名',
 			'settings.account.email' => '邮箱',
 			'settings.account.profile' => '个人资料',
+			_ => null,
+		} ?? switch (path) {
 			'settings.account.changePassword' => '修改密码',
 			'settings.mcp.title' => 'MCP 服务器',
 			'settings.mcp.addServer' => '添加服务器',
-			_ => null,
-		} ?? switch (path) {
 			'settings.mcp.editServer' => '编辑服务器',
 			'settings.mcp.deleteServer' => '删除服务器',
 			'settings.mcp.serverName' => '服务器名称',
@@ -10721,11 +10727,11 @@ extension on TranslationsZhCn {
 			'settings.browser.installed' => '已安装',
 			'settings.browser.installing' => '正在安装...',
 			'settings.browser.missing' => '缺失',
+			_ => null,
+		} ?? switch (path) {
 			'settings.browser.runtimeRequired' => '需要浏览器运行时',
 			'settings.browser.statusDisabled' => '已禁用',
 			'settings.browser.statusLabel' => '状态',
-			_ => null,
-		} ?? switch (path) {
 			'settings.browser.statusReady' => '就绪',
 			'settings.browser.statusSetupRequired' => '需要设置',
 			'settings.browser.title' => 'Browser',
@@ -11235,11 +11241,11 @@ extension on TranslationsZhCn {
 			'tasks.createTask.submitting' => '正在添加...',
 			'tasks.createTask.title' => '添加任务',
 			'tasks.createTask.titleLabel' => '标题',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.createTask.titlePlaceholder' => '需要做什么？',
 			'tasks.list.completedReopen' => '已完成（点击重新打开）',
 			'tasks.list.inProgressComplete' => '进行中（点击完成）',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.list.markCompleted' => '标记为已完成',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => '切换任务 ${id} 的状态',
 			'tasks.list.markDone' => '标记为已完成',
@@ -11749,11 +11755,11 @@ extension on TranslationsZhCn {
 			'skills.screen.clearSearch' => '清除技能搜索',
 			'skills.screen.addSkill' => '添加技能',
 			'skills.screen.scanningProjectSkills' => '正在扫描项目技能...',
+			_ => null,
+		} ?? switch (path) {
 			'skills.screen.savedSuccessfully' => '技能保存成功。',
 			'skills.screen.loadingSkills' => ({required Object provider}) => '正在加载 ${provider} 技能…',
 			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '${count} 个技能', other: '${count} 个技能', ), 
-			_ => null,
-		} ?? switch (path) {
 			'skills.screen.deleteTitle' => ({required Object name}) => '删除 ${name}？',
 			'skills.screen.deleteDescription' => ({required Object directory, required Object provider}) => '这会将 ${directory} 目录从 ${provider} 的托管技能目录中移除。此操作无法撤销。',
 			'skills.screen.noDescription' => '技能的 front matter 中未提供描述。',

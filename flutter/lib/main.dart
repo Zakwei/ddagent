@@ -29,6 +29,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 
 Future<void> main([List<String> args = const []]) async {
+  // web: /chat/42 not /#/chat/42 (T7.4). Before the first runApp — the boot
+  // splash already fixes the strategy (hash), and every reload then dropped
+  // the path and landed on /projects.
+  usePathUrlStrategy();
   WidgetsFlutterBinding.ensureInitialized();
   parseInstanceArgs(args);
   // First frame right away — the window shows a progress bar, not black,
@@ -44,7 +48,6 @@ Future<void> main([List<String> args = const []]) async {
     // runner already brought its window forward) — never run a second copy.
     if (e.path?.endsWith('.lock') ?? false) exit(0);
   } on Object catch (_) {}
-  usePathUrlStrategy(); // web: /chat/42 not /#/chat/42 (T7.4)
   try {
     await initWindow();
   } on Object catch (_) {}

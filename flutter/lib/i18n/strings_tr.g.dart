@@ -2627,6 +2627,9 @@ class Translations$common$errors$tr extends Translations$common$errors$en {
 
 	// Translations
 	@override String get forbidden => 'Erişim reddedildi';
+	@override String get notFoundTitle => 'Sayfa bulunamadı';
+	@override String notFoundBody({required Object path}) => '${path} adresinde bir şey yok.';
+	@override String get goToProjects => 'Projelere git';
 }
 
 // Path: settings.changelog
@@ -10164,6 +10167,9 @@ extension on TranslationsTr {
 			'common.update.webHostFailed' => ({required Object message}) => 'Sunucu güncellendi ama web arayüzü güncellenmedi: ${message}',
 			'common.appShell.panelActive' => ({required Object count}) => 'Panel · ${count} etkin',
 			'common.errors.forbidden' => 'Erişim reddedildi',
+			'common.errors.notFoundTitle' => 'Sayfa bulunamadı',
+			'common.errors.notFoundBody' => ({required Object path}) => '${path} adresinde bir şey yok.',
+			'common.errors.goToProjects' => 'Projelere git',
 			'settings.title' => 'Ayarlar',
 			'settings.changelog.title' => 'Değişiklik günlüğü',
 			'settings.changelog.loading' => 'Yükleniyor…',
@@ -10213,11 +10219,11 @@ extension on TranslationsTr {
 			'settings.account.username' => 'Kullanıcı Adı',
 			'settings.account.email' => 'E-posta',
 			'settings.account.profile' => 'Profil',
+			_ => null,
+		} ?? switch (path) {
 			'settings.account.changePassword' => 'Şifreyi Değiştir',
 			'settings.mcp.title' => 'MCP Sunucuları',
 			'settings.mcp.addServer' => 'Sunucu Ekle',
-			_ => null,
-		} ?? switch (path) {
 			'settings.mcp.editServer' => 'Sunucuyu Düzenle',
 			'settings.mcp.deleteServer' => 'Sunucuyu Sil',
 			'settings.mcp.serverName' => 'Sunucu Adı',
@@ -10727,11 +10733,11 @@ extension on TranslationsTr {
 			'settings.browser.installed' => 'kurulu',
 			'settings.browser.installing' => 'Kuruluyor...',
 			'settings.browser.missing' => 'eksik',
+			_ => null,
+		} ?? switch (path) {
 			'settings.browser.runtimeRequired' => 'Tarayıcı runtime’ı gerekli',
 			'settings.browser.statusDisabled' => 'devre dışı',
 			'settings.browser.statusLabel' => 'Durum',
-			_ => null,
-		} ?? switch (path) {
 			'settings.browser.statusReady' => 'hazır',
 			'settings.browser.statusSetupRequired' => 'kurulum gerekli',
 			'settings.browser.title' => 'Browser',
@@ -11241,11 +11247,11 @@ extension on TranslationsTr {
 			'tasks.createTask.submitting' => 'Ekleniyor...',
 			'tasks.createTask.title' => 'Görev Ekle',
 			'tasks.createTask.titleLabel' => 'Başlık',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.createTask.titlePlaceholder' => 'Ne yapılması gerekiyor?',
 			'tasks.list.completedReopen' => 'Tamamlandı (yeniden açmak için tıklayın)',
 			'tasks.list.inProgressComplete' => 'Devam ediyor (tamamlamak için tıklayın)',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.list.markCompleted' => 'Tamamlandı olarak işaretle',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => 'Görev ${id} durumunu değiştir',
 			'tasks.list.markDone' => 'Tamamlandı olarak işaretle',
@@ -11755,11 +11761,11 @@ extension on TranslationsTr {
 			'skills.screen.clearSearch' => 'Beceri aramasını temizle',
 			'skills.screen.addSkill' => 'Beceri Ekle',
 			'skills.screen.scanningProjectSkills' => 'Proje becerileri taranıyor...',
+			_ => null,
+		} ?? switch (path) {
 			'skills.screen.savedSuccessfully' => 'Beceriler başarıyla kaydedildi.',
 			'skills.screen.loadingSkills' => ({required Object provider}) => '${provider} becerileri yükleniyor…',
 			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('tr'))(count, one: '${count} BECERİ', other: '${count} BECERİ', ), 
-			_ => null,
-		} ?? switch (path) {
 			'skills.screen.deleteTitle' => ({required Object name}) => '${name} silinsin mi?',
 			'skills.screen.deleteDescription' => ({required Object directory, required Object provider}) => 'Bu, ${directory} dizinini ${provider} tarafından yönetilen beceriler dizininden kaldırır. Bu işlem geri alınamaz.',
 			'skills.screen.noDescription' => 'Beceri front matter bölümünde açıklama belirtilmemiş.',

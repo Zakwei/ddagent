@@ -1950,7 +1950,10 @@
       "panelActive": "Panel · {{count}} etkin"
     },
     "errors": {
-      "forbidden": "Erişim reddedildi"
+      "forbidden": "Erişim reddedildi",
+      "notFoundTitle": "Sayfa bulunamadı",
+      "notFoundBody": "{{path}} adresinde bir şey yok.",
+      "goToProjects": "Projelere git"
     }
   },
   "settings": {

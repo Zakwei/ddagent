@@ -4763,6 +4763,15 @@ class Translations$common$errors$en {
 
 	/// en: 'Access denied'
 	String get forbidden => 'Access denied';
+
+	/// en: 'Page not found'
+	String get notFoundTitle => 'Page not found';
+
+	/// en: 'Nothing lives at {{path}}.'
+	String notFoundBody({required Object path}) => 'Nothing lives at ${path}.';
+
+	/// en: 'Go to projects'
+	String get goToProjects => 'Go to projects';
 }
 
 // Path: settings.changelog
@@ -16804,6 +16813,9 @@ extension on Translations {
 			'common.update.webHostFailed' => ({required Object message}) => 'The server was updated, but its web interface was not: ${message}',
 			'common.appShell.panelActive' => ({required Object count}) => 'Panel · ${count} active',
 			'common.errors.forbidden' => 'Access denied',
+			'common.errors.notFoundTitle' => 'Page not found',
+			'common.errors.notFoundBody' => ({required Object path}) => 'Nothing lives at ${path}.',
+			'common.errors.goToProjects' => 'Go to projects',
 			'settings.title' => 'Settings',
 			'settings.changelog.title' => 'Changelog',
 			'settings.changelog.loading' => 'Loading…',
@@ -16853,11 +16865,11 @@ extension on Translations {
 			'settings.account.username' => 'Username',
 			'settings.account.email' => 'Email',
 			'settings.account.profile' => 'Profile',
+			_ => null,
+		} ?? switch (path) {
 			'settings.account.changePassword' => 'Change Password',
 			'settings.mcp.title' => 'MCP Servers',
 			'settings.mcp.addServer' => 'Add Server',
-			_ => null,
-		} ?? switch (path) {
 			'settings.mcp.editServer' => 'Edit Server',
 			'settings.mcp.deleteServer' => 'Delete Server',
 			'settings.mcp.serverName' => 'Server Name',
@@ -17367,11 +17379,11 @@ extension on Translations {
 			'settings.browser.installed' => 'installed',
 			'settings.browser.installing' => 'Installing...',
 			'settings.browser.missing' => 'missing',
+			_ => null,
+		} ?? switch (path) {
 			'settings.browser.runtimeRequired' => 'Browser runtime required',
 			'settings.browser.statusDisabled' => 'disabled',
 			'settings.browser.statusLabel' => 'Status',
-			_ => null,
-		} ?? switch (path) {
 			'settings.browser.statusReady' => 'ready',
 			'settings.browser.statusSetupRequired' => 'setup required',
 			'settings.browser.title' => 'Browser',
@@ -17881,11 +17893,11 @@ extension on Translations {
 			'tasks.createTask.submitting' => 'Adding...',
 			'tasks.createTask.title' => 'Add Task',
 			'tasks.createTask.titleLabel' => 'Title',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.createTask.titlePlaceholder' => 'What needs to be done?',
 			'tasks.list.completedReopen' => 'Completed (click to reopen)',
 			'tasks.list.inProgressComplete' => 'In progress (click to complete)',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.list.markCompleted' => 'Mark completed',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => 'Toggle task ${id} status',
 			'tasks.list.markDone' => 'Mark done',
@@ -18395,11 +18407,11 @@ extension on Translations {
 			'skills.screen.clearSearch' => 'Clear skill search',
 			'skills.screen.addSkill' => 'Add Skill',
 			'skills.screen.scanningProjectSkills' => 'Scanning project skills...',
+			_ => null,
+		} ?? switch (path) {
 			'skills.screen.savedSuccessfully' => 'Skills saved successfully.',
 			'skills.screen.loadingSkills' => ({required Object provider}) => 'Loading ${provider} skills…',
 			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: '${count} SKILL', other: '${count} SKILLS', ), 
-			_ => null,
-		} ?? switch (path) {
 			'skills.screen.deleteTitle' => ({required Object name}) => 'Delete ${name}?',
 			'skills.screen.deleteDescription' => ({required Object directory, required Object provider}) => 'This removes the ${directory} directory from ${provider}\'s managed skills directory. This cannot be undone.',
 			'skills.screen.noDescription' => 'No description provided in the skill front matter.',

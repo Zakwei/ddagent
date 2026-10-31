@@ -2632,6 +2632,9 @@ class Translations$common$errors$de extends Translations$common$errors$en {
 
 	// Translations
 	@override String get forbidden => 'Zugriff verweigert';
+	@override String get notFoundTitle => 'Seite nicht gefunden';
+	@override String notFoundBody({required Object path}) => 'Unter ${path} gibt es nichts.';
+	@override String get goToProjects => 'Zu den Projekten';
 }
 
 // Path: settings.changelog
@@ -10169,6 +10172,9 @@ extension on TranslationsDe {
 			'common.update.webHostFailed' => ({required Object message}) => 'Der Server wurde aktualisiert, seine Weboberfläche aber nicht: ${message}',
 			'common.appShell.panelActive' => ({required Object count}) => 'Panel · ${count} aktiv',
 			'common.errors.forbidden' => 'Zugriff verweigert',
+			'common.errors.notFoundTitle' => 'Seite nicht gefunden',
+			'common.errors.notFoundBody' => ({required Object path}) => 'Unter ${path} gibt es nichts.',
+			'common.errors.goToProjects' => 'Zu den Projekten',
 			'settings.title' => 'Einstellungen',
 			'settings.changelog.title' => 'Änderungsprotokoll',
 			'settings.changelog.loading' => 'Laden…',
@@ -10218,11 +10224,11 @@ extension on TranslationsDe {
 			'settings.account.username' => 'Benutzername',
 			'settings.account.email' => 'E-Mail',
 			'settings.account.profile' => 'Profil',
+			_ => null,
+		} ?? switch (path) {
 			'settings.account.changePassword' => 'Passwort ändern',
 			'settings.mcp.title' => 'MCP-Server',
 			'settings.mcp.addServer' => 'Server hinzufügen',
-			_ => null,
-		} ?? switch (path) {
 			'settings.mcp.editServer' => 'Server bearbeiten',
 			'settings.mcp.deleteServer' => 'Server löschen',
 			'settings.mcp.serverName' => 'Servername',
@@ -10732,11 +10738,11 @@ extension on TranslationsDe {
 			'settings.browser.installed' => 'installiert',
 			'settings.browser.installing' => 'Installiere...',
 			'settings.browser.missing' => 'fehlt',
+			_ => null,
+		} ?? switch (path) {
 			'settings.browser.runtimeRequired' => 'Browser-Runtime erforderlich',
 			'settings.browser.statusDisabled' => 'deaktiviert',
 			'settings.browser.statusLabel' => 'Status',
-			_ => null,
-		} ?? switch (path) {
 			'settings.browser.statusReady' => 'bereit',
 			'settings.browser.statusSetupRequired' => 'Einrichtung erforderlich',
 			'settings.browser.title' => 'Browser',
@@ -11246,11 +11252,11 @@ extension on TranslationsDe {
 			'tasks.createTask.submitting' => 'Füge hinzu...',
 			'tasks.createTask.title' => 'Aufgabe hinzufügen',
 			'tasks.createTask.titleLabel' => 'Titel',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.createTask.titlePlaceholder' => 'Was muss erledigt werden?',
 			'tasks.list.completedReopen' => 'Abgeschlossen (klicken zum Wiederöffnen)',
 			'tasks.list.inProgressComplete' => 'In Bearbeitung (klicken zum Abschließen)',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.list.markCompleted' => 'Als abgeschlossen markieren',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => 'Status von Aufgabe ${id} umschalten',
 			'tasks.list.markDone' => 'Als erledigt markieren',
@@ -11760,11 +11766,11 @@ extension on TranslationsDe {
 			'skills.screen.clearSearch' => 'Skill-Suche leeren',
 			'skills.screen.addSkill' => 'Skill hinzufügen',
 			'skills.screen.scanningProjectSkills' => 'Projekt-Skills werden gescannt...',
+			_ => null,
+		} ?? switch (path) {
 			'skills.screen.savedSuccessfully' => 'Skills erfolgreich gespeichert.',
 			'skills.screen.loadingSkills' => ({required Object provider}) => '${provider}-Skills werden geladen…',
 			'skills.screen.skillsCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(count, one: '${count} SKILL', other: '${count} SKILLS', ), 
-			_ => null,
-		} ?? switch (path) {
 			'skills.screen.deleteTitle' => ({required Object name}) => '${name} löschen?',
 			'skills.screen.deleteDescription' => ({required Object directory, required Object provider}) => 'Dies entfernt das Verzeichnis ${directory} aus dem verwalteten Skill-Verzeichnis von ${provider}. Dies kann nicht rückgängig gemacht werden.',
 			'skills.screen.noDescription' => 'Keine Beschreibung im Front Matter des Skills angegeben.',

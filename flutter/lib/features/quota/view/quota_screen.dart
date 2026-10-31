@@ -509,8 +509,9 @@ class _Kpi extends StatelessWidget {
                     Text(label, style: t.bodySmall?.copyWith(color: c.mutedForeground)),
                     Text(
                       value,
+                      // Neutral zinc reads as disabled text, not as the figure.
                       style: t.titleLarge?.copyWith(
-                        color: color,
+                        color: tone == QuotaTone.neutral ? c.foreground : color,
                         fontFeatures: const [FontFeature.tabularFigures()],
                       ),
                     ),
