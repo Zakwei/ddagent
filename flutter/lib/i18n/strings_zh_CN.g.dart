@@ -447,6 +447,10 @@ class Translations$fileTree$zh_CN extends Translations$fileTree$en {
 	@override String get nameRequired => '必须提供文件或文件夹名称。';
 	@override String get copyRelativePath => '复制相对路径';
 	@override String get closeSearch => '返回资源管理器';
+	@override String get cut => '剪切';
+	@override String get copy => '复制';
+	@override String get paste => '粘贴';
+	@override String moveConfirm({required Object name, required Object target}) => '确定要将“${name}”移到“${target}”吗?';
 }
 
 // Path: git
@@ -11506,6 +11510,10 @@ extension on TranslationsZhCn {
 			'fileTree.nameRequired' => '必须提供文件或文件夹名称。',
 			'fileTree.copyRelativePath' => '复制相对路径',
 			'fileTree.closeSearch' => '返回资源管理器',
+			'fileTree.cut' => '剪切',
+			'fileTree.copy' => '复制',
+			'fileTree.paste' => '粘贴',
+			'fileTree.moveConfirm' => ({required Object name, required Object target}) => '确定要将“${name}”移到“${target}”吗?',
 			'git.checkpoints.title' => '检查点',
 			'git.checkpoints.restoreTitle' => '恢复检查点',
 			'git.checkpoints.restoreMessage' => '将工作树重置到此检查点？当前更改将被替换。',
@@ -11760,12 +11768,12 @@ extension on TranslationsZhCn {
 			'skills.addDialog.folderFilesMeta' => ({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '${count} 个文件 · ${size}', other: '${count} 个文件 · ${size}', ), 
 			'skills.addDialog.removeQueued' => ({required Object name}) => '移除 ${name}',
 			'skills.addDialog.whereWillThisInstall' => '将安装到何处？',
+			_ => null,
+		} ?? switch (path) {
 			'skills.addDialog.hideInstallLocation' => '隐藏安装位置',
 			'skills.addDialog.folderUploadsNote' => '文件夹上传会保留所选文件夹名称；单独文件使用 `SKILL.md` 中的 `name`。',
 			'skills.addDialog.installSkill' => '安装技能',
 			'skills.addDialog.installSkills' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '安装 ${count} 个技能', other: '安装 ${count} 个技能', ), 
-			_ => null,
-		} ?? switch (path) {
 			'skills.moveDialog.toProjectHint' => '选择应拥有此技能的项目。它将从提供商的全局技能目录中移出。',
 			'skills.moveDialog.toGlobalHint' => '将此技能移入全局技能目录，以便所有项目都能使用。',
 			'skills.moveDialog.moveToProject' => '移动到项目',

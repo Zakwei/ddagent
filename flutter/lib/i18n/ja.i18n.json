@@ -3763,7 +3763,11 @@
     "nameExists": "ファイルまたはフォルダー {{name}} はこの場所に既に存在します。",
     "nameRequired": "ファイルまたはフォルダーの名前を指定する必要があります。",
     "copyRelativePath": "相対パスのコピー",
-    "closeSearch": "エクスプローラーに戻る"
+    "closeSearch": "エクスプローラーに戻る",
+    "cut": "切り取り",
+    "copy": "コピー",
+    "paste": "貼り付け",
+    "moveConfirm": "'{{name}}' を '{{target}}' に移動しますか?"
   },
   "git": {
     "checkpoints": {

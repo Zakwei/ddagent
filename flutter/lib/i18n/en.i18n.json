@@ -3774,7 +3774,11 @@
     "nameExists": "A file or folder {{name}} already exists at this location.",
     "nameRequired": "A file or folder name must be provided.",
     "copyRelativePath": "Copy Relative Path",
-    "closeSearch": "Back to explorer"
+    "closeSearch": "Back to explorer",
+    "cut": "Cut",
+    "copy": "Copy",
+    "paste": "Paste",
+    "moveConfirm": "Are you sure you want to move '{{name}}' into '{{target}}'?"
   },
   "git": {
     "checkpoints": {

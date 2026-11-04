@@ -122,6 +122,38 @@ class FileTreeController extends Notifier<FileTreeState> {
   Future<String?> renameEntry({required String oldPath, required String newName}) =>
       _mutate(() => _repo.renameFile(state.projectId!, oldPath: oldPath, newName: newName));
 
+  /// Drag-and-drop / Cut+Paste. [targetDirectory] `''` = project root.
+  Future<({String? error, String? newPath})> moveEntry({
+    required String sourcePath,
+    required String targetDirectory,
+  }) async {
+    String? newPath;
+    final error = await _mutate(() async {
+      newPath = await _repo.moveFile(
+        state.projectId!,
+        sourcePath: sourcePath,
+        targetPath: targetDirectory,
+      );
+    }, expandPath: targetDirectory.isEmpty ? null : targetDirectory);
+    return (error: error, newPath: newPath);
+  }
+
+  /// Copy+Paste; the server names a clashing copy `name copy.ext`.
+  Future<({String? error, String? newPath})> copyEntry({
+    required String sourcePath,
+    required String targetDirectory,
+  }) async {
+    String? newPath;
+    final error = await _mutate(() async {
+      newPath = await _repo.copyFile(
+        state.projectId!,
+        sourcePath: sourcePath,
+        targetPath: targetDirectory,
+      );
+    }, expandPath: targetDirectory.isEmpty ? null : targetDirectory);
+    return (error: error, newPath: newPath);
+  }
+
   Future<String?> deleteEntry({required String path, required String type}) =>
       _mutate(() => _repo.deleteFile(state.projectId!, path: path, type: type));
 
@@ -176,6 +208,33 @@ class FileTreeController extends Notifier<FileTreeState> {
 
 final fileTreeProvider = NotifierProvider<FileTreeController, FileTreeState>(
   FileTreeController.new,
+);
+
+/// An entry put on the explorer clipboard by Cut (`cut: true`) or Copy.
+/// Lives in memory only, like VS Code's file clipboard.
+class ExplorerClipboard {
+  const ExplorerClipboard({
+    required this.projectId,
+    required this.path,
+    required this.isDirectory,
+    required this.cut,
+  });
+
+  final String projectId;
+  final String path;
+  final bool isDirectory;
+  final bool cut;
+}
+
+class ExplorerClipboardController extends Notifier<ExplorerClipboard?> {
+  @override
+  ExplorerClipboard? build() => null;
+
+  void set(ExplorerClipboard? value) => state = value;
+}
+
+final explorerClipboardProvider = NotifierProvider<ExplorerClipboardController, ExplorerClipboard?>(
+  ExplorerClipboardController.new,
 );
 
 /// Simple/compact/detailed rows — persisted in the shared `settings` Hive

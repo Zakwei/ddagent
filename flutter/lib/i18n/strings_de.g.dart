@@ -448,6 +448,10 @@ class Translations$fileTree$de extends Translations$fileTree$en {
 	@override String get nameRequired => 'Es muss ein Datei- oder Ordnername angegeben werden.';
 	@override String get copyRelativePath => 'Relativen Pfad kopieren';
 	@override String get closeSearch => 'Zurück zum Explorer';
+	@override String get cut => 'Ausschneiden';
+	@override String get copy => 'Kopieren';
+	@override String get paste => 'Einfügen';
+	@override String moveConfirm({required Object name, required Object target}) => 'Möchten Sie „${name}“ wirklich nach „${target}“ verschieben?';
 }
 
 // Path: git
@@ -11517,6 +11521,10 @@ extension on TranslationsDe {
 			'fileTree.nameRequired' => 'Es muss ein Datei- oder Ordnername angegeben werden.',
 			'fileTree.copyRelativePath' => 'Relativen Pfad kopieren',
 			'fileTree.closeSearch' => 'Zurück zum Explorer',
+			'fileTree.cut' => 'Ausschneiden',
+			'fileTree.copy' => 'Kopieren',
+			'fileTree.paste' => 'Einfügen',
+			'fileTree.moveConfirm' => ({required Object name, required Object target}) => 'Möchten Sie „${name}“ wirklich nach „${target}“ verschieben?',
 			'git.checkpoints.title' => 'Checkpoints',
 			'git.checkpoints.restoreTitle' => 'Checkpoint wiederherstellen',
 			'git.checkpoints.restoreMessage' => 'Arbeitsverzeichnis auf diesen Checkpoint zurücksetzen? Aktuelle Änderungen werden ersetzt.',
@@ -11771,12 +11779,12 @@ extension on TranslationsDe {
 			'skills.addDialog.folderFilesMeta' => ({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(count, one: '${count} Datei · ${size}', other: '${count} Dateien · ${size}', ), 
 			'skills.addDialog.removeQueued' => ({required Object name}) => '${name} entfernen',
 			'skills.addDialog.whereWillThisInstall' => 'Wo wird dies installiert?',
+			_ => null,
+		} ?? switch (path) {
 			'skills.addDialog.hideInstallLocation' => 'Installationspfad ausblenden',
 			'skills.addDialog.folderUploadsNote' => 'Bei Ordner-Uploads bleibt der ausgewählte Ordnername erhalten; einzelne Dateien verwenden `name` aus `SKILL.md`.',
 			'skills.addDialog.installSkill' => 'Skill installieren',
 			'skills.addDialog.installSkills' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(count, one: '${count} Skill installieren', other: '${count} Skills installieren', ), 
-			_ => null,
-		} ?? switch (path) {
 			'skills.moveDialog.toProjectHint' => 'Wähle das Projekt, dem dieser Skill gehören soll. Er wird aus dem globalen Skill-Verzeichnis des Anbieters verschoben.',
 			'skills.moveDialog.toGlobalHint' => 'Verschiebe diesen Skill in das globale Skill-Verzeichnis, damit ihn jedes Projekt verwenden kann.',
 			'skills.moveDialog.moveToProject' => 'In Projekt verschieben',

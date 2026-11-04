@@ -447,6 +447,10 @@ class Translations$fileTree$ko extends Translations$fileTree$en {
 	@override String get nameRequired => '파일 또는 폴더 이름을 입력해야 합니다.';
 	@override String get copyRelativePath => '상대 경로 복사';
 	@override String get closeSearch => '탐색기로 돌아가기';
+	@override String get cut => '잘라내기';
+	@override String get copy => '복사';
+	@override String get paste => '붙여넣기';
+	@override String moveConfirm({required Object name, required Object target}) => '\'${name}\'을(를) \'${target}\'(으)로 이동하시겠습니까?';
 }
 
 // Path: git
@@ -11506,6 +11510,10 @@ extension on TranslationsKo {
 			'fileTree.nameRequired' => '파일 또는 폴더 이름을 입력해야 합니다.',
 			'fileTree.copyRelativePath' => '상대 경로 복사',
 			'fileTree.closeSearch' => '탐색기로 돌아가기',
+			'fileTree.cut' => '잘라내기',
+			'fileTree.copy' => '복사',
+			'fileTree.paste' => '붙여넣기',
+			'fileTree.moveConfirm' => ({required Object name, required Object target}) => '\'${name}\'을(를) \'${target}\'(으)로 이동하시겠습니까?',
 			'git.checkpoints.title' => '체크포인트',
 			'git.checkpoints.restoreTitle' => '체크포인트 복원',
 			'git.checkpoints.restoreMessage' => '작업 트리를 이 체크포인트로 재설정할까요? 현재 변경 사항이 대체됩니다.',
@@ -11760,12 +11768,12 @@ extension on TranslationsKo {
 			'skills.addDialog.folderFilesMeta' => ({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, one: '${count}개 파일 · ${size}', other: '${count}개 파일 · ${size}', ), 
 			'skills.addDialog.removeQueued' => ({required Object name}) => '${name} 제거',
 			'skills.addDialog.whereWillThisInstall' => '어디에 설치되나요?',
+			_ => null,
+		} ?? switch (path) {
 			'skills.addDialog.hideInstallLocation' => '설치 위치 숨기기',
 			'skills.addDialog.folderUploadsNote' => '폴더 업로드는 선택한 폴더 이름을 유지하며, 단독 파일은 `SKILL.md`의 `name`을 사용합니다.',
 			'skills.addDialog.installSkill' => '스킬 설치',
 			'skills.addDialog.installSkills' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, one: '스킬 ${count}개 설치', other: '스킬 ${count}개 설치', ), 
-			_ => null,
-		} ?? switch (path) {
 			'skills.moveDialog.toProjectHint' => '이 스킬을 소유할 프로젝트를 선택하세요. 제공자의 전역 스킬 디렉터리에서 이동됩니다.',
 			'skills.moveDialog.toGlobalHint' => '이 스킬을 전역 스킬 디렉터리로 이동하여 모든 프로젝트에서 사용할 수 있게 합니다.',
 			'skills.moveDialog.moveToProject' => '프로젝트로 이동',

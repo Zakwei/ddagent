@@ -1245,6 +1245,9 @@ export type FileTreeFileSystem = {
   removeDirectory(directoryPath: string): Promise<void>;
   unlink(filePath: string): Promise<void>;
   copyFile(sourcePath: string, destinationPath: string): Promise<void>;
+  // Recursive copy of a whole directory; must fail rather than overwrite when
+  // the destination already exists.
+  copyDirectory(sourcePath: string, destinationPath: string): Promise<void>;
   createReadStream(filePath: string): Readable;
 };
 
@@ -1367,6 +1370,23 @@ export type FileTreeServices = {
     oldPath: string;
     newPath: string;
     newName: string;
+    message: string;
+  }>;
+  // Explorer drag-and-drop / Cut+Paste: moves `sourcePath` into
+  // `targetDirectory` (empty = project root), keeping its name. Refuses to
+  // overwrite an existing entry or to move a folder into itself.
+  moveEntry(input: { projectId: string; sourcePath: string; targetDirectory: string }): Promise<{
+    success: true;
+    oldPath: string;
+    newPath: string;
+    message: string;
+  }>;
+  // Explorer Copy+Paste: copies a file or a whole folder into
+  // `targetDirectory`; a clashing name gets a VS Code style ` copy` suffix.
+  copyEntry(input: { projectId: string; sourcePath: string; targetDirectory: string }): Promise<{
+    success: true;
+    sourcePath: string;
+    newPath: string;
     message: string;
   }>;
   deleteEntry(input: { projectId: string; targetPath: string }): Promise<{

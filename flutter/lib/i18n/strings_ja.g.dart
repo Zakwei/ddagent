@@ -447,6 +447,10 @@ class Translations$fileTree$ja extends Translations$fileTree$en {
 	@override String get nameRequired => 'ファイルまたはフォルダーの名前を指定する必要があります。';
 	@override String get copyRelativePath => '相対パスのコピー';
 	@override String get closeSearch => 'エクスプローラーに戻る';
+	@override String get cut => '切り取り';
+	@override String get copy => 'コピー';
+	@override String get paste => '貼り付け';
+	@override String moveConfirm({required Object name, required Object target}) => '\'${name}\' を \'${target}\' に移動しますか?';
 }
 
 // Path: git
@@ -11506,6 +11510,10 @@ extension on TranslationsJa {
 			'fileTree.nameRequired' => 'ファイルまたはフォルダーの名前を指定する必要があります。',
 			'fileTree.copyRelativePath' => '相対パスのコピー',
 			'fileTree.closeSearch' => 'エクスプローラーに戻る',
+			'fileTree.cut' => '切り取り',
+			'fileTree.copy' => 'コピー',
+			'fileTree.paste' => '貼り付け',
+			'fileTree.moveConfirm' => ({required Object name, required Object target}) => '\'${name}\' を \'${target}\' に移動しますか?',
 			'git.checkpoints.title' => 'チェックポイント',
 			'git.checkpoints.restoreTitle' => 'チェックポイントを復元',
 			'git.checkpoints.restoreMessage' => '作業ツリーをこのチェックポイントにリセットしますか？現在の変更は置き換えられます。',
@@ -11760,12 +11768,12 @@ extension on TranslationsJa {
 			'skills.addDialog.folderFilesMeta' => ({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ja'))(count, one: '${count} ファイル · ${size}', other: '${count} ファイル · ${size}', ), 
 			'skills.addDialog.removeQueued' => ({required Object name}) => '${name} を削除',
 			'skills.addDialog.whereWillThisInstall' => 'どこにインストールされますか？',
+			_ => null,
+		} ?? switch (path) {
 			'skills.addDialog.hideInstallLocation' => 'インストール先を非表示',
 			'skills.addDialog.folderUploadsNote' => 'フォルダをアップロードした場合は選択したフォルダ名が保持されます。単体ファイルの場合は `SKILL.md` の `name` が使用されます。',
 			'skills.addDialog.installSkill' => 'スキルをインストール',
 			'skills.addDialog.installSkills' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ja'))(count, one: '${count} 件のスキルをインストール', other: '${count} 件のスキルをインストール', ), 
-			_ => null,
-		} ?? switch (path) {
 			'skills.moveDialog.toProjectHint' => 'このスキルを所有するプロジェクトを選択してください。プロバイダーのグローバルスキルディレクトリから移動します。',
 			'skills.moveDialog.toGlobalHint' => 'このスキルをグローバルスキルディレクトリに移動し、すべてのプロジェクトで使用できるようにします。',
 			'skills.moveDialog.moveToProject' => 'プロジェクトに移動',

@@ -1,5 +1,6 @@
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/utils/path_utils.dart';
+import 'package:ddagent_app/features/editor/state/editor_controller.dart';
 import 'package:ddagent_app/features/file_tree/state/explorer_git_status.dart';
 import 'package:ddagent_app/features/file_tree/state/file_tree_controller.dart';
 import 'package:ddagent_app/features/file_tree/view/explorer_tree.dart';
@@ -65,6 +66,10 @@ class _EditorDockState extends ConsumerState<EditorDock> {
               activePath: widget.activePath,
               showOpenInEditor: false,
               onOpenFile: (node) => widget.onOpenFile(node.path),
+              // Open tabs follow a renamed/moved file so a save does not
+              // recreate it at the old path.
+              onEntryRenamed: (oldPath, newPath) =>
+                  ref.read(editorProvider.notifier).retarget(widget.projectId, oldPath, newPath),
             ),
           ),
         ],

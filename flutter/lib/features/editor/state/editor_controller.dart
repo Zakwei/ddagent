@@ -127,6 +127,42 @@ class EditorController extends Notifier<EditorState> {
     }
   }
 
+  /// Points tabs at a moved/renamed file or folder ([oldPath] itself or
+  /// anything below it) so an unsaved buffer is saved to the new location
+  /// instead of recreating the old file.
+  void retarget(String projectId, String oldPath, String newPath) {
+    String? moved(String path) {
+      if (path == oldPath) return newPath;
+      for (final sep in const ['/', r'\']) {
+        if (path.startsWith('$oldPath$sep')) return newPath + path.substring(oldPath.length);
+      }
+      return null;
+    }
+
+    var activeId = state.activeId;
+    final tabs = [
+      for (final t in state.tabs)
+        if (t.projectId == projectId && moved(t.path) != null)
+          () {
+            final path = moved(t.path)!;
+            final id = tabId(projectId, path);
+            if (activeId == t.id) activeId = id;
+            return EditorTab(
+              id: id,
+              projectId: projectId,
+              path: path,
+              content: t.content,
+              savedContent: t.savedContent,
+              loading: t.loading,
+              error: t.error,
+            );
+          }()
+        else
+          t,
+    ];
+    state = state.copyWith(tabs: tabs, activeId: () => activeId);
+  }
+
   /// Closes the tab without checking dirt — the view calls
   /// [confirmCloseTab] first. Falls back to the last remaining tab.
   void close(String id) {

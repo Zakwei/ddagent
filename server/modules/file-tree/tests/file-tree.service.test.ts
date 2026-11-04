@@ -67,6 +67,7 @@ function createFakeFileSystem(
     removeDirectory: unexpectedOperation,
     unlink: unexpectedOperation,
     copyFile: unexpectedOperation,
+    copyDirectory: unexpectedOperation,
     createReadStream: () => Readable.from([]),
     ...overrides,
   };
@@ -498,4 +499,124 @@ test('searchProjectFiles finds matching text across project files with ripgrep',
       fs.rmSync(tempDirectory, { recursive: true, force: true });
     }
   }
+});
+
+/**
+ * Fake filesystem over a set of existing paths (directories listed
+ * separately) that records every rename/copy instead of performing it.
+ */
+function createTransferFileSystem(projectRoot: string, files: string[], directories: string[]) {
+  const existing = new Set([projectRoot, ...files, ...directories]);
+  const directorySet = new Set([projectRoot, ...directories]);
+  const operations: string[] = [];
+  const missing = () => Object.assign(new Error('missing'), { code: 'ENOENT' });
+  const fileSystem = createFakeFileSystem({
+    access: async (candidatePath) => {
+      if (!existing.has(candidatePath)) throw missing();
+    },
+    stat: async (candidatePath) => {
+      if (!existing.has(candidatePath)) throw missing();
+      return createStats(directorySet.has(candidatePath), 0o755);
+    },
+    rename: async (from, to) => {
+      operations.push(`rename ${path.relative(projectRoot, from)} -> ${path.relative(projectRoot, to)}`);
+    },
+    copyFile: async (from, to) => {
+      operations.push(`copyFile ${path.relative(projectRoot, from)} -> ${path.relative(projectRoot, to)}`);
+    },
+    copyDirectory: async (from, to) => {
+      operations.push(`copyDirectory ${path.relative(projectRoot, from)} -> ${path.relative(projectRoot, to)}`);
+    },
+  });
+  return { fileSystem, operations };
+}
+
+test('moveEntry moves an entry into the target folder and into the root for an empty target', async () => {
+  const root = path.resolve('file-tree-move-project');
+  const { fileSystem, operations } = createTransferFileSystem(
+    root,
+    [path.join(root, 'lib', 'a.ts')],
+    [path.join(root, 'lib'), path.join(root, 'src')],
+  );
+  const service = createFileTreeService(createDependencies(fileSystem, root));
+
+  const moved = await service.moveEntry({
+    projectId: 'project-1',
+    sourcePath: path.join(root, 'lib', 'a.ts'),
+    targetDirectory: path.join(root, 'src'),
+  });
+  await service.moveEntry({ projectId: 'project-1', sourcePath: path.join(root, 'lib'), targetDirectory: root });
+  await service.moveEntry({ projectId: 'project-1', sourcePath: path.join(root, 'src'), targetDirectory: '' });
+
+  assert.equal(moved.newPath, path.join(root, 'src', 'a.ts'));
+  // lib and src already live in the root: dropping them there is a no-op.
+  assert.deepEqual(operations, [`rename ${path.join('lib', 'a.ts')} -> ${path.join('src', 'a.ts')}`]);
+});
+
+test('moveEntry refuses a folder into its own subtree, a name clash and the project root', async () => {
+  const root = path.resolve('file-tree-move-project');
+  const { fileSystem, operations } = createTransferFileSystem(
+    root,
+    [path.join(root, 'a.ts'), path.join(root, 'src', 'a.ts')],
+    [path.join(root, 'src'), path.join(root, 'src', 'inner')],
+  );
+  const service = createFileTreeService(createDependencies(fileSystem, root));
+  const hasCode = (code: string) => (error: unknown) => error instanceof AppError && error.code === code;
+
+  await assert.rejects(
+    service.moveEntry({ projectId: 'p', sourcePath: path.join(root, 'src'), targetDirectory: path.join(root, 'src', 'inner') }),
+    hasCode('FILE_TREE_MOVE_INTO_SELF'),
+  );
+  await assert.rejects(
+    service.moveEntry({ projectId: 'p', sourcePath: path.join(root, 'a.ts'), targetDirectory: path.join(root, 'src') }),
+    hasCode('FILE_TREE_ENTRY_EXISTS'),
+  );
+  await assert.rejects(
+    service.moveEntry({ projectId: 'p', sourcePath: root, targetDirectory: path.join(root, 'src') }),
+    (error: unknown) => error instanceof AppError && error.statusCode === 403,
+  );
+  await assert.rejects(
+    service.moveEntry({ projectId: 'p', sourcePath: path.join(root, 'a.ts'), targetDirectory: path.join(root, 'a.ts') }),
+    hasCode('NOT_A_DIRECTORY'),
+  );
+  assert.deepEqual(operations, []);
+});
+
+test('copyEntry keeps the name elsewhere and adds VS Code copy suffixes on a clash', async () => {
+  const root = path.resolve('file-tree-copy-project');
+  const { fileSystem, operations } = createTransferFileSystem(
+    root,
+    [path.join(root, 'a.ts'), path.join(root, 'a copy.ts'), path.join(root, '.env')],
+    [path.join(root, 'src'), path.join(root, 'pkg')],
+  );
+  const service = createFileTreeService(createDependencies(fileSystem, root));
+
+  await service.copyEntry({ projectId: 'p', sourcePath: path.join(root, 'a.ts'), targetDirectory: path.join(root, 'src') });
+  const second = await service.copyEntry({ projectId: 'p', sourcePath: path.join(root, 'a.ts'), targetDirectory: '' });
+  await service.copyEntry({ projectId: 'p', sourcePath: path.join(root, '.env'), targetDirectory: '' });
+  await service.copyEntry({ projectId: 'p', sourcePath: path.join(root, 'pkg'), targetDirectory: root });
+
+  assert.equal(second.newPath, path.join(root, 'a copy 2.ts'));
+  assert.deepEqual(operations, [
+    `copyFile a.ts -> ${path.join('src', 'a.ts')}`,
+    'copyFile a.ts -> a copy 2.ts',
+    'copyFile .env -> .env copy',
+    'copyDirectory pkg -> pkg copy',
+  ]);
+});
+
+test('copyEntry refuses to copy a folder into its own subtree', async () => {
+  const root = path.resolve('file-tree-copy-project');
+  const { fileSystem, operations } = createTransferFileSystem(
+    root,
+    [],
+    [path.join(root, 'src'), path.join(root, 'src', 'inner')],
+  );
+  const service = createFileTreeService(createDependencies(fileSystem, root));
+
+  await assert.rejects(
+    service.copyEntry({ projectId: 'p', sourcePath: path.join(root, 'src'), targetDirectory: path.join(root, 'src', 'inner') }),
+    (error: unknown) => error instanceof AppError && error.code === 'FILE_TREE_COPY_INTO_SELF',
+  );
+  assert.deepEqual(operations, []);
 });

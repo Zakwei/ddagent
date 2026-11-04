@@ -98,6 +98,13 @@ class _ExplorerTreeState extends ConsumerState<ExplorerTree> {
   bool _hovered = false;
   String? _pendingReveal;
 
+  /// Folder a dragged entry would land in (`''` = project root), null when
+  /// the drop is not allowed — highlighted while dragging.
+  String? _dropFolder;
+  Timer? _expandTimer;
+  String? _expandCandidate;
+  final _listKey = GlobalKey();
+
   /// Rows as last rendered — keyboard handling indexes into these.
   List<_Item> _items = const [];
 
@@ -133,6 +140,7 @@ class _ExplorerTreeState extends ConsumerState<ExplorerTree> {
     _focus.dispose();
     _editFocus.dispose();
     _editText.dispose();
+    _expandTimer?.cancel();
     _ownScroll?.dispose();
     super.dispose();
   }
@@ -270,6 +278,12 @@ class _ExplorerTreeState extends ConsumerState<ExplorerTree> {
             (key == LogicalKeyboardKey.backspace && HardwareKeyboard.instance.isMetaPressed)) &&
         row != null) {
       unawaited(_delete(row.node));
+    } else if (_withModifier(key, LogicalKeyboardKey.keyX) && row != null) {
+      _setClipboard(row.node, cut: true);
+    } else if (_withModifier(key, LogicalKeyboardKey.keyC) && row != null) {
+      _setClipboard(row.node, cut: false);
+    } else if (_withModifier(key, LogicalKeyboardKey.keyV)) {
+      unawaited(_paste(_folderFor(row?.node)));
     } else if (key == LogicalKeyboardKey.escape) {
       setState(() => _selected = null);
     } else {
@@ -278,21 +292,172 @@ class _ExplorerTreeState extends ConsumerState<ExplorerTree> {
     return KeyEventResult.handled;
   }
 
+  static bool _withModifier(LogicalKeyboardKey key, LogicalKeyboardKey letter) =>
+      key == letter &&
+      (HardwareKeyboard.instance.isControlPressed || HardwareKeyboard.instance.isMetaPressed);
+
+  // ── clipboard / move / copy ───────────────────────────────────────────
+
+  ExplorerClipboard? get _clip {
+    final clip = ref.read(explorerClipboardProvider);
+    return clip != null && clip.projectId == _tree.projectId ? clip : null;
+  }
+
+  void _setClipboard(FileTreeNode node, {required bool cut}) {
+    final pid = _tree.projectId;
+    if (pid == null) {
+      return;
+    }
+    ref
+        .read(explorerClipboardProvider.notifier)
+        .set(
+          ExplorerClipboard(
+            projectId: pid,
+            path: node.path,
+            isDirectory: node.isDirectory,
+            cut: cut,
+          ),
+        );
+  }
+
+  /// Paste into [folder]: a Cut entry moves (once), a Copied one is copied
+  /// (again on every paste, the server picks `name copy.ext` on a clash).
+  Future<void> _paste(String folder) async {
+    final clip = _clip;
+    if (clip == null) {
+      return;
+    }
+    if (!clip.cut) {
+      await _transfer(clip.path, folder, move: false);
+      return;
+    }
+    ref.read(explorerClipboardProvider.notifier).set(null);
+    final target = folder.isEmpty ? _root : folder;
+    if (target != null && pathDirname(clip.path) != target) {
+      await _transfer(clip.path, folder, move: true);
+    }
+  }
+
+  Future<void> _transfer(String source, String folder, {required bool move}) async {
+    final result = move
+        ? await _ctrl.moveEntry(sourcePath: source, targetDirectory: folder)
+        : await _ctrl.copyEntry(sourcePath: source, targetDirectory: folder);
+    if (!mounted) {
+      return;
+    }
+    if (result.error != null) {
+      AppToast.show(context, result.error!, isError: true);
+      return;
+    }
+    final newPath = result.newPath;
+    if (newPath == null || newPath.isEmpty) {
+      return;
+    }
+    _focus.requestFocus();
+    setState(() => _selected = newPath);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToPath(newPath));
+    if (move && newPath != source) {
+      widget.onEntryRenamed?.call(source, newPath);
+    }
+  }
+
+  /// Drag-and-drop move, confirmed first like VS Code's default
+  /// `explorer.confirmDragAndDrop` (there is no undo).
+  Future<void> _drop(FileTreeNode node, String folder) async {
+    final t = Translations.of(context);
+    final target = folder.isEmpty
+        ? (widget.title.isEmpty ? t.fileTree.projectRoot : widget.title)
+        : pathBasename(folder);
+    final ok = await AppDialog.confirm(
+      context,
+      title: t.common.fileOperations.move,
+      message: t.fileTree.moveConfirm(name: node.name, target: target),
+      confirmLabel: t.common.fileOperations.move,
+    );
+    if (ok && mounted) {
+      await _transfer(node.path, folder, move: true);
+    }
+  }
+
+  void _onDragMove(FileTreeNode source, Offset global) {
+    final box = _listKey.currentContext?.findRenderObject() as RenderBox?;
+    if (box == null || !box.hasSize || !_scroll.hasClients) {
+      return;
+    }
+    final local = box.globalToLocal(global);
+    // Auto-scroll while hovering the top/bottom edge.
+    const edge = 24.0;
+    final pos = _scroll.position;
+    if (local.dy < edge && pos.pixels > 0) {
+      _scroll.jumpTo((pos.pixels - 8).clamp(0, pos.maxScrollExtent));
+    } else if (local.dy > box.size.height - edge && pos.pixels < pos.maxScrollExtent) {
+      _scroll.jumpTo((pos.pixels + 8).clamp(0, pos.maxScrollExtent));
+    }
+    final index = ((local.dy + _scroll.offset) / _rowHeight).floor();
+    final row = index >= 0 && index < _items.length ? _items[index].row : null;
+    final folder = _folderFor(row?.node);
+    final next = _canDrop(source.path, folder) ? folder : null;
+    if (next != _dropFolder) {
+      setState(() => _dropFolder = next);
+    }
+    // Hovering a collapsed folder opens it after a moment.
+    final hoverDir =
+        row != null &&
+            row.node.isDirectory &&
+            !ref.read(fileTreeProvider).expanded.contains(row.path)
+        ? row.path
+        : null;
+    if (hoverDir != _expandCandidate) {
+      _expandTimer?.cancel();
+      _expandCandidate = hoverDir;
+      if (hoverDir != null) {
+        _expandTimer = Timer(const Duration(milliseconds: 600), () {
+          if (mounted && _expandCandidate == hoverDir) {
+            _ctrl.expandDirectories([hoverDir]);
+          }
+        });
+      }
+    }
+  }
+
+  void _clearDrop() {
+    _expandTimer?.cancel();
+    _expandCandidate = null;
+    if (_dropFolder != null && mounted) {
+      setState(() => _dropFolder = null);
+    }
+  }
+
   // ── inline create / rename ────────────────────────────────────────────
 
   /// Folder a new entry goes into: the selected folder, else the selected
   /// file's folder, else the project root.
   String _createTarget() {
     final sel = _selected;
-    if (sel == null) {
-      return '';
-    }
-    final node = findExplorerNode(_tree.roots, sel);
+    return _folderFor(sel == null ? null : findExplorerNode(_tree.roots, sel));
+  }
+
+  /// Folder that receives a create/paste/drop aimed at [node]: the folder
+  /// itself or the file's folder; `''` = project root.
+  String _folderFor(FileTreeNode? node) {
     if (node == null) {
       return '';
     }
     final dir = node.isDirectory ? node.path : pathDirname(node.path);
     return dir == _root ? '' : dir;
+  }
+
+  static bool _isInside(String path, String ancestor) =>
+      path.startsWith('$ancestor/') || path.startsWith('$ancestor\\');
+
+  /// VS Code refuses a drop onto the entry itself, into its own subtree, or
+  /// into the folder it already sits in.
+  bool _canDrop(String sourcePath, String folder) {
+    final target = folder.isEmpty ? (_root ?? '') : folder;
+    if (target.isEmpty || target == sourcePath || _isInside(target, sourcePath)) {
+      return false;
+    }
+    return pathDirname(sourcePath) != target;
   }
 
   void _startCreate(String type, {String? parent}) {
@@ -508,6 +673,23 @@ class _ExplorerTreeState extends ConsumerState<ExplorerTree> {
           ),
       ],
       AppMenuItem(
+        label: t.fileTree.cut,
+        icon: LucideIcons.scissors,
+        dividerBefore: true,
+        onTap: () => _setClipboard(node, cut: true),
+      ),
+      AppMenuItem(
+        label: t.fileTree.copy,
+        icon: LucideIcons.files,
+        onTap: () => _setClipboard(node, cut: false),
+      ),
+      if (_clip != null)
+        AppMenuItem(
+          label: t.fileTree.paste,
+          icon: LucideIcons.clipboardPaste,
+          onTap: () => _paste(_folderFor(node)),
+        ),
+      AppMenuItem(
         label: t.common.fileTree.context.copyPath,
         icon: LucideIcons.copy,
         dividerBefore: true,
@@ -558,6 +740,12 @@ class _ExplorerTreeState extends ConsumerState<ExplorerTree> {
           label: t.common.fileTree.context.upload,
           icon: LucideIcons.upload,
           onTap: () => widget.onUploadTo!(''),
+        ),
+      if (_clip != null)
+        AppMenuItem(
+          label: t.fileTree.paste,
+          icon: LucideIcons.clipboardPaste,
+          onTap: () => _paste(''),
         ),
       AppMenuItem(
         label: t.common.buttons.refresh,
@@ -705,6 +893,77 @@ class _ExplorerTreeState extends ConsumerState<ExplorerTree> {
       }
     }
 
+    final clip = ref.watch(explorerClipboardProvider);
+    final cutPath = clip != null && clip.cut && clip.projectId == state.projectId
+        ? clip.path
+        : null;
+    final dropAbs = _dropFolder == null ? null : (_dropFolder!.isEmpty ? root : _dropFolder);
+    // Drag-and-drop moves files on pointer devices; touch keeps long-press
+    // for the context menu (Cut/Paste covers moving there).
+    final canDrag = !context.breakpoint.isCompact;
+
+    Widget rowFor(int i) {
+      final it = _items[i];
+      final row = it.row;
+      if (row == null) {
+        return _RowView(
+          depth: it.depth,
+          rowHeight: rowHeight,
+          indent: _indent,
+          showGuides: _hovered,
+          isDirectory: it.edit!.type == 'directory',
+          expanded: false,
+          iconName: '',
+          editor: _editField(),
+        );
+      }
+      final node = row.node;
+      final rel = root == null ? null : explorerRelativePath(node.path, root);
+      final renaming = _edit?.renaming?.path == node.path;
+      final view = _RowView(
+        key: ValueKey(node.path),
+        depth: row.depth,
+        rowHeight: rowHeight,
+        indent: _indent,
+        showGuides: _hovered,
+        isDirectory: node.isDirectory,
+        expanded: expanded.contains(node.path),
+        iconName: node.name,
+        label: row.label,
+        highlight: query,
+        italic: node.isSymlink,
+        selected: _selected == node.path,
+        focused: _focus.hasFocus,
+        dimmed: cutPath != null && (node.path == cutPath || _isInside(node.path, cutPath)),
+        dropTarget: dropAbs != null && (node.path == dropAbs || _isInside(node.path, dropAbs)),
+        decoration: rel == null ? null : deco.of(rel, isDirectory: node.isDirectory),
+        details: widget.showDetails && !node.isDirectory
+            ? (formatFileSize(node.size), formatModified(node.modified))
+            : null,
+        editor: renaming ? _editField() : null,
+        onTap: () => _activate(row),
+        onMenu: (pos) {
+          _focus.requestFocus();
+          setState(() => _selected = node.path);
+          unawaited(AppContextMenu.show(context, pos, _rowMenu(node)));
+        },
+      );
+      if (!canDrag || renaming) {
+        return view;
+      }
+      return Draggable<FileTreeNode>(
+        data: node,
+        dragAnchorStrategy: pointerDragAnchorStrategy,
+        feedback: _DragFeedback(node: node, label: row.label),
+        onDragStarted: () {
+          _focus.requestFocus();
+          setState(() => _selected = node.path);
+        },
+        onDragEnd: (_) => _clearDrop(),
+        child: view,
+      );
+    }
+
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: _focus.requestFocus,
@@ -715,58 +974,26 @@ class _ExplorerTreeState extends ConsumerState<ExplorerTree> {
         onKeyEvent: _onKey,
         child: _items.isEmpty
             ? _Message(t.fileTree.noFiles)
-            : Scrollbar(
-                controller: _scroll,
-                child: ListView.builder(
+            : DragTarget<FileTreeNode>(
+                onMove: (d) => _onDragMove(d.data, d.offset),
+                onLeave: (_) => _clearDrop(),
+                onAcceptWithDetails: (d) {
+                  final folder = _dropFolder;
+                  _clearDrop();
+                  if (folder != null) {
+                    unawaited(_drop(d.data, folder));
+                  }
+                },
+                builder: (context, _, _) => Scrollbar(
+                  key: _listKey,
                   controller: _scroll,
-                  itemExtent: rowHeight,
-                  padding: EdgeInsets.only(bottom: rowHeight * 2),
-                  itemCount: _items.length,
-                  itemBuilder: (context, i) {
-                    final it = _items[i];
-                    final row = it.row;
-                    if (row == null) {
-                      return _RowView(
-                        depth: it.depth,
-                        rowHeight: rowHeight,
-                        indent: _indent,
-                        showGuides: _hovered,
-                        isDirectory: it.edit!.type == 'directory',
-                        expanded: false,
-                        iconName: '',
-                        editor: _editField(),
-                      );
-                    }
-                    final node = row.node;
-                    final rel = root == null ? null : explorerRelativePath(node.path, root);
-                    final renaming = _edit?.renaming?.path == node.path;
-                    return _RowView(
-                      key: ValueKey(node.path),
-                      depth: row.depth,
-                      rowHeight: rowHeight,
-                      indent: _indent,
-                      showGuides: _hovered,
-                      isDirectory: node.isDirectory,
-                      expanded: expanded.contains(node.path),
-                      iconName: node.name,
-                      label: row.label,
-                      highlight: query,
-                      italic: node.isSymlink,
-                      selected: _selected == node.path,
-                      focused: _focus.hasFocus,
-                      decoration: rel == null ? null : deco.of(rel, isDirectory: node.isDirectory),
-                      details: widget.showDetails && !node.isDirectory
-                          ? (formatFileSize(node.size), formatModified(node.modified))
-                          : null,
-                      editor: renaming ? _editField() : null,
-                      onTap: () => _activate(row),
-                      onMenu: (pos) {
-                        _focus.requestFocus();
-                        setState(() => _selected = node.path);
-                        unawaited(AppContextMenu.show(context, pos, _rowMenu(node)));
-                      },
-                    );
-                  },
+                  child: ListView.builder(
+                    controller: _scroll,
+                    itemExtent: rowHeight,
+                    padding: EdgeInsets.only(bottom: rowHeight * 2),
+                    itemCount: _items.length,
+                    itemBuilder: (context, i) => rowFor(i),
+                  ),
                 ),
               ),
       ),
@@ -984,6 +1211,8 @@ class _RowView extends StatefulWidget {
     this.italic = false,
     this.selected = false,
     this.focused = false,
+    this.dimmed = false,
+    this.dropTarget = false,
     this.decoration,
     this.details,
     this.editor,
@@ -1003,6 +1232,12 @@ class _RowView extends StatefulWidget {
   final bool italic;
   final bool selected;
   final bool focused;
+
+  /// On the clipboard after Cut (VS Code fades cut entries).
+  final bool dimmed;
+
+  /// Inside the folder a dragged entry would drop into.
+  final bool dropTarget;
   final GitDecoration? decoration;
   final (String, String)? details;
   final Widget? editor;
@@ -1032,6 +1267,8 @@ class _RowViewState extends State<_RowView> {
       bg = c.primary.withValues(alpha: 0.22);
     } else if (w.selected) {
       bg = c.foreground.withValues(alpha: 0.10);
+    } else if (w.dropTarget) {
+      bg = c.primary.withValues(alpha: 0.14);
     } else if (_hover) {
       bg = c.foreground.withValues(alpha: 0.05);
     } else {
@@ -1146,7 +1383,42 @@ class _RowViewState extends State<_RowView> {
                 ? Border.all(color: c.primary.withValues(alpha: 0.8))
                 : null,
           ),
-          child: content,
+          child: w.dimmed ? Opacity(opacity: 0.5, child: content) : content,
+        ),
+      ),
+    );
+  }
+}
+
+/// The chip that follows the pointer while dragging an entry.
+class _DragFeedback extends StatelessWidget {
+  const _DragFeedback({required this.node, required this.label});
+
+  final FileTreeNode node;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.appColors;
+    final icon = node.isDirectory
+        ? (icon: LucideIcons.folder, color: c.mutedForeground)
+        : fileIcon(node.name);
+    return Transform.translate(
+      offset: const Offset(12, 8),
+      child: Material(
+        color: c.popover,
+        elevation: 4,
+        borderRadius: AppRadii.borderSm,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon.icon, size: 14, color: icon.color),
+              const SizedBox(width: 6),
+              Text(label, style: TextStyle(fontSize: 13, color: c.popoverForeground)),
+            ],
+          ),
         ),
       ),
     );

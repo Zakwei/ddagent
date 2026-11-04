@@ -221,6 +221,26 @@ export function createFileTreeRouter(
     }));
   }, logger));
 
+  // Explorer drag-and-drop and Cut+Paste.
+  router.put('/projects/:projectId/files/move', createRouteHandler(async (request, response) => {
+    const body = readBody(request);
+    response.json(await services.moveEntry({
+      projectId: readProjectId(request),
+      sourcePath: readRequiredString(body.sourcePath, 'sourcePath'),
+      targetDirectory: readOptionalString(body.targetPath) ?? '',
+    }));
+  }, logger));
+
+  // Explorer Copy+Paste.
+  router.post('/projects/:projectId/files/copy', createRouteHandler(async (request, response) => {
+    const body = readBody(request);
+    response.json(await services.copyEntry({
+      projectId: readProjectId(request),
+      sourcePath: readRequiredString(body.sourcePath, 'sourcePath'),
+      targetDirectory: readOptionalString(body.targetPath) ?? '',
+    }));
+  }, logger));
+
   router.delete('/projects/:projectId/files', createRouteHandler(async (request, response) => {
     const body = readBody(request);
     const targetPath = readRequiredString(body.path, 'path', 'Path is required');

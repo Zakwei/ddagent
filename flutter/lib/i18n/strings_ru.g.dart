@@ -450,6 +450,10 @@ class Translations$fileTree$ru extends Translations$fileTree$en {
 	@override String get nameRequired => 'Необходимо указать имя файла или папки.';
 	@override String get copyRelativePath => 'Копировать относительный путь';
 	@override String get closeSearch => 'Назад к проводнику';
+	@override String get cut => 'Вырезать';
+	@override String get copy => 'Копировать';
+	@override String get paste => 'Вставить';
+	@override String moveConfirm({required Object name, required Object target}) => 'Вы действительно хотите переместить "${name}" в "${target}"?';
 }
 
 // Path: git
@@ -11555,6 +11559,10 @@ extension on TranslationsRu {
 			'fileTree.nameRequired' => 'Необходимо указать имя файла или папки.',
 			'fileTree.copyRelativePath' => 'Копировать относительный путь',
 			'fileTree.closeSearch' => 'Назад к проводнику',
+			'fileTree.cut' => 'Вырезать',
+			'fileTree.copy' => 'Копировать',
+			'fileTree.paste' => 'Вставить',
+			'fileTree.moveConfirm' => ({required Object name, required Object target}) => 'Вы действительно хотите переместить "${name}" в "${target}"?',
 			'git.checkpoints.title' => 'Чекпоинты',
 			'git.checkpoints.restoreTitle' => 'Восстановить чекпоинт',
 			'git.checkpoints.restoreMessage' => 'Сбросить рабочее дерево к этому чекпоинту? Текущие изменения будут заменены.',
@@ -11809,12 +11817,12 @@ extension on TranslationsRu {
 			'skills.addDialog.folderFilesMeta' => ({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(count, one: '${count} файл · ${size}', other: '${count} файлов · ${size}', ), 
 			'skills.addDialog.removeQueued' => ({required Object name}) => 'Удалить ${name}',
 			'skills.addDialog.whereWillThisInstall' => 'Куда это установится?',
+			_ => null,
+		} ?? switch (path) {
 			'skills.addDialog.hideInstallLocation' => 'Скрыть место установки',
 			'skills.addDialog.folderUploadsNote' => 'При загрузке папки сохраняется её имя; для отдельных файлов используется `name` из `SKILL.md`.',
 			'skills.addDialog.installSkill' => 'Установить навык',
 			'skills.addDialog.installSkills' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(count, one: 'Установить ${count} навык', other: 'Установить ${count} навыков', ), 
-			_ => null,
-		} ?? switch (path) {
 			'skills.moveDialog.toProjectHint' => 'Выберите проект, которому будет принадлежать этот навык. Он будет перемещён из глобальной папки навыков провайдера.',
 			'skills.moveDialog.toGlobalHint' => 'Переместите этот навык в глобальную папку навыков, чтобы его могли использовать все проекты.',
 			'skills.moveDialog.moveToProject' => 'Переместить в проект',

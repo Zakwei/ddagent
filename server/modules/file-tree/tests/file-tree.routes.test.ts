@@ -23,6 +23,8 @@ function createFakeServices(overrides: Partial<FileTreeServices> = {}): FileTree
     searchProjectFiles: unexpectedOperation,
     createEntry: unexpectedOperation,
     renameEntry: unexpectedOperation,
+    moveEntry: unexpectedOperation,
+    copyEntry: unexpectedOperation,
     deleteEntry: unexpectedOperation,
     storeUploadedFiles: unexpectedOperation,
     ...overrides,
@@ -186,4 +188,51 @@ test('search route parses query options and forwards the project id', async () =
     limit: 5,
     regex: true,
   }]]);
+});
+
+test('move route forwards source and target folder, empty target meaning the project root', async () => {
+  const inputs: Parameters<FileTreeServices['moveEntry']>[0][] = [];
+  const services = createFakeServices({
+    moveEntry: async (input) => {
+      inputs.push(input);
+      return { success: true, oldPath: input.sourcePath, newPath: '/p/a.ts', message: 'Moved successfully' };
+    },
+  });
+
+  await withFileTreeServer(services, async (baseUrl) => {
+    for (const targetPath of ['/p/src', undefined]) {
+      const response = await fetch(`${baseUrl}/api/file-tree/projects/project-1/files/move`, {
+        method: 'PUT',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ sourcePath: '/p/lib/a.ts', targetPath }),
+      });
+      assert.equal(response.status, 200);
+    }
+  });
+
+  assert.deepEqual(inputs, [
+    { projectId: 'project-1', sourcePath: '/p/lib/a.ts', targetDirectory: '/p/src' },
+    { projectId: 'project-1', sourcePath: '/p/lib/a.ts', targetDirectory: '' },
+  ]);
+});
+
+test('copy route rejects a missing source without calling the service', async () => {
+  let copyCalled = false;
+  const services = createFakeServices({
+    copyEntry: async () => {
+      copyCalled = true;
+      throw new Error('copyEntry should not run for invalid input');
+    },
+  });
+
+  await withFileTreeServer(services, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/file-tree/projects/project-1/files/copy`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ targetPath: '/p/src' }),
+    });
+    assert.equal(response.status, 400);
+  });
+
+  assert.equal(copyCalled, false);
 });

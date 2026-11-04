@@ -584,6 +584,18 @@ class Translations$fileTree$en {
 
 	/// en: 'Back to explorer'
 	String get closeSearch => 'Back to explorer';
+
+	/// en: 'Cut'
+	String get cut => 'Cut';
+
+	/// en: 'Copy'
+	String get copy => 'Copy';
+
+	/// en: 'Paste'
+	String get paste => 'Paste';
+
+	/// en: 'Are you sure you want to move '{{name}}' into '{{target}}'?'
+	String moveConfirm({required Object name, required Object target}) => 'Are you sure you want to move \'${name}\' into \'${target}\'?';
 }
 
 // Path: git
@@ -18176,6 +18188,10 @@ extension on Translations {
 			'fileTree.nameRequired' => 'A file or folder name must be provided.',
 			'fileTree.copyRelativePath' => 'Copy Relative Path',
 			'fileTree.closeSearch' => 'Back to explorer',
+			'fileTree.cut' => 'Cut',
+			'fileTree.copy' => 'Copy',
+			'fileTree.paste' => 'Paste',
+			'fileTree.moveConfirm' => ({required Object name, required Object target}) => 'Are you sure you want to move \'${name}\' into \'${target}\'?',
 			'git.checkpoints.title' => 'Checkpoints',
 			'git.checkpoints.restoreTitle' => 'Restore checkpoint',
 			'git.checkpoints.restoreMessage' => 'Reset the working tree to this checkpoint? Current changes will be replaced.',
@@ -18430,12 +18446,12 @@ extension on Translations {
 			'skills.addDialog.folderFilesMeta' => ({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: '${count} file · ${size}', other: '${count} files · ${size}', ), 
 			'skills.addDialog.removeQueued' => ({required Object name}) => 'Remove ${name}',
 			'skills.addDialog.whereWillThisInstall' => 'Where will this install?',
+			_ => null,
+		} ?? switch (path) {
 			'skills.addDialog.hideInstallLocation' => 'Hide install location',
 			'skills.addDialog.folderUploadsNote' => 'Folder uploads keep the selected folder name; standalone files use the `name` in `SKILL.md`.',
 			'skills.addDialog.installSkill' => 'Install Skill',
 			'skills.addDialog.installSkills' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: 'Install ${count} Skill', other: 'Install ${count} Skills', ), 
-			_ => null,
-		} ?? switch (path) {
 			'skills.moveDialog.toProjectHint' => 'Choose the project that should own this skill. It moves out of the provider\'s global skills directory.',
 			'skills.moveDialog.toGlobalHint' => 'Move this skill into the global skills directory so every project can use it.',
 			'skills.moveDialog.moveToProject' => 'Move to project',

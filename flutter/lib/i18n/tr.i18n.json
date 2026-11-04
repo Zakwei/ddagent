@@ -3769,7 +3769,11 @@
     "nameExists": "Bu konumda {{name}} adlı bir dosya veya klasör zaten var.",
     "nameRequired": "Bir dosya veya klasör adı sağlanmalıdır.",
     "copyRelativePath": "Göreli Yolu Kopyala",
-    "closeSearch": "Gezgine dön"
+    "closeSearch": "Gezgine dön",
+    "cut": "Kes",
+    "copy": "Kopyala",
+    "paste": "Yapıştır",
+    "moveConfirm": "'{{name}}' öğesini '{{target}}' içine taşımak istediğinizden emin misiniz?"
   },
   "git": {
     "checkpoints": {

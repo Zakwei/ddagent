@@ -447,6 +447,10 @@ class Translations$fileTree$zh_TW extends Translations$fileTree$en {
 	@override String get nameRequired => '必須提供檔案或資料夾名稱。';
 	@override String get copyRelativePath => '複製相對路徑';
 	@override String get closeSearch => '返回檔案總管';
+	@override String get cut => '剪下';
+	@override String get copy => '複製';
+	@override String get paste => '貼上';
+	@override String moveConfirm({required Object name, required Object target}) => '確定要將 \'${name}\' 移至 \'${target}\' 嗎?';
 }
 
 // Path: git
@@ -11506,6 +11510,10 @@ extension on TranslationsZhTw {
 			'fileTree.nameRequired' => '必須提供檔案或資料夾名稱。',
 			'fileTree.copyRelativePath' => '複製相對路徑',
 			'fileTree.closeSearch' => '返回檔案總管',
+			'fileTree.cut' => '剪下',
+			'fileTree.copy' => '複製',
+			'fileTree.paste' => '貼上',
+			'fileTree.moveConfirm' => ({required Object name, required Object target}) => '確定要將 \'${name}\' 移至 \'${target}\' 嗎?',
 			'git.checkpoints.title' => '檢查點',
 			'git.checkpoints.restoreTitle' => '還原檢查點',
 			'git.checkpoints.restoreMessage' => '要將工作樹重設到此檢查點嗎？目前的變更將被取代。',
@@ -11760,12 +11768,12 @@ extension on TranslationsZhTw {
 			'skills.addDialog.folderFilesMeta' => ({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '${count} 個檔案 · ${size}', other: '${count} 個檔案 · ${size}', ), 
 			'skills.addDialog.removeQueued' => ({required Object name}) => '移除 ${name}',
 			'skills.addDialog.whereWillThisInstall' => '這會安裝到哪裡？',
+			_ => null,
+		} ?? switch (path) {
 			'skills.addDialog.hideInstallLocation' => '隱藏安裝位置',
 			'skills.addDialog.folderUploadsNote' => '資料夾上傳會保留所選資料夾名稱；獨立檔案則使用 `SKILL.md` 中的 `name`。',
 			'skills.addDialog.installSkill' => '安裝技能',
 			'skills.addDialog.installSkills' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '安裝 ${count} 個技能', other: '安裝 ${count} 個技能', ), 
-			_ => null,
-		} ?? switch (path) {
 			'skills.moveDialog.toProjectHint' => '選擇應擁有此技能的專案。它會移出提供者的全域技能目錄。',
 			'skills.moveDialog.toGlobalHint' => '將此技能移至全域技能目錄，讓所有專案都能使用。',
 			'skills.moveDialog.moveToProject' => '移至專案',

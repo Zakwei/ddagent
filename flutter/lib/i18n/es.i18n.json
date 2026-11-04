@@ -3774,7 +3774,11 @@
     "nameExists": "Ya existe un archivo o carpeta {{name}} en esta ubicación.",
     "nameRequired": "Debe proporcionarse un nombre de archivo o carpeta.",
     "copyRelativePath": "Copiar ruta de acceso relativa",
-    "closeSearch": "Volver al explorador"
+    "closeSearch": "Volver al explorador",
+    "cut": "Cortar",
+    "copy": "Copiar",
+    "paste": "Pegar",
+    "moveConfirm": "¿Está seguro de que desea mover \"{{name}}\" a \"{{target}}\"?"
   },
   "git": {
     "checkpoints": {

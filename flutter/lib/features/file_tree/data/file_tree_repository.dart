@@ -99,6 +99,34 @@ class FileTreeRepository {
         (_) {},
       );
 
+  /// Moves [sourcePath] into [targetPath] (`''` = project root), keeping its
+  /// name. Returns the new absolute path.
+  Future<String> moveFile(
+    String projectId, {
+    required String sourcePath,
+    required String targetPath,
+  }) => apiCall(
+    () => _dio.put<dynamic>(
+      '/api/file-tree/projects/$projectId/files/move',
+      data: {'sourcePath': sourcePath, 'targetPath': targetPath},
+    ),
+    (d) => ((d as Map)['newPath'] ?? '').toString(),
+  );
+
+  /// Copies a file or folder into [targetPath]; on a name clash the server
+  /// picks `name copy.ext`. Returns the new absolute path.
+  Future<String> copyFile(
+    String projectId, {
+    required String sourcePath,
+    required String targetPath,
+  }) => apiCall(
+    () => _dio.post<dynamic>(
+      '/api/file-tree/projects/$projectId/files/copy',
+      data: {'sourcePath': sourcePath, 'targetPath': targetPath},
+    ),
+    (d) => ((d as Map)['newPath'] ?? '').toString(),
+  );
+
   /// Multipart upload — caller builds the FormData (files + paths).
   Future<Map<String, dynamic>> upload(String projectId, FormData formData) => apiCall(
     () => _dio.post<dynamic>(

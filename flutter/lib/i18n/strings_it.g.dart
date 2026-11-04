@@ -448,6 +448,10 @@ class Translations$fileTree$it extends Translations$fileTree$en {
 	@override String get nameRequired => 'È necessario specificare un nome di file o cartella.';
 	@override String get copyRelativePath => 'Copia percorso relativo';
 	@override String get closeSearch => 'Torna a Esplora risorse';
+	@override String get cut => 'Taglia';
+	@override String get copy => 'Copia';
+	@override String get paste => 'Incolla';
+	@override String moveConfirm({required Object name, required Object target}) => 'Spostare \'${name}\' in \'${target}\'?';
 }
 
 // Path: git
@@ -11517,6 +11521,10 @@ extension on TranslationsIt {
 			'fileTree.nameRequired' => 'È necessario specificare un nome di file o cartella.',
 			'fileTree.copyRelativePath' => 'Copia percorso relativo',
 			'fileTree.closeSearch' => 'Torna a Esplora risorse',
+			'fileTree.cut' => 'Taglia',
+			'fileTree.copy' => 'Copia',
+			'fileTree.paste' => 'Incolla',
+			'fileTree.moveConfirm' => ({required Object name, required Object target}) => 'Spostare \'${name}\' in \'${target}\'?',
 			'git.checkpoints.title' => 'Checkpoint',
 			'git.checkpoints.restoreTitle' => 'Ripristina checkpoint',
 			'git.checkpoints.restoreMessage' => 'Ripristinare l\'albero di lavoro a questo checkpoint? Le modifiche attuali verranno sostituite.',
@@ -11771,12 +11779,12 @@ extension on TranslationsIt {
 			'skills.addDialog.folderFilesMeta' => ({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('it'))(count, one: '${count} file · ${size}', other: '${count} file · ${size}', ), 
 			'skills.addDialog.removeQueued' => ({required Object name}) => 'Rimuovi ${name}',
 			'skills.addDialog.whereWillThisInstall' => 'Dove verrà installato?',
+			_ => null,
+		} ?? switch (path) {
 			'skills.addDialog.hideInstallLocation' => 'Nascondi posizione di installazione',
 			'skills.addDialog.folderUploadsNote' => 'I caricamenti delle cartelle mantengono il nome della cartella selezionata; i file singoli usano il `name` in `SKILL.md`.',
 			'skills.addDialog.installSkill' => 'Installa Skill',
 			'skills.addDialog.installSkills' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('it'))(count, one: 'Installa ${count} Skill', other: 'Installa ${count} Skill', ), 
-			_ => null,
-		} ?? switch (path) {
 			'skills.moveDialog.toProjectHint' => 'Scegli il progetto a cui assegnare questa skill. Verrà rimossa dalla cartella delle skill globali del provider.',
 			'skills.moveDialog.toGlobalHint' => 'Sposta questa skill nella cartella delle skill globali così ogni progetto può usarla.',
 			'skills.moveDialog.moveToProject' => 'Sposta nel progetto',

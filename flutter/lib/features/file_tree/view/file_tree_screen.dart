@@ -9,6 +9,7 @@ import 'package:ddagent_app/core/widgets/app_context_menu.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/core/widgets/subpage_header.dart';
+import 'package:ddagent_app/features/editor/state/editor_controller.dart';
 import 'package:ddagent_app/features/file_tree/data/explorer_rows.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_node.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_repository.dart';
@@ -344,11 +345,12 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
   }
 
   void _onEntryRenamed(String oldPath, String newPath) {
+    // Editor tabs (kept across tabs of the app) follow the file too.
+    ref.read(editorProvider.notifier).retarget(_projectId, oldPath, newPath);
     final open = _openNode?.path;
-    if (open == oldPath) {
-      _open(FileTreeNode(name: pathBasename(newPath), path: newPath, isDirectory: false));
-    } else if (open != null && open.startsWith('$oldPath${_sep(oldPath)}')) {
-      _closeFile();
+    if (open != null && (open == oldPath || open.startsWith('$oldPath${_sep(oldPath)}'))) {
+      final moved = newPath + open.substring(oldPath.length);
+      _open(FileTreeNode(name: pathBasename(moved), path: moved, isDirectory: false));
     }
   }
 

@@ -3814,7 +3814,11 @@
     "nameExists": "Plik lub folder {{name}} już istnieje w tej lokalizacji.",
     "nameRequired": "Należy podać nazwę pliku lub folderu.",
     "copyRelativePath": "Kopiuj ścieżkę względną",
-    "closeSearch": "Wróć do eksploratora"
+    "closeSearch": "Wróć do eksploratora",
+    "cut": "Wytnij",
+    "copy": "Kopiuj",
+    "paste": "Wklej",
+    "moveConfirm": "Czy na pewno chcesz przenieść „{{name}}” do „{{target}}”?"
   },
   "git": {
     "checkpoints": {

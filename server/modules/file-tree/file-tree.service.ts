@@ -155,6 +155,23 @@ function resolvePathInsideProject(projectRoot: string, targetPath: string): stri
   return resolvedPath;
 }
 
+/**
+ * VS Code style name for a pasted copy: `a.ts` → `a copy.ts`, then
+ * `a copy 2.ts`, `a copy 3.ts`… Folders and dotfiles keep the whole name as
+ * the stem. `attempt` 1 is the first ` copy` variant.
+ */
+function copyNameCandidate(name: string, isDirectory: boolean, attempt: number): string {
+  const extension = isDirectory ? '' : path.extname(name);
+  const stem = extension ? name.slice(0, -extension.length) : name;
+  const suffix = attempt === 1 ? ' copy' : ` copy ${attempt}`;
+  return `${stem}${suffix}${extension}`;
+}
+
+/** True when `candidatePath` is `ancestorPath` itself or lies below it. */
+function isSameOrInside(candidatePath: string, ancestorPath: string): boolean {
+  return candidatePath === ancestorPath || candidatePath.startsWith(ancestorPath + path.sep);
+}
+
 function expandWorkspacePath(workspaceRoot: string, inputPath: string): string {
   if (inputPath === '~') {
     return workspaceRoot;
@@ -289,6 +306,54 @@ export function createFileTreeService(dependencies: FileTreeServiceDependencies)
     }
 
     return resolvedPath;
+  }
+
+  async function pathExists(candidatePath: string): Promise<boolean> {
+    try {
+      await fileSystem.access(candidatePath);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Resolves the source of a move/copy: it must exist inside the project and
+   * must not be the project root itself.
+   */
+  async function resolveTransferSource(projectRoot: string, sourcePath: string) {
+    const resolvedSource = await resolveRealPathInsideProject(projectRoot, sourcePath);
+    if (resolvedSource === path.resolve(projectRoot)) {
+      throw createFileTreeError('Cannot move or copy the project root', 403, 'PROJECT_ROOT_TRANSFER_FORBIDDEN');
+    }
+    try {
+      return { resolvedSource, stats: await fileSystem.stat(resolvedSource) };
+    } catch {
+      throw createFileTreeError('File or directory not found', 404, 'FILE_TREE_ENTRY_NOT_FOUND');
+    }
+  }
+
+  /**
+   * Resolves the destination folder of a move/copy. An empty value, `.` or
+   * the project root path itself all mean the project root (the lexical
+   * containment check only accepts paths strictly below the root).
+   */
+  async function resolveTransferTarget(projectRoot: string, targetDirectory: string): Promise<string> {
+    const rootPath = path.resolve(projectRoot);
+    const resolvedTarget = !targetDirectory || targetDirectory === '.' || targetDirectory === './'
+      || path.resolve(targetDirectory) === rootPath
+      ? rootPath
+      : await resolveRealPathInsideProject(projectRoot, targetDirectory);
+    let stats;
+    try {
+      stats = await fileSystem.stat(resolvedTarget);
+    } catch {
+      throw createFileTreeError('Target directory not found', 404, 'TARGET_DIRECTORY_NOT_FOUND');
+    }
+    if (!stats.isDirectory()) {
+      throw createFileTreeError('Target is not a directory', 400, 'NOT_A_DIRECTORY');
+    }
+    return resolvedTarget;
   }
 
   /**
@@ -802,6 +867,99 @@ export function createFileTreeService(dependencies: FileTreeServiceDependencies)
         newPath: resolvedNewPath,
         newName: input.newName,
         message: 'Renamed successfully',
+      };
+    },
+
+    async moveEntry(input) {
+      const projectRoot = await resolveProjectRoot(input.projectId);
+      const { resolvedSource } = await resolveTransferSource(projectRoot, input.sourcePath);
+      const resolvedTarget = await resolveTransferTarget(projectRoot, input.targetDirectory);
+      if (isSameOrInside(resolvedTarget, resolvedSource)) {
+        throw createFileTreeError('Cannot move a folder into itself', 400, 'FILE_TREE_MOVE_INTO_SELF');
+      }
+
+      const destinationPath = path.join(resolvedTarget, path.basename(resolvedSource));
+      if (destinationPath === resolvedSource) {
+        // Dropped onto its own folder: nothing to do.
+        return {
+          success: true,
+          oldPath: resolvedSource,
+          newPath: destinationPath,
+          message: 'Already in the target folder',
+        };
+      }
+      await resolveRealPathInsideProject(projectRoot, destinationPath);
+      if (await pathExists(destinationPath)) {
+        throw createFileTreeError(
+          'A file or directory with this name already exists in the target folder',
+          409,
+          'FILE_TREE_ENTRY_EXISTS',
+        );
+      }
+
+      try {
+        await fileSystem.rename(resolvedSource, destinationPath);
+      } catch (error) {
+        mapFileSystemError(error, {
+          EACCES: { message: 'Permission denied', statusCode: 403 },
+          ENOENT: { message: 'File or directory not found', statusCode: 404 },
+          EINVAL: { message: 'Cannot move a folder into itself', statusCode: 400 },
+          EXDEV: { message: 'Cannot move across different filesystems', statusCode: 400 },
+        });
+      }
+
+      return {
+        success: true,
+        oldPath: resolvedSource,
+        newPath: destinationPath,
+        message: 'Moved successfully',
+      };
+    },
+
+    async copyEntry(input) {
+      const projectRoot = await resolveProjectRoot(input.projectId);
+      const { resolvedSource, stats } = await resolveTransferSource(projectRoot, input.sourcePath);
+      const resolvedTarget = await resolveTransferTarget(projectRoot, input.targetDirectory);
+      const isDirectory = stats.isDirectory();
+      if (isDirectory && isSameOrInside(resolvedTarget, resolvedSource)) {
+        throw createFileTreeError('Cannot copy a folder into itself', 400, 'FILE_TREE_COPY_INTO_SELF');
+      }
+
+      const sourceName = path.basename(resolvedSource);
+      let destinationPath = path.join(resolvedTarget, sourceName);
+      // Bounded so a folder full of copies cannot spin forever.
+      for (let attempt = 1; await pathExists(destinationPath); attempt += 1) {
+        if (attempt > 1000) {
+          throw createFileTreeError('Too many copies with this name', 409, 'FILE_TREE_ENTRY_EXISTS');
+        }
+        destinationPath = path.join(resolvedTarget, copyNameCandidate(sourceName, isDirectory, attempt));
+      }
+      await resolveRealPathInsideProject(projectRoot, destinationPath);
+
+      try {
+        if (isDirectory) {
+          await fileSystem.copyDirectory(resolvedSource, destinationPath);
+        } else {
+          await fileSystem.copyFile(resolvedSource, destinationPath);
+        }
+      } catch (error) {
+        mapFileSystemError(error, {
+          EACCES: { message: 'Permission denied', statusCode: 403 },
+          ENOENT: { message: 'File or directory not found', statusCode: 404 },
+          ENOSPC: { message: 'Not enough disk space', statusCode: 507 },
+          ERR_FS_CP_EINVAL: { message: 'Cannot copy a folder into itself', statusCode: 400 },
+          ERR_FS_CP_EEXIST: {
+            message: 'A file or directory with this name already exists in the target folder',
+            statusCode: 409,
+          },
+        });
+      }
+
+      return {
+        success: true,
+        sourcePath: resolvedSource,
+        newPath: destinationPath,
+        message: 'Copied successfully',
       };
     },
 

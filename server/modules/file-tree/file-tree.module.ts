@@ -53,6 +53,14 @@ const fileTreeFileSystem: FileTreeFileSystem = {
   },
   unlink: (filePath) => fsPromises.unlink(filePath),
   copyFile: (sourcePath, destinationPath) => fsPromises.copyFile(sourcePath, destinationPath),
+  copyDirectory: (sourcePath, destinationPath) =>
+    fsPromises.cp(sourcePath, destinationPath, {
+      recursive: true,
+      force: false,
+      errorOnExist: true,
+      // Keep symlinks as links instead of copying what they point to.
+      verbatimSymlinks: true,
+    }),
   createReadStream: (filePath) => fs.createReadStream(filePath),
 };
 

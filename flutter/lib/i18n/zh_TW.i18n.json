@@ -3763,7 +3763,11 @@
     "nameExists": "此位置已存在檔案或資料夾 {{name}}。",
     "nameRequired": "必須提供檔案或資料夾名稱。",
     "copyRelativePath": "複製相對路徑",
-    "closeSearch": "返回檔案總管"
+    "closeSearch": "返回檔案總管",
+    "cut": "剪下",
+    "copy": "複製",
+    "paste": "貼上",
+    "moveConfirm": "確定要將 '{{name}}' 移至 '{{target}}' 嗎?"
   },
   "git": {
     "checkpoints": {

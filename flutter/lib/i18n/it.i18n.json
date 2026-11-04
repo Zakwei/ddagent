@@ -3774,7 +3774,11 @@
     "nameExists": "In questo percorso esiste già un file o una cartella {{name}}.",
     "nameRequired": "È necessario specificare un nome di file o cartella.",
     "copyRelativePath": "Copia percorso relativo",
-    "closeSearch": "Torna a Esplora risorse"
+    "closeSearch": "Torna a Esplora risorse",
+    "cut": "Taglia",
+    "copy": "Copia",
+    "paste": "Incolla",
+    "moveConfirm": "Spostare '{{name}}' in '{{target}}'?"
   },
   "git": {
     "checkpoints": {

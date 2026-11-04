@@ -448,6 +448,10 @@ class Translations$fileTree$tr extends Translations$fileTree$en {
 	@override String get nameRequired => 'Bir dosya veya klasör adı sağlanmalıdır.';
 	@override String get copyRelativePath => 'Göreli Yolu Kopyala';
 	@override String get closeSearch => 'Gezgine dön';
+	@override String get cut => 'Kes';
+	@override String get copy => 'Kopyala';
+	@override String get paste => 'Yapıştır';
+	@override String moveConfirm({required Object name, required Object target}) => '\'${name}\' öğesini \'${target}\' içine taşımak istediğinizden emin misiniz?';
 }
 
 // Path: git
@@ -11512,6 +11516,10 @@ extension on TranslationsTr {
 			'fileTree.nameRequired' => 'Bir dosya veya klasör adı sağlanmalıdır.',
 			'fileTree.copyRelativePath' => 'Göreli Yolu Kopyala',
 			'fileTree.closeSearch' => 'Gezgine dön',
+			'fileTree.cut' => 'Kes',
+			'fileTree.copy' => 'Kopyala',
+			'fileTree.paste' => 'Yapıştır',
+			'fileTree.moveConfirm' => ({required Object name, required Object target}) => '\'${name}\' öğesini \'${target}\' içine taşımak istediğinizden emin misiniz?',
 			'git.checkpoints.title' => 'Kontrol Noktaları',
 			'git.checkpoints.restoreTitle' => 'Kontrol noktasını geri yükle',
 			'git.checkpoints.restoreMessage' => 'Çalışma ağacı bu kontrol noktasına sıfırlansın mı? Mevcut değişiklikler değiştirilecek.',
@@ -11766,12 +11774,12 @@ extension on TranslationsTr {
 			'skills.addDialog.folderFilesMeta' => ({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('tr'))(count, one: '${count} dosya · ${size}', other: '${count} dosya · ${size}', ), 
 			'skills.addDialog.removeQueued' => ({required Object name}) => '${name} öğesini kaldır',
 			'skills.addDialog.whereWillThisInstall' => 'Nereye kurulacak?',
+			_ => null,
+		} ?? switch (path) {
 			'skills.addDialog.hideInstallLocation' => 'Kurulum konumunu gizle',
 			'skills.addDialog.folderUploadsNote' => 'Klasör yüklemeleri seçilen klasör adını korur; tek başına dosyalar `SKILL.md` içindeki `name` değerini kullanır.',
 			'skills.addDialog.installSkill' => 'Beceri Kur',
 			'skills.addDialog.installSkills' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('tr'))(count, one: '${count} Beceri Kur', other: '${count} Beceri Kur', ), 
-			_ => null,
-		} ?? switch (path) {
 			'skills.moveDialog.toProjectHint' => 'Bu beceriye sahip olacak projeyi seçin. Beceri, sağlayıcının genel beceriler dizininden taşınır.',
 			'skills.moveDialog.toGlobalHint' => 'Bu beceriyi, her projenin kullanabilmesi için genel beceriler dizinine taşıyın.',
 			'skills.moveDialog.moveToProject' => 'Projeye taşı',

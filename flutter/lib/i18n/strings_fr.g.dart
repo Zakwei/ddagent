@@ -448,6 +448,10 @@ class Translations$fileTree$fr extends Translations$fileTree$en {
 	@override String get nameRequired => 'Vous devez fournir un nom de fichier ou de dossier.';
 	@override String get copyRelativePath => 'Copier le chemin relatif';
 	@override String get closeSearch => 'Retour à l\'explorateur';
+	@override String get cut => 'Couper';
+	@override String get copy => 'Copier';
+	@override String get paste => 'Coller';
+	@override String moveConfirm({required Object name, required Object target}) => 'Voulez-vous vraiment déplacer \'${name}\' dans \'${target}\' ?';
 }
 
 // Path: git
@@ -11517,6 +11521,10 @@ extension on TranslationsFr {
 			'fileTree.nameRequired' => 'Vous devez fournir un nom de fichier ou de dossier.',
 			'fileTree.copyRelativePath' => 'Copier le chemin relatif',
 			'fileTree.closeSearch' => 'Retour à l\'explorateur',
+			'fileTree.cut' => 'Couper',
+			'fileTree.copy' => 'Copier',
+			'fileTree.paste' => 'Coller',
+			'fileTree.moveConfirm' => ({required Object name, required Object target}) => 'Voulez-vous vraiment déplacer \'${name}\' dans \'${target}\' ?',
 			'git.checkpoints.title' => 'Checkpoints',
 			'git.checkpoints.restoreTitle' => 'Restaurer le checkpoint',
 			'git.checkpoints.restoreMessage' => 'Réinitialiser l’arbre de travail sur ce checkpoint ? Les modifications actuelles seront remplacées.',
@@ -11771,12 +11779,12 @@ extension on TranslationsFr {
 			'skills.addDialog.folderFilesMeta' => ({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('fr'))(count, one: '${count} fichier · ${size}', other: '${count} fichiers · ${size}', ), 
 			'skills.addDialog.removeQueued' => ({required Object name}) => 'Retirer ${name}',
 			'skills.addDialog.whereWillThisInstall' => 'Où cela sera-t-il installé ?',
+			_ => null,
+		} ?? switch (path) {
 			'skills.addDialog.hideInstallLocation' => 'Masquer l’emplacement d’installation',
 			'skills.addDialog.folderUploadsNote' => 'Les téléversements de dossiers conservent le nom du dossier sélectionné ; les fichiers isolés utilisent le `name` de `SKILL.md`.',
 			'skills.addDialog.installSkill' => 'Installer la compétence',
 			'skills.addDialog.installSkills' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('fr'))(count, one: 'Installer ${count} compétence', other: 'Installer ${count} compétences', ), 
-			_ => null,
-		} ?? switch (path) {
 			'skills.moveDialog.toProjectHint' => 'Choisissez le projet auquel cette compétence doit appartenir. Elle quitte le répertoire de compétences global du fournisseur.',
 			'skills.moveDialog.toGlobalHint' => 'Déplacez cette compétence dans le répertoire de compétences global pour que tous les projets puissent l’utiliser.',
 			'skills.moveDialog.moveToProject' => 'Déplacer vers le projet',

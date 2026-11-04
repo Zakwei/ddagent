@@ -3774,7 +3774,11 @@
     "nameExists": "Un fichier ou dossier {{name}} existe déjà à cet emplacement.",
     "nameRequired": "Vous devez fournir un nom de fichier ou de dossier.",
     "copyRelativePath": "Copier le chemin relatif",
-    "closeSearch": "Retour à l'explorateur"
+    "closeSearch": "Retour à l'explorateur",
+    "cut": "Couper",
+    "copy": "Copier",
+    "paste": "Coller",
+    "moveConfirm": "Voulez-vous vraiment déplacer '{{name}}' dans '{{target}}' ?"
   },
   "git": {
     "checkpoints": {

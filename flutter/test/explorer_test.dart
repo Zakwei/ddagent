@@ -1,4 +1,6 @@
 import 'package:ddagent_app/core/theme/app_theme.dart';
+import 'package:ddagent_app/core/widgets/app_button.dart';
+import 'package:ddagent_app/features/editor/state/editor_controller.dart';
 import 'package:ddagent_app/features/file_tree/data/explorer_rows.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_node.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_repository.dart';
@@ -62,6 +64,31 @@ class _FakeFiles extends FileTreeRepository {
   final creates = <String>[];
   final renames = <String>[];
   final searches = <String>[];
+  final moves = <String>[];
+  final copies = <String>[];
+
+  String _into(String target, String source) =>
+      '${target.isEmpty ? '/proj' : target}/${source.split('/').last}';
+
+  @override
+  Future<String> moveFile(
+    String projectId, {
+    required String sourcePath,
+    required String targetPath,
+  }) async {
+    moves.add('$sourcePath->$targetPath');
+    return _into(targetPath, sourcePath);
+  }
+
+  @override
+  Future<String> copyFile(
+    String projectId, {
+    required String sourcePath,
+    required String targetPath,
+  }) async {
+    copies.add('$sourcePath->$targetPath');
+    return _into(targetPath, sourcePath);
+  }
 
   @override
   Future<FileSearchResult> search(String projectId, String query, {int? limit}) async {
@@ -312,6 +339,72 @@ void main() {
       expect(opened, ['/proj/lib/util.dart']);
     });
 
+    Future<void> pressWithControl(WidgetTester tester, LogicalKeyboardKey key) async {
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+      await tester.sendKeyEvent(key);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('Ctrl+X then Ctrl+V on a folder moves the entry once', (tester) async {
+      await pump(tester);
+      await tester.tap(find.text('README.md'));
+      await tester.pumpAndSettle();
+      await pressWithControl(tester, LogicalKeyboardKey.keyX);
+      await tester.tap(find.text('lib'));
+      await tester.pumpAndSettle();
+      await pressWithControl(tester, LogicalKeyboardKey.keyV);
+      await pressWithControl(tester, LogicalKeyboardKey.keyV); // clipboard is spent
+      expect(files.moves, ['/proj/README.md->/proj/lib']);
+    });
+
+    testWidgets('Ctrl+C then Ctrl+V on a root file copies into the root', (tester) async {
+      await pump(tester);
+      await tester.tap(find.text('lib'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('main.dart'));
+      await tester.pumpAndSettle();
+      await pressWithControl(tester, LogicalKeyboardKey.keyC);
+      await tester.tap(find.text('README.md'));
+      await tester.pumpAndSettle();
+      await pressWithControl(tester, LogicalKeyboardKey.keyV);
+      expect(files.copies, ['/proj/lib/main.dart->']);
+      expect(files.moves, isEmpty);
+    });
+
+    Future<void> dragOnto(WidgetTester tester, String from, String to) async {
+      final g = await tester.startGesture(
+        tester.getCenter(find.text(from)),
+        kind: PointerDeviceKind.mouse,
+      );
+      final target = tester.getCenter(find.text(to));
+      final start = tester.getCenter(find.text(from));
+      for (var i = 1; i <= 10; i++) {
+        await g.moveTo(Offset.lerp(start, target, i / 10)!);
+        await tester.pump(const Duration(milliseconds: 16));
+      }
+      await g.up();
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('dragging a file onto a folder moves it after confirmation', (tester) async {
+      await pump(tester);
+      await dragOnto(tester, 'README.md', 'lib');
+      expect(files.moves, isEmpty, reason: 'VS Code asks before a drag-and-drop move');
+      await tester.tap(find.widgetWithText(AppButton, t.common.fileOperations.move));
+      await tester.pumpAndSettle();
+      expect(files.moves, ['/proj/README.md->/proj/lib']);
+    });
+
+    testWidgets('a folder cannot be dropped into itself', (tester) async {
+      await pump(tester);
+      await tester.tap(find.text('lib'));
+      await tester.pumpAndSettle();
+      await dragOnto(tester, 'lib', 'main.dart');
+      expect(find.byType(AppButton), findsNothing);
+      expect(files.moves, isEmpty);
+    });
+
     testWidgets('git status colours rows with VS Code badges', (tester) async {
       await pump(
         tester,
@@ -386,5 +479,24 @@ void main() {
       expect(find.text(t.common.fileTree.context.rename), findsOneWidget);
       expect(find.text(t.common.fileTree.context.newFolder), findsNothing);
     });
+  });
+
+  test('editor tabs follow a moved folder and keep their buffers', () async {
+    final container = ProviderContainer(
+      overrides: [fileTreeRepositoryProvider.overrideWithValue(_FakeFiles())],
+    );
+    addTearDown(container.dispose);
+    final editor = container.read(editorProvider.notifier);
+    await editor.open('p1', '/proj/lib/src/a.dart', load: false);
+    await editor.open('p1', '/proj/README.md', load: false);
+    editor.activate(EditorController.tabId('p1', '/proj/lib/src/a.dart'));
+    editor.updateContent(EditorController.tabId('p1', '/proj/lib/src/a.dart'), 'edited');
+
+    editor.retarget('p1', '/proj/lib', '/proj/pkg/lib');
+
+    final state = container.read(editorProvider);
+    expect(state.tabs.map((t) => t.path), ['/proj/pkg/lib/src/a.dart', '/proj/README.md']);
+    expect(state.active!.path, '/proj/pkg/lib/src/a.dart');
+    expect(state.active!.content, 'edited');
   });
 }
