@@ -178,6 +178,79 @@ void main() {
     expect(identical(tester.state(find.byKey(const ValueKey('body-pane-0'))), before), isTrue);
   });
 
+  Widget desktopGrid({
+    String? maximizedPaneId,
+    void Function(String)? onClose,
+    void Function(String)? onMaximize,
+  }) => TranslationProvider(
+    child: MaterialApp(
+      theme: AppTheme.light(),
+      home: Scaffold(
+        body: SplitWorkspaceGrid(
+          panes: const [
+            SplitPane(id: 'pane-0', kind: PaneKind.terminal),
+            SplitPane(id: 'pane-1', kind: PaneKind.terminal),
+          ],
+          maximizedPaneId: maximizedPaneId,
+          paneTitle: (pane) => pane.id,
+          onClosePane: onClose ?? (_) {},
+          onToggleMaximizePane: onMaximize ?? (_) {},
+          onLayoutChanged: (_) {},
+          renderPane: (pane, _) => _Body(key: ValueKey('body-${pane.id}')),
+        ),
+      ),
+    ),
+  );
+
+  void desktopView(WidgetTester tester) {
+    tester.view.physicalSize = const Size(1200, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+  }
+
+  testWidgets('header buttons still click although the header is draggable', (tester) async {
+    desktopView(tester);
+    final closed = <String>[];
+    final maximized = <String>[];
+    await tester.pumpWidget(desktopGrid(onClose: closed.add, onMaximize: maximized.add));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip(t.workspace.closePane).first);
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.tap(find.byTooltip(t.workspace.maximizePane).last);
+    await tester.pumpAndSettle();
+    expect(closed, ['pane-0']);
+    expect(maximized, ['pane-1']);
+  });
+
+  testWidgets('double-clicking a header maximizes; a single click does not', (tester) async {
+    desktopView(tester);
+    final maximized = <String>[];
+    await tester.pumpWidget(desktopGrid(onMaximize: maximized.add));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('pane-0'));
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(maximized, isEmpty);
+    await tester.tap(find.text('pane-0'));
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.tap(find.text('pane-0'));
+    await tester.pumpAndSettle();
+    expect(maximized, ['pane-0']);
+  });
+
+  testWidgets('maximize and restore keep every pane body alive', (tester) async {
+    desktopView(tester);
+    await tester.pumpWidget(desktopGrid());
+    await tester.pumpAndSettle();
+    final s0 = tester.state(find.byKey(const ValueKey('body-pane-0')));
+    final s1 = tester.state(find.byKey(const ValueKey('body-pane-1')));
+    await tester.pumpWidget(desktopGrid(maximizedPaneId: 'pane-1'));
+    await tester.pumpAndSettle();
+    await tester.pumpWidget(desktopGrid());
+    await tester.pumpAndSettle();
+    expect(identical(tester.state(find.byKey(const ValueKey('body-pane-0'))), s0), isTrue);
+    expect(identical(tester.state(find.byKey(const ValueKey('body-pane-1'))), s1), isTrue);
+  });
+
   test('drop zones: nearest edge within 30%, else centre', () {
     expect(paneDropZoneAt(0.1, 0.5), PaneDropZone.left);
     expect(paneDropZoneAt(0.9, 0.5), PaneDropZone.right);

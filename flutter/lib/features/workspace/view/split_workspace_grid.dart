@@ -166,9 +166,12 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
         final row = node.axis == PaneAxis.row;
         return LayoutBuilder(
           builder: (context, box) {
-            final extent =
-                (row ? box.maxWidth : box.maxHeight) - _sashExtent * (node.children.length - 1);
             final sum = node.weights.fold<int>(0, (a, b) => a + b);
+            final bounded = row ? box.hasBoundedWidth : box.hasBoundedHeight;
+            // Unbounded (never inside the workspace): the plain weights as flex.
+            final extent = bounded
+                ? (row ? box.maxWidth : box.maxHeight) - _sashExtent * (node.children.length - 1)
+                : sum.toDouble();
             final px =
                 _liveWeights[key] ??
                 [for (final w in node.weights) extent * w / (sum <= 0 ? 1 : sum)];
