@@ -4350,7 +4350,9 @@
     "exportPdf": "PDF（列印至檔案）",
     "matchPosition": "{{current}} / {{total}}",
     "launcherDescription": "為此窗格選擇一個工作區，或建立新的工作區。",
-    "createWorkspace": "建立工作區"
+    "createWorkspace": "建立工作區",
+    "resetLayout": "重設版面配置",
+    "dragPaneHint": "將標題列拖曳到另一個窗格：拖到邊緣會在該處分割，拖到中間會交換兩者。按兩下可最大化。"
   },
   "worktrees": {
     "scripts": "指令碼",

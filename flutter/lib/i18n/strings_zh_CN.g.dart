@@ -761,6 +761,8 @@ class Translations$workspace$zh_CN extends Translations$workspace$en {
 	@override String matchPosition({required Object current, required Object total}) => '${current} / ${total}';
 	@override String get launcherDescription => '为此窗格选择一个工作区，或新建一个。';
 	@override String get createWorkspace => '创建工作区';
+	@override String get resetLayout => '重置布局';
+	@override String get dragPaneHint => '将标题栏拖到另一个窗格：拖到边缘会在该处拆分，拖到中间会交换两者。双击可最大化。';
 }
 
 // Path: worktrees
@@ -11926,6 +11928,8 @@ extension on TranslationsZhCn {
 			'workspace.matchPosition' => ({required Object current, required Object total}) => '${current} / ${total}',
 			'workspace.launcherDescription' => '为此窗格选择一个工作区，或新建一个。',
 			'workspace.createWorkspace' => '创建工作区',
+			'workspace.resetLayout' => '重置布局',
+			'workspace.dragPaneHint' => '将标题栏拖到另一个窗格：拖到边缘会在该处拆分，拖到中间会交换两者。双击可最大化。',
 			'worktrees.scripts' => '脚本',
 			'worktrees.emptyTitle' => '未找到 worktree',
 			'worktrees.emptyDescription' => '创建 worktree 以隔离功能开发或代理运行。',

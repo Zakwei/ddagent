@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:ddagent_app/core/network/api_providers.dart';
+import 'package:ddagent_app/features/workspace/state/pane_layout.dart';
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
 import 'package:ddagent_app/features/workspace/state/workspace_controller.dart';
+import 'package:ddagent_app/features/workspace/state/workspace_sync.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
@@ -148,7 +152,7 @@ void main() {
       expect(p.projectId, 'proj-1');
     });
 
-    test('reorderPanes moves a pane to the target index', () {
+    test('without a layout panes keep the automatic grid; a set layout reorders them', () {
       final c = _container();
       addTearDown(c.dispose);
       final n = c.read(workspaceProvider.notifier);
@@ -156,8 +160,84 @@ void main() {
       n.openPane(PaneKind.browser);
       n.openPane(PaneKind.terminal);
       final ids = [for (final p in c.read(workspaceProvider).panes) p.id];
-      n.reorderPanes(ids[2], 0);
+      expect(c.read(workspaceProvider).layout, isNull);
+      expect(n.isLayoutCustomized, isFalse);
+
+      n.setLayout(movePaneInLayout(autoPaneLayout(ids), ids[2], ids[0], PaneDropZone.left));
       expect(c.read(workspaceProvider).panes.map((p) => p.id), [ids[2], ids[0], ids[1]]);
+      // Docking halves the target's share, like VS Code.
+      final weights = (c.read(workspaceProvider).layout! as PaneSplit).weights;
+      expect(weights[0], closeTo(250, 1));
+      expect(weights[2], closeTo(500, 1));
+      expect(n.isLayoutCustomized, isTrue);
+
+      n.resetLayout();
+      expect(n.isLayoutCustomized, isFalse);
+      expect(c.read(workspaceProvider).layout, isNotNull, reason: 'a reset is synced as a tree');
+    });
+
+    test('with a layout a new pane splits the focused one; closing gives its space back', () {
+      final c = _container();
+      addTearDown(c.dispose);
+      final n = c.read(workspaceProvider.notifier);
+      final a = n.openPane(PaneKind.terminal)!;
+      final b = n.openPane(PaneKind.terminal)!;
+      n.setLayout(movePaneInLayout(autoPaneLayout([a, b]), b, a, PaneDropZone.bottom));
+      n.setActivePaneId(a);
+      final added = n.openPane(PaneKind.editor)!;
+      expect(c.read(workspaceProvider).layout!.toJson(), {
+        'axis': 'column',
+        'children': [
+          {
+            'axis': 'row',
+            'children': [
+              {'pane': a},
+              {'pane': added},
+            ],
+            'weights': [500, 500],
+          },
+          {'pane': b},
+        ],
+        'weights': [500, 500],
+      });
+      n.removePane(added);
+      expect(c.read(workspaceProvider).layout!.toJson(), {
+        'axis': 'column',
+        'children': [
+          {'pane': a},
+          {'pane': b},
+        ],
+        'weights': [500, 500],
+      });
+    });
+
+    test('layout survives sanitize round-trips byte for byte', () {
+      final layout = setLayoutWeights(
+        movePaneInLayout(autoPaneLayout(['a', 'b', 'c']), 'c', 'a', PaneDropZone.bottom),
+        const [],
+        [333.3, 666.7],
+      );
+      final state = WorkspaceState(
+        panes: [
+          for (final id in layoutLeafOrder(layout)) SplitPane(id: id, kind: PaneKind.terminal),
+        ],
+        layout: layout,
+        activePaneId: 'a',
+      );
+      final once = WorkspaceState.sanitize(jsonDecode(jsonEncode(state.toJson())) as Map);
+      expect(jsonEncode(once.toJson()), jsonEncode(state.toJson()));
+    });
+
+    test('a remote state without a layout keeps the local arrangement', () {
+      final layout = movePaneInLayout(autoPaneLayout(['a', 'b']), 'b', 'a', PaneDropZone.top);
+      final panes = [
+        for (final id in ['b', 'a']) SplitPane(id: id, kind: PaneKind.terminal),
+      ];
+      final local = WorkspaceState(panes: panes, layout: layout);
+      final remote = WorkspaceState(panes: [...panes.reversed]); // an older client
+      final merged = mergeWorkspace(base: local, local: local, remote: remote);
+      expect(jsonEncode(merged.layout!.toJson()), jsonEncode(layout!.toJson()));
+      expect(merged.panes.map((p) => p.id), ['b', 'a']);
     });
 
     test('toggleMaximize flips; removing the pane clears it', () {

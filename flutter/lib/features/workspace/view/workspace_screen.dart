@@ -175,7 +175,8 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
               activePaneId: ws.activePaneId,
               onActivatePane: ctrl.setActivePaneId,
               onClosePane: ctrl.removePane,
-              onReorderPanes: ctrl.reorderPanes,
+              layout: ws.layout,
+              onLayoutChanged: ctrl.setLayout,
               maximizedPaneId: ws.maximizedPaneId,
               onToggleMaximizePane: ctrl.toggleMaximize,
               finishedPaneIds: bellHosts,
@@ -234,6 +235,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
       padding: EdgeInsets.zero,
       constraints: BoxConstraints.tightFor(width: m.hit, height: m.hit),
     );
+    final ws = ref.watch(workspaceProvider);
     final buttons = <Widget>[
       const AppNavMenuButton(),
       btn(
@@ -275,6 +277,14 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
       // Compact overflows the 40px targets, so the row scrolls instead of
       // clamping; the Spacer only makes sense on the non-scrolling row.
       if (!compact) const Spacer(),
+      if (!compact && ws.panes.length > 1)
+        btn(
+          LucideIcons.layoutDashboard,
+          i18n.workspace.resetLayout,
+          ref.read(workspaceProvider.notifier).isLayoutCustomized
+              ? () => ref.read(workspaceProvider.notifier).resetLayout()
+              : null,
+        ),
       btn(
         LucideIcons.layoutGrid,
         i18n.chat.splitWorkspace.overview,

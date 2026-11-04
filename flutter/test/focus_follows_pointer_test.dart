@@ -92,7 +92,6 @@ void main() {
             ],
             activePaneId: 'term',
             onClosePane: (_) {},
-            onReorderPanes: (_, _) {},
             renderPane: (pane, _) => pane.id == 'git'
                 ? field ?? const SizedBox()
                 : TerminalViewWrapper(tab: makeTab(), autofocus: false),

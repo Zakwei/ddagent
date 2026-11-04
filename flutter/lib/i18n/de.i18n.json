@@ -4361,7 +4361,9 @@
     "exportPdf": "PDF (In Datei drucken)",
     "matchPosition": "{{current}} von {{total}}",
     "launcherDescription": "Wähle einen Arbeitsbereich für diesen Bereich oder erstelle einen neuen.",
-    "createWorkspace": "Arbeitsbereich erstellen"
+    "createWorkspace": "Arbeitsbereich erstellen",
+    "resetLayout": "Layout zurücksetzen",
+    "dragPaneHint": "Ziehen Sie die Kopfzeile auf einen anderen Bereich: Ein Rand teilt ihn, die Mitte tauscht beide. Doppelklick maximiert."
   },
   "worktrees": {
     "scripts": "Skripte",

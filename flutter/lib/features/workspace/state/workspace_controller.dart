@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:ddagent_app/core/network/api_providers.dart';
 import 'package:ddagent_app/core/realtime/chat_channel.dart';
 import 'package:ddagent_app/core/realtime/realtime_providers.dart';
 import 'package:ddagent_app/core/realtime/ws_client.dart';
+import 'package:ddagent_app/features/workspace/state/pane_layout.dart';
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
 import 'package:ddagent_app/features/workspace/state/workspace_sync.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -95,6 +97,12 @@ class WorkspaceController extends Notifier<WorkspaceState> {
   /// Remote workspace from another device — sanitized upstream by the sync
   /// controller; only the transient maximize flag needs a local cleanup.
   void _applyRemote(WorkspaceState next) {
+    // A state without a layout (written by a client that predates layouts)
+    // keeps this device's arrangement instead of falling back to the grid.
+    if (next.layout == null && state.layout != null) {
+      final layout = reconcileLayout(state.layout, [for (final p in next.panes) p.id]);
+      next = next.copyWith(layout: () => layout, panes: sortPanesByLayout(next.panes, layout));
+    }
     _set(
       next.copyWith(
         maximizedPaneId: () => cleanupMaximizedPaneId(state.maximizedPaneId, next.panes),
@@ -139,7 +147,20 @@ class WorkspaceController extends Notifier<WorkspaceState> {
       filePath: filePath,
       device: device,
     );
-    _set(state.copyWith(panes: addSplitPane(state.panes, pane), activePaneId: () => pane.id));
+    // A user-arranged layout splits the focused pane to the right (VS Code
+    // "Split Editor"); the automatic grid just appends.
+    final layout = state.layout;
+    final target = state.activePaneId ?? layoutLeafOrder(layout).lastOrNull;
+    final nextLayout = layout == null || target == null
+        ? layout
+        : insertPaneIntoLayout(layout, pane.id, target, PaneDropZone.right);
+    _set(
+      state.copyWith(
+        panes: sortPanesByLayout(addSplitPane(state.panes, pane), nextLayout),
+        layout: () => nextLayout,
+        activePaneId: () => pane.id,
+      ),
+    );
     return pane.id;
   }
 
@@ -154,6 +175,7 @@ class WorkspaceController extends Notifier<WorkspaceState> {
     _set(
       state.copyWith(
         panes: next,
+        layout: () => removePaneFromLayout(state.layout, id),
         activePaneId: () => active,
         terminals: WorkspaceState.terminalHostsFor(state.terminals, next),
         maximizedPaneId: () => cleanupMaximizedPaneId(state.maximizedPaneId, next),
@@ -264,8 +286,23 @@ class WorkspaceController extends Notifier<WorkspaceState> {
     if (maximized != null && maximized != host) toggleMaximize(maximized);
   }
 
-  void reorderPanes(String fromId, int toIndex) {
-    _set(state.copyWith(panes: reorderSplitPanes(state.panes, fromId, toIndex)));
+  /// A layout the grid produced (pane dragged to an edge/centre, sash
+  /// resized). Reconciled with the panes, which then follow its leaf order.
+  void setLayout(PaneLayout? layout) {
+    final next = reconcileLayout(layout, [for (final p in state.panes) p.id]);
+    _set(state.copyWith(layout: () => next, panes: sortPanesByLayout(state.panes, next)));
+  }
+
+  /// Back to the equal grid. Stored as an explicit tree (not null) so the
+  /// reset reaches the account's other devices too.
+  void resetLayout() => setLayout(autoPaneLayout([for (final p in state.panes) p.id]));
+
+  /// True when the panes are arranged differently from the equal grid.
+  bool get isLayoutCustomized {
+    final layout = state.layout;
+    if (layout == null) return false;
+    final auto = autoPaneLayout(layoutLeafOrder(layout));
+    return jsonEncode(layout.toJson()) != jsonEncode(auto?.toJson());
   }
 
   void toggleMaximize(String id) {

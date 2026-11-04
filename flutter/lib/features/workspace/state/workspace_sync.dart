@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:ddagent_app/features/workspace/state/pane_layout.dart';
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
 
 /// Port of src/components/main-content/utils/workspaceSync.ts — cross-device
@@ -183,8 +184,19 @@ WorkspaceState mergeWorkspace({
     encode: (p) => jsonEncode(p.toJson()),
   ).take(maxSplitPanes).toList();
 
+  // The layout is one value: a local edit wins, else the server's. A state
+  // without one (pushed by a client that predates layouts) never erases it.
+  String? encodeLayout(PaneLayout? l) => l == null ? null : jsonEncode(l.toJson());
+  final layout = reconcileLayout(
+    encodeLayout(local.layout) != encodeLayout(base.layout)
+        ? local.layout
+        : remote.layout ?? local.layout,
+    [for (final p in panes) p.id],
+  );
+
   return WorkspaceState(
-    panes: panes,
+    panes: sortPanesByLayout(panes, layout),
+    layout: layout,
     activePaneId: _mergeActive(
       base: base.activePaneId,
       local: local.activePaneId,

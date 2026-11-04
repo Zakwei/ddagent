@@ -4356,7 +4356,9 @@
     "exportPdf": "PDF (Dosyaya yazdır)",
     "matchPosition": "{{current}} / {{total}}",
     "launcherDescription": "Bu panel için bir çalışma alanı seçin veya yeni bir tane oluşturun.",
-    "createWorkspace": "Çalışma alanı oluştur"
+    "createWorkspace": "Çalışma alanı oluştur",
+    "resetLayout": "Düzeni sıfırla",
+    "dragPaneHint": "Başlığı başka bir bölmeye sürükleyin: kenar onu böler, orta ikisinin yerini değiştirir. Büyütmek için çift tıklayın."
   },
   "worktrees": {
     "scripts": "Scriptler",

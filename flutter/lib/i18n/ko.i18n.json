@@ -4350,7 +4350,9 @@
     "exportPdf": "PDF (파일로 인쇄)",
     "matchPosition": "{{current}} / {{total}}",
     "launcherDescription": "이 창에 사용할 작업 공간을 선택하거나 새로 만드세요.",
-    "createWorkspace": "작업 공간 만들기"
+    "createWorkspace": "작업 공간 만들기",
+    "resetLayout": "레이아웃 초기화",
+    "dragPaneHint": "헤더를 다른 창으로 끌어다 놓으세요. 가장자리는 분할, 가운데는 서로 바꿉니다. 두 번 클릭하면 최대화됩니다."
   },
   "worktrees": {
     "scripts": "스크립트",

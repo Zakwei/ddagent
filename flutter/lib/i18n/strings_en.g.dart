@@ -1155,6 +1155,12 @@ class Translations$workspace$en {
 
 	/// en: 'Create workspace'
 	String get createWorkspace => 'Create workspace';
+
+	/// en: 'Reset layout'
+	String get resetLayout => 'Reset layout';
+
+	/// en: 'Drag the header onto another pane: an edge splits it, the centre swaps the two. Double-click to maximize.'
+	String get dragPaneHint => 'Drag the header onto another pane: an edge splits it, the centre swaps the two. Double-click to maximize.';
 }
 
 // Path: worktrees
@@ -18604,6 +18610,8 @@ extension on Translations {
 			'workspace.matchPosition' => ({required Object current, required Object total}) => '${current} of ${total}',
 			'workspace.launcherDescription' => 'Pick a workspace for this pane, or create a new one.',
 			'workspace.createWorkspace' => 'Create workspace',
+			'workspace.resetLayout' => 'Reset layout',
+			'workspace.dragPaneHint' => 'Drag the header onto another pane: an edge splits it, the centre swaps the two. Double-click to maximize.',
 			'worktrees.scripts' => 'Scripts',
 			'worktrees.emptyTitle' => 'No worktrees found',
 			'worktrees.emptyDescription' => 'Create a worktree to isolate feature work or agent runs.',

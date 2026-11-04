@@ -4350,7 +4350,9 @@
     "exportPdf": "PDF（打印到文件）",
     "matchPosition": "{{current}} / {{total}}",
     "launcherDescription": "为此窗格选择一个工作区，或新建一个。",
-    "createWorkspace": "创建工作区"
+    "createWorkspace": "创建工作区",
+    "resetLayout": "重置布局",
+    "dragPaneHint": "将标题栏拖到另一个窗格：拖到边缘会在该处拆分，拖到中间会交换两者。双击可最大化。"
   },
   "worktrees": {
     "scripts": "脚本",

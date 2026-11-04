@@ -761,6 +761,8 @@ class Translations$workspace$ja extends Translations$workspace$en {
 	@override String matchPosition({required Object current, required Object total}) => '${current} / ${total}';
 	@override String get launcherDescription => 'このペインのワークスペースを選択するか、新しく作成してください。';
 	@override String get createWorkspace => 'ワークスペースを作成';
+	@override String get resetLayout => 'レイアウトをリセット';
+	@override String get dragPaneHint => 'ヘッダーを別のペインにドラッグ: 端でそこを分割、中央で入れ替えます。ダブルクリックで最大化。';
 }
 
 // Path: worktrees
@@ -11926,6 +11928,8 @@ extension on TranslationsJa {
 			'workspace.matchPosition' => ({required Object current, required Object total}) => '${current} / ${total}',
 			'workspace.launcherDescription' => 'このペインのワークスペースを選択するか、新しく作成してください。',
 			'workspace.createWorkspace' => 'ワークスペースを作成',
+			'workspace.resetLayout' => 'レイアウトをリセット',
+			'workspace.dragPaneHint' => 'ヘッダーを別のペインにドラッグ: 端でそこを分割、中央で入れ替えます。ダブルクリックで最大化。',
 			'worktrees.scripts' => 'スクリプト',
 			'worktrees.emptyTitle' => 'worktree が見つかりません',
 			'worktrees.emptyDescription' => 'worktree を作成して、機能開発やエージェントの実行を分離します。',

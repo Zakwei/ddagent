@@ -4350,7 +4350,9 @@
     "exportPdf": "PDF (ファイルに印刷)",
     "matchPosition": "{{current}} / {{total}}",
     "launcherDescription": "このペインのワークスペースを選択するか、新しく作成してください。",
-    "createWorkspace": "ワークスペースを作成"
+    "createWorkspace": "ワークスペースを作成",
+    "resetLayout": "レイアウトをリセット",
+    "dragPaneHint": "ヘッダーを別のペインにドラッグ: 端でそこを分割、中央で入れ替えます。ダブルクリックで最大化。"
   },
   "worktrees": {
     "scripts": "スクリプト",

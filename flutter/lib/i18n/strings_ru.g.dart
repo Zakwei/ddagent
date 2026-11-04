@@ -764,6 +764,8 @@ class Translations$workspace$ru extends Translations$workspace$en {
 	@override String matchPosition({required Object current, required Object total}) => '${current} из ${total}';
 	@override String get launcherDescription => 'Выберите рабочую область для этой панели или создайте новую.';
 	@override String get createWorkspace => 'Создать рабочую область';
+	@override String get resetLayout => 'Сбросить макет';
+	@override String get dragPaneHint => 'Перетащите заголовок на другую панель: край делит её, центр меняет панели местами. Двойной щелчок разворачивает.';
 }
 
 // Path: worktrees
@@ -11975,6 +11977,8 @@ extension on TranslationsRu {
 			'workspace.matchPosition' => ({required Object current, required Object total}) => '${current} из ${total}',
 			'workspace.launcherDescription' => 'Выберите рабочую область для этой панели или создайте новую.',
 			'workspace.createWorkspace' => 'Создать рабочую область',
+			'workspace.resetLayout' => 'Сбросить макет',
+			'workspace.dragPaneHint' => 'Перетащите заголовок на другую панель: край делит её, центр меняет панели местами. Двойной щелчок разворачивает.',
 			'worktrees.scripts' => 'Скрипты',
 			'worktrees.emptyTitle' => 'Worktree не найдены',
 			'worktrees.emptyDescription' => 'Создайте worktree, чтобы изолировать работу над функцией или запуски агентов.',

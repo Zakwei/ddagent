@@ -761,6 +761,8 @@ class Translations$workspace$ko extends Translations$workspace$en {
 	@override String matchPosition({required Object current, required Object total}) => '${current} / ${total}';
 	@override String get launcherDescription => '이 창에 사용할 작업 공간을 선택하거나 새로 만드세요.';
 	@override String get createWorkspace => '작업 공간 만들기';
+	@override String get resetLayout => '레이아웃 초기화';
+	@override String get dragPaneHint => '헤더를 다른 창으로 끌어다 놓으세요. 가장자리는 분할, 가운데는 서로 바꿉니다. 두 번 클릭하면 최대화됩니다.';
 }
 
 // Path: worktrees
@@ -11926,6 +11928,8 @@ extension on TranslationsKo {
 			'workspace.matchPosition' => ({required Object current, required Object total}) => '${current} / ${total}',
 			'workspace.launcherDescription' => '이 창에 사용할 작업 공간을 선택하거나 새로 만드세요.',
 			'workspace.createWorkspace' => '작업 공간 만들기',
+			'workspace.resetLayout' => '레이아웃 초기화',
+			'workspace.dragPaneHint' => '헤더를 다른 창으로 끌어다 놓으세요. 가장자리는 분할, 가운데는 서로 바꿉니다. 두 번 클릭하면 최대화됩니다.',
 			'worktrees.scripts' => '스크립트',
 			'worktrees.emptyTitle' => 'worktree를 찾을 수 없습니다',
 			'worktrees.emptyDescription' => '기능 작업이나 에이전트 실행을 격리하려면 worktree를 생성하세요.',

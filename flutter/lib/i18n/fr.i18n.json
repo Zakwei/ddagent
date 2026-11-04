@@ -4361,7 +4361,9 @@
     "exportPdf": "PDF (Imprimer dans un fichier)",
     "matchPosition": "{{current}} sur {{total}}",
     "launcherDescription": "Choisissez un espace de travail pour ce panneau ou créez-en un nouveau.",
-    "createWorkspace": "Créer un espace de travail"
+    "createWorkspace": "Créer un espace de travail",
+    "resetLayout": "Réinitialiser la disposition",
+    "dragPaneHint": "Faites glisser l'en-tête sur un autre panneau : un bord le divise, le centre les échange. Double-cliquez pour agrandir."
   },
   "worktrees": {
     "scripts": "Scripts",

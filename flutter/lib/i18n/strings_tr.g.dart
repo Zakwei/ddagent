@@ -762,6 +762,8 @@ class Translations$workspace$tr extends Translations$workspace$en {
 	@override String matchPosition({required Object current, required Object total}) => '${current} / ${total}';
 	@override String get launcherDescription => 'Bu panel için bir çalışma alanı seçin veya yeni bir tane oluşturun.';
 	@override String get createWorkspace => 'Çalışma alanı oluştur';
+	@override String get resetLayout => 'Düzeni sıfırla';
+	@override String get dragPaneHint => 'Başlığı başka bir bölmeye sürükleyin: kenar onu böler, orta ikisinin yerini değiştirir. Büyütmek için çift tıklayın.';
 }
 
 // Path: worktrees
@@ -11932,6 +11934,8 @@ extension on TranslationsTr {
 			'workspace.matchPosition' => ({required Object current, required Object total}) => '${current} / ${total}',
 			'workspace.launcherDescription' => 'Bu panel için bir çalışma alanı seçin veya yeni bir tane oluşturun.',
 			'workspace.createWorkspace' => 'Çalışma alanı oluştur',
+			'workspace.resetLayout' => 'Düzeni sıfırla',
+			'workspace.dragPaneHint' => 'Başlığı başka bir bölmeye sürükleyin: kenar onu böler, orta ikisinin yerini değiştirir. Büyütmek için çift tıklayın.',
 			'worktrees.scripts' => 'Scriptler',
 			'worktrees.emptyTitle' => 'Worktree bulunamadı',
 			'worktrees.emptyDescription' => 'Özellik çalışmalarını veya agent çalıştırmalarını yalıtmak için bir worktree oluşturun.',

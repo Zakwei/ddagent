@@ -4361,7 +4361,9 @@
     "exportPdf": "PDF (Print to File)",
     "matchPosition": "{{current}} of {{total}}",
     "launcherDescription": "Pick a workspace for this pane, or create a new one.",
-    "createWorkspace": "Create workspace"
+    "createWorkspace": "Create workspace",
+    "resetLayout": "Reset layout",
+    "dragPaneHint": "Drag the header onto another pane: an edge splits it, the centre swaps the two. Double-click to maximize."
   },
   "worktrees": {
     "scripts": "Scripts",

@@ -4361,7 +4361,9 @@
     "exportPdf": "PDF (Stampa su file)",
     "matchPosition": "{{current}} di {{total}}",
     "launcherDescription": "Scegli un workspace per questo pannello o creane uno nuovo.",
-    "createWorkspace": "Crea workspace"
+    "createWorkspace": "Crea workspace",
+    "resetLayout": "Ripristina layout",
+    "dragPaneHint": "Trascina l'intestazione su un altro riquadro: un bordo lo divide, il centro li scambia. Doppio clic per massimizzare."
   },
   "worktrees": {
     "scripts": "Script",

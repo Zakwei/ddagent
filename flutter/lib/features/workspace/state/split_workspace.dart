@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:ddagent_app/features/workspace/state/pane_layout.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:hive/hive.dart';
 
@@ -292,9 +293,14 @@ class WorkspaceState {
     this.terminals = const {},
     this.maximizedPaneId,
     this.serverLoaded = false,
+    this.layout,
   });
 
   final List<SplitPane> panes;
+
+  /// User-arranged split tree (VS Code style); null = the automatic grid.
+  /// Always describes exactly [panes], whose order follows its leaves.
+  final PaneLayout? layout;
   final String? activePaneId;
 
   /// Most recently chosen workspace — the launcher's default project.
@@ -323,6 +329,7 @@ class WorkspaceState {
       'terminals': {
         for (final host in terminals.keys.toList()..sort()) host: terminals[host]!.toJson(),
       },
+    'layout': ?layout?.toJson(),
   };
 
   WorkspaceState copyWith({
@@ -332,7 +339,9 @@ class WorkspaceState {
     Map<String, TerminalHostSpec>? terminals,
     String? Function()? maximizedPaneId,
     bool? serverLoaded,
+    PaneLayout? Function()? layout,
   }) => WorkspaceState(
+    layout: layout != null ? layout() : this.layout,
     panes: panes ?? this.panes,
     activePaneId: activePaneId != null ? activePaneId() : this.activePaneId,
     lastUsedProjectId: lastUsedProjectId != null ? lastUsedProjectId() : this.lastUsedProjectId,
@@ -344,9 +353,13 @@ class WorkspaceState {
   static WorkspaceState sanitize(Object? value) {
     if (value is! Map) return const WorkspaceState();
     final raw = value['panes'];
-    final panes = raw is List
+    final listed = raw is List
         ? [for (final p in raw) ?SplitPane.fromJson(p)].take(maxSplitPanes).toList()
         : <SplitPane>[];
+    final layout = reconcileLayout(PaneLayout.fromJson(value['layout']), [
+      for (final p in listed) p.id,
+    ]);
+    final panes = sortPanesByLayout(listed, layout);
     final active = value['activePaneId'];
     final activeId = active is String && panes.any((p) => p.id == active)
         ? active
@@ -355,6 +368,7 @@ class WorkspaceState {
     final rawTerminals = value['terminals'];
     return WorkspaceState(
       panes: panes,
+      layout: layout,
       activePaneId: activeId,
       lastUsedProjectId: last is String && last.isNotEmpty ? last : null,
       terminals: rawTerminals is Map

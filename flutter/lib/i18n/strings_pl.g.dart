@@ -764,6 +764,8 @@ class Translations$workspace$pl extends Translations$workspace$en {
 	@override String matchPosition({required Object current, required Object total}) => '${current} z ${total}';
 	@override String get launcherDescription => 'Wybierz obszar roboczy dla tego panelu lub utwórz nowy.';
 	@override String get createWorkspace => 'Utwórz obszar roboczy';
+	@override String get resetLayout => 'Resetuj układ';
+	@override String get dragPaneHint => 'Przeciągnij nagłówek na inny panel: krawędź dzieli go w tym miejscu, środek zamienia panele miejscami. Dwuklik maksymalizuje.';
 }
 
 // Path: worktrees
@@ -11977,6 +11979,8 @@ extension on TranslationsPl {
 			'workspace.matchPosition' => ({required Object current, required Object total}) => '${current} z ${total}',
 			'workspace.launcherDescription' => 'Wybierz obszar roboczy dla tego panelu lub utwórz nowy.',
 			'workspace.createWorkspace' => 'Utwórz obszar roboczy',
+			'workspace.resetLayout' => 'Resetuj układ',
+			'workspace.dragPaneHint' => 'Przeciągnij nagłówek na inny panel: krawędź dzieli go w tym miejscu, środek zamienia panele miejscami. Dwuklik maksymalizuje.',
 			'worktrees.scripts' => 'Skrypty',
 			'worktrees.emptyTitle' => 'Nie znaleziono worktree',
 			'worktrees.emptyDescription' => 'Utwórz worktree, aby odizolować pracę nad funkcją lub uruchomienia agentów.',

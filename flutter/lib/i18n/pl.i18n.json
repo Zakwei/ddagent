@@ -4401,7 +4401,9 @@
     "exportPdf": "PDF (drukuj do pliku)",
     "matchPosition": "{{current}} z {{total}}",
     "launcherDescription": "Wybierz obszar roboczy dla tego panelu lub utwórz nowy.",
-    "createWorkspace": "Utwórz obszar roboczy"
+    "createWorkspace": "Utwórz obszar roboczy",
+    "resetLayout": "Resetuj układ",
+    "dragPaneHint": "Przeciągnij nagłówek na inny panel: krawędź dzieli go w tym miejscu, środek zamienia panele miejscami. Dwuklik maksymalizuje."
   },
   "worktrees": {
     "scripts": "Skrypty",
