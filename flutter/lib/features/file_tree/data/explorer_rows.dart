@@ -158,8 +158,11 @@ class GitDecorations {
     final files = <String, GitDecoration>{};
     final untrackedDirs = <String>[];
 
-    String? resolve(String raw) {
+    String? resolve(String raw, {required bool strip}) {
       var p = raw.replaceAll(r'\', '/');
+      if (!strip) {
+        return p;
+      }
       while (true) {
         final bare = p.endsWith('/') ? p.substring(0, p.length - 1) : p;
         if (projectPaths.contains(bare)) {
@@ -177,7 +180,9 @@ class GitDecorations {
 
     void put(String key, GitDecoration kind) {
       for (final e in status[key] as List? ?? const []) {
-        final p = resolve(e.toString());
+        // A deleted path is never in the tree, so prefix stripping could
+        // land on an unrelated live file — keep it repo-relative.
+        final p = resolve(e.toString(), strip: kind != GitDecoration.deleted);
         if (p == null || p.isEmpty) {
           continue;
         }

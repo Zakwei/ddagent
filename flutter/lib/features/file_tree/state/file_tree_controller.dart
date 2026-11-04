@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:ddagent_app/core/network/api_error.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_node.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_repository.dart';
+import 'package:ddagent_app/features/file_tree/state/explorer_git_status.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -163,6 +164,8 @@ class FileTreeController extends Notifier<FileTreeState> {
     if (expandPath != null) {
       expandDirectories([expandPath]);
     }
+    // New/renamed/deleted/uploaded entries change the git decorations too.
+    ref.invalidate(gitStatusProvider(state.projectId!));
     await _load();
     if (uploading) {
       state = state.copyWith(uploading: false);

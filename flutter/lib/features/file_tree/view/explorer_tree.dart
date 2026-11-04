@@ -402,7 +402,6 @@ class _ExplorerTreeState extends ConsumerState<ExplorerTree> {
     if (!mounted) {
       return;
     }
-    _refreshGit();
     if (err != null) {
       AppToast.show(context, err, isError: true);
       return;
@@ -438,7 +437,6 @@ class _ExplorerTreeState extends ConsumerState<ExplorerTree> {
     if (!mounted) {
       return;
     }
-    _refreshGit();
     if (err != null) {
       AppToast.show(context, err, isError: true);
       return;
@@ -569,7 +567,7 @@ class _ExplorerTreeState extends ConsumerState<ExplorerTree> {
       ),
       AppMenuItem(
         label: t.common.fileTree.collapseAll,
-        icon: LucideIcons.chevronsDownUp,
+        icon: LucideIcons.copyMinus,
         onTap: _ctrl.collapseAll,
       ),
     ];
@@ -697,11 +695,21 @@ class _ExplorerTreeState extends ConsumerState<ExplorerTree> {
       );
     }
     final rowHeight = _rowHeight;
+    // Rows have their own menu; a held right-click reaches both detectors,
+    // so the blank-area menu only answers below the last row.
+    bool onRow(Offset local) =>
+        _scroll.hasClients && ((local.dy + _scroll.offset) / rowHeight).floor() < _items.length;
+    void blankMenu(Offset local, Offset global) {
+      if (!onRow(local)) {
+        unawaited(AppContextMenu.show(context, global, _blankMenu()));
+      }
+    }
+
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: _focus.requestFocus,
-      onSecondaryTapDown: (d) => AppContextMenu.show(context, d.globalPosition, _blankMenu()),
-      onLongPressStart: (d) => AppContextMenu.show(context, d.globalPosition, _blankMenu()),
+      onSecondaryTapDown: (d) => blankMenu(d.localPosition, d.globalPosition),
+      onLongPressStart: (d) => blankMenu(d.localPosition, d.globalPosition),
       child: Focus(
         focusNode: _focus,
         onKeyEvent: _onKey,
@@ -901,7 +909,7 @@ class _SectionHeader extends StatelessWidget {
                 onTap: onRefresh,
               ),
               _HeaderAction(
-                icon: LucideIcons.chevronsDownUp,
+                icon: LucideIcons.copyMinus,
                 tooltip: t.common.fileTree.collapseAll,
                 onTap: onCollapseAll,
               ),

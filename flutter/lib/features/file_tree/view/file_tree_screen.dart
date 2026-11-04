@@ -386,6 +386,7 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
       _scheduleScrollRestore();
     }
 
+    final sidebarWidth = ref.watch(fileTreeSidebarWidthProvider);
     final project = projects.where((p) => p.projectId == state.projectId).firstOrNull;
     final showingSearch = _searchResult != null || _searching;
 
@@ -470,9 +471,7 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
               : LayoutBuilder(
                   builder: (context, box) {
                     final max = (box.maxWidth - 240).clamp(kMinFileTreeSidebarWidth, 900.0);
-                    final width = ref
-                        .watch(fileTreeSidebarWidthProvider)
-                        .clamp(kMinFileTreeSidebarWidth, max);
+                    final width = sidebarWidth.clamp(kMinFileTreeSidebarWidth, max);
                     return Row(
                       children: [
                         SizedBox(width: width, child: sidebar),

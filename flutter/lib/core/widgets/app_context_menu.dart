@@ -66,9 +66,13 @@ class AppContextMenu extends StatelessWidget {
                   ),
                   const SizedBox(width: AppSpacing.sm),
                 ],
-                Text(
-                  item.label,
-                  style: TextStyle(color: item.destructive ? c.destructive : c.popoverForeground),
+                Flexible(
+                  child: Text(
+                    item.label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: item.destructive ? c.destructive : c.popoverForeground),
+                  ),
                 ),
               ],
             ),

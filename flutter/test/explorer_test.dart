@@ -4,9 +4,13 @@ import 'package:ddagent_app/features/file_tree/data/file_tree_node.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_repository.dart';
 import 'package:ddagent_app/features/file_tree/state/file_tree_controller.dart';
 import 'package:ddagent_app/features/file_tree/view/explorer_tree.dart';
+import 'package:ddagent_app/features/file_tree/view/file_tree_screen.dart';
 import 'package:ddagent_app/features/git/data/git_repository.dart';
+import 'package:ddagent_app/features/projects/data/projects_repository.dart';
+import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -57,6 +61,18 @@ class _FakeFiles extends FileTreeRepository {
 
   final creates = <String>[];
   final renames = <String>[];
+  final searches = <String>[];
+
+  @override
+  Future<FileSearchResult> search(String projectId, String query, {int? limit}) async {
+    searches.add(query);
+    return const FileSearchResult(
+      matches: [
+        FileSearchMatch(path: '/proj/lib/main.dart', line: 3, column: 1, text: 'void main() {}'),
+      ],
+      truncated: false,
+    );
+  }
 
   @override
   Future<List<FileTreeNode>> listFiles(String projectId, {bool respectGitignore = true}) async =>
@@ -85,6 +101,17 @@ class _FakeGit extends GitRepository {
 
   @override
   Future<Map<String, dynamic>> status(String project) async => result;
+}
+
+class _Projects extends ProjectsController {
+  @override
+  ProjectsState build() => const ProjectsState(
+    projects: [Project(projectId: 'p1', path: '/proj', displayName: 'proj')],
+    loading: false,
+  );
+
+  @override
+  Future<void> load() async {}
 }
 
 void main() {
@@ -297,6 +324,67 @@ void main() {
       await tester.tap(find.text('lib'));
       await tester.pumpAndSettle();
       expect(find.text('U'), findsOneWidget);
+    });
+  });
+
+  group('FileTreeScreen', () {
+    late _FakeFiles files;
+
+    Future<void> pumpScreen(WidgetTester tester) async {
+      files = _FakeFiles();
+      tester.view.physicalSize = const Size(1200, 800);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(
+        TranslationProvider(
+          child: ProviderScope(
+            overrides: [
+              fileTreeRepositoryProvider.overrideWithValue(files),
+              gitRepositoryProvider.overrideWithValue(_FakeGit(const {})),
+              projectsProvider.overrideWith(_Projects.new),
+            ],
+            child: MaterialApp(
+              theme: AppTheme.light(),
+              home: const Scaffold(body: FileTreeScreen(projectId: 'p1')),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('side bar + empty editor; filter narrows, Enter searches contents', (tester) async {
+      await pumpScreen(tester);
+      expect(find.byType(ExplorerTree), findsOneWidget);
+      expect(find.text(t.fileTree.noFileOpen), findsOneWidget);
+      expect(find.text('README.md'), findsOneWidget);
+
+      final filter = find.byType(TextField).first;
+      await tester.enterText(filter, 'x.ts');
+      await tester.pumpAndSettle();
+      expect(find.text('README.md'), findsNothing);
+      expect(files.searches, isEmpty, reason: 'typing filters names locally');
+
+      await tester.testTextInput.receiveAction(TextInputAction.search);
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pumpAndSettle();
+      expect(files.searches, ['x.ts']);
+      expect(find.text('void main() {}'), findsOneWidget);
+      expect(find.byType(ExplorerTree), findsNothing);
+    });
+
+    testWidgets('a held right-click on a row opens a single menu', (tester) async {
+      await pumpScreen(tester);
+      final g = await tester.startGesture(
+        tester.getCenter(find.text('README.md')),
+        kind: PointerDeviceKind.mouse,
+        buttons: kSecondaryButton,
+      );
+      await tester.pump(const Duration(milliseconds: 300));
+      await g.up();
+      await tester.pumpAndSettle();
+      expect(find.text(t.common.fileTree.context.rename), findsOneWidget);
+      expect(find.text(t.common.fileTree.context.newFolder), findsNothing);
     });
   });
 }
