@@ -762,7 +762,8 @@ class Translations$workspace$ko extends Translations$workspace$en {
 	@override String get launcherDescription => '이 창에 사용할 작업 공간을 선택하거나 새로 만드세요.';
 	@override String get createWorkspace => '작업 공간 만들기';
 	@override String get resetLayout => '레이아웃 초기화';
-	@override String get dragPaneHint => '헤더를 다른 창으로 끌어다 놓으세요. 가장자리는 분할, 가운데는 서로 바꿉니다. 두 번 클릭하면 최대화됩니다.';
+	@override String get dragPaneHint => '헤더나 탭을 다른 창으로 끌어다 놓으세요. 가장자리는 분할, 가운데는 탭으로 추가하며, 작업 영역 가장자리는 전체 열이나 행을 만듭니다. 두 번 클릭하면 최대화됩니다.';
+	@override String get paneShortcuts => '키보드: Ctrl+Alt+화살표 — 인접 창 · Ctrl+Alt+1…6 — N번째 그룹 · Ctrl+Alt+PgUp/PgDn — 이전/다음 탭';
 }
 
 // Path: worktrees
@@ -11929,7 +11930,8 @@ extension on TranslationsKo {
 			'workspace.launcherDescription' => '이 창에 사용할 작업 공간을 선택하거나 새로 만드세요.',
 			'workspace.createWorkspace' => '작업 공간 만들기',
 			'workspace.resetLayout' => '레이아웃 초기화',
-			'workspace.dragPaneHint' => '헤더를 다른 창으로 끌어다 놓으세요. 가장자리는 분할, 가운데는 서로 바꿉니다. 두 번 클릭하면 최대화됩니다.',
+			'workspace.dragPaneHint' => '헤더나 탭을 다른 창으로 끌어다 놓으세요. 가장자리는 분할, 가운데는 탭으로 추가하며, 작업 영역 가장자리는 전체 열이나 행을 만듭니다. 두 번 클릭하면 최대화됩니다.',
+			'workspace.paneShortcuts' => '키보드: Ctrl+Alt+화살표 — 인접 창 · Ctrl+Alt+1…6 — N번째 그룹 · Ctrl+Alt+PgUp/PgDn — 이전/다음 탭',
 			'worktrees.scripts' => '스크립트',
 			'worktrees.emptyTitle' => 'worktree를 찾을 수 없습니다',
 			'worktrees.emptyDescription' => '기능 작업이나 에이전트 실행을 격리하려면 worktree를 생성하세요.',

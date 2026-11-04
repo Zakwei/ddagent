@@ -4363,7 +4363,8 @@
     "launcherDescription": "Pick a workspace for this pane, or create a new one.",
     "createWorkspace": "Create workspace",
     "resetLayout": "Reset layout",
-    "dragPaneHint": "Drag the header onto another pane: an edge splits it, the centre swaps the two. Double-click to maximize."
+    "dragPaneHint": "Drag the header or a tab onto another pane: an edge splits it, the centre adds it as a tab; the workspace edges make a full column or row. Double-click to maximize.",
+    "paneShortcuts": "Keyboard: Ctrl+Alt+Arrows — neighbouring pane · Ctrl+Alt+1…6 — pane group N · Ctrl+Alt+PgUp/PgDn — previous/next tab"
   },
   "worktrees": {
     "scripts": "Scripts",

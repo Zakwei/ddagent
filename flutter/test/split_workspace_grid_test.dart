@@ -5,6 +5,7 @@ import 'package:ddagent_app/features/workspace/view/split_workspace_grid.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -112,11 +113,139 @@ void main() {
     });
   });
 
-  testWidgets('dropping on the centre swaps the panes', (tester) async {
+  testWidgets('dropping on the centre adds the pane to that group as a tab', (tester) async {
     final changes = await pumpDesktop(tester, ids: ['pane-0', 'pane-1', 'pane-2']);
     final target = tester.getRect(find.byKey(const ValueKey('body-pane-2')));
     await dragHeader(tester, 'pane-0', target.center);
-    expect(layoutLeafOrder(changes.single), ['pane-2', 'pane-1', 'pane-0']);
+    expect(layoutGroupOf(changes.single, 'pane-2')!.toJson(), {
+      'panes': ['pane-2', 'pane-0'],
+      'active': 'pane-0',
+    });
+  });
+
+  testWidgets('a tab group shows tabs; a tab dragged to an edge splits out', (tester) async {
+    final grouped = insertPaneIntoLayout(
+      autoPaneLayout(['pane-0', 'pane-1']),
+      'pane-2',
+      'pane-1',
+      PaneDropZone.center,
+    );
+    final changes = await pumpDesktop(tester, ids: layoutLeafOrder(grouped), layout: grouped);
+    // Both tabs are labelled; only the visible member is on stage.
+    expect(find.text('pane-1'), findsOneWidget);
+    expect(find.text('pane-2'), findsOneWidget);
+    expect(find.byKey(const ValueKey('body-pane-1')), findsNothing);
+    final target = tester.getRect(find.byKey(const ValueKey('body-pane-0')));
+    await dragHeader(tester, 'pane-2', Offset(target.left + 30, target.center.dy));
+    expect(layoutLeafOrder(changes.single), ['pane-2', 'pane-0', 'pane-1']);
+    expect(layoutGroupOf(changes.single, 'pane-1')!.isSingle, isTrue);
+  });
+
+  testWidgets('the workspace edge bands dock a pane as a full column', (tester) async {
+    final changes = await pumpDesktop(tester, ids: ['pane-0', 'pane-1', 'pane-2', 'pane-3']);
+    final size = tester.getSize(find.byType(SplitWorkspaceGrid));
+    await dragHeader(tester, 'pane-0', Offset(size.width - 8, size.height / 2));
+    final root = changes.single as PaneSplit;
+    expect(root.axis, PaneAxis.row);
+    expect(root.children.last.toJson(), {'pane': 'pane-0'});
+  });
+
+  testWidgets('Ctrl+Alt+Arrow moves focus into the neighbouring pane', (tester) async {
+    tester.view.physicalSize = const Size(1200, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    var active = 'pane-0';
+    final fields = {
+      for (final id in ['pane-0', 'pane-1']) id: FocusNode(debugLabel: id),
+    };
+    addTearDown(() {
+      for (final n in fields.values) {
+        n.dispose();
+      }
+    });
+    late StateSetter rebuild;
+    await tester.pumpWidget(
+      TranslationProvider(
+        child: MaterialApp(
+          theme: AppTheme.light(),
+          home: Scaffold(
+            body: StatefulBuilder(
+              builder: (context, setState) {
+                rebuild = setState;
+                return SplitWorkspaceGrid(
+                  panes: const [
+                    SplitPane(id: 'pane-0', kind: PaneKind.terminal),
+                    SplitPane(id: 'pane-1', kind: PaneKind.terminal),
+                  ],
+                  activePaneId: active,
+                  paneTitle: (pane) => pane.id,
+                  onActivatePane: (id) => rebuild(() => active = id),
+                  onClosePane: (_) {},
+                  renderPane: (pane, _) => TextField(focusNode: fields[pane.id]),
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.altLeft);
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+    await tester.pumpAndSettle();
+    expect(active, 'pane-1');
+    expect(fields['pane-1']!.hasFocus, isTrue);
+
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.altLeft);
+    await tester.sendKeyEvent(LogicalKeyboardKey.digit1);
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+    await tester.pumpAndSettle();
+    expect(active, 'pane-0');
+    expect(fields['pane-0']!.hasFocus, isTrue);
+  });
+
+  testWidgets('phone: long-press a tab and drop it on another to swap them', (tester) async {
+    tester.view.physicalSize = const Size(400, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final changes = <PaneLayout>[];
+    await tester.pumpWidget(
+      TranslationProvider(
+        child: MaterialApp(
+          theme: AppTheme.light(),
+          home: Scaffold(
+            body: SplitWorkspaceGrid(
+              panes: const [
+                SplitPane(id: 'pane-0', kind: PaneKind.terminal),
+                SplitPane(id: 'pane-1', kind: PaneKind.terminal),
+              ],
+              activePaneId: 'pane-0',
+              paneTitle: (pane) => pane.id,
+              onClosePane: (_) {},
+              onLayoutChanged: changes.add,
+              renderPane: (_, _) => const SizedBox.expand(),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final from = tester.getCenter(find.text('pane-0').first);
+    final to = tester.getCenter(find.text('pane-1').first);
+    final g = await tester.startGesture(from);
+    await tester.pump(const Duration(milliseconds: 700));
+    for (var i = 1; i <= 8; i++) {
+      await g.moveTo(Offset.lerp(from, to, i / 8)!);
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+    await g.up();
+    await tester.pumpAndSettle();
+    expect(layoutLeafOrder(changes.single), ['pane-1', 'pane-0']);
   });
 
   testWidgets('a sash drag resizes once, on release', (tester) async {

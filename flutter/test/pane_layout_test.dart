@@ -72,7 +72,7 @@ void main() {
         ],
         'weights': [500, 500],
       });
-      expect(removePaneFromLayout(const PaneLeaf('a'), 'a'), isNull);
+      expect(removePaneFromLayout(PaneLeaf('a'), 'a'), isNull);
     });
   });
 
@@ -110,7 +110,7 @@ void main() {
     test('drops unknown and duplicate leaves, appends missing panes', () {
       final layout = PaneSplit(
         PaneAxis.row,
-        const [PaneLeaf('a'), PaneLeaf('gone'), PaneLeaf('a')],
+        [PaneLeaf('a'), PaneLeaf('gone'), PaneLeaf('a')],
         const [1, 1, 1],
       );
       final next = reconcileLayout(layout, ['a', 'b']);
@@ -153,6 +153,108 @@ void main() {
         ),
         {'pane': 'x'},
       );
+    });
+  });
+
+  group('tab groups', () {
+    final row = autoPaneLayout(['a', 'b'])!;
+
+    test('a centre drop adds the pane to the group as the visible tab', () {
+      final next = movePaneInLayout(autoPaneLayout(['a', 'b', 'c']), 'c', 'a', PaneDropZone.center);
+      expect((next! as PaneSplit).children.map(j), [
+        {
+          'panes': ['a', 'c'],
+          'active': 'c',
+        },
+        {'pane': 'b'},
+      ]);
+      expect(layoutLeafOrder(next), ['a', 'c', 'b']);
+      // Dropping on the centre of its own group changes nothing.
+      expect(identical(movePaneInLayout(next, 'c', 'a', PaneDropZone.center), next), isTrue);
+    });
+
+    test('closing the visible tab shows its neighbour; the last tab removes the group', () {
+      final grouped = movePaneInLayout(
+        autoPaneLayout(['a', 'b', 'c']),
+        'c',
+        'a',
+        PaneDropZone.center,
+      );
+      expect(j(layoutGroupOf(removePaneFromLayout(grouped, 'c'), 'a')), {'pane': 'a'});
+      final three = insertPaneIntoLayout(grouped, 'd', 'a', PaneDropZone.center);
+      expect(j(layoutGroupOf(three, 'a')), {
+        'panes': ['a', 'd', 'c'],
+        'active': 'd',
+      });
+      expect(layoutGroupOf(removePaneFromLayout(three, 'd'), 'a')!.activeId, 'c');
+    });
+
+    test('a tab dragged to its own group\'s edge splits out of it', () {
+      final grouped = insertPaneIntoLayout(row, 'c', 'a', PaneDropZone.center);
+      final split = movePaneInLayout(grouped, 'c', 'a', PaneDropZone.bottom);
+      expect(j(split), {
+        'axis': 'row',
+        'children': [
+          {
+            'axis': 'column',
+            'children': [
+              {'pane': 'a'},
+              {'pane': 'c'},
+            ],
+            'weights': [500, 500],
+          },
+          {'pane': 'b'},
+        ],
+        'weights': [500, 500],
+      });
+    });
+
+    test('activating a tab and swapping panes keep the groups', () {
+      final grouped = insertPaneIntoLayout(row, 'c', 'a', PaneDropZone.center);
+      expect(layoutGroupOf(setActivePaneInLayout(grouped, 'a'), 'a')!.activeId, 'a');
+      final swapped = swapPanesInLayout(grouped, 'c', 'b');
+      expect(j(swapped), {
+        'axis': 'row',
+        'children': [
+          {
+            'panes': ['a', 'b'],
+            'active': 'b',
+          },
+          {'pane': 'c'},
+        ],
+        'weights': [500, 500],
+      });
+    });
+
+    test('groups round-trip through JSON and are reconciled', () {
+      final grouped = insertPaneIntoLayout(row, 'c', 'a', PaneDropZone.center);
+      expect(j(PaneLayout.fromJson(grouped.toJson())), j(grouped));
+      expect(
+        j(
+          PaneLayout.fromJson({
+            'panes': ['x', 'y', 'x'],
+            'active': 'zzz',
+          }),
+        ),
+        {
+          'panes': ['x', 'y'],
+          'active': 'x',
+        },
+      );
+      expect(j(layoutGroupOf(reconcileLayout(grouped, ['a', 'b']), 'a')), {'pane': 'a'});
+    });
+  });
+
+  group('dockPaneAtRoot', () {
+    test('a pane dropped on a workspace edge takes a full-height third', () {
+      final layout = autoPaneLayout(['a', 'b', 'c', 'd']);
+      final next = dockPaneAtRoot(layout, 'd', PaneDropZone.right)! as PaneSplit;
+      expect(next.axis, PaneAxis.row);
+      expect(j(next.children.last), {'pane': 'd'});
+      expect(next.weights, [667, 333]);
+      final top = dockPaneAtRoot(layout, 'a', PaneDropZone.top)! as PaneSplit;
+      expect(top.axis, PaneAxis.column);
+      expect(j(top.children.first), {'pane': 'a'});
     });
   });
 }

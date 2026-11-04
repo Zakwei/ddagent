@@ -765,7 +765,8 @@ class Translations$workspace$pl extends Translations$workspace$en {
 	@override String get launcherDescription => 'Wybierz obszar roboczy dla tego panelu lub utwórz nowy.';
 	@override String get createWorkspace => 'Utwórz obszar roboczy';
 	@override String get resetLayout => 'Resetuj układ';
-	@override String get dragPaneHint => 'Przeciągnij nagłówek na inny panel: krawędź dzieli go w tym miejscu, środek zamienia panele miejscami. Dwuklik maksymalizuje.';
+	@override String get dragPaneHint => 'Przeciągnij nagłówek lub kartę na inny panel: krawędź dzieli go w tym miejscu, środek dokłada jako kartę; krawędzie obszaru robią pełną kolumnę lub wiersz. Dwuklik maksymalizuje.';
+	@override String get paneShortcuts => 'Klawiatura: Ctrl+Alt+strzałki — sąsiedni panel · Ctrl+Alt+1…6 — grupa paneli nr N · Ctrl+Alt+PgUp/PgDn — poprzednia/następna karta';
 }
 
 // Path: worktrees
@@ -11980,7 +11981,8 @@ extension on TranslationsPl {
 			'workspace.launcherDescription' => 'Wybierz obszar roboczy dla tego panelu lub utwórz nowy.',
 			'workspace.createWorkspace' => 'Utwórz obszar roboczy',
 			'workspace.resetLayout' => 'Resetuj układ',
-			'workspace.dragPaneHint' => 'Przeciągnij nagłówek na inny panel: krawędź dzieli go w tym miejscu, środek zamienia panele miejscami. Dwuklik maksymalizuje.',
+			'workspace.dragPaneHint' => 'Przeciągnij nagłówek lub kartę na inny panel: krawędź dzieli go w tym miejscu, środek dokłada jako kartę; krawędzie obszaru robią pełną kolumnę lub wiersz. Dwuklik maksymalizuje.',
+			'workspace.paneShortcuts' => 'Klawiatura: Ctrl+Alt+strzałki — sąsiedni panel · Ctrl+Alt+1…6 — grupa paneli nr N · Ctrl+Alt+PgUp/PgDn — poprzednia/następna karta',
 			'worktrees.scripts' => 'Skrypty',
 			'worktrees.emptyTitle' => 'Nie znaleziono worktree',
 			'worktrees.emptyDescription' => 'Utwórz worktree, aby odizolować pracę nad funkcją lub uruchomienia agentów.',

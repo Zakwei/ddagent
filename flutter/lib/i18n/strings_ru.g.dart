@@ -765,7 +765,8 @@ class Translations$workspace$ru extends Translations$workspace$en {
 	@override String get launcherDescription => 'Выберите рабочую область для этой панели или создайте новую.';
 	@override String get createWorkspace => 'Создать рабочую область';
 	@override String get resetLayout => 'Сбросить макет';
-	@override String get dragPaneHint => 'Перетащите заголовок на другую панель: край делит её, центр меняет панели местами. Двойной щелчок разворачивает.';
+	@override String get dragPaneHint => 'Перетащите заголовок или вкладку на другую панель: край делит её, центр добавляет как вкладку; края рабочей области создают целый столбец или строку. Двойной щелчок разворачивает.';
+	@override String get paneShortcuts => 'Клавиатура: Ctrl+Alt+стрелки — соседняя панель · Ctrl+Alt+1…6 — группа N · Ctrl+Alt+PgUp/PgDn — предыдущая/следующая вкладка';
 }
 
 // Path: worktrees
@@ -11978,7 +11979,8 @@ extension on TranslationsRu {
 			'workspace.launcherDescription' => 'Выберите рабочую область для этой панели или создайте новую.',
 			'workspace.createWorkspace' => 'Создать рабочую область',
 			'workspace.resetLayout' => 'Сбросить макет',
-			'workspace.dragPaneHint' => 'Перетащите заголовок на другую панель: край делит её, центр меняет панели местами. Двойной щелчок разворачивает.',
+			'workspace.dragPaneHint' => 'Перетащите заголовок или вкладку на другую панель: край делит её, центр добавляет как вкладку; края рабочей области создают целый столбец или строку. Двойной щелчок разворачивает.',
+			'workspace.paneShortcuts' => 'Клавиатура: Ctrl+Alt+стрелки — соседняя панель · Ctrl+Alt+1…6 — группа N · Ctrl+Alt+PgUp/PgDn — предыдущая/следующая вкладка',
 			'worktrees.scripts' => 'Скрипты',
 			'worktrees.emptyTitle' => 'Worktree не найдены',
 			'worktrees.emptyDescription' => 'Создайте worktree, чтобы изолировать работу над функцией или запуски агентов.',

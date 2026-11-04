@@ -278,6 +278,15 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
       // clamping; the Spacer only makes sense on the non-scrolling row.
       if (!compact) const Spacer(),
       if (!compact && ws.panes.length > 1)
+        Tooltip(
+          message: '${i18n.workspace.dragPaneHint}\n${i18n.workspace.paneShortcuts}',
+          child: SizedBox(
+            width: m.hit,
+            height: m.hit,
+            child: Icon(LucideIcons.keyboard, size: m.icon, color: c.mutedForeground),
+          ),
+        ),
+      if (!compact && ws.panes.length > 1)
         btn(
           LucideIcons.layoutDashboard,
           i18n.workspace.resetLayout,

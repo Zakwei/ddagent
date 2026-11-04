@@ -4403,7 +4403,8 @@
     "launcherDescription": "Wybierz obszar roboczy dla tego panelu lub utwórz nowy.",
     "createWorkspace": "Utwórz obszar roboczy",
     "resetLayout": "Resetuj układ",
-    "dragPaneHint": "Przeciągnij nagłówek na inny panel: krawędź dzieli go w tym miejscu, środek zamienia panele miejscami. Dwuklik maksymalizuje."
+    "dragPaneHint": "Przeciągnij nagłówek lub kartę na inny panel: krawędź dzieli go w tym miejscu, środek dokłada jako kartę; krawędzie obszaru robią pełną kolumnę lub wiersz. Dwuklik maksymalizuje.",
+    "paneShortcuts": "Klawiatura: Ctrl+Alt+strzałki — sąsiedni panel · Ctrl+Alt+1…6 — grupa paneli nr N · Ctrl+Alt+PgUp/PgDn — poprzednia/następna karta"
   },
   "worktrees": {
     "scripts": "Skrypty",

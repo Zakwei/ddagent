@@ -762,7 +762,8 @@ class Translations$workspace$zh_TW extends Translations$workspace$en {
 	@override String get launcherDescription => '為此窗格選擇一個工作區，或建立新的工作區。';
 	@override String get createWorkspace => '建立工作區';
 	@override String get resetLayout => '重設版面配置';
-	@override String get dragPaneHint => '將標題列拖曳到另一個窗格：拖到邊緣會在該處分割，拖到中間會交換兩者。按兩下可最大化。';
+	@override String get dragPaneHint => '將標題列或索引標籤拖曳到另一個窗格：拖到邊緣會在該處分割，拖到中間會加入為索引標籤；拖到工作區邊緣會形成整欄或整列。按兩下可最大化。';
+	@override String get paneShortcuts => '鍵盤：Ctrl+Alt+方向鍵 — 相鄰窗格 · Ctrl+Alt+1…6 — 第 N 個群組 · Ctrl+Alt+PgUp/PgDn — 上一個/下一個索引標籤';
 }
 
 // Path: worktrees
@@ -11929,7 +11930,8 @@ extension on TranslationsZhTw {
 			'workspace.launcherDescription' => '為此窗格選擇一個工作區，或建立新的工作區。',
 			'workspace.createWorkspace' => '建立工作區',
 			'workspace.resetLayout' => '重設版面配置',
-			'workspace.dragPaneHint' => '將標題列拖曳到另一個窗格：拖到邊緣會在該處分割，拖到中間會交換兩者。按兩下可最大化。',
+			'workspace.dragPaneHint' => '將標題列或索引標籤拖曳到另一個窗格：拖到邊緣會在該處分割，拖到中間會加入為索引標籤；拖到工作區邊緣會形成整欄或整列。按兩下可最大化。',
+			'workspace.paneShortcuts' => '鍵盤：Ctrl+Alt+方向鍵 — 相鄰窗格 · Ctrl+Alt+1…6 — 第 N 個群組 · Ctrl+Alt+PgUp/PgDn — 上一個/下一個索引標籤',
 			'worktrees.scripts' => '指令碼',
 			'worktrees.emptyTitle' => '找不到 worktree',
 			'worktrees.emptyDescription' => '建立 worktree 以隔離功能開發或代理執行作業。',

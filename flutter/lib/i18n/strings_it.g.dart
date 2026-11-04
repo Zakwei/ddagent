@@ -763,7 +763,8 @@ class Translations$workspace$it extends Translations$workspace$en {
 	@override String get launcherDescription => 'Scegli un workspace per questo pannello o creane uno nuovo.';
 	@override String get createWorkspace => 'Crea workspace';
 	@override String get resetLayout => 'Ripristina layout';
-	@override String get dragPaneHint => 'Trascina l\'intestazione su un altro riquadro: un bordo lo divide, il centro li scambia. Doppio clic per massimizzare.';
+	@override String get dragPaneHint => 'Trascina l\'intestazione o una scheda su un altro riquadro: un bordo lo divide, il centro la aggiunge come scheda; i bordi dell\'area creano una colonna o riga intera. Doppio clic per massimizzare.';
+	@override String get paneShortcuts => 'Tastiera: Ctrl+Alt+Frecce — riquadro vicino · Ctrl+Alt+1…6 — gruppo N · Ctrl+Alt+PagSu/PagGiù — scheda precedente/successiva';
 }
 
 // Path: worktrees
@@ -11940,7 +11941,8 @@ extension on TranslationsIt {
 			'workspace.launcherDescription' => 'Scegli un workspace per questo pannello o creane uno nuovo.',
 			'workspace.createWorkspace' => 'Crea workspace',
 			'workspace.resetLayout' => 'Ripristina layout',
-			'workspace.dragPaneHint' => 'Trascina l\'intestazione su un altro riquadro: un bordo lo divide, il centro li scambia. Doppio clic per massimizzare.',
+			'workspace.dragPaneHint' => 'Trascina l\'intestazione o una scheda su un altro riquadro: un bordo lo divide, il centro la aggiunge come scheda; i bordi dell\'area creano una colonna o riga intera. Doppio clic per massimizzare.',
+			'workspace.paneShortcuts' => 'Tastiera: Ctrl+Alt+Frecce — riquadro vicino · Ctrl+Alt+1…6 — gruppo N · Ctrl+Alt+PagSu/PagGiù — scheda precedente/successiva',
 			'worktrees.scripts' => 'Script',
 			'worktrees.emptyTitle' => 'Nessun worktree trovato',
 			'worktrees.emptyDescription' => 'Crea un worktree per isolare il lavoro sulle funzionalità o le esecuzioni degli agenti.',

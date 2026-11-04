@@ -1159,8 +1159,11 @@ class Translations$workspace$en {
 	/// en: 'Reset layout'
 	String get resetLayout => 'Reset layout';
 
-	/// en: 'Drag the header onto another pane: an edge splits it, the centre swaps the two. Double-click to maximize.'
-	String get dragPaneHint => 'Drag the header onto another pane: an edge splits it, the centre swaps the two. Double-click to maximize.';
+	/// en: 'Drag the header or a tab onto another pane: an edge splits it, the centre adds it as a tab; the workspace edges make a full column or row. Double-click to maximize.'
+	String get dragPaneHint => 'Drag the header or a tab onto another pane: an edge splits it, the centre adds it as a tab; the workspace edges make a full column or row. Double-click to maximize.';
+
+	/// en: 'Keyboard: Ctrl+Alt+Arrows — neighbouring pane · Ctrl+Alt+1…6 — pane group N · Ctrl+Alt+PgUp/PgDn — previous/next tab'
+	String get paneShortcuts => 'Keyboard: Ctrl+Alt+Arrows — neighbouring pane · Ctrl+Alt+1…6 — pane group N · Ctrl+Alt+PgUp/PgDn — previous/next tab';
 }
 
 // Path: worktrees
@@ -18611,7 +18614,8 @@ extension on Translations {
 			'workspace.launcherDescription' => 'Pick a workspace for this pane, or create a new one.',
 			'workspace.createWorkspace' => 'Create workspace',
 			'workspace.resetLayout' => 'Reset layout',
-			'workspace.dragPaneHint' => 'Drag the header onto another pane: an edge splits it, the centre swaps the two. Double-click to maximize.',
+			'workspace.dragPaneHint' => 'Drag the header or a tab onto another pane: an edge splits it, the centre adds it as a tab; the workspace edges make a full column or row. Double-click to maximize.',
+			'workspace.paneShortcuts' => 'Keyboard: Ctrl+Alt+Arrows — neighbouring pane · Ctrl+Alt+1…6 — pane group N · Ctrl+Alt+PgUp/PgDn — previous/next tab',
 			'worktrees.scripts' => 'Scripts',
 			'worktrees.emptyTitle' => 'No worktrees found',
 			'worktrees.emptyDescription' => 'Create a worktree to isolate feature work or agent runs.',

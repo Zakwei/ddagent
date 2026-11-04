@@ -763,7 +763,8 @@ class Translations$workspace$de extends Translations$workspace$en {
 	@override String get launcherDescription => 'Wähle einen Arbeitsbereich für diesen Bereich oder erstelle einen neuen.';
 	@override String get createWorkspace => 'Arbeitsbereich erstellen';
 	@override String get resetLayout => 'Layout zurücksetzen';
-	@override String get dragPaneHint => 'Ziehen Sie die Kopfzeile auf einen anderen Bereich: Ein Rand teilt ihn, die Mitte tauscht beide. Doppelklick maximiert.';
+	@override String get dragPaneHint => 'Ziehen Sie die Kopfzeile oder einen Tab auf einen anderen Bereich: Ein Rand teilt ihn, die Mitte fügt ihn als Tab hinzu; die Ränder des Arbeitsbereichs erzeugen eine ganze Spalte oder Zeile. Doppelklick maximiert.';
+	@override String get paneShortcuts => 'Tastatur: Strg+Alt+Pfeile — benachbarter Bereich · Strg+Alt+1…6 — Gruppe N · Strg+Alt+Bild↑/Bild↓ — vorheriger/nächster Tab';
 }
 
 // Path: worktrees
@@ -11940,7 +11941,8 @@ extension on TranslationsDe {
 			'workspace.launcherDescription' => 'Wähle einen Arbeitsbereich für diesen Bereich oder erstelle einen neuen.',
 			'workspace.createWorkspace' => 'Arbeitsbereich erstellen',
 			'workspace.resetLayout' => 'Layout zurücksetzen',
-			'workspace.dragPaneHint' => 'Ziehen Sie die Kopfzeile auf einen anderen Bereich: Ein Rand teilt ihn, die Mitte tauscht beide. Doppelklick maximiert.',
+			'workspace.dragPaneHint' => 'Ziehen Sie die Kopfzeile oder einen Tab auf einen anderen Bereich: Ein Rand teilt ihn, die Mitte fügt ihn als Tab hinzu; die Ränder des Arbeitsbereichs erzeugen eine ganze Spalte oder Zeile. Doppelklick maximiert.',
+			'workspace.paneShortcuts' => 'Tastatur: Strg+Alt+Pfeile — benachbarter Bereich · Strg+Alt+1…6 — Gruppe N · Strg+Alt+Bild↑/Bild↓ — vorheriger/nächster Tab',
 			'worktrees.scripts' => 'Skripte',
 			'worktrees.emptyTitle' => 'Keine Worktrees gefunden',
 			'worktrees.emptyDescription' => 'Erstelle einen Worktree, um Feature-Arbeit oder Agent-Läufe zu isolieren.',

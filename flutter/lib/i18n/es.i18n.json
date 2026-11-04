@@ -4363,7 +4363,8 @@
     "launcherDescription": "Elige un espacio de trabajo para este panel o crea uno nuevo.",
     "createWorkspace": "Crear espacio de trabajo",
     "resetLayout": "Restablecer diseño",
-    "dragPaneHint": "Arrastra el encabezado sobre otro panel: un borde lo divide, el centro los intercambia. Doble clic para maximizar."
+    "dragPaneHint": "Arrastra el encabezado o una pestaña sobre otro panel: un borde lo divide, el centro lo añade como pestaña; los bordes del área crean una columna o fila completa. Doble clic para maximizar.",
+    "paneShortcuts": "Teclado: Ctrl+Alt+Flechas — panel vecino · Ctrl+Alt+1…6 — grupo N · Ctrl+Alt+RePág/AvPág — pestaña anterior/siguiente"
   },
   "worktrees": {
     "scripts": "Scripts",

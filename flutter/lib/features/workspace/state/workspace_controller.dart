@@ -118,8 +118,13 @@ class WorkspaceController extends Notifier<WorkspaceState> {
   }
 
   void setActivePaneId(String? id) {
-    if (state.activePaneId == id) return;
-    _set(state.copyWith(activePaneId: () => id));
+    // Focusing a pane also brings its tab to the front of its group.
+    final layout = id == null ? state.layout : setActivePaneInLayout(state.layout, id);
+    final layoutChanged =
+        !identical(layout, state.layout) &&
+        jsonEncode(layout?.toJson()) != jsonEncode(state.layout?.toJson());
+    if (state.activePaneId == id && !layoutChanged) return;
+    _set(state.copyWith(activePaneId: () => id, layout: layoutChanged ? () => layout : null));
   }
 
   void setLastUsedProjectId(String? id) {

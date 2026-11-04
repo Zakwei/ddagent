@@ -6,6 +6,7 @@ import 'package:ddagent_app/features/workspace/view/pane_header_metrics.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Kind icon per pane (port of PANE_KIND_ICONS in SplitWorkspaceGrid.tsx).
@@ -106,7 +107,43 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
   static const _minPaneExtent = 120.0;
   static const _sashExtent = 6.0;
 
+  /// One focus scope per pane body, so keyboard navigation can hand focus
+  /// to a pane (restoring whatever inside it had focus last).
+  final _scopes = <String, FocusScopeNode>{};
+
+  /// A pane is being dragged by its header or tab: the workspace-edge drop
+  /// bands show meanwhile.
+  bool _dragging = false;
+
+  /// Workspace edge the dragged pane hovers (preview of a root dock).
+  PaneDropZone? _rootZone;
+
   GlobalKey _bodyKey(String paneId) => _bodyKeys.putIfAbsent(paneId, GlobalKey.new);
+
+  FocusScopeNode _scope(String paneId) =>
+      _scopes.putIfAbsent(paneId, () => FocusScopeNode(debugLabel: 'pane $paneId'));
+
+  @override
+  void initState() {
+    super.initState();
+    HardwareKeyboard.instance.addHandler(_onKey);
+  }
+
+  @override
+  void dispose() {
+    HardwareKeyboard.instance.removeHandler(_onKey);
+    for (final scope in _scopes.values) {
+      scope.dispose();
+    }
+    super.dispose();
+  }
+
+  void _dragStarted() => setState(() => _dragging = true);
+
+  void _dragEnded() => setState(() {
+    _dragging = false;
+    _rootZone = null;
+  });
 
   PaneLayout? get _effectiveLayout {
     final ids = [for (final p in widget.panes) p.id];
@@ -118,6 +155,15 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
     super.didUpdateWidget(old);
     final ids = {for (final p in widget.panes) p.id};
     _bodyKeys.removeWhere((id, _) => !ids.contains(id));
+    final gone = [
+      for (final id in _scopes.keys)
+        if (!ids.contains(id)) id,
+    ];
+    for (final id in gone) {
+      // Disposed after the frame: the departing pane's subtree still holds it.
+      final scope = _scopes.remove(id)!;
+      WidgetsBinding.instance.addPostFrameCallback((_) => scope.dispose());
+    }
   }
 
   @override
@@ -144,10 +190,7 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
               ? _tile(activePane!, single: false, tabMode: true, maximizeActive: false)
               : single
               ? _tile(panes.first, single: true, tabMode: false, maximizeActive: false)
-              : Padding(
-                  padding: const EdgeInsets.all(2),
-                  child: _node(_effectiveLayout!, const []),
-                ),
+              : _treeWithEdgeBands(),
         ),
       ],
     );
@@ -155,10 +198,83 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
 
   // ─── Split tree ───────────────────────────────────────────────────────────
 
+  /// The split tree plus, while a pane is dragged, drop bands along the
+  /// workspace's outer edges (dock as a full-height column / full-width row).
+  Widget _treeWithEdgeBands() {
+    const band = 22.0;
+    final c = context.appColors;
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Padding(padding: const EdgeInsets.all(2), child: _node(_effectiveLayout!, const [])),
+        if (_dragging) ...[
+          for (final zone in const [
+            PaneDropZone.left,
+            PaneDropZone.right,
+            PaneDropZone.top,
+            PaneDropZone.bottom,
+          ])
+            Positioned(
+              left: zone == PaneDropZone.right ? null : 0,
+              right: zone == PaneDropZone.left ? null : 0,
+              top: zone == PaneDropZone.bottom ? null : 0,
+              bottom: zone == PaneDropZone.top ? null : 0,
+              width: zone == PaneDropZone.left || zone == PaneDropZone.right ? band : null,
+              height: zone == PaneDropZone.top || zone == PaneDropZone.bottom ? band : null,
+              child: DragTarget<SplitPane>(
+                onWillAcceptWithDetails: (_) => widget.panes.length > 1,
+                onMove: (_) {
+                  if (_rootZone != zone) setState(() => _rootZone = zone);
+                },
+                onLeave: (_) {
+                  if (_rootZone == zone) setState(() => _rootZone = null);
+                },
+                onAcceptWithDetails: (d) => _dockRoot(d.data.id, zone),
+                builder: (context, _, _) => ColoredBox(color: c.primary.withValues(alpha: 0.12)),
+              ),
+            ),
+          if (_rootZone case final zone?)
+            Positioned.fill(
+              child: IgnorePointer(
+                child: LayoutBuilder(
+                  builder: (context, box) {
+                    final w = box.maxWidth;
+                    final h = box.maxHeight;
+                    final rect = switch (zone) {
+                      PaneDropZone.left => Rect.fromLTWH(0, 0, w / 3, h),
+                      PaneDropZone.right => Rect.fromLTWH(w * 2 / 3, 0, w / 3, h),
+                      PaneDropZone.top => Rect.fromLTWH(0, 0, w, h / 3),
+                      PaneDropZone.bottom ||
+                      PaneDropZone.center => Rect.fromLTWH(0, h * 2 / 3, w, h / 3),
+                    };
+                    return Stack(
+                      children: [
+                        Positioned.fromRect(
+                          rect: rect,
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: c.primary.withValues(alpha: 0.18),
+                              border: Border.all(color: c.primary.withValues(alpha: 0.7)),
+                              borderRadius: AppRadii.borderSm,
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ),
+        ],
+      ],
+    );
+  }
+
   Widget _node(PaneLayout node, List<int> path) {
     switch (node) {
-      case PaneLeaf(:final paneId):
-        final pane = widget.panes.where((p) => p.id == paneId).firstOrNull;
+      case PaneLeaf():
+        if (!node.isSingle) return _groupTile(node);
+        final pane = widget.panes.where((p) => p.id == node.paneIds.single).firstOrNull;
         if (pane == null) return const SizedBox.shrink();
         return _tile(pane, single: false, tabMode: false, maximizeActive: false, dockable: true);
       case PaneSplit():
@@ -227,10 +343,320 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
     if (next != null) widget.onLayoutChanged?.call(next);
   }
 
-  void _dock(String fromId, String targetId, PaneDropZone zone) {
-    final next = movePaneInLayout(_effectiveLayout, fromId, targetId, zone);
+  /// Drop of [fromId] on [group]: aimed at a member other than the dragged
+  /// pane, so a tab dragged to its own group's edge splits out of it.
+  void _dock(String fromId, PaneLeaf group, PaneDropZone zone) {
+    final target = group.paneIds.where((id) => id != fromId).firstOrNull;
+    if (target == null) return;
+    final next = movePaneInLayout(_effectiveLayout, fromId, target, zone);
     if (next != null) widget.onLayoutChanged?.call(next);
     widget.onActivatePane?.call(fromId);
+  }
+
+  void _dockRoot(String fromId, PaneDropZone zone) {
+    final next = dockPaneAtRoot(_effectiveLayout, fromId, zone);
+    if (next != null) widget.onLayoutChanged?.call(next);
+    widget.onActivatePane?.call(fromId);
+  }
+
+  // ─── Keyboard (Ctrl+Alt+…) ────────────────────────────────────────────────
+
+  /// Ctrl+Alt+Arrow focuses the neighbouring group, Ctrl+Alt+1…9 the n-th
+  /// group, Ctrl+Alt+PageUp/PageDown the previous/next tab of the focused
+  /// group. Chosen so terminals and editors keep their own Ctrl/Alt keys.
+  bool _onKey(KeyEvent e) {
+    if (e is! KeyDownEvent || !mounted) return false;
+    final kb = HardwareKeyboard.instance;
+    if (!kb.isControlPressed || !kb.isAltPressed || kb.isShiftPressed || kb.isMetaPressed) {
+      return false;
+    }
+    if (ModalRoute.of(context)?.isCurrent == false) return false;
+    if (context.breakpoint.isCompact || widget.panes.length < 2) return false;
+    final maximized = widget.panes.any((p) => p.id == widget.maximizedPaneId);
+    if (maximized) return false;
+    final groups = layoutGroups(_effectiveLayout);
+    if (groups.isEmpty) return false;
+    final current = groups.indexWhere((g) => g.paneIds.contains(widget.activePaneId));
+    final group = groups[current < 0 ? 0 : current];
+    final key = e.logicalKey;
+
+    const digits = [
+      LogicalKeyboardKey.digit1,
+      LogicalKeyboardKey.digit2,
+      LogicalKeyboardKey.digit3,
+      LogicalKeyboardKey.digit4,
+      LogicalKeyboardKey.digit5,
+      LogicalKeyboardKey.digit6,
+      LogicalKeyboardKey.digit7,
+      LogicalKeyboardKey.digit8,
+      LogicalKeyboardKey.digit9,
+    ];
+    final n = digits.indexOf(key);
+    if (n >= 0) {
+      if (n >= groups.length) return false;
+      _focusPane(groups[n].activeId);
+      return true;
+    }
+    if (key == LogicalKeyboardKey.pageUp || key == LogicalKeyboardKey.pageDown) {
+      if (group.isSingle) return false;
+      final at = group.paneIds.indexOf(group.activeId);
+      final step = key == LogicalKeyboardKey.pageDown ? 1 : -1;
+      _focusPane(group.paneIds[(at + step) % group.paneIds.length]);
+      return true;
+    }
+    final dir = switch (key) {
+      LogicalKeyboardKey.arrowLeft => PaneDropZone.left,
+      LogicalKeyboardKey.arrowRight => PaneDropZone.right,
+      LogicalKeyboardKey.arrowUp => PaneDropZone.top,
+      LogicalKeyboardKey.arrowDown => PaneDropZone.bottom,
+      _ => null,
+    };
+    if (dir == null) return false;
+    final next = _neighbour(groups, group, dir);
+    if (next != null) _focusPane(next.activeId);
+    return true;
+  }
+
+  Rect? _groupRect(PaneLeaf g) {
+    final box = _bodyKeys[g.activeId]?.currentContext?.findRenderObject() as RenderBox?;
+    if (box == null || !box.hasSize) return null;
+    return box.localToGlobal(Offset.zero) & box.size;
+  }
+
+  /// The group next to [from] in direction [dir]: among groups lying that
+  /// way, prefer ones overlapping it across the axis, then the nearest.
+  PaneLeaf? _neighbour(List<PaneLeaf> groups, PaneLeaf from, PaneDropZone dir) {
+    final origin = _groupRect(from);
+    if (origin == null) return null;
+    PaneLeaf? best;
+    var bestScore = double.infinity;
+    for (final g in groups) {
+      if (identical(g, from)) continue;
+      final r = _groupRect(g);
+      if (r == null) continue;
+      final (ahead, gap, overlap) = switch (dir) {
+        PaneDropZone.left => (
+          r.center.dx < origin.center.dx,
+          origin.left - r.right,
+          r.top < origin.bottom && r.bottom > origin.top,
+        ),
+        PaneDropZone.right => (
+          r.center.dx > origin.center.dx,
+          r.left - origin.right,
+          r.top < origin.bottom && r.bottom > origin.top,
+        ),
+        PaneDropZone.top => (
+          r.center.dy < origin.center.dy,
+          origin.top - r.bottom,
+          r.left < origin.right && r.right > origin.left,
+        ),
+        PaneDropZone.bottom || PaneDropZone.center => (
+          r.center.dy > origin.center.dy,
+          r.top - origin.bottom,
+          r.left < origin.right && r.right > origin.left,
+        ),
+      };
+      if (!ahead) continue;
+      final score = gap.abs() + (overlap ? 0 : 100000) + (r.center - origin.center).distance / 1000;
+      if (score < bestScore) {
+        bestScore = score;
+        best = g;
+      }
+    }
+    return best;
+  }
+
+  /// Activates [paneId] and moves keyboard focus into it (where it last was,
+  /// else its first focusable widget).
+  void _focusPane(String paneId) {
+    widget.onActivatePane?.call(paneId);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final scope = _scopes[paneId];
+      if (!mounted || scope == null || scope.context == null) return;
+      scope.requestFocus();
+      if (scope.focusedChild == null) {
+        scope.traversalDescendants
+            .where((n) => n.canRequestFocus && !n.skipTraversal)
+            .firstOrNull
+            ?.requestFocus();
+      }
+    });
+  }
+
+  // ─── Tab groups ───────────────────────────────────────────────────────────
+
+  Widget _body(SplitPane pane, {required bool isActive}) => KeyedSubtree(
+    key: _bodyKey(pane.id),
+    child: FocusScope(node: _scope(pane.id), child: widget.renderPane(pane, isActive)),
+  );
+
+  /// A group of panes shown as tabs (VS Code editor group): a tab strip and
+  /// the visible pane; the other members stay mounted offstage so terminals
+  /// and browser streams keep running.
+  Widget _groupTile(PaneLeaf group) {
+    final c = context.appColors;
+    final members = [
+      for (final id in group.paneIds) ?widget.panes.where((p) => p.id == id).firstOrNull,
+    ];
+    if (members.isEmpty) return const SizedBox.shrink();
+    final visible = members.firstWhere((p) => p.id == group.activeId, orElse: () => members.first);
+    final groupActive = group.paneIds.contains(widget.activePaneId);
+    final tile = Container(
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: groupActive ? c.primary.withValues(alpha: 0.6) : c.border.withValues(alpha: 0.5),
+        ),
+        borderRadius: AppRadii.borderSm,
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: [
+          _groupTabBar(members, visible, groupActive: groupActive),
+          Expanded(
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                for (final p in members)
+                  Offstage(
+                    offstage: p.id != visible.id,
+                    child: ExcludeFocus(
+                      excluding: p.id != visible.id,
+                      child: ClipRect(child: _body(p, isActive: widget.activePaneId == p.id)),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+    return Listener(
+      onPointerDown: (_) => widget.onActivatePane?.call(visible.id),
+      behavior: HitTestBehavior.translucent,
+      child: _PaneDropTarget(
+        memberIds: group.paneIds.toSet(),
+        onDrop: (fromId, zone) => _dock(fromId, group, zone),
+        child: tile,
+      ),
+    );
+  }
+
+  Widget _groupTabBar(List<SplitPane> members, SplitPane visible, {required bool groupActive}) {
+    final c = context.appColors;
+    final i18n = Translations.of(context);
+    final m = paneHeaderMetrics(context);
+    return Container(
+      height: m.barHeight,
+      decoration: BoxDecoration(
+        color: c.muted.withValues(alpha: 0.3),
+        border: Border(bottom: BorderSide(color: c.border.withValues(alpha: 0.5))),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  for (final p in members)
+                    _groupTab(p, selected: p.id == visible.id, groupActive: groupActive),
+                ],
+              ),
+            ),
+          ),
+          if (widget.onToggleMaximizePane != null)
+            _headerButton(
+              icon: LucideIcons.maximize2,
+              tooltip: i18n.workspace.maximizePane,
+              onPressed: () => widget.onToggleMaximizePane!(visible.id),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _groupTab(SplitPane pane, {required bool selected, required bool groupActive}) {
+    final c = context.appColors;
+    final i18n = Translations.of(context);
+    final title = widget.paneTitle?.call(pane) ?? paneKindLabel(pane.kind);
+    final (accent, accentIcon) = selected
+        ? (null, null)
+        : widget.actionPaneIds.contains(pane.id)
+        ? (_actionColor, LucideIcons.triangleAlert)
+        : widget.finishedPaneIds.contains(pane.id)
+        ? (_finishedColor, Icons.check_circle)
+        : (null, null);
+    final fg = accent ?? (selected ? c.foreground : c.mutedForeground);
+    final tab = Listener(
+      onPointerDown: (e) => _headerPointerDown(pane.id, e),
+      child: InkWell(
+        onTap: () => widget.onActivatePane?.call(pane.id),
+        child: Container(
+          padding: const EdgeInsets.only(left: 10, right: 4),
+          decoration: BoxDecoration(
+            color: selected ? c.background : null,
+            border: Border(
+              top: BorderSide(
+                width: 2,
+                color: selected && groupActive ? c.primary : Colors.transparent,
+              ),
+              right: BorderSide(color: c.border.withValues(alpha: 0.5)),
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(accentIcon ?? paneKindIcon(pane.kind), size: 13, color: accent ?? fg),
+              const SizedBox(width: 6),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 160),
+                child: Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 12, color: fg),
+                ),
+              ),
+              const SizedBox(width: 2),
+              Tooltip(
+                message: i18n.workspace.closePane,
+                child: InkWell(
+                  borderRadius: AppRadii.borderSm,
+                  onTap: () => widget.onClosePane(pane.id),
+                  child: Padding(
+                    padding: const EdgeInsets.all(4),
+                    child: Icon(LucideIcons.x, size: 12, color: c.mutedForeground),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    return Draggable<SplitPane>(
+      data: pane,
+      dragAnchorStrategy: pointerDragAnchorStrategy,
+      onDragStarted: _dragStarted,
+      onDragEnd: (_) => _dragEnded(),
+      onDraggableCanceled: (_, _) => _dragEnded(),
+      feedback: _PaneDragFeedback(icon: paneKindIcon(pane.kind), title: title),
+      child: tab,
+    );
+  }
+
+  /// Hand-timed double click on a header/tab → maximize: a DoubleTap
+  /// recognizer would hold the arena and delay every click on its buttons.
+  void _headerPointerDown(String paneId, PointerDownEvent e) {
+    if (e.buttons != kPrimaryButton || widget.onToggleMaximizePane == null) return;
+    final now = DateTime.now();
+    final last = _lastHeaderDown;
+    _lastHeaderDown = (paneId, now);
+    if (last != null && last.$1 == paneId && now.difference(last.$2) < kDoubleTapTimeout) {
+      _lastHeaderDown = null;
+      widget.onToggleMaximizePane!(paneId);
+    }
   }
 
   Widget _tabStrip(List<SplitPane> panes, SplitPane activePane) {
@@ -249,9 +675,36 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
           for (final p in panes)
             Padding(
               padding: const EdgeInsets.only(right: AppSpacing.xs),
-              child: _tab(p, selected: p.id == activePane.id),
+              child: _reorderableTab(p, selected: p.id == activePane.id),
             ),
         ],
+      ),
+    );
+  }
+
+  /// Phone strip: long-press a tab and drop it on another to swap the two
+  /// panes (the same swap reorders the desktop layout).
+  Widget _reorderableTab(SplitPane pane, {required bool selected}) {
+    final c = context.appColors;
+    return LongPressDraggable<SplitPane>(
+      data: pane,
+      feedback: _PaneDragFeedback(
+        icon: paneKindIcon(pane.kind),
+        title: widget.paneTitle?.call(pane) ?? paneKindLabel(pane.kind),
+      ),
+      child: DragTarget<SplitPane>(
+        onWillAcceptWithDetails: (d) => d.data.id != pane.id,
+        onAcceptWithDetails: (d) {
+          final next = swapPanesInLayout(_effectiveLayout, d.data.id, pane.id);
+          if (next != null) widget.onLayoutChanged?.call(next);
+        },
+        builder: (context, candidates, _) => DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: AppRadii.borderMd,
+            border: Border.all(color: candidates.isEmpty ? Colors.transparent : c.primary),
+          ),
+          child: _tab(pane, selected: selected),
+        ),
       ),
     );
   }
@@ -371,17 +824,15 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
             draggable: dockable,
           ),
           Expanded(
-            child: ClipRect(
-              child: KeyedSubtree(key: _bodyKey(pane.id), child: widget.renderPane(pane, isActive)),
-            ),
+            child: ClipRect(child: _body(pane, isActive: isActive)),
           ),
         ],
       ),
     );
     if (dockable) {
       tile = _PaneDropTarget(
-        paneId: pane.id,
-        onDrop: (fromId, zone) => _dock(fromId, pane.id, zone),
+        memberIds: {pane.id},
+        onDrop: (fromId, zone) => _dock(fromId, PaneLeaf(pane.id), zone),
         child: tile,
       );
     }
@@ -463,19 +914,7 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
       // Double-click toggles maximize (VS Code: double-click the tab bar).
       // Timed by hand: a DoubleTap recognizer would hold the arena and delay
       // every click on the header buttons.
-      header = Listener(
-        onPointerDown: (e) {
-          if (e.buttons != kPrimaryButton) return;
-          final now = DateTime.now();
-          final last = _lastHeaderDown;
-          _lastHeaderDown = (pane.id, now);
-          if (last != null && last.$1 == pane.id && now.difference(last.$2) < kDoubleTapTimeout) {
-            _lastHeaderDown = null;
-            widget.onToggleMaximizePane!(pane.id);
-          }
-        },
-        child: header,
-      );
+      header = Listener(onPointerDown: (e) => _headerPointerDown(pane.id, e), child: header);
     }
     if (!draggable) return header;
     // The whole header is the drag handle (VS Code drags a group by its
@@ -484,6 +923,9 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
     return Draggable<SplitPane>(
       data: pane,
       dragAnchorStrategy: pointerDragAnchorStrategy,
+      onDragStarted: _dragStarted,
+      onDragEnd: (_) => _dragEnded(),
+      onDraggableCanceled: (_, _) => _dragEnded(),
       feedback: _PaneDragFeedback(
         icon: paneKindIcon(pane.kind),
         title: widget.paneTitle?.call(pane) ?? paneKindLabel(pane.kind),
@@ -622,9 +1064,11 @@ class _SashState extends State<_Sash> {
 /// the nearest edge (split there) or the whole pane (swap), like VS Code's
 /// editor-group drop overlay.
 class _PaneDropTarget extends StatefulWidget {
-  const _PaneDropTarget({required this.paneId, required this.onDrop, required this.child});
+  const _PaneDropTarget({required this.memberIds, required this.onDrop, required this.child});
 
-  final String paneId;
+  /// Panes of the target group; a group made of just the dragged pane
+  /// refuses the drop (a pane on itself).
+  final Set<String> memberIds;
   final void Function(String fromId, PaneDropZone zone) onDrop;
   final Widget child;
 
@@ -660,7 +1104,8 @@ class _PaneDropTargetState extends State<_PaneDropTarget> {
   Widget build(BuildContext context) {
     final c = context.appColors;
     return DragTarget<SplitPane>(
-      onWillAcceptWithDetails: (d) => d.data.id != widget.paneId,
+      onWillAcceptWithDetails: (d) =>
+          !(widget.memberIds.length == 1 && widget.memberIds.contains(d.data.id)),
       onMove: (d) => _update(d.offset),
       onLeave: (_) => setState(() => _zone = null),
       onAcceptWithDetails: (d) {

@@ -763,7 +763,8 @@ class Translations$workspace$es extends Translations$workspace$en {
 	@override String get launcherDescription => 'Elige un espacio de trabajo para este panel o crea uno nuevo.';
 	@override String get createWorkspace => 'Crear espacio de trabajo';
 	@override String get resetLayout => 'Restablecer diseño';
-	@override String get dragPaneHint => 'Arrastra el encabezado sobre otro panel: un borde lo divide, el centro los intercambia. Doble clic para maximizar.';
+	@override String get dragPaneHint => 'Arrastra el encabezado o una pestaña sobre otro panel: un borde lo divide, el centro lo añade como pestaña; los bordes del área crean una columna o fila completa. Doble clic para maximizar.';
+	@override String get paneShortcuts => 'Teclado: Ctrl+Alt+Flechas — panel vecino · Ctrl+Alt+1…6 — grupo N · Ctrl+Alt+RePág/AvPág — pestaña anterior/siguiente';
 }
 
 // Path: worktrees
@@ -11940,7 +11941,8 @@ extension on TranslationsEs {
 			'workspace.launcherDescription' => 'Elige un espacio de trabajo para este panel o crea uno nuevo.',
 			'workspace.createWorkspace' => 'Crear espacio de trabajo',
 			'workspace.resetLayout' => 'Restablecer diseño',
-			'workspace.dragPaneHint' => 'Arrastra el encabezado sobre otro panel: un borde lo divide, el centro los intercambia. Doble clic para maximizar.',
+			'workspace.dragPaneHint' => 'Arrastra el encabezado o una pestaña sobre otro panel: un borde lo divide, el centro lo añade como pestaña; los bordes del área crean una columna o fila completa. Doble clic para maximizar.',
+			'workspace.paneShortcuts' => 'Teclado: Ctrl+Alt+Flechas — panel vecino · Ctrl+Alt+1…6 — grupo N · Ctrl+Alt+RePág/AvPág — pestaña anterior/siguiente',
 			'worktrees.scripts' => 'Scripts',
 			'worktrees.emptyTitle' => 'No se encontraron worktrees',
 			'worktrees.emptyDescription' => 'Crea un worktree para aislar el trabajo de una funcionalidad o las ejecuciones de agentes.',

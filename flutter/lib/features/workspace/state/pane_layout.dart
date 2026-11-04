@@ -1,10 +1,12 @@
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
 
 // VS Code-style workspace layout: a tree of row/column splits whose leaves
-// are pane ids. Pure and Flutter-free so it can be synced, merged and tested.
+// are pane groups — one or more panes shown as tabs, one of them visible.
+// Pure and Flutter-free so it can be synced, merged and tested.
 //
 // Wire shape (inside the synced workspace state as `layout`):
-//   leaf  → {"pane": "<pane id>"}
+//   group → {"pane": "<id>"}                       (a single pane)
+//           {"panes": ["<id>", ...], "active": "<id>"}  (tabs)
 //   split → {"axis": "row" | "column", "children": [...], "weights": [int, ...]}
 // Weights are integers normalized to sum to [kLayoutWeightTotal], so a
 // resized layout serializes byte-identically on every device (sync compares
@@ -19,8 +21,9 @@ const _maxDepth = 8;
 /// `row` lays children left→right, `column` top→bottom.
 enum PaneAxis { row, column }
 
-/// Where a dragged pane lands on a target pane: one of its edges (split
-/// there) or its centre (swap the two panes).
+/// Where a dragged pane lands on a target group: one of its edges (split
+/// there) or its centre (join the group as a tab). On the workspace's own
+/// outer edges it makes a full-height column / full-width row.
 enum PaneDropZone { left, right, top, bottom, center }
 
 sealed class PaneLayout {
@@ -34,6 +37,16 @@ sealed class PaneLayout {
     if (value is! Map || depth > _maxDepth) return null;
     final pane = value['pane'];
     if (pane is String && pane.isNotEmpty) return PaneLeaf(pane);
+    final panes = value['panes'];
+    if (panes is List) {
+      final ids = <String>{
+        for (final id in panes)
+          if (id is String && id.isNotEmpty) id,
+      }.toList();
+      if (ids.isEmpty) return null;
+      final active = value['active'];
+      return PaneLeaf.group(ids, active is String ? active : ids.first);
+    }
     final axis = PaneAxis.values.asNameMap()[value['axis']];
     final rawChildren = value['children'];
     if (axis == null || rawChildren is! List) return null;
@@ -55,13 +68,24 @@ sealed class PaneLayout {
   }
 }
 
+/// A leaf of the tree: a group of panes shown as tabs ([paneIds] in tab
+/// order), [activeId] the visible one. Most groups hold a single pane.
 final class PaneLeaf extends PaneLayout {
-  const PaneLeaf(this.paneId);
+  PaneLeaf(String paneId) : paneIds = List.unmodifiable([paneId]), activeId = paneId;
 
-  final String paneId;
+  PaneLeaf.group(List<String> paneIds, String activeId)
+    : assert(paneIds.isNotEmpty),
+      paneIds = List.unmodifiable(paneIds),
+      activeId = paneIds.contains(activeId) ? activeId : paneIds.first;
+
+  final List<String> paneIds;
+  final String activeId;
+
+  bool get isSingle => paneIds.length == 1;
 
   @override
-  Map<String, dynamic> toJson() => {'pane': paneId};
+  Map<String, dynamic> toJson() =>
+      isSingle ? {'pane': paneIds.single} : {'panes': paneIds, 'active': activeId};
 }
 
 final class PaneSplit extends PaneLayout {
@@ -129,12 +153,21 @@ PaneLayout? simplifyLayout(PaneLayout? node) {
   return PaneSplit(node.axis, children, normalizeWeights(weights));
 }
 
-/// Pane ids in reading order (depth-first, left→right / top→bottom).
-List<String> layoutLeafOrder(PaneLayout? node) => switch (node) {
+/// Groups in reading order (depth-first, left→right / top→bottom).
+List<PaneLeaf> layoutGroups(PaneLayout? node) => switch (node) {
   null => const [],
-  PaneLeaf(:final paneId) => [paneId],
-  PaneSplit(:final children) => [for (final c in children) ...layoutLeafOrder(c)],
+  PaneLeaf() => [node],
+  PaneSplit(:final children) => [for (final c in children) ...layoutGroups(c)],
 };
+
+/// Pane ids in reading order: groups in reading order, tabs in tab order.
+List<String> layoutLeafOrder(PaneLayout? node) => [
+  for (final g in layoutGroups(node)) ...g.paneIds,
+];
+
+/// The group holding [paneId], or null.
+PaneLeaf? layoutGroupOf(PaneLayout? layout, String paneId) =>
+    layoutGroups(layout).where((g) => g.paneIds.contains(paneId)).firstOrNull;
 
 /// The automatic grid the workspace used before layouts became editable
 /// (`getSplitLayout`): equal rows, equal cells, a partial last row stretched
@@ -157,10 +190,12 @@ PaneLayout? autoPaneLayout(List<String> ids) {
   return PaneSplit(PaneAxis.column, rows, normalizeWeights(List.filled(rows.length, 1)));
 }
 
-/// [layout] without the leaf of [paneId]; its space goes to its siblings.
-PaneLayout? removePaneFromLayout(PaneLayout? layout, String paneId) {
+/// Rebuilds the tree bottom-up: [group] maps each group to its replacement
+/// (null drops it); splits losing children drop their weights, then the
+/// result is simplified.
+PaneLayout? _mapGroups(PaneLayout? layout, PaneLayout? Function(PaneLeaf group) group) {
   PaneLayout? visit(PaneLayout node) => switch (node) {
-    PaneLeaf(paneId: final id) => id == paneId ? null : node,
+    PaneLeaf() => group(node),
     PaneSplit() => () {
       final children = <PaneLayout>[];
       final weights = <int>[];
@@ -176,10 +211,22 @@ PaneLayout? removePaneFromLayout(PaneLayout? layout, String paneId) {
   return layout == null ? null : simplifyLayout(visit(layout));
 }
 
-/// Docks [paneId] at [zone] of the [targetId] leaf (not [PaneDropZone.center]):
-/// the target's space is halved between the two. A target already inside a
-/// split along that axis gets a sibling; otherwise the target is wrapped in a
-/// new split. An unknown target appends [paneId] to the right of everything.
+/// [layout] without [paneId]. A group keeps its other tabs (the neighbour
+/// tab becomes visible); an emptied group gives its space to its siblings.
+PaneLayout? removePaneFromLayout(PaneLayout? layout, String paneId) => _mapGroups(layout, (g) {
+  final at = g.paneIds.indexOf(paneId);
+  if (at < 0) return g;
+  final rest = [...g.paneIds]..removeAt(at);
+  if (rest.isEmpty) return null;
+  final active = g.activeId == paneId ? rest[at.clamp(0, rest.length - 1)] : g.activeId;
+  return PaneLeaf.group(rest, active);
+});
+
+/// Docks [paneId] (not in the layout) at an edge [zone] of the group holding
+/// [targetId]: the group's space is halved between the two. A group already
+/// inside a split along that axis gets a sibling; otherwise it is wrapped in
+/// a new split. [PaneDropZone.center] adds it to the group as the visible
+/// tab. An unknown target appends [paneId] to the right of everything.
 PaneLayout insertPaneIntoLayout(
   PaneLayout? layout,
   String paneId,
@@ -188,7 +235,16 @@ PaneLayout insertPaneIntoLayout(
 ) {
   final leaf = PaneLeaf(paneId);
   if (layout == null) return leaf;
-  assert(zone != PaneDropZone.center);
+  if (zone == PaneDropZone.center) {
+    var added = false;
+    final next = _mapGroups(layout, (g) {
+      final at = g.paneIds.indexOf(targetId);
+      if (at < 0 || added) return g;
+      added = true;
+      return PaneLeaf.group([...g.paneIds]..insert(at + 1, paneId), paneId);
+    });
+    return added ? next! : insertPaneIntoLayout(layout, paneId, '', PaneDropZone.right);
+  }
   final axis = zone == PaneDropZone.left || zone == PaneDropZone.right
       ? PaneAxis.row
       : PaneAxis.column;
@@ -197,8 +253,8 @@ PaneLayout insertPaneIntoLayout(
 
   PaneLayout visit(PaneLayout node) {
     switch (node) {
-      case PaneLeaf(paneId: final id):
-        if (id != targetId || found) return node;
+      case PaneLeaf():
+        if (!node.paneIds.contains(targetId) || found) return node;
         found = true;
         return PaneSplit(axis, before ? [leaf, node] : [node, leaf], const [1, 1]);
       case PaneSplit():
@@ -206,7 +262,7 @@ PaneLayout insertPaneIntoLayout(
         final weights = <int>[];
         for (final (i, c) in node.children.indexed) {
           final w = node.weights[i];
-          if (!found && node.axis == axis && c is PaneLeaf && c.paneId == targetId) {
+          if (!found && node.axis == axis && c is PaneLeaf && c.paneIds.contains(targetId)) {
             found = true;
             final half = w / 2;
             if (before) {
@@ -229,18 +285,18 @@ PaneLayout insertPaneIntoLayout(
   return simplifyLayout(PaneSplit(PaneAxis.row, [layout, leaf], const [2, 1]))!;
 }
 
-/// Swaps the positions of two panes.
+/// Swaps the positions of two panes (tabs included).
 PaneLayout? swapPanesInLayout(PaneLayout? layout, String a, String b) {
-  PaneLayout? visit(PaneLayout? node) => switch (node) {
-    null => null,
-    PaneLeaf(:final paneId) => paneId == a ? PaneLeaf(b) : (paneId == b ? PaneLeaf(a) : node),
-    PaneSplit() => PaneSplit(node.axis, [for (final c in node.children) visit(c)!], node.weights),
-  };
-  return visit(layout);
+  String swap(String id) => id == a ? b : (id == b ? a : id);
+  return _mapGroups(
+    layout,
+    (g) => PaneLeaf.group([for (final id in g.paneIds) swap(id)], swap(g.activeId)),
+  );
 }
 
-/// Drag-and-drop of pane [fromId] onto pane [targetId]: centre swaps, an
-/// edge moves it there. Dropping a pane on itself changes nothing.
+/// Drag-and-drop of pane [fromId] onto the group holding [targetId]: the
+/// centre adds it to that group as a tab, an edge splits there. Dropping a
+/// pane on itself, or on the centre of its own group, changes nothing.
 PaneLayout? movePaneInLayout(
   PaneLayout? layout,
   String fromId,
@@ -248,9 +304,33 @@ PaneLayout? movePaneInLayout(
   PaneDropZone zone,
 ) {
   if (layout == null || fromId == targetId) return layout;
-  if (zone == PaneDropZone.center) return swapPanesInLayout(layout, fromId, targetId);
+  if (zone == PaneDropZone.center &&
+      layoutGroupOf(layout, targetId)?.paneIds.contains(fromId) == true) {
+    return layout;
+  }
   return insertPaneIntoLayout(removePaneFromLayout(layout, fromId), fromId, targetId, zone);
 }
+
+/// Moves [paneId] to an outer edge of the whole workspace: a full-height
+/// column (left/right) or full-width row (top/bottom) taking a third.
+PaneLayout? dockPaneAtRoot(PaneLayout? layout, String paneId, PaneDropZone zone) {
+  final rest = removePaneFromLayout(layout, paneId);
+  final leaf = PaneLeaf(paneId);
+  if (rest == null || zone == PaneDropZone.center) return rest ?? leaf;
+  final axis = zone == PaneDropZone.left || zone == PaneDropZone.right
+      ? PaneAxis.row
+      : PaneAxis.column;
+  final before = zone == PaneDropZone.left || zone == PaneDropZone.top;
+  return simplifyLayout(
+    PaneSplit(axis, before ? [leaf, rest] : [rest, leaf], before ? const [1, 2] : const [2, 1]),
+  );
+}
+
+/// Makes [paneId] the visible tab of its group.
+PaneLayout? setActivePaneInLayout(PaneLayout? layout, String paneId) => _mapGroups(
+  layout,
+  (g) => g.paneIds.contains(paneId) && g.activeId != paneId ? PaneLeaf.group(g.paneIds, paneId) : g,
+);
 
 /// Replaces the weights of the split at [path] (child indices from the root).
 PaneLayout? setLayoutWeights(PaneLayout? layout, List<int> path, List<num> weights) {
@@ -280,28 +360,20 @@ PaneSplit? layoutSplitAt(PaneLayout? layout, List<int> path) {
   return node is PaneSplit ? node : null;
 }
 
-/// Makes [layout] describe exactly [ids]: leaves of unknown or duplicate
-/// panes are dropped, missing panes are appended on the right. Null stays
-/// null (the automatic grid).
+/// Makes [layout] describe exactly [ids]: unknown or duplicate panes are
+/// dropped, missing panes are appended on the right. Null stays null (the
+/// automatic grid).
 PaneLayout? reconcileLayout(PaneLayout? layout, List<String> ids) {
   if (layout == null) return null;
   final wanted = ids.toSet();
   final seen = <String>{};
-  PaneLayout? visit(PaneLayout node) => switch (node) {
-    PaneLeaf(:final paneId) => wanted.contains(paneId) && seen.add(paneId) ? node : null,
-    PaneSplit() => () {
-      final children = <PaneLayout>[];
-      final weights = <int>[];
-      for (final (i, c) in node.children.indexed) {
-        final next = visit(c);
-        if (next == null) continue;
-        children.add(next);
-        weights.add(node.weights[i]);
-      }
-      return children.isEmpty ? null : PaneSplit(node.axis, children, weights);
-    }(),
-  };
-  var next = simplifyLayout(visit(layout));
+  var next = _mapGroups(layout, (g) {
+    final kept = [
+      for (final id in g.paneIds)
+        if (wanted.contains(id) && seen.add(id)) id,
+    ];
+    return kept.isEmpty ? null : PaneLeaf.group(kept, g.activeId);
+  });
   for (final id in ids) {
     if (seen.contains(id)) continue;
     final last = layoutLeafOrder(next).lastOrNull;

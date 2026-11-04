@@ -4352,7 +4352,8 @@
     "launcherDescription": "为此窗格选择一个工作区，或新建一个。",
     "createWorkspace": "创建工作区",
     "resetLayout": "重置布局",
-    "dragPaneHint": "将标题栏拖到另一个窗格：拖到边缘会在该处拆分，拖到中间会交换两者。双击可最大化。"
+    "dragPaneHint": "将标题栏或标签拖到另一个窗格：拖到边缘会在该处拆分，拖到中间会作为标签加入；拖到工作区边缘会形成整列或整行。双击可最大化。",
+    "paneShortcuts": "键盘：Ctrl+Alt+方向键 — 相邻窗格 · Ctrl+Alt+1…6 — 第 N 个组 · Ctrl+Alt+PgUp/PgDn — 上一个/下一个标签"
   },
   "worktrees": {
     "scripts": "脚本",

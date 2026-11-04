@@ -762,7 +762,8 @@ class Translations$workspace$ja extends Translations$workspace$en {
 	@override String get launcherDescription => 'このペインのワークスペースを選択するか、新しく作成してください。';
 	@override String get createWorkspace => 'ワークスペースを作成';
 	@override String get resetLayout => 'レイアウトをリセット';
-	@override String get dragPaneHint => 'ヘッダーを別のペインにドラッグ: 端でそこを分割、中央で入れ替えます。ダブルクリックで最大化。';
+	@override String get dragPaneHint => 'ヘッダーまたはタブを別のペインにドラッグ: 端でそこを分割、中央でタブとして追加。作業領域の端では列または行全体になります。ダブルクリックで最大化。';
+	@override String get paneShortcuts => 'キーボード: Ctrl+Alt+矢印 — 隣のペイン · Ctrl+Alt+1…6 — N 番目のグループ · Ctrl+Alt+PgUp/PgDn — 前/次のタブ';
 }
 
 // Path: worktrees
@@ -11929,7 +11930,8 @@ extension on TranslationsJa {
 			'workspace.launcherDescription' => 'このペインのワークスペースを選択するか、新しく作成してください。',
 			'workspace.createWorkspace' => 'ワークスペースを作成',
 			'workspace.resetLayout' => 'レイアウトをリセット',
-			'workspace.dragPaneHint' => 'ヘッダーを別のペインにドラッグ: 端でそこを分割、中央で入れ替えます。ダブルクリックで最大化。',
+			'workspace.dragPaneHint' => 'ヘッダーまたはタブを別のペインにドラッグ: 端でそこを分割、中央でタブとして追加。作業領域の端では列または行全体になります。ダブルクリックで最大化。',
+			'workspace.paneShortcuts' => 'キーボード: Ctrl+Alt+矢印 — 隣のペイン · Ctrl+Alt+1…6 — N 番目のグループ · Ctrl+Alt+PgUp/PgDn — 前/次のタブ',
 			'worktrees.scripts' => 'スクリプト',
 			'worktrees.emptyTitle' => 'worktree が見つかりません',
 			'worktrees.emptyDescription' => 'worktree を作成して、機能開発やエージェントの実行を分離します。',

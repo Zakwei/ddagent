@@ -4363,7 +4363,8 @@
     "launcherDescription": "Choisissez un espace de travail pour ce panneau ou créez-en un nouveau.",
     "createWorkspace": "Créer un espace de travail",
     "resetLayout": "Réinitialiser la disposition",
-    "dragPaneHint": "Faites glisser l'en-tête sur un autre panneau : un bord le divise, le centre les échange. Double-cliquez pour agrandir."
+    "dragPaneHint": "Faites glisser l'en-tête ou un onglet sur un autre panneau : un bord le divise, le centre l'ajoute comme onglet ; les bords de l'espace créent une colonne ou une ligne entière. Double-cliquez pour agrandir.",
+    "paneShortcuts": "Clavier : Ctrl+Alt+Flèches — panneau voisin · Ctrl+Alt+1…6 — groupe N · Ctrl+Alt+PgPréc/PgSuiv — onglet précédent/suivant"
   },
   "worktrees": {
     "scripts": "Scripts",

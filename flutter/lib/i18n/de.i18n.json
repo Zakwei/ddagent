@@ -4363,7 +4363,8 @@
     "launcherDescription": "Wähle einen Arbeitsbereich für diesen Bereich oder erstelle einen neuen.",
     "createWorkspace": "Arbeitsbereich erstellen",
     "resetLayout": "Layout zurücksetzen",
-    "dragPaneHint": "Ziehen Sie die Kopfzeile auf einen anderen Bereich: Ein Rand teilt ihn, die Mitte tauscht beide. Doppelklick maximiert."
+    "dragPaneHint": "Ziehen Sie die Kopfzeile oder einen Tab auf einen anderen Bereich: Ein Rand teilt ihn, die Mitte fügt ihn als Tab hinzu; die Ränder des Arbeitsbereichs erzeugen eine ganze Spalte oder Zeile. Doppelklick maximiert.",
+    "paneShortcuts": "Tastatur: Strg+Alt+Pfeile — benachbarter Bereich · Strg+Alt+1…6 — Gruppe N · Strg+Alt+Bild↑/Bild↓ — vorheriger/nächster Tab"
   },
   "worktrees": {
     "scripts": "Skripte",

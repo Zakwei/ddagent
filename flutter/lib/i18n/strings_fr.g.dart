@@ -763,7 +763,8 @@ class Translations$workspace$fr extends Translations$workspace$en {
 	@override String get launcherDescription => 'Choisissez un espace de travail pour ce panneau ou créez-en un nouveau.';
 	@override String get createWorkspace => 'Créer un espace de travail';
 	@override String get resetLayout => 'Réinitialiser la disposition';
-	@override String get dragPaneHint => 'Faites glisser l\'en-tête sur un autre panneau : un bord le divise, le centre les échange. Double-cliquez pour agrandir.';
+	@override String get dragPaneHint => 'Faites glisser l\'en-tête ou un onglet sur un autre panneau : un bord le divise, le centre l\'ajoute comme onglet ; les bords de l\'espace créent une colonne ou une ligne entière. Double-cliquez pour agrandir.';
+	@override String get paneShortcuts => 'Clavier : Ctrl+Alt+Flèches — panneau voisin · Ctrl+Alt+1…6 — groupe N · Ctrl+Alt+PgPréc/PgSuiv — onglet précédent/suivant';
 }
 
 // Path: worktrees
@@ -11940,7 +11941,8 @@ extension on TranslationsFr {
 			'workspace.launcherDescription' => 'Choisissez un espace de travail pour ce panneau ou créez-en un nouveau.',
 			'workspace.createWorkspace' => 'Créer un espace de travail',
 			'workspace.resetLayout' => 'Réinitialiser la disposition',
-			'workspace.dragPaneHint' => 'Faites glisser l\'en-tête sur un autre panneau : un bord le divise, le centre les échange. Double-cliquez pour agrandir.',
+			'workspace.dragPaneHint' => 'Faites glisser l\'en-tête ou un onglet sur un autre panneau : un bord le divise, le centre l\'ajoute comme onglet ; les bords de l\'espace créent une colonne ou une ligne entière. Double-cliquez pour agrandir.',
+			'workspace.paneShortcuts' => 'Clavier : Ctrl+Alt+Flèches — panneau voisin · Ctrl+Alt+1…6 — groupe N · Ctrl+Alt+PgPréc/PgSuiv — onglet précédent/suivant',
 			'worktrees.scripts' => 'Scripts',
 			'worktrees.emptyTitle' => 'Aucun worktree trouvé',
 			'worktrees.emptyDescription' => 'Créez un worktree pour isoler le travail sur une fonctionnalité ou l’exécution des agents.',
