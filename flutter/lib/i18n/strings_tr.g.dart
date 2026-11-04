@@ -440,6 +440,14 @@ class Translations$fileTree$tr extends Translations$fileTree$en {
 	@override String fileTooLarge({required Object name}) => '${name} 200 MB’tan büyük.';
 	@override String deleteFolderConfirm({required Object path}) => '"${path}" klasörü silinsin mi? Bu işlem geri alınamaz.';
 	@override String deleteFileConfirm({required Object path}) => '"${path}" dosyası silinsin mi? Bu işlem geri alınamaz.';
+	@override String get explorer => 'Gezgin';
+	@override String get moreActions => 'Diğer Eylemler…';
+	@override String get showDetails => 'Boyutu ve tarihi göster';
+	@override String get noFileOpen => 'Açmak için gezginde bir dosya seçin';
+	@override String nameExists({required Object name}) => 'Bu konumda ${name} adlı bir dosya veya klasör zaten var.';
+	@override String get nameRequired => 'Bir dosya veya klasör adı sağlanmalıdır.';
+	@override String get copyRelativePath => 'Göreli Yolu Kopyala';
+	@override String get closeSearch => 'Gezgine dön';
 }
 
 // Path: git
@@ -11496,6 +11504,14 @@ extension on TranslationsTr {
 			'fileTree.fileTooLarge' => ({required Object name}) => '${name} 200 MB’tan büyük.',
 			'fileTree.deleteFolderConfirm' => ({required Object path}) => '"${path}" klasörü silinsin mi? Bu işlem geri alınamaz.',
 			'fileTree.deleteFileConfirm' => ({required Object path}) => '"${path}" dosyası silinsin mi? Bu işlem geri alınamaz.',
+			'fileTree.explorer' => 'Gezgin',
+			'fileTree.moreActions' => 'Diğer Eylemler…',
+			'fileTree.showDetails' => 'Boyutu ve tarihi göster',
+			'fileTree.noFileOpen' => 'Açmak için gezginde bir dosya seçin',
+			'fileTree.nameExists' => ({required Object name}) => 'Bu konumda ${name} adlı bir dosya veya klasör zaten var.',
+			'fileTree.nameRequired' => 'Bir dosya veya klasör adı sağlanmalıdır.',
+			'fileTree.copyRelativePath' => 'Göreli Yolu Kopyala',
+			'fileTree.closeSearch' => 'Gezgine dön',
 			'git.checkpoints.title' => 'Kontrol Noktaları',
 			'git.checkpoints.restoreTitle' => 'Kontrol noktasını geri yükle',
 			'git.checkpoints.restoreMessage' => 'Çalışma ağacı bu kontrol noktasına sıfırlansın mı? Mevcut değişiklikler değiştirilecek.',
@@ -11754,6 +11770,8 @@ extension on TranslationsTr {
 			'skills.addDialog.folderUploadsNote' => 'Klasör yüklemeleri seçilen klasör adını korur; tek başına dosyalar `SKILL.md` içindeki `name` değerini kullanır.',
 			'skills.addDialog.installSkill' => 'Beceri Kur',
 			'skills.addDialog.installSkills' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('tr'))(count, one: '${count} Beceri Kur', other: '${count} Beceri Kur', ), 
+			_ => null,
+		} ?? switch (path) {
 			'skills.moveDialog.toProjectHint' => 'Bu beceriye sahip olacak projeyi seçin. Beceri, sağlayıcının genel beceriler dizininden taşınır.',
 			'skills.moveDialog.toGlobalHint' => 'Bu beceriyi, her projenin kullanabilmesi için genel beceriler dizinine taşıyın.',
 			'skills.moveDialog.moveToProject' => 'Projeye taşı',
@@ -11762,8 +11780,6 @@ extension on TranslationsTr {
 			'skills.screen.searchHint' => 'Beceri ara...',
 			'skills.screen.clearSearch' => 'Beceri aramasını temizle',
 			'skills.screen.addSkill' => 'Beceri Ekle',
-			_ => null,
-		} ?? switch (path) {
 			'skills.screen.scanningProjectSkills' => 'Proje becerileri taranıyor...',
 			'skills.screen.savedSuccessfully' => 'Beceriler başarıyla kaydedildi.',
 			'skills.screen.loadingSkills' => ({required Object provider}) => '${provider} becerileri yükleniyor…',

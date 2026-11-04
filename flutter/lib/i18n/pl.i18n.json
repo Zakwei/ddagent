@@ -3806,7 +3806,15 @@
     },
     "fileTooLarge": "Plik {{name}} jest większy niż 200 MB.",
     "deleteFolderConfirm": "Usunąć folder „{{path}}”? Tej operacji nie można cofnąć.",
-    "deleteFileConfirm": "Usunąć plik „{{path}}”? Tej operacji nie można cofnąć."
+    "deleteFileConfirm": "Usunąć plik „{{path}}”? Tej operacji nie można cofnąć.",
+    "explorer": "Eksplorator",
+    "moreActions": "Więcej akcji…",
+    "showDetails": "Pokaż rozmiar i datę",
+    "noFileOpen": "Wybierz plik w eksploratorze, aby go otworzyć",
+    "nameExists": "Plik lub folder {{name}} już istnieje w tej lokalizacji.",
+    "nameRequired": "Należy podać nazwę pliku lub folderu.",
+    "copyRelativePath": "Kopiuj ścieżkę względną",
+    "closeSearch": "Wróć do eksploratora"
   },
   "git": {
     "checkpoints": {

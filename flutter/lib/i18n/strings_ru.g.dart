@@ -442,6 +442,14 @@ class Translations$fileTree$ru extends Translations$fileTree$en {
 	@override String fileTooLarge({required Object name}) => '${name} больше 200 МБ.';
 	@override String deleteFolderConfirm({required Object path}) => 'Удалить папку «${path}»? Это действие нельзя отменить.';
 	@override String deleteFileConfirm({required Object path}) => 'Удалить файл «${path}»? Это действие нельзя отменить.';
+	@override String get explorer => 'Проводник';
+	@override String get moreActions => 'Дополнительные действия…';
+	@override String get showDetails => 'Показывать размер и дату';
+	@override String get noFileOpen => 'Выберите файл в проводнике, чтобы открыть его';
+	@override String nameExists({required Object name}) => 'Файл или папка ${name} уже существует в этом расположении.';
+	@override String get nameRequired => 'Необходимо указать имя файла или папки.';
+	@override String get copyRelativePath => 'Копировать относительный путь';
+	@override String get closeSearch => 'Назад к проводнику';
 }
 
 // Path: git
@@ -11539,6 +11547,14 @@ extension on TranslationsRu {
 			'fileTree.fileTooLarge' => ({required Object name}) => '${name} больше 200 МБ.',
 			'fileTree.deleteFolderConfirm' => ({required Object path}) => 'Удалить папку «${path}»? Это действие нельзя отменить.',
 			'fileTree.deleteFileConfirm' => ({required Object path}) => 'Удалить файл «${path}»? Это действие нельзя отменить.',
+			'fileTree.explorer' => 'Проводник',
+			'fileTree.moreActions' => 'Дополнительные действия…',
+			'fileTree.showDetails' => 'Показывать размер и дату',
+			'fileTree.noFileOpen' => 'Выберите файл в проводнике, чтобы открыть его',
+			'fileTree.nameExists' => ({required Object name}) => 'Файл или папка ${name} уже существует в этом расположении.',
+			'fileTree.nameRequired' => 'Необходимо указать имя файла или папки.',
+			'fileTree.copyRelativePath' => 'Копировать относительный путь',
+			'fileTree.closeSearch' => 'Назад к проводнику',
 			'git.checkpoints.title' => 'Чекпоинты',
 			'git.checkpoints.restoreTitle' => 'Восстановить чекпоинт',
 			'git.checkpoints.restoreMessage' => 'Сбросить рабочее дерево к этому чекпоинту? Текущие изменения будут заменены.',
@@ -11797,6 +11813,8 @@ extension on TranslationsRu {
 			'skills.addDialog.folderUploadsNote' => 'При загрузке папки сохраняется её имя; для отдельных файлов используется `name` из `SKILL.md`.',
 			'skills.addDialog.installSkill' => 'Установить навык',
 			'skills.addDialog.installSkills' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(count, one: 'Установить ${count} навык', other: 'Установить ${count} навыков', ), 
+			_ => null,
+		} ?? switch (path) {
 			'skills.moveDialog.toProjectHint' => 'Выберите проект, которому будет принадлежать этот навык. Он будет перемещён из глобальной папки навыков провайдера.',
 			'skills.moveDialog.toGlobalHint' => 'Переместите этот навык в глобальную папку навыков, чтобы его могли использовать все проекты.',
 			'skills.moveDialog.moveToProject' => 'Переместить в проект',
@@ -11805,8 +11823,6 @@ extension on TranslationsRu {
 			'skills.screen.searchHint' => 'Поиск навыков…',
 			'skills.screen.clearSearch' => 'Очистить поиск навыков',
 			'skills.screen.addSkill' => 'Добавить навык',
-			_ => null,
-		} ?? switch (path) {
 			'skills.screen.scanningProjectSkills' => 'Сканирование навыков проекта…',
 			'skills.screen.savedSuccessfully' => 'Навыки успешно сохранены.',
 			'skills.screen.loadingSkills' => ({required Object provider}) => 'Загрузка навыков ${provider}…',

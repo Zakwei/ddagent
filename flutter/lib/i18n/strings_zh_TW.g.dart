@@ -439,6 +439,14 @@ class Translations$fileTree$zh_TW extends Translations$fileTree$en {
 	@override String fileTooLarge({required Object name}) => '${name} 超過 200MB。';
 	@override String deleteFolderConfirm({required Object path}) => '刪除資料夾「${path}」？此操作無法復原。';
 	@override String deleteFileConfirm({required Object path}) => '刪除檔案「${path}」？此操作無法復原。';
+	@override String get explorer => '檔案總管';
+	@override String get moreActions => '更多動作…';
+	@override String get showDetails => '顯示大小和日期';
+	@override String get noFileOpen => '在檔案總管中選取檔案以開啟';
+	@override String nameExists({required Object name}) => '此位置已存在檔案或資料夾 ${name}。';
+	@override String get nameRequired => '必須提供檔案或資料夾名稱。';
+	@override String get copyRelativePath => '複製相對路徑';
+	@override String get closeSearch => '返回檔案總管';
 }
 
 // Path: git
@@ -11490,6 +11498,14 @@ extension on TranslationsZhTw {
 			'fileTree.fileTooLarge' => ({required Object name}) => '${name} 超過 200MB。',
 			'fileTree.deleteFolderConfirm' => ({required Object path}) => '刪除資料夾「${path}」？此操作無法復原。',
 			'fileTree.deleteFileConfirm' => ({required Object path}) => '刪除檔案「${path}」？此操作無法復原。',
+			'fileTree.explorer' => '檔案總管',
+			'fileTree.moreActions' => '更多動作…',
+			'fileTree.showDetails' => '顯示大小和日期',
+			'fileTree.noFileOpen' => '在檔案總管中選取檔案以開啟',
+			'fileTree.nameExists' => ({required Object name}) => '此位置已存在檔案或資料夾 ${name}。',
+			'fileTree.nameRequired' => '必須提供檔案或資料夾名稱。',
+			'fileTree.copyRelativePath' => '複製相對路徑',
+			'fileTree.closeSearch' => '返回檔案總管',
 			'git.checkpoints.title' => '檢查點',
 			'git.checkpoints.restoreTitle' => '還原檢查點',
 			'git.checkpoints.restoreMessage' => '要將工作樹重設到此檢查點嗎？目前的變更將被取代。',
@@ -11748,6 +11764,8 @@ extension on TranslationsZhTw {
 			'skills.addDialog.folderUploadsNote' => '資料夾上傳會保留所選資料夾名稱；獨立檔案則使用 `SKILL.md` 中的 `name`。',
 			'skills.addDialog.installSkill' => '安裝技能',
 			'skills.addDialog.installSkills' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '安裝 ${count} 個技能', other: '安裝 ${count} 個技能', ), 
+			_ => null,
+		} ?? switch (path) {
 			'skills.moveDialog.toProjectHint' => '選擇應擁有此技能的專案。它會移出提供者的全域技能目錄。',
 			'skills.moveDialog.toGlobalHint' => '將此技能移至全域技能目錄，讓所有專案都能使用。',
 			'skills.moveDialog.moveToProject' => '移至專案',
@@ -11756,8 +11774,6 @@ extension on TranslationsZhTw {
 			'skills.screen.searchHint' => '搜尋技能...',
 			'skills.screen.clearSearch' => '清除技能搜尋',
 			'skills.screen.addSkill' => '新增技能',
-			_ => null,
-		} ?? switch (path) {
 			'skills.screen.scanningProjectSkills' => '正在掃描專案技能...',
 			'skills.screen.savedSuccessfully' => '技能已成功儲存。',
 			'skills.screen.loadingSkills' => ({required Object provider}) => '正在載入 ${provider} 技能…',

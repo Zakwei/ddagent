@@ -3755,7 +3755,15 @@
     },
     "fileTooLarge": "{{name}} 超过 200MB。",
     "deleteFolderConfirm": "删除文件夹“{{path}}”？此操作无法撤销。",
-    "deleteFileConfirm": "删除文件“{{path}}”？此操作无法撤销。"
+    "deleteFileConfirm": "删除文件“{{path}}”？此操作无法撤销。",
+    "explorer": "资源管理器",
+    "moreActions": "更多操作…",
+    "showDetails": "显示大小和日期",
+    "noFileOpen": "在资源管理器中选择一个文件以打开",
+    "nameExists": "此位置已存在文件或文件夹 {{name}}。",
+    "nameRequired": "必须提供文件或文件夹名称。",
+    "copyRelativePath": "复制相对路径",
+    "closeSearch": "返回资源管理器"
   },
   "git": {
     "checkpoints": {

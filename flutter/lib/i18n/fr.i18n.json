@@ -3766,7 +3766,15 @@
     },
     "fileTooLarge": "{{name}} dépasse 200 Mo.",
     "deleteFolderConfirm": "Supprimer le dossier « {{path}} » ? Cette action est irréversible.",
-    "deleteFileConfirm": "Supprimer le fichier « {{path}} » ? Cette action est irréversible."
+    "deleteFileConfirm": "Supprimer le fichier « {{path}} » ? Cette action est irréversible.",
+    "explorer": "Explorateur",
+    "moreActions": "Plus d'actions…",
+    "showDetails": "Afficher la taille et la date",
+    "noFileOpen": "Sélectionnez un fichier dans l'explorateur pour l'ouvrir",
+    "nameExists": "Un fichier ou dossier {{name}} existe déjà à cet emplacement.",
+    "nameRequired": "Vous devez fournir un nom de fichier ou de dossier.",
+    "copyRelativePath": "Copier le chemin relatif",
+    "closeSearch": "Retour à l'explorateur"
   },
   "git": {
     "checkpoints": {

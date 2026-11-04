@@ -191,6 +191,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                   if (_dockOpen && _pid != null)
                     EditorDock(
                       projectId: _pid!,
+                      activePath: tab?.projectId == _pid ? tab?.path : null,
                       onOpenFile: (path, {diff = false}) => _openFile(_pid!, path, diff: diff),
                     ),
                   Expanded(child: _body(tab, settings)),

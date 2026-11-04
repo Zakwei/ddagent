@@ -439,6 +439,14 @@ class Translations$fileTree$zh_CN extends Translations$fileTree$en {
 	@override String fileTooLarge({required Object name}) => '${name} 超过 200MB。';
 	@override String deleteFolderConfirm({required Object path}) => '删除文件夹“${path}”？此操作无法撤销。';
 	@override String deleteFileConfirm({required Object path}) => '删除文件“${path}”？此操作无法撤销。';
+	@override String get explorer => '资源管理器';
+	@override String get moreActions => '更多操作…';
+	@override String get showDetails => '显示大小和日期';
+	@override String get noFileOpen => '在资源管理器中选择一个文件以打开';
+	@override String nameExists({required Object name}) => '此位置已存在文件或文件夹 ${name}。';
+	@override String get nameRequired => '必须提供文件或文件夹名称。';
+	@override String get copyRelativePath => '复制相对路径';
+	@override String get closeSearch => '返回资源管理器';
 }
 
 // Path: git
@@ -11490,6 +11498,14 @@ extension on TranslationsZhCn {
 			'fileTree.fileTooLarge' => ({required Object name}) => '${name} 超过 200MB。',
 			'fileTree.deleteFolderConfirm' => ({required Object path}) => '删除文件夹“${path}”？此操作无法撤销。',
 			'fileTree.deleteFileConfirm' => ({required Object path}) => '删除文件“${path}”？此操作无法撤销。',
+			'fileTree.explorer' => '资源管理器',
+			'fileTree.moreActions' => '更多操作…',
+			'fileTree.showDetails' => '显示大小和日期',
+			'fileTree.noFileOpen' => '在资源管理器中选择一个文件以打开',
+			'fileTree.nameExists' => ({required Object name}) => '此位置已存在文件或文件夹 ${name}。',
+			'fileTree.nameRequired' => '必须提供文件或文件夹名称。',
+			'fileTree.copyRelativePath' => '复制相对路径',
+			'fileTree.closeSearch' => '返回资源管理器',
 			'git.checkpoints.title' => '检查点',
 			'git.checkpoints.restoreTitle' => '恢复检查点',
 			'git.checkpoints.restoreMessage' => '将工作树重置到此检查点？当前更改将被替换。',
@@ -11748,6 +11764,8 @@ extension on TranslationsZhCn {
 			'skills.addDialog.folderUploadsNote' => '文件夹上传会保留所选文件夹名称；单独文件使用 `SKILL.md` 中的 `name`。',
 			'skills.addDialog.installSkill' => '安装技能',
 			'skills.addDialog.installSkills' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '安装 ${count} 个技能', other: '安装 ${count} 个技能', ), 
+			_ => null,
+		} ?? switch (path) {
 			'skills.moveDialog.toProjectHint' => '选择应拥有此技能的项目。它将从提供商的全局技能目录中移出。',
 			'skills.moveDialog.toGlobalHint' => '将此技能移入全局技能目录，以便所有项目都能使用。',
 			'skills.moveDialog.moveToProject' => '移动到项目',
@@ -11756,8 +11774,6 @@ extension on TranslationsZhCn {
 			'skills.screen.searchHint' => '搜索技能...',
 			'skills.screen.clearSearch' => '清除技能搜索',
 			'skills.screen.addSkill' => '添加技能',
-			_ => null,
-		} ?? switch (path) {
 			'skills.screen.scanningProjectSkills' => '正在扫描项目技能...',
 			'skills.screen.savedSuccessfully' => '技能保存成功。',
 			'skills.screen.loadingSkills' => ({required Object provider}) => '正在加载 ${provider} 技能…',

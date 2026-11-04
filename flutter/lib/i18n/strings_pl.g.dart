@@ -442,6 +442,14 @@ class Translations$fileTree$pl extends Translations$fileTree$en {
 	@override String fileTooLarge({required Object name}) => 'Plik ${name} jest większy niż 200 MB.';
 	@override String deleteFolderConfirm({required Object path}) => 'Usunąć folder „${path}”? Tej operacji nie można cofnąć.';
 	@override String deleteFileConfirm({required Object path}) => 'Usunąć plik „${path}”? Tej operacji nie można cofnąć.';
+	@override String get explorer => 'Eksplorator';
+	@override String get moreActions => 'Więcej akcji…';
+	@override String get showDetails => 'Pokaż rozmiar i datę';
+	@override String get noFileOpen => 'Wybierz plik w eksploratorze, aby go otworzyć';
+	@override String nameExists({required Object name}) => 'Plik lub folder ${name} już istnieje w tej lokalizacji.';
+	@override String get nameRequired => 'Należy podać nazwę pliku lub folderu.';
+	@override String get copyRelativePath => 'Kopiuj ścieżkę względną';
+	@override String get closeSearch => 'Wróć do eksploratora';
 }
 
 // Path: git
@@ -11541,6 +11549,14 @@ extension on TranslationsPl {
 			'fileTree.fileTooLarge' => ({required Object name}) => 'Plik ${name} jest większy niż 200 MB.',
 			'fileTree.deleteFolderConfirm' => ({required Object path}) => 'Usunąć folder „${path}”? Tej operacji nie można cofnąć.',
 			'fileTree.deleteFileConfirm' => ({required Object path}) => 'Usunąć plik „${path}”? Tej operacji nie można cofnąć.',
+			'fileTree.explorer' => 'Eksplorator',
+			'fileTree.moreActions' => 'Więcej akcji…',
+			'fileTree.showDetails' => 'Pokaż rozmiar i datę',
+			'fileTree.noFileOpen' => 'Wybierz plik w eksploratorze, aby go otworzyć',
+			'fileTree.nameExists' => ({required Object name}) => 'Plik lub folder ${name} już istnieje w tej lokalizacji.',
+			'fileTree.nameRequired' => 'Należy podać nazwę pliku lub folderu.',
+			'fileTree.copyRelativePath' => 'Kopiuj ścieżkę względną',
+			'fileTree.closeSearch' => 'Wróć do eksploratora',
 			'git.checkpoints.title' => 'Punkty kontrolne',
 			'git.checkpoints.restoreTitle' => 'Przywróć punkt kontrolny',
 			'git.checkpoints.restoreMessage' => 'Zresetować drzewo robocze do tego punktu kontrolnego? Bieżące zmiany zostaną zastąpione.',
@@ -11799,6 +11815,8 @@ extension on TranslationsPl {
 			'skills.addDialog.folderUploadsNote' => 'Przesyłanie folderu zachowuje nazwę wybranego folderu; pojedyncze pliki używają `name` z `SKILL.md`.',
 			'skills.addDialog.installSkill' => 'Zainstaluj skill',
 			'skills.addDialog.installSkills' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('pl'))(count, one: 'Zainstaluj ${count} skill', other: 'Zainstaluj ${count} skilli', ), 
+			_ => null,
+		} ?? switch (path) {
 			'skills.moveDialog.toProjectHint' => 'Wybierz projekt, do którego ma należeć ten skill. Zostanie on przeniesiony z globalnego katalogu skilli dostawcy.',
 			'skills.moveDialog.toGlobalHint' => 'Przenieś ten skill do globalnego katalogu skilli, aby każdy projekt mógł z niego korzystać.',
 			'skills.moveDialog.moveToProject' => 'Przenieś do projektu',
@@ -11807,8 +11825,6 @@ extension on TranslationsPl {
 			'skills.screen.searchHint' => 'Szukaj skilli...',
 			'skills.screen.clearSearch' => 'Wyczyść wyszukiwanie skilli',
 			'skills.screen.addSkill' => 'Dodaj skill',
-			_ => null,
-		} ?? switch (path) {
 			'skills.screen.scanningProjectSkills' => 'Skanowanie skilli projektu...',
 			'skills.screen.savedSuccessfully' => 'Skille zapisano pomyślnie.',
 			'skills.screen.loadingSkills' => ({required Object provider}) => 'Wczytywanie skilli ${provider}…',

@@ -440,6 +440,14 @@ class Translations$fileTree$de extends Translations$fileTree$en {
 	@override String fileTooLarge({required Object name}) => '${name} ist größer als 200 MB.';
 	@override String deleteFolderConfirm({required Object path}) => 'Ordner „${path}“ löschen? Dies kann nicht rückgängig gemacht werden.';
 	@override String deleteFileConfirm({required Object path}) => 'Datei „${path}“ löschen? Dies kann nicht rückgängig gemacht werden.';
+	@override String get explorer => 'Explorer';
+	@override String get moreActions => 'Weitere Aktionen…';
+	@override String get showDetails => 'Größe und Datum anzeigen';
+	@override String get noFileOpen => 'Wählen Sie eine Datei im Explorer aus, um sie zu öffnen';
+	@override String nameExists({required Object name}) => 'Eine Datei oder ein Ordner ${name} ist an diesem Ort bereits vorhanden.';
+	@override String get nameRequired => 'Es muss ein Datei- oder Ordnername angegeben werden.';
+	@override String get copyRelativePath => 'Relativen Pfad kopieren';
+	@override String get closeSearch => 'Zurück zum Explorer';
 }
 
 // Path: git
@@ -11501,6 +11509,14 @@ extension on TranslationsDe {
 			'fileTree.fileTooLarge' => ({required Object name}) => '${name} ist größer als 200 MB.',
 			'fileTree.deleteFolderConfirm' => ({required Object path}) => 'Ordner „${path}“ löschen? Dies kann nicht rückgängig gemacht werden.',
 			'fileTree.deleteFileConfirm' => ({required Object path}) => 'Datei „${path}“ löschen? Dies kann nicht rückgängig gemacht werden.',
+			'fileTree.explorer' => 'Explorer',
+			'fileTree.moreActions' => 'Weitere Aktionen…',
+			'fileTree.showDetails' => 'Größe und Datum anzeigen',
+			'fileTree.noFileOpen' => 'Wählen Sie eine Datei im Explorer aus, um sie zu öffnen',
+			'fileTree.nameExists' => ({required Object name}) => 'Eine Datei oder ein Ordner ${name} ist an diesem Ort bereits vorhanden.',
+			'fileTree.nameRequired' => 'Es muss ein Datei- oder Ordnername angegeben werden.',
+			'fileTree.copyRelativePath' => 'Relativen Pfad kopieren',
+			'fileTree.closeSearch' => 'Zurück zum Explorer',
 			'git.checkpoints.title' => 'Checkpoints',
 			'git.checkpoints.restoreTitle' => 'Checkpoint wiederherstellen',
 			'git.checkpoints.restoreMessage' => 'Arbeitsverzeichnis auf diesen Checkpoint zurücksetzen? Aktuelle Änderungen werden ersetzt.',
@@ -11759,6 +11775,8 @@ extension on TranslationsDe {
 			'skills.addDialog.folderUploadsNote' => 'Bei Ordner-Uploads bleibt der ausgewählte Ordnername erhalten; einzelne Dateien verwenden `name` aus `SKILL.md`.',
 			'skills.addDialog.installSkill' => 'Skill installieren',
 			'skills.addDialog.installSkills' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(count, one: '${count} Skill installieren', other: '${count} Skills installieren', ), 
+			_ => null,
+		} ?? switch (path) {
 			'skills.moveDialog.toProjectHint' => 'Wähle das Projekt, dem dieser Skill gehören soll. Er wird aus dem globalen Skill-Verzeichnis des Anbieters verschoben.',
 			'skills.moveDialog.toGlobalHint' => 'Verschiebe diesen Skill in das globale Skill-Verzeichnis, damit ihn jedes Projekt verwenden kann.',
 			'skills.moveDialog.moveToProject' => 'In Projekt verschieben',
@@ -11767,8 +11785,6 @@ extension on TranslationsDe {
 			'skills.screen.searchHint' => 'Skills suchen...',
 			'skills.screen.clearSearch' => 'Skill-Suche leeren',
 			'skills.screen.addSkill' => 'Skill hinzufügen',
-			_ => null,
-		} ?? switch (path) {
 			'skills.screen.scanningProjectSkills' => 'Projekt-Skills werden gescannt...',
 			'skills.screen.savedSuccessfully' => 'Skills erfolgreich gespeichert.',
 			'skills.screen.loadingSkills' => ({required Object provider}) => '${provider}-Skills werden geladen…',

@@ -229,11 +229,17 @@ void main() {
       await dir.delete(recursive: true);
     });
 
-    test('defaults to detailed, persists selection', () async {
-      expect(readFileTreeViewMode(), FileTreeViewMode.detailed);
-      persistFileTreeViewMode(FileTreeViewMode.compact);
-      expect(Hive.box<dynamic>('settings').get(kFileTreeViewModeKey), 'compact');
+    test('defaults to compact (VS Code rows), persists selection', () async {
       expect(readFileTreeViewMode(), FileTreeViewMode.compact);
+      persistFileTreeViewMode(FileTreeViewMode.detailed);
+      expect(Hive.box<dynamic>('settings').get(kFileTreeViewModeKey), 'detailed');
+      expect(readFileTreeViewMode(), FileTreeViewMode.detailed);
+    });
+
+    test('recent-only filter is off by default and persists', () async {
+      expect(readFileTreeRecentOnly(), isFalse);
+      persistFileTreeRecentOnly(true);
+      expect(readFileTreeRecentOnly(), isTrue);
     });
 
     test('unknown stored value falls back to default', () async {

@@ -3755,7 +3755,15 @@
     },
     "fileTooLarge": "{{name}} 超過 200MB。",
     "deleteFolderConfirm": "刪除資料夾「{{path}}」？此操作無法復原。",
-    "deleteFileConfirm": "刪除檔案「{{path}}」？此操作無法復原。"
+    "deleteFileConfirm": "刪除檔案「{{path}}」？此操作無法復原。",
+    "explorer": "檔案總管",
+    "moreActions": "更多動作…",
+    "showDetails": "顯示大小和日期",
+    "noFileOpen": "在檔案總管中選取檔案以開啟",
+    "nameExists": "此位置已存在檔案或資料夾 {{name}}。",
+    "nameRequired": "必須提供檔案或資料夾名稱。",
+    "copyRelativePath": "複製相對路徑",
+    "closeSearch": "返回檔案總管"
   },
   "git": {
     "checkpoints": {

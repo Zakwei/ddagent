@@ -3766,7 +3766,15 @@
     },
     "fileTooLarge": "{{name}} ist größer als 200 MB.",
     "deleteFolderConfirm": "Ordner „{{path}}“ löschen? Dies kann nicht rückgängig gemacht werden.",
-    "deleteFileConfirm": "Datei „{{path}}“ löschen? Dies kann nicht rückgängig gemacht werden."
+    "deleteFileConfirm": "Datei „{{path}}“ löschen? Dies kann nicht rückgängig gemacht werden.",
+    "explorer": "Explorer",
+    "moreActions": "Weitere Aktionen…",
+    "showDetails": "Größe und Datum anzeigen",
+    "noFileOpen": "Wählen Sie eine Datei im Explorer aus, um sie zu öffnen",
+    "nameExists": "Eine Datei oder ein Ordner {{name}} ist an diesem Ort bereits vorhanden.",
+    "nameRequired": "Es muss ein Datei- oder Ordnername angegeben werden.",
+    "copyRelativePath": "Relativen Pfad kopieren",
+    "closeSearch": "Zurück zum Explorer"
   },
   "git": {
     "checkpoints": {

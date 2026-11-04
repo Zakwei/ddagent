@@ -3755,7 +3755,15 @@
     },
     "fileTooLarge": "{{name}} は 200MB を超えています。",
     "deleteFolderConfirm": "フォルダー「{{path}}」を削除しますか？この操作は元に戻せません。",
-    "deleteFileConfirm": "ファイル「{{path}}」を削除しますか？この操作は元に戻せません。"
+    "deleteFileConfirm": "ファイル「{{path}}」を削除しますか？この操作は元に戻せません。",
+    "explorer": "エクスプローラー",
+    "moreActions": "その他の操作…",
+    "showDetails": "サイズと日付を表示",
+    "noFileOpen": "エクスプローラーでファイルを選択して開きます",
+    "nameExists": "ファイルまたはフォルダー {{name}} はこの場所に既に存在します。",
+    "nameRequired": "ファイルまたはフォルダーの名前を指定する必要があります。",
+    "copyRelativePath": "相対パスのコピー",
+    "closeSearch": "エクスプローラーに戻る"
   },
   "git": {
     "checkpoints": {

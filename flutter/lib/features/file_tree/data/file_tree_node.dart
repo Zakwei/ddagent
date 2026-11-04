@@ -113,7 +113,9 @@ FileSearchResult decodeSearchResult(dynamic data) {
 enum FileTreeViewMode { simple, compact, detailed }
 
 const kFileTreeViewModeKey = 'file_tree_view_mode';
-const kDefaultFileTreeViewMode = FileTreeViewMode.detailed;
+
+/// Plain name rows (VS Code); size + date columns are opt-in ("detailed").
+const kDefaultFileTreeViewMode = FileTreeViewMode.compact;
 
 FileTreeViewMode parseFileTreeViewMode(Object? raw) =>
     FileTreeViewMode.values.asNameMap()[raw] ?? kDefaultFileTreeViewMode;

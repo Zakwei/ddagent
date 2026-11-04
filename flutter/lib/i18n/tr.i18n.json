@@ -3761,7 +3761,15 @@
     },
     "fileTooLarge": "{{name}} 200 MB’tan büyük.",
     "deleteFolderConfirm": "\"{{path}}\" klasörü silinsin mi? Bu işlem geri alınamaz.",
-    "deleteFileConfirm": "\"{{path}}\" dosyası silinsin mi? Bu işlem geri alınamaz."
+    "deleteFileConfirm": "\"{{path}}\" dosyası silinsin mi? Bu işlem geri alınamaz.",
+    "explorer": "Gezgin",
+    "moreActions": "Diğer Eylemler…",
+    "showDetails": "Boyutu ve tarihi göster",
+    "noFileOpen": "Açmak için gezginde bir dosya seçin",
+    "nameExists": "Bu konumda {{name}} adlı bir dosya veya klasör zaten var.",
+    "nameRequired": "Bir dosya veya klasör adı sağlanmalıdır.",
+    "copyRelativePath": "Göreli Yolu Kopyala",
+    "closeSearch": "Gezgine dön"
   },
   "git": {
     "checkpoints": {

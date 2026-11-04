@@ -3766,7 +3766,15 @@
     },
     "fileTooLarge": "{{name}} supera i 200 MB.",
     "deleteFolderConfirm": "Eliminare la cartella \"{{path}}\"? L’operazione non può essere annullata.",
-    "deleteFileConfirm": "Eliminare il file \"{{path}}\"? L’operazione non può essere annullata."
+    "deleteFileConfirm": "Eliminare il file \"{{path}}\"? L’operazione non può essere annullata.",
+    "explorer": "Esplora risorse",
+    "moreActions": "Altre azioni…",
+    "showDetails": "Mostra dimensione e data",
+    "noFileOpen": "Seleziona un file in Esplora risorse per aprirlo",
+    "nameExists": "In questo percorso esiste già un file o una cartella {{name}}.",
+    "nameRequired": "È necessario specificare un nome di file o cartella.",
+    "copyRelativePath": "Copia percorso relativo",
+    "closeSearch": "Torna a Esplora risorse"
   },
   "git": {
     "checkpoints": {

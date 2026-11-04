@@ -439,6 +439,14 @@ class Translations$fileTree$ko extends Translations$fileTree$en {
 	@override String fileTooLarge({required Object name}) => '${name}이(가) 200MB보다 큽니다.';
 	@override String deleteFolderConfirm({required Object path}) => '"${path}" 폴더를 삭제할까요? 이 작업은 되돌릴 수 없습니다.';
 	@override String deleteFileConfirm({required Object path}) => '"${path}" 파일을 삭제할까요? 이 작업은 되돌릴 수 없습니다.';
+	@override String get explorer => '탐색기';
+	@override String get moreActions => '추가 작업…';
+	@override String get showDetails => '크기 및 날짜 표시';
+	@override String get noFileOpen => '탐색기에서 파일을 선택하여 여세요';
+	@override String nameExists({required Object name}) => '이 위치에 ${name} 파일 또는 폴더가 이미 있습니다.';
+	@override String get nameRequired => '파일 또는 폴더 이름을 입력해야 합니다.';
+	@override String get copyRelativePath => '상대 경로 복사';
+	@override String get closeSearch => '탐색기로 돌아가기';
 }
 
 // Path: git
@@ -11490,6 +11498,14 @@ extension on TranslationsKo {
 			'fileTree.fileTooLarge' => ({required Object name}) => '${name}이(가) 200MB보다 큽니다.',
 			'fileTree.deleteFolderConfirm' => ({required Object path}) => '"${path}" 폴더를 삭제할까요? 이 작업은 되돌릴 수 없습니다.',
 			'fileTree.deleteFileConfirm' => ({required Object path}) => '"${path}" 파일을 삭제할까요? 이 작업은 되돌릴 수 없습니다.',
+			'fileTree.explorer' => '탐색기',
+			'fileTree.moreActions' => '추가 작업…',
+			'fileTree.showDetails' => '크기 및 날짜 표시',
+			'fileTree.noFileOpen' => '탐색기에서 파일을 선택하여 여세요',
+			'fileTree.nameExists' => ({required Object name}) => '이 위치에 ${name} 파일 또는 폴더가 이미 있습니다.',
+			'fileTree.nameRequired' => '파일 또는 폴더 이름을 입력해야 합니다.',
+			'fileTree.copyRelativePath' => '상대 경로 복사',
+			'fileTree.closeSearch' => '탐색기로 돌아가기',
 			'git.checkpoints.title' => '체크포인트',
 			'git.checkpoints.restoreTitle' => '체크포인트 복원',
 			'git.checkpoints.restoreMessage' => '작업 트리를 이 체크포인트로 재설정할까요? 현재 변경 사항이 대체됩니다.',
@@ -11748,6 +11764,8 @@ extension on TranslationsKo {
 			'skills.addDialog.folderUploadsNote' => '폴더 업로드는 선택한 폴더 이름을 유지하며, 단독 파일은 `SKILL.md`의 `name`을 사용합니다.',
 			'skills.addDialog.installSkill' => '스킬 설치',
 			'skills.addDialog.installSkills' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, one: '스킬 ${count}개 설치', other: '스킬 ${count}개 설치', ), 
+			_ => null,
+		} ?? switch (path) {
 			'skills.moveDialog.toProjectHint' => '이 스킬을 소유할 프로젝트를 선택하세요. 제공자의 전역 스킬 디렉터리에서 이동됩니다.',
 			'skills.moveDialog.toGlobalHint' => '이 스킬을 전역 스킬 디렉터리로 이동하여 모든 프로젝트에서 사용할 수 있게 합니다.',
 			'skills.moveDialog.moveToProject' => '프로젝트로 이동',
@@ -11756,8 +11774,6 @@ extension on TranslationsKo {
 			'skills.screen.searchHint' => '스킬 검색...',
 			'skills.screen.clearSearch' => '스킬 검색 지우기',
 			'skills.screen.addSkill' => '스킬 추가',
-			_ => null,
-		} ?? switch (path) {
 			'skills.screen.scanningProjectSkills' => '프로젝트 스킬 검사 중...',
 			'skills.screen.savedSuccessfully' => '스킬이 저장되었습니다.',
 			'skills.screen.loadingSkills' => ({required Object provider}) => '${provider} 스킬 로드 중…',

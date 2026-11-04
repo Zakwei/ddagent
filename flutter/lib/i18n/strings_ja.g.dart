@@ -439,6 +439,14 @@ class Translations$fileTree$ja extends Translations$fileTree$en {
 	@override String fileTooLarge({required Object name}) => '${name} は 200MB を超えています。';
 	@override String deleteFolderConfirm({required Object path}) => 'フォルダー「${path}」を削除しますか？この操作は元に戻せません。';
 	@override String deleteFileConfirm({required Object path}) => 'ファイル「${path}」を削除しますか？この操作は元に戻せません。';
+	@override String get explorer => 'エクスプローラー';
+	@override String get moreActions => 'その他の操作…';
+	@override String get showDetails => 'サイズと日付を表示';
+	@override String get noFileOpen => 'エクスプローラーでファイルを選択して開きます';
+	@override String nameExists({required Object name}) => 'ファイルまたはフォルダー ${name} はこの場所に既に存在します。';
+	@override String get nameRequired => 'ファイルまたはフォルダーの名前を指定する必要があります。';
+	@override String get copyRelativePath => '相対パスのコピー';
+	@override String get closeSearch => 'エクスプローラーに戻る';
 }
 
 // Path: git
@@ -11490,6 +11498,14 @@ extension on TranslationsJa {
 			'fileTree.fileTooLarge' => ({required Object name}) => '${name} は 200MB を超えています。',
 			'fileTree.deleteFolderConfirm' => ({required Object path}) => 'フォルダー「${path}」を削除しますか？この操作は元に戻せません。',
 			'fileTree.deleteFileConfirm' => ({required Object path}) => 'ファイル「${path}」を削除しますか？この操作は元に戻せません。',
+			'fileTree.explorer' => 'エクスプローラー',
+			'fileTree.moreActions' => 'その他の操作…',
+			'fileTree.showDetails' => 'サイズと日付を表示',
+			'fileTree.noFileOpen' => 'エクスプローラーでファイルを選択して開きます',
+			'fileTree.nameExists' => ({required Object name}) => 'ファイルまたはフォルダー ${name} はこの場所に既に存在します。',
+			'fileTree.nameRequired' => 'ファイルまたはフォルダーの名前を指定する必要があります。',
+			'fileTree.copyRelativePath' => '相対パスのコピー',
+			'fileTree.closeSearch' => 'エクスプローラーに戻る',
 			'git.checkpoints.title' => 'チェックポイント',
 			'git.checkpoints.restoreTitle' => 'チェックポイントを復元',
 			'git.checkpoints.restoreMessage' => '作業ツリーをこのチェックポイントにリセットしますか？現在の変更は置き換えられます。',
@@ -11748,6 +11764,8 @@ extension on TranslationsJa {
 			'skills.addDialog.folderUploadsNote' => 'フォルダをアップロードした場合は選択したフォルダ名が保持されます。単体ファイルの場合は `SKILL.md` の `name` が使用されます。',
 			'skills.addDialog.installSkill' => 'スキルをインストール',
 			'skills.addDialog.installSkills' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ja'))(count, one: '${count} 件のスキルをインストール', other: '${count} 件のスキルをインストール', ), 
+			_ => null,
+		} ?? switch (path) {
 			'skills.moveDialog.toProjectHint' => 'このスキルを所有するプロジェクトを選択してください。プロバイダーのグローバルスキルディレクトリから移動します。',
 			'skills.moveDialog.toGlobalHint' => 'このスキルをグローバルスキルディレクトリに移動し、すべてのプロジェクトで使用できるようにします。',
 			'skills.moveDialog.moveToProject' => 'プロジェクトに移動',
@@ -11756,8 +11774,6 @@ extension on TranslationsJa {
 			'skills.screen.searchHint' => 'スキルを検索...',
 			'skills.screen.clearSearch' => 'スキル検索をクリア',
 			'skills.screen.addSkill' => 'スキルを追加',
-			_ => null,
-		} ?? switch (path) {
 			'skills.screen.scanningProjectSkills' => 'プロジェクトのスキルをスキャン中...',
 			'skills.screen.savedSuccessfully' => 'スキルを保存しました。',
 			'skills.screen.loadingSkills' => ({required Object provider}) => '${provider} のスキルを読み込み中…',

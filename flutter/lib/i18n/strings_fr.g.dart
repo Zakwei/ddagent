@@ -440,6 +440,14 @@ class Translations$fileTree$fr extends Translations$fileTree$en {
 	@override String fileTooLarge({required Object name}) => '${name} dépasse 200 Mo.';
 	@override String deleteFolderConfirm({required Object path}) => 'Supprimer le dossier « ${path} » ? Cette action est irréversible.';
 	@override String deleteFileConfirm({required Object path}) => 'Supprimer le fichier « ${path} » ? Cette action est irréversible.';
+	@override String get explorer => 'Explorateur';
+	@override String get moreActions => 'Plus d\'actions…';
+	@override String get showDetails => 'Afficher la taille et la date';
+	@override String get noFileOpen => 'Sélectionnez un fichier dans l\'explorateur pour l\'ouvrir';
+	@override String nameExists({required Object name}) => 'Un fichier ou dossier ${name} existe déjà à cet emplacement.';
+	@override String get nameRequired => 'Vous devez fournir un nom de fichier ou de dossier.';
+	@override String get copyRelativePath => 'Copier le chemin relatif';
+	@override String get closeSearch => 'Retour à l\'explorateur';
 }
 
 // Path: git
@@ -11501,6 +11509,14 @@ extension on TranslationsFr {
 			'fileTree.fileTooLarge' => ({required Object name}) => '${name} dépasse 200 Mo.',
 			'fileTree.deleteFolderConfirm' => ({required Object path}) => 'Supprimer le dossier « ${path} » ? Cette action est irréversible.',
 			'fileTree.deleteFileConfirm' => ({required Object path}) => 'Supprimer le fichier « ${path} » ? Cette action est irréversible.',
+			'fileTree.explorer' => 'Explorateur',
+			'fileTree.moreActions' => 'Plus d\'actions…',
+			'fileTree.showDetails' => 'Afficher la taille et la date',
+			'fileTree.noFileOpen' => 'Sélectionnez un fichier dans l\'explorateur pour l\'ouvrir',
+			'fileTree.nameExists' => ({required Object name}) => 'Un fichier ou dossier ${name} existe déjà à cet emplacement.',
+			'fileTree.nameRequired' => 'Vous devez fournir un nom de fichier ou de dossier.',
+			'fileTree.copyRelativePath' => 'Copier le chemin relatif',
+			'fileTree.closeSearch' => 'Retour à l\'explorateur',
 			'git.checkpoints.title' => 'Checkpoints',
 			'git.checkpoints.restoreTitle' => 'Restaurer le checkpoint',
 			'git.checkpoints.restoreMessage' => 'Réinitialiser l’arbre de travail sur ce checkpoint ? Les modifications actuelles seront remplacées.',
@@ -11759,6 +11775,8 @@ extension on TranslationsFr {
 			'skills.addDialog.folderUploadsNote' => 'Les téléversements de dossiers conservent le nom du dossier sélectionné ; les fichiers isolés utilisent le `name` de `SKILL.md`.',
 			'skills.addDialog.installSkill' => 'Installer la compétence',
 			'skills.addDialog.installSkills' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('fr'))(count, one: 'Installer ${count} compétence', other: 'Installer ${count} compétences', ), 
+			_ => null,
+		} ?? switch (path) {
 			'skills.moveDialog.toProjectHint' => 'Choisissez le projet auquel cette compétence doit appartenir. Elle quitte le répertoire de compétences global du fournisseur.',
 			'skills.moveDialog.toGlobalHint' => 'Déplacez cette compétence dans le répertoire de compétences global pour que tous les projets puissent l’utiliser.',
 			'skills.moveDialog.moveToProject' => 'Déplacer vers le projet',
@@ -11767,8 +11785,6 @@ extension on TranslationsFr {
 			'skills.screen.searchHint' => 'Rechercher des compétences...',
 			'skills.screen.clearSearch' => 'Effacer la recherche de compétences',
 			'skills.screen.addSkill' => 'Ajouter une compétence',
-			_ => null,
-		} ?? switch (path) {
 			'skills.screen.scanningProjectSkills' => 'Analyse des compétences du projet...',
 			'skills.screen.savedSuccessfully' => 'Compétences enregistrées avec succès.',
 			'skills.screen.loadingSkills' => ({required Object provider}) => 'Chargement des compétences de ${provider}…',

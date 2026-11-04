@@ -440,6 +440,14 @@ class Translations$fileTree$it extends Translations$fileTree$en {
 	@override String fileTooLarge({required Object name}) => '${name} supera i 200 MB.';
 	@override String deleteFolderConfirm({required Object path}) => 'Eliminare la cartella "${path}"? L’operazione non può essere annullata.';
 	@override String deleteFileConfirm({required Object path}) => 'Eliminare il file "${path}"? L’operazione non può essere annullata.';
+	@override String get explorer => 'Esplora risorse';
+	@override String get moreActions => 'Altre azioni…';
+	@override String get showDetails => 'Mostra dimensione e data';
+	@override String get noFileOpen => 'Seleziona un file in Esplora risorse per aprirlo';
+	@override String nameExists({required Object name}) => 'In questo percorso esiste già un file o una cartella ${name}.';
+	@override String get nameRequired => 'È necessario specificare un nome di file o cartella.';
+	@override String get copyRelativePath => 'Copia percorso relativo';
+	@override String get closeSearch => 'Torna a Esplora risorse';
 }
 
 // Path: git
@@ -11501,6 +11509,14 @@ extension on TranslationsIt {
 			'fileTree.fileTooLarge' => ({required Object name}) => '${name} supera i 200 MB.',
 			'fileTree.deleteFolderConfirm' => ({required Object path}) => 'Eliminare la cartella "${path}"? L’operazione non può essere annullata.',
 			'fileTree.deleteFileConfirm' => ({required Object path}) => 'Eliminare il file "${path}"? L’operazione non può essere annullata.',
+			'fileTree.explorer' => 'Esplora risorse',
+			'fileTree.moreActions' => 'Altre azioni…',
+			'fileTree.showDetails' => 'Mostra dimensione e data',
+			'fileTree.noFileOpen' => 'Seleziona un file in Esplora risorse per aprirlo',
+			'fileTree.nameExists' => ({required Object name}) => 'In questo percorso esiste già un file o una cartella ${name}.',
+			'fileTree.nameRequired' => 'È necessario specificare un nome di file o cartella.',
+			'fileTree.copyRelativePath' => 'Copia percorso relativo',
+			'fileTree.closeSearch' => 'Torna a Esplora risorse',
 			'git.checkpoints.title' => 'Checkpoint',
 			'git.checkpoints.restoreTitle' => 'Ripristina checkpoint',
 			'git.checkpoints.restoreMessage' => 'Ripristinare l\'albero di lavoro a questo checkpoint? Le modifiche attuali verranno sostituite.',
@@ -11759,6 +11775,8 @@ extension on TranslationsIt {
 			'skills.addDialog.folderUploadsNote' => 'I caricamenti delle cartelle mantengono il nome della cartella selezionata; i file singoli usano il `name` in `SKILL.md`.',
 			'skills.addDialog.installSkill' => 'Installa Skill',
 			'skills.addDialog.installSkills' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('it'))(count, one: 'Installa ${count} Skill', other: 'Installa ${count} Skill', ), 
+			_ => null,
+		} ?? switch (path) {
 			'skills.moveDialog.toProjectHint' => 'Scegli il progetto a cui assegnare questa skill. Verrà rimossa dalla cartella delle skill globali del provider.',
 			'skills.moveDialog.toGlobalHint' => 'Sposta questa skill nella cartella delle skill globali così ogni progetto può usarla.',
 			'skills.moveDialog.moveToProject' => 'Sposta nel progetto',
@@ -11767,8 +11785,6 @@ extension on TranslationsIt {
 			'skills.screen.searchHint' => 'Cerca skill…',
 			'skills.screen.clearSearch' => 'Cancella ricerca skill',
 			'skills.screen.addSkill' => 'Aggiungi Skill',
-			_ => null,
-		} ?? switch (path) {
 			'skills.screen.scanningProjectSkills' => 'Scansione delle skill del progetto…',
 			'skills.screen.savedSuccessfully' => 'Skill salvate correttamente.',
 			'skills.screen.loadingSkills' => ({required Object provider}) => 'Caricamento delle skill di ${provider}…',

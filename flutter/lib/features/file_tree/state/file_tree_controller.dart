@@ -189,10 +189,11 @@ class FileTreeViewModeController extends Notifier<FileTreeViewMode> {
 
 const _viewModeBox = 'settings';
 
-/// "Recent only" — the old tree hides files older than 7 days by default
-/// (FILE_TREE_RECENT_ONLY_STORAGE_KEY, localStorage default `true`).
+/// "Recent only" — hides files not modified in the last 7 days. Off by
+/// default: like VS Code, the explorer shows the whole project unless the
+/// user opts into the filter from the "…" menu.
 const kFileTreeRecentOnlyKey = 'file_tree_recent_only';
-const kDefaultFileTreeRecentOnly = true;
+const kDefaultFileTreeRecentOnly = false;
 const kFileTreeRecentWindow = Duration(days: 7);
 
 bool readFileTreeRecentOnly() {
@@ -255,6 +256,37 @@ class FileTreeRespectGitignoreController extends Notifier<bool> {
 
 final fileTreeRespectGitignoreProvider = NotifierProvider<FileTreeRespectGitignoreController, bool>(
   FileTreeRespectGitignoreController.new,
+);
+
+/// Width of the Files tab explorer sidebar (VS Code keeps the side bar
+/// width the user dragged it to).
+const kFileTreeSidebarWidthKey = 'file_tree_sidebar_width';
+const kDefaultFileTreeSidebarWidth = 300.0;
+const kMinFileTreeSidebarWidth = 180.0;
+
+double readFileTreeSidebarWidth() {
+  if (!Hive.isBoxOpen(_viewModeBox)) {
+    return kDefaultFileTreeSidebarWidth;
+  }
+  final raw = Hive.box<dynamic>(_viewModeBox).get(kFileTreeSidebarWidthKey);
+  return raw is num ? raw.toDouble() : kDefaultFileTreeSidebarWidth;
+}
+
+class FileTreeSidebarWidthController extends Notifier<double> {
+  @override
+  double build() => readFileTreeSidebarWidth();
+
+  /// Live update while dragging; [persist] on drag end.
+  void set(double width, {bool persist = false}) {
+    state = width < kMinFileTreeSidebarWidth ? kMinFileTreeSidebarWidth : width;
+    if (persist && Hive.isBoxOpen(_viewModeBox)) {
+      Hive.box<dynamic>(_viewModeBox).put(kFileTreeSidebarWidthKey, state);
+    }
+  }
+}
+
+final fileTreeSidebarWidthProvider = NotifierProvider<FileTreeSidebarWidthController, double>(
+  FileTreeSidebarWidthController.new,
 );
 
 /// Extracted so persistence is testable without a Riverpod container.

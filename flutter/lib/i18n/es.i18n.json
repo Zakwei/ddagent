@@ -3766,7 +3766,15 @@
     },
     "fileTooLarge": "{{name}} supera los 200 MB.",
     "deleteFolderConfirm": "¿Eliminar la carpeta \"{{path}}\"? Esta acción no se puede deshacer.",
-    "deleteFileConfirm": "¿Eliminar el archivo \"{{path}}\"? Esta acción no se puede deshacer."
+    "deleteFileConfirm": "¿Eliminar el archivo \"{{path}}\"? Esta acción no se puede deshacer.",
+    "explorer": "Explorador",
+    "moreActions": "Más acciones…",
+    "showDetails": "Mostrar tamaño y fecha",
+    "noFileOpen": "Selecciona un archivo en el explorador para abrirlo",
+    "nameExists": "Ya existe un archivo o carpeta {{name}} en esta ubicación.",
+    "nameRequired": "Debe proporcionarse un nombre de archivo o carpeta.",
+    "copyRelativePath": "Copiar ruta de acceso relativa",
+    "closeSearch": "Volver al explorador"
   },
   "git": {
     "checkpoints": {

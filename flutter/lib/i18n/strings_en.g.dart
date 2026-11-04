@@ -560,6 +560,30 @@ class Translations$fileTree$en {
 
 	/// en: 'Delete file "{{path}}"? This cannot be undone.'
 	String deleteFileConfirm({required Object path}) => 'Delete file "${path}"? This cannot be undone.';
+
+	/// en: 'Explorer'
+	String get explorer => 'Explorer';
+
+	/// en: 'More Actions…'
+	String get moreActions => 'More Actions…';
+
+	/// en: 'Show size and date'
+	String get showDetails => 'Show size and date';
+
+	/// en: 'Select a file in the explorer to open it'
+	String get noFileOpen => 'Select a file in the explorer to open it';
+
+	/// en: 'A file or folder {{name}} already exists at this location.'
+	String nameExists({required Object name}) => 'A file or folder ${name} already exists at this location.';
+
+	/// en: 'A file or folder name must be provided.'
+	String get nameRequired => 'A file or folder name must be provided.';
+
+	/// en: 'Copy Relative Path'
+	String get copyRelativePath => 'Copy Relative Path';
+
+	/// en: 'Back to explorer'
+	String get closeSearch => 'Back to explorer';
 }
 
 // Path: git
@@ -18144,6 +18168,14 @@ extension on Translations {
 			'fileTree.fileTooLarge' => ({required Object name}) => '${name} is larger than 200MB.',
 			'fileTree.deleteFolderConfirm' => ({required Object path}) => 'Delete folder "${path}"? This cannot be undone.',
 			'fileTree.deleteFileConfirm' => ({required Object path}) => 'Delete file "${path}"? This cannot be undone.',
+			'fileTree.explorer' => 'Explorer',
+			'fileTree.moreActions' => 'More Actions…',
+			'fileTree.showDetails' => 'Show size and date',
+			'fileTree.noFileOpen' => 'Select a file in the explorer to open it',
+			'fileTree.nameExists' => ({required Object name}) => 'A file or folder ${name} already exists at this location.',
+			'fileTree.nameRequired' => 'A file or folder name must be provided.',
+			'fileTree.copyRelativePath' => 'Copy Relative Path',
+			'fileTree.closeSearch' => 'Back to explorer',
 			'git.checkpoints.title' => 'Checkpoints',
 			'git.checkpoints.restoreTitle' => 'Restore checkpoint',
 			'git.checkpoints.restoreMessage' => 'Reset the working tree to this checkpoint? Current changes will be replaced.',
@@ -18402,6 +18434,8 @@ extension on Translations {
 			'skills.addDialog.folderUploadsNote' => 'Folder uploads keep the selected folder name; standalone files use the `name` in `SKILL.md`.',
 			'skills.addDialog.installSkill' => 'Install Skill',
 			'skills.addDialog.installSkills' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: 'Install ${count} Skill', other: 'Install ${count} Skills', ), 
+			_ => null,
+		} ?? switch (path) {
 			'skills.moveDialog.toProjectHint' => 'Choose the project that should own this skill. It moves out of the provider\'s global skills directory.',
 			'skills.moveDialog.toGlobalHint' => 'Move this skill into the global skills directory so every project can use it.',
 			'skills.moveDialog.moveToProject' => 'Move to project',
@@ -18410,8 +18444,6 @@ extension on Translations {
 			'skills.screen.searchHint' => 'Search skills...',
 			'skills.screen.clearSearch' => 'Clear skill search',
 			'skills.screen.addSkill' => 'Add Skill',
-			_ => null,
-		} ?? switch (path) {
 			'skills.screen.scanningProjectSkills' => 'Scanning project skills...',
 			'skills.screen.savedSuccessfully' => 'Skills saved successfully.',
 			'skills.screen.loadingSkills' => ({required Object provider}) => 'Loading ${provider} skills…',

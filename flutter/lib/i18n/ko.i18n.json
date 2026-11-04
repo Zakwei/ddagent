@@ -3755,7 +3755,15 @@
     },
     "fileTooLarge": "{{name}}이(가) 200MB보다 큽니다.",
     "deleteFolderConfirm": "\"{{path}}\" 폴더를 삭제할까요? 이 작업은 되돌릴 수 없습니다.",
-    "deleteFileConfirm": "\"{{path}}\" 파일을 삭제할까요? 이 작업은 되돌릴 수 없습니다."
+    "deleteFileConfirm": "\"{{path}}\" 파일을 삭제할까요? 이 작업은 되돌릴 수 없습니다.",
+    "explorer": "탐색기",
+    "moreActions": "추가 작업…",
+    "showDetails": "크기 및 날짜 표시",
+    "noFileOpen": "탐색기에서 파일을 선택하여 여세요",
+    "nameExists": "이 위치에 {{name}} 파일 또는 폴더가 이미 있습니다.",
+    "nameRequired": "파일 또는 폴더 이름을 입력해야 합니다.",
+    "copyRelativePath": "상대 경로 복사",
+    "closeSearch": "탐색기로 돌아가기"
   },
   "git": {
     "checkpoints": {
