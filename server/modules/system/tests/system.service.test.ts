@@ -507,3 +507,72 @@ test('a tarball built for another Node.js is refused before it can break the ser
     fs.rmSync(appRoot, { recursive: true, force: true });
   }
 });
+
+test('latest release points asset downloads at this server when given a proxy', async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(JSON.stringify({
+    tag_name: 'v0.15.0',
+    assets: [{
+      name: 'ddagent-flutter-android-v0.15.0.apk',
+      url: 'https://api.github.test/assets/1',
+      browser_download_url: 'https://github.test/android.apk',
+      size: 10,
+    }],
+  }), { status: 200 });
+  try {
+    const service = createSystemUpdateService(createDependencies());
+
+    const { release } = await service.getLatestRelease(7, { origin: 'http://100.1.2.3:8085', token: 'jwt' });
+    assert.deepEqual(release?.assets.map((asset) => asset.downloadUrl), [
+      'http://100.1.2.3:8085/api/system/release-asset?tag=v0.15.0&name=ddagent-flutter-android-v0.15.0.apk&token=jwt',
+    ]);
+
+    // Without a proxy (and inside the server's own update flow) the GitHub URL stays.
+    const direct = await service.getLatestRelease(7);
+    assert.equal(direct.release?.assets[0].downloadUrl, 'https://github.test/android.apk');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('release assets stream from the API URL of a listed asset only', async () => {
+  const requests: { url: string; init?: RequestInit }[] = [];
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (url, init) => {
+    requests.push({ url: String(url), init });
+    if (String(url).endsWith('/releases/tags/v0.15.0')) {
+      return new Response(JSON.stringify({
+        tag_name: 'v0.15.0',
+        assets: [{ name: 'app.apk', url: 'https://api.github.test/assets/1' }],
+      }), { status: 200 });
+    }
+    return new Response('APKDATA', {
+      status: 200,
+      headers: { 'content-type': 'application/vnd.android.package-archive', 'content-length': '7' },
+    });
+  };
+  try {
+    const service = createSystemUpdateService(createDependencies({
+      githubTokens: { getActiveGithubToken: () => 'gh-token' },
+    }));
+    const signal = new AbortController().signal;
+
+    assert.equal(await service.openReleaseAsset(7, 'v0.15.0', 'other.apk', signal), null);
+
+    const asset = await service.openReleaseAsset(7, 'v0.15.0', 'app.apk', signal);
+    assert.ok(asset);
+    assert.equal(asset.contentType, 'application/vnd.android.package-archive');
+    assert.equal(asset.contentLength, 7);
+    const chunks: Buffer[] = [];
+    for await (const chunk of asset.body) chunks.push(Buffer.from(chunk));
+    assert.equal(Buffer.concat(chunks).toString(), 'APKDATA');
+
+    const download = requests.at(-1)!;
+    assert.equal(download.url, 'https://api.github.test/assets/1');
+    const headers = download.init?.headers as Record<string, string>;
+    assert.equal(headers.Accept, 'application/octet-stream');
+    assert.equal(headers.Authorization, 'Bearer gh-token');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});

@@ -47,6 +47,11 @@ app.use('/api', (req, res) => {
       headers: {
         ...req.headers,
         host: `127.0.0.1:${BACKEND_PORT}`,
+        // The backend builds absolute URLs (release-asset downloads) from
+        // these — the Host it sees is the loopback rewrite above.
+        'x-forwarded-host': req.headers['x-forwarded-host'] || req.headers.host,
+        'x-forwarded-proto':
+          req.headers['x-forwarded-proto'] || (req.socket.encrypted ? 'https' : 'http'),
       },
     },
     (proxyRes) => {

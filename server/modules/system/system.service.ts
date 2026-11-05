@@ -226,10 +226,50 @@ export function createSystemUpdateService(dependencies: SystemUpdateDependencies
      * 404 on private repos for anonymous callers, which is why the frontend
      * cannot check directly.
      */
-    async getLatestRelease(userId: number) {
+    async getLatestRelease(userId: number, assetProxy?: ReleaseAssetProxy) {
       const data = await githubApi(dependencies, userId, '/releases/latest');
       const release = toRelease(dependencies, data);
+      if (release && assetProxy) {
+        // Clients download through this server: a phone that reaches it over a
+        // VPN IP may have no working DNS for github.com (Failed host lookup).
+        release.assets = release.assets.map((asset) => ({
+          ...asset,
+          downloadUrl: releaseAssetProxyUrl(assetProxy, release.tagName, asset.name),
+        }));
+      }
       return { release };
+    },
+
+    /**
+     * Opens one asset of release [tag] as a stream (GET /release-asset).
+     * The asset is looked up by exact name in that release's asset list, so
+     * only files the release actually publishes can be fetched, and it is
+     * downloaded through the releases API, which also works for private repos
+     * with the user's GitHub token. Null when the release or asset is missing.
+     */
+    async openReleaseAsset(userId: number, tag: string, name: string, signal: AbortSignal) {
+      const data = await githubApi(dependencies, userId, `/releases/tags/${encodeURIComponent(tag)}`);
+      const assets = (data as GitHubReleasePayload | null)?.assets;
+      const asset = Array.isArray(assets) ? assets.find((entry) => entry?.name === name) : undefined;
+      if (!asset?.url) {
+        return null;
+      }
+      const response = await fetch(asset.url, {
+        // The API answers with a redirect to the signed download; fetch drops
+        // the Authorization header when following it to another origin.
+        headers: { ...downloadHeaders(dependencies, userId), Accept: 'application/octet-stream' },
+        redirect: 'follow',
+        signal,
+      });
+      if (!response.ok || !response.body) {
+        throw new Error(`Release asset download failed (HTTP ${response.status}): ${name}`);
+      }
+      const length = Number(response.headers.get('content-length'));
+      return {
+        body: Readable.fromWeb(response.body as never),
+        contentType: response.headers.get('content-type') || 'application/octet-stream',
+        contentLength: Number.isFinite(length) && length > 0 ? length : null,
+      };
     },
 
     /** Recent releases for the Settings changelog, newest first. */
@@ -257,9 +297,31 @@ type GitHubReleasePayload = {
 /** One release asset as returned by the GitHub releases API. */
 type GitHubReleaseAssetPayload = {
   name?: string;
+  /** API URL of the asset; downloads it with `Accept: application/octet-stream`. */
+  url?: string;
   browser_download_url?: string;
   size?: number;
 };
+
+/**
+ * Where the calling client reaches this server: its origin (scheme + host as
+ * the client sent it) and its session token. The token rides in the query
+ * because clients hand asset URLs to a plain HTTP client without the API's
+ * auth headers; `authenticateToken` accepts `?token=` for exactly such URLs.
+ */
+type ReleaseAssetProxy = {
+  origin: string;
+  token: string | null;
+};
+
+/** Absolute URL of GET /api/system/release-asset for one asset on this server. */
+function releaseAssetProxyUrl(proxy: ReleaseAssetProxy, tag: string, name: string): string {
+  const query = new URLSearchParams({ tag, name });
+  if (proxy.token) {
+    query.set('token', proxy.token);
+  }
+  return `${proxy.origin}/api/system/release-asset?${query.toString()}`;
+}
 
 /**
  * Release asset exposed to clients. The Android client matches `name` against
