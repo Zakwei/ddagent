@@ -232,7 +232,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
           child: compact
               ? Stack(
                   children: [
-                    Positioned.fill(child: _body(tab, settings)),
+                    Positioned.fill(child: _body(tab, settings, compact: true)),
                     if (overlayOpen && pid != null) ...[
                       Positioned.fill(
                         child: GestureDetector(
@@ -290,7 +290,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     }
   }
 
-  Widget _body(EditorTab? tab, EditorSettings settings) {
+  Widget _body(EditorTab? tab, EditorSettings settings, {bool compact = false}) {
     if (tab == null) {
       return const _EmptyState();
     }
@@ -346,7 +346,8 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
       fontSize: settings.fontSize,
       tabSize: settings.tabSize,
       wordWrap: settings.wordWrap,
-      minimap: settings.minimap,
+      // A phone has no width to spare for the minimap rail.
+      minimap: settings.minimap && !compact,
       onChanged: (text) => ref.read(editorProvider.notifier).updateContent(tab.id, text),
     );
   }
