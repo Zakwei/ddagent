@@ -135,11 +135,8 @@ void main() {
       await showPane(tester, c, 1);
       expect(bTab.bell, isFalse);
       expect(find.byIcon(LucideIcons.triangleAlert), findsNothing, reason: 'selected pane');
-      // Phone width: the visible tab's prompt shows as answer chips.
-      expect(find.text('1. Yes'), findsOneWidget);
-      await tester.tap(find.text('2. No'));
-      await tester.pump();
-      expect(shells.of(bTab).inputs.last, '2');
+      // No answer strip covers the visible pane — the CLI shows the options.
+      expect(find.text('1. Yes'), findsNothing);
       await drainTimers(tester);
     });
 

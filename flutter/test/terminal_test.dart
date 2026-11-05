@@ -685,11 +685,6 @@ void main() {
       expect(tab.promptOptions, isNotNull);
       expect(tab.promptOptions!.map((o) => o.number), ['1', '2']);
       expect(tab.promptOptions!.map((o) => o.label), ['Approve', 'Reject']);
-
-      fakeWs.sent.clear();
-      controller.answerPrompt(tab.id, '1');
-      expect(tab.promptOptions, isNull);
-      expect(fakeWs.sent.last['data'], '1');
     });
 
     test(
@@ -1890,10 +1885,10 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Disconnect'), findsNothing);
 
-      // CLI prompt output → option chips + Esc. Emit on the real event
-      // loop (same as connectTab) — a bare emitFrame() schedules delivery
-      // on a zone pump() never drains. The 500ms debounce timer then
-      // lives on the fake clock and pump(duration) fires it.
+      // A CLI question gets no answer strip over the terminal — the agent's
+      // own options stay visible and are answered in the CLI. Emit on the
+      // real event loop (same as connectTab); the 500ms scan then lives on
+      // the fake clock and pump(duration) fires it.
       await tester.runAsync(() async {
         fakeWs.emitFrame({
           'type': 'output',
@@ -1904,16 +1899,7 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 600));
       await tester.pump();
-      expect(find.text('1. Approve'), findsOneWidget);
-      expect(find.text('2. Reject'), findsOneWidget);
-      // The chips' Esc plus the key bar's Esc keycap.
-      expect(find.text('Esc'), findsAtLeastNWidgets(1));
-
-      // Tapping a chip sends its digit and clears the strip.
-      fakeWs.sent.clear();
-      await tester.tap(find.text('1. Approve'));
-      await tester.pump();
-      expect(fakeWs.sent.last['data'], '1');
+      expect(find.text('1. Approve'), findsNothing);
       expect(find.text('2. Reject'), findsNothing);
 
       // Disconnect (dropdown) → overlay returns with the explicit Connect CTA.
@@ -1936,56 +1922,6 @@ void main() {
       final inits = fakeWs.sent.where((f) => f['type'] == 'init');
       expect(inits, isNotEmpty);
       expect(inits.every((f) => f['forceRestart'] != true), isTrue);
-    });
-
-    testWidgets('on a phone the prompt chips stack as full-width two-line rows', (tester) async {
-      tester.view.physicalSize = const Size(390, 800);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-
-      final container = ProviderContainer(
-        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
-      );
-      addTearDown(container.dispose);
-
-      await tester.pumpWidget(
-        TranslationProvider(
-          child: UncontrolledProviderScope(
-            container: container,
-            child: MaterialApp(
-              theme: AppTheme.dark(),
-              home: const Scaffold(body: TerminalScreen(projectPath: '/test/proj')),
-            ),
-          ),
-        ),
-      );
-      await tester.pump();
-
-      const long = 'Third runner on the gaming box for this repository (Recommended)';
-      await tester.runAsync(() async {
-        fakeWs.emitFrame({
-          'type': 'output',
-          'data': 'How should CI run?\r\n❯ 1. $long\r\n  2. Hybrid\r\nEsc to cancel\r\n',
-        });
-        await Future<void>.delayed(const Duration(milliseconds: 30));
-      });
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 600));
-      await tester.pump();
-
-      final first = find.text('1. $long');
-      expect(first, findsOneWidget);
-      expect(tester.widget<Text>(first).maxLines, 2);
-      // Full-width rows: both options share the left edge, one under the other.
-      final second = find.text('2. Hybrid');
-      expect(tester.getTopLeft(first).dx, tester.getTopLeft(second).dx);
-      expect(tester.getTopLeft(second).dy, greaterThan(tester.getTopLeft(first).dy));
-
-      fakeWs.sent.clear();
-      await tester.tap(second);
-      await tester.pump();
-      expect(fakeWs.sent.last['data'], '2');
     });
 
     testWidgets('ProviderLoginDialog lists providers and launches terminal', (tester) async {

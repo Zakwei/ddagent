@@ -386,7 +386,7 @@ void main() {
     });
   });
 
-  test('prompt options are per tab and clear on non-prompt output', () async {
+  test('prompt options are detected per tab', () async {
     final a = await open('pane-a');
     final b = await open('pane-b');
     shells.of(a).output('Pick:\r\n❯ 1. Yes\r\n  2. No\r\nesc to cancel\r\n');
@@ -395,9 +395,6 @@ void main() {
     await Future<void>.delayed(const Duration(milliseconds: 650));
     expect(a.promptOptions?.map((o) => o.label), ['Yes', 'No']);
     expect(b.promptOptions, isNull);
-    ctrl().answerPrompt(a.id, '2');
-    expect(shells.of(a).inputs.last, '2');
-    expect(a.promptOptions, isNull);
   });
 
   group('connection and run lifecycle', () {

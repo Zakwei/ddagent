@@ -956,16 +956,6 @@ class TerminalController extends Notifier<TerminalState> {
     }
   }
 
-  /// Answer a detected CLI prompt — sends the option digit (or `'\x1b'` for
-  /// the Esc chip) and clears the chip row (web parity).
-  void answerPrompt(String tabId, String input) {
-    final tab = state.tabs.where((t) => t.id == tabId).firstOrNull;
-    if (tab == null) return;
-    tab.promptOptions = null;
-    sendInput(tabId, input);
-    _notifyTabsChanged();
-  }
-
   /// Disconnect the socket without touching the PTY (web
   /// `disconnectFromShell({suppressAutoConnect: true})`) — the overlay's
   /// Connect CTA re-opens it via [connectTab].
