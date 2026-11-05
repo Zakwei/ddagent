@@ -25,6 +25,7 @@ import 'package:desktop_drop/desktop_drop.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 // file-tree/constants/constants.ts parity.
@@ -118,9 +119,18 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
   String get _projectId => ref.read(fileTreeProvider).projectId ?? '';
 
   void _open(FileTreeNode node) {
-    final compact = context.breakpoint.isCompact;
-    // Images + compact layout open as dialogs; wide layout uses the editor area.
-    if (compact || isImageFile(node.name)) {
+    if (context.breakpoint.isCompact) {
+      // A phone opens the full-screen editor (tabs, explorer slide-over) the
+      // way VS Code goes from the explorer to the file; Back returns here.
+      unawaited(
+        context.push(
+          Uri(
+            path: '/editor',
+            queryParameters: {'projectId': _projectId, 'file': node.path},
+          ).toString(),
+        ),
+      );
+    } else if (isImageFile(node.name)) {
       openFileNode(context, projectId: _projectId, node: node, asDialog: true);
     } else {
       setState(() => _openNode = node);

@@ -1006,6 +1006,11 @@
       "someSavesFailed": "Einige Speichervorgänge fehlgeschlagen",
       "savedTo": "Gespeichert unter {{path}}",
       "mergeApplied": "Merge angewendet — zum Beibehalten speichern"
+    },
+    "quickOpen": {
+      "tooltip": "Gehe zu Datei (Strg+P)",
+      "hint": "Dateien nach Namen suchen",
+      "empty": "Keine passenden Dateien"
     }
   },
   "common": {

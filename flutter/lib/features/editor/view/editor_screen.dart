@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/utils/path_utils.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
+import 'package:ddagent_app/core/widgets/app_context_menu.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/features/editor/data/editor_file_kind.dart';
 import 'package:ddagent_app/features/editor/state/editor_controller.dart';
@@ -10,6 +11,7 @@ import 'package:ddagent_app/features/editor/view/code_editor.dart';
 import 'package:ddagent_app/features/editor/view/editor_diff_view.dart';
 import 'package:ddagent_app/features/editor/view/editor_dock.dart';
 import 'package:ddagent_app/features/editor/view/editor_preview.dart';
+import 'package:ddagent_app/features/editor/view/quick_open.dart';
 import 'package:ddagent_app/features/file_tree/data/file_saver.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
@@ -37,6 +39,14 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   String? _openedKey;
   bool _diffOpen = false;
   bool _dockOpen = true;
+
+  /// Explorer slide-over of a narrow editor; null until toggled, when it is
+  /// open only while no file is open (a phone never lands on an empty pane).
+  bool? _overlayDockOpen;
+
+  /// Below this width the explorer slides over the file instead of taking
+  /// 260px beside it — on a phone, and in a narrow workspace pane.
+  static const _compactWidth = 600.0;
   final _previewOn = <String>{};
 
   /// Project the dock + deep links bind to; falls back to the first project.
@@ -126,6 +136,16 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     ref.read(editorProvider.notifier).activate(next.id);
   }
 
+  /// Ctrl+P — pick a file of the project by name and open it.
+  Future<void> _quickOpen() async {
+    final pid = _pid;
+    if (pid == null) return;
+    final path = await showQuickOpen(context, projectId: pid);
+    if (path == null || !mounted) return;
+    _openFile(pid, path);
+    setState(() => _overlayDockOpen = false);
+  }
+
   Future<void> _closeTab(EditorTab tab) async {
     if (await confirmCloseTab(context, tab)) {
       ref.read(editorProvider.notifier).close(tab.id);
@@ -151,57 +171,111 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
             _cycleTab(-1),
         const SingleActivator(LogicalKeyboardKey.pageDown, control: true): () => _cycleTab(1),
         const SingleActivator(LogicalKeyboardKey.pageUp, control: true): () => _cycleTab(-1),
+        const SingleActivator(LogicalKeyboardKey.keyP, control: true): _quickOpen,
+        const SingleActivator(LogicalKeyboardKey.keyP, meta: true): _quickOpen,
       },
       child: Focus(
         focusNode: _focus,
         autofocus: true,
-        child: Column(
-          children: [
-            _TabStrip(
-              state: state,
-              onActivate: (id) => ref.read(editorProvider.notifier).activate(id),
-              onClose: _closeTab,
-            ),
-            const Divider(height: 1),
-            _Toolbar(
-              tab: tab,
-              diffOpen: _diffOpen,
-              dockOpen: _dockOpen,
-              previewOn: tab != null && _previewOn.contains(tab.id),
-              settings: settings,
-              onToggleDock: _pid == null ? null : () => setState(() => _dockOpen = !_dockOpen),
-              onToggleDiff: () => setState(() => _diffOpen = !_diffOpen),
-              onTogglePreview: tab == null
-                  ? null
-                  : () => setState(() {
-                      if (!_previewOn.remove(tab.id)) _previewOn.add(tab.id);
-                    }),
-              onSave: tab != null && tab.isDirty ? _saveActive : null,
-              onSaveAll: state.hasUnsavedChanges ? _saveAll : null,
-              onReload: tab == null ? null : () => ref.read(editorProvider.notifier).reload(tab.id),
-              onDownload: tab == null ? null : () => _downloadTab(tab),
-              onHtmlPreview: tab == null
-                  ? null
-                  : () => unawaited(previewHtmlFile(_fileName(tab.path), tab.content)),
-            ),
-            const Divider(height: 1),
-            Expanded(
-              child: Row(
-                children: [
-                  if (_dockOpen && _pid != null)
-                    EditorDock(
-                      projectId: _pid!,
-                      activePath: tab?.projectId == _pid ? tab?.path : null,
-                      onOpenFile: (path, {diff = false}) => _openFile(_pid!, path, diff: diff),
-                    ),
-                  Expanded(child: _body(tab, settings)),
-                ],
-              ),
-            ),
-            _Footer(tab: tab),
-          ],
+        child: LayoutBuilder(
+          builder: (context, box) => _layout(state, tab, settings, box.maxWidth),
         ),
       ),
+    );
+  }
+
+  Widget _layout(EditorState state, EditorTab? tab, EditorSettings settings, double width) {
+    final compact = width < _compactWidth;
+    final overlayOpen = _overlayDockOpen ?? state.tabs.isEmpty;
+    final pid = _pid;
+    return Column(
+      children: [
+        _TabStrip(
+          state: state,
+          onActivate: (id) => ref.read(editorProvider.notifier).activate(id),
+          onClose: _closeTab,
+        ),
+        const Divider(height: 1),
+        _Toolbar(
+          tab: tab,
+          diffOpen: _diffOpen,
+          compact: compact,
+          dockOpen: compact ? overlayOpen : _dockOpen,
+          previewOn: tab != null && _previewOn.contains(tab.id),
+          settings: settings,
+          onToggleDock: pid == null
+              ? null
+              : () => setState(() {
+                  if (compact) {
+                    _overlayDockOpen = !overlayOpen;
+                  } else {
+                    _dockOpen = !_dockOpen;
+                  }
+                }),
+          onQuickOpen: pid == null ? null : _quickOpen,
+          onToggleDiff: () => setState(() => _diffOpen = !_diffOpen),
+          onTogglePreview: tab == null
+              ? null
+              : () => setState(() {
+                  if (!_previewOn.remove(tab.id)) _previewOn.add(tab.id);
+                }),
+          onSave: tab != null && tab.isDirty ? _saveActive : null,
+          onSaveAll: state.hasUnsavedChanges ? _saveAll : null,
+          onReload: tab == null ? null : () => ref.read(editorProvider.notifier).reload(tab.id),
+          onDownload: tab == null ? null : () => _downloadTab(tab),
+          onHtmlPreview: tab == null
+              ? null
+              : () => unawaited(previewHtmlFile(_fileName(tab.path), tab.content)),
+        ),
+        const Divider(height: 1),
+        Expanded(
+          child: compact
+              ? Stack(
+                  children: [
+                    Positioned.fill(child: _body(tab, settings)),
+                    if (overlayOpen && pid != null) ...[
+                      Positioned.fill(
+                        child: GestureDetector(
+                          onTap: () => setState(() => _overlayDockOpen = false),
+                          child: const ColoredBox(color: Color(0x66000000)),
+                        ),
+                      ),
+                      Positioned(
+                        left: 0,
+                        top: 0,
+                        bottom: 0,
+                        child: Material(
+                          elevation: 8,
+                          color: context.appColors.background,
+                          child: EditorDock(
+                            projectId: pid,
+                            width: (width * 0.85).clamp(0, 340).toDouble(),
+                            activePath: tab?.projectId == pid ? tab?.path : null,
+                            // Picking a file shows it: the slide-over steps aside.
+                            onOpenFile: (path, {diff = false}) {
+                              _openFile(pid, path, diff: diff);
+                              setState(() => _overlayDockOpen = false);
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                )
+              : Row(
+                  children: [
+                    if (_dockOpen && pid != null)
+                      EditorDock(
+                        projectId: pid,
+                        activePath: tab?.projectId == pid ? tab?.path : null,
+                        onOpenFile: (path, {diff = false}) => _openFile(pid, path, diff: diff),
+                      ),
+                    Expanded(child: _body(tab, settings)),
+                  ],
+                ),
+        ),
+        if (!compact) _Footer(tab: tab),
+      ],
     );
   }
 
@@ -366,6 +440,8 @@ class _TabChip extends StatelessWidget {
 
 class _Toolbar extends StatelessWidget {
   const _Toolbar({
+    required this.compact,
+    required this.onQuickOpen,
     required this.tab,
     required this.diffOpen,
     required this.dockOpen,
@@ -381,6 +457,9 @@ class _Toolbar extends StatelessWidget {
     required this.onHtmlPreview,
   });
 
+  /// Narrow editor: Save, quick open and a "…" menu replace the icon row.
+  final bool compact;
+  final VoidCallback? onQuickOpen;
   final EditorTab? tab;
   final bool diffOpen;
   final bool dockOpen;
@@ -419,55 +498,126 @@ class _Toolbar extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          if (kind == EditorFileKind.markdown)
-            IconButton(
-              tooltip: previewOn
-                  ? t.codeEditor.actions.editMarkdown
-                  : t.codeEditor.actions.previewMarkdown,
-              visualDensity: VisualDensity.compact,
-              icon: Icon(previewOn ? LucideIcons.pencil : LucideIcons.eye, size: 18),
-              onPressed: onTogglePreview,
-            ),
-          if (isTextual)
-            IconButton(
-              tooltip: t.codeEditor.toolbar.diffMerge,
-              visualDensity: VisualDensity.compact,
-              icon: Icon(LucideIcons.diff, size: 18, color: diffOpen ? colors.primary : null),
-              onPressed: onToggleDiff,
-            ),
-          if (isHtml)
-            IconButton(
-              tooltip: t.codeEditor.toolbar.previewInBrowser,
-              visualDensity: VisualDensity.compact,
-              icon: const Icon(LucideIcons.eye, size: 18),
-              onPressed: onHtmlPreview,
-            ),
-          if (isTextual)
-            IconButton(
-              tooltip: t.codeEditor.toolbar.reload,
-              visualDensity: VisualDensity.compact,
-              icon: const Icon(LucideIcons.refreshCw, size: 18),
-              onPressed: onReload,
-            ),
           IconButton(
-            tooltip: t.common.buttons.download,
+            tooltip: t.codeEditor.quickOpen.tooltip,
             visualDensity: VisualDensity.compact,
-            icon: const Icon(LucideIcons.download, size: 18),
-            onPressed: onDownload,
+            icon: const Icon(LucideIcons.search, size: 18),
+            onPressed: onQuickOpen,
           ),
-          AppButton(
-            variant: AppButtonVariant.ghost,
-            size: AppButtonSize.sm,
-            onPressed: onSaveAll,
-            child: Text(t.codeEditor.actions.saveAll),
-          ),
-          const SizedBox(width: 4),
-          AppButton(
-            size: AppButtonSize.sm,
-            onPressed: onSave,
-            child: Text(t.codeEditor.actions.save),
-          ),
-          const _SettingsMenu(),
+          if (compact) ...[
+            AppButton(
+              size: AppButtonSize.sm,
+              onPressed: onSave,
+              child: Text(t.codeEditor.actions.save),
+            ),
+            Builder(
+              builder: (context) => IconButton(
+                tooltip: t.fileTree.moreActions,
+                visualDensity: VisualDensity.compact,
+                icon: const Icon(LucideIcons.ellipsisVertical, size: 18),
+                onPressed: () {
+                  final box = context.findRenderObject()! as RenderBox;
+                  unawaited(
+                    AppContextMenu.show(
+                      context,
+                      box.localToGlobal(box.size.bottomLeft(Offset.zero)),
+                      [
+                        if (kind == EditorFileKind.markdown)
+                          AppMenuItem(
+                            label: previewOn
+                                ? t.codeEditor.actions.editMarkdown
+                                : t.codeEditor.actions.previewMarkdown,
+                            icon: previewOn ? LucideIcons.pencil : LucideIcons.eye,
+                            onTap: onTogglePreview,
+                          ),
+                        if (isTextual)
+                          AppMenuItem(
+                            label: t.codeEditor.toolbar.diffMerge,
+                            icon: LucideIcons.diff,
+                            checked: diffOpen,
+                            onTap: onToggleDiff,
+                          ),
+                        if (isHtml)
+                          AppMenuItem(
+                            label: t.codeEditor.toolbar.previewInBrowser,
+                            icon: LucideIcons.eye,
+                            onTap: onHtmlPreview,
+                          ),
+                        if (isTextual)
+                          AppMenuItem(
+                            label: t.codeEditor.toolbar.reload,
+                            icon: LucideIcons.refreshCw,
+                            onTap: onReload,
+                          ),
+                        AppMenuItem(
+                          label: t.common.buttons.download,
+                          icon: LucideIcons.download,
+                          onTap: onDownload,
+                        ),
+                        AppMenuItem(
+                          label: t.codeEditor.actions.saveAll,
+                          icon: LucideIcons.saveAll,
+                          onTap: onSaveAll,
+                          dividerBefore: true,
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+            const _SettingsMenu(),
+          ] else ...[
+            if (kind == EditorFileKind.markdown)
+              IconButton(
+                tooltip: previewOn
+                    ? t.codeEditor.actions.editMarkdown
+                    : t.codeEditor.actions.previewMarkdown,
+                visualDensity: VisualDensity.compact,
+                icon: Icon(previewOn ? LucideIcons.pencil : LucideIcons.eye, size: 18),
+                onPressed: onTogglePreview,
+              ),
+            if (isTextual)
+              IconButton(
+                tooltip: t.codeEditor.toolbar.diffMerge,
+                visualDensity: VisualDensity.compact,
+                icon: Icon(LucideIcons.diff, size: 18, color: diffOpen ? colors.primary : null),
+                onPressed: onToggleDiff,
+              ),
+            if (isHtml)
+              IconButton(
+                tooltip: t.codeEditor.toolbar.previewInBrowser,
+                visualDensity: VisualDensity.compact,
+                icon: const Icon(LucideIcons.eye, size: 18),
+                onPressed: onHtmlPreview,
+              ),
+            if (isTextual)
+              IconButton(
+                tooltip: t.codeEditor.toolbar.reload,
+                visualDensity: VisualDensity.compact,
+                icon: const Icon(LucideIcons.refreshCw, size: 18),
+                onPressed: onReload,
+              ),
+            IconButton(
+              tooltip: t.common.buttons.download,
+              visualDensity: VisualDensity.compact,
+              icon: const Icon(LucideIcons.download, size: 18),
+              onPressed: onDownload,
+            ),
+            AppButton(
+              variant: AppButtonVariant.ghost,
+              size: AppButtonSize.sm,
+              onPressed: onSaveAll,
+              child: Text(t.codeEditor.actions.saveAll),
+            ),
+            const SizedBox(width: 4),
+            AppButton(
+              size: AppButtonSize.sm,
+              onPressed: onSave,
+              child: Text(t.codeEditor.actions.save),
+            ),
+            const _SettingsMenu(),
+          ],
         ],
       ),
     );

@@ -1006,6 +1006,11 @@
       "someSavesFailed": "Alcuni salvataggi non riusciti",
       "savedTo": "Salvato in {{path}}",
       "mergeApplied": "Merge applicato — salva per conservare le modifiche"
+    },
+    "quickOpen": {
+      "tooltip": "Vai al file (Ctrl+P)",
+      "hint": "Cerca file per nome",
+      "empty": "Nessun file corrispondente"
     }
   },
   "common": {

@@ -203,6 +203,7 @@ class Translations$codeEditor$en {
 	late final Translations$codeEditor$diff$en diff = Translations$codeEditor$diff$en.internal(_root);
 	late final Translations$codeEditor$emptyState$en emptyState = Translations$codeEditor$emptyState$en.internal(_root);
 	late final Translations$codeEditor$toasts$en toasts = Translations$codeEditor$toasts$en.internal(_root);
+	late final Translations$codeEditor$quickOpen$en quickOpen = Translations$codeEditor$quickOpen$en.internal(_root);
 }
 
 // Path: common
@@ -3412,6 +3413,24 @@ class Translations$codeEditor$toasts$en {
 
 	/// en: 'Merge applied — save to persist'
 	String get mergeApplied => 'Merge applied — save to persist';
+}
+
+// Path: codeEditor.quickOpen
+class Translations$codeEditor$quickOpen$en {
+	Translations$codeEditor$quickOpen$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Go to file (Ctrl+P)'
+	String get tooltip => 'Go to file (Ctrl+P)';
+
+	/// en: 'Search files by name'
+	String get hint => 'Search files by name';
+
+	/// en: 'No matching files'
+	String get empty => 'No matching files';
 }
 
 // Path: common.buttons
@@ -16101,6 +16120,9 @@ extension on Translations {
 			'codeEditor.toasts.someSavesFailed' => 'Some saves failed',
 			'codeEditor.toasts.savedTo' => ({required Object path}) => 'Saved to ${path}',
 			'codeEditor.toasts.mergeApplied' => 'Merge applied — save to persist',
+			'codeEditor.quickOpen.tooltip' => 'Go to file (Ctrl+P)',
+			'codeEditor.quickOpen.hint' => 'Search files by name',
+			'codeEditor.quickOpen.empty' => 'No matching files',
 			'common.buttons.save' => 'Save',
 			'common.buttons.cancel' => 'Cancel',
 			'common.buttons.delete' => 'Delete',
@@ -16396,11 +16418,11 @@ extension on Translations {
 			'common.projectWizard.step1.kNew.title' => 'New Workspace',
 			'common.projectWizard.step1.kNew.description' => 'Create a new workspace, optionally clone from a GitHub repository',
 			'common.projectWizard.step2.existingPath' => 'Workspace Path',
+			_ => null,
+		} ?? switch (path) {
 			'common.projectWizard.step2.newPath' => 'Workspace Path',
 			'common.projectWizard.step2.existingPlaceholder' => '/path/to/existing/workspace',
 			'common.projectWizard.step2.newPlaceholder' => '/path/to/new/workspace',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.step2.existingHelp' => 'Full path to your existing workspace directory',
 			'common.projectWizard.step2.newHelp' => 'Full path to your workspace directory',
 			'common.projectWizard.step2.githubUrl' => 'GitHub URL (Optional)',
@@ -16910,11 +16932,11 @@ extension on Translations {
 			'settings.account.language' => 'Language',
 			'settings.account.languageLabel' => 'Display Language',
 			'settings.account.languageDescription' => 'Choose your preferred language for the interface',
+			_ => null,
+		} ?? switch (path) {
 			'settings.account.username' => 'Username',
 			'settings.account.email' => 'Email',
 			'settings.account.profile' => 'Profile',
-			_ => null,
-		} ?? switch (path) {
 			'settings.account.changePassword' => 'Change Password',
 			'settings.mcp.title' => 'MCP Servers',
 			'settings.mcp.addServer' => 'Add Server',
@@ -17424,11 +17446,11 @@ extension on Translations {
 			'settings.browser.errors.loadStatus' => 'Failed to load Browser status',
 			'settings.browser.errors.saveSettings' => 'Failed to save Browser settings',
 			'settings.browser.installHint' => 'Install the browser runtime before agents can create Browser sessions.',
+			_ => null,
+		} ?? switch (path) {
 			'settings.browser.installRuntime' => 'Install Runtime',
 			'settings.browser.installed' => 'installed',
 			'settings.browser.installing' => 'Installing...',
-			_ => null,
-		} ?? switch (path) {
 			'settings.browser.missing' => 'missing',
 			'settings.browser.runtimeRequired' => 'Browser runtime required',
 			'settings.browser.statusDisabled' => 'disabled',
@@ -17938,11 +17960,11 @@ extension on Translations {
 			'tasks.createTask.descriptionPlaceholder' => 'Optional details',
 			'tasks.createTask.error' => 'Failed to add task',
 			'tasks.createTask.priorityLabel' => 'Priority',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.createTask.submit' => 'Add Task',
 			'tasks.createTask.submitting' => 'Adding...',
 			'tasks.createTask.title' => 'Add Task',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.createTask.titleLabel' => 'Title',
 			'tasks.createTask.titlePlaceholder' => 'What needs to be done?',
 			'tasks.list.completedReopen' => 'Completed (click to reopen)',
@@ -18452,11 +18474,11 @@ extension on Translations {
 			'skills.addDialog.chooseFolder' => 'Choose Folder',
 			'skills.addDialog.readyToInstall' => 'Ready to install',
 			'skills.addDialog.markdownFileMeta' => ({required Object size}) => 'Markdown file · ${size}',
+			_ => null,
+		} ?? switch (path) {
 			'skills.addDialog.folderFilesMeta' => ({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: '${count} file · ${size}', other: '${count} files · ${size}', ), 
 			'skills.addDialog.removeQueued' => ({required Object name}) => 'Remove ${name}',
 			'skills.addDialog.whereWillThisInstall' => 'Where will this install?',
-			_ => null,
-		} ?? switch (path) {
 			'skills.addDialog.hideInstallLocation' => 'Hide install location',
 			'skills.addDialog.folderUploadsNote' => 'Folder uploads keep the selected folder name; standalone files use the `name` in `SKILL.md`.',
 			'skills.addDialog.installSkill' => 'Install Skill',

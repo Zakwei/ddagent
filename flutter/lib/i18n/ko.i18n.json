@@ -996,6 +996,11 @@
       "someSavesFailed": "일부 저장 실패",
       "savedTo": "{{path}}에 저장됨",
       "mergeApplied": "병합 적용됨 — 저장하여 유지하세요"
+    },
+    "quickOpen": {
+      "tooltip": "파일로 이동 (Ctrl+P)",
+      "hint": "이름으로 파일 검색",
+      "empty": "일치하는 파일이 없습니다"
     }
   },
   "common": {

@@ -17,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 
 const _tree = [
   FileTreeNode(
@@ -464,6 +465,55 @@ void main() {
       expect(files.searches, ['x.ts']);
       expect(find.text('void main() {}'), findsOneWidget);
       expect(find.byType(ExplorerTree), findsNothing);
+    });
+
+    testWidgets('on a phone a file opens in the editor screen; Back returns to Files', (
+      tester,
+    ) async {
+      files = _FakeFiles();
+      tester.view.physicalSize = const Size(390, 800);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final router = GoRouter(
+        initialLocation: '/files',
+        routes: [
+          GoRoute(
+            path: '/files',
+            builder: (_, _) => const Scaffold(body: FileTreeScreen(projectId: 'p1')),
+          ),
+          GoRoute(
+            path: '/editor',
+            builder: (_, s) => Scaffold(
+              body: Text(
+                'editor ${s.uri.queryParameters['projectId']} ${s.uri.queryParameters['file']}',
+              ),
+            ),
+          ),
+        ],
+      );
+      addTearDown(router.dispose);
+      await tester.pumpWidget(
+        TranslationProvider(
+          child: ProviderScope(
+            overrides: [
+              fileTreeRepositoryProvider.overrideWithValue(files),
+              gitRepositoryProvider.overrideWithValue(_FakeGit(const {})),
+              projectsProvider.overrideWith(_Projects.new),
+            ],
+            child: MaterialApp.router(theme: AppTheme.light(), routerConfig: router),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('README.md'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('editor p1 '), findsOneWidget);
+      expect(find.textContaining('README.md'), findsOneWidget);
+
+      router.pop();
+      await tester.pumpAndSettle();
+      expect(find.byType(ExplorerTree), findsOneWidget);
     });
 
     testWidgets('a held right-click on a row opens a single menu', (tester) async {

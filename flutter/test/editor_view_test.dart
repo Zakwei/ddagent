@@ -5,7 +5,9 @@ import 'package:ddagent_app/features/editor/data/editor_file_kind.dart';
 import 'package:ddagent_app/features/editor/data/line_diff.dart';
 import 'package:ddagent_app/features/editor/state/editor_controller.dart';
 import 'package:ddagent_app/features/editor/view/code_editor.dart';
+import 'package:ddagent_app/features/editor/view/editor_dock.dart';
 import 'package:ddagent_app/features/editor/view/editor_screen.dart';
+import 'package:ddagent_app/features/editor/view/quick_open.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_node.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_repository.dart';
 import 'package:ddagent_app/features/file_tree/view/file_viewer.dart';
@@ -332,6 +334,127 @@ void main() {
       final container = ProviderScope.containerOf(element);
       expect(container.read(editorProvider).active!.path, '/b.dart');
       expect(container.read(editorProvider).active!.content, 'y');
+    });
+
+    group('on a phone', () {
+      setUp(() {
+        files.files['p1:/a.dart'] = 'x';
+        files.files['p1:/lib/b.dart'] = 'y';
+        files.files['p1:/page.html'] = '<p>';
+        files.tree = const [
+          FileTreeNode(name: 'a.dart', path: '/a.dart', isDirectory: false),
+          FileTreeNode(name: 'page.html', path: '/page.html', isDirectory: false),
+          FileTreeNode(
+            name: 'lib',
+            path: '/lib',
+            isDirectory: true,
+            children: [FileTreeNode(name: 'b.dart', path: '/lib/b.dart', isDirectory: false)],
+          ),
+        ];
+      });
+
+      Future<ProviderContainer> pumpPhone(WidgetTester tester, {String? file}) async {
+        tester.view.physicalSize = const Size(390, 800);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.reset);
+        await tester.pumpWidget(
+          _app(
+            files: files,
+            git: git,
+            child: EditorScreen(projectId: 'p1', filePath: file),
+          ),
+        );
+        await tester.pumpAndSettle();
+        return ProviderScope.containerOf(tester.element(find.byType(EditorScreen)));
+      }
+
+      testWidgets('the explorer slides over an empty editor and steps aside after a pick', (
+        tester,
+      ) async {
+        final container = await pumpPhone(tester);
+        // Nothing open yet: the explorer is showing, at most 85% wide.
+        expect(find.byType(EditorDock), findsOneWidget);
+        expect(tester.getSize(find.byType(EditorDock)).width, lessThanOrEqualTo(390 * 0.85));
+
+        await tester.tap(find.text('a.dart'));
+        await tester.pumpAndSettle();
+        expect(container.read(editorProvider).active!.path, '/a.dart');
+        expect(find.byType(EditorDock), findsNothing);
+
+        // The toolbar toggle brings it back; a tap on the dimmed file closes it.
+        await tester.tap(find.byTooltip('Toggle file dock'));
+        await tester.pumpAndSettle();
+        expect(find.byType(EditorDock), findsOneWidget);
+        await tester.tapAt(const Offset(380, 400));
+        await tester.pumpAndSettle();
+        expect(find.byType(EditorDock), findsNothing);
+      });
+
+      testWidgets('a file opened from a link starts with the explorer closed', (tester) async {
+        await pumpPhone(tester, file: '/page.html');
+        expect(find.byType(EditorDock), findsNothing);
+        // The toolbar fits (no overflow) by moving actions into "…".
+        expect(find.byTooltip('Download'), findsNothing);
+        await tester.tap(find.byTooltip('More Actions…'));
+        await tester.pumpAndSettle();
+        expect(find.text('Download'), findsOneWidget);
+        expect(find.text('Preview in browser'), findsOneWidget);
+        expect(find.text('Save all'), findsOneWidget);
+      });
+
+      testWidgets('quick open finds a file by name and opens it', (tester) async {
+        final container = await pumpPhone(tester, file: '/a.dart');
+        await tester.tap(find.byTooltip('Go to file (Ctrl+P)'));
+        await tester.pumpAndSettle();
+        expect(find.byType(QuickOpenPanel), findsOneWidget);
+        await tester.enterText(find.byType(TextField).last, 'bd');
+        await tester.pumpAndSettle();
+        // b.dart under lib/ — the name plus its folder.
+        expect(find.descendant(of: find.byType(ListTile), matching: find.text('b.dart')), findsOne);
+        expect(find.text('lib'), findsWidgets);
+        await tester.testTextInput.receiveAction(TextInputAction.go);
+        await tester.pumpAndSettle();
+        expect(find.byType(QuickOpenPanel), findsNothing);
+        expect(container.read(editorProvider).active!.path, '/lib/b.dart');
+      });
+    });
+  });
+
+  group('quickOpenMatches', () {
+    final all = quickOpenFiles(const [
+      FileTreeNode(name: 'README.md', path: '/p/README.md', isDirectory: false),
+      FileTreeNode(
+        name: 'lib',
+        path: '/p/lib',
+        isDirectory: true,
+        children: [
+          FileTreeNode(name: 'main.dart', path: '/p/lib/main.dart', isDirectory: false),
+          FileTreeNode(
+            name: 'core',
+            path: '/p/lib/core',
+            isDirectory: true,
+            children: [
+              FileTreeNode(
+                name: 'domain.dart',
+                path: '/p/lib/core/domain.dart',
+                isDirectory: false,
+              ),
+            ],
+          ),
+        ],
+      ),
+    ]);
+
+    test('lists files with project-relative paths, skipping folders', () {
+      expect(all.map((f) => f.relative), ['README.md', 'lib/main.dart', 'lib/core/domain.dart']);
+    });
+
+    test('ranks a name substring before a subsequence, then a path match', () {
+      expect(quickOpenMatches(all, 'main').map((f) => f.name), ['main.dart', 'domain.dart']);
+      expect(quickOpenMatches(all, 'mdart').map((f) => f.name), ['main.dart', 'domain.dart']);
+      expect(quickOpenMatches(all, 'core dom').map((f) => f.name), ['domain.dart']);
+      expect(quickOpenMatches(all, 'zzz'), isEmpty);
+      expect(quickOpenMatches(all, '', limit: 2), hasLength(2));
     });
   });
 }

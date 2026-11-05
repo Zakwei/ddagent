@@ -996,6 +996,11 @@
       "someSavesFailed": "部分儲存失敗",
       "savedTo": "已儲存至 {{path}}",
       "mergeApplied": "已套用合併 — 儲存以保留變更"
+    },
+    "quickOpen": {
+      "tooltip": "前往檔案 (Ctrl+P)",
+      "hint": "依名稱搜尋檔案",
+      "empty": "沒有相符的檔案"
     }
   },
   "common": {

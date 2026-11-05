@@ -183,6 +183,7 @@ class Translations$codeEditor$ko extends Translations$codeEditor$en {
 	@override late final Translations$codeEditor$diff$ko diff = Translations$codeEditor$diff$ko._(_root);
 	@override late final Translations$codeEditor$emptyState$ko emptyState = Translations$codeEditor$emptyState$ko._(_root);
 	@override late final Translations$codeEditor$toasts$ko toasts = Translations$codeEditor$toasts$ko._(_root);
+	@override late final Translations$codeEditor$quickOpen$ko quickOpen = Translations$codeEditor$quickOpen$ko._(_root);
 }
 
 // Path: common
@@ -1987,6 +1988,18 @@ class Translations$codeEditor$toasts$ko extends Translations$codeEditor$toasts$e
 	@override String get someSavesFailed => '일부 저장 실패';
 	@override String savedTo({required Object path}) => '${path}에 저장됨';
 	@override String get mergeApplied => '병합 적용됨 — 저장하여 유지하세요';
+}
+
+// Path: codeEditor.quickOpen
+class Translations$codeEditor$quickOpen$ko extends Translations$codeEditor$quickOpen$en {
+	Translations$codeEditor$quickOpen$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get tooltip => '파일로 이동 (Ctrl+P)';
+	@override String get hint => '이름으로 파일 검색';
+	@override String get empty => '일치하는 파일이 없습니다';
 }
 
 // Path: common.buttons
@@ -9417,6 +9430,9 @@ extension on TranslationsKo {
 			'codeEditor.toasts.someSavesFailed' => '일부 저장 실패',
 			'codeEditor.toasts.savedTo' => ({required Object path}) => '${path}에 저장됨',
 			'codeEditor.toasts.mergeApplied' => '병합 적용됨 — 저장하여 유지하세요',
+			'codeEditor.quickOpen.tooltip' => '파일로 이동 (Ctrl+P)',
+			'codeEditor.quickOpen.hint' => '이름으로 파일 검색',
+			'codeEditor.quickOpen.empty' => '일치하는 파일이 없습니다',
 			'common.buttons.save' => '저장',
 			'common.buttons.cancel' => '취소',
 			'common.buttons.delete' => '삭제',
@@ -9712,11 +9728,11 @@ extension on TranslationsKo {
 			'common.projectWizard.step1.kNew.title' => '새 워크스페이스',
 			'common.projectWizard.step1.kNew.description' => '새 워크스페이스를 생성하고, 선택적으로 GitHub 저장소에서 clone합니다',
 			'common.projectWizard.step2.existingPath' => '워크스페이스 경로',
+			_ => null,
+		} ?? switch (path) {
 			'common.projectWizard.step2.newPath' => '워크스페이스 경로',
 			'common.projectWizard.step2.existingPlaceholder' => '/path/to/existing/workspace',
 			'common.projectWizard.step2.newPlaceholder' => '/path/to/new/workspace',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.step2.existingHelp' => '기존 워크스페이스 디렉토리의 전체 경로',
 			'common.projectWizard.step2.newHelp' => '워크스페이스 디렉토리의 전체 경로',
 			'common.projectWizard.step2.githubUrl' => 'GitHub URL (선택사항)',
@@ -10226,11 +10242,11 @@ extension on TranslationsKo {
 			'settings.account.language' => '언어',
 			'settings.account.languageLabel' => '표시 언어',
 			'settings.account.languageDescription' => '인터페이스에 사용할 언어를 선택하세요',
+			_ => null,
+		} ?? switch (path) {
 			'settings.account.username' => '사용자명',
 			'settings.account.email' => '이메일',
 			'settings.account.profile' => '프로필',
-			_ => null,
-		} ?? switch (path) {
 			'settings.account.changePassword' => '비밀번호 변경',
 			'settings.mcp.title' => 'MCP 서버',
 			'settings.mcp.addServer' => '서버 추가',
@@ -10740,11 +10756,11 @@ extension on TranslationsKo {
 			'settings.browser.errors.loadStatus' => 'Browser 상태 로드 실패',
 			'settings.browser.errors.saveSettings' => 'Browser 설정 저장 실패',
 			'settings.browser.installHint' => '에이전트가 Browser 세션을 만들기 전에 브라우저 런타임을 설치하세요.',
+			_ => null,
+		} ?? switch (path) {
 			'settings.browser.installRuntime' => '런타임 설치',
 			'settings.browser.installed' => '설치됨',
 			'settings.browser.installing' => '설치 중...',
-			_ => null,
-		} ?? switch (path) {
 			'settings.browser.missing' => '없음',
 			'settings.browser.runtimeRequired' => '브라우저 런타임 필요',
 			'settings.browser.statusDisabled' => '비활성화됨',
@@ -11254,11 +11270,11 @@ extension on TranslationsKo {
 			'tasks.createTask.descriptionPlaceholder' => '선택적 세부 정보',
 			'tasks.createTask.error' => '작업 추가 실패',
 			'tasks.createTask.priorityLabel' => '우선순위',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.createTask.submit' => '작업 추가',
 			'tasks.createTask.submitting' => '추가 중...',
 			'tasks.createTask.title' => '작업 추가',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.createTask.titleLabel' => '제목',
 			'tasks.createTask.titlePlaceholder' => '무엇을 해야 하나요?',
 			'tasks.list.completedReopen' => '완료됨 (클릭하여 다시 열기)',
@@ -11768,11 +11784,11 @@ extension on TranslationsKo {
 			'skills.addDialog.chooseFolder' => '폴더 선택',
 			'skills.addDialog.readyToInstall' => '설치 준비 완료',
 			'skills.addDialog.markdownFileMeta' => ({required Object size}) => '마크다운 파일 · ${size}',
+			_ => null,
+		} ?? switch (path) {
 			'skills.addDialog.folderFilesMeta' => ({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(count, one: '${count}개 파일 · ${size}', other: '${count}개 파일 · ${size}', ), 
 			'skills.addDialog.removeQueued' => ({required Object name}) => '${name} 제거',
 			'skills.addDialog.whereWillThisInstall' => '어디에 설치되나요?',
-			_ => null,
-		} ?? switch (path) {
 			'skills.addDialog.hideInstallLocation' => '설치 위치 숨기기',
 			'skills.addDialog.folderUploadsNote' => '폴더 업로드는 선택한 폴더 이름을 유지하며, 단독 파일은 `SKILL.md`의 `name`을 사용합니다.',
 			'skills.addDialog.installSkill' => '스킬 설치',

@@ -183,6 +183,7 @@ class Translations$codeEditor$ru extends Translations$codeEditor$en {
 	@override late final Translations$codeEditor$diff$ru diff = Translations$codeEditor$diff$ru._(_root);
 	@override late final Translations$codeEditor$emptyState$ru emptyState = Translations$codeEditor$emptyState$ru._(_root);
 	@override late final Translations$codeEditor$toasts$ru toasts = Translations$codeEditor$toasts$ru._(_root);
+	@override late final Translations$codeEditor$quickOpen$ru quickOpen = Translations$codeEditor$quickOpen$ru._(_root);
 }
 
 // Path: common
@@ -2019,6 +2020,18 @@ class Translations$codeEditor$toasts$ru extends Translations$codeEditor$toasts$e
 	@override String get someSavesFailed => 'Некоторые сохранения не удались';
 	@override String savedTo({required Object path}) => 'Сохранено в ${path}';
 	@override String get mergeApplied => 'Слияние применено — сохраните, чтобы зафиксировать';
+}
+
+// Path: codeEditor.quickOpen
+class Translations$codeEditor$quickOpen$ru extends Translations$codeEditor$quickOpen$en {
+	Translations$codeEditor$quickOpen$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get tooltip => 'Перейти к файлу (Ctrl+P)';
+	@override String get hint => 'Искать файлы по имени';
+	@override String get empty => 'Нет подходящих файлов';
 }
 
 // Path: common.buttons
@@ -9466,6 +9479,9 @@ extension on TranslationsRu {
 			'codeEditor.toasts.someSavesFailed' => 'Некоторые сохранения не удались',
 			'codeEditor.toasts.savedTo' => ({required Object path}) => 'Сохранено в ${path}',
 			'codeEditor.toasts.mergeApplied' => 'Слияние применено — сохраните, чтобы зафиксировать',
+			'codeEditor.quickOpen.tooltip' => 'Перейти к файлу (Ctrl+P)',
+			'codeEditor.quickOpen.hint' => 'Искать файлы по имени',
+			'codeEditor.quickOpen.empty' => 'Нет подходящих файлов',
 			'common.buttons.save' => 'Сохранить',
 			'common.buttons.cancel' => 'Отмена',
 			'common.buttons.delete' => 'Удалить',
@@ -9761,11 +9777,11 @@ extension on TranslationsRu {
 			'common.projectWizard.step1.kNew.title' => 'Новое рабочее пространство',
 			'common.projectWizard.step1.kNew.description' => 'Создать новое рабочее пространство, опционально клонировать из репозитория GitHub',
 			'common.projectWizard.step2.existingPath' => 'Путь к рабочему пространству',
+			_ => null,
+		} ?? switch (path) {
 			'common.projectWizard.step2.newPath' => 'Путь к рабочему пространству',
 			'common.projectWizard.step2.existingPlaceholder' => '/путь/к/существующему/пространству',
 			'common.projectWizard.step2.newPlaceholder' => '/путь/к/новому/пространству',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.step2.existingHelp' => 'Полный путь к каталогу вашего рабочего пространства',
 			'common.projectWizard.step2.newHelp' => 'Полный путь к каталогу вашего рабочего пространства',
 			'common.projectWizard.step2.githubUrl' => 'URL GitHub (необязательно)',
@@ -10275,11 +10291,11 @@ extension on TranslationsRu {
 			'settings.account.language' => 'Язык',
 			'settings.account.languageLabel' => 'Язык интерфейса',
 			'settings.account.languageDescription' => 'Выберите предпочитаемый язык для интерфейса',
+			_ => null,
+		} ?? switch (path) {
 			'settings.account.username' => 'Имя пользователя',
 			'settings.account.email' => 'Эл. почта',
 			'settings.account.profile' => 'Профиль',
-			_ => null,
-		} ?? switch (path) {
 			'settings.account.changePassword' => 'Изменить пароль',
 			'settings.mcp.title' => 'MCP серверы',
 			'settings.mcp.addServer' => 'Добавить сервер',
@@ -10789,11 +10805,11 @@ extension on TranslationsRu {
 			'settings.browser.errors.loadStatus' => 'Не удалось загрузить статус Browser',
 			'settings.browser.errors.saveSettings' => 'Не удалось сохранить настройки Browser',
 			'settings.browser.installHint' => 'Установите среду выполнения браузера, прежде чем агенты смогут создавать сессии Browser.',
+			_ => null,
+		} ?? switch (path) {
 			'settings.browser.installRuntime' => 'Установить среду выполнения',
 			'settings.browser.installed' => 'установлено',
 			'settings.browser.installing' => 'Установка...',
-			_ => null,
-		} ?? switch (path) {
 			'settings.browser.missing' => 'отсутствует',
 			'settings.browser.runtimeRequired' => 'Требуется среда выполнения браузера',
 			'settings.browser.statusDisabled' => 'отключён',
@@ -11303,11 +11319,11 @@ extension on TranslationsRu {
 			'tasks.createTask.descriptionPlaceholder' => 'Дополнительные детали',
 			'tasks.createTask.error' => 'Не удалось добавить задачу',
 			'tasks.createTask.priorityLabel' => 'Приоритет',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.createTask.submit' => 'Добавить задачу',
 			'tasks.createTask.submitting' => 'Добавление...',
 			'tasks.createTask.title' => 'Добавить задачу',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.createTask.titleLabel' => 'Название',
 			'tasks.createTask.titlePlaceholder' => 'Что нужно сделать?',
 			'tasks.list.completedReopen' => 'Выполнена (нажмите, чтобы переоткрыть)',
@@ -11817,11 +11833,11 @@ extension on TranslationsRu {
 			'skills.addDialog.chooseFolder' => 'Выбрать папку',
 			'skills.addDialog.readyToInstall' => 'Готово к установке',
 			'skills.addDialog.markdownFileMeta' => ({required Object size}) => 'Файл Markdown · ${size}',
+			_ => null,
+		} ?? switch (path) {
 			'skills.addDialog.folderFilesMeta' => ({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(count, one: '${count} файл · ${size}', other: '${count} файлов · ${size}', ), 
 			'skills.addDialog.removeQueued' => ({required Object name}) => 'Удалить ${name}',
 			'skills.addDialog.whereWillThisInstall' => 'Куда это установится?',
-			_ => null,
-		} ?? switch (path) {
 			'skills.addDialog.hideInstallLocation' => 'Скрыть место установки',
 			'skills.addDialog.folderUploadsNote' => 'При загрузке папки сохраняется её имя; для отдельных файлов используется `name` из `SKILL.md`.',
 			'skills.addDialog.installSkill' => 'Установить навык',

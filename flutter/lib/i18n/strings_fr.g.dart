@@ -183,6 +183,7 @@ class Translations$codeEditor$fr extends Translations$codeEditor$en {
 	@override late final Translations$codeEditor$diff$fr diff = Translations$codeEditor$diff$fr._(_root);
 	@override late final Translations$codeEditor$emptyState$fr emptyState = Translations$codeEditor$emptyState$fr._(_root);
 	@override late final Translations$codeEditor$toasts$fr toasts = Translations$codeEditor$toasts$fr._(_root);
+	@override late final Translations$codeEditor$quickOpen$fr quickOpen = Translations$codeEditor$quickOpen$fr._(_root);
 }
 
 // Path: common
@@ -1997,6 +1998,18 @@ class Translations$codeEditor$toasts$fr extends Translations$codeEditor$toasts$e
 	@override String get someSavesFailed => 'Certains enregistrements ont échoué';
 	@override String savedTo({required Object path}) => 'Enregistré dans ${path}';
 	@override String get mergeApplied => 'Fusion appliquée — enregistrez pour conserver';
+}
+
+// Path: codeEditor.quickOpen
+class Translations$codeEditor$quickOpen$fr extends Translations$codeEditor$quickOpen$en {
+	Translations$codeEditor$quickOpen$fr._(TranslationsFr root) : this._root = root, super.internal(root);
+
+	final TranslationsFr _root; // ignore: unused_field
+
+	// Translations
+	@override String get tooltip => 'Atteindre le fichier (Ctrl+P)';
+	@override String get hint => 'Rechercher des fichiers par nom';
+	@override String get empty => 'Aucun fichier correspondant';
 }
 
 // Path: common.buttons
@@ -9428,6 +9441,9 @@ extension on TranslationsFr {
 			'codeEditor.toasts.someSavesFailed' => 'Certains enregistrements ont échoué',
 			'codeEditor.toasts.savedTo' => ({required Object path}) => 'Enregistré dans ${path}',
 			'codeEditor.toasts.mergeApplied' => 'Fusion appliquée — enregistrez pour conserver',
+			'codeEditor.quickOpen.tooltip' => 'Atteindre le fichier (Ctrl+P)',
+			'codeEditor.quickOpen.hint' => 'Rechercher des fichiers par nom',
+			'codeEditor.quickOpen.empty' => 'Aucun fichier correspondant',
 			'common.buttons.save' => 'Enregistrer',
 			'common.buttons.cancel' => 'Annuler',
 			'common.buttons.delete' => 'Supprimer',
@@ -9723,11 +9739,11 @@ extension on TranslationsFr {
 			'common.projectWizard.step1.kNew.title' => 'Nouvel espace de travail',
 			'common.projectWizard.step1.kNew.description' => 'Créer un nouvel espace de travail, éventuellement cloné depuis un dépôt GitHub',
 			'common.projectWizard.step2.existingPath' => 'Chemin de l\'espace de travail',
+			_ => null,
+		} ?? switch (path) {
 			'common.projectWizard.step2.newPath' => 'Chemin de l\'espace de travail',
 			'common.projectWizard.step2.existingPlaceholder' => '/chemin/vers/espace-de-travail',
 			'common.projectWizard.step2.newPlaceholder' => '/chemin/vers/nouvel-espace',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.step2.existingHelp' => 'Chemin complet vers votre répertoire d\'espace de travail existant',
 			'common.projectWizard.step2.newHelp' => 'Chemin complet vers votre répertoire d\'espace de travail',
 			'common.projectWizard.step2.githubUrl' => 'URL GitHub (optionnel)',
@@ -10237,11 +10253,11 @@ extension on TranslationsFr {
 			'settings.account.language' => 'Langue',
 			'settings.account.languageLabel' => 'Langue d\'affichage',
 			'settings.account.languageDescription' => 'Choisissez votre langue préférée pour l\'interface',
+			_ => null,
+		} ?? switch (path) {
 			'settings.account.username' => 'Nom d\'utilisateur',
 			'settings.account.email' => 'E-mail',
 			'settings.account.profile' => 'Profil',
-			_ => null,
-		} ?? switch (path) {
 			'settings.account.changePassword' => 'Changer le mot de passe',
 			'settings.mcp.title' => 'Serveurs MCP',
 			'settings.mcp.addServer' => 'Ajouter un serveur',
@@ -10751,11 +10767,11 @@ extension on TranslationsFr {
 			'settings.browser.errors.loadStatus' => 'Échec du chargement du statut Browser',
 			'settings.browser.errors.saveSettings' => 'Échec de l’enregistrement des paramètres Browser',
 			'settings.browser.installHint' => 'Installez le runtime du navigateur avant que les agents puissent créer des sessions Browser.',
+			_ => null,
+		} ?? switch (path) {
 			'settings.browser.installRuntime' => 'Installer le runtime',
 			'settings.browser.installed' => 'installé',
 			'settings.browser.installing' => 'Installation...',
-			_ => null,
-		} ?? switch (path) {
 			'settings.browser.missing' => 'manquant',
 			'settings.browser.runtimeRequired' => 'Runtime du navigateur requis',
 			'settings.browser.statusDisabled' => 'désactivé',
@@ -11265,11 +11281,11 @@ extension on TranslationsFr {
 			'tasks.createTask.descriptionPlaceholder' => 'Détails optionnels',
 			'tasks.createTask.error' => 'Échec de l’ajout de la tâche',
 			'tasks.createTask.priorityLabel' => 'Priorité',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.createTask.submit' => 'Ajouter la tâche',
 			'tasks.createTask.submitting' => 'Ajout...',
 			'tasks.createTask.title' => 'Ajouter une tâche',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.createTask.titleLabel' => 'Titre',
 			'tasks.createTask.titlePlaceholder' => 'Que faut-il faire ?',
 			'tasks.list.completedReopen' => 'Terminée (cliquer pour rouvrir)',
@@ -11779,11 +11795,11 @@ extension on TranslationsFr {
 			'skills.addDialog.chooseFolder' => 'Choisir un dossier',
 			'skills.addDialog.readyToInstall' => 'Prêt à installer',
 			'skills.addDialog.markdownFileMeta' => ({required Object size}) => 'Fichier Markdown · ${size}',
+			_ => null,
+		} ?? switch (path) {
 			'skills.addDialog.folderFilesMeta' => ({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('fr'))(count, one: '${count} fichier · ${size}', other: '${count} fichiers · ${size}', ), 
 			'skills.addDialog.removeQueued' => ({required Object name}) => 'Retirer ${name}',
 			'skills.addDialog.whereWillThisInstall' => 'Où cela sera-t-il installé ?',
-			_ => null,
-		} ?? switch (path) {
 			'skills.addDialog.hideInstallLocation' => 'Masquer l’emplacement d’installation',
 			'skills.addDialog.folderUploadsNote' => 'Les téléversements de dossiers conservent le nom du dossier sélectionné ; les fichiers isolés utilisent le `name` de `SKILL.md`.',
 			'skills.addDialog.installSkill' => 'Installer la compétence',

@@ -1001,6 +1001,11 @@
       "someSavesFailed": "Bazı kaydetmeler başarısız oldu",
       "savedTo": "Şuraya kaydedildi: {{path}}",
       "mergeApplied": "Birleştirme uygulandı — kalıcı olması için kaydet"
+    },
+    "quickOpen": {
+      "tooltip": "Dosyaya git (Ctrl+P)",
+      "hint": "Dosyaları ada göre ara",
+      "empty": "Eşleşen dosya yok"
     }
   },
   "common": {

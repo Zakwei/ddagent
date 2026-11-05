@@ -183,6 +183,7 @@ class Translations$codeEditor$de extends Translations$codeEditor$en {
 	@override late final Translations$codeEditor$diff$de diff = Translations$codeEditor$diff$de._(_root);
 	@override late final Translations$codeEditor$emptyState$de emptyState = Translations$codeEditor$emptyState$de._(_root);
 	@override late final Translations$codeEditor$toasts$de toasts = Translations$codeEditor$toasts$de._(_root);
+	@override late final Translations$codeEditor$quickOpen$de quickOpen = Translations$codeEditor$quickOpen$de._(_root);
 }
 
 // Path: common
@@ -1997,6 +1998,18 @@ class Translations$codeEditor$toasts$de extends Translations$codeEditor$toasts$e
 	@override String get someSavesFailed => 'Einige Speichervorgänge fehlgeschlagen';
 	@override String savedTo({required Object path}) => 'Gespeichert unter ${path}';
 	@override String get mergeApplied => 'Merge angewendet — zum Beibehalten speichern';
+}
+
+// Path: codeEditor.quickOpen
+class Translations$codeEditor$quickOpen$de extends Translations$codeEditor$quickOpen$en {
+	Translations$codeEditor$quickOpen$de._(TranslationsDe root) : this._root = root, super.internal(root);
+
+	final TranslationsDe _root; // ignore: unused_field
+
+	// Translations
+	@override String get tooltip => 'Gehe zu Datei (Strg+P)';
+	@override String get hint => 'Dateien nach Namen suchen';
+	@override String get empty => 'Keine passenden Dateien';
 }
 
 // Path: common.buttons
@@ -9428,6 +9441,9 @@ extension on TranslationsDe {
 			'codeEditor.toasts.someSavesFailed' => 'Einige Speichervorgänge fehlgeschlagen',
 			'codeEditor.toasts.savedTo' => ({required Object path}) => 'Gespeichert unter ${path}',
 			'codeEditor.toasts.mergeApplied' => 'Merge angewendet — zum Beibehalten speichern',
+			'codeEditor.quickOpen.tooltip' => 'Gehe zu Datei (Strg+P)',
+			'codeEditor.quickOpen.hint' => 'Dateien nach Namen suchen',
+			'codeEditor.quickOpen.empty' => 'Keine passenden Dateien',
 			'common.buttons.save' => 'Speichern',
 			'common.buttons.cancel' => 'Abbrechen',
 			'common.buttons.delete' => 'Löschen',
@@ -9723,11 +9739,11 @@ extension on TranslationsDe {
 			'common.projectWizard.step1.kNew.title' => 'Neuer Arbeitsbereich',
 			'common.projectWizard.step1.kNew.description' => 'Einen neuen Arbeitsbereich erstellen, optional aus einem GitHub-Repository klonen',
 			'common.projectWizard.step2.existingPath' => 'Arbeitsbereichspfad',
+			_ => null,
+		} ?? switch (path) {
 			'common.projectWizard.step2.newPath' => 'Arbeitsbereichspfad',
 			'common.projectWizard.step2.existingPlaceholder' => '/Pfad/zum/vorhandenen/Arbeitsbereich',
 			'common.projectWizard.step2.newPlaceholder' => '/Pfad/zum/neuen/Arbeitsbereich',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.step2.existingHelp' => 'Vollständiger Pfad zu deinem vorhandenen Arbeitsbereichsverzeichnis',
 			'common.projectWizard.step2.newHelp' => 'Vollständiger Pfad zu deinem Arbeitsbereichsverzeichnis',
 			'common.projectWizard.step2.githubUrl' => 'GitHub-URL (Optional)',
@@ -10237,11 +10253,11 @@ extension on TranslationsDe {
 			'settings.account.language' => 'Sprache',
 			'settings.account.languageLabel' => 'Anzeigesprache',
 			'settings.account.languageDescription' => 'Wähl deine bevorzugte Sprache für die Oberfläche',
+			_ => null,
+		} ?? switch (path) {
 			'settings.account.username' => 'Benutzername',
 			'settings.account.email' => 'E-Mail',
 			'settings.account.profile' => 'Profil',
-			_ => null,
-		} ?? switch (path) {
 			'settings.account.changePassword' => 'Passwort ändern',
 			'settings.mcp.title' => 'MCP-Server',
 			'settings.mcp.addServer' => 'Server hinzufügen',
@@ -10751,11 +10767,11 @@ extension on TranslationsDe {
 			'settings.browser.errors.loadStatus' => 'Browser-Status konnte nicht geladen werden',
 			'settings.browser.errors.saveSettings' => 'Browser-Einstellungen konnten nicht gespeichert werden',
 			'settings.browser.installHint' => 'Installiere die Browser-Runtime, bevor Agenten Browser-Sitzungen erstellen können.',
+			_ => null,
+		} ?? switch (path) {
 			'settings.browser.installRuntime' => 'Runtime installieren',
 			'settings.browser.installed' => 'installiert',
 			'settings.browser.installing' => 'Installiere...',
-			_ => null,
-		} ?? switch (path) {
 			'settings.browser.missing' => 'fehlt',
 			'settings.browser.runtimeRequired' => 'Browser-Runtime erforderlich',
 			'settings.browser.statusDisabled' => 'deaktiviert',
@@ -11265,11 +11281,11 @@ extension on TranslationsDe {
 			'tasks.createTask.descriptionPlaceholder' => 'Optionale Details',
 			'tasks.createTask.error' => 'Aufgabe konnte nicht hinzugefügt werden',
 			'tasks.createTask.priorityLabel' => 'Priorität',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.createTask.submit' => 'Aufgabe hinzufügen',
 			'tasks.createTask.submitting' => 'Füge hinzu...',
 			'tasks.createTask.title' => 'Aufgabe hinzufügen',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.createTask.titleLabel' => 'Titel',
 			'tasks.createTask.titlePlaceholder' => 'Was muss erledigt werden?',
 			'tasks.list.completedReopen' => 'Abgeschlossen (klicken zum Wiederöffnen)',
@@ -11779,11 +11795,11 @@ extension on TranslationsDe {
 			'skills.addDialog.chooseFolder' => 'Ordner wählen',
 			'skills.addDialog.readyToInstall' => 'Bereit zur Installation',
 			'skills.addDialog.markdownFileMeta' => ({required Object size}) => 'Markdown-Datei · ${size}',
+			_ => null,
+		} ?? switch (path) {
 			'skills.addDialog.folderFilesMeta' => ({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(count, one: '${count} Datei · ${size}', other: '${count} Dateien · ${size}', ), 
 			'skills.addDialog.removeQueued' => ({required Object name}) => '${name} entfernen',
 			'skills.addDialog.whereWillThisInstall' => 'Wo wird dies installiert?',
-			_ => null,
-		} ?? switch (path) {
 			'skills.addDialog.hideInstallLocation' => 'Installationspfad ausblenden',
 			'skills.addDialog.folderUploadsNote' => 'Bei Ordner-Uploads bleibt der ausgewählte Ordnername erhalten; einzelne Dateien verwenden `name` aus `SKILL.md`.',
 			'skills.addDialog.installSkill' => 'Skill installieren',

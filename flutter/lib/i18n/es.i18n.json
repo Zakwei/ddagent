@@ -1006,6 +1006,11 @@
       "someSavesFailed": "Algunos guardados fallaron",
       "savedTo": "Guardado en {{path}}",
       "mergeApplied": "Fusión aplicada — guarda para conservar los cambios"
+    },
+    "quickOpen": {
+      "tooltip": "Ir al archivo (Ctrl+P)",
+      "hint": "Buscar archivos por nombre",
+      "empty": "No hay archivos que coincidan"
     }
   },
   "common": {

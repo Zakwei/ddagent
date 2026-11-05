@@ -1006,6 +1006,11 @@
       "someSavesFailed": "Some saves failed",
       "savedTo": "Saved to {{path}}",
       "mergeApplied": "Merge applied — save to persist"
+    },
+    "quickOpen": {
+      "tooltip": "Go to file (Ctrl+P)",
+      "hint": "Search files by name",
+      "empty": "No matching files"
     }
   },
   "common": {

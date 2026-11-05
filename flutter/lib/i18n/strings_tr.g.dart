@@ -183,6 +183,7 @@ class Translations$codeEditor$tr extends Translations$codeEditor$en {
 	@override late final Translations$codeEditor$diff$tr diff = Translations$codeEditor$diff$tr._(_root);
 	@override late final Translations$codeEditor$emptyState$tr emptyState = Translations$codeEditor$emptyState$tr._(_root);
 	@override late final Translations$codeEditor$toasts$tr toasts = Translations$codeEditor$toasts$tr._(_root);
+	@override late final Translations$codeEditor$quickOpen$tr quickOpen = Translations$codeEditor$quickOpen$tr._(_root);
 }
 
 // Path: common
@@ -1992,6 +1993,18 @@ class Translations$codeEditor$toasts$tr extends Translations$codeEditor$toasts$e
 	@override String get someSavesFailed => 'Bazı kaydetmeler başarısız oldu';
 	@override String savedTo({required Object path}) => 'Şuraya kaydedildi: ${path}';
 	@override String get mergeApplied => 'Birleştirme uygulandı — kalıcı olması için kaydet';
+}
+
+// Path: codeEditor.quickOpen
+class Translations$codeEditor$quickOpen$tr extends Translations$codeEditor$quickOpen$en {
+	Translations$codeEditor$quickOpen$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get tooltip => 'Dosyaya git (Ctrl+P)';
+	@override String get hint => 'Dosyaları ada göre ara';
+	@override String get empty => 'Eşleşen dosya yok';
 }
 
 // Path: common.buttons
@@ -9423,6 +9436,9 @@ extension on TranslationsTr {
 			'codeEditor.toasts.someSavesFailed' => 'Bazı kaydetmeler başarısız oldu',
 			'codeEditor.toasts.savedTo' => ({required Object path}) => 'Şuraya kaydedildi: ${path}',
 			'codeEditor.toasts.mergeApplied' => 'Birleştirme uygulandı — kalıcı olması için kaydet',
+			'codeEditor.quickOpen.tooltip' => 'Dosyaya git (Ctrl+P)',
+			'codeEditor.quickOpen.hint' => 'Dosyaları ada göre ara',
+			'codeEditor.quickOpen.empty' => 'Eşleşen dosya yok',
 			'common.buttons.save' => 'Kaydet',
 			'common.buttons.cancel' => 'İptal',
 			'common.buttons.delete' => 'Sil',
@@ -9718,11 +9734,11 @@ extension on TranslationsTr {
 			'common.projectWizard.step1.kNew.title' => 'Yeni Çalışma Alanı',
 			'common.projectWizard.step1.kNew.description' => 'Yeni bir çalışma alanı oluştur, istersen bir GitHub deposundan klonla',
 			'common.projectWizard.step2.existingPath' => 'Çalışma Alanı Yolu',
+			_ => null,
+		} ?? switch (path) {
 			'common.projectWizard.step2.newPath' => 'Çalışma Alanı Yolu',
 			'common.projectWizard.step2.existingPlaceholder' => '/mevcut/calisma-alani/yolu',
 			'common.projectWizard.step2.newPlaceholder' => '/yeni/calisma-alani/yolu',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.step2.existingHelp' => 'Mevcut çalışma alanı dizinine giden tam yol',
 			'common.projectWizard.step2.newHelp' => 'Çalışma alanı dizinine giden tam yol',
 			'common.projectWizard.step2.githubUrl' => 'GitHub URL\'si (İsteğe Bağlı)',
@@ -10232,11 +10248,11 @@ extension on TranslationsTr {
 			'settings.account.language' => 'Dil',
 			'settings.account.languageLabel' => 'Görüntüleme Dili',
 			'settings.account.languageDescription' => 'Arayüz için tercih ettiğin dili seç',
+			_ => null,
+		} ?? switch (path) {
 			'settings.account.username' => 'Kullanıcı Adı',
 			'settings.account.email' => 'E-posta',
 			'settings.account.profile' => 'Profil',
-			_ => null,
-		} ?? switch (path) {
 			'settings.account.changePassword' => 'Şifreyi Değiştir',
 			'settings.mcp.title' => 'MCP Sunucuları',
 			'settings.mcp.addServer' => 'Sunucu Ekle',
@@ -10746,11 +10762,11 @@ extension on TranslationsTr {
 			'settings.browser.errors.loadStatus' => 'Browser durumu yüklenemedi',
 			'settings.browser.errors.saveSettings' => 'Browser ayarları kaydedilemedi',
 			'settings.browser.installHint' => 'Aracılar Browser oturumları oluşturmadan önce tarayıcı runtime’ını kurun.',
+			_ => null,
+		} ?? switch (path) {
 			'settings.browser.installRuntime' => 'Runtime’ı Kur',
 			'settings.browser.installed' => 'kurulu',
 			'settings.browser.installing' => 'Kuruluyor...',
-			_ => null,
-		} ?? switch (path) {
 			'settings.browser.missing' => 'eksik',
 			'settings.browser.runtimeRequired' => 'Tarayıcı runtime’ı gerekli',
 			'settings.browser.statusDisabled' => 'devre dışı',
@@ -11260,11 +11276,11 @@ extension on TranslationsTr {
 			'tasks.createTask.descriptionPlaceholder' => 'İsteğe bağlı ayrıntılar',
 			'tasks.createTask.error' => 'Görev eklenemedi',
 			'tasks.createTask.priorityLabel' => 'Öncelik',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.createTask.submit' => 'Görev Ekle',
 			'tasks.createTask.submitting' => 'Ekleniyor...',
 			'tasks.createTask.title' => 'Görev Ekle',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.createTask.titleLabel' => 'Başlık',
 			'tasks.createTask.titlePlaceholder' => 'Ne yapılması gerekiyor?',
 			'tasks.list.completedReopen' => 'Tamamlandı (yeniden açmak için tıklayın)',
@@ -11774,11 +11790,11 @@ extension on TranslationsTr {
 			'skills.addDialog.chooseFolder' => 'Klasör Seç',
 			'skills.addDialog.readyToInstall' => 'Kuruluma hazır',
 			'skills.addDialog.markdownFileMeta' => ({required Object size}) => 'Markdown dosyası · ${size}',
+			_ => null,
+		} ?? switch (path) {
 			'skills.addDialog.folderFilesMeta' => ({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('tr'))(count, one: '${count} dosya · ${size}', other: '${count} dosya · ${size}', ), 
 			'skills.addDialog.removeQueued' => ({required Object name}) => '${name} öğesini kaldır',
 			'skills.addDialog.whereWillThisInstall' => 'Nereye kurulacak?',
-			_ => null,
-		} ?? switch (path) {
 			'skills.addDialog.hideInstallLocation' => 'Kurulum konumunu gizle',
 			'skills.addDialog.folderUploadsNote' => 'Klasör yüklemeleri seçilen klasör adını korur; tek başına dosyalar `SKILL.md` içindeki `name` değerini kullanır.',
 			'skills.addDialog.installSkill' => 'Beceri Kur',

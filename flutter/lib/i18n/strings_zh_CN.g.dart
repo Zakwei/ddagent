@@ -183,6 +183,7 @@ class Translations$codeEditor$zh_CN extends Translations$codeEditor$en {
 	@override late final Translations$codeEditor$diff$zh_CN diff = Translations$codeEditor$diff$zh_CN.internal(_root);
 	@override late final Translations$codeEditor$emptyState$zh_CN emptyState = Translations$codeEditor$emptyState$zh_CN.internal(_root);
 	@override late final Translations$codeEditor$toasts$zh_CN toasts = Translations$codeEditor$toasts$zh_CN.internal(_root);
+	@override late final Translations$codeEditor$quickOpen$zh_CN quickOpen = Translations$codeEditor$quickOpen$zh_CN.internal(_root);
 }
 
 // Path: common
@@ -1987,6 +1988,18 @@ class Translations$codeEditor$toasts$zh_CN extends Translations$codeEditor$toast
 	@override String get someSavesFailed => '部分保存失败';
 	@override String savedTo({required Object path}) => '已保存到 ${path}';
 	@override String get mergeApplied => '已应用合并 — 保存以保留更改';
+}
+
+// Path: codeEditor.quickOpen
+class Translations$codeEditor$quickOpen$zh_CN extends Translations$codeEditor$quickOpen$en {
+	Translations$codeEditor$quickOpen$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get tooltip => '转到文件 (Ctrl+P)';
+	@override String get hint => '按名称搜索文件';
+	@override String get empty => '没有匹配的文件';
 }
 
 // Path: common.buttons
@@ -9417,6 +9430,9 @@ extension on TranslationsZhCn {
 			'codeEditor.toasts.someSavesFailed' => '部分保存失败',
 			'codeEditor.toasts.savedTo' => ({required Object path}) => '已保存到 ${path}',
 			'codeEditor.toasts.mergeApplied' => '已应用合并 — 保存以保留更改',
+			'codeEditor.quickOpen.tooltip' => '转到文件 (Ctrl+P)',
+			'codeEditor.quickOpen.hint' => '按名称搜索文件',
+			'codeEditor.quickOpen.empty' => '没有匹配的文件',
 			'common.buttons.save' => '保存',
 			'common.buttons.cancel' => '取消',
 			'common.buttons.delete' => '删除',
@@ -9712,11 +9728,11 @@ extension on TranslationsZhCn {
 			'common.projectWizard.step1.kNew.title' => '新建工作区',
 			'common.projectWizard.step1.kNew.description' => '创建一个新工作区，可选择从 GitHub 仓库克隆',
 			'common.projectWizard.step2.existingPath' => '工作区路径',
+			_ => null,
+		} ?? switch (path) {
 			'common.projectWizard.step2.newPath' => '工作区路径',
 			'common.projectWizard.step2.existingPlaceholder' => '/path/to/existing/workspace',
 			'common.projectWizard.step2.newPlaceholder' => '/path/to/new/workspace',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.step2.existingHelp' => '您现有工作区目录的完整路径',
 			'common.projectWizard.step2.newHelp' => '工作区目录的完整路径',
 			'common.projectWizard.step2.githubUrl' => 'GitHub URL（可选）',
@@ -10226,11 +10242,11 @@ extension on TranslationsZhCn {
 			'settings.account.language' => '语言',
 			'settings.account.languageLabel' => '显示语言',
 			'settings.account.languageDescription' => '选择您偏好的界面语言',
+			_ => null,
+		} ?? switch (path) {
 			'settings.account.username' => '用户名',
 			'settings.account.email' => '邮箱',
 			'settings.account.profile' => '个人资料',
-			_ => null,
-		} ?? switch (path) {
 			'settings.account.changePassword' => '修改密码',
 			'settings.mcp.title' => 'MCP 服务器',
 			'settings.mcp.addServer' => '添加服务器',
@@ -10740,11 +10756,11 @@ extension on TranslationsZhCn {
 			'settings.browser.errors.loadStatus' => '加载 Browser 状态失败',
 			'settings.browser.errors.saveSettings' => '保存 Browser 设置失败',
 			'settings.browser.installHint' => '在代理创建 Browser 会话之前，请安装浏览器运行时。',
+			_ => null,
+		} ?? switch (path) {
 			'settings.browser.installRuntime' => '安装运行时',
 			'settings.browser.installed' => '已安装',
 			'settings.browser.installing' => '正在安装...',
-			_ => null,
-		} ?? switch (path) {
 			'settings.browser.missing' => '缺失',
 			'settings.browser.runtimeRequired' => '需要浏览器运行时',
 			'settings.browser.statusDisabled' => '已禁用',
@@ -11254,11 +11270,11 @@ extension on TranslationsZhCn {
 			'tasks.createTask.descriptionPlaceholder' => '可选详情',
 			'tasks.createTask.error' => '添加任务失败',
 			'tasks.createTask.priorityLabel' => '优先级',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.createTask.submit' => '添加任务',
 			'tasks.createTask.submitting' => '正在添加...',
 			'tasks.createTask.title' => '添加任务',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.createTask.titleLabel' => '标题',
 			'tasks.createTask.titlePlaceholder' => '需要做什么？',
 			'tasks.list.completedReopen' => '已完成（点击重新打开）',
@@ -11768,11 +11784,11 @@ extension on TranslationsZhCn {
 			'skills.addDialog.chooseFolder' => '选择文件夹',
 			'skills.addDialog.readyToInstall' => '可以安装',
 			'skills.addDialog.markdownFileMeta' => ({required Object size}) => 'Markdown 文件 · ${size}',
+			_ => null,
+		} ?? switch (path) {
 			'skills.addDialog.folderFilesMeta' => ({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '${count} 个文件 · ${size}', other: '${count} 个文件 · ${size}', ), 
 			'skills.addDialog.removeQueued' => ({required Object name}) => '移除 ${name}',
 			'skills.addDialog.whereWillThisInstall' => '将安装到何处？',
-			_ => null,
-		} ?? switch (path) {
 			'skills.addDialog.hideInstallLocation' => '隐藏安装位置',
 			'skills.addDialog.folderUploadsNote' => '文件夹上传会保留所选文件夹名称；单独文件使用 `SKILL.md` 中的 `name`。',
 			'skills.addDialog.installSkill' => '安装技能',

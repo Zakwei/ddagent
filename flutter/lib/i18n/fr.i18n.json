@@ -1006,6 +1006,11 @@
       "someSavesFailed": "Certains enregistrements ont échoué",
       "savedTo": "Enregistré dans {{path}}",
       "mergeApplied": "Fusion appliquée — enregistrez pour conserver"
+    },
+    "quickOpen": {
+      "tooltip": "Atteindre le fichier (Ctrl+P)",
+      "hint": "Rechercher des fichiers par nom",
+      "empty": "Aucun fichier correspondant"
     }
   },
   "common": {

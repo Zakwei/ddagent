@@ -183,6 +183,7 @@ class Translations$codeEditor$it extends Translations$codeEditor$en {
 	@override late final Translations$codeEditor$diff$it diff = Translations$codeEditor$diff$it._(_root);
 	@override late final Translations$codeEditor$emptyState$it emptyState = Translations$codeEditor$emptyState$it._(_root);
 	@override late final Translations$codeEditor$toasts$it toasts = Translations$codeEditor$toasts$it._(_root);
+	@override late final Translations$codeEditor$quickOpen$it quickOpen = Translations$codeEditor$quickOpen$it._(_root);
 }
 
 // Path: common
@@ -1997,6 +1998,18 @@ class Translations$codeEditor$toasts$it extends Translations$codeEditor$toasts$e
 	@override String get someSavesFailed => 'Alcuni salvataggi non riusciti';
 	@override String savedTo({required Object path}) => 'Salvato in ${path}';
 	@override String get mergeApplied => 'Merge applicato — salva per conservare le modifiche';
+}
+
+// Path: codeEditor.quickOpen
+class Translations$codeEditor$quickOpen$it extends Translations$codeEditor$quickOpen$en {
+	Translations$codeEditor$quickOpen$it._(TranslationsIt root) : this._root = root, super.internal(root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get tooltip => 'Vai al file (Ctrl+P)';
+	@override String get hint => 'Cerca file per nome';
+	@override String get empty => 'Nessun file corrispondente';
 }
 
 // Path: common.buttons
@@ -9428,6 +9441,9 @@ extension on TranslationsIt {
 			'codeEditor.toasts.someSavesFailed' => 'Alcuni salvataggi non riusciti',
 			'codeEditor.toasts.savedTo' => ({required Object path}) => 'Salvato in ${path}',
 			'codeEditor.toasts.mergeApplied' => 'Merge applicato — salva per conservare le modifiche',
+			'codeEditor.quickOpen.tooltip' => 'Vai al file (Ctrl+P)',
+			'codeEditor.quickOpen.hint' => 'Cerca file per nome',
+			'codeEditor.quickOpen.empty' => 'Nessun file corrispondente',
 			'common.buttons.save' => 'Salva',
 			'common.buttons.cancel' => 'Annulla',
 			'common.buttons.delete' => 'Elimina',
@@ -9723,11 +9739,11 @@ extension on TranslationsIt {
 			'common.projectWizard.step1.kNew.title' => 'Nuova area di lavoro',
 			'common.projectWizard.step1.kNew.description' => 'Crea una nuova area di lavoro, opzionalmente clonando da un repository GitHub',
 			'common.projectWizard.step2.existingPath' => 'Percorso area di lavoro',
+			_ => null,
+		} ?? switch (path) {
 			'common.projectWizard.step2.newPath' => 'Percorso area di lavoro',
 			'common.projectWizard.step2.existingPlaceholder' => '/percorso/area-di-lavoro/esistente',
 			'common.projectWizard.step2.newPlaceholder' => '/percorso/nuova/area-di-lavoro',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.step2.existingHelp' => 'Percorso completo della directory dell\'area di lavoro esistente',
 			'common.projectWizard.step2.newHelp' => 'Percorso completo della directory dell\'area di lavoro',
 			'common.projectWizard.step2.githubUrl' => 'URL GitHub (opzionale)',
@@ -10237,11 +10253,11 @@ extension on TranslationsIt {
 			'settings.account.language' => 'Lingua',
 			'settings.account.languageLabel' => 'Lingua dell\'interfaccia',
 			'settings.account.languageDescription' => 'Scegli la lingua preferita per l\'interfaccia',
+			_ => null,
+		} ?? switch (path) {
 			'settings.account.username' => 'Nome utente',
 			'settings.account.email' => 'Email',
 			'settings.account.profile' => 'Profilo',
-			_ => null,
-		} ?? switch (path) {
 			'settings.account.changePassword' => 'Cambia password',
 			'settings.mcp.title' => 'Server MCP',
 			'settings.mcp.addServer' => 'Aggiungi server',
@@ -10751,11 +10767,11 @@ extension on TranslationsIt {
 			'settings.browser.errors.loadStatus' => 'Impossibile caricare lo stato di Browser',
 			'settings.browser.errors.saveSettings' => 'Impossibile salvare le impostazioni di Browser',
 			'settings.browser.installHint' => 'Installa il runtime del browser prima che gli agenti possano creare sessioni Browser.',
+			_ => null,
+		} ?? switch (path) {
 			'settings.browser.installRuntime' => 'Installa runtime',
 			'settings.browser.installed' => 'installato',
 			'settings.browser.installing' => 'Installazione...',
-			_ => null,
-		} ?? switch (path) {
 			'settings.browser.missing' => 'mancante',
 			'settings.browser.runtimeRequired' => 'Runtime del browser richiesto',
 			'settings.browser.statusDisabled' => 'disabilitato',
@@ -11265,11 +11281,11 @@ extension on TranslationsIt {
 			'tasks.createTask.descriptionPlaceholder' => 'Dettagli opzionali',
 			'tasks.createTask.error' => 'Impossibile aggiungere l’attività',
 			'tasks.createTask.priorityLabel' => 'Priorità',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.createTask.submit' => 'Aggiungi attività',
 			'tasks.createTask.submitting' => 'Aggiunta...',
 			'tasks.createTask.title' => 'Aggiungi attività',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.createTask.titleLabel' => 'Titolo',
 			'tasks.createTask.titlePlaceholder' => 'Cosa va fatto?',
 			'tasks.list.completedReopen' => 'Completata (clicca per riaprire)',
@@ -11779,11 +11795,11 @@ extension on TranslationsIt {
 			'skills.addDialog.chooseFolder' => 'Scegli cartella',
 			'skills.addDialog.readyToInstall' => 'Pronto per l\'installazione',
 			'skills.addDialog.markdownFileMeta' => ({required Object size}) => 'File Markdown · ${size}',
+			_ => null,
+		} ?? switch (path) {
 			'skills.addDialog.folderFilesMeta' => ({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('it'))(count, one: '${count} file · ${size}', other: '${count} file · ${size}', ), 
 			'skills.addDialog.removeQueued' => ({required Object name}) => 'Rimuovi ${name}',
 			'skills.addDialog.whereWillThisInstall' => 'Dove verrà installato?',
-			_ => null,
-		} ?? switch (path) {
 			'skills.addDialog.hideInstallLocation' => 'Nascondi posizione di installazione',
 			'skills.addDialog.folderUploadsNote' => 'I caricamenti delle cartelle mantengono il nome della cartella selezionata; i file singoli usano il `name` in `SKILL.md`.',
 			'skills.addDialog.installSkill' => 'Installa Skill',

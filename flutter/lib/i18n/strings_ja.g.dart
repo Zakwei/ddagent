@@ -183,6 +183,7 @@ class Translations$codeEditor$ja extends Translations$codeEditor$en {
 	@override late final Translations$codeEditor$diff$ja diff = Translations$codeEditor$diff$ja._(_root);
 	@override late final Translations$codeEditor$emptyState$ja emptyState = Translations$codeEditor$emptyState$ja._(_root);
 	@override late final Translations$codeEditor$toasts$ja toasts = Translations$codeEditor$toasts$ja._(_root);
+	@override late final Translations$codeEditor$quickOpen$ja quickOpen = Translations$codeEditor$quickOpen$ja._(_root);
 }
 
 // Path: common
@@ -1987,6 +1988,18 @@ class Translations$codeEditor$toasts$ja extends Translations$codeEditor$toasts$e
 	@override String get someSavesFailed => '一部の保存に失敗しました';
 	@override String savedTo({required Object path}) => '${path} に保存しました';
 	@override String get mergeApplied => 'マージを適用しました — 保存して反映してください';
+}
+
+// Path: codeEditor.quickOpen
+class Translations$codeEditor$quickOpen$ja extends Translations$codeEditor$quickOpen$en {
+	Translations$codeEditor$quickOpen$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get tooltip => 'ファイルに移動 (Ctrl+P)';
+	@override String get hint => '名前でファイルを検索';
+	@override String get empty => '一致するファイルはありません';
 }
 
 // Path: common.buttons
@@ -9417,6 +9430,9 @@ extension on TranslationsJa {
 			'codeEditor.toasts.someSavesFailed' => '一部の保存に失敗しました',
 			'codeEditor.toasts.savedTo' => ({required Object path}) => '${path} に保存しました',
 			'codeEditor.toasts.mergeApplied' => 'マージを適用しました — 保存して反映してください',
+			'codeEditor.quickOpen.tooltip' => 'ファイルに移動 (Ctrl+P)',
+			'codeEditor.quickOpen.hint' => '名前でファイルを検索',
+			'codeEditor.quickOpen.empty' => '一致するファイルはありません',
 			'common.buttons.save' => '保存',
 			'common.buttons.cancel' => 'キャンセル',
 			'common.buttons.delete' => '削除',
@@ -9712,11 +9728,11 @@ extension on TranslationsJa {
 			'common.projectWizard.step1.kNew.title' => '新しいワークスペース',
 			'common.projectWizard.step1.kNew.description' => '新しいワークスペースを作成し、必要に応じてGitHubリポジトリからクローンする',
 			'common.projectWizard.step2.existingPath' => 'ワークスペースのパス',
+			_ => null,
+		} ?? switch (path) {
 			'common.projectWizard.step2.newPath' => 'ワークスペースのパス',
 			'common.projectWizard.step2.existingPlaceholder' => '/path/to/existing/workspace',
 			'common.projectWizard.step2.newPlaceholder' => '/path/to/new/workspace',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.step2.existingHelp' => '既存のワークスペースディレクトリのフルパス',
 			'common.projectWizard.step2.newHelp' => 'ワークスペースディレクトリのフルパス',
 			'common.projectWizard.step2.githubUrl' => 'GitHub URL（任意）',
@@ -10226,11 +10242,11 @@ extension on TranslationsJa {
 			'settings.account.language' => '言語',
 			'settings.account.languageLabel' => '表示言語',
 			'settings.account.languageDescription' => 'インターフェースの表示言語を選択してください',
+			_ => null,
+		} ?? switch (path) {
 			'settings.account.username' => 'ユーザー名',
 			'settings.account.email' => 'メールアドレス',
 			'settings.account.profile' => 'プロフィール',
-			_ => null,
-		} ?? switch (path) {
 			'settings.account.changePassword' => 'パスワードを変更',
 			'settings.mcp.title' => 'MCPサーバー',
 			'settings.mcp.addServer' => 'サーバーを追加',
@@ -10740,11 +10756,11 @@ extension on TranslationsJa {
 			'settings.browser.errors.loadStatus' => 'Browser ステータスの読み込みに失敗しました',
 			'settings.browser.errors.saveSettings' => 'Browser 設定の保存に失敗しました',
 			'settings.browser.installHint' => 'エージェントが Browser セッションを作成する前に、ブラウザランタイムをインストールしてください。',
+			_ => null,
+		} ?? switch (path) {
 			'settings.browser.installRuntime' => 'ランタイムをインストール',
 			'settings.browser.installed' => 'インストール済み',
 			'settings.browser.installing' => 'インストール中...',
-			_ => null,
-		} ?? switch (path) {
 			'settings.browser.missing' => '未インストール',
 			'settings.browser.runtimeRequired' => 'ブラウザランタイムが必要です',
 			'settings.browser.statusDisabled' => '無効',
@@ -11254,11 +11270,11 @@ extension on TranslationsJa {
 			'tasks.createTask.descriptionPlaceholder' => '任意の詳細',
 			'tasks.createTask.error' => 'タスクの追加に失敗しました',
 			'tasks.createTask.priorityLabel' => '優先度',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.createTask.submit' => 'タスクを追加',
 			'tasks.createTask.submitting' => '追加中...',
 			'tasks.createTask.title' => 'タスクを追加',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.createTask.titleLabel' => 'タイトル',
 			'tasks.createTask.titlePlaceholder' => '何をすべきですか？',
 			'tasks.list.completedReopen' => '完了（クリックで再開）',
@@ -11768,11 +11784,11 @@ extension on TranslationsJa {
 			'skills.addDialog.chooseFolder' => 'フォルダを選択',
 			'skills.addDialog.readyToInstall' => 'インストールの準備完了',
 			'skills.addDialog.markdownFileMeta' => ({required Object size}) => 'Markdownファイル · ${size}',
+			_ => null,
+		} ?? switch (path) {
 			'skills.addDialog.folderFilesMeta' => ({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ja'))(count, one: '${count} ファイル · ${size}', other: '${count} ファイル · ${size}', ), 
 			'skills.addDialog.removeQueued' => ({required Object name}) => '${name} を削除',
 			'skills.addDialog.whereWillThisInstall' => 'どこにインストールされますか？',
-			_ => null,
-		} ?? switch (path) {
 			'skills.addDialog.hideInstallLocation' => 'インストール先を非表示',
 			'skills.addDialog.folderUploadsNote' => 'フォルダをアップロードした場合は選択したフォルダ名が保持されます。単体ファイルの場合は `SKILL.md` の `name` が使用されます。',
 			'skills.addDialog.installSkill' => 'スキルをインストール',

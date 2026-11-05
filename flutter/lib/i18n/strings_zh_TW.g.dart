@@ -183,6 +183,7 @@ class Translations$codeEditor$zh_TW extends Translations$codeEditor$en {
 	@override late final Translations$codeEditor$diff$zh_TW diff = Translations$codeEditor$diff$zh_TW.internal(_root);
 	@override late final Translations$codeEditor$emptyState$zh_TW emptyState = Translations$codeEditor$emptyState$zh_TW.internal(_root);
 	@override late final Translations$codeEditor$toasts$zh_TW toasts = Translations$codeEditor$toasts$zh_TW.internal(_root);
+	@override late final Translations$codeEditor$quickOpen$zh_TW quickOpen = Translations$codeEditor$quickOpen$zh_TW.internal(_root);
 }
 
 // Path: common
@@ -1987,6 +1988,18 @@ class Translations$codeEditor$toasts$zh_TW extends Translations$codeEditor$toast
 	@override String get someSavesFailed => '部分儲存失敗';
 	@override String savedTo({required Object path}) => '已儲存至 ${path}';
 	@override String get mergeApplied => '已套用合併 — 儲存以保留變更';
+}
+
+// Path: codeEditor.quickOpen
+class Translations$codeEditor$quickOpen$zh_TW extends Translations$codeEditor$quickOpen$en {
+	Translations$codeEditor$quickOpen$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get tooltip => '前往檔案 (Ctrl+P)';
+	@override String get hint => '依名稱搜尋檔案';
+	@override String get empty => '沒有相符的檔案';
 }
 
 // Path: common.buttons
@@ -9417,6 +9430,9 @@ extension on TranslationsZhTw {
 			'codeEditor.toasts.someSavesFailed' => '部分儲存失敗',
 			'codeEditor.toasts.savedTo' => ({required Object path}) => '已儲存至 ${path}',
 			'codeEditor.toasts.mergeApplied' => '已套用合併 — 儲存以保留變更',
+			'codeEditor.quickOpen.tooltip' => '前往檔案 (Ctrl+P)',
+			'codeEditor.quickOpen.hint' => '依名稱搜尋檔案',
+			'codeEditor.quickOpen.empty' => '沒有相符的檔案',
 			'common.buttons.save' => '儲存',
 			'common.buttons.cancel' => '取消',
 			'common.buttons.delete' => '刪除',
@@ -9712,11 +9728,11 @@ extension on TranslationsZhTw {
 			'common.projectWizard.step1.kNew.title' => '新建工作區',
 			'common.projectWizard.step1.kNew.description' => '建立新工作區，可選擇從 GitHub 儲存庫複製',
 			'common.projectWizard.step2.existingPath' => '工作區路徑',
+			_ => null,
+		} ?? switch (path) {
 			'common.projectWizard.step2.newPath' => '工作區路徑',
 			'common.projectWizard.step2.existingPlaceholder' => '/path/to/existing/workspace',
 			'common.projectWizard.step2.newPlaceholder' => '/path/to/new/workspace',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.step2.existingHelp' => '您現有工作區目錄的完整路徑',
 			'common.projectWizard.step2.newHelp' => '工作區目錄的完整路徑',
 			'common.projectWizard.step2.githubUrl' => 'GitHub URL（選填）',
@@ -10226,11 +10242,11 @@ extension on TranslationsZhTw {
 			'settings.account.language' => '語言',
 			'settings.account.languageLabel' => '顯示語言',
 			'settings.account.languageDescription' => '選擇您偏好的介面語言',
+			_ => null,
+		} ?? switch (path) {
 			'settings.account.username' => '使用者名稱',
 			'settings.account.email' => '電子郵件',
 			'settings.account.profile' => '個人檔案',
-			_ => null,
-		} ?? switch (path) {
 			'settings.account.changePassword' => '變更密碼',
 			'settings.mcp.title' => 'MCP 伺服器',
 			'settings.mcp.addServer' => '新增伺服器',
@@ -10740,11 +10756,11 @@ extension on TranslationsZhTw {
 			'settings.browser.errors.loadStatus' => '載入 Browser 狀態失敗',
 			'settings.browser.errors.saveSettings' => '儲存 Browser 設定失敗',
 			'settings.browser.installHint' => '在代理建立 Browser 工作階段之前，請安裝瀏覽器執行環境。',
+			_ => null,
+		} ?? switch (path) {
 			'settings.browser.installRuntime' => '安裝執行環境',
 			'settings.browser.installed' => '已安裝',
 			'settings.browser.installing' => '正在安裝...',
-			_ => null,
-		} ?? switch (path) {
 			'settings.browser.missing' => '缺失',
 			'settings.browser.runtimeRequired' => '需要瀏覽器執行環境',
 			'settings.browser.statusDisabled' => '已停用',
@@ -11254,11 +11270,11 @@ extension on TranslationsZhTw {
 			'tasks.createTask.descriptionPlaceholder' => '可選詳情',
 			'tasks.createTask.error' => '新增任務失敗',
 			'tasks.createTask.priorityLabel' => '優先級',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.createTask.submit' => '新增任務',
 			'tasks.createTask.submitting' => '正在新增...',
 			'tasks.createTask.title' => '新增任務',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.createTask.titleLabel' => '標題',
 			'tasks.createTask.titlePlaceholder' => '需要做什麼？',
 			'tasks.list.completedReopen' => '已完成（點擊重新開啟）',
@@ -11768,11 +11784,11 @@ extension on TranslationsZhTw {
 			'skills.addDialog.chooseFolder' => '選擇資料夾',
 			'skills.addDialog.readyToInstall' => '可以安裝了',
 			'skills.addDialog.markdownFileMeta' => ({required Object size}) => 'Markdown 檔案 · ${size}',
+			_ => null,
+		} ?? switch (path) {
 			'skills.addDialog.folderFilesMeta' => ({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(count, one: '${count} 個檔案 · ${size}', other: '${count} 個檔案 · ${size}', ), 
 			'skills.addDialog.removeQueued' => ({required Object name}) => '移除 ${name}',
 			'skills.addDialog.whereWillThisInstall' => '這會安裝到哪裡？',
-			_ => null,
-		} ?? switch (path) {
 			'skills.addDialog.hideInstallLocation' => '隱藏安裝位置',
 			'skills.addDialog.folderUploadsNote' => '資料夾上傳會保留所選資料夾名稱；獨立檔案則使用 `SKILL.md` 中的 `name`。',
 			'skills.addDialog.installSkill' => '安裝技能',

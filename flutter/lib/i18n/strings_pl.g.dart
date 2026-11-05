@@ -183,6 +183,7 @@ class Translations$codeEditor$pl extends Translations$codeEditor$en {
 	@override late final Translations$codeEditor$diff$pl diff = Translations$codeEditor$diff$pl._(_root);
 	@override late final Translations$codeEditor$emptyState$pl emptyState = Translations$codeEditor$emptyState$pl._(_root);
 	@override late final Translations$codeEditor$toasts$pl toasts = Translations$codeEditor$toasts$pl._(_root);
+	@override late final Translations$codeEditor$quickOpen$pl quickOpen = Translations$codeEditor$quickOpen$pl._(_root);
 }
 
 // Path: common
@@ -2019,6 +2020,18 @@ class Translations$codeEditor$toasts$pl extends Translations$codeEditor$toasts$e
 	@override String get someSavesFailed => 'Nie udało się zapisać niektórych plików';
 	@override String savedTo({required Object path}) => 'Zapisano w ${path}';
 	@override String get mergeApplied => 'Scalanie zastosowane — zapisz, aby zachować zmiany';
+}
+
+// Path: codeEditor.quickOpen
+class Translations$codeEditor$quickOpen$pl extends Translations$codeEditor$quickOpen$en {
+	Translations$codeEditor$quickOpen$pl._(TranslationsPl root) : this._root = root, super.internal(root);
+
+	final TranslationsPl _root; // ignore: unused_field
+
+	// Translations
+	@override String get tooltip => 'Przejdź do pliku (Ctrl+P)';
+	@override String get hint => 'Szukaj plików po nazwie';
+	@override String get empty => 'Brak pasujących plików';
 }
 
 // Path: common.buttons
@@ -9468,6 +9481,9 @@ extension on TranslationsPl {
 			'codeEditor.toasts.someSavesFailed' => 'Nie udało się zapisać niektórych plików',
 			'codeEditor.toasts.savedTo' => ({required Object path}) => 'Zapisano w ${path}',
 			'codeEditor.toasts.mergeApplied' => 'Scalanie zastosowane — zapisz, aby zachować zmiany',
+			'codeEditor.quickOpen.tooltip' => 'Przejdź do pliku (Ctrl+P)',
+			'codeEditor.quickOpen.hint' => 'Szukaj plików po nazwie',
+			'codeEditor.quickOpen.empty' => 'Brak pasujących plików',
 			'common.buttons.save' => 'Zapisz',
 			'common.buttons.cancel' => 'Anuluj',
 			'common.buttons.delete' => 'Usuń',
@@ -9763,11 +9779,11 @@ extension on TranslationsPl {
 			'common.projectWizard.step1.kNew.title' => 'Nowy obszar roboczy',
 			'common.projectWizard.step1.kNew.description' => 'Utwórz nowy obszar roboczy, opcjonalnie sklonuj z repozytorium GitHub',
 			'common.projectWizard.step2.existingPath' => 'Ścieżka obszaru roboczego',
+			_ => null,
+		} ?? switch (path) {
 			'common.projectWizard.step2.newPath' => 'Ścieżka obszaru roboczego',
 			'common.projectWizard.step2.existingPlaceholder' => '/path/to/existing/workspace',
 			'common.projectWizard.step2.newPlaceholder' => '/path/to/new/workspace',
-			_ => null,
-		} ?? switch (path) {
 			'common.projectWizard.step2.existingHelp' => 'Pełna ścieżka do istniejącego katalogu obszaru roboczego',
 			'common.projectWizard.step2.newHelp' => 'Pełna ścieżka do katalogu obszaru roboczego',
 			'common.projectWizard.step2.githubUrl' => 'Adres URL GitHub (opcjonalnie)',
@@ -10277,11 +10293,11 @@ extension on TranslationsPl {
 			'settings.account.language' => 'Język',
 			'settings.account.languageLabel' => 'Język interfejsu',
 			'settings.account.languageDescription' => 'Wybierz preferowany język interfejsu',
+			_ => null,
+		} ?? switch (path) {
 			'settings.account.username' => 'Nazwa użytkownika',
 			'settings.account.email' => 'E-mail',
 			'settings.account.profile' => 'Profil',
-			_ => null,
-		} ?? switch (path) {
 			'settings.account.changePassword' => 'Zmień hasło',
 			'settings.mcp.title' => 'Serwery MCP',
 			'settings.mcp.addServer' => 'Dodaj serwer',
@@ -10791,11 +10807,11 @@ extension on TranslationsPl {
 			'settings.browser.errors.loadStatus' => 'Nie udało się załadować statusu Browser',
 			'settings.browser.errors.saveSettings' => 'Nie udało się zapisać ustawień Browser',
 			'settings.browser.installHint' => 'Zainstaluj środowisko przeglądarki, zanim agenci będą mogli tworzyć sesje Browser.',
+			_ => null,
+		} ?? switch (path) {
 			'settings.browser.installRuntime' => 'Zainstaluj środowisko',
 			'settings.browser.installed' => 'zainstalowane',
 			'settings.browser.installing' => 'Instalowanie...',
-			_ => null,
-		} ?? switch (path) {
 			'settings.browser.missing' => 'brak',
 			'settings.browser.runtimeRequired' => 'Wymagane środowisko przeglądarki',
 			'settings.browser.statusDisabled' => 'wyłączony',
@@ -11305,11 +11321,11 @@ extension on TranslationsPl {
 			'tasks.createTask.descriptionPlaceholder' => 'Opcjonalne szczegóły',
 			'tasks.createTask.error' => 'Nie udało się dodać zadania',
 			'tasks.createTask.priorityLabel' => 'Priorytet',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.createTask.submit' => 'Dodaj zadanie',
 			'tasks.createTask.submitting' => 'Dodawanie...',
 			'tasks.createTask.title' => 'Dodaj zadanie',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.createTask.titleLabel' => 'Tytuł',
 			'tasks.createTask.titlePlaceholder' => 'Co trzeba zrobić?',
 			'tasks.list.completedReopen' => 'Ukończone (kliknij, aby ponownie otworzyć)',
@@ -11819,11 +11835,11 @@ extension on TranslationsPl {
 			'skills.addDialog.chooseFolder' => 'Wybierz folder',
 			'skills.addDialog.readyToInstall' => 'Gotowe do instalacji',
 			'skills.addDialog.markdownFileMeta' => ({required Object size}) => 'Plik Markdown · ${size}',
+			_ => null,
+		} ?? switch (path) {
 			'skills.addDialog.folderFilesMeta' => ({required num count, required Object size}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('pl'))(count, one: '${count} plik · ${size}', other: '${count} plików · ${size}', ), 
 			'skills.addDialog.removeQueued' => ({required Object name}) => 'Usuń ${name}',
 			'skills.addDialog.whereWillThisInstall' => 'Gdzie to zostanie zainstalowane?',
-			_ => null,
-		} ?? switch (path) {
 			'skills.addDialog.hideInstallLocation' => 'Ukryj lokalizację instalacji',
 			'skills.addDialog.folderUploadsNote' => 'Przesyłanie folderu zachowuje nazwę wybranego folderu; pojedyncze pliki używają `name` z `SKILL.md`.',
 			'skills.addDialog.installSkill' => 'Zainstaluj skill',

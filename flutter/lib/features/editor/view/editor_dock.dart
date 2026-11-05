@@ -13,9 +13,18 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 /// Left dock of the editor: Changed Files (git status, tap → open + diff)
 /// above the VS Code-style project explorer.
 class EditorDock extends ConsumerStatefulWidget {
-  const EditorDock({super.key, required this.projectId, required this.onOpenFile, this.activePath});
+  const EditorDock({
+    super.key,
+    required this.projectId,
+    required this.onOpenFile,
+    this.activePath,
+    this.width = 260,
+  });
 
   final String projectId;
+
+  /// Fixed width beside the editor; the narrow editor's slide-over passes its own.
+  final double width;
 
   /// Open `path` in a tab; `diff: true` also opens the git diff surface.
   final void Function(String path, {bool diff}) onOpenFile;
@@ -46,7 +55,7 @@ class _EditorDockState extends ConsumerState<EditorDock> {
         .where((p) => p.projectId == widget.projectId)
         .firstOrNull;
     return Container(
-      width: 260,
+      width: widget.width,
       decoration: BoxDecoration(
         border: Border(right: BorderSide(color: c.border)),
       ),

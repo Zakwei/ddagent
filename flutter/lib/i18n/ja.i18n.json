@@ -996,6 +996,11 @@
       "someSavesFailed": "一部の保存に失敗しました",
       "savedTo": "{{path}} に保存しました",
       "mergeApplied": "マージを適用しました — 保存して反映してください"
+    },
+    "quickOpen": {
+      "tooltip": "ファイルに移動 (Ctrl+P)",
+      "hint": "名前でファイルを検索",
+      "empty": "一致するファイルはありません"
     }
   },
   "common": {

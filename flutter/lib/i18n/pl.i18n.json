@@ -1036,6 +1036,11 @@
       "someSavesFailed": "Nie udało się zapisać niektórych plików",
       "savedTo": "Zapisano w {{path}}",
       "mergeApplied": "Scalanie zastosowane — zapisz, aby zachować zmiany"
+    },
+    "quickOpen": {
+      "tooltip": "Przejdź do pliku (Ctrl+P)",
+      "hint": "Szukaj plików po nazwie",
+      "empty": "Brak pasujących plików"
     }
   },
   "common": {

@@ -996,6 +996,11 @@
       "someSavesFailed": "部分保存失败",
       "savedTo": "已保存到 {{path}}",
       "mergeApplied": "已应用合并 — 保存以保留更改"
+    },
+    "quickOpen": {
+      "tooltip": "转到文件 (Ctrl+P)",
+      "hint": "按名称搜索文件",
+      "empty": "没有匹配的文件"
     }
   },
   "common": {
